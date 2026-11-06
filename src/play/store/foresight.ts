@@ -8,7 +8,7 @@
 import { ruleCause } from "../../rules/core/cause.ts";
 import { stagingOf } from "../../rules/families/breaking/areas.ts";
 import { declaredDefenders, pooledDefense, standingDefenders } from "../../rules/families/defense/defenders.ts";
-import { modifiedStat, placeDamage } from "../../rules/core/keywords.ts";
+import { destroyCard, modifiedStat, placeDamage } from "../../rules/core/keywords.ts";
 import { engagementCostOf, engagementForecast } from "../../rules/quest/quest.ts";
 import type { EngineStep, ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 import { flagged, inPlay, livingSeats } from "../../rules/core/state.ts";
@@ -29,6 +29,12 @@ const MOST = 20;
 function place(game: ScenarioState, ctx: ReduceContext, cardId: string, amount: number): ScenarioState {
   const steps: EngineStep[] = [];
   return placeDamage(game, cardId, amount, ctx.cards, steps, "combat", ruleCause("rr.step-6-4-4"));
+}
+
+/** Whether discarding a card from play would lose the game now (a hero who carries Wormsbane, the One Ring's bearer): the reason, or null. */
+export function discardLoss(game: ScenarioState, ctx: ReduceContext, cardId: string): string | null {
+  const after = destroyCard(game, cardId, ctx.cards, []);
+  return after.lost && !game.lost ? (after.lossReason ?? "The game is lost") : null;
 }
 
 /** What placing `damage` combat damage on a card would do now. */

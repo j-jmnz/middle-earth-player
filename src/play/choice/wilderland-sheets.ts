@@ -3,7 +3,7 @@ import type { Instruction } from "../../catalog/boundary.ts";
 import { pickCandidates } from "../../rules/interpret/pick.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 
-import { damageOutcome } from "../store/foresight.ts";
+import { damageOutcome, discardLoss } from "../store/foresight.ts";
 import { framsburgBranchCaution } from "../words/framsburg.ts";
 
 /** "Tap again: Beorn is destroyed" for a branch that deals damage to each card its filter finds, when that destroys one; null otherwise. The game is lost when the card's leaving loses it (damageOutcome). Deadly Cold (19021:A:1) deals its damage to the one character `picked`. */
@@ -26,8 +26,9 @@ export function branchCaution(game: ScenarioState, ctx: ReduceContext, choose: E
   return `Tap again: ${gone.length === 1 ? `${gone[0]} is` : `${gone.slice(0, -1).join(", ")} and ${gone.at(-1)} are`} destroyed`;
 }
 
-/** Eyes in the Dark (18057:A:2): "Tap again: Aragorn is discarded" on the row of a questing hero the player may discard; undefined for a pick of any other card and for an ally. */
-export function discardCaution(game: ScenarioState, source: string | null, pick: Instruction, next: Instruction | undefined, id: string, name: (id: string) => string): string | undefined {
+/** Eyes in the Dark (18057:A:2): "Tap again: Aragorn is discarded" on the row of a questing hero the player may discard, "... is discarded and the game is lost" when his leaving play loses it (damageOutcome's reading of the engine); undefined for a pick of any other card and for an ally. */
+export function discardCaution(game: ScenarioState, ctx: ReduceContext, source: string | null, pick: Instruction, next: Instruction | undefined, id: string, name: (id: string) => string): string | undefined {
   if (source == null || game.cards[source]?.code !== "18057" || pick.verb !== "Pick" || next?.verb !== "Discard") return undefined;
-  return game.cards[id]?.zone === "heroes" ? `Tap again: ${name(id)} is discarded` : undefined;
+  if (game.cards[id]?.zone !== "heroes") return undefined;
+  return discardLoss(game, ctx, id) ? `Tap again: ${name(id)} is discarded and the game is lost` : `Tap again: ${name(id)} is discarded`;
 }

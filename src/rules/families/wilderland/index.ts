@@ -23,7 +23,7 @@ import { setAsideDiscardForPool } from "./discard-pool.ts";
 import { flipOver } from "./flip.ts";
 import { bypassStage, flipCurrentQuest, flipInPlace, searchQuestDeck } from "./gundabad.ts";
 import { activateFromCaves, attachTreasuresToHost, stageRandomDiscarded } from "./gundabad-cards.ts";
-import { noteTreacheryReveal, phasePlaysBarred } from "./rounds.ts";
+import { noteTreacheryReveal, phasePlayRefusal, phasePlaysBarred } from "./rounds.ts";
 import { advanceToRandomStage, claimFreed, flipToEnemySide, guardReturnedBy, putTrust } from "./rhovanion.ts";
 import { addSourceToHandOfMost } from "./hand.ts";
 import { advanceToLetterStage, grantSurge, freeTreasures, searchGuardForTreasure, takeControlOfSetAside } from "./mirkwood.ts";
@@ -153,7 +153,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "SearchQuestDeck":
       return searchQuestDeck(state, instruction, focus, ctx, steps);
     case "FlipInPlace":
-      return flipInPlace(state, instruction);
+      return flipInPlace(state, instruction, ctx, steps);
     case "ActivateFromCaves":
       return activateFromCaves(state, instruction, focus, ctx, steps);
     case "StageRandomDiscarded":
@@ -210,6 +210,7 @@ export const manifest: RulesFamily = {
   pick: wilderlandPickMatches,
   optionalEngage: optionalEngageBarred,
   play: phasePlaysBarred,
+  playReason: phasePlayRefusal,
   revealed: noteTreacheryReveal,
   combat: NIGHT_COMBAT,
   // The Evil Creatures deck runs out: its own discard pile is shuffled back into it at once (emce.evil-creatures-deck).

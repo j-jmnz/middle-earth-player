@@ -11,14 +11,13 @@ import { topFrame } from "../../rules/windows/windows.ts";
 
 import type { BranchNow } from "./aflame.ts";
 import type { ChoiceNames, PickWords } from "./choice.ts";
+import { plural } from "./list.ts";
 
 /** The name every Lost Island shows, whatever its other side is called (dcce.uncharted): the side that lies face up hides which location it is. */
 export const LOST_ISLAND_NAME = "Lost Island";
 
 /** The name the Temple column's locations of the Island Map show while they lie Uncharted side up (dcce.island-map): their other side is Temple Halls or The Grotto's Entrance. Their Uncharted side is the one that prints a Threat (4) of its own. */
 export const TEMPLE_NAME = "Temple of the Deceived";
-
-const plural = (count: number, one: string, many: string): string => `${count} ${count === 1 ? one : many}`;
 
 const ordinal = (n: number): string => {
   const mod = n % 100;

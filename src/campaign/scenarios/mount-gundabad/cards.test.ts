@@ -304,6 +304,15 @@ describe("19122 The First Forge", () => {
     expect(worms[0]?.zone).toBe("play");
   });
 
+  it("19122:A:3 the Reforged side is Restricted: flipped onto a hero who carries two Restricted attachments already, one of the three is discarded (rr.restricted)", () => {
+    const t = forge({ phase: "Quest", staging: [], active: CODES.theFirstForge, attached: [{ code: CODES.wormsbane }, { code: "12197", to: "hero2" }, { code: "12200", to: "hero2" }] });
+    const restricted = (state: ScenarioState, id: string) => state.cards[id]?.attachments.filter((other) => t.ctx.cards.get(state.cards[other]?.code ?? "")?.keywords.restricted).length ?? 0;
+    expect(restricted(t.state, t.hero2)).toBe(2);
+    const explored = explore(t);
+    const run = answerAll(send({ state: explored, steps: [] }, offerOf(explored, t, idOf(t.state, CODES.theFirstForge)) as never, t.ctx), t, (state) => (state.window?.kind === "choose" ? (state.window.options.find((id) => id === t.hero2) ?? state.window.options[0] ?? "") : ""));
+    expect(restricted(run.state, t.hero2)).toBe(2);
+  });
+
   it("19122:A:3 the first player may attach it to a hero of another player", () => {
     const t = forge({ phase: "Quest", staging: [], active: CODES.theFirstForge, seats: 2 });
     const explored = explore(t);

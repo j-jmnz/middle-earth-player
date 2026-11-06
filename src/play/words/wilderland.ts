@@ -16,7 +16,7 @@ import type { BranchNow } from "./aflame.ts";
 import type { ChoiceNames, PickWords } from "./choice.ts";
 import { heathAsk, heathBranchWords, heathChooseNote, heathOptionLabel } from "./heath.ts";
 import { framsburgAsk, framsburgBranchNow, framsburgBranchWords, framsburgChooseNote } from "./framsburg.ts";
-import { gundabadAsk, gundabadBranchWords, gundabadChooseNote } from "./gundabad.ts";
+import { dragonSicknessAsk, gundabadAsk, gundabadBranchWords, gundabadChooseNote } from "./gundabad.ts";
 import { nightAsk, nightBranchWords, nightChooseNote, nightQuestsNow } from "./night.ts";
 import { rhovanionAsk, rhovanionBranchWords, rhovanionChooseNote } from "./rhovanion.ts";
 import { askedSeat, seatSays } from "./seat.ts";
@@ -83,7 +83,7 @@ export function wilderlandChooseNote(choose: Extract<Instruction, { verb: "Choos
     const text = `distribute ${damage} damage among characters you control? If you do, ${source ? names.card(source) : "this card"} is shuffled into the encounter deck.`;
     return game.seatCount > 1 ? `Player ${(seat ?? game.firstPlayer) + 1}: ${text}` : `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
   }
-  const heath = heathChooseNote(choose, game, names) ?? rhovanionChooseNote(choose, game, ctx, names, claimed) ?? nightChooseNote(choose, game, ctx, names, source) ?? framsburgChooseNote(choose, game, ctx, names, source) ?? gundabadChooseNote(choose, game, names, source);
+  const heath = heathChooseNote(choose, game, names) ?? rhovanionChooseNote(choose, game, ctx, names, claimed) ?? nightChooseNote(choose, game, ctx, names, source) ?? framsburgChooseNote(choose, game, ctx, names, source) ?? gundabadChooseNote(choose, game, ctx, names, source);
   if (heath) return heath;
   const offer = searchOffer(choose);
   if (!offer) return null;
@@ -133,7 +133,7 @@ export function wilderlandAsk(instruction: Instruction, source: string | null, n
   }
   const kings = kingsQuestAsk(instruction, source, names, next, facts);
   if (kings) return kings;
-  const heath = heathAsk(instruction, source, names, next, facts) ?? rhovanionAsk(instruction, source, names, next, facts) ?? nightAsk(instruction, source, names, next, facts) ?? framsburgAsk(instruction, source, names, next, facts) ?? gundabadAsk(instruction, source, names, next, facts?.game);
+  const heath = heathAsk(instruction, source, names, next, facts) ?? rhovanionAsk(instruction, source, names, next, facts) ?? nightAsk(instruction, source, names, next, facts) ?? framsburgAsk(instruction, source, names, next, facts) ?? dragonSicknessAsk(instruction, source, names, next) ?? gundabadAsk(instruction, source, names, next, facts?.game, facts?.ctx);
   if (heath) return heath;
   if (instruction.verb !== "AttachRandomTreasure") return null;
   const choose = `Choose 1 of ${drawn} random undiscovered treasures to attach as a guarded objective.`;

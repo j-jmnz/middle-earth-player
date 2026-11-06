@@ -2,7 +2,11 @@
 // printing. A side quest reads "Side quest"; an encounter card has no sphere ("Enemy"). Pure.
 import type { PrintedCard } from "../../rules/core/printed.ts";
 
-const capital = (word: string) => `${word.slice(0, 1).toUpperCase()}${word.slice(1)}`;
+/** The text with its first letter capitalized. */
+export const capital = (text: string): string => `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
+
+/** "1 stage", "3 stages"; `many` when the plural is not the word with an s ("1 ally", "2 allies"). */
+export const plural = (count: number, one: string, many = `${one}s`): string => `${count} ${count === 1 ? one : many}`;
 
 /** "Event · Tactics", or null when the printing is not known. */
 export function kindWords(printed: Pick<PrintedCard, "type" | "sphere"> | undefined): string | null {

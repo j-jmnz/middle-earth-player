@@ -13,6 +13,7 @@ import { attackPickWords, attackWords } from "./attack.ts";
 import { assignDamageWords, southWords } from "./south.ts";
 import { moriaBranchWords, moriaPickWords, moriaWords } from "./moria.ts";
 import { burdenBranchWords, burdenPickWords, burdenWords } from "./burden.ts";
+import { capital } from "./list.ts";
 import { miscPickWords, miscWords } from "./misc.ts";
 import { playPickWords, playWords } from "./play.ts";
 import { dungeonWords } from "./dungeon.ts";
@@ -45,10 +46,6 @@ const PLURALS: Readonly<Record<string, string>> = { hero: "heroes", ally: "allie
 
 function article(noun: string): string {
   return /^[aeiou]/.test(noun) ? `an ${noun}` : `a ${noun}`;
-}
-
-function capital(text: string): string {
-  return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 // A record's amount in words: its number, or X when the engine reads it.

@@ -60,6 +60,8 @@ export type ResolutionView =
       songs?: true;
       // What the instructions after this choice do to the campaign pool, in words (12193:B:4, 12193:B:5): told with the choice, since confirming it runs them.
       then?: readonly string[];
+      // The same for the decline tile: what follows when no treasure is taken.
+      thenDeclined?: readonly string[];
     }
   | {
       kind: "settled";
@@ -237,7 +239,10 @@ export function resolutionView(state: ScenarioState, world: World, logged: reado
     const card = state.resolutionLog.earned.find((item) => item.step === window.step && item.seat === seat);
     return { seat, words: card ? cardWords(world, { code: card.code, hero: card.hero, seat }) : `No ${noun}` };
   });
-  const then = afterwardsWords(state, window.step, (code) => nameOf(world, code));
+  // The treasure tapped counts toward the log; declining it leaves the log as it is (the sentence of the decline tile).
+  const taking = instruction.verb === "ChooseRandomTreasure";
+  const then = afterwardsWords(state, window.step, (code) => nameOf(world, code), world.cards, taking);
+  const thenDeclined = taking ? afterwardsWords(state, window.step, (code) => nameOf(world, code), world.cards, false) : then;
   return {
     kind: "choosing",
     step: window.step,
@@ -254,6 +259,7 @@ export function resolutionView(state: ScenarioState, world: World, logged: reado
     later: instruction.verb === "BoonAllyOrLogLine" ? ALLY_LINE_FACTS[instruction.line].later : null,
     answered,
     ...(then.length > 0 ? { then } : {}),
+    ...(thenDeclined.length > 0 ? { thenDeclined } : {}),
     tiles,
     decline,
     to: instruction.verb === "NameCaptives" ? "captive" : instruction.verb === "BoonAllyOrLogLine" ? "ally" : instruction.verb === "RemoveFromPool" ? "removal" : instruction.verb === "ChooseStagedLocationForPool" ? "location" : instruction.verb === "ChooseRandomTreasure" ? "treasure" : instruction.verb === "ChooseHazardForPool" ? "hazard" : instruction.to,
@@ -265,7 +271,8 @@ const orList = (items: readonly string[]): string => (items.length < 3 ? items.j
 /** The sentence above Confirm: what choosing this tile writes, and what the instructions after it do to the campaign pool. */
 export function choiceSentence(view: Extract<ResolutionView, { kind: "choosing" }>, tile: ResolutionTile): string {
   const sentence = choiceCore(view, tile);
-  return view.then && tile.optionId !== SKIP ? `${sentence} ${view.then.join(" ")}` : sentence;
+  const after = tile.optionId === SKIP ? view.thenDeclined : view.then;
+  return after && after.length > 0 ? `${sentence} ${after.join(" ")}` : sentence;
 }
 
 function choiceCore(view: Extract<ResolutionView, { kind: "choosing" }>, tile: ResolutionTile): string {

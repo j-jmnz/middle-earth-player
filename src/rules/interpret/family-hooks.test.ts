@@ -9,7 +9,7 @@ import { legalTargets } from "../engine/legal.ts";
 import { playBlocked } from "../families/sidequests/contract.ts";
 import { forcedTravel, travelCostUnpayable } from "./restrictions.ts";
 import type { RulesFamily } from "./family-manifest.ts";
-import { familyAmount, familyAttached, familyAttackReason, familyDefenseReason, familyForcedTravel, familyPlayBarred, familyUndefendedTargets, familyCondition, familyMayTravel, familyPickMatches, familyTravelCost, familyTravelReach, familyTravelUnpayable, runSettle, settleHooks, withFamilies } from "./family-hooks.ts";
+import { familyAmount, familyAttached, familyAttackReason, familyDefenseReason, familyForcedTravel, familyPlayBarred, familyPlayRefusal, familyUndefendedTargets, familyCondition, familyMayTravel, familyPickMatches, familyTravelCost, familyTravelReach, familyTravelUnpayable, runSettle, settleHooks, withFamilies } from "./family-hooks.ts";
 import { resolveAmount } from "./amounts.ts";
 import { holds } from "./conditions.ts";
 import { matchesPick } from "./pick.ts";
@@ -103,6 +103,16 @@ describe("play hooks", () => {
     expect(playBlocked(held, id, 0, ctx)).toBe(false);
     expect(withFamilies([family("a", { play: () => true })], () => playBlocked(held, id, 0, ctx))).toBe(true);
     expect(withFamilies([family("a", { play: () => true })], () => playBlocked(held, id, 0, ctx, true))).toBe(true);
+    // The hook is told whether the card is being put into play.
+    const putOnly = family("a", { play: (_state, _card, _ctx, how) => how.putting === true });
+    expect(familyPlayBarred(held, id, ctx, [putOnly])).toBe(false);
+    expect(familyPlayBarred(held, id, ctx, [putOnly], { putting: true })).toBe(true);
+  });
+
+  it("say why a family bars a play, the first family that has words winning", () => {
+    const { state: held, id } = spawn(state, "h1", { zone: "hand", seat: 0 });
+    expect(familyPlayRefusal(held, id, ctx, [family("a")])).toBeNull();
+    expect(familyPlayRefusal(held, id, ctx, [family("a", { playReason: () => null }), family("b", { playReason: () => "Not now" }), family("c", { playReason: () => "Never" })])).toBe("Not now");
   });
 });
 

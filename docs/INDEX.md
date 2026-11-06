@@ -59,7 +59,7 @@ Read the sections your task touches.
   - 350–355 Catalog build (~410)
   - 356–371 Tests (~1.3K) ← 3
   - 372–387 Performance (~1.2K) ← 3
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~79.5K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~79.9K tok)
   - 17–38 Sections (~410)
   - 39–50 Product (~530)
   - 51–64 Non-goals (~560)
@@ -92,7 +92,7 @@ Read the sections your task touches.
     - 595–609 The Oath (~2.3K)
     - 610–627 The Caves of Nibin-Dûm (~2.3K)
   - 628–685 Dream-chaser (~15.7K)
-  - 686–711 Ered Mithrin (~13.9K) ← 2
+  - 686–711 Ered Mithrin (~14.3K) ← 2
   - 712–720 Nightmare (~420)
   - 721–759 Deckbuilding (~1.8K) ← 1
   - 760–838 Effects (~3.2K)
@@ -180,15 +180,15 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~10.7K tok)
+- `docs/phases/STATUS.md` — Phase status (~10.9K tok)
   - 5–17 Rules (~620)
   - 18–89 Phases (~2.9K)
-  - 90–217 Open items (~6.7K)
-    - 92–113 Fixtures and Maestro (~1.1K)
-    - 114–160 Rules and engine (~2.0K)
+  - 90–218 Open items (~6.8K)
+    - 92–114 Fixtures and Maestro (~1.2K)
+    - 115–160 Rules and engine (~1.9K)
     - 161–184 Screens and code (~1.3K)
-    - 185–217 Phone and tablet checks (~2.3K)
-  - 218–234 Standing decisions (~430)
+    - 185–218 Phone and tablet checks (~2.4K)
+  - 219–235 Standing decisions (~430)
 - `docs/phases/phase-10-campaign-shell.md` — Phase 10 — Campaign shell (~1.7K tok)
 - `docs/phases/phase-11-scenario-1-table.md` — Phase 11 — Scenario 1 table (~1.6K tok)
 - `docs/phases/phase-12-knife-in-the-dark.md` — Phase 12 — A Knife in the Dark (~1.4K tok)

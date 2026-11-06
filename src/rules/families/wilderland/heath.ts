@@ -93,7 +93,15 @@ export function whenRevealedUncancelable(state: ScenarioState, event: GameEvent,
   // "The 'when revealed' effects of side quests cannot be canceled by player card effects" (emce.side-quests): an encounter side quest is a quest card as well as an encounter card.
   if (revealed && printedOf(ctx.cards, state.cards[revealed]?.code ?? "").type === "encounter-side-quest") return true;
   if (!revealed || !gameReads(state, ctx, '"UncancelableWhenRevealed"')) return false;
-  return constantInstructions(state, ctx).some(({ instruction }) => instruction.verb === "UncancelableWhenRevealed" && (!instruction.firstRevealedEachRound || flagged(state, revealed, "firstTreachery")) && (instruction.trait == null || hasTrait(state, revealed, instruction.trait, ctx)) && (instruction.cardType == null || printedOf(ctx.cards, state.cards[revealed]?.code ?? "").type === instruction.cardType));
+  const type = printedOf(ctx.cards, state.cards[revealed]?.code ?? "").type;
+  return constantInstructions(state, ctx).some(({ instruction }) => {
+    if (instruction.verb !== "UncancelableWhenRevealed") return false;
+    // "The first treachery revealed each round" (19137:B:1): the card the round marked first (families/wilderland/rounds.ts).
+    const first = !instruction.firstRevealedEachRound || flagged(state, revealed, "firstTreachery");
+    const traitMatches = instruction.trait == null || hasTrait(state, revealed, instruction.trait, ctx);
+    const typeMatches = instruction.cardType == null || type === instruction.cardType;
+    return first && traitMatches && typeMatches;
+  });
 }
 
 /** DiscardOtherLooked: the cards LookAtTop showed that are still on top, but the picked one, go to the encounter discard pile faceup. The picked card is then the top card of the deck. */

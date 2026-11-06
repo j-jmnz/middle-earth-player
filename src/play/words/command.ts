@@ -6,6 +6,8 @@ import { DONE, optionsLeft, upToLimit } from "../../rules/families/deck/choose.t
 import type { ReduceContext } from "../../rules/interpret/interpret.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
 
+import { plural } from "./list.ts";
+
 type Choose = Extract<Instruction, { verb: "Choose" }>;
 
 const OPTION_WORDS: Readonly<Record<string, string>> = {
@@ -50,7 +52,6 @@ export function commandBranchWords(choose: Choose, optionId: string, x?: number)
   return nested ? (said ?? null) : null;
 }
 
-const plural = (count: number, one: string, many: string): string => `${count} ${count === 1 ? one : many}`;
 
 /** What a Choose of the Command events asks, or null for any other Choose: how many options it may take (read now), then "Done ends the choice."; or the question inside an option. `picked` names the enemy or
  * attachment the option picked just before ("You may engage the Sea-scorpion."). */

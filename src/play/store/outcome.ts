@@ -12,7 +12,7 @@ import type { ScenarioState } from "../../rules/core/state.ts";
 import type { LogMark } from "./log.ts";
 import { detachLine, grappleLine } from "../words/grapple.ts";
 import { boardingWords } from "../words/sea.ts";
-import { firstTreacheryNote, stageArrivalNote, stageBeats } from "../words/gundabad.ts";
+import { firstTreacheryNote, stageArrivalNote, stageBeats } from "../words/gundabad-beats.ts";
 import { discoverLines, discoverTitle, POOL_COPY } from "../words/wilderland.ts";
 
 // `cards`: the cards a line touches (the shadow card, the card damaged or destroyed), drawn on the table while the banner
@@ -31,7 +31,7 @@ export const BEAT_MS = 650;
 // `revealed` gives the printed When Revealed lines of a card (the Stormcaller's stage the C side of which was just revealed), or null.
 const SIDE_QUEST_TITLE = "End of the planning phase";
 
-type Names = { card: (cardId: string) => string; shadow?: (cardId: string) => string | null; stage?: (cardId: string) => string | null; revealed?: (cardId: string) => string | null };
+type Names = { card: (cardId: string) => string; shadow?: (cardId: string) => string | null; stage?: (cardId: string) => string | null; revealed?: (cardId: string) => string | null; stageName?: (cardId: string) => string | null; mustBypass?: (cardId: string) => string | null };
 
 // "stage 3 of 4" for the Stormcaller's stage `cardId` (the area's current stage once it has advanced), or "its next stage" for a state that moved on.
 function stormcallerStageWords(state: ScenarioState, cardId: string): string {
@@ -51,6 +51,8 @@ type Group = { rank: number; title: string; tone: MomentTone; lines: MomentLine[
  * to the next window). `before` is the state the intent was sent in, `after` the state it left.
  */
 export function momentOf(before: ScenarioState, after: ScenarioState, steps: readonly EngineStep[], names: Names): Moment | null {
+  // A stage of Mount Gundabad's quest deck is told by its reading: the stages print one title (families/wilderland/gundabad.ts, stageName).
+  const stageNamed = (cardId: string): string => names.stageName?.(cardId) ?? names.card(cardId);
   const groups: Group[] = [];
   let current: Group | null = null;
   const open = (rank: number, title: string, tone: MomentTone): Group => {
@@ -101,7 +103,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         line(`${seatWord(after, step.seat)} ${step.amount >= 0 ? "+" : ""}${step.amount}`, "threat");
         return;
       case "progress":
-        line(step.amount < 0 ? `${-step.amount} progress removed from ${names.card(step.targetId)}` : `${step.amount} progress on ${names.card(step.targetId)}`, "progress");
+        line(step.amount < 0 ? `${-step.amount} progress removed from ${stageNamed(step.targetId)}` : `${step.amount} progress on ${stageNamed(step.targetId)}`, "progress");
         return;
       case "advance": {
         // The Stormcaller's stage advance (dcce.stormcallers-area-stages): its C side's When Revealed is the beat's second line.
@@ -113,7 +115,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
           return;
         }
         if (!current) open(1, "The quest advances", "good");
-        line(`The quest advances to ${names.card(step.cardId)}`);
+        line(`The quest advances to ${stageNamed(step.cardId)}`);
         // A stage of Mount Gundabad's quest deck arrives side A up (emce.gundabad-quest-deck).
         const arrival = stageArrivalNote(after, step.cardId);
         if (arrival) line(arrival, null, [step.cardId]);
@@ -244,7 +246,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
   });
 
   // A stage of Mount Gundabad's quest deck flipped to side B at the beginning of the quest phase, or bypassed (emce.bypassing): no step of its own.
-  const stage = stageBeats(before, after, names);
+  const stage = stageBeats(before, after, { card: stageNamed, ...(names.mustBypass ? { mustBypass: names.mustBypass } : {}) });
   if (stage) groups.push({ rank: stage.rank, title: stage.title, tone: "plain", lines: stage.lines.map((text) => ({ text, mark: null })) });
 
   // Travel leaves no step of its own: the location that became active from staging. Once stages are separate each seat has an active location of its

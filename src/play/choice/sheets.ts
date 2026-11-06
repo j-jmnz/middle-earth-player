@@ -48,7 +48,7 @@ import { asksCollection, collectionLabel, collectionOrder } from "./collection-s
 import { cardLabel, has, option, statOf, step } from "./sheet-parts.ts";
 import { nightActionNote, nightResponseNote } from "../words/night.ts";
 import { framsburgActionCaution, framsburgActionNote, framsburgEngageNote, framsburgResponseNote } from "../words/framsburg.ts";
-import { gundabadResponseNote } from "../words/gundabad.ts";
+import { gundabadOptionLabel, gundabadPassCaution, gundabadResponseNote } from "../words/gundabad.ts";
 import { gundabadRow } from "./gundabad-sheets.ts";
 import { TIMING_WORDS, type SheetStat, type HideNumbers, type PickOption, type Sheet, type SheetNames, type TriggerOption, type Unavailable } from "./sheet-types.ts";
 
@@ -311,13 +311,13 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           // The Willpower each character the players may remove from the quest adds up (11075:A:1), as the commit sheet shows it.
           const willpower = wait?.kind === "target" && wait.item.instruction.verb === "RemoveWillpowerFromQuest" ? statOf(game, ctx, id, "willpower") : [];
           // An option of a sea verb that is no card: trade or keep the damage, the deck to discard from, the title named.
-          const sea = wait?.kind === "target" ? (seaOptionLabel(wait.item.instruction, id, game, ctx.cards) ?? grappleOptionLabel(wait.item.instruction, id) ?? wilderlandOptionLabel(wait.item.instruction, id, words) ?? unchartedOptionLabel(wait.item.instruction, id, game, words) ?? islandOptionLabel(wait.item.instruction, id, game, words)) : null;
+          const sea = wait?.kind === "target" ? (seaOptionLabel(wait.item.instruction, id, game, ctx.cards) ?? grappleOptionLabel(wait.item.instruction, id) ?? wilderlandOptionLabel(wait.item.instruction, id, words) ?? unchartedOptionLabel(wait.item.instruction, id, game, words) ?? islandOptionLabel(wait.item.instruction, id, game, words) ?? gundabadOptionLabel(wait.item.instruction, id, game, ctx, words)) : null;
           // Copies of one card in different zones are told apart by where each one is.
           // A pick that puts damage on a location or a character, or takes it off a location: the damage it would stand at, as a mark, with a caution when it burns the location or loses the game.
           const fire = wait?.kind === "target" ? (fireRow(wait.item.instruction, data?.queue[0]?.instruction, id, game, ctx, names, amountNow, source) ?? gundabadRow(wait.item.instruction, data?.queue[0]?.instruction, id, game, ctx, names.card(id))) : null;
           // A Ship objective that is exhausted or attached to: whose it is when the options hold more than one player's, and the damage a card on it would deal.
           const ship = wait?.kind === "target" ? shipRow(wait.item.instruction, data?.queue[0]?.instruction, id, window.options, game, ctx, words) : null;
-          const kingsCaution = wait?.kind === "target" ? discardCaution(game, source, wait.item.instruction, data?.queue[0]?.instruction, id, names.card) : undefined;
+          const kingsCaution = wait?.kind === "target" ? discardCaution(game, ctx, source, wait.item.instruction, data?.queue[0]?.instruction, id, names.card) : undefined;
           const label = fire?.label ?? sea ?? ship?.label ?? (collection ? collectionLabel(game, ctx, id, window.options, names) : outOfPlay ? outOfPlayLabel(game, id, words) : card.label);
           // Another defender's pooled damage (Stand Together, families/defense/defenders.ts).
           const pooled = data?.effectId === DEFENDERS_FRAME ? extraDefender(game, ctx, id) : null;
@@ -334,6 +334,8 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       const sole = endOfRound && options.length > 0 && options.every((item) => item.cardId === options[0]?.cardId) ? (options[0]?.cardId ?? null) : null;
       const about = sole ?? (data?.kind === "responses" ? answeredCard(data.event, data.offers, options) : (frame?.cardId ?? null));
       const cancel = window.kind === "cancelOffer";
+      // A Response whose passing leaves the game unwinnable arms the Pass (words/gundabad.ts).
+      const passCaution = data?.kind === "responses" ? gundabadPassCaution(game, ctx, data.event, options.map((item) => item.cardId)) : null;
       return {
         kind: "trigger",
         key: `${window.kind}:${frame?.id ?? ""}:${options.length}`,
@@ -346,6 +348,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         hide: null,
         options,
         pass: "Pass",
+        ...(passCaution ? { passCaution } : {}),
       };
     }
     case "look":

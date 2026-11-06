@@ -81,7 +81,7 @@ export function hostDiscount(state: ScenarioState, cardId: string, seat: number,
 export function playBlocked(state: ScenarioState, cardId: string, seat: number, ctx: ReduceContext, putting = false): boolean {
   if (!state.cards[cardId]) return false;
   // A family's bar on playing and putting into play alike (the allies-a-round limit of LimitEntries, families/sea/entries.ts).
-  if (familyPlayBarred(state, cardId, ctx, undefined, putting)) return true;
+  if (familyPlayBarred(state, cardId, ctx, undefined, { putting })) return true;
   for (const { source, instruction } of constantInstructions(state, ctx)) {
     if (instruction.verb !== "CannotPlay") continue;
     if (instruction.anyPlayer ? putting : (source.controller ?? state.firstPlayer) !== seat) continue;

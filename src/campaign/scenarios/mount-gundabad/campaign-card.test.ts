@@ -12,10 +12,11 @@ import { EFFECTS } from "../../../effects/index.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { flagged, type ScenarioState } from "../../../rules/core/state.ts";
 import { settle } from "../../../rules/engine/machine.ts";
+import { spawn } from "../../../rules/core/zones.ts";
 import { reduce, startScenario, type PlayerIntent, type ReduceContext } from "../../../rules/engine/reduce.ts";
 import { pushEffectFrame } from "../../../rules/interpret/effect-frames.ts";
 import { ignoresKeyword } from "../../../rules/families/wilderland/markers.ts";
-import { openResolution, resolutionResult } from "../../../rules/setup/resolution.ts";
+import { openResolution, resolutionResult, SKIP } from "../../../rules/setup/resolution.ts";
 import { gundabadLoadout, gundabadPlan, gundabadSetupChoices, gundabadStart, gundabadWorld } from "../../../../test/scenarios/mount-gundabad/game.ts";
 import { CODES, campaign, gundabad, gundabadTable, idOf, legalIntents, loadGundabadWorld, type GundabadWorld } from "../../../../test/scenarios/mount-gundabad/scene.ts";
 
@@ -216,20 +217,37 @@ describe("12193:B Resolution words", () => {
   };
   const pooled = { prisoner: null, usedOnce: [], counters: {}, encounterPool: { "12167": 1 } };
 
-  it("12193:B:2 the treasure choice says 1 of 3, that it is recorded when confirmed, that A Growing Threat leaves the pool and what Dragon-sickness waits for; two-handed it is the first player's", () => {
+  it("12193:B:2 the treasure choice says 1 of 3, that it is recorded when confirmed, what Dragon-sickness does with this treasure and that A Growing Threat leaves the pool; two-handed it is the first player's", () => {
     for (const [seats, label] of [[1, null], [2, "Player 1 (first player) chooses"]] as const) {
       const choosing = view(opened(seats, 1, { facts: pooled, log: logged(TREASURES.slice(0, 5)) }));
       expect(choosing.seatLabel, `${seats} seats`).toBe(label);
       expect(choosing.tiles, `${seats} seats`).toHaveLength(3);
-      expect(consequenceSentence(choosing, null, false)).toBe("Choose 1 of the 3 random undiscovered treasures. It is recorded as discovered when you confirm. A Growing Threat leaves the campaign pool. Dragon-sickness joins the campaign pool as an encounter card: this treasure makes 6 recorded, and 6 or more is enough.");
-      expect(choiceSentence(choosing, choosing.tiles[0]!)).toBe(`${choosing.tiles[0]?.name} is discovered and recorded in the campaign log. The scenario is over, so it is not attached to a character. A Growing Threat leaves the campaign pool. Dragon-sickness joins the campaign pool as an encounter card: this treasure makes 6 recorded, and 6 or more is enough.`);
+      expect(consequenceSentence(choosing, null, false)).toBe("Choose 1 of the 3 random undiscovered treasures. It is recorded as discovered when you confirm. Dragon-sickness joins the campaign pool: with this treasure 6 are recorded, and 6 is enough. A Growing Threat leaves the campaign pool.");
+      expect(choiceSentence(choosing, choosing.tiles[0]!)).toBe(`${choosing.tiles[0]?.name} is discovered and recorded in the campaign log. The scenario is over, so it is not attached to a character. Dragon-sickness joins the campaign pool: with this treasure 6 are recorded, and 6 is enough. A Growing Threat leaves the campaign pool.`);
     }
   });
 
-  it("12193:B:5 with fewer treasures the choice says what the treasures the players control may still bring; with no A Growing Threat in the pool it says nothing of it", () => {
+  it("12193:B:5 with fewer treasures the sentence counts this treasure and the treasures the players control and says whether Dragon-sickness joins; with no A Growing Threat in the pool it says nothing of it", () => {
     const choosing = view(opened(1, 1, { log: logged(TREASURES.slice(0, 2)) }));
-    expect(consequenceSentence(choosing, null, false)).toBe("Choose 1 of the 3 random undiscovered treasures. It is recorded as discovered when you confirm. Dragon-sickness joins the campaign pool as an encounter card if 6 or more treasures are recorded once this one and the treasures the players control are added (2 are recorded now).");
+    expect(consequenceSentence(choosing, null, false)).toBe("Choose 1 of the 3 random undiscovered treasures. It is recorded as discovered when you confirm. Dragon-sickness does not join the campaign pool: 3 treasures are recorded with this one, and it takes 6.");
     expect(consequenceSentence(choosing, null, false)).not.toContain("A Growing Threat");
+    // Taking nothing leaves the log as it is.
+    expect(choiceSentence(choosing, { ...choosing.tiles[0]!, optionId: SKIP })).toContain("Dragon-sickness does not join the campaign pool: 2 treasures are recorded, and it takes 6.");
+  });
+
+  it("12193:B:5 a treasure a player controls is counted as well: 4 recorded and 1 controlled make 6 with this treasure, 5 without it", () => {
+    const base = opened(1, 1, { log: logged(TREASURES.slice(0, 4)) });
+    const state = spawn(base, "12201", { zone: "play", seat: 0 }).state;
+    const choosing = view(state);
+    expect(consequenceSentence(choosing, null, false)).toContain("Dragon-sickness joins the campaign pool: with this treasure and the 1 you control, 6 are recorded.");
+    expect(choiceSentence(choosing, { ...choosing.tiles[0]!, optionId: SKIP })).toContain("Dragon-sickness does not join the campaign pool: 5 treasures are recorded with the 1 you control, and it takes 6.");
+    const short = view(spawn(opened(1, 1, { log: logged(TREASURES.slice(0, 3)) }), "12201", { zone: "play", seat: 0 }).state);
+    expect(consequenceSentence(short, null, false)).toContain("Dragon-sickness does not join the campaign pool: 5 treasures are recorded with this one and the 1 you control, and it takes 6.");
+  });
+
+  it("12193:B:5 declining with the log already at 6 still says Dragon-sickness joins, and that 6 is enough", () => {
+    const choosing = view(opened(1, 1, { log: logged(TREASURES) }));
+    expect(choiceSentence(choosing, { ...choosing.tiles[0]!, optionId: SKIP })).toContain("Dragon-sickness joins the campaign pool: 6 are recorded, and 6 is enough.");
   });
 
   it("12193:B the settled sentence says the treasure discovered, that Dragon-sickness joins the pool, that A Growing Threat leaves it, and that The Fate of Wilderland is next", () => {

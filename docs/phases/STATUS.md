@@ -73,7 +73,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 | 46 | The Drowned Ruins | completed | 2026-11-04. Engine done, review round done. Phone checks open: the Grotto pile (top-card preview and speech, the glide back to it), Command's armed Done and up-to notes, the flip naming its side, Into the Abyss counts; both Maestro flows unrun; `ruins-won` missing, so the win flow cannot run. |
 | 47 | A Storm on Cobas Haven | completed | 2026-11-04. Engine done, review round done. Phone checks open: a controlled tower in staging (fold rank, reader label, its Action from either seat), guarded and re-guarded towers, the Islet's "1 held" pill and where the held enemy returns, the Skirmisher as a ship, Taking on Water's three exhaust picks and host caution, the added-phase rail and carousel, the Tactics hero list, Gandalf's entry, Gavin's Planning Action; both Maestro flows unrun; `haven-won` missing, so the win flow cannot run. |
 | 48 | The City of Corsairs | completed | 2026-11-05. Engine done, review round done. Phone checks open: the Streets of Umbar tax caution on the travel sheet and "Do not travel", the Umbar Harbor and Southern Belfalas questions, The Black Sword's Refresh Action, the second encounter deck after stage 2B, "Campaign complete" with no Spend XP; both Maestro flows unrun; `corsairs-won` missing, so the win flow cannot run. |
-| 49 | Ered Mithrin data | completed | 2026-11-05. Review round done. Open: Mount Gundabad stage 2 pictures (19137-19142); Crypt Stalker Easy count unconfirmed. |
+| 49 | Ered Mithrin data | completed | 2026-11-05. Review round done. Open: Crypt Stalker Easy count unconfirmed. |
 | 50 | Ered Mithrin campaign shell, treasures and the pool | completed | 2026-11-05. Review round done. Open: a discovered treasure cannot be put in a deck from the app; phone checks; `ered-mithrin-start`, `booklet-ered-mithrin` flows not run. |
 | 51 | Wilderland mechanics family | completed | 2026-11-05. Engine only; review round done. Not built: Caves-deck bottom and arrange (18055, 18079), Crypt Key's Discover modifiers, a look window for Discover. |
 | 51b | Wilderland on the table | completed | 2026-11-05. Review round done. Phone checks open (below). |
@@ -84,12 +84,13 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 | 56 | Roam Across Rhovanion | active | 2026-11-06. Engine done; review round done. Phone half open: phone checks, both Maestro flows not run; `rhovanion-won` missing, so the win flow cannot run. |
 | 57 | Fire in the Night | active | 2026-11-06. Engine done; review round done. Phone half open: the table's side-quest area and current-quest mark, phone checks, both Maestro flows not run; `night-won` missing, so the win flow cannot run. |
 | 58 | The Ghost of Framsburg | active | 2026-11-06. Engine done; review round done. Phone half open: phone checks, both Maestro flows not run; `framsburg-won` missing, so the win flow cannot run. |
-| 59 | Mount Gundabad | not started | |
+| 59 | Mount Gundabad | active | 2026-11-06. Engine done; review round done. Phone half open: phone checks, both Maestro flows not run; `gundabad-won` missing, so the win flow cannot run. |
 | 60 | The Fate of Wilderland | not started | |
 
 ## Open items
 
 ### Fixtures and Maestro
+- `gundabad-won` is not committed: none of 100 seeds wins Mount Gundabad with the starter decklists; the hero carrying Wormsbane leaves play in the first rounds or threat runs out. Until it exists `.maestro/scenarios/mount-gundabad/mount-gundabad.yaml` cannot run.
 - `framsburg-won` is not committed: none of 100 seeds wins The Ghost of Framsburg with the starter decklists. Until it exists `.maestro/scenarios/the-ghost-of-framsburg/the-ghost-of-framsburg.yaml` cannot run; its `CHOICE_*` lines are commented out.
 - `night-won` is not committed: none of 100 seeds wins Fire in the Night with the starter decklists. Until it exists `.maestro/scenarios/fire-in-the-night/fire-in-the-night.yaml` cannot run; a win can ask up to four Resolution questions and `subflows/scenario-win.yaml` takes two.
 - `rhovanion-won` is not committed: none of 100 seeds wins Roam Across Rhovanion with the starter decklists. Until it exists `.maestro/scenarios/roam-across-rhovanion/roam-across-rhovanion.yaml` cannot run, and it still needs the `CHOICE_*` and `CHOICE2_*` answers for the Resolution's location choice.
@@ -154,7 +155,6 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - Separate stages: `viewOf` builds a new state per call, so state-keyed memos miss inside a view (speed only). The normalizer's `searched` rule marks every staged location of a quest with an each-player-adds-location clause.
 - Journey in the Dark and Breaking of the Fellowship Nightmare decks (9065xx, 9066xx) have no records.
 
-- Ered Mithrin data: Mount Gundabad stage 2s 19137-19142 are pictures-test exceptions; cardgame.tools files them as `MEC70-137`..`-142` (front `MEC70-135a`..`g`). Needs a number mapping in `scripts/data/sources/pictures.ts` and `pnpm data:sync pictures` before phase 59.
 - Ered Mithrin data: Crypt Stalker (19099) Easy count is 1 (Hall of Beorn) against E08.7's 2; no printed source settles it.
 - Ered Mithrin data: the EMCE box prints collector numbers one below Hall of Beorn and RingsDB; codes and `printings[].number` follow the sources' number.
 
@@ -185,6 +185,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 ### Phone and tablet checks
 - Journey Up the Anduin: the treasure draw rows (picture from a code, long press) and character rows two-handed; The Old Ford's refusal and travel caution at 667 × 375; Ruined Supplies' rows; Weighed Down's discard rows; the Resolution's oath-line row beside two Turayn tiles; A Growing Threat's banner line; the Creatures piles and Haldan's flip on the table.
 - Wilderland table: the Creatures pair and Caves deck at 667 × 375 two-seat at Small/Medium/Large; the Discover strip over the engagement band, the veil with Loot and Hazard ringed above it, the hold on the last beat and glide to discard, staging taps after the banner; reduced motion; a Deep Cave arriving off the Caves deck; the reshuffle glide; a guarded treasure with a screen reader; both themes.
+- Mount Gundabad: the bypass choice and note, Throat of the Mountain's and the look's stage rows, the Tap again cautions on stage damage, AssignDamage and Eyes in the Dark, The First Forge's and the Great Worm's Pass cautions, Dagnir's Hoard search two-handed, the one-card-per-phase refusal, the Resolution's Dragon-sickness and A Growing Threat sentences.
 - The Ghost of Framsburg: Discover's Loot and Hazard choice, Crypt Key's Discover rows, Fram's Shade's treasure Response, the reshuffle Action's Tap again caution, Gundabad Stalker's engagement note, Moonlit Passage's per-seat cap, the Resolution's Hunter-or-Stalker and Hazard choices two-handed.
 - Fire in the Night: the current-quest question and the commit sheet's title, the side-quest reveal line, the Hill attack's defender rows with their overflow and caution, the side-quest Responses, Beldis's boxes, the Resolution's treasure, removal and Beldis sentences two-handed.
 - Roam Across Rhovanion: the Trust in Urdug question at Setup and after a claim, the Wilderland Bear and Deep Ravine sheets two-handed, Harsh Weather's rows, Durin's Key's attach, the random stage-2 banner, Urdug's and Tiny's previews on either side, the Resolution's location choice with its seat labels.

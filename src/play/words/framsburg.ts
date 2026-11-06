@@ -14,6 +14,7 @@ import { effectsOf } from "../../rules/windows/listen.ts";
 import { topFrame } from "../../rules/windows/windows.ts";
 
 import type { ChoiceNames, PickWords } from "./choice.ts";
+import { plural } from "./list.ts";
 import { seatSays } from "./seat.ts";
 
 type Choose = Extract<Instruction, { verb: "Choose" }>;
@@ -21,7 +22,6 @@ type Facts = { game: ScenarioState; ctx: ReduceContext; options: readonly string
 type Kind = "discoverValue" | "searching" | "shadowStalker";
 
 const THREAT_ELIMINATION = 50;
-const plural = (count: number, word: string): string => `${count} ${word}${count === 1 ? "" : "s"}`;
 const list = (items: readonly string[]): string => (items.length <= 2 ? items.join(" and ") : `${items.slice(0, -1).join(", ")} and ${items.at(-1)}`);
 
 // Which of the scenario's Choose windows this is, from the instructions of its options; null for another Choose.

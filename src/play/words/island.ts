@@ -10,8 +10,7 @@ import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts"
 
 import type { ChoiceNames, PickWords } from "./choice.ts";
 import { directionWords, type PlaceMark } from "../store/island-place.ts";
-
-const plural = (count: number, one: string, many: string): string => `${count} ${count === 1 ? one : many}`;
+import { plural } from "./list.ts";
 
 /** One instruction in words, or null when it is not one of the family's. */
 export function islandWords(instruction: Instruction): string | null {

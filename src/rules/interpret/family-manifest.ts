@@ -41,7 +41,13 @@ export type TravelHooks = {
 };
 
 /** Whether a family bars playing a card, or putting it into play (`putting`), from the hand or by an effect: true bars it. Asked after the core's own bars. */
-export type PlayHook = (state: ScenarioState, cardId: string, ctx: ReduceContext, putting: boolean) => boolean;
+export type PlayHook = (state: ScenarioState, cardId: string, ctx: ReduceContext, how: PlayHow) => boolean;
+
+/** What a play bar is asked about: `putting`, the card is put into play rather than played. */
+export type PlayHow = { readonly putting?: boolean };
+
+/** The words for a refused play that a family bars (the hook of `play` says whether; this one says why): null when the family does not bar the card. Asked where the refusal reason of a play is built. */
+export type PlayReasonHook = (state: ScenarioState, cardId: string, ctx: ReduceContext) => string | null;
 
 /** A family's note of an encounter card as it is revealed (the reveal frame's first step, before its When Revealed effects): returns a new state, or the same object. */
 export type RevealHook = (state: ScenarioState, cardId: string, ctx: ReduceContext) => ScenarioState;
@@ -85,6 +91,7 @@ export type RulesFamily = {
   readonly attached?: AttachedHook;
   readonly combat?: CombatHooks;
   readonly play?: PlayHook;
+  readonly playReason?: PlayReasonHook;
   readonly revealed?: RevealHook;
   readonly optionalEngage?: OptionalEngageHook;
 };

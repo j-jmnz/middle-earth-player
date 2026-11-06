@@ -83,7 +83,7 @@ function take(state: ScenarioState, code: string): ScenarioState {
 }
 
 /** The treasures a player controls: claimed and attached to a character, not still in the staging area under a guard. */
-export function controlledTreasures(state: ScenarioState, ctx: ReduceContext): string[] {
+export function controlledTreasures(state: ScenarioState, ctx: Pick<ReduceContext, "cards">): string[] {
   const codes = Object.values(state.cards).filter((card) => {
     const printed = ctx.cards.get(card.code);
     return printed?.campaignKind === "treasure" && inPlay(card.zone) && card.zone !== "staging" && card.zone !== "seatStaging" && card.controller != null;

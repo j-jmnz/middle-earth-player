@@ -6,7 +6,7 @@ import type { PrintedCard } from "../core/printed.ts";
 import type { ScenarioState } from "../core/state.ts";
 import type { AmountScope } from "./amounts.ts";
 import type { Scope } from "./conditions.ts";
-import type { RulesFamily, SettleHook, SettleHooks, TravelCharge } from "./family-manifest.ts";
+import type { PlayHow, RulesFamily, SettleHook, SettleHooks, TravelCharge } from "./family-manifest.ts";
 import type { ReduceContext } from "./interpret.ts";
 import type { PickContext } from "./pick.ts";
 
@@ -51,6 +51,7 @@ type Hooked = {
   readonly forced: readonly RulesFamily[];
   readonly unpayable: readonly RulesFamily[];
   readonly play: readonly RulesFamily[];
+  readonly playReason: readonly RulesFamily[];
   readonly revealed: readonly RulesFamily[];
   readonly pick: readonly RulesFamily[];
   readonly condition: readonly RulesFamily[];
@@ -71,6 +72,7 @@ function hooked(families: readonly RulesFamily[]): Hooked {
       forced: families.filter((family) => family.travel?.forced != null),
       unpayable: families.filter((family) => family.travel?.unpayable != null),
       play: families.filter((family) => family.play != null),
+      playReason: families.filter((family) => family.playReason != null),
       revealed: families.filter((family) => family.revealed != null),
       pick: families.filter((family) => family.pick != null),
       condition: families.filter((family) => family.condition != null),
@@ -160,9 +162,18 @@ export function familyTravelUnpayable(state: ScenarioState, instruction: Instruc
 }
 
 /** Whether some family bars the card from being played or put into play. */
-export function familyPlayBarred(state: ScenarioState, cardId: string, ctx: ReduceContext, families: readonly RulesFamily[] = active(), putting = false): boolean {
-  for (const family of hooked(families).play) if (family.play?.(state, cardId, ctx, putting) === true) return true;
+export function familyPlayBarred(state: ScenarioState, cardId: string, ctx: ReduceContext, families: readonly RulesFamily[] = active(), how: PlayHow = {}): boolean {
+  for (const family of hooked(families).play) if (family.play?.(state, cardId, ctx, how) === true) return true;
   return false;
+}
+
+/** Why some family bars the card from being played, in its own words (families/wilderland/rounds.ts says which card limits the phase), or null when none does. */
+export function familyPlayRefusal(state: ScenarioState, cardId: string, ctx: ReduceContext, families: readonly RulesFamily[] = active()): string | null {
+  for (const family of hooked(families).playReason) {
+    const reason = family.playReason?.(state, cardId, ctx);
+    if (reason != null) return reason;
+  }
+  return null;
 }
 
 /** A card was revealed: each family that notes reveals returns the state it leaves (families/wilderland/rounds.ts notes the first treachery of the round). */

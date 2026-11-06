@@ -44,11 +44,14 @@ export function fireRow(pick: Instruction, next: Instruction | undefined, id: st
       ...(caution ? { caution } : {}),
     };
   }
-  // A character that takes the damage (Put to the Torch, 11048): destroyed in the label, and the game lost in the caution, as a defender's row shows it.
-  if (pick.pick.type === "character" && sourceId != null && game.cards[sourceId]?.code === TORCH) {
-    const outcome = damageOutcome(game, ctx, id, amount);
-    const caution = outcome.destroyed ? (outcome.loss ? `Tap again: ${name} falls and the game is lost` : `Tap again: ${name} is destroyed`) : undefined;
-    return { label: `${name} · ${amount} damage${outcome.destroyed ? " · destroyed" : ""}`, mark: { icon: "damage", value: amount, danger: outcome.destroyed }, ...(caution ? { caution } : {}) };
-  }
+  // A character that takes the damage (Put to the Torch, 11048).
+  if (pick.pick.type === "character" && sourceId != null && game.cards[sourceId]?.code === TORCH) return damagedCharacterRow(game, ctx, id, name, amount);
   return null;
+}
+
+/** The row of a character that takes `amount` damage: destroyed in the label, and the game lost in the caution, as a defender's row shows it. */
+export function damagedCharacterRow(game: ScenarioState, ctx: ReduceContext, id: string, name: string, amount: number): FireRow {
+  const outcome = damageOutcome(game, ctx, id, amount);
+  const caution = outcome.destroyed ? (outcome.loss ? `Tap again: ${name} falls and the game is lost` : `Tap again: ${name} is destroyed`) : undefined;
+  return { label: `${name} · ${amount} damage${outcome.destroyed ? " · destroyed" : ""}`, mark: { icon: "damage", value: amount, danger: outcome.destroyed }, ...(caution ? { caution } : {}) };
 }

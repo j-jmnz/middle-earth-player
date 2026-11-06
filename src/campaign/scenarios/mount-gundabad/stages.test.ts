@@ -335,7 +335,7 @@ describe("19140 Exploring Gundabad (Foreboding Darkness)", () => {
       expect(played.state.played?.map((entry) => entry.id)).toEqual([one]);
       return playReason(played.state, { type: "PlayCard", cardId: two, payments: [] }, t.ctx);
     };
-    expect(playTwo(false)).toBe("Exploring Gundabad: each player plays at most 1 card each phase, and you have played 1 this planning phase.");
+    expect(playTwo(false)).toBe("Exploring Gundabad (play limit): each player can play only 1 card per phase. You have played 1 this planning phase.");
     // Without the stage's side B nothing limits the plays.
     expect(playTwo(true)).toBeNull();
   });
@@ -345,9 +345,9 @@ describe("19140 Exploring Gundabad (Foreboding Darkness)", () => {
     const played = finish(send(start(t.state), { type: "PlayCard", cardId: idOf(t.state, "filler"), payments: [] }, t.ctx), t.ctx);
     const otherSeat = Object.values(played.state.cards).find((card) => card.code === "c0" && card.zone === "hand" && card.controller === 1);
     expect(otherSeat).toBeDefined();
-    expect(phasePlaysBarred({ ...played.state, activeSeat: 1 }, otherSeat?.id ?? "", t.ctx, false)).toBe(false);
-    expect(phasePlaysBarred({ ...played.state, activeSeat: 0 }, otherSeat?.id ?? "", t.ctx, false)).toBe(true);
-    expect(phasePlaysBarred({ ...played.state, activeSeat: 0 }, otherSeat?.id ?? "", t.ctx, true)).toBe(false);
+    expect(phasePlaysBarred({ ...played.state, activeSeat: 1 }, otherSeat?.id ?? "", t.ctx, {})).toBe(false);
+    expect(phasePlaysBarred({ ...played.state, activeSeat: 0 }, otherSeat?.id ?? "", t.ctx, {})).toBe(true);
+    expect(phasePlaysBarred({ ...played.state, activeSeat: 0 }, otherSeat?.id ?? "", t.ctx, { putting: true })).toBe(false);
   });
 
   it("19140:B:2 Forced: when this stage is defeated the first player looks at the top 2 stages, puts 1 on the bottom and the quest advances to the top stage", () => {

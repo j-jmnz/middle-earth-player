@@ -129,6 +129,8 @@ export type TriggerSheet = {
   pass: string | null;
   // The ability already picked: the player tapped a card that has only this one.
   preselect?: string;
+  // What the armed Pass says when passing leaves something undone for good ("Tap again: Wormsbane stays Broken and the game cannot be won."): the Pass then asks twice.
+  passCaution?: string;
 };
 
 // `step` is the eyebrow (Resolution only when a campaign card has one); `action` labels the button that leaves the table

@@ -11,17 +11,28 @@ import { pushCardEffects, pushEffectFrame } from "../../rules/interpret/effect-f
 import { playReason } from "../../rules/player/planning.ts";
 import { CODES, STAGE_TWOS, finish, gundabadTable, idOf, loadGundabadWorld, send, start, type GundabadWorld, type Run } from "../../../test/scenarios/mount-gundabad/scene.ts";
 
+import { stageName } from "../../rules/families/wilderland/gundabad.ts";
+import type { ReduceContext } from "../../rules/interpret/interpret.ts";
+import { mustBypassLead } from "../words/gundabad-beats.ts";
 import { momentOf } from "../store/outcome.ts";
 import { sheetFor } from "./sheets.ts";
 
 let world: GundabadWorld;
+let sceneCtx: ReduceContext;
 beforeAll(async () => {
   world = await loadGundabadWorld();
+  sceneCtx = gundabadTable(world).ctx;
 }, 120_000);
 
 type Table = ReturnType<typeof gundabadTable>;
 const nameOf = (code: string): string => world.cards.get(code)?.name ?? code;
-const names = (state: ScenarioState) => ({ card: (id: string) => nameOf(state.cards[id]?.code ?? id), line: () => null });
+// The names a banner tells a stage by: its reading (the stages print one title) and the lead of a bypass a stage forces.
+const names = (state: ScenarioState) => ({
+  card: (id: string) => nameOf(state.cards[id]?.code ?? id),
+  line: () => null,
+  stageName: (id: string) => stageName(state, sceneCtx, id, nameOf(state.cards[id]?.code ?? id)),
+  mustBypass: (id: string) => mustBypassLead(sceneCtx, state.cards[id]?.code ?? ""),
+});
 
 // Every sheet the file opens, kept to check them all for the words rules once the tests have run.
 const opened_: { note: string; kind: string; labels: string[] }[] = [];
@@ -81,7 +92,7 @@ describe("the bypass at the end of the combat phase (emce.bypassing, 19135:B:3)"
     for (const [seats, suffix] of [[1, ""], [2, " Player 1 chooses."]] as const) {
       const { t, run } = endOfCombat({ seats, progress: 2, questDeck: THREE });
       const sheet = sheetOf(t, run.state);
-      expect(sheet.note).toBe(`Exploring Gundabad: bypass this stage at the end of the combat phase? If the players do, it loses its 2 progress, it goes to the bottom of the quest deck and it is not defeated, so it does not go to the victory display. The next stage 2A is revealed and its When Revealed effect resolves (3 stages wait in the quest deck). If they stay, it keeps its 2 progress and the quest continues.${suffix}`);
+      expect(sheet.note).toBe(`Exploring Gundabad (raises threat): bypass this stage? It loses its 2 progress and goes to the bottom of the quest deck, not defeated: no victory display, and its 'when defeated' effect does not happen. The next stage is revealed (3 wait in the quest deck). Stay and it keeps its 2 progress.${suffix}`);
       expect(labels(sheet)).toEqual(["Bypass the stage: lose 2 progress, go to the bottom of the quest deck", "Stay on the stage: keep 2 progress"]);
       expect(cautions(sheet)).toEqual([undefined, undefined]);
     }
@@ -90,8 +101,8 @@ describe("the bypass at the end of the combat phase (emce.bypassing, 19135:B:3)"
   it("says a stage with no progress has none to lose, and that one stage waiting is a single stage", () => {
     const { t, run } = endOfCombat({ progress: 0, questDeck: ["19137"] });
     const sheet = sheetOf(t, run.state);
-    expect(sheet.note).toContain("If the players do, it has no progress to lose, it goes to the bottom of the quest deck");
-    expect(sheet.note).toContain("(1 stage waits in the quest deck). If they stay, the quest continues.");
+    expect(sheet.note).toContain("bypass this stage? It has no progress to lose and goes to the bottom of the quest deck, not defeated");
+    expect(sheet.note).toContain("(1 waits in the quest deck). Stay and the quest continues.");
     expect(labels(sheet)).toEqual(["Bypass the stage: go to the bottom of the quest deck", "Stay on the stage"]);
   });
 
@@ -99,12 +110,12 @@ describe("the bypass at the end of the combat phase (emce.bypassing, 19135:B:3)"
     const { t, run } = endOfCombat({ progress: 2, questDeck: THREE });
     const bypassed = send(start(run.state), { type: "Choose", optionId: "bypass" }, t.ctx);
     const moment = momentOf(run.state, bypassed.state, bypassed.steps.flat(), names(bypassed.state));
-    expect(moment?.title).toBe("Exploring Gundabad is bypassed");
+    expect(moment?.title).toBe("Exploring Gundabad (raises threat) is bypassed");
     expect(moment?.lines.slice(0, 4).map((line) => line.text)).toEqual([
-      "It loses its 2 progress and goes to the bottom of the quest deck: it is not defeated, so it is not added to the victory display.",
-      "2 progress removed from Exploring Gundabad",
-      "The quest advances to Exploring Gundabad",
-      "It shows side A: only its side A text works until it is flipped at the beginning of the quest phase.",
+      "The stage goes to the bottom of the quest deck: it is not defeated, so it is not added to the victory display.",
+      "2 progress removed from Exploring Gundabad (raises threat)",
+      "The quest advances to Exploring Gundabad (no canceling)",
+      "It stays side A up until the quest phase begins; its side B text works from then.",
     ]);
     expect(bypassed.state.questDeck.at(-1)).toBe(run.state.questStage);
   });
@@ -122,8 +133,8 @@ describe("the bypass at the end of the combat phase (emce.bypassing, 19135:B:3)"
       run = next;
     }
     expect(run.state.window?.kind).not.toBe("choose");
-    expect(moment?.title).toBe("Exploring Gundabad is bypassed");
-    expect(moment?.lines[0]?.text).toBe("It had no progress to lose and goes to the bottom of the quest deck: it is not defeated, so it is not added to the victory display.");
+    expect(moment?.title).toBe("Exploring Gundabad (can win) is bypassed");
+    expect(moment?.lines[0]?.text).toBe("There are 4 or fewer quest cards in the victory display, so the stage must be bypassed. It has no progress to lose and goes to the bottom of the quest deck: it is not defeated, so it is not added to the victory display.");
   });
 
   it("staying keeps the stage and its progress, and the quest goes on to the refresh phase", () => {
@@ -140,7 +151,7 @@ describe("the flip at the beginning of the quest phase (emce.gundabad-quest-deck
     let run = start(t.state);
     for (let guard = 0; guard < 12 && run.state.phase !== "Quest"; guard += 1) run = send(run, { type: "Pass" }, t.ctx);
     const moment = momentOf(t.state, run.state, run.steps.flat(), names(run.state));
-    expect(moment?.title).toBe("Exploring Gundabad is flipped");
+    expect(moment?.title).toBe("Exploring Gundabad (raises threat) is flipped");
     expect(moment?.lines.map((line) => line.text)).toEqual(["The quest card shows side B at the beginning of the quest phase: its side B text works from now on."]);
     expect(run.state.cards[run.state.questStage ?? ""]?.face).toBe("B");
   });
@@ -199,8 +210,9 @@ describe("Throat of the Mountain (19124:A:1)", () => {
       expect(done.state.cards[done.state.questStage ?? ""]?.face).toBe("B");
       // The beat: the stage that was current is not defeated and goes back into the shuffled deck, the new one is flipped over at once.
       const moment = momentOf(asked.state, chosen.state, chosen.steps.flat(), names(chosen.state));
-      expect(moment?.title).toBe("Exploring Gundabad becomes the current quest");
-      expect(moment?.lines[0]?.text).toBe("It loses its 2 progress and the stage that was current goes back into the quest deck, which is shuffled: it is not defeated, so it is not added to the victory display. The new stage is flipped over at once.");
+      expect(moment?.title).toBe(`${stageName(chosen.state, t.ctx, chosen.state.questStage ?? "", "Exploring Gundabad")} becomes the current quest`);
+      expect(moment?.title).not.toBe("Exploring Gundabad becomes the current quest");
+      expect(moment?.lines[0]?.text).toBe("The stage that was current loses its 2 progress and goes back into the quest deck, which is shuffled: it is not defeated, so it is not added to the victory display. The new stage is flipped over at once.");
     }
   });
 });
@@ -232,7 +244,7 @@ describe("Dagnir's Hoard (19123:A:2)", () => {
     const first = sheetOf(t, use(t, run, idOf(t.state, CODES.dagnirSHoard)).state);
     expect(first.note).toBe("Player 1, Dagnir's Hoard: search your deck for an Item attachment and add it to your hand? Your deck is shuffled after the search.");
     expect(first.note).not.toContain("chooses");
-    expect(labels(first)).toEqual(["Search for an Item attachment and add it to your hand", "Do not search: your hand and deck stay as they are"]);
+    expect(labels(first)).toEqual(["Search for an Item attachment and add it to your hand", "Don't search: your hand and deck stay as they are"]);
     const declined = take(t, use(t, run, idOf(t.state, CODES.dagnirSHoard)), "decline");
     const second = sheetOf(t, declined.state);
     expect(second.note).toBe("Player 2, Dagnir's Hoard: search your deck for an Item attachment and add it to your hand? Your deck is shuffled after the search.");
@@ -251,10 +263,12 @@ describe("The First Forge and Wormsbane (19122:A:3, 19134:A:1)", () => {
   };
 
   it("the Response says Wormsbane's Attack, that the hero's leaving play loses the game, and that passing keeps it Broken for good; two-handed it leads Player 1", () => {
-    for (const [seats, lead] of [[1, ""], [2, "Player 1: "]] as const) {
+    for (const [seats, lead, chooser] of [[1, "", "you choose"], [2, "Player 1: ", "the first player chooses"]] as const) {
       const { t, run } = forge(seats);
       const sheet = sheetOf(t, run.state);
-      expect(sheet.note).toBe(`${lead}The First Forge was explored. Flip Wormsbane to its Reforged side and attach it to any hero the first player chooses. That hero gets +3 Attack (1 more than the 2 quest cards in the victory display), and if it leaves play the players lose the game. Pass and Wormsbane stays Broken side up on its hero, since The First Forge is gone.`);
+      expect(sheet.note).toBe(`${lead}The First Forge was explored. Flip Wormsbane to its Reforged side and attach it to any hero ${chooser}. That hero gets +3 Attack (1 more than the 2 quest cards in the victory display), and if it leaves play the players lose the game. Pass and Wormsbane stays Broken: the players cannot win the game without the Reforged Wormsbane.`);
+      // The Pass is armed with what it leaves undone.
+      expect(sheet.kind === "trigger" ? sheet.passCaution : null).toBe("Tap again: Wormsbane stays Broken and the game cannot be won.");
     }
   });
 
@@ -282,11 +296,12 @@ describe("the Response that adds Dagnir to the victory display (19142:B:2)", () 
       const t = gundabadTable(world, { seats, phase: "PlayerAttacks", stage: "19142", questDeck: [], staging: [{ code: CODES.dagnir, damage: 19 }], attached: [{ code: "19144" }], victory: ["19134", "19135", "19137", "19138", "19139"] });
       const run = send(start(t.state), { type: "DeclareAttackers", enemyId: idOf(t.state, CODES.dagnir), attackerIds: [t.hero] } as never, t.ctx);
       const response = sheetOf(t, run.state);
-      expect(response.note).toBe(`${lead}Dagnir has no hit points remaining. You may discard your Reforged Wormsbane to add her to the victory display, and the players win the game. Pass and she stays in play.${suffix}`);
+      expect(response.note).toBe(`${lead}Dagnir has no hit points remaining. You may discard your Reforged Wormsbane to add Dagnir to the victory display, and the players win the game. Pass and Dagnir stays in play.${suffix}`);
+      expect(response.kind === "trigger" ? response.passCaution : null).toBe("Tap again: Dagnir stays in play and the game is not won.");
       const asked = use(t, run, idOf(t.state, "19142"));
       const sheet = sheetOf(t, asked.state);
-      expect(sheet.note).toBe(`${seats === 1 ? "" : "Player 1, "}Exploring Gundabad: discard your Reforged Wormsbane to add Dagnir to the victory display? The players win the game.`);
-      expect(labels(sheet)).toEqual(["Discard Wormsbane: Dagnir is added to the victory display and the players win the game", "Do not discard it: Wormsbane stays attached and Dagnir stays in play"]);
+      expect(sheet.note).toBe(`${seats === 1 ? "" : "Player 1, "}Exploring Gundabad (can win): discard your Reforged Wormsbane to add Dagnir to the victory display? If you do, the players win the game.`);
+      expect(labels(sheet)).toEqual(["Discard Wormsbane: the players win", "Keep Wormsbane: Dagnir stays in play"]);
       expect(sheet.note).not.toContain("chooses");
     }
   });
@@ -309,7 +324,7 @@ describe("a stage's damage to a questing character, with Wormsbane's host among 
     for (const [seats, lead] of [[1, ""], [2, "Player 1: "]] as const) {
       const { t, run } = pursuit(seats, 0);
       const sheet = sheetOf(t, run.state);
-      expect(sheet.note).toBe(`${lead}${lead ? "choose" : "Choose"} a questing character you control to deal 2 damage to.`);
+      expect(sheet.note).toBe(`${lead}${lead ? "deal" : "Deal"} 2 damage to a questing character you control.`);
       expect(sheet.note).not.toContain("chooses");
       expect(cautions(sheet)).toEqual([undefined, undefined]);
     }
@@ -335,7 +350,7 @@ describe("the cards a stage looks at or searches (19134:B:1, 19137:B:2)", () => 
   it("the first player's look at the top 2 stages names the choice and what becomes of the other", () => {
     const t = gundabadTable(world, { seats: 2, phase: "Planning", questDeck: ["19137", "19142", "19139"] });
     const sheet = sheetOf(t, advanceTo(t, start(t.state), () => false).state);
-    expect(sheet.note).toBe("Look at the top 2 stages of the quest deck and choose 1 to place on the bottom. The other becomes the current quest. Player 1 chooses.");
+    expect(sheet.note).toBe("Look at the top 2 stages of the quest deck and choose 1 to place on the bottom. The other becomes the current quest: it is flipped over at once. Player 1 chooses.");
     expect(sheet.options).toHaveLength(2);
   });
 
@@ -361,12 +376,70 @@ describe("Dragon-sickness (12194:A:2)", () => {
 
 describe("the limit on the cards a player plays in a phase (19140:B:1)", () => {
   it("refuses the second card with the card that limits, the number, the player and the phase", () => {
-    for (const [seats, who] of [[1, "you have"], [2, "Player 1 has"]] as const) {
+    for (const [seats, who] of [[1, "You have"], [2, "Player 1 has"]] as const) {
       const t = gundabadTable(world, { seats, phase: "Planning", stage: "19140", questDeck: [], hand: ["filler", "c0"] });
       const [one, two] = [idOf(t.state, "filler"), idOf(t.state, "c0")];
       const played = finish(send(start(t.state), { type: "PlayCard", cardId: one, payments: [] }, t.ctx), t.ctx);
-      expect(playReason(played.state, { type: "PlayCard", cardId: two, payments: [] }, t.ctx)).toBe(`Exploring Gundabad: each player plays at most 1 card each phase, and ${who} played 1 this planning phase.`);
+      expect(playReason(played.state, { type: "PlayCard", cardId: two, payments: [] }, t.ctx)).toBe(`Exploring Gundabad (play limit): each player can play only 1 card per phase. ${who} played 1 this planning phase.`);
     }
+  });
+});
+
+describe("stages that print one title are told apart (emce.gundabad-quest-deck)", () => {
+  it("Throat of the Mountain's search lists each stage by its reading, all different", () => {
+    const t = gundabadTable(world, { phase: "Quest", active: CODES.throatOfTheMountain, stage: "19135", progress: 2, questDeck: ["19137", "19142", "19139"] });
+    const asked = use(t, explore(t), idOf(t.state, CODES.throatOfTheMountain));
+    const row = labels(sheetOf(t, asked.state));
+    expect(row).toEqual(["Exploring Gundabad (no canceling)", "Exploring Gundabad (can win)", "Exploring Gundabad (attacks)"]);
+    expect(new Set(row).size).toBe(row.length);
+  });
+
+  it("the look at the top 2 stages lists them by their reading and says the pick goes to the bottom", () => {
+    const t = gundabadTable(world, { seats: 2, phase: "Planning", questDeck: ["19137", "19142", "19139"] });
+    const row = labels(sheetOf(t, advanceTo(t, start(t.state), () => false).state));
+    expect(row).toEqual(["Exploring Gundabad (no canceling) · to the bottom", "Exploring Gundabad (can win) · to the bottom"]);
+  });
+
+  it("a stage defeated in the quest phase says its successor arrives side A up", () => {
+    const t = gundabadTable(world, { phase: "Quest", stage: "19140", progress: 0, questDeck: ["19137", "19142", "19139"] });
+    const stage = Object.values(t.state.cards).find((card) => card.code === "19140" && card.zone === "questStage");
+    const defeated = updateCard(t.state, stage?.id ?? "", { progress: 99 });
+    const run = advanceTo(t, start(settle({ ...defeated, window: null }, t.ctx, [])), () => false);
+    expect(sheetOf(t, run.state).note).toContain("The other becomes the current quest: it arrives side A up and is flipped at the beginning of the quest phase.");
+  });
+});
+
+describe("an AssignDamage in Mount Gundabad, with Wormsbane's host among the characters (rr.damage, 18064:A:1)", () => {
+  const cavern = (seats: 1 | 2 = 1): { t: Table; run: Run } => {
+    const t = gundabadTable(world, { seats, phase: "Travel", stage: "19137", questDeck: [], staging: [{ code: CODES.crumblingCavern }], attached: [{ code: CODES.wormsbane }] });
+    const hurt = updateCard(t.state, t.hero, { damage: 5 });
+    const to = idOf(hurt, CODES.crumblingCavern);
+    return { t, run: advanceTo(t, send(start(hurt), { type: "Travel", locationId: to }, t.ctx), () => false) };
+  };
+
+  it("names the one damage on every row, arms \"Tap again\" on a character it destroys and names the loss on the host", () => {
+    const { t, run } = cavern();
+    const sheet = sheetOf(t, run.state);
+    expect(labels(sheet)).toEqual(["dh1 · 1 damage · destroyed", "dh2 · 1 damage"]);
+    expect(cautions(sheet)).toEqual(["Tap again: dh1 falls and the game is lost", undefined]);
+  });
+
+  it("a character without Wormsbane that the damage destroys is told so without losing the game", () => {
+    const t = gundabadTable(world, { phase: "Travel", stage: "19137", questDeck: [], staging: [{ code: CODES.crumblingCavern }] });
+    const hurt = updateCard(t.state, t.hero2, { damage: 5 });
+    const run = advanceTo(t, send(start(hurt), { type: "Travel", locationId: idOf(hurt, CODES.crumblingCavern) }, t.ctx), () => false);
+    expect(cautions(sheetOf(t, run.state))).toEqual([undefined, "Tap again: dh2 is destroyed"]);
+  });
+});
+
+describe("Eyes in the Dark discarding the hero who carries Wormsbane (18057:A:2)", () => {
+  it("arms the discard with the loss of the game, and a hero without Wormsbane with the discard alone", () => {
+    const t = gundabadTable(world, { phase: "Quest", stage: "19137", questDeck: [], committed: 2, attached: [{ code: CODES.wormsbane }], staging: [{ code: CODES.eyesInTheDark }] });
+    const eyes = idOf(t.state, CODES.eyesInTheDark);
+    const asked = advanceTo(t, start(opened(t, t.state, CODES.eyesInTheDark, "whenRevealed", eyes)), () => false);
+    const sheet = sheetOf(t, take(t, asked, "discard").state);
+    expect(labels(sheet)).toEqual(["dh1", "dh2"]);
+    expect(cautions(sheet)).toEqual(["Tap again: dh1 is discarded and the game is lost", "Tap again: dh2 is discarded"]);
   });
 });
 
