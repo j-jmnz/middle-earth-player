@@ -1,0 +1,35 @@
+name: Rules or card bug
+description: A card, keyword or rule plays differently from what is printed.
+labels: [rules]
+body:
+  - type: input
+    id: scenario
+    attributes:
+      label: Scenario
+      description: The scenario or campaign, and the mode (normal, Easy, Nightmare).
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: The card or rule, what the app did, and what it should have done.
+    validations:
+      required: true
+  - type: textarea
+    id: source
+    attributes:
+      label: Printed source
+      description: The card's printed text, or the rule and where it is printed (campaign booklet, Learn to Play, Rules Reference, FAQ), with the page if you can.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: How to reach it
+      description: The decks, the round and phase, and the moves leading up to it. A screenshot helps.
+  - type: input
+    id: platform
+    attributes:
+      label: Platform
+      description: iOS, Android or web, and the app commit if you built it yourself.

@@ -2,7 +2,14 @@
   "name": "middle-earth-lcg",
   "main": "expo-router/entry",
   "version": "1.0.0",
+  "description": "An offline app for playing The Lord of the Rings: The Card Game solo. Fan-made, not affiliated with Fantasy Flight Games.",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/j-jmnz/middle-earth-lcg.git"
+  },
+  "homepage": "https://github.com/j-jmnz/middle-earth-lcg#readme",
+  "bugs": "https://github.com/j-jmnz/middle-earth-lcg/issues",
   "dependencies": {
     "@shopify/flash-list": "2.3.2",
     "@shopify/react-native-skia": "2.14.0",
@@ -78,7 +85,9 @@
     "docs:section": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/docs/index.ts section",
     "move": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/tools/move.ts",
     "test:scenario": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/tools/test-scenario.ts",
-    "scenario:new": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/tools/scenario-new.ts"
+    "scenario:new": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/tools/scenario-new.ts",
+    "commit:check": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/git/commit-message.ts",
+    "prepare": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/git/commit-message.ts --install --quiet"
   },
   "private": true,
   "packageManager": "pnpm@10.34.1"

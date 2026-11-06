@@ -6,4 +6,4 @@ The MEC109 booklet, the quest card and the campaign card win on a rule. A card's
 
 A rule change updates `docs/brief.md` in the same change. Do not commit `catalog.db`, card scans or PDFs. Card text and rules text live in `data/` on purpose.
 
-Code changes follow `.claude/rules/code-standards.md`. Doc changes, `docs/phases/STATUS.md` included, follow `.claude/rules/docs-standards.md`. Running a plan with several sections is `/orchestrator`. Implementing a phase is `/implementer`. Reviewing a diff is `/reviewer`. Reviewing screens is `/ux`. Writing effect records for lines no template reads is `effect-author`. Phase status is `docs/phases/STATUS.md`.
+Code changes follow `.claude/rules/code-standards.md`. Doc changes, `docs/phases/STATUS.md` included, follow `.claude/rules/docs-standards.md`. Commits and merges follow `.claude/rules/commit-standards.md`. Running a plan with several sections is `/orchestrator`. Implementing a phase is `/implementer`. Reviewing a diff is `/reviewer`. Reviewing screens is `/ux`. Writing effect records for lines no template reads is `effect-author`. Phase status is `docs/phases/STATUS.md`.

@@ -9,8 +9,9 @@ Read a section, not a file: `pnpm docs:section <file> "<heading>"` prints one se
 Read whole.
 
 - `CLAUDE.md` — Claude Code (~2.1K tok)
-- `.claude/rules/authority.md` — Authority (~430 tok)
+- `.claude/rules/authority.md` — Authority (~450 tok)
 - `.claude/rules/code-standards.md` — Code standards (~1.9K tok)
+- `.claude/rules/commit-standards.md` — Commit standards (~600 tok)
 - `.claude/rules/docs-standards.md` — Docs standards (~1.1K tok)
 
 ## Agents
@@ -27,7 +28,7 @@ Each agent reads its own file.
 
 Read the sections your task touches.
 
-- `README.md` — Middle Earth LCG (~3.8K tok)
+- `README.md` — Middle Earth LCG (~3.4K tok)
   - 8–16 Features (~210)
   - 17–27 Roadmap (~160)
   - 28–36 Accessibility (~340)
@@ -37,11 +38,11 @@ Read the sections your task touches.
     - 64–73 In a browser (~140)
     - 74–95 On a phone (~360)
     - 96–99 Maestro (~150)
-  - 100–125 Commands (~660)
-  - 126–143 Contributing (~480)
-  - 144–151 Documentation (~130)
-  - 152–169 Attribution (~480)
-  - 170–173 License (~80)
+  - 100–126 Commands (~720)
+  - 127–130 Contributing (~70)
+  - 131–138 Documentation (~130)
+  - 139–156 Attribution (~480)
+  - 157–160 License (~80)
 - `docs/architecture.md` — Architecture (~19.8K tok)
   - 7–41 Stack (~980)
   - 42–77 Processes (~660)
@@ -228,16 +229,16 @@ Read when a task names the plan.
 
 Open work; read when a task names it.
 
-- `docs/handover/agent-brief.md` — Brief for a mechanic-family or scenario agent (~3.7K tok)
+- `docs/handover/agent-brief.md` — Brief for a mechanic-family or scenario agent (~3.8K tok)
   - 19–37 Setup (~440)
   - 38–56 Files you own (edit freely) (~490)
   - 57–70 Shared files (~300)
   - 71–85 Approach (~680) ← 1
   - 86–100 Scenario procedure (~620) ← 5
-  - 101–110 Checkpoints (API usage limits can stop you mid-task) (~200)
+  - 101–110 Checkpoints (API usage limits can stop you mid-task) (~210)
   - 111–125 Checks before committing (~320)
-  - 126–132 Merge (~120)
-  - 133–139 Commit (~110)
+  - 126–132 Merge (~140) ← 1
+  - 133–139 Commit (~130)
   - 140–147 Report (your final message) (~90)
 
 ## Code to docs
@@ -248,6 +249,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/checks`: brief.md, Nightmare (2); design-system.md, Screen reader (2); architecture.md, Modules (1); architecture.md, Repository map (1)
 - `scripts/data`: brief.md, Nightmare (4); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
+- `scripts/git`: .claude/rules/commit-standards.md, Subject line (2)
 - `scripts/tools`: handover/agent-brief.md, Scenario procedure (2); architecture.md, Modules (1)
 - `src/campaign`: brief.md, Nightmare (4); architecture.md, Tests (2); brief.md, Ered Mithrin (2)
 - `src/catalog`: architecture.md, Mechanic families (2); brief.md, Nightmare (2); brief.md, A Knife in the Dark (1); brief.md, Dream-chaser (1); brief.md, Ered Mithrin (1); brief.md, Flight to the Ford burden deck and life (1); brief.md, Three layers (1)

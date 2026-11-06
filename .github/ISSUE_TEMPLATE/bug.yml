@@ -1,0 +1,27 @@
+name: App bug
+description: A crash, a layout problem or anything else that is not a rules question.
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what happened instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+  - type: input
+    id: platform
+    attributes:
+      label: Platform
+      description: iOS, Android or web, the device, and the app commit if you built it yourself.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      render: text

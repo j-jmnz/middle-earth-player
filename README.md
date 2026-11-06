@@ -116,6 +116,7 @@ The end-to-end flows are in `.maestro/scenarios/<scenario-id>/` and `.maestro/fe
 | `pnpm scenario:new <scenario-id>` | Writes the skeleton files for a new scenario and registers it. `--dry-run` lists the files first. |
 | `pnpm catalog:build` | Writes `assets/catalog.db` (never committed) and `src/catalog/version.ts` (committed). |
 | `pnpm scans:pack` / `pnpm booklets:pack` | Packs card pictures and the booklet PDFs into `assets/` for the native bundle. |
+| `pnpm commit:check "<subject>"` | Checks commit subjects against `.claude/rules/commit-standards.md`. `--range <base>..<head>` checks a range of commits. `pnpm install` installs it as the `commit-msg` hook (`.githooks/`). |
 | `pnpm move <old> <new>` | Moves files and rewrites every import and path that refers to them. `--dry-run` first. |
 | `pnpm docs:index` / `pnpm docs:section <file> "<heading>"` | Regenerates `docs/INDEX.md` / prints one doc section. |
 | `node --experimental-strip-types scripts/card-smoke/run.ts <codes>` | Plays a seeded game with the given player cards and reports any engine error or stall. `--all` runs every card. |
@@ -125,21 +126,7 @@ Scripts log to stderr. `--verbose` and `--quiet` change how much they print; `LO
 
 ## Contributing
 
-1. Fork the repo and branch from `main`.
-2. Before you push, run `pnpm data:check`, `pnpm lint`, `pnpm typecheck` and `pnpm test`. CI (`.github/workflows/test.yml`) runs the same checks on every push and pull request. While you work, `pnpm test:changed` or `pnpm test:scenario <id>` give quicker feedback.
-3. Open a pull request that says what changed and why.
-
-Conventions:
-
-- Code follows [.claude/rules/code-standards.md](./.claude/rules/code-standards.md). Docs follow [.claude/rules/docs-standards.md](./.claude/rules/docs-standards.md): they describe the current state, and history stays in git.
-- Rules come from the printed sources, not memory. Cite the rule id from `data/rules/entries.json` in the code that implements it. A rule change also updates [docs/brief.md](docs/brief.md).
-- Don't edit `data/` by hand except for the hand-checked inputs (`data/printed/`, `data/rules/index.json`, `data/rules/columns.json`, `data/overrides.json`, `data/prebuilt-decks.json`, `data/starter-decks.json`). Change the build in `scripts/data/` and run `pnpm data:build`.
-- After adding or changing effect records, run `pnpm effects:open`. After changing doc headings or doc citations in code, run `pnpm docs:index`. Tests fail when either output is stale.
-- Use `pnpm move` to move files.
-- Never commit `assets/catalog.db`, card scans, card pictures, PDFs or a filled `src/screens/images/scan-map.ts`.
-- Out of scope: playtest cards, accounts or a backend, online multiplayer, and support for other card games. [docs/brief.md](docs/brief.md) has the full list of non-goals.
-
-Adding a scenario follows the procedure in [docs/handover/agent-brief.md](docs/handover/agent-brief.md), and authoring effect records follows [docs/plans/effect-authoring.md](docs/plans/effect-authoring.md). The repo also contains Claude Code agent definitions and rules in `.claude/`; you don't need them to contribute.
+Contributions are welcome. [CONTRIBUTING.md](CONTRIBUTING.md) covers the checks to run, the conventions and what is out of scope, and everyone taking part follows the [Code of Conduct](CODE_OF_CONDUCT.md). Report a security problem privately, as [SECURITY.md](SECURITY.md) says.
 
 ## Documentation
 

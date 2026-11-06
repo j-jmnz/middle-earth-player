@@ -39,7 +39,7 @@ An agent's report is a claim. Before committing:
 - Run `git status` and look for files that must not be there: `data/` changes, goldens or step logs, `catalog.db`, scans, PDFs, scratch scripts.
 - Run `pnpm lint`, `pnpm typecheck` and `pnpm test:changed` yourself (seconds, and `test:changed` covers the task's uncommitted diff). Run the full `pnpm test` yourself only when the agent edited anything after its last green full run, or the diff touches `data/` or `scripts/data/`.
 - Read each deviation it reports. A deviation that keeps the plan's intent goes into that task's commit message, and into Standing decisions in `docs/phases/STATUS.md` only if it constrains later work. One that changes a kept behaviour, or that the plan settled differently, goes to the user before you commit.
-- Commit with a message in the repository's voice (what changed and why, with the measured numbers), then push to the branch the user named with `git push -u origin <branch>`.
+- Commit with a message that follows `.claude/rules/commit-standards.md` (what changed and why, with the measured numbers), then push to the branch the user named with `git push -u origin <branch>`.
 - A repeated hand-back from a finished agent is not new work: ignore it.
 
 If a task cannot be done without changing a behaviour the plan keeps, stop and ask the user. Do not start the next task in the meantime.
