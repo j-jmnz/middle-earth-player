@@ -20,7 +20,7 @@ An offline, single-device app for playing The Lord of the Rings: The Card Game s
 - Card text comes from `data/printed/`, a ledger of the lines printed on each card, read from its scan.
 - Each printed line is implemented by an effect record: generated ones live in `src/effects/generated/` and hand-written ones in `src/effects/authored/`. A scenario becomes playable once every line of every card it deals has a record. Lines that no record covers yet are listed in `src/effects/open-lines.ts`.
 - The rules engine (`src/rules/`) is a pure reducer that runs in Node. It is split by mechanic family. Code and tests cite the rule ids they implement (`data/rules/entries.json`).
-- When sources disagree, the order of precedence is set in [.cursor/rules/authority.mdc](.cursor/rules/authority.mdc).
+- When sources disagree, the order of precedence is set in [.claude/rules/authority.md](./.claude/rules/authority.md).
 
 The stack is Expo SDK 58, Expo Router, Skia for the game table, Reanimated, NativeWind, SQLite through Drizzle, Zustand and Zod. [docs/architecture.md](docs/architecture.md) covers the module layout, state, the engine and the test layers.
 
@@ -111,7 +111,7 @@ Scripts log to stderr. `--verbose` and `--quiet` change how much they print; `LO
 
 Conventions:
 
-- Code follows [.cursor/rules/code-standards.mdc](.cursor/rules/code-standards.mdc). Docs follow [.cursor/rules/docs-standards.mdc](.cursor/rules/docs-standards.mdc): they describe the current state, and history stays in git.
+- Code follows [.claude/rules/code-standards.md](./.claude/rules/code-standards.md). Docs follow [.claude/rules/docs-standards.md](./.claude/rules/docs-standards.md): they describe the current state, and history stays in git.
 - Rules come from the printed sources, not memory. Cite the rule id from `data/rules/entries.json` in the code that implements it. A rule change also updates [docs/brief.md](docs/brief.md).
 - Don't edit `data/` by hand except for the hand-checked inputs (`data/printed/`, `data/rules/index.json`, `data/rules/columns.json`, `data/overrides.json`, `data/prebuilt-decks.json`, `data/starter-decks.json`). Change the build in `scripts/data/` and run `pnpm data:build`.
 - After adding or changing effect records, run `pnpm effects:open`. After changing doc headings or doc citations in code, run `pnpm docs:index`. Tests fail when either output is stale.
@@ -119,7 +119,7 @@ Conventions:
 - Never commit `assets/catalog.db`, card scans, card pictures, PDFs or a filled `src/screens/images/scan-map.ts`.
 - Out of scope: playtest and fan-made (ALeP) cards, accounts or a backend, online multiplayer, and support for other card games. [docs/brief.md](docs/brief.md) has the full list of non-goals.
 
-Adding a scenario follows the procedure in [docs/handover/agent-brief.md](docs/handover/agent-brief.md), and authoring effect records follows [docs/plans/effect-authoring.md](docs/plans/effect-authoring.md). The repo also contains agent definitions for Claude Code and Cursor (`.claude/` and `.cursor/`); you don't need them to contribute.
+Adding a scenario follows the procedure in [docs/handover/agent-brief.md](docs/handover/agent-brief.md), and authoring effect records follows [docs/plans/effect-authoring.md](docs/plans/effect-authoring.md). The repo also contains Claude Code agent definitions and rules in `.claude/`; you don't need them to contribute.
 
 ## Documentation
 

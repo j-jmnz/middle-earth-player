@@ -22,7 +22,7 @@ cards have no file under `src/effects/authored/families/`.
   Your base commit is the tip of `<BASE>` at that moment; `git log -1 --format=%h` says which.
 - If `node_modules` is missing, run `pnpm install --frozen-lockfile --offline` (without `--offline` if that fails).
 - Find docs through `docs/INDEX.md` and read sections (`pnpm docs:section <file> "<heading>"`), not whole files.
-- Read first: `CLAUDE.md`, `.cursor/rules/authority.mdc`, `.cursor/rules/code-standards.mdc`, `.cursor/rules/docs-standards.mdc`, `docs/plans/effect-authoring.md` (the cookbook; its "Mechanic
+- Read first: `CLAUDE.md`, `.claude/rules/authority.md`, `.claude/rules/code-standards.md`, `.claude/rules/docs-standards.md`, `docs/plans/effect-authoring.md` (the cookbook; its "Mechanic
   families" section describes the files you own), `docs/architecture.md`, the phase file for a scenario phase
   (`docs/phases/phase-NN-*.md`) and `docs/phases/STATUS.md`, and the schema files `src/catalog/effect-schema*.ts`. Skim
   `src/rules/interpret/interpret.ts`, `src/rules/interpret/effect-frames.ts`, `src/rules/windows/triggers.ts`, `src/rules/windows/responses.ts` and
@@ -88,7 +88,7 @@ work together with yours. A line that restates a rule the engine applies anyway 
 Every scenario phase follows it. A phase file names only what its own cards add.
 
 1. `data/scenarios/<id>.json` is built by `pnpm data:build`; re-read its cross-check report with `pnpm data:build -- --verbose`. Every card it deals has a ledger entry. A scan the agent cannot read is a question for the user, not a guess.
-2. `pnpm scenario:new <id>` writes the skeletons and the registry lines (Approach, step 7, lists them). `pnpm data:build` rewrites the barrel of authored effect files, then `pnpm effects:draft <id>` and the `effect-author` agent, until ownership coverage is green for every line of every dealt card, including the campaign card's Setup and Resolution. A task that writes records ends with a Readings list, and the orchestrator asks the user about the `needs-ruling` ones (`.cursor/agents/orchestrator.md`, Implementer tasks). `pnpm test:scenario <id>` is the loop while authoring. The full `pnpm test` is the gate before a commit (and runs in CI).
+2. `pnpm scenario:new <id>` writes the skeletons and the registry lines (Approach, step 7, lists them). `pnpm data:build` rewrites the barrel of authored effect files, then `pnpm effects:draft <id>` and the `effect-author` agent, until ownership coverage is green for every line of every dealt card, including the campaign card's Setup and Resolution. A task that writes records ends with a Readings list, and the orchestrator asks the user about the `needs-ruling` ones (`.claude/agents/orchestrator.md`, Implementer tasks). `pnpm test:scenario <id>` is the loop while authoring. The full `pnpm test` is the gate before a commit (and runs in CI).
 3. Reuse the keyword framework and the verbs. A new verb is engine work in the mechanic family it belongs to (`src/catalog/families/<family>.ts` for the schema, `src/rules/families/<family>/` for the engine), cites a ledger line or a rule span, and gets its own test.
 4. A zone or widget exists only when a setup record or a card line creates it. Cite the line in `docs/brief.md`.
 5. Fill the skeletons on the shared kit (`test/harness/scene-kit.ts`, `game-kit.ts`, `golden-suite.ts`, `scripts/e2e/seed-kit.ts`, `.maestro/subflows/`): a golden of auto-player games on fixed seeds, true solo and two-handed, through a win and through a loss, listed in `test/harness/golden-registry.ts`. `src/campaign/causes.test.ts` covers it. `pnpm test:scenario <id> --words` runs the words test (`src/play/words/scenario-words.test.ts`) before the goldens: check each sentence against `docs/design-system-table.md`, Choice tray (each sentence names its number, side and owner).
@@ -110,7 +110,7 @@ Every scenario phase follows it. A phase file names only what its own cards add.
 
 ## Checks before committing
 
-Other agents share this 4-core machine: use generous timeouts, check as `.cursor/rules/code-standards.mdc` (Checking a
+Other agents share this 4-core machine: use generous timeouts, check as `.claude/rules/code-standards.md` (Checking a
 change) says, and never kill processes you did not start (no `pkill`).
 
 - `pnpm typecheck`

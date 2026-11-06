@@ -19,7 +19,7 @@ Every section keeps these. A task that cannot keep one stops and reports.
 - Every `golden.json` and every committed fixture is byte-identical. `src/rules/engine/version.ts` is unchanged.
 - `src/effects/open-lines.ts` is unchanged, except in section A, where only lines of the scenarios not yet playable may close.
 - A generated record that takes over an authored one has the same id and is deep-equal to it. Any other overlap is narrowed or listed in `REPLACES` with its reason.
-- The scans, the ledger and the rule spans stay the authority (`.cursor/rules/authority.mdc`). Nothing seeded or copied ships unread.
+- The scans, the ledger and the rule spans stay the authority (`.claude/rules/authority.md`). Nothing seeded or copied ships unread.
 - Seeds, intents and policies stay as they are. A shared helper may move code; it may not change what a game does.
 
 ## A. Effects: draft better, template the repeats, copy identical lines
@@ -93,7 +93,7 @@ Exit: the plan's checks (Verification), and `pnpm data:check` shows no differenc
 ## F. Faster feedback while authoring
 
 - `pnpm test:scenario <scenario-id>` runs the scenario's tests, its goldens, the coverage and record-route checks, the file-size check, the rule-id check, every choice-words test, card-smoke on its player codes, and the pool, family and manifest tests when those changed. `--words` runs only the words test.
-- `scripts/checks/file-size.test.ts` holds the size rule in `.cursor/rules/code-standards.mdc`, Making a change, to every `.ts`/`.tsx` under `src`, `scripts` and `test` that is tracked or new and not ignored.
+- `scripts/checks/file-size.test.ts` holds the size rule in `.claude/rules/code-standards.md`, Making a change, to every `.ts`/`.tsx` under `src`, `scripts` and `test` that is tracked or new and not ignored.
 - `scripts/data/rules.test.ts` reads every rule-id prefix in `data/rules/entries.json`, so a rule id cited in code, docs or tests that names no span fails.
 - `src/play/words/scenario-words.test.ts` reads the records of each playable and scaffolded scenario's dealt cards (`test/harness/record-walk.ts` walks them) and words each pick with `askWords` (`src/play/words/ask.ts`), the function the sheet calls, so the test reads the sentence the player reads. It fails on a bare "Choose a/an X." or a fallback sentence; an allowlist, keyed by record id and the instruction's path in the record, holds the cases left as they read, and fails on an entry no sentence needs. `WORDS_DUMP=<id>` prints every sentence.
 - A scenario whose lines are all owned may wait outside `PLAYABLE_SCENARIOS` while its `golden.test.ts` exists and its `golden.json` does not, so the coverage test does not block the goldens task.
@@ -150,13 +150,13 @@ Ordered by what they save per scenario. A step that is built is deleted from thi
   - the build diff and the fix-pass diff, in lines;
   - the review findings by class;
   - the fix-pass lines by area, with the words and the sheets apart from the rest;
-  - the readings asked and the readings ruled (`.cursor/agents/orchestrator.md`, Implementer tasks);
+  - the readings asked and the readings ruled (`.claude/agents/orchestrator.md`, Implementer tasks);
   - the time each task took.
 - **Feed back.** For each finding class that recurs, add a check, a template or a line in the author's readings to Next steps. Delete a step when it is built.
 
 ## Order
 
-E waits until a new campaign or pack is added. The next steps run between scenario phases, one at a time, with the goldens byte-identical after each. Sections and steps run with `orchestrator`, one review round (`.cursor/agents/orchestrator.md`, One review round).
+E waits until a new campaign or pack is added. The next steps run between scenario phases, one at a time, with the goldens byte-identical after each. Sections and steps run with `orchestrator`, one review round (`.claude/agents/orchestrator.md`, One review round).
 
 ## Verification
 

@@ -1,8 +1,3 @@
----
-description: Code standards for every change to src
-alwaysApply: true
----
-
 # Code standards
 
 Every agent that changes code follows these. `docs/architecture.md` (State, Persistence, Screens, Performance) says why and where each one is used; this file is the checklist. A reviewer reports a breach as a finding against the code.
@@ -22,7 +17,7 @@ Every agent that changes code follows these. `docs/architecture.md` (State, Pers
 - That rule is what makes identity checks and `WeakMap` caches keyed by a state or a context sound (`memoOf` in `src/rules/interpret/constant-records.ts`). Reuse `memoOf` instead of writing another two-level `WeakMap`. Do not cache on a key that can be mutated.
 - A cache is bounded or uses a `WeakMap`. Its key holds everything the result depends on. A session cache keys on the whole save and the catalog version, so an Undo, a new deal or a log edit never returns a stale entry.
 - Look things up by index (`effectById`, `effectsOf`), not with `find` over the effect list on a hot path.
-- An engine change leaves every golden, step log and `data/` file unchanged unless the rule changed (then `ENGINE_VERSION`, as `.cursor/agents/implementer.md` says).
+- An engine change leaves every golden, step log and `data/` file unchanged unless the rule changed (then `ENGINE_VERSION`, as `.claude/agents/implementer.md` says).
 
 ## Rendering the table and screens
 
@@ -47,7 +42,7 @@ Every agent that changes code follows these. `docs/architecture.md` (State, Pers
 - Measure a speed-up before and after with a scratch script in the session scratchpad, and report both numbers. The script is not committed.
 - `src/screens` imports nothing from `src/rules`. The lint zones (`pnpm lint`) decide where a new helper lives.
 - A hand-written `.ts` or `.tsx` file has one job. Past roughly 300 lines it needs a single reason to stay together; past 500 it is split along behavior, not by an arbitrary line cut. `scripts/checks/file-size.test.ts` holds the 500: it lists the files over it, none may grow, and one back under the limit fails as stale. `pnpm test:scenario` runs it.
-- Match the surrounding code: dense `//` comments that say what the code does now, sentence case, rule ids and docs cited, the same naming. A comment cites a doc by file and section heading, never by line number, and does not narrate what the code used to do. Update `docs/architecture.md` (and `docs/design-system.md`, or `docs/design-system-table.md` for the table, for anything visible) wherever the change touches what they say, following `.cursor/rules/docs-standards.mdc`.
+- Match the surrounding code: dense `//` comments that say what the code does now, sentence case, rule ids and docs cited, the same naming. A comment cites a doc by file and section heading, never by line number, and does not narrate what the code used to do. Update `docs/architecture.md` (and `docs/design-system.md`, or `docs/design-system-table.md` for the table, for anything visible) wherever the change touches what they say, following `.claude/rules/docs-standards.md`.
 - A hook or script an agent runs prints only what the agent needs to act on. Progress bars, banners and success chatter go behind `--verbose` (scripts log through `scripts/log.ts`); a failure prints its full output.
 - `pnpm test`, `pnpm lint` and `pnpm typecheck` are green before a commit; `pnpm data:check` too when the engine or `data/` could move.
 

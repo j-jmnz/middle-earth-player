@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import { runScript, type Log } from "../log.ts";
 
 // The docs index (docs/INDEX.md): every file an agent reads, its size, the heading tree of the long ones with line ranges,
-// and which code cites each section, so an agent reads one section instead of a whole file (docs-standards.mdc).
+// and which code cites each section, so an agent reads one section instead of a whole file (rules/docs-standards.md).
 // Usage: pnpm docs:index rewrites docs/INDEX.md; pnpm docs:section <file> "<heading>" prints one section.
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
@@ -39,15 +39,15 @@ function listFiles(dir: string, keep: (name: string) => boolean): string[] {
 
 function markdownIn(dir: string, skip: (name: string) => boolean = () => false): string[] {
   return readdirSync(path.join(ROOT, dir))
-    .filter((name) => (name.endsWith(".md") || name.endsWith(".mdc")) && !skip(name))
+    .filter((name) => name.endsWith(".md") && !skip(name))
     .sort()
     .map((name) => `${dir}/${name}`);
 }
 
 export function groups(): Group[] {
   return [
-    { title: "Every session", note: "Read whole.", files: ["CLAUDE.md", ...markdownIn(".cursor/rules")] },
-    { title: "Agents", note: "Each agent reads its own file.", files: [...markdownIn(".cursor/agents"), ...markdownIn(".claude/agents")] },
+    { title: "Every session", note: "Read whole.", files: ["CLAUDE.md", ...markdownIn(".claude/rules")] },
+    { title: "Agents", note: "Each agent reads its own file.", files: markdownIn(".claude/agents") },
     { title: "Product, code and design", note: "Read the sections your task touches.", files: ["README.md", ...markdownIn("docs", (name) => name === "INDEX.md")] },
     { title: "Phases", note: "STATUS.md, then the active phase file.", files: ["docs/phases/STATUS.md", ...markdownIn("docs/phases", (name) => name === "STATUS.md")] },
     { title: "Live plans", note: "Read when a task names the plan.", files: markdownIn("docs/plans") },
@@ -204,8 +204,8 @@ export function renderIndex(graph: Graph = buildGraph()): string {
 // The lines of one section: the file by path or basename, the heading by exact text, prefix or substring.
 export function sectionText(fileArg: string, headingArg: string): string {
   const all = groups().flatMap((group) => group.files);
-  const wanted = fileArg.replace(/\.mdc?$/, "");
-  const file = all.find((item) => item === fileArg || item.replace(/\.mdc?$/, "") === wanted || path.basename(item).replace(/\.mdc?$/, "") === wanted);
+  const wanted = fileArg.replace(/\.md$/, "");
+  const file = all.find((item) => item === fileArg || item.replace(/\.md$/, "") === wanted || path.basename(item).replace(/\.md$/, "") === wanted);
   if (!file) throw new Error(`no indexed doc named ${fileArg}; see ${INDEX_PATH}`);
   const text = readFileSync(path.join(ROOT, file), "utf8");
   const headings = headingsOf(text);
