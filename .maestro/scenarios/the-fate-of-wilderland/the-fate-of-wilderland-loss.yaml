@@ -2,12 +2,26 @@ appId: com.middleearth.lcg
 tags:
   - scenario
 ---
-# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `wilderland-lost` (scripts/e2e/the-fate-of-wilderland.ts): a real two-handed
-# game of The Fate of Wilderland, parked on its loss. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
-# The steps are the shared subflow's (.maestro/subflows/scenario-loss.yaml); add this scenario's own assertions after the call.
+# Phase 60. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `wilderland-lost` (scripts/e2e/the-fate-of-wilderland.ts): a real two-handed game of The Fate of Wilderland
+# (the Defenders of Gondor and Swords of the Noldor lists, Easy) dealt from the log the first eight parts' wins write (parts 1 to 8 recorded as won, so the path resumes it), parked on its loss (every seat eliminated). A loss has no reward screen
+# and writes nothing: the scenario stays current, the campaign is not complete, and the pool the earlier parts wrote is as it was. The steps are the shared subflow's (.maestro/subflows/scenario-loss.yaml).
 - runFlow:
     file: ../../subflows/scenario-loss.yaml
     env:
       FIXTURE: wilderland-lost
       SCENARIO_ID: the-fate-of-wilderland
-# TODO: this scenario's own assertions on the log screen after the loss.
+# Back on the path, the campaign is not complete and this part is still the next one.
+- tapOn:
+    id: log-back
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- assertNotVisible:
+    id: path-complete
+- assertVisible:
+    id: node-the-fate-of-wilderland-status
+    text: "Next"
+- assertVisible:
+    id: pool
+    text: ".*Misplaced Trust.*"

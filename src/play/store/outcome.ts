@@ -12,6 +12,7 @@ import type { ScenarioState } from "../../rules/core/state.ts";
 import type { LogMark } from "./log.ts";
 import { detachLine, grappleLine } from "../words/grapple.ts";
 import { boardingWords } from "../words/sea.ts";
+import type { FateNames } from "../words/fate-beats.ts";
 import { firstTreacheryNote, stageArrivalNote, stageBeats } from "../words/gundabad-beats.ts";
 import { discoverLines, discoverTitle, POOL_COPY } from "../words/wilderland.ts";
 
@@ -31,7 +32,7 @@ export const BEAT_MS = 650;
 // `revealed` gives the printed When Revealed lines of a card (the Stormcaller's stage the C side of which was just revealed), or null.
 const SIDE_QUEST_TITLE = "End of the planning phase";
 
-type Names = { card: (cardId: string) => string; shadow?: (cardId: string) => string | null; stage?: (cardId: string) => string | null; revealed?: (cardId: string) => string | null; stageName?: (cardId: string) => string | null; mustBypass?: (cardId: string) => string | null };
+type Names = { card: (cardId: string) => string; shadow?: (cardId: string) => string | null; stage?: (cardId: string) => string | null; revealed?: (cardId: string) => string | null; stageName?: (cardId: string) => string | null; mustBypass?: (cardId: string) => string | null; fate?: FateNames };
 
 // "stage 3 of 4" for the Stormcaller's stage `cardId` (the area's current stage once it has advanced), or "its next stage" for a state that moved on.
 function stormcallerStageWords(state: ScenarioState, cardId: string): string {
@@ -151,6 +152,9 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
             line(`With ${names.card(declared)} gone, the attack is undefended`, null, [declared]);
           }
           line(step.undefended ? `Attack ${step.attack} on ${target}, undefended` : `Attack ${step.attack} against ${target}'s defense ${step.defense}`, "attack", [step.enemyId, step.targetId]);
+          // The enemy that discards the top card of the encounter deck for its Threat (The Fate of Wilderland).
+          const discarded = names.fate?.strike(after, step.enemyId);
+          if (discarded) line(discarded, null, [step.enemyId]);
         } else {
           open(2, `Attack on ${enemy}`, "plain");
           line(`Attack ${step.attack} against defense ${step.defense}`, "attack", [step.enemyId]);
@@ -160,6 +164,9 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         const end = rest.findIndex((later) => later.kind === "strike" || later.kind === "attack");
         const placed = (end < 0 ? rest : rest.slice(0, end)).some((later) => later.kind === "damage" && later.amount > 0 && later.targetId === step.targetId);
         if (!placed) line("No damage");
+        // The enemy that takes no damage until he has attacked says why (The Fate of Wilderland).
+        const shielded = !placed && step.side === "player" ? names.fate?.shielded(before, step.enemyId) : null;
+        if (shielded) line(shielded, null, [step.enemyId]);
         return;
       }
       case "damage":
@@ -193,6 +200,9 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         // The first treachery of a round, while a stage bars canceling its When Revealed effect (19137:B:1).
         const first = firstTreacheryNote(after, step.cardId, names.card(step.cardId));
         if (first) line(first, null, [step.cardId]);
+        // A treachery that raises the Threat of the staging area for the phase says what it does (The Fate of Wilderland).
+        const raised = names.fate?.revealed(after, step.cardId, before.phase === "Quest" && !steps.slice(0, index).some((earlier) => earlier.kind === "quest"));
+        if (raised) line(raised, null, [step.cardId]);
         return;
       // The enemy was faceup when it was revealed: the line names it and the location it is facedown under now (dcce.grapple).
       case "grapple":
@@ -248,6 +258,9 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
   // A stage of Mount Gundabad's quest deck flipped to side B at the beginning of the quest phase, or bypassed (emce.bypassing): no step of its own.
   const stage = stageBeats(before, after, { card: stageNamed, ...(names.mustBypass ? { mustBypass: names.mustBypass } : {}) });
   if (stage) groups.push({ rank: stage.rank, title: stage.title, tone: "plain", lines: stage.lines.map((text) => ({ text, mark: null })) });
+
+  // Where the objective of The Fate of Wilderland stands after progress moved on it, and the resources on the card that counts them.
+  for (const beat of names.fate?.beats(before, after) ?? []) groups.push({ rank: beat.rank, title: beat.title, tone: "plain", lines: beat.lines.map((text) => ({ text, mark: null })) });
 
   // Travel leaves no step of its own: the location that became active from staging. Once stages are separate each seat has an active location of its
   // own (`Seat.active`), and in two-handed play the line names the seat that traveled.

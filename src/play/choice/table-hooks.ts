@@ -12,6 +12,7 @@ import type { Sheet, SheetNames } from "./sheet-types.ts";
 import { followAnswers, passableWindow, tableAnswer, usableIds, type StopSettings } from "../phases/stops.ts";
 import { effectsOf } from "../../rules/windows/listen.ts";
 import { stageName } from "../../rules/families/wilderland/gundabad.ts";
+import { fateNames } from "../words/fate-beats.ts";
 import { mustBypassLead } from "../words/gundabad-beats.ts";
 import type { LegalIntent, ReduceContext, ScenarioState, TableMoment, TableStore } from "../store/store.ts";
 import { tableSettings, type TableSettings } from "../../ui/table-settings.ts";
@@ -59,13 +60,15 @@ export function useBanner(store: TableStore, ctx: ReduceContext, names: SheetNam
   // A stage of Mount Gundabad's quest deck by its reading (the stages print one title), and the lead of a bypass the stage forces (words/gundabad-beats.ts).
   const stageNamed = useCallback((cardId: string) => stageName(store.getState().game, ctx, cardId, names.card(cardId)), [store, ctx, names]);
   const mustBypass = useCallback((cardId: string) => mustBypassLead(ctx, store.getState().game.cards[cardId]?.code ?? ""), [store, ctx]);
+  // The lines of The Fate of Wilderland's banner: where the objective stands, the card an attack discards, the enemy that took no damage, the treachery that raises the staging area's Threat (words/fate-beats.ts).
+  const fate = useMemo(() => fateNames(ctx, names.card), [ctx, names]);
   // After it, the state it made. Read once per moment.
   const said = useMemo((): Moment | null => {
     if (!shown) return null;
     // After an undo the game is the state before the intent taken back, and `left` the state it had made.
-    if (shown.kind === "undone") return takenBack(intentWords(shown.intent, names.card, shown.after), momentOf(shown.after, shown.left, shown.steps, { card: names.card, shadow, stage, revealed, stageName: stageNamed, mustBypass }));
-    return momentOf(shown.before, shown.after, shown.steps, { card: names.card, shadow, stage, revealed, stageName: stageNamed, mustBypass });
-  }, [shown, names, shadow, stage, revealed, stageNamed, mustBypass]);
+    if (shown.kind === "undone") return takenBack(intentWords(shown.intent, names.card, shown.after), momentOf(shown.after, shown.left, shown.steps, { card: names.card, shadow, stage, revealed, stageName: stageNamed, mustBypass, fate }));
+    return momentOf(shown.before, shown.after, shown.steps, { card: names.card, shadow, stage, revealed, stageName: stageNamed, mustBypass, fate });
+  }, [shown, names, shadow, stage, revealed, stageNamed, mustBypass, fate]);
   // The round summary, once the round's own moment has had its say (outcome.ts, roundSummary).
   const summary = useMemo((): Moment | null => {
     if (shown?.kind !== "sent" || !shown.ended) return null;

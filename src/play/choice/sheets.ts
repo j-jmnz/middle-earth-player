@@ -48,6 +48,7 @@ import { asksCollection, collectionLabel, collectionOrder } from "./collection-s
 import { cardLabel, has, option, statOf, step } from "./sheet-parts.ts";
 import { nightActionNote, nightResponseNote } from "../words/night.ts";
 import { framsburgActionCaution, framsburgActionNote, framsburgEngageNote, framsburgResponseNote } from "../words/framsburg.ts";
+import { fateEngageNote, fateResponseNote } from "../words/fate.ts";
 import { gundabadOptionLabel, gundabadPassCaution, gundabadResponseNote } from "../words/gundabad.ts";
 import { gundabadRow } from "./gundabad-sheets.ts";
 import { TIMING_WORDS, type SheetStat, type HideNumbers, type PickOption, type Sheet, type SheetNames, type TriggerOption, type Unavailable } from "./sheet-types.ts";
@@ -131,7 +132,7 @@ function responseNote(game: ScenarioState, names: SheetNames, offers: readonly {
   const waiting = offers.filter((offer) => offer.seat === seat && !listed.some((item) => item.cardId === offer.cardId && item.effectId === offer.effectId));
   // At the end of the round, a card that counts tokens says what the count leads to (41050:B:1).
   const leads = event?.trigger === "endOfRound" ? offers.flatMap((offer) => tokenOutcome(ctx, game.cards[offer.cardId]?.code ?? "")).slice(0, 1) : [];
-  const night = nightResponseNote(game, names, event, listed.map((item) => item.cardId)) ?? framsburgResponseNote(game, ctx, names, event, listed.map((item) => item.cardId)) ?? gundabadResponseNote(game, ctx, names, event, listed.map((item) => item.cardId));
+  const night = nightResponseNote(game, names, event, listed.map((item) => item.cardId)) ?? framsburgResponseNote(game, ctx, names, event, listed.map((item) => item.cardId)) ?? gundabadResponseNote(game, ctx, names, event, listed.map((item) => item.cardId)) ?? fateResponseNote(game, ctx, names, event, listed.map((item) => item.cardId));
   const base = night ?? ["A Response may be used now, or passed.", ...leads].join(" ");
   if (waiting.length === 0) return base;
   // The side quest's sentence already says that passing gives it up.
@@ -149,7 +150,7 @@ function optionalEngageNote(game: ScenarioState, ctx: ReduceContext, names: Shee
   const parts = [`You may engage one enemy in staging. Your threat is ${threat}.`];
   if (anyway.length > 0) parts.push(`The checks engage ${anyway.join(", ")} anyway.`);
   if (stays.length > 0) parts.push(`${stays.join(", ")} ${stays.length === 1 ? "stays" : "stay"} in staging.`);
-  const barred = framsburgEngageNote(game, ctx, names, seat);
+  const barred = framsburgEngageNote(game, ctx, names, seat) ?? fateEngageNote(game, ctx, names);
   if (barred) parts.push(barred);
   return parts.join(" ");
 }

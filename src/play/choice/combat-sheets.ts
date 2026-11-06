@@ -7,6 +7,7 @@
 import { defenseAsDefender, modifiedStat } from "../../rules/core/keywords.ts";
 import { legalTargets, type LegalIntent, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../rules/engine/reduce.ts";
 
+import { fateAttackNote, fateTargetNote } from "../words/fate.ts";
 import { attackSource } from "../words/grapple.ts";
 import { nightDefenderExcess, nightStageAttack } from "../words/night.ts";
 import { damageOutcome, defenseDamage, undefendedDamage } from "../store/foresight.ts";
@@ -69,7 +70,7 @@ function attackersSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNam
     key: `attackers:${enemyId}`,
     step: "Combat",
     title: `Attack ${names.card(enemyId)}`,
-    note: `Defense ${defense}. Choose the characters that attack it.`,
+    note: `Defense ${defense}. Choose the characters that attack it.${fateTargetNote(game, ctx, enemyId)}`,
     verb: "Attack",
     stats: statOf(game, ctx, enemyId, "defense"),
     options: characters.map((id) => ({ ...option(game, names, id), stats: statOf(game, ctx, id, "attack") })),
@@ -87,7 +88,7 @@ export function defenseSheet(game: ScenarioState, ctx: ReduceContext, legal: rea
   // An attack a shadow card makes says where it comes from, as a pick says its card's line (sheets.ts).
   const shadowSource = numbers && game.pendingAttack?.shadowAttack ? ` ${names.card(numbers.enemyId)}'s shadow effect: it attacks you now, and goes back to the top of the encounter deck after combat.` : "";
   // An attack the Thing makes from the staging area while Eye of the Beast is engaged with the defender, or a detached arm's (dcce.grapple, 12050:A:3, 12052:A:3).
-  const source = shadowSource || attackSource(game, ctx, names.card);
+  const source = shadowSource || attackSource(game, ctx, names.card) || fateAttackNote(game, ctx, names.card);
   const note = numbers ? `Attack ${numbers.attack}.${source}` : "";
   const defenders = has(legal, "DeclareDefender") ? legalTargets(game, { type: "DeclareDefender" }, ctx) : [];
   const undefended = undefendedSheet(game, ctx, names, title, note);
