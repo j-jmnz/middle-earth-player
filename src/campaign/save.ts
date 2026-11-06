@@ -19,6 +19,9 @@ const poolCardSchema = z.strictObject({
   attachedTo: z.string().nullable(),
   seat: z.number().int().nullable(),
   perPlayer: z.boolean().optional(),
+  // A card shuffled into its player's deck after the starting hand (Recurring Nightmare, 11197:B:1; Misplaced Trust, 12184:B:3), and the number of the copy when a code has several (PoolCard in log.ts).
+  afterHand: z.literal(true).optional(),
+  copy: z.number().int().optional(),
 });
 
 const seatLists = z.array(z.array(z.string()));

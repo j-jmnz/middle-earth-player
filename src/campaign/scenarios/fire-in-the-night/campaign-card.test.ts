@@ -5,7 +5,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { buildStart } from "../../start.ts";
 import { campaignScenario } from "../../../catalog/scenario-data.ts";
 import { checklist } from "../../checklist.ts";
-import { choiceSentence, resolutionView, type ResolutionView } from "../../resolution-view.ts";
+import { choiceSentence, consequenceSentence, declineSentence, promptSentence, resolutionView, settledSentence, type ResolutionView } from "../../resolution-view.ts";
 import type { World } from "../../world.ts";
 import { emptyLog, type CampaignLog } from "../../log.ts";
 import { EFFECTS } from "../../../effects/index.ts";
@@ -194,6 +194,64 @@ describe("12187:B Resolution", () => {
     // Alone there is no seat to name.
     const solo = resolutionView(openResolution({ ...opened(1), stageCleared: true, window: null, stack: [] }, ctx), world);
     expect(solo.kind === "choosing" && solo.seatLabel).toBeNull();
+  });
+
+  // The Resolution as the screen reads it: the world the view is built in, and the window the engine has open after the answers so far.
+  const worldOf = () => ({ campaign, scenario: night, effects: ctx.effects, cards: ctx.cards, sets: new Map<string, string>() }) as World;
+  const waiting = (state: ScenarioState): ScenarioState => openResolution({ ...state, stageCleared: true, window: null, stack: [] }, ctx);
+  const choosing = (state: ScenarioState): Extract<ResolutionView, { kind: "choosing" }> => {
+    const view = resolutionView(state, worldOf());
+    if (view.kind !== "choosing") throw new Error(`not choosing: ${view.kind}`);
+    return view;
+  };
+
+  it("12187:B:2 the treasure of three: the first player chooses 1 of the 3 random undiscovered treasures, which are only recorded as discovered, as the scenario is over", () => {
+    for (const seats of [1, 2] as const) {
+      const state = waiting(withProgress(opened(seats), 5));
+      const line = expectOk(reduce(state, { type: "ChooseResolution", optionId: LINE } as PlayerIntent, ctx)).state;
+      const view = choosing(openResolution(line, ctx));
+      expect(view).toMatchObject({ eyebrow: "Choose a treasure", to: "treasure", noun: "treasure", seatLabel: seats > 1 ? "Player 1 (first player) chooses" : null });
+      expect(view.tiles).toHaveLength(3);
+      expect(view.decline).toBeNull();
+      expect(promptSentence(view)).toBe("Choose 1 of the 3 random undiscovered treasures. It is recorded as discovered when you confirm.");
+      expect(choiceSentence(view, view.tiles[1]!)).toBe(`${view.tiles[1]!.name} is discovered and recorded in the campaign log. The scenario is over, so it is not attached to a character.`);
+      expect(consequenceSentence(view, null, false)).toBe(promptSentence(view));
+    }
+  });
+
+  it("12187:B:4 each player's removal says whose turn it is, that a burden cannot be removed, what a decline keeps and what the card does; the answer of the first player is kept for the second", () => {
+    const facts = { prisoner: null, usedOnce: [], counters: {}, pool: [{ code: "12166", seat: 0 }, { code: "12169", seat: 1 }] };
+    let state = waiting(opened(2, 1, { facts }));
+    state = openResolution(expectOk(reduce(state, { type: "ChooseResolution", optionId: LINE } as PlayerIntent, ctx)).state, ctx);
+    const first = choosing(state);
+    expect(first).toMatchObject({ eyebrow: "Remove a card from the pool", to: "removal", seat: 0, seatLabel: "Player 1 (first player) chooses", decline: { label: "Remove nothing" } });
+    expect(promptSentence(first)).toBe("Choose a non-burden card to remove from the campaign pool, or tap Remove nothing to keep them all. Each player is asked in turn, the first player first. Your choice is written to the campaign log when you confirm.");
+    expect(declineSentence(first)).toBe("Player 1 removes nothing from the campaign pool.");
+    const turayn = first.tiles.find((tile) => tile.code === "12166")!;
+    expect(choiceSentence(first, turayn)).toBe("Turayn is removed from the campaign pool.");
+    const pick = legalIntents(state, ctx).flatMap((intent) => (intent.type === "ChooseResolution" && intent.optionId.includes("12166") ? [intent.optionId] : []))[0] ?? "";
+    state = openResolution(expectOk(reduce(state, { type: "ChooseResolution", optionId: pick } as PlayerIntent, ctx)).state, ctx);
+    const second = choosing(state);
+    expect(second).toMatchObject({ seat: 1, seatLabel: "Player 2 chooses", answered: [{ seat: 0, words: "Turayn" }] });
+    expect(second.tiles.map((tile) => tile.code)).toEqual(["12169"]);
+    expect(declineSentence(second)).toBe("Player 2 removes nothing from the campaign pool.");
+    // Alone nobody is named.
+    const solo = choosing(openResolution(expectOk(reduce(waiting(opened(1, 1, { facts: { ...facts, pool: [{ code: "12166", seat: 0 }] } })), { type: "ChooseResolution", optionId: LINE } as PlayerIntent, ctx)).state, ctx));
+    expect(solo.seatLabel).toBeNull();
+    expect(promptSentence(solo)).toBe("Choose a non-burden card to remove from the campaign pool, or tap Remove nothing to keep them all. Your choice is written to the campaign log when you confirm.");
+    expect(declineSentence(solo)).toBe("You remove nothing from the campaign pool.");
+  });
+
+  it("12188:A:1 the confirm sentence records the boxes marked beside Beldis in the game, for each player", () => {
+    const facts = { prisoner: null, usedOnce: [], counters: {}, beldisUses: [2, 0] };
+    const state = won(opened(2, 1, { facts }), takeLine).state;
+    const view = resolutionView(state, worldOf());
+    expect(view).toMatchObject({ kind: "settled", beldis: ["Player 1: Beldis, 2 of 4 boxes marked", "Player 2: Beldis, 0 of 4 boxes marked"] });
+    if (view.kind !== "settled") return;
+    expect(settledSentence(view, worldOf(), "The Ghost of Framsburg")).toContain("The boxes beside Beldis are recorded in the campaign log: Player 1: Beldis, 2 of 4 boxes marked. Player 2: Beldis, 0 of 4 boxes marked.");
+    // A game that used Beldis for nobody says nothing of the boxes.
+    const quiet = resolutionView(won(opened(1), takeLine).state, worldOf());
+    expect(quiet.kind === "settled" && quiet.beldis).toBeUndefined();
   });
 
   it("a lost scenario writes nothing", () => {

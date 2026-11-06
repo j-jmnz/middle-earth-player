@@ -53,6 +53,13 @@ describe("the log's Ered Mithrin columns", () => {
     expect(parseLog(JSON.parse(JSON.stringify(log)))).toEqual(log);
   });
 
+  it("keeps the pool cards a Resolution shuffles into a deck after the starting hand, and the copy number, so a save written after Misplaced Trust loads (12184:B:3)", () => {
+    const pooled = [{ code: "12186", back: "player" as const, burdenSet: null, attachedTo: null, seat: 0, perPlayer: true, afterHand: true as const }, { code: "11197", back: "player" as const, burdenSet: null, attachedTo: null, seat: 1, afterHand: true as const, copy: 2 }];
+    const log: CampaignLog = { ...emptyLog(2), campaignPool: pooled };
+    expect(parseLog(JSON.parse(JSON.stringify(log)))).toEqual(log);
+    expect(() => parseLog({ ...log, campaignPool: [{ ...pooled[0], afterHand: false }] })).toThrow();
+  });
+
   it("reads a log saved before them with the defaults, so an old save loads", () => {
     const { treasures: _t, allyLines: _a, beldisUses: _b, encounterPool: _e, ...old } = emptyLog(1);
     const parsed = parseLog(JSON.parse(JSON.stringify(old)));

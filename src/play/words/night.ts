@@ -2,9 +2,13 @@
 // Fire in the Night's choices on the live sheet (docs/design-system-table.md, Choice tray): each says the number, the side of the table and the player. The first player's question at the beginning of the quest phase names the side quests in the staging area
 // and what each is worth; one player's choice leads with "Player N:" two-handed (`owned`, so the sheet adds no "Player N chooses."), solo it has no lead. Pure.
 import type { Instruction } from "../../catalog/boundary.ts";
+import { BELDIS_BOXES } from "../../catalog/ally-lines.ts";
+import { modifiedStat } from "../../rules/core/keywords.ts";
 import { MAIN_QUEST } from "../../rules/families/wilderland/night.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
+import type { GameEvent } from "../../rules/windows/frame-types.ts";
 import type { ReduceContext } from "../../rules/interpret/interpret.ts";
+import { undefendedDamage } from "../store/foresight.ts";
 
 import type { ChoiceNames, PickWords } from "./choice.ts";
 import { seatSays } from "./seat.ts";
@@ -72,4 +76,45 @@ export function nightAsk(instruction: Instruction, source: string | null, names:
   const says = game ? seatSays(game) : null;
   const text = `the enemy that attacks ${HILL}${source ? ` (${names.card(source)})` : ""}. The first player may declare a defender; the damage left undefended, and the damage beyond a defender's hit points, is dealt to ${HILL}.`;
   return says ? { verb: "Attack", prompt: says.say(`choose ${text}`), ...says.owned } : { verb: "Attack", prompt: `Choose ${text}` };
+}
+
+const leadOf = (game: ScenarioState, seat: number): string => (game.seatCount > 1 ? `Player ${seat + 1}: ` : "");
+
+/**
+ * The sentence over the defense sheet of an attack whose damage goes to Hrogar's Hill. The attack the stage makes (19083:B:1, rr.attacks-outside-the-combat-phase) is the first player's to defend, deals no shadow card, and puts the damage no defender takes, and
+ * the damage beyond a defender's hit points, on the Hill; The Dragon's Fury (19081:A:1) has its shadow card and only the undefended damage go there. `caution` arms Leave undefended when the damage fills the Hill. Null for any other attack.
+ */
+export function nightStageAttack(game: ScenarioState, ctx: ReduceContext, names: Pick<ChoiceNames, "card">, enemyId: string, defenders: number): { note: string; caution?: string } | null {
+  const hill = game.questStage ? game.cards[game.questStage] : undefined;
+  const enemy = game.cards[enemyId];
+  if (!game.pendingAttack?.toStage || game.pendingAttack.undefended || !hill || !enemy) return null;
+  const seat = game.window?.kind === "defense" ? game.window.seat : game.firstPlayer;
+  const points = modifiedStat(game, hill, "questPoints", ctx.cards);
+  const damage = undefendedDamage(game, ctx, enemyId);
+  const holds = `${HILL} holds ${hill.damage} of ${points} damage`;
+  const caution = hill.damage + damage >= points ? { caution: `Tap again: ${HILL} holds ${points} damage and the game is lost` } : {};
+  const lead = leadOf(game, seat);
+  // The attack the stage makes: no shadow card, and the excess beyond the defender goes to the Hill too.
+  if (game.pendingAttack.excessToStage && !enemy.shadowId) {
+    const choice = defenders > 0 ? `A defender takes the damage its Defense leaves, and the damage beyond its hit points goes to ${HILL}. Leave it undefended and all ${damage} damage is dealt to ${HILL}.` : `No character can defend: all ${damage} damage is dealt to ${HILL}.`;
+    return { note: `${lead}${names.card(enemy.id)} attacks ${HILL}. No shadow card is dealt. ${choice} ${holds}.`, ...caution };
+  }
+  const choice = defenders > 0 ? `Choose a defender, or leave it undefended: then all ${damage} damage is dealt to ${HILL}, not to a character.` : `No character can defend: all ${damage} damage is dealt to ${HILL}, not to a character.`;
+  return { note: `${lead}${names.card(enemy.id)} attacks. ${choice} ${holds}.`, ...caution };
+}
+
+/** The sentence over the Response window of a defeated side quest (emce.side-quests-in-play), when one of the Responses offered is its own: the side quest goes to the victory display, the quest deck does not advance, and the first player uses the Response or passes it. Null for another event. */
+export function nightResponseNote(game: ScenarioState, names: Pick<ChoiceNames, "card">, event: GameEvent | null, offered: readonly string[]): string | null {
+  const quest = event?.trigger === "questDefeated" && event.cardId && offered.includes(event.cardId) ? game.cards[event.cardId] : undefined;
+  if (!quest) return null;
+  const seat = game.window?.kind === "response" ? game.window.seat : game.firstPlayer;
+  return `${leadOf(game, seat)}${names.card(quest.id)} is defeated and goes to the victory display; ${HILL} does not advance. Use its Response, or pass: passing gives it up.`;
+}
+
+/** The sentence under Beldis's Action (12188:A:1): how many of the acting player's four boxes beside her in the campaign log are left, and that a win records the mark. Null for another card's Action. */
+export function nightActionNote(game: ScenarioState, effectId: string): string | null {
+  if (effectId !== "12188:action:1") return null;
+  const seat = game.activeSeat;
+  const left = BELDIS_BOXES - (game.campaignFacts?.beldisUses?.[seat] ?? 0);
+  return `${leadOf(game, seat)}${left} of ${BELDIS_BOXES} boxes beside Beldis ${left === 1 ? "is" : "are"} left. Using her marks one in the campaign log if you win.`;
 }

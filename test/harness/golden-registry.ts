@@ -24,7 +24,7 @@ import * as lostmirk from "../scenarios/lost-in-mirkwood/game.ts";
 import * as kingsquest from "../scenarios/the-kings-quest/game.ts";
 import * as heath from "../scenarios/the-withered-heath/game.ts";
 import * as rhovanion from "../scenarios/roam-across-rhovanion/game.ts";
-// import * as night from "../scenarios/fire-in-the-night/game.ts";
+import * as night from "../scenarios/fire-in-the-night/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -74,5 +74,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-kings-quest", "The King's Quest", kingsquest.KINGSQUEST_GOLDENS, kingsquest.kingsquestWorld, kingsquest.playGolden),
   entry("the-withered-heath", "The Withered Heath", heath.HEATH_GOLDENS, heath.heathWorld, heath.playGolden),
   entry("roam-across-rhovanion", "Roam Across Rhovanion", rhovanion.RHOVANION_GOLDENS, rhovanion.rhovanionWorld, rhovanion.playGolden),
-  // entry("fire-in-the-night", "Fire in the Night", night.NIGHT_GOLDENS, night.nightWorld, night.playGolden),
+  entry("fire-in-the-night", "Fire in the Night", night.NIGHT_GOLDENS, night.nightWorld, night.playGolden),
 ];

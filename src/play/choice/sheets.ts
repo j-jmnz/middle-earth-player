@@ -46,6 +46,7 @@ import { hideCommitLimit } from "../../rules/families/nightmare/guards.ts";
 import { sailingSheet, shipRow } from "./sea-sheets.ts";
 import { asksCollection, collectionLabel, collectionOrder } from "./collection-sheets.ts";
 import { cardLabel, has, option, statOf, step } from "./sheet-parts.ts";
+import { nightActionNote, nightResponseNote } from "../words/night.ts";
 import { TIMING_WORDS, type SheetStat, type HideNumbers, type PickOption, type Sheet, type SheetNames, type TriggerOption, type Unavailable } from "./sheet-types.ts";
 
 function effectOf(ctx: ReduceContext, effectId: string): Effect | undefined {
@@ -71,7 +72,7 @@ export function triggerOptions(game: ScenarioState, ctx: ReduceContext, legal: r
       effectId: intent.effectId,
       cardId: intent.cardId,
       timing: TIMING_WORDS[effect.timing],
-      text: lineOf(effect, names),
+      text: [lineOf(effect, names), nightActionNote(game, effect.id)].filter((part) => part != null).join(" ") || null,
       pay: game.window?.kind === "cancelOffer" ? cancelRequest(game, ctx, intent.cardId) : triggerRequest(game, ctx, intent.cardId, effect),
     });
   }
@@ -125,7 +126,7 @@ function responseNote(game: ScenarioState, names: SheetNames, offers: readonly {
   const waiting = offers.filter((offer) => offer.seat === seat && !listed.some((item) => item.cardId === offer.cardId && item.effectId === offer.effectId));
   // At the end of the round, a card that counts tokens says what the count leads to (41050:B:1).
   const leads = event?.trigger === "endOfRound" ? offers.flatMap((offer) => tokenOutcome(ctx, game.cards[offer.cardId]?.code ?? "")).slice(0, 1) : [];
-  const base = ["A Response may be used now, or passed.", ...leads].join(" ");
+  const base = nightResponseNote(game, names, event, listed.map((item) => item.cardId)) ?? ["A Response may be used now, or passed.", ...leads].join(" ");
   if (waiting.length === 0) return base;
   return `${base} Waiting for its cost, and offered once it can be paid: ${waiting.map((offer) => names.card(offer.cardId)).join(", ")}. Passing gives it up too.`;
 }

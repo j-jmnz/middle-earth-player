@@ -15,6 +15,7 @@ import { ALLY_LINE_FACTS, type AllyLine } from "../catalog/ally-lines.ts";
 import { contextOf } from "./session.ts";
 import type { World } from "./world.ts";
 import { cappedTally } from "./wilderland.ts";
+import { wilderlandView } from "./wilderland-view.ts";
 
 // `label`: the words on the tile ("Tireless Ranger on Sam Gamgee", "Turayn for Player 1"). `wide`: a tile with no card, laid in a row of its own under the card tiles (the log line). `tag` is a muted
 // word under the name that tells a kind apart (an encounter card of the pool), `copies` the copies of such a card the pool holds.
@@ -70,7 +71,17 @@ export type ResolutionView =
       lines?: readonly AllyLine[];
       poolAdded?: readonly string[];
       poolRemoved?: readonly string[];
+      // The boxes marked beside Beldis (emce.campaign-log), as the log screen reads them: one sentence a seat, when any is marked.
+      beldis?: readonly string[];
     };
+
+// The boxes beside Beldis a won game writes to the log (the Action of 12188 marks one for the player who used it), in the log screen's words.
+function beldisBoxes(state: ScenarioState): { beldis?: readonly string[] } {
+  const uses = state.campaignFacts?.beldisUses ?? [];
+  if (!uses.some((used) => used > 0)) return {};
+  const view = wilderlandView({ treasures: [], allyLines: [], encounterPool: {}, beldisUses: uses }, state.seatCount);
+  return { beldis: view.beldis.map((row) => row.speech) };
+}
 
 function nameOf(world: World, code: string): string {
   return world.cards.get(code)?.name ?? code;
@@ -115,6 +126,7 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
       ...((settled.allyLines ?? []).length > 0 ? { lines: [...(settled.allyLines ?? [])] } : {}),
       ...(changes.added.length > 0 ? { poolAdded: changes.added } : {}),
       ...(gone.length > 0 ? { poolRemoved: gone } : {}),
+      ...beldisBoxes(state),
       earned: settled.earned.map((item) => ({ code: item.code, hero: item.to === "hero" ? item.hero : null, seat: item.seat })),
       fallen: [...settled.fallen],
       captives: settled.captives.map((item) => item.hero),
@@ -277,6 +289,8 @@ export function promptSentence(view: Extract<ResolutionView, { kind: "choosing" 
   if (view.to === "treasure") return `Choose 1 of the ${view.tiles.length} random undiscovered treasures${view.decline ? `, or tap ${view.decline.label}` : ""}. It is recorded as discovered when you confirm.`;
   // A copy of a location of the staging area for the pool (12184:B:4): each player in turn, a different one if able.
   if (view.to === "location") return `Choose a location in the staging area.${view.seatCount > 1 ? " Each player chooses a different location if able." : ""} A copy of it joins the campaign pool when you confirm.`;
+  // Each player may remove one non-burden card from the pool (12187:B:4), the first player first; a decline keeps the pool as it is.
+  if (view.to === "removal") return `Choose a non-burden card to remove from the campaign pool, or tap ${view.decline?.label ?? "Remove nothing"} to keep them all.${view.seatCount > 1 ? " Each player is asked in turn, the first player first." : ""} Your choice is written to the campaign log when you confirm.`;
   const what =
     view.to === "hero"
       ? `a ${view.noun} and a hero`
@@ -284,9 +298,7 @@ export function promptSentence(view: Extract<ResolutionView, { kind: "choosing" 
         ? "a hero to name as a captive"
         : view.to === "player"
           ? "a player, by one of their heroes"
-          : view.to === "removal"
-              ? "a card to remove from the campaign pool"
-              : `a ${view.noun}`;
+          : `a ${view.noun}`;
   const decline = view.decline ? `, or tap ${view.decline.label}` : "";
   return `Choose ${what}${decline}. Your choice is written to the campaign log when you confirm.`;
 }
@@ -332,7 +344,9 @@ export function settledSentence(view: Extract<ResolutionView, { kind: "settled" 
     return count > 1 ? `${count} copies of ${nameOf(world, code)}` : nameOf(world, code);
   }));
   const joined = view.poolAdded && view.poolAdded.length > 0 ? `${lines} ${copies(view.poolAdded)} join${view.poolAdded.length === 1 ? "s" : ""} the campaign pool as encounter cards.` : lines;
-  const left = view.poolRemoved && view.poolRemoved.length > 0 ? `${joined} ${copies(view.poolRemoved)} leave${view.poolRemoved.length === 1 ? "s" : ""} the campaign pool.` : joined;
+  const gone = view.poolRemoved && view.poolRemoved.length > 0 ? `${joined} ${copies(view.poolRemoved)} leave${view.poolRemoved.length === 1 ? "s" : ""} the campaign pool.` : joined;
+  // The boxes marked beside Beldis in this game are recorded with the win (emce.campaign-log).
+  const left = view.beldis && view.beldis.length > 0 ? `${gone} The boxes beside Beldis are recorded in the campaign log: ${view.beldis.join(". ")}.` : gone;
   // The cards a Resolution keeps for the next campaign, not this one (01131:B:2): a sentence of its own.
   if (!view.carried || view.carried.length === 0) return left;
   const kept = view.carried.map((card) => ({ code: card.code, perPlayer: card.eachPlayer }));

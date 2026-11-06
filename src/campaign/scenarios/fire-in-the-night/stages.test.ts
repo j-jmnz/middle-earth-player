@@ -246,6 +246,20 @@ describe("emce.side-quests-in-play the current quest", () => {
     expect(hill(plenty).progress).toBe(0);
   });
 
+  it("only progress is redirected: an effect that names the quest card still reads Hrogar's Hill while a side quest is the current quest", () => {
+    // Douse the Flames deals 5 damage to Hrogar's Hill at the end of the quest phase, and Defend the Town is the current quest: the damage is the Hill's, and the side quest holds none.
+    const t = nightTable(world, { staging: [CODES.dagnir, CODES.douseTheFlames, CODES.defendTheTown], current: CODES.defendTheTown, threat: [30, 30] });
+    const defend = idOf(t.state, CODES.defendTheTown);
+    expect(currentSideQuest(t.state)).toBe(defend);
+    let run = send(start(t.state), { type: "Commit", cardIds: [t.hero2] }, t.ctx);
+    run = send(run, { type: "Pass" }, t.ctx);
+    expect(hill(run.state).damage).toBe(5);
+    expect(run.state.cards[defend]?.damage).toBe(0);
+    // Healing the quest card heals the Hill's damage, not a side quest's.
+    const healed = resolveRecords(updateCard(t.state, stageId(t.state), { damage: 14 }), t.ctx, CODES.douseTheFlames, "response", idOf(t.state, CODES.douseTheFlames));
+    expect(hill(healed.state).damage).toBe(4);
+  });
+
   it("without a current side quest the progress goes on the main quest as ever", () => {
     const t = nightTable(world, { staging: [CODES.dagnir, CODES.defendTheTown] });
     let run = send(start(t.state), { type: "Commit", cardIds: [t.hero, t.hero2] }, t.ctx);

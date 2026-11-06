@@ -174,7 +174,8 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         // The Hazard a Discover revealed is told in Discover's own lines.
         if (steps.slice(0, index).some((earlier) => earlier.kind === "discover" && earlier.hazard === step.cardId)) return;
         if (!current || current.rank !== 3 || current.whole) open(3, "Staging", "plain");
-        line(`Revealed ${names.card(step.cardId)}`);
+        // A card of the side quest deck (emce.side-quests): it joins the staging area, and nothing cancels its When Revealed effects.
+        line(before.cards[step.cardId]?.zone === "sideQuestDeck" ? `Revealed ${names.card(step.cardId)} from the side quest deck: its When Revealed effects cannot be canceled` : `Revealed ${names.card(step.cardId)}`, null, before.cards[step.cardId]?.zone === "sideQuestDeck" ? [step.cardId] : []);
         return;
       // The enemy was faceup when it was revealed: the line names it and the location it is facedown under now (dcce.grapple).
       case "grapple":

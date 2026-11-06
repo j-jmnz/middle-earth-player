@@ -75,13 +75,14 @@ export function playToEnd(start: StartScenario, ctx: ReduceContext, answer: (sta
 
 /**
  * In a player attack window: every ready character that may attack (and `may` allows) attacks the first enemy any of them can
- * reach, together. Null when the window is another, or nobody can attack.
+ * reach, together (`rank` orders the enemies they can reach, the lowest first; by default the first one found). Null when the window is another, or nobody can attack.
  */
-export function attackTogether(state: ScenarioState, ctx: ReduceContext, may: (id: string) => boolean = () => true): PlayerIntent | null {
+export function attackTogether(state: ScenarioState, ctx: ReduceContext, may: (id: string) => boolean = () => true, rank?: (enemyId: string) => number): PlayerIntent | null {
   if (state.window?.kind !== "playerAttack" || !legalIntents(state, ctx).some((intent) => intent.type === "DeclareAttackers")) return null;
   const seat = state.activeSeat;
   const ready = characters(state, seat, ctx.cards).filter((id) => may(id) && legalTargets(state, { type: "DeclareAttackers", cardId: id }, ctx).length > 0);
-  const enemy = ready.map((id) => legalAttackEnemies(state, seat, id, ctx.cards)[0]).find((id) => id != null);
+  const reachable = ready.flatMap((id) => legalAttackEnemies(state, seat, id, ctx.cards));
+  const enemy = rank ? [...new Set(reachable)].sort((left, right) => rank(left) - rank(right))[0] : reachable[0];
   const attackers = ready.filter((id) => enemy != null && legalAttackEnemies(state, seat, id, ctx.cards).includes(enemy));
   return enemy && attackers.length > 0 ? { type: "DeclareAttackers", enemyId: enemy, attackerIds: attackers } : null;
 }
