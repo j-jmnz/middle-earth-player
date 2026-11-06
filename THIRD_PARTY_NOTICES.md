@@ -4,7 +4,7 @@ The MIT license in `LICENSE` covers the code and documentation written for this 
 
 ## Game content
 
-The Lord of the Rings: The Card Game, its card text, card art, rules text and icons are © Fantasy Flight Games. The Lord of the Rings and the names of its characters, items, events and places are trademarks of Middle-earth Enterprises, used under license by Fantasy Flight Games. This project is not affiliated with or endorsed by either. No license is granted for this material.
+The Lord of the Rings: The Card Game, its card text, card art, rules text and icons are © Fantasy Flight Games. The Lord of the Rings and the names of its characters, items, events and places are trademarks of Middle-earth Enterprises, used under license by Fantasy Flight Games. This is a fan-made, community-supported project and not an official client. It is not associated with, endorsed by, sponsored by or approved by Fantasy Flight Games, Asmodee or Middle-earth Enterprises in any way. No license is granted for this material.
 
 It appears in:
 

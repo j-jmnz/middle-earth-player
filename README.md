@@ -2,7 +2,8 @@
 
 An offline, single-device app for playing The Lord of the Rings: The Card Game solo. It runs on iOS and Android, built with Expo and React Native, and it also runs in a desktop browser for development.
 
-This is an unofficial fan project. It has no affiliation with Fantasy Flight Games, Asmodee or Middle-earth Enterprises. The card text, card art and rules belong to their owners.
+> [!IMPORTANT]
+> This is a fan-made, community-supported project. It is not an official app or client for The Lord of the Rings: The Card Game. It is not associated with, endorsed by, sponsored by or approved by Fantasy Flight Games (FFG), Asmodee or Middle-earth Enterprises in any way. The card text, card art and rules belong to their owners.
 
 ## Features
 
