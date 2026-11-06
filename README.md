@@ -5,6 +5,25 @@ An offline, single-device app for playing The Lord of the Rings: The Card Game s
 > [!IMPORTANT]
 > This is a fan-made, community-supported project. It is not an official app or client for The Lord of the Rings: The Card Game. It is not associated with, endorsed by, sponsored by or approved by Fantasy Flight Games (FFG), Asmodee or Middle-earth Enterprises in any way. All game content belongs to its owners.
 
+## Privacy and security
+
+> [!NOTE]
+> **No accounts, no tracking, no ads, no analytics, no crash reporting.** The app collects no personal data, and your games stay on your device.
+
+- **Plays offline.** The catalog, the rules and the card pictures are inside the app. You can play a whole campaign in airplane mode.
+- **Two kinds of network request.** Importing a deck from a RingsDB link fetches that deck from `ringsdb.com`. A card whose picture the build did not bundle is downloaded once from RingsDB or the Hall of Beorn and DragnCards image storage. Nothing else connects, and only over HTTPS to those fixed hosts.
+- **Two Android permissions:** `INTERNET` and `VIBRATE` (haptics). None on iOS. No camera, microphone, location, contacts or photos.
+- **Your data stays local.** Saves, decks, the campaign log and settings live in the app's private storage. Uninstalling the app removes them.
+- **Supply chain.** Locked dependencies, CI with a read-only token, actions pinned by commit, weekly Dependabot updates.
+
+[PRIVACY.md](PRIVACY.md) lists exactly what is stored and sent. [SECURITY.md](SECURITY.md) names the code behind each request and explains how to report a vulnerability privately.
+
+## How the code is written
+
+Most of the code, tests and docs are written by Claude, Anthropic's AI model, working in Claude Code under the maintainer's direction. The git history shows it: those commits name Claude as their author or in a `Co-Authored-By` line. The maintainer sets the product and the rules, and decides what lands on `main`. The instructions the agents follow are public: `CLAUDE.md`, `.claude/rules/` and `.claude/agents/`.
+
+Nothing lands unless the tests, lint, type check and data check pass in CI. The rules engine cites the rule id it implements from the official rulebooks (`data/rules/entries.json`), so every rule can be traced to its source.
+
 ## Features
 
 - Plays the official campaigns: The Fellowship of the Ring saga (MEC109), Mirkwood Paths, The Dark of Mirkwood, Dream-chaser and Ered Mithrin. Each scenario can also be played on its own, and some have Nightmare mode.
@@ -126,7 +145,7 @@ Scripts log to stderr. `--verbose` and `--quiet` change how much they print; `LO
 
 ## Contributing
 
-Contributions are welcome. [CONTRIBUTING.md](CONTRIBUTING.md) covers the checks to run, the conventions and what is out of scope, and everyone taking part follows the [Code of Conduct](CODE_OF_CONDUCT.md). Report a security problem privately, as [SECURITY.md](SECURITY.md) says.
+Contributions are welcome. [CONTRIBUTING.md](CONTRIBUTING.md) covers the checks to run, the conventions and what is out of scope, and everyone taking part follows the [Code of Conduct](CODE_OF_CONDUCT.md). Report a security problem privately, as [SECURITY.md](SECURITY.md) says. A change that adds a network request, a permission or an SDK that sends data updates [PRIVACY.md](PRIVACY.md) and [SECURITY.md](SECURITY.md) in the same pull request.
 
 ## Documentation
 
