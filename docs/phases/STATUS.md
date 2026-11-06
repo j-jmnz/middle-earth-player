@@ -33,8 +33,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 10 | Campaign shell | completed | 2026-11-06. Review fixes not re-reviewed. |
 | 11 | Scenario 1 table | completed | 2026-11-06. Review fixes not re-reviewed. |
 | 12 | A Knife in the Dark | completed | 2026-11-06. Review fixes not re-reviewed. |
-| 13 | Flight to the Ford | active | 2026-10-26. Engine done. `/ux` not run. |
-| 14 | The Ring Goes South | active | 2026-10-26. Engine done. `/reviewer` and `/ux` not run. |
+| 13 | Flight to the Ford | completed | 2026-11-06. Marked completed by the user; `/ux` not run. |
+| 14 | The Ring Goes South | completed | 2026-11-06. Marked completed by the user; `/reviewer` and `/ux` not run. |
 | 15 | Journey in the Dark | completed | 2026-11-06. Review round done. Not on Nightmare. |
 | 16 | Breaking of the Fellowship | completed | 2026-11-06. Review round done. Not on Nightmare. |
 | 17 | Design system | completed | 2026-10-23. |
@@ -80,7 +80,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 54 | The King's Quest | completed | 2026-11-06. Review round done. |
 | 55 | The Withered Heath | completed | 2026-11-06. Review round done. |
 | 56 | Roam Across Rhovanion | completed | 2026-11-06. Review round done. |
-| 57 | Fire in the Night | active | 2026-11-06. Engine done; review round done. Screen half open: the table's side-quest area and current-quest mark. |
+| 57 | Fire in the Night | completed | 2026-11-06. Review round done. Marked completed by the user; the side-quest area is under Open items. |
 | 58 | The Ghost of Framsburg | completed | 2026-11-06. Review round done. |
 | 59 | Mount Gundabad | completed | 2026-11-06. Review round done. |
 | 60 | The Fate of Wilderland | completed | 2026-11-06. Review round done. |
@@ -99,7 +99,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - `upanduin-won` is not committed: no seed in 600 wins Journey Up the Anduin with the starter decks under the scenario's policy. Until it exists `.maestro/scenarios/journey-up-the-anduin/journey-up-the-anduin.yaml` cannot run.
 - Scenario 1's `won` fixture is not committed. `scripts/e2e/fixtures.ts --won` searches for it. Until it exists `.maestro/scenarios/a-shadow-of-the-past/scenario-1.yaml` cannot run, and `knife-lost` (dealt from its log) is missing, so `.maestro/scenarios/a-knife-in-the-dark/a-knife-in-the-dark-loss.yaml` cannot run either.
 - A Knife in the Dark's won flow has no genuine win (user-accepted, 2026-10-25).
-- Fixtures not committed, because no real win of the earlier scenarios exists to chain from: `ford-start`, `ford-won`, `ford-lost`; `south-start`, `south-stage-4`, `south-won`, `south-lost`; `anduin-won`; `dol-guldur-won`, `dol-guldur-lost`; `nibin-dum-won`; Mirkwood Paths parts 4 and 5; `moria-won`, `moria-pairs`, `moria-lost`; `breaking-solo`, `breaking-pair`, `breaking-won`, `breaking-lost`. A fixture is a real save (phase 13).
+- Fixtures not committed, because no real win of the earlier scenarios exists to chain from: `ford-start`, `ford-won`, `ford-lost`; `south-start`, `south-stage-4`, `south-won`, `south-lost`; `anduin-won`; `dol-guldur-won`, `dol-guldur-lost`; `nibin-dum-won`; Mirkwood Paths parts 4 and 5; `moria-won`, `moria-pairs`, `moria-lost`; `breaking-solo`, `breaking-pair`, `breaking-won`, `breaking-lost`. A fixture is a real save: each starts from the log the earlier parts write when won, and joins `src/campaign/fixtures.ts` when `scripts/e2e/fixtures.ts --won` finds that chain.
 - No Maestro flow has run. The flows that cross a stage advance must pass the quest advance screen (`quest-advance-progress`, Progress is optional); a fixture parked on a When Revealed question shows the question instead.
 - `.maestro/features/mirkwood-start.yaml` picks a Fellowship starter deck that a non-saga briefing may refuse.
 - `.maestro/features/deck.yaml` and `.maestro/features/rules.yaml` are phone flows; they cannot run on an expanded tablet.
@@ -156,6 +156,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - Ered Mithrin data: the EMCE box prints collector numbers one below Hall of Beorn and RingsDB; codes and `printings[].number` follow the sources' number.
 
 ### Screens and code
+- Fire in the Night: the table has no side-quest deck area or current-quest mark (`docs/brief.md`, Ered Mithrin).
 - Ered Mithrin: a discovered treasure cannot reach a deck from the app. `validateLoadout` admits it, but `deckSaveRefusal`, the import, the deck store and the Cards pool read deck-legal rows only, and a saved deck is not tied to a save's log. Needs a design.
 - Ered Mithrin: `AddEncounterToPool` with `inPlay` counts in-play copies the pool did not deal in, an upper bound, since copies have no identity.
 - Run history (28b): `recordUnclosedRun` has no test; a win left unconfirmed until an engine or data update drops it cannot be recorded; `run-writers.ts` imports `ScenarioState` through `play/store`.

@@ -64,7 +64,7 @@ function intentFor(state: ScenarioState, ctx: ReduceContext, memory: Set<string>
 }
 
 // A fixture whose game is not found is left out (a name whose fixture is absent is not offered, `hasFixture`). With no `anduin-won` fixture there is no
-// honest log for this scenario to start from (docs/phases/phase-13-flight-to-the-ford.md: a fixture is a real save), so none is written.
+// honest log for this scenario to start from (docs/phases/STATUS.md, Fixtures and Maestro: a fixture is a real save), so none is written.
 export function dolGuldurFixtures(anduin: AnduinFixture | undefined): Partial<Record<"dol-guldur-won" | "dol-guldur-lost", DolGuldurFixture>> {
   if (!anduin) {
     say.warn("no anduin-won fixture: Escape from Dol Guldur's fixtures are open until Journey Along the Anduin has a won game");

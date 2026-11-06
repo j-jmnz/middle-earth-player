@@ -92,7 +92,7 @@ Read the sections your task touches.
     - 595–609 The Oath (~2.3K)
     - 610–627 The Caves of Nibin-Dûm (~2.4K)
   - 628–685 Dream-chaser (~15.6K)
-  - 686–712 Ered Mithrin (~15.8K) ← 2
+  - 686–712 Ered Mithrin (~15.9K) ← 3
   - 713–721 Nightmare (~420)
   - 722–760 Deckbuilding (~1.8K)
   - 761–839 Effects (~3.2K)
@@ -182,17 +182,14 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~6.3K tok)
+- `docs/phases/STATUS.md` — Phase status (~6.4K tok)
   - 5–15 Rules (~430)
   - 16–87 Phases (~1.4K)
-  - 88–174 Open items (~4.0K)
+  - 88–175 Open items (~4.0K)
     - 90–111 Fixtures and Maestro (~1.2K)
     - 112–157 Rules and engine (~2.1K)
-    - 158–174 Screens and code (~670)
-  - 175–191 Standing decisions (~490)
-- `docs/phases/phase-13-flight-to-the-ford.md` — Phase 13 — Flight to the Ford (~740 tok)
-- `docs/phases/phase-14-ring-goes-south.md` — Phase 14 — The Ring Goes South (~800 tok)
-- `docs/phases/phase-57-fire-in-the-night.md` — Phase 57 — Fire in the Night (~1.1K tok)
+    - 158–175 Screens and code (~700)
+  - 176–192 Standing decisions (~490)
 
 ## Live plans
 
