@@ -14,7 +14,7 @@ import { addStandIns, entry, fightEnemy, HERO, HERO2, HERO3, opening, sceneEffec
 
 // Shared scene for the Mount Gundabad effect tests (ered-mithrin part 8, campaign card 12193). Test-only. The heroes are plain numbers (no player card text), so what a test shows comes from
 // the scenario's records and the engine. The helpers every scene shares (id lookups, answers, the fight) are test/harness/scene-kit.ts; this file keeps the scenario's codes, its layout and its table.
-// TODO: describe the cards that need their own layout fields (a second active location, a grotto deck, an island map) and add them to the layout and the table below.
+// The layout holds what Mount Gundabad adds to a table: the quest deck (the stage 2s, top first, side A up until the quest phase flips the current one), the Caves deck, the card set aside and Wormsbane attached to a hero.
 export const gundabad: ScenarioData = loadScenario("mount-gundabad");
 export const campaign: CampaignData = loadCampaign("ered-mithrin");
 export const dealt: ScenarioData = campaignScenario(gundabad);

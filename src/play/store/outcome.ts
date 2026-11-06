@@ -12,6 +12,7 @@ import type { ScenarioState } from "../../rules/core/state.ts";
 import type { LogMark } from "./log.ts";
 import { detachLine, grappleLine } from "../words/grapple.ts";
 import { boardingWords } from "../words/sea.ts";
+import { firstTreacheryNote, stageArrivalNote, stageBeats } from "../words/gundabad.ts";
 import { discoverLines, discoverTitle, POOL_COPY } from "../words/wilderland.ts";
 
 // `cards`: the cards a line touches (the shadow card, the card damaged or destroyed), drawn on the table while the banner
@@ -113,6 +114,9 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         }
         if (!current) open(1, "The quest advances", "good");
         line(`The quest advances to ${names.card(step.cardId)}`);
+        // A stage of Mount Gundabad's quest deck arrives side A up (emce.gundabad-quest-deck).
+        const arrival = stageArrivalNote(after, step.cardId);
+        if (arrival) line(arrival, null, [step.cardId]);
         // A stage whose When Revealed swaps the encounter sets (Change of Plans, 12040:B:1) reads its printed words as the beat: its flips, the set that leaves and the set shuffled in are in the log.
         if (steps.slice(index + 1).some((later) => later.kind === "removeSet")) {
           const text = names.revealed?.(step.cardId);
@@ -184,6 +188,9 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         }
         if (!current || current.rank !== 3 || current.whole) open(3, "Staging", "plain");
         line(`Revealed ${names.card(step.cardId)}`);
+        // The first treachery of a round, while a stage bars canceling its When Revealed effect (19137:B:1).
+        const first = firstTreacheryNote(after, step.cardId, names.card(step.cardId));
+        if (first) line(first, null, [step.cardId]);
         return;
       // The enemy was faceup when it was revealed: the line names it and the location it is facedown under now (dcce.grapple).
       case "grapple":
@@ -235,6 +242,10 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         return;
     }
   });
+
+  // A stage of Mount Gundabad's quest deck flipped to side B at the beginning of the quest phase, or bypassed (emce.bypassing): no step of its own.
+  const stage = stageBeats(before, after, names);
+  if (stage) groups.push({ rank: stage.rank, title: stage.title, tone: "plain", lines: stage.lines.map((text) => ({ text, mark: null })) });
 
   // Travel leaves no step of its own: the location that became active from staging. Once stages are separate each seat has an active location of its
   // own (`Seat.active`), and in two-handed play the line names the seat that traveled.

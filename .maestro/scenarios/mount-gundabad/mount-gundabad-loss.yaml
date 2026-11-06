@@ -2,12 +2,25 @@ appId: com.middleearth.lcg
 tags:
   - scenario
 ---
-# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `gundabad-lost` (scripts/e2e/mount-gundabad.ts): a real two-handed
-# game of Mount Gundabad, parked on its loss. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
-# The steps are the shared subflow's (.maestro/subflows/scenario-loss.yaml); add this scenario's own assertions after the call.
+# Phase 59. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `gundabad-lost` (scripts/e2e/mount-gundabad.ts): a real two-handed game of Mount Gundabad
+# (the Defenders of Gondor and Swords of the Noldor lists, Easy) dealt from the log the first seven parts' wins write (Ghost of Framsburg's two-handed win on the log of the six before it), parked on its loss (Boromir, the hero who
+# carries Wormsbane, left play in the first round: the players lose the game). A loss has no reward screen and writes nothing: the scenario stays current, and neither a treasure, Dragon-sickness nor the removal of A Growing Threat
+# reaches the log or the pool. The steps are the shared subflow's (.maestro/subflows/scenario-loss.yaml).
 - runFlow:
     file: ../../subflows/scenario-loss.yaml
     env:
       FIXTURE: gundabad-lost
       SCENARIO_ID: mount-gundabad
-# TODO: this scenario's own assertions on the log screen after the loss.
+# Back on the path, this part wrote none of its Ered Mithrin columns: Dragon-sickness is not in the pool, and the scenario is still the next part.
+- tapOn:
+    id: log-back
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- assertNotVisible:
+    id: pool
+    text: ".*Dragon-sickness.*"
+- assertVisible:
+    id: node-mount-gundabad-status
+    text: "Next"

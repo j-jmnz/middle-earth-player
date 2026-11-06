@@ -48,6 +48,8 @@ import { asksCollection, collectionLabel, collectionOrder } from "./collection-s
 import { cardLabel, has, option, statOf, step } from "./sheet-parts.ts";
 import { nightActionNote, nightResponseNote } from "../words/night.ts";
 import { framsburgActionCaution, framsburgActionNote, framsburgEngageNote, framsburgResponseNote } from "../words/framsburg.ts";
+import { gundabadResponseNote } from "../words/gundabad.ts";
+import { gundabadRow } from "./gundabad-sheets.ts";
 import { TIMING_WORDS, type SheetStat, type HideNumbers, type PickOption, type Sheet, type SheetNames, type TriggerOption, type Unavailable } from "./sheet-types.ts";
 
 function effectOf(ctx: ReduceContext, effectId: string): Effect | undefined {
@@ -129,7 +131,7 @@ function responseNote(game: ScenarioState, names: SheetNames, offers: readonly {
   const waiting = offers.filter((offer) => offer.seat === seat && !listed.some((item) => item.cardId === offer.cardId && item.effectId === offer.effectId));
   // At the end of the round, a card that counts tokens says what the count leads to (41050:B:1).
   const leads = event?.trigger === "endOfRound" ? offers.flatMap((offer) => tokenOutcome(ctx, game.cards[offer.cardId]?.code ?? "")).slice(0, 1) : [];
-  const night = nightResponseNote(game, names, event, listed.map((item) => item.cardId)) ?? framsburgResponseNote(game, ctx, names, event, listed.map((item) => item.cardId));
+  const night = nightResponseNote(game, names, event, listed.map((item) => item.cardId)) ?? framsburgResponseNote(game, ctx, names, event, listed.map((item) => item.cardId)) ?? gundabadResponseNote(game, ctx, names, event, listed.map((item) => item.cardId));
   const base = night ?? ["A Response may be used now, or passed.", ...leads].join(" ");
   if (waiting.length === 0) return base;
   // The side quest's sentence already says that passing gives it up.
@@ -312,7 +314,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const sea = wait?.kind === "target" ? (seaOptionLabel(wait.item.instruction, id, game, ctx.cards) ?? grappleOptionLabel(wait.item.instruction, id) ?? wilderlandOptionLabel(wait.item.instruction, id, words) ?? unchartedOptionLabel(wait.item.instruction, id, game, words) ?? islandOptionLabel(wait.item.instruction, id, game, words)) : null;
           // Copies of one card in different zones are told apart by where each one is.
           // A pick that puts damage on a location or a character, or takes it off a location: the damage it would stand at, as a mark, with a caution when it burns the location or loses the game.
-          const fire = wait?.kind === "target" ? fireRow(wait.item.instruction, data?.queue[0]?.instruction, id, game, ctx, names, amountNow, source) : null;
+          const fire = wait?.kind === "target" ? (fireRow(wait.item.instruction, data?.queue[0]?.instruction, id, game, ctx, names, amountNow, source) ?? gundabadRow(wait.item.instruction, data?.queue[0]?.instruction, id, game, ctx, names.card(id))) : null;
           // A Ship objective that is exhausted or attached to: whose it is when the options hold more than one player's, and the damage a card on it would deal.
           const ship = wait?.kind === "target" ? shipRow(wait.item.instruction, data?.queue[0]?.instruction, id, window.options, game, ctx, words) : null;
           const kingsCaution = wait?.kind === "target" ? discardCaution(game, source, wait.item.instruction, data?.queue[0]?.instruction, id, names.card) : undefined;

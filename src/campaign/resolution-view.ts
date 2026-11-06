@@ -14,6 +14,7 @@ import { ALLY_LINE_FACTS, BELDIS_BOXES, type AllyLine } from "../catalog/ally-li
 
 import { contextOf } from "./session.ts";
 import type { World } from "./world.ts";
+import { afterwardsWords } from "./resolution-then.ts";
 import { beldisUsed, cappedTally } from "./wilderland.ts";
 
 // `label`: the words on the tile ("Tireless Ranger on Sam Gamgee", "Turayn for Player 1"). `wide`: a tile with no card, laid in a row of its own under the card tiles (the log line). `tag` is a muted
@@ -57,6 +58,8 @@ export type ResolutionView =
       only?: true;
       // The choice is of Song boons (The Withered Heath, 12175:B:6): each player takes one, a Song only once.
       songs?: true;
+      // What the instructions after this choice do to the campaign pool, in words (12193:B:4, 12193:B:5): told with the choice, since confirming it runs them.
+      then?: readonly string[];
     }
   | {
       kind: "settled";
@@ -234,6 +237,7 @@ export function resolutionView(state: ScenarioState, world: World, logged: reado
     const card = state.resolutionLog.earned.find((item) => item.step === window.step && item.seat === seat);
     return { seat, words: card ? cardWords(world, { code: card.code, hero: card.hero, seat }) : `No ${noun}` };
   });
+  const then = afterwardsWords(state, window.step, (code) => nameOf(world, code));
   return {
     kind: "choosing",
     step: window.step,
@@ -249,6 +253,7 @@ export function resolutionView(state: ScenarioState, world: World, logged: reado
     ally: instruction.verb === "BoonAllyOrLogLine" ? nameOf(world, instruction.ally) : null,
     later: instruction.verb === "BoonAllyOrLogLine" ? ALLY_LINE_FACTS[instruction.line].later : null,
     answered,
+    ...(then.length > 0 ? { then } : {}),
     tiles,
     decline,
     to: instruction.verb === "NameCaptives" ? "captive" : instruction.verb === "BoonAllyOrLogLine" ? "ally" : instruction.verb === "RemoveFromPool" ? "removal" : instruction.verb === "ChooseStagedLocationForPool" ? "location" : instruction.verb === "ChooseRandomTreasure" ? "treasure" : instruction.verb === "ChooseHazardForPool" ? "hazard" : instruction.to,
@@ -257,8 +262,13 @@ export function resolutionView(state: ScenarioState, world: World, logged: reado
 
 const orList = (items: readonly string[]): string => (items.length < 3 ? items.join(" or ") : `${items.slice(0, -1).join(", ")} or ${items.at(-1)}`);
 
-/** The sentence above Confirm: what choosing this tile writes. */
+/** The sentence above Confirm: what choosing this tile writes, and what the instructions after it do to the campaign pool. */
 export function choiceSentence(view: Extract<ResolutionView, { kind: "choosing" }>, tile: ResolutionTile): string {
+  const sentence = choiceCore(view, tile);
+  return view.then && tile.optionId !== SKIP ? `${sentence} ${view.then.join(" ")}` : sentence;
+}
+
+function choiceCore(view: Extract<ResolutionView, { kind: "choosing" }>, tile: ResolutionTile): string {
   if (tile.optionId === SKIP) return declineSentence(view);
   switch (view.to) {
     case "pool": {
@@ -315,7 +325,7 @@ export function promptSentence(view: Extract<ResolutionView, { kind: "choosing" 
     return view.seatCount > 1 ? `Choose which player takes ${ally}, or the line for the log.` : `Take ${ally}, or the line for the log.`;
   }
   // The treasure of three random undiscovered ones (12175:B:7): the number now.
-  if (view.to === "treasure") return `Choose 1 of the ${view.tiles.length} random undiscovered treasures${view.decline ? `, or tap ${view.decline.label}` : ""}. It is recorded as discovered when you confirm.`;
+  if (view.to === "treasure") return `Choose 1 of the ${view.tiles.length} random undiscovered treasures${view.decline ? `, or tap ${view.decline.label}` : ""}. It is recorded as discovered when you confirm.${view.then ? ` ${view.then.join(" ")}` : ""}`;
   // The Hazard cards the Resolution discarded (12189:B:6): the group chooses one for the pool.
   if (view.to === "hazard") return `Choose 1 of the ${view.tiles.length} Hazard cards discarded (${orList(view.tiles.map((tile) => tile.name))}); the group decides${view.seatCount > 1 ? `; Player ${view.seat + 1} confirms` : ""}. It joins the campaign pool when you confirm, and the ${view.tiles.length === 2 ? "other is" : "others are"} not added.`;
   // A copy of a location of the staging area for the pool (12184:B:4): each player in turn, a different one if able.

@@ -266,8 +266,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       condition: { kind: "subjectExplored" },
       instructions: [
         EACH_PLAYER([
-          MAY({ kind: "canPick", pick: { type: "card", control: "you", from: "deck", cardType: "attachment", trait: "Item" } }, [{ verb: "Pick", pick: { type: "card", control: "you", from: "deck", cardType: "attachment", trait: "Item" } }, { verb: "MovePicked", to: "hand" }]),
-          { verb: "ShuffleDeck" },
+          // The deck is shuffled by the search: a player who does not search leaves it as it is.
+          MAY({ kind: "canPick", pick: { type: "card", control: "you", from: "deck", cardType: "attachment", trait: "Item" } }, [{ verb: "Pick", pick: { type: "card", control: "you", from: "deck", cardType: "attachment", trait: "Item" } }, { verb: "MovePicked", to: "hand" }, { verb: "ShuffleDeck" }]),
         ]),
       ],
     },

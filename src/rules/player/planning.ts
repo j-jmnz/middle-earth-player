@@ -4,6 +4,7 @@ import type { Effect } from "../../catalog/boundary.ts";
 
 import { attachmentHostIds, enforceRestricted, playCost } from "./attach.ts";
 import { playLimit, playLimitReason } from "../families/dungeon/limit.ts";
+import { phasePlayLimit, phasePlayLimitReason } from "../families/wilderland/rounds.ts";
 import { effectCause, ruleCause } from "../core/cause.ts";
 import { deckPlayHero, markDeckPlay, playableFromDeck } from "./deck-play.ts";
 import { holds } from "../interpret/conditions.ts";
@@ -213,6 +214,9 @@ export function playWindowReason(state: ScenarioState, cardId: string, ctx: Redu
   if (printed.type !== "event" && planningTurn(state) !== state.activeSeat) return "Only the active player plays allies and attachments now";
   if (uniqueBlocked(state, printed, ctx.cards)) return "A second copy of that unique card cannot enter play";
   // "You cannot play non-unique allies" (a contract, families/sidequests/contract.ts).
+  // "Each player cannot play more than 1 card each phase" (Foreboding Darkness, families/wilderland/rounds.ts) says which card and how many.
+  const phaseLimit = phasePlayLimit(state, cardId, ctx, false);
+  if (phaseLimit) return phasePlayLimitReason(state, phaseLimit);
   if (playBlocked(state, cardId, state.activeSeat, ctx)) return "A card in play forbids that card to be played";
   // "The players, as a group, cannot play more than 1 ally card each round" (families/dungeon/limit.ts).
   const limit = playLimit(state, cardId, ctx);

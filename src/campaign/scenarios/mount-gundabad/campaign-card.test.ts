@@ -4,6 +4,8 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { buildStart } from "../../start.ts";
+import { choiceSentence, consequenceSentence, resolutionView, settledSentence, type ResolutionView } from "../../resolution-view.ts";
+import type { World } from "../../world.ts";
 import { campaignScenario, type Difficulty } from "../../../catalog/scenario-data.ts";
 import { emptyLog, type CampaignLog } from "../../log.ts";
 import { EFFECTS } from "../../../effects/index.ts";
@@ -206,3 +208,36 @@ describe("12193:B Resolution", () => {
   });
 });
 
+describe("12193:B Resolution words", () => {
+  const worldOf = { cards: undefined as unknown as World["cards"], copies: new Map() } as unknown as World;
+  const view = (state: ScenarioState): Extract<ResolutionView, { kind: "choosing" }> => {
+    worldOf.cards = ctx.cards as World["cards"];
+    return resolutionView(openResolution({ ...state, stageCleared: true, window: null, stack: [] }, ctx), worldOf) as Extract<ResolutionView, { kind: "choosing" }>;
+  };
+  const pooled = { prisoner: null, usedOnce: [], counters: {}, encounterPool: { "12167": 1 } };
+
+  it("12193:B:2 the treasure choice says 1 of 3, that it is recorded when confirmed, that A Growing Threat leaves the pool and what Dragon-sickness waits for; two-handed it is the first player's", () => {
+    for (const [seats, label] of [[1, null], [2, "Player 1 (first player) chooses"]] as const) {
+      const choosing = view(opened(seats, 1, { facts: pooled, log: logged(TREASURES.slice(0, 5)) }));
+      expect(choosing.seatLabel, `${seats} seats`).toBe(label);
+      expect(choosing.tiles, `${seats} seats`).toHaveLength(3);
+      expect(consequenceSentence(choosing, null, false)).toBe("Choose 1 of the 3 random undiscovered treasures. It is recorded as discovered when you confirm. A Growing Threat leaves the campaign pool. Dragon-sickness joins the campaign pool as an encounter card: this treasure makes 6 recorded, and 6 or more is enough.");
+      expect(choiceSentence(choosing, choosing.tiles[0]!)).toBe(`${choosing.tiles[0]?.name} is discovered and recorded in the campaign log. The scenario is over, so it is not attached to a character. A Growing Threat leaves the campaign pool. Dragon-sickness joins the campaign pool as an encounter card: this treasure makes 6 recorded, and 6 or more is enough.`);
+    }
+  });
+
+  it("12193:B:5 with fewer treasures the choice says what the treasures the players control may still bring; with no A Growing Threat in the pool it says nothing of it", () => {
+    const choosing = view(opened(1, 1, { log: logged(TREASURES.slice(0, 2)) }));
+    expect(consequenceSentence(choosing, null, false)).toBe("Choose 1 of the 3 random undiscovered treasures. It is recorded as discovered when you confirm. Dragon-sickness joins the campaign pool as an encounter card if 6 or more treasures are recorded once this one and the treasures the players control are added (2 are recorded now).");
+    expect(consequenceSentence(choosing, null, false)).not.toContain("A Growing Threat");
+  });
+
+  it("12193:B the settled sentence says the treasure discovered, that Dragon-sickness joins the pool, that A Growing Threat leaves it, and that The Fate of Wilderland is next", () => {
+    const state = opened(1, 1, { facts: pooled, log: logged(TREASURES.slice(0, 5)) });
+    const settled = resolutionView(won(state).state, { cards: ctx.cards, copies: new Map() } as unknown as World) as Extract<ResolutionView, { kind: "settled" }>;
+    expect(settled.poolRemoved).toEqual([CODES.aGrowingThreat]);
+    expect(settled.poolAdded).toEqual([CODES.dragonSickness]);
+    const sentence = settledSentence(settled, { cards: ctx.cards, copies: new Map() } as unknown as World, "The Fate of Wilderland");
+    expect(sentence).toMatch(/^Confirming records the win and unlocks The Fate of Wilderland\. The players discover [^.]+\. Dragon-sickness joins the campaign pool as encounter cards\. A Growing Threat leaves the campaign pool\.$/);
+  });
+});

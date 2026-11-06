@@ -2,18 +2,26 @@ appId: com.middleearth.lcg
 tags:
   - scenario
 ---
-# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `gundabad-won` (scripts/e2e/mount-gundabad.ts): a real two-handed
-# game of Mount Gundabad, parked on its win. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
-# The steps are the shared subflow's (.maestro/subflows/scenario-win.yaml); add this scenario's own assertions after the call.
+# Phase 59. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `gundabad-won` (scripts/e2e/mount-gundabad.ts): a real two-handed game of Mount Gundabad
+# (the Defenders of Gondor and Swords of the Noldor lists, Easy) dealt from the log the first seven parts' wins write (Misplaced Trust for each player, Gundabad Hunter or Gundabad Stalker, 5 treasures), parked on its win (Dagnir
+# slain at the Great Worm with the Reforged Wormsbane and added to the victory display). The fixture is OPEN: scripts/e2e/fixtures.ts found no win of the two starter decklists in its 100 seeds (the hero who carries Wormsbane
+# leaves play in the first rounds, docs/phases/STATUS.md), so this flow cannot run until a seed wins.
+# The Resolution discovers the treasures the players control (no question), then asks the first player for 1 of 3 random undiscovered treasures (12193:B:2, the eyebrow "Choose a treasure", the seat label "Player 1 (first player) chooses");
+# the prompt also says what confirming does to the pool: A Growing Threat leaves it when the pool holds it, and Dragon-sickness joins it (the log holds 5 treasures, so this one makes 6). When the fixture exists, set CHOICE_ID to the code of
+# the treasure the fixture's seed offers first (a seeded draw), CHOICE_PROMPT to "Choose 1 of the 3 random undiscovered treasures.*" and CHOICE_CONSEQUENCE to ".* is discovered and recorded in the campaign log.*Dragon-sickness joins the campaign pool as an encounter card: this treasure makes 6 recorded.*".
 - runFlow:
     file: ../../subflows/scenario-win.yaml
     env:
       FIXTURE: gundabad-won
       SCENARIO_ID: mount-gundabad
-      # A Resolution that asks one choice: the code of the card it offers, the choice's eyebrow text and the sentence the confirm line shows.
-      # CHOICE_ID: "TODO"
-      # CHOICE_PROMPT: "TODO"
-      # CHOICE_CONSEQUENCE: "TODO"
+      NO_XP: "true"
+      # CHOICE_ID: "<the treasure the seed offers first>"
+      # CHOICE_PROMPT: "Choose 1 of the 3 random undiscovered treasures.*"
+      # CHOICE_CONSEQUENCE: ".* is discovered and recorded in the campaign log.*Dragon-sickness joins the campaign pool as an encounter card: this treasure makes 6 recorded.*"
+# The win wrote the campaign card's Resolution beside what the earlier parts put in the pool: Dragon-sickness joins it as an encounter card, and Misplaced Trust Roam Across Rhovanion earned stays.
+- assertVisible:
+    id: pool
+    text: ".*Misplaced Trust.*"
 # The win unlocks The Fate of Wilderland, which the app cannot deal yet, so the path stops there and its node reads Coming soon (scripts/checks/maestro.test.ts, path-soon).
 - assertVisible:
     id: node-the-fate-of-wilderland-status
@@ -21,4 +29,3 @@ tags:
 - assertVisible:
     id: path-soon
     text: "The Fate of Wilderland is coming soon."
-# TODO: this scenario's own assertions on the path screen after the win (a carried card).

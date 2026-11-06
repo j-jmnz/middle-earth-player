@@ -335,7 +335,7 @@ describe("19140 Exploring Gundabad (Foreboding Darkness)", () => {
       expect(played.state.played?.map((entry) => entry.id)).toEqual([one]);
       return playReason(played.state, { type: "PlayCard", cardId: two, payments: [] }, t.ctx);
     };
-    expect(playTwo(false)).toBe("A card in play forbids that card to be played");
+    expect(playTwo(false)).toBe("Exploring Gundabad: each player plays at most 1 card each phase, and you have played 1 this planning phase.");
     // Without the stage's side B nothing limits the plays.
     expect(playTwo(true)).toBeNull();
   });
