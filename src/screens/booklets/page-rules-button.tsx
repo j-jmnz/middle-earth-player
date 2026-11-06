@@ -30,6 +30,7 @@ function PageRules({ id, first }: { id: BookletId; first: number }) {
         label="Rules on this page"
         testID="booklet-page-rules-open"
         accessibilityLabel={pageRulesLabel(page, rows.length)}
+        expanded={open && rows.length > 0}
         disabled={rows.length === 0}
         onPress={() => setOpen(!open)}
       />

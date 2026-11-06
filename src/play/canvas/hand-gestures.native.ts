@@ -41,8 +41,6 @@ type Args = {
   // The spotlight's: playing now, and the touch that skipped it.
   live: SharedValue<boolean>;
   swallow: SharedValue<boolean>;
-  // Off with a screen reader on: the hand cards stay reachable through the list path, and the 350 ms press previews them.
-  scrubOn: boolean;
   select: (cardId: string | null) => void;
   onTap: (cardId: string) => void;
   // A tap that hits no slot (the table's empty ground, the covered band under the command column): the screen folds an open tray for it.
@@ -51,7 +49,7 @@ type Args = {
   onDrop: (cardId: string, target: string) => void;
 };
 
-export function useTableGestures({ layout, canvas, draggable, targets, k, hurry, live, swallow, scrubOn, select, onTap, onEmptyTap, onPreview, onDrop }: Args) {
+export function useTableGestures({ layout, canvas, draggable, targets, k, hurry, live, swallow, select, onTap, onEmptyTap, onPreview, onDrop }: Args) {
   const { progress: hurryProgress, clear: hurryClear } = hurry;
   const liftTiming = useMemo(() => timing(MOTION.dragLift, k), [k]);
   const returnTiming = useMemo(() => timing(MOTION.dragReturn, k), [k]);
@@ -339,8 +337,8 @@ export function useTableGestures({ layout, canvas, draggable, targets, k, hurry,
         scheduleOnRN(onScrub, -1, false);
       });
 
-    return Gesture.Race(pan, ...(scrubOn ? [scrub] : []), hold, tap);
-  }, [slots, lifts, spreadNow, push, carrying, grabX, grabY, dragging, dx, dy, lift, rise, apart, index, scrubbing, begun, k, liftTiming, riseTiming, apartTiming, hurryProgress, hurryClear, swallow, live, scrubOn, settle, lifting, release, select, onTap, onEmptyTap, onPreview, onScrub]);
+    return Gesture.Race(pan, scrub, hold, tap);
+  }, [slots, lifts, spreadNow, push, carrying, grabX, grabY, dragging, dx, dy, lift, rise, apart, index, scrubbing, begun, k, liftTiming, riseTiming, apartTiming, hurryProgress, hurryClear, swallow, live, settle, lifting, release, select, onTap, onEmptyTap, onPreview, onScrub]);
 
   const scrub: Scrub = useMemo(() => ({ rise, apart, lift: scrubLift, index, left, drop, spread }), [rise, apart, scrubLift, index, left, drop, spread]);
   return { gesture, liftTransform, scrub };

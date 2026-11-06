@@ -123,6 +123,7 @@ export function SecondaryButton({
   tight = false,
   accessibilityLabel,
   accessibilityHint,
+  expanded,
   disabled = false,
 }: {
   label: string;
@@ -134,6 +135,8 @@ export function SecondaryButton({
   tight?: boolean;
   accessibilityLabel?: string;
   accessibilityHint?: string;
+  // Set for a button that opens and closes a list under it: a screen reader says whether it is open.
+  expanded?: boolean;
   disabled?: boolean;
 }) {
   const t = useTableTokens();
@@ -148,7 +151,7 @@ export function SecondaryButton({
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? label}
       accessibilityHint={accessibilityHint}
-      accessibilityState={{ disabled }}
+      accessibilityState={expanded == null ? { disabled } : { disabled, expanded }}
       disabled={disabled}
       onPress={onPress}
       hitSlop={tight ? { top: slop, bottom: slop } : undefined}
@@ -196,7 +199,7 @@ export function TextButton({
   small = false,
   tight = false,
   onLongPress,
-  longPressLabel = "Show card large",
+  longPressLabel = "Show card",
 }: {
   label: string;
   onPress: () => void;

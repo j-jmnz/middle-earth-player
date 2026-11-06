@@ -232,16 +232,15 @@ export function SeatPicker({
         {pickedDeck && !choosing && slot && !ringBearer ? (
           <View testID="ringbearer-slot" className="mt-3">
             <Section title="Ring-bearer" />
-            <View className="gap-2" accessibilityRole="radiogroup" accessibilityLabel="Ring-bearer">
+            <View className="gap-2">
               {candidates.map((candidate) => (
                 <Pressable
                   key={candidate.code}
                   testID={`ringbearer-${candidate.code}`}
                   collapsable={false}
-                  accessibilityRole="radio"
-                  accessibilityState={{ selected: false, checked: false }}
+                  accessibilityRole="button"
                   accessibilityLabel={`Choose ${candidate.name}${candidate.packName ? `, ${candidate.packName}` : ""}`}
-                  {...longPressA11y("Show card large", () => openCard(candidate.code))}
+                  {...longPressA11y("Show card", () => openCard(candidate.code))}
                   onPress={() => onRingBearer(candidate.code)}
                   onLongPress={() => openCard(candidate.code)}
                   delayLongPress={350}

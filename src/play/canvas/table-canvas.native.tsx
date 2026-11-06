@@ -26,17 +26,13 @@ import { useTableGestures } from "./hand-gestures.native.ts";
 import { tableLayout, type CardSlot, type Rect } from "../layout/layout.ts";
 import { slotBounds } from "../layout/hits.ts";
 import { rowFeet } from "../layout/column-reach.ts";
-import { nameOfCard, pictureKey } from "./picture-key.ts";
-import { areaFacts, areaSpeech } from "../store/stormcaller-table.ts";
-import { controlSpeech, treasureSpeech } from "../cards/dungeon-preview.ts";
-import { grappleDetail } from "../words/grapple.ts";
+import { areaFacts } from "../store/stormcaller-table.ts";
 import { stagePill } from "../words/stormcaller.ts";
 import { NO_DRAG, NO_HIGHLIGHT, NO_TARGETS } from "../store/peek.ts";
 import { actingSeat, lookedOf, shownSeat } from "../store/selectors.ts";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
-import { ReaderPiles } from "./reader-piles.tsx";
 import { ReaderTable } from "./reader-table.tsx";
-import { useReaderMode, useScreenReader } from "../../ui/screen-reader.ts";
+import { useReaderMode } from "../../ui/screen-reader.ts";
 import { sphereRing, stripText, useViews } from "./table-canvas-views.ts";
 import { useBackImages, useTokenImages } from "./table-assets.native.ts";
 import { useTableFonts } from "./table-fonts.native.ts";
@@ -146,25 +142,14 @@ function Table({ store, width, height, column, reach, onRowFeet, picture, pictur
   }, [handoff, plan, progress, playing, warm, k]);
 
   const select = useCallback((cardId: string | null) => store.getState().select(cardId), [store]);
-  const reader = useScreenReader();
   // The drag, the tap, the press and the hand scrub (hand-gestures.native.ts).
-  const { gesture, liftTransform, scrub } = useTableGestures({ layout, canvas: { width, height, bottom: bottomInset }, draggable, targets, k, hurry, live, swallow, scrubOn: !reader, select, onTap, onEmptyTap, onPreview, onDrop });
+  const { gesture, liftTransform, scrub } = useTableGestures({ layout, canvas: { width, height, bottom: bottomInset }, draggable, targets, k, hurry, live, swallow, select, onTap, onEmptyTap, onPreview, onDrop });
   const lifted = selected ? (layout.slots.find((slot) => slot.id === selected && slot.kind === "card") ?? null) : null;
 
   // Whose area the staging row is once the table is split between players: the tag at the row's left end, the empty row's word, and the quest strip's seat.
   const owner = seatTag(game, seat);
   const targetZones = useMemo(() => targets.flatMap((target) => (target.kind === "zone" ? [layout.zones[target.zone]] : [])), [targets, layout]);
 
-  // What a screen reader hears of a card whose number or place is only on the canvas: The Havens Burn, with the cards under it against the number that loses; the Stormcaller's stage and area.
-  const spoken = (slot: CardSlot): string | null => {
-    if (slot.kind !== "card" || slot.faceDown || slot.zone === "hand" || slot.zone === "deck") return null;
-    const numbers = info(game, seat, slot.id);
-    // The Stormcaller's stage and the cards of its area say where they stand and whether they can be reached (stormcaller-table.ts).
-    if (slot.stormcaller) return areaSpeech(game, slot.id, (card) => nameOf(pictureKey(card)), numbers.questPoints);
-    // The Havens Burn's count, the enemies grappled under a location, and a Ship location's Threat against the total that loses (each is a sentence of its own; none drops another).
-    const said = [numbers.under?.speech, grappleDetail(game, slot.id), numbers.loss?.speech, controlSpeech(game, slot.id), facts.typeOf(slot.code) === "treasure" ? treasureSpeech(game, slot.id, (id) => nameOfCard(game.cards, id, nameOf)) : null].filter((part): part is string => part != null);
-    return said.length > 0 ? `${nameOf(slot.picture ?? slot.code)}, ${said.join(". ")}` : null;
-  };
   // The Stormcaller's stage wears its number and, while the players are at another stage, the Apart plate.
   const stageFacts = areaFacts(game);
   const stageMarks = stageFacts ? { pill: stagePill(stageFacts), apart: !stageFacts.together } : null;
@@ -222,8 +207,6 @@ function Table({ store, width, height, column, reach, onRowFeet, picture, pictur
           ) : null}
         </Canvas>
       </GestureDetector>
-      {/* A screen reader reaches the piles and the fold stacks through a button over each (reader-piles.tsx). */}
-      {reader ? <ReaderPiles slots={layout.slots} onTap={onTap} speak={(slot) => spoken(slot)} playable={highlight.tappable} nameOf={(code) => nameOf(code)} /> : null}
     </>
   );
 }

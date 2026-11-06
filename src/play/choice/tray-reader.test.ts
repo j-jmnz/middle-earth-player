@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import type { DistributeSheet, MultiSheet, OutcomeSheet, PickSheet, TriggerSheet } from "./sheet-types.ts";
 import type { Choice } from "./table-choice.ts";
-import { shareCap, shareValue, stepChoice, stepShares, tileRole, tileState } from "./tray-logic.ts";
+import { shareCap, shareHint, shareValue, stepChoice, stepShares, tileRole, tileState } from "./tray-logic.ts";
 import { tapShare } from "./pay.ts";
 
 const pick = { kind: "pick", key: "p", step: "Combat", title: "Defend", note: null, verb: "Defend with", options: [], primary: null, alternative: null } as unknown as PickSheet;
@@ -58,13 +58,27 @@ describe("a share row's value", () => {
     expect(shareCap(sheet, "a")).toBe(2);
     expect(shareCap(sheet, "b")).toBe(3);
     expect(shareCap(sheet, "nobody")).toBe(0);
-    expect(shareValue(sheet, [{ id: "a", amount: 2 }], "a")).toEqual({ now: 2, max: 2, text: "2 of 2 paid" });
-    expect(shareValue(sheet, [], "b")).toEqual({ now: 0, max: 3, text: "0 of 3 paid" });
+    expect(shareValue(sheet, [{ id: "a", amount: 2 }], "a")).toEqual({ now: 2, max: 2, text: "Pays 2, up to 2. 2 of 3 paid in all" });
+    expect(shareValue(sheet, [], "b")).toEqual({ now: 0, max: 3, text: "Pays 0, up to 3. 0 of 3 paid in all" });
+    expect(shareValue(sheet, [{ id: "a", amount: 1 }], "a").text).toBe("Pays 1, up to 2. 1 of 3 paid in all");
   });
 
   it("says assigned for archery damage, and takes the pool for a total that need not be met", () => {
     const sheet = pay({ purpose: { kind: "archery" }, exact: false });
-    expect(shareValue(sheet, [{ id: "b", amount: 4 }], "b").text).toBe("4 of 5 assigned");
+    expect(shareValue(sheet, [{ id: "b", amount: 4 }], "b").text).toBe("Takes 4, up to 5. 4 assigned in all");
+    expect(shareValue(pay({ purpose: { kind: "archery" }, total: 4 }), [{ id: "a", amount: 1 }, { id: "b", amount: 1 }], "b").text).toBe("Takes 1, up to 4. 2 of 4 assigned");
+  });
+
+  it("says a double tap adds one, and takes them back at the row's cap or when the total is met", () => {
+    const sheet = pay();
+    expect(shareHint(sheet, [], "a")).toBe("Double tap to add one");
+    expect(shareHint(sheet, [{ id: "a", amount: 1 }], "a")).toBe("Double tap to add one");
+    // At the cap (a's pool is 2).
+    expect(shareHint(sheet, [{ id: "a", amount: 2 }], "a")).toBe("Double tap to take them back");
+    // The total of 3 is met.
+    expect(shareHint(sheet, [{ id: "a", amount: 1 }, { id: "b", amount: 2 }], "b")).toBe("Double tap to take them back");
+    // A row holding none while the total is met has nothing to take back.
+    expect(shareHint(sheet, [{ id: "b", amount: 3 }], "a")).toBe("Nothing more can be added here");
   });
 });
 

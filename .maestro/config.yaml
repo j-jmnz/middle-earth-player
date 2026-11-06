@@ -4,3 +4,6 @@
 flows:
   - "scenarios/*/*"
   - "features/*"
+# The reader flow needs a development build with the reader table forced (README.md, Maestro), which the release e2e build is not.
+excludeTags:
+  - reader

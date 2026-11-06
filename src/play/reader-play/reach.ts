@@ -16,6 +16,8 @@ import { listsResponses, trayTiles } from "../choice/tray-logic.ts";
 import { cannotPay } from "../choice/why.ts";
 import { highlightKeys, highlightOf } from "../canvas/highlight-of.ts";
 import { readerRows, type ReaderRowsDeps } from "../canvas/reader-table-rows.ts";
+import { slotNumbers } from "../cards/card-effects.ts";
+import { cardSpeech, type CardSpeechDeps } from "../words/card-speech.ts";
 import { actingSeat, onTableFor } from "../store/selectors.ts";
 import { sharesReady } from "../choice/pay.ts";
 
@@ -76,6 +78,12 @@ class Walk {
     const items = rows.flatMap((section) => section.items);
     this.cardIds = new Set(items.flatMap((item) => (item.kind === "card" ? [item.id] : [])));
     this.pileOpens = new Set(items.flatMap((item) => (item.kind === "pile" && item.opens ? [item.id] : [])));
+    // Every button of the reader table says something: a card's label (card-speech.ts) and a pile's.
+    const deps: CardSpeechDeps = { nameOf: input.rows.nameOf, inactive: () => false, facts: input.rows.facts, info: (at, seat, cardId) => slotNumbers(at, ctx, cardId, seat), highlight, cards: ctx.cards, sheet, peeking: false };
+    for (const item of items) {
+      if (item.kind === "card") this.label(cardSpeech(game, this.seat, item.id, deps).label, `reader table card ${item.id}`);
+      else if (item.kind === "pile") this.label(item.label, `reader table pile ${item.id}`);
+    }
   }
 
   run(): Reach {

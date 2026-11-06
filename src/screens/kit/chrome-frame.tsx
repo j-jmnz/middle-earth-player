@@ -173,7 +173,7 @@ export function ListRow({
   detail,
   onPress,
   onLongPress,
-  longPressLabel = "Show card large",
+  longPressLabel = "Show card",
   testID,
   leading,
   trailing,

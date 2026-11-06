@@ -83,6 +83,16 @@ describe("the checker", () => {
     expect(rules(`<Pressable accessibilityRole="button" accessibilityLabel="Go" accessibilityActions={actions} onPress={go} onLongPress={more} />`)).toEqual([]);
   });
 
+  it("takes an actions expression that can be undefined for missing", () => {
+    const base = (actions: string) => `<Pressable accessibilityRole="button" accessibilityLabel="Go" accessibilityActions={${actions}} onPress={go} onLongPress={more} />`;
+    expect(rules(base("step ? ACTIONS : undefined"))).toEqual(["long-press-action"]);
+    expect(rules(base("step ? ACTIONS : null"))).toEqual(["long-press-action"]);
+    expect(rules(base("step && ACTIONS"))).toEqual(["long-press-action"]);
+    expect(rules(base("actions ?? undefined"))).toEqual(["long-press-action"]);
+    expect(rules(base("merged.accessibilityActions"))).toEqual([]);
+    expect(rules(base("step ? A : B"))).toEqual([]);
+  });
+
   it("wants a label on a text input", () => {
     expect(rules(`<TextInput value={v} />`)).toEqual(["input-label"]);
     expect(rules(`<TextInput accessibilityLabel="Notes" value={v} />`)).toEqual([]);

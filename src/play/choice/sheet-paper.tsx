@@ -7,6 +7,7 @@ import { Pressable, View, type AccessibilityRole, type DimensionValue } from "re
 import Animated, { SlideInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { longPressA11y, mergeA11yActions } from "../../ui/long-press-action.ts";
 import { IconValue } from "../../ui/game-icon.tsx";
 import { CONTROL_RADIUS, SHEET_RADIUS } from "../../ui/radius.ts";
 import { chipOnSurface, parchmentSurface } from "../../ui/surfaces.ts";
@@ -127,7 +128,7 @@ export function Tile({
   trailing?: ReactNode;
   // More for a screen reader to say (the foreseen damage).
   said?: string;
-  // What a tap does, when the label does not say ("Tap to play it"); said before the long press's hint.
+  // What a tap does, when the label does not say ("Plays it"); said before the long press's hint.
   hint?: string;
   // The detail is drawn but not said again: its words are already in the stats ("Success" beside the success icon).
   detailSpoken?: boolean;
@@ -139,6 +140,12 @@ export function Tile({
   const t = useTableTokens();
   const s = useUiScale();
   const night = surface === "night";
+  // A screen reader's actions on the row: a share row's increment and decrement, and the long press's "Show card" (docs/design-system.md, Screen reader).
+  const onStep = reader?.onStep;
+  const actions = mergeA11yActions(
+    onStep ? { accessibilityActions: STEP_ACTIONS, onAccessibilityAction: (event) => onStep(event.nativeEvent.actionName === "increment" ? 1 : -1) } : null,
+    onLongPress ? longPressA11y("Show card", onLongPress) : null,
+  );
   const numbers = stats.length > 0 || trailing != null ? (
     <View className="flex-row flex-wrap items-center gap-2">
       <Stats stats={stats} surface={surface} />
@@ -152,10 +159,10 @@ export function Tile({
       accessibilityRole={reader?.role ?? "button"}
       accessibilityState={reader?.checks ? { checked: selected } : { selected }}
       accessibilityValue={reader?.value}
-      accessibilityActions={reader?.onStep ? STEP_ACTIONS : undefined}
-      onAccessibilityAction={reader?.onStep ? (event) => reader.onStep?.(event.nativeEvent.actionName === "increment" ? 1 : -1) : undefined}
+      accessibilityActions={actions.accessibilityActions}
+      onAccessibilityAction={actions.onAccessibilityAction}
       accessibilityLabel={[reader?.name ?? label, ...stats.map((stat) => `${stat.word} ${stat.value}`), said, detailSpoken ? (detail ?? "") : ""].filter((part) => part.length > 0).join(". ")}
-      accessibilityHint={[hint, onLongPress ? "Hold to read the card" : null].filter(Boolean).join(". ") || undefined}
+      accessibilityHint={[hint, actions.accessibilityHint].filter(Boolean).join(". ") || undefined}
       onPress={onPress}
       onLongPress={onLongPress ?? undefined}
     >

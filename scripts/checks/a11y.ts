@@ -5,7 +5,8 @@ import ts from "typescript";
 //
 // It reads the JSX, not the types, so it is a heuristic, and these are its limits:
 // - A spread attribute (`{...props}`) is trusted to carry what is missing, except that an `onLongPress` needs a spread of `longPressA11y` or
-//   `mergeA11yActions` (or an `accessibilityActions` attribute).
+//   `mergeA11yActions` (or an `accessibilityActions` attribute). An `accessibilityActions` expression that can be undefined (a conditional with an
+//   undefined or null branch, `a ?? undefined`, `a && b`) counts as missing: the long press then has no action when it is.
 // - "Has text" for the name rule means the element's subtree holds literal text or an expression that is not JSX, a function or null. A
 //   `{items.map(...)}` of icons counts as text; a tree of views and icons does not.
 // - A picture passes when it is labelled, when it or an ancestor is hidden, or when an ancestor carries an `accessibilityLabel` (the labelled
@@ -41,6 +42,28 @@ function literal(attribute: ts.JsxAttribute | undefined): string | null {
   if (ts.isStringLiteral(init)) return init.text;
   if (ts.isJsxExpression(init) && init.expression && (ts.isStringLiteral(init.expression) || ts.isNoSubstitutionTemplateLiteral(init.expression))) return init.expression.text;
   return null;
+}
+
+// Whether an expression can be undefined or null: a literal one, a conditional with such a branch, `a && b`, or `a ?? b` / `a || b` ending in one.
+function canBeUndefined(expression: ts.Expression): boolean {
+  if (ts.isParenthesizedExpression(expression)) return canBeUndefined(expression.expression);
+  if (ts.isIdentifier(expression)) return expression.text === "undefined";
+  if (expression.kind === ts.SyntaxKind.NullKeyword) return true;
+  if (ts.isConditionalExpression(expression)) return canBeUndefined(expression.whenTrue) || canBeUndefined(expression.whenFalse);
+  if (ts.isBinaryExpression(expression)) {
+    const op = expression.operatorToken.kind;
+    if (op === ts.SyntaxKind.AmpersandAmpersandToken) return true;
+    if (op === ts.SyntaxKind.QuestionQuestionToken || op === ts.SyntaxKind.BarBarToken) return canBeUndefined(expression.right);
+  }
+  return false;
+}
+
+// Whether the element sets `accessibilityActions` to something that is always there.
+function hasActions(named: Map<string, ts.JsxAttribute>): boolean {
+  const attribute = named.get("accessibilityActions");
+  if (!attribute) return false;
+  const init = attribute.initializer;
+  return !(init && ts.isJsxExpression(init) && init.expression && canBeUndefined(init.expression));
 }
 
 // `accessible={false}`, a bare `accessibilityElementsHidden` or `={true}`, or importantForAccessibility "no" / "no-hide-descendants".
@@ -135,7 +158,7 @@ export function a11yFindings(text: string, file = "x.tsx"): Finding[] {
         const seen = !hides(named);
         if (seen && named.has("onPress") && !named.has("accessibilityRole") && spreads.length === 0) add("press-role", opening, tag, named);
         if (seen && named.has("onPress") && !named.has("accessibilityLabel") && spreads.length === 0 && !textChildren(node)) add("press-name", opening, tag, named);
-        if (named.has("onLongPress") && !named.has("accessibilityActions") && !spreadsHelper) add("long-press-action", opening, tag, named);
+        if (named.has("onLongPress") && !hasActions(named) && !spreadsHelper) add("long-press-action", opening, tag, named);
       }
       if (INPUTS.has(tag) && !named.has("accessibilityLabel") && spreads.length === 0) add("input-label", opening, tag, named);
       if (PICTURES.has(tag) && !named.has("accessibilityLabel") && !hides(named) && spreads.length === 0 && !coveredByAncestor(node)) add("picture-label", opening, tag, named);

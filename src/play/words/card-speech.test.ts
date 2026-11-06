@@ -77,7 +77,9 @@ describe("cardSpeech label", () => {
     expect(label).toContain(`2 damage of ${printed.health} hit points`);
     expect(label).toContain("3 resources");
     expect(label).toContain(`${printed.willpower} willpower`);
-    expect(label).toContain(`attached: ${nameOf(attachment?.code ?? "")}`);
+    // The attachment is a button of its own after the host, which says its name; the host says how many.
+    expect(label).toContain("1 attachment");
+    expect(label).not.toContain(nameOf(attachment?.code ?? ""));
   });
 
   it("says an enemy in the staging area with its engagement cost against the threat", () => {
@@ -146,8 +148,11 @@ describe("cardSpeech label", () => {
       sheet,
       peeking: true,
     };
-    expect(cardSpeech(duo.state, 1, hero, deps).label).toContain("controlled by player 2");
-    expect(cardSpeech(duo.state, 1, duo.seats[1].engaged[0] ?? "", deps).label).toContain("engaged with player 2");
+    // Told only when the controller is not the seat the zone is listed for.
+    expect(cardSpeech(duo.state, 0, hero, deps).label).toContain("controlled by player 2");
+    expect(cardSpeech(duo.state, 0, duo.seats[1].engaged[0] ?? "", deps).label).toContain("engaged with player 2");
+    expect(cardSpeech(duo.state, 1, hero, deps).label).not.toContain("controlled by");
+    expect(cardSpeech(duo.state, 1, duo.seats[1].engaged[0] ?? "", deps).label).not.toContain("engaged with player");
     const solo = find(({ state }) => state.mode === "planning");
     expect(cardSpeech(solo.state, 0, solo.state.seats[0]?.heroes[0] ?? "", depsOf(solo)).label).not.toContain("player");
   });
@@ -160,17 +165,21 @@ describe("cardSpeech hint", () => {
     const deps = depsOf(moment);
     const playable = moment.sheet.plays.find((id) => moment.state.cards[id]?.zone === "hand") ?? "";
     const blocked = (moment.state.seats[0]?.hand ?? []).find((id) => !(moment.sheet.kind === "window" && moment.sheet.plays.includes(id))) ?? "";
-    expect(cardSpeech(moment.state, 0, playable, deps).hint).toMatch(/^Can be played(, costs \d+( \w+)?)?/);
-    expect(cardSpeech(moment.state, 0, blocked, deps).hint).toBe("Cannot be played now, activate to hear why");
+    // The cost is in the label, not said twice.
+    expect(cardSpeech(moment.state, 0, playable, deps).hint).toBe("Can be played");
+    expect(cardSpeech(moment.state, 0, playable, deps).label).toMatch(/costs \d/);
+    expect(cardSpeech(moment.state, 0, blocked, deps).hint).toBe("Cannot be played now, double tap to hear why");
   });
 
-  it("says a character that can commit, with its willpower", () => {
+  it("says a character that can commit, its willpower being in the label", () => {
     const moment = find(({ state, sheet }) => state.mode === "questCommit" && sheet.kind === "window" && sheet.commit != null);
     if (moment.sheet.kind !== "window" || !moment.sheet.commit) throw new Error("a commit window");
     const option = moment.sheet.commit.options[0];
     const will = option?.stats?.find((stat) => stat.icon === "willpower")?.value;
     expect(will).toBeDefined();
-    expect(cardSpeech(moment.state, 0, option?.id ?? "", depsOf(moment)).hint).toBe(`Can commit, ${will} willpower`);
+    const said = cardSpeech(moment.state, 0, option?.id ?? "", depsOf(moment));
+    expect(said.hint).toBe("Can commit");
+    expect(said.label).toContain(`${will} willpower`);
   });
 
   it("says a defender pick with its mark", () => {
@@ -186,24 +195,27 @@ describe("cardSpeech hint", () => {
     const deps = depsOf(moment);
     const tail = `takes ${mark?.value} damage${mark?.danger ? ", destroyed" : ""}`;
     expect(cardSpeech(state, 0, option?.id ?? "", deps).hint).toBe(`Pick to defend, ${tail}`);
-    // Picked, it says how to take the pick back.
+    // Picked, the button's state says so; the hint says how to take the pick back.
     const picked = depsOf(moment, { highlight: { ...deps.highlight, picked: new Map([[option?.id ?? "", 1]]) } });
-    expect(cardSpeech(state, 0, option?.id ?? "", picked).hint).toBe(`Picked to defend, activate to unpick, ${tail}`);
+    expect(cardSpeech(state, 0, option?.id ?? "", picked).hint).toBe(`${tail}. Double tap to unpick`);
   });
 
-  it("offers no action while peeking at the other seat", () => {
+  it("promises only the card shown large while peeking at the other seat", () => {
     const moment = find(({ state, sheet }) => state.mode === "planning" && sheet.kind === "window" && sheet.plays.length > 0);
     if (moment.sheet.kind !== "window") throw new Error("a window");
     const id = moment.sheet.plays[0] ?? "";
     expect(cardSpeech(moment.state, 0, id, depsOf(moment)).hint).not.toBeNull();
-    expect(cardSpeech(moment.state, 0, id, depsOf(moment, { peeking: true, highlight: NO_HIGHLIGHT })).hint).toBeNull();
-    expect(cardSpeech(moment.state, 0, id, depsOf(moment, { peeking: true })).hint).toBeNull();
+    expect(cardSpeech(moment.state, 0, id, depsOf(moment, { peeking: true, highlight: NO_HIGHLIGHT })).hint).toBe("Double tap to show the card");
+    expect(cardSpeech(moment.state, 0, id, depsOf(moment, { peeking: true })).hint).toBe("Double tap to show the card");
   });
 
-  it("says nothing for a card the moment does not ask about", () => {
+  it("offers the card shown large for a card the moment does not ask about", () => {
     const moment = find(({ sheet }) => sheet.kind === "pick" && sheet.verb === "Defend with");
     const idle = Object.keys(moment.state.cards).find((id) => !depsOf(moment).highlight.tappable.has(id) && moment.state.cards[id]?.zone === "staging") ?? "";
-    expect(cardSpeech(moment.state, 0, idle, depsOf(moment)).hint).toBeNull();
+    expect(cardSpeech(moment.state, 0, idle, depsOf(moment)).hint).toBe("Double tap to show the card");
+    // A facedown card shows nothing.
+    const down = updateCard(moment.state, idle, { face: "down" });
+    expect(cardSpeech(down, 0, idle, depsOf({ ...moment, state: down })).hint).toBeNull();
   });
 });
 
@@ -222,6 +234,8 @@ describe("zoneSpeech", () => {
     expect(zoneSpeech("hand", 6, 0, moment.state)).toBe("Your hand, 6 cards");
     expect(zoneSpeech("play", 4, 0, moment.state)).toBe("Your heroes and play area, 4 cards");
     expect(zoneSpeech("activeLocation", 1, 0, moment.state)).toBe("Active location, 1 card");
+    // The quest stage is one card: its heading is its name, with no count.
+    expect(zoneSpeech("questStage", 1, 0, moment.state)).toBe("Quest stage");
   });
 
   it("names the other seat of a table of two", () => {

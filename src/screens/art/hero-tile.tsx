@@ -75,6 +75,8 @@ export function HeroTile({
   const preview = useCardPreview(hero.code, hero.imagesrc);
   const sphere = sphereWord(hero.sphereName);
   const mark = markedSphere(hero.sphereCode);
+  // The long press is also an action in the reader's menu (docs/design-system.md, Screen reader); its hint joins the tap's.
+  const longPress = onLongPress ? longPressA11y("Show card", () => onLongPress(preview)) : null;
   return (
     <View
       className={`flex-1 overflow-hidden ${flush ? "" : "rounded-item"}`}
@@ -150,8 +152,8 @@ export function HeroTile({
           collapsable={false}
           accessibilityRole="button"
           accessibilityLabel={`${hero.name}, ${sphere}${loss ? `, ${loss}` : ""}`}
-          accessibilityHint="Opens the card"
-          {...(onLongPress ? longPressA11y("Show card large", () => onLongPress(preview)) : null)}
+          accessibilityHint={["Opens the card", longPress?.accessibilityHint].filter(Boolean).join(". ")}
+          {...(longPress ? { accessibilityActions: longPress.accessibilityActions, onAccessibilityAction: longPress.onAccessibilityAction } : {})}
           onPress={onPress}
           onLongPress={onLongPress ? () => onLongPress(preview) : undefined}
           delayLongPress={350}

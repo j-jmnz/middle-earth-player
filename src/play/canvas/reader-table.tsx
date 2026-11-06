@@ -3,7 +3,7 @@
 // button that says its whole state and what a tap does now (card-speech.ts). A double tap is the canvas tap (`onTap`), and the custom action
 // "Show card" is the long press (`onPreview`). It reads the same selectors as the web list and looks like it, for a sighted helper's glance.
 import { useLayoutEffect } from "react";
-import { Pressable, ScrollView, View } from "react-native";
+import { Platform, Pressable, ScrollView, View } from "react-native";
 import { useStore } from "zustand";
 
 import type { ScenarioState } from "../../rules/core/state.ts";
@@ -13,6 +13,9 @@ import { cardSpeech } from "../words/card-speech.ts";
 import { lookIdsOf } from "../words/wilderland.ts";
 import { beatIds } from "../store/beat-store.ts";
 import { NO_HIGHLIGHT } from "../store/peek.ts";
+import { useReaderGateEnd } from "../spotlight/reader-gate.ts";
+import { tableVisibility } from "../choice/panel-visibility.ts";
+import { useReaderPanelOpen } from "../choice/reader-panel.ts";
 import { hidesFace, shownSeat } from "../store/selectors.ts";
 import type { ReaderSeed, TableCanvasProps } from "./table-canvas-types.ts";
 import { readerRows, type ReaderItem } from "./reader-table-rows.ts";
@@ -23,6 +26,8 @@ import { Text } from "../../ui/text.tsx";
 type ReaderProps = Pick<TableCanvasProps, "store" | "width" | "height" | "bottomInset" | "nameOf" | "inactive" | "facts" | "info" | "beats" | "onTap" | "onPreview" | "highlight"> & { readerSeed: ReaderSeed };
 
 const SHOW_CARD = [{ name: "show", label: "Show card" }];
+// The hint of a card the open pick does not ask about.
+const NOT_PART = "Not part of this choice. Double tap to show the card.";
 const OPEN_LIST = [{ name: "open", label: "Open the list" }];
 
 type ButtonProps = {
@@ -41,8 +46,8 @@ type ButtonProps = {
   onTap: (id: string) => void;
 };
 
-// One button: the card's or pile's words, 44 pt high at least. `dimmed`: a pick is open and does not ask about it (told to the reader as disabled; a
-// double tap still goes to the canvas tap, which opens the card large). The pressed fill is on a view inside: NativeWind drops a style function on a
+// One button: the card's or pile's words, 44 pt high at least. `dimmed`: a pick is open and does not ask about it (drawn faint and told in its hint; it is
+// not disabled, since TalkBack may then block its click and actions, and a double tap still goes to the canvas tap, which opens the card large). The pressed fill is on a view inside: NativeWind drops a style function on a
 // Pressable that also has a className.
 function ReaderButton({ id, testID, label, hint, picked, glows, dimmed, muted, faint, actions, onAction, onTap }: ButtonProps) {
   const t = useTableTokens();
@@ -53,7 +58,7 @@ function ReaderButton({ id, testID, label, hint, picked, glows, dimmed, muted, f
       accessibilityRole="button"
       accessibilityLabel={label}
       accessibilityHint={hint ?? undefined}
-      accessibilityState={{ selected: picked > 0, disabled: dimmed }}
+      accessibilityState={{ selected: picked > 0 }}
       accessibilityActions={actions ?? undefined}
       onAccessibilityAction={(event) => onAction(event.nativeEvent.actionName)}
       onPress={() => onTap(id)}
@@ -95,15 +100,16 @@ function Item({ item, place, game, seat, deps, onTap, onPreview }: { item: Reade
   const card = game.cards[item.id];
   const faceDown = hidesFace(card);
   const said = cardSpeech(game, seat, item.id, deps);
+  const dimmed = highlight.dimOthers && !highlight.tappable.has(item.id);
   return (
     <ReaderButton
       id={item.id}
       testID={`reader-card-${item.zone}-${place}`}
       label={said.label}
-      hint={said.hint}
+      hint={dimmed && !faceDown && !highlight.muted.has(item.id) ? NOT_PART : said.hint}
       picked={highlight.picked.get(item.id) ?? 0}
       glows={highlight.tappable.has(item.id)}
-      dimmed={highlight.dimOthers && !highlight.tappable.has(item.id)}
+      dimmed={dimmed}
       muted={highlight.muted.has(item.id)}
       faint={faceDown}
       actions={faceDown ? null : SHOW_CARD}
@@ -117,6 +123,10 @@ function Item({ item, place, game, seat, deps, onTap, onPreview }: { item: Reade
 
 export function ReaderTable({ store, width, height, bottomInset, nameOf, inactive, facts, info, beats, onTap, onPreview, highlight: marked, readerSeed }: ReaderProps) {
   const s = useUiScale();
+  // No canvas plays the spotlight here, so the gate of an attack ends at once.
+  useReaderGateEnd(store);
+  // A reading panel over the table is modal on iOS; Android hides the table from TalkBack while it is open (reader-panel.ts).
+  const panelOpen = useReaderPanelOpen();
   const seat = useStore(store, (state) => shownSeat(state.game, state.viewedSeat));
   const game = useStore(store, (state) => state.game);
   // Peeking at the other seat: nothing is outlined, a tap only previews (use-table-choice.ts).
@@ -132,7 +142,7 @@ export function ReaderTable({ store, width, height, bottomInset, nameOf, inactiv
   const rows = readerRows(game, seat, { facts, cards: readerSeed.cards, nameOf, playable: highlight.tappable, discover });
   const deps: CardSpeechDeps = { nameOf, inactive, facts, info, highlight, cards: readerSeed.cards, sheet: readerSeed.sheet, peeking };
   return (
-    <ScrollView testID="reader-table" style={{ width, height }} contentContainerStyle={{ padding: 12 * s, paddingBottom: 12 * s + bottomInset }}>
+    <ScrollView testID="reader-table" importantForAccessibility={tableVisibility(Platform.OS, panelOpen)} style={{ width, height }} contentContainerStyle={{ padding: 12 * s, paddingBottom: 12 * s + bottomInset }}>
       {rows.map((section) => (
         <View key={section.key} className="mb-3 gap-1">
           {section.heading ? (

@@ -139,3 +139,13 @@ describe("readerRows with a window", () => {
     for (const id of sheet.plays) if (state.cards[id]?.zone === "hand") expect(listed.has(id)).toBe(true);
   });
 });
+
+describe("readerRows speech", () => {
+  it("separates a pile's words with commas, never a middle dot, which a reader says aloud", () => {
+    const state = find((game) => game.mode === "planning" && game.encounterDiscard.length > 0);
+    const piles = section(readerRows(state, 0, depsOf()), "piles");
+    const labels = piles.items.flatMap((item) => (item.kind === "pile" ? [item.label] : []));
+    expect(labels.length).toBeGreaterThan(0);
+    for (const label of labels) expect(label).not.toContain("·");
+  });
+});

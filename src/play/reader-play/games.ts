@@ -1,9 +1,10 @@
 // The seeded games the reader parity test plays (src/play/reader-play.test.ts): A Shadow of the Past with a starter deck, played by the
 // auto-player with card play on, and any other scenario through its golden games (test/harness/golden-registry.ts), whose pinned intents are
 // the driver. A new scenario keeps parity by being in the golden registry; `pnpm test:scenario <id>` plays its games.
-import { expectOk } from "../../rules/core/test-fixture.ts";
-import { reduce, startScenario } from "../../rules/engine/reduce.ts";
+import { readFileSync } from "node:fs";
+import path from "node:path";
 
+import { hasReaderGames as listedInRegistry } from "../../../scripts/tools/test-scenario.ts";
 import { nextIntent } from "../../../test/harness/auto-player.ts";
 import { GOLDEN_REGISTRY } from "../../../test/harness/golden-registry.ts";
 import { RING_BEARER, starterStart, starterWorld, STARTER_SEEDS } from "../../../test/scenarios/a-shadow-of-the-past/game.ts";
@@ -18,9 +19,12 @@ export const DEFAULT_SCENARIOS: readonly string[] = [FIRST_SCENARIO, "voyage-acr
 // The most states one game is checked for: a few rounds, quick enough for a few seconds a game.
 const LIMIT = 400;
 
+// The check is one function (test:scenario uses it too), which reads the golden registry's source; this reads that file for it.
+const REGISTRY = path.join(import.meta.dirname, "../../../test/harness/golden-registry.ts");
+
 /** True when the scenario has games to play: the first scenario, or one the golden registry lists. */
 export function hasReaderGames(scenarioId: string): boolean {
-  return scenarioId === FIRST_SCENARIO || GOLDEN_REGISTRY.some((entry) => entry.scenarioId === scenarioId);
+  return listedInRegistry(scenarioId, readFileSync(REGISTRY, "utf8"));
 }
 
 // A small seeded generator (mulberry32), so a game picks the same elements on every run.
@@ -83,9 +87,7 @@ async function goldenGames(scenarioId: string): Promise<ReaderGame[]> {
   if (!golden) throw new Error(`${scenarioId} has no golden game`);
   const { ctx } = await entry.world(golden.decks);
   const played = entry.play(golden, ctx);
-  // The first seat's Keep is not among the golden's intents (playToEnd); the games' later intents follow it.
-  const kept = expectOk(reduce(startScenario(played.start, ctx), { type: "Keep" }, ctx));
-  void kept;
+  // The first seat's Keep is not among the golden's intents (playToEnd): the game opens with it, and the golden's later intents follow.
   return [{ scenario: scenarioId, name: golden.name, ctx, start: played.start, next: (_state, step) => (step === 0 ? { type: "Keep" } : (played.intents[step - 1] ?? null)), limit: LIMIT }];
 }
 

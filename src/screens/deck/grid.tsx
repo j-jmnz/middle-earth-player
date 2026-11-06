@@ -121,7 +121,7 @@ export const DeckCardCell = memo(function DeckCardCell({ card, width, full, look
         collapsable={false}
         accessibilityRole="button"
         accessibilityLabel={`${card.name}, ${card.count} in the deck${loss ? `, ${loss}` : ""}`}
-        {...longPressA11y("Show card large", () => onPreview(card.code, card.name, picture))}
+        {...longPressA11y("Show card", () => onPreview(card.code, card.name, picture))}
         accessibilityHint="Opens the card. Hold to show it large"
         onPress={() => router.push({ pathname: "/card/[code]", params: { code: card.code } })}
         onLongPress={() => onPreview(card.code, card.name, picture)}

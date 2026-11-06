@@ -21,7 +21,7 @@ import type { Sheet, Unavailable } from "./sheet-types.ts";
 import type { PictureSource } from "../canvas/table-canvas-types.ts";
 import { shareFor, type Choice } from "./table-choice.ts";
 import { useHeld } from "./tray-frame.tsx";
-import { shareValue, tileAction, tileRole, trayTiles, type TrayTile } from "./tray-logic.ts";
+import { shareHint, shareValue, tileAction, tileRole, trayTiles, type TrayTile } from "./tray-logic.ts";
 import { useReaderMode } from "../../ui/screen-reader.ts";
 import { withAlphaHex } from "../../ui/tokens.ts";
 import { useUiScale } from "../../ui/ui-scale.ts";
@@ -141,7 +141,7 @@ export function ChoiceTray({
               said={mark ? `${mark.danger ? "destroyed" : "damage"} ${mark.value}` : ""}
               // A card the Sailing test looked at is no choice: a tap opens it large, as a long press does.
               onPress={() => (tileAction(tile) === "read" ? (onRead && readId ? onRead(readId) : undefined) : onTile(tile.id))}
-              hint={tile.look != null ? "Shows the card" : undefined}
+              hint={tile.look != null ? "Shows the card" : reader && shown.kind === "distribute" ? shareHint(shown, picked.shares, tile.id) : undefined}
               detailSpoken={tile.look == null}
               reader={reader ? { role: tileRole(shown), checks: tileRole(shown) === "radio" || tileRole(shown) === "checkbox", ...(shown.kind === "distribute" ? { name: tile.label, value: { min: 0, ...shareValue(shown, picked.shares, tile.id) }, onStep: (delta: 1 | -1) => onStep?.(tile.id, delta) } : {}) } : undefined}
               onLongPress={onRead && readId ? () => onRead(readId) : null}

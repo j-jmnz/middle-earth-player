@@ -83,6 +83,8 @@ export default function Booklet() {
     const first = startPage(Number.isFinite(scenarioPage) && scenarioPage >= 1 ? scenarioPage : null, row.lastPage, row.pageCount);
     return (
       <Screen testID="booklet" scene="calm" inset={false}>
+        {/* Ahead of the pages in the reading order, so a screen reader reaches it without passing every page; it draws nothing without a reader. */}
+        <PageRulesButton id={id} first={first} />
         <View testID="booklet-reader" className="min-h-0 flex-1" collapsable={false}>
           <BookletPdf
             testID="booklet-pdf"
@@ -100,7 +102,6 @@ export default function Booklet() {
             }}
           />
         </View>
-        <PageRulesButton id={id} first={first} />
         <CloseBar onClose={close} />
       </Screen>
     );

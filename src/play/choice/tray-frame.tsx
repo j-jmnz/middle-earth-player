@@ -6,6 +6,7 @@ import { useState, type ReactNode } from "react";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
 import { MOTION } from "../../ui/motion-tokens.ts";
+import { useReaderPanel } from "./reader-panel.ts";
 import { useOpenMotion } from "../../ui/motion-run.ts";
 import { CONTAINER_RADIUS } from "../../ui/radius.ts";
 import { floatingSurface, parchmentSurface, raisedEdgeOf } from "../../ui/surfaces.ts";
@@ -43,6 +44,8 @@ export function TrayFrame({
   const t = useTableTokens();
   const s = useUiScale();
   const { progress, leaving } = useOpenMotion(open, MOTION.trayEnter, MOTION.trayLeave);
+  // A phone screen reader's table behind the panel is hidden from TalkBack while it is open (reader-panel.ts).
+  useReaderPanel(open);
   const motion = useAnimatedStyle(() => ({ opacity: progress.get(), transform: [{ translateY: (1 - progress.get()) * RISE * s }] }));
   if (!open && !leaving) return null;
   const paper = surface === "paper";

@@ -19,9 +19,9 @@ User decisions (2026-11-05):
 
 **What turns off with a reader.** The hand scrub, the combat spotlight and every drag. Armed buttons wait longer (`dock/buttons.tsx`, `ARM_READER_MS`).
 
-**Reader buttons on the canvas.**
-- Piles and fold stacks: `src/play/canvas/reader-piles.tsx`, with `pile-speech.ts`.
-- Special cards say their state through `spoken()` in `table-canvas.native.tsx`: `areaSpeech`, `grappleDetail`, `treasureSpeech`, `controlSpeech`, `info().loss.speech`.
+**Words for piles and special cards.**
+- Piles and fold stacks: `pile-speech.ts`.
+- Special cards say their state through `areaSpeech`, `grappleDetail`, `treasureSpeech`, `controlSpeech` and `info().loss.speech`, which `cardSpeech` gathers.
 
 **Text the game already has.**
 - The log: `store/log.ts`, `logLines`, shown in `LogPanel` (`reading-panels.tsx`).
@@ -45,7 +45,7 @@ User decisions (2026-11-05):
 - No long-press alternative exists on the canvas.
 
 **On the screens.**
-- Long presses have no accessibility action.
+- Long presses have no accessibility action; the one name for them is "Show card".
 - The booklet's pages are not readable on Android.
 - The card zoom picture has no label.
 - Some segmented controls have no group label.
@@ -57,9 +57,9 @@ User decisions (2026-11-05):
 
 The screen reader path is entirely separate from ordinary play (user instruction, 2026-11-05). With no screen reader on, the app looks, moves, sounds and plays exactly as it does now. This covers the canvas, gestures, drag, the hand scrub, the spotlight, motion, haptics, timings, words on screen, layout, and the web build.
 
-- **One gate.** All new reader behaviour is gated on `useReaderMode()`, a new hook in `src/ui/screen-reader.ts` that returns `Platform.OS !== "web" && useScreenReader()`. The plain `useScreenReader()` answers yes on web, so it is not a gate for anything new.
+- **One gate.** All new reader behaviour is gated on `useReaderMode()`, a new hook in `src/ui/screen-reader.ts` that returns `Platform.OS !== "web" && (useScreenReader() || a development build's override)`, the override being `EXPO_PUBLIC_FORCE_READER=1` for the Maestro flow. The plain `useScreenReader()` answers yes on web, so it is not a gate for anything new.
 - **The reader's own files.** New reader code lives in its own files: `card-speech.ts`, `reader-table.tsx`, `announce.ts`, `use-reader-focus.ts` and `long-press-action.ts`. The ordinary path does not import a reader file, except through one switch at the point where the reader takes over, such as `table-canvas.native.tsx` choosing `ReaderTable`.
-- **Ordinary files gain only accessibility props.** A shared file can gain `accessibility*`, `importantForAccessibility` and `onAccessibilityAction` props, which a sighted touch user never meets. It does not change what is drawn, how a touch acts, or any text on screen. When a reader needs different words (a note, a hint), they are a field read only under `useReaderMode()`; the visible string stays the same.
+- **Ordinary files gain only accessibility props.** A shared file can gain `accessibility*`, `importantForAccessibility` and `onAccessibilityAction` props, which a sighted touch user never meets. It does not change what is drawn, how a touch acts, or any text on screen. When a reader needs different words (a note, a hint), they are a field read only under `useReaderMode()`; the visible string stays the same. The one line in an ordinary file that is not an accessibility prop is the booklet route's `reportBookletPage`, which tells the reader-only button which page is showing.
 - **Tests stay as they are.** No golden, fixture, Maestro flow or existing test assertion changes, except the import of moved `announceForAccessibility` calls. The engine (`src/rules`) and `data/` are not touched.
 - **The reviewer checks it.** `reviewer` checks each section's diff against these rules and blocks any change that reaches a user with no screen reader on.
 
@@ -90,10 +90,10 @@ Vitest runs in node with no renderer, so everything spoken is built by **pure fu
   - the attachments and shadow cards, by name;
   - "Not applied";
   - every special sentence that exists now: the island, the area, grapple, treasure, control, the loss.
-- The hint says what a tap does in the open moment: "Can be played, costs 2 Spirit"; "Can commit, 3 willpower"; "Pick to defend, takes 3 damage, destroyed". It reads `TableHighlight` (`tappable`, `picked`, `marks`, `muted`) and the window sheet's `plays`.
+- The hint says what a tap does in the open moment: "Can be played"; "Can commit"; "Pick to defend, takes 3 damage, destroyed"; "Double tap to show the card" (the cost and the willpower are in the label). It reads `TableHighlight` (`tappable`, `picked`, `marks`, `muted`) and the window sheet's `plays`.
 - `zoneSpeech(zone, count, seat, game)` says the zone headings: "Staging area, 3 cards, threat 5"; "Engaged with you, 2 enemies"; "Your hand, 6 cards".
 - Pile words stay in `pile-speech.ts`.
-- The reader table calls `cardSpeech`, and so does `spoken()` (`table-canvas.native.tsx`), which is reached only with a reader on. Its existing sentences stay word for word, and the existing tests prove it. The web list (`table-canvas.tsx`) is not touched.
+- The reader table calls `cardSpeech`. The special sentences a card has always said stay word for word, and the existing tests prove it. The web list (`table-canvas.tsx`) is not touched.
 
 **`src/ui/announce.ts`**
 - `announce(text)` queues what it is given, so one line does not cut off the next (iOS drops an announcement made while another is speaking). It moves on at the `announcementFinished` event, and on a timer on Android.
@@ -118,12 +118,12 @@ Vitest runs in node with no renderer, so everything spoken is built by **pure fu
   3. your heroes and play area;
   4. the hand;
   5. the piles.
-- A card is a button with the `cardSpeech` label and hint, and `accessibilityState.selected` while it is picked. While a pick is open, a card the pick does not ask about is `disabled`.
+- A card is a button with the `cardSpeech` label and hint, and `accessibilityState.selected` while it is picked. While a pick is open, a card the pick does not ask about is drawn faint and its hint says it is not part of the choice; it is not `disabled`, since TalkBack may block the click and actions of a disabled node.
 - **Double tap** is the canvas tap (`onTap`): it plays, picks or opens the preview through `tapAction`, unchanged.
 - A custom action **"Show card"** (`accessibilityActions`) opens the preview, as the long press does. A pile's action opens its list.
 
 **`table-canvas.native.tsx`**
-- While `useReaderMode()` is on, it renders `ReaderTable` in place of the `Canvas` and `ReaderPiles`. When it is off, the canvas branch is the code that runs today, unchanged.
+- While `useReaderMode()` is on, it renders `ReaderTable` in place of the `Canvas`. When it is off, the canvas branch is the code that runs today, unchanged.
 - `onRowFeet` and `reach` still answer, so the command column lays out as before. The gestures are not mounted.
 
 **The window sheet's note.** A sheet gains an optional `readerNote` beside its `note`. The window sheet's is "Cards that say 'can be played' can be played now.", in place of "Tap a glowing card to play it, or drag it". So is any other note that says "glowing", "drag" or "tap on the table" (find them with a grep on `src/play/choice/*sheets*.ts`).
@@ -155,7 +155,7 @@ Vitest runs in node with no renderer, so everything spoken is built by **pure fu
 
 **Combat without the spotlight.** The banner's lines for each attack (`outcome.ts`: who attacks whom, the shadow and its effect, the damage, a destroyed card) are announced in order through the queue. The banner keeps its Dismiss action.
 
-**The log.** The table menu's Log (or the `LogPanel` row) reads newest first. Each line is one element, with its cause.
+**The log.** The table menu's Log keeps its order, oldest first. Each line is one element, with its cause, and the reader's focus lands on the newest line when the panel opens.
 
 **What is left in the chrome.** A pass over `src/play/chrome`, `readouts`, `phases`, `dream-chaser`, `spotlight` and `src/screens/table`:
 - the preview scrim gets a role (`card-preview.tsx`);
@@ -185,8 +185,8 @@ Vitest runs in node with no renderer, so everything spoken is built by **pure fu
 
 **Roles and labels**
 - Group labels on the segmented controls: `deck/list-bar.tsx`, `pool/card-pool.tsx`, `briefing/parts.tsx` (difficulty), and `routes/standalone/briefing/[scenarioId].tsx` (seats).
-- The sphere chips in `pool/filter-sheet.tsx` become radios, with a group label. `OptionRow` gets a hint that it opens a choice. The captions become headers.
-- The Ring-bearer candidates (`briefing/seat-picker.tsx`) become radios with selected state.
+- The sphere chips in `pool/filter-sheet.tsx` become radios that say `checked` alone, with a group label. `OptionRow` gets a hint that it opens a choice. The captions become headers.
+- The Ring-bearer candidates (`briefing/seat-picker.tsx`) stay buttons ("Choose …"): none is ever checked, so a radio would say nothing true.
 - The resolution tiles (`routes/resolution/[saveId].tsx`) drop ", selected" from their label.
 - Each node of the path road (`campaign/path-road.tsx`) gets an `accessibilityLabel` and a state (won, next, locked, coming soon), even when it cannot be pressed. Nothing visible changes.
 - The log's notes field (`routes/log/[saveId].tsx`) gets a label. The `Eyebrow` labels that title a group (`kit/chrome-text.tsx`) become headers.
@@ -195,7 +195,7 @@ Vitest runs in node with no renderer, so everything spoken is built by **pure fu
 **The booklet reader** (`modules/booklet-pdf`, `routes/booklet/[id].tsx`)
 - Android (`BookletPdfView.kt`): each page's `ImageView` gets `contentDescription` "Page 12 of 32", and changing page announces it.
 - iOS (`BookletPdfModule.swift`): check that PDFKit reads the page's text and says the page. Where it does not, label it the same way.
-- On both: under `useReaderMode()` only, so it is never drawn for a sighted user, a **"Rules on this page"** button lists the rule entries from that page (`data/rules/entries.json`, by document and page, through the catalog), which open in the rules reader. This is the readable path to the booklet's words.
+- On both: under `useReaderMode()` only, so it is never drawn for a sighted user, a **"Rules on this page"** button, ahead of the pages in the reading order, lists the rule entries from that page (`data/rules/entries.json`, by document and page, through the catalog), which open in the rules reader. This is the readable path to the booklet's words.
 - The native compile is a phone check (`docs/phases/STATUS.md`, phase 10 already lists it).
 
 **The static check:** `scripts/checks/a11y.test.ts`. It parses `src/**/*.tsx` with the `typescript` package, as the other checks do, and fails on:
@@ -232,7 +232,7 @@ A screen's own section adds only what departs from this.
 
 **Maestro**
 - `.maestro/features/screen-reader.yaml` opens the table with the reader table forced and plays one round by the reader table's testIDs.
-- The forcing is a development override: `useScreenReader` reads `EXPO_PUBLIC_FORCE_READER`. Maestro cannot turn VoiceOver on.
+- The forcing is a development override: `useReaderMode` reads `EXPO_PUBLIC_FORCE_READER` (`useScreenReader` does not). Maestro cannot turn VoiceOver on. The flow carries the `reader` tag, which `.maestro/config.yaml` excludes, so the release e2e run leaves it out.
 - It does not run in the cloud. `scripts/checks/maestro.test.ts` checks its ids.
 
 **Docs**

@@ -128,7 +128,7 @@ export const PoolCardCell = memo(function PoolCardCell({
         collapsable={false}
         accessibilityRole="button"
         accessibilityLabel={`${item.name}, ${poolDetail(item)}${loss ? `, ${loss}` : ""}${adding && count > 0 ? `, ${count} in the deck` : ""}`}
-        {...longPressA11y("Show card large", () => onPreview(item.code, item.name, picture))}
+        {...longPressA11y("Show card", () => onPreview(item.code, item.name, picture))}
         accessibilityHint="Opens the card. Hold to show it large"
         onPress={() => onOpen(item.code)}
         onLongPress={() => onPreview(item.code, item.name, picture)}

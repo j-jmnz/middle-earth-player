@@ -13,12 +13,27 @@ export function holdsFocus(touched: string | null, asked: ReadonlySet<string>): 
 
 /**
  * What is announced for a new moment once focus has settled. When focus moved to the dock's title, the reader hears the title (and its step
- * and count) from the focus itself, so only the note is added; when focus stayed on a card, the title is announced with its note.
+ * and count) from the focus itself and the note as that title's hint, so nothing is announced; when focus stayed on a card, neither is read
+ * by focus, so the title is announced with its note.
  */
 export function momentSpeech(a: { title: string; note: string | null; moved: boolean }): string {
+  if (a.moved) return "";
   const note = a.note?.trim() ?? "";
-  if (a.moved) return note;
   return [a.title, note].filter((part) => part.length > 0).join(". ");
+}
+
+/** The hint the dock's title carries under a reader: the moment's note, read after the title when focus lands on it. */
+export function momentHint(note: string | null): string | undefined {
+  const text = note?.trim() ?? "";
+  return text === "" ? undefined : text;
+}
+
+/** Why the reader's touched card is forgotten: an Undo, a peek at the other seat, or leaving the table. A send keeps it, so focus can stay on the card the next moment asks about. */
+export type TouchedEnd = "send" | "undo" | "peek" | "leave";
+
+/** The card a reader last activated after a reset reached from `end`: kept through a send, cleared by every other end. */
+export function touchedAfter(touched: string | null, end: TouchedEnd): string | null {
+  return end === "send" ? touched : null;
 }
 
 // The dock's sentence under a primary that waits for a pick, in the words a reader can follow: no card glows on the reader's table.

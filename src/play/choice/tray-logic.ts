@@ -98,11 +98,28 @@ export function shareCap(sheet: Extract<Sheet, { kind: "distribute" }>, id: stri
   return sheet.exact ? Math.min(item.max, sheet.total) : item.max;
 }
 
-/** What a share row speaks as its value: "2 of 3 paid" (a cost) or "2 of 3 assigned" (archery damage). */
+/**
+ * What a share row speaks as its value: the row's share and its cap, then the running total ("Pays 1, up to 2. 1 of 3 paid in all"; archery
+ * damage: "Takes 1, up to 3. 2 of 4 assigned"). A total that need not be met (an X cost) has no "of": "1 paid in all".
+ */
 export function shareValue(sheet: Extract<Sheet, { kind: "distribute" }>, shares: readonly Share[], id: string): { now: number; max: number; text: string } {
   const now = shareOf(shares, id);
   const max = shareCap(sheet, id);
-  return { now, max, text: `${now} of ${max} ${sheet.purpose.kind === "archery" ? "assigned" : "paid"}` };
+  const sum = shareSum(shares);
+  const archery = sheet.purpose.kind === "archery";
+  const all = archery ? (sheet.exact ? `${sum} of ${sheet.total} assigned` : `${sum} assigned in all`) : sheet.exact ? `${sum} of ${sheet.total} paid in all` : `${sum} paid in all`;
+  return { now, max, text: `${archery ? "Takes" : "Pays"} ${now}, up to ${max}. ${all}` };
+}
+
+/**
+ * What a double tap on a share row does: it adds one share; at the row's cap, or when the total is met, it takes them back (tapShare goes
+ * round to none). A row with none to take back when the total is met says so.
+ */
+export function shareHint(sheet: Extract<Sheet, { kind: "distribute" }>, shares: readonly Share[], id: string): string {
+  const now = shareOf(shares, id);
+  const full = sheet.exact && shareSum(shares) >= sheet.total;
+  if (now === 0 && (full || shareCap(sheet, id) === 0)) return "Nothing more can be added here";
+  return now >= shareCap(sheet, id) || full ? "Double tap to take them back" : "Double tap to add one";
 }
 
 /**

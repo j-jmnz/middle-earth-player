@@ -16,8 +16,8 @@ import { pileSpeech } from "./pile-speech.ts";
 /** The order of the zones: the quest and the active location(s), staging, engaged, the seat's heroes and play area, the hand. */
 export const READER_ZONES: readonly ZoneId[] = ["questStage", "activeLocation", "secondActiveLocation", "staging", "engaged", "play", "hand"];
 
-// A zone with nothing in it still has its heading where the player looks for cards (staging, engaged, the hand), and says "no cards"; the quest
-// stage and the locations leave their heading out until a card stands there, as the web list does.
+// A zone with nothing in it still has its heading where the player looks for cards (the active location, staging, engaged, the heroes and play area,
+// the hand), and says "no cards"; the quest stage and the second active location leave their heading out until a card stands there.
 const SHOWN_EMPTY: ReadonlySet<ZoneId> = new Set(["activeLocation", "staging", "engaged", "play", "hand"]);
 
 export type ReaderItem =
@@ -58,8 +58,8 @@ function pileItem(game: ScenarioState, view: PileView, deps: ReaderRowsDeps): Re
   const id = `pile:${view.pile}`;
   const speech = pileSpeech({ zone: view.pile, count: view.ids.length, points: view.points }, deps.playable.has(id), view.pile === "grottoDeck" && view.top ? deps.nameOf(view.top.code) : null);
   // The grotto deck's label already names its top card.
-  const top = view.top && view.pile !== "grottoDeck" ? ` · ${nameOfCard(game.cards, view.top.id, deps.nameOf)} on top` : "";
-  const held = (view.attached ?? []).length > 0 ? ` · ${(view.attached ?? []).map((card) => deps.nameOf(card.code)).join(", ")} attached` : "";
+  const top = view.top && view.pile !== "grottoDeck" ? `, ${nameOfCard(game.cards, view.top.id, deps.nameOf)} on top` : "";
+  const held = (view.attached ?? []).length > 0 ? `, ${(view.attached ?? []).map((card) => deps.nameOf(card.code)).join(", ")} attached` : "";
   return { kind: "pile", id, pile: view.pile, label: `${speech.label}${top}${held}`, hint: speech.hint, opens: speech.hint != null };
 }
 

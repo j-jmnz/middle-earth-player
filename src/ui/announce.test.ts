@@ -2,7 +2,7 @@
 // wait sized to the line; clearing drops what is queued; the listener and the timer are gone once the queue is empty.
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import { announce, clearAnnouncements, waitFor } from "./announce.ts";
+import { announce, clearAnnouncements, isAnnouncing, onIdle, resetAnnouncer, waitFor } from "./announce.ts";
 
 const phone = vi.hoisted(() => ({
   os: "ios",
@@ -11,6 +11,8 @@ const phone = vi.hoisted(() => ({
   handlers: new Set<(event: { announcement?: string; success?: boolean }) => void>(),
   added: 0,
   removed: 0,
+  subscribed: 0,
+  answer: null as Promise<boolean> | null,
 }));
 vi.mock("react-native", () => ({
   Platform: {
@@ -19,6 +21,7 @@ vi.mock("react-native", () => ({
     },
   },
   AccessibilityInfo: {
+    isScreenReaderEnabled: () => phone.answer ?? Promise.resolve(phone.reader),
     announceForAccessibility: (text: string) => phone.said.push(text),
     addEventListener: (_name: string, handler: (event: { announcement?: string; success?: boolean }) => void) => {
       phone.handlers.add(handler);
@@ -34,13 +37,22 @@ vi.mock("react-native", () => ({
 }));
 
 // The phone's accessibility store: announce speaks only while a screen reader is on.
-vi.mock("./accessibility.ts", () => ({ accessibility: () => ({ reduceMotion: null, screenReader: phone.reader }) }));
+vi.mock("./accessibility.ts", () => ({
+  accessibility: () => ({ reduceMotion: null, screenReader: phone.reader }),
+  subscribeAccessibility: () => {
+    phone.subscribed += 1;
+    return () => undefined;
+  },
+}));
 
 const finish = (announcement?: string) => {
   for (const handler of [...phone.handlers]) handler({ ...(announcement != null ? { announcement } : {}), success: true });
 };
 
 beforeEach(() => {
+  resetAnnouncer();
+  phone.subscribed = 0;
+  phone.answer = null;
   vi.useFakeTimers();
   phone.os = "ios";
   phone.reader = true;
@@ -165,5 +177,85 @@ describe("announce", () => {
     expect(phone.said).toEqual([]);
     expect(phone.added).toBe(0);
     expect(vi.getTimerCount()).toBe(0);
+  });
+});
+
+describe("the announcer's own follow of the screen reader", () => {
+  it("starts it with the first line, however many components are mounted", () => {
+    expect(phone.subscribed).toBe(0);
+    announce("one");
+    announce("two");
+    expect(phone.subscribed).toBe(1);
+  });
+
+  it("holds a line made before the phone has answered, and says it once it has said a reader is on", async () => {
+    phone.reader = false;
+    let answer: (on: boolean) => void = () => undefined;
+    phone.answer = new Promise<boolean>((resolve) => {
+      answer = resolve;
+    });
+    announce("one");
+    announce("two");
+    expect(phone.said).toEqual([]);
+    expect(isAnnouncing()).toBe(true);
+    answer(true);
+    await vi.advanceTimersByTimeAsync(0);
+    expect(phone.said).toEqual(["one"]);
+    finish("one");
+    expect(phone.said).toEqual(["one", "two"]);
+  });
+
+  it("drops what it held when the phone says no reader is on", async () => {
+    phone.reader = false;
+    phone.answer = Promise.resolve(false);
+    announce("one");
+    await vi.advanceTimersByTimeAsync(0);
+    expect(phone.said).toEqual([]);
+    expect(isAnnouncing()).toBe(false);
+  });
+});
+
+describe("a banner's lines", () => {
+  it("are all kept: the queue holds a banner of ten lines and the moment after it", () => {
+    for (let line = 0; line < 20; line += 1) announce(`line ${line}`);
+    for (let line = 0; line < 20; line += 1) finish();
+    expect(phone.said).toEqual(Array.from({ length: 20 }, (_, line) => `line ${line}`));
+  });
+
+  it("drop the oldest, never the newest, past the cap", () => {
+    for (let line = 0; line < 40; line += 1) announce(`line ${line}`);
+    for (let line = 0; line < 40; line += 1) finish();
+    expect(phone.said.at(-1)).toBe("line 39");
+    expect(phone.said[0]).toBe("line 0");
+    expect(phone.said).not.toContain("line 1");
+  });
+});
+
+describe("idle", () => {
+  it("runs at once when nothing is being said", () => {
+    const calls: string[] = [];
+    onIdle(() => calls.push("now"));
+    expect(calls).toEqual(["now"]);
+  });
+
+  it("waits for the last queued line to finish", () => {
+    const calls: string[] = [];
+    announce("one");
+    announce("two");
+    onIdle(() => calls.push("idle"));
+    finish("one");
+    expect(calls).toEqual([]);
+    finish("two");
+    expect(calls).toEqual(["idle"]);
+    expect(isAnnouncing()).toBe(false);
+  });
+
+  it("can be cancelled", () => {
+    const calls: string[] = [];
+    announce("one");
+    const cancel = onIdle(() => calls.push("idle"));
+    cancel();
+    finish("one");
+    expect(calls).toEqual([]);
   });
 });

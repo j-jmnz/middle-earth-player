@@ -31,7 +31,7 @@ Each agent reads its own file.
 
 Read the sections your task touches.
 
-- `README.md` — Middle Earth LCG (~4.1K tok)
+- `README.md` — Middle Earth LCG (~4.2K tok)
   - 7–17 Where it stands (~390)
   - 18–23 Rules come from the printed sources (~160)
   - 24–55 Commands (~1.4K)
@@ -41,7 +41,7 @@ Read the sections your task touches.
     - 74–79 Mac browser (~120)
     - 80–85 Codespaces (~110)
     - 86–160 Phone builds from scratch (Mac) (~1.1K)
-    - 161–164 Maestro (~290)
+    - 161–164 Maestro (~320)
 - `docs/architecture.md` — Architecture (~20.1K tok)
   - 7–41 Stack (~990)
   - 42–77 Processes (~660)
@@ -105,7 +105,7 @@ Read the sections your task touches.
   - 868–893 Persistence and shipping (~1.7K)
   - 894–935 Screens (~4.7K) ← 2
     - 920–935 Table screen (~1.8K) ← 5
-- `docs/design-system-table.md` — Design system — Table (landscape) (~33.4K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~34.0K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.1K) ← 4
   - 24–27 Table menu (~430) ← 1
@@ -120,7 +120,7 @@ Read the sections your task touches.
   - 107–120 Piles (~1.8K) ← 8
   - 121–126 Marks of the open moment (~400) ← 1
   - 127–195 Motion (~3.2K) ← 8
-  - 196–223 Spotlight (~2.4K) ← 18
+  - 196–223 Spotlight (~2.5K) ← 18
   - 224–229 Gestures (~580) ← 5
   - 230–233 Hold, slide and release (~940)
   - 234–239 Peeking at the other seat (~600) ← 1
@@ -135,8 +135,8 @@ Read the sections your task touches.
   - 312–317 Quest advance (~530) ← 1
   - 318–321 Undo (~140)
   - 322–325 Haptics (~280)
-  - 326–337 Banner (~670) ← 2
-  - 338–355 Screen reader (~1.7K) ← 9
+  - 326–337 Banner (~660) ← 2
+  - 338–355 Screen reader (~2.1K) ← 14
   - 356–359 Android Back (~90)
 - `docs/design-system.md` — Design system — Carved Stone (~25.5K tok)
   - 7–20 Direction (~670)
@@ -149,7 +149,7 @@ Read the sections your task touches.
   - 138–159 Backdrops (~950) ← 5
   - 160–167 Navigation (~410) ← 3
   - 168–205 Components (~1.7K) ← 9
-  - 206–219 Screen reader (~710) ← 6
+  - 206–219 Screen reader (~760) ← 8
   - 220–234 Icons (~480) ← 6
   - 235–253 Card art (~740) ← 2
   - 254–268 Tablets (~510) ← 13
@@ -174,7 +174,7 @@ Read the sections your task touches.
     - 417–430 Settings (~730)
     - 431–436 Rules (~450) ← 1
     - 437–440 Rule (~220) ← 1
-    - 441–446 Booklet (~270) ← 2
+    - 441–446 Booklet (~280) ← 2
     - 447–450 Database (~20)
   - 451–470 States (~620)
 
@@ -337,17 +337,17 @@ Read when a task names the plan.
   - 145–156 After each scenario phase (~210)
   - 157–160 Order (~70)
   - 161–168 Verification (~100)
-- `docs/plans/screen-reader.md` — Plan: Screen reader parity (VoiceOver and TalkBack) (~4.7K tok)
-  - 3–78 Context (~1.4K)
-    - 11–37 What already works (reuse it, do not rebuild it) (~430)
-    - 38–55 The gaps (~250)
-    - 56–65 Independence from ordinary play (~440)
+- `docs/plans/screen-reader.md` — Plan: Screen reader parity (VoiceOver and TalkBack) (~4.9K tok)
+  - 3–78 Context (~1.5K)
+    - 11–37 What already works (reuse it, do not rebuild it) (~410)
+    - 38–55 The gaps (~260)
+    - 56–65 Independence from ordinary play (~510)
     - 66–78 How the work runs (~200)
   - 79–110 1. Card speech and one announcer (~600)
-  - 111–140 2. The reader table on the phone (~510)
-  - 141–171 3. The table's moments, refusals and chrome (~550)
-  - 172–221 4. Menus and screens (~940)
-  - 222–242 5. Parity as a test (~370)
+  - 111–140 2. The reader table on the phone (~540)
+  - 141–171 3. The table's moments, refusals and chrome (~560)
+  - 172–221 4. Menus and screens (~960)
+  - 222–242 5. Parity as a test (~400)
   - 243–261 Verification (~310)
 - `docs/plans/table-and-deck-fixes.md` — Plan: table and deck fixes (~3.0K tok)
 
@@ -397,8 +397,8 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `src/campaign`: architecture.md, Tests (2)
 - `src/catalog`: architecture.md, Mechanic families (2); brief.md, A Knife in the Dark (1); brief.md, Flight to the Ford burden deck and life (1)
 - `src/effects`: brief.md, Breaking of the Fellowship, stage 2B (1)
-- `src/play`: design-system-table.md, Spotlight (14); design-system-table.md, Cards (12); design-system-table.md, Command column (9); design-system-table.md, Spacing and the play area's rows (9); design-system-table.md, The Island Map (8); design-system-table.md, Screen reader (7); architecture.md, State (6); design-system-table.md, Choice tray (6); design-system-table.md, Piles (6); architecture.md, Images (5); design-system-table.md, Motion (5); design-system-table.md, Reading panels (5); design-system-table.md, The Sailing test (5); design-system-table.md, Gestures (4); architecture.md, Performance (3); brief.md, Table screen (3); design-system-table.md, Top bar (3); architecture.md, Tests (2); design-system-table.md, Banner (2); design-system-table.md, Quest scale (2); plans/done/settings-theme-and-ui-scale.md, UI scale engine (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Two taps (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1); design-system.md, Type (1)
+- `src/play`: design-system-table.md, Spotlight (14); design-system-table.md, Cards (12); design-system-table.md, Screen reader (12); design-system-table.md, Command column (9); design-system-table.md, Spacing and the play area's rows (9); design-system-table.md, The Island Map (8); architecture.md, State (6); design-system-table.md, Choice tray (6); design-system-table.md, Piles (6); architecture.md, Images (5); design-system-table.md, Motion (5); design-system-table.md, Reading panels (5); design-system-table.md, The Sailing test (5); design-system-table.md, Gestures (4); architecture.md, Performance (3); brief.md, Table screen (3); design-system-table.md, Top bar (3); architecture.md, Tests (2); design-system-table.md, Banner (2); design-system-table.md, Quest scale (2); plans/done/settings-theme-and-ui-scale.md, UI scale engine (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Two taps (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Screen reader (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1); design-system.md, Type (1)
 - `src/rules`: architecture.md, Mechanic families (3); brief.md, The engine plays the game (3); architecture.md, State (1)
-- `src/screens`: design-system.md, Tablets (8); design-system.md, Campaigns (campaign list) (6); design-system.md, Briefing (5); design-system.md, Components (5); design-system.md, Campaign path (4); design-system.md, History (4); design-system.md, Campaign setup (3); design-system.md, Card pool (the Cards tab) (3); design-system.md, Deck builder (deck editor) (3); design-system.md, Navigation (3); design-system.md, Performance (3); design-system.md, Backdrops (2); design-system.md, Booklet (2); design-system.md, Card (2); design-system.md, Card art (2); design-system.md, Decks (2); design-system.md, Screen reader (2); architecture.md, Images (1); architecture.md, State (1); architecture.md, Tests (1); brief.md, Campaign (1); brief.md, Card images (1); brief.md, Screens (1); design-system.md, Campaign log (1); design-system.md, Resolution and standalone outcome (1); design-system.md, Rule (1); design-system.md, Rules (1); design-system.md, Scenarios (1); design-system.md, Spend XP (1); design-system.md, Type (1)
+- `src/screens`: design-system.md, Tablets (8); design-system.md, Campaigns (campaign list) (6); design-system.md, Briefing (5); design-system.md, Components (5); design-system.md, Campaign path (4); design-system.md, History (4); design-system.md, Campaign setup (3); design-system.md, Card pool (the Cards tab) (3); design-system.md, Deck builder (deck editor) (3); design-system.md, Navigation (3); design-system.md, Performance (3); design-system.md, Screen reader (3); design-system.md, Backdrops (2); design-system.md, Booklet (2); design-system.md, Card (2); design-system.md, Card art (2); design-system.md, Decks (2); architecture.md, Images (1); architecture.md, State (1); architecture.md, Tests (1); brief.md, Campaign (1); brief.md, Card images (1); brief.md, Screens (1); design-system.md, Campaign log (1); design-system.md, Resolution and standalone outcome (1); design-system.md, Rule (1); design-system.md, Rules (1); design-system.md, Scenarios (1); design-system.md, Spend XP (1); design-system.md, Type (1)
 - `src/ui`: design-system.md, Components (3); design-system.md, Backdrops (2); design-system.md, Screen reader (2); design-system.md, Tablets (2); design-system.md, Type (2); design-system-table.md, Motion (1); design-system-table.md, Table menu (1); design-system.md, Icons (1); design-system.md, Performance (1); design-system.md, Spacing, radius, border (1); design-system.md, Surfaces (1); plans/done/settings-theme-and-ui-scale.md, Theme engine (Dark / Light / System) (1); plans/done/settings-theme-and-ui-scale.md, UI scale engine (1)
 - `tailwind.config.js`: design-system.md, Spacing, radius, border (1); design-system.md, Type (1)

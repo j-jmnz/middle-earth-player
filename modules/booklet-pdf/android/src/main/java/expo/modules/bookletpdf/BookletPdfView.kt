@@ -184,7 +184,7 @@ class BookletPdfView(context: Context, appContext: AppContext) : ExpoView(contex
       }
       holder.bound = position
       // The page's spoken name for TalkBack; it draws nothing.
-      holder.image.contentDescription = "Page ${position + 1} of ${renderer?.pageCount ?: 0}"
+      holder.image.contentDescription = "Page ${position + 1} of $itemCount"
       val token = Any()
       holder.token = token
       val scale = quality

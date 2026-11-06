@@ -1,5 +1,5 @@
 // A long press is also an action (docs/design-system.md, Screen reader): a screen reader cannot hold a finger down, so a control with an
-// `onLongPress` offers the same thing in its actions menu, named for what it does ("Show card large"). Only accessibility props come out of
+// `onLongPress` offers the same thing in its actions menu, named for what it does ("Show card"). Only accessibility props come out of
 // here, so a touch is exactly what it was (user instruction, 2026-11-05: the reader path is separate from ordinary play).
 import type { AccessibilityActionEvent, AccessibilityActionInfo } from "react-native";
 

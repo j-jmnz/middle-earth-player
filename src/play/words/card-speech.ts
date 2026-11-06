@@ -14,9 +14,9 @@ import { stagingThreat } from "../../rules/quest/quest.ts";
 import { nameOfCard, pictureKey } from "../canvas/picture-key.ts";
 import type { SlotInfo, TableHighlight } from "../canvas/table-canvas-types.ts";
 import { controlSpeech, treasureSpeech } from "../cards/dungeon-preview.ts";
-import { wordOf } from "../choice/tray-logic.ts";
+import { shareHint, shareValue, wordOf } from "../choice/tray-logic.ts";
 import type { OptionMark, Sheet } from "../choice/sheet-types.ts";
-import { actingSeat, hidesFace, isPrisoner, type ZoneFacts, type ZoneId } from "../store/selectors.ts";
+import { actingSeat, hidesFace, isLooked, isPrisoner, type ZoneFacts, type ZoneId } from "../store/selectors.ts";
 import { areaRoleOf, areaSpeech } from "../store/stormcaller-table.ts";
 import { seatTag } from "./area.ts";
 import { grappleDetail } from "./grapple.ts";
@@ -104,7 +104,8 @@ function attachedWords(game: ScenarioState, card: CardInstance, nameOf: CardSpee
   const words: string[] = [];
   const attached = card.attachments.flatMap((id) => (game.cards[id] && game.cards[id]?.guard !== true ? [game.cards[id]] : []));
   const named = attached.filter((other): other is CardInstance => other != null && !hidesFace(other));
-  if (named.length > 0) words.push(`attached: ${named.map((other) => nameOfCard(game.cards, other.id, nameOf)).join(", ")}`);
+  // The attachments follow the host on the reader table as buttons of their own, which say their names; the host says how many.
+  if (named.length > 0) words.push(plural(named.length, "attachment", "attachments"));
   const hidden = attached.length - named.length;
   if (hidden > 0) words.push(plural(hidden, "facedown card attached", "facedown cards attached"));
   // A shadow card is named once it lies faceup; until then only that it is there (the table never tells a facedown card).
@@ -136,7 +137,8 @@ function labelOf(game: ScenarioState, seat: number, card: CardInstance, deps: Ca
   const type = typeWord(name, deps.facts.typeOf(card.code));
   const parts: string[] = [stage ?? (type ? `${name}, ${type}` : name)];
 
-  if (game.seatCount > 1 && card.controller != null && (card.zone === "heroes" || card.zone === "play" || card.zone === "engaged")) {
+  // The controller is told only when it is not the seat the zone is listed for.
+  if (game.seatCount > 1 && card.controller != null && card.controller !== seat && (card.zone === "heroes" || card.zone === "play" || card.zone === "engaged")) {
     parts.push(card.zone === "engaged" && printed.type === "enemy" ? `engaged with player ${card.controller + 1}` : `controlled by player ${card.controller + 1}`);
   }
   if (card.zone === "attached" && card.host && game.cards[card.host]) parts.push(`attached to ${nameOfCard(game.cards, card.host, deps.nameOf)}`);
@@ -184,52 +186,47 @@ function markWords(mark: OptionMark): string {
   return `${what}${mark.danger ? ", destroyed" : ""}`;
 }
 
-const statOf = (stats: readonly { icon: string; value: number }[] | undefined, icon: string): number | null => stats?.find((stat) => stat.icon === icon)?.value ?? null;
+const SHOW_HINT = "Double tap to show the card";
+
+// A face-up card the moment does not ask about opens large on a tap; a facedown one shows nothing.
+function previewHint(game: ScenarioState, cardId: string): string | null {
+  const card = game.cards[cardId];
+  return card && hidesFace(card) && !isLooked(game, cardId) ? null : SHOW_HINT;
+}
 
 function hintOf(game: ScenarioState, cardId: string, deps: CardSpeechDeps): string | null {
   const { highlight, sheet } = deps;
-  if (!highlight.tappable.has(cardId)) return highlight.muted.has(cardId) ? "Cannot be played now, activate to hear why" : null;
+  if (!highlight.tappable.has(cardId)) return highlight.muted.has(cardId) ? "Cannot be played now, double tap to hear why" : previewHint(game, cardId);
   const picked = (highlight.picked.get(cardId) ?? 0) > 0;
   const mark = highlight.marks.get(cardId);
   const marked = mark ? `, ${markWords(mark)}` : "";
   switch (sheet?.kind) {
     case "window": {
       const said: string[] = [];
-      const commit = sheet.commit?.options.find((item) => item.id === cardId);
-      if (commit) {
-        const will = statOf(commit.stats, "willpower");
-        said.push(picked ? "Picked to commit, activate to take it back" : `Can commit${will != null ? `, ${will} willpower` : ""}`);
-      }
-      if (sheet.plays.includes(cardId)) {
-        const card = game.cards[cardId];
-        const cost = card ? costWords(printedOf(deps.cards, card.code)) : null;
-        said.push(`Can be played${cost ? `, ${cost}` : ""}`);
-      }
+      // The willpower and the cost are in the label; the picked state is the button's own.
+      if (sheet.commit?.options.some((item) => item.id === cardId)) said.push(picked ? "Double tap to take it back" : "Can commit");
+      if (sheet.plays.includes(cardId)) said.push("Can be played");
       const timings = [...new Set(sheet.triggers.filter((item) => item.cardId === cardId).map((item) => item.timing))];
       if (timings.length > 0) said.push(`Can use its ${timings.join(" or ")}`);
       return said.length > 0 ? said.join(". ") : null;
     }
     case "pick": {
       const verb = wordOf(sheet.verb).toLowerCase();
-      return `${picked ? `Picked to ${verb}, activate to unpick` : `Pick to ${verb}`}${marked}`;
+      return picked ? `${mark ? `${markWords(mark)}. ` : ""}Double tap to unpick` : `Pick to ${verb}${marked}`;
     }
     case "multi": {
       const verb = wordOf(sheet.verb).toLowerCase();
-      const item = sheet.options.find((option) => option.id === cardId);
-      const will = sheet.build.kind === "attack" ? statOf(item?.stats, "attack") : statOf(item?.stats, "willpower");
-      const number = will != null ? `, ${will} ${sheet.build.kind === "attack" ? "attack" : "willpower"}` : "";
-      return picked ? `Picked to ${verb}, activate to take it back` : `Can ${verb}${number}${marked}`;
+      return picked ? "Double tap to take it back" : `Can ${verb}${marked}`;
     }
     case "distribute": {
-      const item = sheet.options.find((option) => option.id === cardId);
-      const given = highlight.picked.get(cardId) ?? 0;
-      const what = highlight.share === "damage" ? "damage" : "resources";
-      return `${given} of up to ${item?.max ?? sheet.total} ${what}, activate to add one`;
+      // The shares so far, as the table marks them (a share is the amount a card holds).
+      const shares = [...highlight.picked].map(([id, amount]) => ({ id, amount }));
+      return `${shareValue(sheet, shares, cardId).text}. ${shareHint(sheet, shares, cardId)}`;
     }
     case "trigger": {
       const abilities = sheet.options.filter((item) => item.cardId === cardId);
       const timings = [...new Set(abilities.map((item) => item.timing))];
-      return picked ? "Picked to use, activate to unpick" : `Can use its ${timings.length > 0 ? timings.join(" or ") : "ability"}`;
+      return picked ? "Double tap to unpick" : `Can use its ${timings.length > 0 ? timings.join(" or ") : "ability"}`;
     }
     default:
       return null;
@@ -239,13 +236,15 @@ function hintOf(game: ScenarioState, cardId: string, deps: CardSpeechDeps): stri
 /**
  * What a screen reader hears of one card: `label` is its whole state (name and type, controller, exhausted or committed, damage against hit
  * points, resources, progress against quest points, the engine's numbers, what is attached, "Not applied", and every sentence a special card
- * says), `hint` is what a tap does in the open moment ("Can be played, costs 2 Spirit", "Can commit, 3 willpower", "Pick to defend, takes 3
- * damage, destroyed"), or null when it does nothing. While the table peeks at the other seat a tap only previews, so there is no hint.
+ * says), `hint` is what a tap does in the open moment ("Can be played", "Can commit", "Pick to defend, takes 3 damage, destroyed", "Double tap
+ * to show the card"), or null when it does nothing. The numbers a hint would repeat (the cost, the willpower) are in the label. While the
+ * table peeks at the other seat a tap only previews the card.
  */
 export function cardSpeech(game: ScenarioState, seat: number, cardId: string, deps: CardSpeechDeps): CardWords {
   const card = game.cards[cardId];
   if (!card) return { label: cardId, hint: null };
-  return { label: labelOf(game, seat, card, deps), hint: deps.peeking ? null : hintOf(game, cardId, deps) };
+  // While the table peeks at the other seat a tap only opens the card large.
+  return { label: labelOf(game, seat, card, deps), hint: deps.peeking ? previewHint(game, cardId) : hintOf(game, cardId, deps) };
 }
 
 /** The shown seat's staging threat, the number a staging heading says. */
@@ -271,6 +270,8 @@ const ZONE_TITLE: Record<ZoneId, (game: ScenarioState, seat: number) => string> 
  * (stagingThreatOf); the other zones ignore it.
  */
 export function zoneSpeech(zone: ZoneId, count: number, seat: number, game: ScenarioState, threat?: number | null): string {
+  // The quest stage is one card: its heading is its name, with no count.
+  if (zone === "questStage") return ZONE_TITLE[zone](game, seat);
   const noun = zone === "engaged" ? (["enemy", "enemies"] as const) : (["card", "cards"] as const);
   const size = count === 0 ? `no ${noun[1]}` : plural(count, noun[0], noun[1]);
   const total = zone === "staging" && threat != null ? `, threat ${threat}` : "";
