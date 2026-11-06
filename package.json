@@ -86,7 +86,8 @@
     "move": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/tools/move.ts",
     "test:scenario": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/tools/test-scenario.ts",
     "scenario:new": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/tools/scenario-new.ts",
-    "commit:check": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/git/commit-message.ts"
+    "commit:check": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/git/commit-message.ts",
+    "prepare": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/git/commit-message.ts --install --quiet"
   },
   "private": true,
   "packageManager": "pnpm@10.34.1"

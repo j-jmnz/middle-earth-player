@@ -11,7 +11,7 @@ Read whole.
 - `CLAUDE.md` — Claude Code (~2.1K tok)
 - `.claude/rules/authority.md` — Authority (~450 tok)
 - `.claude/rules/code-standards.md` — Code standards (~1.9K tok)
-- `.claude/rules/commit-standards.md` — Commit standards (~560 tok)
+- `.claude/rules/commit-standards.md` — Commit standards (~600 tok)
 - `.claude/rules/docs-standards.md` — Docs standards (~1.1K tok)
 
 ## Agents
@@ -38,7 +38,7 @@ Read the sections your task touches.
     - 64–73 In a browser (~140)
     - 74–95 On a phone (~360)
     - 96–99 Maestro (~150)
-  - 100–126 Commands (~700)
+  - 100–126 Commands (~720)
   - 127–130 Contributing (~70)
   - 131–138 Documentation (~130)
   - 139–156 Attribution (~480)

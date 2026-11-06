@@ -1,6 +1,6 @@
 # Commit standards
 
-Every session, agent and contributor that commits follows these (user instruction, 2026-11-06). A reviewer reports a breach as a finding. `pnpm commit:check` (`scripts/git/commit-message.ts`) checks the subject line; CI runs it on every pull request's commits and its title.
+Every session, agent and contributor that commits follows these (user instruction, 2026-11-06). A reviewer reports a breach as a finding. `pnpm commit:check` (`scripts/git/commit-message.ts`) checks the subject line. The `commit-msg` hook in `.githooks/` runs it on every commit (`pnpm install` sets `core.hooksPath`), and CI runs it on every pull request's commits and its title. Do not skip the hook with `--no-verify`; reword the message.
 
 ## Subject line
 

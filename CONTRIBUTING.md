@@ -13,7 +13,7 @@ Thanks for helping. This is a fan-made project: by contributing you agree that y
 
 1. Fork the repo and branch from `main`.
 2. Before you push, run `pnpm data:check`, `pnpm lint`, `pnpm typecheck` and `pnpm test`. CI (`.github/workflows/test.yml`) runs the same checks on every push and pull request. While you work, `pnpm test:changed` or `pnpm test:scenario <id>` give quicker feedback.
-3. Write each commit message as [.claude/rules/commit-standards.md](./.claude/rules/commit-standards.md) says: `<type>: <summary>`, with type `fix`, `feat`, `refactor`, `style` or `repo`. `pnpm commit:check "<subject>"` checks a subject.
+3. Write each commit message as [.claude/rules/commit-standards.md](./.claude/rules/commit-standards.md) says: `<type>: <summary>`, with type `fix`, `feat`, `refactor`, `style` or `repo`. `pnpm install` sets up a `commit-msg` hook (`.githooks/`) that refuses a subject in any other form; `pnpm commit:check "<subject>"` checks one by hand.
 4. Open a pull request whose title follows the same format, and say what changed and why. Pull requests are squash-merged, so the title becomes the commit on `main`. CI checks the title and every commit subject; the pull request template lists the other checks.
 
 ## Conventions
