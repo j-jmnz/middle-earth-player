@@ -65,7 +65,7 @@ Exit: the plan's checks (Verification). Adding a fixture name is one registry li
 - Maestro: one win subflow and one loss subflow under `.maestro/`, run with `runFlow` and `env` (the fixture, the scenario id, an optional choice id). Each scenario's flows call them and keep their own extra assertions.
 - `pnpm scenario:new <scenario-id>` (with `--dry-run`) writes the skeletons and the registry entries: the scene with its codes read from `data/scenarios/<id>.json`, the game, the golden test, the campaign test, the seed finder, both Maestro flows, `src/effects/authored/<id>.ts`, and the line in the fixture registry. It refuses an id that is not in `data/scenarios`.
 - Move every existing scenario onto the kit, one campaign at a time, with the goldens byte-identical after each step.
-- `docs/handover/agent-brief.md`, `docs/phases/phase-12-knife-in-the-dark.md` (Scenario procedure), the phase files 46 to 48 and `.claude/agents/effect-author.md` name the scaffold and the kit. The family list in the effect-author file points to `src/catalog/families/index.ts` instead of copying it.
+- `docs/handover/agent-brief.md` (Approach, Scenario procedure) and `.claude/agents/effect-author.md` name the scaffold and the kit. The family list in the effect-author file points to `src/catalog/families/index.ts` instead of copying it.
 
 Exit: the plan's checks (Verification), and `pnpm scenario:new the-drowned-ruins --dry-run` lists the files and the entries it would write.
 

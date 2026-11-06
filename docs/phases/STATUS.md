@@ -7,10 +7,10 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - If nothing is active, the only legal start is the lowest-numbered phase whose dependencies are completed. Dependencies live in the phase file, not in this table.
 - When you start a phase, set it to `active` with a one-line note. Do not mark the next phase active. More than one phase may be active only when their files say they can run beside each other.
 - A phase is `completed` when its exit is green and `/reviewer` reports no blocks. A phase that changes `src/screens` or `src/play` also needs `/ux` to report no blocks. Write the date.
-- Phases 12 to 16 each have an engine half and a phone half (phase 12 describes them). When the engine half's exit is green and reviewed, write `engine done` in the note and leave the phase `active` or `not started`. The phase is completed when both halves are.
-- Phases 27 to 33 and 37 to 60 (plans `docs/plans/done/mirkwood-paths.md`, `docs/plans/done/dream-chaser.md`, `docs/plans/done/ered-mithrin.md`) have one review round per phase, as `.cursor/agents/orchestrator.md` "One review round" says, in place of "`/reviewer` reports no blocks" (user instructions, 2026-10-27, 2026-10-30, 2026-11-05). A block the fix pass leaves open goes in the phase's note. Phases 29 to 33, 40 to 48 and 52 to 60 have an engine half and a phone half, as phase 12 describes.
+- A scenario phase has an engine half and a screen half (`docs/handover/agent-brief.md`, Scenario procedure). When the engine half's exit is green and reviewed, write `engine done` in the note and leave the phase `active`. The phase is completed when both halves are.
+- Phases 27 to 33 and 37 to 60 (plans `docs/plans/done/mirkwood-paths.md`, `docs/plans/done/dream-chaser.md`, `docs/plans/done/ered-mithrin.md`) have one review round per phase, as `.cursor/agents/orchestrator.md` "One review round" says, in place of "`/reviewer` reports no blocks" (user instructions, 2026-10-27, 2026-10-30, 2026-11-05). A block the fix pass leaves open goes in the phase's note.
 - Maestro flows are written in the phase that names them. `maestro test` runs after the last phase; it does not gate an earlier phase.
-- A cloud session has no phone, simulator or Maestro. Phone checks stay open and are listed here, not marked done.
+- Phone and tablet checks are not tracked: no phase waits on one, and none is listed here (user instruction, 2026-11-06).
 - Current counts live in code: the engine version in `src/rules/engine/version.ts`, the playable scenarios in `src/campaign/playable.ts`, the printed lines no record owns in `src/effects/open-lines.ts` (`pnpm effects:open`).
 
 ## Phases
@@ -22,68 +22,68 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 2 | Catalog build | completed | 2026-10-23. |
 | 3 | Phone databases | completed | 2026-10-23. The open-card Maestro flow runs with the suite. |
 | 4 | Scenario 1 fixture | completed | 2026-10-23. |
-| 5 | Image cache | completed | 2026-10-23. Airplane-mode resume not run on a phone. |
-| 6 | Deck builder | completed | Redesigned 2026-10-25. Phone check open: fling the full pool and type in the filter; the redesigned deck screens; `.maestro/features/deck.yaml` not run. |
+| 5 | Image cache | completed | 2026-10-23. |
+| 6 | Deck builder | completed | Redesigned 2026-10-25. |
 | 7 | Round engine | completed | Review fixes not re-reviewed. |
 | 8 | Scenario 1 effects | completed | 2026-10-24. |
 | 8b | Data store | completed | 2026-10-24. |
 | 8c | Printed text and rule spans | completed | 2026-10-24. Scoring wording differs between the Rules Reference and the Learn to Play; the brief follows the Learn to Play. |
 | 8d | Campaign from cards | completed | 2026-10-24. Deferred: the no-replacement case of the fellowship-of-heroes rule. |
 | 9 | Starter effects | completed | 2026-10-24. Marked completed by the user without a second review; review fixes not re-reviewed. |
-| 10 | Campaign shell | active | 2026-10-24. Review fixes not re-reviewed. Phone checks, its Maestro flows and the native compile of `modules/booklet-pdf` (Swift, Kotlin) are open. |
-| 11 | Scenario 1 table | active | 2026-10-24. Review fixes not re-reviewed. Phone checks and every Maestro run open; `.maestro/scenarios/a-shadow-of-the-past/scenario-1.yaml` needs the scenario 1 won fixture. |
-| 12 | A Knife in the Dark | active | 2026-10-24. Engine done. Review fixes not re-reviewed. Phone checks and both Maestro runs open; the won flow has no fixture (user-accepted). |
-| 13 | Flight to the Ford | active | 2026-10-26. Engine done. `/ux` not run. Phone checks; three Maestro flows written, not run; fixtures `ford-*` not committed. |
-| 14 | The Ring Goes South | active | 2026-10-26. Engine done. `/reviewer` and `/ux` not run. Phone checks; four Maestro flows written, not run; fixtures `south-*` not committed. |
-| 15 | Journey in the Dark | active | 2026-10-30. Engine done; review round done. Phone checks open; three Maestro flows written, not run; fixtures `moria-*` not committed. Not on Nightmare. |
-| 16 | Breaking of the Fellowship | active | 2026-10-30. Engine done; review round done. Phone checks open (true solo and two-handed through 2B); four Maestro flows written, not run; fixtures `breaking-*` not committed. Not on Nightmare. |
+| 10 | Campaign shell | completed | 2026-11-06. Review fixes not re-reviewed. |
+| 11 | Scenario 1 table | completed | 2026-11-06. Review fixes not re-reviewed. |
+| 12 | A Knife in the Dark | completed | 2026-11-06. Review fixes not re-reviewed. |
+| 13 | Flight to the Ford | active | 2026-10-26. Engine done. `/ux` not run. |
+| 14 | The Ring Goes South | active | 2026-10-26. Engine done. `/reviewer` and `/ux` not run. |
+| 15 | Journey in the Dark | completed | 2026-11-06. Review round done. Not on Nightmare. |
+| 16 | Breaking of the Fellowship | completed | 2026-11-06. Review round done. Not on Nightmare. |
 | 17 | Design system | completed | 2026-10-23. |
-| 18 | Card frames follow the card | completed | 2026-10-26. ux fix not re-reviewed. Phone check open. |
-| 19 | Top bar and table menu | completed | 2026-10-26. Phone checks open; `.maestro/features/table-menu.yaml` not run. |
-| 20 | Phase carousel | completed | 2026-10-26. Phone checks open. |
-| 21 | Choice tray | completed | 2026-10-26. Phone checks open. |
-| 22 | Declutter the board | completed | 2026-10-26. Phone checks open. |
-| 23 | Motion pass | completed | 2026-10-26. Phone checks open. |
-| 24 | Combat spotlight | completed | 2026-10-27. Phone checks open (Open items, Combat spotlight). |
-| 25 | Hold and slide through the hand | completed | 2026-10-27. Phone checks open. |
-| 26 | Peek at the other seat | completed | 2026-10-27. Phone checks open; `.maestro/features/seat-peek.yaml` not run. |
+| 18 | Card frames follow the card | completed | 2026-10-26. ux fix not re-reviewed. |
+| 19 | Top bar and table menu | completed | 2026-10-26. |
+| 20 | Phase carousel | completed | 2026-10-26. |
+| 21 | Choice tray | completed | 2026-10-26. |
+| 22 | Declutter the board | completed | 2026-10-26. |
+| 23 | Motion pass | completed | 2026-10-26. |
+| 24 | Combat spotlight | completed | 2026-10-27. |
+| 25 | Hold and slide through the hand | completed | 2026-10-27. |
+| 26 | Peek at the other seat | completed | 2026-10-27. |
 | 27 | Multi-campaign data | completed | 2026-10-27. |
-| 28 | Campaign registry, saga gating, log, booklets | completed | 2026-10-27. Phone checks open; `mirkwood-start`, `scenarios-boxes`, `booklet-dark-of-mirkwood` flows not run. |
-| 28b | Collapsible sections and run history | completed | 2026-10-28. Phone checks open; `history`, `sections-fold` flows not run. Open review notes below. |
-| 29 | Passage Through Mirkwood | active | 2026-10-28. Engine done. Phone checks open; both Maestro flows not run. |
-| 30 | Journey Along the Anduin | active | 2026-10-28. Engine done. Phone checks open; `anduin-won` fixture missing, so the win flow cannot run. |
-| 31 | Escape from Dol Guldur | active | 2026-10-28. Engine done. Phone checks open; both fixtures wait on `anduin-won`, so neither flow can run. |
-| 32 | The Oath | active | 2026-10-28. Engine done. Phone checks open; both flows not run; no Mirkwood Paths part 4 fixture. |
-| 33 | The Caves of Nibin-Dûm | active | 2026-10-28. Engine done. Phone checks open; `nibin-dum-won` missing; no Mirkwood Paths part 5 fixture. |
-| 34 | Nightmare data and pictures | active | 2026-10-30. Open: `pnpm scans:pack` on the build machine; pictures on a phone. |
-| 35 | Nightmare difficulty | active | 2026-10-30. Review rounds done. Open: the briefing switch, list line and top bar's Eye on a phone and a tablet. |
-| 36 | Nightmare effects | active | 2026-10-30. Engine done: all seven playable scenarios on `NIGHTMARE_PLAYABLE`; review round done (known limits in the phase file). Open: one Nightmare game per scenario on a phone. |
+| 28 | Campaign registry, saga gating, log, booklets | completed | 2026-10-27. |
+| 28b | Collapsible sections and run history | completed | 2026-10-28. Open review notes below. |
+| 29 | Passage Through Mirkwood | completed | 2026-11-06. Review round done. |
+| 30 | Journey Along the Anduin | completed | 2026-11-06. Review round done. |
+| 31 | Escape from Dol Guldur | completed | 2026-11-06. Review round done. |
+| 32 | The Oath | completed | 2026-11-06. Review round done. |
+| 33 | The Caves of Nibin-Dûm | completed | 2026-11-06. Review round done. |
+| 34 | Nightmare data and pictures | completed | 2026-11-06. |
+| 35 | Nightmare difficulty | completed | 2026-11-06. Review rounds done. |
+| 36 | Nightmare effects | completed | 2026-11-06. Review round done; known limits under Open items. |
 | 37 | Dream-chaser data | completed | 2026-10-30. Review round done. Open: A Storm on Cobas Haven Easy counts follow Hall of Beorn, not a printed mark. |
-| 38 | Dream-chaser campaign shell and XP | completed | 2026-10-31. Review round done. Phone checks open: Spend XP, Hard/Expert pickers, path and log XP rows, MEC111 reader; flows `dream-chaser-start`, `booklet-dream-chaser` not run. |
+| 38 | Dream-chaser campaign shell and XP | completed | 2026-10-31. Review round done. |
 | 39 | Sea mechanics family | completed | 2026-10-31. Engine only; review round done. Open: Upgraded-side ship stats; face-aware records; Sailing events. |
-| 39b | Ships on the table | completed | 2026-10-31. Review round done. Phone checks open: compact Heading dial and its scroll at 667 × 375, Sailing strip and Done, Boarding into a full row, fold stack and list, Corsair piles at Large, reader buttons. |
-| 40 | Voyage Across Belegaer | completed | 2026-10-31. Engine done, review round done. Phone checks and every Maestro run open (`voyage-across-belegaer*.yaml`, `sea-table.yaml`, `sea-duo.yaml`, extended `dream-chaser-start.yaml` with unrun ids); `voyage-won` missing, so the win flow cannot run. |
-| 41 | The Fate of Númenor | completed | 2026-10-31. Engine done, review round done. Phone checks open: Lost Island hiding (badges, tiles, Details, log, shuffle), Uncharted pile and crowded-table geometry, look sheets; both Maestro flows unrun; `fate-won` missing, so the win flow cannot run. |
-| 42 | Raid on the Grey Havens | completed | 2026-10-31. Engine done, review round done. Phone checks open: Burn "2/5" pill and Aflame pills at 667 × 375 and the three scales, burn-pick row marks, Burn reader button, briefing Counsel offer; both Maestro flows unrun; `raid-won` missing, so the win flow cannot run. |
-| 43 | Flight of the Stormcaller | completed | 2026-10-31. Engine done, review round done. Phone checks open: the Stormcaller's area (stage pill, Apart plate, veil, fold), the banner and stage 4 advance view, Hidden Cove caution, both themes; both Maestro flows unrun; `stormcaller-won` missing, so the win flow cannot run. |
-| 44 | The Thing in the Depths | completed | 2026-10-31. Engine done, review round done. Phone checks open: grappled stacks and the ×N pill, the Ship "n/9" pill, the lowered engagement row at Large, travel cautions, the stage 2 banner, the Trait list scrolling; both Maestro flows unrun; `depths-won` missing, so the win flow cannot run. |
-| 45 | Temple of the Deceived | completed | 2026-11-01. Engine done, review round done. Phone checks open: Island Map chip and panel at three scales, travel direction rows and glyph, the coming-soon path after the win; both Maestro flows unrun; `temple-won` missing, so the win flow cannot run. |
-| 46 | The Drowned Ruins | completed | 2026-11-04. Engine done, review round done. Phone checks open: the Grotto pile (top-card preview and speech, the glide back to it), Command's armed Done and up-to notes, the flip naming its side, Into the Abyss counts; both Maestro flows unrun; `ruins-won` missing, so the win flow cannot run. |
-| 47 | A Storm on Cobas Haven | completed | 2026-11-04. Engine done, review round done. Phone checks open: a controlled tower in staging (fold rank, reader label, its Action from either seat), guarded and re-guarded towers, the Islet's "1 held" pill and where the held enemy returns, the Skirmisher as a ship, Taking on Water's three exhaust picks and host caution, the added-phase rail and carousel, the Tactics hero list, Gandalf's entry, Gavin's Planning Action; both Maestro flows unrun; `haven-won` missing, so the win flow cannot run. |
-| 48 | The City of Corsairs | completed | 2026-11-05. Engine done, review round done. Phone checks open: the Streets of Umbar tax caution on the travel sheet and "Do not travel", the Umbar Harbor and Southern Belfalas questions, The Black Sword's Refresh Action, the second encounter deck after stage 2B, "Campaign complete" with no Spend XP; both Maestro flows unrun; `corsairs-won` missing, so the win flow cannot run. |
+| 39b | Ships on the table | completed | 2026-10-31. Review round done. |
+| 40 | Voyage Across Belegaer | completed | 2026-10-31. Review round done. |
+| 41 | The Fate of Númenor | completed | 2026-10-31. Review round done. |
+| 42 | Raid on the Grey Havens | completed | 2026-10-31. Review round done. |
+| 43 | Flight of the Stormcaller | completed | 2026-10-31. Review round done. |
+| 44 | The Thing in the Depths | completed | 2026-10-31. Review round done. |
+| 45 | Temple of the Deceived | completed | 2026-11-01. Review round done. |
+| 46 | The Drowned Ruins | completed | 2026-11-04. Review round done. |
+| 47 | A Storm on Cobas Haven | completed | 2026-11-04. Review round done. |
+| 48 | The City of Corsairs | completed | 2026-11-05. Review round done. |
 | 49 | Ered Mithrin data | completed | 2026-11-05. Review round done. Open: Crypt Stalker Easy count unconfirmed. |
-| 50 | Ered Mithrin campaign shell, treasures and the pool | completed | 2026-11-05. Review round done. Open: a discovered treasure cannot be put in a deck from the app; phone checks; `ered-mithrin-start`, `booklet-ered-mithrin` flows not run. |
+| 50 | Ered Mithrin campaign shell, treasures and the pool | completed | 2026-11-05. Review round done. Open: a discovered treasure cannot be put in a deck from the app. |
 | 51 | Wilderland mechanics family | completed | 2026-11-05. Engine only; review round done. Not built: Caves-deck bottom and arrange (18055, 18079), Crypt Key's Discover modifiers, a look window for Discover. |
-| 51b | Wilderland on the table | completed | 2026-11-05. Review round done. Phone checks open (below). |
-| 52 | Journey Up the Anduin | active | 2026-11-05. Engine done; review round done. Phone half open: phone checks, both Maestro flows not run; `upanduin-won` missing, so the win flow cannot run. |
-| 53 | Lost in Mirkwood | active | 2026-11-05. Engine done; review round done. Phone half open: phone checks, both Maestro flows not run; `lostmirk-won` missing, so the win flow cannot run. |
-| 54 | The King's Quest | active | 2026-11-05. Engine done; review round done. Phone half open: phone checks, both Maestro flows not run; `kingsquest-won` missing, so the win flow cannot run. |
-| 55 | The Withered Heath | active | 2026-11-05. Engine done; review round done. Phone half open: phone checks, both Maestro flows not run; `heath-won` missing, so the win flow cannot run. |
-| 56 | Roam Across Rhovanion | active | 2026-11-06. Engine done; review round done. Phone half open: phone checks, both Maestro flows not run; `rhovanion-won` missing, so the win flow cannot run. |
-| 57 | Fire in the Night | active | 2026-11-06. Engine done; review round done. Phone half open: the table's side-quest area and current-quest mark, phone checks, both Maestro flows not run; `night-won` missing, so the win flow cannot run. |
-| 58 | The Ghost of Framsburg | active | 2026-11-06. Engine done; review round done. Phone half open: phone checks, both Maestro flows not run; `framsburg-won` missing, so the win flow cannot run. |
-| 59 | Mount Gundabad | active | 2026-11-06. Engine done; review round done. Phone half open: phone checks, both Maestro flows not run; `gundabad-won` missing, so the win flow cannot run. |
-| 60 | The Fate of Wilderland | active | 2026-11-06. Engine done; review round done. Phone half open: phone checks, both Maestro flows not run (and the edited Corsairs and Caves end flows); `wilderland-won` missing, so the win flow cannot run. |
+| 51b | Wilderland on the table | completed | 2026-11-05. Review round done. |
+| 52 | Journey Up the Anduin | completed | 2026-11-06. Review round done. |
+| 53 | Lost in Mirkwood | completed | 2026-11-06. Review round done. |
+| 54 | The King's Quest | completed | 2026-11-06. Review round done. |
+| 55 | The Withered Heath | completed | 2026-11-06. Review round done. |
+| 56 | Roam Across Rhovanion | completed | 2026-11-06. Review round done. |
+| 57 | Fire in the Night | active | 2026-11-06. Engine done; review round done. Screen half open: the table's side-quest area and current-quest mark. |
+| 58 | The Ghost of Framsburg | completed | 2026-11-06. Review round done. |
+| 59 | Mount Gundabad | completed | 2026-11-06. Review round done. |
+| 60 | The Fate of Wilderland | completed | 2026-11-06. Review round done. |
 
 ## Open items
 
@@ -148,6 +148,10 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - One active location per separate stage (phase 16) is read from `rr.active-location` and `mec109.multiple-staging-areas`, not stated by a card. Not user-confirmed.
 - Separate stages: `viewOf` builds a new state per call, so state-keyed memos miss inside a view (speed only). The normalizer's `searched` rule marks every staged location of a quest with an each-player-adds-location clause.
 - Journey in the Dark and Breaking of the Fellowship Nightmare decks (9065xx, 9066xx) have no records.
+- Nightmare, A Knife in the Dark: an exhaust of The One Ring paid as a cost (`exhaustCode`, other Frodo versions) is not announced, so Menacing Wraith (906202:A:2) does not hear it.
+- Nightmare, Passage Through Mirkwood: Ungoliant's Spawn discards a character at 0 Willpower when its effect resolves, not again later in the phase.
+- Nightmare, Journey Along the Anduin: A Flooded Ford's "gains doomed X" raises threat on reveal but is not announced as the doomed keyword; Troll Attack's shadow (900208:A:2) deals the Troll's Attack as damage to a hero of each other player without making an attack, and reads the Attack after its `endOfAttack` modifiers have expired.
+- Nightmare, Escape from Dol Guldur: Torture Master captures the hero the attack was made against, not each of several defenders; with 3 or 4 players the logged prisoner swap (01131:A:3) may leave one player with two prisoners.
 - Ered Mithrin data: Crypt Stalker (19099) Easy count is 1 (Hall of Beorn) against E08.7's 2; no printed source settles it.
 - Ered Mithrin data: the EMCE box prints collector numbers one below Hall of Beorn and RingsDB; codes and `printings[].number` follow the sources' number.
 
@@ -156,64 +160,17 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - Ered Mithrin: `AddEncounterToPool` with `inPlay` counts in-play copies the pool did not deal in, an upper bound, since copies have no identity.
 - Run history (28b): `recordUnclosedRun` has no test; a win left unconfirmed until an engine or data update drops it cannot be recorded; `run-writers.ts` imports `ScenarioState` through `play/store`.
 - A player side quest in the play row is drawn in a portrait rect, so its sideways scan is cropped; two seats with the same side quest show two plates of one name.
-- Rounded chrome (`docs/plans/done/rounded-chrome.md`), phone checks open: both themes on a phone; the capsule controls' pressed darken (`filter: brightness`); the command column's radial fade and the start block's soft scene; the dock with choice rows open on a short phone; the carousel's seven rows at 667 × 375; `.maestro/features/table-menu.yaml`.
-- Hub layout (`docs/plans/done/hub-layout.md`), phone checks open: both hubs, the campaign setup (carry-over rows) and History (cards, Manage, the Archive toast's Undo, Delete in place) on a phone and an iPad in both orientations, both themes; `start=1` from a finished path; flows `briefing`, `booklet`, `mirkwood-start`, `the-caves-of-nibin-dum`, `history` not run.
 - `items-baseline` collapsed on Android in the path; it is still in `card-pool.tsx` and `log/[saveId].tsx`.
 - Why the path screen was laid out taller than the window on Android is not known. The action bar's overrun measure stays for screens that keep a bar.
 - Web only: opening Cards, Import or a deck first can raise "error during concurrent rendering" (expo-sqlite "Sync operation timeout"; React recovers). Rows ending in a stepper warn "nested button".
 - The combat spotlight's sprite is worked out twice per slot in an active frame.
 - Not built from the Carved Stone handoff: the card screen's "Add to a deck"; the table's encounter row and right-hand piles; the handoff's defend tray.
 - Tablet follow-ups: an Android `appCategory` or large-screen plugin if the table lock must hold on Android 16; pushed routes under the tabs; a Packs list-detail; a Deck import section in `docs/design-system.md`; a "Tap anywhere to close" hint on the preview.
-- Performance pass (`docs/plans/done/performance-pass.md`): its out-of-scope items (the per-card glow, an ArcRing of Views, particle buffer reuse, a UI-thread lift) wait for on-device profiling.
-- Table performance settings (`docs/plans/done/table-performance-settings.md`), phone checks open: Card pictures Low on a full table on a 2x and a 3x phone (a little softer; the long press and the Card screen sharp), a High, Low, High switch mid-game, Moving fog off holding the fog still, pickup and game-step frame timing with the memoized `TablePiece` against the commit before it, the table panel's fold at Medium and Large; `.maestro/features/table-menu.yaml` not run.
-- Settings page and table panel (user request, 2026-11-01), phone checks open: the selected `Segmented` thumb staying a capsule after a pick in phone portrait on Android (its radius is now in the style), the new Performance group, the longer details and Ringwraith / Rivendell / System on one line at Large on a 320 pt phone, the two-column tablet split (Display and Performance, then Motion and feel, At the table and About).
-- Playtime, card search, command head and deck/briefing requests (user request, 2026-11-03), phone checks open: the play clock across background, foreground and a table hidden by Activity; the quest meter's tween and reduced-motion snap, its gradients on native, full/compact/hidden heads on real phones' insets; the victory rows' 44 pt targets and the Victory display reading; the threat and Heading change badges inside the bar's foot; deck drag (long press with the FlashList scroll, the lifted cell over its neighbours, auto-scroll, haptics, Move up/down with VoiceOver and TalkBack); HeroTrio at 30 × 42 in Light; the briefing seat fold with a screen reader; `.maestro/features/deck.yaml` not run.
 - Run `pnpm scans:pack` on the build machine before a release, so side B pictures and the `.scene` files are bundled.
 - Scenario pipeline (`docs/plans/scenario-pipeline.md`): section E (ledger seed, pile overrides, XP rows in data) is not built, nor are its Next steps; the core's remaining direct family calls (travel, pick, condition, amount, `syncThreatSaves`, `playSweep`, `heldByLapsedStage`) move behind the hooks when their family is next changed.
 - Choice words: the entries marked Open in the allowlist of `src/play/words/scenario-words.test.ts` are bare prompts still to be named.
 - The Maestro subflows in `.maestro/subflows/` and the eight Dream-chaser flows that call them are checked statically only, not run.
 - Effect templates: an unlabelled conditional constant ("If you are on-course, ~ gets +2 …") is read as triggered by `unreadBefore`; `SPLIT_LINES` in `scripts/data/effects/generate.ts` names one card's line.
-
-### Phone and tablet checks
-
-None ran. Each needs a device.
-
-- Journey Up the Anduin: the treasure draw rows (picture from a code, long press) and character rows two-handed; The Old Ford's refusal and travel caution at 667 × 375; Ruined Supplies' rows; Weighed Down's discard rows; the Resolution's oath-line row beside two Turayn tiles; A Growing Threat's banner line; the Creatures piles and Haldan's flip on the table.
-- Wilderland table: the Creatures pair and Caves deck at 667 × 375 two-seat at Small/Medium/Large; the Discover strip over the engagement band, the veil with Loot and Hazard ringed above it, the hold on the last beat and glide to discard, staging taps after the banner; reduced motion; a Deep Cave arriving off the Caves deck; the reshuffle glide; a guarded treasure with a screen reader; both themes.
-- The Fate of Wilderland: The Goblins' Assault and The Heroes' Defense counts, the last-stage Tap again cautions on the progress rows and the Watchtower's row and Pass, the attack-on-Urdug note before and after he attacks, Urdug's Command defense note, the Setup boon or treasure search two-handed, and the campaign-won Resolution screen and path foot (also The City of Corsairs').
-- Mount Gundabad: the bypass choice and note, Throat of the Mountain's and the look's stage rows, the Tap again cautions on stage damage, AssignDamage and Eyes in the Dark, The First Forge's and the Great Worm's Pass cautions, Dagnir's Hoard search two-handed, the one-card-per-phase refusal, the Resolution's Dragon-sickness and A Growing Threat sentences.
-- The Ghost of Framsburg: Discover's Loot and Hazard choice, Crypt Key's Discover rows, Fram's Shade's treasure Response, the reshuffle Action's Tap again caution, Gundabad Stalker's engagement note, Moonlit Passage's per-seat cap, the Resolution's Hunter-or-Stalker and Hazard choices two-handed.
-- Fire in the Night: the current-quest question and the commit sheet's title, the side-quest reveal line, the Hill attack's defender rows with their overflow and caution, the side-quest Responses, Beldis's boxes, the Resolution's treasure, removal and Beldis sentences two-handed.
-- Roam Across Rhovanion: the Trust in Urdug question at Setup and after a claim, the Wilderland Bear and Deep Ravine sheets two-handed, Harsh Weather's rows, Durin's Key's attach, the random stage-2 banner, Urdug's and Tiny's previews on either side, the Resolution's location choice with its seat labels.
-- The Withered Heath: Deadly Cold's named rows and Tap again caution, the Accolade offer and decline rows two-handed, Master of the Hunt and The Canny Huntsman top/bottom steps at 667 × 375, the Dragon Sign count and stage 3/4 details, the Resolution's Song and treasure questions with their seat labels, the Campaign Setup boon-ally search.
-- The King's Quest: the Stone-troll discard count, Dagnir's Spawn's branch, the Eyes in the Dark hero caution (Tap again), the Resolution's burden choice with its seat label, the Dragon Scales shield badge, the long notes at 667 × 375.
-- Lost in Mirkwood: the Twilight Hall offer and the Claim step; the Player N lead on Carried Away and Truly Lost at 667 × 375; the held-hero, hand-under and nemesis preview lines; objective-locations' quest points and travel.
-- Ered Mithrin shell: the log's long row labels at 360/375 pt and Large scale; the resolution grid with the log-line row (solo and two-handed); the settled sentence height above Confirm; the treasure tray at 667 × 375; the path's Ered Mithrin groups; the booklet tile and Coming later tiles; long press on briefing choices.
-- The app after the file restructure (`src/ui`, the feature folders of `src/play` and `src/screens`): the Android and iOS bundles build (`expo export`); a dev build on a phone opening every tab, a table and a booklet has not run.
-- Booklets: import, open, last page after a kill, Back; first open from the APK and from an iOS Debug and Release build (the module linked through its podspec); Android pinch, double tap, pan and the sharper redraw.
-- Data: airplane-mode play after a kill with images cached; `user.db` keeps the deck and log after a catalog version bump; a changed engine version drops the open scenario.
-- Campaign screens: the card names in the log's rows and the path's pool open the card's preview on a tap (and as links with VoiceOver and TalkBack); the path (stops resume or begin, Campaign log, the foot clear of three-button and gesture navigation), the briefing, the log rows (Prisoner, carry-over, Used this campaign), the Books grid (four covers a row on a tablet; every cover over its scene, the Rules Reference over Journey Along the Anduin), the Resolution and outcome reports.
-- Table chrome: the top bar at 667x375 with two seats; the rail and its three lines on the screen's middle; the dial and its pop under the top edge; the banner centered and its swipe; the menu, carousel, tray and dock at 667x375 and 844x390; the opening quest screen (Begin, Continue, Progress).
-- Table canvas: a crowded table at Small, Medium and Large on a phone and a tablet; stacked play rows (the back row's tokens inside its band); the attack and defense pills in the enemy attacks step beside the effect pills; the 48 pt phase title centered on the screen; a hand of 13 or more cards (half-card overlap) and its scrub at one card size; the table menu's six rows fit under the top bar at 667x375, and Setup card opens the campaign card's Setup side; the briefing's Campaign card and Quest cards rows (both sides of each stage, the spoiler warning) on a phone and a tablet; History's hero tiles under each run and game (scroll cost of a long list); picture sharpness and decode memory on a low-end Android; quest scale only in the Quest phase; side B pictures upright; each card shows its own picture after an earlier build.
-- Victory pile and card lists (user request, 2026-11-03): the fanned victory pile and its gold coin at staging's right end in Dark and Light on a phone and a tablet (the fan clear of the encounter discard, the coin clear of the top bar), the play mark on a discard pile (Elven-light), the night card lists' pictures and scrolling, and the choice's 51 × 71 rows at 667x375 and 844x390.
-- Staging threat list (user request, 2026-11-04): a tap on the quest meter (full and compact) opens the list, its pressed dim, the list's rows and the "Other effects" line in Dark and Light, VoiceOver and TalkBack on the meter's button.
-- Phase titles and spotlight (user request, 2026-11-04): the COMBAT sweep as Combat opens with enemies engaged (over the shadow deal) and the RESOURCE sweep over the draw and the resource pops, neither under a spotlight; an immediate attack outside the Combat phase (Crushing Arm after travel) plays its spotlight, then the table passes on.
-- Two-handed handoff: a Pass that turns the table to the other seat cuts to it at rest, with no flash of either seat's heroes or play area (`kindMoves`); a window the table passes is not drawn (`followAnswers`); pictures of a seat turned back to draw at once (`PARKED`).
-- Gestures and motion: drag smoothness; the 150 ms scrub hold, the lifted card's grow and the cancel line; the scrub's forward push into the drag (13 pt, from any part of the card) and the shake and reject haptic of a card that cannot be played; the reject haptic and dock line on a play the heroes cannot pay for; peek and back; card motion at Normal and Quick; reduced motion snaps; haptics on iOS and Android.
-- Combat spotlight: look at Normal and Quick in Dark and Light; cost on a low-end Android; the burn shader on each GPU; additive Atlas blending; the black fog (user request, 2026-11-04) reads as fog at the edges and the cards' feet in both themes, and its cost (nine fog draws over the screen); skip on canvas, bar and dock.
-- Performance: frame timing of card pickup, the hand scrub, the spotlight and opening the table (Profiler, Perf Monitor), and the loading frame on a cache miss; screens hidden by React Activity re-shown with their state (tabs, stacked screens, the table's pictures, a tab under a sheet's scrim, iOS swipe-back); the Sent and landing ticks' feel.
-- Separate stages (Breaking of the Fellowship): the staging owner tag, per-dial ticks, the peek banner's room, the per-seat quest advance screens and `table-area` with VoiceOver and TalkBack; fallen-hero art.
-- Choice words named by the scenario pipeline: how The Seat of Amon Hen's player pick, the Reattach and attach-host prompts, Taking on Water's Ship objective, Lashing Tentacles' pick and Command's move read in the dock's folded line at 667x375 and 844x390, and with VoiceOver and TalkBack.
-- Scenario sheets: Caught in a Web, Wolf Rider's second attack, The Oath's end-of-round Response and Tokens dial, the Pillar on the attack sheet; a person winning and losing each playable scenario with the log matching.
-- Look and theme: Skia fog and its drift (smooth, cheap, still under reduced motion), grit, `filter` effects, Barlow and Marcellus SC weights, Light's multiply and Dark's screen art blends with no hard edge, Small and Large scales, both themes, keep-awake, `userInterfaceStyle: automatic` after a prebuild.
-- Resign, briefing previews and Campaigns folds: Resign in the table menu (the confirm, then the lost outcome and the run in History); a tap on a briefing hero tile and a long press on a Ring-bearer candidate open the card; the candidate's square painting in both themes; Other journeys and New playthrough fold like Coming later (the stored fold, the count when folded, VoiceOver).
-- Table and deck fixes (`docs/plans/done/table-and-deck-fixes.md`), swipe feel: the stage preview's sideways swipe on a phone, and that an upright move still closes nothing.
-- Table and deck fixes, column touch pass-through: a tap on the command column's empty top and on the empty canvas under it reaching the canvas (folding the tray), the dock and the meter keeping theirs, the tray's outside fold under a covered row.
-- Table and deck fixes, frame timing: crowded rows under the column, the dock crossing a row's foot, the dock growing over a still-extended row while the tray opens, and the table's first layout waiting for the column and the dock to be measured.
-- Table and deck fixes, both themes: the extended rows, the gradient under the canvas and the deck covers and lists without dots.
-- Table and deck fixes, VoiceOver: whether it can reach the adjustable preview card inside the scrim Pressable (the rows and the strip stay the path).
-- Screen reader parity (`docs/plans/done/screen-reader.md`), phone checks open: a full A Shadow of the Past game with VoiceOver and with TalkBack without looking (reader table, focus and announcement order, combat lines, Android Back after an attack); building a deck; a booklet page (Kotlin and Swift not compiled); `.maestro/features/screen-reader.yaml` (tag `reader`, dev build with `EXPO_PUBLIC_FORCE_READER=1`) not run; Skia canvases hidden from the reader; web screenshots before and after.
-- Tablets: iPad rotation on the tabs, deck editor and briefing; the rail; the portrait guard on the table (Split View, Stage Manager, Android 16); foldables; Campaigns art edge on an iPad in landscape; the briefing scene's Skia fade (`SceneCanvas`) on an iPad in landscape in Dark and Light: no line under the picture, no band at the pane's right edge, the dim matching the browser's.
 
 ## Standing decisions
 - Sources are online; no physical card or box check (user, 2026-10-24). The nine MEC109 cards rest on the older printing's scans.

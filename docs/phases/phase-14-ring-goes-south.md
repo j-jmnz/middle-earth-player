@@ -1,12 +1,12 @@
 # Phase 14 — The Ring Goes South
 
 Engine half depends on: phase 13's engine half
-Phone half depends on: phase 13
+Screen half depends on: phase 13
 Blocks: phase 15
 
 ## Goal
 
-`the-ring-goes-south` is playable, including the campaign boons, stage 1B's four face-up cards, stage 4's second active location, and the facedown Ring-bearer. Follow the scenario procedure in phase 12.
+`the-ring-goes-south` is playable, including the campaign boons, stage 1B's four face-up cards, stage 4's second active location, and the facedown Ring-bearer. Follow the Scenario procedure (`docs/handover/agent-brief.md`).
 
 ## Cards
 
@@ -31,6 +31,4 @@ The second active-location slot is shared scenario state from phase 7. This is t
 
 ## Exit
 
-The procedure's two halves. A person can reach stage 4 on the phone, see two active locations, and see the Ring-bearer leave control without leaving play. A win records Lust for the Ring only when it is attached.
-
-Written, 2026-10-26 (cloud session, none has run): `.maestro/scenarios/the-ring-goes-south/the-ring-goes-south.yaml` (stage 4: the active locations and the held Ring-bearer, then kill and relaunch), `-briefing.yaml` (the waiver line, the four boons, no penalty to accept), `-win.yaml` (the Resolution asks nothing and unlocks `journey-in-the-dark`) and `-loss.yaml` (Defeat writes nothing). **Open:** their fixtures `south-start`, `south-stage-4`, `south-won` and `south-lost` are not committed, for the reason phase 13 gives for the Ford fixtures. The decisions of the engine half are in `docs/brief.md` (The Ring Goes South, stage 4 and the damage on locations).
+The procedure's two halves. The table reaches stage 4 with two active locations, and the Ring-bearer can leave control without leaving play. A win records Lust for the Ring only when it is attached.

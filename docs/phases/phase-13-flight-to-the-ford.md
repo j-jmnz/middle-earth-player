@@ -1,12 +1,12 @@
 # Phase 13 — Flight to the Ford
 
 Engine half depends on: phase 12's engine half
-Phone half depends on: phase 12
+Screen half depends on: phase 12
 Blocks: phase 14
 
 ## Goal
 
-`flight-to-the-ford` is playable, including the burden deck and the Ring-bearer's life. Follow the scenario procedure in phase 12.
+`flight-to-the-ford` is playable, including the burden deck and the Ring-bearer's life. Follow the Scenario procedure (`docs/handover/agent-brief.md`).
 
 ## Cards
 
@@ -28,10 +28,8 @@ Created by the Setup line at 15. Its own number. The refresh step does not chang
 
 ## E2E
 
-`.maestro/scenarios/flight-to-the-ford/flight-to-the-ford.yaml` opens a seeded save at the start of this scenario and asserts the life readout is 15 and the burden deck count is 5. The same ids are absent on a scenario 1 save. A resolution flow unlocks `the-ring-goes-south` on a win and writes nothing on a loss.
-
-Written, 2026-10-26 (cloud session, none has run): `.maestro/scenarios/flight-to-the-ford/flight-to-the-ford.yaml` (the start: life 15, burden deck 5, kill and relaunch), `.maestro/scenarios/flight-to-the-ford/flight-to-the-ford-win.yaml` (the Resolution asks nothing and unlocks `the-ring-goes-south`) and `.maestro/scenarios/flight-to-the-ford/flight-to-the-ford-loss.yaml` (Defeat at life 0 writes nothing); `scenario-1.yaml` asserts `life` and `burden-deck` are absent. The ids are `life` and `burden-deck` (the value is `<id>-value`). **Open:** their fixtures `ford-start`, `ford-won` and `ford-lost` are not committed. A fixture is a real save, and these start from the log that scenarios 1 and 2 write when won; no win of either has been found with the starter decks (phases 11 and 12), so the chain cannot be built honestly. Add the three names to `src/campaign/fixtures.ts` when `scripts/e2e/fixtures.ts --won` finds the chain.
+`.maestro/scenarios/flight-to-the-ford/flight-to-the-ford.yaml` opens a seeded save at the start of this scenario and asserts the life readout is 15 and the burden deck count is 5. The same ids are absent on a scenario 1 save. A resolution flow unlocks `the-ring-goes-south` on a win and writes nothing on a loss. A fixture is a real save: `ford-start`, `ford-won` and `ford-lost` start from the log scenarios 1 and 2 write when won, and are added to `src/campaign/fixtures.ts` when `scripts/e2e/fixtures.ts --won` finds that chain.
 
 ## Exit
 
-The procedure's two halves. A win adds exactly the burdens the campaign card names. Life 0 loses. Healing does not raise life. On the phone, the tracker and the burden deck show for this scenario and are hidden for scenario 1.
+The procedure's two halves. A win adds exactly the burdens the campaign card names. Life 0 loses. Healing does not raise life. The tracker and the burden deck show for this scenario and are hidden for scenario 1.

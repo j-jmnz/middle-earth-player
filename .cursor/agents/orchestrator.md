@@ -53,7 +53,7 @@ If a task cannot be done without changing a behaviour the plan keeps, stop and a
 ## Closing
 
 - Update `docs/phases/STATUS.md` as `.cursor/rules/docs-standards.mdc` says: the phase row's note, one line per item still open under Open items, and Standing decisions for a user decision that constrains later work. Do not add a dated section: what was built, the commands, test counts and measured numbers go in the commit messages and your final report.
-- In a cloud session there is no phone, simulator or Maestro. On-device checks are never marked done: list them under Open items.
+- Phone and tablet checks are not tracked (user instruction, 2026-11-06): do not write phone-check notes in `docs/phases/STATUS.md`, a phase file, a plan, a handover or a report, and do not keep a phase open for one.
 - The plan is done: move it to `docs/plans/done/` and update the paths that cite it. Delete any prompt or handover file the work consumed.
 - Before the last commit, check that `pnpm test`, `pnpm lint`, `pnpm typecheck` and `pnpm data:check` are green on the final tree. A full run already green on that tree (the fix task's, or yours after the last task) counts; do not repeat it. Then commit and push.
 - Do not open a pull request unless the user asks.

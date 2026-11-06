@@ -9,7 +9,7 @@ import { runScript, type Log } from "../log.ts";
 import { authoredFile, campaignTestFile, camel, gameFile, goldenTestFile, lossFlowFile, sceneFile, seedFinderFile, winFlowFile, type Facts, type PreviousPart } from "./scenario-new-files.ts";
 
 // Writes the skeleton of a scenario that data/scenarios already has, and the lines that register it, so the work left is the scenario's own
-// (docs/phases/phase-12-knife-in-the-dark.md, Scenario procedure):
+// (docs/handover/agent-brief.md, Scenario procedure):
 //
 //   pnpm scenario:new <scenario-id> [--short <name>] [--dry-run]
 //

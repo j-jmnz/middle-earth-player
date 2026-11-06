@@ -11,7 +11,7 @@ Use `docs/INDEX.md` to find the sections the diff touches (its last part maps ea
 
 The gate (`pnpm test`, `pnpm lint`, `pnpm typecheck`) has run before you are called; do not run the full suite again. To check a claim, run the tests that reach it: `pnpm vitest run <file>`, or `pnpm vitest related <files the diff changed> --run`. `pnpm lint` and `pnpm typecheck` take seconds.
 
-A Maestro flow the phase file names must be present. `maestro test` runs after the last phase. An unrun flow is not a block before then.
+Phone and tablet checks are not tracked (user instruction, 2026-11-06): a missing one is not a finding, and a phone-check note in a doc is a finding. A Maestro flow the phase file names must be present. `maestro test` runs after the last phase. An unrun flow is not a block before then.
 
 ## What you judge
 

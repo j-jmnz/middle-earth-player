@@ -20,7 +20,7 @@ Each agent reads its own file.
 - `.cursor/agents/implementer.md` — Implements one phase from docs/phases (~1.3K tok)
 - `.cursor/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~1.7K tok)
 - `.cursor/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~2.3K tok)
-- `.cursor/agents/ux.md` — Reviews the current screens for phone UX and visual design, and changes the design system when asked (~1.2K tok)
+- `.cursor/agents/ux.md` — Reviews the current screens for phone UX and visual design, and changes the design system when asked (~1.3K tok)
 - `.claude/agents/effect-author.md` — Writes effect records for card lines no template reads (~1.1K tok)
 - `.claude/agents/implementer.md` — Implements one phase from docs/phases (~110 tok)
 - `.claude/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~200 tok)
@@ -31,8 +31,8 @@ Each agent reads its own file.
 
 Read the sections your task touches.
 
-- `README.md` — Middle Earth LCG (~4.1K tok)
-  - 7–15 Where it stands (~270)
+- `README.md` — Middle Earth LCG (~4.0K tok)
+  - 7–15 Where it stands (~260)
   - 16–21 Rules come from the printed sources (~160)
   - 22–53 Commands (~1.4K)
   - 54–63 Documents (~260)
@@ -81,7 +81,7 @@ Read the sections your task touches.
     - 409–422 A Knife in the Dark (~1.6K) ← 1
     - 423–426 Hide tests (~130)
     - 427–450 Flight to the Ford burden deck and life (~1.6K) ← 1
-    - 451–465 The Ring Goes South, stage 4 and the damage on locations (~1.3K) ← 1
+    - 451–465 The Ring Goes South, stage 4 and the damage on locations (~1.3K)
     - 466–481 Journey in the Dark, the Doom countdown and the Balrog (~1.7K)
     - 482–505 Breaking of the Fellowship, stage 2B (~2.2K) ← 1
     - 506–527 Seeded decks (~660)
@@ -106,7 +106,7 @@ Read the sections your task touches.
   - 906–947 Screens (~4.7K) ← 1
     - 932–947 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~37.9K tok)
-  - 5–8 Overview (~150)
+  - 5–8 Overview (~130)
   - 9–23 Top bar (~2.1K) ← 4
   - 24–27 Table menu (~430) ← 2
   - 28–35 Quest scale (~580) ← 2
@@ -182,39 +182,17 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~11.1K tok)
-  - 5–15 Rules (~450)
-  - 16–87 Phases (~2.9K)
-  - 88–217 Open items (~7.2K)
+- `docs/phases/STATUS.md` — Phase status (~6.3K tok)
+  - 5–15 Rules (~430)
+  - 16–87 Phases (~1.4K)
+  - 88–174 Open items (~4.0K)
     - 90–111 Fixtures and Maestro (~1.2K)
-    - 112–153 Rules and engine (~1.9K)
-    - 154–176 Screens and code (~1.3K)
-    - 177–217 Phone and tablet checks (~2.8K)
-  - 218–234 Standing decisions (~490)
-- `docs/phases/phase-10-campaign-shell.md` — Phase 10 — Campaign shell (~1.5K tok)
-- `docs/phases/phase-11-scenario-1-table.md` — Phase 11 — Scenario 1 table (~1.4K tok)
-- `docs/phases/phase-12-knife-in-the-dark.md` — Phase 12 — A Knife in the Dark (~1.3K tok)
-- `docs/phases/phase-13-flight-to-the-ford.md` — Phase 13 — Flight to the Ford (~910 tok)
-- `docs/phases/phase-14-ring-goes-south.md` — Phase 14 — The Ring Goes South (~970 tok)
-- `docs/phases/phase-15-journey-in-the-dark.md` — Phase 15 — Journey in the Dark (~650 tok)
-- `docs/phases/phase-16-breaking-of-the-fellowship.md` — Phase 16 — Breaking of the Fellowship (~1.2K tok)
-- `docs/phases/phase-29-passage-through-mirkwood.md` — Phase 29 — Passage Through Mirkwood (~880 tok)
-- `docs/phases/phase-30-journey-along-the-anduin.md` — Phase 30 — Journey Along the Anduin (~880 tok)
-- `docs/phases/phase-31-escape-from-dol-guldur.md` — Phase 31 — Escape from Dol Guldur (~920 tok)
-- `docs/phases/phase-32-the-oath.md` — Phase 32 — The Oath (~810 tok)
-- `docs/phases/phase-33-caves-of-nibin-dum.md` — Phase 33 — The Caves of Nibin-Dûm (~840 tok)
-- `docs/phases/phase-34-nightmare-data.md` — Phase 34 — Nightmare data and pictures (~440 tok)
-- `docs/phases/phase-35-nightmare-difficulty.md` — Phase 35 — Nightmare difficulty (~410 tok)
-- `docs/phases/phase-36-nightmare-effects.md` — Phase 36 — Nightmare effects (~600 tok)
-- `docs/phases/phase-52-journey-up-the-anduin.md` — Phase 52 — Journey Up the Anduin (~1.2K tok)
-- `docs/phases/phase-53-lost-in-mirkwood.md` — Phase 53 — Lost in Mirkwood (~1.2K tok)
-- `docs/phases/phase-54-the-kings-quest.md` — Phase 54 — The King's Quest (~1.1K tok)
-- `docs/phases/phase-55-the-withered-heath.md` — Phase 55 — The Withered Heath (~1.1K tok)
-- `docs/phases/phase-56-roam-across-rhovanion.md` — Phase 56 — Roam Across Rhovanion (~1.1K tok)
+    - 112–157 Rules and engine (~2.1K)
+    - 158–174 Screens and code (~670)
+  - 175–191 Standing decisions (~490)
+- `docs/phases/phase-13-flight-to-the-ford.md` — Phase 13 — Flight to the Ford (~740 tok)
+- `docs/phases/phase-14-ring-goes-south.md` — Phase 14 — The Ring Goes South (~800 tok)
 - `docs/phases/phase-57-fire-in-the-night.md` — Phase 57 — Fire in the Night (~1.1K tok)
-- `docs/phases/phase-58-the-ghost-of-framsburg.md` — Phase 58 — The Ghost of Framsburg (~1.1K tok)
-- `docs/phases/phase-59-mount-gundabad.md` — Phase 59 — Mount Gundabad (~1.2K tok)
-- `docs/phases/phase-60-the-fate-of-wilderland.md` — Phase 60 — The Fate of Wilderland (~1.0K tok)
 
 ## Live plans
 
@@ -239,7 +217,7 @@ Read when a task names the plan.
   - 15–24 What does not move (~190)
   - 25–48 A. Effects: draft better, template the repeats, copy identical lines (~970)
   - 49–57 B. One registry for scenarios, fixtures and goldens (~280)
-  - 58–71 C. A shared scenario kit and `pnpm scenario:new` (~630)
+  - 58–71 C. A shared scenario kit and `pnpm scenario:new` (~610)
   - 72–83 D. One manifest per family (~460)
   - 84–92 E. Data: seed what can be seeded (~300)
   - 93–105 F. Faster feedback while authoring (~540)
@@ -253,16 +231,17 @@ Read when a task names the plan.
 
 Open work; read when a task names it.
 
-- `docs/handover/agent-brief.md` — Brief for a mechanic-family or scenario agent (~3.2K tok)
+- `docs/handover/agent-brief.md` — Brief for a mechanic-family or scenario agent (~3.7K tok)
   - 19–37 Setup (~440)
   - 38–56 Files you own (edit freely) (~490)
   - 57–70 Shared files (~300)
-  - 71–85 Approach (~700) ← 1
-  - 86–95 Checkpoints (API usage limits can stop you mid-task) (~200)
-  - 96–110 Checks before committing (~330)
-  - 111–117 Merge (~120)
-  - 118–124 Commit (~110)
-  - 125–132 Report (your final message) (~90)
+  - 71–85 Approach (~680) ← 1
+  - 86–100 Scenario procedure (~620) ← 5
+  - 101–110 Checkpoints (API usage limits can stop you mid-task) (~200)
+  - 111–125 Checks before committing (~320)
+  - 126–132 Merge (~120)
+  - 133–139 Commit (~110)
+  - 140–147 Report (your final message) (~90)
 
 ## Done plans
 
@@ -295,7 +274,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/checks`: design-system.md, Screen reader (2); architecture.md, Modules (1); architecture.md, Repository map (1)
 - `scripts/data`: design-system.md, Icons (3); brief.md, Card images (1); plans/done/dream-chaser.md, Facts found during exploration (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
-- `scripts/tools`: phases/phase-12-knife-in-the-dark.md, Scenario procedure (2); architecture.md, Modules (1)
+- `scripts/tools`: handover/agent-brief.md, Scenario procedure (2); architecture.md, Modules (1)
 - `src/campaign`: architecture.md, Tests (2); brief.md, Ered Mithrin (2)
 - `src/catalog`: architecture.md, Mechanic families (2); brief.md, A Knife in the Dark (1); brief.md, Flight to the Ford burden deck and life (1)
 - `src/effects`: brief.md, Breaking of the Fellowship, stage 2B (1)

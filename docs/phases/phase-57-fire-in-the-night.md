@@ -1,10 +1,10 @@
 # Phase 57 — Fire in the Night
 
 Engine half depends on: phase 56's engine half
-Phone half depends on: phase 56
+Screen half depends on: phase 56
 Blocks: phase 58
 
-Plan: [docs/plans/done/ered-mithrin.md](../plans/done/ered-mithrin.md), "Phases 52-60: one scenario each" and "Notes for the orchestrator". Procedure: [phase 12](phase-12-knife-in-the-dark.md), "Scenario procedure".
+Plan: [docs/plans/done/ered-mithrin.md](../plans/done/ered-mithrin.md), "Phases 52-60: one scenario each" and "Notes for the orchestrator". Procedure: [agent brief](../handover/agent-brief.md), "Scenario procedure".
 
 ## Goal
 
@@ -12,7 +12,7 @@ Plan: [docs/plans/done/ered-mithrin.md](../plans/done/ered-mithrin.md), "Phases 
 
 ## Procedure
 
-The phase 12 "Scenario procedure", steps 1 to 6, for `fire-in-the-night`, and the plan's list for phases 52 to 60:
+The "Scenario procedure" (`docs/handover/agent-brief.md`), steps 1 to 6, for `fire-in-the-night`, and the plan's list for phases 52 to 60:
 
 - `pnpm data:build -- --verbose` shows no failed cross-check for it; every dealt card has a ledger entry (phase 49).
 - `pnpm scenario:new fire-in-the-night` (`--dry-run` first) writes the skeletons and the registry lines. `pnpm effects:draft fire-in-the-night`, then the `effect-author` agent, until coverage is green for every line of every dealt card, including the campaign card's Setup and Resolution and the boons, burdens and treasures it names, on both sides where a card has two.
@@ -21,7 +21,7 @@ The phase 12 "Scenario procedure", steps 1 to 6, for `fire-in-the-night`, and th
 - Golden: `src/campaign/scenarios/fire-in-the-night/golden.json` with its golden test, scene and game scripts: true solo and two-handed, a win and a loss, with the Resolution's pool, log-line and treasure effects. Random treasure picks are a seeded draw.
 - A campaign test chains the previous part's real Resolution and checks that its pool, treasures and log lines reach this part.
 - Add `fire-in-the-night` to `src/campaign/playable.ts`, then `pnpm effects:open` and `node --experimental-strip-types scripts/card-smoke/run.ts <new codes>`, including the EMCE cards this scenario deals.
-- Phone half: words and widgets only where a line creates them (cite the line in `docs/brief.md`), Maestro win and loss flows, fixtures.
+- Screen half: words and widgets only where a line creates them (cite the line in `docs/brief.md`), Maestro win and loss flows, fixtures.
 - Rule wording comes from the pinned MEC115 PDF (`pnpm data:query`), never from memory. A scan the agent cannot read is a question for the user. If a golden of an existing campaign would move, stop and report why.
 
 ## Cards
@@ -42,6 +42,6 @@ The phase 12 "Scenario procedure", steps 1 to 6, for `fire-in-the-night`, and th
 
 **Engine half:** coverage and the goldens green in Node. A win runs the Resolution, writes the pool, treasures and log lines it names, and unlocks the next part in Ered Mithrin; a loss writes nothing. The plan's Verification list is green (`data:build`, `data:check`, `--verbose`, `typecheck`, `lint`, `test`, `effects:open` with no line for this scenario, `card-smoke/run.ts` on the new codes, `catalog:build`, `booklets:pack`, the golden). Every other campaign's golden and test passes without edits to its expectations.
 
-**Phone half:** as in phase 12: a person can win and lose the scenario on the phone, the log matches the engine, and no control types damage, resources, threat, progress or life. In a cloud session the phone checks and Maestro runs stay open in `STATUS.md`.
+**Screen half:** as the Scenario procedure says: the words and widgets written and tested, the Maestro flows written, and no control types damage, resources, threat, progress or life.
 
 One review round (`.cursor/agents/orchestrator.md`, "One review round"; `ux` too if `src/screens` or `src/play` changed).

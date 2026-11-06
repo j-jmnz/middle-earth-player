@@ -9,7 +9,7 @@ import { duration, runScript, type Log } from "../log.ts";
 import { smokeCodes } from "../card-smoke/world.ts";
 import { WORDS_SCENARIOS } from "../../test/harness/words-scenarios.ts";
 
-// The tests to run while a scenario is being authored, a fraction of the full suite (README.md, Commands; docs/phases/phase-12-knife-in-the-dark.md, Scenario procedure):
+// The tests to run while a scenario is being authored, a fraction of the full suite (README.md, Commands; docs/handover/agent-brief.md, Scenario procedure):
 //
 //   pnpm test:scenario <scenario-id> [--list]
 //   pnpm test:scenario <scenario-id> --words      only src/play/words/scenario-words.test.ts for the scenario, with WORDS_DUMP=<id>: it prints every sentence
