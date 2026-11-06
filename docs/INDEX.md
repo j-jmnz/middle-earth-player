@@ -9,39 +9,37 @@ Read a section, not a file: `pnpm docs:section <file> "<heading>"` prints one se
 Read whole.
 
 - `CLAUDE.md` — Claude Code (~2.1K tok)
-- `.cursor/rules/authority.mdc` — Authority (~450 tok)
-- `.cursor/rules/code-standards.mdc` — Code standards (~1.9K tok)
-- `.cursor/rules/docs-standards.mdc` — Docs standards (~1.1K tok)
+- `.claude/rules/authority.md` — Authority (~430 tok)
+- `.claude/rules/code-standards.md` — Code standards (~1.9K tok)
+- `.claude/rules/docs-standards.md` — Docs standards (~1.1K tok)
 
 ## Agents
 
 Each agent reads its own file.
 
-- `.cursor/agents/implementer.md` — Implements one phase from docs/phases (~1.3K tok)
-- `.cursor/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~1.8K tok)
-- `.cursor/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~2.3K tok)
-- `.cursor/agents/ux.md` — Reviews the current screens for phone UX and visual design, and changes the design system when asked (~1.3K tok)
 - `.claude/agents/effect-author.md` — Writes effect records for card lines no template reads (~1.1K tok)
-- `.claude/agents/implementer.md` — Implements one phase from docs/phases (~110 tok)
-- `.claude/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~200 tok)
-- `.claude/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~140 tok)
-- `.claude/agents/ux.md` — Reviews the current screens for phone UX and visual design, and changes the design system when asked (~100 tok)
+- `.claude/agents/implementer.md` — Implements one phase from docs/phases (~1.4K tok)
+- `.claude/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~1.8K tok)
+- `.claude/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~2.4K tok)
+- `.claude/agents/ux.md` — Reviews the current screens for phone UX and visual design, and changes the design system when asked (~1.3K tok)
 
 ## Product, code and design
 
 Read the sections your task touches.
 
-- `README.md` — Middle Earth LCG (~4.0K tok)
-  - 7–15 Where it stands (~260)
-  - 16–21 Rules come from the printed sources (~160)
-  - 22–53 Commands (~1.4K)
-  - 54–63 Documents (~250)
-  - 64–67 Agents (~170)
-  - 68–162 Run it locally (~1.6K)
-    - 72–77 Mac browser (~120)
-    - 78–83 Codespaces (~110)
-    - 84–158 Phone builds from scratch (Mac) (~1.1K)
-    - 159–162 Maestro (~320)
+- `README.md` — Middle Earth LCG (~3.3K tok)
+  - 8–16 Features (~210)
+  - 17–26 Architecture (~310)
+  - 27–79 Local setup (~780)
+    - 29–43 Requirements (~130)
+    - 44–53 In a browser (~140)
+    - 54–75 On a phone (~360)
+    - 76–79 Maestro (~150)
+  - 80–105 Commands (~660)
+  - 106–123 Contributing (~480)
+  - 124–131 Documentation (~130)
+  - 132–149 Attribution (~480)
+  - 150–153 License (~80)
 - `docs/architecture.md` — Architecture (~19.8K tok)
   - 7–41 Stack (~980)
   - 42–77 Processes (~660)

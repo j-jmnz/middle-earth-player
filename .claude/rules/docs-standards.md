@@ -1,8 +1,3 @@
----
-description: How to keep the docs agents read short, current and free of history
-alwaysApply: true
----
-
 # Docs standards
 
 Agents read `CLAUDE.md`, the rules, the agent files, `docs/phases/STATUS.md`, the active phase file and the sections of `docs/brief.md`, `docs/architecture.md`, `docs/design-system.md` and `docs/design-system-table.md` their task touches before they work. They find those sections through `docs/INDEX.md` and read one with `pnpm docs:section <file> "<heading>"`. Every line there costs context on every run. These docs say what is true now. History is in git: a commit message says what changed and why, and `git log -- <file>` finds it. A reviewer reports a breach as a finding.
@@ -12,7 +7,7 @@ Agents read `CLAUDE.md`, the rules, the agent files, `docs/phases/STATUS.md`, th
 - When a change supersedes a rule, a design or a plan step, rewrite the passage so it states the new rule. Do not append "was / now", "replaces phase N", "previously", or a dated note under the old text.
 - No dated "built" tags on headings ("— built (2026-10-27)"). A thing that is not built says "Not built." in one line.
 - Keep an authority stamp on a rule the user set, short: "(user instruction, 2026-10-27)". It cites who decided, not how it was reached.
-- Say each rule once, in the doc that owns it (`.cursor/rules/authority.mdc` gives the owners), and point to it from elsewhere. Do not copy a rule into an agent file, a phase file or a plan.
+- Say each rule once, in the doc that owns it (`.claude/rules/authority.md` gives the owners), and point to it from elsewhere. Do not copy a rule into an agent file, a phase file or a plan.
 
 ## Facts the code owns
 

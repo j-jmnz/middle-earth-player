@@ -1,6 +1,6 @@
 # Claude Code
 
-The rules for every session are in `.cursor/rules/authority.mdc`. Read it. Any session or agent that changes code also reads `.cursor/rules/code-standards.mdc` and follows it; one that changes a doc, `docs/phases/STATUS.md` or an agent file follows `.cursor/rules/docs-standards.mdc` (current state only, no history logs). The README, `docs/brief.md`, and `docs/architecture.md` win over anything here.
+The rules for every session are in `.claude/rules/authority.md`. Read it. Any session or agent that changes code also reads `.claude/rules/code-standards.md` and follows it; one that changes a doc, `docs/phases/STATUS.md` or an agent file follows `.claude/rules/docs-standards.md` (current state only, no history logs). The README, `docs/brief.md`, and `docs/architecture.md` win over anything here.
 
 Find docs through `docs/INDEX.md`: every file an agent reads, its size, the heading tree of the long ones with line ranges, and the sections each code area cites. Read a section, not a whole file: `pnpm docs:section <file> "<heading>"` (for example `pnpm docs:section brief "Core round"`). After changing a doc's headings or a doc citation in code, run `pnpm docs:index`; a test fails while the index is stale or a citation names no heading.
 
@@ -25,7 +25,7 @@ Find docs through `docs/INDEX.md`: every file an agent reads, its size, the head
 ## Commands
 
 - `pnpm test` runs Vitest. `pnpm vitest run <file>` runs one file. No network and no prebuilt database are needed.
-- `pnpm test:changed` runs the tests that import a file changed since the last commit; `pnpm test:fast` runs everything but the slow files (`slowFiles` in `vitest.config.mts`). When to run which is `.cursor/rules/code-standards.mdc`, Checking a change.
+- `pnpm test:changed` runs the tests that import a file changed since the last commit; `pnpm test:fast` runs everything but the slow files (`slowFiles` in `vitest.config.mts`). `.claude/rules/code-standards.md` (Checking a change) says when to run which.
 - `pnpm lint` runs Oxlint (`.oxlintrc.json`): the import boundaries and the React and Expo rules.
 - `pnpm typecheck` type-checks with tsrs (the Rust port of TypeScript 7). The `typescript` package stays for the editor and the tests that parse source.
 - `pnpm test:scenario <scenario-id>` (`--list` first) runs the tests that belong to one scenario, its goldens, the coverage checks, the file-size, rule-id and words checks (`--words` runs only the words test) and the card smoke on its player cards, plus the family and manifest tests when pool, family or manifest files changed since the merge base with origin/main (README.md, Commands). Use it while authoring.
@@ -37,7 +37,7 @@ Find docs through `docs/INDEX.md`: every file an agent reads, its size, the head
 
 ## Agents
 
-`implementer`, `reviewer`, `ux` and `orchestrator` in `.claude/agents` wrap the files in `.cursor/agents`. Edit the Cursor file to change an agent's behavior. `docs/handover/agent-brief.md` is the brief for an agent that owns one mechanic family (`docs/plans/effect-authoring.md`). After `implementer` reports a green exit, run `reviewer` on the diff, and `ux` as well when `src/screens` or `src/play` changed. `effect-author` is a Claude agent only. A plan with several sections is run by `orchestrator` (`.cursor/agents/orchestrator.md` sets the models and the one review round).
+`implementer`, `reviewer`, `ux`, `orchestrator` and `effect-author` are in `.claude/agents`. `docs/handover/agent-brief.md` is the brief for an agent that owns one mechanic family (`docs/plans/effect-authoring.md`). After `implementer` reports a green exit, run `reviewer` on the diff, and `ux` as well when `src/screens` or `src/play` changed. A plan with several sections is run by `orchestrator` (`.claude/agents/orchestrator.md` sets the models and the one review round).
 
 ## Cloud sessions
 

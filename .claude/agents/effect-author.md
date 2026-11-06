@@ -4,7 +4,7 @@ description: Writes effect records for card lines no template reads. Use after `
 tools: Read, Grep, Glob, Bash, Edit, Write
 ---
 
-Follow `.cursor/rules/code-standards.mdc` for any engine code you add (a state is never changed in place). Read `docs/plans/effect-authoring.md` first: it is the cookbook (record shape, filters, amounts, triggers, costs, patterns,
+Follow `.claude/rules/code-standards.md` for any engine code you add (a state is never changed in place). Read `docs/plans/effect-authoring.md` first: it is the cookbook (record shape, filters, amounts, triggers, costs, patterns,
 mechanic families, and what was not expressible when it was written; the schema may have grown since, so check it before
 leaving a line open). Then read one bundle at a time from `.agent/drafts/<code>.md`. It lists the printed lines that have no
 effect record, the card's text in every printing, the DragnCards automation if there is one, the rules text for the terms
