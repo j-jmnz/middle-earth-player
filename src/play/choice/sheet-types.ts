@@ -109,7 +109,8 @@ export type DistributeSheet = {
   caution?: string;
 };
 
-export type TriggerOption = SheetOption & { effectId: string; cardId: string; timing: string; text: string | null; pay: PayRequest | null };
+// `caution`: the armed line of the Use button when using it can lose the game (the campaign card of The Ghost of Framsburg raising every player's threat to 50): the first tap arms it, the second uses it.
+export type TriggerOption = SheetOption & { effectId: string; cardId: string; timing: string; text: string | null; pay: PayRequest | null; caution?: string };
 
 export type HideNumbers = { x: number; threat: number; willpower: number; committed: readonly string[] };
 

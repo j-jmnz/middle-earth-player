@@ -248,6 +248,13 @@ export function heldAmount(state: ScenarioState, id: string, stat: Modifier["sta
   return total;
 }
 
+// The smallest positive amount of a number modifier held by one card, 0 with none: a cap that several holders set does not add up, the tightest one holds.
+export function heldLeast(state: ScenarioState, id: string, stat: Modifier["stat"]): number {
+  let least = 0;
+  for (const modifier of state.modifiers) if (modifier.stat === stat && modifier.instanceId === id && modifier.amount > 0 && modifierActive(state, modifier) && (least === 0 || modifier.amount < least)) least = modifier.amount;
+  return least;
+}
+
 // Drops modifiers that end at one of these boundaries, and any that outlived their source.
 export function expireModifiers(state: ScenarioState, untils: readonly ModifierUntil[]): ScenarioState {
   const kept = state.modifiers.filter((modifier) => !untils.includes(modifier.until) && modifierActive(state, modifier));

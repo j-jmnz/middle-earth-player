@@ -402,6 +402,8 @@ export const simpleVerbs = [
     afterMulligan: z.boolean().optional(),
     // With `to: hero` at a Resolution: the hero may be any player's, not only the chooser's ("record which hero you attach it to", 11182:B:1).
     anyHero: z.boolean().optional(),
+    // With `to: pool` and `who: firstPlayer`: the first player chooses one of the named cards for the group, and the others do not join the pool ("Gundabad Hunter or Gundabad Stalker", 12189:B:5); the resolution screen says so.
+    only: z.literal(true).optional(),
     ...when,
   }),
   // Resolution: these cards are earned, with no choice. `eachPlayer`: one copy for each living player ("Each player earns 1 copy of

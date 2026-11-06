@@ -3,7 +3,8 @@ import { describe, expect, it } from "vitest";
 import type { Instruction } from "../../catalog/boundary.ts";
 import { cardMap, hero, idleScenario } from "../../rules/core/test-fixture.ts";
 import { definePrinted } from "../../rules/core/printed.ts";
-import { pushEffectFrame } from "../../rules/interpret/effect-frames.ts";
+import { pushCardEffects, pushEffectFrame } from "../../rules/interpret/effect-frames.ts";
+import { CARDS, ctxOf, deal, marker, record, table } from "../../rules/families/wilderland/fixture.ts";
 import { settle } from "../../rules/engine/machine.ts";
 import { legalIntents } from "../../rules/engine/reduce.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
@@ -45,9 +46,20 @@ describe("the treasure choice", () => {
     expect(wilderlandAsk({ verb: "Draw" }, "hall-id", words)).toBeNull();
   });
 
-  it("asks which looked-at Loot objective Discover attaches, naming the location", () => {
-    expect(wilderlandAsk({ verb: "Discover", amount: 3 }, "hall-id", words)).toEqual({ verb: "Attach", prompt: "Discover: choose 1 Loot objective to attach to Twilight Hall as a guarded objective." });
-    expect(wilderlandAsk({ verb: "Discover", amount: 3 }, null, words)?.prompt).toBe("Discover: choose 1 Loot objective to attach to the active location as a guarded objective.");
+  it("asks which looked-at Loot objective Discover attaches, naming the location, on the live window the keyword opens", () => {
+    // Plain Hill is the active location with Discover 2 and two Loot objectives on top of the encounter deck: the keyword asks which to attach.
+    const effects = [marker("loot1", { verb: "Loot" }), marker("loot2", { verb: "Loot" }), record("plain:forced:1", "plain", "forced", [{ verb: "Discover", amount: 2 }], { trigger: "becameActive", subject: "self" })];
+    const live = ctxOf(effects);
+    const hill = spawn(table(), "plain", { zone: "activeLocation" });
+    const dealt = deal({ ...hill.state, activeLocation: hill.id }, ["loot1", "loot2", "orc"], { zone: "encounterDeck" });
+    const state = settle({ ...pushCardEffects(dealt.state, "forced", hill.id, 0, false, effects, live, []), window: null, mode: "stopped" }, live, []);
+    expect(state.window).toMatchObject({ kind: "choose" });
+    const sheet = sheetFor(state, live, legalIntents(state, live), { card: (id) => CARDS.get(state.cards[id]?.code ?? id)?.name ?? id, facedown: (id) => id, line: () => null });
+    if (sheet?.kind !== "pick") throw new Error("expected a pick sheet");
+    expect(sheet.note).toContain("Discover 2 at Plain Hill. The top 2 cards of the encounter deck were looked at: 2 of them are Loot objectives. Choose 1 to attach to Plain Hill as a guarded objective");
+    expect(sheet.options.map((option) => option.label)).toEqual(["Crypt Key", "Old Lantern"]);
+    // Without the table's facts the generic words say nothing of Discover.
+    expect(wilderlandAsk({ verb: "Discover", amount: 3 }, "hall-id", words)).toBeNull();
   });
 
   it("labels each option with the treasure's title, and no other instruction's", () => {

@@ -11,7 +11,7 @@ import { BREAKING_GOLDENS, breakingCampaignStart, breakingGameWorld, breakingInt
 import { breaking, campaign } from "../../../../test/scenarios/breaking-of-the-fellowship/scene.ts";
 
 import { applyResolution } from "../../log.ts";
-import { resolutionView, settledSentence, type ResolutionView } from "../../resolution-view.ts";
+import { choiceSentence, consequenceSentence, resolutionView, settledSentence, type ResolutionView } from "../../resolution-view.ts";
 import type { World } from "../../world.ts";
 import { NO_COPY_LIMITS } from "../../wilderland.ts";
 
@@ -67,6 +67,22 @@ describe("the resolution screens of Breaking of the Fellowship", () => {
     // The log holds the boon chosen at the Setup (it joined the pool then) and the burden chosen now.
     const written = applyResolution(breakingCampaignStart(1, 1, "Normal", strong.cards).log, breaking.id, end, strong.cards, NO_COPY_LIMITS);
     expect(written.campaignPool.map((card) => card.code).sort()).toEqual(["142015", FOLLOWED_BY_NIGHT]);
+  });
+
+  it("the first player's burden choice (142060:B:2) keeps its words: no chooser line, the plain prompt, and one sentence per tile", () => {
+    for (const name of ["true solo, strong, won on The Seat of Amon Hen", "two-handed, strong, won with a hero fallen into evil"]) {
+      let burden: Extract<ResolutionView, { kind: "choosing" }> | null = null;
+      run(golden(name), strong, (view) => {
+        if (view.kind === "choosing" && view.noun === "burden") burden = view;
+      });
+      const view = burden as Extract<ResolutionView, { kind: "choosing" }> | null;
+      expect(view, name).not.toBeNull();
+      if (!view) return;
+      expect(view.seatLabel, name).toBeNull();
+      expect(view.only, name).toBeUndefined();
+      expect(consequenceSentence(view, null, false), name).toBe("Choose a burden. Your choice is written to the campaign log when you confirm.");
+      for (const tile of view.tiles) expect(choiceSentence(view, tile), name).toBe(`${tile.name} is added to the campaign pool.`);
+    }
   });
 
   it("two-handed: a captive for each seat, the first player's burden, and the fallen hero in the log", () => {

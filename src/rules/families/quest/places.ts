@@ -5,7 +5,7 @@ import type { Instruction, SimpleInstruction } from "../../../catalog/boundary.t
 
 import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
-import { placeProgress } from "../../interpret/effect-verbs.ts";
+import { placeProgress, progressPlacer } from "../../interpret/effect-verbs.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { addModifier, modifiedStat } from "../../core/keywords.ts";
@@ -60,7 +60,7 @@ export function moveProgress(
     return askNumber(state, moved, (n) => ({ ...rest, amount: n }));
   }
   steps.push({ kind: "progress", targetId: fromId, amount: -moved, cause: currentCause(steps, UNATTRIBUTED) });
-  return placeProgress(updateCard(state, fromId, { progress: from.progress - moved }), toId, moved, ctx, steps);
+  return placeProgress(updateCard(state, fromId, { progress: from.progress - moved }), toId, moved, ctx, steps, progressPlacer(state, ctx, focus.seat, focus.sourceId));
 }
 
 // The card gets -amount Threat until the phase or round ends, and the effect's X records whether that took its Threat from above

@@ -24,10 +24,10 @@ export function attachGuard(state: ScenarioState, instruction: Extract<Instructi
   return guardWith(state, guardId, objectiveId);
 }
 
-/** The encounter card `guardId` (in the staging area, or engaged and returned to it) becomes the guard of `objectiveId`: attached to it, staying in the staging area. */
-export function guardWith(state: ScenarioState, guardId: string, objectiveId: string): ScenarioState {
+/** The encounter card `guardId` (in the staging area, or engaged and returned to it) becomes the guard of `objectiveId`: attached to it, staying in the staging area. `stayEngaged`: an engaged guard keeps its engagement (nothing moves it, 12189:B:2). */
+export function guardWith(state: ScenarioState, guardId: string, objectiveId: string, stayEngaged = false): ScenarioState {
   const guard = state.cards[guardId];
   if (!guard) return state;
-  const returned = guard.zone === "engaged" ? updateCard(moveCard(state, guardId, { zone: "staging" }), guardId, { controller: null }) : state;
+  const returned = guard.zone === "engaged" && !stayEngaged ? updateCard(moveCard(state, guardId, { zone: "staging" }), guardId, { controller: null }) : state;
   return updateCard(attachTo(returned, guardId, objectiveId), guardId, { guard: true });
 }

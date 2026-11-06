@@ -328,10 +328,11 @@ export function dockFor(
       if (item) {
         const intent: PlayerIntent = { type: "Trigger", cardId: item.cardId, effectId: item.effectId };
         const action: DockAction = item.pay ? { kind: "open", sheet: paySheet(table.game, table.names, item.pay, { kind: "trigger", cardId: item.cardId, effectId: item.effectId }) } : { kind: "intent", intent };
-        primary = { label: "Use", action, arm: false, testID: "sheet-primary" };
+        // An ability that can lose the game asks twice, with the loss named (item.caution).
+        primary = item.caution ? { label: "Use", action, arm: true, armed: item.caution, testID: "sheet-primary" } : { label: "Use", action, arm: false, testID: "sheet-primary" };
         if (sheet.pass) secondary.push(PASS(sheet.pass, "sheet-pass", `Tap again: ${sheet.pass.toLowerCase()} without it`));
         // A free Response may be set to Always: the table then uses it whenever it is offered (a standing answer).
-        if (!item.pay && options.free?.has(item.effectId)) secondary.push({ label: "Always use", action: { kind: "alwaysUse", effectId: item.effectId, intent }, arm: true, armed: "Tap again: use it now and every time", testID: "sheet-always" });
+        if (!item.pay && !item.caution && options.free?.has(item.effectId)) secondary.push({ label: "Always use", action: { kind: "alwaysUse", effectId: item.effectId, intent }, arm: true, armed: "Tap again: use it now and every time", testID: "sheet-always" });
       } else if (sheet.pass) {
         // Nothing picked: the window's own Pass is the one filled button, in the same place.
         primary = PASS(sheet.pass, "sheet-pass", "Tap again: nothing is used");

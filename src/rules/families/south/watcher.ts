@@ -72,18 +72,19 @@ export function attackFromStaging(state: ScenarioState, instruction: Extract<Ins
   const id = instruction.target === "self" ? (focus.sourceId ?? "") : lastPicked(state);
   const seat = instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat;
   // "Undefended damage from this attack must be dealt to Hrogar's Hill" (19081:A:1): the main quest card takes it.
-  return attackNowFromStaging(state, id, seat, ctx, steps, { shadow: true, ...(instruction.undefendedToStage ? { toStage: true } : {}) });
+  return attackNowFromStaging(state, id, seat, ctx, steps, { shadow: true, ...(instruction.undefendedToStage ? { toStage: true } : {}), ...(instruction.orEngaged ? { engaged: true } : {}) });
 }
 
 // The enemy `id` in the staging area attacks `seat` outside the combat phase, now, and the running effect counts the attack (its frames wait for it). `shadow: false`: no shadow card is dealt. `toStage` and `excessToStage` mark the attack
-// in progress (PendingAttack): the main quest card takes the damage left undefended, and the excess past a defender.
-export function attackNowFromStaging(state: ScenarioState, id: string, seat: number, ctx: ReduceContext, steps: EngineStep[], flags: { shadow: boolean; toStage?: boolean; excessToStage?: boolean }): ScenarioState {
+// in progress (PendingAttack): the main quest card takes the damage left undefended, and the excess past a defender. `engaged`: an enemy engaged with a player attacks too, as an engaged enemy does (its shadow card stays).
+export function attackNowFromStaging(state: ScenarioState, id: string, seat: number, ctx: ReduceContext, steps: EngineStep[], flags: { shadow: boolean; toStage?: boolean; excessToStage?: boolean; engaged?: boolean }): ScenarioState {
   const enemy = id ? state.cards[id] : undefined;
-  if (!id || enemy?.zone !== "staging" || attackBarred(state, id, seat) || state.seats[seat]?.eliminated) return state;
-  const { shadow, ...marks } = flags;
+  const placed = enemy?.zone === "staging" || (flags.engaged === true && enemy?.zone === "engaged");
+  if (!id || !placed || attackBarred(state, id, seat) || state.seats[seat]?.eliminated) return state;
+  const { shadow, engaged: _engaged, ...marks } = flags;
   const data = effectData(state);
   const counted = data ? patchTop(state, { data: { ...data, returned: data.returned + 1 } }) : state;
-  const begun = beginEnemyAttack(shadow ? dealForAttack(counted, id, steps) : counted, seat, id, ctx, steps, { fromStaging: true, shadow });
+  const begun = beginEnemyAttack(shadow ? dealForAttack(counted, id, steps) : counted, seat, id, ctx, steps, { fromStaging: enemy?.zone === "staging", shadow });
   return begun.pendingAttack ? { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true, ...marks } } : begun;
 }
 

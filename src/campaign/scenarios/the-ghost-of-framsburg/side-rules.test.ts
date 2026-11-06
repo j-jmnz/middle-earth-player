@@ -3,6 +3,8 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { flagged, type ScenarioState } from "../../../rules/core/state.ts";
+import { freeOfEncounters } from "../../../rules/families/objectives/free.ts";
+import { moveCard } from "../../../rules/core/zones.ts";
 import { optionalEnemies } from "../../../rules/quest/quest.ts";
 import { enemyCard } from "../../../../test/harness/scene-kit.ts";
 import { CODES, codesIn, finish, framsburgFight, framsburgTable, idOf, legalIntents, loadFramsburgWorld, resolveRecords, send, start, withLoot, type FramsburgWorld, type PlayerIntent, type Run } from "../../../../test/scenarios/the-ghost-of-framsburg/scene.ts";
@@ -45,11 +47,26 @@ describe("12189:B:2 the treasure on Fram's Shade", () => {
       run = finish(run, t.ctx, take(options[1] ?? ""));
       const treasure = Object.values(run.state.cards).find((card) => world.cards.get(card.code)?.campaignKind === "treasure");
       expect(treasure?.code, stage).toBe(options[1]);
-      // The treasure lies in the staging area and Fram's Shade, attached to it as its guard, went back to the staging area with it (rr.guarded); the engagement check then engages it again.
+      // The treasure lies in the staging area, guarded by Fram's Shade: nothing moves the Shade, so it stays engaged with the player it engaged (12189:B:2).
       expect(treasure?.zone).toBe("staging");
       const shade = run.state.cards[idOf(run.state, CODES.framSShade)];
-      expect(shade).toMatchObject({ host: treasure?.id, guard: true });
+      expect(shade).toMatchObject({ host: treasure?.id, guard: true, zone: "engaged" });
+      expect(run.state.seats[0]?.engaged).toContain(shade?.id);
+      expect(run.state.staging).not.toContain(shade?.id);
+      expect(freeOfEncounters(run.state, treasure?.id ?? "")).toBe(false);
     }
+  });
+
+  it("12189:B:2 the treasure is free of encounters once the engaged Fram's Shade leaves play, and not while it is returned to the staging area", () => {
+    const t = table("19110");
+    const run = finish(trigger(t, engageShade(t), "12189:response:1"), t.ctx);
+    const shade = idOf(run.state, CODES.framSShade);
+    const treasure = Object.values(run.state.cards).find((card) => world.cards.get(card.code)?.campaignKind === "treasure")!;
+    const back = moveCard(run.state, shade, { zone: "staging" });
+    expect(freeOfEncounters(back, treasure.id)).toBe(false);
+    const gone = moveCard(run.state, shade, { zone: "encounterDiscard" });
+    expect(freeOfEncounters(gone, treasure.id)).toBe(true);
+    expect(gone.cards[shade]).toMatchObject({ host: null });
   });
 
   it("12189:B:2 it is a group limit once per game: after one use it is not offered again", () => {
@@ -57,8 +74,10 @@ describe("12189:B:2 the treasure on Fram's Shade", () => {
     let run = trigger(t, engageShade(t), "12189:response:1");
     run = finish(run, t.ctx);
     expect(offered(t, run, "12189:response:1")).toBe(false);
-    // A second Fram's Shade engaging (it was returned to the staging area and engages again) gets no second treasure.
-    const spent = { ...run.state, window: { kind: "optionalEngage" as const }, phase: "Encounter" as const, mode: "optionalEngage" as const };
+    // The Shade, returned to the staging area and engaging again, gets no second treasure.
+    const shade = idOf(run.state, CODES.framSShade);
+    const returned = moveCard(run.state, shade, { zone: "staging" });
+    const spent = { ...returned, window: { kind: "optionalEngage" as const }, phase: "Encounter" as const, mode: "optionalEngage" as const };
     const again = engageShade(t, { state: spent, steps: [] });
     expect(offered(t, again, "12189:response:1")).toBe(false);
   });

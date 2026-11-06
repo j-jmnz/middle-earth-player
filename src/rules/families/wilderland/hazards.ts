@@ -37,7 +37,7 @@ export function hazardOptions(state: ScenarioState, hazards: readonly string[], 
 
 /** The card chosen joins the pool: a burden as a burden (one copy however often it is earned), any other encounter card as one more copy among the pool's encounter cards (the log keeps no more than one collection holds). */
 export function applyHazard(state: ScenarioState, optionId: string, step: number): ResolutionLog {
-  const card = state.cards[optionId.slice(ENCOUNTER.length)];
+  const card = state.cards[optionId.slice((optionId.startsWith(BURDEN) ? BURDEN : ENCOUNTER).length)];
   if (!card) return state.resolutionLog;
   const log = state.resolutionLog;
   if (optionId.startsWith(BURDEN)) return log.earned.some((item) => item.code === card.code) ? log : { ...log, earned: [...log.earned, { code: card.code, to: "pool", seat: null, hero: null, step }] };

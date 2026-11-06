@@ -100,9 +100,11 @@ function resolveKeyword(state: ScenarioState, asked: Instruction, locationId: st
 /** Discover X for the location that became the active location (the source of the Forced record). A location the players traveled to has it held back to the end of the travel step (`pushDiscover`). */
 export function discover(state: ScenarioState, instruction: Verb, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const locationId = focus.sourceId;
-  if (!locationId || (state.activeLocation !== locationId && state.secondActiveLocation !== locationId) || ignoresKeyword(state, ctx, "discover")) return state;
-  if (state.discoverHeld === locationId && !instruction.afterTravel) return state;
   const { discoverHeld: _held, ...open } = state;
+  // The frame that resolves the held keyword clears the hold even when it finds nothing to resolve (the location left, or the keyword is ignored now).
+  const released = instruction.afterTravel && state.discoverHeld === locationId ? open : state;
+  if (!locationId || (state.activeLocation !== locationId && state.secondActiveLocation !== locationId) || ignoresKeyword(state, ctx, "discover")) return released;
+  if (state.discoverHeld === locationId && !instruction.afterTravel) return state;
   return resolveKeyword(state.discoverHeld === locationId ? open : state, instruction, locationId, state.firstPlayer, focus, ctx, steps);
 }
 

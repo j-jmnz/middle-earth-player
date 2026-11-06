@@ -18,7 +18,8 @@ import { beldisUsed, cappedTally } from "./wilderland.ts";
 
 // `label`: the words on the tile ("Tireless Ranger on Sam Gamgee", "Turayn for Player 1"). `wide`: a tile with no card, laid in a row of its own under the card tiles (the log line). `tag` is a muted
 // word under the name that tells a kind apart (an encounter card of the pool), `copies` the copies of such a card the pool holds.
-export type ResolutionTile = { optionId: string; code: string | null; name: string; hero: string | null; label: string; wide?: true; tag?: string; copies?: number };
+// `held`: a burden among the Hazard cards that this Resolution has already earned for the pool, so choosing it adds nothing.
+export type ResolutionTile = { optionId: string; code: string | null; name: string; hero: string | null; label: string; wide?: true; tag?: string; copies?: number; held?: true };
 
 // The decline of an optional choice: the reducer's `skip` option, with its words ("No boon").
 export type ResolutionDecline = { optionId: string; label: string };
@@ -52,6 +53,8 @@ export type ResolutionView =
       // `player`: the card is for a player, named by one of their heroes, and goes into their deck after the starting hand (11197:B:1).
       // `ally`: a boon ally for a player, or the log line instead (emce.boon-allies). `removal`: a card of the Campaign Pool a player may remove (12187:B:4). `location`: a location in the staging area a copy of which joins the pool (12184:B:4).
       to: "pool" | "hand" | "hero" | "captive" | "player" | "ally" | "removal" | "treasure" | "location" | "hazard";
+      // The first player chooses one of the cards named for the group and the others do not join the pool (12189:B:5).
+      only?: true;
       // The choice is of Song boons (The Withered Heath, 12175:B:6): each player takes one, a Song only once.
       songs?: true;
     }
@@ -189,7 +192,8 @@ export function resolutionView(state: ScenarioState, world: World, logged: reado
     if (instruction.verb === "ChooseHazardForPool") {
       const code = state.cards[intent.optionId.slice(2)]?.code ?? "";
       const name = nameOf(world, code);
-      return [{ optionId: intent.optionId, code, name, hero: null, label: name, tag: intent.optionId.startsWith("b:") ? "burden" : "encounter card" }];
+      const burden = intent.optionId.startsWith("b:");
+      return [{ optionId: intent.optionId, code, name, hero: null, label: name, tag: burden ? "burden" : "encounter card", ...(burden && state.resolutionLog.earned.some((item) => item.code === code) ? { held: true as const } : {}) }];
     }
     if (instruction.verb === "ChooseStagedLocationForPool") return [{ optionId: intent.optionId, code: intent.optionId, name: nameOf(world, intent.optionId), hero: null, label: nameOf(world, intent.optionId) }];
     if (instruction.verb === "RemoveFromPool") return [removalTile(world, intent.optionId, tally, state.seatCount > 1 && removable.filter((code) => code === removalCode(intent.optionId)).length > 1)];
@@ -203,8 +207,8 @@ export function resolutionView(state: ScenarioState, world: World, logged: reado
     return [{ optionId: intent.optionId, code, name, hero: heroName, label: heroName ? `${name} on ${heroName}` : name }];
   });
   // The King's Quest (12170:B:3) says "the first player chooses either Threat to Wilderland or Dagnir's Spawn". Fellowship's 142060:B:2 says the same of its burdens; its words stay as they were.
-  // Gundabad Hunter or Gundabad Stalker (12189:B:5): the first player chooses the one burden for the group.
-  const burdenOfTwo = instruction.verb === "ChooseCards" && instruction.who === "firstPlayer" && instruction.to === "pool" && instruction.codes.length > 1 && instruction.codes.every((code) => world.cards.get(code)?.campaignKind === "burden") && !instruction.codes.includes("12172");
+  // Gundabad Hunter or Gundabad Stalker (12189:B:5): the first player chooses the one burden for the group (the record's `only`).
+  const only = instruction.verb === "ChooseCards" && instruction.only === true;
   const kingsBurden = instruction.verb === "ChooseCards" && instruction.who === "firstPlayer" && instruction.codes.includes("12172") && state.resolutionLog.earned.some((item) => item.code === "12174");
   const eachSeat = instruction.verb === "NameCaptives" || instruction.verb === "RemoveFromPool" || instruction.verb === "ChooseStagedLocationForPool" || (instruction.verb === "ChooseCards" && instruction.who === "eachSeat");
   const first = window.seat === state.firstPlayer ? " (first player)" : "";
@@ -238,7 +242,8 @@ export function resolutionView(state: ScenarioState, world: World, logged: reado
     eyebrow,
     // A boon ally's offer is the first player's alone, and a table of several players is told whose (the first player token).
     ...(kingsBurden ? { joins: nameOf(world, "12174") } : {}),
-    seatLabel: (eachSeat || kingsBurden || instruction.verb === "BoonAllyOrLogLine" || instruction.verb === "ChooseRandomTreasure" || instruction.verb === "ChooseHazardForPool" || burdenOfTwo) && state.seatCount > 1 ? `Player ${window.seat + 1}${first} chooses` : null,
+    ...(only ? { only: true as const } : {}),
+    seatLabel: (eachSeat || kingsBurden || instruction.verb === "BoonAllyOrLogLine" || instruction.verb === "ChooseRandomTreasure" || instruction.verb === "ChooseHazardForPool" || only) && state.seatCount > 1 ? `Player ${window.seat + 1}${first} chooses` : null,
     noun,
     ...(noun === "Song boon" ? { songs: true as const } : {}),
     ally: instruction.verb === "BoonAllyOrLogLine" ? nameOf(world, instruction.ally) : null,
@@ -250,17 +255,20 @@ export function resolutionView(state: ScenarioState, world: World, logged: reado
   };
 }
 
+const orList = (items: readonly string[]): string => (items.length < 3 ? items.join(" or ") : `${items.slice(0, -1).join(", ")} or ${items.at(-1)}`);
+
 /** The sentence above Confirm: what choosing this tile writes. */
 export function choiceSentence(view: Extract<ResolutionView, { kind: "choosing" }>, tile: ResolutionTile): string {
   if (tile.optionId === SKIP) return declineSentence(view);
   switch (view.to) {
     case "pool": {
       if (view.songs) return `${tile.name} is added to the campaign pool.${view.seatCount > 1 ? " No other player can take it." : ""}`;
-      if (view.joins == null) {
-        // One burden of two (12189:B:5): the other is not added.
-        const left = view.noun === "burden" ? view.tiles.find((item) => item.optionId !== tile.optionId)?.name : undefined;
-        return left ? `${tile.name} is added to the campaign pool as a burden; ${left} is not.` : `${tile.name} is added to the campaign pool.`;
+      if (view.only) {
+        // One of the cards named (12189:B:5): the others are not added.
+        const left = view.tiles.filter((item) => item.optionId !== tile.optionId).map((item) => item.name);
+        return left.length > 0 ? `${tile.name} is added to the campaign pool as a ${view.noun}; ${andList(left)} ${left.length === 1 ? "is" : "are"} not.` : `${tile.name} is added to the campaign pool.`;
       }
+      if (view.joins == null) return `${tile.name} is added to the campaign pool.`;
       const other = view.tiles.find((item) => item.optionId !== tile.optionId)?.name;
       // Dagnir's Spawn is an encounter card of the pool (emce.campaign-pool-encounter); the other burden is not shuffled in.
       const shuffled = tile.code === "12173" ? " and is shuffled into later encounter decks" : "";
@@ -281,7 +289,8 @@ export function choiceSentence(view: Extract<ResolutionView, { kind: "choosing" 
     case "location":
       return `A copy of ${tile.name} is added to the campaign pool as an encounter card. It is written in the campaign log and added to the encounter deck of every later scenario.`;
     case "hazard":
-      return tile.tag === "burden" ? `${tile.name} is added to the campaign pool as a burden.` : `A copy of ${tile.name} is added to the campaign pool as an encounter card. It is written in the campaign log and added to the encounter deck of every later scenario.`;
+      if (tile.held) return `${tile.name} is already a burden in the campaign pool, so nothing is added.`;
+      return tile.tag === "burden" ? `${tile.name} is added to the campaign pool as a burden.` : `${tile.name} is added to the campaign pool as an encounter card. It is written in the campaign log and added to the encounter deck of every later scenario.`;
     case "treasure":
       return `${tile.name} is discovered and recorded in the campaign log. The scenario is over, so it is not attached to a character.`;
     case "removal":
@@ -308,13 +317,13 @@ export function promptSentence(view: Extract<ResolutionView, { kind: "choosing" 
   // The treasure of three random undiscovered ones (12175:B:7): the number now.
   if (view.to === "treasure") return `Choose 1 of the ${view.tiles.length} random undiscovered treasures${view.decline ? `, or tap ${view.decline.label}` : ""}. It is recorded as discovered when you confirm.`;
   // The Hazard cards the Resolution discarded (12189:B:6): the group chooses one for the pool.
-  if (view.to === "hazard") return `Choose 1 of the ${view.tiles.length} Hazard cards discarded (${view.tiles.map((tile) => tile.name).join(" or ")}); the group decides. It joins the campaign pool when you confirm, and the other is not added.`;
+  if (view.to === "hazard") return `Choose 1 of the ${view.tiles.length} Hazard cards discarded (${orList(view.tiles.map((tile) => tile.name))}); the group decides${view.seatCount > 1 ? `; Player ${view.seat + 1} confirms` : ""}. It joins the campaign pool when you confirm, and the ${view.tiles.length === 2 ? "other is" : "others are"} not added.`;
   // A copy of a location of the staging area for the pool (12184:B:4): each player in turn, a different one if able.
   if (view.to === "location") return `Choose a location in the staging area.${view.seatCount > 1 ? " Each player chooses a different location if able." : ""} A copy of it joins the campaign pool when you confirm.`;
   // Each player may remove one non-burden card from the pool (12187:B:4), the first player first; a decline keeps the pool as it is.
   if (view.to === "removal") return `Choose a non-burden card to remove from the campaign pool, or tap ${view.decline?.label ?? "Remove nothing"} to keep them all.${view.seatCount > 1 ? " Each player is asked in turn, the first player first." : ""} Your choice is written to the campaign log when you confirm.`;
   // One burden of two for the pool (12189:B:5): both are named, and the one not chosen stays out.
-  if (view.to === "pool" && view.noun === "burden" && view.joins == null && view.tiles.length > 1) return `Choose ${view.tiles.map((tile) => tile.name).join(" or ")} for the campaign pool; the other is not added. It is written to the campaign log when you confirm.`;
+  if (view.only && view.tiles.length > 1) return `Choose ${orList(view.tiles.map((tile) => tile.name))} for the campaign pool; the ${view.tiles.length === 2 ? "other is" : "others are"} not added. It is written to the campaign log when you confirm.`;
   const what =
     view.to === "hero"
       ? `a ${view.noun} and a hero`

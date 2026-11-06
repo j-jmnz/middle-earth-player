@@ -47,7 +47,7 @@ import { sailingSheet, shipRow } from "./sea-sheets.ts";
 import { asksCollection, collectionLabel, collectionOrder } from "./collection-sheets.ts";
 import { cardLabel, has, option, statOf, step } from "./sheet-parts.ts";
 import { nightActionNote, nightResponseNote } from "../words/night.ts";
-import { framsburgActionNote, framsburgEngageNote, framsburgResponseNote } from "../words/framsburg.ts";
+import { framsburgActionCaution, framsburgActionNote, framsburgEngageNote, framsburgResponseNote } from "../words/framsburg.ts";
 import { TIMING_WORDS, type SheetStat, type HideNumbers, type PickOption, type Sheet, type SheetNames, type TriggerOption, type Unavailable } from "./sheet-types.ts";
 
 function effectOf(ctx: ReduceContext, effectId: string): Effect | undefined {
@@ -66,6 +66,7 @@ export function triggerOptions(game: ScenarioState, ctx: ReduceContext, legal: r
     const effect = effectOf(ctx, intent.effectId);
     const card = game.cards[intent.cardId];
     if (!effect || !card) continue;
+    const caution = framsburgActionCaution(game, effect);
     options.push({
       id: `${intent.cardId}|${intent.effectId}`,
       label: cardLabel(game, names, intent.cardId),
@@ -75,6 +76,7 @@ export function triggerOptions(game: ScenarioState, ctx: ReduceContext, legal: r
       timing: TIMING_WORDS[effect.timing],
       text: [lineOf(effect, names), nightActionNote(game, effect), framsburgActionNote(game, ctx, effect, names, intent.cardId)].filter((part) => part != null).join(" ") || null,
       pay: game.window?.kind === "cancelOffer" ? cancelRequest(game, ctx, intent.cardId) : triggerRequest(game, ctx, intent.cardId, effect),
+      ...(caution ? { caution } : {}),
     });
   }
   return options;

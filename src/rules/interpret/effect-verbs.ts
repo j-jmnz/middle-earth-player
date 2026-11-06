@@ -19,6 +19,8 @@ import { currentCause, UNATTRIBUTED } from "../core/cause.ts";
 import { byPlayerCards, lastPicked, seatOf } from "./player-verbs.ts";
 import { topFrame } from "../windows/windows.ts";
 import { exploring } from "../families/island/map.ts";
+import { gameReadsOnTrigger } from "../core/game-reads.ts";
+import { playerSource } from "../families/quest/threat.ts";
 
 export type TargetVerb = Extract<Instruction, { verb: "ReadyHero" | "BarAttack" | "PlaceProgressOnLocation" }>;
 
@@ -104,15 +106,20 @@ export function applyTargetVerb(
   }
 }
 
-// Progress on a location in play. A location that is full is explored and leaves play.
-export function placeProgress(state: ScenarioState, id: string, amount: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+// The seat to stamp on the progress a player card's effect places: only in a game with a card that hears which player placed it (19102:A:2), so every other game's steps are unchanged.
+export function progressPlacer(state: ScenarioState, ctx: ReduceContext, seat: number, sourceId: string | null): number | undefined {
+  return playerSource(state, sourceId, ctx) && gameReadsOnTrigger(state, ctx, "progressPlaced", '"eventSeat"') ? seat : undefined;
+}
+
+// Progress on a location in play. A location that is full is explored and leaves play. `placedBy` is the player whose card effect placed it (progressPlacer).
+export function placeProgress(state: ScenarioState, id: string, amount: number, ctx: ReduceContext, steps: EngineStep[], placedBy?: number): ScenarioState {
   const location = state.cards[id];
   if (!location) return state;
   const points = questPointsOf(state, location, ctx.cards);
   // What a gate or a cap leaves out (Doors of Durin, Snowdrifts; families/south/locations.ts).
   const placed = Math.min(amount, progressRoom(state, id, ctx.cards));
   if (placed <= 0) return state;
-  steps.push({ kind: "progress", targetId: id, amount: placed, cause: currentCause(steps, UNATTRIBUTED) });
+  steps.push({ kind: "progress", targetId: id, amount: placed, cause: currentCause(steps, UNATTRIBUTED), ...(placedBy != null ? { seat: placedBy } : {}) });
   const next = notePlaced(updateCard(state, id, { progress: location.progress + placed }), id, placed);
   // Under Exploration a location with progress equal to its quest points is not explored; it remains in play (dcce.exploration).
   if (points == null || location.progress + placed < points || exploring(next)) return next;

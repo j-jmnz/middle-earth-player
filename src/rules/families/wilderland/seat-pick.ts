@@ -2,11 +2,11 @@
 import type { PickSpec } from "../../../catalog/boundary.ts";
 
 import type { ReduceContext } from "../../interpret/interpret.ts";
-import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
+import { uniqueEnemiesEngaged } from "./engage.ts";
 
 /** `engagedWithUnique` on a player pick: only a player with a unique enemy engaged with them (12191:A:1). Any other player pick keeps every seat. */
 export function seatPickMatches(state: ScenarioState, seat: number, spec: PickSpec, ctx: ReduceContext): boolean {
   if (!spec.engagedWithUnique) return true;
-  return (state.seats[seat]?.engaged ?? []).some((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").isUnique);
+  return uniqueEnemiesEngaged(state, seat, ctx.cards).length > 0;
 }

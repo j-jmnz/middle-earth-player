@@ -12,6 +12,7 @@ import { freeOfEncounters } from "../objectives/index.ts";
 import { startReveal } from "../../windows/frames.ts";
 import { settle } from "../../engine/machine.ts";
 import { codesOf, ctxOf, deal, marker, record, table } from "./fixture.ts";
+import { discover as runDiscover } from "./discover.ts";
 
 const LOOT = [marker("loot1", { verb: "Loot" }), marker("loot2", { verb: "Loot" })];
 // "Discover 3." on Plain Hill, a Forced effect of the location when it becomes the active location.
@@ -164,5 +165,22 @@ describe("Loot (emce.loot)", () => {
       expect(done.stack).toEqual([]);
       expect(codesOf(done, [...done.encounterDeck, ...done.encounterDiscard]).sort()).toEqual(["loot1", "loot2"]);
     }
+  });
+});
+
+// The verb as the frame runs it: the location is the source, the first player the seat.
+const discoverKeyword = (state: ScenarioState, instruction: Parameters<typeof runDiscover>[1], source: string, ctx: ReturnType<typeof ctxOf>): ScenarioState => runDiscover(state, instruction, { seat: state.firstPlayer, sourceId: source }, ctx, []);
+
+describe("the hold on a keyword the travel step resolves later", () => {
+  it("is released by the frame that resolves it even when the location is no longer the active location, and kept by the Forced record that finds it held", () => {
+    const { state, hill } = atTravel(["loot1", "orc"]);
+    const held = { ...state, discoverHeld: hill };
+    const ctx = ctxOf([...LOOT, discover(2)]);
+    // The Forced record of the becameActive finds the keyword held back and leaves the hold alone.
+    expect(discoverKeyword(held, { verb: "Discover", amount: 2 }, hill, ctx).discoverHeld).toBe(hill);
+    // The held frame finds the location gone from the active slot: nothing resolves and the hold is cleared.
+    const gone = discoverKeyword({ ...held, activeLocation: null }, { verb: "Discover", amount: 2, afterTravel: true }, hill, ctx);
+    expect(gone.discoverHeld).toBeUndefined();
+    expect(gone.encounterDeck).toEqual(state.encounterDeck);
   });
 });

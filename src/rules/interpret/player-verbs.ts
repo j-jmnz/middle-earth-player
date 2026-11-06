@@ -7,7 +7,7 @@ import { currentCause, UNATTRIBUTED } from "../core/cause.ts";
 import { characters } from "../combat/combat.ts";
 import { declareAttack } from "../families/attack/index.ts";
 import { enforceRestricted } from "../player/attach.ts";
-import { placeProgress } from "./effect-verbs.ts";
+import { placeProgress, progressPlacer } from "./effect-verbs.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { shuffleIds } from "../core/seed.ts";
 import type { EngineStep } from "../core/intents.ts";
@@ -170,7 +170,7 @@ export function runPlayerVerb(
           : [refCard(state, instruction.target === "self" ? "self" : instruction.target, scope) ?? ""];
       const amount = resolveAmount(state, instruction.amount, scope, ctx);
       let next = state;
-      for (const id of targets) if (next.cards[id] && amount > 0) next = placeProgress(next, id, amount, ctx, steps);
+      for (const id of targets) if (next.cards[id] && amount > 0) next = placeProgress(next, id, amount, ctx, steps, progressPlacer(next, ctx, focus.seat, focus.sourceId));
       return next;
     }
     case "GiveControl": {

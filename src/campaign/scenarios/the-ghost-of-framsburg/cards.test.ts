@@ -57,6 +57,26 @@ describe("19097 The Cursed Tomb", () => {
     expect(travelTargets(t)).not.toContain(idOf(t.state, CODES.theCursedTomb));
   });
 
+  it("19097:A:3 Fram's Shade already engaged with a player (nothing to search for) attacks each player in turn order from where it is", () => {
+    const t = withLoot(framsburgTable(world, { phase: "Travel", seats: 2, staging: [CODES.theCursedTomb], engaged: [{ code: CODES.framSShade, seat: 0 }], deck: ["f0", "f0", "f0"] }), LOOT);
+    let run = send(start(t.state), { type: "Travel", locationId: idOf(t.state, CODES.theCursedTomb) }, t.ctx);
+    const attacked: number[] = [];
+    for (let guard = 0; guard < 40 && run.state.phase === "Travel"; guard += 1) {
+      if (run.state.window?.kind === "defense") {
+        attacked.push(run.state.pendingAttack?.seat ?? -1);
+        run = send(run, { type: "Undefended", heroId: run.state.pendingAttack?.seat === 0 ? t.hero : (t.seat1Hero ?? "") } as PlayerIntent, t.ctx);
+        continue;
+      }
+      const intent = legalIntents(run.state, t.ctx).find((item) => item.type === "Pass" || item.type === "Choose");
+      if (!intent) break;
+      run = send(run, intent.type === "Choose" && run.state.window?.kind === "choose" ? { type: "Choose", optionId: run.state.window.options[0] ?? "" } : (intent as PlayerIntent), t.ctx);
+    }
+    expect(attacked).toEqual([0, 1]);
+    const shade = where(run.state, CODES.framSShade);
+    expect(shade).toHaveLength(1);
+    expect(shade[0]?.zone).toBe("engaged");
+  });
+
   it("19097:A:3 after the players travel to it, Fram's Shade is searched for in the encounter deck and discard pile and added to the staging area, the deck is shuffled, and it attacks each player in turn order", () => {
     const t = withLoot(framsburgTable(world, { phase: "Travel", seats: 2, staging: [CODES.theCursedTomb], deck: ["f0", CODES.framSShade, "f0", "f0", "f0"], discard: ["f3"] }), LOOT);
     const before = t.state.encounterDeck.slice();
@@ -253,11 +273,20 @@ describe("19102 Haunted Hall", () => {
 
   it("19102:A:2 it works only while Haunted Hall is in the staging area", () => {
     const t = framsburgTable(world, { phase: "Quest", staging: [CODES.cursedTower], threat: [28, 28] });
-    const hall = framsburgTable(world, { phase: "Quest", staging: [CODES.cursedTower], threat: [28, 28] });
-    const active = { ...hall.state, activeLocation: idOf(hall.state, CODES.cursedTower) };
     expect(progressBy(t, 0, CODES.cursedTower, [CODES.hauntedHall]).state.seats[0]?.threat).toBe(29);
-    expect(active.activeLocation).not.toBeNull();
     expect(progressBy(t, 0, CODES.cursedTower).state.seats[0]?.threat).toBe(28);
+    // As the active location it is not in the staging area: the same progress raises nothing.
+    const hall = framsburgTable(world, { phase: "Quest", staging: [CODES.hauntedHall, CODES.cursedTower], threat: [28, 28] });
+    const active = { ...hall, state: activate(hall.state, CODES.hauntedHall) };
+    expect(progressBy(active, 0, CODES.cursedTower).state.seats[0]?.threat).toBe(28);
+  });
+
+  it("19102:A:2 the player who placed the progress pays, also when another player has the same card in play", () => {
+    const t = framsburgTable(world, { seats: 2, phase: "Quest", staging: [CODES.hauntedHall, CODES.cursedTower], threat: [28, 31] });
+    const second = progressBy(t, 1, CODES.cursedTower, [], 0);
+    expect(second.state.seats.map((seat) => seat.threat)).toEqual([28, 32]);
+    const first = progressBy(t, 0, CODES.cursedTower, [], 1);
+    expect(first.state.seats.map((seat) => seat.threat)).toEqual([29, 31]);
   });
 });
 
@@ -307,6 +336,14 @@ describe("19104 Moonlit Passage", () => {
     expect(lowerThreatByEffect(state, 1, 3, ally, t.ctx, [], UNATTRIBUTED).seats[1]?.threat).toBe(29);
     // The next round the cap is fresh.
     expect(lower({ ...state, playerThreatLoweredBy: undefined }, t.ctx, 2, ally).seats[0]?.threat).toBe(28);
+  });
+
+  it("19104:A:2 two copies in the staging area do not add up: the cap is still 1 a round", () => {
+    const t = framsburgTable(world, { phase: "Quest", seats: 2, staging: [CODES.moonlitPassage, CODES.moonlitPassage], threat: [30, 30], play: ["ally"] });
+    const ally = idOf(t.state, "ally");
+    expect(heldAmount(t.state, "seat:0", "playerThreatReductionCap")).toBe(2);
+    expect(lower(t.state, t.ctx, 3, ally).seats[0]?.threat).toBe(29);
+    expect(lower(lower(t.state, t.ctx, 3, ally), t.ctx, 3, ally).seats[0]?.threat).toBe(29);
   });
 
   it("19104:A:2 only player card effects are held to it: an encounter card's reduction is not, and does not use it up", () => {
@@ -440,11 +477,14 @@ describe("19108 Slammed Shut", () => {
 
 // The Snowbourn Scout (01016) of seat `seat` enters play: "Response: After Snowbourn Scout enters play, choose a location. Place 1 progress token on that location." It places its progress on the location with this code in the staging area,
 // as a card effect of that player does; `also` are further cards in the staging area.
-function progressBy(t: Table, seat: number, code: string, also: readonly string[] = []): Run {
+// `decoy`: the seat of a second Snowbourn Scout in play (put there first, so a lookup by card code finds it), which places nothing.
+function progressBy(t: Table, seat: number, code: string, also: readonly string[] = [], decoy?: number): Run {
   let state = t.state;
   for (const extra of also) state = spawn(state, extra, { zone: "staging" }).state;
+  if (decoy != null) state = spawn(state, SCOUT, { zone: "play", seat: decoy }).state;
   const scout = spawn(state, SCOUT, { zone: "play", seat });
-  const synced = syncConstants(scout.state, scoutContext());
+  // The records run for the first player: the seat that plays the card is the one the effect's actor is.
+  const synced = syncConstants({ ...scout.state, firstPlayer: seat }, scoutContext());
   const target = idOf(synced, code);
   return resolveRecords(synced, scoutContext(), SCOUT, "response", scout.id, (window) => (window.window?.kind === "choose" ? (window.window.options.find((option) => option === target) ?? window.window.options[0] ?? "") : ""));
 }

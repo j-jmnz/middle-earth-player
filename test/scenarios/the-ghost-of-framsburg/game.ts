@@ -58,7 +58,8 @@ export function framsburgIntent(state: ScenarioState, ctx: ReduceContext, memory
     const offered = legalIntents(state, ctx).flatMap((intent) => (intent.type === "ChooseResolution" ? [intent.optionId] : []));
     // The burden of the pool: Gundabad Hunter or Gundabad Stalker; then the Hazard card (a prefixed option).
     const burdens = offered.filter((option) => option === CODES.gundabadHunter || option === CODES.gundabadStalker);
-    if (burdens.length > 0) return { type: "ChooseResolution", optionId: (policy.burden === "stalker" ? CODES.gundabadStalker : CODES.gundabadHunter) };
+    const wanted = policy.burden === "stalker" ? CODES.gundabadStalker : CODES.gundabadHunter;
+    if (burdens.length > 0) return { type: "ChooseResolution", optionId: burdens.includes(wanted) ? wanted : (burdens[0] ?? wanted) };
     return { type: "ChooseResolution", optionId: (policy.hazard === "last" ? offered.at(-1) : offered[0]) ?? "" };
   }
   if (state.window?.kind === "choose" && state.window.options.includes("threat") && state.window.options.includes("location")) return { type: "Choose", optionId: policy.stage2 };
@@ -219,22 +220,22 @@ const USE = { use: true, engage: true } as const;
 const SHUFFLE = { ...USE, reshuffle: true } as const;
 export const FRAMSBURG_GOLDENS: readonly FramsburgGolden[] = [
   { name: "true solo, won from a blank log, Loot claimed, Crypt Key and Old Lantern used, Gundabad Hunter for the pool", seatCount: 1, seed: 3, difficulty: "Normal", decks: "strong", outcome: "won", policy: USE },
-  { name: "true solo, won from a blank log, a treasure attached to Fram's Shade and claimed, Gundabad Hunter for the pool", seatCount: 1, seed: 9, difficulty: "Normal", decks: "strong", outcome: "won", policy: USE },
+  { name: "true solo, won from a blank log, a treasure attached to Fram's Shade and claimed, Gundabad Hunter for the pool", seatCount: 1, seed: 24, difficulty: "Normal", decks: "strong", outcome: "won", policy: USE },
   { name: "true solo, won from a blank log, a burden of the two Hazard cards for the pool", seatCount: 1, seed: 10, difficulty: "Normal", decks: "strong", outcome: "won", policy: USE },
-  { name: "true solo, Easy, won from a blank log, the last answers taken, a treasure attached to Fram's Shade", seatCount: 1, seed: 4, difficulty: "Easy", decks: "strong", outcome: "won", policy: { ...USE, choose: "last" } },
+  { name: "true solo, Easy, won from a blank log, the last answers taken, a treasure attached to Fram's Shade", seatCount: 1, seed: 11, difficulty: "Easy", decks: "strong", outcome: "won", policy: { ...USE, choose: "last" } },
   { name: "true solo, Easy, won from a blank log, the encounter discard pile shuffled, Gundabad Stalker and the last Hazard card", seatCount: 1, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won", policy: { ...SHUFFLE, burden: "stalker", hazard: "last" } },
   { name: "true solo, won, after the earlier parts, the encounter discard pile shuffled, Gundabad Hunter", seatCount: 1, seed: 3, difficulty: "Normal", decks: "strong", outcome: "won", after: true, variant: "pool", policy: SHUFFLE },
   { name: "true solo, won, after the earlier parts, Beldis's line, Gundabad Stalker and the last Hazard card", seatCount: 1, seed: 15, difficulty: "Normal", decks: "strong", outcome: "won", after: true, variant: "beldis", policy: { ...SHUFFLE, burden: "stalker", hazard: "last" } },
-  { name: "true solo, won, after the earlier parts, Beldis's line, a treasure attached to Fram's Shade, Gundabad Stalker", seatCount: 1, seed: 16, difficulty: "Normal", decks: "strong", outcome: "won", after: true, variant: "beldis", policy: { ...SHUFFLE, burden: "stalker", hazard: "last" } },
+  { name: "true solo, won, after the earlier parts, Beldis's line, a treasure attached to Fram's Shade, Gundabad Stalker", seatCount: 1, seed: 138, difficulty: "Normal", decks: "strong", outcome: "won", after: true, variant: "beldis", policy: { ...SHUFFLE, burden: "stalker", hazard: "last" } },
   { name: "true solo, Easy, won, Melanwar's and Isolde's lines, the encounter discard pile shuffled, Gundabad Hunter", seatCount: 1, seed: 2, difficulty: "Easy", decks: "strong", outcome: "won", after: true, variant: "oathline", policy: SHUFFLE },
   { name: "true solo, Easy, won, Melanwar's and Isolde's lines, a burden of the two Hazard cards for the pool", seatCount: 1, seed: 7, difficulty: "Easy", decks: "strong", outcome: "won", after: true, variant: "oathline", policy: SHUFFLE },
   { name: "two-handed, won from a blank log, the encounter discard pile shuffled, Gundabad Stalker and the last Hazard card", seatCount: 2, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won", policy: { ...SHUFFLE, burden: "stalker", hazard: "last" } },
-  { name: "two-handed, won from a blank log, a treasure attached to Fram's Shade and claimed, the discard pile shuffled", seatCount: 2, seed: 3, difficulty: "Normal", decks: "strong", outcome: "won", policy: { ...SHUFFLE, burden: "stalker", hazard: "last" } },
+  { name: "two-handed, won from a blank log, a treasure attached to Fram's Shade and claimed, the discard pile shuffled", seatCount: 2, seed: 5, difficulty: "Normal", decks: "strong", outcome: "won", policy: { ...SHUFFLE, burden: "stalker", hazard: "last" } },
   { name: "two-handed, Easy, won from a blank log, Gundabad Hunter, the Hazard card first", seatCount: 2, seed: 14, difficulty: "Easy", decks: "strong", outcome: "won", policy: USE },
   { name: "two-handed, Easy, won from a blank log, a burden of the two Hazard cards for the pool", seatCount: 2, seed: 20, difficulty: "Easy", decks: "strong", outcome: "won", policy: USE },
   { name: "two-handed, won, after the earlier parts, Misplaced Trust, the discard pile shuffled", seatCount: 2, seed: 28, difficulty: "Easy", decks: "strong", outcome: "won", after: true, variant: "pool", policy: SHUFFLE },
-  { name: "two-handed, won, after the earlier parts, Urdug's Cunning, a treasure attached to Fram's Shade", seatCount: 2, seed: 14, difficulty: "Normal", decks: "strong", outcome: "won", after: true, variant: "cunning", policy: SHUFFLE },
-  { name: "two-handed, Easy, won, the oath and guidance lines, a treasure attached to Fram's Shade", seatCount: 2, seed: 7, difficulty: "Easy", decks: "strong", outcome: "won", after: true, variant: "oath", policy: SHUFFLE },
+  { name: "two-handed, won, after the earlier parts, Urdug's Cunning, a treasure attached to Fram's Shade", seatCount: 2, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won", after: true, variant: "cunning", policy: SHUFFLE },
+  { name: "two-handed, Easy, won, the oath and guidance lines, a treasure attached to Fram's Shade", seatCount: 2, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won", after: true, variant: "oath", policy: SHUFFLE },
   { name: "true solo, lost with the threat at 50", seatCount: 1, seed: 5, difficulty: "Normal", decks: "strong", outcome: "lost", policy: USE, lossReason: "No seats remain" },
   { name: "two-handed, lost with the threat of every player at 50", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost", policy: SHUFFLE, lossReason: "No seats remain" },
   { name: "true solo, weak, lost on threat", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },

@@ -11,7 +11,7 @@ import { copyLine, withCopies } from "./reprint.ts";
 // "The Loot objectives the players control" is a count of the claimed ones (`lootKeyword`, `controlled`). The Discover keyword is a Forced effect of the location when it becomes the active location; the Response of Crypt Key adjusts its value before it resolves (families/wilderland/discover.ts).
 // Rules: emce.discover, emce.loot, emce.setup-the-ghost-of-framsburg, emce.guarded-x, emce.treasure, emce.campaign-pool-encounter, emce.immune, rr.guarded, rr.first-player, rr.travel (data/rules/entries.json).
 const LOOT: PickSpec = { type: "objective", control: "any", controlled: true, lootKeyword: true };
-// X, the number of Loot objectives the players control; 1 less of them as the extra shadow cards Fram's Shade is dealt are counted by its own flag.
+// X, the number of Loot objectives the players control: Fram's Shade's Threat, Attack and Defense, and the number of shadow cards it is dealt (19098:A:2, 19098:A:3).
 const LOOT_COUNT = { count: LOOT } as const;
 const FRAMS_SHADE: PickSpec = { type: "card", control: "any", names: ["Fram's Shade"], engagedEnemies: true };
 const FRAMS_SHADE_ENEMY: PickSpec = { type: "enemy", control: "any", staging: true, names: ["Fram's Shade"] };
@@ -30,7 +30,8 @@ const lootRecords = (code: string): Effect[] => [
   { id: `${code}:constant:1`, cardCode: code, lines: [`${code}:A:1`], timing: "constant", instructions: [{ verb: "Loot" }] },
   { id: `${code}:constant:2`, cardCode: code, lines: [`${code}:A:2`], timing: "constant", instructions: [{ verb: "ClaimWhenFree" }] },
 ];
-const STAGE_NEEDS_LOOT = (min: number): Condition => ({ kind: "not", condition: { kind: "count", pick: LOOT, min } });
+// True while the players control fewer than `min` Loot objectives: what a stage or The Cursed Tomb restricts (travel, advance) on.
+const FEWER_LOOT_THAN = (min: number): Condition => ({ kind: "not", condition: { kind: "count", pick: LOOT, min } });
 
 export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
   [
@@ -75,7 +76,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [{ verb: "RaiseThreat", amount: 1, who: "eachSeat" }, { verb: "ShuffleEncounterDiscard" }],
     },
     { id: "12189:resolution:1", cardCode: "12189", lines: ["12189:B:4"], timing: "resolution", instructions: [{ verb: "DiscoverTreasure" }] },
-    { id: "12189:resolution:2", cardCode: "12189", lines: ["12189:B:5"], timing: "resolution", instructions: [{ verb: "ChooseCards", codes: ["12191", "12192"], who: "firstPlayer", to: "pool" }] },
+    { id: "12189:resolution:2", cardCode: "12189", lines: ["12189:B:5"], timing: "resolution", instructions: [{ verb: "ChooseCards", codes: ["12191", "12192"], who: "firstPlayer", to: "pool", only: true }] },
     { id: "12189:resolution:3", cardCode: "12189", lines: ["12189:B:6"], timing: "resolution", instructions: [{ verb: "ChooseHazardForPool", count: 2 }] },
 
     // 19094 Crypt Key (Loot). Response: when the players travel to a Discover location, exhaust it to increase or decrease the location's Discover value by 1; the Discover keyword is held back to the end of the travel step so this comes first.
@@ -132,7 +133,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
 
     // 19097 The Cursed Tomb. The players cannot travel to it unless they control 3 Loot objectives. After they travel to it Fram's Shade is searched for in the encounter deck and discard pile and added to the staging area, the deck is shuffled, and Fram's Shade
     // makes an immediate attack against each player in turn order.
-    { id: "19097:constant:1", cardCode: "19097", lines: ["19097:A:2"], timing: "constant", condition: STAGE_NEEDS_LOOT(3), instructions: [{ verb: "Restrict", what: "travel" }] },
+    { id: "19097:constant:1", cardCode: "19097", lines: ["19097:A:2"], timing: "constant", condition: FEWER_LOOT_THAN(3), instructions: [{ verb: "Restrict", what: "travel" }] },
     {
       id: "19097:forced:1",
       cardCode: "19097",
@@ -140,7 +141,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "forced",
       trigger: "traveled",
       subject: "self",
-      instructions: [{ verb: "SearchToStaging", code: "19098" }, { verb: "ShuffleEncounterDeck" }, EACH_PLAYER([{ verb: "Pick", pick: FRAMS_SHADE_ENEMY }, { verb: "AttackFromStaging" }])],
+      instructions: [{ verb: "SearchToStaging", code: "19098" }, { verb: "ShuffleEncounterDeck" }, EACH_PLAYER([{ verb: "Pick", pick: FRAMS_SHADE_ENEMY }, { verb: "AttackFromStaging", orEngaged: true }])],
     },
     // 19098 Fram's Shade. +1 Threat, Attack and Defense for each Loot objective the players control; dealt that many shadow cards (at least 1).
     {
@@ -274,7 +275,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "setup",
       instructions: [EACH_PLAYER([{ verb: "SearchMove", type: "location", to: "staging", different: true }]), { verb: "ShuffleEncounterDeck" }],
     },
-    { id: "19109:constant:1", cardCode: "19109", lines: ["19109:B:1"], timing: "constant", condition: STAGE_NEEDS_LOOT(1), instructions: [{ verb: "Restrict", what: "advance" }] },
+    { id: "19109:constant:1", cardCode: "19109", lines: ["19109:B:1"], timing: "constant", condition: FEWER_LOOT_THAN(1), instructions: [{ verb: "Restrict", what: "advance" }] },
     // 19110 Searching the Ruins (stage 2). When Revealed: the encounter discard pile is shuffled in and each player reveals an encounter card. Side B: at the beginning of the quest phase the first player chooses, raise each player's threat by 2 or discard
     // from the encounter deck until a location is discarded and add it to the staging area; the stage cannot be defeated unless the players control 2 Loot objectives.
     { id: "19110:whenRevealed:1", cardCode: "19110", lines: ["19110:A:1"], timing: "whenRevealed", instructions: [{ verb: "ShuffleEncounterDiscard" }, EACH_PLAYER([{ verb: "RevealEncounter" }])] },
@@ -296,7 +297,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
         },
       ],
     },
-    { id: "19110:constant:1", cardCode: "19110", lines: ["19110:B:2"], timing: "constant", condition: STAGE_NEEDS_LOOT(2), instructions: [{ verb: "Restrict", what: "advance" }] },
+    { id: "19110:constant:1", cardCode: "19110", lines: ["19110:B:2"], timing: "constant", condition: FEWER_LOOT_THAN(2), instructions: [{ verb: "Restrict", what: "advance" }] },
     // 19111 The Cursed Shade (stage 3). When Revealed: the first player adds The Cursed Tomb to the staging area; each other player searches the encounter deck and discard pile for a non-unique Undead enemy and adds it to the staging area; the deck is shuffled.
     // Side B: Fram's Shade is immune to player card effects; it gains victory 6 while The Cursed Tomb is in the victory display; the stage cannot be defeated unless Fram's Shade is in the victory display (defeating the last stage wins the game, rr.quest-advancement).
     {

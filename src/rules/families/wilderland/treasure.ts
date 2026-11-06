@@ -57,7 +57,8 @@ function attach(state: ScenarioState, code: string, guardId: string, steps: Engi
   const cause = currentCause(steps, UNATTRIBUTED);
   // The record that ran this is remembered on the treasure, so the claim of the freed treasure is credited to it.
   const guarded = "effect" in cause ? updateCard(spawned.state, spawned.id, { setUpBy: cause.effect }) : spawned.state;
-  return guardWith(guarded, guardId, spawned.id);
+  // An engaged guard stays engaged: the treasure is attached to it where it is (12189:B:2), and freed when it leaves play.
+  return guardWith(guarded, guardId, spawned.id, true);
 }
 
 /**

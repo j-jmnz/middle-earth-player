@@ -237,8 +237,31 @@ describe("12189:B Resolution", () => {
       const view = resolutionView(next, worldOf) as Extract<ResolutionView, { kind: "choosing" }>;
       expect(view.seatLabel, `${seats} seats`).toBe(seats === 1 ? null : "Player 1 (first player) chooses");
       // The shuffle of the discard pile orders the two (a seeded draw).
-      expect(consequenceSentence(view, null, false)).toMatch(/^Choose 1 of the 2 Hazard cards discarded \((Evil Spectre or Crypt Stalker|Crypt Stalker or Evil Spectre)\); the group decides\. It joins the campaign pool when you confirm, and the other is not added\.$/);
+      const who = seats === 1 ? "" : "; Player 1 confirms";
+      expect(consequenceSentence(view, null, false)).toMatch(new RegExp(`^Choose 1 of the 2 Hazard cards discarded \\((Evil Spectre or Crypt Stalker|Crypt Stalker or Evil Spectre)\\); the group decides${who}\\. It joins the campaign pool when you confirm, and the other is not added\\.$`));
+      expect(choiceSentence(view, view.tiles[0]!)).toMatch(/^(Crypt Stalker|Evil Spectre) is added to the campaign pool as an encounter card\. /);
     }
+  });
+
+  it("12189:B:5 the words of one card of the group's choice name every other card as not added, for three as for two", () => {
+    const tile = (name: string) => ({ optionId: name, code: name, name, hero: null, label: name });
+    const view = { kind: "choosing", step: 0, seat: 0, seatCount: 1, eyebrow: "", seatLabel: null, noun: "burden", only: true, ally: null, later: null, answered: [], tiles: [tile("A"), tile("B"), tile("C")], decline: null, to: "pool" } as const;
+    expect(choiceSentence(view, view.tiles[0])).toBe("A is added to the campaign pool as a burden; B and C are not.");
+    expect(consequenceSentence(view, null, false)).toBe("Choose A, B or C for the campaign pool; the others are not added. It is written to the campaign log when you confirm.");
+  });
+
+  it("12189:B:6 a burden already earned in this Resolution is not said to be added again", () => {
+    const base = opened(1);
+    const hunter = where(base, CODES.gundabadHunter)[0]!.id;
+    const spectre = Object.values(base.cards).find((card) => card.code === CODES.evilSpectre)!.id;
+    const arranged = onlyEncounterCards(base, { deck: [hunter, spectre], discard: [] });
+    let next = openResolution({ ...arranged, stageCleared: true, window: null, stack: [] }, ctx);
+    next = openResolution(expectOk(reduce(next, { type: "ChooseResolution", optionId: CODES.gundabadHunter } as PlayerIntent, ctx)).state, ctx);
+    const view = resolutionView(next, worldOf) as Extract<ResolutionView, { kind: "choosing" }>;
+    const burden = view.tiles.find((tile) => tile.tag === "burden")!;
+    expect(burden.name).toBe("Gundabad Hunter");
+    expect(choiceSentence(view, burden)).toBe("Gundabad Hunter is already a burden in the campaign pool, so nothing is added.");
+    expect(choiceSentence(view, view.tiles.find((tile) => tile.tag !== "burden")!)).toContain("Evil Spectre is added to the campaign pool as an encounter card.");
   });
 
   it("12189:B:6 a unique Hazard card is a Hazard card like any other: Fram's Shade in the encounter deck or discard pile counts toward the 2 and may be chosen, at most one copy joining the pool", () => {
