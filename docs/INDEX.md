@@ -55,7 +55,7 @@ Read the sections your task touches.
   - 241–273 Scenario definition (~800)
   - 274–294 Persistence (~1.4K)
   - 295–300 Images (~1.0K) ← 6
-  - 301–351 Screens (~3.8K) ← 2
+  - 301–351 Screens (~3.8K) ← 1
   - 352–357 Catalog build (~410)
   - 358–375 Tests (~1.7K) ← 5
   - 376–391 Performance (~1.2K) ← 3
@@ -182,15 +182,15 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~9.8K tok)
+- `docs/phases/STATUS.md` — Phase status (~10.0K tok)
   - 5–17 Rules (~620)
   - 18–89 Phases (~2.7K)
-  - 90–210 Open items (~6.1K)
+  - 90–211 Open items (~6.2K)
     - 92–107 Fixtures and Maestro (~720)
     - 108–153 Rules and engine (~1.9K)
     - 154–178 Screens and code (~1.3K)
-    - 179–210 Phone and tablet checks (~2.1K)
-  - 211–227 Standing decisions (~430)
+    - 179–211 Phone and tablet checks (~2.3K)
+  - 212–229 Standing decisions (~490)
 - `docs/phases/phase-10-campaign-shell.md` — Phase 10 — Campaign shell (~1.7K tok)
 - `docs/phases/phase-11-scenario-1-table.md` — Phase 11 — Scenario 1 table (~1.6K tok)
 - `docs/phases/phase-12-knife-in-the-dark.md` — Phase 12 — A Knife in the Dark (~1.4K tok)
@@ -337,18 +337,6 @@ Read when a task names the plan.
   - 145–156 After each scenario phase (~210)
   - 157–160 Order (~70)
   - 161–168 Verification (~100)
-- `docs/plans/screen-reader.md` — Plan: Screen reader parity (VoiceOver and TalkBack) (~4.9K tok)
-  - 3–78 Context (~1.5K)
-    - 11–37 What already works (reuse it, do not rebuild it) (~410)
-    - 38–55 The gaps (~260)
-    - 56–65 Independence from ordinary play (~510)
-    - 66–78 How the work runs (~200)
-  - 79–110 1. Card speech and one announcer (~600)
-  - 111–140 2. The reader table on the phone (~540)
-  - 141–171 3. The table's moments, refusals and chrome (~560)
-  - 172–221 4. Menus and screens (~960)
-  - 222–242 5. Parity as a test (~400)
-  - 243–261 Verification (~310)
 - `docs/plans/table-and-deck-fixes.md` — Plan: table and deck fixes (~3.0K tok)
 
 ## Handovers
@@ -380,6 +368,7 @@ History and rationale; read only when a code comment or task cites one.
 - `docs/plans/done/inactive-text.md` — Inactive text: a rethink (~2.4K tok)
 - `docs/plans/done/performance-pass.md` — Performance pass: snappy taps, animations and screens (user request, 2026-10-29) (~4.3K tok)
 - `docs/plans/done/rounded-chrome.md` — Rounded chrome: round controls, fewer boxes, fewer words (~3.7K tok)
+- `docs/plans/done/screen-reader.md` — Plan: Screen reader parity (VoiceOver and TalkBack) (~4.9K tok)
 - `docs/plans/done/settings-theme-and-ui-scale.md` — Settings tab, UI scale, and Dark/Light theme (~5.2K tok)
 - `docs/plans/done/table-experience.md` — Table experience: next improvements (~4.4K tok)
 - `docs/plans/done/table-performance-settings.md` — Lighter table on weaker phones: card picture quality, a fog switch, per-card redraws (user request, 2026-10-31) (~2.4K tok)
