@@ -273,7 +273,7 @@ describe("Dream-chaser campaign", () => {
   });
 });
 
-// Ered Mithrin (docs/plans/ered-mithrin.md, phase 49): built from The Wilds of Rhovanion, the six Adventure Packs and the Ered Mithrin Campaign Expansion.
+// Ered Mithrin (docs/plans/done/ered-mithrin.md, phase 49): built from The Wilds of Rhovanion, the six Adventure Packs and the Ered Mithrin Campaign Expansion.
 // The DragnCards Q08 load lists lead the piles, the first two scenarios deal the Revised Core Set's reprints of the Core Set sets they load
 // (overrides.dragnPackAliases), and the booklet's paragraph (emce.setup-<id>) and the printed Setup are the checks.
 describe("Ered Mithrin campaign", () => {

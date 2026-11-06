@@ -4,7 +4,7 @@ Engine half depends on: phase 53's engine half
 Phone half depends on: phase 53
 Blocks: phase 55
 
-Plan: [docs/plans/ered-mithrin.md](../plans/ered-mithrin.md), "Phases 52-60: one scenario each" and "Notes for the orchestrator". Procedure: [phase 12](phase-12-knife-in-the-dark.md), "Scenario procedure".
+Plan: [docs/plans/done/ered-mithrin.md](../plans/done/ered-mithrin.md), "Phases 52-60: one scenario each" and "Notes for the orchestrator". Procedure: [phase 12](phase-12-knife-in-the-dark.md), "Scenario procedure".
 
 ## Goal
 

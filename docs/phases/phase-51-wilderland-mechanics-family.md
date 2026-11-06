@@ -3,7 +3,7 @@
 Depends on: phase 50
 Blocks: phase 51b
 
-Plan: [docs/plans/ered-mithrin.md](../plans/ered-mithrin.md), "Phase 51: Wilderland mechanics family" and "Notes for the orchestrator". Analogue: [phase 39](done/phase-39-sea-mechanics-family.md).
+Plan: [docs/plans/done/ered-mithrin.md](../plans/done/ered-mithrin.md), "Phase 51: Wilderland mechanics family" and "Notes for the orchestrator". Analogue: [phase 39](done/phase-39-sea-mechanics-family.md).
 
 ## Goal
 

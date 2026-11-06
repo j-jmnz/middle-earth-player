@@ -3,7 +3,7 @@
 Depends on: phase 51
 Blocks: phase 52 (its phone half; its engine half needs only phase 51)
 
-Plan: [docs/plans/ered-mithrin.md](../plans/ered-mithrin.md), "Phase 51b: Wilderland on the table" and "Notes for the orchestrator". Analogue: [phase 39b](done/phase-39b-ships-on-the-table.md).
+Plan: [docs/plans/done/ered-mithrin.md](../plans/done/ered-mithrin.md), "Phase 51b: Wilderland on the table" and "Notes for the orchestrator". Analogue: [phase 39b](done/phase-39b-ships-on-the-table.md).
 
 ## Goal
 

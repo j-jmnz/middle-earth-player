@@ -42,7 +42,7 @@ export type SetupClause =
   // "Each player adds 1 copy of X to their hand after drawing their starting hand (including taking a mulligan)."
   | { kind: "addToHandAfterMulligan"; codes: string[]; count: number }
   | { kind: "step"; step: SetupStep; codes: string[]; to?: string[]; count?: number; many?: { count: number; from: number }; sets?: string[]; asideSets?: string[] }
-  // Ered Mithrin (docs/plans/ered-mithrin.md, phase 49), each quoted from data/printed/ered-mithrin.json.
+  // Ered Mithrin (docs/plans/done/ered-mithrin.md, phase 49), each quoted from data/printed/ered-mithrin.json.
   // "Shuffle the encounter deck and discard cards from the top until X locations are discarded, where X is the number of players. Add each
   // discarded location to the staging area." (`amount` "playersLessOne": "X is 1 less than the number of players in the game";
   // `eachPlayer`: "Each player discards cards from the top of the encounter deck until he discards an enemy or location and adds that card to the staging area".)
