@@ -27,7 +27,7 @@ Each agent reads its own file.
 
 Read the sections your task touches.
 
-- `README.md` — Middle Earth LCG (~3.8K tok)
+- `README.md` — Middle Earth LCG (~3.4K tok)
   - 8–16 Features (~210)
   - 17–27 Roadmap (~160)
   - 28–36 Accessibility (~340)
@@ -38,10 +38,10 @@ Read the sections your task touches.
     - 74–95 On a phone (~360)
     - 96–99 Maestro (~150)
   - 100–125 Commands (~660)
-  - 126–143 Contributing (~480)
-  - 144–151 Documentation (~130)
-  - 152–169 Attribution (~480)
-  - 170–173 License (~80)
+  - 126–129 Contributing (~70)
+  - 130–137 Documentation (~130)
+  - 138–155 Attribution (~480)
+  - 156–159 License (~80)
 - `docs/architecture.md` — Architecture (~19.8K tok)
   - 7–41 Stack (~980)
   - 42–77 Processes (~660)

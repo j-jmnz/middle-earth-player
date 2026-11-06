@@ -4,6 +4,14 @@ on:
   push:
   pull_request:
 
+# Read-only token: pull requests from forks run with no write access.
+permissions:
+  contents: read
+
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
