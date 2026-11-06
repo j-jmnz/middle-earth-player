@@ -141,6 +141,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("beldisBox") }),
   // The Caves deck (emce.caves-deck) holds at least `min` cards (1 by default): "look at the top 2 cards of the Caves deck" (18055:A:2). Read by the wilderland family; a game with no Caves deck holds none.
   z.strictObject({ kind: z.literal("cavesDeck"), min: z.number().int().positive().optional() }),
+  // The quest deck holds at least `min` stages (1 by default): the stage 2s Mount Gundabad's current quest can be bypassed in favor of (19135:B:3; emce.bypassing). Read by the wilderland family.
+  z.strictObject({ kind: z.literal("questDeck"), min: z.number().int().positive().optional() }),
   // The active location has no Discover keyword to resolve (none printed, or the keyword is ignored): "If they cannot, Abandoned Ruins gains surge and doomed 2" (19106:A:1; emce.discover). Read by the wilderland family.
   z.strictObject({ kind: z.literal("discoverUnavailable") }),
   // A card with this code is attached to a hero (`is`) or is not.

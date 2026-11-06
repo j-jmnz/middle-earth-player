@@ -8,7 +8,7 @@ import { hasTrait, holds, outOfPlayChoices } from "./conditions.ts";
 import { scheduleDelayed } from "../windows/delayed.ts";
 import type { EngineStep } from "../core/intents.ts";
 import type { ReduceContext } from "./interpret.ts";
-import { destroyCard, eliminateEmpties, modifiedStat, placeDamage, raiseThreat, releaseAttachments } from "../core/keywords.ts";
+import { destroyCard, eliminateEmpties, isEncounterCardEffect, modifiedStat, placeDamage, raiseThreat, releaseAttachments } from "../core/keywords.ts";
 import { lastPicked, otherSeat, seatsFor } from "./player-verbs.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { isPlayerType, printedOf } from "../core/printed.ts";
@@ -21,7 +21,7 @@ import { queueHeard } from "../families/quest/events.ts";
 import { refillsAnyTime } from "../families/nightmare/guards.ts";
 import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
 import { encounterRaised } from "../families/quest/threat.ts";
-import { livingSeats, updateCard, type ScenarioState } from "../core/state.ts";
+import { flagged, livingSeats, updateCard, type ScenarioState } from "../core/state.ts";
 import { attachTo, cardsUnder, moveCard } from "../core/zones.ts";
 import { currentCause, ruleCause, UNATTRIBUTED } from "../core/cause.ts";
 import { noteEncounterThreat } from "../families/encounter/reveal.ts";
@@ -332,6 +332,8 @@ function discardTarget(
 ): ScenarioState {
   const id = kind === "self" || kind === "host" || kind === "picked" || kind === "previous" || kind === "subject" || kind === "attacker" ? refCard(state, kind, frameScope(state, focus.seat, focus.sourceId)) : null;
   if (!id || !state.cards[id]) return state;
+  // "Unique locations cannot be discarded from play by encounter card effects" (12193:B:1): the card holds the flag.
+  if (flagged(state, id, "cannotBeDiscardedByEncounter") && isEncounterCardEffect(state, ctx.cards, focus.sourceId)) return state;
   return destroyCard(state, id, ctx.cards, steps);
 }
 

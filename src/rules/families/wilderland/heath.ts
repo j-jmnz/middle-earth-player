@@ -14,7 +14,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { hasTrait } from "../../interpret/conditions.ts";
 import { NAMED_PILES, pileDealt, pileOf, shufflePile } from "../../core/piles.ts";
 import type { GameEvent, ScenarioState } from "../../core/state.ts";
-import { updateCard, withSeat } from "../../core/state.ts";
+import { flagged, updateCard, withSeat } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { attackWith } from "../attack/immediate.ts";
@@ -93,7 +93,7 @@ export function whenRevealedUncancelable(state: ScenarioState, event: GameEvent,
   // "The 'when revealed' effects of side quests cannot be canceled by player card effects" (emce.side-quests): an encounter side quest is a quest card as well as an encounter card.
   if (revealed && printedOf(ctx.cards, state.cards[revealed]?.code ?? "").type === "encounter-side-quest") return true;
   if (!revealed || !gameReads(state, ctx, '"UncancelableWhenRevealed"')) return false;
-  return constantInstructions(state, ctx).some(({ instruction }) => instruction.verb === "UncancelableWhenRevealed" && (instruction.trait == null || hasTrait(state, revealed, instruction.trait, ctx)) && (instruction.cardType == null || printedOf(ctx.cards, state.cards[revealed]?.code ?? "").type === instruction.cardType));
+  return constantInstructions(state, ctx).some(({ instruction }) => instruction.verb === "UncancelableWhenRevealed" && (!instruction.firstRevealedEachRound || flagged(state, revealed, "firstTreachery")) && (instruction.trait == null || hasTrait(state, revealed, instruction.trait, ctx)) && (instruction.cardType == null || printedOf(ctx.cards, state.cards[revealed]?.code ?? "").type === instruction.cardType));
 }
 
 /** DiscardOtherLooked: the cards LookAtTop showed that are still on top, but the picked one, go to the encounter discard pile faceup. The picked card is then the top card of the deck. */

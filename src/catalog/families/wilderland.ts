@@ -147,7 +147,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("VictoryWhenFree") }),
   // A constant marker, in play under the record's own condition: "While Mountain Pass is in the staging area, the 'when revealed' effects of Weather treachery cards cannot be canceled" (19015:A:1). A Response that cancels the When Revealed effects of an encounter card
   // with the trait is not offered while the marker's source is in play and its record holds (rr.cancel, families/wilderland/heath.ts). With `cardType` the effects of treachery cards ("The 'when revealed' effects of treachery cards cannot be canceled", 19048:B:1). It does nothing when run.
-  z.strictObject({ verb: z.literal("UncancelableWhenRevealed"), trait: z.string().min(1).optional(), cardType: z.literal("treachery").optional() }),
+  // With `firstRevealedEachRound`, only the first treachery revealed each round ("The 'when revealed' effects of the first treachery revealed each round cannot be canceled", 19137:B:1).
+  z.strictObject({ verb: z.literal("UncancelableWhenRevealed"), trait: z.string().min(1).optional(), cardType: z.literal("treachery").optional(), firstRevealedEachRound: z.literal(true).optional() }),
   // "Look at the top 3 cards of the encounter deck. Reveal 1 of those cards and discard the rest" (19022:B:1, 19024:B:1): after LookAtTop and a PickEncounter of one looked card, the other looked cards that are still on top go to the encounter discard pile faceup; the picked card is then the top card, and the
   // RevealEncounter after it reveals it. The discard comes first, a deliberate order as Discover's (emce.discover): a Surge on the revealed card reveals the next card of the deck, not one of the looked ones.
   z.strictObject({ verb: z.literal("DiscardOtherLooked"), ...when }),
@@ -213,6 +214,30 @@ const VERBS = [
   // pile is shuffled in, cards come off the top into the discard pile until `count` Hazard cards are among them (or the deck is empty), and the first player chooses for the group one of those Hazard cards: an encounter card joins the Campaign Pool's encounter cards, a burden joins the pool as a burden.
   // Run by the Resolution (rules/setup/resolution.ts).
   z.strictObject({ verb: z.literal("ChooseHazardForPool"), count: z.number().int().min(1), ...when }),
+  // Mount Gundabad (part 8, campaign card 12193; emce.gundabad-quest-deck, emce.bypassing). A constant marker on side A of each Exploring Gundabad stage 2: "If Exploring Gundabad is the current main quest, do not flip it over until the beginning of
+  // the quest phase" (19135:A:2). The scenario definition copies it onto the stage (`stages[i].deck`): the quest is ordered by its quest deck, a stage arrives with side A up, the stage defeated goes to the victory display and the quest advances to the top
+  // stage of the deck (rules/families/quest/order.ts). Run alone it does nothing.
+  z.strictObject({ verb: z.literal("FlipAtQuestPhase") }),
+  // "At the beginning of the quest phase" the current quest card shows side B (emce.gundabad-quest-deck). A stage that already shows side B changes nothing.
+  z.strictObject({ verb: z.literal("FlipCurrentQuest"), ...when }),
+  // "The players may bypass this stage" (19135:B:3; emce.bypassing): the source stage loses all its progress and goes to the bottom of the quest deck with side A up, and the top stage of the quest deck is revealed, its When Revealed effects resolving. Nothing happens
+  // when the quest deck holds no other stage. A bypassed stage is not defeated: the Forced effects of "when this stage is defeated" do not hear it.
+  z.strictObject({ verb: z.literal("BypassStage"), ...when }),
+  // "Search the quest deck for a quest card and make it the current main quest. Then, flip it over. Shuffle the rest of the quest deck" (19124:A:1): the actor chooses a stage of the quest deck, it becomes the current quest in place of the stage now current (which goes back into
+  // the quest deck with no progress, side A up, as a bypassed stage does), it is revealed and shows side B at once, and the quest deck is shuffled.
+  z.strictObject({ verb: z.literal("SearchQuestDeck"), ...when }),
+  // "Flip Wormsbane to its Reforged side" (19122:A:3): the card in play with the code `code` shows its other side `into`, staying where it lies with its tokens and attachments (the old side is kept as the card's other side).
+  // With `attachTo: "picked"` it then moves to the hero last picked, leaving the card it was attached to.
+  z.strictObject({ verb: z.literal("FlipInPlace"), code, into: code, attachTo: z.literal("picked").optional(), ...when }),
+  // "Search the Caves deck for a location and make it the active location. Shuffle the Caves deck" (19137:B:2): the actor chooses a card of the Caves deck, which becomes the active location (the one active now returns to the staging area) and hears that it did. The shuffle is the record's (ShufflePile).
+  // Nothing happens with the Caves deck empty.
+  z.strictObject({ verb: z.literal("ActivateFromCaves"), ...when }),
+  // "Add a random enemy discarded this way to the staging area" (19138:B:1): after a DiscardEncounterTop, one of the cards it discarded that is still in the encounter discard pile and is of `type`, chosen with the game's seed, enters the staging area.
+  z.strictObject({ verb: z.literal("StageRandomDiscarded"), type: z.literal("enemy"), ...when }),
+  // "Attach all unguarded treasures in play to that character" (12194:A:2): every treasure in play with nothing guarding it, attached to a character or lying in the staging area, is attached to the character the source card is attached to, leaving the card it was on.
+  z.strictObject({ verb: z.literal("AttachTreasuresToHost"), ...when }),
+  // A constant of a card in play: "Each player cannot play more than 1 card each phase" (19140:B:1). A player who has played `max` cards in the phase (the plays state.played records) may play no more; a card put into play is not played.
+  z.strictObject({ verb: z.literal("LimitPlaysPerPhase"), max: z.number().int().min(1) }),
 ] as const;
 
 const TRIGGERS = [
@@ -251,6 +276,15 @@ const FLAGS = [
   "optionalEngageUnique",
   // On a seat (target eachSeat): the most its threat can be reduced by player card effects each round ("each player's threat cannot be reduced by more than 1 via player card effects each round", 19104:A:2). Read by lowerThreatByEffect (families/quest/threat.ts).
   "playerThreatReductionCap",
+  // On a card: damage that comes from an effect other than a quest card's is not placed on it ("Dagnir cannot take damage from non-quest effects", 19127:A:1). Combat damage is not an effect of a card and still counts. Read where damage is placed (rules/core/keywords.ts placeDamage).
+  "cannotTakeNonQuestDamage",
+  // On a card in play: an encounter card's effect cannot discard it ("Unique locations cannot be discarded from play by encounter card effects", 12193:B:1). Read by the Discard verb (rules/interpret/verbs.ts).
+  "cannotBeDiscardedByEncounter",
+  // On a hero (set by a constant ModifyStat of an attachment on its host): the players lose the game when it leaves play ("If attached hero leaves play, the players lose the game", 19143:A:3). Read where a card is destroyed (rules/core/keywords.ts destroyCard).
+  "lossOnLeavingPlay",
+  // Engine use, on a card or the table: the first treachery revealed this round, noted as it is revealed in a game that reads firstRevealedEachRound (families/wilderland/reveals.ts), and that a treachery was revealed this round.
+  "firstTreachery",
+  "treacheryRevealed",
 ] as const;
 
 export const manifest = { name: "wilderland", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

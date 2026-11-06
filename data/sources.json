@@ -5203,9 +5203,9 @@
       "site": "https://drive.google.com/drive/folders/1jEy_yvRaPXGylPfilxhweQjffo9AZQsQ",
       "pin": {
         "kind": "sha256",
-        "value": "f1b007bfac38cc1c308defcd76cc3f842966c59b83e5d187a2cb5698e619603f"
+        "value": "e63522df5741b01bfd923c3a50ea637a5e9aae1d965bbe7c16886a9865c66b54"
       },
-      "fetchedAt": "2026-11-05T01:54:35.338Z",
+      "fetchedAt": "2026-11-06T06:52:08.254Z",
       "files": [
         {
           "path": "pdf/core_set_campaign_cards.pdf",
@@ -14554,6 +14554,78 @@
           "url": "https://images.cardgame.tools/lotr/MEC70-136-back-Quest-Exploring_Gundabad-The_Upper_Levels-A-Mount_Gundabad.jpg",
           "sha256": "b0a1be5be6dd6e9ee84891e09301c4d35801e0e912ded86f0dd7261ef22e9a06",
           "bytes": 957566
+        },
+        {
+          "path": "pictures/19137.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC70-135b-front-Quest-Exploring_Gundabad-The_Lower_Deeps-AC-Mount_Gundabad.jpg",
+          "sha256": "b6c63a5fd22519850749065d56522e8334f609e9276533e66472b97367efe52c",
+          "bytes": 987378
+        },
+        {
+          "path": "pictures/19137.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC70-137-back-Quest-Exploring_Gundabad-The_Lower_Deeps-AC-Mount_Gundabad.jpg",
+          "sha256": "0f75ec2a36bcf8b5d3945fd9849307455717fc23f8fdeed8140ae5524dbe0c81",
+          "bytes": 973041
+        },
+        {
+          "path": "pictures/19138.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC70-135c-front-Quest-Exploring_Gundabad-Frenzied_Warrens-AD-Mount_Gundabad.jpg",
+          "sha256": "b6c63a5fd22519850749065d56522e8334f609e9276533e66472b97367efe52c",
+          "bytes": 987378
+        },
+        {
+          "path": "pictures/19138.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC70-138-back-Quest-Exploring_Gundabad-Frenzied_Warrens-AD-Mount_Gundabad.jpg",
+          "sha256": "fff513e2fd00ce3e1d4dd96043f5b06887b0f8f910d08caefe6e8eb72b12152b",
+          "bytes": 959880
+        },
+        {
+          "path": "pictures/19139.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC70-135d-front-Quest-Exploring_Gundabad-Dagnirs_Wrath-AE-Mount_Gundabad.jpg",
+          "sha256": "b6c63a5fd22519850749065d56522e8334f609e9276533e66472b97367efe52c",
+          "bytes": 987378
+        },
+        {
+          "path": "pictures/19139.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC70-139-back-Quest-Exploring_Gundabad-Dagnirs_Wrath-AE-Mount_Gundabad.jpg",
+          "sha256": "b04fc9339a960547e86e9807360259e7feaa8d45b95344b26491f7503073166b",
+          "bytes": 977937
+        },
+        {
+          "path": "pictures/19140.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC70-135e-front-Quest-Exploring_Gundabad-Foreboding_Darkness-AF-Mount_Gundabad.jpg",
+          "sha256": "b6c63a5fd22519850749065d56522e8334f609e9276533e66472b97367efe52c",
+          "bytes": 987378
+        },
+        {
+          "path": "pictures/19140.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC70-140-back-Quest-Exploring_Gundabad-Foreboding_Darkness-AF-Mount_Gundabad.jpg",
+          "sha256": "9d4384ad86f227b80c63210737296dafcb1bf35641b1d93c0e05fb8ae4b2c750",
+          "bytes": 958988
+        },
+        {
+          "path": "pictures/19141.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC70-135f-front-Quest-Exploring_Gundabad-Imminent_Pursuit-AG-Mount_Gundabad.jpg",
+          "sha256": "b6c63a5fd22519850749065d56522e8334f609e9276533e66472b97367efe52c",
+          "bytes": 987378
+        },
+        {
+          "path": "pictures/19141.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC70-141-back-Quest-Exploring_Gundabad-Imminent_Pursuit-AG-Mount_Gundabad.jpg",
+          "sha256": "b3d8efad85c234d1c7553fc9d6996bbf7d07333354fd83c3d16790415ff62a70",
+          "bytes": 952938
+        },
+        {
+          "path": "pictures/19142.A.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC70-135g-front-Quest-Exploring_Gundabad-The_Great_Worm-AH-Mount_Gundabad.jpg",
+          "sha256": "b6c63a5fd22519850749065d56522e8334f609e9276533e66472b97367efe52c",
+          "bytes": 987378
+        },
+        {
+          "path": "pictures/19142.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC70-142-back-Quest-Exploring_Gundabad-The_Great_Worm-AH-Mount_Gundabad.jpg",
+          "sha256": "a3a3836fe9da3734b93b8adbf36bdb29b15ee14f1b4d2e83ae071c6a1961dd4f",
+          "bytes": 946797
         },
         {
           "path": "pictures/19143.A.jpg",

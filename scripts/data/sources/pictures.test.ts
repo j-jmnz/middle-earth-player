@@ -74,12 +74,10 @@ describe("pictures", () => {
     // The MEC109 printings whose wording differs keep their scan (MEC109_CHANGED). Navigation (11084) is a rules card of The Grey Havens that
     // neither JvZijp nor cardgame.tools carries.
     // Ered Mithrin: no source pictures the Campaign Expansion's own cards (cardgame.tools' MEC115 stops at the encounter cards, JvZijp's Drive holds
-    // none of a campaign expansion's cards), and Mount Gundabad's stage 2 cards 19137 to 19142, whose shared front and own backs the sources file under
-    // other numbers (cardgame.tools lists all seven under 135, JvZijp numbers the backs one up): those keep their scan.
+    // none of a campaign expansion's cards): those keep their scan.
     // The Campaign Expansion's 40 cards, by code (120165 is the Journey Up the Anduin campaign card; the rest are 12166 to 12204).
     const emce = ["120165", ...Array.from({ length: 39 }, (_, at) => String(12166 + at))];
-    // Pinning 19137 to 19142 needs their cardgame.tools pages (MEC70-137 to 142 backs, the shared 135 front) fetched: `pnpm data:sync pictures`.
-    const unpictured = new Set([...MEC109_CHANGED, "11084", ...emce, "19137", "19138", "19139", "19140", "19141", "19142"]);
+    const unpictured = new Set([...MEC109_CHANGED, "11084", ...emce]);
     const missing: string[] = [];
     for (const id of readdirSync(path.join(DATA_DIR, "scenarios")).filter((file) => file.endsWith(".json")).map((file) => file.slice(0, -".json".length))) {
       const scenario = loadScenario(id);

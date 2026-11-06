@@ -99,14 +99,13 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
   const familial = familyCondition(state, condition, scope, ctx);
   if (familial !== null) return familial;
   switch (condition.kind) {
-    // The south family's condition hook answers noneDiscarded (families/south/damage.ts) before this switch; the case only completes it.
+    // A family's condition hook answers these before this switch (south: noneDiscarded, families/south/damage.ts; wilderland: the campaign log's lines and treasures, the Caves deck, the quest deck and Discover, families/wilderland/index.ts); the cases only complete the switch.
     case "noneDiscarded":
-      return false;
-    // The wilderland family's condition hook answers the campaign log's lines and treasures (families/wilderland/index.ts); the case only completes the switch.
     case "logged":
     case "treasuresLogged":
     case "beldisBox":
     case "cavesDeck":
+    case "questDeck":
     case "discoverUnavailable":
       return false;
     case "hideFailed":

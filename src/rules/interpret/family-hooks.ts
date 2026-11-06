@@ -51,6 +51,7 @@ type Hooked = {
   readonly forced: readonly RulesFamily[];
   readonly unpayable: readonly RulesFamily[];
   readonly play: readonly RulesFamily[];
+  readonly revealed: readonly RulesFamily[];
   readonly pick: readonly RulesFamily[];
   readonly condition: readonly RulesFamily[];
   readonly amount: readonly RulesFamily[];
@@ -70,6 +71,7 @@ function hooked(families: readonly RulesFamily[]): Hooked {
       forced: families.filter((family) => family.travel?.forced != null),
       unpayable: families.filter((family) => family.travel?.unpayable != null),
       play: families.filter((family) => family.play != null),
+      revealed: families.filter((family) => family.revealed != null),
       pick: families.filter((family) => family.pick != null),
       condition: families.filter((family) => family.condition != null),
       amount: families.filter((family) => family.amount != null),
@@ -158,9 +160,16 @@ export function familyTravelUnpayable(state: ScenarioState, instruction: Instruc
 }
 
 /** Whether some family bars the card from being played or put into play. */
-export function familyPlayBarred(state: ScenarioState, cardId: string, ctx: ReduceContext, families: readonly RulesFamily[] = active()): boolean {
-  for (const family of hooked(families).play) if (family.play?.(state, cardId, ctx) === true) return true;
+export function familyPlayBarred(state: ScenarioState, cardId: string, ctx: ReduceContext, families: readonly RulesFamily[] = active(), putting = false): boolean {
+  for (const family of hooked(families).play) if (family.play?.(state, cardId, ctx, putting) === true) return true;
   return false;
+}
+
+/** A card was revealed: each family that notes reveals returns the state it leaves (families/wilderland/rounds.ts notes the first treachery of the round). */
+export function familyRevealed(state: ScenarioState, cardId: string, ctx: ReduceContext, families: readonly RulesFamily[] = active()): ScenarioState {
+  let next = state;
+  for (const family of hooked(families).revealed) next = family.revealed?.(next, cardId, ctx) ?? next;
+  return next;
 }
 
 /** Whether some family bars the seat from optionally engaging the enemy in the staging area. */

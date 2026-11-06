@@ -205,8 +205,10 @@ export const SCENARIO_TEMPLATES: readonly Template[] = [
     id: "leaves-play-players-lose",
     pattern: /^If (?:the )?(.+?) leaves play, the players lose(?: the game)?\.$/,
     build: (match, context) => {
-      if (unlabelledBlocked(context, "triggered")) return null;
       const name = match[1] ?? "";
+      // "If attached hero leaves play, the players lose the game" (Wormsbane, 19143:A:3): the attachment's host is the card, so its hero holds the flag the engine reads as the hero is destroyed.
+      if (name === "attached hero") return unlabelledBlocked(context, "constant") ? null : [{ timing: "constant", instructions: [{ verb: "ModifyStat", stat: "lossOnLeavingPlay", amount: 1, until: "whileSourceInPlay", target: "host" }] }];
+      if (unlabelledBlocked(context, "triggered")) return null;
       const subject = name === "{self}" ? ("self" as const) : { type: "card" as const, control: "any" as const, names: [name] };
       return [{ timing: "triggered", trigger: "leftPlay", subject, instructions: [{ verb: "LoseGame" }] }];
     },

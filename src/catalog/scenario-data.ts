@@ -334,13 +334,15 @@ export function campaignScenario(data: ScenarioData): ScenarioData {
 // A stage that names LookAtStages (11016:B:3) carries the number of stages it looks at as its `look`.
 // A stage that names CatchUpWins (12013:B:3) carries the Stormcaller's stage number that makes its defeat a win as its `catchUp`.
 // A stage that names AdvanceToRandomStage (19048:B:2) carries the stages it proceeds to, in a random order, as its `randomNext`.
-function stageOf(code: string, effects: readonly Effect[]): { code: string; branch?: string[]; look?: number; catchUp?: number; randomNext?: { codes: string[]; otherwise?: string; remove?: true } } {
+// A stage that names FlipAtQuestPhase (19135:A:2) is a stage of a quest deck (`deck`): it is not flipped when revealed.
+function stageOf(code: string, effects: readonly Effect[]): { code: string; branch?: string[]; look?: number; catchUp?: number; randomNext?: { codes: string[]; otherwise?: string; remove?: true }; deck?: true } {
   const branch = recordInstructions(effects, code, "forced").find((instruction) => instruction.verb === "BranchStage");
   const look = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "LookAtStages");
   const catchUp = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "CatchUpWins");
   const random = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).find((instruction) => instruction.verb === "AdvanceToRandomStage");
   const randomNext = random?.verb === "AdvanceToRandomStage" ? { codes: random.codes, ...(random.otherwise != null ? { otherwise: random.otherwise } : {}), ...(random.remove ? { remove: true as const } : {}) } : undefined;
-  return { code, ...(randomNext ? { randomNext } : {}), ...(branch?.verb === "BranchStage" ? { branch: branch.codes } : {}), ...(look?.verb === "LookAtStages" ? { look: look.count } : {}), ...(catchUp?.verb === "CatchUpWins" ? { catchUp: catchUp.stage } : {}) };
+  const deck = effects.filter((effect) => effect.cardCode === code).flatMap((effect) => effect.instructions).some((instruction) => instruction.verb === "FlipAtQuestPhase");
+  return { code, ...(randomNext ? { randomNext } : {}), ...(deck ? { deck: true as const } : {}), ...(branch?.verb === "BranchStage" ? { branch: branch.codes } : {}), ...(look?.verb === "LookAtStages" ? { look: look.count } : {}), ...(catchUp?.verb === "CatchUpWins" ? { catchUp: catchUp.stage } : {}) };
 }
 
 export function scenarioDefinition(data: ScenarioData, campaign: CampaignData, effects: readonly Effect[] = []): ScenarioDefinition {

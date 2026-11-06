@@ -41,7 +41,10 @@ export type TravelHooks = {
 };
 
 /** Whether a family bars playing a card, or putting it into play (`putting`), from the hand or by an effect: true bars it. Asked after the core's own bars. */
-export type PlayHook = (state: ScenarioState, cardId: string, ctx: ReduceContext) => boolean;
+export type PlayHook = (state: ScenarioState, cardId: string, ctx: ReduceContext, putting: boolean) => boolean;
+
+/** A family's note of an encounter card as it is revealed (the reveal frame's first step, before its When Revealed effects): returns a new state, or the same object. */
+export type RevealHook = (state: ScenarioState, cardId: string, ctx: ReduceContext) => ScenarioState;
 
 /** A filter predicate of a family: false takes the card out of the pick, true leaves the other predicates to decide. Runs after the core's. */
 export type PickHook = (state: ScenarioState, id: string, spec: PickSpec, at: PickContext, ctx: ReduceContext) => boolean;
@@ -82,5 +85,6 @@ export type RulesFamily = {
   readonly attached?: AttachedHook;
   readonly combat?: CombatHooks;
   readonly play?: PlayHook;
+  readonly revealed?: RevealHook;
   readonly optionalEngage?: OptionalEngageHook;
 };

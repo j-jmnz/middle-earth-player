@@ -2,7 +2,7 @@
 // The Ghost of Framsburg in the Ered Mithrin campaign: it is the seventh part, its campaign card names the Setup the campaign deals, and a standalone game plays the scenario with none of it. The six earlier parts' real Resolutions (Journey Up the Anduin's, Lost in Mirkwood's, The
 // King's Quest's, The Withered Heath's, Roam Across Rhovanion's and Fire in the Night's golden wins, applied one after the other to a blank log) are what reaches it: the allies in a player's pool or their lines, the burdens, Misplaced Trust or Urdug's Cunning, the copies of encounter
 // cards the pool tallies, the Accolade and Song boons, the treasures discovered, all through the Campaign Setup Checklist, whose Isolde and Beldis removals this part adds. Winning this part runs its Resolution (Gundabad Hunter or Gundabad Stalker and one of the first 2 Hazard cards
-// discarded in the pool, the treasures the players control discovered) and unlocks Mount Gundabad, which is coming soon; a loss writes nothing.
+// discarded in the pool, the treasures the players control discovered) and unlocks Mount Gundabad; a loss writes nothing.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../../../effects/index.ts";
@@ -135,7 +135,7 @@ describe("The Ghost of Framsburg in the ered-mithrin campaign", { timeout: 60_00
     expect(where(state, CODES.theCursedTomb)[0]).toMatchObject({ zone: "setAside" });
   });
 
-  it("writes Gundabad Hunter or Stalker, the Hazard card and the treasure to the campaign when won, keeps the earlier parts' pool and unlocks Mount Gundabad, which is coming soon", () => {
+  it("writes Gundabad Hunter or Stalker, the Hazard card and the treasure to the campaign when won, keeps the earlier parts' pool and unlocks Mount Gundabad", () => {
     // Two-handed, after the earlier parts, a treasure attached to Fram's Shade and claimed: the earlier pool stays and the Hunter joins it.
     const win = golden("two-handed, won, after the earlier parts, Urdug's Cunning");
     const state = playGolden(win, ctx).state;
@@ -149,11 +149,12 @@ describe("The Ghost of Framsburg in the ered-mithrin campaign", { timeout: 60_00
     expect(log.treasures).toEqual(expect.arrayContaining([...before.treasures]));
     expect(Object.keys(log.encounterPool ?? {}).length).toBeGreaterThanOrEqual(Object.keys(before.encounterPool ?? {}).length);
     expect(log.allyLines).toEqual(before.allyLines);
-    // The path now offers the eighth part next: Mount Gundabad, which the app cannot deal yet.
+    // The path now offers the eighth part next: Mount Gundabad.
     const path = campaignPath(campaign, {}, log);
     expect(path.slice(0, 8).map((node) => [node.id, node.status === "completed"])).toEqual([...campaign.scenarios.slice(0, 7).map((id) => [id, true]), [nextPartId(campaign, framsburg.id), false]]);
     expect(path[7]?.status).toBe(nextPartStatus(campaign, framsburg.id));
     expect(nextStep(path, null)).toMatchObject({ node: { id: "mount-gundabad" } });
+    expect(nextPartStatus(campaign, framsburg.id)).toBe("current");
     // Gundabad Stalker for the pool, the Hazard card a burden: both burdens join the pool.
     const both = golden("true solo, Easy, won, Melanwar's and Isolde's lines, a burden");
     const bothState = playGolden(both, ctx).state;

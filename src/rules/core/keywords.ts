@@ -167,6 +167,14 @@ export function playerCardEffectCanChoose(printed: PrintedCard, state?: Scenario
   return !printed.keywords.immuneToPlayerCardEffects;
 }
 
+/** Whether an effect from `sourceId` is an encounter card effect: a card that is neither a player card nor a quest or campaign card (a quest card's effect is not an encounter card's, "Unique locations cannot be discarded from play by encounter card effects", 12193:B:1). */
+export function isEncounterCardEffect(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, sourceId: string | null): boolean {
+  const source = sourceId ? state.cards[sourceId] : undefined;
+  if (!source || isPlayerCardEffect(state, cards, sourceId)) return false;
+  const type = printedOf(cards, source.code).type;
+  return type !== "quest" && type !== "campaign";
+}
+
 /** Whether an effect from `sourceId` is a player card effect: a player card without an encounter back, or no card at all (a choice a player makes). An ally with an encounter back is an encounter card and has encounter card effects (dcce.encounter-cards). */
 export function isPlayerCardEffect(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, sourceId: string | null): boolean {
   const source = sourceId ? state.cards[sourceId] : undefined;
@@ -194,6 +202,8 @@ export function placeDamage(state: ScenarioState, assigned: string, amount: numb
   // "Cannot take damage" is lost by Goblin Chieftain while the stage says so (41007:B:1); combat damage dealt to an attacking enemy is canceled
   // by Lightless Passage's Shadow (41033:A:2).
   if ((flagged(state, id, "cannotTakeDamage") && !flagged(state, id, "losesNoDamage")) || (source !== "combat" && flagged(state, id, "cannotTakeNonCombatDamage"))) return state;
+  // "Cannot take damage from non-quest effects" (19127:A:1): the damage of a combat or of a quest card's effect is still placed.
+  if (source !== "combat" && source !== "quest" && flagged(state, id, "cannotTakeNonQuestDamage")) return state;
   if (source === "combat" && flagged(state, id, "combatDamageCanceled")) return state;
   // "When attached enemy would take any amount of damage, cancel all of that damage. Then, discard Dragon Scales" (18059:A:2).
   const scaled = flagged(state, id, "cancelsDamage") ? cancelAllDamage(state, id, amount) : null;
@@ -370,7 +380,8 @@ export function destroyCard(
   steps.push({ kind: "destroy", targetId: id });
   if (cardTypeOf(instance, printed) === "ally" && inPlay(instance.zone)) next = queueEvent(next, { trigger: "allyLeftPlay", seat: instance.controller, subject: id });
   next = discardedFromPlay(next, instance, byDamage);
-  if (printed.leavesPlayLoses) next = markLoss(next, `${printed.name} left play`);
+  // "If attached hero leaves play, the players lose the game" (19143:A:3): the hero holds the flag while Wormsbane is attached to it.
+  if (printed.leavesPlayLoses || flagged(state, id, "lossOnLeavingPlay")) next = markLoss(next, `${printed.name} left play`);
   return eliminateEmpties(next, steps);
 }
 
@@ -399,7 +410,7 @@ export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string,
       const wasInPlay = inPlay(current.zone);
       const dest: Destination = fromEncounterDeck(printed) ? { zone: "encounterDiscard" } : { zone: "discard", seat: current.owner ?? index };
       next = moveCard(next, card.id, dest);
-      if (wasInPlay && printed.leavesPlayLoses) next = markLoss(next, `${printed.name} left play`);
+      if (wasInPlay && (printed.leavesPlayLoses || flagged(state, card.id, "lossOnLeavingPlay"))) next = markLoss(next, `${printed.name} left play`);
     }
     // The action window between two steps of that attack closes with it.
     if (next.pendingAttack?.seat === index) {

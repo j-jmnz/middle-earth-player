@@ -99,6 +99,12 @@ export const RECORDS: readonly Effect[] = [
   // 12192 Gundabad Stalker (burden). A player can optionally engage it only while a unique enemy is engaged with them. The Shadow: a unique attacker returns to the staging area after this attack.
   {"id":"12192:constant:1","cardCode":"12192","lines":["12192:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"optionalEngageUnique","amount":1,"until":"whileSourceInPlay","target":"self"}]},
   {"id":"12192:shadow:1","cardCode":"12192","lines":["12192:A:2"],"timing":"shadow","instructions":[{"verb":"AfterAttack","when":{"kind":"matches","card":"attacker","pick":{"type":"enemy","control":"any","unique":true}},"instructions":[{"verb":"ReturnToStaging","target":{"kind":"self"}}]}]},
+
+  // 12194 Dragon-sickness (burden treachery; Surge is a keyword). When Revealed: it attaches to a character with a treasure attached (the first player chooses) and every treasure in play with nothing guarding it is attached to that character. It counts as a Condition attachment; Forced: after the attached
+  // character exhausts, its controller raises their threat by 1 for each treasure attached to it (families/wilderland/gundabad-cards.ts).
+  {"id":"12194:whenRevealed:1","cardCode":"12194","lines":["12194:A:2"],"timing":"whenRevealed","instructions":[{"verb":"Pick","pick":{"type":"character","control":"any","who":"firstPlayer","hasAttachment":{"treasure":true}}},{"verb":"AttachSelfToPicked"},{"verb":"AttachTreasuresToHost"}]},
+  {"id":"12194:constant:1","cardCode":"12194","lines":["12194:A:2"],"timing":"constant","instructions":[{"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]},
+  {"id":"12194:forced:1","cardCode":"12194","lines":["12194:A:2"],"timing":"forced","trigger":"exhausted","subject":"host","instructions":[{"verb":"RaiseThreat","amount":{"count":{"type":"card","control":"any","cardType":"treasure","attachedTo":"host"}},"who":"hostController"}]},
 ];
 
 export const REPLACES: readonly string[] = [];

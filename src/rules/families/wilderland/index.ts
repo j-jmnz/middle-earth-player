@@ -12,7 +12,7 @@ import { replaceFromCaves, resolveDeep } from "./deep.ts";
 import { addToStagingWithResources, arrangeCaves, attachSearched, attachSelfToPicked, cancelStrike, guardPickedAttachment, guardWithDeckTop, putOnPileBottom, returnHeld } from "./kings.ts";
 import { attachLootFromDiscard, discover, discoverUnavailable, resolveDiscover } from "./discover.ts";
 import { arrangeLookedDeck, attachGuardedFromPile, discardOtherLooked, exhaustOrDamageEachReady, immediateAttackBy, removeSetAsideDamage, shuffleSetAsideIntoPile, victoryWhenFree } from "./heath.ts";
-import { logCondition } from "./log.ts";
+import { logCondition, logFacts } from "./log.ts";
 import { NIGHT_COMBAT, attackStage, beldisBoxLeft, defeatFullSideQuests, excessToStage, makeCurrentQuest, markBeldisUse, revealSideQuest } from "./night.ts";
 import { attachRandomTreasure, claimRandomTreasure } from "./treasure.ts";
 import { wilderlandAmount } from "./amounts.ts";
@@ -21,6 +21,9 @@ import { wilderlandPickMatches } from "./pick.ts";
 import { optionalEngageBarred } from "./engage.ts";
 import { setAsideDiscardForPool } from "./discard-pool.ts";
 import { flipOver } from "./flip.ts";
+import { bypassStage, flipCurrentQuest, flipInPlace, searchQuestDeck } from "./gundabad.ts";
+import { activateFromCaves, attachTreasuresToHost, stageRandomDiscarded } from "./gundabad-cards.ts";
+import { noteTreacheryReveal, phasePlaysBarred } from "./rounds.ts";
 import { advanceToRandomStage, claimFreed, flipToEnemySide, guardReturnedBy, putTrust } from "./rhovanion.ts";
 import { addSourceToHandOfMost } from "./hand.ts";
 import { advanceToLetterStage, grantSurge, freeTreasures, searchGuardForTreasure, takeControlOfSetAside } from "./mirkwood.ts";
@@ -143,6 +146,22 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return makeCurrentQuest(state, instruction, ctx);
     case "MarkBeldisUse":
       return markBeldisUse(state, focus);
+    case "FlipCurrentQuest":
+      return flipCurrentQuest(state);
+    case "BypassStage":
+      return bypassStage(state, focus, ctx, steps);
+    case "SearchQuestDeck":
+      return searchQuestDeck(state, instruction, focus, ctx, steps);
+    case "FlipInPlace":
+      return flipInPlace(state, instruction);
+    case "ActivateFromCaves":
+      return activateFromCaves(state, instruction, focus, ctx, steps);
+    case "StageRandomDiscarded":
+      return stageRandomDiscarded(state, instruction, focus, ctx);
+    case "AttachTreasuresToHost":
+      return attachTreasuresToHost(state, focus, ctx, steps);
+    case "FlipAtQuestPhase":
+    case "LimitPlaysPerPhase":
     case "Loot":
     case "Undiscardable":
     case "ClaimWhenFree":
@@ -180,7 +199,8 @@ function condition(state: ScenarioState, found: Condition, scope: { actor: numbe
   if (found.kind === "discoverUnavailable") return discoverUnavailable(state, ctx);
   if (found.kind === "beldisBox") return beldisBoxLeft(state, scope.actor);
   if (found.kind === "cavesDeck") return pileOf(state, "cavesDeck").length >= (found.min ?? 1);
-  return logCondition(found, state.campaignFacts);
+  if (found.kind === "questDeck") return state.questDeck.length >= (found.min ?? 1);
+  return logCondition(found, logFacts(state));
 }
 
 export const manifest: RulesFamily = {
@@ -189,9 +209,11 @@ export const manifest: RulesFamily = {
   amount: wilderlandAmount,
   pick: wilderlandPickMatches,
   optionalEngage: optionalEngageBarred,
+  play: phasePlaysBarred,
+  revealed: noteTreacheryReveal,
   combat: NIGHT_COMBAT,
   // The Evil Creatures deck runs out: its own discard pile is shuffled back into it at once (emce.evil-creatures-deck).
   settle: { after: (state) => refillEvilCreatures(state), sweep: (state, ctx, steps) => defeatFullSideQuests(claimFreed(victoryWhenFree(returnHeld(clearNemesis(freeTreasures(controlFreedObjectives(state, ctx), ctx, steps), ctx), ctx), ctx, steps), ctx, steps), ctx, steps) },
-  verbs: ["AttachRandomTreasure", "ClaimRandomTreasure", "SetAsideDiscardForPool", "FlipOver", "AddSourceToHandOfMost", "DiscoverTreasure", "BoonAllyOrLogLine", "AddEncounterToPool", "RemoveFromPool", "RemoveFromEncounterDeckIfLogged", "ShufflePile", "ShuffleIntoPile", "AddFromPile", "ShufflePileIntoEncounterDeck", "Deep", "Discover", "Loot", "Undiscardable", "GainControlWhenFree", "IgnoreKeyword", "AdvanceToLetterStage", "TakeControlOfSetAside", "SearchGuardForTreasure", "GrantSurgeToSubject", "DiscardToPoolFromSets", "PutObjectiveLocationAfterDiscard", "CarryAwayHero", "ReleaseGuardedHero", "DiscardGuardedHeroes", "PlaceHandUnderLocation", "ReturnFacedownToHands", "DiscardFacedownUnder", "SearchNemesis", "NemesisAttacks", "AddToStagingWithResources", "ReplaceFromCaves", "ArrangeCaves", "PutOnPileBottom", "AttachSelfToPicked", "AttachSearched", "GuardPickedAttachment", "GuardWithDeckTop", "ReturnGuardedToHand", "CancelStrike", "ShuffleSetAsideIntoPile", "RemoveSetAsideDamage", "AttachGuardedFromPile", "VictoryWhenFree", "UncancelableWhenRevealed", "DiscardOtherLooked", "ArrangeLookedDeck", "ImmediateAttackBy", "ExhaustOrDamageEachReady", "SearchBoonAllyToHand", "RemoveFromCavesIfLogged", "ChooseRandomTreasure", "AdvanceToRandomStage", "FlipToEnemySide", "PutTrust", "ClaimWhenFree", "GuardReturnedBy", "ChooseStagedLocationForPool", "RevealSideQuest", "AttackStage", "ExcessToStage", "MakeCurrentQuest", "MarkBeldisUse", "ResolveDiscover", "AttachLootFromDiscard", "ChooseHazardForPool"],
+  verbs: ["AttachRandomTreasure", "ClaimRandomTreasure", "SetAsideDiscardForPool", "FlipOver", "AddSourceToHandOfMost", "DiscoverTreasure", "BoonAllyOrLogLine", "AddEncounterToPool", "RemoveFromPool", "RemoveFromEncounterDeckIfLogged", "ShufflePile", "ShuffleIntoPile", "AddFromPile", "ShufflePileIntoEncounterDeck", "Deep", "Discover", "Loot", "Undiscardable", "GainControlWhenFree", "IgnoreKeyword", "AdvanceToLetterStage", "TakeControlOfSetAside", "SearchGuardForTreasure", "GrantSurgeToSubject", "DiscardToPoolFromSets", "PutObjectiveLocationAfterDiscard", "CarryAwayHero", "ReleaseGuardedHero", "DiscardGuardedHeroes", "PlaceHandUnderLocation", "ReturnFacedownToHands", "DiscardFacedownUnder", "SearchNemesis", "NemesisAttacks", "AddToStagingWithResources", "ReplaceFromCaves", "ArrangeCaves", "PutOnPileBottom", "AttachSelfToPicked", "AttachSearched", "GuardPickedAttachment", "GuardWithDeckTop", "ReturnGuardedToHand", "CancelStrike", "ShuffleSetAsideIntoPile", "RemoveSetAsideDamage", "AttachGuardedFromPile", "VictoryWhenFree", "UncancelableWhenRevealed", "DiscardOtherLooked", "ArrangeLookedDeck", "ImmediateAttackBy", "ExhaustOrDamageEachReady", "SearchBoonAllyToHand", "RemoveFromCavesIfLogged", "ChooseRandomTreasure", "AdvanceToRandomStage", "FlipToEnemySide", "PutTrust", "ClaimWhenFree", "GuardReturnedBy", "ChooseStagedLocationForPool", "RevealSideQuest", "AttackStage", "ExcessToStage", "MakeCurrentQuest", "MarkBeldisUse", "ResolveDiscover", "AttachLootFromDiscard", "ChooseHazardForPool", "FlipAtQuestPhase", "FlipCurrentQuest", "BypassStage", "SearchQuestDeck", "FlipInPlace", "LimitPlaysPerPhase", "ActivateFromCaves", "StageRandomDiscarded", "AttachTreasuresToHost"],
   run,
 };

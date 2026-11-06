@@ -231,6 +231,7 @@ export function inPlay(zone: ZoneName): boolean {
 
 export function modifierActive(state: ScenarioState, modifier: Modifier): boolean {
   if (modifier.until === "whileSourceInVictory") return state.cards[modifier.sourceId]?.zone === "victory";
+  if (modifier.until === "whileSourceActive") return state.activeLocation === modifier.sourceId || state.secondActiveLocation === modifier.sourceId;
   if (modifier.until !== "whileSourceInPlay") return true;
   const source = state.cards[modifier.sourceId];
   return source != null && inPlay(source.zone);

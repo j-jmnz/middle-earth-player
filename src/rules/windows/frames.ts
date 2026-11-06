@@ -21,6 +21,7 @@ import { discardsAfterReveal } from "../families/sidequests/encounter.ts";
 import { stagingDest } from "../families/breaking/areas.ts";
 import { grapplesOnReveal, pushGrapple } from "../families/grapple/attach.ts";
 import { skipLoot } from "../families/wilderland/loot.ts";
+import { familyRevealed } from "../interpret/family-hooks.ts";
 
 // A frame that waits for a player lives on state.stack. settle advances the top one
 // until it pops or opens a window.
@@ -131,6 +132,8 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
       if (frame.data.guards && next.cards[frame.data.guards] && inPlay(next.cards[frame.data.guards]?.zone ?? "removed")) next = updateCard(attachTo(next, id, frame.data.guards), id, { guard: true });
       steps.push({ kind: "reveal", seat, cardId: id, cause: currentCause(steps, ruleCause("mec109.saga-staging-rules")) });
       if (printed.keywords.peril) next = { ...next, perilSeat: seat };
+      // The families that note a reveal (the first treachery of the round, families/wilderland/rounds.ts) hear it before the card's own effects.
+      next = familyRevealed(next, id, ctx);
       // The lasting effects that watch the reveals act on the card; one may discard it, ending its staging.
       next = watchReveal(next, frame, ctx, steps);
       if (next.stack.length < state.stack.length) return next;

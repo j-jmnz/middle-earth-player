@@ -67,7 +67,9 @@ const VERBS = [
   // 11017:B:3). The scenario definition copies `count` onto the stage (`stages[i].look`), and a quest with one advances in the order of its
   // quest deck (rules/quest/quest.ts): off-course, to the top stage; on-course, the first player chooses one of the top `count` stages (the choice
   // runs this record, so a choice is a frame like any other) and the others go to the bottom. Defeating the last stage wins the game.
-  z.strictObject({ verb: z.literal("LookAtStages"), count: z.number().int().min(2) }),
+  // With `bottom` (Mount Gundabad, 19134:B:1 and 19140:B:2: "look at the top 2 cards of the quest deck and choose 1 to place on the bottom of the quest deck"), the stage chosen goes to the bottom of the deck and the others stay on top in their order, and the
+  // quest advances to the top stage; the choice is asked of every quest, on-course or not, since the stage defeated has no heading.
+  z.strictObject({ verb: z.literal("LookAtStages"), count: z.number().int().min(2), bottom: z.literal(true).optional() }),
   // Removes `amount` progress tokens from the current quest card, no more than it holds ("Remove 4 progress tokens from the current quest
   // card. (If there are fewer than 4 progress tokens on the quest, remove all progress tokens from that quest.)", 01086:A:1; "remove 1
   // progress token from the current quest", 01111:A:1). RemoveQuestProgress counts progress per player instead.

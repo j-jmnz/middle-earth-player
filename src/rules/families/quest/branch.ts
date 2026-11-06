@@ -52,7 +52,8 @@ export function reached(state: ScenarioState, code: string): ScenarioState {
 // in the scenario's order. Its card instance, now out of play. A quest that jumped past stages (AdvanceToStage, Lost in Mirkwood's
 // letters) names the stage it left (`stageLeft`).
 export function defeatedBefore(state: ScenarioState, newId: string): string | undefined {
-  if (state.stageLeft?.to === newId) return state.stageLeft.from;
+  // A stage that was bypassed was not defeated (emce.bypassing): no Forced effect of "when this stage is defeated" hears it.
+  if (state.stageLeft?.to === newId) return state.stageLeft.bypassed ? undefined : state.stageLeft.from;
   return orderBefore(state, newId);
 }
 

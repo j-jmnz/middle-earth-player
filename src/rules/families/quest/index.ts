@@ -23,7 +23,7 @@ import type { Focus } from "../index.ts";
 import { lowerCardThreat, makeActive, moveProgress, removeProgressFromQuest } from "./places.ts";
 import { playerSource, raiseQuestThreat, resetThreat } from "./threat.ts";
 import { advanceStage } from "../../quest/quest.ts";
-import { keepStage, lookedStages, shuffleStages } from "./order.ts";
+import { bottomStage, keepStage, lookedStages, shuffleStages } from "./order.ts";
 import { restricted } from "../../interpret/restrictions.ts";
 import { afterProgress } from "../../quest/stage-reveal.ts";
 
@@ -91,7 +91,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 }
 
 // LookAtStages (families/quest/order.ts): the first player looks at the top stages of the quest deck and chooses the one the quest advances to; the
-// others go to the bottom of the deck. A deck of one stage goes without asking. Null outside the frame the defeated stage pushed.
+// others go to the bottom of the deck; with `bottom` (Mount Gundabad) the stage chosen goes to the bottom and the quest advances to the top of the deck. A deck of one stage goes without asking. Null outside the frame the defeated stage pushed.
 function lookAtStages(state: ScenarioState, instruction: Verb<"LookAtStages">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (state.stageChoice !== "asking") return state;
   const looked = lookedStages(state, instruction.count);
@@ -101,7 +101,7 @@ function lookAtStages(state: ScenarioState, instruction: Verb<"LookAtStages">, f
     return askTarget(state, { instruction, seat: focus.seat, chosen: null, cause }, looked);
   }
   const before = steps.length;
-  return afterProgress(advanceStage(keepStage(state, looked, chosen), ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length), before, ctx, steps);
+  return afterProgress(advanceStage(instruction.bottom ? bottomStage(state, chosen) : keepStage(state, looked, chosen), ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length), before, ctx, steps);
 }
 
 function withModifier(state: ScenarioState, modifier: Modifier): ScenarioState {

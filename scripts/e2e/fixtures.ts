@@ -70,6 +70,7 @@ import { heathFixtures } from "./the-withered-heath.ts";
 import { rhovanionFixtures } from "./roam-across-rhovanion.ts";
 import { nightFixtures } from "./fire-in-the-night.ts";
 import { framsburgFixtures } from "./the-ghost-of-framsburg.ts";
+import { gundabadFixtures } from "./mount-gundabad.ts";
 import { FIXTURE_REGISTRY, fixtureFile, type FixtureName, type FixtureScenarioId } from "../../src/campaign/fixtures/registry.ts";
 import { createLog, runScript } from "../log.ts";
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
@@ -383,6 +384,7 @@ const WRITERS: Record<Chained, (written: Written) => Promise<object> | object> =
   "roam-across-rhovanion": () => rhovanionFixtures(),
   "fire-in-the-night": () => nightFixtures(),
   "the-ghost-of-framsburg": () => framsburgFixtures(),
+  "mount-gundabad": () => gundabadFixtures(),
 };
 
 // The won game is open: no legal win of the two starter decks has been found on this engine (docs/phases/STATUS.md), so

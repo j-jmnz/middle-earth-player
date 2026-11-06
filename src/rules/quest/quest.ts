@@ -25,7 +25,7 @@ import { branchFrom, reached as reachedStage } from "../families/quest/branch.ts
 import { randomStageFrom } from "../families/wilderland/random-stage.ts";
 import { viewOf, withView } from "../families/breaking/areas.ts";
 import { oweDiscards } from "../families/breaking/progress.ts";
-import { orderedNext, stageToVictory } from "../families/quest/order.ts";
+import { arrivalFace, orderedNext, stageToVictory } from "../families/quest/order.ts";
 import { caughtUp } from "../families/stormcaller/values.ts";
 import { islandTravelTo } from "../families/island/travel.ts";
 import { hasSideQuests, placeOnCurrentSideQuest } from "../families/wilderland/night-quest.ts";
@@ -274,9 +274,9 @@ export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineSt
     // The defeated quest card leaves play: the cards attached to it hear it and are discarded (rr.attachment-cards).
     next = releaseAttachments(noteHostDefeated(next, currentId), currentId, cards, steps);
     next = moveCard(next, currentId, { zone: stageToVictory(next, cards, current.code) ? "victory" : rolled?.remove ? "removed" : "setAside" });
-    if (rolled) next = { ...next, stageLeft: { to: nextId, from: currentId } };
+    if (rolled || (ordered && next.stages.some((stage) => stage.deck === true))) next = { ...next, stageLeft: { to: nextId, from: currentId } };
     next = moveCard(next, nextId, { zone: "questStage" });
-    next = updateCard(next, nextId, { face: "B" });
+    next = updateCard(next, nextId, { face: arrivalFace(next, nextCode) });
     if (next.stageChoice) next = withoutStageChoice(next);
     if (nextCode) next = reachedStage(next, nextCode);
     steps.push({ kind: "advance", cardId: nextId });

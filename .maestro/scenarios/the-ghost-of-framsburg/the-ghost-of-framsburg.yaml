@@ -21,10 +21,9 @@ tags:
 - assertVisible:
     id: pool
     text: ".*Misplaced Trust.*"
-# The win unlocks Mount Gundabad, which the app cannot deal yet, so the path stops there and its node reads Coming soon (scripts/checks/maestro.test.ts, path-soon).
+# The win unlocks Mount Gundabad, whose node reads Next (scripts/checks/maestro.test.ts, path-soon).
 - assertVisible:
     id: node-mount-gundabad-status
-    text: "Coming soon"
-- assertVisible:
+    text: "Next"
+- assertNotVisible:
     id: path-soon
-    text: "Mount Gundabad is coming soon."

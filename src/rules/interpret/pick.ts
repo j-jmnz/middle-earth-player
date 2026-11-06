@@ -223,6 +223,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
       if (want.trait && !hasTrait(state, attachmentId, want.trait, ctx)) return false;
       if (want.names && !want.names.includes(printedOf(ctx.cards, attachment.code).name)) return false;
       if (want.playerCard && !isPlayerType(printedOf(ctx.cards, attachment.code))) return false;
+      if (want.treasure && printedOf(ctx.cards, attachment.code).type !== "treasure") return false;
       return true;
     });
     if (want.none ? found : !found) return false;

@@ -23,7 +23,6 @@ export const GENERATED_EFFECTS: readonly Effect[] = [
   {"id":"19098:constant:1","cardCode":"19098","lines":["19098:A:1"],"timing":"constant","condition":{"kind":"sourceIn","zone":"play"},"instructions":[{"verb":"Restrict","what":"attach","exceptTrait":"objective"}]},
   {"id":"19143:constant:1","cardCode":"19143","lines":["19143:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"hero"}}]},
   {"id":"19143:constant:2","cardCode":"19143","lines":["19143:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"whileSourceInPlay","target":"host"}]},
-  {"id":"19143:triggered:1","cardCode":"19143","lines":["19143:A:3"],"timing":"triggered","trigger":"leftPlay","subject":{"type":"card","control":"any","names":["attached hero"]},"instructions":[{"verb":"LoseGame"}]},
+  {"id":"19143:constant:3","cardCode":"19143","lines":["19143:A:3"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"lossOnLeavingPlay","amount":1,"until":"whileSourceInPlay","target":"host"}]},
   {"id":"19144:constant:1","cardCode":"19144","lines":["19144:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"hero"}}]},
-  {"id":"19144:triggered:1","cardCode":"19144","lines":["19144:A:3"],"timing":"triggered","trigger":"leftPlay","subject":{"type":"card","control":"any","names":["attached hero"]},"instructions":[{"verb":"LoseGame"}]},
 ];

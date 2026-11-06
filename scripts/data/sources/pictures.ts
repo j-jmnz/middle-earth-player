@@ -82,6 +82,10 @@ export const PDF_PAGES: readonly { code: string; side: ScanSide; pdf: string; pa
 // wording differs keep their scan. Messenger of the King Allies is not on cardgame.tools.
 const PRODUCT_OF_PACK: Readonly<Record<string, string>> = { OHaUH: "MEC16", OtD: "MEC24", TFotR: "MEC109" };
 
+// cardgame.tools files Mount Gundabad's seven Exploring Gundabad stage 2s under one number (135, fronts 135a to 135g) and their backs under the
+// numbers 136 to 142; the printings number the stage 2s 135 and 137 to 142. A printing filed under another number names it here.
+const FILED_UNDER: Readonly<Record<string, string>> = { "MG 135": "135a", "MG 137": "135b", "MG 138": "135c", "MG 139": "135d", "MG 140": "135e", "MG 141": "135f", "MG 142": "135g" };
+
 export type Product = { code: string; name: string; type: string };
 
 // A Nightmare deck carries the name of the pack it is for ("The Black Riders"); the pack is the product of the other type.
@@ -107,7 +111,8 @@ export function cardgameToolsFile(
 ): string | null {
   for (const printing of card.printings) {
     const product = productOfPack.get(printing.pack);
-    const row = product && printing.number != null ? rows.get(`${product} ${printing.number}`) : undefined;
+    const number = printing.number == null ? null : (FILED_UNDER[`${printing.pack} ${printing.number}`] ?? printing.number);
+    const row = product && number != null ? rows.get(`${product} ${number}`) : undefined;
     if (!row || !lettersOf(row.slug).includes(lettersOf(card.name))) continue;
     return side === "A" ? row.front : row.back;
   }
@@ -131,7 +136,14 @@ function cardgameTools(file: string): { rows: Map<string, CardgameToolsRow>; pro
       FrontImageUrl: string;
       BackImageUrl: string | null;
     }[];
-    return { rows: new Map(rows.map((row) => [`${row.ProductCode} ${row.Number}`, { slug: row.CardSlug, front: row.FrontImageUrl, back: row.BackImageUrl }])), products };
+    // A front lettered after its number (MEC70-135b-front-...) is also filed under that lettered number.
+    const lettered = (row: (typeof rows)[number]) => /^[^-]+-(\d+[a-z])-front-/.exec(row.FrontImageUrl)?.[1] ?? row.Number;
+    const entries = rows.flatMap((row) => {
+      const value = { slug: row.CardSlug, front: row.FrontImageUrl, back: row.BackImageUrl };
+      const letter = lettered(row);
+      return letter === row.Number ? [[`${row.ProductCode} ${row.Number}`, value] as const] : [[`${row.ProductCode} ${row.Number}`, value] as const, [`${row.ProductCode} ${letter}`, value] as const];
+    });
+    return { rows: new Map(entries), products };
   } finally {
     database.close();
   }

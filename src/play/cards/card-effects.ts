@@ -151,6 +151,7 @@ const UNTIL: Readonly<Record<ModifierUntil, string>> = {
   endOfRound: "until the end of the round",
   endOfAttack: "until the end of the attack",
   whileSourceInPlay: "while it is in play",
+  whileSourceActive: "while it is the active location",
   whileSourceInVictory: "while it is in the victory display",
   endOfGame: "for the rest of the game",
 };
