@@ -1,6 +1,6 @@
 # Claude Code
 
-The rules for every session are in `.claude/rules/authority.md`. Read it. Any session or agent that changes code also reads `.claude/rules/code-standards.md` and follows it; one that changes a doc, `docs/phases/STATUS.md` or an agent file follows `.claude/rules/docs-standards.md` (current state only, no history logs). The README, `docs/brief.md`, and `docs/architecture.md` win over anything here.
+The rules for every session are in `.claude/rules/authority.md`. Read it. Any session or agent that changes code also reads `.claude/rules/code-standards.md` and follows it; one that changes a doc, `docs/phases/STATUS.md` or an agent file follows `.claude/rules/docs-standards.md` (current state only, no history logs). Every commit follows `.claude/rules/commit-standards.md` (`<type>: <summary>` with type fix, feat, refactor, style or repo; branches land on `main` squashed). The README, `docs/brief.md`, and `docs/architecture.md` win over anything here.
 
 Find docs through `docs/INDEX.md`: every file an agent reads, its size, the heading tree of the long ones with line ranges, and the sections each code area cites. Read a section, not a whole file: `pnpm docs:section <file> "<heading>"` (for example `pnpm docs:section brief "Core round"`). After changing a doc's headings or a doc citation in code, run `pnpm docs:index`; a test fails while the index is stale or a citation names no heading.
 

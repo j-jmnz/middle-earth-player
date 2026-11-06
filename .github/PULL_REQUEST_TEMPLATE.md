@@ -1,3 +1,5 @@
+<!-- Title: `<type>: <summary>` (fix, feat, refactor, style or repo), at most 72 characters. It becomes the squash commit on main (.claude/rules/commit-standards.md). -->
+
 ## What and why
 
 <!-- What changed, and why. Link the issue it closes. -->

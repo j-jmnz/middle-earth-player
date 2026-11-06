@@ -103,7 +103,7 @@ Every scenario phase follows it. A phase file names only what its own cards add.
 - Keep a handover file at `docs/handover/<F>.md`: what is done, what is in progress, design decisions, next steps, and the
   lines still open, enough for a fresh agent to continue.
 - After each meaningful step (a mechanic implemented with its tests passing, a batch of records written), commit on your
-  worktree branch with a `WIP <F>: ...` message (restore `src/effects/open-lines.ts` first), handover file included. If
+  worktree branch with a typed checkpoint message (`.claude/rules/commit-standards.md`, Squash; restore `src/effects/open-lines.ts` first), handover file included. If
   you sense you are running long, checkpoint first. Then push the worktree branch to GitHub (the user allows extra
   branches): `git push -u origin HEAD:refs/heads/wip/<F>`, retrying on network errors (2s, 4s, 8s, 16s). Never push to
   `<BASE>` or `main`. Your final commit deletes `docs/handover/<F>.md`.
@@ -125,7 +125,7 @@ change) says, and never kill processes you did not start (no `pkill`).
 
 ## Merge
 
-The main session squashes each branch into `<BASE>`, regenerates `src/effects/open-lines.ts` after the last merge, and
+The main session squashes each branch into `<BASE>` (`git merge --squash`, one message per `.claude/rules/commit-standards.md`), regenerates `src/effects/open-lines.ts` after the last merge, and
 reduces duplicates between branches (two definitions of one helper become one). Expect it to merge in the order it chooses,
 so: keep shared-file edits small so they apply cleanly in any order; do not depend on another assignment's unmerged code;
 say in your report exactly what you changed in each shared file, so the merge can be checked against it.
@@ -133,7 +133,7 @@ say in your report exactly what you changed in each shared file, so the merge ca
 ## Commit
 
 - Before committing, restore the burn-down list: `git checkout src/effects/open-lines.ts` (the main session regenerates it).
-- Commit on your worktree branch with a message describing the mechanics added. End the message with exactly the attribution
+- Commit on your worktree branch with a message that follows `.claude/rules/commit-standards.md` and describes the mechanics added. End the message with exactly the attribution
   lines your session's instructions give (`Co-Authored-By` and `Claude-Session`). Do not put model names elsewhere in the message.
 - Push to `wip/<F>` as above. Do not push to `<BASE>` or `main`.
 
