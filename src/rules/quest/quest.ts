@@ -29,6 +29,7 @@ import { orderedNext, stageToVictory } from "../families/quest/order.ts";
 import { caughtUp } from "../families/stormcaller/values.ts";
 import { islandTravelTo } from "../families/island/travel.ts";
 import { hasSideQuests, placeOnCurrentSideQuest } from "../families/wilderland/night-quest.ts";
+import { familyOptionalEngageBarred } from "../interpret/family-hooks.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -330,7 +331,7 @@ export function stagingLocations(state: ScenarioState, cards: Cards, seat?: numb
 export function optionalEnemies(state: ScenarioState, cards: Cards, seat?: number): string[] {
   const acting = seat ?? state.activeSeat;
   if (flagged(state, "table", "cannotBeOptionallyEngaged")) return [];
-  return stagingEnemies(state, cards, acting).filter((id) => !flagged(state, id, "cannotBeEngaged") && !flagged(state, id, "cannotBeOptionallyEngaged") && !engagementBarred(state, id, acting, "engage"));
+  return stagingEnemies(state, cards, acting).filter((id) => !flagged(state, id, "cannotBeEngaged") && !flagged(state, id, "cannotBeOptionallyEngaged") && !engagementBarred(state, id, acting, "engage") && !familyOptionalEngageBarred(state, id, acting, cards));
 }
 
 // The enemies in the staging area; with `seat`, once stages are separate, in that seat's staging area (families/breaking/areas.ts).

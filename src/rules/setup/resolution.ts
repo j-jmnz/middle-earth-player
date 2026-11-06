@@ -15,6 +15,7 @@ import { inPlay, livingSeats, type ScenarioState } from "../core/state.ts";
 import { discardToPoolFromSets } from "../families/wilderland/mirkwood.ts";
 import { addEncounterCards, allyOrLineOptions, applyAllyOrLine, applyRemoval, applyStagedLocation, discoverTreasures, noteRemovalAnswer, playerOptions, removalOptions, removeEncounterCards, stagedLocationOptions } from "../families/wilderland/pool.ts";
 import { drawTreasures } from "../families/wilderland/treasure.ts";
+import { applyHazard, discardHazards, hazardOptions } from "../families/wilderland/hazards.ts";
 
 // A won scenario runs the campaign card's Resolution instructions in order. An instruction that opens a choice asks
 // one seat at a time, first player first; the rest settle on their own from the final state (Lust for the Ring
@@ -23,11 +24,11 @@ import { drawTreasures } from "../families/wilderland/treasure.ts";
 export const SKIP = "skip";
 
 // The instructions that open a window for the players: a card to take, a captive to name, a boon ally or its log line (BoonAllyOrLogLine), a card of the pool to remove (RemoveFromPool with a choice).
-export type Choosing = Extract<Instruction, { verb: "ChooseCards" | "NameCaptives" | "BoonAllyOrLogLine" | "RemoveFromPool" | "ChooseRandomTreasure" | "ChooseStagedLocationForPool" }>;
+export type Choosing = Extract<Instruction, { verb: "ChooseCards" | "NameCaptives" | "BoonAllyOrLogLine" | "RemoveFromPool" | "ChooseRandomTreasure" | "ChooseStagedLocationForPool" | "ChooseHazardForPool" }>;
 
 /** Whether the Resolution instruction asks the players: a card to take, a captive to name, a boon ally or its log line, a card of the pool to remove (a RemoveFromPool with no choice settles at once). */
 export function asksPlayers(instruction: Instruction | undefined): instruction is Choosing {
-  return instruction?.verb === "ChooseCards" || instruction?.verb === "NameCaptives" || instruction?.verb === "BoonAllyOrLogLine" || instruction?.verb === "ChooseRandomTreasure" || instruction?.verb === "ChooseStagedLocationForPool" || (instruction?.verb === "RemoveFromPool" && instruction.choice != null);
+  return instruction?.verb === "ChooseCards" || instruction?.verb === "NameCaptives" || instruction?.verb === "BoonAllyOrLogLine" || instruction?.verb === "ChooseRandomTreasure" || instruction?.verb === "ChooseHazardForPool" || instruction?.verb === "ChooseStagedLocationForPool" || (instruction?.verb === "RemoveFromPool" && instruction.choice != null);
 }
 
 function seatOrder(state: ScenarioState): number[] {
@@ -40,7 +41,7 @@ function seatsFor(state: ScenarioState, instruction: Choosing): number[] {
   const order = seatOrder(state);
   // The group answers a boon ally's offer through its first player; a removal from the pool is each player's, first player first.
   if (instruction.verb === "NameCaptives" || instruction.verb === "RemoveFromPool" || instruction.verb === "ChooseStagedLocationForPool") return order;
-  if (instruction.verb === "BoonAllyOrLogLine" || instruction.verb === "ChooseRandomTreasure") return order.slice(0, 1);
+  if (instruction.verb === "BoonAllyOrLogLine" || instruction.verb === "ChooseRandomTreasure" || instruction.verb === "ChooseHazardForPool") return order.slice(0, 1);
   return instruction.who === "firstPlayer" ? order.slice(0, 1) : order;
 }
 
@@ -191,6 +192,19 @@ export function advanceResolution(state: ScenarioState, ctx: ReduceContext): Sce
         const seat = seatsFor(offered, instruction)[0] ?? offered.firstPlayer;
         return { ...offered, stack: [], perilSeat: null, window: { kind: "resolution" as const, step: offered.resolutionAt, seat }, activeSeat: seat, passed: [] };
       }
+      case "ChooseHazardForPool": {
+        // The discard pile is shuffled in and the Hazard cards discarded once, as the choice opens: the group (the first player answering) chooses among them, and with one card to take there is nothing to choose.
+        const discarded = discardHazards(next, instruction.count, ctx);
+        const options = hazardOptions(discarded.state, discarded.hazards, ctx);
+        if (options.length <= 1) {
+          const only = options[0];
+          next = stepOver(discarded.state, only ? applyHazard(discarded.state, only, next.resolutionAt) : undefined);
+          break;
+        }
+        const offered = { ...discarded.state, resolutionOffer: options };
+        const seat = seatsFor(offered, instruction)[0] ?? offered.firstPlayer;
+        return { ...offered, stack: [], perilSeat: null, window: { kind: "resolution" as const, step: offered.resolutionAt, seat }, activeSeat: seat, passed: [] };
+      }
       case "ChooseCards":
       case "ChooseStagedLocationForPool":
       case "BoonAllyOrLogLine":
@@ -238,7 +252,7 @@ function resolutionOptions(state: ScenarioState, instruction: Choosing, seat: nu
   }
   if (instruction.verb === "BoonAllyOrLogLine") return allyOrLineOptions(state, instruction);
   if (instruction.verb === "ChooseStagedLocationForPool") return stagedLocationOptions(state, ctx);
-  if (instruction.verb === "ChooseRandomTreasure") return [...(state.resolutionOffer ?? [])];
+  if (instruction.verb === "ChooseRandomTreasure" || instruction.verb === "ChooseHazardForPool") return [...(state.resolutionOffer ?? [])];
   if (instruction.verb === "RemoveFromPool") {
     const removable = removalOptions(state, ctx);
     return removable.length === 0 ? [] : [...removable, SKIP];
@@ -298,6 +312,8 @@ export function applyResolution(state: ScenarioState, optionId: string): Scenari
   } else if (instruction.verb === "ChooseStagedLocationForPool") {
     // A copy of the location joins the pool's encounter cards (12184:B:4); the next player's options leave it out.
     log = applyStagedLocation(state, optionId, seat);
+  } else if (instruction.verb === "ChooseHazardForPool") {
+    log = applyHazard(state, optionId, step);
   } else if (instruction.verb === "ChooseRandomTreasure") {
     // The treasure is attached to a character and the players control it: the next line discovers it (the scenario is over, so which character is not asked).
     log = { ...log, treasures: [...new Set([...(log.treasures ?? []), optionId])] };

@@ -64,6 +64,9 @@ export type CombatHooks = {
   readonly undefended?: (state: ScenarioState, candidates: () => readonly string[], cards: ReadonlyMap<string, PrintedCard>) => readonly string[];
 };
 
+/** Whether a family bars a seat from optionally engaging an enemy in the staging area (rr.optional-engagement): true bars it. Asked after the core's own bars, with the cards the game plays. */
+export type OptionalEngageHook = (state: ScenarioState, enemyId: string, seat: number, cards: ReadonlyMap<string, PrintedCard>) => boolean;
+
 export type RulesFamily = {
   /** The folder name, which is also the catalog file name in src/catalog/families. */
   readonly name: string;
@@ -79,4 +82,5 @@ export type RulesFamily = {
   readonly attached?: AttachedHook;
   readonly combat?: CombatHooks;
   readonly play?: PlayHook;
+  readonly optionalEngage?: OptionalEngageHook;
 };

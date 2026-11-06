@@ -1,4 +1,4 @@
-// Rules: emce.evil-creatures-deck, rr.victory (data/rules/entries.json); ledger lines 18066:B:3, 18026:A:1, 18074:B:1, 18075:B:2, 18076:B:1, 19049:B:1, 19049:B:3, 19050:B:1. The wilderland family's pick filters: a card dealt into the Evil Creatures deck (`fromDeck`), and a card in a hand that player card effects cannot discard
+// Rules: emce.evil-creatures-deck, rr.victory (data/rules/entries.json); ledger lines 12191:A:1, 19098:A:2, 18066:B:3, 18026:A:1, 18074:B:1, 18075:B:2, 18076:B:1, 19049:B:1, 19049:B:3, 19050:B:1. The wilderland family's pick filters: a card dealt into the Evil Creatures deck (`fromDeck`), and a card in a hand that player card effects cannot discard
 // (the constant verb Undiscardable) when the pick feeds a discard.
 import type { PickSpec } from "../../../catalog/boundary.ts";
 
@@ -24,6 +24,8 @@ export function wilderlandPickMatches(state: ScenarioState, id: string, spec: Pi
   const card = state.cards[id];
   if (!card) return true;
   if (spec.fromDeck != null && card.deck !== spec.fromDeck) return false;
+  // The Loot objectives (the constant verb Loot): the Ghost of Framsburg counts those the players control (19097:A:2, 19098:A:2, 19109:B:1).
+  if (spec.lootKeyword && !constantVerbCodes(ctx, "Loot").has(card.code)) return false;
   if (spec.objectiveLocation && !printedOf(ctx.cards, card.code).objectiveLocation) return false;
   if (spec.guardsObjectiveLocation) {
     const host = card.host ? state.cards[card.host] : undefined;

@@ -88,6 +88,17 @@ export const RECORDS: readonly Effect[] = [
   {"id":"12204:constant:1","cardCode":"12204","lines":["12204:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"character"}}]},
   {"id":"12204:constant:2","cardCode":"12204","lines":["12204:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"attack","amount":1,"until":"whileSourceInPlay","target":"host"},{"verb":"ModifyStat","stat":"ranged","amount":1,"until":"whileSourceInPlay","target":"host"}]},
   {"id":"12204:response:1","cardCode":"12204","lines":["12204:A:3"],"timing":"response","trigger":"attackDestroyed","subject":"host","condition":{"kind":"canPick","pick":{"type":"location","control":"any","stagingOnly":true}},"instructions":[{"verb":"Pick","pick":{"type":"location","control":"any","stagingOnly":true}},{"verb":"PlaceProgressOn","amount":1,"target":"picked"}]},
+
+  // 12190 Ashen Brazier (boon objective, Loot). It enters play only through the Discover keyword; once nothing guards it the first player claims it and attaches it to a hero. Action: exhaust it to look at a facedown shadow card.
+  {"id":"12190:constant:1","cardCode":"12190","lines":["12190:A:1"],"timing":"constant","instructions":[{"verb":"Loot"}]},
+  {"id":"12190:constant:2","cardCode":"12190","lines":["12190:A:2"],"timing":"constant","instructions":[{"verb":"ClaimWhenFree"}]},
+  {"id":"12190:action:1","cardCode":"12190","lines":["12190:A:3"],"timing":"action","cost":{"kind":"exhaustSelf"},"condition":{"kind":"canPick","pick":{"type":"enemy","control":"any","facedownShadow":true}},"instructions":[{"verb":"Pick","pick":{"type":"enemy","control":"any","facedownShadow":true}},{"verb":"LookAtShadow","target":"picked"}]},
+  // 12191 Gundabad Hunter (burden). When Revealed: the first player chooses a player engaged with a unique enemy, if able, and Gundabad Hunter makes an immediate attack against that player. The Shadow: a unique attacker makes an additional attack after this one.
+  {"id":"12191:whenRevealed:1","cardCode":"12191","lines":["12191:A:1"],"timing":"whenRevealed","instructions":[{"verb":"Pick","pick":{"type":"player","control":"any","engagedWithUnique":true,"who":"firstPlayer"}},{"verb":"SwitchActor","to":"picked","when":{"kind":"canPick","pick":{"type":"player","control":"any","engagedWithUnique":true}}},{"verb":"AttackFromStaging","target":"self","when":{"kind":"canPick","pick":{"type":"player","control":"any","engagedWithUnique":true}}}]},
+  {"id":"12191:shadow:1","cardCode":"12191","lines":["12191:A:2"],"timing":"shadow","instructions":[{"verb":"AfterAttack","when":{"kind":"matches","card":"attacker","pick":{"type":"enemy","control":"any","unique":true}},"instructions":[{"verb":"ImmediateAttack","shadow":false}]}]},
+  // 12192 Gundabad Stalker (burden). A player can optionally engage it only while a unique enemy is engaged with them. The Shadow: a unique attacker returns to the staging area after this attack.
+  {"id":"12192:constant:1","cardCode":"12192","lines":["12192:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"optionalEngageUnique","amount":1,"until":"whileSourceInPlay","target":"self"}]},
+  {"id":"12192:shadow:1","cardCode":"12192","lines":["12192:A:2"],"timing":"shadow","instructions":[{"verb":"AfterAttack","when":{"kind":"matches","card":"attacker","pick":{"type":"enemy","control":"any","unique":true}},"instructions":[{"verb":"ReturnToStaging","target":{"kind":"self"}}]}]},
 ];
 
 export const REPLACES: readonly string[] = [];

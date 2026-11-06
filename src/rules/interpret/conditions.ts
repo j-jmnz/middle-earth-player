@@ -107,6 +107,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     case "treasuresLogged":
     case "beldisBox":
     case "cavesDeck":
+    case "discoverUnavailable":
       return false;
     case "hideFailed":
       return state.hideFailures.some(
@@ -479,7 +480,7 @@ export function outOfPlayChoices(state: ScenarioState, code: string): string[] {
 
 export function searchable(
   state: ScenarioState,
-  selector: { code?: string; trait?: string; type?: string },
+  selector: { code?: string; trait?: string; type?: string; nonUnique?: boolean },
   ctx: ReduceContext,
   zones: readonly ("encounterDeck" | "encounterDiscard")[] = ["encounterDeck", "encounterDiscard"],
 ): string[] {
@@ -491,7 +492,7 @@ export function searchable(
       const printed = printedOf(ctx.cards, instance.code);
       if (selector.code != null && printed.code !== selector.code) continue;
       if (selector.trait != null && !printed.traits.includes(selector.trait)) continue;
-      if (selector.type != null && printed.type !== selector.type) continue;
+      if ((selector.type != null && printed.type !== selector.type) || (selector.nonUnique === true && printed.isUnique)) continue;
       found.push(id);
     }
   }

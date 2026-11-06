@@ -6,7 +6,8 @@
 // placed on a card.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
-import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
+import { currentCause, UNATTRIBUTED, type Cause } from "../../core/cause.ts";
+import { gameReadsOnTrigger } from "../../core/game-reads.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
@@ -15,6 +16,7 @@ import type { ScenarioState } from "../../core/state.ts";
 import { flagged, inPlay, updateCard, withMode } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { listens } from "../encounter/reveal.ts";
+import { isPlayerType, printedOf } from "../../core/printed.ts";
 
 // The quest phase ends at once (141064:A:2): the staging step reveals no more cards, the committed characters stay exhausted but
 // are no longer committed, and the quest is not resolved, so no progress is placed and no threat is raised. The cards already
@@ -57,17 +59,27 @@ export function removeAllQuestProgress(state: ScenarioState, steps: EngineStep[]
 // The steps this call of settle has already looked at, per step list.
 const SEEN = new WeakMap<object, number>();
 
+// The seat of the player who placed progress: the owner of the player card whose effect did it ("a player places any amount of progress", 19102:A:2). Progress the quest placed, or an encounter card's effect, has no player.
+function placingSeat(state: ScenarioState, cause: Cause, ctx: ReduceContext): number | null {
+  if (!("effect" in cause)) return null;
+  const code = ctx.effects.find((effect) => effect.id === cause.effect)?.cardCode;
+  const card = Object.values(state.cards).find((item) => item.code === code && (item.owner ?? item.controller) != null);
+  return card && isPlayerType(printedOf(ctx.cards, card.code)) ? (card.owner ?? card.controller ?? null) : null;
+}
+
 // "After any amount of progress is placed on ~" (141061:A:2): every step that placed progress on a card that is still in play is
 // announced once, when some card hears it. A location the progress explored has left play and hears nothing.
 export function announceProgress(state: ScenarioState, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
   const from = Math.min(SEEN.get(steps) ?? 0, steps.length);
   SEEN.set(steps, steps.length);
   if (steps.length === from || !listens(state, ctx, "progressPlaced")) return state;
+  // The player who placed the progress is told only to a card that asks for it (`eventSeat`, 19102:A:2); every other game announces it with no seat.
+  const reads = gameReadsOnTrigger(state, ctx, "progressPlaced", '"eventSeat"');
   let next = state;
   for (const step of steps.slice(from)) {
     if (step.kind !== "progress" || step.amount <= 0) continue;
     const card = next.cards[step.targetId];
-    if (card && inPlay(card.zone)) next = queueEvent(next, { trigger: "progressPlaced", seat: null, cardId: step.targetId });
+    if (card && inPlay(card.zone)) next = queueEvent(next, { trigger: "progressPlaced", seat: reads ? placingSeat(next, step.cause, ctx) : null, cardId: step.targetId });
   }
   return next;
 }

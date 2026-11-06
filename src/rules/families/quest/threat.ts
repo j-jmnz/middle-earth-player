@@ -39,9 +39,14 @@ export function lowerThreatByEffect(state: ScenarioState, seat: number, amount: 
   // "Cannot be reduced by more than 1 each round" (11217:A:1, dcce.hard-expert): what the round has already taken off counts.
   const roundCap = heldAmount(state, `seat:${seat}`, "threatReductionCap");
   const capped = roundCap > 0 ? Math.max(0, Math.min(once, roundCap - (state.threatLoweredBy?.[seat] ?? 0))) : once;
+  // "Cannot be reduced by more than 1 via player card effects each round" (19104:A:2): only what player card effects took off counts, and only they are held to it.
+  const playerCap = player ? heldAmount(state, `seat:${seat}`, "playerThreatReductionCap") : 0;
+  const held = playerCap > 0 ? Math.max(0, Math.min(capped, playerCap - (state.playerThreatLoweredBy?.[seat] ?? 0))) : capped;
   const before = state.seats[seat]?.threat ?? 0;
-  const moved = lowerThreat(state, seat, capped, steps, cause);
-  const lowered = roundCap > 0 ? { ...moved, threatLoweredBy: { ...moved.threatLoweredBy, [seat]: (moved.threatLoweredBy?.[seat] ?? 0) + (before - (moved.seats[seat]?.threat ?? 0)) } } : moved;
+  const moved = lowerThreat(state, seat, held, steps, cause);
+  const taken = before - (moved.seats[seat]?.threat ?? 0);
+  const counted = roundCap > 0 ? { ...moved, threatLoweredBy: { ...moved.threatLoweredBy, [seat]: (moved.threatLoweredBy?.[seat] ?? 0) + taken } } : moved;
+  const lowered = playerCap > 0 ? { ...counted, playerThreatLoweredBy: { ...counted.playerThreatLoweredBy, [seat]: (counted.playerThreatLoweredBy?.[seat] ?? 0) + taken } } : counted;
   if ((lowered.seats[seat]?.threat ?? 0) >= before || !sourceId) return lowered;
   return queueHeard(lowered, ctx, { trigger: "threatLowered", seat, subject: sourceId });
 }

@@ -56,6 +56,7 @@ type Hooked = {
   readonly amount: readonly RulesFamily[];
   readonly attached: readonly RulesFamily[];
   readonly combat: readonly RulesFamily[];
+  readonly optionalEngage: readonly RulesFamily[];
 };
 const hookedBy = new WeakMap<readonly RulesFamily[], Hooked>();
 
@@ -74,6 +75,7 @@ function hooked(families: readonly RulesFamily[]): Hooked {
       amount: families.filter((family) => family.amount != null),
       attached: families.filter((family) => family.attached != null),
       combat: families.filter((family) => family.combat != null),
+      optionalEngage: families.filter((family) => family.optionalEngage != null),
     };
     hookedBy.set(families, found);
   }
@@ -158,6 +160,12 @@ export function familyTravelUnpayable(state: ScenarioState, instruction: Instruc
 /** Whether some family bars the card from being played or put into play. */
 export function familyPlayBarred(state: ScenarioState, cardId: string, ctx: ReduceContext, families: readonly RulesFamily[] = active()): boolean {
   for (const family of hooked(families).play) if (family.play?.(state, cardId, ctx) === true) return true;
+  return false;
+}
+
+/** Whether some family bars the seat from optionally engaging the enemy in the staging area. */
+export function familyOptionalEngageBarred(state: ScenarioState, enemyId: string, seat: number, cards: ReadonlyMap<string, PrintedCard>, families: readonly RulesFamily[] = active()): boolean {
+  for (const family of hooked(families).optionalEngage) if (family.optionalEngage?.(state, enemyId, seat, cards) === true) return true;
   return false;
 }
 

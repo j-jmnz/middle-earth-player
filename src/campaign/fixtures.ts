@@ -29,6 +29,7 @@ import kingsquestFixtures from "./fixtures/the-kings-quest.json";
 import heathFixtures from "./fixtures/the-withered-heath.json";
 import rhovanionFixtures from "./fixtures/roam-across-rhovanion.json";
 import nightFixtures from "./fixtures/fire-in-the-night.json";
+import framsburgFixtures from "./fixtures/the-ghost-of-framsburg.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -74,6 +75,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-withered-heath": heathFixtures,
   "roam-across-rhovanion": rhovanionFixtures,
   "fire-in-the-night": nightFixtures,
+  "the-ghost-of-framsburg": framsburgFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(

@@ -36,10 +36,10 @@ export function announceDraw(before: ScenarioState, after: ScenarioState, seat: 
   return got > 0 ? queueEvent(after, { trigger: "cardsDrawn", seat, amount: got }) : after;
 }
 
-// What a card was dealt and a seat was relieved of this round (the flags damageCap and threatReductionCap) lasts one round: the new round clears it.
+// What a card was dealt and a seat was relieved of this round (the flags damageCap, threatReductionCap and playerThreatReductionCap) lasts one round: the new round clears it.
 export function pruneRoundCaps(state: ScenarioState): ScenarioState {
-  if (state.roundDamage == null && state.threatLoweredBy == null) return state;
-  const { roundDamage: _damage, threatLoweredBy: _lowered, ...rest } = state;
+  if (state.roundDamage == null && state.threatLoweredBy == null && state.playerThreatLoweredBy == null) return state;
+  const { roundDamage: _damage, threatLoweredBy: _lowered, playerThreatLoweredBy: _player, ...rest } = state;
   return rest;
 }
 

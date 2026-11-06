@@ -141,6 +141,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("beldisBox") }),
   // The Caves deck (emce.caves-deck) holds at least `min` cards (1 by default): "look at the top 2 cards of the Caves deck" (18055:A:2). Read by the wilderland family; a game with no Caves deck holds none.
   z.strictObject({ kind: z.literal("cavesDeck"), min: z.number().int().positive().optional() }),
+  // The active location has no Discover keyword to resolve (none printed, or the keyword is ignored): "If they cannot, Abandoned Ruins gains surge and doomed 2" (19106:A:1; emce.discover). Read by the wilderland family.
+  z.strictObject({ kind: z.literal("discoverUnavailable") }),
   // A card with this code is attached to a hero (`is`) or is not.
   z.strictObject({ kind: z.literal("attachedToHero"), code: z.string().min(1), is: z.boolean() }),
   // Read while a stat is read, not when a constant effect is synced. `defending`: the holder is the declared defender

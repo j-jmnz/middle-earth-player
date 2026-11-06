@@ -21,6 +21,8 @@ function codeVerb<const Verb extends string>(name: Verb) {
 const searchSelector = {
   code: z.string().min(1).optional(),
   trait: z.string().min(1).optional(),
+  // A non-unique card ("searches the encounter deck and discard pile for a non-unique Undead enemy", 19111:A:1).
+  nonUnique: z.boolean().optional(),
   type: z.enum(["enemy", "location", "treachery", "objective"]).optional(),
 };
 

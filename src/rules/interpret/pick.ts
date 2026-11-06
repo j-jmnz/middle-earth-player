@@ -31,6 +31,7 @@ import { highestAttack } from "../families/sea/ramming.ts";
 import { chosenCopies, levelAmount } from "../families/aflame/values.ts";
 import { sidePickMatches } from "../families/grapple/values.ts";
 import { islandPool, outsideCells } from "../families/island/pick.ts";
+import { seatPickMatches } from "../families/wilderland/seat-pick.ts";
 
 // What a filter is read against: who is choosing or counting, the effect's source, what it has picked, its X, and the
 // characters of the attack a Response answers. `counting` reads every card that matches, immune ones too: a count or a
@@ -281,7 +282,7 @@ export function pickCandidates(
   event?: { subject?: string | null; other?: string | null; discards?: boolean },
 ): string[] {
   const asking = spec.who === "firstPlayer" ? state.firstPlayer : seat;
-  if (spec.type === "player") return seatsOf(state, spec, asking).filter((index) => !state.seats[index]?.eliminated).map((index) => `seat:${index}`);
+  if (spec.type === "player") return seatsOf(state, spec, asking).filter((index) => !state.seats[index]?.eliminated && seatPickMatches(state, index, spec, ctx)).map((index) => `seat:${index}`);
   if (spec.hostForPicked) {
     const code = state.cards[picked.at(-1) ?? ""]?.code;
     return code ? attachmentHostIds(state, asking, code, ctx) : [];

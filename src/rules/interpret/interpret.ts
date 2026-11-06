@@ -212,7 +212,12 @@ function placeOneProgress(state: ScenarioState, sourceId: string | null, steps: 
 
 // The enemy's shadow card, when it has none yet. `steps` hears the encounter deck being refilled for it.
 export function dealOneShadow(state: ScenarioState, enemyId: string, steps: EngineStep[]): ScenarioState {
-  return state.cards[enemyId]?.shadowId ? state : dealAdditionalShadow(state, enemyId, steps);
+  if (state.cards[enemyId]?.shadowId) return state;
+  const dealt = dealAdditionalShadow(state, enemyId, steps);
+  // "Deal it a number of shadow cards equal to ..." (the flag dealtShadows, 19098:A:3): the card above is the first, each other an additional one.
+  let next = dealt;
+  for (let more = heldAmount(dealt, enemyId, "dealtShadows") - 1; more > 0 && dealt.cards[enemyId]?.shadowId != null; more -= 1) next = dealAdditionalShadow(next, enemyId, steps);
+  return next;
 }
 
 // One more shadow card for an enemy, beside any it has (141069:A:2). With none yet it is simply its shadow card. An empty

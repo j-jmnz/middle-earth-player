@@ -51,7 +51,7 @@ export type ResolutionView =
       decline: ResolutionDecline | null;
       // `player`: the card is for a player, named by one of their heroes, and goes into their deck after the starting hand (11197:B:1).
       // `ally`: a boon ally for a player, or the log line instead (emce.boon-allies). `removal`: a card of the Campaign Pool a player may remove (12187:B:4). `location`: a location in the staging area a copy of which joins the pool (12184:B:4).
-      to: "pool" | "hand" | "hero" | "captive" | "player" | "ally" | "removal" | "treasure" | "location";
+      to: "pool" | "hand" | "hero" | "captive" | "player" | "ally" | "removal" | "treasure" | "location" | "hazard";
       // The choice is of Song boons (The Withered Heath, 12175:B:6): each player takes one, a Song only once.
       songs?: true;
     }
@@ -155,6 +155,9 @@ export function resolutionView(state: ScenarioState, world: World, logged: reado
   } else if (instruction.verb === "ChooseStagedLocationForPool") {
     noun = "location";
     eyebrow = "Choose a location from the staging area";
+  } else if (instruction.verb === "ChooseHazardForPool") {
+    noun = "Hazard card";
+    eyebrow = "Choose a Hazard card for the pool";
   } else if (instruction.verb === "ChooseRandomTreasure") {
     noun = "treasure";
     eyebrow = "Choose a treasure";
@@ -182,6 +185,11 @@ export function resolutionView(state: ScenarioState, world: World, logged: reado
     if (instruction.verb === "BoonAllyOrLogLine" && intent.optionId === LOG_LINE) {
       const words = ALLY_LINE_FACTS[instruction.line].words;
       return [{ optionId: LOG_LINE, code: null, name: words, hero: null, label: words, wide: true }];
+    }
+    if (instruction.verb === "ChooseHazardForPool") {
+      const code = state.cards[intent.optionId.slice(2)]?.code ?? "";
+      const name = nameOf(world, code);
+      return [{ optionId: intent.optionId, code, name, hero: null, label: name, tag: intent.optionId.startsWith("b:") ? "burden" : "encounter card" }];
     }
     if (instruction.verb === "ChooseStagedLocationForPool") return [{ optionId: intent.optionId, code: intent.optionId, name: nameOf(world, intent.optionId), hero: null, label: nameOf(world, intent.optionId) }];
     if (instruction.verb === "RemoveFromPool") return [removalTile(world, intent.optionId, tally, state.seatCount > 1 && removable.filter((code) => code === removalCode(intent.optionId)).length > 1)];
@@ -228,7 +236,7 @@ export function resolutionView(state: ScenarioState, world: World, logged: reado
     eyebrow,
     // A boon ally's offer is the first player's alone, and a table of several players is told whose (the first player token).
     ...(kingsBurden ? { joins: nameOf(world, "12174") } : {}),
-    seatLabel: (eachSeat || kingsBurden || instruction.verb === "BoonAllyOrLogLine" || instruction.verb === "ChooseRandomTreasure") && state.seatCount > 1 ? `Player ${window.seat + 1}${first} chooses` : null,
+    seatLabel: (eachSeat || kingsBurden || instruction.verb === "BoonAllyOrLogLine" || instruction.verb === "ChooseRandomTreasure" || instruction.verb === "ChooseHazardForPool") && state.seatCount > 1 ? `Player ${window.seat + 1}${first} chooses` : null,
     noun,
     ...(noun === "Song boon" ? { songs: true as const } : {}),
     ally: instruction.verb === "BoonAllyOrLogLine" ? nameOf(world, instruction.ally) : null,
@@ -236,7 +244,7 @@ export function resolutionView(state: ScenarioState, world: World, logged: reado
     answered,
     tiles,
     decline,
-    to: instruction.verb === "NameCaptives" ? "captive" : instruction.verb === "BoonAllyOrLogLine" ? "ally" : instruction.verb === "RemoveFromPool" ? "removal" : instruction.verb === "ChooseStagedLocationForPool" ? "location" : instruction.verb === "ChooseRandomTreasure" ? "treasure" : instruction.to,
+    to: instruction.verb === "NameCaptives" ? "captive" : instruction.verb === "BoonAllyOrLogLine" ? "ally" : instruction.verb === "RemoveFromPool" ? "removal" : instruction.verb === "ChooseStagedLocationForPool" ? "location" : instruction.verb === "ChooseRandomTreasure" ? "treasure" : instruction.verb === "ChooseHazardForPool" ? "hazard" : instruction.to,
   };
 }
 
@@ -266,6 +274,8 @@ export function choiceSentence(view: Extract<ResolutionView, { kind: "choosing" 
         : `\u201c${tile.name}\u201d is marked in the campaign log. ${view.ally ?? "The ally"} does not join the campaign pool. ${view.later ? `Later Setups remove from the encounter deck ${view.later}.` : ""}`.trim();
     case "location":
       return `A copy of ${tile.name} is added to the campaign pool as an encounter card. It is written in the campaign log and added to the encounter deck of every later scenario.`;
+    case "hazard":
+      return tile.tag === "burden" ? `${tile.name} is added to the campaign pool as a burden.` : `A copy of ${tile.name} is added to the campaign pool as an encounter card. It is written in the campaign log and added to the encounter deck of every later scenario.`;
     case "treasure":
       return `${tile.name} is discovered and recorded in the campaign log. The scenario is over, so it is not attached to a character.`;
     case "removal":
@@ -291,6 +301,8 @@ export function promptSentence(view: Extract<ResolutionView, { kind: "choosing" 
   }
   // The treasure of three random undiscovered ones (12175:B:7): the number now.
   if (view.to === "treasure") return `Choose 1 of the ${view.tiles.length} random undiscovered treasures${view.decline ? `, or tap ${view.decline.label}` : ""}. It is recorded as discovered when you confirm.`;
+  // The Hazard cards the Resolution discarded (12189:B:6): the group chooses one for the pool.
+  if (view.to === "hazard") return `Choose 1 of the ${view.tiles.length} Hazard cards discarded. It joins the campaign pool when you confirm.`;
   // A copy of a location of the staging area for the pool (12184:B:4): each player in turn, a different one if able.
   if (view.to === "location") return `Choose a location in the staging area.${view.seatCount > 1 ? " Each player chooses a different location if able." : ""} A copy of it joins the campaign pool when you confirm.`;
   // Each player may remove one non-burden card from the pool (12187:B:4), the first player first; a decline keeps the pool as it is.

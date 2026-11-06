@@ -231,6 +231,10 @@ export const pickSchema = z.strictObject({
   hasFacedownUnder: z.literal(true).optional(),
   facedownUnder: z.literal(true).optional(),
   nemesis: z.literal(true).optional(),
+  // The Ghost of Framsburg (ledger lines 19097:A:2, 19098:A:2, 19109:B:1, 12191:A:1; emce.loot). `lootKeyword`: an objective that prints the Loot keyword (its record has the constant verb Loot), "the Loot objectives the players control" with `controlled`.
+  // `engagedWithUnique` (with `type: player`): a player who has a unique enemy engaged with them ("Choose a player that is engaged with a unique enemy", 12191:A:1). Read by the wilderland family (src/rules/families/wilderland/pick.ts).
+  lootKeyword: z.literal(true).optional(),
+  engagedWithUnique: z.literal(true).optional(),
   // Roam Across Rhovanion's guards (ledger lines 19049:B:1, 19049:B:3, 19050:B:1, 19048:B:3, 19050:B:3). `guardsCard`: an encounter card that guards a card, as the guard of an objective or as the keeper of a player card held under it (Hobgoblin). `guardsNamed`: an encounter card attached
   // to the objective with this title as its guard. Read by the wilderland family (src/rules/families/wilderland/pick.ts).
   guardsCard: z.literal(true).optional(),

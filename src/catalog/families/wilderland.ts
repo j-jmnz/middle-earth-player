@@ -57,7 +57,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("IgnoreKeyword"), keywords: z.array(z.enum(["deep", "discover"])).min(1) }),
   // Forced on a location, trigger becameActive with subject self: the Discover X keyword (emce.discover; 19102:A, 19104:A, 19105:A). The first player looks at the top X cards of the encounter deck (the discard pile is shuffled into it when it holds fewer),
   // attaches one looked-at Loot objective to the active location as a guarded objective (the first player chooses among several), reveals a random looked-at card with the Hazard trait, and puts the rest in the encounter discard pile. Ignored while a card in play ignores the keyword.
-  z.strictObject({ verb: z.literal("Discover"), amount: positiveAmountSchema, ...when }),
+  // `afterTravel` is engine use: the keyword the travel step held back to resolve once the Responses to the travel are done (families/wilderland/discover.ts, so a Response such as Crypt Key's, 19094:A:3, comes before it).
+  z.strictObject({ verb: z.literal("Discover"), amount: positiveAmountSchema, afterTravel: z.literal(true).optional(), ...when }),
   // Constant on an objective, the Loot keyword (emce.loot; 19094:A, 19095:A, 19096:A): the card enters play only through the Discover keyword. One revealed from the encounter deck is discarded and another card is revealed (windows/frames.ts startReveal).
   z.strictObject({ verb: z.literal("Loot") }),
   // Constant on an objective: "The first player gains control of Haldan while he is free of encounters" (18070:A:1; rr.guarded). The objective stays in the staging area under its guard; once none is attached to it, it enters the first player's play area,
@@ -201,11 +202,24 @@ const VERBS = [
   z.strictObject({ verb: z.literal("MakeCurrentQuest"), card: z.string().min(1) }),
   // "Mark a use in the campaign log" (12188:A:1): the actor's box beside Beldis is marked (the log's four boxes for each player, emce.campaign-log). The Action's condition `beldisBox` says one is left. The log keeps it when the scenario is won.
   z.strictObject({ verb: z.literal("MarkBeldisUse") }),
+  // The Ghost of Framsburg (part 7, campaign card 12189; ledger lines 12189:B:6, 19101:A:2, 19106:A:1, 12191:A:1; emce.discover, emce.loot, emce.campaign-pool-encounter).
+  // "Each player resolves the Discover keyword of the active location in turn order" (19106:A:1): the actor, for the player in the keyword's first player, resolves the Discover keyword of the active location (its Discover value, with any adjustment): looks at the top cards, chooses a Loot objective to guard the location,
+  // reveals a random Hazard and discards the rest, exactly as emce.discover says. Nothing happens when the active location has no Discover keyword, or the keyword is ignored (the condition `discoverUnavailable` tells).
+  z.strictObject({ verb: z.literal("ResolveDiscover"), ...when }),
+  // "Then, attach a Loot objective in the encounter discard pile to that enemy as a guarded objective" (19101:A:2): after a DiscardUntil and a MoveEncounterCard put the enemy in the staging area, a Loot objective of the encounter discard pile (the first player chooses among several) is added to the staging area
+  // and the picked enemy guards it (rr.guarded). Nothing happens when no enemy was found or no Loot objective is in the discard pile.
+  z.strictObject({ verb: z.literal("AttachLootFromDiscard"), ...when }),
+  // Resolution: "Shuffle the encounter discard pile into the encounter deck and discard cards from the top until 2 Hazard cards are discarded. The players, as a group, must choose 1 of those cards and add it to the campaign pool" (12189:B:6; emce.campaign-pool-encounter): the discard
+  // pile is shuffled in, cards come off the top into the discard pile until `count` Hazard cards are among them (or the deck is empty), and the first player chooses for the group one of those Hazard cards: an encounter card joins the Campaign Pool's encounter cards, a burden joins the pool as a burden.
+  // Run by the Resolution (rules/setup/resolution.ts).
+  z.strictObject({ verb: z.literal("ChooseHazardForPool"), count: z.number().int().min(1), ...when }),
 ] as const;
 
 const TRIGGERS = [
   // About a side quest: it became the current quest at the beginning of the quest phase ("After Draw Her Fire becomes the current quest", 19066:A:2; emce.side-quests-in-play).
   "becameCurrentQuest",
+  // About a location: its Discover keyword was just resolved (emce.discover). The event's amount is 1 when a Hazard card was revealed by it, else 0 ("After resolving the Discover keyword on Hidden Staircase", 19103:A:3).
+  "discovered",
 ] as const;
 const FLAGS = [
   // On a character: the next damage it would be dealt cancels this many points of it, and the flag is spent ("The next time that character would be dealt damage this round, cancel 1 of that damage", 12166:A:2). Set with a ModifyStat that lasts
@@ -229,6 +243,14 @@ const FLAGS = [
   "defenseIgnored",
   // On an enemy: allies cannot be declared as attackers against it ("Allies cannot be declared as attackers against Dagnir", 19068:A:1). Read by canAttack (rules/combat/combat.ts).
   "alliesCannotAttack",
+  // On an enemy: it is dealt this many shadow cards where it is dealt one ("deal it a number of shadow cards equal to the number of Loot objectives the players control", 19098:A:3; to a minimum of 1). Read by dealOneShadow (rules/interpret/interpret.ts).
+  "dealtShadows",
+  // On a location: the adjustment a Response made to its Discover value this phase, positive or negative ("increase or decrease its Discover value by 1 before resolving it", 19094:A:3). Read by the Discover keyword (families/wilderland/discover.ts).
+  "discoverValue",
+  // On an enemy: a player can optionally engage it only while a unique enemy is engaged with them ("cannot be optionally engaged except by a player who is engaged with a unique enemy", 12192:A:1). Read by the optional-engagement hook (families/wilderland/engage.ts).
+  "optionalEngageUnique",
+  // On a seat (target eachSeat): the most its threat can be reduced by player card effects each round ("each player's threat cannot be reduced by more than 1 via player card effects each round", 19104:A:2). Read by lowerThreatByEffect (families/quest/threat.ts).
+  "playerThreatReductionCap",
 ] as const;
 
 export const manifest = { name: "wilderland", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

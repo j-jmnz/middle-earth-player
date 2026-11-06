@@ -2,7 +2,7 @@
 // Fire in the Night in the Ered Mithrin campaign: it is the sixth part, its campaign card names the Setup the campaign deals, and a standalone game plays the scenario with none of it. The five earlier parts' real Resolutions (Journey Up the Anduin's, Lost in Mirkwood's,
 // The King's Quest's, The Withered Heath's and Roam Across Rhovanion's golden wins, applied one after the other to a blank log) are what reaches it: the allies in a player's pool or their lines, the burdens, Misplaced Trust or Urdug's Cunning, the copy of a location Roam Across
 // Rhovanion pooled, the Accolade and Song boons, the treasures discovered, all through the Campaign Setup Checklist, whose Turayn and Isolde removals this part adds. Winning this part runs its Resolution (Beldis in the pool or his line, the treasure for 5 progress, the cards
-// each player removes from the pool, the boxes marked beside Beldis) and unlocks The Ghost of Framsburg (coming soon); a loss writes nothing.
+// each player removes from the pool, the boxes marked beside Beldis) and unlocks The Ghost of Framsburg; a loss writes nothing.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../../../effects/index.ts";
@@ -142,7 +142,7 @@ describe("Fire in the Night in the ered-mithrin campaign", { timeout: 60_000 }, 
     for (const code of [ROAM.urdugSCunning, ROAM.misplacedTrust, ROAM.abandonedRuin, ROAM.threatToWilderland]) expect(where(state, code), code).toEqual([]);
   });
 
-  it("writes Beldis, the treasure, the cards removed from the pool, the boxes beside Beldis and the log to the campaign when won, unlocks The Ghost of Framsburg (coming soon), and keeps the earlier parts' pool", () => {
+  it("writes Beldis, the treasure, the cards removed from the pool, the boxes beside Beldis and the log to the campaign when won, unlocks The Ghost of Framsburg, and keeps the earlier parts' pool", () => {
     // Two-handed, after the earlier parts, the pool's cards removed: the earlier parts' pool stays beside Beldis, minus what each player removed, and the treasure chosen is discovered.
     const win = golden("two-handed, won, after the earlier parts, Misplaced Trust");
     const state = playGolden(win, ctx).state;
@@ -158,12 +158,12 @@ describe("Fire in the Night in the ered-mithrin campaign", { timeout: 60_000 }, 
     expect(log.treasures).toHaveLength(before.treasures.length + 1);
     expect(log.treasures).toEqual(expect.arrayContaining([...before.treasures]));
     expect(log.allyLines).toEqual(before.allyLines);
-    // The path now offers the seventh part next, which the app cannot deal yet.
+    // The path now offers the seventh part next.
     const path = campaignPath(campaign, {}, log);
     expect(path.slice(0, 7).map((node) => [node.id, node.status === "completed"])).toEqual([...campaign.scenarios.slice(0, 6).map((id) => [id, true]), [nextPartId(campaign, night.id), false]]);
     expect(path[6]?.status).toBe(nextPartStatus(campaign, night.id));
     expect(nextStep(path, null)).toMatchObject({ node: { id: "the-ghost-of-framsburg" } });
-    expect(nextPartStatus(campaign, night.id)).toBe("soon");
+    expect(nextPartStatus(campaign, night.id)).toBe("current");
     // Beldis's line, written instead of the ally, with the boxes beside her marked by the players who used her.
     const healed = golden("two-handed, Easy, won from a blank log, Hill attack defended, enemies engaged, Beldis heals");
     const healedState = playGolden(healed, ctx).state;

@@ -15,6 +15,7 @@ import { topFrame } from "../../rules/windows/windows.ts";
 import type { BranchNow } from "./aflame.ts";
 import type { ChoiceNames, PickWords } from "./choice.ts";
 import { heathAsk, heathBranchWords, heathChooseNote, heathOptionLabel } from "./heath.ts";
+import { framsburgAsk } from "./framsburg.ts";
 import { nightAsk, nightBranchWords, nightChooseNote, nightQuestsNow } from "./night.ts";
 import { rhovanionAsk, rhovanionBranchWords, rhovanionChooseNote } from "./rhovanion.ts";
 import { askedSeat, seatSays } from "./seat.ts";
@@ -133,7 +134,7 @@ export function wilderlandAsk(instruction: Instruction, source: string | null, n
   }
   const kings = kingsQuestAsk(instruction, source, names, next, facts);
   if (kings) return kings;
-  const heath = heathAsk(instruction, source, names, next, facts) ?? rhovanionAsk(instruction, source, names, next, facts) ?? nightAsk(instruction, source, names, next, facts);
+  const heath = heathAsk(instruction, source, names, next, facts) ?? rhovanionAsk(instruction, source, names, next, facts) ?? nightAsk(instruction, source, names, next, facts) ?? framsburgAsk(instruction, source, names, next, facts);
   if (heath) return heath;
   if (instruction.verb !== "AttachRandomTreasure") return null;
   const choose = `Choose 1 of ${drawn} random undiscovered treasures to attach as a guarded objective.`;

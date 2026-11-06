@@ -318,6 +318,10 @@ export type ScenarioState = {
   // effects have lowered this round (the flag `threatReductionCap`). Kept only in a game that has such a card; cleared as the round ends.
   roundDamage?: Readonly<Record<string, number>>;
   threatLoweredBy?: Readonly<Record<number, number>>;
+  // The threat each seat's player card effects have lowered this round (the flag `playerThreatReductionCap`, 19104:A:2). Kept only in a game that has such a card; cleared as the round ends.
+  playerThreatLoweredBy?: Readonly<Record<number, number>>;
+  // The location whose Discover keyword the travel step holds back until the Responses to the travel are done (emce.discover, families/wilderland/discover.ts); cleared when the keyword resolves.
+  discoverHeld?: string;
   // The codes of the stages the quest advanced to, in order. Kept only by a quest that branches (BranchStage), for a Resolution that
   // reads which branch was taken ("If stage 3B was Beorn's Path", 01129:B:1).
   stagesReached?: readonly string[];

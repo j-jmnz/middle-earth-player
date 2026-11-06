@@ -66,6 +66,10 @@ export const amountExprSchema = z.strictObject({
   islandLeft: z.literal(true).optional(),
   // The most cards that match the pick any one player controls, each player counted from their own side ("X is the number of characters controlled by the player with the most characters", 18023:A:1). Read by the wilderland family.
   mostPerPlayer: pickSchema.optional(),
+  // The tens digit of the first player's threat, whoever the actor is ("X is the tens digit of the first player's threat", 19099:A:1, 19103:A:2). Read by the wilderland family.
+  firstPlayerTens: z.literal(true).optional(),
+  // The Discover value of the active location: its Discover X (a number, or the amount its record reads) with the adjustment a Response made, 0 when it has none ("the Discover value of the active location", 19095:A:3; emce.discover). Read by the wilderland family.
+  discoverValue: z.literal(true).optional(),
   // How many of the cards the running effect discarded from the top of the encounter deck (DiscardEncounterTop) match the pick, still in the discard pile ("for each enemy discarded this way", 12185:A:2). Read by the wilderland family.
   discardedMatching: pickSchema.optional(),
   // The printed cost of the card the source guards: the player cards under it, and the card it is attached to as a guard ("X is that card's cost", 18050:A:1). Read by the wilderland family.
