@@ -8,10 +8,10 @@ The Lord of the Rings: The Card Game, its card text, card art, rules text and ic
 
 It appears in:
 
-- `data/cards/`, `data/scenarios/`, `data/campaigns/`, `data/printed/`, `data/rules/`, `data/decks/` and the generated records in `src/effects/generated/`: card text, scenario lists and rules text.
+- `data/cards/`, `data/scenarios/`, `data/campaigns/`, `data/printed/`, `data/rules/`, `data/decks/` and the generated records in `src/effects/generated/`: game text and scenario lists.
 - `data/raw/`: snapshots of the sources below, kept verbatim.
 - `assets/icons/` and `src/ui/icons/`: game icons built from `data/raw/icons/`.
-- Card scans, card pictures and PDFs, which are downloaded at build time and never committed.
+- Card images and PDFs, which are downloaded at build time and never committed.
 
 ## Data sources
 
@@ -19,11 +19,12 @@ None of these sources publishes a license for its data. Their data is used as pu
 
 | Source | Used for | Location |
 | --- | --- | --- |
-| [RingsDB](https://ringsdb.com) | Player cards, packs, the icon font (`ringsdb.svg`, `ringsdb-app.css`) | `data/raw/ringsdb/`, `data/raw/icons/` |
+| [RingsDB](https://ringsdb.com) | Player cards and packs; the icon font (`ringsdb.svg`, `ringsdb-app.css`) | `data/raw/ringsdb/`, `data/raw/icons/` |
 | [Hall of Beorn](https://hallofbeorn.com) | Encounter and quest cards, scenarios, card scans | `data/raw/hallofbeorn/`, `.cache/` |
 | [DragnCards LotR LCG plugin](https://github.com/seastan/dragncards-lotrlcg-plugin) by seastan | Card database, scenario lists, pre-built decks, game steps, token and card-back images | `data/raw/dragncards/`, `data/raw/icons/dragncards/` |
 | [Fantasy Flight Games](https://www.fantasyflightgames.com/en/the-lord-of-the-rings-the-card-game/) | Rules PDFs, print-and-play cards, the icon font in the Dream-chaser rulebook (`mec111-icons.ttf`) | `data/raw/icons/`, `.cache/` |
-| JvZijp's enhanced proxies, u/LepcisMagna's scans on [lotr.cardgame.tools](https://lotr.cardgame.tools), a Nightmare deck folder on Google Drive | Card pictures | `.cache/` |
+| JvZijp's enhanced proxies and u/LepcisMagna's scans on [lotr.cardgame.tools](https://lotr.cardgame.tools) | Card pictures | `.cache/` |
+| A community Google Drive folder | Nightmare deck pictures and card lists | `data/raw/nightmare/`, `.cache/` |
 
 Every source is pinned by URL and sha256 in `data/sources.json`.
 

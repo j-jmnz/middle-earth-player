@@ -3,13 +3,13 @@
 An offline, single-device app for playing The Lord of the Rings: The Card Game solo. It runs on iOS and Android, built with Expo and React Native, and it also runs in a desktop browser for development.
 
 > [!IMPORTANT]
-> This is a fan-made, community-supported project. It is not an official app or client for The Lord of the Rings: The Card Game. It is not associated with, endorsed by, sponsored by or approved by Fantasy Flight Games (FFG), Asmodee or Middle-earth Enterprises in any way. The card text, card art and rules belong to their owners.
+> This is a fan-made, community-supported project. It is not an official app or client for The Lord of the Rings: The Card Game. It is not associated with, endorsed by, sponsored by or approved by Fantasy Flight Games (FFG), Asmodee or Middle-earth Enterprises in any way. All game content belongs to its owners.
 
 ## Features
 
 - Plays the official campaigns: The Fellowship of the Ring saga (MEC109), Mirkwood Paths, The Dark of Mirkwood, Dream-chaser and Ered Mithrin. Each scenario can also be played on its own, and some have Nightmare mode.
 - The engine applies the rules, keywords, phases and card effects, and works out every number. The player picks from the moves the engine lists as legal. You never type in damage, resources, threat or progress yourself.
-- Supports true solo (one seat) or two-handed solo (two seats on one device). No accounts, no server, no multiplayer.
+- Supports true solo (one seat) or two-handed solo (two seats on one device). There are no accounts and no online multiplayer.
 - Includes a deck builder with the full official player-card pool, the pre-built decks, a campaign log, run history and a rules reference.
 
 `src/campaign/playable.ts` lists the scenarios you can play now. [docs/phases/STATUS.md](docs/phases/STATUS.md) lists the work still open.
@@ -60,9 +60,9 @@ pnpm catalog:build
 pnpm scans:pack
 ```
 
-On its first run, `scans:pack` downloads every pinned card picture into `.cache/` (about 5 GB) and checks each one's sha256. It then writes a copy of each picture, scaled to 1200 px, into `assets/scans/`. Later runs pack only pictures that have changed. `pnpm start`, `pnpm ios` and `pnpm android` run both steps on their own. `scans:pack` rewrites `src/screens/images/scan-map.ts`; don't commit that change.
+On its first run, `scans:pack` downloads every pinned card picture into `.cache/` (about 5 GB) and checks each one's sha256. It then writes a copy of each picture, scaled to 1200 px, into `assets/scans/`. Later runs pack only pictures that have changed. Every start and build script runs both steps on its own. `scans:pack` rewrites `src/screens/images/scan-map.ts`; don't commit that change.
 
-Release build, which works offline and includes the catalog, booklets and pictures:
+Release build, which carries all its data and works offline:
 
 ```bash
 pnpm ios --device --configuration Release
@@ -98,10 +98,10 @@ The end-to-end flows are in `.maestro/scenarios/<scenario-id>/` and `.maestro/fe
 | `pnpm scans:pack` / `pnpm booklets:pack` | Packs card pictures and the booklet PDFs into `assets/` for the native bundle. |
 | `pnpm move <old> <new>` | Moves files and rewrites every import and path that refers to them. `--dry-run` first. |
 | `pnpm docs:index` / `pnpm docs:section <file> "<heading>"` | Regenerates `docs/INDEX.md` / prints one doc section. |
-| `node --experimental-strip-types scripts/card-smoke/run.ts <codes>` | Plays a seeded game with the given player cards and reports any throw, refusal or stall. `--all` runs every card. |
+| `node --experimental-strip-types scripts/card-smoke/run.ts <codes>` | Plays a seeded game with the given player cards and reports any engine error or stall. `--all` runs every card. |
 | `node --experimental-strip-types scripts/e2e/fixtures.ts [scenario-id]` | Regenerates the Maestro save fixtures in `src/campaign/fixtures/`. |
 
-Scripts log to stderr. Use `--verbose`, `--quiet` or `LOG_LEVEL` (`debug`, `info`, `warn`, `error`, `silent`) to change how much they print.
+Scripts log to stderr. `--verbose` and `--quiet` change how much they print; `LOG_LEVEL` sets the level directly (`debug`, `info`, `warn`, `error`, `silent`).
 
 ## Contributing
 
@@ -119,11 +119,11 @@ Conventions:
 - Never commit `assets/catalog.db`, card scans, card pictures, PDFs or a filled `src/screens/images/scan-map.ts`.
 - Out of scope: playtest and fan-made (ALeP) cards, accounts or a backend, online multiplayer, and support for other card games. [docs/brief.md](docs/brief.md) has the full list of non-goals.
 
-Adding a scenario follows the procedure in [docs/handover/agent-brief.md](docs/handover/agent-brief.md), and authoring effect records follows [docs/plans/effect-authoring.md](docs/plans/effect-authoring.md). The repo also contains agent definitions for Claude Code and Cursor (`.claude/`, `.cursor/`, [CLAUDE.md](CLAUDE.md)); you don't need them to contribute.
+Adding a scenario follows the procedure in [docs/handover/agent-brief.md](docs/handover/agent-brief.md), and authoring effect records follows [docs/plans/effect-authoring.md](docs/plans/effect-authoring.md). The repo also contains agent definitions for Claude Code and Cursor (`.claude/` and `.cursor/`); you don't need them to contribute.
 
 ## Documentation
 
-- [docs/brief.md](docs/brief.md): product decisions, the rules the engine implements and the data rules.
+- [docs/brief.md](docs/brief.md): product decisions and the rules the engine implements.
 - [docs/architecture.md](docs/architecture.md): code layout, state, the engine and tests.
 - [docs/design-system.md](docs/design-system.md) and [docs/design-system-table.md](docs/design-system-table.md): the look of the screens and the game table.
 - [docs/phases/STATUS.md](docs/phases/STATUS.md): progress and open work.
@@ -131,18 +131,18 @@ Adding a scenario follows the procedure in [docs/handover/agent-brief.md](docs/h
 
 ## Attribution
 
-The Lord of the Rings: The Card Game and its card text, card art and rules are © Fantasy Flight Games. The Lord of the Rings and its characters and places are trademarks of Middle-earth Enterprises. The repo commits card text, rules text, raw source snapshots (`data/raw/`) and the game icons (`assets/icons/`). Card scans, card pictures and PDFs are fetched at build time and never committed. Every source below is pinned by URL and sha256 in `data/sources.json`.
+The Lord of the Rings: The Card Game and all of its content are © Fantasy Flight Games. The Lord of the Rings and its characters and places are trademarks of Middle-earth Enterprises. The repo commits card text, rules text, raw source snapshots (`data/raw/`) and the game icons (`assets/icons/`). Card images and PDFs are fetched at build time and never committed. Every source below is pinned by URL and sha256 in `data/sources.json`.
 
 | Resource | Source |
 | --- | --- |
 | Rules, rulebooks, FAQ, Easy Mode, campaign log, community decklists | [Fantasy Flight Games](https://www.fantasyflightgames.com/en/the-lord-of-the-rings-the-card-game/) PDFs |
 | Campaign, boon and burden card pictures | FFG's print-and-play PDFs |
-| Card data (player cards, packs, decks) | [RingsDB](https://ringsdb.com) |
+| Player cards and packs | [RingsDB](https://ringsdb.com) |
 | Card data (encounter and quest cards, scenarios), card scans | [Hall of Beorn](https://hallofbeorn.com) |
 | Card database, scenario lists, pre-built decks, game steps | [DragnCards LotR LCG plugin](https://github.com/seastan/dragncards-lotrlcg-plugin) by seastan |
-| Card pictures | JvZijp's enhanced proxies ([Google Drive](https://drive.google.com/drive/folders/1jEy_yvRaPXGylPfilxhweQjffo9AZQsQ)), then u/LepcisMagna's 600 DPI scans hosted on [lotr.cardgame.tools](https://lotr.cardgame.tools), then RingsDB, Hall of Beorn and DragnCards |
+| Card pictures | JvZijp's enhanced proxies ([Google Drive](https://drive.google.com/drive/folders/1jEy_yvRaPXGylPfilxhweQjffo9AZQsQ)), then u/LepcisMagna's 600 DPI scans hosted on [lotr.cardgame.tools](https://lotr.cardgame.tools), then the card data sites above |
 | Nightmare deck pictures and card lists | A community [Google Drive folder](https://drive.google.com/drive/folders/10pz9RF2e1QrJXqsmmLWPkO1Hu1auQuxB) |
-| Game icons | RingsDB's icon font, DragnCards' token and card-back images, and the icon font embedded in FFG's Dream-chaser rulebook (MEC111) |
+| Game icons | RingsDB's icon font and DragnCards' token and card-back images; the Dream-chaser symbols come from the font embedded in FFG's MEC111 rulebook |
 | Fonts | [Barlow Semi Condensed](https://fonts.google.com/specimen/Barlow+Semi+Condensed) and [Marcellus SC](https://fonts.google.com/specimen/Marcellus+SC), SIL Open Font License (`assets/fonts/`) |
 
 Picture sources are tried in the order listed in `scripts/data/sources/pictures.ts`.
