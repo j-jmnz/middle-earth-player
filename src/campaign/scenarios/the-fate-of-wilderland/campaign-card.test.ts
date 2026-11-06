@@ -38,7 +38,7 @@ const logged = (...allyLines: ("turayn" | "melanwar" | "isolde" | "beldis")[]): 
 // The scenario dealt and its Setup played to the first round: the mulligan is kept and each question is answered with its first option.
 function opened(seats: 1 | 2, args: { seed?: number; log?: CampaignLog; choices?: readonly string[]; loadout?: LoadoutSeat[] } = {}): ScenarioState {
   const log = args.log ?? emptyLog(seats);
-  let state = startScenario(wilderlandStart(seats, args.seed ?? 1, "Normal", undefined, log, undefined, args.choices ?? wilderlandSetupChoices(seats, log, "Normal", args.loadout), args.loadout), ctx);
+  let state = startScenario(wilderlandStart(seats, args.seed ?? 1, "Normal", { log, choices: args.choices ?? wilderlandSetupChoices(seats, log, "Normal", args.loadout), loadout: args.loadout }), ctx);
   while (state.window?.kind === "mulligan") state = expectOk(reduce(state, { type: "Keep" }, ctx)).state;
   for (let guard = 0; guard < 40 && state.window?.kind === "choose"; guard += 1) state = expectOk(reduce(state, { type: "Choose", optionId: state.window.options[0] ?? "" }, ctx)).state;
   return state;

@@ -338,6 +338,8 @@ export type ScenarioState = {
   resolutionOffer?: readonly string[];
   engagement: { ordinal: number; engagedThisPass: boolean } | null;
   resolvedAttacks: readonly string[];
+  // The enemies that made an immediate attack (outside the combat phase, or in it without using up their attack) in this phase of this round, present only after one did; read by attackedThisPhase (families/wilderland/assault.ts).
+  immediateAttacks?: { round: number; phase: Phase; enemies: readonly string[] };
   // "round:step" for each framework action window opened this round (rr.framework-steps), so each opens once, and
   // "round:traveled" once the travel opportunity is taken or declined.
   stepWindows: readonly string[];

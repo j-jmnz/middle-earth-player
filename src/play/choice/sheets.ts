@@ -48,7 +48,7 @@ import { asksCollection, collectionLabel, collectionOrder } from "./collection-s
 import { cardLabel, has, option, statOf, step } from "./sheet-parts.ts";
 import { nightActionNote, nightResponseNote } from "../words/night.ts";
 import { framsburgActionCaution, framsburgActionNote, framsburgEngageNote, framsburgResponseNote } from "../words/framsburg.ts";
-import { fateEngageNote, fateResponseNote } from "../words/fate.ts";
+import { fateEngageNote, fatePassCaution, fateResponseNote } from "../words/fate.ts";
 import { gundabadOptionLabel, gundabadPassCaution, gundabadResponseNote } from "../words/gundabad.ts";
 import { gundabadRow } from "./gundabad-sheets.ts";
 import { TIMING_WORDS, type SheetStat, type HideNumbers, type PickOption, type Sheet, type SheetNames, type TriggerOption, type Unavailable } from "./sheet-types.ts";
@@ -289,7 +289,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
             const stats: SheetStat[] = threat == null ? [] : [{ icon: "threat", value: threat, word: "Threat" }];
             // A branch that deals damage to each of the player's allies warns when it destroys one.
             const caution = branchCaution(game, ctx, choose, id, window.seat, source, names.card, data?.picked?.at(-1) ?? null);
-            return { id, label: torch ? torch.label(id) : branchWords(choose, id, game, words, source, now), code: null, ...(stats.length > 0 ? { stats } : {}), ...(caution ? { caution } : {}), intent: { type: "Choose", optionId: id } };
+            return { id, label: torch ? torch.label(id) : branchWords(choose, id, game, words, source, now, ctx), code: null, ...(stats.length > 0 ? { stats } : {}), ...(caution ? { caution } : {}), intent: { type: "Choose", optionId: id } };
           }),
         };
       }
@@ -336,7 +336,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       const about = sole ?? (data?.kind === "responses" ? answeredCard(data.event, data.offers, options) : (frame?.cardId ?? null));
       const cancel = window.kind === "cancelOffer";
       // A Response whose passing leaves the game unwinnable arms the Pass (words/gundabad.ts).
-      const passCaution = data?.kind === "responses" ? gundabadPassCaution(game, ctx, data.event, options.map((item) => item.cardId)) : null;
+      const passCaution = data?.kind === "responses" ? (gundabadPassCaution(game, ctx, data.event, options.map((item) => item.cardId)) ?? fatePassCaution(game, ctx, data.event, options.map((item) => item.cardId))) : null;
       return {
         kind: "trigger",
         key: `${window.kind}:${frame?.id ?? ""}:${options.length}`,

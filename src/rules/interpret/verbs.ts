@@ -24,6 +24,7 @@ import { encounterRaised } from "../families/quest/threat.ts";
 import { flagged, livingSeats, updateCard, type ScenarioState } from "../core/state.ts";
 import { attachTo, cardsUnder, moveCard } from "../core/zones.ts";
 import { currentCause, ruleCause, UNATTRIBUTED } from "../core/cause.ts";
+import { takeProgressOff } from "../core/progress.ts";
 import { noteEncounterThreat } from "../families/encounter/reveal.ts";
 import { moveEncounter } from "../families/encounter/moves.ts";
 import { stagingDest } from "../families/breaking/areas.ts";
@@ -315,12 +316,7 @@ export function questProgressMoved(
 
 // Progress comes off the current quest card, `removed` from questProgressMoved. The step records it as a negative amount.
 function removeQuestProgress(state: ScenarioState, removed: number, steps: EngineStep[]): ScenarioState {
-  const id = state.questStage;
-  const stage = id ? state.cards[id] : undefined;
-  if (!id || !stage) return state;
-  if (removed <= 0) return state;
-  steps.push({ kind: "progress", targetId: id, amount: -removed, cause: currentCause(steps, UNATTRIBUTED) });
-  return updateCard(state, id, { progress: stage.progress - removed });
+  return takeProgressOff(state, state.questStage, removed, steps);
 }
 
 function discardTarget(

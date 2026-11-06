@@ -5,6 +5,7 @@ import type { Instruction, SimpleInstruction } from "../../../catalog/boundary.t
 
 import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
+import { takeProgressOff } from "../../core/progress.ts";
 import { placeProgress, progressPlacer } from "../../interpret/effect-verbs.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -81,11 +82,5 @@ export function lowerCardThreat(state: ScenarioState, instruction: Verb<"LowerCa
 // Progress comes off the current quest card: `amount`, or all of it when the card holds fewer ("If there are fewer than 4 progress
 // tokens on the quest, remove all progress tokens from that quest", 01086:A:1). The step records it as a negative amount.
 export function removeProgressFromQuest(state: ScenarioState, instruction: Verb<"RemoveProgressFromQuest">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const id = state.questStage;
-  const stage = id ? state.cards[id] : undefined;
-  if (!id || !stage) return state;
-  const removed = Math.min(stage.progress, Math.max(0, resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx)));
-  if (removed <= 0) return state;
-  steps.push({ kind: "progress", targetId: id, amount: -removed, cause: currentCause(steps, UNATTRIBUTED) });
-  return updateCard(state, id, { progress: stage.progress - removed });
+  return takeProgressOff(state, state.questStage, resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx), steps);
 }

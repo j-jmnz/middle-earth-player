@@ -21,7 +21,7 @@ export const voyageLoadout = fillerLoadout;
 // The goldens' world, the plan and start of a game and its golden (the seeded game's parts every scenario shares: test/harness/game-kit.ts).
 export const voyageWorld = (decks: VoyageDecks = "strong") => game.world(decks);
 export const voyagePlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount)) => game.plan(seatCount, log);
-export const voyageStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard) => game.start(seatCount, seed, difficulty, facts, log, modeCard);
+export const voyageStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard) => game.start(seatCount, seed, difficulty, { facts, log, modeCard });
 
 export type VoyagePolicy = {
   // "keep" or "trade" 2 damage on each ship for a resource; "pass" or "ship" at the Sailing test (commit no one, or the ships that can sail).

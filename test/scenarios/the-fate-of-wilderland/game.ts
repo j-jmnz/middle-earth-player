@@ -5,7 +5,7 @@ import { applyResolution, emptyLog, type CampaignLog } from "../../../src/campai
 import { campaignScenario, type Difficulty } from "../../../src/catalog/scenario-data.ts";
 import { EFFECTS } from "../../../src/effects/index.ts";
 import type { PrintedCard } from "../../../src/rules/core/printed.ts";
-import type { CampaignFacts, ModeCard } from "../../../src/rules/core/campaign-state.ts";
+import type { ModeCard } from "../../../src/rules/core/campaign-state.ts";
 import { characters } from "../../../src/rules/combat/combat.ts";
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 
@@ -16,7 +16,7 @@ import { TREASURES } from "../the-withered-heath/scene.ts";
 import { campaign, CODES, wilderland } from "./scene.ts";
 import { loadScenario } from "../../../scripts/data/load-scenarios.ts";
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
-import { campaignGame, engageOneEach, fillerLoadout, HERO_STATS, type PlayedGame } from "../../harness/game-kit.ts";
+import { campaignGame, engageOneEach, fillerLoadout, HERO_STATS, type PlayedGame, type StartOptions } from "../../harness/game-kit.ts";
 
 // Test helper. A whole game of The Fate of Wilderland in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
 // events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. The first character of a seat quests (the others stay ready to attack and defend), the players travel to the first location they may,
@@ -41,7 +41,7 @@ export const wilderlandWorld = async (decks: WilderlandDecks = "strong") => {
   return made;
 };
 export const wilderlandPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), choices?: readonly string[], difficulty?: Difficulty, loadout?: LoadoutSeat[]) => game.plan(seatCount, log, choices, difficulty, loadout);
-export const wilderlandStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, choices?: readonly string[], loadout?: LoadoutSeat[]) => game.start(seatCount, seed, difficulty, facts, log, modeCard, choices, loadout);
+export const wilderlandStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, options: StartOptions = {}) => game.start(seatCount, seed, difficulty, options);
 
 /**
  * The answers the Campaign Setup asks of the players for `log`: the search for a boon or treasure card (each player may take one, 12195:A:2), then the 3 non-unique enemies Turayn's line removes and the 3 treacheries Beldis's line removes,
@@ -101,7 +101,9 @@ export function wilderlandIntent(state: ScenarioState, ctx: ReduceContext, memor
     const other = answers.find((id) => id !== "progress");
     const spare = answers.find((id) => id !== "progress" && id !== "threat");
     const picked = policy.choose === "spare" ? (spare ?? answers[0]) : policy.choose === "last" ? answers.at(-1) : policy.choose === "progress" ? (progress ?? answers[0]) : policy.choose === "other" ? (other ?? answers[0]) : answers[0];
-    return { type: "Choose", optionId: picked ?? "" };
+    // Only an option the reducer offered is sent; with none offered the auto-player answers the window.
+    if (picked != null) return { type: "Choose", optionId: picked };
+    return nextIntent(state, ctx, options, memory, intents);
   }
   if (state.window?.kind === "response") return nextIntent(state, ctx, { ...options, act: policy.use }, memory, intents);
   if (state.window?.kind === "optionalEngage") return (policy.engage ? engageOneEach(state, ctx, policy.most) : null) ?? { type: "DeclineEngage" };

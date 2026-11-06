@@ -20,7 +20,7 @@ export const ruinsLoadout = fillerLoadout;
 export const ruinsWorld = (decks: RuinsDecks = "strong") => game.world(decks);
 export const afterTemple = (seatCount: 1 | 2) => game.after(seatCount);
 export const ruinsPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), choices: readonly string[] = commandChoices(seatCount)) => game.plan(seatCount, log, choices);
-export const ruinsStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, choices: readonly string[] = commandChoices(seatCount)) => game.start(seatCount, seed, difficulty, facts, log, modeCard, choices);
+export const ruinsStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, choices: readonly string[] = commandChoices(seatCount)) => game.start(seatCount, seed, difficulty, { facts, log, modeCard, choices });
 
 export type RuinsPolicy = {
   // The option a Choose window with these answers takes: the first or the last.

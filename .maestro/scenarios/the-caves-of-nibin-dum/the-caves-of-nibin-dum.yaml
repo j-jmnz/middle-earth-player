@@ -63,7 +63,7 @@ tags:
 # Every scenario is won: the bar says so and names what waits for the next campaign (the Ranger Sense kept by 41051's Resolution).
 - assertVisible:
     id: path-complete
-    text: "Campaign complete\\."
+    text: "The Dark of Mirkwood won\\."
 - assertVisible:
     id: path-carry
     text: ".*Ranger Sense.* for your next campaign\\."

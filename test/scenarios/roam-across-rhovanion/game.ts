@@ -196,7 +196,7 @@ export function rhovanionSetupChoices(seatCount: 1 | 2, log: CampaignLog, diffic
   throw new Error("The Campaign Setup keeps asking");
 }
 export const rhovanionPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), choices?: readonly string[], difficulty?: Difficulty) => game.plan(seatCount, log, choices, difficulty);
-export const rhovanionStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, choices?: readonly string[]) => game.start(seatCount, seed, difficulty, facts, log, modeCard, choices);
+export const rhovanionStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, choices?: readonly string[]) => game.start(seatCount, seed, difficulty, { facts, log, modeCard, choices });
 
 // The pinned games: wins (true solo and two-handed, Normal and Easy, from a blank log and after the four earlier parts' real Resolutions with the allies in the pool or the oath, guidance and Isolde lines, the boon-ally search taken or skipped, Misplaced Trust
 // and Urdug's Cunning, each of the six orders of the three stages 2, the first or the last location chosen for the pool) and losses (heroes too small to quest, heroes too brittle to survive, the threat at a stage 2, Urdug's Gambit holding as much progress as it has quest points),

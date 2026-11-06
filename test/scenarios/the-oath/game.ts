@@ -33,7 +33,7 @@ const game = campaignGame<OathDecks, OathPolicy>({ campaign, scenario: oath, sta
 
 export const oathWorld = (decks: OathDecks = "strong") => game.world(decks);
 export const oathPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), adaptations: Adaptations = DEFAULT_ADAPTATIONS) => game.plan(seatCount, log, oathChoices(seatCount, adaptations));
-export const oathStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: CampaignFacts, log: CampaignLog = emptyLog(seatCount), adaptations: Adaptations = DEFAULT_ADAPTATIONS): StartScenario => game.start(seatCount, seed, difficulty, facts, log, undefined, oathChoices(seatCount, adaptations));
+export const oathStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: CampaignFacts, log: CampaignLog = emptyLog(seatCount), adaptations: Adaptations = DEFAULT_ADAPTATIONS): StartScenario => game.start(seatCount, seed, difficulty, { facts, log, choices: oathChoices(seatCount, adaptations) });
 
 export type OathPolicy = { tokens: "take" | "skip" };
 

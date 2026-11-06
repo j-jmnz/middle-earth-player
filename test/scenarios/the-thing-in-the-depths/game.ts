@@ -21,7 +21,7 @@ export const depthsLoadout = fillerLoadout;
 export const depthsWorld = (decks: DepthsDecks = "strong") => game.world(decks);
 export const afterFlight = (seatCount: 1 | 2) => game.after(seatCount);
 export const depthsPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount)) => game.plan(seatCount, log);
-export const depthsStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard) => game.start(seatCount, seed, difficulty, facts, log, modeCard);
+export const depthsStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard) => game.start(seatCount, seed, difficulty, { facts, log, modeCard });
 
 export type DepthsPolicy = {
   // The option a Choose window with these answers takes: the first or the last.

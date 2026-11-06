@@ -239,13 +239,13 @@ export function wilderlandBranchNow(game: ScenarioState, ctx: ReduceContext, cho
     if (spread) counted[option.id] = resolveAmount(game, spread.amount, frameScope(game, seat, sourceId), ctx);
   }
   const quests = nightQuestsNow(game, ctx, choose);
-  const rows = { ...framsburgBranchNow(game, ctx, choose, seat), ...fateBranchRows(game, ctx, choose) };
+  const rows = { ...framsburgBranchNow(game, ctx, choose, seat), ...fateBranchRows(game, ctx, choose, sourceId) };
   return { ...(Object.keys(counted).length > 0 ? { counted } : {}), ...(quests ? { quests } : {}), ...(Object.keys(rows).length > 0 ? { rows } : {}) };
 }
 
 /** A branch that counts cards, with the number now: "Raise your threat by 3 (1 for each ally you control)", "Deal 1 damage to each ally you control (3)". Null for any other branch. */
-export function wilderlandBranchWords(choose: Extract<Instruction, { verb: "Choose" }>, optionId: string, names: ChoiceNames, now?: BranchNow, source?: string | null, game?: ScenarioState): string | null {
-  const accolade = heathBranchWords(choose, optionId, names, game) ?? rhovanionBranchWords(choose, optionId, names, game) ?? nightBranchWords(choose, optionId, names, source, now) ?? framsburgBranchWords(choose, optionId, now?.rows) ?? gundabadBranchWords(choose, optionId, game) ?? fateBranchWords(choose, optionId, now?.rows);
+export function wilderlandBranchWords(choose: Extract<Instruction, { verb: "Choose" }>, optionId: string, names: ChoiceNames, now?: BranchNow, source?: string | null, game?: ScenarioState, ctx?: ReduceContext): string | null {
+  const accolade = heathBranchWords(choose, optionId, names, game) ?? rhovanionBranchWords(choose, optionId, names, game) ?? nightBranchWords(choose, optionId, names, source, now) ?? framsburgBranchWords(choose, optionId, now?.rows) ?? gundabadBranchWords(choose, optionId, game) ?? fateBranchWords(choose, optionId, now?.rows, game, ctx);
   if (accolade) return accolade;
   const offer = searchOffer(choose);
   if (offer) return optionId === "search" ? `Search for ${names.code(offer.code)}` : "Don't search: no treasure this scenario";

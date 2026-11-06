@@ -29,7 +29,7 @@ const CHOICES = ["01134>q1"];
 const game = campaignGame<DolGuldurDecks, Record<string, never>>({ campaign, scenario: dolGuldur, stats: HERO_STATS, codes: ["01133", "01138"], intent: (state, ctx, memory) => dolGuldurIntent(state, ctx, memory), policy: {}, limit: 8000, upgraded: [] });
 
 export const dolGuldurWorld = (decks: DolGuldurDecks = "strong") => game.world(decks);
-export const dolGuldurStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: CampaignFacts, log: CampaignLog = emptyLog(seatCount)): StartScenario => game.start(seatCount, seed, difficulty, facts, log, undefined, CHOICES);
+export const dolGuldurStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: CampaignFacts, log: CampaignLog = emptyLog(seatCount)): StartScenario => game.start(seatCount, seed, difficulty, { facts, log, choices: CHOICES });
 
 // The auto-player's answer (test/harness/auto-player.ts), except where the auto-player alone always declines: in a player attack window
 // every ready character that can attack the first enemy it can reach attacks it together, and in the optional engagement step the

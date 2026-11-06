@@ -26,7 +26,7 @@ const NO_COUNSEL: CounselChoice = ["skip", "skip"];
 export const raidWorld = (decks: RaidDecks = "strong") => game.world(decks);
 export const afterFate = (seatCount: 1 | 2) => game.after(seatCount);
 export const raidPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), counsel: CounselChoice = NO_COUNSEL) => game.plan(seatCount, log, counsel.slice(0, seatCount));
-export const raidStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, counsel: CounselChoice = NO_COUNSEL) => game.start(seatCount, seed, difficulty, facts, log, modeCard, counsel.slice(0, seatCount));
+export const raidStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, counsel: CounselChoice = NO_COUNSEL) => game.start(seatCount, seed, difficulty, { facts, log, modeCard, choices: counsel.slice(0, seatCount) });
 
 export type RaidPolicy = {
   // The option a Choose window with these answers takes: "damage" or "search" (Corsair Arsonist), "damage" or "discard" (Pillaged Ship), "character" or "location" (Put to the Torch).

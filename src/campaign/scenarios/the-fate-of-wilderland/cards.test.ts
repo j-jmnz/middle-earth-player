@@ -7,7 +7,7 @@ import { modifiedStat, placeDamage, playerCardEffectCanChoose } from "../../../r
 import { flagged, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
-import { CODES, FIGHT, fightTable, progressOn, resourcesOn, announce, codesIn, finish, idOf, legalIntents, legalTargets, loadWilderlandWorld, quest, resolveRecords, send, start, takes, wilderlandFight, wilderlandTable, type WilderlandWorld } from "../../../../test/scenarios/the-fate-of-wilderland/scene.ts";
+import { CODES, FIGHT, fightTable, progressOn, resourcesOn, announce, codesIn, finish, idOf, legalIntents, legalTargets, loadWilderlandWorld, quest, resolveRecords, send, start, takes, wilderlandFight, wilderlandTable, type Run, type WilderlandWorld } from "../../../../test/scenarios/the-fate-of-wilderland/scene.ts";
 
 let world: WilderlandWorld;
 beforeAll(async () => {
@@ -23,6 +23,22 @@ const damageTo = (state: ScenarioState, code: string, amount: number): number =>
 const settled = (t: Table, state: ScenarioState): ScenarioState => settle({ ...state, window: null, mode: "stopped" }, t.ctx, []);
 // The state in the combat phase with the attacks resolved so far (the keys the engine writes: the enemy's id, or `id@seat` for an enemy that attacks each player).
 const inCombat = (t: Table, resolved: readonly string[]): ScenarioState => syncConstants({ ...t.state, phase: "Combat", resolvedAttacks: resolved }, t.ctx);
+// The combat phase played from its start, nobody defending, until the player attacks begin: the state the engine leaves once every enemy attack has resolved.
+function enemyAttacksDone(t: Table): ScenarioState {
+  let run: Run = start(t.state);
+  for (let guard = 0; guard < 60 && run.state.window?.kind !== "playerAttack"; guard += 1) {
+    const window = run.state.window;
+    if (window?.kind === "defense") run = send(run, { type: "Undefended", heroId: run.state.seats[window.seat]?.heroes[0] ?? t.hero } as never, t.ctx);
+    else if (window?.kind === "chooseEnemy") run = send(run, { type: "ChooseEnemy", enemyId: window.options[0] ?? "" }, t.ctx);
+    else {
+      const pass = legalIntents(run.state, t.ctx).find((intent) => intent.type === "Pass" || intent.type === "DeclineAttack");
+      if (!pass) break;
+      run = send(run, pass as never, t.ctx);
+    }
+  }
+  expect(run.state.window?.kind).toBe("playerAttack");
+  return run.state;
+}
 // Threat enough in the staging area to fail the quest: the heroes' two Willpowers come to less.
 const FAILING = [CODES.goblinTroop, CODES.packOfWargs, CODES.strayGoblin];
 
@@ -38,18 +54,24 @@ describe("19155 The Goblins' Assault", () => {
 
   it("19155:A:1 Urdug cannot be dealt damage unless he has resolved an attack this phase", () => {
     const t = fight([CODES.goblinTroop]);
-    const urdug = idOf(t.state, CODES.urdug);
     // Out of the combat phase he has resolved none.
     expect(flags(t.state, CODES.urdug, "cannotTakeDamage")).toEqual([true]);
     expect(damageTo(t.state, CODES.urdug, 3)).toBe(0);
-    // In the combat phase before he attacks, or after another enemy attacked, still none.
+    // In the combat phase before he attacks, still none.
     expect(damageTo(inCombat(t, []), CODES.urdug, 3)).toBe(0);
-    expect(damageTo(inCombat(t, [idOf(t.state, CODES.goblinTroop)]), CODES.urdug, 3)).toBe(0);
-    // After his attack (against the one player, or against each) the damage lands.
-    expect(damageTo(inCombat(t, [urdug]), CODES.urdug, 3)).toBe(3);
-    expect(damageTo(inCombat(t, [`${urdug}@1`]), CODES.urdug, 3)).toBe(3);
+    // After another enemy's attack, played for real, he has still not attacked.
+    const other = enemyAttacksDone(wilderlandTable(world, { phase: "Combat", staging: [...FIGHT], engaged: [{ code: CODES.goblinTroop, seat: 0 }], deck: ["f0", "f0", "f0"] }));
+    expect(other.resolvedAttacks).toEqual([idOf(other, CODES.goblinTroop)]);
+    expect(damageTo(other, CODES.urdug, 3)).toBe(0);
+    // After his own attack, played for real (5 resources for each player on The Heroes' Defense make him attack each player), the damage lands: against the one player, and against each.
+    for (const seats of [1, 2] as const) {
+      const attacked = enemyAttacksDone(wilderlandTable(world, { seats, phase: "Combat", staging: [CODES.theGoblinsAssault, { code: CODES.theHeroesDefense, resources: 5 * seats }, CODES.urdug], deck: ["f0", "f0", "f0", "f0"] }));
+      expect(attacked.resolvedAttacks.map((key) => key.split("@")[0]), `${seats} seats`).toContain(idOf(attacked, CODES.urdug));
+      expect(damageTo(attacked, CODES.urdug, 3), `${seats} seats`).toBe(3);
+    }
     // The next phase is a new phase: the attacks of the combat phase do not count in it.
-    expect(flags(syncConstants({ ...t.state, phase: "Refresh", resolvedAttacks: [urdug] }, t.ctx), CODES.urdug, "cannotTakeDamage")).toEqual([true]);
+    const attacked = enemyAttacksDone(wilderlandTable(world, { phase: "Combat", staging: [CODES.theGoblinsAssault, { code: CODES.theHeroesDefense, resources: 5 }, CODES.urdug], deck: ["f0", "f0", "f0"] }));
+    expect(flags(syncConstants({ ...attacked, phase: "Refresh" }, t.ctx), CODES.urdug, "cannotTakeDamage")).toEqual([true]);
   });
 
   it("19155:A:1 another enemy takes damage as usual", () => {

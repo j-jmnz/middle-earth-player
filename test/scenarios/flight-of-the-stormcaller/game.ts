@@ -26,7 +26,7 @@ const COUNSEL = "11184";
 export const flightWorld = (decks: FlightDecks = "strong") => game.world(decks);
 export const afterRaid = (seatCount: 1 | 2) => game.after(seatCount);
 export const flightPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount)) => game.plan(seatCount, log);
-export const flightStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard) => game.start(seatCount, seed, difficulty, facts, log, modeCard);
+export const flightStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard) => game.start(seatCount, seed, difficulty, { facts, log, modeCard });
 
 export type FlightPolicy = {
   // "keep" or "trade": unused (the campaign card offers no trade of damage), kept so a golden names one policy shape with Voyage's.

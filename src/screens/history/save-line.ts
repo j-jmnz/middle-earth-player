@@ -38,10 +38,10 @@ export function describe(line: SaveLine): string {
   return `${line.name}, ${line.seats}, ${line.done} of ${line.total} completed`;
 }
 
-/** "Next: A Knife in the Dark", "On the table: ...", "The Drowned Ruins is coming soon" or "Every scenario is won": the next step in one phrase (a row, a folded header). */
+/** "Next: A Knife in the Dark", "On the table: ...", "The Drowned Ruins is coming soon" or "Campaign won": the next step in one phrase (a row, a folded header). */
 export function nextSummary(next: NextStep): string {
   if (next.kind === "soon") return soonWords(next.node);
-  return next.kind === "finished" ? "Every scenario is won" : `${next.kind === "resume" ? "On the table" : "Next"}: ${next.node.name}`;
+  return next.kind === "finished" ? "Campaign won" : `${next.kind === "resume" ? "On the table" : "Next"}: ${next.node.name}`;
 }
 
 /** What Delete asks, naming the playthrough by `describe`, since two of one campaign differ only there. */

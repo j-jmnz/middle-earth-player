@@ -248,8 +248,6 @@ const VERBS = [
   z.strictObject({ verb: z.literal("StageDiscarded"), type: z.literal("enemy"), ...when }),
   // "Remove 1 progress from The Goblins' Assault" (19163:A:2): progress comes off the card in play with this title, at most as much as it holds.
   z.strictObject({ verb: z.literal("RemoveProgressFrom"), amount: positiveAmountSchema, named: z.string().min(1), ...when }),
-  // "Place 1 resource on The Heroes' Defense" (19163:A:2): resource tokens go on the card in play with this title, unless a flag bars them (`noResourcesPlaced`).
-  z.strictObject({ verb: z.literal("PlaceResourcesOnNamed"), amount: positiveAmountSchema, named: z.string().min(1), ...when }),
 ] as const;
 
 const TRIGGERS = [

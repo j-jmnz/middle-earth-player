@@ -6,6 +6,7 @@ import { pushEffectFrame } from "../interpret/effect-frames.ts";
 import { holdsNow } from "../interpret/verbs.ts";
 import { shadowBlankOf } from "../interpret/conditions.ts";
 import type { EngineStep } from "../core/intents.ts";
+import { gameReads } from "../core/game-reads.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { runInstruction, type ReduceContext } from "../interpret/interpret.ts";
 import { defenseAsDefender, modifiedStat } from "../core/keywords.ts";
@@ -252,6 +253,13 @@ export function resumeAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   }
 }
 
+// The enemies that made an immediate attack in the phase now under way, with this one added; those of an earlier phase or round are forgotten.
+function noteImmediate(state: ScenarioState, enemyId: string): NonNullable<ScenarioState["immediateAttacks"]> {
+  const noted = state.immediateAttacks;
+  const here = noted != null && noted.round === state.round && noted.phase === state.phase;
+  return { round: state.round, phase: state.phase, enemies: here && noted.enemies.includes(enemyId) ? noted.enemies : [...(here ? noted.enemies : []), enemyId] };
+}
+
 // Ends the attack: endOfAttack modifiers expire, the enemy's attack is used up, and instructions a
 // shadow effect left for after the attack run in a frame of their own.
 export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
@@ -274,7 +282,9 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   // "After an attack in which ~ defends resolves", "After a non-unique enemy attacks you": the attack is over.
   const defender = attack.defenderId && !attack.undefended ? { other: attack.defenderId } : {};
   const announced = queueEvent(announceDestroyed(cleared, attack, ctx), { trigger: "attackResolved", seat: attack.seat, cardId: attack.enemyId, ...defender, ...(blank ? { shadowBlank: true as const } : {}) });
-  const ended: ScenarioState = { ...announced, pendingAttack: null, window: null, resolvedAttacks };
+  // An immediate attack leaves resolvedAttacks alone (it does not use up the enemy's attack). A game with a card that asks whether an enemy attacked this phase notes it for the phase it was made in (attackedThisPhase); every other game's state stays as it was.
+  const noted = attack.immediate && gameReads(done, ctx, '"kind":"attackedThisPhase"') ? { immediateAttacks: noteImmediate(done, attack.enemyId) } : {};
+  const ended: ScenarioState = { ...announced, pendingAttack: null, window: null, resolvedAttacks, ...noted };
   // A shadow card that attacks the defending player (Wolf Rider) attacks once this attack's own "after" instructions have run, and the
   // shadow cards that follow it once its attack has ended (startShadowAttack carries the rest of the list onto its attack).
   const after = attack.after ?? [];

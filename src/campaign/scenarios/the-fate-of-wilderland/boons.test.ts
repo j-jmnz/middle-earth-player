@@ -21,7 +21,7 @@ const where = (state: ScenarioState, code: string) => Object.values(state.cards)
 const pooled = (seats: 1 | 2, ...cards: readonly { code: string; seat?: number }[]): CampaignLog => ({ ...emptyLog(seats), campaignPool: cards.map((card) => poolCard(ctx.cards.get(card.code)!, card.code, null, card.seat ?? null)) });
 // The scenario dealt with these cards in the pool, its Setup played to the first round: the mulligan is kept and each question is answered with its first option.
 function opened(seats: 1 | 2, log: CampaignLog = emptyLog(seats), seed = 1): ScenarioState {
-  let state = startScenario(wilderlandStart(seats, seed, "Normal", undefined, log, undefined, wilderlandSetupChoices(seats, log)), ctx);
+  let state = startScenario(wilderlandStart(seats, seed, "Normal", { log, choices: wilderlandSetupChoices(seats, log) }), ctx);
   while (state.window?.kind === "mulligan") state = expectOk(reduce(state, { type: "Keep" }, ctx)).state;
   for (let guard = 0; guard < 40 && state.window?.kind === "choose"; guard += 1) state = expectOk(reduce(state, { type: "Choose", optionId: state.window.options[0] ?? "" }, ctx)).state;
   return state;
@@ -75,7 +75,7 @@ describe("the treasures of the log", () => {
   it("12197 a treasure in a deck is a player card the Setup may put in the hand, and the stage rules do not touch it", () => {
     const deck = ["12197", ...Array.from({ length: 29 }, () => FILLER)];
     const loadout = [{ heroes: ["q1", "q2", "q3"], deck }];
-    const state = startScenario(wilderlandStart(1, 1, "Normal", undefined, emptyLog(1), undefined, ["12197"], loadout), ctx);
+    const state = startScenario(wilderlandStart(1, 1, "Normal", { choices: ["12197"], loadout }), ctx);
     let opening = state;
     while (opening.window?.kind === "mulligan") opening = expectOk(reduce(opening, { type: "Keep" }, ctx)).state;
     expect(where(opening, "12197")[0]?.zone).toBe("hand");

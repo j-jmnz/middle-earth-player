@@ -85,11 +85,12 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 | 57 | Fire in the Night | active | 2026-11-06. Engine done; review round done. Phone half open: the table's side-quest area and current-quest mark, phone checks, both Maestro flows not run; `night-won` missing, so the win flow cannot run. |
 | 58 | The Ghost of Framsburg | active | 2026-11-06. Engine done; review round done. Phone half open: phone checks, both Maestro flows not run; `framsburg-won` missing, so the win flow cannot run. |
 | 59 | Mount Gundabad | active | 2026-11-06. Engine done; review round done. Phone half open: phone checks, both Maestro flows not run; `gundabad-won` missing, so the win flow cannot run. |
-| 60 | The Fate of Wilderland | not started | |
+| 60 | The Fate of Wilderland | active | 2026-11-06. Engine done; review round done. Phone half open: phone checks, both Maestro flows not run (and the edited Corsairs and Caves end flows); `wilderland-won` missing, so the win flow cannot run. |
 
 ## Open items
 
 ### Fixtures and Maestro
+- `wilderland-won` is not committed: none of 100 seeds (and 750 more under five other policies) wins The Fate of Wilderland with the starter decklists. Until it exists `.maestro/scenarios/the-fate-of-wilderland/the-fate-of-wilderland.yaml` cannot run.
 - `gundabad-won` is not committed: none of 100 seeds wins Mount Gundabad with the starter decklists; the hero carrying Wormsbane leaves play in the first rounds or threat runs out. Until it exists `.maestro/scenarios/mount-gundabad/mount-gundabad.yaml` cannot run.
 - `framsburg-won` is not committed: none of 100 seeds wins The Ghost of Framsburg with the starter decklists. Until it exists `.maestro/scenarios/the-ghost-of-framsburg/the-ghost-of-framsburg.yaml` cannot run; its `CHOICE_*` lines are commented out.
 - `night-won` is not committed: none of 100 seeds wins Fire in the Night with the starter decklists. Until it exists `.maestro/scenarios/fire-in-the-night/fire-in-the-night.yaml` cannot run; a win can ask up to four Resolution questions and `subflows/scenario-win.yaml` takes two.
@@ -185,6 +186,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 ### Phone and tablet checks
 - Journey Up the Anduin: the treasure draw rows (picture from a code, long press) and character rows two-handed; The Old Ford's refusal and travel caution at 667 × 375; Ruined Supplies' rows; Weighed Down's discard rows; the Resolution's oath-line row beside two Turayn tiles; A Growing Threat's banner line; the Creatures piles and Haldan's flip on the table.
 - Wilderland table: the Creatures pair and Caves deck at 667 × 375 two-seat at Small/Medium/Large; the Discover strip over the engagement band, the veil with Loot and Hazard ringed above it, the hold on the last beat and glide to discard, staging taps after the banner; reduced motion; a Deep Cave arriving off the Caves deck; the reshuffle glide; a guarded treasure with a screen reader; both themes.
+- The Fate of Wilderland: The Goblins' Assault and The Heroes' Defense counts, the last-stage Tap again cautions on the progress rows and the Watchtower's row and Pass, the attack-on-Urdug note before and after he attacks, Urdug's Command defense note, the Setup boon or treasure search two-handed, and the campaign-won Resolution screen and path foot (also The City of Corsairs').
 - Mount Gundabad: the bypass choice and note, Throat of the Mountain's and the look's stage rows, the Tap again cautions on stage damage, AssignDamage and Eyes in the Dark, The First Forge's and the Great Worm's Pass cautions, Dagnir's Hoard search two-handed, the one-card-per-phase refusal, the Resolution's Dragon-sickness and A Growing Threat sentences.
 - The Ghost of Framsburg: Discover's Loot and Hazard choice, Crypt Key's Discover rows, Fram's Shade's treasure Response, the reshuffle Action's Tap again caution, Gundabad Stalker's engagement note, Moonlit Passage's per-seat cap, the Resolution's Hunter-or-Stalker and Hazard choices two-handed.
 - Fire in the Night: the current-quest question and the commit sheet's title, the side-quest reveal line, the Hill attack's defender rows with their overflow and caution, the side-quest Responses, Beldis's boxes, the Resolution's treasure, removal and Beldis sentences two-handed.

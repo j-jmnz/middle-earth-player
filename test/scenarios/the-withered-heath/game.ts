@@ -229,7 +229,7 @@ export function heathSetupChoices(seatCount: 1 | 2, log: CampaignLog, difficulty
   throw new Error("The Campaign Setup keeps asking");
 }
 export const heathPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), choices?: readonly string[], difficulty?: Difficulty) => game.plan(seatCount, log, choices, difficulty);
-export const heathStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, choices?: readonly string[]) => game.start(seatCount, seed, difficulty, facts, log, modeCard, choices);
+export const heathStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, choices?: readonly string[]) => game.start(seatCount, seed, difficulty, { facts, log, modeCard, choices });
 
 // The pinned games: wins (true solo and two-handed, Normal and Easy, from a blank log and after the three earlier parts' real Resolutions with the allies in the pool or the oath, guidance and Isolde lines, each Accolade boon, each Song boon and none,
 // 3 and 4 Dragon Signs in the victory display, the treasure of the three drawn) and losses (heroes too small to quest, heroes too brittle to survive, the threat at the last stage), each on a fixed seed. Every win has the stage 4 fight: Cold-Drake defeated.

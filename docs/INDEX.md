@@ -59,7 +59,7 @@ Read the sections your task touches.
   - 350–355 Catalog build (~410)
   - 356–371 Tests (~1.3K) ← 3
   - 372–387 Performance (~1.2K) ← 3
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~81.2K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~81.7K tok)
   - 17–38 Sections (~410)
   - 39–50 Product (~530)
   - 51–64 Non-goals (~560)
@@ -85,14 +85,14 @@ Read the sections your task touches.
     - 466–481 Journey in the Dark, the Doom countdown and the Balrog (~1.7K)
     - 482–505 Breaking of the Fellowship, stage 2B (~2.2K) ← 1
     - 506–527 Seeded decks (~660)
-  - 528–627 Mirkwood Paths and The Dark of Mirkwood (~11.9K)
+  - 528–627 Mirkwood Paths and The Dark of Mirkwood (~12.0K)
     - 546–559 Passage Through Mirkwood (~1.6K)
     - 560–573 Journey Along the Anduin (~2.1K)
     - 574–594 Escape from Dol Guldur (~2.7K)
     - 595–609 The Oath (~2.3K)
-    - 610–627 The Caves of Nibin-Dûm (~2.3K)
+    - 610–627 The Caves of Nibin-Dûm (~2.4K)
   - 628–685 Dream-chaser (~15.7K)
-  - 686–712 Ered Mithrin (~15.6K) ← 2
+  - 686–712 Ered Mithrin (~16.0K) ← 2
   - 713–721 Nightmare (~420)
   - 722–760 Deckbuilding (~1.8K) ← 1
   - 761–839 Effects (~3.2K)
@@ -137,7 +137,7 @@ Read the sections your task touches.
   - 321–324 Haptics (~280)
   - 325–335 Banner (~580) ← 1
   - 336–339 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~24.6K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~24.7K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~580)
   - 34–44 Performance (~670) ← 4
@@ -151,7 +151,7 @@ Read the sections your task touches.
   - 206–220 Icons (~480) ← 6
   - 221–239 Card art (~740) ← 2
   - 240–254 Tablets (~510) ← 13
-  - 255–434 Screens (~13.9K)
+  - 255–434 Screens (~14.0K)
     - 259–262 Splash (~40)
     - 263–266 App icon (~80)
     - 267–282 Campaigns (campaign list) (~1.4K) ← 6
@@ -159,11 +159,11 @@ Read the sections your task touches.
     - 297–308 History (~1.3K) ← 4
     - 309–326 Briefing (~1.8K) ← 5
     - 327–330 Campaign setup (~700) ← 3
-    - 331–336 Campaign path (~700) ← 3
+    - 331–336 Campaign path (~740) ← 3
     - 337–340 Campaign log (~430) ← 1
     - 341–344 Spend XP (~610) ← 1
     - 345–348 Table — landscape (~130) ← 1
-    - 349–360 Resolution and standalone outcome (~1.3K) ← 1
+    - 349–360 Resolution and standalone outcome (~1.4K) ← 1
     - 361–370 Decks (~810) ← 2
     - 371–380 Deck builder (deck editor) (~790) ← 3
     - 381–390 Card pool (the Cards tab) (~770) ← 3
@@ -180,15 +180,15 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~10.9K tok)
+- `docs/phases/STATUS.md` — Phase status (~11.1K tok)
   - 5–17 Rules (~620)
-  - 18–89 Phases (~2.9K)
-  - 90–218 Open items (~6.8K)
-    - 92–114 Fixtures and Maestro (~1.2K)
-    - 115–160 Rules and engine (~1.9K)
-    - 161–184 Screens and code (~1.3K)
-    - 185–218 Phone and tablet checks (~2.4K)
-  - 219–235 Standing decisions (~430)
+  - 18–89 Phases (~3.0K)
+  - 90–220 Open items (~7.0K)
+    - 92–115 Fixtures and Maestro (~1.2K)
+    - 116–161 Rules and engine (~1.9K)
+    - 162–185 Screens and code (~1.3K)
+    - 186–220 Phone and tablet checks (~2.5K)
+  - 221–237 Standing decisions (~430)
 - `docs/phases/phase-10-campaign-shell.md` — Phase 10 — Campaign shell (~1.7K tok)
 - `docs/phases/phase-11-scenario-1-table.md` — Phase 11 — Scenario 1 table (~1.6K tok)
 - `docs/phases/phase-12-knife-in-the-dark.md` — Phase 12 — A Knife in the Dark (~1.4K tok)

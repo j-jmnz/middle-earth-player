@@ -145,6 +145,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("questDeck"), min: z.number().int().positive().optional() }),
   // The enemy with this title has resolved an attack in the combat phase now under way ("unless he has resolved an attack this phase", 19155:A:1): false in any other phase. Read by the wilderland family.
   z.strictObject({ kind: z.literal("attackedThisPhase"), name: z.string().min(1) }),
+  // The card in play with this title holds this flag, a modifier of that stat in force now: "resources cannot be placed on The Heroes' Defense" (19161:A:2) read by the Watchtower's option (19163:A:2). Read by the wilderland family.
+  z.strictObject({ kind: z.literal("namedFlag"), name: z.string().min(1), stat: z.string().min(1) }),
   // The active location has no Discover keyword to resolve (none printed, or the keyword is ignored): "If they cannot, Abandoned Ruins gains surge and doomed 2" (19106:A:1; emce.discover). Read by the wilderland family.
   z.strictObject({ kind: z.literal("discoverUnavailable") }),
   // A card with this code is attached to a hero (`is`) or is not.

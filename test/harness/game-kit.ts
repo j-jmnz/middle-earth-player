@@ -168,6 +168,9 @@ export type CampaignGameSpec<D extends string, P extends object> = {
   earlier?: EarlierParts;
 };
 
+/** What a campaign game's start takes beyond the seats, the seed and the difficulty: the campaign facts, the log the earlier parts leave, the mode card, the Campaign Setup's answers and the seats' decks. */
+export type StartOptions = { facts?: Omit<CampaignFacts, "modeCard"> | undefined; log?: CampaignLog | undefined; modeCard?: ModeCard | undefined; choices?: readonly string[] | undefined; loadout?: LoadoutSeat[] | undefined };
+
 /**
  * The seeded whole game of one scenario of a campaign (test/scenarios/<scenario-id>/game.ts): its world (the cards a campaign game
  * deals and the stand-in heroes and filler deck), the Campaign Setup Checklist's plan, the start the plan builds, the log the earlier
@@ -214,8 +217,9 @@ export function campaignGame<D extends string, P extends object>(spec: CampaignG
     return checked;
   }
 
-  function start(seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, choices?: readonly string[], loadout?: LoadoutSeat[]): StartScenario {
-    const checked = plan(seatCount, log, choices, difficulty, loadout);
+  function start(seatCount: 1 | 2, seed: number, difficulty: Difficulty, options: StartOptions = {}): StartScenario {
+    const { facts, modeCard, choices, loadout } = options;
+    const checked = plan(seatCount, options.log ?? emptyLog(seatCount), choices, difficulty, loadout);
     // The campaign's own columns of the log reach the game as they do in startFor (src/campaign/briefing.ts); another campaign's are none.
     const logged = wilderlandFacts(checked.log, spec.campaign.id);
     const dealtFacts = Object.keys(logged).length > 0 ? { prisoner: null, usedOnce: [], counters: {}, ...facts, ...logged } : facts;
@@ -240,7 +244,7 @@ export function campaignGame<D extends string, P extends object>(spec: CampaignG
   /** Plays until the scenario is lost, or won and every Resolution choice is answered. */
   function play(seatCount: 1 | 2, seed: number, difficulty: Difficulty, ctx: ReduceContext, options: { facts?: Omit<CampaignFacts, "modeCard">; log?: CampaignLog; policy?: Partial<P>; mode?: ModeCard; choices?: readonly string[]; limit?: number } = {}): PlayedGame {
     const policy = { ...spec.policy, ...options.policy };
-    return playToEnd(start(seatCount, seed, difficulty, options.facts, options.log, options.mode, options.choices), ctx, (state, memory) => spec.intent(state, ctx, memory, policy), options.limit ?? spec.limit);
+    return playToEnd(start(seatCount, seed, difficulty, { facts: options.facts, log: options.log, modeCard: options.mode, choices: options.choices }), ctx, (state, memory) => spec.intent(state, ctx, memory, policy), options.limit ?? spec.limit);
   }
 
   /** A golden: its upgraded cards or, after the earlier parts, their levels as the campaign facts; the earlier parts' log; its policy over the default. */

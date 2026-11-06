@@ -208,7 +208,7 @@ export function nightSetupChoices(seatCount: 1 | 2, log: CampaignLog, difficulty
   throw new Error("The Campaign Setup keeps asking");
 }
 export const nightPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), choices?: readonly string[], difficulty?: Difficulty) => game.plan(seatCount, log, choices, difficulty);
-export const nightStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, choices?: readonly string[]) => game.start(seatCount, seed, difficulty, facts, log, modeCard, choices);
+export const nightStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, choices?: readonly string[]) => game.start(seatCount, seed, difficulty, { facts, log, modeCard, choices });
 
 // The pinned games: wins (true solo and two-handed, Normal and Easy, from a blank log and after the five earlier parts' real Resolutions with the allies and Misplaced Trust or Urdug's Cunning in the pool, or the oath, guidance and Isolde lines written; a side quest made the current
 // quest every round or every other round; the attack on Hrogar's Hill defended or left undefended; the enemies engaged or left in the staging area; Beldis healing; a response used or passed; Beldis in the pool or the line; the treasure of three at 5 progress or none; a card of the pool removed or none)

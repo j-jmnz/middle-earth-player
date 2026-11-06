@@ -72,7 +72,7 @@ const nextTone = (archived: boolean): CardLine["tone"] => (archived ? "muted" : 
 export function saveWords(ref: LibrarySave, runs: readonly RunRecord[], started: number | null, archived: boolean, nameOf: NameOf): CardWords {
   const { line: worded, save } = ref;
   const seats = partySeats(save);
-  const next = worded.next.kind === "finished" ? "Campaign complete" : nextSummary(worded.next);
+  const next = worded.next.kind === "finished" ? "Campaign won" : nextSummary(worded.next);
   return {
     title: worded.name,
     lines: [...line(playthroughWords(worded.seats, started, { done: worded.done, total: worded.total }), "muted"), ...line(heroesWords(seats, nameOf), "muted"), ...line(next, nextTone(archived))],

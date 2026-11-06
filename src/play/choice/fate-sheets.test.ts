@@ -63,7 +63,7 @@ describe("the choices that make a player pay or put progress on The Goblins' Ass
     for (const [seats, lead, need] of [[1, "", 4], [2, "Player 1, ", 6]] as const) {
       const t = table({ seats }, 1);
       const sheet = sheetOf(t, bare(t, t.state, CODES.urdugSElite, "forced"));
-      expect(sheet.note).toBe(`${lead}Urdug's Elite: it engaged you. The Goblins' Assault holds 1 of the ${need} progress that advance the quest at the end of the round.`);
+      expect(sheet.note).toBe(`${lead}Urdug's Elite: it engaged you. The Goblins' Assault: 1 of ${need} progress, +1 at the end of the round (1 for each enemy in the staging area). At ${need} the goblins push the quest on.`);
       expect(labels(sheet)).toEqual(["Exhaust a character you control", "Place 1 progress on The Goblins' Assault"]);
       expect(cautions(sheet)).toEqual([undefined, undefined]);
     }
@@ -81,32 +81,46 @@ describe("the choices that make a player pay or put progress on The Goblins' Ass
   it("Fierce Vanguard (19159:A:1) and Warg-rider (19160:A:1): the reason each window opened, and each branch in words", () => {
     const t = table({}, 2);
     const vanguard = sheetOf(t, bare(t, t.state, CODES.fierceVanguard, "forced"));
-    expect(vanguard.note).toBe("Fierce Vanguard: it engaged you. The Goblins' Assault holds 2 of the 4 progress that advance the quest at the end of the round.");
-    expect(labels(vanguard)).toEqual(["This card gets +2 Attack until the end of the round", "Place 1 progress on The Goblins' Assault"]);
+    expect(vanguard.note).toBe("Fierce Vanguard: it engaged you. The Goblins' Assault: 2 of 4 progress, +1 at the end of the round (1 for each enemy in the staging area). At 4 the goblins push the quest on.");
+    expect(labels(vanguard)).toEqual(["Fierce Vanguard gets +2 Attack until the end of the round", "Place 1 progress on The Goblins' Assault"]);
     const warg = sheetOf(t, bare(t, t.state, CODES.wargRider, "forced"));
-    expect(warg.note).toBe("Warg-rider: it was dealt a shadow card with no effect. The Goblins' Assault holds 2 of the 4 progress that advance the quest at the end of the round.");
-    expect(labels(warg)).toEqual(["Return it to the staging area", "Place 1 progress on The Goblins' Assault"]);
+    expect(warg.note).toBe("Warg-rider: it was dealt a shadow card with no effect. The Goblins' Assault: 2 of 4 progress, +1 at the end of the round (1 for each enemy in the staging area). At 4 the goblins push the quest on.");
+    expect(labels(warg)).toEqual(["Return Warg-rider to the staging area: it does not attack you this phase", "Place 1 progress on The Goblins' Assault"]);
+  });
+
+  it("the objective's count by stage: the end of the round adds 1 for each enemy in the staging area (stage 1) or in play (stage 3), and stage 2, which gets its progress from attacks, adds none", () => {
+    const stages = [["19168", "2 of 4 progress, +1 at the end of the round (1 for each enemy in the staging area). At 4 the goblins push the quest on."], ["19169", "2 of 8 progress. At 8 the goblins push the quest on."], ["19170", "2 of 16 progress, +1 at the end of the round (1 for each enemy in play). At 16 the game is lost."]] as const;
+    for (const [stage, said] of stages) {
+      const t = table({ stage }, 2);
+      expect(sheetOf(t, bare(t, t.state, CODES.slopesOfGundabad, "whenRevealed", "staging")).note, stage).toBe(`Slopes of Gundabad: it was revealed. The Goblins' Assault: ${said}`);
+    }
   });
 
   it("Slopes of Gundabad (19164:A:1): the player who revealed it chooses, solo and two-handed", () => {
     for (const [seats, lead] of [[1, ""], [2, "Player 1, "]] as const) {
       const t = table({ seats }, 3);
       const sheet = sheetOf(t, bare(t, t.state, CODES.slopesOfGundabad, "whenRevealed", "staging"));
-      expect(sheet.note).toBe(`${lead}Slopes of Gundabad: it was revealed. The Goblins' Assault holds 3 of the ${seats === 1 ? 4 : 6} progress that advance the quest at the end of the round.`);
+      expect(sheet.note).toBe(`${lead}Slopes of Gundabad: it was revealed. The Goblins' Assault: 3 of ${seats === 1 ? 4 : 6} progress, +1 at the end of the round (1 for each enemy in the staging area). At ${seats === 1 ? 4 : 6} the goblins push the quest on.`);
       expect(labels(sheet)).toEqual(["Place 1 progress on The Goblins' Assault", "Reveal an encounter card"]);
     }
   });
 
   it("on the last stage the row that brings The Goblins' Assault to the number that loses the game arms the confirm, and no other does", () => {
-    const near = table({ stage: "19170" }, 15);
+    // The Final Push adds 1 progress for each enemy in play at the end of the round, Urdug among them, before it checks the number: 14 and the 1 placed and the 1 for Urdug reach 16.
+    const near = table({ stage: "19170" }, 14);
     const sheet = sheetOf(near, bare(near, near.state, CODES.slopesOfGundabad, "whenRevealed", "staging"));
-    expect(sheet.note).toContain("The Goblins' Assault holds 15 of the 16 progress that lose the game at the end of the round.");
-    expect(cautions(sheet)).toEqual(["Tap again: The Goblins' Assault would hold 16 of 16 and the players lose the game at the end of the round, unless progress comes off it.", undefined]);
+    expect(sheet.note).toContain("The Goblins' Assault: 14 of 16 progress, +1 at the end of the round (1 for each enemy in play). At 16 the game is lost.");
+    expect(cautions(sheet)).toEqual(["Tap again: with 1 for each enemy in play, The Goblins' Assault reaches 16 of 16 at the end of the round and the game is lost", undefined]);
+    // One short of it: 13, the 1 placed and the 1 for Urdug make 15.
+    const short = table({ stage: "19170" }, 13);
+    expect(cautions(sheetOf(short, bare(short, short.state, CODES.slopesOfGundabad, "whenRevealed", "staging")))).toEqual([undefined, undefined]);
     const far = table({ stage: "19170" }, 5);
     expect(cautions(sheetOf(far, bare(far, far.state, CODES.slopesOfGundabad, "whenRevealed", "staging")))).toEqual([undefined, undefined]);
-    // Two-handed the number is 8 plus 8 for each player.
-    const two = table({ stage: "19170", seats: 2 }, 23);
-    expect(cautions(sheetOf(two, bare(two, two.state, CODES.fierceVanguard, "forced")))[1]).toBe("Tap again: The Goblins' Assault would hold 24 of 24 and the players lose the game at the end of the round, unless progress comes off it.");
+    // Two-handed the number is 8 plus 8 for each player, and the Vanguard that engaged is an enemy in play with Urdug: 21, the 1 placed and the 2 for the enemies reach 24.
+    const two = table({ stage: "19170", seats: 2 }, 21);
+    expect(cautions(sheetOf(two, bare(two, two.state, CODES.fierceVanguard, "forced")))[1]).toBe("Tap again: with 1 for each enemy in play, The Goblins' Assault reaches 24 of 24 at the end of the round and the game is lost");
+    const twoShort = table({ stage: "19170", seats: 2 }, 20);
+    expect(cautions(sheetOf(twoShort, bare(twoShort, twoShort.state, CODES.fierceVanguard, "forced")))[1]).toBeUndefined();
     // An earlier stage only advances the quest.
     const early = table({ stage: "19169" }, 7);
     expect(cautions(sheetOf(early, bare(early, early.state, CODES.slopesOfGundabad, "whenRevealed", "staging")))).toEqual([undefined, undefined]);
@@ -124,7 +138,7 @@ describe("Dwarven Watchtower (19163:A:2)", () => {
       const { t, run } = explored({ seats });
       const sheet = sheetOf(t, run);
       expect(sheet.kind).toBe("trigger");
-      expect(sheet.note).toBe(`${lead}Dwarven Watchtower was explored. The Heroes' Defense holds 2 of the ${resources} resources that engage Urdug with each player. The Goblins' Assault holds 3 of the ${progress} progress that advance the quest at the end of the round. The first player places the resource or takes the progress off. Pass and neither happens.`);
+      expect(sheet.note).toBe(`${lead}Dwarven Watchtower was explored. The first player may put 1 resource on The Heroes' Defense (2 of ${resources}) or take 1 progress off The Goblins' Assault (3 of ${progress}). Pass and neither happens.`);
     }
   });
 
@@ -133,7 +147,7 @@ describe("Dwarven Watchtower (19163:A:2)", () => {
       const { t, run } = explored({ seats });
       const used = send({ state: run, steps: [] }, offerOf(run, t, watchtower(t)) as never, t.ctx);
       const sheet = sheetOf(t, used.state);
-      expect(sheet.note).toBe(`Dwarven Watchtower was explored. The Heroes' Defense holds 2 of the ${seats === 1 ? 5 : 10} resources that engage Urdug with each player. The Goblins' Assault holds 3 of the ${seats === 1 ? 4 : 6} progress that advance the quest at the end of the round.${suffix}`);
+      expect(sheet.note).toBe(`Dwarven Watchtower was explored. The Heroes' Defense holds 2 of the ${seats === 1 ? 5 : 10} resources that make Urdug engaged with each player. The Goblins' Assault: 3 of ${seats === 1 ? 4 : 6} progress, +1 at the end of the round (1 for each enemy in the staging area). At ${seats === 1 ? 4 : 6} the goblins push the quest on.${suffix}`);
       expect(labels(sheet)).toEqual(["Place 1 resource on The Heroes' Defense", "Remove 1 progress from The Goblins' Assault"]);
     }
   });
@@ -141,9 +155,26 @@ describe("Dwarven Watchtower (19163:A:2)", () => {
   it("with Gate of Gundabad in the staging area the Response says only the progress comes off, names the Gate, and asks no choice", () => {
     const { t, run } = explored({}, [{ code: CODES.theGoblinsAssault, progress: 3 }, CODES.theHeroesDefense, CODES.urdug, CODES.gateOfGundabad]);
     const sheet = sheetOf(t, run);
-    expect(sheet.note).toBe("Dwarven Watchtower was explored. Gate of Gundabad is in the staging area, so no resource can be placed on The Heroes' Defense: only progress comes off. The Goblins' Assault holds 3 of the 4 progress that advance the quest at the end of the round. The first player takes the progress off. Pass and the progress stays.");
+    expect(sheet.note).toBe("Dwarven Watchtower was explored. Gate of Gundabad is in the staging area, so no resource can be placed on The Heroes' Defense. The first player may take 1 progress off The Goblins' Assault (3 of 4). Pass and the progress stays.");
     const used = send({ state: run, steps: [] }, offerOf(run, t, watchtower(t)) as never, t.ctx);
     expect(used.state.window?.kind).not.toBe("choose");
+  });
+
+  it("on the last stage the Pass and the resource row arm 'Tap again' when the objective already stands at the number that loses with the end of the round's progress, and the progress row does not", () => {
+    const armed = "Tap again: no progress comes off and the game is lost at the end of the round";
+    // 15 and the 1 for Urdug reach 16.
+    const { t, run } = explored({ stage: "19170" }, [{ code: CODES.theGoblinsAssault, progress: 15 }, { code: CODES.theHeroesDefense, resources: 2 }, CODES.urdug]);
+    expect((sheetOf(t, run) as { passCaution?: string }).passCaution).toBe(armed);
+    const used = send({ state: run, steps: [] }, offerOf(run, t, watchtower(t)) as never, t.ctx);
+    expect(cautions(sheetOf(t, used.state))).toEqual([armed, undefined]);
+    // One short of it, nothing is armed.
+    const short = explored({ stage: "19170" }, [{ code: CODES.theGoblinsAssault, progress: 14 }, { code: CODES.theHeroesDefense, resources: 2 }, CODES.urdug]);
+    expect((sheetOf(short.t, short.run) as { passCaution?: string }).passCaution).toBeUndefined();
+    const taken = send({ state: short.run, steps: [] }, offerOf(short.run, short.t, watchtower(short.t)) as never, short.t.ctx);
+    expect(cautions(sheetOf(short.t, taken.state))).toEqual([undefined, undefined]);
+    // An earlier stage never loses at the end of the round.
+    const early = explored({ stage: "19169" }, [{ code: CODES.theGoblinsAssault, progress: 7 }, { code: CODES.theHeroesDefense, resources: 2 }, CODES.urdug]);
+    expect((sheetOf(early.t, early.run) as { passCaution?: string }).passCaution).toBeUndefined();
   });
 });
 
@@ -159,13 +190,17 @@ describe("The Heroes' Defense (19156:A:2)", () => {
       const { t, run } = destroyed({ seats }, 3);
       const sheet = sheetOf(t, run);
       expect(sheet.kind).toBe("trigger");
-      expect(sheet.note).toBe(`${lead}Stray Goblin was destroyed. The Heroes' Defense holds 3 of the ${need} resources that engage Urdug with each player. Place 1 resource on it. Pass and it stays at 3.`);
+      expect(sheet.note).toBe(`${lead}Stray Goblin was destroyed. The Heroes' Defense holds 3 of the ${need} resources that make Urdug engaged with each player. Use it to place 1 resource. Pass and it stays at 3.`);
     }
   });
 
-  it("with Gate of Gundabad in the staging area it names the Gate and says passing loses nothing", () => {
+  it("with Gate of Gundabad in the staging area the Response is not offered: its only effect is barred", () => {
     const { t, run } = destroyed({}, 3, [CODES.gateOfGundabad]);
-    expect(sheetOf(t, run).note).toBe("Stray Goblin was destroyed. The Heroes' Defense holds 3 of the 5 resources that engage Urdug with each player. Gate of Gundabad is in the staging area, so no resource can be placed on it: passing loses nothing.");
+    expect(run.window?.kind).not.toBe("response");
+    expect(offerOf(run, t, idOf(run, CODES.theHeroesDefense))).toBeUndefined();
+    // Without the Gate the same destruction offers it.
+    const open = destroyed({}, 3);
+    expect(offerOf(open.run, open.t, idOf(open.run, CODES.theHeroesDefense))).toBeDefined();
   });
 
   it("the banner says the count after the resource, and when the enemy becomes engaged with each player", () => {
@@ -223,14 +258,39 @@ describe("Urdug's attack against each player (19157:A:2)", () => {
     }
     const moment = momentOf(run.state, hit.state, steps, { card: (id) => nameOf(hit.state.cards[id]?.code ?? id), fate: fateNames(t.ctx, (id) => nameOf(hit.state.cards[id]?.code ?? id)) });
     expect(moment?.title).toBe("Urdug attacks");
-    expect(moment?.lines.map((line) => line.text).slice(0, 2)).toEqual(["Attack 5 on dh1, undefended", "Urdug discarded the top card of the encounter deck: its printed Threat is part of this Attack."]);
+    expect(moment?.lines.map((line) => line.text).slice(0, 2)).toEqual(["Attack 5 on dh1, undefended", "Urdug discarded Lonely Lands: +2 Attack from its Threat."]);
   });
 
   it("Urdug's Command (19166:A:1): the attack he makes at once comes from the staging area, now", () => {
     const t = table({ phase: "Encounter", deck: ["f0", CODES.lonelyLands, "f0", "f0"] });
     const revealed = bare(t, t.state, CODES.urdugSCommand, "whenRevealed", "staging");
     expect(revealed.window?.kind).toBe("defense");
-    expect(sheetOf(t, revealed).note).toBe("Attack 5. Urdug attacks you now, from the staging area. The top card of the encounter deck, Lonely Lands, was discarded: its printed Threat 2 is part of this Attack. Choose a defender, or leave it undefended.");
+    expect(sheetOf(t, revealed).note).toBe("Attack 5. Urdug attacks you now, from the staging area. If this attack destroys a character, The Goblins' Assault gets 1 progress. The top card of the encounter deck, Lonely Lands, was discarded: its printed Threat 2 is part of this Attack. Choose a defender, or leave it undefended.");
+  });
+
+  it("on the last stage Urdug's Command says what a destroyed character brings the objective to when that loses the game", () => {
+    const t = table({ stage: "19170", phase: "Encounter", deck: ["f0", CODES.lonelyLands, "f0", "f0"] }, 14);
+    const revealed = bare(t, t.state, CODES.urdugSCommand, "whenRevealed", "staging");
+    expect(sheetOf(t, revealed).note).toContain("If this attack destroys a character, The Goblins' Assault gets 1 progress and reaches 16 of 16 at the end of the round: the game is lost.");
+    const safe = table({ stage: "19170", phase: "Encounter", deck: ["f0", CODES.lonelyLands, "f0", "f0"] }, 5);
+    expect(sheetOf(safe, bare(safe, safe.state, CODES.urdugSCommand, "whenRevealed", "staging")).note).toContain("If this attack destroys a character, The Goblins' Assault gets 1 progress. The top card");
+  });
+
+  it("the sheet of the Attack on Urdug says his Defense and what raises it, that he takes no damage until he has attacked this phase and he has not; after his real attack it says he can be damaged and what destroying him does", () => {
+    const before = wilderlandTable(world, { phase: "PlayerAttacks", discard: W, staging: [CODES.theGoblinsAssault, { code: CODES.theHeroesDefense, resources: 5 }, CODES.urdug, CODES.strayGoblin] });
+    const attackers = (state: ScenarioState, ctx: Table["ctx"]) => {
+      const sheet = sheetFor(state, ctx, legalIntents(state, ctx), names(state));
+      if (sheet?.kind !== "pick") throw new Error("no pick sheet");
+      const next = sheet.options.map((option) => ("next" in option ? option.next : undefined)).find((item) => item?.title === "Attack Urdug");
+      return next && "note" in next ? next.note : undefined;
+    };
+    expect(attackers(before.state, before.ctx)).toBe("Defense 4 (+2 for each other enemy in play). Choose the characters that attack Urdug. He takes no damage until he has attacked this phase, and he has not.");
+    // His attack from the staging area, made for real in the combat phase: the player attacks follow it.
+    const { t, run } = attacks(1);
+    let after: Run = send(run, { type: "Undefended", heroId: t.hero } as never, t.ctx);
+    for (let guard = 0; guard < 12 && after.state.window?.kind !== "playerAttack"; guard += 1) after = send(after, { type: "Pass" } as never, t.ctx);
+    expect(after.state.window?.kind).toBe("playerAttack");
+    expect(attackers(after.state, t.ctx)).toBe("Defense 2 (+2 for each other enemy in play). Choose the characters that attack Urdug. He has attacked this phase, so he can be damaged. Destroy him and the players win.");
   });
 
   it("the Attack on Urdug says he takes no damage until he has resolved an attack this phase, and what his Defense counts", () => {
@@ -262,7 +322,7 @@ describe("the banner of the other lines", () => {
     const t = table({}, 1);
     const placed = send({ state: bare(t, t.state, CODES.slopesOfGundabad, "whenRevealed", "staging"), steps: [] }, { type: "Choose", optionId: "progress" } as never, t.ctx);
     const moment = momentOf(t.state, placed.state, placed.steps.flat(), { card: nameFor(placed.state), fate: fateNames(t.ctx, nameFor(placed.state)) });
-    expect(moment?.lines.map((line) => line.text)).toContain("The Goblins' Assault holds 2 of the 4 progress that advance the quest at the end of the round.");
+    expect(moment?.lines.map((line) => line.text)).toContain("The Goblins' Assault: 2 of 4 progress, +1 at the end of the round (1 for each enemy in the staging area). At 4 the goblins push the quest on.");
   });
 });
 

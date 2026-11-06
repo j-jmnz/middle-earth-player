@@ -5,6 +5,7 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
+import { takeProgressOff } from "../../core/progress.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { queueEvent } from "../../windows/queue.ts";
@@ -85,9 +86,7 @@ export function lookAtFacedown(state: ScenarioState, instruction: Verb<"LookAtFa
   const id = refCard(state, instruction.target ?? "self", frameScope(state, focus.seat, focus.sourceId));
   const card = id ? state.cards[id] : undefined;
   if (!id || !card || !isLostIsland(card, ctx)) return state;
-  const removed = Math.min(card.progress, instruction.remove ?? 0);
-  if (removed > 0) steps.push({ kind: "progress", targetId: id, amount: -removed, cause: currentCause(steps, UNATTRIBUTED) });
-  const next = removed > 0 ? updateCard(state, id, { progress: card.progress - removed }) : state;
+  const next = takeProgressOff(state, id, instruction.remove ?? 0, steps);
   return { ...next, window: { kind: "look", seat: focus.seat, cardIds: [id], side: "A" }, activeSeat: focus.seat, passed: [] };
 }
 

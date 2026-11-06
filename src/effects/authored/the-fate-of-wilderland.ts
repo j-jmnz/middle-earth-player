@@ -19,7 +19,8 @@ const DEFENSE_PICK: PickSpec = { type: "objective", control: "any", staging: tru
 const URDUG_ENEMY: PickSpec = { type: "enemy", control: "any", staging: true, names: [URDUG] };
 const ENEMIES_IN_PLAY: PickSpec = { type: "enemy", control: "any", staging: true };
 const ENEMIES_STAGED: PickSpec = { type: "enemy", control: "any", stagingOnly: true };
-const GATE_IN_STAGING: Condition = { kind: "canPick", pick: { type: "location", control: "any", stagingOnly: true, names: ["Gate of Gundabad"] } };
+// The flag Gate of Gundabad's constant record sets on The Heroes' Defense (19161:A:2).
+const DEFENSE_BARRED: Condition = { kind: "namedFlag", name: DEFENSE, stat: "noResourcesPlaced" };
 // The instructions a Choose option holds.
 type Simple = Extract<Instruction, { verb: "Choose" }>["options"][number]["instructions"];
 // "place N progress on The Goblins' Assault" (amount: a number or an amount the record reads). The two simple instructions fit a Choose option, an AfterAttack and a Delay alike.
@@ -80,7 +81,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "19155:forced:1", cardCode: "19155", lines: ["19155:A:2"], timing: "forced", trigger: "questFailed", limit: "oncePerRound", instructions: [{ verb: "PlaceProgressOn", amount: { players: true }, target: "self" }] },
 
     // 19156 The Heroes' Defense (objective). With 5 resources for each player on it Urdug is considered engaged with each player, as the Watcher in the Water is (he adds no Threat to the staging area, rr.engaged). Response: after an enemy is destroyed
-    // it gets 1 resource (the flag Gate of Gundabad sets bars it).
+    // it gets 1 resource (the flag Gate of Gundabad sets bars it, and the Response is then not offered).
     {
       id: "19156:constant:1",
       cardCode: "19156",
@@ -93,7 +94,17 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
         { verb: "ModifyStat", stat: "attackableByAny", amount: 1, until: "whileSourceInPlay", holders: URDUG_ENEMY },
       ],
     },
-    { id: "19156:response:1", cardCode: "19156", lines: ["19156:A:2"], timing: "response", trigger: "enemyDestroyed", subject: ENEMIES_IN_PLAY, instructions: [{ verb: "PlaceResourceTokens", amount: 1, on: "self" }] },
+    {
+      id: "19156:response:1",
+      cardCode: "19156",
+      lines: ["19156:A:2"],
+      timing: "response",
+      trigger: "enemyDestroyed",
+      subject: ENEMIES_IN_PLAY,
+      // Its only effect is the placing a bar stops: with Gate of Gundabad in the staging area the Response is not offered.
+      condition: { kind: "flag", stat: "noResourcesPlaced", holder: "self", is: false },
+      instructions: [{ verb: "PlaceResourceTokens", amount: 1, on: "self" }],
+    },
 
     // 19157 Urdug (immune to player card effects is a keyword). He cannot leave the staging area. Forced: when he attacks, the top card of the encounter deck is discarded and its printed Threat is added to his Attack for this attack. When he is destroyed
     // the players win the game.
@@ -208,7 +219,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
           verb: "Choose",
           who: "firstPlayer",
           options: [
-            { id: "resource", requires: { kind: "not", condition: GATE_IN_STAGING }, instructions: [{ verb: "PlaceResourcesOnNamed", amount: 1, named: DEFENSE }] },
+            { id: "resource", requires: { kind: "not", condition: DEFENSE_BARRED }, instructions: [{ verb: "Pick", pick: DEFENSE_PICK }, { verb: "PlaceResourceTokens", amount: 1, on: "picked" }] },
             { id: "progress", requires: { kind: "less", left: 0, right: { stat: "progress", ofNamed: ASSAULT } }, instructions: [{ verb: "RemoveProgressFrom", amount: 1, named: ASSAULT }] },
           ],
         },

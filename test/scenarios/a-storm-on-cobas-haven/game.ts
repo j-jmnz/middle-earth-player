@@ -26,7 +26,7 @@ export const afterRuins = (seatCount: 1 | 2) => game.after(seatCount);
 // The campaign card's Setup (11209:A:3) through the Campaign Setup Checklist: the seats are asked in turn for the one copy of Círdan's Blessing until a player takes it ("skip" refuses); the first player does here.
 export const blessingChoices = (): string[] => [CODES.cirdanSBlessing];
 export const havenPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), choices: readonly string[] = blessingChoices()) => game.plan(seatCount, log, choices);
-export const havenStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, choices: readonly string[] = blessingChoices()) => game.start(seatCount, seed, difficulty, facts, log, modeCard, choices);
+export const havenStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, choices: readonly string[] = blessingChoices()) => game.start(seatCount, seed, difficulty, { facts, log, modeCard, choices });
 
 export type HavenPolicy = {
   // The option a Choose window with these answers takes: the first or the last.

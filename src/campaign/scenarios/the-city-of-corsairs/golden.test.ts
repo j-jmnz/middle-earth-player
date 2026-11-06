@@ -165,7 +165,7 @@ goldenSuite<CorsairsGolden, CorsairsDecks>({
   },
   before: (golden) => (golden.after ? afterHaven(golden.seatCount) : emptyLog(golden.seatCount)),
   afterWin({ log, path, golden }) {
-    // The last part of the campaign: winning it leaves no scenario unwon and the path finishes ("Campaign complete"), as the Resolution says.
+    // The last part of the campaign: winning it leaves no scenario unwon and the path finishes ("Dream-chaser won. The players win the campaign!"), as the Resolution says.
     if (golden.after) expect(log.completed).toEqual([...campaign.scenarios]);
     expect(path.every((node) => node.status === "completed")).toBe(true);
     expect(nextStep(path, null)).toEqual({ kind: "finished" });

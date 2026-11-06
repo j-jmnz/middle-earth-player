@@ -198,7 +198,7 @@ export function gundabadSetupChoices(seatCount: 1 | 2, log: CampaignLog, difficu
   throw new Error("The Campaign Setup keeps asking");
 }
 export const gundabadPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), choices?: readonly string[], difficulty?: Difficulty) => game.plan(seatCount, log, choices, difficulty);
-export const gundabadStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, choices?: readonly string[]) => game.start(seatCount, seed, difficulty, facts, log, modeCard, choices);
+export const gundabadStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, choices?: readonly string[]) => game.start(seatCount, seed, difficulty, { facts, log, modeCard, choices });
 
 // The pinned games: wins (true solo and two-handed, Normal and Easy, from a blank log and after the seven earlier parts' real Resolutions with the allies and Misplaced Trust or Urdug's Cunning in the pool, Dragon-sickness shuffled in with 6 or more
 // treasures logged, or the Turayn, Melanwar, Isolde and Beldis lines written; no stage bypassed and several, in several orders of the quest deck; Dagnir hunted and engaged or left to the quest; every win slays Dagnir with the Reforged Wormsbane at the Great Worm) and losses

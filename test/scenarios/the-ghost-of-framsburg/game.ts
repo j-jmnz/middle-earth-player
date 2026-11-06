@@ -211,7 +211,7 @@ export function framsburgSetupChoices(seatCount: 1 | 2, log: CampaignLog, diffic
   throw new Error("The Campaign Setup keeps asking");
 }
 export const framsburgPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), choices?: readonly string[], difficulty?: Difficulty) => game.plan(seatCount, log, choices, difficulty);
-export const framsburgStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, choices?: readonly string[]) => game.start(seatCount, seed, difficulty, facts, log, modeCard, choices);
+export const framsburgStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, choices?: readonly string[]) => game.start(seatCount, seed, difficulty, { facts, log, modeCard, choices });
 
 // The pinned games: wins (true solo and two-handed, Normal and Easy, from a blank log and after the six earlier parts' real Resolutions with the allies and Misplaced Trust or Urdug's Cunning in the pool or the Turayn, Melanwar, Isolde and Beldis lines written; the Loot objectives claimed,
 // Crypt Key and Old Lantern used, a treasure attached to Fram's Shade and claimed or none, the Action that shuffles the encounter discard pile used or not, Gundabad Hunter or Gundabad Stalker for the pool, a Hazard card or a burden among the two discarded) and losses (heroes too small to quest,

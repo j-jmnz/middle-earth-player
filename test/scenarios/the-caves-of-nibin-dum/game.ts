@@ -27,7 +27,7 @@ const game = campaignGame<CavesDecks, CavesPolicy>({ campaign, scenario: caves, 
 
 export const cavesWorld = (decks: CavesDecks = "strong") => game.world(decks);
 export const cavesPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount)) => game.plan(seatCount, log);
-export const cavesStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: CampaignFacts, log: CampaignLog = emptyLog(seatCount)): StartScenario => game.start(seatCount, seed, difficulty, facts, log);
+export const cavesStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: CampaignFacts, log: CampaignLog = emptyLog(seatCount)): StartScenario => game.start(seatCount, seed, difficulty, { facts, log });
 
 export type CavesPolicy = { boon: "play" | "keep" };
 

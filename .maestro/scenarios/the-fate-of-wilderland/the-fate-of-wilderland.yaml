@@ -7,7 +7,7 @@ tags:
 # the treasures the earlier parts discovered), parked on its win (Urdug destroyed once The Heroes' Defense held 5 resources for each player). The fixture is OPEN when scripts/e2e/fixtures.ts found no win of the two starter decklists in its
 # seeds (docs/phases/STATUS.md), so this flow cannot run until a seed wins.
 # The Resolution asks no choice ("The players win the campaign!") and writes nothing to the pool, the treasures or the lines; confirming completes the campaign, as The City of Corsairs' win does: the path has nothing to begin and its foot
-# reads "Campaign complete." (src/campaign/scenarios/the-fate-of-wilderland/golden.test.ts and campaign.test.ts pin the path). Ered Mithrin has no XP and The Fate of Wilderland is its last part.
+# reads "Ered Mithrin won. The players win the campaign!" (src/campaign/scenarios/the-fate-of-wilderland/golden.test.ts and campaign.test.ts pin the path). Ered Mithrin has no XP and The Fate of Wilderland is its last part.
 # The steps are the shared subflow's (.maestro/subflows/scenario-win.yaml).
 - runFlow:
     file: ../../subflows/scenario-win.yaml
@@ -23,7 +23,9 @@ tags:
     id: begin
 - assertVisible:
     id: path-complete
-    text: "Campaign complete\\."
+    text: "Ered Mithrin won\\. The players win the campaign!"
+- assertVisible:
+    id: path-new-campaign
 - assertVisible:
     id: pool
     text: ".*Misplaced Trust.*"

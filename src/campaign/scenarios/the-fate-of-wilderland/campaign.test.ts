@@ -84,11 +84,11 @@ describe("The Fate of Wilderland in the ered-mithrin campaign", { timeout: 60_00
       expect(facts.encounterPool ?? {}).toEqual(log.encounterPool ?? {});
       const given = afterGundabad(2, variant);
       const choices = wilderlandSetupChoices(2, given);
-      const state = opened(wilderlandStart(2, 3, "Normal", undefined, given, undefined, choices));
+      const state = opened(wilderlandStart(2, 3, "Normal", { log: given, choices }));
       expect(state.campaignFacts?.treasures, variant).toEqual(given.treasures);
       expect(state.campaignFacts?.encounterPool ?? {}, variant).toEqual(given.encounterPool ?? {});
       // The pool's encounter cards are dealt with this scenario's own copies.
-      const base = opened(wilderlandStart(2, 3, "Normal", undefined, emptyLog(2), undefined, []));
+      const base = opened(wilderlandStart(2, 3, "Normal", { choices: [] }));
       for (const [code, copies] of Object.entries(given.encounterPool ?? {})) expect(where(state, code), `${variant} ${code}`).toHaveLength(where(base, code).length + copies);
       for (const card of given.campaignPool.filter((item) => item.back === "player")) expect(where(state, card.code).length, `${variant} ${card.code}`).toBeGreaterThanOrEqual(1);
     }
@@ -102,7 +102,7 @@ describe("The Fate of Wilderland in the ered-mithrin campaign", { timeout: 60_00
       const answers = wilderlandSetupChoices(seats, log);
       const plan = wilderlandPlan(seats, log, answers);
       expect(plan.removedFromEncounter, `${seats} ${variant}`).toHaveLength((lines.includes("turayn") ? 3 : 0) + (lines.includes("beldis") ? 3 : 0));
-      const state = opened(wilderlandStart(seats, 2, "Normal", undefined, log, undefined, answers));
+      const state = opened(wilderlandStart(seats, 2, "Normal", { log, choices: answers }));
       expect(state.campaignFacts?.treasures, `${seats} ${variant}`).toEqual(log.treasures);
     }
   });
@@ -113,6 +113,21 @@ describe("The Fate of Wilderland in the ered-mithrin campaign", { timeout: 60_00
     const poolBoons = log.campaignPool.filter((card) => card.back === "player" && ["boon", "treasure"].includes(ctx.cards.get(card.code)?.campaignKind ?? ""));
     expect(poolBoons.length).toBeGreaterThanOrEqual(1);
     expect(wilderlandSetupChoices(2, log).length).toBeGreaterThanOrEqual(1);
+  });
+
+  it("12195:A:2 a player who skips the search is told so in the checklist: \"You do not search\" true solo, \"Player N does not search\" two-handed", () => {
+    for (const [seats, said] of [[1, ["You do not search for a boon or treasure card."]], [2, ["Player 1 does not search for a boon or treasure card.", "Player 2 does not search for a boon or treasure card."]]] as const) {
+      const log = afterGundabad(seats, seats === 1 ? "pool" : "oath");
+      const answers: string[] = [];
+      let plan = checklist({ log, scenario: campaignScenario(wilderland), seats: fillerLoadout(seats), effects: EFFECTS, cards: ctx.cards, difficulty: "Normal", choices: answers });
+      for (let guard = 0; guard < 40 && !plan.ok; guard += 1) {
+        answers.push(plan.needs?.options.includes("skip") ? "skip" : (plan.needs?.options[0] ?? "skip"));
+        plan = checklist({ log, scenario: campaignScenario(wilderland), seats: fillerLoadout(seats), effects: EFFECTS, cards: ctx.cards, difficulty: "Normal", choices: answers });
+      }
+      expect(plan.ok).toBe(true);
+      const did = plan.ok ? plan.steps.flatMap((step) => step.did) : [];
+      for (const line of said) expect(did, `${seats} seats`).toContain(line);
+    }
   });
 
   it("deals the original game in a standalone game: no campaign card, no pool", () => {

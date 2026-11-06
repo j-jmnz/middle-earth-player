@@ -24,7 +24,7 @@ export const templeLoadout = fillerLoadout;
 export const templeWorld = (decks: TempleDecks = "strong") => game.world(decks);
 export const afterDepths = (seatCount: 1 | 2) => game.after(seatCount);
 export const templePlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), choices?: readonly string[]) => game.plan(seatCount, log, choices);
-export const templeStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard) => game.start(seatCount, seed, difficulty, facts, log, modeCard);
+export const templeStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard) => game.start(seatCount, seed, difficulty, { facts, log, modeCard });
 
 export type TemplePolicy = {
   // The option a Choose window with these answers takes: the first or the last.

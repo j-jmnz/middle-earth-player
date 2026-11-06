@@ -3,12 +3,14 @@
 // damage because he had not attacked, and the treachery that raises the staging area's Threat for the phase. The words read the records and the numbers the table holds, never a card code or a title, and they are told only in The Fate of Wilderland (`inFate`). Pure.
 import type { Instruction } from "../../catalog/boundary.ts";
 import { printedOf } from "../../rules/core/printed.ts";
-import { inPlay, type ScenarioState } from "../../rules/core/state.ts";
+import type { ScenarioState } from "../../rules/core/state.ts";
+import { inPlay } from "../../rules/core/state.ts";
+import { namedInPlay } from "../../rules/families/misc/amounts.ts";
 import { attackedThisPhase } from "../../rules/families/wilderland/assault.ts";
 import type { ReduceContext } from "../../rules/interpret/interpret.ts";
 import { effectsOf } from "../../rules/windows/listen.ts";
 
-import { assaultCount, defenseFacts, inFate } from "./fate.ts";
+import { assaultCount, defenseFacts, discardedForThreat, discardsOnAttack, inFate, shieldedTitles } from "./fate.ts";
 import { plural } from "./list.ts";
 
 /** A group of lines the banner adds: its rank among the groups, its title (empty for a continuation of the lead's lines) and its lines. */
@@ -17,12 +19,10 @@ export type FateBeat = { rank: number; title: string; lines: readonly string[] }
 /** What the banner asks of the scenario's words: the groups an intent added, the line under an enemy's attack, the line under a player attack that did no damage, and the line under a revealed card. */
 export type FateNames = {
   beats: (before: ScenarioState, after: ScenarioState) => readonly FateBeat[];
-  strike: (state: ScenarioState, enemyId: string) => string | null;
+  strike: (before: ScenarioState, after: ScenarioState, enemyId: string) => string | null;
   shielded: (before: ScenarioState, enemyId: string) => string | null;
   revealed: (after: ScenarioState, cardId: string, ahead: boolean) => string | null;
 };
-
-const named = (state: ScenarioState, ctx: ReduceContext, test: (id: string) => boolean) => Object.values(state.cards).find((card) => inPlay(card.zone) && test(card.id));
 
 // The objective whose progress the scenario's records take off: the title a RemoveProgressFrom names, wherever it sits in a record.
 function objectiveTitles(ctx: ReduceContext): string[] {
@@ -44,8 +44,8 @@ export function fateBeats(ctx: ReduceContext, before: ScenarioState, after: Scen
   if (!inFate(after, ctx)) return [];
   const beats: FateBeat[] = [];
   for (const title of objectiveTitles(ctx)) {
-    const was = named(before, ctx, (id) => printedOf(ctx.cards, before.cards[id]?.code ?? "").name === title);
-    const now = named(after, ctx, (id) => printedOf(ctx.cards, after.cards[id]?.code ?? "").name === title);
+    const was = before.cards[namedInPlay(before, title, ctx) ?? ""];
+    const now = after.cards[namedInPlay(after, title, ctx) ?? ""];
     if (now && was && now.progress !== was.progress) beats.push({ rank: 9, title: "", lines: [assaultCount(after, ctx, title)] });
   }
   for (const card of Object.values(after.cards)) {
@@ -60,16 +60,14 @@ export function fateBeats(ctx: ReduceContext, before: ScenarioState, after: Scen
   return beats;
 }
 
-const discards = (ctx: ReduceContext, code: string): boolean => effectsOf(ctx, code).some((effect) => effect.timing === "forced" && effect.trigger === "attacks" && effect.instructions.some((step) => step.verb === "DiscardEncounterTop"));
-
-/** The line under the attack of the enemy that discards the top card of the encounter deck and adds its printed Threat to the Attack. Null for any other enemy. */
-export function fateStrikeLine(ctx: ReduceContext, state: ScenarioState, enemyId: string, name: string): string | null {
-  const enemy = state.cards[enemyId];
-  return enemy && inFate(state, ctx) && discards(ctx, enemy.code) ? `${name} discarded the top card of the encounter deck: its printed Threat is part of this Attack.` : null;
+/** The line under the attack of the enemy that discards the top card of the encounter deck and adds its printed Threat to the Attack: "Urdug discarded Lonely Lands: +2 Attack from its Threat." The number and the card come from the attack's modifier, which the state before the strike (or the one after it, while the attack is not over) still holds. Null for any other enemy. */
+export function fateStrikeLine(ctx: ReduceContext, before: ScenarioState, after: ScenarioState, enemyId: string, card: (cardId: string) => string): string | null {
+  const enemy = after.cards[enemyId];
+  if (!enemy || !inFate(after, ctx) || !discardsOnAttack(ctx, enemy.code)) return null;
+  const taken = discardedForThreat(before, ctx, enemyId) ?? discardedForThreat(after, ctx, enemyId);
+  if (!taken) return `${card(enemyId)} discarded the top card of the encounter deck: its printed Threat is part of this Attack.`;
+  return `${card(enemyId)} discarded ${taken.card ? card(taken.card) : "the top card of the encounter deck"}: +${taken.threat} Attack from its Threat.`;
 }
-
-// The titles of the enemies that take no damage unless they have resolved an attack this phase (a constant record's `not attackedThisPhase`).
-const shieldedTitles = (ctx: ReduceContext): string[] => ctx.effects.flatMap((effect) => (effect.condition?.kind === "not" && effect.condition.condition.kind === "attackedThisPhase" ? [effect.condition.condition.name] : []));
 
 /** The line under a player attack that did no damage to the enemy shielded until he has attacked. Null for any other enemy, and for one that has attacked. */
 export function fateShieldedLine(ctx: ReduceContext, before: ScenarioState, enemyId: string): string | null {
@@ -101,7 +99,7 @@ export function fateRevealLine(ctx: ReduceContext, after: ScenarioState, cardId:
 export function fateNames(ctx: ReduceContext, card: (cardId: string) => string): FateNames {
   return {
     beats: (before, after) => fateBeats(ctx, before, after),
-    strike: (state, enemyId) => fateStrikeLine(ctx, state, enemyId, card(enemyId)),
+    strike: (before, after, enemyId) => fateStrikeLine(ctx, before, after, enemyId, card),
     shielded: (before, enemyId) => fateShieldedLine(ctx, before, enemyId),
     revealed: (after, cardId, ahead) => fateRevealLine(ctx, after, cardId, ahead),
   };

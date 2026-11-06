@@ -20,7 +20,7 @@ export const lostmirkLoadout = fillerLoadout;
 export const lostmirkWorld = (decks: LostmirkDecks = "strong") => game.world(decks);
 export const afterUpanduin = (seatCount: 1 | 2) => game.after(seatCount);
 export const lostmirkPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount)) => game.plan(seatCount, log);
-export const lostmirkStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard) => game.start(seatCount, seed, difficulty, facts, log, modeCard);
+export const lostmirkStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard) => game.start(seatCount, seed, difficulty, { facts, log, modeCard });
 
 export type LostmirkPolicy = {
   // The option a Choose window with these answers takes: the first or the last.

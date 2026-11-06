@@ -153,7 +153,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
           }
           line(step.undefended ? `Attack ${step.attack} on ${target}, undefended` : `Attack ${step.attack} against ${target}'s defense ${step.defense}`, "attack", [step.enemyId, step.targetId]);
           // The enemy that discards the top card of the encounter deck for its Threat (The Fate of Wilderland).
-          const discarded = names.fate?.strike(after, step.enemyId);
+          const discarded = names.fate?.strike(before, after, step.enemyId);
           if (discarded) line(discarded, null, [step.enemyId]);
         } else {
           open(2, `Attack on ${enemy}`, "plain");

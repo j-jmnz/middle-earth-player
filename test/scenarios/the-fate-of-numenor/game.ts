@@ -21,7 +21,7 @@ export const fateLoadout = fillerLoadout;
 export const fateWorld = (decks: FateDecks = "strong") => game.world(decks);
 export const afterVoyage = (seatCount: 1 | 2) => game.after(seatCount);
 export const fatePlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount)) => game.plan(seatCount, log);
-export const fateStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard) => game.start(seatCount, seed, difficulty, facts, log, modeCard);
+export const fateStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard) => game.start(seatCount, seed, difficulty, { facts, log, modeCard });
 
 export type FatePolicy = {
   // "keep" or "trade" 1 damage on each character in play for 1 threat.

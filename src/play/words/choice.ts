@@ -6,6 +6,7 @@ import type { Amount, Instruction } from "../../catalog/boundary.ts";
 import { lastPicked } from "../../rules/interpret/player-verbs.ts";
 import { questProgressMoved } from "../../rules/interpret/verbs.ts";
 import type { ScenarioState } from "../../rules/engine/reduce.ts";
+import type { ReduceContext } from "../../rules/interpret/interpret.ts";
 import { attachmentPickWords, attachmentWords, reattachWords } from "./attachment.ts";
 import { deckBranchWords, deckPickThenWords, deckPickWords, deckWords } from "./deck.ts";
 import { encounterPickWords, encounterWords } from "./encounter.ts";
@@ -29,7 +30,7 @@ import { aflameBranchWords, aflamePickWords, aflameWords, type BranchNow } from 
 import { stormcallerBranchWords, stormcallerWords } from "./stormcaller.ts";
 import { commandBranchWords } from "./command.ts";
 import { wilderlandBranchWords } from "./wilderland.ts";
-import { assaultWords } from "./assault.ts";
+import { assaultWords, objectiveTokensWords } from "./assault.ts";
 
 export type ChoiceNames = {
   // A card instance by id.
@@ -324,14 +325,14 @@ function readyPaymentWords(choose: ChooseInstruction, option: ChooseInstruction[
 }
 
 /** A branch of a Choose instruction in words: "Remove 2 progress from the quest", "Remove 2 heroes you control from the quest". */
-export function branchWords(choose: ChooseInstruction, optionId: string, game: ScenarioState, names: ChoiceNames, sourceId: string | null, now?: BranchNow): string {
+export function branchWords(choose: ChooseInstruction, optionId: string, game: ScenarioState, names: ChoiceNames, sourceId: string | null, now?: BranchNow, ctx?: ReduceContext): string {
   const command = commandBranchWords(choose, optionId, now?.x);
   if (command) return command;
   const option = choose.options.find((entry) => entry.id === optionId);
   if (!option) return capital(optionId);
   const refresh = readyPaymentWords(choose, option, game, names, sourceId);
   if (refresh) return refresh;
-  const family = unchartedBranchWords(choose, optionId, now) ?? aflameBranchWords(choose, optionId, names, sourceId, now) ?? stormcallerBranchWords(choose, optionId, game, names, sourceId) ?? wilderlandBranchWords(choose, optionId, names, now, sourceId ? names.card(sourceId) : null, game);
+  const family = unchartedBranchWords(choose, optionId, now) ?? aflameBranchWords(choose, optionId, names, sourceId, now) ?? stormcallerBranchWords(choose, optionId, game, names, sourceId) ?? wilderlandBranchWords(choose, optionId, names, now, sourceId ? names.card(sourceId) : null, game, ctx);
   if (family) return family;
   if (option.instructions.length === 0) return "Do nothing";
   const whole = deckBranchWords(option.instructions) ?? burdenBranchWords(option.instructions) ?? moriaBranchWords(option.instructions) ?? breakingBranchWords(option.instructions, names, sourceId, game);
@@ -475,7 +476,7 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
     case "TakeRevealedCard":
       return { verb: "Give", prompt: `Choose the player who takes control of ${sourceId ? names.card(sourceId) : "the revealed card"}${next.committed ? ", committed to the quest" : ""}.` };
     default:
-      return unchartedPickWords(pick, next, names, sourceId) ?? { verb: "Choose", prompt: `Choose ${one}.` };
+      return unchartedPickWords(pick, next, names, sourceId) ?? objectiveTokensWords(pick, next, one, amountNow) ?? { verb: "Choose", prompt: `Choose ${one}.` };
   }
 }
 

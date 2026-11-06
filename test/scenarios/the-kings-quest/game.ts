@@ -148,7 +148,7 @@ export const kingsquestWorld = async (decks: KingsquestDecks = "strong") => {
   return game.world(decks);
 };
 export const kingsquestPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), choices?: readonly string[]) => game.plan(seatCount, log, choices);
-export const kingsquestStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, choices?: readonly string[]) => game.start(seatCount, seed, difficulty, facts, log, modeCard, choices);
+export const kingsquestStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, choices?: readonly string[]) => game.start(seatCount, seed, difficulty, { facts, log, modeCard, choices });
 
 // The treacheries Turayn's oath removes: the first three titles of the scenario's encounter deck (the briefing asks one card at a time).
 export function oathChoices(ctx: ReduceContext): string[] {

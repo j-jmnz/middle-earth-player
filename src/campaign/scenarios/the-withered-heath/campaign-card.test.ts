@@ -88,6 +88,8 @@ describe("12175:A Setup", () => {
     const log = poolWith([CODES.turayn, 0], [CODES.melanwar, 1]);
     const plan = heathPlan(2, log, ["skip", "skip"]);
     expect(plan.seats.map((seat) => seat.afterMulligan)).toEqual([[], []]);
+    // The checklist's line for a skip is the boon ally search's own, as the other campaigns' searches write it.
+    expect(plan.steps.flatMap((step) => step.did)).toEqual(expect.arrayContaining(["Seat 1 does not search for a boon ally.", "Seat 2 does not search for a boon ally."]));
     expect(plan.seats[0]?.deck).toContain(CODES.turayn);
     expect(plan.seats[1]?.deck).toContain(CODES.melanwar);
     expect(checklist({ log: emptyLog(2), scenario: dealtScenario, seats: heathLoadout(2), effects: EFFECTS, cards: ctx.cards }).ok).toBe(true);

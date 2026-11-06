@@ -21,7 +21,7 @@ export function comingScenarios(boxes: readonly Box[], isPlayable: (scenarioId: 
 
 /** The eyebrow over a hero's next stop: "Next · Scenario 3 of 6", "On the table · Scenario 3 of 6" for the open scenario, or "Coming soon · Scenario 7 of 9" for one the app cannot deal yet. */
 export function nextLabel(next: NextStep, path: readonly PathNode[]): string {
-  if (next.kind === "finished") return "Every scenario is won";
+  if (next.kind === "finished") return "Campaign won";
   if (next.kind === "soon") return `Coming soon \u00b7 Scenario ${next.node.number} of ${path.length}`;
   return `${next.kind === "resume" ? "On the table" : "Next"} · Scenario ${next.node.number} of ${path.length}`;
 }

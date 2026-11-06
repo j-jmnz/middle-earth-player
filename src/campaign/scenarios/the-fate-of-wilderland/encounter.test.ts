@@ -9,6 +9,7 @@ import { definePrinted } from "../../../rules/core/printed.ts";
 import { expireModifiers, flagged, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import { attachTo, spawn } from "../../../rules/core/zones.ts";
 import { settle } from "../../../rules/engine/machine.ts";
+import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { pushEffectFrame } from "../../../rules/interpret/effect-frames.ts";
 import { CODES, FIGHT, fightTable, progressOn, resourcesOn, STAGES, codesIn, finish, idOf, idsOf, legalIntents, loadWilderlandWorld, quest, resolveRecords, send, takes, wilderlandFight, wilderlandTable, type PlayerIntent, type Run, type WilderlandWorld } from "../../../../test/scenarios/the-fate-of-wilderland/scene.ts";
 
@@ -223,6 +224,23 @@ describe("19166 Urdug's Command", () => {
     expect(spared.state.cards[t.hero]?.damage).toBeGreaterThan(0);
     expect(spared.state.cards[t.hero]?.damage).toBeLessThan(hp);
     expect(progressOn(spared.state, CODES.theGoblinsAssault)).toBe(0);
+  });
+
+  it("19155:A:1 and 19166:A:1 the attack he makes at once is an attack he resolved this phase: he can be damaged in the phase it was made in and not in the next, and it does not use up his attack of the combat phase", () => {
+    const urdugOf = (state: ScenarioState) => idOf(state, CODES.urdug);
+    for (const phase of ["Combat", "Quest"] as const) {
+      const t = fight([], { phase, deck: ["f0", "f0", "f0"] });
+      expect(flagged(t.state, urdugOf(t.state), "cannotTakeDamage"), phase).toBe(true);
+      const run = played(resolveRecords(t.state, t.ctx, CODES.urdugSCommand, "whenRevealed"), t);
+      // His attack is over and recorded for this phase: nothing shields him in it, and the attacks the combat phase resolved are still none.
+      expect(run.state.pendingAttack, phase).toBeNull();
+      expect(run.state.cards[t.hero]?.damage, phase).toBeGreaterThan(0);
+      expect(run.state.resolvedAttacks, phase).toEqual([]);
+      expect(flagged(run.state, urdugOf(run.state), "cannotTakeDamage"), phase).toBe(false);
+      // The next phase is a new one, and so is the next round.
+      expect(flagged(syncConstants({ ...run.state, phase: "Refresh" }, t.ctx), urdugOf(run.state), "cannotTakeDamage"), phase).toBe(true);
+      expect(flagged(syncConstants({ ...run.state, round: run.state.round + 1 }, t.ctx), urdugOf(run.state), "cannotTakeDamage"), phase).toBe(true);
+    }
   });
 
   it("19166:A:1 the attack is Urdug's, made against the first player (the attack discards the top card of the encounter deck for its Attack)", () => {

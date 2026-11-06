@@ -16,6 +16,7 @@ import { carryVerb, carryWords } from "../../../campaign/carry-words";
 import { keepsWilderlandLog, wilderlandView } from "../../../campaign/wilderland-view";
 import { xpWords } from "../../../campaign/xp-view";
 import { xpUnspentOf } from "../../../campaign/xp";
+import { campaignEnd } from "../../campaign/campaign-end";
 import { bookletParams, campaignOf, scenarioNames, scenarioOf } from "../../data/campaign-data";
 import { cardNames } from "../../data/card-names";
 import { useDatabases } from "../../data/databases";
@@ -123,6 +124,9 @@ export default function CampaignPath() {
   const complete = nodes.length > 0 && done === nodes.length;
   const kept = save.log.carryOver.map((card) => ({ code: card.code, perPlayer: card.perPlayer }));
   const waiting = kept.length > 0 ? carryWords(kept, name) : null;
+  // The campaign's end: "Ered Mithrin won. The players win the campaign!", the line the last campaign card prints.
+  const lastId = nodes.at(-1)?.id;
+  const end = complete ? campaignEnd(campaign, lastId ? (scenarioOf(lastId)?.campaignCard ?? null) : null) : null;
 
   const navBar = (
     <NavBar
@@ -219,16 +223,14 @@ export default function CampaignPath() {
       return (
         <View>
           <Label testID="path-complete" className="mb-2.5 text-center">
-            Campaign complete.
+            {end?.won ?? `${campaign.name} won.`}
           </Label>
           {waiting ? (
-            <>
-              <Text testID="path-carry" className="mb-2.5 text-center text-label text-bone">
-                {`${waiting.charAt(0).toUpperCase()}${waiting.slice(1)} ${carryVerb(kept) === "is" ? "waits" : "wait"} for your next campaign.`}
-              </Text>
-              <PrimaryButton label="Start a new campaign" testID="path-new-campaign" onPress={() => router.navigate({ pathname: "/", params: { start: "1" } })} />
-            </>
+            <Text testID="path-carry" className="mb-2.5 text-center text-label text-bone">
+              {`${waiting.charAt(0).toUpperCase()}${waiting.slice(1)} ${carryVerb(kept) === "is" ? "waits" : "wait"} for your next campaign.`}
+            </Text>
           ) : null}
+          <PrimaryButton label="Start a new campaign" testID="path-new-campaign" onPress={() => router.navigate({ pathname: "/", params: { start: "1" } })} />
         </View>
       );
     }

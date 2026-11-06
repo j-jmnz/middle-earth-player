@@ -83,6 +83,6 @@ describe("nextLabel", () => {
   });
 
   it("says every scenario is won when none is left", () => {
-    expect(nextLabel({ kind: "finished" }, path)).toBe("Every scenario is won");
+    expect(nextLabel({ kind: "finished" }, path)).toBe("Campaign won");
   });
 });
