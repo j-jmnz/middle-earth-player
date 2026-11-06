@@ -37,6 +37,7 @@ const READ_FROM_CAMPAIGN_SETUP: Readonly<Record<string, string>> = {
   RemoveFromEncounterDeckIfLogged: "src/campaign/checklist.ts",
   RemoveFromCavesIfLogged: "src/campaign/checklist.ts",
   SearchBoonAllyToHand: "src/campaign/checklist.ts",
+  SearchBoonOrTreasureToHand: "src/campaign/checklist.ts",
   ShuffleIntoEncounterDeck: "src/campaign/start.ts",
   ShuffleIntoCorsairDeck: "src/campaign/start.ts",
   KeepCampaignCard: "src/rules/families/burden/campaign.ts",

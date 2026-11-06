@@ -106,6 +106,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     case "beldisBox":
     case "cavesDeck":
     case "questDeck":
+    case "attackedThisPhase":
     case "discoverUnavailable":
       return false;
     case "hideFailed":

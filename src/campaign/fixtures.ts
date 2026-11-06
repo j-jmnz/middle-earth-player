@@ -31,6 +31,7 @@ import rhovanionFixtures from "./fixtures/roam-across-rhovanion.json";
 import nightFixtures from "./fixtures/fire-in-the-night.json";
 import framsburgFixtures from "./fixtures/the-ghost-of-framsburg.json";
 import gundabadFixtures from "./fixtures/mount-gundabad.json";
+import wilderlandFixtures from "./fixtures/the-fate-of-wilderland.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -78,6 +79,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "fire-in-the-night": nightFixtures,
   "the-ghost-of-framsburg": framsburgFixtures,
   "mount-gundabad": gundabadFixtures,
+  "the-fate-of-wilderland": wilderlandFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(

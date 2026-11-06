@@ -42,15 +42,15 @@ Read the sections your task touches.
     - 80–85 Codespaces (~110)
     - 86–160 Phone builds from scratch (Mac) (~1.1K)
     - 161–164 Maestro (~170)
-- `docs/architecture.md` — Architecture (~19.8K tok)
+- `docs/architecture.md` — Architecture (~19.9K tok)
   - 7–41 Stack (~990)
   - 42–77 Processes (~660)
   - 78–160 Modules (~2.1K) ← 3
     - 126–160 Repository map (~850) ← 1
   - 161–186 State (~1.0K) ← 9
   - 187–208 Play loop (~250)
-  - 209–234 Engine (~4.2K)
-    - 223–234 Mechanic families (~3.3K) ← 5
+  - 209–234 Engine (~4.3K)
+    - 223–234 Mechanic families (~3.4K) ← 5
   - 235–240 Effects (~560)
   - 241–273 Scenario definition (~800)
   - 274–294 Persistence (~1.4K)
@@ -59,7 +59,7 @@ Read the sections your task touches.
   - 350–355 Catalog build (~410)
   - 356–371 Tests (~1.3K) ← 3
   - 372–387 Performance (~1.2K) ← 3
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~79.9K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~80.9K tok)
   - 17–38 Sections (~410)
   - 39–50 Product (~530)
   - 51–64 Non-goals (~560)
@@ -92,19 +92,19 @@ Read the sections your task touches.
     - 595–609 The Oath (~2.3K)
     - 610–627 The Caves of Nibin-Dûm (~2.3K)
   - 628–685 Dream-chaser (~15.7K)
-  - 686–711 Ered Mithrin (~14.3K) ← 2
-  - 712–720 Nightmare (~420)
-  - 721–759 Deckbuilding (~1.8K) ← 1
-  - 760–838 Effects (~3.2K)
-    - 762–820 Three layers (~2.4K)
-    - 821–830 Player side quests, contracts and saga cards (~430)
-    - 831–834 Window stack (~100)
-    - 835–838 Coverage test (~270)
-  - 839–859 Data sources (~560)
-  - 860–878 Card images (~1.1K) ← 6
-  - 879–904 Persistence and shipping (~1.7K)
-  - 905–946 Screens (~4.7K) ← 2
-    - 931–946 Table screen (~1.8K) ← 5
+  - 686–712 Ered Mithrin (~15.3K) ← 2
+  - 713–721 Nightmare (~420)
+  - 722–760 Deckbuilding (~1.8K) ← 1
+  - 761–839 Effects (~3.2K)
+    - 763–821 Three layers (~2.4K)
+    - 822–831 Player side quests, contracts and saga cards (~430)
+    - 832–835 Window stack (~100)
+    - 836–839 Coverage test (~270)
+  - 840–860 Data sources (~560)
+  - 861–879 Card images (~1.1K) ← 6
+  - 880–905 Persistence and shipping (~1.7K)
+  - 906–947 Screens (~4.7K) ← 2
+    - 932–947 Table screen (~1.8K) ← 5
 - `docs/design-system-table.md` — Design system — Table (landscape) (~34.1K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.1K) ← 4

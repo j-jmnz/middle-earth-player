@@ -10,13 +10,16 @@ import { flagged, inPlay, modifierActive } from "./state.ts";
 export const ALLIES_CLASS = "allies";
 // The same for every character, hero or ally ("Until the end of the round, characters cannot be readied by player card effects", 19020:A:2).
 export const CHARACTERS_CLASS = "characters";
-export type ClassHolder = typeof ALLIES_CLASS | typeof CHARACTERS_CLASS;
+// The same for every enemy and location in the staging area, whether it was there when the effect began or arrives later ("Each enemy and each location in the staging area gets +1 Threat until the end of the phase", 19167:A:1).
+export const STAGING_CLASS = "stagingCards";
+export type ClassHolder = typeof ALLIES_CLASS | typeof CHARACTERS_CLASS | typeof STAGING_CLASS;
 
 // Whether a modifier is held by this card: by its id, or by a class it belongs to.
 export function heldBy(modifier: { instanceId: string }, instance: CardInstance, printed: PrintedCard): boolean {
   if (modifier.instanceId === instance.id) return true;
   if (!inPlay(instance.zone)) return false;
   if (modifier.instanceId === ALLIES_CLASS) return cardTypeOf(instance, printed) === "ally";
+  if (modifier.instanceId === STAGING_CLASS) return instance.zone === "staging" && (cardTypeOf(instance, printed) === "enemy" || cardTypeOf(instance, printed) === "location");
   return modifier.instanceId === CHARACTERS_CLASS && (instance.zone === "heroes" || isCharacterType(printed));
 }
 

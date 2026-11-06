@@ -22,6 +22,7 @@ import { optionalEngageBarred } from "./engage.ts";
 import { setAsideDiscardForPool } from "./discard-pool.ts";
 import { flipOver } from "./flip.ts";
 import { bypassStage, flipCurrentQuest, flipInPlace, searchQuestDeck } from "./gundabad.ts";
+import { attackedThisPhase, placeResourcesOnNamed, removeProgressFrom, searchStageCard, stageDiscarded } from "./assault.ts";
 import { activateFromCaves, attachTreasuresToHost, stageRandomDiscarded } from "./gundabad-cards.ts";
 import { noteTreacheryReveal, phasePlayRefusal, phasePlaysBarred } from "./rounds.ts";
 import { advanceToRandomStage, claimFreed, flipToEnemySide, guardReturnedBy, putTrust } from "./rhovanion.ts";
@@ -160,6 +161,14 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return stageRandomDiscarded(state, instruction, focus, ctx);
     case "AttachTreasuresToHost":
       return attachTreasuresToHost(state, focus, ctx, steps);
+    case "SearchStageCard":
+      return searchStageCard(state, instruction, focus, ctx, steps);
+    case "StageDiscarded":
+      return stageDiscarded(state, instruction, focus, ctx, steps);
+    case "RemoveProgressFrom":
+      return removeProgressFrom(state, instruction, focus, ctx, steps);
+    case "PlaceResourcesOnNamed":
+      return placeResourcesOnNamed(state, instruction, focus, ctx);
     case "FlipAtQuestPhase":
     case "LimitPlaysPerPhase":
     case "Loot":
@@ -179,6 +188,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "RemoveFromPool":
     case "RemoveFromEncounterDeckIfLogged":
     case "SearchBoonAllyToHand":
+    case "SearchBoonOrTreasureToHand":
     case "RemoveFromCavesIfLogged":
     case "ChooseRandomTreasure":
     case "ChooseHazardForPool":
@@ -200,6 +210,7 @@ function condition(state: ScenarioState, found: Condition, scope: { actor: numbe
   if (found.kind === "beldisBox") return beldisBoxLeft(state, scope.actor);
   if (found.kind === "cavesDeck") return pileOf(state, "cavesDeck").length >= (found.min ?? 1);
   if (found.kind === "questDeck") return state.questDeck.length >= (found.min ?? 1);
+  if (found.kind === "attackedThisPhase") return attackedThisPhase(state, found.name, ctx);
   return logCondition(found, logFacts(state));
 }
 
@@ -215,6 +226,6 @@ export const manifest: RulesFamily = {
   combat: NIGHT_COMBAT,
   // The Evil Creatures deck runs out: its own discard pile is shuffled back into it at once (emce.evil-creatures-deck).
   settle: { after: (state) => refillEvilCreatures(state), sweep: (state, ctx, steps) => defeatFullSideQuests(claimFreed(victoryWhenFree(returnHeld(clearNemesis(freeTreasures(controlFreedObjectives(state, ctx), ctx, steps), ctx), ctx), ctx, steps), ctx, steps), ctx, steps) },
-  verbs: ["AttachRandomTreasure", "ClaimRandomTreasure", "SetAsideDiscardForPool", "FlipOver", "AddSourceToHandOfMost", "DiscoverTreasure", "BoonAllyOrLogLine", "AddEncounterToPool", "RemoveFromPool", "RemoveFromEncounterDeckIfLogged", "ShufflePile", "ShuffleIntoPile", "AddFromPile", "ShufflePileIntoEncounterDeck", "Deep", "Discover", "Loot", "Undiscardable", "GainControlWhenFree", "IgnoreKeyword", "AdvanceToLetterStage", "TakeControlOfSetAside", "SearchGuardForTreasure", "GrantSurgeToSubject", "DiscardToPoolFromSets", "PutObjectiveLocationAfterDiscard", "CarryAwayHero", "ReleaseGuardedHero", "DiscardGuardedHeroes", "PlaceHandUnderLocation", "ReturnFacedownToHands", "DiscardFacedownUnder", "SearchNemesis", "NemesisAttacks", "AddToStagingWithResources", "ReplaceFromCaves", "ArrangeCaves", "PutOnPileBottom", "AttachSelfToPicked", "AttachSearched", "GuardPickedAttachment", "GuardWithDeckTop", "ReturnGuardedToHand", "CancelStrike", "ShuffleSetAsideIntoPile", "RemoveSetAsideDamage", "AttachGuardedFromPile", "VictoryWhenFree", "UncancelableWhenRevealed", "DiscardOtherLooked", "ArrangeLookedDeck", "ImmediateAttackBy", "ExhaustOrDamageEachReady", "SearchBoonAllyToHand", "RemoveFromCavesIfLogged", "ChooseRandomTreasure", "AdvanceToRandomStage", "FlipToEnemySide", "PutTrust", "ClaimWhenFree", "GuardReturnedBy", "ChooseStagedLocationForPool", "RevealSideQuest", "AttackStage", "ExcessToStage", "MakeCurrentQuest", "MarkBeldisUse", "ResolveDiscover", "AttachLootFromDiscard", "ChooseHazardForPool", "FlipAtQuestPhase", "FlipCurrentQuest", "BypassStage", "SearchQuestDeck", "FlipInPlace", "LimitPlaysPerPhase", "ActivateFromCaves", "StageRandomDiscarded", "AttachTreasuresToHost"],
+  verbs: ["AttachRandomTreasure", "ClaimRandomTreasure", "SetAsideDiscardForPool", "FlipOver", "AddSourceToHandOfMost", "DiscoverTreasure", "BoonAllyOrLogLine", "AddEncounterToPool", "RemoveFromPool", "RemoveFromEncounterDeckIfLogged", "ShufflePile", "ShuffleIntoPile", "AddFromPile", "ShufflePileIntoEncounterDeck", "Deep", "Discover", "Loot", "Undiscardable", "GainControlWhenFree", "IgnoreKeyword", "AdvanceToLetterStage", "TakeControlOfSetAside", "SearchGuardForTreasure", "GrantSurgeToSubject", "DiscardToPoolFromSets", "PutObjectiveLocationAfterDiscard", "CarryAwayHero", "ReleaseGuardedHero", "DiscardGuardedHeroes", "PlaceHandUnderLocation", "ReturnFacedownToHands", "DiscardFacedownUnder", "SearchNemesis", "NemesisAttacks", "AddToStagingWithResources", "ReplaceFromCaves", "ArrangeCaves", "PutOnPileBottom", "AttachSelfToPicked", "AttachSearched", "GuardPickedAttachment", "GuardWithDeckTop", "ReturnGuardedToHand", "CancelStrike", "ShuffleSetAsideIntoPile", "RemoveSetAsideDamage", "AttachGuardedFromPile", "VictoryWhenFree", "UncancelableWhenRevealed", "DiscardOtherLooked", "ArrangeLookedDeck", "ImmediateAttackBy", "ExhaustOrDamageEachReady", "SearchBoonAllyToHand", "RemoveFromCavesIfLogged", "ChooseRandomTreasure", "AdvanceToRandomStage", "FlipToEnemySide", "PutTrust", "ClaimWhenFree", "GuardReturnedBy", "ChooseStagedLocationForPool", "RevealSideQuest", "AttackStage", "ExcessToStage", "MakeCurrentQuest", "MarkBeldisUse", "ResolveDiscover", "AttachLootFromDiscard", "ChooseHazardForPool", "FlipAtQuestPhase", "FlipCurrentQuest", "BypassStage", "SearchQuestDeck", "FlipInPlace", "LimitPlaysPerPhase", "ActivateFromCaves", "StageRandomDiscarded", "AttachTreasuresToHost", "SearchBoonOrTreasureToHand", "SearchStageCard", "StageDiscarded", "RemoveProgressFrom", "PlaceResourcesOnNamed"],
   run,
 };

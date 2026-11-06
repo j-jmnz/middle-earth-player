@@ -12,7 +12,7 @@ import { releaseAttachments } from "../../core/keywords.ts";
 import { printedOf } from "../../core/printed.ts";
 import { shuffleIds } from "../../core/seed.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
+import { flagged, inPlay, livingSeats, updateCard } from "../../core/state.ts";
 import { patchTop } from "../../windows/windows.ts";
 import { moveCard } from "../../core/zones.ts";
 import { effectData, moveEncounter } from "../encounter/moves.ts";
@@ -83,10 +83,13 @@ export function engageOutOfPlay(state: ScenarioState, code: string, ctx: ReduceC
 // PlaceResourceTokens: resource tokens go on the card named, while it is in play (900302:A:1, 900305:A:2, 900306:A:2).
 export function placeResourceTokens(state: ScenarioState, on: CardRef, amount: Amount, focus: Focus, ctx: ReduceContext): ScenarioState {
   const scope = frameScope(state, focus.seat, focus.sourceId);
-  const id = refCard(state, on, scope);
+  return addResourceTokens(state, refCard(state, on, scope), resolveAmount(state, amount, scope, ctx));
+}
+
+/** `count` resource tokens on the card with this id, while it is in play and nothing bars them (`noResourcesPlaced`, 19161:A:2). */
+export function addResourceTokens(state: ScenarioState, id: string | null | undefined, count: number): ScenarioState {
   const card = id ? state.cards[id] : undefined;
-  const count = resolveAmount(state, amount, scope, ctx);
-  return card && inPlay(card.zone) && count > 0 ? updateCard(state, card.id, { resources: card.resources + count }) : state;
+  return card && inPlay(card.zone) && count > 0 && !flagged(state, card.id, "noResourcesPlaced") ? updateCard(state, card.id, { resources: card.resources + count }) : state;
 }
 
 // MoveResourceFromHeroes: each hero the actor controls with a resource gives 1 to the card named (900308:A:3).

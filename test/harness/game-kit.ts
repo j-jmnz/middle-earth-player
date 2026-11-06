@@ -208,14 +208,14 @@ export function campaignGame<D extends string, P extends object>(spec: CampaignG
     };
   }
 
-  function plan(seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), choices?: readonly string[], difficulty?: Difficulty) {
-    const checked = checklist({ log, scenario: campaignScenario(spec.scenario), seats: fillerLoadout(seatCount), effects: EFFECTS, cards: cardsOrThrow(), ...(difficulty ? { difficulty } : {}), ...(choices ? { choices } : {}) });
+  function plan(seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), choices?: readonly string[], difficulty?: Difficulty, loadout: LoadoutSeat[] = fillerLoadout(seatCount)) {
+    const checked = checklist({ log, scenario: campaignScenario(spec.scenario), seats: loadout, effects: EFFECTS, cards: cardsOrThrow(), ...(difficulty ? { difficulty } : {}), ...(choices ? { choices } : {}) });
     if (!checked.ok) throw new Error(checked.errors.join("; ") || "The campaign card asks for a choice");
     return checked;
   }
 
-  function start(seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, choices?: readonly string[]): StartScenario {
-    const checked = plan(seatCount, log, choices, difficulty);
+  function start(seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, choices?: readonly string[], loadout?: LoadoutSeat[]): StartScenario {
+    const checked = plan(seatCount, log, choices, difficulty, loadout);
     // The campaign's own columns of the log reach the game as they do in startFor (src/campaign/briefing.ts); another campaign's are none.
     const logged = wilderlandFacts(checked.log, spec.campaign.id);
     const dealtFacts = Object.keys(logged).length > 0 ? { prisoner: null, usedOnce: [], counters: {}, ...facts, ...logged } : facts;

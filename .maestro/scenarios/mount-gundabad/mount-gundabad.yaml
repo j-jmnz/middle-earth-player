@@ -22,10 +22,9 @@ tags:
 - assertVisible:
     id: pool
     text: ".*Misplaced Trust.*"
-# The win unlocks The Fate of Wilderland, which the app cannot deal yet, so the path stops there and its node reads Coming soon (scripts/checks/maestro.test.ts, path-soon).
+# The win unlocks The Fate of Wilderland, whose node reads Next (scripts/checks/maestro.test.ts, path-soon).
 - assertVisible:
     id: node-the-fate-of-wilderland-status
-    text: "Coming soon"
-- assertVisible:
+    text: "Next"
+- assertNotVisible:
     id: path-soon
-    text: "The Fate of Wilderland is coming soon."

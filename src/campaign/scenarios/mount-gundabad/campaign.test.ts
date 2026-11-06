@@ -2,7 +2,7 @@
 // Mount Gundabad in the Ered Mithrin campaign: it is the eighth part, its campaign card names the Setup the campaign deals, and a standalone game plays the scenario with none of it. The seven earlier parts' real Resolutions (Journey Up the Anduin's, Lost in Mirkwood's, The King's
 // Quest's, The Withered Heath's, Roam Across Rhovanion's, Fire in the Night's and The Ghost of Framsburg's golden wins, applied one after the other to a blank log) are what reaches it: the allies in a player's pool or their lines, the burdens, Misplaced Trust or Urdug's Cunning, the copies
 // of encounter cards the pool tallies, the Accolade and Song boons, the treasures discovered, all through the Campaign Setup Checklist, whose Melanwar and Beldis removals this part adds. Winning this part runs its Resolution (a treasure of 3, the treasures the players control discovered,
-// A Growing Threat removed from the pool and, with 6 or more treasures logged, Dragon-sickness added to it) and unlocks The Fate of Wilderland, which is coming soon; a loss writes nothing.
+// A Growing Threat removed from the pool and, with 6 or more treasures logged, Dragon-sickness added to it) and unlocks The Fate of Wilderland; a loss writes nothing.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../../../effects/index.ts";
@@ -50,14 +50,13 @@ describe("Mount Gundabad in the ered-mithrin campaign", { timeout: 60_000 }, () 
     expect(campaign.scenarios[8]).toBe("the-fate-of-wilderland");
   });
 
-  it("is playable, and the path offers it after the first seven parts and The Fate of Wilderland after it as coming soon", () => {
+  it("is playable, and the path offers it after the first seven parts and The Fate of Wilderland after it", () => {
     expect(PLAYABLE_SCENARIOS).toContain(gundabad.id);
     const fresh = campaignPath(campaign, {}, newSave("gundabad", campaign.id, 1).log);
     expect(fresh[7]).toMatchObject({ id: gundabad.id, status: expect.not.stringMatching(/completed/) });
     const path = campaignPath(campaign, {}, afterFramsburg(2));
     expect(path.slice(0, 9).map((node) => node.status)).toEqual(["completed", "completed", "completed", "completed", "completed", "completed", "completed", "current", expect.not.stringMatching(/completed|current/)]);
-    expect(PLAYABLE_SCENARIOS).not.toContain("the-fate-of-wilderland");
-    expect(path[8]).toMatchObject({ id: "the-fate-of-wilderland", status: "soon" });
+    expect(path[8]).toMatchObject({ id: "the-fate-of-wilderland", status: "locked" });
   });
 
   it("deals the Campaign Setup from a blank log: the campaign card on the table, Dagnir in the staging area, The First Forge set aside, Dragon-sickness left out, nothing removed", () => {
@@ -142,7 +141,7 @@ describe("Mount Gundabad in the ered-mithrin campaign", { timeout: 60_000 }, () 
     expect(where(state, CODES.dagnir)[0]).toMatchObject({ zone: "staging" });
   });
 
-  it("writes a treasure, the treasures the players control and Dragon-sickness to the campaign when won, keeps the earlier parts' pool and unlocks The Fate of Wilderland as coming soon", () => {
+  it("writes a treasure, the treasures the players control and Dragon-sickness to the campaign when won, keeps the earlier parts' pool and unlocks The Fate of Wilderland", () => {
     // Two-handed, after the earlier parts, Urdug's Cunning, 6 treasures logged: the pool stays, the treasures are added and Dragon-sickness joins the pool.
     const win = golden("two-handed, won, after the earlier parts, Urdug's Cunning, Dragon-sickness in the encounter deck, a stage bypassed");
     const state = playGolden(win, ctx).state;
@@ -156,12 +155,12 @@ describe("Mount Gundabad in the ered-mithrin campaign", { timeout: 60_000 }, () 
     expect(log.campaignPool.filter((card) => card.code === ROAM.urdugSCunning).map((card) => card.seat).sort()).toEqual([0, 1]);
     expect(log.encounterPool?.[CODES.dragonSickness]).toBe(1);
     expect(log.allyLines).toEqual(before.allyLines);
-    // The path now offers the ninth part next: The Fate of Wilderland, which is coming soon.
+    // The path now offers the ninth part next: The Fate of Wilderland.
     const path = campaignPath(campaign, {}, log);
     expect(path.slice(0, 9).map((node) => [node.id, node.status === "completed"])).toEqual([...campaign.scenarios.slice(0, 8).map((id) => [id, true]), [nextPartId(campaign, gundabad.id), false]]);
-    expect(path[8]?.status).toBe("soon");
-    expect(nextPartStatus(campaign, gundabad.id)).toBe("soon");
-    expect(nextStep(path, null)).toMatchObject({ kind: "soon", node: { id: "the-fate-of-wilderland" } });
+    expect(path[8]?.status).toBe("current");
+    expect(nextPartStatus(campaign, gundabad.id)).toBe("current");
+    expect(nextStep(path, null)).toMatchObject({ kind: "begin", node: { id: "the-fate-of-wilderland" } });
   }, 180_000);
 
   it("removes A Growing Threat from the pool when won, and keeps it when lost; Dragon-sickness joins the pool only when the log reaches 6 treasures", () => {

@@ -86,22 +86,23 @@ function searchCaves(table: Table, instruction: Extract<Instruction, { verb: "Re
   table.out.did.push(...found.removed.map((code) => `The first player searches the Caves deck and removes ${table.name(code)} from the game.`));
 }
 
-// SearchBoonAllyToHand (12175:A): each player in turn, first player first, may take a unique boon ally of their deck (a pool ally that step 7 would shuffle into it, or one the deck holds) into their hand, or skip; the offer ends with the first who takes one.
-// Setup follows the opening hand and any mulligan (rr.setup step 7), so the ally joins the hand after the mulligan, as AddToHandAfterMulligan's cards do; a pool ally stays in the pool but is not shuffled into the deck.
-function searchBoonAlly(table: Table): void {
+// SearchBoonAllyToHand (12175:A) and SearchBoonOrTreasureToHand (12195:A): each player in turn, first player first, may take a card of their deck that `eligible` names (a pool card that step 7 would shuffle into it, or one the deck holds) into their hand, or skip. `untilFirst`: the offer ends
+// with the first who takes one ("a player may search"); otherwise every player is asked ("each player may search").
+// Setup follows the opening hand and any mulligan (rr.setup step 7), so the card joins the hand after the mulligan, as AddToHandAfterMulligan's cards do; a pool card stays in the pool but is not shuffled into the deck.
+function searchToHand(table: Table, search: { eligible: (printed: PrintedCard) => boolean; looksFor: string; untilFirst: boolean }): void {
   const { seats, pool, fresh, input, name } = table;
-  const isBoonAlly = (code: string): boolean => {
+  const isEligible = (code: string): boolean => {
     const printed = input.cards.get(code);
-    return printed != null && printed.type === "ally" && printed.isUnique && printed.campaignKind === "boon";
+    return printed != null && search.eligible(printed);
   };
   for (const [index, seat] of seats.entries()) {
-    const pooled = pool.filter((card) => card.attachedTo == null && card.back === "player" && !card.afterHand && !fresh.has(card) && poolSeat(card, seats.length) === index && isBoonAlly(card.code));
-    const options = [...new Set([...seat.deck.filter(isBoonAlly), ...pooled.map((card) => card.code)])];
+    const pooled = pool.filter((card) => card.attachedTo == null && card.back === "player" && !card.afterHand && !fresh.has(card) && poolSeat(card, seats.length) === index && isEligible(card.code));
+    const options = [...new Set([...seat.deck.filter(isEligible), ...pooled.map((card) => card.code)])];
     if (options.length === 0) continue;
-    const answer = takeAnswer(table, [...options, "skip"], index, "Search your deck for a unique boon ally to add to your hand, or skip. It joins your hand after the mulligan, and if you take one no other player does.");
+    const answer = takeAnswer(table, [...options, "skip"], index, `Search your deck for ${search.looksFor} to add to your hand, or skip. It joins your hand after the mulligan${search.untilFirst ? ", and if you take one no other player does" : ""}.`);
     if (answer == null) return;
     if (answer === "skip") {
-      table.out.did.push(`Seat ${index + 1} does not search for a boon ally.`);
+      table.out.did.push(`Seat ${index + 1} does not search for ${search.looksFor}.`);
       continue;
     }
     const inDeck = seat.deck.indexOf(answer);
@@ -112,9 +113,12 @@ function searchBoonAlly(table: Table): void {
     }
     seat.afterMulligan.push(answer);
     table.out.did.push(`Seat ${index + 1} searches their deck for ${name(answer)} and adds it to their hand after the mulligan.`);
-    return;
+    if (search.untilFirst) return;
   }
 }
+
+const searchBoonAlly = (table: Table): void => searchToHand(table, { eligible: (printed) => printed.type === "ally" && printed.isUnique && printed.campaignKind === "boon", looksFor: "a unique boon ally", untilFirst: true });
+const searchBoonOrTreasure = (table: Table): void => searchToHand(table, { eligible: (printed) => printed.campaignKind === "boon" || printed.campaignKind === "treasure", looksFor: "a boon or treasure card", untilFirst: false });
 
 // AttachChosen: the first player chooses any hero at the table, their own or another player's.
 function attachChosen(table: Table, instruction: Extract<Instruction, { verb: "AttachChosen" }>): void {
@@ -205,6 +209,7 @@ function campaignSetupSteps(campaignSetup: readonly Instruction[], input: Checkl
     else if (instruction.verb === "RemoveFromEncounterDeckIfLogged") searchEncounterDeck(table, instruction);
     else if (instruction.verb === "RemoveFromCavesIfLogged") searchCaves(table, instruction);
     else if (instruction.verb === "SearchBoonAllyToHand") searchBoonAlly(table);
+    else if (instruction.verb === "SearchBoonOrTreasureToHand") searchBoonOrTreasure(table);
   }
   return { ...table.out, removed: table.removed, removedCaves: table.removedCaves };
 }

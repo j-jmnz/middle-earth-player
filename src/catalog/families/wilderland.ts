@@ -238,6 +238,18 @@ const VERBS = [
   z.strictObject({ verb: z.literal("AttachTreasuresToHost"), ...when }),
   // A constant of a card in play: "Each player cannot play more than 1 card each phase" (19140:B:1). A player who has played `max` cards in the phase (the plays state.played records) may play no more; a card put into play is not played.
   z.strictObject({ verb: z.literal("LimitPlaysPerPhase"), max: z.number().int().min(1) }),
+  // The Fate of Wilderland (part 9, campaign card 12195; ledger lines 12195:A:2, 19155 to 19170).
+  // Campaign Setup: "Each player may search their deck for a boon or treasure card and add it to their hand" (12195:A:2). Each player in turn may take a boon or a treasure card of their deck (a pool card the checklist is about to shuffle into it is in the deck already) into their
+  // starting hand, or decline; every player is asked, unlike the search for a boon ally. Dealt by the checklist (campaign/checklist.ts), so it changes nothing here.
+  z.strictObject({ verb: z.literal("SearchBoonOrTreasureToHand") }),
+  // "Search the encounter deck, discard pile, and victory display for a Goblin Troop and add it to the staging area" (19161:A:3): the card with this code in any of the three is added to the staging area, entering play there. Nothing happens when none is left.
+  z.strictObject({ verb: z.literal("SearchStageCard"), code, ...when }),
+  // "Add each enemy discarded by this effect to the staging area" (19162:A:2): every card of `type` that the effect's DiscardEncounterTop discarded and that is still in the encounter discard pile enters the staging area, in the order they were discarded.
+  z.strictObject({ verb: z.literal("StageDiscarded"), type: z.literal("enemy"), ...when }),
+  // "Remove 1 progress from The Goblins' Assault" (19163:A:2): progress comes off the card in play with this title, at most as much as it holds.
+  z.strictObject({ verb: z.literal("RemoveProgressFrom"), amount: positiveAmountSchema, named: z.string().min(1), ...when }),
+  // "Place 1 resource on The Heroes' Defense" (19163:A:2): resource tokens go on the card in play with this title, unless a flag bars them (`noResourcesPlaced`).
+  z.strictObject({ verb: z.literal("PlaceResourcesOnNamed"), amount: positiveAmountSchema, named: z.string().min(1), ...when }),
 ] as const;
 
 const TRIGGERS = [
@@ -285,6 +297,8 @@ const FLAGS = [
   // Engine use, on a card or the table: the first treachery revealed this round, noted as it is revealed in a game that reads firstRevealedEachRound (families/wilderland/reveals.ts), and that a treachery was revealed this round.
   "firstTreachery",
   "treacheryRevealed",
+  // On a card in play: resource tokens cannot be placed on it ("resources cannot be placed on The Heroes' Defense", 19161:A:2). Read by PlaceResourceTokens (families/nightmare/dungeon.ts).
+  "noResourcesPlaced",
 ] as const;
 
 export const manifest = { name: "wilderland", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;
