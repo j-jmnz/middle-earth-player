@@ -19,6 +19,7 @@ import { restoreDefaults, tableSettings } from "../../ui/table-settings";
 import { alwaysCodes, alwaysRows, CREDITS } from "../../play/chrome/settings-words";
 import { useUiScale } from "../../ui/ui-scale";
 import { useSplitColumns } from "../nav/use-split-columns";
+import { openPrivacyPolicy } from "./privacy";
 
 type Change = Parameters<ReturnType<typeof tableSettings.getState>["update"]>[0];
 const change = (next: Change) => tableSettings.getState().update(next);
@@ -52,6 +53,15 @@ export function SettingsView({ fromTable = false }: { fromTable?: boolean }) {
       <Label className="pb-2" testID="app-settings-credits">
         {CREDITS}
       </Label>
+      <View className="-mx-3 items-start">
+        <TextButton
+          label="Privacy policy"
+          tone="accent"
+          testID="app-settings-privacy"
+          accessibilityHint="Opens the privacy policy in your browser"
+          onPress={openPrivacyPolicy}
+        />
+      </View>
       {confirming ? (
         <AskInPlace
           testID="app-settings-restore-ask"

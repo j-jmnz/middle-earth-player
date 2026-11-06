@@ -83,6 +83,10 @@ Each release's notes give the APK's SHA-256 and the fingerprint of the certifica
 - The TestFlight link says the beta is full or not accepting testers: [open an issue](https://github.com/j-jmnz/middle-earth-lcg/issues) and say so.
 - Anything else: [open an issue](https://github.com/j-jmnz/middle-earth-lcg/issues) with your device, its Android or iOS version, and the app version shown in Settings.
 
+### Privacy
+
+The app collects no personal data: no accounts, analytics or ads, and your saves never leave your device. [PRIVACY.md](PRIVACY.md) has the details, and Settings, About links to it.
+
 ## Local setup
 
 ### Requirements
