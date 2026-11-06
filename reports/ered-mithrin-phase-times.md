@@ -6,4 +6,4 @@
 | 54 The King's Quest | 2026-11-05 14:54 | 2026-11-05 18:04 | 3 h 10 min | engine half; A 14:54-15:46, committed 2b779de 15:50; 6 rulings asked 15:50, answered by 15:53; B 15:53-16:50, committed 5a9701e 16:54; X-quest-points ruling (session restart); review round 17:01-17:12; fix pass 17:12-17:55 (incl. X quest points, ENGINE_VERSION 24), committed 4edff42 |
 | 55 The Withered Heath | 2026-11-05 18:05 | 2026-11-05 21:12 | 3 h 07 min | engine half; A 18:05-19:06, committed ab6a98b 19:12; 7 rulings asked 19:12, answered by 19:14; B 19:14-20:10, committed 20:17; review round 20:17-20:27; fix pass 20:28-21:08 |
 | 56 Roam Across Rhovanion | 2026-11-05 21:13 | 2026-11-06 00:55 | 3 h 42 min | engine half; A 21:13-22:24, committed c7a2f33 22:29; 5 rulings asked 22:30, answered by 23:01; B 23:01-00:03, committed 990cd3f 00:09; 3 more rulings; review round 00:09 (cut off by a restart, rerun 00:24-00:32); fix pass 00:32-00:49, committed 0a23ffd |
-| 57 Fire in the Night | 2026-11-06 00:55 | | | in progress |
+| 57 Fire in the Night | 2026-11-06 00:55 | | | in progress; A 00:55-01:39, committed 823514a 01:46; 7 rulings asked 01:46 |
