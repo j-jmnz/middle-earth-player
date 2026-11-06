@@ -10,7 +10,7 @@ Pin Expo SDK 58. The new architecture stays on. One package, no monorepo. pnpm i
 
 | Job | Library | Lives in |
 | --- | --- | --- |
-| Shell, routing, device builds | Expo SDK 58, Expo Router, EAS Build | `src/screens` |
+| Shell, routing, device builds | Expo SDK 58, Expo Router, EAS Build (development and e2e), Gradle in GitHub Actions (release APK) | `src/screens` |
 | Chrome layout | NativeWind 4.2.7, Tailwind 3 | screens other than the table |
 | Table | `@shopify/react-native-skia`, the SDK 58 `pnpm expo install` version | `src/play` |
 | Gestures and motion | `react-native-gesture-handler`, `react-native-reanimated`, `react-native-worklets` | `src/play` |
@@ -37,7 +37,7 @@ The catalog is one `drizzle-orm/sqlite-core` schema. The script opens it with `b
 
 Reanimated is the only animation library. Do not add TanStack Query, Redux, a Phoenix client, a server framework, MUI, Emotion, or styled-components.
 
-Android ships an APK or AAB. iOS ships an IPA. A physical iPhone needs Apple signing. The binary contains the Expo shell, native modules, `catalog.db`, the booklet PDFs that `pnpm booklets:pack` packs into `assets/booklets/` (not committed; `metro.config.js` bundles its map in place of the stub `src/screens/booklets/bundled-map.ts`) and every card's picture, which `scripts/build/pack-scans.ts` writes into `assets/scans` scaled to at most 1200 px on the long side (with the map `src/screens/images/scan-map.ts`, empty in git): each card's pinned `pictures` file, else its scan. `pnpm ios` and `pnpm android` pack too. `eas-build-post-install` runs the catalog build and both packers. Image files stay in the document directory. A bundled booklet is copied into the document directory on first open, and the reader reads only that copy.
+Android ships an APK or AAB. iOS ships an IPA. A physical iPhone needs Apple signing. The binary contains the Expo shell, native modules, `catalog.db`, the booklet PDFs that `pnpm booklets:pack` packs into `assets/booklets/` (not committed; `metro.config.js` bundles its map in place of the stub `src/screens/booklets/bundled-map.ts`) and every card's picture, which `scripts/build/pack-scans.ts` writes into `assets/scans` scaled to at most 1200 px on the long side (with the map `src/screens/images/scan-map.ts`, empty in git): each card's pinned `pictures` file, else its scan. `pnpm ios` and `pnpm android` pack too. `eas-build-post-install` runs the catalog build and both packers, and so does the `android` job of `.github/workflows/release.yml`, which builds the signed release APK (`docs/releasing.md`). The version is `0.0.0` in `app.json`; `app.config.js` stamps the release tag's version and `versionCode` from `APP_VERSION`. Image files stay in the document directory. A bundled booklet is copied into the document directory on first open, and the reader reads only that copy.
 
 ## Processes
 
@@ -69,7 +69,7 @@ flowchart LR
 Three groups of Node entry points exist, and none of them runs on the phone.
 
 - `pnpm data:sync` is the only command that uses the network. It refreshes `data/raw/` (the game icon sources under `data/raw/icons` included), `.cache/pdf/`, `.cache/scans/` and `.cache/pictures/` (every card's picture the app bundles, `scripts/data/sources/pictures.ts`) and records every pin in `data/sources.json`. Card text comes from the printed-text ledger `data/printed/`, read from the scans; rule text from the curated spans in `data/rules/index.json`. `pnpm data:build` turns the raw snapshots into `data/cards`, `data/scenarios`, `data/campaigns`, `data/decks` (the pre-built player decks, read by the import screen), `data/rules`, `src/effects/generated`, and the game icons and printed card backs (`assets/icons`, `src/ui/icons`), offline and deterministically. `pnpm data:check` rebuilds into a temporary directory and fails on any difference.
-- `scripts/build/catalog.ts` (`pnpm catalog:build`) reads `data/` offline. It writes `assets/catalog.db` and the `CATALOG_VERSION` constant. `scripts/build/pack-booklets.ts` and `scripts/build/pack-scans.ts` bundle the booklets and card scans. EAS Build runs all three after install.
+- `scripts/build/catalog.ts` (`pnpm catalog:build`) reads `data/` offline. It writes `assets/catalog.db` and the `CATALOG_VERSION` constant. `scripts/build/pack-booklets.ts` and `scripts/build/pack-scans.ts` bundle the booklets and card scans. EAS Build and the release workflow run all three after install.
 - Developer tools read `data/` and the engine: `pnpm data:query`, `pnpm effects:draft`, `pnpm effects:open`, `scripts/e2e/fixtures.ts`, `scripts/card-smoke/run.ts`, `test/harness/combat-policy.ts` (the policy the combat tests play whole starter games with, which attacks; the auto-player never does), and the auto-player and scene scripts the golden games use.
 - The Expo app runs on the device. It reads the bundled catalog, reads and writes `user.db`, and calls the reducer in process. It needs no network: the catalog, the booklets and every card's picture are in the binary.
 

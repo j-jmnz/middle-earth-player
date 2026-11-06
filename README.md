@@ -44,6 +44,13 @@ After those come the remaining official cycles, saga boxes and standalone scenar
 
 The stack is Expo SDK 58, Expo Router, Skia for the game table, Reanimated, NativeWind, SQLite through Drizzle, Zustand and Zod. [docs/architecture.md](docs/architecture.md) covers the module layout, state, the engine and the test layers.
 
+## Install
+
+The app is not on the Play Store or the App Store.
+
+- Android: download the `.apk` from the latest release on the [Releases page](https://github.com/j-jmnz/middle-earth-lcg/releases) and open it on your phone. Allow your browser or file manager to install unknown apps when it asks. A newer release installs over the old one and keeps your campaigns. Each release's notes give the file's SHA-256 and the signing certificate's fingerprint.
+- iPhone and iPad: there is no download yet. Build it from source as Local setup, On a phone says.
+
 ## Local setup
 
 ### Requirements
@@ -116,6 +123,7 @@ The end-to-end flows are in `.maestro/scenarios/<scenario-id>/` and `.maestro/fe
 | `pnpm scenario:new <scenario-id>` | Writes the skeleton files for a new scenario and registers it. `--dry-run` lists the files first. |
 | `pnpm catalog:build` | Writes `assets/catalog.db` (never committed) and `src/catalog/version.ts` (committed). |
 | `pnpm scans:pack` / `pnpm booklets:pack` | Packs card pictures and the booklet PDFs into `assets/` for the native bundle. |
+| `pnpm release:plan --dry-run` | Prints the next release tag and its notes from the commits since the last tag (`git fetch --tags` first). Changes nothing. |
 | `pnpm commit:check "<subject>"` | Checks commit subjects against `.claude/rules/commit-standards.md`. `--range <base>..<head>` checks a range of commits. `pnpm install` installs it as the `commit-msg` hook (`.githooks/`). |
 | `pnpm move <old> <new>` | Moves files and rewrites every import and path that refers to them. `--dry-run` first. |
 | `pnpm docs:index` / `pnpm docs:section <file> "<heading>"` | Regenerates `docs/INDEX.md` / prints one doc section. |
@@ -133,6 +141,7 @@ Contributions are welcome. [CONTRIBUTING.md](CONTRIBUTING.md) covers the checks 
 - [docs/brief.md](docs/brief.md): product decisions and the rules the engine implements.
 - [docs/architecture.md](docs/architecture.md): code layout, state, the engine and tests.
 - [docs/design-system.md](docs/design-system.md) and [docs/design-system-table.md](docs/design-system-table.md): the look of the screens and the game table.
+- [docs/releasing.md](docs/releasing.md): how a release is cut and shipped; the rules are in [.claude/rules/release-standards.md](./.claude/rules/release-standards.md).
 - [docs/phases/STATUS.md](docs/phases/STATUS.md): progress and open work.
 - [docs/INDEX.md](docs/INDEX.md): a generated index of every doc, by section.
 

@@ -1,0 +1,180 @@
+name: release
+
+# Cuts a release: the next version from the commits since the last tag, the same checks as test.yml, a signed Android APK,
+# then the tag and a GitHub release with generated notes. .claude/rules/release-standards.md sets the rules;
+# docs/releasing.md says how to start it and what each job does. Start it from the Actions tab, with
+# `gh workflow run release.yml --ref main -f bump=auto -f dry_run=false`, or with the GitHub API's workflow dispatch.
+
+on:
+  workflow_dispatch:
+    inputs:
+      bump:
+        description: "auto reads the commits since the last release; patch, minor or major forces that bump"
+        type: choice
+        options: [auto, patch, minor, major]
+        default: auto
+      dry_run:
+        description: "Build and check only: the APK is a workflow artifact, no tag or release is made"
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+# One release at a time; a second run waits instead of racing for the same tag.
+concurrency:
+  group: release-pipeline
+  cancel-in-progress: false
+
+jobs:
+  plan:
+    runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.plan.outputs.tag }}
+      version: ${{ steps.plan.outputs.version }}
+      signed: ${{ steps.signing.outputs.signed }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Plan the version and notes
+        id: plan
+        env:
+          BUMP: ${{ inputs.bump }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: pnpm --silent release:plan --bump "$BUMP" --github-output $([ "$DRY_RUN" = "true" ] && echo --dry-run)
+      - name: Signing key
+        id: signing
+        env:
+          KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          DRY_RUN: ${{ inputs.dry_run }}
+        run: |
+          if [ -n "$KEYSTORE" ]; then echo "signed=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "::warning::No ANDROID_KEYSTORE_BASE64 secret: the dry-run APK is signed with the debug key."
+            echo "signed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "::error::A release needs the ANDROID_KEYSTORE_BASE64, ANDROID_KEYSTORE_PASSWORD, ANDROID_KEY_ALIAS and ANDROID_KEY_PASSWORD secrets (docs/releasing.md, Signing key)."
+          exit 1
+
+  checks:
+    needs: plan
+    uses: ./.github/workflows/test.yml
+
+  android:
+    needs: plan
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    env:
+      # app.config.js stamps the version and versionCode from this.
+      APP_VERSION: ${{ needs.plan.outputs.version }}
+      APK_NAME: middle-earth-lcg-${{ needs.plan.outputs.tag }}${{ inputs.dry_run && '-dry-run' || '' }}.apk
+    steps:
+      # The packed pictures and the native build need more room than the runner leaves free.
+      - name: Free disk space
+        run: sudo rm -rf /usr/share/dotnet /usr/local/lib/node_modules /opt/ghc /usr/local/.ghcup /usr/local/share/boost /opt/hostedtoolcache/CodeQL "$AGENT_TOOLSDIRECTORY/PyPy"
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+      # pdftoppm renders the campaign, boon and burden cards from their PDFs (scripts/build/pack-scans.ts).
+      - run: sudo apt-get update -q && sudo apt-get install -y -q poppler-utils
+      - run: pnpm install --frozen-lockfile
+      # pack-scans keeps a packed picture while its pin is unchanged, so an earlier run's assets/scans saves the downloads.
+      - uses: actions/cache@v4
+        with:
+          path: assets/scans
+          key: scans-${{ hashFiles('data/sources.json', 'scripts/build/pack-scans.ts', 'src/screens/art/crop.ts') }}
+          restore-keys: scans-
+      - name: Catalog, booklets and pictures
+        run: pnpm catalog:build && pnpm booklets:pack && pnpm scans:pack --quiet
+      - name: Generate the native project
+        run: pnpm exec expo prebuild --platform android --no-install
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Build the release APK
+        env:
+          KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          signing=()
+          if [ -n "$KEYSTORE" ]; then
+            echo "$KEYSTORE" | base64 --decode > "$RUNNER_TEMP/release.jks"
+            signing=(
+              "-Pandroid.injected.signing.store.file=$RUNNER_TEMP/release.jks"
+              "-Pandroid.injected.signing.store.password=$KEYSTORE_PASSWORD"
+              "-Pandroid.injected.signing.key.alias=$KEY_ALIAS"
+              "-Pandroid.injected.signing.key.password=$KEY_PASSWORD"
+            )
+          fi
+          cd android
+          ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a "${signing[@]}"
+          mkdir -p "$RUNNER_TEMP/out"
+          mv app/build/outputs/apk/release/app-release.apk "$RUNNER_TEMP/out/$APK_NAME"
+          rm -f "$RUNNER_TEMP/release.jks"
+      - name: Verify the APK
+        run: |
+          apk="$RUNNER_TEMP/out/$APK_NAME"
+          size=$(stat -c %s "$apk")
+          echo "$APK_NAME: $((size / 1048576)) MB"
+          # A GitHub release asset is at most 2 GiB.
+          if [ "$size" -ge 2147483648 ]; then echo "::error::$APK_NAME is over the 2 GiB release asset limit"; exit 1; fi
+          apksigner=$(ls -d "$ANDROID_HOME"/build-tools/*/ | sort -V | tail -1)apksigner
+          "$apksigner" verify --print-certs "$apk" | tee "$RUNNER_TEMP/certs.txt"
+          grep -m1 'SHA-256 digest' "$RUNNER_TEMP/certs.txt" | awk '{print $NF}' > "$RUNNER_TEMP/out/certificate.sha256"
+          (cd "$RUNNER_TEMP/out" && sha256sum "$APK_NAME" > "$APK_NAME.sha256")
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android
+          path: ${{ runner.temp }}/out/
+          retention-days: 14
+          compression-level: 0
+
+  publish:
+    needs: [plan, checks, android]
+    if: ${{ !inputs.dry_run }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/download-artifact@v4
+        with:
+          name: android
+          path: ${{ runner.temp }}/out
+      - name: Write the notes
+        env:
+          BUMP: ${{ inputs.bump }}
+          TAG: ${{ needs.plan.outputs.tag }}
+        run: |
+          apk=$(ls "$RUNNER_TEMP"/out/*.apk)
+          pnpm --silent release:plan --bump "$BUMP" --expect "$TAG" --apk "$apk" \
+            --cert-sha256 "$(cat "$RUNNER_TEMP/out/certificate.sha256")" --notes "$RUNNER_TEMP/notes.md"
+      - name: Tag and release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ needs.plan.outputs.tag }}
+        run: |
+          # A patch cut from a release/vX.Y branch does not take "Latest" from a newer line on main.
+          latest=true
+          if [ "$GITHUB_REF_NAME" != main ]; then latest=false; fi
+          gh release create "$TAG" "$RUNNER_TEMP"/out/*.apk "$RUNNER_TEMP"/out/*.apk.sha256 \
+            --target "$GITHUB_SHA" --title "$TAG" --notes-file "$RUNNER_TEMP/notes.md" --latest="$latest"

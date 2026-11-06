@@ -8,11 +8,12 @@ Read a section, not a file: `pnpm docs:section <file> "<heading>"` prints one se
 
 Read whole.
 
-- `CLAUDE.md` — Claude Code (~2.1K tok)
-- `.claude/rules/authority.md` — Authority (~450 tok)
+- `CLAUDE.md` — Claude Code (~2.2K tok)
+- `.claude/rules/authority.md` — Authority (~470 tok)
 - `.claude/rules/code-standards.md` — Code standards (~1.9K tok)
-- `.claude/rules/commit-standards.md` — Commit standards (~600 tok)
+- `.claude/rules/commit-standards.md` — Commit standards (~680 tok)
 - `.claude/rules/docs-standards.md` — Docs standards (~1.1K tok)
+- `.claude/rules/release-standards.md` — Release standards (~890 tok)
 
 ## Agents
 
@@ -28,23 +29,24 @@ Each agent reads its own file.
 
 Read the sections your task touches.
 
-- `README.md` — Middle Earth LCG (~3.4K tok)
+- `README.md` — Middle Earth LCG (~3.6K tok)
   - 8–16 Features (~210)
   - 17–27 Roadmap (~160)
   - 28–36 Accessibility (~340)
   - 37–46 Architecture (~310)
-  - 47–99 Local setup (~780)
-    - 49–63 Requirements (~130)
-    - 64–73 In a browser (~140)
-    - 74–95 On a phone (~360)
-    - 96–99 Maestro (~150)
-  - 100–126 Commands (~720)
-  - 127–130 Contributing (~70)
-  - 131–138 Documentation (~130)
-  - 139–156 Attribution (~480)
-  - 157–160 License (~80)
-- `docs/architecture.md` — Architecture (~19.8K tok)
-  - 7–41 Stack (~980)
+  - 47–53 Install (~140)
+  - 54–106 Local setup (~780)
+    - 56–70 Requirements (~130)
+    - 71–80 In a browser (~140)
+    - 81–102 On a phone (~360)
+    - 103–106 Maestro (~150)
+  - 107–134 Commands (~760)
+  - 135–138 Contributing (~70)
+  - 139–147 Documentation (~170)
+  - 148–165 Attribution (~480)
+  - 166–169 License (~80)
+- `docs/architecture.md` — Architecture (~19.9K tok)
+  - 7–41 Stack (~1.1K)
   - 42–77 Processes (~660)
   - 78–160 Modules (~2.1K) ← 3
     - 126–160 Repository map (~850) ← 1
@@ -60,12 +62,12 @@ Read the sections your task touches.
   - 352–357 Catalog build (~410)
   - 358–375 Tests (~1.6K) ← 5
   - 376–391 Performance (~1.2K) ← 3
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~81.4K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~81.5K tok)
   - 17–38 Sections (~410)
   - 39–50 Product (~590)
   - 51–64 Non-goals (~540)
   - 65–85 Decisions (~830)
-  - 86–114 Stack (~810)
+  - 86–114 Stack (~870)
   - 115–132 Performance and feel (~750)
   - 133–150 Repository layout (~440)
   - 151–369 Domain (~9.3K)
@@ -103,7 +105,7 @@ Read the sections your task touches.
     - 836–839 Coverage test (~270)
   - 840–860 Data sources (~530)
   - 861–879 Card images (~1.1K) ← 6
-  - 880–905 Persistence and shipping (~1.7K)
+  - 880–905 Persistence and shipping (~1.8K)
   - 906–947 Screens (~4.7K) ← 1
     - 932–947 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~37.9K tok)
@@ -178,6 +180,7 @@ Read the sections your task touches.
     - 441–446 Booklet (~280) ← 2
     - 447–450 Database (~20)
   - 451–470 States (~620)
+- `docs/releasing.md` — Releasing (~1.4K tok)
 
 ## Phases
 
@@ -186,11 +189,12 @@ STATUS.md, then the active phase file.
 - `docs/phases/STATUS.md` — Phase status (~6.4K tok)
   - 5–15 Rules (~410)
   - 16–87 Phases (~1.4K)
-  - 88–175 Open items (~4.0K)
-    - 90–111 Fixtures and Maestro (~1.2K)
-    - 112–157 Rules and engine (~2.1K)
-    - 158–175 Screens and code (~700)
-  - 176–192 Standing decisions (~490)
+  - 88–179 Open items (~4.1K)
+    - 90–93 Releases (~60)
+    - 94–115 Fixtures and Maestro (~1.2K)
+    - 116–161 Rules and engine (~2.1K)
+    - 162–179 Screens and code (~700)
+  - 180–196 Standing decisions (~490)
 
 ## Live plans
 
@@ -210,6 +214,7 @@ Read when a task names the plan.
   - 237–273 Mechanic families: engine and records together (~1.4K) ← 1
   - 274–286 Readings the review catches (~410) ← 3
   - 287–306 Not expressible yet: leave open, report (~390)
+- `docs/plans/ios-release.md` — iOS releases (~750 tok)
 - `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.4K tok)
   - 3–14 Context (~450)
   - 15–24 What does not move (~190)
@@ -250,6 +255,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/data`: brief.md, Nightmare (4); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/git`: .claude/rules/commit-standards.md, Subject line (2)
+- `scripts/release`: .claude/rules/release-standards.md, Versioning (3); .claude/rules/release-standards.md, Release notes (2); .claude/rules/release-standards.md, Branches (1)
 - `scripts/tools`: handover/agent-brief.md, Scenario procedure (2); architecture.md, Modules (1)
 - `src/campaign`: brief.md, Nightmare (4); architecture.md, Tests (2); brief.md, Ered Mithrin (2)
 - `src/catalog`: architecture.md, Mechanic families (2); brief.md, Nightmare (2); brief.md, A Knife in the Dark (1); brief.md, Dream-chaser (1); brief.md, Ered Mithrin (1); brief.md, Flight to the Ford burden deck and life (1); brief.md, Three layers (1)

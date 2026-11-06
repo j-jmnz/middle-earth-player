@@ -11,10 +11,14 @@ Thanks for helping. This is a fan-made project: by contributing you agree that y
 
 ## Making a change
 
-1. Fork the repo and branch from `main`.
+1. Fork the repo and branch from `main`. Name the branch `<type>/<short-slug>` (`fix/staging-attacks`), as [.claude/rules/release-standards.md](./.claude/rules/release-standards.md) (Branches) says.
 2. Before you push, run `pnpm data:check`, `pnpm lint`, `pnpm typecheck` and `pnpm test`. CI (`.github/workflows/test.yml`) runs the same checks on every push and pull request. While you work, `pnpm test:changed` or `pnpm test:scenario <id>` give quicker feedback.
 3. Write each commit message as [.claude/rules/commit-standards.md](./.claude/rules/commit-standards.md) says: `<type>: <summary>`, with type `fix`, `feat`, `refactor`, `style` or `repo`. `pnpm install` sets up a `commit-msg` hook (`.githooks/`) that refuses a subject in any other form; `pnpm commit:check "<subject>"` checks one by hand.
-4. Open a pull request whose title follows the same format, and say what changed and why. Pull requests are squash-merged, so the title becomes the commit on `main`. CI checks the title and every commit subject; the pull request template lists the other checks.
+4. Open a pull request whose title follows the same format, and say what changed and why. Pull requests are squash-merged, so the title becomes the commit on `main` and a line of the next release's notes: write it for a player. If the change loses something a player saved or removes a feature, add a `Breaking: <what players lose>` line to the description's squash body. CI checks the title and every commit subject; the pull request template lists the other checks.
+
+## Releases
+
+Releases are cut by the release workflow, never by hand: it works out the version from the commits, builds and signs the APK, tags the commit and writes the notes. [.claude/rules/release-standards.md](./.claude/rules/release-standards.md) sets the rules and [docs/releasing.md](docs/releasing.md) says how to start one. Don't bump a version or push a tag in a pull request.
 
 ## Conventions
 
