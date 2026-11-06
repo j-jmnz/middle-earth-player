@@ -14,6 +14,17 @@ An offline, single-device app for playing The Lord of the Rings: The Card Game s
 
 `src/campaign/playable.ts` lists the scenarios you can play now. [docs/phases/STATUS.md](docs/phases/STATUS.md) lists the work still open.
 
+## Roadmap
+
+The goal is every official campaign and scenario, followed by the fan-made scenarios and cards from [A Long-extended Party](https://alongextendedparty.com) (ALeP).
+
+Coming soon:
+
+- **The Two Towers** saga: The Uruk-hai, Helm's Deep, The Road to Isengard, The Passage of the Marshes, Journey to the Cross-roads, Shelob's Lair.
+- **The Return of the King** saga: The Passing of the Grey Company, The Siege of Gondor, The Battle of the Pelennor Fields, The Tower of Cirith Ungol, The Black Gate Opens, Mount Doom.
+
+After those come the remaining official cycles, saga boxes and standalone scenarios, then ALeP.
+
 ## Architecture
 
 - `data/` holds the card, scenario and rules data. It is committed and built offline from source snapshots in `data/raw/`. Every source (RingsDB, Hall of Beorn, the DragnCards plugin data, FFG's rules PDFs, card scans) is listed and pinned in `data/sources.json`.
@@ -117,7 +128,7 @@ Conventions:
 - After adding or changing effect records, run `pnpm effects:open`. After changing doc headings or doc citations in code, run `pnpm docs:index`. Tests fail when either output is stale.
 - Use `pnpm move` to move files.
 - Never commit `assets/catalog.db`, card scans, card pictures, PDFs or a filled `src/screens/images/scan-map.ts`.
-- Out of scope: playtest and fan-made (ALeP) cards, accounts or a backend, online multiplayer, and support for other card games. [docs/brief.md](docs/brief.md) has the full list of non-goals.
+- Out of scope: playtest cards, accounts or a backend, online multiplayer, and support for other card games. [docs/brief.md](docs/brief.md) has the full list of non-goals.
 
 Adding a scenario follows the procedure in [docs/handover/agent-brief.md](docs/handover/agent-brief.md), and authoring effect records follows [docs/plans/effect-authoring.md](docs/plans/effect-authoring.md). The repo also contains Claude Code agent definitions and rules in `.claude/`; you don't need them to contribute.
 
