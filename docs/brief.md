@@ -38,7 +38,7 @@ Read the sections your task touches, not the whole file: `docs/INDEX.md` gives e
 
 ## Product
 
-An offline, single-device, fan-made app for The Lord of the Rings Living Card Game, with no connection to FFG. Official campaigns are the product. The first campaign is the 2022 **Fellowship of the Ring Saga Expansion** (FFG product MEC109). Later official campaigns are added as more content in the same app.
+An offline, single-device, fan-made app for The Lord of the Rings Living Card Game, with no connection to FFG. Official campaigns are the product. The first campaign is the 2022 **Fellowship of the Ring Saga Expansion** (FFG product MEC109). Every official campaign and scenario is added to the same app in turn, and then the fan-made ALeP (A Long-extended Party) ones (user decision, 2026-11-06). The README's Roadmap lists what comes next.
 
 One human. No accounts, no rooms, no matchmaking, no server in the play loop. True solo is one local seat. Two-handed solo is two local seats on the same phone, because staging and engagement are defined per player. That is not multiplayer. The paper log has Player 3 and Player 4 columns. This app does not. `seatCount` is 1 or 2, chosen once at campaign start.
 
@@ -56,7 +56,7 @@ Do not do any of these.
 - Do not build a rules language for other card games.
 - Do not add accounts, auth, Patreon, image hosting, or a backend.
 - Do not restrict the deck builder to cards that have automated effects, or to cards printed in the Fellowship box.
-- Do not include ALeP or playtest cards. Easy, Normal and Nightmare (user decision, 2026-10-30; Nightmare, below). Easy Mode also puts 1 resource on each hero during setup (`easy-mode.easy-mode`).
+- Do not include playtest cards. ALeP cards and scenarios come after the official ones (Product); until then the RingsDB sync skips ALeP packs. Easy, Normal and Nightmare (user decision, 2026-10-30; Nightmare, below). Easy Mode also puts 1 resource on each hero during setup (`easy-mode.easy-mode`).
 - Do not commit card scans, booklet PDFs, or `catalog.db`. `data/` holds card text, rules text and raw source snapshots on purpose, so every session has them. The card text, art and rules belong to FFG/Asmodee (`THIRD_PARTY_NOTICES.md`). The phone receives `catalog.db` inside the binary. The release build also carries every booklet PDF (`BOOKLET_SOURCES`, `scripts/build/pack-booklets.ts`): `pnpm booklets:pack` (run by `eas-build-post-install`) copies each pinned PDF from `.cache/pdf`, or fetches it from its pinned URL and checks the sha256 in `data/sources.json`, with a map that requires them into `assets/booklets/` (gitignored); Metro bundles that map in place of the empty stub `src/screens/booklets/bundled-map.ts`. `pnpm data:sync rules` and `pnpm android` pack too. The app never fetches a booklet at runtime. A build without them still lets the player add each PDF from their files.
 - Do not paste the MEC109 narrative prose into screens. Encode procedures. Short original labels are fine ("Hide test", "Ring-bearer's life").
 - Do not ship a WebView of any existing card-table site.

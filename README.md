@@ -14,6 +14,26 @@ An offline, single-device app for playing The Lord of the Rings: The Card Game s
 
 `src/campaign/playable.ts` lists the scenarios you can play now. [docs/phases/STATUS.md](docs/phases/STATUS.md) lists the work still open.
 
+## Roadmap
+
+The goal is every official campaign and scenario, followed by the fan-made scenarios and cards from [A Long-extended Party](https://alongextendedparty.com) (ALeP).
+
+Coming soon:
+
+- **The Two Towers** saga: The Uruk-hai, Helm's Deep, The Road to Isengard, The Passage of the Marshes, Journey to the Cross-roads, Shelob's Lair.
+- **The Return of the King** saga: The Passing of the Grey Company, The Siege of Gondor, The Battle of the Pelennor Fields, The Tower of Cirith Ungol, The Black Gate Opens, Mount Doom.
+
+After those come the remaining official cycles, saga boxes and standalone scenarios, then ALeP.
+
+## Accessibility
+
+- **Screen readers.** VoiceOver and TalkBack can play a full game. When a reader is on, the game table is replaced by a scrolling list of zones and cards. Each card's label gives its whole state (damage, resources, progress, attachments, effect modifiers), and its hint says what a double tap does. Each long press is also offered as a reader action. Each new moment and each refused move is announced in order through one queue, so one line never cuts off another. This mode is only on the phone; the web build has none.
+- **Touch targets.** Every control has a 44 pt target at every text size.
+- **Display.** Settings offer a dark and a light theme, three interface sizes (the table included), and a "Strong outlines" option that thickens effect marks and token counts.
+- **Motion.** Reduce motion follows the phone's setting or can be forced on. It snaps animations and stops the fog and the combat replay. Animation speed and the combat replay can also be set on their own, and haptics can be turned off.
+
+`scripts/checks/a11y.test.ts` fails on a control with no role or name, a long press with no matching action, an unlabelled text field, or an image that is neither labelled nor hidden. The rules are in [docs/design-system.md](docs/design-system.md) and [docs/design-system-table.md](docs/design-system-table.md), Screen reader.
+
 ## Architecture
 
 - `data/` holds the card, scenario and rules data. It is committed and built offline from source snapshots in `data/raw/`. Every source (RingsDB, Hall of Beorn, the DragnCards plugin data, FFG's rules PDFs, card scans) is listed and pinned in `data/sources.json`.
@@ -117,7 +137,7 @@ Conventions:
 - After adding or changing effect records, run `pnpm effects:open`. After changing doc headings or doc citations in code, run `pnpm docs:index`. Tests fail when either output is stale.
 - Use `pnpm move` to move files.
 - Never commit `assets/catalog.db`, card scans, card pictures, PDFs or a filled `src/screens/images/scan-map.ts`.
-- Out of scope: playtest and fan-made (ALeP) cards, accounts or a backend, online multiplayer, and support for other card games. [docs/brief.md](docs/brief.md) has the full list of non-goals.
+- Out of scope: playtest cards, accounts or a backend, online multiplayer, and support for other card games. [docs/brief.md](docs/brief.md) has the full list of non-goals.
 
 Adding a scenario follows the procedure in [docs/handover/agent-brief.md](docs/handover/agent-brief.md), and authoring effect records follows [docs/plans/effect-authoring.md](docs/plans/effect-authoring.md). The repo also contains Claude Code agent definitions and rules in `.claude/`; you don't need them to contribute.
 
