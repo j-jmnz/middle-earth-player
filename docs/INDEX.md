@@ -20,7 +20,7 @@ Each agent reads its own file.
 - `.cursor/agents/implementer.md` — Implements one phase from docs/phases (~1.3K tok)
 - `.cursor/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~1.7K tok)
 - `.cursor/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~2.3K tok)
-- `.cursor/agents/ux.md` — Reviews the current screens for phone UX and visual design, and changes the design system when asked (~1.3K tok)
+- `.cursor/agents/ux.md` — Reviews the current screens for phone UX and visual design, and changes the design system when asked (~1.2K tok)
 - `.claude/agents/effect-author.md` — Writes effect records for card lines no template reads (~1.1K tok)
 - `.claude/agents/implementer.md` — Implements one phase from docs/phases (~110 tok)
 - `.claude/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~200 tok)
@@ -31,38 +31,38 @@ Each agent reads its own file.
 
 Read the sections your task touches.
 
-- `README.md` — Middle Earth LCG (~4.2K tok)
-  - 7–17 Where it stands (~390)
-  - 18–23 Rules come from the printed sources (~160)
-  - 24–55 Commands (~1.4K)
-  - 56–65 Documents (~260)
-  - 66–69 Agents (~170)
-  - 70–164 Run it locally (~1.6K)
-    - 74–79 Mac browser (~120)
-    - 80–85 Codespaces (~110)
-    - 86–160 Phone builds from scratch (Mac) (~1.1K)
-    - 161–164 Maestro (~320)
-- `docs/architecture.md` — Architecture (~20.4K tok)
-  - 7–41 Stack (~990)
+- `README.md` — Middle Earth LCG (~4.1K tok)
+  - 7–15 Where it stands (~270)
+  - 16–21 Rules come from the printed sources (~160)
+  - 22–53 Commands (~1.4K)
+  - 54–63 Documents (~260)
+  - 64–67 Agents (~170)
+  - 68–162 Run it locally (~1.6K)
+    - 72–77 Mac browser (~120)
+    - 78–83 Codespaces (~110)
+    - 84–158 Phone builds from scratch (Mac) (~1.1K)
+    - 159–162 Maestro (~320)
+- `docs/architecture.md` — Architecture (~19.8K tok)
+  - 7–41 Stack (~980)
   - 42–77 Processes (~660)
-  - 78–160 Modules (~2.2K) ← 3
+  - 78–160 Modules (~2.1K) ← 3
     - 126–160 Repository map (~850) ← 1
   - 161–186 State (~1.0K) ← 9
   - 187–208 Play loop (~250)
-  - 209–234 Engine (~4.3K)
-    - 223–234 Mechanic families (~3.4K) ← 5
-  - 235–240 Effects (~560)
+  - 209–234 Engine (~4.2K)
+    - 223–234 Mechanic families (~3.3K) ← 5
+  - 235–240 Effects (~530)
   - 241–273 Scenario definition (~800)
   - 274–294 Persistence (~1.4K)
-  - 295–300 Images (~1.0K) ← 6
-  - 301–351 Screens (~3.8K) ← 1
+  - 295–300 Images (~900) ← 6
+  - 301–351 Screens (~3.6K) ← 1
   - 352–357 Catalog build (~410)
-  - 358–375 Tests (~1.7K) ← 5
+  - 358–375 Tests (~1.6K) ← 5
   - 376–391 Performance (~1.2K) ← 3
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~81.8K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~81.4K tok)
   - 17–38 Sections (~410)
   - 39–50 Product (~530)
-  - 51–64 Non-goals (~560)
+  - 51–64 Non-goals (~520)
   - 65–85 Decisions (~830)
   - 86–114 Stack (~810)
   - 115–132 Performance and feel (~750)
@@ -70,8 +70,8 @@ Read the sections your task touches.
   - 151–369 Domain (~9.3K)
     - 153–230 Campaign (~1.9K) ← 1
     - 231–245 Mirkwood campaign cards and carry-over (~870)
-    - 246–257 Standalone play (~800)
-    - 258–269 Scenario state (~570)
+    - 246–257 Standalone play (~790)
+    - 258–269 Scenario state (~540)
     - 270–302 The engine plays the game (~2.1K) ← 4
     - 303–310 Engine steps (~180)
     - 311–339 Core round (~1.3K) ← 1
@@ -91,53 +91,53 @@ Read the sections your task touches.
     - 574–594 Escape from Dol Guldur (~2.7K)
     - 595–609 The Oath (~2.3K)
     - 610–627 The Caves of Nibin-Dûm (~2.4K)
-  - 628–685 Dream-chaser (~15.7K)
-  - 686–712 Ered Mithrin (~16.0K) ← 2
+  - 628–685 Dream-chaser (~15.6K)
+  - 686–712 Ered Mithrin (~15.8K) ← 2
   - 713–721 Nightmare (~420)
-  - 722–760 Deckbuilding (~1.8K) ← 2
+  - 722–760 Deckbuilding (~1.8K) ← 1
   - 761–839 Effects (~3.2K)
     - 763–821 Three layers (~2.4K)
     - 822–831 Player side quests, contracts and saga cards (~430)
     - 832–835 Window stack (~100)
     - 836–839 Coverage test (~270)
-  - 840–860 Data sources (~560)
+  - 840–860 Data sources (~530)
   - 861–879 Card images (~1.1K) ← 6
   - 880–905 Persistence and shipping (~1.7K)
-  - 906–947 Screens (~4.7K) ← 2
+  - 906–947 Screens (~4.7K) ← 1
     - 932–947 Table screen (~1.8K) ← 5
-- `docs/design-system-table.md` — Design system — Table (landscape) (~38.0K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~37.9K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.1K) ← 4
   - 24–27 Table menu (~430) ← 1
-  - 28–35 Quest scale (~580) ← 3
+  - 28–35 Quest scale (~580) ← 2
   - 36–39 Canvas (~560) ← 2
   - 40–52 Spacing and the play area's rows (~1.8K) ← 9
-  - 53–58 Pictures on the table (~320)
-  - 59–85 Cards (~5.3K) ← 13
+  - 53–58 Pictures on the table (~320) ← 1
+  - 59–85 Cards (~5.3K) ← 12
   - 86–91 The Sailing test (~690) ← 5
   - 92–105 The Island Map (~1.7K) ← 8
   - 106–109 Tokens and effects (~320)
   - 110–123 Piles (~1.8K) ← 8
   - 124–129 Marks of the open moment (~400) ← 1
   - 130–198 Motion (~3.2K) ← 8
-  - 199–226 Spotlight (~2.5K) ← 18
-  - 227–232 Gestures (~580) ← 5
-  - 233–236 Hold, slide and release (~940)
-  - 237–242 Peeking at the other seat (~600) ← 1
-  - 243–261 Command column (~2.4K) ← 11
-  - 262–265 Two taps (~350) ← 2
-  - 266–269 One answer, one tap (~240)
-  - 270–273 Stops and Always use (~250)
-  - 274–277 Guide (~120)
-  - 278–292 Choice tray (~4.7K) ← 19
-  - 293–307 Reading panels (~1.5K) ← 6
-  - 308–317 Phase carousel (~680)
-  - 318–323 Quest advance (~530) ← 1
-  - 324–327 Undo (~140)
-  - 328–331 Haptics (~280)
-  - 332–343 Banner (~660) ← 2
-  - 344–361 Screen reader (~2.1K) ← 14
-  - 362–365 Android Back (~90)
+  - 199–224 Spotlight (~2.5K) ← 19
+  - 225–230 Gestures (~580) ← 5
+  - 231–234 Hold, slide and release (~940)
+  - 235–240 Peeking at the other seat (~600) ← 1
+  - 241–259 Command column (~2.4K) ← 10
+  - 260–263 Two taps (~350) ← 2
+  - 264–267 One answer, one tap (~240)
+  - 268–271 Stops and Always use (~250)
+  - 272–275 Guide (~120)
+  - 276–290 Choice tray (~4.7K) ← 18
+  - 291–305 Reading panels (~1.5K) ← 6
+  - 306–315 Phase carousel (~680)
+  - 316–321 Quest advance (~530) ← 1
+  - 322–325 Undo (~140)
+  - 326–329 Haptics (~280)
+  - 330–341 Banner (~660) ← 2
+  - 342–359 Screen reader (~2.1K) ← 14
+  - 360–363 Android Back (~90)
 - `docs/design-system.md` — Design system — Carved Stone (~25.7K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~580)
@@ -153,18 +153,18 @@ Read the sections your task touches.
   - 220–234 Icons (~480) ← 6
   - 235–253 Card art (~740) ← 2
   - 254–268 Tablets (~510) ← 13
-  - 269–450 Screens (~14.3K)
+  - 269–450 Screens (~14.2K)
     - 273–276 Splash (~40)
     - 277–280 App icon (~80)
     - 281–296 Campaigns (campaign list) (~1.4K) ← 6
-    - 297–310 Scenarios (~790) ← 1
+    - 297–310 Scenarios (~780) ← 1
     - 311–322 History (~1.3K) ← 4
     - 323–340 Briefing (~1.8K) ← 5
     - 341–344 Campaign setup (~700) ← 3
     - 345–350 Campaign path (~780) ← 4
     - 351–354 Campaign log (~430) ← 1
     - 355–358 Spend XP (~610) ← 1
-    - 359–362 Table — landscape (~130) ← 1
+    - 359–362 Table — landscape (~30) ← 1
     - 363–374 Resolution and standalone outcome (~1.4K) ← 1
     - 375–384 Decks (~830) ← 2
     - 385–394 Deck builder (deck editor) (~790) ← 3
@@ -182,34 +182,30 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~11.5K tok)
-  - 5–17 Rules (~620)
-  - 18–89 Phases (~3.0K)
-  - 90–226 Open items (~7.3K)
-    - 92–115 Fixtures and Maestro (~1.2K)
-    - 116–161 Rules and engine (~1.9K)
-    - 162–185 Screens and code (~1.3K)
-    - 186–226 Phone and tablet checks (~2.9K)
-  - 227–244 Standing decisions (~490)
-- `docs/phases/phase-10-campaign-shell.md` — Phase 10 — Campaign shell (~1.7K tok)
-- `docs/phases/phase-11-scenario-1-table.md` — Phase 11 — Scenario 1 table (~1.6K tok)
-- `docs/phases/phase-12-knife-in-the-dark.md` — Phase 12 — A Knife in the Dark (~1.4K tok)
-- `docs/phases/phase-13-flight-to-the-ford.md` — Phase 13 — Flight to the Ford (~1.0K tok)
-- `docs/phases/phase-14-ring-goes-south.md` — Phase 14 — The Ring Goes South (~1.1K tok)
-- `docs/phases/phase-15-journey-in-the-dark.md` — Phase 15 — Journey in the Dark (~790 tok)
-- `docs/phases/phase-16-breaking-of-the-fellowship.md` — Phase 16 — Breaking of the Fellowship (~1.8K tok)
-- `docs/phases/phase-29-passage-through-mirkwood.md` — Phase 29 — Passage Through Mirkwood (~990 tok)
-- `docs/phases/phase-30-journey-along-the-anduin.md` — Phase 30 — Journey Along the Anduin (~990 tok)
-- `docs/phases/phase-31-escape-from-dol-guldur.md` — Phase 31 — Escape from Dol Guldur (~1.0K tok)
-- `docs/phases/phase-32-the-oath.md` — Phase 32 — The Oath (~920 tok)
-- `docs/phases/phase-33-caves-of-nibin-dum.md` — Phase 33 — The Caves of Nibin-Dûm (~950 tok)
+- `docs/phases/STATUS.md` — Phase status (~11.1K tok)
+  - 5–15 Rules (~450)
+  - 16–87 Phases (~2.9K)
+  - 88–217 Open items (~7.2K)
+    - 90–111 Fixtures and Maestro (~1.2K)
+    - 112–153 Rules and engine (~1.9K)
+    - 154–176 Screens and code (~1.3K)
+    - 177–217 Phone and tablet checks (~2.9K)
+  - 218–234 Standing decisions (~490)
+- `docs/phases/phase-10-campaign-shell.md` — Phase 10 — Campaign shell (~1.5K tok)
+- `docs/phases/phase-11-scenario-1-table.md` — Phase 11 — Scenario 1 table (~1.4K tok)
+- `docs/phases/phase-12-knife-in-the-dark.md` — Phase 12 — A Knife in the Dark (~1.3K tok)
+- `docs/phases/phase-13-flight-to-the-ford.md` — Phase 13 — Flight to the Ford (~910 tok)
+- `docs/phases/phase-14-ring-goes-south.md` — Phase 14 — The Ring Goes South (~970 tok)
+- `docs/phases/phase-15-journey-in-the-dark.md` — Phase 15 — Journey in the Dark (~650 tok)
+- `docs/phases/phase-16-breaking-of-the-fellowship.md` — Phase 16 — Breaking of the Fellowship (~1.2K tok)
+- `docs/phases/phase-29-passage-through-mirkwood.md` — Phase 29 — Passage Through Mirkwood (~880 tok)
+- `docs/phases/phase-30-journey-along-the-anduin.md` — Phase 30 — Journey Along the Anduin (~880 tok)
+- `docs/phases/phase-31-escape-from-dol-guldur.md` — Phase 31 — Escape from Dol Guldur (~920 tok)
+- `docs/phases/phase-32-the-oath.md` — Phase 32 — The Oath (~810 tok)
+- `docs/phases/phase-33-caves-of-nibin-dum.md` — Phase 33 — The Caves of Nibin-Dûm (~840 tok)
 - `docs/phases/phase-34-nightmare-data.md` — Phase 34 — Nightmare data and pictures (~440 tok)
 - `docs/phases/phase-35-nightmare-difficulty.md` — Phase 35 — Nightmare difficulty (~410 tok)
-- `docs/phases/phase-36-nightmare-effects.md` — Phase 36 — Nightmare effects (~2.2K tok)
-- `docs/phases/phase-49-ered-mithrin-data.md` — Phase 49 — Ered Mithrin data (~2.5K tok)
-- `docs/phases/phase-50-ered-mithrin-campaign-shell.md` — Phase 50 — Ered Mithrin campaign shell, treasures and the pool (~1.3K tok)
-- `docs/phases/phase-51-wilderland-mechanics-family.md` — Phase 51 — Wilderland mechanics family (~720 tok)
-- `docs/phases/phase-51b-wilderland-on-the-table.md` — Phase 51b — Wilderland on the table (~2.5K tok)
+- `docs/phases/phase-36-nightmare-effects.md` — Phase 36 — Nightmare effects (~600 tok)
 - `docs/phases/phase-52-journey-up-the-anduin.md` — Phase 52 — Journey Up the Anduin (~1.2K tok)
 - `docs/phases/phase-53-lost-in-mirkwood.md` — Phase 53 — Lost in Mirkwood (~1.2K tok)
 - `docs/phases/phase-54-the-kings-quest.md` — Phase 54 — The King's Quest (~1.1K tok)
@@ -279,6 +275,10 @@ Completed phase specs; STATUS.md lists what each leaves open. Read only when a t
 - `docs/phases/done/phase-46-the-drowned-ruins.md` — Phase 46 — The Drowned Ruins (~1.0K tok)
 - `docs/phases/done/phase-47-a-storm-on-cobas-haven.md` — Phase 47 — A Storm on Cobas Haven (~1.0K tok)
 - `docs/phases/done/phase-48-the-city-of-corsairs.md` — Phase 48 — The City of Corsairs (~1.2K tok)
+- `docs/phases/done/phase-49-ered-mithrin-data.md` — Phase 49 — Ered Mithrin data (~2.5K tok)
+- `docs/phases/done/phase-50-ered-mithrin-campaign-shell.md` — Phase 50 — Ered Mithrin campaign shell, treasures and the pool (~1.3K tok)
+- `docs/phases/done/phase-51-wilderland-mechanics-family.md` — Phase 51 — Wilderland mechanics family (~720 tok)
+- `docs/phases/done/phase-51b-wilderland-on-the-table.md` — Phase 51b — Wilderland on the table (~2.5K tok)
 
 ## Live plans
 
@@ -298,18 +298,6 @@ Read when a task names the plan.
   - 237–273 Mechanic families: engine and records together (~1.4K) ← 3
   - 274–286 Readings the review catches (~410) ← 3
   - 287–306 Not expressible yet: leave open, report (~390)
-- `docs/plans/mirkwood-paths.md` — Plan: Mirkwood Paths (Revised Core) and The Dark of Mirkwood (~6.1K tok)
-  - 3–19 Context (~370)
-  - 20–83 Facts found during exploration (~1.2K)
-  - 84–221 Approach: seven new phases (27–33) (~3.2K)
-    - 92–151 Phase 27 — Multi-campaign data (data only, nothing playable yet) (~1.1K)
-    - 152–200 Phase 28 — Campaign registry, saga gating, log, booklets (~980)
-    - 201–221 Phases 29–33 — one scenario each (phase 12 procedure) (~830)
-  - 222–234 Critical files (~270)
-  - 235–249 Verification (~170)
-  - 250–277 Notes for the orchestrator and the implementer agent (~770)
-  - 278–283 Risks (~110)
-- `docs/plans/nightmare-mode.md` — Plan: Nightmare mode (~1.9K tok)
 - `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.4K tok)
   - 3–14 Context (~450)
   - 15–24 What does not move (~190)
@@ -324,23 +312,22 @@ Read when a task names the plan.
   - 145–156 After each scenario phase (~210)
   - 157–160 Order (~70)
   - 161–168 Verification (~100)
-- `docs/plans/table-and-deck-fixes.md` — Plan: table and deck fixes (~3.0K tok)
 
 ## Handovers
 
 Open work; read when a task names it.
 
 - `docs/handover/agent-brief.md` — Brief for a mechanic-family or scenario agent (~3.2K tok)
-  - 20–38 Setup (~440)
-  - 39–57 Files you own (edit freely) (~490)
-  - 58–71 Shared files (~300)
-  - 72–86 Approach (~700) ← 4
-  - 87–96 Checkpoints (API usage limits can stop you mid-task) (~200)
-  - 97–111 Checks before committing (~330)
-  - 112–118 Merge (~120)
-  - 119–125 Commit (~110)
-  - 126–133 Report (your final message) (~90)
-- `docs/handover/combat-spotlight-open.md` — Handover: the combat spotlight's open points (~2.2K tok)
+  - 19–37 Setup (~440)
+  - 38–56 Files you own (edit freely) (~490)
+  - 57–70 Shared files (~300)
+  - 71–85 Approach (~700) ← 4
+  - 86–95 Checkpoints (API usage limits can stop you mid-task) (~200)
+  - 96–110 Checks before committing (~330)
+  - 111–117 Merge (~120)
+  - 118–124 Commit (~110)
+  - 125–132 Report (your final message) (~90)
+- `docs/handover/combat-spotlight-open.md` — Handover: the combat spotlight's open points (~1.9K tok)
 
 ## Done plans
 
@@ -354,10 +341,13 @@ History and rationale; read only when a code comment or task cites one.
 - `docs/plans/done/ered-mithrin.md` — Plan: Ered Mithrin (The Wilds of Rhovanion and the six Ered Mithrin Adventure Packs) (~7.3K tok)
 - `docs/plans/done/hub-layout.md` — Hub layout: one layout for Campaigns and Scenarios, History as the library (~5.2K tok)
 - `docs/plans/done/inactive-text.md` — Inactive text: a rethink (~2.4K tok)
+- `docs/plans/done/mirkwood-paths.md` — Plan: Mirkwood Paths (Revised Core) and The Dark of Mirkwood (~6.1K tok)
+- `docs/plans/done/nightmare-mode.md` — Plan: Nightmare mode (~1.9K tok)
 - `docs/plans/done/performance-pass.md` — Performance pass: snappy taps, animations and screens (user request, 2026-10-29) (~4.3K tok)
 - `docs/plans/done/rounded-chrome.md` — Rounded chrome: round controls, fewer boxes, fewer words (~3.7K tok)
 - `docs/plans/done/screen-reader.md` — Plan: Screen reader parity (VoiceOver and TalkBack) (~4.9K tok)
 - `docs/plans/done/settings-theme-and-ui-scale.md` — Settings tab, UI scale, and Dark/Light theme (~5.2K tok)
+- `docs/plans/done/table-and-deck-fixes.md` — Plan: table and deck fixes (~3.0K tok)
 - `docs/plans/done/table-experience.md` — Table experience: next improvements (~4.4K tok)
 - `docs/plans/done/table-performance-settings.md` — Lighter table on weaker phones: card picture quality, a fog switch, per-card redraws (user request, 2026-10-31) (~2.4K tok)
 - `docs/plans/done/tablets-and-hand-fan.md` — Tablet landscape, fanned hand scrub, no preview Close, table settings panel (~6.3K tok)
