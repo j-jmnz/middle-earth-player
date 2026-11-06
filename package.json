@@ -1,7 +1,7 @@
 {
   "name": "middle-earth-lcg",
   "main": "expo-router/entry",
-  "version": "1.0.0",
+  "version": "0.0.0",
   "description": "An offline app for playing The Lord of the Rings: The Card Game solo. Fan-made, not affiliated with Fantasy Flight Games.",
   "license": "MIT",
   "repository": {
@@ -86,6 +86,8 @@
     "move": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/tools/move.ts",
     "test:scenario": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/tools/test-scenario.ts",
     "scenario:new": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/tools/scenario-new.ts",
+    "release:plan": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/release/plan.ts",
+    "release:source": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/release/sideload-source.ts",
     "commit:check": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/git/commit-message.ts",
     "prepare": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/git/commit-message.ts --install --quiet"
   },

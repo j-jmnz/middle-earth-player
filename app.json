@@ -2,7 +2,7 @@
   "expo": {
     "name": "Middle Earth LCG",
     "slug": "middle-earth-lcg",
-    "version": "1.0.0",
+    "version": "0.0.0",
     "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "middleearthlcg",
@@ -11,7 +11,10 @@
       "icon": "./assets/expo.icon",
       "supportsTablet": true,
       "requireFullScreen": true,
-      "bundleIdentifier": "com.middleearth.lcg"
+      "bundleIdentifier": "com.middleearth.lcg",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.middleearth.lcg",
