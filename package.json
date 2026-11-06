@@ -2,6 +2,7 @@
   "name": "middle-earth-lcg",
   "main": "expo-router/entry",
   "version": "1.0.0",
+  "license": "MIT",
   "dependencies": {
     "@shopify/flash-list": "2.3.2",
     "@shopify/react-native-skia": "2.14.0",

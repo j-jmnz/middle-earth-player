@@ -148,4 +148,4 @@ Picture sources are tried in the order listed in `scripts/data/sources/pictures.
 
 ## License
 
-See [LICENSE](LICENSE). The license covers the code only. It does not cover the card text, art or rules text that `data/` and the bundled assets come from.
+The code and documentation are under the [MIT License](LICENSE). Game content (card text, art, rules text and icons), the source data in `data/raw/`, the fonts and the Expo template images keep their owners' terms; [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) lists each one and where it sits in the repo.
