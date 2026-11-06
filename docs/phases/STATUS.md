@@ -88,7 +88,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 ## Open items
 
 ### Releases
-- The Android key, the App Store Connect app, API key and TestFlight group are not set up (`docs/releasing.md`, Signing), so no release has been cut; the release workflow has not run yet, dry run first.
+- The Android release key is not set up (`docs/releasing.md`, Android key), so no release has been cut; the release workflow has not run yet, dry run first. TestFlight (optional) is not set up.
 
 ### Fixtures and Maestro
 - `wilderland-won` is not committed: none of 100 seeds (and 750 more under five other policies) wins The Fate of Wilderland with the starter decklists. Until it exists `.maestro/scenarios/the-fate-of-wilderland/the-fate-of-wilderland.yaml` cannot run.

@@ -87,6 +87,7 @@
     "test:scenario": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/tools/test-scenario.ts",
     "scenario:new": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/tools/scenario-new.ts",
     "release:plan": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/release/plan.ts",
+    "release:source": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/release/sideload-source.ts",
     "commit:check": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/git/commit-message.ts",
     "prepare": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/git/commit-message.ts --install --quiet"
   },

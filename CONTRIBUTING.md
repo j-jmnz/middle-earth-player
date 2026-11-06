@@ -18,7 +18,7 @@ Thanks for helping. This is a fan-made project: by contributing you agree that y
 
 ## Releases
 
-Releases are cut by the release workflow, never by hand: it works out the version from the commits, builds and signs the Android APK and the iOS build, tags the commit, writes the notes and uploads the iOS build to TestFlight. [.claude/rules/release-standards.md](./.claude/rules/release-standards.md) sets the rules and [docs/releasing.md](docs/releasing.md) says how to start one. Don't bump a version or push a tag in a pull request.
+Releases are cut by the release workflow, never by hand: it works out the version from the commits, builds the signed Android APK and the iOS IPA, tags the commit, writes the notes and the SideStore and AltStore source, and uploads to TestFlight when that is set up. [.claude/rules/release-standards.md](./.claude/rules/release-standards.md) sets the rules and [docs/releasing.md](docs/releasing.md) says how to start one. Don't bump a version or push a tag in a pull request.
 
 ## Conventions
 

@@ -48,8 +48,11 @@ describe("release notes (.claude/rules/release-standards.md, Release notes)", ()
     expect(notes).toContain("Signing certificate SHA-256: `cd34`");
   });
 
-  it("links the TestFlight beta when its public link is known, and points to the README otherwise", () => {
-    expect(renderNotes({ ...base, testflightUrl: "https://testflight.apple.com/join/abc" })).toContain("[the public TestFlight link](https://testflight.apple.com/join/abc)");
-    expect(renderNotes(base)).toContain("the public TestFlight link in the README (Install)");
+  it("gives the SideStore and AltStore source, and the TestFlight beta only while its link is set", () => {
+    const notes = renderNotes({ ...base, ipa: { name: "middle-earth-lcg-v0.4.0.ipa", sha256: "ef56" } });
+    expect(notes).toContain("add the source `https://github.com/j-jmnz/middle-earth-lcg/releases/latest/download/source.json`");
+    expect(notes).toContain("`middle-earth-lcg-v0.4.0.ipa` SHA-256: `ef56`");
+    expect(notes).not.toContain("TestFlight");
+    expect(renderNotes({ ...base, testflightUrl: "https://testflight.apple.com/join/abc" })).toContain("[its public link](https://testflight.apple.com/join/abc)");
   });
 });

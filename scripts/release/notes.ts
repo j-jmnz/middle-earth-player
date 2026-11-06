@@ -1,3 +1,4 @@
+import { sourceUrl } from "./sideload-source.ts";
 import type { Change, CommitType } from "./version.ts";
 
 // The release notes, written from the commits since the last release (.claude/rules/release-standards.md, Release notes).
@@ -14,7 +15,8 @@ export type NotesInput = {
   /** The engine version at the previous release; a different one drops an open scenario on update. */
   previousEngineVersion: number | undefined;
   apk?: { name: string; sha256: string; certificateSha256: string | undefined };
-  /** The TestFlight public link (the repository variable TESTFLIGHT_URL), when it is set. */
+  ipa?: { name: string; sha256: string };
+  /** The TestFlight public link (the repository variable TESTFLIGHT_URL), set only while the optional TestFlight channel runs. */
   testflightUrl?: string;
 };
 
@@ -41,14 +43,14 @@ export function renderNotes(input: NotesInput): string {
   // The first release lists only typed commits: the history before the commit standards has no types to sort.
   const project = input.changes.filter((change) => change.type === "repo" || change.type === undefined).length;
   if (input.previousTag && project > 0) out.push(`Plus ${project} project ${project === 1 ? "change" : "changes"} (docs, tests, tooling, data refreshes).`, "");
-  const testflight = input.testflightUrl ? `[the public TestFlight link](${input.testflightUrl})` : "the public TestFlight link in the README (Install)";
   out.push(
     "## Install",
     "",
     "- Android: download the `.apk` below and open it. Allow your browser or file manager to install unknown apps when it asks. It installs over an earlier release and keeps your campaigns.",
-    `- iPhone and iPad: join the beta through ${testflight}, then install from Apple's TestFlight app. This release reaches it once Apple has reviewed the build, and it updates over an earlier one, keeping your campaigns.`,
-    "",
+    `- iPhone and iPad: in SideStore or AltStore, add the source \`${sourceUrl(input.repository)}\` and install Middle Earth LCG from it, or install the \`.ipa\` below. It is signed with your own Apple ID, updates over an earlier release and keeps your campaigns. The README (Install) has the steps.`,
   );
+  if (input.testflightUrl) out.push(`- Or join the TestFlight beta through [its public link](${input.testflightUrl}); a release reaches it once Apple has reviewed the build.`);
+  out.push("");
   const facts = [`Card data version ${input.catalogVersion}`, `engine version ${input.engineVersion}`];
   if (input.previousTag) facts.push(`[all changes](https://github.com/${input.repository}/compare/${input.previousTag}...${input.tag})`);
   out.push(facts.join(" · "));
@@ -56,5 +58,6 @@ export function renderNotes(input: NotesInput): string {
     out.push("", `\`${input.apk.name}\` SHA-256: \`${input.apk.sha256}\``);
     if (input.apk.certificateSha256) out.push(`Signing certificate SHA-256: \`${input.apk.certificateSha256}\``);
   }
+  if (input.ipa) out.push("", `\`${input.ipa.name}\` SHA-256: \`${input.ipa.sha256}\``);
   return `${out.join("\n")}\n`;
 }

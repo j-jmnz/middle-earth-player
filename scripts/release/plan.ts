@@ -17,9 +17,10 @@ import { BUMP_REQUESTS, branchProblem, nextVersion, parseCommit, parseTag, tagOf
 //   --expect <tag>         fails unless the planned tag is this one (the publish job re-plans the tag the plan job chose)
 //   --notes <file>         writes the notes there instead of printing them
 //   --apk <file>           adds the APK's name and SHA-256 to the notes; --cert-sha256 <hex> adds its signing certificate
+//   --ipa <file>           adds the IPA's name and SHA-256
 //   --dry-run              a branch other than main or release/vX.Y only warns, so the pipeline can be tried from any branch
 //   --github-output        writes tag, version and previous_tag to $GITHUB_OUTPUT and the notes to $GITHUB_STEP_SUMMARY
-// TESTFLIGHT_URL (the repository variable of that name) puts the public TestFlight link in the notes.
+// TESTFLIGHT_URL (the repository variable of that name, set while the optional TestFlight channel runs) adds its public link.
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const RELEASE_TAGS = "v[0-9]*.[0-9]*.[0-9]*";
@@ -108,6 +109,8 @@ async function main(log: Log): Promise<void> {
 
   const apkFile = flag(args, "--apk");
   const apk = apkFile ? { name: path.basename(apkFile), sha256: await fileSha256(apkFile), certificateSha256: flag(args, "--cert-sha256") } : undefined;
+  const ipaFile = flag(args, "--ipa");
+  const ipa = ipaFile ? { name: path.basename(ipaFile), sha256: await fileSha256(ipaFile) } : undefined;
   const notes = renderNotes({
     tag,
     previousTag: previous,
@@ -117,6 +120,7 @@ async function main(log: Log): Promise<void> {
     engineVersion: ENGINE_VERSION,
     previousEngineVersion: previous ? engineVersionAt(previous) : undefined,
     apk,
+    ipa,
     testflightUrl: process.env.TESTFLIGHT_URL || undefined,
   });
 

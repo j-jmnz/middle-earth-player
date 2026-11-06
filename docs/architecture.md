@@ -10,7 +10,7 @@ Pin Expo SDK 58. The new architecture stays on. One package, no monorepo. pnpm i
 
 | Job | Library | Lives in |
 | --- | --- | --- |
-| Shell, routing, device builds | Expo SDK 58, Expo Router, EAS Build (development and e2e), Gradle and Xcode in GitHub Actions (release APK and TestFlight build) | `src/screens` |
+| Shell, routing, device builds | Expo SDK 58, Expo Router, EAS Build (development and e2e), Gradle and Xcode in GitHub Actions (release APK and IPA, optional TestFlight build) | `src/screens` |
 | Chrome layout | NativeWind 4.2.7, Tailwind 3 | screens other than the table |
 | Table | `@shopify/react-native-skia`, the SDK 58 `pnpm expo install` version | `src/play` |
 | Gestures and motion | `react-native-gesture-handler`, `react-native-reanimated`, `react-native-worklets` | `src/play` |
@@ -37,7 +37,7 @@ The catalog is one `drizzle-orm/sqlite-core` schema. The script opens it with `b
 
 Reanimated is the only animation library. Do not add TanStack Query, Redux, a Phoenix client, a server framework, MUI, Emotion, or styled-components.
 
-Android ships an APK or AAB. iOS ships an IPA. A physical iPhone needs Apple signing. The binary contains the Expo shell, native modules, `catalog.db`, the booklet PDFs that `pnpm booklets:pack` packs into `assets/booklets/` (not committed; `metro.config.js` bundles its map in place of the stub `src/screens/booklets/bundled-map.ts`) and every card's picture, which `scripts/build/pack-scans.ts` writes into `assets/scans` scaled to at most 1200 px on the long side (with the map `src/screens/images/scan-map.ts`, empty in git): each card's pinned `pictures` file, else its scan. `pnpm ios` and `pnpm android` pack too. `eas-build-post-install` runs the catalog build and both packers, and so do the `android` and `ios` jobs of `.github/workflows/release.yml`, which build the signed release APK and the TestFlight build (`docs/releasing.md`). The version is `0.0.0` in `app.json`; `app.config.js` stamps the release tag's version and build number from `APP_VERSION`, and the iOS signing team from `APPLE_TEAM_ID`. Image files stay in the document directory. A bundled booklet is copied into the document directory on first open, and the reader reads only that copy.
+Android ships an APK or AAB. iOS ships an IPA. A physical iPhone needs Apple signing. The binary contains the Expo shell, native modules, `catalog.db`, the booklet PDFs that `pnpm booklets:pack` packs into `assets/booklets/` (not committed; `metro.config.js` bundles its map in place of the stub `src/screens/booklets/bundled-map.ts`) and every card's picture, which `scripts/build/pack-scans.ts` writes into `assets/scans` scaled to at most 1200 px on the long side (with the map `src/screens/images/scan-map.ts`, empty in git): each card's pinned `pictures` file, else its scan. `pnpm ios` and `pnpm android` pack too. `eas-build-post-install` runs the catalog build and both packers, and so do the `android` and `ios` jobs of `.github/workflows/release.yml`, which build the signed release APK and the IPA (and, when set up, the TestFlight build; `docs/releasing.md`). The version is `0.0.0` in `app.json`; `app.config.js` stamps the release tag's version and build number from `APP_VERSION`, and the iOS signing team from `APPLE_TEAM_ID`. Image files stay in the document directory. A bundled booklet is copied into the document directory on first open, and the reader reads only that copy.
 
 ## Processes
 

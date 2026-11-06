@@ -13,13 +13,15 @@ Uninstalling the app deletes everything it saved.
 The app plays offline: its cards, pictures and booklets are inside it. It goes online only when:
 
 - you import a deck from RingsDB: it fetches that public decklist, and the card details it needs, from [ringsdb.com](https://ringsdb.com);
-- it shows a card picture it does not carry: it downloads that picture from [RingsDB](https://ringsdb.com) or [Hall of Beorn](https://hallofbeorn.com) once and keeps it on the device. A build from the Releases page or TestFlight carries every picture, so this rarely happens.
+- it shows a card picture it does not carry: it downloads that picture from [RingsDB](https://ringsdb.com) or [Hall of Beorn](https://hallofbeorn.com) once and keeps it on the device. A build from the Releases page carries every picture, so this rarely happens.
 
 Those requests send only what any web request sends (your IP address and the app's request), to those sites, under their own privacy policies. The app sends no identifier, account or game data with them.
 
-## TestFlight and app stores
+## Installing
 
-Installing through TestFlight is handled by Apple under [Apple's privacy policy](https://www.apple.com/legal/privacy/). If you choose to send feedback or a crash report through TestFlight, Apple passes it to the project's maintainer, who uses it only to fix the app. The project gets no data from installing the Android APK.
+The project gets no data when you install the Android APK, or the iOS app with SideStore or AltStore. SideStore and AltStore sign the app with your Apple ID on your own device; they are separate projects with their own privacy policies, and your Apple ID never reaches this project.
+
+If you install through TestFlight instead, Apple handles that under [Apple's privacy policy](https://www.apple.com/legal/privacy/). If you choose to send feedback or a crash report through TestFlight, Apple passes it to the project's maintainer, who uses it only to fix the app.
 
 ## Children
 

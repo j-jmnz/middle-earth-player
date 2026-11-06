@@ -1,7 +1,8 @@
 name: release
 
 # Cuts a release: the next version from the commits since the last tag, the same checks as test.yml, a signed Android APK
-# and a signed iOS build, then the tag and a GitHub release with generated notes, and the iOS build on TestFlight.
+# and an iOS IPA that players sign with SideStore or AltStore, then the tag and a GitHub release with generated notes and the
+# SideStore/AltStore source; and, when the Apple signing is set up, the iOS build on TestFlight as an optional extra.
 # .claude/rules/release-standards.md sets the rules; docs/releasing.md says how to start it and what each job does. Start it
 # from the Actions tab, with `gh workflow run release.yml --ref main -f bump=auto -f dry_run=false`, or with the GitHub
 # API's workflow dispatch.
@@ -50,7 +51,7 @@ jobs:
           DRY_RUN: ${{ inputs.dry_run }}
           TESTFLIGHT_URL: ${{ vars.TESTFLIGHT_URL }}
         run: pnpm --silent release:plan --bump "$BUMP" --github-output $([ "$DRY_RUN" = "true" ] && echo --dry-run)
-      # A release needs both signing setups (docs/releasing.md, Signing); a dry run without one builds that platform unsigned.
+      # A release needs the Android key; the Apple signing is optional and turns on TestFlight (docs/releasing.md, Signing).
       - name: Signing
         id: signing
         env:
@@ -61,17 +62,18 @@ jobs:
           TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
           DRY_RUN: ${{ inputs.dry_run }}
         run: |
-          missing=()
           android=false; ios=false
-          if [ -n "$ANDROID_KEYSTORE" ]; then android=true; else missing+=("Android: the ANDROID_* secrets"); fi
-          if [ -n "$ASC_KEY" ] && [ -n "$ASC_KEY_ID" ] && [ -n "$ASC_ISSUER_ID" ] && [ -n "$TEAM_ID" ]; then ios=true; else missing+=("iOS: the APP_STORE_CONNECT_* secrets and the APPLE_TEAM_ID variable"); fi
+          if [ -n "$ANDROID_KEYSTORE" ]; then android=true
+          elif [ "$DRY_RUN" = "true" ]; then echo "::warning::No ANDROID_* secrets: the dry-run APK is signed with the debug key."
+          else echo "::error::A release needs the ANDROID_* secrets (docs/releasing.md, Android key)."; exit 1; fi
+          apple=0
+          for value in "$ASC_KEY" "$ASC_KEY_ID" "$ASC_ISSUER_ID" "$TEAM_ID"; do
+            if [ -n "$value" ]; then apple=$((apple + 1)); fi
+          done
+          if [ "$apple" = 4 ]; then ios=true
+          elif [ "$apple" -gt 0 ]; then echo "::warning::The Apple signing is only partly set up, so TestFlight is skipped (docs/releasing.md, TestFlight (optional))."; fi
           echo "android=$android" >> "$GITHUB_OUTPUT"
           echo "ios=$ios" >> "$GITHUB_OUTPUT"
-          for item in "${missing[@]}"; do
-            if [ "$DRY_RUN" = "true" ]; then echo "::warning::No signing for $item; the dry run builds it unsigned (Android: with the debug key)."
-            else echo "::error::A release needs signing for $item (docs/releasing.md, Signing)."; fi
-          done
-          if [ "$DRY_RUN" != "true" ] && [ "${#missing[@]}" -gt 0 ]; then exit 1; fi
 
   checks:
     needs: plan
@@ -143,10 +145,11 @@ jobs:
     runs-on: macos-latest
     timeout-minutes: 180
     env:
-      # app.config.js stamps the version, the build number and the signing team from these.
+      # app.config.js stamps the version, the build number and, for TestFlight, the signing team from these.
       APP_VERSION: ${{ needs.plan.outputs.version }}
       APPLE_TEAM_ID: ${{ vars.APPLE_TEAM_ID }}
       SIGNED: ${{ needs.plan.outputs.ios_signed }}
+      IPA_NAME: middle-earth-lcg-${{ needs.plan.outputs.tag }}${{ inputs.dry_run && '-dry-run' || '' }}.ipa
     steps:
       - uses: actions/checkout@v4
       - uses: maxim-lobanov/setup-xcode@v1
@@ -155,9 +158,9 @@ jobs:
       - uses: ./.github/actions/pack-assets
       - name: Generate the native project
         run: pnpm exec expo prebuild --platform ios
-      # Signing is automatic: the App Store Connect API key lets Xcode fetch or make the distribution certificate and the
-      # App Store profile itself (docs/releasing.md, Signing).
-      - name: Archive and export
+      # One archive. Without the Apple signing it is unsigned; with it, Xcode signs it automatically through the App Store
+      # Connect API key (docs/releasing.md, TestFlight (optional)). SideStore and AltStore re-sign either with the player's Apple ID.
+      - name: Archive
         env:
           ASC_KEY: ${{ secrets.APP_STORE_CONNECT_KEY_BASE64 }}
           ASC_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
@@ -166,15 +169,24 @@ jobs:
           workspace=$(ls -d ios/*.xcworkspace | head -1)
           scheme=$(basename "$workspace" .xcworkspace)
           archive="$RUNNER_TEMP/app.xcarchive"
-          if [ "$SIGNED" != "true" ]; then
-            xcodebuild -quiet -workspace "$workspace" -scheme "$scheme" -configuration Release -destination generic/platform=iOS \
-              -archivePath "$archive" archive CODE_SIGNING_ALLOWED=NO
-            exit 0
+          if [ "$SIGNED" = "true" ]; then
+            echo "$ASC_KEY" | base64 --decode > "$RUNNER_TEMP/AuthKey.p8"
+            signing=(-allowProvisioningUpdates -authenticationKeyPath "$RUNNER_TEMP/AuthKey.p8" -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID")
+          else
+            signing=(CODE_SIGNING_ALLOWED=NO)
           fi
-          echo "$ASC_KEY" | base64 --decode > "$RUNNER_TEMP/AuthKey.p8"
-          auth=(-allowProvisioningUpdates -authenticationKeyPath "$RUNNER_TEMP/AuthKey.p8" -authenticationKeyID "$ASC_KEY_ID" -authenticationKeyIssuerID "$ASC_ISSUER_ID")
           xcodebuild -quiet -workspace "$workspace" -scheme "$scheme" -configuration Release -destination generic/platform=iOS \
-            -archivePath "$archive" archive "${auth[@]}"
+            -archivePath "$archive" archive "${signing[@]}"
+          # The sideloading IPA: the app in Payload/, zipped.
+          mkdir -p "$RUNNER_TEMP/out" "$RUNNER_TEMP/ipa/Payload"
+          cp -R "$archive"/Products/Applications/*.app "$RUNNER_TEMP/ipa/Payload/"
+          (cd "$RUNNER_TEMP/ipa" && zip -qry "$RUNNER_TEMP/out/$IPA_NAME" Payload)
+          size=$(stat -f %z "$RUNNER_TEMP/out/$IPA_NAME")
+          echo "$IPA_NAME: $((size / 1048576)) MB"
+          # A GitHub release asset is at most 2 GiB.
+          if [ "$size" -ge 2147483648 ]; then echo "::error::$IPA_NAME is over the 2 GiB release asset limit"; exit 1; fi
+          (cd "$RUNNER_TEMP/out" && shasum -a 256 "$IPA_NAME" > "$IPA_NAME.sha256")
+          if [ "$SIGNED" != "true" ]; then exit 0; fi
           cat > "$RUNNER_TEMP/ExportOptions.plist" <<PLIST
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -187,16 +199,21 @@ jobs:
           </dict></plist>
           PLIST
           xcodebuild -exportArchive -archivePath "$archive" -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
-            -exportPath "$RUNNER_TEMP/export" "${auth[@]}"
-          mkdir -p "$RUNNER_TEMP/out"
-          mv "$RUNNER_TEMP"/export/*.ipa "$RUNNER_TEMP/out/middle-earth-lcg-${{ needs.plan.outputs.tag }}.ipa"
+            -exportPath "$RUNNER_TEMP/export" "${signing[@]}"
+          mkdir -p "$RUNNER_TEMP/testflight"
+          mv "$RUNNER_TEMP"/export/*.ipa "$RUNNER_TEMP/testflight/middle-earth-lcg-${{ needs.plan.outputs.tag }}-testflight.ipa"
           rm -f "$RUNNER_TEMP/AuthKey.p8"
-          ls -l "$RUNNER_TEMP/out"
-      - if: env.SIGNED == 'true'
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: ios
           path: ${{ runner.temp }}/out/
+          retention-days: 14
+          compression-level: 0
+      - if: env.SIGNED == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: testflight
+          path: ${{ runner.temp }}/testflight/
           retention-days: 14
           compression-level: 0
 
@@ -218,15 +235,21 @@ jobs:
         with:
           name: android
           path: ${{ runner.temp }}/out
-      - name: Write the notes
+      - uses: actions/download-artifact@v4
+        with:
+          name: ios
+          path: ${{ runner.temp }}/out
+      - name: Write the notes and the SideStore/AltStore source
         env:
           BUMP: ${{ inputs.bump }}
           TAG: ${{ needs.plan.outputs.tag }}
           TESTFLIGHT_URL: ${{ vars.TESTFLIGHT_URL }}
         run: |
           apk=$(ls "$RUNNER_TEMP"/out/*.apk)
-          pnpm --silent release:plan --bump "$BUMP" --expect "$TAG" --apk "$apk" \
+          ipa=$(ls "$RUNNER_TEMP"/out/*.ipa)
+          pnpm --silent release:plan --bump "$BUMP" --expect "$TAG" --apk "$apk" --ipa "$ipa" \
             --cert-sha256 "$(cat "$RUNNER_TEMP/out/certificate.sha256")" --notes "$RUNNER_TEMP/notes.md"
+          pnpm --silent release:source --tag "$TAG" --ipa "$ipa" --notes "$RUNNER_TEMP/notes.md" --out "$RUNNER_TEMP/out/source.json"
       - name: Tag and release
         env:
           GH_TOKEN: ${{ github.token }}
@@ -236,6 +259,7 @@ jobs:
           latest=true
           if [ "$GITHUB_REF_NAME" != main ]; then latest=false; fi
           gh release create "$TAG" "$RUNNER_TEMP"/out/*.apk "$RUNNER_TEMP"/out/*.apk.sha256 \
+            "$RUNNER_TEMP"/out/*.ipa "$RUNNER_TEMP"/out/*.ipa.sha256 "$RUNNER_TEMP/out/source.json" \
             --target "$GITHUB_SHA" --title "$TAG" --notes-file "$RUNNER_TEMP/notes.md" --latest="$latest"
       # The TestFlight job reads the same notes; the tag now exists, so it cannot plan them again.
       - uses: actions/upload-artifact@v4
@@ -244,15 +268,17 @@ jobs:
           path: ${{ runner.temp }}/notes.md
           retention-days: 14
 
-  # After the release, so a rerun of this job alone finishes a release whose upload failed.
+  # The optional TestFlight channel, only when the Apple signing is set up. After the release, so a rerun of this job alone
+  # finishes a release whose upload failed.
   testflight:
     needs: [plan, ios, publish]
+    if: ${{ needs.plan.outputs.ios_signed == 'true' }}
     runs-on: macos-latest
     timeout-minutes: 90
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: ios
+          name: testflight
           path: ${{ runner.temp }}/ios
       - uses: actions/download-artifact@v4
         with:
