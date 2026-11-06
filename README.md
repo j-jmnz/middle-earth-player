@@ -4,7 +4,7 @@ An offline, single-device app for playing The Lord of the Rings: The Card Game s
 
 This is an unofficial fan project. It has no affiliation with Fantasy Flight Games, Asmodee or Middle-earth Enterprises. The card text, card art and rules belong to their owners.
 
-## What it does
+## Features
 
 - Plays the official campaigns: The Fellowship of the Ring saga (MEC109), Mirkwood Paths, The Dark of Mirkwood, Dream-chaser and Ered Mithrin. Each scenario can also be played on its own, and some have Nightmare mode.
 - The engine applies the rules, keywords, phases and card effects, and works out every number. The player picks from the moves the engine lists as legal. You never type in damage, resources, threat or progress yourself.
@@ -13,7 +13,7 @@ This is an unofficial fan project. It has no affiliation with Fantasy Flight Gam
 
 `src/campaign/playable.ts` lists the scenarios you can play now. [docs/phases/STATUS.md](docs/phases/STATUS.md) lists the work still open.
 
-## How it works
+## Architecture
 
 - `data/` holds the card, scenario and rules data. It is committed and built offline from source snapshots in `data/raw/`. Every source (RingsDB, Hall of Beorn, the DragnCards plugin data, FFG's rules PDFs, card scans) is listed and pinned in `data/sources.json`.
 - Card text comes from `data/printed/`, a ledger of the lines printed on each card, read from its scan.
@@ -23,7 +23,7 @@ This is an unofficial fan project. It has no affiliation with Fantasy Flight Gam
 
 The stack is Expo SDK 58, Expo Router, Skia for the game table, Reanimated, NativeWind, SQLite through Drizzle, Zustand and Zod. [docs/architecture.md](docs/architecture.md) covers the module layout, state, the engine and the test layers.
 
-## Running it locally
+## Local setup
 
 ### Requirements
 
@@ -78,7 +78,7 @@ The end-to-end flows are in `.maestro/scenarios/<scenario-id>/` and `.maestro/fe
 
 ## Commands
 
-| Command | What it does |
+| Command | Description |
 | --- | --- |
 | `pnpm test` | Runs all Vitest tests. |
 | `pnpm test:fast` | Skips the slow files (`slowFiles` in `vitest.config.mts`). |
