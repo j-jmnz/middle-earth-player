@@ -220,6 +220,10 @@ export type PendingAttack = {
   fromStaging?: boolean;
   // A shadow effect says the undefended damage of this attack goes on an active location (142035:A:2).
   toLocation?: boolean;
+  // The attack is made against the main quest card, or an effect says its undefended damage goes on it (19083:B:1, 19081:A:1): the damage of an undefended attack is placed on the quest card, not a hero (families/wilderland/night.ts).
+  toStage?: boolean;
+  // The damage beyond the remaining hit points of the defending character goes on the main quest card (19083:B:1, 19080:A:3).
+  excessToStage?: boolean;
   // Shadow cards that are enemies and say "attacks the defending player" (Wolf Rider, 01081:A:2): each attacks once this attack has ended
   // (families/defense/shadow-attack.ts).
   shadowAttackers?: readonly string[];

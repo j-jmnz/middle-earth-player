@@ -90,6 +90,8 @@ export function victoryWhenFree(state: ScenarioState, ctx: ReduceContext, steps:
 /** Whether a Response that cancels the When Revealed effects of the card the event is about is barred: a card in play whose record holds says the effects of cards with a trait cannot be canceled (UncancelableWhenRevealed, 19015:A:1). Only a game that has such a card looks. */
 export function whenRevealedUncancelable(state: ScenarioState, event: GameEvent, effect: Effect, ctx: ReduceContext): boolean {
   const revealed = cancelsReveal(state, event, effect);
+  // "The 'when revealed' effects of side quests cannot be canceled by player card effects" (emce.side-quests): an encounter side quest is a quest card as well as an encounter card.
+  if (revealed && printedOf(ctx.cards, state.cards[revealed]?.code ?? "").type === "encounter-side-quest") return true;
   if (!revealed || !gameReads(state, ctx, '"UncancelableWhenRevealed"')) return false;
   return constantInstructions(state, ctx).some(({ instruction }) => instruction.verb === "UncancelableWhenRevealed" && (instruction.trait == null || hasTrait(state, revealed, instruction.trait, ctx)) && (instruction.cardType == null || printedOf(ctx.cards, state.cards[revealed]?.code ?? "").type === instruction.cardType));
 }

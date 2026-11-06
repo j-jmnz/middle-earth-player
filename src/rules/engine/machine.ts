@@ -60,6 +60,7 @@ import { committedTo } from "../families/stormcaller/commit.ts";
 import { announceCollected } from "../families/aflame/attack.ts";
 import { chooseLookDone, chooseShift, performSailing, sailingStep } from "../families/sea/sailing.ts";
 import { askingToCommit, askingToLook, askingToShift } from "../families/sea/sailing-legal.ts";
+import { askCurrentQuest } from "../families/wilderland/night.ts";
 
 export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let current = handoffEliminated(state);
@@ -206,7 +207,7 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
       return openPass(state);
     // The Sailing test comes before the characters are committed to the quest (dcce.sailing).
     case "questCommit":
-      return sailingStep(state, ctx) ?? openPass(state);
+      return askCurrentQuest(state, ctx, steps) ?? sailingStep(state, ctx) ?? openPass(state);
     case "planning": {
       const opened = openPass(state);
       return { ...opened, planningSeat: opened.activeSeat };

@@ -63,7 +63,7 @@ export const pickSchema = z.strictObject({
   // (src/rules/families/play/pick.ts, src/rules/families/attack/pick.ts, src/rules/families/sidequests/pick.ts).
   sharesTrait: z.enum(["self", "host", "other", "activeLocation", "attackingEnemy"]).optional(),
   // The printed card type, and a printed cost at most this, for a card picked from a hand, a discard pile or a deck.
-  cardType: z.enum(["ally", "attachment", "event", "hero", "player-side-quest", "treasure"]).optional(),
+  cardType: z.enum(["ally", "attachment", "event", "hero", "player-side-quest", "encounter-side-quest", "treasure"]).optional(),
   // A number, or the X of a scalable card: its level in the Campaign Log (`halved`: half of it rounded up) plus 1 for each copy the campaign card's Setup let the players choose
   // ("Put an ally with cost X or less in your discard pile into play", 11201:A:5; dcce.scalable-upgradable). Read by src/rules/interpret/pick.ts.
   maxCost: z.union([z.number().int().min(0), z.strictObject({ level: z.literal(true), halved: z.literal(true).optional(), plusChosen: z.literal(true).optional() })]).optional(),

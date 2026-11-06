@@ -76,7 +76,8 @@ export function attackFromStaging(state: ScenarioState, instruction: Extract<Ins
   const data = effectData(state);
   const counted = data ? patchTop(state, { data: { ...data, returned: data.returned + 1 } }) : state;
   const begun = beginEnemyAttack(dealForAttack(counted, id, steps), seat, id, ctx, steps, true);
-  return begun.pendingAttack ? { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true } } : begun;
+  // "Undefended damage from this attack must be dealt to Hrogar's Hill" (19081:A:1): the main quest card takes it.
+  return begun.pendingAttack ? { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true, ...(instruction.undefendedToStage ? { toStage: true } : {}) } } : begun;
 }
 
 // DamageActiveLocation: a shadow effect marks the attack in progress: its undefended damage goes on an active location.

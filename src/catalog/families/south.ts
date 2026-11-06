@@ -48,7 +48,8 @@ const VERBS = [
   // engaged (142038:A:2). It is dealt a shadow card of its own.
   // `target: self`: the source enemy attacks (a When Revealed on the enemy, 142047:A:1). `who: firstPlayer`: the first player is attacked, whoever
   // the actor is ("The Balrog makes an attack", 142043:A:2, which is considered engaged with the first player).
-  z.strictObject({ verb: z.literal("AttackFromStaging"), target: z.literal("self").optional(), who: z.literal("firstPlayer").optional(), ...when }),
+  // `undefendedToStage`: "Undefended damage from this attack must be dealt to Hrogar's Hill" (19081:A:1): the damage of the attack if it is left undefended goes on the main quest card, not a hero (emce.side-quests).
+  z.strictObject({ verb: z.literal("AttackFromStaging"), target: z.literal("self").optional(), who: z.literal("firstPlayer").optional(), undefendedToStage: z.literal(true).optional(), ...when }),
   // Choose, among the enemies in the staging area with this trait, the one with the highest engagement cost (ties: the first player
   // chooses) and pick it, or pick nothing when there is none (142038:A:2).
   z.strictObject({ verb: z.literal("PickHighestEngagement"), trait: z.string().min(1), ...when }),

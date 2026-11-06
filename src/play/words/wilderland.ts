@@ -15,6 +15,7 @@ import { topFrame } from "../../rules/windows/windows.ts";
 import type { BranchNow } from "./aflame.ts";
 import type { ChoiceNames, PickWords } from "./choice.ts";
 import { heathAsk, heathBranchWords, heathChooseNote, heathOptionLabel } from "./heath.ts";
+import { nightAsk, nightBranchWords, nightChooseNote } from "./night.ts";
 import { rhovanionAsk, rhovanionBranchWords, rhovanionChooseNote } from "./rhovanion.ts";
 import { askedSeat, seatSays } from "./seat.ts";
 import { assignDamageWords } from "./south.ts";
@@ -80,7 +81,7 @@ export function wilderlandChooseNote(choose: Extract<Instruction, { verb: "Choos
     const text = `distribute ${damage} damage among characters you control? If you do, ${source ? names.card(source) : "this card"} is shuffled into the encounter deck.`;
     return game.seatCount > 1 ? `Player ${(seat ?? game.firstPlayer) + 1}: ${text}` : `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
   }
-  const heath = heathChooseNote(choose, game, names) ?? rhovanionChooseNote(choose, game, ctx, names, claimed);
+  const heath = heathChooseNote(choose, game, names) ?? rhovanionChooseNote(choose, game, ctx, names, claimed) ?? nightChooseNote(choose, game, ctx, names, source);
   if (heath) return heath;
   const offer = searchOffer(choose);
   if (!offer) return null;
@@ -132,7 +133,7 @@ export function wilderlandAsk(instruction: Instruction, source: string | null, n
   }
   const kings = kingsQuestAsk(instruction, source, names, next, facts);
   if (kings) return kings;
-  const heath = heathAsk(instruction, source, names, next, facts) ?? rhovanionAsk(instruction, source, names, next, facts);
+  const heath = heathAsk(instruction, source, names, next, facts) ?? rhovanionAsk(instruction, source, names, next, facts) ?? nightAsk(instruction, source, names, next, facts);
   if (heath) return heath;
   if (instruction.verb !== "AttachRandomTreasure") return null;
   const choose = `Choose 1 of ${drawn} random undiscovered treasures to attach as a guarded objective.`;
@@ -241,7 +242,7 @@ export function wilderlandBranchNow(game: ScenarioState, ctx: ReduceContext, cho
 
 /** A branch that counts cards, with the number now: "Raise your threat by 3 (1 for each ally you control)", "Deal 1 damage to each ally you control (3)". Null for any other branch. */
 export function wilderlandBranchWords(choose: Extract<Instruction, { verb: "Choose" }>, optionId: string, names: ChoiceNames, now?: BranchNow, source?: string | null, game?: ScenarioState): string | null {
-  const accolade = heathBranchWords(choose, optionId, names, game) ?? rhovanionBranchWords(choose, optionId, names, game);
+  const accolade = heathBranchWords(choose, optionId, names, game) ?? rhovanionBranchWords(choose, optionId, names, game) ?? nightBranchWords(choose, optionId, names, source);
   if (accolade) return accolade;
   const offer = searchOffer(choose);
   if (offer) return optionId === "search" ? `Search for ${names.code(offer.code)}` : "Don't search: no treasure this scenario";

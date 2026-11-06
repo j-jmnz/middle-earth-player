@@ -26,6 +26,7 @@ import { afterCancel } from "../families/defense/damage.ts";
 import { healBlocked } from "../families/burden/life.ts";
 import { mayGainResources } from "../families/misc/guards.ts";
 import { addToVictory } from "../families/sidequests/victory.ts";
+import { isQuestSource } from "../families/wilderland/night-quest.ts";
 import { announceCanceled } from "../families/nightmare/index.ts";
 
 // Verbs of the player cards. A Pick (effect-frames.ts) chooses a card or a player and the verbs after it act on the choice.
@@ -158,8 +159,8 @@ export function runPlayerVerb(
       const amount = resolveAmount(state, instruction.amount, scope, ctx);
       if (!state.cards[id] || amount <= 0) return state;
       if (playerSource(state, focus.sourceId, ctx)) return placePlayerDamage(state, focus.seat, id, amount, ctx, steps);
-      // An encounter or campaign card's damage is no player card effect, so a Ship objective's immunity to those does not stop it (dcce.ship-objectives).
-      return placeDamage(state, id, amount, ctx.cards, steps, "framework", currentCause(steps, UNATTRIBUTED));
+      // An encounter or campaign card's damage is no player card effect, so a Ship objective's immunity to those does not stop it (dcce.ship-objectives). A quest card's or a side quest's is a quest effect (Dagnir's cap, 19074:A:2).
+      return placeDamage(state, id, amount, ctx.cards, steps, isQuestSource(state, focus.sourceId, ctx) ? "quest" : "framework", currentCause(steps, UNATTRIBUTED));
     }
     case "PlaceProgressOn": {
       const scope = frameScope(state, focus.seat, focus.sourceId);

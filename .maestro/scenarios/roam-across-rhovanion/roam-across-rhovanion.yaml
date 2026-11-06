@@ -19,10 +19,9 @@ tags:
 - assertVisible:
     id: pool
     text: ".*Misplaced Trust.*"
-# The win unlocks Fire in the Night, which the app cannot deal yet, so the path stops there and its node reads Coming soon (scripts/checks/maestro.test.ts, path-soon).
+# The win unlocks Fire in the Night, whose node reads Next (scripts/checks/maestro.test.ts, path-soon).
 - assertVisible:
     id: node-fire-in-the-night-status
-    text: "Coming soon"
-- assertVisible:
+    text: "Next"
+- assertNotVisible:
     id: path-soon
-    text: "Fire in the Night is coming soon."

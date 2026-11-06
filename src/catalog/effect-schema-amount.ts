@@ -8,8 +8,8 @@ import { pickSchema } from "./effect-schema-pick.ts";
 // the enemy and the defender of the attack in progress.
 // `other` is the second card the answered event names: the enemy a character defends against or attacks, the enemy an
 // attack destroyed, the defender of an attack that resolved.
-// `previous` is the card picked before the last, `discardTop` the top card of the encounter discard pile (the last card put there).
-export const cardRefSchema = z.enum(["self", "host", "picked", "subject", "other", "attacker", "defender", "activeLocation", "previous", "discardTop"]);
+// `previous` is the card picked before the last, `discardTop` the top card of the encounter discard pile (the last card put there), `questStage` the main quest card now (Hrogar's Hill, 19083:B:1).
+export const cardRefSchema = z.enum(["self", "host", "picked", "subject", "other", "attacker", "defender", "activeLocation", "previous", "discardTop", "questStage"]);
 
 export const amountExprSchema = z.strictObject({
   // How many cards match, from the actor's side ("each enemy engaged with you", "each side quest in the victory display").

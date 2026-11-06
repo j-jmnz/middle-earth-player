@@ -6,7 +6,7 @@ import type { CardInstance, ScenarioState } from "./state.ts";
 import { updateCard } from "./state.ts";
 
 /** The zones of Ered Mithrin's decks, kept in `ScenarioState.piles`. The one list the zone types (`PileZone`, `ZoneName`, `Destination`, the dealt zones of the Setup) and the zone guard derive from. */
-export const PILE_ZONES = ["cavesDeck", "evilCreaturesDeck", "evilCreaturesDiscard", "spidersDeck", "orcsDeck"] as const;
+export const PILE_ZONES = ["cavesDeck", "evilCreaturesDeck", "evilCreaturesDiscard", "spidersDeck", "orcsDeck", "sideQuestDeck"] as const;
 export type PileZone = (typeof PILE_ZONES)[number];
 /** A zone that holds a list of card ids apart from the encounter deck: the Dream-chaser box's keep theirs in `corsairDeck`, `corsairDiscard` and `uncharted.deck`. */
 const DECK_ZONES = [...PILE_ZONES, "corsairDeck", "corsairDiscard", "unchartedDeck"] as const;
@@ -27,6 +27,8 @@ const PLAIN_PILES = {
   caves: { deck: "cavesDeck", discard: null },
   spiders: { deck: "spidersDeck", discard: null },
   orcs: { deck: "orcsDeck", discard: null },
+  // Fire in the Night's side quest deck (emce.side-quests): its cards are revealed into the staging area, and a defeated one goes to the victory display.
+  sideQuests: { deck: "sideQuestDeck", discard: null },
 } as const satisfies Record<string, DeckZones>;
 
 /** The piles a record names (`pile` of the wilderland verbs): every deck of Ered Mithrin. */

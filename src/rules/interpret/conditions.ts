@@ -105,6 +105,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     // The wilderland family's condition hook answers the campaign log's lines and treasures (families/wilderland/index.ts); the case only completes the switch.
     case "logged":
     case "treasuresLogged":
+    case "beldisBox":
     case "cavesDeck":
       return false;
     case "hideFailed":

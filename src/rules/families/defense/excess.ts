@@ -1,4 +1,4 @@
-// Rules: rr.damage, rr.hit-points, rr.step-6-4-3 (data/rules/entries.json); ledger lines 01082:A:1, 41030:A:2.
+// Rules: rr.damage, rr.hit-points, rr.step-6-4-3 (data/rules/entries.json); ledger lines 01082:A:1, 41030:A:2, 19080:A:3, 19083:B:1.
 //
 // Hill Troll's excess combat damage. An enemy that holds `excessToThreat` (a constant on itself) sends the damage its attack deals
 // beyond the remaining hit points of the character it damages to its controller's threat: "Excess combat damage dealt by Hill Troll
@@ -62,9 +62,11 @@ export function combatDamage(
   const toThreat = flagged(state, enemyId, "excessToThreat");
   const toQuest = flagged(state, enemyId, "excessToQuestProgress");
   const toShip = flagged(state, enemyId, "excessToShip");
+  // "Excess damage must be dealt to Hrogar's Hill" (19083:B:1, 19080:A:3): an attack that the quest card or a Shadow effect marked sends the damage beyond the defender's remaining hit points to the main quest card.
+  const toStage = state.pendingAttack?.excessToStage === true && state.questStage != null && state.questStage !== targetId;
   // "for each excess point of damage dealt" (18049:A:2): kept for the character the attack destroys, when some card reads it.
   const reads = gameReads(state, ctx, '"excessOf"');
-  if (!toThreat && !toQuest && !toShip && !reads) return placed;
+  if (!toThreat && !toQuest && !toShip && !reads && !toStage) return placed;
   const enemy = state.cards[enemyId];
   const target = state.cards[targetId];
   if (!enemy || !target || !inPlay(target.zone) || target.controller == null) return placed;
@@ -72,6 +74,7 @@ export function combatDamage(
   const remaining = Math.max(0, modifiedStat(state, target, "hitPoints", ctx.cards) - target.damage);
   const excess = landed - remaining;
   if (excess <= 0) return placed;
+  if (toStage && state.questStage) return placeDamage(placed, state.questStage, excess, ctx.cards, steps, "combat", ruleCause("rr.damage"));
   if (!toThreat && !toQuest && !toShip) return noteHitPointsOn(placed, targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
   // "Excess damage from this attack is dealt to a Ship objective you control" (11055:A:2): the excess is the X of the effect the attack leaves for its end.
   if (toShip && !toThreat && !toQuest) return noteExcess(placed, excess);

@@ -110,13 +110,15 @@ export function beginEnemyAttack(
   steps: EngineStep[],
   // An effect made an enemy in the staging area attack (families/south/watcher.ts).
   fromStaging = false,
+  // `false`: no shadow card is dealt for the attack, though the enemy is considered engaged with each player ("Do not deal a shadow card for this attack", 19083:B:1).
+  shadow = true,
 ): ScenarioState {
   const attacker = state.cards[enemyId];
   const here = attacker != null && (attacker.zone === "engaged" || engagedWithAll(state, enemyId) || viaRelay(state, enemyId) || (fromStaging && attacker.zone === "staging"));
   if (!attacker || !here || attackBarred(state, enemyId, seat)) return state;
   steps.push({ kind: "attack", side: "enemy", seat, enemyId });
   // An attack an effect makes from the staging area was dealt its shadow card already (attackFromStaging).
-  const dealt = engagedWithAll(state, enemyId) || (viaRelay(state, enemyId) && !fromStaging) ? dealForAttack(state, enemyId, steps) : state;
+  const dealt = shadow && (engagedWithAll(state, enemyId) || (viaRelay(state, enemyId) && !fromStaging)) ? dealForAttack(state, enemyId, steps) : state;
   const declared: ScenarioState = { ...dealt, pendingAttack: { enemyId, seat, ...(fromStaging ? { fromStaging: true } : {}) }, activeSeat: seat, window: null };
   const fired = fireForced(declared, { trigger: "attacks", seat, cardId: enemyId }, ctx, steps);
   if (fired.stack.length > declared.stack.length && fired.pendingAttack) {
@@ -234,6 +236,8 @@ export function canAttack(
   if (printedOf(cards, enemy.code).ship === "enemy" && flagged(state, attackerId, "cannotAttackShips")) return false;
   // "You cannot attack ... enemies with a title other than Marshland Outlaws" (attackOnlyTitle, 900202:A:1).
   if (titleBarred(state, attacker.controller, enemyId, cards)) return false;
+  // "Allies cannot be declared as attackers against Dagnir" (19068:A:1).
+  if (printed.type === "ally" && flagged(state, enemyId, "alliesCannotAttack")) return false;
   // An enemy in the staging area that is considered engaged with the first player (the Balrog, 142044:A:2): only the first player declares
   // attackers against it, with their own characters and ranged characters of the others (rr.ranged).
   if (enemy.zone === "staging" && flagged(state, enemyId, "engagedWithFirst")) {
@@ -383,6 +387,8 @@ export function heroIds(state: ScenarioState, seat: number): string[] {
 // The characters an undefended attack's damage may be assigned to: the seat's heroes, and a character that says damage from
 // undefended attacks may be assigned to it (takesUndefendedDamage).
 export function undefendedTargets(state: ScenarioState, seat: number, cards: Cards): string[] {
+  // The attack is made against the main quest card, or an effect sent the undefended damage to it (families/wilderland/night.ts).
+  if (state.pendingAttack?.toStage && state.questStage) return [state.questStage];
   // A shadow effect sent the damage to an active location (families/south/watcher.ts).
   const locations = undefendedLocations(state);
   if (locations.length > 0) return locations;

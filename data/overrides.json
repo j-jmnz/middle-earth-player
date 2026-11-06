@@ -817,6 +817,86 @@
       },
       "reason": "Hall of Beorn gives the objective-location Forest Clearing no quest points. The scan prints a quest points box of 4, no Threat and Victory 4 (a location for travel and exploring, rr.victory), so progress can be placed on it once it is the active location.",
       "source": "scan 18032.A, sha256 d60fe5f09910ff5ef7519f755d999a0f930fea1d8ba52792442635c8c0d7bd34 (data/printed/ered-mithrin.json)"
+    },
+    {
+      "match": {
+        "code": "19066"
+      },
+      "set": {
+        "questPoints": 5
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Draw Her Fire no quest points (its Victory 10 is the only number it exports; DragnCards files the same 10 under questPoints for all eight). The scan prints a quest points box of 5 and Victory 10, so progress can be placed on it once it is the current quest (emce.side-quests-in-play).",
+      "source": "scan 19066.A (hallofbeorn-resources Fire-in-the-Night/Draw-Her-Fire.jpg, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "19067"
+      },
+      "set": {
+        "questPoints": 10
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Fortify the Defense no quest points (its Victory 10 is the only number it exports; DragnCards files the same 10 under questPoints for all eight). The scan prints a quest points box of 10 and Victory 10, so progress can be placed on it once it is the current quest (emce.side-quests-in-play).",
+      "source": "scan 19067.A (hallofbeorn-resources Fire-in-the-Night/Fortify-the-Defense.jpg, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "19068"
+      },
+      "set": {
+        "questPoints": 10
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Rally the Woodmen no quest points (its Victory 10 is the only number it exports; DragnCards files the same 10 under questPoints for all eight). The scan prints a quest points box of 10 and Victory 10, so progress can be placed on it once it is the current quest (emce.side-quests-in-play).",
+      "source": "scan 19068.A (hallofbeorn-resources Fire-in-the-Night/Rally-the-Woodmen.jpg, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "19069"
+      },
+      "set": {
+        "questPoints": 10
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Douse the Flames no quest points (its Victory 10 is the only number it exports; DragnCards files the same 10 under questPoints for all eight). The scan prints a quest points box of 10 and Victory 10, so progress can be placed on it once it is the current quest (emce.side-quests-in-play).",
+      "source": "scan 19069.A (hallofbeorn-resources Fire-in-the-Night/Douse-the-Flames.jpg, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "19070"
+      },
+      "set": {
+        "questPoints": 10
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Hold the Door no quest points (its Victory 10 is the only number it exports; DragnCards files the same 10 under questPoints for all eight). The scan prints a quest points box of 10 and Victory 10, so progress can be placed on it once it is the current quest (emce.side-quests-in-play).",
+      "source": "scan 19070.A (hallofbeorn-resources Fire-in-the-Night/Hold-the-Door.jpg, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "19071"
+      },
+      "set": {
+        "questPoints": 5
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Defend the Town no quest points (its Victory 10 is the only number it exports; DragnCards files the same 10 under questPoints for all eight). The scan prints a quest points box of 5 and Victory 10, so progress can be placed on it once it is the current quest (emce.side-quests-in-play).",
+      "source": "scan 19071.A (hallofbeorn-resources Fire-in-the-Night/Defend-the-Town.jpg, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "19072"
+      },
+      "set": {
+        "questPoints": 5
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Rout the Goblins no quest points (its Victory 10 is the only number it exports; DragnCards files the same 10 under questPoints for all eight). The scan prints a quest points box of 5 and Victory 10, so progress can be placed on it once it is the current quest (emce.side-quests-in-play).",
+      "source": "scan 19072.A (hallofbeorn-resources Fire-in-the-Night/Rout-the-Goblins.jpg, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "19073"
+      },
+      "set": {
+        "questPoints": 10
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Face the Dragon no quest points (its Victory 10 is the only number it exports; DragnCards files the same 10 under questPoints for all eight). The scan prints a quest points box of 10 and Victory 10, so progress can be placed on it once it is the current quest (emce.side-quests-in-play).",
+      "source": "scan 19073.A (hallofbeorn-resources Fire-in-the-Night/Face-the-Dragon.jpg, read for the quest points box)"
     }
   ],
   "scenarioPiles": [

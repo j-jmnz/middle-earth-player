@@ -34,7 +34,9 @@ export type CardType =
   // A player card played in the planning phase into its player's quest area (families/sidequests/play.ts), and a contract
   // card that begins the game in its player's play area (families/sidequests/contract.ts).
   | "player-side-quest"
-  | "contract";
+  | "contract"
+  // An encounter side quest (Fire in the Night, emce.side-quests): a quest card with an encounter card back. It is revealed into the staging area and may be the current quest (families/wilderland/night-quest.ts).
+  | "encounter-side-quest";
 
 export type Keywords = {
   surge: boolean;
@@ -305,7 +307,7 @@ export function isPlayerType(printed: PrintedCard): boolean {
   return isCharacterType(printed) || printed.type === "attachment" || printed.type === "event" || printed.type === "player-side-quest" || printed.type === "contract" || printed.type === "treasure";
 }
 
-const CARD_TYPES: readonly CardType[] = ["hero", "ally", "attachment", "event", "enemy", "location", "treachery", "quest", "objective", "treasure", "campaign", "nightmare", "player-side-quest", "contract"];
+const CARD_TYPES: readonly CardType[] = ["hero", "ally", "attachment", "event", "enemy", "location", "treachery", "quest", "objective", "treasure", "campaign", "nightmare", "player-side-quest", "contract", "encounter-side-quest"];
 const SPHERES: readonly Sphere[] = ["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"];
 
 // The engine-facing subset of a data/cards record. A type or sphere the engine does not know fails loudly.

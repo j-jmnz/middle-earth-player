@@ -14,7 +14,7 @@ import { verbFlags } from "../verb-flags.ts";
 
 const code = z.string().min(1);
 // The decks beside the encounter deck (emce.caves-deck, emce.evil-creatures-deck; src/rules/core/piles.ts): the Caves deck, the Evil Creatures deck, and the two encounter sets Lost in Mirkwood sets aside.
-const pile = z.enum(["caves", "evilCreatures", "spiders", "orcs"]);
+const pile = z.enum(["caves", "evilCreatures", "spiders", "orcs", "sideQuests"]);
 
 const VERBS = [
   // "Look at 3 random undiscovered treasures and attach 1 of them to ~ as a guarded objective" (12168:A:2, 12170:A, 12189:B:2): `count` treasures (3 by default) the log has not recorded and
@@ -188,9 +188,25 @@ const VERBS = [
   // Resolution: "Each player chooses a location in the staging area and adds a copy of it to the campaign pool. Players must choose different locations, if able" (12184:B:4): each player in turn, the first player first, chooses a location (by title) in the staging area that no earlier player chose, unless
   // every title is taken; a copy of each joins the Campaign Pool's encounter cards (never more than one collection holds). A burden location (Abandoned Ruin) is not offered: it joins the pool as a burden. Run by the Resolution (rules/setup/resolution.ts).
   z.strictObject({ verb: z.literal("ChooseStagedLocationForPool"), ...when }),
+  // Fire in the Night (part 6, campaign card 12187; ledger lines 19066:A:2, 19083:B:1, 12188:A:1; emce.side-quests, emce.side-quests-in-play).
+  // "Reveal the top card of the side quest deck and add it to the staging area" (19083:B:1): the top card of the side quest deck is revealed as an encounter card by the actor, its When Revealed effects resolve, and it lies in the staging area. A side quest's When Revealed
+  // effects cannot be canceled (emce.side-quests). Nothing happens with an empty deck, or in a game that dealt none.
+  z.strictObject({ verb: z.literal("RevealSideQuest"), ...when }),
+  // "Dagnir makes an attack against Hrogar's Hill. Do not deal a shadow card for this attack. The first player may declare a defender for this attack. Excess damage must be dealt to Hrogar's Hill." (19083:B:1): the last picked enemy, in the staging area, attacks the main quest card. The first player is the
+  // defending player: they may declare a defender (a character they control, or a Sentinel) or leave it undefended; the whole undefended damage, and the damage beyond a defender's remaining hit points, is dealt to the quest card. No shadow card is dealt. It does not use up the enemy's attack of the combat phase.
+  z.strictObject({ verb: z.literal("AttackStage"), ...when }),
+  // "Excess damage from this attack must be dealt to Hrogar's Hill" (19080:A:3, a Shadow effect): the damage the attack in progress deals beyond its defender's remaining hit points goes on the main quest card. Nothing happens outside an attack.
+  z.strictObject({ verb: z.literal("ExcessToStage"), ...when }),
+  // Engine use, the first player's question at the beginning of the quest phase (emce.side-quests-in-play): the side quest `card` (a card id, never written in a record) is the current quest until the end of the phase. A card that is not a side quest in the staging area changes nothing.
+  z.strictObject({ verb: z.literal("MakeCurrentQuest"), card: z.string().min(1) }),
+  // "Mark a use in the campaign log" (12188:A:1): the actor's box beside Beldis is marked (the log's four boxes for each player, emce.campaign-log). The Action's condition `beldisBox` says one is left. The log keeps it when the scenario is won.
+  z.strictObject({ verb: z.literal("MarkBeldisUse") }),
 ] as const;
 
-const TRIGGERS = [] as const;
+const TRIGGERS = [
+  // About a side quest: it became the current quest at the beginning of the quest phase ("After Draw Her Fire becomes the current quest", 19066:A:2; emce.side-quests-in-play).
+  "becameCurrentQuest",
+] as const;
 const FLAGS = [
   // On a character: the next damage it would be dealt cancels this many points of it, and the flag is spent ("The next time that character would be dealt damage this round, cancel 1 of that damage", 12166:A:2). Set with a ModifyStat that lasts
   // until the end of the round or the phase; src/rules/families/wilderland/shield.ts takes it as damage is placed.
@@ -205,6 +221,12 @@ const FLAGS = [
   "progressCapShared",
   // Engine use: the progress placed this round on locations that hold progressCapShared, noted on the table (families/south/locations.ts notePlaced).
   "progressPlacedShared",
+  // On a side quest in the staging area: it is the current quest until the end of the phase (emce.side-quests-in-play). Set by MakeCurrentQuest; a record reads it with the `flag` condition ("While Defend the Town is the current quest", 19071:A:1).
+  "currentQuest",
+  // On an enemy: the characters defending against it do not count their Defense ("Characters do not count their Defense when defending against Dagnir", 19067:A:1). Read by defenseAsDefender (rules/core/keywords.ts).
+  "defenseIgnored",
+  // On an enemy: allies cannot be declared as attackers against it ("Allies cannot be declared as attackers against Dagnir", 19068:A:1). Read by canAttack (rules/combat/combat.ts).
+  "alliesCannotAttack",
 ] as const;
 
 export const manifest = { name: "wilderland", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

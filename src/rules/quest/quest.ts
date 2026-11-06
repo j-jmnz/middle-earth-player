@@ -28,6 +28,7 @@ import { oweDiscards } from "../families/breaking/progress.ts";
 import { orderedNext, stageToVictory } from "../families/quest/order.ts";
 import { caughtUp } from "../families/stormcaller/values.ts";
 import { islandTravelTo } from "../families/island/travel.ts";
+import { hasSideQuests, placeOnCurrentSideQuest } from "../families/wilderland/night-quest.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -207,6 +208,8 @@ export function placeQuestProgress(
     next = queueEvent(next, { trigger: "progressReplaced", seat: null, cardId: next.questStage, amount: remaining });
     remaining = 0;
   }
+  // A side quest that is the current quest takes it instead of the main quest card; what it cannot take is discarded (emce.side-quests-in-play, families/wilderland/night-quest.ts).
+  if (remaining > 0 && hasSideQuests(next)) ({ state: next, remaining } = placeOnCurrentSideQuest(next, remaining, cards, steps));
   if (remaining > 0 && next.questStage && !next.stageCleared) {
     const stageId = next.questStage;
     const stage = next.cards[stageId];

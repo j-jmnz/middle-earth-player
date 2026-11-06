@@ -343,6 +343,8 @@ export type ScenarioState = {
   // "seat:enemyId" for each attack a seat declared this combat phase: one per enemy (faq.limitations-on-attacks).
   declaredAttacks: readonly string[];
   pendingAttack: PendingAttack | null;
+  // The round the first player was asked whether a side quest is the current quest (families/wilderland/night.ts); kept only in a game with a side quest deck.
+  sideAsked?: number;
   pendingStrike: PendingStrike | null;
   // Events raised by code that cannot offer responses itself. settle announces them when no window is open.
   pendingEvents?: readonly GameEvent[];

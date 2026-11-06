@@ -25,7 +25,8 @@ import { printedStat, victoryOf } from "./printed-stat.ts";
 import { heldBy } from "./holder-classes.ts";
 
 // `combat` is the damage of an attack (rr.step-6-4-3, rr.step-6-8-3); every other kind is non-combat damage.
-export type DamageSource = "framework" | "player" | "combat";
+// `quest`: an effect of a quest card or a side quest (framework damage that a card's "non-quest effects" limit does not count, 19074:A:2).
+export type DamageSource = "framework" | "player" | "combat" | "quest";
 
 export { printedStat };
 
@@ -111,6 +112,8 @@ export function defenseAsDefender(state: ScenarioState, defenderId: string, card
   const defender = state.cards[defenderId];
   if (!defender) return 0;
   const attack = state.pendingAttack;
+  // The enemy making the attack says its defenders do not count their Defense (19067:A:1).
+  if (attack && flagged(state, attack.enemyId, "defenseIgnored")) return 0;
   const declared = attack ? { ...state, pendingAttack: { ...attack, defenderId, undefended: false } } : state;
   return modifiedStat(declared, defender, "defense", cards);
 }
@@ -196,7 +199,7 @@ export function placeDamage(state: ScenarioState, assigned: string, amount: numb
   const scaled = flagged(state, id, "cancelsDamage") ? cancelAllDamage(state, id, amount) : null;
   if (scaled) return scaled;
   // A card that takes no more than a number of damage each round ("cannot take more than 4 damage each round", 11177:A:4) takes what is left of it.
-  const cap = heldAmount(state, id, "damageCap");
+  const cap = source === "quest" ? 0 : heldAmount(state, id, "damageCap");
   const taken = state.roundDamage?.[id] ?? 0;
   const resources = resourceShield(state, id, placedLimit(state, id, placedAmount(printed, amount)));
   // "The next time that character would be dealt damage this round, cancel 1 of that damage" (12166:A:2): the flag's points come off first, and it is spent.

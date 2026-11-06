@@ -78,6 +78,8 @@ export function refCard(state: ScenarioState, ref: CardRef, scope: AmountScope):
       return scope.picked?.at(-2) || null;
     case "discardTop":
       return state.encounterDiscard.at(-1) ?? null;
+    case "questStage":
+      return state.questStage ?? null;
   }
 }
 
