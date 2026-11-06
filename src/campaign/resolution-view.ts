@@ -138,7 +138,7 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
     eyebrow = "Remove a card from the pool";
   } else if (instruction.verb === "ChooseStagedLocationForPool") {
     noun = "location";
-    eyebrow = "Choose a location for the pool";
+    eyebrow = "Choose a location from the staging area";
   } else if (instruction.verb === "ChooseRandomTreasure") {
     noun = "treasure";
     eyebrow = "Choose a treasure";
@@ -249,7 +249,7 @@ export function choiceSentence(view: Extract<ResolutionView, { kind: "choosing" 
         ? `${tile.name} is added to the campaign pool. ${tile.hero ? `The player with ${tile.hero}` : "That player"} adds it to their deck for the rest of the campaign. The log line is not recorded, so no card is removed from the encounter deck for it later.`
         : `\u201c${tile.name}\u201d is marked in the campaign log. ${view.ally ?? "The ally"} does not join the campaign pool. ${view.later ? `Later Setups remove from the encounter deck ${view.later}.` : ""}`.trim();
     case "location":
-      return `A copy of ${tile.name} is added to the campaign pool as an encounter card.`;
+      return `A copy of ${tile.name} is added to the campaign pool as an encounter card. It is written in the campaign log and added to the encounter deck of every later scenario${view.seatCount > 1 ? ", and the other players must choose a different location if able" : ""}.`;
     case "treasure":
       return `${tile.name} is discovered and recorded in the campaign log. The scenario is over, so it is not attached to a character.`;
     case "removal":
@@ -275,6 +275,8 @@ export function promptSentence(view: Extract<ResolutionView, { kind: "choosing" 
   }
   // The treasure of three random undiscovered ones (12175:B:7): the number now.
   if (view.to === "treasure") return `Choose 1 of the ${view.tiles.length} random undiscovered treasures${view.decline ? `, or tap ${view.decline.label}` : ""}. It is recorded as discovered when you confirm.`;
+  // A copy of a location of the staging area for the pool (12184:B:4): each player in turn, a different one if able.
+  if (view.to === "location") return `Choose a location in the staging area.${view.seatCount > 1 ? " Each player chooses a different location if able." : ""} A copy of it joins the campaign pool when you confirm.`;
   const what =
     view.to === "hero"
       ? `a ${view.noun} and a hero`

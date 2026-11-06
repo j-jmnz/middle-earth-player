@@ -49,7 +49,7 @@ export function flipToEnemySide(state: ScenarioState, instruction: Verb<"FlipToE
  */
 export function putTrust(state: ScenarioState, instruction: Verb<"PutTrust">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const name = printedOf(ctx.cards, instruction.code).name;
-  const pick: PickSpec = { type: "card", control: "any", names: [name] };
+  const pick: PickSpec = { type: "card", control: "any", names: [name], engagedEnemies: true };
   const choose: Instruction = {
     verb: "Choose",
     who: "firstPlayer",

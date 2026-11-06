@@ -15,6 +15,8 @@ import { copyLine, withCopies } from "./reprint.ts";
 const URDUG = "19052";
 const TINY = "19054";
 const NAMED = (name: string): PickSpec => ({ type: "card", control: "any", names: [name] });
+// Urdug wherever he is in play: in the staging area on either side, under a player, or engaged with one on his enemy side (stage 3).
+const URDUG_ANYWHERE: PickSpec = { type: "card", control: "any", names: ["Urdug"], engagedEnemies: true };
 const STAGING_LOCATIONS = { type: "location", control: "any", stagingOnly: true } as const;
 // "the first player controls Urdug" / "Tiny": a card in the first player's play area.
 const FIRST_PLAYER_CONTROLS = (name: string): Extract<Condition, { kind: "count" }> => ({ kind: "count", pick: { type: "card", control: "you", names: [name], who: "firstPlayer" }, min: 1 });
@@ -42,7 +44,7 @@ const RANDOM_STAGE = (id: string, code: string, line: string): Effect => ({
   subject: "self",
   instructions: [{ verb: "AdvanceToRandomStage", codes: STAGE_TWOS, otherwise: "19051", remove: true }],
 });
-// When Revealed of a stage 2 (19048:A:1, 19049:A:1, 19050:A:1): the first player searches for the guard, which joins the staging area, and the set-aside objective is attached to it as a guarded objective. A search that finds nothing leaves the objective set aside.
+// When Revealed of a stage 2 (19048:A:1, 19049:A:1, 19050:A:1): the first player searches for the guard, which joins the staging area, and the set-aside objective is attached to it as a guarded objective. A search that finds no copy still brings the objective into the staging area, unguarded, and the first player claims it at once (settle sweep; user ruling, 2026-11-05).
 const FOUND = (title: string): Condition => ({ kind: "matches", card: "picked", pick: { type: "card", control: "any", names: [title] }, inPlay: true });
 const GUARD_OBJECTIVE = (id: string, code: string, line: string, guard: string, guardTitle: string, objective: string, objectiveTitle: string): Effect => ({
   id,
@@ -51,7 +53,7 @@ const GUARD_OBJECTIVE = (id: string, code: string, line: string, guard: string, 
   timing: "whenRevealed",
   instructions: [
     { verb: "SearchMove", code: guard, to: "staging", remember: true },
-    { verb: "AddSetAsideToStaging", code: objective, when: FOUND(guardTitle) },
+    { verb: "AddSetAsideToStaging", code: objective },
     { verb: "Pick", pick: { type: "card", control: "any", stagingOnly: true, names: [objectiveTitle] }, when: FOUND(guardTitle) },
     { verb: "AttachGuard", guard: "previous", to: "picked", when: FOUND(objectiveTitle) },
     { verb: "ShuffleEncounterDeck" },
@@ -83,7 +85,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "constant",
       instructions: [
         { verb: "IgnoreKeyword", keywords: ["deep"] },
-        ...(["willpower", "threat", "attack", "defense"] as const).map((stat) => ({ verb: "ModifyStat" as const, stat, amount: { resourcesOn: NAMED("Urdug") }, until: "whileSourceInPlay" as const, holders: NAMED("Urdug") })),
+        ...(["willpower", "threat", "attack", "defense"] as const).map((stat) => ({ verb: "ModifyStat" as const, stat, amount: { resourcesOn: URDUG_ANYWHERE }, until: "whileSourceInPlay" as const, holders: URDUG_ANYWHERE })),
       ],
     },
     {
@@ -92,8 +94,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       lines: ["12184:B:3"],
       timing: "resolution",
       instructions: [
-        { verb: "Earn", codes: ["12186"], eachPlayer: true, afterHand: true, when: { kind: "less", left: 2, right: { resourcesOn: NAMED("Urdug") } } },
-        { verb: "Earn", codes: ["12185"], eachPlayer: true, when: { kind: "not", condition: { kind: "less", left: 2, right: { resourcesOn: NAMED("Urdug") } } } },
+        { verb: "Earn", codes: ["12186"], eachPlayer: true, afterHand: true, when: { kind: "less", left: 2, right: { resourcesOn: URDUG_ANYWHERE } } },
+        { verb: "Earn", codes: ["12185"], eachPlayer: true, when: { kind: "not", condition: { kind: "less", left: 2, right: { resourcesOn: URDUG_ANYWHERE } } } },
       ],
     },
     { id: "12184:resolution:2", cardCode: "12184", lines: ["12184:B:4"], timing: "resolution", instructions: [{ verb: "ChooseStagedLocationForPool" }] },

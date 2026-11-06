@@ -4,14 +4,14 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { campaignScenario } from "../../../catalog/scenario-data.ts";
 import { checklist } from "../../checklist.ts";
-import { choiceSentence, resolutionView } from "../../resolution-view.ts";
+import { choiceSentence, promptSentence, resolutionView } from "../../resolution-view.ts";
 import type { World } from "../../world.ts";
 import { emptyLog, poolCard, type CampaignLog } from "../../log.ts";
 import { EFFECTS } from "../../../effects/index.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { updateCard, type ScenarioState } from "../../../rules/core/state.ts";
-import { spawn } from "../../../rules/core/zones.ts";
+import { moveCard, spawn } from "../../../rules/core/zones.ts";
 import { reduce, startScenario, type PlayerIntent, type ReduceContext } from "../../../rules/engine/reduce.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { settle } from "../../../rules/engine/machine.ts";
@@ -190,6 +190,25 @@ describe("12184:B Resolution", () => {
     }
   });
 
+  // Stage 3 leaves Urdug in the staging area, and a player may engage him: wherever he is in play, his resources count (the stat bonus, the Resolution) and a claim could still put another on him.
+  it("12184:B:2 and 12184:B:3 Urdug engaged with a player on his enemy side keeps the bonus for his resources, and they count at the Resolution", () => {
+    const engage = (state: ScenarioState): ScenarioState => moveCard(state, idOf(state, CODES.urdugEnemy), { zone: "engaged", seat: 0 });
+    for (const seats of [1, 2] as const) {
+      const staged = endOf(seats, 3, LOCATIONS);
+      const id = idOf(staged, CODES.urdugEnemy);
+      const printed = ctx.cards.get(CODES.urdugEnemy)!;
+      const held = syncConstants(engage(staged), ctx);
+      expect(held.cards[id]?.zone).toBe("engaged");
+      for (const [stat, base] of [["attack", printed.attack], ["defense", printed.defense]] as const) {
+        expect(modifiedStat(held, held.cards[id]!, stat, ctx.cards) - modifiedStat(syncConstants(staged, ctx), staged.cards[id]!, stat, ctx.cards), `${seats} seats ${stat}`).toBe(0);
+        expect(modifiedStat(held, held.cards[id]!, stat, ctx.cards), `${seats} seats ${stat}`).toBe((base ?? 0) + 3);
+      }
+      const result = resolutionResult(won(engage(endOf(seats, 3, LOCATIONS))).state);
+      expect(result?.earned.filter((item) => item.code === CODES.misplacedTrust), `${seats} seats`).toHaveLength(seats);
+      expect(result?.earned.some((item) => item.code === CODES.urdugSCunning)).toBe(false);
+    }
+  });
+
   it("12184:B:3 with fewer than 3 resources each player adds a copy of Urdug's Cunning to the campaign pool instead", () => {
     for (const seats of [1, 2] as const) {
       for (const resources of [0, 2]) {
@@ -250,6 +269,40 @@ describe("12184:B Resolution", () => {
       expect(view.tiles.map((tile) => tile.name).sort()).toEqual(["Deep Ravine", "Grey Moorland", "Slopes of Ered Mithrin"]);
       expect(choiceSentence(view, view.tiles[0]!)).toContain("is added to the campaign pool as an encounter card");
     }
+  });
+
+  it("12184:B:4 the Resolution says what the location is for: the eyebrow, the prompt, the sentence of each tile, and what the player before chose", () => {
+    const world = { campaign, scenario: rhovanion, effects: ctx.effects, cards: ctx.cards, sets: new Map<string, string>(), copies: new Map<string, number>() } as unknown as World;
+    const toLocations = (state: ScenarioState): ScenarioState => {
+      let next = openResolution({ ...state, stageCleared: true, window: null, stack: [] }, ctx);
+      while (next.window?.kind === "resolution" && next.resolution[next.window.step]?.verb !== "ChooseStagedLocationForPool") {
+        next = openResolution(expectOk(reduce(next, { type: "ChooseResolution", optionId: "skip" } as PlayerIntent, ctx)).state, ctx);
+      }
+      return next;
+    };
+    // Two-handed: the first player is asked first, with the prompt that says the players choose different locations, then the second player sees what the first chose.
+    const first = toLocations(endOf(2, 3, LOCATIONS));
+    const one = resolutionView(first, world);
+    expect(one.kind).toBe("choosing");
+    if (one.kind !== "choosing") return;
+    expect(one.eyebrow).toBe("Choose a location from the staging area");
+    expect(one.seatLabel).toBe("Player 1 (first player) chooses");
+    expect(promptSentence(one)).toBe("Choose a location in the staging area. Each player chooses a different location if able. A copy of it joins the campaign pool when you confirm.");
+    const moorland = one.tiles.find((tile) => tile.code === CODES.greyMoorland)!;
+    expect(choiceSentence(one, moorland)).toBe("A copy of Grey Moorland is added to the campaign pool as an encounter card. It is written in the campaign log and added to the encounter deck of every later scenario, and the other players must choose a different location if able.");
+    expect(one.decline).toBeNull();
+    const second = toLocations(endOf(2, 3, LOCATIONS));
+    const answered = openResolution(expectOk(reduce(second, { type: "ChooseResolution", optionId: CODES.greyMoorland } as PlayerIntent, ctx)).state, ctx);
+    const two = resolutionView(answered, world);
+    expect(two).toMatchObject({ kind: "choosing", seatLabel: "Player 2 chooses", answered: [{ seat: 0, words: "Grey Moorland" }] });
+    if (two.kind === "choosing") expect(two.tiles.map((tile) => tile.name).sort()).toEqual(["Deep Ravine", "Slopes of Ered Mithrin"]);
+    // Alone there is no lead and no 'different' sentence.
+    const solo = resolutionView(toLocations(endOf(1, 3, LOCATIONS)), world);
+    expect(solo.kind).toBe("choosing");
+    if (solo.kind !== "choosing") return;
+    expect(solo.seatLabel).toBeNull();
+    expect(promptSentence(solo)).toBe("Choose a location in the staging area. A copy of it joins the campaign pool when you confirm.");
+    expect(choiceSentence(solo, solo.tiles[0]!)).toBe(`A copy of ${solo.tiles[0]!.name} is added to the campaign pool as an encounter card. It is written in the campaign log and added to the encounter deck of every later scenario.`);
   });
 
   it("a lost scenario writes nothing", () => {

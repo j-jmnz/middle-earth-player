@@ -59,7 +59,7 @@ Read the sections your task touches.
   - 350–355 Catalog build (~410)
   - 356–371 Tests (~1.3K) ← 3
   - 372–387 Performance (~1.2K) ← 3
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~73.4K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~73.5K tok)
   - 17–38 Sections (~410)
   - 39–50 Product (~530)
   - 51–64 Non-goals (~560)
@@ -92,7 +92,7 @@ Read the sections your task touches.
     - 595–609 The Oath (~2.3K)
     - 610–627 The Caves of Nibin-Dûm (~2.3K)
   - 628–685 Dream-chaser (~15.7K)
-  - 686–708 Ered Mithrin (~7.7K) ← 1
+  - 686–708 Ered Mithrin (~7.9K) ← 1
   - 709–717 Nightmare (~420)
   - 718–756 Deckbuilding (~1.8K) ← 1
   - 757–835 Effects (~3.2K)
@@ -105,7 +105,7 @@ Read the sections your task touches.
   - 876–901 Persistence and shipping (~1.7K)
   - 902–943 Screens (~4.7K) ← 2
     - 928–943 Table screen (~1.8K) ← 5
-- `docs/design-system-table.md` — Design system — Table (landscape) (~32.9K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~33.6K tok)
   - 5–8 Overview (~150)
   - 9–23 Top bar (~2.1K) ← 4
   - 24–27 Table menu (~430) ← 1
@@ -129,14 +129,14 @@ Read the sections your task touches.
   - 261–264 One answer, one tap (~240)
   - 265–268 Stops and Always use (~250)
   - 269–272 Guide (~120)
-  - 273–284 Choice tray (~3.1K) ← 13
-  - 285–298 Reading panels (~1.5K) ← 6
-  - 299–308 Phase carousel (~680)
-  - 309–314 Quest advance (~530) ← 1
-  - 315–318 Undo (~140)
-  - 319–322 Haptics (~280)
-  - 323–333 Banner (~580) ← 1
-  - 334–337 Android Back (~90)
+  - 273–285 Choice tray (~3.8K) ← 13
+  - 286–299 Reading panels (~1.5K) ← 6
+  - 300–309 Phase carousel (~680)
+  - 310–315 Quest advance (~530) ← 1
+  - 316–319 Undo (~140)
+  - 320–323 Haptics (~280)
+  - 324–334 Banner (~580) ← 1
+  - 335–338 Android Back (~90)
 - `docs/design-system.md` — Design system — Carved Stone (~24.6K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~580)

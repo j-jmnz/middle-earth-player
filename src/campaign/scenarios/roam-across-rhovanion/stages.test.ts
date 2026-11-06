@@ -156,9 +156,16 @@ describe("19048 Rescue Tiny, 19049 Retrieve Urdug's Horn, 19050 Find Durin's Key
       expect(codesIn(run.state, "staging").filter((code) => code === "f0" || code === "f3" || code === "place").length + codesIn(run.state, "encounterDiscard").length).toBeGreaterThan(0);
     });
 
-    it(`${line} with no ${guard} to find the objective stays set aside`, () => {
-      const { run } = revealed(stage, { deck: ["f0", "f3"] });
-      expect(codesIn(run.state, "setAside")).toContain(objective);
+    // User ruling (2026-11-05): a search that finds no copy of the guard brings the objective into the staging area unguarded, and the first player claims it at once.
+    it(`${line} with no ${guard} to find the objective comes into the staging area unguarded and the first player claims it at once`, () => {
+      const { run } = revealed(stage, { deck: ["f0", "f3"], campaign: true });
+      const card = run.state.cards[idOf(run.state, objective)]!;
+      expect(codesIn(run.state, "setAside")).not.toContain(objective);
+      expect(card.guard, "unguarded").not.toBe(true);
+      expect(card.zone, "no longer in the staging area").not.toBe("staging");
+      expect(card.controller, "claimed by the first player").toBe(0);
+      // A claim: the campaign card (12184:B:1) asked about trust, and the first answer (trust) put a resource on Urdug.
+      expect(run.state.cards[idOf(run.state, CODES.urdug)]?.resources, "asked about trust").toBe(1);
     });
   }
 
