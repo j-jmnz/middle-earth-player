@@ -3,7 +3,7 @@
 Depends on: phase 27
 Blocks: phase 28b
 
-Plan: [docs/plans/mirkwood-paths.md](../../plans/mirkwood-paths.md), "Phase 28" and "Notes for the orchestrator and the implementer agent".
+Plan: [docs/plans/done/mirkwood-paths.md](../../plans/done/mirkwood-paths.md), "Phase 28" and "Notes for the orchestrator and the implementer agent".
 
 **Review rule (user instruction, 2026-10-27):** one review round per phase. The main session runs `/reviewer` once on this phase's diff (and `/ux` once if `src/screens` or `src/play` changed), hands its blocks to one implementer fix pass, and closes the phase without re-running the reviewers. A block that fix pass leaves open is recorded in this phase's `STATUS.md` note. This replaces "until `/reviewer` reports no blocks" for phases 27 to 33.
 

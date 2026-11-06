@@ -3,7 +3,7 @@
 Depends on: phase 27
 Blocks: phases 35 and 36
 
-Plan: [docs/plans/nightmare-mode.md](../plans/nightmare-mode.md).
+Plan: [docs/plans/done/nightmare-mode.md](../plans/done/nightmare-mode.md).
 
 ## Goal
 

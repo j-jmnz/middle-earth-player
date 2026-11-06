@@ -1,17 +1,15 @@
 # Middle Earth LCG
 
-A personal, offline app for The Lord of the Rings: The Card Game. Official campaigns are the product. The proof of concept is the 2022 Fellowship of the Ring Saga Expansion (MEC109), with the full official player-card pool available for decks from the first install.
+A personal, offline app for The Lord of the Rings: The Card Game. Official campaigns are the product: The Fellowship of the Ring saga (MEC109), Mirkwood Paths and The Dark of Mirkwood, Dream-chaser and Ered Mithrin, each also playable scenario by scenario, with Nightmare decks for some. The full official player-card pool is available for decks from the first install.
 
 The app applies the rules, keywords, phases, card effects, and every number they produce. The player only chooses among the options the engine lists as legal. There is no control that types damage, resources, threat, or progress. Do not reopen the product shape.
 
 ## Where it stands
 
-- Four Fellowship scenarios are playable (`src/campaign/playable.ts`): A Shadow of the Past, A Knife in the Dark, Flight to the Ford and The Ring Goes South. Every printed line of the cards they deal has an effect record. Journey in the Dark and Breaking of the Fellowship (phases 15 and 16) are not: their lines are still open (`pnpm effects:open` lists them). Flight to the Ford and The Ring Goes South have their engine half done; their phone halves are open.
-- Every deck-legal player card has effect records too, apart from the Messenger of the King cards (out of scope, `data/overrides.json`) and the Gollum side of Smeagol (21072). The rules engine is split by mechanic family (`src/catalog/families`, `src/rules/families`, `src/effects/authored/families`).
-- The deck builder, the campaign path, the briefing, the table, the resolution screen, and the campaign log exist.
-- The Scenarios tab plays a scenario as a standalone adventure: no campaign card, log, boons or burdens, a scored win, and each game can be resumed, archived, restored or deleted. Only the playable Fellowship scenarios are dealt.
-- Everything is checked offline in Node. No phone check and no Maestro flow has run yet. Phone checks stay open in [docs/phases/STATUS.md](docs/phases/STATUS.md).
-- Scenario 1's won save fixture is open: no legal win of the two starter decks has been found. Its Maestro flows wait for it. STATUS lists this and the other open items.
+- The playable scenarios are listed in `src/campaign/playable.ts` (`PLAYABLE_SCENARIOS`, and `NIGHTMARE_PLAYABLE` for Nightmare). Every printed line of the cards they deal has an effect record.
+- Every deck-legal player card has effect records too, apart from the Messenger of the King cards (out of scope, `data/overrides.json`). The printed lines no record owns yet are in `src/effects/open-lines.ts`. The rules engine is split by mechanic family (`src/catalog/families`, `src/rules/families`, `src/effects/authored/families`).
+- The deck builder, the campaign path, the briefing, the table, the resolution screen, the campaign log and run history exist. The Scenarios tab plays any playable scenario as a standalone adventure: no campaign card, log, boons or burdens, and a scored win.
+- Everything is checked offline in Node. No phone check and no Maestro flow has run yet, and most scenarios' won save fixtures are missing (no auto-played win with real decks was found).
 
 [docs/phases/STATUS.md](docs/phases/STATUS.md) is the authority on what is done.
 
@@ -96,7 +94,7 @@ brew install node@22 poppler watchman cocoapods
 corepack enable    # pnpm 10.34.1, pinned in package.json
 ```
 
-`poppler` provides `pdftoppm`, which renders the campaign, boon and burden cards from FFG's PDFs. Without it those 26 card sides fall back to their scans, with a warning.
+`poppler` provides `pdftoppm`, which renders the campaign, boon and burden cards from FFG's PDFs. Without it those card sides fall back to their scans, with a warning.
 
 - iOS: install Xcode from the App Store and open it once to accept the licence. In Xcode → Settings → Accounts, add your Apple ID.
 - Android: install Android Studio and, in its SDK Manager, Android SDK Platform 36. Add to `~/.zshrc`:
@@ -124,7 +122,7 @@ pnpm catalog:build
 pnpm scans:pack
 ```
 
-The first `scans:pack` downloads every pinned card picture at full size (about 5 GB, into `.cache/`; JvZijp's Drive files are about 4 MB each), checks each sha256, and writes the 1,300 pictures scaled to 1200 px (272 MB) into `assets/scans`. Later runs keep each picture whose pin has not moved and pack only the new ones, in seconds. `pnpm start`, `pnpm ios` and `pnpm android` run both steps themselves, so a pull that brings new pictures (a new campaign's) is packed on the next start; running them first only gets the download out of the way. No `pnpm data:sync` is needed: `data/sources.json` pins every picture. `scans:pack` rewrites `src/screens/images/scan-map.ts`; leave that change out of commits (`git checkout src/screens/images/scan-map.ts`).
+The first `scans:pack` downloads every pinned card picture at full size (about 5 GB, into `.cache/`; JvZijp's Drive files are about 4 MB each), checks each sha256, and writes every picture scaled to 1200 px into `assets/scans`. Later runs keep each picture whose pin has not moved and pack only the new ones, in seconds. `pnpm start`, `pnpm ios` and `pnpm android` run both steps themselves, so a pull that brings new pictures (a new campaign's) is packed on the next start; running them first only gets the download out of the way. No `pnpm data:sync` is needed: `data/sources.json` pins every picture. `scans:pack` rewrites `src/screens/images/scan-map.ts`; leave that change out of commits (`git checkout src/screens/images/scan-map.ts`).
 
 #### 4. iPhone or iPad
 

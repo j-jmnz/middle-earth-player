@@ -4,11 +4,9 @@ Depends on: phases 6 and 8d
 Blocks: phase 11
 Can run beside: phase 9
 
-**State (2026-10-26):** built; `active` in `STATUS.md` until its phone checks, Maestro flows and native compile run. The dev-only resolution control named below was deleted in phase 11 (the real resolution screen replaced it). The dock is now Campaigns, Scenarios, Decks, Cards, Rules.
-
 ## Goal
 
-The campaign list, the Fellowship path, the briefing, and the log, on the campaign model from phase 8d. Scenario 1 can be won or lost through the reducer. The table does not exist yet. Chrome uses the tokens in `docs/design-system.md`. Do not invent a palette or a type scale.
+The campaign list, the Fellowship path, the briefing, and the log, on the campaign model from phase 8d. Scenario 1 can be won or lost through the reducer. Chrome uses the tokens in `docs/design-system.md`. Do not invent a palette or a type scale.
 
 ## Screens
 
@@ -39,7 +37,7 @@ The campaign list reads `campaigns` and `saves`. It does not query `cards`.
 
 Add `expo-dev-client`. Verify one Expo PDF module against SDK 58. `react-native-pdf` stays out unless `@config-plugins/react-native-pdf` has an SDK 58 release. If that module does not build, use PDFKit on iOS and `PdfRenderer` on Android. The view renders a local file and reports the page. It does not annotate, search the prose into the app, or become a second document system. It is not a Skia surface and not a WebView.
 
-The player can open a stored booklet from the campaign list, the path, the briefing, and the log, then close it and return to that same screen. (User request, 2026-10-25: the campaign list's booklet buttons moved to the Rules tab of the dock, which opens both books and returns to Rules on close.) The reader is full screen. The close control sits in thumb reach and has a testID. The engine does not read the PDF. Do not parse it. Do not commit it. Do not fetch the Asmodee CDN. A missing file does not block a scenario. The control offers to add the booklet and names which book is absent.
+The player can open a stored booklet from the Rules tab of the dock, the path, the briefing, and the log, then close it and return to that same screen (user request, 2026-10-25). The reader is full screen. The close control sits in thumb reach and has a testID. The engine does not read the PDF. Do not parse it. Do not commit it. Do not fetch the Asmodee CDN. A missing file does not block a scenario. The control offers to add the booklet and names which book is absent.
 
 `user.db` `booklets` is one row per book: id, path, original filename, byte size, sha256, page count, and last page. Store one file per book in the document directory under `booklets/`. Those bytes stay eligible for backup. A catalog update does not delete the row or the file. `expo-document-picker` copies into the cache. Copy that file into `booklets/` before inserting the row. Gitignore the PDFs.
 
@@ -49,14 +47,12 @@ The ids for this box are `fellowship-of-the-ring` and `learn-to-play`. The same 
 
 A win from the reducer runs the resolution records of the scenario's campaign card, writes what they record, unlocks `a-knife-in-the-dark`, and shows those cards in the pool or on the attached hero. A loss writes nothing and leaves scenario 2 locked.
 
-A dev-only way to submit the resolution intents is allowed while the table is absent. It sends only the choices `legalIntents` offers. It does not type damage, resources, threat, or progress. Give it a testID. Delete it in phase 11, and move the Maestro flow onto the real resolution screen in that same phase.
-
 Replaying a won scenario is allowed and does not grant the reward a second time unless that scenario's script says so.
 
 ## E2E
 
-`.maestro/features/briefing.yaml` deals a legal loadout and refuses a loadout with no Ring-bearer, naming the rule. `.maestro/features/resolution.yaml` uses the dev-only resolution control: a win unlocks `a-knife-in-the-dark` and shows the chosen cards after a relaunch; a loss leaves that node locked. `.maestro/features/booklet.yaml` asserts the empty state and the close control by testID. A smoke file, if a flow needs one, is a one-page PDF written for the test, not a page of MEC109. Do not assert ability text.
+`.maestro/features/briefing.yaml` deals a legal loadout and refuses a loadout with no Ring-bearer, naming the rule. `.maestro/features/resolution.yaml`, on the resolution screen: a win unlocks `a-knife-in-the-dark` and shows the chosen cards after a relaunch; a loss leaves that node locked. `.maestro/features/booklet.yaml` asserts the empty state and the close control by testID. A smoke file, if a flow needs one, is a one-page PDF written for the test, not a page of MEC109. Do not assert ability text.
 
 ## Exit
 
-On a device, a recorded win unlocks scenario 2 and shows the chosen cards, and the briefing for scenario 2 shows the earned burden going into the encounter deck. A recorded loss leaves scenario 2 locked. Kill and relaunch. The deck and the log are still in `user.db`. Importing a booklet copies it out of the picker cache into `booklets/`, opens it, restores the last page, and closes back to the same screen. A changed engine version drops `saves.activeScenario` and keeps the log, the decks, and the image index. The Maestro flows pass. The dev-only resolution control is still present for phase 11 to delete.
+On a device, a recorded win unlocks scenario 2 and shows the chosen cards, and the briefing for scenario 2 shows the earned burden going into the encounter deck. A recorded loss leaves scenario 2 locked. Kill and relaunch. The deck and the log are still in `user.db`. Importing a booklet copies it out of the picker cache into `booklets/`, opens it, restores the last page, and closes back to the same screen. A changed engine version drops `saves.activeScenario` and keeps the log, the decks, and the image index. The Maestro flows pass.

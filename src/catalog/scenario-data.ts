@@ -41,7 +41,7 @@ const placementSchema = z
   })
   .refine((card) => card.easy <= card.normal, { message: "easy exceeds normal" });
 
-// A scenario's Nightmare deck (docs/plans/nightmare-mode.md), from its setup card: the standard piles less `removed` (each copy
+// A scenario's Nightmare deck (docs/plans/done/nightmare-mode.md), from its setup card: the standard piles less `removed` (each copy
 // taken from the pile it was in), with the deck's own cards (`cards`, the copies printed) shuffled in. A Nightmare card takes the
 // Setup slot of a removed card of its title (`pile`, `perPlayer`). The setup card is placed next to the quest deck, side A faceup,
 // and its lines stay active all game.
@@ -177,7 +177,7 @@ export function normalCopiesByCode(data: ScenarioData): Map<string, number> {
   return totals;
 }
 
-// Nightmare plays the scenario's Nightmare deck (docs/plans/nightmare-mode.md), where it has one (`nightmare`).
+// Nightmare plays the scenario's Nightmare deck (docs/plans/done/nightmare-mode.md), where it has one (`nightmare`).
 export const DIFFICULTIES = ["Easy", "Normal", "Nightmare"] as const;
 export type Difficulty = (typeof DIFFICULTIES)[number];
 

@@ -39,9 +39,9 @@ The brief already fixes targets, thumb reach, the phase rail, legal actions, mot
 - Locked, current, completed, a refused deck, and a failed test are distinguishable without color alone.
 - One primary action is visually dominant. Two primaries on one sheet is a finding.
 - An irreversible choice states the consequence before it commits.
-- Undo, when this phase ships it, has a label. It is not a hidden gesture.
+- Undo has a label. It is not a hidden gesture.
 - The notch, the status bar, and the home indicator do not cover the phase rail or the choice buttons. Nothing depends on hover.
-- Contrast is enough to read the phase rail and sheet text in the theme the app ships. Do not demand a second theme.
+- Contrast is enough to read the phase rail and sheet text in both themes (Dark and Light).
 - Spacing and type repeat. A screen that invents its own scale is a finding.
 - The phase rail and the choice buttons are real controls a screen reader can reach. A card that exists only as pixels still opens on the inspect screen.
 

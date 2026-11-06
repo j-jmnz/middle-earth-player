@@ -3,7 +3,7 @@
 Depends on: phase 49
 Blocks: phase 51
 
-Plan: [docs/plans/done/ered-mithrin.md](../plans/done/ered-mithrin.md), "Phase 50: Ered Mithrin campaign shell, treasures and the pool" and "Notes for the orchestrator". Analogue: [phase 38](done/phase-38-dream-chaser-campaign-shell.md).
+Plan: [docs/plans/done/ered-mithrin.md](../../plans/done/ered-mithrin.md), "Phase 50: Ered Mithrin campaign shell, treasures and the pool" and "Notes for the orchestrator". Analogue: [phase 38](phase-38-dream-chaser-campaign-shell.md).
 
 ## Goal
 

@@ -4,8 +4,6 @@ Engine half depends on: phases 8d and 9. It can run beside phases 10 and 11.
 Phone half depends on: phase 11
 Blocks: phase 13
 
-**State (2026-10-26):** engine half done and reviewed; phone half built; phone checks and Maestro runs open; the won flow stays open (no genuine win found; user-accepted). The procedure's verbs now live in mechanic families (`src/catalog/families/<family>.ts`, `src/rules/families/<family>/`, `src/effects/authored/families/<family>.ts`); the scenario's own records are in `src/effects/authored/fellowship-of-the-ring.ts`.
-
 ## Goal
 
 `a-knife-in-the-dark` is playable on the phone. One scenario in this change. Do not start phase 13's engine half until this scenario's coverage is green.

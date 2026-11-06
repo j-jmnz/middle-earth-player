@@ -21,7 +21,7 @@ export type SetupClause =
   | { kind: "earned"; codes: string[] }
   | { kind: "waivePenalty" }
   | { kind: "leftoverIntoFirstPlayerDeck" }
-  // Mirkwood Paths and The Dark of Mirkwood (docs/plans/mirkwood-paths.md, phase 27). Each is quoted from a ledger line.
+  // Mirkwood Paths and The Dark of Mirkwood (docs/plans/done/mirkwood-paths.md, phase 27). Each is quoted from a ledger line.
   // "Search the encounter deck for X and Y": finds the cards; the next clause says where they go.
   | { kind: "search"; codes: string[] }
   // "Search the encounter deck for the 3 objective cards, reveal and place them in the staging area."

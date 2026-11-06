@@ -63,7 +63,7 @@ export function lastHideFailed(state: ScenarioState): boolean {
 }
 
 // On Nightmare the setup card's recipe can replace a scenario card by a Nightmare card of the same title (Weathertop 141046 by 906204,
-// Ford of Bruinen 141059 by 906303; docs/plans/nightmare-mode.md). A record that names the standard card by code ("Add Weathertop to
+// Ford of Bruinen 141059 by 906303; docs/plans/done/nightmare-mode.md). A record that names the standard card by code ("Add Weathertop to
 // the staging area", 141027:A:1) means the card of that title the game dealt: with no card of the named code in the game, the code of a
 // dealt card with the same printed title stands in for it. Off Nightmare, or when the named card is dealt, the code is kept.
 export function twinCode(state: ScenarioState, code: string, cards: Cards): string {

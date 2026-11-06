@@ -3,7 +3,7 @@
 Depends on: phase 37 (the pipeline it generalizes). Phase 48 is not touched.
 Blocks: phase 50
 
-Plan: [docs/plans/done/ered-mithrin.md](../plans/done/ered-mithrin.md), "Phase 49: Ered Mithrin data" and "Notes for the orchestrator". Analogue: [phase 37](done/phase-37-dream-chaser-data.md).
+Plan: [docs/plans/done/ered-mithrin.md](../../plans/done/ered-mithrin.md), "Phase 49: Ered Mithrin data" and "Notes for the orchestrator". Analogue: [phase 37](phase-37-dream-chaser-data.md).
 
 ## Goal
 

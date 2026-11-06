@@ -1,6 +1,6 @@
 // Rules: mec109.setup, rr.setup (data/rules/entries.json). One seeded game of each scenario on NIGHTMARE_PLAYABLE, on Nightmare: the
 // recipe deals, the players keep, and the auto-player plays rounds with card play and Actions on. Every intent it sends is one the reducer
-// listed, so a refusal, a throw or a stall in the Nightmare deck's records fails here (docs/plans/nightmare-mode.md, phase 36).
+// listed, so a refusal, a throw or a stall in the Nightmare deck's records fails here (docs/plans/done/nightmare-mode.md, phase 36).
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 import { describe, expect, it } from "vitest";

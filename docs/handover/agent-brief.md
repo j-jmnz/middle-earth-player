@@ -4,14 +4,13 @@ Repository: middle-earth-lcg, a TypeScript/Expo app for The Lord of the Rings: T
 rules engine (`src/rules`) that runs effect records (`src/effects`) written in a Zod vocabulary (`src/catalog/effect-schema*.ts`
 and `src/catalog/families/`).
 
-The user's directive (2026-10-26): every deck-legal player card is fully playable, meaning its printed text is automated by
-effect records the engine runs, and every scenario of the Fellowship box follows (phases 13 to 16). The lines still without a
-record are listed in `src/effects/open-lines.ts` (`pnpm effects:open` rewrites it). The Messenger of the King cards are out of scope
-(`outOfScope` in `data/overrides.json`). This brief is reused for each new assignment: you own one **family** (the engine
-support one mechanic needs, and the records for its lines) or one **scenario phase** (phases 15 and 16: the records of the
-scenario's cards, plus the engine support they lack, which is a new family when it is a new mechanic). Other agents may work
-on other assignments at the same time. Below, `<F>` is your family or scenario id and `<BASE>` the integration branch the
-main session names in your task.
+Every deck-legal player card and every card a playable scenario deals is automated by effect records the engine runs
+(user directive, 2026-10-26). The lines still without a record are listed in `src/effects/open-lines.ts` (`pnpm effects:open`
+rewrites it). The Messenger of the King cards are out of scope (`outOfScope` in `data/overrides.json`). This brief is reused for
+each assignment: you own one **family** (the engine support one mechanic needs, and the records for its lines) or one
+**scenario phase** (the records of the scenario's cards, plus the engine support they lack, which is a new family when it is a
+new mechanic). Other agents may work on other assignments at the same time. Below, `<F>` is your family or scenario id and
+`<BASE>` the integration branch the main session names in your task.
 
 The families that exist are listed in `src/catalog/families/index.ts`. A scenario's own records are in
 `src/effects/authored/<scenario-id>.ts` (`fellowship-of-the-ring.ts` for scenarios 1 and 2); families used only by scenario

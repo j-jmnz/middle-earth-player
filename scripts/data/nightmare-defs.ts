@@ -1,6 +1,6 @@
 // The Nightmare decks (FFG's print-on-demand Nightmare packs), one row per Hall of Beorn card set. The user brought them into
 // scope on 2026-10-30: every deck's cards are built for future use, and a built scenario with a deck of its own can be played on
-// Nightmare (docs/plans/nightmare-mode.md). No source names a stable code for a Nightmare card: Hall of Beorn reuses the codes of
+// Nightmare (docs/plans/done/nightmare-mode.md). No source names a stable code for a Nightmare card: Hall of Beorn reuses the codes of
 // the cycle each deck belongs to (02002 is Ungoliant's Spawn and also The Hunt for Gollum's card 2), and RingsDB does not list
 // them. A card's code is the deck's `prefix` and its two-digit collector number (900102 is Ungoliant's Spawn), so a row keeps its
 // prefix forever: a new deck is appended, never inserted. `folder` is the deck's folder in the Nightmare proxies on Google Drive

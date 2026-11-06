@@ -41,7 +41,7 @@ const PENDING_LINES: Readonly<Record<string, string>> = {};
 const campaignCards = new Set(Object.values(campaign.campaignCards));
 // The player's requests (scripts/data/printed/scope.ts: The Shirefolk and the four core-set Learn to Play decks) are held to the
 // same rule as the starter cards: every printed line owned.
-// A scenario's Nightmare deck is held to the rule only once it is in NIGHTMARE_PLAYABLE (docs/plans/nightmare-mode.md).
+// A scenario's Nightmare deck is held to the rule only once it is in NIGHTMARE_PLAYABLE (docs/plans/done/nightmare-mode.md).
 const dealt = new Set([
   ...dealtCodes(campaign, scenarios.filter((scenario) => PLAYABLE.includes(scenario.id)), { nightmare: false }),
   ...nightmareCodes(scenarios.filter((scenario) => NIGHTMARE_PLAYABLE.includes(scenario.id))),

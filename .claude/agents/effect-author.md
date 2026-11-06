@@ -14,7 +14,7 @@ exact match: copy them) or the nearest existing records. The vocabulary is in `.
 1. Write the records where the card belongs. A player card whose mechanic has a family goes in
    `src/effects/authored/families/<family>.ts` (`RECORDS`, `REPLACES`; the families are listed in `src/catalog/families/index.ts`). Any other player card goes in `src/effects/authored/pool/<PACK>.ts`. A
    scenario's cards (and the saga box's) go in `src/effects/authored/<scenario-id>.ts` (`fellowship-of-the-ring.ts` for
-   scenarios 1 and 2; `pnpm scenario:new <scenario-id>` writes the empty file with the scenario's other skeletons, and `pnpm data:build` adds it to the barrel `src/effects/generated/authored.ts`); the burden and south families' verbs are used by the Flight to the Ford and Ring Goes South files.
+   scenarios 1 and 2; `pnpm scenario:new <scenario-id>` writes the empty file with the scenario's other skeletons, and `pnpm data:build` adds it to the barrel `src/effects/generated/authored.ts`).
    Ids are `<code>:<timing>:<n>`, numbered in text order per timing (front, then side B, then shadow) and unique across
    every file: `grep -rn '"<code>:' src/effects`. An id a template already produces replaces the generated record; list it in
    `REPLACES` (`AUTHORED_REPLACES` in a scenario file) and say why. A line that only restates a rule the engine applies

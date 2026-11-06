@@ -4,8 +4,6 @@ Engine half depends on: phase 15's engine half
 Phone half depends on: phase 15
 Blocks: nothing in the proof of concept
 
-**State (2026-10-30):** engine half done and reviewed: `breaking-of-the-fellowship` is in `src/campaign/playable.ts` and its goldens run in Node (`src/campaign/scenarios/breaking-of-the-fellowship/golden.test.ts`). Phone half code done: the table draws the shown seat's staging area, stage and active location, the readouts and Choose words follow, and the four flows `.maestro/scenarios/breaking-of-the-fellowship/breaking-of-the-fellowship*.yaml` are written. Open: the fixtures `breaking-solo`, `breaking-pair`, `breaking-won` and `breaking-lost` (no chained win of scenarios 1 to 5 yet), the flows run, and the phone checks.
-
 ## Goal
 
 `breaking-of-the-fellowship` is playable, including the Ring-bearer leaving the game at stage 2A and a staging area per seat from stage 2B. This is the last scenario in the Fellowship box. Follow the scenario procedure in phase 12.
@@ -34,14 +32,3 @@ The per-seat staging slot and quest stage have existed on the model since phase 
 ## Exit
 
 The procedure's two halves. True solo and two-handed both run stage 2B on a phone. Fellowship's six nodes can show won, in order, and only a won scenario has unlocked the next.
-
-The next campaign is out of scope. It will be more `data:sync` output, its ledger entries and campaign cards, and its effects, plus a catalog version bump. `user.db` stays. The Two Towers campaign cards remove burdens by burden set and remove named cards from the pool. Phase 8d's `burdenSet` and pool model are what they need. A later saga box fills the remaining log rows from its own booklet. It does not get a new log type.
-
-## Handover from phase 26
-
-Phase 26 is merged. In two-handed play the table can show a seat that is not acting:
-
-- `viewedSeat` (UI-only, `src/play/store/store.ts`) is the seat being peeked at; it is null after every new state, when the table opens and on Back. `shownSeat(game, viewed)` (`src/play/store/selectors.ts`) is the seat the canvas, the web list and the pile list draw; `actingSeat(game)` is the seat that picks, pays and sends (`use-table-choice.ts` must never read the shown seat; a test guards it).
-- The peek swaps only the seat zones (`zoneIds`, `pileIds`); staging and the quest stay shared. When 2B creates a staging area and a quest stage per seat, draw them from `shownSeat`, so a peek shows that seat's staging and stage, and keep every pick, engagement and reveal on `actingSeat`. A peek has no motion (`kindMoves` in `motion/kind.ts`), so nothing else changes for it.
-- `peek-banner` is a 36 pt night pill 2 pt under the top bar, across the top of the canvas, over the staging row's name strips. A second staging row must leave it room, or move it.
-- Android Back is `skipSpotlight`, `cancelScrub`, `endPeek`, then the rest (`src/play/chrome/back.ts`).

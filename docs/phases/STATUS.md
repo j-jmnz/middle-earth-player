@@ -1,6 +1,6 @@
 # Phase status
 
-Status is `not started`, `active`, or `completed`. Git keeps the history; this file keeps only what is current (`.cursor/rules/docs-standards.mdc`: a note is one line of what is open, a done item is deleted, no dated sections).
+Status is `not started`, `active`, or `completed`. This file keeps only what is current (`.cursor/rules/docs-standards.mdc`).
 
 ## Rules
 
@@ -8,9 +8,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - When you start a phase, set it to `active` with a one-line note. Do not mark the next phase active. More than one phase may be active only when their files say they can run beside each other.
 - A phase is `completed` when its exit is green and `/reviewer` reports no blocks. A phase that changes `src/screens` or `src/play` also needs `/ux` to report no blocks. Write the date.
 - Phases 12 to 16 each have an engine half and a phone half (phase 12 describes them). When the engine half's exit is green and reviewed, write `engine done` in the note and leave the phase `active` or `not started`. The phase is completed when both halves are.
-- Phases 27 to 33 (Mirkwood Paths and The Dark of Mirkwood, plan `docs/plans/mirkwood-paths.md`) have **one review round per phase** (user instruction, 2026-10-27). The main session runs `/reviewer` once on the phase's diff, and `/ux` once when `src/screens` or `src/play` changed, hands their blocks to one implementer fix pass, and closes the phase without re-running the reviewers. A block that pass leaves open goes in the phase's note and does not keep the phase open. This replaces "`/reviewer` reports no blocks" for those phases. Phases 29 to 33 have an engine half and a phone half, as phase 12 describes.
-- Phases 37 to 48 and 39b (Dream-chaser, plan `docs/plans/done/dream-chaser.md`) have one review round per phase, as `.cursor/agents/orchestrator.md` "One review round" says (user instruction, 2026-10-30). Phases 40 to 48 have an engine half and a phone half, as phase 12 describes.
-- Phases 49 to 60 and 51b (Ered Mithrin, plan `docs/plans/done/ered-mithrin.md`) have one review round per phase, as `.cursor/agents/orchestrator.md` "One review round" says (user instruction, 2026-11-05). Phases 52 to 60 have an engine half and a phone half, as phase 12 describes.
+- Phases 27 to 33 and 37 to 60 (plans `docs/plans/done/mirkwood-paths.md`, `docs/plans/done/dream-chaser.md`, `docs/plans/done/ered-mithrin.md`) have one review round per phase, as `.cursor/agents/orchestrator.md` "One review round" says, in place of "`/reviewer` reports no blocks" (user instructions, 2026-10-27, 2026-10-30, 2026-11-05). A block the fix pass leaves open goes in the phase's note. Phases 29 to 33, 40 to 48 and 52 to 60 have an engine half and a phone half, as phase 12 describes.
 - Maestro flows are written in the phase that names them. `maestro test` runs after the last phase; it does not gate an earlier phase.
 - A cloud session has no phone, simulator or Maestro. Phone checks stay open and are listed here, not marked done.
 - Current counts live in code: the engine version in `src/rules/engine/version.ts`, the playable scenarios in `src/campaign/playable.ts`, the printed lines no record owns in `src/effects/open-lines.ts` (`pnpm effects:open`).
@@ -39,14 +37,14 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 | 14 | The Ring Goes South | active | 2026-10-26. Engine done. `/reviewer` and `/ux` not run. Phone checks; four Maestro flows written, not run; fixtures `south-*` not committed. |
 | 15 | Journey in the Dark | active | 2026-10-30. Engine done; review round done. Phone checks open; three Maestro flows written, not run; fixtures `moria-*` not committed. Not on Nightmare. |
 | 16 | Breaking of the Fellowship | active | 2026-10-30. Engine done; review round done. Phone checks open (true solo and two-handed through 2B); four Maestro flows written, not run; fixtures `breaking-*` not committed. Not on Nightmare. |
-| 17 | Design system | completed | 2026-10-23. Superseded by Carved Stone (`docs/design-system.md`). |
+| 17 | Design system | completed | 2026-10-23. |
 | 18 | Card frames follow the card | completed | 2026-10-26. ux fix not re-reviewed. Phone check open. |
 | 19 | Top bar and table menu | completed | 2026-10-26. Phone checks open; `.maestro/features/table-menu.yaml` not run. |
 | 20 | Phase carousel | completed | 2026-10-26. Phone checks open. |
 | 21 | Choice tray | completed | 2026-10-26. Phone checks open. |
 | 22 | Declutter the board | completed | 2026-10-26. Phone checks open. |
 | 23 | Motion pass | completed | 2026-10-26. Phone checks open. |
-| 24 | Combat spotlight | completed | 2026-10-27. Look and timing superseded by the 2026-10-29 redesign. Phone checks open. |
+| 24 | Combat spotlight | completed | 2026-10-27. Phone checks open (Open items, Combat spotlight). |
 | 25 | Hold and slide through the hand | completed | 2026-10-27. Phone checks open. |
 | 26 | Peek at the other seat | completed | 2026-10-27. Phone checks open; `.maestro/features/seat-peek.yaml` not run. |
 | 27 | Multi-campaign data | completed | 2026-10-27. |
@@ -57,12 +55,12 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 | 31 | Escape from Dol Guldur | active | 2026-10-28. Engine done. Phone checks open; both fixtures wait on `anduin-won`, so neither flow can run. |
 | 32 | The Oath | active | 2026-10-28. Engine done. Phone checks open; both flows not run; no Mirkwood Paths part 4 fixture. |
 | 33 | The Caves of Nibin-Dûm | active | 2026-10-28. Engine done. Phone checks open; `nibin-dum-won` missing; no Mirkwood Paths part 5 fixture. |
-| 34 | Nightmare data and pictures | active | 2026-10-30. Built: 72 decks (637 cards), the nine built scenarios' `nightmare` blocks, the `nightmare` source (730 pictures pinned), the ledger (88 sides), the Eye icon. Open: `pnpm scans:pack` on the build machine; pictures on a phone. |
-| 35 | Nightmare difficulty | active | 2026-10-30. Built: the Nightmare deal and setup card, saves, the briefing switch, the list line, the top bar's Eye; `/reviewer` and `/ux` rounds done. Open: the switch, list and top bar on a phone and a tablet. |
+| 34 | Nightmare data and pictures | active | 2026-10-30. Open: `pnpm scans:pack` on the build machine; pictures on a phone. |
+| 35 | Nightmare difficulty | active | 2026-10-30. Review rounds done. Open: the briefing switch, list line and top bar's Eye on a phone and a tablet. |
 | 36 | Nightmare effects | active | 2026-10-30. Engine done: all seven playable scenarios on `NIGHTMARE_PLAYABLE`; review round done (known limits in the phase file). Open: one Nightmare game per scenario on a phone. |
 | 37 | Dream-chaser data | completed | 2026-10-30. Review round done. Open: A Storm on Cobas Haven Easy counts follow Hall of Beorn, not a printed mark. |
 | 38 | Dream-chaser campaign shell and XP | completed | 2026-10-31. Review round done. Phone checks open: Spend XP, Hard/Expert pickers, path and log XP rows, MEC111 reader; flows `dream-chaser-start`, `booklet-dream-chaser` not run. |
-| 39 | Sea mechanics family | completed | 2026-10-31. Engine only; review round done. Open: the fleet choice on the seat picker and briefing (phase 39b); Upgraded-side ship stats; face-aware records; Sailing events. |
+| 39 | Sea mechanics family | completed | 2026-10-31. Engine only; review round done. Open: Upgraded-side ship stats; face-aware records; Sailing events. |
 | 39b | Ships on the table | completed | 2026-10-31. Review round done. Phone checks open: compact Heading dial and its scroll at 667 × 375, Sailing strip and Done, Boarding into a full row, fold stack and list, Corsair piles at Large, reader buttons. |
 | 40 | Voyage Across Belegaer | completed | 2026-10-31. Engine done, review round done. Phone checks and every Maestro run open (`voyage-across-belegaer*.yaml`, `sea-table.yaml`, `sea-duo.yaml`, extended `dream-chaser-start.yaml` with unrun ids); `voyage-won` missing, so the win flow cannot run. |
 | 41 | The Fate of Númenor | completed | 2026-10-31. Engine done, review round done. Phone checks open: Lost Island hiding (badges, tiles, Details, log, shuffle), Uncharted pile and crowded-table geometry, look sheets; both Maestro flows unrun; `fate-won` missing, so the win flow cannot run. |
@@ -98,13 +96,11 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - `heath-won` is not committed: none of 100 seeds wins The Withered Heath with the starter decklists. Until it exists `.maestro/scenarios/the-withered-heath/the-withered-heath.yaml` (with `CHOICE2_SEAT`) cannot run.
 - `kingsquest-won` is not committed: none of 100 seeds wins The King's Quest with the starter decklists. Until it exists `.maestro/scenarios/the-kings-quest/the-kings-quest.yaml` (and its `CHOICE2_*` path in `scenario-win.yaml`) cannot run.
 - `lostmirk-won` is not committed: none of 100 seeds wins Lost in Mirkwood with the starter decklists. Until it exists `.maestro/scenarios/lost-in-mirkwood/lost-in-mirkwood.yaml` cannot run, and its pool and treasure asserts do not yet prove part 2 wrote them.
-- `upanduin-won` is not committed: no seed in 600 wins Journey Up the Anduin with the starter decks under the scenario's policy. Until it exists `.maestro/scenarios/journey-up-the-anduin/journey-up-the-anduin.yaml` cannot run. `scenario-win.yaml` now taps Confirm twice after a choice and takes `NO_XP`; no flow using it has run.
-
+- `upanduin-won` is not committed: no seed in 600 wins Journey Up the Anduin with the starter decks under the scenario's policy. Until it exists `.maestro/scenarios/journey-up-the-anduin/journey-up-the-anduin.yaml` cannot run.
 - Scenario 1's `won` fixture is not committed. `scripts/e2e/fixtures.ts --won` searches for it. Until it exists `.maestro/scenarios/a-shadow-of-the-past/scenario-1.yaml` cannot run, and `knife-lost` (dealt from its log) is missing, so `.maestro/scenarios/a-knife-in-the-dark/a-knife-in-the-dark-loss.yaml` cannot run either.
 - A Knife in the Dark's won flow has no genuine win (user-accepted, 2026-10-25).
 - Fixtures not committed, because no real win of the earlier scenarios exists to chain from: `ford-start`, `ford-won`, `ford-lost`; `south-start`, `south-stage-4`, `south-won`, `south-lost`; `anduin-won`; `dol-guldur-won`, `dol-guldur-lost`; `nibin-dum-won`; Mirkwood Paths parts 4 and 5; `moria-won`, `moria-pairs`, `moria-lost`; `breaking-solo`, `breaking-pair`, `breaking-won`, `breaking-lost`. A fixture is a real save (phase 13).
 - No Maestro flow has run. The flows that cross a stage advance must pass the quest advance screen (`quest-advance-progress`, Progress is optional); a fixture parked on a When Revealed question shows the question instead.
-- `seat-peek.yaml`, `scenario-1-loss.yaml` and `the-caves-of-nibin-dum.yaml` read `continue-next`, now matched by its accessibility label: run them.
 - `.maestro/features/mirkwood-start.yaml` picks a Fellowship starter deck that a non-saga briefing may refuse.
 - `.maestro/features/deck.yaml` and `.maestro/features/rules.yaml` are phone flows; they cannot run on an expanded tablet.
 - No Maestro flow plays an attack through the redesigned combat spotlight.
@@ -121,7 +117,6 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - The King's Quest: the goldens' policy keeps Underground Lake in the Caves deck, so no golden explores an X-quest-point location; unit tests cover it. 18079:B:2 has no `anyPlayer`, so only the first player is offered the stage's Caves look. `freeTreasures`' gate is always true in real games (the scan of the staging area is the real gate).
 - Lost in Mirkwood: no golden wins on the nemesis route (stage 4A, The Forest of Great Fear); unit tests cover it. With two players each holding a hero (18074), `heldDial` marks only the first seat's dial.
 - Wilderland readings not user-confirmed: Deep does nothing once its location is no longer active; a non-location Deep replacement other than a Dragon Sign goes to staging; Guarded (X) with no match leaves the objective unguarded.
-
 - Dream-chaser: which side a set-aside upgraded card turns up on is decided per scenario (phases 40-48); `SetAside` deals facedown.
 - Dream-chaser: the two Grapple variants on Nightmare cards (fewest or most enemies grappled) stay unparsed.
 - The Havens Burn and the Dream-chaser location are upgradable on the MEC111 log, but no source prints their Upgraded sides: their XP rows cannot be bought. Gavin and the four Send for Help cards have no B side in the ledger either.
@@ -133,12 +128,10 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - A Storm on Cobas Haven, known limits: the `exhausted` trigger fires only for the Exhaust verb, so a sea sweep announces `shipExhausted` between actions (Taking on Water's 2 damage lands after the exhausting action; an exhaust and ready inside one action is missed); The Beacon may be used with no Warship set aside; an added phase does not give back once-per-phase uses; the "If Send for Help (X) is upgraded" clauses are unrecorded (no Upgraded side printed); the 3-or-more-players branch of 12121:A:1 is tested by no scene.
 - A Storm on Cobas Haven, not reached by a golden (card tests only): the Skirmisher's Response and the ship it becomes, a Warship's set-aside on destruction, Send for Help (Tactics), 11209:B:6 to B:8.
 - Revenant's damage limit is two Forced records: `effect-coverage.test.ts` refuses a constant record on a printed "Forced:" line.
-- Staging folds rank "controlled" by `claimed`; a freed tower (phase 47) must set it.
 - The Corsair reshuffle glides the discard to the deck without a count pop.
 - The City of Corsairs: The Shattered Monument is dealt facedown from the encounter deck, so an upgraded game keeps it on side A and its immunity (`dealtFace` upgrades faceup deals only). Gavin ends in the encounter deck or discard pile in the upgraded goldens; not checked against the rules.
 - The City of Corsairs, not reached by a golden (card tests only): the Corsair Waters limit and the Umbar Slaver's spend trigger (the auto-player plays no cards); no two-handed golden wins by sinking the Stormcaller.
 - Nightmare 904605 Sahír's Pursuer and 905402 Patrol Ship print ENEMY (Ship trait), so they stay non-ship enemies.
-
 - Fellowship-of-heroes with no replacement left in the collection is not modelled (`ltp.fellowship-of-heroes`, `rr.fellowship-of-heroes`).
 - Simultaneous Forced and delayed effects resolve in a fixed order, not the first player's choice (FAQ 1.02).
 - `src/play/readouts/threat-level.ts` shows 50 as the elimination level and ignores The One Ring's `eliminationReduction`.
@@ -155,14 +148,12 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - One active location per separate stage (phase 16) is read from `rr.active-location` and `mec109.multiple-staging-areas`, not stated by a card. Not user-confirmed.
 - Separate stages: `viewOf` builds a new state per call, so state-keyed memos miss inside a view (speed only). The normalizer's `searched` rule marks every staged location of a quest with an each-player-adds-location clause.
 - Journey in the Dark and Breaking of the Fellowship Nightmare decks (9065xx, 9066xx) have no records.
-
 - Ered Mithrin data: Crypt Stalker (19099) Easy count is 1 (Hall of Beorn) against E08.7's 2; no printed source settles it.
 - Ered Mithrin data: the EMCE box prints collector numbers one below Hall of Beorn and RingsDB; codes and `printings[].number` follow the sources' number.
 
 ### Screens and code
 - Ered Mithrin: a discovered treasure cannot reach a deck from the app. `validateLoadout` admits it, but `deckSaveRefusal`, the import, the deck store and the Cards pool read deck-legal rows only, and a saved deck is not tied to a save's log. Needs a design.
 - Ered Mithrin: `AddEncounterToPool` with `inPlay` counts in-play copies the pool did not deal in, an upper bound, since copies have no identity.
-
 - Run history (28b): `recordUnclosedRun` has no test; a win left unconfirmed until an engine or data update drops it cannot be recorded; `run-writers.ts` imports `ScenarioState` through `play/store`.
 - A player side quest in the play row is drawn in a portrait rect, so its sideways scan is cropped; two seats with the same side quest show two plates of one name.
 - Rounded chrome (`docs/plans/done/rounded-chrome.md`), phone checks open: both themes on a phone; the capsule controls' pressed darken (`filter: brightness`); the command column's radial fade and the start block's soft scene; the dock with choice rows open on a short phone; the carousel's seven rows at 667 × 375; `.maestro/features/table-menu.yaml`.
@@ -184,6 +175,9 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - Effect templates: an unlabelled conditional constant ("If you are on-course, ~ gets +2 …") is read as triggered by `unreadBefore`; `SPLIT_LINES` in `scripts/data/effects/generate.ts` names one card's line.
 
 ### Phone and tablet checks
+
+None ran. Each needs a device.
+
 - Journey Up the Anduin: the treasure draw rows (picture from a code, long press) and character rows two-handed; The Old Ford's refusal and travel caution at 667 × 375; Ruined Supplies' rows; Weighed Down's discard rows; the Resolution's oath-line row beside two Turayn tiles; A Growing Threat's banner line; the Creatures piles and Haldan's flip on the table.
 - Wilderland table: the Creatures pair and Caves deck at 667 × 375 two-seat at Small/Medium/Large; the Discover strip over the engagement band, the veil with Loot and Hazard ringed above it, the hold on the last beat and glide to discard, staging taps after the banner; reduced motion; a Deep Cave arriving off the Caves deck; the reshuffle glide; a guarded treasure with a screen reader; both themes.
 - The Fate of Wilderland: The Goblins' Assault and The Heroes' Defense counts, the last-stage Tap again cautions on the progress rows and the Watchtower's row and Pass, the attack-on-Urdug note before and after he attacks, Urdug's Command defense note, the Setup boon or treasure search two-handed, and the campaign-won Resolution screen and path foot (also The City of Corsairs').
@@ -195,9 +189,6 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 - The King's Quest: the Stone-troll discard count, Dagnir's Spawn's branch, the Eyes in the Dark hero caution (Tap again), the Resolution's burden choice with its seat label, the Dragon Scales shield badge, the long notes at 667 × 375.
 - Lost in Mirkwood: the Twilight Hall offer and the Claim step; the Player N lead on Carried Away and Truly Lost at 667 × 375; the held-hero, hand-under and nemesis preview lines; objective-locations' quest points and travel.
 - Ered Mithrin shell: the log's long row labels at 360/375 pt and Large scale; the resolution grid with the log-line row (solo and two-handed); the settled sentence height above Confirm; the treasure tray at 667 × 375; the path's Ered Mithrin groups; the booklet tile and Coming later tiles; long press on briefing choices.
-
-None ran. Each needs a device.
-
 - The app after the file restructure (`src/ui`, the feature folders of `src/play` and `src/screens`): the Android and iOS bundles build (`expo export`); a dev build on a phone opening every tab, a table and a booklet has not run.
 - Booklets: import, open, last page after a kill, Back; first open from the APK and from an iOS Debug and Release build (the module linked through its podspec); Android pinch, double tap, pan and the sharper redraw.
 - Data: airplane-mode play after a kill with images cached; `user.db` keeps the deck and log after a catalog version bump; a changed engine version drops the open scenario.
@@ -209,14 +200,14 @@ None ran. Each needs a device.
 - Phase titles and spotlight (user request, 2026-11-04): the COMBAT sweep as Combat opens with enemies engaged (over the shadow deal) and the RESOURCE sweep over the draw and the resource pops, neither under a spotlight; an immediate attack outside the Combat phase (Crushing Arm after travel) plays its spotlight, then the table passes on.
 - Two-handed handoff: a Pass that turns the table to the other seat cuts to it at rest, with no flash of either seat's heroes or play area (`kindMoves`); a window the table passes is not drawn (`followAnswers`); pictures of a seat turned back to draw at once (`PARKED`).
 - Gestures and motion: drag smoothness; the 150 ms scrub hold, the lifted card's grow and the cancel line; the scrub's forward push into the drag (13 pt, from any part of the card) and the shake and reject haptic of a card that cannot be played; the reject haptic and dock line on a play the heroes cannot pay for; peek and back; card motion at Normal and Quick; reduced motion snaps; haptics on iOS and Android.
-- Combat spotlight (redesign): look at Normal and Quick in Dark and Light; cost on a low-end Android; the burn shader on each GPU; additive Atlas blending; the black fog (user request, 2026-11-04) reads as fog at the edges and the cards' feet in both themes, and its cost (nine fog draws over the screen); skip on canvas, bar and dock. Handover: `docs/handover/combat-spotlight-open.md`.
+- Combat spotlight: look at Normal and Quick in Dark and Light; cost on a low-end Android; the burn shader on each GPU; additive Atlas blending; the black fog (user request, 2026-11-04) reads as fog at the edges and the cards' feet in both themes, and its cost (nine fog draws over the screen); skip on canvas, bar and dock. Handover: `docs/handover/combat-spotlight-open.md`.
 - Performance: frame timing of card pickup, the hand scrub, the spotlight and opening the table (Profiler, Perf Monitor), and the loading frame on a cache miss; screens hidden by React Activity re-shown with their state (tabs, stacked screens, the table's pictures, a tab under a sheet's scrim, iOS swipe-back); the Sent and landing ticks' feel.
 - Separate stages (Breaking of the Fellowship): the staging owner tag, per-dial ticks, the peek banner's room, the per-seat quest advance screens and `table-area` with VoiceOver and TalkBack; fallen-hero art.
-- Choice words named by the scenario pipeline (2026-11-05): how The Seat of Amon Hen's player pick, the Reattach and attach-host prompts, Taking on Water's Ship objective, Lashing Tentacles' pick and Command's move read in the dock's folded line at 667x375 and 844x390, and with VoiceOver and TalkBack.
+- Choice words named by the scenario pipeline: how The Seat of Amon Hen's player pick, the Reattach and attach-host prompts, Taking on Water's Ship objective, Lashing Tentacles' pick and Command's move read in the dock's folded line at 667x375 and 844x390, and with VoiceOver and TalkBack.
 - Scenario sheets: Caught in a Web, Wolf Rider's second attack, The Oath's end-of-round Response and Tokens dial, the Pillar on the attack sheet; a person winning and losing each playable scenario with the log matching.
 - Look and theme: Skia fog and its drift (smooth, cheap, still under reduced motion), grit, `filter` effects, Barlow and Marcellus SC weights, Light's multiply and Dark's screen art blends with no hard edge, Small and Large scales, both themes, keep-awake, `userInterfaceStyle: automatic` after a prebuild.
 - Resign, briefing previews and Campaigns folds: Resign in the table menu (the confirm, then the lost outcome and the run in History); a tap on a briefing hero tile and a long press on a Ring-bearer candidate open the card; the candidate's square painting in both themes; Other journeys and New playthrough fold like Coming later (the stored fold, the count when folded, VoiceOver).
-- Table and deck fixes (`docs/plans/table-and-deck-fixes.md`), swipe feel: the stage preview's sideways swipe on a phone, and that an upright move still closes nothing.
+- Table and deck fixes (`docs/plans/done/table-and-deck-fixes.md`), swipe feel: the stage preview's sideways swipe on a phone, and that an upright move still closes nothing.
 - Table and deck fixes, column touch pass-through: a tap on the command column's empty top and on the empty canvas under it reaching the canvas (folding the tray), the dock and the meter keeping theirs, the tray's outside fold under a covered row.
 - Table and deck fixes, frame timing: crowded rows under the column, the dock crossing a row's foot, the dock growing over a still-extended row while the tray opens, and the table's first layout waiting for the column and the dock to be measured.
 - Table and deck fixes, both themes: the extended rows, the gradient under the canvas and the deck covers and lists without dots.
@@ -225,7 +216,6 @@ None ran. Each needs a device.
 - Tablets: iPad rotation on the tabs, deck editor and briefing; the rail; the portrait guard on the table (Split View, Stage Manager, Android 16); foldables; Campaigns art edge on an iPad in landscape; the briefing scene's Skia fade (`SceneCanvas`) on an iPad in landscape in Dark and Light: no line under the picture, no band at the pane's right edge, the dim matching the browser's.
 
 ## Standing decisions
-
 - Sources are online; no physical card or box check (user, 2026-10-24). The nine MEC109 cards rest on the older printing's scans.
 - Every Rules Reference action window opens; Responses are offered as soon as their trigger resolves; deckbuilding follows the Rules Reference (one to three heroes, no sphere match on save) (user, 2026-10-25).
 - An event with no record cannot be played (`rr.triggered-ability`) (user, 2026-10-26).
