@@ -102,17 +102,18 @@ export function nextEnemyGroup(state: ScenarioState): { seat: number; enemies: s
 // The shadow card is not turned up yet: it resolves once the defender is declared or the attack is undefended.
 // Forced effects "when this enemy attacks" (141069:A:2) resolve as the attack begins (rr.step-6-4b), before the defender is
 // declared: the defense window waits for their frames.
+export type BeginAttackOptions = { readonly fromStaging?: boolean; readonly shadow?: boolean };
+
 export function beginEnemyAttack(
   state: ScenarioState,
   seat: number,
   enemyId: string,
   ctx: ReduceContext,
   steps: EngineStep[],
-  // An effect made an enemy in the staging area attack (families/south/watcher.ts).
-  fromStaging = false,
-  // `false`: no shadow card is dealt for the attack, though the enemy is considered engaged with each player ("Do not deal a shadow card for this attack", 19083:B:1).
-  shadow = true,
+  options: BeginAttackOptions = {},
 ): ScenarioState {
+  // `fromStaging`: an effect made an enemy in the staging area attack (families/south/watcher.ts). `shadow: false`: no shadow card is dealt for the attack, though the enemy is considered engaged with each player ("Do not deal a shadow card for this attack", 19083:B:1).
+  const { fromStaging = false, shadow = true } = options;
   const attacker = state.cards[enemyId];
   const here = attacker != null && (attacker.zone === "engaged" || engagedWithAll(state, enemyId) || viaRelay(state, enemyId) || (fromStaging && attacker.zone === "staging"));
   if (!attacker || !here || attackBarred(state, enemyId, seat)) return state;
@@ -230,14 +231,12 @@ export function canAttack(
   const printed = printedOf(cards, attacker.code);
   if (!isCharacterType(printed) || attacker.host != null) return false;
   // A ship-objective attacks only ship-enemies (dcce.ship-objectives), and only Ship objectives can be declared as attackers against Raider Flagship (12124:A:3).
-  if (familyAttackReason(state, enemyId, printed, printedOf(cards, enemy.code))) return false;
+  if (familyAttackReason(state, enemyId, printed, printedOf(cards, enemy.code), attackerId)) return false;
   // "Ship enemies ... cannot be attacked" (11024:A:1), "characters you control cannot attack Ship enemies" (11063:A:1).
   if (flagged(state, enemyId, "cannotBeAttacked") || attackerLimitReached(state, enemyId)) return false;
   if (printedOf(cards, enemy.code).ship === "enemy" && flagged(state, attackerId, "cannotAttackShips")) return false;
   // "You cannot attack ... enemies with a title other than Marshland Outlaws" (attackOnlyTitle, 900202:A:1).
   if (titleBarred(state, attacker.controller, enemyId, cards)) return false;
-  // "Allies cannot be declared as attackers against Dagnir" (19068:A:1).
-  if (printed.type === "ally" && flagged(state, enemyId, "alliesCannotAttack")) return false;
   // An enemy in the staging area that is considered engaged with the first player (the Balrog, 142044:A:2): only the first player declares
   // attackers against it, with their own characters and ranged characters of the others (rr.ranged).
   if (enemy.zone === "staging" && flagged(state, enemyId, "engagedWithFirst")) {
@@ -387,14 +386,13 @@ export function heroIds(state: ScenarioState, seat: number): string[] {
 // The characters an undefended attack's damage may be assigned to: the seat's heroes, and a character that says damage from
 // undefended attacks may be assigned to it (takesUndefendedDamage).
 export function undefendedTargets(state: ScenarioState, seat: number, cards: Cards): string[] {
-  // The attack is made against the main quest card, or an effect sent the undefended damage to it (families/wilderland/night.ts).
-  if (state.pendingAttack?.toStage && state.questStage) return [state.questStage];
   // A shadow effect sent the damage to an active location (families/south/watcher.ts).
   const locations = undefendedLocations(state);
   if (locations.length > 0) return locations;
-  // A ship-enemy's undefended attack damages a ship-objective its player controls, not a hero (dcce.ship-enemies).
-  const ships = familyUndefendedTargets(state, () => characters(state, seat, cards), cards);
-  if (ships.length > 0) return [...ships];
+  // A family sends the damage elsewhere: a ship-enemy's undefended attack damages a ship-objective its player controls, not a hero (dcce.ship-enemies); an attack on the main quest card
+  // damages the quest card (families/wilderland/night.ts).
+  const redirected = familyUndefendedTargets(state, () => characters(state, seat, cards), cards);
+  if (redirected.length > 0) return [...redirected];
   const heroes = heroIds(state, seat);
   const own = [...heroes, ...characters(state, seat, cards).filter((id) => !heroes.includes(id) && flagged(state, id, "takesUndefendedDamage"))];
   // A character another card lets take it for this player (08093), whoever controls that character.

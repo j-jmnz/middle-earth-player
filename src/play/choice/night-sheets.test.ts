@@ -7,6 +7,7 @@ import type { Effect } from "../../catalog/boundary.ts";
 import { legalIntents } from "../../rules/engine/legal.ts";
 import { reduce } from "../../rules/engine/reduce.ts";
 import { settle } from "../../rules/engine/machine.ts";
+import { modifiedStat } from "../../rules/core/keywords.ts";
 import { updateCard, type ScenarioState } from "../../rules/core/state.ts";
 import { spawn } from "../../rules/core/zones.ts";
 import { pushCardEffects } from "../../rules/interpret/effect-frames.ts";
@@ -15,6 +16,7 @@ import { expectOk } from "../../rules/core/test-fixture.ts";
 import { CODES, idOf, loadNightWorld, nightTable, send, start, type NightWorld } from "../../../test/scenarios/fire-in-the-night/scene.ts";
 import { momentOf } from "../store/outcome.ts";
 
+import { windowSheet } from "./bar-sheets.ts";
 import { sheetFor, triggerOptions } from "./sheets.ts";
 
 let world: NightWorld;
@@ -63,9 +65,9 @@ describe("the first player's choice of the current quest (emce.side-quests-in-pl
       const run = toQuestQuestion(t);
       expect(run.state.phase).toBe("Quest");
       const sheet = sheetOf(t, run.state);
-      expect(sheet.note).toBe(`${lead} in the staging area the current quest until the end of the phase, or keep Hrogar's Hill? Progress goes on the active location first, then on the current quest instead of Hrogar's Hill: what it cannot take is discarded.`);
+      expect(sheet.note).toBe(`${lead} in the staging area the current quest until the end of the phase, or keep Hrogar's Hill? Progress goes on the active location first, then on the current quest instead of Hrogar's Hill; progress beyond its quest points is discarded.`);
       expect(sheet.note).not.toContain("chooses");
-      expect(labels(sheet)).toEqual(["Keep Hrogar's Hill as the quest", "Make Hold the Door the current quest"]);
+      expect(labels(sheet)).toEqual(["Keep Hrogar's Hill as the current quest", "Make Hold the Door the current quest (0 of 10 progress)"]);
     }
   });
 
@@ -75,11 +77,27 @@ describe("the first player's choice of the current quest (emce.side-quests-in-pl
     expect(run.state.window?.kind).toBe("choose");
     const sheet = sheetOf(t, run.state);
     expect(sheet.note).toMatch(/^Player 1: make 1 of the 2 side quests in the staging area the current quest until the end of the phase, or keep Hrogar's Hill\?/);
-    expect(labels(sheet)).toEqual(["Keep Hrogar's Hill as the quest", "Make Hold the Door the current quest", "Make Face the Dragon the current quest"]);
+    expect(labels(sheet)).toEqual(["Keep Hrogar's Hill as the current quest", "Make Hold the Door the current quest (0 of 10 progress)", "Make Face the Dragon the current quest (0 of 10 progress)"]);
     const kept = take(t, run.state, "main");
     expect(currentSideQuest(kept)).toBeNull();
     run = { state: take(t, run.state, idOf(run.state, CODES.faceTheDragon)), steps: [] };
     expect(currentSideQuest(run.state)).toBe(idOf(run.state, CODES.faceTheDragon));
+  });
+
+  it("a row shows the side quest's progress, and Draw Her Fire's says Dagnir then attacks the first player (19066:A:2)", () => {
+    const t = nightTable(world, { seats: 1, phase: "Planning", sideQuests: [CODES.holdTheDoor], staging: [CODES.dagnir, CODES.drawHerFire] });
+    const sheet = sheetOf(t, toQuestQuestion(t).state);
+    expect(labels(sheet)).toContain("Make Draw Her Fire the current quest (0 of 5 progress; Dagnir then attacks the first player)");
+    expect(labels(sheet)).toContain("Make Hold the Door the current quest (0 of 10 progress)");
+  });
+
+  it("the commit sheet names the side quest that is the current quest", () => {
+    const t = nightTable(world, { seats: 1, phase: "Planning", sideQuests: [CODES.holdTheDoor], staging: [CODES.dagnir, CODES.faceTheDragon] });
+    const asked = toQuestQuestion(t).state;
+    const chosen = take(t, asked, idOf(asked, CODES.faceTheDragon));
+    expect(currentSideQuest(chosen)).toBe(idOf(chosen, CODES.faceTheDragon));
+    const sheet = windowSheet(chosen, t.ctx, legalIntents(chosen, t.ctx), names(chosen));
+    expect(sheet.title).toBe("Commit to Face the Dragon (current quest until the end of the phase)");
   });
 
   it("is the first player's question: Player 2 is asked when the first player token has moved", () => {
@@ -100,8 +118,13 @@ describe("the side quest deck's reveal and the attack on Hrogar's Hill (19083:B:
       const result = expectOk(reduce(before, { type: "Pass" }, t.ctx));
       run = { state: result.state, steps: [...run.steps, ...result.steps] };
       if (result.steps.some((step) => step.kind === "reveal")) {
-        const moment = momentOf(before, result.state, result.steps, { card: (id: string) => nameOf(result.state.cards[id]?.code ?? id) } as never);
-        expect(JSON.stringify(moment)).toContain("Revealed Hold the Door from the side quest deck: its When Revealed effects cannot be canceled");
+        const card = (id: string) => nameOf(result.state.cards[id]?.code ?? id);
+        const plain = JSON.stringify(momentOf(before, result.state, result.steps, { card } as never));
+        expect(plain).toContain("Revealed Hold the Door from the side quest deck: it is added to the staging area.");
+        expect(plain).toContain("End of the planning phase");
+        expect(plain).not.toContain("cannot be canceled");
+        // A side quest with a When Revealed effect says nothing cancels it.
+        expect(JSON.stringify(momentOf(before, result.state, result.steps, { card, revealed: () => "When Revealed: ..." } as never))).toContain("Its When Revealed effect cannot be canceled by player cards.");
         return;
       }
     }
@@ -114,7 +137,7 @@ describe("the side quest deck's reveal and the attack on Hrogar's Hill (19083:B:
       const run = planningEnds(t);
       expect(run.state.window).toMatchObject({ kind: "defense", seat: 0 });
       const sheet = sheetOf(t, run.state);
-      expect(sheet.note).toBe(`${lead}Dagnir attacks Hrogar's Hill. No shadow card is dealt. A defender takes the damage its Defense leaves, and the damage beyond its hit points goes to Hrogar's Hill. Leave it undefended and all 7 damage is dealt to Hrogar's Hill. Hrogar's Hill holds 0 of 50 damage.`);
+      expect(sheet.note).toBe(`${lead}No shadow card is dealt. A defender takes the attack minus its Defense; damage beyond its hit points goes to Hrogar's Hill. Leave it undefended and all 7 damage is dealt to Hrogar's Hill. Hrogar's Hill holds 0 of 50 damage.`);
       expect(sheet.kind === "pick" && sheet.alternative?.label).toBe("Leave undefended");
       expect(leaveCaution(sheet)).toBeUndefined();
     }
@@ -131,13 +154,25 @@ describe("the side quest deck's reveal and the attack on Hrogar's Hill (19083:B:
     expect(hill(left.state).damage).toBe(51);
   });
 
+  it("a defender whose hit points the damage exceeds shows what goes on Hrogar's Hill, and the row is armed when that fills the Hill", () => {
+    const t = nightTable(world, { phase: "Planning", sideQuests: [CODES.holdTheDoor], staging: [CODES.dagnir] });
+    const hurt = { ...t, state: updateCard(updateCard(t.state, t.hero, { damage: modifiedStat(t.state, t.state.cards[t.hero]!, "hitPoints", world.cards) - 1 }), t.state.questStage ?? "", { damage: 49 }) };
+    const sheet = sheetOf(hurt, planningEnds(hurt).state);
+    const row = sheet.options.find((option) => option.id === hurt.hero);
+    expect(row?.label).toMatch(/ · \+\d+ to Hrogar's Hill/);
+    expect(row && "caution" in row ? row.caution : undefined).toBe("Tap again: Hrogar's Hill holds 50 damage and the game is lost");
+    // A defender that holds the damage has no such suffix.
+    const fresh = sheetOf(t, planningEnds(t).state);
+    expect(fresh.options.every((option) => !option.label.includes("to Hrogar's Hill"))).toBe(true);
+  });
+
   it("The Dragon's Fury (19081:A:1) is a different attack: it has its shadow card, and only the damage left undefended goes to Hrogar's Hill", () => {
     for (const [seats, lead] of [[1, ""], [2, "Player 1: "]] as const) {
       const t = nightTable(world, { seats, staging: [CODES.dagnir, CODES.theDragonSFury], deck: ["f0", "f3"] });
       const state = opened(t, t.state, CODES.theDragonSFury, "whenRevealed", idOf(t.state, CODES.theDragonSFury), "whenRevealed");
       expect(state.window).toMatchObject({ kind: "defense", seat: 0 });
       const sheet = sheetOf(t, state);
-      expect(sheet.note).toBe(`${lead}Dagnir attacks. Choose a defender, or leave it undefended: then all 7 damage is dealt to Hrogar's Hill, not to a character. Hrogar's Hill holds 0 of 50 damage.`);
+      expect(sheet.note).toBe(`${lead}Choose a defender, or leave it undefended and the 7 damage, before its shadow card, is dealt to Hrogar's Hill, not to a character. Hrogar's Hill holds 0 of 50 damage.`);
       expect(sheet.note).not.toContain("No shadow card");
     }
   });
@@ -158,7 +193,7 @@ describe("a defeated side quest's Response (emce.side-quests-in-play)", () => {
       for (let pass = 0; pass < 4 && run.state.window?.kind !== "response"; pass += 1) run = send(run, { type: "Pass" }, t.ctx);
       const sheet = sheetOf(t, run.state);
       expect(sheet.kind).toBe("trigger");
-      expect(sheet.note).toBe(`${lead}Hold the Door is defeated and goes to the victory display; Hrogar's Hill does not advance. Use its Response, or pass: passing gives it up.`);
+      expect(sheet.note).toBe(`${lead}Hold the Door is defeated and goes to the victory display; Hrogar's Hill does not advance. Use its Response, or pass to give it up.`);
       expect(sheet.title).toBe("Hold the Door");
       expect(sheet.kind === "trigger" && sheet.pass).toBe("Pass");
       expect(sheet.kind === "trigger" && sheet.options.map((option) => option.timing)).toEqual(["Response"]);
@@ -172,7 +207,7 @@ describe("a defeated side quest's Response (emce.side-quests-in-play)", () => {
     const t = nightTable(world, { seats: 2, staging: [CODES.dagnir], victory: [CODES.fortifyTheDefense], deckOf: ["f0", "f0", "f0", "f0"] });
     const state = opened(t, t.state, CODES.fortifyTheDefense, "response", idOf(t.state, CODES.fortifyTheDefense));
     const sheet = sheetOf(t, state);
-    expect(sheet.note).toBe("Player 1: Fortify the Defense is defeated: draw 3 cards, or each hero you control gains 1 resource?");
+    expect(sheet.note).toBe("Player 1: Fortify the Defense is defeated. Draw 3 cards, or each hero you control gains 1 resource?");
     expect(labels(sheet)).toEqual(["Draw 3 cards", "Each hero you control gains 1 resource"]);
     const next = sheetOf(t, take(t, state, "draw"));
     expect(next.note).toMatch(/^Player 2: Fortify the Defense is defeated/);
@@ -186,7 +221,7 @@ describe("The Dragon's Thrall (19075:A:1) and Orc of the Flame (19076:A:1)", () 
       const thrall = spawn(t.state, CODES.theDragonSThrall, { zone: "engaged", seat: 0 });
       const state = opened(t, thrall.state, CODES.theDragonSThrall, "forced", thrall.id);
       const sheet = sheetOf(t, state);
-      expect(sheet.note).toBe(`${lead}The Dragon's Thrall has engaged you: deal 3 damage to Hrogar's Hill, or it makes an immediate attack against you?`);
+      expect(sheet.note).toBe(`${lead}The Dragon's Thrall has engaged you. Deal 3 damage to Hrogar's Hill, or it makes an immediate attack against you (Attack 3)?`);
       expect(labels(sheet)).toEqual(["Deal 3 damage to Hrogar's Hill", "The Dragon's Thrall makes an immediate attack against you"]);
     }
   });
@@ -195,7 +230,7 @@ describe("The Dragon's Thrall (19075:A:1) and Orc of the Flame (19076:A:1)", () 
     const t = nightTable(world, { seats: 2, staging: [CODES.dagnir, CODES.orcOfTheFlame] });
     const state = opened(t, t.state, CODES.orcOfTheFlame, "whenRevealed", idOf(t.state, CODES.orcOfTheFlame), "whenRevealed");
     const sheet = sheetOf(t, state);
-    expect(sheet.note).toBe("Player 1: Orc of the Flame: deal 2 damage to a hero you control, or 3 damage to Hrogar's Hill?");
+    expect(sheet.note).toBe("Player 1, Orc of the Flame: deal 2 damage to a hero you control, or 3 damage to Hrogar's Hill?");
     expect(labels(sheet)).toEqual(["Deal 2 damage to a hero you control", "Deal 3 damage to Hrogar's Hill"]);
     expect(hill(take(t, state, "hill")).damage).toBe(3);
   });

@@ -15,7 +15,7 @@ import { topFrame } from "../../rules/windows/windows.ts";
 import type { BranchNow } from "./aflame.ts";
 import type { ChoiceNames, PickWords } from "./choice.ts";
 import { heathAsk, heathBranchWords, heathChooseNote, heathOptionLabel } from "./heath.ts";
-import { nightAsk, nightBranchWords, nightChooseNote } from "./night.ts";
+import { nightAsk, nightBranchWords, nightChooseNote, nightQuestsNow } from "./night.ts";
 import { rhovanionAsk, rhovanionBranchWords, rhovanionChooseNote } from "./rhovanion.ts";
 import { askedSeat, seatSays } from "./seat.ts";
 import { assignDamageWords } from "./south.ts";
@@ -225,7 +225,7 @@ function distributeBranch(option: Extract<Instruction, { verb: "Choose" }>["opti
 }
 
 /** The numbers a Choose states for its branches now: how many cards each count finds for the seat choosing, and the amounts read from the table. */
-export function wilderlandBranchNow(game: ScenarioState, ctx: ReduceContext, choose: Extract<Instruction, { verb: "Choose" }>, seat: number, sourceId: string | null): Pick<BranchNow, "counted"> {
+export function wilderlandBranchNow(game: ScenarioState, ctx: ReduceContext, choose: Extract<Instruction, { verb: "Choose" }>, seat: number, sourceId: string | null): Pick<BranchNow, "counted" | "quests"> {
   const counted: Record<string, number> = {};
   for (const option of choose.options) {
     const step = countedBranch(option, choose);
@@ -237,12 +237,13 @@ export function wilderlandBranchNow(game: ScenarioState, ctx: ReduceContext, cho
     const spread = distributeBranch(option);
     if (spread) counted[option.id] = resolveAmount(game, spread.amount, frameScope(game, seat, sourceId), ctx);
   }
-  return Object.keys(counted).length > 0 ? { counted } : {};
+  const quests = nightQuestsNow(game, ctx, choose);
+  return { ...(Object.keys(counted).length > 0 ? { counted } : {}), ...(quests ? { quests } : {}) };
 }
 
 /** A branch that counts cards, with the number now: "Raise your threat by 3 (1 for each ally you control)", "Deal 1 damage to each ally you control (3)". Null for any other branch. */
 export function wilderlandBranchWords(choose: Extract<Instruction, { verb: "Choose" }>, optionId: string, names: ChoiceNames, now?: BranchNow, source?: string | null, game?: ScenarioState): string | null {
-  const accolade = heathBranchWords(choose, optionId, names, game) ?? rhovanionBranchWords(choose, optionId, names, game) ?? nightBranchWords(choose, optionId, names, source);
+  const accolade = heathBranchWords(choose, optionId, names, game) ?? rhovanionBranchWords(choose, optionId, names, game) ?? nightBranchWords(choose, optionId, names, source, now);
   if (accolade) return accolade;
   const offer = searchOffer(choose);
   if (offer) return optionId === "search" ? `Search for ${names.code(offer.code)}` : "Don't search: no treasure this scenario";

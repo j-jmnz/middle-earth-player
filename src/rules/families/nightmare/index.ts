@@ -127,7 +127,7 @@ function attackActor(state: ScenarioState, focus: Focus, ctx: ReduceContext, ste
   const staged = enemy.zone === "staging";
   if (!staged && !(enemy.zone === "engaged" && enemy.controller === focus.seat)) return state;
   const dealt = staged ? dealForAttack(state, id, steps) : dealAttackShadow(state, id, ctx, steps);
-  const begun = beginEnemyAttack(dealt, focus.seat, id, ctx, steps, staged);
+  const begun = beginEnemyAttack(dealt, focus.seat, id, ctx, steps, { fromStaging: staged });
   return begun.pendingAttack ? { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true } } : begun;
 }
 

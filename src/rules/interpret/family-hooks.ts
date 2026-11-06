@@ -202,9 +202,9 @@ export function familyDefenseReason(state: ScenarioState, defender: PrintedCard,
 }
 
 /** Why a family bars the attacker from being declared against the enemy, or null (the first family's reason). */
-export function familyAttackReason(state: ScenarioState, enemyId: string, attacker: PrintedCard, target: PrintedCard, families: readonly RulesFamily[] = active()): string | null {
+export function familyAttackReason(state: ScenarioState, enemyId: string, attacker: PrintedCard, target: PrintedCard, attackerId: string, families: readonly RulesFamily[] = active()): string | null {
   for (const family of hooked(families).combat) {
-    const reason = family.combat?.attack?.(state, enemyId, attacker, target);
+    const reason = family.combat?.attack?.(state, enemyId, attacker, target, attackerId);
     if (reason) return reason;
   }
   return null;

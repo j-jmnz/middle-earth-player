@@ -245,10 +245,16 @@ describe("12187:B Resolution", () => {
   it("12188:A:1 the confirm sentence records the boxes marked beside Beldis in the game, for each player", () => {
     const facts = { prisoner: null, usedOnce: [], counters: {}, beldisUses: [2, 0] };
     const state = won(opened(2, 1, { facts }), takeLine).state;
-    const view = resolutionView(state, worldOf());
-    expect(view).toMatchObject({ kind: "settled", beldis: ["Player 1: Beldis, 2 of 4 boxes marked", "Player 2: Beldis, 0 of 4 boxes marked"] });
+    // The log held 1 box for the first player before this game: only the marks this game adds are told.
+    const view = resolutionView(state, worldOf(), [1, 0]);
+    expect(view).toMatchObject({ kind: "settled", beldis: ["Player 1 marks 1 box beside Beldis (2 of 4 marked)"] });
     if (view.kind !== "settled") return;
-    expect(settledSentence(view, worldOf(), "The Ghost of Framsburg")).toContain("The boxes beside Beldis are recorded in the campaign log: Player 1: Beldis, 2 of 4 boxes marked. Player 2: Beldis, 0 of 4 boxes marked.");
+    expect(settledSentence(view, worldOf(), "The Ghost of Framsburg")).toContain(" Player 1 marks 1 box beside Beldis (2 of 4 marked).");
+    const both = resolutionView(state, worldOf());
+    expect(both).toMatchObject({ kind: "settled", beldis: ["Player 1 marks 2 boxes beside Beldis (2 of 4 marked)"] });
+    // Solo: "You mark".
+    const solo = resolutionView(won(opened(1, 1, { facts: { prisoner: null, usedOnce: [], counters: {}, beldisUses: [3] } }), takeLine).state, worldOf(), [2]);
+    expect(solo).toMatchObject({ kind: "settled", beldis: ["You mark 1 box beside Beldis (3 of 4 marked)"] });
     // A game that used Beldis for nobody says nothing of the boxes.
     const quiet = resolutionView(won(opened(1), takeLine).state, worldOf());
     expect(quiet.kind === "settled" && quiet.beldis).toBeUndefined();

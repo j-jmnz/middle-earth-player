@@ -3,25 +3,22 @@
 // make one the current quest at the beginning of the quest phase, progress goes on it once the active location is full (beyond its quest points it is discarded), and a defeated one is added to the victory display with no advance of the quest deck. The attack
 // against Hrogar's Hill (the main quest card takes the damage of an undefended attack, and the excess damage past a defender) and the boxes marked beside Beldis in the campaign log are here too. A game that dealt no side quest deck reads none of it.
 import type { Instruction } from "../../../catalog/boundary.ts";
+import { isAllyLike } from "../../core/printed.ts";
+import type { CombatHooks } from "../../interpret/family-manifest.ts";
 
 import { BELDIS_BOXES } from "../../../catalog/ally-lines.ts";
 import { ruleCause } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
-import { modifiedStat } from "../../core/keywords.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { NAMED_PILES, pileOf } from "../../core/piles.ts";
-import { printedOf } from "../../core/printed.ts";
-import type { ScenarioState } from "../../core/state.ts";
-import { beginEnemyAttack } from "../../combat/combat.ts";
-import { attackBarred } from "../../interpret/constants.ts";
+import { flagged, type ScenarioState } from "../../core/state.ts";
 import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import { startReveal } from "../../windows/frames.ts";
-import { patchTop } from "../../windows/windows.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
-import { effectData } from "../encounter/moves.ts";
 import { defeatSideQuest } from "../sidequests/quest.ts";
-import { hasSideQuests, isSideQuest, stagedSideQuests } from "./night-quest.ts";
+import { hasSideQuests, isSideQuest, sideQuestPoints, stagedSideQuests } from "./night-quest.ts";
+import { attackNowFromStaging } from "../south/watcher.ts";
 import type { Focus } from "../index.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
@@ -72,7 +69,7 @@ export function defeatFullSideQuests(state: ScenarioState, ctx: ReduceContext, s
   for (const id of stagedSideQuests(state, ctx)) {
     const quest = next.cards[id];
     if (!quest || quest.progress <= 0) continue;
-    const points = printedOf(ctx.cards, quest.code).questPoints == null ? null : modifiedStat(next, quest, "questPoints", ctx.cards);
+    const points = sideQuestPoints(next, quest, ctx.cards);
     if (points != null && quest.progress >= points) next = defeatSideQuest(next, id, ctx, steps);
   }
   return next;
@@ -85,12 +82,8 @@ export function defeatFullSideQuests(state: ScenarioState, ctx: ReduceContext, s
 export function attackStage(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const id = lastPicked(state);
   const enemy = id ? state.cards[id] : undefined;
-  const seat = state.firstPlayer;
-  if (!id || enemy?.zone !== "staging" || !state.questStage || attackBarred(state, id, seat) || state.seats[seat]?.eliminated) return state;
-  const data = effectData(state);
-  const counted = data ? patchTop(state, { data: { ...data, returned: data.returned + 1 } }) : state;
-  const begun = beginEnemyAttack(counted, seat, id, ctx, steps, true, false);
-  return begun.pendingAttack ? { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true, toStage: true, excessToStage: true } } : begun;
+  if (!id || enemy?.zone !== "staging" || !state.questStage) return state;
+  return attackNowFromStaging(state, id, state.firstPlayer, ctx, steps, { shadow: false, toStage: true, excessToStage: true });
 }
 
 /** ExcessToStage: a Shadow effect marks the attack in progress: the damage beyond its defender's remaining hit points goes on the main quest card (19080:A:3). */
@@ -112,3 +105,12 @@ export function markBeldisUse(state: ScenarioState, focus: Focus): ScenarioState
 export function beldisBoxLeft(state: ScenarioState, seat: number): boolean {
   return (state.campaignFacts?.beldisUses?.[seat] ?? 0) < BELDIS_BOXES;
 }
+
+/**
+ * The combat hooks of the side quests' cards: allies (an ally, or an objective ally a player controls, but not an ally among the heroes) cannot be declared as attackers against an enemy that holds `alliesCannotAttack` (19068:A:1), and an attack on the main quest card sends the damage left
+ * undefended to it (19083:B:1, 19081:A:1).
+ */
+export const NIGHT_COMBAT: CombatHooks = {
+  attack: (state, enemyId, attacker, _target, attackerId) => (state.cards[attackerId]?.zone !== "heroes" && isAllyLike(attacker) && flagged(state, enemyId, "alliesCannotAttack") ? "Allies cannot attack that enemy" : null),
+  undefended: (state) => (state.pendingAttack?.toStage && state.questStage ? [state.questStage] : []),
+};

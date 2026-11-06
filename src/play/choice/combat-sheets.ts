@@ -8,7 +8,7 @@ import { defenseAsDefender, modifiedStat } from "../../rules/core/keywords.ts";
 import { legalTargets, type LegalIntent, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../rules/engine/reduce.ts";
 
 import { attackSource } from "../words/grapple.ts";
-import { nightStageAttack } from "../words/night.ts";
+import { nightDefenderExcess, nightStageAttack } from "../words/night.ts";
 import { damageOutcome, defenseDamage, undefendedDamage } from "../store/foresight.ts";
 import { has, option, statOf } from "./sheet-parts.ts";
 import type { Alternative, MultiSheet, OptionMark, Sheet, SheetNames, SheetStat } from "./sheet-types.ts";
@@ -95,8 +95,8 @@ export function defenseSheet(game: ScenarioState, ctx: ReduceContext, legal: rea
   const lone = "kind" in undefended ? null : undefended.type === "Undefended" ? undefended.heroId : null;
   const loneCaution = lone && numbers ? foreseen(game, ctx, names, lone, numbers.attack).caution : undefined;
   // The attack on Hrogar's Hill (19083:B:1) says where the damage goes, and arms Leave undefended when the Hill would hold as much as it has quest points.
-  const onHill = numbers ? nightStageAttack(game, ctx, names, numbers.enemyId, defenders.length) : null;
-  const cautious = onHill?.caution ?? loneCaution;
+  const onHill = numbers ? nightStageAttack(game, ctx, numbers.enemyId, defenders.length) : null;
+  const cautious = onHill ? onHill.caution : loneCaution;
   const leave: Alternative =
     "kind" in undefended
       ? { label: "Leave undefended", next: undefended }
@@ -114,13 +114,16 @@ export function defenseSheet(game: ScenarioState, ctx: ReduceContext, legal: rea
       const damage = numbers ? defenseDamage(game, ctx, numbers.enemyId, id) : 0;
       const base = option(game, names, id);
       const seen = foreseen(game, ctx, names, id, damage);
+      // Damage beyond the defender's hit points goes on Hrogar's Hill (19083:B:1): the row says how much, and arms the caution when that fills the Hill.
+      const hill = nightDefenderExcess(game, ctx, id, damage);
+      const caution = hill?.caution ?? ("caution" in seen ? seen.caution : undefined);
       return {
         ...base,
-        label: `${base.label}${seen.suffix}`,
+        label: `${base.label}${seen.suffix}${hill?.suffix ?? ""}`,
         stats: [{ icon: "defense" as const, value: defense, word: "Defense" }, ...seen.stats],
         mark: seen.mark,
         intent: { type: "DeclareDefender", defenderId: id },
-        ...("caution" in seen && seen.caution ? { caution: seen.caution } : {}),
+        ...(caution ? { caution } : {}),
       };
     }),
     primary: null,

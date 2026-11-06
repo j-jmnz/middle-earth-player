@@ -160,7 +160,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       cardCode: "19074",
       lines: ["19074:A:2"],
       timing: "constant",
-      instructions: [{ verb: "ModifyStat", stat: "cannotBeEngaged", amount: 1, until: "whileSourceInPlay", target: "self" }, { verb: "ModifyStat", stat: "damageCap", amount: X, until: "whileSourceInPlay", target: "self" }],
+      instructions: [{ verb: "ModifyStat", stat: "cannotBeEngaged", amount: 1, until: "whileSourceInPlay", target: "self" }, { verb: "ModifyStat", stat: "damageCap", amount: X, until: "whileSourceInPlay", target: "self" }, { verb: "ModifyStat", stat: "damageCapSparesQuest", amount: 1, until: "whileSourceInPlay", target: "self" }],
     },
     {
       id: "19074:constant:3",
@@ -241,7 +241,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     // 19079 Burning Watchtower. X, its Threat, is 1 more than the number of side quests in the victory display. Travel: each player assigns X damage among characters he controls.
     { id: "19079:constant:1", cardCode: "19079", lines: ["19079:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "threat", amount: X, until: "whileSourceInPlay", target: "self" }] },
     { id: "19079:travel:1", cardCode: "19079", lines: ["19079:A:2"], timing: "travel", instructions: [{ verb: "AssignDamage", amount: X, pick: { type: "character", control: "you" }, who: "eachSeat" }] },
-    // 19080 Powerful in Wrath (Doomed is a keyword). When Revealed: the active location is discarded and its Threat is dealt as damage to Hrogar's Hill; with no damage dealt it gains surge. The Shadow: the excess damage of the attack goes on Hrogar's Hill.
+    // 19080 Powerful in Wrath (Doomed is a keyword). When Revealed: the active location is discarded and its Threat is dealt as damage to Hrogar's Hill; with no damage dealt it gains surge (read before the location leaves play: a Threat that is a constant of the location is gone once it is discarded). The Shadow: the excess damage of the attack goes on Hrogar's Hill.
     {
       id: "19080:whenRevealed:1",
       cardCode: "19080",
@@ -250,8 +250,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [
         { verb: "Pick", pick: { type: "location", control: "any", active: true } },
         { verb: "DamageCard", amount: { stat: "threat", of: "picked" }, target: "questStage" },
-        { verb: "Discard", target: { kind: "picked" } },
         { verb: "GainSurge", when: { kind: "not", condition: { kind: "less", left: 0, right: { stat: "threat", of: "picked" } } } },
+        { verb: "Discard", target: { kind: "picked" } },
       ],
     },
     { id: "19080:shadow:1", cardCode: "19080", lines: ["19080:A:3"], timing: "shadow", instructions: [{ verb: "ExcessToStage" }] },

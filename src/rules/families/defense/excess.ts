@@ -74,7 +74,7 @@ export function combatDamage(
   const remaining = Math.max(0, modifiedStat(state, target, "hitPoints", ctx.cards) - target.damage);
   const excess = landed - remaining;
   if (excess <= 0) return placed;
-  if (toStage && state.questStage) return placeDamage(placed, state.questStage, excess, ctx.cards, steps, "combat", ruleCause("rr.damage"));
+  if (toStage && state.questStage) return noteHitPointsOn(placeDamage(placed, state.questStage, excess, ctx.cards, steps, "combat", ruleCause("rr.damage")), targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
   if (!toThreat && !toQuest && !toShip) return noteHitPointsOn(placed, targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
   // "Excess damage from this attack is dealt to a Ship objective you control" (11055:A:2): the excess is the X of the effect the attack leaves for its end.
   if (toShip && !toThreat && !toQuest) return noteExcess(placed, excess);

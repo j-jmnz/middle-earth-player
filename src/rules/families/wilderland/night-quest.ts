@@ -6,7 +6,7 @@ import { modifiedStat } from "../../core/keywords.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { NAMED_PILES, pileDealt } from "../../core/piles.ts";
 import { printedOf } from "../../core/printed.ts";
-import type { ScenarioState } from "../../core/state.ts";
+import type { CardInstance, ScenarioState } from "../../core/state.ts";
 import { flagged, updateCard } from "../../core/state.ts";
 
 /** The game deals a side quest deck (emce.side-quests): the other games never read any of this. */
@@ -19,6 +19,11 @@ export const isSideQuest = (state: ScenarioState, id: string, ctx: Pick<ReduceCo
 /** The side quests in the staging area, in the order they were added. */
 export function stagedSideQuests(state: ScenarioState, ctx: Pick<ReduceContext, "cards">): string[] {
   return state.staging.filter((id) => isSideQuest(state, id, ctx));
+}
+
+/** The quest points a side quest needs to be full, as modified now, or null when it prints none. */
+export function sideQuestPoints(state: ScenarioState, quest: CardInstance, cards: ReduceContext["cards"]): number | null {
+  return printedOf(cards, quest.code).questPoints == null ? null : modifiedStat(state, quest, "questPoints", cards);
 }
 
 /** The side quest that is the current quest until the end of the phase, or null (emce.side-quests-in-play). */
@@ -35,7 +40,7 @@ export function placeOnCurrentSideQuest(state: ScenarioState, amount: number, ca
   const id = currentSideQuest(state);
   const quest = id ? state.cards[id] : undefined;
   if (!id || !quest) return { state, remaining: amount };
-  const points = printedOf(cards, quest.code).questPoints == null ? null : modifiedStat(state, quest, "questPoints", cards);
+  const points = sideQuestPoints(state, quest, cards);
   const placed = points == null ? amount : Math.min(amount, Math.max(0, points - quest.progress));
   if (placed <= 0) return { state, remaining: 0 };
   steps.push({ kind: "progress", targetId: id, amount: placed, cause: ruleCause("emce.side-quests-in-play") });

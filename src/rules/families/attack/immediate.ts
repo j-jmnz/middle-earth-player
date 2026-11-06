@@ -24,6 +24,6 @@ export function attackWith(state: ScenarioState, enemyId: string, ctx: ReduceCon
   const data = seat == null ? effectData(state) : undefined;
   const counted = data ? patchTop(state, { data: { ...data, returned: data.returned + 1 } }) : state;
   const dealt = dealAttackShadow(counted, enemyId, ctx, steps);
-  const begun = beginEnemyAttack(dealt, target, enemyId, ctx, steps, enemy.zone === "staging");
+  const begun = beginEnemyAttack(dealt, target, enemyId, ctx, steps, { fromStaging: enemy.zone === "staging" });
   return begun.pendingAttack ? { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true } } : begun;
 }

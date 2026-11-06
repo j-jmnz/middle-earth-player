@@ -10,12 +10,11 @@ import { andList, carryVerb, carryWords } from "./carry-words.ts";
 import { legalIntents, type ScenarioState } from "../rules/engine/reduce.ts";
 import { answeredSeats, asksPlayers, resolutionResult, SKIP } from "../rules/setup/resolution.ts";
 import { isEncounterOption, LOG_LINE, poolTally, removalCode, removalSeat } from "../rules/families/wilderland/pool.ts";
-import { ALLY_LINE_FACTS, type AllyLine } from "../catalog/ally-lines.ts";
+import { ALLY_LINE_FACTS, BELDIS_BOXES, type AllyLine } from "../catalog/ally-lines.ts";
 
 import { contextOf } from "./session.ts";
 import type { World } from "./world.ts";
-import { cappedTally } from "./wilderland.ts";
-import { wilderlandView } from "./wilderland-view.ts";
+import { beldisUsed, cappedTally } from "./wilderland.ts";
 
 // `label`: the words on the tile ("Tireless Ranger on Sam Gamgee", "Turayn for Player 1"). `wide`: a tile with no card, laid in a row of its own under the card tiles (the log line). `tag` is a muted
 // word under the name that tells a kind apart (an encounter card of the pool), `copies` the copies of such a card the pool holds.
@@ -71,16 +70,20 @@ export type ResolutionView =
       lines?: readonly AllyLine[];
       poolAdded?: readonly string[];
       poolRemoved?: readonly string[];
-      // The boxes marked beside Beldis (emce.campaign-log), as the log screen reads them: one sentence a seat, when any is marked.
+      // The boxes this game marks beside Beldis (emce.campaign-log): one phrase a seat whose count rose.
       beldis?: readonly string[];
     };
 
-// The boxes beside Beldis a won game writes to the log (the Action of 12188 marks one for the player who used it), in the log screen's words.
-function beldisBoxes(state: ScenarioState): { beldis?: readonly string[] } {
+// The boxes beside Beldis this game marks (the Action of 12188 marks one for the player who used it), one sentence a seat whose count rose above the log's (`logged`), in the log screen's count: "Player 1 marks 1 box beside Beldis (3 of 4 marked)", solo "You mark 1 box ...".
+function beldisBoxes(state: ScenarioState, logged: readonly number[]): { beldis?: readonly string[] } {
   const uses = state.campaignFacts?.beldisUses ?? [];
-  if (!uses.some((used) => used > 0)) return {};
-  const view = wilderlandView({ treasures: [], allyLines: [], encounterPool: {}, beldisUses: uses }, state.seatCount);
-  return { beldis: view.beldis.map((row) => row.speech) };
+  const rows = uses.flatMap((used, seat) => {
+    const now = beldisUsed({ beldisUses: uses }, seat);
+    const rose = now - beldisUsed({ beldisUses: logged }, seat);
+    if (rose <= 0) return [];
+    return [`${state.seatCount > 1 ? `Player ${seat + 1} marks` : "You mark"} ${rose} ${rose === 1 ? "box" : "boxes"} beside Beldis (${now} of ${BELDIS_BOXES} marked)`];
+  });
+  return rows.length > 0 ? { beldis: rows } : {};
 }
 
 function nameOf(world: World, code: string): string {
@@ -113,7 +116,8 @@ function removalTile(world: World, optionId: string, tally: Readonly<Record<stri
   return { optionId, code, name, hero: null, label: shared && seat != null ? `${name} (Player ${seat + 1})` : name };
 }
 
-export function resolutionView(state: ScenarioState, world: World): ResolutionView {
+// `logged`: the boxes beside Beldis the campaign log holds before this game (the save's log), so the view names only the marks this game adds.
+export function resolutionView(state: ScenarioState, world: World, logged: readonly number[] = []): ResolutionView {
   if (state.lost) return { kind: "lost", reason: state.lossReason };
   const settled = resolutionResult(state);
   if (settled) {
@@ -126,7 +130,7 @@ export function resolutionView(state: ScenarioState, world: World): ResolutionVi
       ...((settled.allyLines ?? []).length > 0 ? { lines: [...(settled.allyLines ?? [])] } : {}),
       ...(changes.added.length > 0 ? { poolAdded: changes.added } : {}),
       ...(gone.length > 0 ? { poolRemoved: gone } : {}),
-      ...beldisBoxes(state),
+      ...beldisBoxes(state, logged),
       earned: settled.earned.map((item) => ({ code: item.code, hero: item.to === "hero" ? item.hero : null, seat: item.seat })),
       fallen: [...settled.fallen],
       captives: settled.captives.map((item) => item.hero),
@@ -346,7 +350,7 @@ export function settledSentence(view: Extract<ResolutionView, { kind: "settled" 
   const joined = view.poolAdded && view.poolAdded.length > 0 ? `${lines} ${copies(view.poolAdded)} join${view.poolAdded.length === 1 ? "s" : ""} the campaign pool as encounter cards.` : lines;
   const gone = view.poolRemoved && view.poolRemoved.length > 0 ? `${joined} ${copies(view.poolRemoved)} leave${view.poolRemoved.length === 1 ? "s" : ""} the campaign pool.` : joined;
   // The boxes marked beside Beldis in this game are recorded with the win (emce.campaign-log).
-  const left = view.beldis && view.beldis.length > 0 ? `${gone} The boxes beside Beldis are recorded in the campaign log: ${view.beldis.join(". ")}.` : gone;
+  const left = view.beldis && view.beldis.length > 0 ? `${gone} ${andList(view.beldis)}.` : gone;
   // The cards a Resolution keeps for the next campaign, not this one (01131:B:2): a sentence of its own.
   if (!view.carried || view.carried.length === 0) return left;
   const kept = view.carried.map((card) => ({ code: card.code, perPlayer: card.eachPlayer }));

@@ -215,6 +215,8 @@ const FLAGS = [
   "cancelsDamage",
   // On an enemy: it has at most this many damage tokens ("it cannot have more than 18 damage", 19023:B:3); damage past the amount is not placed. Read where damage is placed (rules/core/keywords.ts placeDamage).
   "damageCeiling",
+  // On a card that holds damageCap: the damage a quest card or a side quest deals is not counted against the cap or held to it ("takes at most X damage each round from effects other than a quest card's", 19074:A:2). Read where damage is placed (rules/core/keywords.ts placeDamage).
+  "damageCapSparesQuest",
   // On a character, or on every character ModifyStat target "characters" holds now and later: player card effects cannot ready it ("characters cannot be readied by player card effects", 19020:A:2). Read by readyBarred (rules/core/holder-classes.ts).
   "cannotReadyByPlayerCard",
   // On a location in the staging area: no more than this much progress can be placed on the locations in the staging area as a whole each round ("no more than 1 progress can be placed on locations in the staging area each round", 19042:A:1). Read by progressRoom (families/south/locations.ts).

@@ -161,7 +161,7 @@ export function enemyAttacksFirstPlayer(state: ScenarioState, id: string | null,
   const enemy = id ? state.cards[id] : undefined;
   const seat = state.firstPlayer;
   if (!id || !enemy || (enemy.zone !== "staging" && enemy.zone !== "engaged") || attackBarred(state, id, seat) || state.seats[seat]?.eliminated) return state;
-  const begun = beginEnemyAttack(dealAttackShadow(state, id, ctx, steps), seat, id, ctx, steps, enemy.zone === "staging");
+  const begun = beginEnemyAttack(dealAttackShadow(state, id, ctx, steps), seat, id, ctx, steps, { fromStaging: enemy.zone === "staging" });
   return begun.pendingAttack ? { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true } } : begun;
 }
 

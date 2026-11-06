@@ -199,7 +199,7 @@ export function placeDamage(state: ScenarioState, assigned: string, amount: numb
   const scaled = flagged(state, id, "cancelsDamage") ? cancelAllDamage(state, id, amount) : null;
   if (scaled) return scaled;
   // A card that takes no more than a number of damage each round ("cannot take more than 4 damage each round", 11177:A:4) takes what is left of it.
-  const cap = source === "quest" ? 0 : heldAmount(state, id, "damageCap");
+  const cap = source === "quest" && flagged(state, id, "damageCapSparesQuest") ? 0 : heldAmount(state, id, "damageCap");
   const taken = state.roundDamage?.[id] ?? 0;
   const resources = resourceShield(state, id, placedLimit(state, id, placedAmount(printed, amount)));
   // "The next time that character would be dealt damage this round, cancel 1 of that damage" (12166:A:2): the flag's points come off first, and it is spent.

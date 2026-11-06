@@ -72,7 +72,7 @@ export function triggerOptions(game: ScenarioState, ctx: ReduceContext, legal: r
       effectId: intent.effectId,
       cardId: intent.cardId,
       timing: TIMING_WORDS[effect.timing],
-      text: [lineOf(effect, names), nightActionNote(game, effect.id)].filter((part) => part != null).join(" ") || null,
+      text: [lineOf(effect, names), nightActionNote(game, effect)].filter((part) => part != null).join(" ") || null,
       pay: game.window?.kind === "cancelOffer" ? cancelRequest(game, ctx, intent.cardId) : triggerRequest(game, ctx, intent.cardId, effect),
     });
   }
@@ -126,9 +126,11 @@ function responseNote(game: ScenarioState, names: SheetNames, offers: readonly {
   const waiting = offers.filter((offer) => offer.seat === seat && !listed.some((item) => item.cardId === offer.cardId && item.effectId === offer.effectId));
   // At the end of the round, a card that counts tokens says what the count leads to (41050:B:1).
   const leads = event?.trigger === "endOfRound" ? offers.flatMap((offer) => tokenOutcome(ctx, game.cards[offer.cardId]?.code ?? "")).slice(0, 1) : [];
-  const base = nightResponseNote(game, names, event, listed.map((item) => item.cardId)) ?? ["A Response may be used now, or passed.", ...leads].join(" ");
+  const night = nightResponseNote(game, names, event, listed.map((item) => item.cardId));
+  const base = night ?? ["A Response may be used now, or passed.", ...leads].join(" ");
   if (waiting.length === 0) return base;
-  return `${base} Waiting for its cost, and offered once it can be paid: ${waiting.map((offer) => names.card(offer.cardId)).join(", ")}. Passing gives it up too.`;
+  // The side quest's sentence already says that passing gives it up.
+  return `${base} Waiting for its cost, and offered once it can be paid: ${waiting.map((offer) => names.card(offer.cardId)).join(", ")}.${night ? "" : " Passing gives it up too."}`;
 }
 
 // What the optional engagement is against: the seat's threat, and which enemies the engagement checks engage anyway or
@@ -269,7 +271,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         const ask = torch?.note ?? wilderlandChooseNote(choose, game, ctx, words, window.seat, source, data?.subject ?? null) ?? commandNote(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, names.card) ?? (source ? unchartedNote(choose, names.card(source)) : null) ?? "Choose one.";
         return {
           ...base,
-          note: [`${ask}${/^Player \d+: /.test(ask) ? "" : who}`, line].filter((part) => part != null).join(" "),
+          note: [`${ask}${/^Player \d+[:,] /.test(ask) ? "" : who}`, line].filter((part) => part != null).join(" "),
           verb: "Choose",
           confirm: "Confirm",
           alternative: stop ? { label: stop.label, intent: { type: "Choose", optionId: stop.optionId }, caution: stop.caution } : null,

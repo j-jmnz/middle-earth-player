@@ -15,13 +15,20 @@ import { STEP_WORDS, windowPoint } from "../phases/rail.ts";
 import type { DistributePurpose, DistributeSheet, MultiSheet, PickSheet, Sheet, SheetNames, TriggerOption, TriggerSheet, WindowSheet } from "./sheet-types.ts";
 import { option, statOf, step } from "./sheet-parts.ts";
 import { triggerOptions } from "./sheets.ts";
+import { currentSideQuest } from "../../rules/families/wilderland/night-quest.ts";
+
+// The commit names the quest it is to: the side quest a player made the current quest until the end of the phase (emce.side-quests-in-play), else the main quest.
+function commitTitle(game: ScenarioState, names: SheetNames): string {
+  const current = currentSideQuest(game);
+  return current ? `Commit to ${names.card(current)} (current quest until the end of the phase)` : "Commit to the quest";
+}
 
 export function commitSheet(game: ScenarioState, ctx: ReduceContext, names: SheetNames): MultiSheet {
   return {
     kind: "multi",
     key: `commit:${game.round}`,
     step: "Quest",
-    title: "Commit to the quest",
+    title: commitTitle(game, names),
     note: "Committed characters exhaust and add their willpower against the threat in staging.",
     verb: "Commit",
     options: legalTargets(game, { type: "Commit" }, ctx).map((id) => ({ ...option(game, names, id), stats: statOf(game, ctx, id, "willpower") })),
@@ -76,11 +83,11 @@ export function windowSheet(game: ScenarioState, ctx: ReduceContext, legal: read
     const sideQuests = sideQuestIds(game).map((id) => ({ id, label: names.card(id) }));
     const toSide = sideQuests.length > 0 ? ` Or send them to ${sideQuests.map((quest) => quest.label).join(" or ")}: its willpower goes on it as progress.` : "";
     return some
-      ? { ...base, sideQuests, title: "Commit to the quest", note: `Tap more characters to quest, or end the commit.${toSide}`, pass: "Done", passNote: "Done ends the commit.", armed: "Tap again: no one else quests" }
+      ? { ...base, sideQuests, title: commitTitle(game, names), note: `Tap more characters to quest, or end the commit.${toSide}`, pass: "Done", passNote: "Done ends the commit.", armed: "Tap again: no one else quests" }
       : {
           ...base,
           sideQuests,
-          title: "Commit to the quest",
+          title: commitTitle(game, names),
           note: `Tap characters to quest. They exhaust, so they cannot defend or attack this round.${toSide}`,
           pass: "Commit no one",
           passNote: "Pass sends no one.",

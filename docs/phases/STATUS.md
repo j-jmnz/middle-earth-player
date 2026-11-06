@@ -82,7 +82,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 | 54 | The King's Quest | active | 2026-11-05. Engine done; review round done. Phone half open: phone checks, both Maestro flows not run; `kingsquest-won` missing, so the win flow cannot run. |
 | 55 | The Withered Heath | active | 2026-11-05. Engine done; review round done. Phone half open: phone checks, both Maestro flows not run; `heath-won` missing, so the win flow cannot run. |
 | 56 | Roam Across Rhovanion | active | 2026-11-06. Engine done; review round done. Phone half open: phone checks, both Maestro flows not run; `rhovanion-won` missing, so the win flow cannot run. |
-| 57 | Fire in the Night | not started | |
+| 57 | Fire in the Night | active | 2026-11-06. Engine done; review round done. Phone half open: the table's side-quest area and current-quest mark, phone checks, both Maestro flows not run; `night-won` missing, so the win flow cannot run. |
 | 58 | The Ghost of Framsburg | not started | |
 | 59 | Mount Gundabad | not started | |
 | 60 | The Fate of Wilderland | not started | |
@@ -90,6 +90,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 ## Open items
 
 ### Fixtures and Maestro
+- `night-won` is not committed: none of 100 seeds wins Fire in the Night with the starter decklists. Until it exists `.maestro/scenarios/fire-in-the-night/fire-in-the-night.yaml` cannot run; a win can ask up to four Resolution questions and `subflows/scenario-win.yaml` takes two.
 - `rhovanion-won` is not committed: none of 100 seeds wins Roam Across Rhovanion with the starter decklists. Until it exists `.maestro/scenarios/roam-across-rhovanion/roam-across-rhovanion.yaml` cannot run, and it still needs the `CHOICE_*` and `CHOICE2_*` answers for the Resolution's location choice.
 - `heath-won` is not committed: none of 100 seeds wins The Withered Heath with the starter decklists. Until it exists `.maestro/scenarios/the-withered-heath/the-withered-heath.yaml` (with `CHOICE2_SEAT`) cannot run.
 - `kingsquest-won` is not committed: none of 100 seeds wins The King's Quest with the starter decklists. Until it exists `.maestro/scenarios/the-kings-quest/the-kings-quest.yaml` (and its `CHOICE2_*` path in `scenario-win.yaml`) cannot run.
@@ -158,7 +159,6 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 
 ### Screens and code
 - Ered Mithrin: a discovered treasure cannot reach a deck from the app. `validateLoadout` admits it, but `deckSaveRefusal`, the import, the deck store and the Cards pool read deck-legal rows only, and a saved deck is not tied to a save's log. Needs a design.
-- Ered Mithrin: nothing marks Beldis's boxes yet (phase 57).
 - Ered Mithrin: `AddEncounterToPool` with `inPlay` counts in-play copies the pool did not deal in, an upper bound, since copies have no identity.
 
 - Run history (28b): `recordUnclosedRun` has no test; a win left unconfirmed until an engine or data update drops it cannot be recorded; `run-writers.ts` imports `ScenarioState` through `play/store`.
@@ -184,6 +184,7 @@ Status is `not started`, `active`, or `completed`. Git keeps the history; this f
 ### Phone and tablet checks
 - Journey Up the Anduin: the treasure draw rows (picture from a code, long press) and character rows two-handed; The Old Ford's refusal and travel caution at 667 × 375; Ruined Supplies' rows; Weighed Down's discard rows; the Resolution's oath-line row beside two Turayn tiles; A Growing Threat's banner line; the Creatures piles and Haldan's flip on the table.
 - Wilderland table: the Creatures pair and Caves deck at 667 × 375 two-seat at Small/Medium/Large; the Discover strip over the engagement band, the veil with Loot and Hazard ringed above it, the hold on the last beat and glide to discard, staging taps after the banner; reduced motion; a Deep Cave arriving off the Caves deck; the reshuffle glide; a guarded treasure with a screen reader; both themes.
+- Fire in the Night: the current-quest question and the commit sheet's title, the side-quest reveal line, the Hill attack's defender rows with their overflow and caution, the side-quest Responses, Beldis's boxes, the Resolution's treasure, removal and Beldis sentences two-handed.
 - Roam Across Rhovanion: the Trust in Urdug question at Setup and after a claim, the Wilderland Bear and Deep Ravine sheets two-handed, Harsh Weather's rows, Durin's Key's attach, the random stage-2 banner, Urdug's and Tiny's previews on either side, the Resolution's location choice with its seat labels.
 - The Withered Heath: Deadly Cold's named rows and Tap again caution, the Accolade offer and decline rows two-handed, Master of the Hunt and The Canny Huntsman top/bottom steps at 667 × 375, the Dragon Sign count and stage 3/4 details, the Resolution's Song and treasure questions with their seat labels, the Campaign Setup boon-ally search.
 - The King's Quest: the Stone-troll discard count, Dagnir's Spawn's branch, the Eyes in the Dark hero caution (Tap again), the Resolution's burden choice with its seat label, the Dragon Scales shield badge, the long notes at 667 × 375.

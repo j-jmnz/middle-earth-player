@@ -334,7 +334,7 @@ function attackReason(
     if (seen.has(attackerId)) return "That character cannot attack twice";
     seen.add(attackerId);
     if (!canAttack(state, state.activeSeat, attackerId, intent.enemyId, ctx.cards)) {
-      const barred = familyAttackReason(state, intent.enemyId, printedOf(ctx.cards, state.cards[attackerId]?.code ?? ""), printedOf(ctx.cards, enemy.code));
+      const barred = familyAttackReason(state, intent.enemyId, printedOf(ctx.cards, state.cards[attackerId]?.code ?? ""), printedOf(ctx.cards, enemy.code), attackerId);
       if (barred) return barred;
       if (enemy.controller !== state.activeSeat) return "Ranged is required to attack an enemy engaged with another seat";
       return "That attack is illegal";

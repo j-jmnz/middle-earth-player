@@ -28,6 +28,8 @@ export const BEAT_MS = 650;
 // `shadow` gives the printed shadow line of a card, or null when it has no shadow effect; `stage` the printed lines of a quest
 // stage that say how it is won or held (not its When Revealed effects), or null.
 // `revealed` gives the printed When Revealed lines of a card (the Stormcaller's stage the C side of which was just revealed), or null.
+const SIDE_QUEST_TITLE = "End of the planning phase";
+
 type Names = { card: (cardId: string) => string; shadow?: (cardId: string) => string | null; stage?: (cardId: string) => string | null; revealed?: (cardId: string) => string | null };
 
 // "stage 3 of 4" for the Stormcaller's stage `cardId` (the area's current stage once it has advanced), or "its next stage" for a state that moved on.
@@ -173,9 +175,15 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
       case "reveal":
         // The Hazard a Discover revealed is told in Discover's own lines.
         if (steps.slice(0, index).some((earlier) => earlier.kind === "discover" && earlier.hazard === step.cardId)) return;
+        // A card of the side quest deck (emce.side-quests) is revealed at the end of the planning phase, not by the staging step: it joins the staging area, and nothing cancels its When Revealed effect.
+        if (before.cards[step.cardId]?.zone === "sideQuestDeck") {
+          if (!current || current.title !== SIDE_QUEST_TITLE) open(3, SIDE_QUEST_TITLE, "plain");
+          const cancel = names.revealed?.(step.cardId) ? " Its When Revealed effect cannot be canceled by player cards." : "";
+          line(`Revealed ${names.card(step.cardId)} from the side quest deck: it is added to the staging area.${cancel}`, null, [step.cardId]);
+          return;
+        }
         if (!current || current.rank !== 3 || current.whole) open(3, "Staging", "plain");
-        // A card of the side quest deck (emce.side-quests): it joins the staging area, and nothing cancels its When Revealed effects.
-        line(before.cards[step.cardId]?.zone === "sideQuestDeck" ? `Revealed ${names.card(step.cardId)} from the side quest deck: its When Revealed effects cannot be canceled` : `Revealed ${names.card(step.cardId)}`, null, before.cards[step.cardId]?.zone === "sideQuestDeck" ? [step.cardId] : []);
+        line(`Revealed ${names.card(step.cardId)}`);
         return;
       // The enemy was faceup when it was revealed: the line names it and the location it is facedown under now (dcce.grapple).
       case "grapple":
