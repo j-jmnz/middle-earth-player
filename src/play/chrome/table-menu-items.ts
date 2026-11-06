@@ -1,4 +1,4 @@
-// The rows of the table menu (docs/phases/done/phase-19-top-bar-menu.md): the five things that left the top bar, the scenario's setup card and Resign. Pure, so a test
+// The rows of the table menu (docs/design-system-table.md, Table menu): the five things that left the top bar, the scenario's setup card and Resign. Pure, so a test
 // reads the order and the words. The testIDs are the ones the controls had in the bar, so a Maestro flow taps `table-menu`
 // and then the same id.
 import type { IconName } from "../../ui/icon-map.ts";

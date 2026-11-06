@@ -35,6 +35,6 @@ Agents read `CLAUDE.md`, the rules, the agent files, `docs/phases/STATUS.md`, th
 ## Plans, phases and handovers
 
 - A plan under `docs/plans/` is live while its work is open. When the work is done, move it to `docs/plans/done/` and update the paths that cite it. Agents do not read `done/` unless a task names it.
-- A phase file is its spec and exit. When the phase is completed, remove the sections written only for the agent that built it (implementer notes, "Handover from phase N", a "Built" log) and move the file to `docs/phases/done/`. Its open items stay in `docs/phases/STATUS.md`.
-- A handover in `docs/handover/` exists while work is in flight or open. The final commit of that work deletes it, or cuts it to the points still open.
+- A phase file is its spec and exit. When the phase is completed, delete the file; git keeps it. Its open items stay in `docs/phases/STATUS.md`, and a citation of it in code or a live doc points to the doc that owns the behaviour (`docs/brief.md`, `docs/architecture.md`, the design system) instead.
+- A handover in `docs/handover/` exists while work is in flight or open. The final commit of that work deletes it, or cuts it to the points still open. Device checks that are all that is left go to `docs/phases/STATUS.md`, Phone and tablet checks, and the handover is deleted.
 - A paste-once prompt for a new session is not committed. Give it to the user in the report, or put it in the scratchpad.
