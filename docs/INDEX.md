@@ -29,22 +29,27 @@ Each agent reads its own file.
 
 Read the sections your task touches.
 
-- `README.md` — Middle Earth LCG (~3.7K tok)
+- `README.md` — Middle Earth LCG (~4.4K tok)
   - 8–16 Features (~210)
   - 17–27 Roadmap (~160)
   - 28–36 Accessibility (~340)
   - 37–46 Architecture (~310)
-  - 47–53 Install (~170)
-  - 54–106 Local setup (~780)
-    - 56–70 Requirements (~130)
-    - 71–80 In a browser (~140)
-    - 81–102 On a phone (~360)
-    - 103–106 Maestro (~150)
-  - 107–134 Commands (~760)
-  - 135–138 Contributing (~70)
-  - 139–147 Documentation (~170)
-  - 148–165 Attribution (~480)
-  - 166–169 License (~80)
+  - 47–85 Install (~890)
+    - 51–56 What you need (~100)
+    - 57–66 Android (~230)
+    - 67–74 iPhone and iPad (~190)
+    - 75–78 Check a download (optional) (~100)
+    - 79–85 If something goes wrong (~180)
+  - 86–138 Local setup (~780)
+    - 88–102 Requirements (~130)
+    - 103–112 In a browser (~140)
+    - 113–134 On a phone (~360)
+    - 135–138 Maestro (~150)
+  - 139–166 Commands (~760)
+  - 167–170 Contributing (~70)
+  - 171–179 Documentation (~170)
+  - 180–197 Attribution (~480)
+  - 198–201 License (~80)
 - `docs/architecture.md` — Architecture (~19.9K tok)
   - 7–41 Stack (~1.1K)
   - 42–77 Processes (~660)
@@ -180,7 +185,7 @@ Read the sections your task touches.
     - 441–446 Booklet (~280) ← 2
     - 447–450 Database (~20)
   - 451–470 States (~620)
-- `docs/releasing.md` — Releasing (~2.1K tok)
+- `docs/releasing.md` — Releasing (~2.0K tok)
 
 ## Phases
 

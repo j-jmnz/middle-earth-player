@@ -46,10 +46,42 @@ The stack is Expo SDK 58, Expo Router, Skia for the game table, Reanimated, Nati
 
 ## Install
 
-The app is not listed on the Play Store or the App Store.
+The app is not listed on the Play Store or the App Store. Android phones and tablets install it from this repository's [Releases page](https://github.com/j-jmnz/middle-earth-lcg/releases); iPhones and iPads install it through TestFlight, Apple's app for beta apps. It's free either way, and once installed it needs no network: every card, picture and booklet is inside the app.
 
-- Android: download the `.apk` from the latest release on the [Releases page](https://github.com/j-jmnz/middle-earth-lcg/releases) and open it on your phone. Allow your browser or file manager to install unknown apps when it asks. A newer release installs over the old one and keeps your campaigns. Each release's notes give the file's SHA-256 and the signing certificate's fingerprint.
-- iPhone and iPad: join the beta through the public TestFlight link in the latest release's notes, then install the app from Apple's TestFlight app. TestFlight offers each new release as an update and keeps your campaigns.
+### What you need
+
+- Android: Android 7.0 or later on a 64-bit phone or tablet (nearly every device sold since 2017).
+- iPhone or iPad: iOS or iPadOS 15.1 or later, an Apple ID, and the free TestFlight app from the App Store.
+- Room for a large download. The app carries every card picture and booklet, so download it over Wi-Fi and keep at least twice its size free while it installs.
+
+### Android
+
+1. On your phone, open the [latest release](https://github.com/j-jmnz/middle-earth-lcg/releases/latest) and, under Assets, tap the file named `middle-earth-lcg-v<version>.apk`. Leave the `.sha256` file; it is only for checking the download.
+2. When the download finishes, open it from the browser's downloads or from your Files app.
+3. The first time, Android asks whether this app (your browser or Files) may install unknown apps. Tap Settings, turn on Allow from this source, then go back.
+4. Tap Install. If Google Play Protect warns that it doesn't know the app, tap More details, then Install anyway: the app is signed by this project, not reviewed by Google.
+5. Open Middle Earth LCG from your app drawer.
+
+To update, install the newer release's `.apk` the same way. It installs over the old one and keeps your campaigns, decks and settings. Don't uninstall first: uninstalling deletes your saves.
+
+### iPhone and iPad
+
+1. Install [TestFlight](https://apps.apple.com/app/testflight/id899247664) from the App Store.
+2. On the same device, open the public TestFlight link in the latest release's notes on the [Releases page](https://github.com/j-jmnz/middle-earth-lcg/releases/latest).
+3. Tap Accept, then Install. The app appears on your home screen like any other.
+
+TestFlight shows each new release as an update; tap Update in TestFlight, or turn on Automatic Updates on the app's page in TestFlight. Updating keeps your campaigns. A TestFlight build stops opening 90 days after it was published, and a new release always comes out before then: if the app says it has expired, open TestFlight and install the latest build. Deleting the app deletes your saves.
+
+### Check a download (optional)
+
+Each release's notes give the APK's SHA-256 and the fingerprint of the certificate it is signed with. To check the file on a computer, compare the notes' SHA-256 with the output of `sha256sum middle-earth-lcg-v<version>.apk` (Linux), `shasum -a 256 middle-earth-lcg-v<version>.apk` (macOS) or `certutil -hashfile middle-earth-lcg-v<version>.apk SHA256` (Windows).
+
+### If something goes wrong
+
+- "App not installed" on Android: the phone is 32-bit or older than Android 7.0, there isn't enough free space, or a copy of the app you built yourself is installed. A self-built copy is signed with a different key: uninstall it first (its saves go with it).
+- The download stops or the file won't open: download it again over Wi-Fi; a partial file can't be installed.
+- The TestFlight link says the beta is full or not accepting testers: [open an issue](https://github.com/j-jmnz/middle-earth-lcg/issues) and say so.
+- Anything else: [open an issue](https://github.com/j-jmnz/middle-earth-lcg/issues) with your device, its Android or iOS version, and the app version shown in Settings.
 
 ## Local setup
 

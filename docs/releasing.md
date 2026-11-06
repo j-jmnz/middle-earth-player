@@ -58,8 +58,7 @@ TestFlight needs a paid Apple Developer Program membership. The owner sets it up
 
 ## Installing
 
-- Android: a player opens the Releases page, downloads the `.apk` and opens it on the phone, allowing the browser or file manager to install unknown apps. A newer release installs over the older one and keeps every save. To check a download, compare `sha256sum` of the file with the `.sha256` asset, and the signer (`apksigner verify --print-certs`) with the fingerprint in the notes.
-- iPhone and iPad: a player opens the public TestFlight link, installs Apple's TestFlight app, and installs the app from it. TestFlight offers each new build as an update, and saves are kept. A TestFlight build stops opening 90 days after its upload, so a release is cut at least every 90 days, even a `patch` with only `repo` changes.
+The README's Install section is the players' guide: the requirements, the Android and TestFlight steps, checking a download and what to do when an install fails. Keep it in step with what the pipeline ships. The 90-day TestFlight expiry is why a release is cut at least every 90 days (`.claude/rules/release-standards.md`, Tags and releases).
 
 ## When it fails
 
