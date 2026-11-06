@@ -1,4 +1,4 @@
-// The combat spotlight's particles as Skia Atlas draws (docs/plans/done/combat-spotlight-redesign.md, §4 and §5): the glow (the charge's
+// The combat spotlight's particles as Skia Atlas draws (docs/design-system-table.md, Spotlight): the glow (the charge's
 // converging embers), the streaks (sparks, or a block's silver deflection) and the ash of a burn. Three draws of one sprite texture,
 // each added to the picture with the "plus" blend (ATLAS_BLEND). The UI thread fills each draw's buffers from the attack's frame
 // (useRSXformBuffer, useColorBuffer; the layout of a slot is spotlight/atlas.ts), so nothing here renders again while the spotlight plays.

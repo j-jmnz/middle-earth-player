@@ -1,4 +1,4 @@
-// The table's geometry at each UI scale (docs/plans/done/settings-theme-and-ui-scale.md, UI scale engine; user request, 2026-10-28): at Medium it is
+// The table's geometry at each UI scale (docs/design-system.md, Settings; user request, 2026-10-28): at Medium it is
 // the table as it was; at Small and Large every card still fits the canvas, the hand keeps its 44 pt strip and its target, and the
 // gutters and gaps are Medium's times the factor.
 import { readFileSync } from "node:fs";

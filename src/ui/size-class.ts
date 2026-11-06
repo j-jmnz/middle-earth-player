@@ -1,4 +1,4 @@
-// Size classes, not devices (docs/design-system.md, Standard 8 and Tablets; docs/plans/done/tablets-and-hand-fan.md, Part 4a). Material 3's
+// Size classes, not devices (docs/design-system.md, Standard 8 and Tablets). Material 3's
 // window size classes on the window's width in logical points (its points over the UI scale), so Split View, Stage Manager and a
 // foldable lay out by the room they have, and the same code serves a phone and a tablet. Pure, so a test reads it in Node; the hooks
 // that feed it are use-size-class.ts.

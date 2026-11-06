@@ -82,7 +82,7 @@ export type TableNav = {
 /** What the table draws from: the opened world, the reducer context, and each card's picture source and text. */
 export type OpenedTable = { world: World; ctx: ReduceContext; facts: ReadonlyMap<string, CardFacts> };
 
-// The Nightmare setup card on the table, if the game has one (docs/plans/done/nightmare-mode.md).
+// The Nightmare setup card on the table, if the game has one (docs/brief.md, Nightmare).
 function setupCodes(game: { cards: Readonly<Record<string, { zone: string; code: string }>> }): string[] {
   return Object.values(game.cards).filter((card) => card.zone === "nightmare").map((card) => card.code);
 }

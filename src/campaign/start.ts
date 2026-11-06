@@ -109,7 +109,7 @@ export function buildStart(start: StartInput): StartScenario {
   const dealtDecks = dealtPiles(input.scenario, input.difficulty);
   const removedCaves = standalone ? [] : (input.removedFromCaves ?? []);
   const piles = removedCaves.length > 0 && dealtDecks.cavesDeck ? { ...dealtDecks, cavesDeck: withoutCards(dealtDecks.cavesDeck, removedCaves) } : dealtDecks;
-  // Nightmare: the setup card goes next to the quest deck, its side A faceup (docs/plans/done/nightmare-mode.md).
+  // Nightmare: the setup card goes next to the quest deck, its side A faceup (docs/brief.md, Nightmare).
   if (input.difficulty === "Nightmare") definition = { ...definition, nightmareCard: input.scenario.nightmare?.setupCard };
   return {
     seatCount: input.seatCount,

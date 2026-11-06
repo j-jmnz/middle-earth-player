@@ -1,4 +1,4 @@
-// The combat spotlight's beats (docs/plans/done/combat-spotlight-redesign.md, §3 and §4): the seven beats add up to the run, the run is
+// The combat spotlight's beats (docs/design-system-table.md, Spotlight): the seven beats add up to the run, the run is
 // 3200 ms at Normal and 0.6 of it at Quick, and a frame at any moment is the pose the table of beats describes.
 import { describe, expect, it } from "vitest";
 

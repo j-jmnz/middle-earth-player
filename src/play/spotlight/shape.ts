@@ -1,4 +1,4 @@
-// The combat spotlight's shapes (docs/plans/done/combat-spotlight-redesign.md, §2 and §3): distances in points, scales, shares and counts.
+// The combat spotlight's shapes (docs/design-system-table.md, Spotlight): distances in points, scales, shares and counts.
 // Not durations (those are `MOTION` in src/ui/motion-tokens.ts), so the motion scale leaves them alone. Pure numbers, like `SHAPE`.
 export const SPOT = {
   // The stage (spotlight/stage.ts): the cards stand at this share of the screen's height, at most this tall (pt), centered at this

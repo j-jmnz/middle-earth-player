@@ -1,4 +1,4 @@
-// The combat spotlight's particles (docs/plans/done/combat-spotlight-redesign.md, §4): closed-form sprites from an index, a seed and a time.
+// The combat spotlight's particles (docs/design-system-table.md, Spotlight): closed-form sprites from an index, a seed and a time.
 import { describe, expect, it } from "vitest";
 
 import { MOTION } from "../../ui/motion-tokens.ts";

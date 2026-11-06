@@ -58,7 +58,7 @@ Do not commit `catalog.db`, card scans, card pictures, or PDFs. The catalog is g
 - [docs/INDEX.md](docs/INDEX.md): generated index of every doc agents read, with section line ranges and the sections each code area cites (`pnpm docs:index`; `pnpm docs:section <file> "<heading>"` prints one section).
 - [docs/design-system.md](docs/design-system.md): the screens' look; the table's is in [docs/design-system-table.md](docs/design-system-table.md).
 - [docs/phases/](docs/phases/): one file per phase, and [STATUS.md](docs/phases/STATUS.md).
-- [docs/plans/](docs/plans/): plans, among them [effect-authoring.md](docs/plans/effect-authoring.md), the cookbook for effect records and mechanic families. Plans already carried out are in `docs/plans/done/`.
+- [docs/plans/](docs/plans/): plans, among them [effect-authoring.md](docs/plans/effect-authoring.md), the cookbook for effect records and mechanic families.
 - [docs/handover/](docs/handover/): [agent-brief.md](docs/handover/agent-brief.md), the brief a family agent follows, and handovers for work left open.
 
 ## Agents

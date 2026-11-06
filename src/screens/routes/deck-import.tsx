@@ -66,7 +66,7 @@ export default function DeckImportScreen() {
   const pad = list.inset > 0 ? { paddingHorizontal: Math.max(list.inset, 24 * scale) } : undefined;
   const { catalog, user } = useDatabases();
   // The deck-legal pool and the cards with a line the app does not apply: read once per catalog (pool/cache.ts), shared with the Cards tab and the
-  // deck editor. A pre-built deck row says how many of its cards the app does not fully apply (docs/plans/done/inactive-text.md), so the
+  // deck editor. A pre-built deck row says how many of its cards the app does not fully apply (docs/brief.md, Three layers), so the
   // player can pick a deck the app plays as printed.
   const { byCode: pool, notApplied: inactive } = poolOf(catalog);
   // The list is built on the first look (deck/import.ts); each group heading stays at the top while its decks scroll under it.

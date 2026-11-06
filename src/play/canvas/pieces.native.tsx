@@ -86,7 +86,7 @@ export function Outlined({ x, y, text, font, t, s, color, heavy = false }: { x: 
 /**
  * A card with printed text the app does not apply (src/catalog/active-text.ts): a small faint mark at its right edge, upright
  * like the tokens, on a corner no token, effect pill or other mark uses: a ring struck through. Never a band over the picture
- * and never a word on the canvas; the preview lists the lines (docs/plans/done/inactive-text.md). Not accent, which marks the one
+ * and never a word on the canvas; the preview lists the lines (docs/brief.md, Three layers). Not accent, which marks the one
  * action, and not danger, which marks a refusal.
  */
 export function NotAppliedMark({ rect, t, s }: { rect: Rect; t: TableTokens; s: number }) {

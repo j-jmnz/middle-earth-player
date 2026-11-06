@@ -1,4 +1,4 @@
-// The vocabulary the Nightmare decks (phase 36, docs/plans/done/nightmare-mode.md) add to effect records: verbs, triggers and stat flags.
+// The vocabulary the Nightmare decks (phase 36, docs/brief.md, Nightmare) add to effect records: verbs, triggers and stat flags.
 // effect-schema-verbs.ts, effect-schema.ts and effect-schema-stats.ts compose them. src/rules/families/nightmare/index.ts runs them (with nightmare/dungeon.ts and nightmare/setup.ts).
 import { z } from "zod";
 

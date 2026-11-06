@@ -1,4 +1,4 @@
-// The combat spotlight (docs/design-system-table.md, Spotlight; docs/plans/done/combat-spotlight-redesign.md), drawn by the full-screen layer
+// The combat spotlight (docs/design-system-table.md, Spotlight), drawn by the full-screen layer
 // (spotlight/layer.native.tsx) on its own canvas over the whole table. When an attack deals or blocks damage black fog closes in, the
 // attacker (or a fan of attackers) and the target arc from their slots to the middle, large, side by side; the attacker draws back, charges
 // and strikes with afterimages, the stage freezes for the hit stop and then shakes, flashes and sparks, and both go back (a destroyed

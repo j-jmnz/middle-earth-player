@@ -1,4 +1,4 @@
-// The combat spotlight's full-screen layer (docs/plans/done/combat-spotlight-redesign.md, §1). It is mounted over the whole table, always,
+// The combat spotlight's full-screen layer (docs/design-system-table.md, Spotlight). It is mounted over the whole table, always,
 // and holds what the spotlight draws with: the fonts, the damage token and the card backs, the particle sprite texture, the burn shader
 // and the stage-size decodes of the plan's cards. It mounts a Skia canvas (not opaque, so a TextureView on Android and stacked correctly
 // over the table) only while a spotlight plays, so with none playing nothing draws and nothing redraws. The plan, the clock and the

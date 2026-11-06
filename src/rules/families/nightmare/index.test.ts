@@ -245,7 +245,7 @@ describe("cards that answer a failed Hide test (906104:A:1, 906104:A:2, 906107:A
   });
 });
 
-describe("a card the recipe replaced, named by code (docs/plans/done/nightmare-mode.md; rr.setup)", () => {
+describe("a card the recipe replaced, named by code (docs/brief.md, Nightmare; rr.setup)", () => {
   const add: Effect = { id: "stage:whenRevealed:9", cardCode: "stage", lines: ["fixture:A:1"], timing: "whenRevealed", instructions: [{ verb: "AddSetAsideToStaging", code: "141046" }] };
 
   it("is the Nightmare card of its title on Nightmare: Add Weathertop to the staging area finds Nightmare Weathertop", () => {

@@ -21,7 +21,7 @@ export function announceStageRevealed(state: ScenarioState, stageId: string, ctx
 
 // The setup card's own Setup lines (906401:A:2, "Setup: Set each copy of Pale-green Tentacle aside, out of play") resolve once the piles are
 // dealt and the encounter cards' Setup has run, before the first quest card's Setup (setup.ts finishSetup; mec109.setup, rr.setup): the
-// recipe is applied before the quest's Setup (docs/plans/done/nightmare-mode.md). The setup card stays where it is, next to the quest deck.
+// recipe is applied before the quest's Setup (docs/brief.md, Nightmare). The setup card stays where it is, next to the quest deck.
 export function nightmareSetup(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let next = state;
   for (const card of Object.values(state.cards)) {

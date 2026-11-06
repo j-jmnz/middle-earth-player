@@ -1,4 +1,4 @@
-// The combat spotlight's beats as arithmetic on a time (docs/plans/done/combat-spotlight-redesign.md, §3; docs/design-system-table.md,
+// The combat spotlight's beats as arithmetic on a time (docs/design-system-table.md, Spotlight; docs/design-system-table.md,
 // Spotlight). Pure: the layer's UI thread calls `frameAt`, `burstAt`, `darkAt` and `punchAt` once per frame from one clock, and a
 // Vitest reads them (the functions marked "worklet" run there; in Node the directive is an unused string). src/ui/motion-tokens.ts says how
 // long each beat is, spotlight/shape.ts how far things move, spotlight/stage.ts where the cards stand and spotlight/fx.ts the

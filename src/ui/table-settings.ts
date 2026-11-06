@@ -1,4 +1,4 @@
-// The app's settings (docs/plans/done/table-experience.md, docs/plans/done/settings-theme-and-ui-scale.md): the theme and the UI scale,
+// The app's settings (docs/design-system-table.md, Overview, docs/design-system.md, Settings): the theme and the UI scale,
 // haptics and reduced motion, the card picture quality and the moving fog, keeping the screen awake, where the table stops to ask
 // in a step's action window, the free Responses the player always uses, the readability options and the first-game guide. Kept in
 // user.db by the screens (src/screens/settings/store.ts); a vanilla Zustand store here so src/play reads them without importing screens.

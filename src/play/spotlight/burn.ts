@@ -1,4 +1,4 @@
-// The burn of a destroyed target (docs/plans/done/combat-spotlight-redesign.md, §4): a noise-threshold dissolve with an ember rim. The
+// The burn of a destroyed target (docs/design-system-table.md, Spotlight): a noise-threshold dissolve with an ember rim. The
 // field is 2-octave value noise over the card (0 at the top-left, 1 at the bottom-right of its rectangle), leaning so the fire
 // climbs from the foot; a pixel is gone once the threshold passes its field value. `burnField` is the field in TypeScript and `BURN_SKSL`
 // is the same field in SkSL, both built from the constants below, so the ash that rises where the front passes

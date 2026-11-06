@@ -7,12 +7,12 @@ import { scenarioDefinitionSchema, type Effect, type Instruction, type ScenarioD
 // `burden` is the burden deck (Flight to the Ford): a zone beside the quest deck, not part of the encounter deck.
 // `attachedChosen` is a card the quest's Setup attaches to a hero the first player chooses (The Caves of Nibin-Dûm's Cave
 // Torch): out of the encounter deck, dealt by the Setup record, not by `setupInstructions`.
-// Dream-chaser's extra decks (docs/plans/done/dream-chaser.md, phase 37), each a zone the scenario's Setup prepares (the engine reads them from
+// Dream-chaser's extra decks (docs/brief.md, Dream-chaser), each a zone the scenario's Setup prepares (the engine reads them from
 // phase 39 on): `corsairDeck` (the non-ship enemies, "Prepare the Corsair deck", dcce.corsair-deck), `encounterDeck2` (the deck the
 // quest swaps to: The Thing in the Depths 5, The City of Corsairs 9, dcce.from-sea-to-land), `unchartedDeck` (dcce.uncharted-deck),
 // `islandMap` (Temple of the Deceived's fifteen double-sided locations, dcce.island-map), `grottoDeck` (dcce.grotto-deck) and
 // `stormcallerQuests` (stages 2C to 4C beside the Stormcaller, dcce.stormcallers-area). None is part of the encounter deck.
-// Ered Mithrin's decks beside the encounter deck (docs/plans/done/ered-mithrin.md, phase 49), each a zone the scenario's Setup builds from encounter sets:
+// Ered Mithrin's decks beside the encounter deck (docs/brief.md, Ered Mithrin), each a zone the scenario's Setup builds from encounter sets:
 // `evilCreaturesDeck` (the Wilderlands enemies, emce.evil-creatures-deck), `cavesDeck` (the Lost Caves set and the cards a Setup shuffles in,
 // emce.caves-deck), `sideQuestDeck` (Fire in the Night's eight encounter side quests, emce.side-quests), and Lost in Mirkwood's two decks
 // `spidersDeck` and `orcsDeck` (the Spiders of Mirkwood and Dol Guldur Orcs sets, which the quest swaps into the encounter deck).
@@ -41,7 +41,7 @@ const placementSchema = z
   })
   .refine((card) => card.easy <= card.normal, { message: "easy exceeds normal" });
 
-// A scenario's Nightmare deck (docs/plans/done/nightmare-mode.md), from its setup card: the standard piles less `removed` (each copy
+// A scenario's Nightmare deck (docs/brief.md, Nightmare), from its setup card: the standard piles less `removed` (each copy
 // taken from the pile it was in), with the deck's own cards (`cards`, the copies printed) shuffled in. A Nightmare card takes the
 // Setup slot of a removed card of its title (`pile`, `perPlayer`). The setup card is placed next to the quest deck, side A faceup,
 // and its lines stay active all game.
@@ -177,7 +177,7 @@ export function normalCopiesByCode(data: ScenarioData): Map<string, number> {
   return totals;
 }
 
-// Nightmare plays the scenario's Nightmare deck (docs/plans/done/nightmare-mode.md), where it has one (`nightmare`).
+// Nightmare plays the scenario's Nightmare deck (docs/brief.md, Nightmare), where it has one (`nightmare`).
 export const DIFFICULTIES = ["Easy", "Normal", "Nightmare"] as const;
 export type Difficulty = (typeof DIFFICULTIES)[number];
 

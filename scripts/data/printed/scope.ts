@@ -58,7 +58,7 @@ export const PLAYER_REQUESTS = [
   ...["01015", "01018", "01019", "01022", "01029", "01032", "01033", "01036", "01037", "01038", "01039", "01040", "01041"],
   ...["01044", "01047", "01049", "01052", "01054", "01055", "01056"],
   ...["01058", "01061", "01063", "01064", "01065", "01066", "01067", "01068", "01069", "01070", "01071", "01072"],
-  // Core cards the Mirkwood Paths plan (docs/plans/done/mirkwood-paths.md, phase 27) ledgers beside its boxes: Guard of the Citadel,
+  // Core cards the Mirkwood Paths plan (docs/brief.md, Mirkwood Paths and The Dark of Mirkwood) ledgers beside its boxes: Guard of the Citadel,
   // Silverlode Archer and Horseback Archer, the three core player cards the four Learn to Play decks hold that no record read.
   "01013",
   "01017",

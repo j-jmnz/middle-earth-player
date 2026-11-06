@@ -65,7 +65,7 @@ export type ZoneName =
   // The campaign card next to the quest deck (rr.campaign-cards). Placed only when the card has an ability that works during
   // the scenario (a Response, a Forced effect, a constant, an Action), so it is in play: 141056:A:2.
   | "campaign"
-  // The Nightmare setup card next to the quest deck, side A faceup, on Nightmare (docs/plans/done/nightmare-mode.md): in play all game.
+  // The Nightmare setup card next to the quest deck, side A faceup, on Nightmare (docs/brief.md, Nightmare): in play all game.
   | "nightmare"
   // The Hard/Expert Mode card next to the quest deck, on the side the players chose (dcce.hard-expert): in play all game. A zone of its own, so
   // nothing that reads the Nightmare setup card reads it.

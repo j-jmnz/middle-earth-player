@@ -1,4 +1,4 @@
-// How a card of the combat spotlight is posed on the stage (docs/plans/done/combat-spotlight-redesign.md, §5), as arithmetic on a frame
+// How a card of the combat spotlight is posed on the stage (docs/design-system-table.md, Spotlight), as arithmetic on a frame
 // (spotlight/beats.ts): the transform of a flying card with its arc and its perspective flip, and of an afterimage. Pure and worklet-safe (in Node the "worklet" directive is an unused string); the native pieces
 // (spotlight/pieces.native.tsx) hand the result to a Skia group. Lengths come back in screen points: the stage is already times the UI scale.
 import type { Transforms3d } from "@shopify/react-native-skia";

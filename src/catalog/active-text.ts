@@ -6,7 +6,7 @@
 // the printed-text ledger marks it inert. A card the shipped ledger does not hold is read from its source text the way the
 // data build reads the pool (pool-lines.ts), so the check names exactly the lines of src/effects/open-lines.ts and of the
 // coverage test (scripts/checks/effect-coverage.test.ts). The pool filter, the card screen, the table, the preview and the deck
-// screens all read this one check (docs/plans/done/inactive-text.md).
+// screens all read this one check (docs/brief.md, Three layers).
 import type { Effect } from "./effect-schema.ts";
 import { isKeywordLine } from "./keyword-line.ts";
 import { poolSides } from "./pool-lines.ts";

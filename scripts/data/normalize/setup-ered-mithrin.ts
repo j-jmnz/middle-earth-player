@@ -1,7 +1,7 @@
 import { namedBy, setsOf, stepWith } from "./setup-names.ts";
 import type { NameIndex, SetupClause } from "./setup-text.ts";
 
-// Ered Mithrin's Setup sentences (docs/plans/done/ered-mithrin.md, phase 49): the nine stage 1A cards' and the nine campaign cards'. Every pattern is quoted from a
+// Ered Mithrin's Setup sentences (docs/brief.md, Ered Mithrin): the nine stage 1A cards' and the nine campaign cards'. Every pattern is quoted from a
 // ledger line (data/printed/ered-mithrin.json), names the cards (and, for the deck steps, the encounter sets) it moves, and returns null for a sentence it
 // does not read, so the other patterns try it. A step that names cards returns null when a name finds no card: the sentence ends up unread and the
 // scenario is not built, a name is never dropped silently. A sentence that only restates the one before it (`This is the side quest deck`,

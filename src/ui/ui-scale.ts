@@ -1,4 +1,4 @@
-// How large the whole UI draws (docs/plans/done/settings-theme-and-ui-scale.md, UI scale engine; user request, 2026-10-28). The setting is
+// How large the whole UI draws (docs/design-system.md, Settings; user request, 2026-10-28). The setting is
 // Small, Medium or Large. Each size is multiplied by the factor, so text stays crisp and the layout reflows; nothing is transformed.
 // NativeWind's rem carries the classes (the root layout sets it to 14 times the factor), and this file carries the numbers in code.
 // Hairlines: an RN `borderWidth` hairline (1, 1.5) stays unscaled, while a Skia `strokeWidth` scales with the drawing it outlines.

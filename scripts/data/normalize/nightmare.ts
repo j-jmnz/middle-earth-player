@@ -3,7 +3,7 @@ import { NIGHTMARE_PILES, type NightmareData, type Placement } from "../../../sr
 import { isNightmareCard, nightmareDeckOf, nightmareDeckOfCode } from "../nightmare-defs.ts";
 import { sameName, titleKey } from "./names.ts";
 
-// A built scenario's Nightmare deck (docs/plans/done/nightmare-mode.md). The setup card's side B prints the recipe: "Begin with the
+// A built scenario's Nightmare deck (docs/brief.md, Nightmare). The setup card's side B prints the recipe: "Begin with the
 // standard quest deck and encounter deck", "Remove the following cards, in the specified quantities, from the standard encounter
 // deck" (one card a line, "3x Evil Crow" or "Forest Spider x3"), then shuffle the deck's own encounter cards in and place the setup
 // card next to the quest deck, its side A faceup. The removals name the scenario's cards by title; a title the scenario does not

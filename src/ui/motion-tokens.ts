@@ -103,7 +103,7 @@ export const MOTION = {
   threatBadgeOut: tween(400, null),
   toastIn: tween(160, null),
   toastOut: tween(120, null),
-  // The combat spotlight, one attack (docs/plans/done/combat-spotlight-redesign.md): the dark comes in and the cards arc to the center
+  // The combat spotlight, one attack (docs/design-system-table.md, Spotlight): the dark comes in and the cards arc to the center
   // (enter), the medallions pop and a shadow card flips (read), the attacker draws back and glows (charge), strikes (lunge),
   // everything holds at the hit (stop), the target takes it (impact, with burstStep and burstFly inside it), the cards and the
   // result stay (hold) and both go back (return). A destroyed target burns inside the return (burn). The eight beats add up to `spotlight`.

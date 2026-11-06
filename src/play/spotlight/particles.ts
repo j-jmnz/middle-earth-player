@@ -1,4 +1,4 @@
-// The combat spotlight's particles as closed-form arithmetic (docs/plans/done/combat-spotlight-redesign.md, §4). Pure and worklet-safe:
+// The combat spotlight's particles as closed-form arithmetic (docs/design-system-table.md, Spotlight). Pure and worklet-safe:
 // `particleAt` works one sprite's pose out from its index, its seed and a time alone (no per-frame state), so the UI thread
 // evaluates a whole emitter from one clock and a Vitest reads it. Positions are screen points; every length is a share of `at.size`
 // (the height of the card the effect belongs to), so the effect scales with the stage. `t` is ms since the emitter began, at
