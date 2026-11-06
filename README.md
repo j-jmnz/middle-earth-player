@@ -128,6 +128,24 @@ Adding a scenario follows the procedure in [docs/handover/agent-brief.md](docs/h
 - [docs/phases/STATUS.md](docs/phases/STATUS.md): progress and open work.
 - [docs/INDEX.md](docs/INDEX.md): a generated index of every doc, by section.
 
+## Attribution
+
+The Lord of the Rings: The Card Game and its card text, card art and rules are © Fantasy Flight Games. The Lord of the Rings and its characters and places are trademarks of Middle-earth Enterprises. The repo commits card text, rules text, raw source snapshots (`data/raw/`) and the game icons (`assets/icons/`). Card scans, card pictures and PDFs are fetched at build time and never committed. Every source below is pinned by URL and sha256 in `data/sources.json`.
+
+| Resource | Source |
+| --- | --- |
+| Rules, rulebooks, FAQ, Easy Mode, campaign log, community decklists | [Fantasy Flight Games](https://www.fantasyflightgames.com/en/the-lord-of-the-rings-the-card-game/) PDFs |
+| Campaign, boon and burden card pictures | FFG's print-and-play PDFs |
+| Card data (player cards, packs, decks) | [RingsDB](https://ringsdb.com) |
+| Card data (encounter and quest cards, scenarios), card scans | [Hall of Beorn](https://hallofbeorn.com) |
+| Card database, scenario lists, pre-built decks, game steps | [DragnCards LotR LCG plugin](https://github.com/seastan/dragncards-lotrlcg-plugin) by seastan |
+| Card pictures | JvZijp's enhanced proxies ([Google Drive](https://drive.google.com/drive/folders/1jEy_yvRaPXGylPfilxhweQjffo9AZQsQ)), then u/LepcisMagna's 600 DPI scans hosted on [lotr.cardgame.tools](https://lotr.cardgame.tools), then RingsDB, Hall of Beorn and DragnCards |
+| Nightmare deck pictures and card lists | A community [Google Drive folder](https://drive.google.com/drive/folders/10pz9RF2e1QrJXqsmmLWPkO1Hu1auQuxB) |
+| Game icons | RingsDB's icon font, DragnCards' token and card-back images, and the icon font embedded in FFG's Dream-chaser rulebook (MEC111) |
+| Fonts | [Barlow Semi Condensed](https://fonts.google.com/specimen/Barlow+Semi+Condensed) and [Marcellus SC](https://fonts.google.com/specimen/Marcellus+SC), SIL Open Font License (`assets/fonts/`) |
+
+Picture sources are tried in the order listed in `scripts/data/sources/pictures.ts`.
+
 ## License
 
 See [LICENSE](LICENSE). The license covers the code only. It does not cover the card text, art or rules text that `data/` and the bundled assets come from.
