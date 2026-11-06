@@ -62,7 +62,7 @@ Read the sections your task touches.
   - 352–357 Catalog build (~410)
   - 358–375 Tests (~1.6K) ← 5
   - 376–391 Performance (~1.2K) ← 3
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~81.5K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~81.6K tok)
   - 17–38 Sections (~410)
   - 39–50 Product (~590)
   - 51–64 Non-goals (~540)
@@ -104,7 +104,7 @@ Read the sections your task touches.
     - 832–835 Window stack (~100)
     - 836–839 Coverage test (~270)
   - 840–860 Data sources (~530)
-  - 861–879 Card images (~1.1K) ← 6
+  - 861–879 Card images (~1.2K) ← 6
   - 880–905 Persistence and shipping (~1.8K)
   - 906–947 Screens (~4.7K) ← 1
     - 932–947 Table screen (~1.8K) ← 3

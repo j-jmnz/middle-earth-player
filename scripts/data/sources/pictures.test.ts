@@ -73,8 +73,8 @@ describe("pictures", () => {
     const pinned = new Set([...(sources.pictures?.files ?? []), ...(sources.nightmare?.files ?? [])].map((file) => /^pictures\/(\w+)\.A\./.exec(file.path)?.[1]).filter((code) => code != null));
     // The MEC109 printings whose wording differs keep their scan (MEC109_CHANGED). Navigation (11084) is a rules card of The Grey Havens that
     // neither JvZijp nor cardgame.tools carries.
-    // Ered Mithrin: no source pictures the Campaign Expansion's own cards (cardgame.tools' MEC115 stops at the encounter cards, JvZijp's Drive holds
-    // none of a campaign expansion's cards): those keep their scan.
+    // Ered Mithrin: no picture source carries the Campaign Expansion's own cards (cardgame.tools' MEC115 stops at the encounter cards, JvZijp's Drive holds
+    // none of a campaign expansion's cards): the pack bundles their scan, Hall of Beorn's digital render (about 1020 × 1451), so each must have one.
     // The Campaign Expansion's 40 cards, by code (120165 is the Journey Up the Anduin campaign card; the rest are 12166 to 12204).
     const emce = ["120165", ...Array.from({ length: 39 }, (_, at) => String(12166 + at))];
     const unpictured = new Set([...MEC109_CHANGED, "11084", ...emce]);
@@ -86,5 +86,7 @@ describe("pictures", () => {
       }
     }
     expect(missing, "Run pnpm data:sync pictures").toEqual([]);
+    const scanned = new Set((sources.scans?.files ?? []).map((file) => /^scans\/(\w+)\.A\./.exec(file.path)?.[1]).filter((code) => code != null));
+    expect(emce.filter((code) => !scanned.has(code)), "Run pnpm data:sync scans").toEqual([]);
   });
 });
