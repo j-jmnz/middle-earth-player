@@ -7,6 +7,7 @@ import { questFailureRaise } from "../families/quest/threat.ts";
 import { askQuestProgress } from "../families/attachments/quest.ts";
 import { resolveSideQuests, sideQuestTotals } from "../families/sidequests/quest.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
+import { gameReadsOnTrigger } from "../core/game-reads.ts";
 import { isLocationId } from "../core/printed.ts";
 import { advanceStage, clearCommitted, questPointsOf, resolveQuest } from "./quest.ts";
 import { defeatedBefore, questCardDefeatedHeard } from "../families/quest/branch.ts";
@@ -34,19 +35,22 @@ export function resolutionStep(state: ScenarioState, ctx: ReduceContext, steps: 
   const sides = sideQuestTotals(state, ctx);
   const canAdvance = (current: ScenarioState) => !restricted(current, ctx, "advance").length;
   // Once stages are separate each seat resolves the quest of its own stage in player order, against its own staging area (mec109.multiple-staging-areas).
-  const quested = state.separate ? resolveSeparate(state, ctx, steps, canAdvance) : resolveQuest(state, ctx.cards, steps, canAdvance, questFailureRaise(ctx, steps));
+  const quested = state.separate ? resolveSeparate(state, ctx, steps, canAdvance) : resolveQuest(state, ctx.cards, steps, canAdvance, questFailureRaise(ctx, steps), undefined, failureAmountRead(state, ctx));
   const resolved = resolveSideQuests(quested, sides, ctx, steps);
   // The scenario is over: settle stops on it, so there is no second pass.
   if (resolved.stageCleared || resolved.lost) return finish(resolved);
   return afterQuestOutcome(afterProgress({ ...resolved, questResolved: true }, before, ctx, steps), outcome, ctx, steps);
 }
 
+// A card in the game answers a failed quest with an X amount (Urdug's Gambit, 19051:B:2): the event carries the shortfall for it.
+const failureAmountRead = (state: ScenarioState, ctx: ReduceContext): boolean => gameReadsOnTrigger(state, ctx, "questFailed", '"x":true');
+
 // The quest of each living seat in player order, one stage and one staging area each: its committed willpower against the threat in its own staging area,
 // progress on its own stage or only its own threat raised (resolveQuest with `only`). The commitments end once every seat has resolved.
 function resolveSeparate(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[], canAdvance: (state: ScenarioState) => boolean): ScenarioState {
   let next = state;
   for (const seat of livingSeats(state)) {
-    next = resolveQuest(next, ctx.cards, steps, canAdvance, questFailureRaise(ctx, steps), seat);
+    next = resolveQuest(next, ctx.cards, steps, canAdvance, questFailureRaise(ctx, steps), seat, failureAmountRead(state, ctx));
     if (next.stageCleared || next.lost) break;
   }
   return clearCommitted(next);

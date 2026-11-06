@@ -15,6 +15,7 @@ import { copyLine, withCopies } from "./reprint.ts";
 const URDUG = "19052";
 const TINY = "19054";
 const NAMED = (name: string): PickSpec => ({ type: "card", control: "any", names: [name] });
+const ENGAGEABLE: PickSpec = { type: "enemy", control: "any", stagingOnly: true, engageable: true };
 // Urdug wherever he is in play: in the staging area on either side, under a player, or engaged with one on his enemy side (stage 3).
 const URDUG_ANYWHERE: PickSpec = { type: "card", control: "any", names: ["Urdug"], engagedEnemies: true };
 const STAGING_LOCATIONS = { type: "location", control: "any", stagingOnly: true } as const;
@@ -77,7 +78,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
         { verb: "PutTrust", code: URDUG, burden: "12185" },
       ],
     },
-    { id: "12184:forced:1", cardCode: "12184", lines: ["12184:B:1"], timing: "forced", trigger: "claimed", subject: { type: "objective", control: "any" }, instructions: [{ verb: "PutTrust", code: URDUG, burden: "12185" }] },
+    { id: "12184:forced:1", cardCode: "12184", lines: ["12184:B:1"], timing: "forced", trigger: "claimed", subject: { type: "objective", control: "any" }, condition: { kind: "firstPlayer" }, instructions: [{ verb: "PutTrust", code: URDUG, burden: "12185" }] },
     {
       id: "12184:constant:1",
       cardCode: "12184",
@@ -267,9 +268,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [
         EACH_PLAYER([
           // A player with no enemy left in the staging area to choose counts toward X (read before the choice, which takes an enemy out).
-          { verb: "AddToX", amount: 1, when: { kind: "not", condition: { kind: "canPick", pick: { type: "enemy", control: "any", stagingOnly: true } } } },
-          { verb: "Pick", pick: { type: "enemy", control: "any", stagingOnly: true }, when: { kind: "canPick", pick: { type: "enemy", control: "any", stagingOnly: true } } },
-          { verb: "Engage", target: "picked", when: { kind: "canPick", pick: { type: "enemy", control: "any", stagingOnly: true } } },
+          { verb: "AddToX", amount: 1, when: { kind: "not", condition: { kind: "canPick", pick: ENGAGEABLE } } },
+          { verb: "Pick", pick: ENGAGEABLE, when: { kind: "canPick", pick: ENGAGEABLE } },
+          { verb: "Engage", target: "picked", when: { kind: "canPick", pick: ENGAGEABLE } },
         ]),
         { verb: "DiscardUntil", type: "enemy", trait: "Creature", when: { kind: "x", min: 1 } },
         { verb: "MoveEncounterCard", card: "picked", to: "staging", when: PICKED_IS("enemy") },

@@ -235,6 +235,8 @@ export const pickSchema = z.strictObject({
   // to the objective with this title as its guard. Read by the wilderland family (src/rules/families/wilderland/pick.ts).
   guardsCard: z.literal(true).optional(),
   guardsNamed: z.string().min(1).optional(),
+  // Only an enemy the chooser may engage: not one that cannot be engaged, nor one barred to this seat ("each player chooses an enemy in the staging area and engages it", 19046:A:1; a player with no such enemy has none to engage).
+  engageable: z.literal(true).optional(),
   // The effect discards the card chosen, for a condition that asks before the discard (a canPick ahead of DiscardFromHand): a card that player card effects cannot discard (18026:A:1) is left out. A Pick followed by DiscardPicked is known without it (families/wilderland/pick.ts).
   discarded: z.literal(true).optional(),
   // The sidequests family's filters (src/rules/families/sidequests/pick.ts).

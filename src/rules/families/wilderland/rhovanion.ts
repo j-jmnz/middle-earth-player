@@ -89,22 +89,23 @@ function claimers(ctx: ReduceContext): readonly { code: string; host: string | u
 export function claimFreed(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (state.stack.length > 0 || state.lost || state.failure || state.stageCleared || state.staging.length === 0 || !gameReads(state, ctx, '"ClaimWhenFree"')) return state;
   const codes = constantVerbCodes(ctx, "ClaimWhenFree");
-  const id = state.staging.find((candidate) => {
-    const card = state.cards[candidate];
-    return card != null && card.zone === "staging" && codes.has(card.code) && freeOfEncounters(state, candidate);
-  });
-  const card = id ? state.cards[id] : undefined;
-  const rule = card ? claimers(ctx).find((entry) => entry.code === card.code) : undefined;
-  if (!id || !card || !rule) return state;
-  if (rule.host == null) {
-    const record = ctx.effects.find((effect) => effect.id === rule.id);
-    if (!record || state.seats[state.firstPlayer]?.eliminated) return state;
-    const instructions: Instruction[] = [{ verb: "Pick", pick: { type: "hero", control: "you" } }, { verb: "ClaimObjective" }];
-    return pushEffectFrame(state, { frame: "ResolveEffect", sourceId: id, actor: state.firstPlayer, peril: false, effectId: record.id, instructions, picked: [], cancel: null, blockCancel: null, cause: effectCause(record) }, steps);
+  // The first free objective that can be claimed now: one that names a host waits for that card to be in play and the next is tried.
+  for (const id of state.staging) {
+    const card = state.cards[id];
+    if (!card || card.zone !== "staging" || !codes.has(card.code) || !freeOfEncounters(state, id)) continue;
+    const rule = claimers(ctx).find((entry) => entry.code === card.code);
+    if (!rule) continue;
+    if (rule.host == null) {
+      const record = ctx.effects.find((effect) => effect.id === rule.id);
+      if (!record || state.seats[state.firstPlayer]?.eliminated) continue;
+      const instructions: Instruction[] = [{ verb: "Pick", pick: { type: "hero", control: "you" } }, { verb: "ClaimObjective" }];
+      return pushEffectFrame(state, { frame: "ResolveEffect", sourceId: id, actor: state.firstPlayer, peril: false, effectId: record.id, instructions, picked: [], cancel: null, blockCancel: null, cause: effectCause(record) }, steps);
+    }
+    const hostId = Object.values(state.cards).find((other) => inPlay(other.zone) && other.id !== id && printedOf(ctx.cards, other.code).name === rule.host)?.id;
+    const host = hostId ? state.cards[hostId] : undefined;
+    if (!hostId || !host) continue;
+    const attached = updateCard(attachTo(moveCard(state, id, { zone: "attached" }), id, hostId), id, { face: "up", controller: host.controller, claimed: true });
+    return queueEvent(attached, { trigger: "claimed", seat: state.firstPlayer, cardId: id });
   }
-  const hostId = Object.values(state.cards).find((other) => inPlay(other.zone) && other.id !== id && printedOf(ctx.cards, other.code).name === rule.host)?.id;
-  const host = hostId ? state.cards[hostId] : undefined;
-  if (!hostId || !host) return state;
-  const attached = updateCard(attachTo(moveCard(state, id, { zone: "attached" }), id, hostId), id, { face: "up", controller: host.controller, claimed: true });
-  return queueEvent(attached, { trigger: "claimed", seat: state.firstPlayer, cardId: id });
+  return state;
 }

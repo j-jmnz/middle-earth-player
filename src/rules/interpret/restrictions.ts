@@ -9,7 +9,7 @@ import { grantedTravel } from "../families/grapple/travel.ts";
 import { familyForcedTravel, familyTravelUnpayable } from "./family-hooks.ts";
 import { modifiedStat } from "../core/keywords.ts";
 import { pickCandidates } from "./pick.ts";
-import { isGuard } from "../families/objectives/pick.ts";
+import { guardsTitled } from "../families/objectives/pick.ts";
 import { isPlayerType, printedOf } from "../core/printed.ts";
 import { flagged, heldAmount, inPlay, livingSeats, type CardInstance, type ScenarioState } from "../core/state.ts";
 
@@ -47,12 +47,6 @@ function scanRestricted(state: ScenarioState, ctx: ReduceContext, what: Restrict
     });
   }
   return found;
-}
-
-// Whether the card is attached as the guard of the objective with this title ("the Grey Moorland guarding Tiny", 19048:B:3).
-function guardsTitled(state: ScenarioState, ctx: ReduceContext, id: string, title: string): boolean {
-  const host = state.cards[id]?.host;
-  return isGuard(state, id) && host != null && printedOf(ctx.cards, state.cards[host]?.code ?? "").name === title;
 }
 
 export function travelBlocked(state: ScenarioState, ctx: ReduceContext, locationId: string): boolean {

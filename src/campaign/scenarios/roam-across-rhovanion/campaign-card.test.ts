@@ -16,6 +16,9 @@ import { reduce, startScenario, type PlayerIntent, type ReduceContext } from "..
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { ignoresKeyword } from "../../../rules/families/wilderland/markers.ts";
+import { drainEvents } from "../../../rules/windows/events.ts";
+import { queueEvent } from "../../../rules/windows/queue.ts";
+import { stagedLocationOptions } from "../../../rules/families/wilderland/pool.ts";
 import { openResolution, resolutionResult } from "../../../rules/setup/resolution.ts";
 import { rhovanionLoadout, rhovanionPlan, rhovanionStart, rhovanionWorld } from "../../../../test/scenarios/roam-across-rhovanion/game.ts";
 import { CODES, campaign, idOf, legalIntents, loadRhovanionWorld, rhovanion, rhovanionTable, type RhovanionWorld } from "../../../../test/scenarios/roam-across-rhovanion/scene.ts";
@@ -122,6 +125,15 @@ describe("12184:B side B", () => {
       expect(urdug(done).resources).toBe(answer === "trust" ? 2 : 1);
       expect(where(done, CODES.urdugSCunning)).toHaveLength(answer === "burden" ? 1 : 0);
     }
+  });
+
+  it("12184:B:1 only a claim by the first player asks: a claim announced for another player does not", () => {
+    const base = opened(2, 1, { answer: () => "trust" });
+    const tiny = spawn(base, CODES.tiny, { zone: "play", seat: 0 });
+    // The event is announced on its own (the engine would play on after an answer-less one): the Forced effect goes on the stack only for the first player.
+    const hear = (seat: number): ScenarioState => drainEvents(queueEvent({ ...tiny.state, window: null }, { trigger: "claimed", seat, cardId: tiny.id }), ctx, []);
+    expect(hear(0).stack.length).toBeGreaterThan(base.stack.length);
+    expect(hear(1).stack.length).toBe(base.stack.length);
   });
 
   it("12184:B:2 Urdug gets +1 Willpower, +1 Threat, +1 Attack and +1 Defense for each resource on him", () => {
@@ -245,6 +257,28 @@ describe("12184:B Resolution", () => {
     expect(resolutionResult(state)?.encounterPool).toEqual({ [CODES.greyMoorland]: 2 });
   });
 
+  it("12184:B:4 only players still in the game choose a location, and every player still earns Misplaced Trust", () => {
+    const base = endOf(2, 3, LOCATIONS);
+    const [first, second] = base.seats;
+    const out: ScenarioState = { ...base, seats: [first, { ...second, eliminated: true }] };
+    const { state, asked } = won(out);
+    expect(asked.filter((entry) => entry.options.some((option) => LOCATIONS.includes(option))).map((entry) => entry.seat)).toEqual([0]);
+    const result = resolutionResult(state);
+    expect(result?.earned.filter((item) => item.code === CODES.misplacedTrust).map((item) => item.seat)).toEqual([0, 1]);
+    expect(Object.values(result?.encounterPool ?? {}).reduce((sum, copies) => sum + copies, 0)).toBe(1);
+  });
+
+  it("12184:B:4 a title is one choice whatever the code: two cards of one title offer one option, and a later player is not offered the title chosen before", () => {
+    const twin = { ...ctx.cards.get(CODES.greyMoorland)!, code: "twin" };
+    const cards = new Map(ctx.cards).set("twin", twin);
+    const state = endOf(2, 3, [CODES.greyMoorland, "twin", CODES.deepRavine]);
+    const options = stagedLocationOptions(state, { ...ctx, cards });
+    expect(options).toHaveLength(2);
+    expect(options).toContain(CODES.deepRavine);
+    const chosen = { ...state, resolutionLog: { ...state.resolutionLog, poolAnswers: [{ seat: 0, option: "twin" }] } };
+    expect(stagedLocationOptions(chosen, { ...ctx, cards })).toEqual([CODES.deepRavine]);
+  });
+
   it("12184:B:4 with no location in the staging area nobody is asked, and the pool gains nothing", () => {
     const { state, asked } = won(endOf(2, 3, []));
     expect(asked.some((entry) => entry.options.some((option) => LOCATIONS.includes(option)))).toBe(false);
@@ -289,7 +323,7 @@ describe("12184:B Resolution", () => {
     expect(one.seatLabel).toBe("Player 1 (first player) chooses");
     expect(promptSentence(one)).toBe("Choose a location in the staging area. Each player chooses a different location if able. A copy of it joins the campaign pool when you confirm.");
     const moorland = one.tiles.find((tile) => tile.code === CODES.greyMoorland)!;
-    expect(choiceSentence(one, moorland)).toBe("A copy of Grey Moorland is added to the campaign pool as an encounter card. It is written in the campaign log and added to the encounter deck of every later scenario, and the other players must choose a different location if able.");
+    expect(choiceSentence(one, moorland)).toBe("A copy of Grey Moorland is added to the campaign pool as an encounter card. It is written in the campaign log and added to the encounter deck of every later scenario.");
     expect(one.decline).toBeNull();
     const second = toLocations(endOf(2, 3, LOCATIONS));
     const answered = openResolution(expectOk(reduce(second, { type: "ChooseResolution", optionId: CODES.greyMoorland } as PlayerIntent, ctx)).state, ctx);

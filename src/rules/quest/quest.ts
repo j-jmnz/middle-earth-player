@@ -140,6 +140,8 @@ export function resolveQuest(
   // Stages are separate (mec109.multiple-staging-areas): the quest of this seat alone. Its committed Willpower is compared with the Threat in its own staging
   // area, progress goes on its own stage (or on the active location first) and only its threat rises. The commitments stay until every seat has resolved.
   only?: number,
+  // The game has a card whose record answers a failed quest with an X amount (gameReadsOnTrigger): the event carries the shortfall for it.
+  stampAmount = false,
 ): ScenarioState {
   const willpower = committedWillpower(state, cards, only);
   const threat = stagingThreat(state, cards, only);
@@ -156,8 +158,8 @@ export function resolveQuest(
   }
   // Each seat hears how its quest went ("After you quest successfully"; questing exactly equal is neither, rr.step-3-4).
   if (willpower !== threat) {
-    // In a quest whose stages come in a random order (AdvanceToRandomStage) the failed quest's event carries the amount the threat would rise by, for the stage that answers it ("place X progress here", 19051:B:2); no other game's events change.
-    const stamped = willpower < threat && state.stages.some((stage) => stage.randomNext != null);
+    // The failed quest's event carries the amount the threat would rise by when a record answers it with X ("place X progress here", 19051:B:2); no other game's events change.
+    const stamped = willpower < threat && stampAmount;
     for (const seat of hearing) next = queueEvent(next, { trigger: willpower > threat ? "questSucceeded" : "questFailed", seat, ...(stamped ? { amount: threat - willpower } : {}) });
   }
   const ready = withView(next, only, (view) => advanceReady(view, cards, steps, canAdvance));

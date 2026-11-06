@@ -72,7 +72,7 @@ function searchOffer(choose: Extract<Instruction, { verb: "Choose" }>): { code: 
 }
 
 /** The sentence over the Twilight Hall search offer (12168:A:2): the card, where it enters and the treasures it will guard, as many as are left to draw. Null for any other Choose. */
-export function wilderlandChooseNote(choose: Extract<Instruction, { verb: "Choose" }>, game: ScenarioState, ctx: ReduceContext, names: ChoiceNames, seat?: number, source?: string | null): string | null {
+export function wilderlandChooseNote(choose: Extract<Instruction, { verb: "Choose" }>, game: ScenarioState, ctx: ReduceContext, names: ChoiceNames, seat?: number, source?: string | null, claimed?: string | null): string | null {
   // Dagnir's Spawn (12173:A:2): each player decides for their own characters, so two-handed the note leads with the player.
   const spread = choose.options.map(distributeBranch).find((assign) => assign != null);
   if (spread) {
@@ -80,7 +80,7 @@ export function wilderlandChooseNote(choose: Extract<Instruction, { verb: "Choos
     const text = `distribute ${damage} damage among characters you control? If you do, ${source ? names.card(source) : "this card"} is shuffled into the encounter deck.`;
     return game.seatCount > 1 ? `Player ${(seat ?? game.firstPlayer) + 1}: ${text}` : `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
   }
-  const heath = heathChooseNote(choose, game, names) ?? rhovanionChooseNote(choose, game, ctx, names);
+  const heath = heathChooseNote(choose, game, names) ?? rhovanionChooseNote(choose, game, ctx, names, claimed);
   if (heath) return heath;
   const offer = searchOffer(choose);
   if (!offer) return null;

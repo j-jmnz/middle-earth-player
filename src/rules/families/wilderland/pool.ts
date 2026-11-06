@@ -127,18 +127,20 @@ export function applyAllyOrLine(state: ScenarioState, instruction: Verb<"BoonAll
 }
 
 /**
- * The options of ChooseStagedLocationForPool (12184:B:4): the codes of the locations in the staging area, none of them a burden (it joins the pool as one), leaving out the titles an earlier player chose ("Players must choose different locations, if able"):
+ * The options of ChooseStagedLocationForPool (12184:B:4): one code for each title of the locations in the staging area, none of them a burden (it joins the pool as one), leaving out the titles an earlier player chose ("Players must choose different locations, if able"):
  * when every title is taken, any of them is offered again. No location in the staging area offers nothing.
  */
 export function stagedLocationOptions(state: ScenarioState, ctx: ReduceContext): string[] {
-  const staged = [...new Set(state.staging.flatMap((id) => {
+  // One code per title: two copies of a location, or two cards that share a title, are one choice ("different" is by title).
+  const byTitle = new Map<string, string>();
+  for (const id of state.staging) {
     const card = state.cards[id];
     const printed = card ? printedOf(ctx.cards, card.code) : null;
-    return card && card.zone === "staging" && printed && isLocationCard(printed) && printed.campaignKind !== "burden" ? [card.code] : [];
-  }))];
-  const taken = new Set((state.resolutionLog.poolAnswers ?? []).map((item) => item.option));
-  const different = staged.filter((code) => !taken.has(code));
-  return different.length > 0 ? different : staged;
+    if (card && card.zone === "staging" && printed && isLocationCard(printed) && printed.campaignKind !== "burden" && !byTitle.has(printed.name)) byTitle.set(printed.name, card.code);
+  }
+  const taken = new Set((state.resolutionLog.poolAnswers ?? []).map((item) => printedOf(ctx.cards, item.option).name));
+  const different = [...byTitle].filter(([title]) => !taken.has(title)).map(([, code]) => code);
+  return different.length > 0 ? different : [...byTitle.values()];
 }
 
 /** One seat's choice of a location: a copy joins the pool's encounter cards, and the answer is kept for the next player. */

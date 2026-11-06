@@ -210,6 +210,15 @@ describe("19037 Urdug's Horn", () => {
     expect(offered(freed.state)).toEqual(["trust", "burden"]);
   });
 
+  it("19037:A:1 a free Horn with no Urdug in play to carry it waits, and another free objective after it in the staging area is still claimed", () => {
+    const t = rhovanionTable(world, { staging: [CODES.urdugSHorn, CODES.durinSKey], campaign: true, play: [] });
+    const run = settled(t, t.state);
+    expect(run.state.cards[idOf(run.state, CODES.urdugSHorn)]?.zone).toBe("staging");
+    expect(run.state.window?.kind).toBe("choose");
+    // The Key was claimed: the first player is choosing the hero it is attached to.
+    expect(offered(run.state)).toEqual(expect.arrayContaining([t.hero2]));
+  });
+
   it("19037:A:2 when Urdug attacks as an ally, the top card of the encounter deck is discarded and its Threat added to his Attack until the end of the phase", () => {
     const t = rhovanionTable(world, { phase: "PlayerAttacks", engaged: [{ code: "mild", seat: 0 }], play: [CODES.urdug], deck: [CODES.greyMoorland, "f3"] });
     const urdug = idOf(t.state, CODES.urdug);
@@ -456,5 +465,15 @@ describe("19046 Wild Creatures", () => {
     const full = resolveRecords(enough.state, enough.ctx, CODES.wildCreatures, "whenRevealed", idOf(enough.state, CODES.wildCreatures));
     expect(codesIn(full.state, "encounterDeck")).toEqual([CODES.wilderlandBear]);
     expect(idsOf(full.state, CODES.wilderlandBear)).toHaveLength(1);
+  });
+
+  it("19046:A:1 a player counts as unable to engage when every enemy in the staging area is barred to them", () => {
+    const t = rhovanionTable(world, { staging: [CODES.wildCreatures, "f0"], deck: [CODES.harshWeather, CODES.wilderlandBear, "place"] });
+    const enemy = idOf(t.state, "f0");
+    const barred = { ...t.state, modifiers: [...t.state.modifiers, { instanceId: enemy, sourceId: enemy, stat: "cannotBeEngaged" as const, amount: 1, until: "endOfRound" as const }] };
+    const run = resolveRecords(barred, t.ctx, CODES.wildCreatures, "whenRevealed", idOf(barred, CODES.wildCreatures));
+    expect(run.state.cards[enemy]?.zone).toBe("staging");
+    expect(codesIn(run.state, "staging")).toContain(CODES.wilderlandBear);
+    expect(codesIn(run.state, "encounterDiscard")).toEqual([CODES.harshWeather]);
   });
 });

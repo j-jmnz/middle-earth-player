@@ -49,8 +49,8 @@ describe("the trust in Urdug (12184:A:2, 12184:B:1)", () => {
   it("solo, has no lead; it states the resources he has now, what each adds and what declining does", () => {
     const { t, state } = claimed(1);
     const sheet = sheetOf(t, state);
-    expect(sheet.note).toBe("Put your trust in Urdug? He gets a resource (0 now, 1 after) and +1 Willpower, Threat, Attack and Defense for it. If you don't, a copy of Urdug's Cunning is shuffled into the encounter deck. At 3 resources on him a win adds Misplaced Trust to the pool, else Urdug's Cunning.");
-    expect(labels(sheet)).toEqual(["Put a resource on Urdug: +1 Willpower, Threat, Attack and Defense", "Don't: shuffle Urdug's Cunning into the encounter deck"]);
+    expect(sheet.note).toBe("Put your trust in Urdug? He has 0; trust makes it 1. If you don't, a copy of Urdug's Cunning is shuffled into the encounter deck. At the Resolution, with 3 or more resources on him each player adds Misplaced Trust to the campaign pool and their deck; with fewer, Urdug's Cunning.");
+    expect(labels(sheet)).toEqual(["Put a resource on Urdug: +1 Willpower, Threat, Attack and Defense", "Decline: shuffle a copy of Urdug's Cunning into the encounter deck"]);
   });
 
   it("two-handed, leads with the player who chooses (the first player), and the sheet adds no 'Player N chooses.'", () => {
@@ -68,7 +68,18 @@ describe("the trust in Urdug (12184:A:2, 12184:B:1)", () => {
     const held = take(t, state, "trust");
     expect(resources(held, CODES.urdug)).toBe(1);
     const again = opened(t, held, CODES.campaignCard, "forced", idOf(held, CODES.campaignCard), "forced", "12184:forced:1");
-    expect(sheetOf(t, again).note).toContain("He gets a resource (1 now, 2 after)");
+    expect(sheetOf(t, again).note).toContain("He has 1; trust makes it 2.");
+  });
+
+  it("after a claim the question leads with the card claimed, and says nothing of it at the Setup", () => {
+    for (const [seats, lead] of [[1, "You claimed Durin's Key. Put"], [2, "Player 1: you claimed Durin's Key. Put"]] as const) {
+      const { t, state } = claimed(seats, { staging: [CODES.durinSKey] });
+      const key = idOf(state, CODES.durinSKey);
+      const top = state.stack.at(-1);
+      expect(top?.data.kind).toBe("effect");
+      const told = { ...state, stack: state.stack.map((frame) => (frame === top && frame.data.kind === "effect" ? { ...frame, data: { ...frame.data, subject: key } } : frame)) };
+      expect(sheetOf(t, told).note).toMatch(new RegExp(`^${lead} your trust in Urdug\\? He has 0; trust makes it 1\\. `));
+    }
   });
 
   it("the burden shuffles a copy of Urdug's Cunning into the encounter deck", () => {
@@ -82,7 +93,7 @@ describe("the trust in Urdug (12184:A:2, 12184:B:1)", () => {
     const t = rhovanionTable(world, { seats: 2, campaign: true, play: [CODES.urdug] });
     const state = opened(t, t.state, CODES.campaignCard, "campaignSetup", idOf(t.state, CODES.campaignCard), "setup", "12184:campaignSetup:1", ["PutTrust"]);
     const sheet = sheetOf(t, state);
-    expect(sheet.note).toMatch(/^Player 1: put your trust in Urdug\? He gets a resource \(0 now, 1 after\)/);
+    expect(sheet.note).toMatch(/^Player 1: put your trust in Urdug\? He has 0; trust makes it 1\./);
     expect(labels(sheet)).toHaveLength(2);
   });
 
@@ -100,7 +111,7 @@ describe("Sneaking Off (19044:A:1), Wild Creatures (19046:A:1) and Durin's Key (
       const off = spawn(t.state, CODES.sneakingOff, { zone: "staging" });
       const state = opened(t, off.state, CODES.sneakingOff, "whenRevealed", off.id, "whenRevealed");
       const sheet = sheetOf(t, state);
-      expect(sheet.note).toContain(`${lead} in the staging area. Urdug is attached to it as a guarded objective: you lose control of him until it leaves play, and Sneaking Off leaves the game.`);
+      expect(sheet.note).toContain(`${lead} in the staging area. Urdug is attached to it as a guarded objective: you lose control of him until it leaves play, and Sneaking Off is removed from the game.`);
       expect(sheet.note).not.toContain("chooses");
       expect(labels(sheet).sort()).toEqual(["Grey Moorland", "Slopes of Ered Mithrin"]);
     }
@@ -112,17 +123,17 @@ describe("Sneaking Off (19044:A:1), Wild Creatures (19046:A:1) and Durin's Key (
       const creatures = spawn(t.state, CODES.wildCreatures, { zone: "staging" });
       const state = opened(t, creatures.state, CODES.wildCreatures, "whenRevealed", creatures.id, "whenRevealed");
       const sheet = sheetOf(t, state);
-      expect(sheet.note).toContain(`${lead} in the staging area to engage. A player left with none to engage makes a Creature enemy join the staging area.`);
+      expect(sheet.note).toContain(`${lead} in the staging area to engage. If any player has none to engage, cards are discarded from the encounter deck until a Creature enemy is, and it joins the staging area.`);
       expect(sheet.note).not.toContain("chooses");
     }
   });
 
   it("Durin's Key: free of encounters, the first player chooses the hero that carries it, and the sheet says so", () => {
-    for (const [seats, lead] of [[2, "Player 1: choose one of your heroes"], [1, "Choose one of your heroes"]] as const) {
+    for (const [seats, lead] of [[2, "Player 1: attach"], [1, "Attach"]] as const) {
       const t = rhovanionTable(world, { seats, campaign: true, play: [CODES.urdug], staging: [CODES.durinSKey] });
       const state = settle({ ...t.state, window: null, mode: "stopped" }, t.ctx, []);
       const sheet = sheetOf(t, state);
-      expect(sheet.note).toContain(`${lead} to carry Durin's Key. It is free of encounters, so the players claim it.`);
+      expect(sheet.note).toContain(`${lead} Durin's Key to one of your heroes. It is free of encounters, so you claim it; you are asked about trust in Urdug next.`);
       expect(sheet.note).not.toContain("chooses");
     }
   });
@@ -130,13 +141,13 @@ describe("Sneaking Off (19044:A:1), Wild Creatures (19046:A:1) and Durin's Key (
 
 describe("Wilderland Bear (19040:A:1), Deep Ravine (19042:A:2) and Harsh Weather (19045:A:1)", () => {
   it("Wilderland Bear: the first player chooses between the immediate attack and the discard", () => {
-    for (const [seats, lead] of [[2, "Player 1: choose"], [1, "Choose"]] as const) {
+    for (const [seats, lead] of [[2, "Player 1: "], [1, ""]] as const) {
       const t = rhovanionTable(world, { seats, staging: [CODES.wilderlandBear] });
       const state = opened(t, t.state, CODES.wilderlandBear, "whenRevealed", idOf(t.state, CODES.wilderlandBear), "whenRevealed");
       const sheet = sheetOf(t, state);
-      expect(sheet.note).toBe(`${lead}: the Bear makes an immediate attack against the first player, or each player discards 1 card at random from their hand.`);
+      expect(sheet.note).toBe(`${lead}Wilderland Bear attacks you, or each player discards 1 card at random from their hand?`);
       expect(sheet.note).not.toContain("chooses");
-      expect(labels(sheet)).toEqual(["The Bear makes an immediate attack against the first player", "Each player discards 1 card at random from their hand"]);
+      expect(labels(sheet)).toEqual(["Wilderland Bear makes an immediate attack against you", "Each player discards 1 card at random from their hand"]);
     }
   });
 

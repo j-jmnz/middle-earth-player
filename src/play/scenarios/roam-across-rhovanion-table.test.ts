@@ -63,14 +63,17 @@ describe("Urdug's trust (12184:B:2) and his enemy side (19051:B:3, 19055:A:2)", 
     const table = rhovanionTable(world, { stage: STAGES[4], staging: [CODES.urdugEnemy, CODES.tinyEnemy] });
     const synced = { ...table, state: syncConstants(updateCard(table.state, idOf(table.state, CODES.urdugEnemy), { resources: 2, damage: 4 }), table.ctx) };
     const health = world.cards.get(CODES.urdugEnemy)?.health ?? 0;
-    expect(detail(synced, CODES.urdugEnemy)).toBe(`2 resources of trust on him: +2 Willpower, Threat, Attack and Defense. 4 of ${health} damage: the players win when he has no hit points remaining, and he stays in play even then. He takes no damage while Tiny is in play.`);
+    expect(detail(synced, CODES.urdugEnemy)).toBe(`2 resources of trust on him: +2 Willpower, Threat, Attack and Defense. 4 of ${health} damage. He is indestructible: the players win when he has no hit points remaining. He takes no damage while Tiny is in play.`);
     // Without Tiny he takes damage again.
     const alone = rhovanionTable(world, { stage: STAGES[4], staging: [CODES.urdugEnemy] });
-    expect(detail(alone, CODES.urdugEnemy)).toBe(`0 of ${health} damage: the players win when he has no hit points remaining, and he stays in play even then.`);
+    expect(detail(alone, CODES.urdugEnemy)).toBe(`0 of ${health} damage. He is indestructible: the players win when he has no hit points remaining.`);
   });
 
-  it("says nothing of Tiny on either side", () => {
+  it("says nothing of Tiny alone, and with Urdug that he shields him", () => {
     const table = rhovanionTable(world, { stage: STAGES[4], staging: [CODES.tinyEnemy] });
     expect(detail(table, CODES.tinyEnemy)).toBeNull();
+    const both = rhovanionTable(world, { stage: STAGES[4], staging: [CODES.urdugEnemy, CODES.tinyEnemy] });
+    const synced = { ...both, state: syncConstants(both.state, both.ctx) };
+    expect(detail(synced, CODES.tinyEnemy)).toBe("Urdug takes no damage while Tiny is in play.");
   });
 });

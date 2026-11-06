@@ -36,20 +36,31 @@ describe("the words of Roam Across Rhovanion", () => {
     const solo = withWindow(1, 0);
     const one = updateCard(solo.game, idOf(solo.game, CODES.urdug), { resources: 2 });
     const note = rhovanionChooseNote(TRUST, one, solo.ctx, names);
-    expect(note).toContain("He gets a resource (2 now, 3 after) and +1 Willpower, Threat, Attack and Defense for it.");
+    expect(note).toContain("He has 2; trust makes it 3.");
+    expect(note).not.toContain("Willpower");
+    expect(note).toContain("At the Resolution, with 3 or more resources on him each player adds Misplaced Trust to the campaign pool and their deck; with fewer, Urdug's Cunning.");
     expect(note).toContain("If you don't, a copy of Urdug's Cunning is shuffled into the encounter deck.");
     expect(note?.startsWith("Put your trust in Urdug?")).toBe(true);
     const pair = withWindow(2, 1);
     expect(rhovanionChooseNote(TRUST, pair.game, pair.ctx, names)?.startsWith("Player 2: put your trust in Urdug?")).toBe(true);
     expect(rhovanionBranchWords(TRUST, "trust", names)).toBe("Put a resource on Urdug: +1 Willpower, Threat, Attack and Defense");
-    expect(rhovanionBranchWords(TRUST, "burden", names)).toBe("Don't: shuffle Urdug's Cunning into the encounter deck");
+    expect(rhovanionBranchWords(TRUST, "burden", names)).toBe("Decline: shuffle a copy of Urdug's Cunning into the encounter deck");
+  });
+
+  it("12184:B:1 after a claim the question leads with the claim; the Setup's does not", () => {
+    const solo = withWindow(1, 0);
+    expect(rhovanionChooseNote(TRUST, solo.game, solo.ctx, { ...names, card: () => "Durin's Key" }, "any")?.startsWith("You claimed Durin's Key. Put your trust in Urdug? He has 0; trust makes it 1.")).toBe(true);
+    const pair = withWindow(2, 0);
+    expect(rhovanionChooseNote(TRUST, pair.game, pair.ctx, { ...names, card: () => "Durin's Key" }, "any")?.startsWith("Player 1: you claimed Durin's Key. Put your trust in Urdug? ")).toBe(true);
+    expect(rhovanionChooseNote(TRUST, pair.game, pair.ctx, names)?.startsWith("Player 1: put your trust in Urdug? ")).toBe(true);
   });
 
   it("19040:A:1 Wilderland Bear's question names the first player and the discard", () => {
     const t = withWindow(2, 0);
     const choose = recordChoose(t.ctx, CODES.wilderlandBear, "whenRevealed");
-    expect(rhovanionChooseNote(choose, t.game, t.ctx, names)).toBe("Player 1: choose: the Bear makes an immediate attack against the first player, or each player discards 1 card at random from their hand.");
-    expect(rhovanionBranchWords(choose, "attack", names)).toBe("The Bear makes an immediate attack against the first player");
+    expect(rhovanionChooseNote(choose, t.game, t.ctx, names)).toBe("Player 1: Wilderland Bear attacks you, or each player discards 1 card at random from their hand?");
+    expect(rhovanionChooseNote(choose, withWindow(1, 0).game, t.ctx, names)).toBe("Wilderland Bear attacks you, or each player discards 1 card at random from their hand?");
+    expect(rhovanionBranchWords(choose, "attack", names)).toBe("Wilderland Bear makes an immediate attack against you");
     expect(rhovanionBranchWords(choose, "discard", names)).toBe("Each player discards 1 card at random from their hand");
   });
 
@@ -59,6 +70,10 @@ describe("the words of Roam Across Rhovanion", () => {
     expect(rhovanionChooseNote(choose, t.game, t.ctx, names)).toBe("To travel to Deep Ravine, exhaust Urdug, or raise each player's threat by 2?");
     expect(rhovanionBranchWords(choose, "exhaust", names)).toBe("Exhaust Urdug");
     expect(rhovanionBranchWords(choose, "threat", names)).toBe("Raise each player's threat by 2");
+    // Urdug exhausted: the exhaust is not possible, and the note says what travelling costs.
+    const urdug = idOf(t.game, CODES.urdug);
+    const spent = updateCard(t.game, urdug, { exhausted: true });
+    expect(rhovanionChooseNote(choose, spent, t.ctx, names)).toBe("Urdug is exhausted: travelling to Deep Ravine raises each player's threat by 2.");
   });
 
   it("any other Choose has no words here", () => {
