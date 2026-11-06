@@ -38,7 +38,7 @@ Read the sections your task touches, not the whole file: `docs/INDEX.md` gives e
 
 ## Product
 
-A personal, offline, single-device app for The Lord of the Rings Living Card Game. Official campaigns are the product. The first campaign is the 2022 **Fellowship of the Ring Saga Expansion** (FFG product MEC109). Later official campaigns are added as more content in the same app.
+An offline, single-device, fan-made app for The Lord of the Rings Living Card Game, with no connection to FFG. Official campaigns are the product. The first campaign is the 2022 **Fellowship of the Ring Saga Expansion** (FFG product MEC109). Later official campaigns are added as more content in the same app.
 
 One human. No accounts, no rooms, no matchmaking, no server in the play loop. True solo is one local seat. Two-handed solo is two local seats on the same phone, because staging and engagement are defined per player. That is not multiplayer. The paper log has Player 3 and Player 4 columns. This app does not. `seatCount` is 1 or 2, chosen once at campaign start.
 
@@ -46,7 +46,7 @@ The app opens on the campaign list, not on a blank table. Deckbuilding is a sepa
 
 The booklet allows playing a scenario as a standalone adventure (`mec109.campaign-mode`: "players can still play the scenarios as standalone adventures if they choose"). The app has it: a Scenarios tab beside the campaign list deals any playable scenario of the box on its own, with no campaign mechanics (Standalone play, below; user decision 2026-10-25). The Scenarios tab lists one section for each box the app plays: the Fellowship of the Ring, the Revised Core Set (Passage Through Mirkwood, Journey Along the Anduin, Escape from Dol Guldur) The Dark of Mirkwood (The Oath, The Caves of Nibin-Dûm) Dream-chaser (its nine scenarios) and Ered Mithrin (its nine scenarios), see Mirkwood Paths and The Dark of Mirkwood, Dream-chaser and Ered Mithrin, below. A box's scenario is dealable once `src/campaign/playable.ts` lists it.
 
-This brief assumes a personal, unpublished app. A public store listing is a different copyright situation and is not decided here. Do not start one.
+The repository is open source: the code is under the MIT License, and game content keeps its owners' terms (`THIRD_PARTY_NOTICES.md`). An app store listing is a different copyright situation and is not decided here. Do not start one.
 
 ## Non-goals
 
@@ -57,7 +57,7 @@ Do not do any of these.
 - Do not add accounts, auth, Patreon, image hosting, or a backend.
 - Do not restrict the deck builder to cards that have automated effects, or to cards printed in the Fellowship box.
 - Do not include ALeP or playtest cards. Easy, Normal and Nightmare (user decision, 2026-10-30; Nightmare, below). Easy Mode also puts 1 resource on each hero during setup (`easy-mode.easy-mode`).
-- Do not commit card scans, booklet PDFs, or `catalog.db`. `data/` holds card text, rules text and raw source snapshots on purpose, so every session has them. The card text, art and rules belong to FFG/Asmodee; if this repo is ever made public, that is a legal exposure to revisit first. The phone receives `catalog.db` inside the binary. The release build also carries every booklet PDF (`BOOKLET_SOURCES`, `scripts/build/pack-booklets.ts`): `pnpm booklets:pack` (run by `eas-build-post-install`) copies each pinned PDF from `.cache/pdf`, or fetches it from its pinned URL and checks the sha256 in `data/sources.json`, with a map that requires them into `assets/booklets/` (gitignored); Metro bundles that map in place of the empty stub `src/screens/booklets/bundled-map.ts`. `pnpm data:sync rules` and `pnpm android` pack too. The app never fetches a booklet at runtime. A build without them still lets the player add each PDF from their files.
+- Do not commit card scans, booklet PDFs, or `catalog.db`. `data/` holds card text, rules text and raw source snapshots on purpose, so every session has them. The card text, art and rules belong to FFG/Asmodee (`THIRD_PARTY_NOTICES.md`). The phone receives `catalog.db` inside the binary. The release build also carries every booklet PDF (`BOOKLET_SOURCES`, `scripts/build/pack-booklets.ts`): `pnpm booklets:pack` (run by `eas-build-post-install`) copies each pinned PDF from `.cache/pdf`, or fetches it from its pinned URL and checks the sha256 in `data/sources.json`, with a map that requires them into `assets/booklets/` (gitignored); Metro bundles that map in place of the empty stub `src/screens/booklets/bundled-map.ts`. `pnpm data:sync rules` and `pnpm android` pack too. The app never fetches a booklet at runtime. A build without them still lets the player add each PDF from their files.
 - Do not paste the MEC109 narrative prose into screens. Encode procedures. Short original labels are fine ("Hide test", "Ring-bearer's life").
 - Do not ship a WebView of any existing card-table site.
 - Do not build a collection tracker, an encounter-card deck editor, or a second game.

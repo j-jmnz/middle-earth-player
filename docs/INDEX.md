@@ -57,10 +57,10 @@ Read the sections your task touches.
   - 352–357 Catalog build (~410)
   - 358–375 Tests (~1.6K) ← 5
   - 376–391 Performance (~1.2K) ← 3
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~81.3K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~81.4K tok)
   - 17–38 Sections (~410)
-  - 39–50 Product (~530)
-  - 51–64 Non-goals (~520)
+  - 39–50 Product (~560)
+  - 51–64 Non-goals (~510)
   - 65–85 Decisions (~830)
   - 86–114 Stack (~810)
   - 115–132 Performance and feel (~750)
