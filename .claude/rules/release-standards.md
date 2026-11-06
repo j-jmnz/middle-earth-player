@@ -10,7 +10,7 @@ Every session, agent and contributor that branches, tags or releases follows the
 
 ## Versioning
 
-- Versions are semver, `<major>.<minor>.<patch>`, and live only in the tag `v<major>.<minor>.<patch>`. `app.json` and `package.json` stay at `0.0.0` on every branch; the release build stamps the version and Android's `versionCode` from the tag (`app.config.js`). Do not commit a version bump.
+- Versions are semver, `<major>.<minor>.<patch>`, and live only in the tag `v<major>.<minor>.<patch>`. `app.json` and `package.json` stay at `0.0.0` on every branch; the release build stamps the version and the build number (Android's `versionCode`, iOS's `CFBundleVersion`) from the tag (`app.config.js`). Do not commit a version bump.
 - The bump comes from the commits since the last tag: a `Breaking:` line is major, a `feat` minor, a `fix`, `style` or `refactor` patch. `repo` commits alone make no release; ask for `patch` when a `repo` change (a card data refresh) should still ship.
 - `Breaking:` is a line in the commit body, kept in the squash commit, written for players: an update that loses something saved (a campaign, a log, a deck) or removes a feature or setting. An engine version change that drops an open scenario is not breaking: the notes say it on their own.
 - Before 1.0.0 a breaking change bumps minor. 1.0.0 is the user's decision, asked for with `major`. The first release is 0.1.0.
@@ -19,7 +19,8 @@ Every session, agent and contributor that branches, tags or releases follows the
 
 - Only the release workflow (`.github/workflows/release.yml`) creates a `v*` tag or a GitHub release. Do not tag, push a tag or draft a release by hand.
 - A tag is never moved, deleted or reused. A bad release is followed by a fixed patch release; edit the bad one's notes to say what is wrong with it.
-- Every release carries a signed APK, built from the tagged commit after the same checks as `test.yml`, signed with the one release key (`docs/releasing.md`, Signing key), so each release installs over the last and keeps the player's saves.
+- Every release ships on both platforms from the tagged commit, after the same checks as `test.yml`: a signed APK on the GitHub release, signed with the one release key so each release installs over the last and keeps the player's saves, and the iOS build on TestFlight (user decision, 2026-11-06). `docs/releasing.md` (Signing) sets both up.
+- A TestFlight build expires 90 days after upload, so a release is cut at least every 90 days.
 
 ## Release notes
 

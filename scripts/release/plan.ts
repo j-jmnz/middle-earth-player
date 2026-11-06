@@ -19,6 +19,7 @@ import { BUMP_REQUESTS, branchProblem, nextVersion, parseCommit, parseTag, tagOf
 //   --apk <file>           adds the APK's name and SHA-256 to the notes; --cert-sha256 <hex> adds its signing certificate
 //   --dry-run              a branch other than main or release/vX.Y only warns, so the pipeline can be tried from any branch
 //   --github-output        writes tag, version and previous_tag to $GITHUB_OUTPUT and the notes to $GITHUB_STEP_SUMMARY
+// TESTFLIGHT_URL (the repository variable of that name) puts the public TestFlight link in the notes.
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const RELEASE_TAGS = "v[0-9]*.[0-9]*.[0-9]*";
@@ -116,6 +117,7 @@ async function main(log: Log): Promise<void> {
     engineVersion: ENGINE_VERSION,
     previousEngineVersion: previous ? engineVersionAt(previous) : undefined,
     apk,
+    testflightUrl: process.env.TESTFLIGHT_URL || undefined,
   });
 
   const notesFile = flag(args, "--notes");

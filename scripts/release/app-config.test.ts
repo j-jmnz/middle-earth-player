@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 // app.config.js stamps the release version into the build (.claude/rules/release-standards.md, Versioning).
 const require = createRequire(import.meta.url);
 const appConfig = require("../../app.config.js") as {
-  stamp: (config: Record<string, unknown>, version: string | undefined) => Record<string, unknown>;
+  stamp: (config: Record<string, unknown>, version: string | undefined, appleTeamId?: string) => Record<string, unknown>;
   versionCodeOf: (version: string) => number;
 };
 const app = require("../../app.json") as { expo: Record<string, unknown> };
@@ -23,6 +23,12 @@ describe("app.config.js", () => {
     expect(stamped.ios.buildNumber).toBe("1002003");
     const order = ["0.1.0", "0.1.1", "0.2.0", "0.999.999", "1.0.0", "1.0.1"].map(appConfig.versionCodeOf);
     expect([...order].sort((a, b) => a - b)).toEqual(order);
+  });
+
+  it("sets the iOS signing team only when one is given", () => {
+    const stamped = appConfig.stamp(app.expo, "0.2.0", "ABCDE12345") as { ios: { appleTeamId: string; bundleIdentifier: string } };
+    expect(stamped.ios).toMatchObject({ appleTeamId: "ABCDE12345", bundleIdentifier: "com.middleearth.lcg" });
+    expect((appConfig.stamp(app.expo, "0.2.0") as { ios: { appleTeamId?: string } }).ios.appleTeamId).toBeUndefined();
   });
 
   it("refuses a version that is not plain semver or does not fit", () => {

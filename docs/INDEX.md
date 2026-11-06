@@ -13,7 +13,7 @@ Read whole.
 - `.claude/rules/code-standards.md` — Code standards (~1.9K tok)
 - `.claude/rules/commit-standards.md` — Commit standards (~680 tok)
 - `.claude/rules/docs-standards.md` — Docs standards (~1.1K tok)
-- `.claude/rules/release-standards.md` — Release standards (~890 tok)
+- `.claude/rules/release-standards.md` — Release standards (~950 tok)
 
 ## Agents
 
@@ -29,12 +29,12 @@ Each agent reads its own file.
 
 Read the sections your task touches.
 
-- `README.md` — Middle Earth LCG (~3.6K tok)
+- `README.md` — Middle Earth LCG (~3.7K tok)
   - 8–16 Features (~210)
   - 17–27 Roadmap (~160)
   - 28–36 Accessibility (~340)
   - 37–46 Architecture (~310)
-  - 47–53 Install (~140)
+  - 47–53 Install (~170)
   - 54–106 Local setup (~780)
     - 56–70 Requirements (~130)
     - 71–80 In a browser (~140)
@@ -180,7 +180,7 @@ Read the sections your task touches.
     - 441–446 Booklet (~280) ← 2
     - 447–450 Database (~20)
   - 451–470 States (~620)
-- `docs/releasing.md` — Releasing (~1.4K tok)
+- `docs/releasing.md` — Releasing (~2.1K tok)
 
 ## Phases
 
@@ -189,12 +189,12 @@ STATUS.md, then the active phase file.
 - `docs/phases/STATUS.md` — Phase status (~6.4K tok)
   - 5–15 Rules (~410)
   - 16–87 Phases (~1.4K)
-  - 88–179 Open items (~4.1K)
-    - 90–93 Releases (~60)
-    - 94–115 Fixtures and Maestro (~1.2K)
-    - 116–161 Rules and engine (~2.1K)
-    - 162–179 Screens and code (~700)
-  - 180–196 Standing decisions (~490)
+  - 88–178 Open items (~4.1K)
+    - 90–92 Releases (~50)
+    - 93–114 Fixtures and Maestro (~1.2K)
+    - 115–160 Rules and engine (~2.1K)
+    - 161–178 Screens and code (~700)
+  - 179–195 Standing decisions (~490)
 
 ## Live plans
 
@@ -214,7 +214,6 @@ Read when a task names the plan.
   - 237–273 Mechanic families: engine and records together (~1.4K) ← 1
   - 274–286 Readings the review catches (~410) ← 3
   - 287–306 Not expressible yet: leave open, report (~390)
-- `docs/plans/ios-release.md` — iOS releases (~750 tok)
 - `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.4K tok)
   - 3–14 Context (~450)
   - 15–24 What does not move (~190)

@@ -46,10 +46,10 @@ The stack is Expo SDK 58, Expo Router, Skia for the game table, Reanimated, Nati
 
 ## Install
 
-The app is not on the Play Store or the App Store.
+The app is not listed on the Play Store or the App Store.
 
 - Android: download the `.apk` from the latest release on the [Releases page](https://github.com/j-jmnz/middle-earth-lcg/releases) and open it on your phone. Allow your browser or file manager to install unknown apps when it asks. A newer release installs over the old one and keeps your campaigns. Each release's notes give the file's SHA-256 and the signing certificate's fingerprint.
-- iPhone and iPad: there is no download yet. Build it from source as Local setup, On a phone says.
+- iPhone and iPad: join the beta through the public TestFlight link in the latest release's notes, then install the app from Apple's TestFlight app. TestFlight offers each new release as an update and keeps your campaigns.
 
 ## Local setup
 

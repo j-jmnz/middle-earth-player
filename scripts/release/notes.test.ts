@@ -47,4 +47,9 @@ describe("release notes (.claude/rules/release-standards.md, Release notes)", ()
     expect(notes).toContain("`middle-earth-lcg-v0.1.0.apk` SHA-256: `ab12`");
     expect(notes).toContain("Signing certificate SHA-256: `cd34`");
   });
+
+  it("links the TestFlight beta when its public link is known, and points to the README otherwise", () => {
+    expect(renderNotes({ ...base, testflightUrl: "https://testflight.apple.com/join/abc" })).toContain("[the public TestFlight link](https://testflight.apple.com/join/abc)");
+    expect(renderNotes(base)).toContain("the public TestFlight link in the README (Install)");
+  });
 });

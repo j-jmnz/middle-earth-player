@@ -102,7 +102,7 @@ Pin these. Do not swap them for a lookalike.
 | Haptics | `expo-haptics`, the SDK 58 `pnpm expo install` version (user request, 2026-10-25): a tick when a table button arms, sends or is refused, and on Undo. It adds to what the screen shows and never replaces it. |
 | Screen state | Zustand. The only writer of game state is the reducer in `src/rules` |
 | Tests | Vitest, in Node, on `src/rules` and `src/campaign`. Maestro flows in `.maestro/` are written with the phase that names them and run with `maestro test` after the last phase. The physical phone still judges fling and drag. Card ability text stays out of Maestro. |
-| Device builds | Releases: a signed Android APK on the GitHub Releases page, built by `.github/workflows/release.yml` (`docs/releasing.md`); no store listing. iOS from source; `docs/plans/ios-release.md` weighs a download. EAS Build profiles for development and e2e builds |
+| Device builds | Releases, built by `.github/workflows/release.yml` (`docs/releasing.md`) with no store listing: a signed Android APK on the GitHub Releases page, and the iOS build on TestFlight (user decision, 2026-11-06). EAS Build profiles for development and e2e builds |
 
 Install Reanimated, `react-native-worklets`, Gesture Handler, Skia, FlashList, `expo-sqlite`, `expo-image`, `expo-file-system` and `expo-haptics` with `pnpm expo install`. Worklets is the Reanimated 4 peer. Stay on the Skia and FlashList versions that command selects. Expo Go ships those binaries.
 
@@ -897,7 +897,7 @@ Open `catalog.db` and `user.db` as two handles, both reachable from screens. Do 
 
 Schema changes to `catalog.db` are a new file, not an in-place migration. Schema changes to `user.db` are migrations.
 
-The release workflow builds the Android APK players sideload from the Releases page, signed with the one release key so each release installs over the last; EAS Build makes the development and e2e builds. A physical iPhone needs Apple signing (a build from Xcode, ad hoc, or TestFlight). The simulator does not.
+The release workflow builds the Android APK players sideload from the Releases page, signed with the one release key so each release installs over the last, and uploads the iOS build to TestFlight, which players install from Apple's TestFlight app; EAS Build makes the development and e2e builds. A physical iPhone needs Apple signing (TestFlight, or a build from Xcode). The simulator does not.
 
 Development gotcha: the copy from the asset into the app sandbox runs once per database name. After changing `assets/catalog.db` during development, rebuild it with `pnpm catalog:build`, which changes `CATALOG_VERSION`, or delete the app's storage. Do not leave `forceOverwrite` unconditionally true.
 
