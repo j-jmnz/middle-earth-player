@@ -2,18 +2,25 @@ appId: com.middleearth.lcg
 tags:
   - scenario
 ---
-# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `framsburg-won` (scripts/e2e/the-ghost-of-framsburg.ts): a real two-handed
-# game of The Ghost of Framsburg, parked on its win. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
-# The steps are the shared subflow's (.maestro/subflows/scenario-win.yaml); add this scenario's own assertions after the call.
+# Phase 58. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `framsburg-won` (scripts/e2e/the-ghost-of-framsburg.ts): a real two-handed game of The Ghost of Framsburg
+# (the Defenders of Gondor and Swords of the Noldor lists, Easy) dealt from the log the first six parts' wins write, parked on its win (three Loot objectives controlled, The Cursed Tomb and Fram's Shade in the victory display). The fixture is OPEN:
+# scripts/e2e/fixtures.ts found no win of the two starter decklists in its 100 seeds (docs/phases/STATUS.md), so this flow cannot run until a seed wins.
+# The Resolution discovers the treasures the players control (no question), then asks the first player whether Gundabad Hunter or Gundabad Stalker joins the pool (12189:B:5, the eyebrow "Choose a burden", the seat label "Player 1 (first player) chooses"),
+# then which of the first 2 Hazard cards discarded joins it (12189:B:6, "Choose a Hazard card for the pool"; no question when the two are one card). When the fixture exists, set CHOICE_ID to the Hunter's code, CHOICE_PROMPT to the eyebrow and
+# CHOICE_CONSEQUENCE to "Gundabad Hunter is added to the campaign pool as a burden; Gundabad Stalker is not."; the Hazard card is a seeded draw, so CHOICE2_ID is the code or `e:`/`b:` tile id the fixture's seed discards, set when it exists.
 - runFlow:
     file: ../../subflows/scenario-win.yaml
     env:
       FIXTURE: framsburg-won
       SCENARIO_ID: the-ghost-of-framsburg
-      # A Resolution that asks one choice: the code of the card it offers, the choice's eyebrow text and the sentence the confirm line shows.
-      # CHOICE_ID: "TODO"
-      # CHOICE_PROMPT: "TODO"
-      # CHOICE_CONSEQUENCE: "TODO"
+      NO_XP: "true"
+      # CHOICE_ID: "12191"
+      # CHOICE_PROMPT: "Choose a burden"
+      # CHOICE_CONSEQUENCE: "Gundabad Hunter is added to the campaign pool as a burden; Gundabad Stalker is not."
+# The win wrote the campaign card's Resolution to the pool beside what the earlier parts put there: the burden chosen, and Misplaced Trust Roam Across Rhovanion earned.
+- assertVisible:
+    id: pool
+    text: ".*Misplaced Trust.*"
 # The win unlocks Mount Gundabad, which the app cannot deal yet, so the path stops there and its node reads Coming soon (scripts/checks/maestro.test.ts, path-soon).
 - assertVisible:
     id: node-mount-gundabad-status
@@ -21,4 +28,3 @@ tags:
 - assertVisible:
     id: path-soon
     text: "Mount Gundabad is coming soon."
-# TODO (task B): this scenario's own assertions on the path screen after the win (a carried card).

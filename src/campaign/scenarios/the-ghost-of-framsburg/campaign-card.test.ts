@@ -212,6 +212,51 @@ describe("12189:B Resolution", () => {
     expect(consequenceSentence(choosing, null, false)).toContain("Choose 1 of the 2 Hazard cards discarded");
   });
 
+  it("12189:B:5 the first player's choice of Gundabad Hunter or Gundabad Stalker names both, says the other is not added and, two-handed, whose it is", () => {
+    for (const seats of [1, 2] as const) {
+      const state = opened(seats);
+      const asking = openResolution({ ...state, stageCleared: true, window: null, stack: [] }, ctx);
+      const view = resolutionView(asking, worldOf) as Extract<ResolutionView, { kind: "choosing" }>;
+      expect(view.kind).toBe("choosing");
+      expect(view.eyebrow).toBe("Choose a burden");
+      expect(view.tiles.map((tile) => tile.name)).toEqual(["Gundabad Hunter", "Gundabad Stalker"]);
+      expect(view.seatLabel, `${seats} seats`).toBe(seats === 1 ? null : "Player 1 (first player) chooses");
+      expect(consequenceSentence(view, null, false)).toBe("Choose Gundabad Hunter or Gundabad Stalker for the campaign pool; the other is not added. It is written to the campaign log when you confirm.");
+      expect(consequenceSentence(view, view.tiles[1]!, false)).toBe("Gundabad Stalker is added to the campaign pool as a burden; Gundabad Hunter is not.");
+    }
+  });
+
+  it("12189:B:6 the Hazard choice names both cards, says the group decides and that the other is not added; two-handed it is the first player's", () => {
+    for (const seats of [1, 2] as const) {
+      const base = opened(seats);
+      const stalker = Object.values(base.cards).find((card) => card.code === CODES.cryptStalker)!.id;
+      const spectre = Object.values(base.cards).find((card) => card.code === CODES.evilSpectre)!.id;
+      const arranged = onlyEncounterCards(base, { deck: [stalker], discard: [spectre] });
+      let next = openResolution({ ...arranged, stageCleared: true, window: null, stack: [] }, ctx);
+      next = openResolution(expectOk(reduce(next, { type: "ChooseResolution", optionId: CODES.gundabadHunter } as PlayerIntent, ctx)).state, ctx);
+      const view = resolutionView(next, worldOf) as Extract<ResolutionView, { kind: "choosing" }>;
+      expect(view.seatLabel, `${seats} seats`).toBe(seats === 1 ? null : "Player 1 (first player) chooses");
+      // The shuffle of the discard pile orders the two (a seeded draw).
+      expect(consequenceSentence(view, null, false)).toMatch(/^Choose 1 of the 2 Hazard cards discarded \((Evil Spectre or Crypt Stalker|Crypt Stalker or Evil Spectre)\); the group decides\. It joins the campaign pool when you confirm, and the other is not added\.$/);
+    }
+  });
+
+  it("12189:B:6 a unique Hazard card is a Hazard card like any other: Fram's Shade in the encounter deck or discard pile counts toward the 2 and may be chosen, at most one copy joining the pool", () => {
+    // The Resolution reads the trait and not uniqueness (emce.campaign-pool-encounter limits the copies to what one collection holds); in a win Fram's Shade is in the victory display, so it is never reached.
+    const base = opened(1);
+    const shade = where(base, CODES.framSShade)[0]!.id;
+    const stalker = Object.values(base.cards).find((card) => card.code === CODES.cryptStalker)!.id;
+    const arranged = onlyEncounterCards(base, { deck: [shade, stalker], discard: [] });
+    const result = won(arranged, (options) => options.find((option) => codeOfOption(arranged, option) === CODES.framSShade) ?? options[0] ?? "");
+    const hazardStep = result.asked.find((step) => step.options.every((option) => option.startsWith("e:") || option.startsWith("b:")));
+    expect(hazardStep?.options.map((option) => codeOfOption(arranged, option)).sort()).toEqual([CODES.cryptStalker, CODES.framSShade].sort());
+    expect(resolutionResult(result.state)?.encounterPool).toEqual({ [CODES.framSShade]: 1 });
+    // A won game has Fram's Shade in the victory display, which the Resolution does not shuffle.
+    const won2 = onlyEncounterCards(moveCard(base, shade, { zone: "victory" }), { deck: [stalker], discard: [] });
+    expect(resolutionResult(won(won2).state)?.encounterPool).toEqual({ [CODES.cryptStalker]: 1 });
+    expect(where(won(won2).state, CODES.framSShade)).toMatchObject([{ zone: "victory" }]);
+  });
+
   it("12189:B:4 discovers the treasures the players control, and not one still guarded", () => {
     const state = opened(1);
     expect(resolutionResult(won(state).state)?.treasures).toBeUndefined();

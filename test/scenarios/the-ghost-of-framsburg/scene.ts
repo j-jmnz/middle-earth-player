@@ -23,6 +23,9 @@ export const dealt: ScenarioData = campaignScenario(framsburg);
 // What the first six parts leave in the pool (the boon allies, the burdens, the Accolade boons, Misplaced Trust and Urdug's Cunning) and the cards of their sets a pool tally may add.
 export const EARLIER_POOL = ["12166", "12167", "12169", "12171", "12172", "12173", "12174", "12176", "12177", "12178", "12179", "12180", "12181", "12182", "12183", "12184", "12185", "12186", "12188", "18046"] as const;
 
+// A player card that reduces a threat (08112 Galadriel's Action), for the words of Moonlit Passage's cap.
+export const GALADRIEL = "08112";
+
 export const STAGES = ["19109", "19110", "19111"] as const;
 // Read from data/scenarios/the-ghost-of-framsburg.json and data/cards: the cards the scenario deals, the campaign card and the cards it places. Rename a key for what a test says.
 export const CODES = {
@@ -64,7 +67,7 @@ export type FramsburgWorld = { definition: ReturnType<typeof scenarioDefinition>
 export async function loadFramsburgWorld(): Promise<FramsburgWorld> {
   const definition = scenarioDefinition(dealt, campaign, EFFECTS);
   // The treasures a record that draws a random one (AttachRandomTreasure, 12189:B:2) draws from.
-  const codes = [...new Set([...dealt.cards.map((card) => card.code), ...dealt.campaignPlaced, dealt.campaignCard, ...TREASURES, ...EARLIER_POOL, ...gameCodes(campaign, framsburg)])];
+  const codes = [...new Set([...dealt.cards.map((card) => card.code), ...dealt.campaignPlaced, dealt.campaignCard, ...TREASURES, ...EARLIER_POOL, ...gameCodes(campaign, framsburg), GALADRIEL])];
   const cards = new Map(await loadPrinted(codes));
   addStandIns(cards, ["f0", "f3", "place", "treachery", "heroes"]);
   addStandIns(cards, ["filler", "event", "ally"], [0, 1, 2, 3]);

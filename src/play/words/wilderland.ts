@@ -15,7 +15,7 @@ import { topFrame } from "../../rules/windows/windows.ts";
 import type { BranchNow } from "./aflame.ts";
 import type { ChoiceNames, PickWords } from "./choice.ts";
 import { heathAsk, heathBranchWords, heathChooseNote, heathOptionLabel } from "./heath.ts";
-import { framsburgAsk } from "./framsburg.ts";
+import { framsburgAsk, framsburgBranchNow, framsburgBranchWords, framsburgChooseNote } from "./framsburg.ts";
 import { nightAsk, nightBranchWords, nightChooseNote, nightQuestsNow } from "./night.ts";
 import { rhovanionAsk, rhovanionBranchWords, rhovanionChooseNote } from "./rhovanion.ts";
 import { askedSeat, seatSays } from "./seat.ts";
@@ -82,7 +82,7 @@ export function wilderlandChooseNote(choose: Extract<Instruction, { verb: "Choos
     const text = `distribute ${damage} damage among characters you control? If you do, ${source ? names.card(source) : "this card"} is shuffled into the encounter deck.`;
     return game.seatCount > 1 ? `Player ${(seat ?? game.firstPlayer) + 1}: ${text}` : `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
   }
-  const heath = heathChooseNote(choose, game, names) ?? rhovanionChooseNote(choose, game, ctx, names, claimed) ?? nightChooseNote(choose, game, ctx, names, source);
+  const heath = heathChooseNote(choose, game, names) ?? rhovanionChooseNote(choose, game, ctx, names, claimed) ?? nightChooseNote(choose, game, ctx, names, source) ?? framsburgChooseNote(choose, game, ctx, names, source);
   if (heath) return heath;
   const offer = searchOffer(choose);
   if (!offer) return null;
@@ -119,8 +119,6 @@ export function wilderlandAsk(instruction: Instruction, source: string | null, n
   if (stage) return stage;
   const weighed = weighedDownAsk(instruction, source, names, next, facts);
   if (weighed) return weighed;
-  // Discover X looked at several Loot objectives: the first player picks the one to attach to the active location (emce.discover).
-  if (instruction.verb === "Discover") return { verb: "Attach", prompt: `Discover: choose 1 Loot objective to attach to ${source ? names.card(source) : "the active location"} as a guarded objective.` };
   // The treasures drawn, as many as there are (3 unless fewer are undiscovered): the step chooses one, the character step after it attaches it.
   const drawn = isTreasureDraw(instruction) ? (facts?.options.length || instruction.count || 3) : 0;
   // ClaimRandomTreasure (120165:A:3): the treasure is claimed for a character; the choice of the character follows (choice.ts, AttachPicked).
@@ -226,7 +224,7 @@ function distributeBranch(option: Extract<Instruction, { verb: "Choose" }>["opti
 }
 
 /** The numbers a Choose states for its branches now: how many cards each count finds for the seat choosing, and the amounts read from the table. */
-export function wilderlandBranchNow(game: ScenarioState, ctx: ReduceContext, choose: Extract<Instruction, { verb: "Choose" }>, seat: number, sourceId: string | null): Pick<BranchNow, "counted" | "quests"> {
+export function wilderlandBranchNow(game: ScenarioState, ctx: ReduceContext, choose: Extract<Instruction, { verb: "Choose" }>, seat: number, sourceId: string | null): Pick<BranchNow, "counted" | "quests" | "rows"> {
   const counted: Record<string, number> = {};
   for (const option of choose.options) {
     const step = countedBranch(option, choose);
@@ -239,12 +237,13 @@ export function wilderlandBranchNow(game: ScenarioState, ctx: ReduceContext, cho
     if (spread) counted[option.id] = resolveAmount(game, spread.amount, frameScope(game, seat, sourceId), ctx);
   }
   const quests = nightQuestsNow(game, ctx, choose);
-  return { ...(Object.keys(counted).length > 0 ? { counted } : {}), ...(quests ? { quests } : {}) };
+  const rows = framsburgBranchNow(game, ctx, choose, seat);
+  return { ...(Object.keys(counted).length > 0 ? { counted } : {}), ...(quests ? { quests } : {}), ...(Object.keys(rows).length > 0 ? { rows } : {}) };
 }
 
 /** A branch that counts cards, with the number now: "Raise your threat by 3 (1 for each ally you control)", "Deal 1 damage to each ally you control (3)". Null for any other branch. */
 export function wilderlandBranchWords(choose: Extract<Instruction, { verb: "Choose" }>, optionId: string, names: ChoiceNames, now?: BranchNow, source?: string | null, game?: ScenarioState): string | null {
-  const accolade = heathBranchWords(choose, optionId, names, game) ?? rhovanionBranchWords(choose, optionId, names, game) ?? nightBranchWords(choose, optionId, names, source, now);
+  const accolade = heathBranchWords(choose, optionId, names, game) ?? rhovanionBranchWords(choose, optionId, names, game) ?? nightBranchWords(choose, optionId, names, source, now) ?? framsburgBranchWords(choose, optionId, now?.rows);
   if (accolade) return accolade;
   const offer = searchOffer(choose);
   if (offer) return optionId === "search" ? `Search for ${names.code(offer.code)}` : "Don't search: no treasure this scenario";
