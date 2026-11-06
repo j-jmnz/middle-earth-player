@@ -95,11 +95,15 @@ export function windowSheet(game: ScenarioState, ctx: ReduceContext, legal: read
           armed: noOneQuests(stagingThreat(game, ctx.cards, questSeat(game))),
         };
   }
+  // A screen reader hears what its buttons say in place of a glow or a drag (card-speech.ts: "Can be played", "Can use its Action").
+  const readerPlays = plays.length > 0 ? "Cards that say 'can be played' can be played now." : null;
+  const readerUses = triggers.length > 0 ? "Cards that say 'can use' can be used now." : null;
   if (game.mode === "planning") {
     return {
       ...base,
       title: "Play allies and attachments",
       note: [usable ? "Tap a glowing card to play it, or drag it." : "Nothing in your hand can be played now.", pileNote].filter((part) => part != null).join(" "),
+      readerNote: [usable ? [readerPlays, readerUses].filter((part) => part != null).join(" ") : "Nothing in your hand can be played now.", pileNote].filter((part) => part != null).join(" "),
       pass: "Pass",
       passNote: "Pass ends your planning.",
       armed: "Tap again: planning ends",
@@ -111,6 +115,7 @@ export function windowSheet(game: ScenarioState, ctx: ReduceContext, legal: read
     ...base,
     title: point?.title ?? "Action window",
     note: [point?.note, noFight, usable ? "Tap a glowing card to use it." : null, pileNote].filter((part) => part != null).join(" ") || null,
+    readerNote: [point?.note, noFight, [readerPlays, readerUses].filter((part) => part != null).join(" ") || null, pileNote].filter((part) => part != null).join(" ") || null,
     pass: "Pass",
     passNote: game.seatCount > 1 ? "The game moves on once both players pass." : "Pass moves the game on.",
     armed: "Tap again to pass",

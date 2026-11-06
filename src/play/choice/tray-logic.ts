@@ -2,7 +2,8 @@
 // the command column's box (the width the rows and the reading panels share), and what a tap outside it does. The component is
 // choice/tray.tsx, drawn inside the dock; the hook that holds the fold is use-table-choice.ts.
 import { successWords } from "../words/sea.ts";
-import type { Choice } from "./table-choice.ts";
+import { shareOf, shareSum, type Share } from "./pay.ts";
+import { choiceFor, type Choice } from "./table-choice.ts";
 import type { PlaceMark } from "../store/island-place.ts";
 import type { OptionMark, Sheet, SheetStat } from "./sheet-types.ts";
 
@@ -63,8 +64,87 @@ export function tileAction(tile: Pick<TrayTile, "look">): "read" | "pick" {
   return tile.look != null ? "read" : "pick";
 }
 
+/**
+ * The role a screen reader gives a row of the open tray (docs/design-system-table.md, Screen reader): a pick is one of several to choose
+ * from (radio), a multi a set to tick (checkbox), a trigger a thing to use (button), a share an amount to raise or lower (adjustable). A
+ * card a Sailing test looked at is listed to read, a button. Said only under useReaderMode.
+ */
+export type TileRole = "radio" | "checkbox" | "button" | "adjustable";
+
+export function tileRole(sheet: Sheet): TileRole {
+  switch (sheet.kind) {
+    case "pick":
+      return sheet.look != null ? "button" : "radio";
+    case "multi":
+      return "checkbox";
+    case "distribute":
+      return "adjustable";
+    case "trigger":
+    case "window":
+    case "outcome":
+      return "button";
+  }
+}
+
+/** The state a row of that role speaks: a radio or a checkbox is checked, any other is selected. */
+export function tileState(role: TileRole, selected: boolean): { checked: boolean } | { selected: boolean } {
+  return role === "radio" || role === "checkbox" ? { checked: selected } : { selected };
+}
+
+/** The most one recipient of a distribute sheet can take: its own pool, and for a fixed total no more than the total. */
+export function shareCap(sheet: Extract<Sheet, { kind: "distribute" }>, id: string): number {
+  const item = sheet.options.find((candidate) => candidate.id === id);
+  if (!item) return 0;
+  return sheet.exact ? Math.min(item.max, sheet.total) : item.max;
+}
+
+/**
+ * What a share row speaks as its value: the row's share and its cap, then the running total ("Pays 1, up to 2. 1 of 3 paid in all"; archery
+ * damage: "Takes 1, up to 3. 2 of 4 assigned"). A total that need not be met (an X cost) has no "of": "1 paid in all".
+ */
+export function shareValue(sheet: Extract<Sheet, { kind: "distribute" }>, shares: readonly Share[], id: string): { now: number; max: number; text: string } {
+  const now = shareOf(shares, id);
+  const max = shareCap(sheet, id);
+  const sum = shareSum(shares);
+  const archery = sheet.purpose.kind === "archery";
+  const all = archery ? (sheet.exact ? `${sum} of ${sheet.total} assigned` : `${sum} assigned in all`) : sheet.exact ? `${sum} of ${sheet.total} paid in all` : `${sum} paid in all`;
+  return { now, max, text: `${archery ? "Takes" : "Pays"} ${now}, up to ${max}. ${all}` };
+}
+
+/**
+ * What a double tap on a share row does: it adds one share; at the row's cap, or when the total is met, it takes them back (tapShare goes
+ * round to none). A row with none to take back when the total is met says so.
+ */
+export function shareHint(sheet: Extract<Sheet, { kind: "distribute" }>, shares: readonly Share[], id: string): string {
+  const now = shareOf(shares, id);
+  const full = sheet.exact && shareSum(shares) >= sheet.total;
+  if (now === 0 && (full || shareCap(sheet, id) === 0)) return "Nothing more can be added here";
+  return now >= shareCap(sheet, id) || full ? "Double tap to take them back" : "Double tap to add one";
+}
+
+/**
+ * One share more (`delta` 1) or less (-1) for a recipient, from an increment or decrement action of a screen reader. Unlike a tap, which
+ * goes round to none at its cap, an action stops at the ends: it adds while the recipient is under its cap and, for a fixed total, while
+ * the total is not met, and takes one away only while it holds one. Returns the same list when nothing moves.
+ */
+export function stepShares(shares: readonly Share[], id: string, cap: number, total: number | null, delta: 1 | -1): readonly Share[] {
+  const current = shareOf(shares, id);
+  const next = delta === 1 ? (current >= cap || (total != null && shareSum(shares) >= total) ? current : current + 1) : Math.max(0, current - 1);
+  if (next === current) return shares;
+  const rest = shares.filter((share) => share.id !== id);
+  return next > 0 ? [...rest, { id, amount: next }] : rest;
+}
+
+/** The choice after an increment or decrement action on a distribute row, or null when the row does not exist or nothing moves. */
+export function stepChoice(sheet: Sheet, held: Choice | null, id: string, delta: 1 | -1): Choice | null {
+  if (sheet.kind !== "distribute") return null;
+  const choice = choiceFor(sheet, held);
+  const shares = stepShares(choice.shares, id, shareCap(sheet, id), sheet.exact ? sheet.total : null, delta);
+  return shares === choice.shares ? null : { ...choice, shares };
+}
+
 // The sheet's verb without its trailing preposition ("Defend with" is "Defend").
-const wordOf = (verb: string): string => verb.replace(/\s+(with|to|on|for)$/i, "");
+export const wordOf = (verb: string): string => verb.replace(/\s+(with|to|on|for)$/i, "");
 
 /** The count the dock's title speaks while the rows are open, led by the moment's verb: "Defend · pick 1 of 6", "Commit · 2 of 4 picked". */
 export function trayCount(sheet: Sheet, choice: Choice): string {
@@ -103,8 +183,8 @@ export function trayOpen(onPaper: boolean, foldedKey: string | null, sheetKey: s
  * Where a tap on the canvas (or a drop) goes while the choice is on paper: with the tray open it folds it and goes no further, so
  * it picks nothing, opens no pile and sends no intent; with a screen reader on (the tray is the default and every choice stays a
  * control) or no tray open it is routed as usual: a pile's list, or a pick for the open moment. While the table peeks at the other
- * seat a card is never picked: it only opens its preview (`peeking`). A card the open tray lists because it answers a
- * Response window (`answers`, listsResponses) is picked from the table too, so its glow still works with the tray open.
+ * seat a card is never picked: it only opens its preview (`peeking`). A card of the open sheet (`answers`: it glows on the table while
+ * the tray lists it) is picked from the table too, so its glow still works with the tray open.
  */
 export function tapRoute(state: { panelOpen: boolean; reader: boolean; cardId: string; peeking?: boolean; answers?: boolean }): "fold" | "pile" | "preview" | "pick" {
   if (state.panelOpen && !state.reader && !(state.answers && !state.peeking)) return "fold";

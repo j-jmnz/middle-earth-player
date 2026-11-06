@@ -8,12 +8,13 @@ import { Pressable, ScrollView, useWindowDimensions, View } from "react-native";
 
 import { CardImage } from "../../ui/card-image.tsx";
 import { cardCorner } from "../../ui/card-corner.ts";
+import { longPressA11y, longPressHint } from "../../ui/long-press-action.ts";
 import { LIST_PICTURE, LIST_PICTURE_SMALL, smallPictures } from "../choice/dock/budget.ts";
 import { chipOnSurface, dropShadowOf } from "../../ui/surfaces.ts";
 import type { PictureSource } from "../canvas/table-canvas-types.ts";
 import { withAlphaHex } from "../../ui/tokens.ts";
 
-import type { LogLine } from "../store/log.ts";
+import { logLineSpeech, type LogLine } from "../store/log.ts";
 import { CloseButton, TextButton } from "../../ui/buttons.tsx";
 import { LineMark } from "./table-chrome.tsx";
 import { SettingsRows } from "./setting-rows.tsx";
@@ -21,6 +22,7 @@ import type { TableSettings } from "../../ui/table-settings.ts";
 import { touch, useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
 import { Text } from "../../ui/text.tsx";
+import { usePanelFocus } from "./use-panel-focus.ts";
 
 // The round ✕ at a panel's top right, level with its title: a 44 pt target that sits in the frame's padding. The header keeps this much
 // clear at each side so a long title never runs under it.
@@ -55,14 +57,16 @@ function CardRow({ card, playable, testID, onPress, onLongPress }: { card: ListC
   const w = box.w * s;
   const h = box.h * s;
   const detail = playable ? "Playable now · tap to play" : (card.detail ?? null);
-  const said = playable ? detail : (card.said ?? detail);
+  // The tap is in the hint ("Plays it"), so the label says only that the card can be played.
+  const said = playable ? "Playable now" : (card.said ?? detail);
   return (
     <Pressable
       testID={testID}
       accessibilityRole="button"
       accessibilityState={{ selected: playable }}
       accessibilityLabel={[card.label, said].filter(Boolean).join(". ")}
-      accessibilityHint={playable ? "Tap to play it. Hold to read the card" : "Shows the card"}
+      {...(onLongPress ? longPressA11y("Show card", onLongPress) : null)}
+      accessibilityHint={[playable ? "Plays it" : "Shows the card", onLongPress ? longPressHint("Show card") : null].filter(Boolean).join(". ")}
       onPress={onPress}
       onLongPress={onLongPress}
     >
@@ -97,10 +101,11 @@ function CardRow({ card, playable, testID, onPress, onLongPress }: { card: ListC
 // A list's head: the count over the title, centred clear of the round ✕.
 function ListHead({ count, title }: { count: string; title: string }) {
   const s = useUiScale();
+  const focus = usePanelFocus();
   return (
     <View style={{ paddingHorizontal: CLOSE_CLEAR * s }}>
       <Text className="text-center font-display text-eyebrow uppercase text-faint">{count}</Text>
-      <Text accessibilityRole="header" className="mt-1 text-center font-display text-title text-bone">
+      <Text ref={focus} accessibilityRole="header" className="mt-1 text-center font-display text-title text-bone">
         {title}
       </Text>
     </View>
@@ -195,18 +200,20 @@ export function ThreatSourceList({ title, total, cards, adjust, onRead, onClose 
 export function LogPanel({ round, lines, onClose }: { round: number; lines: readonly LogLine[]; onClose: () => void }) {
   const t = useTableTokens();
   const s = useUiScale();
+  // The log reads oldest first; a screen reader's focus opens on the newest line (the header when there is none).
+  const focus = usePanelFocus();
   return (
     <View testID="log-sheet" collapsable={false} style={{ flexShrink: 1 }}>
       <View className="items-center" style={{ paddingHorizontal: CLOSE_CLEAR * s }}>
-        <Text accessibilityRole="header" accessibilityLabel={`Log, round ${round}`} className="font-display text-title text-ink">
+        <Text ref={lines.length === 0 ? focus : undefined} accessibilityRole="header" accessibilityLabel={`Log, round ${round}`} className="font-display text-title text-ink">
           Log
         </Text>
       </View>
       <PanelClose testID="log-close" onPress={onClose} />
       <ScrollView className="mt-3" style={{ flexGrow: 0, flexShrink: 1 }}>
         {lines.length === 0 ? <Text className="text-center text-body text-inkMuted">Nothing has happened this round yet.</Text> : null}
-        {lines.map((line) => (
-          <View key={line.key} testID={`log-line-${line.key}`} className="border-b py-2" style={{ borderColor: t.inkLine }}>
+        {lines.map((line, index) => (
+          <View key={line.key} ref={index === lines.length - 1 ? focus : undefined} testID={`log-line-${line.key}`} accessible accessibilityLabel={logLineSpeech(line)} className="border-b py-2" style={{ borderColor: t.inkLine }}>
             <View className="flex-row items-center gap-2">
               <LineMark mark={line.mark} />
               <Text className="shrink text-body text-ink">{line.text}</Text>
@@ -237,9 +244,10 @@ export function ThreatPanel({
   onClose: () => void;
 }) {
   const s = useUiScale();
+  const focus = usePanelFocus();
   return (
     <View testID="threat-panel" collapsable={false} style={{ flexShrink: 1 }}>
-      <View accessible accessibilityRole="header" accessibilityLabel={`${seatLabel ? `${seatLabel}, ` : ""}Threat ${threat} of 50`} className="items-center" style={{ paddingHorizontal: CLOSE_CLEAR * s }}>
+      <View ref={focus} accessible accessibilityRole="header" accessibilityLabel={`${seatLabel ? `${seatLabel}, ` : ""}Threat ${threat} of 50`} className="items-center" style={{ paddingHorizontal: CLOSE_CLEAR * s }}>
         {seatLabel ? <Text className="font-display text-eyebrow uppercase text-inkLabel">{seatLabel}</Text> : null}
         <Text className="mt-1 font-display text-title text-ink">Threat</Text>
         <Text className="font-display text-heading text-inkMuted">{`${threat} of 50`}</Text>
@@ -286,10 +294,11 @@ export function SettingsPanel({
   onClose: () => void;
 }) {
   const s = useUiScale();
+  const focus = usePanelFocus();
   return (
     <View testID="settings-panel" collapsable={false} style={{ flexShrink: 1 }}>
       <View style={{ paddingRight: CLOSE_CLEAR * s }}>
-        <Text accessibilityRole="header" className="font-display text-title text-bone">
+        <Text ref={focus} accessibilityRole="header" className="font-display text-title text-bone">
           Table settings
         </Text>
       </View>

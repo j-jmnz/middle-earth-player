@@ -10,6 +10,7 @@ import type { ComponentRef, ReactNode, Ref } from "react";
 
 import { GameIcon } from "./game-icon.tsx";
 import type { IconName } from "./icon-map.ts";
+import { longPressA11y } from "./long-press-action.ts";
 import { CONTROL_RADIUS } from "./radius.ts";
 import { accentPlate, DISABLED_OPACITY, glassSurface, PRESSED_FILTER, slateSurface, textSurface } from "./surfaces.ts";
 import { withAlphaHex } from "./tokens.ts";
@@ -122,6 +123,7 @@ export function SecondaryButton({
   tight = false,
   accessibilityLabel,
   accessibilityHint,
+  expanded,
   disabled = false,
 }: {
   label: string;
@@ -133,6 +135,8 @@ export function SecondaryButton({
   tight?: boolean;
   accessibilityLabel?: string;
   accessibilityHint?: string;
+  // Set for a button that opens and closes a list under it: a screen reader says whether it is open.
+  expanded?: boolean;
   disabled?: boolean;
 }) {
   const t = useTableTokens();
@@ -147,7 +151,7 @@ export function SecondaryButton({
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel ?? label}
       accessibilityHint={accessibilityHint}
-      accessibilityState={{ disabled }}
+      accessibilityState={expanded == null ? { disabled } : { disabled, expanded }}
       disabled={disabled}
       onPress={onPress}
       hitSlop={tight ? { top: slop, bottom: slop } : undefined}
@@ -195,11 +199,14 @@ export function TextButton({
   small = false,
   tight = false,
   onLongPress,
+  longPressLabel = "Show card",
 }: {
   label: string;
   onPress: () => void;
   // A long press on a button that names a card shows the card large (the briefing's choices, like the Ring-bearer rows).
   onLongPress?: () => void;
+  // What a screen reader's actions menu calls the long press (docs/design-system.md, Screen reader).
+  longPressLabel?: string;
   testID: string;
   tone?: "bone" | "accent" | "ink" | "danger" | "muted";
   // A printed icon before the word, in the word's colour (Full path, Campaign log, New playthrough on Campaigns).
@@ -227,6 +234,9 @@ export function TextButton({
       {label}
     </Text>
   );
+  // A long press is also an action in the reader's menu; the hint names it after any hint the caller gave.
+  const longPress = onLongPress ? longPressA11y(longPressLabel, onLongPress) : null;
+  const hint = [accessibilityHint, longPress?.accessibilityHint].filter(Boolean).join(". ") || undefined;
   return (
     <Pressable
       testID={testID}
@@ -234,7 +244,8 @@ export function TextButton({
       accessibilityRole={selected == null ? "button" : "radio"}
       {...(state ? { accessibilityState: state } : {})}
       accessibilityLabel={accessibilityLabel ?? label}
-      accessibilityHint={accessibilityHint}
+      accessibilityHint={hint}
+      {...(longPress ? { accessibilityActions: longPress.accessibilityActions, onAccessibilityAction: longPress.onAccessibilityAction } : {})}
       disabled={disabled}
       onPress={onPress}
       onLongPress={onLongPress}

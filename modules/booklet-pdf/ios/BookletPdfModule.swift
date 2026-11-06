@@ -1,5 +1,6 @@
 import ExpoModulesCore
 import PDFKit
+import UIKit
 
 internal final class PdfOpenFailed: Exception {
   override var reason: String { "The file could not be opened as a PDF" }
@@ -96,5 +97,9 @@ class BookletPdfView: ExpoView {
     if !settled { return }
     wantedPage = page
     onPageChange(["page": page, "pageCount": document.pageCount])
+    // VoiceOver says the page that came into view; with it off nothing is posted.
+    if UIAccessibility.isVoiceOverRunning {
+      UIAccessibility.post(notification: .announcement, argument: "Page \(page) of \(document.pageCount)")
+    }
   }
 }

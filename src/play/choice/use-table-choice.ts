@@ -14,23 +14,27 @@ import { useAutoAnswer, useBanner, useGuide, useSettle } from "./table-hooks.ts"
 import { tableSettings, toggleAlways } from "../../ui/table-settings.ts";
 import type { Moment } from "../store/outcome.ts";
 import { readoutFor, type Readout } from "../readouts/readout.ts";
-import { useScreenReader } from "../../ui/screen-reader.ts";
+import { useReaderMode, useScreenReader } from "../../ui/screen-reader.ts";
 import { hidesFace, actingSeat, isLooked, onTableFor } from "../store/selectors.ts";
 import { dropOutcome, targetFromKey } from "../store/selection.ts";
 import { cannotPay } from "./why.ts";
+import { announce } from "../../ui/announce.ts";
+import { readerDock } from "./reader-moment.ts";
+import { useReaderChoice } from "./use-reader-choice.ts";
 import type { Sheet, SheetNames, Unavailable } from "./sheet-types.ts";
 import { dockExtras } from "./dock/extras.ts";
 import { usePeeking } from "../store/use-peek.ts";
 import { useStable } from "../../ui/use-stable.ts";
-import { fightOf, highlightKeys, highlightOf, playedCard } from "../canvas/highlight-of.ts";
+import { boardUnlit, fightOf, highlightKeys, highlightOf, playedCard } from "../canvas/highlight-of.ts";
+import { listedOnPaper, pickResult } from "./pick-route.ts";
 import { listsResponses, tapAction, tapRoute, trayOpen } from "./tray-logic.ts";
 import { sheetFor } from "./sheets.ts";
 import { effectById } from "../../rules/windows/listen.ts";
 import type { LegalIntent, PlayerIntent, ReduceContext, ScenarioState, TableStore } from "../store/store.ts";
 import type { LayoutOptions } from "../layout/layout.ts";
-import type { TableHighlight } from "../canvas/table-canvas-types.ts";
+import type { ReaderSeed, TableHighlight } from "../canvas/table-canvas-types.ts";
 import type { DockExtra } from "./dock/buttons.tsx";
-import { choiceFor, dockFor, fightPreview, headerOf, onTheTable, onlyAnswer, pickedWords, primaryReady, tap, tappable, type Choice, type Dock, type DockButton, type TapContext } from "./table-choice.ts";
+import { choiceFor, dockFor, fightPreview, headerOf, onTheTable, onlyAnswer, pickedWords, tap, tappable, type Choice, type Dock, type DockButton, type TapContext } from "./table-choice.ts";
 
 // A sheet the player opened from the table, for the game it was opened in. `panel` keeps it on paper even when its choices
 // are cards on the table (the Actions list reads the printed lines).
@@ -45,6 +49,8 @@ export type TableChoice = {
   unavailable: readonly Unavailable[];
   readout: Readout | null;
   highlight: TableHighlight;
+  // What the reader table needs besides the highlight; null with no phone screen reader on, so the canvas gets nothing new.
+  readerSeed: ReaderSeed | null;
   raised: string | null;
   fight: LayoutOptions["preview"];
   // The choice is on a paper panel, and the panel is open (not folded).
@@ -62,11 +68,15 @@ export type TableChoice = {
   dismissBanner: () => void;
   // The first-game guide's line for this moment, and turning the guide off.
   guide: string | null;
+  // A screen reader's focus stays where it is when the moment changes: it is on a card the new moment still asks about (use-reader-choice.ts).
+  stayFocus: boolean;
   // The Undo button: puts back the pick being made, or goes back one intent (store.ts, undo-history.ts); null when there is
   // neither. It is also the first of `extras`.
   undo: DockExtra | null;
   onTap: (cardId: string) => void;
   onTile: (id: string) => void;
+  // A screen reader's increment or decrement action on a share row: one share more or less (tray-logic.ts, stepChoice).
+  onStep: (id: string, delta: 1 | -1) => void;
   onDrop: (cardId: string, key: string) => void;
   onButton: (button: DockButton) => void;
   fold: () => void;
@@ -104,7 +114,10 @@ export function useTableChoice({
   const legal = useStore(store, (state) => state.legal);
   const moment = useStore(store, (state) => state.moment);
   const canUndo = useStore(store, (state) => state.history.length > 0);
-  const reader = useScreenReader();
+  // The phone's screen reader (not the web list): it hears a sheet's readerNote and gets the words of each card (reader-table.tsx).
+  const readerMode = useReaderMode();
+  // The tray lists the choices for any reader, and a development build that forces the reader table (screen-reader.ts) lists them too.
+  const reader = useScreenReader() || readerMode;
   const [overlay, setOverlay] = useState<Overlay | null>(null);
   const [held, setHeld] = useState<Choice | null>(null);
   const [folded, setFolded] = useState<string | null>(null);
@@ -132,11 +145,15 @@ export function useTableChoice({
   const onTable = useMemo(() => onTableFor(game, acting, rowFolded), [game, acting, rowFolded]);
   // A moment that is not this one (a new sheet key) ends a peek; while it lasts a tap on a card only previews it.
   const peeking = usePeeking(store, sheet.key);
+  const { readerSeed, stayFocus, touch: touchReader, reset: resetReader, onStep } = useReaderChoice({ readerMode, sheet, held, setHeld, peeking, cards: ctx.cards });
   // On paper: when the player asked, when a screen reader is on (a card drawn only on the canvas is no control for it), or
   // when the choices are not cards drawn whole on the table. The action window itself stays on the table.
   // A Response the player may use opens listed, beside the dock's Pass (user request, 2026-10-29).
   const responses = listsResponses(sheet, game.window?.kind);
-  const asked = (live?.panel ?? false) || listed === sheet.key || responses || (reader && sheet.kind !== "window" && sheet.kind !== "outcome" && tappable(sheet).size > 0) || (reader && sheet.kind === "pick" && sheet.look != null);
+  // `!!`: the compiler reads a call's result as an object that may change later, which a boolean read by a callback below is not.
+  // The sheet's choices are counted only for a reader, who lists them on paper.
+  const choices = reader ? tappable(sheet).size : 0;
+  const asked = !!listedOnPaper((live?.panel ?? false) || listed === sheet.key, responses, reader, sheet.kind, choices, sheet.kind === "pick" && sheet.look != null);
   const panel = asked || !onTheTable(sheet, onTable);
   const panelOpen = trayOpen(panel, folded, sheet.key);
   const passLegal = legal.some((intent) => intent.type === "Pass");
@@ -148,20 +165,25 @@ export function useTableChoice({
   // Pass to stop is offered while stops are on, naming where the run ends at the latest (a choice on the way ends it sooner).
   const stopPass = settings.stopsOn && !live && !single && passableWindow(game, sheet, legal) ? `Tap again: pass until ${nextStopTitle(game, settings, pointTitle)}` : null;
   const free = useMemo(() => new Set(sheet.kind === "trigger" && game.window?.kind === "response" ? sheet.options.filter((item) => isFreeResponse(effectById(ctx, item.effectId))).map((item) => item.effectId) : []), [sheet, game, ctx]);
-  const dock = dockFor(sheet, choice, table, { overlay: live != null, passLegal, surface: panelOpen ? "panel" : "table", single, stopPass, free });
+  const plainDock = dockFor(sheet, choice, table, { overlay: live != null, passLegal, surface: panelOpen ? "panel" : "table", single, stopPass, free });
+  // No card glows on a reader's table: the sentence under a waiting primary names the list instead (reader-moment.ts, readerDock).
+  const dock = readerDock(plainDock, sheet, readerMode);
   const readout = useMemo(() => readoutFor(game, ctx, sheet, choice, names.card), [game, ctx, sheet, choice, names]);
   // The canvas's props keep their identity while their contents are the same, so a change elsewhere in the game (a threat)
   // does not draw the table again (docs/architecture.md, State). Card ids carry no commas.
-  const { glow, picked: pickedKey, share, dim, marks: markKey, muted: mutedKey, keep: keepKey } = highlightKeys({ game, seat: acting, sheet, choice, panel: panel && !(responses && onTheTable(sheet, onTable)) });
+  // The board glows, dims and marks the sheet's own cards whenever any of them is drawn on the table, the tray open or not (boardUnlit).
+  const { glow, picked: pickedKey, share, dim, marks: markKey, muted: mutedKey, keep: keepKey } = highlightKeys({ game, seat: acting, sheet, choice, panel: boardUnlit(panel, sheet, onTable) });
   const highlight = useMemo((): TableHighlight => highlightOf({ glow, picked: pickedKey, share, dim, marks: markKey, muted: mutedKey, keep: keepKey }), [glow, pickedKey, share, dim, markKey, mutedKey, keepKey]);
   const fightNow = fightPreview(game, sheet, choice);
   const fightKey = fightNow ? `${fightNow.enemyId}:${fightNow.kind}:${fightNow.ids.join(",")}` : "";
   const fight = useMemo(() => fightOf(fightKey), [fightKey]);
   // The hand card being played rises whole above the bottom edge.
   const raised = live ? playedCard(live.sheet) : null;
-  const baseHeader = headerOf(sheet, game);
+  // A reader hears the sheet's own sentence for it where the visible note names a glow or a drag (sheet-types.ts, readerNote).
+  const headed = headerOf(sheet, game);
+  const baseHeader = readerMode && sheet.kind !== "outcome" && sheet.readerNote ? { ...headed, note: sheet.readerNote } : headed;
   // While stops are on, the eyebrow says so first (a long eyebrow is cut at its end): the table passes some windows.
-  const header = settings.stopsOn ? { ...baseHeader, step: `Stops on · ${baseHeader.step}` } : baseHeader;
+  const header = settings.stopsOn ? { ...baseHeader, step: `Stops on, ${baseHeader.step}` } : baseHeader;
   const guide = useGuide(settings, game, sheet, legal, live != null, header.note);
   const reset = useCallback(() => {
     setOverlay(null);
@@ -180,10 +202,15 @@ export function useTableChoice({
       // gets the Refused tick, never both. The moments the table answers after it are answered in the same tap (table-hooks.ts, follow).
       if (store.getState().dispatch(intent, tickSent)) {
         reset();
+        // An accepted send keeps the card the reader last activated, so focus can stay on it in the next moment.
+        resetReader("send");
         follow();
-      } else tickRefused();
+      } else {
+        tickRefused();
+        if (readerMode) announce(store.getState().refusal ?? "");
+      }
     },
-    [store, reset, follow],
+    [store, reset, follow, readerMode, resetReader],
   );
 
   // A pick being made is put back first; otherwise the last intent is taken back.
@@ -198,14 +225,16 @@ export function useTableChoice({
     tickSent();
     store.getState().undo();
     reset();
-  }, [picking, store, reset]);
+    resetReader("undo");
+  }, [picking, store, reset, resetReader]);
   // A payment the pools cannot make: the reject haptic, and the reason on the dock as a reducer refusal shows.
   const refuse = useCallback(
     (reason: string) => {
       tickRefused();
       store.getState().refuse(reason);
+      if (readerMode) announce(reason);
     },
-    [store],
+    [store, readerMode],
   );
   // Every sheet the player opens comes through here: a payment sheet (or an attachment's host pick) the pools cannot pay is refused
   // instead of opened (why.ts, cannotPay), whichever path asked for it.
@@ -246,11 +275,11 @@ export function useTableChoice({
   const pick = useCallback(
     (id: string): boolean => {
       // The only answer of the moment: the tap on its card sends it.
-      if (dock.single && dock.primary && primaryReady(dock) && tappable(sheet).has(id)) {
+      const result = pickResult(sheet, held, id, table, dock);
+      if (result.kind === "primary" && dock.primary) {
         onButton(dock.primary);
         return true;
       }
-      const result = tap(sheet, held, id, table);
       if (result.kind === "choice") setHeld(result.choice);
       else if (result.kind === "open") open(result.sheet);
       return result.kind !== "none";
@@ -266,16 +295,25 @@ export function useTableChoice({
   // A tap on the table: a pile, a pick for the open moment, or (on a card the moment does not ask about) the card large.
   const onTap = useCallback(
     (cardId: string) => {
-      // A Response listed only so it shows beside Pass still glows on the table, and a tap on its card picks it.
-      const answers = responses && tappable(sheet).has(cardId);
+      touchReader(cardId);
+      // A card of the open sheet glows on the table while the tray lists it (a Response listed beside Pass, or any choice in the open
+      // tray), and a tap on it picks it through the same pick as its tray row, so the tray's selection and the board stay in step; a tap
+      // on any other card folds the tray.
+      const answers = (responses || panelOpen) && tappable(sheet).has(cardId);
       const action = tapAction({ panelOpen, reader, cardId, peeking, faceDown: hidesFace(game.cards[cardId]) && !isLooked(game, cardId), answers }, pick);
       if (action === "fold") setFolded(sheet.key);
       else if (action === "pile") onPile(cardId.slice(5));
       else if (action === "preview") onPreview(cardId);
     },
-    [panelOpen, reader, peeking, sheet, responses, pick, onPile, onPreview, game],
+    [panelOpen, reader, touchReader, peeking, sheet, responses, pick, onPile, onPreview, game],
   );
-  const onTile = useCallback((id: string) => void pick(id), [pick]);
+  const onTile = useCallback(
+    (id: string) => {
+      touchReader(id);
+      void pick(id);
+    },
+    [pick, touchReader],
+  );
   const tapOnTable = useStable(onTap);
   const onDrop = useCallback(
     (cardId: string, key: string) => {
@@ -318,6 +356,7 @@ export function useTableChoice({
     choice,
     dock,
     header,
+    readerSeed: readerSeed,
     // No line shows it (the cards' marks and the primary's verb say it); the primary's hint speaks it.
     picked: pickedWords(sheet, choice, names),
     unavailable: sheet.kind === "pick" ? (sheet.unavailable ?? []) : [],
@@ -334,9 +373,11 @@ export function useTableChoice({
     onBeat,
     dismissBanner,
     guide,
+    stayFocus: stayFocus,
     undo: undoButton,
     onTap: tapOnTable,
     onTile,
+    onStep,
     onDrop: dropOnTable,
     onButton,
     fold: () => setFolded(sheet.key),

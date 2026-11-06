@@ -138,7 +138,7 @@ export function OtherRuns({ testID, title, fold, children }: { testID: string; t
   }
   return (
     <View testID={testID} style={{ gap: 10 * s }}>
-      <Eyebrow>{title}</Eyebrow>
+      <Eyebrow header>{title}</Eyebrow>
       {rows}
     </View>
   );

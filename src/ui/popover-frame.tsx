@@ -143,7 +143,7 @@ export function PopoverFrame({
   if (!open && !leaving) return null;
   return (
     // One modal layer: a screen reader stays inside the popover while it is open (the card preview does the same).
-    <View testID={ids.layer} accessibilityViewIsModal={open} pointerEvents={open ? "box-none" : "none"} style={StyleSheet.absoluteFill}>
+    <View testID={ids.layer} accessibilityViewIsModal={open} onAccessibilityEscape={open ? onClose : undefined} pointerEvents={open ? "box-none" : "none"} style={StyleSheet.absoluteFill}>
       {open ? <Pressable testID={ids.scrim} accessibilityRole="button" accessibilityLabel={closeLabel} onPress={onClose} style={StyleSheet.absoluteFill} /> : null}
       <Animated.View
         testID={ids.popover}

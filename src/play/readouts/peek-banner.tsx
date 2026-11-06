@@ -6,7 +6,7 @@
 // words are one line, at most 1.3 times the system font scale, so the pill never grows past the room the table keeps for it. It fades
 // in and out over the banner tokens and snaps under reduced motion. It holds no state and sends nothing.
 import { useEffect, useMemo } from "react";
-import { AccessibilityInfo, Pressable, View } from "react-native";
+import { Pressable, View } from "react-native";
 import Animated, { FadeIn, FadeOut } from "react-native-reanimated";
 
 import { layoutAnim, useMotionScale } from "../../ui/motion-run.ts";
@@ -16,6 +16,7 @@ import { textSurface } from "../../ui/surfaces.ts";
 import { touchSlop, useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
 import { Text } from "../../ui/text.tsx";
+import { announce } from "../../ui/announce.ts";
 
 // Medium's sizes; the banner draws them times the UI scale (ui-scale.ts), and callers scale PEEK_TOP and PEEK_ROOM.
 const PILL = 36;
@@ -35,7 +36,7 @@ export function PeekBanner({ words, top, left, width, onBack }: { words: PeekWor
   const fade = useMemo(() => ({ enter: layoutAnim(FadeIn, MOTION.bannerIn, scale), leave: layoutAnim(FadeOut, MOTION.bannerOut, scale) }), [scale]);
   // Android reads a live region on a view that has just mounted unreliably: announce on both platforms.
   useEffect(() => {
-    AccessibilityInfo.announceForAccessibility(`${words.text}. ${words.back} is the button to return.`);
+    announce(`${words.text}. ${words.back} is the button to return.`);
   }, [words.text, words.back]);
   return (
     <Animated.View testID="peek-layer" entering={fade.enter} exiting={fade.leave} pointerEvents="box-none" style={{ position: "absolute", top, left, width, alignItems: "center", paddingHorizontal: 8 * s }}>

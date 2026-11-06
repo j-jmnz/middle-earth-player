@@ -216,6 +216,12 @@ None ran. Each needs a device.
 - Scenario sheets: Caught in a Web, Wolf Rider's second attack, The Oath's end-of-round Response and Tokens dial, the Pillar on the attack sheet; a person winning and losing each playable scenario with the log matching.
 - Look and theme: Skia fog and its drift (smooth, cheap, still under reduced motion), grit, `filter` effects, Barlow and Marcellus SC weights, Light's multiply and Dark's screen art blends with no hard edge, Small and Large scales, both themes, keep-awake, `userInterfaceStyle: automatic` after a prebuild.
 - Resign, briefing previews and Campaigns folds: Resign in the table menu (the confirm, then the lost outcome and the run in History); a tap on a briefing hero tile and a long press on a Ring-bearer candidate open the card; the candidate's square painting in both themes; Other journeys and New playthrough fold like Coming later (the stored fold, the count when folded, VoiceOver).
+- Table and deck fixes (`docs/plans/table-and-deck-fixes.md`), swipe feel: the stage preview's sideways swipe on a phone, and that an upright move still closes nothing.
+- Table and deck fixes, column touch pass-through: a tap on the command column's empty top and on the empty canvas under it reaching the canvas (folding the tray), the dock and the meter keeping theirs, the tray's outside fold under a covered row.
+- Table and deck fixes, frame timing: crowded rows under the column, the dock crossing a row's foot, the dock growing over a still-extended row while the tray opens, and the table's first layout waiting for the column and the dock to be measured.
+- Table and deck fixes, both themes: the extended rows, the gradient under the canvas and the deck covers and lists without dots.
+- Table and deck fixes, VoiceOver: whether it can reach the adjustable preview card inside the scrim Pressable (the rows and the strip stay the path).
+- Screen reader parity (`docs/plans/done/screen-reader.md`), phone checks open: a full A Shadow of the Past game with VoiceOver and with TalkBack without looking (reader table, focus and announcement order, combat lines, Android Back after an attack); building a deck; a booklet page (Kotlin and Swift not compiled); `.maestro/features/screen-reader.yaml` (tag `reader`, dev build with `EXPO_PUBLIC_FORCE_READER=1`) not run; Skia canvases hidden from the reader; web screenshots before and after.
 - Tablets: iPad rotation on the tabs, deck editor and briefing; the rail; the portrait guard on the table (Split View, Stage Manager, Android 16); foldables; Campaigns art edge on an iPad in landscape; the briefing scene's Skia fade (`SceneCanvas`) on an iPad in landscape in Dark and Light: no line under the picture, no band at the pane's right edge, the dim matching the browser's.
 
 ## Standing decisions
@@ -234,3 +240,4 @@ None ran. Each needs a device.
 - The victory display is a fanned pile at staging's right end, shown only while a card is in it; card lists (piles, rows, the choice's rows) show each card's picture on night (user, 2026-11-03).
 - The combat spotlight stage is always dark, a lone attack runs about 2.2 s, and a destroyed target burns (user, 2026-10-29).
 - Page art has no hard edges: it fades to black or into the fog; framed tiles and panels keep theirs (user, 2026-10-30).
+- The screen reader path is independent of ordinary play: with no phone screen reader on, nothing drawn, touched, heard or timed changes, the web build included; new reader behaviour is gated on `useReaderMode()` (user, 2026-11-05).

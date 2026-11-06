@@ -120,7 +120,7 @@ export default function StandaloneBriefing() {
       aside={<EncounterDetails facts={facts} />}
     >
       <Section title="Players" className="mt-4" />
-      <Segmented options={SEAT_WORDS} value={seatWord(seatCount)} onChange={(next) => setSeatCount(seatCountOf(next))} testIDPrefix="seats" stretch />
+      <Segmented options={SEAT_WORDS} value={seatWord(seatCount)} onChange={(next) => setSeatCount(seatCountOf(next))} testIDPrefix="seats" stretch accessibilityLabel="Number of players" />
       <DifficultyPicker facts={facts} difficulty={difficulty} onDifficulty={setDifficulty} nightmare={isNightmarePlayable(world.scenario.id)} />
       {seats.map((seat, index) => (
         <SeatPicker

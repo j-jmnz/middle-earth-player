@@ -9,6 +9,9 @@ import { Pressable, ScrollView, useWindowDimensions, View } from "react-native";
 import { DockButtons, type DockExtra } from "./buttons.tsx";
 import { isDense, labelChars, PILL_PT, planWords, smallPictures, trayRoom, wordsWindow } from "./budget.ts";
 import { dockLines } from "./lines.ts";
+import { useReaderMoment } from "./use-reader-moment.ts";
+import { momentHint } from "../reader-moment.ts";
+import { useReaderMode } from "../../../ui/screen-reader.ts";
 import type { Readout } from "../../readouts/readout.ts";
 import { Stats } from "../sheet-paper.tsx";
 import type { Unavailable } from "../sheet-types.ts";
@@ -69,6 +72,8 @@ export function TableDock({
   onMore,
   onLines,
   resetKey,
+  momentKey = "",
+  stay = false,
   guide = null,
   trayOpen = false,
   count = "",
@@ -77,7 +82,7 @@ export function TableDock({
   onHeight,
   onNumbers,
 }: {
-  // The step in words ("Combat", "Stops on · Combat"): not drawn, the rail names the phase; a screen reader hears it before the title.
+  // The step in words ("Combat", "Stops on, Combat"): not drawn, the rail names the phase; a screen reader hears it before the title.
   step: string;
   // What leads the title: the seat that is asked in two-handed play ("Player 1 · ") and a Response's or an Action's timing
   // ("Response · "), or "". The step overline is not drawn, so this is how the player knows a chance to respond from a plain question.
@@ -100,12 +105,15 @@ export function TableDock({
   onLines?: (top: number) => void;
   // Changes with the moment and the pick: an armed button goes back to unarmed.
   resetKey: string;
+  // The open sheet's key, and whether a screen reader's focus stays where it is when it changes (use-reader-moment.ts): both are for the reader only.
+  momentKey?: string;
+  stay?: boolean;
   // The first-game guide's line for the moment (reference.ts); it is turned off in the table settings.
   guide?: string | null;
   // The choice's options are open in the dock (`tray`, choice/tray.tsx): the title asks the question and the folded line waits behind
   // the "i", so the rows get the room; on a short phone the readout is one line (its words stay in the accessibility label).
   trayOpen?: boolean;
-  // The choice's count ("Defend · pick 1 of 6"): not drawn, a screen reader hears it with the title while the rows are open.
+  // The choice's count ("Defend · pick 1 of 6"): not drawn, a screen reader hears it with the title while the rows are open ("Defend, pick 1 of 6").
   count?: string;
   // The choice's rows, drawn between the words and the buttons.
   tray?: ReactNode;
@@ -122,6 +130,10 @@ export function TableDock({
   const s = useUiScale();
   const root = useRef<ComponentRef<typeof View>>(null);
   const pillRef = useRef<ComponentRef<typeof View>>(null);
+  const titleRef = useRef<ComponentRef<typeof View>>(null);
+  useReaderMoment(titleRef, { momentKey, title: lead + title, note, stay });
+  // A reader hears the moment's note after the title, as its hint (use-reader-moment.ts).
+  const readerHint = useReaderMode() ? momentHint(note) : undefined;
   const [room, setRoom] = useState({ column: 0, block: 0, text: 198 });
   const measure = () => root.current?.measureInWindow((_x, y) => onTop?.(Math.round(y)));
   // The folded line is one line on a short phone (under DENSE_BELOW tall, as the choice rows) and two on a taller one.
@@ -154,9 +166,9 @@ export function TableDock({
   ) : null;
   const readoutLine = dense && trayOpen;
   return (
-    <View style={{ flex: 1, minHeight: 0, justifyContent: "flex-end" }} onLayout={(event) => setRoom((now) => ({ ...now, column: Math.round(event.nativeEvent.layout.height) }))}>
+    <View pointerEvents="box-none" style={{ flex: 1, minHeight: 0, justifyContent: "flex-end" }} onLayout={(event) => setRoom((now) => ({ ...now, column: Math.round(event.nativeEvent.layout.height) }))}>
       {/* No panel: the dock stands on the command column's fade (table/view.tsx). The words, the choice's rows (when it is open) and the
-          numbers and buttons are stacked from the foot of the column up. */}
+          numbers and buttons are stacked from the foot of the column up. The column's empty top above them passes taps to the canvas. */}
       <View
         ref={root}
         collapsable={false}
@@ -177,7 +189,7 @@ export function TableDock({
         <ScrollView style={{ flexGrow: 0, flexShrink: trayOpen ? 0 : 1, minHeight: 0 }} showsVerticalScrollIndicator={false} nestedScrollEnabled>
           <View onLayout={(event) => setRoom((now) => ({ ...now, text: Math.round(event.nativeEvent.layout.width) }))} style={{ paddingBottom: (dense ? 2 : 8) * s }}>
             <View className="flex-row items-start gap-1.5">
-              <Text testID="sheet-title" accessibilityRole="header" accessibilityLabel={[step, title, trayOpen ? count : ""].filter(Boolean).join(". ")} numberOfLines={plan.titleLines} className="flex-1 font-display text-heading text-bone" style={{ flexShrink: 0 }}>
+              <Text ref={titleRef} testID="sheet-title" accessibilityRole="header" accessibilityLabel={[step, title, trayOpen ? count.replaceAll(" · ", ", ") : ""].filter(Boolean).join(". ")} accessibilityHint={readerHint} numberOfLines={plan.titleLines} className="flex-1 font-display text-heading text-bone" style={{ flexShrink: 0 }}>
                 {lead + title}
               </Text>
               {plan.pillOnTitle ? pill : null}

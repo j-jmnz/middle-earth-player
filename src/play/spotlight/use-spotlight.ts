@@ -18,7 +18,7 @@ import { spotlightHolds } from "./gate.ts";
 import { buildPlan, type SpotlightPlan } from "./plan.ts";
 import { sameArea, type StageArea } from "./stage.ts";
 import { warmFor, type Warm } from "./warm.ts";
-import { useScreenReader } from "../../ui/screen-reader.ts";
+import { useReaderMode, useScreenReader } from "../../ui/screen-reader.ts";
 import type { TableStore } from "../store/store.ts";
 import { tableSettings } from "../../ui/table-settings.ts";
 
@@ -32,8 +32,10 @@ const CANVAS = Platform.OS !== "web";
 export function useSpotlightScale(): number {
   const on = useStore(tableSettings, (state) => state.settings.spotlight);
   const reader = useScreenReader();
+  // The phone's reader table (also forced in a dev build) mounts no canvas.
+  const readerTable = useReaderMode();
   const scale = useMotionScale();
-  return on && !reader ? scale : 0;
+  return on && !reader && !readerTable ? scale : 0;
 }
 
 /** Whether the table is waiting for the spotlight to play: the banner, the settle and the state's card motions start after it. */

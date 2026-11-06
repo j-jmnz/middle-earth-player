@@ -56,7 +56,7 @@ export const SpotlightLayer = memo(function SpotlightLayer({ handoff, picture, p
   }, [canPlay]);
   if (!playing || !plan || !progress) return null;
   return (
-    <Canvas style={StyleSheet.absoluteFill} pointerEvents="none">
+    <Canvas style={StyleSheet.absoluteFill} pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
       <Spotlight plan={plan} progress={progress} images={images} damage={damage} backs={backs} fonts={fonts} spotFonts={spotFonts} texture={texture} burn={burn} t={tableTokensByTheme.dark} theme={theme} drift={drift} s={s} nameOf={nameOf} sphereOf={iconOf} k={k} />
     </Canvas>
   );

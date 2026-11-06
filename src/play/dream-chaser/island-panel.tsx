@@ -9,6 +9,7 @@ import { useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
 import { Text } from "../../ui/text.tsx";
+import { usePanelFocus } from "../chrome/use-panel-focus.ts";
 
 const CLOSE_CLEAR = 44;
 
@@ -16,9 +17,10 @@ export function IslandPanel({ readout, fit, onRead, onClose }: { readout: Island
   const t = useTableTokens();
   const s = useUiScale();
   const beside = fit.layout === "beside";
+  const focus = usePanelFocus();
   return (
     <View testID="island-map" collapsable={false} style={{ flexShrink: 1 }}>
-      <View accessible accessibilityRole="header" accessibilityLabel={`Island Map, ${readout.explored} of ${readout.cells.length} locations explored`} className="flex-row flex-wrap items-baseline justify-center" style={{ paddingHorizontal: CLOSE_CLEAR * s, columnGap: 8 * s }}>
+      <View ref={focus} accessible accessibilityRole="header" accessibilityLabel={`Island Map, ${readout.explored} of ${readout.cells.length} locations explored`} className="flex-row flex-wrap items-baseline justify-center" style={{ paddingHorizontal: CLOSE_CLEAR * s, columnGap: 8 * s }}>
         <Text className="font-display text-title text-ink">Island Map</Text>
         <Text className="font-display text-eyebrow uppercase text-inkLabel">{`${readout.explored} of ${readout.cells.length} explored`}</Text>
       </View>

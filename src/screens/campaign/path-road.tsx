@@ -11,6 +11,7 @@ import { usePalette } from "../kit/palette-hook";
 import { withAlphaHex } from "../../ui/tokens";
 import { useUiScale } from "../../ui/ui-scale";
 import { Text } from "../../ui/text";
+import { stopLabel, stopState } from "./road-speech";
 
 const TAG = { completed: "Won", current: "Next", locked: "Locked", soon: "Coming soon" } as const;
 
@@ -104,7 +105,8 @@ export function Road({ stops, height, width, label, onStop, scores, go = null }:
           <View key={node.id} testID={`node-${node.id}`} style={{ position: "absolute", left: stop.x - labelWidth / 2, top: stop.y - size / 2, width: labelWidth, alignItems: "center" }}>
             <Pressable
               accessibilityRole={press ? "button" : undefined}
-              accessibilityLabel={`${node.name}, ${tag}`}
+              accessibilityLabel={stopLabel(node.name, node.status, scores.get(node.id))}
+              accessibilityState={stopState(press != null)}
               accessibilityHint={go?.id === node.id ? go.action : undefined}
               disabled={!press}
               onPress={press}

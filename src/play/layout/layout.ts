@@ -12,7 +12,8 @@ import { hidesFace } from "../store/selectors.ts";
 import type { BasePileId, FightKind, PileId, PileView, SecondPileId, VictoryPileId, ZoneEntry, ZoneId, ZoneView } from "../store/selectors.ts";
 import { ASPECT, cardRect, deepestUnder, footprint, MIN_TARGET, PAIR_STEP, placeStaging, placeUnder, rowXs, slotOf, type Metrics } from "./slots.ts";
 import { placePlay, playPlan } from "./play-area.ts";
-import { foldRow, groupCards, keeps, stagingRank, type FoldGroup } from "./row-fold.ts";
+import { groupCards, keeps, stagingRank, type FoldGroup } from "./row-fold.ts";
+import { reachRow, type RowReach } from "./row-reach.ts";
 import { lookBands, lookStrip } from "./look-strip.ts";
 import { areaGroupFold, areaWidth, isAreaGroup, placeArea } from "./stormcaller-layout.ts";
 import type { AreaRole } from "../store/stormcaller-table.ts";
@@ -95,6 +96,8 @@ export type TableLayout = {
   piles: TablePiles<Rect>;
   // The cards that left staging or the engagement area for a fold stack are on no slot: the row list shows them.
   folds?: readonly FoldPlace[];
+  // The staging row's foot with every staging card's peeks drawn, folded or not (column-reach.ts reads it, so the row's foot never depends on the fold).
+  stagingFoot?: number;
   slots: readonly CardSlot[];
   marks: readonly CombatMark[];
   // The enemy whose attack is in progress, edged on the table from the moment it attacks.
@@ -125,6 +128,10 @@ export type LayoutOptions = {
   stacks?: boolean;
   // The cards a fold must keep on the table (row-fold.ts): those the open moment asks about, the picked ones and the one the banner's beat names.
   keep?: ReadonlySet<string>;
+  // The command column lies over the canvas's right edge, `column` points wide past `width`; `reach` is how many top rows (staging, then the
+  // engagement area) lie wholly above its dock and head (column-reach.ts). A crowded row it covers runs on under the column (row-reach.ts).
+  column?: number;
+  reach?: 0 | 1 | 2;
   // The UI scale (ui-scale.ts, user request, 2026-10-28): the gutter, the gaps, the peeks, the hand's strip, the combat marks' room and the
   // card's cap and floor are Medium's sizes times it. The 44 pt hit target is a floor (`touch`). Default 1.
   scale?: number;
@@ -134,6 +141,8 @@ export type LayoutOptions = {
 const GUTTER = 8;
 const GAP = 6;
 export const PEEK = 10;
+// The gaps between a covered row's piles and the cards carried past them.
+const PILE_BREAK = 3;
 // How much of a hand card shows above the bottom edge: a share of the card, and never less than a 44 pt target plus the
 // fan's drop at the ends (at a UI scale the target is `touch`, and the drop is scaled).
 export const HAND_SHOW = 0.56;
@@ -197,7 +206,7 @@ function foldSlot(zone: "staging" | "engaged", stack: { x: number; w: number; ca
   out.push({ ...rect, id, code: top && !hidesFace(top) ? top.code : "", ...side, zone, kind: "pile", exhausted: false, faceDown: top == null || hidesFace(top), landscape: false, resources: 0, damage: 0, progress: 0, tilt: 0, count: stack.cards.length, committed: false, fold: zone, ...(areaOnly ? { areaFold: true as const } : {}) });
 }
 
-function placeRow(entries: readonly ZoneEntry[], zone: ZoneId, area: Rect, size: { w: number; h: number }, out: CardSlot[], m: Metrics, folding?: RowFolding): void {
+function placeRow(entries: readonly ZoneEntry[], zone: ZoneId, area: Rect, size: { w: number; h: number }, out: CardSlot[], m: Metrics, folding?: RowFolding, reach: RowReach | null = null): void {
   // A guard lies over the objective it guards, shifted by PAIR_STEP of its width, and the pair keeps a wider gap from its neighbours (rr.guarded).
   const groups: ZoneEntry[][] = [];
   for (const entry of entries) {
@@ -208,7 +217,7 @@ function placeRow(entries: readonly ZoneEntry[], zone: ZoneId, area: Rect, size:
   }
   const widths = groups.map((group) => (isAreaGroup(group) ? areaWidth(group.length - 1, size, m) : footprint((group[0] as ZoneEntry).card, size) + (group.length - 1) * size.w * PAIR_STEP + (group.length > 1 ? m.gap : 0)));
   // The area's group never folds its stage, which carries the Stormcaller's progress; its cards fold first, those the moment does not ask about (stormcaller-layout.ts).
-  const fold = folding && zone === "staging" ? foldRow(groups.map((group, at): FoldGroup => areaGroupFold(group, widths[at] ?? 0, size, m, folding.keep) ?? { id: group[0]?.card.id ?? "", width: widths[at] ?? 0, cards: groupCards(group), rank: stagingRank(group), pinned: keeps(group, folding.keep) }), { x: area.x, width: area.w, gap: m.gap, target: folding.target, stackW: folding.pile.w }) : null;
+  const fold = folding && zone === "staging" ? reachRow(groups.map((group, at): FoldGroup => areaGroupFold(group, widths[at] ?? 0, size, m, folding.keep) ?? { id: group[0]?.card.id ?? "", width: widths[at] ?? 0, cards: groupCards(group), rank: stagingRank(group), pinned: keeps(group, folding.keep) }), { x: area.x, width: area.w, gap: m.gap, target: folding.target, stackW: folding.pile.w }, reach) : null;
   const xs = fold ? fold.xs : rowXs(widths, area.x, area.w, m.gap);
   if (fold?.stack && folding) {
     const areaIds = new Set(entries.filter((entry) => entry.area != null).map((entry) => entry.card.id));
@@ -244,11 +253,11 @@ function groupWidth(entry: ZoneEntry, size: { w: number; h: number }, m: Metrics
   return footprint(entry.card, size) + shadows + paired;
 }
 
-function placeEngaged(entries: readonly ZoneEntry[], area: Rect, size: { w: number; h: number }, out: CardSlot[], marks: CombatMark[], preview: string | null, m: Metrics, folding?: RowFolding, attacker?: string | null): void {
+function placeEngaged(entries: readonly ZoneEntry[], area: Rect, size: { w: number; h: number }, out: CardSlot[], marks: CombatMark[], preview: string | null, m: Metrics, folding?: RowFolding, attacker?: string | null, reach: RowReach | null = null): void {
   const widths = entries.map((entry) => groupWidth(entry, size, m) + (entry.paired.length > 0 ? m.gap : 0));
   // Enemies that are not attacking, not fighting and not in the open moment fold, oldest first (row-fold.ts).
   const fold = folding
-    ? foldRow(entries.map((entry, at): FoldGroup => ({ id: entry.card.id, width: widths[at] ?? 0, cards: groupCards([entry]), rank: 1, pinned: keeps([entry], folding.keep) || entry.paired.length > 0 || entry.card.id === attacker })), { x: area.x, width: area.w, gap: m.gap, target: folding.target, stackW: folding.pile.w })
+    ? reachRow(entries.map((entry, at): FoldGroup => ({ id: entry.card.id, width: widths[at] ?? 0, cards: groupCards([entry]), rank: 1, pinned: keeps([entry], folding.keep) || entry.paired.length > 0 || entry.card.id === attacker })), { x: area.x, width: area.w, gap: m.gap, target: folding.target, stackW: folding.pile.w }, reach)
     : null;
   const xs = fold ? fold.xs : rowXs(widths, area.x, area.w, m.gap);
   if (fold?.stack && folding) foldSlot("engaged", fold.stack, area.y, { h: size.h }, folding.pile, new Map(entries.map((entry) => [entry.card.id, entry.card])), out, folding.folds);
@@ -408,8 +417,15 @@ export function tableLayout(
   // Staging and the engagement area squeeze to 44 pt steps and then fold the groups the moment does not ask about into a stack at the row's left end (row-fold.ts).
   const folds: FoldPlace[] = [];
   const folding: RowFolding = { keep: options.keep, pile, folds, target: touch(scale, MIN_TARGET), stacks: options.stacks === true };
-  placeRow(views.staging.entries, "staging", staging, card, slots, m, folding);
-  placeEngaged(views.engaged.entries, engaged, card, slots, marks, options.preview?.enemyId ?? null, m, folding, options.attacker ?? null);
+  // A covered row runs on past its piles, if it has any, to a gutter short of the column's right edge (row-reach.ts). The cards carried past the piles
+  // stand three gaps clear of them, so the piles read as their own block and not as the row's last cards.
+  const reach = (options.column ?? 0) > 0 ? (options.reach ?? 0) : 0;
+  const reachOf = (row: Rect, piled: boolean): RowReach => {
+    const start = piled ? width - rightGutter + PILE_BREAK * gap : row.x + row.w;
+    return { hole: start - (row.x + row.w), extra: width + (options.column ?? 0) - rightGutter - start };
+  };
+  placeRow(views.staging.entries, "staging", staging, card, slots, m, folding, reach >= 1 ? reachOf(staging, true) : null);
+  placeEngaged(views.engaged.entries, engaged, card, slots, marks, options.preview?.enemyId ?? null, m, folding, options.attacker ?? null, reach >= 2 ? reachOf(engaged, second) : null);
   placePlay(plan, play, slots, m);
   // Each second-slot deck stands in the slot's left place, its discard pile in the right one (only the Corsair and Evil Creatures pairs have one).
   const pileRects: { -readonly [K in keyof TablePiles<Rect>]: TablePiles<Rect>[K] } = { deck, discard, encounterDeck, encounterDiscard };
@@ -457,6 +473,7 @@ export function tableLayout(
     zones: { questStage, staging, activeLocation, secondActiveLocation, engaged, play, hand },
     piles: pileRects,
     folds,
+    stagingFoot: stagingY + card.h + peek * (options.stacks ? Math.min(1, deepestUnder(views.staging.entries)) : deepestUnder(views.staging.entries)),
     slots,
     marks,
     attacker: options.attacker ?? null,

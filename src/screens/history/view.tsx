@@ -6,7 +6,7 @@
 import { FlashList } from "@shopify/flash-list";
 import { useFocusEffect, useRouter, type Href } from "expo-router";
 import { useCallback, useState, type ReactNode } from "react";
-import { AccessibilityInfo, View } from "react-native";
+import { View } from "react-native";
 
 import type { RunKind, RunRecord } from "../../campaign/runs";
 import { standaloneStatus, type ListedStandalone } from "../../campaign/standalone";
@@ -32,6 +32,7 @@ import { recordUnclosedRun } from "../session/table-session";
 import { showToast } from "../kit/toast";
 import { ToastView } from "../kit/toast-view";
 import { useBottomInset } from "../nav/use-bottom-inset";
+import { announce } from "../../ui/announce";
 
 const KINDS = ["Campaign", "Standalone"] as const;
 type KindWord = (typeof KINDS)[number];
@@ -191,7 +192,7 @@ export function HistoryView({ initial }: { initial: RunKind }) {
         onArchive={() => putAway(entry, archived)}
         onAsk={() => {
           setAsking(entry.id);
-          AccessibilityInfo.announceForAccessibility(`${entry.sentence} Tap Delete for good to confirm.`);
+          announce(`${entry.sentence} Tap Delete for good to confirm.`);
         }}
         onDelete={() => remove(entry)}
         onKeep={() => setAsking(null)}

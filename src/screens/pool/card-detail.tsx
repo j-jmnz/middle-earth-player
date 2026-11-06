@@ -111,7 +111,7 @@ export function cardGlowOf(sphereCode: string | null, palette: ReturnType<typeof
 
 /** The picture at `width`, rounded and lit by its sphere's glow. `children` wraps the image (the card screen's pinch zoom). */
 export function CardPicture({ row, preview, intrinsic, width, wrap }: {
-  row: Pick<CardRow, "code" | "sphereCode">;
+  row: Pick<CardRow, "code" | "name" | "sphereCode">;
   preview: { uri: string } | number;
   intrinsic: { width: number; height: number };
   width: number;
@@ -120,7 +120,7 @@ export function CardPicture({ row, preview, intrinsic, width, wrap }: {
   const palette = usePalette();
   const t = useTableTokens();
   const size = imageLayoutSize(intrinsic.width, intrinsic.height, width);
-  const image = <InspectCardImage code={row.code} source={preview} width={size.width} height={size.height} />;
+  const image = <InspectCardImage code={row.code} name={row.name} source={preview} width={size.width} height={size.height} />;
   // The card screen's corner, the one every card picture shares (10 pt at its 236 pt phone width).
   const corner = cardCorner(size.width, size.height);
   return (
@@ -231,7 +231,7 @@ export function CardFacts({ row }: { row: CardRow }) {
       ) : null}
       {row.errata ? (
         <View className="mt-5">
-          <Eyebrow tone="accent">Errata</Eyebrow>
+          <Eyebrow tone="accent" header>Errata</Eyebrow>
           <View className="mt-2">
             <CardTextView text={row.errata} />
           </View>

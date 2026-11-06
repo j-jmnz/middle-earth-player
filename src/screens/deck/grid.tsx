@@ -12,6 +12,7 @@ import { CardThumb, useCardPreview } from "../images/picture";
 import { usePalette } from "../kit/palette-hook";
 import { SectionHeading } from "../../ui/section-heading";
 import { cardCorner } from "../../ui/card-corner";
+import { longPressA11y } from "../../ui/long-press-action";
 import { dropShadowOf } from "../../ui/surfaces";
 import type { PictureSource } from "../../play/canvas/table-canvas-types";
 import { withAlphaHex } from "../../ui/tokens";
@@ -120,6 +121,7 @@ export const DeckCardCell = memo(function DeckCardCell({ card, width, full, look
         collapsable={false}
         accessibilityRole="button"
         accessibilityLabel={`${card.name}, ${card.count} in the deck${loss ? `, ${loss}` : ""}`}
+        {...longPressA11y("Show card", () => onPreview(card.code, card.name, picture))}
         accessibilityHint="Opens the card. Hold to show it large"
         onPress={() => router.push({ pathname: "/card/[code]", params: { code: card.code } })}
         onLongPress={() => onPreview(card.code, card.name, picture)}

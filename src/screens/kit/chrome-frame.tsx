@@ -1,6 +1,6 @@
 // The chrome's frame (docs/design-system.md, Components): the page and its scrolling body, the top bar, rows, panels, stat tiles,
 // the pinned action bar, the paper sheet and the outcome word. Re-exported by chrome.tsx.
-import { useContext, type ComponentRef, type ReactNode, type RefObject } from "react";
+import { useContext, useRef, type ComponentRef, type ReactNode, type RefObject } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -14,6 +14,8 @@ import { Eyebrow } from "./chrome-text";
 import { usePalette } from "./palette-hook";
 import { GameIcon } from "../../ui/game-icon";
 import type { IconName } from "../../ui/icon-map";
+import { longPressA11y } from "../../ui/long-press-action";
+import { useOpenFocus } from "../../ui/use-open-focus";
 import { SheetCornersContext, SheetFrame } from "../../play/choice/sheet-paper";
 import { nightFade, panelSurface, rowSurface, selectedWash, tileSurface } from "../../ui/surfaces";
 import { useTableTokens } from "../../ui/use-table-tokens";
@@ -171,6 +173,7 @@ export function ListRow({
   detail,
   onPress,
   onLongPress,
+  longPressLabel = "Show card",
   testID,
   leading,
   trailing,
@@ -181,6 +184,8 @@ export function ListRow({
   detail?: string;
   // A long press on a card row shows the card large (src/play/cards/card-preview.tsx).
   onLongPress?: () => void;
+  // What a screen reader's actions menu calls the long press (docs/design-system.md, Screen reader).
+  longPressLabel?: string;
   // Small game icons before the detail line (a sphere, a cost). The detail stays words.
   detailIcons?: ReactNode;
   onPress: () => void;
@@ -198,6 +203,7 @@ export function ListRow({
       collapsable={false}
       accessibilityRole="button"
       accessibilityState={selected == null ? undefined : { selected }}
+      {...(onLongPress ? longPressA11y(longPressLabel, onLongPress) : null)}
       onPress={onPress}
       onLongPress={onLongPress}
       delayLongPress={350}
@@ -338,12 +344,17 @@ export function ActionBar({ children, safe = true, testID, align = "auto" }: { c
 export function PaperSheet({ step, title, children }: { step?: string; title: string; children: ReactNode }) {
   // A sheet floating centred (SheetModal outside compact) is not pulled down from its top edge, so it has no grabber.
   const floating = useContext(SheetCornersContext) === "all";
+  // The title is a header, and a screen reader's focus lands on it when the sheet opens or its title changes (docs/design-system.md, Screen reader).
+  const titleRef = useRef<ComponentRef<typeof View>>(null);
+  useOpenFocus(titleRef, title);
   return (
     <SheetFrame animated={false}>
       {floating ? null : <View className="mb-4 h-1 w-10 self-center rounded-control bg-inkLine" />}
       <View className="items-center">
         {step ? <Eyebrow tone="inkLabel">{step}</Eyebrow> : null}
-        <Text className={`${step ? "mt-1 " : ""}text-center font-display text-title text-ink`}>{title}</Text>
+        <Text ref={titleRef} accessibilityRole="header" className={`${step ? "mt-1 " : ""}text-center font-display text-title text-ink`}>
+          {title}
+        </Text>
       </View>
       <View className="mt-5">{children}</View>
     </SheetFrame>

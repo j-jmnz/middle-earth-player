@@ -16,7 +16,7 @@ export function PoolEncounterLine({ view, name, onCard }: Props) {
   const lines = view.encounter.map((entry): Line => [cardSegment(entry.code, name), { text: copiesMark(entry.copies) }]);
   return (
     <View className="mt-3">
-      <Eyebrow>Encounter cards in the Campaign Pool</Eyebrow>
+      <Eyebrow header>Encounter cards in the Campaign Pool</Eyebrow>
       <CardLines lines={lines} empty="None." onCard={onCard} testID="path-pool-encounter" className="mt-0.5 text-label text-bone" speech={encounterSpeech(view.encounter, name)} />
     </View>
   );
@@ -31,13 +31,13 @@ export function WilderlandLine({ view, name, onCard }: Props) {
     <View testID="wilderland-line">
       {view.treasures.length > 0 ? (
         <View className="mt-3">
-          <Eyebrow>Treasures</Eyebrow>
+          <Eyebrow header>Treasures</Eyebrow>
           <CardLines lines={view.treasures.map((code): Line => [cardSegment(code, name)])} empty="None discovered." onCard={onCard} testID="path-treasures" className="mt-0.5 text-label text-bone" />
         </View>
       ) : null}
       {view.lines.length > 0 ? (
         <View className="mt-3">
-          <Eyebrow>Unique Allies Protecting Wilderland</Eyebrow>
+          <Eyebrow header>Unique Allies Protecting Wilderland</Eyebrow>
           <Text testID="path-ally-lines" className="mt-0.5 text-label text-bone">
             {view.lines.map((words) => `${words}.`).join("\n")}
           </Text>
@@ -45,7 +45,7 @@ export function WilderlandLine({ view, name, onCard }: Props) {
       ) : null}
       {hasBeldis ? (
         <View className="mt-3">
-          <Eyebrow>Beldis</Eyebrow>
+          <Eyebrow header>Beldis</Eyebrow>
           <Text testID="path-beldis" className="mt-0.5 text-label text-bone" accessibilityLabel={view.beldis.map((row) => row.speech).join(". ")}>
             {view.beldis.map((row) => `${row.prefix}${row.boxes}`).join("\n")}
           </Text>

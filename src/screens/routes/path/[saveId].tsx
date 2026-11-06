@@ -169,14 +169,14 @@ export default function CampaignPath() {
   );
   const poolLine = (
     <View className="mt-3">
-      <Eyebrow>Pool</Eyebrow>
+      <Eyebrow header>Pool</Eyebrow>
       <CardLines lines={poolLines} empty="Nothing earned yet." onCard={preview.openCode} testID="pool" className="mt-0.5 text-label text-bone" />
     </View>
   );
   // A campaign with XP (Dream-chaser): what the won scenarios gave and what is unspent, and Spend XP between scenarios (dcce.scalable-upgradable).
   const xpLine = campaign.xp ? (
     <View className="mt-3">
-      <Eyebrow>XP</Eyebrow>
+      <Eyebrow header>XP</Eyebrow>
       <Text testID="xp-line" className="mt-0.5 text-label text-bone">
         {xpWords(save.log)}
       </Text>
@@ -259,7 +259,7 @@ export default function CampaignPath() {
             <ScreenScroll bottom={24 + bottomInset / s}>
               {won.length > 0 ? (
                 <View style={{ gap: 8 * s }} className="mb-4">
-                  <Eyebrow>Completed</Eyebrow>
+                  <Eyebrow header>Completed</Eyebrow>
                   {won.map((entry) => (
                     <WonRow key={entry.id} node={entry} rounds={save.log.scenarios[entry.id]?.rounds ?? null} rewards={entry.reward.map(name)} onReplay={replay(entry)} />
                   ))}

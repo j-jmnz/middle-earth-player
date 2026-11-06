@@ -1,7 +1,7 @@
 import { FlashList, type FlashListRef } from "@shopify/flash-list";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useCallback, useMemo, useRef, useState, useSyncExternalStore } from "react";
-import { AccessibilityInfo, View } from "react-native";
+import { View } from "react-native";
 
 import { BodyText, HubHeader, IconButton, PillButton, Screen, TextButton } from "../../kit/chrome";
 import { editSavedDeck, startNewDeck } from "../../deck/draft";
@@ -24,6 +24,7 @@ import { ToastView } from "../../kit/toast-view";
 import { AskInPlace } from "../../kit/ask-in-place";
 import { useUiScale } from "../../../ui/ui-scale";
 import { useSizeClass } from "../../../ui/use-size-class";
+import { announce } from "../../../ui/announce";
 
 type Row =
   | { kind: "deck"; key: string; deck: SavedDeck; starter: boolean }
@@ -165,7 +166,7 @@ export default function Decks() {
     if (at < 0 || to < 0 || to >= ids.length) return;
     writeDeckOrder(user, moveItem(ids, at, to));
     refresh();
-    AccessibilityInfo.announceForAccessibility(`Moved ${deck.name} to place ${to + 1} of ${ids.length}`);
+    announce(`Moved ${deck.name} to place ${to + 1} of ${ids.length}`);
   }
 
   function facesFor(deck: SavedDeck): HeroFace[] {
@@ -209,7 +210,7 @@ export default function Decks() {
 
   function ask(id: string, action: "delete" | "reset"): void {
     setAsking({ id, action });
-    AccessibilityInfo.announceForAccessibility(action === "delete" ? "Delete this deck? Tap Delete for good to confirm." : "Reset this deck? Tap Reset to confirm.");
+    announce(action === "delete" ? "Delete this deck? Tap Delete for good to confirm." : "Reset this deck? Tap Reset to confirm.");
   }
 
   function renderBody(item: Row) {
@@ -255,7 +256,6 @@ export default function Decks() {
       detail: deckCountLine(deck),
       short: deckShortLine(deck),
       status: readiness.get(deck.id) ?? { ready: false, text: "" },
-      quietReady: true,
       note: notAppliedLine(deck, inactive),
       onPress: () => openDeck(deck),
       // A long press drags the deck while the list can be reordered, and starts Manage when it cannot.

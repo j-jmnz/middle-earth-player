@@ -1,8 +1,10 @@
+import type { PrintedCard } from "../../rules/core/printed.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
 import type { BeatStore } from "../store/beat-store.ts";
 import type { SlotNumbers } from "../cards/card-effects.ts";
-import type { OptionMark } from "../choice/sheet-types.ts";
+import type { OptionMark, Sheet } from "../choice/sheet-types.ts";
 import type { LayoutOptions } from "../layout/layout.ts";
+import type { Reach, RowFeet } from "../layout/column-reach.ts";
 import type { SpotlightHandoff } from "../spotlight/handoff.ts";
 import type { ZoneFacts } from "../store/selectors.ts";
 import type { StageArea } from "../spotlight/stage.ts";
@@ -31,10 +33,21 @@ export type TableHighlight = {
 // and whether a delayed effect will act on it.
 export type SlotInfo = SlotNumbers;
 
+// What only the reader table reads (reader-table.tsx): the sheet of the open moment and the printed cards, for the words on each card.
+// The screen passes it while a screen reader is on and null otherwise, so the canvas's props are what they were without one.
+export type ReaderSeed = { sheet: Sheet; cards: ReadonlyMap<string, PrintedCard> };
+
 export type TableCanvasProps = {
   store: TableStore;
   width: number;
   height: number;
+  // The command column lies over the canvas's right edge, `column` points past `width`: the canvas draws that far, and a crowded top row
+  // the column's empty top covers (`reach` rows, column-reach.ts) runs on into it (row-reach.ts). The hand and the play area stay in `width`.
+  column?: number;
+  // null: the screen has not measured the column and its dock yet, so the canvas only reports the rows' feet and lays nothing out (table-canvas.native.tsx).
+  reach?: Reach | null;
+  // Told the feet of the staging and engagement rows each time they move, so the screen can count the reach.
+  onRowFeet?: (feet: RowFeet) => void;
   // The cached file (or bundled scan) for a code, or null while it is not on the phone.
   picture: (code: string) => PictureSource | null;
   // Moves when the image cache gains a file, so a card drawn as its name is tried again.
@@ -51,6 +64,7 @@ export type TableCanvasProps = {
   // The engine's numbers on a card, read from the state the canvas is handed (so a render never reads the store) and the seat drawn.
   info: (game: ScenarioState, seat: number, cardId: string) => SlotInfo;
   highlight: TableHighlight;
+  readerSeed?: ReaderSeed | null;
   // The cards the banner's current line names (the shadow card, the card damaged), ringed while the banner is at that line. The canvas
   // reads them itself, so a beat draws it and not the screen above it (beat-store.ts).
   beats: BeatStore;
@@ -68,6 +82,8 @@ export type TableCanvasProps = {
   look?: { contrast: boolean };
   // A tap on a card, or on a pile ("pile:discard"). The screen decides what it does; a tap never sends an intent.
   onTap: (cardId: string) => void;
+  // A tap that hits no card or pile: the screen folds an open tray for it, as for the top of the command column.
+  onEmptyTap?: () => void;
   // A long press on a face-up card: the screen shows it large over the table.
   onPreview: (cardId: string) => void;
   // A drag ended on one of the selected card's drop targets (a key from targetKey). The screen picks; it does not send.

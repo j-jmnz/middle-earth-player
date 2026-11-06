@@ -325,7 +325,7 @@ export function DifficultyPicker({
   return (
     <>
       <Section title="Difficulty" className="mt-4" right={<Chip label={`${facts.deckSize} encounter cards`} />} />
-      <Segmented options={options} value={difficulty} onChange={onDifficulty} testIDPrefix="difficulty" stretch icons={DIFFICULTY_ICONS} />
+      <Segmented options={options} value={difficulty} onChange={onDifficulty} testIDPrefix="difficulty" stretch icons={DIFFICULTY_ICONS} accessibilityLabel="Difficulty" />
       {/* What the difficulty changes, for a first game (ltp.easy-mode, easy-mode.easy-mode). */}
       <Label testID="briefing-difficulty-note" tone="muted" className="mt-2">
         {DIFFICULTY_NOTES[difficulty]}

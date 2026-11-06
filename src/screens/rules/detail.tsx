@@ -43,7 +43,7 @@ export function RuleBody({ entry, onSeeAlso, reading = false }: { entry: Glossar
   const seeAlsoRow =
     links.length > 0 ? (
       <View testID="rule-see-also">
-        <Eyebrow>See also</Eyebrow>
+        <Eyebrow header>See also</Eyebrow>
         <View className="mt-1 flex-row flex-wrap items-center gap-x-1.5">
           {links.map(({ name, entry: target }) =>
             target ? (

@@ -34,7 +34,8 @@ export function SheetModal({
   const tablet = useIsTablet();
   return (
     <Modal visible={visible} transparent animationType={animationType} onRequestClose={onRequestClose} supportedOrientations={tablet ? ALL_ORIENTATIONS : PORTRAIT}>
-      <View className={floating ? "flex-1 items-center justify-center" : "flex-1 justify-end"}>
+      {/* A reader's escape gesture closes the sheet, as the scrim and Back do. */}
+      <View className={floating ? "flex-1 items-center justify-center" : "flex-1 justify-end"} accessibilityViewIsModal onAccessibilityEscape={onRequestClose}>
         <Pressable accessibilityRole="button" accessibilityLabel={scrimLabel} onPress={onRequestClose} style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0, backgroundColor: palette.night, opacity: 0.72 }} />
         <SheetCornersContext.Provider value={floating ? "all" : "top"}>
           {floating ? <View style={{ width: "100%", maxWidth: SHEET_MAX * s }}>{children}</View> : children}

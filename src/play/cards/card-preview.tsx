@@ -5,10 +5,12 @@
 //
 // On a wide screen (the table, in landscape) the card stands at the left and a column at its right names it, says what
 // effects are on it now (+1 Attack from Dagger of Westernesse) and lists the cards attached to it and its shadow cards: a
-// tap on one shows that card in its place.
+// tap on one shows that card in its place. A horizontal swipe on the card steps through the same cards (preview-swipe.ts), and so
+// does the screen reader's adjust gesture; the rows stay the plain path.
 import { Image } from "expo-image";
 import { useCallback, useEffect, useState } from "react";
 import { BackHandler, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { scheduleOnRN } from "react-native-worklets";
@@ -21,6 +23,8 @@ import { NotAppliedView } from "./not-applied-view.tsx";
 import { springConfig, timing, useMotionScale } from "../../ui/motion-run.ts";
 import { MOTION } from "../../ui/motion-tokens.ts";
 import { previewSideSize, previewSize } from "./preview-size.ts";
+import { clampStep, swipeStep } from "./preview-swipe.ts";
+import { chipLabel, EARLIER_STAGE, listHeading, previewValue, rowName } from "./preview-words.ts";
 import { SecondaryButton } from "../../ui/buttons.tsx";
 import type { PictureSource } from "../canvas/table-canvas-types.ts";
 import { cardCorner } from "../../ui/card-corner.ts";
@@ -101,7 +105,8 @@ export function CardPreview({
   closeRef,
 }: {
   card: PreviewCard;
-  // The cards attached to it and its face-up shadow cards, each shown in its place on a tap.
+  // The cards attached to it and its face-up shadow cards (and, for the quest stage, the stages before it), each shown in its place on a
+  // tap or a swipe.
   related?: readonly PreviewCard[];
   onClose: () => void;
   // The hardware Back closes the preview here (a list's preview) unless the screen routes Back itself (the table's layers,
@@ -168,10 +173,32 @@ export function CardPreview({
   });
   const buttonsStyle = useAnimatedStyle(() => ({ opacity: Math.min(1, Math.max(0, progress.get())) }));
 
+  // A sideways swipe on the card steps one card along, never past either end. It waits for a clear sideways move and gives way to an
+  // upright one, and a tap still reaches the scrim and closes the preview. Its callbacks run on the JS thread: they only set `at`.
+  const count = all.length;
+  const swipe = Gesture.Pan()
+    .runOnJS(true)
+    .enabled(count > 1)
+    .activeOffsetX([-12 * s, 12 * s])
+    .failOffsetY([-12 * s, 12 * s])
+    .onEnd((event) => setAt((now) => swipeStep(now, count, event.translationX, event.velocityX, s)));
+  const step = (by: number) => setAt((now) => clampStep(now, count, by));
   const frame = (
-    <Animated.View style={[{ width: size.width, height: size.height, borderRadius: shown.source ? 0 : cardCorner(size.width, size.height), overflow: "hidden", backgroundColor: shown.source ? "transparent" : t.paper }, cardStyle]}>
-      <PreviewPicture card={shown} width={size.width} height={size.height} imageKey={`${shown.code}:${at}`} />
-    </Animated.View>
+    <GestureDetector gesture={swipe}>
+      <Animated.View
+        testID="card-preview-card"
+        accessible={count > 1}
+        accessibilityRole={count > 1 ? "adjustable" : undefined}
+        accessibilityLabel={count > 1 ? "Card shown large" : undefined}
+        accessibilityValue={count > 1 ? { text: previewValue(shown, at, count) } : undefined}
+        accessibilityHint={count > 1 ? "Adjust to show the other cards with it" : undefined}
+        accessibilityActions={count > 1 ? [{ name: "increment" }, { name: "decrement" }] : undefined}
+        onAccessibilityAction={(event) => step(event.nativeEvent.actionName === "increment" ? 1 : -1)}
+        style={[{ width: size.width, height: size.height, borderRadius: shown.source ? 0 : cardCorner(size.width, size.height), overflow: "hidden", backgroundColor: shown.source ? "transparent" : t.paper }, cardStyle]}
+      >
+        <PreviewPicture card={shown} width={size.width} height={size.height} imageKey={`${shown.code}:${at}`} />
+      </Animated.View>
+    </GestureDetector>
   );
   const buttons = onDetails && shown.lostIsland !== true ? (
     <SecondaryButton
@@ -190,6 +217,7 @@ export function CardPreview({
       <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: t.night }, scrimStyle]} />
       <Pressable
         testID="card-preview-scrim"
+        accessibilityRole="button"
         accessibilityLabel="Close the preview"
         onPress={close}
         style={[StyleSheet.absoluteFill, wide ? styles.row : styles.column, { paddingTop: insets.top, paddingBottom: insets.bottom, paddingLeft: insets.left + 16 * s, paddingRight: insets.right + 16 * s }]}
@@ -244,7 +272,7 @@ export function CardPreview({
                 ) : null}
                 {all.length > 1 ? (
                   <View testID="card-preview-attached">
-                    <Text className="font-display text-eyebrow uppercase text-accent">{at === 0 ? "With it" : "The card and what is with it"}</Text>
+                    <Text className="font-display text-eyebrow uppercase text-accent">{listHeading(all, at)}</Text>
                     {all.map((item, index) => (
                       <Pressable
                         key={`${item.code}:${index}`}
@@ -264,9 +292,9 @@ export function CardPreview({
                             </View>
                             <View className="shrink">
                               <Text numberOfLines={1} className="text-body text-bone">
-                                {item.name}
+                                {rowName(item)}
                               </Text>
-                              {item.role ? <Text className="text-label text-muted">{item.role}</Text> : null}
+                              {item.role && item.role !== EARLIER_STAGE ? <Text className="text-label text-muted">{item.role}</Text> : null}
                             </View>
                           </View>
                         )}
@@ -295,7 +323,7 @@ export function CardPreview({
                       key={`${item.code}:${index}`}
                       testID={`card-preview-related-${index}`}
                       accessibilityRole="button"
-                      accessibilityLabel={item.role ? `${item.name}, ${item.role}` : item.name}
+                      accessibilityLabel={chipLabel(item)}
                       accessibilityState={{ selected: index === at }}
                       onPress={() => setAt(index)}
                     >
@@ -308,7 +336,7 @@ export function CardPreview({
                             {item.source ? <Image source={item.source} cachePolicy={cachePolicyFor(item.source)} recyclingKey={`${item.code}:${index}:thumb`} contentFit="cover" style={{ width: 24 * s, height: 34 * s }} /> : null}
                           </View>
                           <Text numberOfLines={1} className="text-label text-bone">
-                            {item.role ?? item.name}
+                            {index > 0 && item.title ? item.title : (item.role ?? item.name)}
                           </Text>
                         </View>
                       )}

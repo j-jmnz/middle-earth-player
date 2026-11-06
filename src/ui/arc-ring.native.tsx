@@ -32,7 +32,7 @@ export function ArcRing({ size, parts, track, stroke: given, gap = 2, children }
   }, [size, stroke]);
   return (
     <View style={{ width: size, height: size, alignItems: "center", justifyContent: "center" }}>
-      <Canvas style={{ position: "absolute", width: size, height: size }}>
+      <Canvas accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={{ position: "absolute", width: size, height: size }}>
         <Path path={ring} style="stroke" strokeWidth={stroke} color={track} />
         {paths.map((arc) => (
           <Path key={arc.key} path={arc.path} style="stroke" strokeWidth={stroke} color={arc.color} />

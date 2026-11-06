@@ -48,6 +48,8 @@ export type PickSheet = {
   step: string;
   title: string;
   note: string | null;
+  // What a screen reader hears in place of `note`, where the note names a glow or a drag; read only under useReaderMode (use-table-choice.ts).
+  readerNote?: string | null;
   // The action the primary button names with the chosen option ("Defend with" Sam).
   verb: string;
   // A fixed primary label when an option is a whole sentence (a branch of a Choose), in place of verb and option.
@@ -80,6 +82,8 @@ export type MultiSheet = {
   step: string;
   title: string;
   note: string | null;
+  // What a screen reader hears in place of `note`, where the note names a glow or a drag; read only under useReaderMode (use-table-choice.ts).
+  readerNote?: string | null;
   verb: string;
   options: readonly SheetOption[];
   build: MultiBuild;
@@ -99,6 +103,8 @@ export type DistributeSheet = {
   step: string;
   title: string;
   note: string;
+  // What a screen reader hears in place of `note`, where the note names a glow or a drag; read only under useReaderMode (use-table-choice.ts).
+  readerNote?: string;
   total: number;
   exact: boolean;
   options: readonly (SheetOption & { max: number })[];
@@ -123,6 +129,8 @@ export type TriggerSheet = {
   sourceId: string | null;
   timing: string;
   note: string | null;
+  // What a screen reader hears in place of `note`, where the note names a glow or a drag; read only under useReaderMode (use-table-choice.ts).
+  readerNote?: string | null;
   hide: HideNumbers | null;
   options: readonly TriggerOption[];
   // The pass button's word, or null when the window cannot be passed.
@@ -147,6 +155,8 @@ export type WindowSheet = {
   step: string;
   title: string;
   note: string | null;
+  // What a screen reader hears in place of `note`, where the note names a glow or a drag; read only under useReaderMode (use-table-choice.ts).
+  readerNote?: string | null;
   // The quest commit in the commit window: a tap on a character puts it in or takes it out.
   commit: MultiSheet | null;
   // The player side quests in the quest areas the commit can go to instead of the current quest (families/sidequests/quest.ts).

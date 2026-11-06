@@ -22,7 +22,7 @@ export function NeedChoices({ options, nameOf, printedText, onChoose }: Props) {
     const action = skip ? null : actionLine(printedText[code]);
     return (
       <View key={option}>
-        <TextButton label={label} testID={`choice-${option}`} onPress={() => onChoose(option)} {...(skip ? {} : { onLongPress: () => openCard(code), accessibilityHint: "Long press to see the card" })} />
+        <TextButton label={label} testID={`choice-${option}`} onPress={() => onChoose(option)} {...(skip ? {} : { onLongPress: () => openCard(code) })} />
         {action ? (
           <Label tone="muted" className="mb-1 text-center" testID={`choice-${option}-action`}>
             {action}

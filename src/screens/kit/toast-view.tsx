@@ -1,6 +1,6 @@
 import { useFocusEffect, useIsFocused } from "expo-router";
 import { useCallback, useEffect, useMemo } from "react";
-import { AccessibilityInfo, View } from "react-native";
+import { Platform, View } from "react-native";
 import Animated, { FadeInDown, FadeOut } from "react-native-reanimated";
 
 import { layoutAnim, useMotionScale } from "../../ui/motion-run";
@@ -9,6 +9,10 @@ import { useScreenReader } from "../../ui/screen-reader";
 import { TextButton } from "./chrome";
 import { dismissToast, leaveToastScreen, toastDuration, useToast } from "./toast";
 import { Text } from "../../ui/text";
+import { announce } from "../../ui/announce";
+
+// A phone's screen reader hears the toast once, through `announce` (a live region as well made Android read it twice). The web keeps its live region.
+const LIVE_REGION = Platform.OS === "web" ? ("polite" as const) : undefined;
 
 /**
  * The toast of src/screens/kit/toast.ts, docked at the foot of the screen's content, above its pinned bar. It takes its own
@@ -27,7 +31,7 @@ export function ToastView() {
 
   useEffect(() => {
     if (!toast) return;
-    AccessibilityInfo.announceForAccessibility(toast.text);
+    announce(toast.text);
     const timer = setTimeout(() => dismissToast(toast.id), toastDuration(toast, screenReader));
     return () => clearTimeout(timer);
   }, [toast, screenReader]);
@@ -40,7 +44,7 @@ export function ToastView() {
       <Animated.View key={toast.id} entering={fade.enter} exiting={fade.leave}>
         <View
           testID="toast"
-          accessibilityLiveRegion="polite"
+          accessibilityLiveRegion={LIVE_REGION}
           className="min-h-14 flex-row items-center rounded-container bg-pressed pl-4"
         >
           <Text testID="toast-text" className={`flex-1 py-3 text-body ${toast.tone === "danger" ? "text-danger" : "text-bone"}`}>

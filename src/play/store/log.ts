@@ -22,6 +22,11 @@ export type LogMark = "threat" | "willpower" | "attack" | "damage" | "progress" 
 
 export type LogLine = { key: string; text: string; cause: string | null; mark: LogMark };
 
+/** What a screen reader hears of a log line, as one element: the step, then its cause ("3 damage on Aragorn. Enemy attack, rr.step-6-4-3"). */
+export function logLineSpeech(line: Pick<LogLine, "text" | "cause">): string {
+  return line.cause ? `${line.text}. ${line.cause}` : line.text;
+}
+
 function markOf(step: EngineStep): LogMark {
   switch (step.kind) {
     case "threat":

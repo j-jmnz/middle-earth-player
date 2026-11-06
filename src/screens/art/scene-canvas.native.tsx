@@ -31,7 +31,7 @@ export function SceneCanvas({
   const image = useImage(typeof source === "number" ? source : source.uri);
   if (!image) return null;
   return (
-    <Canvas pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, width, height }}>
+    <Canvas pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={{ position: "absolute", left: 0, top: 0, width, height }}>
       <Group layer>
         <Group clip={rect(0, 0, width, band)}>
           <Image image={image} x={crop.left} y={crop.top} width={crop.width} height={crop.height} fit="fill">

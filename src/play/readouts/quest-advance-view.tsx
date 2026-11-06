@@ -70,7 +70,7 @@ export function QuestAdvanceView({
   const tiles = asks ? trayTiles(sheet) : [];
   const marks = new Set(choice.choice.ids);
   return (
-    <View testID="quest-advance" accessibilityViewIsModal style={StyleSheet.absoluteFill}>
+    <View testID="quest-advance" accessibilityViewIsModal onAccessibilityEscape={asks ? undefined : onProgress} style={StyleSheet.absoluteFill}>
       <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: t.night }, scrimStyle]} />
       <View
         style={[

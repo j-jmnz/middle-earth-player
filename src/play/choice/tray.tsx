@@ -21,7 +21,8 @@ import type { Sheet, Unavailable } from "./sheet-types.ts";
 import type { PictureSource } from "../canvas/table-canvas-types.ts";
 import { shareFor, type Choice } from "./table-choice.ts";
 import { useHeld } from "./tray-frame.tsx";
-import { tileAction, trayTiles, type TrayTile } from "./tray-logic.ts";
+import { shareHint, shareValue, tileAction, tileRole, trayTiles, type TrayTile } from "./tray-logic.ts";
+import { useReaderMode } from "../../ui/screen-reader.ts";
 import { withAlphaHex } from "../../ui/tokens.ts";
 import { useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
@@ -90,6 +91,7 @@ export function ChoiceTray({
   dense,
   onTile,
   onRead,
+  onStep,
 }: {
   open: boolean;
   sheet: Sheet;
@@ -99,8 +101,12 @@ export function ChoiceTray({
   dense: boolean;
   onTile: (id: string) => void;
   onRead: ((cardId: string) => void) | null;
+  // A screen reader's increment or decrement action on a share row (use-table-choice.ts, onStep); a touch never calls it.
+  onStep?: ((id: string, delta: 1 | -1) => void) | null;
 }) {
   const s = useUiScale();
+  // A phone screen reader hears each row as a radio, a checkbox, a button or an adjustable share (tray-logic.ts, tileRole); no one else does.
+  const reader = useReaderMode();
   // A phone draws the small picture, and the rows keep one row of it (dock/budget.ts; the dock budgets its words against the same).
   const small = smallPictures(useWindowDimensions().height, s);
   const { progress, leaving } = useOpenMotion(open, MOTION.trayEnter, MOTION.trayLeave);
@@ -135,8 +141,9 @@ export function ChoiceTray({
               said={mark ? `${mark.danger ? "destroyed" : "damage"} ${mark.value}` : ""}
               // A card the Sailing test looked at is no choice: a tap opens it large, as a long press does.
               onPress={() => (tileAction(tile) === "read" ? (onRead && readId ? onRead(readId) : undefined) : onTile(tile.id))}
-              hint={tile.look != null ? "Shows the card" : undefined}
+              hint={tile.look != null ? "Shows the card" : reader && shown.kind === "distribute" ? shareHint(shown, picked.shares, tile.id) : undefined}
               detailSpoken={tile.look == null}
+              reader={reader ? { role: tileRole(shown), checks: tileRole(shown) === "radio" || tileRole(shown) === "checkbox", ...(shown.kind === "distribute" ? { name: tile.label, value: { min: 0, ...shareValue(shown, picked.shares, tile.id) }, onStep: (delta: 1 | -1) => onStep?.(tile.id, delta) } : {}) } : undefined}
               onLongPress={onRead && readId ? () => onRead(readId) : null}
             />
           );

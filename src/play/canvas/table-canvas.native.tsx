@@ -25,16 +25,14 @@ import { HandScrub } from "./hand-scrub.native.tsx";
 import { useTableGestures } from "./hand-gestures.native.ts";
 import { tableLayout, type CardSlot, type Rect } from "../layout/layout.ts";
 import { slotBounds } from "../layout/hits.ts";
-import { nameOfCard, pictureKey } from "./picture-key.ts";
-import { areaFacts, areaSpeech } from "../store/stormcaller-table.ts";
-import { controlSpeech, treasureSpeech } from "../cards/dungeon-preview.ts";
-import { grappleDetail } from "../words/grapple.ts";
+import { rowFeet } from "../layout/column-reach.ts";
+import { areaFacts } from "../store/stormcaller-table.ts";
 import { stagePill } from "../words/stormcaller.ts";
 import { NO_DRAG, NO_HIGHLIGHT, NO_TARGETS } from "../store/peek.ts";
 import { actingSeat, lookedOf, shownSeat } from "../store/selectors.ts";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
-import { ReaderPiles } from "./reader-piles.tsx";
-import { useScreenReader } from "../../ui/screen-reader.ts";
+import { ReaderTable } from "./reader-table.tsx";
+import { useReaderMode } from "../../ui/screen-reader.ts";
 import { sphereRing, stripText, useViews } from "./table-canvas-views.ts";
 import { useBackImages, useTokenImages } from "./table-assets.native.ts";
 import { useTableFonts } from "./table-fonts.native.ts";
@@ -59,7 +57,7 @@ function ZoneWord({ rect, text, font, t, s }: { rect: Rect; text: string; font: 
   return <Text x={rect.x + 6 * s} y={rect.y + 16 * s} text={text} font={font} color={t.faint} />;
 }
 
-function Table({ store, width, height, picture, pictureRevision, nameOf, sphereOf, inactive, facts, success, info, highlight: marked, beats, raised, fight, bottomInset, stageArea, handoff, look, onTap, onPreview, onDrop }: TableCanvasProps) {
+function Table({ store, width, height, column, reach, onRowFeet, picture, pictureRevision, nameOf, sphereOf, inactive, facts, success, info, highlight: marked, beats, raised, fight, bottomInset, stageArea, handoff, look, onTap, onEmptyTap, onPreview, onDrop }: TableCanvasProps) {
   // The UI scale, read once here and handed down with the tokens: to the layout, the fonts, every piece and the spotlight (user request, 2026-10-28).
   const s = useUiScale();
   const contrast = look?.contrast ?? false;
@@ -103,9 +101,16 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   // The moment's own cards (`marked.keep`) count while the tray is open or the table peeks, when nothing glows.
   const keep = useMemo(() => new Set([...marked.keep, ...targetIds, ...beating, ...(selected ? [selected] : [])]), [marked, targetIds, beating, selected]);
   const layout = useMemo(
-    () => tableLayout(width, height, views, piles, { raised, deckTop, attacker, preview: fight, bottomInset, scale: s, keep, look: strip, lookLeavesStaging: discovered.length > 0, stacks: seaGame }),
-    [width, height, views, piles, raised, deckTop, attacker, fight, bottomInset, s, keep, strip, discovered, seaGame],
+    () => tableLayout(width, height, views, piles, { raised, deckTop, attacker, preview: fight, bottomInset, scale: s, keep, look: strip, lookLeavesStaging: discovered.length > 0, stacks: seaGame, column, reach: reach ?? 0 }),
+    [width, height, views, piles, raised, deckTop, attacker, fight, bottomInset, s, keep, strip, discovered, seaGame, column, reach],
   );
+  // The rows' feet go up to the screen, which counts how many the command column's empty top covers (column-reach.ts). They do not move with the reach.
+  const feet = rowFeet(layout);
+  useLayoutEffect(() => {
+    onRowFeet?.({ staging: feet.staging, engaged: feet.engaged });
+  }, [onRowFeet, feet.staging, feet.engaged]);
+  // The canvas draws under the command column too.
+  const drawnWidth = width + (column ?? 0);
   // The cards the rows folded away are told to the table's pick (a folded card is not on the table) and to the row list (row-fold.ts).
   const foldedKey = (layout.folds ?? []).map((fold) => `${fold.zone}:${fold.cards.join(",")}`).join("|");
   useLayoutEffect(() => {
@@ -137,25 +142,14 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   }, [handoff, plan, progress, playing, warm, k]);
 
   const select = useCallback((cardId: string | null) => store.getState().select(cardId), [store]);
-  const reader = useScreenReader();
   // The drag, the tap, the press and the hand scrub (hand-gestures.native.ts).
-  const { gesture, liftTransform, scrub } = useTableGestures({ layout, canvas: { width, height, bottom: bottomInset }, draggable, targets, k, hurry, live, swallow, scrubOn: !reader, select, onTap, onPreview, onDrop });
+  const { gesture, liftTransform, scrub } = useTableGestures({ layout, canvas: { width, height, bottom: bottomInset }, draggable, targets, k, hurry, live, swallow, select, onTap, onEmptyTap, onPreview, onDrop });
   const lifted = selected ? (layout.slots.find((slot) => slot.id === selected && slot.kind === "card") ?? null) : null;
 
   // Whose area the staging row is once the table is split between players: the tag at the row's left end, the empty row's word, and the quest strip's seat.
   const owner = seatTag(game, seat);
   const targetZones = useMemo(() => targets.flatMap((target) => (target.kind === "zone" ? [layout.zones[target.zone]] : [])), [targets, layout]);
 
-  // What a screen reader hears of a card whose number or place is only on the canvas: The Havens Burn, with the cards under it against the number that loses; the Stormcaller's stage and area.
-  const spoken = (slot: CardSlot): string | null => {
-    if (slot.kind !== "card" || slot.faceDown || slot.zone === "hand" || slot.zone === "deck") return null;
-    const numbers = info(game, seat, slot.id);
-    // The Stormcaller's stage and the cards of its area say where they stand and whether they can be reached (stormcaller-table.ts).
-    if (slot.stormcaller) return areaSpeech(game, slot.id, (card) => nameOf(pictureKey(card)), numbers.questPoints);
-    // The Havens Burn's count, the enemies grappled under a location, and a Ship location's Threat against the total that loses (each is a sentence of its own; none drops another).
-    const said = [numbers.under?.speech, grappleDetail(game, slot.id), numbers.loss?.speech, controlSpeech(game, slot.id), facts.typeOf(slot.code) === "treasure" ? treasureSpeech(game, slot.id, (id) => nameOfCard(game.cards, id, nameOf)) : null].filter((part): part is string => part != null);
-    return said.length > 0 ? `${nameOf(slot.picture ?? slot.code)}, ${said.join(". ")}` : null;
-  };
   // The Stormcaller's stage wears its number and, while the players are at another stage, the Apart plate.
   const stageFacts = areaFacts(game);
   const stageMarks = stageFacts ? { pill: stagePill(stageFacts), apart: !stageFacts.together } : null;
@@ -174,7 +168,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
   return (
     <>
       <GestureDetector gesture={gesture}>
-        <Canvas style={{ width, height }}>
+        <Canvas style={{ width: drawnWidth, height }}>
           {/* No felt and no zone boxes: the screen's fog (ember over the encounter, moonlight over the fellowship) shows through, and
               the engagement area is told apart by a red haze toward its left, where the enemies stand. */}
           <SkRect x={layout.zones.engaged.x - 12 * s} y={layout.zones.engaged.y - 10 * s} width={layout.zones.engaged.w + 24 * s} height={layout.zones.engaged.h + 20 * s}>
@@ -199,7 +193,7 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
             </Leaving>
           ))}
           {layout.slots.filter((slot) => slot.zone !== "hand").map(piece)}
-          <HandScrub slots={layout.slots.filter((slot) => slot.zone === "hand")} scrub={scrub} width={width} height={height} t={t} piece={piece} />
+          <HandScrub slots={layout.slots.filter((slot) => slot.zone === "hand")} scrub={scrub} width={drawnWidth} height={height} t={t} piece={piece} />
           <TokenFx fx={moves.fx} layout={layout} clock={fxClock} images={tokens} fonts={fonts} t={t} s={s} ringOf={(code) => sphereRing(sphereOf(code), t)} stripOf={(slot) => stripText(slot, info(game, seat, slot.id).questPoints, slot.zone === "questStage" ? owner : null)} contrast={contrast} />
           {attackerSlot ? <AttackerMark rect={slotBounds(attackerSlot)} t={t} s={s} /> : null}
           {layout.marks.map((mark) => (
@@ -213,11 +207,37 @@ function Table({ store, width, height, picture, pictureRevision, nameOf, sphereO
           ) : null}
         </Canvas>
       </GestureDetector>
-      {/* A screen reader reaches the piles and the fold stacks through a button over each (reader-piles.tsx). */}
-      {reader ? <ReaderPiles slots={layout.slots} onTap={onTap} speak={(slot) => spoken(slot)} playable={highlight.tappable} nameOf={(code) => nameOf(code)} /> : null}
     </>
   );
 }
 
+// Until the screen has measured the command column and its dock (`reach` null) the table is not laid out: this only tells the screen the rows' feet, which
+// do not depend on the reach, so the first table that is drawn, folded and answered is the one the reach decides, and a resumed game opens as the same moment reached in play.
+function RowFeetProbe({ store, width, height, column, onRowFeet, facts, bottomInset }: TableCanvasProps) {
+  const s = useUiScale();
+  const seat = useStore(store, (state) => shownSeat(state.game, state.viewedSeat));
+  const { views, piles } = useViews(store, seat, facts);
+  const seaGame = useStore(store, (state) => state.game.sea != null);
+  const feet = rowFeet(tableLayout(width, height, views, piles, { bottomInset, scale: s, stacks: seaGame, column }));
+  useLayoutEffect(() => {
+    onRowFeet?.({ staging: feet.staging, engaged: feet.engaged });
+  }, [onRowFeet, feet.staging, feet.engaged]);
+  return null;
+}
+
+// With a screen reader on the phone the reader table takes the canvas's place (reader-table.tsx); the probe keeps answering the rows' feet so the command column lays out as it does over the canvas.
+function TableOrProbe(props: TableCanvasProps) {
+  const reader = useReaderMode();
+  if (reader && props.readerSeed) {
+    return (
+      <>
+        <RowFeetProbe {...props} />
+        <ReaderTable {...props} readerSeed={props.readerSeed} />
+      </>
+    );
+  }
+  return props.reach === null ? <RowFeetProbe {...props} /> : <Table {...props} />;
+}
+
 // Drawn again only when its props change: the screen keeps them stable while their contents are the same.
-export const TableCanvas = memo(Table);
+export const TableCanvas = memo(TableOrProbe);

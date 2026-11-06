@@ -1,7 +1,7 @@
 import { FlashList, type FlashListRef } from "@shopify/flash-list";
 import { useRouter } from "expo-router";
 import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState, type ComponentRef, type ReactNode } from "react";
-import { AccessibilityInfo, Pressable, ScrollView, View } from "react-native";
+import { Pressable, ScrollView, View } from "react-native";
 
 import { ActionBar, BodyText, PrimaryButton, ProgressBar, Screen, SearchField, Segmented, SecondaryButton, ToggleChip, sphereWord } from "../kit/chrome";
 import { draftAddRefused, draftCopyCount, useDeckDraft, type TitleLookup } from "../deck/draft";
@@ -28,6 +28,7 @@ import type { PictureSource } from "../../play/canvas/table-canvas-types";
 import { touch, useUiScale } from "../../ui/ui-scale";
 import { useSizeClass } from "../../ui/use-size-class";
 import { Text } from "../../ui/text";
+import { announce } from "../../ui/announce";
 
 
 const viewabilityConfig = { itemVisiblePercentThreshold: 10 };
@@ -220,7 +221,7 @@ export function CardPoolBody({
   useEffect(() => {
     if (!typeRequest) return;
     list.current?.scrollToOffset({ offset: 0, animated: false });
-    AccessibilityInfo.announceForAccessibility(typeRequestWords(types, typeRequest.type));
+    announce(typeRequestWords(types, typeRequest.type));
   }, [typeRequest, types]);
   // Other printings of a title share its copy limit: the deck's codes are named from the loaded rows.
   const lookup = useMemo<TitleLookup>(() => (code) => byCode.get(code), [byCode]);
@@ -287,7 +288,7 @@ export function CardPoolBody({
       />
       <View className="mt-1 flex-row items-center justify-between">
         <Text testID="pool-shown" className="text-label text-muted">{`${visible.length} ${visible.length === 1 ? "card" : "cards"}`}</Text>
-        <Segmented options={["Grid", "List"] as const} value={view} onChange={viewSetting.set} testIDPrefix="pool-view" compact />
+        <Segmented options={["Grid", "List"] as const} value={view} onChange={viewSetting.set} testIDPrefix="pool-view" compact accessibilityLabel="Card view" />
       </View>
       <View
         className="mt-2 min-h-0 flex-1"

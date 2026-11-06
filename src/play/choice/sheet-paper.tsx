@@ -3,10 +3,11 @@
 // they send, are dock/buttons.tsx. Every press shows its pressed fill in the same frame. Nothing here holds a number the engine
 // did not compute.
 import { createContext, useContext, useMemo, type ReactNode } from "react";
-import { Pressable, View, type DimensionValue } from "react-native";
+import { Pressable, View, type AccessibilityRole, type DimensionValue } from "react-native";
 import Animated, { SlideInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { longPressA11y, mergeA11yActions } from "../../ui/long-press-action.ts";
 import { IconValue } from "../../ui/game-icon.tsx";
 import { CONTROL_RADIUS, SHEET_RADIUS } from "../../ui/radius.ts";
 import { chipOnSurface, parchmentSurface } from "../../ui/surfaces.ts";
@@ -89,6 +90,8 @@ export function Stats({ stats, testID, surface = "paper", size = "body" }: { sta
   );
 }
 
+const STEP_ACTIONS = [{ name: "increment" }, { name: "decrement" }];
+
 /**
  * A choice row, on paper (a pile's cards) or on night (the choice in the dock). `leading` is a card picture, `trailing` a pill (the
  * foreseen damage); `dense` puts everything on one line (the choice on a short phone). A row has no plate and no drawn edge: at rest
@@ -110,6 +113,7 @@ export function Tile({
   said = "",
   hint,
   detailSpoken = true,
+  reader,
 }: {
   label: string;
   selected: boolean;
@@ -124,14 +128,24 @@ export function Tile({
   trailing?: ReactNode;
   // More for a screen reader to say (the foreseen damage).
   said?: string;
-  // What a tap does, when the label does not say ("Tap to play it"); said before the long press's hint.
+  // What a tap does, when the label does not say ("Plays it"); said before the long press's hint.
   hint?: string;
   // The detail is drawn but not said again: its words are already in the stats ("Success" beside the success icon).
   detailSpoken?: boolean;
+  // How a screen reader meets the row (accessibility props only; a touch acts as it always did): its role, whether its state is "checked"
+  // (a radio, a checkbox) or "selected", the name it speaks when that is not the drawn label, and for an "adjustable" row its value and the
+  // increment and decrement actions that add or take away one share (tray-logic.ts, stepShares). Given only under useReaderMode.
+  reader?: { role: AccessibilityRole; checks: boolean; name?: string; value?: { min: number; max: number; now: number; text: string }; onStep?: (delta: 1 | -1) => void };
 }) {
   const t = useTableTokens();
   const s = useUiScale();
   const night = surface === "night";
+  // A screen reader's actions on the row: a share row's increment and decrement, and the long press's "Show card" (docs/design-system.md, Screen reader).
+  const onStep = reader?.onStep;
+  const actions = mergeA11yActions(
+    onStep ? { accessibilityActions: STEP_ACTIONS, onAccessibilityAction: (event) => onStep(event.nativeEvent.actionName === "increment" ? 1 : -1) } : null,
+    onLongPress ? longPressA11y("Show card", onLongPress) : null,
+  );
   const numbers = stats.length > 0 || trailing != null ? (
     <View className="flex-row flex-wrap items-center gap-2">
       <Stats stats={stats} surface={surface} />
@@ -142,10 +156,13 @@ export function Tile({
     <Pressable
       testID={testID}
       collapsable={false}
-      accessibilityRole="button"
-      accessibilityState={{ selected }}
-      accessibilityLabel={[label, ...stats.map((stat) => `${stat.word} ${stat.value}`), said, detailSpoken ? (detail ?? "") : ""].filter((part) => part.length > 0).join(". ")}
-      accessibilityHint={[hint, onLongPress ? "Hold to read the card" : null].filter(Boolean).join(". ") || undefined}
+      accessibilityRole={reader?.role ?? "button"}
+      accessibilityState={reader?.checks ? { checked: selected } : { selected }}
+      accessibilityValue={reader?.value}
+      accessibilityActions={actions.accessibilityActions}
+      onAccessibilityAction={actions.onAccessibilityAction}
+      accessibilityLabel={[reader?.name ?? label, ...stats.map((stat) => `${stat.word} ${stat.value}`), said, detailSpoken ? (detail ?? "") : ""].filter((part) => part.length > 0).join(". ")}
+      accessibilityHint={[hint, actions.accessibilityHint].filter(Boolean).join(". ") || undefined}
       onPress={onPress}
       onLongPress={onLongPress ?? undefined}
     >

@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { changedFamilyTests, registryTitle, scenarioTests, selectTests } from "./test-scenario.ts";
+import { changedFamilyTests, hasReaderGames, registryTitle, scenarioTests, selectTests } from "./test-scenario.ts";
 
 // pnpm test:scenario <id>: the selection is a pure function of the id, the changed paths and the tree of test files.
 const TREE = [
@@ -119,5 +119,16 @@ describe("selectTests", () => {
     expect(selected.coverage).toContain("src/effects/copies.test.ts");
     expect(selected.families).not.toContain("src/effects/copies.test.ts");
     expect(selected.families).toContain("src/effects/effects.test.ts");
+  });
+});
+
+describe("the reader parity check (src/play/reader-play.test.ts)", () => {
+  const registry = ['  entry("the-oath", "The Oath", oath.OATH_GOLDENS, oath.oathWorld, oath.playGolden),', '  // entry("the-next", "The Next", next.NEXT_GOLDENS, next.nextWorld, next.playGolden),'].join("\n");
+
+  it("plays the first scenario and each scenario with a line in the golden registry, not a commented-out one or an unlisted one", () => {
+    expect(hasReaderGames("a-shadow-of-the-past", registry)).toBe(true);
+    expect(hasReaderGames("the-oath", registry)).toBe(true);
+    expect(hasReaderGames("the-next", registry)).toBe(false);
+    expect(hasReaderGames("the-oat", registry)).toBe(false);
   });
 });

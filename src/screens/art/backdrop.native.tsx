@@ -60,7 +60,7 @@ export function Backdrop({ scene }: { scene: SceneName }) {
   const still = useSharedValue(0);
   return (
     <View pointerEvents="none" style={StyleSheet.absoluteFill}>
-      <Canvas style={StyleSheet.absoluteFill}>
+      <Canvas style={StyleSheet.absoluteFill} accessibilityElementsHidden importantForAccessibility="no-hide-descendants">
         {ground.kind === "solid" ? (
           <Rect x={0} y={0} width={width} height={height} color={ground.color} />
         ) : (
@@ -95,7 +95,7 @@ export function Backdrop({ scene }: { scene: SceneName }) {
 export function FogVeil({ layers, width, height }: { layers: readonly FogLayer[]; width: number; height: number }) {
   const seconds = useDriftClock(1, useDriftRunning());
   return (
-    <Canvas pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, width, height }}>
+    <Canvas pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={{ position: "absolute", left: 0, top: 0, width, height }}>
       {layers.map((layer, index) => (
         <Fog key={index} layer={layer} width={width} height={height} seconds={seconds} />
       ))}
@@ -106,7 +106,7 @@ export function FogVeil({ layers, width, height }: { layers: readonly FogLayer[]
 /** The morning light in a box of its own, over a picture (HeroArt, Light): the glow and the beams, in the box's fractions. */
 export function LightVeil({ light, width, height }: { light: SceneLight; width: number; height: number }) {
   return (
-    <Canvas pointerEvents="none" style={{ position: "absolute", left: 0, top: 0, width, height }}>
+    <Canvas pointerEvents="none" accessibilityElementsHidden importantForAccessibility="no-hide-descendants" style={{ position: "absolute", left: 0, top: 0, width, height }}>
       <Light light={light} width={width} height={height} />
     </Canvas>
   );

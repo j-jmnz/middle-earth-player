@@ -41,7 +41,7 @@ function Tile({ tile, selected, imagesrc, onPress }: { tile: ResolutionTile; sel
       collapsable={false}
       accessibilityRole="radio"
       accessibilityState={{ selected }}
-      accessibilityLabel={`${selected ? `${label}, selected` : label}${tile.tag ? `, ${tile.tag}` : ""}`}
+      accessibilityLabel={`${label}${tile.tag ? `, ${tile.tag}` : ""}`}
       onPress={onPress}
       // Two tiles a row: a boon offered on each hero makes a longer list than one row holds. An odd last tile keeps the
       // two-column width.
@@ -82,7 +82,9 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
   useEffect(() => {
     if (lost) recordCampaignRun(user, opened.save(), opened.save(), session.world, game);
   }, [lost, user, opened, session, game]);
-  const toPath = () => router.replace({ pathname: "/path/[saveId]", params: { saveId } });
+  // The path the game was opened from is usually below the outcome: pop back to it. A replace would stack a second path on it, and
+  // Back from there would open the same path again. With no path below (a cold start, Continue from the campaign list), it replaces.
+  const toPath = () => router.dismissTo({ pathname: "/path/[saveId]", params: { saveId } });
   // Back is a labelled control, never a gesture alone. Each choice is already saved, so leaving loses nothing; the
   // resolution waits on the path (Resume).
   const back = <NavBar onBack={() => goBack(router, { pathname: "/path/[saveId]", params: { saveId } })} backTestID="resolution-path" backLabel="Path" />;
@@ -262,7 +264,6 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
                     label={view.decline.label}
                     testID="resolution-decline"
                     selected={declined}
-                    accessibilityLabel={declined ? `${view.decline.label}, selected` : view.decline.label}
                     onPress={() => setChosen(view.decline?.optionId ?? null)}
                   />
                   {declined ? <Text className="text-label font-semibold text-accentHigh">Selected</Text> : null}

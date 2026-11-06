@@ -5,6 +5,7 @@ import { useContext, useState } from "react";
 import { Pressable, View, type LayoutChangeEvent } from "react-native";
 
 import { notAppliedWords } from "../../play/cards/not-applied";
+import { longPressA11y } from "../../ui/long-press-action";
 import { rowSurface } from "../../ui/surfaces";
 import { useTableTokens } from "../../ui/use-table-tokens";
 import { CroppedArt } from "../art/art";
@@ -86,7 +87,7 @@ export function SeatPicker({
   // stored per seat index in `sections`, like every FoldSection (fold-section.tsx); a seat that needs the player opens anyway (seat-state.ts).
   const folds = useFolds();
   const foldId = `briefing-seat-${index}`;
-  const state = seatState({ seeded, deck: pickedDeck, fallen, readiness, short, missingRingBearer: slot && !ringBearer });
+  const state = seatState({ seeded, deck: pickedDeck, fallen, nameOf, readiness, short, missingRingBearer: slot && !ringBearer });
   const folded = seatFolded(folds.folded(foldId), state);
   // A Ring-bearer the deck brings itself is one of the candidates (a Fellowship hero with the Ring-bearer trait).
   const carries = (code: string) => candidates.some((candidate) => candidate.code === code);
@@ -239,7 +240,7 @@ export function SeatPicker({
                   collapsable={false}
                   accessibilityRole="button"
                   accessibilityLabel={`Choose ${candidate.name}${candidate.packName ? `, ${candidate.packName}` : ""}`}
-                  accessibilityHint="Long press to see the card"
+                  {...longPressA11y("Show card", () => openCard(candidate.code))}
                   onPress={() => onRingBearer(candidate.code)}
                   onLongPress={() => openCard(candidate.code)}
                   delayLongPress={350}
