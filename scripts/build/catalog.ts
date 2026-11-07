@@ -12,7 +12,7 @@ import { campaigns, cards, catalogTables, meta, packs } from "../../src/catalog/
 import { contentVersion, writeCatalogVersion } from "./catalog-version.ts";
 import { catalogStamp } from "../../src/catalog/version.ts";
 import { bytes, createLog, runScript } from "../log.ts";
-import { PACK_CAMPAIGN } from "../data/campaign-defs.ts";
+import { PACK_CAMPAIGN, REPRINT_PACKS } from "../data/campaign-defs.ts";
 import { loadCards } from "../data/load-cards.ts";
 import { DATA_DIR } from "../data/paths.ts";
 import { parseLedger } from "../data/printed/ledger.ts";
@@ -105,7 +105,7 @@ export function pictureOf(card: Card, fronts: ReadonlyMap<string, string>): stri
   if (card.imagesrc) return card.imagesrc;
   const ledgered = fronts.get(card.code);
   if (ledgered) return ledgered;
-  const printings = [...card.printings].sort((left, right) => Number(right.pack === "TFotR") - Number(left.pack === "TFotR"));
+  const printings = [...card.printings].sort((left, right) => Number(REPRINT_PACKS.has(right.pack)) - Number(REPRINT_PACKS.has(left.pack)));
   const urls = printings.flatMap((printing) => printing.imageUrls ?? []);
   return urls.find((url) => !url.includes("dragncards")) ?? urls[0] ?? null;
 }

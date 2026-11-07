@@ -1019,6 +1019,38 @@
       "pile": "encounterDeck2",
       "reason": "DragnCards sets The Shattered Monument aside. Stage 1A sets The City of Corsairs encounter set aside as an inactive second encounter deck, and stage 3A prints 'Search the encounter deck for The Shattered Monument and Captain Sahír, and set them aside, out of play', so both are in that second deck until stage 3A.",
       "source": "scan 12147.A; scan 12149.A; dcce.from-sea-to-land"
+    },
+    {
+      "scenario": "helms-deep",
+      "code": "143036",
+      "from": "staging",
+      "pile": "setAside",
+      "reason": "DragnCards loads the four Soldier of Isengard in the staging area (Q0C.08, E0C.08). Stage 1A (The King of the Golden Hall, 143072) prints \"Each player sets 1 copy of Soldier of Isengard aside, out of play.\" and stage 2A adds each set aside copy to the staging area, so the copies start out of play, set aside.",
+      "source": "dragncards preBuiltDecks.json (Q0C.08, E0C.08); hallofbeorn.com/Export/QuestCards (The King of the Golden Hall, The Two Towers #72)"
+    },
+    {
+      "scenario": "helms-deep",
+      "code": "143021",
+      "from": "staging",
+      "pile": "campaign",
+      "reason": "DragnCards loads the four Poisoned Counsels in the staging area (Q0C.08, E0C.08). Stage 1A (143072) prints \"Then, the players must choose: either each player shuffles 1 copy of Poisoned Counsels into his deck, or advance to stage 2A (bypassing stage 1B).\", so none is staged: they are the Helm's Deep burden, which the Setup shuffles into the players' decks and the campaign card's Resolution (143077) earns. The Setup record deals them.",
+      "source": "dragncards preBuiltDecks.json (Q0C.08, E0C.08); hallofbeorn.com/Export/QuestCards (The King of the Golden Hall; Helm's Deep Campaign)"
+    },
+    {
+      "scenario": "the-passage-of-the-marshes",
+      "code": "144075",
+      "from": "staging",
+      "pile": "setAside",
+      "reason": "DragnCards loads the Gollum / Sméagol card in the staging area (Q0C.10, E0C.10), on its Sméagol row. Stage 1A (The Taming of Sméagol, 144064) prints \"Put Gollum into play engaged with the first player.\", so he starts out of play, set aside, on his Gollum side.",
+      "source": "dragncards preBuiltDecks.json (Q0C.10, E0C.10); hallofbeorn.com/Export/QuestCards (The Taming of Sméagol, The Two Towers #124)"
+    },
+    {
+      "scenario": "shelobs-lair",
+      "code": "144076",
+      "from": "staging",
+      "pile": "setAside",
+      "reason": "DragnCards loads the Gollum / Sméagol card in the staging area (Q0C.12, E0C.12). Stage 1A (The Stairs of Cirith Ungol, 144070) prints \"Put Sméagol into play under the first player's control.\", so he starts out of play, set aside, on his Sméagol side.",
+      "source": "dragncards preBuiltDecks.json (Q0C.12, E0C.12); hallofbeorn.com/Export/QuestCards (The Stairs of Cirith Ungol, The Two Towers #123)"
     }
   ],
   "scenarioRemovals": [
@@ -1054,6 +1086,48 @@
       "easy": 1,
       "reason": "The DragnCards Easy deck keeps 3 Black Steed. Hall of Beorn gives 1 in both its scenario list and its card record. The gold Easy mark is printed on individual copies, so one scan cannot show it; the two agreeing Hall of Beorn fields win. Normal mode is unaffected.",
       "source": "hallofbeorn.com/Export/Scenarios/Flight-to-the-Ford; hallofbeorn.com/Export/EncounterCards (Black Steed EasyModeQuantity 1)"
+    },
+    {
+      "scenario": "the-uruk-hai",
+      "code": "143024",
+      "easy": 0,
+      "reason": "The DragnCards Easy deck (E0C.07) does not hold Grishnákh; Hall of Beorn's scenario list gives Easy 1. No printed source decides: the gold Easy mark is printed on individual copies, so the one pinned scan per code cannot show it. The DragnCards Easy decks lead for The Two Towers (user decision, 2026-11-07), so Easy keeps the E0C.07 count. Not confirmed by a printed source. Normal mode is unaffected.",
+      "source": "dragncards preBuiltDecks.json (E0C.07); hallofbeorn.com/Export/Scenarios/The-Uruk-hai"
+    },
+    {
+      "scenario": "the-passage-of-the-marshes",
+      "code": "144021",
+      "easy": 2,
+      "reason": "The DragnCards Easy deck (E0C.10) keeps 2 Haunted Mere; Hall of Beorn's scenario list gives Easy 3. No printed source decides: the gold Easy mark is printed on individual copies, so the one pinned scan per code cannot show it. The DragnCards Easy decks lead for The Two Towers (user decision, 2026-11-07), so Easy keeps the E0C.10 count. Not confirmed by a printed source. Normal mode is unaffected.",
+      "source": "dragncards preBuiltDecks.json (E0C.10); hallofbeorn.com/Export/Scenarios/The-Passage-of-the-Marshes"
+    },
+    {
+      "scenario": "shelobs-lair",
+      "code": "144059",
+      "easy": 2,
+      "reason": "The DragnCards Easy deck (E0C.12) keeps 2 Blocked Tunnel; Hall of Beorn's scenario list gives Easy 1. No printed source decides: the gold Easy mark is printed on individual copies, so the one pinned scan per code cannot show it. The DragnCards Easy decks lead for The Two Towers (user decision, 2026-11-07), so Easy keeps the E0C.12 count. Not confirmed by a printed source. Normal mode is unaffected.",
+      "source": "dragncards preBuiltDecks.json (E0C.12); hallofbeorn.com/Export/Scenarios/Shelob's-Lair"
+    },
+    {
+      "scenario": "shelobs-lair",
+      "code": "144060",
+      "easy": 2,
+      "reason": "The DragnCards Easy deck (E0C.12) keeps 2 Shelob's Poison; Hall of Beorn's scenario list gives Easy 1. No printed source decides: the gold Easy mark is printed on individual copies, so the one pinned scan per code cannot show it. The DragnCards Easy decks lead for The Two Towers (user decision, 2026-11-07), so Easy keeps the E0C.12 count. Not confirmed by a printed source. Normal mode is unaffected.",
+      "source": "dragncards preBuiltDecks.json (E0C.12); hallofbeorn.com/Export/Scenarios/Shelob's-Lair"
+    },
+    {
+      "scenario": "shelobs-lair",
+      "code": "144061",
+      "easy": 3,
+      "reason": "The DragnCards Easy deck (E0C.12) keeps 3 Lurking Malice; Hall of Beorn's scenario list gives Easy 2. No printed source decides: the gold Easy mark is printed on individual copies, so the one pinned scan per code cannot show it. The DragnCards Easy decks lead for The Two Towers (user decision, 2026-11-07), so Easy keeps the E0C.12 count. Not confirmed by a printed source. Normal mode is unaffected.",
+      "source": "dragncards preBuiltDecks.json (E0C.12); hallofbeorn.com/Export/Scenarios/Shelob's-Lair"
+    },
+    {
+      "scenario": "shelobs-lair",
+      "code": "144062",
+      "easy": 3,
+      "reason": "The DragnCards Easy deck (E0C.12) keeps 3 Rage and Hunger; Hall of Beorn's scenario list gives Easy 2. No printed source decides: the gold Easy mark is printed on individual copies, so the one pinned scan per code cannot show it. The DragnCards Easy decks lead for The Two Towers (user decision, 2026-11-07), so Easy keeps the E0C.12 count. Not confirmed by a printed source. Normal mode is unaffected.",
+      "source": "dragncards preBuiltDecks.json (E0C.12); hallofbeorn.com/Export/Scenarios/Shelob's-Lair"
     }
   ],
   "scenarioCounts": [
@@ -1095,16 +1169,6 @@
     }
   ],
   "campaigns": [
-    {
-      "id": "the-two-towers",
-      "name": "The Two Towers",
-      "products": [
-        "The Treason of Saruman",
-        "The Land of Shadow"
-      ],
-      "reason": "No source names a campaign. Hall of Beorn numbers the Saga scenarios 1-18 in book order and groups them by pack: The Black Riders and The Road Darkens are 1-6 (the Fellowship campaign built here), The Treason of Saruman 7-9 and The Land of Shadow 10-12 follow it. The pairing of the packs into one campaign and the campaign's name (the title of the book its scenarios follow) are the saga's published structure, recorded here because no fetched source states them; the scenario count is Hall of Beorn's listing.",
-      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 41"
-    },
     {
       "id": "the-return-of-the-king",
       "name": "The Return of the King",
@@ -1200,6 +1264,14 @@
       "code": "18030",
       "reason": "Abandoned Village is an objective-location of Lost in Mirkwood. DragnCards types it Location, and Hall of Beorn has no OCTGN guid for it (its three siblings Overgrown Path, Bare Hilltop and Forest Clearing have one), so no guid or type match finds it. The card is Hall of Beorn's Abandoned Village, The Wilds of Rhovanion #30.",
       "source": "dragncards cardDb.tsv (The Wilds of Rhovanion 30, Abandoned Village) and preBuiltDecks.json (Q08.2, E08.2); hallofbeorn.com/Export/EncounterCards (Abandoned-Village-TWoR, no OctgnGuid); scan 18030.A"
+    },
+    {
+      "dragncards": "The Land of Shadow",
+      "number": 75,
+      "side": "b",
+      "code": "144076",
+      "reason": "Gollum / Sméagol is one physical card with two sides (mec112.gollum-smeagol): DragnCards files it as one OCTGN guid with two rows, Gollum (the guid) and Smeagol (the .B picture), both collector number 75. Hall of Beorn files the sides as two cards, #75 Gollum (the guid) and #76 Sméagol (no guid), so no guid or pack and number match finds Sméagol. Side B of the DragnCards card is Sméagol.",
+      "source": "dragncards cardDb.tsv (The Land of Shadow 75, Gollum and Smeagol rows) and preBuiltDecks.json (Q0C.10, Q0C.12); hallofbeorn.com/Export/EncounterCards (Gollum-TLoS, Smeagol-TLoS); MEC112 rulebook p4 (mec112.gollum-smeagol)"
     }
   ],
   "encounterSetAliases": [
@@ -1208,6 +1280,12 @@
       "set": "Journey Along the Anduin",
       "reason": "The Revised Core Set's Learn to Play (p25) and the Easy Mode sheet (p2) call the second core scenario and its encounter set \"Journey Down the Anduin\". The scenario's own campaign card, quest cards and encounter set icon print \"Journey Along the Anduin\" (Mirkwood Paths - Part 2, scan 01130.A), and Hall of Beorn follows the cards. The card wins (authority order); the booklet's name is an alias.",
       "source": "Learn to Play p25 (ltp.setup-journey-along-the-anduin); scan 01130.A; hallofbeorn.com/Export/Scenarios/Journey-Along-the-Anduin-(Campaign)"
+    },
+    {
+      "booklet": "Harad",
+      "set": "Men of Harad",
+      "reason": "Journey to the Cross-roads stage 1A (144068) prints \"Shuffle the Harad encounter set and place it facedown under The Cross-roads.\"; the booklet's Setup paragraph (mec112.setup-journey-to-the-cross-roads) and the cards' set icon name the set Men of Harad.",
+      "source": "mec112.setup-journey-to-the-cross-roads; hallofbeorn.com/Export/QuestCards (Ambush the Men of Harad, The Two Towers #122); hallofbeorn.com/Export/Scenarios/Journey-to-the-Cross-roads"
     }
   ]
 }

@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { readdirSync } from "node:fs";
+import { readdirSync, readFileSync } from "node:fs";
 
 import index from "../../../data/campaigns/index.json";
 import entries from "../../../data/rules/entries.json";
@@ -25,21 +25,25 @@ describe("campaign data on the phone", () => {
   });
 });
 
+// The Two Towers is built as data (phase 61) and listed locked; the app registers it in phase 62 (docs/plans/the-two-towers.md).
+const NOT_REGISTERED = ["the-two-towers"];
+const unregisteredScenarios = new Set(NOT_REGISTERED.flatMap((id) => (JSON.parse(readFileSync(`data/campaigns/${id}.json`, "utf8")) as { scenarios: string[] }).scenarios));
+
 describe("the registry", () => {
   it("holds every playable campaign data/campaigns/index.json lists, and nothing else that is built", () => {
-    const built = readdirSync("data/campaigns").filter((name) => name !== "index.json").map((name) => name.replace(/\.json$/, "")).sort();
+    const built = readdirSync("data/campaigns").filter((name) => name !== "index.json").map((name) => name.replace(/\.json$/, "")).filter((id) => !NOT_REGISTERED.includes(id)).sort();
     expect([...campaignIds()].sort()).toEqual(built);
     for (const entry of index) {
       const campaign = campaignOf(entry.id);
       if (built.includes(entry.id)) {
         expect(campaign?.name, entry.id).toBe(entry.name);
         expect(campaign?.scenarios.length, entry.id).toBe(entry.scenarioCount);
-      } else expect(campaign, entry.id).toBeNull(); // The Two Towers and The Return of the King are listed locked and not built.
+      } else expect(campaign, entry.id).toBeNull(); // The Two Towers (built, not registered yet) and The Return of the King (not built) are listed locked.
     }
   });
 
   it("holds every scenario file, and each campaign's scenarios are all in it", () => {
-    const files = readdirSync("data/scenarios").map((name) => name.replace(/\.json$/, "")).sort();
+    const files = readdirSync("data/scenarios").map((name) => name.replace(/\.json$/, "")).filter((id) => !unregisteredScenarios.has(id)).sort();
     for (const id of files) expect(scenarioOf(id)?.id, id).toBe(id);
     for (const id of campaignIds()) for (const scenario of campaignOf(id)?.scenarios ?? []) expect(files, `${id}: ${scenario}`).toContain(scenario);
   });

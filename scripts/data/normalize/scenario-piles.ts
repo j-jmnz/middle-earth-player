@@ -35,7 +35,7 @@ export function pileAccepts(args: { code: string; pile: string; printed: Card | 
   const fleet = stepExists("prepareFleet") && /Fleet/.test(printed?.encounterSet ?? "");
   switch (pile) {
     case "setAside":
-      return said(["aside"]) || steps("takeControl", "attach", "prepareStormcallerArea") || setAsideBySet || (fleet && (printed?.type === "ship-objective" || printed?.type === "objective")) || (stepExists("asideEachOtherObjective") && printed?.type === "objective");
+      return said(["aside", "putIntoPlay"]) || steps("takeControl", "attach", "prepareStormcallerArea") || setAsideBySet || (fleet && (printed?.type === "ship-objective" || printed?.type === "objective")) || (stepExists("asideEachOtherObjective") && printed?.type === "objective");
     case "activeLocation":
       return said(["active"]);
     case "attachedChosen":
@@ -71,7 +71,10 @@ export function pileAccepts(args: { code: string; pile: string; printed: Card | 
       return stepExists("buildSideQuestDeck");
     case "spidersDeck":
     case "orcsDeck":
+    case "greatSpiderDeck":
       return setAsideBySet;
+    case "haradDeck":
+      return stepExists("shuffleSetUnder");
     default:
       return true;
   }

@@ -1,0 +1,189 @@
+{
+  "id": "shelobs-lair",
+  "name": "Shelob's Lair",
+  "number": 12,
+  "stages": [
+    "144070",
+    "144071",
+    "144072"
+  ],
+  "encounterSets": [
+    {
+      "name": "Shelob's Lair",
+      "count": 21
+    },
+    {
+      "name": "Gollum",
+      "count": 2
+    },
+    {
+      "name": "Morgul Nazgûl",
+      "count": 4
+    },
+    {
+      "name": "The Great Spider",
+      "count": 10
+    }
+  ],
+  "cards": [
+    {
+      "code": "144041",
+      "normal": 4,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "144042",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "144046",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "144047",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "144048",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "144049",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "144050",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "144051",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "144055",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "144053",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "144054",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "144070",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "144071",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "144072",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "144044",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "144043",
+      "normal": 1,
+      "easy": 1,
+      "pile": "activeLocation"
+    },
+    {
+      "code": "144040",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "144045",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "144076",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside",
+      "back": "144075"
+    },
+    {
+      "code": "144059",
+      "normal": 2,
+      "easy": 2,
+      "pile": "greatSpiderDeck"
+    },
+    {
+      "code": "144060",
+      "normal": 2,
+      "easy": 2,
+      "pile": "greatSpiderDeck"
+    },
+    {
+      "code": "144061",
+      "normal": 3,
+      "easy": 3,
+      "pile": "greatSpiderDeck"
+    },
+    {
+      "code": "144062",
+      "normal": 3,
+      "easy": 3,
+      "pile": "greatSpiderDeck"
+    }
+  ],
+  "campaignCard": "144073",
+  "campaignPlaced": [
+    "144052"
+  ],
+  "sagaStart": {
+    "ringBearer": true,
+    "attached": [
+      "144063"
+    ]
+  },
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q0C.12",
+    "dragnEasy": "E0C.12",
+    "hobSlug": "Shelob's-Lair"
+  }
+}

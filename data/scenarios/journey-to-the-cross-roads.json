@@ -1,0 +1,142 @@
+{
+  "id": "journey-to-the-cross-roads",
+  "name": "Journey to the Cross-roads",
+  "number": 11,
+  "stages": [
+    "144068"
+  ],
+  "encounterSets": [
+    {
+      "name": "Journey to the Cross-roads",
+      "count": 29
+    },
+    {
+      "name": "Men of Harad",
+      "count": 9
+    }
+  ],
+  "cards": [
+    {
+      "code": "144028",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "144029",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "144031",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "144032",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "144033",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "144034",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "144035",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "144036",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "144037",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "144038",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "144039",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "144068",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "144027",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "144030",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "144056",
+      "normal": 3,
+      "easy": 3,
+      "pile": "haradDeck"
+    },
+    {
+      "code": "144057",
+      "normal": 3,
+      "easy": 3,
+      "pile": "haradDeck"
+    },
+    {
+      "code": "144058",
+      "normal": 3,
+      "easy": 3,
+      "pile": "haradDeck"
+    }
+  ],
+  "campaignCard": "144069",
+  "campaignPlaced": [
+    "144014"
+  ],
+  "sagaStart": {
+    "ringBearer": true,
+    "attached": [
+      "144063"
+    ]
+  },
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q0C.11",
+    "dragnEasy": "E0C.11",
+    "hobSlug": "Journey-to-the-Cross-roads"
+  }
+}

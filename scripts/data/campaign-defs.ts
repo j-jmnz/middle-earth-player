@@ -28,7 +28,19 @@ export type ScenarioDef = {
   // A two-sided card the Setup has the first player take control of is dealt on the side the Setup names (Ered Mithrin's Haldan, loaded as
   // Woodmen Village and flipped by DragnCards' postLoadActionList), where the load list's side is not the one in play.
   takeControlFaceup?: boolean;
+  // The load list files a double-sided card of the scenario as one guid with a row for each side (Gollum / Sméagol of The Passage of the
+  // Marshes and Shelob's Lair): the two sides are two catalog cards, `back` of one placement (`Loaded.placements`), as with `deck` scenarios.
+  sidedLoad?: boolean;
 };
+
+// A saga box's reprint of RingsDB's adventure packs (MEC109, MEC112): Hall of Beorn's card set of it, the catalog pack code its printings carry
+// (Hall of Beorn's slug suffix; the only invented code), and the cardgame.tools product its scans are filed under.
+// `keepsRingsDb`: a deck-legal player card of the twin packs keeps its RingsDB record and takes only the reprint's printing (The Two Towers: the pool lines and the
+// effect records of ToS and LoS player cards are numbered from that text; the Fellowship's reprint takes Hall of Beorn's facts, as it always has).
+export type ReprintDef = { set: string; pack: string; product: string; keepsRingsDb?: boolean };
+
+const FELLOWSHIP_REPRINT: ReprintDef = { set: "The Fellowship of the Ring", pack: "TFotR", product: "MEC109" };
+const TWO_TOWERS_REPRINT: ReprintDef = { set: "The Two Towers", pack: "TTwT", product: "MEC112", keepsRingsDb: true };
 
 // A Hall of Beorn product (a box) the pipeline builds cards or scenarios from: the one table every other site derives from.
 export type ProductDef = {
@@ -47,6 +59,10 @@ export type ProductDef = {
   // The RingsDB twin pack Hall of Beorn's cards are paired with, which is also the pack name DragnCards gives them (the
   // Fellowship boxes). null: the box's cards come from Hall of Beorn alone, stamped with packs[0].
   twinPack: string | null;
+  // The saga box that reprints this product's cards as one box (a twin pack's `reprint`): its Hall of Beorn card set and its catalog pack. The
+  // Fellowship box (MEC109) reprints The Black Riders and The Road Darkens, The Two Towers (MEC112) The Treason of Saruman and The Land of Shadow.
+  // The reprint's card takes its twin's code, and the twins pair within their own reprint set (a title in both boxes must not cross).
+  reprint?: ReprintDef;
   // The product is a campaign expansion: it prints a campaign's campaign cards, boons and burdens, and no scenario of its own (the
   // Dream-chaser and Ered Mithrin Campaign Expansions). The scan scope takes every card it prints, and a Hall of Beorn Treasure row of it is a campaign treasure.
   campaignExpansion?: boolean;
@@ -59,6 +75,9 @@ export type ProductDef = {
   // DragnCards files each side of a double-sided card of the box as a row of its own (the Dream-chaser boxes): addDragnBacks and dragnRowOf
   // read the two rows as one card.
   sidedDragnRows?: boolean;
+  // Each scenario starts with the first player's saga hero, which the load list names in player 1's play area (The Two Towers: ☺ Aragorn, or the Ring-bearer
+  // and The One Ring): recorded as ScenarioData.sagaStart. The Fellowship's Ring-bearer attachments are the campaign's `prelude` instead.
+  sagaStart?: boolean;
   // The product reprints cards of the Adventure Packs with a Campaign Mode only or Upgraded side (the Dream-chaser Campaign Expansion): a campaign
   // game deals the reprint (scripts/data/normalize/reprints.ts).
   campaignReprints?: boolean;
@@ -68,8 +87,11 @@ const DCCE = "Dream-chaser Campaign Expansion";
 const EMCE = "Ered Mithrin Campaign Expansion";
 
 export const PRODUCTS: readonly ProductDef[] = [
-  { name: "The Black Riders", packs: ["TFotR"], home: "fellowship-of-the-ring", load: "dragncards", easySheet: false, twinPack: "TBR" },
-  { name: "The Road Darkens", packs: ["TFotR"], home: "fellowship-of-the-ring", load: "dragncards", easySheet: false, twinPack: "TRD" },
+  { name: "The Black Riders", packs: ["TFotR"], home: "fellowship-of-the-ring", load: "dragncards", easySheet: false, twinPack: "TBR", reprint: FELLOWSHIP_REPRINT },
+  { name: "The Road Darkens", packs: ["TFotR"], home: "fellowship-of-the-ring", load: "dragncards", easySheet: false, twinPack: "TRD", reprint: FELLOWSHIP_REPRINT },
+  // The Two Towers: The Treason of Saruman and The Land of Shadow are the base cards (RingsDB 2015), the MEC112 box (2023) their reprint.
+  { name: "The Treason of Saruman", packs: ["TTwT"], home: "the-two-towers", load: "dragncards", easySheet: false, twinPack: "ToS", reprint: TWO_TOWERS_REPRINT, sagaStart: true, campaignCardRewards: true },
+  { name: "The Land of Shadow", packs: ["TTwT"], home: "the-two-towers", load: "dragncards", easySheet: false, twinPack: "LoS", reprint: TWO_TOWERS_REPRINT, sagaStart: true, campaignCardRewards: true },
   { name: "Revised Core Set", packs: ["RevCore"], home: "mirkwood-paths", load: "setup", easySheet: true, twinPack: null },
   { name: "The Dark of Mirkwood", packs: ["TDoM"], home: "the-dark-of-mirkwood", load: "setup", easySheet: false, twinPack: null },
   // Dream-chaser: The Grey Havens and the six Adventure Packs are the base cards, the Campaign Expansion (MEC111, 2023) the campaign.
@@ -91,6 +113,11 @@ export const PRODUCTS: readonly ProductDef[] = [
   { name: "The Fate of Wilderland", packs: ["TFoW"], home: "ered-mithrin", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
   { name: EMCE, packs: ["EMCE"], home: "ered-mithrin", load: "dragncards", easySheet: false, twinPack: null, campaignExpansion: true, campaignCardRewards: true, ledgerKeywords: true },
 ];
+
+// Every saga box's reprint, once each, in campaign order.
+export const REPRINTS: readonly ReprintDef[] = [...new Map(PRODUCTS.flatMap((product) => (product.reprint ? [[product.reprint.set, product.reprint] as const] : []))).values()];
+// The catalog pack codes of the reprints (TFotR, TTwT): printings that are not RingsDB packs.
+export const REPRINT_PACKS: ReadonlySet<string> = new Set(REPRINTS.map((reprint) => reprint.pack));
 
 // The catalog's `cards.campaign_id`: the campaign a pack's cards belong to. A product with a twin pack (the Fellowship boxes, whose
 // MEC109 printing is not a catalog pack) is tagged through that pack; the others through their own packs. Derived from PRODUCTS.
@@ -118,12 +145,17 @@ export type CampaignDef = {
   // The booklet the campaign opens (src/screens/booklets/books.ts) and the rules document it is.
   bookletId: string;
   bookletDoc: string;
-  // A saga campaign carries the Ring-bearer and the Fellowship rules (Fellowship of the Ring only).
+  // A saga campaign carries the Ring-bearer and the Fellowship rules (the Fellowship of the Ring and The Two Towers).
   saga: boolean;
   // A campaign whose campaign cards award XP, which the players spend on the log's scalable and upgradable cards (Dream-chaser only).
   xp?: boolean;
   // Where the scan-read ledger for this campaign lives (data/printed/<ledger>.json).
   ledger: string;
+  // The campaign file carries the booklet's two starter decklists (the Fellowship only; data/starter-decks.json).
+  starterDecks?: boolean;
+  // The campaign's cards reuse titles of an earlier saga box (The Two Towers' Aragorn, Frodo Baggins, The One Ring and Gollum): a card name in a record of the
+  // campaign is a card of the campaign (scripts/data/effects/generate.ts), and no other campaign's record reads those cards, so an earlier box's records stay as they were.
+  ownTitles?: boolean;
 };
 
 const OATH: ScenarioDef = { id: "the-oath", product: "The Dark of Mirkwood", setupSpan: "tdom.setup-the-oath", crossCheck: { normal: "Q00.01B", easy: "E00.01B" } };
@@ -137,6 +169,12 @@ function dreamChaser(n: number, id: string, product: string, groups: Readonly<Re
 // An Ered Mithrin scenario: its box, the Campaign Expansion's campaign card, and the DragnCards decks (Q08.n / E08.n).
 function eredMithrin(n: number, id: string, product: string, groups: Readonly<Record<string, Pile>> = {}): ScenarioDef {
   return { id, product, campaignProduct: EMCE, setupSpan: `emce.setup-${id}`, deck: { normal: `Q08.${n}`, easy: `E08.${n}` }, groups, takeControlFaceup: true };
+}
+
+// A Two Towers scenario: its box's product, the quest card's setup span (MEC112) and, where the Setup deals an encounter set into a deck of its own, the
+// pile of the DragnCards load group (`Q0C.<n>`'s sharedEncounterDeck2). The DragnCards Normal and Easy decks are found by the title, as the Fellowship's are.
+function twoTowers(id: string, product: string, extra: Partial<ScenarioDef> = {}): ScenarioDef {
+  return { id, product, setupSpan: `mec112.setup-${id}`, ...extra };
 }
 
 export const CAMPAIGNS: readonly CampaignDef[] = [
@@ -156,6 +194,7 @@ export const CAMPAIGNS: readonly CampaignDef[] = [
     bookletDoc: "mec109",
     saga: true,
     ledger: "fellowship-of-the-ring",
+    starterDecks: true,
   },
   {
     id: "mirkwood-paths",
@@ -226,6 +265,24 @@ export const CAMPAIGNS: readonly CampaignDef[] = [
     bookletDoc: "emce",
     saga: false,
     ledger: "ered-mithrin",
+  },
+  {
+    id: "the-two-towers",
+    name: "The Two Towers",
+    products: ["The Treason of Saruman", "The Land of Shadow"],
+    scenarios: [
+      twoTowers("the-uruk-hai", "The Treason of Saruman"),
+      twoTowers("helms-deep", "The Treason of Saruman"),
+      twoTowers("the-road-to-isengard", "The Treason of Saruman"),
+      twoTowers("the-passage-of-the-marshes", "The Land of Shadow", { sidedLoad: true }),
+      twoTowers("journey-to-the-cross-roads", "The Land of Shadow", { groups: { sharedEncounterDeck2: "haradDeck" } }),
+      twoTowers("shelobs-lair", "The Land of Shadow", { groups: { sharedEncounterDeck2: "greatSpiderDeck" }, sidedLoad: true, takeControlFaceup: true }),
+    ],
+    bookletId: "the-two-towers",
+    bookletDoc: "mec112",
+    saga: true,
+    ledger: "the-two-towers",
+    ownTitles: true,
   },
 ];
 

@@ -32,7 +32,7 @@ const overridesSchema = z.object({
   scenarioRemovals: z
     .array(z.object({ scenario: z.string().min(1), set: z.string().min(1), types: z.array(z.string().min(1)).min(1), reason: z.string().min(1), source: z.string().min(1) }))
     .default([]),
-  // A printed Easy count the sources disagree on. `easy` is the count of copies that stay in an Easy deck.
+  // A printed Easy count the sources disagree on, settled here with its reason (the count may differ from Hall of Beorn's). `easy` is the count of copies that stay in an Easy deck.
   scenarioEasy: z
     .array(z.object({ scenario: z.string().min(1), code: z.string().min(1), easy: z.number().int().nonnegative(), reason: z.string().min(1), source: z.string().min(1) }))
     .default([]),

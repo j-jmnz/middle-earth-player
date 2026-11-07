@@ -1,0 +1,14 @@
+{
+  "campaign": "the-two-towers",
+  "conventions": [
+    "One entry per code and side. Side A is the front, side B the back of a double-sided card; a shadow effect is a line of side A.",
+    "lines are the ability text of the text box in print order, one ability per line: no title, traits, stats, flavor text, or Victory line. Keyword lines (Surge., Doomed 1., Loot., Discover 4.) stay.",
+    "Icons are written as the words Hall of Beorn uses (Willpower, Attack, Defense, Threat, Lore, Fellowship). Apostrophes and quotation marks are straight.",
+    "A printed typo is written corrected in lines, and the printed wording is kept under misprints.",
+    "inert lists line numbers that need no effect record, with the reason. A line that is only keywords the engine reads is owned by the keyword.",
+    "A quest stage's card side B is its stage B; Gollum / Sméagol is one physical card whose two sides are two catalog cards (Gollum, Sméagol), each side A of its own code.",
+    "A campaign card's side A opens with the marker line \"You are playing campaign mode.\"; its side B holds the Resolution paragraphs, each paragraph one line. The Campaign Log's divider between a Forced line and the Resolution is not a line.",
+    "A card whose 2023 wording differs from the 2015 Treason of Saruman or Land of Shadow printing it reprints is listed in MEC112_CHANGED (scripts/data/printed/scope.ts)."
+  ],
+  "entries": []
+}

@@ -12,13 +12,14 @@ import {
 import { CAMPAIGNS, CAMPAIGN_SUFFIX, PRODUCTS, productOf, scenarioDefs, scenarioSlug, type CampaignDef } from "../campaign-defs.ts";
 import { PLAYER_TYPES, type Overrides } from "./cards.ts";
 import { clausesOf, codesOf, nameIndex, parseSetup, type ParsedSetup } from "./setup-text.ts";
-import { setsOf } from "./setup-names.ts";
 import { pileAccepts, questFacts } from "./scenario-piles.ts";
-import type { RuleEntry } from "../rules/spans.ts";
-import { crossCheckProblems, easyRemovals, easySheetProblem, plain, PLAYER_GROUP, type Deck } from "./scenario-checks.ts";
+import { bookletSetsOf, setupOf } from "./scenario-text.ts";
+import { burdenSetProblems, crossCheckProblems, easyRemovals, easySheetProblem, plain, PLAYER_GROUP, type Deck } from "./scenario-checks.ts";
 import { pilesFromSetup, type Loaded } from "./setup-piles.ts";
+import type { RuleEntry } from "../rules/spans.ts";
 import { campaignTextCodes } from "./campaign-text.ts";
 import { nightmareOf } from "./nightmare.ts";
+import { sagaStartOf } from "./saga-start.ts";
 import { reprintsOf, isReprint } from "./reprints.ts";
 import { dragnResolver } from "./dragn-resolve.ts";
 import { isNightmareCard } from "../nightmare-defs.ts";
@@ -36,8 +37,9 @@ const GROUP_PILE: Readonly<Record<string, Pile>> = {
 };
 // Dream-chaser's decks beside the encounter deck (PILES, src/catalog/scenario-data.ts): their cards are dealt by the scenario's Setup
 // ("Prepare the Corsair deck", "Prepare the Uncharted deck"), never by a line naming each card, and they count toward their encounter sets.
-// Ered Mithrin's decks (evilCreaturesDeck, cavesDeck, sideQuestDeck, spidersDeck, orcsDeck) are built by the Setup's deck steps the same way.
-const EXTRA_DECKS: ReadonlySet<string> = new Set(["corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests", "evilCreaturesDeck", "cavesDeck", "sideQuestDeck", "spidersDeck", "orcsDeck"]);
+// Ered Mithrin's decks (evilCreaturesDeck, cavesDeck, sideQuestDeck, spidersDeck, orcsDeck) are built by the Setup's deck steps the same way, and
+// The Two Towers' second encounter decks (haradDeck, greatSpiderDeck) by the Setup's encounter set that is shuffled under a card or set aside.
+const EXTRA_DECKS: ReadonlySet<string> = new Set(["corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests", "evilCreaturesDeck", "cavesDeck", "sideQuestDeck", "spidersDeck", "orcsDeck", "haradDeck", "greatSpiderDeck"]);
 // The RingsDB twin packs (PRODUCTS): DragnCards names the Fellowship boxes by product, RingsDB by these pack codes.
 const TWIN_PACKS: ReadonlySet<string> = new Set(PRODUCTS.flatMap((product) => (product.twinPack ? [product.twinPack] : [])));
 
@@ -54,34 +56,6 @@ function isHero(cards: ReadonlyMap<string, Card>, code: string): boolean {
   return cards.get(code)?.type === "hero";
 }
 
-
-function textLines(text: string | null | undefined): string[] {
-  return (text ?? "").split("\n").map((line) => line.trim()).filter((line) => line !== "");
-}
-
-// A line of a card's text that opens an ability of its own ("Forced:", "Travel Action:", "Resolution:"): it ends a Setup paragraph.
-const LABELLED = /^[A-Z][A-Za-z' -]{2,28}:\s/;
-
-// The Setup ability of a quest or campaign card as one string (its "Setup:" line and, when `continued`, the unlabelled lines that continue it,
-// as the campaign cards of Dream-chaser print them), and the card's other lines.
-function setupOf(text: string | null | undefined, continued: boolean): { setup: string | null; others: string[] } {
-  const lines = textLines(text);
-  const at = lines.findIndex((line) => /^Setup:/.test(line));
-  if (at < 0) return { setup: null, others: lines };
-  let end = at + 1;
-  // Only a Dream-chaser campaign card continues its Setup on unlabelled lines; elsewhere the line after Setup is another ability.
-  while (continued && end < lines.length && !LABELLED.test(lines[end] ?? "")) end += 1;
-  return { setup: lines.slice(at, end).join(" "), others: [...lines.slice(0, at), ...lines.slice(end)] };
-}
-
-function bookletSetsOf(entry: RuleEntry | undefined): string[] {
-  if (!entry) return [];
-  const flat = entry.text.replace(/\s+/g, " ");
-  const match = /built with all the cards from (?:the following encounter sets: )?(.+?)(?: encounter set)?\.(?: These sets| This set| \s*$|$)/.exec(flat);
-  if (!match?.[1]) return [];
-  // "(these last two sets can be found in ... the core set)" says where sets are found, not what they are called.
-  return setsOf(match[1].replace(/\s*\([^)]*\)/g, ""));
-}
 
 export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: Overrides, rules: readonly RuleEntry[], campaignDefs: readonly CampaignDef[] = CAMPAIGNS): ScenarioResult {
   const problems: string[] = [];
@@ -178,7 +152,9 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       }
       return pattern.test(campaignText);
     };
-    const extras = def.deck === undefined ? [] : cards.filter((card) => !scope.includes(card) && !isReprint(card) && (card.printings.some((p) => cardPacks.includes(p.pack)) || reprintOf.has(card.code) || inCampaignText(card)));
+    // A Two Towers campaign card removes cards of the earlier box from the Campaign Pool by name ("Remove Gildor Inglorion and Mr. Underhill"): those boons are named, never dealt.
+    const poolCards = product.sagaStart ? cards.filter((card) => card.campaignKind != null && !card.printings.some((p) => cardPacks.includes(p.pack))) : [];
+    const extras = def.deck === undefined ? poolCards : cards.filter((card) => !scope.includes(card) && !isReprint(card) && (card.printings.some((p) => cardPacks.includes(p.pack)) || reprintOf.has(card.code) || inCampaignText(card)));
     const names = nameIndex([...scope, ...extras], new Set(scope.filter((card) => card.type !== "quest").map((card) => card.code)));
 
     // Stages in printed order: the Hall of Beorn quest cards give it, the Dragncards deck must agree.
@@ -191,11 +167,12 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
 
     // The printed Setup of the first quest stage and of the campaign card.
     const questSetup = setupOf(byCode.get(stages[0] ?? "")?.text, false).setup;
-    const campaignLines = setupOf(byCode.get(campaignCard)?.text, def.deck !== undefined);
+    const campaignLines = setupOf(byCode.get(campaignCard)?.text, def.deck !== undefined || product.sagaStart === true);
     const campaignSetup = campaignLines.setup;
     const quest: ParsedSetup = questSetup ? parseSetup(questSetup, names) : { clauses: [], unread: [] };
     const camp: ParsedSetup = campaignSetup ? parseSetup(campaignSetup, names) : { clauses: [], unread: [] };
     for (const sentence of [...quest.unread, ...camp.unread]) local.push(`${id}: a Setup sentence no pattern reads: ${sentence}`);
+    local.push(...burdenSetProblems(id, camp, cards, plain));
     const nameOf = (code: string) => byCode.get(code)?.name ?? code;
 
     // The side a Stormcaller Elite card is dealt faceup (dcce.stormcaller-elite): the quest card's Setup names it ("enemy side faceup",
@@ -203,11 +180,13 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     const eliteFaceup = /objective[- ]ally sides? faceup/i.test(questSetup ?? "") ? "objective" : /enemy side faceup/i.test(questSetup ?? "") ? "enemy" : null;
     // A key of `Loaded.placements`: code, pile and, for a two-sided card whose sides are two catalog cards, the code of its other side.
     const keyOf = (code: string, pile: string, back?: string) => `${code}\u0000${pile}${back ? `\u0000${back}` : ""}`;
+    // The heroes the Normal load list puts in player 1's play area (the saga hero of a Two Towers scenario).
+    const heroes: string[] = [];
     const load = (deck: Deck): { placements: Map<string, number>; player: string[]; campaign: Set<string> } => {
       const placements = new Map<string, number>();
       const player: string[] = [];
       const campaign = new Set<string>();
-      const sided = def.deck !== undefined;
+      const sided = def.deck !== undefined || def.sidedLoad === true;
       for (const line of deck.cards) {
         let card = resolve(line.databaseId, "a", sided);
         let other = sided ? resolve(line.databaseId, "b", sided) : null;
@@ -220,6 +199,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
         if (card.type === "campaign") continue;
         if (line.loadGroupId === PLAYER_GROUP && def.groups?.[line.loadGroupId] === undefined) {
           if (!isHero(byCode, card.code)) player.push(card.code);
+          else if (deck === normalDeck) heroes.push(card.code);
           continue;
         }
         let pile: Pile | "campaign" | undefined = def.groups?.[line.loadGroupId] ?? GROUP_PILE[line.loadGroupId];
@@ -428,7 +408,8 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       if (sheetProblem) local.push(sheetProblem);
       // Hall of Beorn's count against the load list's: a difference is a problem; an override settles it (overrides.scenarioCounts, scenarioEasy).
       if (normalCount !== item.NormalQuantity) local.push(`${id}: ${item.Title} Normal ${normalCount}, Hall of Beorn ${item.NormalQuantity}`);
-      if (easyCount !== item.EasyQuantity) local.push(`${id}: ${item.Title} Easy ${easyCount}, Hall of Beorn ${item.EasyQuantity}`);
+      // An override is the recorded decision, so its count is not compared with Hall of Beorn's again (The Two Towers keeps DragnCards' E0C counts where the two differ).
+      if (fixed == null && easyCount !== item.EasyQuantity) local.push(`${id}: ${item.Title} Easy ${easyCount}, Hall of Beorn ${item.EasyQuantity}`);
       if (fixed != null) for (const p of mine) p.easy = Math.min(fixed, p.normal);
     }
 
@@ -453,7 +434,13 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     // A campaign game deals the Campaign Expansion's reprint of each card that has one (ScenarioData.reprints).
     const dealt = [...new Set([...placed.flatMap((item) => (item.back ? [item.code, item.back] : [item.code])), ...campaignPlaced])].sort();
     const reprints = Object.fromEntries(dealt.flatMap((code) => (reprintOf.has(code) ? [[code, reprintOf.get(code) as string] as const] : [])));
-    preludes.set(id, normal.player.map((code) => ({ code })));
+    // A Two Towers scenario's saga hero is `sagaStart`; the campaign's prelude stays empty (the Fellowship's attachments are its prelude).
+    const sagaStart = product.sagaStart ? sagaStartOf(byCode, heroes, normal.player) : undefined;
+    if (product.sagaStart && !sagaStart) {
+      problems.push(`${id}: the load list's player 1 play area is not one saga hero or a Ring-bearer with attachments (heroes ${heroes.join(",")}, cards ${normal.player.join(",")})`);
+      continue;
+    }
+    preludes.set(id, product.sagaStart ? [] : normal.player.map((code) => ({ code })));
     campaignCards[id] = campaignCard;
     scenarios.push(
       parseScenarioData({
@@ -467,6 +454,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
         campaignPlaced: [...campaignPlaced].sort(),
         ...(Object.keys(reprints).length > 0 ? { reprints } : {}),
         ...(life != null ? { life } : {}),
+        ...(sagaStart ? { sagaStart } : {}),
         widgets,
         source: { dragnNormal: normalKey, dragnEasy: easyDeck ? easyKey : null, hobSlug: hob.Slug },
         ...(nightmare.data ? { nightmare: nightmare.data } : {}),

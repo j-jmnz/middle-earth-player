@@ -1,10 +1,12 @@
+import { readFileSync } from "node:fs";
+
 import { describe, expect, it } from "vitest";
 
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
 import { loadCards } from "../../scripts/data/load-cards.ts";
 import { EFFECTS } from "../effects/index.ts";
 import { scenarioDefinitionSchema } from "./boundary.ts";
-import { normalCopiesByCode, normalEncounterSize, scenarioCards, scenarioDefinition } from "./scenario-data.ts";
+import { campaignDataSchema, encounterCodes, normalCopiesByCode, normalEncounterSize, parseScenarioData, scenarioCards, scenarioDefinition } from "./scenario-data.ts";
 
 describe("a-shadow-of-the-past scenario data", () => {
   const scenario = loadScenario("a-shadow-of-the-past");
@@ -91,5 +93,26 @@ describe("a-shadow-of-the-past scenario data", () => {
 
   it("starts every scenario with The One Ring on the Ring-bearer", () => {
     expect(campaign.prelude).toEqual([{ code: "141085" }]);
+  });
+});
+
+describe("The Two Towers scenario data", () => {
+  it("accepts the second encounter decks of Journey to the Cross-roads and Shelob's Lair, and keeps them out of the encounter deck", () => {
+    const harad = loadScenario("journey-to-the-cross-roads");
+    const spider = loadScenario("shelobs-lair");
+    expect(harad.cards.filter((card) => card.pile === "haradDeck")).toHaveLength(3);
+    expect(spider.cards.filter((card) => card.pile === "greatSpiderDeck")).toHaveLength(4);
+    expect(encounterCodes(harad)).toHaveLength(29);
+    expect(encounterCodes(spider)).toHaveLength(27);
+    expect(parseScenarioData({ ...harad, cards: [...harad.cards, { code: "x", normal: 1, easy: 1, pile: "greatSpiderDeck" }] }).cards).toHaveLength(harad.cards.length + 1);
+  });
+
+  it("records the saga hero of a scenario as a hero or as the Ring-bearer with its attachments, and nothing else", () => {
+    expect(loadScenario("helms-deep").sagaStart).toEqual({ hero: "143001" });
+    expect(loadScenario("shelobs-lair").sagaStart).toEqual({ ringBearer: true, attached: ["144063"] });
+    const base = loadScenario("helms-deep");
+    expect(() => parseScenarioData({ ...base, sagaStart: { hero: "143001", ringBearer: true } })).toThrow();
+    expect(() => parseScenarioData({ ...base, sagaStart: { ringBearer: true, attached: [] } })).toThrow();
+    expect(campaignDataSchema.parse(JSON.parse(readFileSync("data/campaigns/the-two-towers.json", "utf8"))).prelude).toEqual([]);
   });
 });

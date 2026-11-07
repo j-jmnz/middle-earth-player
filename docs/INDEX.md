@@ -73,7 +73,7 @@ Read the sections your task touches.
   - 354–359 Catalog build (~410)
   - 360–377 Tests (~1.7K) ← 5
   - 378–393 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~81.8K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~83.2K tok)
   - 17–38 Sections (~410)
   - 39–50 Product (~590)
   - 51–64 Non-goals (~540)
@@ -84,7 +84,7 @@ Read the sections your task touches.
   - 152–370 Domain (~9.3K)
     - 154–231 Campaign (~1.9K) ← 3
     - 232–246 Mirkwood campaign cards and carry-over (~870) ← 1
-    - 247–258 Standalone play (~790) ← 2
+    - 247–258 Standalone play (~790) ← 1
     - 259–270 Scenario state (~540)
     - 271–303 The engine plays the game (~2.1K) ← 4
     - 304–311 Engine steps (~180)
@@ -107,18 +107,19 @@ Read the sections your task touches.
     - 611–628 The Caves of Nibin-Dûm (~2.4K)
   - 629–686 Dream-chaser (~15.6K) ← 4
   - 687–713 Ered Mithrin (~15.8K) ← 8
-  - 714–722 Nightmare (~410) ← 19
-  - 723–761 Deckbuilding (~1.9K)
-  - 762–840 Effects (~3.2K)
-    - 764–822 Three layers (~2.4K) ← 10
-    - 823–832 Player side quests, contracts and saga cards (~430)
-    - 833–836 Window stack (~100)
-    - 837–840 Coverage test (~270)
-  - 841–861 Data sources (~530)
-  - 862–880 Card images (~1.2K) ← 9
-  - 881–906 Persistence and shipping (~1.8K)
-  - 907–948 Screens (~4.7K) ← 1
-    - 933–948 Table screen (~1.8K) ← 3
+  - 714–738 The Two Towers (~1.3K) ← 2
+  - 739–747 Nightmare (~410) ← 19
+  - 748–786 Deckbuilding (~1.9K)
+  - 787–865 Effects (~3.2K)
+    - 789–847 Three layers (~2.4K) ← 10
+    - 848–857 Player side quests, contracts and saga cards (~430)
+    - 858–861 Window stack (~100)
+    - 862–865 Coverage test (~270)
+  - 866–886 Data sources (~530)
+  - 887–905 Card images (~1.2K) ← 9
+  - 906–931 Persistence and shipping (~1.8K)
+  - 932–973 Screens (~4.7K) ← 1
+    - 958–973 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~40.1K tok)
   - 5–8 Overview (~130) ← 1
   - 9–23 Top bar (~2.2K) ← 4
@@ -199,14 +200,14 @@ STATUS.md, then the active phase file.
 
 - `docs/phases/STATUS.md` — Phase status (~6.8K tok)
   - 5–15 Rules (~410)
-  - 16–87 Phases (~1.4K)
-  - 88–186 Open items (~4.4K)
-    - 90–92 Releases (~50)
-    - 93–114 Fixtures and Maestro (~1.2K)
-    - 115–162 Rules and engine (~2.2K)
-    - 163–183 Screens and code (~900)
-    - 184–186 Scenario pipeline (~30)
-  - 187–203 Standing decisions (~510)
+  - 16–89 Phases (~1.4K)
+  - 90–188 Open items (~4.4K)
+    - 92–94 Releases (~50)
+    - 95–116 Fixtures and Maestro (~1.2K)
+    - 117–164 Rules and engine (~2.2K)
+    - 165–185 Screens and code (~900)
+    - 186–188 Scenario pipeline (~30)
+  - 189–205 Standing decisions (~510)
 
 ## Live plans
 
@@ -264,27 +265,27 @@ Read when a task names the plan.
   - 152–163 After each scenario phase (~210) ← 1
   - 164–167 Order (~70)
   - 168–175 Verification (~100)
-- `docs/plans/the-two-towers.md` — Plan: The Two Towers data and campaign shell (~9.4K tok)
-  - 7–23 Open questions found while planning (~540)
+- `docs/plans/the-two-towers.md` — Plan: The Two Towers data and campaign shell (~9.7K tok)
+  - 7–23 Decisions (~600)
   - 24–64 What the sources say (~2.1K)
     - 26–35 The product (~770)
     - 36–43 Card codes (~390)
     - 44–60 The scenarios, in order (~770)
     - 61–64 The first player's saga hero (~170)
   - 65–78 How the Fellowship log carries into The Two Towers (~730)
-  - 79–148 Phase 61: The Two Towers data (~3.5K)
+  - 79–147 Phase 61: The Two Towers data (~3.9K)
     - 83–86 Goal (~150)
     - 87–90 Network order (~60)
-    - 91–130 Steps (~2.8K)
+    - 91–130 Steps (~3.3K)
     - 131–139 Exit (~230)
-    - 140–148 Stop and ask the user (~240)
-  - 149–200 Phase 62: The Two Towers campaign shell (~2.2K)
-    - 153–156 Goal (~100)
-    - 157–160 Shape (recommendation, Q6) (~200)
-    - 161–186 Steps (~1.3K)
+    - 140–147 Stop and ask the user (~210)
+  - 148–195 Phase 62: The Two Towers campaign shell (~1.9K)
+    - 152–155 Goal (~100)
+    - 156–159 Shape (Q6) (~200)
+    - 160–186 Steps (~1.4K)
     - 187–190 Exit (~80)
-    - 191–200 Stop and ask the user (~430)
-  - 201–206 Notes for the orchestrator (~160)
+    - 191–195 Stop and ask the user (~70)
+  - 196–201 Notes for the orchestrator (~200)
 
 ## Handovers
 
@@ -310,7 +311,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/build`: brief.md, Card images (2)
 - `scripts/card-smoke`: brief.md, Standalone play (1)
 - `scripts/checks`: brief.md, Nightmare (2); design-system.md, Screen reader (2); architecture.md, Modules (1); architecture.md, Repository map (1)
-- `scripts/data`: brief.md, Nightmare (4); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1); plans/scenario-fast-track.md, F2. Each record rendered as English and read fresh (1)
+- `scripts/data`: brief.md, Nightmare (4); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1); brief.md, The Two Towers (1); plans/scenario-fast-track.md, F2. Each record rendered as English and read fresh (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/git`: .claude/rules/commit-standards.md, Subject line (2)
 - `scripts/release`: .claude/rules/release-standards.md, Versioning (3); .claude/rules/release-standards.md, Release notes (2); releasing.md, Jobs (2); .claude/rules/release-standards.md, Branches (1)

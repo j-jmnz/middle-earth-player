@@ -218,7 +218,7 @@ Campaign play follows the Learn to Play and Rules Reference campaign rules (`rr.
 
 The campaign pool holds several copies of one code: "each player earns 1 copy" is one entry for each player, marked `perPlayer` and carrying that player's `seat`, and a card removed from the pool ("remove it from the Campaign Pool") removes one entry (the removing player's copy when the game says whose it was). Any other earn is one copy of its code however often it is earned and whichever seat wrote it, as in the Fellowship: The Ring Draws Them chosen in scenario 1 and earned again by Flight to the Ford is one card. An eliminated player still has a seat for "each player". The structured facts reach the engine at the start of a scenario in Campaign Mode (`StartScenario.facts`), and a won game writes them back; a standalone game has none.
 
-The log shows the six Fellowship rows. Later saga rows are added from each later booklet, in that booklet's order. This file does not set that order. The next box must not invent a second log type. Fellowship's six, in order, are fixed:
+The log shows the six Fellowship rows. Each later saga box is its own campaign and save with the same log type, never a second one; a new save of The Two Towers may take in a finished Fellowship save's log (The Two Towers below, user decision 2026-11-07). Fellowship's six, in order, are fixed:
 
 1. A Shadow of the Past
 2. A Knife in the Dark
@@ -710,6 +710,31 @@ The Ered Mithrin campaign is nine scenarios played in order: The Wilds of Rhovan
 - **Haldan** (`emce.haldan`, hero 19026). "Haldan cannot be used as a hero in this campaign"; The King's Quest, the third part, says "Haldan may be included among a player's heroes" (12170:A:2). A campaign briefing refuses him in every part but the third, naming the card and the rule; `HERO_BANS` lists the parts a ban holds in. A standalone game is not bound by it.
 - **Hero changes.** The campaign cards of The King's Quest and The Ghost of Framsburg let each player change hero cards without the +1 threat penalty (`WaiveThreatPenalty`).
 - **Booklet.** The Ered Mithrin campaign rulebook (MEC115) is the sixth bundled book; the path, the log and the briefing open it on the scenario's setup page.
+
+## The Two Towers
+
+MEC112 (2023) reprints **The Treason of Saruman** (RingsDB pack `ToS`) and **The Land of Shadow** (pack `LoS`) as the second saga box: six scenarios, numbered 7 to 12. Its catalog pack code `TTwT` is Hall of Beorn's slug suffix, as `TFotR` is the Fellowship's; each of its 156 cards takes the code of its twin (143001 to 143081, 144001 to 144076), a title both boxes print (Aragorn, Frodo Baggins, The One Ring, Gollum) pairing with its own box's twin. The campaign id is `the-two-towers`: its own campaign and save with the one `CampaignLog` type (user decision, 2026-11-07). Its data is built (`data/campaigns/the-two-towers.json`, six scenario files); the app does not offer it yet and no scenario is playable. Not built: the campaign in the app.
+
+| # | Scenario id | Difficulty | Encounter sets, from the booklet (`mec112.setup-<id>`) |
+| --- | --- | --- | --- |
+| 7 | `the-uruk-hai` | 6 | The Uruk-hai, Orcs of the White Hand, Snaga Orcs. The pursuit value (`mec112.pursuit`). |
+| 8 | `helms-deep` | 8 | Helm's Deep, Orcs of the White Hand. The defense keyword (`mec112.defense`). |
+| 9 | `the-road-to-isengard` | 7 | The Road to Isengard, Snaga Orcs. Wizardry (`mec112.wizardry`). |
+| 10 | `the-passage-of-the-marshes` | 6 | The Passage of the Marshes, Gollum, Morgul Nazgûl. Mire X (`mec112.mire`). |
+| 11 | `journey-to-the-cross-roads` | 8 | Journey to the Cross-roads, Men of Harad (a second encounter deck under The Cross-roads, pile `haradDeck`). |
+| 12 | `shelobs-lair` | 7 | Shelob's Lair, Gollum, Morgul Nazgûl, The Great Spider (a second encounter deck set aside, pile `greatSpiderDeck`). |
+
+- **Saga start per scenario** (`mec112.setting-up-the-game`). The first player takes control of ☺ Aragorn (143001) in scenarios 7 to 9, and of a ☺ hero with the Ring-bearer trait with The One Ring (144063) attached in 10 to 12. Aragorn does not count against the hero limit, so no Ring-bearer slot is asked for 7 to 9 (`mec112.aragorn`); the One Ring's rules are the Fellowship's (`mec112.the-one-ring`, `mec112.multiplayer-the-one-ring`). The scenario data records it (`ScenarioData.sagaStart`); the campaign's `prelude` is empty.
+- **Fellowship heroes** (`mec112.the-fellowship-sphere`, `mec112.fellowship-sphere-heroes`). One ☺ hero in play at a time, and no other version of Aragorn or of Frodo Baggins as a starting hero or in the deck. The Ring-bearer Frodo stays on the log but is not dealt as a hero in scenarios 7 to 9, and returns for 10 to 12 (user decision, 2026-11-07, from the Treason of Saruman campaign-mode rule that players cannot use a card titled Frodo Baggins in those scenarios; the pinned MEC112 rulebook words only the one-☺-hero rule).
+- **Banned titles** (`mec112.saruman-grima-smeagol`). No ally or hero titled Saruman, Gríma or Sméagol in any of the six scenarios.
+- **Saga staging** (`mec112.saga-staging-rules`) is the Fellowship's rule: each player reveals one encounter card in player order.
+- **Aragorn in a campaign** (`mec112.campaign-mode-aragorn`). When a scenario features ☺ Aragorn and a player recorded Aragorn as a hero, that player loses control of that version and may choose another hero without the +1 threat penalty, records it, and moves the Permanent cards of the old Aragorn to ☺ Aragorn. If Aragorn is on the list of fallen heroes he is removed from it and each player takes a permanent +1 threat penalty.
+- **Continuing the saga.** A new Two Towers save may take in a finished Fellowship save's log (heroes, fallen heroes, captives, pool, threat penalty, notes) while the Fellowship save stays as it was. The Campaign Total carries on from the Fellowship log in a continued save and starts at zero in a fresh one (user decision, 2026-11-07: no source settles it, and the saga is one campaign across the boxes).
+- **A fresh start** (user decision, 2026-11-07). A Two Towers save may start with no Fellowship behind it, from an empty log: no captives (the Uruk-hai captive step skips), an empty pool and the per-scenario saga hero. The briefing says the save starts fresh.
+- **Standalone** (user decision, 2026-11-07), as the Fellowship box is (`mec112.campaign-mode`): no campaign card, no boons or burdens, the per-scenario saga start.
+- **The Black Gate** (Journey to the Cross-roads Resolution). The name and quantity of each enemy under The Black Gate is a structured log fact that the log screen shows in the notes section, since The Black Gate Opens (MEC113) may read it (user decision, 2026-11-07).
+- **The per-seat threat penalty.** The Passage of the Marshes' Resolution has each player take a permanent +2 starting threat penalty or earn The Searching Eye, recorded per player; the log's one `threatPenalty` number becomes per seat only if the printed text is per player.
+- **Data.** Gollum / Sméagol is one card with two sides (`mec112.gollum-smeagol`): Gollum faceup in scenario 10, Sméagol in 12. A burden or boon the campaign deals, and the copies each player sets aside (Soldier of Isengard), are not in the encounter pile. Easy counts come from the DragnCards `E0C.07` to `E0C.12` decks, each disagreement with Hall of Beorn recorded as an override with its reason (user decision, 2026-11-07). The six Two Towers Nightmare decks stay unattached.
 
 ## Nightmare
 

@@ -239,3 +239,65 @@ describe("Ered Mithrin spans", () => {
     expect(text("emce.boon-allies")).toContain("Isolde is on the hunt");
   });
 });
+
+// The Two Towers (MEC112): the hand-checked spans its scenario data reads (data/rules/columns.json: the rulebook's art-overlaid pages 3 to 5 are read in boxes that skip the card pictures' captions).
+describe("The Two Towers spans", () => {
+  const text = (id: string) => (byId.get(id)?.text ?? "").replace(/\s+/g, " ");
+  const SETUPS = ["the-uruk-hai", "helms-deep", "the-road-to-isengard", "the-passage-of-the-marshes", "journey-to-the-cross-roads", "shelobs-lair"];
+
+  it("pin the rulebook's pages 1 to 11 (the decklist page keeps its four boxes) with a span for each rule the plan names", () => {
+    expect(docs.get("mec112")?.pages.map((page) => page.number)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]);
+    expect(docs.get("mec112")?.pages.find((page) => page.number === 11)?.columns).toHaveLength(4);
+    for (const id of [
+      ...SETUPS.map((scenario) => `mec112.setup-${scenario}`),
+      ...["setting-up-the-game", "saga-staging-rules", "saruman-grima-smeagol", "the-fellowship-sphere", "fellowship-sphere-heroes", "aragorn", "the-one-ring", "multiplayer-the-one-ring", "campaign-mode", "campaign-mode-aragorn", "gollum-smeagol", "poisoned-counsels-searching-eye", "pursuit", "defense", "wizardry", "mire", "saga-expansion-rules", "saga-expansion-player-cards", "archery", "immune-to-player-card-effects", "indestructible", "peril", "permanent", "setup", "toughness"].map((rule) => `mec112.${rule}`),
+    ]) {
+      expect(byId.has(id), id).toBe(true);
+    }
+    expect(byId.get("decklist.mec112-ents-and-friends")?.text).toContain("Treebeard");
+    expect(byId.get("decklist.mec112-king-of-rohan")?.text).toContain("2x Dwarven Tomb");
+  });
+
+  it("print each scenario's encounter-deck paragraph, the set lists the build checks the cards against", () => {
+    expect(text("mec112.setup-the-uruk-hai")).toContain("The Uruk-hai, Orcs of the White Hand, and Snaga Orcs");
+    expect(text("mec112.setup-helms-deep")).toContain("Helm’s Deep and Orcs of the White Hand");
+    expect(text("mec112.setup-the-road-to-isengard")).toContain("The Road to Isengard and Snaga Orcs");
+    expect(text("mec112.setup-the-passage-of-the-marshes")).toContain("The Passage of the Marshes, Gollum, and Morgul Nazgûl");
+    expect(text("mec112.setup-journey-to-the-cross-roads")).toContain("Journey to the Cross-roads and Men of Harad");
+    expect(text("mec112.setup-shelobs-lair")).toContain("Shelob’s Lair, The Great Spider, Gollum, and Morgul Nazgûl");
+  });
+
+  it("hold the saga rules as the rulebook words them", () => {
+    expect(text("mec112.setting-up-the-game")).toContain("the first player takes control of ☺ Aragorn");
+    expect(text("mec112.saga-staging-rules")).toContain("each player reveals 1 encounter card and resolves its staging before the next player reveals a card");
+    expect(text("mec112.saruman-grima-smeagol")).toContain("the players cannot use any ally or hero card with the title “Saruman,” “Gríma,” or “Sméagol.”");
+    expect(text("mec112.the-fellowship-sphere")).toContain("only one hero from the Fellowship sphere can be played at a time");
+    expect(text("mec112.fellowship-sphere-heroes")).toContain("players cannot start with any other version(s) of that hero as a starting hero or include any other version(s) of them in their decks");
+    expect(text("mec112.aragorn")).toContain("☺ Aragorn does not count against the hero limit.");
+    expect(text("mec112.the-one-ring")).toContain("“Attached hero does not count against the hero limit.”");
+    expect(text("mec112.multiplayer-the-one-ring")).toContain("“The first player gains control of attached hero.”");
+    expect(text("mec112.saga-expansion-rules")).toContain("the scenarios in this expansion have additional rules");
+    expect(text("mec112.saga-expansion-player-cards")).toContain("a select few are only intended for use when playing the scenarios presented in saga expansions");
+  });
+
+  it("hold the campaign rules, the Gollum / Sméagol card and the scenarios' own keywords", () => {
+    expect(text("mec112.campaign-mode")).toContain("play the six scenarios included in this box in campaign mode as part of The Lord of the Rings campaign they began in The Fellowship of the Ring Saga Expansion");
+    expect(text("mec112.campaign-mode-aragorn")).toContain("That player may choose a different hero to replace Aragorn without incurring the +1 threat penalty.");
+    expect(text("mec112.campaign-mode-aragorn")).toContain("remove his name from the list and each player incurs a permanent +1 threat penalty.");
+    expect(text("mec112.gollum-smeagol")).toContain("Gollum is an enemy, and Sméagol is an objective-ally.");
+    expect(text("mec112.gollum-smeagol")).toContain("When Gollum is defeated, discard all damage from him, flip him over to his Sméagol side, and exhaust him.");
+    expect(text("mec112.gollum-smeagol")).toContain("The Sméagol objective-ally leaves play, and the Gollum enemy enters play.");
+    expect(text("mec112.poisoned-counsels-searching-eye")).toContain("These cards cannot be played.");
+    expect(text("mec112.pursuit")).toContain("When setting up The Uruk-hai, players are instructed to set the pursuit value to 10.");
+    expect(text("mec112.defense")).toContain("While the current quest has the defense keyword, players cannot place progress on the quest (or active location) by questing successfully.");
+    expect(text("mec112.wizardry")).toContain("When a location with Wizardry leaves play as an explored location, trigger its Wizardry effect (even if it is not the active location).");
+    expect(text("mec112.mire")).toContain("When a location with the mire keyword has mire tokens equal to its mire X value, it is immediately discarded.");
+    expect(text("mec112.archery")).toContain("[defense] does not block archery damage.");
+    expect(text("mec112.indestructible")).toContain("cannot be destroyed by damage, even when it has damage on it equal to its hit points.");
+    expect(text("mec112.peril")).toContain("they must resolve the staging of that card on their own without conferring with the other players");
+    expect(text("mec112.permanent")).toContain("A card with the permanent keyword can only be attached to one hero for the duration of a campaign.");
+    expect(text("mec112.setup")).toContain("search the encounter deck for that card and follow its instructions before resolving the Setup instructions on the quest");
+    expect(text("mec112.toughness")).toContain("reduces the amount of damage it takes by X each time it is assigned any amount of damage.");
+    expect(text("mec112.immune-to-player-card-effects")).toContain("cannot be chosen as targets of player card effects");
+  });
+});

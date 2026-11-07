@@ -1,7 +1,7 @@
 import type { PrintedKeywords, RingsDbCard, RingsDbPack } from "../../../src/catalog/boundary.ts";
 import { cardSchema, type Card, type Printing } from "../../../src/catalog/card-facts.ts";
 import { deckLegal } from "../../../src/catalog/deck-legal.ts";
-import { PRODUCTS } from "../campaign-defs.ts";
+import { PRODUCTS, REPRINTS, type ReprintDef } from "../campaign-defs.ts";
 import type { HobCard } from "../sources/hallofbeorn.ts";
 import { parseKeywordTokens } from "./keywords.ts";
 import type { RawData } from "./load-raw.ts";
@@ -10,11 +10,11 @@ import { addDragnBacks, addNightmareCards, addProductCards, dragnOnlyCards, drag
 import type { Overrides } from "./overrides.ts";
 import { timingLabels } from "./timings.ts";
 
-const TFOTR = "The Fellowship of the Ring";
 // Hall of Beorn card sets whose twin codes are RingsDB codes, with the RingsDB pack of each (PRODUCTS, in campaign order).
 const TWIN_SETS: ReadonlyMap<string, string> = new Map(PRODUCTS.flatMap((product) => (product.twinPack ? [[product.name, product.twinPack] as const] : [])));
-// Sets Hall of Beorn numbers from 00001 with no RingsDB code of their own.
-const UNCODED_SETS = new Set([TFOTR, "The Two Towers", "The Return of the King"]);
+// Sets Hall of Beorn numbers from 00001 with no RingsDB code of their own: each saga box's reprint set (PRODUCTS, `reprint`) and the box
+// not built yet.
+const UNCODED_SETS = new Set([...REPRINTS.map((reprint) => reprint.set), "The Return of the King"]);
 
 const TYPE_BY_HOB: Readonly<Record<string, { type: string; typeName: string }>> = {
   Hero: { type: "hero", typeName: "Hero" },
@@ -240,29 +240,34 @@ function twinKey(card: HobCard): string {
   return `${card.Title}\u0000${card.CardType}`;
 }
 
-// A TFotR card and its Black Riders or Road Darkens twin share a title and type. Several of each (Frodo,
-// Pursued by the Enemy) pair up in campaign order, then collector number.
-function pairTwins(tfotr: readonly HobCard[], twins: readonly HobCard[]): Map<HobCard, HobCard> {
-  const setOrder = [...TWIN_SETS.keys()];
+// A reprint card (a saga box's, MEC109 or MEC112) and its twin in the box's adventure packs share a title and type. Several of each (Frodo,
+// Pursued by the Enemy) pair up in campaign order, then collector number. The twins are those of the one reprint: a title the two saga boxes
+// both print (Aragorn, Frodo Baggins, The One Ring, Gollum) pairs within its own box.
+function pairTwins(box: readonly HobCard[], twins: readonly HobCard[], setOrder: readonly string[]): Map<HobCard, HobCard> {
   const order = (a: HobCard, b: HobCard) => setOrder.indexOf(a.CardSet) - setOrder.indexOf(b.CardSet) || a.Number - b.Number;
-  const groups = new Map<string, { tfotr: HobCard[]; twins: HobCard[] }>();
-  for (const [list, side] of [[tfotr, "tfotr"], [twins, "twins"]] as const) {
+  const groups = new Map<string, { box: HobCard[]; twins: HobCard[] }>();
+  for (const [list, side] of [[box, "box"], [twins, "twins"]] as const) {
     for (const card of list) {
-      const group = groups.get(twinKey(card)) ?? { tfotr: [], twins: [] };
+      const group = groups.get(twinKey(card)) ?? { box: [], twins: [] };
       group[side].push(card);
       groups.set(twinKey(card), group);
     }
   }
   const pairs = new Map<HobCard, HobCard>();
   for (const group of groups.values()) {
-    group.tfotr.sort((a, b) => a.Number - b.Number);
+    group.box.sort((a, b) => a.Number - b.Number);
     group.twins.sort(order);
-    group.tfotr.forEach((card, index) => {
+    group.box.forEach((card, index) => {
       const twin = group.twins[index];
       if (twin) pairs.set(card, twin);
     });
   }
   return pairs;
+}
+
+// The Hall of Beorn sets of a reprint's twin products, in campaign order.
+function twinSetsOf(reprint: ReprintDef): string[] {
+  return PRODUCTS.filter((product) => product.reprint?.set === reprint.set && product.twinPack !== null).map((product) => product.name);
 }
 
 function overrideFor(overrides: Overrides, probe: { code?: string; name: string; set?: string; number?: number }) {
@@ -343,10 +348,7 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
     });
   }
 
-  // Fellowship cards: the TFotR printing wins over the twin it was paired with.
-  const tfotr = hobCards.filter((card) => card.CardSet === TFOTR);
-  const twins = hobCards.filter((card) => TWIN_SETS.has(card.CardSet));
-  const pairs = pairTwins(tfotr, twins);
+  // Saga box cards (the Fellowship's, the Two Towers'): the reprint's printing wins over the twin it was paired with.
   const claimed = new Set<HobCard>();
 
   const dragnImageOf = (card: HobCard): string | null => {
@@ -361,8 +363,14 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
     if (!existing && !type) throw new Error(`Card ${code} ${source.Title}: unknown Hall of Beorn type ${source.CardType}`);
     const printings: Printing[] = [];
     if (twin) printings.push(printingOf(TWIN_SETS.get(twin.CardSet) ?? twin.CardSet, twin, dragnImageOf(twin)));
-    if (source !== twin) printings.push(printingOf("TFotR", source, null));
+    // A reprint card (source is not its twin) is printed in its box's pack (TFotR, TTwT).
+    const reprint = REPRINTS.find((item) => item.set === source.CardSet);
+    if (source !== twin && reprint) printings.push(printingOf(reprint.pack, source, null));
     const known = existing?.printings.filter((p) => !printings.some((q) => q.pack === p.pack)) ?? [];
+    // A RingsDB player card of a box whose reprint keeps it (ReprintDef.keepsRingsDb) takes only the reprint's printing.
+    if (existing?.deckLegal && reprint?.keepsRingsDb && twin) {
+      return { ...existing, printings: [...existing.printings, ...printings.filter((p) => !existing.printings.some((q) => q.pack === p.pack))] };
+    }
     const card: Card = existing
       ? {
           ...existing,
@@ -401,26 +409,32 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
     return card;
   };
 
-  for (const source of tfotr) {
-    const twin = pairs.get(source);
-    if (twin) claimed.add(twin);
-    let code = twin?.RingsDbCardId ?? "";
-    let packOverride: string | undefined;
-    if (!twin) {
-      const set = overrideFor(overrides, { name: source.Title, set: source.CardSet, number: source.Number });
-      if (!set?.code) {
-        report.twinless.push(`${source.Title} (#${source.Number})`);
-        continue;
+  for (const reprint of REPRINTS) {
+    const sets = twinSetsOf(reprint);
+    const mine = hobCards.filter((card) => card.CardSet === reprint.set);
+    const twins = hobCards.filter((card) => sets.includes(card.CardSet));
+    const pairs = pairTwins(mine, twins, sets);
+    for (const source of mine) {
+      const twin = pairs.get(source);
+      if (twin) claimed.add(twin);
+      let code = twin?.RingsDbCardId ?? "";
+      let packOverride: string | undefined;
+      if (!twin) {
+        const set = overrideFor(overrides, { name: source.Title, set: source.CardSet, number: source.Number });
+        if (!set?.code) {
+          report.twinless.push(`${source.Title} (#${source.Number})`);
+          continue;
+        }
+        code = set.code;
+        packOverride = set.pack;
       }
-      code = set.code;
-      packOverride = set.pack;
+      const merged = merge(code, twin, source);
+      if (packOverride) merged.printings = [{ ...(merged.printings[0] ?? { pack: packOverride, number: source.Number }), pack: packOverride }];
+      byCode.set(code, merged);
     }
-    const merged = merge(code, twin, source);
-    if (packOverride) merged.printings = [{ ...(merged.printings[0] ?? { pack: packOverride, number: source.Number }), pack: packOverride }];
-    byCode.set(code, merged);
   }
-  // Twin printings with no TFotR card of their own (the later scenarios) come from Hall of Beorn alone.
-  for (const twin of twins) {
+  // Twin printings with no reprint card of their own (the later scenarios) come from Hall of Beorn alone.
+  for (const twin of hobCards.filter((card) => TWIN_SETS.has(card.CardSet))) {
     const code = twin.RingsDbCardId;
     if (claimed.has(twin) || !code || byCode.has(code)) continue;
     byCode.set(code, merge(code, twin, twin));

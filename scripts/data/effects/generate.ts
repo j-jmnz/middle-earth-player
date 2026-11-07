@@ -4,7 +4,7 @@ import type { CampaignData, ScenarioData } from "../../../src/catalog/scenario-d
 import { selfNamed as selfNamedBy } from "../../../src/catalog/self-named.ts";
 import { stripKeywords } from "../normalize/keywords.ts";
 import { sameName } from "../normalize/names.ts";
-import { productOf, scenarioDefs } from "../campaign-defs.ts";
+import { CAMPAIGNS, productOf, scenarioDefs } from "../campaign-defs.ts";
 import { dealtCodes, gameCodes, starterCodes } from "../load-scenarios.ts";
 import { keyOf, lineId, type Ledger } from "../printed/ledger.ts";
 import { isPoolCard } from "../printed/pool.ts";
@@ -184,6 +184,10 @@ export function generateEffects(cards: readonly Card[], scenarios: readonly Scen
   const scope = cards.filter((card) => wanted.has(card.code)).sort((a, b) => a.code.localeCompare(b.code));
   const setAside = new Set(scenarios.flatMap((scenario) => scenario.cards.filter((card) => card.pile === "setAside").map((card) => card.code)));
   const box = boxCodes(campaign, scenarios);
+  // A campaign whose cards reuse an earlier box's titles (CampaignDef.ownTitles) reads its own cards by name, and no other box's record sees them.
+  const owners = boxOwners(Array.isArray(campaign) ? campaign : [campaign as CampaignData], scenarios);
+  const ownTitles = new Set(CAMPAIGNS.filter((def) => def.ownTitles).map((def) => def.id));
+  const titled = (code: string): boolean => ownTitles.has(owners.get(code) ?? "");
   // A name a box card prints is a box card; a pool card's is a card of its own pack, else the one pool card of that name.
   const codeOf = (reader: Card, name: string): string | null => {
     const among = (list: readonly Card[]): string | null => {
@@ -192,7 +196,7 @@ export function generateEffects(cards: readonly Card[], scenarios: readonly Scen
       const hits = exact.length > 0 ? exact : list.filter((card) => sameName(card.name, name.trim()));
       return hits.length === 1 ? (hits[0]?.code ?? null) : null;
     };
-    if (box.has(reader.code)) return among(scope.filter((card) => box.has(card.code)));
+    if (box.has(reader.code)) return among(scope.filter((card) => box.has(card.code) && (titled(reader.code) ? owners.get(card.code) === owners.get(reader.code) : !titled(card.code))));
     const pack = reader.printings[0]?.pack;
     return among(scope.filter((card) => card.printings[0]?.pack === pack)) ?? among(scope.filter((card) => !box.has(card.code)));
   };

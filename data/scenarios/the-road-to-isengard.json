@@ -1,0 +1,172 @@
+{
+  "id": "the-road-to-isengard",
+  "name": "The Road to Isengard",
+  "number": 9,
+  "stages": [
+    "143078",
+    "143079",
+    "143080"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Road to Isengard",
+      "count": 27
+    },
+    {
+      "name": "Snaga Orcs",
+      "count": 5
+    }
+  ],
+  "cards": [
+    {
+      "code": "143049",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "143050",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "143051",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "143052",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "143055",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "143056",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "143057",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "143058",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "143059",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "143060",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "143061",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "143062",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "143066",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "143067",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "143078",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "143079",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "143080",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "143046",
+      "normal": 4,
+      "easy": 4,
+      "pile": "staging"
+    },
+    {
+      "code": "143047",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "143048",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "143053",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "143054",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    }
+  ],
+  "campaignCard": "143081",
+  "campaignPlaced": [
+    "143020",
+    "143068"
+  ],
+  "sagaStart": {
+    "hero": "143001"
+  },
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q0C.09",
+    "dragnEasy": "E0C.09",
+    "hobSlug": "The-Road-to-Isengard"
+  }
+}

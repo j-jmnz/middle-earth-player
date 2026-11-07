@@ -91,7 +91,7 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR, log: Log = buil
       scenarios: campaign.scenarios,
       campaignCards: campaign.campaignCards,
       prelude: campaign.prelude,
-      starterDecks: campaign.saga ? loadStarterDecks(cards, entries) : [],
+      starterDecks: def.starterDecks ? loadStarterDecks(cards, entries) : [],
       bookletPages: bookletPages(entries, campaign.scenarios, def.bookletDoc),
       bookletId: campaign.bookletId,
       saga: campaign.saga,

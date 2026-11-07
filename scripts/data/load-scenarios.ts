@@ -53,6 +53,8 @@ export function dealtCodes(campaign: CampaignData | readonly CampaignData[], sce
       if (card.back != null) codes.add(card.back);
     }
     for (const code of scenario.campaignPlaced) codes.add(code);
+    // The saga hero and the attachments the first player starts with (The Two Towers' Aragorn, The One Ring).
+    if (scenario.sagaStart) for (const code of "hero" in scenario.sagaStart ? [scenario.sagaStart.hero] : scenario.sagaStart.attached) codes.add(code);
     for (const code of gameCodes(campaign, scenario)) codes.add(code);
     if (nightmare) for (const code of nightmareCodes([scenario])) codes.add(code);
   }

@@ -1,0 +1,155 @@
+{
+  "id": "the-passage-of-the-marshes",
+  "name": "The Passage of the Marshes",
+  "number": 10,
+  "stages": [
+    "144064",
+    "144065",
+    "144066"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Passage of the Marshes",
+      "count": 30
+    },
+    {
+      "name": "Gollum",
+      "count": 2
+    },
+    {
+      "name": "Morgul Nazgûl",
+      "count": 4
+    }
+  ],
+  "cards": [
+    {
+      "code": "144016",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "144017",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "144018",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "144019",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "144020",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "144021",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "144022",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "144023",
+      "normal": 4,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "144024",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "144025",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "144026",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "144055",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "144053",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "144054",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "144064",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "144065",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "144066",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "144075",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside",
+      "back": "144076"
+    }
+  ],
+  "campaignCard": "144067",
+  "campaignPlaced": [
+    "144015"
+  ],
+  "sagaStart": {
+    "ringBearer": true,
+    "attached": [
+      "144063"
+    ]
+  },
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q0C.10",
+    "dragnEasy": "E0C.10",
+    "hobSlug": "The-Passage-of-the-Marshes"
+  }
+}
