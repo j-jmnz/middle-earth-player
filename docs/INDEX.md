@@ -8,7 +8,7 @@ Read a section, not a file: `pnpm docs:section <file> "<heading>"` prints one se
 
 Read whole.
 
-- `CLAUDE.md` — Claude Code (~2.2K tok)
+- `CLAUDE.md` — Claude Code (~2.3K tok)
 - `.claude/rules/authority.md` — Authority (~470 tok)
 - `.claude/rules/code-standards.md` — Code standards (~1.9K tok)
 - `.claude/rules/commit-standards.md` — Commit standards (~680 tok)
@@ -29,7 +29,7 @@ Each agent reads its own file.
 
 Read the sections your task touches.
 
-- `README.md` — Middle Earth LCG (~4.1K tok)
+- `README.md` — Middle Earth LCG (~4.2K tok)
   - 8–23 Contents (~190)
   - 24–29 Privacy and security (~120)
   - 30–35 How the code is written (~120)
@@ -49,11 +49,11 @@ Read the sections your task touches.
     - 137–146 In a browser (~100)
     - 147–168 On a phone (~270)
     - 169–172 Maestro (~130)
-  - 173–202 Commands (~740)
-  - 203–206 Contributing (~80)
-  - 207–216 Documentation (~170)
-  - 217–234 Attribution (~470)
-  - 235–238 License (~50)
+  - 173–203 Commands (~820)
+  - 204–207 Contributing (~80)
+  - 208–217 Documentation (~170)
+  - 218–235 Attribution (~470)
+  - 236–239 License (~50)
 - `docs/architecture.md` — Architecture (~20.1K tok)
   - 7–41 Stack (~1.1K)
   - 42–77 Processes (~680)
@@ -82,7 +82,7 @@ Read the sections your task touches.
   - 152–370 Domain (~9.3K)
     - 154–231 Campaign (~1.9K) ← 2
     - 232–246 Mirkwood campaign cards and carry-over (~870)
-    - 247–258 Standalone play (~790)
+    - 247–258 Standalone play (~790) ← 1
     - 259–270 Scenario state (~540)
     - 271–303 The engine plays the game (~2.1K) ← 4
     - 304–311 Engine steps (~180)
@@ -233,7 +233,7 @@ Read when a task names the plan.
     - 40–56 F1. Choice words as data beside the record (~480)
     - 57–67 F2. Each record rendered as English and read fresh (~250)
     - 68–80 F3. Card behaviour as spec rows (~310)
-    - 81–94 F4. Encounter-card smoke (~170) ← 1
+    - 81–94 F4. Encounter-card smoke (~170)
     - 95–111 F5. One author, a small context pack, rulings first, a quick loop (~400)
     - 112–117 F6. A search player for the goldens (~130)
   - 118–139 Order (~450)
@@ -247,7 +247,7 @@ Read when a task names the plan.
   - 181–200 Verification (~200)
     - 183–194 After each build step (~140)
     - 195–200 The A/B (~60)
-- `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.3K tok)
+- `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.7K tok)
   - 3–14 Context (~450)
   - 15–24 What does not move (~190)
   - 25–48 A. Effects: draft better, template the repeats, copy identical lines (~970)
@@ -255,12 +255,12 @@ Read when a task names the plan.
   - 58–71 C. A shared scenario kit and `pnpm scenario:new` (~610)
   - 72–83 D. One manifest per family (~460)
   - 84–92 E. Data: seed what can be seeded (~300)
-  - 93–105 F. Faster feedback while authoring (~540)
-  - 106–130 Where a scenario's cost is now (~760)
-  - 131–144 Next steps (~390) ← 1
-  - 145–156 After each scenario phase (~210) ← 1
-  - 157–160 Order (~70)
-  - 161–168 Verification (~100)
+  - 93–113 F. Faster feedback while authoring (~870)
+  - 114–138 Where a scenario's cost is now (~790)
+  - 139–151 Next steps (~360) ← 1
+  - 152–163 After each scenario phase (~210) ← 1
+  - 164–167 Order (~70)
+  - 168–175 Verification (~100)
 
 ## Handovers
 
@@ -283,6 +283,7 @@ Open work; read when a task names it.
 The sections each area's comments cite, most cited first. Read these before changing code there.
 
 - `scripts/build`: brief.md, Card images (2)
+- `scripts/card-smoke`: brief.md, Standalone play (1)
 - `scripts/checks`: brief.md, Nightmare (2); design-system.md, Screen reader (2); architecture.md, Modules (1); architecture.md, Repository map (1)
 - `scripts/data`: brief.md, Nightmare (4); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)

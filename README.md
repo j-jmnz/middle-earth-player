@@ -177,7 +177,7 @@ Flows are in `.maestro/scenarios/<scenario-id>/` and `.maestro/features/`. Run `
 | `pnpm test` | All Vitest tests. |
 | `pnpm test:fast` | All but the slow files (`slowFiles` in `vitest.config.mts`). |
 | `pnpm test:changed` | Tests that import a file changed since the last commit. |
-| `pnpm test:scenario <scenario-id>` | One scenario's goldens, effect coverage, file-size, rule-id and wording checks, and the card smoke on its player cards; also the family and manifest tests if pool, family or manifest files changed since the merge base with `origin/main`. `--list` prints the selection. |
+| `pnpm test:scenario <scenario-id>` | One scenario's goldens, effect coverage, file-size, rule-id and wording checks, the card smoke on its player cards and the encounter smoke; also the family and manifest tests if pool, family or manifest files changed since the merge base with `origin/main`. `--list` prints the selection. |
 | `pnpm lint` | Oxlint (`.oxlintrc.json`). |
 | `pnpm typecheck` | tsrs type check. |
 | `pnpm data:sync [ringsdb\|hallofbeorn\|dragncards\|rules\|scans\|pictures\|icons]` | Refreshes `data/raw/` and `.cache/`. The only networked command. `scans` and `pictures` run only when named, after `data:build`. |
@@ -196,6 +196,7 @@ Flows are in `.maestro/scenarios/<scenario-id>/` and `.maestro/features/`. Run `
 | `pnpm move <old> <new>` | Moves files and rewrites every reference. `--dry-run` first. |
 | `pnpm docs:index` / `pnpm docs:section <file> "<heading>"` | Regenerates `docs/INDEX.md` / prints one doc section. |
 | `node --experimental-strip-types scripts/card-smoke/run.ts <codes>` | Plays a seeded game with those cards; reports errors and stalls. `--all` for every card. |
+| `node --experimental-strip-types scripts/card-smoke/encounter.ts <scenario-id>...` | Plays every encounter-side card of a scenario (reveal, Shadow, travel, quest Setup) and seeded games with random legal intents; reports errors, stalls and replay differences. `--all` for every playable scenario. |
 | `node --experimental-strip-types scripts/e2e/fixtures.ts [scenario-id]` | Regenerates the Maestro save fixtures in `src/campaign/fixtures/`. |
 
 Scripts log to stderr. `--verbose`, `--quiet`, or `LOG_LEVEL` (`debug`, `info`, `warn`, `error`, `silent`).

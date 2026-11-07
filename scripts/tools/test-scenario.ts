@@ -27,6 +27,9 @@ import { WORDS_SCENARIOS } from "../../test/harness/words-scenarios.ts";
 //   reader     src/play/reader-play.test.ts for the scenario (READER_PLAY_SCENARIO=<id>): a seeded game played through what a screen reader can reach, which fails
 //              on an intent the engine offers that no labelled element sends. The first scenario, and any scenario with a line in the golden registry, has games
 //   smoke      scripts/card-smoke/run.ts on the player cards the scenario deals (skipped when it deals none)
+//   encounter  scripts/card-smoke/encounter.ts on the scenario: each encounter-side card it deals revealed, its Shadow resolved, a location traveled to,
+//              a quest card's Setup run, and a few dozen seeded games with random legal intents that must end and replay. It runs for every scenario,
+//              whichever track built it and whether or not it deals player cards
 //   families   the family and pool tests, and the manifest tests, when files of those changed since the merge base with origin/main (HEAD when there is
 //              none), committed, staged, unstaged or untracked (changedFamilyTests)
 // `--list` prints the files and codes without running anything. A file runs once, in the first part that names it.
@@ -137,6 +140,16 @@ export function playerCodes(id: string, recorded: readonly string[]): string[] {
   return [...new Set(dealt)].filter((code) => withRecords.has(code));
 }
 
+const SMOKE_NODE = ["--experimental-strip-types", "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON"];
+
+/** The card smokes of the scenario: the player cards' (skipped when it deals none), and the encounter smoke, which every scenario has. */
+export function smokeRuns(id: string, playerCards: readonly string[]): { name: "smoke" | "encounter"; args: string[]; detail: string }[] {
+  return [
+    { name: "smoke", args: playerCards.length === 0 ? [] : [...SMOKE_NODE, "scripts/card-smoke/run.ts", ...playerCards], detail: playerCards.length === 0 ? "skipped (no player cards dealt)" : `${playerCards.length} cards` },
+    { name: "encounter", args: [...SMOKE_NODE, "scripts/card-smoke/encounter.ts", id], detail: "encounter cards and seeded games" },
+  ];
+}
+
 function git(args: string[]): string[] {
   const out = spawnSync("git", args, { cwd: ROOT, encoding: "utf8" });
   if (out.status !== 0) throw new Error(`git ${args.join(" ")} failed: ${out.stderr}`);
@@ -200,6 +213,7 @@ async function main(log: Log): Promise<void> {
       for (const file of part.files) log.info(`  ${file}`);
     }
     log.info(`smoke: ${smoke.length > 0 ? smoke.join(" ") : "no player cards dealt"}`);
+    log.info(`encounter: scripts/card-smoke/encounter.ts ${id}`);
     return;
   }
 
@@ -212,10 +226,13 @@ async function main(log: Log): Promise<void> {
     const outcome = run("pnpm", vitest(part.files, part.filter), part.env);
     results.push({ name: part.name, ok: outcome.ok, ms: outcome.ms, detail: `${part.files.length} files${part.filter ? `, -t ${part.filter}` : ""}` });
   }
-  if (smoke.length === 0) results.push({ name: "smoke", ok: true, ms: 0, detail: "skipped (no player cards dealt)" });
-  else {
-    const outcome = run("node", ["--experimental-strip-types", "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "scripts/card-smoke/run.ts", ...smoke]);
-    results.push({ name: "smoke", ok: outcome.ok, ms: outcome.ms, detail: `${smoke.length} cards` });
+  for (const smoked of smokeRuns(id, smoke)) {
+    if (smoked.args.length === 0) {
+      results.push({ name: smoked.name, ok: true, ms: 0, detail: smoked.detail });
+      continue;
+    }
+    const outcome = run("node", smoked.args);
+    results.push({ name: smoked.name, ok: outcome.ok, ms: outcome.ms, detail: smoked.detail });
   }
 
   for (const result of results) (result.ok ? log.info : log.error)(`${result.name.padEnd(9)} ${result.ok ? "passed" : "FAILED"}  ${result.detail}${result.ms > 0 ? `  (${duration(result.ms)})` : ""}`);

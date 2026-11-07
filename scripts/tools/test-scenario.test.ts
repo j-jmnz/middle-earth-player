@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { changedFamilyTests, hasReaderGames, registryTitle, scenarioTests, selectTests } from "./test-scenario.ts";
+import { changedFamilyTests, hasReaderGames, registryTitle, scenarioTests, selectTests, smokeRuns } from "./test-scenario.ts";
 
 // pnpm test:scenario <id>: the selection is a pure function of the id, the changed paths and the tree of test files.
 const TREE = [
@@ -130,5 +130,18 @@ describe("the reader parity check (src/play/reader-play.test.ts)", () => {
     expect(hasReaderGames("the-oath", registry)).toBe(true);
     expect(hasReaderGames("the-next", registry)).toBe(false);
     expect(hasReaderGames("the-oat", registry)).toBe(false);
+  });
+});
+
+describe("the card smokes (smokeRuns)", () => {
+  it("runs the encounter smoke for every scenario, with or without player cards", () => {
+    const withCards = smokeRuns("the-oath", ["141001", "141002"]);
+    expect(withCards.map((run) => run.name)).toEqual(["smoke", "encounter"]);
+    expect(withCards[0]?.args.slice(-2)).toEqual(["141001", "141002"]);
+    const without = smokeRuns("the-oath", []);
+    expect(without.map((run) => run.name)).toEqual(["smoke", "encounter"]);
+    // The player-card smoke is skipped: no arguments to run.
+    expect(without[0]?.args).toEqual([]);
+    expect(without[1]?.args.slice(-2)).toEqual(["scripts/card-smoke/encounter.ts", "the-oath"]);
   });
 });
