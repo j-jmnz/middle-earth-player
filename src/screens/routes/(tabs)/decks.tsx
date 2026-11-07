@@ -10,7 +10,7 @@ import { deckFaces, deleteDeck, duplicateDeck, isStarterDeck, listDecks, notAppl
 import { useDatabases } from "../../data/databases";
 import { COVER_GAP, deckListFiltered, deckListLayout, deckListSpheres, emptyDeckListFilter, filterDecks, useDeckListView, type DeckListFilter } from "../../deck/list";
 import { DeckListBar } from "../../deck/list-bar";
-import { moveItem } from "../../deck/order";
+import { moveChoices, moveItem } from "../../deck/order";
 import { DeckCell, LiftedRowProvider, ReorderItem, useDeckReorder } from "../../deck/reorder";
 import { DeckCover, DeckRow, heroFace, type HeroFace } from "../../art/hero-tile";
 import {
@@ -62,6 +62,8 @@ function DeckActions({
   asking,
   onAsk,
   onCancel,
+  canMove,
+  onMove,
   onDuplicate,
   onDelete,
   onReset,
@@ -71,6 +73,9 @@ function DeckActions({
   asking: Asking;
   onAsk: (action: "delete" | "reset") => void;
   onCancel: () => void;
+  // Move up / Move down for a deck that can be reordered (WCAG 2.5.7: the drag has a single-pointer way); undefined when reorder is off.
+  canMove?: { up: boolean; down: boolean };
+  onMove?: (direction: "up" | "down") => void;
   onDuplicate: () => void;
   onDelete: () => void;
   onReset: () => void;
@@ -93,13 +98,15 @@ function DeckActions({
     );
   }
   return (
-    <View className="flex-row">
+    <View className="flex-row flex-wrap">
       <TextButton label="Duplicate" testID={`deck-duplicate-${deck.id}`} tone="accent" accessibilityLabel={`Duplicate ${deck.name}`} onPress={onDuplicate} />
       {starter ? (
         <TextButton label="Reset" testID={`deck-reset-${deck.id}`} accessibilityLabel={`Reset ${deck.name} to the printed list`} onPress={() => onAsk("reset")} />
       ) : (
         <TextButton label="Delete" testID={`deck-delete-${deck.id}`} tone="danger" accessibilityLabel={`Delete ${deck.name}`} onPress={() => onAsk("delete")} />
       )}
+      {onMove && canMove?.up ? <TextButton label="Move up" testID={`deck-move-up-${deck.id}`} accessibilityLabel={`Move ${deck.name} up`} onPress={() => onMove("up")} /> : null}
+      {onMove && canMove?.down ? <TextButton label="Move down" testID={`deck-move-down-${deck.id}`} accessibilityLabel={`Move ${deck.name} down`} onPress={() => onMove("down")} /> : null}
     </View>
   );
 }
@@ -266,7 +273,7 @@ export default function Decks() {
             setAsking(null);
           },
       onMove: draggable ? (direction: "up" | "down") => moveDeck(deck, direction) : undefined,
-      canMove: { up: place > 0, down: place < ids.length - 1 },
+      canMove: moveChoices(place, ids.length),
     };
     const actions = managing ? (
       <DeckActions
@@ -275,6 +282,8 @@ export default function Decks() {
         asking={asking}
         onAsk={(action) => ask(deck.id, action)}
         onCancel={() => setAsking(null)}
+        canMove={summary.canMove}
+        onMove={summary.onMove}
         onDuplicate={() => duplicate(deck)}
         onDelete={() => remove(deck)}
         onReset={() => reset(deck)}

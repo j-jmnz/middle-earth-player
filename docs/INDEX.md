@@ -177,7 +177,7 @@ Read the sections your task touches.
     - 361–364 Spend XP (~610) ← 1
     - 365–368 Table — landscape (~30) ← 1
     - 369–380 Resolution and standalone outcome (~1.4K) ← 1
-    - 381–390 Decks (~830) ← 2
+    - 381–390 Decks (~900) ← 2
     - 391–400 Deck builder (deck editor) (~790) ← 3
     - 401–410 Card pool (the Cards tab) (~770) ← 3
     - 411–416 Card (~480) ← 2
