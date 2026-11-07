@@ -82,15 +82,15 @@ Read the sections your task touches.
   - 116–133 Performance and feel (~750)
   - 134–151 Repository layout (~440)
   - 152–370 Domain (~9.3K)
-    - 154–231 Campaign (~1.9K) ← 2
-    - 232–246 Mirkwood campaign cards and carry-over (~870)
-    - 247–258 Standalone play (~790) ← 1
+    - 154–231 Campaign (~1.9K) ← 3
+    - 232–246 Mirkwood campaign cards and carry-over (~870) ← 1
+    - 247–258 Standalone play (~790) ← 2
     - 259–270 Scenario state (~540)
     - 271–303 The engine plays the game (~2.1K) ← 4
     - 304–311 Engine steps (~180)
     - 312–340 Core round (~1.3K) ← 1
     - 341–370 Keywords implemented once (~1.6K)
-  - 371–528 Fellowship of the Ring (~10.4K)
+  - 371–528 Fellowship of the Ring (~10.4K) ← 1
     - 395–409 Scenario 1 resolution (~370)
     - 410–423 A Knife in the Dark (~1.6K) ← 1
     - 424–427 Hide tests (~130)
@@ -106,7 +106,7 @@ Read the sections your task touches.
     - 596–610 The Oath (~2.3K)
     - 611–628 The Caves of Nibin-Dûm (~2.4K)
   - 629–686 Dream-chaser (~15.6K) ← 4
-  - 687–713 Ered Mithrin (~15.8K) ← 7
+  - 687–713 Ered Mithrin (~15.8K) ← 8
   - 714–722 Nightmare (~410) ← 19
   - 723–761 Deckbuilding (~1.9K)
   - 762–840 Effects (~3.2K)
@@ -239,7 +239,7 @@ Read when a task names the plan.
     - 81–94 F4. Encounter-card smoke (~170)
     - 95–111 F5. One author, a small context pack, rulings first, a quick loop (~400)
     - 112–117 F6. A search player for the goldens (~130)
-  - 118–131 Order (~250)
+  - 118–131 Order (~250) ← 1
   - 132–172 The A/B: The Uruk-hai, both arms fresh (~530)
     - 134–141 Arms (~160)
     - 142–145 Rulings (~50)
@@ -264,6 +264,27 @@ Read when a task names the plan.
   - 152–163 After each scenario phase (~210) ← 1
   - 164–167 Order (~70)
   - 168–175 Verification (~100)
+- `docs/plans/the-two-towers.md` — Plan: The Two Towers data and campaign shell (~9.4K tok)
+  - 7–23 Open questions found while planning (~540)
+  - 24–64 What the sources say (~2.1K)
+    - 26–35 The product (~770)
+    - 36–43 Card codes (~390)
+    - 44–60 The scenarios, in order (~770)
+    - 61–64 The first player's saga hero (~170)
+  - 65–78 How the Fellowship log carries into The Two Towers (~730)
+  - 79–148 Phase 61: The Two Towers data (~3.5K)
+    - 83–86 Goal (~150)
+    - 87–90 Network order (~60)
+    - 91–130 Steps (~2.8K)
+    - 131–139 Exit (~230)
+    - 140–148 Stop and ask the user (~240)
+  - 149–200 Phase 62: The Two Towers campaign shell (~2.2K)
+    - 153–156 Goal (~100)
+    - 157–160 Shape (recommendation, Q6) (~200)
+    - 161–186 Steps (~1.3K)
+    - 187–190 Exit (~80)
+    - 191–200 Stop and ask the user (~430)
+  - 201–206 Notes for the orchestrator (~160)
 
 ## Handovers
 
