@@ -7,10 +7,10 @@ import type { ReactNode } from "react";
 import { TextButton } from "../../ui/buttons.tsx";
 import { Segmented } from "../../ui/segmented.tsx";
 import { SettingSwitch } from "../../ui/setting-switch.tsx";
-import { ALWAYS_EMPTY_LINE, BANNER_CLOSES_LINE, BANNER_CLOSES_WORDS, ALWAYS_LINE, AWAKE_LINE, CONFIRM_TIME_LINE, CONFIRM_TIME_WORDS, CONTRAST_LINE, fogLine, GUIDE_LINE, HAPTICS_LINE, NONE_YET, PERFORMANCE_LINE, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, TABLE_LIST_LINE, TABLE_LIST_WORDS, THEME_LABELS, THEME_LINE, THEME_WORDS, type AlwaysRow } from "./settings-words.ts";
+import { ALWAYS_EMPTY_LINE, BANNER_CLOSES_LINE, BANNER_CLOSES_WORDS, ALWAYS_LINE, AWAKE_LINE, CONFIRM_TIME_LINE, CONFIRM_TIME_WORDS, CONTRAST_LINE, fogLine, GUIDE_LINE, HAPTICS_LINE, NONE_YET, PERFORMANCE_LINE, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, STRONG_OUTLINES_WORDS, TITLE_FACE_LINE, TITLE_FACE_WORDS, TABLE_LIST_LINE, TABLE_LIST_WORDS, THEME_LABELS, THEME_LINE, THEME_WORDS, type AlwaysRow } from "./settings-words.ts";
 import { SPEEDS } from "../../ui/motion-tokens.ts";
 import { useReduceMotion } from "../../ui/motion-run.ts";
-import { BANNER_CLOSES_OPTIONS, CARD_QUALITY_OPTIONS, CONFIRM_TIME_OPTIONS, REDUCE_MOTION_OPTIONS, TABLE_LIST_OPTIONS, THEME_OPTIONS, UI_SCALE_OPTIONS, type TableSettings } from "../../ui/table-settings.ts";
+import { BANNER_CLOSES_OPTIONS, CARD_QUALITY_OPTIONS, CONFIRM_TIME_OPTIONS, REDUCE_MOTION_OPTIONS, STRONG_OUTLINES_OPTIONS, TABLE_LIST_OPTIONS, THEME_OPTIONS, TITLE_FACE_OPTIONS, UI_SCALE_OPTIONS, type TableSettings } from "../../ui/table-settings.ts";
 import { SectionHeading } from "../../ui/section-heading.tsx";
 import { useTheme } from "../../ui/theme.ts";
 import { useUiScale } from "../../ui/ui-scale.ts";
@@ -92,7 +92,12 @@ export function SettingsRows({
           <SettingChoice title="UI scale" detail={SCALE_LINE} testID={id("scale")}>
             <Segmented options={UI_SCALE_OPTIONS} value={settings.uiScale} onChange={(uiScale) => onChange({ uiScale })} testIDPrefix={id("scale")} accessibilityLabel="UI scale" stretch words={SCALE_WORDS} />
           </SettingChoice>
-          <SettingSwitch roomy label="Strong outlines" detail={CONTRAST_LINE} value={settings.highContrast} onChange={(highContrast) => onChange({ highContrast })} testID={id("contrast")} />
+          <SettingChoice title="Strong outlines" detail={CONTRAST_LINE} testID={id("contrast")}>
+            <Segmented options={STRONG_OUTLINES_OPTIONS} value={settings.highContrast} onChange={(highContrast) => onChange({ highContrast })} testIDPrefix={id("contrast")} accessibilityLabel="Strong outlines" stretch words={STRONG_OUTLINES_WORDS} />
+          </SettingChoice>
+          <SettingChoice title="Title face" detail={TITLE_FACE_LINE} testID={id("title-face")}>
+            <Segmented options={TITLE_FACE_OPTIONS} value={settings.titleFace} onChange={(titleFace) => onChange({ titleFace })} testIDPrefix={id("title-face")} accessibilityLabel="Title face" stretch words={TITLE_FACE_WORDS} />
+          </SettingChoice>
         </SettingGroup>
       ) : null}
 

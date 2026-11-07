@@ -30,6 +30,7 @@ import { TableDock } from "../../play/choice/dock/table-dock";
 import { TableLayers } from "../../play/chrome/table-layers";
 import { openReading, type Reading } from "../../play/chrome/reading";
 import { phaseCarousel, stopAheadOf } from "../../play/phases/carousel";
+import { useLook } from "../../ui/display-prefs";
 import { tableSettings } from "../../ui/table-settings";
 import { useKeepAwake } from "../../play/chrome/use-keep-awake";
 import { TableMenu } from "../../play/chrome/table-menu";
@@ -127,11 +128,10 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
   // The feet of the canvas's staging and engagement rows, as the canvas last laid them out (column-reach.ts).
   const [feet, setFeet] = useState<RowFeet | null>(null);
   // Only the settings this view uses: a change to another (the theme, the scale, a haptics switch) does not render it.
-  const highContrast = useStore(tableSettings, (state) => state.settings.highContrast);
   const stopsOn = useStore(tableSettings, (state) => state.settings.stopsOn);
   const stops = useStore(tableSettings, (state) => state.settings.stops);
   useKeepAwake();
-  const look = useMemo(() => ({ contrast: highContrast }), [highContrast]);
+  const look = useLook();
   // The card shown large, and cards listed with it that are not on the table (the Look window's).
   const [preview, setPreview] = useState<{ id: string; extra: readonly string[] } | null>(null);
   // The scenario's setup card shown large from the menu (user request, 2026-11-01): a preview of its own, since the card need not be on the table.

@@ -12,7 +12,8 @@ import type { Clock } from "./card-motion.native.tsx";
 import { type CardSlot, type Rect, type TableLayout } from "../layout/layout.ts";
 import { shownBounds } from "../layout/hits.ts";
 import { useSharedFont } from "../canvas/table-assets.native.ts";
-import { MARCELLUS } from "../canvas/table-fonts.native.ts";
+import { titleFile } from "../canvas/table-fonts.native.ts";
+import { usePlainTitles } from "../../ui/display-prefs.ts";
 import { floatWords, type TokenKind } from "./token-deltas.ts";
 import { FLOAT_MS, floatAt, POP_MS, popShows, tokenPopScale, type Fx } from "./token-fx.ts";
 import { TOKEN, tokenSpot } from "../canvas/token-spots.ts";
@@ -103,7 +104,7 @@ export function TokenFx({
   stripOf: (slot: CardSlot) => string | null;
   contrast: boolean;
 }) {
-  const font = useSharedFont(MARCELLUS, FLOAT_SIZE * s);
+  const font = useSharedFont(titleFile(usePlainTitles()), FLOAT_SIZE * s);
   if (fx.length === 0) return null;
   return (
     <Group>

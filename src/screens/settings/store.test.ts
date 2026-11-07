@@ -129,3 +129,24 @@ describe("restoreDefaults", () => {
     expect(restoreDefaults(changed)).toEqual({ ...DEFAULT_SETTINGS, guideSeen: { "3.3": 2 } });
   });
 });
+
+describe("parseSettings strong outlines and title face", () => {
+  it("reads an older build's switch: on is Always, off is Follow system", () => {
+    expect(parseSettings({ highContrast: true }).highContrast).toBe("always");
+    expect(parseSettings({ highContrast: false }).highContrast).toBe("system");
+    expect(parseSettings({}).highContrast).toBe("system");
+  });
+
+  it("keeps the three values and defaults an unknown or wrong-typed one", () => {
+    for (const highContrast of ["system", "always", "off"]) expect(parseSettings({ highContrast }).highContrast).toBe(highContrast);
+    expect(parseSettings({ highContrast: "sometimes" }).highContrast).toBe("system");
+    expect(parseSettings({ highContrast: 1 }).highContrast).toBe("system");
+  });
+
+  it("parses the title face and restores it", () => {
+    expect(parseSettings({}).titleFace).toBe("carved");
+    expect(parseSettings({ titleFace: "plain" }).titleFace).toBe("plain");
+    expect(parseSettings({ titleFace: "gothic" }).titleFace).toBe("carved");
+    expect(restoreDefaults({ ...DEFAULT_SETTINGS, titleFace: "plain", highContrast: "off" })).toMatchObject({ titleFace: "carved", highContrast: "system" });
+  });
+});

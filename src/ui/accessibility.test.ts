@@ -7,6 +7,10 @@ import { accessibility, subscribeAccessibility } from "./accessibility.ts";
 const phone = vi.hoisted(() => ({
   reduceMotion: false,
   screenReader: false,
+  boldText: false,
+  reduceTransparency: false,
+  darker: false,
+  highText: false,
   handlers: new Map<string, (enabled: boolean) => void>(),
   added: 0,
   removed: 0,
@@ -15,6 +19,10 @@ vi.mock("react-native", () => ({
   AccessibilityInfo: {
     isReduceMotionEnabled: () => Promise.resolve(phone.reduceMotion),
     isScreenReaderEnabled: () => Promise.resolve(phone.screenReader),
+    isBoldTextEnabled: () => Promise.resolve(phone.boldText),
+    isReduceTransparencyEnabled: () => Promise.resolve(phone.reduceTransparency),
+    isDarkerSystemColorsEnabled: () => Promise.resolve(phone.darker),
+    isHighTextContrastEnabled: () => Promise.resolve(phone.highText),
     addEventListener: (name: string, handler: (enabled: boolean) => void) => {
       phone.handlers.set(name, handler);
       phone.added += 1;
@@ -33,20 +41,24 @@ const settle = () => new Promise((resolve) => setTimeout(resolve, 0));
 beforeEach(() => {
   phone.reduceMotion = false;
   phone.screenReader = false;
+  phone.boldText = false;
+  phone.reduceTransparency = false;
+  phone.darker = false;
+  phone.highText = false;
   phone.added = 0;
   phone.removed = 0;
   phone.handlers.clear();
 });
 
 describe("the accessibility store", () => {
-  it("opens two listeners for any number of readers, and closes them with the last", () => {
+  it("opens six listeners for any number of readers, and closes them with the last", () => {
     const stops = [subscribeAccessibility(() => undefined), subscribeAccessibility(() => undefined), subscribeAccessibility(() => undefined)];
-    expect(phone.added).toBe(2);
+    expect(phone.added).toBe(6);
     stops[0]?.();
     stops[1]?.();
     expect(phone.removed).toBe(0);
     stops[2]?.();
-    expect(phone.removed).toBe(2);
+    expect(phone.removed).toBe(6);
     expect(phone.handlers.size).toBe(0);
   });
 
@@ -72,6 +84,21 @@ describe("the accessibility store", () => {
     phone.handlers.get("screenReaderChanged")?.(accessibility().screenReader);
     expect(accessibility()).toBe(before);
     expect(told).toBe(1);
+    stop();
+  });
+
+  it("reads Bold Text, Reduce Transparency and Increase Contrast from either platform's source, and follows them", async () => {
+    phone.boldText = true;
+    phone.highText = true;
+    const stop = subscribeAccessibility(() => undefined);
+    await settle();
+    expect(accessibility()).toMatchObject({ boldText: true, reduceTransparency: false, increaseContrast: true });
+    phone.handlers.get("reduceTransparencyChanged")?.(true);
+    phone.handlers.get("boldTextChanged")?.(false);
+    phone.handlers.get("highTextContrastChanged")?.(false);
+    expect(accessibility()).toMatchObject({ boldText: false, reduceTransparency: true, increaseContrast: false });
+    phone.handlers.get("darkerSystemColorsChanged")?.(true);
+    expect(accessibility().increaseContrast).toBe(true);
     stop();
   });
 });

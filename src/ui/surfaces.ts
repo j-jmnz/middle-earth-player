@@ -7,7 +7,7 @@
 // and the parchment's burnt rim are the only literals); screens and the table both read these, so src/play keeps them. Each takes the tokens of the theme in force as its last parameter (useTableTokens, or the palette's
 // twin) and draws Dark without it. Depth differs in kind between the themes: Dark lifts a panel with black shadow and a faint green
 // haze, Light with a warm brown shade (`t.depth`).
-import { tableTokens, withAlphaHex, type TableTokens } from "./tokens.ts";
+import { fillAlpha, tableTokens, withAlphaHex, type TableTokens } from "./tokens.ts";
 
 type Surface = { backgroundColor: string; backgroundImage?: string; filter?: string };
 type Lifted = Surface & { boxShadow: string };
@@ -45,8 +45,8 @@ export function panelDepthOf(t: TableTokens = dark): string {
  */
 export function panelSurface(pressed = false, t: TableTokens = dark): Lifted {
   if (pressed) return { backgroundColor: t.pressed, boxShadow: panelDepthOf(t) };
-  const top = withAlphaHex(t.raisedTop, isLight(t) ? 0.92 : 0.82);
-  const foot = withAlphaHex(isLight(t) ? t.raised : t.dusk, isLight(t) ? 0.95 : 0.92);
+  const top = withAlphaHex(t.raisedTop, fillAlpha(t, isLight(t) ? 0.92 : 0.82));
+  const foot = withAlphaHex(isLight(t) ? t.raised : t.dusk, fillAlpha(t, isLight(t) ? 0.95 : 0.92));
   return { backgroundColor: foot, backgroundImage: linear(`${top} 0%, ${foot} 100%`), boxShadow: panelDepthOf(t) };
 }
 
@@ -71,8 +71,8 @@ export function tileSurface(pressed = false, t: TableTokens = dark): Lifted {
  * (`rowDepthOf`), because a row in a FlashList casts none (docs/design-system.md, Performance).
  */
 export function rowSurface(pressed = false, t: TableTokens = dark): Surface {
-  if (pressed) return { backgroundColor: withAlphaHex(t.pressed, isLight(t) ? 0.9 : 0.85) };
-  return { backgroundColor: isLight(t) ? withAlphaHex(t.raisedTop, 0.75) : withAlphaHex(t.dusk, 0.72) };
+  if (pressed) return { backgroundColor: withAlphaHex(t.pressed, fillAlpha(t, isLight(t) ? 0.9 : 0.85)) };
+  return { backgroundColor: isLight(t) ? withAlphaHex(t.raisedTop, fillAlpha(t, 0.75)) : withAlphaHex(t.dusk, fillAlpha(t, 0.72)) };
 }
 
 export const rowDepthOf = (t: TableTokens = dark) => (isLight(t) ? `0 10px 24px ${shade(t, 0.2)}` : `0 14px 30px ${shade(t, 0.85)}`);
@@ -139,7 +139,7 @@ export function slateSurface(pressed = false, t: TableTokens = dark): Surface {
 
 /** The glass button (Back, the gear, the menu) and its capsule (History, Manage): a dark or a pale fill over whatever lies under it, with no shadow. */
 export function glassSurface(pressed = false, t: TableTokens = dark): Surface {
-  return darkened({ backgroundColor: withAlphaHex(isLight(t) ? t.raisedTop : t.dusk, isLight(t) ? 0.7 : 0.62) }, pressed);
+  return darkened({ backgroundColor: withAlphaHex(isLight(t) ? t.raisedTop : t.dusk, fillAlpha(t, isLight(t) ? 0.7 : 0.62)) }, pressed);
 }
 
 /** A text button: no fill; while it is held, a capsule of shade (a darker patch of the ground, on Dark and Light alike). */

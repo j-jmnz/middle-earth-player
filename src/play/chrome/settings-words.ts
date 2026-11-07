@@ -1,6 +1,6 @@
 // The words and lists the Settings screen (src/screens/settings/view.tsx) and the table's settings panel (reading-panels.tsx) share,
 // so the two say the same thing (user request, 2026-10-28). Pure, so a test reads them.
-import type { BannerClosesOption, CardQualityOption, ConfirmTimeOption, ReduceMotionOption, TableListOption, ThemeOption, UiScaleOption } from "../../ui/table-settings.ts";
+import type { BannerClosesOption, CardQualityOption, ConfirmTimeOption, ReduceMotionOption, StrongOutlinesOption, TableListOption, ThemeOption, TitleFaceOption, UiScaleOption } from "../../ui/table-settings.ts";
 import type { Speed } from "../../ui/motion-tokens.ts";
 
 // The themes go by Middle-earth names: Ringwraith is the dark theme, Rivendell the light. A screen reader hears which is which (THEME_LABELS).
@@ -12,13 +12,16 @@ export const BANNER_CLOSES_WORDS: Readonly<Record<BannerClosesOption, string>> =
 export const SCALE_WORDS: Readonly<Record<UiScaleOption, string>> = { small: "Small", medium: "Medium", large: "Large", xlarge: "Extra large" };
 export const TABLE_LIST_WORDS: Readonly<Record<TableListOption, string>> = { system: "Follow screen reader", always: "Always" };
 export const CONFIRM_TIME_WORDS: Readonly<Record<ConfirmTimeOption, string>> = { standard: "Standard", long: "Long", none: "No limit" };
+export const STRONG_OUTLINES_WORDS: Readonly<Record<StrongOutlinesOption, string>> = { system: "Follow system", always: "Always", off: "Off" };
+export const TITLE_FACE_WORDS: Readonly<Record<TitleFaceOption, string>> = { carved: "Carved", plain: "Plain" };
 export const QUALITY_WORDS: Readonly<Record<CardQualityOption, string>> = { high: "High", low: "Low" };
 
 // Each row's detail states what the setting changes. The settings that exist to lighten the load on the device sit in the Performance
 // group (setting-rows.tsx); Reduce motion and Keep screen awake, which also affect it, say so in their detail.
 export const THEME_LINE = "Ringwraith is dark, Rivendell is light. System follows the device's setting.";
 export const SCALE_LINE = "Size of text, buttons and cards, the table included.";
-export const CONTRAST_LINE = "Thicker outlines on effect marks and token counts.";
+export const CONTRAST_LINE = "Thicker outlines on effect marks and token counts. Follow system turns them on with the device's Increase Contrast (iOS) or High contrast text (Android).";
+export const TITLE_FACE_LINE = "Carved draws titles and the table's numbers in Marcellus SC, with small capitals. Plain draws them in the same face as the text, in semibold.";
 export const PERFORMANCE_LINE = "Lower these if the table stutters or the device runs hot. Gameplay is unchanged.";
 export const QUALITY_LINE = "Low draws table cards at a lower resolution and uses less memory. Previews stay sharp.";
 export const FOG_LINE = "Animated fog behind every screen. Off saves battery.";
