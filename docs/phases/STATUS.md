@@ -84,6 +84,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 58 | The Ghost of Framsburg | completed | 2026-11-06. Review round done. |
 | 59 | Mount Gundabad | completed | 2026-11-06. Review round done. |
 | 60 | The Fate of Wilderland | completed | 2026-11-06. Review round done. |
+| 61 | The Two Towers data | active | 2026-11-07. Plan `docs/plans/the-two-towers.md`. |
+| 62 | The Two Towers campaign shell | not started | |
 
 ## Open items
 
