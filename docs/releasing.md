@@ -1,21 +1,21 @@
 # Releasing
 
-How a release is cut and shipped. The rules (branches, versions, tags, notes, who may release) are in `.claude/rules/release-standards.md`; this doc says how the pipeline carries them out. The app is not listed on the Play Store or the App Store. Every release goes on the repository's Releases page: Android players install the APK, and iPhone and iPad players install the IPA with SideStore or AltStore, which sign it with the player's own Apple ID, so no Apple review or developer account stands in the way. TestFlight is an optional extra channel, on only while its Apple setup is in place (user decision, 2026-11-06).
+Rules (branches, versions, tags, notes, who may release): `.claude/rules/release-standards.md`. Every release goes on the Releases page: an APK for Android and an IPA that players sign with their own Apple ID through SideStore or AltStore. TestFlight is optional and runs only while its Apple setup is in place (user decision, 2026-11-06).
 
 ## Start a release
 
-The release is `.github/workflows/release.yml`, started by hand on `main` (or a `release/v<major>.<minor>` branch). It takes two inputs:
+Run `.github/workflows/release.yml` by hand on `main` or a `release/v<major>.<minor>` branch. Inputs:
 
-- `bump`: `auto` (the default) reads the commits since the last tag; `patch`, `minor` or `major` forces that bump.
-- `dry_run`: `true` (the default) builds and checks only, leaving the APK and the IPA as workflow artifacts for 14 days; `false` tags and publishes (and uploads to TestFlight when it is set up).
+- `bump`: `auto` (default) reads the commits since the last tag; `patch`, `minor` or `major` forces it.
+- `dry_run`: `true` (default) builds and checks only, keeping the APK and IPA as artifacts for 14 days; `false` tags, publishes and uploads to TestFlight if set up.
 
-Start it whichever way you have:
+Ways to start it:
 
-- On GitHub: Actions, release, Run workflow, pick the branch and the inputs.
-- With the GitHub CLI: `gh workflow run release.yml --ref main -f bump=auto -f dry_run=false`, then `gh run watch`.
-- As an agent with the GitHub MCP tools: `actions_run_trigger` with `method: run_workflow`, `workflow_id: release.yml`, `ref: main` and `inputs: { bump: "auto", dry_run: "false" }`; follow the run with `actions_list` and `actions_get`, and read a failed job with `get_job_logs`. The release is at `get_latest_release` once it is done.
+- GitHub: Actions, release, Run workflow, then pick the branch and inputs.
+- GitHub CLI: `gh workflow run release.yml --ref main -f bump=auto -f dry_run=false`, then `gh run watch`.
+- GitHub MCP tools: `actions_run_trigger` with `method: run_workflow`, `workflow_id: release.yml`, `ref: main` and `inputs: { bump: "auto", dry_run: "false" }`. Follow it with `actions_list` and `actions_get`; read failed jobs with `get_job_logs`; the result is at `get_latest_release`.
 
-Preview the version and notes first with `git fetch --tags && pnpm release:plan --dry-run`; it prints the tag and the notes and changes nothing. A dry run on another branch only warns, so a change to the pipeline can be tried before it merges (`workflow_dispatch` needs the workflow file on `main` first).
+Preview with `git fetch --tags && pnpm release:plan --dry-run` (prints the tag and notes, changes nothing). A dry run on another branch only warns, so pipeline changes can be tried before merging; `workflow_dispatch` needs the workflow file on `main` first.
 
 ## Jobs
 
@@ -27,15 +27,15 @@ Preview the version and notes first with `git fetch --tags && pnpm release:plan 
 4. `publish` (not on a dry run) needs the checks and both builds. It plans again with `--expect` (so the tag cannot have moved), writes the notes with the APK's and the IPA's SHA-256 and the APK's signing certificate fingerprint, writes the SideStore and AltStore source (`pnpm release:source`, `scripts/release/sideload-source.ts`), and runs `gh release create`, which makes the tag on the built commit and attaches the APK, the IPA, their `.sha256` files and `source.json`. Players add the source once, at `https://github.com/j-jmnz/middle-earth-lcg/releases/latest/download/source.json`; GitHub sends that URL to the newest release's file, so SideStore and AltStore offer each release as an update. A patch from a release branch is not marked Latest.
 5. `testflight` (only with TestFlight set up) follows `publish`. fastlane's `pilot` uploads the IPA, waits for Apple to process it, sets What to Test from the release notes, and gives the build to the external TestFlight group, which sends the first build of each version to Apple's Beta App Review (usually within a day). Testers get the build when the review passes.
 
-The workflow runs one release at a time; a second start waits.
+One release runs at a time; a second start waits.
 
 ## Signing
 
-A release needs the Android key; `plan` refuses one without it. The iOS IPA needs no signing from the project. The Apple setup below is only for the optional TestFlight channel. An agent cannot make or read these secrets. Add each in the repository's Settings, Secrets and variables, Actions, and keep the originals in a password manager. Never commit a key (`.gitignore` refuses `*.jks`, `*.p8` and `*.p12`).
+A release needs the Android key; `plan` refuses without it. The IPA needs no project signing; the Apple setup is only for TestFlight. Agents cannot create or read these secrets. Add them under Settings, Secrets and variables, Actions, and keep the originals in a password manager. Never commit a key (`.gitignore` refuses `*.jks`, `*.p8`, `*.p12`).
 
 ### Android key
 
-Android installs an update over an earlier release only when both are signed with the same key, so one key signs every release, for good. Losing it means players must uninstall (and lose their saves) to move to a new one. The repository owner makes it once:
+Android updates in place only when both builds share a key, so one key signs every release permanently. Losing it forces players to uninstall, losing their saves. The owner creates it once:
 
 ```bash
 keytool -genkeypair -v -keystore middle-earth-lcg-release.jks -alias release \
@@ -47,7 +47,7 @@ Secrets: `ANDROID_KEYSTORE_BASE64` (the contents of `keystore.b64`), `ANDROID_KE
 
 ### TestFlight (optional)
 
-TestFlight needs a paid Apple Developer Program membership, and each version goes through Apple's Beta App Review, which checks the App Review Guidelines (intellectual property included) and can refuse a build. The release on GitHub does not wait for it: a refused build only means TestFlight testers do not get that release. The owner sets it up once:
+Needs a paid Apple Developer Program membership. Each version goes through Beta App Review, which applies the App Review Guidelines (intellectual property included) and can refuse a build. The GitHub release does not wait for it; a refusal only means TestFlight testers miss that release. One-time setup by the owner:
 
 1. In the developer account, register the bundle id `com.middleearth.lcg`. In App Store Connect, create the app with that bundle id.
 2. In App Store Connect, Users and Access, Integrations, make an App Store Connect API key with the Admin role (so Xcode can make the distribution certificate and profile itself), and download its `.p8` once.
@@ -60,7 +60,7 @@ To turn TestFlight off, delete `APPLE_TEAM_ID` and `TESTFLIGHT_URL`; the next re
 
 ## Installing
 
-The README's Install section is the players' guide: the requirements, the Android and SideStore or AltStore steps, checking a download and what to do when an install fails. Keep it in step with what the pipeline ships. While TestFlight is on, its 90-day build expiry is why a release is cut at least every 90 days (`.claude/rules/release-standards.md`, Tags and releases).
+The players' guide is the README's Install section; keep it in line with what the pipeline ships. While TestFlight is on, its 90-day expiry means a release at least every 90 days (`.claude/rules/release-standards.md`, Tags and releases).
 
 ## When it fails
 
