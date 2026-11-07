@@ -3,7 +3,7 @@
 // they send, are dock/buttons.tsx. Every press shows its pressed fill in the same frame. Nothing here holds a number the engine
 // did not compute.
 import { createContext, useContext, useMemo, type ReactNode } from "react";
-import { Pressable, View, type AccessibilityRole, type DimensionValue } from "react-native";
+import { Pressable, useWindowDimensions, View, type AccessibilityRole, type DimensionValue } from "react-native";
 import Animated, { SlideInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -16,7 +16,7 @@ import { layoutAnim, useMotionScale } from "../../ui/motion-run.ts";
 import { MOTION } from "../../ui/motion-tokens.ts";
 import type { SheetStat } from "./sheet-types.ts";
 import { withAlphaHex } from "../../ui/tokens.ts";
-import { touch, useUiScale } from "../../ui/ui-scale.ts";
+import { capLines, touch, useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
 import { Text } from "../../ui/text.tsx";
 
@@ -142,6 +142,8 @@ export function Tile({
   const s = useUiScale();
   const night = surface === "night";
   const ring = useFocusRing();
+  // A row's name keeps two lines at the phone's default text size and grows with larger text (capLines, ui/ui-scale.ts).
+  const labelCap = capLines(2, useWindowDimensions().fontScale);
   // A screen reader's actions on the row: a share row's increment and decrement, and the long press's "Show card" (docs/design-system.md, Screen reader).
   const onStep = reader?.onStep;
   const actions = mergeA11yActions(
@@ -181,7 +183,7 @@ export function Tile({
           {leading}
           <View className={`flex-1 ${dense ? "flex-row flex-wrap items-center gap-x-2 gap-y-0.5" : ""}`}>
             <View className={dense ? "" : "flex-row items-center justify-between gap-2"} style={dense ? { flexGrow: 1, flexShrink: 1, minWidth: 84 * s } : undefined}>
-              <Text numberOfLines={2} className={`shrink text-body ${selected ? "font-semibold" : ""}`} style={{ color: night ? (selected ? t.accentHigh : t.bone) : t.ink }}>
+              <Text numberOfLines={labelCap} className={`shrink text-body ${selected ? "font-semibold" : ""}`} style={{ color: night ? (selected ? t.accentHigh : t.bone) : t.ink }}>
                 {label}
               </Text>
               {night || dense ? null : numbers}

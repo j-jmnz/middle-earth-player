@@ -44,9 +44,17 @@ export function smallPictures(height: number, scale = 1): boolean {
   return height < DENSE_BELOW || isDense(height, scale);
 }
 
-/** The least room the choice's rows keep (Medium's points, times the scale where it is used): one row of the picture size in use. */
-export function trayRoom(small: boolean): number {
-  return small ? TRAY_ROW_SMALL_PX : TRAY_ROW_PX;
+// The least a row is without its picture: one line of body type (tailwind.config.js, text-body) and the row's padding.
+export const TRAY_LABEL_LINE_PX = 20;
+export const TRAY_ROW_PAD_PX = 8;
+
+/**
+ * The least room the choice's rows keep (Medium's points, times the scale where it is used): one row of the picture size in use, or one
+ * line of the row's name at the phone's text size (`text`, the font scale) when that is taller. A longer row is as tall as its words and
+ * the rows scroll (tray.tsx).
+ */
+export function trayRoom(small: boolean, text = 1): number {
+  return Math.max(small ? TRAY_ROW_SMALL_PX : TRAY_ROW_PX, TRAY_LABEL_LINE_PX * text + TRAY_ROW_PAD_PX);
 }
 
 /** The height of the words' window: the dock's room (the column less its padding) less its measured pinned block. */

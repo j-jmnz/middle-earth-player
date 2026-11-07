@@ -39,9 +39,12 @@ export function armedLines(texts: readonly (string | null)[], chars: number = CH
   return Math.min(MAX_LINES, Math.max(MIN_LINES, most));
 }
 
-/** The height of the armed line's room, the bar's reserve included, at a UI `scale` (ui-scale.ts). */
-export function armedRoom(lines: number, dense = false, scale = 1): number {
-  return (lines * LINE_PX + (dense ? BAR_DENSE_PX : BAR_PX)) * scale;
+/**
+ * The height of the armed line's room, the bar's reserve included, at a UI `scale` (ui-scale.ts). `text` is the phone's font scale: the
+ * lines are that much taller, the bar is not.
+ */
+export function armedRoom(lines: number, dense = false, scale = 1, text = 1): number {
+  return (lines * LINE_PX * text + (dense ? BAR_DENSE_PX : BAR_PX)) * scale;
 }
 
 // A consequence clause: it says what the second tap costs (a card that falls or is destroyed, the game lost), not just which button.

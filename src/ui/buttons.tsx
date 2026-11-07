@@ -5,7 +5,7 @@
 // primary about 8% and sinks it 1 pt, and fills the others. A disabled button keeps its shape at DISABLED_OPACITY, and the sentence
 // beside it says why. Every fill and text colour is a style, not only a class: on the phone a class on a Pressable whose style is a
 // function can be dropped (user report, 2026-10-25), so the pressed state comes from the Pressable's children.
-import { Pressable, View, type ViewStyle } from "react-native";
+import { Pressable, useWindowDimensions, View, type ViewStyle } from "react-native";
 import type { ComponentRef, ReactNode, Ref } from "react";
 
 import { useFocusRing } from "./focus-ring.ts";
@@ -15,7 +15,7 @@ import { longPressA11y } from "./long-press-action.ts";
 import { CONTROL_RADIUS } from "./radius.ts";
 import { accentPlate, DISABLED_OPACITY, glassSurface, PRESSED_FILTER, slateSurface, textSurface } from "./surfaces.ts";
 import { withAlphaHex } from "./tokens.ts";
-import { touch, touchSlop, useUiScale } from "./ui-scale.ts";
+import { capLines, touch, touchSlop, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 import { Text } from "./text.tsx";
 
@@ -91,6 +91,9 @@ export function PrimaryFace({
 }) {
   const t = useTableTokens();
   const s = useUiScale();
+  // The dock's primary keeps two lines at the phone's default text size; larger text grows the button (capLines, ui/ui-scale.ts).
+  const twoLines = capLines(2, useWindowDimensions().fontScale);
+  const dockCap = dock ? twoLines : undefined;
   const fill = paper ? { backgroundColor: t.ink, opacity: pressed && !disabled ? 0.85 : 1 } : accentPlate(pressed && !disabled, t);
   return (
     <View
@@ -104,7 +107,7 @@ export function PrimaryFace({
       }}
     >
       <Text
-        numberOfLines={dock ? 2 : undefined}
+        numberOfLines={dockCap}
         className="font-display text-center"
         style={{ fontSize: 17 * s, lineHeight: 21 * s, letterSpacing: 1.2 * s, color: paper ? t.paper : t.onAccent }}
       >

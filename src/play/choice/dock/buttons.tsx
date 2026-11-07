@@ -5,7 +5,7 @@
 // it back. Arming changes no button's size, so the second tap lands where the first did. The parent keys this component on
 // the moment and the pick, so nothing stays armed into the next one.
 import { useEffect, useRef, useState, type ComponentRef } from "react";
-import { View } from "react-native";
+import { useWindowDimensions, View } from "react-native";
 import { useStore } from "zustand";
 import Animated, { cancelAnimation, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
@@ -61,6 +61,7 @@ export function DockButtons({
 }) {
   const t = useTableTokens();
   const s = useUiScale();
+  const text = useWindowDimensions().fontScale;
   const moreRef = useRef<ComponentRef<typeof View>>(null);
   const [armed, setArmed] = useState<string | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -119,8 +120,9 @@ export function DockButtons({
     <View className={dense ? "gap-0" : "gap-0.5"}>
       {/* The armed line, always held: what the armed button's second tap does (a caution names the loss in full), or what the
           primary waits for; the bar that runs down has its own 4 pt under the text (the bar at the top of it, 2 pt clear above the primary). Arming moves nothing. */}
-      <View style={{ height: armedRoom(lines, dense, s) }}>
-        <View style={{ height: lines * LINE_PX * s, justifyContent: "flex-end" }}>
+      <View style={{ height: armedRoom(lines, dense, s, text) }}>
+        {/* A fixed slot: the armed line keeps the lines this moment's longest caution takes (numberOfLines {lines}), each as tall as the phone's text size makes it. */}
+        <View style={{ height: lines * LINE_PX * s * text, justifyContent: "flex-end" }}>
           {line ? (
             <Text testID={armedButton ? `${armedButton.testID}-armed` : dock.why ? "sheet-why" : "dock-only"} numberOfLines={lines} accessibilityLabel={armedButton ? (armedButton.armed ?? `Tap again: ${armedButton.label}`) : undefined} className={`text-center text-label ${armedButton ? "text-accent" : "text-muted"}`}>
               {line}

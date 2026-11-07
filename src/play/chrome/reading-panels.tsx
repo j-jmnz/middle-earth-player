@@ -19,7 +19,7 @@ import { CloseButton, TextButton } from "../../ui/buttons.tsx";
 import { LineMark } from "./table-chrome.tsx";
 import { SettingsRows } from "./setting-rows.tsx";
 import type { TableSettings } from "../../ui/table-settings.ts";
-import { touch, useUiScale } from "../../ui/ui-scale.ts";
+import { capLines, touch, useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
 import { Text } from "../../ui/text.tsx";
 import { usePanelFocus } from "./use-panel-focus.ts";
@@ -56,6 +56,8 @@ function CardRow({ card, playable, testID, onPress, onLongPress }: { card: ListC
   const box = smallPictures(useWindowDimensions().height, s) ? LIST_PICTURE_SMALL : LIST_PICTURE;
   const w = box.w * s;
   const h = box.h * s;
+  // Two lines each at the phone's default text size; larger text grows the row (capLines, ui/ui-scale.ts).
+  const cap = capLines(2, useWindowDimensions().fontScale);
   const detail = playable ? "Playable now · tap to play" : (card.detail ?? null);
   // The tap is in the hint ("Plays it"), so the label says only that the card can be played.
   const said = playable ? "Playable now" : (card.said ?? detail);
@@ -83,11 +85,11 @@ function CardRow({ card, playable, testID, onPress, onLongPress }: { card: ListC
             )}
           </View>
           <View className="min-w-0 flex-1">
-            <Text numberOfLines={2} className="font-display text-body" style={{ color: playable ? t.accentHigh : t.bone }}>
+            <Text numberOfLines={cap} className="font-display text-body" style={{ color: playable ? t.accentHigh : t.bone }}>
               {card.label}
             </Text>
             {detail ? (
-              <Text numberOfLines={2} className="mt-0.5 text-label" style={{ color: playable ? t.accent : t.faint }}>
+              <Text numberOfLines={cap} className="mt-0.5 text-label" style={{ color: playable ? t.accent : t.faint }}>
                 {detail}
               </Text>
             ) : null}

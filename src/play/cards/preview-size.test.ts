@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { inspectSize, previewSideSize, previewSize } from "./preview-size.ts";
+import { inspectSize, previewSideSize, previewSize, previewStrip, tokenLines } from "./preview-size.ts";
 
 describe("the long-press preview", () => {
   it("fills a phone's width with a portrait card and leaves room for the buttons", () => {
@@ -50,5 +50,26 @@ describe("the Card screen's picture", () => {
     const large = inspectSize(700 * 1.15, 900 * 1.15, 1.15);
     expect(large.width).toBe(Math.round(base.width * 1.15));
     expect(large.height).toBe(Math.round(base.height * 1.15));
+  });
+});
+
+describe("the strip under an upright card", () => {
+  const TOKENS = "3 damage · 2 progress · 4 resources · Exhausted";
+
+  it("is Medium's at the phone's default text size: a 44 pt row of the cards with it and a two-line tokens line", () => {
+    expect(tokenLines(TOKENS, 300)).toBe(2);
+    expect(previewStrip({ chips: true, tokenRows: 2 })).toBe(44 + 16 + 12 + 40);
+    expect(previewStrip({ chips: false, tokenRows: 0 })).toBe(0);
+    expect(previewStrip({ chips: true, tokenRows: 0 }, 1.15)).toBe(Math.max(44, 44 * 1.15) + 16 * 1.15);
+  });
+
+  it("at a font scale of 2 counts the tokens line's own lines, each twice as tall, and takes them from the card, not the buttons", () => {
+    const rows = tokenLines(TOKENS, 300, 1, 2);
+    expect(rows).toBe(Math.ceil(TOKENS.length / Math.floor(300 / (7.2 * 2))));
+    expect(rows).toBeGreaterThan(2);
+    const strip = previewStrip({ chips: true, tokenRows: rows }, 1, 2);
+    expect(strip).toBe(44 + 16 + 12 + rows * 20 * 2);
+    const room = 667 - strip;
+    expect(previewSize(390, room, false).height).toBeLessThan(previewSize(390, 667 - previewStrip({ chips: true, tokenRows: 2 }), false).height);
   });
 });

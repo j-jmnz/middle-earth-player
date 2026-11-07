@@ -108,7 +108,8 @@ export function ChoiceTray({
   // A phone screen reader hears each row as a radio, a checkbox, a button or an adjustable share (tray-logic.ts, tileRole); no one else does.
   const reader = useReaderMode();
   // A phone draws the small picture, and the rows keep one row of it (dock/budget.ts; the dock budgets its words against the same).
-  const small = smallPictures(useWindowDimensions().height, s);
+  const { height: screenHeight, fontScale } = useWindowDimensions();
+  const small = smallPictures(screenHeight, s);
   const { progress, leaving } = useOpenMotion(open, MOTION.trayEnter, MOTION.trayLeave);
   const motion = useAnimatedStyle(() => ({ opacity: progress.get(), transform: [{ translateY: (1 - progress.get()) * RISE * s }] }));
   const shown = useHeld(open ? sheet : null) ?? sheet;
@@ -119,7 +120,7 @@ export function ChoiceTray({
   if (!open && !leaving) return null;
   return (
     <Animated.View testID="sheet" collapsable={false} pointerEvents={open ? "auto" : "none"} style={[{ flexShrink: 1, minHeight: 0 }, motion]}>
-      <ScrollView style={{ flexGrow: 0, flexShrink: 1, minHeight: tiles.length > 0 ? trayRoom(small) * s : 0 }} showsVerticalScrollIndicator={false} nestedScrollEnabled>
+      <ScrollView style={{ flexGrow: 0, flexShrink: 1, minHeight: tiles.length > 0 ? trayRoom(small, fontScale) * s : 0 }} showsVerticalScrollIndicator={false} nestedScrollEnabled>
         {tiles.map((tile) => {
           const share = shareFor(shown, picked, tile.id);
           const readId = tile.readId;

@@ -22,13 +22,13 @@ import type { NotApplied } from "./not-applied.ts";
 import { NotAppliedView } from "./not-applied-view.tsx";
 import { springConfig, timing, useMotionScale } from "../../ui/motion-run.ts";
 import { MOTION } from "../../ui/motion-tokens.ts";
-import { previewSideSize, previewSize } from "./preview-size.ts";
+import { previewSideSize, previewSize, previewStrip, tokenLines } from "./preview-size.ts";
 import { clampStep, swipeStep } from "./preview-swipe.ts";
 import { chipLabel, EARLIER_STAGE, listHeading, previewValue, rowName } from "./preview-words.ts";
 import { SecondaryButton } from "../../ui/buttons.tsx";
 import type { PictureSource } from "../canvas/table-canvas-types.ts";
 import { cardCorner } from "../../ui/card-corner.ts";
-import { touch, useUiScale } from "../../ui/ui-scale.ts";
+import { capLines, touch, useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
 import { Text } from "../../ui/text.tsx";
 
@@ -131,7 +131,9 @@ export function CardPreview({
   const sideways = (shown.landscape ?? false) !== (((shown.turn ?? 0) % 180 + 180) % 180 === 90);
   // Upright, the cards with it are a strip under the card (user request, 2026-11-02: a quest card's side B was out of reach on a phone);
   // the card gives up the strip's height.
-  const strip = !wide ? (all.length > 1 ? touch(s, 44) + 16 * s : 0) + (all.some((item) => (item.tokens ?? []).length > 0) ? 12 * s + 40 * s : 0) : 0;
+  // The tokens line is two lines at the phone's default text size and as many as its words take at a larger one (preview-size.ts, previewStrip).
+  const tokenRows = Math.max(0, ...all.map((item) => ((item.tokens ?? []).length > 0 ? tokenLines((item.tokens ?? []).join(" · "), roomW - 32 * s, s, screen.fontScale) : 0)));
+  const strip = !wide ? previewStrip({ chips: all.length > 1, tokenRows }, s, screen.fontScale) : 0;
   const size = wide ? previewSideSize(roomW, roomH, sideways, s) : previewSize(screen.width, roomH - strip, sideways, s);
 
   useEffect(() => {
@@ -228,6 +230,8 @@ export function CardPreview({
             {/* Not a control of its own: a tap here reaches the scrim and closes the preview too; only Details and the rows of what is
                 with the card do something else (user request, 2026-10-29). */}
             <View style={{ flexShrink: 1 }}>
+              {/* The column is one scroll: at a large text size its name, line, tokens and the rows under them are as tall as their words and the column scrolls inside the card's height. */}
+              <ScrollView style={{ flexShrink: 1 }}>
               <Text testID="card-preview-name" accessibilityRole="header" className="font-display text-title text-bone">
                 {shown.title ?? shown.name}
               </Text>
@@ -238,7 +242,7 @@ export function CardPreview({
                   {(shown.tokens ?? []).join(" · ")}
                 </Text>
               ) : null}
-              <ScrollView style={{ flexShrink: 1 }} className="mt-2">
+              <View className="mt-2">
                 {shown.note ? (
                   <View testID="card-preview-why" className="mb-2">
                     <Text className="font-display text-eyebrow uppercase text-accent">{shown.noteTitle ?? "Not playable now"}</Text>
@@ -291,7 +295,7 @@ export function CardPreview({
                               {item.source ? <Image source={item.source} cachePolicy={cachePolicyFor(item.source)} recyclingKey={`${item.code}:${index}:thumb`} contentFit="cover" style={{ width: 24 * s, height: 34 * s }} /> : null}
                             </View>
                             <View className="shrink">
-                              <Text numberOfLines={1} className="text-body text-bone">
+                              <Text className="text-body text-bone">
                                 {rowName(item)}
                               </Text>
                               {item.role && item.role !== EARLIER_STAGE ? <Text className="text-label text-muted">{item.role}</Text> : null}
@@ -302,6 +306,7 @@ export function CardPreview({
                     ))}
                   </View>
                 ) : null}
+              </View>
               </ScrollView>
               {buttons ? <View className="mt-2 flex-row gap-3">{buttons}</View> : null}
             </View>
@@ -310,7 +315,7 @@ export function CardPreview({
           <>
             {(shown.tokens ?? []).length > 0 ? (
               <Animated.View style={[{ marginTop: 12 * s, maxWidth: roomW - 32 * s }, buttonsStyle]}>
-                <Text testID="card-preview-tokens" numberOfLines={2} className="text-center text-body text-accent">
+                <Text testID="card-preview-tokens" numberOfLines={capLines(2, screen.fontScale)} className="text-center text-body text-accent">
                   {(shown.tokens ?? []).join(" · ")}
                 </Text>
               </Animated.View>
@@ -335,7 +340,7 @@ export function CardPreview({
                           <View style={{ width: 24 * s, height: 34 * s, borderRadius: cardCorner(24 * s, 34 * s), overflow: "hidden", backgroundColor: t.raised }}>
                             {item.source ? <Image source={item.source} cachePolicy={cachePolicyFor(item.source)} recyclingKey={`${item.code}:${index}:thumb`} contentFit="cover" style={{ width: 24 * s, height: 34 * s }} /> : null}
                           </View>
-                          <Text numberOfLines={1} className="text-label text-bone">
+                          <Text className="text-label text-bone">
                             {index > 0 && item.title ? item.title : (item.role ?? item.name)}
                           </Text>
                         </View>
