@@ -5,6 +5,7 @@ import type { MultiSheet, PickSheet, TriggerSheet } from "./sheet-types.ts";
 import type { Choice } from "./table-choice.ts";
 import { tableLayout } from "../layout/layout.ts";
 import { TOP_BAR } from "../chrome/top-bar-layout.ts";
+import { UI_SCALES } from "../../ui/ui-scale.ts";
 import { PILES, TABLE_ZONES, type PileView, type ZoneId, type ZoneView } from "../store/selectors.ts";
 import { COLUMN_PAD, listsResponses, outsideLayers, tapAction, tapRoute, TRAY_MAX, trayBox, trayCount, trayOpen, trayTiles } from "./tray-logic.ts";
 
@@ -184,6 +185,26 @@ describe("where the tray sits", () => {
           expect(rect.x + rect.w, `${id} at ${width} inset ${inset}`).toBeLessThanOrEqual(trayLeft);
           expect(rect.x).toBeGreaterThanOrEqual(0);
         }
+      }
+    }
+  });
+
+  it("covers neither encounter pile at every UI scale, Extra large included, on 844x390 and 667x375 (the command column grows with the scale)", () => {
+    const views = Object.fromEntries(TABLE_ZONES.map((zone) => [zone, { zone, seat: 0, entries: [] } satisfies ZoneView])) as unknown as Record<ZoneId, ZoneView>;
+    const piles = Object.fromEntries(PILES.map((pile) => [pile, { pile, seat: 0, ids: [], top: null } satisfies PileView])) as unknown as Record<(typeof PILES)[number], PileView>;
+    for (const scale of Object.values(UI_SCALES)) {
+      for (const [width, height] of [[844, 390], [667, 375]] as const) {
+        // The command column's width at a scale (screens/table/command.ts, which src/play cannot import): 30% of the logical width between 210 and 280, times the scale.
+        const commandWidth = Math.round(Math.min(280, Math.max(210, (width / scale) * 0.3)) * scale);
+        const barBottom = TOP_BAR * scale;
+        const box = trayBox({ commandWidth, insetRight: 0, screenHeight: height, barBottom, anchorTop: 200 }, scale);
+        const canvas = width - commandWidth;
+        const layout = tableLayout(canvas, height - barBottom, views, piles, { scale });
+        const trayLeft = canvas + commandWidth - box.right - box.width;
+        const at = `${width}x${height} at ${scale}`;
+        expect(trayLeft, at).toBeCloseTo(canvas + COLUMN_PAD * scale, 6);
+        expect(box.width, at).toBeGreaterThan(0);
+        for (const id of ["encounterDeck", "encounterDiscard"] as const) expect(layout.piles[id].x + layout.piles[id].w, `${id} ${at}`).toBeLessThanOrEqual(trayLeft);
       }
     }
   });

@@ -111,7 +111,7 @@ describe("top bar zones", () => {
 // word and lays its badge under the disc, and the row scrolls to it.
 describe("the Heading dial in the top bar (phase 39b)", () => {
   const SCREENS = [{ width: 667, inset: 0 }, { width: 844, inset: 47 }, { width: 1024, inset: 0 }] as const;
-  const SCALES = [UI_SCALES.small, UI_SCALES.medium, UI_SCALES.large] as const;
+  const SCALES = [UI_SCALES.small, UI_SCALES.medium, UI_SCALES.large, UI_SCALES.xlarge] as const;
 
   // The dials row of a two-handed game with the Heading dial, as the bar lays it out: the seat dials, a gap, the Heading dial (compact or not).
   function barOf(screen: (typeof SCREENS)[number], scale: number, seats: number) {
@@ -194,7 +194,7 @@ describe("the Heading dial in the top bar (phase 39b)", () => {
 
 describe("the Island Map chip in the top bar", () => {
   const SCREENS = [{ width: 667, inset: 0 }, { width: 844, inset: 47 }, { width: 1024, inset: 0 }] as const;
-  const SCALES = [UI_SCALES.small, UI_SCALES.medium, UI_SCALES.large] as const;
+  const SCALES = [UI_SCALES.small, UI_SCALES.medium, UI_SCALES.large, UI_SCALES.xlarge] as const;
 
   // The dials row of a two-handed game on the map: the seat dials, a gap, the chip right after them (with the word "Map", or without it where the full chip would make the row scroll).
   function barOf(screen: (typeof SCREENS)[number], scale: number, seats: number) {

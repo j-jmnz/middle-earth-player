@@ -36,7 +36,7 @@ export function RunHero({ overline, title, detail, seats, testID }: { overline: 
   const shadow = useTitleShadow();
   const big = size === "compact" ? 38 : 60;
   const rows = seats.filter((seat) => seat.length > 0);
-  // Two seats take two shorter, denser rows; a tight window (Large scale, a short phone) shorter tiles still, so the hero's primary
+  // Two seats take two shorter, denser rows; a tight window (Large or Extra large scale, a short phone) shorter tiles still, so the hero's primary
   // stays on the first screen.
   const two = rows.length > 1;
   const tight = short || s > 1;

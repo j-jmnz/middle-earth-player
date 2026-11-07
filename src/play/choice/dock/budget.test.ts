@@ -149,3 +149,40 @@ describe("the picture size of the lists and the choice's rows", () => {
     expect(trayRoom(false)).toBeGreaterThanOrEqual(LIST_PICTURE.h + 12);
   });
 });
+
+// The phone's own text size (docs/design-system.md, Type): React Native text follows it, so the budget counts a title's characters and the line
+// heights `text` times larger while the dock's padding stays. `text` 1 is what the budget was.
+describe("the words window at the phone's text size 2", () => {
+  it("counts the characters of a line and of a title twice as wide, and changes nothing at 1", () => {
+    expect(labelChars(198, 1, 1)).toBe(labelChars(198));
+    expect(titleLinesOf(LONG, 198, 1, 1)).toBe(titleLinesOf(LONG, 198));
+    expect(labelChars(400, 1, 2)).toBe(Math.floor(400 / (6.6 * 2)));
+    expect(labelChars(198, 1, 2)).toBeLessThanOrEqual(labelChars(198) / 2 + 1);
+    expect(titleLinesOf("Choose a hero", 198, 1, 1)).toBe(1);
+    expect(titleLinesOf("Choose a hero", 198, 1, 2)).toBe(2);
+    expect(titleLinesOf(LONG, 198, 1, 2)).toBe(2);
+  });
+
+  it("clamps the title to the lines that fit with each line twice as tall, never under one, and puts the button where no folded line fits", () => {
+    const plan = { dense: true, title: LONG, textWidth: 198, hasLine: true, foldable: true };
+    // One title line and one label line need 22 + 18 pt at text 1 and 44 + 36 at text 2.
+    expect(planWords({ ...plan, space: 40 })).toMatchObject({ showLine: true, titleLines: 1 });
+    expect(planWords({ ...plan, space: 40, text: 2 })).toMatchObject({ showLine: false, titleLines: 1, pill: true, pillOnTitle: true });
+    expect(planWords({ ...plan, space: 80, text: 2 }).showLine).toBe(true);
+    for (const space of [0, 20, 44, 60, 80, 120, 200]) {
+      const at = planWords({ ...plan, space, text: 2 });
+      expect(at.titleLines, `${space}`).toBeGreaterThanOrEqual(1);
+      expect(at.titleLines * 44 + (at.showLine ? 36 : 0) <= Math.max(space, 44) || at.titleLines === 1, `${space}`).toBe(true);
+    }
+    // The dock's padding is not text: the window is the same at any text size.
+    expect(wordsWindow({ room: 300, block: 100 })).toBe(300 - 100 - DOCK_PAD_PX);
+  });
+
+  it("holds at the Extra large scale together with text size 2 (the budget works in logical points at the scale)", () => {
+    const X = 1.3;
+    const plan = { dense: true, title: LONG, textWidth: 198 * X, hasLine: true, foldable: true, text: 2 };
+    const a = planWords({ ...plan, textWidth: 198, space: 80 });
+    const b = planWords({ ...plan, space: 80 * X }, X);
+    expect(b).toEqual(a);
+  });
+});

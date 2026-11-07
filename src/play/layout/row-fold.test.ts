@@ -162,8 +162,8 @@ function crowded(staging: number, engaged: number, extra: { attacker?: boolean }
 const SCREENS = [{ width: 591, height: 338 }, { width: 760, height: 330 }, { width: 980, height: 600 }];
 
 describe("the rule on the table", () => {
-  it("keeps every step at least 44 pt at Small, Medium and Large, folding only what must", () => {
-    for (const scale of [UI_SCALES.small, UI_SCALES.medium, UI_SCALES.large]) {
+  it("keeps every step at least 44 pt at every scale, folding only what must", () => {
+    for (const scale of [UI_SCALES.small, UI_SCALES.medium, UI_SCALES.large, UI_SCALES.xlarge]) {
       for (const screen of SCREENS) {
         for (const count of [3, 6, 9, 14]) {
           const { views, piles } = crowded(count, count);
@@ -224,7 +224,7 @@ describe("the rule on the table", () => {
 
   it("gives the fold stack a 44 pt hit, as every pile has", () => {
     const { views, piles } = crowded(14, 14);
-    for (const scale of [UI_SCALES.small, UI_SCALES.medium, UI_SCALES.large]) {
+    for (const scale of [UI_SCALES.small, UI_SCALES.medium, UI_SCALES.large, UI_SCALES.xlarge]) {
       const layout = tableLayout(591, 338, views, piles, { scale });
       for (const fold of layout.folds ?? []) {
         const slot = layout.slots.find((candidate) => candidate.id === fold.id);

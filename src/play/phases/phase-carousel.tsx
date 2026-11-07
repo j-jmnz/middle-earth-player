@@ -66,6 +66,7 @@ function CarouselBody({ carousel, width, settings, onChange }: { carousel: Carou
       <View style={{ width: left }}>
         {/* The round's label: Marcellus SC (small caps) in label type on one line, clear of the panel's 20 pt corner. */}
         <View style={{ height: ROUND_HEAD * s, justifyContent: "center", paddingLeft: (CONTAINER_RADIUS - 4) * s, paddingRight: 8 * s }}>
+          {/* Kept: a one-line label in a fixed ROUND_HEAD row and a column of fixed width, so it shrinks to the slot instead of cutting the words. */}
           <Text accessibilityRole="header" numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.8} className="font-display text-micro" style={{ color: t.muted, letterSpacing: 1.2 * s }}>
             {where}
           </Text>

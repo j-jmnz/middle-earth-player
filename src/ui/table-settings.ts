@@ -28,7 +28,7 @@ export type TableSettings = {
   animationSpeed: Speed;
   // The combat spotlight (phase 24): when an attack deals or blocks damage the table plays it large. Off plays none, as reduced motion does.
   spotlight: boolean;
-  // How large the whole UI draws: Small, Medium or Large (ui-scale.ts holds the factors).
+  // How large the whole UI draws: Small, Medium, Large or Extra large (ui-scale.ts holds the factors).
   uiScale: UiScaleOption;
   // A buzz on the table's key moments. Off plays none.
   haptics: boolean;
@@ -51,7 +51,7 @@ export type TableSettings = {
   bannerCloses: BannerClosesOption;
 };
 
-export const UI_SCALE_OPTIONS = ["small", "medium", "large"] as const;
+export const UI_SCALE_OPTIONS = ["small", "medium", "large", "xlarge"] as const;
 export type UiScaleOption = (typeof UI_SCALE_OPTIONS)[number];
 export const REDUCE_MOTION_OPTIONS = ["system", "always"] as const;
 export type ReduceMotionOption = (typeof REDUCE_MOTION_OPTIONS)[number];

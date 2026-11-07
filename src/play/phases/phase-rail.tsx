@@ -107,6 +107,7 @@ export function PhaseRail({
               <Text
                 testID={rail.phase ? "rail-phase" : "rail-current"}
                 numberOfLines={1}
+                // Kept: the rail's width is a fixed slot (RAIL_FLOOR counts it from this size), so the phone's larger text shrinks to it rather than widening the bar.
                 adjustsFontSizeToFit
                 minimumFontScale={0.85}
                 className="font-display"

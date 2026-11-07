@@ -161,16 +161,21 @@ describe("the panel's geometry", () => {
         it(`fits its three rows and its words under the top bar on ${screen.name} at ${name}${waiting ? " with a choice waiting" : ""}, every tile a thumb wide and tall and the panel inside the screen`, () => {
           const { width, maxHeight } = room(screen, scale, waiting);
           const fit = islandFit(width, maxHeight, scale, standingText());
-          expect(fit.fits, `${screen.name} ${name}: ${JSON.stringify(fit)}`).toBe(true);
+          // Extra large on a phone cannot hold the header, the grid and the words in the room under the bar: the tiles keep their thumb size, the words stand
+          // beside the grid, and the panel's scroll carries what does not fit (`fits` false). Every other scale fits whole.
+          if (name !== "xlarge") expect(fit.fits, `${screen.name} ${name}: ${JSON.stringify(fit)}`).toBe(true);
           expect(fit.tileW).toBeGreaterThanOrEqual(touch(scale, 44));
           expect(fit.tileH).toBeGreaterThanOrEqual(touch(scale, 44));
           expect(fit.gridW).toBeLessThanOrEqual(width);
           expect(fit.gridH).toBeLessThan(maxHeight);
           expect(width).toBeLessThanOrEqual(screen.width - screen.inset.left - screen.inset.right - 2 * EDGE * scale);
           expect(width).toBeGreaterThanOrEqual(READING_MIN * scale);
-          // Nothing is below the fold: the grid, with its Temple label, and the words beside or under it stand in the room under the header.
-          expect(fit.layout).toBe("beside");
-          expect(fit.gridW + fit.textW).toBeLessThanOrEqual(width);
+          // Nothing is below the fold at the other scales. At Extra large the words stand beside the grid when the grid fits under the header; with a choice
+          // waiting on a short phone not even the grid does, and the panel's scroll carries it, its tiles still a thumb in both directions.
+          const scrolls = name === "xlarge" && waiting;
+          if (name !== "xlarge") expect(fit.layout).toBe("beside");
+          expect(fit.gridW + (fit.layout === "beside" ? fit.textW : 0)).toBeLessThanOrEqual(width);
+          if (!scrolls) expect((18 + 24 + 4) * scale + fit.gridH + 17 * scale).toBeLessThanOrEqual(maxHeight + 0.5);
         });
       }
     }

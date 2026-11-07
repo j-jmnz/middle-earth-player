@@ -137,14 +137,14 @@ export function TableDock({
   const [room, setRoom] = useState({ column: 0, block: 0, text: 198 });
   const measure = () => root.current?.measureInWindow((_x, y) => onTop?.(Math.round(y)));
   // The folded line is one line on a short phone (under DENSE_BELOW tall, as the choice rows) and two on a taller one.
-  const screenHeight = useWindowDimensions().height;
+  const { height: screenHeight, fontScale } = useWindowDimensions();
   const dense = isDense(screenHeight, s);
-  const lines = dockLines({ guide, note, unavailable, chars: (dense ? 1 : 2) * labelChars(room.text - PILL_PT * s, s) });
+  const lines = dockLines({ guide, note, unavailable, chars: (dense ? 1 : 2) * labelChars(room.text - PILL_PT * s, s, fontScale) });
   // The words' window (budget in dock/budget.ts): the title keeps the lines that fit above the folded line and the buttons (and, with the
   // choice open, above one row), and the rest of it waits behind the "i", which sits on the title row when the room cannot hold a
   // folded line. With the choice open the folded line waits behind the "i" too.
   const space = room.column > 0 ? wordsWindow({ room: room.column, block: room.block + (trayOpen ? trayRoom(smallPictures(screenHeight, s)) * s : 0), dense }, s) : Infinity;
-  const plan = planWords({ space, dense, clamp: trayOpen, title: lead + title, textWidth: room.text, hasLine: !trayOpen && lines.first != null, foldable: lines.foldable || (trayOpen && lines.first != null) }, s);
+  const plan = planWords({ space, dense, clamp: trayOpen, title: lead + title, textWidth: room.text, hasLine: !trayOpen && lines.first != null, foldable: lines.foldable || (trayOpen && lines.first != null), text: fontScale }, s);
   const pill = plan.pill ? (
     // The "i" button (`dock-more`) opens the full title and every line; the More pill (`dock-more-actions`) folds the reading aids.
     // 26 pt round with a 44 pt target that stays clear of the line's words (6 pt gap) and inside the dock's padding.
@@ -218,7 +218,7 @@ export function TableDock({
               {refusal}
             </Text>
           ) : null}
-          <DockButtons key={resetKey} dock={dock} extras={extras} more={more} onMore={onMore} picked={picked} dense={dense} chars={labelChars(room.text, s)} onButton={onButton} />
+          <DockButtons key={resetKey} dock={dock} extras={extras} more={more} onMore={onMore} picked={picked} dense={dense} chars={labelChars(room.text, s, fontScale)} onButton={onButton} />
         </View>
       </View>
     </View>

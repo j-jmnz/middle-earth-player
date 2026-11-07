@@ -1,4 +1,4 @@
-// The segmented switch (docs/design-system.md, Components): two or three words in a tonal capsule track with no edge, a word optionally
+// The segmented switch (docs/design-system.md, Components): two to four words in a tonal capsule track with no edge, a word optionally
 // led by a game icon. It lives in src/play, in the table tokens, because the table's settings panel uses it too and src/play cannot
 // import src/screens; chrome-buttons.tsx re-exports it.
 import { Pressable, View } from "react-native";
@@ -10,7 +10,7 @@ import { touchSlop, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 import { Text } from "./text.tsx";
 
-/** Two or three mutually exclusive words in a tonal capsule track. Selected is a lighter capsule thumb, its word semibold in bone. */
+/** Two to four mutually exclusive words in a tonal capsule track. Selected is a lighter capsule thumb, its word semibold in bone. */
 export function Segmented<T extends string>({
   options,
   value,
@@ -57,7 +57,9 @@ export function Segmented<T extends string>({
       accessibilityRole="radiogroup"
       accessibilityLabel={accessibilityLabel}
       className={`flex-row ${stretch ? "" : "self-start"}`}
-      style={{ padding: pad, borderRadius: thumb / 2 + pad, ...sunkSurface(t) }}
+      // A stretched track whose words no longer fit one line (four words at Extra large, or at the phone's larger text sizes) wraps its
+      // options onto a second line, so none is cut or pushed off the screen.
+      style={{ padding: pad, flexWrap: stretch ? "wrap" : "nowrap", borderRadius: thumb / 2 + pad, ...sunkSurface(t) }}
     >
       {options.map((option) => {
         const selected = option === value;
