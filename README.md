@@ -5,6 +5,22 @@ An offline app for playing The Lord of the Rings: The Card Game solo, on iOS and
 > [!IMPORTANT]
 > This is a fan-made, community-supported project. It is not an official app or client for The Lord of the Rings: The Card Game. It is not associated with, endorsed by, sponsored by or approved by Fantasy Flight Games (FFG), Asmodee or Middle-earth Enterprises in any way. All game content belongs to its owners.
 
+## Contents
+
+- [Privacy and security](#privacy-and-security)
+- [How the code is written](#how-the-code-is-written)
+- [Features](#features)
+- [Roadmap](#roadmap)
+- [Accessibility](#accessibility)
+- [Architecture](#architecture)
+- [Install](#install): [What you need](#what-you-need), [Android](#android), [iPhone and iPad](#iphone-and-ipad), [Check a download](#check-a-download-optional), [If something goes wrong](#if-something-goes-wrong), [Privacy](#privacy)
+- [Local setup](#local-setup): [Requirements](#requirements), [In a browser](#in-a-browser), [On a phone](#on-a-phone), [Maestro](#maestro)
+- [Commands](#commands)
+- [Contributing](#contributing)
+- [Documentation](#documentation)
+- [Attribution](#attribution)
+- [License](#license)
+
 ## Privacy and security
 
 The app has no accounts, tracking, ads, analytics or crash reporting. Cards, rules, booklets and card pictures are bundled, so it plays offline. It goes online only to import a RingsDB deck. Saves stay in the app's private storage and are deleted with the app. Android permissions: `INTERNET` and `VIBRATE`. iOS: none.
