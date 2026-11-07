@@ -28,8 +28,9 @@ export type ScanTarget = { code: string; side: ScanSide; printing: string; urls:
 // Burdens and the Phial belong to later scenarios, but their printed text is settled here from the MEC109 scan.
 export const MEC109_CHANGED = ["141078", "141080", "141081", "141082", "141083", "141084", "142015", "142085", "142086"];
 
-// Cards the MEC112 printing words differently from the 2015 Treason of Saruman and Land of Shadow printings it reprints. Hall of Beorn's TTwT front text, keywords,
-// stats, shadow and quantity equal the twins' for all 156 pairs, so only the scans can show a reworded line: the scan read lists each card it finds changed.
+// Cards the 2023 MEC112 printing words differently from the 2015 Treason of Saruman and Land of Shadow printings it reprints. Hall of Beorn's TTwT front text, keywords,
+// stats, shadow and quantity equal the twins' for all 156 pairs, and no pinned scan shows the 2023 wording (the ledger's printing is ToS or LoS), so a MEC112 rewording
+// cannot be found from these scans: the list stays empty until a scan of the MEC112 cards is read.
 export const MEC112_CHANGED: readonly string[] = [];
 
 // Quest cards whose Hall of Beorn text has a known error the ledger corrects (typos, a duplicated line). They belong

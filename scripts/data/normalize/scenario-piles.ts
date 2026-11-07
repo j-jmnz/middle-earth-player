@@ -6,6 +6,8 @@ import { clausesOf, codesOf, type ParsedSetup, type SetupClause, type SetupStep 
 // the physical card it is loaded as and by no other card of that title.
 export type QuestFacts = {
   said: (kinds: readonly SetupClause["kind"][]) => boolean;
+  // The Setup puts this card into play engaged with the first player (the Passage of the Marshes' Gollum): the card waits set aside until then.
+  putEngaged: boolean;
   steps: (...wanted: readonly SetupStep[]) => boolean;
   stepExists: (...wanted: readonly SetupStep[]) => boolean;
   inSets: (list: readonly string[]) => boolean;
@@ -18,6 +20,7 @@ export function questFacts(args: { quest: ParsedSetup; code: string; printed: Ca
   const inSets = (list: readonly string[]) => list.some((name) => canon(name) === canon(printed?.encounterSet ?? "\u0000"));
   return {
     said: (kinds) => [...codesOf(quest, kinds)].some((named) => same(named, code)),
+    putEngaged: clausesOf(quest, "putIntoPlay").some((clause) => clause.under === "engagedFirstPlayer" && clause.codes.some((named) => same(named, code))),
     steps: (...wanted) => stepClauses.some((clause) => wanted.includes(clause.step) && clause.codes.some((named) => same(named, code))),
     stepExists: (...wanted) => stepClauses.some((clause) => wanted.includes(clause.step)),
     inSets,
@@ -30,12 +33,14 @@ export function questFacts(args: { quest: ParsedSetup; code: string; printed: Ca
 // by the encounter set the Setup sets aside.
 export function pileAccepts(args: { code: string; pile: string; printed: Card | undefined; quest: ParsedSetup; facts: QuestFacts }): boolean {
   const { code, pile, printed, quest, facts } = args;
-  const { said, steps, stepExists, setAsideBySet } = facts;
+  const { said, putEngaged, steps, stepExists, setAsideBySet } = facts;
   const own = printed?.text ?? "";
+  // The Setup shuffles the set this card is printed in and places it under a card (Journey to the Cross-roads' Men of Harad).
+  const setUnder = clausesOf(quest, "step").some((clause) => clause.step === "shuffleSetUnder" && facts.inSets(clause.asideSets ?? []));
   const fleet = stepExists("prepareFleet") && /Fleet/.test(printed?.encounterSet ?? "");
   switch (pile) {
     case "setAside":
-      return said(["aside", "putIntoPlay"]) || steps("takeControl", "attach", "prepareStormcallerArea") || setAsideBySet || (fleet && (printed?.type === "ship-objective" || printed?.type === "objective")) || (stepExists("asideEachOtherObjective") && printed?.type === "objective");
+      return said(["aside"]) || putEngaged || steps("takeControl", "attach", "prepareStormcallerArea") || setAsideBySet || (fleet && (printed?.type === "ship-objective" || printed?.type === "objective")) || (stepExists("asideEachOtherObjective") && printed?.type === "objective");
     case "activeLocation":
       return said(["active"]);
     case "attachedChosen":
@@ -74,7 +79,7 @@ export function pileAccepts(args: { code: string; pile: string; printed: Card | 
     case "greatSpiderDeck":
       return setAsideBySet;
     case "haradDeck":
-      return stepExists("shuffleSetUnder");
+      return setUnder;
     default:
       return true;
   }

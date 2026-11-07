@@ -1,6 +1,7 @@
 // Rules: mec112.setting-up-the-game, mec112.setup-the-uruk-hai, mec112.setup-helms-deep, mec112.setup-the-road-to-isengard, mec112.setup-the-passage-of-the-marshes,
 // mec112.setup-journey-to-the-cross-roads, mec112.setup-shelobs-lair, mec112.gollum-smeagol (data/rules/entries.json). The Two Towers campaign built from The Treason of
 // Saruman and The Land of Shadow (RingsDB twins of the MEC112 box): its codes, scenarios, piles and saga start.
+import { createHash } from "node:crypto";
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
@@ -16,6 +17,12 @@ import { DATA_DIR } from "./paths.ts";
 const cards = loadCards();
 const byCode = new Map(cards.map((card) => [card.code, card]));
 const campaign = loadCampaign("the-two-towers");
+
+// The first 16 hex digits of the sha256 of a record's JSON with its keys sorted.
+function digestOf(record: object): string {
+  const sorted = JSON.stringify(record, (_key, value: unknown) => (value && typeof value === "object" && !Array.isArray(value) ? Object.fromEntries(Object.entries(value).sort(([x], [y]) => (x < y ? -1 : 1))) : value));
+  return createHash("sha256").update(sorted).digest("hex").slice(0, 16);
+}
 
 // The Normal and Easy encounter decks, the cards each scenario sets aside or stages, and the decks beside the encounter deck.
 const DECK = {
@@ -60,7 +67,20 @@ describe("The Two Towers codes", () => {
   it("keeps the RingsDB record of a Two Towers player card and adds only the MEC112 printing", () => {
     const aragorn = byCode.get("143001");
     expect(aragorn?.printings.map((printing) => printing.pack)).toEqual(["ToS", "TTwT"]);
-    expect(aragorn?.text).toContain("Action: Spend 2 resources from Aragorn's resource pool to ready a hero.");
+    // RingsDB's marked-up text, not the ledger's plain words (printed.ts, applyPrinted).
+    expect(aragorn?.text).toContain("<b>Action:</b> Spend 2 resources from Aragorn's resource pool to ready a hero.");
+    // Every deck-legal ToS and LoS record, fields other than printings, as it was before the TTwT printing (a digest of each, `two-towers-ringsdb.json`).
+    const digests: Record<string, string> = JSON.parse(readFileSync(path.join(import.meta.dirname, "two-towers-ringsdb.json"), "utf8"));
+    expect(Object.keys(digests)).toHaveLength(27);
+    for (const [code, digest] of Object.entries(digests)) {
+      const card = byCode.get(code);
+      expect(card, code).toBeDefined();
+      const { printings, ...rest } = card!;
+      const packs = printings.map((printing) => printing.pack);
+      expect(packs[0], code).toMatch(/^(ToS|LoS)$/);
+      expect(packs.at(-1), code).toBe("TTwT");
+      expect(digestOf(rest), code).toBe(digest);
+    }
   });
 
   it("names one reprint set and pack per saga box, the Fellowship's unchanged", () => {

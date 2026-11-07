@@ -198,16 +198,17 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~6.8K tok)
+- `docs/phases/STATUS.md` — Phase status (~7.0K tok)
   - 5–15 Rules (~410)
-  - 16–89 Phases (~1.4K)
-  - 90–188 Open items (~4.4K)
+  - 16–89 Phases (~1.5K)
+  - 90–192 Open items (~4.5K)
     - 92–94 Releases (~50)
     - 95–116 Fixtures and Maestro (~1.2K)
     - 117–164 Rules and engine (~2.2K)
     - 165–185 Screens and code (~900)
-    - 186–188 Scenario pipeline (~30)
-  - 189–205 Standing decisions (~510)
+    - 186–189 Rules and engine (The Two Towers) (~100)
+    - 190–192 Scenario pipeline (~30)
+  - 193–209 Standing decisions (~510)
 
 ## Live plans
 
@@ -265,18 +266,18 @@ Read when a task names the plan.
   - 152–163 After each scenario phase (~210) ← 1
   - 164–167 Order (~70)
   - 168–175 Verification (~100)
-- `docs/plans/the-two-towers.md` — Plan: The Two Towers data and campaign shell (~9.7K tok)
+- `docs/plans/the-two-towers.md` — Plan: The Two Towers data and campaign shell (~9.6K tok)
   - 7–23 Decisions (~600)
   - 24–64 What the sources say (~2.1K)
     - 26–35 The product (~770)
     - 36–43 Card codes (~390)
     - 44–60 The scenarios, in order (~770)
     - 61–64 The first player's saga hero (~170)
-  - 65–78 How the Fellowship log carries into The Two Towers (~730)
+  - 65–78 How the Fellowship log carries into The Two Towers (~710)
   - 79–147 Phase 61: The Two Towers data (~3.9K)
     - 83–86 Goal (~150)
     - 87–90 Network order (~60)
-    - 91–130 Steps (~3.3K)
+    - 91–130 Steps (~3.2K)
     - 131–139 Exit (~230)
     - 140–147 Stop and ask the user (~210)
   - 148–195 Phase 62: The Two Towers campaign shell (~1.9K)
@@ -285,7 +286,7 @@ Read when a task names the plan.
     - 160–186 Steps (~1.4K)
     - 187–190 Exit (~80)
     - 191–195 Stop and ask the user (~70)
-  - 196–201 Notes for the orchestrator (~200)
+  - 196–201 Notes for the orchestrator (~170)
 
 ## Handovers
 

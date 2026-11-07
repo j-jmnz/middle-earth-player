@@ -1026,7 +1026,7 @@
       "from": "staging",
       "pile": "setAside",
       "reason": "DragnCards loads the four Soldier of Isengard in the staging area (Q0C.08, E0C.08). Stage 1A (The King of the Golden Hall, 143072) prints \"Each player sets 1 copy of Soldier of Isengard aside, out of play.\" and stage 2A adds each set aside copy to the staging area, so the copies start out of play, set aside.",
-      "source": "dragncards preBuiltDecks.json (Q0C.08, E0C.08); hallofbeorn.com/Export/QuestCards (The King of the Golden Hall, The Two Towers #72)"
+      "source": "dragncards preBuiltDecks.json (Q0C.08, E0C.08); scan 143072.A; hallofbeorn.com/Export/QuestCards (The King of the Golden Hall, The Two Towers #72)"
     },
     {
       "scenario": "helms-deep",
@@ -1034,7 +1034,7 @@
       "from": "staging",
       "pile": "campaign",
       "reason": "DragnCards loads the four Poisoned Counsels in the staging area (Q0C.08, E0C.08). Stage 1A (143072) prints \"Then, the players must choose: either each player shuffles 1 copy of Poisoned Counsels into his deck, or advance to stage 2A (bypassing stage 1B).\", so none is staged: they are the Helm's Deep burden, which the Setup shuffles into the players' decks and the campaign card's Resolution (143077) earns. The Setup record deals them.",
-      "source": "dragncards preBuiltDecks.json (Q0C.08, E0C.08); hallofbeorn.com/Export/QuestCards (The King of the Golden Hall; Helm's Deep Campaign)"
+      "source": "dragncards preBuiltDecks.json (Q0C.08, E0C.08); scan 143072.A; hallofbeorn.com/Export/QuestCards (The King of the Golden Hall; Helm's Deep Campaign)"
     },
     {
       "scenario": "the-passage-of-the-marshes",
@@ -1042,7 +1042,7 @@
       "from": "staging",
       "pile": "setAside",
       "reason": "DragnCards loads the Gollum / Sméagol card in the staging area (Q0C.10, E0C.10), on its Sméagol row. Stage 1A (The Taming of Sméagol, 144064) prints \"Put Gollum into play engaged with the first player.\", so he starts out of play, set aside, on his Gollum side.",
-      "source": "dragncards preBuiltDecks.json (Q0C.10, E0C.10); hallofbeorn.com/Export/QuestCards (The Taming of Sméagol, The Two Towers #124)"
+      "source": "dragncards preBuiltDecks.json (Q0C.10, E0C.10); scan 144064.A; hallofbeorn.com/Export/QuestCards (The Taming of Sméagol, The Two Towers #124)"
     },
     {
       "scenario": "shelobs-lair",
@@ -1050,7 +1050,7 @@
       "from": "staging",
       "pile": "setAside",
       "reason": "DragnCards loads the Gollum / Sméagol card in the staging area (Q0C.12, E0C.12). Stage 1A (The Stairs of Cirith Ungol, 144070) prints \"Put Sméagol into play under the first player's control.\", so he starts out of play, set aside, on his Sméagol side.",
-      "source": "dragncards preBuiltDecks.json (Q0C.12, E0C.12); hallofbeorn.com/Export/QuestCards (The Stairs of Cirith Ungol, The Two Towers #123)"
+      "source": "dragncards preBuiltDecks.json (Q0C.12, E0C.12); scan 144070.A; hallofbeorn.com/Export/QuestCards (The Stairs of Cirith Ungol, The Two Towers #123)"
     }
   ],
   "scenarioRemovals": [

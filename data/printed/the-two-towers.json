@@ -14,7 +14,7 @@
     {
       "code": "143001",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Aragorn.jpg",
         "sha256": "a905f695bd4133a93c62d2a6d2fd826be637c3f4af1dab3186b7381c8ccfc005"
@@ -32,7 +32,7 @@
     {
       "code": "143002",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Théoden.jpg",
         "sha256": "0e4687998be950c63cbaf132705566d7b82411d6d3cc233f3134471aea71bf35"
@@ -49,7 +49,7 @@
     {
       "code": "143003",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Treebeard.jpg",
         "sha256": "8574d7d55006a0a8978fa4b62f9ba4742410e520a1012723e07362f4b6c78fb8"
@@ -66,7 +66,7 @@
     {
       "code": "143004",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Gimli.jpg",
         "sha256": "e6b7acdc3f4398c61ff9df6949c52cee6714ce6f367607b9696970a1ca989b1b"
@@ -83,7 +83,7 @@
     {
       "code": "143005",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Legolas.jpg",
         "sha256": "1053550d857db3cad00e2fd03ae9c999c5953f2f6637a66ad428e771fc952c4d"
@@ -100,7 +100,7 @@
     {
       "code": "143006",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Quickbeam.jpg",
         "sha256": "467ccf5771a447af27548ec6cf29ffebe3a4ff5983f7c6122a7027f7f3c5b895"
@@ -117,7 +117,7 @@
     {
       "code": "143007",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Háma.jpg",
         "sha256": "3970f1c1f2c00de74ef624535b333a9a839b60acf534925135315c427c325486"
@@ -133,7 +133,7 @@
     {
       "code": "143009",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Ent-Draught.jpg",
         "sha256": "76e8801db037ce43c924cd3e6e740b0a7154a0d343fe48efe019bd277ad114cb"
@@ -151,7 +151,7 @@
     {
       "code": "143010",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Herugrim.jpg",
         "sha256": "ce7c60fbb099573b7ff3b697b5b259b4e1249bb88d7e4d3339e2dc5654bf04c5"
@@ -169,7 +169,7 @@
     {
       "code": "143015",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Intimidation.jpg",
         "sha256": "7752801b1cb899d0d058f9d8e5096dac37702e6a7e4e00682ca91150a7554543"
@@ -187,7 +187,7 @@
     {
       "code": "143016",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Hands-of-a-Healer.jpg",
         "sha256": "5c6185f173027b9f536e88b294009cb5dee00ffa576fb040582e38ac3529bece"
@@ -205,7 +205,7 @@
     {
       "code": "143017",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Forewarned.jpg",
         "sha256": "fd678b22a58a544af32b4622b39f953392870b971ff463c97d565c2920b7ebab"
@@ -223,7 +223,7 @@
     {
       "code": "143018",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Leader-of-Men.jpg",
         "sha256": "3fec5215d87a917ba657cd18f9e4ccbe1371a985746d5fe0572907056a2b5012"
@@ -241,7 +241,7 @@
     {
       "code": "143019",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Beyond-All-Hope.jpg",
         "sha256": "bc614fc65c7abfb531cf952aa90978d3783ae3c4b284679141a5777b86994f9a"
@@ -259,7 +259,7 @@
     {
       "code": "143020",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Palantír-of-Orthanc.jpg",
         "sha256": "f283683c1b9d543cfd2aaf9fde22a803fffe10f402ab21dd6ddf6a9f1ea1783a"
@@ -277,7 +277,7 @@
     {
       "code": "143021",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Poisoned-Counsels.jpg",
         "sha256": "60b03fedf5e502196a01f0fc64084855bd57c38de15254c408c122ebcca025e6"
@@ -294,7 +294,7 @@
     {
       "code": "143022",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/To-Isengard.jpg",
         "sha256": "c7c4714f82321cc10a3397c3a0e3779e9599b7ce62fa2ecb1f30da78247f7231"
@@ -311,7 +311,7 @@
     {
       "code": "143023",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Uglúk.jpg",
         "sha256": "df2a83bca92020430df8698fb49a8bbe35a8c983c864247ca956981d24007635"
@@ -328,7 +328,7 @@
     {
       "code": "143024",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Grishnákh.jpg",
         "sha256": "a68fc85753b0a10aa0b7341b226dd2adc4d9fcd51cc42d28918fae8af7dc7fb1"
@@ -346,7 +346,7 @@
     {
       "code": "143025",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Uglúk's-Uruk-hai.jpg",
         "sha256": "66fa4b239c6f47e21baf97ec1ecf8a1cfc4e04e2bdf075c66bddfd878597d29f"
@@ -363,7 +363,7 @@
     {
       "code": "143026",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Wold.jpg",
         "sha256": "7762ee47c15c33770321d4e04fbe1213a7d6ade9709abcef57185c83636fbf62"
@@ -380,7 +380,7 @@
     {
       "code": "143027",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Eastemnet.jpg",
         "sha256": "2b6f9553bd5399172856414f3c85270b0ee88dd9432067297c7824e1ae78ebc6"
@@ -397,7 +397,7 @@
     {
       "code": "143028",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Plains-of-Rohan.jpg",
         "sha256": "2f6cdfc5d73cdeb9af2d1289bee03adea17d3fe5cf53b94ec60ee5029a1607b4"
@@ -414,7 +414,7 @@
     {
       "code": "143029",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Banks-of-Entwash.jpg",
         "sha256": "e7998b1a37f8655390a7baaa4176631a309f2c9e8602833481b219ca92ea25bb"
@@ -431,7 +431,7 @@
     {
       "code": "143030",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Rest-by-Night.jpg",
         "sha256": "c1cc989dc6b7e604b05361e7f8f1ce8f0573baa5c3139e535e2c5418e01115f5"
@@ -448,7 +448,7 @@
     {
       "code": "143031",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Strange-Weariness.jpg",
         "sha256": "75d228925bd587cca0950132f9fdab51df13ba3709f635db52a4aff5673c5455"
@@ -466,7 +466,7 @@
     {
       "code": "143032",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Unseen-Barrier.jpg",
         "sha256": "9a5649aa65092014e35cb73de95c698d28aefe4d47d755998b725a7b0a9405a6"
@@ -484,7 +484,7 @@
     {
       "code": "143033",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Defense-of-Helm's-Deep.jpg",
         "sha256": "43d09f56694a100e7969f877a7582274a9423ff3de43d0d26e1b8052dd19464c"
@@ -502,7 +502,7 @@
     {
       "code": "143034",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Wild-Hillman.jpg",
         "sha256": "2538309cf0114288f80f08c795a7872563e6816a563e2ff695722c8f16c43b26"
@@ -519,7 +519,7 @@
     {
       "code": "143035",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Warrior-of-Dunland.jpg",
         "sha256": "660c03e40c5f2ba86bc5053e44450423d22a57980f4937a8840199e3d8d28deb"
@@ -537,7 +537,7 @@
     {
       "code": "143036",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Soldier-of-Isengard.jpg",
         "sha256": "84adf46a62e926a5cca5b88e57d04777613605d0a561b68b878c743349e9b3cb"
@@ -555,7 +555,7 @@
     {
       "code": "143037",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Hornburg.jpg",
         "sha256": "c86c87ed5f7a8e13f0a4246242afc6f2f1e5886e18b8698de9b6063a1253b37c"
@@ -572,7 +572,7 @@
     {
       "code": "143038",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Deeping-Wall.jpg",
         "sha256": "bcbcf95408984e42fbf61dfe744b8be9677bc94620fc1cc5ab7736fa20b5a11d"
@@ -589,7 +589,7 @@
     {
       "code": "143039",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Deeping-Culvert.jpg",
         "sha256": "6de689b393b3186ef1fad58ea63775a0840cdf5e58cc98cae4b7ba9decee0d66"
@@ -607,7 +607,7 @@
     {
       "code": "143040",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Postern-Door.jpg",
         "sha256": "01b1ac8885f7f0d0d88ad27b8ae63175f4198bee7ae8f26577dd17c8a29cd58a"
@@ -624,7 +624,7 @@
     {
       "code": "143041",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Helm's-Gate.jpg",
         "sha256": "1311b11d9caca44637e420a3af1ea1d17d4e784f8c72a52682ebacefd90711fb"
@@ -641,7 +641,7 @@
     {
       "code": "143042",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Scaling-Ladders.jpg",
         "sha256": "93a857a16d71a843ab985ee76f280652ced847ea85be5d49438601d0891d3750"
@@ -660,7 +660,7 @@
     {
       "code": "143043",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Devilry-of-Saruman.jpg",
         "sha256": "496ea6128baec54fc3663f743cb9fb66a351bc3f241f2467809a21d278bb8f72"
@@ -677,7 +677,7 @@
     {
       "code": "143044",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Reckless-Hate.jpg",
         "sha256": "841d194ea82221afce5a0ed110e333434060c93138a628ff09c72e6b820af8a8"
@@ -695,7 +695,7 @@
     {
       "code": "143045",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Night-Without-End.jpg",
         "sha256": "a8dfc0b0c45c29bc394b8202f2c37687bf2de134a41981fd9099655b27dd859c"
@@ -713,7 +713,7 @@
     {
       "code": "143046",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Ent-of-Fangorn.jpg",
         "sha256": "753dfad5a9c78eff1a15d47590fc31aebee2c95027c9191735aa1a14fcf14218"
@@ -729,7 +729,7 @@
     {
       "code": "143047",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Saruman.jpg",
         "sha256": "e59fe9c6bd12a86af9b45d36a98c14f6004c689cdf93e9ef5a4e3c564373fb07"
@@ -747,7 +747,7 @@
     {
       "code": "143048",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Saruman's-Staff.jpg",
         "sha256": "25067449ebf2812894ea4bec3effebc491d4d239dd0fda8d1722aa281bc738b4"
@@ -765,7 +765,7 @@
     {
       "code": "143049",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Gríma.jpg",
         "sha256": "50cdb013c4c30540317bc8d646f74ad4f49142e1c939a362922e83be5734ed12"
@@ -783,7 +783,7 @@
     {
       "code": "143050",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Lieutenant-of-Orthanc.jpg",
         "sha256": "05da805ff78462049c509f55c324a57bd98a4b8ef3c3705855afac58856c2441"
@@ -799,7 +799,7 @@
     {
       "code": "143051",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Isengard-Orc.jpg",
         "sha256": "fe75b21348809bf0708e5554b6feb1347f0326141b2e634644cef6e92208c6ca"
@@ -817,7 +817,7 @@
     {
       "code": "143052",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Wolf-of-Isengard.jpg",
         "sha256": "45c0a0b9884444a28ad808427a00993cf7387bb1108de48e2ef7981456f14632"
@@ -835,7 +835,7 @@
     {
       "code": "143053",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Orthanc.jpg",
         "sha256": "949d555f8fcca233f64461506e42c6562bf8881511bf3e8ecd25c51660784da5"
@@ -852,7 +852,7 @@
     {
       "code": "143054",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Gates-of-Isengard.jpg",
         "sha256": "e982b27d9fe34e8659e38196fa2ca1a7a1bc3c264fceed54110b7ebabe695798"
@@ -869,7 +869,7 @@
     {
       "code": "143055",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Ring-wall-of-Isengard.jpg",
         "sha256": "9cc8932b7cc4a09a7b9ac7d13ddcdc7ba0d1fbcbffba0bb47121048c6d5c416f"
@@ -886,7 +886,7 @@
     {
       "code": "143056",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Underground-Armoury.jpg",
         "sha256": "b926ec4559152520e1a759982f5e654e42bc9c9232b7a902591cc08c8f0dc5e5"
@@ -903,7 +903,7 @@
     {
       "code": "143057",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Steaming-Vent.jpg",
         "sha256": "8c089965dd24538140a275d24c4bd96f55fb128ecdb3b3b635efd60d358d210c"
@@ -920,7 +920,7 @@
     {
       "code": "143058",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Plain-of-Isengard.jpg",
         "sha256": "6b8ec319e39e157387e113179e0fb5531ad1968b4ab71c6f8623132e4a77f03c"
@@ -938,7 +938,7 @@
     {
       "code": "143059",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Open-Pit.jpg",
         "sha256": "7febeced95df9af026b808b5e065556ee86b2ce10d002fb8f6e00d7e1607e02f"
@@ -955,7 +955,7 @@
     {
       "code": "143060",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Blast-of-Sorcery.jpg",
         "sha256": "3c16d719f7855c6b01d63d27ce7d1f32fb74e7ec43799a3706ad3fde26ee8abb"
@@ -973,7 +973,7 @@
     {
       "code": "143061",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Poisoned-Vapour.jpg",
         "sha256": "2abd25d7aa95612dd67a0f764df3eaa35b247f7240c23ab2a831ea555de47b6a"
@@ -991,7 +991,7 @@
     {
       "code": "143062",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Machines-of-Isengard.jpg",
         "sha256": "4988afc1802e6507a90a02e5545fca1ed118086454063ec49e961fea38ae21b0"
@@ -1008,7 +1008,7 @@
     {
       "code": "143063",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Isengard-Uruk.jpg",
         "sha256": "f441cee32fa796fe6cd89116dcd9a9b1b87529f5b62f2ab6a84e4180631288ae"
@@ -1025,7 +1025,7 @@
     {
       "code": "143064",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Uruk-hai-Fighter.jpg",
         "sha256": "7158795332d0646c7b77fd42b8026458f0595d06ffc10d14eaa50b50978fc990"
@@ -1043,7 +1043,7 @@
     {
       "code": "143065",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Fighting-Uruk-hai.jpg",
         "sha256": "0389bb4f744c12cafdee1b606dda9ce2f43b2ad201f8548efc74fbb931222152"
@@ -1060,7 +1060,7 @@
     {
       "code": "143066",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Snaga.jpg",
         "sha256": "eb62eb7e51bff271cfe3c9dd311b828ea059c63039ef982db6936d755af3d665"
@@ -1077,7 +1077,7 @@
     {
       "code": "143067",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Saruman's-Orders.jpg",
         "sha256": "180b9959a003e53cd0ec874cfc742ecf87cd72f29132d230cda418453d6bea24"
@@ -1094,7 +1094,7 @@
     {
       "code": "143068",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Saruman's-Voice.jpg",
         "sha256": "030606da374af1c264bd54b188763b6557f86f4ee6354264d2c41c9eab01511c"
@@ -1111,7 +1111,7 @@
     {
       "code": "143069",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Follow-the-Orcs-1A.jpg",
         "sha256": "3164054efd18c76bca9969f58232e7fcd8df0f17bfd365dacafa40b542af4c09"
@@ -1128,7 +1128,7 @@
     {
       "code": "143069",
       "side": "B",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Follow-the-Orcs-1B.jpg",
         "sha256": "24ae92a5126043d0deb85bd87dc6caa310017d57975d79b25bf7555af6ad69ff"
@@ -1146,7 +1146,7 @@
     {
       "code": "143070",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Rescue-the-Captives-2A.jpg",
         "sha256": "63098ffcc2f30ca23f6b04da9b25b59955e6ccb5f91198ab8cf654154ec604b7"
@@ -1162,7 +1162,7 @@
     {
       "code": "143070",
       "side": "B",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Rescue-the-Captives-2B.jpg",
         "sha256": "3b6f4a3e56732a8de357d2ad0a2fd7aa3d4ced5880d80f4860708fe459b8f7f2"
@@ -1180,7 +1180,7 @@
     {
       "code": "143071",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Uruk-hai-SetupA.jpg",
         "sha256": "b904e25bed02d85cf9eeb557119482e8932114a3fc219f03b539cc56c023113c"
@@ -1203,7 +1203,7 @@
     {
       "code": "143071",
       "side": "B",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Uruk-hai-SetupB.jpg",
         "sha256": "586c453f772d0d72a59d5c1123ff6a3252b620c274bacff927d6ba82589f8b85"
@@ -1225,7 +1225,7 @@
     {
       "code": "143072",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-King-of-the-Golden-Hall-1A.jpg",
         "sha256": "70b676ce32087e5ea2f5703ea8653bd19a8a633dafb989820440343a462c6835"
@@ -1241,7 +1241,7 @@
     {
       "code": "143072",
       "side": "B",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-King-of-the-Golden-Hall-1B.jpg",
         "sha256": "7d0dda2e23128fb449a56af074e16e183e0ba893cc23e5bc4c4f1e5b4a5bf6ab"
@@ -1259,7 +1259,7 @@
     {
       "code": "143073",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Assault-on-Helm's-Deep-2A.jpg",
         "sha256": "968ef1511f6f1903677f892130a5bda2e7511528842ac8d933fd4f58a89c1efe"
@@ -1275,7 +1275,7 @@
     {
       "code": "143073",
       "side": "B",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Assault-on-Helm's-Deep-2B.jpg",
         "sha256": "9dedf07a66a4ee0a36f105a045509facb6d90a4910454375cee7c70d6859f914"
@@ -1293,7 +1293,7 @@
     {
       "code": "143074",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Hosts-of-Isengard-3A.jpg",
         "sha256": "0d17b5bb43f24bdecb8dc03750ac59f8de0d24ddff98f708fe381be507f61c12"
@@ -1309,7 +1309,7 @@
     {
       "code": "143074",
       "side": "B",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Hosts-of-Isengard-3B.jpg",
         "sha256": "6f6391b0be0fe7bafcf2a4fafb0b6d626db871195c028de4c4bf6d6552b2dfd9"
@@ -1326,7 +1326,7 @@
     {
       "code": "143075",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Wall-is-Breached-4A.jpg",
         "sha256": "8d70a64bffe84cd6c92d4a967430487c3fb3b1d1b60a78789b3e308a5343150c"
@@ -1342,7 +1342,7 @@
     {
       "code": "143075",
       "side": "B",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Wall-is-Breached-4B.jpg",
         "sha256": "574884b850a89f9557518b3ee961917f2b848810eb4603640a2b623944a5d5d7"
@@ -1360,7 +1360,7 @@
     {
       "code": "143076",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-King-Rides-Out-5A.jpg",
         "sha256": "3a22382e80660ea41352229b81666cfa566687b5518405efd0d7af3136ef334a"
@@ -1376,7 +1376,7 @@
     {
       "code": "143076",
       "side": "B",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-King-Rides-Out-5B.jpg",
         "sha256": "01b45d2861073a210f95cb8c921c483dc68ec7602ea480f7899d6c941281c4d1"
@@ -1393,7 +1393,7 @@
     {
       "code": "143077",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Helm's-Deep-SetupA.jpg",
         "sha256": "e122fb84046266144510a8994cd4ae247e17c7aa3851867cd0b834c8647e59b5"
@@ -1416,7 +1416,7 @@
     {
       "code": "143077",
       "side": "B",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Helm's-Deep-SetupB.jpg",
         "sha256": "9506b86ec6e7f8b6840f94d00c5781123c769ee95e857edc690dcdea98d155ad"
@@ -1432,7 +1432,7 @@
     {
       "code": "143078",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Rouse-the-Ents-1A.jpg",
         "sha256": "c7e932ef85616d248b86e1801827f9e1cd6c51745204284d7ed0d467f9432ee0"
@@ -1448,7 +1448,7 @@
     {
       "code": "143078",
       "side": "B",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Rouse-the-Ents-1B.jpg",
         "sha256": "fc761fcbf09892605e3e7a03fbf1f5345783e57c9746b7f0573698c1232e966d"
@@ -1465,7 +1465,7 @@
     {
       "code": "143079",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Breaking-Isengard-2A.jpg",
         "sha256": "8815e04885064b4b4b8111d04be6ec772bd9b740cc5ee87bcf7786c5b9f652a4"
@@ -1481,7 +1481,7 @@
     {
       "code": "143079",
       "side": "B",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Breaking-Isengard-2B.jpg",
         "sha256": "d59898778f1e03da57ca21b15bff1047492f03775c0096ad5aa205ad7b7d5a59"
@@ -1499,7 +1499,7 @@
     {
       "code": "143080",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Voice-of-Saruman-3A.jpg",
         "sha256": "fcc5ef4b90ad51f8f8ddb9affded65f1a7d3b45e4bec9c5cc5af10e06b7bc2e1"
@@ -1515,7 +1515,7 @@
     {
       "code": "143080",
       "side": "B",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Voice-of-Saruman-3B.jpg",
         "sha256": "6a0f58c8469d43b430b4fd8223e8e1f7e3bebe7961f1f12a67abcf419da2cccf"
@@ -1533,7 +1533,7 @@
     {
       "code": "143081",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Road-to-Isengard-SetupA.jpg",
         "sha256": "dc43a9f1c99eff4e3b901b2db59696ee089b3ab8019f4ba7ce02d613af045d25"
@@ -1556,7 +1556,7 @@
     {
       "code": "143081",
       "side": "B",
-      "printing": "MEC112",
+      "printing": "ToS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Road-to-Isengard-SetupB.jpg",
         "sha256": "c39cc22dec9f2045f5d25ef0e900fe7e8d6f22a56572426f732e4fcbc02a89e9"
@@ -1572,7 +1572,7 @@
     {
       "code": "144001",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Frodo-Baggins.jpg",
         "sha256": "20b64143efbc18e5687b3f9534b780a44a0f941421147cd9bfc070ca0a0f61a1"
@@ -1589,7 +1589,7 @@
     {
       "code": "144002",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Faramir.jpg",
         "sha256": "5ede7826acea87b0db8a33e5a0673c4e5e58dd568ad3b96fdc03d7d54c387dea"
@@ -1606,7 +1606,7 @@
     {
       "code": "144004",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Anborn.jpg",
         "sha256": "6319166f2345a6a46e338b3e80e3958c38003bfe50f8081fba91891caeecc7eb"
@@ -1622,7 +1622,7 @@
     {
       "code": "144005",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Mablung.jpg",
         "sha256": "76d092e2abec745499b33707727026a0a3aaf95d50aa0cbbe9cc0b47ac465341"
@@ -1638,7 +1638,7 @@
     {
       "code": "144006",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Skinbark.jpg",
         "sha256": "6b1b59bcaceaf1e5f1f4d4b5fc1343fc23320d0d237cdcb1a9a0fbfa8facb29a"
@@ -1655,7 +1655,7 @@
     {
       "code": "144007",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Gamling.jpg",
         "sha256": "884d4ad2c69fc8bf6afa54e64a628b4f5152b75486d3691001080edd41f79e40"
@@ -1671,7 +1671,7 @@
     {
       "code": "144010",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Snowmane.jpg",
         "sha256": "daa13cb1040d29648cffc33cb47413c2ad19b0937975b3c8a411cfc63672b9c7"
@@ -1689,7 +1689,7 @@
     {
       "code": "144014",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Brace-of-Coneys.jpg",
         "sha256": "0e3d45e93ec04e7d604c4eb3de670b0432456e11eb8760a36586e0d0b62156dd"
@@ -1706,7 +1706,7 @@
     {
       "code": "144015",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Searching-Eye.jpg",
         "sha256": "ba3397b09810ea2c588e0a202c1a2ca3157fcfe2d2dcb16aa709642323c976ff"
@@ -1723,7 +1723,7 @@
     {
       "code": "144016",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Groping-Dead.jpg",
         "sha256": "349d200044397dcd3f93e0e0ba7a268a6e7b83c6ff64267658b2640e72834dcf"
@@ -1742,7 +1742,7 @@
     {
       "code": "144017",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Dead-Things.jpg",
         "sha256": "c4ed85723b09f1371ed6f5bcfb1eb9ebca67ba2cf1ebce1524859031b91e82fe"
@@ -1761,7 +1761,7 @@
     {
       "code": "144018",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Candle-bearer.jpg",
         "sha256": "27dc9caefc30652e96e3b90f98a0047845be0f72392aaae6151bf8bc03ec60ca"
@@ -1780,7 +1780,7 @@
     {
       "code": "144019",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Evil-smelling-Fens.jpg",
         "sha256": "c93f136e9b200fb3bfa5bc10d0dc9172220f8a410e5d35d2aaf0c00a41c078d5"
@@ -1799,7 +1799,7 @@
     {
       "code": "144020",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Shifting-Quagmire.jpg",
         "sha256": "81169a7c4b3b2134fc7010b7a32adcf7a1afa6841f36a571655b07144e7ee748"
@@ -1818,7 +1818,7 @@
     {
       "code": "144021",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Haunted-Mere.jpg",
         "sha256": "c8fc7b370ed21fdcaca21eb476373228aa88276fc7b9377c6d586d10164ecb8e"
@@ -1836,7 +1836,7 @@
     {
       "code": "144022",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Stagnant-Pools.jpg",
         "sha256": "f234a5b963884346564059ca3ca778f6c16c390cfee9da86d92875b0b885281f"
@@ -1855,7 +1855,7 @@
     {
       "code": "144023",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Soft-Mires.jpg",
         "sha256": "d6b978346ad0af87b07e55a4c16931ffca654dfbbd7786c6ae77972760a69a22"
@@ -1873,7 +1873,7 @@
     {
       "code": "144024",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Creeping-Marshes.jpg",
         "sha256": "a78155765c8d4321880a27cec00d82004056c0838106942ee4e15df59945e9da"
@@ -1890,7 +1890,7 @@
     {
       "code": "144025",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Bitter-Reek.jpg",
         "sha256": "7d76fd4377c86ebc664c20050d010833990e63da245a2e61e97ea425eeda0010"
@@ -1909,7 +1909,7 @@
     {
       "code": "144026",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/A-Fell-Light.jpg",
         "sha256": "e2e7535d3ed0d5b5b96ba3f7e2316a2acee50d20181c5c3442b8aaac484f823e"
@@ -1928,7 +1928,7 @@
     {
       "code": "144027",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Black-Gate.jpg",
         "sha256": "cd0d03826740601ca6c426d6d9cbcc0c6ed33fb4602f230e01878d759a94be97"
@@ -1946,7 +1946,7 @@
     {
       "code": "144028",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Man-of-Harad.jpg",
         "sha256": "e0e06d4d7e4ee757b2f76df35d0d2f7e23c244b257279f10e0a7ee4c52d745f7"
@@ -1965,7 +1965,7 @@
     {
       "code": "144029",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Captain-of-Harad.jpg",
         "sha256": "a6557b3092764ed39c014a9180bb229cd00d2ad070d717a6490350890b2c5cab"
@@ -1983,7 +1983,7 @@
     {
       "code": "144030",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Cross-roads.jpg",
         "sha256": "88df4a6f82b24411e6f72f721cdafda86034d892034b70bb246ff8668b8999ab"
@@ -2001,7 +2001,7 @@
     {
       "code": "144031",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Henneth-Annûn.jpg",
         "sha256": "193ff1310f7d0cd9c4b66ca6768b1306d866207e48c2548d40e758f80b5ea1d3"
@@ -2018,7 +2018,7 @@
     {
       "code": "144032",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Southward-Road.jpg",
         "sha256": "6d790ae166b48e03dd92b92ee15b0ca513ef1a75bbddc84b4700bb2dac9d18aa"
@@ -2035,7 +2035,7 @@
     {
       "code": "144033",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Foothills-of-Ephel-Dúath.jpg",
         "sha256": "c67e5c4e8ddadcd96e77cde4c6ecf24ab77a7c90909bb59faebbbc20e16a3772"
@@ -2052,7 +2052,7 @@
     {
       "code": "144034",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Ithilien-Woods.jpg",
         "sha256": "8b2b070a34235b54bbd5210bb473cba87d2e4216c15c91932a596eae289e447f"
@@ -2070,7 +2070,7 @@
     {
       "code": "144035",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Hills-of-Ithilien.jpg",
         "sha256": "bdbd0cfed7ee475327b2bfaf28fc135431e328bdb5b863126fd3609c04a0688b"
@@ -2088,7 +2088,7 @@
     {
       "code": "144036",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Dark-Lord's-Summons.jpg",
         "sha256": "ce6c64ce72a6f173bef62dea44db3eb0b15ec6c4da432c56ed0ad6e602adbd87"
@@ -2106,7 +2106,7 @@
     {
       "code": "144037",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Marching-Up-the-Road.jpg",
         "sha256": "fca7c463190e1fbd0a65ca2cac2b6e997edbca76aa264a6bc22f6fa7916c0c9c"
@@ -2124,7 +2124,7 @@
     {
       "code": "144038",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Fierce-Southrons.jpg",
         "sha256": "c7a52ac844c67910b9e6f7d851954ddaba9d3c34be0826ec94423dbf8850597a"
@@ -2141,7 +2141,7 @@
     {
       "code": "144039",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Arrows-Thick-in-the-Air.jpg",
         "sha256": "8a733f700cdce763f0d7c08303a9c802cbeb537a9f8d199afdb854905a972a7f"
@@ -2159,7 +2159,7 @@
     {
       "code": "144040",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Shelob.jpg",
         "sha256": "ad33fa9b407de79b07ee8eefb2d0f1e6daa14f2e144143d2bb76cba4faaba345"
@@ -2178,7 +2178,7 @@
     {
       "code": "144041",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Morgul-Orc.jpg",
         "sha256": "b149a608b7c4a8d56b8e356aada2a90049de04f23b7bb927ced408af50a322d2"
@@ -2197,7 +2197,7 @@
     {
       "code": "144042",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Orc-of-Cirith-Ungol.jpg",
         "sha256": "80605e396a480d5f29c8811bc64aae03d25618db15aeaf991e3111c750b96fe6"
@@ -2214,7 +2214,7 @@
     {
       "code": "144043",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Morgul-Vale.jpg",
         "sha256": "f2404618ef89baf5247a3f2dc9c19e09ede79529cc86fe81f9c55393029da39d"
@@ -2231,7 +2231,7 @@
     {
       "code": "144044",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Sméagol's-Secret-Way.jpg",
         "sha256": "a8054b7a17625e428bc42788bdd0ffcf6be808023c67f485c49d4eff2adfc05e"
@@ -2249,7 +2249,7 @@
     {
       "code": "144045",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Cleft-of-Cirith-Ungol.jpg",
         "sha256": "797243518418ba8f5fd42fd08d0486958894e9ceb5b0e16ea554076cbe600f15"
@@ -2268,7 +2268,7 @@
     {
       "code": "144046",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Spider's-Lair.jpg",
         "sha256": "eb8becd97329298a51a30003ae927276f2571853e8128ea6f610ead0ff8731fa"
@@ -2286,7 +2286,7 @@
     {
       "code": "144047",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Under-way.jpg",
         "sha256": "e50e3a1e982b79c9c8258a25c9274e8f88c3593034c1a1fbd6ae3ca193e764ff"
@@ -2304,7 +2304,7 @@
     {
       "code": "144048",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Deep-Dark-Passage.jpg",
         "sha256": "f26de56004076938f83aa8f0b0d47bbf9a17c44e55b544a8ff24d70f8c70b400"
@@ -2322,7 +2322,7 @@
     {
       "code": "144049",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Den-of-Night.jpg",
         "sha256": "2964058f06ea15b8387bc3fcfb90c8bc3eb8ccc87681d79f985cc3e09bee7bea"
@@ -2339,7 +2339,7 @@
     {
       "code": "144050",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Exhalation-of-Decay.jpg",
         "sha256": "58917f367efb66ea8652e8b1e0e7473e6ab35e7e9153f79b0c13cf095afd5046"
@@ -2357,7 +2357,7 @@
     {
       "code": "144051",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Many-Openings.jpg",
         "sha256": "e940d721f6f8511bdeed5fd9453eeea21c7a206182d10c92e1b625cff72fabf3"
@@ -2375,7 +2375,7 @@
     {
       "code": "144052",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/A-Heavy-Burden.jpg",
         "sha256": "51264dfa4e456459218dc421223b6ecd1947ed90d558c5c8f510b3533327bbfd"
@@ -2393,7 +2393,7 @@
     {
       "code": "144053",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Morgul-Wraith.jpg",
         "sha256": "25aeb91d56cd26161ceedd0dab27f8fa60c5dd8881d77228cbef4696e85d3f3b"
@@ -2410,7 +2410,7 @@
     {
       "code": "144054",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Call-of-the-Ring.jpg",
         "sha256": "248eb1e5ffdd97726d9a7e435a3de1a6d551a85decdf3924d8184e60aa238bdc"
@@ -2428,7 +2428,7 @@
     {
       "code": "144055",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/We-Hates-Them.jpg",
         "sha256": "608ebdc86b277716eaa39e0e62a29a10b6cb030aaf981c96273f530208c3e397"
@@ -2447,7 +2447,7 @@
     {
       "code": "144056",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Oliphaunt.jpg",
         "sha256": "fd86336c017435dde3ff785b145e52c6ea1b87f26d3c09070294df1137e330f4"
@@ -2466,7 +2466,7 @@
     {
       "code": "144057",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Haradrim-Soldier.jpg",
         "sha256": "1bc64aa0a8864269073b272411b0b5d46a974c93c59c903e0a1142b903a800e2"
@@ -2484,7 +2484,7 @@
     {
       "code": "144058",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Haradrim-Archer.jpg",
         "sha256": "5c9f001f39a3d26c2ffe57239e3100e3473faa57d30e7ed6c6ff0d58d3d4bd4c"
@@ -2503,7 +2503,7 @@
     {
       "code": "144059",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Blocked-Tunnel.jpg",
         "sha256": "58adcf4c782dc659466ca841a3b101061dae6efab029e3535901bd08a01b1810"
@@ -2521,7 +2521,7 @@
     {
       "code": "144060",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Shelob's-Poison.jpg",
         "sha256": "8d3cffd762f591b343a3f1128aa9053acbde251a0557d214a034391e1454f713"
@@ -2539,7 +2539,7 @@
     {
       "code": "144061",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Lurking-Malice.jpg",
         "sha256": "b00ae832054cc2a796abceb0784eab421a89df382c9447ad8a33f34cfb4d08cf"
@@ -2558,7 +2558,7 @@
     {
       "code": "144062",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Rage-and-Hunger.jpg",
         "sha256": "32f60ffef2371858387e93ca888fdaf30c7a6474f8b7ca9df9d1bcbec67cf9d2"
@@ -2576,7 +2576,7 @@
     {
       "code": "144063",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-One-Ring.jpg",
         "sha256": "ee2530a9a57f2f92cc61670fe5d419328dd4bac8031d1c85d839172343aa70c8"
@@ -2595,7 +2595,7 @@
     {
       "code": "144064",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Taming-of-Sméagol-1A.jpg",
         "sha256": "06adc166ab4046fd36e18fbd0b91dc4c4b1b300a2ebdcc486de88ed855df7547"
@@ -2611,7 +2611,7 @@
     {
       "code": "144064",
       "side": "B",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Taming-of-Sméagol-1B.jpg",
         "sha256": "e4776b83905a5debd95ef11d47e9e85852b2035d9a7dc00de09e62b3ef546089"
@@ -2628,7 +2628,7 @@
     {
       "code": "144065",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Across-the-Marshes-2A.jpg",
         "sha256": "8a9408daa6d15ed6b62ecb8a78c00c0fec32b1fafddc31ab273335ca9b579e54"
@@ -2644,7 +2644,7 @@
     {
       "code": "144065",
       "side": "B",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Across-the-Marshes-2B.jpg",
         "sha256": "7bc570c2a2c32fbc44d9f0630616f1f299ce2e9b0047a756059a9152cf48b653"
@@ -2662,7 +2662,7 @@
     {
       "code": "144066",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Don't-Look-at-the-Lights-3A.jpg",
         "sha256": "ed78a954ece77508380ee173b6435bee624e0bad1518dfc8f71ee91008c3bed2"
@@ -2678,7 +2678,7 @@
     {
       "code": "144066",
       "side": "B",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Don't-Look-at-the-Lights-3B.jpg",
         "sha256": "ac5f8acc8bedc24ee08f51722a07290bca4f5276ffa9c5e007a14af0d159421b"
@@ -2695,7 +2695,7 @@
     {
       "code": "144067",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Passage-of-the-Marshes-SetupA.jpg",
         "sha256": "9f324d04784f5e9ac2aadf0dc40d74d4efb4d0f5255a32b18c93646a068605f9"
@@ -2718,7 +2718,7 @@
     {
       "code": "144067",
       "side": "B",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Passage-of-the-Marshes-SetupB.jpg",
         "sha256": "7d1aa4b2db85faf05e62482bb3dfe3c446b4d771b902445fa7bb80cb3d4c8d4e"
@@ -2734,7 +2734,7 @@
     {
       "code": "144068",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Ambush-the-Men-of-Harad-1A.jpg",
         "sha256": "c32706e763e5ce20d9411c1b4a42ce281d79db98422329c2742718a51977babd"
@@ -2751,7 +2751,7 @@
     {
       "code": "144068",
       "side": "B",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Ambush-the-Men-of-Harad-1B.jpg",
         "sha256": "293a1e16a92a1b1a6e87af22c5ff667c33870c22ce1575504f7f49b6df51ccdc"
@@ -2768,7 +2768,7 @@
     {
       "code": "144069",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Journey-to-the-Cross-roads-SetupA.jpg",
         "sha256": "538ccca9240e38550924b870edeb30ad244287cebdbe596ba3fd1aa3cfaa6458"
@@ -2791,7 +2791,7 @@
     {
       "code": "144069",
       "side": "B",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Journey-to-the-Cross-roads-SetupB.jpg",
         "sha256": "dc3b6596267931f690e3384972b8151f1ebddf19c2caa32fcc9b05d5ab82e423"
@@ -2807,7 +2807,7 @@
     {
       "code": "144070",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Stairs-of-Cirith-Ungol-1A.jpg",
         "sha256": "2c333569dd66d62f8d4637f6c63bb4ce86379e8dd5c4c2e9f0fb26301858db28"
@@ -2823,7 +2823,7 @@
     {
       "code": "144070",
       "side": "B",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Stairs-of-Cirith-Ungol-1B.jpg",
         "sha256": "3f10c70610d13421c81511b91a7b39ebc19be85aa4917f1518aaf822904805a5"
@@ -2841,7 +2841,7 @@
     {
       "code": "144071",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Spider's-Pass-2A.jpg",
         "sha256": "fcf84e2ff38cffc077608df2a567e5c7b3d48e60d3a3d027c360b75522e47f08"
@@ -2857,7 +2857,7 @@
     {
       "code": "144071",
       "side": "B",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Spider's-Pass-2B.jpg",
         "sha256": "3f9d683c400b0b88e5f117562b23af36425bacf7d3ac26c121f2d9d5577866d6"
@@ -2875,7 +2875,7 @@
     {
       "code": "144072",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Gollum's-Betrayal-3A.jpg",
         "sha256": "c590e9e2fbd57a5251017061295907e2e116173cc73e92514b227a6b2ecc7775"
@@ -2891,7 +2891,7 @@
     {
       "code": "144072",
       "side": "B",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Gollum's-Betrayal-3B.jpg",
         "sha256": "e700e5b0269a7218860a59caa0b563473277e8608b39dfe5de026fc21bdc5748"
@@ -2909,7 +2909,7 @@
     {
       "code": "144073",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Shelob's-Lair-SetupA.jpg",
         "sha256": "330e310b2e1b5abfc2da6c082946d57de76c50be34015a622eac02340d58f800"
@@ -2932,7 +2932,7 @@
     {
       "code": "144073",
       "side": "B",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Shelob's-Lair-SetupB.jpg",
         "sha256": "1820833ad01af022032cbf14714b5cfb8e3b88adc1dad92ee27d2dfdf0b46f08"
@@ -2949,7 +2949,7 @@
     {
       "code": "144075",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Gollum.jpg",
         "sha256": "e171d3ec2360dd7be3ede0506e1181b777c884285d813f91fe54510387d50fa6"
@@ -2968,7 +2968,7 @@
     {
       "code": "144076",
       "side": "A",
-      "printing": "MEC112",
+      "printing": "LoS",
       "scan": {
         "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Sméagol.jpg",
         "sha256": "01f4b6e18528f298d31176fc479b570bf5005b1385d556d31faf8d2d8faa2d74"

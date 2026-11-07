@@ -84,8 +84,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 58 | The Ghost of Framsburg | completed | 2026-11-06. Review round done. |
 | 59 | Mount Gundabad | completed | 2026-11-06. Review round done. |
 | 60 | The Fate of Wilderland | completed | 2026-11-06. Review round done. |
-| 61 | The Two Towers data | active | 2026-11-07. Plan `docs/plans/the-two-towers.md`. |
-| 62 | The Two Towers campaign shell | not started | |
+| 61 | The Two Towers data | completed | 2026-11-07. Review round done. Open: MEC112 2023 wording unverified. |
+| 62 | The Two Towers campaign shell | active | 2026-11-07. Plan `docs/plans/the-two-towers.md`. |
 
 ## Open items
 
@@ -182,6 +182,10 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - Accessibility: at font scale 2 on a phone in landscape the dock's worst moment (a why line, a three-line primary, Cancel and More, an attack readout) passes its column even with the aids folded (`it.fails` in `dock/text-size-fit.test.ts`); at font scale 1 the longest caution with an attack readout passes it by up to 16 pt (`HAND_SLACK`, `budget.test.ts`). Needs a dock design.
 - Accessibility: the Label in Name entries held in `OPEN` (`scripts/checks/a11y-web.ts`) are axe joining sibling text with no space on react-native-web; the names start with their visible words.
 - Effect templates: an unlabelled conditional constant ("If you are on-course, ~ gets +2 …") is read as triggered by `unreadBefore`; `SPLIT_LINES` in `scripts/data/effects/generate.ts` names one card's line.
+
+### Rules and engine (The Two Towers)
+- The Two Towers ledger reads the pinned 2014 and 2015 Treason of Saruman and Land of Shadow scans; no pinned scan shows MEC112's 2023 wording, so a rewording cannot be found (`scripts/data/printed/scope.ts`, `MEC112_CHANGED`).
+- Easy: the DragnCards `E0C.12` deck keeps all ten Great Spider cards where Hall of Beorn keeps six; the E0C decks lead (user decision, 2026-11-07).
 
 ### Scenario pipeline
 - Fast track built; Two Towers data, then the A/B on The Uruk-hai (`docs/plans/scenario-fast-track.md`).

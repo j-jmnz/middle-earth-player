@@ -327,7 +327,7 @@ describe("parseSetup: Ered Mithrin Setup sentences", () => {
   });
 });
 
-// The Two Towers (phase 61): each sentence is the text of its quest or campaign card (mec112.setup-<id>); until the ledger holds a card, Hall of Beorn's candidate text.
+// The Two Towers: each sentence is a sentence of the Setup line the ledger holds for its quest or campaign card (data/printed/the-two-towers.json; rules mec112.setup-<id>).
 describe("parseSetup: The Two Towers Setup sentences", () => {
   const TOWERS = nameIndex(
     [
@@ -360,19 +360,19 @@ describe("parseSetup: The Two Towers Setup sentences", () => {
   });
 
   it("144067.A: removes the burdens from the players' decks too, and shuffles the Searching Eye into each deck", () => {
-    const parsed = read("Setup: Each player may change hero cards he controls without incurring the +1 threat penalty. Each player shuffles 1 copy of The Searching Eye into his deck. Remove each burden with the following burden set icons from the encounter deck and each player's deck: Helm's Deep, The Road to Isengard");
+    const parsed = read("Setup: Each player may change hero cards without incurring the +1 threat penalty. Each player shuffles 1 copy of The Searching Eye into his deck. Remove each burden with the following burden set icons from the encounter deck and each player's deck: Helm's Deep, The Road to Isengard");
     expect(parsed.unread).toEqual([]);
     expect(parsed.clauses).toEqual([{ kind: "waivePenalty" }, step("shuffleIntoDecks", { codes: ["u1"], count: 1 }), step("removeBurdens", { sets: ["Helm's Deep", "The Road to Isengard"], players: true })]);
   });
 
   it("144069.A: chooses between a resource and a copy of Brace of Coneys", () => {
-    const parsed = read("Setup: Each player must choose: either add 1 resource to each of his heroes’ pools, or shuffle 1 copy of Brace of Coneys into his deck.");
+    const parsed = read("Setup: Each player must choose: either add 1 resource to each of his heroes' pools, or shuffle 1 copy of Brace of Coneys into his deck. Remove each burden with the following burden set icons from the encounter deck and each player's deck: Helm's Deep, The Road to Isengard");
     expect(parsed.unread).toEqual([]);
-    expect(parsed.clauses).toEqual([step("chooseResourceOrCopy", { codes: ["u2"], count: 1 })]);
+    expect(parsed.clauses).toEqual([step("chooseResourceOrCopy", { codes: ["u2"], resources: 1, count: 1 }), step("removeBurdens", { sets: ["Helm's Deep", "The Road to Isengard"], players: true })]);
   });
 
   it("143069.A: the active location, the captives (from the log in a campaign) and the pursuit value", () => {
-    const parsed = read("Setup: Make Eastemnet the active location. Add Uglúk and To Isengard! to the staging area. Each player chooses 1 non-Fellowship hero he controls to be a Captive and places it faceup underneath To Isengard! (If playing campaign mode, choose each captive from the Campaign Log instead). Set the pursuit value to 10.");
+    const parsed = read("Setup: Make Eastemnet the active location. Add Uglúk and To Isengard! to the staging area. Each player chooses 1 non-Fellowship hero he controls to be a Captive and places it faceup underneath To Isengard! (If playing campaign mode, choose each \"captive\" from the Campaign Log instead). Set the pursuit value to 10.");
     expect(parsed.unread).toEqual([]);
     expect(parsed.clauses).toEqual([{ kind: "active", codes: ["t1"] }, { kind: "stage", codes: ["t2", "t3"], perPlayer: null, count: 1 }, step("chooseCaptives", { to: ["t3"] }), step("setPursuit", { count: 10 })]);
   });
@@ -380,7 +380,7 @@ describe("parseSetup: The Two Towers Setup sentences", () => {
   it("143072.A: sets cards aside, 1 copy for each player, and offers the Poisoned Counsels or stage 2A", () => {
     const parsed = read("Setup: Set The Defense of Helm's Deep and 1 copy of Deeping Wall aside, out of play. Each player sets 1 copy of Soldier of Isengard aside, out of play. Then, the players must choose: either each player shuffles 1 copy of Poisoned Counsels into his deck, or advance to stage 2A (bypassing stage 1B).");
     expect(parsed.unread).toEqual([]);
-    expect(parsed.clauses).toEqual([{ kind: "aside", codes: ["t6", "t7"], allCopies: false }, { kind: "aside", codes: ["t8"], allCopies: false }, step("chooseCounselsOrAdvance", { codes: ["t9"], count: 2 })]);
+    expect(parsed.clauses).toEqual([{ kind: "aside", codes: ["t6", "t7"], allCopies: false }, { kind: "aside", codes: ["t8"], allCopies: false, eachPlayer: 1 }, step("chooseCounselsOrAdvance", { codes: ["t9"], count: 2, copies: 1 })]);
   });
 
   it("144064.A, 144068.A, 144070.A: Gollum engaged with the first player, a location for each player, the Harad set under The Cross-roads, Sméagol under the first player's control", () => {
@@ -389,9 +389,9 @@ describe("parseSetup: The Two Towers Setup sentences", () => {
       { kind: "eachPlayerAddsLocation", count: 1 },
       { kind: "shuffleEncounterDeck" },
     ]);
-    expect(read("Setup: Add The Black Gate and The Cross-roads to the staging area. Shuffle the Harad encounter set and place it facedown under The Cross-roads. Each player, except for the first player, searches the encounter deck for a different non-unique location and adds it to the staging area. Shuffle the encounter deck.").clauses).toEqual([
+    expect(read("Setup: Add The Black Gate and The Cross-roads to the staging area. Shuffle the Men of Harad encounter set and place it facedown under The Cross-roads. Each player, except the first player, searches the encounter deck for a different non-unique location and adds it to the staging area. Shuffle the encounter deck.").clauses).toEqual([
       { kind: "stage", codes: ["u5", "u6"], perPlayer: null, count: 1 },
-      step("shuffleSetUnder", { asideSets: ["Harad"], to: ["u6"] }),
+      step("shuffleSetUnder", { asideSets: ["Men of Harad"], to: ["u6"] }),
       step("eachOtherPlayerAddsLocation", { count: 1 }),
       { kind: "shuffleEncounterDeck" },
     ]);

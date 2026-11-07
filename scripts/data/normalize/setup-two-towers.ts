@@ -5,6 +5,9 @@ import type { NameIndex, SetupClause } from "./setup-text.ts";
 // ledger line (data/printed/the-two-towers.json), names the cards (and, for the burden removal, the burden sets) it moves, and returns null for a sentence it
 // does not read, so the other patterns try it. A step that names cards returns null when a name finds no card: the sentence ends up unread and the
 // scenario is not built, a name is never dropped silently.
+// "1", "a", "an" or "one" copy.
+const copiesOf = (word: string | undefined): number => (/^\d+$/.test(word ?? "") ? Number(word) : 1);
+
 export function readTwoTowers(sentence: string, names: NameIndex): SetupClause[] | null {
   const step = stepWith([]);
   const named = namedBy(names);
@@ -24,7 +27,7 @@ export function readTwoTowers(sentence: string, names: NameIndex): SetupClause[]
   }
   if ((match = /^Each player must choose: either add (\d+) resources? to each of (?:his|their) heroes['’] pools?, or shuffle (\d+) cop(?:y|ies) of (.+?) into (?:his|their) deck$/i.exec(sentence))) {
     const codes = names.codesOf(match[3] ?? "");
-    return codes.length === 0 ? null : [stepWith(codes)("chooseResourceOrCopy", { count: Number(match[2]) })];
+    return codes.length === 0 ? null : [stepWith(codes)("chooseResourceOrCopy", { resources: Number(match[1]), count: Number(match[2]) })];
   }
 
   // The Uruk-hai (143069): the captives and the pursuit value.
@@ -41,11 +44,11 @@ export function readTwoTowers(sentence: string, names: NameIndex): SetupClause[]
   // Helm's Deep (143072): the copies each player sets aside, and the choice that ends stage 1.
   if ((match = /^Each player sets (\d+|an?|one) cop(?:y|ies) of (.+?) aside,? out of play$/i.exec(sentence))) {
     const codes = named(match[2]);
-    return codes.length === 0 ? null : [{ kind: "aside", codes, allCopies: false }];
+    return codes.length === 0 ? null : [{ kind: "aside", codes, allCopies: false, eachPlayer: copiesOf(match[1]) }];
   }
   if ((match = /^(?:Then, )?the players must choose: either each player shuffles (\d+|an?|one) cop(?:y|ies) of (.+?) into (?:his|their) deck, or advance to stage (\d+)A \(bypassing stage (\d+)B\)$/i.exec(sentence))) {
     const codes = names.codesOf(match[2] ?? "");
-    return codes.length === 0 ? null : [stepWith(codes)("chooseCounselsOrAdvance", { count: Number(match[3]) })];
+    return codes.length === 0 ? null : [stepWith(codes)("chooseCounselsOrAdvance", { count: Number(match[3]), copies: copiesOf(match[1]) })];
   }
 
   // The Passage of the Marshes (144064), Journey to the Cross-roads (144068) and Shelob's Lair (144070).
