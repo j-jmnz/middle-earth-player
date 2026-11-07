@@ -7,7 +7,6 @@
 // effects are on it now (+1 Attack from Dagger of Westernesse) and lists the cards attached to it and its shadow cards: a
 // tap on one shows that card in its place. A horizontal swipe on the card steps through the same cards (preview-swipe.ts), and so
 // does the screen reader's adjust gesture; the rows stay the plain path.
-import { Image } from "expo-image";
 import { useCallback, useEffect, useState } from "react";
 import { BackHandler, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
@@ -17,18 +16,18 @@ import { scheduleOnRN } from "react-native-worklets";
 
 import { CardImage } from "../../ui/card-image.tsx";
 import { CardTextView } from "./card-text-view.tsx";
-import { cachePolicyFor } from "../../ui/image-cache.ts";
 import type { NotApplied } from "./not-applied.ts";
 import { NotAppliedView } from "./not-applied-view.tsx";
 import { springConfig, timing, useMotionScale } from "../../ui/motion-run.ts";
 import { MOTION } from "../../ui/motion-tokens.ts";
 import { previewSideSize, previewSize, previewStrip, tokenLines } from "./preview-size.ts";
 import { clampStep, swipeStep } from "./preview-swipe.ts";
-import { chipLabel, EARLIER_STAGE, listHeading, previewValue, rowName } from "./preview-words.ts";
+import { listHeading, previewValue } from "./preview-words.ts";
 import { SecondaryButton } from "../../ui/buttons.tsx";
+import { RelatedChip, RelatedRow } from "./related-rows.tsx";
 import type { PictureSource } from "../canvas/table-canvas-types.ts";
 import { cardCorner } from "../../ui/card-corner.ts";
-import { capLines, touch, useUiScale } from "../../ui/ui-scale.ts";
+import { capLines, useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
 import { Text } from "../../ui/text.tsx";
 
@@ -214,6 +213,65 @@ export function CardPreview({
     />
   ) : null;
 
+  const scrolls = screen.fontScale > 1;
+  const heading = (
+    <>
+      <Text testID="card-preview-name" accessibilityRole="header" className="font-display text-title text-bone">
+        {shown.title ?? shown.name}
+      </Text>
+      {shown.detail ? <Text testID="card-preview-detail" className="text-label text-muted">{shown.detail}</Text> : null}
+      {shown.role ? <Text className="text-label text-muted">{shown.role}</Text> : null}
+      {(shown.tokens ?? []).length > 0 ? (
+        <Text testID="card-preview-tokens" className="mt-1 text-body text-accent">
+          {(shown.tokens ?? []).join(" · ")}
+        </Text>
+      ) : null}
+    </>
+  );
+  const body = (
+    <>
+        {shown.note ? (
+          <View testID="card-preview-why" className="mb-2">
+            <Text className="font-display text-eyebrow uppercase text-accent">{shown.noteTitle ?? "Not playable now"}</Text>
+            <Text className="mt-1 text-body text-bone">{shown.note}</Text>
+          </View>
+        ) : null}
+        {shown.notApplied ? (
+          <View className="mb-2">
+            <NotAppliedView notApplied={shown.notApplied} testID="card-preview-not-applied" />
+          </View>
+        ) : null}
+        {(shown.steps ?? []).length > 0 ? (
+          <View testID="card-preview-steps" className="mb-2">
+            <Text className="font-display text-eyebrow uppercase text-accent">The four steps</Text>
+            {(shown.steps ?? []).map((row) => (
+              <Text key={row.text} accessibilityState={{ selected: row.current }} className={`mt-1 text-label ${row.current ? "text-accent" : "text-bone"}`}>
+                {row.current ? `Now · ${row.text}` : row.text}
+              </Text>
+            ))}
+          </View>
+        ) : null}
+        {(shown.effects ?? []).length > 0 ? (
+          <View testID="card-preview-effects" className="mb-2">
+            <Text className="font-display text-eyebrow uppercase text-accent">Effects on it</Text>
+            {(shown.effects ?? []).map((line) => (
+              <Text key={line} className="mt-1 text-label text-bone">
+                {line}
+              </Text>
+            ))}
+          </View>
+        ) : null}
+        {all.length > 1 ? (
+          <View testID="card-preview-attached">
+            <Text className="font-display text-eyebrow uppercase text-accent">{listHeading(all, at)}</Text>
+            {all.map((item, index) => (
+              <RelatedRow key={`${item.code}:${index}`} item={item} index={index} selected={index === at} onPress={() => setAt(index)} />
+            ))}
+          </View>
+        ) : null}
+    </>
+  );
+
   return (
     <View testID="card-preview" accessibilityViewIsModal onAccessibilityEscape={close} style={StyleSheet.absoluteFill}>
       <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { backgroundColor: t.night }, scrimStyle]} />
@@ -230,84 +288,21 @@ export function CardPreview({
             {/* Not a control of its own: a tap here reaches the scrim and closes the preview too; only Details and the rows of what is
                 with the card do something else (user request, 2026-10-29). */}
             <View style={{ flexShrink: 1 }}>
-              {/* The column is one scroll: at a large text size its name, line, tokens and the rows under them are as tall as their words and the column scrolls inside the card's height. */}
-              <ScrollView style={{ flexShrink: 1 }}>
-              <Text testID="card-preview-name" accessibilityRole="header" className="font-display text-title text-bone">
-                {shown.title ?? shown.name}
-              </Text>
-              {shown.detail ? <Text testID="card-preview-detail" className="text-label text-muted">{shown.detail}</Text> : null}
-              {shown.role ? <Text className="text-label text-muted">{shown.role}</Text> : null}
-              {(shown.tokens ?? []).length > 0 ? (
-                <Text testID="card-preview-tokens" className="mt-1 text-body text-accent">
-                  {(shown.tokens ?? []).join(" · ")}
-                </Text>
-              ) : null}
-              <View className="mt-2">
-                {shown.note ? (
-                  <View testID="card-preview-why" className="mb-2">
-                    <Text className="font-display text-eyebrow uppercase text-accent">{shown.noteTitle ?? "Not playable now"}</Text>
-                    <Text className="mt-1 text-body text-bone">{shown.note}</Text>
-                  </View>
-                ) : null}
-                {shown.notApplied ? (
-                  <View className="mb-2">
-                    <NotAppliedView notApplied={shown.notApplied} testID="card-preview-not-applied" />
-                  </View>
-                ) : null}
-                {(shown.steps ?? []).length > 0 ? (
-                  <View testID="card-preview-steps" className="mb-2">
-                    <Text className="font-display text-eyebrow uppercase text-accent">The four steps</Text>
-                    {(shown.steps ?? []).map((row) => (
-                      <Text key={row.text} accessibilityState={{ selected: row.current }} className={`mt-1 text-label ${row.current ? "text-accent" : "text-bone"}`}>
-                        {row.current ? `Now · ${row.text}` : row.text}
-                      </Text>
-                    ))}
-                  </View>
-                ) : null}
-                {(shown.effects ?? []).length > 0 ? (
-                  <View testID="card-preview-effects" className="mb-2">
-                    <Text className="font-display text-eyebrow uppercase text-accent">Effects on it</Text>
-                    {(shown.effects ?? []).map((line) => (
-                      <Text key={line} className="mt-1 text-label text-bone">
-                        {line}
-                      </Text>
-                    ))}
-                  </View>
-                ) : null}
-                {all.length > 1 ? (
-                  <View testID="card-preview-attached">
-                    <Text className="font-display text-eyebrow uppercase text-accent">{listHeading(all, at)}</Text>
-                    {all.map((item, index) => (
-                      <Pressable
-                        key={`${item.code}:${index}`}
-                        testID={`card-preview-related-${index}`}
-                        accessibilityRole="button"
-                        accessibilityState={{ selected: index === at }}
-                        onPress={() => setAt(index)}
-                      >
-                        {/* Layout and fill are styles, not classes: a class on a Pressable with a style function can be dropped on the phone. */}
-                        {({ pressed }) => (
-                          <View
-                            className="mt-1 flex-row items-center gap-2 rounded-item px-2"
-                            style={{ minHeight: touch(s, 44), backgroundColor: pressed ? t.pressed : index === at ? t.raised : "transparent" }}
-                          >
-                            <View style={{ width: 24 * s, height: 34 * s, borderRadius: cardCorner(24 * s, 34 * s), overflow: "hidden", backgroundColor: t.raised }}>
-                              {item.source ? <Image source={item.source} cachePolicy={cachePolicyFor(item.source)} recyclingKey={`${item.code}:${index}:thumb`} contentFit="cover" style={{ width: 24 * s, height: 34 * s }} /> : null}
-                            </View>
-                            <View className="shrink">
-                              <Text className="text-body text-bone">
-                                {rowName(item)}
-                              </Text>
-                              {item.role && item.role !== EARLIER_STAGE ? <Text className="text-label text-muted">{item.role}</Text> : null}
-                            </View>
-                          </View>
-                        )}
-                      </Pressable>
-                    ))}
-                  </View>
-                ) : null}
-              </View>
-              </ScrollView>
+              {/* The column's words and rows sit above one ScrollView at the phone's default text size, as they always did; at a larger size
+                  the whole column is the scroll, since its name, line, tokens and rows are as tall as their words and must reach the card's height. */}
+              {scrolls ? (
+                <ScrollView style={{ flexShrink: 1 }}>
+                  {heading}
+                  <View className="mt-2">{body}</View>
+                </ScrollView>
+              ) : (
+                <>
+                  {heading}
+                  <ScrollView style={{ flexShrink: 1 }} className="mt-2">
+                    {body}
+                  </ScrollView>
+                </>
+              )}
               {buttons ? <View className="mt-2 flex-row gap-3">{buttons}</View> : null}
             </View>
           </Animated.View>
@@ -324,28 +319,7 @@ export function CardPreview({
               <Animated.View testID="card-preview-attached" style={[{ marginTop: 16 * s, maxWidth: roomW - 32 * s }, buttonsStyle]}>
                 <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 6 * s }}>
                   {all.map((item, index) => (
-                    <Pressable
-                      key={`${item.code}:${index}`}
-                      testID={`card-preview-related-${index}`}
-                      accessibilityRole="button"
-                      accessibilityLabel={chipLabel(item)}
-                      accessibilityState={{ selected: index === at }}
-                      onPress={() => setAt(index)}
-                    >
-                      {({ pressed }) => (
-                        <View
-                          className="flex-row items-center gap-2 rounded-item px-2"
-                          style={{ minHeight: touch(s, 44), backgroundColor: pressed ? t.pressed : index === at ? t.raised : "transparent" }}
-                        >
-                          <View style={{ width: 24 * s, height: 34 * s, borderRadius: cardCorner(24 * s, 34 * s), overflow: "hidden", backgroundColor: t.raised }}>
-                            {item.source ? <Image source={item.source} cachePolicy={cachePolicyFor(item.source)} recyclingKey={`${item.code}:${index}:thumb`} contentFit="cover" style={{ width: 24 * s, height: 34 * s }} /> : null}
-                          </View>
-                          <Text className="text-label text-bone">
-                            {index > 0 && item.title ? item.title : (item.role ?? item.name)}
-                          </Text>
-                        </View>
-                      )}
-                    </Pressable>
+                    <RelatedChip key={`${item.code}:${index}`} item={item} index={index} selected={index === at} onPress={() => setAt(index)} />
                   ))}
                 </ScrollView>
               </Animated.View>

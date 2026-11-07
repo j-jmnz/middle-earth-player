@@ -8,6 +8,7 @@ import { Pressable, ScrollView, useWindowDimensions, View } from "react-native";
 
 import { CardImage } from "../../ui/card-image.tsx";
 import { cardCorner } from "../../ui/card-corner.ts";
+import { useFocusRing } from "../../ui/focus-ring.ts";
 import { longPressA11y, longPressHint } from "../../ui/long-press-action.ts";
 import { LIST_PICTURE, LIST_PICTURE_SMALL, smallPictures } from "../choice/dock/budget.ts";
 import { chipOnSurface, dropShadowOf } from "../../ui/surfaces.ts";
@@ -53,6 +54,7 @@ function CardRow({ card, playable, testID, onPress, onLongPress }: { card: ListC
   const s = useUiScale();
   // The table's card on a tablet, the smaller picture on a phone, as the choice's rows (dock/budget.ts, smallPictures); a card's corners. A facedown
   // card or a missing file is a raised plate.
+  const ring = useFocusRing();
   const box = smallPictures(useWindowDimensions().height, s) ? LIST_PICTURE_SMALL : LIST_PICTURE;
   const w = box.w * s;
   const h = box.h * s;
@@ -63,6 +65,7 @@ function CardRow({ card, playable, testID, onPress, onLongPress }: { card: ListC
   const said = playable ? "Playable now" : (card.said ?? detail);
   return (
     <Pressable
+      {...ring.props}
       testID={testID}
       accessibilityRole="button"
       accessibilityState={{ selected: playable }}
@@ -75,7 +78,7 @@ function CardRow({ card, playable, testID, onPress, onLongPress }: { card: ListC
       {({ pressed }) => (
         <View
           className="mb-1 flex-row items-center rounded-item px-1.5 py-1"
-          style={{ gap: 12 * s, minHeight: touch(s, 48), ...(pressed ? { backgroundColor: t.pressed } : playable ? chipOnSurface(t) : { backgroundColor: "transparent" }) }}
+          style={{ gap: 12 * s, minHeight: touch(s, 48), ...(pressed ? { backgroundColor: t.pressed } : playable ? chipOnSurface(t) : { backgroundColor: "transparent" }), ...ring.style }}
         >
           <View style={{ width: w, height: h, borderRadius: cardCorner(w, h), ...(playable ? { boxShadow: `0 0 0 2px ${t.accent}, 0 0 12px 2px ${withAlphaHex(t.accent, 0.55)}` } : { boxShadow: dropShadowOf(t, 3, 8, 0.8) }) }}>
             {card.picture ? (

@@ -3,6 +3,7 @@
 // before and after any of them is armed: arming moves nothing. Pure: a character-per-line estimate of the dock's text width.
 
 import type { ConfirmTimeOption } from "../../../ui/table-settings.ts";
+import type { Dock, DockButton } from "../table-choice.ts";
 
 // Label type is about 6.6 pt a character; the narrowest dock text (the 210 pt column) is 168 pt wide, so about 25 a line. 24 keeps a
 // margin. The dock passes the characters its measured width holds (labelChars in dock/budget.ts); this is the default.
@@ -45,6 +46,20 @@ export function armedLines(texts: readonly (string | null)[], chars: number = CH
  */
 export function armedRoom(lines: number, dense = false, scale = 1, text = 1): number {
   return (lines * LINE_PX * text + (dense ? BAR_DENSE_PX : BAR_PX)) * scale;
+}
+
+// The line above the buttons in a moment with one legal answer.
+export const ONLY = "The only choice now: one tap sends it";
+
+/** What an armed button's line says: its caution or "Tap again: <label>", the lead-in dropped on a dense dock when that saves a line. */
+export function armedSaid(button: DockButton, dense: boolean, chars: number = CHARS_PER_LINE): string {
+  return armedWords(button.armed ?? `${LEAD}${button.label}`, dense, chars);
+}
+
+/** The lines the dock's armed room holds for this moment: the longest thing its buttons can say when armed, the why line or the only-choice line. */
+export function dockArmedLines(dock: Dock, dense: boolean, chars: number = CHARS_PER_LINE): number {
+  const armed = [dock.primary, ...dock.secondary].map((button) => (button?.arm ? armedSaid(button, dense, chars) : null));
+  return armedLines([...armed, dock.why, dock.single ? ONLY : null], chars);
 }
 
 // A consequence clause: it says what the second tap costs (a card that falls or is destroyed, the game lost), not just which button.

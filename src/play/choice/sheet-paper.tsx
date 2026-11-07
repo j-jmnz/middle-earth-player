@@ -141,7 +141,7 @@ export function Tile({
   const t = useTableTokens();
   const s = useUiScale();
   const night = surface === "night";
-  const ring = useFocusRing();
+  const ring = useFocusRing(!night);
   // A row's name keeps two lines at the phone's default text size and grows with larger text (capLines, ui/ui-scale.ts).
   const labelCap = capLines(2, useWindowDimensions().fontScale);
   // A screen reader's actions on the row: a share row's increment and decrement, and the long press's "Show card" (docs/design-system.md, Screen reader).

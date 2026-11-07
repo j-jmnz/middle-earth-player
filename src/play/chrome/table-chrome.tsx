@@ -8,6 +8,7 @@ import Animated, { FadeIn, FadeOut, useAnimatedStyle, useSharedValue, withSequen
 
 // Split by platform (Skia on a phone, CSS on the web), so imported without its extension.
 import { ArcRing } from "../../ui/arc-ring";
+import { useFocusRing } from "../../ui/focus-ring.ts";
 import { GameIcon } from "../../ui/game-icon.tsx";
 import type { IconName } from "../../ui/icon-map.ts";
 import type { LogMark } from "../store/log.ts";
@@ -135,6 +136,7 @@ function ThreatDial({
   const speed = useMotionScale();
   const t = useTableTokens();
   const s = useUiScale();
+  const focus = useFocusRing();
   const badge = useMemo(() => ({ in: layoutAnim(FadeIn, MOTION.threatBadgeIn, speed), out: layoutAnim(FadeOut, MOTION.threatBadgeOut, speed) }), [speed]);
   const level = elimination ? threatLevel(threat.threat) : "calm";
   const look = threat.eliminated ? { edge: t.hairline, fill: t.night, meter: t.hairline } : elimination ? dialOf(t)[level] : { edge: t.accent, fill: t.night, meter: t.accent };
@@ -175,13 +177,14 @@ function ThreatDial({
   const dialWords = `${spokenWord ? dialSpeech(spokenWord, threat.threat, label, role) : `${name} ${threat.threat}`}${threat.eliminated ? ", eliminated" : critical ? ", near elimination" : ""}${tickWords}${ring ? `. ${ring}` : ""}${deltaWords ? `. ${deltaWords}` : ""}`;
   return (
     <Pressable
+      {...focus.props}
       disabled={!onPress}
       onPress={onPress}
       accessible
       accessibilityRole={onPress ? "button" : undefined}
       accessibilityLabel={dialWords}
       accessibilityHint={onPress ? (hint ?? "Shows each enemy's engagement cost against your threat") : undefined}
-      style={({ pressed }) => ({ minHeight: touch(s, 44), flexDirection: "row", alignItems: "center", gap: 6 * s, paddingHorizontal: 4 * s, borderRadius: 999, backgroundColor: pressed ? withAlphaHex(t.bone, 0.12) : "transparent" })}
+      style={({ pressed }) => ({ minHeight: touch(s, 44), flexDirection: "row", alignItems: "center", gap: 6 * s, paddingHorizontal: 4 * s, borderRadius: 999, backgroundColor: pressed ? withAlphaHex(t.bone, 0.12) : "transparent", ...focus.style })}
     >
       <Animated.View style={pop}>
         <View testID={id} style={{ width: DIAL * s, height: DIAL * s, borderRadius: (DIAL / 2) * s, boxShadow: threat.eliminated ? undefined : `0 0 22px ${withAlphaHex(t.threat, critical ? 0.6 : 0.4)}` }}>
@@ -268,6 +271,7 @@ export function HeadingDial({ step, compact = false, onPress }: { step: HeadingS
   const speed = useMotionScale();
   const t = useTableTokens();
   const s = useUiScale();
+  const ring = useFocusRing();
   const badge = useMemo(() => ({ in: layoutAnim(FadeIn, MOTION.threatBadgeIn, speed), out: layoutAnim(FadeOut, MOTION.threatBadgeOut, speed) }), [speed]);
   const look = headingLook(step);
   const color = t[look.tone];
@@ -299,13 +303,14 @@ export function HeadingDial({ step, compact = false, onPress }: { step: HeadingS
   ) : null;
   return (
     <Pressable
+      {...ring.props}
       disabled={!onPress}
       onPress={onPress}
       accessible
       accessibilityRole={onPress ? "button" : undefined}
       accessibilityLabel={words}
       accessibilityHint={onPress ? HEADING_HINT : undefined}
-      style={({ pressed }) => ({ minHeight: touch(s, 44), flexDirection: "row", alignItems: "center", gap: 6 * s, paddingHorizontal: 4 * s, borderRadius: 999, backgroundColor: pressed ? withAlphaHex(t.bone, 0.12) : "transparent" })}
+      style={({ pressed }) => ({ minHeight: touch(s, 44), flexDirection: "row", alignItems: "center", gap: 6 * s, paddingHorizontal: 4 * s, borderRadius: 999, backgroundColor: pressed ? withAlphaHex(t.bone, 0.12) : "transparent", ...ring.style })}
     >
       <Animated.View style={pop}>
         <View testID="heading" style={{ width: DIAL * s, height: DIAL * s, borderRadius: (DIAL / 2) * s }}>

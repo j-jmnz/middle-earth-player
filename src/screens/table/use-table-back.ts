@@ -5,7 +5,7 @@
 import { useEffect, useEffectEvent } from "react";
 import { BackHandler } from "react-native";
 
-import { backStep, playLayers, runBackStep } from "../../play/chrome/back-steps";
+import { backStep, playLayers, runBackStep, undoAllowed } from "../../play/chrome/back-steps";
 import type { DockExtra } from "../../play/choice/dock/buttons";
 import type { QuestAdvanceState } from "../../play/readouts/use-quest-advance";
 import type { TableStore } from "../../play/store/store";
@@ -45,11 +45,12 @@ function peel(a: TableBackArgs, leaves: boolean): boolean {
   return true;
 }
 
-// Undo by key only when the touch path could press the button: it is on the dock and nothing is open over the table.
+// Undo by key only when the touch path could press the button: it is on the dock and nothing is open over the table, a playing spotlight and an
+// open scrub included (undoAllowed, play/chrome/back.ts).
 function undoByKey(a: TableBackArgs): void {
   const o = a.open;
-  const layered = o.menu || o.more || o.lines || o.preview || o.reading || o.overlay || a.advance.shown != null;
-  if (a.undo && !layered) a.undo.onPress();
+  const layers = { ...playLayers(a.store), menuOpen: o.menu, moreOpen: o.more, linesOpen: o.lines, previewOpen: o.preview, readingOpen: o.reading, overlayOpen: o.overlay, panelOpen: o.panel };
+  if (a.undo && a.advance.shown == null && undoAllowed(layers)) a.undo.onPress();
 }
 
 function onKey(a: TableBackArgs, event: KeyInput): void {
@@ -62,7 +63,7 @@ function onKey(a: TableBackArgs, event: KeyInput): void {
 
 /** Registers the hardware Back and returns the root's `onKeyDown`. */
 export function useTableBack(a: TableBackArgs): (event: { nativeEvent: KeyInput }) => void {
-  // Read through an effect event: the handler is added once, so a later render does not move it above a layer's own Back handler (the card preview's).
+  // Read through an effect event: the handler is added once, so the effect subscribes once and a re-render never adds it again.
   const back = useEffectEvent(() => peel(a, true));
   useEffect(() => {
     const subscription = BackHandler.addEventListener("hardwareBackPress", back);

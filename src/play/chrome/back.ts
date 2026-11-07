@@ -26,3 +26,12 @@ export function backStep(layers: BackLayers): BackStep {
   if (layers.panelOpen) return "foldPanel";
   return "leave";
 }
+
+/**
+ * Whether a hardware keyboard's Z may run the dock's Undo: the touch path could press it, so nothing is open over the table (a playing
+ * spotlight, an open scrub, the menu or a popover, the preview, a reading layer, a sheet opened from the table). A folded or open choice
+ * tray and a peek leave the Undo button where it is.
+ */
+export function undoAllowed(layers: BackLayers): boolean {
+  return !(layers.spotlightOpen || layers.scrubOpen || layers.menuOpen || layers.moreOpen || layers.linesOpen || layers.previewOpen || layers.readingOpen || layers.overlayOpen);
+}

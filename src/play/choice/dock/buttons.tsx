@@ -9,8 +9,9 @@ import { useWindowDimensions, View } from "react-native";
 import { useStore } from "zustand";
 import Animated, { cancelAnimation, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
-import { armedLines, armedRoom, armedWords, armMs, BAR_DENSE_PX, BAR_PX, LINE_PX } from "./armed-room.ts";
+import { armedRoom, armedSaid, armMs, BAR_DENSE_PX, BAR_PX, dockArmedLines, LINE_PX, ONLY } from "./armed-room.ts";
 import { MORE_ID } from "./extras.ts";
+import { RING_OFFSET, RING_WIDTH } from "../../../ui/focus-ring-style.ts";
 import { tickArmed } from "../../../ui/haptics.ts";
 import { armBarEasing, useMotionScale } from "../../../ui/motion-run.ts";
 import { useScreenReader } from "../../../ui/screen-reader.ts";
@@ -27,8 +28,7 @@ import { announce } from "../../../ui/announce.ts";
 // motion token: the bar only shows it running out, on the linear curve of src/ui/motion-tokens.ts, and does not run under reduced motion
 // (the line says it). Quick does not shorten it: the second tap's window stays the same.
 const HINT = "Tap twice to confirm";
-// A moment with one legal answer: the line above the buttons says the one tap sends it.
-const ONLY = "The only choice now: one tap sends it";
+// A moment with one legal answer: the line above the buttons says the one tap sends it (ONLY, armed-room.ts).
 const ONLY_HINT = "Sends at once";
 
 // The More pill (`dock-more-actions`) folds the quiet pills behind a popover; it is not the "i" pill (`dock-more`) that opens the
@@ -68,6 +68,8 @@ export function DockButtons({
   const text = useWindowDimensions().fontScale;
   const moreRef = useRef<ComponentRef<typeof View>>(null);
   const [armed, setArmed] = useState<string | null>(null);
+  // A keyboard holds focus on the primary: on a dense dock its ring (the width and its offset) would lie over the armed bar, so the bar moves up.
+  const [primaryFocus, setPrimaryFocus] = useState(false);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const left = useSharedValue(1);
   const animates = useMotionScale() > 0;
@@ -116,10 +118,9 @@ export function DockButtons({
   const hints = [picked ? `Picked: ${picked}` : null, primary?.arm ? HINT : dock.single ? ONLY_HINT : null].filter(Boolean).join(". ");
   const primaryHint = hints === "" ? undefined : hints;
   const armedButton = [primary, ...dock.secondary].find((button) => button?.testID === armed) ?? null;
-  const said = (button: DockButton) => armedWords(button.armed ?? `Tap again: ${button.label}`, dense, chars);
-  const line = armedButton ? said(armedButton) : (dock.why ?? (dock.single ? ONLY : null));
+  const line = armedButton ? armedSaid(armedButton, dense, chars) : (dock.why ?? (dock.single ? ONLY : null));
   // The room holds the longest thing this moment's buttons can say when armed, in full, so arming moves nothing (armed-room.ts).
-  const lines = armedLines([...[primary, ...dock.secondary].map((button) => (button?.arm ? said(button) : null)), dock.why, dock.single ? ONLY : null], chars);
+  const lines = dockArmedLines(dock, dense, chars);
   const inline = aidsFolded && more.length > 0;
   const moreButton =
     more.length > 0 ? (
@@ -149,7 +150,7 @@ export function DockButtons({
           ) : null}
         </View>
         {armedButton ? (
-          <View pointerEvents="none" style={{ height: (dense ? BAR_DENSE_PX : BAR_PX) * s, justifyContent: "flex-start", alignItems: "center" }}>
+          <View pointerEvents="none" style={{ height: (dense ? BAR_DENSE_PX : BAR_PX) * s, justifyContent: "flex-start", alignItems: "center", transform: [{ translateY: dense && primaryFocus ? -(RING_WIDTH + RING_OFFSET) * s : 0 }] }}>
             <Animated.View style={[{ height: 2 * s, backgroundColor: t.accent }, bar]} />
           </View>
         ) : null}
@@ -162,6 +163,7 @@ export function DockButtons({
           compact={dense}
           disabled={!primaryReady(dock)}
           accessibilityHint={primaryHint}
+          onFocusChange={setPrimaryFocus}
           onPress={() => press(primary)}
         />
       ) : null}

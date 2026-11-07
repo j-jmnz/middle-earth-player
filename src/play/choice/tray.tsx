@@ -9,6 +9,7 @@ import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
 import { CardImage } from "../../ui/card-image.tsx";
 import { cardCorner } from "../../ui/card-corner.ts";
+import { ringRoom, ringScroll } from "../../ui/focus-ring-style.ts";
 import { LIST_PICTURE, LIST_PICTURE_SMALL, smallPictures, trayRoom } from "./dock/budget.ts";
 import { dropShadowOf } from "../../ui/surfaces.ts";
 import { IconValue } from "../../ui/game-icon.tsx";
@@ -120,7 +121,8 @@ export function ChoiceTray({
   if (!open && !leaving) return null;
   return (
     <Animated.View testID="sheet" collapsable={false} pointerEvents={open ? "auto" : "none"} style={[{ flexShrink: 1, minHeight: 0 }, motion]}>
-      <ScrollView style={{ flexGrow: 0, flexShrink: 1, minHeight: tiles.length > 0 ? trayRoom(small, fontScale) * s : 0 }} showsVerticalScrollIndicator={false} nestedScrollEnabled>
+      {/* The rows' focus ring has room inside the scroll (ringScroll); its margins take that room back, and trayRoom's row is counted from under it. */}
+      <ScrollView style={{ flexGrow: 0, flexShrink: 1, minHeight: tiles.length > 0 ? trayRoom(small, fontScale) * s + ringRoom(s) : 0, ...ringScroll(s).style }} contentContainerStyle={ringScroll(s).content} showsVerticalScrollIndicator={false} nestedScrollEnabled>
         {tiles.map((tile) => {
           const share = shareFor(shown, picked, tile.id);
           const readId = tile.readId;

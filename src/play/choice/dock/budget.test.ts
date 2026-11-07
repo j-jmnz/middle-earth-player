@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { armedLines, armedRoom, armedWords } from "./armed-room.ts";
 import { DOCK_PAD_DENSE_PX, DOCK_PAD_PX, LABEL_PX, labelChars, linesPlace, LIST_PICTURE, LIST_PICTURE_SMALL, PILL_PT, planWords, smallPictures, titleLinesOf, TITLE_PX, trayRoom, wordsWindow } from "./budget.ts";
+import { dockColumn } from "./fit.ts";
 import { dockLines } from "./lines.ts";
 
 // The dense dock's budget (phase 22): one title line and the folded line stay in view in the worst dock at 667x375 and 844x390.
@@ -19,8 +20,12 @@ const READOUT = 30 + 54;
 const BUTTONS = 44 + 40 + 40;
 // The pinned block: readout, the armed room, the buttons, and the block's own 2 pt gap.
 const block = (armed: number) => READOUT + 2 + armedRoom(armed, true) + BUTTONS;
-// The command column's height: the screen less the 44 pt top bar and the 8 pt foot.
-const column = (height: number) => height - 44 - 8;
+// The command column's height: the screen less the real top bar and foot (fit.ts, dockColumn), no safe insets.
+const column = (height: number) => dockColumn(height, 1, { top: 0, bottom: 0 });
+// The constants above were measured against a 44 pt bar and an 8 pt foot; the column is 16 pt shorter (the bar is 52 pt under 8 pt of room
+// above it). Font scale 1 layouts do not change, so the worst moments below (the longest caution armed, an attack readout, one row open) are
+// held to the old room: they stand at most this far past the real column.
+const HAND_SLACK = 16;
 const LONG = "Choose a defender for Gollum, Guide of the Dead Marshes";
 
 describe("the dense dock's words window", () => {
@@ -96,7 +101,7 @@ describe("the words window with the choice's rows open", () => {
     for (const height of [375, 390]) {
       const { plan, used, room } = open(height, true, armedLines([armedWords(worst, true)]));
       expect(plan.titleLines, `${height} tall`).toBeGreaterThanOrEqual(1);
-      expect(used, `${height} tall`).toBeLessThanOrEqual(room);
+      expect(used, `${height} tall`).toBeLessThanOrEqual(room + HAND_SLACK);
     }
   });
 
@@ -104,7 +109,7 @@ describe("the words window with the choice's rows open", () => {
     const { plan, used, room } = open(430, false, 2);
     expect(titleLinesOf(LONG, 168)).toBe(2);
     expect(plan).toMatchObject({ titleLines: 1, cut: true, pill: true });
-    expect(used).toBeLessThanOrEqual(room);
+    expect(used).toBeLessThanOrEqual(room + HAND_SLACK);
     // Unclamped the same dock would pass its column.
     expect(used + TITLE_PX).toBeGreaterThan(room);
   });

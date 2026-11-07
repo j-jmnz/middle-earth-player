@@ -19,6 +19,7 @@ import { useReaderPanelOpen } from "../choice/reader-panel.ts";
 import { hidesFace, shownSeat } from "../store/selectors.ts";
 import type { ReaderSeed, TableCanvasProps } from "./table-canvas-types.ts";
 import { readerRows, type ReaderItem } from "./reader-table-rows.ts";
+import { useBannerHeight } from "../readouts/banner-height.ts";
 import { useFocusRing } from "../../ui/focus-ring.ts";
 import { useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
@@ -67,12 +68,15 @@ function ReaderButton({ id, testID, label, hint, picked, glows, dimmed, muted, f
       onPress={() => onTap(id)}
     >
       {({ pressed }) => (
-        <View
-          className={`min-h-touch justify-center rounded-item px-2 py-1 ${picked > 0 ? "bg-accentLine" : "bg-raised"} ${glows ? "border border-accent" : ""} ${dimmed || muted ? "opacity-60" : ""}`}
-          style={{ ...(pressed ? { backgroundColor: t.hairline } : {}), ...ring.style }}
-        >
-          <Text className={faint ? "text-label text-faint" : "text-label text-bone"}>{label}</Text>
-          {hint ? <Text className="text-label text-muted">{hint}</Text> : null}
+        // The ring is on a view of its own so a dimmed row's opacity does not fade it.
+        <View className="rounded-item" style={ring.style}>
+          <View
+            className={`min-h-touch justify-center rounded-item px-2 py-1 ${picked > 0 ? "bg-accentLine" : "bg-raised"} ${glows ? "border border-accent" : ""} ${dimmed || muted ? "opacity-60" : ""}`}
+            style={pressed ? { backgroundColor: t.hairline } : undefined}
+          >
+            <Text className={faint ? "text-label text-faint" : "text-label text-bone"}>{label}</Text>
+            {hint ? <Text className="text-label text-muted">{hint}</Text> : null}
+          </View>
         </View>
       )}
     </Pressable>
@@ -130,6 +134,8 @@ export function ReaderTable({ store, width, height, bottomInset, nameOf, inactiv
   useReaderGateEnd(store);
   // A reading panel over the table is modal on iOS; Android hides the table from TalkBack while it is open (reader-panel.ts).
   const panelOpen = useReaderPanelOpen();
+  // The outcome banner lies over the table's top; while it is up the rows start under it, so a focused row is never covered (banner-height.ts).
+  const banner = useBannerHeight();
   const seat = useStore(store, (state) => shownSeat(state.game, state.viewedSeat));
   const game = useStore(store, (state) => state.game);
   // Peeking at the other seat: nothing is outlined, a tap only previews (use-table-choice.ts).
@@ -145,7 +151,7 @@ export function ReaderTable({ store, width, height, bottomInset, nameOf, inactiv
   const rows = readerRows(game, seat, { facts, cards: readerSeed.cards, nameOf, playable: highlight.tappable, discover });
   const deps: CardSpeechDeps = { nameOf, inactive, facts, info, highlight, cards: readerSeed.cards, sheet: readerSeed.sheet, peeking };
   return (
-    <ScrollView testID="reader-table" importantForAccessibility={tableVisibility(Platform.OS, panelOpen)} style={{ width, height }} contentContainerStyle={{ padding: 12 * s, paddingBottom: 12 * s + bottomInset }}>
+    <ScrollView testID="reader-table" importantForAccessibility={tableVisibility(Platform.OS, panelOpen)} style={{ width, height }} contentContainerStyle={{ padding: 12 * s, paddingTop: 12 * s + banner, paddingBottom: 12 * s + bottomInset }}>
       {rows.map((section) => (
         <View key={section.key} className="mb-3 gap-1">
           {section.heading ? (

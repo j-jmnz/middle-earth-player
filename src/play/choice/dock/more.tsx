@@ -47,7 +47,8 @@ export function useMorePopover(count: number, key: string): MorePopover {
 }
 
 // What the "i" popover holds: the full title, then the guide, the note and the refusals (dock/lines.ts).
-export type DockWords = { title: string; guide: string | null; note: string | null; unavailable: readonly Unavailable[] };
+// On a dense dock the readout's result and the refusal are fixed slots, so the "i" also holds them whole.
+export type DockWords = { title: string; guide: string | null; note: string | null; unavailable: readonly Unavailable[]; result?: string | null; refusal?: string | null };
 
 export function MorePopoverView({ more, items, words, commandWidth, insetRight, onClose }: { more: MorePopover; items: readonly DockExtra[]; words: DockWords; commandWidth: number; insetRight: number; onClose: () => void }) {
   const screen = useWindowDimensions();

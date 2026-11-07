@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { backStep, type BackLayers } from "./back.ts";
+import { backStep, undoAllowed, type BackLayers } from "./back.ts";
 
 const none: BackLayers = { spotlightOpen: false, scrubOpen: false, peekOpen: false, menuOpen: false, moreOpen: false, linesOpen: false, previewOpen: false, readingOpen: false, overlayOpen: false, panelOpen: false };
 const all: BackLayers = { spotlightOpen: false, scrubOpen: false, peekOpen: false, menuOpen: true, moreOpen: true, linesOpen: false, previewOpen: true, readingOpen: true, overlayOpen: true, panelOpen: true };
@@ -61,5 +61,21 @@ describe("hardware Back on the table", () => {
     expect(backStep({ ...none, overlayOpen: true, panelOpen: true })).toBe("closeOverlay");
     expect(backStep({ ...none, panelOpen: true })).toBe("foldPanel");
     expect(backStep(none)).toBe("leave");
+  });
+});
+
+describe("Undo by a hardware keyboard's Z", () => {
+  const none: BackLayers = { spotlightOpen: false, scrubOpen: false, peekOpen: false, menuOpen: false, moreOpen: false, linesOpen: false, previewOpen: false, readingOpen: false, overlayOpen: false, panelOpen: false };
+
+  it("runs with nothing over the table, with the tray open or a peek showing", () => {
+    expect(undoAllowed(none)).toBe(true);
+    expect(undoAllowed({ ...none, panelOpen: true })).toBe(true);
+    expect(undoAllowed({ ...none, peekOpen: true })).toBe(true);
+  });
+
+  it("does nothing while a spotlight plays, a scrub is open, or a menu, popover, preview, reading layer or sheet is open", () => {
+    for (const layer of ["spotlightOpen", "scrubOpen", "menuOpen", "moreOpen", "linesOpen", "previewOpen", "readingOpen", "overlayOpen"] as const) {
+      expect(undoAllowed({ ...none, [layer]: true }), layer).toBe(false);
+    }
   });
 });

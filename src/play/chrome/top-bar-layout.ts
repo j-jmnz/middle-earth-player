@@ -13,6 +13,11 @@ export const TOP_BAR = 52;
 // stands 3 pt under the bar's top edge and its pop (1.22) reaches 5 pt above the dial, off the screen and into a phone's rounded
 // corner (user report, 2026-10-29).
 export const BAR_TOP = 8;
+
+/** Where the bar's top edge is: under the top inset, and never at the screen's very edge (BAR_TOP at the UI scale `s`). */
+export function barTopOf(insetTop: number, s: number): number {
+  return Math.max(insetTop, BAR_TOP * s);
+}
 export const MENU_BUTTON = 44;
 // The bar's side padding (px-2 in table/top-bar.tsx).
 export const BAR_PAD = 8;

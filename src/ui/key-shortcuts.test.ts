@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { keyAction } from "./key-shortcuts.ts";
-import { ringStyleOf } from "./focus-ring-style.ts";
+import { ringRoom, ringScroll, ringStyleOf } from "./focus-ring-style.ts";
 
 describe("keyAction", () => {
   it("maps Escape", () => {
@@ -25,5 +25,12 @@ describe("ringStyleOf", () => {
   it("is a 2 pt solid outline 2 pt off, scaled", () => {
     expect(ringStyleOf("#fff", 1)).toEqual({ outlineStyle: "solid", outlineColor: "#fff", outlineWidth: 2, outlineOffset: 2 });
     expect(ringStyleOf("#fff", 1.5)).toMatchObject({ outlineWidth: 3, outlineOffset: 3 });
+  });
+});
+
+describe("ringScroll", () => {
+  it("pads a scroll view's content by the ring's room and takes the room back in the view's margins", () => {
+    expect(ringRoom(1)).toBe(4);
+    expect(ringScroll(1.5)).toEqual({ style: { marginTop: -6, marginHorizontal: -6 }, content: { paddingTop: 6, paddingHorizontal: 6 } });
   });
 });

@@ -8,6 +8,7 @@ import { scheduleOnRN } from "react-native-worklets";
 import { useStore } from "zustand";
 
 import { bannerSpan } from "./banner-span.ts";
+import { setBannerHeight } from "./banner-height.ts";
 import { layoutAnim, timing, useMotionScale, useReduceMotion } from "../../ui/motion-run.ts";
 import { MOTION } from "../../ui/motion-tokens.ts";
 import { CONTAINER_RADIUS } from "../../ui/radius.ts";
@@ -132,6 +133,8 @@ export function MomentBanner({
     const timer = setTimeout(() => setShownLines((count) => count + 1), bannerBeatMs(speed));
     return () => clearTimeout(timer);
   }, [shownLines, moment.lines.length, speed]);
+  // The list table keeps its rows under the banner's height while it is up (banner-height.ts).
+  useEffect(() => () => setBannerHeight(0), []);
   const beatCards = moment.lines[Math.max(0, shownLines - 1)]?.cards ?? [];
   const beatKey = beatCards.join(",");
   useEffect(() => {
@@ -139,7 +142,7 @@ export function MomentBanner({
     return () => onBeat?.([]);
   }, [beatKey, onBeat]);
   return (
-    <Animated.View entering={fade.enter} exiting={fade.leave} pointerEvents="box-none" style={{ position: "absolute", top, left, right, alignItems: "center", paddingHorizontal: SIDE }}>
+    <Animated.View entering={fade.enter} exiting={fade.leave} pointerEvents="box-none" onLayout={(event) => setBannerHeight(Math.round(event.nativeEvent.layout.height))} style={{ position: "absolute", top, left, right, alignItems: "center", paddingHorizontal: SIDE }}>
       <GestureDetector gesture={gesture}>
         {/* The shadow sits on an outer view: iOS clips a shadow on the view that clips its own corners. */}
         {/* The corners are a style: a class on a reanimated view does not apply. */}
