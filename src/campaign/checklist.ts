@@ -6,6 +6,7 @@ import { printedOf, type PrintedCard } from "../rules/core/printed.ts";
 import { AFTER_HAND, type StartSeat } from "../rules/setup/setup.ts";
 
 import { poolCard, type CampaignLog, type PoolCard } from "./log.ts";
+import { sagaOf } from "./checklist-saga.ts";
 import { logConditionHolds, poolEncounterCopies, removeFromDeck, searchableCaves, searchableDeck } from "./wilderland.ts";
 import { xpRowOf } from "./xp.ts";
 
@@ -15,7 +16,7 @@ import { xpRowOf } from "./xp.ts";
 
 export type ChecklistStep = { n: number; rule: "rr.campaign-setup-checklist"; text: string; did: string[] };
 // The seat while the checklist fills it in; StartSeat is the read-only shape it hands to the start.
-type Working = { heroes: string[]; deck: string[]; attachments: { host: string; code: string }[]; hand: string[]; afterMulligan: string[]; chosen?: string[] };
+type Working = { heroes: string[]; deck: string[]; attachments: { host: string; code: string }[]; hand: string[]; afterMulligan: string[]; chosen?: string[]; threatPenalty?: number };
 
 // `note` says what the choice is when the options alone do not (a search of the encounter deck for cards to remove from the game).
 export type Need = { seat: number; options: readonly string[]; note?: string };
@@ -32,7 +33,7 @@ export type ChecklistInput = {
 };
 
 export type ChecklistPlan =
-  | { ok: true; steps: ChecklistStep[]; threatModifier: number; seats: StartSeat[]; poolEncounterCards: string[]; poolIntoPlay: string[]; removedFromEncounter: string[]; removedFromCaves: string[]; log: CampaignLog }
+  | { ok: true; steps: ChecklistStep[]; threatModifier: number; forcedPenalty: number; seats: StartSeat[]; poolEncounterCards: string[]; poolIntoPlay: string[]; removedFromEncounter: string[]; removedFromCaves: string[]; log: CampaignLog }
   | { ok: false; errors: string[]; needs: Need | null };
 
 const TEXT: Readonly<Record<number, string>> = {
@@ -234,38 +235,66 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
   const seatCount = input.seats.length;
   const campaignSetup = recordInstructions(input.effects, scenario.campaignCard, "campaignSetup");
   const waived = campaignSetup.some((instruction) => instruction.verb === "WaiveThreatPenalty");
-  const fallen = new Set(log.fallenHeroesBySeat.flat());
 
   // The pool this checklist works on. A new save's first checklist takes in the cards a finished campaign carried over.
-  const pool: PoolCard[] = [...log.campaignPool, ...log.carryIn];
+  let pool: PoolCard[] = [...log.campaignPool, ...log.carryIn];
   // Entries the campaign card's own Setup adds (AddToPool): recorded, but not dealt again by steps 7 and 8.
   const fresh = new Set<PoolCard>();
+
+  // The saga hero of a Two Towers scenario (src/campaign/checklist-saga.ts): ☺ Aragorn is granted, not listed in the log, and a logged Aragorn or Fellowship hero is
+  // handled by mec112.campaign-mode-aragorn. Every other scenario reads as before (`saga.active` false).
+  const saga = sagaOf(scenario, cards);
+  let fallenLists = log.fallenHeroesBySeat;
+  let forcedPenalty = 0;
+  if (saga.active && saga.granted != null) {
+    // "If Aragorn had previously been added to the list of fallen heroes, remove his name from the list and each player incurs a permanent +1 threat penalty."
+    if (log.fallenHeroesBySeat.flat().some(saga.isAragorn)) {
+      fallenLists = log.fallenHeroesBySeat.map((list) => list.filter((code) => !saga.isAragorn(code)));
+      forcedPenalty = 1;
+    }
+  }
+  const fallen = new Set(fallenLists.flat());
 
   // 1 and 2: the heroes the players bring against the log, and the fallen list.
   const did1: string[] = log.carryIn.map((card) => `${name(card.code)} is carried over from the last campaign into the Campaign Pool.`);
   let changed = 0;
+  const forgotten = new Set<string>();
+  // What each seat plays (the granted hero included) and what its log lists afterwards (the granted hero never; the Fellowship heroes the saga keeps).
+  const dealtBySeat: string[][] = [];
   const heroesBySeat = input.seats.map((seat, index) => {
+    const dealt = [...seat.heroes];
+    dealtBySeat.push(dealt);
     const logged = log.heroesBySeat[index] ?? [];
+    const playing = dealt.filter((code) => code !== saga.granted);
     if (logged.length === 0) {
-      did1.push(`Seat ${index + 1} lists ${seat.heroes.map(name).join(", ")} in the Campaign Log.`);
-      return [...seat.heroes];
+      did1.push(`Seat ${index + 1} lists ${playing.map(name).join(", ")} in the Campaign Log.`);
+      return playing;
     }
-    const added = seat.heroes.filter((code) => !logged.includes(code));
-    const dropped = logged.filter((code) => !seat.heroes.includes(code));
+    // The Aragorn rule: that player loses control of the logged version, and the hero who replaces him costs no +1.
+    const lost = saga.active ? logged.filter(saga.isAragorn) : [];
+    for (const code of lost) forgotten.add(code);
+    const keptSaga = saga.active ? logged.filter((code) => saga.ofSaga(code)) : [];
+    const loggedPlayers = logged.filter((code) => !lost.includes(code) && !(saga.active && saga.ofSaga(code)));
+    const playersNow = playing.filter((code) => !(saga.active && saga.ofSaga(code)));
+    const added = playersNow.filter((code) => !loggedPlayers.includes(code));
+    const dropped = loggedPlayers.filter((code) => !playersNow.includes(code));
     // The same heroes every scenario, with two exceptions (ltp.fellowship-of-heroes): a fallen hero may be replaced, and
     // a player may trade 1 hero for a new one. A hero still alive is never left out without that trade.
     const droppedFallen = dropped.filter((code) => fallen.has(code)).length;
     const droppedAlive = dropped.filter((code) => !fallen.has(code));
-    const trades = Math.max(0, added.length - droppedFallen);
+    const freed = Math.min(lost.length, added.length);
+    const trades = Math.max(0, added.length - droppedFallen - freed);
     if (droppedAlive.length > trades) errors.push(`Seat ${index + 1}: ${droppedAlive.map(name).join(", ")} is listed in the Campaign Log and must start unless traded for a new hero`);
     if (trades > 1) errors.push(`Seat ${index + 1}: a player may trade only 1 hero between scenarios`);
     for (const code of dropped) {
       const carrying = log.campaignPool.find((card) => card.attachedTo === code && printedOf(cards, card.code).keywords.permanent);
       if (carrying && !fallen.has(code)) errors.push(`${name(code)} carries ${name(carrying.code)}, a Permanent card that must be attached to that hero at the start`);
     }
-    changed += added.length;
-    if (added.length > 0) did1.push(`Seat ${index + 1} changes ${dropped.map(name).join(", ") || "nothing"} for ${added.map(name).join(", ")}.`);
-    return [...seat.heroes];
+    changed += added.length - freed;
+    if (lost.length > 0) did1.push(`Seat ${index + 1} loses control of ${lost.map(name).join(", ")}: ☺ ${name(saga.granted ?? "")} takes ${lost.length === 1 ? "his" : "their"} place${added.length > 0 ? `, and ${added.map(name).join(", ")} replaces ${lost.length === 1 ? "him" : "them"} without the +1 penalty` : ""}.`);
+    if (added.length > freed) did1.push(`Seat ${index + 1} changes ${dropped.map(name).join(", ") || "nothing"} for ${added.map(name).join(", ")}.`);
+    // The log keeps the Fellowship heroes it holds (the Ring-bearer Frodo while ☺ Aragorn is granted), and lists the new line-up after them.
+    return saga.active ? [...keptSaga.filter((code) => !playing.includes(code)), ...playing] : playing;
   });
   note(1, did1.length > 0 ? did1 : ["Every player is using the heroes listed in the log."]);
   const unfit = input.seats.flatMap((seat, index) => seat.heroes.filter((code) => fallen.has(code)).map((code) => `Seat ${index + 1}: ${name(code)} is a fallen hero and cannot start`));
@@ -274,18 +303,27 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
 
   // 3 and 4: the threat penalty.
   const added = waived ? 0 : changed;
-  const threatPenalty = log.threatPenalty + added;
-  note(3, changed === 0 ? ["No hero was changed."] : waived ? [`${changed} hero change(s) cost nothing: the campaign card waives the +1 penalty.`] : [`${changed} hero change(s) add ${changed} to the threat penalty.`]);
-  note(4, [`Each player's starting threat is the combined threat cost of their heroes plus ${threatPenalty}.`]);
+  const threatPenalty = log.threatPenalty + added + forcedPenalty;
+  note(3, [...(changed === 0 ? ["No hero was changed."] : waived ? [`${changed} hero change(s) cost nothing: the campaign card waives the +1 penalty.`] : [`${changed} hero change(s) add ${changed} to the threat penalty.`]), ...(forcedPenalty > 0 ? ["Aragorn leaves the list of fallen heroes: each player takes a permanent +1 threat penalty (mec112.campaign-mode-aragorn)."] : [])]);
+  const extra = Array.from({ length: seatCount }, (_, index) => log.threatPenaltyBySeat[index] ?? 0);
+  note(4, [`Each player's starting threat is the combined threat cost of their heroes plus ${threatPenalty}.`, ...extra.flatMap((more, index) => (more > 0 ? [`Seat ${index + 1} takes a permanent +${more} starting threat penalty of its own, so its starting threat is plus ${threatPenalty + more}.`] : []))]);
 
-  const seats: Working[] = input.seats.map((seat, index) => ({ heroes: [...(heroesBySeat[index] ?? [])], deck: [...seat.deck], attachments: [], hand: [], afterMulligan: [] }));
+  const seats: Working[] = input.seats.map((seat, index) => ({ heroes: [...(dealtBySeat[index] ?? [])], deck: [...seat.deck], attachments: [], hand: [], afterMulligan: [], ...((extra[index] ?? 0) > 0 ? { threatPenalty: extra[index] } : {}) }));
 
-  // 5: Permanent boons and burdens go on their recorded hero.
+  // The cards with the Permanent keyword on a logged Aragorn move to ☺ Aragorn (mec112.campaign-mode-aragorn).
+  if (forgotten.size > 0 && saga.granted != null) pool = pool.map((card) => (card.attachedTo != null && forgotten.has(card.attachedTo) ? { ...card, attachedTo: saga.granted ?? card.attachedTo } : card));
+
+  // 5: Permanent boons and burdens go on their recorded hero. A hero of the saga who is not starting this scenario (the Ring-bearer Frodo while ☺ Aragorn is granted, ☺ Aragorn
+  // in the Ring-bearer scenarios) keeps the card in the pool.
   const did5: string[] = [];
   for (const card of pool) {
     if (card.attachedTo == null) continue;
     const seat = seats.findIndex((candidate) => candidate.heroes.includes(card.attachedTo ?? ""));
     if (seat < 0) {
+      if (saga.active && saga.ofSaga(card.attachedTo)) {
+        did5.push(`${name(card.code)} stays with ${name(card.attachedTo)}, who is not in this scenario.`);
+        continue;
+      }
       errors.push(`${name(card.code)} is attached to ${name(card.attachedTo)}, who is not one of the heroes starting`);
       continue;
     }
@@ -349,11 +387,12 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
     ok: true,
     steps,
     threatModifier: threatPenalty,
+    forcedPenalty,
     seats,
     poolEncounterCards,
     poolIntoPlay,
     removedFromEncounter: six.removed,
     removedFromCaves: six.removedCaves,
-    log: { ...log, heroesBySeat, threatPenalty, campaignPool: pool, carryIn: [] },
+    log: { ...log, heroesBySeat, fallenHeroesBySeat: fallenLists, threatPenalty, campaignPool: pool, carryIn: [] },
   };
 }

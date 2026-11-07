@@ -68,11 +68,23 @@ export type CampaignLog = {
   beldisUses: readonly number[];
   // The encounter cards in the Campaign Pool and how many copies of each: every later encounter deck holds them, whatever its set (emce.campaign-pool-encounter).
   encounterPool: Readonly<Record<string, number>>;
+  // The Two Towers Campaign Log (docs/brief.md, The Two Towers). A log saved before it reads with these defaults.
+  // The permanent starting threat penalty each seat takes of its own, on top of `threatPenalty` (The Passage of the Marshes: "each player must choose: either take a permanent +2 starting threat penalty, or earn 1 copy of The Searching Eye"). A seat with none read is 0.
+  threatPenaltyBySeat: readonly number[];
+  // What each seat chose there, by seat; a seat that has not chosen is null.
+  marshesChoice: readonly (MarshesChoice | null)[];
+  // The enemies underneath The Black Gate when Journey to the Cross-roads was won, by card code and quantity: "the name and quantity of each enemy", shown with the notes (The Black Gate Opens may read it).
+  blackGate: Readonly<Record<string, number>>;
+  // The campaign total the finished Fellowship save carried on (a continued save, docs/brief.md, The Two Towers): added to the scenario scores. 0 in a fresh save.
+  scoreBase: number;
 };
+
+export const MARSHES_CHOICES = ["penalty", "searchingEye"] as const;
+export type MarshesChoice = (typeof MARSHES_CHOICES)[number];
 
 export function emptyLog(seatCount: number): CampaignLog {
   const seats = Array.from({ length: seatCount }, () => [] as readonly string[]);
-  return { heroesBySeat: seats, fallenHeroesBySeat: seats, threatPenalty: 0, campaignPool: [], captives: [], completed: [], earned: {}, scenarios: {}, score: 0, notes: "", prisoner: null, usedOnce: [], counters: {}, carryOver: [], carryIn: [], xpGained: {}, marks: {}, modes: {}, modeDefault: null, treasures: [], allyLines: [], beldisUses: [], encounterPool: {} };
+  return { heroesBySeat: seats, fallenHeroesBySeat: seats, threatPenalty: 0, campaignPool: [], captives: [], completed: [], earned: {}, scenarios: {}, score: 0, notes: "", prisoner: null, usedOnce: [], counters: {}, carryOver: [], carryIn: [], xpGained: {}, marks: {}, modes: {}, modeDefault: null, treasures: [], allyLines: [], beldisUses: [], encounterPool: {}, threatPenaltyBySeat: [], marshesChoice: [], blackGate: {}, scoreBase: 0 };
 }
 
 // The Ring-bearer may have moved to another seat with the first player token (mec109.multiplayer-the-one-ring).
@@ -147,7 +159,7 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
     completed: [...log.completed, scenarioId],
     earned: { ...log.earned, [scenarioId]: result.earned.map((item) => item.code) },
     scenarios,
-    score: Object.values(scenarios).reduce((sum, item) => sum + item.score, 0),
+    score: log.scoreBase + Object.values(scenarios).reduce((sum, item) => sum + item.score, 0),
     notes: log.notes,
     prisoner: result.prisoner !== undefined ? result.prisoner : state.campaignFacts ? state.campaignFacts.prisoner : log.prisoner,
     // The game started from the log's uses and adds its own: its list is the whole record.
@@ -165,5 +177,9 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
     // The game started from the log's boxes and returns the whole record, as it does the uses.
     beldisUses: state.campaignFacts?.beldisUses ?? log.beldisUses,
     encounterPool: result.encounterPool ? cappedTally(result.encounterPool, copies) : log.encounterPool,
+    threatPenaltyBySeat: log.threatPenaltyBySeat,
+    marshesChoice: log.marshesChoice,
+    blackGate: log.blackGate,
+    scoreBase: log.scoreBase,
   };
 }

@@ -52,9 +52,9 @@ describe("pack booklets", () => {
       },
       log,
     );
-    expect(packed.map((book) => book.filename)).toEqual(["fellowship-of-the-ring.pdf", "learn-to-play.pdf", "rules-reference.pdf", "the-dark-of-mirkwood.pdf", "dream-chaser.pdf", "ered-mithrin.pdf"]);
+    expect(packed.map((book) => book.filename)).toEqual(["fellowship-of-the-ring.pdf", "learn-to-play.pdf", "rules-reference.pdf", "the-dark-of-mirkwood.pdf", "dream-chaser.pdf", "ered-mithrin.pdf", "the-two-towers.pdf"]);
     // Only the stale cached copy and the books with no cached copy are fetched.
-    expect(fetched).toEqual([ltp, BOOKLET_SOURCES["rules-reference"], BOOKLET_SOURCES["the-dark-of-mirkwood"], BOOKLET_SOURCES["dream-chaser"], BOOKLET_SOURCES["ered-mithrin"]].map((file) => `https://example.test/${file}`));
+    expect(fetched).toEqual([ltp, BOOKLET_SOURCES["rules-reference"], BOOKLET_SOURCES["the-dark-of-mirkwood"], BOOKLET_SOURCES["dream-chaser"], BOOKLET_SOURCES["ered-mithrin"], BOOKLET_SOURCES["the-two-towers"]].map((file) => `https://example.test/${file}`));
     expect(readFileSync(path.join(staged.outDir, "learn-to-play.pdf"))).toEqual(Buffer.from(body(ltp)));
     const map = readFileSync(path.join(staged.outDir, "bundled-map.ts"), "utf8");
     expect(map).toContain(`"fellowship-of-the-ring": { moduleId: require("./fellowship-of-the-ring.pdf") as number, filename: "${mec109}", bytes: ${body(mec109).length}, sha256: "${sha256(body(mec109))}" },`);
@@ -72,11 +72,12 @@ describe("pack booklets", () => {
 });
 
 describe("the booklet sources", () => {
-  it("bundle six books: the four campaign books, Learn to Play and the Rules Reference, each from its pinned file", () => {
-    expect(BOOKLETS.map((book) => book.id)).toEqual(["fellowship-of-the-ring", "learn-to-play", "rules-reference", "the-dark-of-mirkwood", "dream-chaser", "ered-mithrin"]);
+  it("bundle seven books: the five campaign books, Learn to Play and the Rules Reference, each from its pinned file", () => {
+    expect(BOOKLETS.map((book) => book.id)).toEqual(["fellowship-of-the-ring", "learn-to-play", "rules-reference", "the-dark-of-mirkwood", "dream-chaser", "ered-mithrin", "the-two-towers"]);
     expect(BOOKLET_SOURCES["rules-reference"]).toBe("mec101_rules_reference.pdf");
     expect(BOOKLET_SOURCES["the-dark-of-mirkwood"]).toBe("dark_of_mirkwood_rulebook_v2.pdf");
     expect(BOOKLET_SOURCES["dream-chaser"]).toBe("mec111_dream-chaser_campaign_expansion.pdf");
     expect(BOOKLET_SOURCES["ered-mithrin"]).toBe("mec115_rules-web.pdf");
+    expect(BOOKLET_SOURCES["the-two-towers"]).toBe("mec112_rulebook_eng.pdf");
   });
 });

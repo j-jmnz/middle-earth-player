@@ -1,6 +1,6 @@
 import { describe, expect, it, vi } from "vitest";
 
-import { readdirSync, readFileSync } from "node:fs";
+import { readdirSync } from "node:fs";
 
 import index from "../../../data/campaigns/index.json";
 import entries from "../../../data/rules/entries.json";
@@ -25,25 +25,21 @@ describe("campaign data on the phone", () => {
   });
 });
 
-// The Two Towers is built as data (phase 61) and listed locked; the app registers it in phase 62 (docs/plans/the-two-towers.md).
-const NOT_REGISTERED = ["the-two-towers"];
-const unregisteredScenarios = new Set(NOT_REGISTERED.flatMap((id) => (JSON.parse(readFileSync(`data/campaigns/${id}.json`, "utf8")) as { scenarios: string[] }).scenarios));
-
 describe("the registry", () => {
   it("holds every playable campaign data/campaigns/index.json lists, and nothing else that is built", () => {
-    const built = readdirSync("data/campaigns").filter((name) => name !== "index.json").map((name) => name.replace(/\.json$/, "")).filter((id) => !NOT_REGISTERED.includes(id)).sort();
+    const built = readdirSync("data/campaigns").filter((name) => name !== "index.json").map((name) => name.replace(/\.json$/, "")).sort();
     expect([...campaignIds()].sort()).toEqual(built);
     for (const entry of index) {
       const campaign = campaignOf(entry.id);
       if (built.includes(entry.id)) {
         expect(campaign?.name, entry.id).toBe(entry.name);
         expect(campaign?.scenarios.length, entry.id).toBe(entry.scenarioCount);
-      } else expect(campaign, entry.id).toBeNull(); // The Two Towers (built, not registered yet) and The Return of the King (not built) are listed locked.
+      } else expect(campaign, entry.id).toBeNull(); // The Return of the King (not built) is listed locked.
     }
   });
 
   it("holds every scenario file, and each campaign's scenarios are all in it", () => {
-    const files = readdirSync("data/scenarios").map((name) => name.replace(/\.json$/, "")).filter((id) => !unregisteredScenarios.has(id)).sort();
+    const files = readdirSync("data/scenarios").map((name) => name.replace(/\.json$/, "")).sort();
     for (const id of files) expect(scenarioOf(id)?.id, id).toBe(id);
     for (const id of campaignIds()) for (const scenario of campaignOf(id)?.scenarios ?? []) expect(files, `${id}: ${scenario}`).toContain(scenario);
   });
@@ -57,8 +53,8 @@ describe("the registry", () => {
     }
   });
 
-  it("splits the scenarios into five boxes, each scenario in one, each box inside its own campaign", () => {
-    expect(BOXES.map((box) => box.name)).toEqual(["Fellowship of the Ring", "Revised Core Set", "The Dark of Mirkwood", "Dream-chaser", "Ered Mithrin"]);
+  it("splits the scenarios into six boxes, each scenario in one, each box inside its own campaign", () => {
+    expect(BOXES.map((box) => box.name)).toEqual(["Fellowship of the Ring", "Revised Core Set", "The Dark of Mirkwood", "Dream-chaser", "Ered Mithrin", "The Two Towers"]);
     const listed = BOXES.flatMap((box) => box.scenarios);
     expect(new Set(listed).size).toBe(listed.length);
     const every = new Set(campaignIds().flatMap((id) => campaignOf(id)?.scenarios ?? []));
@@ -72,11 +68,15 @@ describe("the registry", () => {
     // One box holds all nine Dream-chaser scenarios, in play order (user decision, 2026-10-30).
     expect(BOXES.find((box) => box.id === "dream-chaser")?.scenarios).toEqual(campaignOf("dream-chaser")?.scenarios);
     expect(boxOf("a-storm-on-cobas-haven")?.id).toBe("dream-chaser");
+    // One box holds the six Two Towers scenarios, in play order.
+    expect(BOXES.find((box) => box.id === "the-two-towers")?.scenarios).toEqual(campaignOf("the-two-towers")?.scenarios);
+    expect(boxOf("shelobs-lair")?.id).toBe("the-two-towers");
     expect(boxOf("nowhere")).toBeNull();
   });
 
-  it("takes a standalone game's flags from its box: saga only for the Fellowship", () => {
+  it("takes a standalone game's flags from its box: saga for the Fellowship and The Two Towers", () => {
     expect(campaignOfScenario("a-knife-in-the-dark")?.saga).toBe(true);
+    expect(campaignOfScenario("the-uruk-hai")?.saga).toBe(true);
     expect(campaignOfScenario("the-drowned-ruins")?.saga).toBe(false);
     expect(campaignOfScenario("passage-through-mirkwood")?.saga).toBe(false);
     expect(campaignOfScenario("the-caves-of-nibin-dum")?.saga).toBe(false);
@@ -84,6 +84,8 @@ describe("the registry", () => {
   });
 
   it("opens each campaign's own booklet, on the scenario's page", () => {
+    expect(bookletParams("the-two-towers", "the-passage-of-the-marshes")).toEqual({ id: "the-two-towers", page: "9" });
+    expect(bookletParams("the-two-towers")).toEqual({ id: "the-two-towers" });
     expect(bookletParams("mirkwood-paths", "passage-through-mirkwood")).toEqual({ id: "learn-to-play", page: "25" });
     expect(bookletParams("the-dark-of-mirkwood", "the-oath")).toEqual({ id: "the-dark-of-mirkwood", page: "3" });
     expect(bookletParams("the-dark-of-mirkwood")).toEqual({ id: "the-dark-of-mirkwood" });

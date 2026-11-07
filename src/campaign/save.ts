@@ -6,7 +6,8 @@ import { ALLY_LINES, BELDIS_BOXES } from "../catalog/ally-lines.ts";
 import { DIFFICULTIES, type Difficulty } from "../catalog/scenario-data.ts";
 import type { PlayerIntent } from "../rules/core/intents.ts";
 
-import { emptyLog, type CampaignLog, type PoolCard } from "./log.ts";
+import { continuedLog } from "./continue.ts";
+import { emptyLog, MARSHES_CHOICES, type CampaignLog, type PoolCard } from "./log.ts";
 import type { ActiveScenario } from "./replay.ts";
 import { MODE_CARDS, type ModeCard } from "./xp.ts";
 
@@ -54,6 +55,11 @@ export const campaignLogSchema = z.strictObject({
   allyLines: z.array(z.enum(ALLY_LINES)).default([]),
   beldisUses: z.array(z.number().int().min(0).max(BELDIS_BOXES)).default([]),
   encounterPool: z.record(z.string(), z.number().int().positive()).default({}),
+  // The Two Towers Campaign Log (phase 62). A log saved before it reads with these defaults.
+  threatPenaltyBySeat: z.array(z.number().int().min(0)).default([]),
+  marshesChoice: z.array(z.enum(MARSHES_CHOICES).nullable()).default([]),
+  blackGate: z.record(z.string(), z.number().int().positive()).default({}),
+  scoreBase: z.number().int().default(0),
 });
 
 // The intents are checked by the reducer when they are replayed: one it does not know is refused, and the open
@@ -107,13 +113,16 @@ export type Save = {
 // What a new save may start with. `carried` is the carry-over of a finished save (carry-over.ts): the cards its first checklist takes into the
 // pool. A copy for each player becomes one entry for each of this save's seats, whatever the finished save had. `carriedFrom` is the finished
 // save's id. `modeDefault` is the Hard/Expert Mode card the campaign setup offers each briefing first (Dream-chaser).
-export type NewSaveOptions = { carried?: readonly PoolCard[]; carriedFrom?: string | null; modeDefault?: ModeCard | null };
+// `continued` is a finished save of the box before this one in the saga (continue.ts): the new save takes its log columns and its seat count, a log being per seat.
+export type NewSaveOptions = { carried?: readonly PoolCard[]; carriedFrom?: string | null; modeDefault?: ModeCard | null; continued?: Pick<Save, "id" | "seatCount" | "log"> | null };
 
 // A new save starts on a blank log (the Dark of Mirkwood mini campaign included).
 export function newSave(id: string, campaignId: string, seatCount: 1 | 2, options: NewSaveOptions = {}): Save {
-  const { carried = [], carriedFrom = null, modeDefault = null } = options;
-  const carryIn = carried.flatMap((card) => (card.perPlayer ? Array.from({ length: seatCount }, (_, seat) => ({ ...card, seat })) : [card]));
-  return { id, campaignId, seatCount, log: { ...emptyLog(seatCount), carryIn, modeDefault, ...(carriedFrom ? { carriedFrom } : {}) }, active: null, loadout: null };
+  const { carried = [], carriedFrom = null, modeDefault = null, continued = null } = options;
+  const seats = continued ? continued.seatCount : seatCount;
+  const carryIn = carried.flatMap((card) => (card.perPlayer ? Array.from({ length: seats }, (_, seat) => ({ ...card, seat })) : [card]));
+  const start = continued ? continuedLog(continued) : { ...emptyLog(seats), ...(carriedFrom ? { carriedFrom } : {}) };
+  return { id, campaignId, seatCount: seats, log: { ...start, carryIn, modeDefault }, active: null, loadout: null };
 }
 
 export function parseSeatCount(value: number): 1 | 2 {

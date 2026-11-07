@@ -3,6 +3,7 @@ import { burdenCodes, campaignScenario, corsairCodes, dealtPiles, doubleSidedCar
 import type { CampaignFacts } from "../rules/core/campaign-state.ts";
 import type { StartScenario, StartSeat } from "../rules/setup/setup.ts";
 
+import { sagaAttachments } from "./saga.ts";
 import { logConditionHolds } from "./wilderland.ts";
 import { MODE_CARD_CODE, MODE_CARD_SIDE, type ModeCard } from "./xp.ts";
 
@@ -120,6 +121,8 @@ export function buildStart(start: StartInput): StartScenario {
       ...(afterSetup.length > 0 ? { afterSetup } : {}),
       setup: [
         ...input.campaign.prelude.map((card) => ({ verb: "AttachToRingBearer" as const, code: card.code })),
+        // The One Ring a Two Towers scenario of the Ring-bearer attaches (ScenarioData.sagaStart); its campaign's prelude is empty.
+        ...sagaAttachments(input.scenario).map((code) => ({ verb: "AttachToRingBearer" as const, code })),
         ...dealt,
         ...poolInPlay.map((code) => ({ verb: "PutObjectiveAllyIntoPlay" as const, code })),
         ...setupInstructions(input.scenario, input.difficulty, input.seatCount),

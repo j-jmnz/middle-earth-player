@@ -28,6 +28,12 @@ export function andList(parts: readonly string[]): string {
   return parts.length > 1 ? `${parts.slice(0, -1).join(", ")} and ${parts.at(-1)}` : (parts[0] ?? "");
 }
 
+/** What a continued save takes in from a finished save of the box before it: "3 heroes, 1 fallen hero and 2 cards in the pool". */
+export function continueWords(offer: { heroes: number; fallen: number; pool: number }): string {
+  const count = (n: number, one: string, many: string): string => `${n} ${n === 1 ? one : many}`;
+  return andList([count(offer.heroes, "hero", "heroes"), count(offer.fallen, "fallen hero", "fallen heroes"), count(offer.pool, "card in the pool", "cards in the pool")]);
+}
+
 /** "is" for one card or a copy of one card for each player ("A Ranger Sense for each player is kept"), "are" for several cards or several copies of one. */
 export function carryVerb(cards: readonly Carried[]): "is" | "are" {
   return cards.length > 1 ? "are" : "is";

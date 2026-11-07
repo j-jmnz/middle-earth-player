@@ -7,11 +7,12 @@ const GLOSSARY = glossary();
 describe("GLOSSARY", () => {
   it("holds the rule books' spans and leaves out decklists, setups and stages", () => {
     const docs = new Set(GLOSSARY.map((entry) => entry.doc));
-    expect([...docs].sort()).toEqual(["dcce", "easy-mode", "emce", "faq", "learn-to-play", "mec109", "rr", "tdom"]);
-    expect(GLOSSARY.some((entry) => /^(decklist\.|mec109\.(starter-|setup-|stage-)|dcce\.(campaign-)?setup-|emce\.setup-)/.test(entry.id))).toBe(false);
+    expect([...docs].sort()).toEqual(["dcce", "easy-mode", "emce", "faq", "learn-to-play", "mec109", "mec112", "rr", "tdom"]);
+    expect(GLOSSARY.some((entry) => /^(decklist\.|mec109\.(starter-|setup-|stage-)|dcce\.(campaign-)?setup-|emce\.setup-|mec112\.setup-)/.test(entry.id))).toBe(false);
     expect(glossaryEntry("dcce.gaining-xp")?.source).toBe("Dream-chaser campaign rulebook · page 29");
     expect(glossaryEntry("mec109.hide-tests")?.source).toBe("Fellowship of the Ring campaign book · page 4");
     expect(glossaryEntry("emce.treasure")?.source).toBe("Ered Mithrin campaign rulebook · page 3");
+    expect(glossaryEntry("mec112.campaign-mode-aragorn")?.source).toBe("The Two Towers campaign rulebook · page 4");
   });
 
   it("sorts by title without entry numbers, step numbers or quote marks", () => {
@@ -91,6 +92,7 @@ describe("bookPage", () => {
     expect(bookPage(glossaryEntry("tdom.mirkwood-paths")!)).toEqual({ id: "the-dark-of-mirkwood", name: "The Dark of Mirkwood rulebook", page: 7 });
     expect(bookPage(glossaryEntry("dcce.gaining-xp")!)).toEqual({ id: "dream-chaser", name: "Dream-chaser campaign rulebook", page: 29 });
     expect(bookPage(glossaryEntry("emce.treasure")!)).toEqual({ id: "ered-mithrin", name: "Ered Mithrin campaign rulebook", page: 3 });
+    expect(bookPage(glossaryEntry("mec112.aragorn")!)).toEqual({ id: "the-two-towers", name: "The Two Towers campaign rulebook", page: 3 });
     expect(bookPage(glossaryEntry("faq.limitations-on-attacks")!)).toBeNull();
   });
 });
