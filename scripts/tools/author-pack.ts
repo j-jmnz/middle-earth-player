@@ -4,6 +4,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { bytes, runScript, type Log } from "../log.ts";
+import { dealtCodes, loadCampaigns, loadScenario } from "../data/load-scenarios.ts";
 import { ROOT } from "../data/paths.ts";
 import { sectionText } from "../docs/index.ts";
 
@@ -130,6 +131,12 @@ export function entriesFor(text: string, verbs: ReadonlySet<string>): { header: 
   return { header, entries };
 }
 
+/** The drafts of `names` (file names, `<code>.md`) that belong to the scenario, those of a card it deals, and the others, which another scenario's run (or `effects:draft` for a pack) left in the folder. */
+export function draftsOfScenario(names: readonly string[], dealt: ReadonlySet<string>): { kept: string[]; others: string[] } {
+  const kept = names.filter((name) => dealt.has(name.slice(0, -3)));
+  return { kept, others: names.filter((name) => !kept.includes(name)) };
+}
+
 /** The `##` headings of a doc, in order. */
 export function headingsIn(doc: string): string[] {
   return doc.split("\n").flatMap((line) => (/^## /.test(line) ? [line.slice(3).trim()] : []));
@@ -180,10 +187,11 @@ function main(log: Log): void {
   const draftsDir = path.join(ROOT, DRAFTS_DIR);
   const vocabularyPath = path.join(draftsDir, "vocabulary.md");
   if (!existsSync(vocabularyPath)) throw new Error(`${DRAFTS_DIR}/vocabulary.md is missing: run pnpm effects:draft ${id} first`);
-  const drafts = readdirSync(draftsDir)
-    .filter((name) => name.endsWith(".md") && name !== "vocabulary.md")
-    .sort()
-    .map((name) => ({ name, text: readFileSync(path.join(draftsDir, name), "utf8") }));
+  // Only the drafts of the scenario's own cards: with --no-draft the folder may hold another scenario's.
+  const present = readdirSync(draftsDir).filter((name) => name.endsWith(".md") && name !== "vocabulary.md").sort();
+  const { kept, others } = draftsOfScenario(present, dealtCodes(loadCampaigns(), [loadScenario(id)], { nightmare: true }));
+  if (others.length > 0) log.warn(`${DRAFTS_DIR} holds ${others.length} draft${others.length === 1 ? "" : "s"} of cards ${id} does not deal (${others.join(", ")}): left out of the pack. Run without --no-draft to rewrite the folder for ${id}.`);
+  const drafts = kept.map((name) => ({ name, text: readFileSync(path.join(draftsDir, name), "utf8") }));
   const sources = new Map<string, string>([
     ...readdirSync(path.join(ROOT, FAMILIES_DIR))
       .filter((name) => name.endsWith(".ts") && name !== "index.ts" && !name.endsWith(".test.ts"))

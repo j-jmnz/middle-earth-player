@@ -113,17 +113,9 @@ This replaces next step 4 of `docs/plans/scenario-pipeline.md` (Next steps).
 
 Not built. Build it only if the A/B shows that the goldens' intent policy is a large part of the fast arm's time.
 
-It is a generic beam search over legal intents, built on `test/harness/auto-player.ts` and scored on threat, progress, hero health and stage. It would replace the per-scenario policy in `game.ts` and find the won fixtures (`docs/phases/STATUS.md`, Fixtures and Maestro). It is also next step 5 of `docs/plans/scenario-pipeline.md` (Next steps).
+It is a generic beam search over legal intents, built on `test/harness/auto-player.ts` and scored on threat, progress, hero health and stage. It would replace the per-scenario policy in `game.ts` and find the won fixtures (`docs/phases/STATUS.md`, Fixtures and Maestro). It is also the win finder step of `docs/plans/scenario-pipeline.md` (Next steps).
 
 ## Order
-
-**Build the fast track.** Each step runs with `orchestrator` and one review round (`.claude/agents/orchestrator.md`, One review round).
-
-1. **F4.** Both arms use it, and it depends on nothing else.
-2. **F3.** Prove it with a scratch test, not committed, that writes rows for ten lines of `the-fate-of-wilderland` and shows the record-removed run failing.
-3. **F2.** Prove it by rendering `the-fate-of-wilderland`, putting one of its review-found misreadings back in a scratch copy, and showing the judge flag it.
-4. **F1.** Prove it with scratch asks for three of `the-fate-of-wilderland`'s choices that render the sentences `src/play/choice/fate-sheets.test.ts` pins.
-5. **F5.** `scenario:new --track fast`, `author:pack`, `test:scenario --quick`, the two agent files and `docs/handover/fast-track.md`.
 
 **Shared prerequisite.** The Two Towers data and campaign shell, on the classic procedure. No plan for them exists yet:
 

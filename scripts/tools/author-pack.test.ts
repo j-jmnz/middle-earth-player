@@ -3,7 +3,7 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { ALWAYS_SECTIONS, entriesFor, headingsIn, packPlan, recordsOf, renderPack, verbFamilies } from "./author-pack.ts";
+import { ALWAYS_SECTIONS, draftsOfScenario, entriesFor, headingsIn, packPlan, recordsOf, renderPack, verbFamilies } from "./author-pack.ts";
 
 // pnpm author:pack <scenario-id>: what goes into the pack is a pure function of the drafts' text and the schema files' text.
 const ROOT = path.resolve(import.meta.dirname, "..", "..");
@@ -111,5 +111,12 @@ describe("headingsIn and renderPack", () => {
     expect(text).not.toContain('verb: z.literal("Third")');
     expect(text).toContain("## src/catalog/families/south.ts");
     expect(text).toContain("## 1.md");
+  });
+});
+
+describe("draftsOfScenario", () => {
+  it("keeps the drafts of the cards a scenario deals and names the others", () => {
+    expect(draftsOfScenario(["11001.md", "12044.md", "900101.md"], new Set(["12044", "900101"]))).toEqual({ kept: ["12044.md", "900101.md"], others: ["11001.md"] });
+    expect(draftsOfScenario([], new Set(["1"]))).toEqual({ kept: [], others: [] });
   });
 });

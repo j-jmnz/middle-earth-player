@@ -52,7 +52,16 @@ const TARGET_STAT: Readonly<Record<string, string>> = {
 const targetStat = (value: string): string => TARGET_STAT[value] ?? cardRef(value);
 const untilWords = (until: unknown): string => STAT_UNTIL[str(until)] ?? str(until);
 
-const TEMPLATES: Readonly<Record<string, Template>> = {
+// What bounds an Each that lets the actor choose: how many cards, the total printed cost they may add up to, and the cards the engine has already recorded.
+function eachLimits(i: Obj, ctx: Ctx): string {
+  const total = i.totalCost === undefined ? "" : `their printed costs adding up to at most ${amount(i.totalCost, ctx)}`;
+  const upTo = i.upTo === undefined ? "" : `up to ${i.upTo === "any" ? "any number" : amount(i.upTo, ctx)} chosen`;
+  const bound = [upTo, total].filter((part) => part !== "").join(", ");
+  const taken = Array.isArray(i.taken) ? ` (the engine has recorded ${i.taken.length} chosen so far)` : "";
+  return `${bound === "" ? "" : ` (${bound})`}${taken}`;
+}
+
+export const TEMPLATES: Readonly<Record<string, Template>> = {
   ModifyStat: (i, ctx) => {
     const holders = isObj(i.holders) ? `each ${pick(i.holders, ctx)}` : typeof i.target === "string" ? targetStat(i.target) : "this card";
     const per = typeof i.per === "string" ? ` for each ${i.per}` : "";
@@ -73,7 +82,7 @@ const TEMPLATES: Readonly<Record<string, Template>> = {
   Discard: (i) => ({ text: `discard ${target(i.target)}`, read: ["target"] }),
   DiscardFromHand: (i, ctx) => ({ text: `discard ${amount(i.amount, ctx)} cards from hand`, read: ["amount"] }),
   Draw: (i, ctx) => ({ text: `${who(i.who ?? "actor")} draws ${i.amount === undefined ? "1" : amount(i.amount, ctx)} card(s)${typeof i.perHero === "string" ? ` for each ${i.perHero} hero` : ""}${i.from === "bottom" ? " from the bottom of the deck" : ""}`, read: ["who", "amount", "perHero", "from"] }),
-  RaiseThreat: (i, ctx) => ({ text: `raise threat by ${i.amount === undefined ? "1" : amount(i.amount, ctx)} (${who(i.who ?? "actor")})`, read: ["amount", "who", "perCommitted"] }),
+  RaiseThreat: (i, ctx) => ({ text: `raise threat by ${i.amount === undefined ? "1" : amount(i.amount, ctx)} (${who(i.who ?? "actor")})${isObj(i.perCommitted) ? ` for each ${typeof i.perCommitted.exceptSphere === "string" ? `non-${i.perCommitted.exceptSphere} ` : ""}${str(i.perCommitted.type)} committed to the quest` : ""}`, read: ["amount", "who", "perCommitted"] }),
   LowerThreat: (i, ctx) => ({ text: `lower threat by ${amount(i.amount, ctx)} (${who(i.who)})`, read: ["amount", "who"] }),
   ReturnToStaging: (i) => ({ text: `return ${target(i.target)} to the staging area`, read: ["target"] }),
   ShuffleEncounterDeck: () => ({ text: "shuffle the encounter deck", read: [] }),
@@ -97,19 +106,22 @@ const TEMPLATES: Readonly<Record<string, Template>> = {
   Engage: (i) => ({ text: `engage ${cardRef(i.target ?? "picked")}`, read: ["target"] }),
   Travel: () => ({ text: "travel to this location", read: ["to"] }),
   Attack: () => ({ text: "make an attack", read: [] }),
-  MovePicked: (i) => ({ text: `move the picked card to ${i.to === "hand" ? "hand" : "play"}`, read: ["to", "who"] }),
+  MovePicked: (i) => ({
+    text: typeof i.who === "string" ? `move the picked card ${i.to === "hand" ? `to ${who(i.who)}'s hand` : `into play under ${who(i.who)}'s control`}` : `move the picked card to ${i.to === "hand" ? "hand" : "play"}`,
+    read: ["to", "who"],
+  }),
   Choose: (i, ctx) => ({
     text: `${who(i.who)} chooses${i.different === true ? " (each option once)" : ""}${i.upTo !== undefined ? ` up to ${amount(i.upTo, ctx)} options` : " one of"}:`,
     read: ["who", "different", "upTo", "options"],
     children: Array.isArray(i.options) ? (i.options as readonly Obj[]) : [],
   }),
   Each: (i, ctx) => ({
-    text: `for each ${pick(i.pick, ctx)}${i.upTo !== undefined ? ` (up to ${i.upTo === "any" ? "any number" : amount(i.upTo, ctx)} chosen)` : ""}:`,
+    text: `for each ${pick(i.pick, ctx)}${eachLimits(i, ctx)}:`,
     read: ["pick", "upTo", "instructions", "totalCost", "taken"],
     children: Array.isArray(i.instructions) ? (i.instructions as readonly Obj[]) : [],
   }),
   Delay: (i, ctx) => ({
-    text: `later, ${DELAY_UNTIL[str(i.until)] ?? `at ${str(i.until)}`}${isObj(i.uncancelable) ? ` (cannot be canceled while ${renderCondition(i.uncancelable, ctx)})` : ""}:`,
+    text: `later, ${DELAY_UNTIL[str(i.until)] ?? `at ${str(i.until)}`}${i.subject === "picked" ? ", acting on the card last picked" : ""}${isObj(i.uncancelable) ? ` (cannot be canceled while ${renderCondition(i.uncancelable, ctx)})` : ""}:`,
     read: ["until", "uncancelable", "subject", "instructions"],
     children: Array.isArray(i.instructions) ? (i.instructions as readonly Obj[]) : [],
   }),

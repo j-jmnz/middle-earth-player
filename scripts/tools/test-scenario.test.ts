@@ -168,6 +168,13 @@ describe("quickParts (--quick)", () => {
     expect(by("tests")?.note).toContain("--quick");
   });
 
+  it("skips the goldens a scenario's tests part reads directly: a-shadow-of-the-past's replay and causes tests", () => {
+    const direct = [{ name: "tests", files: ["src/campaign/causes.test.ts", "src/campaign/replay.test.ts", "src/campaign/scenarios/a-shadow-of-the-past/quest.test.ts"] }];
+    expect(quickParts(direct, "a-shadow-of-the-past", true)[0]?.files).toEqual(["src/campaign/scenarios/a-shadow-of-the-past/quest.test.ts"]);
+    // Another scenario's tests part keeps them: they are its tests, not goldens it skips.
+    expect(quickParts(direct, "the-oath", true)[0]?.files).toEqual(direct[0]!.files);
+  });
+
   it("keeps the coverage and family parts, and another scenario's golden test", () => {
     const quick = quickParts(parts, "the-oath-extra", true);
     expect(quick.find((part) => part.name === "coverage")).toEqual(parts[2]);

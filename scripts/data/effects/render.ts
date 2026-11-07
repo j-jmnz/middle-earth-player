@@ -1,4 +1,4 @@
-import { mkdirSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 
@@ -19,14 +19,16 @@ import { renderCard } from "./render/cards.ts";
 // docs/plans/scenario-fast-track.md, F2) checks each record against the line it implements. A piece with no template prints as compact JSON.
 // A scenario id renders the cards that have a record in src/effects/authored/<scenario-id>.ts; --all-dealt renders every card the scenario deals.
 
-async function authoredCodes(scenarioId: string): Promise<Set<string> | null> {
+// The cards the scenario's authored file has records for, or null when it has no such file (the caller says so and renders every dealt card). A file that fails to load throws: it is not "no file".
+async function authoredCodes(scenarioId: string, log: Log): Promise<Set<string> | null> {
   const file = path.join(ROOT, "src", "effects", "authored", `${scenarioId}.ts`);
-  try {
-    const loaded = (await import(pathToFileURL(file).href)) as { AUTHORED_EFFECTS?: readonly Effect[] };
-    return loaded.AUTHORED_EFFECTS ? new Set(loaded.AUTHORED_EFFECTS.map((effect) => effect.cardCode)) : null;
-  } catch {
+  if (!existsSync(file)) {
+    log.warn(`src/effects/authored/${scenarioId}.ts does not exist: rendering every card the scenario deals (as --all-dealt does)`);
     return null;
   }
+  const loaded = (await import(pathToFileURL(file).href)) as { AUTHORED_EFFECTS?: readonly Effect[] };
+  if (!loaded.AUTHORED_EFFECTS) throw new Error(`src/effects/authored/${scenarioId}.ts exports no AUTHORED_EFFECTS`);
+  return new Set(loaded.AUTHORED_EFFECTS.map((effect) => effect.cardCode));
 }
 
 async function main(log: Log): Promise<void> {
@@ -45,7 +47,7 @@ async function main(log: Log): Promise<void> {
   else {
     const scenario = loadScenario(pieces[0] ?? "");
     const dealt = [...dealtCodes(loadCampaigns(), [scenario])];
-    const owned = args.includes("--all-dealt") ? null : await authoredCodes(scenario.id);
+    const owned = args.includes("--all-dealt") ? null : await authoredCodes(scenario.id, log);
     codes = dealt.filter((code) => owned === null || owned.has(code)).sort();
     for (const card of scenario.cards) piles.set(card.code, card.pile);
     log.info(`scenario ${scenario.id}: ${codes.length} cards`);

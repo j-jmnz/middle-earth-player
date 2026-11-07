@@ -31,7 +31,7 @@ export function askWords(a: {
   cause?: Cause;
 }): AskedWords {
   const { game, ctx, names, instruction, queue, options, source, picked, amountNow, effectId, cause } = a;
-  const written = asksPick({ game, ctx, names, instruction, source, amountNow, ...(effectId ? { effectId } : {}), ...(cause ? { cause } : {}) });
+  const written = asksPick({ game, ctx, names, instruction, source, amountNow, options, ...(effectId ? { effectId } : {}), ...(cause ? { cause } : {}) });
   if (written) return written;
   const traded = instruction.verb === "TradeDamageForThreat" && instruction.character ? game.cards[instruction.character] : undefined;
   if (instruction.verb === "TradeDamageForThreat" && traded) {

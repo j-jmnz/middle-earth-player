@@ -113,6 +113,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - `LowerThreatByRaise` (08062) bypasses `lowerThreatByEffect`, so the Hard cap and Expert bar do not stop it. Engine refusal strings in `sea/ships.ts` still say "ship-objective".
 
 ### Rules and engine
+- A Shadow of the Past: the encounter smoke (`scripts/card-smoke/encounter.ts`, `KNOWN`) finds Escape to Buckland's Response (141024:response:1, hideSucceeded) offered during a travel's Hide test and refused with "Travel was refused". Not fixed.
+- The Fate of Wilderland readings the reading judge questions, not user-confirmed: 19155:A:2 carries a once-per-round limit the printed Forced lacks; 19160:A:1 fires when the attack is over, not when the blank shadow card is dealt.
 - Journey Up the Anduin readings not user-confirmed: the treasure comes at exactly X resources (120165:A:3); the first player chooses the treasure and its character; progress placed after a successful quest counts for 18066:B:1; locations from 18066:A:1 are added as each is discarded; 18067:B:1 caps staging locations only; Lost in the Wild goes to the encounter discard when it discards the hand.
 - Lost in the Wild: a player-card `canPick` condition knows a hand pick is a discard only when its record says `discarded: true` (Jewels of Wilderland, Glittering Lute); other campaigns' records are not marked.
 - Treasures cannot be played from a hand (no path for type `treasure`); only the claim puts one into play.
@@ -178,6 +180,9 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - Accessibility: at font scale 2 on a phone in landscape the dock's worst moment (a why line, a three-line primary, Cancel and More, an attack readout) passes its column even with the aids folded (`it.fails` in `dock/text-size-fit.test.ts`); at font scale 1 the longest caution with an attack readout passes it by up to 16 pt (`HAND_SLACK`, `budget.test.ts`). Needs a dock design.
 - Accessibility: the Label in Name entries held in `OPEN` (`scripts/checks/a11y-web.ts`) are axe joining sibling text with no space on react-native-web; the names start with their visible words.
 - Effect templates: an unlabelled conditional constant ("If you are on-course, ~ gets +2 …") is read as triggered by `unreadBefore`; `SPLIT_LINES` in `scripts/data/effects/generate.ts` names one card's line.
+
+### Scenario pipeline
+- Fast track built; Two Towers data, then the A/B on The Uruk-hai (`docs/plans/scenario-fast-track.md`).
 
 ## Standing decisions
 - Sources are online; no physical card or box check (user, 2026-10-24). The nine MEC109 cards rest on the older printing's scans.

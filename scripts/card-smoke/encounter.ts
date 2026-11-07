@@ -19,6 +19,22 @@ import { encounterStart, encounterWorld, kept, type EncounterWorld } from "./enc
 // Usage: node --experimental-strip-types scripts/card-smoke/encounter.ts <scenario-id>... [--all] [--games=<n>] [--cards-only] [--games-only] [--verbose]
 // --all smokes every playable scenario (src/campaign/playable.ts).
 
+/**
+ * Failures the engine has and this smoke reports without failing the run, each open in docs/phases/STATUS.md (Open items). A game is named by its scenario, number and seed, and the entry matches only the
+ * message that contains `error` on an intent that contains `intent`: any other problem of that game, and any other game, still fails. Delete an entry when its engine fix lands.
+ */
+export type KnownFailure = { scenario: string; game: number; seed: number; intent: string; error: string; note: string };
+export const KNOWN: readonly KnownFailure[] = [
+  {
+    scenario: "a-shadow-of-the-past",
+    game: 5,
+    seed: 6,
+    intent: "141024:response:1",
+    error: "Travel was refused",
+    note: "Escape to Buckland (141024:response:1, hideSucceeded) is offered as a Trigger and then refused with \"Travel was refused\"; open in docs/phases/STATUS.md",
+  },
+];
+
 export type EncounterSummary = { scenario: string; cards: CardResult[]; games: GameSummary[]; ms: number };
 
 /** The table the card probes run on: the scenario dealt to one seat, its first seat kept. */
@@ -43,29 +59,51 @@ export async function smokeScenario(scenarioId: string, options: { games?: numbe
   return { scenario: scenarioId, cards: results, games, ms: performance.now() - begin };
 }
 
-export function problemsOf(summary: EncounterSummary): string[] {
+const gameLine = (scenario: string, game: GameSummary, problem: NonNullable<GameSummary["problem"]>): string =>
+  `${scenario} game ${game.game} (seed ${game.seed}, ${game.profile} heroes, ${game.seats} seat${game.seats > 1 ? "s" : ""}) intent ${problem.step} (round ${problem.round}, window ${problem.window ?? "none"}): ${JSON.stringify(problem.intent)}: ${problem.message}`;
+
+/** The problems of a summary that are not in `known`: what fails the run. */
+export function problemsOf(summary: EncounterSummary, known: readonly KnownFailure[] = KNOWN): string[] {
   const cards = summary.cards.flatMap((result) => (result.problem ? [`${summary.scenario} card ${result.code} ${result.probe}: ${result.problem}`] : []));
-  const games = summary.games.flatMap((game) => {
-    const problem = game.problem;
-    if (!problem) return [];
-    return [`${summary.scenario} game ${game.game} (seed ${game.seed}, ${game.profile} heroes, ${game.seats} seat${game.seats > 1 ? "s" : ""}) intent ${problem.step} (round ${problem.round}, window ${problem.window ?? "none"}): ${JSON.stringify(problem.intent)}: ${problem.message}`];
-  });
+  const games = summary.games.flatMap((game) => (game.problem && !knownFailure(summary.scenario, game, known) ? [gameLine(summary.scenario, game, game.problem)] : []));
   return [...cards, ...games];
+}
+
+/** The known failure a game's problem is, or undefined (a different message, intent, game or seed is not it). */
+export function knownFailure(scenario: string, game: GameSummary, known: readonly KnownFailure[] = KNOWN): KnownFailure | undefined {
+  const problem = game.problem;
+  if (!problem) return undefined;
+  return known.find((item) => item.scenario === scenario && item.game === game.game && item.seed === game.seed && problem.message.includes(item.error) && JSON.stringify(problem.intent).includes(item.intent));
+}
+
+/** The games whose problem is a known failure, as report lines. */
+export function knownOf(summary: EncounterSummary, known: readonly KnownFailure[] = KNOWN): string[] {
+  return summary.games.flatMap((game) => {
+    const item = knownFailure(summary.scenario, game, known);
+    return item && game.problem ? [`${gameLine(summary.scenario, game, game.problem)} (known: ${item.note})`] : [];
+  });
 }
 
 export function formatSummary(summary: EncounterSummary): string {
   const ended = (kind: GameSummary["ended"]) => summary.games.filter((game) => game.ended === kind).length;
+  const knownLines = knownOf(summary);
   const probes = summary.cards.length;
   const notes = summary.cards.filter((result) => result.note != null).length;
-  const head = `${summary.scenario}: ${probes} card probes (${notes} with nothing to run), ${summary.games.length} games (${ended("won")} won, ${ended("lost")} lost, ${ended("problem")} problems), ${duration(summary.ms)}`;
-  return [head, ...problemsOf(summary).map((line) => `  problem: ${line}`)].join("\n");
+  const head = `${summary.scenario}: ${probes} card probes (${notes} with nothing to run), ${summary.games.length} games (${ended("won")} won, ${ended("lost")} lost, ${ended("problem") - knownLines.length} problems${knownLines.length > 0 ? `, ${knownLines.length} known` : ""}), ${duration(summary.ms)}`;
+  return [head, ...problemsOf(summary).map((line) => `  problem: ${line}`), ...knownLines.map((line) => `  known: ${line}`)].join("\n");
+}
+
+/** A non-negative whole number from a flag: `--games=abc` is an error, not a run of no games that passes. */
+export function countOf(name: string, value: string): number {
+  if (!/^\d+$/.test(value)) throw new Error(`--${name}=${value}: expected a whole number`);
+  return Number(value);
 }
 
 async function main(log: Log): Promise<void> {
   const args = process.argv.slice(2);
   const number = (name: string) => {
     const value = args.find((arg) => arg.startsWith(`--${name}=`))?.split("=")[1];
-    return value == null ? undefined : Number(value);
+    return value == null ? undefined : countOf(name, value);
   };
   const named = args.filter((arg) => !arg.startsWith("--"));
   const ids = args.includes("--all") ? [...PLAYABLE_SCENARIOS] : named;

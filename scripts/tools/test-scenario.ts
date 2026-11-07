@@ -14,8 +14,9 @@ import { WORDS_SCENARIOS } from "../../test/harness/words-scenarios.ts";
 //   pnpm test:scenario <scenario-id> [--list]
 //   pnpm test:scenario <scenario-id> --quick      the loop while authoring: skips the goldens (the registry-wide golden tests and the scenario's own golden.test.ts) and the reader
 //                                                 check; the full run, once before the hand-back, runs them (docs/handover/fast-track.md)
-//   pnpm test:scenario <scenario-id> --words      only src/play/words/scenario-words.test.ts for the scenario, with WORDS_DUMP=<id>: it prints every sentence
-//                                                 the scenario's choices say (the check for a bare "Choose a player." or a fallback sentence)
+//   pnpm test:scenario <scenario-id> --words      only src/play/words/scenario-words.test.ts for the scenario, and src/play/words/asks.test.ts when it has an asks file
+//                                                 (src/play/words/asks/<id>.ts), with WORDS_DUMP=<id>: it prints every sentence the scenario's choices say (the
+//                                                 check for a bare "Choose a player." or a fallback sentence, and for a fast-track scenario every asks entry rendered)
 //
 // Parts, each its own vitest run (or the card smoke), so a failure names its part:
 //   tests      the test files that belong to the scenario: those whose path names it (its folder under src/campaign/scenarios/, src/play/scenarios/<id>-*.test.ts, ...)
@@ -47,6 +48,7 @@ export const COVERAGE_TESTS = ["scripts/checks/effect-coverage.test.ts", "script
 export const READER_TEST = "src/play/reader-play.test.ts";
 const WORDS_ROOT = "src/play/words/";
 const WORDS_TEST = `${WORDS_ROOT}scenario-words.test.ts`;
+const ASKS_TEST = `${WORDS_ROOT}asks.test.ts`;
 export const GOLDEN_TESTS = ["src/campaign/causes.test.ts", "src/campaign/replay.test.ts", "src/campaign/fixtures.test.ts"];
 
 const escapeRegExp = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -116,14 +118,16 @@ export const DIRECT_GOLDENS: Readonly<Record<string, readonly string[]>> = {
 
 const QUICK_NOTE = "skipped by --quick";
 
-/** The parts `--quick` leaves out: the goldens (the registry-wide tests, and the scenario's own golden test out of `tests`) and the reader check. A pure function of the parts. */
+/** The parts `--quick` leaves out: the goldens (the registry-wide tests, the scenario's own golden test out of `tests`, and the tests that read its goldens directly) and the reader check. A pure function of the parts. */
 export function quickParts<T extends { name: string; files: string[]; note?: string | undefined }>(parts: readonly T[], id: string, quick: boolean): T[] {
   if (!quick) return [...parts];
   return parts.map((part) => {
     if (part.name === "goldens" || part.name === "reader") return { ...part, files: [], note: QUICK_NOTE };
     if (part.name !== "tests") return part;
-    const files = part.files.filter((file) => file !== `src/campaign/scenarios/${id}/golden.test.ts`);
-    return files.length === part.files.length ? part : { ...part, files, note: `${QUICK_NOTE}: the scenario's golden test` };
+    // The scenario's own golden test, and the registry-wide tests that read its goldens directly (DIRECT_GOLDENS: replay and causes, run whole for a-shadow-of-the-past).
+    const goldens = new Set([`src/campaign/scenarios/${id}/golden.test.ts`, ...(DIRECT_GOLDENS[id] ?? [])]);
+    const files = part.files.filter((file) => !goldens.has(file));
+    return files.length === part.files.length ? part : { ...part, files, note: `${QUICK_NOTE}: the scenario's golden tests` };
   });
 }
 
@@ -201,8 +205,9 @@ async function main(log: Log): Promise<void> {
     if (!existsSync(path.join(ROOT, WORDS_TEST))) throw new Error(`${WORDS_TEST} does not exist`);
     // The test reads the playable and the scaffolded scenarios only; for any other id vitest would run nothing and report success.
     if (!WORDS_SCENARIOS.includes(id)) throw new Error(`${id} is neither playable (src/campaign/playable.ts) nor scaffolded (src/campaign/scenarios/${id}/golden.test.ts), so the words test does not read it`);
-    // The describe.each title of the test is "the words of <id>"; WORDS_DUMP makes it print the sentences.
-    const outcome = run("pnpm", ["exec", "vitest", "run", WORDS_TEST, "-t", `the words of ${id}`, "--silent=false"], { WORDS_DUMP: id });
+    // The describe.each titles are "the words of <id>" and, for a scenario with an asks file, "the asks of <id>"; WORDS_DUMP makes them print the sentences.
+    const asked = existsSync(path.join(ROOT, WORDS_ROOT, "asks", `${id}.ts`));
+    const outcome = run("pnpm", ["exec", "vitest", "run", WORDS_TEST, ...(asked ? [ASKS_TEST] : []), "-t", `the (words|asks) of ${escapeRegExp(id)}`, "--silent=false"], { WORDS_DUMP: id });
     if (!outcome.ok) throw new Error("the words test failed");
     return;
   }

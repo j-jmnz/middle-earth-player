@@ -3,9 +3,9 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Effect, Instruction } from "../../src/catalog/boundary.ts";
 import type { ReduceContext } from "../../src/rules/engine/reduce.ts";
 
-import { probeTable, problemsOf, smokeScenario } from "./encounter.ts";
+import { countOf, KNOWN, knownOf, probeTable, problemsOf, smokeScenario, type EncounterSummary } from "./encounter.ts";
 import { encounterCards, probeCard, type Probe } from "./encounter-cards.ts";
-import { playGame } from "./encounter-games.ts";
+import { playGame, type GameSummary } from "./encounter-games.ts";
 import type { EncounterWorld } from "./encounter-world.ts";
 import { encounterWorld } from "./encounter-world.ts";
 
@@ -78,5 +78,39 @@ describe(`encounter smoke: ${SCENARIO}`, () => {
     expect(failed.length).toBeGreaterThan(0);
     expect(failed[0]?.problem?.message).toContain("NoSuchVerb");
     expect(failed[0]?.problem?.step).toBeGreaterThan(0);
+  });
+});
+
+describe("known failures and flags", () => {
+  const game = (over: Partial<NonNullable<GameSummary["problem"]>> & { game?: number; seed?: number } = {}): GameSummary => ({
+    game: over.game ?? 5,
+    seed: over.seed ?? 6,
+    profile: "strong",
+    seats: 2,
+    steps: 0,
+    rounds: 0,
+    ended: "problem",
+    problem: { game: over.game ?? 5, seed: over.seed ?? 6, profile: "strong", seats: 2, step: 80, round: 3, window: "response", intent: { type: "Trigger", cardId: "i3", effectId: "141024:response:1" }, message: "The reducer refused an offered intent: Travel was refused", ...over },
+  });
+  const summary = (games: GameSummary[]): EncounterSummary => ({ scenario: "a-shadow-of-the-past", cards: [], games, ms: 0 });
+
+  it("reports the listed failure as known and fails on anything else", () => {
+    expect(KNOWN.length).toBeGreaterThan(0);
+    expect(problemsOf(summary([game()]))).toEqual([]);
+    expect(knownOf(summary([game()]))).toHaveLength(1);
+    // Another message, another seed, another game or another scenario is not the known one.
+    expect(problemsOf(summary([game({ message: "The reducer refused an offered intent: something else" })]))).toHaveLength(1);
+    expect(problemsOf(summary([game({ seed: 7 })]))).toHaveLength(1);
+    expect(problemsOf(summary([game({ game: 6 })]))).toHaveLength(1);
+    expect(problemsOf({ ...summary([game()]), scenario: "the-oath" })).toHaveLength(1);
+    expect(problemsOf(summary([game({ intent: { type: "Pass" } })]))).toHaveLength(1);
+  });
+
+  it("rejects a count that is not a whole number", () => {
+    expect(countOf("games", "12")).toBe(12);
+    expect(countOf("games", "0")).toBe(0);
+    expect(() => countOf("games", "abc")).toThrow(/--games=abc/);
+    expect(() => countOf("games", "")).toThrow();
+    expect(() => countOf("games", "-1")).toThrow();
   });
 });

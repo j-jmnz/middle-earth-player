@@ -102,7 +102,7 @@ Exit: the plan's checks (Verification), and `pnpm data:check` shows no differenc
   - resolves each card's Shadow in an attack on a plain enemy, defended and undefended;
   - travels to each location (the Island Map's, never in the staging area, are left out);
   - runs each later quest card's Setup (the first one ran when the game was dealt);
-  - then plays 24 seeded games (`GAMES`) with random legal intents, completed the way the table's sheets would, over stand-in heroes of five profiles (`HERO_STATS`) and one or two seats.
+  - then plays seeded games (`GAMES`, `scripts/card-smoke/encounter-games.ts`) with random legal intents, completed the way the table's sheets would, over stand-in heroes of five profiles (`HERO_STATS`) and one or two seats.
 
   It reports a throw, a refused intent, `state.failure`, a window that never closes, a game that does not end within its step and round caps, or one whose intents do not replay (`src/campaign/replay.ts`) to the same final state. It proves that the records run without breaking the game, not that they do what the card says. `scripts/card-smoke/encounter.test.ts` shows each report on a broken record; `--cards-only` and `--games-only` run one half, `--games=<n>` sets the count.
 - `effects:draft` and `card-smoke/run.ts` take codes separated by commas or spaces (`scripts/codes.ts`, `splitCodes`).

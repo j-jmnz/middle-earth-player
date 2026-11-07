@@ -4,18 +4,16 @@ import type { Effect } from "../../src/catalog/boundary.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
 import { flagged, type GameEvent, type ScenarioState } from "../../src/rules/core/state.ts";
 import { modifiedStat } from "../../src/rules/core/keywords.ts";
-import { spawn } from "../../src/rules/core/zones.ts";
 import { settle } from "../../src/rules/engine/machine.ts";
-import { startReveal } from "../../src/rules/windows/frames.ts";
 import { fireForced } from "../../src/rules/windows/triggers.ts";
 import type { EngineStep } from "../../src/rules/core/intents.ts";
 
-import { fightEnemy, finish, first, idOf, idsOf, legalIntents, resolveRecords, send, start as begin, tableFromLayout, type Layout, type LayoutTable, type Run } from "./scene-kit.ts";
+import { fightEnemy, finish, first, idOf, idsOf, legalIntents, resolveRecords, revealFromTop, send, start as begin, tableFromLayout, type Layout, type LayoutTable, type Run } from "./scene-kit.ts";
 import type { PlayerIntent } from "../../src/rules/engine/reduce.ts";
 
 // Test helper. Card behaviour as spec rows: a row names a ledger line (the one an effect record names in `lines`), the table it needs by
 // zone, one action that gives the behaviour a game moment, and what must be true afterwards. `cardSpecs` runs each row on the scenario's
-// records, and again with the records of its line removed: a row that still passes then tests nothing and fails. The table is
+// records, and again with the records of its line removed: a row that still passes then tests nothing and fails (an answer the removed records never asked for is skipped, so only the expectation can pass it). The table is
 // `tableFromLayout` (scene-kit.ts), so a scenario needs no scene file; the actions are the scene kit's helpers. Rules: rr.forced,
 // rr.response, rr.reveal, rr.shadow-effects, rr.travel (data/rules/entries.json).
 
@@ -77,12 +75,13 @@ export const offers = (intent: PlayerIntent["type"], code?: string): Expect => (
 
 type Done = { run: Run; table: LayoutTable };
 
-// The answers an action's choices take, in order: a listed option that is not offered is an error; with none left, the first option.
-function picker(queue: string[]): (state: ScenarioState) => string {
+// The answers an action's choices take, in order: a listed option that is not offered is an error; with none left, the first option. A `lenient` picker (the run without the row's records, which may open no
+// choice at all) takes the first option instead of failing: an answer the records never asked for is not what the row is checked on.
+function picker(queue: string[], lenient: boolean): (state: ScenarioState) => string {
   return (state) => {
     if (state.window?.kind !== "choose") return "";
     const wanted = queue.shift();
-    if (wanted === undefined) return state.window.options[0] ?? "";
+    if (wanted === undefined || (lenient && !state.window.options.includes(wanted))) return state.window.options[0] ?? "";
     if (!state.window.options.includes(wanted)) throw new Error(`option ${wanted} is not offered (${state.window.options.join(", ")})`);
     return wanted;
   };
@@ -126,9 +125,9 @@ function runQuest(done: Done, outcome: "success" | "fail", pick: (state: Scenari
 }
 
 // One action on the state so far. `picks` are the answers that follow it.
-function perform(done: Done, act: Act, picks: string[], scenarioId: string): Run {
+function perform(done: Done, act: Act, picks: string[], scenarioId: string, lenient: boolean): Run {
   const { run, table } = done;
-  const pick = picker(picks);
+  const pick = picker(picks, lenient);
   switch (act.act) {
     case "resolve": {
       const source = act.source ?? (first(run.state, act.code) || undefined);
@@ -138,11 +137,9 @@ function perform(done: Done, act: Act, picks: string[], scenarioId: string): Run
     case "quest":
       return runQuest(done, act.outcome, pick);
     case "reveal": {
-      const spawned = spawn(run.state, act.code, { zone: "encounterDeck" }, "down");
-      const top = { ...spawned.state, encounterDeck: [spawned.id, ...spawned.state.encounterDeck.filter((id) => id !== spawned.id)] };
       const steps: EngineStep[] = [];
-      const revealed = startReveal({ ...top, window: null }, 0, table.ctx, steps);
-      const made = finish({ state: settle({ ...revealed, window: null, mode: "stopped" }, table.ctx, steps), steps }, table.ctx, pick);
+      const revealed = revealFromTop(run.state, table.ctx, act.code, steps);
+      const made = finish({ state: revealed.state, steps }, table.ctx, pick);
       return { state: made.state, steps: [...run.steps, ...made.steps] };
     }
     case "travel": {
@@ -153,7 +150,12 @@ function perform(done: Done, act: Act, picks: string[], scenarioId: string): Run
     case "endRound":
       return passOn(run, table, (state) => state.round > run.state.round, pick);
     case "answer": {
-      if (run.state.window?.kind !== "choose") throw new Error(`answer(${act.id}) with no choice open`);
+      if (run.state.window?.kind !== "choose") {
+        // Without the row's records nothing opens the choice: the answer is skipped, and the expectation says whether the row held.
+        if (lenient) return run;
+        throw new Error(`answer(${act.id}) with no choice open`);
+      }
+      if (lenient && !run.state.window.options.includes(act.id)) return run;
       return finish(send(run, { type: "Choose", optionId: act.id }, table.ctx), table.ctx, pick);
     }
     case "announce": {
@@ -168,7 +170,7 @@ function perform(done: Done, act: Act, picks: string[], scenarioId: string): Run
 }
 
 // The actions of a row on a table: each action takes the `answer` actions that follow it as its choices.
-function play(scenarioId: string, row: Row, effects: readonly Effect[]): Done {
+function play(scenarioId: string, row: Row, effects: readonly Effect[], lenient: boolean): Done {
   const acts = Array.isArray(row.act) ? (row.act as readonly Act[]) : [row.act as Act];
   const layout = row.layout ?? {};
   const build = (made: Layout): LayoutTable => tableFromLayout(scenarioId, made, { effects });
@@ -185,7 +187,7 @@ function play(scenarioId: string, row: Row, effects: readonly Effect[]): Done {
     const picks = takeAnswers();
     const engaged = [...(layout.engaged ?? []), ...((layout.engaged ?? []).some((item) => (typeof item === "string" ? item : item.code) === firstAct.enemy) ? [] : [{ code: firstAct.enemy, seat: 0 }])];
     const dealt = firstAct.shadow ? { deck: [firstAct.shadow, ...(layout.deck ?? ["f0", "f0", "f0"])] } : {};
-    const fought = fightEnemy(build, firstAct.shadow ?? "f0", firstAct.enemy, { ...layout, engaged, ...dealt }, { undefended: firstAct.undefended === true, pick: picker(picks) });
+    const fought = fightEnemy(build, firstAct.shadow ?? "f0", firstAct.enemy, { ...layout, engaged, ...dealt }, { undefended: firstAct.undefended === true, pick: picker(picks, lenient) });
     done = { run: fought.run, table: fought.made };
   } else {
     const table = build(layout);
@@ -194,8 +196,8 @@ function play(scenarioId: string, row: Row, effects: readonly Effect[]): Done {
   while (index < acts.length) {
     const act = acts[index++]!;
     const picks = act.act === "answer" ? [] : takeAnswers();
-    done = { run: perform(done, act, picks, scenarioId), table: done.table };
-    if (picks.length > 0) throw new Error(`answer(${picks.join(", ")}) was never asked for`);
+    done = { run: perform(done, act, picks, scenarioId, lenient), table: done.table };
+    if (picks.length > 0 && !lenient) throw new Error(`answer(${picks.join(", ")}) was never asked for`);
   }
   return done;
 }
@@ -251,11 +253,14 @@ function failures(done: Done, wanted: readonly Expect[]): string[] {
   return problems;
 }
 
-/** What a row says is wrong when it runs on these records: the failed expectations, or the error an action threw. Empty when the row holds. */
-export function rowProblems(scenarioId: string, row: Row, effects: readonly Effect[]): string[] {
+/**
+ * What a row says is wrong when it runs on these records: the failed expectations, or the error an action threw. Empty when the row holds. `lenient` is the run without the row's records: an answer nobody asks
+ * for is skipped there (the records that asked are gone), so only the expectation can pass the run.
+ */
+export function rowProblems(scenarioId: string, row: Row, effects: readonly Effect[], lenient = false): string[] {
   const wanted = Array.isArray(row.expect) ? (row.expect as readonly Expect[]) : [row.expect as Expect];
   try {
-    return failures(play(scenarioId, row, effects), wanted);
+    return failures(play(scenarioId, row, effects, lenient), wanted);
   } catch (error) {
     return [error instanceof Error ? error.message : String(error)];
   }
@@ -281,7 +286,7 @@ export function cardSpecs(scenarioId: string, rows: readonly Row[], options: { e
         expect(problems, title).toEqual([]);
       });
       it(`${title}: fails without its records`, () => {
-        const problems = rowProblems(scenarioId, row, withoutLine(effects, row.line));
+        const problems = rowProblems(scenarioId, row, withoutLine(effects, row.line), true);
         if (problems.length === 0) throw new Error(`row ${row.line} passes without its records`);
       });
     });

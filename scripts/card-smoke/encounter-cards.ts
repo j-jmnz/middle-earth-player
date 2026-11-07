@@ -5,12 +5,11 @@ import { spawn } from "../../src/rules/core/zones.ts";
 import { settle } from "../../src/rules/engine/machine.ts";
 import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
 import { pushCardEffects } from "../../src/rules/interpret/effect-frames.ts";
-import { startReveal } from "../../src/rules/windows/frames.ts";
 import type { EngineStep } from "../../src/rules/core/intents.ts";
 
 import { nextIntent } from "../../test/harness/auto-player.ts";
 import { causeProblems } from "../../test/harness/cause-check.ts";
-import { opening } from "../../test/harness/scene-kit.ts";
+import { opening, revealFromTop } from "../../test/harness/scene-kit.ts";
 import { describeError } from "../log.ts";
 import { POLICY as PLAY } from "./world.ts";
 
@@ -72,18 +71,10 @@ function checked(steps: readonly EngineStep[]): void {
   if (problems.length > 0) throw new Error(`Steps without a cause: ${problems.join("; ")}`);
 }
 
-// The card on top of the encounter deck.
-function onTop(state: ScenarioState, code: string): { state: ScenarioState; id: string } {
-  const spawned = spawn(state, code, { zone: "encounterDeck" });
-  return { state: { ...spawned.state, encounterDeck: [spawned.id, ...spawned.state.encounterDeck.filter((id) => id !== spawned.id)] }, id: spawned.id };
-}
-
 function reveal(base: ScenarioState, ctx: ReduceContext, code: string, steps: EngineStep[]): ScenarioState {
-  const top = onTop({ ...base, window: null, mode: "stopped" }, code);
-  const depth = top.state.stack.length;
-  const begun = startReveal(top.state, top.state.firstPlayer, ctx, steps);
-  const settled = settle(begun, ctx, steps);
-  const done = drive(settled, ctx, steps, (state) => state.stack.length <= depth && state.window?.kind !== "choose");
+  const top = revealFromTop(base, ctx, code, steps);
+  const depth = base.stack.length;
+  const done = drive(top.state, ctx, steps, (state) => state.stack.length <= depth && state.window?.kind !== "choose");
   return left(done, top.id, "was not revealed");
 }
 

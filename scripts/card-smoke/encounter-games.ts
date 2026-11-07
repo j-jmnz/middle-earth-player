@@ -21,8 +21,11 @@ export const GAMES = 24;
 // The intents a game may take, and the rounds it may last, before it counts as stalled.
 export const STEP_CAP = 2500;
 export const ROUND_CAP = 60;
-// The share of steps that take the auto-player's answer rather than a random legal intent: the games with strong heroes follow it closely, so some of them win and reach the Resolution.
+// The share of steps that take the auto-player's answer rather than a random legal intent. The mix is chosen for what each kind of game is for, not for any card it passes: a game of an even number follows
+// the auto-player closely with the heroes that can win (strong, steady), so some games clear the last stage and play the Resolution (at 0.6 none does); a game of an odd number takes a random legal intent
+// on 40% of its steps (MIXED) whatever its heroes, so unusual intents and their order are covered, and each profile plays both kinds across the games of a scenario.
 const GUIDED: Readonly<Record<Profile, number>> = { strong: 0.97, weak: 0.6, brittle: 0.6, tense: 0.6, steady: 0.85 };
+export const MIXED = 0.6;
 // A fixed data hash for the replay: the save only compares it with itself.
 const HASH = 1;
 // The profiles the games rotate through (test/harness/game-kit.ts, HERO_STATS): strong heroes that win when the dice allow, weak ones that lose on threat, brittle ones that die.
@@ -104,7 +107,7 @@ function complete(state: ScenarioState, ctx: ReduceContext, offer: LegalIntent, 
 }
 
 /** The next intent: the auto-player's answer on a share of the steps, else a random offered intent completed, else the auto-player's. */
-export function randomIntent(state: ScenarioState, ctx: ReduceContext, legal: readonly LegalIntent[], roll: Dice, memory: Set<string>, guided = 0.6): PlayerIntent {
+export function randomIntent(state: ScenarioState, ctx: ReduceContext, legal: readonly LegalIntent[], roll: Dice, memory: Set<string>, guided = MIXED): PlayerIntent {
   if (roll.roll() >= guided) {
     for (const offer of roll.shuffle(legal)) {
       const intent = complete(state, ctx, offer, roll);
@@ -153,7 +156,7 @@ export function playGame(world: EncounterWorld, number: number): GameSummary {
       if (state.round > ROUND_CAP) return problem(`The game has not ended after ${ROUND_CAP} rounds`);
       const legal = legalIntents(state, ctx);
       if (legal.length === 0) return problem(`The engine offers no intent (window ${state.window?.kind ?? "none"}) and the game is not over`);
-      intent = randomIntent(state, ctx, legal, roll, memory, GUIDED[profile]);
+      intent = randomIntent(state, ctx, legal, roll, memory, number % 2 === 0 ? GUIDED[profile] : MIXED);
       const result = reduce(state, intent, ctx);
       if (!result.ok) return problem(`The reducer refused an offered intent: ${result.reason}`);
       if (result.state.failure) return problem(`state.failure: ${result.state.failure}`);
