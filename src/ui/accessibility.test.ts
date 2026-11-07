@@ -1,4 +1,4 @@
-// The app's one accessibility store: two AccessibilityInfo listeners however many hooks read it, started by the first reader and removed
+// The app's one accessibility store: six AccessibilityInfo listeners however many hooks read it, started by the first reader and removed
 // with the last, and the phone's current values read when it starts.
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -99,6 +99,19 @@ describe("the accessibility store", () => {
     expect(accessibility()).toMatchObject({ boldText: false, reduceTransparency: true, increaseContrast: false });
     phone.handlers.get("darkerSystemColorsChanged")?.(true);
     expect(accessibility().increaseContrast).toBe(true);
+    stop();
+  });
+
+  it("sets Increase Contrast from both answers on every start, so a stale true does not survive a restart", async () => {
+    phone.darker = true;
+    let stop = subscribeAccessibility(() => undefined);
+    await settle();
+    expect(accessibility().increaseContrast).toBe(true);
+    stop();
+    phone.darker = false;
+    stop = subscribeAccessibility(() => undefined);
+    await settle();
+    expect(accessibility().increaseContrast).toBe(false);
     stop();
   });
 });

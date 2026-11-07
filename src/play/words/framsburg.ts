@@ -95,7 +95,7 @@ export function framsburgAsk(instruction: Instruction, source: string | null, na
   if (instruction.verb === "AttachRandomTreasure" && instruction.to === "subject" && facts) {
     const data = topFrame(facts.game)?.data;
     const guard = data?.kind === "effect" && data.subject ? names.card(data.subject) : "The enemy";
-    return group("Choose", `Choose 1 of ${facts.options.length || instruction.count || 3} random undiscovered treasures to attach as a guarded objective. ${guard} stays engaged; the players cannot claim the treasure until it is free of encounters, when ${guard} leaves play.`);
+    return group("Choose", `Choose 1 of ${facts.options.length || instruction.count || 3} random undiscovered treasures to attach as a guarded objective. ${guard} stays engaged. The players can claim the treasure once it is free of encounters, when ${guard} leaves play.`);
   }
   if (instruction.verb === "AttachLootFromDiscard") return sentence("Attach", `choose a Loot objective in the encounter discard pile to attach to the enemy just added to the staging area, as its guarded objective.`);
   if (instruction.verb !== "Pick") return null;
@@ -214,7 +214,7 @@ export function framsburgResponseNote(game: ScenarioState, ctx: ReduceContext, n
     const shade = enemy ? names.card(enemy) : "The enemy";
     const left = Math.min(3, undiscoveredTreasures(game, ctx).length);
     if (left === 0) return say(`${shade} engaged you. No undiscovered treasure is left to look at, so nothing can be attached to ${shade}.`);
-    return say(`${shade} engaged you. Look at ${left === 1 ? "the 1 random undiscovered treasure" : `${left} random undiscovered treasures`} and attach 1 to ${shade} as a guarded objective. ${shade} stays engaged with you. The players cannot claim the treasure until it is free of encounters, when ${shade} leaves play. If they win with it, they discover it. Group limit once per game. Pass and it stays unused for a later engagement at stage 1B or 2B.`);
+    return say(`${shade} engaged you. Look at ${left === 1 ? "the 1 random undiscovered treasure" : `${left} random undiscovered treasures`} and attach 1 to ${shade} as a guarded objective. ${shade} stays engaged with you. The players can claim the treasure once it is free of encounters, when ${shade} leaves play. If they win with it, they discover it. Group limit once per game. Pass and it stays unused for a later engagement at stage 1B or 2B.`);
   }
   return null;
 }

@@ -6,12 +6,11 @@ import { useSyncExternalStore } from "react";
 import { Platform } from "react-native";
 
 import { accessibility, subscribeAccessibility } from "./accessibility.ts";
+import { off, subscribeSettings } from "./display-prefs.ts";
 import { tableSettings } from "./table-settings.ts";
 
 // Read from the app's one accessibility store (accessibility.ts), not from a listener of its own.
 const screenReaderOn = () => accessibility().screenReader;
-const off = () => false;
-
 export function useScreenReader(): boolean {
   return useSyncExternalStore(subscribeAccessibility, screenReaderOn, off);
 }
@@ -24,7 +23,6 @@ function forced(): boolean {
 }
 
 // The Table as a list setting (table-settings.ts): Always puts the phone on the reader table with no reader on.
-const subscribeSettings = (onChange: () => void) => tableSettings.subscribe(onChange);
 const listAlways = () => tableSettings.getState().settings.tableAsList === "always";
 
 /**

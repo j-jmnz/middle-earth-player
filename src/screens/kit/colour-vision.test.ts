@@ -23,7 +23,7 @@ const PAIRS: readonly (readonly [Token, Token])[] = [
 const key = (a: Token, b: Token): string => [a, b].sort().join(" / ");
 
 const SPHERE_CUE =
-  "The tint is the sphere icon's own colour, and a sphere icon always sits beside its word or carries an accessibility label; the glyphs differ in shape (docs/design-system.md, Icons).";
+  "The tint is the sphere icon's own colour, and a sphere icon always sits beside its word or carries an accessibility label; the glyphs differ in shape (docs/design-system.md, Icons). The deck donut's legend (DeckAnalytics, deck-sphere-legend) pairs each sphere's icon with its count under the ring.";
 const THREAT_CUE =
   "A sphere tint is its icon's colour and the icon sits beside its word (docs/design-system.md, Icons); threat is the dial and the bar with their numbers, the Eye, and a pill with its word and icon (docs/design-system-table.md, Marks of the open moment).";
 

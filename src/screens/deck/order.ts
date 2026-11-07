@@ -14,7 +14,7 @@ export function moveItem<T>(items: readonly T[], from: number, to: number): T[] 
   return out;
 }
 
-/** Which of Move up / Move down a deck at `place` of `count` offers: each direction that has room. */
+/** Which of Move up / Move down a deck at `place` of `count` can move: each direction that has room (the other button is drawn disabled, not left out). */
 export function moveChoices(place: number, count: number): { up: boolean; down: boolean } {
   return { up: place > 0 && place < count, down: place >= 0 && place < count - 1 };
 }

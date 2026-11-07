@@ -7,7 +7,7 @@ import { dropShadowOf } from "../../ui/surfaces";
 import { withAlphaHex } from "../../ui/tokens";
 import { useTableTokens } from "../../ui/use-table-tokens";
 import { SPHERE_TINT } from "../../ui/icon-map";
-import { BodyText, Label, sphereWord, useTitleShadow } from "../kit/chrome";
+import { BodyText, Label, markedSphere, SphereMark, sphereWord, useTitleShadow } from "../kit/chrome";
 import { CardThumb } from "../images/picture";
 import { ArcRing } from "../../ui/arc-ring";
 import { costCurve, CURVE_LABELS, deckCardCount, DECK_MINIMUM, sphereSplit, type DeckFace } from "./status";
@@ -97,16 +97,32 @@ export function DeckAnalytics({
   const parts = split.map((entry) => ({ key: entry.code, share: entry.count / Math.max(1, splitTotal), color: tint(entry.code) }));
   return (
     <View className="flex-row items-center" style={{ gap: 14 * s }}>
-      <View accessible accessibilityLabel={`${countLine}. Spheres: ${split.map((entry) => `${sphereWord(entry.name)} ${entry.count}`).join(", ") || "none yet"}`}>
-        <ArcRing size={68 * s} parts={parts} track={withAlphaHex(palette.bone, 0.08)}>
-          <Text testID="deck-card-count" className="font-display" style={{ fontSize: 22 * s, lineHeight: 24 * s, color: ready ? palette.ok : palette.bone }}>
-            {String(cardCount)}
-          </Text>
-          {/* "cards" under the number; "of 50" instead while the deck is short of its minimum. */}
-          <Text testID="deck-card-count-word" className="text-micro text-muted" style={{ lineHeight: 12 * s }}>
-            {cardCount < DECK_MINIMUM ? `of ${DECK_MINIMUM}` : "cards"}
-          </Text>
-        </ArcRing>
+      <View className="items-center" style={{ gap: 4 * s }}>
+        <View accessible accessibilityLabel={`${countLine}. Spheres: ${split.map((entry) => `${sphereWord(entry.name)} ${entry.count}`).join(", ") || "none yet"}`}>
+          <ArcRing size={68 * s} parts={parts} track={withAlphaHex(palette.bone, 0.08)}>
+            <Text testID="deck-card-count" className="font-display" style={{ fontSize: 22 * s, lineHeight: 24 * s, color: ready ? palette.ok : palette.bone }}>
+              {String(cardCount)}
+            </Text>
+            {/* "cards" under the number; "of 50" instead while the deck is short of its minimum. */}
+            <Text testID="deck-card-count-word" className="text-micro text-muted" style={{ lineHeight: 12 * s }}>
+              {cardCount < DECK_MINIMUM ? `of ${DECK_MINIMUM}` : "cards"}
+            </Text>
+          </ArcRing>
+        </View>
+        {/* The ring's colours are not the only cue: each sphere present is named by its icon and its count under the ring. The ring's label says it, so a reader skips this. */}
+        {split.length > 0 ? (
+          <View testID="deck-sphere-legend" importantForAccessibility="no-hide-descendants" accessibilityElementsHidden className="flex-row flex-wrap justify-center" style={{ gap: 6 * s, maxWidth: 96 * s }}>
+            {split.map((entry) => {
+              const mark = markedSphere(entry.code);
+              return (
+                <View key={entry.code} className="flex-row items-center" style={{ gap: 2 * s }}>
+                  {mark ? <SphereMark sphere={mark} size={12} /> : null}
+                  <Text className="text-micro text-muted">{String(entry.count)}</Text>
+                </View>
+              );
+            })}
+          </View>
+        ) : null}
       </View>
       <View className="min-w-0 flex-1">
         <View

@@ -291,7 +291,7 @@ export function StatTile({
   const s = useUiScale();
   return (
     <View testID={testID} accessible accessibilityLabel={`${label} ${value}${detail ? ` ${detail}` : ""}`} className="flex-1 items-center rounded-item px-2 py-2.5" style={tileSurface(false, t)}>
-      <Text className="font-bold uppercase text-faint" style={{ fontSize: 10 * s, lineHeight: 13 * s, letterSpacing: 1.4 * s }} numberOfLines={1}>
+      <Text className="font-bold uppercase text-faint" style={{ fontSize: 10 * s, lineHeight: 13 * s, letterSpacing: 1.4 * s, textAlign: "center" }} numberOfLines={2}>
         {label}
       </Text>
       <View className="flex-row items-center gap-1.5">

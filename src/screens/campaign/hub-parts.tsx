@@ -90,12 +90,12 @@ export function RunHero({ overline, title, detail, seats, testID }: { overline: 
 }
 
 /** Another open run: one 62 pt row that opens it, with the first seat's three heroes (`HeroTrio`), its title and a line under it. */
-export function RunRow({ testID, title, line, heroes, accessibilityLabel, onPress }: { testID: string; title: string; line: string; heroes: readonly HeroFace[]; accessibilityLabel: string; onPress: () => void }) {
+export function RunRow({ testID, title, line, heroes, accessibilityLabel, accessibilityHint, onPress }: { testID: string; title: string; line: string; heroes: readonly HeroFace[]; accessibilityLabel: string; accessibilityHint?: string; onPress: () => void }) {
   const palette = usePalette();
   const t = useTableTokens();
   const { s } = useSizeClass();
   return (
-    <Pressable testID={testID} collapsable={false} accessibilityRole="button" accessibilityLabel={accessibilityLabel} onPress={onPress}>
+    <Pressable testID={testID} collapsable={false} accessibilityRole="button" accessibilityLabel={accessibilityLabel} accessibilityHint={accessibilityHint} onPress={onPress}>
       {({ pressed }) => (
         <View className="flex-row items-center gap-3 rounded-item px-3" style={{ minHeight: 62 * s, ...rowSurface(pressed, t) }}>
           <HeroTrio heroes={heroes} />
@@ -194,6 +194,7 @@ export function CatalogTile({
   line,
   tone,
   accessibilityLabel,
+  accessibilityHint,
   posters,
   onPress,
 }: {
@@ -204,6 +205,7 @@ export function CatalogTile({
   line: string;
   tone: string;
   accessibilityLabel: string;
+  accessibilityHint?: string;
   posters: number;
   onPress: () => void;
 }) {
@@ -211,12 +213,16 @@ export function CatalogTile({
   const t = useTableTokens();
   const { size, s } = useSizeClass();
   const badge = number == null ? null : <NumberBadge number={number} />;
+  // The row grows with its words (no line cap, so a larger text size is never cut); the art stops growing at 100 pt so the words keep the room.
+  const artWidth = Math.min(86 * s, 100);
+  const artHeight = (artWidth * 64) / 86;
   return (
     <Pressable
       testID={testID}
       collapsable={false}
       accessibilityRole="button"
       accessibilityLabel={accessibilityLabel}
+      accessibilityHint={accessibilityHint}
       onPress={onPress}
       style={posters ? { width: `${100 / posters}%`, paddingHorizontal: 6 * s } : undefined}
     >
@@ -243,8 +249,8 @@ export function CatalogTile({
           </View>
         ) : (
           <View className="flex-row items-center gap-3.5 overflow-hidden rounded-item pr-3" style={rowSurface(pressed, t)}>
-            <View style={{ width: 86 * s, height: 64 * s }}>
-              <SceneArt scenarioId={sceneId} width={86 * s} height={64 * s} vivid>
+            <View style={{ width: artWidth, height: artHeight }}>
+              <SceneArt scenarioId={sceneId} width={artWidth} height={artHeight} vivid>
                 <View pointerEvents="none" style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, backgroundColor: withAlphaHex(palette.night, 0.15) }} />
               </SceneArt>
               {badge ? (
@@ -254,11 +260,9 @@ export function CatalogTile({
               ) : null}
             </View>
             <View className="min-w-0 flex-1 py-2">
-              <Text className="font-display text-heading text-bone" numberOfLines={2}>
-                {name}
-              </Text>
+              <Text className="font-display text-heading text-bone">{name}</Text>
               {line ? (
-                <Text className="text-label" style={{ color: tone }} numberOfLines={1}>
+                <Text className="text-label" style={{ color: tone }}>
                   {line}
                 </Text>
               ) : null}

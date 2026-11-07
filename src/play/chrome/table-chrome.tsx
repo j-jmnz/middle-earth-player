@@ -14,7 +14,7 @@ import type { LogMark } from "../store/log.ts";
 import { layoutAnim, springConfig, timing, useMotionScale } from "../../ui/motion-run.ts";
 import { MOTION, SHAPE } from "../../ui/motion-tokens.ts";
 import { HEADING_HINT, headingArcs, headingDelta, headingDeltaWords, headingLook, headingWords, type HeadingStep } from "../dream-chaser/heading.ts";
-import { dialName, type DialRole } from "../store/peek.ts";
+import { dialSpeech, type DialRole } from "../store/peek.ts";
 import type { SeatThreat } from "../store/selectors.ts";
 import { threatDelta, threatDeltaWords, threatLevel, threatMeter, type ThreatLevel } from "../readouts/threat-level.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
@@ -49,6 +49,7 @@ export function ThreatRing({
   icon = "threat",
   compact = false,
   accessibilityName,
+  spokenWord,
   role = null,
   hint = null,
   elimination = true,
@@ -64,6 +65,9 @@ export function ThreatRing({
   compact?: boolean;
   // What a screen reader says for a short label ("P1" reads "Player 1 threat").
   accessibilityName?: string;
+  // A seat's threat dial speaks its number first, as it is drawn ("Threat 20, P1, acting"; peek.ts, dialSpeech): the word before the number.
+  // Other dials say their name and the number.
+  spokenWord?: string;
   // How the dial reads in two-handed play (peek.ts, `seatDial`). "acting", the seat the engine is asking: an accent label, and the dial pulses
   // when the engine turns to it. "viewing", the seat the player is peeking at, which is not the acting one: a bone ring round the dial
   // and a small eye mark. Both are in the screen reader's name. null: neither, and every dial of a solo game.
@@ -83,7 +87,7 @@ export function ThreatRing({
 }) {
   const s = useUiScale();
   const id = testID ?? `threat-${threat.seat}`;
-  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} onPress={onPress} />;
+  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} spokenWord={spokenWord} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} onPress={onPress} />;
   return (
     <View testID={id} accessible accessibilityLabel={`${label} ${threat.threat}`} className="items-center">
       <View className="h-12 w-12 items-center justify-center rounded-control">
@@ -105,6 +109,7 @@ function ThreatDial({
   id,
   icon,
   name,
+  spokenWord,
   role,
   hint,
   elimination,
@@ -118,6 +123,7 @@ function ThreatDial({
   id: string;
   icon: IconName | null;
   name: string;
+  spokenWord?: string;
   role: DialRole;
   hint: string | null;
   elimination: boolean;
@@ -166,7 +172,7 @@ function ThreatDial({
   const engaging = ticks.filter((cost) => cost <= threat.threat).length;
   const tickWords = ticks.length === 0 ? "" : ticks.length === 1 ? `, the enemy in staging ${engaging === 1 ? "engages" : "does not engage"} at this threat` : `, ${engaging} of the ${ticks.length} enemies in staging engage at this threat`;
   // The dial is one control with one name (the change badge's words included), so Android gives it one focus stop.
-  const dialWords = `${role ? `${dialName(name, role)},` : name} ${threat.threat}${threat.eliminated ? ", eliminated" : critical ? ", near elimination" : ""}${tickWords}${ring ? `. ${ring}` : ""}${deltaWords ? `. ${deltaWords}` : ""}`;
+  const dialWords = `${spokenWord ? dialSpeech(spokenWord, threat.threat, label, role) : `${name} ${threat.threat}`}${threat.eliminated ? ", eliminated" : critical ? ", near elimination" : ""}${tickWords}${ring ? `. ${ring}` : ""}${deltaWords ? `. ${deltaWords}` : ""}`;
   return (
     <Pressable
       disabled={!onPress}

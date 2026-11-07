@@ -74,7 +74,7 @@ export function Segmented<T extends string>({
             onPress={() => onChange(option)}
             hitSlop={{ top: slop, bottom: slop }}
             // Stretched, each option grows from its own width (a word with an icon needs more than a third of a 320 pt phone's track),
-            // with tighter padding; a word never breaks.
+            // with tighter padding; a word never breaks, and a stretched track's option may take a second line (numberOfLines 2, centred) where a phrase such as Follow screen reader is wider than its share.
             style={stretch ? { flexGrow: 1, flexBasis: "auto" } : undefined}
           >
             {/* The thumb and its pressed fill are on a view inside: NativeWind drops a style function on a Pressable that also has a className. */}
@@ -84,7 +84,7 @@ export function Segmented<T extends string>({
                 style={{ minHeight: thumb, borderRadius: thumb / 2, overflow: "hidden", ...(selected ? segmentSurface(t, pressed) : segmentRestSurface(pressed, t)) }}
               >
                 {icons?.[option] ? <GameIcon name={icons[option]} size={(compact ? 14 : 16) * s} tint={selected ? "threat" : "muted"} /> : null}
-                <Text numberOfLines={1} className={`${compact ? "text-label" : "text-body"} ${selected ? "font-semibold text-bone" : "text-muted"}`}>{words?.[option] ?? option}</Text>
+                <Text numberOfLines={stretch ? 2 : 1} className={`${stretch ? "text-center " : ""}${compact ? "text-label" : "text-body"} ${selected ? "font-semibold text-bone" : "text-muted"}`}>{words?.[option] ?? option}</Text>
               </View>
             )}
           </Pressable>

@@ -5,11 +5,13 @@ import { useMemo, useSyncExternalStore } from "react";
 import { accessibility, subscribeAccessibility } from "./accessibility.ts";
 import { strongOutlines, tableSettings } from "./table-settings.ts";
 
-const subscribeSettings = (onChange: () => void) => tableSettings.subscribe(onChange);
+/** For useSyncExternalStore: the table settings store's subscribe, shared by every hook that reads one setting (text.tsx, screen-reader.ts). */
+export const subscribeSettings = (onChange: () => void) => tableSettings.subscribe(onChange);
 const strongOn = () => strongOutlines(tableSettings.getState().settings.highContrast, accessibility().increaseContrast);
 const plainTitlesOn = () => tableSettings.getState().settings.titleFace === "plain";
 const reduceTransparencyOn = () => accessibility().reduceTransparency;
-const off = () => false;
+/** The server snapshot of a boolean hook. */
+export const off = () => false;
 
 // The setting and the phone both move the answer, so it subscribes to both and returns one boolean.
 function subscribeBoth(onChange: () => void): () => void {

@@ -3,6 +3,7 @@ import { ScrollView, View } from "react-native";
 import { SearchField, Segmented, SphereMark, ToggleChip, markedSphere, sphereWord } from "../kit/chrome";
 import { deckListFiltered, setDeckListView, useDeckListView, type DeckListFilter, type DeckListStatus } from "./list";
 import { Text } from "../../ui/text";
+import { useUiScale } from "../../ui/ui-scale";
 
 // The deck list's search, Cards / List switch and filter chips, shared by the Decks tab and the briefing's deck picker.
 
@@ -36,10 +37,11 @@ export function DeckListBar({
   testIDPrefix?: string;
 }) {
   const view = useDeckListView();
+  const s = useUiScale();
   return (
     <View className="mt-2">
-      <View className="flex-row items-center gap-2">
-        <SearchField testID={`${testIDPrefix}-search`} value={filter.query} onChangeText={(query) => onFilter({ ...filter, query })} placeholder="Search" accessibilityLabel="Search decks or heroes" />
+      <View className="flex-row flex-wrap items-center gap-2">
+        <SearchField testID={`${testIDPrefix}-search`} value={filter.query} onChangeText={(query) => onFilter({ ...filter, query })} placeholder="Search" accessibilityLabel="Search decks or heroes" minWidth={160 * s} />
         <Segmented options={VIEWS} value={view} onChange={setDeckListView} testIDPrefix={`${testIDPrefix}-view`} accessibilityLabel="Deck view" />
       </View>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} keyboardShouldPersistTaps="handled" className="-mx-6 mt-2 grow-0" contentContainerClassName="gap-1.5 px-6">

@@ -105,8 +105,9 @@ function DeckActions({
       ) : (
         <TextButton label="Delete" testID={`deck-delete-${deck.id}`} tone="danger" accessibilityLabel={`Delete ${deck.name}`} onPress={() => onAsk("delete")} />
       )}
-      {onMove && canMove?.up ? <TextButton label="Move up" testID={`deck-move-up-${deck.id}`} accessibilityLabel={`Move ${deck.name} up`} onPress={() => onMove("up")} /> : null}
-      {onMove && canMove?.down ? <TextButton label="Move down" testID={`deck-move-down-${deck.id}`} accessibilityLabel={`Move ${deck.name} down`} onPress={() => onMove("down")} /> : null}
+      {/* Fixed slots: the first deck's Move up and the last deck's Move down are drawn disabled, so a repeat tap never lands on the other move. */}
+      {onMove && canMove ? <TextButton label="Move up" testID={`deck-move-up-${deck.id}`} accessibilityLabel={`Move ${deck.name} up`} disabled={!canMove.up} onPress={() => onMove("up")} /> : null}
+      {onMove && canMove ? <TextButton label="Move down" testID={`deck-move-down-${deck.id}`} accessibilityLabel={`Move ${deck.name} down`} disabled={!canMove.down} onPress={() => onMove("down")} /> : null}
     </View>
   );
 }

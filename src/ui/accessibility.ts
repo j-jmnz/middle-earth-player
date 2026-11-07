@@ -44,11 +44,11 @@ function ask(method: Method): Promise<boolean> {
   }
 }
 
-const PHONE: readonly { field: "boldText" | "reduceTransparency" | "increaseContrast"; method: Method; event: "boldTextChanged" | "reduceTransparencyChanged" | "darkerSystemColorsChanged" | "highTextContrastChanged" }[] = [
-  { field: "boldText", method: "isBoldTextEnabled", event: "boldTextChanged" },
-  { field: "reduceTransparency", method: "isReduceTransparencyEnabled", event: "reduceTransparencyChanged" },
-  { field: "increaseContrast", method: "isDarkerSystemColorsEnabled", event: "darkerSystemColorsChanged" },
-  { field: "increaseContrast", method: "isHighTextContrastEnabled", event: "highTextContrastChanged" },
+const PHONE: readonly { field: "boldText" | "reduceTransparency" | "increaseContrast"; event: "boldTextChanged" | "reduceTransparencyChanged" | "darkerSystemColorsChanged" | "highTextContrastChanged" }[] = [
+  { field: "boldText", event: "boldTextChanged" },
+  { field: "reduceTransparency", event: "reduceTransparencyChanged" },
+  { field: "increaseContrast", event: "darkerSystemColorsChanged" },
+  { field: "increaseContrast", event: "highTextContrastChanged" },
 ];
 
 function listen(event: (typeof PHONE)[number]["event"], handler: (enabled: boolean) => void): { remove: () => void } {
@@ -72,12 +72,17 @@ function start(): () => void {
       if (live) set({ screenReader: enabled });
     })
     .catch(() => undefined);
-  for (const { field, method } of PHONE) {
-    ask(method).then((enabled) => {
-      // Increase Contrast has an iOS and an Android source: only one can be on, and a false from the other must not clear it.
-      if (live && (enabled || field !== "increaseContrast")) set({ [field]: enabled });
-    });
-  }
+  ask("isBoldTextEnabled").then((enabled) => {
+    if (live) set({ boldText: enabled });
+  });
+  ask("isReduceTransparencyEnabled").then((enabled) => {
+    if (live) set({ reduceTransparency: enabled });
+  });
+  // Increase Contrast has an iOS and an Android source: only one can be on. Both answers make one value, set whatever it is, so a stale true
+  // from an earlier start does not survive a restart.
+  Promise.all([ask("isDarkerSystemColorsEnabled"), ask("isHighTextContrastEnabled")]).then(([darker, highText]) => {
+    if (live) set({ increaseContrast: darker || highText });
+  });
   const subscriptions = [
     AccessibilityInfo.addEventListener("reduceMotionChanged", (enabled) => set({ reduceMotion: enabled })),
     AccessibilityInfo.addEventListener("screenReaderChanged", (enabled) => set({ screenReader: enabled })),

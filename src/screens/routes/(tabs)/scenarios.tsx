@@ -110,7 +110,7 @@ export default function Scenarios() {
               {playable.map(({ id, number }) => {
                 const { line, tone } = standing(id);
                 return (
-                  <CatalogTile key={id} testID={`standalone-${id}`} sceneId={id} number={number} name={scenarioName(id)} line={line} tone={tone} accessibilityLabel={`Play ${scenarioName(id)}`} posters={posters} onPress={() => brief(id)} />
+                  <CatalogTile key={id} testID={`standalone-${id}`} sceneId={id} number={number} name={scenarioName(id)} line={line} tone={tone} accessibilityLabel={[`Scenario ${number}`, scenarioName(id), line].filter(Boolean).join(", ")} accessibilityHint="Opens its briefing" posters={posters} onPress={() => brief(id)} />
                 );
               })}
             </CatalogGrid>

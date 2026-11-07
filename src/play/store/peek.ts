@@ -38,9 +38,12 @@ export function seatDial(count: number, acting: number, viewed: number | null, s
   return { role: seat === acting ? "acting" : seat === viewed ? "viewing" : null, hint: seat === shown ? null : `Shows Player ${seat + 1}'s ${areas ? "area" : "cards"}` };
 }
 
-/** A dial's screen reader name with its role: "Player 1 threat, acting", "Player 2 threat, viewing". */
-export function dialName(name: string, role: DialRole): string {
-  return role ? `${name}, ${role}` : name;
+/**
+ * What a seat's threat dial says: the number first, as it is drawn, then the seat's label and its role ("Threat 20, P1, acting",
+ * "Threat 33, P2, viewing"). A solo dial's label is the word itself, so it says "Threat 20".
+ */
+export function dialSpeech(word: string, value: number, seatLabel: string, role: DialRole): string {
+  return [`${word} ${value}`, seatLabel === word ? "" : seatLabel, role ?? ""].filter(Boolean).join(", ");
 }
 
 export type PeekWords = { text: string; back: string };

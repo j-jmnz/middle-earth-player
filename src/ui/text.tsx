@@ -6,19 +6,16 @@ import { useSyncExternalStore, type ComponentProps } from "react";
 import { Text as NativeText, TextInput as NativeTextInput, type TextInputProps, type TextProps } from "react-native";
 
 import { accessibility, subscribeAccessibility } from "./accessibility.ts";
+import { off, usePlainTitles } from "./display-prefs.ts";
 import { faceClass } from "./faces.ts";
-import { tableSettings } from "./table-settings.ts";
 
 // Bold Text (the phone's, read from the one accessibility store) and the Title face setting decide the face (faces.ts). Each is one boolean
 // snapshot, so a text re-renders only when its own answer changes.
-const subscribeSettings = (onChange: () => void) => tableSettings.subscribe(onChange);
 const boldOn = () => accessibility().boldText;
-const plainOn = () => tableSettings.getState().settings.titleFace === "plain";
-const off = () => false;
 
 function useFaceClass(className: string | undefined): string {
   const bold = useSyncExternalStore(subscribeAccessibility, boldOn, off);
-  const plain = useSyncExternalStore(subscribeSettings, plainOn, off);
+  const plain = usePlainTitles();
   return faceClass(className, { bold, plain });
 }
 

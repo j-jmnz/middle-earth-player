@@ -337,7 +337,7 @@ export function useTableChoice({
   const dropOnTable = useStable(onDrop);
 
   // The dock's extra buttons (dock/extras.ts).
-  const undoButton: DockExtra | null = !live && (canUndo || picking) ? { label: "Undo", testID: "table-undo", accessibilityLabel: picking ? "Put back this pick" : "Take back your last choice", onPress: undo } : null;
+  const undoButton: DockExtra | null = !live && (canUndo || picking) ? { label: "Undo", testID: "table-undo", accessibilityHint: picking ? "Puts back this pick" : "Takes back your last choice", onPress: undo } : null;
   const extras = dockExtras({
     sheet,
     undoButton,

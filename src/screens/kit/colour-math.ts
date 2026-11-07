@@ -1,10 +1,10 @@
 // Colour maths for the palette tests: WCAG luminance (contrast.test.ts) and colour-vision simulation with CIEDE2000 (colour-vision.test.ts).
 // Pure functions of a "#RRGGBB" string; nothing here is drawn.
-export type Rgb = readonly [r: number, g: number, b: number];
-export type Lab = readonly [l: number, a: number, b: number];
+type Rgb = readonly [r: number, g: number, b: number];
+type Lab = readonly [l: number, a: number, b: number];
 
 /** The sRGB channels of "#RRGGBB" as linear light, 0 to 1. */
-export function linearRgb(hex: string): Rgb {
+function linearRgb(hex: string): Rgb {
   const value = Number.parseInt(hex.slice(1), 16);
   const channel = (shift: number) => {
     const c = ((value >> shift) & 255) / 255;

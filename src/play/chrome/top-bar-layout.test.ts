@@ -9,6 +9,7 @@ import {
   DIAL_GAP,
   DIAL_LABEL_GAP,
   DIAL_PAD,
+  dialScale,
   DIAL_SIZE,
   EDGE_FADE,
   HEADING_BADGE_OVER,
@@ -117,7 +118,7 @@ describe("the Heading dial in the top bar (phase 39b)", () => {
   function barOf(screen: (typeof SCREENS)[number], scale: number, seats: number) {
     const bar = screen.width - 2 * screen.inset - 2 * 8;
     const center = bar / 2;
-    const before = (seats * SEAT_DIAL + seats * DIAL_GAP) * scale;
+    const before = seats * SEAT_DIAL * dialScale(scale) + seats * DIAL_GAP * scale;
     const compact = headingCompact(bar, before - DIAL_GAP * scale, scale, center);
     const w = headingDialWidth(compact) * scale;
     // The dial's place in the row includes the room its compact badge reaches into after it.
@@ -200,7 +201,7 @@ describe("the Island Map chip in the top bar", () => {
   function barOf(screen: (typeof SCREENS)[number], scale: number, seats: number) {
     const bar = screen.width - 2 * screen.inset - 2 * 8;
     const center = bar / 2;
-    const before = seats * SEAT_DIAL * scale + (seats - 1) * DIAL_GAP * scale;
+    const before = seats * SEAT_DIAL * dialScale(scale) + (seats - 1) * DIAL_GAP * scale;
     const compact = chipCompact(bar, before, scale, center);
     const content = before + (DIAL_GAP + mapChipWidth(compact)) * scale;
     return { bar, center, compact, content, zones: barZones(bar, content, scale, center), full: barZones(bar, before + (DIAL_GAP + mapChipWidth(false)) * scale, scale, center) };
@@ -243,5 +244,25 @@ describe("badgeFoot", () => {
       expect(badgeBottom, `${scale}`).toBeLessThanOrEqual(TOP_BAR * scale);
       expect(badgeFoot(scale)).toBeGreaterThanOrEqual(0);
     }
+  });
+});
+
+describe("the seat dials at Extra large", () => {
+  it("draws the seat dials at Large's size at most", () => {
+    expect(dialScale(UI_SCALES.small)).toBe(UI_SCALES.small);
+    expect(dialScale(UI_SCALES.large)).toBe(UI_SCALES.large);
+    expect(dialScale(UI_SCALES.xlarge)).toBe(UI_SCALES.large);
+  });
+
+  it("fits both dials of a two-handed game in the window at Extra large on 667 x 375, the rail on the middle, where the full size scrolled", () => {
+    const scale = UI_SCALES.xlarge;
+    const bar = 667 - 2 * 8;
+    const full = barZones(bar, 2 * SEAT_DIAL * scale + DIAL_GAP * scale, scale, bar / 2);
+    expect(full.scroll).toBe(true);
+    const content = 2 * SEAT_DIAL * dialScale(scale) + DIAL_GAP * scale;
+    const zones = barZones(bar, content, scale, bar / 2);
+    expect(zones.scroll).toBe(false);
+    expect(content).toBeLessThanOrEqual(zones.left);
+    expect(Math.abs(zones.left + zones.rail / 2 - bar / 2)).toBeLessThanOrEqual(0.5);
   });
 });

@@ -129,7 +129,7 @@ export function nightStageAttack(game: ScenarioState, ctx: ReduceContext, enemyI
     const choice = defenders > 0 ? `A defender takes the attack minus its Defense; damage beyond its hit points goes to ${HILL}. Leave it undefended and all ${damage} damage is dealt to ${HILL}.` : `No character can defend: all ${damage} damage is dealt to ${HILL}.`;
     return { note: say(`No shadow card is dealt. ${choice} ${holds}`), ...caution };
   }
-  const choice = defenders > 0 ? `Choose a defender, or leave it undefended. Undefended, the ${damage} damage, before its shadow card, is dealt to ${HILL}, not to a character.` : `No character can defend: the ${damage} damage, before its shadow card, is dealt to ${HILL}, not to a character.`;
+  const choice = defenders > 0 ? `Choose a defender, or leave it undefended. Left undefended, its ${damage} damage (before its shadow card) is dealt to ${HILL}, not to a character.` : `No character can defend: the ${damage} damage, before its shadow card, is dealt to ${HILL}, not to a character.`;
   return { note: say(`${choice} ${holds}`), ...caution };
 }
 

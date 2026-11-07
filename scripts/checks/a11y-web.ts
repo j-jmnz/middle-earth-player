@@ -26,11 +26,12 @@ const DIST = path.join(tmpdir(), "middle-earth-lcg-a11y-web");
 // No rule is disabled: every rule axe runs applies to react-native-web's output, which is plain HTML.
 //
 // Findings still open, as the most elements one screen may show (the larger of its light and dark counts). A count above it fails the run, and so
-// does a count below it, so the number is lowered as a screen is fixed. Label in Name (WCAG 2.5.3): a control's accessible name leaves out text drawn
-// on it ("Undo" on a button named "Take back your last choice", the quest number and "3 quest stages" on a scenario row), so a voice-control player's
-// "tap Undo" finds nothing. Each needs its label reworded with its screen reader wording (docs/design-system.md, Screen reader).
+// does a count below it, so the number is lowered as a screen is fixed. Label in Name (WCAG 2.5.3): each remaining element's accessible name starts
+// with its visible words ("Scenario 1, A Shadow of the Past, 3 quest stages", "Threat 20, P1, acting"), but axe joins the visible text of sibling
+// blocks with no space on react-native-web ("1A Shadow of the Past3 quest stages", "20P1") and finds no such run in the name. They are axe's text
+// join on react-native-web's output, not wording; VoiceOver and TalkBack read the names as written.
 const OPEN: Readonly<Record<string, Readonly<Record<string, number>>>> = {
-  "label-content-name-mismatch": { Campaigns: 2, Scenarios: 8, History: 1, Decks: 2, Cards: 1, Table: 4 },
+  "label-content-name-mismatch": { Scenarios: 8, History: 1, Decks: 2, Table: 3 },
 };
 
 // Only these fail the run; minor and moderate findings are listed.
@@ -68,12 +69,20 @@ function isFile(file: string): boolean {
 }
 
 // A static Expo export has one html per route, with `[param].html` for a dynamic one; an unknown path falls back to that file.
+// A path that climbs out of the export folder ("/../") is not served: it falls to the not-found page.
+function inside(root: string, file: string): boolean {
+  const relative = path.relative(root, file);
+  return relative !== "" && !relative.startsWith("..") && !path.isAbsolute(relative);
+}
+
 function resolveFile(root: string, pathname: string): string {
-  const direct = [pathname, `${pathname}.html`, path.join(pathname, "index.html")].map((candidate) => path.join(root, candidate)).find(isFile);
+  const missing = path.join(root, "+not-found.html");
+  const at = (candidate: string) => path.resolve(root, `.${path.sep}${candidate}`);
+  const direct = [pathname, `${pathname}.html`, path.join(pathname, "index.html")].map(at).find((file) => inside(root, file) && isFile(file));
   if (direct) return direct;
-  const dir = path.join(root, path.dirname(pathname));
-  const dynamic = existsSync(dir) ? readdirSync(dir).find((name) => /^\[.*\]\.html$/.test(name)) : undefined;
-  return dynamic ? path.join(dir, dynamic) : path.join(root, "+not-found.html");
+  const dir = at(path.dirname(pathname));
+  const dynamic = inside(root, dir) && existsSync(dir) ? readdirSync(dir).find((name) => /^\[.*\]\.html$/.test(name)) : undefined;
+  return dynamic ? path.join(dir, dynamic) : missing;
 }
 
 // The database runs in a worker that needs a cross-origin isolated page (SharedArrayBuffer).
@@ -97,7 +106,7 @@ function exportWeb(log: Log): void {
     execFileSync("pnpm", ["exec", "expo", "export", "-p", "web", "--output-dir", DIST], {
       cwd: ROOT,
       stdio: ["ignore", "ignore", "inherit"],
-      env: { ...process.env, EXPO_PUBLIC_E2E_SEED: "1", EXPO_NO_TELEMETRY: "1", CI: "1" },
+      env: { ...process.env, EXPO_PUBLIC_E2E_SEED: "1", EXPO_NO_TELEMETRY: "1", EXPO_OFFLINE: "1", CI: "1" },
     });
   });
 }
@@ -158,7 +167,9 @@ async function main(log: Log): Promise<void> {
   const base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
   let browser: Browser | undefined;
   try {
-    browser = await chromium.launch({ executablePath: process.env.A11Y_CHROMIUM || undefined, args: ["--no-sandbox"] });
+    // A container's Chromium (A11Y_CHROMIUM) runs as root and needs the sandbox off; CI's own Playwright browser keeps it.
+    const custom = process.env.A11Y_CHROMIUM || undefined;
+    browser = await chromium.launch({ executablePath: custom, args: custom ? ["--no-sandbox"] : [] });
     const findings: Finding[] = [];
     for (const scheme of ["light", "dark"] as const) {
       const context = await browser.newContext({ viewport: { width: 390, height: 844 }, colorScheme: scheme, reducedMotion: "reduce" });
@@ -171,15 +182,18 @@ async function main(log: Log): Promise<void> {
       await seed.close();
       for (const screen of SCREENS) {
         const found = await audit(context, base, screen, scheme, log);
-        log.info(`${screen.name} (${scheme}): ${found.length === 0 ? "no violations" : found.map((item) => `${item.rule} x${item.count}`).join(", ")}`);
+        log.debug(`${screen.name} (${scheme}): ${found.length === 0 ? "no violations" : found.map((item) => `${item.rule} x${item.count}`).join(", ")}`);
         findings.push(...found);
       }
       await context.close();
     }
-    for (const item of findings) {
-      log.info(`${item.screen} (${item.scheme}): ${item.rule} (${item.impact}) x${item.count}: ${item.help}\n${item.targets.map((target) => `  ${target}`).join("\n")}`);
-    }
     const problems = verdict(findings);
+    // Minor and moderate findings are listed under --verbose; a serious or critical one is printed in full when the run fails.
+    for (const item of findings) {
+      const detail = `${item.screen} (${item.scheme}): ${item.rule} (${item.impact}) x${item.count}: ${item.help}\n${item.targets.map((target) => `  ${target}`).join("\n")}`;
+      if (problems.length > 0 && FAILING.has(item.impact)) log.error(detail);
+      else log.debug(detail);
+    }
     for (const problem of problems) log.error(problem);
     if (problems.length > 0) throw new Error(`${problems.length} serious or critical finding${problems.length === 1 ? "" : "s"} on the web build`);
   } finally {

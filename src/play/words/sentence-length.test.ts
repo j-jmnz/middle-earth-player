@@ -7,7 +7,7 @@ import path from "node:path";
 import ts from "typescript";
 import { describe, expect, it } from "vitest";
 
-const LIMIT = 30;
+const LIMIT = 25;
 const root = path.resolve(import.meta.dirname, "..");
 const files = [
   ...fs.readdirSync(import.meta.dirname).filter((name) => name.endsWith(".ts") && !name.endsWith(".test.ts")).map((name) => path.join(import.meta.dirname, name)),

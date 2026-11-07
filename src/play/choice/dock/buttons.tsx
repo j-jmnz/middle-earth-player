@@ -33,7 +33,7 @@ const ONLY_HINT = "Sends at once";
 
 // The More pill (`dock-more-actions`) folds the quiet pills behind a popover; it is not the "i" pill (`dock-more`) that opens the
 // dock's folded note lines (table-dock.tsx).
-export type DockExtra = { label: string; testID: string; onPress: () => void; accessibilityLabel?: string };
+export type DockExtra = { label: string; testID: string; onPress: () => void; accessibilityLabel?: string; accessibilityHint?: string };
 
 export function DockButtons({
   dock,
@@ -156,7 +156,7 @@ export function DockButtons({
       {extras.length > 0 || more.length > 0 ? (
         <View className="flex-row flex-wrap items-center justify-center gap-1" style={{ marginTop: (dense ? 2 : 4) * s }}>
           {extras.map((item) => (
-            <TextButton key={item.testID} label={item.label} testID={item.testID} small tight={dense} tone="muted" accessibilityLabel={item.accessibilityLabel} onPress={extra(item.onPress)} />
+            <TextButton key={item.testID} label={item.label} testID={item.testID} small tight={dense} tone="muted" accessibilityLabel={item.accessibilityLabel} accessibilityHint={item.accessibilityHint} onPress={extra(item.onPress)} />
           ))}
           {more.length > 0 ? (
             <View ref={moreRef} collapsable={false}>

@@ -162,7 +162,7 @@ export function HistoryView({ initial }: { initial: RunKind }) {
 
   // A live or archived card starts Manage on a long press, as a deck does; while managing it shows its head alone, so the list scans.
   // `party`: a game's heroes by seat, shown as tiles under its lines (a playthrough's show under each of its runs).
-  const card = (testID: string, state: CardState, words: CardWords, listed: readonly RunRecord[], open: { onPress: () => void; verb: string } | null, footer: ReactNode, party?: readonly (readonly string[])[] | null) => (
+  const card = (testID: string, state: CardState, words: CardWords, listed: readonly RunRecord[], open: { onPress: () => void; verb: string; hint: string } | null, footer: ReactNode, party?: readonly (readonly string[])[] | null) => (
     <HistoryCard
       testID={testID}
       state={state}
@@ -174,7 +174,8 @@ export function HistoryView({ initial }: { initial: RunKind }) {
       nameOf={nameOf}
       faces={faces}
       party={managing ? null : (party ?? null)}
-      accessibilityLabel={open ? `${open.verb} ${words.spoken}` : words.spoken}
+      accessibilityLabel={open?.verb ? `${open.verb} ${words.spoken}` : words.spoken}
+      accessibilityHint={open?.hint}
       onPress={open?.onPress ?? null}
       onLongPress={startManaging}
       footer={footer}
@@ -226,7 +227,7 @@ export function HistoryView({ initial }: { initial: RunKind }) {
         const entry = managedSave(item.save);
         return (
           <View className="pb-3">
-            {card(`entry-${item.save.id}`, item.archived ? "archived" : "live", saveWords(item.save, item.runs, item.started, item.archived, nameOf), item.runs, { onPress: go(pathHref(item.save.id)), verb: "Open" }, actions(entry, item.archived))}
+            {card(`entry-${item.save.id}`, item.archived ? "archived" : "live", saveWords(item.save, item.runs, item.started, item.archived, nameOf), item.runs, { onPress: go(pathHref(item.save.id)), verb: "", hint: "Opens the campaign" }, actions(entry, item.archived))}
           </View>
         );
       }
@@ -240,7 +241,7 @@ export function HistoryView({ initial }: { initial: RunKind }) {
               item.archived ? "archived" : "live",
               gameWords(item.game, managing ? null : item.run, open?.word ?? null, item.archived, nameOf),
               [],
-              open ? { onPress: go(gameHref(item.game, open.to)), verb: open.verb } : null,
+              open ? { onPress: go(gameHref(item.game, open.to)), verb: open.verb, hint: "Opens the game" } : null,
               actions(entry, item.archived),
               item.run?.heroes ?? item.game.loadout?.seats.map((seat) => seat.heroes) ?? null,
             )}

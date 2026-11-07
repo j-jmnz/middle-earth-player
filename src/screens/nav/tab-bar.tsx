@@ -235,7 +235,7 @@ export function HubHeader({ title, subtitle, children }: { title: string; subtit
         <Text accessibilityRole="header" numberOfLines={1} className="shrink-0 font-display text-bone" style={{ fontSize: big * s, lineHeight: big * 1.25 * s, letterSpacing: 0.5 * s, ...shadow }}>
           {title}
         </Text>
-        <View className="ml-auto flex-row items-center" style={{ gap: 8 * s }}>
+        <View className="ml-auto max-w-full shrink flex-row flex-wrap items-center justify-end" style={{ gap: 8 * s, rowGap: 8 * s }}>
           {children}
           <GearButton />
         </View>

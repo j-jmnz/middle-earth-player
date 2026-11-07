@@ -154,7 +154,7 @@ function Stat({ label, value, icon }: { label: string; value: string; icon: Icon
           {value}
         </Text>
       </View>
-      <Text className="mt-0.5 font-bold uppercase text-faint" style={{ fontSize: 9 * s, lineHeight: 12 * s, letterSpacing: 1 * s }} numberOfLines={1}>
+      <Text className="mt-0.5 font-bold uppercase text-faint" style={{ fontSize: 9 * s, lineHeight: 12 * s, letterSpacing: 1 * s, textAlign: "center" }} numberOfLines={2}>
         {label}
       </Text>
     </View>

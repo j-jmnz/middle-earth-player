@@ -1,6 +1,7 @@
 // The Island Map panel a tap on the chip opens (docs/design-system-table.md, The Island Map): the fifteen locations as laid out, the marker, the locations next to it and the secrets under the Temple column, with the words
 // (where the marker stands, the legend) beside the grid when the panel is wide. A reading panel on paper: text and tiles that show a card large; it sends nothing (travel is picked on the staging row). A tile is a covered
 // location ("?"), a revealed one (its progress), an explored one (a check over its quest points) or the active one (the marker over its progress).
+import { useEffect, useEffectEvent, useRef, type ComponentRef } from "react";
 import { Pressable, ScrollView, View } from "react-native";
 
 import { CloseButton } from "../../ui/buttons.tsx";
@@ -18,6 +19,15 @@ export function IslandPanel({ readout, fit, onRead, onClose }: { readout: Island
   const s = useUiScale();
   const beside = fit.layout === "beside";
   const focus = usePanelFocus();
+  // When the map cannot fit its box it scrolls: the scrollbar stays drawn and flashes once as the panel opens, so a player who cannot see the
+  // rest knows it is there.
+  const scroller = useRef<ComponentRef<typeof ScrollView>>(null);
+  const flash = useEffectEvent(() => {
+    if (!fit.fits) scroller.current?.flashScrollIndicators();
+  });
+  useEffect(() => {
+    flash();
+  }, []);
   return (
     <View testID="island-map" collapsable={false} style={{ flexShrink: 1 }}>
       <View ref={focus} accessible accessibilityRole="header" accessibilityLabel={`Island Map, ${readout.explored} of ${readout.cells.length} locations explored`} className="flex-row flex-wrap items-baseline justify-center" style={{ paddingHorizontal: CLOSE_CLEAR * s, columnGap: 8 * s }}>
@@ -27,7 +37,7 @@ export function IslandPanel({ readout, fit, onRead, onClose }: { readout: Island
       <View style={{ position: "absolute", top: -6 * s, right: -6 * s }}>
         <CloseButton testID="island-map-close" onPress={onClose} paper />
       </View>
-      <ScrollView style={{ flexGrow: 0, flexShrink: 1, marginTop: 4 * s }} contentContainerStyle={{ alignItems: beside ? "flex-start" : "center", flexDirection: beside ? "row" : "column", justifyContent: "center", gap: beside ? 12 * s : 8 * s }}>
+      <ScrollView ref={scroller} showsVerticalScrollIndicator persistentScrollbar style={{ flexGrow: 0, flexShrink: 1, marginTop: 4 * s }} contentContainerStyle={{ alignItems: beside ? "flex-start" : "center", flexDirection: beside ? "row" : "column", justifyContent: "center", gap: beside ? 12 * s : 8 * s }}>
         <View>
           {/* The word over the Temple column, as printed: the three Temple of the Deceived locations are the last column. */}
           <View style={{ height: 17 * s }}>

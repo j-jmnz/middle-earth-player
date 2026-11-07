@@ -59,7 +59,7 @@ describe("the words of the Flight of the Stormcaller choices", () => {
   it("each verb of the family reads as a clause", () => {
     expect(stormcallerWords({ verb: "PrepareStormcallerArea", stages: ["12016", "12017", "12018"], number: 2 })).toBe("prepare the Stormcaller's area: a second quest deck of the Stormcaller's stages 2C, 3C and 4C, and the Stormcaller beside it");
     expect(stormcallerWords({ verb: "MoveProgressToStormcaller", amount: 2 })).toBe("move 2 progress from the main quest to the Stormcaller's quest stage");
-    expect(stormcallerWords({ verb: "StormcallerProgress" })).toBe("discard the top card of the encounter deck; the Stormcaller places progress on its stage equal to its Threat plus the Threat of the discarded card");
+    expect(stormcallerWords({ verb: "StormcallerProgress" })).toBe("discard the top card of the encounter deck. The Stormcaller places progress on its stage equal to its Threat plus the discarded card's Threat");
     expect(stormcallerWords({ verb: "MoveToStormcallerArea" })).toBe("add it to the Stormcaller's area");
     expect(stormcallerWords({ verb: "FlipStormcaller" })).toBe("flip the Stormcaller to its Campaign Mode only side");
     expect(stormcallerWords({ verb: "CatchUpWins", stage: 2 })).toBe("defeating this stage when the Stormcaller is at stage 2 wins the game");

@@ -130,14 +130,14 @@ describe("the treasure for Fram's Shade (12189:B:2)", () => {
       const run = send(start(t.state), { type: "Engage", enemyId: idOf(t.state, CODES.framSShade) }, t.ctx);
       expect(run.state.window).toMatchObject({ kind: "response" });
       const sheet = sheetOf(t, run.state);
-      expect(sheet.note).toBe(`${lead}Fram's Shade engaged you. Look at 3 random undiscovered treasures and attach 1 to Fram's Shade as a guarded objective. Fram's Shade stays engaged with you. The players cannot claim the treasure until it is free of encounters, when Fram's Shade leaves play. If they win with it, they discover it. Group limit once per game. Pass and it stays unused for a later engagement at stage 1B or 2B.`);
+      expect(sheet.note).toBe(`${lead}Fram's Shade engaged you. Look at 3 random undiscovered treasures and attach 1 to Fram's Shade as a guarded objective. Fram's Shade stays engaged with you. The players can claim the treasure once it is free of encounters, when Fram's Shade leaves play. If they win with it, they discover it. Group limit once per game. Pass and it stays unused for a later engagement at stage 1B or 2B.`);
       // Passing attaches nothing.
       const passed = send(run, { type: "Pass" }, t.ctx);
       expect(Object.values(passed.state.cards).filter((card) => world.cards.get(card.code)?.campaignKind === "treasure")).toEqual([]);
       // Using it asks which of the 3 treasures, the first player's.
       const asked = use(t, run).state;
       const pick = sheetOf(t, asked);
-      expect(pick.note).toContain("Choose 1 of 3 random undiscovered treasures to attach as a guarded objective. Fram's Shade stays engaged; the players cannot claim the treasure until it is free of encounters, when Fram's Shade leaves play.");
+      expect(pick.note).toContain("Choose 1 of 3 random undiscovered treasures to attach as a guarded objective. Fram's Shade stays engaged. The players can claim the treasure once it is free of encounters, when Fram's Shade leaves play.");
       expect(labels(pick)).toHaveLength(3);
     }
   });

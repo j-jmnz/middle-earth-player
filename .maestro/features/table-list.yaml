@@ -1,6 +1,6 @@
 appId: com.middleearth.lcg
 ---
-# Table as a list set to Always (accessibility plan T1). Written in a cloud session: it has not run. With no screen reader on, the setting puts the phone on
+# Table as a list set to Always (docs/design-system-table.md, Screen reader). Written in a cloud session: it has not run. With no screen reader on, the setting puts the phone on
 # the list table, the way Switch Control, Voice Control and Switch Access players use it (src/ui/screen-reader.ts, useReaderMode), so unlike
 # screen-reader.yaml this flow needs no forced development build: it runs in the e2e-test build with the rest. The fixture is the same two-handed game of
 # A Shadow of the Past parked on the first player's planning window of round 1 (src/campaign/fixtures, `duo`). The table opens as the reader table

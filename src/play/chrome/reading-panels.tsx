@@ -276,8 +276,8 @@ export function ThreatPanel({
 
 /**
  * The table's settings, a night side panel from the menu's Table settings (user request, 2026-10-28): the Settings tab's own grouped rows
- * (setting-rows.tsx) under a left-aligned title, minus Stops on, which the rail's carousel carries. At the foot, All settings opens the
- * Settings tab (the game is saved) and Close closes the panel. Text and switches only; nothing here sends an intent.
+ * (setting-rows.tsx) under a left-aligned title, minus Stops on, which the rail's carousel carries. At the end of the rows, All settings opens the
+ * Settings tab (the game is saved); the round ✕ closes the panel. Text and switches only; nothing here sends an intent.
  */
 export function SettingsPanel({
   settings,
@@ -305,10 +305,11 @@ export function SettingsPanel({
       <PanelClose testID="settings-close" onPress={onClose} paper={false} />
       <ScrollView style={{ flexGrow: 0, flexShrink: 1 }} showsVerticalScrollIndicator persistentScrollbar>
         <SettingsRows settings={settings} onChange={onChange} always={always} testPrefix="settings" first />
+        {/* The last item of the scroll content, not a pinned footer: at Extra large on a short phone the rows take the room. */}
+        <View className="-ml-3 items-start pt-2">
+          <TextButton tone="accent" label="All settings" accessibilityLabel="All settings. Opens Settings and leaves the table" testID="settings-all" onPress={onAllSettings} />
+        </View>
       </ScrollView>
-      <View className="-ml-3 items-start pt-2">
-        <TextButton tone="accent" label="All settings" accessibilityLabel="All settings. Opens Settings and leaves the table" testID="settings-all" onPress={onAllSettings} />
-      </View>
     </View>
   );
 }

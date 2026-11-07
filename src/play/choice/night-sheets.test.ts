@@ -172,7 +172,7 @@ describe("the side quest deck's reveal and the attack on Hrogar's Hill (19083:B:
       const state = opened(t, t.state, CODES.theDragonSFury, "whenRevealed", idOf(t.state, CODES.theDragonSFury), "whenRevealed");
       expect(state.window).toMatchObject({ kind: "defense", seat: 0 });
       const sheet = sheetOf(t, state);
-      expect(sheet.note).toBe(`${lead}Choose a defender, or leave it undefended. Undefended, the 7 damage, before its shadow card, is dealt to Hrogar's Hill, not to a character. Hrogar's Hill holds 0 of 50 damage.`);
+      expect(sheet.note).toBe(`${lead}Choose a defender, or leave it undefended. Left undefended, its 7 damage (before its shadow card) is dealt to Hrogar's Hill, not to a character. Hrogar's Hill holds 0 of 50 damage.`);
       expect(sheet.note).not.toContain("No shadow card");
     }
   });

@@ -47,7 +47,7 @@ describe("the words of the Command choices", () => {
     expect(branchWords(first!, "resources", state, names, null, { x: 2 })).toBe("Remove 2 resources from a non-unique enemy (X is Command's level)");
     expect(branchWords(first!, "resources", state, names, null, { x: 1 })).toBe("Remove 1 resource from a non-unique enemy (X is Command's level)");
     const [ally] = commands().flatMap((effect) => chooses(effect.instructions)).filter((item) => item.upTo != null && item.options.some((option) => option.id === "ally"));
-    expect(branchWords(ally!, "ally", state, names, null, { x: 3 })).toBe("Put an ally with cost 3 or less from your discard pile into play, then discard it at the end of the phase (X is Command's level)");
+    expect(branchWords(ally!, "ally", state, names, null, { x: 3 })).toBe("Put an ally with cost 3 or less from your discard pile into play (X is Command's level). Discard it at the end of the phase");
     const spyglass = commands().flatMap((effect) => chooses(effect.instructions)).find((item) => item.options.some((option) => option.id === "spyglassDeck"))!;
     expect(branchWords(spyglass, "spyglassDeck", state, names, null)).toBe("Put Spyglass from your deck into play, then shuffle your deck");
     expect(branchWords(spyglass, "spyglassHand", state, names, null)).toBe("Put Spyglass from your hand into play");

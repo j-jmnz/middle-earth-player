@@ -51,7 +51,7 @@ export function stormcallerWords(instruction: Instruction): string | null {
     case "MoveProgressToStormcaller":
       return `move ${typeof instruction.amount === "number" ? instruction.amount : "X"} progress from the main quest to the Stormcaller's quest stage`;
     case "StormcallerProgress":
-      return "discard the top card of the encounter deck; the Stormcaller places progress on its stage equal to its Threat plus the Threat of the discarded card";
+      return "discard the top card of the encounter deck. The Stormcaller places progress on its stage equal to its Threat plus the discarded card's Threat";
     case "MoveToStormcallerArea":
       return "add it to the Stormcaller's area";
     case "CatchUpWins":

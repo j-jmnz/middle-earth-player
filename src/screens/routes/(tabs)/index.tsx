@@ -92,7 +92,8 @@ export default function CampaignList() {
               title={line.name}
               line={`${line.seats} · ${nextSummary(line.next)}`}
               heroes={fellowshipOf(save)[0] ?? []}
-              accessibilityLabel={`Open ${describe(line)}`}
+              accessibilityLabel={describe(line)}
+              accessibilityHint="Opens the campaign"
               onPress={() => openPath(save)}
             />
           );

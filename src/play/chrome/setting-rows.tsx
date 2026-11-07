@@ -24,11 +24,20 @@ export function SettingChoice({ title, detail, children, testID }: { title: stri
   return (
     <View testID={testID} className="min-h-touch" style={{ paddingVertical: 6 * s, gap: 6 * s }}>
       <View>
-        <Text className="text-body text-bone">{title}</Text>
+        <Text className="text-body font-semibold text-bone">{title}</Text>
         {detail ? <Text className="text-label text-muted">{detail}</Text> : null}
       </View>
       {children}
     </View>
+  );
+}
+
+/** A choice row over a stretched Segmented: `id` is the row's test id and the options' prefix, `title` its name to a screen reader too. */
+export function ChoiceRow<T extends string>({ title, detail, id, options, words, labels, value, onChange }: { title: string; detail: string; id: string; options: readonly T[]; words: Partial<Record<T, string>>; labels?: Partial<Record<T, string>>; value: T; onChange: (next: T) => void }) {
+  return (
+    <SettingChoice title={title} detail={detail} testID={id}>
+      <Segmented options={options} value={value} onChange={onChange} testIDPrefix={id} accessibilityLabel={title} stretch words={words} labels={labels} />
+    </SettingChoice>
   );
 }
 
@@ -86,41 +95,25 @@ export function SettingsRows({
     <>
       {groups.includes("display") ? (
         <SettingGroup title="Display" testID={id("display")} first={first && top === "display"}>
-          <SettingChoice title="Theme" detail={THEME_LINE} testID={id("theme")}>
-            <Segmented options={THEME_OPTIONS} value={settings.theme} onChange={(theme) => onChange({ theme })} testIDPrefix={id("theme")} accessibilityLabel="Theme" stretch words={THEME_WORDS} labels={THEME_LABELS} />
-          </SettingChoice>
-          <SettingChoice title="UI scale" detail={SCALE_LINE} testID={id("scale")}>
-            <Segmented options={UI_SCALE_OPTIONS} value={settings.uiScale} onChange={(uiScale) => onChange({ uiScale })} testIDPrefix={id("scale")} accessibilityLabel="UI scale" stretch words={SCALE_WORDS} />
-          </SettingChoice>
-          <SettingChoice title="Strong outlines" detail={CONTRAST_LINE} testID={id("contrast")}>
-            <Segmented options={STRONG_OUTLINES_OPTIONS} value={settings.highContrast} onChange={(highContrast) => onChange({ highContrast })} testIDPrefix={id("contrast")} accessibilityLabel="Strong outlines" stretch words={STRONG_OUTLINES_WORDS} />
-          </SettingChoice>
-          <SettingChoice title="Title face" detail={TITLE_FACE_LINE} testID={id("title-face")}>
-            <Segmented options={TITLE_FACE_OPTIONS} value={settings.titleFace} onChange={(titleFace) => onChange({ titleFace })} testIDPrefix={id("title-face")} accessibilityLabel="Title face" stretch words={TITLE_FACE_WORDS} />
-          </SettingChoice>
+          <ChoiceRow title="Theme" detail={THEME_LINE} id={id("theme")} options={THEME_OPTIONS} words={THEME_WORDS} labels={THEME_LABELS} value={settings.theme} onChange={(theme) => onChange({ theme })} />
+          <ChoiceRow title="UI scale" detail={SCALE_LINE} id={id("scale")} options={UI_SCALE_OPTIONS} words={SCALE_WORDS} value={settings.uiScale} onChange={(uiScale) => onChange({ uiScale })} />
+          <ChoiceRow title="Strong outlines" detail={CONTRAST_LINE} id={id("contrast")} options={STRONG_OUTLINES_OPTIONS} words={STRONG_OUTLINES_WORDS} value={settings.highContrast} onChange={(highContrast) => onChange({ highContrast })} />
+          <ChoiceRow title="Title face" detail={TITLE_FACE_LINE} id={id("title-face")} options={TITLE_FACE_OPTIONS} words={TITLE_FACE_WORDS} value={settings.titleFace} onChange={(titleFace) => onChange({ titleFace })} />
         </SettingGroup>
       ) : null}
 
       {groups.includes("performance") ? (
         <SettingGroup title="Performance" note={PERFORMANCE_LINE} testID={id("performance")} first={first && top === "performance"}>
-          <SettingChoice title="Card pictures" detail={QUALITY_LINE} testID={id("quality")}>
-            <Segmented options={CARD_QUALITY_OPTIONS} value={settings.cardQuality} onChange={(cardQuality) => onChange({ cardQuality })} testIDPrefix={id("quality")} accessibilityLabel="Card pictures" stretch words={QUALITY_WORDS} />
-          </SettingChoice>
+          <ChoiceRow title="Card pictures" detail={QUALITY_LINE} id={id("quality")} options={CARD_QUALITY_OPTIONS} words={QUALITY_WORDS} value={settings.cardQuality} onChange={(cardQuality) => onChange({ cardQuality })} />
           <SettingSwitch roomy label="Moving fog" detail={fogLine(light, reduced)} dim={fogStill} value={settings.fogDrift} onChange={(fogDrift) => onChange({ fogDrift })} testID={id("fog")} />
         </SettingGroup>
       ) : null}
 
       {groups.includes("motion") ? (
         <SettingGroup title="Motion and feel" testID={id("motion")} first={first && top === "motion"}>
-          <SettingChoice title="Animation speed" detail={SPEED_LINE} testID={id("speed")}>
-            <Segmented options={SPEEDS} value={settings.animationSpeed} onChange={(animationSpeed) => onChange({ animationSpeed })} testIDPrefix={id("speed")} accessibilityLabel="Animation speed" stretch words={SPEED_WORDS} />
-          </SettingChoice>
-          <SettingChoice title="Banner closes" detail={BANNER_CLOSES_LINE} testID={id("banner-closes")}>
-            <Segmented options={BANNER_CLOSES_OPTIONS} value={settings.bannerCloses} onChange={(bannerCloses) => onChange({ bannerCloses })} testIDPrefix={id("banner-closes")} accessibilityLabel="Banner closes" stretch words={BANNER_CLOSES_WORDS} />
-          </SettingChoice>
-          <SettingChoice title="Reduce motion" detail={REDUCE_MOTION_LINE} testID={id("reduce-motion")}>
-            <Segmented options={REDUCE_MOTION_OPTIONS} value={settings.reduceMotion} onChange={(reduceMotion) => onChange({ reduceMotion })} testIDPrefix={id("reduce-motion")} accessibilityLabel="Reduce motion" stretch words={REDUCE_MOTION_WORDS} />
-          </SettingChoice>
+          <ChoiceRow title="Animation speed" detail={SPEED_LINE} id={id("speed")} options={SPEEDS} words={SPEED_WORDS} value={settings.animationSpeed} onChange={(animationSpeed) => onChange({ animationSpeed })} />
+          <ChoiceRow title="Reduce motion" detail={REDUCE_MOTION_LINE} id={id("reduce-motion")} options={REDUCE_MOTION_OPTIONS} words={REDUCE_MOTION_WORDS} value={settings.reduceMotion} onChange={(reduceMotion) => onChange({ reduceMotion })} />
+          <ChoiceRow title="Banner closes" detail={BANNER_CLOSES_LINE} id={id("banner-closes")} options={BANNER_CLOSES_OPTIONS} words={BANNER_CLOSES_WORDS} value={settings.bannerCloses} onChange={(bannerCloses) => onChange({ bannerCloses })} />
           <SettingSwitch roomy label="Combat spotlight" detail={SPOTLIGHT_LINE} value={settings.spotlight} onChange={(spotlight) => onChange({ spotlight })} testID={id("spotlight")} />
           <SettingSwitch roomy label="Haptics" detail={HAPTICS_LINE} value={settings.haptics} onChange={(haptics) => onChange({ haptics })} testID={id("haptics")} />
         </SettingGroup>
@@ -132,13 +125,9 @@ export function SettingsRows({
           {stops ? <SettingSwitch roomy label="Stops on" detail={STOPS_LINE} value={settings.stopsOn} onChange={(stopsOn) => onChange({ stopsOn })} testID={id("stops")} /> : null}
           {/* The web build is already a list of names: the row would change nothing there. */}
           {Platform.OS !== "web" ? (
-            <SettingChoice title="Table as a list" detail={TABLE_LIST_LINE} testID={id("table-list")}>
-              <Segmented options={TABLE_LIST_OPTIONS} value={settings.tableAsList} onChange={(tableAsList) => onChange({ tableAsList })} testIDPrefix={id("table-list")} accessibilityLabel="Table as a list" stretch words={TABLE_LIST_WORDS} />
-            </SettingChoice>
+            <ChoiceRow title="Table as a list" detail={TABLE_LIST_LINE} id={id("table-list")} options={TABLE_LIST_OPTIONS} words={TABLE_LIST_WORDS} value={settings.tableAsList} onChange={(tableAsList) => onChange({ tableAsList })} />
           ) : null}
-          <SettingChoice title="Confirm time" detail={CONFIRM_TIME_LINE} testID={id("confirm-time")}>
-            <Segmented options={CONFIRM_TIME_OPTIONS} value={settings.confirmTime} onChange={(confirmTime) => onChange({ confirmTime })} testIDPrefix={id("confirm-time")} accessibilityLabel="Confirm time" stretch words={CONFIRM_TIME_WORDS} />
-          </SettingChoice>
+          <ChoiceRow title="Confirm time" detail={CONFIRM_TIME_LINE} id={id("confirm-time")} options={CONFIRM_TIME_OPTIONS} words={CONFIRM_TIME_WORDS} value={settings.confirmTime} onChange={(confirmTime) => onChange({ confirmTime })} />
           <SettingSwitch roomy label="Keep screen awake" detail={AWAKE_LINE} value={settings.keepAwake} onChange={(keepAwake) => onChange({ keepAwake })} testID={id("awake")} />
           <SettingChoice title="Responses used every time" detail={always.length > 0 ? ALWAYS_LINE : ALWAYS_EMPTY_LINE} testID={id("always")}>
             {always.length === 0 ? (

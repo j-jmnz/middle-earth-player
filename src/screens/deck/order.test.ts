@@ -63,12 +63,12 @@ describe("shiftsFor", () => {
 });
 
 describe("moveChoices", () => {
-  it("offers each direction that has room", () => {
+  it("enables each direction that has room", () => {
     expect(moveChoices(0, 3)).toEqual({ up: false, down: true });
     expect(moveChoices(1, 3)).toEqual({ up: true, down: true });
     expect(moveChoices(2, 3)).toEqual({ up: true, down: false });
   });
-  it("offers nothing for one deck or a deck not in the list", () => {
+  it("enables nothing for one deck or a deck not in the list", () => {
     expect(moveChoices(0, 1)).toEqual({ up: false, down: false });
     expect(moveChoices(-1, 3)).toEqual({ up: false, down: false });
   });

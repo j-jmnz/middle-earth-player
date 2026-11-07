@@ -5,6 +5,7 @@
 import { useCallback, useMemo, useState, type ReactNode } from "react";
 import { Pressable, View } from "react-native";
 
+import { usePlainTitles } from "../../ui/display-prefs";
 import { sectionTitleStyle } from "../../ui/section-heading";
 import { textSurface } from "../../ui/surfaces";
 import { useUiScale } from "../../ui/ui-scale";
@@ -72,6 +73,7 @@ export function FoldHeader({ id, title, folded, onFold, count, unit, summary, le
   const palette = usePalette();
   const t = useTableTokens();
   const s = useUiScale();
+  const plain = usePlainTitles();
   const counted = summary != null ? (lead ? `${lead}, ${summary}` : summary) : count == null ? null : unit ? plural(count, unit) : String(count);
   const summaryTone = attention ? "text-danger" : "text-muted";
   return (
@@ -96,7 +98,7 @@ export function FoldHeader({ id, title, folded, onFold, count, unit, summary, le
               <View className="w-3 items-center">
                 <Chevron direction={folded ? "right" : "down"} color={palette.moon} size={8} />
               </View>
-              <Text className="shrink font-display text-moon" style={sectionTitleStyle(s)}>
+              <Text className="shrink font-display text-moon" style={sectionTitleStyle(s, plain)}>
                 {title}
               </Text>
               <View className="min-w-3 flex-1" />

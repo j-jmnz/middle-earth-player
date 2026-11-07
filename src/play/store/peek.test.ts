@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { fixtureDefinition } from "../../rules/core/test-fixture.ts";
 import { blankScenario, withSeat } from "../../rules/core/state.ts";
 
-import { dialName, dialTap, NO_DRAG, NO_HIGHLIGHT, NO_TARGETS, peekSeat, peekWords, seatDial } from "./peek.ts";
+import { dialSpeech, dialTap, NO_DRAG, NO_HIGHLIGHT, NO_TARGETS, peekSeat, peekWords, seatDial } from "./peek.ts";
 import { onScrubCancel, scrubMoved, scrubOpen } from "../canvas/scrub-open.ts";
 import { twoHanded } from "./seat-fixture.ts";
 import { createTableStore } from "./store.ts";
@@ -51,9 +51,10 @@ describe("the dials' roles and words", () => {
     expect(seatDial(2, 0, 1, 0).role).toBe("acting");
     expect(seatDial(2, 0, 1, 1).role).toBe("viewing");
     expect(seatDial(3, 0, 2, 1).role).toBeNull();
-    expect(dialName("Player 1 threat", "acting")).toBe("Player 1 threat, acting");
-    expect(dialName("Player 2 threat", "viewing")).toBe("Player 2 threat, viewing");
-    expect(dialName("Player 2 threat", null)).toBe("Player 2 threat");
+    expect(dialSpeech("Threat", 28, "P1", "acting")).toBe("Threat 28, P1, acting");
+    expect(dialSpeech("Threat", 33, "P2", "viewing")).toBe("Threat 33, P2, viewing");
+    expect(dialSpeech("Threat", 33, "P2", null)).toBe("Threat 33, P2");
+    expect(dialSpeech("Threat", 20, "Threat", null)).toBe("Threat 20");
   });
 
   it("hints what a tap on a dial that is not shown does, and keeps the panel's hint on the one that is", () => {
