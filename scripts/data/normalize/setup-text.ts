@@ -107,8 +107,8 @@ export type SetupStep =
   | "shuffleIntoDecks" // "Each player shuffles 1 copy of The Searching Eye into his deck"
   | "chooseResourceOrCopy" // "Each player must choose: either add 1 resource to each of his heroes' pools, or shuffle 1 copy of Brace of Coneys into his deck"
   | "chooseCounselsOrAdvance" // "the players must choose: either each player shuffles 1 copy of Poisoned Counsels into his deck, or advance to stage 2A (bypassing stage 1B)": `count` the stage
-  | "eachOtherPlayerAddsLocation" // "Each player, except for the first player, searches the encounter deck for a different non-unique location and adds it to the staging area"
-  | "shuffleSetUnder"; // "Shuffle the Harad encounter set and place it facedown under The Cross-roads": `asideSets` the set, `to` the card
+  | "eachOtherPlayerAddsLocation" // "Each player, except the first player, searches the encounter deck for a different non-unique location and adds it to the staging area"
+  | "shuffleSetUnder"; // "Shuffle the Men of Harad encounter set and place it facedown under The Cross-roads": `asideSets` the set, `to` the card
 
 export type ParsedSetup = { clauses: SetupClause[]; unread: string[] };
 

@@ -60,7 +60,7 @@ describe("The Two Towers codes", () => {
   it("keeps the RingsDB record of a Two Towers player card and adds only the MEC112 printing", () => {
     const aragorn = byCode.get("143001");
     expect(aragorn?.printings.map((printing) => printing.pack)).toEqual(["ToS", "TTwT"]);
-    expect(aragorn?.text).toContain("<b>Action:</b>");
+    expect(aragorn?.text).toContain("Action: Spend 2 resources from Aragorn's resource pool to ready a hero.");
   });
 
   it("names one reprint set and pack per saga box, the Fellowship's unchanged", () => {

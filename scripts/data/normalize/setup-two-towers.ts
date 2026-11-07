@@ -69,7 +69,7 @@ export function readTwoTowers(sentence: string, names: NameIndex): SetupClause[]
     return codes.length === 0 ? null : [step("takeControl", { codes })];
   }
   if (/^Each player searches the encounter deck for (?:1|one|a) location, reveals it, and adds it to the staging area$/i.test(sentence)) return [{ kind: "eachPlayerAddsLocation", count: 1 }];
-  if (/^Each player, except for the first player, searches the encounter deck for a different non-unique location and adds it to the staging area$/i.test(sentence)) return [step("eachOtherPlayerAddsLocation", { count: 1 })];
+  if (/^Each player,? except (?:for )?the first player,? searches the encounter deck for a different non-unique location and adds it to the staging area$/i.test(sentence)) return [step("eachOtherPlayerAddsLocation", { count: 1 })];
   if ((match = /^Shuffle the (.+?) encounter set and place it facedown under (.+)$/i.exec(sentence))) {
     const under = names.codesOf(match[2] ?? "");
     return under.length === 0 ? null : [step("shuffleSetUnder", { asideSets: [(match[1] ?? "").trim()], to: under })];
