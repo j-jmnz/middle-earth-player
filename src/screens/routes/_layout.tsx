@@ -157,10 +157,13 @@ export default function RootLayout() {
     <ThemeContext.Provider value={resolved}>
     <UiScaleContext.Provider value={scale}>
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: palette.night }}>
-      {/* The web page's title (nothing on the phone): a reader says it first, and the web accessibility check needs one. */}
-      <Head>
-        <title>Middle Earth LCG</title>
-      </Head>
+      {/* The web page's title: a reader says it first, and the web accessibility check needs one. Rendered on the web only: on iOS
+          Head publishes a Handoff activity whose URL needs an origin in the router config, and without one it raises an alert. */}
+      {Platform.OS === "web" ? (
+        <Head>
+          <title>Middle Earth LCG</title>
+        </Head>
+      ) : null}
       <StatusBar barStyle={resolved === "dark" ? "light-content" : "dark-content"} />
       <SafeAreaProvider initialMetrics={initialWindowMetrics}>
         <View className="flex-1" style={themeStyle}>
