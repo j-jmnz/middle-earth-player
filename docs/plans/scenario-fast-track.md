@@ -94,16 +94,10 @@ This replaces next step 4 of `docs/plans/scenario-pipeline.md` (Next steps).
 
 ### F5. One author, a small context pack, rulings first, a quick loop
 
-- **A new agent, `.claude/agents/scenario-author.md`, runs on Sonnet (`.claude/agents/orchestrator.md`, Models).** One agent takes the scenario through these steps in order:
-  1. Scaffold.
-  2. Drafts.
-  3. A readings pass, which asks every reading that needs a ruling in one batch, before any engine work.
-  4. Verbs.
-  5. Records.
-  6. Render and reading judge.
-  7. Spec rows.
-  8. Asks.
-  9. Goldens.
+- **A new agent, `.claude/agents/scenario-author.md`, runs on Sonnet (`.claude/agents/orchestrator.md`, Models).** One agent file covers the whole scenario. A subagent cannot start agents of its own, so the orchestrator runs it as three tasks and runs the reading judge between them:
+  1. **Read.** Scaffold, drafts and a readings pass. It hands back every reading that needs a ruling, before any engine work, and the orchestrator asks the user once.
+  2. **Build.** Verbs and records with the rulings applied, then `pnpm effects:render`. The orchestrator then runs `reading-judge` on the render.
+  3. **Finish.** It fixes every line the judge called `wrong`, then writes the spec rows, the asks and the goldens.
 - **The review round is the one `.claude/agents/orchestrator.md` describes (One review round)**, so the A/B compares like with like.
 - **`pnpm author:pack <scenario-id>` (`scripts/tools/author-pack.ts`) writes `.agent/pack/<id>.md`, which is not committed.** It holds:
   - the vocabulary file;
@@ -131,12 +125,15 @@ It is a generic beam search over legal intents, built on `test/harness/auto-play
 4. **F1.** Prove it with scratch asks for three of `the-fate-of-wilderland`'s choices that render the sentences `src/play/choice/fate-sheets.test.ts` pins.
 5. **F5.** `scenario:new --track fast`, `author:pack`, `test:scenario --quick`, the two agent files and `docs/handover/fast-track.md`.
 
-**Shared prerequisite.** The Two Towers data and campaign shell, on the classic procedure, as the Dream-chaser and Ered Mithrin data and shell phases were:
+**Shared prerequisite.** The Two Towers data and campaign shell, on the classic procedure. No plan for them exists yet:
 
-- the ledger read from the scans;
-- `data/scenarios/the-uruk-hai.json`;
-- the campaign card;
-- the campaign entry in `data/campaigns`.
+1. A planning task writes `docs/plans/the-two-towers.md`, with a data phase and a campaign-shell phase. The analogues are the Ered Mithrin and Dream-chaser data and shell phases (`git show 86279f3^:docs/phases/done/phase-49-ered-mithrin-data.md`, and `phase-50-ered-mithrin-campaign-shell.md`, `phase-37-dream-chaser-data.md` and `phase-38-dream-chaser-campaign-shell.md` from the same commit). The Two Towers continues the Fellowship of the Ring saga campaign (`docs/brief.md`, Campaign), so the shell carries the Fellowship log over. The user approves the plan before any of it is built.
+2. The data phase. It ends with:
+   - the ledger read from the scans;
+   - `data/scenarios/the-uruk-hai.json` and the other Two Towers scenarios;
+   - the campaign cards;
+   - the campaign entry in `data/campaigns`.
+3. The campaign-shell phase.
 
 **Then run the A/B.**
 
@@ -144,9 +141,9 @@ It is a generic beam search over legal intents, built on `test/harness/auto-play
 
 ### Arms
 
-- Both arms start from the same `main` commit, after the fast track and the Two Towers data are merged.
+- Both arms start from the same commit: the one after the fast track and the Two Towers data and shell, on `main` if they are merged by then, and on their work branch otherwise.
 - **Classic arm:** branch `ab/the-uruk-hai-classic`, run by `orchestrator` on the Scenario procedure.
-- **Fast arm:** branch `ab/the-uruk-hai-fast`, run by `scenario-author` on `docs/handover/fast-track.md`.
+- **Fast arm:** branch `ab/the-uruk-hai-fast`, run by `orchestrator` as the three `scenario-author` tasks of F5, on `docs/handover/fast-track.md`.
 - The same models write and review in both.
 - The arms run one after the other, not side by side, so that machine load does not skew the times. A coin toss picks the first arm, and the result is recorded.
 
