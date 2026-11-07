@@ -5,6 +5,8 @@
 import type { ScenarioData } from "../catalog/scenario-data.ts";
 import type { PrintedCard } from "../rules/core/printed.ts";
 
+import type { PoolCard } from "./log.ts";
+
 export type ChecklistSaga = {
   active: boolean;
   // The ☺ hero the scenario grants the first player (☺ Aragorn in scenarios 7 to 9), or null (a Ring-bearer scenario).
@@ -31,4 +33,37 @@ export function sagaOf(scenario: Pick<ScenarioData, "sagaStart">, cards: Readonl
     },
     isAragorn: (code) => grantedName != null && code !== granted && cards.get(code)?.type === "hero" && cards.get(code)?.name === grantedName,
   };
+}
+
+/**
+ * "If Aragorn had previously been added to the list of fallen heroes, remove his name from the list and each player incurs a permanent +1 threat
+ * penalty" (mec112.campaign-mode-aragorn): the fallen lists without the logged Aragorn, and the penalty that costs each player (0 when there is none to remove).
+ */
+export function fallenWithoutAragorn(saga: ChecklistSaga, fallen: readonly (readonly string[])[]): { fallenLists: readonly (readonly string[])[]; forcedPenalty: number } {
+  if (!saga.active || saga.granted == null || !fallen.flat().some(saga.isAragorn)) return { fallenLists: fallen, forcedPenalty: 0 };
+  return { fallenLists: fallen.map((list) => list.filter((code) => !saga.isAragorn(code))), forcedPenalty: 1 };
+}
+
+/**
+ * One seat's logged heroes and the heroes it plays, split by the saga: `lost` the logged Aragorn the scenario replaces, `keptSaga` the Fellowship heroes the log keeps, `loggedPlayers` and
+ * `playersNow` the heroes that are the player's own choice (the granted hero and the saga's are not).
+ */
+export function sagaSeat(saga: ChecklistSaga, logged: readonly string[], playing: readonly string[]): { lost: string[]; keptSaga: string[]; loggedPlayers: string[]; playersNow: string[] } {
+  const lost = saga.active ? logged.filter(saga.isAragorn) : [];
+  const keptSaga = saga.active ? logged.filter((code) => saga.ofSaga(code)) : [];
+  const loggedPlayers = logged.filter((code) => !lost.includes(code) && !(saga.active && saga.ofSaga(code)));
+  const playersNow = playing.filter((code) => !(saga.active && saga.ofSaga(code)));
+  return { lost, keptSaga, loggedPlayers, playersNow };
+}
+
+/** The heroes that replace a lost Aragorn without the +1 penalty: one for each. */
+export function freedBy(lost: readonly string[], added: readonly string[]): number {
+  return Math.min(lost.length, added.length);
+}
+
+/** The pool with the cards stuck to a logged Aragorn moved to the granted hero (mec112.campaign-mode-aragorn). */
+export function moveToGranted(pool: readonly PoolCard[], forgotten: ReadonlySet<string>, saga: ChecklistSaga): PoolCard[] {
+  const granted = saga.granted;
+  if (forgotten.size === 0 || granted == null) return [...pool];
+  return pool.map((card) => (card.attachedTo != null && forgotten.has(card.attachedTo) ? { ...card, attachedTo: granted } : card));
 }

@@ -82,30 +82,14 @@ export default function CampaignSetup() {
         </View>
       }
     >
-      <Section title="Players" className="mt-4" />
-      {continued ? (
-        <Text testID="continue-seats" className="text-body text-muted">{`${seatWord(continued.seatCount)}, as in the finished campaign.`}</Text>
-      ) : (
-        <Segmented
-          options={SEAT_WORDS}
-          value={seatWord(seats)}
-          onChange={(next) => setSeats(seatCountOf(next))}
-          testIDPrefix="seats"
-          testIDs={{ "True solo": seatId(1), "Two-handed": seatId(2) }}
-          labels={{ "True solo": `${seatWord(1)}, ${name}`, "Two-handed": `${seatWord(2)}, ${name}` }}
-          accessibilityLabel={`Players for ${name}`}
-          stretch
-        />
-      )}
-      {hasXp ? <ModePicker mode={mode} onMode={setMode} testIDPrefix={`mode-${id}`} campaignName={name} setup /> : null}
       {continues.length > 0 ? (
         <View className="gap-2" testID="continue-saga">
           <Section title="Continue the saga" className="mt-4" />
-          <Text className="text-label text-muted">{"The heroes, fallen heroes, threat penalty, pool, captives and notes of a finished campaign carry on. It stays as it was."}</Text>
+          <Text className="text-label text-muted">{"The heroes, fallen heroes, threat penalty, pool, captives and notes of a finished campaign carry on. The finished campaign is not changed."}</Text>
           <View className="gap-2" accessibilityRole="radiogroup" accessibilityLabel={`Continue the saga in ${name}`}>
-            <RadioTile selected={continuing == null} testID="continue-none" label={`Fresh start, ${name}`} onPress={() => setContinuing(null)} className="min-h-touch justify-center rounded-item px-4 py-2">
-              <Text className={continuing == null ? "text-body font-semibold text-bone" : "text-body text-muted"}>Fresh start</Text>
-              <Text className="text-label text-muted">An empty log: no captives, no pool.</Text>
+            <RadioTile selected={continuing == null} testID="continue-none" label={`Start a new saga, ${name}`} onPress={() => setContinuing(null)} className="min-h-touch justify-center rounded-item px-4 py-2">
+              <Text className={continuing == null ? "text-body font-semibold text-bone" : "text-body text-muted"}>Start a new saga</Text>
+              <Text className="text-label text-muted">An empty log: no heroes and no captives carried.</Text>
             </RadioTile>
             {continues.map((choice) => {
               const selected = continuing === choice.saveId;
@@ -127,13 +111,29 @@ export default function CampaignSetup() {
           </View>
         </View>
       ) : null}
+      <Section title="Players" className="mt-4" />
+      {continued ? (
+        <Text testID="continue-seats" className="text-body text-muted">{`${seatWord(continued.seatCount)}, as in the finished campaign.`}</Text>
+      ) : (
+        <Segmented
+          options={SEAT_WORDS}
+          value={seatWord(seats)}
+          onChange={(next) => setSeats(seatCountOf(next))}
+          testIDPrefix="seats"
+          testIDs={{ "True solo": seatId(1), "Two-handed": seatId(2) }}
+          labels={{ "True solo": `${seatWord(1)}, ${name}`, "Two-handed": `${seatWord(2)}, ${name}` }}
+          accessibilityLabel={`Players for ${name}`}
+          stretch
+        />
+      )}
+      {hasXp ? <ModePicker mode={mode} onMode={setMode} testIDPrefix={`mode-${id}`} campaignName={name} setup /> : null}
       {carry.length > 0 ? (
         <View className="gap-2" testID="carry-over">
           <Section title="Carry over from a finished campaign" className="mt-4" />
           <Text className="text-label text-muted">{"The cards join this campaign's pool at its first scenario."}</Text>
           <View className="gap-2" accessibilityRole="radiogroup" accessibilityLabel={`Carry-over for ${name}`}>
-            <RadioTile selected={taking == null} testID="carry-none" label={`Fresh start, ${name}`} onPress={() => setTaking(null)} className="min-h-touch justify-center rounded-item px-4 py-2">
-              <Text className={taking == null ? "text-body font-semibold text-bone" : "text-body text-muted"}>Fresh start</Text>
+            <RadioTile selected={taking == null} testID="carry-none" label={`Carry nothing over, ${name}`} onPress={() => setTaking(null)} className="min-h-touch justify-center rounded-item px-4 py-2">
+              <Text className={taking == null ? "text-body font-semibold text-bone" : "text-body text-muted"}>Carry nothing over</Text>
             </RadioTile>
             {carry.map((choice) => {
               const selected = taking === choice.saveId;

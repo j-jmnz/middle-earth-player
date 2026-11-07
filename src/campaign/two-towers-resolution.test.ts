@@ -24,6 +24,7 @@ import { NO_COPY_LIMITS } from "./wilderland.ts";
 // the copies chosen at Setup and the enemies under The Black Gate, and what the log writes from each. No scenario of the box is playable, so the table is the Fellowship's with the log's hero lists in its facts.
 const HEROES = ["01001", "01011", "01012", "01013"];
 const [ARAGORN, GLORFINDEL, BERAVOR, ELROND] = HEROES as [string, string, string, string];
+const THEODRED = "01002";
 const BOONS = ["143015", "143016", "143017", "143018"];
 const HOPE = "143019";
 const PALANTIR = "143020";
@@ -33,7 +34,7 @@ const BRACE = "144014";
 const EYE = "144015";
 const GATE = "144027";
 const HARAD = "144040";
-const CARDS = [...HEROES, ...BOONS, HOPE, PALANTIR, COUNSELS, VOICE, BRACE, EYE, GATE, HARAD, "141001", "141002", "141003"];
+const CARDS = [...HEROES, THEODRED, ...BOONS, HOPE, PALANTIR, COUNSELS, VOICE, BRACE, EYE, GATE, HARAD, "141001", "141002", "141003"];
 
 let scene: SceneWorld;
 let cards: Map<string, PrintedCard>;
@@ -128,6 +129,31 @@ describe("143071 The Uruk-hai: Beyond All Hope", () => {
     expect(log.campaignPool.map((card) => [card.code, card.attachedTo])).toEqual([[HOPE, ARAGORN]]);
   });
 
+  describe("a hero destroyed in this game", () => {
+    // Theodred is on the log and in the discard pile: the player controls Glorfindel, Beravor and the revived Aragorn, three heroes.
+    const destroyed = () => won("143071", 1, (s) => spawn({ ...s, pursuit: 25, campaignFacts: facts({ heroes: [["141001", GLORFINDEL, BERAVOR, THEODRED]], fallen: [[ARAGORN]], fellowship: ["141001"] }) }, THEODRED, { zone: "discard", seat: 0 }).state);
+
+    it("is not counted by the trim, so no hero is asked to be removed", () => {
+      const { state, ctx } = destroyed();
+      const revived = choose(choose(state, ctx, "hope"), ctx, `0:${ARAGORN}`);
+      expect(revived.resolutionLog.removedHeroes).toBeUndefined();
+      expect(options(revived, ctx)).toEqual([]);
+      expect(resolutionResult(revived)).not.toBeNull();
+    });
+
+    it("is recorded as fallen on the log, even when the player removed him", () => {
+      const { state, ctx } = destroyed();
+      const revived = choose(choose(state, ctx, "hope"), ctx, `0:${ARAGORN}`);
+      const before = { ...emptyLog(1), heroesBySeat: [["141001", GLORFINDEL, BERAVOR, THEODRED]], fallenHeroesBySeat: [[ARAGORN]] };
+      const kept = writeLog(before, revived.scenarioId, revived, cards, NO_COPY_LIMITS);
+      expect(kept.fallenHeroesBySeat).toEqual([[THEODRED]]);
+      const removed = { ...revived, resolutionLog: { ...revived.resolutionLog, removedHeroes: [{ seat: 0, hero: THEODRED }] } };
+      const gone = writeLog(before, removed.scenarioId, removed, cards, NO_COPY_LIMITS);
+      expect(gone.heroesBySeat[0]).not.toContain(THEODRED);
+      expect(gone.fallenHeroesBySeat).toEqual([[THEODRED]]);
+    });
+  });
+
   it("is told on the resolution screen: the options, then the hero for the player, then the hero removed", () => {
     const { state } = start();
     const asking = resolutionView(state, world);
@@ -209,6 +235,52 @@ describe("144067 The Passage of the Marshes: the penalty or The Searching Eye", 
     expect(view.kind === "choosing" && view.tiles.map((tile) => tile.label)).toEqual(["Take a permanent +2 starting threat penalty", "Earn 1 copy of The Searching Eye"]);
     if (view.kind === "choosing") expect(choiceSentence(view, view.tiles[0] ?? view.tiles[0]!)).toContain("+2");
     expect(resolutionView(choose(state, ctx, "penalty"), world).kind).toBe("settled");
+  });
+});
+
+describe("the words of a true solo or two-handed choice", () => {
+  const tellers = (state: ScenarioState) => {
+    const view = resolutionView(state, world);
+    if (view.kind !== "choosing") throw new Error("not choosing");
+    return view;
+  };
+
+  it("says 'You' in true solo and names the seat two-handed, with the Searching Eye's card on its tile", () => {
+    const solo = tellers(won("144067", 1).state);
+    expect(solo.tiles.map((tile) => [tile.code, tile.says])).toEqual([
+      [null, "You take a permanent +2 starting threat penalty, recorded in the campaign log."],
+      [EYE, "You earn 1 copy of The Searching Eye, recorded in the campaign log."],
+    ]);
+    const two = tellers(won("144067", 2).state);
+    expect(two.seatLabel).toBe("Player 1 (first player) chooses");
+    expect(two.tiles.map((tile) => tile.says)).toEqual(["Player 1 takes a permanent +2 starting threat penalty, recorded in the campaign log.", "Player 1 earns 1 copy of The Searching Eye, recorded in the campaign log."]);
+  });
+
+  it("asks a first-player choice as 'Choose one option' in true solo and 'The players choose' two-handed", () => {
+    const place: Place = (s) => ({ ...s, pursuit: 25, campaignFacts: facts({ heroes: [[GLORFINDEL], []], fallen: [[ARAGORN], []], fellowship: [] }) });
+    const solo = tellers(won("143071", 1, place).state);
+    expect(solo).toMatchObject({ eyebrow: "You choose", prompt: expect.stringMatching(/^Choose one option\./) });
+    const two = tellers(won("143071", 2, place).state);
+    expect(two).toMatchObject({ eyebrow: "The players choose", prompt: "The players choose one option; the first player confirms.", seatLabel: "Player 1 (first player) chooses" });
+  });
+
+  it("drops the player who takes control of the fallen hero in true solo", () => {
+    const place: Place = (s) => ({ ...s, pursuit: 25, campaignFacts: facts({ heroes: [[GLORFINDEL], []], fallen: [[ARAGORN], []], fellowship: [] }) });
+    const { state, ctx } = won("143071", 1, place);
+    const solo = tellers(choose(state, ctx, "hope"));
+    expect(solo.prompt).not.toContain("the player who takes control");
+    expect(solo.prompt).toMatch(/^Choose a fallen hero\. /);
+    const second = won("143071", 2, place);
+    expect(tellers(choose(second.state, second.ctx, "hope")).prompt).toContain("and the player who takes control of it");
+  });
+
+  it("records The Black Gate's enemies in the campaign log, as 'count × name'", () => {
+    const place: Place = (s) => {
+      const gate = spawn(s, GATE, { zone: "staging" });
+      return spawn(gate.state, HARAD, { zone: "under", locationId: gate.id }).state;
+    };
+    const view = resolutionView(won("144069", 1, place).state, world);
+    expect(view.kind === "settled" && view.notes?.join(" ")).toMatch(/Under The Black Gate: 1 \u00d7 .+, recorded in the campaign log\./);
   });
 });
 

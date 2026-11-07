@@ -51,6 +51,8 @@ export type CampaignLog = {
   carryIn: readonly PoolCard[];
   // The finished save whose carry-over this one took in, so that save's offer is not made again. Absent when it took nothing.
   carriedFrom?: string;
+  // The finished save of the box before this one that this save continues (a continued save, docs/brief.md, The Two Towers), so that save's continue offer is not made again. Absent when it continued none.
+  continuedFrom?: string;
   // Dream-chaser's XP (dcce.gaining-xp, dcce.scalable-upgradable; src/campaign/xp.ts). An older log reads with these defaults.
   // The XP each won scenario's Resolution awarded, by scenario id; the unspent XP is this less the boxes marked, never stored.
   xpGained: Readonly<Record<string, number>>;
@@ -122,7 +124,8 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
   const bearer = ringBearerOf(state, cards);
   const owned = heroesByOwner(state);
   // A fallen hero a boon brought back and the heroes a player removed (The Two Towers' Resolution) change the lists as the log keeps them.
-  const heroesBySeat = revisedHeroes(owned.map((codes, index) => (log.heroesBySeat[index]?.length ? log.heroesBySeat[index] ?? [] : codes)), result);
+  const listed = owned.map((codes, index) => (log.heroesBySeat[index]?.length ? log.heroesBySeat[index] ?? [] : codes));
+  const heroesBySeat = revisedHeroes(listed, result);
   // A hero in a discard pile at the end of the game is a fallen hero (ltp.fellowship-of-heroes), and so is one a
   // Resolution names.
   const fellBy = new Set<string>(result.fallen);
@@ -132,7 +135,8 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
       if (code && printedOf(cards, code).type === "hero") fellBy.add(code);
     }
   }
-  const fallenHeroesBySeat = revisedFallen(heroesBySeat.map((heroes, index) => [...new Set([...(log.fallenHeroesBySeat[index] ?? []), ...heroes.filter((code) => fellBy.has(code))])]), result);
+  // The list read before a removal: a hero that fell and was then removed from the log is still a fallen hero.
+  const fallenHeroesBySeat = revisedFallen(listed.map((heroes, index) => [...new Set([...(log.fallenHeroesBySeat[index] ?? []), ...heroes.filter((code) => fellBy.has(code))])]), result);
   const fallen = new Set(fallenHeroesBySeat.flat());
   // A card the game removed from the campaign pool ("add it to the victory display and remove it from the campaign pool") is gone:
   // one pool entry for each removal, the player's own copy when the game says whose it was.

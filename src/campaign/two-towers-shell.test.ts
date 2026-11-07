@@ -9,13 +9,15 @@ import { campaign as mirkwoodCampaign, passage } from "../../test/scenarios/pass
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
 
 import { loadoutProblems, needsRingBearerSlot } from "./briefing.ts";
+import { carryOffers } from "./carry-over.ts";
+import { continueWords } from "./carry-words.ts";
 import { checklist, type ChecklistPlan } from "./checklist.ts";
 import { continuedLog, continueOffers } from "./continue.ts";
 import { emptyLog, type CampaignLog, type PoolCard } from "./log.ts";
 import { sagaRoleOf, titleBansOf } from "./saga.ts";
 import { newSave, parseLog, type Save } from "./save.ts";
 import { buildStart } from "./start.ts";
-import { blackGateEnemies, keepsTwoTowersLog, marshesLines, threatWords } from "./two-towers-view.ts";
+import { blackGateEnemies, keepsTwoTowersLog, marshesLines, SEARCHING_EYE, threatWords } from "./two-towers-view.ts";
 import type { World } from "./world.ts";
 
 // Rules: mec112.setting-up-the-game, mec112.aragorn, mec112.fellowship-sphere-heroes, mec112.saruman-grima-smeagol, mec112.campaign-mode-aragorn, mec112.campaign-mode,
@@ -32,6 +34,7 @@ const SMEAGOL_HERO = "21072";
 const SARUMAN_ALLY = "07003";
 const BOON = "141079";
 const SPARE = "02025";
+const BRACE = "144014";
 
 const campaign = loadCampaign("the-two-towers");
 const uruk = loadScenario("the-uruk-hai");
@@ -41,7 +44,7 @@ const shelob = loadScenario("shelobs-lair");
 
 let cards: ReadonlyMap<string, PrintedCard>;
 beforeAll(async () => {
-  cards = await loadPrinted([FRODO, ARAGORN_SAGA, ARAGORN, GLORFINDEL, BERAVOR, THEODEN, SPARE, GRIMA_HERO, SMEAGOL_HERO, SARUMAN_ALLY, BOON]);
+  cards = await loadPrinted([FRODO, ARAGORN_SAGA, ARAGORN, GLORFINDEL, BERAVOR, THEODEN, SPARE, GRIMA_HERO, SMEAGOL_HERO, SARUMAN_ALLY, BOON, BRACE]);
 });
 
 const worldOf = (scenario: World["scenario"]): World => ({ campaign, scenario, effects: [], cards, sets: new Map() });
@@ -90,6 +93,8 @@ describe("the loadout of The Two Towers", () => {
     for (const scenario of [uruk, helm]) {
       const found = messages(check(input(scenario, [FRODO, GLORFINDEL])));
       expect(found.some((line) => line.startsWith("A title the box refuses") && line.includes("Frodo Baggins"))).toBe(true);
+      // One refusal for him, the ban, not a second for the Fellowship-sphere hero limit.
+      expect(found.filter((line) => line.includes("Frodo Baggins"))).toHaveLength(1);
     }
     expect(messages(check(input(marshes, [GLORFINDEL], FRODO)))).toEqual([]);
   });
@@ -119,7 +124,7 @@ describe("the loadout of The Two Towers", () => {
 });
 
 const log = (extra: Partial<CampaignLog> = {}): CampaignLog => ({ ...emptyLog(1), ...extra });
-const plan = (scenario: World["scenario"], saved: CampaignLog, heroes: readonly string[]): ChecklistPlan => checklist({ log: saved, scenario, seats: [{ heroes, deck: [] }], effects: [], cards });
+const plan = (scenario: World["scenario"], saved: CampaignLog, heroes: readonly string[], effects: Parameters<typeof checklist>[0]["effects"] = []): ChecklistPlan => checklist({ log: saved, scenario, seats: [{ heroes, deck: [] }], effects, cards });
 const ok = (result: ChecklistPlan): Extract<ChecklistPlan, { ok: true }> => {
   if (!result.ok) throw new Error(result.errors.join("; "));
   return result;
@@ -170,10 +175,14 @@ describe("the checklist with ☺ Aragorn (mec112.campaign-mode-aragorn)", () => 
     expect(made.steps.find((step) => step.n === 3)?.did.join(" ")).toContain("permanent +1");
   });
 
-  it("charges the +1 for an ordinary hero change in scenario 8, as the Fellowship does", () => {
-    const made = ok(plan(helm, log({ heroesBySeat: [[GLORFINDEL, BERAVOR]] }), [ARAGORN_SAGA, GLORFINDEL, THEODEN]));
-    expect(made.threatModifier).toBe(1);
-    expect(made.forcedPenalty).toBe(0);
+  it("charges the +1 for an ordinary hero change in scenario 7, as the Fellowship does, and not in scenario 8, whose campaign card waives it (143077:A:2)", () => {
+    const saved = log({ heroesBySeat: [[GLORFINDEL, BERAVOR]] });
+    const seven = ok(plan(uruk, saved, [ARAGORN_SAGA, GLORFINDEL, THEODEN], EFFECTS));
+    expect(seven.threatModifier).toBe(1);
+    expect(seven.forcedPenalty).toBe(0);
+    const eight = ok(plan(helm, saved, [ARAGORN_SAGA, GLORFINDEL, THEODEN], EFFECTS));
+    expect(eight.threatModifier).toBe(0);
+    expect(eight.steps.find((step) => step.n === 3)?.did.join(" ")).toContain("waives");
   });
 
   it("leaves a pool card on the Ring-bearer Frodo in the pool while he is not in the scenario", () => {
@@ -182,12 +191,43 @@ describe("the checklist with ☺ Aragorn (mec112.campaign-mode-aragorn)", () => 
     expect(made.steps.find((step) => step.n === 5)?.did.join(" ")).toContain("who is not in this scenario");
   });
 
+  it("says one thing of Mr. Underhill: the Setup removes him from the pool, so step 5 does not keep him with Frodo", async () => {
+    const underhill = "141017";
+    const have = await loadPrinted([underhill, FRODO, ARAGORN_SAGA, GLORFINDEL]);
+    const made = ok(checklist({ log: log({ heroesBySeat: [[FRODO, GLORFINDEL]], campaignPool: [pooled(underhill, FRODO)] }), scenario: uruk, seats: [{ heroes: [ARAGORN_SAGA, GLORFINDEL], deck: [] }], effects: EFFECTS, cards: new Map([...have, ...cards]) }));
+    expect(made.steps.find((step) => step.n === 5)?.did.join(" ")).not.toContain("stays with");
+    expect(made.steps.find((step) => step.n === 6)?.did.join(" ")).toContain("is removed from the Campaign Pool");
+    expect(made.log.campaignPool).toEqual([]);
+  });
+
   it("brings the Ring-bearer back for scenarios 10 to 12 and logs him when the log has none", () => {
     const made = ok(plan(shelob, log({ heroesBySeat: [[GLORFINDEL, BERAVOR]] }), [FRODO, GLORFINDEL, BERAVOR]));
     expect(made.log.heroesBySeat).toEqual([[FRODO, GLORFINDEL, BERAVOR]]);
     expect(made.threatModifier).toBe(0);
     const again = ok(plan(shelob, made.log, [FRODO, GLORFINDEL, BERAVOR]));
     expect(again.log.heroesBySeat).toEqual([[FRODO, GLORFINDEL, BERAVOR]]);
+  });
+});
+
+describe("the Setup choice of Journey to the Cross-roads (144069)", () => {
+  it("offers a copy of the card or resources on each hero, with words for the option that is not a card", () => {
+    const journey = loadScenario("journey-to-the-cross-roads");
+    const asked = checklist({ log: log({ heroesBySeat: [[FRODO, GLORFINDEL]] }), scenario: journey, seats: [{ heroes: [FRODO, GLORFINDEL], deck: [] }], effects: EFFECTS, cards });
+    expect(asked.ok).toBe(false);
+    const needs = asked.ok ? null : asked.needs;
+    expect(needs?.options).toEqual([BRACE, "resources"]);
+    expect(needs?.words).toEqual({ resources: expect.stringMatching(/^Put \d+ resources? on each of your heroes$/) });
+    expect(needs?.note).toContain("into your deck, or put");
+    const taken = checklist({ log: log({ heroesBySeat: [[FRODO, GLORFINDEL]] }), scenario: journey, seats: [{ heroes: [FRODO, GLORFINDEL], deck: [] }], effects: EFFECTS, cards, choices: ["resources"] });
+    expect(taken.ok && taken.seats[0]?.resources).toBeGreaterThan(0);
+  });
+});
+
+describe("the offer words of a continued save", () => {
+  it("leave out a count of zero and add the captives and the threat penalty", () => {
+    expect(continueWords({ heroes: 3, fallen: 1, captives: 1, pool: 2, penalty: 1 })).toBe("3 heroes, 1 fallen hero, 1 captive, 2 cards in the pool and a +1 threat penalty");
+    expect(continueWords({ heroes: 3, fallen: 0, captives: 0, pool: 0, penalty: 0 })).toBe("3 heroes");
+    expect(continueWords({ heroes: 0, fallen: 0, captives: 0, pool: 0, penalty: 0 })).toBe("an empty log");
   });
 });
 
@@ -229,8 +269,10 @@ describe("a seat's own threat penalty (The Passage of the Marshes)", () => {
     expect(threatWords(log({ threatPenalty: 1 }), 2)).toBe("+1");
     expect(threatWords(log({ threatPenalty: 1, threatPenaltyBySeat: [2] }), 1)).toBe("+3");
     expect(threatWords(log({ threatPenalty: 1, threatPenaltyBySeat: [0, 2] }), 2)).toBe("Player 1: +1 · Player 2: +3");
-    expect(marshesLines(log({ marshesChoice: ["penalty", "searchingEye"] }), 2)).toEqual(["Player 1: a permanent +2 starting threat penalty", "Player 2: The Searching Eye"]);
-    expect(marshesLines(log({ marshesChoice: [null, "searchingEye"] }), 2)).toEqual(["Player 2: The Searching Eye"]);
+    expect(threatWords(log({ threatPenaltyBySeat: [0, 2] }), 2)).toBe("Player 1: None · Player 2: +2");
+    const eye = (code: string) => (code === SEARCHING_EYE ? "The Searching Eye" : code);
+    expect(marshesLines(log({ marshesChoice: ["penalty", "searchingEye"] }), 2, eye)).toEqual([[{ text: "Player 1: " }, { text: "a permanent +2 starting threat penalty" }], [{ text: "Player 2: " }, { text: "The Searching Eye", code: SEARCHING_EYE }]]);
+    expect(marshesLines(log({ marshesChoice: [null, "searchingEye"] }), 2, eye)).toEqual([[{ text: "Player 2: " }, { text: "The Searching Eye", code: SEARCHING_EYE }]]);
     expect(blackGateEnemies(log({ blackGate: { "144040": 2, "144030": 1 } }))).toEqual([{ code: "144030", count: 1 }, { code: "144040", count: 2 }]);
     expect(keepsTwoTowersLog(campaign)).toBe(true);
     expect(keepsTwoTowersLog({ id: "fellowship-of-the-ring" })).toBe(false);
@@ -278,7 +320,7 @@ describe("continuing the saga (docs/brief.md, The Two Towers)", () => {
     const unfinished = finished("b", { completed: ["a-shadow-of-the-past"] });
     const other = finished("c", {}, "dream-chaser");
     const offers = continueOffers([done, unfinished, other], "the-two-towers", scenariosOf);
-    expect(offers).toEqual([{ saveId: "a", campaignId: "fellowship-of-the-ring", seatCount: 1, score: 142, heroes: 3, fallen: 1, pool: 1 }]);
+    expect(offers).toEqual([{ saveId: "a", campaignId: "fellowship-of-the-ring", seatCount: 1, score: 142, heroes: 3, fallen: 1, captives: 1, pool: 1, penalty: 2 }]);
     expect(continueOffers([done], "fellowship-of-the-ring", scenariosOf)).toEqual([]);
     const taken = newSave("n", "the-two-towers", 1, { continued: done });
     expect(continueOffers([done, taken], "the-two-towers", scenariosOf)).toEqual([]);
@@ -300,14 +342,30 @@ describe("continuing the saga (docs/brief.md, The Two Towers)", () => {
       notes: "Rescued Beravor.",
       scoreBase: 142,
       score: 142,
-      carriedFrom: "a",
+      continuedFrom: "a",
     });
     expect(save.log.completed).toEqual([]);
     expect(save.log.earned).toEqual({});
     expect(save.log.scenarios).toEqual({});
     // The Fellowship save stays as it was.
     expect(JSON.stringify(done)).toBe(before);
-    expect(continuedLog(done).carriedFrom).toBe("a");
+    expect(continuedLog(done).continuedFrom).toBe("a");
+    expect(continuedLog(done).carriedFrom).toBeUndefined();
+  });
+
+  it("takes a continue and a carry-over together, each once, and offers neither again", () => {
+    const fellowship = finished("a");
+    const mirkwood = finished("b", { carryOver: [pooled(BOON, null)] }, "mirkwood-paths");
+    const both = newSave("n", "the-two-towers", 1, { continued: fellowship, carried: mirkwood.log.carryOver, carriedFrom: "b" });
+    expect(both.log.continuedFrom).toBe("a");
+    expect(both.log.carriedFrom).toBe("b");
+    const saves = [fellowship, mirkwood, both];
+    const scenarios = (id: string) => (id === "mirkwood-paths" ? ["x"] : scenariosOf(id));
+    expect(continueOffers(saves, "the-two-towers", scenarios)).toEqual([]);
+    expect(carryOffers(saves.map((save) => (save.id === "b" ? { ...save, log: { ...save.log, completed: ["x"] } } : save)), scenarios)).toEqual([]);
+    // Deleted, the new save gives both offers back.
+    expect(continueOffers([fellowship], "the-two-towers", scenarios)).toHaveLength(1);
+    expect(carryOffers([{ ...mirkwood, log: { ...mirkwood.log, completed: ["x"] } }], scenarios)).toHaveLength(1);
   });
 
   it("takes the finished save's seat count, a log being per seat", () => {

@@ -85,7 +85,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 59 | Mount Gundabad | completed | 2026-11-06. Review round done. |
 | 60 | The Fate of Wilderland | completed | 2026-11-06. Review round done. |
 | 61 | The Two Towers data | completed | 2026-11-07. Review round done. Open: MEC112 2023 wording unverified. |
-| 62 | The Two Towers campaign shell | active | 2026-11-07. Plan `docs/plans/the-two-towers.md`. |
+| 62 | The Two Towers campaign shell | completed | 2026-11-07. Review round done. No Two Towers scenario is playable yet. |
 
 ## Open items
 
@@ -184,11 +184,13 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - Effect templates: an unlabelled conditional constant ("If you are on-course, ~ gets +2 …") is read as triggered by `unreadBefore`; `SPLIT_LINES` in `scripts/data/effects/generate.ts` names one card's line.
 
 ### Rules and engine (The Two Towers)
+- Beyond All Hope readings not user-confirmed (143071:B:1): the trim to three non-Fellowship heroes counts the living heroes on the log, not only those in the game; the fallen list is one shared list; the first player picks who earns the boon.
+- The Uruk-hai: its quest card's captive step (143069:A, reading `campaignFacts.heroLog.captives`) and the setter of `ScenarioState.pursuit` are the scenario's records, not built.
 - The Two Towers ledger reads the pinned 2014 and 2015 Treason of Saruman and Land of Shadow scans; no pinned scan shows MEC112's 2023 wording, so a rewording cannot be found (`scripts/data/printed/scope.ts`, `MEC112_CHANGED`).
 - Easy: the DragnCards `E0C.12` deck keeps all ten Great Spider cards where Hall of Beorn keeps six; the E0C decks lead (user decision, 2026-11-07).
 
 ### Scenario pipeline
-- Fast track built; Two Towers data, then the A/B on The Uruk-hai (`docs/plans/scenario-fast-track.md`).
+- Fast track and Two Towers data built; the A/B on The Uruk-hai is next (`docs/plans/scenario-fast-track.md`).
 
 ## Standing decisions
 - Sources are online; no physical card or box check (user, 2026-10-24). The nine MEC109 cards rest on the older printing's scans.

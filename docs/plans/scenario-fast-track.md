@@ -117,16 +117,6 @@ It is a generic beam search over legal intents, built on `test/harness/auto-play
 
 ## Order
 
-**Shared prerequisite.** The Two Towers data and campaign shell, on the classic procedure. No plan for them exists yet:
-
-1. A planning task writes `docs/plans/the-two-towers.md`, with a data phase and a campaign-shell phase. The analogues are the Ered Mithrin and Dream-chaser data and shell phases (`git show 86279f3^:docs/phases/done/phase-49-ered-mithrin-data.md`, and `phase-50-ered-mithrin-campaign-shell.md`, `phase-37-dream-chaser-data.md` and `phase-38-dream-chaser-campaign-shell.md` from the same commit). The Two Towers continues the Fellowship of the Ring saga campaign (`docs/brief.md`, Campaign), so the shell carries the Fellowship log over. The user approves the plan before any of it is built.
-2. The data phase. It ends with:
-   - the ledger read from the scans;
-   - `data/scenarios/the-uruk-hai.json` and the other Two Towers scenarios;
-   - the campaign cards;
-   - the campaign entry in `data/campaigns`.
-3. The campaign-shell phase.
-
 **Then run the A/B.**
 
 ## The A/B: The Uruk-hai, both arms fresh

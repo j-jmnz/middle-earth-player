@@ -24,12 +24,16 @@ import { applyChooseOption, applyRevive, applyTrim, chooseOptionIds, earnForPick
 
 export const SKIP = "skip";
 
-// The instructions that open a window for the players: a card to take, a captive to name, a boon ally or its log line (BoonAllyOrLogLine), a card of the pool to remove (RemoveFromPool with a choice).
+// The instructions that open a window for the players: a card to take, a captive to name, a boon ally or its log line (BoonAllyOrLogLine), a card of the pool to remove (RemoveFromPool with a choice),
+// a treasure, hazard or staged location for the pool, and The Two Towers' own choices (ChooseOption, ReviveFallenHero, TrimHeroes).
 export type Choosing = Extract<Instruction, { verb: "ChooseCards" | "NameCaptives" | "BoonAllyOrLogLine" | "RemoveFromPool" | "ChooseRandomTreasure" | "ChooseStagedLocationForPool" | "ChooseHazardForPool" | "ChooseOption" | "ReviveFallenHero" | "TrimHeroes" }>;
 
-/** Whether the Resolution instruction asks the players: a card to take, a captive to name, a boon ally or its log line, a card of the pool to remove (a RemoveFromPool with no choice settles at once). */
+const ASKING: ReadonlySet<Instruction["verb"]> = new Set<Instruction["verb"]>(["ChooseCards", "NameCaptives", "BoonAllyOrLogLine", "ChooseRandomTreasure", "ChooseHazardForPool", "ChooseStagedLocationForPool", "ChooseOption", "ReviveFallenHero", "TrimHeroes"]);
+
+/** Whether the Resolution instruction asks the players: a card to take, a captive to name, a boon ally or its log line, a treasure, hazard or location, one of The Two Towers' choices, a card of the pool to remove (a RemoveFromPool with no choice settles at once). */
 export function asksPlayers(instruction: Instruction | undefined): instruction is Choosing {
-  return instruction?.verb === "ChooseCards" || instruction?.verb === "NameCaptives" || instruction?.verb === "BoonAllyOrLogLine" || instruction?.verb === "ChooseRandomTreasure" || instruction?.verb === "ChooseHazardForPool" || instruction?.verb === "ChooseStagedLocationForPool" || instruction?.verb === "ChooseOption" || instruction?.verb === "ReviveFallenHero" || instruction?.verb === "TrimHeroes" || (instruction?.verb === "RemoveFromPool" && instruction.choice != null);
+  if (!instruction) return false;
+  return ASKING.has(instruction.verb) || (instruction.verb === "RemoveFromPool" && instruction.choice != null);
 }
 
 function seatOrder(state: ScenarioState): number[] {
@@ -43,7 +47,6 @@ function seatsFor(state: ScenarioState, instruction: Choosing): number[] {
   // The group answers a boon ally's offer through its first player; a removal from the pool is each player's, first player first.
   if (instruction.verb === "NameCaptives" || instruction.verb === "RemoveFromPool" || instruction.verb === "ChooseStagedLocationForPool" || instruction.verb === "TrimHeroes") return order;
   if (instruction.verb === "BoonAllyOrLogLine" || instruction.verb === "ChooseRandomTreasure" || instruction.verb === "ChooseHazardForPool" || instruction.verb === "ReviveFallenHero") return order.slice(0, 1);
-  if (instruction.verb === "ChooseOption") return instruction.who === "firstPlayer" ? order.slice(0, 1) : order;
   return instruction.who === "firstPlayer" ? order.slice(0, 1) : order;
 }
 

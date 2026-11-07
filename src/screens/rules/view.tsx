@@ -87,7 +87,7 @@ export function RulesView({ header, books, testID }: { header: ReactNode; books:
   const query = useDeferredValue(search);
   const visible = useMemo(() => searchGlossary(glossary(), query), [query]);
   const expanded = size === "expanded";
-  const cover = size === "medium" ? "min-w-[22%] flex-1" : "min-w-[45%] flex-1";
+  const cover = size === "medium" ? "min-w-[22%] max-w-[25%] flex-1" : "min-w-[45%] max-w-[50%] flex-1";
   const entry = picked ? glossaryEntry(picked) : null;
   const listRef = useRef<FlashListRef<(typeof visible)[number]>>(null);
   // A pick made in the pane (See also) brings its row into view in the list, when the search leaves it there, and is announced.

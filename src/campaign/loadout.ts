@@ -154,7 +154,11 @@ export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMa
     return errors;
   }
 
-  if (rules.hero != null) return [...errors, ...grantedHeroErrors(heroCards, deckCards, cards, rules.hero)];
+  if (rules.hero != null) {
+    // A Fellowship hero whose title the box already bans (Frodo Baggins in 7 to 9) is refused once, for the ban.
+    const banned = new Set(errors.filter((error) => error.rule === "bannedTitle").map((error) => error.code));
+    return [...errors, ...grantedHeroErrors(heroCards, deckCards, cards, rules.hero).filter((error) => !(error.rule === "twoFellowshipHeroes" && banned.has(error.code)))];
+  }
 
   // The first seat needs a Ring-bearer of its own.
   const first = heroCards[0] ?? [];

@@ -4,23 +4,19 @@
 import type { Instruction } from "../../../catalog/boundary.ts";
 import type { Earned, ResolutionLog } from "../../core/campaign-state.ts";
 import { inPlay, livingSeats, type ScenarioState } from "../../core/state.ts";
+import { fallenAfter, heroesAfter } from "./hero-lists.ts";
 import { seatsThatPicked } from "./picks.ts";
 
 type Verb<V extends Instruction["verb"]> = Extract<Instruction, { verb: V }>;
 
 /** The heroes a seat's Campaign Log lists now: the log's, plus the ones a boon brought back, less the ones removed in this Resolution. */
 export function loggedHeroes(state: ScenarioState, seat: number): string[] {
-  const log = state.resolutionLog;
-  const base = state.campaignFacts?.heroLog?.heroes[seat] ?? [];
-  const added = (log.revived ?? []).filter((item) => item.seat === seat).map((item) => item.hero);
-  const gone = new Set((log.removedHeroes ?? []).filter((item) => item.seat === seat).map((item) => item.hero));
-  return [...new Set([...base, ...added])].filter((hero) => !gone.has(hero));
+  return heroesAfter(state.campaignFacts?.heroLog?.heroes[seat] ?? [], seat, state.resolutionLog);
 }
 
 /** The heroes on the list of fallen heroes now: every seat's list, less the ones a boon brought back. */
 export function fallenNow(state: ScenarioState): string[] {
-  const back = new Set((state.resolutionLog.revived ?? []).map((item) => item.hero));
-  return [...new Set((state.campaignFacts?.heroLog?.fallen ?? []).flat())].filter((hero) => !back.has(hero));
+  return fallenAfter([...new Set((state.campaignFacts?.heroLog?.fallen ?? []).flat())], state.resolutionLog);
 }
 
 /** The options a ChooseOption offers: an option that needs a fallen hero is offered only while the list holds one. */
@@ -48,10 +44,12 @@ export function applyRevive(state: ScenarioState, instruction: Verb<"ReviveFalle
   return { ...state.resolutionLog, revived: [...(state.resolutionLog.revived ?? []), { seat, hero }], earned: [...state.resolutionLog.earned, entry] };
 }
 
-// The non-Fellowship heroes a seat's log lists now.
+// The non-Fellowship heroes a seat controls and its log lists now: a hero in a discard pile at the game's end fell (it is on the log's fallen list when the Resolution is written) and is not one the player still has, unless a boon brought it back.
 function nonFellowship(state: ScenarioState, seat: number): string[] {
   const fellowship = new Set(state.campaignFacts?.heroLog?.fellowship ?? []);
-  return loggedHeroes(state, seat).filter((hero) => !fellowship.has(hero));
+  const revived = new Set((state.resolutionLog.revived ?? []).map((item) => item.hero));
+  const fell = new Set(state.seats.slice(0, state.seatCount).flatMap((zones) => zones.discard.map((id) => state.cards[id]?.code)));
+  return loggedHeroes(state, seat).filter((hero) => !fellowship.has(hero) && (!fell.has(hero) || revived.has(hero)));
 }
 
 /** The heroes a seat must choose one of to remove: its non-Fellowship heroes while it lists more than `limit`, else none. */

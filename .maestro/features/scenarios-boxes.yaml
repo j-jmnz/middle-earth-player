@@ -1,6 +1,6 @@
 appId: com.middleearth.lcg
 ---
-# Phase 28, updated in phases 38, 50 and 62. Written in a cloud session: it has not run. The Scenarios tab lists one section for each box that has a playable
+# Written in a cloud session: it has not run. The Scenarios tab lists one section for each box that has a playable
 # scenario; the Dream-chaser box (`box-dream-chaser`, all nine scenarios) has none until phase 40, so its scenarios wait under Coming later. The Ered Mithrin box
 # (`box-ered-mithrin`, all nine scenarios) has none until phase 52, so its nine scenarios wait under Coming later as well.
 - launchApp:

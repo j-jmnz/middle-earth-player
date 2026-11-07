@@ -139,6 +139,7 @@ export function resolutionView(state: ScenarioState, world: World, logged: reado
     // The tally the log will hold: the copies are capped at what one collection holds (applyResolution).
     const changes = poolChanges(state, settled.encounterPool ? cappedTally(settled.encounterPool, world.copies) : undefined);
     const gone = [...changes.removed, ...(settled.poolRemoved ?? []).map((item) => item.code)];
+    const notes = twoTowersNotes(settled, state.seatCount, (code) => nameOf(world, code));
     return {
       kind: "settled",
       ...((settled.treasures ?? []).length > 0 ? { treasures: [...(settled.treasures ?? [])] } : {}),
@@ -146,7 +147,7 @@ export function resolutionView(state: ScenarioState, world: World, logged: reado
       ...(changes.added.length > 0 ? { poolAdded: changes.added } : {}),
       ...(gone.length > 0 ? { poolRemoved: gone } : {}),
       ...beldisBoxes(state, logged),
-      ...(twoTowersNotes(settled, state.seatCount, (code) => nameOf(world, code)).length > 0 ? { notes: twoTowersNotes(settled, state.seatCount, (code) => nameOf(world, code)) } : {}),
+      ...(notes.length > 0 ? { notes } : {}),
       earned: settled.earned.map((item) => ({ code: item.code, hero: item.to === "hero" ? item.hero : null, seat: item.seat })),
       fallen: [...settled.fallen],
       captives: settled.captives.map((item) => item.hero),
@@ -286,7 +287,7 @@ function twoTowersView(state: ScenarioState, world: World, instruction: Extract<
     seat: window.seat,
     seatCount: state.seatCount,
     eyebrow: words.eyebrow,
-    seatLabel: (words.eachSeat || words.firstPlayerAnswers) && state.seatCount > 1 ? `Player ${window.seat + 1}${first}` : null,
+    seatLabel: (words.eachSeat || words.firstPlayerAnswers) && state.seatCount > 1 ? `Player ${window.seat + 1}${first} chooses` : null,
     noun: words.noun,
     ally: null,
     later: null,

@@ -44,10 +44,11 @@ export function shuffleIntoEachDeck(seats: SeatDeal[], instruction: Verb<"Shuffl
  * ChooseCopyOrResources: each seat in turn answers the card's code (a copy goes into its deck and is recorded as chosen at Setup) or `resources` (each of its heroes starts with that many more resources).
  * `take` asks for the answer and says null when the step needs one; the lines describe what was done.
  */
-export function chooseCopyOrResources(seats: SeatDeal[], instruction: Verb<"ChooseCopyOrResources">, take: (legal: readonly string[], seat: number) => string | null, name: (code: string) => string): string[] {
+export function chooseCopyOrResources(seats: SeatDeal[], instruction: Verb<"ChooseCopyOrResources">, take: (legal: readonly string[], seat: number, ask: { note: string; words: Readonly<Record<string, string>> }) => string | null, name: (code: string) => string): string[] {
   const did: string[] = [];
   for (const [index, seat] of seats.entries()) {
-    const answer = take([instruction.code, "resources"], index);
+    const each = `${instruction.resources} resource${instruction.resources === 1 ? "" : "s"} on each of your heroes`;
+    const answer = take([instruction.code, "resources"], index, { note: `Shuffle a copy of ${name(instruction.code)} into your deck, or put ${each}.`, words: { resources: `Put ${each}` } });
     if (answer == null) return did;
     if (answer === "resources") {
       seat.resources = (seat.resources ?? 0) + instruction.resources;

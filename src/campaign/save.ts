@@ -45,6 +45,7 @@ export const campaignLogSchema = z.strictObject({
   carryOver: z.array(poolCardSchema).default([]),
   carryIn: z.array(poolCardSchema).default([]),
   carriedFrom: z.string().optional(),
+  continuedFrom: z.string().optional(),
   // Dream-chaser's XP and Hard/Expert choices (phase 38). A log saved before them reads with these defaults.
   xpGained: z.record(z.string(), z.number().int().nonnegative()).default({}),
   marks: z.record(z.string(), z.number().int().nonnegative()).default({}),
@@ -55,7 +56,7 @@ export const campaignLogSchema = z.strictObject({
   allyLines: z.array(z.enum(ALLY_LINES)).default([]),
   beldisUses: z.array(z.number().int().min(0).max(BELDIS_BOXES)).default([]),
   encounterPool: z.record(z.string(), z.number().int().positive()).default({}),
-  // The Two Towers Campaign Log (phase 62). A log saved before it reads with these defaults.
+  // The Two Towers Campaign Log (docs/brief.md, The Two Towers). A log saved before it reads with these defaults.
   threatPenaltyBySeat: z.array(z.number().int().min(0)).default([]),
   marshesChoice: z.array(z.enum(MARSHES_CHOICES).nullable()).default([]),
   blackGate: z.record(z.string(), z.number().int().positive()).default({}),
@@ -121,7 +122,8 @@ export function newSave(id: string, campaignId: string, seatCount: 1 | 2, option
   const { carried = [], carriedFrom = null, modeDefault = null, continued = null } = options;
   const seats = continued ? continued.seatCount : seatCount;
   const carryIn = carried.flatMap((card) => (card.perPlayer ? Array.from({ length: seats }, (_, seat) => ({ ...card, seat })) : [card]));
-  const start = continued ? continuedLog(continued) : { ...emptyLog(seats), ...(carriedFrom ? { carriedFrom } : {}) };
+  // The two marks are separate: a save may continue one finished save and take another's carry-over.
+  const start = { ...(continued ? continuedLog(continued) : emptyLog(seats)), ...(carriedFrom ? { carriedFrom } : {}) };
   return { id, campaignId, seatCount: seats, log: { ...start, carryIn, modeDefault }, active: null, loadout: null };
 }
 

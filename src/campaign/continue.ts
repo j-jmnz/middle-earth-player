@@ -3,30 +3,31 @@
 // Campaign Log columns the later scenarios read. The finished save is never edited. Pure.
 import { emptyLog, type CampaignLog } from "./log.ts";
 import type { Save } from "./save.ts";
+import { TWO_TOWERS_CAMPAIGN } from "./saga.ts";
 
 /** The box a saga box continues: the campaign whose finished save its new save may take in. */
-export const SAGA_PREVIOUS: Readonly<Record<string, string>> = { "the-two-towers": "fellowship-of-the-ring" };
+export const SAGA_PREVIOUS: Readonly<Record<string, string>> = { [TWO_TOWERS_CAMPAIGN]: "fellowship-of-the-ring" };
 
-export type ContinueOffer = { saveId: string; campaignId: string; seatCount: 1 | 2; score: number; heroes: number; fallen: number; pool: number };
+export type ContinueOffer = { saveId: string; campaignId: string; seatCount: 1 | 2; score: number; heroes: number; fallen: number; captives: number; pool: number; penalty: number };
 
 type Candidate = Pick<Save, "id" | "campaignId" | "seatCount" | "log">;
 
 /**
  * The finished saves a new save of `campaignId` may continue: each save of the campaign before it in the saga whose scenarios are all won and that no other save has
- * continued (`log.carriedFrom`), most recent first as `saves` lists them. `scenarios` is a campaign's scenario ids; one it does not know is never finished. A save that
+ * continued (`log.continuedFrom`), most recent first as `saves` lists them. `scenarios` is a campaign's scenario ids; one it does not know is never finished. A save that
  * continues an offer holds it until it is deleted: the offer then returns. An empty list for a campaign that continues no other.
  */
 export function continueOffers(saves: readonly Candidate[], campaignId: string, scenarios: (campaignId: string) => readonly string[] | null): ContinueOffer[] {
   const previous = SAGA_PREVIOUS[campaignId];
   if (previous == null) return [];
-  const taken = new Set(saves.flatMap((save) => (save.log.carriedFrom ? [save.log.carriedFrom] : [])));
+  const taken = new Set(saves.flatMap((save) => (save.log.continuedFrom ? [save.log.continuedFrom] : [])));
   const ids = scenarios(previous);
   if (ids == null || ids.length === 0) return [];
   return saves.flatMap((save) => {
     const finished = save.campaignId === previous && ids.every((id) => save.log.completed.includes(id));
     if (!finished || taken.has(save.id)) return [];
     const { log } = save;
-    return [{ saveId: save.id, campaignId: save.campaignId, seatCount: save.seatCount, score: log.score, heroes: log.heroesBySeat.flat().length, fallen: log.fallenHeroesBySeat.flat().length, pool: log.campaignPool.length }];
+    return [{ saveId: save.id, campaignId: save.campaignId, seatCount: save.seatCount, score: log.score, heroes: log.heroesBySeat.flat().length, fallen: log.fallenHeroesBySeat.flat().length, captives: log.captives.length, pool: log.campaignPool.length, penalty: log.threatPenalty }];
   });
 }
 
@@ -48,6 +49,6 @@ export function continuedLog(from: Pick<Save, "id" | "seatCount" | "log">): Camp
     notes: log.notes,
     scoreBase: log.score,
     score: log.score,
-    carriedFrom: from.id,
+    continuedFrom: from.id,
   };
 }

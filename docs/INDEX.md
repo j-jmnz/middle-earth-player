@@ -73,7 +73,7 @@ Read the sections your task touches.
   - 354–359 Catalog build (~410)
   - 360–377 Tests (~1.7K) ← 5
   - 378–393 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~84.4K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~84.5K tok)
   - 17–38 Sections (~410)
   - 39–50 Product (~590)
   - 51–64 Non-goals (~540)
@@ -82,15 +82,15 @@ Read the sections your task touches.
   - 116–133 Performance and feel (~750)
   - 134–151 Repository layout (~440)
   - 152–375 Domain (~9.5K)
-    - 154–236 Campaign (~2.1K) ← 3
-    - 237–251 Mirkwood campaign cards and carry-over (~890) ← 1
+    - 154–236 Campaign (~2.1K) ← 1
+    - 237–251 Mirkwood campaign cards and carry-over (~890)
     - 252–263 Standalone play (~810) ← 1
     - 264–275 Scenario state (~540)
     - 276–308 The engine plays the game (~2.1K) ← 4
     - 309–316 Engine steps (~180)
     - 317–345 Core round (~1.3K) ← 1
     - 346–375 Keywords implemented once (~1.6K)
-  - 376–533 Fellowship of the Ring (~10.4K) ← 1
+  - 376–533 Fellowship of the Ring (~10.4K)
     - 400–414 Scenario 1 resolution (~370)
     - 415–428 A Knife in the Dark (~1.6K) ← 1
     - 429–432 Hide tests (~130)
@@ -106,7 +106,7 @@ Read the sections your task touches.
     - 601–615 The Oath (~2.3K)
     - 616–633 The Caves of Nibin-Dûm (~2.4K)
   - 634–691 Dream-chaser (~15.6K) ← 4
-  - 692–718 Ered Mithrin (~15.8K) ← 8
+  - 692–718 Ered Mithrin (~15.8K) ← 7
   - 719–744 The Two Towers (~2.4K) ← 12
   - 745–753 Nightmare (~410) ← 19
   - 754–792 Deckbuilding (~1.9K)
@@ -153,7 +153,7 @@ Read the sections your task touches.
   - 332–343 Banner (~750) ← 4
   - 344–363 Screen reader (~2.8K) ← 17
   - 364–367 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~27.9K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~28.1K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~580)
   - 34–44 Performance (~680) ← 4
@@ -168,16 +168,16 @@ Read the sections your task touches.
   - 229–243 Icons (~480) ← 7
   - 244–262 Card art (~740) ← 2
   - 263–277 Tablets (~510) ← 13
-  - 278–459 Screens (~15.1K)
+  - 278–459 Screens (~15.3K)
     - 282–285 Splash (~40)
     - 286–289 App icon (~80)
     - 290–305 Campaigns (campaign list) (~1.5K) ← 6
     - 306–319 Scenarios (~830) ← 1
     - 320–331 History (~1.3K) ← 4
     - 332–349 Briefing (~1.8K) ← 5
-    - 350–353 Campaign setup (~910) ← 3
+    - 350–353 Campaign setup (~1.0K) ← 3
     - 354–359 Campaign path (~780) ← 4
-    - 360–363 Campaign log (~540) ← 1
+    - 360–363 Campaign log (~600) ← 1
     - 364–367 Spend XP (~610) ← 1
     - 368–371 Table — landscape (~30) ← 1
     - 372–383 Resolution and standalone outcome (~1.6K) ← 1
@@ -187,7 +187,7 @@ Read the sections your task touches.
     - 414–419 Card (~490) ← 2
     - 420–425 Packs and pack cards (~130)
     - 426–439 Settings (~900) ← 11
-    - 440–445 Rules (~450) ← 1
+    - 440–445 Rules (~470) ← 1
     - 446–449 Rule (~220) ← 1
     - 450–455 Booklet (~280) ← 2
     - 456–459 Database (~20)
@@ -198,17 +198,17 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~7.0K tok)
+- `docs/phases/STATUS.md` — Phase status (~7.1K tok)
   - 5–15 Rules (~410)
   - 16–89 Phases (~1.5K)
-  - 90–192 Open items (~4.5K)
+  - 90–194 Open items (~4.6K)
     - 92–94 Releases (~50)
     - 95–116 Fixtures and Maestro (~1.2K)
     - 117–164 Rules and engine (~2.2K)
     - 165–185 Screens and code (~900)
-    - 186–189 Rules and engine (The Two Towers) (~100)
-    - 190–192 Scenario pipeline (~30)
-  - 193–209 Standing decisions (~510)
+    - 186–191 Rules and engine (The Two Towers) (~210)
+    - 192–194 Scenario pipeline (~30)
+  - 195–211 Standing decisions (~510)
 
 ## Live plans
 
@@ -228,7 +228,7 @@ Read when a task names the plan.
   - 237–273 Mechanic families: engine and records together (~1.4K) ← 2
   - 274–287 Readings the review catches (~490) ← 5
   - 288–307 Not expressible yet: leave open, report (~390)
-- `docs/plans/scenario-fast-track.md` — Plan: a fast track for scenarios, A/B-tested against the classic track (~3.7K tok)
+- `docs/plans/scenario-fast-track.md` — Plan: a fast track for scenarios, A/B-tested against the classic track (~3.4K tok)
   - 3–35 Context (~840)
     - 7–16 Where a scenario's time goes (~300)
     - 17–24 What this plan does not change, and why (~200)
@@ -241,17 +241,17 @@ Read when a task names the plan.
     - 81–94 F4. Encounter-card smoke (~170)
     - 95–111 F5. One author, a small context pack, rulings first, a quick loop (~400)
     - 112–117 F6. A search player for the goldens (~130)
-  - 118–131 Order (~250) ← 1
-  - 132–172 The A/B: The Uruk-hai, both arms fresh (~530)
-    - 134–141 Arms (~160)
-    - 142–145 Rulings (~50)
-    - 146–152 Measures (~70)
-    - 153–156 Blind review (~60)
-    - 157–160 Cross-check (~60)
-    - 161–172 Decision (~120)
-  - 173–192 Verification (~200)
-    - 175–186 After each build step (~140)
-    - 187–192 The A/B (~60)
+  - 118–121 Order (~10)
+  - 122–162 The A/B: The Uruk-hai, both arms fresh (~530)
+    - 124–131 Arms (~160)
+    - 132–135 Rulings (~50)
+    - 136–142 Measures (~70)
+    - 143–146 Blind review (~60)
+    - 147–150 Cross-check (~60)
+    - 151–162 Decision (~120)
+  - 163–182 Verification (~200)
+    - 165–176 After each build step (~140)
+    - 177–182 The A/B (~60)
 - `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.7K tok)
   - 3–14 Context (~450)
   - 15–24 What does not move (~190)
@@ -266,27 +266,6 @@ Read when a task names the plan.
   - 152–163 After each scenario phase (~210) ← 1
   - 164–167 Order (~70)
   - 168–175 Verification (~100)
-- `docs/plans/the-two-towers.md` — Plan: The Two Towers data and campaign shell (~9.8K tok)
-  - 7–23 Decisions (~600)
-  - 24–64 What the sources say (~2.1K)
-    - 26–35 The product (~770)
-    - 36–43 Card codes (~390)
-    - 44–60 The scenarios, in order (~770)
-    - 61–64 The first player's saga hero (~170)
-  - 65–78 How the Fellowship log carries into The Two Towers (~710)
-  - 79–147 Phase 61: The Two Towers data (~3.9K)
-    - 83–86 Goal (~150)
-    - 87–90 Network order (~60)
-    - 91–130 Steps (~3.2K)
-    - 131–139 Exit (~230)
-    - 140–147 Stop and ask the user (~210)
-  - 148–190 Phase 62: The Two Towers campaign shell (~2.1K)
-    - 152–155 Goal (~100)
-    - 156–159 Shape (Q6) (~200)
-    - 160–181 Steps (~1.7K)
-    - 182–185 Exit (~80)
-    - 186–190 Stop and ask the user (~70)
-  - 191–196 Notes for the orchestrator (~170)
 
 ## Handovers
 
@@ -317,7 +296,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/git`: .claude/rules/commit-standards.md, Subject line (2)
 - `scripts/release`: .claude/rules/release-standards.md, Versioning (3); .claude/rules/release-standards.md, Release notes (2); releasing.md, Jobs (2); .claude/rules/release-standards.md, Branches (1)
 - `scripts/tools`: handover/agent-brief.md, Scenario procedure (2); architecture.md, Modules (1); design-system-table.md, Choice tray (1); handover/fast-track.md, Finish (1); handover/fast-track.md, Read (1)
-- `src/campaign`: brief.md, The Two Towers (5); brief.md, Nightmare (4); architecture.md, Tests (2); brief.md, Ered Mithrin (2)
+- `src/campaign`: brief.md, The Two Towers (6); brief.md, Nightmare (4); architecture.md, Tests (2); brief.md, Ered Mithrin (2)
 - `src/catalog`: architecture.md, Mechanic families (2); brief.md, Nightmare (2); brief.md, A Knife in the Dark (1); brief.md, Dream-chaser (1); brief.md, Ered Mithrin (1); brief.md, Flight to the Ford burden deck and life (1); brief.md, The Two Towers (1); brief.md, Three layers (1)
 - `src/effects`: brief.md, Breaking of the Fellowship, stage 2B (1); brief.md, Nightmare (1)
 - `src/play`: design-system-table.md, Spotlight (28); design-system-table.md, Choice tray (16); design-system-table.md, Cards (13); design-system-table.md, Screen reader (12); design-system-table.md, Command column (11); design-system-table.md, Spacing and the play area's rows (9); design-system-table.md, The Island Map (8); architecture.md, State (6); design-system-table.md, Piles (6); architecture.md, Images (5); design-system-table.md, Motion (5); design-system-table.md, Reading panels (5); design-system-table.md, The Sailing test (5); design-system.md, Type (5); architecture.md, Performance (4); brief.md, Three layers (4); design-system-table.md, Banner (4); design-system-table.md, Gestures (4); brief.md, Table screen (3); design-system-table.md, Top bar (3); architecture.md, Tests (2); design-system-table.md, Quest scale (2); design-system.md, Settings (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Table menu (1); design-system-table.md, Two taps (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Screen reader (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1)

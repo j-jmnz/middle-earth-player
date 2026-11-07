@@ -37,9 +37,12 @@ const TWO_TOWERS_BANS: readonly TitleBan[] = ["Saruman", "Gríma", "Sméagol"].m
 // Ring-bearer stays on the log and returns for 10 to 12 (docs/brief.md, The Two Towers; user decision, 2026-11-07).
 const NO_FRODO: TitleBan = { title: "Frodo Baggins", types: null, rule: "mec112.fellowship-sphere-heroes" };
 
+/** The campaign whose log keeps the Two Towers columns and whose box bans the titles above (data/campaigns/the-two-towers.json). */
+export const TWO_TOWERS_CAMPAIGN = "the-two-towers";
+
 /** The titles the players cannot use in this scenario of this campaign. */
 export function titleBansOf(campaign: Pick<CampaignData, "id">, scenario: Pick<ScenarioData, "sagaStart">): readonly TitleBan[] {
-  if (campaign.id !== "the-two-towers") return [];
+  if (campaign.id !== TWO_TOWERS_CAMPAIGN) return [];
   return scenario.sagaStart && "hero" in scenario.sagaStart ? [...TWO_TOWERS_BANS, NO_FRODO] : TWO_TOWERS_BANS;
 }
 
