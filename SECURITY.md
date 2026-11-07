@@ -1,13 +1,12 @@
 # Security
 
-[PRIVACY.md](PRIVACY.md) says what the app stores and what it sends. In short, the app has no accounts, no backend, no analytics, no ads and no crash reporting. A phone build makes two kinds of network request, both to fixed hosts over HTTPS:
+[PRIVACY.md](PRIVACY.md) says what the app stores and what it sends. In short, the app has no accounts, no backend, no analytics, no ads and no crash reporting, and a release phone build makes one kind of network request:
 
 - **Deck import from RingsDB.** Pasting a RingsDB deck link fetches that deck's public JSON from `ringsdb.com`, and the name of any card the app does not know. Nothing else uses `fetch` (`src/screens/routes/deck-import.tsx`).
-- **A card picture the build did not bundle.** A release build bundles every card's picture (`pnpm scans:pack`). For a card it lacks, the app downloads the picture once from `ringsdb.com` or the Hall of Beorn and DragnCards image buckets on `s3.amazonaws.com`. `src/screens/images/policy.ts` refuses any other host, any non-HTTPS URL and any URL with credentials, a port, a query or `..`.
 
-The web build is for development. It has no bundled pictures and loads each one from those hosts.
+Card pictures are bundled (`pnpm scans:pack`), and a release build fetches none: every screen and the download queue get a picture's URL from `remotePictureUrl` (`src/screens/images/remote.native.ts`), which returns none outside a development build, so a card without a bundled picture is drawn as its text. A development build, and the web build (`remote.ts`), download such a picture from `ringsdb.com` or the Hall of Beorn and DragnCards image buckets on `s3.amazonaws.com`. `src/screens/images/policy.ts` refuses any other host, any non-HTTPS URL and any URL with credentials, a port, a query or `..`.
 
-On Android the app asks for two permissions: `INTERNET`, for the requests above, and `VIBRATE`, for haptics. `app.json` (`android.blockedPermissions`) removes the overlay and external-storage permissions that Expo and its libraries would otherwise add. On iOS it asks for none. Opening a rulebook PDF goes through the system file picker, which needs no permission.
+On Android the app asks for two permissions: `INTERNET`, for the deck import, and `VIBRATE`, for haptics. `app.json` (`android.blockedPermissions`) removes the overlay and external-storage permissions that Expo and its libraries would otherwise add. On iOS it asks for none. Opening a rulebook PDF goes through the system file picker, which needs no permission.
 
 At build time, only `pnpm data:sync` uses the network. It fetches the sources listed in `data/sources.json` and checks each download against its pinned sha256 or git commit.
 

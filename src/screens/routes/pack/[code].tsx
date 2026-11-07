@@ -9,7 +9,8 @@ import { BodyText, Column, ListRow, NavBar, Screen, ScreenTitle } from "../../ki
 import { useListGutter } from "../../nav/list-gutter";
 import { useDatabases } from "../../data/databases";
 import { enqueueImageDownloads } from "../../images/queue";
-import { cardImageUrl, shownCardImage } from "../../images/policy";
+import { shownCardImage } from "../../images/policy";
+import { remotePictureUrl } from "../../images/remote";
 import { cardCorner } from "../../../ui/card-corner";
 import { RowCardImage } from "../../images/picture";
 import { routeCode } from "../../nav/route-code";
@@ -46,7 +47,7 @@ function PackCardRow({ item, onPress, onPreview }: { item: PackCard; onPress: ()
     imagesrc: item.imagesrc,
     bundled: scanAssets[item.code] ?? null,
   });
-  const remote = !source && item.imagesrc ? cardImageUrl(item.imagesrc) : null;
+  const remote = !source && item.imagesrc ? remotePictureUrl(item.imagesrc) : null;
   const preview = source ?? (remote ? { uri: remote } : null);
   return (
     <ListRow

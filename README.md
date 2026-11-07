@@ -8,15 +8,15 @@ An offline, single-device app for playing The Lord of the Rings: The Card Game s
 ## Privacy and security
 
 > [!NOTE]
-> **No accounts, no tracking, no ads, no analytics, no crash reporting.** The app collects no personal data, and your games stay on your device.
+> **No accounts, no tracking, no ads, no analytics, no crash reporting.** Your games stay on your phone.
 
-- **Plays offline.** The catalog, the rules and the card pictures are inside the app. You can play a whole campaign in airplane mode.
-- **Two kinds of network request.** Importing a deck from a RingsDB link fetches that deck from `ringsdb.com`. A card whose picture the build did not bundle is downloaded once from RingsDB or the Hall of Beorn and DragnCards image storage. Nothing else connects, and only over HTTPS to those fixed hosts.
-- **Two Android permissions:** `INTERNET` and `VIBRATE` (haptics). None on iOS. No camera, microphone, location, contacts or photos.
-- **Your data stays local.** Saves, decks, the campaign log and settings live in the app's private storage. Uninstalling the app removes them.
+- **Offline.** The cards, the rules, the rulebooks and every card picture ship inside the app. A whole campaign plays in airplane mode.
+- **Network only when you import a deck.** Importing from a RingsDB link fetches that public deck, and the name of any card the app does not know, from `ringsdb.com`. Nothing else connects.
+- **Two Android permissions:** `INTERNET` for the deck import, `VIBRATE` for haptics. None on iOS.
+- **Local data.** Saves, decks, the campaign log and settings stay in the app's private storage. Uninstalling the app removes them.
 - **Supply chain.** Locked dependencies, CI with a read-only token, actions pinned by commit, weekly Dependabot updates.
 
-[PRIVACY.md](PRIVACY.md) lists exactly what is stored and sent. [SECURITY.md](SECURITY.md) names the code behind each request and explains how to report a vulnerability privately.
+[PRIVACY.md](PRIVACY.md) lists what is stored and what the import sends. [SECURITY.md](SECURITY.md) names the code behind it and says how to report a vulnerability privately.
 
 ## How the code is written
 

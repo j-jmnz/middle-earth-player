@@ -10,7 +10,6 @@ import {
   DOWNLOAD_CONCURRENCY,
   IMAGE_DIRECTORY,
   PAUSE_STATE_FILE,
-  cardImageUrl,
   commitImageRecord,
   createDownloadPump,
   isRemoteImageUri,
@@ -26,6 +25,7 @@ import {
   type ImageQueueStatus,
   type ImageRecord,
 } from "./policy";
+import { REMOTE_PICTURES, remotePictureUrl } from "./remote";
 import { scanAssets } from "./scan-map";
 import { cachedImage, publishCachedImage } from "./store";
 
@@ -126,7 +126,7 @@ export function enqueueImageDownloads(jobs: readonly ImageDownloadRequest[]): vo
   for (const job of jobs) {
     // A scan the release build bundled (scripts/build/pack-scans.ts) is not downloaded again.
     if (queued.has(job.code) || cachedImage(job.code) || scanAssets[job.code]) continue;
-    const url = cardImageUrl(job.imagesrc);
+    const url = remotePictureUrl(job.imagesrc);
     if (!url) continue;
     queued.add(job.code);
     const item = { code: job.code, url };
@@ -482,7 +482,7 @@ function pauseStateFile(): File | null {
 }
 
 function readPauseEntries(): DownloadPauseEntry[] {
-  const file = pauseStateFile();
+  const file = REMOTE_PICTURES ? pauseStateFile() : null; // A release build resumes no paused download (remote.native.ts).
   if (!file?.exists) {
     pauseEntryCount = 0;
     return [];
