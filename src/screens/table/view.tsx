@@ -3,12 +3,11 @@
 // intent in user.db, and this view hands the canvas the pictures in the image cache and lays the pieces out. The reducer is
 // the only writer of the game; how a tap becomes an intent is src/play/choice/use-table-choice.ts.
 import { useRouter, type Href } from "expo-router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Alert, BackHandler, useWindowDimensions, View, type LayoutChangeEvent } from "react-native";
+import { useCallback, useMemo, useRef, useState } from "react";
+import { Alert, useWindowDimensions, View, type LayoutChangeEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useStore } from "zustand";
 
-import { backStep, playLayers, runBackStep } from "../../play/chrome/back-steps";
 import { createBeats } from "../../play/store/beat-store";
 import { slotNumbers } from "../../play/cards/card-effects";
 import { CardPreview } from "../../play/cards/card-preview";
@@ -58,6 +57,7 @@ import { whyNotChosen } from "../../play/choice/why";
 import { ledgerLine, ruleTitle, sideText } from "../../play/cards/ledger";
 import { notApplied } from "../../play/cards/not-applied";
 import { BodyText, NavBar, Screen } from "../kit/chrome";
+import { useTableBack } from "./use-table-back";
 import { TableTopBar, TOP_BAR } from "./top-bar";
 import { BAR_TOP } from "../../play/chrome/top-bar-layout";
 import { goBack } from "../nav/go-back";
@@ -217,32 +217,24 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
   const more = useMorePopover(pills.more.length, choice.resetKey);
   const { open: moreOpen, lines: linesOpen, close: closeMore } = more;
 
-  // Android hardware Back peels one layer at a time (src/play/chrome/back.ts) and only then leaves the table.
-  useEffect(() => {
-    const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
-      // The quest advance screen is on top: Back is its Progress, and does nothing while the stage asks.
-      if (advance.shown) {
-        if (!advance.asks) advance.close();
-        return true;
-      }
-      const step = backStep({
-        ...playLayers(store),
-        menuOpen, moreOpen, linesOpen,
-        previewOpen: preview != null || setupShown, readingOpen: reading != null,
-        overlayOpen: choice.overlayOpen, panelOpen: choice.panelOpen,
-      });
-      if (runBackStep(step, store)) return true;
-      if (step === "closeMenu") setMenuOpen(false);
-      else if (step === "closeMore" || step === "closeLines") closeMore();
-      else if (step === "closePreview") (previewClose.current ?? (() => (setupShown ? setSetupShown(false) : setPreview(null))))();
-      else if (step === "closeReading") setReading(null);
-      else if (step === "closeOverlay") choice.closeOverlay();
-      else if (step === "foldPanel") choice.fold();
-      else goBack(router, nav.back);
-      return true;
-    });
-    return () => subscription.remove();
-  }, [store, menuOpen, moreOpen, linesOpen, closeMore, preview, setupShown, reading, choice, router, nav, advance]);
+  // Android hardware Back peels one layer at a time and only then leaves the table; a hardware keyboard's Escape peels without leaving and Z is Undo (use-table-back.ts).
+  const onKeyDown = useTableBack({
+    store,
+    advance,
+    open: { menu: menuOpen, more: moreOpen, lines: linesOpen, preview: preview != null || setupShown, reading: reading != null, overlay: choice.overlayOpen, panel: choice.panelOpen },
+    close: {
+      menu: () => setMenuOpen(false),
+      more: closeMore,
+      preview: () => (previewClose.current ?? (() => (setupShown ? setSetupShown(false) : setPreview(null))))(),
+      reading: () => setReading(null),
+      overlay: choice.closeOverlay,
+      panel: choice.fold,
+    },
+    banner: choice.banner != null,
+    dismissBanner: choice.dismissBanner,
+    undo: choice.undo,
+    leave: () => goBack(router, nav.back),
+  });
 
   const onLayout = (event: LayoutChangeEvent) => {
     const { width, height, x } = event.nativeEvent.layout;
@@ -332,7 +324,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
 
   return (
     // Bleed: the view below insets itself (barTop), so the status bar's inset is not added twice (user report, 2026-10-30).
-    <Screen testID="table" scene="table" bleed>
+    <Screen testID="table" scene="table" bleed onKeyDown={onKeyDown}>
       {/* Never flattened: with "auto" alone this view is layout-only and the renderer drops it, so the menu or a popover turning
           it to "no-hide-descendants" would add a native view and move the canvas into it, and the canvas would flash. */}
       <View className="flex-1" collapsable={false} importantForAccessibility={menuOpen || more.open || more.lines ? "no-hide-descendants" : "auto"} style={{ paddingTop: barTop, paddingLeft: insets.left, paddingRight: insets.right }}>

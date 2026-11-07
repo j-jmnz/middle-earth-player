@@ -26,7 +26,7 @@ All of these are in Settings, and the table's settings panel has the same rows. 
 
 ## Known gaps
 
-- **Hardware keyboard.** The table has no keyboard control and no focus ring. Switch and voice control work through the list table.
+- **Hardware keyboard.** The drawn canvas has no keyboard focus: play through Table as a list. There the rows, the tray and the dock's buttons take focus and show a focus ring; Escape closes the top layer and Z is Undo on Android (React Native sends key events to a view only there; iOS keeps Tab, Full Keyboard Access and Space or Enter). Switch and voice control work through the list table.
 - **The web build** (development only) draws no canvas: it lists each zone's cards by name (`src/play/canvas/table-canvas.tsx`). It has no reader announcements and no focus moves, so those are checked on the phone only.
 - **Label in Name (WCAG 2.5.3).** A control's spoken name starts with the words drawn on it ("Scenario 1, A Shadow of the Past, 3 quest stages", "Threat 20, P1, acting", "Planning, round 1"). The web check still reports these on a few screens, because axe joins the text of sibling blocks with no space on react-native-web ("1A Shadow of the Past3 quest stages", "20P1") and finds no such run in a name read as written. It is axe's text join, not the wording.
 - **The table's own drawing** follows UI scale but not the phone's text size or Bold Text. The list table, every other screen and the card previews do follow them.

@@ -7,6 +7,7 @@ import { Pressable, View, type AccessibilityRole, type DimensionValue } from "re
 import Animated, { SlideInDown } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useFocusRing } from "../../ui/focus-ring.ts";
 import { longPressA11y, mergeA11yActions } from "../../ui/long-press-action.ts";
 import { IconValue } from "../../ui/game-icon.tsx";
 import { CONTROL_RADIUS, SHEET_RADIUS } from "../../ui/radius.ts";
@@ -140,6 +141,7 @@ export function Tile({
   const t = useTableTokens();
   const s = useUiScale();
   const night = surface === "night";
+  const ring = useFocusRing();
   // A screen reader's actions on the row: a share row's increment and decrement, and the long press's "Show card" (docs/design-system.md, Screen reader).
   const onStep = reader?.onStep;
   const actions = mergeA11yActions(
@@ -154,6 +156,7 @@ export function Tile({
   ) : null;
   return (
     <Pressable
+      {...ring.props}
       testID={testID}
       collapsable={false}
       accessibilityRole={reader?.role ?? "button"}
@@ -172,6 +175,7 @@ export function Tile({
           style={{
             minHeight: touch(s, dense ? 44 : night ? 50 : 48),
             ...(pressed ? { backgroundColor: night ? t.pressed : t.paperPressed } : selected ? (night ? chipOnSurface(t) : { backgroundColor: withAlphaHex(t.ink, 0.1) }) : { backgroundColor: "transparent" }),
+            ...ring.style,
           }}
         >
           {leading}

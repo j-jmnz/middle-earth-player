@@ -19,6 +19,7 @@ import { useReaderPanelOpen } from "../choice/reader-panel.ts";
 import { hidesFace, shownSeat } from "../store/selectors.ts";
 import type { ReaderSeed, TableCanvasProps } from "./table-canvas-types.ts";
 import { readerRows, type ReaderItem } from "./reader-table-rows.ts";
+import { useFocusRing } from "../../ui/focus-ring.ts";
 import { useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
 import { Text } from "../../ui/text.tsx";
@@ -51,8 +52,10 @@ type ButtonProps = {
 // Pressable that also has a className.
 function ReaderButton({ id, testID, label, hint, picked, glows, dimmed, muted, faint, actions, onAction, onTap }: ButtonProps) {
   const t = useTableTokens();
+  const ring = useFocusRing();
   return (
     <Pressable
+      {...ring.props}
       testID={testID}
       accessible
       accessibilityRole="button"
@@ -66,7 +69,7 @@ function ReaderButton({ id, testID, label, hint, picked, glows, dimmed, muted, f
       {({ pressed }) => (
         <View
           className={`min-h-touch justify-center rounded-item px-2 py-1 ${picked > 0 ? "bg-accentLine" : "bg-raised"} ${glows ? "border border-accent" : ""} ${dimmed || muted ? "opacity-60" : ""}`}
-          style={pressed ? { backgroundColor: t.hairline } : undefined}
+          style={{ ...(pressed ? { backgroundColor: t.hairline } : {}), ...ring.style }}
         >
           <Text className={faint ? "text-label text-faint" : "text-label text-bone"}>{label}</Text>
           {hint ? <Text className="text-label text-muted">{hint}</Text> : null}

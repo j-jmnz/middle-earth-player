@@ -224,6 +224,7 @@ VoiceOver and TalkBack drive every screen as it is drawn; what only a reader mee
 - **Nothing is said twice.** A state is spoken once, by its state, not by the label and the state; a word beside a picture that already names it is not repeated by the picture; a toast is an announcement or a live region, not both.
 
 `scripts/checks/a11y.test.ts` (`a11y.ts`) holds these for every raw control in `src/**/*.tsx`: a `Pressable`, `TouchableOpacity` or `Text` with `onPress` and no role or no name, an `onLongPress` with no action, a `TextInput` with no label, and an `Image` or Skia `Canvas` neither labelled nor hidden. A control that is exempt is named in the test with its reason, and an exemption nothing needs fails the test.
+- **Keyboard focus.** A button, a row or a chip a hardware keyboard focuses wears the focus ring: an accentHigh outline, 2 pt wide and 2 pt off the control, drawn only while it is focused (`src/ui/focus-ring.ts`; the table's keys and where the ring is clipped are `docs/design-system-table.md`, Screen reader).
 
 ## Icons
 

@@ -1,7 +1,7 @@
 // The chrome's frame (docs/design-system.md, Components): the page and its scrolling body, the top bar, rows, panels, stat tiles,
 // the pinned action bar, the paper sheet and the outcome word. Re-exported by chrome.tsx.
 import { useContext, useRef, type ComponentRef, type ReactNode, type RefObject } from "react";
-import { Pressable, ScrollView, View } from "react-native";
+import { Pressable, ScrollView, View, type ViewProps } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { Backdrop } from "../art/backdrop";
@@ -37,9 +37,12 @@ export function Screen({
   inset = true,
   bleed = false,
   art,
+  onKeyDown,
 }: {
   children: ReactNode;
   testID?: string;
+  // A hardware keyboard's key, bubbled from the focused control (the table's Escape and Undo; Android only).
+  onKeyDown?: ViewProps["onKeyDown"];
   scene?: SceneName;
   inset?: boolean;
   bleed?: boolean;
@@ -49,7 +52,7 @@ export function Screen({
   const insets = useSafeAreaInsets();
   const s = useUiScale();
   return (
-    <View testID={testID} collapsable={false} className="flex-1 overflow-hidden bg-night">
+    <View testID={testID} collapsable={false} onKeyDown={onKeyDown} className="flex-1 overflow-hidden bg-night">
       <Backdrop scene={scene} />
       {art}
       {/* The top inset is a style, not NativeWind's pt-safe: one source of insets for the whole screen. */}
