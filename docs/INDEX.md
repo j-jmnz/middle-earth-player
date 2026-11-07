@@ -8,7 +8,7 @@ Read a section, not a file: `pnpm docs:section <file> "<heading>"` prints one se
 
 Read whole.
 
-- `CLAUDE.md` — Claude Code (~2.3K tok)
+- `CLAUDE.md` — Claude Code (~2.4K tok)
 - `.claude/rules/authority.md` — Authority (~470 tok)
 - `.claude/rules/code-standards.md` — Code standards (~1.9K tok)
 - `.claude/rules/commit-standards.md` — Commit standards (~680 tok)
@@ -22,6 +22,7 @@ Each agent reads its own file.
 - `.claude/agents/effect-author.md` — Writes effect records for card lines no template reads (~1.1K tok)
 - `.claude/agents/implementer.md` — Implements one phase from docs/phases (~1.4K tok)
 - `.claude/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~1.8K tok)
+- `.claude/agents/reading-judge.md` — Reads each effect record, rendered as English, against the printed ledger line it implements and says ok, wrong or ambiguous (~860 tok)
 - `.claude/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~2.4K tok)
 - `.claude/agents/ux.md` — Reviews the current screens for phone UX and visual design, and changes the design system when asked (~1.3K tok)
 
@@ -209,7 +210,7 @@ STATUS.md, then the active phase file.
 
 Read when a task names the plan.
 
-- `docs/plans/effect-authoring.md` — Authoring effect records (~7.3K tok)
+- `docs/plans/effect-authoring.md` — Authoring effect records (~7.4K tok)
   - 12–33 Workflow (~470)
   - 34–50 Where records live (~370)
   - 51–75 Templates and copied lines (~690) ← 4
@@ -221,8 +222,8 @@ Read when a task names the plan.
   - 155–174 Triggers and stat flags (~440)
   - 175–236 Patterns (~1.4K)
   - 237–273 Mechanic families: engine and records together (~1.4K) ← 1
-  - 274–286 Readings the review catches (~410) ← 4
-  - 287–306 Not expressible yet: leave open, report (~390)
+  - 274–287 Readings the review catches (~490) ← 4
+  - 288–307 Not expressible yet: leave open, report (~390)
 - `docs/plans/scenario-fast-track.md` — Plan: a fast track for scenarios, A/B-tested against the classic track (~3.9K tok)
   - 3–35 Context (~840)
     - 7–16 Where a scenario's time goes (~300)
@@ -231,7 +232,7 @@ Read when a task names the plan.
     - 32–35 Expected gain (~70)
   - 36–117 The fast track (~1.8K)
     - 40–56 F1. Choice words as data beside the record (~480)
-    - 57–67 F2. Each record rendered as English and read fresh (~250)
+    - 57–67 F2. Each record rendered as English and read fresh (~250) ← 1
     - 68–80 F3. Card behaviour as spec rows (~310)
     - 81–94 F4. Encounter-card smoke (~170)
     - 95–111 F5. One author, a small context pack, rulings first, a quick loop (~400)
@@ -285,7 +286,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/build`: brief.md, Card images (2)
 - `scripts/card-smoke`: brief.md, Standalone play (1)
 - `scripts/checks`: brief.md, Nightmare (2); design-system.md, Screen reader (2); architecture.md, Modules (1); architecture.md, Repository map (1)
-- `scripts/data`: brief.md, Nightmare (4); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1)
+- `scripts/data`: brief.md, Nightmare (4); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1); plans/scenario-fast-track.md, F2. Each record rendered as English and read fresh (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/git`: .claude/rules/commit-standards.md, Subject line (2)
 - `scripts/release`: .claude/rules/release-standards.md, Versioning (3); .claude/rules/release-standards.md, Release notes (2); releasing.md, Jobs (2); .claude/rules/release-standards.md, Branches (1)

@@ -17,6 +17,7 @@ Find docs through `docs/INDEX.md`: every file an agent reads, its size, the head
 - `pnpm data:check` rebuilds into a temporary directory and fails on any difference. CI runs it.
 - `pnpm data:query "<sql>"` queries tables `cards`, `scenario_cards` and `rules` in memory. Rules text is `select id, title, text from rules where ...`.
 - `pnpm effects:draft <scenario-id | starter-deck-id | pack | code,code,...>` writes `.agent/drafts/<code>.md` (not committed) for each card with a printed ledger line no effect record owns. It clears its earlier drafts, groups batch twins, and takes codes separated by commas or spaces. The `effect-author` agent turns a bundle into records in `src/effects/authored/`.
+- `pnpm effects:render <scenario-id | code,code,...>` (`--out <file>`, `--all-dealt`) prints each card's printed ledger lines with the records that name them rendered as plain English, and the lines no record names. It is a reading aid; a piece with no template prints as JSON. Run it as soon as records are written, then the `reading-judge` agent on it.
 - `pnpm effects:open` rewrites `src/effects/open-lines.ts`, the printed lines no record owns. A test compares it, so run it after adding or changing records. `src/campaign/playable.ts` lists the scenarios whose lines are all covered.
 - `node --experimental-strip-types scripts/card-smoke/run.ts <codes>` plays a seeded game with a player card's records and reports any throw, refusal or stall (`--all` runs every card). `node --experimental-strip-types scripts/card-smoke/encounter.ts <scenario-id>` does the same for a scenario's encounter cards and a few dozen seeded random-intent games (`--all` runs every playable scenario).
 
@@ -38,7 +39,7 @@ Find docs through `docs/INDEX.md`: every file an agent reads, its size, the head
 
 ## Agents
 
-`implementer`, `reviewer`, `ux`, `orchestrator` and `effect-author` are in `.claude/agents`. `docs/handover/agent-brief.md` is the brief for an agent that owns one mechanic family (`docs/plans/effect-authoring.md`). After `implementer` reports a green exit, run `reviewer` on the diff, and `ux` as well when `src/screens` or `src/play` changed. A plan with several sections is run by `orchestrator` (`.claude/agents/orchestrator.md` sets the models and the one review round).
+`implementer`, `reviewer`, `ux`, `orchestrator`, `effect-author` and `reading-judge` (reads each rendered record from `pnpm effects:render` against its printed line; read-only) are in `.claude/agents`. `docs/handover/agent-brief.md` is the brief for an agent that owns one mechanic family (`docs/plans/effect-authoring.md`). After `implementer` reports a green exit, run `reviewer` on the diff, and `ux` as well when `src/screens` or `src/play` changed. A plan with several sections is run by `orchestrator` (`.claude/agents/orchestrator.md` sets the models and the one review round).
 
 ## Cloud sessions
 

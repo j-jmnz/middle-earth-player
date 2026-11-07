@@ -281,6 +281,7 @@ Read each new record against these before the review. Each one is a card bug a r
 - **"For any reason" and "cannot enter …".** The route must cover every way a card can arrive: discards made by player cards, searches, reshuffles, and both sides of a two-sided card.
 - **The trigger's scope.** "After a location is explored" hears a location explored in the staging area too (`locationExplored`), not only the active one (`activeExplored`). Check which zones the trigger's event is queued from.
 - **The card's own name in a filter.** A count "for each copy of ~" or "~ chosen" counts cards with that printed title, not every chosen card.
+- **An optional ability whose whole effect is barred.** A Response or Action must not be offered while another card's flag stops everything it does (`noResourcesPlaced` on "place 1 resource here"): give it a `condition` on that flag. `pnpm effects:render` prints a `note:` on such a record, saying whether it is offered while barred.
 - **New core state.** Test it at its boundaries, not only on the normal path: a phase's end, an Undo, a save and load.
 - **The options of a choice.** Every new `Choose` or `Pick` gets words in `src/play/words` that name the number, the side and whose deck (`docs/design-system-table.md`, Choice tray).
 
