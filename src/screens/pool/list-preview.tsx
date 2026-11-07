@@ -12,7 +12,8 @@ import { sideText } from "../../play/cards/ledger";
 import type { PictureSource } from "../../play/canvas/table-canvas-types";
 import { useDatabases } from "../data/databases";
 
-import { cardImageUrl, shownCardImage } from "../images/policy";
+import { shownCardImage } from "../images/policy";
+import { remotePictureUrl } from "../images/remote";
 import { scanAssets } from "../images/scan-map";
 import { cachedImage } from "../images/store";
 
@@ -23,7 +24,7 @@ export type CardSide = { code: string; side: "A" | "B"; label?: string };
 function pictureNow(code: string, imagesrc: string | null): PictureSource | null {
   const { source } = shownCardImage({ cached: cachedImage(code), imagesrc, bundled: scanAssets[code] ?? null });
   if (source) return source;
-  const remote = imagesrc ? cardImageUrl(imagesrc) : null;
+  const remote = imagesrc ? remotePictureUrl(imagesrc) : null;
   return remote ? { uri: remote } : null;
 }
 

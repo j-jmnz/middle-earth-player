@@ -12,7 +12,8 @@ import { useUiScale } from "../../ui/ui-scale";
 import { ListRow, Section, TextButton } from "../kit/chrome";
 import { useDatabases } from "../data/databases";
 import { RowCardImage } from "../images/picture";
-import { cardImageUrl, shownCardImage } from "../images/policy";
+import { shownCardImage } from "../images/policy";
+import { remotePictureUrl } from "../images/remote";
 import { scanAssets } from "../images/scan-map";
 import { useCachedImage } from "../images/store";
 import type { CardSide } from "../pool/list-preview";
@@ -23,7 +24,7 @@ function Thumb({ code, imagesrc }: { code: string; imagesrc: string | null }) {
   const s = useUiScale();
   const cached = useCachedImage(code);
   const { source } = shownCardImage({ cached, imagesrc, bundled: scanAssets[code] ?? null });
-  const remote = !source && imagesrc ? cardImageUrl(imagesrc) : null;
+  const remote = !source && imagesrc ? remotePictureUrl(imagesrc) : null;
   const picture = source ?? (remote ? { uri: remote } : null);
   return (
     <View className="overflow-hidden bg-raised" style={{ width: 32 * s, height: 44 * s, borderRadius: cardCorner(32 * s, 44 * s) }}>

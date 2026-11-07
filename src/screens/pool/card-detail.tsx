@@ -11,7 +11,8 @@ import { Chevron, Eyebrow, sphereWord, useTitleShadow } from "../kit/chrome";
 import { useDatabases } from "../data/databases";
 import { listDecks } from "../deck/store";
 import { enqueueImageDownloads } from "../images/queue";
-import { cardImageUrl, imageLayoutSize, shownCardImage } from "../images/policy";
+import { imageLayoutSize, shownCardImage } from "../images/policy";
+import { remotePictureUrl } from "../images/remote";
 import { InspectCardImage } from "../images/picture";
 import { scanAssets } from "../images/scan-map";
 import { useCachedImage } from "../images/store";
@@ -92,7 +93,7 @@ export function useCardPicture(code: string | null, imagesrc: string | null) {
   const cached = useCachedImage(code ?? "");
   const bundled = code ? (scanAssets[code] ?? null) : null;
   const { resolved, source } = shownCardImage({ cached, imagesrc, bundled });
-  const remote = !source && imagesrc ? cardImageUrl(imagesrc) : null;
+  const remote = !source && imagesrc ? remotePictureUrl(imagesrc) : null;
   const preview = source ?? (remote ? { uri: remote } : null);
   const intrinsic = resolved.kind === "file" || resolved.kind === "asset" ? { width: resolved.width, height: resolved.height } : remote ? { width: 423, height: 600 } : null;
   useEffect(() => {

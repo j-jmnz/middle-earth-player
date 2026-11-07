@@ -1,0 +1,16 @@
+# Weekly update pull requests. Actions are pinned by commit in .github/workflows, and Dependabot moves the pin and
+# its version comment together. npm updates are grouped so one pull request carries a week's minor and patch bumps.
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directories: [/, /.github/actions/*]
+    schedule:
+      interval: weekly
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]

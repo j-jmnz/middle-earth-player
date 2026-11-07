@@ -1,21 +1,28 @@
 # Privacy policy
 
-Middle Earth LCG collects no personal data. It has no accounts, no analytics, no advertising, no crash reporting of its own and no server. This policy covers the app on Android, iPhone, iPad and the web, in every build this repository publishes.
+Middle Earth LCG collects no personal data. It has no accounts, no sign-in, no analytics, no advertising, no crash reporting of its own and no server. The maintainers receive nothing from the app. This policy covers the app on Android, iPhone, iPad and the web, in every build this repository publishes.
 
 ## What stays on your device
 
-Your campaigns, games, campaign logs, decks, notes and settings are saved only on your device, in the app's own storage. Nothing is sent to the project or anyone else. Booklets or deck files you open from your files are copied into that storage and stay there. Your phone's own backup (iCloud or Google) may include the app's saves, as it does for other apps; downloaded card pictures are left out of it.
+Your campaigns, games, campaign logs, decks, notes and settings are saved only on your device, in the app's own storage (a SQLite database, `user.db`). Nothing is sent to the project or anyone else. Booklets or deck files you open with the system file picker are copied into that storage and stay there; the app reads only the file you choose.
 
-Uninstalling the app deletes everything it saved.
+Your phone's own backup (iCloud, or Android's backup to Google) may include the app's saves, as it does for other apps. That copy goes to your account with Apple or Google, not to this project. Uninstalling the app deletes everything it saved.
 
 ## When the app uses the network
 
-The app plays offline: its cards, pictures and booklets are inside it. It goes online only when:
+The phone app plays offline: its cards, rules, booklets and every card picture are inside it. It connects in one case only, over HTTPS:
 
-- you import a deck from RingsDB: it fetches that public decklist, and the card details it needs, from [ringsdb.com](https://ringsdb.com);
-- it shows a card picture it does not carry: it downloads that picture from [RingsDB](https://ringsdb.com) or [Hall of Beorn](https://hallofbeorn.com) once and keeps it on the device. A build from the Releases page carries every picture, so this rarely happens.
+| When | To | What is sent |
+| --- | --- | --- |
+| You import a deck from a RingsDB link | [ringsdb.com](https://ringsdb.com) | The deck's id from the link, and the code of any card in it that the app does not recognise |
 
-Those requests send only what any web request sends (your IP address and the app's request), to those sites, under their own privacy policies. The app sends no identifier, account or game data with them.
+Like any web request, this shows RingsDB your IP address and a standard user agent, under RingsDB's own privacy policy. The app adds no identifier, cookie, account or game data. If you never import a deck from RingsDB, the phone app never connects.
+
+The web build carries no card pictures, so it also loads each picture it shows from [RingsDB](https://ringsdb.com), or the [Hall of Beorn](https://hallofbeorn.com) and DragnCards image storage on `s3.amazonaws.com`, with the same kind of request.
+
+## Permissions
+
+On Android: `INTERNET` (the deck import) and `VIBRATE` (haptics). On iPhone and iPad: none. The app does not use the camera, microphone, location, contacts or photos.
 
 ## Installing
 
@@ -27,6 +34,10 @@ If you install through TestFlight instead, Apple handles that under [Apple's pri
 
 The app collects no data from anyone, children included.
 
+## Checking this yourself
+
+The code is open, and [SECURITY.md](SECURITY.md) names the files behind each of these points. You can also inspect an APK from the Releases page with a tool such as [Exodus Privacy](https://reports.exodus-privacy.eu.org), which lists its permissions and any tracking libraries, or play a whole game with the phone in airplane mode.
+
 ## Changes and contact
 
-A change to this policy is made in this file, and its history is in the repository's commits. Questions go to the repository's [issues](https://github.com/j-jmnz/middle-earth-lcg/issues).
+A change to this policy is made in this file, and its history is in the repository's commits. Questions go to the repository's [issues](https://github.com/j-jmnz/middle-earth-lcg/issues); report a security problem privately, as [SECURITY.md](SECURITY.md) says.

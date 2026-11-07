@@ -6,7 +6,8 @@ import { cardCorner } from "../../ui/card-corner";
 import { CardImage } from "../../ui/card-image";
 import { cachePolicyFor } from "../../ui/image-cache";
 
-import { cardImageUrl, shownCardImage } from "./policy";
+import { shownCardImage } from "./policy";
+import { remotePictureUrl } from "./remote";
 import { scanAssets } from "./scan-map";
 import { useCachedImage } from "./store";
 
@@ -23,7 +24,7 @@ export function useCardPreview(code: string, imagesrc: string | null): { uri: st
     });
     if (source) return source;
     if (!imagesrc) return null;
-    const remote = cardImageUrl(imagesrc);
+    const remote = remotePictureUrl(imagesrc);
     return remote ? { uri: remote } : null;
   }, [code, imagesrc, cached]);
 }
