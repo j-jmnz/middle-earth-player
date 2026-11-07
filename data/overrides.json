@@ -1280,12 +1280,6 @@
       "set": "Journey Along the Anduin",
       "reason": "The Revised Core Set's Learn to Play (p25) and the Easy Mode sheet (p2) call the second core scenario and its encounter set \"Journey Down the Anduin\". The scenario's own campaign card, quest cards and encounter set icon print \"Journey Along the Anduin\" (Mirkwood Paths - Part 2, scan 01130.A), and Hall of Beorn follows the cards. The card wins (authority order); the booklet's name is an alias.",
       "source": "Learn to Play p25 (ltp.setup-journey-along-the-anduin); scan 01130.A; hallofbeorn.com/Export/Scenarios/Journey-Along-the-Anduin-(Campaign)"
-    },
-    {
-      "booklet": "Harad",
-      "set": "Men of Harad",
-      "reason": "Journey to the Cross-roads stage 1A (144068) prints \"Shuffle the Harad encounter set and place it facedown under The Cross-roads.\"; the booklet's Setup paragraph (mec112.setup-journey-to-the-cross-roads) and the cards' set icon name the set Men of Harad.",
-      "source": "mec112.setup-journey-to-the-cross-roads; hallofbeorn.com/Export/QuestCards (Ambush the Men of Harad, The Two Towers #122); hallofbeorn.com/Export/Scenarios/Journey-to-the-Cross-roads"
     }
   ]
 }

@@ -1,4 +1,3 @@
-import { distance, titleKey } from "./names.ts";
 import { namedBy, setsOf, stepWith } from "./setup-names.ts";
 import type { NameIndex, SetupClause } from "./setup-text.ts";
 
@@ -6,15 +5,6 @@ import type { NameIndex, SetupClause } from "./setup-text.ts";
 // ledger line (data/printed/the-two-towers.json), names the cards (and, for the burden removal, the burden sets) it moves, and returns null for a sentence it
 // does not read, so the other patterns try it. A step that names cards returns null when a name finds no card: the sentence ends up unread and the
 // scenario is not built, a name is never dropped silently.
-// A name one letter off a card of the scenario, when exactly one card is that near: Hall of Beorn's candidate of Follow the Orcs prints "Estemnet" for Eastemnet.
-// The ledger text is read from the scan and its names are matched exactly (named); this only keeps a candidate's typo from hiding the Setup line.
-function nearName(phrase: string | undefined, names: NameIndex): string[] {
-  const key = titleKey(phrase ?? "");
-  const hits = key.length < 6 ? [] : [...names.aliases].filter(([name]) => distance(titleKey(name), key) <= 1);
-  const only = hits.length === 1 ? hits[0] : undefined;
-  return only ? [only[1]] : [];
-}
-
 export function readTwoTowers(sentence: string, names: NameIndex): SetupClause[] | null {
   const step = stepWith([]);
   const named = namedBy(names);
@@ -44,8 +34,7 @@ export function readTwoTowers(sentence: string, names: NameIndex): SetupClause[]
   }
   if ((match = /^Set the pursuit value to (\d+)$/i.exec(sentence))) return [step("setPursuit", { count: Number(match[1]) })];
   if ((match = /^Make (.+?) the active location$/i.exec(sentence))) {
-    const exact = named(match[1]);
-    const codes = exact.length > 0 ? exact : nearName(match[1], names);
+    const codes = named(match[1]);
     return codes.length === 0 ? null : [{ kind: "active", codes }];
   }
 

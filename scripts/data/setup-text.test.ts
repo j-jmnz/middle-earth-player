@@ -377,11 +377,6 @@ describe("parseSetup: The Two Towers Setup sentences", () => {
     expect(parsed.clauses).toEqual([{ kind: "active", codes: ["t1"] }, { kind: "stage", codes: ["t2", "t3"], perPlayer: null, count: 1 }, step("chooseCaptives", { to: ["t3"] }), step("setPursuit", { count: 10 })]);
   });
 
-  it("143069.A: reads a candidate's one-letter typo of a card's name (Estemnet) as that card", () => {
-    expect(read("Setup: Make Estemnet the active location.").clauses).toEqual([{ kind: "active", codes: ["t1"] }]);
-    expect(read("Setup: Make Estemmmmnet the active location.").unread).toEqual(["Make Estemmmmnet the active location"]);
-  });
-
   it("143072.A: sets cards aside, 1 copy for each player, and offers the Poisoned Counsels or stage 2A", () => {
     const parsed = read("Setup: Set The Defense of Helm's Deep and 1 copy of Deeping Wall aside, out of play. Each player sets 1 copy of Soldier of Isengard aside, out of play. Then, the players must choose: either each player shuffles 1 copy of Poisoned Counsels into his deck, or advance to stage 2A (bypassing stage 1B).");
     expect(parsed.unread).toEqual([]);

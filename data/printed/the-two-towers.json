@@ -1721,6 +1721,658 @@
       "confirmedBy": null
     },
     {
+      "code": "144016",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Groping-Dead.jpg",
+        "sha256": "349d200044397dcd3f93e0e0ba7a268a6e7b83c6ff64267658b2640e72834dcf"
+      },
+      "lines": [
+        "The engaged player cannot reduce his threat.",
+        "Forced: After Groping Dead destroys a character, place 1 mire token on the active location.",
+        "Shadow: If this attack destroys a character, place 1 mire token on the active location."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's candidate has \"attacks and destroys\" in the Forced line and no Shadow line; the scan has \"destroys\" and the Shadow line."
+    },
+    {
+      "code": "144017",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Dead-Things.jpg",
+        "sha256": "c4ed85723b09f1371ed6f5bcfb1eb9ebca67ba2cf1ebce1524859031b91e82fe"
+      },
+      "lines": [
+        "The engaged player cannot reduce his threat.",
+        "Forced: After Dead Things destroys a character, the defending player must raise his threat by 3.",
+        "Shadow: Raise your threat by 1 for each Undead enemy engaged with you."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's candidate has \"attacks and destroys\" and \"raises his threat\" in the Forced line and no Shadow line; the scan has \"destroys\", \"must raise\" and the Shadow line."
+    },
+    {
+      "code": "144018",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Candle-bearer.jpg",
+        "sha256": "27dc9caefc30652e96e3b90f98a0047845be0f72392aaae6151bf8bc03ec60ca"
+      },
+      "lines": [
+        "The engaged player cannot reduce his threat.",
+        "Forced: After Candle-bearer destroys a character, it cannot take damage until the end of the round.",
+        "Shadow: Until the end of the round, attacking enemy cannot take damage."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's candidate has \"attacks and destroys\" and no Shadow line; the scan has \"destroys\" and the Shadow line."
+    },
+    {
+      "code": "144019",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Evil-smelling-Fens.jpg",
+        "sha256": "c93f136e9b200fb3bfa5bc10d0dc9172220f8a410e5d35d2aaf0c00a41c078d5"
+      },
+      "lines": [
+        "Mire 3. Forced: When Evil-smelling Fens is discarded by the Mire keyword, deal 1 damage to each character.",
+        "Travel: Each player must raise his threat by 1 to travel here.",
+        "Shadow: Deal 1 damage to defending character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's candidate has \"Raise each player's threat by 1 to travel here\" and no Shadow line, and drops the Mire 3 keyword from the line; the scan has \"Each player must raise his threat by 1 to travel here\", \"Mire 3.\" opening the Forced paragraph, and the Shadow line."
+    },
+    {
+      "code": "144020",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Shifting-Quagmire.jpg",
+        "sha256": "81169a7c4b3b2134fc7010b7a32adcf7a1afa6841f36a571655b07144e7ee748"
+      },
+      "lines": [
+        "Surge.",
+        "Mire 1. Forced: When Shifting Quagmire is discarded by the Mire keyword, either return a random location from the victory display to the staging area, or raise each player's threat by 1 for each location in the victory display.",
+        "Travel: Spend 1 Fellowship resource to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The Mire 1 keyword opens the Forced paragraph and is kept in its line; the candidate drops it."
+    },
+    {
+      "code": "144021",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Haunted-Mere.jpg",
+        "sha256": "c8fc7b370ed21fdcaca21eb476373228aa88276fc7b9377c6d586d10164ecb8e"
+      },
+      "lines": [
+        "Mire 2. Forced: When Haunted Mere is discarded by the Mire keyword, search the encounter deck and discard pile for an Undead enemy, reveal it, and add it to the staging area. Shuffle the encounter deck.",
+        "Travel: Exhaust Sméagol to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The Mire 2 keyword opens the Forced paragraph and is kept in its line; the candidate drops it and spells Smeagol without the accent."
+    },
+    {
+      "code": "144022",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Stagnant-Pools.jpg",
+        "sha256": "f234a5b963884346564059ca3ca778f6c16c390cfee9da86d92875b0b885281f"
+      },
+      "lines": [
+        "Mire 5. Forced: When Stagnant Pools is discarded by the Mire keyword, each player must raise his threat by 5.",
+        "Stagnant Pools gets +1 Threat for each mire token on it.",
+        "Travel: Exhaust Sméagol to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The Mire 5 keyword opens the Forced paragraph and is kept in its line; the candidate drops it, has \"raise each player's threat\" for the scan's \"each player must raise his threat\", and spells Smeagol without the accent."
+    },
+    {
+      "code": "144023",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Soft-Mires.jpg",
+        "sha256": "d6b978346ad0af87b07e55a4c16931ffca654dfbbd7786c6ae77972760a69a22"
+      },
+      "lines": [
+        "Mire 1. Forced: When Soft Mires is discarded by the Mire keyword, the first player reveals the top card of the encounter deck.",
+        "Travel: Each player must raise his threat by 1 to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The Mire 1 keyword opens the Forced paragraph and is kept in its line; the candidate drops it and has \"reveals an encounter card\" and \"Raise each player's threat by 1\" where the scan words them as above."
+    },
+    {
+      "code": "144024",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Creeping-Marshes.jpg",
+        "sha256": "a78155765c8d4321880a27cec00d82004056c0838106942ee4e15df59945e9da"
+      },
+      "lines": [
+        "Surge. Doomed 1.",
+        "When Revealed: Attach to the current quest. (Counts as a Condition attachment with the text: \"Forced: At the end of the refresh phase, place 1 mire token on each location in the staging area. Then, discard Creeping Marshes.\")"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "144025",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Bitter-Reek.jpg",
+        "sha256": "7d76fd4377c86ebc664c20050d010833990e63da245a2e61e97ea425eeda0010"
+      },
+      "lines": [
+        "Peril.",
+        "When Revealed: Either raise your threat by 1 for each character you control that is committed to the quest, or deal 1 damage to each character committed to the quest.",
+        "Shadow: Raise your threat by the attacking enemy's Threat."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The candidate has no Shadow line; the scan has it, with the Threat icon."
+    },
+    {
+      "code": "144026",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/A-Fell-Light.jpg",
+        "sha256": "e2e7535d3ed0d5b5b96ba3f7e2316a2acee50d20181c5c3442b8aaac484f823e"
+      },
+      "lines": [
+        "Peril.",
+        "When Revealed: Put the topmost Undead enemy in the encounter discard pile into play engaged with you. Each Undead enemy engaged with you makes an immediate attack.",
+        "Shadow: Return the topmost Undead enemy in the encounter discard pile to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The candidate has \"in the discard pile\" and no Shadow line; the scan has \"in the encounter discard pile\" and the Shadow line."
+    },
+    {
+      "code": "144027",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Black-Gate.jpg",
+        "sha256": "cd0d03826740601ca6c426d6d9cbcc0c6ed33fb4602f230e01878d759a94be97"
+      },
+      "lines": [
+        "Forced: At the end of the planning phase, place each Harad enemy in the staging area facedown under The Black Gate.",
+        "If there are at least X facedown cards under The Black Gate, the players lose the game. X is 3 more than the number of players."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The candidate has \"underneath\"; the scan has \"under\"."
+    },
+    {
+      "code": "144028",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Man-of-Harad.jpg",
+        "sha256": "e0e06d4d7e4ee757b2f76df35d0d2f7e23c244b257279f10e0a7ee4c52d745f7"
+      },
+      "lines": [
+        "Surge. Archery 1.",
+        "Forced: After Man of Harad engages you, discard 1 random card from your hand.",
+        "Shadow: Discard 1 random card from your hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The candidate has no Shadow line; the scan has it."
+    },
+    {
+      "code": "144029",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Captain-of-Harad.jpg",
+        "sha256": "a6557b3092764ed39c014a9180bb229cd00d2ad070d717a6490350890b2c5cab"
+      },
+      "lines": [
+        "Forced: After Captain of Harad engages you, each Harad enemy gets +1 Attack and -10 engagement cost until the end of the round.",
+        "Shadow: If this attack destroys a character, return attacking enemy to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The candidate has no Shadow line; the scan has it."
+    },
+    {
+      "code": "144030",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Cross-roads.jpg",
+        "sha256": "88df4a6f82b24411e6f72f721cdafda86034d892034b70bb246ff8668b8999ab"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "The Cross-roads gets -1 Threat for each facedown card under it. The players cannot travel here unless there are no facedown cards under The Cross-roads and at least 20 progress tokens on stage 1B."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The candidate has \"there are 0 facedown cards\"; the scan has \"there are no facedown cards\"."
+    },
+    {
+      "code": "144031",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Henneth-Annûn.jpg",
+        "sha256": "193ff1310f7d0cd9c4b66ca6768b1306d866207e48c2548d40e758f80b5ea1d3"
+      },
+      "lines": [
+        "While Henneth Annûn is the active location, skip both the encounter phase and combat phase, and ignore the Forced effects on stage 1B and The Black Gate.",
+        "Forced: After Henneth Annûn becomes the active location, return each engaged enemy to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "144032",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Southward-Road.jpg",
+        "sha256": "6d790ae166b48e03dd92b92ee15b0ca513ef1a75bbddc84b4700bb2dac9d18aa"
+      },
+      "lines": [
+        "While Southward Road is the active location, each player may optionally engage an additional enemy during the encounter phase.",
+        "Travel: The first player reveals the top facedown card under The Cross-roads and adds it to the staging area to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "144033",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Foothills-of-Ephel-Dúath.jpg",
+        "sha256": "c67e5c4e8ddadcd96e77cde4c6ecf24ab77a7c90909bb59faebbbc20e16a3772"
+      },
+      "lines": [
+        "While Foothills of Ephel Dúath is the active location, each Harad enemy gets -1 Threat.",
+        "Travel: The first player engages an enemy in the staging area to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "144034",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Ithilien-Woods.jpg",
+        "sha256": "8b2b070a34235b54bbd5210bb473cba87d2e4216c15c91932a596eae289e447f"
+      },
+      "lines": [
+        "While Ithilien Woods is the active location, it gains: \"Forced: After a player engages a Harad enemy, he readies a character he controls.\"",
+        "Travel: The first player reveals the top card of the encounter deck to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The candidate has \"reveals an encounter card to travel here\"; the scan has \"reveals the top card of the encounter deck to travel here\"."
+    },
+    {
+      "code": "144035",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Hills-of-Ithilien.jpg",
+        "sha256": "bdbd0cfed7ee475327b2bfaf28fc135431e328bdb5b863126fd3609c04a0688b"
+      },
+      "lines": [
+        "While Hills of Ithilien is the active location, it gains: \"Forced: After a player engages a Harad enemy, deal 1 damage to that enemy.\"",
+        "Shadow: Discard a non-objective attachment you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The candidate has no Shadow line; the scan has it."
+    },
+    {
+      "code": "144036",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Dark-Lord's-Summons.jpg",
+        "sha256": "ce6c64ce72a6f173bef62dea44db3eb0b15ec6c4da432c56ed0ad6e602adbd87"
+      },
+      "lines": [
+        "Peril.",
+        "When Revealed: Either place the lowest Attack Harad enemy engaged with you facedown under The Black Gate, or reveal the top facedown card from under The Cross-roads and put it into play engaged with you."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The candidate has \"reveal the top card from under\"; the scan has \"reveal the top facedown card from under\"."
+    },
+    {
+      "code": "144037",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Marching-Up-the-Road.jpg",
+        "sha256": "fca7c463190e1fbd0a65ca2cac2b6e997edbca76aa264a6bc22f6fa7916c0c9c"
+      },
+      "lines": [
+        "When Revealed: Each player must either return an enemy engaged with him to the staging area, or search the encounter deck for a Harad enemy and put it into play engaged with him.",
+        "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, place attacking enemy facedown under The Black Gate."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The candidate has no Shadow line; the scan has it."
+    },
+    {
+      "code": "144038",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Fierce-Southrons.jpg",
+        "sha256": "c7a52ac844c67910b9e6f7d851954ddaba9d3c34be0826ec94423dbf8850597a"
+      },
+      "lines": [
+        "Peril.",
+        "When Revealed: Either place the lowest Threat Harad enemy in the staging area facedown under The Black Gate and reveal an additional encounter card, or each enemy in the staging area makes an immediate attack against you."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "144039",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Arrows-Thick-in-the-Air.jpg",
+        "sha256": "8a733f700cdce763f0d7c08303a9c802cbeb537a9f8d199afdb854905a972a7f"
+      },
+      "lines": [
+        "When Revealed: Each Harad enemy gains Archery 2 until the end of the round.",
+        "Shadow: Either place attacking enemy facedown under The Black Gate after this attack, or it makes an additional attack against you after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The candidate has \"Until the end of the round, each Harad enemy gains Archery 2\" and no Shadow line; the scan has the order above and the Shadow line."
+    },
+    {
+      "code": "144040",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Shelob.jpg",
+        "sha256": "ad33fa9b407de79b07ee8eefb2d0f1e6daa14f2e144143d2bb76cba4faaba345"
+      },
+      "lines": [
+        "Indestructible. Cannot have attachments.",
+        "Shelob gets +1 Threat for each resource on her.",
+        "Forced: At the beginning of the quest phase, either place 1 resource on Shelob, or she makes an immediate attack against the first player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The candidate drops the Indestructible keyword from the first line; the scan has it."
+    },
+    {
+      "code": "144041",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Morgul-Orc.jpg",
+        "sha256": "b149a608b7c4a8d56b8e356aada2a90049de04f23b7bb927ced408af50a322d2"
+      },
+      "lines": [
+        "Peril.",
+        "When Revealed: Either discard 1 random card from your hand, or reveal an additional encounter card.",
+        "Shadow: If this attack destroys a character, discard 1 random card from your hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The candidate has no Shadow line; the scan has it."
+    },
+    {
+      "code": "144042",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Orc-of-Cirith-Ungol.jpg",
+        "sha256": "80605e396a480d5f29c8811bc64aae03d25618db15aeaf991e3111c750b96fe6"
+      },
+      "lines": [
+        "Peril.",
+        "When Revealed: Either discard 1 random card from each player's hand, or Orc of Cirith Ungol makes an immediate attack against you."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "144043",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Morgul-Vale.jpg",
+        "sha256": "f2404618ef89baf5247a3f2dc9c19e09ede79529cc86fe81f9c55393029da39d"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Forced: After Morgul Vale is explored, search the encounter deck and discard pile for a Morgul Wraith and add it to the staging area. Shuffle the encounter deck. Then, the first player must either exhaust The One Ring, or discard 1 random card from each player's hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "144044",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Sméagol's-Secret-Way.jpg",
+        "sha256": "a8054b7a17625e428bc42788bdd0ffcf6be808023c67f485c49d4eff2adfc05e"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Travel: Either exhaust Sméagol, or discard 1 random card from each player's hand.",
+        "Forced: After Sméagol's Secret Way is explored, each player either exhausts a character he controls, or discards 1 random card from his hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "144045",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Cleft-of-Cirith-Ungol.jpg",
+        "sha256": "797243518418ba8f5fd42fd08d0486958894e9ceb5b0e16ea554076cbe600f15"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "While Cleft of Cirith Ungol is in the victory display, Shelob gets +2 Attack, loses Indestructible, and gains: \"Shelob engages the first player.\"",
+        "Travel: Place 1 resource on Shelob to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The candidate has \"While The Cleft of Cirith Ungol\" and \"loses the Indestructible keyword\"; the scan has \"While Cleft of Cirith Ungol\" and \"loses Indestructible\"."
+    },
+    {
+      "code": "144046",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Spider's-Lair.jpg",
+        "sha256": "eb8becd97329298a51a30003ae927276f2571853e8128ea6f610ead0ff8731fa"
+      },
+      "lines": [
+        "Forced: When The Spider's Lair is explored, remove 1 resource from Shelob.",
+        "Forced: After The Spider's Lair becomes the active location, Shelob makes an immediate attack against the first player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The candidate has \"makes an attack\"; the scan has \"makes an immediate attack\"."
+    },
+    {
+      "code": "144047",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/The-Under-way.jpg",
+        "sha256": "e50e3a1e982b79c9c8258a25c9274e8f88c3593034c1a1fbd6ae3ca193e764ff"
+      },
+      "lines": [
+        "While The Under-way is in the staging area, each Orc enemy gets -5 engagement cost and gains: \"Forced: After this enemy engages a player, deal it a shadow card.\"",
+        "Shadow: Deal the attacking enemy 2 additional shadow cards."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The candidate has no Shadow line; the scan has it."
+    },
+    {
+      "code": "144048",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Deep-Dark-Passage.jpg",
+        "sha256": "f26de56004076938f83aa8f0b0d47bbf9a17c44e55b544a8ff24d70f8c70b400"
+      },
+      "lines": [
+        "While Deep Dark Passage is in the staging area, it gains: \"Forced: When any amount of progress would be placed on a location in the staging area, reduce that amount by 1.\"",
+        "Travel: Exhaust Sméagol to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The candidate spells Smeagol without the accent."
+    },
+    {
+      "code": "144049",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Den-of-Night.jpg",
+        "sha256": "2964058f06ea15b8387bc3fcfb90c8bc3eb8ccc87681d79f985cc3e09bee7bea"
+      },
+      "lines": [
+        "While Den of Night is in the staging area, it gains: \"Forced: After a 'When Revealed' effect is canceled, place 1 resource on Shelob.\"",
+        "Travel: Place 1 resource on Shelob to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "144050",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Exhalation-of-Decay.jpg",
+        "sha256": "58917f367efb66ea8652e8b1e0e7473e6ab35e7e9153f79b0c13cf095afd5046"
+      },
+      "lines": [
+        "When Revealed: Each player discards 1 random card from his hand and 1 non-objective attachment he controls.",
+        "Shadow: Discard a non-objective attachment you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The candidate has no Shadow line; the scan has it."
+    },
+    {
+      "code": "144051",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Many-Openings.jpg",
+        "sha256": "e940d721f6f8511bdeed5fd9453eeea21c7a206182d10c92e1b625cff72fabf3"
+      },
+      "lines": [
+        "When Revealed: Each location in the staging area gets +1 Threat until the end of the round. If the number of locations in the staging area is less than the number of players in the game, reveal an additional encounter card.",
+        "Shadow: Attacking enemy gets +X Attack, where X is the active location's Threat."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The candidate has no Shadow line; the scan has it, with the Attack and Threat icons."
+    },
+    {
       "code": "144052",
       "side": "A",
       "printing": "MEC112",
@@ -1737,6 +2389,189 @@
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
       "confirmedBy": null
+    },
+    {
+      "code": "144053",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Morgul-Wraith.jpg",
+        "sha256": "25aeb91d56cd26161ceedd0dab27f8fa60c5dd8881d77228cbef4696e85d3f3b"
+      },
+      "lines": [
+        "Cannot have non-Morgul attachments.",
+        "While The One Ring is exhausted, Morgul Wraith gets -30 engagement cost and gains: \"Immune to player card effects.\""
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "144054",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Call-of-the-Ring.jpg",
+        "sha256": "248eb1e5ffdd97726d9a7e435a3de1a6d551a85decdf3924d8184e60aa238bdc"
+      },
+      "lines": [
+        "When Revealed: The first player must choose: either search the encounter deck, discard pile, and victory display for a Nazgûl enemy and add it to the staging area, or exhaust The One Ring and reveal the top card of the encounter deck.",
+        "Shadow: Attacking enemy makes an additional attack against you after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The candidate has \"Nazgul\" without the circumflex and no Shadow line; the scan has \"Nazgûl\" and the Shadow line."
+    },
+    {
+      "code": "144055",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/We-Hates-Them.jpg",
+        "sha256": "608ebdc86b277716eaa39e0e62a29a10b6cb030aaf981c96273f530208c3e397"
+      },
+      "lines": [
+        "Surge.",
+        "When Revealed: Either flip Sméagol to Gollum, or Gollum makes an immediate attack. The first player may spend 1 Fellowship resource and exhaust The One Ring to cancel this effect.",
+        "Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if the attacking enemy is Gollum)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The candidate has no Shadow line; the scan has it, with the Attack icons."
+    },
+    {
+      "code": "144056",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Oliphaunt.jpg",
+        "sha256": "fd86336c017435dde3ff785b145e52c6ea1b87f26d3c09070294df1137e330f4"
+      },
+      "lines": [
+        "Cannot have attachments or take more than 3 damage each round.",
+        "Forced: After Oliphaunt engages you, exhaust each ally you control.",
+        "Shadow: Attacking enemy gets +3 Attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The candidate has no Shadow line; the scan has it."
+    },
+    {
+      "code": "144057",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Haradrim-Soldier.jpg",
+        "sha256": "1bc64aa0a8864269073b272411b0b5d46a974c93c59c903e0a1142b903a800e2"
+      },
+      "lines": [
+        "Forced: After Haradrim Soldier engages you, it makes an immediate attack.",
+        "Shadow: Attacking enemy makes an additional attack against you after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The candidate has no Shadow line; the scan has it."
+    },
+    {
+      "code": "144058",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Haradrim-Archer.jpg",
+        "sha256": "5c9f001f39a3d26c2ffe57239e3100e3473faa57d30e7ed6c6ff0d58d3d4bd4c"
+      },
+      "lines": [
+        "Archery X. X is the number of players in the game.",
+        "Forced: After Haradrim Archer engages you, assign X damage among characters you control.",
+        "Shadow: Deal 1 damage to the defending character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The candidate drops the Archery X keyword from the first line and has no Shadow line; the scan has both."
+    },
+    {
+      "code": "144059",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Blocked-Tunnel.jpg",
+        "sha256": "58adcf4c782dc659466ca841a3b101061dae6efab029e3535901bd08a01b1810"
+      },
+      "lines": [
+        "When Revealed: Make Blocked Tunnel the active location, returning any other active location to the staging area.",
+        "Action: Exhaust a character with a Weapon attachment to place 3 progress on Blocked Tunnel. (Any player may trigger this effect.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The candidate has \"returning any previous active location\"; the scan has \"returning any other active location\"."
+    },
+    {
+      "code": "144060",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Shelob's-Poison.jpg",
+        "sha256": "8d3cffd762f591b343a3f1128aa9053acbde251a0557d214a034391e1454f713"
+      },
+      "lines": [
+        "When Revealed: Attach to a hero you control and exhaust that hero. (Counts as a Condition attachment with the text: \"Limit 1 per hero. Treat attached hero's text box as blank, except for Traits. Attached hero cannot ready.\").",
+        "Shadow: If attacking enemy is Shelob, resolve the 'When Revealed' effect on Shelob's Poison."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The scan closes the parenthesis with a period after the closing quotation mark; the candidate has no closing period and no Shadow line."
+    },
+    {
+      "code": "144061",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Lurking-Malice.jpg",
+        "sha256": "b00ae832054cc2a796abceb0784eab421a89df382c9447ad8a33f34cfb4d08cf"
+      },
+      "lines": [
+        "Peril. Surge.",
+        "When Revealed: Either place 1 resource on Shelob, or she makes an immediate attack against you.",
+        "Shadow: If attacking enemy is Shelob, place 1 resource on her. Then, she gets +1 Attack for each resource on her."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The candidate has \"1 resources\" and no Shadow line; the scan has \"1 resource\" and the Shadow line."
+    },
+    {
+      "code": "144062",
+      "side": "A",
+      "printing": "MEC112",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Rage-and-Hunger.jpg",
+        "sha256": "32f60ffef2371858387e93ca888fdaf30c7a6474f8b7ca9df9d1bcbec67cf9d2"
+      },
+      "lines": [
+        "When Revealed: Shelob gets +2 Attack until the end of the phase. Shelob makes an immediate attack against each player, in player order.",
+        "Shadow: If attacking enemy is Shelob, she makes an additional attack against you after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqDiotgwcHzQpJ3iS4E, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The candidate has \"Then, she makes ... in turn order\" and no Shadow line; the scan has \"Shelob makes ... in player order\" and the Shadow line."
     },
     {
       "code": "144063",
