@@ -80,6 +80,7 @@ export function SettingSwitch({
       accessibilityLabel={label}
       accessibilityHint={hint ?? detail}
       accessibilityState={{ checked: value }}
+      aria-checked={value}
       onPress={() => onChange(!value)}
       style={({ pressed }) => ({
         minHeight: touch(s, ROW),

@@ -22,7 +22,7 @@ All of these are in Settings, and the table's settings panel has the same rows. 
 
 ## Automated checks
 
-`scripts/checks/a11y.test.ts` fails on a control with no role or name, a long press with no matching action, an unlabelled text field, or an image that is neither labelled nor hidden. Other tests cover the colour-vision pairs and the layout at large text sizes.
+`scripts/checks/a11y.test.ts` fails on a control with no role or name, a long press with no matching action, an unlabelled text field, or an image that is neither labelled nor hidden. Other tests cover the colour-vision pairs and the layout at large text sizes. `pnpm a11y:web` (a job of its own in CI) exports the web build and audits the main screens with axe-core in Chromium, in both themes, and fails on a serious or critical finding. It checks the names, roles and states the web build gives a reader, not what VoiceOver or TalkBack do. The Label in Name finding it still reports (a button's name leaves out text drawn on it) is listed in `scripts/checks/a11y-web.ts`.
 
 ## Known gaps
 

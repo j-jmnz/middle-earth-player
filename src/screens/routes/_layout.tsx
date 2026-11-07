@@ -4,6 +4,7 @@ import "../../../global.css";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import { Platform, StatusBar, View } from "react-native";
 import { Stack } from "expo-router";
+import Head from "expo-router/head";
 import { initialWindowMetrics, SafeAreaProvider } from "react-native-safe-area-context";
 import * as SplashScreen from "expo-splash-screen";
 import { colorScheme, rem, vars } from "nativewind";
@@ -156,6 +157,10 @@ export default function RootLayout() {
     <ThemeContext.Provider value={resolved}>
     <UiScaleContext.Provider value={scale}>
     <GestureHandlerRootView style={{ flex: 1, backgroundColor: palette.night }}>
+      {/* The web page's title (nothing on the phone): a reader says it first, and the web accessibility check needs one. */}
+      <Head>
+        <title>Middle Earth LCG</title>
+      </Head>
       <StatusBar barStyle={resolved === "dark" ? "light-content" : "dark-content"} />
       <SafeAreaProvider initialMetrics={initialWindowMetrics}>
         <View className="flex-1" style={themeStyle}>

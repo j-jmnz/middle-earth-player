@@ -70,6 +70,7 @@ export function Segmented<T extends string>({
             accessibilityRole="radio"
             accessibilityLabel={labels?.[option]}
             accessibilityState={{ selected, checked: selected }}
+            aria-checked={selected}
             onPress={() => onChange(option)}
             hitSlop={{ top: slop, bottom: slop }}
             // Stretched, each option grows from its own width (a word with an icon needs more than a third of a 320 pt phone's track),

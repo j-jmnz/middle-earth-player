@@ -170,6 +170,7 @@ export function ToggleChip({
       collapsable={false}
       accessibilityRole={asSwitch ? "switch" : "button"}
       {...(selected == null ? {} : { accessibilityState: asSwitch ? { checked: selected } : { selected } })}
+      {...(selected != null && asSwitch ? { "aria-checked": selected } : {})}
       accessibilityLabel={accessibilityLabel ?? label}
       onPress={onPress}
       onLayout={onLayout}

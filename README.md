@@ -180,6 +180,7 @@ The end-to-end flows are in `.maestro/scenarios/<scenario-id>/` and `.maestro/fe
 | `pnpm effects:draft <scenario \| deck \| pack \| codes>` | Writes `.agent/drafts/<code>.md` for each card with a printed line that has no effect record. |
 | `pnpm effects:open` | Regenerates `src/effects/open-lines.ts`. |
 | `pnpm scenario:new <scenario-id>` | Writes the skeleton files for a new scenario and registers it. `--dry-run` lists the files first. |
+| `pnpm a11y:web` | Exports the web build, serves it on localhost and audits the main screens with axe-core in Chromium; fails on a serious or critical finding. Needs `pnpm exec playwright install chromium` once, or `A11Y_CHROMIUM=<path to a Chromium>`. |
 | `pnpm catalog:build` | Writes `assets/catalog.db` (never committed) and `src/catalog/version.ts` (committed). |
 | `pnpm scans:pack` / `pnpm booklets:pack` | Packs card pictures and the booklet PDFs into `assets/` for the native bundle. |
 | `pnpm release:plan --dry-run` | Prints the next release tag and its notes from the commits since the last tag (`git fetch --tags` first). Changes nothing. |

@@ -243,6 +243,7 @@ export function TextButton({
       collapsable={false}
       accessibilityRole={selected == null ? "button" : "radio"}
       {...(state ? { accessibilityState: state } : {})}
+      {...(selected == null ? {} : { "aria-checked": selected })}
       accessibilityLabel={accessibilityLabel ?? label}
       accessibilityHint={hint}
       {...(longPress ? { accessibilityActions: longPress.accessibilityActions, onAccessibilityAction: longPress.onAccessibilityAction } : {})}

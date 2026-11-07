@@ -8,6 +8,7 @@ import { useEffect, useMemo, useState, type ReactNode } from "react";
 import { PixelRatio, Platform, View, type ViewStyle } from "react-native";
 
 import { cards } from "../../catalog/schema";
+import { DECORATIVE_ALT } from "../../ui/decorative";
 import { cachePolicyFor } from "../../ui/image-cache";
 import { nightFade, panelSurface, topShade } from "../../ui/surfaces";
 import { useTableTokens } from "../../ui/use-table-tokens";
@@ -94,6 +95,7 @@ export function CroppedArt({
             cachePolicy={cachePolicyFor(source)}
             contentFit="fill"
             accessible={false}
+            accessibilityLabel={DECORATIVE_ALT}
             style={{ position: "absolute", width: crop.width, height: crop.height, left: crop.left, top: crop.top }}
           />
         </View>

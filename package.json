@@ -44,6 +44,7 @@
     "zustand": "5.0.15"
   },
   "devDependencies": {
+    "@axe-core/playwright": "4.14.0",
     "@babel/core": "7.29.7",
     "@types/better-sqlite3": "^9.6.0",
     "@types/react": "~19.3.0",
@@ -54,6 +55,7 @@
     "eslint-plugin-import-x": "^4.17.1",
     "jsonc-parser": "^3.3.1",
     "oxlint": "1.91.0",
+    "playwright": "1.64.1",
     "sharp": "0.34.3",
     "tailwindcss": "3.4.17",
     "tsrs": "0.21.0-ts7.1.0-beta",
@@ -70,6 +72,7 @@
     "test": "vitest run",
     "test:fast": "VITEST_FAST=1 vitest run",
     "test:changed": "vitest run --changed",
+    "a11y:web": "pnpm catalog:build && node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/checks/a11y-web.ts",
     "typecheck": "tsrs -p . --noEmit",
     "catalog:build": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/build/catalog.ts",
     "eas-build-post-install": "pnpm catalog:build && pnpm scans:pack && pnpm booklets:pack",

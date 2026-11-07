@@ -29,7 +29,7 @@ Each agent reads its own file.
 
 Read the sections your task touches.
 
-- `README.md` — Middle Earth LCG (~5.2K tok)
+- `README.md` — Middle Earth LCG (~5.3K tok)
   - 8–20 Privacy and security (~250)
   - 21–26 How the code is written (~170)
   - 27–35 Features (~210)
@@ -48,11 +48,11 @@ Read the sections your task touches.
     - 130–139 In a browser (~140)
     - 140–161 On a phone (~360)
     - 162–165 Maestro (~150)
-  - 166–194 Commands (~800)
-  - 195–198 Contributing (~120)
-  - 199–208 Documentation (~200)
-  - 209–226 Attribution (~480)
-  - 227–230 License (~80)
+  - 166–195 Commands (~870)
+  - 196–199 Contributing (~120)
+  - 200–209 Documentation (~200)
+  - 210–227 Attribution (~480)
+  - 228–231 License (~80)
 - `docs/architecture.md` — Architecture (~20.0K tok)
   - 7–41 Stack (~1.1K)
   - 42–77 Processes (~680)
@@ -160,7 +160,7 @@ Read the sections your task touches.
   - 146–167 Backdrops (~950) ← 5
   - 168–175 Navigation (~410) ← 3
   - 176–213 Components (~1.7K) ← 9
-  - 214–227 Screen reader (~760) ← 8
+  - 214–227 Screen reader (~760) ← 9
   - 228–242 Icons (~480) ← 7
   - 243–261 Card art (~740) ← 2
   - 262–276 Tablets (~510) ← 13
@@ -258,7 +258,7 @@ Open work; read when a task names it.
 The sections each area's comments cite, most cited first. Read these before changing code there.
 
 - `scripts/build`: brief.md, Card images (2)
-- `scripts/checks`: brief.md, Nightmare (2); design-system.md, Screen reader (2); architecture.md, Modules (1); architecture.md, Repository map (1)
+- `scripts/checks`: design-system.md, Screen reader (3); brief.md, Nightmare (2); architecture.md, Modules (1); architecture.md, Repository map (1)
 - `scripts/data`: brief.md, Nightmare (4); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/git`: .claude/rules/commit-standards.md, Subject line (2)

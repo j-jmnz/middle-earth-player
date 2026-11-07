@@ -17,6 +17,7 @@ export function RadioTile({ selected, testID, label, onPress, className, childre
       accessibilityRole="radio"
       accessibilityLabel={label}
       accessibilityState={{ selected, checked: selected }}
+      aria-checked={selected}
       onPress={onPress}
       className={className.includes("flex-1") ? "flex-1" : undefined}
     >

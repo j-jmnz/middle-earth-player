@@ -9,6 +9,7 @@ import Animated, { useAnimatedStyle, useSharedValue } from "react-native-reanima
 import { BodyText, Chip, Eyebrow, NavBar, Screen, ScreenScroll, ScreenTitle, TwoPane } from "../../kit/chrome";
 import { CardFacts, CardName, CardPicture, DeckUse, useCardPicture, useCardRow } from "../../pool/card-detail";
 import { pictureMaxWidth, type PicturePane } from "../../pool/card-picture";
+import { DECORATIVE_ALT } from "../../../ui/decorative";
 import { cachePolicyFor } from "../../../ui/image-cache";
 import { CardTextView } from "../../../play/cards/card-text-view";
 import { sideText } from "../../../play/cards/ledger";
@@ -122,7 +123,7 @@ export default function CardScreen() {
         // scene's art layer, where Light can multiply it onto the ground.
         previewSource ? (
           <View pointerEvents="none" style={[StyleSheet.absoluteFill, { height: 560 * s, ...art.blend }]}>
-            <Image source={previewSource} cachePolicy={cachePolicyFor(previewSource)} contentFit="cover" blurRadius={30} accessible={false} style={{ width: "100%", height: 560 * s, opacity: 0.4 }} />
+            <Image source={previewSource} cachePolicy={cachePolicyFor(previewSource)} contentFit="cover" blurRadius={30} accessible={false} accessibilityLabel={DECORATIVE_ALT} style={{ width: "100%", height: 560 * s, opacity: 0.4 }} />
             <View style={{ position: "absolute", left: 0, right: 0, top: 0, bottom: 0, ...nightFade(0.1, 1, art.ground, t) }} />
           </View>
         ) : undefined
