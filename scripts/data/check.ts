@@ -33,6 +33,7 @@ void runScript("data:check", (log) => {
   log.debug(`building into ${scratch}`);
   cpSync(path.join(DATA_DIR, "rules"), path.join(scratch, "data", "rules"), { recursive: true });
   process.env.EFFECTS_OUT = path.join(scratch, "effects");
+  process.env.ASKS_OUT = path.join(scratch, "asks");
   process.env.ICONS_OUT = path.join(scratch, "icons");
   process.env.ICON_MODULES_OUT = path.join(scratch, "icon-modules");
   log.step("fresh build", () => build(path.join(scratch, "data"), log.child("build")));
@@ -41,6 +42,7 @@ void runScript("data:check", (log) => {
     ...["cards", "scenarios", "campaigns", "decks"].flatMap((dir) => compare(`data/${dir}`, path.join(DATA_DIR, dir), path.join(scratch, "data", dir))),
     ...compare("data/rules", path.join(DATA_DIR, "rules"), path.join(scratch, "data", "rules"), (name) => name.endsWith(".json") || name.endsWith(".md")),
     ...compare("src/effects/generated", path.join(ROOT, "src", "effects", "generated"), path.join(scratch, "effects")),
+    ...compare("src/play/words/asks", path.join(ROOT, "src", "play", "words", "asks"), path.join(scratch, "asks"), (name) => name === "index.ts"),
     ...compare("assets/icons", path.join(ROOT, "assets", "icons"), path.join(scratch, "icons")),
     ...compare("src/ui/icons", path.join(ROOT, "src", "ui", "icons"), path.join(scratch, "icon-modules")),
   ]);
