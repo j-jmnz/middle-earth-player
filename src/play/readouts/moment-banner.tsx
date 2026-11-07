@@ -5,15 +5,18 @@ import { useWindowDimensions, View } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { FadeInDown, FadeOut, useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
+import { useStore } from "zustand";
 
 import { bannerSpan } from "./banner-span.ts";
 import { layoutAnim, timing, useMotionScale, useReduceMotion } from "../../ui/motion-run.ts";
 import { MOTION } from "../../ui/motion-tokens.ts";
 import { CONTAINER_RADIUS } from "../../ui/radius.ts";
-import { BEAT_MS, type Moment } from "../store/outcome.ts";
+import { type Moment } from "../store/outcome.ts";
+import { bannerBeatMs } from "./banner-time.ts";
 import { bannerLabel, bannerSpeech } from "./banner-speech.ts";
 import { LineMark } from "../chrome/table-chrome.tsx";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
+import { tableSettings } from "../../ui/table-settings.ts";
 import { useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
 import { Text } from "../../ui/text.tsx";
@@ -120,14 +123,15 @@ export function MomentBanner({
     transform: [{ translateX: dx.get() }, { translateY: dy.get() }],
     opacity: 1 - Math.min(0.6, Math.abs(dx.get()) / (BANNER_WIDTH * s)),
   }));
-  // Resolve in beats: one line more every BEAT_MS, each ringing on the table the cards it names; reduced motion shows all.
+  // Resolve in beats: one line more every beat (banner-time.ts), each ringing on the table the cards it names; reduced motion shows all.
   const reduceMotion = useReduceMotion();
+  const speed = useStore(tableSettings, (state) => state.settings.animationSpeed);
   const [shownLines, setShownLines] = useState(reduceMotion ? moment.lines.length : 1);
   useEffect(() => {
     if (shownLines >= moment.lines.length) return;
-    const timer = setTimeout(() => setShownLines((count) => count + 1), BEAT_MS);
+    const timer = setTimeout(() => setShownLines((count) => count + 1), bannerBeatMs(speed));
     return () => clearTimeout(timer);
-  }, [shownLines, moment.lines.length]);
+  }, [shownLines, moment.lines.length, speed]);
   const beatCards = moment.lines[Math.max(0, shownLines - 1)]?.cards ?? [];
   const beatKey = beatCards.join(",");
   useEffect(() => {

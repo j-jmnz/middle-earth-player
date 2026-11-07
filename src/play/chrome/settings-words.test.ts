@@ -1,8 +1,8 @@
 import { describe, expect, it } from "vitest";
 
-import { alwaysCodes, alwaysRows, FOG_LIGHT_LINE, FOG_LINE, CONFIRM_TIME_WORDS, FOG_REDUCED_LINE, fogLine, TABLE_LIST_WORDS, NONE_YET, QUALITY_WORDS, REDUCE_MOTION_WORDS, SCALE_WORDS, SPEED_WORDS, THEME_LABELS, THEME_WORDS } from "./settings-words.ts";
+import { alwaysCodes, alwaysRows, BANNER_CLOSES_WORDS, FOG_LIGHT_LINE, FOG_LINE, CONFIRM_TIME_WORDS, FOG_REDUCED_LINE, fogLine, TABLE_LIST_WORDS, NONE_YET, QUALITY_WORDS, REDUCE_MOTION_WORDS, SCALE_WORDS, SPEED_WORDS, THEME_LABELS, THEME_WORDS } from "./settings-words.ts";
 import { SPEEDS } from "../../ui/motion-tokens.ts";
-import { CARD_QUALITY_OPTIONS, CONFIRM_TIME_OPTIONS, DEFAULT_SETTINGS, TABLE_LIST_OPTIONS, REDUCE_MOTION_OPTIONS, restoreDefaults, tableSettings, THEME_OPTIONS, UI_SCALE_OPTIONS } from "../../ui/table-settings.ts";
+import { BANNER_CLOSES_OPTIONS, CARD_QUALITY_OPTIONS, CONFIRM_TIME_OPTIONS, DEFAULT_SETTINGS, TABLE_LIST_OPTIONS, REDUCE_MOTION_OPTIONS, restoreDefaults, tableSettings, THEME_OPTIONS, UI_SCALE_OPTIONS } from "../../ui/table-settings.ts";
 
 const effects = [
   { id: "sam.ready", cardCode: "01015" },
@@ -40,6 +40,9 @@ describe("the words of each choice", () => {
     expect(Object.keys(SPEED_WORDS)).toEqual([...SPEEDS]);
     expect(Object.keys(TABLE_LIST_WORDS)).toEqual([...TABLE_LIST_OPTIONS]);
     expect(Object.keys(CONFIRM_TIME_WORDS)).toEqual([...CONFIRM_TIME_OPTIONS]);
+    expect(Object.keys(BANNER_CLOSES_WORDS)).toEqual([...BANNER_CLOSES_OPTIONS]);
+    expect(SPEED_WORDS.slow).toBe("Slow");
+    expect(BANNER_CLOSES_WORDS).toEqual({ timer: "After a few seconds", tap: "When tapped" });
     expect(Object.keys(QUALITY_WORDS)).toEqual([...CARD_QUALITY_OPTIONS]);
   });
 });

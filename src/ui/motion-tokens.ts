@@ -2,22 +2,28 @@
 // named here and nowhere else. Pure numbers and names, so a Vitest reads them and the canvas worklets share them
 // (motion/curves.ts draws a curve from a name; src/ui/motion-run.ts hands the same names to Reanimated).
 //
-// Every duration passes through `motionScale(speed, reduced)`: 1 for Normal, 0.6 for Quick, 0 under reduced motion (then
+// Every duration passes through `motionScale(speed, reduced)`: 1 for Normal, 0.6 for Quick, 1.5 for Slow, 0 under reduced motion (then
 // everything snaps). Each token is at most 500 ms; the sweep, the spotlight's hold and its whole run (phase 24), and the lives
 // of its ash are the exceptions.
 // What is not motion stays out of the scale: a gate or a timer (the top bar's 400 ms measure fallback, the dock's second-tap
 // window, the banner's beats, the 350 ms settle after a new moment) is not a token.
 
 /** The Animation speed setting (table-settings.ts). */
-export type Speed = "normal" | "quick";
+export type Speed = "normal" | "quick" | "slow";
 
-export const SPEEDS: readonly Speed[] = ["normal", "quick"];
+export const SPEEDS: readonly Speed[] = ["normal", "quick", "slow"];
 
-/** 1 for Normal, 0.6 for Quick, 0 under reduced motion. */
+/** 1 for Normal, 0.6 for Quick, 1.5 for Slow, 0 under reduced motion. */
 export function motionScale(speed: Speed, reduced: boolean): number {
   "worklet";
   if (reduced) return 0;
+  if (speed === "slow") return 1.5;
   return speed === "quick" ? 0.6 : 1;
+}
+
+/** How much longer the banner's beats and hold last: 1.5 for Slow, 1 otherwise (they are timers, not tokens, so Quick leaves them and reduced motion does not snap the hold). */
+export function paceScale(speed: Speed): number {
+  return speed === "slow" ? 1.5 : 1;
 }
 
 /** A token's length in ms at a scale, whole milliseconds. */

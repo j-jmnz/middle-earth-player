@@ -24,7 +24,7 @@ export type TableSettings = {
   guide: boolean;
   // How many times the guide has explained each step.
   guideSeen: Readonly<Record<string, number>>;
-  // Animation speed (src/ui/motion-tokens.ts, motionScale): Normal, or Quick at 0.6 of every length. Reduced motion snaps either.
+  // Animation speed (src/ui/motion-tokens.ts, motionScale): Normal, Quick at 0.6 of every length or Slow at 1.5. Reduced motion snaps all three.
   animationSpeed: Speed;
   // The combat spotlight (phase 24): when an attack deals or blocks damage the table plays it large. Off plays none, as reduced motion does.
   spotlight: boolean;
@@ -47,6 +47,8 @@ export type TableSettings = {
   tableAsList: TableListOption;
   // Confirm time: how long an armed two-tap button waits for its second tap (dock/armed-room.ts, armMs).
   confirmTime: ConfirmTimeOption;
+  // Banner closes: after a few seconds (readouts/banner-time.ts), or only when the player taps or swipes it, or a new moment replaces it.
+  bannerCloses: BannerClosesOption;
 };
 
 export const UI_SCALE_OPTIONS = ["small", "medium", "large"] as const;
@@ -59,13 +61,15 @@ export const TABLE_LIST_OPTIONS = ["system", "always"] as const;
 export type TableListOption = (typeof TABLE_LIST_OPTIONS)[number];
 export const CONFIRM_TIME_OPTIONS = ["standard", "long", "none"] as const;
 export type ConfirmTimeOption = (typeof CONFIRM_TIME_OPTIONS)[number];
+export const BANNER_CLOSES_OPTIONS = ["timer", "tap"] as const;
+export type BannerClosesOption = (typeof BANNER_CLOSES_OPTIONS)[number];
 export const CARD_QUALITY_OPTIONS = ["high", "low"] as const;
 export type CardQualityOption = (typeof CARD_QUALITY_OPTIONS)[number];
 
 // The stops the video uses: after staging ("the golden action window") and before the shadow card turns.
 export const DEFAULT_STOPS: readonly string[] = ["3.3", "shadow"];
 
-export const DEFAULT_SETTINGS: TableSettings = { stopsOn: false, stops: DEFAULT_STOPS, alwaysUse: [], highContrast: false, guide: true, guideSeen: {}, animationSpeed: "normal", spotlight: true, uiScale: "medium", haptics: true, reduceMotion: "system", keepAwake: true, theme: "dark", cardQuality: "high", fogDrift: true, tableAsList: "system", confirmTime: "standard" };
+export const DEFAULT_SETTINGS: TableSettings = { stopsOn: false, stops: DEFAULT_STOPS, alwaysUse: [], highContrast: false, guide: true, guideSeen: {}, animationSpeed: "normal", spotlight: true, uiScale: "medium", haptics: true, reduceMotion: "system", keepAwake: true, theme: "dark", cardQuality: "high", fogDrift: true, tableAsList: "system", confirmTime: "standard", bannerCloses: "timer" };
 
 /** Settings read back from storage: unknown keys dropped, missing ones defaulted, wrong types replaced. */
 export function parseSettings(raw: unknown): TableSettings {
@@ -94,6 +98,7 @@ export function parseSettings(raw: unknown): TableSettings {
     fogDrift: flag(value.fogDrift, DEFAULT_SETTINGS.fogDrift),
     tableAsList: TABLE_LIST_OPTIONS.find((option) => option === value.tableAsList) ?? DEFAULT_SETTINGS.tableAsList,
     confirmTime: CONFIRM_TIME_OPTIONS.find((option) => option === value.confirmTime) ?? DEFAULT_SETTINGS.confirmTime,
+    bannerCloses: BANNER_CLOSES_OPTIONS.find((option) => option === value.bannerCloses) ?? DEFAULT_SETTINGS.bannerCloses,
   };
 }
 

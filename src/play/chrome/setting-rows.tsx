@@ -7,10 +7,10 @@ import type { ReactNode } from "react";
 import { TextButton } from "../../ui/buttons.tsx";
 import { Segmented } from "../../ui/segmented.tsx";
 import { SettingSwitch } from "../../ui/setting-switch.tsx";
-import { ALWAYS_EMPTY_LINE, ALWAYS_LINE, AWAKE_LINE, CONFIRM_TIME_LINE, CONFIRM_TIME_WORDS, CONTRAST_LINE, fogLine, GUIDE_LINE, HAPTICS_LINE, NONE_YET, PERFORMANCE_LINE, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, TABLE_LIST_LINE, TABLE_LIST_WORDS, THEME_LABELS, THEME_LINE, THEME_WORDS, type AlwaysRow } from "./settings-words.ts";
+import { ALWAYS_EMPTY_LINE, BANNER_CLOSES_LINE, BANNER_CLOSES_WORDS, ALWAYS_LINE, AWAKE_LINE, CONFIRM_TIME_LINE, CONFIRM_TIME_WORDS, CONTRAST_LINE, fogLine, GUIDE_LINE, HAPTICS_LINE, NONE_YET, PERFORMANCE_LINE, QUALITY_LINE, QUALITY_WORDS, REDUCE_MOTION_LINE, REDUCE_MOTION_WORDS, SCALE_LINE, SCALE_WORDS, SPEED_LINE, SPEED_WORDS, SPOTLIGHT_LINE, STOPS_LINE, TABLE_LIST_LINE, TABLE_LIST_WORDS, THEME_LABELS, THEME_LINE, THEME_WORDS, type AlwaysRow } from "./settings-words.ts";
 import { SPEEDS } from "../../ui/motion-tokens.ts";
 import { useReduceMotion } from "../../ui/motion-run.ts";
-import { CARD_QUALITY_OPTIONS, CONFIRM_TIME_OPTIONS, REDUCE_MOTION_OPTIONS, TABLE_LIST_OPTIONS, THEME_OPTIONS, UI_SCALE_OPTIONS, type TableSettings } from "../../ui/table-settings.ts";
+import { BANNER_CLOSES_OPTIONS, CARD_QUALITY_OPTIONS, CONFIRM_TIME_OPTIONS, REDUCE_MOTION_OPTIONS, TABLE_LIST_OPTIONS, THEME_OPTIONS, UI_SCALE_OPTIONS, type TableSettings } from "../../ui/table-settings.ts";
 import { SectionHeading } from "../../ui/section-heading.tsx";
 import { useTheme } from "../../ui/theme.ts";
 import { useUiScale } from "../../ui/ui-scale.ts";
@@ -109,6 +109,9 @@ export function SettingsRows({
         <SettingGroup title="Motion and feel" testID={id("motion")} first={first && top === "motion"}>
           <SettingChoice title="Animation speed" detail={SPEED_LINE} testID={id("speed")}>
             <Segmented options={SPEEDS} value={settings.animationSpeed} onChange={(animationSpeed) => onChange({ animationSpeed })} testIDPrefix={id("speed")} accessibilityLabel="Animation speed" stretch words={SPEED_WORDS} />
+          </SettingChoice>
+          <SettingChoice title="Banner closes" detail={BANNER_CLOSES_LINE} testID={id("banner-closes")}>
+            <Segmented options={BANNER_CLOSES_OPTIONS} value={settings.bannerCloses} onChange={(bannerCloses) => onChange({ bannerCloses })} testIDPrefix={id("banner-closes")} accessibilityLabel="Banner closes" stretch words={BANNER_CLOSES_WORDS} />
           </SettingChoice>
           <SettingChoice title="Reduce motion" detail={REDUCE_MOTION_LINE} testID={id("reduce-motion")}>
             <Segmented options={REDUCE_MOTION_OPTIONS} value={settings.reduceMotion} onChange={(reduceMotion) => onChange({ reduceMotion })} testIDPrefix={id("reduce-motion")} accessibilityLabel="Reduce motion" stretch words={REDUCE_MOTION_WORDS} />

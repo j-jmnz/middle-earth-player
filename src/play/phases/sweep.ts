@@ -25,13 +25,13 @@ function order(point: PhasePoint): [number, number] {
 /**
  * The name to sweep when the game's phase went from `before` to `now`, or null. Only one of the round's seven phases is named
  * (not Setup, the Mulligan or the beginning and end of the round), and nothing sweeps:
- * - when the scale is not 1 (Quick or reduced motion);
+ * - when the scale is under 1 (Quick or reduced motion; Slow plays it, longer);
  * - when the new state moves cards or changes a count (`busy`): the title would cover the pops and turns on the player's row;
  * - when the phase went backward, which is Undo taking a phase back.
  */
 export function sweepName(before: PhasePoint, now: PhasePoint, scale: number, busy: boolean): string | null {
   if (before.phase === now.phase && before.round === now.round) return null;
-  if (scale !== 1 || busy || !ROUND_PHASES.includes(now.phase)) return null;
+  if (scale < 1 || busy || !ROUND_PHASES.includes(now.phase)) return null;
   const [roundWas, phaseWas] = order(before);
   const [roundNow, phaseNow] = order(now);
   if (roundNow < roundWas || (roundNow === roundWas && phaseNow < phaseWas)) return null;
