@@ -77,6 +77,8 @@ Values live in `src/screens/kit/palette.js`. `tailwind.config.js` maps them to u
 
 Contrast (`contrast.test.ts` checks every pair in both themes, and the words of a button on its tonal and tinted fills; body text needs 4.5:1, a graphic 3:1). Rivendell meets 4.5 on every text pair. Two Ringwraiths pairs are held at their real values: faint on pressed, 4.35:1 (faint sits on the pressed fill only for the moment of a press), and onThreat on threat, 3.10:1, used only for the large dial numerals. accentLine holds 3:1 against night and raised in both themes.
 
+Colour vision (`colour-vision.test.ts`): the sphere tints against one another and against threat, danger against ok and the glows against the ground must differ by CIEDE2000 10 or more under protanopia, deuteranopia and tritanopia simulation in both themes, or the pair is listed with the non-colour cue that carries it (a sphere icon beside its word, a sentence, a check ring); an entry nothing needs fails (WCAG 1.4.1).
+
 The table's copy of the tokens (`tokens.ts`) carries keys that are not colours of the palette: `lit` (the lit edge), `depth` ("dark" or "light": how surfaces.ts builds depth), `shade` (the shadow colour: black on Dark, a warm brown on Light) and `primaryTop`/`primaryMid` (the primary's lit top and middle).
 
 ## Surfaces
