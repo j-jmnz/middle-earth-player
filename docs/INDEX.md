@@ -67,7 +67,7 @@ Read the sections your task touches.
   - 241–273 Scenario definition (~800)
   - 274–294 Persistence (~1.4K)
   - 295–300 Images (~940) ← 6
-  - 301–351 Screens (~3.7K) ← 1
+  - 301–351 Screens (~3.7K) ← 2
   - 352–357 Catalog build (~410)
   - 358–375 Tests (~1.6K) ← 5
   - 376–391 Performance (~1.2K) ← 4
@@ -141,7 +141,7 @@ Read the sections your task touches.
   - 264–267 One answer, one tap (~240)
   - 268–271 Stops and Always use (~250)
   - 272–275 Guide (~120)
-  - 276–291 Choice tray (~4.9K) ← 19
+  - 276–291 Choice tray (~4.9K) ← 20
   - 292–306 Reading panels (~1.6K) ← 5
   - 307–316 Phase carousel (~680)
   - 317–322 Quest advance (~530) ← 1
@@ -221,9 +221,33 @@ Read when a task names the plan.
   - 155–174 Triggers and stat flags (~440)
   - 175–236 Patterns (~1.4K)
   - 237–273 Mechanic families: engine and records together (~1.4K) ← 1
-  - 274–286 Readings the review catches (~410) ← 3
+  - 274–286 Readings the review catches (~410) ← 4
   - 287–306 Not expressible yet: leave open, report (~390)
-- `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.4K tok)
+- `docs/plans/scenario-fast-track.md` — Plan: a fast track for scenarios, A/B-tested against the classic track (~3.6K tok)
+  - 3–35 Context (~840)
+    - 7–16 Where a scenario's time goes (~300)
+    - 17–24 What this plan does not change, and why (~200)
+    - 25–31 What other engines do that transfers (~150)
+    - 32–35 Expected gain (~70)
+  - 36–123 The fast track (~1.7K)
+    - 40–56 F1. Choice words as data beside the record (~480)
+    - 57–67 F2. Each record rendered as English and read fresh (~250)
+    - 68–80 F3. Card behaviour as spec rows (~310)
+    - 81–94 F4. Encounter-card smoke (~170) ← 1
+    - 95–117 F5. One author, a small context pack, rulings first, a quick loop (~330)
+    - 118–123 F6. A search player for the goldens (~130)
+  - 124–142 Order (~280)
+  - 143–183 The A/B: The Uruk-hai, both arms fresh (~500)
+    - 145–152 Arms (~130)
+    - 153–156 Rulings (~50)
+    - 157–163 Measures (~70)
+    - 164–167 Blind review (~60)
+    - 168–171 Cross-check (~60)
+    - 172–183 Decision (~120)
+  - 184–203 Verification (~200)
+    - 186–197 After each build step (~140)
+    - 198–203 The A/B (~60)
+- `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.3K tok)
   - 3–14 Context (~450)
   - 15–24 What does not move (~190)
   - 25–48 A. Effects: draft better, template the repeats, copy identical lines (~970)
@@ -233,8 +257,8 @@ Read when a task names the plan.
   - 84–92 E. Data: seed what can be seeded (~300)
   - 93–105 F. Faster feedback while authoring (~540)
   - 106–130 Where a scenario's cost is now (~760)
-  - 131–144 Next steps (~440)
-  - 145–156 After each scenario phase (~210)
+  - 131–144 Next steps (~390) ← 1
+  - 145–156 After each scenario phase (~210) ← 1
   - 157–160 Order (~70)
   - 161–168 Verification (~100)
 
@@ -247,7 +271,7 @@ Open work; read when a task names it.
   - 38–56 Files you own (edit freely) (~490)
   - 57–70 Shared files (~300)
   - 71–85 Approach (~680) ← 1
-  - 86–100 Scenario procedure (~620) ← 5
+  - 86–100 Scenario procedure (~620) ← 6
   - 101–110 Checkpoints (API usage limits can stop you mid-task) (~210)
   - 111–125 Checks before committing (~320)
   - 126–132 Merge (~140) ← 1

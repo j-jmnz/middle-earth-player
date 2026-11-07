@@ -139,7 +139,7 @@ Ordered by what they save per scenario. A step that is built is deleted from thi
    - Each one gets a card test, or a golden reaches it.
    - Exit: the list is empty or each entry has a card test.
 3. **The draft marks the Setup sentences the piles already carry out.** Not built. For a campaign card's Setup, `effects:draft` marks each sentence that the scenario's `scenarioPiles` or the Setup parser already carries out, so the author writes no record for it. Exit: the draft of a scenario whose Setup the piles carry lists no such sentence as open.
-4. **An encounter-card smoke.** Not built. In a seeded scene, it reveals each encounter card the scenario deals, resolves its Shadow in an attack and travels to each location. It reports any throw, refusal or stall, as `scripts/card-smoke/run.ts` does for player cards. `pnpm test:scenario` runs it. Exit: it passes on every playable scenario.
+4. **An encounter-card smoke.** Not built. Planned as F4 of `docs/plans/scenario-fast-track.md` (F4. Encounter-card smoke), which both tracks use.
 5. **The win finder** (section F). Not built. It is the only way the Dream-chaser win flows can run. Exit: a won fixture for each scenario in `docs/phases/STATUS.md`, Fixtures and Maestro.
 
 ## After each scenario phase
