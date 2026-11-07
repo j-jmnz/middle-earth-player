@@ -68,7 +68,7 @@ describe("the choice's rows at the phone's text size", () => {
     expect(wide.used).toBeLessThanOrEqual(wide.column);
   });
 
-  // Known gap (ACCESSIBILITY.md, Text size on a short phone): at font scale 2 the primary "Leave undefended" wraps to three lines in the 168 pt words and
+  // Known gap (ACCESSIBILITY.md, Known gaps): at font scale 2 the primary "Leave undefended" wraps to three lines in the 168 pt words and
   // "Cancel" and More take two rows, so with the title and one row the controls alone pass the column. Nothing may be cut to fit, so this stays
   // an expected failure until the dock has a way to hold it; it turns red the day it passes.
   it.fails("keeps the audit's worst moment inside the column at Medium and font scale 2, on 844x390 and 667x375", () => {

@@ -1,30 +1,28 @@
 # Privacy policy
 
-Middle Earth LCG collects no personal data. It has no accounts, no sign-in, no analytics, no advertising, no crash reporting of its own and no server. The maintainers receive nothing from the app. This policy covers the app on Android, iPhone, iPad and the web, in every build this repository publishes.
+Middle Earth LCG collects no personal data. No accounts, analytics, advertising, crash reporting of its own or server; the maintainers receive nothing from the app. This applies to every Android, iPhone, iPad and web build this repository publishes.
 
 ## What stays on your device
 
-Your campaigns, games, campaign logs, decks, notes and settings are saved only on your device, in the app's own storage (a SQLite database, `user.db`). Nothing is sent to the project or anyone else. Booklets or deck files you open with the system file picker are copied into that storage and stay there; the app reads only the file you choose.
+Campaigns, games, logs, decks, notes and settings are saved only in the app's own storage (a SQLite database, `user.db`). Booklets or deck files you open with the system file picker are copied there; the app reads only the file you pick.
 
-Your phone's own backup (iCloud, or Android's backup to Google) may include the app's saves, as it does for other apps. That copy goes to your account with Apple or Google, not to this project. Uninstalling the app deletes everything it saved.
+Your phone's backup (iCloud or Google) may include these saves; that copy goes to your Apple or Google account, not to this project. Uninstalling the app deletes everything it saved.
 
 ## When the app uses the network
 
-The phone app plays offline: its cards, rules, booklets and every card picture are inside it. It connects in one case only: when you import a deck from a RingsDB link, it sends [ringsdb.com](https://ringsdb.com), over HTTPS, the deck's id from the link and the code of any card in it that the app does not recognise.
+The phone app is offline. Its one connection: importing a deck from a RingsDB link sends [ringsdb.com](https://ringsdb.com), over HTTPS, the deck id and the code of any card the app does not recognise. RingsDB sees your IP address and a standard user agent, under its own privacy policy. No identifier, cookie, account or game data is added. If you never import from RingsDB, the phone app never connects.
 
-Like any web request, this shows RingsDB your IP address and a standard user agent, under RingsDB's own privacy policy. The app adds no identifier, cookie, account or game data. If you never import a deck from RingsDB, the phone app never connects.
-
-The web build carries no card pictures, so it also loads each picture it shows from [RingsDB](https://ringsdb.com), or the [Hall of Beorn](https://hallofbeorn.com) and DragnCards image storage on `s3.amazonaws.com`, with the same kind of request.
+The web build has no bundled pictures, so it also loads each card picture from [RingsDB](https://ringsdb.com), or the [Hall of Beorn](https://hallofbeorn.com) and DragnCards image storage on `s3.amazonaws.com`.
 
 ## Permissions
 
-On Android: `INTERNET` (the deck import) and `VIBRATE` (haptics). On iPhone and iPad: none. The app does not use the camera, microphone, location, contacts or photos.
+Android: `INTERNET` (deck import) and `VIBRATE` (haptics). iPhone and iPad: none. No camera, microphone, location, contacts or photos.
 
 ## Installing
 
-The project gets no data when you install the Android APK, or the iOS app with SideStore or AltStore. SideStore and AltStore sign the app with your Apple ID on your own device; they are separate projects with their own privacy policies, and your Apple ID never reaches this project.
+Installing the APK, or the iOS app through SideStore or AltStore, sends this project nothing. SideStore and AltStore sign the app with your Apple ID on your device, under their own privacy policies; your Apple ID never reaches this project.
 
-If you install through TestFlight instead, Apple handles that under [Apple's privacy policy](https://www.apple.com/legal/privacy/). If you choose to send feedback or a crash report through TestFlight, Apple passes it to the project's maintainer, who uses it only to fix the app.
+TestFlight installs are handled by Apple under [Apple's privacy policy](https://www.apple.com/legal/privacy/). Feedback or crash reports you send through TestFlight go to the maintainer and are used only to fix the app.
 
 ## Children
 
@@ -32,8 +30,8 @@ The app collects no data from anyone, children included.
 
 ## Checking this yourself
 
-The code is open, and [SECURITY.md](SECURITY.md) names the files behind each of these points. You can also inspect an APK from the Releases page with a tool such as [Exodus Privacy](https://reports.exodus-privacy.eu.org), which lists its permissions and any tracking libraries, or play a whole game with the phone in airplane mode.
+The code is open; [SECURITY.md](SECURITY.md) names the files behind each point. You can inspect a release APK with [Exodus Privacy](https://reports.exodus-privacy.eu.org), which lists permissions and tracking libraries, or play a game in airplane mode.
 
 ## Changes and contact
 
-A change to this policy is made in this file, and its history is in the repository's commits. Questions go to the repository's [issues](https://github.com/j-jmnz/middle-earth-lcg/issues); report a security problem privately, as [SECURITY.md](SECURITY.md) says.
+Changes to this policy are made in this file; its history is in the commits. Questions: [issues](https://github.com/j-jmnz/middle-earth-lcg/issues). Security problems: report privately as [SECURITY.md](SECURITY.md) says.
