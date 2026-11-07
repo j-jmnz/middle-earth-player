@@ -54,7 +54,7 @@ Read the sections your task touches.
   - 208–217 Documentation (~170)
   - 218–235 Attribution (~470)
   - 236–239 License (~50)
-- `docs/architecture.md` — Architecture (~20.1K tok)
+- `docs/architecture.md` — Architecture (~20.3K tok)
   - 7–41 Stack (~1.1K)
   - 42–77 Processes (~680)
   - 78–160 Modules (~2.2K) ← 3
@@ -69,7 +69,7 @@ Read the sections your task touches.
   - 295–300 Images (~940) ← 6
   - 301–351 Screens (~3.7K) ← 2
   - 352–357 Catalog build (~410)
-  - 358–375 Tests (~1.6K) ← 5
+  - 358–375 Tests (~1.7K) ← 5
   - 376–391 Performance (~1.2K) ← 4
 - `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~81.8K tok)
   - 17–38 Sections (~410)
