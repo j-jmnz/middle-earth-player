@@ -63,6 +63,58 @@ After those come the remaining official cycles, saga boxes and standalone scenar
 
 The stack is Expo SDK 58, Expo Router, Skia for the game table, Reanimated, NativeWind, SQLite through Drizzle, Zustand and Zod. [docs/architecture.md](docs/architecture.md) covers the module layout, state, the engine and the test layers.
 
+## Install
+
+The app is not listed on the Play Store or the App Store. Android phones and tablets install it from this repository's [Releases page](https://github.com/j-jmnz/middle-earth-lcg/releases); iPhones and iPads install the same release with SideStore or AltStore, which sign it with your own Apple ID. It's free either way, and once installed it needs no network: every card, picture and booklet is inside the app.
+
+### What you need
+
+- Android: Android 7.0 or later on a 64-bit phone or tablet (nearly every device sold since 2017).
+- iPhone or iPad: iOS or iPadOS 15.1 or later, a free Apple ID, and SideStore or AltStore Classic. Setting either up takes a computer once; AltStore also needs its computer app, AltServer, to refresh the app each week.
+- Room for a large download. The app carries every card picture and booklet, so download it over Wi-Fi and keep at least twice its size free while it installs.
+
+### Android
+
+1. On your phone, open the [latest release](https://github.com/j-jmnz/middle-earth-lcg/releases/latest) and, under Assets, tap the file named `middle-earth-lcg-v<version>.apk`. Leave the `.sha256` file; it is only for checking the download.
+2. When the download finishes, open it from the browser's downloads or from your Files app.
+3. The first time, Android asks whether this app (your browser or Files) may install unknown apps. Tap Settings, turn on Allow from this source, then go back.
+4. Tap Install. If Google Play Protect warns that it doesn't know the app, tap More details, then Install anyway: the app is signed by this project, not reviewed by Google.
+5. Open Middle Earth LCG from your app drawer.
+
+To update, install the newer release's `.apk` the same way. It installs over the old one and keeps your campaigns, decks and settings. Don't uninstall first: uninstalling deletes your saves.
+
+### iPhone and iPad
+
+Apple only lets apps outside the App Store onto an iPhone signed by an Apple ID. SideStore and AltStore do that signing on your device with your own free Apple ID, so nothing goes through Apple's review.
+
+1. Set up [SideStore](https://sidestore.io) (it refreshes apps on the phone itself) or [AltStore Classic](https://altstore.io) (it refreshes through AltServer on a Mac or PC on the same Wi-Fi), following its own guide. Use AltStore Classic, not AltStore PAL: PAL installs only apps from its own marketplace.
+2. If iOS asks, turn on Developer Mode in Settings, Privacy & Security, and restart. iOS 16 and later ask for it before running an app signed with a free Apple ID.
+3. In SideStore or AltStore, open Sources, tap +, and add `https://github.com/j-jmnz/middle-earth-lcg/releases/latest/download/source.json`.
+4. Open the Middle Earth LCG source and tap the app's Free or Get button. It installs and appears on your home screen.
+
+Instead of the source, you can download the `.ipa` from the [latest release](https://github.com/j-jmnz/middle-earth-lcg/releases/latest) in Safari and add it from SideStore's or AltStore's My Apps, +.
+
+An app signed with a free Apple ID lasts 7 days, then has to be refreshed: SideStore and AltStore do it in the background, or tap Refresh All in My Apps. If the app stops opening, refresh it; your campaigns are kept. New releases show in the source as updates, and updating keeps your campaigns too. A free Apple ID holds 3 sideloaded apps at a time, SideStore or AltStore included. Deleting the app deletes your saves.
+
+Some releases are also on TestFlight. When a release's notes give a TestFlight link, you can join that instead: install [TestFlight](https://apps.apple.com/app/testflight/id899247664), open the link on the device, tap Accept, then Install. A TestFlight build needs no refreshing but stops opening 90 days after it was published.
+
+### Check a download (optional)
+
+Each release's notes give the APK's SHA-256 and the fingerprint of the certificate it is signed with. To check the file on a computer, compare the notes' SHA-256 with the output of `sha256sum middle-earth-lcg-v<version>.apk` (Linux), `shasum -a 256 middle-earth-lcg-v<version>.apk` (macOS) or `certutil -hashfile middle-earth-lcg-v<version>.apk SHA256` (Windows).
+
+### If something goes wrong
+
+- "App not installed" on Android: the phone is 32-bit or older than Android 7.0, there isn't enough free space, or a copy of the app you built yourself is installed. A self-built copy is signed with a different key: uninstall it first (its saves go with it).
+- The download stops or the file won't open: download it again over Wi-Fi; a partial file can't be installed.
+- The app won't open on an iPhone or iPad after a few days: its 7-day signature ran out. Refresh it in SideStore or AltStore (for AltStore, with AltServer running on the same Wi-Fi).
+- SideStore or AltStore says you have reached the app limit: a free Apple ID allows 3 sideloaded apps at once; remove one you don't use.
+- A TestFlight link says the beta is full or not accepting testers: install with SideStore or AltStore instead.
+- Anything else: [open an issue](https://github.com/j-jmnz/middle-earth-lcg/issues) with your device, its Android or iOS version, and the app version shown in Settings.
+
+### Privacy
+
+The app collects no personal data: no accounts, analytics or ads, and your saves never leave your device. [PRIVACY.md](PRIVACY.md) has the details, and Settings, About links to it.
+
 ## Local setup
 
 ### Requirements
@@ -135,6 +187,8 @@ The end-to-end flows are in `.maestro/scenarios/<scenario-id>/` and `.maestro/fe
 | `pnpm scenario:new <scenario-id>` | Writes the skeleton files for a new scenario and registers it. `--dry-run` lists the files first. |
 | `pnpm catalog:build` | Writes `assets/catalog.db` (never committed) and `src/catalog/version.ts` (committed). |
 | `pnpm scans:pack` / `pnpm booklets:pack` | Packs card pictures and the booklet PDFs into `assets/` for the native bundle. |
+| `pnpm release:plan --dry-run` | Prints the next release tag and its notes from the commits since the last tag (`git fetch --tags` first). Changes nothing. |
+| `pnpm release:source --tag <tag> --ipa <file> --notes <file> --out <file>` | Writes the SideStore and AltStore source for a release; the release workflow runs it. |
 | `pnpm commit:check "<subject>"` | Checks commit subjects against `.claude/rules/commit-standards.md`. `--range <base>..<head>` checks a range of commits. `pnpm install` installs it as the `commit-msg` hook (`.githooks/`). |
 | `pnpm move <old> <new>` | Moves files and rewrites every import and path that refers to them. `--dry-run` first. |
 | `pnpm docs:index` / `pnpm docs:section <file> "<heading>"` | Regenerates `docs/INDEX.md` / prints one doc section. |
@@ -152,6 +206,7 @@ Contributions are welcome. [CONTRIBUTING.md](CONTRIBUTING.md) covers the checks 
 - [docs/brief.md](docs/brief.md): product decisions and the rules the engine implements.
 - [docs/architecture.md](docs/architecture.md): code layout, state, the engine and tests.
 - [docs/design-system.md](docs/design-system.md) and [docs/design-system-table.md](docs/design-system-table.md): the look of the screens and the game table.
+- [docs/releasing.md](docs/releasing.md): how a release is cut and shipped; the rules are in [.claude/rules/release-standards.md](./.claude/rules/release-standards.md).
 - [docs/phases/STATUS.md](docs/phases/STATUS.md): progress and open work.
 - [docs/INDEX.md](docs/INDEX.md): a generated index of every doc, by section.
 

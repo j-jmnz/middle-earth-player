@@ -13,7 +13,7 @@ At build time, only `pnpm data:sync` uses the network. It fetches the sources li
 ## Supply chain
 
 - `pnpm-lock.yaml` is committed, and CI installs with `--frozen-lockfile`.
-- CI (`.github/workflows/test.yml`) runs with a read-only token, so a pull request from a fork cannot write to the repository. Every action is pinned to a commit SHA, not a tag.
+- CI (`.github/workflows/test.yml`) runs with a read-only token, so a pull request from a fork cannot write to the repository. Every action it and the release workflow (`.github/workflows/release.yml`, which holds the signing keys) use is pinned to a commit SHA, not a tag.
 - Dependabot (`.github/dependabot.yml`) opens weekly update pull requests for the npm packages and the actions. They pass the same CI as any other change.
 - No secret, signing key or keystore is committed.
 

@@ -87,6 +87,9 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 
 ## Open items
 
+### Releases
+- The Android release key is not set up (`docs/releasing.md`, Android key), so no release has been cut; the release workflow has not run yet, dry run first. TestFlight (optional) is not set up.
+
 ### Fixtures and Maestro
 - `wilderland-won` is not committed: none of 100 seeds (and 750 more under five other policies) wins The Fate of Wilderland with the starter decklists. Until it exists `.maestro/scenarios/the-fate-of-wilderland/the-fate-of-wilderland.yaml` cannot run.
 - `gundabad-won` is not committed: none of 100 seeds wins Mount Gundabad with the starter decklists; the hero carrying Wormsbane leaves play in the first rounds or threat runs out. Until it exists `.maestro/scenarios/mount-gundabad/mount-gundabad.yaml` cannot run.

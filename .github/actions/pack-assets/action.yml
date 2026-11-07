@@ -1,0 +1,29 @@
+name: Pack the app's assets
+description: Installs the dependencies and packs the catalog, the booklets and every card picture into assets/, as each native release build needs (docs/releasing.md, Jobs).
+
+runs:
+  using: composite
+  steps:
+    - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.3.0
+    - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+      with:
+        node-version: 22
+        cache: pnpm
+    # pdftoppm renders the campaign, boon and burden cards from FFG's PDFs (scripts/build/pack-scans.ts).
+    - if: runner.os == 'Linux'
+      shell: bash
+      run: sudo apt-get update -q && sudo apt-get install -y -q poppler-utils
+    - if: runner.os == 'macOS'
+      shell: bash
+      run: brew install poppler
+    - shell: bash
+      run: pnpm install --frozen-lockfile
+    # pack-scans keeps a packed picture while its pin is unchanged, so an earlier run's assets/scans saves the downloads.
+    - uses: actions/cache@0057852bfaa89a56745cba8c7296529d2fc39830 # v4.3.0
+      with:
+        path: assets/scans
+        key: scans-${{ runner.os }}-${{ hashFiles('data/sources.json', 'scripts/build/pack-scans.ts', 'src/screens/art/crop.ts') }}
+        restore-keys: scans-${{ runner.os }}-
+    - name: Catalog, booklets and pictures
+      shell: bash
+      run: pnpm catalog:build && pnpm booklets:pack && pnpm scans:pack --quiet

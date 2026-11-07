@@ -40,6 +40,7 @@ Every agent that changes code follows these. `docs/architecture.md` (State, Pers
 
 - Keep the behaviour the user sees exactly: the spotlight gate, skip, Back, the haptics, the banner wait, Undo and relaunch replay. If a speed-up cannot be had without changing one, stop and ask the user. Do not work around it silently.
 - Measure a speed-up before and after with a scratch script in the session scratchpad, and report both numbers. The script is not committed.
+- A change that makes the app send, store or share anything it did not before (a new request, a new kind of saved data, an SDK) updates `PRIVACY.md` in the same change.
 - `src/screens` imports nothing from `src/rules`. The lint zones (`pnpm lint`) decide where a new helper lives.
 - A hand-written `.ts` or `.tsx` file has one job. Past roughly 300 lines it needs a single reason to stay together; past 500 it is split along behavior, not by an arbitrary line cut. `scripts/checks/file-size.test.ts` holds the 500: it lists the files over it, none may grow, and one back under the limit fails as stale. `pnpm test:scenario` runs it.
 - Match the surrounding code: dense `//` comments that say what the code does now, sentence case, rule ids and docs cited, the same naming. A comment cites a doc by file and section heading, never by line number, and does not narrate what the code used to do. Update `docs/architecture.md` (and `docs/design-system.md`, or `docs/design-system-table.md` for the table, for anything visible) wherever the change touches what they say, following `.claude/rules/docs-standards.md`.

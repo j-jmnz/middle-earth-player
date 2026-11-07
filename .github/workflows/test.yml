@@ -3,6 +3,8 @@ name: test
 on:
   push:
   pull_request:
+  # The release workflow runs the same checks on the commit it releases.
+  workflow_call:
 
 # Read-only token: pull requests from forks run with no write access. Actions are pinned to a commit, not a
 # movable tag; Dependabot (.github/dependabot.yml) proposes the updates.
@@ -10,7 +12,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: test-${{ github.ref }}
+  group: ${{ github.workflow }}-test-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
