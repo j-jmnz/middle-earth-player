@@ -80,11 +80,11 @@ export function IconButton({
 }
 
 /** The glass capsule for a word (History, Manage, Import, Packs): 44 pt tall, body type in muted. */
-export function PillButton({ label, onPress, testID, accessibilityLabel }: { label: string; onPress: () => void; testID: string; accessibilityLabel?: string }) {
+export function PillButton({ label, onPress, testID, accessibilityLabel, accessibilityHint }: { label: string; onPress: () => void; testID: string; accessibilityLabel?: string; accessibilityHint?: string }) {
   const t = useTableTokens();
   const s = useUiScale();
   return (
-    <Pressable testID={testID} collapsable={false} accessibilityRole="button" accessibilityLabel={accessibilityLabel ?? label} onPress={onPress}>
+    <Pressable testID={testID} collapsable={false} accessibilityRole="button" accessibilityLabel={accessibilityLabel ?? label} accessibilityHint={accessibilityHint} onPress={onPress}>
       {({ pressed }) => (
         <View style={{ minHeight: touch(s, 44), minWidth: touch(s, 44), borderRadius: CONTROL_RADIUS, paddingHorizontal: 14 * s, alignItems: "center", justifyContent: "center", ...glassSurface(pressed, t) }}>
           <Text className="text-body" style={{ color: t.muted }}>
@@ -105,6 +105,7 @@ export function SearchField({
   accessibilityLabel,
   accessibilityHint,
   search = true,
+  minWidth,
 }: {
   value: string;
   onChangeText: (next: string) => void;
@@ -115,11 +116,13 @@ export function SearchField({
   accessibilityHint?: string;
   // False for a field that takes a value rather than searching (a RingsDB link): no magnifier.
   search?: boolean;
+  // The narrowest the field gets: in a row that wraps, the field then moves to its own line instead of shrinking to nothing.
+  minWidth?: number;
 }) {
   const palette = usePalette();
   const t = useTableTokens();
   return (
-    <View className="min-h-touch min-w-0 flex-1 flex-row items-center gap-2.5 rounded-control px-4" style={sunkSurface(t)}>
+    <View className="min-h-touch min-w-0 flex-1 flex-row items-center gap-2.5 rounded-control px-4" style={minWidth == null ? sunkSurface(t) : { ...sunkSurface(t), minWidth }}>
       {search ? <Magnifier color={palette.faint} /> : null}
       <TextInput
         testID={testID}
@@ -170,6 +173,7 @@ export function ToggleChip({
       collapsable={false}
       accessibilityRole={asSwitch ? "switch" : "button"}
       {...(selected == null ? {} : { accessibilityState: asSwitch ? { checked: selected } : { selected } })}
+      {...(selected != null && asSwitch ? { "aria-checked": selected } : {})}
       accessibilityLabel={accessibilityLabel ?? label}
       onPress={onPress}
       onLayout={onLayout}

@@ -8,13 +8,14 @@ import Animated, { FadeIn, FadeOut, useAnimatedStyle, useSharedValue, withSequen
 
 // Split by platform (Skia on a phone, CSS on the web), so imported without its extension.
 import { ArcRing } from "../../ui/arc-ring";
+import { useFocusRing } from "../../ui/focus-ring.ts";
 import { GameIcon } from "../../ui/game-icon.tsx";
 import type { IconName } from "../../ui/icon-map.ts";
 import type { LogMark } from "../store/log.ts";
 import { layoutAnim, springConfig, timing, useMotionScale } from "../../ui/motion-run.ts";
 import { MOTION, SHAPE } from "../../ui/motion-tokens.ts";
 import { HEADING_HINT, headingArcs, headingDelta, headingDeltaWords, headingLook, headingWords, type HeadingStep } from "../dream-chaser/heading.ts";
-import { dialName, type DialRole } from "../store/peek.ts";
+import { dialSpeech, type DialRole } from "../store/peek.ts";
 import type { SeatThreat } from "../store/selectors.ts";
 import { threatDelta, threatDeltaWords, threatLevel, threatMeter, type ThreatLevel } from "../readouts/threat-level.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
@@ -49,6 +50,7 @@ export function ThreatRing({
   icon = "threat",
   compact = false,
   accessibilityName,
+  spokenWord,
   role = null,
   hint = null,
   elimination = true,
@@ -64,6 +66,9 @@ export function ThreatRing({
   compact?: boolean;
   // What a screen reader says for a short label ("P1" reads "Player 1 threat").
   accessibilityName?: string;
+  // A seat's threat dial speaks its number first, as it is drawn ("Threat 20, P1, acting"; peek.ts, dialSpeech): the word before the number.
+  // Other dials say their name and the number.
+  spokenWord?: string;
   // How the dial reads in two-handed play (peek.ts, `seatDial`). "acting", the seat the engine is asking: an accent label, and the dial pulses
   // when the engine turns to it. "viewing", the seat the player is peeking at, which is not the acting one: a bone ring round the dial
   // and a small eye mark. Both are in the screen reader's name. null: neither, and every dial of a solo game.
@@ -83,7 +88,7 @@ export function ThreatRing({
 }) {
   const s = useUiScale();
   const id = testID ?? `threat-${threat.seat}`;
-  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} onPress={onPress} />;
+  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} spokenWord={spokenWord} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} onPress={onPress} />;
   return (
     <View testID={id} accessible accessibilityLabel={`${label} ${threat.threat}`} className="items-center">
       <View className="h-12 w-12 items-center justify-center rounded-control">
@@ -105,6 +110,7 @@ function ThreatDial({
   id,
   icon,
   name,
+  spokenWord,
   role,
   hint,
   elimination,
@@ -118,6 +124,7 @@ function ThreatDial({
   id: string;
   icon: IconName | null;
   name: string;
+  spokenWord?: string;
   role: DialRole;
   hint: string | null;
   elimination: boolean;
@@ -129,6 +136,7 @@ function ThreatDial({
   const speed = useMotionScale();
   const t = useTableTokens();
   const s = useUiScale();
+  const focus = useFocusRing();
   const badge = useMemo(() => ({ in: layoutAnim(FadeIn, MOTION.threatBadgeIn, speed), out: layoutAnim(FadeOut, MOTION.threatBadgeOut, speed) }), [speed]);
   const level = elimination ? threatLevel(threat.threat) : "calm";
   const look = threat.eliminated ? { edge: t.hairline, fill: t.night, meter: t.hairline } : elimination ? dialOf(t)[level] : { edge: t.accent, fill: t.night, meter: t.accent };
@@ -166,16 +174,17 @@ function ThreatDial({
   const engaging = ticks.filter((cost) => cost <= threat.threat).length;
   const tickWords = ticks.length === 0 ? "" : ticks.length === 1 ? `, the enemy in staging ${engaging === 1 ? "engages" : "does not engage"} at this threat` : `, ${engaging} of the ${ticks.length} enemies in staging engage at this threat`;
   // The dial is one control with one name (the change badge's words included), so Android gives it one focus stop.
-  const dialWords = `${role ? `${dialName(name, role)},` : name} ${threat.threat}${threat.eliminated ? ", eliminated" : critical ? ", near elimination" : ""}${tickWords}${ring ? `. ${ring}` : ""}${deltaWords ? `. ${deltaWords}` : ""}`;
+  const dialWords = `${spokenWord ? dialSpeech(spokenWord, threat.threat, label, role) : `${name} ${threat.threat}`}${threat.eliminated ? ", eliminated" : critical ? ", near elimination" : ""}${tickWords}${ring ? `. ${ring}` : ""}${deltaWords ? `. ${deltaWords}` : ""}`;
   return (
     <Pressable
+      {...focus.props}
       disabled={!onPress}
       onPress={onPress}
       accessible
       accessibilityRole={onPress ? "button" : undefined}
       accessibilityLabel={dialWords}
       accessibilityHint={onPress ? (hint ?? "Shows each enemy's engagement cost against your threat") : undefined}
-      style={({ pressed }) => ({ minHeight: touch(s, 44), flexDirection: "row", alignItems: "center", gap: 6 * s, paddingHorizontal: 4 * s, borderRadius: 999, backgroundColor: pressed ? withAlphaHex(t.bone, 0.12) : "transparent" })}
+      style={({ pressed }) => ({ minHeight: touch(s, 44), flexDirection: "row", alignItems: "center", gap: 6 * s, paddingHorizontal: 4 * s, borderRadius: 999, backgroundColor: pressed ? withAlphaHex(t.bone, 0.12) : "transparent", ...focus.style })}
     >
       <Animated.View style={pop}>
         <View testID={id} style={{ width: DIAL * s, height: DIAL * s, borderRadius: (DIAL / 2) * s, boxShadow: threat.eliminated ? undefined : `0 0 22px ${withAlphaHex(t.threat, critical ? 0.6 : 0.4)}` }}>
@@ -262,6 +271,7 @@ export function HeadingDial({ step, compact = false, onPress }: { step: HeadingS
   const speed = useMotionScale();
   const t = useTableTokens();
   const s = useUiScale();
+  const ring = useFocusRing();
   const badge = useMemo(() => ({ in: layoutAnim(FadeIn, MOTION.threatBadgeIn, speed), out: layoutAnim(FadeOut, MOTION.threatBadgeOut, speed) }), [speed]);
   const look = headingLook(step);
   const color = t[look.tone];
@@ -293,13 +303,14 @@ export function HeadingDial({ step, compact = false, onPress }: { step: HeadingS
   ) : null;
   return (
     <Pressable
+      {...ring.props}
       disabled={!onPress}
       onPress={onPress}
       accessible
       accessibilityRole={onPress ? "button" : undefined}
       accessibilityLabel={words}
       accessibilityHint={onPress ? HEADING_HINT : undefined}
-      style={({ pressed }) => ({ minHeight: touch(s, 44), flexDirection: "row", alignItems: "center", gap: 6 * s, paddingHorizontal: 4 * s, borderRadius: 999, backgroundColor: pressed ? withAlphaHex(t.bone, 0.12) : "transparent" })}
+      style={({ pressed }) => ({ minHeight: touch(s, 44), flexDirection: "row", alignItems: "center", gap: 6 * s, paddingHorizontal: 4 * s, borderRadius: 999, backgroundColor: pressed ? withAlphaHex(t.bone, 0.12) : "transparent", ...ring.style })}
     >
       <Animated.View style={pop}>
         <View testID="heading" style={{ width: DIAL * s, height: DIAL * s, borderRadius: (DIAL / 2) * s }}>

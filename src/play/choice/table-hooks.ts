@@ -6,7 +6,7 @@ import { useStore } from "zustand";
 
 import { setBeat, type BeatStore } from "../store/beat-store.ts";
 import { stageText } from "../readouts/objective.ts";
-import { BEAT_MS, intentWords, momentOf, roundSummary, takenBack, type Moment } from "../store/outcome.ts";
+import { intentWords, momentOf, roundSummary, takenBack, type Moment } from "../store/outcome.ts";
 import { guideLine } from "../phases/reference.ts";
 import type { Sheet, SheetNames } from "./sheet-types.ts";
 import { followAnswers, passableWindow, tableAnswer, usableIds, type StopSettings } from "../phases/stops.ts";
@@ -16,11 +16,8 @@ import { fateNames } from "../words/fate-beats.ts";
 import { mustBypassLead } from "../words/gundabad-beats.ts";
 import type { LegalIntent, ReduceContext, ScenarioState, TableMoment, TableStore } from "../store/store.ts";
 import { tableSettings, type TableSettings } from "../../ui/table-settings.ts";
+import { momentHoldMs, summaryHoldMs } from "../readouts/banner-time.ts";
 import { useSpotlightHold } from "../spotlight/use-spotlight.ts";
-
-// How long the outcome banner stays up once every line is shown; the log keeps it. Each line before the last takes a beat
-// (outcome.ts, BEAT_MS).
-const MOMENT_MS = 4500;
 
 /**
  * The banner over the table: the last moment worth showing (store.ts, `shown`), line by line, then the round's summary when
@@ -31,6 +28,9 @@ const MOMENT_MS = 4500;
 export function useBanner(store: TableStore, ctx: ReduceContext, names: SheetNames, beats: BeatStore): { banner: Moment | null; bannerKey: string; onBeat: (cards: readonly string[]) => void; dismiss: () => void } {
   const shown = useStore(store, (state) => state.shown);
   const spotlit = useSpotlightHold(store);
+  // How long it stays, or whether only the player closes it (banner-time.ts).
+  const speed = useStore(tableSettings, (state) => state.settings.animationSpeed);
+  const closes = useStore(tableSettings, (state) => state.settings.bannerCloses);
   const [closedMoment, setClosedMoment] = useState(0);
   const [closedSummary, setClosedSummary] = useState(0);
   // A shadow card's printed shadow line, for the banner.
@@ -80,14 +80,18 @@ export function useBanner(store: TableStore, ctx: ReduceContext, names: SheetNam
   // The banner stays up for its beats (one line at a time) and then a while to read; the summary follows it.
   useEffect(() => {
     if (!shown || !momentOpen || !said) return;
-    const timer = setTimeout(() => setClosedMoment(shown.seq), MOMENT_MS + said.lines.length * BEAT_MS);
+    const hold = momentHoldMs(speed, closes, said.lines.length);
+    if (hold == null) return;
+    const timer = setTimeout(() => setClosedMoment(shown.seq), hold);
     return () => clearTimeout(timer);
-  }, [shown, momentOpen, said]);
+  }, [shown, momentOpen, said, speed, closes]);
   useEffect(() => {
     if (!shown || !summaryOpen) return;
-    const timer = setTimeout(() => setClosedSummary(shown.seq), MOMENT_MS);
+    const hold = summaryHoldMs(speed, closes);
+    if (hold == null) return;
+    const timer = setTimeout(() => setClosedSummary(shown.seq), hold);
     return () => clearTimeout(timer);
-  }, [shown, summaryOpen]);
+  }, [shown, summaryOpen, speed, closes]);
   const onBeat = useCallback((cards: readonly string[]) => setBeat(beats, cards), [beats]);
   // A swipe closes what the banner shows now: the moment (its round summary then follows) or the summary.
   const seq = shown?.seq ?? 0;

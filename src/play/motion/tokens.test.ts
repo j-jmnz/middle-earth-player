@@ -13,8 +13,10 @@ describe("motionScale", () => {
   it("is 1 for Normal, 0.6 for Quick and 0 under reduced motion", () => {
     expect(motionScale("normal", false)).toBe(1);
     expect(motionScale("quick", false)).toBe(0.6);
+    expect(motionScale("slow", false)).toBe(1.5);
     expect(motionScale("normal", true)).toBe(0);
     expect(motionScale("quick", true)).toBe(0);
+    expect(motionScale("slow", true)).toBe(0);
   });
 
   it("scales a token to whole milliseconds, and to nothing under reduced motion", () => {
@@ -54,6 +56,7 @@ describe("the tokens", () => {
     expect(MOTION.spotlight.ms).toBe(3200);
     expect(ms(MOTION.spotlight, motionScale("normal", false))).toBe(3200);
     expect(ms(MOTION.spotlight, motionScale("quick", false))).toBe(1920);
+    expect(ms(MOTION.spotlight, motionScale("slow", false))).toBe(4800);
     // Reduced motion plays none.
     expect(ms(MOTION.spotlight, motionScale("normal", true))).toBe(0);
     expect(SPOTLIGHT_BEATS.map((name) => MOTION[name].ms)).toEqual([350, 300, 350, 120, 100, 480, 1000, 500]);

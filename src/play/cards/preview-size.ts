@@ -1,5 +1,7 @@
 // How large the long-press preview (card-preview.tsx) draws a card. Pure, so tests read it in Node.
 
+import { touch } from "../../ui/ui-scale.ts";
+
 // Width over height of a printed card.
 const CARD_ASPECT = 0.705;
 
@@ -16,6 +18,30 @@ export function previewSize(width: number, height: number, landscape: boolean, s
   }
   const w = Math.min(roomW - 16, roomH * CARD_ASPECT, 440);
   return { width: Math.round(w * scale), height: Math.round((w / CARD_ASPECT) * scale) };
+}
+
+// The tokens line under an upright card (docs/design-system-table.md, Cards): body type on a 20 pt line, about 7.2 pt a character, two lines
+// at the phone's default text size.
+const TOKEN_LINE_PX = 20;
+const TOKEN_CHAR_PT = 7.2;
+
+/**
+ * The lines the tokens line takes in `width` screen points: two (its cap) at the phone's default text size, as many as its words fill at a
+ * larger one (`text`, the font scale), where the cap is lifted (card-preview.tsx).
+ */
+export function tokenLines(tokens: string, width: number, scale = 1, text = 1): number {
+  if (text <= 1) return 2;
+  const chars = Math.max(8, Math.floor(width / scale / (TOKEN_CHAR_PT * text)));
+  return Math.max(1, Math.ceil(tokens.length / chars));
+}
+
+/**
+ * The height the strip under an upright card takes, in screen points: the row of the cards with it (a 44 pt target and its 16 pt gap) and
+ * the tokens line (12 pt above it and `tokenRows` lines of it, each as tall as the phone's text size makes it). The card gives it up
+ * (`previewSize`), so a taller line at a larger text size takes it from the card, never from the controls.
+ */
+export function previewStrip(a: { chips: boolean; tokenRows: number }, scale = 1, text = 1): number {
+  return (a.chips ? touch(scale, 44) + 16 * scale : 0) + (a.tokenRows > 0 ? 12 * scale + a.tokenRows * TOKEN_LINE_PX * scale * text : 0);
 }
 
 /**

@@ -22,7 +22,7 @@ export default function Cards() {
   const preview = useListPreview();
   const header = (
     <HubHeader title="Cards">
-      <PillButton label="Packs" testID="packs-open" accessibilityLabel="Browse cards by pack" onPress={() => router.push("/packs")} />
+      <PillButton label="Packs" testID="packs-open" accessibilityHint="Browse the cards by pack" onPress={() => router.push("/packs")} />
     </HubHeader>
   );
   if (size !== "expanded") return <CardPool adding={false} header={header} />;

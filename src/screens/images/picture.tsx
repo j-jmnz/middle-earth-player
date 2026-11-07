@@ -4,6 +4,7 @@ import { View } from "react-native";
 
 import { cardCorner } from "../../ui/card-corner";
 import { CardImage } from "../../ui/card-image";
+import { DECORATIVE_ALT } from "../../ui/decorative";
 import { cachePolicyFor } from "../../ui/image-cache";
 
 import { shownCardImage } from "./policy";
@@ -59,7 +60,7 @@ export function InspectCardImage({
   width: number;
   height: number;
 }) {
-  return <Image recyclingKey={code} contentFit="contain" accessible accessibilityRole="image" accessibilityLabel={name} cachePolicy={cachePolicyFor(source)} source={source} style={{ width, height }} />;
+  return <Image recyclingKey={code} contentFit="contain" accessible accessibilityRole="image" accessibilityLabel={name} aria-label={name} cachePolicy={cachePolicyFor(source)} source={source} style={{ width, height }} />;
 }
 
 export function CoverCardImage({
@@ -79,6 +80,7 @@ export function CoverCardImage({
       contentFit="cover"
       contentPosition={focusTop}
       accessible={false}
+      accessibilityLabel={DECORATIVE_ALT}
       cachePolicy={cachePolicyFor(source)}
       source={source}
       style={{ width, height }}

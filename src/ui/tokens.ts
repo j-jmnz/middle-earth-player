@@ -48,6 +48,8 @@ export const tableTokens = {
   // Not a palette key: the victory pile's gold coin, under ink numbers (canvas/pieces.native.tsx). Light's is paler than its bronze
   // fellowship, so the ink number keeps 4.5:1 (5.9:1 here, 7.4:1 on Dark).
   coin: "#C9A961",
+  // Not a palette key: "solid" while the phone's Reduce Transparency is on, so surfaces.ts draws every translucent fill opaque (solidTokens).
+  veil: "clear",
 } as const;
 
 export type TableToken = keyof typeof tableTokens;
@@ -95,9 +97,23 @@ const lightTableTokens: TableTokens = {
   primaryTop: "#3F5A4B",
   primaryMid: "#253A2F",
   coin: "#B8964E",
+  veil: "clear",
 };
 
 export const tableTokensByTheme: { readonly dark: TableTokens; readonly light: TableTokens } = { dark: tableTokens, light: lightTableTokens };
+
+/** The tokens with Reduce Transparency applied: the same colors, `veil` solid. The two are made once, so a reader's identity check holds. */
+const solidTokens: { readonly dark: TableTokens; readonly light: TableTokens } = { dark: { ...tableTokens, veil: "solid" }, light: { ...lightTableTokens, veil: "solid" } };
+
+/** The theme's tokens, solid when the phone's Reduce Transparency is on. */
+export function tokensFor(theme: "dark" | "light", reduceTransparency: boolean): TableTokens {
+  return reduceTransparency ? solidTokens[theme] : tableTokensByTheme[theme];
+}
+
+/** A fill's opacity: `alpha`, or 1 under Reduce Transparency (the tokens' `veil`). */
+export function fillAlpha(t: TableTokens, alpha: number): number {
+  return t.veil === "solid" ? 1 : alpha;
+}
 
 /** A token at some opacity, so the palette drift test covers tints too (`#RRGGBB` in, `rgba(...)` out). */
 export function withAlphaHex(hex: string, alpha: number): string {

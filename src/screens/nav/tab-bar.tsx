@@ -92,7 +92,7 @@ function DockTabBar(props: TabBarProps) {
   const palette = usePalette();
   const insets = useSafeAreaInsets();
   const s = useUiScale();
-  // The words stay at Medium's size at Large, so five fit across a narrow phone.
+  // The words stay at Medium's size at Large and Extra large, so five fit across a narrow phone.
   const labelScale = Math.min(s, 1);
   const t = useTableTokens();
   const light = t.depth === "light";
@@ -130,6 +130,7 @@ function DockTabBar(props: TabBarProps) {
                   className="font-display"
                   style={{ fontSize: 12 * labelScale, lineHeight: 15 * labelScale, letterSpacing: 0.4 * labelScale, color: focused ? palette.bone : palette.faint }}
                   numberOfLines={1}
+                  // Kept: five equal slots across a narrow phone, so a word the phone's larger text would widen shrinks to its slot; the bar grows in height only.
                   adjustsFontSizeToFit
                   minimumFontScale={0.8}
                 >
@@ -173,6 +174,7 @@ function RailTabBar(props: TabBarProps) {
           <View className="items-center justify-center" style={{ height: RAIL_ICON * s }} importantForAccessibility="no-hide-descendants">
             {icon}
           </View>
+          {/* Kept: the rail's tab is a fixed-width slot, as the dock's tabs are. */}
           <Text className="font-display" style={label(focused)} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.85}>
             {word}
           </Text>
@@ -233,7 +235,7 @@ export function HubHeader({ title, subtitle, children }: { title: string; subtit
         <Text accessibilityRole="header" numberOfLines={1} className="shrink-0 font-display text-bone" style={{ fontSize: big * s, lineHeight: big * 1.25 * s, letterSpacing: 0.5 * s, ...shadow }}>
           {title}
         </Text>
-        <View className="ml-auto flex-row items-center" style={{ gap: 8 * s }}>
+        <View className="ml-auto max-w-full shrink flex-row flex-wrap items-center justify-end" style={{ gap: 8 * s, rowGap: 8 * s }}>
           {children}
           <GearButton />
         </View>

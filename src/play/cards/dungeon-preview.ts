@@ -76,7 +76,7 @@ function lostInMirkwoodDetail(game: ScenarioState, ctx: ReduceContext, card: Sce
   }
   if (card.nemesis !== true) return null;
   const stage = game.questStage ? ctx.cards.get(game.cards[game.questStage]?.code ?? "")?.questPoints : null;
-  return `The nemesis: immune to player card effects, takes no damage while the stage has fewer than ${stage ?? 8} progress, blocks the stage while in play, returns to the staging area and attacks the first player at the end of each round. Defeating it wins the game.`;
+  return `The nemesis is immune to player card effects. It takes no damage while the stage has fewer than ${stage ?? 8} progress, and it blocks the stage while in play. At the end of each round it returns to the staging area and attacks the first player. Defeating it wins the game.`;
 }
 
 // The King's Quest's cards (ledger lines 18050:A:2, 18043:A:3, 12172:A:2): the card Hobgoblin holds faceup under it, an Artifact guarded in the staging area, and The Threat to Wilderland's resources. The engine decided each; this only says it.
@@ -92,7 +92,7 @@ function kingsQuestDetail(game: ScenarioState, ctx: ReduceContext, card: Scenari
   if (card.code !== "12172") return null;
   const left = card.resources;
   return left > 0
-    ? `${left} ${left === 1 ? "resource" : "resources"}: one is removed at the beginning of each quest phase, then the first player chooses: each player raises their threat by 2, or every encounter card is immune to player card effects this phase`
+    ? `${left} ${left === 1 ? "resource" : "resources"}: one is removed at the beginning of each quest phase. Then the first player chooses: each player raises their threat by 2, or every encounter card is immune to player card effects this phase`
     : "No resources left: it does nothing";
 }
 
@@ -121,7 +121,7 @@ function heathDetail(game: ScenarioState, ctx: ReduceContext, card: ScenarioStat
   }
   if (card.zone !== "staging" && card.zone !== "engaged") return null;
   const lines: string[] = [];
-  if (flagged(game, card.id, "engagedWithAll")) lines.push("Engaged with each player from the staging area: it attacks every player in the combat phase, any player's characters can attack it, and it adds no Threat");
+  if (flagged(game, card.id, "engagedWithAll")) lines.push("Engaged with each player from the staging area. It attacks every player in the combat phase, any player's characters can attack it, and it adds no Threat");
   const cap = heldAmount(game, card.id, "damageCap");
   // A cap that counts the Dragon Signs in the victory display (19025:B:1) says so; a fixed one (19023:B:2) does not.
   const stage = game.questStage ? game.cards[game.questStage]?.code : undefined;

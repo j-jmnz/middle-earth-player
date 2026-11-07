@@ -36,7 +36,8 @@ describe("table settings", () => {
   it("stores the animation speed: Normal by default, Quick when chosen, anything else back to Normal", () => {
     expect(DEFAULT_SETTINGS.animationSpeed).toBe("normal");
     expect(parseSettings({ animationSpeed: "quick" }).animationSpeed).toBe("quick");
-    expect(parseSettings({ animationSpeed: "slow" }).animationSpeed).toBe("normal");
+    expect(parseSettings({ animationSpeed: "slow" }).animationSpeed).toBe("slow");
+    expect(parseSettings({ animationSpeed: "fast" }).animationSpeed).toBe("normal");
     expect(parseSettings({ animationSpeed: 2 }).animationSpeed).toBe("normal");
   });
 

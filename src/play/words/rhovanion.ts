@@ -63,7 +63,7 @@ export function rhovanionChooseNote(choose: Choose, game: ScenarioState, ctx: Re
     // After a claim (12184:B:1) the question leads with the claim; the Setup's (12184:A:2) does not.
     const lead = claimed ? `you claimed ${names.card(claimed)}. Put your trust in Urdug?` : "put your trust in Urdug?";
     const count = now != null ? ` He has ${now}; trust makes it ${now + 1}.` : "";
-    return say(`${lead}${count} If you don't, a copy of ${cunning} is shuffled into the encounter deck. At the Resolution, with 3 or more resources on him each player adds ${names.code(TRUST_REWARD)} to the campaign pool and their deck; with fewer, ${cunning}.`);
+    return say(`${lead}${count} If you don't, a copy of ${cunning} is shuffled into the encounter deck. At the Resolution, with 3 or more resources on him each player adds ${names.code(TRUST_REWARD)} to the campaign pool and their deck. With fewer, each player adds ${cunning}.`);
   }
   if (kind === "bear") return say(`${bearName(names)} attacks you, or each player discards 1 card at random from their hand?`);
   if (kind === "ravine") {
@@ -98,7 +98,7 @@ export function rhovanionAsk(instruction: Instruction, source: string | null, na
   const pick = instruction.pick;
   const code = source ? (game?.cards[source]?.code ?? source) : undefined;
   // Sneaking Off (19044:A:1): the first player chooses the location in the staging area that comes to guard Urdug.
-  if (code === "19044" && pick.type === "location" && pick.stagingOnly === true) return ask("Guard", "choose a location in the staging area. Urdug is attached to it as a guarded objective: you lose control of him until it leaves play, and Sneaking Off is removed from the game.");
+  if (code === "19044" && pick.type === "location" && pick.stagingOnly === true) return ask("Guard", "choose a location in the staging area. Urdug is attached to it as a guarded objective. You lose control of him until it leaves play, and Sneaking Off is removed from the game.");
   // Wild Creatures (19046:A:1): each player in turn engages an enemy from the staging area.
   if (code === "19046" && pick.type === "enemy" && pick.stagingOnly === true && next?.verb === "Engage") return ask("Engage", "choose an enemy in the staging area to engage. If any player has none to engage, cards are discarded from the encounter deck until a Creature enemy is, and it joins the staging area.");
   // Durin's Key (19036:A:1): the first player attaches it to a hero they control.

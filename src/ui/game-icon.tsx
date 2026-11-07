@@ -5,6 +5,7 @@ import { Image } from "expo-image";
 import { View } from "react-native";
 
 import { iconAspect, type IconName } from "./icon-map.ts";
+import { DECORATIVE_ALT } from "./decorative.ts";
 import { cachePolicyFor } from "./image-cache.ts";
 import { ICONS } from "./icons/generated.ts";
 import { ICON_FILES } from "./icons/files.generated.ts";
@@ -22,7 +23,7 @@ export function GameIcon({ name, size = 16, tint, label }: { name: IconName; siz
       contentFit="contain"
       tintColor={vector && tint ? t[tint] : undefined}
       accessible={label != null}
-      accessibilityLabel={label}
+      accessibilityLabel={label ?? DECORATIVE_ALT}
       style={{ width: Math.round(size * iconAspect(name)), height: size }}
     />
   );

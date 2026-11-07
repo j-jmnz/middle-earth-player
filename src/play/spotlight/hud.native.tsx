@@ -11,7 +11,7 @@ import type { Frame } from "./beats.ts";
 import { stampLook } from "./fx.ts";
 import { SPOT } from "./shape.ts";
 import type { Stage } from "./stage.ts";
-import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
+import { fillAlpha, withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
 
 /** A stat medallion straddling a card's foot: a night disc with a ring, the stat's game icon over its number in Marcellus SC. It pops in; the defense one bounces on a block. */
 export function Medallion({ at, radius, icon, color, text, font, frame, badge, t, s }: { at: { cx: number; cy: number }; radius: number; icon: IconName; color: string; text: string; font: SkFont; frame: SharedValue<Frame>; badge: "badgeA" | "badgeD"; t: TableTokens; s: number }) {
@@ -50,7 +50,7 @@ export function Stamp({ at, text, font, color, frame, t, s }: { at: { cx: number
   const height = font.getSize() * 1.3;
   return (
     <Group transform={transform} origin={vec(at.cx, at.cy)} opacity={opacity}>
-      <RoundedRect x={at.cx - width / 2} y={at.cy - height / 2} width={width} height={height} r={height * 0.25} color={withAlphaHex(t.night, 0.75)} />
+      <RoundedRect x={at.cx - width / 2} y={at.cy - height / 2} width={width} height={height} r={height * 0.25} color={withAlphaHex(t.night, fillAlpha(t, 0.75))} />
       <Outlined x={at.cx} y={at.cy + font.getSize() * 0.35} text={text} font={font} t={t} s={s} color={color} heavy />
     </Group>
   );

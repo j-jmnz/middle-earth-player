@@ -53,7 +53,7 @@ describe("Discover and the Loot and Hazard cards it looks at (emce.discover, 191
     for (const [seats, suffix] of [[1, ""], [2, " Player 1 chooses."]] as const) {
       const t = framsburgTable(world, { seats, phase: "Travel", staging: [CODES.moonlitPassage], deck: [CODES.cryptKey, CODES.oldLantern, CODES.hauntedHall, "f0"] });
       const sheet = sheetOf(t, travelTo(t, CODES.moonlitPassage).state);
-      expect(sheet.note).toBe(`Discover 2 at Moonlit Passage. The top 2 cards of the encounter deck were looked at: 2 of them are Loot objectives. Choose 1 to attach to Moonlit Passage as a guarded objective; the other cards looked at go to the encounter discard pile.${suffix}`);
+      expect(sheet.note).toBe(`Discover 2 at Moonlit Passage. The top 2 cards of the encounter deck were looked at: 2 of them are Loot objectives. Choose 1 to attach to Moonlit Passage as a guarded objective. The other cards looked at go to the encounter discard pile.${suffix}`);
       expect(labels(sheet)).toEqual(["Crypt Key", "Old Lantern"]);
     }
   });
@@ -63,16 +63,16 @@ describe("Discover and the Loot and Hazard cards it looks at (emce.discover, 191
     const sheet = sheetOf(t, travelTo(t, CODES.hauntedHall).state);
     expect(sheet.note).toContain("Discover 4 at Haunted Hall. The top 4 cards of the encounter deck were looked at: 2 of them are Loot objectives.");
     // Terrible Shadows is a treachery: it has no place in the staging area, so its When Revealed effect resolves and it is discarded (emce.discover).
-    expect(sheet.note).toContain("the 1 Hazard card looked at is revealed, its When Revealed effect resolves and it is discarded, and the other cards looked at go to the encounter discard pile.");
+    expect(sheet.note).toContain("The 1 Hazard card looked at is revealed, its When Revealed effect resolves and it is discarded. The other cards looked at go to the encounter discard pile.");
   });
 
   it("names a Hazard enemy or location as added to the staging area, a pair of copies as copies, and a mix of kinds for what each becomes", () => {
     const enemy = framsburgTable(world, { phase: "Travel", staging: [CODES.hauntedHall], deck: [CODES.cryptKey, CODES.oldLantern, CODES.cryptStalker, "f0"] });
-    expect(sheetOf(enemy, travelTo(enemy, CODES.hauntedHall).state).note).toContain("the 1 Hazard card looked at is revealed and added to the staging area, and the other cards looked at");
+    expect(sheetOf(enemy, travelTo(enemy, CODES.hauntedHall).state).note).toContain("The 1 Hazard card looked at is revealed and added to the staging area. The other cards looked at");
     const copies = framsburgTable(world, { phase: "Travel", staging: [CODES.hauntedHall], deck: [CODES.cryptKey, CODES.oldLantern, CODES.slammedShut, CODES.slammedShut] });
-    expect(sheetOf(copies, travelTo(copies, CODES.hauntedHall).state).note).toContain("1 of the 2 copies of Slammed Shut looked at is revealed, its When Revealed effect resolves and it is discarded, and the other cards looked at");
+    expect(sheetOf(copies, travelTo(copies, CODES.hauntedHall).state).note).toContain("1 of the 2 copies of Slammed Shut looked at is revealed, its When Revealed effect resolves and it is discarded. The other cards looked at");
     const mixed = framsburgTable(world, { phase: "Travel", staging: [CODES.hauntedHall], deck: [CODES.cryptKey, CODES.oldLantern, CODES.cryptStalker, CODES.slammedShut] });
-    expect(sheetOf(mixed, travelTo(mixed, CODES.hauntedHall).state).note).toContain("1 of the 2 Hazard cards looked at, picked at random, is revealed: an enemy or location is added to the staging area, a treachery resolves its When Revealed effect and is discarded, and the other cards looked at");
+    expect(sheetOf(mixed, travelTo(mixed, CODES.hauntedHall).state).note).toContain("1 of the 2 Hazard cards looked at, picked at random, is revealed. An enemy or location is added to the staging area. A treachery resolves its When Revealed effect and is discarded. The other cards looked at");
   });
 
   it("Abandoned Ruins asks each player in turn: Player 1, then Player 2, each led by the player and with no \"chooses\" after it; solo has no lead", () => {
@@ -82,7 +82,7 @@ describe("Discover and the Loot and Hazard cards it looks at (emce.discover, 191
       const state = opened(t, place, CODES.abandonedRuins, "whenRevealed", idOf(t.state, CODES.abandonedRuins), "whenRevealed");
       const first = sheetOf(t, state);
       const lead = seats === 1 ? "" : "Player 1, ";
-      expect(first.note).toBe(`${lead}Abandoned Ruins: resolve Discover 2 at Moonlit Passage. The top 2 cards of the encounter deck were looked at: 2 of them are Loot objectives. Choose 1 to attach to Moonlit Passage as a guarded objective; the other cards looked at go to the encounter discard pile.`);
+      expect(first.note).toBe(`${lead}Abandoned Ruins: resolve Discover 2 at Moonlit Passage. The top 2 cards of the encounter deck were looked at: 2 of them are Loot objectives. Choose 1 to attach to Moonlit Passage as a guarded objective. The other cards looked at go to the encounter discard pile.`);
       expect(first.note).not.toContain("chooses");
       if (seats === 2) {
         const second = sheetOf(t, take(t, state, first.options[0]!.id).state);
@@ -130,14 +130,14 @@ describe("the treasure for Fram's Shade (12189:B:2)", () => {
       const run = send(start(t.state), { type: "Engage", enemyId: idOf(t.state, CODES.framSShade) }, t.ctx);
       expect(run.state.window).toMatchObject({ kind: "response" });
       const sheet = sheetOf(t, run.state);
-      expect(sheet.note).toBe(`${lead}Fram's Shade engaged you. Look at 3 random undiscovered treasures and attach 1 to Fram's Shade as a guarded objective: Fram's Shade stays engaged with you, the players cannot claim the treasure until it is free of encounters, when Fram's Shade leaves play, and if they win with it they discover it. Group limit once per game. Pass and it stays unused for a later engagement at stage 1B or 2B.`);
+      expect(sheet.note).toBe(`${lead}Fram's Shade engaged you. Look at 3 random undiscovered treasures and attach 1 to Fram's Shade as a guarded objective. Fram's Shade stays engaged with you. The players can claim the treasure once it is free of encounters, when Fram's Shade leaves play. If they win with it, they discover it. Group limit once per game. Pass and it stays unused for a later engagement at stage 1B or 2B.`);
       // Passing attaches nothing.
       const passed = send(run, { type: "Pass" }, t.ctx);
       expect(Object.values(passed.state.cards).filter((card) => world.cards.get(card.code)?.campaignKind === "treasure")).toEqual([]);
       // Using it asks which of the 3 treasures, the first player's.
       const asked = use(t, run).state;
       const pick = sheetOf(t, asked);
-      expect(pick.note).toContain("Choose 1 of 3 random undiscovered treasures to attach as a guarded objective. Fram's Shade stays engaged; the players cannot claim the treasure until it is free of encounters, when Fram's Shade leaves play.");
+      expect(pick.note).toContain("Choose 1 of 3 random undiscovered treasures to attach as a guarded objective. Fram's Shade stays engaged. The players can claim the treasure once it is free of encounters, when Fram's Shade leaves play.");
       expect(labels(pick)).toHaveLength(3);
     }
   });
@@ -240,11 +240,11 @@ describe("the optional engagement of a unique-only enemy (12192:A:1)", () => {
       const without = framsburgTable(world, { seats, phase: "Encounter", staging: [CODES.gundabadStalker, CODES.cryptStalker] });
       const sheet = sheetOf(without, without.state);
       expect(sheet.title).toBe(title);
-      expect(sheet.note).toContain("Gundabad Stalker may be engaged only by a player engaged with a unique enemy, and you are not engaged with one, so you cannot choose it here.");
+      expect(sheet.note).toContain("Gundabad Stalker may be engaged only by a player engaged with a unique enemy. You are not engaged with one, so you cannot choose it here.");
       expect(labels(sheet)).toEqual(["Crypt Stalker"]);
       const engaged = framsburgTable(world, { seats, phase: "Encounter", staging: [CODES.gundabadStalker, CODES.cryptStalker], engaged: [CODES.framSShade] });
       const yes = sheetOf(engaged, engaged.state);
-      expect(yes.note).toContain("Gundabad Stalker may be engaged only by a player engaged with a unique enemy, and you are engaged with Fram's Shade, so you may choose it.");
+      expect(yes.note).toContain("Gundabad Stalker may be engaged only by a player engaged with a unique enemy. You are engaged with Fram's Shade, so you may choose it.");
       expect(labels(yes)).toEqual(["Gundabad Stalker", "Crypt Stalker"]);
       expect(yes.kind === "pick" && yes.alternative && "label" in yes.alternative && yes.alternative.label).toBe("Do not engage");
     }
@@ -298,11 +298,11 @@ describe("Searching the Ruins' choice (19110:B:1)", () => {
   it("is the first player's choice for the group: it names both threats, and the sheet adds who chooses", () => {
     const { t, state } = stage2(1);
     const sheet = sheetOf(t, state);
-    expect(sheet.note).toBe("Searching the Ruins: raise each player's threat by 2 (now 28), or discard cards from the encounter deck until a location is discarded and add it to the staging area?");
+    expect(sheet.note).toBe("Searching the Ruins: raise each player's threat by 2 (now 28)? Or discard cards from the encounter deck until a location is discarded, and add it to the staging area?");
     expect(labels(sheet)).toEqual(["Each player raises their threat by 2", "Discard cards until a location is discarded, then add it to the staging area"]);
     expect(cautions(sheet)).toEqual([undefined, undefined]);
     const pair = stage2(2, [28, 31]);
-    expect(sheetOf(pair.t, pair.state).note).toBe("Searching the Ruins: raise each player's threat by 2 (now Player 1 28 and Player 2 31), or discard cards from the encounter deck until a location is discarded and add it to the staging area? Player 1 chooses.");
+    expect(sheetOf(pair.t, pair.state).note).toBe("Searching the Ruins: raise each player's threat by 2 (now Player 1 28 and Player 2 31)? Or discard cards from the encounter deck until a location is discarded, and add it to the staging area? Player 1 chooses.");
   });
 
   it("arms the raise when it eliminates a player or loses the game", () => {

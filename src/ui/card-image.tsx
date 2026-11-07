@@ -7,6 +7,7 @@ import { useState } from "react";
 import { View } from "react-native";
 
 import { cardCorner, containIn } from "./card-corner.ts";
+import { DECORATIVE_ALT } from "./decorative.ts";
 import { cachePolicyFor, type CachePolicy } from "./image-cache.ts";
 
 type Props = {
@@ -35,7 +36,7 @@ export function CardImage({ source, recyclingKey, width, height, accessibilityLa
           contentFit={shape ? "cover" : "contain"}
           cachePolicy={cachePolicyFor(source, cachePolicy)}
           accessible={accessibilityLabel != null}
-          accessibilityLabel={accessibilityLabel}
+          accessibilityLabel={accessibilityLabel ?? DECORATIVE_ALT}
           source={source}
           onLoad={onLoad}
           style={{ width: fit.w, height: fit.h }}

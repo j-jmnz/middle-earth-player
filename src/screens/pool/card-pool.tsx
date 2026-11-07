@@ -118,6 +118,7 @@ function SphereToggles({ value, onChange }: { value: string | null; onChange: (n
             testID={`pool-sphere-${sphere}`}
             accessibilityRole="radio"
             accessibilityState={{ selected: on, checked: on }}
+            aria-checked={on}
             accessibilityLabel={sphereWord(sphere)}
             onPress={() => onChange(on ? null : sphere)}
           >

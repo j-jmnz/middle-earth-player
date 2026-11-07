@@ -65,7 +65,7 @@ describe("the first player's choice of the current quest (emce.side-quests-in-pl
       const run = toQuestQuestion(t);
       expect(run.state.phase).toBe("Quest");
       const sheet = sheetOf(t, run.state);
-      expect(sheet.note).toBe(`${lead} in the staging area the current quest until the end of the phase, or keep Hrogar's Hill? Progress goes on the active location first, then on the current quest instead of Hrogar's Hill; progress beyond its quest points is discarded.`);
+      expect(sheet.note).toBe(`${lead} in the staging area the current quest until the end of the phase, or keep Hrogar's Hill? Progress goes on the active location first, then on the current quest instead of Hrogar's Hill. Progress beyond its quest points is discarded.`);
       expect(sheet.note).not.toContain("chooses");
       expect(labels(sheet)).toEqual(["Keep Hrogar's Hill as the current quest", "Make Hold the Door the current quest (0 of 10 progress)"]);
     }
@@ -172,7 +172,7 @@ describe("the side quest deck's reveal and the attack on Hrogar's Hill (19083:B:
       const state = opened(t, t.state, CODES.theDragonSFury, "whenRevealed", idOf(t.state, CODES.theDragonSFury), "whenRevealed");
       expect(state.window).toMatchObject({ kind: "defense", seat: 0 });
       const sheet = sheetOf(t, state);
-      expect(sheet.note).toBe(`${lead}Choose a defender, or leave it undefended and the 7 damage, before its shadow card, is dealt to Hrogar's Hill, not to a character. Hrogar's Hill holds 0 of 50 damage.`);
+      expect(sheet.note).toBe(`${lead}Choose a defender, or leave it undefended. Left undefended, its 7 damage (before its shadow card) is dealt to Hrogar's Hill, not to a character. Hrogar's Hill holds 0 of 50 damage.`);
       expect(sheet.note).not.toContain("No shadow card");
     }
   });

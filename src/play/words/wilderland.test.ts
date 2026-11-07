@@ -180,7 +180,7 @@ describe("the Wilderland scenario's prompts", () => {
     const two: ScenarioState = { ...idleScenario(2), window: { kind: "choose", seat: 1, options: ["h"] } };
     const asks = wilderlandAsk(pick, null, words, next, null, { game: two, ctx, options: ["h"] });
     expect(asks?.prompt).toMatch(/^Player 2: choose 1 hero you control to be carried away\./);
-    expect(asks?.prompt).toContain("guards it facedown until that enemy leaves play, then the hero returns exhausted");
+    expect(asks?.prompt).toContain("guards the hero facedown. When that enemy leaves play, the hero returns exhausted");
     expect(asks?.prompt).not.toContain("holds it");
     expect(asks?.owned).toBe(true);
     const solo = wilderlandAsk(pick, null, words, next, null, { game: idleScenario(1), ctx, options: ["h"] });

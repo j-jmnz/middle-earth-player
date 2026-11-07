@@ -74,7 +74,7 @@ export function nightChooseNote(choose: Choose, game: ScenarioState, ctx: Reduce
   const titled = (name: string, text: string): string => (game.seatCount > 1 ? `Player ${seat + 1}, ${name}: ${text}` : `${name}: ${text}`);
   if (kind === "current") {
     const quests = choose.options.filter((option) => option.id !== MAIN_QUEST).length;
-    return say(`make ${quests === 1 ? "the side quest in the staging area" : `1 of the ${quests} side quests in the staging area`} the current quest until the end of the phase, or keep ${HILL}? Progress goes on the active location first, then on the current quest instead of ${HILL}; progress beyond its quest points is discarded.`);
+    return say(`make ${quests === 1 ? "the side quest in the staging area" : `1 of the ${quests} side quests in the staging area`} the current quest until the end of the phase, or keep ${HILL}? Progress goes on the active location first, then on the current quest instead of ${HILL}. Progress beyond its quest points is discarded.`);
   }
   if (kind === "thrall") {
     const name = source ? names.card(source) : "The Dragon's Thrall";
@@ -106,7 +106,7 @@ export function nightAsk(instruction: Instruction, _source: string | null, names
   const game = facts?.game;
   const says = game ? seatSays(game) : null;
   const only = facts?.options.length === 1 ? facts.options[0] : undefined;
-  const text = `the enemy that attacks ${HILL}${only ? ` (${names.card(only)})` : ""}. You may then declare a defender; the damage left undefended, and the damage beyond a defender's hit points, is dealt to ${HILL}.`;
+  const text = `the enemy that attacks ${HILL}${only ? ` (${names.card(only)})` : ""}. You may then declare a defender. The damage left undefended, and the damage beyond a defender's hit points, is dealt to ${HILL}.`;
   return says ? { verb: "Attack", prompt: says.say(`choose ${text}`), ...says.owned } : { verb: "Attack", prompt: `Choose ${text}` };
 }
 
@@ -129,7 +129,7 @@ export function nightStageAttack(game: ScenarioState, ctx: ReduceContext, enemyI
     const choice = defenders > 0 ? `A defender takes the attack minus its Defense; damage beyond its hit points goes to ${HILL}. Leave it undefended and all ${damage} damage is dealt to ${HILL}.` : `No character can defend: all ${damage} damage is dealt to ${HILL}.`;
     return { note: say(`No shadow card is dealt. ${choice} ${holds}`), ...caution };
   }
-  const choice = defenders > 0 ? `Choose a defender, or leave it undefended and the ${damage} damage, before its shadow card, is dealt to ${HILL}, not to a character.` : `No character can defend: the ${damage} damage, before its shadow card, is dealt to ${HILL}, not to a character.`;
+  const choice = defenders > 0 ? `Choose a defender, or leave it undefended. Left undefended, its ${damage} damage (before its shadow card) is dealt to ${HILL}, not to a character.` : `No character can defend: the ${damage} damage, before its shadow card, is dealt to ${HILL}, not to a character.`;
   return { note: say(`${choice} ${holds}`), ...caution };
 }
 

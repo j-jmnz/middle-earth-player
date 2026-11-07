@@ -87,9 +87,66 @@ describe("parseSettings card pictures and moving fog", () => {
   });
 });
 
+describe("parseSettings table as a list and confirm time", () => {
+  it("defaults a missing, wrong-typed or unknown value", () => {
+    expect(parseSettings({}).tableAsList).toBe("system");
+    expect(parseSettings({ tableAsList: "sometimes" }).tableAsList).toBe("system");
+    expect(parseSettings({ tableAsList: true }).tableAsList).toBe("system");
+    expect(parseSettings({}).confirmTime).toBe("standard");
+    expect(parseSettings({ confirmTime: "forever" }).confirmTime).toBe("standard");
+    expect(parseSettings({ confirmTime: 10 }).confirmTime).toBe("standard");
+  });
+
+  it("round-trips every valid value", () => {
+    expect(parseSettings({ tableAsList: "always" }).tableAsList).toBe("always");
+    for (const confirmTime of ["standard", "long", "none"]) expect(parseSettings({ confirmTime }).confirmTime).toBe(confirmTime);
+  });
+
+  it("restores both to their defaults", () => {
+    const changed = { ...DEFAULT_SETTINGS, tableAsList: "always" as const, confirmTime: "none" as const };
+    expect(restoreDefaults(changed)).toMatchObject({ tableAsList: "system", confirmTime: "standard" });
+  });
+});
+
+describe("parseSettings animation speed and banner closes", () => {
+  it("defaults a missing, wrong-typed or unknown value, and keeps every valid one", () => {
+    expect(parseSettings({}).bannerCloses).toBe("timer");
+    expect(parseSettings({ bannerCloses: "never" }).bannerCloses).toBe("timer");
+    expect(parseSettings({ bannerCloses: 3 }).bannerCloses).toBe("timer");
+    expect(parseSettings({ bannerCloses: "tap" }).bannerCloses).toBe("tap");
+    for (const animationSpeed of ["normal", "quick", "slow"]) expect(parseSettings({ animationSpeed }).animationSpeed).toBe(animationSpeed);
+  });
+
+  it("restores both to their defaults", () => {
+    const changed = { ...DEFAULT_SETTINGS, animationSpeed: "slow" as const, bannerCloses: "tap" as const };
+    expect(restoreDefaults(changed)).toMatchObject({ animationSpeed: "normal", bannerCloses: "timer" });
+  });
+});
+
 describe("restoreDefaults", () => {
   it("returns the defaults and keeps what the guide has explained", () => {
     const changed = { ...DEFAULT_SETTINGS, uiScale: "large" as const, theme: "light" as const, stopsOn: true, guide: false, guideSeen: { "3.3": 2 } };
     expect(restoreDefaults(changed)).toEqual({ ...DEFAULT_SETTINGS, guideSeen: { "3.3": 2 } });
+  });
+});
+
+describe("parseSettings strong outlines and title face", () => {
+  it("reads an older build's switch: on is Always, off is Follow system", () => {
+    expect(parseSettings({ highContrast: true }).highContrast).toBe("always");
+    expect(parseSettings({ highContrast: false }).highContrast).toBe("system");
+    expect(parseSettings({}).highContrast).toBe("system");
+  });
+
+  it("keeps the three values and defaults an unknown or wrong-typed one", () => {
+    for (const highContrast of ["system", "always", "off"]) expect(parseSettings({ highContrast }).highContrast).toBe(highContrast);
+    expect(parseSettings({ highContrast: "sometimes" }).highContrast).toBe("system");
+    expect(parseSettings({ highContrast: 1 }).highContrast).toBe("system");
+  });
+
+  it("parses the title face and restores it", () => {
+    expect(parseSettings({}).titleFace).toBe("carved");
+    expect(parseSettings({ titleFace: "plain" }).titleFace).toBe("plain");
+    expect(parseSettings({ titleFace: "gothic" }).titleFace).toBe("carved");
+    expect(restoreDefaults({ ...DEFAULT_SETTINGS, titleFace: "plain", highContrast: "off" })).toMatchObject({ titleFace: "carved", highContrast: "system" });
   });
 });

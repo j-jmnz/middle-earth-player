@@ -24,6 +24,7 @@ const PILL = 36;
 export const PEEK_TOP = 2;
 /** The room the banner takes under the top bar (its gap, the pill and a gap below): the table's own outcome banner hangs under it while it shows. */
 export const PEEK_ROOM = PEEK_TOP + PILL + 4;
+// The one cap on the phone's text size that stays: the pill is a fixed 36 pt slot over the staging row (PEEK_ROOM), so its two words stop growing at 1.3 times.
 const SCALE = 1.3;
 
 export function PeekBanner({ words, top, left, width, onBack }: { words: PeekWords; top: number; left: number; width: number; onBack: () => void }) {

@@ -36,6 +36,7 @@ import { useReaderMode } from "../../ui/screen-reader.ts";
 import { sphereRing, stripText, useViews } from "./table-canvas-views.ts";
 import { useBackImages, useTokenImages } from "./table-assets.native.ts";
 import { useTableFonts } from "./table-fonts.native.ts";
+import { usePlainTitles } from "../../ui/display-prefs.ts";
 import { useTableImages } from "./table-images.native.ts";
 import { pictureBoxes, pictureRatio } from "./table-pictures.ts";
 import { tableSettings } from "../../ui/table-settings.ts";
@@ -132,7 +133,7 @@ function Table({ store, width, height, column, reach, onRowFeet, picture, pictur
   const images = useTableImages(boxes, picture, pictureRevision, pictureRatio(PixelRatio.get(), quality));
   const tokens = useTokenImages();
   const backs = useBackImages();
-  const fonts = useTableFonts(s);
+  const fonts = useTableFonts(s, usePlainTitles());
   // The plan, the clock and the table's decodes go to the layer when the plan, whether it plays, the pictures to decode ahead or the motion scale changes; only the
   // layer listens, so this canvas does not render again for it. The decodes are a fallback until the layer's own are ready.
   const { plan, progress, playing, warm } = spot;

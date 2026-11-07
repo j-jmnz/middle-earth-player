@@ -38,7 +38,7 @@ describe("the words of Roam Across Rhovanion", () => {
     const note = rhovanionChooseNote(TRUST, one, solo.ctx, names);
     expect(note).toContain("He has 2; trust makes it 3.");
     expect(note).not.toContain("Willpower");
-    expect(note).toContain("At the Resolution, with 3 or more resources on him each player adds Misplaced Trust to the campaign pool and their deck; with fewer, Urdug's Cunning.");
+    expect(note).toContain("At the Resolution, with 3 or more resources on him each player adds Misplaced Trust to the campaign pool and their deck. With fewer, each player adds Urdug's Cunning.");
     expect(note).toContain("If you don't, a copy of Urdug's Cunning is shuffled into the encounter deck.");
     expect(note?.startsWith("Put your trust in Urdug?")).toBe(true);
     const pair = withWindow(2, 1);

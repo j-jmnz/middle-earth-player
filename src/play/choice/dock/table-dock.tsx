@@ -7,6 +7,7 @@ import { useRef, useState, type ComponentRef, type ReactNode } from "react";
 import { Pressable, ScrollView, useWindowDimensions, View } from "react-native";
 
 import { DockButtons, type DockExtra } from "./buttons.tsx";
+import { lineCount } from "./armed-room.ts";
 import { isDense, labelChars, PILL_PT, planWords, smallPictures, trayRoom, wordsWindow } from "./budget.ts";
 import { dockLines } from "./lines.ts";
 import { useReaderMoment } from "./use-reader-moment.ts";
@@ -16,15 +17,19 @@ import type { Readout } from "../../readouts/readout.ts";
 import { Stats } from "../sheet-paper.tsx";
 import type { Unavailable } from "../sheet-types.ts";
 import type { Dock, DockButton } from "../table-choice.ts";
+import { useFocusRing } from "../../../ui/focus-ring.ts";
 import { CONTROL_RADIUS } from "../../../ui/radius.ts";
 import { withAlphaHex } from "../../../ui/tokens.ts";
-import { touchSlop, useUiScale } from "../../../ui/ui-scale.ts";
+import { capLines, touchSlop, useUiScale } from "../../../ui/ui-scale.ts";
 import { useTableTokens } from "../../../ui/use-table-tokens.ts";
 import { Text } from "../../../ui/text.tsx";
 
 /** The engine's numbers for the moment, large, and what they come to: inline in the dock, on no band. */
 // `oneLine`: the result is one line (the choice rows are open in the dock on a short phone); its words stay in the label.
 function ReadoutView({ readout, tight = false, oneLine = false, onNumbers }: { readout: Readout; tight?: boolean; oneLine?: boolean; onNumbers?: (height: number) => void }) {
+  // The result keeps its three lines at the phone's default text size and larger text grows it (the pinned block is measured, room.block and
+  // fit.ts); a dense dock with the rows open keeps it one line at every size, a fixed slot: a cut result is whole behind the "i".
+  const { fontScale } = useWindowDimensions();
   return (
     <View testID={`readout-${readout.kind}`} className="px-2">
       {readout.stats.length > 0 ? (
@@ -38,7 +43,7 @@ function ReadoutView({ readout, tight = false, oneLine = false, onNumbers }: { r
         </View>
       ) : null}
       {readout.result ? (
-        <Text testID="readout-result" numberOfLines={oneLine ? 1 : 3} accessibilityLabel={readout.result} className={`${tight ? "" : "mt-0.5"} text-center text-label text-muted`}>
+        <Text testID="readout-result" numberOfLines={oneLine ? 1 : capLines(3, fontScale)} accessibilityLabel={readout.result} className={`${tight ? "" : "mt-0.5"} text-center text-label text-muted`}>
           {readout.result}
         </Text>
       ) : null}
@@ -69,6 +74,7 @@ export function TableDock({
   onButton,
   extras = [],
   more = [],
+  aidsFolded = false,
   onMore,
   onLines,
   resetKey,
@@ -100,6 +106,8 @@ export function TableDock({
   extras?: readonly DockExtra[];
   // The quiet pills folded behind the More pill, and what it does (dock/extras.ts, dockPills; dock/more.tsx).
   more?: readonly DockExtra[];
+  // Every reading aid is behind More at this text size (dock/extras.ts, foldAids); More then sits on the answers' row.
+  aidsFolded?: boolean;
   onMore?: (foot: number) => void;
   // The "i" pill opens the full title and every line in a popover (dock/more.tsx); it reports the screen y of the pill's top.
   onLines?: (top: number) => void;
@@ -126,6 +134,8 @@ export function TableDock({
   onNumbers?: (height: number) => void;
 }) {
   const t = useTableTokens();
+  // The "i" button's focus ring (ui/focus-ring.ts), on the 26 pt round inside its 44 pt target.
+  const pillRing = useFocusRing();
   // The UI scale (ui-scale.ts): the dock's padding and budget are Medium's sizes times it.
   const s = useUiScale();
   const root = useRef<ComponentRef<typeof View>>(null);
@@ -137,18 +147,22 @@ export function TableDock({
   const [room, setRoom] = useState({ column: 0, block: 0, text: 198 });
   const measure = () => root.current?.measureInWindow((_x, y) => onTop?.(Math.round(y)));
   // The folded line is one line on a short phone (under DENSE_BELOW tall, as the choice rows) and two on a taller one.
-  const screenHeight = useWindowDimensions().height;
+  const { height: screenHeight, fontScale } = useWindowDimensions();
   const dense = isDense(screenHeight, s);
-  const lines = dockLines({ guide, note, unavailable, chars: (dense ? 1 : 2) * labelChars(room.text - PILL_PT * s, s) });
+  const lines = dockLines({ guide, note, unavailable, chars: (dense ? 1 : 2) * labelChars(room.text - PILL_PT * s, s, fontScale) });
   // The words' window (budget in dock/budget.ts): the title keeps the lines that fit above the folded line and the buttons (and, with the
   // choice open, above one row), and the rest of it waits behind the "i", which sits on the title row when the room cannot hold a
   // folded line. With the choice open the folded line waits behind the "i" too.
-  const space = room.column > 0 ? wordsWindow({ room: room.column, block: room.block + (trayOpen ? trayRoom(smallPictures(screenHeight, s)) * s : 0), dense }, s) : Infinity;
-  const plan = planWords({ space, dense, clamp: trayOpen, title: lead + title, textWidth: room.text, hasLine: !trayOpen && lines.first != null, foldable: lines.foldable || (trayOpen && lines.first != null) }, s);
+  const space = room.column > 0 ? wordsWindow({ room: room.column, block: room.block + (trayOpen ? trayRoom(smallPictures(screenHeight, s), fontScale) * s : 0), dense }, s) : Infinity;
+  // The readout's result (one line while the rows are open) and the refusal (three lines) are fixed slots on a dense dock; a cut one is whole behind the "i".
+  const chars = labelChars(room.text, s, fontScale);
+  const cutWords = (dense && trayOpen && readout?.result != null && lineCount(readout.result, chars) > 1) || (dense && refusal != null && lineCount(refusal, chars) > 3);
+  const plan = planWords({ space, dense, clamp: trayOpen, title: lead + title, textWidth: room.text, hasLine: !trayOpen && lines.first != null, foldable: lines.foldable || (trayOpen && lines.first != null) || cutWords, text: fontScale }, s);
   const pill = plan.pill ? (
     // The "i" button (`dock-more`) opens the full title and every line; the More pill (`dock-more-actions`) folds the reading aids.
     // 26 pt round with a 44 pt target that stays clear of the line's words (6 pt gap) and inside the dock's padding.
     <Pressable
+      {...pillRing.props}
       ref={pillRef}
       testID="dock-more"
       collapsable={false}
@@ -157,7 +171,7 @@ export function TableDock({
       hitSlop={{ top: touchSlop(s, PILL * s), bottom: touchSlop(s, PILL * s), left: 6 * s, right: 12 * s }}
       onPress={() => pillRef.current?.measureInWindow((_x, y) => onLines?.(Math.round(y)))}
     >
-      <View className="items-center justify-center" style={{ width: PILL * s, height: PILL * s, borderRadius: CONTROL_RADIUS, backgroundColor: withAlphaHex(t.bone, 0.1) }}>
+      <View className="items-center justify-center" style={{ width: PILL * s, height: PILL * s, borderRadius: CONTROL_RADIUS, backgroundColor: withAlphaHex(t.bone, 0.1), ...pillRing.style }}>
         <Text className="text-label font-semibold" style={{ color: t.bone }}>
           i
         </Text>
@@ -189,6 +203,7 @@ export function TableDock({
         <ScrollView style={{ flexGrow: 0, flexShrink: trayOpen ? 0 : 1, minHeight: 0 }} showsVerticalScrollIndicator={false} nestedScrollEnabled>
           <View onLayout={(event) => setRoom((now) => ({ ...now, text: Math.round(event.nativeEvent.layout.width) }))} style={{ paddingBottom: (dense ? 2 : 8) * s }}>
             <View className="flex-row items-start gap-1.5">
+              {/* A budgeted slot (planWords): the title keeps the lines the room holds at the phone's text size; a cut title is whole behind the "i". */}
               <Text ref={titleRef} testID="sheet-title" accessibilityRole="header" accessibilityLabel={[step, title, trayOpen ? count.replaceAll(" · ", ", ") : ""].filter(Boolean).join(". ")} accessibilityHint={readerHint} numberOfLines={plan.titleLines} className="flex-1 font-display text-heading text-bone" style={{ flexShrink: 0 }}>
                 {lead + title}
               </Text>
@@ -196,7 +211,7 @@ export function TableDock({
             </View>
             {plan.showLine && lines.first ? (
               <View className="mt-0.5 flex-row items-start gap-1.5">
-                {/* One line shows. A screen reader hears every line from it. */}
+                {/* A budgeted slot (dockLines, labelChars at the font scale): one line shows on a dense dock, two on a taller one; the rest is behind the "i". A screen reader hears every line from it. */}
                 <Text testID={lines.first.testID} numberOfLines={dense ? 1 : 2} accessibilityLabel={lines.spoken} className={`flex-1 text-label ${lineTone(lines.first.kind)}`}>
                   {lines.first.text}
                 </Text>
@@ -214,11 +229,11 @@ export function TableDock({
         >
           {readout ? <ReadoutView readout={readout} tight={dense} oneLine={readoutLine} onNumbers={onNumbers} /> : null}
           {refusal ? (
-            <Text testID="sheet-refusal" numberOfLines={3} className="text-center text-label text-danger">
+            <Text testID="sheet-refusal" numberOfLines={dense ? 3 : capLines(3, fontScale)} className="text-center text-label text-danger">
               {refusal}
             </Text>
           ) : null}
-          <DockButtons key={resetKey} dock={dock} extras={extras} more={more} onMore={onMore} picked={picked} dense={dense} chars={labelChars(room.text, s)} onButton={onButton} />
+          <DockButtons key={resetKey} dock={dock} extras={extras} more={more} aidsFolded={aidsFolded} onMore={onMore} picked={picked} dense={dense} chars={chars} onButton={onButton} />
         </View>
       </View>
     </View>

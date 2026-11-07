@@ -24,7 +24,8 @@ describe("sweepName", () => {
     for (const now of ["Setup", "Mulligan", "Beginning of round", "End of round", ""]) expect(sweepName(at("Refresh"), at(now), 1, false)).toBeNull();
   });
 
-  it("is skipped when the scale is not 1: under Quick (0.6) and under reduced motion (0)", () => {
+  it("is skipped when the scale is under 1: under Quick (0.6) and under reduced motion (0), and plays at Slow (1.5)", () => {
+    expect(sweepName(at("Resource"), at("Planning"), 1.5, false)).toBe("Planning");
     expect(sweepName(at("Resource"), at("Planning"), 0.6, false)).toBeNull();
     expect(sweepName(at("Resource"), at("Planning"), 0, false)).toBeNull();
   });

@@ -14,7 +14,7 @@ const OPTION_WORDS: Readonly<Record<string, string>> = {
   defense: "A hero gets +2 Defense until the end of the round",
   enemyDefense: "An enemy gets -2 Defense until the end of the round",
   ready: "Ready a character with Círdan's Blessing on it",
-  ally: "Put an ally with cost X or less from your discard pile into play, then discard it at the end of the phase (X is Command's level)",
+  ally: "Put an ally with cost X or less from your discard pile into play (X is Command's level). Discard it at the end of the phase",
   resources: "Remove X resources from a non-unique enemy (X is Command's level)",
   blessings: "Add 2 resources to each Círdan's Blessing",
   bottom: "Add the bottom card of your deck to your hand",

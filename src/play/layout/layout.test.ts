@@ -69,7 +69,7 @@ const TABLETS = [
   { width: 980, height: 920 },
 ];
 const CANVASES = [...PHONES, ...TABLETS];
-const SCALES = [UI_SCALES.small, UI_SCALES.medium, UI_SCALES.large];
+const SCALES = [UI_SCALES.small, UI_SCALES.medium, UI_SCALES.large, UI_SCALES.xlarge];
 
 describe("the table's layout at a UI scale", () => {
   it("is the same table at scale 1 as with no scale", () => {
@@ -82,7 +82,7 @@ describe("the table's layout at a UI scale", () => {
     }
   });
 
-  it("keeps every card on the table inside the canvas at Small and Large", () => {
+  it("keeps every card on the table inside the canvas at Small, Large and Extra large", () => {
     for (const scale of SCALES) {
       for (const canvas of CANVASES) {
         for (const hand of [0, 1, 5, 9, 12]) {
@@ -520,14 +520,14 @@ describe("the second pile slot, ships and staging stacks (phase 39b)", () => {
     }
   });
 
-  it("leaves a Fellowship and a Mirkwood table as it was: no fold stack, no second slot, the pairs where they were", () => {
+  it("leaves a Fellowship and a Mirkwood table as it was: no fold stack (Extra large on the 400 x 300 canvas folds staging into one stack with its own 44 pt target, row-fold.ts), no second slot, the pairs where they were", () => {
     for (const canvas of CANVASES) {
       for (const scale of SCALES) {
         const { views: v, piles } = views(7);
         const layout = tableLayout(canvas.width, canvas.height, v, piles, { scale });
-        expect(layout.folds).toEqual([]);
+        expect((layout.folds ?? []).map((fold) => fold.id), `${canvas.width}x${canvas.height}@${scale}`).toEqual(scale === UI_SCALES.xlarge && canvas.width === 400 ? ["fold:staging"] : []);
         expect(layout.piles.corsairDeck).toBeUndefined();
-        expect(layout.slots.every((slot) => slot.stack == null && slot.fold == null)).toBe(true);
+        expect(layout.slots.every((slot) => slot.stack == null && (scale === UI_SCALES.xlarge || slot.fold == null))).toBe(true);
         expect(Object.keys(layout.piles).sort()).toEqual(["deck", "discard", "encounterDeck", "encounterDiscard"]);
       }
     }

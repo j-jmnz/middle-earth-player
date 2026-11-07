@@ -9,6 +9,7 @@ import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-na
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { CardImage } from "../../ui/card-image.tsx";
+import { ringRoom, ringScroll } from "../../ui/focus-ring-style.ts";
 import { PreviewPicture, type PreviewCard } from "../cards/card-preview.tsx";
 import { DockButtons } from "../choice/dock/buttons.tsx";
 import { springConfig, useMotionScale } from "../../ui/motion-run.ts";
@@ -106,7 +107,7 @@ export function QuestAdvanceView({
               <Text className="font-display text-eyebrow uppercase text-accent">{choice.header.step}</Text>
               <Text className="mt-1 text-body text-bone">{choice.header.title}</Text>
               {choice.header.note ? <Text className="mt-0.5 text-label text-muted">{choice.header.note}</Text> : null}
-              <ScrollView style={{ flexShrink: 1, marginTop: 8 * s }} showsVerticalScrollIndicator={false}>
+              <ScrollView style={{ flexShrink: 1, marginTop: 8 * s - ringRoom(s), marginHorizontal: ringScroll(s).style.marginHorizontal }} contentContainerStyle={ringScroll(s).content} showsVerticalScrollIndicator={false}>
                 {tiles.map((tile) => {
                   const source = tile.code ? picture(tile.code) : null;
                   const readId = tile.readId;

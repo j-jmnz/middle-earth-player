@@ -4,7 +4,7 @@
 // Pure, so a test reads it.
 import { ROUND_PHASES, STEP_WORDS } from "../phases/rail.ts";
 import { CHIP, COLS } from "../dream-chaser/island-table.ts";
-import { touch } from "../../ui/ui-scale.ts";
+import { touch, UI_SCALES } from "../../ui/ui-scale.ts";
 
 // The bar's height: the 46 pt threat dial with 3 pt above and below; its pop (1.22) and the peek's bone ring may reach past the bar
 // over the canvas's own top gutter. The rail's two lines (phase, ticks) fit in it.
@@ -13,6 +13,11 @@ export const TOP_BAR = 52;
 // stands 3 pt under the bar's top edge and its pop (1.22) reaches 5 pt above the dial, off the screen and into a phone's rounded
 // corner (user report, 2026-10-29).
 export const BAR_TOP = 8;
+
+/** Where the bar's top edge is: under the top inset, and never at the screen's very edge (BAR_TOP at the UI scale `s`). */
+export function barTopOf(insetTop: number, s: number): number {
+  return Math.max(insetTop, BAR_TOP * s);
+}
 export const MENU_BUTTON = 44;
 // The bar's side padding (px-2 in table/top-bar.tsx).
 export const BAR_PAD = 8;
@@ -119,6 +124,13 @@ export const DIAL_GAP = 10;
 export function badgeFoot(scale: number): number {
   const row = Math.max(touch(scale, 44), DIAL_SIZE * scale);
   return Math.max(0, (TOP_BAR * scale - row) / 2 - scale);
+}
+/**
+ * The scale the seat dials are drawn at: Large's at most. The bar's words stop growing at Medium (the tab words do), and at Extra large
+ * two seats' dials at the full size are wider than the bar leaves them on a 667 pt phone, so they scroll; at Large's size they fit.
+ */
+export function dialScale(scale: number): number {
+  return Math.min(scale, UI_SCALES.large);
 }
 /** The fade at the right edge of a scrolling dials row, and the room the row keeps clear of it at its end. */
 export const EDGE_FADE = 28;

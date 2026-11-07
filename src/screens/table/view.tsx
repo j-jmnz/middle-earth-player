@@ -3,18 +3,17 @@
 // intent in user.db, and this view hands the canvas the pictures in the image cache and lays the pieces out. The reducer is
 // the only writer of the game; how a tap becomes an intent is src/play/choice/use-table-choice.ts.
 import { useRouter, type Href } from "expo-router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Alert, BackHandler, useWindowDimensions, View, type LayoutChangeEvent } from "react-native";
+import { useCallback, useMemo, useRef, useState } from "react";
+import { Alert, useWindowDimensions, View, type LayoutChangeEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useStore } from "zustand";
 
-import { backStep, playLayers, runBackStep } from "../../play/chrome/back-steps";
 import { createBeats } from "../../play/store/beat-store";
 import { slotNumbers } from "../../play/cards/card-effects";
 import { CardPreview } from "../../play/cards/card-preview";
 import { standInText } from "../../play/cards/dungeon-preview";
 import { causeKey, type LogNames } from "../../play/store/log";
-import { dockPills } from "../../play/choice/dock/extras";
+import { dockPills, dockTextWidth, foldAids, footPadOf } from "../../play/choice/dock/extras";
 import { ChoiceTray } from "../../play/choice/tray";
 import { isDense } from "../../play/choice/dock/budget";
 import { MorePopoverView, useMorePopover } from "../../play/choice/dock/more";
@@ -30,6 +29,7 @@ import { TableDock } from "../../play/choice/dock/table-dock";
 import { TableLayers } from "../../play/chrome/table-layers";
 import { openReading, type Reading } from "../../play/chrome/reading";
 import { phaseCarousel, stopAheadOf } from "../../play/phases/carousel";
+import { useLook } from "../../ui/display-prefs";
 import { tableSettings } from "../../ui/table-settings";
 import { useKeepAwake } from "../../play/chrome/use-keep-awake";
 import { TableMenu } from "../../play/chrome/table-menu";
@@ -57,8 +57,9 @@ import { whyNotChosen } from "../../play/choice/why";
 import { ledgerLine, ruleTitle, sideText } from "../../play/cards/ledger";
 import { notApplied } from "../../play/cards/not-applied";
 import { BodyText, NavBar, Screen } from "../kit/chrome";
+import { useTableBack } from "./use-table-back";
 import { TableTopBar, TOP_BAR } from "./top-bar";
-import { BAR_TOP } from "../../play/chrome/top-bar-layout";
+import { barTopOf } from "../../play/chrome/top-bar-layout";
 import { goBack } from "../nav/go-back";
 import { useTablePictures } from "./use-table-pictures";
 import { pictureAt, useCardLookups } from "./card-lookups";
@@ -127,11 +128,10 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
   // The feet of the canvas's staging and engagement rows, as the canvas last laid them out (column-reach.ts).
   const [feet, setFeet] = useState<RowFeet | null>(null);
   // Only the settings this view uses: a change to another (the theme, the scale, a haptics switch) does not render it.
-  const highContrast = useStore(tableSettings, (state) => state.settings.highContrast);
   const stopsOn = useStore(tableSettings, (state) => state.settings.stopsOn);
   const stops = useStore(tableSettings, (state) => state.settings.stops);
   useKeepAwake();
-  const look = useMemo(() => ({ contrast: highContrast }), [highContrast]);
+  const look = useLook();
   // The card shown large, and cards listed with it that are not on the table (the Look window's).
   const [preview, setPreview] = useState<{ id: string; extra: readonly string[] } | null>(null);
   // The scenario's setup card shown large from the menu (user request, 2026-11-01): a preview of its own, since the card need not be on the table.
@@ -211,38 +211,31 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
   const choice = useTableChoice({ store, ctx, names, beats, onPreview, onPile, onOutcome, hold: advance.held });
   // A card shown large reads its picture from the cache, so it is described again when a file lands (pictureAt) while it is up.
   const revision = useImageRevision(preview != null || advance.shown != null);
-  // The quiet pills: Undo and up to two others, or Undo and More (dock/extras.ts); More opens a popover (dock/more.tsx).
-  const pills = dockPills(choice.extras);
+  // The quiet pills: Undo and up to two others, or Undo and More, or every one behind More at a larger text size when the room is short (dock/extras.ts); More opens a popover (dock/more.tsx).
+  const aidsFolded = foldAids({ height: screen.height, s, text: screen.fontScale, insets, width: dockTextWidth(commandWidthOf(screen.width, s), s), trayOpen: choice.panelOpen, dock: choice.dock, readout: choice.readout, refusal, extras: choice.extras });
+  const pills = dockPills(choice.extras, aidsFolded);
   const scale = useMemo(() => questScaleOf(game, ctx, choice.readout), [game, ctx, choice.readout]);
   const more = useMorePopover(pills.more.length, choice.resetKey);
   const { open: moreOpen, lines: linesOpen, close: closeMore } = more;
 
-  // Android hardware Back peels one layer at a time (src/play/chrome/back.ts) and only then leaves the table.
-  useEffect(() => {
-    const subscription = BackHandler.addEventListener("hardwareBackPress", () => {
-      // The quest advance screen is on top: Back is its Progress, and does nothing while the stage asks.
-      if (advance.shown) {
-        if (!advance.asks) advance.close();
-        return true;
-      }
-      const step = backStep({
-        ...playLayers(store),
-        menuOpen, moreOpen, linesOpen,
-        previewOpen: preview != null || setupShown, readingOpen: reading != null,
-        overlayOpen: choice.overlayOpen, panelOpen: choice.panelOpen,
-      });
-      if (runBackStep(step, store)) return true;
-      if (step === "closeMenu") setMenuOpen(false);
-      else if (step === "closeMore" || step === "closeLines") closeMore();
-      else if (step === "closePreview") (previewClose.current ?? (() => (setupShown ? setSetupShown(false) : setPreview(null))))();
-      else if (step === "closeReading") setReading(null);
-      else if (step === "closeOverlay") choice.closeOverlay();
-      else if (step === "foldPanel") choice.fold();
-      else goBack(router, nav.back);
-      return true;
-    });
-    return () => subscription.remove();
-  }, [store, menuOpen, moreOpen, linesOpen, closeMore, preview, setupShown, reading, choice, router, nav, advance]);
+  // Android hardware Back peels one layer at a time and only then leaves the table; a hardware keyboard's Escape peels without leaving and Z is Undo (use-table-back.ts).
+  const onKeyDown = useTableBack({
+    store,
+    advance,
+    open: { menu: menuOpen, more: moreOpen, lines: linesOpen, preview: preview != null || setupShown, reading: reading != null, overlay: choice.overlayOpen, panel: choice.panelOpen },
+    close: {
+      menu: () => setMenuOpen(false),
+      more: closeMore,
+      preview: () => (previewClose.current ?? (() => (setupShown ? setSetupShown(false) : setPreview(null))))(),
+      reading: () => setReading(null),
+      overlay: choice.closeOverlay,
+      panel: choice.fold,
+    },
+    banner: choice.banner != null,
+    dismissBanner: choice.dismissBanner,
+    undo: choice.undo,
+    leave: () => goBack(router, nav.back),
+  });
 
   const onLayout = (event: LayoutChangeEvent) => {
     const { width, height, x } = event.nativeEvent.layout;
@@ -264,7 +257,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
   const nightmareId = useMemo(() => nightmareCardId(game), [game]);
   const commandWidth = commandWidthOf(screen.width, s);
   // The head stands in the column's room above the dock (command-head.ts), the quest meter in the Quest phase only; while it shows, the dock keeps only the readout's result line.
-  const footPad = Math.max(insets.bottom, 8 * s);
+  const footPad = footPadOf(insets.bottom, s);
   // Once stage 2B has split the table a peek shows the other seat's staging row, which the pill would cover: the canvas leaves the pill its room above the row.
   const peekRoom = peek.words && game.separate === true ? (PEEK_ROOM - PEEK_TOP) * s : 0;
   // The reach (the top rows wholly above the dock, which a crowded row may run on under, column-reach.ts) is planned without the head, against the dock with its
@@ -281,7 +274,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
   // The screen the combat spotlight fills: its size, where the canvas's corner is on it (under the top bar, after the left inset and
   // the left inset) and the safe insets (spotlight/stage.ts).
   // The bar's top: under the top inset, and never at the screen's very edge (BAR_TOP).
-  const barTop = Math.max(insets.top, BAR_TOP * s);
+  const barTop = barTopOf(insets.top, s);
   const barBottom = barTop + TOP_BAR * s;
   const canvasX = size?.x ?? 0;
   const stageArea = useMemo<StageArea>(
@@ -332,7 +325,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
 
   return (
     // Bleed: the view below insets itself (barTop), so the status bar's inset is not added twice (user report, 2026-10-30).
-    <Screen testID="table" scene="table" bleed>
+    <Screen testID="table" scene="table" bleed onKeyDown={onKeyDown}>
       {/* Never flattened: with "auto" alone this view is layout-only and the renderer drops it, so the menu or a popover turning
           it to "no-hide-descendants" would add a native view and move the canvas into it, and the canvas would flash. */}
       <View className="flex-1" collapsable={false} importantForAccessibility={menuOpen || more.open || more.lines ? "no-hide-descendants" : "auto"} style={{ paddingTop: barTop, paddingLeft: insets.left, paddingRight: insets.right }}>
@@ -410,8 +403,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
               dock={choice.dock}
               onButton={choice.onButton}
               extras={pills.pills}
-              more={pills.more}
-              onMore={more.show} onLines={more.showLines}
+              more={pills.more} aidsFolded={aidsFolded} onMore={more.show} onLines={more.showLines}
               resetKey={choice.resetKey} momentKey={choice.sheet.key} stay={choice.stayFocus}
               guide={choice.guide}
               trayOpen={choice.panelOpen}
@@ -506,7 +498,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
       ) : null}
       {/* Last, so the layer Back closes first is the one on top. */}
       <TableMenu open={menuOpen} nav={nav} top={barBottom} right={insets.right + 8 * s} onClose={() => setMenuOpen(false)} onSelect={onMenuRow} />
-      <MorePopoverView more={more} items={pills.more} words={{ title: choice.header.lead + choice.header.title, guide: choice.guide, note: choice.header.note, unavailable: choice.unavailable }} commandWidth={commandWidth} insetRight={insets.right} onClose={more.close} />
+      <MorePopoverView more={more} items={pills.more} words={{ title: choice.header.lead + choice.header.title, guide: choice.guide, note: choice.header.note, unavailable: choice.unavailable, result: choice.readout?.result, refusal }} commandWidth={commandWidth} insetRight={insets.right} onClose={more.close} />
     </Screen>
   );
 }

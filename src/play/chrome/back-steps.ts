@@ -7,7 +7,7 @@ import { spotlightOpen } from "../spotlight/gate.ts";
 import type { TableStore } from "../store/store.ts";
 import { peekTo } from "../store/use-peek.ts";
 
-export { backStep } from "./back.ts";
+export { backStep, undoAllowed } from "./back.ts";
 
 /** The layers of `backStep` the play layer knows by itself: a spotlight playing, a hand scrub open, a peek at the other seat. */
 export function playLayers(store: TableStore): Pick<BackLayers, "spotlightOpen" | "scrubOpen" | "peekOpen"> {

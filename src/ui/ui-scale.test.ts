@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { DEFAULT_SETTINGS, UI_SCALE_OPTIONS } from "./table-settings.ts";
+import { DEFAULT_SETTINGS, parseSettings, UI_SCALE_OPTIONS } from "./table-settings.ts";
 import { scaled, touch, touchSlop, uiFactor, UI_SCALES } from "./ui-scale.ts";
 
 describe("ui scale", () => {
@@ -9,6 +9,9 @@ describe("ui scale", () => {
     expect(uiFactor("small")).toBe(0.875);
     expect(uiFactor("medium")).toBe(1);
     expect(uiFactor("large")).toBe(1.15);
+    expect(uiFactor("xlarge")).toBe(1.3);
+    expect(parseSettings({ uiScale: "xlarge" }).uiScale).toBe("xlarge");
+    expect(parseSettings({ uiScale: "huge" }).uiScale).toBe("medium");
     expect(uiFactor(DEFAULT_SETTINGS.uiScale)).toBe(1);
   });
 

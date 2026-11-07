@@ -1,5 +1,5 @@
 // The faces the table canvas draws with (docs/design-system.md, Type): names and small words in Barlow Semi Condensed, numbers in
-// Marcellus SC, both embedded; the system face stands in for the moment a font file takes to load. The combat spotlight's faces
+// Marcellus SC (Barlow semibold under the Title face setting's Plain), both embedded; the system face stands in for the moment a font file takes to load. The combat spotlight's faces
 // (`useSpotFonts`) are loaded once by its layer, not once for each attack it plays; they are null while the file loads. Every file and size is loaded
 // once for the app and shared by the canvas, its token layer and the spotlight's layer (table-assets.native.ts).
 // Every size is Medium's times the UI scale (ui-scale.ts, user request, 2026-10-28), which the canvas root passes in.
@@ -21,18 +21,22 @@ const BARLOW_BOLD = require("../../../assets/fonts/BarlowSemiCondensed-Bold.ttf"
  */
 export type SpotFonts = { pill: SkFont | null; count: SkFont | null; word: SkFont | null; number: SkFont | null; stamp: SkFont | null; note: SkFont | null };
 
-/** The spotlight's faces at a UI scale; each is null while its file loads. */
-export function useSpotFonts(scale = 1): SpotFonts {
-  const pill = useSharedFont(MARCELLUS, 24 * scale);
-  const count = useSharedFont(MARCELLUS, 19 * scale);
-  const word = useSharedFont(MARCELLUS, 14 * scale);
-  const number = useSharedFont(MARCELLUS, SPOT.numberSize * scale);
-  const stamp = useSharedFont(MARCELLUS, SPOT.stampSize * scale);
+/** The title file: Marcellus SC, or Barlow semibold under the Title face setting's Plain (display-prefs.ts). */
+export const titleFile = (plain: boolean): number => (plain ? BARLOW : MARCELLUS);
+
+/** The spotlight's faces at a UI scale; each is null while its file loads. `plain` draws the numbers and stamps in Barlow semibold. */
+export function useSpotFonts(scale = 1, plain = false): SpotFonts {
+  const title = titleFile(plain);
+  const pill = useSharedFont(title, 24 * scale);
+  const count = useSharedFont(title, 19 * scale);
+  const word = useSharedFont(title, 14 * scale);
+  const number = useSharedFont(title, SPOT.numberSize * scale);
+  const stamp = useSharedFont(title, SPOT.stampSize * scale);
   const note = useSharedFont(BARLOW_BOLD, SPOT.noteSize * scale);
   return useMemo(() => ({ pill, count, word, number, stamp, note }), [pill, count, word, number, stamp, note]);
 }
 
-export function useTableFonts(scale = 1): Fonts {
+export function useTableFonts(scale = 1, plain = false): Fonts {
   const family = Platform.select({ ios: "Helvetica", default: "sans-serif" });
   const systemNames = useMemo(() => matchFont({ fontFamily: family, fontSize: 11 * scale }), [family, scale]);
   const systemSmall = useMemo(() => matchFont({ fontFamily: family, fontSize: 10 * scale, fontWeight: "bold" }), [family, scale]);
@@ -40,6 +44,6 @@ export function useTableFonts(scale = 1): Fonts {
   const names = useSharedFont(BARLOW, 12 * scale);
   const small = useSharedFont(BARLOW_BOLD, 11 * scale);
   const badge = useSharedFont(BARLOW_BOLD, 12 * scale);
-  const marcellus = useSharedFont(MARCELLUS, 12 * scale);
+  const marcellus = useSharedFont(titleFile(plain), 12 * scale);
   return { names: names ?? systemNames, numbers: marcellus ?? systemNames, small: small ?? systemSmall, badge: badge ?? systemBadge };
 }

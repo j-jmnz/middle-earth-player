@@ -1,0 +1,50 @@
+name: Accessibility barrier
+description: Something in the app you cannot see, read, hear, reach or operate. It is treated as a bug.
+labels: [accessibility]
+body:
+  - type: input
+    id: device
+    attributes:
+      label: Device
+      description: The phone or tablet model.
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: OS version
+      description: iOS or Android, and its version.
+    validations:
+      required: true
+  - type: input
+    id: tech
+    attributes:
+      label: Assistive technology and its version
+      description: VoiceOver, TalkBack, Switch Control, Voice Control, a larger text size, Increase Contrast and so on. Say None if there is none.
+    validations:
+      required: true
+  - type: input
+    id: screen
+    attributes:
+      label: Screen
+      description: Where in the app, for example Settings, Decks or the table in the Quest phase.
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did and what the app did or did not do.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: input
+    id: app
+    attributes:
+      label: App version
+      description: The release, or the commit if you built it yourself.

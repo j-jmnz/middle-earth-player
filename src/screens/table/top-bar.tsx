@@ -19,8 +19,8 @@ import type { HeadingStep } from "../../play/dream-chaser/heading";
 import { MenuButton } from "../../play/chrome/table-menu";
 import { useTableTokens } from "../../ui/use-table-tokens";
 import { withAlphaHex } from "../../ui/tokens";
-import { BAR_PAD, barZones, chipCompact, DIAL_GAP, EDGE_FADE, HEADING_BADGE_OVER, headingCompact, headingOffset, railWide, TOP_BAR } from "../../play/chrome/top-bar-layout";
-import { useUiScale } from "../../ui/ui-scale";
+import { BAR_PAD, barZones, chipCompact, DIAL_GAP, dialScale, EDGE_FADE, HEADING_BADGE_OVER, headingCompact, headingOffset, railWide, TOP_BAR } from "../../play/chrome/top-bar-layout";
+import { UiScaleContext, useUiScale } from "../../ui/ui-scale";
 
 export { TOP_BAR };
 // The scroll fade: this many bands of this width (EDGE_FADE in all), rising to nearly the felt.
@@ -127,19 +127,21 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
             {threats.map((threat) => {
               const dial = seatDial(threats.length, acting, viewed, threat.seat, areas);
               return (
-                <ThreatRing
-                  key={threat.seat}
-                  threat={threat}
-                  label={threats.length > 1 ? `P${threat.seat + 1}` : "Threat"}
-                  accessibilityName={threats.length > 1 ? `Player ${threat.seat + 1} threat` : "Threat"}
-                  role={dial.role}
-                  hint={dial.hint}
-                  compact
-                  ticks={ticks[threat.seat] ?? NO_TICKS}
-                  ring={ringSeat === threat.seat ? ringWords : null}
-                  ringMark={ringMark}
-                  onPress={() => onThreat(threat.seat)}
-                />
+                <UiScaleContext.Provider key={threat.seat} value={dialScale(s)}>
+                  <ThreatRing
+                    threat={threat}
+                    label={threats.length > 1 ? `P${threat.seat + 1}` : "Threat"}
+                    accessibilityName={threats.length > 1 ? `Player ${threat.seat + 1} threat` : "Threat"}
+                    spokenWord="Threat"
+                    role={dial.role}
+                    hint={dial.hint}
+                    compact
+                    ticks={ticks[threat.seat] ?? NO_TICKS}
+                    ring={ringSeat === threat.seat ? ringWords : null}
+                    ringMark={ringMark}
+                    onPress={() => onThreat(threat.seat)}
+                  />
+                </UiScaleContext.Provider>
               );
             })}
             {/* The Map chip follows the seat dials; it drops its word when the row would scroll with it. */}

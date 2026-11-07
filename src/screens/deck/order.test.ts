@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { moveItem, nearestSlot, shiftsFor, type SlotRect } from "./order.ts";
+import { moveChoices, moveItem, nearestSlot, shiftsFor, type SlotRect } from "./order.ts";
 
 const column: SlotRect[] = [
   { x: 0, y: 0, width: 100, height: 50 },
@@ -59,5 +59,17 @@ describe("shiftsFor", () => {
     expect(shifts[3]).toEqual({ x: 0, y: -100 });
     expect(shifts[1]).toEqual({ x: -100, y: 100 });
     expect(shifts[2]).toEqual({ x: 100, y: 0 });
+  });
+});
+
+describe("moveChoices", () => {
+  it("enables each direction that has room", () => {
+    expect(moveChoices(0, 3)).toEqual({ up: false, down: true });
+    expect(moveChoices(1, 3)).toEqual({ up: true, down: true });
+    expect(moveChoices(2, 3)).toEqual({ up: true, down: false });
+  });
+  it("enables nothing for one deck or a deck not in the list", () => {
+    expect(moveChoices(0, 1)).toEqual({ up: false, down: false });
+    expect(moveChoices(-1, 3)).toEqual({ up: false, down: false });
   });
 });

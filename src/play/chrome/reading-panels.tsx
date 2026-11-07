@@ -8,6 +8,7 @@ import { Pressable, ScrollView, useWindowDimensions, View } from "react-native";
 
 import { CardImage } from "../../ui/card-image.tsx";
 import { cardCorner } from "../../ui/card-corner.ts";
+import { useFocusRing } from "../../ui/focus-ring.ts";
 import { longPressA11y, longPressHint } from "../../ui/long-press-action.ts";
 import { LIST_PICTURE, LIST_PICTURE_SMALL, smallPictures } from "../choice/dock/budget.ts";
 import { chipOnSurface, dropShadowOf } from "../../ui/surfaces.ts";
@@ -19,7 +20,7 @@ import { CloseButton, TextButton } from "../../ui/buttons.tsx";
 import { LineMark } from "./table-chrome.tsx";
 import { SettingsRows } from "./setting-rows.tsx";
 import type { TableSettings } from "../../ui/table-settings.ts";
-import { touch, useUiScale } from "../../ui/ui-scale.ts";
+import { capLines, touch, useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
 import { Text } from "../../ui/text.tsx";
 import { usePanelFocus } from "./use-panel-focus.ts";
@@ -53,14 +54,18 @@ function CardRow({ card, playable, testID, onPress, onLongPress }: { card: ListC
   const s = useUiScale();
   // The table's card on a tablet, the smaller picture on a phone, as the choice's rows (dock/budget.ts, smallPictures); a card's corners. A facedown
   // card or a missing file is a raised plate.
+  const ring = useFocusRing();
   const box = smallPictures(useWindowDimensions().height, s) ? LIST_PICTURE_SMALL : LIST_PICTURE;
   const w = box.w * s;
   const h = box.h * s;
+  // Two lines each at the phone's default text size; larger text grows the row (capLines, ui/ui-scale.ts).
+  const cap = capLines(2, useWindowDimensions().fontScale);
   const detail = playable ? "Playable now · tap to play" : (card.detail ?? null);
   // The tap is in the hint ("Plays it"), so the label says only that the card can be played.
   const said = playable ? "Playable now" : (card.said ?? detail);
   return (
     <Pressable
+      {...ring.props}
       testID={testID}
       accessibilityRole="button"
       accessibilityState={{ selected: playable }}
@@ -73,7 +78,7 @@ function CardRow({ card, playable, testID, onPress, onLongPress }: { card: ListC
       {({ pressed }) => (
         <View
           className="mb-1 flex-row items-center rounded-item px-1.5 py-1"
-          style={{ gap: 12 * s, minHeight: touch(s, 48), ...(pressed ? { backgroundColor: t.pressed } : playable ? chipOnSurface(t) : { backgroundColor: "transparent" }) }}
+          style={{ gap: 12 * s, minHeight: touch(s, 48), ...(pressed ? { backgroundColor: t.pressed } : playable ? chipOnSurface(t) : { backgroundColor: "transparent" }), ...ring.style }}
         >
           <View style={{ width: w, height: h, borderRadius: cardCorner(w, h), ...(playable ? { boxShadow: `0 0 0 2px ${t.accent}, 0 0 12px 2px ${withAlphaHex(t.accent, 0.55)}` } : { boxShadow: dropShadowOf(t, 3, 8, 0.8) }) }}>
             {card.picture ? (
@@ -83,11 +88,11 @@ function CardRow({ card, playable, testID, onPress, onLongPress }: { card: ListC
             )}
           </View>
           <View className="min-w-0 flex-1">
-            <Text numberOfLines={2} className="font-display text-body" style={{ color: playable ? t.accentHigh : t.bone }}>
+            <Text numberOfLines={cap} className="font-display text-body" style={{ color: playable ? t.accentHigh : t.bone }}>
               {card.label}
             </Text>
             {detail ? (
-              <Text numberOfLines={2} className="mt-0.5 text-label" style={{ color: playable ? t.accent : t.faint }}>
+              <Text numberOfLines={cap} className="mt-0.5 text-label" style={{ color: playable ? t.accent : t.faint }}>
                 {detail}
               </Text>
             ) : null}
@@ -276,8 +281,8 @@ export function ThreatPanel({
 
 /**
  * The table's settings, a night side panel from the menu's Table settings (user request, 2026-10-28): the Settings tab's own grouped rows
- * (setting-rows.tsx) under a left-aligned title, minus Stops on, which the rail's carousel carries. At the foot, All settings opens the
- * Settings tab (the game is saved) and Close closes the panel. Text and switches only; nothing here sends an intent.
+ * (setting-rows.tsx) under a left-aligned title, minus Stops on, which the rail's carousel carries. At the end of the rows, All settings opens the
+ * Settings tab (the game is saved); the round ✕ closes the panel. Text and switches only; nothing here sends an intent.
  */
 export function SettingsPanel({
   settings,
@@ -305,10 +310,11 @@ export function SettingsPanel({
       <PanelClose testID="settings-close" onPress={onClose} paper={false} />
       <ScrollView style={{ flexGrow: 0, flexShrink: 1 }} showsVerticalScrollIndicator persistentScrollbar>
         <SettingsRows settings={settings} onChange={onChange} always={always} testPrefix="settings" first />
+        {/* The last item of the scroll content, not a pinned footer: at Extra large on a short phone the rows take the room. */}
+        <View className="-ml-3 items-start pt-2">
+          <TextButton tone="accent" label="All settings" accessibilityLabel="All settings. Opens Settings and leaves the table" testID="settings-all" onPress={onAllSettings} />
+        </View>
       </ScrollView>
-      <View className="-ml-3 items-start pt-2">
-        <TextButton tone="accent" label="All settings" accessibilityLabel="All settings. Opens Settings and leaves the table" testID="settings-all" onPress={onAllSettings} />
-      </View>
     </View>
   );
 }

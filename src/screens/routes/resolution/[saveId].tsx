@@ -41,6 +41,7 @@ function Tile({ tile, selected, imagesrc, onPress }: { tile: ResolutionTile; sel
       collapsable={false}
       accessibilityRole="radio"
       accessibilityState={{ selected }}
+      aria-checked={selected}
       accessibilityLabel={`${label}${tile.tag ? `, ${tile.tag}` : ""}`}
       onPress={onPress}
       // Two tiles a row: a boon offered on each hero makes a longer list than one row holds. An odd last tile keeps the

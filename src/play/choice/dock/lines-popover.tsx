@@ -6,7 +6,7 @@ import { useRef } from "react";
 import { ScrollView, useWindowDimensions, View } from "react-native";
 
 import { CloseButton } from "../../../ui/buttons.tsx";
-import { linesPlace } from "./budget.ts";
+import { isDense, linesPlace } from "./budget.ts";
 import { dockLines } from "./lines.ts";
 import type { DockWords } from "./more.tsx";
 import { PopoverFrame, type PressableRef } from "../../../ui/popover-frame.tsx";
@@ -30,6 +30,8 @@ export function LinesPopover({ open, top, words, commandWidth, insetRight, onClo
   const lines = dockLines({ guide: words.guide, note: words.note, unavailable: words.unavailable });
   const tones = toneOf(t);
   const all = lines.first ? [lines.first, ...lines.rest] : [];
+  // A dense dock's result and refusal are fixed slots (table-dock.tsx): a cut one is whole here.
+  const dense = isDense(screen.height, s);
   return (
     <PopoverFrame
       open={open}
@@ -52,6 +54,16 @@ export function LinesPopover({ open, top, words, commandWidth, insetRight, onClo
                 {line.text}
               </Text>
             ))}
+            {dense && words.result ? (
+              <Text testID="dock-more-result-full" className="text-label" style={{ color: t.muted }}>
+                {words.result}
+              </Text>
+            ) : null}
+            {dense && words.refusal ? (
+              <Text testID="dock-more-refusal-full" className="text-label" style={{ color: t.danger }}>
+                {words.refusal}
+              </Text>
+            ) : null}
           </View>
         </ScrollView>
         {/* The round ✕ at the top right, over the title's end, which keeps its room clear of it. */}

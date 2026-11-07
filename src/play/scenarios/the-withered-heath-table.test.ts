@@ -45,7 +45,7 @@ describe("a Dragon Sign (19012:A:1 to 19012:A:3)", () => {
 describe("Cold-Drake at stage 2 (19023:B:2, 19023:B:3)", () => {
   it("is engaged with each player from the staging area, takes at most 6 damage a round and never has more than 18", () => {
     const t = heathTable(world, { stage: "19023", staging: [CODES.coldDrake] });
-    expect(detail(t, CODES.coldDrake)).toBe("Engaged with each player from the staging area: it attacks every player in the combat phase, any player's characters can attack it, and it adds no Threat. Takes at most 6 damage each round (6 more this round). Never has more than 18 damage, and stays in play even then.");
+    expect(detail(t, CODES.coldDrake)).toBe("Engaged with each player from the staging area. It attacks every player in the combat phase, any player's characters can attack it, and it adds no Threat. Takes at most 6 damage each round (6 more this round). Never has more than 18 damage, and stays in play even then.");
   });
 
   it("counts the damage it has taken this round", () => {

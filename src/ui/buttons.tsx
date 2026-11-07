@@ -5,16 +5,17 @@
 // primary about 8% and sinks it 1 pt, and fills the others. A disabled button keeps its shape at DISABLED_OPACITY, and the sentence
 // beside it says why. Every fill and text colour is a style, not only a class: on the phone a class on a Pressable whose style is a
 // function can be dropped (user report, 2026-10-25), so the pressed state comes from the Pressable's children.
-import { Pressable, View } from "react-native";
+import { Pressable, useWindowDimensions, View, type ViewStyle } from "react-native";
 import type { ComponentRef, ReactNode, Ref } from "react";
 
+import { useFocusRing } from "./focus-ring.ts";
 import { GameIcon } from "./game-icon.tsx";
 import type { IconName } from "./icon-map.ts";
 import { longPressA11y } from "./long-press-action.ts";
 import { CONTROL_RADIUS } from "./radius.ts";
 import { accentPlate, DISABLED_OPACITY, glassSurface, PRESSED_FILTER, slateSurface, textSurface } from "./surfaces.ts";
 import { withAlphaHex } from "./tokens.ts";
-import { touch, touchSlop, useUiScale } from "./ui-scale.ts";
+import { capLines, touch, touchSlop, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
 import { Text } from "./text.tsx";
 
@@ -33,6 +34,7 @@ export function PrimaryButton({
   accessibilityHint,
   compact = false,
   dock = false,
+  onFocusChange,
 }: {
   label: string;
   onPress: () => void;
@@ -45,10 +47,21 @@ export function PrimaryButton({
   compact?: boolean;
   // The table's command column: 46 pt, and a long word takes a second line rather than shrinking.
   dock?: boolean;
+  // Told when a keyboard moves focus onto the button or off it: the dock moves the armed bar clear of the ring (dock/buttons.tsx).
+  onFocusChange?: (focused: boolean) => void;
 }) {
   const paper = surface === "paper";
+  const ring = useFocusRing(paper);
   return (
     <Pressable
+      onFocus={() => {
+        ring.props.onFocus();
+        onFocusChange?.(true);
+      }}
+      onBlur={() => {
+        ring.props.onBlur();
+        onFocusChange?.(false);
+      }}
       testID={testID}
       collapsable={false}
       accessibilityRole="button"
@@ -58,7 +71,7 @@ export function PrimaryButton({
       disabled={disabled}
       onPress={onPress}
     >
-      {({ pressed }) => <PrimaryFace label={label} pressed={pressed} disabled={disabled} paper={paper} compact={compact} dock={dock} />}
+      {({ pressed }) => <PrimaryFace label={label} pressed={pressed} disabled={disabled} paper={paper} compact={compact} dock={dock} ring={ring.style} />}
     </Pressable>
   );
 }
@@ -75,6 +88,7 @@ export function PrimaryFace({
   paper = false,
   compact = false,
   dock = false,
+  ring,
 }: {
   label: string;
   pressed?: boolean;
@@ -82,27 +96,35 @@ export function PrimaryFace({
   paper?: boolean;
   compact?: boolean;
   dock?: boolean;
+  // The focus ring's outline while a keyboard holds focus (focus-ring.ts).
+  ring?: ViewStyle;
 }) {
   const t = useTableTokens();
   const s = useUiScale();
+  // The dock's primary keeps two lines at the phone's default text size; larger text grows the button (capLines, ui/ui-scale.ts).
+  const twoLines = capLines(2, useWindowDimensions().fontScale);
+  const dockCap = dock ? twoLines : undefined;
   const fill = paper ? { backgroundColor: t.ink, opacity: pressed && !disabled ? 0.85 : 1 } : accentPlate(pressed && !disabled, t);
   return (
-    <View
-      className="items-center justify-center rounded-control px-5"
-      style={{
-        minHeight: touch(s, compact ? 44 : dock ? 46 : 52),
-        ...fill,
-        ...(disabled ? { opacity: DISABLED_OPACITY } : {}),
-        transform: [{ translateY: pressed && !disabled ? 1 : 0 }],
-      }}
-    >
-      <Text
-        numberOfLines={dock ? 2 : undefined}
-        className="font-display text-center"
-        style={{ fontSize: 17 * s, lineHeight: 21 * s, letterSpacing: 1.2 * s, color: paper ? t.paper : t.onAccent }}
+    // The ring is on a view of its own so a disabled capsule's opacity does not fade it (the capsule's corner radius is the ring's).
+    <View style={{ borderRadius: CONTROL_RADIUS, ...ring }}>
+      <View
+        className="items-center justify-center rounded-control px-5"
+        style={{
+          minHeight: touch(s, compact ? 44 : dock ? 46 : 52),
+          ...fill,
+          ...(disabled ? { opacity: DISABLED_OPACITY } : {}),
+          transform: [{ translateY: pressed && !disabled ? 1 : 0 }],
+        }}
       >
-        {label}
-      </Text>
+        <Text
+          numberOfLines={dockCap}
+          className="font-display text-center"
+          style={{ fontSize: 17 * s, lineHeight: 21 * s, letterSpacing: 1.2 * s, color: paper ? t.paper : t.onAccent }}
+        >
+          {label}
+        </Text>
+      </View>
     </View>
   );
 }
@@ -144,8 +166,10 @@ export function SecondaryButton({
   const color = tone === "danger" ? t.danger : tone === "bone" ? t.bone : t.accent;
   const row = tight ? 40 * s : touch(s, 44);
   const slop = touchSlop(s, row);
+  const ring = useFocusRing();
   return (
     <Pressable
+      {...ring.props}
       testID={testID}
       collapsable={false}
       accessibilityRole="button"
@@ -158,21 +182,24 @@ export function SecondaryButton({
       style={{ minHeight: row, justifyContent: "center" }}
     >
       {({ pressed }) => (
-        <View
-          className="flex-row items-center justify-center gap-2 rounded-control"
-          style={{
-            minHeight: tight ? 36 * s : touch(s, 44),
-            minWidth: touch(s, 44),
-            paddingHorizontal: 18 * s,
-            ...slateSurface(pressed && !disabled, t),
-            ...(disabled ? { opacity: DISABLED_OPACITY } : {}),
-          }}
-        >
-          {icon ? <GameIcon name={icon} size={15 * s} tint={tone === "danger" ? "danger" : tone === "bone" ? "bone" : "accent"} /> : null}
-          <Text className="font-display" style={{ fontSize: 15 * s, lineHeight: 19 * s, letterSpacing: 1 * s, color }}>
-            {label}
-          </Text>
-          {trailing}
+        // The ring is on a view of its own so a disabled capsule's opacity does not fade it.
+        <View style={{ borderRadius: CONTROL_RADIUS, ...ring.style }}>
+          <View
+            className="flex-row items-center justify-center gap-2 rounded-control"
+            style={{
+              minHeight: tight ? 36 * s : touch(s, 44),
+              minWidth: touch(s, 44),
+              paddingHorizontal: 18 * s,
+              ...slateSurface(pressed && !disabled, t),
+              ...(disabled ? { opacity: DISABLED_OPACITY } : {}),
+            }}
+          >
+            {icon ? <GameIcon name={icon} size={15 * s} tint={tone === "danger" ? "danger" : tone === "bone" ? "bone" : "accent"} /> : null}
+            <Text className="font-display" style={{ fontSize: 15 * s, lineHeight: 19 * s, letterSpacing: 1 * s, color }}>
+              {label}
+            </Text>
+            {trailing}
+          </View>
         </View>
       )}
     </Pressable>
@@ -237,12 +264,15 @@ export function TextButton({
   // A long press is also an action in the reader's menu; the hint names it after any hint the caller gave.
   const longPress = onLongPress ? longPressA11y(longPressLabel, onLongPress) : null;
   const hint = [accessibilityHint, longPress?.accessibilityHint].filter(Boolean).join(". ") || undefined;
+  const ring = useFocusRing(tone === "ink");
   return (
     <Pressable
+      {...ring.props}
       testID={testID}
       collapsable={false}
       accessibilityRole={selected == null ? "button" : "radio"}
       {...(state ? { accessibilityState: state } : {})}
+      {...(selected == null ? {} : { "aria-checked": selected })}
       accessibilityLabel={accessibilityLabel ?? label}
       accessibilityHint={hint}
       {...(longPress ? { accessibilityActions: longPress.accessibilityActions, onAccessibilityAction: longPress.onAccessibilityAction } : {})}
@@ -255,18 +285,21 @@ export function TextButton({
     >
       {/* The size and the pressed fill are on a view inside: NativeWind drops a style function on a Pressable that also has a className. */}
       {({ pressed }) => (
-        <View
-          className="flex-row items-center justify-center gap-2 px-3"
-          style={{
-            minHeight: row,
-            minWidth: touch(s, 44),
-            borderRadius: CONTROL_RADIUS,
-            ...(disabled ? { opacity: DISABLED_OPACITY } : {}),
-            ...(tone === "ink" ? { backgroundColor: pressed && !disabled ? t.paperPressed : "transparent" } : textSurface(pressed && !disabled, t)),
-          }}
-        >
-          {icon ? <GameIcon name={icon} size={16 * s} tint={tone === "ink" ? "inkLabel" : tone} /> : null}
-          {word}
+        // The ring is on a view of its own so a disabled button's opacity does not fade it.
+        <View style={{ borderRadius: CONTROL_RADIUS, ...ring.style }}>
+          <View
+            className="flex-row items-center justify-center gap-2 px-3"
+            style={{
+              minHeight: row,
+              minWidth: touch(s, 44),
+              borderRadius: CONTROL_RADIUS,
+              ...(disabled ? { opacity: DISABLED_OPACITY } : {}),
+              ...(tone === "ink" ? { backgroundColor: pressed && !disabled ? t.paperPressed : "transparent" } : textSurface(pressed && !disabled, t)),
+            }}
+          >
+            {icon ? <GameIcon name={icon} size={16 * s} tint={tone === "ink" ? "inkLabel" : tone} /> : null}
+            {word}
+          </View>
         </View>
       )}
     </Pressable>
@@ -308,8 +341,10 @@ export function GlassIconButton({
   const s = useUiScale();
   const box = touch(s, 44);
   const color = active ? t.accent : paper ? t.ink : tone === "accent" ? t.accent : t.bone;
+  const ring = useFocusRing(paper);
   return (
     <Pressable
+      {...ring.props}
       ref={pressRef}
       testID={testID}
       collapsable={false}
@@ -328,6 +363,7 @@ export function GlassIconButton({
             alignItems: "center",
             justifyContent: "center",
             ...(paper ? { backgroundColor: withAlphaHex(t.ink, 0.08), ...(pressed ? { filter: PRESSED_FILTER } : {}) } : glassSurface(pressed, t)),
+            ...ring.style,
           }}
         >
           {mark(color)}

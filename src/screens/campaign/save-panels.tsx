@@ -32,9 +32,9 @@ export function NextStop({ id, line, onNext, onPath, onLog }: { id: string; line
         </Text>
       </View>
       {go ? <PrimaryPlate>{go}</PrimaryPlate> : null}
-      <View className="flex-row" style={{ gap: 8 * s }}>
-        <TextButton label="Full path" icon="oneRing" tone="accent" testID="continue-path" accessibilityLabel={`Path of ${describe(line)}`} onPress={onPath} />
-        <TextButton label="Campaign log" icon="contract" tone="accent" testID="continue-log" accessibilityLabel={`Log of ${describe(line)}`} onPress={onLog} />
+      <View className="flex-row flex-wrap" style={{ gap: 8 * s }}>
+        <TextButton label="Full path" icon="oneRing" tone="accent" testID="continue-path" accessibilityLabel={`Full path, ${describe(line)}`} onPress={onPath} />
+        <TextButton label="Campaign log" icon="contract" tone="accent" testID="continue-log" accessibilityLabel={`Campaign log, ${describe(line)}`} onPress={onLog} />
       </View>
     </View>
   );

@@ -139,6 +139,7 @@ function Chip({
     <Pressable
       accessibilityRole="radio"
       accessibilityState={{ checked: selected }}
+      aria-checked={selected}
       onPress={onPress}
       className="mb-2 mr-2 min-h-touch flex-row items-center gap-2 rounded-control px-4"
       style={{ backgroundColor: selected ? palette.ink : withAlphaHex(palette.ink, 0.08) }}

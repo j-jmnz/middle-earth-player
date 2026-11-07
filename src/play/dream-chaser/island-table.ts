@@ -168,7 +168,7 @@ export type IslandFit = {
   // The words stand beside the grid (`beside`) or under it (`below`), and the width the words have.
   layout: "beside" | "below";
   textW: number;
-  // Whether the whole panel (header, grid, words) fits its box with every tile at least a thumb in both directions; the grid is never cut, it shrinks first.
+  // Whether the whole panel (header, grid, words) fits its box with every tile at least a thumb in both directions; the grid is never cut, it shrinks first; when it cannot fit at thumb size `fits` is false and the panel scrolls.
   fits: boolean;
 };
 
@@ -218,7 +218,15 @@ export function islandFit(width: number, maxHeight: number, s: number, standing 
   const spent = head + 16 * s + TEXT_GAP * s + wordsHeight(inner);
   const tileH = Math.max(0, Math.min(tileW * 1.1, down(spent)));
   const { gridW, gridH } = grid(tileW, tileH);
-  return { tileW, tileH, gap, gridW, gridH, layout: "below", textW: inner, fits: tileW >= floor && tileH >= floor && gridW <= inner + 0.5 && gridH + label + spent <= maxHeight + 0.5 };
+  const fits = tileW >= floor && tileH >= floor && gridW <= inner + 0.5 && gridH + label + spent <= maxHeight + 0.5;
+  if (fits || tileW < floor) return { tileW, tileH, gap, gridW, gridH, layout: "below", textW: inner, fits };
+  // The room cannot hold the header, the grid and the words at once (Extra large on a short phone): the tiles keep their thumb size, never shrinking
+  // under it, and the panel's scroll carries what does not fit, the words beside the grid when it leaves them room, else under it.
+  const small = grid(floor, floor);
+  const textW = inner - small.gridW - SIDE_GAP * s;
+  if (textW >= SIDE_MIN * s && small.gridH + label + head <= maxHeight + 0.5) return { tileW: floor, tileH: floor, gap, gridW: small.gridW, gridH: small.gridH, layout: "beside", textW, fits: false };
+  const { gridW: floorW, gridH: floorH } = grid(tileW, floor);
+  return { tileW, tileH: floor, gap, gridW: floorW, gridH: floorH, layout: "below", textW: inner, fits: false };
 }
 
 /** The chip's mini grid: five cells across and three down, each a small square, drawn inside a 44 pt target. */

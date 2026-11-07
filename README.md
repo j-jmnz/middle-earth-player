@@ -46,12 +46,7 @@ After those come the remaining official cycles, saga boxes and standalone scenar
 
 ## Accessibility
 
-- **Screen readers.** VoiceOver and TalkBack can play a full game. When a reader is on, the game table is replaced by a scrolling list of zones and cards. Each card's label gives its whole state (damage, resources, progress, attachments, effect modifiers), and its hint says what a double tap does. Each long press is also offered as a reader action. Each new moment and each refused move is announced in order through one queue, so one line never cuts off another. This mode is only on the phone; the web build has none.
-- **Touch targets.** Every control has a 44 pt target at every text size.
-- **Display.** Settings offer a dark and a light theme, three interface sizes (the table included), and a "Strong outlines" option that thickens effect marks and token counts.
-- **Motion.** Reduce motion follows the phone's setting or can be forced on. It snaps animations and stops the fog and the combat replay. Animation speed and the combat replay can also be set on their own, and haptics can be turned off.
-
-`scripts/checks/a11y.test.ts` fails on a control with no role or name, a long press with no matching action, an unlabelled text field, or an image that is neither labelled nor hidden. The rules are in [docs/design-system.md](docs/design-system.md) and [docs/design-system-table.md](docs/design-system-table.md), Screen reader.
+VoiceOver and TalkBack can play a full game: with a reader on, the table becomes a list of zones and cards that the reader announces. Settings offer the table as a list without a reader, larger text, strong outlines that follow the phone's contrast setting, a slower game, a banner that waits for a tap, a longer or no time on the two-tap buttons, and a plain title face. The app aims at WCAG 2.2 AA and the Game Accessibility Guidelines, has not been audited by a third party and makes no conformance claim. [ACCESSIBILITY.md](ACCESSIBILITY.md) lists what is supported, the settings, the known gaps and how to report a barrier.
 
 ## Architecture
 
@@ -185,6 +180,7 @@ The end-to-end flows are in `.maestro/scenarios/<scenario-id>/` and `.maestro/fe
 | `pnpm effects:draft <scenario \| deck \| pack \| codes>` | Writes `.agent/drafts/<code>.md` for each card with a printed line that has no effect record. |
 | `pnpm effects:open` | Regenerates `src/effects/open-lines.ts`. |
 | `pnpm scenario:new <scenario-id>` | Writes the skeleton files for a new scenario and registers it. `--dry-run` lists the files first. |
+| `pnpm a11y:web` | Exports the web build, serves it on localhost and audits the main screens with axe-core in Chromium; fails on a serious or critical finding. Needs `pnpm exec playwright install chromium` once, or `A11Y_CHROMIUM=<path to a Chromium>`. |
 | `pnpm catalog:build` | Writes `assets/catalog.db` (never committed) and `src/catalog/version.ts` (committed). |
 | `pnpm scans:pack` / `pnpm booklets:pack` | Packs card pictures and the booklet PDFs into `assets/` for the native bundle. |
 | `pnpm release:plan --dry-run` | Prints the next release tag and its notes from the commits since the last tag (`git fetch --tags` first). Changes nothing. |
@@ -208,6 +204,7 @@ Contributions are welcome. [CONTRIBUTING.md](CONTRIBUTING.md) covers the checks 
 - [docs/design-system.md](docs/design-system.md) and [docs/design-system-table.md](docs/design-system-table.md): the look of the screens and the game table.
 - [docs/releasing.md](docs/releasing.md): how a release is cut and shipped; the rules are in [.claude/rules/release-standards.md](./.claude/rules/release-standards.md).
 - [docs/phases/STATUS.md](docs/phases/STATUS.md): progress and open work.
+- [ACCESSIBILITY.md](ACCESSIBILITY.md): what the app supports for players who need it, its gaps and how to report a barrier.
 - [docs/INDEX.md](docs/INDEX.md): a generated index of every doc, by section.
 
 ## Attribution

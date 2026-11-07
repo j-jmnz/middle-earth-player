@@ -34,7 +34,7 @@ import { foldTitle } from "../layout/row-fold.ts";
 import { areaRoleOf } from "../store/stormcaller-table.ts";
 import { AREA_LIST_TITLE } from "../words/stormcaller.ts";
 import { alwaysRows } from "./settings-words.ts";
-import { useScreenReader } from "../../ui/screen-reader.ts";
+import { useReaderMode, useScreenReader } from "../../ui/screen-reader.ts";
 import { hidesFace, PILE_WORDS, pileIds, type PileId } from "../store/selectors.ts";
 import type { Sheet, SheetNames } from "../choice/sheet-types.ts";
 import { SpotlightScrim } from "../spotlight/scrim.tsx";
@@ -208,7 +208,9 @@ export function TableLayers({
   // The settings panel and the strip's Stops switches read the settings themselves; no state of the game renders this view (the panels that
   // read the game below subscribe to it on their own, and only while they are open).
   const settings = useStore(tableSettings, (state) => state.settings);
-  const reader = useScreenReader();
+  // The tray stays open for a reader and for the list table (Table as a list): neither has a canvas to fold it onto.
+  const readerMode = useReaderMode();
+  const reader = useScreenReader() || readerMode;
   // The discard pile list is the shown seat's; the banner over the canvas says when that is not the acting seat's (peek.ts).
   const peek = usePeek(store);
   const dialsEdge = useDialsEdge();

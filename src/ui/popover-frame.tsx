@@ -7,6 +7,7 @@ import { useEffect, useRef, type ComponentRef, type ReactNode, type RefObject } 
 import { AccessibilityInfo, findNodeHandle, Pressable, StyleSheet, View } from "react-native";
 import Animated, { useAnimatedStyle } from "react-native-reanimated";
 
+import { useFocusRing } from "./focus-ring.ts";
 import { GameIcon } from "./game-icon.tsx";
 import type { IconName } from "./icon-map.ts";
 import { useOpenMotion } from "./motion-run.ts";
@@ -42,8 +43,11 @@ export function PopoverRow({ item, onPress, rowRef }: { item: PopoverRowItem; on
   const t = useTableTokens();
   const s = useUiScale();
   const row = touch(s, ROW);
+  // The ring stays inside the frame's padding (PAD 6 pt holds its 2 pt and 2 pt offset at Medium).
+  const ring = useFocusRing();
   return (
     <Pressable
+      {...ring.props}
       ref={rowRef}
       testID={item.testID}
       collapsable={false}
@@ -63,6 +67,7 @@ export function PopoverRow({ item, onPress, rowRef }: { item: PopoverRowItem; on
             paddingHorizontal: 10 * s,
             borderRadius: ITEM_RADIUS * s,
             backgroundColor: pressed ? t.pressed : "transparent",
+            ...ring.style,
           }}
         >
           {item.icon ? <GameIcon name={item.icon} size={18 * s} tint="bone" /> : null}

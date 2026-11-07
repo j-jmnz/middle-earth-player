@@ -12,6 +12,7 @@ import { timing, useMotionScale } from "../../ui/motion-run.ts";
 import { MOTION } from "../../ui/motion-tokens.ts";
 import { withAlphaHex } from "../../ui/tokens.ts";
 import { CONTROL_RADIUS } from "../../ui/radius.ts";
+import { usePlainTitles } from "../../ui/display-prefs.ts";
 import { touch, useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
 import { ROUND_PHASES, type Rail } from "./rail.ts";
@@ -57,6 +58,7 @@ export function PhaseRail({
   const scale = useMotionScale();
   const t = useTableTokens();
   const s = useUiScale();
+  const plain = usePlainTitles();
   const flash = useSharedValue(0);
   const lastPhase = useRef(rail.phase);
   useEffect(() => {
@@ -65,11 +67,14 @@ export function PhaseRail({
     if (scale > 0) flash.set(withSequence(withTiming(1, timing(MOTION.railFlashIn, scale)), withTiming(0, timing(MOTION.railFlashOut, scale))));
   }, [rail.phase, scale, flash]);
   const glow = useAnimatedStyle(() => ({ opacity: 0.55 + 0.45 * flash.get() }));
-  const round = rail.round > 0 ? `Round ${rail.round}` : "";
+  const round = rail.round > 0 ? `round ${rail.round}` : "";
   // The headline is the phase; Setup and the mulligan have none, so their step takes its place.
   const head = rail.phase || rail.current;
   const at = ROUND_PHASES.findIndex((phase) => phase.toLowerCase() === rail.phase.toLowerCase());
-  const label = [round, rail.additional ? `${rail.phase} · additional` : rail.phase, rail.current, stopAhead ? STOP_AHEAD_WORDS : ""].filter(Boolean).join(". ");
+  // Label in Name: the spoken label starts with the visible phase ("Planning, round 1"), names the step only when it is not the phase itself,
+  // then the stop note.
+  const step = rail.phase && rail.current.toLowerCase() !== rail.phase.toLowerCase() ? rail.current : "";
+  const label = [rail.additional ? `${head}, additional` : head, round, step, stopAhead ? STOP_AHEAD_WORDS : ""].filter(Boolean).join(", ");
   return (
     <Pressable
       testID="rail"
@@ -102,19 +107,20 @@ export function PhaseRail({
           ) : null}
           {head ? (
             // iOS tracks after the last letter too; Android splits the tracking round each letter.
-            <View style={{ paddingLeft: (STOP_MARK + (Platform.OS === "ios" ? 4 : 0)) * s, paddingRight: STOP_MARK * s }}>
+            <View style={{ paddingLeft: (STOP_MARK + (Platform.OS === "ios" ? (plain ? 0.5 : 4) : 0)) * s, paddingRight: STOP_MARK * s }}>
               <Animated.View pointerEvents="none" style={[{ position: "absolute", left: -8 * s, right: -8 * s, top: 2 * s, bottom: 2 * s, borderRadius: CONTROL_RADIUS, backgroundImage: `radial-gradient(50% 50% at 50% 50%, ${withAlphaHex(t.glow, 0.22)}, ${withAlphaHex(t.glow, 0)})` }, glow]} />
               <Text
                 testID={rail.phase ? "rail-phase" : "rail-current"}
                 numberOfLines={1}
+                // Kept: the rail's width is a fixed slot (RAIL_FLOOR counts it from this size), so the phone's larger text shrinks to it rather than widening the bar.
                 adjustsFontSizeToFit
                 minimumFontScale={0.85}
                 className="font-display"
                 style={{
-                  // 17 pt tracked 4: top-bar-layout.ts counts the rail's floor from this size and Marcellus SC's letters.
+                  // 17 pt tracked 4 (0.5 under the Plain title face, whose letters are not capitals): top-bar-layout.ts counts the rail's floor from this size and Marcellus SC's letters.
                   fontSize: 17 * s,
                   lineHeight: 21 * s,
-                  letterSpacing: 4 * s,
+                  letterSpacing: (plain ? 0.5 : 4) * s,
                   color: t.bone,
                   ...(t.depth === "light" ? {} : { textShadowColor: withAlphaHex(t.glow, 0.8), textShadowRadius: 10 * s, textShadowOffset: { width: 0, height: 0 } }),
                 }}

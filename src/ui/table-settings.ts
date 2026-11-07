@@ -18,17 +18,18 @@ export type TableSettings = {
   stops: readonly string[];
   // Effect ids of Responses with no cost and no choice that the player always uses (Sam Gamgee's ready, Pippin's draw).
   alwaysUse: readonly string[];
-  // Effect pills and token counts drawn with stronger outlines.
-  highContrast: boolean;
+  // Strong outlines: effect pills and token counts drawn with stronger outlines. Follow system turns them on with the phone's Increase Contrast
+  // (iOS) or High contrast text (Android); Always and Off decide it. The key keeps its first name, when it was a switch (parseSettings).
+  highContrast: StrongOutlinesOption;
   // The first-game guide: a line under the dock's title the first two times each step comes up.
   guide: boolean;
   // How many times the guide has explained each step.
   guideSeen: Readonly<Record<string, number>>;
-  // Animation speed (src/ui/motion-tokens.ts, motionScale): Normal, or Quick at 0.6 of every length. Reduced motion snaps either.
+  // Animation speed (src/ui/motion-tokens.ts, motionScale): Normal, Quick at 0.6 of every length or Slow at 1.5. Reduced motion snaps all three.
   animationSpeed: Speed;
   // The combat spotlight (phase 24): when an attack deals or blocks damage the table plays it large. Off plays none, as reduced motion does.
   spotlight: boolean;
-  // How large the whole UI draws: Small, Medium or Large (ui-scale.ts holds the factors).
+  // How large the whole UI draws: Small, Medium, Large or Extra large (ui-scale.ts holds the factors).
   uiScale: UiScaleOption;
   // A buzz on the table's key moments. Off plays none.
   haptics: boolean;
@@ -42,21 +43,46 @@ export type TableSettings = {
   cardQuality: CardQualityOption;
   // Whether the fog behind every screen drifts. Off holds it still (src/screens/art/backdrop-drift.ts).
   fogDrift: boolean;
+  // Table as a list: the reader table (the tray as the default path, the reader notes) follows the phone's screen reader, or is always on, for a
+  // player whose Switch Control, Voice Control or Switch Access cannot reach a card drawn on the canvas. Native only (screen-reader.ts, useReaderMode).
+  tableAsList: TableListOption;
+  // Confirm time: how long an armed two-tap button waits for its second tap (dock/armed-room.ts, armMs).
+  confirmTime: ConfirmTimeOption;
+  // Banner closes: after a few seconds (readouts/banner-time.ts), or only when the player taps or swipes it, or a new moment replaces it.
+  bannerCloses: BannerClosesOption;
+  // Title face: Carved is Marcellus SC (small capitals) for every `font-display` text and the canvas's numbers; Plain is Barlow Semi Condensed semibold.
+  titleFace: TitleFaceOption;
 };
 
-export const UI_SCALE_OPTIONS = ["small", "medium", "large"] as const;
+export const UI_SCALE_OPTIONS = ["small", "medium", "large", "xlarge"] as const;
 export type UiScaleOption = (typeof UI_SCALE_OPTIONS)[number];
 export const REDUCE_MOTION_OPTIONS = ["system", "always"] as const;
 export type ReduceMotionOption = (typeof REDUCE_MOTION_OPTIONS)[number];
 export const THEME_OPTIONS = ["dark", "light", "system"] as const;
 export type ThemeOption = (typeof THEME_OPTIONS)[number];
+export const TABLE_LIST_OPTIONS = ["system", "always"] as const;
+export type TableListOption = (typeof TABLE_LIST_OPTIONS)[number];
+export const CONFIRM_TIME_OPTIONS = ["standard", "long", "none"] as const;
+export type ConfirmTimeOption = (typeof CONFIRM_TIME_OPTIONS)[number];
+export const BANNER_CLOSES_OPTIONS = ["timer", "tap"] as const;
+export type BannerClosesOption = (typeof BANNER_CLOSES_OPTIONS)[number];
+export const STRONG_OUTLINES_OPTIONS = ["system", "always", "off"] as const;
+export type StrongOutlinesOption = (typeof STRONG_OUTLINES_OPTIONS)[number];
+export const TITLE_FACE_OPTIONS = ["carved", "plain"] as const;
+export type TitleFaceOption = (typeof TITLE_FACE_OPTIONS)[number];
 export const CARD_QUALITY_OPTIONS = ["high", "low"] as const;
 export type CardQualityOption = (typeof CARD_QUALITY_OPTIONS)[number];
+
+/** Whether Strong outlines is in effect: Always and Off decide it; Follow system is on while the phone's Increase Contrast or High contrast text is. */
+export function strongOutlines(option: StrongOutlinesOption, increaseContrast: boolean): boolean {
+  if (option === "always") return true;
+  return option === "system" && increaseContrast;
+}
 
 // The stops the video uses: after staging ("the golden action window") and before the shadow card turns.
 export const DEFAULT_STOPS: readonly string[] = ["3.3", "shadow"];
 
-export const DEFAULT_SETTINGS: TableSettings = { stopsOn: false, stops: DEFAULT_STOPS, alwaysUse: [], highContrast: false, guide: true, guideSeen: {}, animationSpeed: "normal", spotlight: true, uiScale: "medium", haptics: true, reduceMotion: "system", keepAwake: true, theme: "dark", cardQuality: "high", fogDrift: true };
+export const DEFAULT_SETTINGS: TableSettings = { stopsOn: false, stops: DEFAULT_STOPS, alwaysUse: [], highContrast: "system", guide: true, guideSeen: {}, animationSpeed: "normal", spotlight: true, uiScale: "medium", haptics: true, reduceMotion: "system", keepAwake: true, theme: "dark", cardQuality: "high", fogDrift: true, tableAsList: "system", confirmTime: "standard", bannerCloses: "timer", titleFace: "carved" };
 
 /** Settings read back from storage: unknown keys dropped, missing ones defaulted, wrong types replaced. */
 export function parseSettings(raw: unknown): TableSettings {
@@ -71,7 +97,8 @@ export function parseSettings(raw: unknown): TableSettings {
     stopsOn: flag(value.stopsOn, DEFAULT_SETTINGS.stopsOn),
     stops: strings(value.stops, DEFAULT_SETTINGS.stops).filter((stop) => (STOP_POINTS as readonly string[]).includes(stop)),
     alwaysUse: strings(value.alwaysUse, []),
-    highContrast: flag(value.highContrast, false),
+    // An older build stored a switch: on is Always, off is Follow system.
+    highContrast: value.highContrast === true ? "always" : (STRONG_OUTLINES_OPTIONS.find((option) => option === value.highContrast) ?? DEFAULT_SETTINGS.highContrast),
     guide: flag(value.guide, true),
     guideSeen: seen,
     animationSpeed: SPEEDS.find((speed) => speed === value.animationSpeed) ?? DEFAULT_SETTINGS.animationSpeed,
@@ -83,6 +110,10 @@ export function parseSettings(raw: unknown): TableSettings {
     theme: THEME_OPTIONS.find((option) => option === value.theme) ?? DEFAULT_SETTINGS.theme,
     cardQuality: CARD_QUALITY_OPTIONS.find((option) => option === value.cardQuality) ?? DEFAULT_SETTINGS.cardQuality,
     fogDrift: flag(value.fogDrift, DEFAULT_SETTINGS.fogDrift),
+    tableAsList: TABLE_LIST_OPTIONS.find((option) => option === value.tableAsList) ?? DEFAULT_SETTINGS.tableAsList,
+    confirmTime: CONFIRM_TIME_OPTIONS.find((option) => option === value.confirmTime) ?? DEFAULT_SETTINGS.confirmTime,
+    bannerCloses: BANNER_CLOSES_OPTIONS.find((option) => option === value.bannerCloses) ?? DEFAULT_SETTINGS.bannerCloses,
+    titleFace: TITLE_FACE_OPTIONS.find((option) => option === value.titleFace) ?? DEFAULT_SETTINGS.titleFace,
   };
 }
 

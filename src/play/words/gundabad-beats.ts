@@ -51,10 +51,10 @@ export function stageBeats(before: ScenarioState, after: ScenarioState, names: S
   // A stage searched out of the quest deck (Throat of the Mountain) shows side B at once and the deck is shuffled; a bypassed one arrives side A and goes to the bottom.
   if (after.cards[id]?.face === "B") {
     const progress = lost === 0 ? "had no progress" : `loses its ${lost} progress`;
-    return { rank: 0, title: `${names.card(id)} becomes the current quest`, lines: [`The stage that was current ${progress} and goes back into the quest deck, which is shuffled: it is not defeated, so it is not added to the victory display. The new stage is flipped over at once.`] };
+    return { rank: 0, title: `${names.card(id)} becomes the current quest`, lines: [`The stage that was current ${progress} and goes back into the quest deck, which is shuffled. It is not defeated, so it is not added to the victory display. The new stage is flipped over at once.`] };
   }
   const forced = names.mustBypass?.(left.from);
-  const goes = "goes to the bottom of the quest deck: it is not defeated, so it is not added to the victory display.";
+  const goes = "goes to the bottom of the quest deck. It is not defeated, so it is not added to the victory display.";
   const text = forced ? `${forced} ${lost === 0 ? `It has no progress to lose and ${goes}` : `It ${goes}`}` : lost === 0 ? `It had no progress to lose and ${goes}` : `The stage ${goes}`;
   return { rank: 0, title: `${names.card(left.from)} is bypassed`, lines: [text] };
 }

@@ -164,7 +164,7 @@ describe("spreadLayout", () => {
   });
 
   it("keeps the lifted card and its neighbours inside the canvas at every hand size, at Small and Large", () => {
-    for (const scale of [UI_SCALES.small, UI_SCALES.large]) {
+    for (const scale of [UI_SCALES.small, UI_SCALES.large, UI_SCALES.xlarge]) {
       // (A hand of 12 on a canvas narrower than these cannot keep 44 pt of each card at any scale: layout.test.ts.)
       for (const canvas of [...CANVASES, { width: 591, height: 338, bottom: 0 }]) {
         for (let count = 1; count <= 12; count += 1) {

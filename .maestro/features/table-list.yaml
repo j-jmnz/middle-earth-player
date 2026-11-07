@@ -1,0 +1,62 @@
+appId: com.middleearth.lcg
+---
+# Table as a list set to Always (docs/design-system-table.md, Screen reader). Written in a cloud session: it has not run. With no screen reader on, the setting puts the phone on
+# the list table, the way Switch Control, Voice Control and Switch Access players use it (src/ui/screen-reader.ts, useReaderMode), so unlike
+# screen-reader.yaml this flow needs no forced development build: it runs in the e2e-test build with the rest. The fixture is the same two-handed game of
+# A Shadow of the Past parked on the first player's planning window of round 1 (src/campaign/fixtures, `duo`). The table opens as the reader table
+# (`reader-table`, its zones as `reader-zone-<zone>`, its cards as `reader-card-<zone>-<n>`), and a pick made on it reaches the dock.
+- launchApp:
+    clearState: true
+# The setting starts on Follow screen reader and takes Always; Settings keeps it for the table.
+- tapOn:
+    id: settings-open
+- assertVisible:
+    id: app-settings
+- scrollUntilVisible:
+    element:
+      id: app-settings-table-list-always
+- assertVisible:
+    id: app-settings-table-list-system
+    selected: true
+- tapOn:
+    id: app-settings-table-list-always
+- assertVisible:
+    id: app-settings-table-list-always
+    selected: true
+- tapOn:
+    id: app-settings-back
+- openLink: "middleearthlcg://e2e/duo"
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- tapOn:
+    id: path-back
+- assertVisible:
+    id: continue-next
+    text: "On the table: A Shadow of the Past"
+- tapOn:
+    id: continue
+- extendedWaitUntil:
+    visible:
+      id: table
+    timeout: 30000
+# The table opens on the quest stage in play (quest-advance.ts, openingLatch).
+- tapOn:
+    id: quest-advance-progress
+    optional: true
+- extendedWaitUntil:
+    visible:
+      id: dock
+    timeout: 15000
+# The list table, not the canvas: the zones are headings and the hero is a button.
+- assertVisible:
+    id: reader-table
+- assertVisible:
+    id: reader-zone-play
+- assertVisible:
+    id: reader-zone-hand
+- assertVisible:
+    id: reader-card-play-0
+- assertVisible:
+    id: reader-pile-deck

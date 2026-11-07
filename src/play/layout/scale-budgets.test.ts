@@ -1,5 +1,5 @@
 // The pure budget modules at a UI scale (docs/design-system.md, Settings; user request, 2026-10-28): at scale 1
-// they are what they were; at Large, a screen 1.15 times as large gives 1.15 times the answer, since they work in logical points.
+// they are what they were; at Large and Extra large, a screen 1.15 or 1.3 times as large gives 1.15 or 1.3 times the answer, since they work in logical points.
 import { describe, expect, it } from "vitest";
 
 import { armedRoom } from "../choice/dock/armed-room.ts";
@@ -12,10 +12,9 @@ import { barZones, MENU_BUTTON, railWide, RAIL_WIDE } from "../chrome/top-bar-la
 import { trayBox } from "../choice/tray-logic.ts";
 import { UI_SCALES } from "../../ui/ui-scale.ts";
 
-const L = UI_SCALES.large;
 const S = UI_SCALES.small;
 
-describe("scale 1 is unchanged and 1.15 is proportional", () => {
+describe.each([UI_SCALES.large, UI_SCALES.xlarge])("scale 1 is unchanged and %s is proportional", (L) => {
   it("top bar zones", () => {
     for (const [bar, dials] of [[800, 120], [800, 400], [620, 460], [500, 900]] as const) {
       expect(barZones(bar, dials, 1)).toEqual(barZones(bar, dials));
@@ -55,7 +54,7 @@ describe("scale 1 is unchanged and 1.15 is proportional", () => {
     expect(isDense(400 * L, L)).toBe(false);
     expect(isDense(399 * L, L)).toBe(true);
     // A 460 pt phone is dense at Large (400 logical points of 460 / 1.15) and not at Small.
-    expect(isDense(460, L)).toBe(false);
+    expect(isDense(460, L)).toBe(460 / L < 400);
     expect(isDense(430, L)).toBe(true);
     expect(isDense(430, S)).toBe(false);
   });
@@ -82,7 +81,7 @@ describe("scale 1 is unchanged and 1.15 is proportional", () => {
   });
 
   it("row-fold and look-strip", () => {
-    // The crowding rule works in points: scaled by 1.15 with a 1.15 target (`touch` at Large) it gives 1.15 times the answer.
+    // The crowding rule works in points: scaled by the factor with a target scaled by it (`touch` at Large) it gives that times the answer.
     const groups = Array.from({ length: 9 }, (_, at) => ({ id: `g${at}`, width: 50 + (at % 3) * 5, cards: [`g${at}`], rank: at % 4, pinned: at === 5 }));
     const row = { x: 10, width: 300, gap: 6, target: 44, stackW: 40 };
     const a = foldRow(groups, row);

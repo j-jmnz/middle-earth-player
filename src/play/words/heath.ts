@@ -132,7 +132,7 @@ export function heathAsk(instruction: Instruction, source: string | null, names:
   if (instruction.verb === "Each" && instruction.upTo === "any" && code === "12180") {
     const looked = game ? lookedCount(game) : null;
     const moved = instruction.taken?.length ?? 0;
-    return ask("Choose", `choose the cards that go to the bottom of the encounter deck${looked != null ? `, from the top ${looked} you looked at` : ""}, one at a time: each is placed under the rest.${moved > 0 ? ` ${moved} to the bottom so far.` : ""} Done puts the rest back on top, in the order you choose next.`);
+    return ask("Choose", `choose the cards that go to the bottom of the encounter deck${looked != null ? `, from the top ${looked} you looked at` : ""}, one at a time. Each is placed under the rest.${moved > 0 ? ` ${moved} to the bottom so far.` : ""} Done puts the rest back on top, in the order you choose next.`);
   }
   // High Falls (19019:A:3): the first player assigns all X damage among any player's characters, one point at a time.
   if (instruction.verb === "AssignDamage" && code === "19019") {

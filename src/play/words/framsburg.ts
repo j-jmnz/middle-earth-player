@@ -54,15 +54,15 @@ function lookedAt(game: ScenarioState, ctx: ReduceContext, seat: number): { plac
 
 /**
  * What becomes of the Hazard cards a Discover looked at (emce.discover): one is selected at random, revealed and added to the staging area; a treachery has no place there, so its When Revealed effect resolves and it is discarded. Copies of one card are named as copies.
- * Empty with no Hazard card among them.
+ * Its own sentences, each ending in a full stop, with a space after the last; empty with no Hazard card among them.
  */
 function hazardWords(game: ScenarioState, ctx: ReduceContext, names: Pick<ChoiceNames, "card">, hazards: readonly string[]): string {
   if (hazards.length === 0) return "";
   const codes = new Set(hazards.map((id) => game.cards[id]?.code ?? id));
   const treacheries = hazards.filter((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").type === "treachery").length;
   const which = hazards.length === 1 ? "the 1 Hazard card looked at" : codes.size === 1 ? `1 of the ${hazards.length} copies of ${names.card(hazards[0] ?? "")} looked at` : `1 of the ${hazards.length} Hazard cards looked at, picked at random,`;
-  const fate = treacheries === 0 ? "is revealed and added to the staging area" : treacheries === hazards.length ? "is revealed, its When Revealed effect resolves and it is discarded" : "is revealed: an enemy or location is added to the staging area, a treachery resolves its When Revealed effect and is discarded";
-  return `${which} ${fate}, and `;
+  const fate = treacheries === 0 ? "is revealed and added to the staging area" : treacheries === hazards.length ? "is revealed, its When Revealed effect resolves and it is discarded" : "is revealed. An enemy or location is added to the staging area. A treachery resolves its When Revealed effect and is discarded";
+  return `${which.charAt(0).toUpperCase()}${which.slice(1)} ${fate}. `;
 }
 
 /** The unique enemies engaged with a seat, named. */
@@ -86,8 +86,8 @@ export function framsburgAsk(instruction: Instruction, source: string | null, na
   const now = (instruction.verb === "Discover" || instruction.verb === "ResolveDiscover") && facts && says ? lookedAt(facts.game, facts.ctx, says.seat) : null;
   if (now && facts && says && now.depth > 0) {
     const place = now.place ? names.card(now.place) : "the active location";
-    const rest = `${hazardWords(facts.game, facts.ctx, names, now.hazards)}the other cards looked at`;
-    const looked = `The top ${plural(now.depth, "card")} of the encounter deck were looked at: ${now.loot === 1 ? "1 of them is a Loot objective" : `${now.loot} of them are Loot objectives`}. Choose 1 to attach to ${place} as a guarded objective; ${rest} go to the encounter discard pile.`;
+    const hazard = hazardWords(facts.game, facts.ctx, names, now.hazards);
+    const looked = `The top ${plural(now.depth, "card")} of the encounter deck were looked at: ${now.loot === 1 ? "1 of them is a Loot objective" : `${now.loot} of them are Loot objectives`}. Choose 1 to attach to ${place} as a guarded objective. ${hazard}The other cards looked at go to the encounter discard pile.`;
     if (instruction.verb === "Discover") return group("Attach", `Discover ${now.depth} at ${place}. ${looked}`);
     return sentence("Attach", `resolve Discover ${now.depth} at ${place}. ${looked}`, card);
   }
@@ -95,7 +95,7 @@ export function framsburgAsk(instruction: Instruction, source: string | null, na
   if (instruction.verb === "AttachRandomTreasure" && instruction.to === "subject" && facts) {
     const data = topFrame(facts.game)?.data;
     const guard = data?.kind === "effect" && data.subject ? names.card(data.subject) : "The enemy";
-    return group("Choose", `Choose 1 of ${facts.options.length || instruction.count || 3} random undiscovered treasures to attach as a guarded objective. ${guard} stays engaged; the players cannot claim the treasure until it is free of encounters, when ${guard} leaves play.`);
+    return group("Choose", `Choose 1 of ${facts.options.length || instruction.count || 3} random undiscovered treasures to attach as a guarded objective. ${guard} stays engaged. The players can claim the treasure once it is free of encounters, when ${guard} leaves play.`);
   }
   if (instruction.verb === "AttachLootFromDiscard") return sentence("Attach", `choose a Loot objective in the encounter discard pile to attach to the enemy just added to the staging area, as its guarded objective.`);
   if (instruction.verb !== "Pick") return null;
@@ -143,7 +143,7 @@ export function framsburgChooseNote(choose: Choose, game: ScenarioState, ctx: Re
   if (kind === "searching") {
     const raise = raiseOf(choose, "threat");
     const threats = livingSeats(game).map((index) => (game.seatCount > 1 ? `Player ${index + 1} ${game.seats[index]?.threat ?? 0}` : `${game.seats[index]?.threat ?? 0}`));
-    return `${card}: raise each player's threat by ${raise} (now ${list(threats)}), or discard cards from the encounter deck until a location is discarded and add it to the staging area?`;
+    return `${card}: raise each player's threat by ${raise} (now ${list(threats)})? Or discard cards from the encounter deck until a location is discarded, and add it to the staging area?`;
   }
   const raise = raiseOf(choose, "threat");
   const attacker = game.pendingAttack?.enemyId;
@@ -214,7 +214,7 @@ export function framsburgResponseNote(game: ScenarioState, ctx: ReduceContext, n
     const shade = enemy ? names.card(enemy) : "The enemy";
     const left = Math.min(3, undiscoveredTreasures(game, ctx).length);
     if (left === 0) return say(`${shade} engaged you. No undiscovered treasure is left to look at, so nothing can be attached to ${shade}.`);
-    return say(`${shade} engaged you. Look at ${left === 1 ? "the 1 random undiscovered treasure" : `${left} random undiscovered treasures`} and attach 1 to ${shade} as a guarded objective: ${shade} stays engaged with you, the players cannot claim the treasure until it is free of encounters, when ${shade} leaves play, and if they win with it they discover it. Group limit once per game. Pass and it stays unused for a later engagement at stage 1B or 2B.`);
+    return say(`${shade} engaged you. Look at ${left === 1 ? "the 1 random undiscovered treasure" : `${left} random undiscovered treasures`} and attach 1 to ${shade} as a guarded objective. ${shade} stays engaged with you. The players can claim the treasure once it is free of encounters, when ${shade} leaves play. If they win with it, they discover it. Group limit once per game. Pass and it stays unused for a later engagement at stage 1B or 2B.`);
   }
   return null;
 }
@@ -264,5 +264,5 @@ export function framsburgEngageNote(game: ScenarioState, ctx: ReduceContext, nam
   const name = list([...new Set(barred.map((id) => names.card(id)))]);
   const many = barred.length > 1;
   const rule = `${name} may be engaged only by a player engaged with a unique enemy`;
-  return uniques.length > 0 ? `${rule}, and you are engaged with ${list(uniques)}, so you may choose ${many ? "them" : "it"}.` : `${rule}, and you are not engaged with one, so you cannot choose ${many ? "them" : "it"} here.`;
+  return uniques.length > 0 ? `${rule}. You are engaged with ${list(uniques)}, so you may choose ${many ? "them" : "it"}.` : `${rule}. You are not engaged with one, so you cannot choose ${many ? "them" : "it"} here.`;
 }

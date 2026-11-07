@@ -1,18 +1,10 @@
 import { describe, expect, it } from "vitest";
 
+import { luminance } from "./colour-math.ts";
 import { palettes, type Palette } from "./palette.js";
 import { TINT_ALPHA, TONAL_ALPHA } from "../../ui/surfaces.ts";
 
 // WCAG 2.x contrast (user request, 2026-10-28: a Light theme that reads as well as Dark). Body text needs 4.5:1.
-function luminance(hex: string): number {
-  const value = Number.parseInt(hex.slice(1), 16);
-  const channel = (shift: number) => {
-    const c = ((value >> shift) & 255) / 255;
-    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
-  };
-  return 0.2126 * channel(16) + 0.7152 * channel(8) + 0.0722 * channel(0);
-}
-
 function contrast(a: string, b: string): number {
   const [hi, lo] = [luminance(a), luminance(b)].sort((x, y) => y - x);
   return (hi! + 0.05) / (lo! + 0.05);

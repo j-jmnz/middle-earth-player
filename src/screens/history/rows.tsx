@@ -40,6 +40,7 @@ export function HistoryCard({
   faces,
   party,
   accessibilityLabel,
+  accessibilityHint,
   onPress,
   onLongPress,
   footer,
@@ -58,6 +59,7 @@ export function HistoryCard({
   // A game's party, each seat's heroes, shown as tiles under its lines (its one run is worded in the lines, not listed).
   party?: readonly (readonly string[])[] | null;
   accessibilityLabel: string;
+  accessibilityHint?: string;
   onPress: (() => void) | null;
   onLongPress: (() => void) | null;
   footer?: ReactNode;
@@ -71,6 +73,7 @@ export function HistoryCard({
         collapsable={false}
         accessibilityRole={onPress ? "button" : "text"}
         accessibilityLabel={accessibilityLabel}
+        accessibilityHint={onPress ? accessibilityHint : undefined}
         disabled={onPress == null && onLongPress == null}
         onPress={onPress ?? undefined}
         {...(onLongPress ? longPressA11y("Start managing", onLongPress) : null)}
