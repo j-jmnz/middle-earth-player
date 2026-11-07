@@ -46,4 +46,12 @@ describe("dockPills", () => {
   it("keeps the More pill's test id for the flows", () => {
     expect(MORE_ID).toBe("dock-more-actions");
   });
+
+  it("puts every pill, Undo first, behind More when the aids are folded, and nothing when there are none", () => {
+    const folded = dockPills([undo, read], true);
+    expect(folded.pills).toEqual([]);
+    expect(ids(folded.more)).toEqual([UNDO_ID, "sheet-inspect"]);
+    expect(dockPills([], true)).toEqual({ pills: [], more: [] });
+    expect(ids(dockPills([undo, read], false).pills)).toEqual([UNDO_ID, "sheet-inspect"]);
+  });
 });

@@ -4,7 +4,7 @@ import type { DockExtra } from "./buttons.tsx";
 import type { Sheet } from "../sheet-types.ts";
 import { tappable } from "../table-choice.ts";
 
-// Undo always shows on the dock. The other quiet pills show as they are while there are this many or fewer; one more and they
+// Undo always shows on the dock, except where foldAids puts every aid behind More. The other quiet pills show as they are while there are this many or fewer; one more and they
 // fold into a single More pill (dock-more-actions) that opens a popover (dock/more.tsx).
 export const UNDO_ID = "table-undo";
 export const PILLS_BEFORE_MORE = 2;
@@ -17,8 +17,14 @@ export type DockPills = {
   more: readonly DockExtra[];
 };
 
-/** Undo first and always out; the others as they are, or all of them behind More when more than PILLS_BEFORE_MORE would show. */
-export function dockPills(extras: readonly DockExtra[]): DockPills {
+export { foldAids } from "./budget.ts";
+
+/**
+ * Undo first and always out; the others as they are, or all of them behind More when more than PILLS_BEFORE_MORE would show. With
+ * `fold` (foldAids: a larger text size and a short room) every one, Undo too, is behind More; Undo keeps its id, label and hint there.
+ */
+export function dockPills(extras: readonly DockExtra[], fold = false): DockPills {
+  if (fold && extras.length > 0) return { pills: [], more: extras };
   const undo = extras.filter((item) => item.testID === UNDO_ID);
   const others = extras.filter((item) => item.testID !== UNDO_ID);
   return others.length > PILLS_BEFORE_MORE ? { pills: undo, more: others } : { pills: [...undo, ...others], more: [] };

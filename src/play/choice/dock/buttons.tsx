@@ -39,6 +39,7 @@ export function DockButtons({
   dock,
   extras = [],
   more = [],
+  aidsFolded = false,
   onMore,
   picked = null,
   dense = false,
@@ -49,6 +50,9 @@ export function DockButtons({
   extras?: readonly DockExtra[];
   // The quiet pills folded behind the More pill (dock/extras.ts, dockPills), and what the pill does: it reports the screen y of its foot.
   more?: readonly DockExtra[];
+  // The reading aids are all behind More because the room is short at a larger text size (dock/extras.ts, foldAids): the More pill then
+  // sits on the answers' row and the aids' row is not drawn.
+  aidsFolded?: boolean;
   onMore?: (foot: number) => void;
   // What is picked, in words: no line on the dock says it (the cards wear their marks, the primary's verb counts them), so a
   // screen reader hears it in the primary's hint.
@@ -116,6 +120,21 @@ export function DockButtons({
   const line = armedButton ? said(armedButton) : (dock.why ?? (dock.single ? ONLY : null));
   // The room holds the longest thing this moment's buttons can say when armed, in full, so arming moves nothing (armed-room.ts).
   const lines = armedLines([...[primary, ...dock.secondary].map((button) => (button?.arm ? said(button) : null)), dock.why, dock.single ? ONLY : null], chars);
+  const inline = aidsFolded && more.length > 0;
+  const moreButton =
+    more.length > 0 ? (
+      <View ref={moreRef} collapsable={false}>
+        <TextButton
+          label="More"
+          testID={MORE_ID}
+          small
+          tight={dense}
+          tone="muted"
+          accessibilityHint={`Lists ${more.map((item) => item.accessibilityLabel ?? item.label).join(", ")}`}
+          onPress={pressMore}
+        />
+      </View>
+    ) : null;
   return (
     <View className={dense ? "gap-0" : "gap-0.5"}>
       {/* The armed line, always held: what the armed button's second tap does (a caution names the loss in full), or what the
@@ -147,32 +166,21 @@ export function DockButtons({
         />
       ) : null}
       {/* The other answers are secondary capsules on a row of their own; the reading aids are text buttons with small muted words on
-          one row under it (Undo, Read), which wraps if a third shows. */}
-      {dock.secondary.length > 0 ? (
+          one row under it (Undo, Read), which wraps if a third shows; folded behind More (`aidsFolded`) they leave that row and More joins this one. */}
+      {dock.secondary.length > 0 || inline ? (
         <View className="flex-row flex-wrap items-center justify-center gap-2" style={{ marginTop: (dense ? 4 : 6) * s }}>
           {dock.secondary.map((button) => (
             <SecondaryButton key={button.testID} label={button.label} testID={button.testID} tight={dense} accessibilityHint={button.arm ? HINT : undefined} onPress={() => press(button)} />
           ))}
+          {inline ? moreButton : null}
         </View>
       ) : null}
-      {extras.length > 0 || more.length > 0 ? (
+      {!inline && (extras.length > 0 || more.length > 0) ? (
         <View className="flex-row flex-wrap items-center justify-center gap-1" style={{ marginTop: (dense ? 2 : 4) * s }}>
           {extras.map((item) => (
             <TextButton key={item.testID} label={item.label} testID={item.testID} small tight={dense} tone="muted" accessibilityLabel={item.accessibilityLabel} accessibilityHint={item.accessibilityHint} onPress={extra(item.onPress)} />
           ))}
-          {more.length > 0 ? (
-            <View ref={moreRef} collapsable={false}>
-              <TextButton
-                label="More"
-                testID={MORE_ID}
-                small
-                tight={dense}
-                tone="muted"
-                accessibilityHint={`Lists ${more.map((item) => item.accessibilityLabel ?? item.label).join(", ")}`}
-                onPress={pressMore}
-              />
-            </View>
-          ) : null}
+          {moreButton}
         </View>
       ) : null}
     </View>

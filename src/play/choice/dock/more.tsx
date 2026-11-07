@@ -69,7 +69,7 @@ export function MorePopoverView({ more, items, words, commandWidth, insetRight, 
         {items.map((item, index) => (
           <PopoverRow
             key={item.testID}
-            item={{ testID: item.testID, label: item.label, accessibilityLabel: item.accessibilityLabel }}
+            item={{ testID: item.testID, label: item.label, accessibilityLabel: item.accessibilityLabel, accessibilityHint: item.accessibilityHint }}
             rowRef={index === 0 ? first : undefined}
             onPress={() => {
               onClose();

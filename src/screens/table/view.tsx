@@ -13,7 +13,7 @@ import { slotNumbers } from "../../play/cards/card-effects";
 import { CardPreview } from "../../play/cards/card-preview";
 import { standInText } from "../../play/cards/dungeon-preview";
 import { causeKey, type LogNames } from "../../play/store/log";
-import { dockPills } from "../../play/choice/dock/extras";
+import { dockPills, foldAids } from "../../play/choice/dock/extras";
 import { ChoiceTray } from "../../play/choice/tray";
 import { isDense } from "../../play/choice/dock/budget";
 import { MorePopoverView, useMorePopover } from "../../play/choice/dock/more";
@@ -211,8 +211,9 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
   const choice = useTableChoice({ store, ctx, names, beats, onPreview, onPile, onOutcome, hold: advance.held });
   // A card shown large reads its picture from the cache, so it is described again when a file lands (pictureAt) while it is up.
   const revision = useImageRevision(preview != null || advance.shown != null);
-  // The quiet pills: Undo and up to two others, or Undo and More (dock/extras.ts); More opens a popover (dock/more.tsx).
-  const pills = dockPills(choice.extras);
+  // The quiet pills: Undo and up to two others, or Undo and More, or every one behind More at a larger text size when the room is short (dock/extras.ts); More opens a popover (dock/more.tsx).
+  const aidsFolded = foldAids({ height: screen.height, s, text: screen.fontScale, trayOpen: choice.panelOpen });
+  const pills = dockPills(choice.extras, aidsFolded);
   const scale = useMemo(() => questScaleOf(game, ctx, choice.readout), [game, ctx, choice.readout]);
   const more = useMorePopover(pills.more.length, choice.resetKey);
   const { open: moreOpen, lines: linesOpen, close: closeMore } = more;
@@ -402,8 +403,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
               dock={choice.dock}
               onButton={choice.onButton}
               extras={pills.pills}
-              more={pills.more}
-              onMore={more.show} onLines={more.showLines}
+              more={pills.more} aidsFolded={aidsFolded} onMore={more.show} onLines={more.showLines}
               resetKey={choice.resetKey} momentKey={choice.sheet.key} stay={choice.stayFocus}
               guide={choice.guide}
               trayOpen={choice.panelOpen}

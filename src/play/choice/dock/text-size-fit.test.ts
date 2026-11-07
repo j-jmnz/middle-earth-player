@@ -7,24 +7,19 @@ import { describe, expect, it } from "vitest";
 
 import { capLines, UI_SCALES } from "../../../ui/ui-scale.ts";
 import { armedRoom } from "./armed-room.ts";
-import { DOCK_PAD_DENSE_PX, DOCK_PAD_PX, isDense, planWords, smallPictures, TITLE_PX, trayRoom, wordsWindow } from "./budget.ts";
+import { DOCK_PAD_DENSE_PX, DOCK_PAD_PX, foldAids, isDense, pinnedBlock, planWords, smallPictures, TITLE_PX, trayRoom, wordsWindow } from "./budget.ts";
 
 const TOP_BAR = 44;
 const FOOT = 8;
 const LONG = "Choose a defender for Gollum, Guide of the Dead Marshes";
 
-// What the dock needs in a column, in screen points: the title, the dock's padding, one row and the pinned block (numbers row, one result
-// line, the armed room, the primary, a secondary row and, when `quiet`, the row of reading aids; the tests leave that row out).
+// What the dock needs in a column, in screen points: the title, the dock's padding, one row and the pinned block (budget.ts, pinnedBlock). `quiet`
+// is the row of reading aids under the buttons; folded behind More they leave it (the More pill joins the answers' row).
 function need(a: { height: number; s: number; text: number; quiet: boolean }) {
   const { height, s, text, quiet } = a;
   const dense = isDense(height, s);
   const column = height - (TOP_BAR + FOOT) * s;
-  const numbers = (24 * text + 6) * s;
-  const result = 18 * text * s;
-  const primary = Math.max(dense ? 44 : 46, 21 * text * s);
-  const secondary = (dense ? 4 : 6) * s + Math.max(dense ? 40 * s : 44, 20 * text * s + 8 * s);
-  const aids = quiet ? (dense ? 2 : 4) * s + Math.max(dense ? 40 * s : 44, 17 * text * s + 6) : 0;
-  const block = numbers + result + 2 + armedRoom(0, dense, s, text) + primary + secondary + aids;
+  const block = pinnedBlock({ dense, s, text, aids: quiet });
   const row = trayRoom(smallPictures(height, s), text) * s;
   const space = wordsWindow({ room: column, block: block + row, dense }, s);
   const plan = planWords({ space, dense, clamp: true, title: LONG, textWidth: 168 * s, hasLine: false, foldable: true, text }, s);
@@ -61,6 +56,28 @@ describe("the choice's rows and the dock at the phone's text size", () => {
         expect(at.used, `${height} tall, text ${text}`).toBeLessThanOrEqual(at.column);
       }
     }
+  });
+});
+
+describe("the reading aids folded behind More at a larger text size", () => {
+  it("fits the title, the buttons and one row at font scale 2 and Medium on 844x390 and 667x375, where the aids' row on its own does not", () => {
+    for (const height of [390, 375]) {
+      const open = need({ height, s: UI_SCALES.medium, text: 2, quiet: true });
+      const folded = need({ height, s: UI_SCALES.medium, text: 2, quiet: false });
+      expect(open.used, `${height} tall, aids out`).toBeGreaterThan(open.column);
+      expect(folded.used, `${height} tall, aids folded`).toBeLessThanOrEqual(folded.column);
+      expect(foldAids({ height, s: UI_SCALES.medium, text: 2, trayOpen: true }), `${height} tall`).toBe(true);
+    }
+  });
+
+  it("folds above a font scale of 1 only when the room is short, and never at 1", () => {
+    for (const height of [375, 390, 412, 600, 844]) {
+      for (const s of Object.values(UI_SCALES)) expect(foldAids({ height, s, text: 1, trayOpen: true }), `${height} tall, scale ${s}, text 1`).toBe(false);
+    }
+    expect(foldAids({ height: 390, s: UI_SCALES.medium, text: 0.85, trayOpen: true })).toBe(false);
+    // A tall screen has the room at 200% with the rows open; a short one does not; no row open takes less room.
+    expect(foldAids({ height: 844, s: UI_SCALES.medium, text: 2, trayOpen: true })).toBe(false);
+    expect(foldAids({ height: 390, s: UI_SCALES.medium, text: 1.15, trayOpen: false })).toBe(false);
   });
 });
 

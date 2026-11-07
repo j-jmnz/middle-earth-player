@@ -116,7 +116,7 @@ Read the sections your task touches.
   - 881–906 Persistence and shipping (~1.8K)
   - 907–948 Screens (~4.7K) ← 1
     - 933–948 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~39.2K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~39.3K tok)
   - 5–8 Overview (~130) ← 1
   - 9–23 Top bar (~2.2K) ← 4
   - 24–27 Table menu (~430) ← 2
@@ -135,7 +135,7 @@ Read the sections your task touches.
   - 225–230 Gestures (~620) ← 4
   - 231–234 Hold, slide and release (~940)
   - 235–240 Peeking at the other seat (~600) ← 1
-  - 241–259 Command column (~2.4K) ← 10
+  - 241–259 Command column (~2.5K) ← 10
   - 260–263 Two taps (~420) ← 2
   - 264–267 One answer, one tap (~240)
   - 268–271 Stops and Always use (~250)

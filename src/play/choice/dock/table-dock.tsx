@@ -71,6 +71,7 @@ export function TableDock({
   onButton,
   extras = [],
   more = [],
+  aidsFolded = false,
   onMore,
   onLines,
   resetKey,
@@ -102,6 +103,8 @@ export function TableDock({
   extras?: readonly DockExtra[];
   // The quiet pills folded behind the More pill, and what it does (dock/extras.ts, dockPills; dock/more.tsx).
   more?: readonly DockExtra[];
+  // Every reading aid is behind More at this text size (dock/extras.ts, foldAids); More then sits on the answers' row.
+  aidsFolded?: boolean;
   onMore?: (foot: number) => void;
   // The "i" pill opens the full title and every line in a popover (dock/more.tsx); it reports the screen y of the pill's top.
   onLines?: (top: number) => void;
@@ -221,7 +224,7 @@ export function TableDock({
               {refusal}
             </Text>
           ) : null}
-          <DockButtons key={resetKey} dock={dock} extras={extras} more={more} onMore={onMore} picked={picked} dense={dense} chars={labelChars(room.text, s, fontScale)} onButton={onButton} />
+          <DockButtons key={resetKey} dock={dock} extras={extras} more={more} aidsFolded={aidsFolded} onMore={onMore} picked={picked} dense={dense} chars={labelChars(room.text, s, fontScale)} onButton={onButton} />
         </View>
       </View>
     </View>

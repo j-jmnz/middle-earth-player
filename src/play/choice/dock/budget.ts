@@ -7,7 +7,7 @@
 // screen points and goes out as screen points; the arithmetic is the Medium one, in logical points (the screen over the scale). The phone's
 // own text size (`text`, the font scale, 1 when it is not set) grows the words only, not the dock's padding: React Native text follows it
 // (docs/design-system.md, Type), so a title's characters and the line heights are counted `text` times wider and taller.
-import { lineCount } from "./armed-room.ts";
+import { armedRoom, lineCount } from "./armed-room.ts";
 
 // Line heights of the type the words use (tailwind.config.js): the title (Marcellus SC at the heading size on its 22 pt line), label type.
 export const TITLE_PX = 22;
@@ -128,3 +128,39 @@ export function linesPlace(a: { screenWidth: number; screenHeight: number; comma
   return { width: Math.max(180, Math.min(POPOVER_MAX_WIDTH, canvas)) * scale, maxHeight: Math.max(POPOVER_MIN_ROOM, (a.screenHeight - a.top) / scale - POPOVER_EDGE) * scale };
 }
 
+
+// The column the dock stands in on a phone: the screen less the top bar and the foot (command column, table/view.tsx), Medium's points.
+const TOP_BAR_PX = 44;
+const FOOT_PX = 8;
+
+/**
+ * The height of the dock's pinned block at the UI scale `s` and the font scale `text`, in screen points: the numbers row, one result line,
+ * the armed room, the primary, a row of answers and, when `aids`, the row of reading aids (Undo, Read). The sizes are what the components
+ * draw (readout in table-dock.tsx, buttons in ui/buttons.tsx): a text's line is its Medium line times both scales; a control keeps its
+ * 44 pt floor (40 on a dense dock) and grows with its word.
+ */
+export function pinnedBlock(a: { dense: boolean; s: number; text: number; aids: boolean }): number {
+  const { dense, s, text } = a;
+  const numbers = (24 * text + 6) * s;
+  const result = 18 * text * s;
+  const primary = Math.max(dense ? 44 : 46, 21 * text * s);
+  const answers = (dense ? 4 : 6) * s + Math.max(dense ? 40 * s : 44, 20 * text * s + 8 * s);
+  const aids = a.aids ? (dense ? 2 : 4) * s + Math.max(dense ? 40 * s : 44, 17 * text * s + 6) : 0;
+  return numbers + result + 2 + armedRoom(0, dense, s, text) + primary + answers + aids;
+}
+
+/**
+ * Whether the reading aids go behind the More pill: only above the phone's default text size (`text` over 1), and only when the dock's
+ * column cannot hold one title line, the dock's padding, the choice's one row (when `trayOpen`) and the pinned block with the aids' row.
+ * At a font scale of 1 it is never true, so every layout there is unchanged. The More pill then sits on the answers' row, so the
+ * block is counted without the aids' row.
+ */
+export function foldAids(a: { height: number; s: number; text: number; trayOpen: boolean }): boolean {
+  if (a.text <= 1) return false;
+  const dense = isDense(a.height, a.s);
+  const column = a.height - (TOP_BAR_PX + FOOT_PX) * a.s;
+  const row = a.trayOpen ? trayRoom(smallPictures(a.height, a.s), a.text) * a.s : 0;
+  const pad = (dense ? DOCK_PAD_DENSE_PX : DOCK_PAD_PX) * a.s;
+  const used = TITLE_PX * a.text * a.s + pad + row + pinnedBlock({ dense, s: a.s, text: a.text, aids: true });
+  return used > column;
+}
