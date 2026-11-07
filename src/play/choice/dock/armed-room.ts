@@ -2,6 +2,8 @@
 // its loss in full, so the room is as many lines as the longest thing the dock's buttons can say when armed, held the same
 // before and after any of them is armed: arming moves nothing. Pure: a character-per-line estimate of the dock's text width.
 
+import type { ConfirmTimeOption } from "../../../ui/table-settings.ts";
+
 // Label type is about 6.6 pt a character; the narrowest dock text (the 210 pt column) is 168 pt wide, so about 25 a line. 24 keeps a
 // margin. The dock passes the characters its measured width holds (labelChars in dock/budget.ts); this is the default.
 export const CHARS_PER_LINE = 24;
@@ -54,4 +56,16 @@ export function armedWords(text: string, dense: boolean, chars: number = CHARS_P
   if (!dense || !text.startsWith(LEAD)) return text;
   const short = text.slice(LEAD.length);
   return CONSEQUENCE.test(short) && lineCount(short, chars) < lineCount(text, chars) ? short : text;
+}
+
+// How long an armed button waits for its second tap, by the Confirm time setting (table-settings.ts): Standard is 3 s, 10 s while a screen
+// reader speaks; Long is 10 s; No limit waits until another button, a new pick or a new moment puts it back. A timer, not a motion token.
+export const ARM_MS = 3000;
+export const ARM_LONG_MS = 10000;
+
+/** The armed wait in milliseconds, or null for no limit. */
+export function armMs(option: ConfirmTimeOption, reader: boolean): number | null {
+  if (option === "none") return null;
+  if (option === "long") return ARM_LONG_MS;
+  return reader ? ARM_LONG_MS : ARM_MS;
 }

@@ -87,6 +87,27 @@ describe("parseSettings card pictures and moving fog", () => {
   });
 });
 
+describe("parseSettings table as a list and confirm time", () => {
+  it("defaults a missing, wrong-typed or unknown value", () => {
+    expect(parseSettings({}).tableAsList).toBe("system");
+    expect(parseSettings({ tableAsList: "sometimes" }).tableAsList).toBe("system");
+    expect(parseSettings({ tableAsList: true }).tableAsList).toBe("system");
+    expect(parseSettings({}).confirmTime).toBe("standard");
+    expect(parseSettings({ confirmTime: "forever" }).confirmTime).toBe("standard");
+    expect(parseSettings({ confirmTime: 10 }).confirmTime).toBe("standard");
+  });
+
+  it("round-trips every valid value", () => {
+    expect(parseSettings({ tableAsList: "always" }).tableAsList).toBe("always");
+    for (const confirmTime of ["standard", "long", "none"]) expect(parseSettings({ confirmTime }).confirmTime).toBe(confirmTime);
+  });
+
+  it("restores both to their defaults", () => {
+    const changed = { ...DEFAULT_SETTINGS, tableAsList: "always" as const, confirmTime: "none" as const };
+    expect(restoreDefaults(changed)).toMatchObject({ tableAsList: "system", confirmTime: "standard" });
+  });
+});
+
 describe("restoreDefaults", () => {
   it("returns the defaults and keeps what the guide has explained", () => {
     const changed = { ...DEFAULT_SETTINGS, uiScale: "large" as const, theme: "light" as const, stopsOn: true, guide: false, guideSeen: { "3.3": 2 } };

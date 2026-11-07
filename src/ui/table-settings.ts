@@ -42,6 +42,11 @@ export type TableSettings = {
   cardQuality: CardQualityOption;
   // Whether the fog behind every screen drifts. Off holds it still (src/screens/art/backdrop-drift.ts).
   fogDrift: boolean;
+  // Table as a list: the reader table (the tray as the default path, the reader notes) follows the phone's screen reader, or is always on, for a
+  // player whose Switch Control, Voice Control or Switch Access cannot reach a card drawn on the canvas. Native only (screen-reader.ts, useReaderMode).
+  tableAsList: TableListOption;
+  // Confirm time: how long an armed two-tap button waits for its second tap (dock/armed-room.ts, armMs).
+  confirmTime: ConfirmTimeOption;
 };
 
 export const UI_SCALE_OPTIONS = ["small", "medium", "large"] as const;
@@ -50,13 +55,17 @@ export const REDUCE_MOTION_OPTIONS = ["system", "always"] as const;
 export type ReduceMotionOption = (typeof REDUCE_MOTION_OPTIONS)[number];
 export const THEME_OPTIONS = ["dark", "light", "system"] as const;
 export type ThemeOption = (typeof THEME_OPTIONS)[number];
+export const TABLE_LIST_OPTIONS = ["system", "always"] as const;
+export type TableListOption = (typeof TABLE_LIST_OPTIONS)[number];
+export const CONFIRM_TIME_OPTIONS = ["standard", "long", "none"] as const;
+export type ConfirmTimeOption = (typeof CONFIRM_TIME_OPTIONS)[number];
 export const CARD_QUALITY_OPTIONS = ["high", "low"] as const;
 export type CardQualityOption = (typeof CARD_QUALITY_OPTIONS)[number];
 
 // The stops the video uses: after staging ("the golden action window") and before the shadow card turns.
 export const DEFAULT_STOPS: readonly string[] = ["3.3", "shadow"];
 
-export const DEFAULT_SETTINGS: TableSettings = { stopsOn: false, stops: DEFAULT_STOPS, alwaysUse: [], highContrast: false, guide: true, guideSeen: {}, animationSpeed: "normal", spotlight: true, uiScale: "medium", haptics: true, reduceMotion: "system", keepAwake: true, theme: "dark", cardQuality: "high", fogDrift: true };
+export const DEFAULT_SETTINGS: TableSettings = { stopsOn: false, stops: DEFAULT_STOPS, alwaysUse: [], highContrast: false, guide: true, guideSeen: {}, animationSpeed: "normal", spotlight: true, uiScale: "medium", haptics: true, reduceMotion: "system", keepAwake: true, theme: "dark", cardQuality: "high", fogDrift: true, tableAsList: "system", confirmTime: "standard" };
 
 /** Settings read back from storage: unknown keys dropped, missing ones defaulted, wrong types replaced. */
 export function parseSettings(raw: unknown): TableSettings {
@@ -83,6 +92,8 @@ export function parseSettings(raw: unknown): TableSettings {
     theme: THEME_OPTIONS.find((option) => option === value.theme) ?? DEFAULT_SETTINGS.theme,
     cardQuality: CARD_QUALITY_OPTIONS.find((option) => option === value.cardQuality) ?? DEFAULT_SETTINGS.cardQuality,
     fogDrift: flag(value.fogDrift, DEFAULT_SETTINGS.fogDrift),
+    tableAsList: TABLE_LIST_OPTIONS.find((option) => option === value.tableAsList) ?? DEFAULT_SETTINGS.tableAsList,
+    confirmTime: CONFIRM_TIME_OPTIONS.find((option) => option === value.confirmTime) ?? DEFAULT_SETTINGS.confirmTime,
   };
 }
 

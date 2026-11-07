@@ -6,13 +6,15 @@
 // the moment and the pick, so nothing stays armed into the next one.
 import { useEffect, useRef, useState, type ComponentRef } from "react";
 import { View } from "react-native";
+import { useStore } from "zustand";
 import Animated, { cancelAnimation, useAnimatedStyle, useSharedValue, withTiming } from "react-native-reanimated";
 
-import { armedLines, armedRoom, armedWords, BAR_DENSE_PX, BAR_PX, LINE_PX } from "./armed-room.ts";
+import { armedLines, armedRoom, armedWords, armMs, BAR_DENSE_PX, BAR_PX, LINE_PX } from "./armed-room.ts";
 import { MORE_ID } from "./extras.ts";
 import { tickArmed } from "../../../ui/haptics.ts";
 import { armBarEasing, useMotionScale } from "../../../ui/motion-run.ts";
 import { useScreenReader } from "../../../ui/screen-reader.ts";
+import { tableSettings } from "../../../ui/table-settings.ts";
 import { PrimaryButton, SecondaryButton, TextButton } from "../../../ui/buttons.tsx";
 import { primaryReady, type Dock, type DockButton } from "../table-choice.ts";
 import { useUiScale } from "../../../ui/ui-scale.ts";
@@ -20,11 +22,10 @@ import { useTableTokens } from "../../../ui/use-table-tokens.ts";
 import { Text } from "../../../ui/text.tsx";
 import { announce } from "../../../ui/announce.ts";
 
-// How long an armed button waits for its second tap; longer while a screen reader is on. That is a timer, not a motion token: the bar
-// only shows it running out, on the linear curve of src/ui/motion-tokens.ts, and does not run under reduced motion (the line says it).
-// Quick does not shorten it: the second tap's window stays the same.
-const ARM_MS = 3000;
-const ARM_READER_MS = 10000;
+// How long an armed button waits for its second tap is the Confirm time setting (armed-room.ts, armMs): Standard is longer while a screen
+// reader speaks, and No limit waits for another button, a new pick or a new moment, the bar drawn full and still. That is a timer, not a
+// motion token: the bar only shows it running out, on the linear curve of src/ui/motion-tokens.ts, and does not run under reduced motion
+// (the line says it). Quick does not shorten it: the second tap's window stays the same.
 const HINT = "Tap twice to confirm";
 // A moment with one legal answer: the line above the buttons says the one tap sends it.
 const ONLY = "The only choice now: one tap sends it";
@@ -65,7 +66,9 @@ export function DockButtons({
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const left = useSharedValue(1);
   const animates = useMotionScale() > 0;
+  // The wait follows the real reader (it speaks the line), not the Table as a list setting.
   const reader = useScreenReader();
+  const confirmTime = useStore(tableSettings, (state) => state.settings.confirmTime);
   // The arm timer and the bar running down stop with the dock.
   useEffect(
     () => () => {
@@ -78,10 +81,12 @@ export function DockButtons({
     if (timer.current) clearTimeout(timer.current);
     if (button.arm && armed !== button.testID) {
       setArmed(button.testID);
-      const wait = reader ? ARM_READER_MS : ARM_MS;
+      const wait = armMs(confirmTime, reader);
       left.set(1);
-      if (animates) left.set(withTiming(0, { duration: wait, easing: armBarEasing }));
-      timer.current = setTimeout(() => setArmed(null), wait);
+      if (wait != null) {
+        if (animates) left.set(withTiming(0, { duration: wait, easing: armBarEasing }));
+        timer.current = setTimeout(() => setArmed(null), wait);
+      }
       tickArmed();
       // A screen reader hears what the second tap does, the loss a caution names included.
       announce(button.armed ?? `Tap again: ${button.label}`);

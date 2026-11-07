@@ -2,6 +2,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { useReaderMode, useScreenReader } from "./screen-reader.ts";
+import { DEFAULT_SETTINGS, tableSettings } from "./table-settings.ts";
 
 const phone = vi.hoisted(() => ({ os: "ios", screenReader: false }));
 
@@ -20,12 +21,31 @@ vi.mock("react-native", () => ({
 // No renderer runs in node: the store hook answers with the snapshot, which the mocked store gives from `phone`.
 vi.mock("react", async (importOriginal) => ({
   ...(await importOriginal<typeof import("react")>()),
-  useSyncExternalStore: () => phone.screenReader,
+  useSyncExternalStore: (_subscribe: unknown, snapshot: () => boolean) => snapshot(),
 }));
+vi.mock("./accessibility.ts", () => ({ accessibility: () => ({ screenReader: phone.screenReader }), subscribeAccessibility: () => () => undefined }));
 
 beforeEach(() => {
   phone.os = "ios";
   phone.screenReader = false;
+  tableSettings.getState().hydrate(DEFAULT_SETTINGS);
+});
+
+describe("useReaderMode with Table as a list", () => {
+  it("is true on a phone with no reader on when the setting is Always, and the real reader still says no", () => {
+    tableSettings.getState().update({ tableAsList: "always" });
+    expect(useReaderMode()).toBe(true);
+    phone.os = "android";
+    expect(useReaderMode()).toBe(true);
+    expect(useScreenReader()).toBe(false);
+  });
+
+  it("is false with the default, and false on the web whatever the setting says", () => {
+    expect(useReaderMode()).toBe(false);
+    tableSettings.getState().update({ tableAsList: "always" });
+    phone.os = "web";
+    expect(useReaderMode()).toBe(false);
+  });
 });
 
 describe("useReaderMode", () => {

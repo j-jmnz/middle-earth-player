@@ -1,6 +1,6 @@
 // The words and lists the Settings screen (src/screens/settings/view.tsx) and the table's settings panel (reading-panels.tsx) share,
 // so the two say the same thing (user request, 2026-10-28). Pure, so a test reads them.
-import type { CardQualityOption, ReduceMotionOption, ThemeOption, UiScaleOption } from "../../ui/table-settings.ts";
+import type { CardQualityOption, ConfirmTimeOption, ReduceMotionOption, TableListOption, ThemeOption, UiScaleOption } from "../../ui/table-settings.ts";
 import type { Speed } from "../../ui/motion-tokens.ts";
 
 // The themes go by Middle-earth names: Ringwraith is the dark theme, Rivendell the light. A screen reader hears which is which (THEME_LABELS).
@@ -9,6 +9,8 @@ export const THEME_LABELS: Readonly<Record<ThemeOption, string>> = { dark: "Ring
 export const REDUCE_MOTION_WORDS: Readonly<Record<ReduceMotionOption, string>> = { system: "Follow system", always: "Always" };
 export const SPEED_WORDS: Readonly<Record<Speed, string>> = { normal: "Normal", quick: "Quick" };
 export const SCALE_WORDS: Readonly<Record<UiScaleOption, string>> = { small: "Small", medium: "Medium", large: "Large" };
+export const TABLE_LIST_WORDS: Readonly<Record<TableListOption, string>> = { system: "Follow screen reader", always: "Always" };
+export const CONFIRM_TIME_WORDS: Readonly<Record<ConfirmTimeOption, string>> = { standard: "Standard", long: "Long", none: "No limit" };
 export const QUALITY_WORDS: Readonly<Record<CardQualityOption, string>> = { high: "High", low: "Low" };
 
 // Each row's detail states what the setting changes. The settings that exist to lighten the load on the device sit in the Performance
@@ -29,6 +31,8 @@ export const HAPTICS_LINE = "Vibration at key moments.";
 export const GUIDE_LINE = "A hint under the step title, the first two times each step comes up.";
 export const STOPS_LINE = "Pauses where a card can be played. Choose the steps on the table's rail.";
 export const AWAKE_LINE = "Keeps the screen on during a game. Uses more battery.";
+export const TABLE_LIST_LINE = "Always lists the table's cards and choices as text, as a screen reader gets it. For Switch Control, Voice Control or Switch Access, or if you prefer it.";
+export const CONFIRM_TIME_LINE = "How long a button that asks for a second tap waits. Standard is 3 seconds, 10 with a screen reader. No limit waits until you tap again or choose something else.";
 export const NONE_YET = "None yet";
 // The Responses row's detail, empty and not.
 export const ALWAYS_EMPTY_LINE = "Free Responses set to Always use. The game plays them without asking.";

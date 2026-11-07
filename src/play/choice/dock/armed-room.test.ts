@@ -1,7 +1,7 @@
 import { readdirSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
-import { armedLines, armedRoom, armedWords, CHARS_PER_LINE, lineCount, MAX_LINES, MIN_LINES } from "./armed-room.ts";
+import { ARM_LONG_MS, ARM_MS, armMs, armedLines, armedRoom, armedWords, CHARS_PER_LINE, lineCount, MAX_LINES, MIN_LINES } from "./armed-room.ts";
 
 // The armed line holds a caution in full at the narrowest dock (phase 22 ux fix): its room is sized to the longest words a dock
 // button can say when armed, and is the same before and after arming.
@@ -52,5 +52,22 @@ describe("the armed line's room", () => {
     expect(armedWords("Tap again: use it now and every time", true)).toBe("Tap again: use it now and every time");
     const same = `Tap again: ${longestName(["hero", "ally"])} falls and the game is lost`;
     expect(armedWords(same, true).endsWith("falls and the game is lost")).toBe(true);
+  });
+});
+
+describe("the armed wait", () => {
+  it("is 3 s, or 10 s while a screen reader speaks, on Standard", () => {
+    expect(armMs("standard", false)).toBe(ARM_MS);
+    expect(armMs("standard", true)).toBe(ARM_LONG_MS);
+  });
+
+  it("is 10 s on Long whatever the reader says", () => {
+    expect(armMs("long", false)).toBe(10000);
+    expect(armMs("long", true)).toBe(10000);
+  });
+
+  it("has no limit on No limit", () => {
+    expect(armMs("none", false)).toBeNull();
+    expect(armMs("none", true)).toBeNull();
   });
 });

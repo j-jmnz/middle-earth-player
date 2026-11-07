@@ -116,7 +116,7 @@ Read the sections your task touches.
   - 880–905 Persistence and shipping (~1.8K)
   - 906–947 Screens (~4.7K) ← 1
     - 932–947 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~37.9K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~38.1K tok)
   - 5–8 Overview (~130) ← 1
   - 9–23 Top bar (~2.1K) ← 4
   - 24–27 Table menu (~430) ← 2
@@ -136,7 +136,7 @@ Read the sections your task touches.
   - 231–234 Hold, slide and release (~940)
   - 235–240 Peeking at the other seat (~600) ← 1
   - 241–259 Command column (~2.4K) ← 9
-  - 260–263 Two taps (~350) ← 2
+  - 260–263 Two taps (~420) ← 2
   - 264–267 One answer, one tap (~240)
   - 268–271 Stops and Always use (~250)
   - 272–275 Guide (~120)
@@ -147,9 +147,9 @@ Read the sections your task touches.
   - 322–325 Undo (~140)
   - 326–329 Haptics (~280)
   - 330–341 Banner (~660) ← 2
-  - 342–359 Screen reader (~2.1K) ← 14
+  - 342–359 Screen reader (~2.2K) ← 14
   - 360–363 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~25.7K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~25.8K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~580)
   - 34–44 Performance (~670) ← 4
@@ -164,7 +164,7 @@ Read the sections your task touches.
   - 220–234 Icons (~480) ← 6
   - 235–253 Card art (~740) ← 2
   - 254–268 Tablets (~510) ← 13
-  - 269–450 Screens (~14.2K)
+  - 269–450 Screens (~14.3K)
     - 273–276 Splash (~40)
     - 277–280 App icon (~80)
     - 281–296 Campaigns (campaign list) (~1.4K) ← 6
@@ -182,7 +182,7 @@ Read the sections your task touches.
     - 395–404 Card pool (the Cards tab) (~770) ← 3
     - 405–410 Card (~480) ← 2
     - 411–416 Packs and pack cards (~130)
-    - 417–430 Settings (~770) ← 9
+    - 417–430 Settings (~830) ← 9
     - 431–436 Rules (~450) ← 1
     - 437–440 Rule (~220) ← 1
     - 441–446 Booklet (~280) ← 2
