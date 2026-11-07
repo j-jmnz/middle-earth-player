@@ -1,8 +1,6 @@
 # Security
 
-[PRIVACY.md](PRIVACY.md) says what the app stores and what it sends. In short, the app has no accounts, no backend, no analytics, no ads and no crash reporting, and a release phone build makes one kind of network request:
-
-- **Deck import from RingsDB.** Pasting a RingsDB deck link fetches that deck's public JSON from `ringsdb.com`, and the name of any card the app does not know. Nothing else uses `fetch` (`src/screens/routes/deck-import.tsx`).
+[PRIVACY.md](PRIVACY.md) says what the app stores and what it sends. In short, the app has no accounts, no backend, no analytics, no ads and no crash reporting, and a release phone build makes one kind of network request. Pasting a RingsDB deck link fetches that deck's public JSON from `ringsdb.com`, and the name of any card the app does not know. Nothing else uses `fetch` (`src/screens/routes/deck-import.tsx`).
 
 Card pictures are bundled (`pnpm scans:pack`), and a release build fetches none: every screen and the download queue get a picture's URL from `remotePictureUrl` (`src/screens/images/remote.native.ts`), which returns none outside a development build, so a card without a bundled picture is drawn as its text. A development build, and the web build (`remote.ts`), download such a picture from `ringsdb.com` or the Hall of Beorn and DragnCards image buckets on `s3.amazonaws.com`. `src/screens/images/policy.ts` refuses any other host, any non-HTTPS URL and any URL with credentials, a port, a query or `..`.
 

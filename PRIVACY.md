@@ -10,11 +10,7 @@ Your phone's own backup (iCloud, or Android's backup to Google) may include the 
 
 ## When the app uses the network
 
-The phone app plays offline: its cards, rules, booklets and every card picture are inside it. It connects in one case only, over HTTPS:
-
-| When | To | What is sent |
-| --- | --- | --- |
-| You import a deck from a RingsDB link | [ringsdb.com](https://ringsdb.com) | The deck's id from the link, and the code of any card in it that the app does not recognise |
+The phone app plays offline: its cards, rules, booklets and every card picture are inside it. It connects in one case only: when you import a deck from a RingsDB link, it sends [ringsdb.com](https://ringsdb.com), over HTTPS, the deck's id from the link and the code of any card in it that the app does not recognise.
 
 Like any web request, this shows RingsDB your IP address and a standard user agent, under RingsDB's own privacy policy. The app adds no identifier, cookie, account or game data. If you never import a deck from RingsDB, the phone app never connects.
 

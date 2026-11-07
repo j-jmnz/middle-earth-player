@@ -8,13 +8,13 @@ An offline, single-device app for playing The Lord of the Rings: The Card Game s
 ## Privacy and security
 
 > [!NOTE]
-> **No accounts, no tracking, no ads, no analytics, no crash reporting.** Your games stay on your phone.
+> The app has no accounts, tracking, ads, analytics or crash reporting. Your games stay on your phone.
 
-- **Offline.** The cards, the rules, the rulebooks and every card picture ship inside the app. A whole campaign plays in airplane mode.
-- **Network only when you import a deck.** Importing from a RingsDB link fetches that public deck, and the name of any card the app does not know, from `ringsdb.com`. Nothing else connects.
-- **Two Android permissions:** `INTERNET` for the deck import, `VIBRATE` for haptics. None on iOS.
-- **Local data.** Saves, decks, the campaign log and settings stay in the app's private storage. Uninstalling the app removes them.
-- **Supply chain.** Locked dependencies, CI with a read-only token, actions pinned by commit, weekly Dependabot updates.
+- The cards, the rules, the rulebooks and every card picture ship inside the app. A whole campaign plays in airplane mode.
+- The app goes online only when you import a deck. Importing from a RingsDB link fetches that public deck, and the name of any card the app does not know, from `ringsdb.com`. Nothing else connects.
+- On Android the app asks for two permissions, `INTERNET` for the deck import and `VIBRATE` for haptics. On iOS it asks for none.
+- Saves, decks, the campaign log and settings stay in the app's private storage. Uninstalling the app removes them.
+- Dependencies are locked, CI runs with a read-only token, actions are pinned by commit, and Dependabot proposes updates weekly.
 
 [PRIVACY.md](PRIVACY.md) lists what is stored and what the import sends. [SECURITY.md](SECURITY.md) names the code behind it and says how to report a vulnerability privately.
 
@@ -29,7 +29,7 @@ Nothing lands unless the tests, lint, type check and data check pass in CI. The 
 - Plays the official campaigns: The Fellowship of the Ring saga (MEC109), Mirkwood Paths, The Dark of Mirkwood, Dream-chaser and Ered Mithrin. Each scenario can also be played on its own, and some have Nightmare mode.
 - The engine applies the rules, keywords, phases and card effects, and works out every number. The player picks from the moves the engine lists as legal. You never type in damage, resources, threat or progress yourself.
 - Supports true solo (one seat) or two-handed solo (two seats on one device). There are no accounts and no online multiplayer.
-- Includes a deck builder with the full official player-card pool, the pre-built decks, a campaign log, run history and a rules reference.
+- It has a deck builder with the full official player-card pool and the pre-built decks, plus a campaign log, run history and a rules reference.
 
 `src/campaign/playable.ts` lists the scenarios you can play now. [docs/phases/STATUS.md](docs/phases/STATUS.md) lists the work still open.
 
@@ -39,8 +39,8 @@ The goal is every official campaign and scenario, followed by the fan-made scena
 
 Coming soon:
 
-- **The Two Towers** saga: The Uruk-hai, Helm's Deep, The Road to Isengard, The Passage of the Marshes, Journey to the Cross-roads, Shelob's Lair.
-- **The Return of the King** saga: The Passing of the Grey Company, The Siege of Gondor, The Battle of the Pelennor Fields, The Tower of Cirith Ungol, The Black Gate Opens, Mount Doom.
+- The Two Towers saga: The Uruk-hai, Helm's Deep, The Road to Isengard, The Passage of the Marshes, Journey to the Cross-roads, Shelob's Lair.
+- The Return of the King saga: The Passing of the Grey Company, The Siege of Gondor, The Battle of the Pelennor Fields, The Tower of Cirith Ungol, The Black Gate Opens, Mount Doom.
 
 After those come the remaining official cycles, saga boxes and standalone scenarios, then ALeP.
 
