@@ -65,7 +65,7 @@ describe("The Threat to Wilderland (12172:A:2)", () => {
     const t = kingsquestTable(world, { staging: [{ code: CODES.theThreatToWilderland, resources: 3 }] });
     const threat = idOf(t.state, CODES.theThreatToWilderland);
     expect(tokenLines(t.state.cards[threat]!)).toContain("3 resources");
-    expect(dungeonDetail(t.state, t.ctx, threat, nameOf(t))).toBe("3 resources: one is removed at the beginning of each quest phase, then the first player chooses: each player raises their threat by 2, or every encounter card is immune to player card effects this phase");
+    expect(dungeonDetail(t.state, t.ctx, threat, nameOf(t))).toBe("3 resources: one is removed at the beginning of each quest phase. Then the first player chooses: each player raises their threat by 2, or every encounter card is immune to player card effects this phase");
     const spent = kingsquestTable(world, { staging: [{ code: CODES.theThreatToWilderland, resources: 0 }] });
     expect(dungeonDetail(spent.state, spent.ctx, idOf(spent.state, CODES.theThreatToWilderland), nameOf(spent))).toBe("No resources left: it does nothing");
   });

@@ -271,7 +271,7 @@ describe("Urdug's attack against each player (19157:A:2)", () => {
   it("on the last stage Urdug's Command says what a destroyed character brings the objective to when that loses the game", () => {
     const t = table({ stage: "19170", phase: "Encounter", deck: ["f0", CODES.lonelyLands, "f0", "f0"] }, 14);
     const revealed = bare(t, t.state, CODES.urdugSCommand, "whenRevealed", "staging");
-    expect(sheetOf(t, revealed).note).toContain("If this attack destroys a character, The Goblins' Assault gets 1 progress and reaches 16 of 16 at the end of the round: the game is lost.");
+    expect(sheetOf(t, revealed).note).toContain("If this attack destroys a character, The Goblins' Assault gets 1 progress. It then reaches 16 of 16 at the end of the round: the game is lost.");
     const safe = table({ stage: "19170", phase: "Encounter", deck: ["f0", CODES.lonelyLands, "f0", "f0"] }, 5);
     expect(sheetOf(safe, bare(safe, safe.state, CODES.urdugSCommand, "whenRevealed", "staging")).note).toContain("If this attack destroys a character, The Goblins' Assault gets 1 progress. The top card");
   });

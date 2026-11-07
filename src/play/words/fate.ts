@@ -284,7 +284,7 @@ function afterDestroying(attack: NonNullable<ScenarioState["pendingAttack"]>, ga
   const objective = pick?.verb === "Pick" ? pick.pick.names?.[0] : undefined;
   if (place?.verb !== "PlaceProgressOn" || typeof place.amount !== "number" || !objective) return "";
   const looms = lossLooms(game, ctx, objective, place.amount);
-  return ` If this attack destroys a character, ${objective} gets ${place.amount} progress${looms ? ` and reaches ${looms.total} of ${looms.need} at the end of the round: the game is lost` : ""}.`;
+  return ` If this attack destroys a character, ${objective} gets ${place.amount} progress${looms ? `. It then reaches ${looms.total} of ${looms.need} at the end of the round: the game is lost` : ""}.`;
 }
 
 /** The words of the attack that discards the encounter deck's top card for its Threat, on the defense sheet: whom he attacks, what a destroyed character costs when it is Urdug's Command, and the card discarded. Empty for any other attack, and outside The Fate of Wilderland. */

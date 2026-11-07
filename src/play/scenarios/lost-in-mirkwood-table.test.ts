@@ -57,9 +57,9 @@ describe("the nemesis (18076:B:1 to 18076:B:3)", () => {
     const marked = updateCard(t.state, spider, { nemesis: true });
     const line = dungeonDetail(marked, t.ctx, spider, nameOf(t));
     expect(line).toContain("immune to player card effects");
-    expect(line).toContain("takes no damage while the stage has fewer than 8 progress");
+    expect(line).toContain("It takes no damage while the stage has fewer than 8 progress");
     expect(line).toContain("blocks the stage");
-    expect(line).toContain("attacks the first player at the end of each round");
+    expect(line).toContain("it returns to the staging area and attacks the first player");
     expect(line).toContain("Defeating it wins the game");
     expect(dungeonDetail(t.state, t.ctx, spider, nameOf(t))).toBeNull();
   });

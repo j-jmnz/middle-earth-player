@@ -76,7 +76,7 @@ export function gundabadChooseNote(choose: Choose, game: ScenarioState, ctx: Red
   const defeat = source != null && effectsOf(ctx, game.cards[source]?.code ?? "").some((effect) => effect.trigger === "questCardDefeated") ? ", and its 'when defeated' effect does not happen" : "";
   const lost = progress === 0 ? "It has no progress to lose and goes" : `It loses its ${progress} progress and goes`;
   const stay = progress === 0 ? "the quest continues" : `it keeps its ${progress} progress`;
-  return `${source ? card : "This stage"}: bypass this stage? ${lost} to the bottom of the quest deck, not defeated: no victory display${defeat}. The next stage is revealed (${waiting(game)}). Stay and ${stay}.`;
+  return `${source ? card : "This stage"}: bypass this stage? ${lost} to the bottom of the quest deck. It is not defeated: no victory display${defeat}. The next stage is revealed (${waiting(game)}). Stay and ${stay}.`;
 }
 
 /** The row of a branch of the bypass choice, of the search for an attachment or of the discard that wins the game, or null for another Choose. */
@@ -209,9 +209,9 @@ export function gundabadResponseNote(game: ScenarioState, ctx: ReduceContext, na
     if (!forge) return null;
     const attack = questsInVictory(game, ctx) + 1;
     const chooser = game.seatCount > 1 ? "the first player chooses" : "you choose";
-    return say(`${explored} was explored. Flip ${forge.name} to its ${forge.reforged} side and attach it to any hero ${chooser}. That hero gets +${attack} Attack (1 more than the ${plural(attack - 1, "quest card")} in the victory display), and if it leaves play the players lose the game. Pass and ${forge.name} stays ${forge.broken}: the players cannot win the game without the ${forge.reforged} ${forge.name}.`);
+    return say(`${explored} was explored. Flip ${forge.name} to its ${forge.reforged} side and attach it to any hero ${chooser}. That hero gets +${attack} Attack (1 more than the ${plural(attack - 1, "quest card")} in the victory display). If it leaves play, the players lose the game. Pass and ${forge.name} stays ${forge.broken}: the players cannot win the game without the ${forge.reforged} ${forge.name}.`);
   }
-  if (found.kind === "quest") return say(`${explored} was explored. Search the quest deck (${plural(game.questDeck.length, "stage")}) for a quest card and make it the current main quest, flipped over at once; the stage now current (${progressLost(stageProgress(game))}) goes back into the quest deck and the quest deck is shuffled. Pass and the quest stays as it is.`);
+  if (found.kind === "quest") return say(`${explored} was explored. Search the quest deck (${plural(game.questDeck.length, "stage")}) for a quest card and make it the current main quest, flipped over at once. The stage now current (${progressLost(stageProgress(game))}) goes back into the quest deck, and the quest deck is shuffled. Pass and the quest stays as it is.`);
   if (found.kind === "hoard") return say(`${explored} was explored. Each player may search their deck for an Item attachment, add it to their hand and shuffle their deck. Pass and nobody searches.`);
   const kill = killOf(found.step);
   return event?.trigger === "attacked" && kill ? say(`${kill.added} has no hit points remaining. You may discard your ${kill.discarded} to add ${kill.added} to the victory display, and the players win the game. Pass and ${kill.added} stays in play.`) : null;

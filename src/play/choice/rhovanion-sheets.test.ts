@@ -49,7 +49,7 @@ describe("the trust in Urdug (12184:A:2, 12184:B:1)", () => {
   it("solo, has no lead; it states the resources he has now, what each adds and what declining does", () => {
     const { t, state } = claimed(1);
     const sheet = sheetOf(t, state);
-    expect(sheet.note).toBe("Put your trust in Urdug? He has 0; trust makes it 1. If you don't, a copy of Urdug's Cunning is shuffled into the encounter deck. At the Resolution, with 3 or more resources on him each player adds Misplaced Trust to the campaign pool and their deck; with fewer, Urdug's Cunning.");
+    expect(sheet.note).toBe("Put your trust in Urdug? He has 0; trust makes it 1. If you don't, a copy of Urdug's Cunning is shuffled into the encounter deck. At the Resolution, with 3 or more resources on him each player adds Misplaced Trust to the campaign pool and their deck. With fewer, each player adds Urdug's Cunning.");
     expect(labels(sheet)).toEqual(["Put a resource on Urdug: +1 Willpower, Threat, Attack and Defense", "Decline: shuffle a copy of Urdug's Cunning into the encounter deck"]);
   });
 
@@ -111,7 +111,7 @@ describe("Sneaking Off (19044:A:1), Wild Creatures (19046:A:1) and Durin's Key (
       const off = spawn(t.state, CODES.sneakingOff, { zone: "staging" });
       const state = opened(t, off.state, CODES.sneakingOff, "whenRevealed", off.id, "whenRevealed");
       const sheet = sheetOf(t, state);
-      expect(sheet.note).toContain(`${lead} in the staging area. Urdug is attached to it as a guarded objective: you lose control of him until it leaves play, and Sneaking Off is removed from the game.`);
+      expect(sheet.note).toContain(`${lead} in the staging area. Urdug is attached to it as a guarded objective. You lose control of him until it leaves play, and Sneaking Off is removed from the game.`);
       expect(sheet.note).not.toContain("chooses");
       expect(labels(sheet).sort()).toEqual(["Grey Moorland", "Slopes of Ered Mithrin"]);
     }

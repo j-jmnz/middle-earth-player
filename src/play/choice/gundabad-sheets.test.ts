@@ -92,7 +92,7 @@ describe("the bypass at the end of the combat phase (emce.bypassing, 19135:B:3)"
     for (const [seats, suffix] of [[1, ""], [2, " Player 1 chooses."]] as const) {
       const { t, run } = endOfCombat({ seats, progress: 2, questDeck: THREE });
       const sheet = sheetOf(t, run.state);
-      expect(sheet.note).toBe(`Exploring Gundabad (raises threat): bypass this stage? It loses its 2 progress and goes to the bottom of the quest deck, not defeated: no victory display, and its 'when defeated' effect does not happen. The next stage is revealed (3 wait in the quest deck). Stay and it keeps its 2 progress.${suffix}`);
+      expect(sheet.note).toBe(`Exploring Gundabad (raises threat): bypass this stage? It loses its 2 progress and goes to the bottom of the quest deck. It is not defeated: no victory display, and its 'when defeated' effect does not happen. The next stage is revealed (3 wait in the quest deck). Stay and it keeps its 2 progress.${suffix}`);
       expect(labels(sheet)).toEqual(["Bypass the stage: lose 2 progress, go to the bottom of the quest deck", "Stay on the stage: keep 2 progress"]);
       expect(cautions(sheet)).toEqual([undefined, undefined]);
     }
@@ -101,7 +101,7 @@ describe("the bypass at the end of the combat phase (emce.bypassing, 19135:B:3)"
   it("says a stage with no progress has none to lose, and that one stage waiting is a single stage", () => {
     const { t, run } = endOfCombat({ progress: 0, questDeck: ["19137"] });
     const sheet = sheetOf(t, run.state);
-    expect(sheet.note).toContain("bypass this stage? It has no progress to lose and goes to the bottom of the quest deck, not defeated");
+    expect(sheet.note).toContain("bypass this stage? It has no progress to lose and goes to the bottom of the quest deck. It is not defeated");
     expect(sheet.note).toContain("(1 waits in the quest deck). Stay and the quest continues.");
     expect(labels(sheet)).toEqual(["Bypass the stage: go to the bottom of the quest deck", "Stay on the stage"]);
   });
@@ -112,7 +112,7 @@ describe("the bypass at the end of the combat phase (emce.bypassing, 19135:B:3)"
     const moment = momentOf(run.state, bypassed.state, bypassed.steps.flat(), names(bypassed.state));
     expect(moment?.title).toBe("Exploring Gundabad (raises threat) is bypassed");
     expect(moment?.lines.slice(0, 4).map((line) => line.text)).toEqual([
-      "The stage goes to the bottom of the quest deck: it is not defeated, so it is not added to the victory display.",
+      "The stage goes to the bottom of the quest deck. It is not defeated, so it is not added to the victory display.",
       "2 progress removed from Exploring Gundabad (raises threat)",
       "The quest advances to Exploring Gundabad (no canceling)",
       "It stays side A up until the quest phase begins; its side B text works from then.",
@@ -134,7 +134,7 @@ describe("the bypass at the end of the combat phase (emce.bypassing, 19135:B:3)"
     }
     expect(run.state.window?.kind).not.toBe("choose");
     expect(moment?.title).toBe("Exploring Gundabad (can win) is bypassed");
-    expect(moment?.lines[0]?.text).toBe("There are 4 or fewer quest cards in the victory display, so the stage must be bypassed. It has no progress to lose and goes to the bottom of the quest deck: it is not defeated, so it is not added to the victory display.");
+    expect(moment?.lines[0]?.text).toBe("There are 4 or fewer quest cards in the victory display, so the stage must be bypassed. It has no progress to lose and goes to the bottom of the quest deck. It is not defeated, so it is not added to the victory display.");
   });
 
   it("staying keeps the stage and its progress, and the quest goes on to the refresh phase", () => {
@@ -194,7 +194,7 @@ describe("Throat of the Mountain (19124:A:1)", () => {
       const { t, run } = throat(seats);
       const sheet = sheetOf(t, run.state);
       expect(sheet.kind).toBe("trigger");
-      expect(sheet.note).toBe(`${lead}Throat of the Mountain was explored. Search the quest deck (3 stages) for a quest card and make it the current main quest, flipped over at once; the stage now current (it loses its 2 progress) goes back into the quest deck and the quest deck is shuffled. Pass and the quest stays as it is.`);
+      expect(sheet.note).toBe(`${lead}Throat of the Mountain was explored. Search the quest deck (3 stages) for a quest card and make it the current main quest, flipped over at once. The stage now current (it loses its 2 progress) goes back into the quest deck, and the quest deck is shuffled. Pass and the quest stays as it is.`);
     }
   });
 
@@ -212,7 +212,7 @@ describe("Throat of the Mountain (19124:A:1)", () => {
       const moment = momentOf(asked.state, chosen.state, chosen.steps.flat(), names(chosen.state));
       expect(moment?.title).toBe(`${stageName(chosen.state, t.ctx, chosen.state.questStage ?? "", "Exploring Gundabad")} becomes the current quest`);
       expect(moment?.title).not.toBe("Exploring Gundabad becomes the current quest");
-      expect(moment?.lines[0]?.text).toBe("The stage that was current loses its 2 progress and goes back into the quest deck, which is shuffled: it is not defeated, so it is not added to the victory display. The new stage is flipped over at once.");
+      expect(moment?.lines[0]?.text).toBe("The stage that was current loses its 2 progress and goes back into the quest deck, which is shuffled. It is not defeated, so it is not added to the victory display. The new stage is flipped over at once.");
     }
   });
 });
@@ -266,7 +266,7 @@ describe("The First Forge and Wormsbane (19122:A:3, 19134:A:1)", () => {
     for (const [seats, lead, chooser] of [[1, "", "you choose"], [2, "Player 1: ", "the first player chooses"]] as const) {
       const { t, run } = forge(seats);
       const sheet = sheetOf(t, run.state);
-      expect(sheet.note).toBe(`${lead}The First Forge was explored. Flip Wormsbane to its Reforged side and attach it to any hero ${chooser}. That hero gets +3 Attack (1 more than the 2 quest cards in the victory display), and if it leaves play the players lose the game. Pass and Wormsbane stays Broken: the players cannot win the game without the Reforged Wormsbane.`);
+      expect(sheet.note).toBe(`${lead}The First Forge was explored. Flip Wormsbane to its Reforged side and attach it to any hero ${chooser}. That hero gets +3 Attack (1 more than the 2 quest cards in the victory display). If it leaves play, the players lose the game. Pass and Wormsbane stays Broken: the players cannot win the game without the Reforged Wormsbane.`);
       // The Pass is armed with what it leaves undone.
       expect(sheet.kind === "trigger" ? sheet.passCaution : null).toBe("Tap again: Wormsbane stays Broken and the game cannot be won.");
     }

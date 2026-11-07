@@ -28,7 +28,7 @@ const MANY: Choose = { ...CURRENT, options: [...CURRENT.options, { id: "i-two", 
 describe("the words of Fire in the Night", () => {
   it("emce.side-quests-in-play the first player's question at the beginning of the quest phase names the side quests and what each does; two-handed it leads with the player", () => {
     const solo = withWindow(1, 0);
-    expect(nightChooseNote(CURRENT, solo.game, solo.ctx, names)).toBe("Make the side quest in the staging area the current quest until the end of the phase, or keep Hrogar's Hill? Progress goes on the active location first, then on the current quest instead of Hrogar's Hill; progress beyond its quest points is discarded.");
+    expect(nightChooseNote(CURRENT, solo.game, solo.ctx, names)).toBe("Make the side quest in the staging area the current quest until the end of the phase, or keep Hrogar's Hill? Progress goes on the active location first, then on the current quest instead of Hrogar's Hill. Progress beyond its quest points is discarded.");
     const pair = withWindow(2, 0);
     expect(nightChooseNote(MANY, pair.game, pair.ctx, names)?.startsWith("Player 1: make 1 of the 2 side quests in the staging area the current quest until the end of the phase, or keep Hrogar's Hill?")).toBe(true);
     expect(nightBranchWords(CURRENT, MAIN_QUEST, names)).toBe("Keep Hrogar's Hill as the current quest");
@@ -67,7 +67,7 @@ describe("the words of Fire in the Night", () => {
     const at = stage.findIndex((step) => step.verb === "Pick");
     const asked = nightAsk(stage[at]!, "Hrogar's Hill", names, stage[at + 1], { game: t.game, ctx: t.ctx, options: ["Dagnir"] });
     expect(asked?.verb).toBe("Attack");
-    expect(asked?.prompt).toBe("Player 1: choose the enemy that attacks Hrogar's Hill (Dagnir). You may then declare a defender; the damage left undefended, and the damage beyond a defender's hit points, is dealt to Hrogar's Hill.");
+    expect(asked?.prompt).toBe("Player 1: choose the enemy that attacks Hrogar's Hill (Dagnir). You may then declare a defender. The damage left undefended, and the damage beyond a defender's hit points, is dealt to Hrogar's Hill.");
     expect(nightAsk(stage[at]!, null, names, stage[at + 1], { game: t.game, ctx: t.ctx, options: ["a", "b"] })?.prompt).not.toContain("(");
     expect(nightAsk(stage[at]!, null, names, undefined, undefined)).toBeNull();
   });

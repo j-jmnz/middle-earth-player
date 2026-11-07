@@ -175,7 +175,7 @@ function kingsQuestAsk(instruction: Instruction, source: string | null, names: C
     const left = data?.kind === "effect" ? data.queue.filter((item) => item.instruction.verb === "DiscardPicked").length : 1;
     return ask("Discard", `discard 1 card from your hand (${left} left: 1 for each point of excess damage).`);
   }
-  if (next?.verb === "GuardPickedAttachment") return ask("Guard", "choose an Artifact attachment in your hand: it lies in the staging area guarded by a location from the encounter deck, and the players claim it once that location is dealt with.");
+  if (next?.verb === "GuardPickedAttachment") return ask("Guard", "choose an Artifact attachment in your hand. It lies in the staging area, guarded by a location from the encounter deck. The players claim it once that location is dealt with.");
   if (code === "18043" && pick.type === "player" && next?.verb === "SwitchActor") return { verb: "Choose", prompt: "Choose the player who puts an Artifact from their hand in the staging area, guarded by a location." };
   if (next?.verb === "AttackFromStaging" && pick.highestAttack === true) {
     const first = game && facts?.options[0] && game.cards[facts.options[0]] ? modifiedStat(game, game.cards[facts.options[0]]!, "attack", facts.ctx.cards) : null;
@@ -370,6 +370,6 @@ function carriedAwayAsk(pick: Instruction, next: Instruction | undefined, facts:
   if (pick.verb !== "Pick" || next?.verb !== "DiscardUntil" || pick.pick.type !== "hero") return null;
   const game = facts?.game;
   const many = game != null && game.seatCount > 1;
-  const body = "choose 1 hero you control to be carried away. It loses its tokens and attachments. The next enemy discarded from the encounter deck enters the staging area and guards it facedown until that enemy leaves play, then the hero returns exhausted.";
+  const body = "choose 1 hero you control to be carried away. It loses its tokens and attachments. The next enemy discarded from the encounter deck enters the staging area and guards the hero facedown. When that enemy leaves play, the hero returns exhausted.";
   return many ? { verb: "Carry away", prompt: `Player ${askedSeat(game) + 1}: ${body}`, owned: true } : { verb: "Carry away", prompt: `${body.charAt(0).toUpperCase()}${body.slice(1)}` };
 }

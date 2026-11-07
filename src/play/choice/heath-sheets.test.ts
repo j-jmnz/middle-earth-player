@@ -142,7 +142,7 @@ describe("The Canny Huntsman (12180:A:1)", () => {
   it("two-handed, leads with the player and says the cards chosen go to the bottom, in order, and Done puts the rest on top", () => {
     const { t, state } = song(2);
     const sheet = sheetOf(t, state);
-    expect(sheet.note).toMatch(/^Player 1: choose the cards that go to the bottom of the encounter deck, from the top 5 you looked at, one at a time: each is placed under the rest\. Done puts the rest back on top, in the order you choose next\./);
+    expect(sheet.note).toMatch(/^Player 1: choose the cards that go to the bottom of the encounter deck, from the top 5 you looked at, one at a time\. Each is placed under the rest\. Done puts the rest back on top, in the order you choose next\./);
     expect(sheet.note).not.toContain("Player 1 chooses");
     expect(sheet.note).not.toContain("in any order");
     expect(sheet.note).not.toContain("so far");
