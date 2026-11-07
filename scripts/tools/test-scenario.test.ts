@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { changedFamilyTests, hasReaderGames, registryTitle, scenarioTests, selectTests, smokeRuns } from "./test-scenario.ts";
+import { changedFamilyTests, hasReaderGames, quickParts, registryTitle, scenarioTests, selectTests, smokeRuns } from "./test-scenario.ts";
 
 // pnpm test:scenario <id>: the selection is a pure function of the id, the changed paths and the tree of test files.
 const TREE = [
@@ -143,5 +143,35 @@ describe("the card smokes (smokeRuns)", () => {
     // The player-card smoke is skipped: no arguments to run.
     expect(without[0]?.args).toEqual([]);
     expect(without[1]?.args.slice(-2)).toEqual(["scripts/card-smoke/encounter.ts", "the-oath"]);
+  });
+});
+
+describe("quickParts (--quick)", () => {
+  const parts = [
+    { name: "tests", files: ["src/campaign/scenarios/the-oath/golden.test.ts", "src/campaign/scenarios/the-oath/quest.test.ts"] },
+    { name: "goldens", files: ["src/campaign/causes.test.ts", "src/campaign/replay.test.ts"], filter: "The Oath" },
+    { name: "coverage", files: ["scripts/checks/effect-coverage.test.ts"] },
+    { name: "families", files: [] as string[], note: "no pool, family or manifest file changed" },
+    { name: "reader", files: ["src/play/reader-play.test.ts"] },
+  ];
+
+  it("is the same parts without --quick", () => {
+    expect(quickParts(parts, "the-oath", false)).toEqual(parts);
+  });
+
+  it("skips the registry-wide goldens, the reader check and the scenario's own golden test, and says so", () => {
+    const quick = quickParts(parts, "the-oath", true);
+    const by = (name: string) => quick.find((part) => part.name === name);
+    expect(by("goldens")).toMatchObject({ files: [], note: "skipped by --quick" });
+    expect(by("reader")).toMatchObject({ files: [], note: "skipped by --quick" });
+    expect(by("tests")?.files).toEqual(["src/campaign/scenarios/the-oath/quest.test.ts"]);
+    expect(by("tests")?.note).toContain("--quick");
+  });
+
+  it("keeps the coverage and family parts, and another scenario's golden test", () => {
+    const quick = quickParts(parts, "the-oath-extra", true);
+    expect(quick.find((part) => part.name === "coverage")).toEqual(parts[2]);
+    expect(quick.find((part) => part.name === "families")).toEqual(parts[3]);
+    expect(quick.find((part) => part.name === "tests")).toEqual(parts[0]);
   });
 });

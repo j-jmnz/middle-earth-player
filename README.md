@@ -177,7 +177,7 @@ Flows are in `.maestro/scenarios/<scenario-id>/` and `.maestro/features/`. Run `
 | `pnpm test` | All Vitest tests. |
 | `pnpm test:fast` | All but the slow files (`slowFiles` in `vitest.config.mts`). |
 | `pnpm test:changed` | Tests that import a file changed since the last commit. |
-| `pnpm test:scenario <scenario-id>` | One scenario's goldens, effect coverage, file-size, rule-id and wording checks, the card smoke on its player cards and the encounter smoke; also the family and manifest tests if pool, family or manifest files changed since the merge base with `origin/main`. `--list` prints the selection. |
+| `pnpm test:scenario <scenario-id>` | One scenario's goldens, effect coverage, file-size, rule-id and wording checks, the card smoke on its player cards and the encounter smoke; also the family and manifest tests if pool, family or manifest files changed since the merge base with `origin/main`. `--list` prints the selection; `--quick` skips the goldens and the reader check. |
 | `pnpm lint` | Oxlint (`.oxlintrc.json`). |
 | `pnpm typecheck` | tsrs type check. |
 | `pnpm data:sync [ringsdb\|hallofbeorn\|dragncards\|rules\|scans\|pictures\|icons]` | Refreshes `data/raw/` and `.cache/`. The only networked command. `scans` and `pictures` run only when named, after `data:build`. |
@@ -186,7 +186,8 @@ Flows are in `.maestro/scenarios/<scenario-id>/` and `.maestro/features/`. Run `
 | `pnpm data:query "<sql>"` | Queries `cards`, `scenario_cards` and `rules` in memory. |
 | `pnpm effects:draft <scenario \| deck \| pack \| codes>` | Writes `.agent/drafts/<code>.md` per card with an uncovered printed line. |
 | `pnpm effects:open` | Regenerates `src/effects/open-lines.ts`. |
-| `pnpm scenario:new <scenario-id>` | Writes and registers a new scenario's skeleton files. `--dry-run` first. |
+| `pnpm scenario:new <scenario-id>` | Writes and registers a new scenario's skeleton files. `--dry-run` first; `--track fast` writes spec rows and an asks file in place of the scene file. |
+| `pnpm author:pack <scenario-id>` | Writes `.agent/pack/<id>.md`, the fast-track author's context: vocabulary, schema entries, cookbook sections and drafts. |
 | `pnpm a11y:web` | Audits the main web screens with axe-core in Chromium; fails on serious or critical findings. Needs `pnpm exec playwright install chromium` once, or `A11Y_CHROMIUM=<path>`. |
 | `pnpm catalog:build` | Writes `assets/catalog.db` (never committed) and `src/catalog/version.ts` (committed). |
 | `pnpm scans:pack` / `pnpm booklets:pack` | Packs card pictures / booklet PDFs into `assets/`. |

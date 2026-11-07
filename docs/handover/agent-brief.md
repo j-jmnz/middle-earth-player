@@ -94,6 +94,8 @@ Every scenario phase follows it. A phase file names only what its own cards add.
 5. Fill the skeletons on the shared kit (`test/harness/scene-kit.ts`, `game-kit.ts`, `golden-suite.ts`, `scripts/e2e/seed-kit.ts`, `.maestro/subflows/`): a golden of auto-player games on fixed seeds, true solo and two-handed, through a win and through a loss, listed in `test/harness/golden-registry.ts`. `src/campaign/causes.test.ts` covers it. `pnpm test:scenario <id> --words` runs the words test (`src/play/words/scenario-words.test.ts`) before the goldens: check each sentence against `docs/design-system-table.md`, Choice tray (each sentence names its number, side and owner).
 6. The scenario's campaign test continues the campaign: the previous scenario's earned pool cards reach this scenario through the Campaign Setup Checklist.
 
+A scenario scaffolded with `pnpm scenario:new <id> --track fast` follows `docs/handover/fast-track.md` instead of steps 2 and 5.
+
 **Engine half exit:** coverage and the goldens are green in Node. A win runs this campaign card's resolution and unlocks the next scenario. A loss writes nothing.
 
 **Screen half exit:** the scenario's words and widgets are written and tested, its Maestro win and loss flows are written, and no control types damage, resources, threat, progress, or life. Phone checks are not tracked.

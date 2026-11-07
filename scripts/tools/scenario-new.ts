@@ -6,17 +6,20 @@ import { loadCards } from "../data/load-cards.ts";
 import { loadCampaignsInOrder, loadScenario } from "../data/load-scenarios.ts";
 import { ROOT } from "../data/paths.ts";
 import { runScript, type Log } from "../log.ts";
-import { authoredFile, campaignTestFile, camel, gameFile, goldenTestFile, lossFlowFile, sceneFile, seedFinderFile, winFlowFile, type Facts, type PreviousPart } from "./scenario-new-files.ts";
+import { asksFile, authoredFile, campaignTestFile, camel, gameFile, goldenTestFile, lossFlowFile, sceneFile, seedFinderFile, specTestFile, winFlowFile, type Facts, type PreviousPart, type Track } from "./scenario-new-files.ts";
 
 // Writes the skeleton of a scenario that data/scenarios already has, and the lines that register it, so the work left is the scenario's own
 // (docs/handover/agent-brief.md, Scenario procedure):
 //
-//   pnpm scenario:new <scenario-id> [--short <name>] [--dry-run]
+//   pnpm scenario:new <scenario-id> [--short <name>] [--track classic|fast] [--dry-run]
 //
 // Files (never overwritten: if any exists the command refuses, listing them): the scene and the game (test/scenarios/<id>/), the golden
 // test and the campaign test (src/campaign/scenarios/<id>/), the seed finder (scripts/e2e/<id>.ts), both Maestro flows
 // (.maestro/scenarios/<id>/), the authored effects file (src/effects/authored/<id>.ts) and the empty fixture file
 // (src/campaign/fixtures/<id>.json).
+// `--track fast` (docs/handover/fast-track.md) writes no scene file: the game, the golden test and the campaign test read the scenario from data/, the card tests are spec rows
+// (src/campaign/scenarios/<id>/spec.test.ts, on tableFromLayout) and the choice words are an asks file (src/play/words/asks/<id>.ts, listed in its barrel by pnpm data:build).
+// `--track classic` (the default) writes the files above unchanged.
 // Registry lines: the fixture registry, the JSON import and FILES entry in src/campaign/fixtures.ts, the writer in scripts/e2e/fixtures.ts,
 // and the golden registry (test/harness/golden-registry.ts), whose two lines are written as comments because that registry's test fails
 // on an entry with no golden.json. Nothing else runs: the next commands are printed.
@@ -147,7 +150,7 @@ function insert(text: string, file: string, place: { block?: Block; anchor?: Reg
   return [...lines.slice(0, at), line, ...lines.slice(at)].join("\n");
 }
 
-export function planScenario(id: string, options: { short?: string }, repo: Repo, exists: (file: string) => boolean): { plan: Plan | null; problems: string[] } {
+export function planScenario(id: string, options: { short?: string; track?: Track }, repo: Repo, exists: (file: string) => boolean): { plan: Plan | null; problems: string[] } {
   const problems: string[] = [];
   let facts: Facts;
   try {
@@ -164,11 +167,14 @@ export function planScenario(id: string, options: { short?: string }, repo: Repo
     return { plan: null, problems: [error instanceof Error ? error.message : String(error)] };
   }
 
+  const track = options.track ?? "classic";
+  const fast = track === "fast";
   const files = [
-    { file: `test/scenarios/${id}/scene.ts`, text: sceneFile(facts) },
-    { file: `test/scenarios/${id}/game.ts`, text: gameFile(facts) },
-    { file: `src/campaign/scenarios/${id}/golden.test.ts`, text: goldenTestFile(facts) },
-    { file: `src/campaign/scenarios/${id}/campaign.test.ts`, text: campaignTestFile(facts) },
+    ...(fast ? [] : [{ file: `test/scenarios/${id}/scene.ts`, text: sceneFile(facts) }]),
+    { file: `test/scenarios/${id}/game.ts`, text: gameFile(facts, track) },
+    { file: `src/campaign/scenarios/${id}/golden.test.ts`, text: goldenTestFile(facts, track) },
+    { file: `src/campaign/scenarios/${id}/campaign.test.ts`, text: campaignTestFile(facts, track) },
+    ...(fast ? [{ file: `src/campaign/scenarios/${id}/spec.test.ts`, text: specTestFile(facts) }, { file: `src/play/words/asks/${id}.ts`, text: asksFile(facts) }] : []),
     { file: `scripts/e2e/${id}.ts`, text: seedFinderFile(facts) },
     { file: `.maestro/scenarios/${id}/${id}.yaml`, text: winFlowFile(facts) },
     { file: `.maestro/scenarios/${id}/${id}-loss.yaml`, text: lossFlowFile(facts) },
@@ -258,11 +264,16 @@ function addedLines(before: readonly string[], after: readonly string[]): string
   return added;
 }
 
-function nextSteps(facts: Facts, log: Log): void {
+function nextSteps(facts: Facts, track: Track, log: Log): void {
   log.info("next:");
-  log.info("  pnpm data:build                   rewrites the barrel of authored effect files (src/effects/generated/authored.ts)");
+  log.info(`  pnpm data:build                   rewrites the barrel of authored effect files (src/effects/generated/authored.ts)${track === "fast" ? " and of asks files (src/play/words/asks/index.ts)" : ""}`);
   log.info(`  pnpm effects:draft ${facts.id}   writes .agent/drafts/<code>.md for each printed line no record owns; the effect-author agent turns them into records`);
   log.info("  pnpm effects:open                 after the records, then add the scenario to src/campaign/playable.ts when none of its lines is open");
+  if (track === "fast") {
+    log.info(`  pnpm author:pack ${facts.id}   writes .agent/pack/${facts.id}.md: the vocabulary, the families' manifests the drafts need, the cookbook sections and the drafts (docs/handover/fast-track.md)`);
+    log.info(`  fill the skeletons: spec rows (src/campaign/scenarios/${facts.id}/spec.test.ts), asks (src/play/words/asks/${facts.id}.ts), test/scenarios/${facts.id}/game.ts, the golden test (a skipped suite), the seed finder, the Maestro flows; then list the goldens in test/harness/golden-registry.ts`);
+    return;
+  }
   log.info(`  fill the skeletons: test/scenarios/${facts.id}/, the golden test (a skipped suite), the seed finder, the Maestro flows; then list the goldens in test/harness/golden-registry.ts`);
 }
 
@@ -271,8 +282,13 @@ function main(log: Log): void {
   const flags = new Set(args.filter((arg) => arg.startsWith("--")));
   const shortAt = args.indexOf("--short");
   const short = shortAt >= 0 ? args[shortAt + 1] : undefined;
-  const id = args.find((arg, index) => !arg.startsWith("--") && (shortAt < 0 || index !== shortAt + 1));
-  if (!id) throw new Error("usage: pnpm scenario:new <scenario-id> [--short <name>] [--dry-run]");
+  const trackAt = args.indexOf("--track");
+  const trackName = trackAt >= 0 ? args[trackAt + 1] : "classic";
+  if (trackName !== "classic" && trackName !== "fast") throw new Error(`--track ${trackName ?? ""} is not a track: use classic or fast`);
+  const track: Track = trackName;
+  const taken = (index: number): boolean => (shortAt >= 0 && index === shortAt + 1) || (trackAt >= 0 && index === trackAt + 1);
+  const id = args.find((arg, index) => !arg.startsWith("--") && !taken(index));
+  if (!id) throw new Error("usage: pnpm scenario:new <scenario-id> [--short <name>] [--track classic|fast] [--dry-run]");
   const repo: Repo = {
     read: (file) => {
       try {
@@ -282,7 +298,7 @@ function main(log: Log): void {
       }
     },
   };
-  const { plan, problems } = planScenario(id, short === undefined ? {} : { short }, repo, (file) => existsSync(path.join(ROOT, file)));
+  const { plan, problems } = planScenario(id, { ...(short === undefined ? {} : { short }), track }, repo, (file) => existsSync(path.join(ROOT, file)));
   if (!plan) {
     for (const problem of problems) log.error(problem);
     process.exitCode = 1;
@@ -298,7 +314,7 @@ function main(log: Log): void {
     }
     for (const item of plan.edits) writeFileSync(path.join(ROOT, item.file), item.after);
   }
-  nextSteps(plan.facts, log);
+  nextSteps(plan.facts, track, log);
 }
 
 if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) void runScript("scenario:new", main, { done: false });

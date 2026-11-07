@@ -8,7 +8,7 @@ Read a section, not a file: `pnpm docs:section <file> "<heading>"` prints one se
 
 Read whole.
 
-- `CLAUDE.md` — Claude Code (~2.4K tok)
+- `CLAUDE.md` — Claude Code (~2.5K tok)
 - `.claude/rules/authority.md` — Authority (~470 tok)
 - `.claude/rules/code-standards.md` — Code standards (~1.9K tok)
 - `.claude/rules/commit-standards.md` — Commit standards (~680 tok)
@@ -21,16 +21,17 @@ Each agent reads its own file.
 
 - `.claude/agents/effect-author.md` — Writes effect records for card lines no template reads (~1.1K tok)
 - `.claude/agents/implementer.md` — Implements one phase from docs/phases (~1.4K tok)
-- `.claude/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~1.8K tok)
+- `.claude/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~1.9K tok)
 - `.claude/agents/reading-judge.md` — Reads each effect record, rendered as English, against the printed ledger line it implements and says ok, wrong or ambiguous (~860 tok)
 - `.claude/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~2.4K tok)
+- `.claude/agents/scenario-author.md` — Builds one scenario on the fast track (docs/handover/fast-track.md) as three tasks the orchestrator runs in turn: Read, Build and Finish (~890 tok)
 - `.claude/agents/ux.md` — Reviews the current screens for phone UX and visual design, and changes the design system when asked (~1.3K tok)
 
 ## Product, code and design
 
 Read the sections your task touches.
 
-- `README.md` — Middle Earth LCG (~4.2K tok)
+- `README.md` — Middle Earth LCG (~4.3K tok)
   - 8–23 Contents (~190)
   - 24–29 Privacy and security (~120)
   - 30–35 How the code is written (~120)
@@ -50,11 +51,11 @@ Read the sections your task touches.
     - 137–146 In a browser (~100)
     - 147–168 On a phone (~270)
     - 169–172 Maestro (~130)
-  - 173–203 Commands (~820)
-  - 204–207 Contributing (~80)
-  - 208–217 Documentation (~170)
-  - 218–235 Attribution (~470)
-  - 236–239 License (~50)
+  - 173–204 Commands (~890)
+  - 205–208 Contributing (~80)
+  - 209–218 Documentation (~170)
+  - 219–236 Attribution (~470)
+  - 237–240 License (~50)
 - `docs/architecture.md` — Architecture (~20.4K tok)
   - 7–41 Stack (~1.1K)
   - 42–77 Processes (~680)
@@ -142,7 +143,7 @@ Read the sections your task touches.
   - 264–267 One answer, one tap (~240)
   - 268–271 Stops and Always use (~250)
   - 272–275 Guide (~120)
-  - 276–292 Choice tray (~5.2K) ← 21
+  - 276–292 Choice tray (~5.2K) ← 24
   - 293–307 Reading panels (~1.6K) ← 5
   - 308–317 Phase carousel (~680)
   - 318–323 Quest advance (~530) ← 1
@@ -213,7 +214,7 @@ Read when a task names the plan.
 - `docs/plans/effect-authoring.md` — Authoring effect records (~7.4K tok)
   - 12–33 Workflow (~470)
   - 34–50 Where records live (~370)
-  - 51–75 Templates and copied lines (~690) ← 4
+  - 51–75 Templates and copied lines (~690) ← 5
   - 76–100 The record (~500)
   - 101–117 Which card an instruction acts on (~380)
   - 118–138 Pick filters (~410)
@@ -221,8 +222,8 @@ Read when a task names the plan.
   - 148–154 Conditions (~110)
   - 155–174 Triggers and stat flags (~440)
   - 175–236 Patterns (~1.4K)
-  - 237–273 Mechanic families: engine and records together (~1.4K) ← 1
-  - 274–287 Readings the review catches (~490) ← 4
+  - 237–273 Mechanic families: engine and records together (~1.4K) ← 2
+  - 274–287 Readings the review catches (~490) ← 5
   - 288–307 Not expressible yet: leave open, report (~390)
 - `docs/plans/scenario-fast-track.md` — Plan: a fast track for scenarios, A/B-tested against the classic track (~3.9K tok)
   - 3–35 Context (~840)
@@ -268,16 +269,17 @@ Read when a task names the plan.
 Open work; read when a task names it.
 
 - `docs/handover/agent-brief.md` — Brief for a mechanic-family or scenario agent (~3.8K tok)
-  - 19–37 Setup (~440)
+  - 19–37 Setup (~440) ← 1
   - 38–56 Files you own (edit freely) (~490)
   - 57–70 Shared files (~300)
-  - 71–85 Approach (~680) ← 1
-  - 86–100 Scenario procedure (~620) ← 6
-  - 101–110 Checkpoints (API usage limits can stop you mid-task) (~210)
-  - 111–125 Checks before committing (~320)
-  - 126–132 Merge (~140) ← 1
-  - 133–139 Commit (~130)
-  - 140–147 Report (your final message) (~90)
+  - 71–85 Approach (~680) ← 2
+  - 86–102 Scenario procedure (~660) ← 7
+  - 103–112 Checkpoints (API usage limits can stop you mid-task) (~210)
+  - 113–127 Checks before committing (~320)
+  - 128–134 Merge (~140) ← 1
+  - 135–141 Commit (~130)
+  - 142–149 Report (your final message) (~90) ← 2
+- `docs/handover/fast-track.md` — The fast track: building a scenario with one author (~1.4K tok)
 
 ## Code to docs
 
@@ -290,7 +292,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/git`: .claude/rules/commit-standards.md, Subject line (2)
 - `scripts/release`: .claude/rules/release-standards.md, Versioning (3); .claude/rules/release-standards.md, Release notes (2); releasing.md, Jobs (2); .claude/rules/release-standards.md, Branches (1)
-- `scripts/tools`: handover/agent-brief.md, Scenario procedure (2); architecture.md, Modules (1)
+- `scripts/tools`: handover/agent-brief.md, Scenario procedure (2); architecture.md, Modules (1); design-system-table.md, Choice tray (1); handover/fast-track.md, Finish (1); handover/fast-track.md, Read (1)
 - `src/campaign`: brief.md, Nightmare (4); architecture.md, Tests (2); brief.md, Ered Mithrin (2)
 - `src/catalog`: architecture.md, Mechanic families (2); brief.md, Nightmare (2); brief.md, A Knife in the Dark (1); brief.md, Dream-chaser (1); brief.md, Ered Mithrin (1); brief.md, Flight to the Ford burden deck and life (1); brief.md, Three layers (1)
 - `src/effects`: brief.md, Breaking of the Fellowship, stage 2B (1); brief.md, Nightmare (1)

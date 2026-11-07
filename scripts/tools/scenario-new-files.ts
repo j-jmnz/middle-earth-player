@@ -33,6 +33,13 @@ export const camel = (short: string): string => {
 };
 const upper = (short: string): string => short.toUpperCase().replace(/-/g, "_");
 
+/** The track a scenario is scaffolded for: `classic` writes a scene file the tests import, `fast` has none (docs/handover/fast-track.md). */
+export type Track = "classic" | "fast";
+
+// What a fast-track file imports in place of the scene: the campaign and the scenario, read from data/ (a classic file imports both from scene.ts).
+const dataImport = (depth: string): string => `import { loadCampaign, loadScenario } from "${depth}scripts/data/load-scenarios.ts";`;
+const dataConsts = (facts: Facts, c: string): string => `const campaign = loadCampaign("${facts.campaignId}");\nconst ${c} = loadScenario("${facts.id}");`;
+
 /** test/scenarios/<id>/scene.ts */
 export function sceneFile(facts: Facts): string {
   const P = pascal(facts.short);
@@ -160,7 +167,7 @@ export function ${c}Fight(world: ${P}World, shadow: string, enemy: string, layou
 }
 
 /** test/scenarios/<id>/game.ts */
-export function gameFile(facts: Facts): string {
+export function gameFile(facts: Facts, track: Track = "classic"): string {
   const P = pascal(facts.short);
   const c = camel(facts.short);
   const U = upper(facts.short);
@@ -172,10 +179,10 @@ import type { Difficulty } from "../../../src/catalog/scenario-data.ts";
 import type { CampaignFacts, ModeCard } from "../../../src/rules/core/campaign-state.ts";
 import { legalIntents, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 
-import { campaign, ${c} } from "./scene.ts";
+${track === "fast" ? dataImport("../../../") : `import { campaign, ${c} } from "./scene.ts";`}
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
 import { campaignGame, fillerLoadout, HERO_STATS, type PlayedGame } from "../../harness/game-kit.ts";
-
+${track === "fast" ? `\n${dataConsts(facts, c)}\n` : ""}
 // Test helper. A whole game of ${facts.name} in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
 // events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. TODO: say how the players travel, engage and answer the choices this scenario asks.
 export const ${U}_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: false, act: false };
@@ -228,7 +235,7 @@ export const playGolden = (golden: ${P}Golden, ctx: ReduceContext): ${P}Game => 
 }
 
 /** src/campaign/scenarios/<id>/golden.test.ts */
-export function goldenTestFile(facts: Facts): string {
+export function goldenTestFile(facts: Facts, track: Track = "classic"): string {
   const P = pascal(facts.short);
   const c = camel(facts.short);
   const U = upper(facts.short);
@@ -236,9 +243,9 @@ export function goldenTestFile(facts: Facts): string {
 import { describe, expect } from "vitest";
 
 import { ${U}_GOLDENS, playGolden, ${c}World, type ${P}Decks, type ${P}Golden } from "../../../../test/scenarios/${facts.id}/game.ts";
-import { campaign, ${c} } from "../../../../test/scenarios/${facts.id}/scene.ts";
+${track === "fast" ? dataImport("../../../../") : `import { campaign, ${c} } from "../../../../test/scenarios/${facts.id}/scene.ts";`}
 import { goldenSuite } from "../../../../test/harness/golden-suite.ts";
-
+${track === "fast" ? `\n${dataConsts(facts, c)}\n` : ""}
 // A permanent golden: whole games of ${facts.name} in Campaign Mode played by the auto-player (test/scenarios/${facts.id}/game.ts) on fixed seeds, through a win and through each way to lose.
 // TODO: say what the games cover. Update the snapshot only when the change is meant.
 //
@@ -272,19 +279,19 @@ describe.skip("${facts.name} golden (open: scaffold)", () => {
 }
 
 /** src/campaign/scenarios/<id>/campaign.test.ts */
-export function campaignTestFile(facts: Facts): string {
+export function campaignTestFile(facts: Facts, track: Track = "classic"): string {
   const c = camel(facts.short);
   return `// Rules: TODO name the rule ids the scenario implements (data/rules/entries.json).
 import { describe, expect, it } from "vitest";
 
-import { CODES, campaign, ${c} } from "../../../../test/scenarios/${facts.id}/scene.ts";
-
+${track === "fast" ? dataImport("../../../../") : `import { CODES, campaign, ${c} } from "../../../../test/scenarios/${facts.id}/scene.ts";`}
+${track === "fast" ? `\n${dataConsts(facts, c)}\n` : ""}
 // ${facts.name} in the ${facts.campaignId} campaign (part ${facts.part}, campaign card ${facts.campaignCard}). The first check reads data/; the todos are what the campaign test of every
 // scenario shows (src/campaign/scenarios/the-thing-in-the-depths/campaign.test.ts is the pattern). TODO: turn each into a test once the scenario's records exist.
 describe("${facts.name} in the ${facts.campaignId} campaign", () => {
   it("is part ${facts.part} of the campaign and names its campaign card", () => {
     expect(campaign.scenarios.indexOf(${c}.id)).toBe(${facts.part - 1});
-    expect(${c}.campaignCard).toBe(CODES.campaignCard);
+    expect(${c}.campaignCard).toBe(${track === "fast" ? `"${facts.campaignCard}"` : "CODES.campaignCard"});
   });
 
   it.todo("is playable (src/campaign/playable.ts), and the path offers it after the earlier parts");
@@ -412,5 +419,32 @@ export function authoredFile(facts: Facts): string {
 export const AUTHORED_EFFECTS: readonly Effect[] = [];
 
 export const AUTHORED_REPLACES: readonly string[] = [];
+`;
+}
+
+/** src/play/words/asks/<id>.ts (fast track): the scenario's choice words as data (src/play/words/asks.ts). pnpm data:build adds it to the barrel. */
+export function asksFile(facts: Facts): string {
+  return `import type { Ask } from "../asks.ts";
+
+// The choice words of ${facts.name} (${facts.campaignId} part ${facts.part}), one entry for each Pick and Choose of its records: \`<record id> @<instruction path> <verb | option id>\` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
+// \`pnpm test:scenario ${facts.id} --words\` fails on a Pick or Choose with neither an entry nor words of its own, and \`WORDS_DUMP=${facts.id}\` prints each sentence.
+export const ASKS: Readonly<Record<string, Ask>> = {};
+`;
+}
+
+/** src/campaign/scenarios/<id>/spec.test.ts (fast track): the card spec rows (test/harness/card-spec.ts). */
+export function specTestFile(facts: Facts): string {
+  return `// Rules: TODO name the rule ids the rows exercise (data/rules/entries.json).
+import { describe, it } from "vitest";
+
+import { cardSpecs, type Row } from "../../../../test/harness/card-spec.ts";
+
+// Card specs for ${facts.name} (${facts.campaignId} part ${facts.part}): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
+// \`cardSpecs\` runs each row again with the records of its line removed and fails a row that still passes (docs/handover/fast-track.md, Finish).
+// TODO: the rows; the todo below stands in until there is one.
+const ROWS: readonly Row[] = [];
+
+if (ROWS.length > 0) cardSpecs("${facts.id}", ROWS);
+else describe("${facts.id} card specs", () => it.todo("a row for each record whose behaviour needs a game moment"));
 `;
 }

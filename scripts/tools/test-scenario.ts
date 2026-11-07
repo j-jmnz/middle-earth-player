@@ -12,6 +12,8 @@ import { WORDS_SCENARIOS } from "../../test/harness/words-scenarios.ts";
 // The tests to run while a scenario is being authored, a fraction of the full suite (README.md, Commands; docs/handover/agent-brief.md, Scenario procedure):
 //
 //   pnpm test:scenario <scenario-id> [--list]
+//   pnpm test:scenario <scenario-id> --quick      the loop while authoring: skips the goldens (the registry-wide golden tests and the scenario's own golden.test.ts) and the reader
+//                                                 check; the full run, once before the hand-back, runs them (docs/handover/fast-track.md)
 //   pnpm test:scenario <scenario-id> --words      only src/play/words/scenario-words.test.ts for the scenario, with WORDS_DUMP=<id>: it prints every sentence
 //                                                 the scenario's choices say (the check for a bare "Choose a player." or a fallback sentence)
 //
@@ -112,6 +114,19 @@ export const DIRECT_GOLDENS: Readonly<Record<string, readonly string[]>> = {
   "a-shadow-of-the-past": ["src/campaign/causes.test.ts", "src/campaign/replay.test.ts"],
 };
 
+const QUICK_NOTE = "skipped by --quick";
+
+/** The parts `--quick` leaves out: the goldens (the registry-wide tests, and the scenario's own golden test out of `tests`) and the reader check. A pure function of the parts. */
+export function quickParts<T extends { name: string; files: string[]; note?: string | undefined }>(parts: readonly T[], id: string, quick: boolean): T[] {
+  if (!quick) return [...parts];
+  return parts.map((part) => {
+    if (part.name === "goldens" || part.name === "reader") return { ...part, files: [], note: QUICK_NOTE };
+    if (part.name !== "tests") return part;
+    const files = part.files.filter((file) => file !== `src/campaign/scenarios/${id}/golden.test.ts`);
+    return files.length === part.files.length ? part : { ...part, files, note: `${QUICK_NOTE}: the scenario's golden test` };
+  });
+}
+
 export function selectTests(id: string, changed: readonly string[], tree: readonly string[], title: string | null, read: (file: string) => string): Selection {
   const present = (files: readonly string[]) => files.filter((file) => tree.includes(file));
   const tests = scenarioTests(id, tree, read);
@@ -177,8 +192,9 @@ async function main(log: Log): Promise<void> {
   const args = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
   const listOnly = process.argv.includes("--list");
   const wordsOnly = process.argv.includes("--words");
+  const quick = process.argv.includes("--quick");
   const id = args[0];
-  if (id === undefined || args.length > 1) throw new Error("Usage: pnpm test:scenario <scenario-id> [--list | --words]");
+  if (id === undefined || args.length > 1) throw new Error("Usage: pnpm test:scenario <scenario-id> [--list | --quick | --words]");
   if (!existsSync(path.join(DATA_DIR, "scenarios", `${id}.json`))) throw new Error(`${id} is not a scenario in data/scenarios`);
 
   if (wordsOnly) {
@@ -199,13 +215,15 @@ async function main(log: Log): Promise<void> {
   const smoke = playerCodes(id, smokeCodes());
 
   const readerGames = hasReaderGames(id, registrySource) && existsSync(path.join(ROOT, READER_TEST));
-  const parts: { name: string; files: string[]; filter?: string; note?: string; env?: Record<string, string> }[] = [
+  const planned: { name: string; files: string[]; filter?: string; note?: string; env?: Record<string, string> }[] = [
     { name: "tests", files: selection.tests },
     { name: "goldens", files: selection.goldens.files, filter: selection.goldens.title ?? undefined, note: title === null ? (id in DIRECT_GOLDENS ? "no registry entry: replay.test.ts and causes.test.ts read its goldens directly and run whole in tests" : "no entry in test/harness/golden-registry.ts") : undefined },
     { name: "coverage", files: selection.coverage },
     { name: "families", files: selection.families, note: selection.families.length === 0 ? "no pool, family or manifest file changed" : undefined },
     { name: "reader", files: readerGames ? [READER_TEST] : [], note: readerGames ? undefined : "no games: the scenario has no line in test/harness/golden-registry.ts", env: { READER_PLAY_SCENARIO: id } },
   ];
+
+  const parts = quickParts(planned, id, quick);
 
   if (listOnly) {
     for (const part of parts) {
