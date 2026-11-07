@@ -61,7 +61,8 @@ describe("the saga hero of each scenario (mec112.setting-up-the-game)", () => {
       { kind: "ringBearer" },
     ]);
     const attaches = (scenario: World["scenario"]) => buildStart({ campaign, scenario, seatCount: 1, seed: 1, threatModifier: 0, seats: [{ heroes: [FRODO], deck: [] }], effects: EFFECTS }).definition.setup.filter((step) => step.verb === "AttachToRingBearer");
-    expect(attaches(shelob)).toEqual([{ verb: "AttachToRingBearer", code: "144063" }]);
+    // The saga start attaches The One Ring; the campaign card of Shelob's Lair (144073:A:2) then attaches A Heavy Burden.
+    expect(attaches(shelob)).toEqual([{ verb: "AttachToRingBearer", code: "144063" }, { verb: "AttachToRingBearer", code: "144052" }]);
     expect(attaches(uruk)).toEqual([]);
   });
 

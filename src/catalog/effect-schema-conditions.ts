@@ -277,6 +277,13 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The When Revealed effects of the source card are resolving now: a quest stage's side B holds from the moment it is revealed, but its text is not in force while side A's When Revealed is
   // ("Each Raider enemy revealed by the encounter deck enters play with 1 resource on it" does not reach the cards revealed by the stage's own When Revealed, 11037:B:2).
   z.strictObject({ kind: z.literal("revealing") }),
+  // The pursuit value (mec112.pursuit, the pursuit tracker beside the quest deck) is at most `max`: "If the pursuit value is 25 or lower" (143071:B:1). False while no tracker is set (ScenarioState.pursuit).
+  z.strictObject({ kind: z.literal("pursuit"), max: z.number().int().min(0) }),
+  // A Resolution's ChooseOption was answered with `option` (the first player's answer for the group, or any seat's when each player answers): "either each player earns one of the Skill boons ... or one player
+  // earns Beyond All Hope" (143071:B:1). False until the option is chosen. Read by src/rules/families/campaign/resolution.ts.
+  z.strictObject({ kind: z.literal("picked"), name: z.string().min(1), option: z.string().min(1) }),
+  // Some living player's hand holds at least `min` and at most `max` cards: "If any player has 3 or fewer cards in his hand" (143081:B:1, `max: 3`), "3 or more" (`min: 3`).
+  z.strictObject({ kind: z.literal("anyHand"), min: z.number().int().min(0).optional(), max: z.number().int().min(0).optional() }),
 ]);
 
 export const conditionSchema = z.discriminatedUnion("kind", [

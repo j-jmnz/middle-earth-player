@@ -45,6 +45,46 @@ const VERBS = [
   // Places `amount` resource tokens (1 by default) on the source card: the campaign card counts them ("Response: At the end of each round, place 1
   // resource token here", 41050:A:3). It is no hero's resource pool, so nothing collects it and no `resourcesAdded` is announced.
   z.strictObject({ verb: z.literal("PlaceToken"), amount: z.number().int().positive().optional(), ...when }),
+  // The Two Towers' campaign cards (docs/brief.md, The Two Towers; src/campaign/checklist-two-towers.ts deals the Setup ones, src/rules/families/campaign/resolution.ts runs the Resolution ones).
+  // Campaign Setup: these cards leave the Campaign Pool ("Remove Gildor Inglorion and Mr. Underhill from the Campaign Pool", 143071:A:2). The log loses them; a card on a hero goes with it.
+  z.strictObject({ verb: z.literal("RemovePoolCards"), codes: z.array(code).min(1) }),
+  // Campaign Setup: the pool's burdens of these burden sets are not dealt this scenario ("Remove each burden with the following burden set icons from the encounter deck", 143071:A:2, 143077:A:2, 143081:A:2;
+  // "... from the encounter deck and each player's deck", 144067:A:2 to 144073:A:2, `playerDecks`). The cards stay in the pool: the setup only leaves them out of the decks it builds, so
+  // an encounter-backed burden misses the encounter deck and, with `playerDecks`, one a player shuffles into their deck (a burden that functions like a player card) misses that deck too.
+  z.strictObject({ verb: z.literal("RemoveBurdenSets"), sets: z.array(z.string().min(1)).min(1), playerDecks: z.literal(true).optional() }),
+  // Campaign Setup: each player shuffles one copy of the card into their own deck ("Each player shuffles 1 copy of The Searching Eye into his deck", 144067:A:2). The copy is dealt for this
+  // game only: nothing joins the pool until a Resolution earns one.
+  z.strictObject({ verb: z.literal("ShuffleIntoEachDeck"), code }),
+  // Campaign Setup: each player in turn chooses either to shuffle one copy of the card into their deck or to add `resources` resources to each of their heroes' pools ("either add 1 resource to
+  // each of his heroes' pools, or shuffle 1 copy of Brace of Coneys into his deck", 144069:A:2). A copy is recorded as chosen at Setup (ScenarioState.chosenAtSetup), so the Resolution's EarnDealt earns it.
+  z.strictObject({ verb: z.literal("ChooseCopyOrResources"), code, resources: z.number().int().positive() }),
+  // Resolution: the players answer a choice between named options, the first player for the group or each player in turn ("the players must choose: either ... or ...", 143071:B:1; "Each player must choose:
+  // either ... or ...", 144067:B:1). The answer is recorded under `name` (the `picked` condition and the verbs below read it). An option with `needsFallen` is offered only while the list of fallen heroes holds one.
+  z.strictObject({
+    verb: z.literal("ChooseOption"),
+    name: z.string().min(1),
+    options: z.array(z.strictObject({ id: z.string().min(1), needsFallen: z.literal(true).optional() })).min(2),
+    who: z.enum(["firstPlayer", "eachSeat"]),
+    ...when,
+  }),
+  // Resolution: each player who answered `name` with `option` takes a permanent starting threat penalty of `amount`, recorded in the log for that seat ("take a permanent +2 starting threat penalty", 144067:B:1).
+  z.strictObject({ verb: z.literal("ThreatPenaltyForPick"), name: z.string().min(1), option: z.string().min(1), amount: z.number().int().positive() }),
+  // Resolution: each player who answered `name` with `option` earns one copy of each of these cards, shuffled into their deck after the starting hand in the scenarios that follow ("or earn 1 copy of
+  // The Searching Eye", 144067:B:1).
+  z.strictObject({ verb: z.literal("EarnForPick"), name: z.string().min(1), option: z.string().min(1), codes: z.array(code).min(1) }),
+  // Resolution: each player with a copy of one of these cards in their hand, deck or discard pile earns that burden, shuffled into their deck after the starting hand later ("Each player with a copy of Poisoned
+  // Counsels in his hand, deck or discard pile has earned that burden", 143077:B:1).
+  z.strictObject({ verb: z.literal("EarnHeldCopies"), codes: z.array(code).min(1), ...when }),
+  // Resolution: one player earns the boon and takes control of a hero from the list of fallen heroes, removing it from the list, and attaches the boon to that hero ("one player earns the boon Beyond All Hope and
+  // chooses a hero from the list of fallen heroes. That player takes control of the chosen hero (removing it from the list of fallen heroes) and attaches Beyond All Hope to it", 143071:B:1). The first player
+  // answers for the group, choosing the hero and the player; changing heroes this way costs no +1 threat penalty. Nothing is asked when the list is empty.
+  z.strictObject({ verb: z.literal("ReviveFallenHero"), code, ...when }),
+  // Resolution: a player who controls more than `limit` non-Fellowship heroes removes heroes from the Campaign Log until they control only `limit` ("must remove heroes from the Campaign Log until he controls
+  // only 3 heroes", 143071:B:1). Fellowship heroes are not counted and are never removed. Each such player is asked in turn, the first player first.
+  z.strictObject({ verb: z.literal("TrimHeroes"), limit: z.number().int().positive(), ...when }),
+  // Resolution: the enemies facedown underneath the card with this code are recorded in the Campaign Log by card code and quantity ("Record the name and quantity of each enemy underneath The Black Gate in the notes
+  // section of the campaign log", 144069:B:1).
+  z.strictObject({ verb: z.literal("RecordUnderneath"), code, ...when }),
 ] as const;
 
 const TRIGGERS = [] as const;

@@ -6,6 +6,7 @@
 // 141044:B:1 does), or, once every choice is answered, what confirming will write. The options are the ChooseResolution
 // intents the reducer lists; the screen sends the one the player picks and nothing else. A choice the card lets a seat pass
 // ("each player may choose") lists the reducer's `skip` as `decline`, a visible "No boon", not as one more tile.
+import type { Instruction } from "../catalog/boundary.ts";
 import { andList, carryVerb, carryWords } from "./carry-words.ts";
 import { legalIntents, type ScenarioState } from "../rules/engine/reduce.ts";
 import { answeredSeats, asksPlayers, resolutionResult, SKIP } from "../rules/setup/resolution.ts";
@@ -15,12 +16,14 @@ import { ALLY_LINE_FACTS, BELDIS_BOXES, type AllyLine } from "../catalog/ally-li
 import { contextOf } from "./session.ts";
 import type { World } from "./world.ts";
 import { afterwardsWords } from "./resolution-then.ts";
+import { isTwoTowersChoice, pickWords, twoTowersChoosing, twoTowersNotes } from "./resolution-two-towers.ts";
 import { beldisUsed, cappedTally } from "./wilderland.ts";
 
 // `label`: the words on the tile ("Tireless Ranger on Sam Gamgee", "Turayn for Player 1"). `wide`: a tile with no card, laid in a row of its own under the card tiles (the log line). `tag` is a muted
 // word under the name that tells a kind apart (an encounter card of the pool), `copies` the copies of such a card the pool holds.
 // `held`: a burden among the Hazard cards that this Resolution has already earned for the pool, so choosing it adds nothing.
-export type ResolutionTile = { optionId: string; code: string | null; name: string; hero: string | null; label: string; wide?: true; tag?: string; copies?: number; held?: true };
+// `says`: the sentence above Confirm for this tile, where the choice words it itself (The Two Towers' options and heroes).
+export type ResolutionTile = { optionId: string; code: string | null; name: string; hero: string | null; label: string; wide?: true; tag?: string; copies?: number; held?: true; says?: string };
 
 // The decline of an optional choice: the reducer's `skip` option, with its words ("No boon").
 export type ResolutionDecline = { optionId: string; label: string };
@@ -53,7 +56,9 @@ export type ResolutionView =
       decline: ResolutionDecline | null;
       // `player`: the card is for a player, named by one of their heroes, and goes into their deck after the starting hand (11197:B:1).
       // `ally`: a boon ally for a player, or the log line instead (emce.boon-allies). `removal`: a card of the Campaign Pool a player may remove (12187:B:4). `location`: a location in the staging area a copy of which joins the pool (12184:B:4).
-      to: "pool" | "hand" | "hero" | "captive" | "player" | "ally" | "removal" | "treasure" | "location" | "hazard";
+      to: "pool" | "hand" | "hero" | "captive" | "player" | "ally" | "removal" | "treasure" | "location" | "hazard" | "option";
+      // The sentence shown before a tile is chosen, where the choice words it itself (`to: "option"`).
+      prompt?: string;
       // The first player chooses one of the cards named for the group and the others do not join the pool (12189:B:5).
       only?: true;
       // The choice is of Song boons (The Withered Heath, 12175:B:6): each player takes one, a Song only once.
@@ -80,6 +85,8 @@ export type ResolutionView =
       poolRemoved?: readonly string[];
       // The boxes this game marks beside Beldis (emce.campaign-log): one phrase a seat whose count rose.
       beldis?: readonly string[];
+      // What The Two Towers' Resolution records: the threat penalties, the hero who returned, the heroes removed, the enemies under The Black Gate.
+      notes?: readonly string[];
     };
 
 // The boxes beside Beldis this game marks (the Action of 12188 marks one for the player who used it), one sentence a seat whose count rose above the log's (`logged`), in the log screen's count: "Player 1 marks 1 box beside Beldis (3 of 4 marked)", solo "You mark 1 box ...".
@@ -139,6 +146,7 @@ export function resolutionView(state: ScenarioState, world: World, logged: reado
       ...(changes.added.length > 0 ? { poolAdded: changes.added } : {}),
       ...(gone.length > 0 ? { poolRemoved: gone } : {}),
       ...beldisBoxes(state, logged),
+      ...(twoTowersNotes(settled, state.seatCount, (code) => nameOf(world, code)).length > 0 ? { notes: twoTowersNotes(settled, state.seatCount, (code) => nameOf(world, code)) } : {}),
       earned: settled.earned.map((item) => ({ code: item.code, hero: item.to === "hero" ? item.hero : null, seat: item.seat })),
       fallen: [...settled.fallen],
       captives: settled.captives.map((item) => item.hero),
@@ -151,6 +159,7 @@ export function resolutionView(state: ScenarioState, world: World, logged: reado
   if (!state.stageCleared || window?.kind !== "resolution") return { kind: "playing" };
   const instruction = state.resolution[window.step];
   if (!asksPlayers(instruction)) return { kind: "playing" };
+  if (isTwoTowersChoice(instruction)) return twoTowersView(state, world, instruction, window);
   let decline: ResolutionDecline | null = null;
   let eyebrow = "Name a captive";
   let noun = "captive";
@@ -266,6 +275,29 @@ export function resolutionView(state: ScenarioState, world: World, logged: reado
   };
 }
 
+// The choosing view of one of The Two Towers' own choices (resolution-two-towers.ts words them).
+function twoTowersView(state: ScenarioState, world: World, instruction: Extract<Instruction, { verb: "ChooseOption" | "ReviveFallenHero" | "TrimHeroes" }>, window: { step: number; seat: number }): ResolutionView {
+  const optionIds = legalIntents(state, contextOf(world)).flatMap((intent) => (intent.type === "ChooseResolution" ? [intent.optionId] : []));
+  const words = twoTowersChoosing(state, instruction, window.seat, optionIds, (code) => nameOf(world, code));
+  const first = window.seat === state.firstPlayer ? " (first player)" : "";
+  return {
+    kind: "choosing",
+    step: window.step,
+    seat: window.seat,
+    seatCount: state.seatCount,
+    eyebrow: words.eyebrow,
+    seatLabel: (words.eachSeat || words.firstPlayerAnswers) && state.seatCount > 1 ? `Player ${window.seat + 1}${first}` : null,
+    noun: words.noun,
+    ally: null,
+    later: null,
+    answered: instruction.verb === "ChooseOption" && instruction.who === "eachSeat" ? answeredSeats(state).map((seat) => ({ seat, words: pickWords(state.resolutionLog, instruction, seat) })) : [],
+    tiles: words.tiles,
+    decline: null,
+    to: "option",
+    prompt: words.prompt,
+  };
+}
+
 const orList = (items: readonly string[]): string => (items.length < 3 ? items.join(" or ") : `${items.slice(0, -1).join(", ")} or ${items.at(-1)}`);
 
 /** The sentence above Confirm: what choosing this tile writes, and what the instructions after it do to the campaign pool. */
@@ -310,6 +342,8 @@ function choiceCore(view: Extract<ResolutionView, { kind: "choosing" }>, tile: R
       return tile.tag === "burden" ? `${tile.name} is added to the campaign pool as a burden.` : `${tile.name} is added to the campaign pool as an encounter card. It is written in the campaign log and added to the encounter deck of every later scenario.`;
     case "treasure":
       return `${tile.name} is discovered and recorded in the campaign log. The scenario is over, so it is not attached to a character.`;
+    case "option":
+      return tile.says ?? tile.label;
     case "removal":
       if (tile.copies == null) return `${tile.label} is removed from the campaign pool.`;
       return tile.copies > 1 ? `One copy of ${tile.name} leaves the campaign pool (${tile.copies - 1} ${tile.copies === 2 ? "stays" : "stay"}).` : `${tile.name} leaves the campaign pool: it was the last copy.`;
@@ -326,6 +360,7 @@ export function declineSentence(view: Extract<ResolutionView, { kind: "choosing"
 
 /** The sentence above Confirm before anything is chosen, built from the noun: "Choose a boon and a hero, or tap No boon." A boon ally's offer says who takes the ally. */
 export function promptSentence(view: Extract<ResolutionView, { kind: "choosing" }>): string {
+  if (view.prompt) return view.prompt;
   // A boon ally's offer: the first player answers for the group, and the ally goes to the player whose hero is tapped (emce.boon-allies).
   if (view.to === "ally") {
     const ally = view.ally ?? "the ally";
@@ -396,7 +431,9 @@ export function settledSentence(view: Extract<ResolutionView, { kind: "settled" 
   const joined = view.poolAdded && view.poolAdded.length > 0 ? `${lines} ${copies(view.poolAdded)} join${view.poolAdded.length === 1 ? "s" : ""} the campaign pool as encounter cards.` : lines;
   const gone = view.poolRemoved && view.poolRemoved.length > 0 ? `${joined} ${copies(view.poolRemoved)} leave${view.poolRemoved.length === 1 ? "s" : ""} the campaign pool.` : joined;
   // The boxes marked beside Beldis in this game are recorded with the win (emce.campaign-log).
-  const left = view.beldis && view.beldis.length > 0 ? `${gone} ${andList(view.beldis)}.` : gone;
+  const marked = view.beldis && view.beldis.length > 0 ? `${gone} ${andList(view.beldis)}.` : gone;
+  // What The Two Towers' Resolution records: each note is a sentence of its own.
+  const left = view.notes && view.notes.length > 0 ? `${marked} ${view.notes.join(" ")}` : marked;
   // The cards a Resolution keeps for the next campaign, not this one (01131:B:2): a sentence of its own.
   if (!view.carried || view.carried.length === 0) return left;
   const kept = view.carried.map((card) => ({ code: card.code, perPlayer: card.eachPlayer }));

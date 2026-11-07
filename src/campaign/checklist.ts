@@ -7,6 +7,7 @@ import { AFTER_HAND, type StartSeat } from "../rules/setup/setup.ts";
 
 import { poolCard, type CampaignLog, type PoolCard } from "./log.ts";
 import { sagaOf } from "./checklist-saga.ts";
+import { burdenLeftOut, chooseCopyOrResources, removePoolCards, shuffleIntoEachDeck, type BurdenRemoval } from "./checklist-two-towers.ts";
 import { logConditionHolds, poolEncounterCopies, removeFromDeck, searchableCaves, searchableDeck } from "./wilderland.ts";
 import { xpRowOf } from "./xp.ts";
 
@@ -16,7 +17,7 @@ import { xpRowOf } from "./xp.ts";
 
 export type ChecklistStep = { n: number; rule: "rr.campaign-setup-checklist"; text: string; did: string[] };
 // The seat while the checklist fills it in; StartSeat is the read-only shape it hands to the start.
-type Working = { heroes: string[]; deck: string[]; attachments: { host: string; code: string }[]; hand: string[]; afterMulligan: string[]; chosen?: string[]; threatPenalty?: number };
+type Working = { heroes: string[]; deck: string[]; attachments: { host: string; code: string }[]; hand: string[]; afterMulligan: string[]; chosen?: string[]; threatPenalty?: number; resources?: number };
 
 // `note` says what the choice is when the options alone do not (a search of the encounter deck for cards to remove from the game).
 export type Need = { seat: number; options: readonly string[]; note?: string };
@@ -52,7 +53,7 @@ const TEXT: Readonly<Record<number, string>> = {
 type Dealing = { did: string[]; errors: string[]; needs: Need | null };
 // What a verb works on: the seats, the pool, the answers still unused and the names.
 // `deck` is the encounter deck a Setup search looks through as it stands (the campaign card's own shuffles so far, and the pool's encounter cards), `removed` the codes searched out of it; `caves` and `removedCaves` are the Caves deck's.
-type Table = { input: ChecklistInput; seats: Working[]; pool: PoolCard[]; fresh: Set<PoolCard>; answers: string[]; name: (code: string) => string; out: Dealing; deck: string[]; removed: string[]; caves: string[]; removedCaves: string[] };
+type Table = { input: ChecklistInput; seats: Working[]; pool: PoolCard[]; fresh: Set<PoolCard>; answers: string[]; name: (code: string) => string; out: Dealing; deck: string[]; removed: string[]; caves: string[]; removedCaves: string[]; burdens: BurdenRemoval[] };
 
 // The seat a pool card is dealt to: the seat it was recorded for, or the last seat when the game has fewer.
 function poolSeat(card: PoolCard, seatCount: number): number {
@@ -198,8 +199,8 @@ function chooseCards(table: Table, instruction: Extract<Instruction, { verb: "Ch
 }
 
 // Step 6: the campaign card's Setup instructions that deal a card to a player, in the order the card lists them.
-function campaignSetupSteps(campaignSetup: readonly Instruction[], input: ChecklistInput, seats: Working[], pool: PoolCard[], fresh: Set<PoolCard>, name: (code: string) => string): Dealing & { removed: string[]; removedCaves: string[] } {
-  const table: Table = { input, seats, pool, fresh, answers: [...(input.choices ?? [])], name, out: { did: [], errors: [], needs: null }, deck: searchableDeck(input.scenario, input.difficulty, input.seats.length, [...encounterDeal(pool, input.effects, () => false).map((card) => card.code), ...poolEncounterCopies(input.log.encounterPool)]), removed: [], caves: searchableCaves(input.scenario, input.difficulty), removedCaves: [] };
+function campaignSetupSteps(campaignSetup: readonly Instruction[], input: ChecklistInput, seats: Working[], pool: PoolCard[], fresh: Set<PoolCard>, name: (code: string) => string): Dealing & { removed: string[]; removedCaves: string[]; leftOut: (card: PoolCard) => boolean } {
+  const table: Table = { input, seats, pool, fresh, answers: [...(input.choices ?? [])], name, out: { did: [], errors: [], needs: null }, deck: searchableDeck(input.scenario, input.difficulty, input.seats.length, [...encounterDeal(pool, input.effects, () => false).map((card) => card.code), ...poolEncounterCopies(input.log.encounterPool)]), removed: [], caves: searchableCaves(input.scenario, input.difficulty), removedCaves: [], burdens: [] };
   for (const instruction of campaignSetup) {
     // A line that shuffles a card into the encounter deck puts it where the searches after it look (the Setup lines run in print order).
     if (instruction.verb === "ShuffleIntoEncounterDeck" && logConditionHolds(instruction.when, input.log)) table.deck.push(instruction.code);
@@ -211,8 +212,14 @@ function campaignSetupSteps(campaignSetup: readonly Instruction[], input: Checkl
     else if (instruction.verb === "RemoveFromCavesIfLogged") searchCaves(table, instruction);
     else if (instruction.verb === "SearchBoonAllyToHand") searchBoonAlly(table);
     else if (instruction.verb === "SearchBoonOrTreasureToHand") searchBoonOrTreasure(table);
+    else if (instruction.verb === "RemovePoolCards") table.out.did.push(...removePoolCards(table.pool, table.seats, instruction).map((code) => `${table.name(code)} is removed from the Campaign Pool.`));
+    else if (instruction.verb === "RemoveBurdenSets") table.burdens.push({ sets: instruction.sets, playerDecks: instruction.playerDecks === true });
+    else if (instruction.verb === "ShuffleIntoEachDeck") {
+      shuffleIntoEachDeck(table.seats, instruction);
+      table.out.did.push(`Each player shuffles a copy of ${table.name(instruction.code)} into their deck.`);
+    } else if (instruction.verb === "ChooseCopyOrResources") table.out.did.push(...chooseCopyOrResources(table.seats, instruction, (legal, seat) => takeAnswer(table, legal, seat), table.name));
   }
-  return { ...table.out, removed: table.removed, removedCaves: table.removedCaves };
+  return { ...table.out, removed: table.removed, removedCaves: table.removedCaves, leftOut: (card) => burdenLeftOut(table.burdens, card) };
 }
 
 // The pool card's own campaignSetup record puts it into play ("Put Mendor into play at the start of each scenario").
@@ -348,10 +355,15 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
   const did8: string[] = [];
   const poolEncounterCards: string[] = [];
   const poolIntoPlay: string[] = [];
-  const toDeck = new Set(encounterDeal(pool, input.effects, (card) => fresh.has(card) || dealt(card)));
+  const toDeck = new Set(encounterDeal(pool, input.effects, (card) => fresh.has(card) || dealt(card) || six.leftOut(card)));
   for (const card of pool) {
     if (card.attachedTo != null || fresh.has(card)) continue;
     if (dealt(card)) continue;
+    // A burden of a set the campaign card's Setup removes stays in the pool and is not dealt (RemoveBurdenSets).
+    if (six.leftOut(card)) {
+      (card.back === "player" || card.afterHand ? did7 : did8).push(`${name(card.code)} stays in the pool: its burden set is removed from the decks this scenario.`);
+      continue;
+    }
     if (toDeck.has(card)) {
       poolEncounterCards.push(card.code);
       did8.push(`${name(card.code)} is shuffled into the encounter deck.`);

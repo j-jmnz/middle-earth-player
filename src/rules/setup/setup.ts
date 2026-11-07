@@ -37,6 +37,8 @@ export type StartSeat = {
   hand?: readonly string[];
   // The permanent starting threat penalty this seat takes of its own, on top of the table's `threatModifier` (The Passage of the Marshes, docs/brief.md, The Two Towers).
   threatPenalty?: number;
+  // Resources each of this seat's heroes starts with beyond the usual (The Two Towers: "add 1 resource to each of his heroes' pools", 144069:A:2).
+  resources?: number;
   // Cards a campaign card's Setup adds to the hand once the mulligan is over (AddToHandAfterMulligan): not drawn, not shuffled
   // back by a mulligan, not counted in the opening hand.
   // A code with the prefix AFTER_HAND is shuffled into the seat's deck instead ("shuffles that Recurring Nightmare into their deck after they draw their starting hand", 11197:B:1).
@@ -122,7 +124,8 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
       const placed = spawn(state, code, { zone: "heroes", seat: index });
       // Easy mode: "During step 2 of Setup, 'Place Heroes and Set Initial Threat Levels', add one resource to each hero's
       // resource pool" (easy-mode.easy-mode; ltp.easy-mode step 1, which says only "during setup").
-      state = input.difficulty === "Easy" ? updateCard(placed.state, placed.id, { resources: 1 }) : placed.state;
+      const starting = (input.difficulty === "Easy" ? 1 : 0) + (seat.resources ?? 0);
+      state = starting > 0 ? updateCard(placed.state, placed.id, { resources: starting }) : placed.state;
       threat += printedOf(ctx.cards, code).threat ?? 0;
     }
     for (const attached of seat.attachments ?? []) {

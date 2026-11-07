@@ -7,6 +7,7 @@ import type { ScenarioState } from "../rules/core/state.ts";
 import type { AllyLine } from "../catalog/ally-lines.ts";
 
 import { scoreOf, type ScenarioScore } from "./score.ts";
+import { marshesAfter, penaltiesAfter, revisedFallen, revisedHeroes } from "./log-two-towers.ts";
 import { cappedTally } from "./wilderland.ts";
 import { xpAwarded, type ModeCard } from "./xp.ts";
 
@@ -120,7 +121,8 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
   if (!result || state.scenarioId !== scenarioId || log.completed.includes(scenarioId)) return log;
   const bearer = ringBearerOf(state, cards);
   const owned = heroesByOwner(state);
-  const heroesBySeat = owned.map((codes, index) => (log.heroesBySeat[index]?.length ? log.heroesBySeat[index] ?? [] : codes));
+  // A fallen hero a boon brought back and the heroes a player removed (The Two Towers' Resolution) change the lists as the log keeps them.
+  const heroesBySeat = revisedHeroes(owned.map((codes, index) => (log.heroesBySeat[index]?.length ? log.heroesBySeat[index] ?? [] : codes)), result);
   // A hero in a discard pile at the end of the game is a fallen hero (ltp.fellowship-of-heroes), and so is one a
   // Resolution names.
   const fellBy = new Set<string>(result.fallen);
@@ -130,7 +132,7 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
       if (code && printedOf(cards, code).type === "hero") fellBy.add(code);
     }
   }
-  const fallenHeroesBySeat = heroesBySeat.map((heroes, index) => [...new Set([...(log.fallenHeroesBySeat[index] ?? []), ...heroes.filter((code) => fellBy.has(code))])]);
+  const fallenHeroesBySeat = revisedFallen(heroesBySeat.map((heroes, index) => [...new Set([...(log.fallenHeroesBySeat[index] ?? []), ...heroes.filter((code) => fellBy.has(code))])]), result);
   const fallen = new Set(fallenHeroesBySeat.flat());
   // A card the game removed from the campaign pool ("add it to the victory display and remove it from the campaign pool") is gone:
   // one pool entry for each removal, the player's own copy when the game says whose it was.
@@ -177,9 +179,9 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
     // The game started from the log's boxes and returns the whole record, as it does the uses.
     beldisUses: state.campaignFacts?.beldisUses ?? log.beldisUses,
     encounterPool: result.encounterPool ? cappedTally(result.encounterPool, copies) : log.encounterPool,
-    threatPenaltyBySeat: log.threatPenaltyBySeat,
-    marshesChoice: log.marshesChoice,
-    blackGate: log.blackGate,
+    threatPenaltyBySeat: penaltiesAfter(log.threatPenaltyBySeat, result, state.seatCount),
+    marshesChoice: marshesAfter(log.marshesChoice, result, state.seatCount),
+    blackGate: result.underneath ?? log.blackGate,
     scoreBase: log.scoreBase,
   };
 }

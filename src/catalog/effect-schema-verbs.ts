@@ -410,7 +410,8 @@ export const simpleVerbs = [
   // Resolution: these cards are earned, with no choice. `eachPlayer`: one copy for each living player ("Each player earns 1 copy of
   // the Mendor's Support boon", 01129:B:1), the pool holding several copies of the one code.
   // `afterHand`: the copy goes into its player's deck, shuffled in once the starting hand is drawn ("adds a copy of Misplaced Trust to the campaign pool (and their deck)", 12184:B:3; the card's own Setup, 12186:A:1), as a card a player chooses for the pool does (Recurring Nightmare, 11197:B:1).
-  z.strictObject({ verb: z.literal("Earn"), codes: z.array(z.string().min(1)).min(1), eachPlayer: z.boolean().optional(), afterHand: z.literal(true).optional(), ...when }),
+  // `forFirstPlayer`: the card is the first player's ("the first player has earned the Palantír of Orthanc boon card", 143081:B:1), a pool entry for that seat.
+  z.strictObject({ verb: z.literal("Earn"), codes: z.array(z.string().min(1)).min(1), eachPlayer: z.boolean().optional(), afterHand: z.literal(true).optional(), forFirstPlayer: z.literal(true).optional(), ...when }),
   // Resolution: every burden in play, in the encounter deck and in the encounter discard pile is earned.
   verb("EarnAllBurdens"),
   // Resolution: the hero this card is attached to joins the fallen heroes.
