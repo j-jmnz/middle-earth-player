@@ -12,7 +12,7 @@ import { lastPicked } from "../../interpret/player-verbs.ts";
 import { restricted } from "../../interpret/restrictions.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { inPlay, updateCard } from "../../core/state.ts";
+import { inPlay, inPlayByCode, updateCard } from "../../core/state.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import { advanceStage } from "../../quest/quest.ts";
 import { afterProgress } from "../../quest/stage-reveal.ts";
@@ -31,13 +31,9 @@ export function advanceToRandomStage(state: ScenarioState, focus: Focus, ctx: Re
   return afterProgress(advanceStage(state, ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length), before, ctx, steps);
 }
 
-function inPlayWithCode(state: ScenarioState, code: string): string | undefined {
-  return Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone))?.id;
-}
-
 /** FlipToEnemySide: the card in play with the code becomes `into`, faceup and ready in the staging area, controlled by no one, with its damage removed; it keeps its resources and the cards attached to it. The old side is kept as the card's other side. */
 export function flipToEnemySide(state: ScenarioState, instruction: Verb<"FlipToEnemySide">): ScenarioState {
-  const id = inPlayWithCode(state, instruction.code);
+  const id = inPlayByCode(state, instruction.code)?.id;
   const card = id ? state.cards[id] : undefined;
   if (!id || !card) return state;
   return updateCard(moveCard(state, id, { zone: "staging" }), id, { code: instruction.into, other: card.code, face: "up", controller: null, damage: 0, exhausted: false });
@@ -64,7 +60,7 @@ export function putTrust(state: ScenarioState, instruction: Verb<"PutTrust">, fo
 
 /** GuardReturnedBy: the card in play with the code goes back to the staging area, controlled by no one, guarded by the last picked card, which must be in the staging area (19044:A:1). */
 export function guardReturnedBy(state: ScenarioState, instruction: Verb<"GuardReturnedBy">): ScenarioState {
-  const id = inPlayWithCode(state, instruction.code);
+  const id = inPlayByCode(state, instruction.code)?.id;
   const guard = lastPicked(state);
   if (!id || !guard || state.cards[guard]?.zone !== "staging" || guard === id) return state;
   return guardWith(updateCard(moveCard(state, id, { zone: "staging" }), id, { controller: null, face: "up" }), guard, id);

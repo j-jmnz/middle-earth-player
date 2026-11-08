@@ -10,7 +10,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { destroyCard, destroyOverwhelmed, placeDamage } from "../../core/keywords.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { inPlay, updateCard } from "../../core/state.ts";
+import { inPlayByCode, updateCard } from "../../core/state.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { threatCostOf } from "../costs/stats.ts";
@@ -31,14 +31,10 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-function inPlayWith(state: ScenarioState, code: string): string | undefined {
-  return Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone))?.id;
-}
-
 // Damage tokens come on (positive) or off (negative, no further than 0) the card in play with this code: tokens, not dealt damage, so nothing
 // answers them and no keyword changes them (142040:A:1, 142043:A:1). The step records the change.
 function changeDamage(state: ScenarioState, code: string, change: number, steps: EngineStep[]): ScenarioState {
-  const id = inPlayWith(state, code);
+  const id = inPlayByCode(state, code)?.id;
   const card = id ? state.cards[id] : undefined;
   if (!id || !card) return state;
   const amount = change > 0 ? change : -Math.min(card.damage, -change);
@@ -52,7 +48,7 @@ function changeDamage(state: ScenarioState, code: string, change: number, steps:
 function sacrificeForDamage(state: ScenarioState, code: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const heroId = lastPicked(state);
   const hero = state.cards[heroId];
-  const targetId = inPlayWith(state, code);
+  const targetId = inPlayByCode(state, code)?.id;
   if (!hero || hero.zone !== "heroes" || !targetId) return state;
   const cause = currentCause(steps, UNATTRIBUTED);
   const amount = threatCostOf(state, heroId, ctx);

@@ -8,7 +8,7 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { CardInstance, ScenarioState } from "../../core/state.ts";
-import { inPlay, updateCard } from "../../core/state.ts";
+import { inPlay, updateCard, withSeat } from "../../core/state.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { ringBearerId } from "../burden/deck.ts";
@@ -80,4 +80,12 @@ export function releaseHero(state: ScenarioState, heroId: string, seat: number, 
     next = attachTo(updateCard(placed, id, { face: "up", ...attachmentPatch }), id, heroId);
   }
   return next;
+}
+
+// The hero returns to the place it held among its seat's heroes (releasing appends it).
+export function backInPlace(state: ScenarioState, seat: number, heroId: string, slot: number): ScenarioState {
+  const current = state.seats[seat];
+  if (!current) return state;
+  const others = current.heroes.filter((id) => id !== heroId);
+  return withSeat(state, seat, { ...current, heroes: [...others.slice(0, slot), heroId, ...others.slice(slot)] });
 }

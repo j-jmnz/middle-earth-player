@@ -78,6 +78,10 @@ describe("The Uruk-hai in the the-two-towers campaign", () => {
     const game = playGolden(won, ctx);
     const log = applyResolution(emptyLog(2), game.state.scenarioId, game.state, cards, NO_COPY_LIMITS);
     expect(log.completed).toEqual(["the-uruk-hai"]);
+    // The win rescued each Captive (143070:A:1): none is held, and the log lists every hero of the table under its owner.
+    const heroCodes = Object.values(game.state.cards).filter((card) => card.zone === "heroes").map((card) => card.code).sort();
+    expect(Object.values(game.state.cards).some((card) => card.zone === "captive")).toBe(false);
+    expect(log.heroesBySeat.flat().sort()).toEqual(heroCodes);
     expect(log.xpGained).toEqual({});
     expect(campaignPath(campaign, {}, log).map((node) => node.status).slice(0, 2)).toEqual(["completed", "soon"]);
     expect(PLAYABLE_SCENARIOS).not.toContain("helms-deep");

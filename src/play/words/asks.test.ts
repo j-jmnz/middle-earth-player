@@ -268,7 +268,9 @@ describe.each(Object.keys(ASKS_BY_SCENARIO))("the asks of %s", (id) => {
           // A Pick's {n} is what the instruction after it deals, read now; a Choose and its branches have none.
           const asksCard = instruction.verb !== "Choose";
           const now = asksCard ? dealtNow(game, ctx, next, askedSeat(game), effect.cardCode) : undefined;
-          const asked = { game, ctx, names, instruction, source: effect.cardCode, effectId: effect.id, options: [], ...(now !== undefined ? { amountNow: now } : {}) };
+          // An AssignDamage asks one damage at a time, with the engine's `left` and `of` on its copy of the instruction: here its first step of 3.
+          const asking = instruction.verb === "AssignDamage" ? { ...instruction, left: 3, of: 3 } : instruction;
+          const asked = { game, ctx, names, instruction: asking, source: effect.cardCode, effectId: effect.id, options: [], ...(now !== undefined ? { amountNow: now } : {}) };
           const unknown = unknownPlaceholders(entry, asksCard);
           if (unknown.length > 0) problems.push(`${key}: no value for ${unknown.map((name) => `{${name}}`).join(", ")}`);
           // Every template, each variant and each caution, whether its condition holds on this table or not.

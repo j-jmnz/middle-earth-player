@@ -6,10 +6,12 @@ import { definePrinted } from "../../../rules/core/printed.ts";
 import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import { attachTo, spawn } from "../../../rules/core/zones.ts";
+import type { Effect } from "../../../catalog/boundary.ts";
 import { settle } from "../../../rules/engine/machine.ts";
+import { startReveal } from "../../../rules/windows/frames.ts";
 import { placeProgress } from "../../../rules/interpret/effect-verbs.ts";
 import { questRoom } from "../../../rules/families/caves/progress.ts";
-import { engageWith, stagingThreat } from "../../../rules/quest/quest.ts";
+import { engageWith, placeQuestProgress, stagingThreat } from "../../../rules/quest/quest.ts";
 import { CODES, haiFight, haiTable, idOf, legalIntents, loadHaiWorld, resolveRecords, send, start, type HaiWorld, type PlayerIntent } from "../../../../test/scenarios/the-uruk-hai/scene.ts";
 
 let world: HaiWorld;
@@ -124,9 +126,26 @@ describe("143030 Rest by Night?", () => {
     expect(damaged.state.cards[t.hero2]?.damage).toBe(0);
   });
 
-  it("143030:A:1 the effect cannot be canceled", () => {
-    const record = world.definition && haiTable(world).ctx.effects.find((effect) => effect.id === "143030:whenRevealed:1");
-    expect(record?.uncancelable).toBeDefined();
+  it("143030:A:1 the effect cannot be canceled: a Response that cancels a When Revealed is offered against Strange Weariness and refused against Rest by Night?", () => {
+    // A Response card in play that cancels the When Revealed effects of the card just revealed (as A Test of Will does).
+    const cancels: Effect = { id: "blade:response:9", cardCode: "blade", lines: ["blade:A:1"], timing: "response", trigger: "whenRevealedPending", instructions: [{ verb: "CancelEffect" }] };
+    const revealed = (code: string) => {
+      const t = haiTable(world, { deck: [code, "f0"] });
+      const ctx = { ...t.ctx, effects: [...t.ctx.effects, cancels], cards: new Map([...t.ctx.cards, ["blade", definePrinted({ code: "blade", name: "Blade", type: "attachment" })]]) };
+      const blade = spawn(t.state, "blade", { zone: "play", seat: 0 });
+      const steps: Parameters<typeof startReveal>[3] = [];
+      const started = startReveal({ ...attachTo(blade.state, blade.id, t.hero), window: null, mode: "stopped" }, 0, ctx, steps);
+      return settle({ ...started, window: null }, ctx, steps);
+    };
+    const offered = (state: ScenarioState): string[] => {
+      const top = state.stack[state.stack.length - 1];
+      return top?.data.kind === "responses" ? top.data.offers.map((offer) => offer.effectId) : [];
+    };
+    expect(offered(revealed(CODES.strangeWeariness))).toEqual(["blade:response:9"]);
+    const rest = revealed(CODES.restByNight);
+    expect(offered(rest)).toEqual([]);
+    // Its choice opens instead: the cancel was never offered.
+    expect(rest.window?.kind).toBe("choose");
   });
 });
 
@@ -158,6 +177,20 @@ describe("143031 Strange Weariness and 143032 Unseen Barrier", () => {
     const run = resolveRecords(t.state, t.ctx, CODES.unseenBarrier, "whenRevealed");
     expect(questRoom(run.state)).toBe(3);
     expect(run.state.modifiers.some((modifier) => modifier.stat === "questProgressCap" && modifier.until === "endOfRound" && modifier.amount === 3)).toBe(true);
+  });
+
+  it("143032:A:1 progress placed on the quest earlier in the round counts toward its 3 (\"until the end of the round, no more than 3 progress\")", () => {
+    const t = haiTable(world, { pursuit: 10, stage: CODES.stage1 });
+    const stage = idOf(t.state, CODES.stage1);
+    const placed = placeQuestProgress(t.state, 2, world.cards, [], () => false);
+    expect(placed.cards[stage]?.progress).toBe(2);
+    // Unseen Barrier is revealed afterwards: only 1 more progress fits this round.
+    const run = resolveRecords(placed, t.ctx, CODES.unseenBarrier, "whenRevealed");
+    expect(questRoom(run.state)).toBe(1);
+    const more = placeQuestProgress(run.state, 5, world.cards, [], () => false);
+    expect(more.cards[stage]?.progress).toBe(3);
+    // The next round starts clean.
+    expect(questRoom({ ...more, modifiers: more.modifiers.filter((modifier) => modifier.until !== "endOfRound") })).toBe(Number.MAX_SAFE_INTEGER);
   });
 });
 
@@ -212,6 +245,16 @@ describe("143065 Fighting Uruk-hai, 143066 Snaga and 143067 Saruman's Orders", (
     const done = reveal(other, CODES.fightingUrukHai);
     const stray = spawn(done.state, "f3", { zone: "staging" });
     expect(stagingThreat(engageWith(stray.state, 1, stray.id, []), world.cards)).toBe(3);
+  });
+
+  it("143065:A:2 also searches the discard pile, and the enemy it finds is revealed: its When Revealed runs (Uglúk's Uruk-hai)", () => {
+    const t = haiTable(world, { pursuit: 10, deck: ["f0", "f3"], discard: [CODES.uglukSUrukHai] });
+    const run = reveal(t, CODES.fightingUrukHai, taking("pursuit"));
+    const found = idOf(run.state, CODES.uglukSUrukHai);
+    expect(run.state.cards[found]).toMatchObject({ zone: "engaged", controller: 0 });
+    expect(run.state.encounterDiscard).not.toContain(found);
+    // Its own When Revealed ran: the pursuit value rose by 3.
+    expect(run.state.pursuit).toBe(13);
   });
 
   it("143066:A:2 When Revealed: a random card of your hand is discarded and Snaga gets +X Threat until the end of the round, X being its printed cost", () => {

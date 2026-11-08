@@ -73,7 +73,7 @@ Read the sections your task touches.
   - 354–359 Catalog build (~410)
   - 360–377 Tests (~1.7K) ← 5
   - 378–393 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~85.4K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~85.5K tok)
   - 17–38 Sections (~410)
   - 39–50 Product (~590)
   - 51–64 Non-goals (~540)
@@ -107,7 +107,7 @@ Read the sections your task touches.
     - 616–633 The Caves of Nibin-Dûm (~2.4K)
   - 634–691 Dream-chaser (~15.6K) ← 4
   - 692–718 Ered Mithrin (~15.8K) ← 7
-  - 719–745 The Two Towers (~3.4K) ← 13
+  - 719–745 The Two Towers (~3.5K) ← 13
   - 746–754 Nightmare (~410) ← 19
   - 755–793 Deckbuilding (~1.9K)
   - 794–872 Effects (~3.2K)
@@ -120,9 +120,9 @@ Read the sections your task touches.
   - 913–938 Persistence and shipping (~1.8K)
   - 939–980 Screens (~4.7K) ← 1
     - 965–980 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~40.3K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~40.4K tok)
   - 5–8 Overview (~130) ← 1
-  - 9–24 Top bar (~2.3K) ← 4
+  - 9–24 Top bar (~2.5K) ← 4
   - 25–28 Table menu (~430) ← 2
   - 29–36 Quest scale (~580) ← 2
   - 37–40 Canvas (~560)

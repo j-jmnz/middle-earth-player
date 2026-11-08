@@ -57,6 +57,7 @@ export function ThreatRing({
   ticks = [],
   ring = null,
   ringMark = "oneRing",
+  limit = null,
   onPress,
 }: {
   threat: SeatThreat;
@@ -83,12 +84,14 @@ export function ThreatRing({
   ring?: string | null;
   // The mark beside the label when `ring` is set: the One Ring (the Ring-bearer facedown), a hero (the prisoner).
   ringMark?: "oneRing" | "hero";
+  // A dial that is no seat's threat but ends the game when it reaches `at` (The Uruk-hai's pursuit value, 143022:A:2): its meter fills toward `at`, it warms near it as the threat dial does, and `words` say the loss to a screen reader.
+  limit?: { at: number; words: string } | null;
   // A tap opens the threat panel (each enemy's cost against the threat), or peeks at the seat (a dial that is not shown).
   onPress?: () => void;
 }) {
   const s = useUiScale();
   const id = testID ?? `threat-${threat.seat}`;
-  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} spokenWord={spokenWord} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} onPress={onPress} />;
+  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} spokenWord={spokenWord} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} limit={limit} onPress={onPress} />;
   return (
     <View testID={id} accessible accessibilityLabel={`${label} ${threat.threat}`} className="items-center">
       <View className="h-12 w-12 items-center justify-center rounded-control">
@@ -117,6 +120,7 @@ function ThreatDial({
   ticks,
   ring,
   ringMark,
+  limit,
   onPress,
 }: {
   threat: SeatThreat;
@@ -131,6 +135,7 @@ function ThreatDial({
   ticks: readonly number[];
   ring: string | null;
   ringMark: "oneRing" | "hero";
+  limit: { at: number; words: string } | null;
   onPress?: () => void;
 }) {
   const speed = useMotionScale();
@@ -138,8 +143,11 @@ function ThreatDial({
   const s = useUiScale();
   const focus = useFocusRing();
   const badge = useMemo(() => ({ in: layoutAnim(FadeIn, MOTION.threatBadgeIn, speed), out: layoutAnim(FadeOut, MOTION.threatBadgeOut, speed) }), [speed]);
-  const level = elimination ? threatLevel(threat.threat) : "calm";
-  const look = threat.eliminated ? { edge: t.hairline, fill: t.night, meter: t.hairline } : elimination ? dialOf(t)[level] : { edge: t.accent, fill: t.night, meter: t.accent };
+  // A dial with a limit (the pursuit value) warms and fills toward it as the threat dial does toward 50; Life and Burden have neither.
+  const metered = elimination || limit != null;
+  const top = limit?.at;
+  const level = metered ? threatLevel(threat.threat, top) : "calm";
+  const look = threat.eliminated ? { edge: t.hairline, fill: t.night, meter: t.hairline } : metered ? dialOf(t)[level] : { edge: t.accent, fill: t.night, meter: t.accent };
   // The change since the number last moved, shown beside the dial for DELTA_MS. A new change replaces it.
   const seen = useRef(threat.threat);
   const [change, setChange] = useState<{ before: number; after: number; at: number } | null>(null);
@@ -174,7 +182,7 @@ function ThreatDial({
   const engaging = ticks.filter((cost) => cost <= threat.threat).length;
   const tickWords = ticks.length === 0 ? "" : ticks.length === 1 ? `, the enemy in staging ${engaging === 1 ? "engages" : "does not engage"} at this threat` : `, ${engaging} of the ${ticks.length} enemies in staging engage at this threat`;
   // The dial is one control with one name (the change badge's words included), so Android gives it one focus stop.
-  const dialWords = `${spokenWord ? dialSpeech(spokenWord, threat.threat, label, role) : `${name} ${threat.threat}`}${threat.eliminated ? ", eliminated" : critical ? ", near elimination" : ""}${tickWords}${ring ? `. ${ring}` : ""}${deltaWords ? `. ${deltaWords}` : ""}`;
+  const dialWords = `${spokenWord ? dialSpeech(spokenWord, threat.threat, label, role) : `${name} ${threat.threat}`}${limit ? `, ${limit.words}` : ""}${threat.eliminated ? ", eliminated" : critical ? (limit ? ", near the limit" : ", near elimination") : ""}${tickWords}${ring ? `. ${ring}` : ""}${deltaWords ? `. ${deltaWords}` : ""}`;
   return (
     <Pressable
       {...focus.props}
@@ -189,7 +197,7 @@ function ThreatDial({
       <Animated.View style={pop}>
         <View testID={id} style={{ width: DIAL * s, height: DIAL * s, borderRadius: (DIAL / 2) * s, boxShadow: threat.eliminated ? undefined : `0 0 22px ${withAlphaHex(t.threat, critical ? 0.6 : 0.4)}` }}>
           {/* The threat's share of 50, the elimination level, as an arc round the dial (rr.threat-elimination-level). */}
-          <ArcRing size={DIAL * s} stroke={4 * s} parts={elimination && !threat.eliminated ? [{ key: "threat", share: threatMeter(threat.threat), color: look.meter }] : []} track={withAlphaHex(t.threat, 0.16)}>
+          <ArcRing size={DIAL * s} stroke={4 * s} parts={metered && !threat.eliminated ? [{ key: "threat", share: threatMeter(threat.threat, top), color: look.meter }] : []} track={withAlphaHex(t.threat, 0.16)}>
             <View
               className="items-center justify-center"
               style={{

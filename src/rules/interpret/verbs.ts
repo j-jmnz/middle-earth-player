@@ -283,7 +283,6 @@ function damageAllies(
   return next;
 }
 
-// The seat discards cards from its hand chosen by the seed, one roll each.
 // DiscardRandomFromHand: the actor (or the first player, or each player) discards cards at random from their hand.
 function discardRandomFromHand(state: ScenarioState, instruction: Extract<Instruction, { verb: "DiscardRandomFromHand" }>, focus: VerbFocus, ctx: ReduceContext): ScenarioState {
   // `eachSeat` ("each player discards 1 card at random from his hand", 19040:A:1): every living player, the first player first.
@@ -296,12 +295,16 @@ function discardRandomFromHand(state: ScenarioState, instruction: Extract<Instru
   return discardRandom(state, instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat, instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx), focus.sourceId, ctx);
 }
 
-// The total printed cost of the cards that left a hand between two states (a card with no printed cost counts 0).
+// The total printed cost of the cards that left a hand between two states. A card that prints no cost (a card with an X cost, a treachery) counts 0 (143066:A:2, "the discarded card's printed cost").
 function handCost(before: ScenarioState, after: ScenarioState, ctx: ReduceContext): number {
-  const held = new Set(after.seats.flatMap((seat) => seat.hand));
-  return before.seats.flatMap((seat) => seat.hand).filter((id) => !held.has(id)).reduce((sum, id) => sum + (Number(printedOf(ctx.cards, before.cards[id]?.code ?? "").cost) || 0), 0);
+  const stillHeld = new Set(after.seats.flatMap((seat) => seat.hand));
+  const discarded = before.seats.flatMap((seat) => seat.hand).filter((id) => !stillHeld.has(id));
+  let total = 0;
+  for (const id of discarded) total += printedOf(ctx.cards, before.cards[id]?.code ?? "").cost ?? 0;
+  return total;
 }
 
+// The seat discards cards from its hand chosen by the seed, one roll each.
 function discardRandom(state: ScenarioState, seat: number, amount: number, sourceId: string | null, ctx: ReduceContext): ScenarioState {
   let next = state;
   for (let count = 0; count < amount; count += 1) {

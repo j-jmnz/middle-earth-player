@@ -23,6 +23,8 @@ const STAGING_ENEMIES = { type: "enemy", control: "any", stagingOnly: true } as 
 const NON_UNIQUE_ENEMY = { type: "enemy", control: "any", nonUnique: true } as const;
 const QUESTING = { type: "character", control: "any", committed: true } as const;
 const THE_ATTACKING_ENEMY_HAS_A_SHADOW = { type: "enemy", control: "any", attackingEnemy: true, hasShadow: true } as const;
+const LOGGED_CAPTIVE = { type: "hero", control: "you", loggedCaptive: true } as const;
+const NO_LOGGED_CAPTIVE: Condition = { kind: "not", condition: { kind: "canPick", pick: LOGGED_CAPTIVE } };
 const PURSUIT = (amount: number) => ({ verb: "RaisePursuit", amount }) as const;
 // "If this attack destroys a character" (the attack's X is the characters it destroyed).
 const X_AT_LEAST_ONE: Condition = { kind: "x", min: 1 };
@@ -105,7 +107,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "forced",
       trigger: "endOfPhase",
       condition: { kind: "phase", is: "Refresh" },
-      instructions: [PURSUIT(1), { verb: "LoseGame", reason: "The Uruk-hai reached Isengard", when: { kind: "pursuit", min: 30 } }],
+      instructions: [PURSUIT(1), { verb: "LoseGame", reason: "The pursuit value reached 30", when: { kind: "pursuit", min: 30 } }],
     },
 
     // 143023 Uglúk (Toughness 3 and Cannot have attachments are keywords). Allies cannot be declared as attackers or defenders against him.
@@ -136,7 +138,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "forced",
       trigger: "endOfPhase",
       condition: { kind: "phase", is: "Quest" },
-      instructions: [{ verb: "Pick", pick: { type: "hero", control: "any", captives: "held" } }, { verb: "DamageCard", amount: 1, target: "picked" }],
+      instructions: [{ verb: "Each", pick: { type: "hero", control: "any", captives: "held" }, instructions: [{ verb: "DamageCard", amount: 1, target: "picked" }] }],
     },
 
     // 143025 Uglúk's Uruk-hai (Peril, Toughness 1 and Archery 1 are keywords). When Revealed: either increase the pursuit value by 3, or reveal an additional encounter card.
@@ -312,9 +314,10 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
           verb: "ForEachPlayer",
           order: "firstFirst",
           instructions: [
-            { verb: "Pick", pick: { type: "hero", control: "you", loggedCaptive: true } },
-            { verb: "Pick", pick: { type: "hero", control: "you", exceptSphere: "fellowship" }, when: { kind: "not", condition: { kind: "canPick", pick: { type: "hero", control: "you", loggedCaptive: true } } } },
-            { verb: "TakeCaptive", under: TO_ISENGARD },
+            // No hero of the seat on the log: the player picks one and it is taken. A hero the log names is taken without asking (the last instruction); the picks are skipped while the log names one.
+            { verb: "Pick", pick: { type: "hero", control: "you", exceptSphere: "fellowship" }, when: NO_LOGGED_CAPTIVE },
+            { verb: "TakeCaptive", under: TO_ISENGARD, when: NO_LOGGED_CAPTIVE },
+            { verb: "TakeCaptive", under: TO_ISENGARD, logged: true, when: { kind: "canPick", pick: LOGGED_CAPTIVE } },
           ],
         },
         { verb: "SetPursuit", value: 10 },

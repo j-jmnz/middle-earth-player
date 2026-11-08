@@ -8,8 +8,7 @@ import { pickedList } from "../../interpret/player-verbs.ts";
 import { printedOf } from "../../core/printed.ts";
 import { inPlay, updateCard, type ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
-import { backInPlace } from "../prisoner/index.ts";
-import { captureHero, heldFrom, releaseHero } from "../south/captive.ts";
+import { backInPlace, captureHero, heldFrom, releaseHero } from "../south/captive.ts";
 
 /** The hero the enemy guards, or null: the guarded hero lying under it, whether or not the enemy is still in play. */
 export function heroGuardedBy(state: ScenarioState, enemyId: string): string | null {

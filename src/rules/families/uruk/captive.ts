@@ -6,22 +6,16 @@
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { lastPicked } from "../../interpret/player-verbs.ts";
-import type { CardInstance, ScenarioState } from "../../core/state.ts";
-import { inPlay, updateCard } from "../../core/state.ts";
+import type { ScenarioState } from "../../core/state.ts";
+import { inPlayByCode, updateCard } from "../../core/state.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
-import { heldFrom } from "../south/captive.ts";
+import { backInPlace, captivesUnder, heldFrom, releaseHero } from "../south/captive.ts";
 
 /** The Captives in play, in the order their cards were made; with `heldBy`, only those the enemy with that id holds. */
 export function captivesOf(state: ScenarioState, heldBy?: string): string[] {
-  return Object.values(state.cards)
-    .filter((card) => card.zone === "captive" && card.captive === true && (heldBy == null || card.host === heldBy))
-    .map((card) => card.id);
-}
-
-// The card in play with this code ("To Isengard!"), or undefined.
-function inPlayByCode(state: ScenarioState, code: string): CardInstance | undefined {
-  return Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone));
+  const held = heldBy != null ? captivesUnder(state, heldBy) : Object.keys(state.cards).filter((id) => state.cards[id]?.zone === "captive");
+  return held.filter((id) => state.cards[id]?.captive === true);
 }
 
 // The hero, and each card attached to it, goes into the captive zone under the card `hostId`, faceup, with its tokens kept. The hero remembers the seat it came from and its place among that seat's heroes; its attachments leave the
@@ -38,9 +32,9 @@ export function holdCaptive(state: ScenarioState, heroId: string, hostId: string
   return next;
 }
 
-// TakeCaptive: the hero the actor picked last, one of the actor's own, becomes a Captive under the card with this code.
+// TakeCaptive: the hero the actor picked last (with `logged`, the hero the Campaign Log names as the actor's captive), one of the actor's own, becomes a Captive under the card with this code.
 function takeCaptive(state: ScenarioState, instruction: Extract<Instruction, { verb: "TakeCaptive" }>, focus: Focus): ScenarioState {
-  const heroId = lastPicked(state);
+  const heroId = instruction.logged === true ? (state.seats[focus.seat]?.heroes.find((id) => loggedCaptiveMatches(state, id, true)) ?? "") : lastPicked(state);
   const hero = state.cards[heroId];
   const host = inPlayByCode(state, instruction.under);
   if (!hero || !host || hero.zone !== "heroes" || hero.controller !== focus.seat) return state;
@@ -61,6 +55,22 @@ function returnCaptive(state: ScenarioState, instruction: Extract<Instruction, {
   if (!under || !focus.sourceId) return state;
   let next = state;
   for (const id of captivesOf(state, focus.sourceId)) next = updateCard(moveCard(next, id, { zone: "captive", hostId: under.id }), id, { face: "up" });
+  return next;
+}
+
+/**
+ * The players win: each Captive is rescued (143070:A:1, "rescued each Captive"; 143071:B:1 reads the rescued heroes). It returns among its owner's heroes, in the place it held, controlled by its owner again, with its tokens kept, and
+ * the cards attached to it return to its owner's play area. No event: the scenario is won, and its text box is no longer blank once no Captive is held.
+ */
+export function rescueCaptives(state: ScenarioState): ScenarioState {
+  let next = state;
+  for (const id of captivesOf(state)) {
+    const hero = next.cards[id];
+    if (!hero || hero.owner == null) continue;
+    const seat = hero.owner;
+    const released = releaseHero(next, id, seat, { face: "up", captive: undefined, owner: undefined, heroSlot: undefined, host: null }, { owner: undefined }, true);
+    next = hero.heroSlot == null ? released : backInPlace(released, seat, id, hero.heroSlot);
+  }
   return next;
 }
 

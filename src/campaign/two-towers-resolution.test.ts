@@ -9,6 +9,7 @@ import { holds } from "../rules/interpret/conditions.ts";
 import { openResolution, resolutionResult } from "../rules/setup/resolution.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
 import { spawn } from "../rules/core/zones.ts";
+import { holdCaptive } from "../rules/families/uruk/captive.ts";
 import { loadPrinted } from "../../test/harness/catalog.ts";
 import { loadWorld, table, type World as SceneWorld } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
@@ -34,7 +35,7 @@ const BRACE = "144014";
 const EYE = "144015";
 const GATE = "144027";
 const HARAD = "144040";
-const CARDS = [...HEROES, THEODRED, ...BOONS, HOPE, PALANTIR, COUNSELS, VOICE, BRACE, EYE, GATE, HARAD, "141001", "141002", "141003"];
+const CARDS = [...HEROES, THEODRED, "143022", ...BOONS, HOPE, PALANTIR, COUNSELS, VOICE, BRACE, EYE, GATE, HARAD, "141001", "141002", "141003"];
 
 let scene: SceneWorld;
 let cards: Map<string, PrintedCard>;
@@ -97,6 +98,22 @@ describe("143071 The Uruk-hai: the Skill boons (user ruling C1, 2026-11-08)", ()
       [BOONS[0], "hero", 0, THEODRED],
       [BOONS[2], "hero", 1, "01012"],
     ]);
+  });
+
+  it("rescues each Captive first (143070:A:1): a seat whose only Warrior is its Captive is offered Intimidation on that hero", () => {
+    const { state, ctx } = won("143071", 1, (s) => {
+      const hero = spawn(s, THEODRED, { zone: "heroes", seat: 0 });
+      const host = spawn(hero.state, "143022", { zone: "staging" });
+      const held = holdCaptive(host.state, hero.id, host.id);
+      expect(held.cards[hero.id]?.captive).toBe(true);
+      return { ...held, pursuit: 20, campaignFacts: facts({ heroes: [[ARAGORN]], fallen: [[]], fellowship: [] }) };
+    });
+    const theodred = heroId(state, THEODRED);
+    expect(theodred).not.toBe("");
+    expect(state.cards[theodred]).toMatchObject({ zone: "heroes", controller: 0, face: "up" });
+    expect(state.cards[theodred]?.captive).toBeUndefined();
+    expect(state.seats[0].heroes).toContain(theodred);
+    expect(options(state, ctx)).toEqual([`${BOONS[0]}>${theodred}`, `${BOONS[3]}>${theodred}`]);
   });
 
   it("offers a seat none of them when no hero it controls has a Skill's trait", () => {

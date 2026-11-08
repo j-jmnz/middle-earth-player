@@ -136,7 +136,6 @@ describe("143070 Rescue the Captives", () => {
   it("143070:A:1 each player searches the encounter deck and discard pile for an Uruk-hai enemy, reveals it and adds it to the staging area; the deck is shuffled", () => {
     const t = haiTable(world, { seats: 2, stage: CODES.stage2, deck: ["f0", CODES.urukHaiFighter, "f3"], discard: [CODES.urukHaiFighter], staging: [CODES.toIsengard] });
     // The Uruk-hai Fighters have no When Revealed: the reveal only places them.
-    world.cards.set(CODES.urukHaiFighter, { ...world.cards.get(CODES.urukHaiFighter)!, traits: ["Orc", "Uruk-hai"] });
     const run = resolveRecords(t.state, t.ctx, CODES.stage2, "whenRevealed", stageId(t.state));
     const fighters = run.state.staging.filter((id) => run.state.cards[id]?.code === CODES.urukHaiFighter);
     expect(fighters).toHaveLength(2);
@@ -190,7 +189,7 @@ describe("143022 To Isengard!", () => {
     const last = resolveRecords({ ...t.state, pursuit: 29 }, t.ctx, CODES.toIsengard, "forced", idOf(t.state, CODES.toIsengard));
     expect(last.state.pursuit).toBe(30);
     expect(last.state.lost).toBe(true);
-    expect(last.state.lossReason).toBe("The Uruk-hai reached Isengard");
+    expect(last.state.lossReason).toBe("The pursuit value reached 30");
   });
 
   it("143022:A:2 is heard at the end of the refresh phase", () => {

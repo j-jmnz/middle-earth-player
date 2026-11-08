@@ -8,6 +8,7 @@ import { Pressable, ScrollView, useWindowDimensions, View, type LayoutChangeEven
 import { setDialsEdge } from "../../play/chrome/bar-edge";
 import { GameIcon } from "../../ui/game-icon";
 import { Text } from "../../ui/text";
+import { PURSUIT_LIMIT } from "../../play/readouts/widgets";
 import { seatDial } from "../../play/store/peek";
 import type { Rail } from "../../play/phases/rail";
 import type { SeatThreat } from "../../play/store/selectors";
@@ -27,6 +28,7 @@ export { TOP_BAR };
 const FADE_BANDS = 7;
 const FADE_BAND = EDGE_FADE / FADE_BANDS;
 const NO_TICKS: readonly number[] = [];
+const NO_HELD: readonly { seat: number; words: string; mark: "oneRing" | "hero" }[] = [];
 
 export type TopBarProps = {
   threats: readonly SeatThreat[];
@@ -59,18 +61,15 @@ export type TopBarProps = {
   areas?: boolean;
   // The engagement costs marked on each dial, by seat.
   ticks: readonly (readonly number[])[];
-  // The seat holding the Ring-bearer facedown and what to say of it (a Ring mark on its dial), or null.
-  ringSeat?: number | null;
-  ringWords?: string | null;
-  // The mark that dial wears: the One Ring for the Ring-bearer, a hero for the prisoner.
-  ringMark?: "oneRing" | "hero";
+  // The seats whose dial says it holds something facedown or captive (a Ring mark for the Ring-bearer, a hero mark for a prisoner or a Captive) and what to say of it, one entry for each seat.
+  held?: readonly { seat: number; words: string; mark: "oneRing" | "hero" }[];
   menuOpen: boolean;
   onThreat: (seat: number) => void;
   onRail: () => void;
   onMenu: () => void;
 };
 
-export function TableTopBar({ threats, acting, viewed, life, burdenDeck, pursuit = null, tokens = null, heading = null, island = null, onIsland, onNightmare = null, rail, stopAhead, carouselOpen, narrow, areas, ticks, ringSeat = null, ringWords = null, ringMark = "oneRing", menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
+export function TableTopBar({ threats, acting, viewed, life, burdenDeck, pursuit = null, tokens = null, heading = null, island = null, onIsland, onNightmare = null, rail, stopAhead, carouselOpen, narrow, areas, ticks, held = NO_HELD, menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
   const t = useTableTokens();
   const s = useUiScale();
   const screen = useWindowDimensions();
@@ -139,8 +138,8 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, pursuit
                     hint={dial.hint}
                     compact
                     ticks={ticks[threat.seat] ?? NO_TICKS}
-                    ring={ringSeat === threat.seat ? ringWords : null}
-                    ringMark={ringMark}
+                    ring={held.find((dial) => dial.seat === threat.seat)?.words ?? null}
+                    ringMark={held.find((dial) => dial.seat === threat.seat)?.mark ?? "oneRing"}
                     onPress={() => onThreat(threat.seat)}
                   />
                 </UiScaleContext.Provider>
@@ -159,7 +158,7 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, pursuit
               </View>
             ) : null}
             {life != null ? <ThreatRing threat={{ seat: 0, threat: life, eliminated: false }} label="Life" testID="life" icon={null} elimination={false} compact /> : null}
-            {pursuit != null ? <ThreatRing threat={{ seat: 0, threat: pursuit, eliminated: false }} label="Pursuit" accessibilityName="Pursuit value" testID="pursuit-value" icon={null} elimination={false} compact /> : null}
+            {pursuit != null ? <ThreatRing threat={{ seat: 0, threat: pursuit, eliminated: false }} label="Pursuit" accessibilityName="Pursuit value" testID="pursuit-value" icon={null} elimination={false} limit={PURSUIT_LIMIT} compact /> : null}
             {tokens != null ? <ThreatRing threat={{ seat: 0, threat: tokens.tokens, eliminated: false }} label="Tokens" accessibilityName={`Resource tokens on ${tokens.name}`} testID="campaign-tokens" icon="resource" elimination={false} compact /> : null}
             {burdenDeck != null ? <ThreatRing threat={{ seat: 0, threat: burdenDeck, eliminated: false }} label="Burden" accessibilityName="Burden deck" testID="burden-deck" icon={null} elimination={false} compact /> : null}
             {onNightmare ? (

@@ -27,12 +27,23 @@ export function fallenNow(state: ScenarioState): string[] {
  * Choice": "Each of these boons can only be attached to a hero with the corresponding trait"), only a hero with it; any other boon takes every hero.
  */
 export function boonHeroes(state: ScenarioState, ctx: ReduceContext, code: string, heroes: readonly string[]): string[] {
-  const trait = effectsOf(ctx, code).flatMap((effect) => (effect.timing === "setup" ? effect.instructions : [])).flatMap((instruction) => (instruction.verb === "AttachSelf" && instruction.to.kind === "hero" && instruction.to.trait ? [instruction.to.trait] : []))[0];
+  const trait = attachTrait(ctx, code);
   if (trait === undefined) return [...heroes];
   return heroes.filter((id) => {
     const card = state.cards[id];
     return card != null && printedOf(ctx.cards, card.code).traits.includes(trait);
   });
+}
+
+// The Trait the card's own Setup record names for its host ("Attach to a Warrior hero."), or undefined when it names none.
+function attachTrait(ctx: ReduceContext, code: string): string | undefined {
+  for (const effect of effectsOf(ctx, code)) {
+    if (effect.timing !== "setup") continue;
+    for (const instruction of effect.instructions) {
+      if (instruction.verb === "AttachSelf" && instruction.to.kind === "hero" && instruction.to.trait) return instruction.to.trait;
+    }
+  }
+  return undefined;
 }
 
 /** The options a ChooseOption offers: an option that needs a fallen hero is offered only while the list holds one. */

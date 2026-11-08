@@ -10,8 +10,8 @@ import { loggedCaptiveMatches, runCaptive } from "./captive.ts";
 import { runPursuit } from "./pursuit.ts";
 
 // The verbs src/catalog/families/uruk.ts adds. Null when the verb is not one of them.
-export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, _steps: EngineStep[]): ScenarioState | null {
-  return runPursuit(state, instruction, focus, ctx) ?? runCaptive(state, instruction, focus);
+export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
+  return runPursuit(state, instruction, focus, ctx, steps) ?? runCaptive(state, instruction, focus);
 }
 
 export const manifest: RulesFamily = {

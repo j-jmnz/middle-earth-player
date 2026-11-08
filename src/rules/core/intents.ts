@@ -9,6 +9,8 @@ export type EngineStep =
   | { kind: "threat"; seat: number; amount: number; cause: Cause }
   // The Ring-bearer's life went down by -`amount` (mec109.ringbearers-life).
   | { kind: "life"; amount: number; cause: Cause }
+  // The pursuit value of The Uruk-hai moved by `amount` (mec112.pursuit; negative when it fell).
+  | { kind: "pursuit"; amount: number; cause: Cause }
   // `seat`: the player whose card effect placed it, stamped only in a game with a card that hears who placed progress (`eventSeat`, 19102:A:2).
   | { kind: "progress"; targetId: string; amount: number; cause: Cause; seat?: number }
   // `under`: an Aflame location placed facedown underneath The Havens Burn (dcce.aflame): out of play and hidden, so no line names it.

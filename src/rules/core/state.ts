@@ -229,6 +229,11 @@ export function inPlay(zone: ZoneName): boolean {
   );
 }
 
+// The card in play with this code, or undefined (the first one when several are).
+export function inPlayByCode(state: ScenarioState, code: string): CardInstance | undefined {
+  return Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone));
+}
+
 export function modifierActive(state: ScenarioState, modifier: Modifier): boolean {
   if (modifier.until === "whileSourceInVictory") return state.cards[modifier.sourceId]?.zone === "victory";
   if (modifier.until === "whileSourceActive") return state.activeLocation === modifier.sourceId || state.secondActiveLocation === modifier.sourceId;

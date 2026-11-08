@@ -25,9 +25,9 @@ export type Text = string | readonly { when?: Condition; text: string }[];
 
 /**
  * One entry of an asks file. Templates hold `{card}` (the card the record is on), `{owner}` ("Player N", the seat asked), `{n}` (what the instruction after a Pick deals or places, read now: a Pick's entry only, a Choose
- * has none) and a `{name}` for each key of `bind`. Every `Text` below is a template or variants.
+ * has none), `{step}` and `{of}` (the damage an AssignDamage is on, "1" of "3": the step that asks only) and a `{name}` for each key of `bind`. Every `Text` below is a template or variants.
  * - `note`: the sentence over a Pick or a Choose (the entry keyed with the instruction's verb).
- * - `why`: the reason the window opened. It is said after the card's title and before the note, "Card: why note" ("Player 1, Card: why note" when owned and two-handed).
+ * - `why`: the reason the window opened (variants say it differently in a campaign and a standalone game). It is said after the card's title and before the note, "Card: why note" ("Player 1, Card: why note" when owned and two-handed).
  * - `owned`: one player's own choice. Two-handed the sentence leads with the player and the sheet adds no "Player N chooses."; solo it has no lead, and a note with no `why` is capitalised.
  * - `verb`: the button's word over a Pick, one or two words ("Exhaust"); "Choose" when absent.
  * - `labels`: the rows of a Pick that are no card, by option id ("skip", "done"). A key that names a card is refused.
@@ -38,7 +38,7 @@ export type Text = string | readonly { when?: Condition; text: string }[];
  */
 export type Ask = {
   note?: Text;
-  why?: string;
+  why?: Text;
   owned?: true;
   verb?: string;
   label?: Text;
@@ -84,12 +84,12 @@ export const textsOf = (text: Text | undefined): string[] => (text === undefined
 
 /** Every template of an entry, variants included. */
 export function templatesOf(entry: Ask): string[] {
-  return [...textsOf(entry.note), ...(entry.why == null ? [] : [entry.why]), ...textsOf(entry.label), ...Object.values(entry.labels ?? {}).flatMap(textsOf), ...textsOf(entry.caution?.text)];
+  return [...textsOf(entry.note), ...textsOf(entry.why), ...textsOf(entry.label), ...Object.values(entry.labels ?? {}).flatMap(textsOf), ...textsOf(entry.caution?.text)];
 }
 
 /** The placeholders of an entry that no value answers: none of `card`, `owner`, `n` (only where `withN`: a Pick has what its next instruction deals, a Choose has nothing) and its `bind` names. */
 export function unknownPlaceholders(entry: Ask, withN = true): string[] {
-  const known = new Set(["card", "owner", ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {})]);
+  const known = new Set(["card", "owner", ...(withN ? ["n", "step", "of"] : []), ...Object.keys(entry.bind ?? {})]);
   return [...new Set(templatesOf(entry).flatMap(placeholdersOf))].filter((name) => !known.has(name));
 }
 
@@ -132,11 +132,16 @@ export function askAt(a: AskFacts, table?: AsksTable): AskAt | null {
   return best ? { id: best.id, path: best.path, table: entries } : null;
 }
 
+// The damage an AssignDamage step asks about: it deals them one at a time, `left` of `of` still to place.
+function stepOf(instruction: Instruction): Values {
+  return instruction.verb === "AssignDamage" && instruction.left != null && instruction.of != null ? { step: instruction.of - instruction.left + 1, of: instruction.of } : {};
+}
+
 /** The values the templates of an entry read now. */
 export function askValues(a: AskFacts, entry: Ask): { values: Values; scope: ReturnType<typeof frameScope> } {
   const seat = askedSeat(a.game);
   const scope = frameScope(a.game, seat, a.source);
-  const values: Values = { card: a.source ? a.names.card(a.source) : "This card", owner: `Player ${seat + 1}`, n: a.amountNow };
+  const values: Values = { card: a.source ? a.names.card(a.source) : "This card", owner: `Player ${seat + 1}`, n: a.amountNow, ...stepOf(a.instruction) };
   for (const [name, amount] of Object.entries(entry.bind ?? {})) values[name] = resolveAmount(a.game, amount, scope, a.ctx);
   return { values, scope };
 }
@@ -169,7 +174,7 @@ function cautionOf(a: AskFacts, hit: Hit, picked?: string): string | undefined {
 function sentence(a: AskFacts, hit: Hit): string | null {
   const { entry, values } = hit;
   const note = entry.note == null ? null : said(a, hit, entry.note);
-  const why = entry.why == null ? "" : fill(entry.why, values);
+  const why = entry.why == null ? "" : said(a, hit, entry.why);
   if (note === null || why === null) return null;
   const owned = entry.owned === true;
   const lead = seatSays(a.game);

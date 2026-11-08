@@ -63,7 +63,7 @@ export type HaiGolden = { name: string; seatCount: 1 | 2; seed: number; difficul
 export const POOL = { gildor: "141077", underhill: "141017", shadowBurden: "141078", fordBurden: "141080", darkBurden: "142085" } as const;
 
 const THREAT_LOST = "No seats remain";
-const ISENGARD_LOST = "The Uruk-hai reached Isengard";
+const ISENGARD_LOST = "The pursuit value reached 30";
 
 // A win (143070:B:3: Uglúk out of play and stage 2 defeated) in true solo and two-handed, Normal and Easy, with the Captives chosen by the players and named by the Campaign Log (R1), with Grishnákh holding a Captive at the end (R4), and with
 // the pursuit value above 25 when it ends (no Resolution choice, 143071:B:1); a loss to the pursuit value (nobody attacks Uglúk, 143022:A:2), to the threat (weak heroes that cannot quest) and to the Uruk-hai's attacks (brittle heroes).

@@ -5,20 +5,22 @@
 // badge says what the last intent did to it ("−6" when it fell, "+2" when it rose).
 
 export const ELIMINATION_THREAT = 50;
-const NEAR = 40;
-const CRITICAL = 45;
+// The dial warms this far below its limit: tinted from 10 under it, solid from 5 under it (50: 40 and 45; The Uruk-hai's pursuit value, which loses at 30: 20 and 25).
+const NEAR_BELOW = 10;
+const CRITICAL_BELOW = 5;
 
 export type ThreatLevel = "calm" | "near" | "critical";
 
-export function threatLevel(threat: number): ThreatLevel {
-  if (threat >= CRITICAL) return "critical";
-  if (threat >= NEAR) return "near";
+export function threatLevel(threat: number, limit?: number): ThreatLevel {
+  const top = limit ?? ELIMINATION_THREAT;
+  if (threat >= top - CRITICAL_BELOW) return "critical";
+  if (threat >= top - NEAR_BELOW) return "near";
   return "calm";
 }
 
-/** The meter's fill, 0 to 1: the threat against the elimination level. */
-export function threatMeter(threat: number): number {
-  return Math.max(0, Math.min(1, threat / ELIMINATION_THREAT));
+/** The meter's fill, 0 to 1: the threat against the elimination level (or the limit of another dial). */
+export function threatMeter(threat: number, limit?: number): number {
+  return Math.max(0, Math.min(1, threat / (limit ?? ELIMINATION_THREAT)));
 }
 
 /** The change badge: a true minus sign when the threat fell, a plus when it rose; null when it did not move. */

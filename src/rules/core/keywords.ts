@@ -304,10 +304,11 @@ export function defeatedDestination(
   // A card put into play for a time leaves the game when it leaves play (PutIntoPlay `then: removeFromGame`, 11212:A:2).
   if (instance.temporary) return { zone: "removed" };
   // A claimed objective that is discarded or loses its hero returns to the staging area (01108:A:2, families/objectives/claimed.ts).
+  // A destroyed Captive is controlled by no player: its owner's discard pile takes it (143022:A:1).
+  const keeper = instance.controller ?? (instance.captive === true ? instance.owner : undefined);
   const usual: Destination =
-    // A destroyed Captive is controlled by no player: its owner's discard pile takes it (143022:A:1).
-    !fromEncounterDeck(printed) && (instance.controller != null || (instance.captive === true && instance.owner != null))
-      ? { zone: "discard", seat: instance.owner ?? instance.controller ?? 0 }
+    !fromEncounterDeck(printed) && keeper != null
+      ? { zone: "discard", seat: instance.owner ?? keeper }
       : printed.type === "quest"
         ? { zone: "setAside" }
         : { zone: "encounterDiscard" };

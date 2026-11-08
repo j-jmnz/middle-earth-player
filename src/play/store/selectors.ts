@@ -196,10 +196,11 @@ function entriesOf(game: ScenarioState, ids: readonly string[], pairs: ReturnTyp
     const card = game.cards[id];
     if (!card) continue;
     // An engaged enemy's shadow cards travel with it, so turning one up changes this zone's view.
+    // A Captive held by Grishnákh is drawn under him, engaged or in the staging area (143024:A:1).
     // The Ring-bearer facedown under the Watcher in the Water is drawn under it, in play and facedown (mec109.stage-4).
     // Mendor, captured with the prisoner, is drawn under it (01131:A:3). An encounter card guarding an objective is a card of the staging area
     // beside it, not a card drawn under it.
-    const captives = card.zone === "staging" || card.zone === "captive" ? captivesUnder(game, id) : NO_IDS;
+    const captives = card.zone === "staging" || card.zone === "engaged" || card.zone === "captive" ? captivesUnder(game, id) : NO_IDS;
     // The enemies grappled with a location are drawn facedown under it, as its attachments are (dcce.grapple).
     const attached = cardsOf(game, [...card.attachments.filter((other) => game.cards[other]?.guard !== true), ...shadowCards(card), ...captives, ...(card.zone === "staging" ? grappledWith(game, id) : [])]);
     const pair = pairs.get(id);

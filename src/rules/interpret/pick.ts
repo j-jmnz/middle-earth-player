@@ -66,6 +66,13 @@ function stagingFor(state: ScenarioState, spec: PickSpec, asking: number): reado
   return spec.stagingArea === "shared" ? sharedStaging(state) : (state.seats[asking]?.staging ?? []);
 }
 
+// The Captives a `captives` filter offers alone: every Captive (`only`), or the ones the source enemy holds (`held`, none without a source). Null when the filter does not ask for them alone.
+function captivePool(state: ScenarioState, spec: PickSpec, sourceId: string | null): string[] | null {
+  if (spec.captives === "only") return captivesOf(state);
+  if (spec.captives === "held") return sourceId ? captivesOf(state, sourceId) : [];
+  return null;
+}
+
 // The cards a filter starts from: its zone group and whose cards they are.
 function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceContext, sourceId: string | null): string[] {
   const seats = seatsOf(state, spec, asking);
@@ -81,7 +88,8 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
   }
   const from = spec.from ?? "play";
   // The Captives of The Uruk-hai: only them (`only`, `held`), or beside the cards the filter offers (`also`, below) (families/uruk/captive.ts).
-  if (spec.captives === "only" || spec.captives === "held") return spec.captives === "held" ? (sourceId ? captivesOf(state, sourceId) : []) : captivesOf(state);
+  const captives = captivePool(state, spec, sourceId);
+  if (captives) return captives;
   // Only the cards the running effect looked at or discarded (families/deck/pick.ts).
   if (spec.looked) return lookedPool(state, spec, seats);
   if (from === "hand") for (const index of seats) raw.push(...(state.seats[index]?.hand ?? []));

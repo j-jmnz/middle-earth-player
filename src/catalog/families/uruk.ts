@@ -18,7 +18,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("LowerPursuit"), amount: positiveAmountSchema, ...when }),
   // 143069:A:1, "places it faceup underneath To Isengard!": the hero the actor picked last (one of its own heroes) becomes a Captive under the card in play with this code. It leaves its owner's heroes, in play and controlled
   // by no player, faceup, keeping its tokens and the cards attached to it (user ruling, 2026-11-08); the owner stays in the game while it is held (rr.player-elimination). Nothing happens when the pick is not one of the actor's heroes.
-  z.strictObject({ verb: z.literal("TakeCaptive"), under: code, ...when }),
+  // `logged`: the hero is the one the Campaign Log names as the actor's captive, taken without a pick (143069:A:1, "choose each captive from the Campaign Log"; user ruling R1, 2026-11-08).
+  z.strictObject({ verb: z.literal("TakeCaptive"), under: code, logged: z.literal(true).optional(), ...when }),
   // 143024:A:1, "the first player attaches 1 of the Captives to him": the Captive picked last is held by the source enemy instead of lying under To Isengard!. Nothing happens when the pick is not a Captive.
   z.strictObject({ verb: z.literal("AttachCaptive"), ...when }),
   // 143024:A:1, "If Grishnákh is defeated, place the attached Captive faceup underneath To Isengard!": each Captive the source enemy holds goes under the card in play with this code, however the enemy left play (user ruling, 2026-11-08);

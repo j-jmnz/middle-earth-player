@@ -40,21 +40,29 @@ goldenSuite<HaiGolden, HaiDecks>({
     },
   },
   checks({ game }) {
-    it("keeps every Captive in play with its owner's seat, held under To Isengard! or by Grishnákh, and the Captive Grishnákh holds is the one that takes his damage", () => {
+    it("keeps every Captive in play with its owner's seat, held under To Isengard! or by Grishnákh, until the win rescues them; a lost game still holds one for each seat", () => {
       for (const golden of HAI_GOLDENS) {
         const { state } = game(golden);
         const captives = Object.values(state.cards).filter((card) => card.captive === true);
+        // A won game rescued each Captive (143070:A:1): none is held, and none is left in the captive zone.
+        if (golden.outcome === "won") {
+          expect(captives, golden.name).toHaveLength(0);
+          expect(Object.values(state.cards).filter((card) => card.zone === "captive"), golden.name).toHaveLength(0);
+          continue;
+        }
         expect(captives.length, golden.name).toBe(golden.seatCount);
         for (const card of captives) expect([CODES.toIsengard, CODES.grishnakh], golden.name).toContain(code(state, card.host ?? ""));
       }
     });
 
-    it("holds a Captive under Grishnákh at the end of the games that say so (143024:A:1)", () => {
-      for (const golden of HAI_GOLDENS.filter((item) => item.name.includes("Grishnákh holds"))) {
-        const { state } = game(golden);
+    it("holds a Captive under Grishnákh at the end of the lost games that say so, and has it take his damage at the end of the quest phase (143024:A:1, 143024:A:2)", () => {
+      for (const golden of HAI_GOLDENS.filter((item) => item.name.includes("Grishnákh") && item.outcome === "lost")) {
+        const { state, steps } = game(golden);
         const held = Object.values(state.cards).filter((card) => card.captive === true && code(state, card.host ?? "") === CODES.grishnakh);
         expect(held, golden.name).toHaveLength(1);
         expect(Object.values(state.cards).find((card) => card.code === CODES.grishnakh)?.zone, golden.name).toBe("staging");
+        const hurt = steps.filter((step) => step.kind === "damage" && "effect" in step.cause && step.cause.effect === "143024:forced:3");
+        expect(hurt.length, golden.name).toBeGreaterThan(0);
       }
     });
 
@@ -69,7 +77,8 @@ goldenSuite<HaiGolden, HaiDecks>({
   won(state) {
     expect(state.cards[state.questStage ?? ""]?.code).toBe(CODES.stage2);
     expect(state.victory.map((id) => code(state, id))).toContain(CODES.ugluk);
-    expect(Object.values(state.cards).filter((card) => card.captive === true).length).toBeGreaterThan(0);
+    // The win rescued each Captive: they are among their owners' heroes again (or in a discard pile when damage destroyed them).
+    expect(Object.values(state.cards).filter((card) => card.captive === true)).toHaveLength(0);
     // The stand-in heroes have no Skill's Trait, so no boon is offered whatever the pursuit value is; the gate's own pick is answered, or never asked above 25.
     expect(state.resolutionLog.earned).toEqual([]);
     expect(state.resolutionLog.picks ?? []).toEqual((state.pursuit ?? 99) <= 25 ? [{ name: "uruk", seat: state.firstPlayer, option: "boons" }] : []);

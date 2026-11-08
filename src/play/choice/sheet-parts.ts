@@ -1,6 +1,7 @@
 // The pieces every sheet builder uses: the step's words, a card's stat as the engine reads it, an option's label, and
 // whether an intent type is legal now.
 import type { LegalIntent, ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
+import type { CardInstance } from "../../rules/core/state.ts";
 import { modifiedStat } from "../../rules/core/keywords.ts";
 
 import { pictureKey } from "../canvas/picture-key.ts";
@@ -21,11 +22,18 @@ export function statOf(game: ScenarioState, ctx: ReduceContext, id: string, stat
   return card ? [{ icon: stat, value: modifiedStat(game, card, stat, ctx.cards), word: STAT_WORDS[stat] }] : [];
 }
 
-/** A card's name as a tile or row reads it; a Lost Island's is followed by what tells it from the others (progress, place in staging). */
+/**
+ * A card's name as a tile or row reads it; a Lost Island's is followed by what tells it from the others (progress, place in staging), and a Captive's by the player whose hero it is when there are
+ * several (the Captives of The Uruk-hai are controlled by no one: its owner is who tells them apart).
+ */
 export function cardLabel(game: ScenarioState, names: SheetNames, id: string): string {
   const card = game.cards[id];
-  const tell = card ? islandTell(game, card) : null;
+  const tell = card == null ? null : (islandTell(game, card) ?? captiveTell(game, card));
   return tell ? `${names.card(id)} · ${tell}` : names.card(id);
+}
+
+function captiveTell(game: ScenarioState, card: CardInstance): string | null {
+  return card.captive === true && card.owner != null && game.seatCount > 1 ? `Player ${card.owner + 1}` : null;
 }
 
 export function option(game: ScenarioState, names: SheetNames, id: string): SheetOption {

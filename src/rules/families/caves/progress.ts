@@ -31,9 +31,10 @@ export function questRoom(state: ScenarioState): number {
   return Math.max(0, limit - placed);
 }
 
-// Notes progress placed on the quest card this round, for a cap.
+// Notes progress placed on the quest card this round, for a cap. A cap that arrives later in the round counts what was placed before it ("no more than 3 progress ... this round", Unseen Barrier, 143032:A:1), so a game with the pursuit
+// tracker of The Uruk-hai notes every placement; any other game notes only while a cap is in force.
 export function noteQuestPlaced(state: ScenarioState, amount: number): ScenarioState {
-  if (amount <= 0 || cap(state) == null) return state;
+  if (amount <= 0 || (cap(state) == null && state.pursuit == null)) return state;
   return { ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: "table", stat: "questProgressPlaced", amount, until: "endOfRound" }] };
 }
 

@@ -12,11 +12,11 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { printedOf } from "../../core/printed.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { livingSeats, updateCard, withSeat } from "../../core/state.ts";
+import { livingSeats, updateCard } from "../../core/state.ts";
 import { shuffleIds } from "../../core/seed.ts";
 import { moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
-import { captureHero, releaseHero } from "../south/captive.ts";
+import { backInPlace, captureHero, releaseHero } from "../south/captive.ts";
 
 const CAMPAIGN_CARD = "01131";
 
@@ -117,14 +117,6 @@ function unholdPrisoner(state: ScenarioState, damage: number): ScenarioState {
   const seat = hero.owner ?? state.firstPlayer;
   const released = releaseHero(state, heroId, seat, { damage: hero.damage + damage, face: "up", prisoner: undefined, owner: undefined, heroSlot: undefined }, { prisoner: undefined, owner: undefined }, true);
   return hero.heroSlot == null ? released : backInPlace(released, seat, heroId, hero.heroSlot);
-}
-
-// The hero returns to the place it held among its seat's heroes (releasing appends it).
-export function backInPlace(state: ScenarioState, seat: number, heroId: string, slot: number): ScenarioState {
-  const current = state.seats[seat];
-  if (!current) return state;
-  const others = current.heroes.filter((id) => id !== heroId);
-  return withSeat(state, seat, { ...current, heroes: [...others.slice(0, slot), heroId, ...others.slice(slot)] });
 }
 
 // FreeCaptive: the card captured with the prisoner returns faceup to the first player's play area with `damage` damage on it.
