@@ -12,11 +12,11 @@ export function seatsThatPicked(state: ScenarioState, name: string, option: stri
   return (state.resolutionLog.picks ?? []).filter((pick) => pick.name === name && pick.option === option).map((pick) => pick.seat);
 }
 
-/** The campaign family's conditions (src/catalog/effect-schema-conditions.ts): the pursuit value, a ChooseOption's answer, and the hands. */
+/** The campaign family's conditions (src/catalog/effect-schema-conditions.ts): the pursuit value (the uruk family sets it, families/uruk/pursuit.ts), a ChooseOption's answer, and the hands. */
 export function campaignHolds(state: ScenarioState, condition: Extract<Condition, { kind: "pursuit" | "picked" | "anyHand" }>): boolean {
   switch (condition.kind) {
     case "pursuit":
-      return state.pursuit != null && state.pursuit <= condition.max;
+      return state.pursuit != null && (condition.max == null || state.pursuit <= condition.max) && (condition.min == null || state.pursuit >= condition.min);
     case "picked":
       return pickedOption(state, condition.name, condition.option);
     case "anyHand":

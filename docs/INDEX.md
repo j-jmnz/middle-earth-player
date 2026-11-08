@@ -63,8 +63,8 @@ Read the sections your task touches.
     - 126–160 Repository map (~850) ← 1
   - 161–186 State (~1.0K) ← 9
   - 187–208 Play loop (~250)
-  - 209–234 Engine (~4.2K)
-    - 223–234 Mechanic families (~3.3K) ← 5
+  - 209–234 Engine (~4.3K)
+    - 223–234 Mechanic families (~3.4K) ← 5
   - 235–240 Effects (~530)
   - 241–273 Scenario definition (~800)
   - 274–294 Persistence (~1.5K)
@@ -73,7 +73,7 @@ Read the sections your task touches.
   - 354–359 Catalog build (~410)
   - 360–377 Tests (~1.7K) ← 5
   - 378–393 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~84.5K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~85.1K tok)
   - 17–38 Sections (~410)
   - 39–50 Product (~590)
   - 51–64 Non-goals (~540)
@@ -107,19 +107,19 @@ Read the sections your task touches.
     - 616–633 The Caves of Nibin-Dûm (~2.4K)
   - 634–691 Dream-chaser (~15.6K) ← 4
   - 692–718 Ered Mithrin (~15.8K) ← 7
-  - 719–744 The Two Towers (~2.4K) ← 12
-  - 745–753 Nightmare (~410) ← 19
-  - 754–792 Deckbuilding (~1.9K)
-  - 793–871 Effects (~3.2K)
-    - 795–853 Three layers (~2.4K) ← 10
-    - 854–863 Player side quests, contracts and saga cards (~430)
-    - 864–867 Window stack (~100)
-    - 868–871 Coverage test (~270)
-  - 872–892 Data sources (~530)
-  - 893–911 Card images (~1.2K) ← 9
-  - 912–937 Persistence and shipping (~1.8K)
-  - 938–979 Screens (~4.7K) ← 1
-    - 964–979 Table screen (~1.8K) ← 3
+  - 719–745 The Two Towers (~3.1K) ← 13
+  - 746–754 Nightmare (~410) ← 19
+  - 755–793 Deckbuilding (~1.9K)
+  - 794–872 Effects (~3.2K)
+    - 796–854 Three layers (~2.4K) ← 10
+    - 855–864 Player side quests, contracts and saga cards (~430)
+    - 865–868 Window stack (~100)
+    - 869–872 Coverage test (~270)
+  - 873–893 Data sources (~530)
+  - 894–912 Card images (~1.2K) ← 9
+  - 913–938 Persistence and shipping (~1.8K)
+  - 939–980 Screens (~4.7K) ← 1
+    - 965–980 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~40.1K tok)
   - 5–8 Overview (~130) ← 1
   - 9–23 Top bar (~2.2K) ← 4

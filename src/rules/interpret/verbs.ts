@@ -28,6 +28,7 @@ import { takeProgressOff } from "../core/progress.ts";
 import { noteEncounterThreat } from "../families/encounter/reveal.ts";
 import { moveEncounter } from "../families/encounter/moves.ts";
 import { stagingDest } from "../families/breaking/areas.ts";
+import { setX } from "../families/costs/verbs.ts";
 
 export type VerbFocus = { seat: number; sourceId: string | null };
 
@@ -103,14 +104,9 @@ export function runExtraVerb(
       return focus.sourceId ? shuffleIntoEncounterDeck(state, focus.sourceId) : state;
     }
     case "DiscardRandomFromHand": {
-      // `eachSeat` ("each player discards 1 card at random from his hand", 19040:A:1): every living player, the first player first.
-      if (instruction.who === "eachSeat") {
-        const amount = instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
-        const living = livingSeats(state);
-        const at = Math.max(0, living.indexOf(state.firstPlayer));
-        return [...living.slice(at), ...living.slice(0, at)].reduce((current, seat) => discardRandom(current, seat, amount, focus.sourceId, ctx), state);
-      }
-      return discardRandom(state, instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat, instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx), focus.sourceId, ctx);
+      const discarded = discardRandomFromHand(state, instruction, focus, ctx);
+      // The effect's X is the total printed cost of the cards discarded (143066:A:2).
+      return instruction.setX === true ? setX(discarded, handCost(state, discarded, ctx)) : discarded;
     }
     case "PlaceUnderSelf": {
       const id = lastPicked(state);
@@ -166,12 +162,14 @@ export function runExtraVerb(
       const id = refCard(state, instruction.to ?? "host", scope);
       const hero = id ? state.cards[id] : undefined;
       const amount = resolveAmount(state, instruction.amount, scope, ctx);
-      if (!hero || hero.controller == null || amount <= 0 || !mayGainResources(state, hero.id, focus.sourceId, ctx)) return state;
+      // A Captive is controlled by no player; its owner's seat stands for it (143027:A:1, "each hero's resource pool": user ruling, 2026-11-08).
+      const seat = hero?.controller ?? (hero?.captive === true ? hero.owner : undefined);
+      if (!hero || seat == null || amount <= 0 || !mayGainResources(state, hero.id, focus.sourceId, ctx)) return state;
       for (let added = 0; added < amount; added += 1) {
-        steps.push({ kind: "gainResource", seat: hero.controller, heroId: hero.id, cause: currentCause(steps, UNATTRIBUTED) });
+        steps.push({ kind: "gainResource", seat, heroId: hero.id, cause: currentCause(steps, UNATTRIBUTED) });
       }
       // "After a card effect adds resources to a hero's pool" (rr.resources).
-      return queueEvent(updateCard(state, hero.id, { resources: hero.resources + amount }), { trigger: "resourcesAdded", seat: hero.controller, cardId: hero.id });
+      return queueEvent(updateCard(state, hero.id, { resources: hero.resources + amount }), { trigger: "resourcesAdded", seat, cardId: hero.id });
     }
     case "Delay":
       return scheduleDelayed(state, instruction, focus, ctx, currentCause(steps, UNATTRIBUTED));
@@ -286,6 +284,24 @@ function damageAllies(
 }
 
 // The seat discards cards from its hand chosen by the seed, one roll each.
+// DiscardRandomFromHand: the actor (or the first player, or each player) discards cards at random from their hand.
+function discardRandomFromHand(state: ScenarioState, instruction: Extract<Instruction, { verb: "DiscardRandomFromHand" }>, focus: VerbFocus, ctx: ReduceContext): ScenarioState {
+  // `eachSeat` ("each player discards 1 card at random from his hand", 19040:A:1): every living player, the first player first.
+  if (instruction.who === "eachSeat") {
+    const amount = instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
+    const living = livingSeats(state);
+    const at = Math.max(0, living.indexOf(state.firstPlayer));
+    return [...living.slice(at), ...living.slice(0, at)].reduce((current, seat) => discardRandom(current, seat, amount, focus.sourceId, ctx), state);
+  }
+  return discardRandom(state, instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat, instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx), focus.sourceId, ctx);
+}
+
+// The total printed cost of the cards that left a hand between two states (a card with no printed cost counts 0).
+function handCost(before: ScenarioState, after: ScenarioState, ctx: ReduceContext): number {
+  const held = new Set(after.seats.flatMap((seat) => seat.hand));
+  return before.seats.flatMap((seat) => seat.hand).filter((id) => !held.has(id)).reduce((sum, id) => sum + (Number(printedOf(ctx.cards, before.cards[id]?.code ?? "").cost) || 0), 0);
+}
+
 function discardRandom(state: ScenarioState, seat: number, amount: number, sourceId: string | null, ctx: ReduceContext): ScenarioState {
   let next = state;
   for (let count = 0; count < amount; count += 1) {

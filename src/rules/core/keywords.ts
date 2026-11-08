@@ -305,8 +305,9 @@ export function defeatedDestination(
   if (instance.temporary) return { zone: "removed" };
   // A claimed objective that is discarded or loses its hero returns to the staging area (01108:A:2, families/objectives/claimed.ts).
   const usual: Destination =
-    !fromEncounterDeck(printed) && instance.controller != null
-      ? { zone: "discard", seat: instance.owner ?? instance.controller }
+    // A destroyed Captive is controlled by no player: its owner's discard pile takes it (143022:A:1).
+    !fromEncounterDeck(printed) && (instance.controller != null || (instance.captive === true && instance.owner != null))
+      ? { zone: "discard", seat: instance.owner ?? instance.controller ?? 0 }
       : printed.type === "quest"
         ? { zone: "setAside" }
         : { zone: "encounterDiscard" };
@@ -449,8 +450,8 @@ export function eliminateEmpties(state: ScenarioState, steps: EngineStep[], fina
     // The elimination level, lowered by a card the seat holds (The One Ring, families/misc.ts).
     const level = 50 - Math.max(0, heldAmount(next, `seat:${index}`, "eliminationReduction"));
     if (!final && seat.threat < level && seat.heroes.length === 0 && (state.heroSavers ?? []).includes(index)) continue;
-    // A hero an enemy guards is in play, not killed (Carried Away, 18074:B:1; rr.player-elimination): its owner is not out of heroes while it is held.
-    const held = seat.threat < level && seat.heroes.length === 0 && Object.values(next.cards).some((card) => card.guardedHero === true && card.owner === index);
+    // A hero an enemy guards is in play, not killed (Carried Away, 18074:B:1; rr.player-elimination): its owner is not out of heroes while it is held. A Captive of The Uruk-hai is held the same way (143022:A:1).
+    const held = seat.threat < level && seat.heroes.length === 0 && Object.values(next.cards).some((card) => (card.guardedHero === true || card.captive === true) && card.owner === index);
     if (held) continue;
     if (seat.threat >= level || seat.heroes.length === 0) {
       // A card that keeps the seat in the game at its threat elimination level is asked instead (10124:A:2).

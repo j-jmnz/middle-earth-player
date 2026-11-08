@@ -82,6 +82,8 @@ export const amountExprSchema = z.strictObject({
   max: z.literal(true).optional(),
   // The damage tokens on the cards that match, added up ("equal to the total damage on each Ship objective he controls", 12148:A:1; read by the sea family, src/rules/families/sea/swap.ts).
   damageOn: pickSchema.optional(),
+  // The pursuit value (mec112.pursuit): "X is the pursuit value" (143069:B:1). 0 while no tracker is set. Read by the uruk family (src/rules/families/uruk/pursuit.ts).
+  pursuit: z.literal(true).optional(),
 });
 
 export const amountSchema = z.union([z.number().int(), amountExprSchema]);

@@ -60,3 +60,10 @@ export function encounterStart(world: EncounterWorld, seatCount: 1 | 2, seed: nu
 export function kept(start: StartScenario, ctx: ReduceContext): ScenarioState {
   return expectOk(reduce(startScenario(start, ctx), { type: "Keep" }, ctx)).state;
 }
+
+/** The state with the choices a Setup opened answered, each with its first option (the Captive each player chooses in The Uruk-hai, 143069:A:1): the table a card probe is dropped on. */
+export function setupAnswered(state: ScenarioState, ctx: ReduceContext): ScenarioState {
+  let next = state;
+  for (let guard = 0; guard < 20 && next.window?.kind === "choose"; guard += 1) next = expectOk(reduce(next, { type: "Choose", optionId: next.window.options[0] ?? "" }, ctx)).state;
+  return next;
+}

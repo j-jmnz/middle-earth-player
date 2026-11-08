@@ -113,6 +113,7 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
       if (instruction.who === "eachSeat") return `each player lowers threat by ${amount}`;
       return instruction.who === "picked" || instruction.who === "eventSeat" ? `lower that player's threat by ${amount}` : `lower your threat by ${amount}`;
     }
+    case "RaisePursuit": return `increase the pursuit value by ${amountWords(instruction.amount)}`; // mec112.pursuit; 143025:A:2, 143029:A:2, 143030:A:1
     case "Draw": {
       const amount = amountWords(instruction.amount);
       const deck = instruction.who === "picked" || instruction.who === "eventSeat" ? "their deck" : "your deck";

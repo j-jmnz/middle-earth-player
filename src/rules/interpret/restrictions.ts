@@ -148,6 +148,8 @@ export function attachBlocked(state: ScenarioState, ctx: ReduceContext, hostId: 
   const traits = printedOf(ctx.cards, attachmentCode).traits;
   if (flagged(state, hostId, "cannotHaveAttachments")) return true;
   if (flagged(state, hostId, "noPlayerAttachments") && isPlayerType(printedOf(ctx.cards, attachmentCode))) return true;
+  // "Cannot have treachery card attachments" (Beyond All Hope, 143019:A:3).
+  if (flagged(state, hostId, "noTreacheryAttachments") && printedOf(ctx.cards, attachmentCode).type === "treachery") return true;
   if (flagged(state, hostId, "cannotHaveRestricted") && printedOf(ctx.cards, attachmentCode).keywords.restricted) return true;
   return restricted(state, ctx, "attach").some(
     (rule) => rule.sourceId === hostId && !(rule.exceptTrait != null && traits.includes(rule.exceptTrait)),

@@ -166,7 +166,8 @@ export const simpleVerbs = [
   // Moves one matching card from the encounter discard pile into the encounter deck, then shuffles.
   z.strictObject({ verb: z.literal("ShuffleIntoDeck"), ...searchSelector, ...when }),
   // Finds a card in the encounter deck or discard pile and reveals it.
-  z.strictObject({ verb: z.literal("SearchReveal"), ...searchSelector, who: whoSchema, ...when }),
+  // `engaged`: the revealed enemy is put into play engaged with the revealing player instead of joining the staging area ("reveal it, and put it into play engaged with you", 143065:A:2).
+  z.strictObject({ verb: z.literal("SearchReveal"), ...searchSelector, who: whoSchema, engaged: z.literal(true).optional(), ...when }),
   // Finds a card in the encounter deck or discard pile and puts it out without revealing it. With `each`, every card that
   // matches goes ("add each Nazgûl enemy found to the staging area", 141027:A:1) and nobody chooses.
   verbFlags(z.strictObject({
@@ -204,7 +205,8 @@ export const simpleVerbs = [
       // with the highest printed threat cost among every hero in play (the first player chooses among those tied), or (`picked`, "attach this
       // card to one of that player's heroes", 900106:A:1) a hero of the player the effect picked, who chooses it.
       // or (`mostAttachments`, "Attach to the hero with the most attachments without Weighed Down attached", 18027:A:1) the hero with the most attachments among those the card is not on yet; the first player chooses among heroes tied.
-      z.strictObject({ kind: z.literal("hero"), control: z.enum(["you", "any", "highestThreat", "highestThreatCost", "picked", "mostAttachments"]).optional(), exceptSphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]).optional() }),
+      // `trait`: only a hero with this Trait ("Attach to a Warrior hero.", 143015:A:2).
+      z.strictObject({ kind: z.literal("hero"), control: z.enum(["you", "any", "highestThreat", "highestThreatCost", "picked", "mostAttachments"]).optional(), exceptSphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral", "fellowship", "baggins"]).optional(), trait: z.string().min(1).optional() }),
       z.strictObject({ kind: z.literal("enemy"), trait: z.string().min(1) }),
       // The enemy making the attack in progress ("Shadow: Attach this card to attacking enemy", 18018:A:2).
       z.strictObject({ kind: z.literal("attackingEnemy") }),
@@ -379,7 +381,8 @@ export const simpleVerbs = [
   verb("ShuffleSelfIntoEncounterDeck"),
   // The actor (or, with `who`, the first player) discards cards at random from their hand, `amount` (1 by default; read, so X works). The seed
   // picks them (141047:A:2, 141084:A:2).
-  z.strictObject({ verb: z.literal("DiscardRandomFromHand"), amount: positiveAmountSchema.optional(), who: z.enum(["firstPlayer", "eachSeat"]).optional(), ...when }),
+  // `setX`: the effect's X becomes the total printed cost of the cards discarded, 0 with none ("Snaga gets +X Threat ... where X is the discarded card's printed cost", 143066:A:2).
+  z.strictObject({ verb: z.literal("DiscardRandomFromHand"), amount: positiveAmountSchema.optional(), who: z.enum(["firstPlayer", "eachSeat"]).optional(), setX: z.literal(true).optional(), ...when }),
   // Setup: a card from the box joins the encounter deck. The deck is shuffled by the Setup step that says so.
   codeVerb("ShuffleIntoEncounterDeck"),
   // Campaign setup: the voluntary hero change costs no threat penalty on this scenario's card.

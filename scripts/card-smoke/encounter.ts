@@ -8,7 +8,7 @@ import { DATA_DIR } from "../data/paths.ts";
 import { describeError, duration, runScript, type Log } from "../log.ts";
 import { encounterCards, probeCard, probesOf, type CardResult } from "./encounter-cards.ts";
 import { GAMES, playGame, type GameSummary } from "./encounter-games.ts";
-import { encounterStart, encounterWorld, kept, type EncounterWorld } from "./encounter-world.ts";
+import { encounterStart, encounterWorld, kept, setupAnswered, type EncounterWorld } from "./encounter-world.ts";
 
 // A smoke test for one scenario's encounter side. Every encounter-side card the scenario deals is played once on a table made from the
 // scenario's own opening, and a few dozen seeded games are played with random legal intents (scripts/card-smoke/encounter-cards.ts,
@@ -39,7 +39,7 @@ export type EncounterSummary = { scenario: string; cards: CardResult[]; games: G
 
 /** The table the card probes run on: the scenario dealt to one seat, its first seat kept. */
 export function probeTable(world: EncounterWorld): ScenarioState {
-  return kept(encounterStart(world, 1, 1), world.contexts.strong);
+  return setupAnswered(kept(encounterStart(world, 1, 1), world.contexts.strong), world.contexts.strong);
 }
 
 /** Plays every encounter-side card of the scenario, and `games` seeded random games (none with 0). */

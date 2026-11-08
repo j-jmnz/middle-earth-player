@@ -267,6 +267,11 @@ export const pickSchema = z.strictObject({
   // Of the cards that match, only those with the highest Attack, as the table shows it ("the engaged Ship enemy with the highest Attack", 12131:A:1); every one of them when tied, and then the chooser decides.
   // Read by the sea family (src/rules/families/sea/ramming.ts).
   highestAttack: z.literal(true).optional(),
+  // The uruk family's filters (src/rules/families/uruk/captive.ts). `captives`: the Captives of The Uruk-hai, heroes held in play under To Isengard! or attached to an enemy and controlled by no player (143022:A:1). `only` offers just them;
+  // `also` adds them to the cards the filter would offer ("a hero" is any hero in play, a Captive included, 143016:A:3, 143027:A:1; user ruling, 2026-11-08); `held` offers just the ones the source enemy holds ("the attached Captive", 143024:A:2).
+  // `loggedCaptive`: a hero the Campaign Log names as a captive of the chooser's seat (143069:A:1, "choose each captive from the Campaign Log").
+  captives: z.enum(["only", "also", "held"]).optional(),
+  loggedCaptive: z.literal(true).optional(),
 });
 
 export type PickSpec = z.infer<typeof pickSchema>;

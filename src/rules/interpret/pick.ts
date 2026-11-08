@@ -32,6 +32,7 @@ import { chosenCopies, levelAmount } from "../families/aflame/values.ts";
 import { sidePickMatches } from "../families/grapple/values.ts";
 import { islandPool, outsideCells } from "../families/island/pick.ts";
 import { seatPickMatches } from "../families/wilderland/seat-pick.ts";
+import { captivesOf } from "../families/uruk/captive.ts";
 
 // What a filter is read against: who is choosing or counting, the effect's source, what it has picked, its X, and the
 // characters of the attack a Response answers. `counting` reads every card that matches, immune ones too: a count or a
@@ -66,7 +67,7 @@ function stagingFor(state: ScenarioState, spec: PickSpec, asking: number): reado
 }
 
 // The cards a filter starts from: its zone group and whose cards they are.
-function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceContext): string[] {
+function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceContext, sourceId: string | null): string[] {
   const seats = seatsOf(state, spec, asking);
   const raw: string[] = [];
   // The Island Map's filters start from its own cards (families/island/pick.ts).
@@ -79,6 +80,8 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
       .map((card) => card.id);
   }
   const from = spec.from ?? "play";
+  // The Captives of The Uruk-hai: only them (`only`, `held`), or beside the cards the filter offers (`also`, below) (families/uruk/captive.ts).
+  if (spec.captives === "only" || spec.captives === "held") return spec.captives === "held" ? (sourceId ? captivesOf(state, sourceId) : []) : captivesOf(state);
   // Only the cards the running effect looked at or discarded (families/deck/pick.ts).
   if (spec.looked) return lookedPool(state, spec, seats);
   if (from === "hand") for (const index of seats) raw.push(...(state.seats[index]?.hand ?? []));
@@ -133,6 +136,7 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
   } else {
     for (const index of seats) raw.push(...characters(state, index, ctx.cards));
   }
+  if (spec.captives === "also" && spec.control !== "you") raw.push(...captivesOf(state));
   return raw;
 }
 
@@ -291,7 +295,7 @@ export function pickCandidates(
   // Immunity is to player card effects: an encounter card's Pick may choose an immune card (mec109.immune-to-player-card-effects).
   // An ally with an encounter back is an encounter card and has encounter card effects (dcce.encounter-cards: the ship-objectives, the Modification attachments, Calaerion, Gavin, Send for Help). The Stormcaller Elite's objective allies have no encounter back (dcce.stormcaller-elite) and stay objectives.
   const playerEffect = !counting && isPlayerCardEffect(state, ctx.cards, sourceId);
-  const raw = spec.attachedTo ? attachedPool(state, spec.attachedTo, sourceId) : pool(state, spec, asking, ctx);
+  const raw = spec.attachedTo ? attachedPool(state, spec.attachedTo, sourceId) : pool(state, spec, asking, ctx, sourceId);
   const at: PickContext = { seat, sourceId, picked, ...(x != null ? { x } : {}), ...(participants ? { participants } : {}), counting, ...event };
   const found = raw.filter((id) => {
     const instance = state.cards[id];

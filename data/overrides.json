@@ -897,6 +897,26 @@
       },
       "reason": "Hall of Beorn gives the encounter side quest Face the Dragon no quest points (its Victory 10 is the only number it exports; DragnCards files the same 10 under questPoints for all eight). The scan prints a quest points box of 10 and Victory 10, so progress can be placed on it once it is the current quest (emce.side-quests-in-play).",
       "source": "scan 19073.A (hallofbeorn-resources Fire-in-the-Night/Face-the-Dragon.jpg, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "143069"
+      },
+      "set": {
+        "questPoints": 0
+      },
+      "reason": "Hall of Beorn prints the quest points of Follow the Orcs (stage side B) as X, which its export reads as no number. The scan prints X, the pursuit value (mec112.pursuit; the stage's own line \"X is the pursuit value\"), so the base is 0 and a constant record adds the pursuit value: progress can be placed on the stage and the stage is defeated when it holds X.",
+      "source": "scan 143069.B, sha256 24ae92a5126043d0deb85bd87dc6caa310017d57975d79b25bf7555af6ad69ff (data/printed/the-two-towers.json)"
+    },
+    {
+      "match": {
+        "code": "143070"
+      },
+      "set": {
+        "questPoints": 0
+      },
+      "reason": "Hall of Beorn prints the quest points of Rescue the Captives (stage side B) as X, which its export reads as no number. The scan prints X, the pursuit value (mec112.pursuit; the stage's own line \"X is the pursuit value\"), so the base is 0 and a constant record adds the pursuit value: progress can be placed on the stage and the stage is defeated when it holds X.",
+      "source": "scan 143070.B, sha256 3b6f4a3e56732a8de357d2ad0a2fd7aa3d4ced5880d80f4860708fe459b8f7f2 (data/printed/the-two-towers.json)"
     }
   ],
   "scenarioPiles": [
