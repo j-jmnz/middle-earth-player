@@ -1,6 +1,8 @@
 import type { CampaignData } from "../catalog/scenario-data.ts";
 import type { PrintedCard } from "../rules/core/printed.ts";
 
+import { sameTitle, type TitleBan } from "./saga.ts";
+
 // The loadout rules of a briefing: one deck and its heroes per seat. Pure. Each error names the card and the rule. In a saga
 // campaign (the Fellowship of the Ring) the Fellowship saga rules apply: a Ring-bearer from the player's own heroes, one
 // Fellowship-sphere hero, no second Frodo, no One Ring in a deck, a fourth hero only as the Ring-bearer. Outside a saga none of
@@ -41,8 +43,14 @@ export type LoadoutRule =
   | "ringInDeck"
   | "sameHero"
   | "bannedHero"
+  | "bannedTitle"
+  | "secondVersion"
   | "undiscoveredTreasure"
   | "treasureCopies";
+
+// What a scenario's saga start adds to the loadout rules: the ☺ hero it grants the first player in place of a Ring-bearer from their own heroes
+// (mec112.setting-up-the-game; ☺ Aragorn in scenarios 7 to 9), and the titles the players cannot use (src/campaign/saga.ts).
+export type SagaRules = { hero?: string | undefined; titleBans?: readonly TitleBan[] | undefined };
 
 export type LoadoutError = { rule: LoadoutRule; code: string; card: string; message: string };
 
@@ -56,8 +64,40 @@ function isRingBearer(card: PrintedCard): boolean {
   return isFellowship(card) && card.traits.includes("Ring-bearer");
 }
 
+// A scenario that grants ☺ Aragorn (mec112.setting-up-the-game): no Ring-bearer is asked for. Only one ☺ hero is in play, so no player hero is from the
+// Fellowship sphere; no other version of the granted hero is a starting hero or in a deck (mec112.fellowship-sphere-heroes); ☺ Aragorn does not count against
+// the hero limit (mec112.aragorn); heroes are unique (rr.unique-cards).
+type Cards = readonly (readonly (PrintedCard | null)[])[];
+
+function grantedHeroErrors(heroCards: Cards, deckCards: Cards, cards: ReadonlyMap<string, PrintedCard>, hero: string): LoadoutError[] {
+  const errors: LoadoutError[] = [];
+  const fail = (rule: LoadoutRule, card: PrintedCard, why: string) => errors.push({ rule, code: card.code, card: card.name, message: `${card.name} (${card.code}): ${why}` });
+  const granted = cards.get(hero);
+  const heroes = heroCards.flat();
+  const inDecks = deckCards.flat();
+  for (const card of heroes) {
+    if (card != null && card.code !== hero && isFellowship(card)) fail("twoFellowshipHeroes", card, "only one Fellowship-sphere hero may be in play, and this scenario grants one");
+  }
+  for (const card of [...heroes, ...inDecks]) {
+    if (card == null || card.code === hero) continue;
+    if (granted && card.name === granted.name) fail("secondVersion", card, `another ${granted.name} cannot be a starting hero or in the deck while the ☺ ${granted.name} is in the game`);
+    if (card.leavesPlayLoses) fail("ringInDeck", card, "this card is granted by setup and cannot be in a deck");
+  }
+  for (const seat of heroCards) {
+    for (const card of seat.filter((item): item is PrintedCard => item != null && item.code !== hero).slice(MOST_HEROES)) fail("tooManyHeroes", card, "a fourth hero is legal only when the extra hero is ☺ Aragorn");
+  }
+  const names = new Set<string>();
+  for (const card of heroes) {
+    if (card == null || card.type !== "hero") continue;
+    if (names.has(card.name) && card.name !== granted?.name) fail("sameHero", card, `only one ${card.name} can be in play, so no two heroes may share that title`);
+    names.add(card.name);
+  }
+  return errors;
+}
+
 // `discovered` is the treasures the Campaign Log records (emce.treasure): a deck may hold a treasure only when its code is listed, one copy by title, and a game without a log lists none.
-export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMap<string, PrintedCard>, saga: boolean, bans: readonly HeroBan[] = [], discovered: readonly string[] = []): LoadoutError[] {
+// `rules` is the scenario's saga start and title bans (SagaRules).
+export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMap<string, PrintedCard>, saga: boolean, bans: readonly HeroBan[] = [], discovered: readonly string[] = [], rules: SagaRules = {}): LoadoutError[] {
   const errors: LoadoutError[] = [];
   const fail = (rule: LoadoutRule, card: PrintedCard, why: string) =>
     errors.push({ rule, code: card.code, card: card.name, message: `${card.name} (${card.code}): ${why}` });
@@ -87,6 +127,13 @@ export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMa
     if (card != null && ban != null) fail("bannedHero", card, `${ban.name} cannot be used in this scenario of the campaign (${ban.rule})`);
   }
 
+  // A title the box refuses (mec112.saruman-grima-smeagol): a hero or an ally, or any card for Frodo Baggins in the scenarios that grant ☺ Aragorn.
+  for (const ban of rules.titleBans ?? []) {
+    for (const card of [...heroCards.flat(), ...deckCards.flat()]) {
+      if (card != null && sameTitle(card.name, ban.title) && (ban.types == null || ban.types.includes(card.type))) fail("bannedTitle", card, `the players cannot use ${ban.types == null ? "any card" : "any ally or hero card"} titled ${ban.title} in this box (${ban.rule})`);
+    }
+  }
+
   // A treasure is a deck card only once the log records it (emce.treasure): "if that treasure card is marked in the campaign log". No more than 1 copy of a title.
   for (const deck of deckCards) {
     const seen = new Set<string>();
@@ -105,6 +152,12 @@ export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMa
     // The same hero twice is still refused (rr.unique-cards).
     refuseSameHero(heroCards.flat(), null);
     return errors;
+  }
+
+  if (rules.hero != null) {
+    // A Fellowship hero whose title the box already bans (Frodo Baggins in 7 to 9) is refused once, for the ban.
+    const banned = new Set(errors.filter((error) => error.rule === "bannedTitle").map((error) => error.code));
+    return [...errors, ...grantedHeroErrors(heroCards, deckCards, cards, rules.hero).filter((error) => !(error.rule === "twoFellowshipHeroes" && banned.has(error.code)))];
   }
 
   // The first seat needs a Ring-bearer of its own.

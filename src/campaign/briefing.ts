@@ -9,10 +9,12 @@ import { printedOf } from "../rules/core/printed.ts";
 import type { StartScenario } from "../rules/setup/setup.ts";
 
 import { checklist, type ChecklistPlan, type ChecklistStep, type Need } from "./checklist.ts";
-import { heroBansOf, validateLoadout, type HeroBan, type LoadoutSeat } from "./loadout.ts";
+import { heroBansOf, validateLoadout, type HeroBan, type LoadoutSeat, type SagaRules } from "./loadout.ts";
 import type { CampaignLog } from "./log.ts";
+import { twoTowersFacts } from "./log-two-towers.ts";
 import { isNightmarePlayable, isPlayable } from "./playable.ts";
 import { printedScenarioName } from "./printed-name.ts";
+import { sagaRoleOf, titleBansOf, type SagaRole } from "./saga.ts";
 import { buildStart, type PlayMode } from "./start.ts";
 import type { World } from "./world.ts";
 import { wilderlandFacts } from "./wilderland.ts";
@@ -58,22 +60,35 @@ export function isRingBearerCard(world: World, code: string): boolean {
   return card != null && card.type === "hero" && card.sphere === "fellowship" && card.traits.includes("Ring-bearer");
 }
 
-/** The Ring-bearer slot is asked for only in a saga campaign, when the first seat's deck brings none. */
+/** The saga hero the scenario gives the first player (src/campaign/saga.ts): the Ring-bearer slot, a granted ☺ hero, or none. */
+export function sagaRole(world: World): SagaRole {
+  return sagaRoleOf(world.campaign, world.scenario);
+}
+
+/** The Ring-bearer slot is asked for only where the scenario's saga hero is a Ring-bearer, when the first seat's deck brings none. */
 export function needsRingBearerSlot(world: World, seat: BriefingSeat | undefined): boolean {
-  return world.campaign.saga && !deckHasRingBearer(world, seat);
+  return sagaRole(world).kind === "ringBearer" && !deckHasRingBearer(world, seat);
 }
 
 export function deckHasRingBearer(world: World, seat: BriefingSeat | undefined): boolean {
   return (seat?.heroes ?? []).some((code) => isRingBearerCard(world, code));
 }
 
-// The loadout the saga rules and the checklist read: the saved deck's heroes, and the slot's hero in front when the
-// deck brings no Ring-bearer. A fallen hero is not special-cased here: step 2 of the checklist names it.
+// The loadout the saga rules and the checklist read: the saved deck's heroes, and in front of them the slot's hero when the
+// deck brings no Ring-bearer, or the ☺ hero the scenario grants the first player (☺ Aragorn: mec112.setting-up-the-game). A fallen hero is
+// not special-cased here: step 2 of the checklist names it.
 export function loadoutOf(input: LoadoutInput): LoadoutSeat[] {
+  const role = sagaRole(input.world);
   return input.seats.slice(0, input.seatCount).map((seat, index) => {
-    const slot = input.world.campaign.saga && index === 0 && input.ringBearer && !deckHasRingBearer(input.world, seat) ? [input.ringBearer] : [];
+    const slot = role.kind === "ringBearer" && index === 0 && input.ringBearer && !deckHasRingBearer(input.world, seat) ? [input.ringBearer] : role.kind === "hero" && index === 0 && !seat.heroes.includes(role.hero) ? [role.hero] : [];
     return { heroes: [...slot, ...seat.heroes], deck: seat.deck };
   });
+}
+
+// What the scenario's saga start adds to the loadout rules: the granted ☺ hero, and the titles the box refuses in standalone play too.
+function sagaRulesOf(world: World): SagaRules {
+  const role = sagaRole(world);
+  return { hero: role.kind === "hero" ? role.hero : undefined, titleBans: titleBansOf(world.campaign, world.scenario) };
 }
 
 const RULE_OF: Readonly<Record<string, string>> = {
@@ -81,6 +96,8 @@ const RULE_OF: Readonly<Record<string, string>> = {
   fellowshipOutsideSaga: "Fellowship heroes only in a saga",
   twoFellowshipHeroes: "Only one Fellowship-sphere hero may start",
   secondFrodo: "One version of Frodo",
+  secondVersion: "One version of the ☺ hero",
+  bannedTitle: "A title the box refuses",
   noRingBearer: "A Ring-bearer is required",
   tooManyHeroes: "Three heroes besides the Ring-bearer",
   ringInDeck: "The One Ring is not a deck card",
@@ -122,7 +139,7 @@ export function loadoutProblems(input: LoadoutInput, fallen: readonly string[], 
   });
   const loadout = loadoutOf(input);
   if (problems.length === 0) {
-    for (const error of validateLoadout(loadout, world.cards, world.campaign.saga, bans, discovered)) problems.push({ rule: RULE_OF[error.rule] ?? error.rule, message: error.message });
+    for (const error of validateLoadout(loadout, world.cards, world.campaign.saga, bans, discovered, sagaRulesOf(world))) problems.push({ rule: RULE_OF[error.rule] ?? error.rule, message: error.message });
   }
   return { problems, loadout };
 }
@@ -156,7 +173,8 @@ export function briefing(input: BriefingInput): Briefing {
   if (!plan.ok) {
     return { ...empty, needs: plan.needs, problems: plan.errors.map((message) => ({ rule: "Campaign Setup Checklist", message })) };
   }
-  const penaltyAdded = plan.threatModifier - log.threatPenalty;
+  // The +1 each player takes when a fallen Aragorn leaves the list (mec112.campaign-mode-aragorn) is not a hero change and needs no acceptance.
+  const penaltyAdded = plan.threatModifier - log.threatPenalty - plan.forcedPenalty;
   const unaccepted = penaltyAdded > 0 && input.acceptPenalty !== true;
   return {
     ...empty,
@@ -195,7 +213,7 @@ export function startFor(input: BriefingInput, seed: number): StartScenario {
     removedFromCaves: plan.removedFromCaves,
     ...(input.modeCard ? { modeCard: input.modeCard } : {}),
     // The log's structured facts (the pool as the checklist leaves it, with the cards the campaign card's Setup added); a Dream-chaser log adds its scalable cards' levels and its upgraded cards (buildStart adds the Hard/Expert card in play).
-    facts: { prisoner: input.log.prisoner, usedOnce: input.log.usedOnce, counters: input.log.counters, ...xpFacts(input.log), ...wilderlandFacts(plan.log, world.campaign.id) },
+    facts: { prisoner: input.log.prisoner, usedOnce: input.log.usedOnce, counters: input.log.counters, ...xpFacts(input.log), ...wilderlandFacts(plan.log, world.campaign.id), ...twoTowersFacts(plan.log, world.campaign.id, world.cards) },
   });
 }
 

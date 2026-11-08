@@ -35,6 +35,7 @@ import { corsairHolds } from "../families/sea/corsair.ts";
 import { stormcallerHolds } from "../families/stormcaller/values.ts";
 import { areaOf } from "../families/stormcaller/zone.ts";
 import { lastHideFailed, onStage, withTwin } from "../families/nightmare/guards.ts";
+import { campaignHolds } from "../families/campaign/picks.ts";
 
 // Who the condition is asked about. `returned` is the count the running effect has returned to staging.
 // `phase` overrides the current phase for an end-of-phase event, which fires after the phase has moved on.
@@ -129,6 +130,10 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return islandHolds(state, condition);
     case "handSize":
       return livingSeats(state).every((seat) => (state.seats[seat]?.hand.length ?? 0) <= condition.max);
+    case "pursuit":
+    case "picked":
+    case "anyHand":
+      return campaignHolds(state, condition);
     case "prisoner":
       return (prisonerHero(state) != null) === condition.is;
     case "inVictory":

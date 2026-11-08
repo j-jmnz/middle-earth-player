@@ -43,6 +43,8 @@ function instructionCodes(effects: readonly Effect[], card: string): string[] {
 export function worldCodes(campaign: CampaignData, scenario: ScenarioData, effects: readonly Effect[], extra: Iterable<string> = []): string[] {
   const codes = new Set<string>(campaign.prelude.map((card) => card.code));
   codes.add(scenario.campaignCard);
+  // The saga hero a scenario grants and what it attaches to the Ring-bearer (ScenarioData.sagaStart).
+  if (scenario.sagaStart) for (const code of "hero" in scenario.sagaStart ? [scenario.sagaStart.hero] : scenario.sagaStart.attached) codes.add(code);
   // A card with two catalog codes (the Stormcaller Elite) is dealt as its first side; the other side is in the world for the flip.
   for (const card of scenarioCards(scenario)) {
     codes.add(card.code);
@@ -63,7 +65,7 @@ export function worldCodes(campaign: CampaignData, scenario: ScenarioData, effec
 
 // The codes a log names: its heroes, its fallen heroes, the cards of its pool and the cards it takes in from another campaign.
 export function logCodes(log: CampaignLog): string[] {
-  return [...log.heroesBySeat.flat(), ...log.fallenHeroesBySeat.flat(), ...log.campaignPool.map((card) => card.code), ...log.carryIn.map((card) => card.code), ...log.campaignPool.flatMap((card) => (card.attachedTo ? [card.attachedTo] : [])), ...log.treasures, ...Object.keys(log.encounterPool)];
+  return [...log.heroesBySeat.flat(), ...log.fallenHeroesBySeat.flat(), ...log.campaignPool.map((card) => card.code), ...log.carryIn.map((card) => card.code), ...log.campaignPool.flatMap((card) => (card.attachedTo ? [card.attachedTo] : [])), ...log.treasures, ...Object.keys(log.encounterPool), ...Object.keys(log.blackGate)];
 }
 
 export function worldFrom(campaign: CampaignData, scenario: ScenarioData, effects: readonly Effect[], rows: readonly CatalogRow[]): World {

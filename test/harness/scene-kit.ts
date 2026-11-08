@@ -4,6 +4,7 @@ import type { EngineStep } from "../../src/rules/core/intents.ts";
 import { definePrinted, type PrintedCard } from "../../src/rules/core/printed.ts";
 import { byCode } from "../../src/rules/core/test-fixture.ts";
 import { spawn } from "../../src/rules/core/zones.ts";
+import { startReveal } from "../../src/rules/windows/frames.ts";
 import { settle } from "../../src/rules/engine/machine.ts";
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
 import { syncConstants } from "../../src/rules/interpret/constants.ts";
@@ -14,7 +15,8 @@ import { begin, send, type Run } from "./scene.ts";
 
 // Test helper. What the campaign scenarios' scenes (test/scenarios/<scenario-id>/scene.ts) share: card and zone lookups, the answers to
 // the choices an effect opens, a card's records resolved by themselves, an attack fought out with a Shadow card, the phase a table
-// opens on, the stand-in cards and the filler records. A scene keeps its codes, its layout and its table.
+// opens on, the stand-in cards and the filler records. A scene keeps its codes, its layout and its table; `tableFromLayout` (layout.ts, re-exported at the end)
+// builds a table for any scenario from data/ alone (test/harness/card-spec.ts runs its rows on it).
 
 export { begin as start, send, legalIntents, legalTargets };
 export type { Run };
@@ -61,6 +63,16 @@ export function finish(run: Run, ctx: ReduceContext, pick?: (state: ScenarioStat
     else break;
   }
   return current;
+}
+
+/**
+ * The card is put face down on top of the encounter deck and revealed by the first player (`startReveal`), the round stopped where it is, and the effects the reveal pushed are settled. The choices and looks they open
+ * are left to the caller (`finish`, or an auto-player). Shared by the card-spec `reveal` action and the encounter smoke (scripts/card-smoke/encounter-cards.ts).
+ */
+export function revealFromTop(state: ScenarioState, ctx: ReduceContext, code: string, steps: EngineStep[]): { state: ScenarioState; id: string } {
+  const spawned = spawn({ ...state, window: null, mode: "stopped" }, code, { zone: "encounterDeck" }, "down");
+  const top = { ...spawned.state, encounterDeck: [spawned.id, ...spawned.state.encounterDeck.filter((id) => id !== spawned.id)] };
+  return { state: settle(startReveal(top, top.firstPlayer, ctx, steps), ctx, steps), id: spawned.id };
 }
 
 /**
@@ -207,3 +219,7 @@ export function fightEnemy<T extends FightTable, L>(table: (layout: L) => T, sha
   }
   return { run, ctx: made.ctx, made, start: state, during };
 }
+
+// The table built from a layout is test/harness/layout.ts; it lives there so this file keeps to the scene's helpers.
+export { printedIn, tableFromLayout } from "./layout.ts";
+export type { Layout, LayoutTable, Placed, PileZone } from "./layout.ts";

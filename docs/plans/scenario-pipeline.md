@@ -92,11 +92,19 @@ Exit: the plan's checks (Verification), and `pnpm data:check` shows no differenc
 
 ## F. Faster feedback while authoring
 
-- `pnpm test:scenario <scenario-id>` runs the scenario's tests, its goldens, the coverage and record-route checks, the file-size check, the rule-id check, every choice-words test, card-smoke on its player codes, and the pool, family and manifest tests when those changed. `--words` runs only the words test.
+- `pnpm test:scenario <scenario-id>` runs the scenario's tests, its goldens, the coverage and record-route checks, the file-size check, the rule-id check, every choice-words test, card-smoke on its player codes, the encounter smoke, and the pool, family and manifest tests when those changed. `--words` runs only the words test.
 - `scripts/checks/file-size.test.ts` holds the size rule in `.claude/rules/code-standards.md`, Making a change, to every `.ts`/`.tsx` under `src`, `scripts` and `test` that is tracked or new and not ignored.
 - `scripts/data/rules.test.ts` reads every rule-id prefix in `data/rules/entries.json`, so a rule id cited in code, docs or tests that names no span fails.
 - `src/play/words/scenario-words.test.ts` reads the records of each playable and scaffolded scenario's dealt cards (`test/harness/record-walk.ts` walks them) and words each pick with `askWords` (`src/play/words/ask.ts`), the function the sheet calls, so the test reads the sentence the player reads. It fails on a bare "Choose a/an X." or a fallback sentence; an allowlist, keyed by record id and the instruction's path in the record, holds the cases left as they read, and fails on an entry no sentence needs. `WORDS_DUMP=<id>` prints every sentence.
 - A scenario whose lines are all owned may wait outside `PLAYABLE_SCENARIOS` while its `golden.test.ts` exists and its `golden.json` does not, so the coverage test does not block the goldens task.
+- `node --experimental-strip-types scripts/card-smoke/encounter.ts <scenario-id>... | --all` is the encounter-card smoke, and `pnpm test:scenario` runs it for every scenario on both tracks. On a table made from the scenario's own opening it:
+  - reveals each encounter-side card the scenario deals (its piles, its Nightmare deck, the other side of a two-code card);
+  - resolves each card's Shadow in an attack on a plain enemy, defended and undefended;
+  - travels to each location (the Island Map's, never in the staging area, are left out);
+  - runs each later quest card's Setup (the first one ran when the game was dealt);
+  - then plays seeded games (`GAMES`, `scripts/card-smoke/encounter-games.ts`) with random legal intents, completed the way the table's sheets would, over stand-in heroes of five profiles (`HERO_STATS`) and one or two seats.
+
+  It reports a throw, a refused intent, `state.failure`, a window that never closes, a game that does not end within its step and round caps, or one whose intents do not replay (`src/campaign/replay.ts`) to the same final state. It proves that the records run without breaking the game, not that they do what the card says. `scripts/card-smoke/encounter.test.ts` shows each report on a broken record; `--cards-only` and `--games-only` run one half, `--games=<n>` sets the count.
 - `effects:draft` and `card-smoke/run.ts` take codes separated by commas or spaces (`scripts/codes.ts`, `splitCodes`).
 - `scripts/checks/record-routes.test.ts` walks every record whose route the engine picks from a verb list: a quest card's Setup (`revealsPerPlayer`), a Shadow (`runsInFrame`) and a campaign card's Setup (the setup roles, the start and the checklist). It names a record that would be skipped or fail with "Unimplemented instruction".
 - `scripts/e2e/fixtures.ts <scenario-id>` writes only that scenario's fixture file; the earlier parts' won games come from their committed files.
@@ -119,7 +127,7 @@ Sections A to D and F are built (E waits for a new campaign or pack). What each 
   - `scripts/checks/record-routes.test.ts` fails on a record that no route runs, except a Shadow verb that runs outside a frame but pushes effects: that is first played in a golden.
 - **Goldens.** Filling the goldens is policy work on the kit. The goldens find engine bugs that unit tests miss.
   - A record that no golden reaches is found only by the reviewer. The fix pass then writes card tests for it.
-  - The card smoke runs only player cards, so an encounter card's Shadow or When Revealed effect is first played in a golden.
+  - The player-card smoke runs only player cards; the encounter smoke (`scripts/card-smoke/encounter.ts`, Faster feedback while authoring) plays each encounter card's When Revealed, Shadow, Travel and Setup before a golden does.
   - The box-wide check (`scripts/checks/box-dealt.test.ts`) finds a scenario's undealt card; the golden finds the rest.
 - **Fixtures and Maestro.** With real decks the seed finder finds a loss but no win, so the win flow cannot run (`docs/phases/STATUS.md`, Fixtures and Maestro).
 - **Review and fix.** The one fix pass is the largest single task of the phase. Its findings fall into classes the author can check before the review:
@@ -139,8 +147,7 @@ Ordered by what they save per scenario. A step that is built is deleted from thi
    - Each one gets a card test, or a golden reaches it.
    - Exit: the list is empty or each entry has a card test.
 3. **The draft marks the Setup sentences the piles already carry out.** Not built. For a campaign card's Setup, `effects:draft` marks each sentence that the scenario's `scenarioPiles` or the Setup parser already carries out, so the author writes no record for it. Exit: the draft of a scenario whose Setup the piles carry lists no such sentence as open.
-4. **An encounter-card smoke.** Not built. In a seeded scene, it reveals each encounter card the scenario deals, resolves its Shadow in an attack and travels to each location. It reports any throw, refusal or stall, as `scripts/card-smoke/run.ts` does for player cards. `pnpm test:scenario` runs it. Exit: it passes on every playable scenario.
-5. **The win finder** (section F). Not built. It is the only way the Dream-chaser win flows can run. Exit: a won fixture for each scenario in `docs/phases/STATUS.md`, Fixtures and Maestro.
+4. **The win finder** (section F). Not built. It is the only way the Dream-chaser win flows can run. Exit: a won fixture for each scenario in `docs/phases/STATUS.md`, Fixtures and Maestro.
 
 ## After each scenario phase
 

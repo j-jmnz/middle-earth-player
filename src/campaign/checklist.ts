@@ -6,6 +6,8 @@ import { printedOf, type PrintedCard } from "../rules/core/printed.ts";
 import { AFTER_HAND, type StartSeat } from "../rules/setup/setup.ts";
 
 import { poolCard, type CampaignLog, type PoolCard } from "./log.ts";
+import { fallenWithoutAragorn, freedBy, moveToGranted, sagaOf, sagaSeat } from "./checklist-saga.ts";
+import { burdenLeftOut, chooseCopyOrResources, removePoolCards, shuffleIntoEachDeck, type BurdenRemoval } from "./checklist-two-towers.ts";
 import { logConditionHolds, poolEncounterCopies, removeFromDeck, searchableCaves, searchableDeck } from "./wilderland.ts";
 import { xpRowOf } from "./xp.ts";
 
@@ -15,10 +17,11 @@ import { xpRowOf } from "./xp.ts";
 
 export type ChecklistStep = { n: number; rule: "rr.campaign-setup-checklist"; text: string; did: string[] };
 // The seat while the checklist fills it in; StartSeat is the read-only shape it hands to the start.
-type Working = { heroes: string[]; deck: string[]; attachments: { host: string; code: string }[]; hand: string[]; afterMulligan: string[]; chosen?: string[] };
+type Working = { heroes: string[]; deck: string[]; attachments: { host: string; code: string }[]; hand: string[]; afterMulligan: string[]; chosen?: string[]; threatPenalty?: number; resources?: number };
 
 // `note` says what the choice is when the options alone do not (a search of the encounter deck for cards to remove from the game).
-export type Need = { seat: number; options: readonly string[]; note?: string };
+// `words` gives an option that is not a card the words it is shown with (`resources`); a card option is shown as the card.
+export type Need = { seat: number; options: readonly string[]; note?: string; words?: Readonly<Record<string, string>> };
 
 export type ChecklistInput = {
   log: CampaignLog;
@@ -32,7 +35,7 @@ export type ChecklistInput = {
 };
 
 export type ChecklistPlan =
-  | { ok: true; steps: ChecklistStep[]; threatModifier: number; seats: StartSeat[]; poolEncounterCards: string[]; poolIntoPlay: string[]; removedFromEncounter: string[]; removedFromCaves: string[]; log: CampaignLog }
+  | { ok: true; steps: ChecklistStep[]; threatModifier: number; forcedPenalty: number; seats: StartSeat[]; poolEncounterCards: string[]; poolIntoPlay: string[]; removedFromEncounter: string[]; removedFromCaves: string[]; log: CampaignLog }
   | { ok: false; errors: string[]; needs: Need | null };
 
 const TEXT: Readonly<Record<number, string>> = {
@@ -51,7 +54,7 @@ const TEXT: Readonly<Record<number, string>> = {
 type Dealing = { did: string[]; errors: string[]; needs: Need | null };
 // What a verb works on: the seats, the pool, the answers still unused and the names.
 // `deck` is the encounter deck a Setup search looks through as it stands (the campaign card's own shuffles so far, and the pool's encounter cards), `removed` the codes searched out of it; `caves` and `removedCaves` are the Caves deck's.
-type Table = { input: ChecklistInput; seats: Working[]; pool: PoolCard[]; fresh: Set<PoolCard>; answers: string[]; name: (code: string) => string; out: Dealing; deck: string[]; removed: string[]; caves: string[]; removedCaves: string[] };
+type Table = { input: ChecklistInput; seats: Working[]; pool: PoolCard[]; fresh: Set<PoolCard>; answers: string[]; name: (code: string) => string; out: Dealing; deck: string[]; removed: string[]; caves: string[]; removedCaves: string[]; burdens: BurdenRemoval[] };
 
 // The seat a pool card is dealt to: the seat it was recorded for, or the last seat when the game has fewer.
 function poolSeat(card: PoolCard, seatCount: number): number {
@@ -59,10 +62,10 @@ function poolSeat(card: PoolCard, seatCount: number): number {
 }
 
 // The next answer for `seat`, if it is one of `legal`. With none left the step needs one; a wrong one is an error.
-function takeAnswer(table: Table, legal: readonly string[], seat: number, note?: string): string | null {
+function takeAnswer(table: Table, legal: readonly string[], seat: number, note?: string, words?: Readonly<Record<string, string>>): string | null {
   const answer = table.answers.shift();
   if (answer == null) {
-    table.out.needs ??= { seat, options: legal, ...(note ? { note } : {}) };
+    table.out.needs ??= { seat, options: legal, ...(note ? { note } : {}), ...(words ? { words } : {}) };
     return null;
   }
   if (!legal.includes(answer)) {
@@ -197,8 +200,8 @@ function chooseCards(table: Table, instruction: Extract<Instruction, { verb: "Ch
 }
 
 // Step 6: the campaign card's Setup instructions that deal a card to a player, in the order the card lists them.
-function campaignSetupSteps(campaignSetup: readonly Instruction[], input: ChecklistInput, seats: Working[], pool: PoolCard[], fresh: Set<PoolCard>, name: (code: string) => string): Dealing & { removed: string[]; removedCaves: string[] } {
-  const table: Table = { input, seats, pool, fresh, answers: [...(input.choices ?? [])], name, out: { did: [], errors: [], needs: null }, deck: searchableDeck(input.scenario, input.difficulty, input.seats.length, [...encounterDeal(pool, input.effects, () => false).map((card) => card.code), ...poolEncounterCopies(input.log.encounterPool)]), removed: [], caves: searchableCaves(input.scenario, input.difficulty), removedCaves: [] };
+function campaignSetupSteps(campaignSetup: readonly Instruction[], input: ChecklistInput, seats: Working[], pool: PoolCard[], fresh: Set<PoolCard>, name: (code: string) => string): Dealing & { removed: string[]; removedCaves: string[]; leftOut: (card: PoolCard) => boolean } {
+  const table: Table = { input, seats, pool, fresh, answers: [...(input.choices ?? [])], name, out: { did: [], errors: [], needs: null }, deck: searchableDeck(input.scenario, input.difficulty, input.seats.length, [...encounterDeal(pool, input.effects, () => false).map((card) => card.code), ...poolEncounterCopies(input.log.encounterPool)]), removed: [], caves: searchableCaves(input.scenario, input.difficulty), removedCaves: [], burdens: [] };
   for (const instruction of campaignSetup) {
     // A line that shuffles a card into the encounter deck puts it where the searches after it look (the Setup lines run in print order).
     if (instruction.verb === "ShuffleIntoEncounterDeck" && logConditionHolds(instruction.when, input.log)) table.deck.push(instruction.code);
@@ -210,8 +213,14 @@ function campaignSetupSteps(campaignSetup: readonly Instruction[], input: Checkl
     else if (instruction.verb === "RemoveFromCavesIfLogged") searchCaves(table, instruction);
     else if (instruction.verb === "SearchBoonAllyToHand") searchBoonAlly(table);
     else if (instruction.verb === "SearchBoonOrTreasureToHand") searchBoonOrTreasure(table);
+    else if (instruction.verb === "RemovePoolCards") table.out.did.push(...removePoolCards(table.pool, table.seats, instruction).map((code) => `${table.name(code)} is removed from the Campaign Pool.`));
+    else if (instruction.verb === "RemoveBurdenSets") table.burdens.push({ sets: instruction.sets, playerDecks: instruction.playerDecks === true });
+    else if (instruction.verb === "ShuffleIntoEachDeck") {
+      shuffleIntoEachDeck(table.seats, instruction);
+      table.out.did.push(`Each player shuffles a copy of ${table.name(instruction.code)} into their deck.`);
+    } else if (instruction.verb === "ChooseCopyOrResources") table.out.did.push(...chooseCopyOrResources(table.seats, instruction, (legal, seat, ask) => takeAnswer(table, legal, seat, ask.note, ask.words), table.name));
   }
-  return { ...table.out, removed: table.removed, removedCaves: table.removedCaves };
+  return { ...table.out, removed: table.removed, removedCaves: table.removedCaves, leftOut: (card) => burdenLeftOut(table.burdens, card) };
 }
 
 // The pool card's own campaignSetup record puts it into play ("Put Mendor into play at the start of each scenario").
@@ -234,38 +243,55 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
   const seatCount = input.seats.length;
   const campaignSetup = recordInstructions(input.effects, scenario.campaignCard, "campaignSetup");
   const waived = campaignSetup.some((instruction) => instruction.verb === "WaiveThreatPenalty");
-  const fallen = new Set(log.fallenHeroesBySeat.flat());
 
   // The pool this checklist works on. A new save's first checklist takes in the cards a finished campaign carried over.
-  const pool: PoolCard[] = [...log.campaignPool, ...log.carryIn];
+  let pool: PoolCard[] = [...log.campaignPool, ...log.carryIn];
   // Entries the campaign card's own Setup adds (AddToPool): recorded, but not dealt again by steps 7 and 8.
   const fresh = new Set<PoolCard>();
+
+  // The saga hero of a Two Towers scenario (src/campaign/checklist-saga.ts): ☺ Aragorn is granted, not listed in the log, and a logged Aragorn or Fellowship hero is
+  // handled by mec112.campaign-mode-aragorn. Every other scenario reads as before (`saga.active` false).
+  const saga = sagaOf(scenario, cards);
+  const { fallenLists, forcedPenalty } = fallenWithoutAragorn(saga, log.fallenHeroesBySeat);
+  const fallen = new Set(fallenLists.flat());
 
   // 1 and 2: the heroes the players bring against the log, and the fallen list.
   const did1: string[] = log.carryIn.map((card) => `${name(card.code)} is carried over from the last campaign into the Campaign Pool.`);
   let changed = 0;
+  const forgotten = new Set<string>();
+  // What each seat plays (the granted hero included) and what its log lists afterwards (the granted hero never; the Fellowship heroes the saga keeps).
+  const dealtBySeat: string[][] = [];
   const heroesBySeat = input.seats.map((seat, index) => {
+    const dealt = [...seat.heroes];
+    dealtBySeat.push(dealt);
     const logged = log.heroesBySeat[index] ?? [];
+    const playing = dealt.filter((code) => code !== saga.granted);
     if (logged.length === 0) {
-      did1.push(`Seat ${index + 1} lists ${seat.heroes.map(name).join(", ")} in the Campaign Log.`);
-      return [...seat.heroes];
+      did1.push(`Seat ${index + 1} lists ${playing.map(name).join(", ")} in the Campaign Log.`);
+      return playing;
     }
-    const added = seat.heroes.filter((code) => !logged.includes(code));
-    const dropped = logged.filter((code) => !seat.heroes.includes(code));
+    // The Aragorn rule: that player loses control of the logged version, and the hero who replaces him costs no +1.
+    const { lost, keptSaga, loggedPlayers, playersNow } = sagaSeat(saga, logged, playing);
+    for (const code of lost) forgotten.add(code);
+    const added = playersNow.filter((code) => !loggedPlayers.includes(code));
+    const dropped = loggedPlayers.filter((code) => !playersNow.includes(code));
     // The same heroes every scenario, with two exceptions (ltp.fellowship-of-heroes): a fallen hero may be replaced, and
     // a player may trade 1 hero for a new one. A hero still alive is never left out without that trade.
     const droppedFallen = dropped.filter((code) => fallen.has(code)).length;
     const droppedAlive = dropped.filter((code) => !fallen.has(code));
-    const trades = Math.max(0, added.length - droppedFallen);
+    const freed = freedBy(lost, added);
+    const trades = Math.max(0, added.length - droppedFallen - freed);
     if (droppedAlive.length > trades) errors.push(`Seat ${index + 1}: ${droppedAlive.map(name).join(", ")} is listed in the Campaign Log and must start unless traded for a new hero`);
     if (trades > 1) errors.push(`Seat ${index + 1}: a player may trade only 1 hero between scenarios`);
     for (const code of dropped) {
       const carrying = log.campaignPool.find((card) => card.attachedTo === code && printedOf(cards, card.code).keywords.permanent);
       if (carrying && !fallen.has(code)) errors.push(`${name(code)} carries ${name(carrying.code)}, a Permanent card that must be attached to that hero at the start`);
     }
-    changed += added.length;
-    if (added.length > 0) did1.push(`Seat ${index + 1} changes ${dropped.map(name).join(", ") || "nothing"} for ${added.map(name).join(", ")}.`);
-    return [...seat.heroes];
+    changed += added.length - freed;
+    if (lost.length > 0) did1.push(`Seat ${index + 1} loses control of ${lost.map(name).join(", ")}: ☺ ${name(saga.granted ?? "")} takes ${lost.length === 1 ? "his" : "their"} place${added.length > 0 ? `, and ${added.map(name).join(", ")} replaces ${lost.length === 1 ? "him" : "them"} without the +1 penalty` : ""}.`);
+    if (added.length > freed) did1.push(`Seat ${index + 1} changes ${dropped.map(name).join(", ") || "nothing"} for ${added.map(name).join(", ")}.`);
+    // The log keeps the Fellowship heroes it holds (the Ring-bearer Frodo while ☺ Aragorn is granted), and lists the new line-up after them.
+    return saga.active ? [...keptSaga.filter((code) => !playing.includes(code)), ...playing] : playing;
   });
   note(1, did1.length > 0 ? did1 : ["Every player is using the heroes listed in the log."]);
   const unfit = input.seats.flatMap((seat, index) => seat.heroes.filter((code) => fallen.has(code)).map((code) => `Seat ${index + 1}: ${name(code)} is a fallen hero and cannot start`));
@@ -274,18 +300,29 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
 
   // 3 and 4: the threat penalty.
   const added = waived ? 0 : changed;
-  const threatPenalty = log.threatPenalty + added;
-  note(3, changed === 0 ? ["No hero was changed."] : waived ? [`${changed} hero change(s) cost nothing: the campaign card waives the +1 penalty.`] : [`${changed} hero change(s) add ${changed} to the threat penalty.`]);
-  note(4, [`Each player's starting threat is the combined threat cost of their heroes plus ${threatPenalty}.`]);
+  const threatPenalty = log.threatPenalty + added + forcedPenalty;
+  note(3, [...(changed === 0 ? ["No hero was changed."] : waived ? [`${changed} hero change(s) cost nothing: the campaign card waives the +1 penalty.`] : [`${changed} hero change(s) add ${changed} to the threat penalty.`]), ...(forcedPenalty > 0 ? ["Aragorn leaves the list of fallen heroes: each player takes a permanent +1 threat penalty (mec112.campaign-mode-aragorn)."] : [])]);
+  const extra = Array.from({ length: seatCount }, (_, index) => log.threatPenaltyBySeat[index] ?? 0);
+  note(4, [`Each player's starting threat is the combined threat cost of their heroes plus ${threatPenalty}.`, ...extra.flatMap((more, index) => (more > 0 ? [`Seat ${index + 1} takes a permanent +${more} starting threat penalty of its own, so its starting threat is plus ${threatPenalty + more}.`] : []))]);
 
-  const seats: Working[] = input.seats.map((seat, index) => ({ heroes: [...(heroesBySeat[index] ?? [])], deck: [...seat.deck], attachments: [], hand: [], afterMulligan: [] }));
+  const seats: Working[] = input.seats.map((seat, index) => ({ heroes: [...(dealtBySeat[index] ?? [])], deck: [...seat.deck], attachments: [], hand: [], afterMulligan: [], ...((extra[index] ?? 0) > 0 ? { threatPenalty: extra[index] } : {}) }));
 
-  // 5: Permanent boons and burdens go on their recorded hero.
+  // The cards with the Permanent keyword on a logged Aragorn move to ☺ Aragorn (mec112.campaign-mode-aragorn).
+  pool = moveToGranted(pool, forgotten, saga);
+
+  // 5: Permanent boons and burdens go on their recorded hero. A hero of the saga who is not starting this scenario (the Ring-bearer Frodo while ☺ Aragorn is granted, ☺ Aragorn
+  // in the Ring-bearer scenarios) keeps the card in the pool.
+  // A card the campaign card's Setup removes from the pool (step 6) is not attached: step 6 says it is removed.
+  const removedAtSetup = new Set(campaignSetup.flatMap((instruction) => (instruction.verb === "RemovePoolCards" ? instruction.codes : [])));
   const did5: string[] = [];
   for (const card of pool) {
-    if (card.attachedTo == null) continue;
+    if (card.attachedTo == null || removedAtSetup.has(card.code)) continue;
     const seat = seats.findIndex((candidate) => candidate.heroes.includes(card.attachedTo ?? ""));
     if (seat < 0) {
+      if (saga.active && saga.ofSaga(card.attachedTo)) {
+        did5.push(`${name(card.code)} stays with ${name(card.attachedTo)}, who is not in this scenario.`);
+        continue;
+      }
       errors.push(`${name(card.code)} is attached to ${name(card.attachedTo)}, who is not one of the heroes starting`);
       continue;
     }
@@ -310,10 +347,15 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
   const did8: string[] = [];
   const poolEncounterCards: string[] = [];
   const poolIntoPlay: string[] = [];
-  const toDeck = new Set(encounterDeal(pool, input.effects, (card) => fresh.has(card) || dealt(card)));
+  const toDeck = new Set(encounterDeal(pool, input.effects, (card) => fresh.has(card) || dealt(card) || six.leftOut(card)));
   for (const card of pool) {
     if (card.attachedTo != null || fresh.has(card)) continue;
     if (dealt(card)) continue;
+    // A burden of a set the campaign card's Setup removes stays in the pool and is not dealt (RemoveBurdenSets).
+    if (six.leftOut(card)) {
+      (card.back === "player" || card.afterHand ? did7 : did8).push(`${name(card.code)} stays in the pool: its burden set is removed from the decks this scenario.`);
+      continue;
+    }
     if (toDeck.has(card)) {
       poolEncounterCards.push(card.code);
       did8.push(`${name(card.code)} is shuffled into the encounter deck.`);
@@ -349,11 +391,12 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
     ok: true,
     steps,
     threatModifier: threatPenalty,
+    forcedPenalty,
     seats,
     poolEncounterCards,
     poolIntoPlay,
     removedFromEncounter: six.removed,
     removedFromCaves: six.removedCaves,
-    log: { ...log, heroesBySeat, threatPenalty, campaignPool: pool, carryIn: [] },
+    log: { ...log, heroesBySeat, fallenHeroesBySeat: fallenLists, threatPenalty, campaignPool: pool, carryIn: [] },
   };
 }

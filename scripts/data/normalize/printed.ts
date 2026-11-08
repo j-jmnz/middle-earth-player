@@ -1,6 +1,6 @@
 import type { Card } from "../../../src/catalog/card-facts.ts";
 import type { PrintedKeywords } from "../../../src/catalog/boundary.ts";
-import { PRODUCTS } from "../campaign-defs.ts";
+import { PRODUCTS, REPRINTS, REPRINT_PACKS } from "../campaign-defs.ts";
 import { isKeywordLine, parseKeywordTokens } from "./keywords.ts";
 import { timingLabels } from "./timings.ts";
 import type { Ledger, LedgerEntry } from "../printed/ledger.ts";
@@ -33,6 +33,8 @@ export type Difference = { key: string; ledger: string[]; source: string[] };
 // effects on the ships and the Thing in the Depths), so for these cards the keyword sentences that open a line of the scan-read ledger are
 // keywords the card has, and the Sailing success symbols the ledger counts are kept with them (dcce.sailing-tests).
 export const LEDGER_KEYWORD_PACKS: ReadonlySet<string> = new Set(PRODUCTS.filter((product) => product.ledgerKeywords).flatMap((product) => [product.name, ...product.packs]));
+
+const KEEPS_RINGSDB: ReadonlySet<string> = new Set(REPRINTS.filter((reprint) => reprint.keepsRingsDb).map((reprint) => reprint.pack));
 
 function ledgerKeywords(entry: LedgerEntry): PrintedKeywords {
   const sentences: string[] = [];
@@ -77,9 +79,10 @@ export function applyPrinted(cards: readonly Card[], ledger: Ledger): { cards: C
     };
     if (a) compare(keyOf(card.code, "A"), a.lines, sourceFront);
     if (b) compare(keyOf(card.code, "B"), b.lines, sourceBack);
-    // A card whose text came from Hall of Beorn takes the ledger text: the box cards (the Fellowship's MEC109 printing, and
+    // A card whose text came from Hall of Beorn takes the ledger text: the box cards (a saga box's reprint (MEC109, MEC112), and
     // every campaign, quest, encounter, boon and burden card). A deck-legal player card keeps its RingsDB text.
-    if (card.deckLegal && !card.printings.some((printing) => printing.pack === "TFotR")) return card;
+    // A reprint that keepsRingsDb (ReprintDef) leaves its deck-legal player cards as RingsDB has them.
+    if (card.deckLegal && !card.printings.some((printing) => REPRINT_PACKS.has(printing.pack) && !KEEPS_RINGSDB.has(printing.pack))) return card;
     const backText = b ? (b.lines.length > 0 ? b.lines.join("\n") : null) : (card.back?.text ?? null);
     // The stats an override read from the scan of the Upgraded side stay on it (dcce.scalable-upgradable), and the Victory of the Stormcaller's Campaign Mode only side (dcce.campaign-mode).
     const back = b || card.back ? { name: card.back?.name ?? null, text: backText, questPoints: card.back?.questPoints ?? null, stage: card.back?.stage ?? null, ...pickBackStats(card.back) } : null;

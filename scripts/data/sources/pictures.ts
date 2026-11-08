@@ -5,11 +5,12 @@ import path from "node:path";
 
 import Database from "better-sqlite3";
 
+import { REPRINTS } from "../campaign-defs.ts";
 import { loadCards } from "../load-cards.ts";
 import { RINGSDB_ORIGIN } from "../../../src/screens/images/policy.ts";
 import type { Card } from "../../../src/catalog/card-facts.ts";
 import { PDF_CACHE_DIR, PICTURE_CACHE_DIR, RAW_DIR } from "../paths.ts";
-import { MEC109_CHANGED, scanTargets, type ScanSide } from "../printed/scope.ts";
+import { MEC109_CHANGED, MEC112_CHANGED, scanTargets, type ScanSide } from "../printed/scope.ts";
 import { bytes, createLog, type Log } from "../../log.ts";
 import { combinedPin, fetchBytes, sha256, type SourceFile, type SourceRecord } from "./fetch.ts";
 import { driveFileUrl, JVZIJP_FOLDER, JVZIJP_SITE, jvzijpFile, jvzijpPictures, listDriveTree } from "./jvzijp.ts";
@@ -77,10 +78,10 @@ export const PDF_PAGES: readonly { code: string; side: ScanSide; pdf: string; pa
 ];
 
 // cardgame.tools files a card by product and number; a printing names its RingsDB pack and number. A pack is the product of
-// the same name, except these, which cardgame.tools names differently or RingsDB does not list. The Fellowship box (MEC109)
-// has no pictures of its own there: it reuses The Black Riders' and The Road Darkens' scans, so the cards whose MEC109
+// the same name, except these, which cardgame.tools names differently or RingsDB does not list. The saga boxes (MEC109, MEC112)
+// may have no pictures of their own there: they reuse the twin packs' scans, so the cards whose MEC109 or MEC112
 // wording differs keep their scan. Messenger of the King Allies is not on cardgame.tools.
-const PRODUCT_OF_PACK: Readonly<Record<string, string>> = { OHaUH: "MEC16", OtD: "MEC24", TFotR: "MEC109" };
+const PRODUCT_OF_PACK: Readonly<Record<string, string>> = { OHaUH: "MEC16", OtD: "MEC24", ...Object.fromEntries(REPRINTS.map((reprint) => [reprint.pack, reprint.product])) };
 
 // cardgame.tools files Mount Gundabad's seven Exploring Gundabad stage 2s under one number (135, fronts 135a to 135g) and their backs under the
 // numbers 136 to 142; the printings number the stage 2s 135 and 137 to 142. A printing filed under another number names it here.
@@ -216,9 +217,9 @@ export async function syncPictures(log: Log = createLog("pictures")): Promise<So
     const card = cards.get(target.code);
     if (!card) throw new Error(`${key} is not in data/cards`);
     const page = PDF_PAGES.find((entry) => entry.code === target.code && entry.side === target.side);
-    // Each source in order of preference, as a fetch or a render. The cards MEC109 rewords have no picture of that printing.
+    // Each source in order of preference, as a fetch or a render. The cards MEC109 and MEC112 reword have no picture of that printing.
     const sources: { from: keyof typeof from; url: string; load: () => Promise<Uint8Array> }[] = [];
-    if (!MEC109_CHANGED.includes(target.code)) {
+    if (!MEC109_CHANGED.includes(target.code) && !MEC112_CHANGED.includes(target.code)) {
       const drivePicture = jvzijpFile(jvzijp, card, target.side, page ? (page.pdf === CORE_CAMPAIGN_PDF ? page.page : -1) : null);
       if (drivePicture) {
         const url = driveFileUrl(drivePicture.id);

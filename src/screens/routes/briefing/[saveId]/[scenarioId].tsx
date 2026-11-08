@@ -254,7 +254,7 @@ export default function Briefing() {
             </Label>
           ) : null}
           {choices.length > 0 ? <TextButton label="Undo last choice" testID="choice-undo" onPress={() => setChoices((current) => current.slice(0, -1))} /> : null}
-          <NeedChoices options={result.needs.options} nameOf={nameOf} printedText={printedText} onChoose={(option) => setChoices((current) => [...current, option])} />
+          <NeedChoices options={result.needs.options} {...(result.needs.words ? { words: result.needs.words } : {})} nameOf={nameOf} printedText={printedText} onChoose={(option) => setChoices((current) => [...current, option])} />
         </View>
       ) : null}
 

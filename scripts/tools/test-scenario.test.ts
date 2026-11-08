@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { changedFamilyTests, hasReaderGames, registryTitle, scenarioTests, selectTests } from "./test-scenario.ts";
+import { changedFamilyTests, hasReaderGames, quickParts, registryTitle, scenarioTests, selectTests, smokeRuns } from "./test-scenario.ts";
 
 // pnpm test:scenario <id>: the selection is a pure function of the id, the changed paths and the tree of test files.
 const TREE = [
@@ -130,5 +130,55 @@ describe("the reader parity check (src/play/reader-play.test.ts)", () => {
     expect(hasReaderGames("the-oath", registry)).toBe(true);
     expect(hasReaderGames("the-next", registry)).toBe(false);
     expect(hasReaderGames("the-oat", registry)).toBe(false);
+  });
+});
+
+describe("the card smokes (smokeRuns)", () => {
+  it("runs the encounter smoke for every scenario, with or without player cards", () => {
+    const withCards = smokeRuns("the-oath", ["141001", "141002"]);
+    expect(withCards.map((run) => run.name)).toEqual(["smoke", "encounter"]);
+    expect(withCards[0]?.args.slice(-2)).toEqual(["141001", "141002"]);
+    const without = smokeRuns("the-oath", []);
+    expect(without.map((run) => run.name)).toEqual(["smoke", "encounter"]);
+    // The player-card smoke is skipped: no arguments to run.
+    expect(without[0]?.args).toEqual([]);
+    expect(without[1]?.args.slice(-2)).toEqual(["scripts/card-smoke/encounter.ts", "the-oath"]);
+  });
+});
+
+describe("quickParts (--quick)", () => {
+  const parts = [
+    { name: "tests", files: ["src/campaign/scenarios/the-oath/golden.test.ts", "src/campaign/scenarios/the-oath/quest.test.ts"] },
+    { name: "goldens", files: ["src/campaign/causes.test.ts", "src/campaign/replay.test.ts"], filter: "The Oath" },
+    { name: "coverage", files: ["scripts/checks/effect-coverage.test.ts"] },
+    { name: "families", files: [] as string[], note: "no pool, family or manifest file changed" },
+    { name: "reader", files: ["src/play/reader-play.test.ts"] },
+  ];
+
+  it("is the same parts without --quick", () => {
+    expect(quickParts(parts, "the-oath", false)).toEqual(parts);
+  });
+
+  it("skips the registry-wide goldens, the reader check and the scenario's own golden test, and says so", () => {
+    const quick = quickParts(parts, "the-oath", true);
+    const by = (name: string) => quick.find((part) => part.name === name);
+    expect(by("goldens")).toMatchObject({ files: [], note: "skipped by --quick" });
+    expect(by("reader")).toMatchObject({ files: [], note: "skipped by --quick" });
+    expect(by("tests")?.files).toEqual(["src/campaign/scenarios/the-oath/quest.test.ts"]);
+    expect(by("tests")?.note).toContain("--quick");
+  });
+
+  it("skips the goldens a scenario's tests part reads directly: a-shadow-of-the-past's replay and causes tests", () => {
+    const direct = [{ name: "tests", files: ["src/campaign/causes.test.ts", "src/campaign/replay.test.ts", "src/campaign/scenarios/a-shadow-of-the-past/quest.test.ts"] }];
+    expect(quickParts(direct, "a-shadow-of-the-past", true)[0]?.files).toEqual(["src/campaign/scenarios/a-shadow-of-the-past/quest.test.ts"]);
+    // Another scenario's tests part keeps them: they are its tests, not goldens it skips.
+    expect(quickParts(direct, "the-oath", true)[0]?.files).toEqual(direct[0]!.files);
+  });
+
+  it("keeps the coverage and family parts, and another scenario's golden test", () => {
+    const quick = quickParts(parts, "the-oath-extra", true);
+    expect(quick.find((part) => part.name === "coverage")).toEqual(parts[2]);
+    expect(quick.find((part) => part.name === "families")).toEqual(parts[3]);
+    expect(quick.find((part) => part.name === "tests")).toEqual(parts[0]);
   });
 });

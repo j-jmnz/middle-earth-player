@@ -2,11 +2,11 @@ import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import type { Card } from "../../../src/catalog/card-facts.ts";
-import { PRODUCT_PACKS, PRODUCTS } from "../campaign-defs.ts";
+import { PRODUCT_PACKS, PRODUCTS, REPRINT_PACKS, REPRINTS } from "../campaign-defs.ts";
 
 import { loadCards } from "../load-cards.ts";
 import { dealtCodes, loadCampaign, loadCampaigns, loadScenarios } from "../load-scenarios.ts";
-import { RAW_DIR } from "../paths.ts";
+import { DATA_DIR, RAW_DIR } from "../paths.ts";
 import { isNightmareCard, NIGHTMARE_DECKS, NIGHTMARE_PACK, nightmareDeckOfCode } from "../nightmare-defs.ts";
 import { deckFiles, nightmareFiles } from "../sources/nightmare.ts";
 import { driveFileUrl, type DriveFile } from "../sources/jvzijp.ts";
@@ -17,7 +17,7 @@ import { titleKey } from "../normalize/names.ts";
 // The packs the Campaign Expansions' cards are printed in (ProductDef.campaignExpansion, scripts/data/campaign-defs.ts).
 const CAMPAIGN_EXPANSION_PACKS: ReadonlySet<string> = new Set(PRODUCTS.filter((product) => product.campaignExpansion).flatMap((product) => product.packs));
 
-// The cards whose printed text the ledger holds: everything every built scenario deals (the six of the Fellowship box, the
+// The cards whose printed text the ledger holds: everything every built scenario deals (the six of the Fellowship box, the six of The Two Towers, the
 // three Revised Core scenarios, The Oath and The Caves of Nibin-Dûm), on every difficulty (the Nightmare decks of the nine that
 // have one, read from the Nightmare proxies' pictures), The One Ring, the campaign cards, the boons and
 // burdens of each box, and both starter lists. The player's requests add cards of their own decks.
@@ -27,6 +27,11 @@ export type ScanTarget = { code: string; side: ScanSide; printing: string; urls:
 // Cards the MEC109 printing words differently from the 2013 and 2014 printings that RingsDB carries (phase 8b found nine).
 // Burdens and the Phial belong to later scenarios, but their printed text is settled here from the MEC109 scan.
 export const MEC109_CHANGED = ["141078", "141080", "141081", "141082", "141083", "141084", "142015", "142085", "142086"];
+
+// Cards the 2023 MEC112 printing words differently from the 2015 Treason of Saruman and Land of Shadow printings it reprints. Hall of Beorn's TTwT front text, keywords,
+// stats, shadow and quantity equal the twins' for all 156 pairs, and no pinned scan shows the 2023 wording (the ledger's printing is ToS or LoS), so a MEC112 rewording
+// cannot be found from these scans: the list stays empty until a scan of the MEC112 cards is read.
+export const MEC112_CHANGED: readonly string[] = [];
 
 // Quest cards whose Hall of Beorn text has a known error the ledger corrects (typos, a duplicated line). They belong
 // to scenarios 2 to 6; phase 8d ledgers the rest of those scenarios.
@@ -96,11 +101,20 @@ function boxCodes(): string[] {
   // 2023 reprints with their Campaign Mode only and Upgraded sides, its ships, every boon and burden, and Ered Mithrin's treasures.
   for (const card of cards) if (card.printings.some((printing) => CAMPAIGN_EXPANSION_PACKS.has(printing.pack))) codes.add(card.code);
   // The box's Ring-bearer: every scenario starts with a Fellowship-sphere Ring-bearer hero in play (mec109.setting-up-the-game),
-  // so his text is part of every game.
+  // so his text is part of every game. The Two Towers' scenarios 10 to 12 start the same way (mec112.setting-up-the-game).
   for (const card of cards) {
-    if (card.sphere === "fellowship" && card.type === "hero" && card.traits.includes("Ring-bearer") && card.printings.some((printing) => printing.pack === "TFotR")) codes.add(card.code);
+    if (card.sphere === "fellowship" && card.type === "hero" && card.traits.includes("Ring-bearer") && card.printings.some((printing) => REPRINT_PACKS.has(printing.pack))) codes.add(card.code);
   }
+  for (const code of decklistCodes(cards)) codes.add(code);
   return [...codes];
+}
+
+// The box's cards the product's decklists hold (data/decks/prebuilt.json, `decklist.<product>-*` spans: The Two Towers' Ents and Friends and The King of Rohan Rides).
+function decklistCodes(cards: readonly Card[]): string[] {
+  const reprinted = new Set(cards.filter((card) => card.printings.some((printing) => REPRINT_PACKS.has(printing.pack))).map((card) => card.code));
+  const prefixes = REPRINTS.map((reprint) => `decklist.${reprint.product.toLowerCase()}-`);
+  const decks = JSON.parse(readFileSync(path.join(DATA_DIR, "decks", "prebuilt.json"), "utf8")) as { source: string; heroes: string[]; cards: { code: string }[] }[];
+  return decks.filter((deck) => prefixes.some((prefix) => deck.source.startsWith(prefix))).flatMap((deck) => [...deck.heroes, ...deck.cards.map((slot) => slot.code)]).filter((code) => reprinted.has(code));
 }
 
 export function scopeCodes(): string[] {
@@ -177,7 +191,7 @@ function nightmarePictures(cards: readonly Card[], scope: ReadonlySet<string>): 
   return out;
 }
 
-// Hall of Beorn's MEC109 scan first (its TFotR printing), then the other printings, DragnCards last. A card the box
+// Hall of Beorn's scan of the saga box's reprint first (MEC109, MEC112: its TFotR or TTwT printing), then the other printings, DragnCards last. A card the box
 // does not reprint (the core-set cards of the starter lists) takes the Revised Core Set scan. A Nightmare card takes its proxy picture.
 export function scanTargets(codes: readonly string[] = scopeCodes()): ScanTarget[] {
   const all = loadCards();
@@ -201,9 +215,9 @@ export function scanTargets(codes: readonly string[] = scopeCodes()): ScanTarget
       }
       continue;
     }
-    const mec = card.printings.find((printing) => printing.pack === "TFotR" && printing.imageUrls);
+    const mec = card.printings.find((printing) => REPRINT_PACKS.has(printing.pack) && printing.imageUrls);
     const sources: { printing: string; urls: string[] }[] = [];
-    if (mec?.imageUrls) sources.push({ printing: "MEC109", urls: mec.imageUrls });
+    if (mec?.imageUrls) sources.push({ printing: REPRINTS.find((reprint) => reprint.pack === mec.pack)?.product ?? mec.pack, urls: mec.imageUrls });
     for (const printing of card.printings) {
       if (printing !== mec && printing.imageUrls) {
         sources.push({ printing: printing.pack, urls: [...printing.imageUrls].sort((a, b) => Number(a.includes("dragncards")) - Number(b.includes("dragncards"))) });

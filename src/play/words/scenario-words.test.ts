@@ -16,17 +16,15 @@ import { blankScenario } from "../../rules/core/state.ts";
 import { loadCards } from "../../../scripts/data/load-cards.ts";
 import { dealtCodes, loadCampaigns, loadScenario } from "../../../scripts/data/load-scenarios.ts";
 import { ROOT } from "../../../scripts/data/paths.ts";
-import { ASKING_VERBS, walk } from "../../../test/harness/record-walk.ts";
+import { asksPlayer, walk } from "../../../test/harness/record-walk.ts";
+import { judgeBranch, judgePick } from "../../../test/harness/words-judge.ts";
 import { WORDS_SCENARIOS } from "../../../test/harness/words-scenarios.ts";
 
 import { askWords } from "./ask.ts";
-import { branchWords, pickWords, type ChoiceNames } from "./choice.ts";
+import { pickWords, type ChoiceNames } from "./choice.ts";
 
-// The instructions that ask for something besides a Pick of a card: the sheet words them with pickWords (src/play/choice/sheets.ts).
-const ASKING = new Set([...ASKING_VERBS, "PickEncounter", "ChooseX", "Reattach", "PlayFromHand", "PayToPlay", "SpendResources", "ChooseAmount", "DiscardRestricted", "AssignDamage"]);
-
-// RevealCorsair asks only when the first player names who reveals it (12154:A:1); the other readings of the verb name nobody.
-const asks = (instruction: Instruction): boolean => ASKING.has(instruction.verb) || (instruction.verb === "RevealCorsair" && instruction.who === "anyPlayer");
+// The judgement of a Pick and of a branch is test/harness/words-judge.ts's (the record's asks entry first, then the chain), the one asks.test.ts uses for a scenario worded by an asks file.
+const asks = asksPlayer;
 
 // A sentence that is allowed to equal the fallback or to be a bare prompt, by `<record id> @<the instruction's path in the record> <verb | option id>`
 // (test/harness/record-walk.ts). Each entry says why it is fine, and the test fails on an entry no sentence needs any more.
@@ -50,7 +48,6 @@ const ALLOWED: Readonly<Record<string, string>> = {
   "900303:shadow:1 @0 Pick": "Open: the attacking staging enemy whose delayed threat is raised; the prompt should say what the enemy is picked for.",
 };
 
-const bare = /^Choose an? [\w-]+\.$/;
 const cards = new Map(loadCards().map((card) => [card.code, card]));
 const campaigns = loadCampaigns();
 const dump = process.env.WORDS_DUMP;
@@ -82,15 +79,10 @@ describe.each(WORDS_SCENARIOS)("the words of %s", (id) => {
     problems.length = 0;
     for (const effect of records) {
       walk(effect.instructions, (instruction, next, after, path) => {
-        if (!asks(instruction)) return;
-        // Only a ReturnToStaging that lets the player choose an engaged enemy asks; the others send a known card back without a question.
-        if (instruction.verb === "ReturnToStaging" && !(instruction.target.kind === "engagedEnemies" && instruction.target.pick === "choose")) return;
-        const words = askWords({ game, ctx, names, instruction, queue: next ? [next, ...after] : [], options: [], source: effect.cardCode, picked: null });
-        // What the same function says for a Pick with no instruction after it, or for a verb it has no words for.
-        const fallback = pickWords(instruction.verb === "Pick" ? instruction : ({ verb: "NoSuchVerb" } as unknown as Instruction), undefined, names, null);
-        const key = `${effect.id} @${path} ${instruction.verb}`;
-        lines.push(`${key}: ${words.verb} / ${words.prompt}`);
-        judge(key, !/^[A-Z].*\.$/.test(words.prompt) ? `not a sentence: ${words.prompt}` : bare.test(words.prompt) ? `a bare "${words.prompt}"` : words.prompt === fallback.prompt ? `the fallback sentence "${words.prompt}"` : null);
+        const verdict = judgePick({ game, ctx, names }, effect, instruction, next, after, path);
+        if (!verdict) return;
+        lines.push(verdict.line);
+        judge(verdict.key, verdict.problem);
       });
     }
     expect(problems).toEqual([]);
@@ -102,11 +94,9 @@ describe.each(WORDS_SCENARIOS)("the words of %s", (id) => {
       walk(effect.instructions, (instruction, _next, _after, path) => {
         if (instruction.verb !== "Choose") return;
         for (const option of instruction.options) {
-          const words = branchWords(instruction, option.id, game, names, effect.cardCode);
-          const key = `${effect.id} @${path} ${option.id}`;
-          lines.push(`${key}: ${words}`);
-          // branchWords answers an option it has no words for with the option's id, capitalised.
-          judge(key, words === option.id.charAt(0).toUpperCase() + option.id.slice(1) ? `the fallback sentence "${words}"` : !/^[A-Z0-9]/.test(words) ? `not a sentence: ${words}` : null);
+          const verdict = judgeBranch({ game, ctx, names }, effect, instruction, option.id, path);
+          lines.push(verdict.line);
+          judge(verdict.key, verdict.problem);
         }
       });
     }

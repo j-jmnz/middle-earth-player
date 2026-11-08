@@ -378,6 +378,8 @@ export type ScenarioState = {
   // The cards the campaign card's Setup let each seat choose and the Resolution earns (Galdor's Counsel, 11182:A:2): the code and the seat that chose it, whether the copy is now in a hand, in play, in a
   // discard pile or in the victory display, and the cards a Forced effect of the campaign card gave (11194:A:3). Their number is the "for each of those copies" an amount reads (`plusChosen`); absent in a game with none.
   chosenAtSetup?: readonly { code: string; seat: number }[];
+  // The pursuit value of The Uruk-hai (mec112.pursuit): the pursuit tracker beside the quest deck. Absent while the scenario sets none; the `pursuit` condition reads it.
+  pursuit?: number;
   // The cards each seat adds to its hand once every player has finished the mulligan (AddToHandAfterMulligan), by seat; dealt and
   // dropped when the opening hands are final.
   afterMulligan?: readonly (readonly string[])[];

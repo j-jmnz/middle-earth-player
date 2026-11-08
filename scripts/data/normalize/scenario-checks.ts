@@ -3,6 +3,7 @@ import type { Placement } from "../../../src/catalog/scenario-data.ts";
 import type { ProductDef, ScenarioDef } from "../campaign-defs.ts";
 import type { RawData } from "./load-raw.ts";
 import { sameName, titleKey } from "./names.ts";
+import { clausesOf, type ParsedSetup } from "./setup-text.ts";
 
 // A DragnCards pre-built deck: the load list (Q0C) or a check deck (Q01, Q00).
 export type Deck = { label: string; cards: { databaseId: string; quantity: number; loadGroupId: string }[] };
@@ -91,4 +92,12 @@ export function crossCheckProblems(
     }
   }
   return problems;
+}
+
+// A campaign card that removes the burdens of named burden sets (mec112.setup-*) names sets some burden card of the catalog bears.
+export function burdenSetProblems(id: string, setup: ParsedSetup, cards: readonly Card[], canon: (name: string) => string): string[] {
+  const known = new Set(cards.filter((card) => card.campaignKind === "burden" && card.burdenSet != null).map((card) => canon(card.burdenSet ?? "")));
+  return clausesOf(setup, "step")
+    .filter((clause) => clause.step === "removeBurdens")
+    .flatMap((clause) => (clause.sets ?? []).filter((name) => !known.has(canon(name))).map((name) => `${id}: the Setup removes the burdens of ${name}, which no burden card bears`));
 }

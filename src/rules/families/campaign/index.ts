@@ -1,4 +1,4 @@
-// Rules: rr.campaign-cards, rr.campaign-setup-checklist, ltp.campaign-setup-checklist (data/rules/entries.json).
+// Rules: rr.campaign-cards, rr.campaign-setup-checklist, ltp.campaign-setup-checklist (data/rules/entries.json). The Two Towers' Resolution verbs run in resolution.ts beside this file.
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
@@ -29,12 +29,23 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return placeToken(state, focus.sourceId, instruction.amount ?? 1);
     case "EarnAttached":
     case "NamePrisoner":
+    case "ChooseOption":
+    case "ThreatPenaltyForPick":
+    case "EarnForPick":
+    case "EarnHeldCopies":
+    case "ReviveFallenHero":
+    case "TrimHeroes":
+    case "RecordUnderneath":
       // Resolution verbs: rules/setup/resolution.ts runs them.
       return state;
     case "AttachChosen":
     case "AddToHandAfterMulligan":
     case "AddToPool":
     case "CarryOver":
+    case "RemovePoolCards":
+    case "RemoveBurdenSets":
+    case "ShuffleIntoEachDeck":
+    case "ChooseCopyOrResources":
       return state;
     default:
       return null;
@@ -61,4 +72,4 @@ function attachSetAside(state: ScenarioState, code: string, hostId: string): Sce
   return queueEvent(attachTo(placed, copy, hostId), { trigger: "attached", seat: host.controller, subject: copy, other: hostId });
 }
 
-export const manifest: RulesFamily = { name: "campaign", verbs: ["PutObjectiveAllyIntoPlay", "SetAsideEachPlayer", "AttachSetAside", "PlaceToken", "EarnAttached", "NamePrisoner", "AttachChosen", "AddToHandAfterMulligan", "AddToPool", "CarryOver"], run };
+export const manifest: RulesFamily = { name: "campaign", verbs: ["PutObjectiveAllyIntoPlay", "SetAsideEachPlayer", "AttachSetAside", "PlaceToken", "EarnAttached", "NamePrisoner", "AttachChosen", "AddToHandAfterMulligan", "AddToPool", "CarryOver", "RemovePoolCards", "RemoveBurdenSets", "ShuffleIntoEachDeck", "ChooseCopyOrResources", "ChooseOption", "ThreatPenaltyForPick", "EarnForPick", "EarnHeldCopies", "ReviveFallenHero", "TrimHeroes", "RecordUnderneath"], run };

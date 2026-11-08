@@ -16,6 +16,7 @@ import { topFrame } from "../../rules/windows/windows.ts";
 import { asksPlayers } from "../../rules/setup/resolution.ts";
 
 import { askWords } from "../words/ask.ts";
+import { askAt, asksChoose, asksOption, type AskedWords } from "../words/asks.ts";
 import { branchThreat, branchWords, outOfPlayLabel, type ChoiceNames } from "../words/choice.ts";
 import { islandBlocked, islandBlockedTitle, islandOptionLabel, islandTravelNote, islandTravelRow } from "../words/island.ts";
 import { grantedTravelWords, grappleOptionLabel, grappleTravel, returnsNote, travelNote } from "../words/grapple.ts";
@@ -276,7 +277,10 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         const now = { ...branchNow(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, words), ...wilderlandBranchNow(game, ctx, choose, window.seat, source) };
         // A Choose with `upTo` (Command) stops on the sheet's armed pass, not on a row of the list: "Done", with the options used so far.
         const stop = commandDone(game, ctx, choose, window.seat, source, source ? names.card(source) : "This card");
-        const ask = torch?.note ?? wilderlandChooseNote(choose, game, ctx, words, window.seat, source, data?.subject ?? null) ?? commandNote(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, names.card) ?? (source ? unchartedNote(choose, names.card(source)) : null) ?? "Choose one.";
+        // The record's asks entries (words/asks.ts) come before the families' words.
+        const asked = { game, ctx, names: words, instruction: choose, ...(data?.effectId ? { effectId: data.effectId } : {}), ...(wait.item.cause ? { cause: wait.item.cause } : {}), source };
+        const written = { ...asked, at: askAt(asked) };
+        const ask = asksChoose(written)?.note ?? torch?.note ?? wilderlandChooseNote(choose, game, ctx, words, window.seat, source, data?.subject ?? null) ?? commandNote(game, ctx, choose, window.seat, source, data?.picked?.at(-1) ?? null, names.card) ?? (source ? unchartedNote(choose, names.card(source)) : null) ?? "Choose one.";
         return {
           ...base,
           note: [`${ask}${/^Player \d+[:,] /.test(ask) ? "" : who}`, line].filter((part) => part != null).join(" "),
@@ -288,8 +292,9 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
             const threat = branchThreat(choose, id);
             const stats: SheetStat[] = threat == null ? [] : [{ icon: "threat", value: threat, word: "Threat" }];
             // A branch that deals damage to each of the player's allies warns when it destroys one.
-            const caution = branchCaution(game, ctx, choose, id, window.seat, source, names.card, data?.picked?.at(-1) ?? null);
-            return { id, label: torch ? torch.label(id) : branchWords(choose, id, game, words, source, now, ctx), code: null, ...(stats.length > 0 ? { stats } : {}), ...(caution ? { caution } : {}), intent: { type: "Choose", optionId: id } };
+            const said = asksOption(written, id);
+            const caution = said?.caution ?? branchCaution(game, ctx, choose, id, window.seat, source, names.card, data?.picked?.at(-1) ?? null);
+            return { id, label: said?.label ?? (torch ? torch.label(id) : branchWords(choose, id, game, words, source, now, ctx)), code: null, ...(stats.length > 0 ? { stats } : {}), ...(caution ? { caution } : {}), intent: { type: "Choose", optionId: id } };
           }),
         };
       }
@@ -298,7 +303,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       // What the instruction after the pick deals or places, read now (the damage, progress or resources a prompt and a row state).
       const amountNow = wait?.kind === "target" ? dealtNow(game, ctx, data?.queue[0]?.instruction, window.seat, source) : undefined;
       const queue = (data?.queue ?? []).map((item) => item.instruction);
-      const asked = wait?.kind === "target" ? askWords({ game, ctx, names: words, instruction: wait.item.instruction, queue, options: window.options, source, picked: data?.kind === "effect" ? (data.picked?.at(-1) ?? null) : null, amountNow }) : { verb: "Choose", prompt: "Choose one." };
+      const asked: AskedWords = wait?.kind === "target" ? askWords({ game, ctx, names: words, instruction: wait.item.instruction, queue, options: window.options, source, picked: data?.kind === "effect" ? (data.picked?.at(-1) ?? null) : null, amountNow, ...(data?.effectId ? { effectId: data.effectId } : {}), ...(wait.item.cause ? { cause: wait.item.cause } : {}) }) : { verb: "Choose", prompt: "Choose one." };
       const outOfPlay = wait?.kind === "target" && wait.item.instruction.verb === "ShuffleOutOfPlayIntoEncounterDeck";
       const collection = wait?.kind === "target" && asksCollection(wait.item.instruction);
       return {
@@ -319,10 +324,12 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           // A Ship objective that is exhausted or attached to: whose it is when the options hold more than one player's, and the damage a card on it would deal.
           const ship = wait?.kind === "target" ? shipRow(wait.item.instruction, data?.queue[0]?.instruction, id, window.options, game, ctx, words) : null;
           const kingsCaution = wait?.kind === "target" ? discardCaution(game, ctx, source, wait.item.instruction, data?.queue[0]?.instruction, id, names.card) : undefined;
-          const label = fire?.label ?? sea ?? ship?.label ?? (collection ? collectionLabel(game, ctx, id, window.options, names) : outOfPlay ? outOfPlayLabel(game, id, words) : card.label);
+          // An asks entry's warning is the row's own (asks.ts): it arms the confirm on that row only.
+          const rowCaution = asked.cautions?.[id] ?? fire?.caution ?? ship?.caution ?? kingsCaution;
+          const label = (game.cards[id] ? undefined : asked.labels?.[id]) ?? fire?.label ?? sea ?? ship?.label ?? (collection ? collectionLabel(game, ctx, id, window.options, names) : outOfPlay ? outOfPlayLabel(game, id, words) : card.label);
           // Another defender's pooled damage (Stand Together, families/defense/defenders.ts).
           const pooled = data?.effectId === DEFENDERS_FRAME ? extraDefender(game, ctx, id) : null;
-          return { ...card, label, ...(wait?.kind === "target" && (isTreasureDraw(wait.item.instruction)) ? { code: id } : {}), ...(willpower.length > 0 ? { stats: willpower } : {}), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(fire?.caution ?? ship?.caution ?? kingsCaution ? { caution: fire?.caution ?? ship?.caution ?? kingsCaution } : {}), intent: { type: "Choose", optionId: id } };
+          return { ...card, label, ...(wait?.kind === "target" && (isTreasureDraw(wait.item.instruction)) ? { code: id } : {}), ...(willpower.length > 0 ? { stats: willpower } : {}), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(rowCaution ? { caution: rowCaution } : {}), intent: { type: "Choose", optionId: id } };
         }),
       };
     }

@@ -42,6 +42,14 @@ export type ResolutionLog = {
   poolRemoved?: readonly { code: string; seat: number | null }[];
   // What each seat answered to the choice of a card to remove from the pool, in the order they answered: the option taken, or the decline (the screen reads it back for the seats that have answered).
   poolAnswers?: readonly { seat: number; option: string }[];
+  // The Two Towers (docs/brief.md, The Two Towers), each left out while it holds nothing: what each seat answered to a ChooseOption (`name` is the instruction's, `option` the one taken); the
+  // permanent starting threat penalty a seat took (ThreatPenaltyForPick); the heroes taken off the list of fallen heroes (ReviveFallenHero) and the ones removed from the Campaign Log
+  // (TrimHeroes), by the seat whose heroes they are; the enemies underneath The Black Gate by card code and quantity (RecordUnderneath).
+  picks?: readonly { name: string; seat: number; option: string }[];
+  threatPenalties?: readonly { seat: number; amount: number }[];
+  revived?: readonly { seat: number; hero: string }[];
+  removedHeroes?: readonly { seat: number; hero: string }[];
+  underneath?: Readonly<Record<string, number>>;
 };
 
 // The campaign log's structured facts, handed to the engine at the start of a scenario in Campaign Mode (campaign/log.ts writes
@@ -68,4 +76,6 @@ export type CampaignFacts = {
   beldisUses?: readonly number[];
   encounterPool?: Readonly<Record<string, number>>;
   pool?: readonly { code: string; seat: number | null }[];
+  // The Campaign Log's hero lists by seat, the codes of the saga's Fellowship heroes among them, and the captives the log names (a quest card's Setup in Campaign Mode takes each captive from them), for the Resolution that changes the lists (ReviveFallenHero, TrimHeroes); left out in a game of another campaign.
+  heroLog?: { heroes: readonly (readonly string[])[]; fallen: readonly (readonly string[])[]; fellowship: readonly string[]; captives: readonly { seat: number; hero: string }[] };
 };

@@ -1,0 +1,160 @@
+{
+  "id": "the-uruk-hai",
+  "name": "The Uruk-hai",
+  "number": 7,
+  "stages": [
+    "143069",
+    "143070"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Uruk-hai",
+      "count": 21
+    },
+    {
+      "name": "Orcs of the White Hand",
+      "count": 8
+    },
+    {
+      "name": "Snaga Orcs",
+      "count": 5
+    }
+  ],
+  "cards": [
+    {
+      "code": "143024",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "143025",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "143026",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "143027",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "143028",
+      "normal": 4,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "143029",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "143030",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "143031",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "143032",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "143063",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "143064",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "143065",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "143066",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "143067",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "143069",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "143070",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "143022",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "143023",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "143027",
+      "normal": 1,
+      "easy": 1,
+      "pile": "activeLocation"
+    }
+  ],
+  "campaignCard": "143071",
+  "campaignPlaced": [
+    "143015",
+    "143016",
+    "143017",
+    "143018",
+    "143019"
+  ],
+  "sagaStart": {
+    "hero": "143001"
+  },
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q0C.07",
+    "dragnEasy": "E0C.07",
+    "hobSlug": "The-Uruk-hai"
+  }
+}

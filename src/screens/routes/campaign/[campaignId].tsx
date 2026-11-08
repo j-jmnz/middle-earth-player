@@ -29,7 +29,9 @@ export default function CampaignSetup() {
   const [taking, setTaking] = useState<string | null>(null);
   // The Hard/Expert Mode card each briefing offers first, in a campaign with XP (dcce.hard-expert).
   const [mode, setMode] = useState<ModeCard | null>(null);
-  const carry = useCarryChoices(catalog, user);
+  // The finished save of the box before this one that this save continues, or null (docs/brief.md, The Two Towers).
+  const [continuing, setContinuing] = useState<string | null>(null);
+  const { carry, continues } = useCarryChoices(catalog, user, campaignId);
   // Set by the first press, so a second tap before the screen is replaced cannot make another save.
   const started = useRef(false);
 
@@ -52,6 +54,9 @@ export default function CampaignSetup() {
   const count = data.scenarios.length;
   const words = `${count} ${count === 1 ? "scenario" : "scenarios"}`;
   const taken = carry.find((choice) => choice.saveId === taking) ?? null;
+  const continued = continues.find((choice) => choice.saveId === continuing) ?? null;
+  // A continued save takes the finished save's seat count: its log is per seat, and the count is chosen once.
+  const seatsNow = continued ? continued.seatCount : seats;
   // The Fellowship's testIDs are the ones the Maestro flows use (`seats-1`, `start-fellowship`); every other campaign is `seats-<id>-<n>` and `start-<id>`.
   const fellowship = id === FELLOWSHIP_ID;
   const seatId = (n: 1 | 2) => (fellowship ? `seats-${n}` : `seats-${id}-${n}`);
@@ -59,7 +64,7 @@ export default function CampaignSetup() {
   function start(): void {
     if (started.current) return;
     started.current = true;
-    const save = createSave(user, id, seats, { carried: taken?.cards ?? [], carriedFrom: taken?.saveId ?? null, modeDefault: hasXp ? mode : null });
+    const save = createSave(user, id, seatsNow, { carried: taken?.cards ?? [], carriedFrom: taken?.saveId ?? null, modeDefault: hasXp ? mode : null, continued: continued?.from ?? null });
     router.replace(pathHref(save.id));
   }
 
@@ -73,29 +78,62 @@ export default function CampaignSetup() {
           <Label tone="muted" className="text-center">
             {"Can't be changed later."}
           </Label>
-          <PrimaryButton label="Start campaign" accessibilityLabel={`Start ${name}, ${words}, ${seatWord(seats)}`} testID={fellowship ? "start-fellowship" : `start-${id}`} onPress={start} />
+          <PrimaryButton label="Start campaign" accessibilityLabel={`Start ${name}, ${words}, ${seatWord(seatsNow)}`} testID={fellowship ? "start-fellowship" : `start-${id}`} onPress={start} />
         </View>
       }
     >
+      {continues.length > 0 ? (
+        <View className="gap-2" testID="continue-saga">
+          <Section title="Continue the saga" className="mt-4" />
+          <Text className="text-label text-muted">{"The heroes, fallen heroes, threat penalty, pool, captives and notes of a finished campaign carry on. The finished campaign is not changed."}</Text>
+          <View className="gap-2" accessibilityRole="radiogroup" accessibilityLabel={`Continue the saga in ${name}`}>
+            <RadioTile selected={continuing == null} testID="continue-none" label={`Start a new saga, ${name}`} onPress={() => setContinuing(null)} className="min-h-touch justify-center rounded-item px-4 py-2">
+              <Text className={continuing == null ? "text-body font-semibold text-bone" : "text-body text-muted"}>Start a new saga</Text>
+              <Text className="text-label text-muted">An empty log: no heroes and no captives carried.</Text>
+            </RadioTile>
+            {continues.map((choice) => {
+              const selected = continuing === choice.saveId;
+              return (
+                <RadioTile
+                  key={choice.saveId}
+                  selected={selected}
+                  testID={`continue-${choice.saveId}`}
+                  label={`${choice.label}, ${choice.source}: ${choice.words}`}
+                  onPress={() => setContinuing(choice.saveId)}
+                  className="min-h-touch justify-center rounded-item px-4 py-2"
+                >
+                  <Text className={selected ? "text-body font-semibold text-bone" : "text-body text-muted"}>{choice.label}</Text>
+                  <Text className="text-label text-faint">{choice.source}</Text>
+                  <Text className="text-label text-muted">{choice.words}</Text>
+                </RadioTile>
+              );
+            })}
+          </View>
+        </View>
+      ) : null}
       <Section title="Players" className="mt-4" />
-      <Segmented
-        options={SEAT_WORDS}
-        value={seatWord(seats)}
-        onChange={(next) => setSeats(seatCountOf(next))}
-        testIDPrefix="seats"
-        testIDs={{ "True solo": seatId(1), "Two-handed": seatId(2) }}
-        labels={{ "True solo": `${seatWord(1)}, ${name}`, "Two-handed": `${seatWord(2)}, ${name}` }}
-        accessibilityLabel={`Players for ${name}`}
-        stretch
-      />
+      {continued ? (
+        <Text testID="continue-seats" className="text-body text-muted">{`${seatWord(continued.seatCount)}, as in the finished campaign.`}</Text>
+      ) : (
+        <Segmented
+          options={SEAT_WORDS}
+          value={seatWord(seats)}
+          onChange={(next) => setSeats(seatCountOf(next))}
+          testIDPrefix="seats"
+          testIDs={{ "True solo": seatId(1), "Two-handed": seatId(2) }}
+          labels={{ "True solo": `${seatWord(1)}, ${name}`, "Two-handed": `${seatWord(2)}, ${name}` }}
+          accessibilityLabel={`Players for ${name}`}
+          stretch
+        />
+      )}
       {hasXp ? <ModePicker mode={mode} onMode={setMode} testIDPrefix={`mode-${id}`} campaignName={name} setup /> : null}
       {carry.length > 0 ? (
         <View className="gap-2" testID="carry-over">
           <Section title="Carry over from a finished campaign" className="mt-4" />
           <Text className="text-label text-muted">{"The cards join this campaign's pool at its first scenario."}</Text>
           <View className="gap-2" accessibilityRole="radiogroup" accessibilityLabel={`Carry-over for ${name}`}>
-            <RadioTile selected={taking == null} testID="carry-none" label={`Fresh start, ${name}`} onPress={() => setTaking(null)} className="min-h-touch justify-center rounded-item px-4 py-2">
-              <Text className={taking == null ? "text-body font-semibold text-bone" : "text-body text-muted"}>Fresh start</Text>
+            <RadioTile selected={taking == null} testID="carry-none" label={`Carry nothing over, ${name}`} onPress={() => setTaking(null)} className="min-h-touch justify-center rounded-item px-4 py-2">
+              <Text className={taking == null ? "text-body font-semibold text-bone" : "text-body text-muted"}>Carry nothing over</Text>
             </RadioTile>
             {carry.map((choice) => {
               const selected = taking === choice.saveId;

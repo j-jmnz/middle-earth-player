@@ -16,7 +16,9 @@ import { scenarioDefinitionSchema, type Effect, type Instruction, type ScenarioD
 // `evilCreaturesDeck` (the Wilderlands enemies, emce.evil-creatures-deck), `cavesDeck` (the Lost Caves set and the cards a Setup shuffles in,
 // emce.caves-deck), `sideQuestDeck` (Fire in the Night's eight encounter side quests, emce.side-quests), and Lost in Mirkwood's two decks
 // `spidersDeck` and `orcsDeck` (the Spiders of Mirkwood and Dol Guldur Orcs sets, which the quest swaps into the encounter deck).
-export const PILES = ["encounter", "quest", "staging", "activeLocation", "setAside", "attached", "burden", "attachedChosen", "corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests", "evilCreaturesDeck", "cavesDeck", "sideQuestDeck", "spidersDeck", "orcsDeck"] as const;
+// The Two Towers' second encounter decks (mec112.setup-journey-to-the-cross-roads, mec112.setup-shelobs-lair): `haradDeck` (the Men of Harad set, shuffled and
+// placed facedown under The Cross-roads) and `greatSpiderDeck` (The Great Spider set, set aside). Neither is part of the encounter deck.
+export const PILES = ["encounter", "quest", "staging", "activeLocation", "setAside", "attached", "burden", "attachedChosen", "corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests", "evilCreaturesDeck", "cavesDeck", "sideQuestDeck", "spidersDeck", "orcsDeck", "haradDeck", "greatSpiderDeck"] as const;
 export type Pile = (typeof PILES)[number];
 
 const placementSchema = z
@@ -74,6 +76,11 @@ export const scenarioDataSchema = z
     reprints: z.record(z.string().min(1), z.string().min(1)).optional(),
     // The Ring-bearer's starting life, when a Setup line sets it.
     life: z.number().int().positive().optional(),
+    // The Two Towers: the saga hero the first player takes control of at setup (mec112.setting-up-the-game), where a scenario names one. `hero` is a
+    // ☺ hero card (Aragorn in scenarios 7 to 9, who does not count against the hero limit); `ringBearer` is a ☺ hero with the Ring-bearer trait the
+    // first player picks, with `attached` (The One Ring) attached to him (scenarios 10 to 12). Absent for the Fellowship box, whose six scenarios
+    // all start with a Ring-bearer and its attachments in the campaign's `prelude`.
+    sagaStart: z.union([z.strictObject({ hero: z.string().min(1) }), z.strictObject({ ringBearer: z.literal(true), attached: z.array(z.string().min(1)).min(1) })]).optional(),
     // Table pieces the cards call for, read from their printed text by the build.
     widgets: z.strictObject({ hide: z.boolean(), secondActiveLocation: z.boolean(), perSeatStaging: z.boolean() }),
     // The DragnCards decks the Fellowship box is loaded from (null where the box has none: Hall of Beorn's counts and the printed

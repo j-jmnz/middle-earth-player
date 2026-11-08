@@ -1,12 +1,14 @@
 // The one order a pick's words are built in: the sheet (src/play/choice/sheets.ts) and the scenario words test both ask this function, so a sentence a later function
-// would say is never worded by one and shown by the other. A trade's hero, the grapple family, the wilderland family, the sea family (which reads the table), then `pickWords`.
+// would say is never worded by one and shown by the other. The record's asks entry (asks.ts) first, then a trade's hero, the grapple family, the wilderland family, the sea family (which reads the table), then `pickWords`.
 import type { Instruction } from "../../catalog/boundary.ts";
+import type { Cause } from "../../rules/core/cause.ts";
 import { restrictedLimit } from "../../rules/player/attach.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
 import type { ReduceContext } from "../../rules/interpret/interpret.ts";
 import { effectsOf } from "../../rules/windows/listen.ts";
 
-import { pickWords, type ChoiceNames, type PickWords } from "./choice.ts";
+import { asksPick, type AskedWords } from "./asks.ts";
+import { pickWords, type ChoiceNames } from "./choice.ts";
 import { grappleAsk, grappleFactsOf } from "./grapple.ts";
 import { seaAsk } from "./sea.ts";
 import { tradeWords } from "./uncharted.ts";
@@ -24,8 +26,13 @@ export function askWords(a: {
   picked: string | null;
   // What the instruction after the pick deals or places, read now.
   amountNow?: number;
-}): PickWords {
-  const { game, ctx, names, instruction, queue, options, source, picked, amountNow } = a;
+  // The record the instruction is from: the frame's effect id, and the cause of the queued instruction when the frame runs several records (asks.ts).
+  effectId?: string;
+  cause?: Cause;
+}): AskedWords {
+  const { game, ctx, names, instruction, queue, options, source, picked, amountNow, effectId, cause } = a;
+  const written = asksPick({ game, ctx, names, instruction, source, amountNow, options, ...(effectId ? { effectId } : {}), ...(cause ? { cause } : {}) });
+  if (written) return written;
   const traded = instruction.verb === "TradeDamageForThreat" && instruction.character ? game.cards[instruction.character] : undefined;
   if (instruction.verb === "TradeDamageForThreat" && traded) {
     const loses = effectsOf(ctx, traded.code).some((item) => item.trigger === "leftPlay" && item.instructions.some((step) => step.verb === "LoseGame"));

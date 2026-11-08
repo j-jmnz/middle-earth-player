@@ -7,6 +7,7 @@ import type { ScenarioState } from "../rules/core/state.ts";
 import type { AllyLine } from "../catalog/ally-lines.ts";
 
 import { scoreOf, type ScenarioScore } from "./score.ts";
+import { marshesAfter, penaltiesAfter, revisedFallen, revisedHeroes } from "./log-two-towers.ts";
 import { cappedTally } from "./wilderland.ts";
 import { xpAwarded, type ModeCard } from "./xp.ts";
 
@@ -50,6 +51,8 @@ export type CampaignLog = {
   carryIn: readonly PoolCard[];
   // The finished save whose carry-over this one took in, so that save's offer is not made again. Absent when it took nothing.
   carriedFrom?: string;
+  // The finished save of the box before this one that this save continues (a continued save, docs/brief.md, The Two Towers), so that save's continue offer is not made again. Absent when it continued none.
+  continuedFrom?: string;
   // Dream-chaser's XP (dcce.gaining-xp, dcce.scalable-upgradable; src/campaign/xp.ts). An older log reads with these defaults.
   // The XP each won scenario's Resolution awarded, by scenario id; the unspent XP is this less the boxes marked, never stored.
   xpGained: Readonly<Record<string, number>>;
@@ -68,11 +71,23 @@ export type CampaignLog = {
   beldisUses: readonly number[];
   // The encounter cards in the Campaign Pool and how many copies of each: every later encounter deck holds them, whatever its set (emce.campaign-pool-encounter).
   encounterPool: Readonly<Record<string, number>>;
+  // The Two Towers Campaign Log (docs/brief.md, The Two Towers). A log saved before it reads with these defaults.
+  // The permanent starting threat penalty each seat takes of its own, on top of `threatPenalty` (The Passage of the Marshes: "each player must choose: either take a permanent +2 starting threat penalty, or earn 1 copy of The Searching Eye"). A seat with none read is 0.
+  threatPenaltyBySeat: readonly number[];
+  // What each seat chose there, by seat; a seat that has not chosen is null.
+  marshesChoice: readonly (MarshesChoice | null)[];
+  // The enemies underneath The Black Gate when Journey to the Cross-roads was won, by card code and quantity: "the name and quantity of each enemy", shown with the notes (The Black Gate Opens may read it).
+  blackGate: Readonly<Record<string, number>>;
+  // The campaign total the finished Fellowship save carried on (a continued save, docs/brief.md, The Two Towers): added to the scenario scores. 0 in a fresh save.
+  scoreBase: number;
 };
+
+export const MARSHES_CHOICES = ["penalty", "searchingEye"] as const;
+export type MarshesChoice = (typeof MARSHES_CHOICES)[number];
 
 export function emptyLog(seatCount: number): CampaignLog {
   const seats = Array.from({ length: seatCount }, () => [] as readonly string[]);
-  return { heroesBySeat: seats, fallenHeroesBySeat: seats, threatPenalty: 0, campaignPool: [], captives: [], completed: [], earned: {}, scenarios: {}, score: 0, notes: "", prisoner: null, usedOnce: [], counters: {}, carryOver: [], carryIn: [], xpGained: {}, marks: {}, modes: {}, modeDefault: null, treasures: [], allyLines: [], beldisUses: [], encounterPool: {} };
+  return { heroesBySeat: seats, fallenHeroesBySeat: seats, threatPenalty: 0, campaignPool: [], captives: [], completed: [], earned: {}, scenarios: {}, score: 0, notes: "", prisoner: null, usedOnce: [], counters: {}, carryOver: [], carryIn: [], xpGained: {}, marks: {}, modes: {}, modeDefault: null, treasures: [], allyLines: [], beldisUses: [], encounterPool: {}, threatPenaltyBySeat: [], marshesChoice: [], blackGate: {}, scoreBase: 0 };
 }
 
 // The Ring-bearer may have moved to another seat with the first player token (mec109.multiplayer-the-one-ring).
@@ -108,7 +123,9 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
   if (!result || state.scenarioId !== scenarioId || log.completed.includes(scenarioId)) return log;
   const bearer = ringBearerOf(state, cards);
   const owned = heroesByOwner(state);
-  const heroesBySeat = owned.map((codes, index) => (log.heroesBySeat[index]?.length ? log.heroesBySeat[index] ?? [] : codes));
+  // A fallen hero a boon brought back and the heroes a player removed (The Two Towers' Resolution) change the lists as the log keeps them.
+  const listed = owned.map((codes, index) => (log.heroesBySeat[index]?.length ? log.heroesBySeat[index] ?? [] : codes));
+  const heroesBySeat = revisedHeroes(listed, result);
   // A hero in a discard pile at the end of the game is a fallen hero (ltp.fellowship-of-heroes), and so is one a
   // Resolution names.
   const fellBy = new Set<string>(result.fallen);
@@ -118,7 +135,8 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
       if (code && printedOf(cards, code).type === "hero") fellBy.add(code);
     }
   }
-  const fallenHeroesBySeat = heroesBySeat.map((heroes, index) => [...new Set([...(log.fallenHeroesBySeat[index] ?? []), ...heroes.filter((code) => fellBy.has(code))])]);
+  // The list read before a removal: a hero that fell and was then removed from the log is still a fallen hero.
+  const fallenHeroesBySeat = revisedFallen(listed.map((heroes, index) => [...new Set([...(log.fallenHeroesBySeat[index] ?? []), ...heroes.filter((code) => fellBy.has(code))])]), result);
   const fallen = new Set(fallenHeroesBySeat.flat());
   // A card the game removed from the campaign pool ("add it to the victory display and remove it from the campaign pool") is gone:
   // one pool entry for each removal, the player's own copy when the game says whose it was.
@@ -147,7 +165,7 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
     completed: [...log.completed, scenarioId],
     earned: { ...log.earned, [scenarioId]: result.earned.map((item) => item.code) },
     scenarios,
-    score: Object.values(scenarios).reduce((sum, item) => sum + item.score, 0),
+    score: log.scoreBase + Object.values(scenarios).reduce((sum, item) => sum + item.score, 0),
     notes: log.notes,
     prisoner: result.prisoner !== undefined ? result.prisoner : state.campaignFacts ? state.campaignFacts.prisoner : log.prisoner,
     // The game started from the log's uses and adds its own: its list is the whole record.
@@ -165,5 +183,9 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
     // The game started from the log's boxes and returns the whole record, as it does the uses.
     beldisUses: state.campaignFacts?.beldisUses ?? log.beldisUses,
     encounterPool: result.encounterPool ? cappedTally(result.encounterPool, copies) : log.encounterPool,
+    threatPenaltyBySeat: penaltiesAfter(log.threatPenaltyBySeat, result, state.seatCount),
+    marshesChoice: marshesAfter(log.marshesChoice, result, state.seatCount),
+    blackGate: result.underneath ?? log.blackGate,
+    scoreBase: log.scoreBase,
   };
 }

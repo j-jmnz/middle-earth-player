@@ -1,12 +1,14 @@
 import type { Card } from "../../../src/catalog/card-facts.ts";
 import { readEredMithrin } from "./setup-ered-mithrin.ts";
+import { readTwoTowers } from "./setup-two-towers.ts";
 import { isNameList, namedBy, setsOf, stepWith } from "./setup-names.ts";
 
 // What a Setup line says, as data. A sentence the patterns do not read is returned in `unread`, so a new Setup
 // verb fails a build loudly instead of being skipped. Names are found by matching the known card names of the
 // scenario (longest first), because a name can hold commas ("Doom, Doom, Doom") or a period ("Mr. Underhill").
 export type SetupClause =
-  | { kind: "aside"; codes: string[]; allCopies: boolean }
+  // `eachPlayer`: "Each player sets 1 copy of X aside" (the copies each player sets aside); absent, the Setup sets the cards aside once.
+  | { kind: "aside"; codes: string[]; allCopies: boolean; eachPlayer?: number }
   // `many`: "(2 instead if there are 3 or more players in the game)" -- that many copies from that many players on.
   | { kind: "stage"; codes: string[]; perPlayer: number | null; count: number; many?: { count: number; from: number } }
   | { kind: "active"; codes: string[] }
@@ -31,7 +33,7 @@ export type SetupClause =
   // "Attach 1 encounter card to each objective card."
   | { kind: "attachEncounterToObjectives"; count: number }
   // "Put Mendor into play."
-  | { kind: "putIntoPlay"; codes: string[]; under?: "dreamChaser" | "anyPlayer" }
+  | { kind: "putIntoPlay"; codes: string[]; under?: "dreamChaser" | "anyPlayer" | "engagedFirstPlayer" }
   // "Attach X to a hero of the first player's choice." / "The first player attaches X to one of his heroes."
   // `anyPlayer`: "Attach Wormsbane to a hero, Broken side face-up" names no player.
   | { kind: "attachChosen"; codes: string[]; who: "firstPlayer" | "anyPlayer" }
@@ -41,7 +43,7 @@ export type SetupClause =
   | { kind: "addToCampaignPool"; codes: string[] }
   // "Each player adds 1 copy of X to their hand after drawing their starting hand (including taking a mulligan)."
   | { kind: "addToHandAfterMulligan"; codes: string[]; count: number }
-  | { kind: "step"; step: SetupStep; codes: string[]; to?: string[]; count?: number; many?: { count: number; from: number }; sets?: string[]; asideSets?: string[] }
+  | { kind: "step"; step: SetupStep; codes: string[]; to?: string[]; count?: number; copies?: number; resources?: number; many?: { count: number; from: number }; sets?: string[]; asideSets?: string[]; players?: boolean }
   // Ered Mithrin (docs/brief.md, Ered Mithrin), each quoted from data/printed/ered-mithrin.json.
   // "Shuffle the encounter deck and discard cards from the top until X locations are discarded, where X is the number of players. Add each
   // discarded location to the staging area." (`amount` "playersLessOne": "X is 1 less than the number of players in the game";
@@ -97,7 +99,17 @@ export type SetupStep =
   | "trustInUrdug" // "The first player may put their trust in Urdug by placing a resource on him (from the token pool)": campaign card 12184
   | "cunningUnlessTrusted" // "If they don't, shuffle a copy of the Urdug's Cunning burden into the encounter deck"
   | "eachOtherPlayerReveals" // "Each other player reveals an encounter card"
-  | "ignoreKeywords"; // "Ignore the deep keyword" / "Ignore the deep and discover keywords": sets are the keywords
+  | "ignoreKeywords" // "Ignore the deep keyword" / "Ignore the deep and discover keywords": sets are the keywords
+  // The Two Towers (mec112.*): each quoted from a stage 1A or campaign card Setup.
+  | "removeFromPool" // "Remove Gildor Inglorion and Mr. Underhill from the Campaign Pool": `to` are the pool cards
+  | "removeBurdens" // "Remove each burden with the following burden set icons from the encounter deck [and each player's deck]: <sets>": `sets` are the burden sets, `players` the decks
+  | "chooseCaptives" // "Each player chooses 1 non-Fellowship hero he controls to be a Captive and places it faceup underneath To Isengard! (If playing campaign mode, choose each captive from the Campaign Log instead)": `to` the objective
+  | "setPursuit" // "Set the pursuit value to 10": mec112.pursuit
+  | "shuffleIntoDecks" // "Each player shuffles 1 copy of The Searching Eye into his deck"
+  | "chooseResourceOrCopy" // "Each player must choose: either add 1 resource to each of his heroes' pools, or shuffle 1 copy of Brace of Coneys into his deck": `resources` the resources for each hero, `count` the copies
+  | "chooseCounselsOrAdvance" // "the players must choose: either each player shuffles 1 copy of Poisoned Counsels into his deck, or advance to stage 2A (bypassing stage 1B)": `count` the stage, `copies` the copies each player shuffles in
+  | "eachOtherPlayerAddsLocation" // "Each player, except the first player, searches the encounter deck for a different non-unique location and adds it to the staging area"
+  | "shuffleSetUnder"; // "Shuffle the Men of Harad encounter set and place it facedown under The Cross-roads": `asideSets` the set, `to` the card
 
 export type ParsedSetup = { clauses: SetupClause[]; unread: string[] };
 
@@ -294,7 +306,7 @@ export function parseSetup(text: string, names: NameIndex, set: (name: string) =
   for (const raw of sentencesOf(text.replace(/^Setup:\s*/i, ""))) {
     const sentence = raw.replace(/\.$/, "");
     let match: RegExpExecArray | null;
-    const campaignStep = readDreamChaser(sentence, names) ?? readEredMithrin(sentence, names, clauses);
+    const campaignStep = readDreamChaser(sentence, names) ?? readEredMithrin(sentence, names, clauses) ?? readTwoTowers(sentence, names);
     if (campaignStep) {
       clauses.push(...campaignStep);
     } else if ((match = /^Set (all copies of |each copy of )?(.+?) aside,? out of play$/i.exec(sentence))) {

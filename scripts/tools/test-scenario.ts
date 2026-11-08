@@ -12,8 +12,11 @@ import { WORDS_SCENARIOS } from "../../test/harness/words-scenarios.ts";
 // The tests to run while a scenario is being authored, a fraction of the full suite (README.md, Commands; docs/handover/agent-brief.md, Scenario procedure):
 //
 //   pnpm test:scenario <scenario-id> [--list]
-//   pnpm test:scenario <scenario-id> --words      only src/play/words/scenario-words.test.ts for the scenario, with WORDS_DUMP=<id>: it prints every sentence
-//                                                 the scenario's choices say (the check for a bare "Choose a player." or a fallback sentence)
+//   pnpm test:scenario <scenario-id> --quick      the loop while authoring: skips the goldens (the registry-wide golden tests and the scenario's own golden.test.ts) and the reader
+//                                                 check; the full run, once before the hand-back, runs them (docs/handover/fast-track.md)
+//   pnpm test:scenario <scenario-id> --words      only src/play/words/scenario-words.test.ts for the scenario, and src/play/words/asks.test.ts when it has an asks file
+//                                                 (src/play/words/asks/<id>.ts), with WORDS_DUMP=<id>: it prints every sentence the scenario's choices say (the
+//                                                 check for a bare "Choose a player." or a fallback sentence, and for a fast-track scenario every asks entry rendered)
 //
 // Parts, each its own vitest run (or the card smoke), so a failure names its part:
 //   tests      the test files that belong to the scenario: those whose path names it (its folder under src/campaign/scenarios/, src/play/scenarios/<id>-*.test.ts, ...)
@@ -27,6 +30,9 @@ import { WORDS_SCENARIOS } from "../../test/harness/words-scenarios.ts";
 //   reader     src/play/reader-play.test.ts for the scenario (READER_PLAY_SCENARIO=<id>): a seeded game played through what a screen reader can reach, which fails
 //              on an intent the engine offers that no labelled element sends. The first scenario, and any scenario with a line in the golden registry, has games
 //   smoke      scripts/card-smoke/run.ts on the player cards the scenario deals (skipped when it deals none)
+//   encounter  scripts/card-smoke/encounter.ts on the scenario: each encounter-side card it deals revealed, its Shadow resolved, a location traveled to,
+//              a quest card's Setup run, and a few dozen seeded games with random legal intents that must end and replay. It runs for every scenario,
+//              whichever track built it and whether or not it deals player cards
 //   families   the family and pool tests, and the manifest tests, when files of those changed since the merge base with origin/main (HEAD when there is
 //              none), committed, staged, unstaged or untracked (changedFamilyTests)
 // `--list` prints the files and codes without running anything. A file runs once, in the first part that names it.
@@ -42,6 +48,7 @@ export const COVERAGE_TESTS = ["scripts/checks/effect-coverage.test.ts", "script
 export const READER_TEST = "src/play/reader-play.test.ts";
 const WORDS_ROOT = "src/play/words/";
 const WORDS_TEST = `${WORDS_ROOT}scenario-words.test.ts`;
+const ASKS_TEST = `${WORDS_ROOT}asks.test.ts`;
 export const GOLDEN_TESTS = ["src/campaign/causes.test.ts", "src/campaign/replay.test.ts", "src/campaign/fixtures.test.ts"];
 
 const escapeRegExp = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -109,6 +116,21 @@ export const DIRECT_GOLDENS: Readonly<Record<string, readonly string[]>> = {
   "a-shadow-of-the-past": ["src/campaign/causes.test.ts", "src/campaign/replay.test.ts"],
 };
 
+const QUICK_NOTE = "skipped by --quick";
+
+/** The parts `--quick` leaves out: the goldens (the registry-wide tests, the scenario's own golden test out of `tests`, and the tests that read its goldens directly) and the reader check. A pure function of the parts. */
+export function quickParts<T extends { name: string; files: string[]; note?: string | undefined }>(parts: readonly T[], id: string, quick: boolean): T[] {
+  if (!quick) return [...parts];
+  return parts.map((part) => {
+    if (part.name === "goldens" || part.name === "reader") return { ...part, files: [], note: QUICK_NOTE };
+    if (part.name !== "tests") return part;
+    // The scenario's own golden test, and the registry-wide tests that read its goldens directly (DIRECT_GOLDENS: replay and causes, run whole for a-shadow-of-the-past).
+    const goldens = new Set([`src/campaign/scenarios/${id}/golden.test.ts`, ...(DIRECT_GOLDENS[id] ?? [])]);
+    const files = part.files.filter((file) => !goldens.has(file));
+    return files.length === part.files.length ? part : { ...part, files, note: `${QUICK_NOTE}: the scenario's golden tests` };
+  });
+}
+
 export function selectTests(id: string, changed: readonly string[], tree: readonly string[], title: string | null, read: (file: string) => string): Selection {
   const present = (files: readonly string[]) => files.filter((file) => tree.includes(file));
   const tests = scenarioTests(id, tree, read);
@@ -135,6 +157,16 @@ export function playerCodes(id: string, recorded: readonly string[]): string[] {
   const dealt = [...scenario.cards.map((card) => card.code), ...scenario.campaignPlaced, ...decks].filter((code) => own.has(code));
   const withRecords = new Set(recorded);
   return [...new Set(dealt)].filter((code) => withRecords.has(code));
+}
+
+const SMOKE_NODE = ["--experimental-strip-types", "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON"];
+
+/** The card smokes of the scenario: the player cards' (skipped when it deals none), and the encounter smoke, which every scenario has. */
+export function smokeRuns(id: string, playerCards: readonly string[]): { name: "smoke" | "encounter"; args: string[]; detail: string }[] {
+  return [
+    { name: "smoke", args: playerCards.length === 0 ? [] : [...SMOKE_NODE, "scripts/card-smoke/run.ts", ...playerCards], detail: playerCards.length === 0 ? "skipped (no player cards dealt)" : `${playerCards.length} cards` },
+    { name: "encounter", args: [...SMOKE_NODE, "scripts/card-smoke/encounter.ts", id], detail: "encounter cards and seeded games" },
+  ];
 }
 
 function git(args: string[]): string[] {
@@ -164,16 +196,18 @@ async function main(log: Log): Promise<void> {
   const args = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
   const listOnly = process.argv.includes("--list");
   const wordsOnly = process.argv.includes("--words");
+  const quick = process.argv.includes("--quick");
   const id = args[0];
-  if (id === undefined || args.length > 1) throw new Error("Usage: pnpm test:scenario <scenario-id> [--list | --words]");
+  if (id === undefined || args.length > 1) throw new Error("Usage: pnpm test:scenario <scenario-id> [--list | --quick | --words]");
   if (!existsSync(path.join(DATA_DIR, "scenarios", `${id}.json`))) throw new Error(`${id} is not a scenario in data/scenarios`);
 
   if (wordsOnly) {
     if (!existsSync(path.join(ROOT, WORDS_TEST))) throw new Error(`${WORDS_TEST} does not exist`);
     // The test reads the playable and the scaffolded scenarios only; for any other id vitest would run nothing and report success.
     if (!WORDS_SCENARIOS.includes(id)) throw new Error(`${id} is neither playable (src/campaign/playable.ts) nor scaffolded (src/campaign/scenarios/${id}/golden.test.ts), so the words test does not read it`);
-    // The describe.each title of the test is "the words of <id>"; WORDS_DUMP makes it print the sentences.
-    const outcome = run("pnpm", ["exec", "vitest", "run", WORDS_TEST, "-t", `the words of ${id}`, "--silent=false"], { WORDS_DUMP: id });
+    // The describe.each titles are "the words of <id>" and, for a scenario with an asks file, "the asks of <id>"; WORDS_DUMP makes them print the sentences.
+    const asked = existsSync(path.join(ROOT, WORDS_ROOT, "asks", `${id}.ts`));
+    const outcome = run("pnpm", ["exec", "vitest", "run", WORDS_TEST, ...(asked ? [ASKS_TEST] : []), "-t", `the (words|asks) of ${escapeRegExp(id)}`, "--silent=false"], { WORDS_DUMP: id });
     if (!outcome.ok) throw new Error("the words test failed");
     return;
   }
@@ -186,7 +220,7 @@ async function main(log: Log): Promise<void> {
   const smoke = playerCodes(id, smokeCodes());
 
   const readerGames = hasReaderGames(id, registrySource) && existsSync(path.join(ROOT, READER_TEST));
-  const parts: { name: string; files: string[]; filter?: string; note?: string; env?: Record<string, string> }[] = [
+  const planned: { name: string; files: string[]; filter?: string; note?: string; env?: Record<string, string> }[] = [
     { name: "tests", files: selection.tests },
     { name: "goldens", files: selection.goldens.files, filter: selection.goldens.title ?? undefined, note: title === null ? (id in DIRECT_GOLDENS ? "no registry entry: replay.test.ts and causes.test.ts read its goldens directly and run whole in tests" : "no entry in test/harness/golden-registry.ts") : undefined },
     { name: "coverage", files: selection.coverage },
@@ -194,12 +228,15 @@ async function main(log: Log): Promise<void> {
     { name: "reader", files: readerGames ? [READER_TEST] : [], note: readerGames ? undefined : "no games: the scenario has no line in test/harness/golden-registry.ts", env: { READER_PLAY_SCENARIO: id } },
   ];
 
+  const parts = quickParts(planned, id, quick);
+
   if (listOnly) {
     for (const part of parts) {
       log.info(`${part.name}${part.filter ? ` (-t ${part.filter})` : ""}${part.note ? ` [${part.note}]` : ""}: ${part.files.length} files`);
       for (const file of part.files) log.info(`  ${file}`);
     }
     log.info(`smoke: ${smoke.length > 0 ? smoke.join(" ") : "no player cards dealt"}`);
+    log.info(`encounter: scripts/card-smoke/encounter.ts ${id}`);
     return;
   }
 
@@ -212,10 +249,13 @@ async function main(log: Log): Promise<void> {
     const outcome = run("pnpm", vitest(part.files, part.filter), part.env);
     results.push({ name: part.name, ok: outcome.ok, ms: outcome.ms, detail: `${part.files.length} files${part.filter ? `, -t ${part.filter}` : ""}` });
   }
-  if (smoke.length === 0) results.push({ name: "smoke", ok: true, ms: 0, detail: "skipped (no player cards dealt)" });
-  else {
-    const outcome = run("node", ["--experimental-strip-types", "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "scripts/card-smoke/run.ts", ...smoke]);
-    results.push({ name: "smoke", ok: outcome.ok, ms: outcome.ms, detail: `${smoke.length} cards` });
+  for (const smoked of smokeRuns(id, smoke)) {
+    if (smoked.args.length === 0) {
+      results.push({ name: smoked.name, ok: true, ms: 0, detail: smoked.detail });
+      continue;
+    }
+    const outcome = run("node", smoked.args);
+    results.push({ name: smoked.name, ok: outcome.ok, ms: outcome.ms, detail: smoked.detail });
   }
 
   for (const result of results) (result.ok ? log.info : log.error)(`${result.name.padEnd(9)} ${result.ok ? "passed" : "FAILED"}  ${result.detail}${result.ms > 0 ? `  (${duration(result.ms)})` : ""}`);

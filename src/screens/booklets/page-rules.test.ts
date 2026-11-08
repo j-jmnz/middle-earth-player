@@ -26,7 +26,7 @@ describe("rulesOnPage", () => {
   it("leaves out entries the glossary does not hold and pages with none", () => {
     expect(rulesOnPage(rows, "fellowship-of-the-ring", 1)).toEqual([]);
     expect(rulesOnPage(rows, "rules-reference", 9999)).toEqual([]);
-    for (const book of ["rules-reference", "fellowship-of-the-ring", "learn-to-play", "the-dark-of-mirkwood", "dream-chaser", "ered-mithrin"] as const) {
+    for (const book of ["rules-reference", "fellowship-of-the-ring", "learn-to-play", "the-dark-of-mirkwood", "dream-chaser", "ered-mithrin", "the-two-towers"] as const) {
       for (let page = 1; page <= 40; page += 1) {
         for (const entry of rulesOnPage(rows, book, page)) expect(rows).toContain(entry);
       }

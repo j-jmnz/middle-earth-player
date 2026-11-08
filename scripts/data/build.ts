@@ -7,6 +7,7 @@ import { DATA_DIR, ROOT } from "./paths.ts";
 import { buildIcons } from "./icons.ts";
 import { buildCards, parseOverrides } from "./normalize/cards.ts";
 import { loadRaw } from "./normalize/load-raw.ts";
+import { asksFileNames, checkAsksNames, renderAsksBarrel } from "./effects/asks-barrel.ts";
 import { authoredFileNames, authoredOrder, renderAuthoredBarrel } from "./effects/barrel.ts";
 import { boxCodes, boxOwners, generateEffects, renderGenerated } from "./effects/generate.ts";
 import { applyPrinted } from "./normalize/printed.ts";
@@ -90,7 +91,7 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR, log: Log = buil
       scenarios: campaign.scenarios,
       campaignCards: campaign.campaignCards,
       prelude: campaign.prelude,
-      starterDecks: campaign.saga ? loadStarterDecks(cards, entries) : [],
+      starterDecks: def.starterDecks ? loadStarterDecks(cards, entries) : [],
       bookletPages: bookletPages(entries, campaign.scenarios, def.bookletDoc),
       bookletId: campaign.bookletId,
       saga: campaign.saga,
@@ -126,6 +127,12 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR, log: Log = buil
   // The authored files, merged in campaign order (Metro cannot glob them).
   const authored = authoredOrder(authoredFileNames(path.join(ROOT, "src", "effects", "authored")), built.campaigns, built.scenarios);
   writeFileSync(path.join(effectsDir, "authored.ts"), renderAuthoredBarrel(authored));
+  // The asks files, the choice words kept as data beside the records (src/play/words/asks.ts).
+  const asksNames = asksFileNames(path.join(ROOT, "src", "play", "words", "asks"));
+  checkAsksNames(asksNames, built.scenarios);
+  const asksOut = process.env.ASKS_OUT ?? path.join(ROOT, "src", "play", "words", "asks");
+  mkdirSync(asksOut, { recursive: true });
+  writeFileSync(path.join(asksOut, "index.ts"), renderAsksBarrel(asksNames));
   const icons = log.step("icons", () => buildIcons(process.env.ICONS_OUT ?? path.join(ROOT, "assets", "icons"), process.env.ICON_MODULES_OUT ?? path.join(ROOT, "src", "ui", "icons")));
   log.info(`icons: ${icons.length} (${icons.filter((icon) => icon.kind === "vector").length} vector, ${icons.filter((icon) => icon.kind === "raster").length} raster)`);
   log.info(`effects: ${generated.effects.length} generated, ${generated.unmatched.length} lines without a template`);

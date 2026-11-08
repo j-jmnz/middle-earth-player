@@ -1,0 +1,332 @@
+{
+  "Title": "The Uruk-hai",
+  "Slug": "The-Uruk-hai",
+  "Product": "The Treason of Saruman",
+  "Number": 7,
+  "QuestCards": [
+    {
+      "Title": "Follow the Orcs",
+      "Slug": "Follow-the-Orcs-ToS",
+      "IsUnique": false,
+      "CardType": "Quest",
+      "CardSubType": "None",
+      "Sphere": null,
+      "Front": {
+        "Subtitle": null,
+        "ImagePath": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Treason-of-Saruman/Follow-the-Orcs-1A.jpg",
+        "Stats": {
+          "StageNumber": "1A"
+        },
+        "Traits": [],
+        "Keywords": [],
+        "Text": [
+          "Setup: Make Estemnet the active location. Add Ugl\u00FAk and To Isengard! to the staging area. Each player chooses 1 non-Fellowship hero he controls to be a Captive and places it faceup underneath to Isengard! (If playing campaign mode, choose each \u0060captive\u0060 from the Campaign Log instead). Set the pursuit value to 10."
+        ],
+        "Shadow": null,
+        "FlavorText": "The Orcs that attached the Fellowship at Amon Hen captured several members of the Company and are carrying them to Isengard. Aragorn and his companions decide to chase the Uruk-hai in an effort to rescue their friends..."
+      },
+      "Back": {
+        "Subtitle": null,
+        "ImagePath": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Treason-of-Saruman/Follow-the-Orcs-1B.jpg",
+        "Stats": {
+          "StageNumber": "1B",
+          "QuestPoints": "X"
+        },
+        "Traits": [],
+        "Keywords": [],
+        "Text": [
+          "X is the Pursuit value.\nUgl\u00FAk cannot leave the staging area or take damage.\nForced: At the end of the combat phase, increase the pursuit value by 1 for each enemy in the staging area.\n"
+        ],
+        "Shadow": null,
+        "FlavorText": "\u0060With hope or without hope we will follow the trail of our enemies. And woe to them, if we prove the swifter!\u0060 -Aragorn, The Two Towers"
+      },
+      "CardSet": "The Treason of Saruman",
+      "EncounterInfo": {
+        "EncounterSet": "The Uruk-hai",
+        "EasyModeQuantity": 0,
+        "IncludedEncounterSets": [
+          "Orcs of the White Hand",
+          "Snaga Orcs"
+        ],
+        "StageNumber": 1,
+        "StageLetter": "A"
+      },
+      "Number": 69,
+      "Quantity": 1,
+      "Artist": "Nicholas Gregory",
+      "HasErrata": false,
+      "OctgnGuid": null,
+      "RingsDbCardId": null,
+      "RingsDbPopularity": 0,
+      "RingsDbVotes": 0,
+      "Categories": null
+    },
+    {
+      "Title": "Rescue the Captives",
+      "Slug": "Rescue-the-Captives-ToS",
+      "IsUnique": false,
+      "CardType": "Quest",
+      "CardSubType": "None",
+      "Sphere": null,
+      "Front": {
+        "Subtitle": null,
+        "ImagePath": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Treason-of-Saruman/Rescue-the-Captives-2A.jpg",
+        "Stats": {
+          "StageNumber": "2A"
+        },
+        "Traits": [],
+        "Keywords": [],
+        "Text": [
+          "When Revealed: Each player searches the encounter deck and discard pile for an Uruk-hai enemy, reveals it, and adds it to the staging area. Shuffle the encounter deck."
+        ],
+        "Shadow": null,
+        "FlavorText": "As their pursuers close in on them, the Uruk-hai race towards the forest of Fangorn with redoubled speed. If the Orcs reach its borders, they will escape into the woods, taking their captives with them..."
+      },
+      "Back": {
+        "Subtitle": null,
+        "ImagePath": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Treason-of-Saruman/Rescue-the-Captives-2B.jpg",
+        "Stats": {
+          "StageNumber": "2B",
+          "QuestPoints": "X"
+        },
+        "Traits": [],
+        "Keywords": [],
+        "Text": [
+          "The players cannot defeat this stage while Ugl\u00FAk is in play. If the players defeat this stage, they have rescued each Captive hero and won the game."
+        ],
+        "Shadow": null,
+        "FlavorText": "\u0060Run! There\u0060s the forest,\u0060 he shouted, pointing ahead. \u0060Get to it! It\u0060s your best hope. Off you go!\u0060 -Ugl\u00FAk, The Two Towers"
+      },
+      "CardSet": "The Treason of Saruman",
+      "EncounterInfo": {
+        "EncounterSet": "The Uruk-hai",
+        "EasyModeQuantity": 0,
+        "IncludedEncounterSets": [
+          "Orcs of the White Hand",
+          "Snaga Orcs"
+        ],
+        "StageNumber": 2,
+        "StageLetter": "A"
+      },
+      "Number": 70,
+      "Quantity": 1,
+      "Artist": "Romana Kendelic",
+      "HasErrata": false,
+      "OctgnGuid": null,
+      "RingsDbCardId": null,
+      "RingsDbPopularity": 0,
+      "RingsDbVotes": 0,
+      "Categories": null
+    }
+  ],
+  "ScenarioCards": [
+    {
+      "EncounterSet": "Orcs of the White Hand",
+      "Title": "Fighting Uruk-hai",
+      "Slug": "Fighting-Uruk-hai-ToS",
+      "NormalQuantity": 2,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 2
+    },
+    {
+      "EncounterSet": "Orcs of the White Hand",
+      "Title": "Isengard Uruk",
+      "Slug": "Isengard-Uruk-ToS",
+      "NormalQuantity": 3,
+      "EasyQuantity": 2,
+      "NightmareQuantity": 3
+    },
+    {
+      "EncounterSet": "Orcs of the White Hand",
+      "Title": "Uruk-hai Fighter",
+      "Slug": "Uruk-hai-Fighter-ToS",
+      "NormalQuantity": 3,
+      "EasyQuantity": 3,
+      "NightmareQuantity": 3
+    },
+    {
+      "EncounterSet": "Snaga Orcs",
+      "Title": "Saruman\u0027s Orders",
+      "Slug": "Saruman\u0027s-Orders-ToS",
+      "NormalQuantity": 2,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 2
+    },
+    {
+      "EncounterSet": "Snaga Orcs",
+      "Title": "Snaga",
+      "Slug": "Snaga-ToS",
+      "NormalQuantity": 3,
+      "EasyQuantity": 2,
+      "NightmareQuantity": 3
+    },
+    {
+      "EncounterSet": "The Uruk-hai",
+      "Title": "Banks of Entwash",
+      "Slug": "Banks-of-Entwash-ToS",
+      "NormalQuantity": 2,
+      "EasyQuantity": 2,
+      "NightmareQuantity": 2
+    },
+    {
+      "EncounterSet": "The Uruk-hai",
+      "Title": "Eastemnet",
+      "Slug": "Eastemnet-ToS",
+      "NormalQuantity": 3,
+      "EasyQuantity": 3,
+      "NightmareQuantity": 3
+    },
+    {
+      "EncounterSet": "The Uruk-hai",
+      "Title": "Grishn\u00E1kh",
+      "Slug": "Grishnakh-ToS",
+      "NormalQuantity": 1,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 1
+    },
+    {
+      "EncounterSet": "The Uruk-hai",
+      "Title": "Plains of Rohan",
+      "Slug": "Plains-of-Rohan-ToS",
+      "NormalQuantity": 4,
+      "EasyQuantity": 3,
+      "NightmareQuantity": 4
+    },
+    {
+      "EncounterSet": "The Uruk-hai",
+      "Title": "Rest by Night?",
+      "Slug": "Rest-by-Night-ToS",
+      "NormalQuantity": 2,
+      "EasyQuantity": 2,
+      "NightmareQuantity": 2
+    },
+    {
+      "EncounterSet": "The Uruk-hai",
+      "Title": "Strange Weariness",
+      "Slug": "Strange-Weariness-ToS",
+      "NormalQuantity": 2,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 2
+    },
+    {
+      "EncounterSet": "The Uruk-hai",
+      "Title": "The Uruk-hai (Campaign)",
+      "Slug": "The-Uruk-hai-Campaign-ToS",
+      "NormalQuantity": 1,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 1
+    },
+    {
+      "EncounterSet": "The Uruk-hai",
+      "Title": "The Wold",
+      "Slug": "The-Wold-ToS",
+      "NormalQuantity": 3,
+      "EasyQuantity": 3,
+      "NightmareQuantity": 3
+    },
+    {
+      "EncounterSet": "The Uruk-hai",
+      "Title": "To Isengard!",
+      "Slug": "To-Isengard-ToS",
+      "NormalQuantity": 1,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 1
+    },
+    {
+      "EncounterSet": "The Uruk-hai",
+      "Title": "Ugl\u00FAk",
+      "Slug": "Ugluk-ToS",
+      "NormalQuantity": 1,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 1
+    },
+    {
+      "EncounterSet": "The Uruk-hai",
+      "Title": "Ugl\u00FAk\u0027s Uruk-hai",
+      "Slug": "Ugluk\u0027s-Uruk-hai-ToS",
+      "NormalQuantity": 3,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 3
+    },
+    {
+      "EncounterSet": "The Uruk-hai",
+      "Title": "Unseen Barrier",
+      "Slug": "Unseen-Barrier-ToS",
+      "NormalQuantity": 2,
+      "EasyQuantity": 2,
+      "NightmareQuantity": 2
+    },
+    {
+      "EncounterSet": "The Uruk-hai Nightmare",
+      "Title": "Enchanted Land",
+      "Slug": "Enchanted-Land-TUHN",
+      "NormalQuantity": 3,
+      "EasyQuantity": 3,
+      "NightmareQuantity": 3
+    },
+    {
+      "EncounterSet": "The Uruk-hai Nightmare",
+      "Title": "Lugdush",
+      "Slug": "Lugdush-TUHN",
+      "NormalQuantity": 1,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 1
+    },
+    {
+      "EncounterSet": "The Uruk-hai Nightmare",
+      "Title": "Mauh\u00FAr",
+      "Slug": "Mauhur-TUHN",
+      "NormalQuantity": 1,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 1
+    },
+    {
+      "EncounterSet": "The Uruk-hai Nightmare",
+      "Title": "Orc of the White Hand",
+      "Slug": "Orc-of-the-White-Hand-TUHN",
+      "NormalQuantity": 4,
+      "EasyQuantity": 4,
+      "NightmareQuantity": 4
+    },
+    {
+      "EncounterSet": "The Uruk-hai Nightmare",
+      "Title": "Orc-draught",
+      "Slug": "Orc-draught-TUHN",
+      "NormalQuantity": 2,
+      "EasyQuantity": 2,
+      "NightmareQuantity": 2
+    },
+    {
+      "EncounterSet": "The Uruk-hai Nightmare",
+      "Title": "The Uruk-hai Nightmare",
+      "Slug": "The-Uruk-hai-Nightmare-TUHN",
+      "NormalQuantity": 1,
+      "EasyQuantity": 1,
+      "NightmareQuantity": 1
+    },
+    {
+      "EncounterSet": "The Uruk-hai Nightmare",
+      "Title": "The Uruk\u0027s Trail",
+      "Slug": "The-Uruk\u0027s-Trail-TUHN",
+      "NormalQuantity": 3,
+      "EasyQuantity": 3,
+      "NightmareQuantity": 3
+    },
+    {
+      "EncounterSet": "The Uruk-hai Nightmare",
+      "Title": "Ugl\u00FAk\u0027s Command",
+      "Slug": "Ugluk\u0027s-Command-TUHN",
+      "NormalQuantity": 3,
+      "EasyQuantity": 3,
+      "NightmareQuantity": 3
+    },
+    {
+      "EncounterSet": "The Uruk-hai Nightmare",
+      "Title": "Wold of Rohan",
+      "Slug": "Wold-of-Rohan-TUHN",
+      "NormalQuantity": 2,
+      "EasyQuantity": 2,
+      "NightmareQuantity": 2
+    }
+  ]
+}

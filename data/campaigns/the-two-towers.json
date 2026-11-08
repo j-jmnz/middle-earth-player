@@ -1,0 +1,32 @@
+{
+  "id": "the-two-towers",
+  "name": "The Two Towers",
+  "scenarios": [
+    "the-uruk-hai",
+    "helms-deep",
+    "the-road-to-isengard",
+    "the-passage-of-the-marshes",
+    "journey-to-the-cross-roads",
+    "shelobs-lair"
+  ],
+  "campaignCards": {
+    "the-uruk-hai": "143071",
+    "helms-deep": "143077",
+    "the-road-to-isengard": "143081",
+    "the-passage-of-the-marshes": "144067",
+    "journey-to-the-cross-roads": "144069",
+    "shelobs-lair": "144073"
+  },
+  "prelude": [],
+  "starterDecks": [],
+  "bookletPages": {
+    "the-uruk-hai": 6,
+    "helms-deep": 7,
+    "the-road-to-isengard": 8,
+    "the-passage-of-the-marshes": 9,
+    "journey-to-the-cross-roads": 9,
+    "shelobs-lair": 10
+  },
+  "bookletId": "the-two-towers",
+  "saga": true
+}

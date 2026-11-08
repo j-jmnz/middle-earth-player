@@ -3,6 +3,7 @@ import { burdenCodes, campaignScenario, corsairCodes, dealtPiles, doubleSidedCar
 import type { CampaignFacts } from "../rules/core/campaign-state.ts";
 import type { StartScenario, StartSeat } from "../rules/setup/setup.ts";
 
+import { sagaAttachments } from "./saga.ts";
 import { logConditionHolds } from "./wilderland.ts";
 import { MODE_CARD_CODE, MODE_CARD_SIDE, type ModeCard } from "./xp.ts";
 
@@ -54,7 +55,7 @@ const DEALT_VERBS = setupRoleVerbs("dealt");
 const AFTER_SETUP_VERBS = setupRoleVerbs("afterSetup");
 
 function hasFacts(facts: CampaignFacts): boolean {
-  return facts.prisoner != null || facts.usedOnce.length > 0 || Object.keys(facts.counters).length > 0 || facts.levels != null || facts.upgraded != null || facts.modeCard != null || facts.treasures != null || facts.allyLines != null || facts.beldisUses != null || facts.encounterPool != null || facts.pool != null;
+  return facts.prisoner != null || facts.usedOnce.length > 0 || Object.keys(facts.counters).length > 0 || facts.levels != null || facts.upgraded != null || facts.modeCard != null || facts.treasures != null || facts.allyLines != null || facts.beldisUses != null || facts.encounterPool != null || facts.pool != null || facts.heroLog != null;
 }
 
 // The facts the engine gets: the log's, and the Hard/Expert Mode card chosen for this game (the log records it when the scenario is won).
@@ -120,6 +121,8 @@ export function buildStart(start: StartInput): StartScenario {
       ...(afterSetup.length > 0 ? { afterSetup } : {}),
       setup: [
         ...input.campaign.prelude.map((card) => ({ verb: "AttachToRingBearer" as const, code: card.code })),
+        // The One Ring a Two Towers scenario of the Ring-bearer attaches (ScenarioData.sagaStart); its campaign's prelude is empty.
+        ...sagaAttachments(input.scenario).map((code) => ({ verb: "AttachToRingBearer" as const, code })),
         ...dealt,
         ...poolInPlay.map((code) => ({ verb: "PutObjectiveAllyIntoPlay" as const, code })),
         ...setupInstructions(input.scenario, input.difficulty, input.seatCount),

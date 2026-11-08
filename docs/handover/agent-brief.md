@@ -94,6 +94,8 @@ Every scenario phase follows it. A phase file names only what its own cards add.
 5. Fill the skeletons on the shared kit (`test/harness/scene-kit.ts`, `game-kit.ts`, `golden-suite.ts`, `scripts/e2e/seed-kit.ts`, `.maestro/subflows/`): a golden of auto-player games on fixed seeds, true solo and two-handed, through a win and through a loss, listed in `test/harness/golden-registry.ts`. `src/campaign/causes.test.ts` covers it. `pnpm test:scenario <id> --words` runs the words test (`src/play/words/scenario-words.test.ts`) before the goldens: check each sentence against `docs/design-system-table.md`, Choice tray (each sentence names its number, side and owner).
 6. The scenario's campaign test continues the campaign: the previous scenario's earned pool cards reach this scenario through the Campaign Setup Checklist.
 
+A scenario scaffolded with `pnpm scenario:new <id> --track fast` follows `docs/handover/fast-track.md` instead of steps 2 and 5.
+
 **Engine half exit:** coverage and the goldens are green in Node. A win runs this campaign card's resolution and unlocks the next scenario. A loss writes nothing.
 
 **Screen half exit:** the scenario's words and widgets are written and tested, its Maestro win and loss flows are written, and no control types damage, resources, threat, progress, or life. Phone checks are not tracked.
@@ -118,7 +120,7 @@ change) says, and never kill processes you did not start (no `pkill`).
 - `pnpm effects:open`, then `pnpm vitest run scripts/checks/effect-coverage.test.ts src/effects src/rules/families`
 - `node --experimental-strip-types scripts/card-smoke/run.ts <codes>` for every card you wrote records for: no problems reported.
 - `pnpm data:check` if you touched anything under `data/` or `scripts/data/`.
-- `pnpm test:scenario <scenario-id>` while authoring (the scenario's tests, its goldens, the coverage checks and the card smoke on its player cards).
+- `pnpm test:scenario <scenario-id>` while authoring (the scenario's tests, its goldens, the coverage checks, the card smoke on its player cards and the encounter smoke).
 - Full `pnpm test` once at the end (Scenario procedure). The golden snapshots (`src/campaign/scenarios/<scenario-id>/golden.json` for the scenario games, `src/campaign/starter/golden/` for the
   starter decks) must not change. If your change alters them, find out why; fix it unless it is a genuine bug fix, and then
   explain it. A rule change that can move a replayed game bumps `ENGINE_VERSION` (`src/rules/engine/version.ts`) and the saves' fixtures are rewritten with `scripts/e2e/fixtures.ts` when `src/campaign/fixtures.test.ts` says so.
