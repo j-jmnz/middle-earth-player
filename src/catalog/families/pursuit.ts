@@ -17,6 +17,12 @@ const VERBS = [
 
 const TRIGGERS = [] as const;
 
-const FLAGS = [] as const;
+const FLAGS = [
+  // On a seat (target `actorSeat`): each enemy engaged with that seat adds its Threat to the total Threat in the staging area, read live while the effect lasts, so an enemy that engages later counts
+  // ("Until the end of the round, each enemy engaged with you adds its Threat to the total Threat in the staging area", 143065:A:2; rr.lasting-effects).
+  "engagedThreatSeat",
+  // On a card in the staging area: nothing moves it out of the staging area ("Uglúk cannot leave the staging area", 143069:B:2): moveCard refuses a move to another zone, as cannotEnterStaging does into it.
+  "cannotLeaveStaging",
+] as const;
 
 export const manifest = { name: "pursuit", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

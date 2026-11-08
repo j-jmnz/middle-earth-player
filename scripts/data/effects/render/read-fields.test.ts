@@ -40,6 +40,7 @@ const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   ConsiderUndefended: [{ verb: "ConsiderUndefended" }],
   DiscardShadowOf: [{ verb: "DiscardShadowOf", target: "other" }],
   DamageEach: [{ verb: "DamageEach", amount: 1, pick: HERO }],
+  Restrict: [{ verb: "Restrict", what: "defend", allies: true }],
   ShuffleEncounterDeck: [{ verb: "ShuffleEncounterDeck" }],
   ShuffleEncounterDiscard: [{ verb: "ShuffleEncounterDiscard" }],
   DiscardEncounterTop: [{ verb: "DiscardEncounterTop", count: 2 }],

@@ -50,6 +50,16 @@ const TARGET_STAT: Readonly<Record<string, string>> = {
   eachSeat: "each player",
 };
 const targetStat = (value: string): string => TARGET_STAT[value] ?? cardRef(value);
+// What a stat flag means where the bare name would not say it.
+const STAT_NOTE: Readonly<Record<string, string>> = {
+  questProgressCap: " (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count)",
+  cannotLeaveStaging: " (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect)",
+  cannotBeEngaged: " (no player engages it: not optionally, not by an engagement check, not by an effect)",
+  blankText: " (its text box is blank)",
+  engagedThreatSeat: " (each enemy engaged with that player adds its Threat to the staging area's total, counted live: an enemy that engages later counts too)",
+  cannotHaveTreachery: " (no treachery card can be attached to it)",
+  alliesCannotAttack: " (allies cannot be declared as attackers against it)",
+};
 const untilWords = (until: unknown): string => STAT_UNTIL[str(until)] ?? str(until);
 
 // What bounds an Each that lets the actor choose: how many cards, the total printed cost they may add up to, and the cards the engine has already recorded.
@@ -67,7 +77,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     const per = typeof i.per === "string" ? ` for each ${i.per}` : "";
     const trait = typeof i.trait === "string" ? ` (${i.trait} only)` : "";
     const sign = i.subtract === true ? "minus " : "";
-    return { text: `${holders}${trait}: stat ${str(i.stat)} ${sign}${amount(i.amount, ctx)}${per}, ${untilWords(i.until)}`, read: ["stat", "amount", "until", "holders", "target", "per", "trait", "subtract"] };
+    return { text: `${holders}${trait}: stat ${str(i.stat)}${STAT_NOTE[str(i.stat)] ?? ""} ${sign}${amount(i.amount, ctx)}${per}, ${untilWords(i.until)}`, read: ["stat", "amount", "until", "holders", "target", "per", "trait", "subtract"] };
   },
   Pick: (i, ctx) => ({ text: `choose ${pick(i.pick, ctx)}`, read: ["pick"] }),
   PlaceProgressOn: (i, ctx) => ({ text: `place ${amount(i.amount, ctx)} progress on ${cardRef(i.target)}`, read: ["amount", "target"] }),
@@ -84,7 +94,12 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   Draw: (i, ctx) => ({ text: `${who(i.who ?? "actor")} draws ${i.amount === undefined ? "1" : amount(i.amount, ctx)} card(s)${typeof i.perHero === "string" ? ` for each ${i.perHero} hero` : ""}${i.from === "bottom" ? " from the bottom of the deck" : ""}`, read: ["who", "amount", "perHero", "from"] }),
   RaiseThreat: (i, ctx) => ({ text: `raise threat by ${i.amount === undefined ? "1" : amount(i.amount, ctx)} (${who(i.who ?? "actor")})${isObj(i.perCommitted) ? ` for each ${typeof i.perCommitted.exceptSphere === "string" ? `non-${i.perCommitted.exceptSphere} ` : ""}${str(i.perCommitted.type)} committed to the quest` : ""}`, read: ["amount", "who", "perCommitted"] }),
   LowerThreat: (i, ctx) => ({ text: `lower threat by ${amount(i.amount, ctx)} (${who(i.who)})`, read: ["amount", "who"] }),
-  ReturnToStaging: (i) => ({ text: `return ${target(i.target)} to the staging area`, read: ["target"] }),
+  ReturnToStaging: (i, ctx) => {
+    const found = isObj(i.target) ? i.target : null;
+    if (found?.kind === "engagedEnemies") return { text: `return ${found.pick === "choose" ? "one enemy" : "every enemy"}${typeof found.trait === "string" ? ` with the trait ${found.trait}` : ""} engaged with ${found.who === "actor" ? "the acting player" : "a player"}${found.pick === "choose" ? " (that player picks which)" : ""} to the staging area`, read: ["target"] };
+    if (found?.kind === "self" && ctx.attacker === true) return { text: "return the attacking enemy (the card whose shadow this is the attacker of) to the staging area", read: ["target"] };
+    return { text: `return ${target(i.target)} to the staging area`, read: ["target"] };
+  },
   SetPursuit: (i) => ({ text: `set the pursuit value to ${str(i.value)}`, read: ["value"] }),
   RaisePursuit: (i, ctx) => ({ text: `increase the pursuit value by ${amount(i.amount, ctx)}`, read: ["amount"] }),
   LowerPursuit: (i, ctx) => ({ text: `reduce the pursuit value by ${amount(i.amount, ctx)} (never below 0)`, read: ["amount"] }),
@@ -103,10 +118,19 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   }),
   AttachSelf: (i) => (isObj(i.to) && i.to.kind === "hero" ? { text: `attach this card to ${typeof i.to.trait === "string" ? `a ${i.to.trait} hero` : "a hero"}`, read: ["to"] } : null),
   EndQuestPhase: () => ({ text: "end the quest phase at once (no quest resolution)", read: [] }),
-  ImmediateAttack: (i) => ({ text: `this enemy attacks now${i.shadow === false ? ", dealt no shadow card" : ", dealt a new shadow card after its old ones are discarded"}`, read: ["shadow"] }),
+  ImmediateAttack: (i, ctx) => ({ text: `${ctx.attacker === true ? "the attacking enemy attacks the defending player again (an additional attack, against \"you\" on the shadow card)" : "this enemy attacks now"}${i.shadow === false ? ", dealt no shadow card" : ", dealt a new shadow card after its old ones are discarded"}`, read: ["shadow"] }),
   ConsiderUndefended: () => ({ text: "this attack is considered undefended", read: [] }),
   DiscardShadowOf: (i) => ({ text: `discard a shadow card dealt to ${cardRef(i.target ?? "picked")}`, read: ["target"] }),
   DamageEach: (i, ctx) => ({ text: `deal ${amount(i.amount, ctx)} damage to each ${pick(i.pick, ctx)}`, read: ["amount", "pick"] }),
+  Restrict: (i) => ({
+    text:
+      i.what === "defend"
+        ? `${i.allies === true ? "allies" : "characters with little Willpower"} cannot be declared as defenders against this card's attacks (only this card's, not another enemy's)`
+        : i.what === "advance"
+          ? "the players cannot defeat this stage while this holds (defeating the last stage wins the game: the engine owns that, so the Captives are rescued and count as surviving heroes in the score)"
+          : `the players are restricted: ${str(i.what)}`,
+    read: ["what", "allies"],
+  }),
   ShuffleEncounterDeck: () => ({ text: "shuffle the encounter deck", read: [] }),
   ShuffleEncounterDiscard: () => ({ text: "shuffle the encounter discard pile into the encounter deck", read: [] }),
   DiscardEncounterTop: (i, ctx) => ({ text: `discard ${amount(i.count, ctx)} card(s) from the top of the encounter deck`, read: ["count"] }),
@@ -171,7 +195,8 @@ export function renderInstruction(value: unknown, ctx: Ctx, depth = 0, later = f
   if (value.verb === "Choose") {
     for (const option of childrenOf(value, made)) lines.push(...renderOption(option, ctx, depth + 1));
   } else {
-    childrenOf(value, made).forEach((child, at) => lines.push(...renderInstruction(child, ctx, depth + 1, at > 0)));
+    const inner = value.verb === "AfterAttack" ? { ...ctx, attacker: true } : ctx;
+    childrenOf(value, made).forEach((child, at) => lines.push(...renderInstruction(child, inner, depth + 1, at > 0)));
   }
   return lines;
 }

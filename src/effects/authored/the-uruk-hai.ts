@@ -201,7 +201,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [
         { verb: "SearchReveal", trait: "Uruk-hai", type: "enemy", who: "actor", to: "engaged" },
         { verb: "ShuffleEncounterDeck" },
-        { verb: "ModifyStat", stat: "engagedThreat", amount: 1, until: "endOfRound", holders: { type: "enemy", control: "any", engaged: "you" } },
+        { verb: "ModifyStat", stat: "engagedThreatSeat", amount: 1, until: "endOfRound", target: "actorSeat" },
       ],
     },
     // 143066 Snaga: a random card of the revealing player's hand is discarded; Snaga gets its printed cost as Threat until the end of the round.
@@ -267,6 +267,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [
         { verb: "ModifyStat", stat: "cannotTakeDamage", amount: 1, until: "whileSourceInPlay", holders: ENEMY_NAMED_UGLUK },
         { verb: "ModifyStat", stat: "cannotBeEngaged", amount: 1, until: "whileSourceInPlay", holders: ENEMY_NAMED_UGLUK },
+        { verb: "ModifyStat", stat: "cannotLeaveStaging", amount: 1, until: "whileSourceInPlay", holders: ENEMY_NAMED_UGLUK },
       ],
     },
     { id: "143069:forced:1", cardCode: "143069", lines: ["143069:B:3"], timing: "forced", trigger: "endOfPhase", condition: { kind: "phase", is: "Combat" }, instructions: [{ verb: "RaisePursuit", amount: { count: STAGING_ENEMIES } }] },

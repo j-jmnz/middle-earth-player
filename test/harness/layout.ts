@@ -5,6 +5,7 @@ import { printedFromCard, type PrintedCard } from "../../src/rules/core/printed.
 import { blankScenario, updateCard, withThreat } from "../../src/rules/core/state.ts";
 import { attachTo, spawn, type Destination } from "../../src/rules/core/zones.ts";
 import type { ReduceContext, ScenarioState } from "../../src/rules/engine/reduce.ts";
+import { holdCaptive } from "../../src/rules/families/captives/index.ts";
 import { syncConstants } from "../../src/rules/interpret/constants.ts";
 
 import { gameCodes, loadCampaigns, loadScenario } from "../../scripts/data/load-scenarios.ts";
@@ -49,6 +50,10 @@ export type Layout = {
   attached?: readonly { code: string; to: string }[];
   // The codes of the cards committed to the quest (a hero stand-in, an ally of `play`).
   committed?: readonly string[];
+  // The pursuit value of The Uruk-hai, as its quest card's Setup set it (mec112.pursuit); absent: no tracker.
+  pursuit?: number;
+  // A hero stand-in lies faceup as a Captive under the card with the code `under` (The Uruk-hai, 143069:A:1).
+  captive?: { hero: string; under: string };
   // Other zones that hold a list of cards (a second deck, a named pile).
   piles?: Partial<Record<PileZone, readonly Entry[]>>;
 };
@@ -142,6 +147,8 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
     const spawned = spawn(state, attachment.code, { zone: "play", seat: 0 });
     state = attachTo(spawned.state, spawned.id, host);
   }
+  if (layout.captive) state = holdCaptive(state, idOf(state, layout.captive.hero), idOf(state, layout.captive.under));
+  if (layout.pursuit != null) state = { ...state, pursuit: layout.pursuit };
   for (const code of layout.committed ?? []) for (const id of idsOf(state, code)) state = updateCard(state, id, { committed: true });
   state = { ...state, ...opening(layout.phase ?? "Quest") };
   return { state: syncConstants(state, ctx), ctx, hero: first.id, hero2: secondHero.id, seat1Hero, definition, cards };

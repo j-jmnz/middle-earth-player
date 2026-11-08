@@ -17,6 +17,11 @@ import { heldFrom } from "../south/captive.ts";
 import type { Focus } from "../index.ts";
 import { captiveHeldBy, captivesOf } from "./values.ts";
 
+/** The hero lies faceup under `hostId` as a Captive (the Setup's choice, a test table's layout). */
+export function holdCaptive(state: ScenarioState, heroId: string, hostId: string): ScenarioState {
+  return hold(state, heroId, hostId);
+}
+
 // The hero lies faceup under `hostId`: it leaves its seat's list of heroes (remembering where it was), keeps what it has, and nobody controls it.
 function hold(state: ScenarioState, heroId: string, hostId: string): ScenarioState {
   const hero = state.cards[heroId];

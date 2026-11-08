@@ -332,6 +332,8 @@ export function moveCard(state: ScenarioState, id: string, requested: Destinatio
   const dest = current.deck === undefined ? routed : deckRoute(current, routed, inPlay(current.zone));
   // A card that cannot enter the staging area stays where it is ("Shrine to Morgoth ... cannot enter the staging area", 12094:A:1).
   if (dest.zone === "staging" && flagged(state, id, "cannotEnterStaging")) return state;
+  // A card that cannot leave the staging area stays in it, whatever moves it (Uglúk, 143069:B:2).
+  if (current.zone === "staging" && dest.zone !== "staging" && flagged(state, id, "cannotLeaveStaging")) return state;
   const leavingPlay = current.zone === "play" || current.zone === "heroes" || current.zone === "attached";
   let next = detach(state, id);
   if ((leavingPlay || guardLeaves(current, dest)) && current.host) next = unhost(next, id);

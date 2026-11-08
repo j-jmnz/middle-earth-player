@@ -3,7 +3,8 @@
 
 export type Tally = { template: number; json: number };
 // `effects` and `cardName` are the card being rendered and the records around it, read by the barred-effect note (bars.ts).
-export type Ctx = { tally: Tally; effects?: readonly Obj[]; cardName?: string };
+// `attacker`: the instructions run when an attack ends (AfterAttack), where "this card" is the attacking enemy whose shadow it is.
+export type Ctx = { tally: Tally; effects?: readonly Obj[]; cardName?: string; attacker?: boolean };
 export type Obj = Readonly<Record<string, unknown>>;
 
 export const newCtx = (extra: { effects?: readonly Obj[]; cardName?: string } = {}): Ctx => ({ tally: { template: 0, json: 0 }, ...extra });

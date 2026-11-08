@@ -51,12 +51,13 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["defending"], pick.defending === true ? "defending" : null);
   note(["hasResources"], pick.hasResources === true ? "with resources on it" : null);
   note(["progress"], pick.progress === true ? "with progress on it" : null);
-  note(["captive"], typeof pick.captive === "string" ? (pick.captive === "only" ? "that is a Captive" : pick.captive === "free" ? "that is a Captive lying under To Isengard!" : "(Captives included)") : null);
+  note(["captive"], typeof pick.captive === "string" ? (pick.captive === "only" ? "that is a Captive (heroes held under To Isengard! or by an enemy)" : pick.captive === "free" ? "that is a Captive lying under To Isengard!" : "(Captives included)") : null);
   note(["exceptSphere"], typeof pick.exceptSphere === "string" ? `that is not a ${pick.exceptSphere} card` : null);
   note(["who"], pick.who === "firstPlayer" ? "chosen by the first player" : null);
   note(["engagedEnemies"], pick.engagedEnemies === true ? "that is an enemy engaged with a player" : null);
   note(["hasShadow"], pick.hasShadow === true ? "with a shadow card" : null);
-  const control = typeof pick.control === "string" ? (CONTROL[pick.control] ?? pick.control) : "";
+  // A Captive is in play but no player controls it (families/captives owns "Captives are in play but are not under any player's control", 143022:A:1).
+  const control = pick.captive === "only" || pick.captive === "free" ? "in play, controlled by no player" : typeof pick.control === "string" ? (CONTROL[pick.control] ?? pick.control) : "";
   const noun = [...front, str(pick.type)].join(" ");
   const text = `${noun} (${control})${after.length > 0 ? ` ${after.join(", ")}` : ""}`;
   return done(ctx, text, pick, read);
