@@ -107,7 +107,7 @@ Read the sections your task touches.
     - 616–633 The Caves of Nibin-Dûm (~2.4K)
   - 634–691 Dream-chaser (~15.6K) ← 4
   - 692–718 Ered Mithrin (~15.8K) ← 7
-  - 719–744 The Two Towers (~2.4K) ← 14
+  - 719–744 The Two Towers (~2.4K) ← 15
   - 745–753 Nightmare (~410) ← 19
   - 754–792 Deckbuilding (~1.9K)
   - 793–871 Effects (~3.2K)
@@ -144,7 +144,7 @@ Read the sections your task touches.
   - 264–267 One answer, one tap (~240)
   - 268–271 Stops and Always use (~250)
   - 272–275 Guide (~120)
-  - 276–292 Choice tray (~5.5K) ← 26
+  - 276–292 Choice tray (~5.5K) ← 27
   - 293–307 Reading panels (~1.6K) ← 5
   - 308–317 Phase carousel (~680)
   - 318–323 Quest advance (~530) ← 1
@@ -225,8 +225,21 @@ Read when a task names the plan.
   - 155–174 Triggers and stat flags (~440)
   - 175–236 Patterns (~1.4K)
   - 237–273 Mechanic families: engine and records together (~1.4K) ← 2
-  - 274–287 Readings the review catches (~490) ← 6
+  - 274–287 Readings the review catches (~490) ← 7
   - 288–307 Not expressible yet: leave open, report (~390)
+- `docs/plans/one-scenario-pipeline.md` — Plan: one scenario pipeline (~3.9K tok)
+  - 3–21 Context (~590)
+  - 22–27 Base and landing (~140)
+  - 28–187 Sections (~3.0K)
+    - 30–46 1. Land The Uruk-hai (~480)
+    - 47–56 2. Room under the limits (~170)
+    - 57–70 3. One full suite per scenario (~300)
+    - 71–93 4. Spec rows that see more (~360)
+    - 94–106 5. Renderer and judge (~280)
+    - 107–115 6. A smaller pack (~150)
+    - 116–165 7. The one pipeline (~890)
+    - 166–187 8. Cleanup: no more A/B (~400)
+  - 188–194 Verification (~160)
 - `docs/plans/scenario-fast-track.md` — Plan: a fast track for scenarios, A/B-tested against the classic track (~3.4K tok)
   - 3–35 Context (~840)
     - 7–16 Where a scenario's time goes (~300)
@@ -308,7 +321,7 @@ Open work; read when a task names it.
   - 38–56 Files you own (edit freely) (~490)
   - 57–70 Shared files (~300)
   - 71–85 Approach (~680) ← 2
-  - 86–102 Scenario procedure (~660) ← 9
+  - 86–102 Scenario procedure (~660) ← 10
   - 103–112 Checkpoints (API usage limits can stop you mid-task) (~210)
   - 113–127 Checks before committing (~320)
   - 128–134 Merge (~140) ← 1
