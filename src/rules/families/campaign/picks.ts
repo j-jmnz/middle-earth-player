@@ -16,7 +16,7 @@ export function seatsThatPicked(state: ScenarioState, name: string, option: stri
 export function campaignHolds(state: ScenarioState, condition: Extract<Condition, { kind: "pursuit" | "picked" | "anyHand" }>): boolean {
   switch (condition.kind) {
     case "pursuit":
-      return state.pursuit != null && state.pursuit <= condition.max;
+      return state.pursuit != null && (condition.max == null || state.pursuit <= condition.max) && (condition.min == null || state.pursuit >= condition.min);
     case "picked":
       return pickedOption(state, condition.name, condition.option);
     case "anyHand":

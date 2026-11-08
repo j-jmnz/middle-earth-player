@@ -33,7 +33,7 @@
     "id": "the-two-towers",
     "name": "The Two Towers",
     "scenarioCount": 6,
-    "playable": false
+    "playable": true
   },
   {
     "id": "the-return-of-the-king",

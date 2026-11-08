@@ -1,5 +1,5 @@
 // Conditions: when a record applies, a verb runs or an option is offered. `src/catalog/effect-schema-conditions.ts` owns the kinds; `not`, `all` and `any` combine the others one level deep.
-import { renderAmount } from "./amounts.ts";
+import { cardRef as cardRefWords, renderAmount } from "./amounts.ts";
 import { done, isObj, jsonOf, str, type Ctx, type Obj } from "./kit.ts";
 import { renderPick } from "./picks.ts";
 
@@ -47,6 +47,10 @@ const TEMPLATES: Readonly<Record<string, Template>> = {
   questFailed: () => ({ text: "the quest failed", read: [] }),
   logged: (c) => ({ text: `the Campaign Log ${c.is === false ? "does not hold" : "holds"} the line "${str(c.line)}"`, read: ["line", "is"] }),
   onStage: (c) => ({ text: `the players are on stage ${str(c.stage)}`, read: ["stage"] }),
+  pursuit: (c) => ({ text: `the pursuit value is ${range(c.min, c.max)}`, read: ["min", "max"] }),
+  soleAttacker: () => ({ text: "exactly one character was declared as an attacker in this attack", read: [] }),
+  captives: (c) => ({ text: `the number of Captives in play${c.of === "actor" ? " that belong to the acting seat" : ""} is ${range(c.min, c.max)}`, read: ["min", "max", "of"] }),
+  matches: (c, ctx) => ({ text: `${typeof c.card === "string" ? cardRefWords(c.card) : "the card"} is a ${renderPick(c.pick, ctx)}`, read: ["card", "pick"] }),
   controls: (c) => ({ text: `the actor controls the card with code ${str(c.code)}`, read: ["code"] }),
 };
 

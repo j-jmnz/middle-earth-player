@@ -350,7 +350,7 @@ export function moveCard(state: ScenarioState, id: string, requested: Destinatio
   // leaves play"). An encounter card's leaving is announced where it happens (stage-reveal.ts).
   if ((current.zone === "play" || current.zone === "heroes") && !inPlay(dest.zone)) moved = queueEvent(moved, { trigger: "leftPlay", seat: current.controller, cardId: id });
   // An enemy that guards a hero (Carried Away, 18074:B:2) is announced when it leaves play in any way; only a game that holds such a hero asks.
-  if ((current.zone === "engaged" || current.zone === "staging") && !inPlay(dest.zone) && Object.values(moved.cards).some((card) => card.guardedHero === true && card.zone === "captive" && card.host === id)) moved = queueEvent(moved, { trigger: "leftPlay", seat: null, cardId: id });
+  if ((current.zone === "engaged" || current.zone === "staging") && !inPlay(dest.zone) && Object.values(moved.cards).some((card) => (card.guardedHero === true || card.captive === true) && card.zone === "captive" && card.host === id)) moved = queueEvent(moved, { trigger: "leftPlay", seat: null, cardId: id });
   // A card a player card put out of play under itself "while ~ is in play" comes back to the staging area when it leaves (07003:A:3).
   if ((current.zone === "play" || current.zone === "heroes") && !inPlay(dest.zone)) for (const under of cardsUnder(moved, id)) moved = updateCard(moveCard(moved, under, { zone: "staging" }), under, { face: "up" });
   // An enemy that leaves play takes its dealt shadow cards to the encounter discard (Learn to Play p16).

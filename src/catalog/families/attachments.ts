@@ -63,6 +63,8 @@ const TRIGGERS = [
 ] as const;
 
 const FLAGS = [
+  // On a card: no treachery card can be attached to it ("cannot have treachery card attachments", 143019:A:3): a treachery that would attach cannot, as with cannotHaveAttachments.
+  "cannotHaveTreachery",
   // On an enemy: any character may choose it as the target of an attack, in the staging area or engaged with any player
   // ("Any character may choose attached enemy as the target of an attack").
   "attackableByAny",

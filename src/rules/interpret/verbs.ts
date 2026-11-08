@@ -11,6 +11,7 @@ import type { ReduceContext } from "./interpret.ts";
 import { destroyCard, eliminateEmpties, isEncounterCardEffect, modifiedStat, placeDamage, raiseThreat, releaseAttachments } from "../core/keywords.ts";
 import { lastPicked, otherSeat, seatsFor } from "./player-verbs.ts";
 import { queueEvent } from "../windows/queue.ts";
+import { patchTop, topFrame } from "../windows/windows.ts";
 import { isPlayerType, printedOf } from "../core/printed.ts";
 import { engageEnemy, engageWith, placeQuestProgress, stagingEnemies } from "../quest/quest.ts";
 import { restricted } from "./restrictions.ts";
@@ -110,7 +111,14 @@ export function runExtraVerb(
         const at = Math.max(0, living.indexOf(state.firstPlayer));
         return [...living.slice(at), ...living.slice(0, at)].reduce((current, seat) => discardRandom(current, seat, amount, focus.sourceId, ctx), state);
       }
-      return discardRandom(state, instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat, instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx), focus.sourceId, ctx);
+      const seat = instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat;
+      const discarded = discardRandom(state, seat, instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx), focus.sourceId, ctx);
+      if (!instruction.remember) return discarded;
+      // `remember`: the card discarded is the effect's picked card afterward ("the discarded card's printed cost", 143066:A:2).
+      const pile = discarded.seats[seat]?.discard ?? [];
+      const id = pile.length > (state.seats[seat]?.discard.length ?? 0) ? pile.at(-1) : undefined;
+      const data = topFrame(discarded)?.data;
+      return id && data?.kind === "effect" ? patchTop(discarded, { data: { ...data, picked: [...(data.picked ?? []), id] } }) : discarded;
     }
     case "PlaceUnderSelf": {
       const id = lastPicked(state);

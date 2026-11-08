@@ -18,6 +18,7 @@ import { resetEncounterDeck, shuffleEncounterDeck } from "../interpret/verbs.ts"
 import { attachTo, moveCard } from "../core/zones.ts";
 import { announceEntered, noteEncounterThreat, revealSeat, revealsAllowed, watchReveal } from "../families/encounter/reveal.ts";
 import { discardsAfterReveal } from "../families/sidequests/encounter.ts";
+import { engageWith } from "../quest/quest.ts";
 import { stagingDest } from "../families/breaking/areas.ts";
 import { grapplesOnReveal, pushGrapple } from "../families/grapple/attach.ts";
 import { skipLoot } from "../families/wilderland/loot.ts";
@@ -55,6 +56,8 @@ export function startReveal(
   cardId?: string,
   // The objective the card guards (families/objectives.ts).
   guards?: string,
+  // An enemy found by a search is put into play engaged with the revealing seat, not staged (SearchReveal `to: engaged`).
+  engage?: boolean,
 ): ScenarioState {
   // A Loot card on top of the deck is discarded, not revealed (emce.loot).
   const skipped = cardId ? { state, top: cardId } : skipLoot(resetEncounterDeck(state, steps), ctx, steps);
@@ -64,7 +67,7 @@ export function startReveal(
   if (!id || !instance) return ready;
   const peril = printedOf(ctx.cards, instance.code).keywords.peril;
   const fromDeck = cardId == null ? { fromDeck: true } : {};
-  return pushFrame(ready, { frame: "reveal", cardId: id, seat, peril, data: { kind: "reveal", hide: null, surge: false, ...fromDeck, ...(guards ? { guards } : {}) } }, steps);
+  return pushFrame(ready, { frame: "reveal", cardId: id, seat, peril, data: { kind: "reveal", hide: null, surge: false, ...fromDeck, ...(guards ? { guards } : {}), ...(engage ? { engage: true as const } : {}) } }, steps);
 }
 
 // A reveal started by an effect instruction. It cannot wait for a player, so a Hide test or any other
@@ -126,7 +129,8 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
   switch (frame.step) {
     case 0: {
       // Into the revealing seat's own staging area once stages are separate (mec109.multiple-staging-areas).
-      let next = moveCard(state, id, stagingDest(state, seat));
+      const engages = frame.data.engage === true && printed.type === "enemy";
+      let next = engages ? engageWith(state, seat, id, steps) : moveCard(state, id, stagingDest(state, seat));
       next = updateCard(next, id, { face: "up", controller: seat });
       // A guard is attached to its objective as it is placed (rr.guarded); the objective may have left play since.
       if (frame.data.guards && next.cards[frame.data.guards] && inPlay(next.cards[frame.data.guards]?.zone ?? "removed")) next = updateCard(attachTo(next, id, frame.data.guards), id, { guard: true });
@@ -140,7 +144,7 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
       // An enemy with Grapple attaches to a location in the staging area as it is revealed, and is not added to the staging area (dcce.grapple).
       if (grapplesOnReveal(next, id, ctx)) return pushGrapple(patchTop(next, { step: 1 }), id, seat, steps);
       // "After an enemy is added to the staging area" hears the card arrive.
-      next = queueEvent(next, { trigger: "addedToStaging", seat, cardId: id });
+      if (!engages) next = queueEvent(next, { trigger: "addedToStaging", seat, cardId: id });
       next = patchTop(next, { step: 1 });
       // A card just revealed from the encounter deck: a Response may cancel its effects before any of them resolves.
       return frame.data.fromDeck ? offerResponses(next, { trigger: "encounterRevealed", seat, subject: id }, ctx, steps) : next;

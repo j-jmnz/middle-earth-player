@@ -14,6 +14,7 @@ import { attackPickWords, attackWords } from "./attack.ts";
 import { assignDamageWords, southWords } from "./south.ts";
 import { moriaBranchWords, moriaPickWords, moriaWords } from "./moria.ts";
 import { burdenBranchWords, burdenPickWords, burdenWords } from "./burden.ts";
+import { pursuitWords } from "./pursuit.ts";
 import { capital } from "./list.ts";
 import { miscPickWords, miscWords } from "./misc.ts";
 import { playPickWords, playWords } from "./play.ts";
@@ -305,7 +306,7 @@ function instructionWords(instruction: Instruction, game: ScenarioState, names: 
       return `${refWords(instruction.target)} gets ${instruction.amount >= 0 ? `+${instruction.amount}` : instruction.amount} ${STAT_WORDS[instruction.stat] ?? instruction.stat} while attacking ${refWords(instruction.versus)}`;
     default:
       // The encounter family's verbs (src/catalog/families/encounter.ts), then the attachments, attack, play and deck families'.
-      return breakingWords(instruction, names, game) ?? oathWords(instruction, names.code) ?? nightmareWords(instruction, names.code) ?? seaWords(instruction) ?? unchartedWords(instruction) ?? islandWords(instruction) ?? aflameWords(instruction) ?? stormcallerWords(instruction) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? moriaWords(instruction, names) ?? burdenWords(instruction) ?? encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction) ?? assaultWords(instruction);
+      return breakingWords(instruction, names, game) ?? oathWords(instruction, names.code) ?? nightmareWords(instruction, names.code) ?? seaWords(instruction) ?? unchartedWords(instruction) ?? islandWords(instruction) ?? aflameWords(instruction) ?? stormcallerWords(instruction) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? moriaWords(instruction, names) ?? burdenWords(instruction) ?? encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction) ?? assaultWords(instruction) ?? pursuitWords(instruction);
   }
 }
 

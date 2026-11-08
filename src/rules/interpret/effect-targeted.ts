@@ -179,7 +179,7 @@ function applyTargeted(
       return (instruction.different || instruction.remember) && data?.kind === "effect" ? patchTop(next, { data: { ...data, picked: [...(data.picked ?? []), ...moved] } }) : next;
     }
     case "SearchReveal":
-      return first ? startReveal(state, seatFor(state, instruction.who, item.seat), ctx, steps, first) : state;
+      return first ? startReveal(state, seatFor(state, instruction.who, item.seat), ctx, steps, first, undefined, instruction.to === "engaged") : state;
     case "ShuffleIntoDeck":
     case "ShuffleOutOfPlayIntoEncounterDeck":
       return first ? shuffleIntoEncounterDeck(state, first) : state;

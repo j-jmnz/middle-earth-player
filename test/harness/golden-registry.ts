@@ -28,6 +28,7 @@ import * as night from "../scenarios/fire-in-the-night/game.ts";
 import * as framsburg from "../scenarios/the-ghost-of-framsburg/game.ts";
 import * as gundabad from "../scenarios/mount-gundabad/game.ts";
 import * as wilderland from "../scenarios/the-fate-of-wilderland/game.ts";
+// import * as hai from "../scenarios/the-uruk-hai/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -81,4 +82,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-ghost-of-framsburg", "The Ghost of Framsburg", framsburg.FRAMSBURG_GOLDENS, framsburg.framsburgWorld, framsburg.playGolden),
   entry("mount-gundabad", "Mount Gundabad", gundabad.GUNDABAD_GOLDENS, gundabad.gundabadWorld, gundabad.playGolden),
   entry("the-fate-of-wilderland", "The Fate of Wilderland", wilderland.WILDERLAND_GOLDENS, wilderland.wilderlandWorld, wilderland.playGolden),
+  // entry("the-uruk-hai", "The Uruk-hai", hai.HAI_GOLDENS, hai.haiWorld, hai.playGolden),
 ];
