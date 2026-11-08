@@ -21,7 +21,7 @@ Each track gives the merged pipeline these parts:
 
 ## Base and landing
 
-- The work runs on a branch from `claude/uruk-hai-fast-track-analysis-nmnawq`. That branch carries `ccr-dce79bf0-2c47oi`: the Two Towers data and campaign shell, and the fast-track tools. None of them is on `main` yet.
+- The work runs on a branch from `main`: `feat/the-uruk-hai-one-pipeline`, or the branch the session's harness names.
 - `orchestrator` runs the sections in order (`.claude/agents/orchestrator.md`): one implementer task per section, then one review round at the end.
 - Each section is one commit, typed by `.claude/rules/commit-standards.md`. The branch lands on `main` squashed (`.claude/rules/release-standards.md`, Branches).
 

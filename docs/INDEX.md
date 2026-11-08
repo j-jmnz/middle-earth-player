@@ -229,7 +229,7 @@ Read when a task names the plan.
   - 288–307 Not expressible yet: leave open, report (~390)
 - `docs/plans/one-scenario-pipeline.md` — Plan: one scenario pipeline (~3.9K tok)
   - 3–21 Context (~590)
-  - 22–27 Base and landing (~140)
+  - 22–27 Base and landing (~110)
   - 28–187 Sections (~3.0K)
     - 30–46 1. Land The Uruk-hai (~480)
     - 47–56 2. Room under the limits (~170)
