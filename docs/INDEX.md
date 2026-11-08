@@ -107,7 +107,7 @@ Read the sections your task touches.
     - 616–633 The Caves of Nibin-Dûm (~2.4K)
   - 634–691 Dream-chaser (~15.6K) ← 4
   - 692–718 Ered Mithrin (~15.8K) ← 7
-  - 719–744 The Two Towers (~2.4K) ← 12
+  - 719–744 The Two Towers (~2.4K) ← 14
   - 745–753 Nightmare (~410) ← 19
   - 754–792 Deckbuilding (~1.9K)
   - 793–871 Effects (~3.2K)
@@ -122,7 +122,7 @@ Read the sections your task touches.
     - 964–979 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~40.1K tok)
   - 5–8 Overview (~130) ← 1
-  - 9–23 Top bar (~2.2K) ← 4
+  - 9–23 Top bar (~2.2K) ← 5
   - 24–27 Table menu (~430) ← 2
   - 28–35 Quest scale (~580) ← 2
   - 36–39 Canvas (~560)
@@ -144,7 +144,7 @@ Read the sections your task touches.
   - 264–267 One answer, one tap (~240)
   - 268–271 Stops and Always use (~250)
   - 272–275 Guide (~120)
-  - 276–292 Choice tray (~5.5K) ← 25
+  - 276–292 Choice tray (~5.5K) ← 26
   - 293–307 Reading panels (~1.6K) ← 5
   - 308–317 Phase carousel (~680)
   - 318–323 Quest advance (~530) ← 1
@@ -225,7 +225,7 @@ Read when a task names the plan.
   - 155–174 Triggers and stat flags (~440)
   - 175–236 Patterns (~1.4K)
   - 237–273 Mechanic families: engine and records together (~1.4K) ← 2
-  - 274–287 Readings the review catches (~490) ← 5
+  - 274–287 Readings the review catches (~490) ← 6
   - 288–307 Not expressible yet: leave open, report (~390)
 - `docs/plans/scenario-fast-track.md` — Plan: a fast track for scenarios, A/B-tested against the classic track (~3.4K tok)
   - 3–35 Context (~840)
@@ -238,7 +238,7 @@ Read when a task names the plan.
     - 57–67 F2. Each record rendered as English and read fresh (~250) ← 1
     - 68–80 F3. Card behaviour as spec rows (~310)
     - 81–94 F4. Encounter-card smoke (~170)
-    - 95–111 F5. One author, a small context pack, rulings first, a quick loop (~400)
+    - 95–111 F5. One author, a small context pack, rulings first, a quick loop (~400) ← 1
     - 112–117 F6. A search player for the goldens (~130)
   - 118–121 Order (~10)
   - 122–162 The A/B: The Uruk-hai, both arms fresh (~530)
@@ -247,10 +247,10 @@ Read when a task names the plan.
     - 136–142 Measures (~70)
     - 143–146 Blind review (~60)
     - 147–150 Cross-check (~60)
-    - 151–162 Decision (~120)
+    - 151–162 Decision (~120) ← 1
   - 163–182 Verification (~200)
     - 165–176 After each build step (~140)
-    - 177–182 The A/B (~60)
+    - 177–182 The A/B (~60) ← 1
 - `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.7K tok)
   - 3–14 Context (~450)
   - 15–24 What does not move (~190)
@@ -262,7 +262,7 @@ Read when a task names the plan.
   - 93–113 F. Faster feedback while authoring (~880)
   - 114–138 Where a scenario's cost is now (~790)
   - 139–151 Next steps (~360) ← 1
-  - 152–163 After each scenario phase (~210) ← 1
+  - 152–163 After each scenario phase (~210) ← 2
   - 164–167 Order (~70)
   - 168–175 Verification (~100)
 
@@ -270,17 +270,50 @@ Read when a task names the plan.
 
 Open work; read when a task names it.
 
+- `docs/handover/ab-uruk-hai-briefs.md` — Briefs of the A/B on The Uruk-hai (~8.2K tok)
+  - 5–33 Shared blocks (~910)
+    - 9–17 The scenario (~370)
+    - 18–33 Standing rules, what must not move, hand-back (~510)
+  - 34–118 Fast arm (~3.2K)
+    - 36–47 Read (scenario-author, Sonnet) (~310)
+    - 48–57 Build (message to the same agent) (~410)
+    - 58–61 reading-judge (Opus, fresh) (~90)
+    - 62–84 Finish (message to the same agent) (~850)
+    - 85–118 Fix (implementer, Sonnet, fresh) (~1.5K)
+  - 119–203 Classic arm (~3.1K)
+    - 121–145 Task A, records and verbs (implementer, Sonnet) (~740)
+    - 146–175 Task B, words, goldens, fixtures and flows (implementer, Sonnet) (~1.1K)
+    - 176–203 Fix (implementer, Sonnet, fresh) (~1.3K)
+  - 204–209 Review rounds (~320)
+  - 210–223 Blind review (same brief for each tree) (~570)
+    - 212–219 reviewer (~300)
+    - 220–223 ux (~260)
+- `docs/handover/ab-uruk-hai.md` — Handover: why the fast track was not faster on The Uruk-hai (~4.6K tok)
+  - 7–15 What to read first (~190)
+  - 16–26 The branches (~260)
+  - 27–46 How each arm ran (~510)
+  - 47–124 The measures (~1.7K)
+    - 49–66 Time and tokens per task (~330)
+    - 67–86 Diff by area (~290)
+    - 87–104 Review findings (~610)
+    - 105–116 Cross-check (~290)
+    - 117–124 Rulings (~150)
+  - 125–135 What skews the comparison (~330)
+  - 136–145 Leads the orchestrator saw (to test, not to take as found) (~590)
+  - 146–157 What the analysis should produce (~320)
+  - 158–187 Reproducing the numbers (~410)
+  - 188–194 Open after this handover (~130)
 - `docs/handover/agent-brief.md` — Brief for a mechanic-family or scenario agent (~3.8K tok)
   - 19–37 Setup (~440) ← 1
   - 38–56 Files you own (edit freely) (~490)
   - 57–70 Shared files (~300)
   - 71–85 Approach (~680) ← 2
-  - 86–102 Scenario procedure (~660) ← 7
+  - 86–102 Scenario procedure (~660) ← 9
   - 103–112 Checkpoints (API usage limits can stop you mid-task) (~210)
   - 113–127 Checks before committing (~320)
   - 128–134 Merge (~140) ← 1
   - 135–141 Commit (~130)
-  - 142–149 Report (your final message) (~90) ← 2
+  - 142–149 Report (your final message) (~90) ← 3
 - `docs/handover/fast-track.md` — The fast track: building a scenario with one author (~1.4K tok)
 
 ## Code to docs
