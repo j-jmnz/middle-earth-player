@@ -1,4 +1,4 @@
-// Rules: mec112.pursuit, rr.step-6-8b (data/rules/entries.json); ledger lines 143069:A:1, 143069:B:1, 143070:B:2, 143022:A:2, 143015:A:3. The pursuit family on a table of The Uruk-hai.
+// Rules: mec112.pursuit, rr.step-6-8b (data/rules/entries.json); ledger lines 143069:A:1, 143069:B:1, 143070:B:2, 143022:A:2. The pursuit family on a table of The Uruk-hai.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import type { EngineStep } from "../../core/intents.ts";
@@ -63,15 +63,5 @@ describe("To Isengard!'s Forced effect (143022:A:2)", () => {
     const edge = resolveRecords({ ...table, phase: "Refresh", pursuit: 29 }, ctxOf(), "143022", "forced", isengard);
     expect(edge.state.pursuit).toBe(30);
     expect(edge.state.lost).toBe(true);
-  });
-});
-
-describe("the sole attacker (143015:A:3)", () => {
-  it("holds when exactly one character was declared as an attacker in the attack under way", () => {
-    const one = { ...table, pendingStrike: { seat: 0, enemyId: "e", attackerIds: ["a"] } };
-    const two = { ...table, pendingStrike: { seat: 0, enemyId: "e", attackerIds: ["a", "b"] } };
-    expect(holds(one, { kind: "soleAttacker" }, scope, ctxOf())).toBe(true);
-    expect(holds(two, { kind: "soleAttacker" }, scope, ctxOf())).toBe(false);
-    expect(holds(table, { kind: "soleAttacker" }, scope, ctxOf())).toBe(false);
   });
 });

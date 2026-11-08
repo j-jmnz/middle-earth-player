@@ -122,15 +122,17 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   ConsiderUndefended: () => ({ text: "this attack is considered undefended", read: [] }),
   DiscardShadowOf: (i) => ({ text: `discard a shadow card dealt to ${cardRef(i.target ?? "picked")}`, read: ["target"] }),
   DamageEach: (i, ctx) => ({ text: `deal ${amount(i.amount, ctx)} damage to each ${pick(i.pick, ctx)}`, read: ["amount", "pick"] }),
-  Restrict: (i) => ({
-    text:
-      i.what === "defend"
-        ? `${i.allies === true ? "allies" : "characters with little Willpower"} cannot be declared as defenders against this card's attacks (only this card's, not another enemy's)`
-        : i.what === "advance"
-          ? "the players cannot defeat this stage while this holds (defeating the last stage wins the game: the engine owns that, so the Captives are rescued and count as surviving heroes in the score)"
-          : `the players are restricted: ${str(i.what)}`,
-    read: ["what", "allies"],
-  }),
+  // A restriction read from the record's own fields; one the template does not word (attach, heroLimit, travelOnly) prints as JSON.
+  Restrict: (i) => {
+    const read = ["what", "allies", "maxWillpower", "belowSourceHitPoints", "location", "guarding", "exceptTrait"];
+    if (i.what === "advance") return { text: "the players cannot defeat this stage while this holds", read };
+    if (i.what === "defend") {
+      const who = i.allies === true ? "allies" : i.belowSourceHitPoints === true ? "allies with fewer printed hit points than this card" : typeof i.maxWillpower === "number" ? `characters with Willpower ${i.maxWillpower} or less` : "characters";
+      return { text: `${who}${typeof i.exceptTrait === "string" ? ` (except those with the trait ${i.exceptTrait})` : ""} cannot be declared as defenders against this card's attacks (only this card's, not another enemy's)`, read };
+    }
+    if (i.what === "travel") return { text: `the players cannot travel to ${typeof i.location === "string" ? `the location with code ${i.location}${typeof i.guarding === "string" ? ` that guards ${i.guarding}` : ""}` : "any location"} while this holds`, read };
+    return null;
+  },
   ShuffleEncounterDeck: () => ({ text: "shuffle the encounter deck", read: [] }),
   ShuffleEncounterDiscard: () => ({ text: "shuffle the encounter discard pile into the encounter deck", read: [] }),
   DiscardEncounterTop: (i, ctx) => ({ text: `discard ${amount(i.count, ctx)} card(s) from the top of the encounter deck`, read: ["count"] }),

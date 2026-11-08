@@ -3,7 +3,8 @@
 import type { Instruction } from "../../catalog/boundary.ts";
 import { frameScope, refCard } from "./amounts.ts";
 import { askTarget } from "../windows/choices.ts";
-import { hasTrait, outOfPlayChoices, searchable } from "./conditions.ts";
+import { hasTrait } from "./conditions.ts";
+import { outOfPlayChoices, searchable } from "./search.ts";
 import { applyTargetVerb, targetCandidates } from "./effect-verbs.ts";
 import { startReveal } from "../windows/frames.ts";
 import type { EngineStep } from "../core/intents.ts";

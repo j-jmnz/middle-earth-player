@@ -352,8 +352,21 @@ function stageOf(code: string, effects: readonly Effect[]): { code: string; bran
   return { code, ...(randomNext ? { randomNext } : {}), ...(deck ? { deck: true as const } : {}), ...(branch?.verb === "BranchStage" ? { branch: branch.codes } : {}), ...(look?.verb === "LookAtStages" ? { look: look.count } : {}), ...(catchUp?.verb === "CatchUpWins" ? { catchUp: catchUp.stage } : {}) };
 }
 
+// The pursuit value at which the players lose, when a stage's Setup sets a pursuit tracker (mec112.pursuit, SetPursuit): the `min` of the pursuit condition on a LoseGame record of a card the scenario places. Undefined
+// for a scenario with no tracker. The top bar's pursuit dial draws its meter against it.
+export function pursuitLimit(data: ScenarioData, effects: readonly Effect[]): number | undefined {
+  if (!data.stages.some((code) => recordInstructions(effects, code, "setup").some((instruction) => instruction.verb === "SetPursuit"))) return undefined;
+  const placed = new Set(placementsAt(data, "Normal").map((card) => card.code));
+  for (const effect of effects) {
+    if (!placed.has(effect.cardCode)) continue;
+    for (const instruction of effect.instructions) if (instruction.verb === "LoseGame" && instruction.when?.kind === "pursuit" && instruction.when.min != null) return instruction.when.min;
+  }
+  return undefined;
+}
+
 export function scenarioDefinition(data: ScenarioData, campaign: CampaignData, effects: readonly Effect[] = []): ScenarioDefinition {
   const burden = burdenCodes(data);
+  const pursuit = pursuitLimit(data, effects);
   return scenarioDefinitionSchema.parse({
     id: data.id,
     encounterSets: data.encounterSets.map((set) => ({ code: set.name, count: set.count })),
@@ -362,6 +375,7 @@ export function scenarioDefinition(data: ScenarioData, campaign: CampaignData, e
       hide: data.widgets.hide,
       lifeTracker: data.life != null,
       burdenDeck: burden.length > 0,
+      ...(pursuit != null ? { pursuitTracker: pursuit } : {}),
       secondActiveLocation: data.widgets.secondActiveLocation,
       perSeatStaging: data.widgets.perSeatStaging,
     },

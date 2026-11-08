@@ -8,12 +8,15 @@ import { runInstruction } from "../../interpret/interpret.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
 import { settle } from "../../engine/machine.ts";
 import { eliminateEmpties } from "../../core/keywords.ts";
+import { moveCard } from "../../core/zones.ts";
+import { fireForced } from "../../windows/triggers.ts";
 import { textBlank } from "../attachments/hold.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { updateCard } from "../../core/state.ts";
 import { probeTable } from "../../../../scripts/card-smoke/encounter.ts";
 import { encounterWorld, type EncounterWorld } from "../../../../scripts/card-smoke/encounter-world.ts";
-import { idOf } from "../../../../test/harness/scene-kit.ts";
+import { finish, idOf, revealFromTop, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
+import { holdCaptive } from "./index.ts";
 import { captivesOf } from "./values.ts";
 
 let world: EncounterWorld;
@@ -82,19 +85,25 @@ describe("TakeLoggedCaptives", () => {
 });
 
 describe("a Captive held by Grishnákh (143024)", () => {
-  it("is attached to him, damaged, and returns under To Isengard! when he is gone", () => {
-    const grishnakh = idOf({ ...table, cards: table.cards }, "143023");
-    const [captive] = captivesOf(table);
-    const held = run({ ...table, window: null }, { verb: "HoldCaptive" }, grishnakh);
-    // No picked card: nothing is held.
-    expect(captivesOf(held)[0]?.host).toBe(idOf(table, "143022"));
-    const direct = updateCard(table, captive?.id ?? "", { host: grishnakh });
-    const damaged = run(direct, { verb: "DamageHeldCaptive", amount: 1 }, grishnakh);
-    expect(damaged.cards[captive?.id ?? ""]?.damage).toBe(1);
-    const back = run(damaged, { verb: "ReturnCaptive", under: "143022" }, grishnakh);
-    expect(back.cards[captive?.id ?? ""]?.host).toBe(idOf(table, "143022"));
-    expect(back.cards[captive?.id ?? ""]?.damage).toBe(1);
-    expect(back.cards[captive?.id ?? ""]?.captive).toBe(true);
+  // Grishnákh is revealed, the first player picks the Captive he holds (143024:A:1) and the choice is answered.
+  const holding = (): { state: ScenarioState; grishnakh: string; captive: string } => {
+    const steps: EngineStep[] = [];
+    const revealed = revealFromTop(table, ctxOf(), "143024", steps);
+    const state = finish({ state: revealed.state, steps }, ctxOf()).state;
+    return { state, grishnakh: revealed.id, captive: captivesOf(state)[0]?.id ?? "" };
+  };
+
+  it("is attached to him, damaged, and returns under To Isengard! when he leaves play in any way", () => {
+    const held = holding();
+    expect(captivesOf(held.state)[0]?.host).toBe(held.grishnakh);
+    const damaged = run(held.state, { verb: "DamageHeldCaptive", amount: 1 }, held.grishnakh);
+    expect(damaged.cards[held.captive]?.damage).toBe(1);
+    // He is discarded (any way out of play): the Captive lies under To Isengard! again with its damage.
+    const gone = settle({ ...moveCard(damaged, held.grishnakh, { zone: "encounterDiscard" }), window: null }, ctxOf(), []);
+    expect(gone.cards[held.grishnakh]?.zone).toBe("encounterDiscard");
+    expect(gone.cards[held.captive]?.host).toBe(idOf(table, "143022"));
+    expect(gone.cards[held.captive]?.damage).toBe(1);
+    expect(gone.cards[held.captive]?.captive).toBe(true);
   });
 
   it("goes to its owner's discard pile when destroyed, and with no Captive left the constant loses the game (143022:A:1)", () => {
@@ -107,6 +116,29 @@ describe("a Captive held by Grishnákh (143024)", () => {
     expect(destroyed.cards[captive?.id ?? ""]?.zone).toBe("discard");
     expect(destroyed.seats[0].discard).toContain(captive?.id);
     expect(captivesOf(destroyed)).toHaveLength(0);
+    // It is a Captive no more: nothing holds its owner in the game.
+    expect(destroyed.cards[captive?.id ?? ""]?.captive).toBeUndefined();
+    expect(destroyed.cards[captive?.id ?? ""]?.owner).toBeUndefined();
     expect(constantWin(syncConstants(destroyed, ctxOf()), ctxOf()).lost).toBe(true);
+  });
+
+  it("two-handed: a seat whose only Captive Grishnákh's damage destroys is out of heroes and eliminated, while the other seat's Captive stays under To Isengard! (rr.player-elimination)", () => {
+    const made = tableFromLayout("the-uruk-hai", { seats: 2, stage: "143069", staging: ["143022", "143024"], captive: { hero: "dh2", under: "143022" } }, {});
+    const grishnakh = idOf(made.state, "143024");
+    const underIsengard = idOf(made.state, "dh2");
+    const seat1 = made.seat1Hero ?? "";
+    expect(made.state.seats[1].heroes).toEqual([seat1]);
+    // Seat 1's only hero is held by Grishnákh and almost dead; his quest phase damage destroys it.
+    const holding = updateCard(holdCaptive(made.state, seat1, grishnakh), seat1, { damage: 99 });
+    expect(captivesOf(holding).map((card) => [card.owner, card.host])).toEqual([[0, idOf(made.state, "143022")], [1, grishnakh]]);
+    expect(eliminateEmpties(holding, []).seats[1].eliminated).not.toBe(true);
+    const fired = fireForced({ ...holding, window: null, phase: "Quest" }, { trigger: "endOfPhase", seat: null, phase: "Quest" }, made.ctx, []);
+    const destroyed = eliminateEmpties(settle(fired, made.ctx, []), []);
+    expect(destroyed.cards[seat1]?.zone).toBe("discard");
+    expect(destroyed.seats[1].discard).toContain(seat1);
+    expect(destroyed.cards[seat1]?.captive).toBeUndefined();
+    expect(destroyed.seats[1].eliminated).toBe(true);
+    expect(destroyed.seats[0].eliminated).not.toBe(true);
+    expect(destroyed.cards[underIsengard]?.zone).toBe("captive");
   });
 });

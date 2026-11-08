@@ -3,10 +3,11 @@ import { describe, expect, it } from "vitest";
 import { expectOk } from "../../core/test-fixture.ts";
 import { modifiedStat } from "../../core/keywords.ts";
 import { legalIntents, reduce } from "../../engine/reduce.ts";
+import { holds } from "../../interpret/conditions.ts";
 import { actionWindow, record, table } from "./fixture.ts";
 
 // Rules: rr.step-6-8b, rr.step-6-8-1, rr.step-6-8-2, rr.step-6-8-3, rr.step-6-8-4, rr.response, rr.lasting-effects, rr.ranged,
-// rr.attacks-outside-the-combat-phase, faq.limitations-on-attacks (data/rules/entries.json).
+// rr.attacks-outside-the-combat-phase, faq.limitations-on-attacks (data/rules/entries.json); ledger line 143015:A:3.
 // The player attack: Responses to the declaration before its strength, "for this attack" ending with it, conditions on the
 // enemy attacked, attacks an effect declares, attacks into the staging area and a card's attack window.
 
@@ -95,5 +96,17 @@ describe("the events of a player attack", () => {
     const attacked = expectOk(reduce(kept, { type: "DeclareAttackers", enemyId: ids.orc!, attackerIds: [ids.aragorn!] }, ctx)).state;
     expect(attacked.cards[ids.orc!]?.damage).toBe(3);
     expect(attacked.modifiers).toEqual([]);
+  });
+});
+
+describe("the sole attacker (143015:A:3)", () => {
+  it("holds when exactly one character was declared as an attacker in the attack under way", () => {
+    const { state, ctx } = table([{ code: "aragorn", at: { zone: "heroes", seat: 0 } }, { code: "orc", at: { zone: "engaged", seat: 0 } }], []);
+    const scope = { actor: 0, sourceId: null, returned: 0 } as const;
+    const one = { ...state, pendingStrike: { seat: 0, enemyId: "e", attackerIds: ["a"] } };
+    const two = { ...state, pendingStrike: { seat: 0, enemyId: "e", attackerIds: ["a", "b"] } };
+    expect(holds(one, { kind: "soleAttacker" }, scope, ctx)).toBe(true);
+    expect(holds(two, { kind: "soleAttacker" }, scope, ctx)).toBe(false);
+    expect(holds(state, { kind: "soleAttacker" }, scope, ctx)).toBe(false);
   });
 });

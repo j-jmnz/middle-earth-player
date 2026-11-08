@@ -138,6 +138,8 @@ const FLAGS = [
   // Held by the table while the source is the active location: "encounter card effects cannot be canceled" (41010:A:1). No Response cancels a
   // When Revealed or Shadow effect, and no paid cancel is offered against one (src/rules/families/encounter/cancel.ts).
   "encounterUncancelable",
+  // On a card in the staging area: nothing moves it out of the staging area ("Uglúk cannot leave the staging area", 143069:B:2): moveCard refuses a move to another zone, as cannotEnterStaging refuses one into it.
+  "cannotLeaveStaging",
 ] as const;
 
 export const manifest = { name: "encounter", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

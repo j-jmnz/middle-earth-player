@@ -165,6 +165,9 @@ function cautionOf(a: AskFacts, hit: Hit, picked?: string): string | undefined {
   return holds(a.game, caution.when, scopeOf(a, hit, picked), a.ctx) ? (said(a, hit, caution.text, picked) ?? undefined) : undefined;
 }
 
+// The first word of a note after "Player 1: " starts lower case, unless it is an acronym.
+const lowerFirst = (note: string): string => (/^[A-Z][^A-Z]/.test(note) ? `${note.charAt(0).toLowerCase()}${note.slice(1)}` : note);
+
 // "Card: why note", led as every family leads (seatSays): "Player 1, Card: why note" two-handed, "Player 1: note" for an owned note with no why, capitalised solo.
 function sentence(a: AskFacts, hit: Hit): string | null {
   const { entry, values } = hit;
@@ -173,7 +176,8 @@ function sentence(a: AskFacts, hit: Hit): string | null {
   if (note === null || why === null) return null;
   const owned = entry.owned === true;
   const lead = seatSays(a.game);
-  if (why === "") return owned ? lead.say(note) : note;
+  // An owned note leads with the player two-handed ("Player 1: choose ...", as every family writes it) and is capitalised only solo, whichever way the entry wrote its first word.
+  if (why === "") return owned ? lead.say(a.game.seatCount > 1 ? lowerFirst(note) : note) : note;
   return owned ? lead.titled(String(values.card), `${why} ${note}`) : `${String(values.card)}: ${why} ${note}`;
 }
 

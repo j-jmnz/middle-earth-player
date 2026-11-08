@@ -2,7 +2,8 @@
 // (test/scenarios/raid-on-the-grey-havens/scene.ts): the keyword, the end of the round, the destruction under The Havens Burn and what that costs, the Setup's discards, the quest cards' effects and the encounter cards that burn.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { holds, outOfPlayCopies } from "../../interpret/conditions.ts";
+import { holds } from "../../interpret/conditions.ts";
+import { outOfPlayCopies } from "../../interpret/search.ts";
 import { settle } from "../../engine/machine.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ScenarioState } from "../../core/state.ts";

@@ -88,7 +88,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "forced",
       trigger: "endOfPhase",
       condition: { kind: "phase", is: "Refresh" },
-      instructions: [{ verb: "RaisePursuit", amount: 1 }, { verb: "LoseGame", reason: "The Uruk-hai delivered their prisoners to Saruman", when: { kind: "pursuit", min: 30 } }],
+      instructions: [{ verb: "RaisePursuit", amount: 1 }, { verb: "LoseGame", reason: "To Isengard!: the pursuit value reached 30", when: { kind: "pursuit", min: 30 } }],
     },
     // 143023 Uglúk: allies can be declared neither as attackers nor as defenders against him. (A:1, Toughness and no attachments, is a template.)
     {

@@ -5,6 +5,7 @@
 // words for the preview. The numbers are read with the engine's modifiedStat; nothing here adds one up.
 import type { Instruction, ModifierStat, ModifierUntil } from "../../catalog/boundary.ts";
 import { memoOf, type StateMemo } from "../../rules/interpret/constant-records.ts";
+import { captivesUnder } from "../../rules/families/captives/values.ts";
 import { aflameTally, burnTally } from "../../rules/families/aflame/values.ts";
 import { cellOf, islandOf } from "../../rules/families/island/map.ts";
 
@@ -299,7 +300,10 @@ function underMark(tally: { count: number; limit: number } | null): UnderMark | 
 }
 
 // The Ship enemy Belfalas Islet holds out of play while it is the active location (12129:A:2) is the same night pill as the cards under The Havens Burn: "1 held", and the reader hears the enemy's name.
+// The Captives of The Uruk-hai lying under To Isengard! or held by Grishnákh are counted the same way (families/captives): "2 held", and the reader hears each hero's name.
 function heldMark(game: ScenarioState, ctx: ReduceContext, cardId: string): UnderMark | null {
+  const captives = captivesUnder(game, cardId);
+  if (captives.length > 0) return heldWords(captives.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name));
   const held = Object.values(game.cards).filter((other) => other.zone === "under" && other.host === cardId && game.sea?.held?.[other.id] != null);
   return held.length > 0 ? heldWords(held.map((other) => printedOf(ctx.cards, other.code).name)) : null;
 }

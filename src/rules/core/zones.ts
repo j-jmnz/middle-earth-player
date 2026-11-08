@@ -338,6 +338,8 @@ export function moveCard(state: ScenarioState, id: string, requested: Destinatio
   let next = detach(state, id);
   if ((leavingPlay || guardLeaves(current, dest)) && current.host) next = unhost(next, id);
   let moved = stampEntry(attach(next, id, dest), id, current.zone);
+  // A Captive that leaves the captive zone is a Captive no more, and no seat holds it (families/captives): the discard pile it went to was read above.
+  if (current.captive === true && dest.zone !== "captive") moved = updateCard(moved, id, { captive: undefined, owner: undefined, heroSlot: undefined });
   // A card that goes from the encounter deck to its discard pile is announced in a game with ships (families/stormcaller/zone.ts).
   if (current.zone === "encounterDeck" && dest.zone === "encounterDiscard") moved = discardedFromDeck(moved, id);
   // A card shuffled back into the Uncharted deck is shuffled into it (families/uncharted/zone.ts).

@@ -279,7 +279,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("revealing") }),
   // The pursuit value (mec112.pursuit, the pursuit tracker beside the quest deck) is at most `max` and at least `min`: "If the pursuit value is 25 or lower" (143071:B:1), "30 or greater" (143022:A:2). False while no tracker is set (ScenarioState.pursuit).
   z.strictObject({ kind: z.literal("pursuit"), max: z.number().int().min(0).optional(), min: z.number().int().min(0).optional() }),
-  // The sole attacker: exactly one character was declared as an attacker in the attack in progress ("declared as the only attacker", 143015:A:3; rr.step-6-8b). Read by the pursuit family.
+  // The sole attacker: exactly one character was declared as an attacker in the attack in progress ("declared as the only attacker", 143015:A:3; rr.step-6-8b). Read by the attack family.
   z.strictObject({ kind: z.literal("soleAttacker") }),
   // The Captives in play (the Uruk-hai's heroes under To Isengard! or held by an enemy; src/rules/families/captives): at least `min` and at most `max` of them, or with `of: "actor"` only the acting seat's ("a seat with no Captive chooses one", 143069:A:1; "if there are no Captives in play", 143022:A:1).
   z.strictObject({ kind: z.literal("captives"), min: z.number().int().min(0).optional(), max: z.number().int().min(0).optional(), of: z.literal("actor").optional() }),

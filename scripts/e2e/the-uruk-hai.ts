@@ -20,7 +20,7 @@ export async function haiFixtures(): Promise<Partial<Record<HaiFixtureName, HaiF
   const find = (wanted: (state: ScenarioState) => boolean, label: string): HaiFixture | null => {
     const answer = (state: ScenarioState, ctx: ReduceContext, memory: Set<string>) => haiIntent(state, ctx, memory, { ...DEFAULT_POLICY, quest: "most" }, { ...HAI_POLICY, play: true, act: true });
     const found = firstSeed(say, { campaignId: "the-two-towers", scenarioId: "the-uruk-hai", seatCount: 2, answer }, "HAI_SEEDS", wanted, label);
-    return found && found;
+    return found;
   };
   const won = find((state) => state.stageCleared && !state.lost, "hai-won");
   const lost = find((state) => state.lost, "hai-lost");

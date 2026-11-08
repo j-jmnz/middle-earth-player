@@ -71,9 +71,9 @@ describe("an asks entry", () => {
     expect(asksChoose(facts(choose), loose)).toEqual({ note: "Urdug's Elite was explored.", owned: false });
   });
 
-  it("leads an owned note with no reason as every family does: \"Player 1: Choose ...\" two-handed, capitalised solo", () => {
+  it("leads an owned note with no reason as every family does: \"Player 1: choose ...\" two-handed, capitalised solo, whichever way the entry wrote the first word", () => {
     const own: AsksTable = { [askKey(RECORD, "0", "Choose")]: { note: "Choose how {card} is paid.", owned: true } };
-    expect(asksChoose(facts(choose), own)).toEqual({ note: "Player 1: Choose how Urdug's Elite is paid.", owned: true });
+    expect(asksChoose(facts(choose), own)).toEqual({ note: "Player 1: choose how Urdug's Elite is paid.", owned: true });
     const lower: AsksTable = { [askKey(RECORD, "0", "Choose")]: { note: "choose how {card} is paid.", owned: true } };
     expect(asksChoose(facts(choose, 1), lower)).toEqual({ note: "Choose how Urdug's Elite is paid.", owned: false });
   });
@@ -88,7 +88,7 @@ describe("an asks entry", () => {
   });
 
   it("words a Pick: the verb, the sentence, the rows that are no card, and no caution while its condition fails", () => {
-    expect(asksPick(facts(pick), table)).toEqual({ verb: "Exhaust", prompt: "Player 1: Choose a ready character you control to exhaust.", owned: true, labels: { skip: "Exhaust no one (Player 1)" } });
+    expect(asksPick(facts(pick), table)).toEqual({ verb: "Exhaust", prompt: "Player 1: choose a ready character you control to exhaust.", owned: true, labels: { skip: "Exhaust no one (Player 1)" } });
     expect(asksPick(facts(pick, 1), table)?.prompt).toBe("Choose a ready character you control to exhaust.");
   });
 

@@ -28,6 +28,14 @@ export function cardLabel(game: ScenarioState, names: SheetNames, id: string): s
   return tell ? `${names.card(id)} · ${tell}` : names.card(id);
 }
 
+/** The row of a Captive of The Uruk-hai in a pick whose options hold the Captives of more than one player (Grishnákh's, 143024:A:1): "Legolas · Player 2". Undefined for any other row. */
+export function captiveLabel(game: ScenarioState, names: SheetNames, id: string, options: readonly string[]): string | undefined {
+  const card = game.cards[id];
+  if (card?.captive !== true || card.owner == null) return undefined;
+  const owners = new Set(options.map((other) => game.cards[other]?.owner));
+  return owners.size > 1 ? `${names.card(id)} · Player ${card.owner + 1}` : undefined;
+}
+
 export function option(game: ScenarioState, names: SheetNames, id: string): SheetOption {
   if (id.startsWith("seat:")) return { id, label: `Player ${Number(id.slice(5)) + 1}`, code: null };
   // The staging area, where a Trap or a Guarded attachment is played (src/rules/families/attachments/play.ts).

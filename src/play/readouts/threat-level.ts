@@ -10,15 +10,16 @@ const CRITICAL = 45;
 
 export type ThreatLevel = "calm" | "near" | "critical";
 
-export function threatLevel(threat: number): ThreatLevel {
-  if (threat >= CRITICAL) return "critical";
-  if (threat >= NEAR) return "near";
+/** `limit` is the number that loses: the elimination level for a threat dial, 30 for the pursuit dial; it warms at four fifths of it and is critical from nine tenths. */
+export function threatLevel(threat: number, limit: number = ELIMINATION_THREAT): ThreatLevel {
+  if (threat >= (limit * CRITICAL) / ELIMINATION_THREAT) return "critical";
+  if (threat >= (limit * NEAR) / ELIMINATION_THREAT) return "near";
   return "calm";
 }
 
-/** The meter's fill, 0 to 1: the threat against the elimination level. */
-export function threatMeter(threat: number): number {
-  return Math.max(0, Math.min(1, threat / ELIMINATION_THREAT));
+/** The meter's fill, 0 to 1: the threat against the elimination level (or the `limit` that loses). */
+export function threatMeter(threat: number, limit: number = ELIMINATION_THREAT): number {
+  return Math.max(0, Math.min(1, threat / limit));
 }
 
 /** The change badge: a true minus sign when the threat fell, a plus when it rose; null when it did not move. */

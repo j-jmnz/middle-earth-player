@@ -52,7 +52,7 @@ describe("The Uruk-hai golden", () => {
         expect(won.some((golden) => golden.decks === "brittle")).toBe(true);
         const lost = HAI_GOLDENS.filter((golden) => golden.outcome === "lost");
         expect(lost.some((golden) => golden.decks === "weak")).toBe(true);
-        expect(lost.some((golden) => golden.lossReason?.includes("prisoners to Saruman"))).toBe(true);
+        expect(lost.some((golden) => golden.lossReason?.includes("pursuit value reached 30"))).toBe(true);
       });
 
       it("loses at 30 with the pursuit value at 30 or more, and never wins with it there", () => {

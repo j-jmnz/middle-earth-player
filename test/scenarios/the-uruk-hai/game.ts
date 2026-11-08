@@ -95,8 +95,8 @@ export const HAI_GOLDENS: readonly HaiGolden[] = [
   { name: "two-handed, won, Easy", seatCount: 2, seed: 5, difficulty: "Easy", decks: "strong", outcome: "won" },
   { name: "true solo, lost, heroes too small to quest", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
   { name: "two-handed, lost, heroes too small to quest", seatCount: 2, seed: 2, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
-  { name: "true solo, lost, the pursuit value reaches 30", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost", policy: { engage: false }, lossReason: "The Uruk-hai delivered their prisoners to Saruman" },
-  { name: "two-handed, lost, the pursuit value reaches 30", seatCount: 2, seed: 2, difficulty: "Normal", decks: "strong", outcome: "lost", policy: { engage: false }, lossReason: "The Uruk-hai delivered their prisoners to Saruman" },
+  { name: "true solo, lost, the pursuit value reaches 30", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost", policy: { engage: false }, lossReason: "To Isengard!: the pursuit value reached 30" },
+  { name: "two-handed, lost, the pursuit value reaches 30", seatCount: 2, seed: 2, difficulty: "Normal", decks: "strong", outcome: "lost", policy: { engage: false }, lossReason: "To Isengard!: the pursuit value reached 30" },
 ];
 
 const game = campaignGame<HaiDecks, HaiPolicy>({
