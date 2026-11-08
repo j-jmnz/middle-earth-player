@@ -18,6 +18,11 @@ export function captiveUnder(state: ScenarioState, hostId: string): string | nul
   return Object.values(state.cards).find((card) => card.zone === "captive" && card.host === hostId)?.id ?? null;
 }
 
+// Every hero held under the card: The Uruk-hai's To Isengard! holds one for each player (families/uruk/captive.ts), the other holders one.
+export function captivesUnder(state: ScenarioState, hostId: string): string[] {
+  return Object.values(state.cards).filter((card) => card.zone === "captive" && card.host === hostId).map((card) => card.id);
+}
+
 // CaptureRingBearer: discards every token on the Ring-bearer (its life is its own number, not a token), and places it and each
 // card attached to it facedown under the source. Nothing happens when no player controls a Ring-bearer.
 export function captureRingBearer(state: ScenarioState, instruction: Extract<Instruction, { verb: "CaptureRingBearer" }>, ctx: ReduceContext): ScenarioState {

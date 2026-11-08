@@ -12,12 +12,15 @@ export type WidgetReadouts = {
   life: number | null;
   // How many cards the burden deck holds (mec109.burden-deck), or null when the scenario has none. Their order is hidden.
   burdenDeck: number | null;
+  // The pursuit value of The Uruk-hai (mec112.pursuit), present only while the scenario's Setup has set one; the engine owns the number.
+  pursuit?: number;
 };
 
 export function widgetReadouts(game: ScenarioState): WidgetReadouts {
   return {
     life: game.widgets.lifeTracker && game.life != null ? game.life : null,
     burdenDeck: game.widgets.burdenDeck && game.burdenDeck != null ? game.burdenDeck.length : null,
+    ...(game.pursuit != null ? { pursuit: game.pursuit } : {}),
   };
 }
 

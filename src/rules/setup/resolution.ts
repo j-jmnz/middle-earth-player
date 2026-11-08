@@ -16,7 +16,7 @@ import { discardToPoolFromSets } from "../families/wilderland/mirkwood.ts";
 import { addEncounterCards, allyOrLineOptions, applyAllyOrLine, applyRemoval, applyStagedLocation, discoverTreasures, noteRemovalAnswer, playerOptions, removalOptions, removeEncounterCards, stagedLocationOptions } from "../families/wilderland/pool.ts";
 import { drawTreasures } from "../families/wilderland/treasure.ts";
 import { applyHazard, discardHazards, hazardOptions } from "../families/wilderland/hazards.ts";
-import { applyChooseOption, applyRevive, applyTrim, chooseOptionIds, earnForPick, earnHeldCopies, reviveOptions, threatPenalties, trimOptions, underneath } from "../families/campaign/resolution.ts";
+import { applyChooseOption, applyRevive, boonHeroes, applyTrim, chooseOptionIds, earnForPick, earnHeldCopies, reviveOptions, threatPenalties, trimOptions, underneath } from "../families/campaign/resolution.ts";
 
 // A won scenario runs the campaign card's Resolution instructions in order. An instruction that opens a choice asks
 // one seat at a time, first player first; the rest settle on their own from the final state (Lust for the Ring
@@ -291,7 +291,7 @@ function resolutionOptions(state: ScenarioState, instruction: Choosing, seat: nu
   const step = state.window?.kind === "resolution" ? state.window.step : state.resolutionAt;
   const codes = remainingCodes(state, instruction, step);
   if (codes.length === 0) return [];
-  const options = instruction.to === "hero" ? codes.flatMap((code) => heroesOf(state, seat, instruction.anyHero).map((hero) => `${code}>${hero}`)) : instruction.to === "player" ? playerOptions(state, codes) : codes;
+  const options = instruction.to === "hero" ? codes.flatMap((code) => boonHeroes(state, ctx, code, heroesOf(state, seat, instruction.anyHero)).map((hero) => `${code}>${hero}`)) : instruction.to === "player" ? playerOptions(state, codes) : codes;
   return instruction.optional ? [...options, SKIP] : options;
 }
 

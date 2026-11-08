@@ -334,7 +334,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
           acting={peek.acting}
           viewed={peek.viewed}
           life={widgets.life}
-          burdenDeck={widgets.burdenDeck}
+          burdenDeck={widgets.burdenDeck} pursuit={widgets.pursuit ?? null}
           tokens={tokens}
           heading={headingDial} island={island}
           onIsland={() => setReading({ kind: "island" })}

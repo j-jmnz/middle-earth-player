@@ -3,6 +3,9 @@
 // the log's hero lists (`campaignFacts.heroLog`) and returns the Resolution log; src/rules/setup/resolution.ts opens the windows and calls these.
 import type { Instruction } from "../../../catalog/boundary.ts";
 import type { Earned, ResolutionLog } from "../../core/campaign-state.ts";
+import { printedOf } from "../../core/printed.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { effectsOf } from "../../windows/listen.ts";
 import { inPlay, livingSeats, type ScenarioState } from "../../core/state.ts";
 import { fallenAfter, heroesAfter } from "./hero-lists.ts";
 import { seatsThatPicked } from "./picks.ts";
@@ -17,6 +20,19 @@ export function loggedHeroes(state: ScenarioState, seat: number): string[] {
 /** The heroes on the list of fallen heroes now: every seat's list, less the ones a boon brought back. */
 export function fallenNow(state: ScenarioState): string[] {
   return fallenAfter([...new Set((state.campaignFacts?.heroLog?.fallen ?? []).flat())], state.resolutionLog);
+}
+
+/**
+ * The heroes a boon may be attached to at a Resolution: with a Trait on its own "Attach to a Warrior hero." line (the Skill boons, 143015:A:2 to 143018:A:2; user ruling C1, 2026-11-08, from the FFG preview "Now May I Make a Right
+ * Choice": "Each of these boons can only be attached to a hero with the corresponding trait"), only a hero with it; any other boon takes every hero.
+ */
+export function boonHeroes(state: ScenarioState, ctx: ReduceContext, code: string, heroes: readonly string[]): string[] {
+  const trait = effectsOf(ctx, code).flatMap((effect) => (effect.timing === "setup" ? effect.instructions : [])).flatMap((instruction) => (instruction.verb === "AttachSelf" && instruction.to.kind === "hero" && instruction.to.trait ? [instruction.to.trait] : []))[0];
+  if (trait === undefined) return [...heroes];
+  return heroes.filter((id) => {
+    const card = state.cards[id];
+    return card != null && printedOf(ctx.cards, card.code).traits.includes(trait);
+  });
 }
 
 /** The options a ChooseOption offers: an option that needs a fallen hero is offered only while the list holds one. */

@@ -36,6 +36,8 @@ export type TopBarProps = {
   viewed: number | null;
   life: number | null;
   burdenDeck: number | null;
+  // The pursuit value of The Uruk-hai (mec112.pursuit), a dial with no meter beside the others while the scenario holds one.
+  pursuit?: number | null;
   // The resource tokens on the campaign card (The Oath, 41050:A:3) or on the current stage (Journey in the Dark, 142041:B:3) and the card's name, or null
   // when its scenario has none.
   tokens?: { name: string; tokens: number } | null;
@@ -68,7 +70,7 @@ export type TopBarProps = {
   onMenu: () => void;
 };
 
-export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens = null, heading = null, island = null, onIsland, onNightmare = null, rail, stopAhead, carouselOpen, narrow, areas, ticks, ringSeat = null, ringWords = null, ringMark = "oneRing", menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
+export function TableTopBar({ threats, acting, viewed, life, burdenDeck, pursuit = null, tokens = null, heading = null, island = null, onIsland, onNightmare = null, rail, stopAhead, carouselOpen, narrow, areas, ticks, ringSeat = null, ringWords = null, ringMark = "oneRing", menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
   const t = useTableTokens();
   const s = useUiScale();
   const screen = useWindowDimensions();
@@ -157,6 +159,7 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
               </View>
             ) : null}
             {life != null ? <ThreatRing threat={{ seat: 0, threat: life, eliminated: false }} label="Life" testID="life" icon={null} elimination={false} compact /> : null}
+            {pursuit != null ? <ThreatRing threat={{ seat: 0, threat: pursuit, eliminated: false }} label="Pursuit" accessibilityName="Pursuit value" testID="pursuit-value" icon={null} elimination={false} compact /> : null}
             {tokens != null ? <ThreatRing threat={{ seat: 0, threat: tokens.tokens, eliminated: false }} label="Tokens" accessibilityName={`Resource tokens on ${tokens.name}`} testID="campaign-tokens" icon="resource" elimination={false} compact /> : null}
             {burdenDeck != null ? <ThreatRing threat={{ seat: 0, threat: burdenDeck, eliminated: false }} label="Burden" accessibilityName="Burden deck" testID="burden-deck" icon={null} elimination={false} compact /> : null}
             {onNightmare ? (

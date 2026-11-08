@@ -75,19 +75,34 @@ describe("143071 The Uruk-hai: the pursuit value gates the choice (mec112.pursui
   });
 });
 
-describe("143071 The Uruk-hai: the Skill boons", () => {
-  it("answers 'boons' itself when no hero has fallen, then each player takes a different Skill boon onto a hero", () => {
-    const { state, ctx } = won("143071", 2, (s) => ({ ...s, pursuit: 20, campaignFacts: facts({ heroes: [[ARAGORN], []], fallen: [[], []], fellowship: [] }) }));
+describe("143071 The Uruk-hai: the Skill boons (user ruling C1, 2026-11-08)", () => {
+  // The table's own heroes are Hobbits, which no Skill boon fits; Théodred (a Warrior) is seat 0's and Beravor (a Ranger) seat 1's.
+  const withHeroes: Place = (s) => {
+    const first = spawn(s, THEODRED, { zone: "heroes", seat: 0 });
+    const second = spawn(first.state, "01012", { zone: "heroes", seat: 1 });
+    return { ...second.state, pursuit: 20, campaignFacts: facts({ heroes: [[ARAGORN], []], fallen: [[], []], fellowship: [] }) };
+  };
+
+  it("answers 'boons' itself when no hero has fallen, then each player takes a different Skill boon onto a hero with its trait", () => {
+    const { state, ctx } = won("143071", 2, withHeroes);
     expect(state.resolutionLog.picks).toEqual([{ name: "uruk", seat: 0, option: "boons" }]);
-    const first = options(state, ctx);
-    expect(first).toContain(`${BOONS[0]}>${heroId(state, "141001")}`);
-    const one = choose(state, ctx, `${BOONS[0]}>${heroId(state, "141001")}`);
-    expect(options(one, ctx).some((id) => id.startsWith(`${BOONS[0]}>`))).toBe(false);
-    const done = choose(one, ctx, `${BOONS[1]}>${heroId(one, "141003")}`);
+    const theodred = heroId(state, THEODRED);
+    // Théodred is a Noble Warrior: Intimidation and Leader of Men fit him, Hands of a Healer and Forewarned fit no hero of seat 0.
+    expect(options(state, ctx)).toEqual([`${BOONS[0]}>${theodred}`, `${BOONS[3]}>${theodred}`]);
+    const one = choose(state, ctx, `${BOONS[0]}>${theodred}`);
+    // Seat 1 holds Beravor, a Ranger: Forewarned only.
+    expect(options(one, ctx)).toEqual([`${BOONS[2]}>${heroId(one, "01012")}`]);
+    const done = choose(one, ctx, `${BOONS[2]}>${heroId(one, "01012")}`);
     expect(resolutionResult(done)?.earned.map((item) => [item.code, item.to, item.seat, item.hero])).toEqual([
-      [BOONS[0], "hero", 0, "141001"],
-      [BOONS[1], "hero", 1, "141003"],
+      [BOONS[0], "hero", 0, THEODRED],
+      [BOONS[2], "hero", 1, "01012"],
     ]);
+  });
+
+  it("offers a seat none of them when no hero it controls has a Skill's trait", () => {
+    const { state, ctx } = won("143071", 1, (s) => ({ ...s, pursuit: 20, campaignFacts: facts({ heroes: [[ARAGORN]], fallen: [[]], fellowship: [] }) }));
+    expect(options(state, ctx)).toEqual([]);
+    expect(resolutionResult(state)?.earned).toEqual([]);
   });
 });
 

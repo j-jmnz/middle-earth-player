@@ -2,16 +2,27 @@ appId: com.middleearth.lcg
 tags:
   - scenario
 ---
-# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `hai-won` (scripts/e2e/the-uruk-hai.ts): a real two-handed
-# game of The Uruk-hai, parked on its win. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
-# The steps are the shared subflow's (.maestro/subflows/scenario-win.yaml); add this scenario's own assertions after the call.
+# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `hai-won` (scripts/e2e/the-uruk-hai.ts): a real two-handed game of The Uruk-hai
+# (the Defenders of Gondor and Swords of the Noldor lists, Easy) from the blank log a new The Two Towers playthrough starts on, parked on its win (Uglúk out of play, Rescue the Captives defeated). The fixture is OPEN:
+# scripts/e2e/fixtures.ts found no win of the two decklists in its seeds (Aragorn, who has 5 hit points and whose leaving play loses the game, leaves play in most games), so this flow cannot run until a seed wins.
+# The table shows the pursuit value as a dial of the top bar (`pursuit-value`, docs/design-system-table.md, Top bar), read while the victory is on it. The Resolution asks nothing the decklists answer: with the pursuit
+# value at 25 or lower the players choose between a Skill boon for each player and Beyond All Hope, and a boon is offered only on a hero with its Trait (143071:B:1). The Two Towers has no XP.
+# The win unlocks Helm's Deep, which is not playable yet: its node is coming soon (scripts/checks/maestro.test.ts, path-soon).
 - runFlow:
     file: ../../subflows/scenario-win.yaml
     env:
       FIXTURE: hai-won
       SCENARIO_ID: the-uruk-hai
-      # A Resolution that asks one choice: the code of the card it offers, the choice's eyebrow text and the sentence the confirm line shows.
-      # CHOICE_ID: "TODO"
-      # CHOICE_PROMPT: "TODO"
-      # CHOICE_CONSEQUENCE: "TODO"
-# TODO: this scenario's own assertions on the path screen after the win (the next part's node, a carried card).
+      NO_XP: "true"
+      TABLE_WIDGET: pursuit-value
+      # A Resolution that asks one choice: the code of the card it offers, the choice's eyebrow text and the sentence the confirm line shows. Set them once the fixture's seed is known (the choice depends on the pursuit
+      # value it ends on and the Traits of its heroes).
+      # CHOICE_ID: "<the code the seed offers first>"
+      # CHOICE_PROMPT: "<the eyebrow>"
+      # CHOICE_CONSEQUENCE: "<the confirm line>"
+# Helm's Deep is the next part and the app cannot deal it yet: the road says so and offers nothing to begin.
+- assertVisible:
+    id: path-soon
+    text: "Helm.s Deep is coming soon\\."
+- assertNotVisible:
+    id: begin
