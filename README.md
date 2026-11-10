@@ -186,7 +186,7 @@ Flows are in `.maestro/scenarios/<scenario-id>/` and `.maestro/features/`. Run `
 | `pnpm data:query "<sql>"` | Queries `cards`, `scenario_cards` and `rules` in memory. |
 | `pnpm effects:draft <scenario \| deck \| pack \| codes>` | Writes `.agent/drafts/<code>.md` per card with an uncovered printed line. |
 | `pnpm effects:open` | Regenerates `src/effects/open-lines.ts`. |
-| `pnpm scenario:new <scenario-id>` | Writes and registers a new scenario's skeleton files. `--dry-run` first; `--track fast` writes spec rows and an asks file in place of the scene file. |
+| `pnpm scenario:new <scenario-id>` | Writes and registers a new scenario's skeleton files. `--dry-run` first. |
 | `pnpm author:pack <scenario-id>` | Writes `.agent/pack/<id>.md`, the fast-track author's context: vocabulary, schema entries, cookbook sections and drafts. |
 | `pnpm a11y:web` | Audits the main web screens with axe-core in Chromium; fails on serious or critical findings. Needs `pnpm exec playwright install chromium` once, or `A11Y_CHROMIUM=<path>`. |
 | `pnpm catalog:build` | Writes `assets/catalog.db` (never committed) and `src/catalog/version.ts` (committed). |

@@ -147,7 +147,11 @@ Ordered by what they save per scenario. A step that is built is deleted from thi
    - Each one gets a card test, or a golden reaches it.
    - Exit: the list is empty or each entry has a card test.
 3. **The draft marks the Setup sentences the piles already carry out.** Not built. For a campaign card's Setup, `effects:draft` marks each sentence that the scenario's `scenarioPiles` or the Setup parser already carries out, so the author writes no record for it. Exit: the draft of a scenario whose Setup the piles carry lists no such sentence as open.
-4. **The win finder** (section F). Not built. It is the only way the Dream-chaser win flows can run. Exit: a won fixture for each scenario in `docs/phases/STATUS.md`, Fixtures and Maestro.
+4. **The win finder** (section F). Not built.
+   - It is the search player: a beam search over legal intents, built on `test/harness/auto-player.ts` and scored on threat, progress, hero health and stage.
+   - It replaces each scenario's policy in `game.ts`.
+   - It is the only way the Dream-chaser win flows can run.
+   - Exit: a won fixture for each scenario in `docs/phases/STATUS.md`, Fixtures and Maestro.
 
 ## After each scenario phase
 
@@ -158,7 +162,7 @@ Ordered by what they save per scenario. A step that is built is deleted from thi
   - the review findings by class;
   - the fix-pass lines by area, with the words and the sheets apart from the rest;
   - the readings asked and the readings ruled (`.claude/agents/orchestrator.md`, Implementer tasks);
-  - the time each task took.
+  - for each task, its full runs, its wait minutes and its writing minutes.
 - **Feed back.** For each finding class that recurs, add a check, a template or a line in the author's readings to Next steps. Delete a step when it is built.
 
 ## Order
