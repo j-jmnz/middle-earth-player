@@ -62,11 +62,11 @@ describe("the guide and Restore defaults", () => {
 });
 
 describe("the Moving fog row's detail", () => {
-  it("says why the fog is already still, else what the switch does", () => {
+  it("says why the fog is already still, else what the switch does, on Rivendell for the table alone", () => {
     expect(fogLine(false, false)).toBe(FOG_LINE);
     expect(fogLine(true, false)).toBe(FOG_LIGHT_LINE);
     expect(fogLine(false, true)).toBe(FOG_REDUCED_LINE);
-    expect(fogLine(true, true)).toBe(FOG_LIGHT_LINE);
+    expect(fogLine(true, true)).toBe(FOG_REDUCED_LINE);
   });
 });
 

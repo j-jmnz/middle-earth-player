@@ -31,8 +31,9 @@ export const TITLE_FACE_LINE = "Carved draws titles and the table's numbers in c
 export const PERFORMANCE_LINE = "Lower these if the table stutters or the device runs hot. Gameplay is unchanged.";
 export const QUALITY_LINE = "Low draws table cards at a lower resolution and uses less memory. Previews stay sharp.";
 export const FOG_LINE = "Animated fog behind every screen. Off saves battery.";
-// What the Moving fog row says when the fog is already still (the switch still saves its value).
-export const FOG_LIGHT_LINE = "No effect: Rivendell has no fog.";
+// What the Moving fog row says on Rivendell, whose fog is the table's only, and when Reduce motion already holds it still (the switch still
+// saves its value).
+export const FOG_LIGHT_LINE = "Animated fog behind the table. Off saves battery.";
 export const FOG_REDUCED_LINE = "No effect: Reduce motion already stops the fog.";
 export const SPEED_LINE = "Quick shortens animations and skips the phase title. Slow makes animations and the banner's pauses one and a half times as long.";
 export const BANNER_CLOSES_LINE = "After a few seconds closes the banner on its own. When tapped keeps it until you tap or swipe it, or the next one replaces it.";
@@ -56,10 +57,10 @@ export const ALWAYS_LINE = "Played without asking. Tap one to be asked again.";
 export const CREDITS =
   "Card data comes from RingsDB, Hall of Beorn and DragnCards. The type is Marcellus SC and Barlow Semi Condensed, under the SIL Open Font License. This is a fan-made, unofficial app, not made, endorsed or sponsored by Fantasy Flight Games or Asmodee.";
 
-/** The Moving fog row's detail: why the fog is already still (the Light theme has none, Reduce motion holds it), else what the switch does. */
+/** The Moving fog row's detail: why the fog is already still (Reduce motion holds it), else what the switch does, on Rivendell for the table's fog alone. */
 export function fogLine(light: boolean, reduced: boolean): string {
-  if (light) return FOG_LIGHT_LINE;
-  return reduced ? FOG_REDUCED_LINE : FOG_LINE;
+  if (reduced) return FOG_REDUCED_LINE;
+  return light ? FOG_LIGHT_LINE : FOG_LINE;
 }
 
 export type AlwaysRow = { effectId: string; label: string };

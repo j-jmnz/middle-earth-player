@@ -14,7 +14,7 @@ export function resolveTheme(setting: ThemeOption, osScheme: "light" | "dark" | 
   return setting;
 }
 
-/** Reads the setting and the phone's scheme. Only the root layout calls it, and hands the answer down through ThemeContext. */
+/** Reads the setting and the phone's scheme. The root layout calls it and hands the answer down through ThemeContext; so does each page (`Screen`, chrome-frame.tsx), for a screen React Activity holds hidden. */
 export function useResolvedTheme(): ThemeName {
   const setting = useStore(tableSettings, (state) => state.settings.theme);
   return resolveTheme(setting, useColorScheme());

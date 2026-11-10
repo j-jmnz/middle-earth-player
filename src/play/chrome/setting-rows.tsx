@@ -87,10 +87,10 @@ export function SettingsRows({
 }) {
   const id = (name: string) => `${testPrefix}-${name}`;
   const top = groups[0];
-  // The fog is already still in the light theme, Rivendell (it has none) and under reduced motion: the row says so, dimmed, and still saves.
+  // The fog is already still under reduced motion: the row says so, dimmed, and still saves. On Rivendell it moves only the table's fog, and says so.
   const light = useTheme() === "light";
   const reduced = useReduceMotion();
-  const fogStill = light || reduced;
+  const fogStill = reduced;
   return (
     <>
       {groups.includes("display") ? (
