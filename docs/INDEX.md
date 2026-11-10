@@ -107,7 +107,7 @@ Read the sections your task touches.
     - 616–633 The Caves of Nibin-Dûm (~2.4K)
   - 634–691 Dream-chaser (~15.6K) ← 4
   - 692–718 Ered Mithrin (~15.8K) ← 7
-  - 719–757 The Two Towers (~3.6K) ← 13
+  - 719–757 The Two Towers (~3.6K) ← 14
   - 758–766 Nightmare (~410) ← 19
   - 767–805 Deckbuilding (~1.9K)
   - 806–884 Effects (~3.2K)
@@ -200,14 +200,14 @@ STATUS.md, then the active phase file.
 
 - `docs/phases/STATUS.md` — Phase status (~7.2K tok)
   - 5–15 Rules (~410)
-  - 16–90 Phases (~1.5K)
-  - 91–194 Open items (~4.7K)
-    - 93–95 Releases (~50)
-    - 96–118 Fixtures and Maestro (~1.3K)
-    - 119–166 Rules and engine (~2.2K)
-    - 167–187 Screens and code (~900)
-    - 188–194 Rules and engine (The Two Towers) (~240)
-  - 195–212 Standing decisions (~550)
+  - 16–92 Phases (~1.5K)
+  - 93–196 Open items (~4.7K)
+    - 95–97 Releases (~50)
+    - 98–120 Fixtures and Maestro (~1.3K)
+    - 121–168 Rules and engine (~2.2K)
+    - 169–189 Screens and code (~900)
+    - 190–196 Rules and engine (The Two Towers) (~240)
+  - 197–214 Standing decisions (~550)
 
 ## Live plans
 
@@ -216,7 +216,7 @@ Read when a task names the plan.
 - `docs/plans/effect-authoring.md` — Authoring effect records (~7.4K tok)
   - 12–33 Workflow (~470)
   - 34–50 Where records live (~370)
-  - 51–75 Templates and copied lines (~690) ← 5
+  - 51–75 Templates and copied lines (~690) ← 6
   - 76–100 The record (~500)
   - 101–117 Which card an instruction acts on (~380)
   - 118–138 Pick filters (~410)
@@ -227,6 +227,16 @@ Read when a task names the plan.
   - 237–273 Mechanic families: engine and records together (~1.4K) ← 1
   - 274–287 Readings the review catches (~490) ← 4
   - 288–307 Not expressible yet: leave open, report (~390)
+- `docs/plans/helms-deep-and-road-to-isengard.md` — Plan: Helm's Deep and The Road to Isengard (~4.1K tok)
+  - 3–10 Context (~310)
+  - 11–16 Base and landing (~150)
+  - 17–22 What does not move (~110)
+  - 23–122 Sections (~3.2K)
+    - 25–62 1. Helm's Deep (phase 64) (~1.5K)
+    - 63–113 2. The Road to Isengard (phase 65) (~1.7K)
+    - 114–122 3. Closing (~100)
+  - 123–128 Risks (~190)
+  - 129–136 Measure (~70)
 - `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.7K tok)
   - 3–14 Context (~450)
   - 15–24 What does not move (~190)
@@ -251,7 +261,7 @@ Open work; read when a task names it.
   - 38–56 Files you own (edit freely) (~490)
   - 57–70 Shared files (~300)
   - 71–85 Approach (~690) ← 1
-  - 86–123 Scenario procedure (~1.7K) ← 11
+  - 86–123 Scenario procedure (~1.7K) ← 12
   - 124–133 Checkpoints (API usage limits can stop you mid-task) (~210)
   - 134–148 Checks before committing (~320)
   - 149–155 Merge (~140) ← 1

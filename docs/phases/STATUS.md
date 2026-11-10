@@ -87,6 +87,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 61 | The Two Towers data | completed | 2026-11-07. Review round done. Open: MEC112 2023 wording unverified. |
 | 62 | The Two Towers campaign shell | completed | 2026-11-07. Review round done. |
 | 63 | The Uruk-hai | completed | 2026-11-10. Review round done. Open: `hai-won`. |
+| 64 | Helm's Deep | not started | Plan: `docs/plans/helms-deep-and-road-to-isengard.md`, section 1. |
+| 65 | The Road to Isengard | not started | Plan: `docs/plans/helms-deep-and-road-to-isengard.md`, section 2. Depends on 64. |
 
 ## Open items
 
