@@ -6,7 +6,7 @@ import { EFFECTS } from "../../src/effects/index.ts";
 
 import type { Effect } from "../../src/catalog/boundary.ts";
 
-import { announce, answer, attack, offers, attackersOf, cancel, cardSpecs, counter, damageOn, defend, defender, drew, handCount, heldBy, progressOn, quest, refused, resolve, resourcesOn, respond, reveal, rowProblems, stat, withoutLine, zone, type Row } from "./card-spec.ts";
+import { announce, answer, attack, offers, attackersOf, cancel, cardSpecs, counter, damageOn, deckCount, defend, defender, drew, endPhase, handCount, heldBy, progressOn, quest, refused, resolve, resourcesOn, respond, reveal, rowProblems, stat, withoutLine, zone, type Row } from "./card-spec.ts";
 import { printedIn } from "./scene-kit.ts";
 
 const ID = "the-fate-of-wilderland";
@@ -83,6 +83,24 @@ describe("card-spec damage, hand, draws and held Captives", () => {
     expect(rowProblems(URUK, { ...pursuit, expect: counter("pursuit", 10) }, EFFECTS)).toEqual(["pursuit is 11, not 10"]);
     expect(rowProblems(URUK, { ...pursuit, layout: { staging: ["143029"] }, expect: counter("pursuit", 0) }, EFFECTS)).toEqual(["pursuit is absent, not 0"]);
     expect(rowProblems(URUK, { ...pursuit, expect: counter("life", 1) }, EFFECTS)).toEqual(["life is absent, not 1"]);
+  });
+});
+
+describe("card-spec deck count and ending a phase", () => {
+  it("counts the encounter deck: the shadow card of an additional attack leaves it", () => {
+    const twice = row({}, attack("f3", { shadow: "143031", undefended: true }), deckCount(2));
+    expect(rowProblems(URUK, twice, EFFECTS)).toEqual([]);
+    expect(rowProblems(URUK, { ...twice, expect: deckCount(3) }, EFFECTS)).toEqual(["the encounter deck holds 2 cards, not 3"]);
+    expect(rowProblems(URUK, twice, withoutLine(EFFECTS, "143031:A:2"))).toEqual(["the encounter deck holds 3 cards, not 2"]);
+  });
+
+  it("plays on until the phase the row began in is over, also after an action that stopped the round", () => {
+    const layout = { committed: ["dh1"], deck: ["f0", "f0"], staging: ["143023"] };
+    const lasting = row(layout, [reveal("143031"), endPhase], stat("dh1", "willpower", 1));
+    expect(rowProblems(URUK, lasting, EFFECTS)).toEqual([]);
+    // The quest phase is over: the travel window is open, which it is not right after the reveal.
+    expect(rowProblems(URUK, { ...lasting, expect: offers("DeclineTravel") }, EFFECTS)).toEqual([]);
+    expect(rowProblems(URUK, { ...lasting, act: reveal("143031"), expect: offers("DeclineTravel") }, EFFECTS)).toEqual(["DeclineTravel is not offered"]);
   });
 });
 

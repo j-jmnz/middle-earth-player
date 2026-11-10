@@ -77,8 +77,8 @@ const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   ForEachPlayer: [{ verb: "ForEachPlayer", order: "lastFirst", instructions: [] }],
 };
 
-// A key whose every value reads alike (the only value of `to` on Travel is "self", also what its absence means).
-const SAME_EITHER_WAY = new Set(["Travel.to"]);
+// A key whose value in a sample reads as its absence does (the only value of `to` on Travel is "self"; `to: "play"` is what a MovePicked without `to` words).
+const SAME_EITHER_WAY = new Set(["Travel.to", "MovePicked[1].to"]);
 // Keys that hold instructions: the renderer prints them beneath, not in the line.
 const NESTED = new Set(["instructions", "options"]);
 
@@ -93,16 +93,13 @@ describe("effects:render read fields", () => {
     expect(Object.keys(SAMPLES).sort()).toEqual(Object.keys(TEMPLATES).sort());
   });
 
-  it("prints every field a template says it reads", () => {
+  it("prints every field a template says it reads, in each sample that sets it", () => {
     const hidden: string[] = [];
     for (const [verb, samples] of Object.entries(SAMPLES)) {
-      const read = new Set<string>();
-      const shown = new Set<string>();
-      for (const sample of samples) {
+      samples.forEach((sample, index) => {
         const full = textOf(verb, sample);
         for (const key of full.read) {
-          read.add(key);
-          if (!(key in sample)) continue;
+          if (!(key in sample) || NESTED.has(key) || SAME_EITHER_WAY.has(`${verb}.${key}`) || SAME_EITHER_WAY.has(`${verb}[${index}].${key}`)) continue;
           const { [key]: _removed, ...rest } = sample;
           let without: string | null = null;
           try {
@@ -110,13 +107,18 @@ describe("effects:render read fields", () => {
           } catch {
             // A template that cannot run without the key reads it for its text.
           }
-          if (without !== full.text) shown.add(key);
+          // Removing the key must change the text: otherwise the sample's value is not said.
+          if (without === full.text) hidden.push(`${verb}[${index}].${key}`);
         }
-      }
-      // A key shows in some sample: the text changes when it is removed. A key no sample sets cannot be checked.
-      for (const key of read) if (!NESTED.has(key) && !SAME_EITHER_WAY.has(`${verb}.${key}`) && !shown.has(key)) hidden.push(`${verb}.${key}`);
+      });
     }
     expect(hidden).toEqual([]);
+  });
+
+  it("claims for Restrict only the keys its branch says", () => {
+    expect(textOf("Restrict", { verb: "Restrict", what: "advance" }).read).toEqual(["what"]);
+    expect(textOf("Restrict", { verb: "Restrict", what: "travel" }).read).not.toContain("allies");
+    expect(textOf("Restrict", { verb: "Restrict", what: "defend" }).read).not.toContain("location");
   });
 
   it("says the fields the review found dropped", () => {

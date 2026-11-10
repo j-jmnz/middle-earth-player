@@ -22,6 +22,7 @@ export type Act =
   | { act: "reveal"; code: string }
   | { act: "travel"; code: string }
   | { act: "endRound" }
+  | { act: "endPhase" }
   | { act: "answer"; id: string }
   | { act: "respond"; code: string }
   | { act: "cancel" }
@@ -41,6 +42,7 @@ export type Expect =
   | { expect: "refused"; code: string; value: boolean }
   | { expect: "counter"; name: CounterName; value: number }
   | { expect: "heldBy"; code: string; host: string }
+  | { expect: "deckCount"; value: number }
   | { expect: "lost" }
   | { expect: "won" }
   | { expect: "frame"; name: string }

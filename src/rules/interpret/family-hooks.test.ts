@@ -42,14 +42,14 @@ describe("settle hooks", () => {
     expect(() => settleHooks("before", list, { before: ["a"], after: [], sweep: [] })).toThrow(/family b .*settle\.before/);
   });
 
-  it("keep the order the core's chain had", () => {
+  it("keep the order the core's chain had, the captives' rescue last", () => {
     const names = (phase: "before" | "after" | "sweep") => RULES_FAMILIES.filter((candidate) => candidate.settle?.[phase]).map((candidate) => candidate.name);
     for (const phase of ["before", "after", "sweep"] as const) {
       expect([...names(phase)].sort()).toEqual([...SETTLE_ORDER[phase]].sort());
       expect(settleHooks(phase)).toHaveLength(SETTLE_ORDER[phase].length);
     }
     expect(SETTLE_ORDER.before).toEqual(["burden", "island", "south"]);
-    expect(SETTLE_ORDER.after).toEqual(["sea", "stormcaller", "island", "wilderland"]);
+    expect(SETTLE_ORDER.after).toEqual(["sea", "stormcaller", "island", "wilderland", "captives"]);
   });
 });
 

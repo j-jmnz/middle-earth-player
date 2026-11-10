@@ -1,5 +1,4 @@
 // Rules: rr.in-play-and-out-of-play, rr.removed-from-game (data/rules/entries.json). The encounter cards an effect can find or shuffle: the out-of-play copies of a card and the matches in the encounter deck and discard pile.
-// Split from conditions.ts, whose conditions and traits it has no part in.
 import { BURN_CODE } from "../families/aflame/values.ts";
 import { printedOf } from "../core/printed.ts";
 import type { ScenarioState } from "../core/state.ts";

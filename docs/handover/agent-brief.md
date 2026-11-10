@@ -95,7 +95,7 @@ The one way to build a scenario. A subagent cannot start agents, so the orchestr
    - Verbs in their families, each with its own test: a new verb is engine work in the mechanic family it belongs to (`src/catalog/families/<family>.ts` for the schema, `src/rules/families/<family>/` for the engine), cites a ledger line or a rule span, and reuses the keyword framework and the existing verbs where they fit.
    - The records in `src/effects/authored/<id>.ts`, a repeated sentence as a template and a line printed the same as another card's as a copy (`docs/plans/effect-authoring.md`, Templates and copied lines); `pnpm effects:open`; the scenario in `PLAYABLE_SCENARIOS` (`src/campaign/playable.ts`) once none of its lines is open, until ownership coverage is green for every line of every dealt card, the campaign card's Setup and Resolution included.
    - Then the render, `pnpm effects:render <id> --out .agent/render/<id>.md` (a piece printed as `[json ...]` or `[also {...}]` has no template yet), and the scenario's snapshot, `pnpm effects:render --all --out scripts/data/effects/render/snapshots`, which `snapshots.test.ts` compares for every playable scenario.
-3. **Judge.** The orchestrator runs `reading-judge` on the render and the ledger, with a fresh context. A `render-gap` row is filed as a renderer open item in `docs/phases/STATUS.md`, not sent to the author.
+3. **Judge.** The orchestrator runs `reading-judge` on the render and the ledger, with a fresh context. A `render-gap` row (`.claude/agents/reading-judge.md`) is filed as a renderer open item in `docs/phases/STATUS.md`, not sent to the author.
 4. **Finish**, by a fresh `scenario-author` handed the Build note and the judge's rows. It writes:
    - fixes for every `wrong` line, rendered again; an `ambiguous` line that is a real choice goes back to the orchestrator;
    - spec rows, one for each record whose behaviour needs a game moment, in `src/campaign/scenarios/<id>/spec.test.ts` (`test/harness/card-spec.ts` says the row's shape and runs it again with its line's records removed, failing a row that still passes), plus tests in the same folder for what a row cannot express: a full test file is for a new verb (a family test) or a multi-step mechanic, and each of its tests starts its title with the line id it covers. `scripts/checks/spec-coverage.test.ts` fails a line the records name that has neither a row nor such a test, and a test file whose header claims a line it does not test;
@@ -119,7 +119,7 @@ Each is cited in `docs/brief.md`.
 
 **Engine half exit:** coverage and the goldens are green in Node. A win runs this campaign card's resolution and unlocks the next scenario. A loss writes nothing.
 
-**Screen half exit:** the scenario's words and widgets are written and tested, its Maestro win and loss flows are written, and no control types damage, resources, threat, progress, or life. Phone checks are not tracked.
+**Screen half exit:** the scenario's words and widgets are written and tested, its Maestro win and loss flows are written, and no control types damage, resources, threat, progress, or life.
 
 ## Checkpoints (API usage limits can stop you mid-task)
 

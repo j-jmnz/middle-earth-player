@@ -7,7 +7,7 @@ import type { EngineStep } from "../../src/rules/core/intents.ts";
 import type { PlayerIntent } from "../../src/rules/engine/reduce.ts";
 
 import type { Act, Done, Row } from "./card-spec-types.ts";
-import { fightEnemy, finish, first, idOf, legalIntents, resolveRecords, revealFromTop, send, start as begin, tableFromLayout, type Layout, type LayoutTable, type Run } from "./scene-kit.ts";
+import { fightEnemy, finish, first, idOf, legalIntents, opening, resolveRecords, revealFromTop, send, start as begin, tableFromLayout, type Layout, type LayoutTable, type Run, type ScenePhase } from "./scene-kit.ts";
 
 // Test helper. Plays the actions of a card-spec row (card-spec-types.ts, Act) on a table built from its layout: each action is the scene kit's helper for it (`resolveRecords`, `revealFromTop`, `fightEnemy`, `send` of an
 // intent from `legalIntents`). Rules: rr.forced, rr.response, rr.reveal, rr.cancel, rr.travel (data/rules/entries.json).
@@ -117,6 +117,11 @@ function perform(done: Done, act: Act, next: Act | undefined, picks: string[], s
     }
     case "endRound":
       return passOn(run, table, (state) => state.round > run.state.round, pick);
+    case "endPhase": {
+      // An action that stopped the round (a reveal, a resolved effect) leaves it between windows: the phase it stopped in opens again where it began.
+      const resumed = run.state.mode === "stopped" && !run.state.window ? { ...run, state: { ...run.state, ...opening(run.state.phase as ScenePhase) } } : run;
+      return passOn(resumed, table, (state) => state.phase !== run.state.phase || state.round > run.state.round, pick);
+    }
     case "answer": {
       if (run.state.window?.kind !== "choose") {
         // Without the row's records nothing opens the choice: the answer is skipped, and the expectation says whether the row held.

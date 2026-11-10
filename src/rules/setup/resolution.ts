@@ -11,7 +11,6 @@ import { frameScope, resolveAmount } from "../interpret/amounts.ts";
 import { xpOf } from "../families/dreamchaser/index.ts";
 import { dealtCopies } from "../families/aflame/cards.ts";
 import { shuffleIds } from "../core/seed.ts";
-import { rescueCaptives } from "../families/captives/index.ts";
 import { inPlay, livingSeats, type ScenarioState } from "../core/state.ts";
 import { discardToPoolFromSets } from "../families/wilderland/mirkwood.ts";
 import { addEncounterCards, allyOrLineOptions, applyAllyOrLine, applyRemoval, applyStagedLocation, discoverTreasures, noteRemovalAnswer, playerOptions, removalOptions, removeEncounterCards, stagedLocationOptions } from "../families/wilderland/pool.ts";
@@ -313,8 +312,7 @@ export function openResolution(state: ScenarioState, ctx: ReduceContext): Scenar
   // Dropping the frame stack is safe: a frame only continues a reveal, hide, response, or effect of the round
   // that just ended, and the scenario is won, so nothing it could still do (a surge reveal, a forced trigger,
   // more damage) can change the outcome. Frames are not carried into the resolution window or past it.
-  // Winning the last stage rescues each Captive of The Uruk-hai: they are among their owners' heroes when the Resolution reads them (143070:B:3).
-  return advanceResolution(rescueCaptives(state), ctx);
+  return advanceResolution(state, ctx);
 }
 
 export function resolutionIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {

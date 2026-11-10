@@ -78,6 +78,11 @@ describe("an asks entry", () => {
     expect(asksChoose(facts(choose, 1), lower)).toEqual({ note: "Choose how Urdug's Elite is paid.", owned: false });
   });
 
+  it("keeps the capital of a card's name that opens an owned note", () => {
+    const named: AsksTable = { [askKey(RECORD, "0", "Choose")]: { note: "Grishnákh takes {card}.", owned: true } };
+    expect(asksChoose(facts(choose), named)).toEqual({ note: "Player 1: Grishnákh takes Urdug's Elite.", owned: true });
+  });
+
   it("words a branch: its row from the entry keyed with the option id, and its caution only when the condition holds", () => {
     expect(asksOption(facts(choose), "exhaust", table)).toEqual({ label: "Exhaust a character you control" });
     // A Choose has no {n} of its own (the entry binds the number it says): the row's own bind fills it.

@@ -22,7 +22,7 @@ For each ledger line, read the printed words first, then the English, and compar
 - `ok`: every clause of the printed line is in the English and nothing is added.
 - `wrong`: a clause is missing, extra, reversed or mis-scoped. Name the clause and what it should say.
 - `ambiguous`: the printed words, or a rule they lean on, allow two readings and the English picks one. A line with no record, or with `[json ...]` you cannot read, is `ambiguous` unless the ledger marks it inert.
-- `render-gap`: the record may be right, but the English cannot show whether a clause holds (a stat's engine name, a flag, a field the template leaves out). Name the clause. It is not `ambiguous`, which is two readings of the card: the orchestrator files a render gap as a renderer open item and does not send it to the author.
+- `render-gap`: the record may be right, but the English cannot show whether a clause holds (a stat's engine name, a flag, a field the template leaves out). Name the clause. It is not `ambiguous`, which is two readings of the card: the orchestrator files it (`docs/handover/agent-brief.md`, Scenario procedure, Judge).
 
 ## Output
 
@@ -39,4 +39,4 @@ Needs ruling
 - <line id>: reading A / reading B (<rule id or card line that decides it, or "none found">)
 ```
 
-One entry for each reading that needs a ruling, and for each `ambiguous` row that is a real choice between two readings; write `Needs ruling` followed by `- none` when there is none. The author fixes every `wrong` before going on, and a `render-gap` is not theirs to fix; a ruling is the caller's to ask for.
+One entry for each reading that needs a ruling, and for each `ambiguous` row that is a real choice between two readings; write `Needs ruling` followed by `- none` when there is none. The author fixes every `wrong` before going on, and a `render-gap` is not theirs to fix (Judge, in the same procedure); a ruling is the caller's to ask for.

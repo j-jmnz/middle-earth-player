@@ -2,6 +2,7 @@
 // whether an intent type is legal now.
 import type { LegalIntent, ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 import { modifiedStat } from "../../rules/core/keywords.ts";
+import { printedOf } from "../../rules/core/printed.ts";
 
 import { pictureKey } from "../canvas/picture-key.ts";
 import { islandTell } from "../words/scenarios/uncharted.ts";
@@ -28,12 +29,17 @@ export function cardLabel(game: ScenarioState, names: SheetNames, id: string): s
   return tell ? `${names.card(id)} · ${tell}` : names.card(id);
 }
 
-/** The row of a Captive of The Uruk-hai in a pick whose options hold the Captives of more than one player (Grishnákh's, 143024:A:1): "Legolas · Player 2". Undefined for any other row. */
-export function captiveLabel(game: ScenarioState, names: SheetNames, id: string, options: readonly string[]): string | undefined {
+/**
+ * The row of a Captive of The Uruk-hai in a pick (Grishnákh's, 143024:A:1; Hands of a Healer's, 143016:A:3, which mixes Captives with the heroes the players control): "Legolas · Captive · 2 of 4 damage", with
+ * " · Player 2" after it when the options hold the heroes of more than one player. Undefined for any other row.
+ */
+export function captiveLabel(game: ScenarioState, ctx: ReduceContext, names: SheetNames, id: string, options: readonly string[]): string | undefined {
   const card = game.cards[id];
-  if (card?.captive !== true || card.owner == null) return undefined;
-  const owners = new Set(options.map((other) => game.cards[other]?.owner));
-  return owners.size > 1 ? `${names.card(id)} · Player ${card.owner + 1}` : undefined;
+  if (card?.captive !== true) return undefined;
+  const hitPoints = printedOf(ctx.cards, card.code).health;
+  const damage = hitPoints == null ? `${card.damage} damage` : `${card.damage} of ${hitPoints} damage`;
+  const owners = new Set(options.map((other) => game.cards[other]?.owner).filter((owner) => owner != null));
+  return `${names.card(id)} · Captive · ${damage}${card.owner != null && owners.size > 1 ? ` · Player ${card.owner + 1}` : ""}`;
 }
 
 export function option(game: ScenarioState, names: SheetNames, id: string): SheetOption {

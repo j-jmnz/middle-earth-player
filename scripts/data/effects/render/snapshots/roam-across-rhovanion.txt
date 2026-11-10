@@ -21,10 +21,10 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
   12184:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - ignore the deep keyword(s)
-    - each card (any player controls) named "Urdug", that is an enemy engaged with a player: stat willpower the resource tokens on card (any player controls) named "Urdug", that is an enemy engaged with a player, while this card is in play
-    - each card (any player controls) named "Urdug", that is an enemy engaged with a player: stat threat the resource tokens on card (any player controls) named "Urdug", that is an enemy engaged with a player, while this card is in play
-    - each card (any player controls) named "Urdug", that is an enemy engaged with a player: stat attack the resource tokens on card (any player controls) named "Urdug", that is an enemy engaged with a player, while this card is in play
-    - each card (any player controls) named "Urdug", that is an enemy engaged with a player: stat defense the resource tokens on card (any player controls) named "Urdug", that is an enemy engaged with a player, while this card is in play
+    - each card (any player controls) named "Urdug", (enemies engaged with a player included): stat willpower the resource tokens on card (any player controls) named "Urdug", (enemies engaged with a player included), while this card is in play
+    - each card (any player controls) named "Urdug", (enemies engaged with a player included): stat threat the resource tokens on card (any player controls) named "Urdug", (enemies engaged with a player included), while this card is in play
+    - each card (any player controls) named "Urdug", (enemies engaged with a player included): stat attack the resource tokens on card (any player controls) named "Urdug", (enemies engaged with a player included), while this card is in play
+    - each card (any player controls) named "Urdug", (enemies engaged with a player included): stat defense the resource tokens on card (any player controls) named "Urdug", (enemies engaged with a player included), while this card is in play
 
 12184:B:3 (back): Resolution: If there are 3 or more resources on Urdug, each player adds a copy of Misplaced Trust to the campaign pool (and their deck). Otherwise, each player adds a copy of Urdug's Cunning to the campaign pool.
   12184:resolution:1: Resolution
@@ -311,7 +311,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 
 19050:B:1 (back): Each encounter card guarding a card is immune to player card effects.
   19050:constant:1: Constant
-    - each card (any player controls) that is an enemy engaged with a player [also {"guardsCard":true}]: stat immuneToPlayerCards 1, while this card is in play
+    - each card (any player controls) (enemies engaged with a player included) [also {"guardsCard":true}]: stat immuneToPlayerCards 1, while this card is in play
 
 19050:B:2 (back): Forced: When the players defeat this stage, remove it from the game. Advance to a random stage 2A, if able. Otherwise, advance to stage 3A.
   19050:forced:1: Forced on the event questCardDefeated (heard about this card)

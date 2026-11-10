@@ -6,7 +6,8 @@ import type { CampaignFacts } from "../rules/core/campaign-state.ts";
 import type { PrintedCard } from "../rules/core/printed.ts";
 import { legalIntents, reduce } from "../rules/engine/reduce.ts";
 import { holds } from "../rules/interpret/conditions.ts";
-import { openResolution, resolutionResult } from "../rules/setup/resolution.ts";
+import { resolutionResult } from "../rules/setup/resolution.ts";
+import { settle } from "../rules/engine/machine.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
 import { spawn } from "../rules/core/zones.ts";
 import { holdCaptive } from "../rules/families/captives/index.ts";
@@ -54,7 +55,8 @@ const facts = (heroLog?: Omit<NonNullable<CampaignFacts["heroLog"]>, "captives">
 function won(code: string, seats: 1 | 2 = 1, place: Place = (state) => state) {
   const { state, ctx } = table(scene, { seats });
   const resolving: ScenarioState = { ...place(state), phase: "Quest", window: null, stageCleared: true, resolution: recordInstructions(EFFECTS, code, "resolution") };
-  return { state: openResolution(resolving, ctx), ctx };
+  // The settle loop rescues each Captive as the stage is defeated, then opens the Resolution.
+  return { state: settle(resolving, ctx, []), ctx };
 }
 
 const options = (state: ScenarioState, ctx: ReturnType<typeof table>["ctx"]): string[] => legalIntents(state, ctx).flatMap((intent) => (intent.type === "ChooseResolution" ? [intent.optionId] : []));
@@ -100,7 +102,7 @@ describe("143071 The Uruk-hai: the Skill boons (user ruling C1, 2026-11-08)", ()
     ]);
   });
 
-  it("rescues each Captive first (143070:A:1): a seat whose only Warrior is its Captive is offered Intimidation on that hero", () => {
+  it("rescues each Captive first (143070:B:3): a seat whose only Warrior is its Captive is offered Intimidation on that hero", () => {
     const { state, ctx } = won("143071", 1, (s) => {
       const hero = spawn(s, THEODRED, { zone: "heroes", seat: 0 });
       const host = spawn(hero.state, "143022", { zone: "staging" });

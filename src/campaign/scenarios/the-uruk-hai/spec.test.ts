@@ -1,7 +1,7 @@
 // Rules: mec112.pursuit, mec112.permanent, rr.reveal, rr.travel, rr.player-elimination, rr.lasting-effects, rr.active-location (data/rules/entries.json).
 import { describe, it } from "vitest";
 
-import { announce, answer, attack, attackersOf, cardSpecs, counter, damageOn, drew, endRound, flag, handCount, heldBy, lost, resolve, resourcesOn, respond, reveal, stat, travel, quest, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, attackersOf, cardSpecs, counter, damageOn, deckCount, drew, endPhase, endRound, flag, handCount, heldBy, lost, resolve, resourcesOn, respond, reveal, stat, travel, quest, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Uruk-hai (the-two-towers part 1): one row for each record whose behaviour a game moment shows (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/handover/agent-brief.md, Scenario procedure). The pursuit value is read through the quest points X of the
@@ -18,7 +18,7 @@ const ROWS: readonly Row[] = [
   { line: "143069:A:1", name: "a hero becomes a Captive and the pursuit value is set to 10", layout: { staging: ["143022"] }, act: SETUP, expect: [X(10), zone("dh1", "captive")] },
   { line: "143069:B:1", name: "the stage's quest points are the pursuit value", layout: { staging: ["143022"] }, act: SETUP, expect: X(10) },
   { line: "143069:B:2", name: "Uglúk cannot leave the staging area", layout: { staging: ["143023"] }, act: [], expect: [flag("143023", "cannotLeaveStaging"), flag("143023", "cannotTakeDamage"), flag("143023", "cannotBeEngaged")] },
-  // Combat ends with 1 enemy (Uglúk) in the staging area, the refresh phase adds 1 more.
+  // Combat ends with 2 enemies (Uglúk and f0) in the staging area, the refresh phase adds 1 more: 10 + 2 + 1.
   { line: "143069:B:3", name: "the combat phase's end raises the pursuit value by the enemies in the staging area", layout: { staging: ["143022", "143023", "f0"], pursuit: 10, captive: CAPTIVE }, act: endRound, expect: X(13) },
   { line: "143022:A:2", name: "the refresh phase raises the pursuit value by 1", layout: { staging: ["143022"], pursuit: 10, captive: CAPTIVE }, act: endRound, expect: X(11) },
   { line: "143022:A:1", name: "with no Captive in play the players lose", layout: { staging: ["143022"] }, act: resolve("143022", "forced"), expect: lost },
@@ -45,6 +45,8 @@ const ROWS: readonly Row[] = [
   { line: "143029:A:2", name: "Shadow: the second option has the attack considered undefended", layout: { pursuit: 10 }, act: [attack("f3", { shadow: "143029" }), answer("undefended")], expect: [counter("pursuit", 10), damageOn("dh1", 1)] },
   { line: "143030:A:1", name: "the second option deals 1 damage to each character committed to the quest", layout: { pursuit: 10, committed: ["dh1"] }, act: [reveal("143030"), answer("damage")], expect: [damageOn("dh1", 1), counter("pursuit", 10)] },
   { line: "143031:A:2", name: "Shadow: the attacking enemy makes an additional attack", act: attack("f3", { shadow: "143031", undefended: true }), expect: attackersOf("dh1", ["f3", "f3"]) },
+  { line: "143031:A:2", name: "Shadow: the additional attack is dealt a new shadow card (faq.additional-attacks)", act: attack("f3", { shadow: "143031", undefended: true }), expect: deckCount(2) },
+  { line: "143031:A:1", name: "the -1 Willpower lasts past the quest phase, to the end of the round", layout: { committed: ["dh1"], deck: ["f0", "f0"], staging: ["143023"] }, act: [reveal("143031"), endPhase], expect: stat("dh1", "willpower", 1) },
   { line: "143063:A:2", name: "the first option has the player assign 3 damage among their characters", layout: { pursuit: 10 }, act: [reveal("143063"), answer("damage")], expect: damageOn("dh1", 3) },
   { line: "143064:A:3", name: "Shadow: a non-objective attachment the defending player controls is discarded", layout: { attached: [{ code: "attachment", to: "dh1" }] }, act: attack("f3", { shadow: "143064" }), expect: zone("attachment", "discard") },
   { line: "143066:A:2", name: "When Revealed: a card of the revealing player's hand is discarded", layout: { hand: ["filler"], staging: ["143022"] }, act: resolve("143066", "whenRevealed"), expect: handCount(0) },

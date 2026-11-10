@@ -102,7 +102,7 @@ Scenario piles that place cards with no record (activeLocation: 143027 Eastemnet
 143023:A:2 (front): Allies cannot be declared as attackers or defenders against Uglúk.
   143023:constant:2: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each card (any player controls) named "Uglúk", that is an enemy engaged with a player: stat alliesCannotAttack (allies cannot be declared as attackers against it) 1, while this card is in play
+    - each card (any player controls) named "Uglúk", (enemies engaged with a player included): stat alliesCannotAttack (allies cannot be declared as attackers against it) 1, while this card is in play
     - allies cannot be declared as defenders against this card's attacks (only this card's, not another enemy's)
 
 ## 143024 Grishnákh

@@ -49,7 +49,7 @@ export const RULES_FAMILIES: readonly RulesFamily[] = [
 // `before`: after the constant win check, before the core refills the encounter deck. `after`: right after that refill. `sweep`: after the core's own sweeps.
 export const SETTLE_ORDER: Readonly<Record<"before" | "after" | "sweep", readonly string[]>> = {
   before: ["burden", "island", "south"],
-  after: ["sea", "stormcaller", "island", "wilderland"],
+  after: ["sea", "stormcaller", "island", "wilderland", "captives"],
   sweep: ["aflame", "objectives", "sea", "wilderland"],
 };
 

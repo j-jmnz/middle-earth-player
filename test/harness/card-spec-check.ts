@@ -95,6 +95,9 @@ export function failures(done: Done, wanted: readonly Expect[]): string[] {
           if (held?.zone !== "captive" || held.host !== host) problems.push(`${item.code} is ${held?.zone === "captive" ? `held by ${state.cards[held.host ?? ""]?.code ?? "nothing"}` : `in ${held?.zone ?? "no zone"}`}, not held by ${item.host}`);
           break;
         }
+        case "deckCount":
+          if (state.encounterDeck.length !== item.value) problems.push(`the encounter deck holds ${state.encounterDeck.length} cards, not ${item.value}`);
+          break;
         case "lost":
           if (!state.lost) problems.push("the game is not lost");
           break;

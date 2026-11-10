@@ -30,6 +30,8 @@ export const reveal = (code: string): Act => ({ act: "reveal", code });
 export const travel = (code: string): Act => ({ act: "travel", code });
 /** Every window is passed until the next round begins, the end of this round included. */
 export const endRound: Act = { act: "endRound" };
+/** Every window is passed until the phase the row began in is over, and the next one has begun. */
+export const endPhase: Act = { act: "endPhase" };
 /** The option of the choice that is open. */
 export const answer = (id: string): Act => ({ act: "answer", id });
 /** The first hero declares `with` (any card of the layout) as the defender of the attack, in place of the first hero. Follows the `attack` action directly. */
@@ -62,6 +64,8 @@ export const refused = (code: string, value = true): Expect => ({ expect: "refus
 export const counter = (name: CounterName, value: number): Expect => ({ expect: "counter", name, value });
 /** The card lies in the captive zone, held by the host card. */
 export const heldBy = (code: string, host: string): Expect => ({ expect: "heldBy", code, host });
+/** The encounter deck holds this many cards: one is gone for each shadow card or reveal drawn from it (an additional attack is dealt a new shadow card, faq.additional-attacks). */
+export const deckCount = (value: number): Expect => ({ expect: "deckCount", value });
 export const lost: Expect = { expect: "lost" };
 export const won: Expect = { expect: "won" };
 /** A frame of this name was pushed while the action ran. */

@@ -18,13 +18,8 @@ import { heldFrom, releaseHero } from "../south/captive.ts";
 import type { Focus } from "../index.ts";
 import { captiveHeldBy, captivesOf } from "./values.ts";
 
-/** The hero lies faceup under `hostId` as a Captive (the Setup's choice, a test table's layout). */
+/** The hero lies faceup under `hostId` as a Captive: it leaves its seat's list of heroes (remembering where it was), keeps what it has, and nobody controls it (the Setup's choice, a test table's layout). */
 export function holdCaptive(state: ScenarioState, heroId: string, hostId: string): ScenarioState {
-  return hold(state, heroId, hostId);
-}
-
-// The hero lies faceup under `hostId`: it leaves its seat's list of heroes (remembering where it was), keeps what it has, and nobody controls it.
-function hold(state: ScenarioState, heroId: string, hostId: string): ScenarioState {
   const hero = state.cards[heroId];
   if (!hero) return state;
   const held = hero.captive === true ? {} : heldFrom(state, heroId);
@@ -44,7 +39,7 @@ function takeLogged(state: ScenarioState, under: string): ScenarioState {
   for (const entry of logged) {
     const seat = next.seats[entry.seat];
     const heroId = seat?.heroes.find((id) => next.cards[id]?.code === entry.hero);
-    if (heroId) next = hold(next, heroId, host.id);
+    if (heroId) next = holdCaptive(next, heroId, host.id);
   }
   return next;
 }
@@ -54,24 +49,24 @@ function make(state: ScenarioState, under: string): ScenarioState {
   const hero = state.cards[heroId];
   const host = cardInPlay(state, under);
   if (!hero || !host || hero.zone !== "heroes") return state;
-  return hold(state, heroId, host.id);
+  return holdCaptive(state, heroId, host.id);
 }
 
 function holdPicked(state: ScenarioState, focus: Focus): ScenarioState {
   const hero = state.cards[lastPicked(state)];
   if (!hero || hero.captive !== true || focus.sourceId == null) return state;
-  return hold(state, hero.id, focus.sourceId);
+  return holdCaptive(state, hero.id, focus.sourceId);
 }
 
 function returnHeld(state: ScenarioState, under: string, focus: Focus): ScenarioState {
   const held = captiveHeldBy(state, focus.sourceId);
   const host = cardInPlay(state, under);
-  return held && host ? hold(state, held.id, host.id) : state;
+  return held && host ? holdCaptive(state, held.id, host.id) : state;
 }
 
 /**
  * The players win by defeating Rescue the Captives (143070:B:3, "they have rescued each Captive hero"; 143071:B:1 reads the rescued heroes): each Captive returns among its owner's heroes in the place it held, controlled by its owner
- * again, with its damage, tokens and attachments kept. It is no longer a Captive, so To Isengard!'s blank no longer reaches it. No event. Called when the Resolution opens, before it reads the heroes.
+ * again, with its damage, tokens and attachments kept. It is no longer a Captive, so To Isengard!'s blank no longer reaches it. No event. The settle loop calls it as soon as the stage is cleared, in a campaign game and in a standalone one alike, before the score or the Resolution reads the heroes.
  */
 export function rescueCaptives(state: ScenarioState): ScenarioState {
   let next = state;
@@ -116,6 +111,7 @@ function condition(state: ScenarioState, found: Condition, scope: { actor: numbe
 
 export const manifest: RulesFamily = {
   name: "captives",
+  settle: { after: (state) => (state.stageCleared && !state.lost ? rescueCaptives(state) : state) },
   verbs: ["TakeLoggedCaptives", "MakeCaptive", "HoldCaptive", "ReturnCaptive", "DamageHeldCaptive"],
   run,
   condition: (state, found, scope) => condition(state, found, scope),

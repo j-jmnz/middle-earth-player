@@ -12,9 +12,9 @@ export function captiveHeldBy(state: ScenarioState, hostId: string | null): Card
   return hostId == null ? null : (captivesOf(state).find((card) => card.host === hostId) ?? null);
 }
 
-/** The ids of the Captives the card holds (lies under or is attached to), in card order: To Isengard! holds every Captive no enemy does, Grishnákh the one he picked. */
-export function captivesUnder(state: ScenarioState, hostId: string): string[] {
-  return captivesOf(state).filter((card) => card.host === hostId).map((card) => card.id);
+/** The ids of the Captives the card holds (lies under or is attached to), in card order: To Isengard! holds every Captive no enemy does, Grishnákh the one he picked. `held` is `captivesOf(state)` when the caller already has it for several hosts. */
+export function captivesUnder(state: ScenarioState, hostId: string, held?: readonly CardInstance[]): string[] {
+  return (held ?? captivesOf(state)).filter((card) => card.host === hostId).map((card) => card.id);
 }
 
 /** The pick filter `captive`: `only` and `include` name every Captive, `free` those lying under a card that is not an enemy (none held by Grishnákh). */

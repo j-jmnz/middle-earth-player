@@ -37,8 +37,6 @@ export function scoreParts(state: ScenarioState, cards: ReadonlyMap<string, Prin
       for (const id of seat.heroes) damage += state.cards[id]?.damage ?? 0;
     }
   }
-  // A Captive the players rescued by winning (143070:B:3) is a surviving hero: the damage on it counts.
-  for (const card of Object.values(state.cards)) if (card.captive === true && card.zone === "captive") damage += card.damage;
   const victoryPoints = state.victory.reduce((sum, id) => sum + victoryPointsOf(state, id, cards), 0);
   return { threat, destroyed, damage, rounds: completedRounds(state), victoryPoints };
 }

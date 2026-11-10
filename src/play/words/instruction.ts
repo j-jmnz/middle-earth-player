@@ -287,17 +287,22 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
       return `${refWords(instruction.target)} gets ${instruction.amount >= 0 ? `+${instruction.amount}` : instruction.amount} ${STAT_WORDS[instruction.stat] ?? instruction.stat} while attacking ${refWords(instruction.versus)}`;
     default:
       // The encounter family's verbs (src/catalog/families/encounter.ts), then the attachments, attack, play and deck families'.
-      return breakingWords(instruction, names, game) ?? oathWords(instruction, names.code) ?? nightmareWords(instruction, names.code) ?? seaWords(instruction) ?? unchartedWords(instruction) ?? islandWords(instruction) ?? aflameWords(instruction) ?? stormcallerWords(instruction) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? moriaWords(instruction, names) ?? burdenWords(instruction) ?? encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction) ?? assaultWords(instruction) ?? pursuitWords(instruction);
+      return breakingWords(instruction, names, game) ?? oathWords(instruction, names.code) ?? nightmareWords(instruction, names.code) ?? seaWords(instruction) ?? unchartedWords(instruction) ?? islandWords(instruction) ?? aflameWords(instruction) ?? stormcallerWords(instruction) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? moriaWords(instruction, names) ?? burdenWords(instruction) ?? encounterWords(instruction) ?? attachmentWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction) ?? assaultWords(instruction) ?? pursuitWords(instruction, game);
   }
 }
 
+// ", to 31": the value the branch leaves, when the amount is a plain number and the Setup has set the value (a lowered value stops at 0, 143070:B:2).
+function pursuitTo(game: ScenarioState, amount: Amount, sign: 1 | -1): string {
+  return typeof amount === "number" && game.pursuit != null ? `, to ${Math.max(0, game.pursuit + sign * amount)}` : "";
+}
+
 // The words of the pursuit family's verbs (src/catalog/families/pursuit.ts) inside a choice: what a branch of a Choose does ("Increase the pursuit value by 3"), or null for any other verb.
-function pursuitWords(instruction: Instruction): string | null {
+function pursuitWords(instruction: Instruction, game: ScenarioState): string | null {
   switch (instruction.verb) {
     case "RaisePursuit":
-      return `increase the pursuit value by ${amountWords(instruction.amount)}`;
+      return `increase the pursuit value by ${amountWords(instruction.amount)}${pursuitTo(game, instruction.amount, 1)}`;
     case "LowerPursuit":
-      return `reduce the pursuit value by ${amountWords(instruction.amount)}`;
+      return `reduce the pursuit value by ${amountWords(instruction.amount)}${pursuitTo(game, instruction.amount, -1)}`;
     case "SetPursuit":
       return `set the pursuit value to ${instruction.value}`;
     default:

@@ -4,7 +4,7 @@ import { discardArea } from "../families/breaking/areas.ts";
 import type { EngineStep } from "./intents.ts";
 import { fromEncounterDeck, printedOf, type PrintedCard } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
-import { flagged, heldAmount, livingSeats, updateCard, withSeat } from "./state.ts";
+import { flagged, heldAmount, heldHero, livingSeats, updateCard, withSeat } from "./state.ts";
 import { inPlay, moveCard, type Destination } from "./zones.ts";
 
 export function markLoss(state: ScenarioState, reason: string): ScenarioState {
@@ -77,7 +77,7 @@ export function eliminateEmpties(state: ScenarioState, steps: EngineStep[], fina
     const level = 50 - Math.max(0, heldAmount(next, `seat:${index}`, "eliminationReduction"));
     if (!final && seat.threat < level && seat.heroes.length === 0 && (state.heroSavers ?? []).includes(index)) continue;
     // A hero an enemy guards is in play, not killed (Carried Away, 18074:B:1; rr.player-elimination): its owner is not out of heroes while it is held.
-    const held = seat.threat < level && seat.heroes.length === 0 && Object.values(next.cards).some((card) => (card.guardedHero === true || card.captive === true) && card.zone === "captive" && card.owner === index);
+    const held = seat.threat < level && seat.heroes.length === 0 && Object.values(next.cards).some((card) => heldHero(card) && card.owner === index);
     if (held) continue;
     if (seat.threat >= level || seat.heroes.length === 0) {
       // A card that keeps the seat in the game at its threat elimination level is asked instead (10124:A:2).

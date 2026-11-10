@@ -13,6 +13,8 @@ import { moveCard } from "../../rules/core/zones.ts";
 import { loadCampaign, loadScenario } from "../../../scripts/data/load-scenarios.ts";
 
 import { cardEffects, slotNumbers } from "../cards/card-effects.ts";
+import { dungeonDetail } from "../cards/dungeon-preview.ts";
+import { captiveLabel } from "../choice/sheet-parts.ts";
 import { sheetFor } from "../choice/sheets.ts";
 import type { PickSheet, SheetNames } from "../choice/sheet-types.ts";
 import { threatLevel, threatMeter } from "../readouts/threat-level.ts";
@@ -97,15 +99,43 @@ describe("the Captives on the table", () => {
     const window = revealed.state.window;
     expect(window?.kind).toBe("choose");
     const sheet = sheetFor(revealed.state, made.ctx, legalIntents(revealed.state, made.ctx), namesOf(revealed.state, made.cards)) as PickSheet;
-    expect(sheet.options.map((option) => option.label)).toEqual([`${made.cards.get("dh2")?.name} · Player 1`, `${made.cards.get(both.cards[seat1]?.code ?? "")?.name} · Player 2`]);
+    expect(sheet.options.map((option) => option.label)).toEqual([`${made.cards.get("dh2")?.name} · Captive · 0 of 6 damage · Player 1`, `${made.cards.get(both.cards[seat1]?.code ?? "")?.name} · Captive · 0 of 6 damage · Player 2`]);
     expect(sheet.note).toContain("choose 1 Captive for Grishnákh to hold");
     expect(sheet.note?.startsWith("Player 1: choose")).toBe(true);
+    // The damage on a Captive is against its hit points.
+    const hurt = updateCard(both, idOf(both, "dh2"), { damage: 2 });
+    const hurtReveal = revealFromTop(hurt, made.ctx, "143024", []);
+    const hurtSheet = sheetFor(hurtReveal.state, made.ctx, legalIntents(hurtReveal.state, made.ctx), namesOf(hurtReveal.state, made.cards)) as PickSheet;
+    expect(hurtSheet.options[0]?.label).toBe("dh2 · Captive · 2 of 6 damage · Player 1");
     // One seat's Captives only: no owner is added.
     const mine = tableFromLayout("the-uruk-hai", { ...PURSUING, seats: 2 }, {});
     const twice = holdCaptive(mine.state, mine.hero, idOf(mine.state, "143022"));
     const own = revealFromTop(twice, mine.ctx, "143024", []);
     const ownSheet = sheetFor(own.state, mine.ctx, legalIntents(own.state, mine.ctx), namesOf(own.state, mine.cards));
-    expect(ownSheet?.kind === "pick" ? ownSheet.options.map((option) => option.label) : []).toEqual([made.cards.get("dh1")?.name, made.cards.get("dh2")?.name]);
+    expect(ownSheet?.kind === "pick" ? ownSheet.options.map((option) => option.label) : []).toEqual([`${made.cards.get("dh1")?.name} · Captive · 0 of 6 damage`, `${made.cards.get("dh2")?.name} · Captive · 0 of 6 damage`]);
+  });
+
+  it("a pick that mixes a Captive with a hero the player controls (Hands of a Healer, 143016:A:3) reads the Captive as one and the hero as a plain row", () => {
+    const made = two();
+    const captive = idOf(made.state, "dh2");
+    const hero = idOf(made.state, "dh1");
+    const labels = [captive, hero].map((id) => captiveLabel(made.state, made.ctx, namesOf(made.state, made.cards), id, [captive, hero]));
+    expect(labels).toEqual([`${made.cards.get("dh2")?.name} · Captive · 0 of 6 damage`, undefined]);
+  });
+
+  it("the preview of a Captive says who holds it and that its text box is blank; the card that holds Captives names them", () => {
+    const made = two();
+    const seat1 = made.seat1Hero ?? "";
+    const isengard = idOf(made.state, "143022");
+    const grishnakh = idOf(made.state, "143024");
+    const name = (id: string) => made.cards.get(made.state.cards[id]?.code ?? "")?.name ?? id;
+    const under = dungeonDetail(made.state, made.ctx, idOf(made.state, "dh2"), name);
+    expect(under).toBe("Player 1's hero, a Captive held under To Isengard! No one controls it and its text box is blank until the players win.");
+    const both = holdCaptive(made.state, seat1, grishnakh);
+    expect(dungeonDetail(both, made.ctx, seat1, name)).toBe("Player 2's hero, a Captive held by Grishnákh. No one controls it and its text box is blank. It takes 1 damage at the end of each quest phase until Grishnákh leaves play.");
+    expect(dungeonDetail(both, made.ctx, isengard, name)).toBe("Holds dh2 as a Captive. No one controls it, and its text box is blank until the players win.");
+    expect(dungeonDetail(both, made.ctx, grishnakh, name)).toBe(`Holds ${name(seat1)}, a Captive. It takes 1 damage at the end of each quest phase until Grishnákh leaves play.`);
+    expect(dungeonDetail(made.state, made.ctx, grishnakh, name)).toBeNull();
   });
 });
 
@@ -121,6 +151,15 @@ describe("the choices that name the pursuit value", () => {
     const note = sheet?.kind === "pick" ? sheet.note : "";
     expect(note).toContain(WORDS);
     if (code === "143030") expect(note).toContain("This effect cannot be canceled.");
+  });
+
+  it("143025's rows name the value each leaves: the raise to 30, and the other card", () => {
+    const made = tableFromLayout("the-uruk-hai", layout, {});
+    const revealed = revealFromTop(made.state, made.ctx, "143025", []);
+    const sheet = sheetFor(revealed.state, made.ctx, legalIntents(revealed.state, made.ctx), namesOf(revealed.state, made.cards));
+    const labels = sheet?.kind === "pick" ? sheet.options.map((option) => option.label) : [];
+    expect(labels[0]).toBe("Increase the pursuit value by 3, to 30");
+    expect(labels).toHaveLength(2);
   });
 
   it("143029's Shadow choice does as well", () => {

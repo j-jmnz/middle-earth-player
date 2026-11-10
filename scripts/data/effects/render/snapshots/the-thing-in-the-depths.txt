@@ -217,7 +217,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12046:A:1 (front): Travel: Add 1 resource to each Raider card in play to travel here.
   12046:travel:1: Travel
-    - for each Raider card (any player controls) that is an enemy engaged with a player:
+    - for each Raider card (any player controls) (enemies engaged with a player included):
       - place 1 resource tokens on the picked card
 
 12046:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack.

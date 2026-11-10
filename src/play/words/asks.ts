@@ -25,7 +25,7 @@ export type Text = string | readonly { when?: Condition; text: string }[];
 
 /**
  * One entry of an asks file. Templates hold `{card}` (the card the record is on), `{owner}` ("Player N", the seat asked), `{n}` (what the instruction after a Pick deals or places, read now: a Pick's entry only, a Choose
- * has none) and a `{name}` for each key of `bind`. Every `Text` below is a template or variants.
+ * has none), `{pursuitLimit}` (the value at which the players lose, in a scenario with a pursuit tracker) and a `{name}` for each key of `bind`. Every `Text` below is a template or variants.
  * - `note`: the sentence over a Pick or a Choose (the entry keyed with the instruction's verb).
  * - `why`: the reason the window opened. It is said after the card's title and before the note, "Card: why note" ("Player 1, Card: why note" when owned and two-handed).
  * - `owned`: one player's own choice. Two-handed the sentence leads with the player and the sheet adds no "Player N chooses."; solo it has no lead, and a note with no `why` is capitalised.
@@ -87,9 +87,9 @@ export function templatesOf(entry: Ask): string[] {
   return [...textsOf(entry.note), ...(entry.why == null ? [] : [entry.why]), ...textsOf(entry.label), ...Object.values(entry.labels ?? {}).flatMap(textsOf), ...textsOf(entry.caution?.text)];
 }
 
-/** The placeholders of an entry that no value answers: none of `card`, `owner`, `n` (only where `withN`: a Pick has what its next instruction deals, a Choose has nothing) and its `bind` names. */
+/** The placeholders of an entry that no value answers: none of `card`, `owner`, `n` (only where `withN`: a Pick has what its next instruction deals, a Choose has nothing), `pursuitLimit` and its `bind` names. */
 export function unknownPlaceholders(entry: Ask, withN = true): string[] {
-  const known = new Set(["card", "owner", ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {})]);
+  const known = new Set(["card", "owner", "pursuitLimit", ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {})]);
   return [...new Set(templatesOf(entry).flatMap(placeholdersOf))].filter((name) => !known.has(name));
 }
 
@@ -136,7 +136,7 @@ export function askAt(a: AskFacts, table?: AsksTable): AskAt | null {
 export function askValues(a: AskFacts, entry: Ask): { values: Values; scope: ReturnType<typeof frameScope> } {
   const seat = askedSeat(a.game);
   const scope = frameScope(a.game, seat, a.source);
-  const values: Values = { card: a.source ? a.names.card(a.source) : "This card", owner: `Player ${seat + 1}`, n: a.amountNow };
+  const values: Values = { card: a.source ? a.names.card(a.source) : "This card", owner: `Player ${seat + 1}`, n: a.amountNow, pursuitLimit: a.game.widgets.pursuitTracker };
   for (const [name, amount] of Object.entries(entry.bind ?? {})) values[name] = resolveAmount(a.game, amount, scope, a.ctx);
   return { values, scope };
 }
@@ -165,8 +165,9 @@ function cautionOf(a: AskFacts, hit: Hit, picked?: string): string | undefined {
   return holds(a.game, caution.when, scopeOf(a, hit, picked), a.ctx) ? (said(a, hit, caution.text, picked) ?? undefined) : undefined;
 }
 
-// The first word of a note after "Player 1: " starts lower case, unless it is an acronym.
-const lowerFirst = (note: string): string => (/^[A-Z][^A-Z]/.test(note) ? `${note.charAt(0).toLowerCase()}${note.slice(1)}` : note);
+// The first word of a note after "Player 1: " starts lower case when it is an imperative ("Choose 1 of your heroes"); a card's name or an acronym keeps its capital.
+const IMPERATIVES = /^(Add|Assign|Attach|Choose|Declare|Discard|Draw|Exhaust|Heal|Look|Move|Name|Pay|Pick|Place|Put|Ready|Remove|Return|Reveal|Search|Select|Shuffle|Take)\b/;
+const lowerFirst = (note: string): string => (IMPERATIVES.test(note) ? `${note.charAt(0).toLowerCase()}${note.slice(1)}` : note);
 
 // "Card: why note", led as every family leads (seatSays): "Player 1, Card: why note" two-handed, "Player 1: note" for an owned note with no why, capitalised solo.
 function sentence(a: AskFacts, hit: Hit): string | null {

@@ -21,7 +21,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
     - ignore the deep keyword(s)
 
 12189:B:2 (back): Response: After Fram's Shade engages a player while the players are at stage 1B or 2B, look at 3 random undiscovered treasures and attach 1 of them to Fram's Shade as a guarded objective. When the treasure is free of encounters, the players claim it and attach it to an eligible character. (Group limit once per game.)
-  12189:response:1: Response after an enemy engages a player (heard about card (any player controls) named "Fram's Shade", that is an enemy engaged with a player; limit oncePerGameGroup)
+  12189:response:1: Response after an enemy engages a player (heard about card (any player controls) named "Fram's Shade", (enemies engaged with a player included); limit oncePerGameGroup)
     only if any of: (the players are on stage 1) or (the players are on stage 2)
     - [json AttachRandomTreasure {"verb":"AttachRandomTreasure","to":"subject"}]
 
@@ -355,12 +355,12 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 
 19111:B:1 (back): Fram's Shade is immune to player card effects.
   19111:constant:1: Constant
-    - each card (any player controls) named "Fram's Shade", that is an enemy engaged with a player: stat immuneToPlayerCards 1, while this card is in play
+    - each card (any player controls) named "Fram's Shade", (enemies engaged with a player included): stat immuneToPlayerCards 1, while this card is in play
 
 19111:B:2 (back): While The Cursed Tomb is in the victory display, Fram's Shade gains victory 6.
   19111:constant:2: Constant
     only if [json condition {"kind":"inVictory","code":"19097","is":true}]
-    - each card (any player controls) named "Fram's Shade", that is an enemy engaged with a player: stat gainsVictory 6, while this card is in play
+    - each card (any player controls) named "Fram's Shade", (enemies engaged with a player included): stat gainsVictory 6, while this card is in play
 
 19111:B:3 (back): This stage cannot be defeated unless Fram's Shade is in the victory display. When the players defeat this stage, they win the game.
   19111:constant:3: Constant

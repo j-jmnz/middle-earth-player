@@ -50,7 +50,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 
 19066:A:1 (front): Shadow cards dealt to Dagnir are immune to player card effects and their effects cannot be canceled.
   19066:constant:1: Constant
-    - each card (any player controls) named "Dagnir", that is an enemy engaged with a player: stat shadowsImmune 1, while this card is in play
+    - each card (any player controls) named "Dagnir", (enemies engaged with a player included): stat shadowsImmune 1, while this card is in play
 
 19066:A:2 (front): Forced: After Draw Her Fire becomes the current quest, Dagnir makes an immediate attack against the first player.
   19066:forced:1: Forced on the event becameCurrentQuest
@@ -63,7 +63,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 
 19067:A:1 (front): Characters do not count their Defense when defending against Dagnir.
   19067:constant:1: Constant
-    - each card (any player controls) named "Dagnir", that is an enemy engaged with a player: stat defenseIgnored 1, while this card is in play
+    - each card (any player controls) named "Dagnir", (enemies engaged with a player included): stat defenseIgnored 1, while this card is in play
 
 19067:A:2 (front): Response: When Fortify the Defense is defeated, each player chooses: either draw 3 cards, or each hero he controls gains 1 resource.
   19067:response:1: Response on the event questDefeated
@@ -79,7 +79,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 
 19068:A:1 (front): Allies cannot be declared as attackers against Dagnir.
   19068:constant:1: Constant
-    - each card (any player controls) named "Dagnir", that is an enemy engaged with a player: stat alliesCannotAttack (allies cannot be declared as attackers against it) 1, while this card is in play
+    - each card (any player controls) named "Dagnir", (enemies engaged with a player included): stat alliesCannotAttack (allies cannot be declared as attackers against it) 1, while this card is in play
 
 19068:A:2 (front): Response: When Rally the Woodmen is defeated, each player searches the top 5 cards of his deck for an ally, puts it into play and shuffles his deck.
   19068:response:1: Response on the event questDefeated
@@ -143,15 +143,15 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 
 19073:A:1 (front): Forced: After Dagnir attacks and destroys a character, heal 5 damage from her.
   19073:forced:1: Forced on the event characterDestroyedByAttack
-    only if the event's other card is a card (any player controls) named "Dagnir", that is an enemy engaged with a player
+    only if the event's other card is a card (any player controls) named "Dagnir", (enemies engaged with a player included)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose card (any player controls) named "Dagnir", that is an enemy engaged with a player
+    - choose card (any player controls) named "Dagnir", (enemies engaged with a player included)
     - heal 5 damage from the picked card
 
 19073:A:2 (front): Forced: After Face the Dragon is defeated, deal 5 damage to Dagnir.
   19073:forced:2: Forced on the event questDefeated
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose card (any player controls) named "Dagnir", that is an enemy engaged with a player
+    - choose card (any player controls) named "Dagnir", (enemies engaged with a player included)
     - deal 5 damage to the picked card
 
 ## 19074 Dagnir
@@ -234,7 +234,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 19078:A:1 (front): While Wooden Palisade is the active location, Dagnir gets -2 Attack.
   19078:constant:1: Constant
     only if this card is the active location
-    - each card (any player controls) named "Dagnir", that is an enemy engaged with a player: stat attack -2, while this card is in play
+    - each card (any player controls) named "Dagnir", (enemies engaged with a player included): stat attack -2, while this card is in play
 
 19078:A:2 (front): Travel: The first player readies a hero he controls.
   19078:travel:1: Travel

@@ -22,7 +22,7 @@ Each agent reads its own file.
 - `.claude/agents/effect-author.md` — Writes effect records for card lines no template reads (~1.1K tok)
 - `.claude/agents/implementer.md` — Implements one phase from docs/phases (~1.4K tok)
 - `.claude/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~2.0K tok)
-- `.claude/agents/reading-judge.md` — Reads each effect record, rendered as English, against the printed ledger line it implements and says ok, wrong, ambiguous or render-gap (~950 tok)
+- `.claude/agents/reading-judge.md` — Reads each effect record, rendered as English, against the printed ledger line it implements and says ok, wrong, ambiguous or render-gap (~960 tok)
 - `.claude/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~2.4K tok)
 - `.claude/agents/scenario-author.md` — Builds one scenario's engine half, one task per run (Read, Build or Finish), each run fresh from the hand-off note (~1.0K tok)
 - `.claude/agents/ux.md` — Reviews the current screens for phone UX and visual design, and changes the design system when asked (~1.3K tok)
@@ -73,7 +73,7 @@ Read the sections your task touches.
   - 354–359 Catalog build (~410)
   - 360–377 Tests (~1.7K) ← 5
   - 378–393 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~85.5K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~85.6K tok)
   - 17–38 Sections (~410)
   - 39–50 Product (~590)
   - 51–64 Non-goals (~540)
@@ -120,7 +120,7 @@ Read the sections your task touches.
   - 923–948 Persistence and shipping (~1.8K)
   - 949–990 Screens (~4.7K) ← 1
     - 975–990 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~40.6K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~40.8K tok)
   - 5–8 Overview (~130) ← 1
   - 9–23 Top bar (~2.3K) ← 4
   - 24–27 Table menu (~430) ← 2
@@ -128,7 +128,7 @@ Read the sections your task touches.
   - 36–39 Canvas (~560)
   - 40–52 Spacing and the play area's rows (~1.8K) ← 9
   - 53–58 Pictures on the table (~320) ← 1
-  - 59–86 Cards (~5.6K) ← 14
+  - 59–86 Cards (~5.8K) ← 14
   - 87–92 The Sailing test (~690) ← 5
   - 93–106 The Island Map (~1.8K) ← 8
   - 107–110 Tokens and effects (~320)
@@ -201,13 +201,13 @@ STATUS.md, then the active phase file.
 - `docs/phases/STATUS.md` — Phase status (~7.2K tok)
   - 5–15 Rules (~410)
   - 16–90 Phases (~1.5K)
-  - 91–194 Open items (~4.7K)
+  - 91–195 Open items (~4.8K)
     - 93–95 Releases (~50)
     - 96–118 Fixtures and Maestro (~1.3K)
     - 119–166 Rules and engine (~2.2K)
     - 167–187 Screens and code (~900)
-    - 188–194 Rules and engine (The Two Towers) (~260)
-  - 195–212 Standing decisions (~550)
+    - 188–195 Rules and engine (The Two Towers) (~300)
+  - 196–213 Standing decisions (~550)
 
 ## Live plans
 
@@ -233,7 +233,7 @@ Read when a task names the plan.
   - 25–48 A. Effects: draft better, template the repeats, copy identical lines (~970)
   - 49–57 B. One registry for scenarios, fixtures and goldens (~280)
   - 58–71 C. A shared scenario kit and `pnpm scenario:new` (~610)
-  - 72–83 D. One manifest per family (~470)
+  - 72–83 D. One manifest per family (~460)
   - 84–92 E. Data: seed what can be seeded (~300)
   - 93–113 F. Faster feedback while authoring (~880)
   - 114–138 Where a scenario's cost is now (~790)
@@ -251,7 +251,7 @@ Open work; read when a task names it.
   - 38–56 Files you own (edit freely) (~490)
   - 57–70 Shared files (~300)
   - 71–85 Approach (~690) ← 1
-  - 86–123 Scenario procedure (~1.7K) ← 10
+  - 86–123 Scenario procedure (~1.7K) ← 11
   - 124–133 Checkpoints (API usage limits can stop you mid-task) (~210)
   - 134–148 Checks before committing (~320)
   - 149–155 Merge (~140) ← 1
