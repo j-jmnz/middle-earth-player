@@ -73,7 +73,7 @@ Read the sections your task touches.
   - 354–359 Catalog build (~410)
   - 360–377 Tests (~1.7K) ← 5
   - 378–393 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~85.6K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~85.7K tok)
   - 17–38 Sections (~410)
   - 39–50 Product (~590)
   - 51–64 Non-goals (~540)
@@ -107,19 +107,19 @@ Read the sections your task touches.
     - 616–633 The Caves of Nibin-Dûm (~2.4K)
   - 634–691 Dream-chaser (~15.6K) ← 4
   - 692–718 Ered Mithrin (~15.8K) ← 7
-  - 719–755 The Two Towers (~3.5K) ← 13
-  - 756–764 Nightmare (~410) ← 19
-  - 765–803 Deckbuilding (~1.9K)
-  - 804–882 Effects (~3.2K)
-    - 806–864 Three layers (~2.4K) ← 10
-    - 865–874 Player side quests, contracts and saga cards (~430)
-    - 875–878 Window stack (~100)
-    - 879–882 Coverage test (~270)
-  - 883–903 Data sources (~530)
-  - 904–922 Card images (~1.2K) ← 9
-  - 923–948 Persistence and shipping (~1.8K)
-  - 949–990 Screens (~4.7K) ← 1
-    - 975–990 Table screen (~1.8K) ← 3
+  - 719–757 The Two Towers (~3.6K) ← 13
+  - 758–766 Nightmare (~410) ← 19
+  - 767–805 Deckbuilding (~1.9K)
+  - 806–884 Effects (~3.2K)
+    - 808–866 Three layers (~2.4K) ← 10
+    - 867–876 Player side quests, contracts and saga cards (~430)
+    - 877–880 Window stack (~100)
+    - 881–884 Coverage test (~270)
+  - 885–905 Data sources (~530)
+  - 906–924 Card images (~1.2K) ← 9
+  - 925–950 Persistence and shipping (~1.8K)
+  - 951–992 Screens (~4.7K) ← 1
+    - 977–992 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~40.8K tok)
   - 5–8 Overview (~130) ← 1
   - 9–23 Top bar (~2.3K) ← 4
@@ -201,13 +201,13 @@ STATUS.md, then the active phase file.
 - `docs/phases/STATUS.md` — Phase status (~7.2K tok)
   - 5–15 Rules (~410)
   - 16–90 Phases (~1.5K)
-  - 91–195 Open items (~4.8K)
+  - 91–194 Open items (~4.7K)
     - 93–95 Releases (~50)
     - 96–118 Fixtures and Maestro (~1.3K)
     - 119–166 Rules and engine (~2.2K)
     - 167–187 Screens and code (~900)
-    - 188–195 Rules and engine (The Two Towers) (~300)
-  - 196–213 Standing decisions (~550)
+    - 188–194 Rules and engine (The Two Towers) (~240)
+  - 195–212 Standing decisions (~550)
 
 ## Live plans
 

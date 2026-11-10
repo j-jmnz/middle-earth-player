@@ -86,7 +86,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 60 | The Fate of Wilderland | completed | 2026-11-06. Review round done. |
 | 61 | The Two Towers data | completed | 2026-11-07. Review round done. Open: MEC112 2023 wording unverified. |
 | 62 | The Two Towers campaign shell | completed | 2026-11-07. Review round done. |
-| 63 | The Uruk-hai | completed | 2026-11-10. Review round done. Open: `hai-won`; readings below. |
+| 63 | The Uruk-hai | completed | 2026-11-10. Review round done. Open: `hai-won`. |
 
 ## Open items
 
@@ -187,7 +187,6 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 
 ### Rules and engine (The Two Towers)
 - Beyond All Hope readings not user-confirmed (143071:B:1): the trim to three non-Fellowship heroes counts the living heroes on the log, not only those in the game; the fallen list is one shared list; the first player picks who earns the boon.
-- The Uruk-hai readings not user-confirmed: Eastemnet (143027:A:1) adds a resource to Captives too; a Captive rescued at the win back to an eliminated seat scores its threat cost as a destroyed hero (`src/campaign/score.ts`).
 - Not fixed from The Uruk-hai's review: `engagedThreatSeat` (143065:A:2) is declared in the pursuit family, not with `engagedThreat`.
 - Six older records put `shadow: false` on a printed additional attack (18035:A:2 and its copies), against `faq.additional-attacks`, which deals the additional attack a new shadow card.
 - The Two Towers ledger reads the pinned 2014 and 2015 Treason of Saruman and Land of Shadow scans; no pinned scan shows MEC112's 2023 wording, so a rewording cannot be found (`scripts/data/printed/scope.ts`, `MEC112_CHANGED`).
