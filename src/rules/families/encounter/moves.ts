@@ -98,7 +98,8 @@ export function moveEncounter(
     case "deckBottom":
       return toDeck(leavePlay(next, id, ctx, steps), id, to === "deckTop");
     case "shuffle":
-      return shuffleIntoEncounterDeck(updateCard(leavePlay(next, id, ctx, steps), id, { controller: null }), id);
+      // The card leaves its seat's engaged list while it is still the seat's (moveCard reads its controller), then it has none (143049:A:2: an engaged enemy shuffles itself back in).
+      return updateCard(shuffleIntoEncounterDeck(leavePlay(next, id, ctx, steps), id), id, { controller: null });
     case "discard":
       return updateCard(moveCard(leavePlay(next, id, ctx, steps), id, { zone: "encounterDiscard" }), id, { face: "up", controller: null });
     case "victory":

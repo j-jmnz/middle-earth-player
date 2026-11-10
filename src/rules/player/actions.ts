@@ -13,6 +13,7 @@ import { textBlank } from "../families/attachments/hold.ts";
 import { printedOf } from "../core/printed.ts";
 import { inPlay, type ScenarioState } from "../core/state.ts";
 import { payUsage, usable, usageReason } from "./usage.ts";
+import { announceAbility } from "../families/deck/pressure.ts";
 
 type TriggerIntent = Extract<PlayerIntent, { type: "Trigger" }>;
 
@@ -85,7 +86,7 @@ export function applyTrigger(
   const seat = state.activeSeat;
   // What the cost changes (threat raised to claim an objective, damage on the source) is the effect's doing.
   const paid = inCause(steps, effectCause(effect), () => payUsage(state, effect, intent.cardId, intent.payments ?? [], ctx, steps, seat));
-  return pushEffectFrame(
+  const framed = pushEffectFrame(
     { ...paid, window: null },
     {
       frame: "ResolveEffect",
@@ -101,4 +102,5 @@ export function applyTrigger(
     },
     steps,
   );
+  return announceAbility(framed, intent.cardId, seat, ctx);
 }

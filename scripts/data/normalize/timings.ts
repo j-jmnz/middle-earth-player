@@ -40,7 +40,8 @@ export function lineTimings(line: string): Set<string> {
   const label = lead?.[1] ? LABELS.get(lead[1].toLowerCase()) : undefined;
   if (label) allowed.add(label);
   if (label === "setup") allowed.add("campaignSetup");
-  for (const match of line.matchAll(/(?:^|[("'\s])([A-Z][A-Za-z ]+?):\s/g)) {
+  // A label quoted inside the line may carry the same lead words ("it gains: "Quest Action: ...", 143046:A:1).
+  for (const match of line.matchAll(/(?:^|[("'\s\u201c])(?:(?:Valour|Planning|Quest|Travel|Encounter|Combat|Refresh|Resource)\s+){0,2}([A-Z][A-Za-z ]+?):\s/g)) {
     const inner = match[1] ? LABELS.get(match[1].toLowerCase()) : undefined;
     if (inner) allowed.add(inner);
   }

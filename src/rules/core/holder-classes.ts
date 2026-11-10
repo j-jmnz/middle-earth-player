@@ -14,11 +14,13 @@ export const CHARACTERS_CLASS = "characters";
 export const STAGING_CLASS = "stagingCards";
 // The same for every enemy in play, staged or engaged, whether it was there when the effect began or arrives later ("each enemy gets -20 engagement cost and +2 Attack until the end of the round", 143041:A:2).
 export const ENEMIES_CLASS = "enemies";
-export type ClassHolder = typeof ALLIES_CLASS | typeof CHARACTERS_CLASS | typeof STAGING_CLASS | typeof ENEMIES_CLASS;
+// The same for every character that is damaged now, whether it was damaged when the effect began or is damaged later; a healed character is no longer held ("treat each damaged character's text box as if it were blank", 143061:A:2, FAQ 1.55).
+export const DAMAGED_CHARACTERS_CLASS = "damagedCharacters";
+export type ClassHolder = typeof ALLIES_CLASS | typeof CHARACTERS_CLASS | typeof STAGING_CLASS | typeof ENEMIES_CLASS | typeof DAMAGED_CHARACTERS_CLASS;
 
 // Whether a modifier's holder id names a class of cards rather than one card.
 export function isClassHolder(id: string): id is ClassHolder {
-  return id === ALLIES_CLASS || id === CHARACTERS_CLASS || id === STAGING_CLASS || id === ENEMIES_CLASS;
+  return id === ALLIES_CLASS || id === CHARACTERS_CLASS || id === STAGING_CLASS || id === ENEMIES_CLASS || id === DAMAGED_CHARACTERS_CLASS;
 }
 
 // Whether a modifier is held by this card: by its id, or by a class it belongs to.
@@ -28,6 +30,7 @@ export function heldBy(modifier: { instanceId: string }, instance: CardInstance,
   if (modifier.instanceId === ALLIES_CLASS) return cardTypeOf(instance, printed) === "ally";
   if (modifier.instanceId === STAGING_CLASS) return instance.zone === "staging" && (cardTypeOf(instance, printed) === "enemy" || cardTypeOf(instance, printed) === "location");
   if (modifier.instanceId === ENEMIES_CLASS) return cardTypeOf(instance, printed) === "enemy";
+  if (modifier.instanceId === DAMAGED_CHARACTERS_CLASS) return instance.damage > 0 && (instance.zone === "heroes" || isCharacterType(printed));
   return modifier.instanceId === CHARACTERS_CLASS && (instance.zone === "heroes" || isCharacterType(printed));
 }
 

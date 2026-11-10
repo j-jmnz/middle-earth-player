@@ -14,6 +14,7 @@ import { queueEvent } from "../../windows/queue.ts";
 import type { CardInstance, PendingStrike, ScenarioState } from "../../core/state.ts";
 import { flagged, inPlay } from "../../core/state.ts";
 import { heard } from "./events.ts";
+import { playerSource } from "../quest/threat.ts";
 
 type Attacking = Extract<Condition, { kind: "attacking" }>;
 
@@ -93,7 +94,7 @@ export function struck(
   }
   for (const modifier of next.modifiers.filter((entry) => entry.stat === "drawOnAttackDestroy" && entry.instanceId === `seat:${seat}`)) {
     const cause = sourceCause(next, modifier.sourceId, ctx);
-    next = drawMany(next, seat, modifier.amount, steps, cause, ctx);
+    next = drawMany(next, seat, modifier.amount, steps, cause, ctx, false, playerSource(next, modifier.sourceId, ctx));
   }
   return next;
 }

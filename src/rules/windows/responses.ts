@@ -17,6 +17,7 @@ import type { GameEvent, ResponseOffer, ScenarioState } from "../core/state.ts";
 import { inPlay, livingSeats, perilLock } from "../core/state.ts";
 import { payUsage, controllerSeat, offerable, usable, usageReason } from "../player/usage.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
+import { announceAbility } from "../families/deck/pressure.ts";
 
 type TriggerIntent = Extract<PlayerIntent, { type: "Trigger" }>;
 
@@ -154,7 +155,7 @@ export function applyResponse(state: ScenarioState, intent: TriggerIntent, ctx: 
   const left = frame.data.offers.filter((offer) => !(offer.cardId === intent.cardId && offer.effectId === intent.effectId && (offer.event ?? opened) === event));
   // The seat answering pays: its threat for a raiseThreat cost, its deck for discardDeckTop, its use of a per-player limit.
   const paid = payUsage(patchTop(state, { data: { ...frame.data, offers: left } }), effect, intent.cardId, intent.payments ?? [], ctx, steps, seat);
-  return pushEffectFrame(
+  const framed = pushEffectFrame(
     { ...paid, window: null },
     {
       frame: "ResolveEffect",
@@ -180,6 +181,7 @@ export function applyResponse(state: ScenarioState, intent: TriggerIntent, ctx: 
     },
     steps,
   );
+  return announceAbility(framed, intent.cardId, seat, ctx);
 }
 
 // Pass: the seat gives up every Response it was offered for this event.

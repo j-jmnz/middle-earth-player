@@ -35,6 +35,7 @@ import { manifest as wilderland } from "./wilderland/index.ts";
 import { manifest as pursuit } from "./pursuit/index.ts";
 import { manifest as captives } from "./captives/index.ts";
 import { manifest as fortress } from "./fortress/index.ts";
+import { manifest as wizardry } from "./wizardry/index.ts";
 import { registerFamilies } from "../interpret/family-hooks.ts";
 
 export type { Focus };
@@ -42,7 +43,7 @@ export type { Focus };
 // The mechanic families' rules, in play order: where two runners could answer one verb, the first in this list does (docs/architecture.md, Mechanic families).
 // The order is the catalog list's (src/catalog/families/index.ts).
 export const RULES_FAMILIES: readonly RulesFamily[] = [
-  attack, defense, encounter, quest, play, costs, deck, attachments, sidequests, misc, burden, south, campaign, objectives, prisoner, dungeon, caves, nightmare, moria, breaking, dreamchaser, sea, uncharted, aflame, stormcaller, grapple, island, wilderland, pursuit, captives, fortress,
+  attack, defense, encounter, quest, play, costs, deck, attachments, sidequests, misc, burden, south, campaign, objectives, prisoner, dungeon, caves, nightmare, moria, breaking, dreamchaser, sea, uncharted, aflame, stormcaller, grapple, island, wilderland, pursuit, captives, fortress, wizardry,
 ];
 
 // The order the families' settle hooks run in within a phase (src/rules/engine/machine.ts, settle), in this order.
@@ -51,7 +52,7 @@ export const RULES_FAMILIES: readonly RulesFamily[] = [
 export const SETTLE_ORDER: Readonly<Record<"before" | "after" | "sweep", readonly string[]>> = {
   before: ["burden", "island", "south"],
   after: ["sea", "stormcaller", "island", "wilderland", "captives"],
-  sweep: ["aflame", "objectives", "sea", "wilderland"],
+  sweep: ["aflame", "objectives", "sea", "wilderland", "deck"],
 };
 
 /** Runs a verb a mechanic family adds (src/catalog/families), or returns null when no family owns it. */

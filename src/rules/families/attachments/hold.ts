@@ -4,7 +4,7 @@
 // happens to the cards attached to a host that is destroyed or defeated, a Guarded attachment whose guard leaves play, and a
 // card whose text box is blank. Kept free of engine imports beyond the state, so those modules can call it.
 import { queueEvent } from "../../windows/queue.ts";
-import { CHARACTERS_CLASS, heldBy } from "../../core/holder-classes.ts";
+import { CHARACTERS_CLASS, DAMAGED_CHARACTERS_CLASS, heldBy } from "../../core/holder-classes.ts";
 import { printedOf, type PrintedCard } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { heldAmount, inPlay, modifierActive, updateCard } from "../../core/state.ts";
@@ -60,7 +60,7 @@ export function textBlank(state: ScenarioState, id: string, cards: ReadonlyMap<s
   if (instance?.prisoner === true) return true;
   for (const modifier of state.modifiers) {
     if (modifier.stat !== "blankText" || modifier.amount <= 0 || !modifierActive(state, modifier)) continue;
-    if (modifier.instanceId === id || (instance != null && cards != null && modifier.instanceId === CHARACTERS_CLASS && heldBy(modifier, instance, printedOf(cards, instance.code)))) return true;
+    if (modifier.instanceId === id || (instance != null && cards != null && (modifier.instanceId === CHARACTERS_CLASS || modifier.instanceId === DAMAGED_CHARACTERS_CLASS) && heldBy(modifier, instance, printedOf(cards, instance.code)))) return true;
   }
   return false;
 }

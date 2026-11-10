@@ -9,7 +9,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import { ruleCause } from "../../core/cause.ts";
 import { attackBarred } from "../../interpret/constants.ts";
 import { beginEnemyAttack } from "../../combat/combat.ts";
-import { dealOneShadow, type ReduceContext } from "../../interpret/interpret.ts";
+import { dealAdditionalShadow, dealOneShadow, type ReduceContext } from "../../interpret/interpret.ts";
 import { modifiedStat, placeDamage } from "../../core/keywords.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
 import type { PendingAttack, ScenarioState } from "../../core/state.ts";
@@ -69,22 +69,25 @@ export function dealForAttack(state: ScenarioState, enemyId: string, steps: Engi
 // AttackFromStaging: the picked enemy in the staging area (or the source, `target: self`) attacks the actor now (142038:A:2), or the first
 // player (`who: firstPlayer`, 142043:A:2).
 export function attackFromStaging(state: ScenarioState, instruction: Extract<Instruction, { verb: "AttackFromStaging" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const id = instruction.target === "self" ? (focus.sourceId ?? "") : lastPicked(state);
+  const id = instruction.target === "self" ? (focus.sourceId ?? "") : instruction.target === "host" ? (state.cards[focus.sourceId ?? ""]?.host ?? "") : lastPicked(state);
   const seat = instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat;
   // "Undefended damage from this attack must be dealt to Hrogar's Hill" (19081:A:1): the main quest card takes it.
-  return attackNowFromStaging(state, id, seat, ctx, steps, { shadow: true, ...(instruction.undefendedToStage ? { toStage: true } : {}), ...(instruction.orEngaged ? { engaged: true } : {}) });
+  return attackNowFromStaging(state, id, seat, ctx, steps, { shadow: true, ...(instruction.shadows ? { shadows: instruction.shadows } : {}), ...(instruction.undefendedToStage ? { toStage: true } : {}), ...(instruction.orEngaged ? { engaged: true } : {}) });
 }
 
 // The enemy `id` in the staging area attacks `seat` outside the combat phase, now, and the running effect counts the attack (its frames wait for it). `shadow: false`: no shadow card is dealt. `toStage` and `excessToStage` mark the attack
 // in progress (PendingAttack): the main quest card takes the damage left undefended, and the excess past a defender. `engaged`: an enemy engaged with a player attacks too, as an engaged enemy does (its shadow card stays).
-export function attackNowFromStaging(state: ScenarioState, id: string, seat: number, ctx: ReduceContext, steps: EngineStep[], flags: { shadow: boolean; toStage?: boolean; excessToStage?: boolean; engaged?: boolean }): ScenarioState {
+export function attackNowFromStaging(state: ScenarioState, id: string, seat: number, ctx: ReduceContext, steps: EngineStep[], flags: { shadow: boolean; shadows?: number; toStage?: boolean; excessToStage?: boolean; engaged?: boolean }): ScenarioState {
   const enemy = id ? state.cards[id] : undefined;
   const placed = enemy?.zone === "staging" || (flags.engaged === true && enemy?.zone === "engaged");
   if (!id || !placed || attackBarred(state, id, seat) || state.seats[seat]?.eliminated) return state;
-  const { shadow, engaged: _engaged, ...marks } = flags;
+  const { shadow, shadows, engaged: _engaged, ...marks } = flags;
   const data = effectData(state);
   const counted = data ? patchTop(state, { data: { ...data, returned: data.returned + 1 } }) : state;
-  const begun = beginEnemyAttack(shadow ? dealForAttack(counted, id, steps) : counted, seat, id, ctx, steps, { fromStaging: enemy?.zone === "staging", shadow });
+  // "Deal and resolve 2 shadow cards for this attack" (143048:A:1): the first as any attack from the staging area, the others additional ones.
+  let dealt = shadow ? dealForAttack(counted, id, steps) : counted;
+  for (let more = 1; more < (shadows ?? 1); more += 1) dealt = dealAdditionalShadow(dealt, id, steps);
+  const begun = beginEnemyAttack(dealt, seat, id, ctx, steps, { fromStaging: enemy?.zone === "staging", shadow });
   return begun.pendingAttack ? { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true, ...marks } } : begun;
 }
 

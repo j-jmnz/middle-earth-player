@@ -230,6 +230,8 @@ function travelIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] 
 }
 
 function committers(state: ScenarioState, seat: number, ctx: ReduceContext): string[] {
+  // "Do not commit characters to the quest" (143078:B:1).
+  if (state.modifiers.length > 0 && flagged(state, "table", "cannotCommit")) return [];
   return characters(state, seat, ctx.cards).filter((id) => {
     const instance = state.cards[id];
     // "Can commit to quests while exhausted" (11009:A:1).

@@ -13,6 +13,7 @@ import { spawn } from "../../core/zones.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { livingSeats, updateCard } from "../../core/state.ts";
 import { pickedList } from "../../interpret/player-verbs.ts";
+import { playerSource } from "../quest/threat.ts";
 
 import type { Focus } from "../index.ts";
 import { attachCollectionHero, swapHero, takeFromCollection } from "./collection.ts";
@@ -26,7 +27,7 @@ function drawEach(state: ScenarioState, instruction: Verb<"DrawEach">, focus: Fo
   const seats = livingSeats(state);
   const from = Math.max(0, seats.indexOf(state.firstPlayer));
   let next = state;
-  for (const seat of [...seats.slice(from), ...seats.slice(0, from)]) next = drawMany(next, seat, count, steps, UNATTRIBUTED, ctx);
+  for (const seat of [...seats.slice(from), ...seats.slice(0, from)]) next = drawMany(next, seat, count, steps, UNATTRIBUTED, ctx, false, playerSource(state, focus.sourceId, ctx));
   return next;
 }
 

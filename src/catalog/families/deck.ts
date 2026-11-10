@@ -74,6 +74,8 @@ const VERBS = [
 ] as const;
 
 const TRIGGERS = [
+  // About a card: one of its own abilities was triggered, an Action or a Response its controller initiated or a Forced effect that triggered (rr.triggered-ability: "triggers its ability", 143068:A:2). Heard only in a game that has a record on it.
+  "abilityTriggered",
   // About the seat: its opening hand was just drawn at setup. A Response here is offered in the mulligan window, in place of
   // the mulligan (Galdor of the Havens, 11002).
   "setupHandDrawn",
@@ -83,6 +85,11 @@ const TRIGGERS = [
 ] as const;
 
 const FLAGS = [
+  // Held by the table while a card in play says so: no player gains resources, the resource phase's collection and every effect that adds resources to a pool included, not the heroes' starting resources (rr.resources: "Players cannot draw cards or gain
+  // resources", 143078:B:1). Read by gainSeatResources and AddResources (rules/interpret/interpret.ts).
+  "cannotGainResources",
+  // Held by the table while a card in play says so: a player with 0 cards in hand is eliminated from the game, checked at each settle once what emptied the hand has finished (rr.constant-ability, "If a player has 0 cards in his hand", 143080:B:3; settle hook of the deck family).
+  "eliminatedAtEmptyHand",
   // Held by the table until the end of the phase: each ally that leaves play goes to its owner's hand instead of the discard
   // pile (Rallying Cry, 10003).
   "alliesToHand",

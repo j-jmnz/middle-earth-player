@@ -86,6 +86,8 @@ const FLAGS = [
   // that seat's stage until the modifier ends (142082:A:1). Read by rules/combat/combat.ts archeryTotal.
   "archeryPlayers",
   "archeryBonus",
+  // On "table", while a card in the staging area holds it: archery damage must be assigned to allies, if able (143058:A:2; rules/combat/combat.ts archeryRecipients).
+  "archeryToAllies",
   // On "table": the player who holds the first player token cannot lose it for the rest of the game (LockFirstPlayer, 142068:A:2); the token does not pass at the end
   // of the refresh phase (rules/engine/refresh.ts).
   "firstPlayerLocked",

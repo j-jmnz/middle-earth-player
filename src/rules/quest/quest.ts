@@ -21,6 +21,7 @@ import { placeQuestingProgress } from "../families/defense/damage.ts";
 import { travelsOverActive } from "../families/grapple/travel.ts";
 import { freeSlot, makeActiveIn, placeOnActive } from "../families/south/locations.ts";
 import { noteQuestPlaced, questRoom } from "../families/caves/progress.ts";
+import { noteQuestPhase } from "../families/wizardry/progress.ts";
 import { branchFrom, reached as reachedStage } from "../families/quest/branch.ts";
 import { randomStageFrom } from "../families/wilderland/random-stage.ts";
 import { viewOf, withView } from "../families/breaking/areas.ts";
@@ -239,6 +240,7 @@ export function putOnStage(state: ScenarioState, stageId: string, amount: number
   if (placed > 0) {
     next = updateCard(next, stageId, { progress: stage.progress + placed });
     if (counted) next = noteQuestPlaced(next, placed);
+    next = noteQuestPhase(next, placed);
     steps.push({ kind: "progress", targetId: stageId, amount: placed, cause });
   }
   const updated = next.cards[stageId];
