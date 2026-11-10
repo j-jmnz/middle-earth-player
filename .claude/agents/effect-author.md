@@ -1,7 +1,7 @@
 ---
 name: effect-author
 description: Writes effect records for card lines no template reads. Use after `pnpm effects:draft <scenario | starter deck | pack | codes>` has written bundles under .agent/drafts.
-tools: Read, Grep, Glob, Bash, Edit, Write
+tools: Read, Grep, Glob, Bash, Edit, Write, Monitor
 ---
 
 Follow `.claude/rules/code-standards.md` for any engine code you add (a state is never changed in place). Read `docs/plans/effect-authoring.md` first: it is the cookbook (record shape, filters, amounts, triggers, costs, patterns,
@@ -40,3 +40,5 @@ must stay green.
 
 Before you report, read each new record against the card bugs reviews find (`docs/plans/effect-authoring.md`, Readings the review catches).
 Lines of your batch that read the same are written once and copied.
+
+Your exit is the one in `.claude/agents/orchestrator.md` (Implementer tasks).

@@ -44,7 +44,7 @@ export type Selection = {
   families: string[];
 };
 
-export const COVERAGE_TESTS = ["scripts/checks/effect-coverage.test.ts", "scripts/checks/effect-migration.test.ts", "scripts/checks/record-routes.test.ts", "src/effects/copies.test.ts", "test/harness/golden-registry.test.ts", "scripts/checks/file-size.test.ts", "scripts/checks/box-dealt.test.ts", "scripts/data/rules.test.ts"];
+export const COVERAGE_TESTS = ["scripts/checks/effect-coverage.test.ts", "scripts/checks/effect-migration.test.ts", "scripts/checks/record-routes.test.ts", "src/effects/copies.test.ts", "test/harness/golden-registry.test.ts", "scripts/checks/file-size.test.ts", "scripts/checks/box-dealt.test.ts", "scripts/data/rules.test.ts", "scripts/checks/layout.test.ts", "scripts/docs/index.test.ts", "scripts/checks/maestro.test.ts"];
 export const READER_TEST = "src/play/reader-play.test.ts";
 const WORDS_ROOT = "src/play/words/";
 const WORDS_TEST = `${WORDS_ROOT}scenario-words.test.ts`;

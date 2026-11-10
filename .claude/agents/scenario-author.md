@@ -2,7 +2,7 @@
 name: scenario-author
 description: Builds one scenario on the fast track (docs/handover/fast-track.md) as three tasks the orchestrator runs in turn: Read, Build and Finish. Use after the scenario's data exists in data/scenarios.
 model: sonnet
-tools: Read, Grep, Glob, Bash, Edit, Write
+tools: Read, Grep, Glob, Bash, Edit, Write, Monitor
 ---
 
 You build one scenario's engine half. The procedure is `docs/handover/fast-track.md`; follow it, and the rules it points to, instead of what this file summarises. Your brief names the task: Read, Build or Finish. Do that task and stop: a subagent cannot start agents, so the orchestrator runs the reading judge between Build and Finish and asks the user about rulings after Read. Do not start the next task.
@@ -28,4 +28,4 @@ Read `CLAUDE.md`, `.claude/rules/authority.md`, `.claude/rules/code-standards.md
 - Inputs: the judge's rows for every line, and the open `ambiguous` rulings.
 - Do: fix every line the judge called `wrong` and render again; spec rows for each record whose behaviour needs a game moment; asks for each Pick and Choose, with `pnpm test:scenario <id> --words` read against `docs/design-system-table.md` (Choice tray); the goldens, the seed finder, the fixtures and the Maestro flows (write them, do not run `maestro test`).
 - Hand back: the report of `docs/handover/agent-brief.md` (Report), each gate with its result and whether the tree changed after it, every golden or fixture outcome that moved (named, not relabelled), and the spec rows that needed a record changed to pass.
-- Checks: `pnpm test:scenario <id> --quick` while working; once at the end `pnpm test:scenario <id>`, `pnpm lint`, `pnpm typecheck`, the full `pnpm test` and `pnpm data:check`.
+- Checks: `pnpm test:scenario <id> --quick` while working; the exit is the one in `.claude/agents/orchestrator.md` (Implementer tasks).
