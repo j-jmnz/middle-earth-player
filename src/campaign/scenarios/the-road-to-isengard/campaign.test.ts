@@ -1,4 +1,4 @@
-// Rules: mec112.setup-road-to-isengard, mec112.campaign-mode, mec112.poisoned-counsels-searching-eye, rr.campaign-setup-checklist, ltp.campaign-setup-checklist (data/rules/entries.json); ledger lines 143081:A:2 and 143081:B:1.
+// Rules: mec112.setup-the-road-to-isengard, mec112.campaign-mode, mec112.poisoned-counsels-searching-eye, rr.campaign-setup-checklist, ltp.campaign-setup-checklist (data/rules/entries.json); ledger lines 143081:A:2 and 143081:B:1.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../../../effects/index.ts";
