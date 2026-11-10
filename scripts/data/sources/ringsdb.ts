@@ -7,6 +7,13 @@ const PACKS_URL = "https://ringsdb.com/api/public/packs/";
 // Fan-made Alep packs are not official printings.
 const ALEP_PREFIX = "ALeP -";
 
+// The test decks (data/decks/test-decks.json): RingsDB decklists the fixture games play, by decklist id.
+export const TEST_DECKLISTS: readonly number[] = [8682];
+
+function decklistUrl(id: number): string {
+  return `https://ringsdb.com/api/public/decklist/${id}`;
+}
+
 function cardUrl(packCode: string): string {
   return `https://ringsdb.com/api/public/cards/${encodeURIComponent(packCode)}.json`;
 }
@@ -31,6 +38,14 @@ export async function syncRingsDb(log: Log = createLog("ringsdb")): Promise<Sour
     }
     files.push(writeRaw(`ringsdb/cards/${pack.code}.json`, url, body));
     tick(`${pack.code} ${pack.name}: ${count} cards, ${bytes(body.length)}`);
+  }
+  for (const id of TEST_DECKLISTS) {
+    const url = decklistUrl(id);
+    const body = await fetchText(url, undefined, log);
+    const parsed = JSON.parse(body) as { id?: unknown };
+    if (parsed.id !== id) throw new Error(`RingsDB decklist ${id} came back as ${String(parsed.id)}`);
+    files.push(writeRaw(`ringsdb/decklists/${id}.json`, url, body));
+    log.info(`decklist ${id}: ${bytes(body.length)}`);
   }
   return { id: "ringsdb", site: "https://ringsdb.com", pin: { kind: "sha256", value: combinedPin(files) }, fetchedAt: new Date().toISOString(), files };
 }

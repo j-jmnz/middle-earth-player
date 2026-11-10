@@ -17064,9 +17064,9 @@
       "site": "https://ringsdb.com",
       "pin": {
         "kind": "sha256",
-        "value": "8d738cd020ee519fcd2aeaac9fe01fc88ca8b8c39ddbf57d48ce3d979a03947f"
+        "value": "443c1a9476c29b296ab15d6e5a1c5673696e8319c5a53741b488e0138daf4f9c"
       },
-      "fetchedAt": "2026-10-24T10:19:16.655Z",
+      "fetchedAt": "2026-11-10T19:57:20.489Z",
       "files": [
         {
           "path": "raw/ringsdb/packs.json",
@@ -17649,6 +17649,12 @@
           "url": "https://ringsdb.com/api/public/cards/EMCE.json",
           "sha256": "837973802b3f858421f3269830f88f7ddb538fe1dd14356698472f4fd37ba7bf",
           "bytes": 27267
+        },
+        {
+          "path": "raw/ringsdb/decklists/8682.json",
+          "url": "https://ringsdb.com/api/public/decklist/8682",
+          "sha256": "db856dfcede1f323413bd15aaa11ad4a29bd51f96ee870b7914290e7abb5b586",
+          "bytes": 34565
         }
       ]
     },

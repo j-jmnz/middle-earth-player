@@ -1,0 +1,110 @@
+[
+  {
+    "id": "the-one-deck",
+    "name": "The One Deck",
+    "source": "https://www.ringsdb.com/decklist/view/8682",
+    "heroes": [
+      "10140",
+      "145002",
+      "04128"
+    ],
+    "cards": [
+      {
+        "code": "01014",
+        "count": 1
+      },
+      {
+        "code": "01026",
+        "count": 2
+      },
+      {
+        "code": "01031",
+        "count": 1
+      },
+      {
+        "code": "01045",
+        "count": 2
+      },
+      {
+        "code": "01046",
+        "count": 1
+      },
+      {
+        "code": "01050",
+        "count": 2
+      },
+      {
+        "code": "01057",
+        "count": 2
+      },
+      {
+        "code": "01073",
+        "count": 3
+      },
+      {
+        "code": "02079",
+        "count": 1
+      },
+      {
+        "code": "02100",
+        "count": 2
+      },
+      {
+        "code": "02119",
+        "count": 3
+      },
+      {
+        "code": "04083",
+        "count": 3
+      },
+      {
+        "code": "04106",
+        "count": 3
+      },
+      {
+        "code": "04134",
+        "count": 3
+      },
+      {
+        "code": "04137",
+        "count": 3
+      },
+      {
+        "code": "08146",
+        "count": 2
+      },
+      {
+        "code": "09014",
+        "count": 1
+      },
+      {
+        "code": "10145",
+        "count": 2
+      },
+      {
+        "code": "12006",
+        "count": 1
+      },
+      {
+        "code": "12009",
+        "count": 3
+      },
+      {
+        "code": "12085",
+        "count": 2
+      },
+      {
+        "code": "17004",
+        "count": 1
+      },
+      {
+        "code": "17006",
+        "count": 3
+      },
+      {
+        "code": "17008",
+        "count": 3
+      }
+    ]
+  }
+]
