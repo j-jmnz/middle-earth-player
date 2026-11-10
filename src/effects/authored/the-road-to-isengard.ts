@@ -26,7 +26,7 @@ const THREE_RESOURCES: Condition = { kind: "less", left: 2, right: { stat: "reso
 const ENT_PICK: PickSpec = { type: "ally", control: "you", names: ["Ent of Fangorn"], state: "ready" };
 const NON_UNIQUE_LOCATION: PickSpec = { type: "location", control: "any", nonUnique: true };
 const ORTHANC_PICK: PickSpec = { type: "location", control: "any", names: ["Orthanc"] };
-const SARUMAN_ENEMY: PickSpec = { type: "enemy", control: "any", names: ["Saruman"] };
+const SARUMAN_ENEMY: PickSpec = { type: "enemy", control: "any", staging: true, names: ["Saruman"] };
 const HAS_CARDS_IN_HAND: PickSpec = { type: "card", control: "you", from: "hand" };
 // "That character's Willpower is greater than the discarded card's Threat" (the Ent and the Palantír, one shape: 142058:A:2): the discarded card has no Threat unless it prints one (a Threat of 0).
 const THREAT_BELOW = (willpowerOf: "previous" | "host"): Condition => ({ kind: "less", left: { stat: "threat", of: "discardTop" }, right: { stat: "willpower", of: willpowerOf } });
@@ -141,7 +141,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     },
     copyLine("141082:A:3", "143052:A:2"),
 
-    // 143053 Orthanc, 143054 Gates of Isengard (both Immune): Orthanc in the staging area gains a Forced effect after the players quest successfully (it fires once, for the first player); the Gates put an enemy
+    // 143053 Orthanc, 143054 Gates of Isengard (both Immune): Orthanc in the staging area gains a Forced effect after the players quest successfully (it fires once, for the first player: the chosen card is revealed and resolved, then the others looked at are discarded, as printed); the Gates put an enemy
     // into play engaged with each player when they are explored.
     {
       id: "143053:forced:1",
@@ -150,7 +150,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "forced",
       trigger: "questSucceeded",
       condition: { kind: "all", conditions: [IN_STAGING, { kind: "firstPlayer" }] },
-      instructions: [{ verb: "LookAtTop", count: 3 }, { verb: "PickEncounter", from: "looked" }, { verb: "DiscardOtherLooked" }, { verb: "RevealEncounter" }],
+      instructions: [{ verb: "LookAtTop", count: 3 }, { verb: "PickEncounter", from: "looked" }, { verb: "MoveEncounterCard", to: "deckTop" }, { verb: "RevealEncounter" }, { verb: "DiscardOtherLooked" }],
     },
     {
       id: "143054:forced:1",

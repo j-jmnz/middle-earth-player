@@ -51,7 +51,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 143048:A:1 (front): Forced: After a player draws any number of cards, Saruman attacks that player. Deal and resolve 2 shadow cards for this attack. Then, remove 1 damage from Saruman.
   143048:forced:1: Forced on the event cardsDrawn
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the picked enemy attacks the acting player now, from the staging area [also {"shadows":2}]
+    - its host attacks the acting player now, from the staging area, dealt 2 shadow cards
     - heal 1 damage from its host
 
 143048:A:2 (front): While Saruman has any hit points remaining, the players cannot win the game.
@@ -128,8 +128,9 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json LookAtTop {"verb":"LookAtTop","count":3}]
     - [json PickEncounter {"verb":"PickEncounter","from":"looked"}]
-    - [json DiscardOtherLooked {"verb":"DiscardOtherLooked"}]
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","to":"deckTop"}]
     - the acting player reveals an encounter card
+    - [json DiscardOtherLooked {"verb":"DiscardOtherLooked"}]
 
 ## 143054 Gates of Isengard
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -362,7 +363,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 143080:B:1 (back): While Orthanc is the active location, Saruman is considered to be engaged with the first player.
   143080:constant:1: Constant
     only if the active location is a location (any player controls) named "Orthanc"
-    - each enemy (any player controls) named "Saruman": stat engagedWithFirst 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Saruman": stat engagedWithFirst 1, while this card is in play
 
 143080:B:2 (back): Forced: When Orthanc is explored, cancel any progress placed on the quest this phase and return Orthanc to the staging area.
   143080:forced:1: Forced after a card leaves play (heard about location (any player controls) named "Orthanc")
@@ -377,4 +378,4 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
     - the table: stat eliminatedAtEmptyHand 1, while this card is in play
     - the table: stat trackQuestProgress 1, while this card is in play
 
-(rendered pieces: 197 by template, 40 as JSON)
+(rendered pieces: 198 by template, 40 as JSON)

@@ -73,7 +73,7 @@ Read the sections your task touches.
   - 354–359 Catalog build (~410)
   - 360–377 Tests (~1.9K) ← 6
   - 378–393 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~89.1K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~89.4K tok)
   - 17–38 Sections (~410)
   - 39–50 Product (~590)
   - 51–64 Non-goals (~540)
@@ -107,19 +107,19 @@ Read the sections your task touches.
     - 616–633 The Caves of Nibin-Dûm (~2.4K)
   - 634–691 Dream-chaser (~15.6K) ← 4
   - 692–718 Ered Mithrin (~15.8K) ← 7
-  - 719–795 The Two Towers (~7.0K) ← 17
-  - 796–804 Nightmare (~410) ← 19
-  - 805–843 Deckbuilding (~1.9K)
-  - 844–922 Effects (~3.2K)
-    - 846–904 Three layers (~2.4K) ← 10
-    - 905–914 Player side quests, contracts and saga cards (~430)
-    - 915–918 Window stack (~100)
-    - 919–922 Coverage test (~270)
-  - 923–943 Data sources (~530)
-  - 944–962 Card images (~1.2K) ← 9
-  - 963–988 Persistence and shipping (~1.8K)
-  - 989–1030 Screens (~4.7K) ← 1
-    - 1015–1030 Table screen (~1.8K) ← 3
+  - 719–796 The Two Towers (~7.3K) ← 17
+  - 797–805 Nightmare (~410) ← 19
+  - 806–844 Deckbuilding (~1.9K)
+  - 845–923 Effects (~3.2K)
+    - 847–905 Three layers (~2.4K) ← 10
+    - 906–915 Player side quests, contracts and saga cards (~430)
+    - 916–919 Window stack (~100)
+    - 920–923 Coverage test (~270)
+  - 924–944 Data sources (~530)
+  - 945–963 Card images (~1.2K) ← 9
+  - 964–989 Persistence and shipping (~1.8K)
+  - 990–1031 Screens (~4.7K) ← 1
+    - 1016–1031 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~41.5K tok)
   - 5–8 Overview (~130) ← 1
   - 9–23 Top bar (~2.5K) ← 4
