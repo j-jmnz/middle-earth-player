@@ -73,7 +73,7 @@ Read the sections your task touches.
   - 354–359 Catalog build (~410)
   - 360–377 Tests (~1.9K) ← 6
   - 378–393 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~89.4K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~89.6K tok)
   - 17–38 Sections (~410)
   - 39–50 Product (~590)
   - 51–64 Non-goals (~540)
@@ -107,7 +107,7 @@ Read the sections your task touches.
     - 616–633 The Caves of Nibin-Dûm (~2.4K)
   - 634–691 Dream-chaser (~15.6K) ← 4
   - 692–718 Ered Mithrin (~15.8K) ← 7
-  - 719–796 The Two Towers (~7.3K) ← 17
+  - 719–796 The Two Towers (~7.5K) ← 17
   - 797–805 Nightmare (~410) ← 19
   - 806–844 Deckbuilding (~1.9K)
   - 845–923 Effects (~3.2K)
@@ -120,39 +120,39 @@ Read the sections your task touches.
   - 964–989 Persistence and shipping (~1.8K)
   - 990–1031 Screens (~4.7K) ← 1
     - 1016–1031 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~41.5K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~42.0K tok)
   - 5–8 Overview (~130) ← 1
-  - 9–23 Top bar (~2.5K) ← 4
+  - 9–23 Top bar (~2.8K) ← 4
   - 24–27 Table menu (~430) ← 2
   - 28–35 Quest scale (~830) ← 2
   - 36–39 Canvas (~560)
   - 40–52 Spacing and the play area's rows (~1.8K) ← 9
   - 53–58 Pictures on the table (~320) ← 1
-  - 59–87 Cards (~6.0K) ← 15
-  - 88–93 The Sailing test (~690) ← 5
-  - 94–107 The Island Map (~1.8K) ← 8
-  - 108–111 Tokens and effects (~320)
-  - 112–125 Piles (~1.8K) ← 7
-  - 126–131 Marks of the open moment (~400) ← 1
-  - 132–200 Motion (~3.2K) ← 7
-  - 201–226 Spotlight (~2.5K) ← 33
-  - 227–232 Gestures (~620) ← 4
-  - 233–236 Hold, slide and release (~940)
-  - 237–242 Peeking at the other seat (~600) ← 1
-  - 243–261 Command column (~2.5K) ← 11
-  - 262–265 Two taps (~420) ← 2
-  - 266–269 One answer, one tap (~240)
-  - 270–273 Stops and Always use (~250)
-  - 274–277 Guide (~120)
-  - 278–294 Choice tray (~5.5K) ← 26
-  - 295–309 Reading panels (~1.6K) ← 5
-  - 310–319 Phase carousel (~680)
-  - 320–325 Quest advance (~530) ← 1
-  - 326–329 Undo (~150)
-  - 330–333 Haptics (~280)
-  - 334–345 Banner (~750) ← 4
-  - 346–365 Screen reader (~2.8K) ← 17
-  - 366–369 Android Back (~90)
+  - 59–88 Cards (~6.3K) ← 16
+  - 89–94 The Sailing test (~690) ← 5
+  - 95–108 The Island Map (~1.8K) ← 8
+  - 109–112 Tokens and effects (~320)
+  - 113–126 Piles (~1.8K) ← 7
+  - 127–132 Marks of the open moment (~400) ← 1
+  - 133–201 Motion (~3.2K) ← 7
+  - 202–227 Spotlight (~2.5K) ← 33
+  - 228–233 Gestures (~620) ← 4
+  - 234–237 Hold, slide and release (~940)
+  - 238–243 Peeking at the other seat (~600) ← 1
+  - 244–262 Command column (~2.5K) ← 11
+  - 263–266 Two taps (~420) ← 2
+  - 267–270 One answer, one tap (~240)
+  - 271–274 Stops and Always use (~250)
+  - 275–278 Guide (~120)
+  - 279–295 Choice tray (~5.5K) ← 25
+  - 296–310 Reading panels (~1.6K) ← 5
+  - 311–320 Phase carousel (~680)
+  - 321–326 Quest advance (~530) ← 1
+  - 327–330 Undo (~150)
+  - 331–334 Haptics (~280)
+  - 335–346 Banner (~750) ← 4
+  - 347–366 Screen reader (~2.8K) ← 17
+  - 367–370 Android Back (~90)
 - `docs/design-system.md` — Design system — Carved Stone (~28.1K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~580)
@@ -284,7 +284,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `src/campaign`: brief.md, The Two Towers (6); brief.md, Nightmare (4); handover/agent-brief.md, Scenario procedure (3); architecture.md, Tests (2); brief.md, Ered Mithrin (2)
 - `src/catalog`: architecture.md, Mechanic families (2); brief.md, Nightmare (2); brief.md, The Two Towers (2); brief.md, A Knife in the Dark (1); brief.md, Dream-chaser (1); brief.md, Ered Mithrin (1); brief.md, Flight to the Ford burden deck and life (1); brief.md, Three layers (1)
 - `src/effects`: brief.md, The Two Towers (2); brief.md, Breaking of the Fellowship, stage 2B (1); brief.md, Nightmare (1)
-- `src/play`: design-system-table.md, Spotlight (29); design-system-table.md, Choice tray (19); design-system-table.md, Cards (14); design-system-table.md, Screen reader (12); design-system-table.md, Command column (11); design-system-table.md, Spacing and the play area's rows (9); design-system-table.md, The Island Map (8); architecture.md, State (6); design-system-table.md, Piles (6); architecture.md, Images (5); design-system-table.md, Motion (5); design-system-table.md, Reading panels (5); design-system-table.md, The Sailing test (5); design-system.md, Type (5); architecture.md, Performance (4); brief.md, Three layers (4); design-system-table.md, Banner (4); design-system-table.md, Gestures (4); brief.md, Table screen (3); design-system-table.md, Top bar (3); architecture.md, Tests (2); design-system-table.md, Quest scale (2); design-system.md, Settings (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Table menu (1); design-system-table.md, Two taps (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Screen reader (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1)
+- `src/play`: design-system-table.md, Spotlight (29); design-system-table.md, Choice tray (18); design-system-table.md, Cards (15); design-system-table.md, Screen reader (12); design-system-table.md, Command column (11); design-system-table.md, Spacing and the play area's rows (9); design-system-table.md, The Island Map (8); architecture.md, State (6); design-system-table.md, Piles (6); architecture.md, Images (5); design-system-table.md, Motion (5); design-system-table.md, Reading panels (5); design-system-table.md, The Sailing test (5); design-system.md, Type (5); architecture.md, Performance (4); brief.md, Three layers (4); design-system-table.md, Banner (4); design-system-table.md, Gestures (4); brief.md, Table screen (3); design-system-table.md, Top bar (3); architecture.md, Tests (2); design-system-table.md, Quest scale (2); design-system.md, Settings (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Table menu (1); design-system-table.md, Two taps (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Screen reader (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1)
 - `src/rules`: brief.md, Nightmare (5); architecture.md, Mechanic families (3); brief.md, The engine plays the game (3); brief.md, The Two Towers (3); architecture.md, State (1)
 - `src/screens`: design-system.md, Tablets (8); design-system.md, Campaigns (campaign list) (6); brief.md, Three layers (5); design-system.md, Briefing (5); design-system.md, Components (5); brief.md, Card images (4); design-system.md, Campaign path (4); design-system.md, History (4); design-system.md, Settings (4); design-system.md, Campaign setup (3); design-system.md, Card pool (the Cards tab) (3); design-system.md, Deck builder (deck editor) (3); design-system.md, Navigation (3); design-system.md, Performance (3); design-system.md, Screen reader (3); brief.md, The Two Towers (2); design-system.md, Backdrops (2); design-system.md, Booklet (2); design-system.md, Card (2); design-system.md, Card art (2); design-system.md, Decks (2); architecture.md, Images (1); architecture.md, State (1); architecture.md, Tests (1); brief.md, Campaign (1); brief.md, Nightmare (1); brief.md, Screens (1); design-system-table.md, Marks of the open moment (1); design-system-table.md, Screen reader (1); design-system.md, Campaign log (1); design-system.md, Color (1); design-system.md, Icons (1); design-system.md, Resolution and standalone outcome (1); design-system.md, Rule (1); design-system.md, Rules (1); design-system.md, Scenarios (1); design-system.md, Spend XP (1); design-system.md, Type (1); releasing.md, TestFlight (optional) (1)
 - `src/ui`: design-system.md, Settings (4); design-system.md, Type (4); design-system.md, Components (3); design-system-table.md, Screen reader (2); design-system.md, Backdrops (2); design-system.md, Screen reader (2); design-system.md, Tablets (2); design-system-table.md, Motion (1); design-system-table.md, Overview (1); design-system-table.md, Spotlight (1); design-system-table.md, Table menu (1); design-system.md, Icons (1); design-system.md, Performance (1); design-system.md, Spacing, radius, border (1); design-system.md, Surfaces (1)

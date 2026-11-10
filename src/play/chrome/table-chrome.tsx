@@ -60,6 +60,8 @@ export function ThreatRing({
   limit,
   limitWords,
   goal,
+  warn,
+  note,
   onPress,
 }: {
   threat: SeatThreat;
@@ -92,12 +94,16 @@ export function ThreatRing({
   limitWords?: string;
   // The limit is the players' way out, not a loss (the Defense dial): the ring fills toward it in the accent, and the dial never warms or says "near the limit".
   goal?: boolean;
+  // A dial that warns by its own rule (a hand count of 1 or 0 on The Voice of Saruman, 143080:B:3): its level warms the dial as the elimination dial does, and these words are heard in place of "near elimination".
+  warn?: { level: "near" | "critical"; words: string };
+  // What a screen reader hears after the number and the limit: what the number is (Saruman's hit points left, the win gate).
+  note?: string;
   // A tap opens the threat panel (each enemy's cost against the threat), or peeks at the seat (a dial that is not shown).
   onPress?: () => void;
 }) {
   const s = useUiScale();
   const id = testID ?? `threat-${threat.seat}`;
-  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} spokenWord={spokenWord} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} limit={limit} limitWords={limitWords} goal={goal} onPress={onPress} />;
+  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} spokenWord={spokenWord} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} limit={limit} limitWords={limitWords} goal={goal} warn={warn} note={note} onPress={onPress} />;
   return (
     <View testID={id} accessible accessibilityLabel={`${label} ${threat.threat}`} className="items-center">
       <View className="h-12 w-12 items-center justify-center rounded-control">
@@ -129,6 +135,8 @@ function ThreatDial({
   limit,
   limitWords,
   goal,
+  warn,
+  note,
   onPress,
 }: {
   threat: SeatThreat;
@@ -146,6 +154,8 @@ function ThreatDial({
   limit?: number;
   limitWords?: string;
   goal?: boolean;
+  warn?: { level: "near" | "critical"; words: string };
+  note?: string;
   onPress?: () => void;
 }) {
   const speed = useMotionScale();
@@ -153,8 +163,8 @@ function ThreatDial({
   const s = useUiScale();
   const focus = useFocusRing();
   const badge = useMemo(() => ({ in: layoutAnim(FadeIn, MOTION.threatBadgeIn, speed), out: layoutAnim(FadeOut, MOTION.threatBadgeOut, speed) }), [speed]);
-  const level = elimination && !goal ? threatLevel(threat.threat, limit) : "calm";
-  const look = threat.eliminated ? { edge: t.hairline, fill: t.night, meter: t.hairline } : goal ? { edge: t.accent, fill: t.night, meter: t.accent } : elimination ? dialOf(t)[level] : { edge: t.accent, fill: t.night, meter: t.accent };
+  const level = warn ? warn.level : elimination && !goal ? threatLevel(threat.threat, limit) : "calm";
+  const look = threat.eliminated ? { edge: t.hairline, fill: t.night, meter: t.hairline } : goal ? { edge: t.accent, fill: t.night, meter: t.accent } : warn || elimination ? dialOf(t)[level] : { edge: t.accent, fill: t.night, meter: t.accent };
   // The change since the number last moved, shown beside the dial for DELTA_MS. A new change replaces it.
   const seen = useRef(threat.threat);
   const [change, setChange] = useState<{ before: number; after: number; at: number } | null>(null);
@@ -191,7 +201,7 @@ function ThreatDial({
   const engaging = ticks.filter((cost) => cost <= threat.threat).length;
   const tickWords = ticks.length === 0 ? "" : ticks.length === 1 ? `, the enemy in staging ${engaging === 1 ? "engages" : "does not engage"} at this threat` : `, ${engaging} of the ${ticks.length} enemies in staging engage at this threat`;
   // The dial is one control with one name (the change badge's words included), so Android gives it one focus stop.
-  const dialWords = `${spokenWord ? dialSpeech(spokenWord, threat.threat, label, role) : `${name} ${threat.threat}`}${threat.eliminated ? ", eliminated" : critical ? (limit != null ? ", near the limit" : ", near elimination") : ""}${limit != null ? `, ${limitWords ?? `the players lose at ${limit}`}` : ""}${tickWords}${ring ? `. ${ring}` : ""}${deltaWords ? `. ${deltaWords}` : ""}`;
+  const dialWords = `${spokenWord ? dialSpeech(spokenWord, threat.threat, label, role) : `${name} ${threat.threat}`}${threat.eliminated ? ", eliminated" : warn ? `, ${warn.words}` : critical ? (limit != null ? ", near the limit" : ", near elimination") : ""}${note ? `, ${note}` : ""}${limit != null ? `, ${limitWords ?? `the players lose at ${limit}`}` : ""}${tickWords}${ring ? `. ${ring}` : ""}${deltaWords ? `. ${deltaWords}` : ""}`;
   return (
     <Pressable
       {...focus.props}

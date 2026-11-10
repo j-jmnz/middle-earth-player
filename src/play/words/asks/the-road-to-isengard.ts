@@ -1,7 +1,9 @@
+import type { Condition } from "../../../catalog/boundary.ts";
 import type { Ask } from "../asks.ts";
 
-// The choice words of The Road to Isengard (the-two-towers part 3), one entry for each Pick and Choose of its records: `<record id> @<instruction path> <verb | option id>` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
-// `pnpm test:scenario the-road-to-isengard --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=the-road-to-isengard` prints each sentence.
+// A Wizardry line resolved from a shadow card (Saruman's Forced effect, 143047:A:2) is resolved while Saruman is the attacking enemy: the defending player resolves it as the only player in the game.
+const IN_SHADOW: Condition = { kind: "matches", card: "attacker", pick: { type: "enemy", control: "any", names: ["Saruman"] } };
+
 export const ASKS: Readonly<Record<string, Ask>> = {
   // 143020:A:2: the Palantír's Quest Action exhausted Aragorn and the Palantír and discarded the top encounter card; the optional part ("may") needs Aragorn's Willpower above that card's Threat. Controller-owned.
   "143020:action:1 @1 Choose": { note: "Palantír of Orthanc: You exhausted Aragorn and the Palantír, and discarded the top encounter card, and Aragorn's Willpower is greater than its Threat. You either use the Palantír for good or do nothing." },
@@ -21,10 +23,10 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   // 143053:A:2: the first player looked at the top 3 cards; the one chosen is revealed, then the others are discarded.
   "143053:forced:1 @1 PickEncounter": { owned: true, note: "Orthanc: choose 1 of the 3 encounter cards you looked at to reveal. Once it is resolved, the other cards you looked at are discarded.", verb: "Reveal" },
   // 143056:A:2 and 143057:A:1, 143057:A:2, 143058:A:3: the Wizardry locations; each player chooses their own.
-  "143056:forced:2 @0.0 Pick": { owned: true, note: "Underground Armoury, Wizardry: exhaust 1 ready character you control.", verb: "Exhaust" },
+  "143056:forced:2 @0.0 Pick": { owned: true, note: [{ when: IN_SHADOW, text: "Underground Armoury's Wizardry, from Saruman's shadow card: you resolve it as the only player. Exhaust 1 ready character you control." }, { text: "Underground Armoury, Wizardry: exhaust 1 ready character you control." }], verb: "Exhaust" },
   "143057:forced:1 @0 Pick": { owned: true, note: "Steaming Vent: choose a questing character you control to take 1 damage.", verb: "Assign" },
-  "143057:forced:2 @0 AssignDamage": { note: "Steaming Vent, Wizardry: assign {x} damage among the characters in play (the defending player's, when Saruman's shadow card resolves it).", bind: { x: { players: true, plus: 1 } }, verb: "Assign" },
-  "143058:forced:1 @0.0 Pick": { owned: true, note: "Plain of Isengard, Wizardry: discard 1 ally you control.", verb: "Discard" },
+  "143057:forced:2 @0 AssignDamage": { note: [{ when: IN_SHADOW, text: "Steaming Vent's Wizardry, from Saruman's shadow card: you resolve it as the only player. Assign 2 damage among your characters." }, { text: "Steaming Vent, Wizardry: assign {x} damage among the characters in play." }], bind: { x: { players: true, plus: 1 } }, verb: "Assign" },
+  "143058:forced:1 @0.0 Pick": { owned: true, note: [{ when: IN_SHADOW, text: "Plain of Isengard's Wizardry, from Saruman's shadow card: you resolve it as the only player. Discard 1 ally you control." }, { text: "Plain of Isengard, Wizardry: discard 1 ally you control." }], verb: "Discard" },
   "143060:whenRevealed:1 @0 AssignDamage": { note: "Blast of Sorcery: assign {x} damage among the characters committed to the quest, 1 more than the number of players.", bind: { x: { players: true, plus: 1 } }, verb: "Assign" },
   // 143068:A:2 (Peril, so the words speak to the player who reveals it): a hero committed to the quest, any player's; then its controller discards 1 card each time the hero commits, attacks, defends or triggers its ability.
   "143068:whenRevealed:1 @0 Pick": { owned: true, note: "Saruman's Voice: choose a hero committed to the quest, any player's. Remove it from the quest and attach Saruman's Voice to it. Its player discards 1 card each time it commits, attacks, defends or triggers its ability.", verb: "Attach" },

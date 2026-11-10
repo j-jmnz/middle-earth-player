@@ -8,6 +8,8 @@ export function attackWords(instruction: Instruction): string | null {
       return instruction.ranged ? "make a ranged attack against that enemy" : "declare it as an attacker against that enemy";
     case "OfferAttacks":
       return "declare an attack against each of those enemies";
+    case "ImmediateAttack":
+      return instruction.afterThis ? "make an additional attack against the defending player after this one" : null;
     case "QuestProgress":
       return `place ${typeof instruction.amount === "number" ? instruction.amount : "X"} progress on the current quest`;
     case "ExcessDamageTo":
