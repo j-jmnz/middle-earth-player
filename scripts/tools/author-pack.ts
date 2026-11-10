@@ -8,7 +8,7 @@ import { dealtCodes, loadCampaigns, loadScenario } from "../data/load-scenarios.
 import { ROOT } from "../data/paths.ts";
 import { sectionText } from "../docs/index.ts";
 
-// The context a fast-track scenario author reads in place of the brief's full list (docs/handover/fast-track.md, Read):
+// The context a scenario author reads in place of the brief's full list (docs/handover/agent-brief.md, Scenario procedure):
 //
 //   pnpm author:pack <scenario-id> [--no-draft]
 //
@@ -181,7 +181,7 @@ export function renderPack(parts: PackParts): string {
   const out = [
     `# Author pack for ${parts.id}`,
     ``,
-    `Written by \`pnpm author:pack ${parts.id}\`; not committed. It replaces the brief's full reading list (docs/handover/fast-track.md, Read): the vocabulary, the schema entries of the verbs the drafts' records use (from ${parts.plan.families.join(", ") || "no file"}), the cookbook sections those records need, and the ${parts.drafts.length} draft${parts.drafts.length === 1 ? "" : "s"}.`,
+    `Written by \`pnpm author:pack ${parts.id}\`; not committed. It replaces the brief's full reading list (docs/handover/agent-brief.md, Scenario procedure): the vocabulary, the schema entries of the verbs the drafts' records use (from ${parts.plan.families.join(", ") || "no file"}), the cookbook sections those records need, and the ${parts.drafts.length} draft${parts.drafts.length === 1 ? "" : "s"}.`,
     `An entry is cut from its file: a helper it names (\`code\`, \`pile\`, \`when\`) is declared higher in that file. The fields a verb takes are the entry's.`,
     ``,
     `# Part 1: the vocabulary`,

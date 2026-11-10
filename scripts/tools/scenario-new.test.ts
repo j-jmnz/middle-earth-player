@@ -160,11 +160,6 @@ describe("pnpm scenario:new", () => {
     for (const edit of plan?.edits ?? []) expect(view.repo.read(edit.file), edit.file).toBe(edit.before);
   });
 
-  it("takes no --track flag: it reads the flag as an id and refuses it", () => {
-    const run = cli("--track", "fast", "--dry-run");
-    expect(run.status).toBe(1);
-  });
-
   // The CLI reads the real repo, so it runs on a scenario the real repo has not scaffolded yet (none, once every scenario has its files).
   it.skipIf(!NEW)("--dry-run on the real repo lists the files and writes nothing", () => {
     const id = NEW as string;

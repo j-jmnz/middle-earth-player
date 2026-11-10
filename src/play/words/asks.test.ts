@@ -195,7 +195,7 @@ describe("the barrel of asks files", () => {
   });
 });
 
-// A scenario with an asks file is on the fast track: its words are data, and these checks stand in for the words code it has none of.
+// A scenario with an asks file has its words as data, and these checks stand in for the words code it has none of.
 const dump = process.env.WORDS_DUMP;
 const LIMIT = 25;
 const wordsIn = (text: string): number => text.trim().split(/\s+/).filter(Boolean).length;
