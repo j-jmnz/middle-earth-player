@@ -269,7 +269,8 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
         else local.push(`${id}: ${nameOf(code)} is in the ${pile} pile and no Setup line puts it there`);
         continue;
       }
-      const perPlayer = clausesOf(quest, "stage").find((clause) => clause.perPlayer != null && clause.codes.includes(code))?.perPlayer;
+      // "Each player sets 1 copy of X aside" (143072:A:1, an `aside` clause with `eachPlayer`) places one copy for each player, as the `stage` clauses of a per-player Setup do.
+      const perPlayer = clausesOf(quest, "stage").find((clause) => clause.perPlayer != null && clause.codes.includes(code))?.perPlayer ?? clausesOf(quest, "aside").find((clause) => clause.eachPlayer != null && clause.codes.includes(code))?.eachPlayer;
       // A location the quest's Setup has each player add (found in the encounter deck): dealt with the deck, found by the Setup record.
       const searched = pile === "staging" && printed?.type === "location" && clausesOf(quest, "eachPlayerAddsLocation").length > 0;
       // "(2 copies instead if there are 3 or more players in the game)": the copies of this card the Setup stages.

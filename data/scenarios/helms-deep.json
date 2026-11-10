@@ -144,7 +144,8 @@
       "code": "143036",
       "normal": 4,
       "easy": 4,
-      "pile": "setAside"
+      "pile": "setAside",
+      "perPlayer": 1
     },
     {
       "code": "143038",
