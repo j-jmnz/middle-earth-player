@@ -114,10 +114,10 @@ describe("Helm's Deep in the the-two-towers campaign", () => {
     expect(log.campaignPool.some((card) => card.code === COUNSELS)).toBe(false);
   });
 
-  it("143077:B:1 unlocks The Road to Isengard on the path, which the app cannot deal yet", () => {
+  it("143077:B:1 unlocks The Road to Isengard on the path", () => {
     const { log } = resolved("two-handed, won, Normal");
     const path = campaignPath(campaign, {}, { ...afterHai, completed: ["the-uruk-hai", "helms-deep"], campaignPool: log.campaignPool });
-    expect(path.slice(0, 3).map((node) => [node.id, node.status])).toEqual([["the-uruk-hai", "completed"], ["helms-deep", "completed"], ["the-road-to-isengard", "soon"]]);
+    expect(path.slice(0, 3).map((node) => [node.id, node.status])).toEqual([["the-uruk-hai", "completed"], ["helms-deep", "completed"], ["the-road-to-isengard", "current"]]);
   });
 
   it("deals the original card in a standalone game, with no campaign card", () => {

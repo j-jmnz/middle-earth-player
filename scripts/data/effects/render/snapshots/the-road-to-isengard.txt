@@ -1,0 +1,380 @@
+Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; quest: 143079 Breaking Isengard; quest: 143080 The Voice of Saruman; staging: 143046 Ent of Fangorn; setAside: 143047 Saruman; setAside: 143048 Saruman's Staff; setAside: 143053 Orthanc; setAside: 143054 Gates of Isengard)
+
+## 143020 Palantír of Orthanc
+
+143020:A:1 (front): Attach to Fellowship Aragorn.
+  143020:constant:1: Constant
+    - [json AttachesTo {"verb":"AttachesTo","hosts":[{"type":"hero","control":"you","names":["Aragorn"],"spheres":["fellowship"]}]}]
+
+143020:A:2 (front): Quest Action: Exhaust Aragorn and Palantír of Orthanc to discard the top card of the encounter deck. If Aragorn's Willpower is greater than the discarded card's Threat, you may add Palantír of Orthanc to the victory display and remove it from the campaign pool to choose a player. That player reveals 1 fewer encounter card this phase (to a minimum of 0).
+  143020:action:1: Action (cost: exhaust this card and exhaust the attached card)
+    only if it is the Quest phase
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"}]
+    - the acting player chooses one of:
+      * option "use" (only if threat of the top card of the encounter discard pile is less than willpower of its host):
+        - [json RemoveFromCampaignPool {"verb":"RemoveFromCampaignPool"}]
+        - [json AddSourceToVictory {"verb":"AddSourceToVictory"}]
+        - choose player (any player controls)
+        - [json RevealFewer {"verb":"RevealFewer","amount":1,"min":0,"who":"picked"}]
+      * option "skip":
+
+## 143046 Ent of Fangorn
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+143046:A:1 (front): While Ent of Fangorn is in the staging area, it gains: "Quest Action: Exhaust a hero you control to discard the top card of the encounter deck. If that hero's Willpower is greater than the discarded card's Threat, place 1 resource here. Then, if there are 3 resources here, discard them to take control of Ent of Fangorn. Any player may trigger this effect."
+  143046:action:1: Action (any player may use it)
+    only if all of: (it is the Quest phase) and (this card is in the staging area) and (there is a ready hero (you control) to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready hero (you control)
+    - exhaust the picked card
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"}]
+    - [json PlaceToken {"verb":"PlaceToken","amount":1,"when":{"kind":"less","left":{"stat":"threat","of":"discardTop"},"right":{"stat":"willpower","of":"previous"}}}]
+    - [json TakeControl {"verb":"TakeControl","who":"actor","when":{"kind":"less","left":2,"right":{"stat":"resources","of":"self"}}}]
+    - [json DiscardResources {"verb":"DiscardResources","amount":3,"target":"self","when":{"kind":"less","left":2,"right":{"stat":"resources","of":"self"}}}]
+
+## 143047 Saruman
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+143047:A:1 (front): Indestructible. Immune to player card effects. Cannot leave the staging area.
+  (the keyword part is owned by the card's keywords; the records cover: Cannot leave the staging area.)
+  143047:constant:1: Constant
+    - this card: stat cannotLeaveStaging (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect) 1, while this card is in play
+
+143047:A:2 (front): Forced: When Saruman is dealt a shadow card with a Wizardry effect, the defending player resolves that Wizardry effect as if he is the only player in the game.
+  143047:forced:1: Forced on the event shadowWizardry (heard about this card)
+    - [json TriggerWizardry {"verb":"TriggerWizardry","target":"shadowCard","asOnlyPlayer":true}]
+
+## 143048 Saruman's Staff
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+143048:A:1 (front): Forced: After a player draws any number of cards, Saruman attacks that player. Deal and resolve 2 shadow cards for this attack. Then, remove 1 damage from Saruman.
+  143048:forced:1: Forced on the event cardsDrawn
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the picked enemy attacks the acting player now, from the staging area [also {"shadows":2}]
+    - heal 1 damage from its host
+
+143048:A:2 (front): While Saruman has any hit points remaining, the players cannot win the game.
+  143048:constant:1: Constant
+    only if damage of "Saruman" is less than hit points of "Saruman"
+    - the players cannot defeat this stage while this holds
+
+## 143049 Gríma
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143049:A:1: Doomed 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+143049:A:2 (front): Forced: After Gríma attacks a player, that player shuffles Gríma back into the encounter deck and reveals an encounter card.
+  143049:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"self","to":"shuffle"}]
+    - the player the event is about reveals an encounter card
+
+143049:A:3 (shadow): Shadow: This attack is considered undefended.
+  143049:shadow:1: Shadow
+    - this attack is considered undefended
+
+## 143050 Lieutenant of Orthanc
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143050:A:1 (front): Forced: After Lieutenant of Orthanc attacks and destroys a character, that character's controller discards 1 random card from his hand.
+  143050:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
+    only if the event's other card is a enemy (any player controls) [also {"isSource":true}]
+    - the acting player discards 1 random card(s) from hand
+
+## 143051 Isengard Orc
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143051:A:1: Peril. Archery 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+143051:A:2 (front): When Revealed: Either discard 1 random card from your hand, or reveal an encounter card.
+  143051:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "discard" (only if the actor has a card in hand):
+        - the acting player discards 1 random card(s) from hand
+      * option "reveal":
+        - the acting player reveals an encounter card
+
+143051:A:3 (shadow): Shadow: Until the end of the round, attacking enemy gets +2 Defense.
+  143051:shadow:1: Shadow
+    - the attacking enemy: stat defense 2, until the end of the round
+
+## 143052 Wolf of Isengard
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143052:A:1 (front): Forced: When Wolf of Isengard is dealt a shadow card with a Wizardry effect, either discard 1 card from your hand, or Wolf of Isengard makes an additional attack against you after this one.
+  143052:forced:1: Forced on the event shadowWizardry (heard about this card)
+    - the acting player chooses one of:
+      * option "discard" (only if the actor has a card in hand):
+        - discard 1 cards from hand
+      * option "attack":
+        - this enemy attacks now, dealt a new shadow card after its old ones are discarded [also {"afterThis":true}]
+
+143052:A:2 (shadow): Shadow: Deal 1 damage to defending character.
+  143052:shadow:1: Shadow
+    - deal 1 damage to the defender
+
+## 143053 Orthanc
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+143053:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+143053:A:2 (front): While Orthanc is in the staging area, it gains: "Forced: After the players quest successfully, the first player looks at the top 3 cards of the encounter deck, reveals 1, and discards the others."
+  143053:forced:1: Forced after the players quest successfully
+    only if all of: (this card is in the staging area) and (the actor holds the first player token)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json LookAtTop {"verb":"LookAtTop","count":3}]
+    - [json PickEncounter {"verb":"PickEncounter","from":"looked"}]
+    - [json DiscardOtherLooked {"verb":"DiscardOtherLooked"}]
+    - the acting player reveals an encounter card
+
+## 143054 Gates of Isengard
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+143054:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+143054:A:2 (front): Forced: When Gates of Isengard is explored, each player searches the encounter deck and discard pile for an enemy and puts it into play engaged with him. Shuffle the encounter deck.
+  143054:forced:1: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - [json SearchMove {"verb":"SearchMove","type":"enemy","to":"engaged"}]
+    - shuffle the encounter deck
+
+## 143055 Ring-wall of Isengard
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143055:A:1 (front): While Ring-wall of Isengard is in the staging area, it gains: "Forced: After any amount of damage is healed from a character, its owner discards 1 card from his hand."
+  143055:forced:1: Forced on the event healed (heard about character (any player controls))
+    only if this card is in the staging area
+    - discard 1 cards from hand
+
+143055:A:2 (front): Wizardry: Each player discards 1 random card from his hand.
+  143055:forced:2: Forced on the event wizardry (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    - for each player, first player first:
+      - the acting player discards 1 random card(s) from hand
+
+## 143056 Underground Armoury
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143056:A:1 (front): While Underground Armoury is in the staging area, it gains: "Forced: After an enemy engages a player, deal it a shadow card."
+  143056:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls))
+    only if this card is in the staging area
+    - [json DealShadowTo {"verb":"DealShadowTo","target":"subject"}]
+
+143056:A:2 (front): Wizardry: Each player exhausts a character he controls.
+  143056:forced:2: Forced on the event wizardry (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    - for each player, first player first:
+      - choose ready character (you control)
+      - exhaust the picked card
+
+## 143057 Steaming Vent
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143057:A:1 (front): While Steaming Vent is in the staging area, it gains: "Forced: After a player commits characters to the quest, he deals 1 damage to a questing character he controls."
+  143057:forced:1: Forced on the event commitmentMade
+    only if this card is in the staging area
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if there is a character (you control) committed to the quest to choose: choose character (you control) committed to the quest
+    - then, if there is a character (you control) committed to the quest to choose (checked when this step runs, after the steps above; not tied to whether they did anything): deal 1 damage to the picked card
+
+143057:A:2 (front): Wizardry: Assign X damage among characters in play. X is 1 more than the number of players in the game.
+  143057:forced:2: Forced on the event wizardry (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    - [json AssignDamage {"verb":"AssignDamage","amount":{"players":true,"plus":1},"pick":{"type":"character","control":"any"}}]
+
+## 143058 Plain of Isengard
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143058:A:1 (front): X is the number of players in the game.
+  143058:constant:1: Constant
+    - this card: stat threat the number of players, while this card is in play
+
+143058:A:2 (front): While Plain of Isengard is in the staging area, archery damage must be assigned to allies, if able.
+  143058:constant:2: Constant
+    only if this card is in the staging area
+    - the table: stat archeryToAllies 1, while this card is in play
+
+143058:A:3 (front): Wizardry: Each player discards 1 ally he controls.
+  143058:forced:1: Forced on the event wizardry (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    - for each player, first player first:
+      - choose ally (you control)
+      - discard the picked card
+
+## 143059 Open Pit
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143059:A:1 (front): While Open Pit is in the staging area, it gains: "Forced: After a player draws any number of cards from a player card effect, he raises his threat by 2."
+  143059:forced:1: Forced on the event cardsDrawn
+    only if all of: (this card is in the staging area) and ([json condition {"kind":"byPlayerCard"}])
+    - raise threat by 2 (the player the event is about)
+
+143059:A:2 (front): Wizardry: Each player raises his threat by 2.
+  143059:forced:2: Forced on the event wizardry (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    - raise threat by 2 (each player)
+
+## 143060 Blast of Sorcery
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143060:A:1 (front): When Revealed: Assign X damage among characters committed to the quest. X is 1 more than the number of players in the game.
+  143060:whenRevealed:1: When revealed
+    - [json AssignDamage {"verb":"AssignDamage","amount":{"players":true,"plus":1},"pick":{"type":"character","control":"any","committed":true}}]
+
+143060:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending player has 1 or fewer cards in his hand).
+  143060:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the number of card (you control) in hand is at most 1): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the number of card (you control) in hand is at most 1 (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 143061 Poisoned Vapour
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143061:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+143061:A:2 (front): When Revealed: Exhaust each damaged character. Until the end of the combat phase, treat each damaged character's text box as if it were blank (except for Traits).
+  143061:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json ExhaustEach {"verb":"ExhaustEach","pick":{"type":"character","control":"any","damaged":true}}]
+    - damagedCharacters: stat blankText (its text box is blank) 1, endOfCombat
+
+143061:A:3 (shadow): Shadow: Discard a non-objective attachment you control.
+  143061:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (you control) that is not an objective
+    - discard the picked card
+
+## 143062 Machines of Isengard
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143062:A:1 (front): When Revealed: Trigger the Wizardry effect on the active location. If no Wizardry effect is triggered this way, Machines of Isengard gains surge.
+  143062:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json GainSurge {"verb":"GainSurge","when":{"kind":"not","condition":{"kind":"hasWizardry"}}}]
+    - [json TriggerWizardry {"verb":"TriggerWizardry","target":"activeLocation"}]
+
+143062:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, discard 1 random card from your hand.
+  143062:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the acting player discards 1 random card(s) from hand
+
+## 143068 Saruman's Voice
+
+143068:A:1: Peril. Doomed 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+143068:A:2 (front): When Revealed: Remove a hero from the quest and attach Saruman's Voice to that hero. (Counts as a Condition attachment with the text: "Forced: When attached hero commits to the quest, is declared as an attacker or defender, or triggers its ability, its controller must discard 1 card from his hand.")
+  143068:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if there is a hero (any player controls) committed to the quest to choose: choose hero (any player controls) committed to the quest
+    - [json AttachSelfToPicked {"verb":"AttachSelfToPicked","when":{"kind":"canPick","pick":{"type":"hero","control":"any","committed":true}}}]
+    - [json RemoveFromQuest {"verb":"RemoveFromQuest","when":{"kind":"canPick","pick":{"type":"hero","control":"any","committed":true}}}]
+  143068:constant:1: Constant
+    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+  143068:forced:1: Forced after a card is committed to the quest (heard about the host)
+    - discard 1 cards from hand
+  143068:forced:2: Forced after a character is declared as an attacker (heard about the host)
+    - discard 1 cards from hand
+  143068:forced:3: Forced after a character is declared as a defender (heard about the host)
+    - discard 1 cards from hand
+  143068:forced:4: Forced on the event abilityTriggered (heard about the host)
+    - discard 1 cards from hand
+
+## 143078 Rouse the Ents
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+143078:A:1 (front): Setup: Set Gates of Isengard, Orthanc, Saruman, and Saruman's Staff aside, out of play. Add each copy of Ent of Fangorn to the staging area. Shuffle the encounter deck.
+  143078:setup:1: Setup
+    - shuffle the encounter deck
+
+143078:B:1 (back): Players cannot draw cards or gain resources. Do not commit characters to the quest or reveal encounter cards during the quest phase.
+  143078:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the table: stat cannotDraw 1, while this card is in play
+    - the table: stat cannotGainResources 1, while this card is in play
+    - the table: stat cannotCommit 1, while this card is in play
+    - the table: stat skipStaging 1, while this card is in play
+
+143078:B:2 (back): Forced: At the end of the round, place 1 resource here. Then, the players may advance to stage 2. If the players advance, the first player shuffles the encounter discard pile into the encounter deck and reveals 1 encounter card for each resource here. Then, remove each Ent objective in the staging area from the game.
+  143078:forced:1: Forced at the end of the round
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json PlaceToken {"verb":"PlaceToken","amount":1}]
+    - the acting player chooses one of:
+      * option "advance":
+        - [json AdvanceToStage {"verb":"AdvanceToStage","code":"143079"}]
+        - shuffle the encounter discard pile into the encounter deck
+        - the acting player reveals an encounter card [also {"times":{"stat":"resources","of":"self"}}]
+        - for each objective (any player controls) in the staging area only, named "Ent of Fangorn":
+          - [json RemoveFromGame {"verb":"RemoveFromGame"}]
+      * option "stay":
+
+## 143079 Breaking Isengard
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+143079:A:1 (front): When Revealed: Make Gates of Isengard the active location. Add Saruman and Orthanc to the staging area.
+  143079:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json MakeSetAsideActive {"verb":"MakeSetAsideActive","code":"143054"}]
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"143047"}]
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"143053"}]
+
+143079:B:1 (back): The players cannot travel to Orthanc.
+  143079:constant:1: Constant
+    - the players cannot travel to the location with code 143053 while this holds
+
+143079:B:2 (back): Forced: After a non-unique location is explored, place 1 damage here. Then, if there are 5 damage tokens here, advance to stage 3A.
+  143079:forced:1: Forced on the event locationExplored (heard about non-unique location (any player controls))
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json PlaceDamage {"verb":"PlaceDamage","amount":1,"card":"self"}]
+    - [json AdvanceToStage {"verb":"AdvanceToStage","code":"143080","when":{"kind":"less","left":4,"right":{"stat":"damage","of":"self"}}}]
+
+143079:B:3 (back): Quest Action: Exhaust Ent of Fangorn to place 2 progress on a non-unique location.
+  143079:action:1: Action
+    only if all of: (it is the Quest phase) and (there is a ready ally (you control) named "Ent of Fangorn" to choose) and (there is a non-unique location (any player controls) to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready ally (you control) named "Ent of Fangorn"
+    - exhaust the picked card
+    - choose non-unique location (any player controls)
+    - place 2 progress on the picked card
+
+## 143080 The Voice of Saruman
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+143080:A:1 (front): When Revealed: Each player draws 6 cards. Each player with more than 6 cards in his hand discards cards from his hand until he has only 6. Attach Saruman's Staff to Saruman.
+  143080:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player draws 6 card(s)
+    - for each player, first player first:
+      - discard the cards in your hand - 6 cards from hand
+    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"143048","to":"Saruman"}]
+
+143080:B:1 (back): While Orthanc is the active location, Saruman is considered to be engaged with the first player.
+  143080:constant:1: Constant
+    only if the active location is a location (any player controls) named "Orthanc"
+    - each enemy (any player controls) named "Saruman": stat engagedWithFirst 1, while this card is in play
+
+143080:B:2 (back): Forced: When Orthanc is explored, cancel any progress placed on the quest this phase and return Orthanc to the staging area.
+  143080:forced:1: Forced after a card leaves play (heard about location (any player controls) named "Orthanc")
+    only if the card the event is about had enough progress to be explored
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json CancelPhaseProgress {"verb":"CancelPhaseProgress"}]
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"subject","to":"staging"}]
+
+143080:B:3 (back): If a player has 0 cards in his hand, he is eliminated from the game. If the players defeat this stage, they win the game.
+  143080:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the table: stat eliminatedAtEmptyHand 1, while this card is in play
+    - the table: stat trackQuestProgress 1, while this card is in play
+
+(rendered pieces: 197 by template, 40 as JSON)

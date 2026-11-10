@@ -22,6 +22,7 @@ const STAGE_3 = "143080";
 const A_CHARACTER: PickSpec = { type: "character", control: "any" };
 const THIS_ENEMY: PickSpec = { type: "enemy", control: "any", isSource: true };
 const IN_STAGING: Condition = { kind: "sourceIn", zone: "staging" };
+const THREE_RESOURCES: Condition = { kind: "less", left: 2, right: { stat: "resources", of: "self" } };
 const ENT_PICK: PickSpec = { type: "ally", control: "you", names: ["Ent of Fangorn"], state: "ready" };
 const NON_UNIQUE_LOCATION: PickSpec = { type: "location", control: "any", nonUnique: true };
 const ORTHANC_PICK: PickSpec = { type: "location", control: "any", names: ["Orthanc"] };
@@ -65,7 +66,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     },
 
     // 143046 Ent of Fangorn (objective ally). In the staging area it gains a Quest Action any player may trigger: exhaust a hero, discard the top encounter card, place a resource when the hero's Willpower beats its
-    // Threat; at 3 the triggering player takes control (the tokens go as it enters play).
+    // Threat; at 3 the triggering player takes control and the resources are discarded.
     {
       id: "143046:action:1",
       cardCode: ENT,
@@ -78,7 +79,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
         { verb: "Exhaust", target: { kind: "picked" } },
         { verb: "MoveEncounterCard", card: "deckTop", to: "discard" },
         { verb: "PlaceToken", amount: 1, when: THREAT_BELOW("previous") },
-        { verb: "TakeControl", who: "actor", when: { kind: "less", left: 2, right: { stat: "resources", of: "self" } } },
+        { verb: "TakeControl", who: "actor", when: THREE_RESOURCES },
+        { verb: "DiscardResources", amount: 3, target: "self", when: THREE_RESOURCES },
       ],
     },
 

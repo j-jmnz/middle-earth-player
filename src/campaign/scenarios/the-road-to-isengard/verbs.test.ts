@@ -7,16 +7,17 @@ import { describe, expect, it } from "vitest";
 import type { Effect } from "../../../catalog/boundary.ts";
 import { archeryRecipients } from "../../../rules/combat/combat.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
-import { expireModifiers, flagged, type ScenarioState } from "../../../rules/core/state.ts";
+import { expireModifiers, flagged, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { pushCardEffects } from "../../../rules/interpret/effect-frames.ts";
+import { placeProgress } from "../../../rules/interpret/effect-verbs.ts";
 import { runInstruction } from "../../../rules/interpret/interpret.ts";
 import { restricted } from "../../../rules/interpret/restrictions.ts";
 import { textBlank } from "../../../rules/families/attachments/hold.ts";
 import { revealSkipped, revealsAllowed } from "../../../rules/families/encounter/reveal.ts";
 import { stagingStep } from "../../../rules/windows/frames.ts";
-import { updateCard } from "../../../rules/core/state.ts";
-import { fightEnemy, finish, idOf, resolveRecords, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { legalIntents } from "../../../rules/engine/reduce.ts";
+import { fightEnemy, finish, idOf, resolveRecords, send, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const ID = "the-road-to-isengard";
 const at = (layout: Layout = {}) => tableFromLayout(ID, { stage: "143079", phase: "Quest", deck: ["f0", "f0", "f0", "f0"], ...layout });
@@ -32,7 +33,7 @@ describe("143020:A:2 the Palantír makes a chosen player reveal 1 fewer encounte
   const fewer = (): ScenarioState =>
     resolved(at({ seats: 2 }), [{ verb: "Pick", pick: { type: "player", control: "any" } }, { verb: "RevealFewer", amount: 1, min: 0, who: "picked" }], (state) => (state.window?.kind === "choose" ? (state.window.options[1] ?? "") : ""));
 
-  it("skips that player's reveal and no other: the staging step reveals for the other seat only", () => {
+  it("143020:A:2 skips that player's reveal and no other: the staging step reveals for the other seat only", () => {
     const state = fewer();
     expect(revealSkipped(state, 1)).not.toBeNull();
     expect(revealSkipped(state, 0)).toBeNull();
@@ -45,8 +46,49 @@ describe("143020:A:2 the Palantír makes a chosen player reveal 1 fewer encounte
   });
 });
 
+describe("143046:A:1 the Ent of Fangorn's Quest Action", () => {
+  const ent = (resources: number, seats: 1 | 2 = 1) => {
+    const made = at({ stage: "143078", staging: [{ code: "143046", resources }], deck: ["f0", "f0"], seats });
+    return { made, id: idOf(made.state, "143046") };
+  };
+  const trigger = (made: ReturnType<typeof at>, id: string, seat: number) => finish(send({ state: { ...made.state, activeSeat: seat }, steps: [] }, { type: "Trigger", cardId: id, effectId: "143046:action:1", payments: [] }, made.ctx), made.ctx);
+
+  it("143046:A:1 is offered to any player while the Ent is in the staging area, and places a resource when the hero's Willpower beats the Threat", () => {
+    const { made, id } = ent(0, 2);
+    const offered = legalIntents(made.state, made.ctx).filter((intent) => intent.type === "Trigger" && intent.cardId === id);
+    expect(offered.length).toBeGreaterThan(0);
+    const done = trigger(made, id, 1);
+    expect(done.state.cards[id]?.resources).toBe(1);
+    expect(done.state.cards[made.seat1Hero ?? ""]?.exhausted).toBe(true);
+  });
+
+  it("143046:A:1 gives control of the Ent to the triggering player at 3 resources, and the tokens go", () => {
+    const { made, id } = ent(2, 2);
+    const done = trigger(made, id, 1);
+    expect(done.state.cards[id]?.zone).toBe("play");
+    expect(done.state.cards[id]?.controller).toBe(1);
+    expect(done.state.cards[id]?.resources).toBe(0);
+  });
+});
+
+describe("143079:B:2 each non-unique location explored puts a damage on stage 2B", () => {
+  it("143079:B:2 places 1 damage and advances to stage 3A at 5, for a location explored in the staging area, and counts no unique location", () => {
+    const made = at({ staging: ["143059"], deck: ["f0", "f0"], threat: [20, 20] });
+    const stage = idOf(made.state, "143079");
+    const four = updateCard(made.state, stage, { damage: 4 });
+    const explored = rest(placeProgress(four, idOf(four, "143059"), 99, made.ctx, []), made.ctx);
+    expect(explored.cards[idOf(explored, "143080")]?.zone).toBe("questStage");
+    const one = rest(placeProgress(made.state, idOf(made.state, "143059"), 99, made.ctx, []), made.ctx);
+    expect(one.cards[stage]?.damage).toBe(1);
+    expect(one.cards[stage]?.zone).toBe("questStage");
+    const unique = at({ active: "143054", deck: ["f0", "f0"] });
+    const gates = rest(placeProgress(unique.state, idOf(unique.state, "143054"), 99, unique.ctx, []), unique.ctx);
+    expect(gates.cards[idOf(gates, "143079")]?.damage).toBe(0);
+  });
+});
+
 describe("143078:B:2 reveals 1 encounter card for each resource", () => {
-  it("RevealEncounter with `times` reveals that many cards, one after the other", () => {
+  it("143078:B:2 RevealEncounter with `times` reveals that many cards, one after the other", () => {
     const made = at({ deck: ["f0", "f0", "f0", "f0", "f0"] });
     const done = resolved(made, [{ verb: "RevealEncounter", times: 3 }]);
     expect(made.state.encounterDeck.length - done.encounterDeck.length).toBe(3);
@@ -65,7 +107,7 @@ describe("143078:B:2 reveals 1 encounter card for each resource", () => {
 });
 
 describe("143052:A:1 the Wolf's additional attack comes after this one", () => {
-  it("ImmediateAttack with `afterThis` waits in the attack's own list while the attack is in progress, and does nothing with none", () => {
+  it("143052:A:1 ImmediateAttack with `afterThis` waits in the attack's own list while the attack is in progress, and does nothing with none", () => {
     const made = at({ engaged: ["143052"] });
     const wolf = idOf(made.state, "143052");
     const effect: Effect = { id: "t:forced:1", cardCode: "143052", lines: ["143052:A:1"], timing: "forced", instructions: [{ verb: "ImmediateAttack", afterThis: true }] };
@@ -74,7 +116,7 @@ describe("143052:A:1 the Wolf's additional attack comes after this one", () => {
     expect(run(made.state).pendingAttack ?? null).toBeNull();
   });
 
-  it("makes a second attack against the same player, dealt a shadow card of its own", () => {
+  it("143052:A:1 makes a second attack against the same player, dealt a shadow card of its own", () => {
     const fought = fightEnemy((layout: Layout) => tableFromLayout(ID, layout), "143059", "143052", { stage: "143079", hand: ["filler", "filler"] }, { pick: () => "attack" });
     const attacks = fought.run.steps.filter((step) => step.kind === "attack" && step.side === "enemy" && step.enemyId === idOf(fought.start, "143052"));
     expect(attacks.length).toBeGreaterThanOrEqual(2);
@@ -89,7 +131,7 @@ describe("143061:A:2 Poisoned Vapour blanks the damaged characters until the end
     return { made, done };
   };
 
-  it("exhausts each damaged character and blanks its text box, Traits kept; a character damaged later is blank too, a healed one is not", () => {
+  it("143061:A:2 exhausts each damaged character and blanks its text box, Traits kept; a character damaged later is blank too, a healed one is not", () => {
     const { made, done } = vapour();
     expect(done.state.cards[made.hero]?.exhausted).toBe(true);
     expect(done.state.cards[made.hero2]?.exhausted).toBe(false);
@@ -99,7 +141,7 @@ describe("143061:A:2 Poisoned Vapour blanks the damaged characters until the end
     expect(textBlank(updateCard(done.state, made.hero, { damage: 0 }), made.hero, made.cards)).toBe(false);
   });
 
-  it("ends with the combat phase: not at the end of the quest phase", () => {
+  it("143061:A:2 ends with the combat phase: not at the end of the quest phase", () => {
     const { made, done } = vapour();
     expect(textBlank(expireModifiers({ ...done.state, phase: "Quest" }, ["endOfPhase"]), made.hero, made.cards)).toBe(true);
     expect(textBlank(expireModifiers(done.state, ["endOfCombat"]), made.hero, made.cards)).toBe(false);
@@ -107,7 +149,7 @@ describe("143061:A:2 Poisoned Vapour blanks the damaged characters until the end
 });
 
 describe("143058:A:2 Plain of Isengard sends archery to allies", () => {
-  it("lets archery damage go to allies only, if there are any, while it is in the staging area", () => {
+  it("143058:A:2 lets archery damage go to allies only, if there are any, while it is in the staging area", () => {
     const withAlly = at({ staging: ["143058"], play: ["ally"] });
     expect(flagged(withAlly.state, "table", "archeryToAllies")).toBe(true);
     const recipients = archeryRecipients(withAlly.state, withAlly.cards);
@@ -120,7 +162,7 @@ describe("143058:A:2 Plain of Isengard sends archery to allies", () => {
 });
 
 describe("143080:B:2 Orthanc explored", () => {
-  it("cancels the progress placed on the quest this phase, the overflow included, and returns to the staging area with no tokens", () => {
+  it("143080:B:2 cancels the progress placed on the quest this phase, the overflow included, and returns to the staging area with no tokens", () => {
     // The Staff is attached, Saruman unhurt: the stage cannot be defeated, so the progress stays on it until Orthanc is explored.
     const made = at({ stage: "143080", active: "143053", staging: ["143047"], attached: [{ code: "143048", to: "143047" }], deck: ["f0", "f0"] });
     const orthanc = idOf(made.state, "143053");
@@ -142,9 +184,21 @@ describe("143048:A:2 the players cannot win while Saruman has hit points left", 
     return restricted(made.state, made.ctx, "advance");
   };
 
-  it("holds the last stage until Saruman has taken 6 damage, his hit points", () => {
+  it("143048:A:2 holds the last stage until Saruman has taken 6 damage, his hit points", () => {
     expect(gate(0).length).toBeGreaterThan(0);
     expect(gate(5).length).toBeGreaterThan(0);
     expect(gate(6)).toEqual([]);
+  });
+
+  it("143080:B:3 does not win with the stage full and Saruman unhurt, and wins as soon as he has taken 6 damage; with 6 damage already it wins at once", () => {
+    const layout: Layout = { stage: "143080", phase: "Quest", progress: 15, staging: ["143047"], attached: [{ code: "143048", to: "143047" }], deckOf: ["filler", "filler"], hand: ["filler"] };
+    const held = at(layout);
+    const settled = rest(held.state, held.ctx);
+    expect(settled.stageCleared).toBeFalsy();
+    const saruman = idOf(settled, "143047");
+    expect(rest(updateCard(settled, saruman, { damage: 5 }), held.ctx).stageCleared).toBeFalsy();
+    expect(rest(updateCard(settled, saruman, { damage: 6 }), held.ctx).stageCleared).toBe(true);
+    const open = at({ ...layout, staging: [{ code: "143047", damage: 6 }] });
+    expect(rest(open.state, open.ctx).stageCleared).toBe(true);
   });
 });
