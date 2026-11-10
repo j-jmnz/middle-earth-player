@@ -30,7 +30,10 @@ describe("Helm's Deep golden", () => {
         expect(zonesOf(state, "143033"), golden.name).toEqual(["setAside"]);
         expect(zonesOf(state, "143038").filter((zone) => zone === "setAside"), golden.name).toHaveLength(1);
         expect(zonesOf(state, "143036").filter((zone) => zone === "setAside"), golden.name).toHaveLength(golden.seatCount);
-        expect(zonesOf(state, COUNSELS).sort(), golden.name).toEqual(Array.from({ length: golden.seatCount }, () => "deck"));
+        // One copy for each seat, shuffled in after the starting hands (a seat's second mulligan window may have drawn it already).
+        const copies = zonesOf(state, COUNSELS);
+        expect(copies, golden.name).toHaveLength(golden.seatCount);
+        for (const zone of copies) expect(["deck", "hand"], golden.name).toContain(zone);
       },
     },
     wins: "wins on stage 5A once the 8 tokens have advanced the players and no enemy is in play, runs 143077's Resolution and unlocks the next part",
