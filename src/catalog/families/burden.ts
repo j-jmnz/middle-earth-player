@@ -6,6 +6,7 @@ import type { CatalogFamily } from "../family-manifest.ts";
 import { positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { pickSchema } from "../effect-schema-pick.ts";
+import { verbFlags } from "../verb-flags.ts";
 
 const VERBS = [
   // Setup: the Ring-bearer's life is set to `value` (mec109.ringbearers-life). The scenario's definition already starts the
@@ -31,6 +32,11 @@ const VERBS = [
   // enemy attacked. `enemy` is engine use: the enemy whose attack is next.
   // `trait`: only the engaged enemies with this trait ("All engaged Troll enemies attack", 900208:A:1); `notTrait`: only those without it ("Each engaged non-Ship enemy makes an immediate attack", 11067:A:1).
   z.strictObject({ verb: z.literal("ImmediateAttackEach"), enemy: z.string().min(1).optional(), trait: z.string().min(1).optional(), notTrait: z.string().min(1).optional(), ...when }),
+  // Setup: one copy of the card goes into each player's deck, which is shuffled ("each player shuffles 1 copy of Poisoned Counsels into his deck", 143072:A:1; a burden that functions like a
+  // player card, mec112.poisoned-counsels-searching-eye). The Setup runs once the starting hands are drawn, so the copy is never in an opening hand. Inside a Choose of the quest card's Setup it makes the record run.
+  verbFlags(z.strictObject({ verb: z.literal("ShuffleCopyIntoEachDeck"), code: z.string().min(1), ...when }), { setupRuns: "inChoose" }),
+  // The actor discards every card in their hand, the source card (`except: "self"`) kept ("discard all other cards in your hand", 143021:A:2): not a choice, no card is skipped.
+  z.strictObject({ verb: z.literal("DiscardHand"), except: z.literal("self").optional(), ...when }),
   // The first player token passes to the next player in the game; with no other player it stays (rr.first-player).
   z.strictObject({ verb: z.literal("PassFirstPlayer"), ...when }),
   // The quest phase ends at once: the cards it has yet to reveal are not revealed and the quest is not resolved

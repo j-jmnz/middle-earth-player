@@ -79,5 +79,5 @@ export function playPickWords(asked: Instruction, picked: string | null = null):
   }
   if (asked.verb !== "PutIntoPlayFromHand") return null;
   if (asked.card) return { verb: "Choose", prompt: "Choose the player who controls it." };
-  return { verb: "Put into play", prompt: `Choose a card to put into play from ${asked.from === "any" ? "the players' hands" : "your hand"}, or none.` };
+  return { verb: "Put into play", prompt: `Choose a card to put into play from ${asked.from === "any" ? "the players' hands" : "your hand"}${asked.required ? "" : ", or none"}.` };
 }

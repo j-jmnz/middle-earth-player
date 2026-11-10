@@ -382,6 +382,8 @@ export type ScenarioState = {
   chosenAtSetup?: readonly { code: string; seat: number }[];
   // The pursuit value of The Uruk-hai (mec112.pursuit): the pursuit tracker beside the quest deck. Absent while the scenario sets none; the `pursuit` condition reads it.
   pursuit?: number;
+  // Whether the encounter deck placed progress on the current quest stage itself in the last quest resolution under the Defense keyword (mec112.defense); absent in a game that never resolves one. The `encounterPlacedOnStage` condition reads it.
+  defensePlaced?: boolean;
   // The cards each seat adds to its hand once every player has finished the mulligan (AddToHandAfterMulligan), by seat; dealt and
   // dropped when the opening hands are final.
   afterMulligan?: readonly (readonly string[])[];

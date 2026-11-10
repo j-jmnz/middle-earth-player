@@ -1,0 +1,337 @@
+Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; quest: 143072 The King of the Golden Hall; quest: 143073 Assault on Helm's Deep; quest: 143074 The Hosts of Isengard; quest: 143075 The Wall is Breached!; quest: 143076 The King Rides Out; setAside: 143033 The Defense of Helm's Deep; setAside: 143036 Soldier of Isengard)
+
+## 143021 Poisoned Counsels
+
+143021:A:1 (front): Poisoned Counsels functions like a player card.
+  143021:constant:1: Constant
+    (no instructions)
+
+143021:A:2 (front): Forced: After you draw this card, discard all other cards in your hand.
+  143021:forced:1: Forced on the event enteredHand (heard about this card)
+    - [json DiscardHand {"verb":"DiscardHand","except":"self"}]
+
+## 143033 The Defense of Helm's Deep
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+143033:A:1 (front): Add 1 to the total Threat in the staging area for each resource token here.
+  143033:constant:1: Constant
+    - the table: stat moreStagingThreat resources of this card, while this card is in play
+
+143033:A:2 (front): Forced: At the end of the quest phase, place 1 resource token here.
+  143033:forced:1: Forced at the end of the phase (record also names 143033:A:3)
+    only if it is the Quest phase
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json PlaceToken {"verb":"PlaceToken","amount":1}]
+    - [json AddSourceToVictory {"verb":"AddSourceToVictory","when":{"kind":"tokens","code":"143033","min":8}}]
+    - [json AdvanceToStage {"verb":"AdvanceToStage","code":"143076","when":{"kind":"inVictory","code":"143033","is":true}}]
+
+143033:A:3 (front): If there are 8 resource tokens here, add The Defense of Helm's Deep to the victory display and advance to stage 5A.
+  143033:forced:1: Forced at the end of the phase (record also names 143033:A:2)
+    only if it is the Quest phase
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json PlaceToken {"verb":"PlaceToken","amount":1}]
+    - [json AddSourceToVictory {"verb":"AddSourceToVictory","when":{"kind":"tokens","code":"143033","min":8}}]
+    - [json AdvanceToStage {"verb":"AdvanceToStage","code":"143076","when":{"kind":"inVictory","code":"143033","is":true}}]
+
+## 143034 Wild Hillman
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143034:A:1 (front): Forced: After Wild Hillman attacks, place 1 progress on the active location.
+  143034:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    - place 1 progress on the active location
+
+143034:A:2 (shadow): Shadow: Place 1 progress on the active location. Attacking enemy gets +1 Attack for each progress on the active location.
+  143034:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if there is a location (any player controls) [also {"active":true}] to choose: choose location (any player controls) [also {"active":true}]
+    - then, if there is a location (any player controls) [also {"active":true}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 progress on the picked card
+    - the attacking enemy: stat attack progress of the active location, until the end of the attack
+
+## 143035 Warrior of Dunland
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143035:A:1: Peril. Archery 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+143035:A:2 (front): When Revealed: Warrior of Dunland makes an immediate attack against you.
+  143035:whenRevealed:1: When revealed
+    - this card attacks the acting player now, from the staging area
+
+143035:A:3 (front): Forced: After Warrior of Dunland attacks and destroys a character, place 3 progress on the active location.
+  143035:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
+    only if the event's other card is a enemy (any player controls) [also {"isSource":true}]
+    - place 3 progress on the active location
+
+## 143036 Soldier of Isengard
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+143036:A:1: Toughness 1. Archery 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+143036:A:2 (front): Forced: After Soldier of Isengard attacks and destroys a character, place 1 progress on the current quest.
+  143036:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
+    only if the event's other card is a enemy (any player controls) [also {"isSource":true}]
+    - [json ProgressQuest {"verb":"ProgressQuest","amount":1}]
+
+143036:A:3 (shadow): Shadow: Exhaust a character you control.
+  143036:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+
+## 143037 The Hornburg
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143037:A:1 (front): While The Hornburg is the active location, reduce the archery total by 1 for each player in the game.
+  143037:constant:1: Constant
+    only if this card is the active location
+    - this card: stat archeryBonus the number of players x -1, while this card is in play
+
+143037:A:2 (front): Forced: When The Hornburg is explored, assign X damage among characters in play. X is the number of enemies in play.
+  143037:forced:1: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    - [json AssignDamage {"verb":"AssignDamage","amount":{"count":{"type":"enemy","control":"any"}},"pick":{"type":"character","control":"any"}}]
+
+## 143038 Deeping Wall
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+143038:A:1 (front): While Deeping Wall is the active location, each hero gets +1 Defense.
+  143038:constant:1: Constant
+    only if this card is the active location
+    - every hero in play: stat defense 1, while this card is in play
+
+143038:A:2 (front): Forced: When Deeping Wall is explored, raise each player's threat by 4.
+  143038:forced:1: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    - raise threat by 4 (each player)
+
+## 143039 Deeping Culvert
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143039:A:1 (front): X is 1 more than the number of allies controlled by the first player.
+  143039:constant:1: Constant
+    - this card: stat threat the number of ally (you control) chosen by the first player + 1, while this card is in play
+
+143039:A:2 (front): Forced: When Deeping Culvert is explored, each player searches the encounter deck and discard pile for an enemy, reveals it, and adds it to the staging area. Shuffle the encounter deck.
+  143039:forced:1: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player searches the encounter deck and discard pile for a enemy, reveals it and adds it to the staging area
+    - shuffle the encounter deck
+
+## 143040 Postern Door
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143040:A:1 (front): While Postern Door is the active location, each hero gets +1 Attack.
+  143040:constant:1: Constant
+    only if this card is the active location
+    - every hero in play: stat attack 1, while this card is in play
+
+143040:A:2 (front): Forced: When Postern Door is explored, until the end of the round, players cannot declare attacks.
+  143040:forced:1: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    - the table: stat cannotDeclareAttacks 1, until the end of the round
+
+## 143041 Helm's Gate
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143041:A:1 (front): While Helm's Gate is the active location, if any player is not engaged with an enemy, the first player reveals an encounter card at the end of each staging step.
+  143041:forced:1: Forced on the event stagingStepEnds
+    only if all of: (this card is the active location) and ([json condition {"kind":"playerUnengaged"}])
+    - the acting player reveals an encounter card
+
+143041:A:2 (front): Forced: When Helm's Gate is explored, each enemy gets -20 engagement cost and +2 Attack until the end of the round.
+  143041:forced:2: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - every enemy in play: stat engagementCost -20, until the end of the round
+    - every enemy in play: stat attack 2, until the end of the round
+
+## 143042 Scaling Ladders
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143042:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+143042:A:2 (front): When Revealed: Attach to the active location. (Counts as a Siege attachment with the text: "Each enemy gets +1 Threat.")
+  143042:whenRevealed:1: When revealed
+    - [json AttachToActiveLocation {"verb":"AttachToActiveLocation"}]
+  143042:constant:1: Constant
+    - every enemy in play: stat threat 1, while this card is in play
+
+143042:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, place 1 progress on the current quest.
+  143042:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - [json ProgressQuest {"verb":"ProgressQuest","amount":1,"when":{"kind":"x","min":1}}]
+
+## 143043 Devilry of Saruman
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143043:A:1 (front): When Revealed: Place 3 progress on the main quest (bypassing any active location). Until the end of the round, treat each character's text box as if it was blank (except for Traits).
+  143043:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AddStageProgress {"verb":"AddStageProgress","amount":3}]
+    - every character in play, now and entering later: stat blankText (its text box is blank) 1, until the end of the round
+
+143043:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack and gains Toughness 2 until the end of the round.
+  143043:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 2, until the end of the attack
+    - the attacking enemy: stat toughness 2, until the end of the round
+
+## 143044 Reckless Hate
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143044:A:1: Peril.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+143044:A:2 (front): When Revealed: The enemy in the staging area with the highest Attack makes an immediate attack against you. If no attack is made this way, Reckless Hate gains surge.
+  143044:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) in the staging area only [also {"highestAttack":true}]
+    - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the acting player now, from the staging area
+    - [json GainSurge {"verb":"GainSurge","when":{"kind":"not","condition":{"kind":"canPick","pick":{"type":"enemy","control":"any","stagingOnly":true}}}}]
+
+143044:A:3 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
+  143044:shadow:1: Shadow
+    - when the attack in progress ends:
+      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+
+## 143045 Night Without End
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143045:A:1: Peril. Doomed 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+143045:A:2 (front): When Revealed: Either remove 1 resource token from The Defense of Helm's Deep, or reveal 2 additional encounter cards.
+  143045:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "remove" (only if [json condition {"kind":"tokens","code":"143033","min":1}]):
+        - [json RemoveResourceTokens {"verb":"RemoveResourceTokens","code":"143033","amount":1}]
+      * option "reveal":
+        - the acting player reveals an encounter card
+        - the acting player reveals an encounter card
+
+143045:A:3 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
+  143045:shadow:1: Shadow
+    - when the attack in progress ends:
+      - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 143072 The King of the Golden Hall
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+143072:A:1 (front): Setup: Set The Defense of Helm's Deep and 1 copy of Deeping Wall aside, out of play. Each player sets 1 copy of Soldier of Isengard aside, out of play. Then, the players must choose: either each player shuffles 1 copy of Poisoned Counsels into his deck, or advance to stage 2A (bypassing stage 1B).
+  143072:setup:1: Setup
+    - the first player chooses one of:
+      * option "counsels":
+        - [json ShuffleCopyIntoEachDeck {"verb":"ShuffleCopyIntoEachDeck","code":"143021"}]
+      * option "bypass":
+        - [json AdvanceToStage {"verb":"AdvanceToStage","code":"143073"}]
+
+143072:B:1 (back): When Revealed: Each player chooses 1 ally in his hand that matches the sphere of a hero he controls and puts it into play under his control.
+  143072:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - [json PutIntoPlayFromHand {"verb":"PutIntoPlayFromHand","pick":{"type":"ally","control":"you","heroSphere":true},"required":true}]
+
+143072:B:2 (back): Skip the quest phase and combat phase.
+  143072:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the table: stat skipQuestPhase 1, while this card is in play
+    - the table: stat skipCombat 1, while this card is in play
+
+143072:B:3 (back): Forced: At the end of the round, advance to stage 2A.
+  143072:forced:1: Forced at the end of the round
+    - [json AdvanceToStage {"verb":"AdvanceToStage","code":"143073"}]
+
+## 143073 Assault on Helm's Deep
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+143073:A:1 (front): When Revealed: Add The Defense of Helm's Deep and each set aside copy of Soldier of Isengard to the staging area. Make Deeping Wall the active location. Shuffle the encounter deck. Then, each player reveals 1 encounter card.
+  143073:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"143033"}]
+    - repeat 4 times:
+      - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"143036"}]
+    - [json MakeSetAsideActive {"verb":"MakeSetAsideActive","code":"143038"}]
+    - shuffle the encounter deck
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+143073:B:1 (back): Defense.
+  143073:constant:1: Constant
+    - this card: stat defenseKeyword 1, while this card is in play
+
+143073:B:2 (back): Forced: At the end of the combat phase, if the number of enemies in the staging area is less than the number of players in the game, the first player reveals an encounter card.
+  143073:forced:1: Forced at the end of the phase
+    only if all of: (it is the Combat phase) and (the number of enemy (any player controls) in the staging area only is less than the number of players)
+    - the acting player reveals an encounter card
+
+143073:B:3 (back): Forced: At the end of the round place 1 progress here for each enemy in the staging area (bypassing any active location).
+  143073:forced:2: Forced at the end of the round
+    - [json AddStageProgress {"verb":"AddStageProgress","amount":{"count":{"type":"enemy","control":"any","stagingOnly":true}}}]
+
+## 143074 The Hosts of Isengard
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+143074:A:1 (front): When Revealed: Search the encounter deck, discard pile, and victory display for Helm's Gate and add it to the staging area. Shuffle the encounter deck. Make Helm's Gate the active location, returning any previous active location to the staging area.
+  143074:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SearchToStaging {"verb":"SearchToStaging","code":"143041"}]
+    - shuffle the encounter deck
+    - then, if there is a location (any player controls) in the staging area only, named "Helm's Gate" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose location (any player controls) in the staging area only, named "Helm's Gate"
+    - [json MakeActive {"verb":"MakeActive","when":{"kind":"canPick","pick":{"type":"location","control":"any","stagingOnly":true,"names":["Helm's Gate"]}}}]
+
+143074:B:1 (back): Defense.
+  143074:constant:1: Constant
+    - this card: stat defenseKeyword 1, while this card is in play
+
+143074:B:2 (back): Forced: After resolving the quest, if the encounter deck did not place at least 1 progress on this stage as the result of questing, the first player reveals 1 encounter card.
+  143074:forced:1: Forced on the event questResolved (heard about this card)
+    only if not ([json condition {"kind":"encounterPlacedOnStage"}])
+    - the acting player reveals an encounter card
+
+## 143075 The Wall is Breached!
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+143075:A:1 (front): When Revealed: Shuffle the encounter discard pile into the encounter deck. Discard cards from the encounter deck until X enemies are discarded. X is the number of players. Add each enemy discarded this way to the staging area.
+  143075:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - discard from the top of the encounter deck until 1 enemy for each player is discarded; add those enemies to the staging area
+
+143075:B:1 (back): Defense.
+  143075:constant:1: Constant
+    - this card: stat defenseKeyword 1, while this card is in play
+
+143075:B:2 (back): Forced: After a character is destroyed, place 1 progress on this stage (bypassing any active location).
+  143075:forced:1: Forced on the event characterDestroyed
+    - [json AddStageProgress {"verb":"AddStageProgress","amount":1}]
+
+143075:B:3 (back): If this stage is defeated, the players lose the game.
+  143075:forced:2: Forced on the event questCardDefeated (heard about this card)
+    - the players lose the game (The Wall is Breached!: Saruman's army captured Helm's Deep)
+
+## 143076 The King Rides Out
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+143076:A:1 (front): When Revealed: Shuffle the encounter discard pile into the encounter deck. Discard cards from the encounter deck until X enemies are discarded. X is the number of players. Add each enemy discarded this way to the staging area.
+  143076:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - discard from the top of the encounter deck until 1 enemy for each player is discarded; add those enemies to the staging area
+
+143076:B:1 (back): Skip the quest phase. Players cannot reduce their threat.
+  143076:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the table: stat skipQuestPhase 1, while this card is in play
+    - each player: stat noThreatReduction 1, while this card is in play
+
+143076:B:2 (back): If there are no enemies in play, the players win the game.
+  143076:constant:2: Constant
+    only if [json condition {"kind":"enemyInPlay","is":false}]
+    - the players win the game
+
+(rendered pieces: 147 by template, 35 as JSON)

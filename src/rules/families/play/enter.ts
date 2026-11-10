@@ -142,7 +142,8 @@ export function putFromHand(state: ScenarioState, instruction: PutFromHand, focu
   const options = handOptions(state, instruction, chooser, focus, ctx);
   if (options.length === 0) return state;
   const chosen = focus.chosen && options.includes(focus.chosen) ? focus.chosen : null;
-  if (!chosen) return askTarget(state, { instruction, seat: chooser, chosen: null, cause }, [...options, NONE]);
+  // A required choice offers no "none" (143072:B:1).
+  if (!chosen) return askTarget(state, { instruction, seat: chooser, chosen: null, cause }, instruction.required ? options : [...options, NONE]);
   const owner = state.cards[chosen]?.controller ?? chooser;
   const seats = seatOptions(state);
   if (instruction.anyController && seats.length > 1) return askTarget(state, { instruction: { ...base, card: chosen }, seat: chooser, chosen: null, cause }, seats);

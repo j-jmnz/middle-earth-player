@@ -29,7 +29,7 @@ import { arrivalFace, orderedNext, stageToVictory } from "../families/quest/orde
 import { caughtUp } from "../families/stormcaller/values.ts";
 import { islandTravelTo } from "../families/island/travel.ts";
 import { hasSideQuests, placeOnCurrentSideQuest } from "../families/wilderland/night-quest.ts";
-import { familyOptionalEngageBarred } from "../interpret/family-hooks.ts";
+import { familyOptionalEngageBarred, familyQuestResult } from "../interpret/family-hooks.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -153,7 +153,10 @@ export function resolveQuest(
   // The seats that hear it: the one that quested, or every living seat.
   const hearing = only == null ? livingSeats(state) : [only];
   let next = state;
-  if (willpower < threat) {
+  // A family that places the progress or the threat itself (the Defense keyword, families/fortress) answers first; the core resolves the quest otherwise.
+  const family = familyQuestResult(state, { willpower, threat, ...(only != null ? { only } : {}) }, cards, steps, canAdvance);
+  if (family) next = family;
+  else if (willpower < threat) {
     // Learn to Play p12-13: every player's threat dial goes up by the difference. An eliminated seat has no dial.
     next = failQuest(next, threat - willpower, steps, hearing, raise);
   } else if (willpower > threat) {

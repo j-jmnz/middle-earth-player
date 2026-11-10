@@ -28,7 +28,7 @@ function actionEffect(state: ScenarioState, ctx: ReduceContext, cardId: string, 
   const instance = state.cards[cardId];
   if (!instance) return undefined;
   // A card whose printed text box is blank has none of its abilities (rr.blank).
-  if (textBlank(state, instance.id)) return undefined;
+  if (textBlank(state, instance.id, ctx.cards)) return undefined;
   const effect = effectsOfCard(state, ctx, instance).find((entry) => entry.id === effectId && entry.timing === "action");
   // An objective, quest or location in play belongs to no player: any player may initiate its Action (rr.action).
   // The campaign card next to the quest deck belongs to no player either, and its Action is any player's (11197:A:3, "Travel Action").

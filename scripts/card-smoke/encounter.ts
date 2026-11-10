@@ -3,7 +3,7 @@ import path from "node:path";
 
 import { PLAYABLE_SCENARIOS } from "../../src/campaign/playable.ts";
 import { legalIntents, reduce, type PlayerIntent, type ScenarioState } from "../../src/rules/engine/reduce.ts";
-import { expectOk } from "../../src/rules/core/test-fixture.ts";
+import { flagged } from "../../src/rules/core/state.ts";
 
 import { DATA_DIR } from "../data/paths.ts";
 import { describeError, duration, runScript, type Log } from "../log.ts";
@@ -38,14 +38,17 @@ export const KNOWN: readonly KnownFailure[] = [
 
 export type EncounterSummary = { scenario: string; cards: CardResult[]; games: GameSummary[]; ms: number };
 
-/** The table the card probes run on: the scenario dealt to one seat, its first seat kept. A quest card's Setup that asks (The Uruk-hai: each seat chooses a Captive) is answered with the first intent offered. */
+/** The table the card probes run on: the scenario dealt to one seat, its first seat kept. A quest card's Setup that asks (The Uruk-hai: each seat chooses a Captive) is answered with the first intent offered,
+ * except that a table whose combat phase is skipped (Helm's Deep's stage 1B) cannot play the shadow probes, so the first answer that leaves combat to be played is taken when there is one. */
 export function probeTable(world: EncounterWorld): ScenarioState {
   const ctx = world.contexts.strong;
   let state = kept(encounterStart(world, 1, 1), ctx);
   for (let guard = 0; guard < 20 && state.window?.kind === "choose" && state.phase === "Beginning of round"; guard += 1) {
-    const first = legalIntents(state, ctx)[0];
-    if (!first) break;
-    state = expectOk(reduce(state, first as PlayerIntent, ctx)).state;
+    const offered = legalIntents(state, ctx);
+    const answers = offered.map((intent) => reduce(state, intent as PlayerIntent, ctx)).flatMap((result) => (result.ok ? [result.state] : []));
+    const next = answers.find((answer) => !flagged(answer, "table", "skipCombat")) ?? answers[0];
+    if (!next) break;
+    state = next;
   }
   return state;
 }

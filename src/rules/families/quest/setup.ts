@@ -22,11 +22,13 @@ export function revealsPerPlayer(effect: Effect): boolean {
   const top = setupRunVerbs("top");
   const inForEachPlayer = setupRunVerbs("inForEachPlayer");
   const inEach = setupRunVerbs("inEach");
+  const inChoose = setupRunVerbs("inChoose");
   return effect.instructions.some(
     (instruction) =>
       top.has(instruction.verb) ||
       (instruction.verb === "ForEachPlayer" && instruction.instructions.some((inner) => inForEachPlayer.has(inner.verb))) ||
-      (instruction.verb === "Each" && instruction.instructions.some((inner) => inEach.has(inner.verb))),
+      (instruction.verb === "Each" && instruction.instructions.some((inner) => inEach.has(inner.verb))) ||
+      (instruction.verb === "Choose" && instruction.options.some((option) => option.instructions.some((inner) => inChoose.has(inner.verb)))),
   );
 }
 

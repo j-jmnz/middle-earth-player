@@ -71,7 +71,7 @@ export function travelIntent(state: ScenarioState, locationId: string, ctx: Redu
   if (!location) return state;
   // A location whose printed text box is blank has no Travel effect (rr.blank).
   // Only the Travel effect of the side the location shows works (12068:B:3, families/dreamchaser/faces.ts).
-  const effects = textBlank(state, locationId) ? [] : recordsOfFace(location, ctx.effects.filter((effect) => effect.cardCode === location.code)).filter((effect) => effect.timing === "travel");
+  const effects = textBlank(state, locationId, ctx.cards) ? [] : recordsOfFace(location, ctx.effects.filter((effect) => effect.cardCode === location.code)).filter((effect) => effect.timing === "travel");
   const first = effects[0];
   // A Travel cost another card gave the location comes after its own (families/grapple/travel.ts).
   const granted = grantedTravel(state, locationId);

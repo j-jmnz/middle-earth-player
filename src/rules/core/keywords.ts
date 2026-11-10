@@ -129,10 +129,10 @@ export function addModifier(
   return { ...state, modifiers: [...state.modifiers, { instanceId, sourceId, stat, amount, until }] };
 }
 
-export function placedAmount(printed: PrintedCard, amount: number): number {
-  const toughness = printed.type === "enemy" ? printed.keywords.toughness : null;
-  const reduced = toughness == null ? amount : amount - toughness;
-  return Math.max(0, reduced);
+// The damage a card takes of `amount` once Toughness has reduced it (mec109.toughness): the printed keyword, and `gained` from a card effect ("gains Toughness 2 until the end of the round", 143043:A:2).
+export function placedAmount(printed: PrintedCard, amount: number, gained = 0): number {
+  const toughness = printed.type === "enemy" ? (printed.keywords.toughness ?? 0) : 0;
+  return Math.max(0, amount - toughness - gained);
 }
 
 export function raiseThreat(
@@ -210,7 +210,7 @@ export function placeDamage(state: ScenarioState, assigned: string, amount: numb
   // A card that takes no more than a number of damage each round ("cannot take more than 4 damage each round", 11177:A:4) takes what is left of it.
   const cap = source === "quest" && flagged(state, id, "damageCapSparesQuest") ? 0 : heldAmount(state, id, "damageCap");
   const taken = state.roundDamage?.[id] ?? 0;
-  const resources = resourceShield(state, id, placedLimit(state, id, placedAmount(printed, amount)));
+  const resources = resourceShield(state, id, placedLimit(state, id, placedAmount(printed, amount, printed.type === "enemy" ? heldAmount(state, id, "toughness") : 0)));
   // "The next time that character would be dealt damage this round, cancel 1 of that damage" (12166:A:2): the flag's points come off first, and it is spent.
   const shield = damageShield(resources.state, id, resources.amount);
   const capped = cap > 0 ? Math.max(0, Math.min(shield.amount, cap - taken)) : shield.amount;
@@ -387,7 +387,7 @@ export function hasKeyword(state: ScenarioState, id: string, keyword: "sentinel"
   if (!instance) return false;
   const printed = printedOf(cards, instance.code);
   // A card whose printed text box is blank has none of its printed keywords; one gained from another source stays (rr.blank).
-  const blank = textBlank(state, id);
+  const blank = textBlank(state, id, cards);
   if (keyword === "doomed") return !blank && (printed.keywords.doomed ?? 0) > 0;
   if (keyword === "ranged" && flagged(state, id, "loseRanged")) return false;
   if (!blank && printed.keywords[keyword]) return true;

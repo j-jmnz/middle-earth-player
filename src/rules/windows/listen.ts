@@ -62,7 +62,7 @@ export function subjectMatches(state: ScenarioState, id: string, spec: PickSpec,
 export function hears(state: ScenarioState, effect: Effect, listener: CardInstance, event: GameEvent, ctx: ReduceContext): boolean {
   if (!triggerHears(effect.trigger, event.trigger)) return false;
   // A card whose printed text box is blank has none of its abilities (rr.blank).
-  if (textBlank(state, listener.id)) return false;
+  if (textBlank(state, listener.id, ctx.cards)) return false;
   if (effect.byEncounterDeck && !event.fromDeck) return false;
   if (effect.eventSeat) {
     const mine = listener.controller ?? state.firstPlayer;

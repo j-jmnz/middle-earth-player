@@ -48,6 +48,9 @@ const TRIGGERS = [
 ] as const;
 
 const FLAGS = [
+  // On an enemy: it gains Toughness of this amount until the modifier ends, on top of any it prints ("Attacking enemy gets +2 Attack and gains Toughness 2 until the end of the round", 143043:A:2;
+  // mec109.toughness): each instance of damage it is assigned is reduced by it.
+  "toughness",
   // On a character: it can be declared as an attacker against enemies in the staging area (`attacksStaging`), or only when it
   // attacks alone (`attacksStagingAlone`, 01009:A:1).
   "attacksStaging",
