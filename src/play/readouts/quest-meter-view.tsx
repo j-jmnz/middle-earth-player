@@ -41,7 +41,7 @@ const CAPTION = 14;
 function FullMeter({ scale, height }: { scale: QuestScale; height: number }) {
   const t = useTableTokens();
   const s = useUiScale();
-  const marker = scaleMarker(scale.delta);
+  const marker = scaleMarker(scale.delta, scale.defense === true);
   const even = marker.word === "Even";
   const share = meterFractions(scale);
   const threatFill = useFill(share.threat);
@@ -119,7 +119,7 @@ function CompactRow({ fill, color, edge, word, value, trailing, trailingColor }:
 /** The compact meter: the same two values as short horizontal bars with their numbers, in `height` points. */
 function CompactMeter({ scale, height }: { scale: QuestScale; height: number }) {
   const t = useTableTokens();
-  const marker = scaleMarker(scale.delta);
+  const marker = scaleMarker(scale.delta, scale.defense === true);
   const share = meterFractions(scale);
   const threatFill = useFill(share.threat);
   const willFill = useFill(share.willpower);

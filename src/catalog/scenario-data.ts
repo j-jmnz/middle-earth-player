@@ -364,9 +364,24 @@ export function pursuitLimit(data: ScenarioData, effects: readonly Effect[]): nu
   return undefined;
 }
 
+// The objective whose tokens end a stage when they reach a number (mec112.defense, The Defense of Helm's Deep, 143033:A:3): the card of a record whose instruction is held by a `tokens` condition on that card, and the `min` of it.
+// Undefined for a scenario that deals no such card. The top bar's Defense dial draws its meter against the limit.
+export function defenseTracker(data: ScenarioData, effects: readonly Effect[]): { code: string; limit: number } | undefined {
+  const dealt = new Set(data.cards.map((card) => card.code));
+  for (const effect of effects) {
+    if (!dealt.has(effect.cardCode) || effect.timing !== "forced") continue;
+    for (const instruction of effect.instructions) {
+      const when = "when" in instruction ? instruction.when : undefined;
+      if (instruction.verb === "AddSourceToVictory" && when?.kind === "tokens" && when.code === effect.cardCode && when.min != null) return { code: effect.cardCode, limit: when.min };
+    }
+  }
+  return undefined;
+}
+
 export function scenarioDefinition(data: ScenarioData, campaign: CampaignData, effects: readonly Effect[] = []): ScenarioDefinition {
   const burden = burdenCodes(data);
   const pursuit = pursuitLimit(data, effects);
+  const defense = defenseTracker(data, effects);
   return scenarioDefinitionSchema.parse({
     id: data.id,
     encounterSets: data.encounterSets.map((set) => ({ code: set.name, count: set.count })),
@@ -376,6 +391,7 @@ export function scenarioDefinition(data: ScenarioData, campaign: CampaignData, e
       lifeTracker: data.life != null,
       burdenDeck: burden.length > 0,
       ...(pursuit != null ? { pursuitTracker: pursuit } : {}),
+      ...(defense != null ? { defenseTracker: defense } : {}),
       secondActiveLocation: data.widgets.secondActiveLocation,
       perSeatStaging: data.widgets.perSeatStaging,
     },
