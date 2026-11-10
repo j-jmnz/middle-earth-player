@@ -3,6 +3,7 @@
 import { useContext, useRef, type ComponentRef, type ReactNode, type RefObject } from "react";
 import { Pressable, ScrollView, View, type ViewProps } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { vars } from "nativewind";
 
 import { Backdrop } from "../art/backdrop";
 import { useBottomInset } from "../nav/use-bottom-inset";
@@ -12,6 +13,7 @@ import { IconButton } from "./chrome-buttons";
 import { Chevron } from "./chrome-marks";
 import { Eyebrow } from "./chrome-text";
 import { usePalette } from "./palette-hook";
+import { themeVars } from "./palette.js";
 import { GameIcon } from "../../ui/game-icon";
 import type { IconName } from "../../ui/icon-map";
 import { longPressA11y } from "../../ui/long-press-action";
@@ -24,11 +26,17 @@ import { ACTION_GROUP, MEDIUM_ACTION_GROUP, capWidth } from "../../ui/size-class
 import { touch, useUiScale } from "../../ui/ui-scale";
 import { useSizeClass } from "../../ui/use-size-class";
 import { Text } from "../../ui/text";
+import { ThemeContext, useResolvedTheme } from "../../ui/theme";
 
 /**
  * The page: the ground and its fog (the scene), an optional art layer, then the content, inset 24 and starting under the status bar; in landscape (the card and booklet
  * screens can turn with the phone) it is inset past the side safe areas too. `bleed` drops both, for a screen that opens on a
  * picture running under the status bar (the briefing, the deck editor): it insets its own words.
+ *
+ * The page provides the theme again, read from the setting itself, with its color variables. A screen the stack or the dock hides is
+ * held by React Activity, and a theme change from above reaches its memoized parts only on their next own render, so a hub came back
+ * from Settings with its History and gear still Dark. Read here, the change is an update of the hidden screen, which React applies
+ * when it is shown; the theme it provides and the variables NativeWind's classes read then reach every part under it.
  */
 export function Screen({
   children,
@@ -51,15 +59,22 @@ export function Screen({
 }) {
   const insets = useSafeAreaInsets();
   const s = useUiScale();
+  const theme = useResolvedTheme();
+  // NativeWind knows a vars() style by its identity, so it is the whole style of a View of its own, and the page under it reads it.
+  const themeStyle = vars(themeVars(theme));
   return (
-    <View testID={testID} collapsable={false} onKeyDown={onKeyDown} className="flex-1 overflow-hidden bg-night">
-      <Backdrop scene={scene} />
-      {art}
-      {/* The top inset is a style, not NativeWind's pt-safe: one source of insets for the whole screen. */}
-      <View className="flex-1" style={bleed ? undefined : { paddingTop: insets.top, ...(inset ? { paddingLeft: 24 * s + insets.left, paddingRight: 24 * s + insets.right } : {}) }}>
-        {children}
+    <ThemeContext.Provider value={theme}>
+      <View className="flex-1" style={themeStyle}>
+        <View testID={testID} collapsable={false} onKeyDown={onKeyDown} className="flex-1 overflow-hidden bg-night">
+          <Backdrop scene={scene} />
+          {art}
+          {/* The top inset is a style, not NativeWind's pt-safe: one source of insets for the whole screen. */}
+          <View className="flex-1" style={bleed ? undefined : { paddingTop: insets.top, ...(inset ? { paddingLeft: 24 * s + insets.left, paddingRight: 24 * s + insets.right } : {}) }}>
+            {children}
+          </View>
+        </View>
       </View>
-    </View>
+    </ThemeContext.Provider>
   );
 }
 
