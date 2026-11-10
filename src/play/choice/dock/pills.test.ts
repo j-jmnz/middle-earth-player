@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { DockExtra } from "./buttons.tsx";
-import { dockPills, MORE_ID, UNDO_ID } from "./extras.ts";
+import { dockPills, MORE_ID, titleRead, UNDO_ID } from "./extras.ts";
 
 // The dock's quiet pills (docs/design-system-table.md, Command column; phase 22): Undo always shows, the others fold into More
 // when more than two would show.
@@ -53,5 +53,12 @@ describe("dockPills", () => {
     expect(ids(folded.more)).toEqual([UNDO_ID, "sheet-inspect"]);
     expect(dockPills([], true)).toEqual({ pills: [], more: [] });
     expect(ids(dockPills([undo, read], false).pills)).toEqual([UNDO_ID, "sheet-inspect"]);
+  });
+});
+
+describe("the dock's title", () => {
+  it("opens the card Read opens, and nothing when the moment names no card (user request, 2026-11-08)", () => {
+    expect(titleRead([undo, read, list])).toBe(read.onPress);
+    expect(titleRead([undo, list])).toBeUndefined();
   });
 });

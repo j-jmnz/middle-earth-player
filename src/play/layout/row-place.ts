@@ -27,7 +27,8 @@ function foldSlot(zone: "staging" | "engaged", stack: { x: number; w: number; ca
   out.push({ ...rect, id, code: top && !hidesFace(top) ? top.code : "", ...side, zone, kind: "pile", exhausted: false, faceDown: top == null || hidesFace(top), landscape: false, resources: 0, damage: 0, progress: 0, tilt: 0, count: stack.cards.length, committed: false, fold: zone, ...(areaOnly ? { areaFold: true as const } : {}) });
 }
 
-export function placeRow(entries: readonly ZoneEntry[], zone: ZoneId, area: Rect, size: { w: number; h: number }, out: CardSlot[], m: Metrics, folding?: RowFolding, reach: RowReach | null = null): void {
+/** Lays a row's cards into `out`, folding and reaching as `folding` and `reach` allow; true when it took the room past its own span. */
+export function placeRow(entries: readonly ZoneEntry[], zone: ZoneId, area: Rect, size: { w: number; h: number }, out: CardSlot[], m: Metrics, folding?: RowFolding, reach: RowReach | null = null): boolean {
   // A guard lies over the objective it guards, shifted by PAIR_STEP of its width, and the pair keeps a wider gap from its neighbours (rr.guarded).
   const groups: ZoneEntry[][] = [];
   for (const entry of entries) {
@@ -64,6 +65,8 @@ export function placeRow(entries: readonly ZoneEntry[], zone: ZoneId, area: Rect
       out.push(slotOf(entry.card, zone, "card", { ...rect, y: rect.y + lift }));
     });
   });
+  // Whether the row took the room past its own span (row-reach.ts).
+  return fold?.reached === true;
 }
 
 // The engagement area: each enemy, its resolved shadow cards beside it, then the characters fighting it.

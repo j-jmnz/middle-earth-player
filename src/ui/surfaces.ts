@@ -60,6 +60,16 @@ export function floatingSurface(t: TableTokens = dark): Lifted {
   return { backgroundColor: foot, backgroundImage: linear(`${top} 0%, ${foot} 100%`), boxShadow: panelDepthOf(t) };
 }
 
+/**
+ * The banner's plain fill (docs/design-system-table.md, Banner), shared by the table menu and a discard pile's list (user request,
+ * 2026-11-08): night on Dark, the pale `raisedTop` on Light, with no gradient and no lit edge, and a soft drop shadow. `alpha` is the
+ * fill's share: the banner's 0.9, or FLOATING_ALPHA for a panel over the dock's words. Under Reduce Transparency it is opaque (fillAlpha).
+ */
+export function noticeSurface(alpha: number, t: TableTokens = dark): Lifted {
+  if (isLight(t)) return { backgroundColor: withAlphaHex(t.raisedTop, fillAlpha(t, alpha)), boxShadow: `0 10px 28px ${shade(t, 0.35)}` };
+  return { backgroundColor: withAlphaHex(t.night, fillAlpha(t, alpha)), boxShadow: `0 10px 28px ${shade(t, 0.7)}` };
+}
+
 /** A tile that stands for a row or a stat: the panel's look with a shorter shadow, so a grid of them does not darken the page. */
 export function tileSurface(pressed = false, t: TableTokens = dark): Lifted {
   const look = panelSurface(pressed, t);

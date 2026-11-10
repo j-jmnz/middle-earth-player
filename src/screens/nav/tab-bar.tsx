@@ -223,9 +223,9 @@ export function GearButton() {
 
 /**
  * The head of a hub: its title in Marcellus SC (24 pt on a phone, 30 on a tablet) on the left, the hub's own controls and the gear on
- * the right, and an optional line under the title.
+ * the right. No line under the title (user request, 2026-11-08: no filler subtitles).
  */
-export function HubHeader({ title, subtitle, children }: { title: string; subtitle?: string; children?: ReactNode }) {
+export function HubHeader({ title, children }: { title: string; children?: ReactNode }) {
   const { size, s } = useSizeClass();
   const shadow = useTitleShadow();
   const big = size === "compact" ? 24 : 30;
@@ -240,7 +240,6 @@ export function HubHeader({ title, subtitle, children }: { title: string; subtit
           <GearButton />
         </View>
       </View>
-      {subtitle ? <Text className="text-label text-muted">{subtitle}</Text> : null}
     </View>
   );
 }

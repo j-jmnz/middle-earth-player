@@ -230,8 +230,10 @@ export function TableLayers({
   const panel = reading && reading.kind !== "carousel" ? reading : null;
   const held = useHeld(panel);
   const settingsOpen = held?.kind === "settings";
-  // The settings panel and the card lists (a pile's, a row's, the staging threat's) stand on night; the log, the threat panel and the Island Map on paper.
-  const night = settingsOpen || held?.kind === "pile" || held?.kind === "row" || held?.kind === "stagingThreat";
+  // A pile's list (a discard pile, the victory display) stands on the banner's plain fill (user request, 2026-11-08); the settings panel and the
+  // other card lists (a row's, the staging threat's) on night; the log, the threat panel and the Island Map on paper.
+  const night = settingsOpen || held?.kind === "row" || held?.kind === "stagingThreat";
+  const surface = held?.kind === "pile" ? "notice" : night ? "night" : "paper";
   // The settings panel is wider than the other panels, so its three-word switches fit (settings-panel-width.ts).
   const width = settingsOpen ? settingsPanelWidth(canvas, s, screen.width - insets.left - insets.right - 2 * EDGE * s) : Math.max(READING_MIN * s, box.width);
   const foot = Math.max(insets.bottom, EDGE * s);
@@ -254,7 +256,7 @@ export function TableLayers({
         </>
       ) : null}
       {panel ? <Pressable testID="reading-scrim" accessibilityRole="button" accessibilityLabel="Close the panel" onPress={close} style={{ position: "absolute", top: barBottom, left: 0, right: 0, bottom: 0 }} /> : null}
-      <TrayFrame open={panel != null} surface={night ? "night" : "paper"} testID="reading" onClose={close} place={{ right: insets.right, width: shown, bottom: foot, maxHeight: room }}>
+      <TrayFrame open={panel != null} surface={surface} testID="reading" onClose={close} place={{ right: insets.right, width: shown, bottom: foot, maxHeight: room }}>
         {held?.kind === "pile" ? (
           <PileReading
             store={store}
@@ -289,7 +291,7 @@ export function TableLayers({
         ) : null}
         {/* A choice is still open under the panel: say so, and the dock's armed button is untouched by closing it. */}
         {trayShown && panel ? (
-          <Text testID="choice-waiting" className={`pt-1 text-center text-label ${night ? "text-muted" : "text-inkMuted"}`}>
+          <Text testID="choice-waiting" className={`pt-1 text-center text-label ${surface === "paper" ? "text-inkMuted" : "text-muted"}`}>
             Choice waiting
           </Text>
         ) : null}

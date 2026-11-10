@@ -55,7 +55,6 @@ export default function Scenarios() {
 
   const heroBlock = hero ? (
     <RunHero
-      overline={`In progress · ${seatWord(hero.seatCount)}`}
       title={scenarioName(hero.scenarioId)}
       detail={detailOf(hero)}
       seats={seatsOf(hero).map((seat) => seat.map((code) => heroFace(faces, code)))}
@@ -134,7 +133,6 @@ export default function Scenarios() {
       testID="scenarios"
       title="Scenarios"
       actions={<PillButton label="History" testID="history-open" accessibilityLabel="History: games in progress, finished and archived" onPress={() => router.push({ pathname: "/history", params: { kind: "standalone" } })} />}
-      subtitle="Standalone adventures. No campaign log, boons or burdens."
       hero={heroBlock}
       heroAction={heroAction}
       heroTestID="current-game"

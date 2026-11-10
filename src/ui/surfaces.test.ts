@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { floatingSurface, FLOATING_ALPHA, PRESSED_FILTER, segmentSurface, glassSurface, slateSurface, textSurface, chipSurface } from "./surfaces.ts";
+import { floatingSurface, FLOATING_ALPHA, noticeSurface, PRESSED_FILTER, segmentSurface, glassSurface, slateSurface, textSurface, chipSurface } from "./surfaces.ts";
 import { tableTokens, tableTokensByTheme } from "./tokens.ts";
 
 const lightTableTokens = tableTokensByTheme.light;
@@ -15,6 +15,15 @@ describe("the surfaces that float over the dock's words", () => {
       expect(found.length).toBeGreaterThan(0);
       for (const alpha of found) expect(alpha).toBeGreaterThanOrEqual(0.97);
       expect(FLOATING_ALPHA).toBeGreaterThanOrEqual(0.97);
+    }
+  });
+
+  it("include the banner's plain fill at the floating share (the table menu, a pile's list): opaque, flat, the banner's colour", () => {
+    for (const t of [tableTokens, lightTableTokens]) {
+      const look = noticeSurface(FLOATING_ALPHA, t);
+      expect(look.backgroundImage).toBeUndefined();
+      for (const alpha of alphas(look.backgroundColor)) expect(alpha).toBeGreaterThanOrEqual(0.97);
+      expect(look.backgroundColor.replace(/,[\d.]+\)$/, ")")).toBe(noticeSurface(0.9, t).backgroundColor.replace(/,[\d.]+\)$/, ")"));
     }
   });
 });

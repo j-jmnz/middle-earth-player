@@ -67,8 +67,8 @@ export default function CampaignList() {
   }
 
   const heroLine = hero ? lineOf(hero) : null;
-  const heroBlock = hero && heroLine ? <RunHero overline={`In progress · ${heroLine.seats}`} title={heroLine.name} seats={fellowshipOf(hero)} testID="continue-campaign" /> : null;
-  // Under its words the hero holds the screen's one primary (Begin or Resume).
+  const heroBlock = hero && heroLine ? <RunHero title={heroLine.name} seats={fellowshipOf(hero)} testID="continue-campaign" /> : null;
+  // Under its words the hero holds the screen's one primary, Resume.
   const heroAction =
     hero && heroLine ? (
       <NextStop
@@ -146,7 +146,6 @@ export default function CampaignList() {
       testID="campaign-list"
       title="Campaigns"
       actions={<PillButton label="History" testID="history-open" accessibilityLabel="History: playthroughs in progress, finished and archived" onPress={() => router.push({ pathname: "/history", params: { kind: "campaign" } })} />}
-      subtitle="Play a box's scenarios in order, with its log, boons and burdens."
       hero={heroBlock}
       heroAction={heroAction}
       heroTestID="current-playthrough"

@@ -46,6 +46,7 @@ export function TableMenu({ open, nav, top, right, onClose, onSelect }: { open: 
       ids={{ layer: "table-menu-layer", scrim: "table-menu-scrim", popover: "table-menu-popover" }}
       closeLabel="Close the menu"
       focusRef={first}
+      surface="notice"
       onClose={onClose}
     >
       {menuItems(nav).map((item, index) => (
