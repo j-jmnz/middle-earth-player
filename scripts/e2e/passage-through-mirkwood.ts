@@ -19,7 +19,7 @@ function find(wanted: (state: ScenarioState) => boolean, label: string): Mirkwoo
     campaignId: "mirkwood-paths",
     scenarioId: "passage-through-mirkwood",
     seatCount: 2,
-    decks: ["dwarves-of-durin", "elves-of-lorien"],
+    decks: ["the-one-deck", "elves-of-lorien"],
     limit: 6000,
     seeds: 60,
     answer: (state: ScenarioState, ctx: Parameters<typeof nextIntent>[1], memory: Set<string>) => nextIntent(state, ctx, { scout: "", prefer: "", protect: "", play: true, act: true }, memory),

@@ -11,6 +11,7 @@ import type { PrintedCard } from "../../src/rules/core/printed.ts";
 import { reduce, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
 
 import prebuilt from "../../data/decks/prebuilt.json" with { type: "json" };
+import testDecks from "../../data/decks/test-decks.json" with { type: "json" };
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 import { loadCampaign, loadScenario } from "../data/load-scenarios.ts";
 import type { Log } from "../log.ts";
@@ -21,9 +22,9 @@ import { NO_COPY_LIMITS } from "../../src/campaign/wilderland.ts";
 // answers, every intent one the reducer accepts, the first seed that gives the game a fixture wants, and the log an earlier part's
 // won golden writes. A seed finder keeps what is its own: its answers, its fixture names and what it keeps.
 
-/** A printed decklist of data/decks/prebuilt.json: its heroes, and its cards one entry a copy. */
+/** A decklist of data/decks/prebuilt.json or data/decks/test-decks.json (The One Deck): its heroes, and its cards one entry a copy. */
 export function prebuiltDeck(id: string): { heroes: string[]; deck: string[] } {
-  const found = prebuilt.find((entry) => entry.id === id);
+  const found = prebuilt.find((entry) => entry.id === id) ?? testDecks.find((entry) => entry.id === id);
   if (!found) throw new Error(`No prebuilt deck ${id}`);
   return { heroes: [...found.heroes], deck: found.cards.flatMap((row) => Array.from({ length: row.count }, () => row.code)) };
 }
@@ -60,8 +61,11 @@ export function playDealt(
   return { intents, state };
 }
 
-/** The saved decklists every fixture plays: the first seat's, then the second's. */
-export const FIXTURE_DECKS = ["defenders-of-gondor", "swords-of-the-noldor"] as const;
+/**
+ * The saved decklists every fixture plays: the first seat's, then the second's. The first is The One Deck (RingsDB decklist 8682,
+ * data/decks/test-decks.json). The second shares no hero title with it, since a hero title may be in only one seat.
+ */
+export const FIXTURE_DECKS = ["the-one-deck", "defenders-of-gondor"] as const;
 export const DREAM_CHASER = "dream-chaser";
 
 export type SeedSpec<S extends 1 | 2> = {

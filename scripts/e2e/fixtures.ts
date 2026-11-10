@@ -9,15 +9,15 @@
 // With a scenario id, a part after the first takes the earlier parts' won games from their committed files, so the other files are not rewritten.
 //
 // `won` and `knife-lost` are open (docs/phases/STATUS.md): with the rules as the sources state them, the search has found no
-// legal win of the two starter decks, so they are not committed, and the tests that replay them are skipped until they are.
+// legal win of the two decks the search played, so they are not committed, and the tests that replay them are skipped until they are.
 //
-// `won`: both starter decks, two-handed, Easy, parked on the first Resolution choice. The naive auto-player loses every
-// game with the starter decks, so a seeded beam search plays varied (still legal) answers a round at a time and keeps the
+// `won`: The One Deck (with the saga Frodo) and Stealth and Steadfastness, two-handed, Easy, parked on the first Resolution choice. The naive auto-player loses every
+// game with those decks, so a seeded beam search plays varied (still legal) answers a round at a time and keeps the
 // games that got furthest until one is won; every intent is one the reducer listed or accepted, and the search is
-// deterministic. `lost`: Stealth and Steadfastness with the saga
+// deterministic. `lost`: The One Deck with the saga
 // Frodo, true solo, Normal, every intent up to the loss.
 //
-// `duo`: both starter decks, two-handed, Easy, parked on the first player's planning window of round 1 (the opening hands kept, the
+// `duo`: the same two decks, two-handed, Easy, parked on the first player's planning window of round 1 (the opening hands kept, the
 // first resource and the quest of nothing yet), for the flows that need two dials and a seat that is not acting (the peek,
 // `.maestro/features/seat-peek.yaml`). Nothing in it is a win or a loss: it is the auto-player's answers up to that window.
 //
@@ -27,7 +27,7 @@
 // is left out of its file.
 //
 // `knife-lost`: A Knife in the Dark from the log the `won` game writes when its Resolution is answered with Gandalf's Delay
-// (141078) and Gildor Inglorion (141077), as the scenario-1 Maestro flow answers it. Each seat plays its starter list with
+// (141078) and Gildor Inglorion (141077), as the scenario-1 Maestro flow answers it. Each seat plays its list with
 // a core set hero of the same sphere in place of each hero that fell in that game (REPLACEMENT), and the briefing's threat
 // penalty when one did. Two-handed, Easy, the auto-player's answers, every intent up to the loss.
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
@@ -49,6 +49,7 @@ import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceConte
 
 import { nextIntent } from "../../test/harness/auto-player.ts";
 import { loadCampaign, loadScenario, scenarioOrder } from "../data/load-scenarios.ts";
+import { prebuiltDeck } from "./seed-kit.ts";
 import { anduinFixtures } from "./journey-along-the-anduin.ts";
 import { dolGuldurFixtures } from "./escape-from-dol-guldur.ts";
 import { mirkwoodFixtures } from "./passage-through-mirkwood.ts";
@@ -92,8 +93,10 @@ function starter(id: string): { heroes: string[]; deck: string[] } {
   };
 }
 
+// The first seat plays The One Deck (data/decks/test-decks.json) and takes the saga Frodo as its Ring-bearer. The second
+// seat plays Stealth and Steadfastness: Wisdom and Wizardry has Éowyn (01007), the title of The One Deck's 145002.
+const oneDeck = prebuiltDeck("the-one-deck");
 const stealth = starter("stealth-and-steadfastness");
-const wisdom = starter("wisdom-and-wizardry");
 
 function opened(seatCount: 1 | 2, loadout: StoredLoadout, seed: number): { state: ScenarioState; ctx: ReduceContext } {
   const codes = [FRODO, ...loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck])];
@@ -163,8 +166,8 @@ function searchWin(): { seed: number; loadout: StoredLoadout; intents: PlayerInt
     scenarioId: scenario.id,
     difficulty: "Easy",
     seats: [
+      { deckId: "the-one-deck", heroes: oneDeck.heroes, deck: oneDeck.deck },
       { deckId: "stealth-and-steadfastness", heroes: stealth.heroes, deck: stealth.deck },
-      { deckId: "wisdom-and-wizardry", heroes: wisdom.heroes, deck: wisdom.deck },
     ],
     ringBearer: FRODO,
     choices: [],
@@ -228,7 +231,7 @@ function playLoss(): { seed: number; loadout: StoredLoadout; intents: PlayerInte
   const loadout: StoredLoadout = {
     scenarioId: scenario.id,
     difficulty: "Normal",
-    seats: [{ deckId: "stealth-and-steadfastness", heroes: stealth.heroes, deck: stealth.deck }],
+    seats: [{ deckId: "the-one-deck", heroes: oneDeck.heroes, deck: oneDeck.deck }],
     ringBearer: FRODO,
     choices: [],
     acceptPenalty: false,
@@ -238,7 +241,7 @@ function playLoss(): { seed: number; loadout: StoredLoadout; intents: PlayerInte
   let state = start;
   const intents: PlayerIntent[] = [];
   for (let turn = 0; turn < 3000 && !state.lost; turn += 1) {
-    const intent = nextIntent(state, ctx, { scout: stealth.heroes[2] ?? "", prefer: "141035", protect: FRODO });
+    const intent = nextIntent(state, ctx, { scout: oneDeck.heroes[2] ?? "", prefer: "141035", protect: FRODO });
     const result = reduce(state, intent, ctx);
     if (!result.ok) throw new Error(`The policy sent a refused intent: ${result.reason}`);
     state = result.state;
@@ -254,8 +257,8 @@ function playDuo(): { seed: number; loadout: StoredLoadout; intents: PlayerInten
     scenarioId: scenario.id,
     difficulty: "Easy",
     seats: [
+      { deckId: "the-one-deck", heroes: oneDeck.heroes, deck: oneDeck.deck },
       { deckId: "stealth-and-steadfastness", heroes: stealth.heroes, deck: stealth.deck },
-      { deckId: "wisdom-and-wizardry", heroes: wisdom.heroes, deck: wisdom.deck },
     ],
     ringBearer: FRODO,
     choices: [],
@@ -299,14 +302,14 @@ function logOfPastResolution(won: { seed: number; loadout: StoredLoadout; intent
   return { log: finish(save, world, state).log, choices };
 }
 
-// A core set hero of the same sphere for each starter hero that can fall (Gandalf is neutral: a Lore hero takes his place).
+// A core set hero of the same sphere for each hero that can fall, whose title is in neither seat (never Aragorn: the Fellowship's rule).
 const REPLACEMENT: Readonly<Record<string, string>> = {
+  "10140": "01008",
+  "145002": "01004",
+  "04128": "01011",
   "141002": "01003",
   "141003": "01005",
   "141004": "01010",
-  "142002": "01011",
-  "01002": "01001",
-  "01007": "01008",
 };
 
 function playKnifeLoss(log: CampaignLog): { seed: number; loadout: StoredLoadout; intents: PlayerIntent[] } {
@@ -314,13 +317,13 @@ function playKnifeLoss(log: CampaignLog): { seed: number; loadout: StoredLoadout
   // Each seat replaces the heroes that fell in the won game (checklist step 2), and takes the threat penalty for it.
   const replaced = (heroes: readonly string[], seat: number) =>
     heroes.map((code) => ((log.fallenHeroesBySeat[seat] ?? []).includes(code) ? (REPLACEMENT[code] ?? code) : code));
-  const seats = [replaced(stealth.heroes, 0), replaced(wisdom.heroes, 1)];
+  const seats = [replaced(oneDeck.heroes, 0), replaced(stealth.heroes, 1)];
   const loadout: StoredLoadout = {
     scenarioId: knife.id,
     difficulty: "Easy",
     seats: [
-      { deckId: "stealth-and-steadfastness", heroes: seats[0] ?? [], deck: stealth.deck },
-      { deckId: "wisdom-and-wizardry", heroes: seats[1] ?? [], deck: wisdom.deck },
+      { deckId: "the-one-deck", heroes: seats[0] ?? [], deck: oneDeck.deck },
+      { deckId: "stealth-and-steadfastness", heroes: seats[1] ?? [], deck: stealth.deck },
     ],
     ringBearer: FRODO,
     choices: [],
