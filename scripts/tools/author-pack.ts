@@ -17,7 +17,8 @@ import { sectionText } from "../docs/index.ts";
 //   - the schema entries (and the comment on each) of the verbs the drafts' nearest records and exact matches use, from the core schema files and the family manifests (src/catalog/families/<family>.ts)
 //     that declare them: an entry, not the whole manifest, since one manifest is tens of KB;
 //   - the sections of docs/plans/effect-authoring.md those records need: a fixed set every author reads, and the ones for picks, amounts, conditions and triggers when a record uses them;
-//   - the drafts, one section each.
+//   - the engine files of the families those records use, as paths with line counts;
+//   - the rules text the drafts cite, each span once, then the drafts, one section each, each citing its spans by rule id.
 
 const COOKBOOK = "docs/plans/effect-authoring.md";
 const FAMILIES_DIR = "src/catalog/families";
@@ -142,7 +143,38 @@ export function headingsIn(doc: string): string[] {
   return doc.split("\n").flatMap((line) => (/^## /.test(line) ? [line.slice(3).trim()] : []));
 }
 
-export type PackParts = { id: string; vocabulary: string; plan: PackPlan; sources: ReadonlyMap<string, string>; sections: readonly string[]; drafts: readonly { name: string; text: string }[] };
+const SPANS_HEADING = "## Rules text that mentions its terms";
+
+/**
+ * A draft's rules spans, taken out: the draft with its "Rules text that mentions its terms" section cut to one line of the rule ids it cites, and the spans themselves (`### <rule id> (<doc> p<page>)` and the text under it).
+ * A draft with no such section comes back as it is.
+ */
+export function takeSpans(draft: string): { text: string; spans: { id: string; block: string }[] } {
+  const start = draft.indexOf(`${SPANS_HEADING}\n`);
+  if (start < 0) return { text: draft, spans: [] };
+  const afterHeading = start + SPANS_HEADING.length + 1;
+  const next = draft.indexOf("\n## ", afterHeading - 1);
+  const end = next < 0 ? draft.length : next + 1;
+  const body = draft.slice(afterHeading, end);
+  const spans = body
+    .split(/^(?=### )/m)
+    .filter((block) => block.startsWith("### "))
+    .map((block) => ({ id: /^### (\S+)/.exec(block)?.[1] ?? "", block: block.trimEnd() }));
+  const cited = spans.length === 0 ? "None." : `Rule ids (text under "Rules text" above): ${spans.map((span) => span.id).join(", ")}.`;
+  return { text: `${draft.slice(0, start)}${SPANS_HEADING.replace("mentions its terms", "cited")}\n${cited}\n\n${draft.slice(end)}`, spans };
+}
+
+export type EngineFamily = { family: string; files: readonly { path: string; lines: number }[] };
+
+export type PackParts = {
+  id: string;
+  vocabulary: string;
+  plan: PackPlan;
+  sources: ReadonlyMap<string, string>;
+  sections: readonly string[];
+  engine: readonly EngineFamily[];
+  drafts: readonly { name: string; text: string }[];
+};
 
 /** The pack's text: a short header, then the four parts. */
 export function renderPack(parts: PackParts): string {
@@ -168,10 +200,32 @@ export function renderPack(parts: PackParts): string {
   }
   out.push(`# Part 3: ${COOKBOOK}`, ``);
   for (const section of parts.sections) out.push(section.trimEnd(), ``);
+  if (parts.engine.length > 0) {
+    out.push(`Engine files of those families (read these, do not search for them):`, ``);
+    for (const { family, files } of parts.engine) out.push(`- ${family}: ${files.map((file) => `${file.path} (${file.lines})`).join(", ")}`);
+    out.push(``);
+  }
   out.push(`# Part 4: the drafts`, ``);
   if (parts.drafts.length === 0) out.push(`None: no printed line of ${parts.id} is without a record.`, ``);
-  for (const draft of parts.drafts) out.push(`## ${draft.name}`, ``, draft.text.trimEnd(), ``);
+  // Each rules span once, in order of first appearance; a draft keeps the list of the ids it cites.
+  const taken = parts.drafts.map((draft) => ({ name: draft.name, ...takeSpans(draft.text) }));
+  const blocks = [...new Set(taken.flatMap((draft) => draft.spans.map((span) => span.block)))];
+  if (blocks.length > 0) out.push(`## Rules text`, ``, `Cited by the drafts below, each span once.`, ``, ...blocks.flatMap((block) => [block, ``]));
+  for (const draft of taken) out.push(`## ${draft.name}`, ``, draft.text.trimEnd(), ``);
   return `${out.join("\n")}\n`;
+}
+
+// The engine files of each family in `families` (core schema paths have none): src/rules/families/<family>/*.ts without tests, and the family's manifest, with line counts.
+function engineFilesOf(families: readonly string[]): EngineFamily[] {
+  const lines = (file: string): number => readFileSync(path.join(ROOT, file), "utf8").split("\n").length - 1;
+  return families
+    .filter((family) => !family.includes("/"))
+    .map((family) => {
+      const folder = `src/rules/families/${family}`;
+      const engine = existsSync(path.join(ROOT, folder)) ? readdirSync(path.join(ROOT, folder)).filter((name) => name.endsWith(".ts") && !name.endsWith(".test.ts")).sort() : [];
+      const files = [`${FAMILIES_DIR}/${family}.ts`, ...engine.map((name) => `${folder}/${name}`)];
+      return { family, files: files.map((file) => ({ path: file, lines: lines(file) })) };
+    });
 }
 
 function main(log: Log): void {
@@ -201,7 +255,7 @@ function main(log: Log): void {
   const cookbook = readFileSync(path.join(ROOT, COOKBOOK), "utf8");
   const plan = packPlan(drafts.map((draft) => draft.text), verbFamilies(sources), headingsIn(cookbook));
   const sections = plan.sections.map((heading) => sectionText(COOKBOOK, heading));
-  const text = renderPack({ id, vocabulary: readFileSync(vocabularyPath, "utf8"), plan, sources, sections, drafts });
+  const text = renderPack({ id, vocabulary: readFileSync(vocabularyPath, "utf8"), plan, sources, sections, engine: engineFilesOf(plan.families), drafts });
   const target = path.join(ROOT, ".agent", "pack", `${id}.md`);
   mkdirSync(path.dirname(target), { recursive: true });
   writeFileSync(target, text);
