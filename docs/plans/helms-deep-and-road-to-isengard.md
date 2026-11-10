@@ -12,7 +12,8 @@ The rules are `mec112.defense`, `mec112.wizardry`, `mec112.poisoned-counsels-sea
 
 - The work runs on the branch the session's harness names, from `main`.
 - `orchestrator` runs the sections in order (`.claude/agents/orchestrator.md`). Sections 1 and 2 are each one scenario, run as the tasks of `docs/handover/agent-brief.md` (Scenario procedure): Read, the rulings asked once, Build, Judge, Finish, one review round, Fix. Section 2 starts after section 1's Fix: its campaign test continues from Helm's Deep's real Resolution.
-- Each task is one commit, typed by `.claude/rules/commit-standards.md` (a scenario's tasks are `feat` checkpoints). The branch lands on `main` squashed.
+- Commit and push often (`.claude/rules/commit-standards.md`, Checkpoints). Each writing task pushes a typed checkpoint after every green step, and the orchestrator commits and pushes at the end of each task. Section 1's checkpoints are `feat: Helm's Deep …, checkpoint` and section 2's are `feat: The Road to Isengard …, checkpoint`. The branch lands on `main` squashed.
+- No task waits on the user for a reading. Read researches every reading, and Build applies it as researched or recommended.
 
 ## What does not move
 
@@ -45,7 +46,7 @@ The rules are `mec112.defense`, `mec112.wizardry`, `mec112.poisoned-counsels-sea
 
 **Poisoned Counsels** (143021, `mec112.poisoned-counsels-searching-eye`). An encounter card in a player's deck: drawn, held, discarded from hand or deck, never played. After it is drawn, the rest of the hand is discarded. Build checks how far the player-deck burden path already goes (`ShuffleIntoEachDeck`, the `cardsDrawn` and `enteredHand` triggers). The Searching Eye (scenario 10) reuses it, so it goes in the `burden` family, not in `fortress`.
 
-**Readings to raise at Read** (the Read task confirms each, adds its own, and marks each `literal`, `span-settled` or `needs-ruling`):
+**Readings to research at Read.** The Read task confirms each one and adds its own. It researches every reading the spans leave open: official rulings first, then community discussions. If neither gives a clear answer, it takes its recommended reading (`docs/handover/agent-brief.md`, Scenario procedure, Open points are researched, not asked). The literal reading named below is the default recommendation, not a decision.
 - 143074:B:2. Does progress the encounter deck places on the active location, and not on the stage, count as "placed progress on this stage"? Literal: no.
 - Devilry of Saruman (143043:A:1). Is a character entering play later in the round blank too? Literal: yes, each character.
 - Night Without End (143045:A:2). With no token on The Defense of Helm's Deep, may the players still choose "remove 1 token"?
@@ -91,7 +92,7 @@ The rules are `mec112.defense`, `mec112.wizardry`, `mec112.poisoned-counsels-sea
 - Plain of Isengard (143058:A:1) prints Threat X, as Deeping Culvert does.
 - Treacheries: Blast of Sorcery's damage among the questing characters. Poisoned Vapour exhausts each damaged character and blanks it until the end of the combat phase.
 
-**Readings to raise at Read:**
+**Readings to research at Read** (as in section 1):
 - Poisoned Vapour (143061:A:2). Are the characters damaged when it resolves blanked, or every damaged character until the end of combat, live?
 - Saruman's Voice (143068:A:2). Which hero, and whose, when none is questing or the revealing player has none questing (Peril)?
 - 143080:B:3. Checked at once (a constant), so a player emptied mid-effect is eliminated before the effect ends?
@@ -115,9 +116,9 @@ The rules are `mec112.defense`, `mec112.wizardry`, `mec112.poisoned-counsels-sea
 
 `repo`, by the orchestrator (`.claude/agents/orchestrator.md`, Closing):
 - Phases 64 and 65 marked in `docs/phases/STATUS.md`.
-- The readings not confirmed go to Open items, under The Two Towers.
+- Each reading goes in `docs/brief.md`, The Two Towers, under its scenario's bullet, with its source URL or "agent recommendation".
+- Each `recommended` reading, and each one settled only by a community discussion, also goes to Open items, under The Two Towers, as not user-confirmed.
 - Any `*-won` fixture the seed finder cannot find goes under Fixtures and Maestro, as `hai-won` is.
-- The rulings go in `docs/brief.md`, The Two Towers, one bullet per scenario.
 - This plan is deleted.
 
 ## Risks

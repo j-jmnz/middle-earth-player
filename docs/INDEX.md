@@ -11,7 +11,7 @@ Read whole.
 - `CLAUDE.md` — Claude Code (~2.6K tok)
 - `.claude/rules/authority.md` — Authority (~470 tok)
 - `.claude/rules/code-standards.md` — Code standards (~1.9K tok)
-- `.claude/rules/commit-standards.md` — Commit standards (~680 tok)
+- `.claude/rules/commit-standards.md` — Commit standards (~890 tok)
 - `.claude/rules/docs-standards.md` — Docs standards (~1.1K tok)
 - `.claude/rules/release-standards.md` — Release standards (~1.0K tok)
 
@@ -24,7 +24,7 @@ Each agent reads its own file.
 - `.claude/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~2.0K tok)
 - `.claude/agents/reading-judge.md` — Reads each effect record, rendered as English, against the printed ledger line it implements and says ok, wrong, ambiguous or render-gap (~960 tok)
 - `.claude/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~2.4K tok)
-- `.claude/agents/scenario-author.md` — Builds one scenario's engine half, one task per run (Read, Build or Finish), each run fresh from the hand-off note (~1.0K tok)
+- `.claude/agents/scenario-author.md` — Builds one scenario's engine half, one task per run (Read, Build or Finish), each run fresh from the hand-off note (~1.1K tok)
 - `.claude/agents/ux.md` — Reviews the current screens for phone UX and visual design, and changes the design system when asked (~1.3K tok)
 
 ## Product, code and design
@@ -227,16 +227,16 @@ Read when a task names the plan.
   - 237–273 Mechanic families: engine and records together (~1.4K) ← 1
   - 274–287 Readings the review catches (~490) ← 4
   - 288–307 Not expressible yet: leave open, report (~390)
-- `docs/plans/helms-deep-and-road-to-isengard.md` — Plan: Helm's Deep and The Road to Isengard (~4.1K tok)
+- `docs/plans/helms-deep-and-road-to-isengard.md` — Plan: Helm's Deep and The Road to Isengard (~4.3K tok)
   - 3–10 Context (~310)
-  - 11–16 Base and landing (~150)
-  - 17–22 What does not move (~110)
-  - 23–122 Sections (~3.2K)
-    - 25–62 1. Helm's Deep (phase 64) (~1.5K)
-    - 63–113 2. The Road to Isengard (phase 65) (~1.7K)
-    - 114–122 3. Closing (~100)
-  - 123–128 Risks (~190)
-  - 129–136 Measure (~70)
+  - 11–17 Base and landing (~240)
+  - 18–23 What does not move (~110)
+  - 24–123 Sections (~3.3K)
+    - 26–63 1. Helm's Deep (phase 64) (~1.5K)
+    - 64–114 2. The Road to Isengard (phase 65) (~1.7K)
+    - 115–123 3. Closing (~140)
+  - 124–129 Risks (~190)
+  - 130–137 Measure (~70)
 - `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.7K tok)
   - 3–14 Context (~450)
   - 15–24 What does not move (~190)
@@ -256,17 +256,17 @@ Read when a task names the plan.
 
 Open work; read when a task names it.
 
-- `docs/handover/agent-brief.md` — Brief for a mechanic-family or scenario agent (~4.9K tok)
+- `docs/handover/agent-brief.md` — Brief for a mechanic-family or scenario agent (~5.2K tok)
   - 19–37 Setup (~440)
   - 38–56 Files you own (edit freely) (~490)
   - 57–70 Shared files (~300)
   - 71–85 Approach (~690) ← 1
-  - 86–123 Scenario procedure (~1.7K) ← 12
-  - 124–133 Checkpoints (API usage limits can stop you mid-task) (~210)
-  - 134–148 Checks before committing (~320)
-  - 149–155 Merge (~140) ← 1
-  - 156–162 Commit (~130)
-  - 163–170 Report (your final message) (~90) ← 1
+  - 86–124 Scenario procedure (~2.0K) ← 12
+  - 125–134 Checkpoints (API usage limits can stop you mid-task) (~210)
+  - 135–149 Checks before committing (~320)
+  - 150–156 Merge (~140) ← 1
+  - 157–163 Commit (~130)
+  - 164–171 Report (your final message) (~90) ← 1
 
 ## Code to docs
 
