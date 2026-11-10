@@ -389,7 +389,7 @@ describe("duo (the peek's two-handed fixture, phase 26)", () => {
   it("is a two-handed game of scenario 1 with one deck per seat, from an empty log", () => {
     const found = fixture("duo");
     expect(found.seatCount).toBe(2);
-    expect(found.loadout.seats.map((seat) => seat.deckId)).toEqual(["stealth-and-steadfastness", "wisdom-and-wizardry"]);
+    expect(found.loadout.seats.map((seat) => seat.deckId)).toEqual(["the-one-deck", "stealth-and-steadfastness"]);
     expect(found.loadout.scenarioId).toBe("a-shadow-of-the-past");
     expect(found.past).toBeNull();
     expect(found.log.completed).toEqual([]);
