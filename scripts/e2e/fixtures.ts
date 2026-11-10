@@ -75,6 +75,7 @@ import { gundabadFixtures } from "./mount-gundabad.ts";
 import { wilderlandFixtures } from "./the-fate-of-wilderland.ts";
 import { haiFixtures } from "./the-uruk-hai.ts";
 import { deepFixtures } from "./helms-deep.ts";
+import { isengardFixtures } from "./the-road-to-isengard.ts";
 import { FIXTURE_REGISTRY, fixtureFile, type FixtureName, type FixtureScenarioId } from "../../src/campaign/fixtures/registry.ts";
 import { createLog, runScript } from "../log.ts";
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
@@ -394,6 +395,7 @@ const WRITERS: Record<Chained, (written: Written) => Promise<object> | object> =
   "the-fate-of-wilderland": () => wilderlandFixtures(),
   "the-uruk-hai": () => haiFixtures(),
   "helms-deep": () => deepFixtures(),
+  "the-road-to-isengard": () => isengardFixtures(),
 };
 
 // The won game is open: no legal win of the two starter decks has been found on this engine (docs/phases/STATUS.md), so
