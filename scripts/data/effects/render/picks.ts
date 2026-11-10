@@ -7,7 +7,7 @@ const CONTROL: Readonly<Record<string, string>> = { you: "you control", any: "an
 const FROM: Readonly<Record<string, string>> = { play: "in play", hand: "in hand", discard: "in the discard pile", deck: "in the deck", victory: "in the victory display", loot: "in the loot pile", encounterDeck: "in the encounter deck" };
 const ENGAGED: Readonly<Record<string, string>> = { you: "engaged with you", other: "engaged with another player" };
 
-// Each entry reads some keys and says one qualifier; the order is the order the phrase reads in.
+// Each entry reads some keys and says one qualifier; the order is the order the phrase reads in. A key whose value says nothing (`committed: false` before it had words) is not claimed, so it prints after the text as `[also {...}]`.
 type Part = { keys: readonly string[]; say: (pick: Obj) => string | null };
 const PARTS: readonly Part[] = [
   { keys: ["state"], say: (p) => (typeof p.state === "string" ? p.state : null) },
@@ -17,21 +17,24 @@ const PARTS: readonly Part[] = [
   { keys: ["nonUnique"], say: (p) => (p.nonUnique === true ? "non-unique" : null) },
   { keys: ["trait"], say: (p) => (typeof p.trait === "string" ? p.trait : null) },
   { keys: ["traits"], say: (p) => (Array.isArray(p.traits) ? p.traits.map(str).join(" or ") : null) },
-  { keys: ["damaged"], say: (p) => (p.damaged === true ? "damaged" : null) },
+  { keys: ["damaged"], say: (p) => (p.damaged === true ? "damaged" : p.damaged === false ? "undamaged" : null) },
 ];
 
 export const renderPick: PickRenderer = (value, ctx) => {
   if (!isObj(value) || typeof value.type !== "string") return jsonOf(ctx, "pick", value);
   const pick = value;
   const read = ["type", "control"];
+  const claim = (keys: readonly string[], text: string | null): void => {
+    if (text !== null || keys.every((key) => pick[key] === undefined)) read.push(...keys);
+  };
   const front = PARTS.flatMap((part) => {
-    read.push(...part.keys);
     const said = part.say(pick);
+    claim(part.keys, said);
     return said ? [said] : [];
   });
   const after: string[] = [];
   const note = (keys: readonly string[], text: string | null): void => {
-    read.push(...keys);
+    claim(keys, text);
     if (text) after.push(text);
   };
   note(["from"], typeof pick.from === "string" ? (FROM[pick.from] ?? pick.from) : null);
@@ -46,12 +49,12 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["nonObjective"], pick.nonObjective === true ? "that is not an objective" : null);
   note(["objective"], pick.objective === true ? "that is an objective" : null);
   note(["cardType"], typeof pick.cardType === "string" ? `of card type ${pick.cardType}` : null);
-  note(["committed"], pick.committed === true ? "committed to the quest" : null);
+  note(["committed"], pick.committed === true ? "committed to the quest" : pick.committed === false ? "not committed to the quest" : null);
   note(["attacking"], pick.attacking === true ? "attacking" : null);
   note(["defending"], pick.defending === true ? "defending" : null);
   note(["hasResources"], pick.hasResources === true ? "with resources on it" : null);
-  note(["progress"], pick.progress === true ? "with progress on it" : null);
-  note(["captive"], typeof pick.captive === "string" ? (pick.captive === "only" ? "that is a Captive (heroes held under To Isengard! or by an enemy)" : pick.captive === "free" ? "that is a Captive lying under To Isengard!" : "(Captives included)") : null);
+  note(["progress"], pick.progress === true ? "with progress on it" : pick.progress === false ? "with no progress on it" : null);
+  note(["captive"], typeof pick.captive === "string" ? (pick.captive === "only" ? "that is a Captive (held by an enemy or lying free)" : pick.captive === "free" ? "that is a Captive that no enemy holds" : "(Captives included)") : null);
   note(["exceptSphere"], typeof pick.exceptSphere === "string" ? `that is not a ${pick.exceptSphere} card` : null);
   note(["who"], pick.who === "firstPlayer" ? "chosen by the first player" : null);
   note(["engagedEnemies"], pick.engagedEnemies === true ? "that is an enemy engaged with a player" : null);

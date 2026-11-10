@@ -31,7 +31,7 @@ Each brief stands on its own, because the agent knows only what you give it:
 - Do not commit or push; do not edit `docs/phases/STATUS.md`. Report changes by file, each deviation from the plan and why, and the command results.
 - A task that writes records ends its report with a Readings list: for each line read in more than one way, the line, the reading taken, the alternative, a citation (a ledger line or a rule span) and a status: `literal`, `span-settled` or `needs-ruling`.
 - After the last records task and before the goldens task, ask the user once about the `needs-ruling` readings. Rulings go to `docs/brief.md`; the other readings go to Open items in `docs/phases/STATUS.md`.
-- A fast-track scenario (`docs/handover/fast-track.md`) is three `scenario-author` tasks, Read, Build and Finish, run in that order: ask the user about the `needs-ruling` readings once after Read, and run `reading-judge` on the render between Build and Finish.
+- A fast-track scenario (`docs/handover/fast-track.md`) is three `scenario-author` tasks, Read, Build and Finish, run in that order: ask the user about the `needs-ruling` readings once after Read, and run `reading-judge` on the render between Build and Finish; the orchestrator files a `render-gap` row as a renderer open item in `docs/phases/STATUS.md` and does not send it to the author.
 - The task that writes the table words runs `pnpm test:scenario <id> --words` and checks each sentence against `docs/design-system-table.md`, Choice tray, before it hands back.
 
 ## After each task

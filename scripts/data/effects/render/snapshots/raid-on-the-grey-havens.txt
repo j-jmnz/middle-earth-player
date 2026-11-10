@@ -1,0 +1,484 @@
+Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager; quest: 11036 The Corsairs' Assault; quest: 11037 Sahír's Advance; staging: 11038 The Havens Burn; staging: 11039 Dream-chaser; setAside: 11076 Captain Sahír; setAside: 11078 Na'asiyah)
+
+## 11036 The Corsairs' Assault
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+11036:A:1 (front): Setup: Set Captain Sahír and Na'asiyah aside, out of play. Add The Havens Burn, the Dream-chaser, and 1 copy of Sahír's Ravager to the staging area. Shuffle the encounter deck and discard cards from the top of the encounter deck until X locations with the Aflame keyword are discarded, where X is the number of players in the game. Add each discarded Aflame location to the staging area. Then, shuffle the encounter discard pile back into the encounter deck.
+  11036:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter deck
+    - [json DiscardUntilAflame {"verb":"DiscardUntilAflame","perPlayer":1}]
+    - shuffle the encounter discard pile into the encounter deck
+
+11036:B:1 (back): Forced: At the end of the combat phase, deal X damage to the Aflame location in play with the lowest Aflame value. X is the number of Corsair enemies in play.
+  11036:forced:1: Forced at the end of the phase
+    only if it is the Combat phase
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the number of Corsair enemy (any player controls) or in the staging area is at least 1: choose location (any player controls) chosen by the first player [also {"aflame":true,"lowestAflame":true}]
+    - then, if the number of Corsair enemy (any player controls) or in the staging area is at least 1 (checked when this step runs, after the steps above; not tied to whether they did anything): deal the number of Corsair enemy (any player controls) or in the staging area damage to the picked card
+
+## 11037 Sahír's Advance
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+11037:A:1 (front): When Revealed: Add Na'asiyah and Captain Sahír to the staging area, enemy side faceup. Each player reveals the top card of the encounter deck. Place resources on both Na'asiyah and Captain Sahír equal to the amount of damage on the Dream-chaser. Add 1 resource to each other Raider enemy in play.
+  11037:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json StageSetAside {"verb":"StageSetAside","code":"11078"}]
+    - [json StageSetAside {"verb":"StageSetAside","code":"11076"}]
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+    - for each enemy (any player controls) or in the staging area, named "Captain Sahír" or "Na'asiyah":
+      - place damage of "Dream-chaser" resource tokens on the picked card
+    - for each Raider enemy (any player controls) or in the staging area, not named "Captain Sahír" or "Na'asiyah":
+      - place 1 resource tokens on the picked card
+
+11037:B:1 (back): Any time players would place progress on this quest, remove an equal amount of damage from locations in play instead. (Progress is placed on the active location before triggering this effect.)
+  11037:constant:1: Constant
+    - this card: stat progressHeals 1, while this card is in play
+  11037:triggered:1: Triggered (mandatory, not printed as Forced) on the event progressReplaced
+    - [json HealLocations {"verb":"HealLocations","amount":{"x":true}}]
+
+11037:B:2 (back): Each Raider enemy revealed by the encounter deck enters play with 1 resource on it.
+  11037:forced:1: Forced after a card is revealed (heard about Raider enemy (any player controls) or in the staging area; only when the encounter deck revealed it)
+    only if not ([json condition {"kind":"revealing"}])
+    - place 1 resource tokens on the card the event is about
+
+11037:B:3 (back): If Captain Sahír is in the victory display and each location in play has no damage, the players win the game.
+  11037:constant:2: Constant
+    only if all of: ([json condition {"kind":"inVictory","code":"11076","is":true}]) and (the number of damaged location (any player controls) is at most 0)
+    - the players win the game
+
+## 11038 The Havens Burn
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+11038:A:1 (front): Forced: When a card is placed underneath The Havens Burn, reveal the top card of the encounter deck.
+  11038:forced:1: Forced on the event placedUnder (heard about location (any player controls))
+    - the acting player reveals an encounter card
+
+11038:A:2 (front): If there are X or more cards underneath The Havens Burn, the Corsairs have destroyed the Elven fleet and the players lose the game. X is 3 more than the number of players in the game.
+  11038:triggered:1: Triggered (mandatory, not printed as Forced) on the event placedUnder (heard about location (any player controls))
+    only if [json condition {"kind":"underBurn","min":3,"players":true}]
+    - the players lose the game (The Corsairs have destroyed the Elven fleet)
+
+## 11039 Dream-chaser
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+11039:A:1: Aflame 12.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+11039:A:2: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+11039:A:3 (front): The players cannot travel to the Dream-chaser.
+  11039:constant:1: Constant
+    - the players cannot travel to any location while this holds
+
+11039:A:4 (front): When the Dream-chaser is placed underneath The Havens Burn, the players lose the game.
+  11039:triggered:1: Triggered (mandatory, not printed as Forced) on the event placedUnder (heard about this card)
+    - the players lose the game (The Dream-chaser was placed underneath The Havens Burn)
+
+## 11040 Corsair Arsonist
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+11040:A:1 (front): When Revealed: Either deal 2 damage to an Aflame location in play, or search the encounter deck and discard pile for the Aflame location with the highest Aflame value, and add it to the staging area.
+  11040:whenRevealed:1: When revealed
+    - the first player chooses one of:
+      * option "damage" (only if there is a location (any player controls) [also {"aflame":true}] to choose):
+        - choose location (any player controls) chosen by the first player [also {"aflame":true}]
+        - deal 2 damage to the picked card
+      * option "search" (only if [json condition {"kind":"encounterHas","piles":"deckAndDiscard","cardType":"location","aflame":true}]):
+        - [json SearchAflame {"verb":"SearchAflame"}]
+
+## 11041 Sahír's Ravager
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+11041:A:1 (front): Forced: After Sahír's Ravager attacks, place 1 resource on it. Then, deal X damage to the Aflame location in play with the lowest Aflame value, where X is the number of resources on Sahír's Ravager.
+  11041:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - place 1 resource tokens on this card
+    - choose location (any player controls) chosen by the first player [also {"aflame":true,"lowestAflame":true}]
+    - deal resources of this card damage to the picked card
+
+## 11042 Mithlond Harbor
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+11042:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+11042:A:2 (front): While Mithlond Harbor is in the staging area, progress cannot be placed on locations in the staging area.
+  11042:constant:1: Constant
+    only if this card is in the staging area
+    - each location (any player controls) in the staging area only: stat noProgressPlaced 1, while this card is in play
+
+11042:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack for each damage token on the active location.
+  11042:shadow:1: Shadow
+    - the attacking enemy: stat attack damage of the active location, until the end of the attack
+
+## 11043 Burning Piers
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+11043:A:1: Aflame 5.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+11043:A:2 (front): Burning Piers gets +1 Threat for each damage on it.
+  11043:constant:1: Constant
+    - this card: stat threat damage of this card, while this card is in play
+
+11043:A:3 (front): Forced: When Burning Piers is placed underneath The Havens Burn, deal 3 damage to The Dream-chaser.
+  11043:forced:1: Forced on the event placedUnder (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose location (any player controls) named "Dream-chaser"
+    - deal 3 damage to the picked card
+
+11043:A:4 (shadow): Shadow: Add Burning Piers to the staging area.
+  11043:shadow:1: Shadow
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"self","to":"staging"}]
+
+## 11044 Pillaged Ship
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+11044:A:1: Aflame 5.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+11044:A:2 (front): When Revealed: Either deal 3 damage to Pillaged Ship, or add the topmost enemy in the encounter discard pile to the staging area.
+  11044:whenRevealed:1: When revealed
+    - the first player chooses one of:
+      * option "damage":
+        - deal 3 damage to this card
+      * option "discard" (only if [json condition {"kind":"encounterHas","piles":"discard","cardType":"enemy"}]):
+        - [json PickDiscardTop {"verb":"PickDiscardTop","types":["enemy"]}]
+        - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging"}]
+
+11044:A:3 (shadow): Shadow: If attacking enemy is a Raider, move all resources from defending character to attacking enemy.
+  11044:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the attacking enemy is a Raider enemy (any player controls): choose character (any player controls) defending
+    - then, if the attacking enemy is a Raider enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) [also {"attackingEnemy":true}]
+    - [json MoveResources {"verb":"MoveResources","all":true,"when":{"kind":"matches","card":"attacker","pick":{"type":"enemy","control":"any","trait":"Raider"}}}]
+
+## 11045 White Ship
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+11045:A:1: Aflame 4.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+11045:A:2 (front): Travel: Search the encounter deck and discard pile for a Corsair enemy and add it to the staging area. Shuffle the encounter deck.
+  11045:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SearchMove {"verb":"SearchMove","trait":"Corsair","type":"enemy","to":"staging"}]
+    - shuffle the encounter deck
+
+11045:A:3 (front): Forced: When White Ship is placed underneath The Havens Burn, place 1 resource on each Raider enemy in play.
+  11045:forced:1: Forced on the event placedUnder (heard about this card)
+    - for each Raider enemy (any player controls) or in the staging area:
+      - place 1 resource tokens on the picked card
+
+## 11046 Elven Wave-runner
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+11046:A:1: Aflame 3.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+11046:A:2 (front): Response: After Elven Wave-runner is added to the victory display, each player draws 1 card.
+  11046:response:1: Response after a card leaves play (heard about this card)
+    only if this card is in the victory display
+    - for each player, first player first:
+      - the acting player draws 1 card(s)
+
+11046:A:3 (shadow): Shadow: If attacking enemy is a Raider, discard a card at random from your hand and place 1 resource on attacking enemy.
+  11046:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the attacking enemy is a Raider enemy (any player controls): the acting player discards 1 random card(s) from hand
+    - then, if the attacking enemy is a Raider enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) [also {"attackingEnemy":true}]
+    - then, if the attacking enemy is a Raider enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 resource tokens on the picked card
+
+## 11047 Elven Caravel
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+11047:A:1: Aflame 4.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+11047:A:2 (front): Travel: Each player must assign damage among characters he controls equal to the amount of damage on Elven Caravel.
+  11047:travel:1: Travel
+    - [json AssignDamage {"verb":"AssignDamage","amount":{"stat":"damage","of":"self"},"pick":{"type":"character","control":"you"},"who":"eachSeat"}]
+
+11047:A:3 (front): Forced: When Elven Caravel is placed underneath The Havens Burn, deal 1 damage to each character in play.
+  11047:forced:1: Forced on the event placedUnder (heard about this card)
+    - deal 1 damage to each character (any player controls)
+
+## 11048 Put to the Torch
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+11048:A:1 (front): When Revealed: Each player must either deal 3 damage to a character he controls, or to an Aflame location in play.
+  11048:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "character" (only if there is a character (you control) to choose):
+          - choose character (you control)
+          - deal 3 damage to the picked card
+        * option "location" (only if there is a location (any player controls) [also {"aflame":true}] to choose):
+          - choose location (any player controls) [also {"aflame":true}]
+          - deal 3 damage to the picked card
+
+11048:A:2 (shadow): Shadow: If the active location has the Aflame keyword, either deal it 3 damage or deal the defending character 1 damage.
+  11048:shadow:1: Shadow
+    - the acting player chooses one of:
+      * option "location" (only if the active location is a location (any player controls) [also {"aflame":true}]):
+        - deal 3 damage to the active location
+      * option "character" (only if all of: (the active location is a location (any player controls) [also {"aflame":true}]) and (there is a character (any player controls) defending to choose)):
+        - deal 1 damage to the defender
+
+## 11049 The Fires Spread
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+11049:A:1: Doomed 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+11049:A:2 (front): When Revealed: Deal 1 damage to each Aflame location in play. If less than 3 total damage is dealt by this effect, The Fires Spread gains surge.
+  11049:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json GainSurge {"verb":"GainSurge","when":{"kind":"count","pick":{"type":"location","control":"any","aflame":true},"max":2}}]
+    - deal 1 damage to each location (any player controls) [also {"aflame":true}]
+
+11049:A:3 (shadow): Shadow: If this attack destroys a character, deal 1 damage to each Aflame location in play.
+  11049:shadow:1: Shadow
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): deal 1 damage to each location (any player controls) [also {"aflame":true}]
+
+## 11064 Umbar Raider
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+11064:A:1 (front): Umbar Raider gets +1 Attack for each resource on it.
+  11064:constant:1: Constant
+    - this card: stat attack resources of this card, while this card is in play
+
+11064:A:2 (front): Forced: After Umbar Raider attacks you, move 1 resource from one of your heroes' resource pools to Umbar Raider.
+  11064:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card; event happened to the controller)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (you control) with resources on it
+    - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"picked"}]
+    - place 1 resource tokens on this card
+
+## 11065 Corsair Infiltrator
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+11065:A:1 (front): Forced: When Corsair Infiltrator attacks, deal it 1 additional shadow card for each resource on it.
+  11065:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    - repeat resources of this card times:
+      - [json DealShadow {"verb":"DealShadow","additional":true}]
+
+11065:A:2 (front): Forced: After the engaged player collects resources at the beginning of the resource phase, that player moves 1 resource from one of his heroes' pools to Corsair Infiltrator.
+  11065:forced:2: Forced on the event resourcesCollected (event happened to the controller)
+    only if all of: (this card is engaged with the player) and (there is a hero (you control) with resources on it to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (you control) with resources on it
+    - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"picked"}]
+    - place 1 resource tokens on this card
+
+## 11066 Raid Leader
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+11066:A:1 (front): Raid Leader gets +1 Defense for each resource on it.
+  11066:constant:1: Constant
+    - this card: stat defense resources of this card, while this card is in play
+
+11066:A:2 (front): Forced: When Raid Leader engages you, move 1 resource from each of your heroes' resource pools to Raid Leader.
+  11066:forced:1: Forced after an enemy engages a player (heard about this card; event happened to the controller)
+    - [json MoveResourceFromHeroes {"verb":"MoveResourceFromHeroes","to":"self"}]
+
+## 11067 Battle-Hardened
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+11067:A:1 (front): When Revealed: Place 1 resource on each Raider enemy in play. Each engaged non-Ship enemy makes an immediate attack. If there are no engaged non-Ship enemies, Battle-Hardened gains surge.
+  11067:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each Raider enemy (any player controls) or in the staging area:
+      - place 1 resource tokens on the picked card
+    - [json ImmediateAttackEach {"verb":"ImmediateAttackEach","notTrait":"Ship"}]
+    - [json GainSurge {"verb":"GainSurge","when":{"kind":"noneReturned"}}]
+
+11067:A:2 (shadow): Shadow: If the attacking enemy is a Raider, place 2 resources on it.
+  11067:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the attacking enemy is a Raider enemy (any player controls): choose enemy (any player controls) [also {"attackingEnemy":true}]
+    - then, if the attacking enemy is a Raider enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): place 2 resource tokens on the picked card
+
+## 11076 Captain Sahír
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+11076:A:1 (front): Captain Sahír engages the first player.
+  11076:forced:1: Forced after an encounter card is added to the staging area (heard about this card)
+    - [json EngageFirstPlayer {"verb":"EngageFirstPlayer"}]
+
+11076:A:2 (front): For each point of damage Captain Sahír would take, discard 1 resource from him and cancel that damage.
+  11076:constant:1: Constant
+    - this card: stat resourceShield 1, while this card is in play
+
+11076:A:3 (front): Forced: After Captain Sahír attacks, place 2 resource tokens on him (4 instead if his attack destroyed a character).
+  11076:forced:2: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    - when the attack in progress ends:
+      - if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)): place 2 resource tokens on this card
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): place 4 resource tokens on this card
+
+## 11077 Captain Sahír
+
+11077:A:1 (front): The first player gains control of Captain Sahír.
+  11077:constant:1: Constant
+    - [json ControlledBy {"verb":"ControlledBy","who":"firstPlayer","card":"self"}]
+
+11077:A:2 (front): Captain Sahír gets +1 Willpower and +1 Attack for each resource on him (max +6).
+  11077:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat willpower resources of this card, at most 6, while this card is in play
+    - this card: stat attack resources of this card, at most 6, while this card is in play
+
+11077:A:3 (front): Action: Spend 1 resource from a hero you control to place 1 resource on Captain Sahír. (Limit once per round.)
+  11077:action:1: Action (limit once per round)
+    only if there is a hero (you control) with resources on it to choose
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (you control) with resources on it
+    - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"picked"}]
+    - place 1 resource tokens on this card
+
+11077:A:4 (front): If Captain Sahír leaves play, the players lose.
+  11077:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    - the players lose the game
+
+## 11078 Na'asiyah
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+11078:A:1 (front): Na'asiyah engages the last player.
+  11078:forced:1: Forced after an encounter card is added to the staging area (heard about this card)
+    - [json EngageLastPlayer {"verb":"EngageLastPlayer"}]
+
+11078:A:2 (front): Forced: When Na'asiyah engages you, discard each event in your hand. Add 1 resource to Na'asiyah for each event discarded in this way.
+  11078:forced:2: Forced after an enemy engages a player (heard about this card; event happened to the controller)
+    - for each card (you control) in hand, of card type event:
+      - discard the picked card
+      - place 1 resource tokens on this card
+
+11078:A:3 (front): Forced: When Na'asiyah attacks or defends, she gets +1 Attack and +1 Defense for this attack for each resource on her. After this attack, discard 1 resource from her.
+  11078:forced:4: Forced on the event enemyAttacked (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat attack resources of this card, until the end of the attack
+    - this card: stat defense resources of this card, until the end of the attack
+    - later, when the attack ends:
+      - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"self"}]
+  11078:forced:3: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat attack resources of this card, until the end of the attack
+    - this card: stat defense resources of this card, until the end of the attack
+    - when the attack in progress ends:
+      - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"self"}]
+
+## 11079 Na'asiyah
+
+11079:A:1 (front): The last player gains control of Na'asiyah.
+  11079:constant:1: Constant
+    - [json ControlledBy {"verb":"ControlledBy","who":"lastPlayer","card":"self"}]
+
+11079:A:2 (front): Action: While Na'asiyah is attacking or defending, spend 1 resource from her to give her +2 Attack or +2 Defense for this attack.
+  11079:action:2: Action (cost: pay 1 resource(s) from this card's pool)
+    only if any of: ([json condition {"kind":"attacking","card":"self"}]) or (this card is a character (any player controls) defending)
+    - the acting player chooses one of:
+      * option "attack" (only if [json condition {"kind":"attacking","card":"self"}]):
+        - this card: stat attack 2, until the end of the attack
+      * option "defense" (only if this card is a character (any player controls) defending):
+        - this card: stat defense 2, until the end of the attack
+
+11079:A:3 (front): Action: Spend 1 resource from a hero you control to place 1 resource on Na'asiyah. (Limit once per round.)
+  11079:action:1: Action (limit once per round)
+    only if there is a hero (you control) with resources on it to choose
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (you control) with resources on it
+    - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"picked"}]
+    - place 1 resource tokens on this card
+
+11079:A:4 (front): If Na'asiyah leaves play, the players lose.
+  11079:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    - the players lose the game
+
+## 11182 Raid on the Grey Havens
+
+11182:A:1 (front): You are playing Campaign Mode.
+  (inert: the engine applies it by rule, no record)
+
+11182:A:2 (front): Setup: The first player takes control of Calphon and attaches Spyglass and Black Key (boon) to him. Shuffle Graxar into the encounter deck. Each player may choose one copy of Galdor's Counsel and add it to their hand. For this game, X is plus 1 for each of those copies.
+  11182:campaignSetup:1: Campaign setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SetAside {"verb":"SetAside","code":"11180"}]
+    - [json SetAside {"verb":"SetAside","code":"11183"}]
+    - [json PutObjectiveAllyIntoPlay {"verb":"PutObjectiveAllyIntoPlay","code":"110013"}]
+    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"11188"}]
+    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11180","to":"Calphon"}]
+    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11183","to":"Calphon"}]
+    - [json ChooseCards {"verb":"ChooseCards","codes":["11184","11185","11186","11187"],"who":"eachSeat","to":"hand","optional":true,"unearned":true,"afterMulligan":true}]
+
+11182:A:3 (front): Forced: After stage 2B is revealed, remove Calphon and each attachment on him from the game, ignoring his "leaves play" ability.
+  11182:forced:1: Forced on the event afterStageRevealed
+    only if the card the event is about is a card (any player controls) named "Sahír's Advance"
+    - [json RemoveNamedFromGame {"verb":"RemoveNamedFromGame","name":"Calphon"}]
+
+11182:B:1 (back): Resolution: If Graxar is in the victory display, choose either Parrying Cutlass or Throwing Axe, add it to the Campaign Pool, and record which hero you attach it to.
+  11182:resolution:1: Resolution
+    - [json ChooseCards {"verb":"ChooseCards","codes":["11189","11190"],"who":"firstPlayer","to":"hero","anyHero":true,"when":{"kind":"inVictory","code":"11188","is":true}}]
+
+11182:B:2 (back): Add the copies of Galdor's Counsel chosen during setup to the Campaign Pool.
+  11182:resolution:2: Resolution
+    - [json EarnDealt {"verb":"EarnDealt","codes":["11184","11185","11186","11187"]}]
+
+11182:B:3 (back): Gain the following:
+  11182:resolution:3: Resolution (record also names 11182:B:4)
+    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"survivingPlayer"}}]
+
+11182:B:4 (back): • 1 XP for each surviving player.
+  11182:resolution:3: Resolution (record also names 11182:B:3)
+    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"survivingPlayer"}}]
+
+11182:B:5 (back): • 1 XP if 2 or fewer cards are underneath The Havens Burn (2 XP instead if no cards are underneath it).
+  11182:resolution:4: Resolution
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"underBurn","max":2}}]
+    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"underBurn","max":0}}]
+
+11182:B:6 (back): • 1 XP for each Elven Wave-runner in the victory display.
+  11182:resolution:5: Resolution
+    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"inVictory","codes":["11046"]}}]
+
+11182:B:7 (back): • 1 XP if Na'asiyah is in the victory display.
+  11182:resolution:6: Resolution
+    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"inVictory","code":"11078","is":true}}]
+
+11182:B:8 (back): • 1 XP if no enemies are in play.
+  11182:resolution:7: Resolution
+    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"enemyInPlay","is":false}}]
+
+11182:B:9 (back): • 1 XP if each surviving player's threat is 40 or less.
+  11182:resolution:8: Resolution
+    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"survivorsThreat","max":40}}]
+
+11182:B:10 (back): • -1 XP if Ominous Fate is in the victory display.
+  11182:resolution:9: Resolution
+    - [json GainXp {"verb":"GainXp","amount":-1,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Ominous Fate"]},"min":1}}]
+
+## 11188 Graxar
+
+11188:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+11188:A:2 (front): No more than 1 character can attack Graxar each round.
+  11188:constant:1: Constant
+    - this card: stat attackerLimit 1, while this card is in play
+
+11188:A:3 (front): Graxar gets +1 Attack for each damage on him and +1 Defense for each resource on him.
+  11188:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat attack damage of this card, while this card is in play
+    - this card: stat defense resources of this card, while this card is in play
+
+11188:A:4 (front): Forced: When Graxar is dealt a shadow card, place 1 resource on him.
+  11188:forced:1: Forced on the event shadowsDealt (event happened to the controller)
+    only if all of: (this card is engaged with the player) and (this card is a enemy (any player controls) with a shadow card)
+    - place shadowCards of this card resource tokens on this card
+
+(rendered pieces: 263 by template, 65 as JSON)

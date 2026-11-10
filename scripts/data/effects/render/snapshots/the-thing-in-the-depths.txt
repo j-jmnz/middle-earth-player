@@ -1,0 +1,374 @@
+Scenario piles that place cards with no record (staging: 11064 Umbar Raider; quest: 12039 Take the Ship!; quest: 12040 Change of Plans; quest: 12041 Defend the Ship!; staging: 12042 Helm of the Stormcaller; setAside: 12049 The Thing in the Depths; setAside: 11076 Captain Sahír; setAside: 11078 Na'asiyah; encounterDeck2: 12050 Eye of the Beast; encounterDeck2: 12051 Thrashing Arm; encounterDeck2: 12052 Crushing Arm; encounterDeck2: 12053 Grasping Arm; encounterDeck2: 12054 Giant Arm; encounterDeck2: 12055 From the Depths; encounterDeck2: 12056 Lashing Tentacles)
+
+## 110063 The Thing in the Depths
+
+110063:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110063:A:2 (front): Cannot be engaged.
+  110063:constant:1: Constant
+    - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
+
+110063:A:3 (front): The Thing in the Depths gets +3 hit points per player.
+  110063:constant:2: Constant
+    - this card: stat hitPoints the number of players x 3, while this card is in play
+
+110063:A:4 (front): Forced: When a Creature enemy is destroyed, deal damage to The Thing in the Depths equal to that enemy's Threat.
+  110063:forced:1: Forced after an enemy is destroyed (heard about Creature enemy (any player controls))
+    - deal printed threat of the card the event is about damage to this card
+
+110063:B:1 (back): Campaign Mode only.
+  (inert: the engine applies it by rule, no record)
+
+110063:B:2: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110063:B:3 (back): Cannot be engaged.
+  110063:constant:4: Constant
+    - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
+
+110063:B:4 (back): The Thing in the Depths gets +3 hit points per player.
+  110063:constant:5: Constant
+    - this card: stat hitPoints the number of players x 3, while this card is in play
+
+110063:B:5 (back): Forced: When a Creature enemy is destroyed, deal 2 damage to The Thing in the Depths.
+  110063:forced:2: Forced after an enemy is destroyed (heard about Creature enemy (any player controls))
+    - deal 2 damage to this card
+
+## 11194 The Thing in the Depths
+
+11194:A:1 (front): You are playing Campaign Mode.
+  11194:campaignSetup:1: Campaign setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SetAside {"verb":"SetAside","code":"11183"}]
+    - [json SetAside {"verb":"SetAside","code":"11192"}]
+    - [json SetAside {"verb":"SetAside","code":"11195"}]
+    - [json SetAside {"verb":"SetAside","code":"11196"}]
+    - [json FlipSetAside {"verb":"FlipSetAside","name":"The Thing in the Depths"}]
+
+11194:A:2 (front): Forced: After Captain Sahír (enemy) enters play, attach Black Key (burden) to him.
+  11194:forced:1: Forced after an encounter card is added to the staging area (heard about enemy (any player controls) or in the staging area, named "Captain Sahír")
+    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Captain Sahír"}]
+
+11194:A:3 (front): Forced: After Captain Sahír flips over, remove Black Key (burden) from the game and attach Black Key (boon) to him. Add Sea Serpent (Menacing side) to the staging area. One player adds Come Together to their hand. For this game, X is plus 1 for Come Together.
+  11194:forced:2: Forced on the event flipped (heard about card (any player controls) named "Captain Sahír")
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json RemoveCodeFromGame {"verb":"RemoveCodeFromGame","code":"11192"}]
+    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11183","to":"Captain Sahír"}]
+    - [json StageSetAside {"verb":"StageSetAside","code":"11196"}]
+    - choose player (any player controls)
+    - [json AddSetAsideToHand {"verb":"AddSetAsideToHand","code":"11195"}]
+
+11194:B:1 (back): Resolution: The players may add Come Together to the Campaign Pool.
+  11194:resolution:1: Resolution
+    - [json ChooseCards {"verb":"ChooseCards","codes":["11195"],"who":"firstPlayer","to":"pool","optional":true}]
+
+11194:B:2 (back): Gain the following:
+  11194:resolution:2: Resolution (record also names 11194:B:3)
+    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"survivingPlayer"}}]
+
+11194:B:3 (back): • 1 XP for each surviving player.
+  11194:resolution:2: Resolution (record also names 11194:B:2)
+    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"survivingPlayer"}}]
+
+11194:B:4 (back): • 1 XP if Captain Sahír has 5 or more resources.
+  11194:resolution:3: Resolution
+    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"count","pick":{"type":"card","control":"any","names":["Captain Sahír"],"minResources":5},"min":1}}]
+
+11194:B:5 (back): • 1 XP if Na'asiyah has 5 or more resources.
+  11194:resolution:4: Resolution
+    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"count","pick":{"type":"card","control":"any","names":["Na'asiyah"],"minResources":5},"min":1}}]
+
+11194:B:6 (back): • 1 XP if Sea Serpent (Enraged side) is in play (2 XP instead if it is in the victory display).
+  11194:resolution:5: Resolution
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"count","pick":{"type":"enemy","control":"any","staging":true,"names":["Sea Serpent"],"side":"B"},"min":1}}]
+    - [json GainXp {"verb":"GainXp","amount":2,"when":{"kind":"inVictory","code":"11196","is":true}}]
+
+11194:B:7 (back): • 1 XP if each hero has no damage on it.
+  11194:resolution:6: Resolution
+    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"count","pick":{"type":"hero","control":"any","damaged":true},"max":0}}]
+
+11194:B:8 (back): • 1 XP if each surviving player's threat is 40 or less (2 XP instead if their threat is 30 or less).
+  11194:resolution:7: Resolution
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"survivorsThreat","max":40}}]
+    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"survivorsThreat","max":30}}]
+
+11194:B:9 (back): • -1 XP if Ominous Fate is in the victory display.
+  11194:resolution:8: Resolution
+    - [json GainXp {"verb":"GainXp","amount":-1,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Ominous Fate"]},"min":1}}]
+
+## 12039 Take the Ship!
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+12039:A:1 (front): Setup: Build the encounter deck using only The Stormcaller and Corsair Raiders encounter sets, setting The Thing in the Depths and The Stormcaller Elite encounter sets aside, out of play (enemy side faceup). Search the encounter deck for Helm of the Stormcaller and 1 copy of Umbar Raider, and add them to the staging area. Shuffle the encounter deck.
+  12039:setup:1: Setup
+    - shuffle the encounter deck
+
+12039:B:1 (back): Captain Sahír and Na'asiyah gain indestructible.
+  12039:constant:1: Constant
+    - each enemy (any player controls) or in the staging area, named "Captain Sahír" or "Na'asiyah": stat indestructible 1, while this card is in play
+
+12039:B:2 (back): Forced: At the end of the round, if Captain Sahír and Na'asiyah are not in play, add 1 resource to each of them.
+  12039:forced:1: Forced at the end of the round
+    only if all of: (the card with code 11076 is not in play) and (the card with code 11078 is not in play)
+    - [json AddResourcesSetAside {"verb":"AddResourcesSetAside","codes":["11076","11078"],"amount":1}]
+
+12039:B:3 (back): Progress cannot be placed on this stage unless Helm of the Stormcaller is in the victory display.
+  12039:constant:2: Constant
+    - if [json condition {"kind":"inVictory","code":"12042","is":false}]: the table: stat noQuestProgress 1, while this card is in play
+
+## 12040 Change of Plans
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+12040:B:1 (back): When Revealed: Flip Captain Sahír and Na'asiyah to their objective sides, removing all tokens from them. Search the encounter deck, discard pile and all play areas for each encounter card from the Corsair Raiders encounter set and remove each of those cards from the game. Add The Thing in the Depths to the staging area. Shuffle the encounter discard pile and the previously set aside The Thing in the Depths encounter set into the encounter deck. Advance to stage 3.
+  12040:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json FlipElite {"verb":"FlipElite","name":"Captain Sahír","to":"firstPlayer"}]
+    - [json FlipElite {"verb":"FlipElite","name":"Na'asiyah","to":"lastPlayer"}]
+    - [json RemoveEncounterSet {"verb":"RemoveEncounterSet","set":"Corsair Raiders"}]
+    - [json StageSetAside {"verb":"StageSetAside","name":"The Thing in the Depths"}]
+    - shuffle the encounter discard pile into the encounter deck
+    - [json ShuffleSetAsideSet {"verb":"ShuffleSetAsideSet","set":"The Thing in the Depths"}]
+    - shuffle the encounter deck
+    - advance to the next quest stage
+
+## 12041 Defend the Ship!
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+12041:A:1 (front): When Revealed: Discard cards from the top of the encounter deck until X Tentacle enemies are discarded, where X is 1 more than the number of players in the game. Resolve the Grapple keyword on each of those enemies.
+  12041:whenRevealed:1: When revealed
+    - [json DiscardUntilGrapple {"verb":"DiscardUntilGrapple","trait":"Tentacle","count":{"players":true,"plus":1}}]
+
+12041:B:1 (back): During the travel phase, the players may travel to a location in the staging area even if another location is currently active. If they do, return the currently active location to the staging area.
+  12041:constant:1: Constant
+    - the table: stat travelOverActive 1, while this card is in play
+
+12041:B:2 (back): At the end of the round, if the total Threat of any one Ship location is 9 or higher, the Stormcaller is destroyed, and the players lose the game.
+  12041:forced:1: Forced at the end of the round
+    only if [json condition {"kind":"locationThreat","trait":"Ship","min":9}]
+    - the players lose the game (The Stormcaller was destroyed: a Ship location's Threat reached 9)
+
+12041:B:3 (back): When The Thing in the Depths is destroyed, the players win the game.
+  12041:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, named "The Thing in the Depths")
+    - the players win the game
+
+## 12042 Helm of the Stormcaller
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+12042:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12042:A:2 (front): Helm of the Stormcaller gets +1 quest point for each resource token on a Raider enemy in play.
+  12042:constant:1: Constant
+    - this card: stat questPoints the resource tokens on Raider enemy (any player controls) or in the staging area, while this card is in play
+
+12042:A:3 (front): Forced: When Helm of the Stormcaller becomes the active location, add Captain Sahír and Na'asiyah to the staging area from out of play (enemy side faceup).
+  12042:forced:1: Forced after this location becomes the active location (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json StageSetAside {"verb":"StageSetAside","code":"11078"}]
+    - [json StageSetAside {"verb":"StageSetAside","code":"11076"}]
+
+## 12043 Forecastle Deck
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12043:A:1 (front): Forced: After you travel to Forecastle Deck, search the encounter deck and discard pile for an enemy and reveal it. Shuffle the encounter deck.
+  12043:forced:1: Forced after the players travel (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player searches the encounter deck and discard pile for a enemy, reveals it and adds it to the staging area
+    - shuffle the encounter deck
+
+12043:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if defending character has no resources on it or in its resource pool).
+  12043:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the defender is a character (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the defender is a character (any player controls) with resources on it (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack minus 1, until the end of the attack
+
+## 12044 Weather Deck
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12044:A:1 (front): While Weather Deck is in the staging area, each other Deck location in play gains: "Travel: Each player must exhaust a character he controls to travel here."
+  12044:constant:1: Constant
+    only if this card is in the staging area
+    - each Deck location (any player controls) [also {"other":true}]: stat travelExhaust 1, while this card is in play
+
+12044:A:2 (shadow): Shadow: Exhaust a character you control.
+  12044:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+
+## 12045 Cargo Hold
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12045:A:1 (front): While Cargo Hold is the active location, each enemy gets +1 Defense.
+  12045:constant:1: Constant
+    only if this card is the active location
+    - each enemy (any player controls) or in the staging area: stat defense 1, while this card is in play
+
+12045:A:2 (shadow): Shadow: Until the end of the phase, attacking enemy gets +2 Defense.
+  12045:shadow:1: Shadow
+    - the attacking enemy: stat defense 2, until the end of the phase
+
+## 12046 Crew Quarters
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12046:A:1 (front): Travel: Add 1 resource to each Raider card in play to travel here.
+  12046:travel:1: Travel
+    - for each Raider card (any player controls) that is an enemy engaged with a player:
+      - place 1 resource tokens on the picked card
+
+12046:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack.
+  12046:shadow:1: Shadow
+    - the attacking enemy: stat attack 2, until the end of the attack
+
+## 12047 Quarter Deck
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12047:A:1 (front): While Quarter Deck is the active location, deal each enemy an additional shadow card at the beginning of the combat phase.
+  12047:forced:1: Forced on the event shadowsDealt
+    only if all of: (it is the Combat phase) and (this card is the active location)
+    - for each enemy (any player controls) engaged with you:
+      - [json DealShadowTo {"verb":"DealShadowTo","target":"picked"}]
+
+12047:A:2 (shadow): Shadow: Discard an attachment you control.
+  12047:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (you control)
+    - discard the picked card
+
+## 12048 Hold Steady!
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12048:A:1 (front): When Revealed: Exhaust each character with 1 Defense or less.
+  12048:whenRevealed:1: When revealed
+    - for each character (any player controls) [also {"maxDefense":1}]:
+      - exhaust the picked card
+
+12048:A:2 (shadow): Shadow: If the defending character has 0 Defense, discard it. Otherwise, the defending character gets -2 Defense for this attack.
+  12048:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (any player controls) defending [also {"maxDefense":0}]
+    - discard the picked card
+    - then, if not (the defender is a character (any player controls) [also {"maxDefense":0}]) (checked when this step runs, after the steps above; not tied to whether they did anything): the defender: stat defense -2, until the end of the attack
+
+## 12049 The Thing in the Depths
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+12049:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12049:A:2 (front): Cannot be engaged.
+  12049:constant:1: Constant
+    - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
+
+12049:A:3 (front): The Thing in the Depths gets +3 hit points per player.
+  12049:constant:2: Constant
+    - this card: stat hitPoints the number of players x 3, while this card is in play
+
+12049:A:4 (front): Forced: When a Creature enemy is destroyed, deal damage to The Thing in the Depths equal to that enemy's Threat.
+  12049:forced:1: Forced after an enemy is destroyed (heard about Creature enemy (any player controls))
+    - deal printed threat of the card the event is about damage to this card
+
+## 12050 Eye of the Beast
+(the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
+
+12050:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12050:A:2 (front): Eye of the Beast cannot attack.
+  12050:constant:1: Constant
+    - this card: stat cannotAttack 1, while this card is in play
+
+12050:A:3 (front): While Eye of the Beast is engaged with a player, The Thing in the Depths attacks that player during the combat phase (deal and resolve a shadow card for this attack).
+  12050:constant:2: Constant
+    only if this card is engaged with the player
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat relaysAttack 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "The Thing in the Depths": stat attacksViaRelay 1, while this card is in play
+
+## 12051 Thrashing Arm
+(the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
+
+12051:A:1: Grapple (lowest printed Threat).
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12051:A:2 (front): Forced: At the end of the combat phase, if Thrashing Arm is engaged with you, deal 3 damage to a character you control.
+  12051:forced:1: Forced at the end of the phase
+    only if all of: (it is the Combat phase) and (this card is engaged with the player)
+    - for each player, first player first:
+      - if [json condition {"kind":"engagedWithActor"}]: choose character (you control)
+      - then, if [json condition {"kind":"engagedWithActor"}] (checked when this step runs, after the steps above; not tied to whether they did anything): deal 3 damage to the picked card
+
+## 12052 Crushing Arm
+(the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
+
+12052:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12052:A:2: Grapple (highest printed quest points).
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12052:A:3 (front): Forced: After Crushing Arm is detached from a location, it makes an immediate attack against the first player.
+  12052:forced:1: Forced on the event grappleDetached (heard about this card)
+    - this card attacks the first player now, from the staging area
+
+## 12053 Grasping Arm
+(the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
+
+12053:A:1: Grapple (highest printed Threat).
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12053:A:2 (front): Forced: When Grasping Arm attacks, the engaged player must exhaust a character he controls.
+  12053:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+
+12053:A:3 (shadow): Shadow: If this attack is undefended, resolve Grasping Arm's Grapple keyword.
+  12053:shadow:1: Shadow
+    - [json ResolveGrapple {"verb":"ResolveGrapple","target":"self","when":{"kind":"undefended"}}]
+
+## 12054 Giant Arm
+(the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
+
+12054:A:1: Grapple (lowest printed quest points).
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12054:A:2 (front): Giant Arm gets +2 Attack when attacking allies.
+  12054:constant:1: Constant
+    - if [json condition {"kind":"versusDefender","ally":true}]: this card: stat attack 2, while this card is in play
+
+12054:A:3 (shadow): Shadow: After this attack, either put Giant Arm into play engaged with you and deal it a shadow card, or resolve its Grapple keyword.
+  12054:shadow:1: Shadow
+    - [json EngageOrGrapple {"verb":"EngageOrGrapple"}]
+
+## 12055 From the Depths
+(the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
+
+12055:A:1 (front): When Revealed: Discard the top 3 cards of the encounter deck. Resolve the Grapple keyword on each enemy discarded by this effect.
+  12055:whenRevealed:1: When revealed
+    - [json DiscardTopGrapple {"verb":"DiscardTopGrapple","count":3}]
+
+12055:A:2 (shadow): Shadow: Assign damage among characters you control equal to the number of enemies grappled with locations in the staging area.
+  12055:shadow:1: Shadow
+    - [json AssignDamage {"verb":"AssignDamage","amount":{"grappled":true},"pick":{"type":"character","control":"you"}}]
+
+## 12056 Lashing Tentacles
+(the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
+
+12056:A:1 (front): When Revealed: The Thing in the Depths attacks each player in turn order from the staging area (deal and resolve a shadow card for each attack).
+  12056:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - choose enemy (any player controls) or in the staging area, named "The Thing in the Depths"
+      - the picked enemy attacks the acting player now, from the staging area
+
+12056:A:2 (shadow): Shadow: After this attack, The Thing in the Depths makes an attack against the defending player (deal a shadow card for this attack).
+  12056:shadow:1: Shadow
+    - when the attack in progress ends:
+      - choose enemy (any player controls) or in the staging area, named "The Thing in the Depths"
+      - the picked enemy attacks the acting player now, from the staging area
+
+(rendered pieces: 156 by template, 44 as JSON)

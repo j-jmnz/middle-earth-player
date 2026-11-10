@@ -1,0 +1,447 @@
+Scenario piles that place cards with no record (staging: 11022 Scouting Ship; quest: 12120 Outmaneuver the Enemy; quest: 12121 Battle in the Bay; quest: 12122 Break Through the Fleet!; staging: 12124 Raider Flagship; setAside: 12123 Dol Amroth Warship; setAside: 110138 Duskbringer; setAside: 110139 Glórinaith; setAside: 11080 Dream-chaser; setAside: 11081 Dawn Star; setAside: 11082 Nárelenya; setAside: 11083 Silver Wing; setAside: 11084 Navigation; corsairDeck: 11060 Southron Sailor; corsairDeck: 11061 Cunning Pirate; corsairDeck: 11062 Vicious Marauder; corsairDeck: 11063 Umbar Captain; corsairDeck: 11064 Umbar Raider; corsairDeck: 11065 Corsair Infiltrator; corsairDeck: 11066 Raid Leader)
+
+## 110102 Dol Amroth Warship
+
+110102:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110102:A:2 (front): If you are on-course (Sun), Dol Amroth Warship gets +2 Willpower, +2 Attack, and +2 Defense.
+  110102:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if [json condition {"kind":"heading","is":"onCourse"}]: this card: stat willpower 2, while this card is in play
+    - then, if [json condition {"kind":"heading","is":"onCourse"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat attack 2, while this card is in play
+    - then, if [json condition {"kind":"heading","is":"onCourse"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat defense 2, while this card is in play
+
+110102:A:3 (front): Forced: When Dol Amroth Warship is destroyed, set it aside, out of play.
+  110102:forced:1: Forced on the event characterDestroyed (heard about this card)
+    - [json SetAsideSelf {"verb":"SetAsideSelf"}]
+
+110102:B:1 (back): Campaign Mode only.
+  (inert: the engine applies it by rule, no record)
+
+110102:B:2: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110102:B:3: Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110102:B:4 (back): If you are on-course (Sun), Dol Amroth Warship gets +2 Willpower, +2 Attack, and +2 Defense.
+  110102:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if [json condition {"kind":"heading","is":"onCourse"}]: this card: stat willpower 2, while this card is in play
+    - then, if [json condition {"kind":"heading","is":"onCourse"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat attack 2, while this card is in play
+    - then, if [json condition {"kind":"heading","is":"onCourse"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat defense 2, while this card is in play
+
+110102:B:5 (back): Forced: When Dol Amroth Warship is destroyed, set it aside, out of play.
+  110102:forced:2: Forced on the event characterDestroyed (heard about this card)
+    - [json SetAsideSelf {"verb":"SetAsideSelf"}]
+
+## 11209 A Storm on Cobas Haven
+
+11209:A:1 (front): You are playing Campaign Mode.
+  (inert: the engine applies it by rule, no record)
+
+11209:A:2 (front): Setup: Attach Black Key (burden) to Raider Flagship. Each player chooses a Modification boon for each of their ship-objectives and attaches it to that ship-objective. Shuffle Thunderstruck into the encounter deck. Shuffle Crowley into the Corsair deck.
+  11209:campaignSetup:1: Campaign setup (record also names 11209:A:3)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SetAside {"verb":"SetAside","code":"11172"}]
+    - [json SetAside {"verb":"SetAside","code":"11173"}]
+    - [json SetAside {"verb":"SetAside","code":"11174"}]
+    - [json SetAside {"verb":"SetAside","code":"11175"}]
+    - [json SetAside {"verb":"SetAside","code":"11192"}]
+    - [json SetAside {"verb":"SetAside","code":"11193"}]
+    - [json SetAside {"verb":"SetAside","code":"11210"}]
+    - [json SetAside {"verb":"SetAside","code":"11211"}]
+    - [json SetAside {"verb":"SetAside","code":"11212"}]
+    - [json SetAside {"verb":"SetAside","code":"11213"}]
+    - [json SetAside {"verb":"SetAside","code":"11214"}]
+    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"11177"}]
+    - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
+    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Raider Flagship"}]
+    - [json FitShips {"verb":"FitShips","codes":["11172","11173","11174","11175"]}]
+    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Calaerion","withCard":"Dream-chaser"}]
+    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Gavin","to":"anyPlayer"}]
+    - [json ChooseCards {"verb":"ChooseCards","codes":["11205","11206","11207","11208"],"who":"onePlayer","to":"hand","optional":true,"unearned":true,"afterMulligan":true}]
+
+11209:A:3 (front): Put Calaerion into play under the control of the player with the Dream-chaser. Put Gavin into play under any player's control. One player may choose a copy of Círdan's Blessing not in the Campaign Pool and add it to their hand.
+  11209:campaignSetup:1: Campaign setup (record also names 11209:A:2)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SetAside {"verb":"SetAside","code":"11172"}]
+    - [json SetAside {"verb":"SetAside","code":"11173"}]
+    - [json SetAside {"verb":"SetAside","code":"11174"}]
+    - [json SetAside {"verb":"SetAside","code":"11175"}]
+    - [json SetAside {"verb":"SetAside","code":"11192"}]
+    - [json SetAside {"verb":"SetAside","code":"11193"}]
+    - [json SetAside {"verb":"SetAside","code":"11210"}]
+    - [json SetAside {"verb":"SetAside","code":"11211"}]
+    - [json SetAside {"verb":"SetAside","code":"11212"}]
+    - [json SetAside {"verb":"SetAside","code":"11213"}]
+    - [json SetAside {"verb":"SetAside","code":"11214"}]
+    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"11177"}]
+    - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
+    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Raider Flagship"}]
+    - [json FitShips {"verb":"FitShips","codes":["11172","11173","11174","11175"]}]
+    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Calaerion","withCard":"Dream-chaser"}]
+    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Gavin","to":"anyPlayer"}]
+    - [json ChooseCards {"verb":"ChooseCards","codes":["11205","11206","11207","11208"],"who":"onePlayer","to":"hand","optional":true,"unearned":true,"afterMulligan":true}]
+
+11209:B:1 (back): Resolution: Add the Círdan's Blessing chosen during setup to the Campaign Pool. The players may spend 4 XP on Gavin to record in the Campaign Log that "Gavin returned."
+  11209:resolution:1: Resolution
+    - [json EarnDealt {"verb":"EarnDealt","codes":["11205","11206","11207","11208"]}]
+
+11209:B:2 (back): Gain the following:
+  11209:resolution:2: Resolution (record also names 11209:B:3)
+    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"survivingPlayer"}}]
+
+11209:B:3 (back): • 1 XP for each surviving player.
+  11209:resolution:2: Resolution (record also names 11209:B:2)
+    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"survivingPlayer"}}]
+
+11209:B:4 (back): • 1 XP if you ended the game on-course (Sun).
+  11209:resolution:3: Resolution
+    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"heading","is":"onCourse"}}]
+
+11209:B:5 (back): • 1 XP if 2 Dol Amroth Warships are in play.
+  11209:resolution:4: Resolution
+    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"count","pick":{"type":"character","control":"any","names":["Dol Amroth Warship"]},"min":2}}]
+
+11209:B:6 (back): • 1 XP if the players control 2 Corsair Skirmishers.
+  11209:resolution:5: Resolution
+    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"count","pick":{"type":"character","control":"any","names":["Corsair Skirmisher"]},"min":2}}]
+
+11209:B:7 (back): • 1 XP if the players control 4 Dol Amroth objectives.
+  11209:resolution:6: Resolution
+    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"count","pick":{"type":"objective","control":"any","trait":"Dol Amroth","controlled":true},"min":4}}]
+
+11209:B:8 (back): • 1 XP for each Corsair Warship in the victory display.
+  11209:resolution:7: Resolution
+    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"inVictory","codes":["11058"]}}]
+
+11209:B:9 (back): • 1 XP if Crowley is in the victory display.
+  11209:resolution:8: Resolution
+    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Crowley"]},"min":1}}]
+
+11209:B:10 (back): • 2 XP if Raider Flagship is in the victory display.
+  11209:resolution:9: Resolution
+    - [json GainXp {"verb":"GainXp","amount":2,"when":{"kind":"inVictory","code":"12124","is":true}}]
+
+11209:B:11 (back): • 2 XP if Thunderstruck is in the victory display.
+  11209:resolution:10: Resolution
+    - [json GainXp {"verb":"GainXp","amount":2,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Thunderstruck"]},"min":1}}]
+
+11209:B:12 (back): • -1 XP if Ominous Fate is in the victory display.
+  11209:resolution:11: Resolution
+    - [json GainXp {"verb":"GainXp","amount":-1,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Ominous Fate"]},"min":1}}]
+
+## 12120 Outmaneuver the Enemy
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+12120:A:1 (front): Setup: Prepare the Corsair deck. Players prepare their fleet. Set each copy of Dol Amroth Warship aside, out of play. Search the encounter deck for Raider Flagship and 1 copy of Scouting Ship, and add them to the staging area. Search the encounter deck for a Dol Amroth objective of your choice and add it to the staging area. Then, shuffle the encounter deck and resolve the Guarded keyword on that objective.
+  12120:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json PrepareCorsairDeck {"verb":"PrepareCorsairDeck"}]
+    - [json PrepareFleet {"verb":"PrepareFleet"}]
+    - [json SearchMove {"verb":"SearchMove","type":"objective","trait":"Dol Amroth","to":"staging","remember":true}]
+    - shuffle the encounter deck
+    - [json GuardObjective {"verb":"GuardObjective","target":"picked"}]
+
+12120:B:1: Sailing.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12120:B:2 (back): Forced: When a Ship enemy engages you, if you are off-course (Cloud, Rain, or Storm), deal 2 damage to a Ship objective you control. If you are on-course (Sun), deal 2 damage to that Ship enemy instead.
+  12120:forced:1: Forced after an enemy engages a player (heard about Ship enemy (any player controls) or in the staging area)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if [json condition {"kind":"heading","is":"offCourse"}]: choose Ship character (you control)
+    - [json DamageShip {"verb":"DamageShip","amount":2,"when":{"kind":"heading","is":"offCourse"}}]
+    - then, if [json condition {"kind":"heading","is":"onCourse"}] (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the card the event is about
+
+12120:B:3 (back): If your current heading is at the worst setting (Storm), Raider Flagship gets -50 engagement cost.
+  12120:constant:1: Constant
+    only if [json condition {"kind":"heading","is":"worst"}]
+    - each enemy (any player controls) or in the staging area, named "Raider Flagship": stat engagementCost -50, while this card is in play
+
+## 12121 Battle in the Bay
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+12121:A:1 (front): When Revealed: Search the encounter deck and discard pile for a Ship enemy and add it to the staging area (2 Ship enemies instead if there are 3 or more players in the game). Shuffle the encounter deck. For each unguarded objective in the staging area, attach a non-unique Ship enemy in the staging area to that objective, guarding it.
+  12121:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SearchMove {"verb":"SearchMove","type":"enemy","trait":"Ship","to":"staging"}]
+    - [json SearchMove {"verb":"SearchMove","type":"enemy","trait":"Ship","to":"staging","when":{"kind":"count","pick":{"type":"player","control":"any"},"min":3}}]
+    - shuffle the encounter deck
+    - for each objective (any player controls) in the staging area only [also {"hasGuard":false}]:
+      - choose non-unique Ship enemy (any player controls) in the staging area only [also {"isGuard":false}]
+      - [json AttachGuard {"verb":"AttachGuard","guard":"picked","to":"previous"}]
+
+12121:B:1: Sailing.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12121:B:2 (back): If your current heading is at the worst setting (Storm), Raider Flagship gets -50 engagement cost.
+  12121:constant:1: Constant
+    only if [json condition {"kind":"heading","is":"worst"}]
+    - each enemy (any player controls) or in the staging area, named "Raider Flagship": stat engagementCost -50, while this card is in play
+
+12121:B:3 (back): You cannot advance while at least 1 objective is guarded by an encounter.
+  12121:constant:2: Constant
+    only if the number of objective (any player controls) in the staging area only [also {"hasGuard":true}] is at least 1
+    - the players cannot defeat this stage while this holds
+
+## 12122 Break Through the Fleet!
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+12122:A:1 (front): When Revealed: The players make engagement checks against each enemy in the staging area. Raider Flagship gets -50 engagement cost during these engagement checks.
+  12122:whenRevealed:1: When revealed
+    - [json MakeEngagementChecks {"verb":"MakeEngagementChecks","lower":{"name":"Raider Flagship","amount":50}}]
+
+12122:B:1: Sailing.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12122:B:2 (back): Raider Flagship gets -50 engagement cost.
+  12122:constant:1: Constant
+    - each enemy (any player controls) or in the staging area, named "Raider Flagship": stat engagementCost -50, while this card is in play
+
+12122:B:3 (back): Break Through the Fleet! has +5 quest points for each Ship enemy in play.
+  12122:constant:2: Constant
+    - this card: stat questPoints the number of Ship enemy (any player controls) or in the staging area x 5, while this card is in play
+
+12122:B:4 (back): If this stage is defeated, or if Raider Flagship is in the victory display, the players have broken through the Corsair fleet and win the game!
+  12122:constant:3: Constant
+    only if [json condition {"kind":"inVictory","code":"12124","is":true}]
+    - the players win the game
+
+## 12123 Dol Amroth Warship
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+12123:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12123:A:2 (front): If you are on-course (Sun), Dol Amroth Warship gets +2 Willpower, +2 Attack, and +2 Defense.
+  12123:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if [json condition {"kind":"heading","is":"onCourse"}]: this card: stat willpower 2, while this card is in play
+    - then, if [json condition {"kind":"heading","is":"onCourse"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat attack 2, while this card is in play
+    - then, if [json condition {"kind":"heading","is":"onCourse"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat defense 2, while this card is in play
+
+12123:A:3 (front): Forced: When Dol Amroth Warship is destroyed, set it aside, out of play.
+  12123:forced:1: Forced on the event characterDestroyed (heard about this card)
+    - [json SetAsideSelf {"verb":"SetAsideSelf"}]
+
+## 12124 Raider Flagship
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+12124:A:1: Boarding 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12124:A:2: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12124:A:3 (front): Only Ship objectives can be declared as attackers against Raider Flagship.
+  12124:constant:1: Constant
+    - this card: stat shipAttackersOnly 1, while this card is in play
+
+12124:A:4 (front): Forced: At the end of the encounter phase, the engaged player reveals the top card of the Corsair deck and engages it.
+  12124:forced:1: Forced at the end of the phase
+    only if all of: (it is the Encounter phase) and (this card is engaged with the player)
+    - for each player, first player first:
+      - [json RevealCorsair {"verb":"RevealCorsair","when":{"kind":"engagedWithActor"}}]
+
+## 12125 Corsair Skirmisher
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12125:A:1: Boarding 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12125:A:2: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12125:A:3 (front): Response: After Corsair Skirmisher is destroyed as an enemy, the engaged player may discard allies he controls with a total of at least 3 Willpower to take control of Corsair Skirmisher as a Ship-Objective with Willpower equal to its Threat. (It loses the Ship-Enemy card type and gains the Ship-Objective card type).
+  12125:response:1: Response after an enemy is destroyed (heard about this card; answered by the player the event happened to)
+    only if [json condition {"kind":"alliesWillpower","min":3}]
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json DiscardAlliesForWillpower {"verb":"DiscardAlliesForWillpower","willpower":3}]
+    - [json TakeControlAsShip {"verb":"TakeControlAsShip"}]
+
+## 12126 Siege Ship
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12126:A:1: Archery 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12126:A:2 (front): Cannot have attachments.
+  12126:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+12126:A:3 (front): While Siege Ship is in the staging area, it gains: "Forced: At the end of the quest phase, if Siege Ship is not guarding an objective and there is an unguarded objective in the staging area, attach Siege Ship to that objective, guarding it."
+  12126:forced:1: Forced at the end of the phase
+    only if all of: (it is the Quest phase) and (this card is in the staging area) and (this card is a enemy (any player controls) [also {"isGuard":false}]) and (there is a objective (any player controls) in the staging area only [also {"hasGuard":false}] to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose objective (any player controls) in the staging area only [also {"hasGuard":false}]
+    - [json AttachGuard {"verb":"AttachGuard","to":"picked"}]
+
+## 12127 Heavy Cruiser
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12127:A:1: Boarding 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12127:A:2 (front): Cannot have attachments.
+  12127:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+12127:A:3 (front): When Revealed: Search the encounter deck and discard pile for a Dol Amroth objective and add it to the staging area. Then, attach Heavy Cruiser to that objective, guarding it. Shuffle the encounter deck.
+  12127:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SearchMove {"verb":"SearchMove","type":"objective","trait":"Dol Amroth","to":"staging","remember":true}]
+    - [json AttachGuard {"verb":"AttachGuard","to":"picked"}]
+    - shuffle the encounter deck
+
+## 12128 Coast of Anfalas
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12128:A:1 (front): If you are off-course (Cloud, Rain, or Storm), Coast of Anfalas gets +2 Threat.
+  12128:constant:1: Constant
+    - if [json condition {"kind":"heading","is":"offCourse"}]: this card: stat threat 2, while this card is in play
+
+12128:A:2 (front): Travel: Exhaust a Ship objective to travel here.
+  12128:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready Ship character (any player controls)
+    - exhaust the picked card
+
+12128:A:3 (shadow): Shadow: If you are off-course (Cloud, Rain, or Storm), attacking enemy gets +2 Attack.
+  12128:shadow:1: Shadow
+    - if [json condition {"kind":"heading","is":"offCourse"}]: the attacking enemy: stat attack 2, until the end of the attack
+
+## 12129 Belfalas Islet
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12129:A:1 (front): You cannot travel to Belfalas Islet if you are off-course (Cloud, Rain, or Storm).
+  12129:constant:1: Constant
+    - if [json condition {"kind":"heading","is":"offCourse"}]: the players cannot travel to any location while this holds
+
+12129:A:2 (front): Response: After you travel to Belfalas Islet, choose a Ship enemy that is not guarding an objective. While Belfalas Islet is the active location, the chosen enemy is considered to be out of play.
+  12129:response:1: Response after the players travel (heard about this card)
+    only if there is a Ship enemy (any player controls) or in the staging area [also {"isGuard":false}] to choose
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose Ship enemy (any player controls) or in the staging area [also {"isGuard":false}]
+    - [json ConsiderOutOfPlay {"verb":"ConsiderOutOfPlay"}]
+
+## 12130 Cobas Haven
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12130:A:1 (front): While Cobas Haven is the active location, reduce the Boarding X value on each Ship enemy by 1.
+  12130:constant:1: Constant
+    only if this card is the active location
+    - each Ship enemy (any player controls) or in the staging area: stat boarding -1, while this card is in play
+
+## 12131 Ramming Speed!
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12131:A:1 (front): When Revealed: If you are off-course (Cloud, Rain, or Storm), the engaged Ship enemy with the highest Attack makes an immediate attack. Until the end of the phase, add 1 to the total Threat in the staging area for each damage dealt by this attack. If no attack is made as a result of this effect, Ramming Speed! gains doomed 2.
+  12131:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if [json condition {"kind":"heading","is":"offCourse"}]: choose Ship enemy (any player controls) engaged with you [also {"highestAttack":true}]
+    - [json AttackWithPicked {"verb":"AttackWithPicked","raiseStagingThreat":"endOfPhase","when":{"kind":"heading","is":"offCourse"}}]
+    - [json Doomed {"verb":"Doomed","amount":2,"when":{"kind":"noneReturned"}}]
+
+## 12132 Taking on Water
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12132:A:1 (front): When Revealed: Attach to a Ship objective. (Counts as a Condition attachment with the text: "Forced: When attached objective exhausts, deal 2 damage to it. Action: Exhaust 3 characters you control to discard Taking on Water.")
+  12132:whenRevealed:1: When revealed
+    - [json AttachSelf {"verb":"AttachSelf","to":{"kind":"ship"}}]
+  12132:constant:1: Constant
+    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+  12132:forced:1: Forced on the event shipExhausted (heard about the host)
+    - deal 2 damage to its host
+  12132:action:1: Action
+    only if the number of ready character (you control) is at least 3
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - repeat 3 times:
+      - choose ready character (you control)
+      - exhaust the picked card
+    - discard this card
+
+12132:A:2 (shadow): Shadow: If defending character is a Ship, attach Taking on Water to it.
+  12132:shadow:1: Shadow
+    - [json AttachSelf {"verb":"AttachSelf","to":{"kind":"ship","defender":true}}]
+
+## 12133 The Raiders' Assault
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12133:A:1 (front): When Revealed: Choose a Ship enemy that is not currently guarding an objective. Attach that enemy to an unguarded objective in the staging area, guarding it (return that enemy to the staging area if it is engaged). If no Ship enemy is returned to the staging area by this effect, The Raiders' Assault gains surge.
+  12133:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if there is a objective (any player controls) in the staging area only [also {"hasGuard":false}] to choose: choose Ship enemy (any player controls) or in the staging area [also {"isGuard":false}]
+    - then, if there is a objective (any player controls) in the staging area only [also {"hasGuard":false}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): return the picked card to the staging area
+    - choose objective (any player controls) in the staging area only [also {"hasGuard":false}]
+    - [json AttachGuard {"verb":"AttachGuard","guard":"previous","to":"picked"}]
+    - [json GainSurge {"verb":"GainSurge","when":{"kind":"noneReturned"}}]
+
+## 12134 Sea-ward Tower
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12134:A:1 (front): Guarded.
+  12134:whenRevealed:1: When revealed
+    - [json GuardObjective {"verb":"GuardObjective"}]
+
+12134:A:2 (front): If Sea-ward Tower is free of encounters, add it to the staging area, controlled by the players.
+  12134:constant:1: Constant
+    - [json ControlWhenFree {"verb":"ControlWhenFree"}]
+
+12134:A:3 (front): While the players control Sea-ward Tower, look at 2 additional cards from the top of the encounter deck during each Sailing test.
+  12134:constant:2: Constant
+    only if [json condition {"kind":"controlledByPlayers"}]
+    - the table: stat sailingLook 2, while this card is in play
+
+## 12135 Tower of the Gull
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12135:A:1 (front): Guarded.
+  12135:whenRevealed:1: When revealed
+    - [json GuardObjective {"verb":"GuardObjective"}]
+
+12135:A:2 (front): If Tower of the Gull is free of encounters, add it to the staging area, controlled by the players.
+  12135:constant:1: Constant
+    - [json ControlWhenFree {"verb":"ControlWhenFree"}]
+
+12135:A:3 (front): Combat Action: If the players control Tower of the Gull, exhaust it to deal 2 damage to a non-unique Ship enemy. Any player may trigger this action.
+  12135:action:1: Action (cost: exhaust this card)
+    only if all of: (it is the Combat phase) and ([json condition {"kind":"controlledByPlayers"}]) and (there is a non-unique Ship enemy (any player controls) or in the staging area to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose non-unique Ship enemy (any player controls) or in the staging area
+    - deal 2 damage to the picked card
+
+## 12136 The Beacon
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12136:A:1 (front): Guarded.
+  12136:whenRevealed:1: When revealed
+    - [json GuardObjective {"verb":"GuardObjective"}]
+
+12136:A:2 (front): If The Beacon is free of encounters, add it to the staging area, controlled by the players.
+  12136:constant:1: Constant
+    - [json ControlWhenFree {"verb":"ControlWhenFree"}]
+
+12136:A:3 (front): Planning Action: If the players control The Beacon, exhaust it and spend 5 resources to take control of 1 set aside copy of Dol Amroth Warship. Any player may trigger this action.
+  12136:action:1: Action (cost: exhaust this card and pay 5 resource(s))
+    only if all of: (it is the Planning phase) and ([json condition {"kind":"controlledByPlayers"}])
+    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Dol Amroth Warship","to":"actor"}]
+
+## 12137 Tower of the Heron
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12137:A:1 (front): Guarded.
+  12137:whenRevealed:1: When revealed
+    - [json GuardObjective {"verb":"GuardObjective"}]
+
+12137:A:2 (front): If Tower of the Heron is free of encounters, add it to the staging area, controlled by the players.
+  12137:constant:1: Constant
+    - [json ControlWhenFree {"verb":"ControlWhenFree"}]
+
+12137:A:3 (front): While Tower of the Heron is controlled by the players, reduce the archery total by 4.
+  12137:constant:2: Constant
+    only if [json condition {"kind":"controlledByPlayers"}]
+    - this card: stat archeryBonus -4, while this card is in play
+
+(rendered pieces: 144 by template, 119 as JSON)

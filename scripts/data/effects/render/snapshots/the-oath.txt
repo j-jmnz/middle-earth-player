@@ -1,0 +1,320 @@
+Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirkwood; quest: 41001 After the Raid; quest: 41002 Mirkwood Forest; quest: 41003 The Rearguard; setAside: 41019 Goblin Troop)
+
+## 41001 After the Raid
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+41001:A:1 (front): Setup: Search the encounter deck for 1 copy of The Eaves of Mirkwood and Goblin Troop. Add The Eaves of Mirkwood to the staging area and set Goblin Troop aside, out of play. Shuffle the encounter deck.
+  41001:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AddToStaging {"verb":"AddToStaging","code":"41010"}]
+    - [json SetAside {"verb":"SetAside","code":"41019"}]
+    - shuffle the encounter deck
+
+## 41002 Mirkwood Forest
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+41002:B:1 (back): When Revealed: Each player searches the encounter deck and discard pile for a Forest location and adds it to the staging area. Shuffle the encounter deck.
+  41002:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - [json SearchMove {"verb":"SearchMove","trait":"Forest","type":"location","to":"staging"}]
+    - shuffle the encounter deck
+
+41002:B:2 (back): This stage cannot be defeated unless at least 1 copy of Goblin Trail is in the victory display.
+  41002:constant:1: Constant
+    only if [json condition {"kind":"inVictory","code":"41014","is":false}]
+    - the players cannot defeat this stage while this holds
+
+## 41003 The Rearguard
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+41003:A:1 (front): When Revealed: The first player adds the set-aside Goblin Troop to the staging area. Each other player searches the encounter deck and discard pile for a Goblin enemy and adds it to the staging area.
+  41003:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"41019"}]
+    - for each player, first player first:
+      - [json SearchMove {"verb":"SearchMove","trait":"Goblin","type":"enemy","to":"staging","when":{"kind":"not","condition":{"kind":"firstPlayer"}}}]
+
+41003:B:1 (back): This stage cannot be defeated while Goblin Troop is in play. When this stage is defeated, the heroes discover the trail to the Goblins' secret lair and the players win the game.
+  41003:constant:1: Constant
+    only if the card with code 41019 is in play
+    - the players cannot defeat this stage while this holds
+
+## 41008 Spiders of Mirkwood
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+41008:A:1 (front): While it is engaged with you, Spiders of Mirkwood gets +1 Attack for each exhausted character you control.
+  41008:constant:1: Constant
+    only if this card is engaged with the player
+    - this card: stat attack the number of exhausted character (you control), while this card is in play
+
+41008:A:2 (shadow): Shadow: Choose and exhaust 1 character you control. If this attack was undefended, also deal that character 2 damage.
+  41008:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the picked card
+
+## 41009 Great Spider
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+41009:A:1 (front): Forced: After Great Spider engages you, exhaust a character you control.
+  41009:forced:1: Forced after an enemy engages a player (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+
+41009:A:2 (shadow): Shadow: Deal 1 damage to an exhausted character you control.
+  41009:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose exhausted character (you control)
+    - deal 1 damage to the picked card
+
+## 41010 The Eaves of Mirkwood
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+41010:A:1 (front): While The Eaves of Mirkwood is the active location, encounter card effects cannot be canceled.
+  41010:constant:1: Constant
+    only if this card is the active location
+    - the table: stat encounterUncancelable 1, while this card is in play
+
+## 41011 Tangled Grove
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+41011:A:1 (front): X is the number of locations in the staging area.
+  41011:constant:1: Constant
+    - this card: stat threat the number of location (any player controls) in the staging area only, while this card is in play
+
+41011:A:2 (front): Travel: Each player must discard 1 random card from his hand to travel here.
+  41011:travel:1: Travel
+    - for each player, first player first:
+      - the acting player discards 1 random card(s) from hand
+
+## 41012 Forest Gate
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+41012:A:1 (front): Response: After you travel to Forest Gate, the first player may draw 2 cards.
+  41012:response:1: Response after the players travel
+    - the first player draws 2 card(s)
+
+## 41013 Spider Den
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+41013:A:1 (front): Quest Action: Search the encounter deck and discard pile for a Spider enemy and put it into play engaged with you to discard Spider Den. (Any player may trigger this effect.)
+  41013:action:1: Action (any player may use it)
+    only if all of: (it is the Quest phase) and ([json condition {"kind":"searchable","trait":"Spider"}])
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SearchMove {"verb":"SearchMove","trait":"Spider","type":"enemy","to":"engaged"}]
+    - discard this card
+
+## 41014 Goblin Trail
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+41014:A:1 (front): Travel: Reveal the top card of the encounter deck to travel here.
+  41014:travel:1: Travel
+    - the acting player reveals an encounter card
+
+41014:A:2 (front): Response: When Goblin Trail leaves play as an explored location, place 6 progress on the current quest.
+  41014:response:1: Response after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    - [json ProgressQuest {"verb":"ProgressQuest","amount":6}]
+
+## 41015 Abandoned Camp
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+41015:A:1 (front): Response: After the players travel to Abandoned Camp, the first player discards the top card of their deck. If that card is an ally, put it into play under their control.
+  41015:response:1: Response after the players travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json DiscardFromDeck {"verb":"DiscardFromDeck","amount":1}]
+    - choose card (you control) in the discard pile, of card type ally [also {"looked":true}]
+    - [json PutIntoPlay {"verb":"PutIntoPlay","card":"picked","who":"actor"}]
+
+41015:A:2 (front): Travel: Discard the top card of the encounter deck. If that card is an enemy, add it to the staging area.
+  41015:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"}]
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"}}}]
+
+## 41016 Driven by Shadow
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+41016:A:1 (front): When Revealed: Each enemy and each location currently in the staging area gets +1 Threat until the end of the phase. If there are no cards in the staging area, Driven by Shadow gains surge.
+  41016:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy (any player controls) in the staging area only: stat threat 1, until the end of the phase
+    - each location (any player controls) in the staging area only: stat threat 1, until the end of the phase
+    - [json GainSurge {"verb":"GainSurge","when":{"kind":"count","pick":{"type":"card","control":"any","stagingOnly":true,"other":true},"max":0}}]
+
+41016:A:2 (shadow): Shadow: Choose and discard 1 attachment from the defending character. (If this attack is undefended, discard all attachments you control.)
+  41016:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attack has no defender): choose attachment (any player controls) [also {"attachedTo":"defender"}]
+    - then, if not (the attack has no defender) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): for each attachment (you control):
+      - discard the picked card
+
+## 41017 Surprising Speed
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+41017:A:1 (front): When Revealed: Each player returns 1 enemy engaged with him to the staging area. If no enemy was returned to the staging area this way, Surprising Speed gains surge and doomed 1.
+  41017:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - return one enemy engaged with the acting player (that player picks which) to the staging area
+    - [json GainSurge {"verb":"GainSurge","when":{"kind":"noneReturned"}}]
+    - [json Doomed {"verb":"Doomed","amount":1,"when":{"kind":"noneReturned"}}]
+
+41017:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. Return attacking enemy to the staging area after this attack.
+  41017:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 41018 Caught in a Web
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+41018:A:1 (front): When Revealed: The player with the highest threat level attaches this card to one of his heroes. (Counts as a Condition attachment with the text: "Attached hero does not ready during the refresh phase unless you pay 2 resources from that hero's pool.")
+  41018:whenRevealed:1: When revealed
+    - attach this card to a hero
+  41018:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - its host: stat doesNotReady 1, while this card is in play
+    - its host: stat readyPayment 2, while this card is in play
+
+## 41019 Goblin Troop
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+41019:A:1 (front): Cannot have attachments.
+  41019:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+41019:A:2 (front): While Goblin Troop is engaged with you, each other Goblin enemy engaged with you gets +1 Attack and +1 Defense.
+  41019:constant:2: Constant
+    only if this card is engaged with the player
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each Goblin enemy (any player controls) engaged with you [also {"other":true}]: stat attack 1, while this card is in play
+    - each Goblin enemy (any player controls) engaged with you [also {"other":true}]: stat defense 1, while this card is in play
+
+41019:A:3 (shadow): Shadow: Attacking enemy gets +2 Attack.
+  41019:shadow:1: Shadow
+    - the attacking enemy: stat attack 2, until the end of the attack
+
+## 41020 Goblin Sniper
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+41020:A:1 (front): During the encounter phase, players cannot optionally engage Goblin Sniper if there are other enemies in the staging area.
+  41020:constant:1: Constant
+    only if all of: (it is the Encounter phase) and (this card is in the staging area) and (the number of enemy (any player controls) in the staging area only [also {"other":true}] is at least 1)
+    - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
+
+41020:A:2 (front): Forced: If Goblin Sniper is in the staging area at the end of the combat phase, each player deals 1 point of damage to 1 character he controls.
+  41020:forced:1: Forced at the end of the phase
+    only if all of: (it is the Combat phase) and (this card is in the staging area)
+    - for each player, first player first:
+      - choose character (you control)
+      - deal 1 damage to the picked card
+
+## 41021 Goblin Runners
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+41021:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+41021:A:2 (shadow): Shadow: Attacking enemy makes an additional attack immediately after this one. (Deal a new shadow card for that attack.)
+  41021:shadow:1: Shadow
+    - when the attack in progress ends:
+      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+
+## 41022 Goblintown Scavengers
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+41022:A:1 (front): When Revealed: Discard the top card of each player's deck. Until the end of the phase, increase Goblintown Scavengers' Threat by the total printed cost of all cards discarded in this way.
+  41022:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - [json SetX {"verb":"SetX","value":0}]
+      - [json DiscardTopOfDeck {"verb":"DiscardTopOfDeck"}]
+      - this card: stat threat X, until the end of the phase
+
+## 41023 Wild Wargs
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+41023:A:1 (front): Forced: After Wild Wargs engages you, discard the top card of the encounter deck. If that card is a Goblin enemy, put it into play engaged with you.
+  41023:forced:1: Forced after an enemy engages a player (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"}]
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"engaged","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any","trait":"Goblin"}}}]
+
+## 41024 Goblins are Upon You!
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+41024:A:1 (front): When Revealed: Each player must search the encounter deck and discard pile for a Goblin enemy and put it into play, engaged with him. Then, shuffle the encounter deck. (This effect cannot be canceled.)
+  41024:whenRevealed:1: When revealed (cannot be canceled while this card is in the staging area)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - [json SearchMove {"verb":"SearchMove","trait":"Goblin","type":"enemy","to":"engaged"}]
+    - shuffle the encounter deck
+
+41024:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each Goblin enemy engaged with you.
+  41024:shadow:1: Shadow
+    - the attacking enemy: stat attack the number of Goblin enemy (any player controls) engaged with you, until the end of the attack
+
+## 41025 Eyes in the Dark
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+41025:A:1: Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+41025:A:2 (front): When Revealed: Each player must choose: Either raise your threat by 1 for each questing character you control, or discard a questing character you control.
+  41025:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "threat":
+          - raise threat by the number of character (you control) committed to the quest (the acting player)
+        * option "discard" (only if there is a character (you control) committed to the quest to choose):
+          - choose character (you control) committed to the quest
+          - discard the picked card
+
+41025:A:3 (shadow): Shadow: If this attack is undefended, discard an ally you control.
+  41025:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the attack has no defender: choose ally (you control)
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+
+## 41026 Obsidian Arrows
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+41026:A:1 (front): When Revealed: Deal 2 damage to a character you control.
+  41026:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (you control)
+    - deal 2 damage to the picked card
+
+41026:A:2 (shadow): Shadow: Deal 1 damage to a character you control.
+  41026:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (you control)
+    - deal 1 damage to the picked card
+
+## 41050 The Oath
+
+41050:A:1 (front): You are playing Campaign Mode.
+  (inert: the engine applies it by rule, no record)
+
+41050:A:2 (front): Setup: Each player chooses 1 Adaptation boon attachment and attaches it to one of their heroes. Shuffle the Stalking Goblin burden enemy into the encounter deck. Add Stalking Goblin and each attached Adaptation to the Campaign Pool.
+  41050:campaignSetup:1: Campaign setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json ChooseCards {"verb":"ChooseCards","codes":["41044","41045","41046","41047"],"who":"eachSeat","to":"hero"}]
+    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"41041"}]
+    - [json AddToPool {"verb":"AddToPool","code":"41041"}]
+
+41050:A:3 (front): Response: At the end of each round, place 1 resource token here.
+  41050:response:1: Response at the end of the round
+    - [json PlaceToken {"verb":"PlaceToken","amount":1}]
+
+41050:B:1 (back): Resolution: If there are 6 or more resource tokens here, the thought of the captured villagers suffering weighs heavily on you. Add the Guilty Conscience treachery burden to the Campaign Pool.
+  41050:resolution:1: Resolution
+    - [json Earn {"verb":"Earn","codes":["41043"],"when":{"kind":"tokens","code":"41050","min":6}}]
+
+(rendered pieces: 150 by template, 32 as JSON)

@@ -1,0 +1,327 @@
+Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; staging: 19074 Dagnir; sideQuestDeck: 19066 Draw Her Fire; sideQuestDeck: 19067 Fortify the Defense; sideQuestDeck: 19068 Rally the Woodmen; sideQuestDeck: 19069 Douse the Flames; sideQuestDeck: 19070 Hold the Door; sideQuestDeck: 19071 Defend the Town; sideQuestDeck: 19072 Rout the Goblins; sideQuestDeck: 19073 Face the Dragon)
+
+## 12187 Fire in the Night
+
+12187:A:1 (front): You are playing campaign mode.
+  (inert: the engine applies it by rule, no record)
+
+12187:A:2 (front): Setup: The first player gains control of Beldis. If "Turayn has taken an oath of vigilance," search the encounter deck for 3 non-unique locations and remove them from the game. If "Isolde is on the hunt," search the encounter deck for 3 non-unique enemies and remove them from the game.
+  12187:campaignSetup:1: Campaign setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json PutObjectiveAllyIntoPlay {"verb":"PutObjectiveAllyIntoPlay","code":"12188"}]
+    - if the Campaign Log holds "turayn": remove 3 non-unique locations from the encounter deck
+    - if the Campaign Log holds "isolde": remove 3 non-unique enemies from the encounter deck
+
+12187:A:3 (front): Ignore the deep keyword.
+  12187:constant:1: Constant
+    - ignore the deep keyword(s)
+
+12187:A:4 (front): (Note: If you make 5 or more progress on the main quest, you will earn a treasure during quest resolution.)
+  (inert: the engine applies it by rule, no record)
+
+12187:B:1 (back): Resolution: While repairs begin on Hrogar's Hill, Beldis attends to the wounded heroes. If the heroes choose to accept her offer to join their quest, add Beldis to the campaign pool (any player may add her to their deck). Otherwise, mark in the campaign log that "Beldis's care has bolstered the heroes' spirits" (fear will have less of a hold on them).
+  12187:resolution:1: Resolution
+    - [json BoonAllyOrLogLine {"verb":"BoonAllyOrLogLine","ally":"12188","line":"beldis"}]
+
+12187:B:2 (back): If there is at least 5 progress on Hrogar's Hill, the players look at 3 random undiscovered treasures and choose 1 to attach to an eligible character.
+  12187:resolution:2: Resolution
+    - [json ChooseRandomTreasure {"verb":"ChooseRandomTreasure","count":3,"when":{"kind":"stageProgress","min":5}}]
+
+12187:B:3 (back): The players discover each treasure they control.
+  12187:resolution:3: Resolution
+    - [json DiscoverTreasure {"verb":"DiscoverTreasure"}]
+
+12187:B:4 (back): Each player may remove a non-burden card from the campaign pool.
+  12187:resolution:4: Resolution
+    - [json RemoveFromPool {"verb":"RemoveFromPool","choice":"eachPlayerNonBurden"}]
+
+## 12188 Beldis
+
+12188:A:1 (front): Action: Spend 1 resource and mark a use in the campaign log to heal 3 damage from a character. Any player may trigger this ability. (Each player has 4 uses for the campaign.)
+  12188:action:1: Action (cost: pay 1 resource(s); any player may use it)
+    only if [json condition {"kind":"beldisBox"}]
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json MarkBeldisUse {"verb":"MarkBeldisUse"}]
+    - choose character (any player controls)
+    - heal 3 damage from the picked card
+
+## 19066 Draw Her Fire
+(the scenario deals it into the sideQuestDeck pile; the piles place it, no record does)
+
+19066:A:1 (front): Shadow cards dealt to Dagnir are immune to player card effects and their effects cannot be canceled.
+  19066:constant:1: Constant
+    - each card (any player controls) named "Dagnir", that is an enemy engaged with a player: stat shadowsImmune 1, while this card is in play
+
+19066:A:2 (front): Forced: After Draw Her Fire becomes the current quest, Dagnir makes an immediate attack against the first player.
+  19066:forced:1: Forced on the event becameCurrentQuest
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Dagnir"
+    - the picked enemy attacks the first player now, from the staging area
+
+## 19067 Fortify the Defense
+(the scenario deals it into the sideQuestDeck pile; the piles place it, no record does)
+
+19067:A:1 (front): Characters do not count their Defense when defending against Dagnir.
+  19067:constant:1: Constant
+    - each card (any player controls) named "Dagnir", that is an enemy engaged with a player: stat defenseIgnored 1, while this card is in play
+
+19067:A:2 (front): Response: When Fortify the Defense is defeated, each player chooses: either draw 3 cards, or each hero he controls gains 1 resource.
+  19067:response:1: Response on the event questDefeated
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "draw":
+          - the acting player draws 3 card(s)
+        * option "resources":
+          - [json HeroesGainResources {"verb":"HeroesGainResources","amount":1}]
+
+## 19068 Rally the Woodmen
+(the scenario deals it into the sideQuestDeck pile; the piles place it, no record does)
+
+19068:A:1 (front): Allies cannot be declared as attackers against Dagnir.
+  19068:constant:1: Constant
+    - each card (any player controls) named "Dagnir", that is an enemy engaged with a player: stat alliesCannotAttack (allies cannot be declared as attackers against it) 1, while this card is in play
+
+19068:A:2 (front): Response: When Rally the Woodmen is defeated, each player searches the top 5 cards of his deck for an ally, puts it into play and shuffles his deck.
+  19068:response:1: Response on the event questDefeated
+    - for each player, first player first:
+      - choose card (you control) in the deck, among the top 5, of card type ally
+      - [json PutIntoPlay {"verb":"PutIntoPlay","card":"picked","who":"actor"}]
+      - [json ShuffleDeck {"verb":"ShuffleDeck"}]
+
+## 19069 Douse the Flames
+(the scenario deals it into the sideQuestDeck pile; the piles place it, no record does)
+
+19069:A:1 (front): Forced: At the end of the quest phase, deal 5 damage to Hrogar's Hill.
+  19069:forced:1: Forced at the end of the phase
+    only if it is the Quest phase
+    - deal 5 damage to the current quest stage
+
+19069:A:2 (front): Response: When Douse the Flames is defeated, remove 10 damage from Hrogar's Hill.
+  19069:response:1: Response on the event questDefeated
+    - heal 10 damage from the current quest stage
+
+## 19070 Hold the Door
+(the scenario deals it into the sideQuestDeck pile; the piles place it, no record does)
+
+19070:A:1 (front): Each player's threat cannot be reduced.
+  19070:constant:1: Constant
+    - each player: stat threatReductionBarred 1, while this card is in play
+
+19070:A:2 (front): Response: When Hold the Door is defeated, reduce each player's threat by 5.
+  19070:response:1: Response on the event questDefeated
+    - lower threat by 5 (each player)
+
+## 19071 Defend the Town
+(the scenario deals it into the sideQuestDeck pile; the piles place it, no record does)
+
+19071:A:1 (front): While Defend the Town is the current quest, reveal an additional encounter card during the quest phase.
+  19071:constant:1: Constant
+    only if this card holds the flag currentQuest
+    - the table: stat revealMore 1, while this card is in play
+
+19071:A:2 (front): Forced: At the end of the encounter phase, deal 1 damage to Hrogar's Hill for each enemy in the staging area.
+  19071:forced:1: Forced at the end of the phase
+    only if it is the Encounter phase
+    - deal the number of enemy (any player controls) in the staging area only damage to the current quest stage
+
+## 19072 Rout the Goblins
+(the scenario deals it into the sideQuestDeck pile; the piles place it, no record does)
+
+19072:A:1 (front): Rout the Goblins gets +5 quest points for each Goblin enemy in play.
+  19072:constant:1: Constant
+    - this card: stat questPoints the number of Goblin enemy (any player controls) or in the staging area x 5, while this card is in play
+
+19072:A:2 (front): When Revealed: Each player searches the encounter deck and discard pile for a different Goblin enemy and puts it into play engaged with him. Shuffle the encounter deck.
+  19072:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - [json SearchMove {"verb":"SearchMove","trait":"Goblin","type":"enemy","to":"engaged","different":true}]
+    - shuffle the encounter deck
+
+## 19073 Face the Dragon
+(the scenario deals it into the sideQuestDeck pile; the piles place it, no record does)
+
+19073:A:1 (front): Forced: After Dagnir attacks and destroys a character, heal 5 damage from her.
+  19073:forced:1: Forced on the event characterDestroyedByAttack
+    only if the event's other card is a card (any player controls) named "Dagnir", that is an enemy engaged with a player
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose card (any player controls) named "Dagnir", that is an enemy engaged with a player
+    - heal 5 damage from the picked card
+
+19073:A:2 (front): Forced: After Face the Dragon is defeated, deal 5 damage to Dagnir.
+  19073:forced:2: Forced on the event questDefeated
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose card (any player controls) named "Dagnir", that is an enemy engaged with a player
+    - deal 5 damage to the picked card
+
+## 19074 Dagnir
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+19074:A:1 (front): Immune to player card effects. X is 1 more than the number of side quests in the victory display.
+  (the keyword part is owned by the card's keywords; the records cover: X is 1 more than the number of side quests in the victory display.)
+  19074:constant:1: Constant
+    - this card: stat threat the number of card (any player controls) in the victory display, of card type encounter-side-quest + 1, while this card is in play
+
+19074:A:2 (front): Cannot leave the staging area or take more than X damage from non-quest effects each round.
+  19074:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
+    - this card: stat damageCap the number of card (any player controls) in the victory display, of card type encounter-side-quest + 1, while this card is in play
+    - this card: stat damageCapSparesQuest 1, while this card is in play
+
+19074:A:3 (front): While at least 3 side quests are in the victory display, Dagnir is considered to be engaged with each player.
+  19074:constant:3: Constant
+    only if 2 is less than the number of card (any player controls) in the victory display, of card type encounter-side-quest
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat engagedWithAll 1, while this card is in play
+    - this card: stat noThreatContribution 1, while this card is in play
+    - this card: stat attackableByAny 1, while this card is in play
+
+## 19075 The Dragon's Thrall
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19075:A:1 (front): Forced: After The Dragon's Thrall engages you, either deal 3 damage to Hrogar's Hill, or it makes an immediate attack against you.
+  19075:forced:1: Forced after an enemy engages a player (heard about this card)
+    - the acting player chooses one of:
+      * option "hill":
+        - deal 3 damage to the current quest stage
+      * option "attack":
+        - [json ImmediateAttackBy {"verb":"ImmediateAttackBy"}]
+
+19075:A:2 (shadow): Shadow: If this attack destroys a character, deal 3 damage to Hrogar's Hill.
+  19075:shadow:1: Shadow
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): deal 3 damage to the current quest stage
+
+## 19076 Orc of the Flame
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19076:A:1 (front): When Revealed: The first player must either deal 2 damage to a hero he controls, or deal 3 damage to Hrogar's Hill.
+  19076:whenRevealed:1: When revealed
+    - the first player chooses one of:
+      * option "hero":
+        - choose hero (you control)
+        - deal 2 damage to the picked card
+      * option "hill":
+        - deal 3 damage to the current quest stage
+
+19076:A:2 (shadow): Shadow: Attacker gets +1 Attack (+2 Attack instead if Hrogar's Hill has at least 25 damage on it).
+  19076:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (24 is less than damage of the current quest stage): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if 24 is less than damage of the current quest stage (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 19077 Town Gate
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19077:A:1 (front): While Town Gate is in the staging area, it gains: 'Forced: At the end of the quest phase, place 1 resource here. Then, if there are 3 resources here, discard Town Gate and deal 4 damage to Hrogar's Hill.'
+  19077:forced:1: Forced at the end of the phase
+    only if all of: (it is the Quest phase) and (this card is in the staging area)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - place 1 resource tokens on this card
+    - then, if 2 is less than resources of this card (checked when this step runs, after the steps above; not tied to whether they did anything): discard this card
+    - then, if 2 is less than resources of this card (checked when this step runs, after the steps above; not tied to whether they did anything): deal 4 damage to the current quest stage
+
+19077:A:2 (front): Travel: Dagnir makes an immediate attack against the first player.
+  19077:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Dagnir"
+    - the picked enemy attacks the first player now, from the staging area
+
+## 19078 Wooden Palisade
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19078:A:1 (front): While Wooden Palisade is the active location, Dagnir gets -2 Attack.
+  19078:constant:1: Constant
+    only if this card is the active location
+    - each card (any player controls) named "Dagnir", that is an enemy engaged with a player: stat attack -2, while this card is in play
+
+19078:A:2 (front): Travel: The first player readies a hero he controls.
+  19078:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (you control) chosen by the first player
+    - ready the picked card
+
+## 19079 Burning Watchtower
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19079:A:1 (front): X is 1 more than the number of side quests in the victory display.
+  19079:constant:1: Constant
+    - this card: stat threat the number of card (any player controls) in the victory display, of card type encounter-side-quest + 1, while this card is in play
+
+19079:A:2 (front): Travel: Each player assigns X damage among characters he controls.
+  19079:travel:1: Travel
+    - [json AssignDamage {"verb":"AssignDamage","amount":{"count":{"type":"card","control":"any","from":"victory","cardType":"encounter-side-quest"},"plus":1},"pick":{"type":"character","control":"you"},"who":"eachSeat"}]
+
+## 19080 Powerful in Wrath
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19080:A:1: Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+19080:A:2 (front): When Revealed: Discard the active location and deal X damage to Hrogar's Hill, where X is that location's Threat. If no damage is dealt this way, Powerful in Wrath gains surge.
+  19080:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose location (any player controls) [also {"active":true}]
+    - deal threat of the picked card damage to the current quest stage
+    - [json GainSurge {"verb":"GainSurge","when":{"kind":"not","condition":{"kind":"less","left":0,"right":{"stat":"threat","of":"picked"}}}}]
+    - discard the picked card
+
+19080:A:3 (shadow): Shadow: Excess damage from this attack must be dealt to Hrogar's Hill.
+  19080:shadow:1: Shadow
+    - [json ExcessToStage {"verb":"ExcessToStage"}]
+
+## 19081 The Dragon's Fury
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19081:A:1 (front): When Revealed: Dagnir makes an immediate attack against the first player. Undefended damage from this attack must be dealt to Hrogar's Hill.
+  19081:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Dagnir"
+    - the picked enemy attacks the first player now, from the staging area, undefended damage going to the stage
+
+19081:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
+  19081:shadow:1: Shadow
+    - when the attack in progress ends:
+      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt no shadow card
+
+## 19082 Bright Flames
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19082:A:1 (front): When Revealed: Each player assigns X damage among characters he controls, where X is 1 more than the number of side quests in the victory display.
+  19082:whenRevealed:1: When revealed
+    - [json AssignDamage {"verb":"AssignDamage","amount":{"count":{"type":"card","control":"any","from":"victory","cardType":"encounter-side-quest"},"plus":1},"pick":{"type":"character","control":"you"},"who":"eachSeat"}]
+
+19082:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each side quest in the victory display.
+  19082:shadow:1: Shadow
+    - the attacking enemy: stat attack the number of card (any player controls) in the victory display, of card type encounter-side-quest, until the end of the attack
+
+## 19083 Hrogar's Hill
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+19083:A:1 (front): Setup: Search the encounter deck for all 8 encounter side quests, shuffle them together, and place them facedown next to the quest deck. This is the side quest deck. The first player adds Dagnir to the staging area and shuffles the encounter deck. Each other player reveals an encounter card.
+  19083:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json ShufflePile {"verb":"ShufflePile","pile":"sideQuests"}]
+    - shuffle the encounter deck
+    - for each player, first player first:
+      - if not (the actor holds the first player token): the acting player reveals an encounter card
+
+19083:B:1 (back): Forced: At the end of the planning phase, reveal the top card of the side quest deck and add it to the staging area. Dagnir makes an attack against Hrogar's Hill. Do not deal a shadow card for this attack. The first player may declare a defender for this attack. Excess damage must be dealt to Hrogar's Hill.
+  19083:forced:1: Forced at the end of the phase
+    only if it is the Planning phase
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json RevealSideQuest {"verb":"RevealSideQuest"}]
+    - choose enemy (any player controls) or in the staging area, named "Dagnir"
+    - [json AttackStage {"verb":"AttackStage"}]
+
+19083:B:2 (back): This stage cannot be defeated while Dagnir has hit points remaining. If Dagnir has no hit points remaining, the players win the game. If this stage has damage equal to its quest points, the players lose the game.
+  19083:constant:1: Constant
+    only if damage of "Dagnir" is less than hit points of "Dagnir"
+    - the players cannot defeat this stage while this holds
+  19083:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, named "Dagnir")
+    - the players win the game
+  19083:constant:2: Constant
+    - this card: stat loseAtDamage quest points of this card, while this card is in play
+
+(rendered pieces: 180 by template, 20 as JSON)

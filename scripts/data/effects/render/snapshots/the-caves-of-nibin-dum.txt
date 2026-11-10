@@ -1,0 +1,311 @@
+Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-Dûm; quest: 41005 Surprise Attack; quest: 41006 The Chasm; quest: 41007 Oathkeepers; setAside: 41027 Goblin Chieftain; setAside: 41028 Cracked Pillar; attachedChosen: 41029 Cave Torch)
+
+## 41004 The Dark of Nibin-Dûm
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+41004:A:1 (front): Setup: Search the encounter deck for Goblin Chieftain, Cracked Pillar, and Cave Torch. Set Goblin Chieftain and Cracked Pillar aside, out of play. The first player attaches Cave Torch to one of his heroes. Shuffle the encounter deck.
+  41004:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SetAside {"verb":"SetAside","code":"41029"}]
+    - choose hero (you control) [also {"attachable":"41029"}]
+    - [json AttachSetAside {"verb":"AttachSetAside","code":"41029"}]
+    - shuffle the encounter deck
+
+41004:B:1 (back): When Revealed: Each player searches the encounter deck for a different location and adds it to the staging area. Shuffle the encounter deck.
+  41004:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - [json SearchMove {"verb":"SearchMove","type":"location","to":"staging","different":true}]
+    - shuffle the encounter deck
+
+## 41005 Surprise Attack
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+41005:A:1 (front): When Revealed: Add Goblin Chieftain to the staging area. Each player searches the encounter deck and discard pile for a different enemy of his choice and adds it to the staging area. Shuffle the encounter deck.
+  41005:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"41027"}]
+    - for each player, first player first:
+      - [json SearchMove {"verb":"SearchMove","type":"enemy","to":"staging","different":true}]
+    - shuffle the encounter deck
+
+41005:B:1 (back): During the encounter phase, treat each enemy's engagement cost as if it were 0.
+  41005:constant:1: Constant
+    - the table: stat engagementCostZero 1, while this card is in play
+
+41005:B:2 (back): This stage gets +4 quest points for each enemy in play.
+  41005:constant:2: Constant
+    - this card: stat questPoints the number of enemy (any player controls) or in the staging area x 4, while this card is in play
+
+## 41006 The Chasm
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+41006:A:1 (front): When Revealed: Set Goblin Chieftain aside, out of play. Add Cracked Pillar to the staging area.
+  41006:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"41027"}]
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"41028"}]
+
+41006:B:1 (back): Forced: Reveal an additional encounter card during the quest phase.
+  41006:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    - [json RevealMore {"verb":"RevealMore","amount":1}]
+
+41006:B:2 (back): Progress cannot be placed on Cracked Pillar while it is in the staging area.
+  41006:constant:1: Constant
+    - each location (any player controls) in the staging area only, named "Cracked Pillar": stat noProgressPlaced 1, while this card is in play
+
+41006:B:3 (back): After Cracked Pillar leaves play as an explored location, advance to stage 4A.
+  41006:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about location (any player controls) named "Cracked Pillar")
+    only if the card the event is about had enough progress to be explored
+    - advance to the next quest stage
+
+## 41007 Oathkeepers
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+41007:A:1 (front): When Revealed: Add Goblin Chieftain to the staging area.
+  41007:whenRevealed:1: When revealed
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"41027"}]
+
+41007:B:1 (back): While there are at least 8 progress tokens on this stage, Goblin Chieftain loses the text: "Cannot take damage."
+  41007:constant:1: Constant
+    only if [json condition {"kind":"stageProgress","min":8}]
+    - each enemy (any player controls) or in the staging area, named "Goblin Chieftain": stat losesNoDamage 1, while this card is in play
+
+41007:B:2 (back): This stage cannot be defeated while Goblin Chieftain is in play. When this stage is defeated, the heroes rescue the captives, fulfilling their oaths, and the players win the game!
+  41007:constant:2: Constant
+    only if the card with code 41027 is in play
+    - the players cannot defeat this stage while this holds
+
+## 41027 Goblin Chieftain
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+41027:A:1 (front): X is the stage number of the quest.
+  41027:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat threat the stage number of the quest, while this card is in play
+    - this card: stat attack the stage number of the quest, while this card is in play
+    - this card: stat defense the stage number of the quest, while this card is in play
+
+41027:A:2 (front): Cannot take damage. Cannot have attachments.
+  41027:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat cannotTakeDamage 1, while this card is in play
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+41027:A:3 (front): Forced: After Goblin Chieftain attacks, either remove X progress from the quest, or return it to the staging area.
+  41027:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    - the first player chooses one of:
+      * option "progress" (only if [json condition {"kind":"stageProgress","min":1}]):
+        - [json RemoveProgressFromQuest {"verb":"RemoveProgressFromQuest","amount":{"stage":true}}]
+      * option "staging":
+        - return this card to the staging area
+
+## 41028 Cracked Pillar
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+41028:A:1 (front): While Cracked Pillar is in the staging area, it gains: "The first player may declare an attack against Cracked Pillar during the combat phase as if it was an enemy engaged with him. Use Cracked Pillar's Threat as its Defense during this attack."
+  41028:constant:1: Constant
+    only if this card is in the staging area
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat attackableAsEngaged 1, while this card is in play
+    - this card: stat defense threat of this card, while this card is in play
+
+41028:A:2 (front): Travel: Remove 4 damage from Cracked Pillar to travel here.
+  41028:travel:1: Travel
+    - heal 4 damage from this card
+
+## 41029 Cave Torch
+(the scenario deals it into the attachedChosen pile; the piles place it, no record does)
+
+41029:A:1 (front): Attach to a hero. Restricted.
+  41029:constant:1: Constant
+    - [json AttachesTo {"verb":"AttachesTo","host":{"kind":"hero"}}]
+
+41029:A:2 (front): Action: Exhaust Cave Torch to place up to 3 progress tokens on a Dark location.
+  41029:action:1: Action
+    only if all of: (the card with code 41029 in play is ready) and (there is a Dark location (any player controls) to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - exhaust this card
+    - [json ChooseX {"verb":"ChooseX","max":[3]}]
+    - choose Dark location (any player controls)
+    - place X progress on the picked card
+
+41029:A:3 (front): Forced: After Cave Torch exhausts, discard the top card of the encounter deck. If that card is an enemy, add it to the staging area.
+  41029:forced:1: Forced on the event exhausted (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"}]
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"}}}]
+
+## 41030 Great Cave-troll
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+41030:A:1 (front): Cannot have attachments.
+  41030:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+41030:A:2 (front): For each point of excess combat damage dealt by Great Cave-troll (damage that is dealt beyond the remaining hit points of the character damaged by its attack) remove 1 progress from the current quest.
+  41030:constant:2: Constant
+    - this card: stat excessToQuestProgress 1, while this card is in play
+
+## 41031 Cavern Warg
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+41031:A:1 (front): Response: When Cavern Warg attacks you, exhaust Cave Torch to cancel the attack and return Cavern Warg to the staging area.
+  41031:response:1: Response on the event enemyAttacks (heard about this card)
+    only if all of: (the actor controls the card with code 41029) and (the card with code 41029 in play is ready)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - exhaust the card with code 41029
+    - [json CancelAttack {"verb":"CancelAttack"}]
+    - return this card to the staging area
+
+41031:A:2 (shadow): Shadow: If this attack destroys a character, return attacking enemy to the staging area after this attack.
+  41031:shadow:1: Shadow
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 41032 Goblin Tunnels
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+41032:A:1 (front): While Goblin Tunnels is in the staging area, it gains: "Forced: After a Goblin is revealed from the encounter deck, remove a progress token from the current quest card."
+  41032:forced:1: Forced after a card is revealed (heard about Goblin enemy (any player controls); only when the encounter deck revealed it)
+    only if this card is in the staging area
+    - [json RemoveProgressFromQuest {"verb":"RemoveProgressFromQuest","amount":1}]
+
+41032:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+3 Attack instead if attacking enemy is a Goblin.)
+  41032:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attacking enemy is a Goblin enemy (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the attacking enemy is a Goblin enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
+
+## 41033 Lightless Passage
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+41033:A:1 (front): Travel: Players must exhaust a Cave Torch to travel here.
+  41033:travel:1: Travel
+    - exhaust the card with code 41029
+
+41033:A:2 (shadow): Shadow: Cancel all combat damage dealt to attacking enemy.
+  41033:shadow:1: Shadow
+    - the attacking enemy: stat combatDamageCanceled 1, until the end of the attack
+
+## 41034 Branching Paths
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+41034:A:1 (front): While Branching Paths is in the staging area, each Dark location gets +1 Threat.
+  41034:constant:1: Constant
+    only if this card is in the staging area
+    - each Dark location (any player controls): stat threat 1, while this card is in play
+
+41034:A:2 (front): Forced: After Branching Paths leaves play as an explored location, look at the top 3 cards of the encounter deck. Players must choose 1 of those to reveal and add to the staging area, moving the other 2 to the bottom of the deck.
+  41034:forced:1: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json LookAtTop {"verb":"LookAtTop","count":3}]
+    - [json PickEncounter {"verb":"PickEncounter","from":"looked"}]
+    - [json BottomOtherLooked {"verb":"BottomOtherLooked"}]
+    - the acting player reveals an encounter card
+
+## 41035 Collapsed Mine
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+41035:A:1 (front): While Collapsed Mine is in the staging area, no more than 4 progress can be placed on the quest each round.
+  41035:constant:1: Constant
+    only if this card is in the staging area
+    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 4, while this card is in play
+
+41035:A:2 (shadow): Shadow: Raise your threat by 1 for each point of damage dealt by this attack.
+  41035:shadow:1: Shadow
+    - when the attack in progress ends:
+      - raise threat by the damage just dealt (the acting player)
+
+## 41036 Goblin Dungeon
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+41036:A:1 (front): Travel: Reveal the top card of the encounter deck to travel here.
+  41036:travel:1: Travel
+    - the acting player reveals an encounter card
+
+41036:A:2 (front): Response: After Goblin Dungeon leaves play as an explored location, the first player searches the top 5 cards of his deck for an ally and puts it into play under his control. Shuffle the rest of the searched cards back into his deck.
+  41036:response:1: Response after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose card (you control) in the deck, among the top 5, of card type ally
+    - [json PutIntoPlay {"verb":"PutIntoPlay","card":"picked","who":"actor"}]
+    - [json ShuffleDeck {"verb":"ShuffleDeck"}]
+
+## 41037 Crumbling Stairs
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+41037:A:1 (front): While Crumbling Stairs is in the staging area, progress cannot be placed on it.
+  41037:constant:1: Constant
+    only if this card is in the staging area
+    - this card: stat noProgressPlaced 1, while this card is in play
+
+41037:A:2 (front): Forced: When Crumbling Stairs leaves play as an explored location, discard the top card of the encounter deck. If the discarded card is a location, put it into play as the active location.
+  41037:forced:1: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"}]
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"activeLocation","when":{"kind":"matches","card":"picked","pick":{"type":"location","control":"any"}}}]
+
+## 41038 Crumbling Ruin
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+41038:A:1 (front): When Revealed: Each player must exhaust a character and discard the top card of his deck, if able. If the printed cost of the discarded card is equal to or higher than the remaining hit points of the exhausted character, discard the exhausted character.
+  41038:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - choose ready character (you control)
+      - exhaust the picked card
+      - [json SetX {"verb":"SetX","value":0}]
+      - [json DiscardTopOfDeck {"verb":"DiscardTopOfDeck"}]
+      - then, if [json condition {"kind":"xReachesRemaining"}] (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+
+## 41039 Lost in the Dark
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+41039:A:1 (front): When Revealed: The player who controls Cave Torch must choose: Either exhaust Cave Torch, or progress cannot be placed on the quest until the end of the phase. (Progress can still be placed on the active location.)
+  41039:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "exhaust" (only if all of: (the actor controls the card with code 41029) and (the card with code 41029 in play is ready)):
+          - exhaust the card with code 41029
+        * option "noProgress" (only if the actor controls the card with code 41029):
+          - the table: stat noQuestProgress 1, until the end of the phase
+
+41039:A:2 (shadow): Shadow: Deal 1 damage to the defending character.
+  41039:shadow:1: Shadow
+    - deal 1 damage to the defender
+
+## 41040 Watchful Eyes
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+41040:A:1 (front): When Revealed: The first player attaches Watchful Eyes to one of his heroes. (Counts as a Condition attachment with the text: "Limit 1 per hero. Forced: If attached hero is exhausted at the end of the combat phase, reveal 1 card from the encounter deck and add it to the staging area.")
+  41040:whenRevealed:1: When revealed
+    - attach this card to a hero
+  41040:constant:1: Constant
+    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+  41040:forced:1: Forced at the end of the phase
+    only if all of: (it is the Combat phase) and (its host is a exhausted hero (any player controls))
+    - the acting player reveals an encounter card
+
+## 41051 The Caves of Nibin-Dûm
+
+41051:A:1 (front): You are playing Campaign Mode.
+  (inert: the engine applies it by rule, no record)
+
+41051:A:2 (front): Setup: Each player adds 1 copy of the "No Time to Waste!" boon to their hand after drawing their starting hand (including taking a mulligan). Add each copy of "No Time to Waste!" in a player's hand to the Campaign Pool. Shuffle the Shiny Distraction burden into the encounter deck and add it to the Campaign Pool.
+  41051:campaignSetup:1: Campaign setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AddToHandAfterMulligan {"verb":"AddToHandAfterMulligan","code":"41048"}]
+    - [json AddToPool {"verb":"AddToPool","code":"41048","eachPlayer":true}]
+    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"41042"}]
+    - [json AddToPool {"verb":"AddToPool","code":"41042"}]
+
+41051:B:1 (back): Resolution: Check the final threat of the player with the highest threat: If it is under 40, you have rescued a retired Ranger who shares his wisdom with you. Each player may add 1 copy of Ranger Sense to their deck and to the Campaign Pool. At the start of your next campaign, each player may also shuffle 1 copy of Ranger Sense into their deck and add it to the Campaign Pool.
+  41051:resolution:1: Resolution
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json Earn {"verb":"Earn","codes":["41049"],"eachPlayer":true,"when":{"kind":"highestThreat","max":39}}]
+    - [json CarryOver {"verb":"CarryOver","codes":["41049"],"eachPlayer":true,"when":{"kind":"highestThreat","max":39}}]
+
+(rendered pieces: 150 by template, 36 as JSON)

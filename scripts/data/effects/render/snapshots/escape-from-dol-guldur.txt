@@ -1,0 +1,224 @@
+Scenario piles that place cards with no record (quest: 01123 The Necromancer's Tower; quest: 01124 Through the Caverns; quest: 01125 Out of the Dungeons; staging: 01108 Gandalf's Map; staging: 01109 Dungeon Torch; staging: 01110 Shadow Key; setAside: 01102 Nazgûl of Dol Guldur)
+
+## 01101 Dungeon Jailor
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01101:A:1 (front): Forced: If Dungeon Jailor is in the staging area after the players have just quested unsuccessfully, shuffle 1 unclaimed objective card from the staging area back into the encounter deck.
+  01101:forced:1: Forced after the players quest unsuccessfully (limit once per round)
+    only if all of: (this card is in the staging area) and (there is a objective (any player controls) in the staging area only, chosen by the first player to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose objective (any player controls) in the staging area only, chosen by the first player
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"shuffle"}]
+
+## 01102 Nazgûl of Dol Guldur
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+01102:A:1 (front): No attachments can be played on Nazgûl of Dol Guldur.
+  01102:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+01102:A:2 (front): Forced: When the prisoner is "rescued," move Nazgûl of Dol Guldur into the staging area.
+  01102:forced:1: Forced on the event prisonerRescued (heard about hero (any player controls))
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"self","to":"staging"}]
+
+01102:A:3 (front): Forced: After a shadow effect dealt to Nazgûl of Dol Guldur resolves, the engaged player must choose and discard 1 character he controls.
+  01102:forced:2: Forced on the event shadowEffectResolved (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (you control)
+    - discard the picked card
+
+## 01103 Cavern Guardian
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01103:A:1: Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+01103:A:2 (shadow): Shadow: Choose and discard 1 attachment you control. Discarded objective cards are returned to the staging area. (If this attack is undefended, discard all attachments you control.)
+  01103:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attack has no defender): choose attachment (you control)
+    - then, if not (the attack has no defender) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): for each attachment (you control):
+      - discard the picked card
+
+## 01104 Under the Shadow
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01104:A:1 (front): When Revealed: Until the end of the phase, raise the total Threat in the staging area by X, where X is the number of players in the game.
+  01104:whenRevealed:1: When revealed
+    - [json RaiseStagingThreat {"verb":"RaiseStagingThreat","amount":{"players":true},"until":"endOfPhase"}]
+
+01104:A:2 (shadow): Shadow: Defending player raises his threat by the number of enemies with which he is engaged.
+  01104:shadow:1: Shadow
+    - raise threat by the number of enemy (any player controls) engaged with you (the acting player)
+
+## 01105 Iron Shackles
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01105:A:1 (front): When Revealed: Attach Iron Shackles to the top of the first player's deck. (Counts as a Condition attachment with the text: "The next time a player would draw 1 or more cards from attached deck, discard Iron Shackles instead.")
+  01105:whenRevealed:1: When revealed
+    - [json AttachToDeck {"verb":"AttachToDeck","who":"firstPlayer"}]
+  01105:constant:1: Constant
+    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+
+01105:A:2 (shadow): Shadow: Resolve the "When Revealed" effect of Iron Shackles.
+  01105:shadow:1: Shadow
+    - [json ResolveWhenRevealed {"verb":"ResolveWhenRevealed","card":"self"}]
+
+## 01107 Tower Gate
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01107:A:1 (front): Forced: After travelling to Tower Gate, each player places the top card of his deck, face down in front of him, as if it just engaged him from the staging area. These cards are called "Orc Guard," and act as enemies with: 1 hit point, 1 Attack, and 1 Defense.
+  01107:forced:1: Forced after the players travel (heard about this card)
+    - for each player, first player first:
+      - [json PlaceOrcGuard {"verb":"PlaceOrcGuard"}]
+
+## 01108 Gandalf's Map
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+01108:A:1 (front): Guarded. Restricted.
+  01108:whenRevealed:1: When revealed
+    - [json GuardObjective {"verb":"GuardObjective"}]
+
+01108:A:2 (front): Action: Raise your threat by 2 to claim this objective when it is free of encounters. When claimed, attach Gandalf's Map to a hero you control. (Counts as an attachment. If detached, return Gandalf's Map to the staging area.)
+  01108:action:1: Action (cost: raise your threat by 2)
+    only if all of: (this card is in the staging area) and ([json condition {"kind":"freeOfEncounters"}])
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (you control)
+    - [json ClaimObjective {"verb":"ClaimObjective"}]
+  01108:constant:1: Constant
+    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Item"}]
+
+01108:A:3 (front): Attached hero cannot attack or defend.
+  01108:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - its host: stat cannotAttack 1, while this card is in play
+    - its host: stat cannotDefend 1, while this card is in play
+
+## 01109 Dungeon Torch
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+01109:A:1 (front): Guarded. Restricted.
+  01109:whenRevealed:1: When revealed
+    - [json GuardObjective {"verb":"GuardObjective"}]
+
+01109:A:2 (front): Action: Raise your threat by 2 to claim this objective when it is free of encounters. When claimed, attach Dungeon Torch to a hero you control. (Counts as an attachment. If detached, return Dungeon Torch to the staging area.)
+  01109:action:1: Action (cost: raise your threat by 2)
+    only if all of: (this card is in the staging area) and ([json condition {"kind":"freeOfEncounters"}])
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (you control)
+    - [json ClaimObjective {"verb":"ClaimObjective"}]
+  01109:constant:1: Constant
+    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Item"}]
+
+01109:A:3 (front): Forced: At the end of each round, raise attached hero's controller's threat by 2.
+  01109:forced:1: Forced at the end of the round
+    only if its host is a hero (any player controls)
+    - raise threat by 2 (hostController)
+
+## 01110 Shadow Key
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+01110:A:1 (front): Guarded. Restricted.
+  01110:whenRevealed:1: When revealed
+    - [json GuardObjective {"verb":"GuardObjective"}]
+
+01110:A:2 (front): Action: Raise your threat by 2 to claim this objective when it is free of encounters. When claimed, attach Shadow Key to a hero you control. (Counts as an attachment. If detached, return Shadow Key to the staging area.)
+  01110:action:1: Action (cost: raise your threat by 2)
+    only if all of: (this card is in the staging area) and ([json condition {"kind":"freeOfEncounters"}])
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (you control)
+    - [json ClaimObjective {"verb":"ClaimObjective"}]
+  01110:constant:1: Constant
+    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Item"}]
+
+01110:A:3 (front): Forced: At the end of each round, attached hero suffers 1 damage.
+  01110:forced:1: Forced at the end of the round
+    only if its host is a hero (any player controls)
+    - deal 1 damage to its host
+
+## 01123 The Necromancer's Tower
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+01123:A:1 (front): Setup: Search the encounter deck for the 3 objective cards, reveal and place them in the staging area. Also, place the Nazgûl of Dol Guldur face up but out of play, alongside the quest deck. Then, shuffle the encounter deck, and attach 1 encounter to each objective card.
+  01123:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json TurnFaceUp {"verb":"TurnFaceUp","code":"01102"}]
+    - for each objective (any player controls) in the staging area only:
+      - [json GuardObjective {"verb":"GuardObjective","target":"picked"}]
+
+01123:B:1 (back): When Revealed: Randomly select 1 hero card (among all the heroes controlled by the players) and turn it facedown. That hero is now considered a "prisoner," cannot be used, cannot be damaged, and does not collect resources, until it is "rescued" (as instructed by card effects) later in this quest.
+  01123:whenRevealed:1: When revealed
+    - [json TakePrisoner {"verb":"TakePrisoner"}]
+
+01123:B:2 (back): The players, as a group, cannot play more than 1 ally card each round.
+  01123:constant:1: Constant
+    - [json LimitPlays {"verb":"LimitPlays","cardType":"ally","max":1}]
+
+01123:B:3 (back): Players cannot advance to the next stage of this quest unless they have at least 1 objective card.
+  01123:constant:2: Constant
+    only if the number of objective (any player controls) [also {"attached":true}] is at most 0
+    - the players cannot defeat this stage while this holds
+
+## 01124 Through the Caverns
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+01124:B:1 (back): Response: After placing any number of progress tokens on this card, flip the "prisoner" hero card face-up, and place 1 damage token on it. This hero has been "rescued," and may now be used by its controller.
+  01124:response:1: Response on the event progressPlaced (heard about this card)
+    only if [json condition {"kind":"prisoner","is":true}]
+    - [json RescuePrisoner {"verb":"RescuePrisoner","damage":1}]
+
+01124:B:2 (back): The players, as a group, cannot play more than 1 ally card each round.
+  01124:constant:1: Constant
+    - [json LimitPlays {"verb":"LimitPlays","cardType":"ally","max":1}]
+
+01124:B:3 (back): Players cannot advance to the next stage of this quest unless they have rescued the prisoner and have all 3 "Escape from Dol Guldur" objective cards.
+  01124:constant:2: Constant
+    only if any of: ([json condition {"kind":"prisoner","is":true}]) or (the number of objective (any player controls) [also {"attached":true}] is at most 2)
+    - the players cannot defeat this stage while this holds
+
+## 01125 Out of the Dungeons
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+01125:B:1 (back): Forced: At the beginning of each quest phase, each player places the top card of his deck, face down in front of him, as if it just engaged him from the staging area. These cards are called "Orc Guard," and act as enemies with: 1 hit point, 1 Attack, and 1 Defense.
+  01125:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    - for each player, first player first:
+      - [json PlaceOrcGuard {"verb":"PlaceOrcGuard"}]
+
+01125:B:2 (back): Players cannot defeat this stage while Nazgûl of Dol Guldur is in play. If this stage is defeated and Nazgûl of Dol Guldur is not in play, the players have won the game.
+  01125:constant:1: Constant
+    only if the card with code 01102 is in play
+    - the players cannot defeat this stage while this holds
+
+## 01131 Escape from Dol Guldur
+
+01131:A:1 (front): You are playing Campaign Mode.
+  (inert: the engine applies it by rule, no record)
+
+01131:A:2 (front): Setup: Put Mendor into play. Attach Appointed by Fate to a hero of the first player's choice.
+  01131:campaignSetup:1: Campaign setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json PutObjectiveAllyIntoPlay {"verb":"PutObjectiveAllyIntoPlay","code":"01135"}]
+    - [json AttachChosen {"verb":"AttachChosen","code":"01134"}]
+
+01131:A:3 (front): Forced: When a hero would be randomly selected to be a "prisoner," the "prisoner" from the Campaign Log is selected instead. Each card attached to that hero is turned facedown until that hero is "rescued." Mendor is captured as well. Place Mendor facedown next to the prisoner (this does not cause him to leave play). Flip this card over.
+  01131:forced:1: Forced on the event prisonerTaken (heard about hero (any player controls))
+    only if this card shows side A
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SelectLoggedPrisoner {"verb":"SelectLoggedPrisoner"}]
+    - [json CaptureWithPrisoner {"verb":"CaptureWithPrisoner","code":"01135"}]
+    - [json FlipCard {"verb":"FlipCard"}]
+
+01131:B:1 (back): Response: After the first objective is claimed, flip Mendor face-up and place 1 damage token on him.
+  01131:response:1: Response on the event claimed (heard about objective (any player controls); limit once per game)
+    only if all of: (this card shows side B) and (the number of objective (any player controls) [also {"attached":true}] is at most 1)
+    - [json FreeCaptive {"verb":"FreeCaptive","code":"01135","damage":1}]
+
+01131:B:2 (back): Resolution: Determine one of the following: 1) If Mendor is still in play, add Mendor to the Campaign Pool. If you do, put Mendor into play at the start of each scenario during your next campaign. Each player may include 1 copy of Mendor's Support in their deck during that campaign. 2) If Mendor is not in play, do not adjust the Campaign Pool for your next campaign.
+  01131:resolution:1: Resolution
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json CarryOver {"verb":"CarryOver","codes":["01135"],"when":{"kind":"inPlay","code":"01135","is":true}}]
+    - [json CarryOver {"verb":"CarryOver","codes":["01132"],"eachPlayer":true,"when":{"kind":"inPlay","code":"01135","is":true}}]
+
+(rendered pieces: 102 by template, 39 as JSON)

@@ -1,0 +1,292 @@
+Scenario piles that place cards with no record (quest: 19168 Urdug's Assault; quest: 19169 Outflanked; quest: 19170 The Final Push; staging: 19155 The Goblins' Assault; staging: 19156 The Heroes' Defense; staging: 19157 Urdug)
+
+## 12195 The Fate of Wilderland
+
+12195:A:1 (front): You are playing campaign mode.
+  (inert: the engine applies it by rule, no record)
+
+12195:A:2 (front): Setup: Each player may search their deck for a boon or treasure card and add it to their hand. If "Turayn has taken an oath of vigilance," search the encounter deck for 3 non-unique enemies and remove them from the game. If "Beldis's care has bolstered the heroes' spirits," search the encounter deck for 3 treacheries and remove them from the game.
+  12195:campaignSetup:1: Campaign setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each player may search their deck for a boon or treasure card and add it to their hand
+    - if the Campaign Log holds "turayn": remove 3 non-unique enemies from the encounter deck
+    - if the Campaign Log holds "beldis": remove 3 treacheries from the encounter deck
+
+12195:A:3 (front): Ignore the deep and discover keywords.
+  12195:constant:1: Constant
+    - ignore the deep and discover keyword(s)
+
+12195:B:1 (back): Resolution: The players win the campaign!
+  12195:resolution:1: Resolution
+    (no instructions)
+
+## 19155 The Goblins' Assault
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+19155:A:1 (front): Urdug gets +2 Defense for each other enemy in play and cannot be dealt damage unless he has resolved an attack this phase.
+  19155:constant:1: Constant
+    - each enemy (any player controls) or in the staging area, named "Urdug": stat defense the number of enemy (any player controls) or in the staging area x 2 - 2, while this card is in play
+  19155:constant:2: Constant
+    only if not ("Urdug" has resolved an attack this phase)
+    - each enemy (any player controls) or in the staging area, named "Urdug": stat cannotTakeDamage 1, while this card is in play
+
+19155:A:2 (front): Forced: After the players quest unsuccessfully, place 1 progress here for each player in the game.
+  19155:forced:1: Forced after the players quest unsuccessfully (limit once per round)
+    - place the number of players progress on this card
+
+## 19156 The Heroes' Defense
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+19156:A:1 (front): While there are X or more resources on The Heroes' Defense, Urdug is considered to be engaged with each player. X is five times the number of players.
+  19156:constant:1: Constant
+    only if the number of players x 5 - 1 is less than resources of this card
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy (any player controls) or in the staging area, named "Urdug": stat engagedWithAll 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Urdug": stat noThreatContribution 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Urdug": stat attackableByAny 1, while this card is in play
+
+19156:A:2 (front): Response: After an enemy is destroyed, place 1 resource here.
+  19156:response:1: Response after an enemy is destroyed (heard about enemy (any player controls) or in the staging area)
+    only if this card does not hold the flag noResourcesPlaced
+    note: its whole effect is barred by the flag noResourcesPlaced (set by 19161:constant:1) and the record is NOT offered while it bars
+    - place 1 resource tokens on this card
+
+## 19157 Urdug
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+19157:A:1 (front): Immune to player card effects. Cannot leave the staging area.
+  (the keyword part is owned by the card's keywords; the records cover: Cannot leave the staging area.)
+  19157:constant:1: Constant
+    - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
+
+19157:A:2 (front): Forced: When Urdug attacks, discard the top card of the encounter deck. He gets +X Attack for this attack, where X is the discarded card's printed Threat.
+  19157:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard 1 card(s) from the top of the encounter deck
+    - this card: stat attack printed threat of the top card of the encounter discard pile, until the end of the attack
+
+19157:A:3 (front): When Urdug is destroyed, the players win the game.
+  19157:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about this card)
+    - the players win the game
+
+## 19158 Urdug's Elite
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19158:A:1 (front): Forced: After Urdug's Elite engages you, either exhaust a character you control, or place 1 progress on The Goblins' Assault.
+  19158:forced:1: Forced after an enemy engages a player (heard about this card)
+    - the acting player chooses one of:
+      * option "exhaust" (only if there is a ready character (you control) to choose):
+        - choose ready character (you control)
+        - exhaust the picked card
+      * option "progress":
+        - choose objective (any player controls) or in the staging area, named "The Goblins' Assault"
+        - place 1 progress on the picked card
+
+19158:A:2 (shadow): Shadow: Exhaust a character you control.
+  19158:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+
+## 19159 Fierce Vanguard
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19159:A:1 (front): Forced: After Fierce Vanguard engages you, either it gets +2 Attack until the end of the round, or place 1 progress on The Goblins' Assault.
+  19159:forced:1: Forced after an enemy engages a player (heard about this card)
+    - the acting player chooses one of:
+      * option "attack":
+        - this card: stat attack 2, until the end of the round
+      * option "progress":
+        - choose objective (any player controls) or in the staging area, named "The Goblins' Assault"
+        - place 1 progress on the picked card
+
+19159:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack and +2 Defense until the end of the phase.
+  19159:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 2, until the end of the phase
+    - the attacking enemy: stat defense 2, until the end of the phase
+
+## 19160 Warg-rider
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19160:A:1 (front): Forced: After Warg-rider is dealt a shadow card with no effect, either return it to the staging area or place 1 progress on The Goblins' Assault.
+  19160:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    only if the enemy held a shadow card with no shadow effect (read when the attack ends, as the card the event is about)
+    - the acting player chooses one of:
+      * option "staging":
+        - return this card to the staging area
+      * option "progress":
+        - choose objective (any player controls) or in the staging area, named "The Goblins' Assault"
+        - place 1 progress on the picked card
+
+## 19161 Gate of Gundabad
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19161:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+19161:A:2 (front): While Gate of Gundabad is in the staging area, resources cannot be placed on The Heroes' Defense.
+  19161:constant:1: Constant
+    only if this card is in the staging area
+    - each objective (any player controls) or in the staging area, named "The Heroes' Defense": stat noResourcesPlaced 1, while this card is in play
+
+19161:A:3 (front): Travel: Search the encounter deck, discard pile, and victory display for a Goblin Troop and add it to the staging area. Shuffle the encounter deck.
+  19161:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - search for the card with code 18020 and add it to the staging area
+    - shuffle the encounter deck
+
+## 19162 Hilltop Battlements
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19162:A:1 (front): While Hilltop Battlements is in the staging area, each non-unique enemy gets -5 engagement cost.
+  19162:constant:1: Constant
+    only if this card is in the staging area
+    - each non-unique enemy (any player controls) or in the staging area: stat engagementCost -5, while this card is in play
+
+19162:A:2 (front): Forced: When Hilltop Battlements is explored, discard the top X cards of the encounter deck, where X is the number of players in the game. Add each enemy discarded by this effect to the staging area.
+  19162:forced:1: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard the number of players card(s) from the top of the encounter deck
+    - add the discarded enemies to the staging area
+
+## 19163 Dwarven Watchtower
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19163:A:1 (front): While Dwarven Watchtower is the active location, each hero gets +1 Defense.
+  19163:constant:1: Constant
+    only if this card is the active location
+    - every hero in play: stat defense 1, while this card is in play
+
+19163:A:2 (front): Response: After Dwarven Watchtower is explored, the first player chooses: either place 1 resource on The Heroes' Defense, or remove 1 progress from The Goblins' Assault.
+  19163:response:1: Response after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    - the first player chooses one of:
+      * option "resource" (only if not (the card in play titled "The Heroes' Defense" holds the flag noResourcesPlaced)):
+        - choose objective (any player controls) or in the staging area, named "The Heroes' Defense"
+        - place 1 resource tokens on the picked card
+      * option "progress" (only if 0 is less than progress of "The Goblins' Assault"):
+        - remove 1 progress from "The Goblins' Assault"
+
+## 19164 Slopes of Gundabad
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19164:A:1 (front): When Revealed: Either place 1 progress on The Goblins' Assault, or reveal an additional encounter card.
+  19164:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "progress":
+        - choose objective (any player controls) or in the staging area, named "The Goblins' Assault"
+        - place 1 progress on the picked card
+      * option "reveal":
+        - the acting player reveals an encounter card
+
+19164:A:2 (shadow): Shadow: Attacking enemy cannot take damage this phase.
+  19164:shadow:1: Shadow
+    - the attacking enemy: stat cannotTakeDamage 1, until the end of the phase
+
+## 19165 Fierce Attack
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19165:A:1: Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+19165:A:2 (front): When Revealed: Place X progress on The Goblins' Assault, where X is the stage number of the main quest.
+  19165:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose objective (any player controls) or in the staging area, named "The Goblins' Assault"
+    - place the stage number of the quest progress on the picked card
+
+19165:A:3 (shadow): Shadow: Attacking enemy gets +X Attack, where X is the stage number of the main quest.
+  19165:shadow:1: Shadow
+    - the attacking enemy: stat attack the stage number of the quest, until the end of the attack
+
+## 19166 Urdug's Command
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19166:A:1 (front): When Revealed: Urdug makes an immediate attack against the first player. If this attack destroys a character, place 1 progress on The Goblins' Assault.
+  19166:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Urdug"
+    - the picked enemy attacks the first player now, from the staging area
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): choose objective (any player controls) or in the staging area, named "The Goblins' Assault"
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 progress on the picked card
+
+19166:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, place 1 progress on The Goblins' Assault.
+  19166:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): choose objective (any player controls) or in the staging area, named "The Goblins' Assault"
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 progress on the picked card
+
+## 19167 Dark Clouds
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19167:A:1 (front): When Revealed: Each enemy and each location in the staging area gets +1 Threat until the end of the phase. If the players quest unsuccessfully this phase, place 1 progress on The Goblins' Assault.
+  19167:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - every enemy and location in the staging area, now and arriving there later while the effect lasts: stat threat 1, until the end of the phase
+    - later, if the players quest unsuccessfully this phase (never, if they do not):
+      - choose objective (any player controls) or in the staging area, named "The Goblins' Assault"
+      - place 1 progress on the picked card
+
+19167:A:2 (shadow): Shadow: Discard a non-objective attachment you control.
+  19167:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (you control) that is not an objective
+    - discard the picked card
+
+## 19168 Urdug's Assault
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+19168:A:1 (front): Setup: Add The Goblins' Assault, The Heroes' Defense, and Urdug to the staging area. Shuffle the encounter deck and discard cards from the top until X enemies are discarded, where X is the number of players in the game. Add those enemies to the staging area.
+  19168:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter deck
+    - discard from the top of the encounter deck until 1 enemy for each player is discarded; add those enemies to the staging area
+
+19168:B:1 (back): Forced: At the end of the round, place 1 progress on The Goblins' Assault for each enemy in the staging area. Then, if there is X or more progress on The Goblins' Assault, advance. X is equal to 2, plus 2 per player.
+  19168:forced:1: Forced at the end of the round
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose objective (any player controls) or in the staging area, named "The Goblins' Assault"
+    - place the number of enemy (any player controls) in the staging area only progress on the picked card
+    - then, if the number of players x 2 + 1 is less than progress of "The Goblins' Assault" (checked when this step runs, after the steps above; not tied to whether they did anything): advance to the next quest stage
+
+## 19169 Outflanked
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+19169:A:1 (front): When Revealed: Shuffle the encounter discard pile into the encounter deck and discard cards from the top until X enemies are discarded, where X is number of players in the game. Add those enemies to the staging area.
+  19169:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - discard from the top of the encounter deck until 1 enemy for each player is discarded; add those enemies to the staging area
+
+19169:B:1 (back): Forced: After an enemy attacks, place 1 progress on The Goblins' Assault.
+  19169:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about enemy (any player controls) or in the staging area)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose objective (any player controls) or in the staging area, named "The Goblins' Assault"
+    - place 1 progress on the picked card
+
+19169:B:2 (back): Forced: At the end of the round, if there is X or more progress on The Goblins' Assault, advance. X is equal to 4, plus 4 per player.
+  19169:forced:2: Forced at the end of the round
+    - if the number of players x 4 + 3 is less than progress of "The Goblins' Assault": advance to the next quest stage
+
+## 19170 The Final Push
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+19170:A:1 (front): When Revealed: Shuffle the encounter discard pile into the encounter deck and discard cards from the top until X enemies are discarded, where X is the number of players in the game. Add those enemies to the staging area.
+  19170:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - discard from the top of the encounter deck until 1 enemy for each player is discarded; add those enemies to the staging area
+
+19170:B:1 (back): Forced: At the end of the round, place 1 progress on The Goblins' Assault for each enemy in play. Then, if there is X or more progress on The Goblins' Assault, the players lose the game. X is equal to 8, plus 8 per player.
+  19170:forced:1: Forced at the end of the round
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose objective (any player controls) or in the staging area, named "The Goblins' Assault"
+    - place the number of enemy (any player controls) or in the staging area progress on the picked card
+    - then, if the number of players x 8 + 7 is less than progress of "The Goblins' Assault" (checked when this step runs, after the steps above; not tied to whether they did anything): the players lose the game (The Goblins' Assault holds as much progress as the players can bear)
+
+(rendered pieces: 195 by template, 0 as JSON)

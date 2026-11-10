@@ -4,7 +4,8 @@
 export type Tally = { template: number; json: number };
 // `effects` and `cardName` are the card being rendered and the records around it, read by the barred-effect note (bars.ts).
 // `attacker`: the instructions run when an attack ends (AfterAttack), where "this card" is the attacking enemy whose shadow it is.
-export type Ctx = { tally: Tally; effects?: readonly Obj[]; cardName?: string; attacker?: boolean };
+// `reads`: set by read-fields.test.ts to collect the keys each finished template claimed (the last entry is the outermost piece), so the test can check each one shows in the English.
+export type Ctx = { tally: Tally; effects?: readonly Obj[]; cardName?: string; attacker?: boolean; reads?: (readonly string[])[] };
 export type Obj = Readonly<Record<string, unknown>>;
 
 export const newCtx = (extra: { effects?: readonly Obj[]; cardName?: string } = {}): Ctx => ({ tally: { template: 0, json: 0 }, ...extra });
@@ -23,6 +24,7 @@ export function without(obj: Obj, keys: readonly string[]): Obj {
 
 // Finishes a template: the text, plus whatever keys the template did not read.
 export function done(ctx: Ctx, text: string, obj: Obj, read: readonly string[]): string {
+  ctx.reads?.push(read);
   const rest = without(obj, read);
   if (Object.keys(rest).length === 0) {
     ctx.tally.template += 1;

@@ -22,7 +22,7 @@ Each agent reads its own file.
 - `.claude/agents/effect-author.md` — Writes effect records for card lines no template reads (~1.1K tok)
 - `.claude/agents/implementer.md` — Implements one phase from docs/phases (~1.4K tok)
 - `.claude/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~2.0K tok)
-- `.claude/agents/reading-judge.md` — Reads each effect record, rendered as English, against the printed ledger line it implements and says ok, wrong or ambiguous (~860 tok)
+- `.claude/agents/reading-judge.md` — Reads each effect record, rendered as English, against the printed ledger line it implements and says ok, wrong, ambiguous or render-gap (~950 tok)
 - `.claude/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~2.4K tok)
 - `.claude/agents/scenario-author.md` — Builds one scenario on the fast track (docs/handover/fast-track.md) as three tasks the orchestrator runs in turn: Read, Build and Finish (~890 tok)
 - `.claude/agents/ux.md` — Reviews the current screens for phone UX and visual design, and changes the design system when asked (~1.3K tok)

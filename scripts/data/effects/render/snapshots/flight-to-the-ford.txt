@@ -1,0 +1,307 @@
+Scenario piles that place cards with no record (quest: 141028 Pursued by the Enemy; quest: 141029 Race to Rivendell; staging: 141058 The Last Bridge; staging: 141063 Fell Rider; setAside: 141059 Ford of Bruinen; setAside: 141068 The Witch-king; attached: 141057 An Evil Wound; burden: 141080 Weight of the Ring; burden: 141081 Fear of Discovery; burden: 141082 Eaten Alive!; burden: 141083 Panicked; burden: 141084 Overcome by Terror)
+
+## 141028 Pursued by the Enemy
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+141028:A:1 (front): Setup: Shuffle each burden card from the Flight to the Ford burden set into a Burden deck. Attach An Evil Wound to the Ring-bearer. Set Ford of Bruinen and The Witch-king aside, out of play. Add The Last Bridge and 1 Fell Rider per player to the staging area. Set the Ring-bearer's life at 15. Shuffle the encounter deck.
+  141028:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json ShuffleBurdenDeck {"verb":"ShuffleBurdenDeck"}]
+    - [json AttachToRingBearer {"verb":"AttachToRingBearer","code":"141057"}]
+    - [json SetAside {"verb":"SetAside","code":"141059"}]
+    - [json SetAside {"verb":"SetAside","code":"141068"}]
+    - [json AddToStaging {"verb":"AddToStaging","code":"141058"}]
+    - [json AddToStaging {"verb":"AddToStaging","code":"141063"}]
+    - [json SetLife {"verb":"SetLife","value":15}]
+    - shuffle the encounter deck
+
+141028:B:1 (back): The players cannot advance unless The Last Bridge is in the victory display.
+  141028:constant:1: Constant
+    only if [json condition {"kind":"inVictory","code":"141058","is":false}]
+    - the players cannot defeat this stage while this holds
+
+141028:B:2 (back): Forced: At the end of the round, reduce the Ring-bearer's life by 1.
+  141028:forced:1: Forced at the end of the round
+    - [json ReduceLife {"verb":"ReduceLife","amount":1}]
+
+## 141029 Race to Rivendell
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+141029:B:1 (back): When Revealed: Add Ford of Bruinen and The Witch-king to the staging area.
+  141029:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"141059"}]
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"141068"}]
+
+141029:B:2 (back): While at least 1 Nazgûl enemy is in play, Race to Rivendell gets +15 quest points.
+  141029:constant:1: Constant
+    only if [json condition {"kind":"enemyInPlay","trait":"Nazgûl","is":true}]
+    - this card: stat questPoints 15, while this card is in play
+
+141029:B:3 (back): Forced: At the end of the round, reduce the Ring-bearer's life by 1.
+  141029:forced:1: Forced at the end of the round
+    - [json ReduceLife {"verb":"ReduceLife","amount":1}]
+
+141029:B:4 (back): If the players defeat this stage, they have won the game.
+  (inert: the engine applies it by rule, no record)
+
+## 141056 Flight to the Ford
+
+141056:A:1 (front): You are playing Campaign Mode.
+  (inert: the engine applies it by rule, no record)
+
+141056:A:2 (front): Response: After an enemy is declared as an attacker, shuffle the top card of the burden deck into the encounter deck to cancel that attack. (Any player may trigger this ability.)
+  141056:response:1: Response on the event enemyAttacks (heard about enemy (any player controls); any player may use it)
+    only if [json condition {"kind":"burdenDeck"}]
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json MoveBurden {"verb":"MoveBurden","to":"encounterShuffle"}]
+    - [json CancelAttack {"verb":"CancelAttack"}]
+
+141056:B:1 (back): Resolution: Add each burden card in play, in the encounter deck, and in the discard pile to the Campaign Pool. The added cards have been earned by the players.
+  141056:resolution:1: Resolution
+    - [json EarnAllBurdens {"verb":"EarnAllBurdens"}]
+
+## 141057 An Evil Wound
+(the scenario deals it into the attached pile; the piles place it, no record does)
+
+141057:A:1 (front): Attach to the Ring-bearer. Attached hero cannot be healed.
+  141057:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AttachesTo {"verb":"AttachesTo","host":{"kind":"ringBearer"}}]
+    - its host: stat cannotBeHealed 1, while this card is in play
+
+141057:A:2 (front): When attached hero would take any amount of damage, reduce the Ring-bearer's life by an equal amount instead.
+  141057:constant:2: Constant
+    - its host: stat damageToLife 1, while this card is in play
+
+141057:A:3 (front): If the Ring-bearer's life reaches zero, the players lose the game.
+  (inert: the engine applies it by rule, no record)
+
+## 141058 The Last Bridge
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+141058:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+141058:A:2 (front): X is the number of players in the game.
+  141058:constant:1: Constant
+    - this card: stat threat the number of players, while this card is in play
+
+141058:A:3 (front): Travel: The first player must reveal the top card of the burden deck and resolve that card as if it were just revealed from the encounter deck to travel here.
+  141058:travel:1: Travel
+    - [json RevealBurden {"verb":"RevealBurden"}]
+
+## 141059 Ford of Bruinen
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+141059:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+141059:A:2 (front): Response: After Ford of Bruinen leaves play as an explored location, all engaged enemies are discarded.
+  141059:response:1: Response after a card leaves play (heard about this card)
+    - for each enemy (any player controls):
+      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"discard"}]
+
+141059:A:3 (front): Travel: The first player must reveal the top card of the encounter deck to travel here.
+  141059:travel:1: Travel
+    - the acting player reveals an encounter card
+
+## 141060 The Troll's Camp
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+141060:A:1 (front): While The Troll's Camp is the active location, each hero gets +1 Willpower, +1 Attack and +1 Defense.
+  141060:constant:1: Constant
+    only if this card is the active location
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - every hero in play: stat willpower 1, while this card is in play
+    - every hero in play: stat attack 1, while this card is in play
+    - every hero in play: stat defense 1, while this card is in play
+
+## 141061 Ettenmoors
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+141061:A:1 (front): While Ettenmoors is the active location, do not deal Nazgûl enemies a shadow card during the combat phase.
+  141061:constant:1: Constant
+    only if this card is the active location
+    - every enemy in play (Nazgûl only): stat noShadowDealt 1, while this card is in play
+
+141061:A:2 (front): Forced: After any amount of progress is placed on Ettenmoors, reduce the Ring-bearer's life by 1.
+  141061:forced:1: Forced on the event progressPlaced
+    - [json ReduceLife {"verb":"ReduceLife","amount":1}]
+
+## 141062 The Old Road
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+141062:A:1 (front): Action: Place the top card of the burden deck on top of the encounter deck to place 4 progress on The Old Road. (Use this action only if you are playing campaign mode.)
+  141062:action:1: Action
+    only if all of: ([json condition {"kind":"campaign"}]) and ([json condition {"kind":"burdenDeck"}])
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json MoveBurden {"verb":"MoveBurden","to":"encounterTop"}]
+    - place 4 progress on this card
+
+## 141063 Fell Rider
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+141063:A:1 (front): Cannot have non-Morgul attachments.
+  141063:constant:1: Constant
+    only if this card is in play
+    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"Morgul"}]
+
+141063:A:2 (front): While Fell Rider is in the staging area, it gains: "Forced: At the beginning of the encounter phase, the first player must either reduce the Ring-bearer's life by 1 or engage Fell Rider."
+  141063:forced:1: Forced when a phase begins
+    only if all of: (it is the Encounter phase) and (this card is in the staging area)
+    - the first player chooses one of:
+      * option "life":
+        - [json ReduceLife {"verb":"ReduceLife","amount":1}]
+      * option "engage":
+        - engage this card
+
+## 141064 Stricken Dumb
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+141064:A:1: Peril.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+141064:A:2 (front): When Revealed: You must either shuffle the top card of the burden deck into the encounter deck and reveal an additional encounter card, or raise each player's threat by 3 and immediately end the quest phase (do not resolve the quest).
+  141064:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "burden" (only if [json condition {"kind":"burdenDeck"}]):
+        - [json MoveBurden {"verb":"MoveBurden","to":"encounterShuffle"}]
+        - [json GainSurge {"verb":"GainSurge"}]
+      * option "threat":
+        - raise threat by 3 (each player)
+        - end the quest phase at once (no quest resolution)
+
+## 141065 The Enemy is Upon Us!
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+141065:A:1 (front): When Revealed: Each engaged enemy makes an immediate attack. If no attack is made this way, The Enemy is Upon Us! gains surge.
+  141065:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json ImmediateAttackEach {"verb":"ImmediateAttackEach"}]
+    - [json GainSurge {"verb":"GainSurge","when":{"kind":"noneReturned"}}]
+
+141065:A:2 (shadow): Shadow: If this attack destroys a character, remove all progress from the current quest.
+  141065:shadow:1: Shadow
+    - when the attack in progress ends:
+      - [json RemoveAllQuestProgress {"verb":"RemoveAllQuestProgress","when":{"kind":"x","min":1}}]
+
+## 141066 Pain Assailed Him
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+141066:A:1 (front): When Revealed: Reduce the Ring-bearer's life by 1. Then, reduce the Ring-bearer's Willpower, Attack, and Defense to 0 until the end of the round.
+  141066:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json ReduceLife {"verb":"ReduceLife","amount":1}]
+    - [json SetStatUntil {"verb":"SetStatUntil","stat":"willpower","value":0,"until":"endOfRound","holders":{"type":"hero","control":"any","trait":"Ring-bearer"}}]
+    - [json SetStatUntil {"verb":"SetStatUntil","stat":"attack","value":0,"until":"endOfRound","holders":{"type":"hero","control":"any","trait":"Ring-bearer"}}]
+    - [json SetStatUntil {"verb":"SetStatUntil","stat":"defense","value":0,"until":"endOfRound","holders":{"type":"hero","control":"any","trait":"Ring-bearer"}}]
+
+141066:A:2 (shadow): Shadow: If this attack destroys a character, reduce the Ring-bearer's life by 1.
+  141066:shadow:1: Shadow
+    - when the attack in progress ends:
+      - [json ReduceLife {"verb":"ReduceLife","amount":1,"when":{"kind":"x","min":1}}]
+
+## 141067 The Nine are Abroad
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+141067:A:1 (front): When Revealed: Treat the text box of each character in play as blank (except for Traits) until the end of the round. If there is a Nazgûl enemy in the staging area, The Nine are Abroad gains surge.
+  141067:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each character (any player controls): stat blankText (its text box is blank) 1, until the end of the round
+    - [json GainSurge {"verb":"GainSurge","when":{"kind":"count","pick":{"type":"enemy","control":"any","stagingOnly":true,"trait":"Nazgûl"},"min":1}}]
+
+141067:A:2 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
+  141067:shadow:1: Shadow
+    - when the attack in progress ends:
+      - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 141080 Weight of the Ring
+(the scenario deals it into the burden pile; the piles place it, no record does)
+
+141080:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+141080:A:2 (front): When Revealed: Attach to the Ring-bearer. (Counts as a Condition attachment with the text: "Forced: At the beginning of each quest phase, either exhaust The One Ring or reveal an additional encounter card this phase.")
+  141080:whenRevealed:1: When revealed
+    - [json AttachSelfToRingBearer {"verb":"AttachSelfToRingBearer"}]
+  141080:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    - the first player chooses one of:
+      * option "exhaust" (only if the card with code 141085 in play is ready):
+        - exhaust the card with code 141085
+      * option "reveal":
+        - [json RevealMore {"verb":"RevealMore","amount":1}]
+
+## 141081 Fear of Discovery
+(the scenario deals it into the burden pile; the piles place it, no record does)
+
+141081:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+141081:A:2 (front): When Revealed: The first player must either exhaust the Ring-bearer or reveal an additional encounter card.
+  141081:whenRevealed:1: When revealed
+    - the first player chooses one of:
+      * option "exhaust" (only if there is a ready Ring-bearer hero (any player controls) to choose):
+        - choose ready Ring-bearer hero (any player controls)
+        - exhaust the picked card
+      * option "reveal":
+        - the acting player reveals an encounter card
+
+141081:A:3 (shadow): Shadow: Defending player raises his threat by 3.
+  141081:shadow:1: Shadow
+    - raise threat by 3 (the acting player)
+
+## 141082 Eaten Alive!
+(the scenario deals it into the burden pile; the piles place it, no record does)
+
+141082:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+141082:A:2 (front): When Revealed: The first player must deal X damage divided among heroes he controls where X is the number of players in the game.
+  141082:whenRevealed:1: When revealed
+    - repeat the number of players times:
+      - choose hero (you control) chosen by the first player
+      - deal 1 damage to the picked card
+
+141082:A:3 (shadow): Shadow: Deal 1 damage to defending character.
+  141082:shadow:1: Shadow
+    - deal 1 damage to the defender
+
+## 141083 Panicked
+(the scenario deals it into the burden pile; the piles place it, no record does)
+
+141083:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+141083:A:2 (front): When Revealed: The first player raises his threat by 3 and passes the first player token to the next player.
+  141083:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - raise threat by 3 (the first player)
+    - [json PassFirstPlayer {"verb":"PassFirstPlayer"}]
+
+141083:A:3 (shadow): Shadow: Defending player exhausts a character he controls.
+  141083:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+
+## 141084 Overcome by Terror
+(the scenario deals it into the burden pile; the piles place it, no record does)
+
+141084:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+141084:A:2 (front): When Revealed: The first player must exhaust The One Ring. If The One Ring is already exhausted, the first player must discard 2 cards at random from his hand.
+  141084:whenRevealed:1: When revealed
+    - the first player chooses one of:
+      * option "exhaust" (only if the card with code 141085 in play is ready):
+        - exhaust the card with code 141085 (controlled by the first player)
+      * option "discard" (only if the card with code 141085 in play is exhausted):
+        - the first player discards 2 random card(s) from hand
+
+141084:A:3 (shadow): Shadow: Defending player discards 1 card at random from his hand.
+  141084:shadow:1: Shadow
+    - the acting player discards 1 random card(s) from hand
+
+(rendered pieces: 109 by template, 41 as JSON)

@@ -1,0 +1,436 @@
+Scenario piles that place cards with no record (quest: 142061 The Great River; quest: 142062 The Company Divided; quest: 142063 Searching the Woods; quest: 142064 Guard the Hobbits; quest: 142065 The Seat of Amon Hen; quest: 142066 Orc Hunting; quest: 142067 The Ring-bearer Sets Out; staging: 142075 The Argonath; staging: 142076 Sarn Gebir; setAside: 142068 Frodo's Choice; setAside: 142073 Parth Galen; setAside: 142074 Seat of Seeing)
+
+## 142061 The Great River
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+142061:A:1 (front): Setup: Set Frodo's Choice, Seat of Seeing, and Parth Galen aside, out of play. Add The Argonath and Sarn Gebir to the staging area.
+  142061:setup:1: Setup
+    (no instructions)
+
+142061:B:1 (back): Enemies get +2 Defense and cannot be engaged. Skip the encounter phase.
+  142061:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - every enemy in play: stat defense 2, while this card is in play
+    - every enemy in play: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
+    - the table: stat skipEncounter 1, while this card is in play
+
+142061:B:2 (back): The players cannot advance while The Argonath is in play.
+  142061:constant:1: Constant
+    only if the card with code 142075 is in play
+    - the players cannot defeat this stage while this holds
+
+## 142062 The Company Divided
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+142062:A:1 (front): When Revealed: Remove the Ring-bearer, and each card attached to it, from the game (treat The One Ring's text as blank while resolving this effect). Reduce each enemy's engagement cost to 0 until the end of the encounter phase. Skip the travel phase this round.
+  142062:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json RemoveRingBearer {"verb":"RemoveRingBearer"}]
+    - [json ZeroEngagementCosts {"verb":"ZeroEngagementCosts"}]
+    - [json SkipTravelPhase {"verb":"SkipTravelPhase"}]
+
+142062:B:1 (back): Forced: At the end of the refresh phase, shuffle Seat of Seeing and Frodo's Choice into the encounter discard pile. Then, place the encounter discard pile on the bottom of the encounter deck. Starting with the first player, each player creates his own staging area and advances to a different stage 3A of his choice. In player order, each player moves 1 encounter card from this staging area to his. When there are no encounter cards left at this stage, discard it.
+  142062:forced:1: Forced at the end of the phase
+    only if it is the Refresh phase
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json ShuffleSetAsideIntoDiscard {"verb":"ShuffleSetAsideIntoDiscard","codes":["142074","142068"]}]
+    - [json PlaceDiscardUnderDeck {"verb":"PlaceDiscardUnderDeck"}]
+    - for each player, first player first:
+      - the acting player chooses (each option once) one of:
+        * option "142063":
+          - [json StartSeparateStage {"verb":"StartSeparateStage","code":"142063"}]
+        * option "142064":
+          - [json StartSeparateStage {"verb":"StartSeparateStage","code":"142064"}]
+        * option "142065":
+          - [json StartSeparateStage {"verb":"StartSeparateStage","code":"142065"}]
+        * option "142066":
+          - [json StartSeparateStage {"verb":"StartSeparateStage","code":"142066"}]
+    - [json DealOutStaging {"verb":"DealOutStaging"}]
+    - [json DiscardSharedStage {"verb":"DiscardSharedStage"}]
+
+## 142063 Searching the Woods
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+142063:A:1 (front): Forced: After stage 2B is discarded, if the total Threat of encounter cards in this staging area is less than 4, reveal 1 encounter card.
+  142063:forced:1: Forced on the event stageDiscarded
+    only if [json condition {"kind":"stagingThreat","max":3}]
+    - the acting player reveals an encounter card
+
+142063:B:1 (back): If Frodo's Choice is not in play, any time players would place progress on this quest, discard an equal number of cards from the encounter deck instead.
+  142063:constant:1: Constant
+    only if the card with code 142068 is not in play
+    - this card: stat progressDiscards 1, while this card is in play
+
+142063:B:2 (back): Forced: After Frodo's Choice is revealed at this stage, advance to stage 4A.
+  142063:forced:2: Forced after a card is revealed (heard about objective (any player controls) named "Frodo's Choice"; event happened to the controller)
+    - [json AdvanceToStage {"verb":"AdvanceToStage","code":"142067"}]
+
+142063:B:3 (back): Response: After you quest successfully, discard a non-unique location in any staging area.
+  142063:response:1: Response after the players quest successfully (event happened to the controller)
+    only if there is a non-unique location (any player controls) in the staging area only [also {"stagingArea":"any"}] to choose
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose non-unique location (any player controls) in the staging area only [also {"stagingArea":"any"}]
+    - discard the picked card
+
+## 142064 Guard the Hobbits
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+142064:A:1 (front): Forced: After stage 2B is discarded, if the total Threat of encounter cards in this staging area is less than 4, reveal 1 encounter card.
+  142064:forced:1: Forced on the event stageDiscarded
+    only if [json condition {"kind":"stagingThreat","max":3}]
+    - the acting player reveals an encounter card
+
+142064:B:1 (back): If Frodo's Choice is not in play, any time players would place progress on this quest, discard an equal number of cards from the encounter deck instead.
+  142064:constant:1: Constant
+    only if the card with code 142068 is not in play
+    - this card: stat progressDiscards 1, while this card is in play
+
+142064:B:2 (back): Forced: After Frodo's Choice is revealed at this stage, advance to stage 4A.
+  142064:forced:2: Forced after a card is revealed (heard about objective (any player controls) named "Frodo's Choice"; event happened to the controller)
+    - [json AdvanceToStage {"verb":"AdvanceToStage","code":"142067"}]
+
+142064:B:3 (back): Response: After you quest successfully, choose a player. Ready each of that player's heroes.
+  142064:response:1: Response after the players quest successfully (event happened to the controller)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose player (any player controls)
+    - for each hero (any player controls) [also {"controlledBy":"picked"}]:
+      - ready the picked card
+
+## 142065 The Seat of Amon Hen
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+142065:A:1 (front): Forced: After stage 2B is discarded, if the total Threat of encounter cards in this staging area is less than 4, reveal 1 encounter card.
+  142065:forced:1: Forced on the event stageDiscarded
+    only if [json condition {"kind":"stagingThreat","max":3}]
+    - the acting player reveals an encounter card
+
+142065:B:1 (back): If Frodo's Choice is not in play, any time players would place progress on this quest, discard an equal number of cards from the encounter deck instead.
+  142065:constant:1: Constant
+    only if the card with code 142068 is not in play
+    - this card: stat progressDiscards 1, while this card is in play
+
+142065:B:2 (back): Forced: After Frodo's Choice is revealed at this stage, advance to stage 4A.
+  142065:forced:2: Forced after a card is revealed (heard about objective (any player controls) named "Frodo's Choice"; event happened to the controller)
+    - [json AdvanceToStage {"verb":"AdvanceToStage","code":"142067"}]
+
+142065:B:3 (back): Response: After you quest successfully, choose a player. That player draws 2 cards and lowers his threat by 2.
+  142065:response:1: Response after the players quest successfully (event happened to the controller)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose player (any player controls)
+    - the picked player draws 2 card(s)
+    - lower threat by 2 (the picked player)
+
+## 142066 Orc Hunting
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+142066:A:1 (front): Forced: After stage 2B is discarded, if the total Threat of encounter cards in this staging area is less than 4, reveal 1 encounter card.
+  142066:forced:1: Forced on the event stageDiscarded
+    only if [json condition {"kind":"stagingThreat","max":3}]
+    - the acting player reveals an encounter card
+
+142066:B:1 (back): If Frodo's Choice is not in play, any time players would place progress on this quest, discard an equal number of cards from the encounter deck instead.
+  142066:constant:1: Constant
+    only if the card with code 142068 is not in play
+    - this card: stat progressDiscards 1, while this card is in play
+
+142066:B:2 (back): Forced: After Frodo's Choice is revealed at this stage, advance to stage 4A.
+  142066:forced:2: Forced after a card is revealed (heard about objective (any player controls) named "Frodo's Choice"; event happened to the controller)
+    - [json AdvanceToStage {"verb":"AdvanceToStage","code":"142067"}]
+
+142066:B:3 (back): Response: After you quest successfully, discard an enemy engaged with a player.
+  142066:response:1: Response after the players quest successfully (event happened to the controller)
+    only if there is a enemy (any player controls) to choose
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls)
+    - discard the picked card
+
+## 142067 The Ring-bearer Sets Out
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+142067:A:1 (front): When Revealed: Add Parth Galen to the staging area. If it is your quest phase, end the phase (do not resolve the quest).
+  142067:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"142073"}]
+    - then, if it is the Quest phase (checked when this step runs, after the steps above; not tied to whether they did anything): end the quest phase at once (no quest resolution)
+
+142067:B:1 (back): During the quest phase, reveal 1 additional encounter card for each player in the game.
+  142067:constant:1: Constant
+    - the table: stat revealMore the number of players, while this card is in play
+
+142067:B:2 (back): Response: After an enemy is revealed at this stage, raise your threat by X to engage that enemy. X is that enemy's Threat. Each player (at any stage) may trigger this ability once per round.
+  142067:response:1: Response after a card is revealed (heard about enemy (any player controls); event happened to the controller; limit once per round for each player; any player may use it; only when the encounter deck revealed it)
+    only if the card the event is about is a enemy (any player controls) [also {"inStaging":true}]
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - raise threat by threat of the card the event is about (the acting player)
+    - engage the card the event is about
+
+142067:B:3 (back): When this stage is defeated, the players win the game.
+  142067:constant:2: Constant
+    (no instructions)
+
+## 142068 Frodo's Choice
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+142068:A:1 (front): If Frodo's Choice is discarded, reveal it instead.
+  142068:constant:1: Constant
+    - [json RevealIfDiscarded {"verb":"RevealIfDiscarded"}]
+
+142068:A:2 (front): When Revealed: Take control of the first player token and the Ring-bearer (and each card attached to it). Attach to the Ring-bearer. For the rest of the game, you cannot lose control of the first player token.
+  142068:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json TakeFirstPlayer {"verb":"TakeFirstPlayer"}]
+    - [json TakeRingBearer {"verb":"TakeRingBearer"}]
+    - [json AttachSelfToRingBearer {"verb":"AttachSelfToRingBearer"}]
+    - [json LockFirstPlayer {"verb":"LockFirstPlayer"}]
+
+## 142069 Uruk-hai Captain
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+142069:A:1 (front): Toughness 2. Cannot have attachments.
+  (the keyword part is owned by the card's keywords; the records cover: Cannot have attachments.)
+  142069:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+142069:A:2 (front): Allies with fewer printed hit points than Uruk-hai Captain cannot defend against Uruk-hai Captain.
+  142069:constant:2: Constant
+    - allies with fewer printed hit points than this card cannot be declared as defenders against this card's attacks (only this card's, not another enemy's)
+
+142069:A:3 (shadow): Shadow: Attacking enemy makes an additional attack after this one.
+  142069:shadow:1: Shadow
+    - when the attack in progress ends:
+      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+
+## 142070 Uruk-hai Archer
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+142070:A:1 (front): Peril. Toughness 1. Archery X.
+  (the keyword part is owned by the card's keywords; the records cover: Archery X.)
+  142070:constant:1: Constant (record also names 142070:A:2)
+    - this card: stat archeryPlayers 1, while this card is in play
+
+142070:A:2 (front): X is the number of players at this stage.
+  142070:constant:1: Constant (record also names 142070:A:1)
+    - this card: stat archeryPlayers 1, while this card is in play
+
+142070:A:3 (front): When Revealed: Discard an ally you control.
+  142070:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ally (you control)
+    - discard the picked card
+
+## 142071 Uruk-hai Tracker
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+142071:A:1: Surge. Toughness 1. Archery 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+142071:A:2 (front): Uruk-hai Tracker gets +2 Attack against characters with 2 or fewer printed hit points.
+  142071:constant:1: Constant
+    - if [json condition {"kind":"versusDefender","maxHitPoints":2}]: this card: stat attack 2, while this card is in play
+
+142071:A:3 (shadow): Shadow: Discard a non-objective attachment you control.
+  142071:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (you control) that is not an objective
+    - discard the picked card
+
+## 142072 Uruk-hai Hunter
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+142072:A:1: Peril. Toughness 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+142072:A:2 (front): When Revealed: Either choose a player to reveal an encounter card, or Uruk-hai Hunter makes an immediate attack against you.
+  142072:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "reveal":
+        - choose player (any player controls)
+        - [json SwitchActor {"verb":"SwitchActor","to":"picked"}]
+        - the acting player reveals an encounter card
+      * option "attack":
+        - this card attacks the acting player now, from the staging area
+
+## 142073 Parth Galen
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+142073:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+142073:A:2 (front): Travel: Search the encounter deck and discard pile for an enemy and add it to the staging area to travel here. Shuffle the encounter deck.
+  142073:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SearchMove {"verb":"SearchMove","type":"enemy","to":"staging"}]
+    - shuffle the encounter deck
+
+142073:A:3 (front): While Parth Galen is in play, the players cannot win the game.
+  142073:constant:1: Constant
+    - the players cannot defeat this stage while this holds
+
+## 142074 Seat of Seeing
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+142074:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+142074:A:2 (front): Response: When Seat of Seeing is explored, choose a burden card in play, in the encounter deck, or in the discard pile, and remove it from the game. Shuffle the encounter deck. (If you are playing campaign mode, remove that card from the campaign pool.)
+  142074:response:1: Response after a card leaves play (heard about this card)
+    only if all of: (the card the event is about had enough progress to be explored) and (there is a card (any player controls) [also {"burden":true}] to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose card (any player controls) [also {"burden":true}]
+    - [json RemoveFromGame {"verb":"RemoveFromGame"}]
+    - shuffle the encounter deck
+
+## 142075 The Argonath
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+142075:A:1 (front): Immune to player card effects. X is the number of players in the game.
+  (the keyword part is owned by the card's keywords; the records cover: X is the number of players in the game.)
+  142075:constant:1: Constant
+    - this card: stat threat the number of players, while this card is in play
+
+142075:A:2 (front): The players cannot travel here while Sarn Gebir is in play. While The Argonath is the active location, skip the combat phase.
+  142075:constant:2: Constant
+    only if the card with code 142076 is in play
+    - the players cannot travel to any location while this holds
+  142075:constant:3: Constant
+    only if this card is the active location
+    - the table: stat skipCombat 1, while this card is in play
+
+## 142076 Sarn Gebir
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+142076:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+142076:A:2 (front): Forced: When Sarn Gebir is explored, deal 1 damage to each exhausted character.
+  142076:forced:1: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    - deal 1 damage to each exhausted character (any player controls)
+
+## 142077 River Anduin
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+142077:A:1 (front): While River Anduin is in the staging area it gains: "Forced: At the end of the travel phase, each player at this stage raises his threat by 1. Then, River Anduin moves to the staging area to the left, if able."
+  142077:forced:1: Forced at the end of the phase
+    only if all of: (it is the Travel phase) and (this card is in the staging area)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json RaiseThreatAtStage {"verb":"RaiseThreatAtStage","amount":1}]
+    - [json MoveToLeftArea {"verb":"MoveToLeftArea"}]
+
+## 142078 Wooded Shoreline
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+142078:A:1 (front): While Wooded Shoreline is in the staging area, it gains archery 2.
+  142078:constant:1: Constant
+    only if this card is in the staging area
+    - this card: stat archeryBonus 2, while this card is in play
+
+142078:A:2 (front): Travel: Search the encounter deck and discard pile for an enemy and add it to this staging area to travel here. Shuffle the encounter deck.
+  142078:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SearchMove {"verb":"SearchMove","type":"enemy","to":"staging"}]
+    - shuffle the encounter deck
+
+## 142079 Slopes of Amon Hen
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+142079:A:1 (front): Travel: A player at this staging area must engage an enemy in any staging area to travel here.
+  142079:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) in the staging area only [also {"stagingArea":"any"}]
+    - engage the picked card
+
+142079:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending character has fewer printed hit points than the attacking enemy).
+  142079:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the defender is a character (any player controls) [also {"fewerHitPointsThan":"attackingEnemy"}]): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the defender is a character (any player controls) [also {"fewerHitPointsThan":"attackingEnemy"}] (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 142080 Growing Threat
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+142080:A:1: Peril.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+142080:A:2 (front): When Revealed: Either move 1 enemy engaged with you to the first player's staging area, or Growing Threat gains doomed 2 and surge.
+  142080:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "move" (only if the actor has an enemy engaged):
+        - choose enemy (you control) engaged with you
+        - [json MoveToFirstStaging {"verb":"MoveToFirstStaging","target":"picked"}]
+      * option "doomed":
+        - [json Doomed {"verb":"Doomed","amount":2}]
+        - [json GainSurge {"verb":"GainSurge"}]
+
+142080:A:3 (shadow): Shadow: After this attack, move attacking enemy to the first player's staging area.
+  142080:shadow:1: Shadow
+    - when the attack in progress ends:
+      - [json MoveToFirstStaging {"verb":"MoveToFirstStaging"}]
+
+## 142081 Orcs of the White Hand
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+142081:A:1 (front): When Revealed: Remove all damage from each enemy at this stage. Each enemy at this stage gets +1 Threat, +1 Attack, and +1 Defense until the end of the round.
+  142081:whenRevealed:1: When revealed
+    - for each enemy (any player controls) or in the staging area [also {"atStage":true}]:
+      - heal all damage from the picked card
+      - the picked card: stat threat 1, until the end of the round
+      - the picked card: stat attack 1, until the end of the round
+      - the picked card: stat defense 1, until the end of the round
+
+142081:A:2 (shadow): Shadow: If the defending character has fewer printed hit points than the attacking enemy, this attack is considered undefended.
+  142081:shadow:1: Shadow
+    - if the defender is a character (any player controls) [also {"fewerHitPointsThan":"attackingEnemy"}]: this attack is considered undefended
+
+## 142082 Black Feathered Arrows
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+142082:A:1 (front): When Revealed: Until the end of the round, add 1 to the archery total at this stage for each ally currently at this stage.
+  142082:whenRevealed:1: When revealed
+    - actorSeat: stat archeryBonus the number of ally (any player controls) [also {"atStage":true}], until the end of the round
+
+142082:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending character has fewer printed hit points than the attacking enemy).
+  142082:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the defender is a character (any player controls) [also {"fewerHitPointsThan":"attackingEnemy"}]): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the defender is a character (any player controls) [also {"fewerHitPointsThan":"attackingEnemy"}] (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 142083 Fallen Into Evil
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+142083:A:1 (front): When Revealed: Attach to a non-Fellowship hero and move it to the first player's staging area. (Counts as a Condition attachment with the text: "Attached hero loses the hero card type and gains the enemy card type with Threat equal to its Willpower and engagement cost equal to its threat cost. If Fallen into Evil is discarded, return attached hero to its owner's control.")
+  142083:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - attach this card to a hero
+    - [json FallIntoEvil {"verb":"FallIntoEvil"}]
+  142083:constant:1: Constant
+    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+  142083:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    - [json ReturnFallenHero {"verb":"ReturnFallenHero"}]
+
+## 142089 Followed by Night
+
+142089:A:1: Peril. Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+142089:A:2 (front): When Revealed: Put the topmost enemy of the encounter deck discard pile into play engaged with you.
+  142089:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json PickDiscardTop {"verb":"PickDiscardTop","types":["enemy"]}]
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"engaged"}]
+
+## 142090 Ill Fate
+
+142090:A:1: Peril. Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+142090:A:2 (front): When Revealed: Attach to a hero you control. (Counts as a Condition attachment with the text: "Forced: After a character you control is destroyed, raise your threat by 2.")
+  142090:whenRevealed:1: When revealed
+    - attach this card to a hero
+  142090:constant:1: Constant
+    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+  142090:forced:1: Forced on the event characterDestroyed (heard about character (any player controls) [also {"controlledBy":"host"}])
+    only if not (this card is in the staging area)
+    - raise threat by 2 (hostController)
+
+(rendered pieces: 189 by template, 57 as JSON)

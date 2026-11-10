@@ -22,7 +22,7 @@ const range = (min: unknown, max: unknown): string => {
 
 // One template per condition kind; a kind with none prints as JSON. A template returns its text and the keys it read.
 type Template = (c: Obj, ctx: Ctx) => { text: string; read: readonly string[] } | null;
-const TEMPLATES: Readonly<Record<string, Template>> = {
+export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   sourceIn: (c) => ({ text: `this card ${ZONE[str(c.zone)] ?? `is in ${str(c.zone)}`}`, read: ["zone"] }),
   less: (c, ctx) => ({ text: `${renderAmount(c.left, ctx, renderPick)} is less than ${renderAmount(c.right, ctx, renderPick)}`, read: ["left", "right"] }),
   subjectExplored: () => ({ text: "the card the event is about had enough progress to be explored", read: [] }),
@@ -62,7 +62,7 @@ export function renderCondition(value: unknown, ctx: Ctx): string {
     const parts = Array.isArray(value.conditions) ? value.conditions.map((part) => renderCondition(part, ctx)) : [];
     return done(ctx, `${kind === "all" ? "all of" : "any of"}: ${parts.map((part) => `(${part})`).join(kind === "all" ? " and " : " or ")}`, value, ["kind", "conditions"]);
   }
-  const template = TEMPLATES[kind];
+  const template = CONDITION_TEMPLATES[kind];
   const made = template?.(value, ctx);
   if (!made) return jsonOf(ctx, "condition", value);
   return done(ctx, made.text, value, ["kind", ...made.read]);

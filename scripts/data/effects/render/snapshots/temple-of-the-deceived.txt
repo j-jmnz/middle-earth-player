@@ -1,0 +1,463 @@
+Scenario piles that place cards with no record (quest: 12067 Searching the Island; staging: 12070 Temple Guardian; setAside: 12071 Gate Key; setAside: 11077 Captain Sahír; setAside: 11079 Na'asiyah; islandMap: 12068 The Grotto's Entrance; islandMap: 12069 Temple Halls; islandMap: 12072 Jagged Cliffs; islandMap: 12073 Winding Caverns; islandMap: 12074 Jungle Path; islandMap: 11072 Flooded Ruins; islandMap: 11073 Drowned Graves; islandMap: 11074 Cursed Temple)
+
+## 110077 Temple Guardian
+
+110077:A:1 (front): X is the number of players in the game.
+  110077:constant:1: Constant
+    - this card: stat threat the number of players, while this card is in play
+
+110077:A:2: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110077:A:3 (front): Cannot be optionally engaged.
+  110077:constant:2: Constant
+    - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
+
+110077:A:4 (front): Temple Guardian gets -50 engagement cost while Cursed Temple is the active location.
+  110077:constant:3: Constant
+    only if the active location is a location (any player controls) named "Cursed Temple"
+    - this card: stat engagementCost -50, while this card is in play
+
+110077:B:1 (back): Campaign Mode only.
+  (inert: the engine applies it by rule, no record)
+
+110077:B:2 (back): Archery X. X is the number of players in the game.
+  110077:constant:4: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat threat the number of players, while this card is in play
+    - this card: stat defense the number of players, while this card is in play
+    - this card: stat archery the number of players, while this card is in play
+
+110077:B:3: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110077:B:4 (back): Cannot be optionally engaged.
+  110077:constant:5: Constant
+    - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
+
+110077:B:5 (back): Temple Guardian gets -50 engagement cost while Cursed Temple is the active location.
+  110077:constant:6: Constant
+    only if the active location is a location (any player controls) named "Cursed Temple"
+    - this card: stat engagementCost -50, while this card is in play
+
+## 110078 Gate Key
+
+110078:A:1 (front): If unattached, return Gate Key to the staging area and it gains: "Action: Exhaust a hero to claim Gate Key and attach it to that hero."
+  110078:action:1: Action
+    only if all of: (this card is in the staging area) and (there is a ready hero (you control) to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready hero (you control)
+    - exhaust the picked card
+    - [json ClaimObjective {"verb":"ClaimObjective"}]
+
+110078:A:2 (front): Action: Exhaust Gate Key and attached hero and spend 3 resources from attached hero's resource pool to look at the facedown side of a Temple of the Deceived location.
+  110078:action:2: Action (cost: exhaust this card and exhaust the attached card and pay 3 resource(s) from the host's pool)
+    only if all of: (its host is a hero (any player controls)) and (there is a location (any player controls) [also {"island":"temple"}] to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose location (any player controls) [also {"island":"temple"}]
+    - [json LookAtFacedown {"verb":"LookAtFacedown","target":"picked"}]
+
+110078:B:1 (back): Campaign Mode only.
+  (inert: the engine applies it by rule, no record)
+
+110078:B:2 (back): If unattached, return Gate Key to the staging area and it gains: "Action: Exhaust a hero to claim Gate Key and attach it to that hero."
+  110078:action:3: Action
+    only if all of: (this card is in the staging area) and (there is a ready hero (you control) to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready hero (you control)
+    - exhaust the picked card
+    - [json ClaimObjective {"verb":"ClaimObjective"}]
+
+110078:B:3 (back): Action: Exhaust Gate Key and attached hero to look at the facedown side of a Temple of the Deceived location or secret.
+  110078:action:4: Action (cost: exhaust this card and exhaust the attached card)
+    only if its host is a hero (any player controls)
+    - the acting player chooses one of:
+      * option "temple" (only if there is a location (any player controls) [also {"island":"temple"}] to choose):
+        - choose location (any player controls) [also {"island":"temple"}]
+        - [json LookAtFacedown {"verb":"LookAtFacedown","target":"picked"}]
+      * option "secret" (only if there is a card (any player controls) [also {"island":"secret"}] to choose):
+        - choose card (any player controls) [also {"island":"secret"}]
+        - [json LookAtSecret {"verb":"LookAtSecret"}]
+
+## 11197 Temple of the Deceived
+
+11197:A:1 (front): You are playing Campaign Mode.
+  (inert: the engine applies it by rule, no record)
+
+11197:A:2 (front): Setup: Attach Black Key (boon) to Captain Sahír. Shuffle Revenant into the encounter deck. Shuffle Starla and both Recurring Nightmares together and place one facedown under each Temple of the Deceived location, as secrets. For each character in play, its controller may deal 1 damage to it to reduce their threat by 1. One player may raise their threat by 4 to attach Spyglass to a hero.
+  11197:campaignSetup:1: Campaign setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json KeepCampaignCard {"verb":"KeepCampaignCard"}]
+    - [json SetAside {"verb":"SetAside","code":"11180"}]
+    - [json SetAside {"verb":"SetAside","code":"11183"}]
+    - [json SetAside {"verb":"SetAside","code":"11198"}]
+    - [json SetAside {"verb":"SetAside","code":"11199"}]
+    - [json SetAside {"verb":"SetAside","code":"11199"}]
+    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"11181"}]
+    - [json FlipSetAside {"verb":"FlipSetAside","name":"Temple Guardian"}]
+    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11183","to":"Captain Sahír"}]
+    - [json PlaceSecrets {"verb":"PlaceSecrets","codes":["11198","11199","11199"]}]
+    - [json TradeDamageForThreat {"verb":"TradeDamageForThreat","damage":1,"threat":1}]
+    - [json RaiseThreatToAttach {"verb":"RaiseThreatToAttach","code":"11180","amount":4}]
+
+11197:A:3 (front): Travel Action: Flip over a secret at your location. If it is a Recurring Nightmare, it engages you. If it is Starla, you gain control of her (ready).
+  11197:action:1: Action (any player may use it)
+    only if all of: (it is the Travel phase) and (there is a card (any player controls) [also {"island":"here"}] to choose)
+    - [json FlipSecret {"verb":"FlipSecret"}]
+
+11197:B:1 (back): Resolution: If Starla is under a player's control, add her to the Campaign Pool. For each Recurring Nightmare that is not a secret, add it to the Campaign Pool and choose a player. For the remainder of the campaign, that player shuffles that Recurring Nightmare into their deck after they draw their starting hand.
+  11197:resolution:1: Resolution
+    - [json Earn {"verb":"Earn","codes":["11198"],"when":{"kind":"count","pick":{"type":"ally","control":"any","names":["Starla"]},"min":1}}]
+  11197:resolution:2: Resolution
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json ChooseCards {"verb":"ChooseCards","codes":["11199"],"who":"firstPlayer","to":"player","when":{"kind":"island","revealed":{"code":"11199","min":1}}}]
+    - [json ChooseCards {"verb":"ChooseCards","codes":["11199"],"who":"firstPlayer","to":"player","when":{"kind":"island","revealed":{"code":"11199","min":2}}}]
+
+11197:B:2 (back): Gain the following:
+  11197:resolution:3: Resolution (record also names 11197:B:3)
+    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"survivingPlayer"}}]
+
+11197:B:3 (back): • 1 XP for each surviving player.
+  11197:resolution:3: Resolution (record also names 11197:B:2)
+    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"survivingPlayer"}}]
+
+11197:B:4 (back): • 1 XP for each resource on this card (to a maximum of 3 XP).
+  11197:resolution:4: Resolution
+    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"tokens","code":"11197"},"max":3}]
+
+11197:B:5 (back): • 1 XP for each faceup Temple Halls.
+  11197:resolution:5: Resolution
+    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"islandFaceup","code":"12069"}}]
+
+11197:B:6 (back): • 1 XP if 4 or fewer Uncharted locations are faceup.
+  11197:resolution:6: Resolution
+    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"island","flippedAtMost":4}}]
+
+11197:B:7 (back): • 1 XP if Temple Guardian is in the victory display.
+  11197:resolution:7: Resolution
+    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"any","conditions":[{"kind":"inVictory","code":"12070","is":true},{"kind":"inVictory","code":"110077","is":true}]}}]
+
+11197:B:8 (back): • 1 XP if each surviving player's threat is 40 or less.
+  11197:resolution:8: Resolution
+    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"survivorsThreat","max":40}}]
+
+11197:B:9 (back): • -1 XP if Ominous Fate is in the victory display.
+  11197:resolution:9: Resolution
+    - [json GainXp {"verb":"GainXp","amount":-1,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Ominous Fate"]},"min":1}}]
+
+## 12067 Searching the Island
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+12067:A:1 (front): Setup: Prepare the Island Map (see insert). Flip over the top-left and bottom-left locations of the Island Map (without resolving their Forced effects, if any), and choose one as the players' starting active location, using a resource token to represent which location is active. The first player takes control of Captain Sahír, and the last player takes control of Na'asiyah (objective-ally sides faceup). Add Temple Guardian to the staging area and attach Gate Key to it, guarded. Shuffle the encounter deck.
+  12067:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json PrepareIslandMap {"verb":"PrepareIslandMap","temple":["12068","12069"]}]
+    - [json RevealIslandCorners {"verb":"RevealIslandCorners"}]
+    - choose location (any player controls) chosen by the first player [also {"island":"start"}]
+    - [json SetIslandActive {"verb":"SetIslandActive"}]
+    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Captain Sahír"}]
+    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Na'asiyah"}]
+    - [json AttachGuarded {"verb":"AttachGuarded","name":"Gate Key","to":"Temple Guardian"}]
+    - shuffle the encounter deck
+
+12067:B:1 (back): Exploration.
+  12067:constant:1: Constant
+    - the table: stat exploration 1, while this card is in play
+
+12067:B:2 (back): For each progress that would be placed on Searching the Island, you may place it on a location in the staging area, instead.
+  12067:constant:2: Constant
+    - this card: stat progressToStaging 1, while this card is in play
+  12067:triggered:1: Triggered (mandatory, not printed as Forced) on the event progressReplaced
+    - [json PlaceProgressInStaging {"verb":"PlaceProgressInStaging"}]
+
+## 12068 The Grotto's Entrance
+(the scenario deals it into the islandMap pile; the piles place it, no record does)
+
+12068:A:1 (front): Forced: When The Grotto's Entrance is flipped over while active, put Temple Guardian into play from the victory display, engaged with the player with the highest threat.
+  12068:forced:1: Forced on the event flippedOver (heard about this card)
+    only if this card is the active location
+    - [json EngageFromVictory {"verb":"EngageFromVictory","name":"Temple Guardian"}]
+
+12068:A:2 (front): When the 8th progress is placed on The Grotto's Entrance, the players have found the sunken ruins and win the game.
+  12068:triggered:1: Triggered (mandatory, not printed as Forced) on the event progressPlaced (heard about this card)
+    only if this card is a location (any player controls) [also {"minProgress":8}]
+    - the players win the game
+
+12068:B:1: Uncharted.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12068:B:2: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12068:B:3 (back): Travel: Exhaust the Gate Key to travel here.
+  12068:travel:1: Travel
+    - exhaust "Gate Key"
+
+12068:B:4 (back): Forced: After Temple of the Deceived becomes the active location, flip it over.
+  12068:forced:2: Forced after this location becomes the active location (heard about this card)
+    - [json FlipUncharted {"verb":"FlipUncharted"}]
+
+RECORD NAMING NO LINE OF THIS CARD (12068:B:2)
+  12068:constant:2: Constant
+    - this card: stat immuneToPlayerCards 1, while this card is in play
+
+## 12069 Temple Halls
+(the scenario deals it into the islandMap pile; the piles place it, no record does)
+
+12069:A:1 (front): While Temple Halls is the active location, each character gets -1 Attack and -1 Defense.
+  12069:constant:1: Constant
+    only if this card is the active location
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each character (any player controls): stat attack -1, while this card is in play
+    - each character (any player controls): stat defense -1, while this card is in play
+
+12069:A:2 (front): Forced: When Temple Halls is flipped over while active, put Temple Guardian into play from the victory display, engaged with the player with the highest threat.
+  12069:forced:1: Forced on the event flippedOver (heard about this card)
+    only if this card is the active location
+    - [json EngageFromVictory {"verb":"EngageFromVictory","name":"Temple Guardian"}]
+
+12069:B:1: Uncharted.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12069:B:2: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12069:B:3 (back): Travel: Exhaust the Gate Key to travel here.
+  12069:travel:1: Travel
+    - exhaust "Gate Key"
+
+12069:B:4 (back): Forced: After Temple of the Deceived becomes the active location, flip it over.
+  12069:forced:2: Forced after this location becomes the active location (heard about this card)
+    - [json FlipUncharted {"verb":"FlipUncharted"}]
+
+RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
+  12069:constant:2: Constant
+    - this card: stat immuneToPlayerCards 1, while this card is in play
+
+## 12070 Temple Guardian
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+12070:A:1 (front): X is the number of players in the game.
+  12070:constant:1: Constant
+    - this card: stat threat the number of players, while this card is in play
+
+12070:A:2: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12070:A:3 (front): Cannot be optionally engaged.
+  12070:constant:2: Constant
+    - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
+
+12070:A:4 (front): Temple Guardian gets -50 engagement cost while Cursed Temple is the active location.
+  12070:constant:3: Constant
+    only if the active location is a location (any player controls) named "Cursed Temple"
+    - this card: stat engagementCost -50, while this card is in play
+
+## 12071 Gate Key
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+12071:A:1 (front): If unattached, return Gate Key to the staging area and it gains: "Action: Exhaust a hero to claim Gate Key and attach it to that hero."
+  12071:action:1: Action
+    only if all of: (this card is in the staging area) and (there is a ready hero (you control) to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready hero (you control)
+    - exhaust the picked card
+    - [json ClaimObjective {"verb":"ClaimObjective"}]
+
+12071:A:2 (front): Action: Exhaust Gate Key and attached hero and spend 3 resources from attached hero's resource pool to look at the facedown side of a Temple of the Deceived.
+  12071:action:2: Action (cost: exhaust this card and exhaust the attached card and pay 3 resource(s) from the host's pool)
+    only if all of: (its host is a hero (any player controls)) and (there is a location (any player controls) [also {"island":"temple"}] to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose location (any player controls) [also {"island":"temple"}]
+    - [json LookAtFacedown {"verb":"LookAtFacedown","target":"picked"}]
+
+## 12072 Jagged Cliffs
+(the scenario deals it into the islandMap pile; the piles place it, no record does)
+
+12072:A:1 (front): While Jagged Cliffs is the active location, the location to its right is not considered to be in the staging area.
+  12072:constant:1: Constant
+    only if this card is the active location
+    - this card: stat islandBlock 1, while this card is in play
+
+12072:A:2 (front): Forced: When Jagged Cliffs is flipped over while active, look at the facedown side of each adjacent copy of Lost Island.
+  12072:forced:1: Forced on the event flippedOver (heard about this card)
+    only if this card is the active location
+    - for each location (any player controls) [also {"island":"adjacent"}]:
+      - [json LookAtFacedown {"verb":"LookAtFacedown","target":"picked"}]
+
+12072:B:1: Uncharted.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12072:B:2 (back): Cannot have player card attachments.
+  12072:constant:2: Constant
+    - this card: stat noPlayerAttachments 1, while this card is in play
+
+12072:B:3 (back): Forced: After Lost Island becomes the active location, flip it over.
+  12072:forced:2: Forced after this location becomes the active location (heard about this card)
+    - [json FlipUncharted {"verb":"FlipUncharted"}]
+
+12072:B:4 (back): Action: Remove 4 progress from Lost Island to look at its facedown side.
+  12072:action:1: Action (any player may use it)
+    only if this card is a location (any player controls) [also {"minProgress":4}]
+    - [json LookAtFacedown {"verb":"LookAtFacedown","remove":4}]
+
+## 12073 Winding Caverns
+(the scenario deals it into the islandMap pile; the piles place it, no record does)
+
+12073:A:1 (front): While Winding Caverns is the active location, each enemy gets +10 engagement cost.
+  12073:constant:1: Constant
+    only if this card is the active location
+    - each enemy (any player controls) or in the staging area: stat engagementCost 10, while this card is in play
+
+12073:A:2 (front): When you would travel from Winding Caverns to another location, you may travel to a location up to 3 locations away. (You must still pay that location's Travel cost in order to travel there.)
+  12073:constant:2: Constant
+    only if this card is the active location
+    - this card: stat islandReach 3, while this card is in play
+
+12073:B:1: Uncharted.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12073:B:2 (back): Cannot have player card attachments.
+  12073:constant:3: Constant
+    - this card: stat noPlayerAttachments 1, while this card is in play
+
+12073:B:3 (back): Forced: After Lost Island becomes the active location, flip it over.
+  12073:forced:1: Forced after this location becomes the active location (heard about this card)
+    - [json FlipUncharted {"verb":"FlipUncharted"}]
+
+12073:B:4 (back): Action: Remove 4 progress from Lost Island to look at its facedown side.
+  12073:action:1: Action (any player may use it)
+    only if this card is a location (any player controls) [also {"minProgress":4}]
+    - [json LookAtFacedown {"verb":"LookAtFacedown","remove":4}]
+
+## 12074 Jungle Path
+(the scenario deals it into the islandMap pile; the piles place it, no record does)
+
+12074:A:1 (front): While Jungle Path is the active location, the locations immediately above and below it are not considered to be in the staging area.
+  12074:constant:1: Constant
+    only if this card is the active location
+    - this card: stat islandBlock 2, while this card is in play
+
+12074:A:2 (front): Forced: When Jungle Path is flipped over while active, each player must exhaust a character with at least 2 Attack.
+  12074:forced:1: Forced on the event flippedOver (heard about this card)
+    only if this card is the active location
+    - for each player, first player first:
+      - choose ready character (you control) [also {"minAttack":2}]
+      - exhaust the picked card
+
+12074:B:1: Uncharted.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12074:B:2 (back): Cannot have player card attachments.
+  12074:constant:2: Constant
+    - this card: stat noPlayerAttachments 1, while this card is in play
+
+12074:B:3 (back): Forced: After Lost Island becomes the active location, flip it over.
+  12074:forced:2: Forced after this location becomes the active location (heard about this card)
+    - [json FlipUncharted {"verb":"FlipUncharted"}]
+
+12074:B:4 (back): Action: Remove 4 progress from Lost Island to look at its facedown side.
+  12074:action:1: Action (any player may use it)
+    only if this card is a location (any player controls) [also {"minProgress":4}]
+    - [json LookAtFacedown {"verb":"LookAtFacedown","remove":4}]
+
+## 12075 Faithless Desecrator
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12075:A:1 (front): While engaged with a player, Faithless Desecrator contributes its Threat to the total Threat in the staging area.
+  12075:constant:1: Constant
+    only if this card is engaged with the player
+    - this card: stat engagedThreat 1, while this card is in play
+
+12075:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the active location is a Ruins location).
+  12075:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the active location is a Ruins location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
+
+## 12076 Island Watcher
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12076:A:1 (front): Island Watcher cannot be optionally engaged.
+  12076:constant:1: Constant
+    - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
+
+12076:A:2 (front): While Island Watcher is in the staging area, it gains: "Forced: At the beginning of the encounter phase, if the active location has the Ruins trait, Island Watcher engages the player with the highest threat. Then, deal it 2 shadow cards."
+  12076:forced:1: Forced when a phase begins
+    only if all of: (it is the Encounter phase) and (this card is in the staging area) and (the active location is a Ruins location (any player controls))
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json PickHighestThreat {"verb":"PickHighestThreat"}]
+    - [json SwitchActor {"verb":"SwitchActor","to":"picked"}]
+    - engage this card
+    - [json DealShadow {"verb":"DealShadow","additional":true}]
+    - [json DealShadow {"verb":"DealShadow","additional":true}]
+
+## 12077 Profane Dead
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12077:A:1 (front): Forced: When you travel to the right, Profane Dead makes an immediate attack against the engaged player.
+  12077:forced:1: Forced after the players travel (heard about location (any player controls))
+    only if all of: ([json condition {"kind":"island","movedRight":true}]) and (this card is engaged with the player)
+    - for each player, first player first:
+      - if [json condition {"kind":"engagedWithActor"}]: this enemy attacks now, dealt a new shadow card after its old ones are discarded
+
+12077:A:2 (shadow): Shadow: Attacking enemy gets +3 Attack if the players control the Gate Key.
+  12077:shadow:1: Shadow
+    - if the number of objective (any player controls) named "Gate Key" [also {"controlled":true}] is at least 1: the attacking enemy: stat attack 3, until the end of the attack
+
+## 12078 Deeper into the Ruins
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12078:A:1 (front): When Revealed: Until the end of the phase, add X Threat to the total Threat in the staging area. X is the total Threat of all locations to the left of the active location (in its row). If X is 0, Deeper into the Ruins gains Doomed 1.
+  12078:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json RaiseStagingThreat {"verb":"RaiseStagingThreat","amount":{"islandLeft":true},"until":"endOfPhase","when":{"kind":"less","left":0,"right":{"islandLeft":true}}}]
+    - [json Doomed {"verb":"Doomed","amount":1,"when":{"kind":"less","left":{"islandLeft":true},"right":1}}]
+
+## 12079 Furious Rainstorm
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12079:A:1 (front): When Revealed: Each player must choose: raise his threat by the number of his characters committed to the quest, or deal 1 damage to each of his characters committed to the quest.
+  12079:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "threat" (only if there is a character (you control) committed to the quest to choose):
+          - raise threat by the number of character (you control) committed to the quest (the acting player)
+        * option "damage" (only if there is a character (you control) committed to the quest to choose):
+          - deal 1 damage to each character (you control) committed to the quest
+
+12079:A:2 (shadow): Shadow: If this attack destroys a character, raise your threat by the attacking enemy's Threat.
+  12079:shadow:1: Shadow
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): raise threat by threat of this card (the acting player)
+
+## 12080 Dwindling Supplies
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12080:A:1 (front): When Revealed: Each player must randomly discard cards from his hand until he has no more than 3 cards in his hand. If no cards were discarded by this effect, Dwindling Supplies gains doomed 2.
+  12080:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json Doomed {"verb":"Doomed","amount":2,"when":{"kind":"handSize","max":3}}]
+    - for each player, first player first:
+      - the acting player discards the cards in your hand - 3 random card(s) from hand
+
+12080:A:2 (shadow): Shadow: Defending character gets -2 Defense for this attack.
+  12080:shadow:1: Shadow
+    - the defender: stat defense -2, until the end of the attack
+
+## 12081 Sunken Ruins
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12081:A:1: Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12081:A:2 (front): When Revealed: Each Uncharted location in the staging area gets +1 Threat until the end of the phase. If the active location has the Ruins trait, discard 1 resource from each hero and objective-ally in play.
+  12081:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each location (any player controls) in the staging area only [also {"uncharted":true}]: stat threat 1, until the end of the phase
+    - then, if the active location is a Ruins location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): for each ally (any player controls) that is an objective, with resources on it:
+      - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"picked"}]
+    - then, if the active location is a Ruins location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): for each hero (any player controls) with resources on it:
+      - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"picked"}]
+
+(rendered pieces: 229 by template, 78 as JSON)
