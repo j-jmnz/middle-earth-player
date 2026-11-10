@@ -47,9 +47,9 @@ function condition(state: ScenarioState, found: Condition): boolean | null {
   return null;
 }
 
-// `isSource`: only the card whose record is being read (the copy that attacked).
+// `isSource`: only the card whose record is being read (the copy that attacked). A condition's `matches` reads no source here and checks it itself (conditions.ts).
 function pick(_state: ScenarioState, id: string, spec: PickSpec, at: PickContext): boolean {
-  return !spec.isSource || id === at.sourceId;
+  return !spec.isSource || at.sourceId == null || id === at.sourceId;
 }
 
 // "Until the end of the round, players cannot declare attacks" (143040:A:2): no character is declared as an attacker while the table holds the flag.

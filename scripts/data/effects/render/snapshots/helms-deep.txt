@@ -85,12 +85,12 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143037:A:1 (front): While The Hornburg is the active location, reduce the archery total by 1 for each player in the game.
   143037:constant:1: Constant
     only if this card is the active location
-    - this card: stat archeryBonus the number of players x -1, while this card is in play
+    - this card: stat archeryBonus minus (the number of players), while this card is in play
 
 143037:A:2 (front): Forced: When The Hornburg is explored, assign X damage among characters in play. X is the number of enemies in play.
   143037:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
-    - [json AssignDamage {"verb":"AssignDamage","amount":{"count":{"type":"enemy","control":"any"}},"pick":{"type":"character","control":"any"}}]
+    - [json AssignDamage {"verb":"AssignDamage","amount":{"count":{"type":"enemy","control":"any","staging":true}},"pick":{"type":"character","control":"any"}}]
 
 ## 143038 Deeping Wall
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -179,7 +179,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143043:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack and gains Toughness 2 until the end of the round.
   143043:shadow:1: Shadow
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the attacking enemy: stat attack 2, until the end of the attack
+    - the attacking enemy: stat attack 2, until the end of the round
     - the attacking enemy: stat toughness 2, until the end of the round
 
 ## 143044 Reckless Hate

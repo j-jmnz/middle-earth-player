@@ -189,6 +189,13 @@ export function fightEnemy<T extends FightTable, L>(table: (layout: L) => T, sha
       run = send(run, { type: "Choose", optionId: options.pick?.(run.state) ?? run.state.window.options[0] ?? "" }, made.ctx);
       continue;
     }
+    if (run.state.window?.kind === "archery") {
+      // The archery of an enemy in the fight (a Soldier of Isengard): the whole total goes on the second hero, so the first hero's damage is the attack's alone.
+      const recipients = legalTargets(run.state, { type: "Distribute" }, made.ctx);
+      const recipient = recipients.includes(made.hero2) ? made.hero2 : (recipients[0] ?? made.hero2);
+      run = send(run, { type: "Distribute", assignments: [{ cardId: recipient, amount: run.state.window.total }] }, made.ctx);
+      continue;
+    }
     const pass = legalIntents(run.state, made.ctx).find((intent) => intent.type === "Pass" || intent.type === "DeclineAttack" || intent.type === "DeclineEngage");
     if (!pass) break;
     run = send(run, pass as PlayerIntent, made.ctx);

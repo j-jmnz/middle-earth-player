@@ -43,6 +43,10 @@ export type Expect =
   | { expect: "counter"; name: CounterName; value: number }
   | { expect: "heldBy"; code: string; host: string }
   | { expect: "deckCount"; value: number }
+  | { expect: "exhausted"; code: string; value: boolean }
+  | { expect: "stagingThreat"; value: number }
+  | { expect: "threat"; value: number; seat: number }
+  | { expect: "revealedBy"; code: string; seat: number }
   | { expect: "lost" }
   | { expect: "won" }
   | { expect: "frame"; name: string }

@@ -86,7 +86,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       lines: ["143037:A:1"],
       timing: "constant",
       condition: { kind: "sourceIn", zone: "activeLocation" },
-      instructions: [{ verb: "ModifyStat", stat: "archeryBonus", amount: { players: true, times: -1 }, until: "whileSourceInPlay" }],
+      instructions: [{ verb: "ModifyStat", stat: "archeryBonus", amount: { players: true, negative: true }, until: "whileSourceInPlay" }],
     },
     {
       id: "143037:forced:1",
@@ -94,7 +94,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       lines: ["143037:A:2"],
       timing: "forced",
       ...WHEN_EXPLORED,
-      instructions: [{ verb: "AssignDamage", amount: { count: { type: "enemy", control: "any" } }, pick: A_CHARACTER }],
+      instructions: [{ verb: "AssignDamage", amount: { count: { type: "enemy", control: "any", staging: true } }, pick: A_CHARACTER }],
     },
 
     // 143038 Deeping Wall: +1 Defense for each hero while it is the active location (the same line as Dwarven Watchtower); each player raises their threat by 4 when it is explored.
@@ -187,7 +187,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       lines: ["143043:A:2"],
       timing: "shadow",
       instructions: [
-        { verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfAttack", target: "attacker" },
+        { verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfRound", target: "attacker" },
         { verb: "ModifyStat", stat: "toughness", amount: 2, until: "endOfRound", target: "attacker" },
       ],
     },
