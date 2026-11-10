@@ -16,6 +16,7 @@ const TREE = [
   "scripts/checks/effect-coverage.test.ts",
   "scripts/checks/effect-migration.test.ts",
   "scripts/checks/layout.test.ts",
+  "scripts/checks/spec-coverage.test.ts",
   "scripts/docs/index.test.ts",
   "scripts/checks/maestro.test.ts",
   "src/effects/copies.test.ts",
@@ -97,7 +98,7 @@ describe("selectTests", () => {
   it("gathers the parts, and skips the golden tests for a scenario with no registry entry", () => {
     const selected = selectTests("the-oath", [], TREE, "The Oath", read);
     expect(selected.goldens).toEqual({ files: ["src/campaign/causes.test.ts", "src/campaign/replay.test.ts", "src/campaign/fixtures.test.ts"], title: "The Oath" });
-    expect(selected.coverage).toEqual(["scripts/checks/effect-coverage.test.ts", "scripts/checks/effect-migration.test.ts", "src/effects/copies.test.ts", "test/harness/golden-registry.test.ts", "scripts/checks/layout.test.ts", "scripts/docs/index.test.ts", "scripts/checks/maestro.test.ts", "src/play/words/scenarios/sea.test.ts"]);
+    expect(selected.coverage).toEqual(["scripts/checks/effect-coverage.test.ts", "scripts/checks/effect-migration.test.ts", "src/effects/copies.test.ts", "test/harness/golden-registry.test.ts", "scripts/checks/layout.test.ts", "scripts/checks/spec-coverage.test.ts", "scripts/docs/index.test.ts", "scripts/checks/maestro.test.ts", "src/play/words/scenarios/sea.test.ts"]);
     expect(selected.families).toEqual([]);
     expect(selectTests("the-oath", [], TREE, null, read).goldens.files).toEqual([]);
   });

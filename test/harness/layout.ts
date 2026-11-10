@@ -16,8 +16,11 @@ import { addStandIns, entry, fillerRecord, HERO, HERO2, HERO3, idOf, idsOf, open
 // Test helper. A table built from a layout (cards by zone) for any scenario, from data/ alone: the data loading and `tableFromLayout`, which test/harness/card-spec.ts runs its rows on. scene-kit.ts re-exports
 // everything here, so a scenario's tests import it from there.
 
-/** A card the layout places: a code, or a code with its tokens. */
+/** A card the layout places: a code, or a code with its tokens (and the seat it belongs to, the first by default). */
 export type Placed = Entry | { code: string; seat: number; damage?: number; resources?: number };
+
+/** A card of a hand or a deck: a code (every seat gets one), or a code and the one seat that holds it. */
+export type Dealt = string | { code: string; seat: number };
 
 /** The zones a layout fills with a list of cards and no seat: a second deck, the Corsair or uncharted decks, the victory display. */
 export type PileZone = Extract<Destination, { area?: number }>["zone"];
@@ -39,11 +42,13 @@ export type Layout = {
   setAside?: readonly string[];
   victory?: readonly string[];
   engaged?: readonly Placed[];
-  hand?: readonly string[];
-  deckOf?: readonly string[];
-  play?: readonly string[];
+  hand?: readonly Dealt[];
+  deckOf?: readonly Dealt[];
+  play?: readonly Placed[];
   phase?: ScenePhase;
   threat?: readonly [number, number];
+  // Resources in the pool of every hero stand-in (a cost a row pays, a cancel).
+  heroResources?: number;
   // The campaign card is on the table (a campaign game).
   campaign?: boolean;
   // Cards attached to the first card of `to`, wherever it lies (an attachment is spawned in play and attached).
@@ -57,6 +62,10 @@ export type Layout = {
   // Other zones that hold a list of cards (a second deck, a named pile).
   piles?: Partial<Record<PileZone, readonly Entry[]>>;
 };
+
+const seatOf = (item: Placed): number => (typeof item === "object" && "seat" in item ? item.seat : 0);
+const dealtCode = (item: Dealt): string => (typeof item === "string" ? item : item.code);
+const dealtTo = (item: Dealt, seat: number): boolean => typeof item === "string" || item.seat === seat;
 
 export type LayoutTable = { state: ScenarioState; ctx: ReduceContext; hero: string; hero2: string; seat1Hero: string | null; definition: ScenarioDefinition; cards: Map<string, PrintedCard> };
 
@@ -80,7 +89,7 @@ function loadedWorld(scenarioId: string): Loaded {
     if (!card) throw new Error(`data/cards has no card ${code}`);
     cards.set(code, printedFromCard(card));
   }
-  addStandIns(cards, ["f0", "f3", "place", "treachery", "heroes"]);
+  addStandIns(cards, ["f0", "f3", "place", "treachery", "attachment", "heroes"]);
   addStandIns(cards, ["filler", "event", "ally"], [0, 1, 2, 3]);
   const made = { data, dealt, campaign, cards };
   LOADED.set(scenarioId, made);
@@ -124,20 +133,21 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   }
   for (let seat = 0; seat < seats; seat += 1) state = withThreat(state, seat, layout.threat?.[seat] ?? 28);
   for (let seat = 0; seat < seats; seat += 1) {
-    for (const code of layout.hand ?? []) state = spawn(state, code, { zone: "hand", seat }).state;
-    for (const code of layout.deckOf ?? []) state = spawn(state, code, { zone: "deck", seat }, "down").state;
+    for (const item of layout.hand ?? []) if (dealtTo(item, seat)) state = spawn(state, dealtCode(item), { zone: "hand", seat }).state;
+    for (const item of layout.deckOf ?? []) if (dealtTo(item, seat)) state = spawn(state, dealtCode(item), { zone: "deck", seat }, "down").state;
   }
+  if (layout.heroResources) for (const id of Object.keys(state.cards)) if (state.cards[id]?.zone === "heroes") state = updateCard(state, id, { resources: layout.heroResources });
   const put = (code: string, dest: Destination, tokens: Entry = code, face?: "up" | "down"): void => {
     const row = entry(tokens);
     const spawned = spawn(state, code, dest, face);
     state = updateCard(spawned.state, spawned.id, { progress: row.progress, damage: row.damage, resources: row.resources });
   };
-  for (const code of layout.play ?? []) put(code, { zone: "play", seat: 0 });
+  for (const item of layout.play ?? []) put(entry(item).code, { zone: "play", seat: seatOf(item) }, item);
   for (const code of layout.deck ?? []) put(code, { zone: "encounterDeck" }, code, "down");
   for (const code of layout.discard ?? []) put(code, { zone: "encounterDiscard" });
   for (const item of layout.staging ?? []) put(entry(item).code, { zone: "staging" }, item);
   for (const code of layout.setAside ?? []) put(code, { zone: "setAside" }, code, "up");
-  for (const item of layout.engaged ?? []) put(entry(item).code, { zone: "engaged", seat: typeof item === "object" && "seat" in item ? item.seat : 0 }, item);
+  for (const item of layout.engaged ?? []) put(entry(item).code, { zone: "engaged", seat: seatOf(item) }, item);
   for (const code of layout.victory ?? []) put(code, { zone: "victory" });
   if (layout.active) put(layout.active, { zone: "activeLocation" });
   if (layout.campaign) put(world.dealt.campaignCard, { zone: "campaign" });

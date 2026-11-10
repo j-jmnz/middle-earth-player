@@ -327,7 +327,7 @@ Open work; read when a task names it.
   - 128–134 Merge (~140) ← 1
   - 135–141 Commit (~130)
   - 142–149 Report (your final message) (~90) ← 3
-- `docs/handover/fast-track.md` — The fast track: building a scenario with one author (~1.4K tok)
+- `docs/handover/fast-track.md` — The fast track: building a scenario with one author (~1.5K tok)
 
 ## Code to docs
 
