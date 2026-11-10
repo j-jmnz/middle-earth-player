@@ -7,8 +7,10 @@ function amountWords(amount: unknown): string {
 }
 
 /** One burden instruction in words, or null when it is not one of them (or adds nothing the player decides on). */
-export function burdenWords(instruction: Instruction): string | null {
+export function burdenWords(instruction: Instruction, nameOf: (code: string) => string): string | null {
   switch (instruction.verb) {
+    case "ShuffleCopyIntoEachDeck":
+      return `each player shuffles 1 ${nameOf(instruction.code)} into their deck`;
     case "ReduceLife":
       return `reduce the Ring-bearer's life by ${amountWords(instruction.amount)}`;
     case "MoveBurden":

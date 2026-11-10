@@ -12,7 +12,7 @@ import { grappleDetail, shipLoss } from "../words/scenarios/grapple.ts";
 import { oathDetail } from "./oath-preview.ts";
 import { delayedLines, effectLines } from "./card-effects.ts";
 import type { PreviewCard } from "./card-preview.tsx";
-import { stageRuleLines } from "../readouts/fortress.ts";
+import { stageDetail } from "../readouts/fortress.ts";
 import { advanceHold, questObjective, stagePoints } from "../readouts/objective.ts";
 import { pictureKey } from "../canvas/picture-key.ts";
 import { headingLook, headingPreviewSteps, headingPreviewTitle, headingStepOf } from "../dream-chaser/heading.ts";
@@ -38,7 +38,7 @@ export function questTitle(whole: ScenarioState, ctx: ReduceContext, cardId: str
   // A stage held back says what holds it, so progress past its quest points reads as the rule and not a fault (13 / 8).
   const hold = points != null ? advanceHold(game, ctx, line) : null;
   // A stage with Defense says where questing's progress goes, and a stage whose filling loses the game says so (mec112.defense, 143075:B:3).
-  const detail = [hold, ...stageRuleLines(game, ctx, stage.code)].filter((text) => text != null).join(". ");
+  const detail = stageDetail(game, ctx, stage.code, points, hold, null).join(". ");
   if (points != null) return { title: `${name} · ${stage.progress} / ${points}`, ...(detail ? { detail } : {}) };
   const objective = questObjective(game, ctx, line);
   return { title: name, detail: objective ? `To win: ${objective}` : "No quest points" };

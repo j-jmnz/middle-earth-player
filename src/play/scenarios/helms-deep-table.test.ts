@@ -8,26 +8,26 @@ import { updateCard } from "../../rules/core/state.ts";
 import { loadCampaign, loadScenario } from "../../../scripts/data/load-scenarios.ts";
 
 import { questTitle } from "../cards/table-preview.ts";
-import { defenseTokens, stageDefeatLoses, stageHasDefense, stageRuleLines } from "../readouts/fortress.ts";
+import { defenseOutcome, defenseTokens, stageDefeatLoses, stageDetail, stageHasDefense } from "../readouts/fortress.ts";
 import { advanceWords } from "../readouts/quest-advance.ts";
 import { readoutFor } from "../readouts/readout.ts";
-import { questScaleOf, scaleLabel, scaleMarker } from "../readouts/quest-scale.ts";
-import { threatLevel, threatMeter } from "../readouts/threat-level.ts";
+import { questScaleOf, scaleLabel, scaleMarker, type QuestScale } from "../readouts/quest-scale.ts";
+import { threatMeter } from "../readouts/threat-level.ts";
 import { heldDials } from "../readouts/widgets.ts";
-import { DEFENSE_STAGE, defenseLimitWords, defenseQuestResult, STAGE_DEFEAT_LOSS } from "../words/scenarios/fortress.ts";
+import { DEFENSE_STAGE, defenseLimitWords, defenseQuestResult } from "../words/scenarios/fortress.ts";
 
 const table = (layout: Layout = {}) => tableFromLayout("helms-deep", layout);
 const nameOf = (made: ReturnType<typeof table>) => (code: string) => made.cards.get(code)?.name ?? code;
 
 describe("the Defense dial", () => {
   it("is declared by the scenario's definition with the number read from the record, and a scenario with no such card declares none", () => {
-    expect(table().definition.widgets.defenseTracker).toEqual({ code: "143033", limit: 8 });
+    expect(table().definition.widgets.defenseTracker).toEqual({ code: "143033", limit: 8, stage: 5 });
     expect(scenarioDefinition(loadScenario("the-oath"), loadCampaign(), []).widgets).not.toHaveProperty("defenseTracker");
   });
 
   it("reads the tokens the engine holds while the objective is in play, and is none before it joins the staging area and after it joins the victory display", () => {
     const made = table({ staging: [{ code: "143033", resources: 5 }] });
-    expect(defenseTokens(made.state, nameOf(made))).toEqual({ name: "The Defense of Helm's Deep", value: 5, limit: 8 });
+    expect(defenseTokens(made.state, nameOf(made))).toEqual({ name: "The Defense of Helm's Deep", value: 5, limit: 8, stage: 5 });
     expect(defenseTokens(table({ setAside: ["143033"] }).state, nameOf(made))).toBeNull();
     expect(defenseTokens(table({ victory: ["143033"] }).state, nameOf(made))).toBeNull();
     const none = { ...made.state, widgets: { ...made.state.widgets, defenseTracker: undefined } };
@@ -36,15 +36,10 @@ describe("the Defense dial", () => {
     expect(defenseTokens(more, nameOf(made))?.value).toBe(6);
   });
 
-  it("warms toward 8 as the pursuit dial toward 30: the meter fills against the limit, near from 7 and critical from 8", () => {
+  it("fills its ring against the limit, and is read as the tokens on the objective with how many more advance the players (the limit is their way out: no warning)", () => {
     expect(threatMeter(4, 8)).toBe(0.5);
-    expect(threatLevel(6, 8)).toBe("calm");
-    expect(threatLevel(7, 8)).toBe("near");
-    expect(threatLevel(8, 8)).toBe("critical");
-  });
-
-  it("is read as the tokens on the objective, with the number at which the players advance", () => {
-    expect(defenseLimitWords(8)).toBe("at 8 the players advance to stage 5A");
+    expect(defenseLimitWords(6, 8, 5)).toBe("2 more and the players advance to stage 5");
+    expect(defenseLimitWords(7, 8, 5)).toBe("1 more and the players advance to stage 5");
   });
 
   it("143073:B:1 leaves every seat without a held dial", () => {
@@ -60,10 +55,12 @@ describe("the quest on a stage with Defense", () => {
     expect(stageHasDefense(table({ stage: "143076" }).state)).toBe(false);
   });
 
+
   it("143073:B:1 says the encounter deck places the difference when the Threat wins, and no progress when the Willpower does, and names no threat for the players", () => {
-    expect(defenseQuestResult(2, 5)).toBe("The encounter deck places 3 progress, not your threat");
-    expect(defenseQuestResult(5, 2)).toBe("No progress: the stage has Defense");
-    expect(defenseQuestResult(3, 3)).toBe("No progress: the stage has Defense");
+    const none = { fills: "nothing", reveals: false } as const;
+    expect(defenseQuestResult(2, 5, none)).toBe("The encounter deck places 3 progress, not your threat");
+    expect(defenseQuestResult(5, 2, none)).toBe("The encounter deck places no progress");
+    expect(defenseQuestResult(3, 3, none)).toBe("The encounter deck places no progress");
     // Committing 4 Willpower against 6 Threat in the staging area, the dock's result line is the Defense line; on stage 1B it is the plain one.
     const made = table({ stage: "143073", staging: ["f3", "f3"], committed: ["dh1", "dh2"] });
     const readout = readoutFor({ ...made.state, mode: "resolution" }, made.ctx, null, null, () => "");
@@ -72,11 +69,26 @@ describe("the quest on a stage with Defense", () => {
     expect(readoutFor({ ...plain.state, mode: "resolution" }, plain.ctx, null, null, () => "")?.result).toMatch(/^Threat \+2 if nothing changes/);
   });
 
-  it("143073:B:1 draws the meter's marker as the way the progress goes: +N for the encounter deck when short, 0 when ahead", () => {
-    expect(scaleMarker(-2, true)).toEqual({ value: "+2", word: "Encounter", tone: "danger" });
-    expect(scaleMarker(3, true)).toEqual({ value: "0", word: "None", tone: "muted" });
-    expect(scaleMarker(0, true).word).toBe("Even");
-    expect(scaleMarker(-2)).toEqual({ value: "−2", word: "Short", tone: "danger" });
+  it("143075:B:3 says what filling the stage does: stage 4B loses, 2B advances to stage 3, and 3B with no progress on it has the first player reveal a card (143074:B:2)", () => {
+    // Stage 4B with 7 progress, 6 Threat against 2 Willpower: the encounter deck places 4 and the players lose, though no threat rises.
+    const wall = table({ stage: "143075", progress: 7, staging: ["f3", "f3"], committed: ["dh1"] });
+    expect(defenseOutcome(wall.state, wall.ctx)).toEqual({ fills: "loses", reveals: false });
+    expect(readoutFor({ ...wall.state, mode: "resolution" }, wall.ctx, null, null, () => "")?.result).toBe("The encounter deck places 4 progress, not your threat; the stage fills: the players lose");
+    const second = table({ stage: "143073", progress: 7, staging: ["f3", "f3"], committed: ["dh1"] });
+    expect(defenseOutcome(second.state, second.ctx)).toEqual({ fills: { advancesTo: 3 }, reveals: false });
+    expect(readoutFor({ ...second.state, mode: "resolution" }, second.ctx, null, null, () => "")?.result).toBe("The encounter deck places 4 progress, not your threat; the stage fills: advance to stage 3");
+    // Willpower beats the Threat on stage 3B: nothing lands on it, so the first player reveals a card.
+    const third = table({ stage: "143074", staging: ["f3"], committed: ["dh1", "dh2"] });
+    expect(defenseOutcome(third.state, third.ctx)).toEqual({ fills: "nothing", reveals: true });
+    expect(readoutFor({ ...third.state, mode: "resolution" }, third.ctx, null, null, () => "")?.result).toBe("The encounter deck places no progress; the first player reveals 1 encounter card");
+  });
+
+  it("143073:B:1 draws the meter's marker as the way the progress goes: +N to the stage for the encounter deck when short, Held when ahead", () => {
+    const at = (delta: number, defense?: boolean): QuestScale => ({ threat: 0, willpower: 0, delta, live: true, seat: null, ...(defense ? { defense } : {}) });
+    expect(scaleMarker(at(-2, true))).toEqual({ value: "+2", word: "Encounter", tone: "danger", caption: "to stage" });
+    expect(scaleMarker(at(3, true))).toEqual({ value: "Held", word: "Held", tone: "muted", caption: null });
+    expect(scaleMarker(at(0, true)).word).toBe("Even");
+    expect(scaleMarker(at(-2))).toEqual({ value: "−2", word: "Short", tone: "danger", caption: null });
     const made = table({ stage: "143073", staging: ["f3", "f3"], committed: ["dh1", "dh2"] });
     const scale = questScaleOf(made.state, made.ctx, null);
     expect(scale.defense).toBe(true);
@@ -92,15 +104,15 @@ describe("the stage that loses when it is full", () => {
     for (const code of ["143072", "143073", "143074", "143076"]) expect(stageDefeatLoses(made.ctx, code)).toBe(false);
   });
 
-  it("143075:B:3 says so in the stage's preview title line, beside its progress over its quest points, and on the advance screen", () => {
+  it("says when a stage with Defense is full in its preview title line, beside its progress over its quest points, and on the advance screen: the loss first on 4B", () => {
     const made = table({ stage: "143075", progress: 3 });
     const stage = idOf(made.state, "143075");
     const title = questTitle(made.state, made.ctx, stage, "The Wall is Breached!", () => null);
-    expect(title).toEqual({ title: "The Wall is Breached! · 3 / 8", detail: `${DEFENSE_STAGE}. ${STAGE_DEFEAT_LOSS}` });
-    expect(advanceWords(made.state, made.ctx, stage, "The Wall is Breached!", () => null).detail).toBe(`8 quest points to complete it. ${DEFENSE_STAGE}. ${STAGE_DEFEAT_LOSS}`);
+    expect(title).toEqual({ title: "The Wall is Breached! · 3 / 8", detail: `The players lose at 8 progress. ${DEFENSE_STAGE}` });
+    expect(advanceWords(made.state, made.ctx, stage, "The Wall is Breached!", () => null).detail).toBe(`The players lose at 8 progress. ${DEFENSE_STAGE}`);
     const second = table({ stage: "143073" });
-    expect(stageRuleLines(second.state, second.ctx, "143073")).toEqual([DEFENSE_STAGE]);
+    expect(stageDetail(second.state, second.ctx, "143073", 8, null, "8 quest points to complete it")).toEqual(["The encounter deck advances it at 8 progress", DEFENSE_STAGE]);
     const first = table({ stage: "143072" });
-    expect(stageRuleLines(first.state, first.ctx, "143072")).toEqual([]);
+    expect(stageDetail(first.state, first.ctx, "143072", 8, null, "8 quest points to complete it")).toEqual(["8 quest points to complete it"]);
   });
 });

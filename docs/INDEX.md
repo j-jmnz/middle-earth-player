@@ -73,7 +73,7 @@ Read the sections your task touches.
   - 354–359 Catalog build (~410)
   - 360–377 Tests (~1.9K) ← 6
   - 378–393 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~86.9K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~87.0K tok)
   - 17–38 Sections (~410)
   - 39–50 Product (~590)
   - 51–64 Non-goals (~540)
@@ -120,11 +120,11 @@ Read the sections your task touches.
   - 941–966 Persistence and shipping (~1.8K)
   - 967–1008 Screens (~4.7K) ← 1
     - 993–1008 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~41.3K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~41.5K tok)
   - 5–8 Overview (~130) ← 1
-  - 9–23 Top bar (~2.4K) ← 4
+  - 9–23 Top bar (~2.5K) ← 4
   - 24–27 Table menu (~430) ← 2
-  - 28–35 Quest scale (~710) ← 2
+  - 28–35 Quest scale (~830) ← 2
   - 36–39 Canvas (~560)
   - 40–52 Spacing and the play area's rows (~1.8K) ← 9
   - 53–58 Pictures on the table (~320) ← 1

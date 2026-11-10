@@ -152,7 +152,7 @@ const widgetsSchema = z.strictObject({
   // The pursuit value at which the players lose (mec112.pursuit), for a scenario whose quest card sets a pursuit tracker; absent otherwise.
   pursuitTracker: z.number().int().positive().optional(),
   // The objective whose resource tokens the table reads against the number that ends it (mec112.defense, 143033:A:3: 8 tokens on The Defense of Helm's Deep advance to stage 5A); absent otherwise.
-  defenseTracker: z.strictObject({ code: z.string().min(1), limit: z.number().int().positive() }).optional(),
+  defenseTracker: z.strictObject({ code: z.string().min(1), limit: z.number().int().positive(), stage: z.number().int().positive() }).optional(),
   secondActiveLocation: z.boolean(),
   perSeatStaging: z.boolean(),
 });

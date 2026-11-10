@@ -364,15 +364,18 @@ export function pursuitLimit(data: ScenarioData, effects: readonly Effect[]): nu
   return undefined;
 }
 
-// The objective whose tokens end a stage when they reach a number (mec112.defense, The Defense of Helm's Deep, 143033:A:3): the card of a record whose instruction is held by a `tokens` condition on that card, and the `min` of it.
-// Undefined for a scenario that deals no such card. The top bar's Defense dial draws its meter against the limit.
-export function defenseTracker(data: ScenarioData, effects: readonly Effect[]): { code: string; limit: number } | undefined {
+// The objective whose tokens end a stage when they reach a number (mec112.defense, The Defense of Helm's Deep, 143033:A:3): the card of a record whose instruction is held by a `tokens` condition on that card, the `min` of it,
+// and the quest stage (1-based, as `stageNumber` counts) the same record's `AdvanceToStage` goes to. Undefined for a scenario that deals no such card. The top bar's Defense dial draws its meter against the limit.
+export function defenseTracker(data: ScenarioData, effects: readonly Effect[]): { code: string; limit: number; stage: number } | undefined {
   const dealt = new Set(data.cards.map((card) => card.code));
   for (const effect of effects) {
     if (!dealt.has(effect.cardCode) || effect.timing !== "forced") continue;
     for (const instruction of effect.instructions) {
       const when = "when" in instruction ? instruction.when : undefined;
-      if (instruction.verb === "AddSourceToVictory" && when?.kind === "tokens" && when.code === effect.cardCode && when.min != null) return { code: effect.cardCode, limit: when.min };
+      if (instruction.verb !== "AddSourceToVictory" || when?.kind !== "tokens" || when.code !== effect.cardCode || when.min == null) continue;
+      const advance = effect.instructions.find((other) => other.verb === "AdvanceToStage");
+      const stage = advance?.verb === "AdvanceToStage" ? data.stages.indexOf(advance.code) + 1 : 0;
+      if (stage > 0) return { code: effect.cardCode, limit: when.min, stage };
     }
   }
   return undefined;

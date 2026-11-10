@@ -19,7 +19,7 @@ import { topFrame } from "../../rules/windows/windows.ts";
 
 import { damageOutcome, enemiesToFace, lossWords, outcomeWords } from "../store/foresight.ts";
 import { defenseQuestResult } from "../words/scenarios/fortress.ts";
-import { stageHasDefense } from "./fortress.ts";
+import { defenseOutcome, stageHasDefense } from "./fortress.ts";
 import { sailingReadout } from "./sea-readout.ts";
 import type { Sheet, SheetStat } from "../choice/sheet-types.ts";
 import { choiceFor, type Choice } from "../choice/table-choice.ts";
@@ -167,7 +167,7 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     const threat = stagingThreat(game, ctx.cards, seat);
     if (game.mode === "questCommit") return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: commitWords(game, ctx, picked) };
     // A stage with Defense (mec112.defense): the Threat that beats the Willpower is progress the encounter deck places, so no player's threat rises and no elimination is warned of.
-    if (stageHasDefense(game)) return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: defenseQuestResult(willpower, threat) };
+    if (stageHasDefense(game)) return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: defenseQuestResult(willpower, threat, defenseOutcome(game, ctx)) };
     return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: `${questResult(willpower, threat)}${eliminationWords(game, threat - willpower, seat)}` };
   }
   return null;

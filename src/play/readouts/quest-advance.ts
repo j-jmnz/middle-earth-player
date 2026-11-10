@@ -14,7 +14,7 @@ import type { CardFace } from "../../rules/core/state.ts";
 import { isOver } from "../../rules/engine/undo.ts";
 import { topFrame } from "../../rules/windows/windows.ts";
 
-import { stageRuleLines } from "./fortress.ts";
+import { stageDetail } from "./fortress.ts";
 import { advanceHold, questObjective, stagePoints } from "./objective.ts";
 import { STAGE_LOSS } from "../words/scenarios/stormcaller.ts";
 import type { TableMoment } from "../store/store.ts";
@@ -117,8 +117,7 @@ export function advanceWords(
   const objective = points == null ? questObjective(view, ctx, line) : null;
   const won = points != null ? `${points} quest point${points === 1 ? "" : "s"} to complete it` : objective ? `To win: ${objective}` : null;
   // A stage with Defense says where questing's progress goes, one whose filling loses the game says so (mec112.defense, 143075:B:3).
-  const rules = stage ? stageRuleLines(view, ctx, stage.code) : [];
-  const detail = [hold ?? won, ...rules].filter((text) => text != null).join(". ") || null;
+  const detail = (stage ? stageDetail(view, ctx, stage.code, points, hold, won) : [hold ?? won].filter((text) => text != null)).join(". ") || null;
   const who = seat != null && game.seatCount > 1 ? `Player ${seat + 1}` : null;
   const stageWords = place ? `Stage ${place.at} of ${place.of}` : null;
   const eyebrow = who && stageWords ? `${who} · ${stageWords}` : (who ?? stageWords);

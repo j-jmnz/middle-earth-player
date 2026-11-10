@@ -9,6 +9,7 @@ import { useEffect } from "react";
 import { Pressable, View } from "react-native";
 import Animated, { cancelAnimation, useAnimatedStyle, useSharedValue, withTiming, type SharedValue } from "react-native-reanimated";
 
+import { GameIcon } from "../../ui/game-icon.tsx";
 import { MOTION } from "../../ui/motion-tokens.ts";
 import { timing, useMotionScale } from "../../ui/motion-run.ts";
 import { meterFractions, scaleLabel, scaleMarker, stagingWord, type QuestScale } from "./quest-scale.ts";
@@ -41,8 +42,8 @@ const CAPTION = 14;
 function FullMeter({ scale, height }: { scale: QuestScale; height: number }) {
   const t = useTableTokens();
   const s = useUiScale();
-  const marker = scaleMarker(scale.delta, scale.defense === true);
-  const even = marker.word === "Even";
+  const marker = scaleMarker(scale);
+  const small = marker.word === "Even" || marker.word === "Held";
   const share = meterFractions(scale);
   const threatFill = useFill(share.threat);
   const willFill = useFill(share.willpower);
@@ -69,11 +70,13 @@ function FullMeter({ scale, height }: { scale: QuestScale; height: number }) {
       <View className="items-center" style={{ width: 44 * s }}>
         <View style={{ height: NUMBER * s }} />
         <View className="min-h-0 flex-1 items-center justify-center">
-          <Text testID="quest-meter-marker" className="font-display" style={{ fontSize: (even ? 15 : 22) * s, lineHeight: (even ? 18 : 26) * s, color: markerColor(marker.tone, t) }}>
-            {even ? marker.word : marker.value}
+          <Text testID="quest-meter-marker" className="font-display" style={{ fontSize: (small ? 15 : 22) * s, lineHeight: (small ? 18 : 26) * s, color: markerColor(marker.tone, t) }}>
+            {marker.word === "Even" ? marker.word : marker.value}
           </Text>
         </View>
-        <View style={{ height: CAPTION * s }} />
+        <Text testID="quest-meter-caption" className="text-micro" numberOfLines={1} style={{ height: CAPTION * s, color: t.muted }}>
+          {marker.caption ?? ""}
+        </Text>
       </View>
       <View testID="quest-meter-willpower" className="items-center" style={{ width: 64 * s }}>
         <Text className="font-display" style={{ height: NUMBER * s, fontSize: 20 * s, lineHeight: NUMBER * s, color: t.bone }}>
@@ -94,7 +97,7 @@ function FullMeter({ scale, height }: { scale: QuestScale; height: number }) {
   );
 }
 
-function CompactRow({ fill, color, edge, word, value, trailing, trailingColor }: { fill: SharedValue<number>; color: string; edge: string; word: string; value: string; trailing: string | null; trailingColor: string }) {
+function CompactRow({ fill, color, edge, word, value, trailing, trailingColor, glyph }: { fill: SharedValue<number>; color: string; edge: string; word: string; value: string; trailing: string | null; trailingColor: string; glyph?: boolean }) {
   const t = useTableTokens();
   const s = useUiScale();
   const style = useAnimatedStyle(() => ({ width: `${fill.get() * 100}%` }));
@@ -109,9 +112,13 @@ function CompactRow({ fill, color, edge, word, value, trailing, trailingColor }:
       <Text className="font-display" style={{ width: 24 * s, textAlign: "right", fontSize: 16 * s, lineHeight: 20 * s, color: t.bone }}>
         {value}
       </Text>
-      <Text className="font-display" numberOfLines={1} style={{ width: 40 * s, fontSize: 16 * s, lineHeight: 20 * s, color: trailingColor }}>
-        {trailing ?? ""}
-      </Text>
+      <View className="flex-row items-center" style={{ width: 40 * s, gap: 2 * s }}>
+        <Text className="font-display" numberOfLines={1} style={{ fontSize: 16 * s, lineHeight: 20 * s, color: trailingColor }}>
+          {trailing ?? ""}
+        </Text>
+        {/* On a stage with Defense the progress goes to the stage: a word as well as the colour. */}
+        {glyph ? <GameIcon name="progress" size={14 * s} /> : null}
+      </View>
     </View>
   );
 }
@@ -119,7 +126,7 @@ function CompactRow({ fill, color, edge, word, value, trailing, trailingColor }:
 /** The compact meter: the same two values as short horizontal bars with their numbers, in `height` points. */
 function CompactMeter({ scale, height }: { scale: QuestScale; height: number }) {
   const t = useTableTokens();
-  const marker = scaleMarker(scale.delta, scale.defense === true);
+  const marker = scaleMarker(scale);
   const share = meterFractions(scale);
   const threatFill = useFill(share.threat);
   const willFill = useFill(share.willpower);
@@ -127,7 +134,7 @@ function CompactMeter({ scale, height }: { scale: QuestScale; height: number }) 
   return (
     <View style={{ height }}>
       <CompactRow fill={threatFill} color={t.threat} edge={t.threatEdge} word={stagingWord(scale)} value={String(scale.threat)} trailing={null} trailingColor={t.muted} />
-      <CompactRow fill={willFill} color={t.accent} edge={t.accentDeep} word="willpower" value={String(scale.willpower)} trailing={even ? "Even" : marker.value} trailingColor={markerColor(marker.tone, t)} />
+      <CompactRow fill={willFill} color={t.accent} edge={t.accentDeep} word="willpower" value={String(scale.willpower)} trailing={even ? "Even" : marker.value} trailingColor={markerColor(marker.tone, t)} glyph={marker.word === "Encounter"} />
     </View>
   );
 }
