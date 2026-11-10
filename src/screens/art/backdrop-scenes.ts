@@ -2,7 +2,8 @@
  * Backdrop scenes (docs/design-system.md, Backdrops): the ground, the fog or the light over it, the vignette and the grit, as data both
  * backdrops draw (Skia on a phone, CSS on the web). Coordinates are fractions of the screen (x of width, y of height). These and the
  * combat spotlight's black fog (src/play/spotlight/fog.ts) are the only colour values outside palette.js, because they are scene art. Screens pick a scene by name, and the theme picks its Dark or Light
- * art (user request, 2026-10-29: Dark's fog as rolling banks in Morgul's light, Light as Rivendell's morning light with no fog).
+ * art (user request, 2026-10-29: Dark's fog as rolling banks in Morgul's light, Light as Rivendell's morning light). Light has fog on
+ * the table only: gold mist over the fellowship and umber smoke over the encounter (user decision, 2026-11-10).
  *
  * The fog itself (its textures, layers and colour matrix) is src/ui/fog/fog.ts. Ember fog, the red one, goes only where the enemy
  * lives.
@@ -11,7 +12,7 @@
  * haze slower than the banks, so they part a little; the ember the other way), its mask stays put, and a scene can slow it all
  * (`drift`). Reduced motion holds it still.
  */
-import { banks, type Ellipse, type FogLayer, type FogTexture } from "../../ui/fog/fog";
+import { banks, type Ellipse, type FogLayer, type FogSet, type FogTexture } from "../../ui/fog/fog";
 
 export type SceneName = "moon" | "hero" | "path" | "ember" | "calm" | "victory" | "table";
 
@@ -24,7 +25,7 @@ export type Beam = { points: readonly (readonly [x: number, y: number])[]; opaci
  */
 export type SceneLight = { sun: { cx: number; cy: number; r: number }; rgb: readonly [number, number, number]; beams: readonly Beam[]; blur: number };
 
-/** A colour multiplied into the ground inside an ellipse: Light's pale rust where the enemy is, since Light has no ember fog. */
+/** A colour multiplied into the ground inside an ellipse: Light's pale rust where the enemy is on a page, or the deeper parchment under the table's mist. */
 export type Wash = Ellipse & { rgb: readonly [number, number, number]; alpha: number };
 
 export type Scene = {
@@ -114,13 +115,25 @@ export const scenes: Record<SceneName, Scene> = {
   },
 };
 
-// Light: Rivendell in the morning. No fog: warm parchment, a sun's glow high on the right and its beams slanting down across the page;
-// a pale rust multiplied in where the enemy is.
+// Light: Rivendell in the morning. Warm parchment, a sun's glow high on the right and its beams slanting down across the page; a pale
+// rust multiplied in where the enemy is. Only the table has fog: the Dark banks' noise in a golden morning mist over the fellowship
+// (on parchment deepened a step, so the mist shows) and in an umber smoke over the encounter, of a family with the engagement area's
+// red haze.
 const lightGround: Scene["ground"] = { kind: "radial", cx: 0.5, cy: 0.35, rx: 0.9, ry: 0.7, stops: [[0, "#F2EBDC"], [0.6, "#E4DCCB"], [1, "#CFC3A8"]] };
 const lightVignette = { rgb: "90,80,64", alpha: 0.28, from: 0.52 };
 const lightGrit = { opacity: 0.14, blend: "multiply" } as const;
 const SUNLIGHT = [255, 246, 222] as const;
 const RUST = [201, 138, 102] as const;
+const GOLD = {
+  haze: { ...moonHaze, rgb: [255, 238, 196] },
+  bank: { ...moonBank, rgb: [255, 240, 205] },
+  crest: { ...moonCrest, rgb: [255, 250, 236] },
+} satisfies FogSet;
+const UMBER = {
+  haze: { ...emberHaze, rgb: [118, 62, 40] },
+  bank: { ...emberBank, rgb: [118, 62, 40] },
+  crest: { ...emberCrest, rgb: [184, 112, 80] },
+} satisfies FogSet;
 
 /** The morning light of a portrait page: the glow in the top right corner and three beams falling to about the middle. */
 const morning: SceneLight = {
@@ -144,7 +157,8 @@ export const lightScenes: Record<SceneName, Scene> = {
   ember: lit({ wash: { cx: 0.3, cy: 0.28, rx: 0.6, ry: 0.5, rgb: RUST, alpha: 0.32 } }),
   calm: lit(),
   victory: lit(),
-  // The table, in landscape: the beams fall the whole height onto the play area, the rust lies over the encounter row.
+  // The table, in landscape: umber smoke over the encounter row, gold mist from the fellowship's row down on deepened parchment, and
+  // the beams falling the whole height into the mist. Its fog drifts at half speed, as on Dark.
   table: lit({
     light: {
       sun: { cx: 0.97, cy: 0.05, r: 0.7 },
@@ -156,7 +170,9 @@ export const lightScenes: Record<SceneName, Scene> = {
         { points: [[1, 0.15], [1, 0.33], [0.88, 1], [0.83, 1]], opacity: 0.26 },
       ],
     },
-    wash: { cx: 0.45, cy: 0, rx: 0.9, ry: 0.45, rgb: RUST, alpha: 0.5 },
+    wash: { cx: 0.5, cy: 1, rx: 0.9, ry: 0.55, rgb: [214, 196, 160], alpha: 0.5 },
+    fog: [...banks(UMBER, 0.7, { cx: 0.45, cy: 0.05, rx: 0.75, ry: 0.55 }), ...banks(GOLD, 1, { cx: 0.5, cy: 0.95, rx: 0.85, ry: 0.6 })],
+    drift: 0.5,
   }),
 };
 

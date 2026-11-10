@@ -49,8 +49,8 @@ function WashLayer({ wash, width, height }: { wash: Wash; width: number; height:
 
 /**
  * One Skia canvas behind the screen, never inside a list row (docs/design-system.md, Backdrops): the ground, the fog layers each
- * faded at its edges and drifting (or Light's wash and morning light, still), the vignette falling to the ground, and the grit over
- * all of it. Only the fog moves, and only Dark has any, so a Light canvas is drawn once per size.
+ * faded at its edges and drifting, Light's wash under them and its morning light over them, still, the vignette falling to the ground,
+ * and the grit over all of it. Only the fog moves; on Light only the table has any, so a Light page's canvas is drawn once per size.
  */
 export function Backdrop({ scene }: { scene: SceneName }) {
   const { width, height } = useWindowDimensions();

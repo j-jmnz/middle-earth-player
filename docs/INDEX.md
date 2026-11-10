@@ -153,7 +153,7 @@ Read the sections your task touches.
   - 334–345 Banner (~750) ← 5
   - 346–365 Screen reader (~2.8K) ← 17
   - 366–369 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~28.1K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~28.2K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~580)
   - 34–44 Performance (~680) ← 4
@@ -161,7 +161,7 @@ Read the sections your task touches.
   - 84–106 Surfaces (~840) ← 1
   - 107–128 Type (~1.5K) ← 11
   - 129–146 Spacing, radius, border (~600) ← 2
-  - 147–168 Backdrops (~950) ← 5
+  - 147–168 Backdrops (~1.0K) ← 5
   - 169–176 Navigation (~450) ← 3
   - 177–214 Components (~1.8K) ← 9
   - 215–229 Screen reader (~920) ← 8
@@ -186,7 +186,7 @@ Read the sections your task touches.
     - 405–414 Card pool (the Cards tab) (~770) ← 3
     - 415–420 Card (~490) ← 2
     - 421–426 Packs and pack cards (~130)
-    - 427–440 Settings (~900) ← 11
+    - 427–440 Settings (~910) ← 11
     - 441–446 Rules (~470) ← 1
     - 447–450 Rule (~220) ← 1
     - 451–456 Booklet (~280) ← 2
