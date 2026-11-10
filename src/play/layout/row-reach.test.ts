@@ -1,10 +1,11 @@
 // A crowded top row that runs on under the command column (row-reach.ts; docs/design-system-table.md, Spacing and the play area's rows):
-// it takes the room only when it would squeeze or fold, skips its piles, and leaves an uncrowded table exactly as it was.
+// it takes the room only when it would squeeze or fold, keeps staging's piles at its right end (the screen's edge) and skips the engagement
+// area's, and leaves an uncrowded table exactly as it was.
 import { describe, expect, it } from "vitest";
 
 import type { CardInstance } from "../../rules/core/state.ts";
 
-import { tableLayout, type LayoutViews, type PileViews, type Rect, type TableLayout } from "./layout.ts";
+import { tableLayout, type LayoutViews, type PileViews, type TableLayout } from "./layout.ts";
 import { slotBounds } from "./hits.ts";
 import { foldRow, type FoldGroup } from "./row-fold.ts";
 import { rowFeet } from "./column-reach.ts";
@@ -38,7 +39,6 @@ const CANVASES = [
 
 const folded = (layout: TableLayout, zone: "staging" | "engaged") => layout.folds?.find((fold) => fold.zone === zone)?.cards.length ?? 0;
 const zoneSlots = (layout: TableLayout, zone: "staging" | "engaged") => layout.slots.filter((slot) => slot.zone === zone);
-const overlaps = (a: Rect, b: Rect) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
 
 describe("a row under the command column", () => {
   it("leaves an uncrowded table exactly as it was, whatever the reach", () => {
@@ -49,18 +49,20 @@ describe("a row under the command column", () => {
     }
   });
 
-  it("folds fewer of a crowded staging row's groups with reach 1, past the encounter piles, which stay where they were", () => {
+  it("folds fewer of a crowded staging row's groups with reach 1 and moves the encounter piles to the screen's edge, past every staging card", () => {
     for (const canvas of CANVASES) {
       const { views, piles } = table(16, 2);
       const plain = tableLayout(canvas.width, canvas.height, views, piles);
       const reached = tableLayout(canvas.width, canvas.height, views, piles, { column: canvas.column, reach: 1 });
       expect(folded(plain, "staging"), `${canvas.width}`).toBeGreaterThan(0);
       expect(folded(reached, "staging"), `${canvas.width}`).toBeLessThan(folded(plain, "staging"));
-      expect(reached.piles).toEqual(plain.piles);
+      // The pair moves right by the column's width, to the screen's edge; the player's piles stay where they were.
+      expect(reached.piles.encounterDeck.x).toBe(plain.piles.encounterDeck.x + canvas.column);
+      expect(reached.piles.encounterDiscard.x + reached.piles.encounterDiscard.w).toBeLessThanOrEqual(canvas.width + canvas.column);
+      expect(reached.piles.deck).toEqual(plain.piles.deck);
       for (const slot of zoneSlots(reached, "staging")) {
         const box = slotBounds(slot);
-        expect(overlaps(box, reached.piles.encounterDeck) || overlaps(box, reached.piles.encounterDiscard), slot.id).toBe(false);
-        expect(box.x + box.w, slot.id).toBeLessThanOrEqual(canvas.width + canvas.column + 0.5);
+        expect(box.x + box.w, slot.id).toBeLessThanOrEqual(reached.piles.encounterDeck.x + 0.5);
       }
       expect(Math.max(...zoneSlots(reached, "staging").map((slot) => slot.x + slot.w))).toBeGreaterThan(canvas.width);
       // The rows the reach does not cover, the hand and the play area stay as they were.
@@ -69,14 +71,16 @@ describe("a row under the command column", () => {
     }
   });
 
-  it("sets the cards carried past the piles at least two gaps clear of them", () => {
+  it("keeps the victory display at staging's right end, after the encounter pair, when the row reaches", () => {
     for (const canvas of CANVASES) {
       const { views, piles } = table(16, 2);
-      const reached = tableLayout(canvas.width, canvas.height, views, piles, { column: canvas.column, reach: 1 });
-      const piled = reached.piles.encounterDiscard.x + reached.piles.encounterDiscard.w;
-      const past = zoneSlots(reached, "staging").filter((slot) => slot.kind === "card" && slot.x >= piled);
-      expect(past.length, `${canvas.width}`).toBeGreaterThan(0);
-      expect(Math.min(...past.map((slot) => slot.x)) - piled, `${canvas.width}`).toBeGreaterThanOrEqual(12);
+      const withVictory = { ...piles, victory: { pile: "victory", seat: 0, ids: ["v"], top: null } } as PileViews;
+      const reached = tableLayout(canvas.width, canvas.height, views, withVictory, { column: canvas.column, reach: 1 });
+      const victory = reached.piles.victory;
+      expect(victory).toBeDefined();
+      expect(victory!.x).toBeGreaterThan(reached.piles.encounterDiscard.x);
+      expect(victory!.x + victory!.w).toBeLessThanOrEqual(canvas.width + canvas.column);
+      for (const slot of zoneSlots(reached, "staging")) expect(slotBounds(slot).x + slotBounds(slot).w, slot.id).toBeLessThanOrEqual(reached.piles.encounterDeck.x + 0.5);
     }
   });
 

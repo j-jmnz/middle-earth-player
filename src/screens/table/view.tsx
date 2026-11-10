@@ -13,7 +13,7 @@ import { slotNumbers } from "../../play/cards/card-effects";
 import { CardPreview } from "../../play/cards/card-preview";
 import { standInText } from "../../play/cards/dungeon-preview";
 import { causeKey, type LogNames } from "../../play/store/log";
-import { dockPills, dockTextWidth, foldAids } from "../../play/choice/dock/extras";
+import { dockPills, dockTextWidth, foldAids, titleRead } from "../../play/choice/dock/extras";
 import { ChoiceTray } from "../../play/choice/tray";
 import { isDense } from "../../play/choice/dock/budget";
 import { MorePopoverView, useMorePopover } from "../../play/choice/dock/more";
@@ -370,6 +370,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
               step={choice.header.step}
               lead={choice.header.lead}
               title={choice.header.title}
+              onTitle={titleRead(choice.extras)}
               note={choice.header.note}
               picked={choice.picked}
               unavailable={choice.unavailable}

@@ -279,9 +279,14 @@ export function tableLayout(
   const victoryW = piles.victory ? pile.w + Math.round(pile.h * VICTORY_FAN) + gap : 0;
   const staging: Rect = { x: centerX, y: stagingY, w: Math.max(card.w, centerW - encounterW - victoryW - gap), h: card.h };
   const pileY = stagingY + Math.round((card.h - pile.h) / 2);
-  const encounterDeck: Rect = { x: width - rightGutter - victoryW - encounterW, y: pileY, w: pile.w, h: pile.h };
-  const victory: Rect = { x: width - rightGutter - pile.w, y: pileY, w: pile.w, h: pile.h };
-  const encounterDiscard: Rect = { x: encounterDeck.x + pile.w + gap, y: pileY, w: pile.w, h: pile.h };
+  // `push`: how far right the encounter piles and the victory display stand, past the canvas's edge: by the column's width when a crowded staging row
+  // runs on under the command column, so they stay at the row's right end, at the screen's edge (user request, 2026-11-08).
+  const stagingPiles = (push: number) => {
+    const encounterDeck: Rect = { x: width - rightGutter - victoryW - encounterW + push, y: pileY, w: pile.w, h: pile.h };
+    const victory: Rect = { x: width - rightGutter - pile.w + push, y: pileY, w: pile.w, h: pile.h };
+    const encounterDiscard: Rect = { x: encounterDeck.x + pile.w + gap, y: pileY, w: pile.w, h: pile.h };
+    return { encounterDeck, encounterDiscard, victory };
+  };
   // The second slot of piles (a scenario with a second deck: the Corsair pair) stands at the right end of the engagement area, as wide as the encounter pair and
   // right-aligned with the canvas (under the encounter pair, or under the encounter discard pile and the victory display while that is out); the engagement area
   // narrows by that width and a gap only while the slot is declared. A deck alone takes the left place (docs/design-system-table.md, Piles).
@@ -327,7 +332,9 @@ export function tableLayout(
     const start = piled ? width - rightGutter + PILE_BREAK * gap : row.x + row.w;
     return { hole: start - (row.x + row.w), extra: width + (options.column ?? 0) - rightGutter - start };
   };
-  placeRow(views.staging.entries, "staging", staging, card, slots, m, folding, reach >= 1 ? reachOf(staging, true) : null);
+  // Staging's cards stay left of its piles: a row that reaches widens by the column's room up to the piles, which move to the screen's edge.
+  const stagingReached = placeRow(views.staging.entries, "staging", staging, card, slots, m, folding, reach >= 1 ? { hole: 0, extra: options.column ?? 0 } : null);
+  const { encounterDeck, encounterDiscard, victory } = stagingPiles(stagingReached ? (options.column ?? 0) : 0);
   placeEngaged(views.engaged.entries, engaged, card, slots, marks, options.preview?.enemyId ?? null, m, folding, options.attacker ?? null, reach >= 2 ? reachOf(engaged, second) : null);
   placePlay(plan, play, slots, m);
   // Each second-slot deck stands in the slot's left place, its discard pile in the right one (only the Corsair and Evil Creatures pairs have one).

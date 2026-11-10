@@ -13,7 +13,7 @@ import type { IconName } from "./icon-map.ts";
 import { useOpenMotion } from "./motion-run.ts";
 import { MOTION, ms } from "./motion-tokens.ts";
 import { CONTAINER_RADIUS, ITEM_RADIUS } from "./radius.ts";
-import { floatingSurface, raisedEdgeOf } from "./surfaces.ts";
+import { FLOATING_ALPHA, floatingSurface, noticeSurface, raisedEdgeOf } from "./surfaces.ts";
 import { withAlphaHex } from "./tokens.ts";
 import { touch, useUiScale } from "./ui-scale.ts";
 import { useTableTokens } from "./use-table-tokens.ts";
@@ -115,6 +115,7 @@ export function PopoverFrame({
   ids,
   closeLabel,
   focusRef,
+  surface,
   onClose,
   children,
 }: {
@@ -125,6 +126,8 @@ export function PopoverFrame({
   ids: { layer: string; scrim: string; popover: string };
   closeLabel: string;
   focusRef?: RefObject<PressableRef | null>;
+  // `notice`: the banner's plain fill (the table menu, noticeSurface), opaque as every popover is; else the lit night card.
+  surface?: "notice";
   onClose: () => void;
   children: ReactNode;
 }) {
@@ -146,6 +149,7 @@ export function PopoverFrame({
   });
 
   if (!open && !leaving) return null;
+  const look = surface === "notice" ? noticeSurface(FLOATING_ALPHA, t) : { ...floatingSurface(t), boxShadow: `${raisedEdgeOf(t)}, 0 12px 32px ${withAlphaHex(t.night, 0.65)}, 0 2px 6px ${withAlphaHex(t.night, 0.4)}` };
   return (
     // One modal layer: a screen reader stays inside the popover while it is open (the card preview does the same).
     <View testID={ids.layer} accessibilityViewIsModal={open} onAccessibilityEscape={open ? onClose : undefined} pointerEvents={open ? "box-none" : "none"} style={StyleSheet.absoluteFill}>
@@ -160,8 +164,7 @@ export function PopoverFrame({
             width,
             padding: PAD * s,
             borderRadius: CONTAINER_RADIUS * s,
-            ...floatingSurface(t),
-            boxShadow: `${raisedEdgeOf(t)}, 0 12px 32px ${withAlphaHex(t.night, 0.65)}, 0 2px 6px ${withAlphaHex(t.night, 0.4)}`,
+            ...look,
             transformOrigin: origin,
           },
           style,

@@ -23,12 +23,12 @@ import { Text } from "../../ui/text";
 const OVERLAP = 10;
 
 /**
- * The words over the current run's scene: an overline with a short rule, the run's name large, an optional muted line under it, and
+ * The words over the current run's scene: an optional overline with a short rule (Scenarios' "In progress · True solo"; Campaigns has none), the run's name large, an optional muted line under it, and
  * the fellowship as their paintings (`HeroTile`: the card's painting with its name and sphere, no ring), one row per seat, each
  * lapping a little over the right edge of the one before it and shadowing it. Hero titles carry a dark shadow on Dark; on Light the
  * words sit in a soft glow of the ground, so the overline reads over a dark scene. `testID` is the title's.
  */
-export function RunHero({ overline, title, detail, seats, testID }: { overline: string; title: string; detail?: string; seats: readonly (readonly HeroFace[])[]; testID: string }) {
+export function RunHero({ overline, title, detail, seats, testID }: { overline?: string; title: string; detail?: string; seats: readonly (readonly HeroFace[])[]; testID: string }) {
   const t = useTableTokens();
   const palette = usePalette();
   const theme = useTheme();
@@ -54,8 +54,8 @@ export function RunHero({ overline, title, detail, seats, testID }: { overline: 
             style={{ position: "absolute", left: -8 * s, right: -8 * s, top: -28 * s, bottom: -24 * s, backgroundImage: `radial-gradient(50% 50% at 50% 50%, ${withAlphaHex(palette.night, 0.78)} 0%, ${withAlphaHex(palette.night, 0.5)} 55%, ${withAlphaHex(palette.night, 0)} 100%)` }}
           />
         ) : null}
-        <Eyebrow rule onArt>{overline}</Eyebrow>
-        <Text testID={testID} accessibilityRole="header" className="mt-2 font-display text-bone" style={{ fontSize: big * s, lineHeight: big * 1.06 * s, ...shadow }}>
+        {overline ? <Eyebrow rule onArt>{overline}</Eyebrow> : null}
+        <Text testID={testID} accessibilityRole="header" className={`${overline ? "mt-2 " : ""}font-display text-bone`} style={{ fontSize: big * s, lineHeight: big * 1.06 * s, ...shadow }}>
           {title}
         </Text>
         {detail ? (
@@ -315,7 +315,6 @@ export function HubPage({
   testID,
   title,
   actions,
-  subtitle,
   hero,
   heroAction,
   heroTestID,
@@ -330,8 +329,6 @@ export function HubPage({
   // The head's title and its own controls (History); the gear follows them.
   title: string;
   actions?: ReactNode;
-  // Said under the title only while there is no hero.
-  subtitle?: string;
   hero?: ReactNode;
   heroAction?: ReactNode;
   // The block holding the hero and its action.
@@ -355,7 +352,7 @@ export function HubPage({
   const tall = height / s;
   const heroDrop = hero ? (size === "compact" ? clamp(tall - 700, 60, 170) : clamp(tall * 0.2, 96, 330)) * s : 0;
   const header = (
-    <HubHeader title={title} subtitle={hero ? undefined : subtitle}>
+    <HubHeader title={title}>
       {actions}
     </HubHeader>
   );

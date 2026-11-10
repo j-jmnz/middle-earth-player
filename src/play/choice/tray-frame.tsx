@@ -1,5 +1,5 @@
 // The frame of the reading panels (docs/design-system-table.md, Reading panels): a container-cornered box at the command column's
-// right edge, with no drawn edge (user request, 2026-10-27: fewer borders), on parchment, or on night for the table settings. It
+// right edge, with no drawn edge (user request, 2026-10-27: fewer borders), on parchment, on night for the table settings and the card lists, or on the banner's plain fill for a discard pile's list. It
 // enters decelerating (16 pt up and a fade) and leaves accelerating (MOTION.trayEnter, MOTION.trayLeave), and snaps under reduced
 // motion. The choice's rows (choice/tray.tsx) share its motion but stand in the dock.
 import { useState, type ReactNode } from "react";
@@ -9,7 +9,7 @@ import { MOTION } from "../../ui/motion-tokens.ts";
 import { useReaderPanel } from "./reader-panel.ts";
 import { useOpenMotion } from "../../ui/motion-run.ts";
 import { CONTAINER_RADIUS } from "../../ui/radius.ts";
-import { floatingSurface, parchmentSurface, raisedEdgeOf } from "../../ui/surfaces.ts";
+import { FLOATING_ALPHA, floatingSurface, noticeSurface, parchmentSurface, raisedEdgeOf } from "../../ui/surfaces.ts";
 import { withAlphaHex } from "../../ui/tokens.ts";
 import { useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
@@ -35,7 +35,8 @@ export function TrayFrame({
 }: {
   open: boolean;
   place: TrayPlace;
-  surface?: "night" | "paper";
+  // `notice`: the banner's plain fill (a discard pile's list, noticeSurface), opaque over the dock.
+  surface?: "night" | "paper" | "notice";
   testID: string;
   // What a screen reader's escape gesture does while the panel is open (it is then modal: the table behind it is not read).
   onClose?: () => void;
@@ -48,7 +49,12 @@ export function TrayFrame({
   useReaderPanel(open);
   const motion = useAnimatedStyle(() => ({ opacity: progress.get(), transform: [{ translateY: (1 - progress.get()) * RISE * s }] }));
   if (!open && !leaving) return null;
-  const paper = surface === "paper";
+  const look =
+    surface === "paper"
+      ? parchmentSurface(t)
+      : surface === "notice"
+        ? noticeSurface(FLOATING_ALPHA, t)
+        : { ...floatingSurface(t), boxShadow: `${raisedEdgeOf(t)}, 0 -10px 24px -8px ${withAlphaHex(t.shade, t.depth === "light" ? 0.25 : 0.8)}` };
   return (
     <Animated.View
       testID={testID}
@@ -64,8 +70,7 @@ export function TrayFrame({
           bottom: place.bottom,
           ...(place.top != null ? { top: place.top } : {}),
           ...(place.maxHeight != null ? { maxHeight: place.maxHeight } : {}),
-          ...(paper ? parchmentSurface(t) : floatingSurface(t)),
-          ...(paper ? {} : { boxShadow: `${raisedEdgeOf(t)}, 0 -10px 24px -8px ${withAlphaHex(t.shade, t.depth === "light" ? 0.25 : 0.8)}` }),
+          ...look,
           borderRadius: CONTAINER_RADIUS * s,
           paddingHorizontal: 12 * s,
           paddingTop: 10 * s,

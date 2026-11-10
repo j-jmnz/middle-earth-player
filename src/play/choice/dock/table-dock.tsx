@@ -65,6 +65,7 @@ export function TableDock({
   step,
   lead = "",
   title,
+  onTitle,
   note,
   picked,
   unavailable = [],
@@ -94,6 +95,8 @@ export function TableDock({
   // ("Response · "), or "". The step overline is not drawn, so this is how the player knows a chance to respond from a plain question.
   lead?: string;
   title: string;
+  // The title names the card the moment is about (a look's card, a Response's source): a tap on it opens that card in the preview, as Read does.
+  onTitle?: () => void;
   note: string | null;
   // The cards picked so far, in words ("Frodo Baggins, Sam Gamgee"), or an ability's printed line, or null: heard in the
   // primary's hint; no line shows it.
@@ -179,6 +182,8 @@ export function TableDock({
     </Pressable>
   ) : null;
   const readoutLine = dense && trayOpen;
+  // A title that opens its card is underlined faintly, so the name reads as a link to the card.
+  const titleStyle = onTitle ? { flexShrink: 0, textDecorationLine: "underline" as const, textDecorationColor: withAlphaHex(t.bone, 0.35) } : { flexShrink: 0 };
   return (
     <View pointerEvents="box-none" style={{ flex: 1, minHeight: 0, justifyContent: "flex-end" }} onLayout={(event) => setRoom((now) => ({ ...now, column: Math.round(event.nativeEvent.layout.height) }))}>
       {/* No panel: the dock stands on the command column's fade (table/view.tsx). The words, the choice's rows (when it is open) and the
@@ -204,7 +209,7 @@ export function TableDock({
           <View onLayout={(event) => setRoom((now) => ({ ...now, text: Math.round(event.nativeEvent.layout.width) }))} style={{ paddingBottom: (dense ? 2 : 8) * s }}>
             <View className="flex-row items-start gap-1.5">
               {/* A budgeted slot (planWords): the title keeps the lines the room holds at the phone's text size; a cut title is whole behind the "i". */}
-              <Text ref={titleRef} testID="sheet-title" accessibilityRole="header" accessibilityLabel={[step, title, trayOpen ? count.replaceAll(" · ", ", ") : ""].filter(Boolean).join(". ")} accessibilityHint={readerHint} numberOfLines={plan.titleLines} className="flex-1 font-display text-heading text-bone" style={{ flexShrink: 0 }}>
+              <Text ref={titleRef} testID="sheet-title" accessibilityRole="header" accessibilityLabel={[step, title, trayOpen ? count.replaceAll(" · ", ", ") : ""].filter(Boolean).join(". ")} accessibilityHint={readerHint} numberOfLines={plan.titleLines} className="flex-1 font-display text-heading text-bone" style={titleStyle} onPress={onTitle} suppressHighlighting>
                 {lead + title}
               </Text>
               {plan.pillOnTitle ? pill : null}

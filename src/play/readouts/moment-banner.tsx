@@ -16,7 +16,8 @@ import { type Moment } from "../store/outcome.ts";
 import { bannerBeatMs } from "./banner-time.ts";
 import { bannerLabel, bannerSpeech } from "./banner-speech.ts";
 import { LineMark } from "../chrome/table-chrome.tsx";
-import { fillAlpha, withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
+import { noticeSurface } from "../../ui/surfaces.ts";
+import { fillAlpha, type TableTokens } from "../../ui/tokens.ts";
 import { tableSettings } from "../../ui/table-settings.ts";
 import { useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
@@ -39,8 +40,9 @@ const FLICK = 600;
  * pale panel, a little see-through. Under the phone's Reduce Transparency both are opaque (fillAlpha).
  */
 function bannerFill(t: TableTokens, tone: Moment["tone"]) {
-  if (t.depth === "light") return { backgroundColor: withAlphaHex(t.raisedTop, fillAlpha(t, 0.9)), boxShadow: `0 10px 28px ${withAlphaHex(t.shade, 0.35)}` };
-  return { backgroundColor: tone === "bad" ? `rgba(26,10,9,${fillAlpha(t, 0.9)})` : withAlphaHex(t.night, fillAlpha(t, 0.9)), boxShadow: `0 10px 28px ${withAlphaHex(t.shade, 0.7)}` };
+  const plain = noticeSurface(0.9, t);
+  if (t.depth === "light" || tone !== "bad") return plain;
+  return { ...plain, backgroundColor: `rgba(26,10,9,${fillAlpha(t, 0.9)})` };
 }
 
 /**

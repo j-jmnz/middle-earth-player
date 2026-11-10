@@ -13,6 +13,7 @@ export { dockTextWidth, footPadOf } from "./fit.ts";
 export const UNDO_ID = "table-undo";
 export const PILLS_BEFORE_MORE = 2;
 export const MORE_ID = "dock-more-actions";
+export const READ_ID = "sheet-inspect";
 
 export type DockPills = {
   // The pills on the row, Undo first when there is one.
@@ -44,6 +45,11 @@ export function foldAids(a: { height: number; s: number; text: number; insets: {
   return aidsFoldHelps({ height: a.height, s: a.s, text: a.text, insets: a.insets, width: a.width, trayOpen: a.trayOpen, content: { dock: a.dock, readout: a.readout, refusal: a.refusal, aids, hasExtras: true } });
 }
 
+/** What a tap on the dock's title does: Read's, opening the card the moment names in the preview (user request, 2026-11-08), or nothing when it names none. */
+export function titleRead(extras: readonly DockExtra[]): (() => void) | undefined {
+  return extras.find((item) => item.testID === READ_ID)?.onPress;
+}
+
 export function dockExtras(a: {
   sheet: Sheet;
   undoButton: DockExtra | null;
@@ -61,7 +67,7 @@ export function dockExtras(a: {
   if (a.undoButton) extras.push(a.undoButton);
   const about = sheet.kind === "pick" ? (sheet.about ?? []) : sheet.kind === "trigger" && sheet.sourceId ? [sheet.sourceId] : [];
   const first = about[0];
-  if (first) extras.push({ label: "Read", accessibilityLabel: "Read the card", testID: "sheet-inspect", onPress: () => a.onRead(first, about) });
+  if (first) extras.push({ label: "Read", accessibilityLabel: "Read the card", testID: READ_ID, onPress: () => a.onRead(first, about) });
   if (!a.panel && sheet.kind !== "window" && tappable(sheet).size > 0) extras.push({ label: "List", testID: "sheet-list", onPress: a.onList });
   // A Sailing test's look: the cards listed with their marks, read-only (sea-sheets.ts); also the path a screen reader takes.
   if (!a.panel && sheet.kind === "pick" && sheet.look != null && sheet.look.length > 0) extras.push({ label: "List", testID: "sheet-list", onPress: a.onList });
