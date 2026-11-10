@@ -55,7 +55,6 @@ export default function Scenarios() {
 
   const heroBlock = hero ? (
     <RunHero
-      overline={`In progress · ${seatWord(hero.seatCount)}`}
       title={scenarioName(hero.scenarioId)}
       detail={detailOf(hero)}
       seats={seatsOf(hero).map((seat) => seat.map((code) => heroFace(faces, code)))}

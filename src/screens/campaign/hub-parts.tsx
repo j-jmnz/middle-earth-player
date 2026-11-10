@@ -23,12 +23,12 @@ import { Text } from "../../ui/text";
 const OVERLAP = 10;
 
 /**
- * The words over the current run's scene: an optional overline with a short rule (Scenarios' "In progress · True solo"; Campaigns has none), the run's name large, an optional muted line under it, and
+ * The words over the current run's scene: the run's name large, with no overline (user request, 2026-11-08), an optional muted line under it, and
  * the fellowship as their paintings (`HeroTile`: the card's painting with its name and sphere, no ring), one row per seat, each
  * lapping a little over the right edge of the one before it and shadowing it. Hero titles carry a dark shadow on Dark; on Light the
- * words sit in a soft glow of the ground, so the overline reads over a dark scene. `testID` is the title's.
+ * words sit in a soft glow of the ground, so they read over a dark scene. `testID` is the title's.
  */
-export function RunHero({ overline, title, detail, seats, testID }: { overline?: string; title: string; detail?: string; seats: readonly (readonly HeroFace[])[]; testID: string }) {
+export function RunHero({ title, detail, seats, testID }: { title: string; detail?: string; seats: readonly (readonly HeroFace[])[]; testID: string }) {
   const t = useTableTokens();
   const palette = usePalette();
   const theme = useTheme();
@@ -54,8 +54,7 @@ export function RunHero({ overline, title, detail, seats, testID }: { overline?:
             style={{ position: "absolute", left: -8 * s, right: -8 * s, top: -28 * s, bottom: -24 * s, backgroundImage: `radial-gradient(50% 50% at 50% 50%, ${withAlphaHex(palette.night, 0.78)} 0%, ${withAlphaHex(palette.night, 0.5)} 55%, ${withAlphaHex(palette.night, 0)} 100%)` }}
           />
         ) : null}
-        {overline ? <Eyebrow rule onArt>{overline}</Eyebrow> : null}
-        <Text testID={testID} accessibilityRole="header" className={`${overline ? "mt-2 " : ""}font-display text-bone`} style={{ fontSize: big * s, lineHeight: big * 1.06 * s, ...shadow }}>
+        <Text testID={testID} accessibilityRole="header" className="font-display text-bone" style={{ fontSize: big * s, lineHeight: big * 1.06 * s, ...shadow }}>
           {title}
         </Text>
         {detail ? (
