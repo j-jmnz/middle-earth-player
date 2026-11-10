@@ -2,7 +2,8 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 
 import { PLAYABLE_SCENARIOS } from "../../src/campaign/playable.ts";
-import type { ScenarioState } from "../../src/rules/engine/reduce.ts";
+import { legalIntents, reduce, type PlayerIntent, type ScenarioState } from "../../src/rules/engine/reduce.ts";
+import { expectOk } from "../../src/rules/core/test-fixture.ts";
 
 import { DATA_DIR } from "../data/paths.ts";
 import { describeError, duration, runScript, type Log } from "../log.ts";
@@ -37,9 +38,16 @@ export const KNOWN: readonly KnownFailure[] = [
 
 export type EncounterSummary = { scenario: string; cards: CardResult[]; games: GameSummary[]; ms: number };
 
-/** The table the card probes run on: the scenario dealt to one seat, its first seat kept. */
+/** The table the card probes run on: the scenario dealt to one seat, its first seat kept. A quest card's Setup that asks (The Uruk-hai: each seat chooses a Captive) is answered with the first intent offered. */
 export function probeTable(world: EncounterWorld): ScenarioState {
-  return kept(encounterStart(world, 1, 1), world.contexts.strong);
+  const ctx = world.contexts.strong;
+  let state = kept(encounterStart(world, 1, 1), ctx);
+  for (let guard = 0; guard < 20 && state.window?.kind === "choose" && state.phase === "Beginning of round"; guard += 1) {
+    const first = legalIntents(state, ctx)[0];
+    if (!first) break;
+    state = expectOk(reduce(state, first as PlayerIntent, ctx)).state;
+  }
+  return state;
 }
 
 /** Plays every encounter-side card of the scenario, and `games` seeded random games (none with 0). */

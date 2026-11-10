@@ -277,8 +277,12 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The When Revealed effects of the source card are resolving now: a quest stage's side B holds from the moment it is revealed, but its text is not in force while side A's When Revealed is
   // ("Each Raider enemy revealed by the encounter deck enters play with 1 resource on it" does not reach the cards revealed by the stage's own When Revealed, 11037:B:2).
   z.strictObject({ kind: z.literal("revealing") }),
-  // The pursuit value (mec112.pursuit, the pursuit tracker beside the quest deck) is at most `max`: "If the pursuit value is 25 or lower" (143071:B:1). False while no tracker is set (ScenarioState.pursuit).
-  z.strictObject({ kind: z.literal("pursuit"), max: z.number().int().min(0) }),
+  // The pursuit value (mec112.pursuit, the pursuit tracker beside the quest deck) is at most `max` and at least `min`: "If the pursuit value is 25 or lower" (143071:B:1), "30 or greater" (143022:A:2). False while no tracker is set (ScenarioState.pursuit).
+  z.strictObject({ kind: z.literal("pursuit"), max: z.number().int().min(0).optional(), min: z.number().int().min(0).optional() }),
+  // The sole attacker: exactly one character was declared as an attacker in the attack in progress ("declared as the only attacker", 143015:A:3; rr.step-6-8b). Read by the attack family.
+  z.strictObject({ kind: z.literal("soleAttacker") }),
+  // The Captives in play (the Uruk-hai's heroes under To Isengard! or held by an enemy; src/rules/families/captives): at least `min` and at most `max` of them, or with `of: "actor"` only the acting seat's ("a seat with no Captive chooses one", 143069:A:1; "if there are no Captives in play", 143022:A:1).
+  z.strictObject({ kind: z.literal("captives"), min: z.number().int().min(0).optional(), max: z.number().int().min(0).optional(), of: z.literal("actor").optional() }),
   // A Resolution's ChooseOption was answered with `option` (the first player's answer for the group, or any seat's when each player answers): "either each player earns one of the Skill boons ... or one player
   // earns Beyond All Hope" (143071:B:1). False until the option is chosen. Read by src/rules/families/campaign/resolution.ts.
   z.strictObject({ kind: z.literal("picked"), name: z.string().min(1), option: z.string().min(1) }),

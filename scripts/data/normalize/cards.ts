@@ -78,6 +78,15 @@ type HobFacts = Pick<Card, "traits" | "threat" | "willpower" | "attack" | "defen
 
 type DragnRow = Record<string, string> | undefined;
 
+// A location that prints X for its quest points.
+const locationPrintsX = (card: HobCard): boolean => card.Front.Stats.QuestPoints === "X" && card.CardType === "Location";
+
+// The boxes whose quest stages the engine plays and whose side B prints X ("X is the pursuit value", The Uruk-hai 143069:B:1 and Rescue the Captives 143070:B:1): the Two Towers box and its Treason of Saruman printing. The other stages
+// with an X on side B (The Paths of the Dead, Retreat from Osgiliath, On the Trail, Goblin Ambush) are in scenarios that are not built, and flagging them would change their cards before a record gives X its value, so they do not count yet.
+// Neither the campaign definitions nor Hall of Beorn's card carry the box as a field, so it is read from the folder of side B's image.
+const BUILT_BOXES = /\/Cards\/The-(Two-Towers|Treason-of-Saruman)\//;
+const stagePrintsX = (card: HobCard): boolean => card.CardType === "Quest" && card.Back?.Stats.QuestPoints === "X" && BUILT_BOXES.test(card.Back.ImagePath ?? "");
+
 // Hall of Beorn's keyword list can miss one that the card text and DragnCards carry (Bucklebury Ferry's
 // Immune, Bag End's Victory 1). The two sources are merged; DragnCards' free-text keywords field is only
 // read for sentences that parse as keywords.
@@ -92,8 +101,8 @@ function keywordsOf(card: HobCard, dragn: DragnRow, report: BuildReport): { keyw
   const fromDragn = parseKeywordTokens((dragn?.keywords ?? "").split(/(?<=\.)\s+/).filter((sentence) => parseKeywordTokens([sentence]).unknown.length === 0));
   Object.assign(parsed.keywords, fromDragn.keywords);
   for (const token of parsed.unknown) report.unknownKeywords[token] = (report.unknownKeywords[token] ?? 0) + 1;
-  // A location that prints X for its quest points (the number stays null; a record sets the value).
-  if (card.Front.Stats.QuestPoints === "X" && card.CardType === "Location") parsed.keywords.questPointsX = true;
+  // A location or a built quest stage that prints X for its quest points (the number stays null; a record sets the value).
+  if (locationPrintsX(card) || stagePrintsX(card)) parsed.keywords.questPointsX = true;
   return { keywords: parsed.keywords, victory };
 }
 

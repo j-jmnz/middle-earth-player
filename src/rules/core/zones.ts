@@ -332,10 +332,14 @@ export function moveCard(state: ScenarioState, id: string, requested: Destinatio
   const dest = current.deck === undefined ? routed : deckRoute(current, routed, inPlay(current.zone));
   // A card that cannot enter the staging area stays where it is ("Shrine to Morgoth ... cannot enter the staging area", 12094:A:1).
   if (dest.zone === "staging" && flagged(state, id, "cannotEnterStaging")) return state;
+  // A card that cannot leave the staging area stays in it, whatever moves it (Uglúk, 143069:B:2).
+  if (current.zone === "staging" && dest.zone !== "staging" && flagged(state, id, "cannotLeaveStaging")) return state;
   const leavingPlay = current.zone === "play" || current.zone === "heroes" || current.zone === "attached";
   let next = detach(state, id);
   if ((leavingPlay || guardLeaves(current, dest)) && current.host) next = unhost(next, id);
   let moved = stampEntry(attach(next, id, dest), id, current.zone);
+  // A Captive that leaves the captive zone is a Captive no more, and no seat holds it (families/captives): the discard pile it went to was read above.
+  if (current.captive === true && dest.zone !== "captive") moved = updateCard(moved, id, { captive: undefined, owner: undefined, heroSlot: undefined });
   // A card that goes from the encounter deck to its discard pile is announced in a game with ships (families/stormcaller/zone.ts).
   if (current.zone === "encounterDeck" && dest.zone === "encounterDiscard") moved = discardedFromDeck(moved, id);
   // A card shuffled back into the Uncharted deck is shuffled into it (families/uncharted/zone.ts).
@@ -350,7 +354,7 @@ export function moveCard(state: ScenarioState, id: string, requested: Destinatio
   // leaves play"). An encounter card's leaving is announced where it happens (stage-reveal.ts).
   if ((current.zone === "play" || current.zone === "heroes") && !inPlay(dest.zone)) moved = queueEvent(moved, { trigger: "leftPlay", seat: current.controller, cardId: id });
   // An enemy that guards a hero (Carried Away, 18074:B:2) is announced when it leaves play in any way; only a game that holds such a hero asks.
-  if ((current.zone === "engaged" || current.zone === "staging") && !inPlay(dest.zone) && Object.values(moved.cards).some((card) => card.guardedHero === true && card.zone === "captive" && card.host === id)) moved = queueEvent(moved, { trigger: "leftPlay", seat: null, cardId: id });
+  if ((current.zone === "engaged" || current.zone === "staging") && !inPlay(dest.zone) && Object.values(moved.cards).some((card) => (card.guardedHero === true || card.captive === true) && card.zone === "captive" && card.host === id)) moved = queueEvent(moved, { trigger: "leftPlay", seat: null, cardId: id });
   // A card a player card put out of play under itself "while ~ is in play" comes back to the staging area when it leaves (07003:A:3).
   if ((current.zone === "play" || current.zone === "heroes") && !inPlay(dest.zone)) for (const under of cardsUnder(moved, id)) moved = updateCard(moveCard(moved, under, { zone: "staging" }), under, { face: "up" });
   // An enemy that leaves play takes its dealt shadow cards to the encounter discard (Learn to Play p16).

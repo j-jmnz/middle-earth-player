@@ -80,6 +80,8 @@ export const amountExprSchema = z.strictObject({
   resourcesOn: pickSchema.optional(),
   // With `resourcesOn`: the most resource tokens on any one of those cards, not the sum ("X is the highest number of resources on a Raider enemy in play", 12161:A:1). 0 when none matches.
   max: z.literal(true).optional(),
+  // The pursuit value (mec112.pursuit; `pursuit`), 0 while no tracker is set: "X is the pursuit value" (143069:B:1). Read by the pursuit family.
+  pursuit: z.literal(true).optional(),
   // The damage tokens on the cards that match, added up ("equal to the total damage on each Ship objective he controls", 12148:A:1; read by the sea family, src/rules/families/sea/swap.ts).
   damageOn: pickSchema.optional(),
 });

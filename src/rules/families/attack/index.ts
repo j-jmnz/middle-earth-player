@@ -2,7 +2,7 @@
 // faq.limitations-on-attacks (data/rules/entries.json).
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import { announceEnemyAttacked } from "../aflame/attack.ts";
-import type { CardRef, Instruction } from "../../../catalog/boundary.ts";
+import type { CardRef, Condition, Instruction } from "../../../catalog/boundary.ts";
 import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
 import { continueStrike } from "../../combat/combat.ts";
 import type { EngineStep } from "../../core/intents.ts";
@@ -90,4 +90,9 @@ export function openStrike(state: ScenarioState, seat: number, enemyId: string, 
   return playerAttackWindow(next, ctx, "strike") ?? awaitStrike(next, ctx) ?? continueStrike(next, ctx, steps);
 }
 
-export const manifest: RulesFamily = { name: "attack", verbs: ["DeclareAttack", "OfferAttacks", "QuestProgress", "ExcessDamageTo"], run };
+// "Declared as the only attacker" (143015:A:3): the attack in progress was declared with exactly one attacker (rr.step-6-8b: the attackers of an attack are declared together).
+function condition(state: ScenarioState, found: Condition): boolean | null {
+  return found.kind === "soleAttacker" ? state.pendingStrike?.attackerIds.length === 1 : null;
+}
+
+export const manifest: RulesFamily = { name: "attack", verbs: ["DeclareAttack", "OfferAttacks", "QuestProgress", "ExcessDamageTo"], run, condition: (state, found) => condition(state, found) };

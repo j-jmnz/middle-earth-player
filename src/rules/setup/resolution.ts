@@ -11,12 +11,13 @@ import { frameScope, resolveAmount } from "../interpret/amounts.ts";
 import { xpOf } from "../families/dreamchaser/index.ts";
 import { dealtCopies } from "../families/aflame/cards.ts";
 import { shuffleIds } from "../core/seed.ts";
+import { rescueCaptives } from "../families/captives/index.ts";
 import { inPlay, livingSeats, type ScenarioState } from "../core/state.ts";
 import { discardToPoolFromSets } from "../families/wilderland/mirkwood.ts";
 import { addEncounterCards, allyOrLineOptions, applyAllyOrLine, applyRemoval, applyStagedLocation, discoverTreasures, noteRemovalAnswer, playerOptions, removalOptions, removeEncounterCards, stagedLocationOptions } from "../families/wilderland/pool.ts";
 import { drawTreasures } from "../families/wilderland/treasure.ts";
 import { applyHazard, discardHazards, hazardOptions } from "../families/wilderland/hazards.ts";
-import { applyChooseOption, applyRevive, applyTrim, chooseOptionIds, earnForPick, earnHeldCopies, reviveOptions, threatPenalties, trimOptions, underneath } from "../families/campaign/resolution.ts";
+import { applyChooseOption, applyRevive, applyTrim, boonHeroes, chooseOptionIds, earnForPick, earnHeldCopies, reviveOptions, threatPenalties, trimOptions, underneath } from "../families/campaign/resolution.ts";
 
 // A won scenario runs the campaign card's Resolution instructions in order. An instruction that opens a choice asks
 // one seat at a time, first player first; the rest settle on their own from the final state (Lust for the Ring
@@ -291,7 +292,7 @@ function resolutionOptions(state: ScenarioState, instruction: Choosing, seat: nu
   const step = state.window?.kind === "resolution" ? state.window.step : state.resolutionAt;
   const codes = remainingCodes(state, instruction, step);
   if (codes.length === 0) return [];
-  const options = instruction.to === "hero" ? codes.flatMap((code) => heroesOf(state, seat, instruction.anyHero).map((hero) => `${code}>${hero}`)) : instruction.to === "player" ? playerOptions(state, codes) : codes;
+  const options = instruction.to === "hero" ? codes.flatMap((code) => boonHeroes(state, ctx, code, heroesOf(state, seat, instruction.anyHero)).map((hero) => `${code}>${hero}`)) : instruction.to === "player" ? playerOptions(state, codes) : codes;
   return instruction.optional ? [...options, SKIP] : options;
 }
 
@@ -312,7 +313,8 @@ export function openResolution(state: ScenarioState, ctx: ReduceContext): Scenar
   // Dropping the frame stack is safe: a frame only continues a reveal, hide, response, or effect of the round
   // that just ended, and the scenario is won, so nothing it could still do (a surge reveal, a forced trigger,
   // more damage) can change the outcome. Frames are not carried into the resolution window or past it.
-  return advanceResolution(state, ctx);
+  // Winning the last stage rescues each Captive of The Uruk-hai: they are among their owners' heroes when the Resolution reads them (143070:B:3).
+  return advanceResolution(rescueCaptives(state), ctx);
 }
 
 export function resolutionIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {

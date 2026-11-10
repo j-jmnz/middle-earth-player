@@ -52,7 +52,7 @@ import { questScaleOf } from "../../play/readouts/quest-scale";
 import { CommandHead } from "../../play/readouts/command-head-view";
 import { dockWithNumbers, HEAD_GAP, headPlan, headRoom, NUMBERS_ROW } from "../../play/readouts/command-head";
 import { columnReach, coveredTop, type RowFeet } from "../../play/layout/column-reach";
-import { campaignTokens, heldDial, nightmareCardId, widgetReadouts } from "../../play/readouts/widgets";
+import { campaignTokens, heldDials, nightmareCardId, usePursuitReadout, widgetReadouts } from "../../play/readouts/widgets";
 import { whyNotChosen } from "../../play/choice/why";
 import { ledgerLine, ruleTitle, sideText } from "../../play/cards/ledger";
 import { notApplied } from "../../play/cards/not-applied";
@@ -252,7 +252,8 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
   const tokenName = campaign?.name ?? null;
   const tokenCount = campaign?.tokens ?? null;
   const tokens = useMemo(() => (tokenName == null || tokenCount == null ? null : { name: tokenName, tokens: tokenCount }), [tokenName, tokenCount]);
-  const held = useMemo(() => heldDial(game, nameOf), [game, nameOf]);
+  const held = useMemo(() => heldDials(game, nameOf, (code) => ctx.cards.get(code)?.type === "enemy"), [game, nameOf, ctx]);
+  const pursuit = usePursuitReadout(game);
   // The Nightmare setup card next to the quest deck, on Nightmare: the Eye in the top bar opens it.
   const nightmareId = useMemo(() => nightmareCardId(game), [game]);
   const commandWidth = commandWidthOf(screen.width, s);
@@ -343,9 +344,8 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
           stopAhead={stopAhead} carouselOpen={carouselOpen}
           narrow={narrow} areas={game.separate === true}
           ticks={ticks}
-          ringSeat={held?.seat}
-          ringWords={held?.words}
-          ringMark={held?.mark}
+          pursuit={pursuit}
+          held={held}
           menuOpen={menuOpen}
           onThreat={(threatSeat) => { choice.foldOutside(); setReading(peek.tap(threatSeat) ? null : { kind: "threat", seat: threatSeat }); }}
           onRail={() => setReading((now) => openReading(now, { kind: "carousel" }))}

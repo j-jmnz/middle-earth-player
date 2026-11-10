@@ -149,6 +149,8 @@ const widgetsSchema = z.strictObject({
   hide: z.boolean(),
   lifeTracker: z.boolean(),
   burdenDeck: z.boolean(),
+  // The pursuit value at which the players lose (mec112.pursuit), for a scenario whose quest card sets a pursuit tracker; absent otherwise.
+  pursuitTracker: z.number().int().positive().optional(),
   secondActiveLocation: z.boolean(),
   perSeatStaging: z.boolean(),
 });

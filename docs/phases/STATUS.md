@@ -85,7 +85,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 59 | Mount Gundabad | completed | 2026-11-06. Review round done. |
 | 60 | The Fate of Wilderland | completed | 2026-11-06. Review round done. |
 | 61 | The Two Towers data | completed | 2026-11-07. Review round done. Open: MEC112 2023 wording unverified. |
-| 62 | The Two Towers campaign shell | completed | 2026-11-07. Review round done. No Two Towers scenario is playable yet. |
+| 62 | The Two Towers campaign shell | completed | 2026-11-07. Review round done. |
+| 63 | The Uruk-hai | active | 2026-11-10. Engine and table built; review round not run. Open: `hai-won`. |
 
 ## Open items
 
@@ -93,6 +94,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - The Android release key is not set up (`docs/releasing.md`, Android key), so no release has been cut; the release workflow has not run yet, dry run first. TestFlight (optional) is not set up.
 
 ### Fixtures and Maestro
+- `hai-won` is not committed: no seed in 100 wins The Uruk-hai with the starter decklists. Until it exists `.maestro/scenarios/the-uruk-hai/the-uruk-hai.yaml` cannot run.
 - `wilderland-won` is not committed: none of 100 seeds (and 750 more under five other policies) wins The Fate of Wilderland with the starter decklists. Until it exists `.maestro/scenarios/the-fate-of-wilderland/the-fate-of-wilderland.yaml` cannot run.
 - `gundabad-won` is not committed: none of 100 seeds wins Mount Gundabad with the starter decklists; the hero carrying Wormsbane leaves play in the first rounds or threat runs out. Until it exists `.maestro/scenarios/mount-gundabad/mount-gundabad.yaml` cannot run.
 - `framsburg-won` is not committed: none of 100 seeds wins The Ghost of Framsburg with the starter decklists. Until it exists `.maestro/scenarios/the-ghost-of-framsburg/the-ghost-of-framsburg.yaml` cannot run; its `CHOICE_*` lines are commented out.
@@ -185,7 +187,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 
 ### Rules and engine (The Two Towers)
 - Beyond All Hope readings not user-confirmed (143071:B:1): the trim to three non-Fellowship heroes counts the living heroes on the log, not only those in the game; the fallen list is one shared list; the first player picks who earns the boon.
-- The Uruk-hai: its quest card's captive step (143069:A, reading `campaignFacts.heroLog.captives`) and the setter of `ScenarioState.pursuit` are the scenario's records, not built.
+- The Uruk-hai readings not user-confirmed: Eastemnet (143027:A:1) adds a resource to Captives too; a Captive whose owner was eliminated scores as a surviving hero (`src/campaign/score.ts`).
+- Six older records put `shadow: false` on a printed additional attack (18035:A:2 and its copies), against `faq.additional-attacks`, which deals the additional attack a new shadow card.
 - The Two Towers ledger reads the pinned 2014 and 2015 Treason of Saruman and Land of Shadow scans; no pinned scan shows MEC112's 2023 wording, so a rewording cannot be found (`scripts/data/printed/scope.ts`, `MEC112_CHANGED`).
 - Easy: the DragnCards `E0C.12` deck keeps all ten Great Spider cards where Hall of Beorn keeps six; the E0C decks lead (user decision, 2026-11-07).
 

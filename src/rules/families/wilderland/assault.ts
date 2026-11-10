@@ -9,7 +9,7 @@ import { takeProgressOff } from "../../core/progress.ts";
 import type { Modifier, ScenarioState } from "../../core/state.ts";
 import { flagged } from "../../core/state.ts";
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
-import { searchable } from "../../interpret/conditions.ts";
+import { searchable } from "../../interpret/search.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { effectData, moveEncounter } from "../encounter/moves.ts";
 import { namedInPlay } from "../misc/amounts.ts";
