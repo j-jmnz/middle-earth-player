@@ -13,7 +13,7 @@ import { legalIntents, reduce, startScenario, type ReduceContext, type ScenarioS
 import { BREAKING_GOLDENS, breakingCampaignStart, breakingGameWorld, breakingIntent, type BreakingGolden } from "../../../test/scenarios/breaking-of-the-fellowship/game.ts";
 import { intentsOf } from "../../../test/harness/sheet-intents.ts";
 
-import { areaWords } from "../words/area.ts";
+import { areaWords } from "../words/scenarios/area.ts";
 import { threatRows } from "../store/foresight.ts";
 import { actionsSheet, commitSheet } from "../choice/bar-sheets.ts";
 import { pictureCode, pictureKey } from "../canvas/picture-key.ts";

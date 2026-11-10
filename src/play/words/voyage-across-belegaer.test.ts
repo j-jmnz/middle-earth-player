@@ -10,7 +10,7 @@ import { loadVoyageWorld, voyageTable, type VoyageWorld } from "../../../test/sc
 
 import { branchWords, pickWords, type ChoiceNames } from "./choice.ts";
 import { pushEffectFrame } from "../../rules/interpret/effect-frames.ts";
-import { seaAsk, seaOptionLabel } from "./sea.ts";
+import { seaAsk, seaOptionLabel } from "./scenarios/sea.ts";
 import { walk } from "../../../test/harness/record-walk.ts";
 
 let world: VoyageWorld;

@@ -18,10 +18,10 @@ import { shareHint, shareValue, wordOf } from "../choice/tray-logic.ts";
 import type { OptionMark, Sheet } from "../choice/sheet-types.ts";
 import { actingSeat, hidesFace, isLooked, isPrisoner, type ZoneFacts, type ZoneId } from "../store/selectors.ts";
 import { areaRoleOf, areaSpeech } from "../store/stormcaller-table.ts";
-import { seatTag } from "./area.ts";
-import { grappleDetail } from "./grapple.ts";
-import { areaTell } from "./stormcaller.ts";
-import { islandTell } from "./uncharted.ts";
+import { seatTag } from "./scenarios/area.ts";
+import { grappleDetail } from "./scenarios/grapple.ts";
+import { areaTell } from "./scenarios/stormcaller.ts";
+import { islandTell } from "./scenarios/uncharted.ts";
 
 /** Everything the speech reads besides the state, so the function stays pure: the table's lookups, the engine's numbers, what the open moment marks. */
 export type CardSpeechDeps = {

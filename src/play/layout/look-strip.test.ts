@@ -10,7 +10,7 @@ import { successSymbols } from "../../rules/families/sea/sailing.ts";
 
 import { lookBands, lookStrip, MEDALLION, medallionAt, squeezedCapacity } from "./look-strip.ts";
 import { seaFixture, seaViews } from "../dream-chaser/sea-fixture.ts";
-import { medallionCount } from "../words/sea.ts";
+import { medallionCount } from "../words/scenarios/sea.ts";
 import { touch, UI_SCALES } from "../../ui/ui-scale.ts";
 
 type Screen = { width: number; height: number; inset: number; scales: readonly number[] };

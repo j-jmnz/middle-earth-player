@@ -19,7 +19,7 @@ import { walk } from "../../../test/harness/record-walk.ts";
 import { judgeBranch, judgePick } from "../../../test/harness/words-judge.ts";
 
 import { askWords } from "./ask.ts";
-import { dealtNow } from "./aflame.ts";
+import { dealtNow } from "./scenarios/aflame.ts";
 import { askAt, askKey, askValues, asksChoose, asksOption, asksPick, fill, placeholdersOf, templatesOf, textsOf, unknownPlaceholders, type Ask, type AsksTable } from "./asks.ts";
 import { ASKS_BY_SCENARIO } from "./asks/index.ts";
 import { pickWords, type ChoiceNames } from "./choice.ts";

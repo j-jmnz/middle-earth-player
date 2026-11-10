@@ -7,7 +7,7 @@ import { holds } from "../../interpret/conditions.ts";
 import { runInstruction } from "../../interpret/interpret.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
 import { settle } from "../../engine/machine.ts";
-import { eliminateEmpties } from "../../core/keywords.ts";
+import { eliminateEmpties } from "../../core/eliminate.ts";
 import { moveCard } from "../../core/zones.ts";
 import { fireForced } from "../../windows/triggers.ts";
 import { textBlank } from "../attachments/hold.ts";

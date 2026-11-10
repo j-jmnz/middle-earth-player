@@ -9,7 +9,7 @@ import { type IconName } from "../../ui/icon-map.ts";
 import { glyphCells, type PlaceMark } from "../store/island-place.ts";
 import { COLS, ROWS } from "../dream-chaser/island-table.ts";
 import type { CombatMark, Rect } from "../layout/layout.ts";
-import { STAGE_APART_WORD } from "../words/stormcaller.ts";
+import { STAGE_APART_WORD } from "../words/scenarios/stormcaller.ts";
 import type { OptionMark } from "../choice/sheet-types.ts";
 import { TOKEN } from "./token-spots.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";

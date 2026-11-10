@@ -5,7 +5,8 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
-import { eliminateEmpties, releaseAttachments } from "../../core/keywords.ts";
+import { releaseAttachments } from "../../core/keywords.ts";
+import { eliminateEmpties } from "../../core/eliminate.ts";
 import { afterProgress } from "../../quest/stage-reveal.ts";
 import { noteHostDefeated } from "../attachments/hold.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";

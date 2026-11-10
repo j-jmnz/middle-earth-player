@@ -13,7 +13,7 @@ import { CODES, STAGE_TWOS, finish, gundabadTable, idOf, loadGundabadWorld, send
 
 import { stageName } from "../../rules/families/wilderland/gundabad.ts";
 import type { ReduceContext } from "../../rules/interpret/interpret.ts";
-import { mustBypassLead } from "../words/gundabad-beats.ts";
+import { mustBypassLead } from "../words/scenarios/gundabad-beats.ts";
 import { momentOf } from "../store/outcome.ts";
 import { sheetFor } from "./sheets.ts";
 

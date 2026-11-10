@@ -144,7 +144,7 @@ src/campaign/           saves, log, loadout, start, briefing, resolution, XP, ru
 src/ui/                 the design system (see the table above)
 src/play/               the table
   store/  canvas/  layout/  motion/  spotlight/  phases/      state and selectors; the Skia table; zone geometry; card motion; the combat spotlight; the phase rail and carousel
-  choice/ (dock/)  readouts/  words/  cards/  chrome/         sheets, the tray and the dock; numbers and banners; choice wording per family; card text and preview; top bar, menu, panels
+  choice/ (dock/)  readouts/  words/  cards/  chrome/         sheets, the tray and the dock; numbers and banners; choice wording (words/scenarios/ holds the modules named for a scenario or a mechanic family, words/asks/ the asks files); card text and preview; top bar, menu, panels
   dream-chaser/         the Dream-chaser table pieces (the Island Map, the Heading dial)
   scenarios/            table tests that play one scenario
 src/screens/            the app around the table

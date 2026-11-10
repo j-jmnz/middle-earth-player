@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { sphereTell } from "../../play/words/aflame.ts";
+import { sphereTell } from "../../play/words/scenarios/aflame.ts";
 
 import { actionLine, dealSentence, needWords, problemWords } from "./words.ts";
 

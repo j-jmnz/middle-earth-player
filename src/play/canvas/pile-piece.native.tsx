@@ -7,7 +7,7 @@ import { Back, LINE, Outlined, PICTURE_SAMPLING, shadowOf, stripOf, type BackIma
 import { cardCorner } from "../../ui/card-corner.ts";
 import type { CardSlot } from "../layout/layout.ts";
 import { FOLD_WORD, foldCount } from "../layout/row-fold.ts";
-import { AREA_FOLD_WORD } from "../words/stormcaller.ts";
+import { AREA_FOLD_WORD } from "../words/scenarios/stormcaller.ts";
 import type { TableTokens } from "../../ui/tokens.ts";
 import { wrapName } from "./wrap.ts";
 

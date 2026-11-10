@@ -11,7 +11,7 @@ import { SPHERE_TINT, type IconName } from "../../ui/icon-map.ts";
 import { ICONS } from "../../ui/icons/generated.ts";
 import type { CardSlot, Rect } from "../layout/layout.ts";
 import { medallionAt } from "../layout/look-strip.ts";
-import { medallionCount } from "../words/sea.ts";
+import { medallionCount } from "../words/scenarios/sea.ts";
 import { stripText } from "./table-canvas-views.ts";
 import { TOKEN, tokenSpot } from "./token-spots.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";

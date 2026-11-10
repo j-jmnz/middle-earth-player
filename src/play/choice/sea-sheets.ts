@@ -7,7 +7,7 @@ import { modifierActive } from "../../rules/core/state.ts";
 import { legalTargets } from "../../rules/engine/reduce.ts";
 import { askingToCommit, askingToLook, askingToShift } from "../../rules/families/sea/sailing-legal.ts";
 
-import { SAILING_COMMIT_NOTE, SAILING_COMMIT_TITLE, SAILING_PASS_ARMED, sailingTitle } from "../words/sea.ts";
+import { SAILING_COMMIT_NOTE, SAILING_COMMIT_TITLE, SAILING_PASS_ARMED, sailingTitle } from "../words/scenarios/sea.ts";
 import type { Instruction } from "../../catalog/boundary.ts";
 import { printedOf } from "../../rules/core/printed.ts";
 import { damageOutcome } from "../store/foresight.ts";

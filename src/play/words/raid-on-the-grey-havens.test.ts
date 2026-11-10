@@ -8,7 +8,7 @@ import { AUTHORED_EFFECTS } from "../../effects/authored/raid-on-the-grey-havens
 import { RECORDS as DCCE_RECORDS } from "../../effects/authored/pool/DCCE.ts";
 import { CODES, idOf, loadRaidWorld, raidTable, type RaidWorld } from "../../../test/scenarios/raid-on-the-grey-havens/scene.ts";
 
-import { aflameWords, branchNow, dealtNow } from "./aflame.ts";
+import { aflameWords, branchNow, dealtNow } from "./scenarios/aflame.ts";
 import { branchWords, pickWords, type ChoiceNames } from "./choice.ts";
 import { walk } from "../../../test/harness/record-walk.ts";
 

@@ -7,7 +7,7 @@ import { cardMap, expectOk, fixtureDefinition, hero } from "../core/test-fixture
 import { definePrinted } from "../core/printed.ts";
 import { legalIntents, legalTargets, reduce } from "../engine/reduce.ts";
 import { blankScenario, updateCard, withThreat, type ScenarioState } from "../core/state.ts";
-import { clearEliminated } from "../core/keywords.ts";
+import { clearEliminated } from "../core/eliminate.ts";
 import { discardShadows } from "./shadow.ts";
 import { moveCard, spawn } from "../core/zones.ts";
 

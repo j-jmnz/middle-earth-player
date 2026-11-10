@@ -20,7 +20,7 @@ import { seaFixture, seaViews } from "../dream-chaser/sea-fixture.ts";
 import { stagingRank } from "../layout/row-fold.ts";
 import { stripText } from "../canvas/table-canvas-views.ts";
 import { areaFacts, areaGroup, areaRoleOf, areaSpeech } from "./stormcaller-table.ts";
-import { AREA_FOLD_WHERE, AREA_FOLD_WORD, memberSpeech, stageSpeech, stageTitle, stagePill, STAGE_LOSS } from "../words/stormcaller.ts";
+import { AREA_FOLD_WHERE, AREA_FOLD_WORD, memberSpeech, stageSpeech, stageTitle, stagePill, STAGE_LOSS } from "../words/scenarios/stormcaller.ts";
 import { UI_SCALES, touch } from "../../ui/ui-scale.ts";
 import { zoneFactsOf } from "./zone-facts.ts";
 

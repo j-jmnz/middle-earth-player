@@ -17,7 +17,6 @@ const OVER_LIMIT: Readonly<Record<string, number>> = {
   "src/rules/combat/combat.test.ts": 598,
   "src/play/layout/layout.test.ts": 584,
   "src/screens/images/queue.native.ts": 548,
-  "src/screens/table/view.tsx": 505,
   "src/campaign/fixtures.test.ts": 508,
   "src/play/choice/table-choice.test.ts": 503,
   "src/effects/authored/raid-on-the-grey-havens.ts": 501,

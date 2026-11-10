@@ -3,7 +3,7 @@
 import { useContext } from "react";
 import { View } from "react-native";
 
-import { sphereTell } from "../../play/words/aflame";
+import { sphereTell } from "../../play/words/scenarios/aflame";
 import { Label, TextButton } from "../kit/chrome";
 import { actionLine } from "./words";
 import { OpenCardContext } from "./parts";

@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
 import { definePrinted } from "../../core/printed.ts";
-import { eliminateEmpties } from "../../core/keywords.ts";
+import { eliminateEmpties } from "../../core/eliminate.ts";
 import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { moveCard, playerCardsUnder, spawn } from "../../core/zones.ts";
 import { noteEvent } from "../costs/pay.ts";

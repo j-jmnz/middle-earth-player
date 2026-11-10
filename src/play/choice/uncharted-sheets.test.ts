@@ -19,7 +19,7 @@ import { sheetFor } from "./sheets.ts";
 import type { PickOption, Sheet, SheetNames } from "./sheet-types.ts";
 import { previewCards } from "../cards/table-preview.ts";
 import { trayTiles } from "./tray-logic.ts";
-import { islandTell } from "../words/uncharted.ts";
+import { islandTell } from "../words/scenarios/uncharted.ts";
 
 // Rules: dcce.uncharted, dcce.uncharted-deck (data/rules/entries.json). What the table says of a Lost Island and of the Fate of Númenor's choices: a card on its Lost Island side is a Lost Island in
 // every tile, label and log line (its real name and picture never show), the Uncharted deck is a pile, and the words of Calphon, Spyglass, Aimless Wandering and the trade of damage for threat.

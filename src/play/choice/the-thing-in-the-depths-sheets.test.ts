@@ -10,7 +10,7 @@ import type { ScenarioState } from "../../rules/core/state.ts";
 import { CODES, depthsTable, idOf, loadDepthsWorld, resolveRecords, send, start, type DepthsLayout, type DepthsWorld } from "../../../test/scenarios/the-thing-in-the-depths/scene.ts";
 
 import { slotNumbers } from "../cards/card-effects.ts";
-import { attackSource, grappleDetail, grantedTravelWords, returnsNote, shipLoss } from "../words/grapple.ts";
+import { attackSource, grappleDetail, grantedTravelWords, returnsNote, shipLoss } from "../words/scenarios/grapple.ts";
 import { logLines } from "../store/log.ts";
 import { momentOf } from "../store/outcome.ts";
 import { STAGING_RANK, stagingRank } from "../layout/row-fold.ts";

@@ -46,7 +46,8 @@ import { flagged, inPlay, livingSeats, reached, updateCard, withMode, type ModeN
 import { runSettle } from "../interpret/family-hooks.ts";
 import { heldByLapsedStage } from "../families/grapple/values.ts";
 import { heldBySettingAside } from "../families/wilderland/heath.ts";
-import { clearEliminated, damageHeld, destroyOverwhelmed } from "../core/keywords.ts";
+import { damageHeld, destroyOverwhelmed } from "../core/keywords.ts";
+import { clearEliminated } from "../core/eliminate.ts";
 import { effectsOf } from "../windows/listen.ts";
 import { engagesAgain, optionallyEngaged } from "../families/quest/engage.ts";
 import { syncThreatSaves } from "../families/quest/threat.ts";

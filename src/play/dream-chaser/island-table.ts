@@ -8,7 +8,7 @@ import type { PrintedCard } from "../../rules/core/printed.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
 import { cardsUnder } from "../../rules/core/zones.ts";
 
-import { LOST_ISLAND_NAME, TEMPLE_NAME } from "../words/uncharted.ts";
+import { LOST_ISLAND_NAME, TEMPLE_NAME } from "../words/scenarios/uncharted.ts";
 import { touch } from "../../ui/ui-scale.ts";
 
 export { COLS, ROWS, TEMPLE_NAME };

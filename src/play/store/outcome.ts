@@ -10,11 +10,11 @@ import type { EngineStep, PlayerIntent } from "../../rules/core/intents.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
 
 import type { LogMark } from "./log.ts";
-import { detachLine, grappleLine } from "../words/grapple.ts";
-import { boardingWords } from "../words/sea.ts";
-import type { FateNames } from "../words/fate-beats.ts";
-import { firstTreacheryNote, stageArrivalNote, stageBeats } from "../words/gundabad-beats.ts";
-import { discoverLines, discoverTitle, POOL_COPY } from "../words/wilderland.ts";
+import { detachLine, grappleLine } from "../words/scenarios/grapple.ts";
+import { boardingWords } from "../words/scenarios/sea.ts";
+import type { FateNames } from "../words/scenarios/fate-beats.ts";
+import { firstTreacheryNote, stageArrivalNote, stageBeats } from "../words/scenarios/gundabad-beats.ts";
+import { discoverLines, discoverTitle, POOL_COPY } from "../words/scenarios/wilderland.ts";
 
 // `cards`: the cards a line touches (the shadow card, the card damaged or destroyed), drawn on the table while the banner
 // is at that line (resolve in beats).

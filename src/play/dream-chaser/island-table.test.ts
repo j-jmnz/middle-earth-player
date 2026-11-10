@@ -5,7 +5,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { CODES, loadTempleWorld, templeTable, type TempleLayout, type TempleWorld } from "../../../test/scenarios/temple-of-the-deceived/scene.ts";
 import { trayBox } from "../choice/tray-logic.ts";
 import { CHIP, COLS, LEGEND, ROWS, TEMPLE_LABEL_WORD, TEMPLE_NAME, WAITING, chipHeight, chipWidth, chipWords, islandFit, islandPanelWidth, islandReadout, standingWords, tileMarks } from "./island-table.ts";
-import { LOST_ISLAND_NAME } from "../words/uncharted.ts";
+import { LOST_ISLAND_NAME } from "../words/scenarios/uncharted.ts";
 import { UI_SCALES, touch } from "../../ui/ui-scale.ts";
 
 let world: TempleWorld;

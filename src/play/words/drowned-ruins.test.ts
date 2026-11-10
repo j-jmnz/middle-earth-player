@@ -8,8 +8,8 @@ import { idOf, loadRuinsWorld, ruinsTable, type RuinsWorld } from "../../../test
 
 import type { ScenarioState } from "../../rules/core/state.ts";
 import { branchWords, pickWords, type ChoiceNames } from "./choice.ts";
-import { branchNow } from "./aflame.ts";
-import { unchartedNote } from "./uncharted.ts";
+import { branchNow } from "./scenarios/aflame.ts";
+import { unchartedNote } from "./scenarios/uncharted.ts";
 import { ASKING_VERBS, walk } from "../../../test/harness/record-walk.ts";
 
 let world: RuinsWorld;

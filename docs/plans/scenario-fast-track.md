@@ -8,7 +8,7 @@ A scenario phase costs about three and a half hours of agent time (`reports/ered
 
 - **The records are the small part.** The authored records, the card judgement itself, are under a tenth of a scenario's diff. The new verbs and family code are about as much again.
 - **Hand-written card tests are the largest part of task A.** Each test builds a table, does one action and asserts, and the same helpers are copied from file to file. A scenario writes several lines of test for each line of record.
-- **Choice words are the largest part of task B and of the fix pass, and they grow with every scenario.** The generic words compose one instruction at a time, so each scenario writes code that recognises its own record shapes (`src/play/words/fate.ts`), then a gate test so those words do not leak into another game.
+- **Choice words are the largest part of task B and of the fix pass, and they grow with every scenario.** The generic words compose one instruction at a time, so each scenario writes code that recognises its own record shapes (`src/play/words/scenarios/fate.ts`), then a gate test so those words do not leak into another game.
 - **Card-reading errors are found late.** The review finds them, and a separate fix pass corrects them.
 - **Rulings arrive mid-phase**, after the records task, and the session often restarts while it waits.
 - **The inner loop is slow.** `pnpm test:scenario` runs the goldens and the reader check on every call.

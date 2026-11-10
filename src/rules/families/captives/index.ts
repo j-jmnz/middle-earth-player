@@ -1,7 +1,7 @@
 // Rules: rr.player-elimination, rr.ownership-and-control, rr.in-play-and-out-of-play, mec112.permanent (data/rules/entries.json); ledger lines 143022:A:1, 143024:A:1, 143024:A:2, 143069:A:1, 143070:B:3 (the rescue at the win).
 // The Captives of The Uruk-hai: a hero lying faceup under To Isengard! (or attached to the enemy that holds it), in play and controlled by nobody (the captive zone the Ring-bearer under the Watcher uses,
 // families/south/captive.ts). It keeps its damage, tokens and attachments (a Permanent boon included); it is not among its owner's heroes, so nothing the owner controls reaches it, yet its owner is not out
-// of heroes while it is held (core/keywords.ts eliminateEmpties). It is flagged `captive` and remembers its owner and its place among that owner's heroes.
+// of heroes while it is held (core/eliminate.ts eliminateEmpties). It is flagged `captive` and remembers its owner and its place among that owner's heroes.
 import type { Condition, Instruction } from "../../../catalog/boundary.ts";
 
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";

@@ -8,7 +8,7 @@ import type { CardInstance } from "../../rules/core/state.ts";
 
 import { dungeonDetail } from "./dungeon-preview.ts";
 import { earlierStages, heldStage } from "./earlier-stages.ts";
-import { grappleDetail, shipLoss } from "../words/grapple.ts";
+import { grappleDetail, shipLoss } from "../words/scenarios/grapple.ts";
 import { oathDetail } from "./oath-preview.ts";
 import { delayedLines, effectLines } from "./card-effects.ts";
 import type { PreviewCard } from "./card-preview.tsx";

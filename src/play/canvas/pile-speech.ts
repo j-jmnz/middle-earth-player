@@ -1,8 +1,8 @@
 // What a screen reader hears of a pile and of a row's fold stack (reader-piles.tsx puts a button over each). Pure.
 import type { CardSlot } from "../layout/layout.ts";
 import { foldWords } from "../layout/row-fold.ts";
-import { AREA_FOLD_WHERE } from "../words/stormcaller.ts";
-import { pileCountWords } from "../words/sea.ts";
+import { AREA_FOLD_WHERE } from "../words/scenarios/stormcaller.ts";
+import { pileCountWords } from "../words/scenarios/sea.ts";
 import { opensList, PILE_WORDS, type PileId } from "../store/selectors.ts";
 
 /**

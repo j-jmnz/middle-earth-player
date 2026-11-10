@@ -10,25 +10,25 @@ import { attachmentPickWords, reattachWords } from "./attachment.ts";
 import { deckBranchWords, deckPickThenWords, deckPickWords } from "./deck.ts";
 import { encounterPickWords } from "./encounter.ts";
 import { attackPickWords } from "./attack.ts";
-import { assignDamageWords } from "./south.ts";
-import { moriaBranchWords, moriaPickWords } from "./moria.ts";
-import { burdenBranchWords, burdenPickWords } from "./burden.ts";
+import { assignDamageWords } from "./scenarios/south.ts";
+import { moriaBranchWords, moriaPickWords } from "./scenarios/moria.ts";
+import { burdenBranchWords, burdenPickWords } from "./scenarios/burden.ts";
 import { amountWords, article, instructionWords, PICK_NOUNS } from "./instruction.ts";
 import { capital } from "./list.ts";
 import { miscPickWords } from "./misc.ts";
 import { playPickWords } from "./play.ts";
-import { oathPickWords } from "./oath.ts";
+import { oathPickWords } from "./scenarios/oath.ts";
 import { stageNumber } from "../../rules/families/caves/progress.ts";
-import { cavesAttachWords, cavesLeavesWords, cavesPickWords } from "./caves.ts";
-import { breakingBranchWords, breakingPickWords } from "./breaking.ts";
-import { seaPickWords } from "./sea.ts";
-import { unchartedBranchWords, unchartedPickWords } from "./uncharted.ts";
-import { islandPickWords } from "./island.ts";
-import { aflameBranchWords, aflamePickWords, type BranchNow } from "./aflame.ts";
-import { stormcallerBranchWords } from "./stormcaller.ts";
+import { cavesAttachWords, cavesLeavesWords, cavesPickWords } from "./scenarios/caves.ts";
+import { breakingBranchWords, breakingPickWords } from "./scenarios/breaking.ts";
+import { seaPickWords } from "./scenarios/sea.ts";
+import { unchartedBranchWords, unchartedPickWords } from "./scenarios/uncharted.ts";
+import { islandPickWords } from "./scenarios/island.ts";
+import { aflameBranchWords, aflamePickWords, type BranchNow } from "./scenarios/aflame.ts";
+import { stormcallerBranchWords } from "./scenarios/stormcaller.ts";
 import { commandBranchWords } from "./command.ts";
-import { wilderlandBranchWords } from "./wilderland.ts";
-import { objectiveTokensWords } from "./assault.ts";
+import { wilderlandBranchWords } from "./scenarios/wilderland.ts";
+import { objectiveTokensWords } from "./scenarios/assault.ts";
 
 export type ChoiceNames = {
   // A card instance by id.

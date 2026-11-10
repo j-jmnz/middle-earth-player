@@ -4,7 +4,7 @@ import type { LegalIntent, ReduceContext, ScenarioState } from "../../rules/engi
 import { modifiedStat } from "../../rules/core/keywords.ts";
 
 import { pictureKey } from "../canvas/picture-key.ts";
-import { islandTell } from "../words/uncharted.ts";
+import { islandTell } from "../words/scenarios/uncharted.ts";
 import { STEP_WORDS } from "../phases/rail.ts";
 import type { SheetNames, SheetOption, SheetStat } from "./sheet-types.ts";
 

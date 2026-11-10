@@ -7,7 +7,8 @@ import { RECORDS as AUTHORED } from "../../../effects/authored/families/misc.ts"
 import { POOL_GENERATED_EFFECTS } from "../../../effects/generated/player-pool.ts";
 import { syncConstants } from "../../interpret/constants.ts";
 import { cardMap, codes, expectOk, fixtureDefinition } from "../../core/test-fixture.ts";
-import { eliminateEmpties, placeDamage } from "../../core/keywords.ts";
+import { placeDamage } from "../../core/keywords.ts";
+import { eliminateEmpties } from "../../core/eliminate.ts";
 import { ruleCause } from "../../core/cause.ts";
 import { legalIntents, reduce, startScenario } from "../../engine/reduce.ts";
 import { updateCard, withThreat, type ScenarioState } from "../../core/state.ts";

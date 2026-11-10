@@ -150,7 +150,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - The Oath: the Tokens dial does not open the quest preview; the Resolution joins used Adaptations with a comma, not "and".
 - Escape from Dol Guldur: the claim prompt does not name the lasting effect.
 - A confirmed "another" defender cannot be backed out of (the declaration frame has no pass).
-- Phase 13 reviewer notes, not fixed: one function for passing the first player token; one immediate attack; the 141028 Setup record that setup does not read; the module-level map in `announceProgress`; non-burden verbs in the burden family; a hard-coded "Ring-bearer's" in `words/burden.ts`.
+- Phase 13 reviewer notes, not fixed: one function for passing the first player token; one immediate attack; the 141028 Setup record that setup does not read; the module-level map in `announceProgress`; non-burden verbs in the burden family; a hard-coded "Ring-bearer's" in `words/scenarios/burden.ts`.
 - `CountsAs` and `byEncounterDeck` live in the shared schema, not a family. `why.ts` matches the "different heroes" refusal by its wording.
 - Ledger readings 41050.A, 41012.A and 01090.A were re-checked against the scans, not user-confirmed.
 - Frodo's Choice (142068:A:2): its Ring-bearer clauses find nothing, since stage 2A removed the Ring-bearer from the game; the revealer takes the first player token for the game. Not user-confirmed.

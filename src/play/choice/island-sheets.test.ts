@@ -7,11 +7,11 @@ import { legalIntents } from "../../rules/engine/legal.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
 import { CODES, loadTempleWorld, send, start, templeTable, type TempleLayout, type TempleWorld } from "../../../test/scenarios/temple-of-the-deceived/scene.ts";
 
-import { islandBlocked, islandBlockedTitle, islandOptionLabel, islandPickWords, islandTravelNote, islandTravelRow, islandWords } from "../words/island.ts";
+import { islandBlocked, islandBlockedTitle, islandOptionLabel, islandPickWords, islandTravelNote, islandTravelRow, islandWords } from "../words/scenarios/island.ts";
 import { sheetFor } from "./sheets.ts";
 import type { SheetNames } from "./sheet-types.ts";
 import { shownName } from "../cards/shown-name.ts";
-import { islandTell } from "../words/uncharted.ts";
+import { islandTell } from "../words/scenarios/uncharted.ts";
 import { pictureKey } from "../canvas/picture-key.ts";
 
 let world: TempleWorld;
