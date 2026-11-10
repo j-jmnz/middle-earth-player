@@ -56,7 +56,7 @@ Read the sections your task touches.
   - 209–218 Documentation (~170)
   - 219–236 Attribution (~470)
   - 237–240 License (~50)
-- `docs/architecture.md` — Architecture (~20.7K tok)
+- `docs/architecture.md` — Architecture (~20.9K tok)
   - 7–41 Stack (~1.1K)
   - 42–77 Processes (~680)
   - 78–160 Modules (~2.3K) ← 3
@@ -71,7 +71,7 @@ Read the sections your task touches.
   - 295–300 Images (~940) ← 6
   - 301–353 Screens (~3.8K) ← 1
   - 354–359 Catalog build (~410)
-  - 360–377 Tests (~1.7K) ← 6
+  - 360–377 Tests (~1.9K) ← 6
   - 378–393 Performance (~1.2K) ← 4
 - `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~85.7K tok)
   - 17–38 Sections (~410)
@@ -198,7 +198,7 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~7.3K tok)
+- `docs/phases/STATUS.md` — Phase status (~7.2K tok)
   - 5–15 Rules (~410)
   - 16–92 Phases (~1.5K)
   - 93–196 Open items (~4.7K)
@@ -207,7 +207,7 @@ STATUS.md, then the active phase file.
     - 121–168 Rules and engine (~2.2K)
     - 169–189 Screens and code (~900)
     - 190–196 Rules and engine (The Two Towers) (~240)
-  - 197–215 Standing decisions (~600)
+  - 197–214 Standing decisions (~550)
 
 ## Live plans
 

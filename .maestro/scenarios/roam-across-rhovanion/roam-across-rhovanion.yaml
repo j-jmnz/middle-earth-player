@@ -3,9 +3,9 @@ tags:
   - scenario
 ---
 # Phase 56. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `rhovanion-won` (scripts/e2e/roam-across-rhovanion.ts): a real two-handed game of
-# Roam Across Rhovanion (the Defenders of Gondor and Swords of the Noldor lists, Easy) dealt from the log Journey Up the Anduin's, Lost in Mirkwood's, The King's Quest's and The Withered Heath's wins write (Turayn, Melanwar
+# Roam Across Rhovanion (The One Deck and the Defenders of Gondor lists, Easy) dealt from the log Journey Up the Anduin's, Lost in Mirkwood's, The King's Quest's and The Withered Heath's wins write (Turayn, Melanwar
 # and Isolde in a pool, Abandoned Ruin and The Threat to Wilderland pooled, the Songs and the treasures), parked on its win (Urdug's Gambit, Urdug with no hit points remaining). The fixture is OPEN: scripts/e2e/fixtures.ts
-# found no win of the two starter decklists in its 100 seeds (docs/phases/STATUS.md), so this flow cannot run until a seed wins.
+# found no win of The One Deck and the Defenders of Gondor lists in its 100 seeds (docs/phases/STATUS.md), so this flow cannot run until a seed wins.
 # The Resolution gives each player Misplaced Trust (3 or more resources on Urdug; otherwise Urdug's Cunning) without a question, then asks each player in turn, the first player first, for a location of the staging area whose copy
 # joins the pool's encounter cards (12184:B:4, "Choose a location from the staging area"). When the fixture exists, set CHOICE_ID to the code of the first location it offers and CHOICE2_ID to the second player's (the codes the
 # fixture's staging area holds at the win; the prompt, the consequence "A copy of ... is added to the campaign pool as an encounter card." and the seat labels "Player 1 (first player) chooses" and "Player 2 chooses" are the screen's).

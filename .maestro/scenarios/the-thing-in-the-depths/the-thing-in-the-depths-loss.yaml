@@ -3,7 +3,7 @@ tags:
   - scenario
 ---
 # Phase 44. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json). The fixture `depths-lost` is a real two-handed game of
-# The Thing in the Depths (the Defenders of Gondor and Swords of the Noldor lists) from the log the Voyage, Fate, Raid and Flight goldens' wins write (parts 1 to 4 recorded as won, so the path resumes it), parked on its
+# The Thing in the Depths (The One Deck and the Defenders of Gondor lists) from the log the Voyage, Fate, Raid and Flight goldens' wins write (parts 1 to 4 recorded as won, so the path resumes it), parked on its
 # loss. A loss has no reward screen and writes nothing: the scenario stays current, no XP reaches the log. The path screen has no table-menu: the log is opened from `log-open`.
 - runFlow:
     file: ../../subflows/scenario-loss.yaml

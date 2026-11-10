@@ -3,8 +3,8 @@ tags:
   - scenario
 ---
 # Phase 53. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `lostmirk-won` (scripts/e2e/lost-in-mirkwood.ts): a real two-handed game of
-# Lost in Mirkwood (the Defenders of Gondor and Swords of the Noldor lists, Easy) dealt from the log Journey Up the Anduin's win writes (Turayn in a pool, A Growing Threat and the cards set aside in the encounter pool, a
-# treasure discovered), parked on its win (Escape from Taur-nu-fuin, the stage defeated). The fixture is OPEN when scripts/e2e/fixtures.ts found no win of the two starter decklists in its seeds (docs/phases/STATUS.md).
+# Lost in Mirkwood (The One Deck and the Defenders of Gondor lists, Easy) dealt from the log Journey Up the Anduin's win writes (Turayn in a pool, A Growing Threat and the cards set aside in the encounter pool, a
+# treasure discovered), parked on its win (Escape from Taur-nu-fuin, the stage defeated). The fixture is OPEN when scripts/e2e/fixtures.ts found no win of The One Deck and the Defenders of Gondor lists in its seeds (docs/phases/STATUS.md).
 # The Resolution asks one choice, whether Melanwar joins the pool or the guidance line is written (12168:B:1); the flow writes the line. It then writes the treasure the players control and the Spiders of Mirkwood and
 # Dol Guldur Orcs cards discarded for the pool, and unlocks The King's Quest, whose node reads Next (src/campaign/scenarios/lost-in-mirkwood/golden.test.ts pins the path).
 - runFlow:

@@ -1,5 +1,4 @@
-// The Maestro fixtures of The Withered Heath (ered-mithrin part 4), written into src/campaign/fixtures/the-withered-heath.json by scripts/e2e/fixtures.ts: real games of saved decklists (the Defenders of
-// Gondor and Swords of the Noldor lists of data/decks/prebuilt.json), two-handed, Easy, so each is a real save. `heath-won` is the first seed that wins, parked on the win (the Resolution waits); `heath-lost` the first
+// The Maestro fixtures of The Withered Heath (ered-mithrin part 4), written into src/campaign/fixtures/the-withered-heath.json by scripts/e2e/fixtures.ts: real games of saved decklists (The One Deck and the Defenders of Gondor lists of data/decks/test-decks.json and data/decks/prebuilt.json), two-handed, Easy, so each is a real save. `heath-won` is the first seed that wins, parked on the win (the Resolution waits); `heath-lost` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the first three parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.
 // The Campaign Setup asks the first player one question: the boon-ally search (12175:A:2), answered with the first ally the pool offers (Turayn). The log is the two-handed wins of parts 1 to 3 that put the allies in the pool,

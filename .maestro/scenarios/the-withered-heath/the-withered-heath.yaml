@@ -3,9 +3,9 @@ tags:
   - scenario
 ---
 # Phase 55. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `heath-won` (scripts/e2e/the-withered-heath.ts): a real two-handed game of
-# The Withered Heath (the Defenders of Gondor and Swords of the Noldor lists, Easy) dealt from the log Journey Up the Anduin's, Lost in Mirkwood's and The King's Quest's wins write (Turayn, Melanwar and Isolde in a pool,
+# The Withered Heath (The One Deck and the Defenders of Gondor lists, Easy) dealt from the log Journey Up the Anduin's, Lost in Mirkwood's and The King's Quest's wins write (Turayn, Melanwar and Isolde in a pool,
 # Abandoned Ruin and The Threat to Wilderland pooled, the treasures discovered), parked on its win (A Cornered Dragon, Cold-Drake defeated, 3 Dragon Signs in the victory display). The fixture is OPEN when
-# scripts/e2e/fixtures.ts found no such win of the two starter decklists in its seeds (docs/phases/STATUS.md).
+# scripts/e2e/fixtures.ts found no such win of The One Deck and the Defenders of Gondor lists in its seeds (docs/phases/STATUS.md).
 # The Resolution adds each Accolade boon in play to the pool on its hero (no question) and asks each player for a Song boon (12175:B:6): the first player takes The Canny Huntsman, then the second player A Tale of Victories.
 # With 4 Dragon Signs it would also ask the first player to choose 1 of 3 random undiscovered treasures; the fixture's win has 3, so it does not. It then writes the treasure the players control, if any, and unlocks Roam
 # Across Rhovanion, which the app cannot deal yet (src/campaign/scenarios/the-withered-heath/golden.test.ts pins the path).

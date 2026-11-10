@@ -1,5 +1,4 @@
-// The Maestro fixtures of Fire in the Night (ered-mithrin part 6), written into src/campaign/fixtures/fire-in-the-night.json by scripts/e2e/fixtures.ts: real games of saved decklists (the Defenders of
-// Gondor and Swords of the Noldor lists of data/decks/prebuilt.json), two-handed, Easy, so each is a real save. `night-won` is the first seed that wins, parked on the win (the Resolution waits); `night-lost`
+// The Maestro fixtures of Fire in the Night (ered-mithrin part 6), written into src/campaign/fixtures/fire-in-the-night.json by scripts/e2e/fixtures.ts: real games of saved decklists (The One Deck and the Defenders of Gondor lists of data/decks/test-decks.json and data/decks/prebuilt.json), two-handed, Easy, so each is a real save. `night-won` is the first seed that wins, parked on the win (the Resolution waits); `night-lost`
 // the first that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it. It is the log of the two-handed Roam Across Rhovanion win that put Misplaced
 // Trust for each player and a copy of a location in the pool, on the log of the four parts before it (no ally line is written, so the Campaign Setup asks nothing).

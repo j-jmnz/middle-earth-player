@@ -1,5 +1,4 @@
-// The Maestro fixtures of Lost in Mirkwood (ered-mithrin part 2), written into src/campaign/fixtures/lost-in-mirkwood.json by scripts/e2e/fixtures.ts: real games of saved decklists (the Defenders of
-// Gondor and Swords of the Noldor lists of data/decks/prebuilt.json), two-handed, Easy, so each is a real save. `lostmirk-won` is the first seed that wins, parked on the win (the Resolution waits); `lostmirk-lost` the first
+// The Maestro fixtures of Lost in Mirkwood (ered-mithrin part 2), written into src/campaign/fixtures/lost-in-mirkwood.json by scripts/e2e/fixtures.ts: real games of saved decklists (The One Deck and the Defenders of Gondor lists of data/decks/test-decks.json and data/decks/prebuilt.json), two-handed, Easy, so each is a real save. `lostmirk-won` is the first seed that wins, parked on the win (the Resolution waits); `lostmirk-lost` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.
 // The Campaign Setup asks the first player whether to search the encounter deck for Twilight Hall (the policy searches) and, once the treasure it guards is free, which character carries it; the Resolution asks the first player whether

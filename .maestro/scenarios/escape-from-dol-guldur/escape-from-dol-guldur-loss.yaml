@@ -3,7 +3,7 @@ tags:
   - scenario
 ---
 # Phase 31. Written in a cloud session: it has not run, and its fixture is OPEN. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture
-# `dol-guldur-lost`, which is not committed: it is a real two-handed game of Escape from Dol Guldur (the Dwarves of Durin and Elves of Lórien lists) from the
+# `dol-guldur-lost`, which is not committed: it is a real two-handed game of Escape from Dol Guldur (The One Deck and the Elves of Lórien lists) from the
 # log a real win of Journey Along the Anduin writes, and `anduin-won` is open (docs/phases/STATUS.md; a fixture is a real save, phase 13). Once `anduin-won` is
 # committed, `scripts/e2e/fixtures.ts` writes it. It is parked on its loss: no seat remains. A loss has no reward screen and writes nothing, so Escape from
 # Dol Guldur stays current and The Oath stays locked. The path screen has no table-menu: the log is opened from `log-open`.

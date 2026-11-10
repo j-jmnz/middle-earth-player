@@ -1,5 +1,5 @@
 // The Maestro fixtures of The Caves of Nibin-Dûm (The Dark of Mirkwood part 2, the last part of the campaign), written into src/campaign/fixtures/the-caves-of-nibin-dum.json by
-// scripts/e2e/fixtures.ts: two real games of saved decklists (the Defenders of Gondor and Swords of the Noldor lists of data/decks/prebuilt.json), two-handed, Easy, from the
+// scripts/e2e/fixtures.ts: two real games of saved decklists (The One Deck and the Defenders of Gondor lists of data/decks/test-decks.json and data/decks/prebuilt.json), two-handed, Easy, from the
 // log the `oath-won` game writes when it is confirmed (scripts/e2e/the-oath.ts: the Adaptations, Stalking Goblin and Guilty Conscience in the pool, the once-per-campaign uses),
 // so each is a real save and nothing here builds a log by hand. Played by the auto-player, every intent one the reducer listed.
 // `nibin-dum-won`: the first seed that wins, parked on the win (41051's Resolution asks nothing: with the highest final threat under 40 each player earns a Ranger Sense

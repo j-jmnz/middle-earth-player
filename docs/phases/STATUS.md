@@ -195,7 +195,6 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - Easy: the DragnCards `E0C.12` deck keeps all ten Great Spider cards where Hall of Beorn keeps six; the E0C decks lead (user decision, 2026-11-07).
 
 ## Standing decisions
-- The fixture seed finders play The One Deck (RingsDB decklist 8682) in the first seat, in place of the starter and printed decklists (user, 2026-11-10; `docs/plans/helms-deep-and-road-to-isengard.md`, section 0).
 - Sources are online; no physical card or box check (user, 2026-10-24). The nine MEC109 cards rest on the older printing's scans.
 - Every Rules Reference action window opens; Responses are offered as soon as their trigger resolves; deckbuilding follows the Rules Reference (one to three heroes, no sphere match on save) (user, 2026-10-25).
 - An event with no record cannot be played (`rr.triggered-ability`) (user, 2026-10-26).
