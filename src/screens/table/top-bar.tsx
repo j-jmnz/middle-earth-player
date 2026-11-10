@@ -11,6 +11,7 @@ import { Text } from "../../ui/text";
 import { seatDial } from "../../play/store/peek";
 import type { Rail } from "../../play/phases/rail";
 import type { SeatThreat } from "../../play/store/selectors";
+import type { HeldDial } from "../../play/readouts/widgets";
 import { PhaseRail } from "../../play/phases/phase-rail";
 import { HeadingDial, ThreatRing } from "../../play/chrome/table-chrome";
 import { IslandChip } from "../../play/dream-chaser/island-chip";
@@ -27,6 +28,7 @@ export { TOP_BAR };
 const FADE_BANDS = 7;
 const FADE_BAND = EDGE_FADE / FADE_BANDS;
 const NO_TICKS: readonly number[] = [];
+const NO_HELD: readonly HeldDial[] = [];
 
 export type TopBarProps = {
   threats: readonly SeatThreat[];
@@ -57,18 +59,17 @@ export type TopBarProps = {
   areas?: boolean;
   // The engagement costs marked on each dial, by seat.
   ticks: readonly (readonly number[])[];
-  // The seat holding the Ring-bearer facedown and what to say of it (a Ring mark on its dial), or null.
-  ringSeat?: number | null;
-  ringWords?: string | null;
-  // The mark that dial wears: the One Ring for the Ring-bearer, a hero for the prisoner.
-  ringMark?: "oneRing" | "hero";
+  // The pursuit value of The Uruk-hai and the value at which the players lose (mec112.pursuit), or null: a dial after Life that warms toward the limit.
+  pursuit?: { value: number; limit: number } | null;
+  // The seats that hold something facedown or as a Captive and what to say of each (a mark on its dial): the Ring-bearer under the Watcher, a prisoner, a hero an enemy holds, a Captive.
+  held?: readonly HeldDial[];
   menuOpen: boolean;
   onThreat: (seat: number) => void;
   onRail: () => void;
   onMenu: () => void;
 };
 
-export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens = null, heading = null, island = null, onIsland, onNightmare = null, rail, stopAhead, carouselOpen, narrow, areas, ticks, ringSeat = null, ringWords = null, ringMark = "oneRing", menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
+export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens = null, heading = null, island = null, onIsland, onNightmare = null, rail, stopAhead, carouselOpen, narrow, areas, ticks, pursuit = null, held, menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
   const t = useTableTokens();
   const s = useUiScale();
   const screen = useWindowDimensions();
@@ -126,6 +127,7 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
           <View style={{ flexDirection: "row", flexShrink: 0, gap: DIAL_GAP * s }} onLayout={onDials}>
             {threats.map((threat) => {
               const dial = seatDial(threats.length, acting, viewed, threat.seat, areas);
+              const holding = (held ?? NO_HELD).find((entry) => entry.seat === threat.seat);
               return (
                 <UiScaleContext.Provider key={threat.seat} value={dialScale(s)}>
                   <ThreatRing
@@ -137,8 +139,8 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
                     hint={dial.hint}
                     compact
                     ticks={ticks[threat.seat] ?? NO_TICKS}
-                    ring={ringSeat === threat.seat ? ringWords : null}
-                    ringMark={ringMark}
+                    ring={holding?.words ?? null}
+                    ringMark={holding?.mark}
                     onPress={() => onThreat(threat.seat)}
                   />
                 </UiScaleContext.Provider>
@@ -157,6 +159,7 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
               </View>
             ) : null}
             {life != null ? <ThreatRing threat={{ seat: 0, threat: life, eliminated: false }} label="Life" testID="life" icon={null} elimination={false} compact /> : null}
+            {pursuit != null ? <ThreatRing threat={{ seat: 0, threat: pursuit.value, eliminated: false }} label="Pursuit" accessibilityName="Pursuit value" testID="pursuit" icon={null} limit={pursuit.limit} compact /> : null}
             {tokens != null ? <ThreatRing threat={{ seat: 0, threat: tokens.tokens, eliminated: false }} label="Tokens" accessibilityName={`Resource tokens on ${tokens.name}`} testID="campaign-tokens" icon="resource" elimination={false} compact /> : null}
             {burdenDeck != null ? <ThreatRing threat={{ seat: 0, threat: burdenDeck, eliminated: false }} label="Burden" accessibilityName="Burden deck" testID="burden-deck" icon={null} elimination={false} compact /> : null}
             {onNightmare ? (

@@ -1,0 +1,370 @@
+Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; staging: 19102 Haunted Hall; staging: 19103 Hidden Staircase; staging: 19104 Moonlit Passage; staging: 19105 Cursed Tower; quest: 19109 The Haunted Keep; quest: 19110 Searching the Ruins; quest: 19111 The Cursed Shade; setAside: 19097 The Cursed Tomb)
+
+## 12189 The Ghost of Framsburg
+
+12189:A:1 (front): You are playing campaign mode.
+  (inert: the engine applies it by rule, no record)
+
+12189:A:2 (front): Setup: Each player may change hero cards without incurring the +1 threat penalty. Shuffle Ashen Brazier, Gundabad Hunter, and Gundabad Stalker into the encounter deck. A player may search their deck for a unique boon ally and add it to their hand. If "Isolde is on the hunt," search the encounter deck for 3 treacheries and remove them from the game. If "Beldis's care has bolstered the heroes' spirits," search the encounter deck for 3 non-unique locations and remove them from the game. Flip this card.
+  12189:campaignSetup:1: Campaign setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json WaiveThreatPenalty {"verb":"WaiveThreatPenalty"}]
+    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"12190"}]
+    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"12191"}]
+    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"12192"}]
+    - [json SearchBoonAllyToHand {"verb":"SearchBoonAllyToHand"}]
+    - if the Campaign Log holds "isolde": remove 3 treacheries from the encounter deck
+    - if the Campaign Log holds "beldis": remove 3 non-unique locations from the encounter deck
+
+12189:B:1 (back): Ignore the deep keyword.
+  12189:constant:1: Constant
+    - ignore the deep keyword(s)
+
+12189:B:2 (back): Response: After Fram's Shade engages a player while the players are at stage 1B or 2B, look at 3 random undiscovered treasures and attach 1 of them to Fram's Shade as a guarded objective. When the treasure is free of encounters, the players claim it and attach it to an eligible character. (Group limit once per game.)
+  12189:response:1: Response after an enemy engages a player (heard about card (any player controls) named "Fram's Shade", (enemies engaged with a player included); limit oncePerGameGroup)
+    only if any of: (the players are on stage 1) or (the players are on stage 2)
+    - [json AttachRandomTreasure {"verb":"AttachRandomTreasure","to":"subject"}]
+
+12189:B:3 (back): Action: Raise each player's threat by 1 to shuffle the encounter discard pile into the encounter deck. (Any player may trigger this ability.)
+  12189:action:1: Action (any player may use it)
+    only if [json condition {"kind":"encounterHas","piles":"discard"}]
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - raise threat by 1 (each player)
+    - shuffle the encounter discard pile into the encounter deck
+
+12189:B:4 (back): Resolution: The players discover each treasure they control.
+  12189:resolution:1: Resolution
+    - [json DiscoverTreasure {"verb":"DiscoverTreasure"}]
+
+12189:B:5 (back): Add either Gundabad Hunter or Gundabad Stalker to the campaign pool.
+  12189:resolution:2: Resolution
+    - [json ChooseCards {"verb":"ChooseCards","codes":["12191","12192"],"who":"firstPlayer","to":"pool","only":true}]
+
+12189:B:6 (back): Shuffle the encounter discard pile into the encounter deck and discard cards from the top until 2 Hazard cards are discarded. The players, as a group, must choose 1 of those cards and add it to the campaign pool.
+  12189:resolution:3: Resolution
+    - [json ChooseHazardForPool {"verb":"ChooseHazardForPool","count":2}]
+
+## 19094 Crypt Key
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19094:A:1 (front): Loot.
+  19094:constant:1: Constant
+    - [json Loot {"verb":"Loot"}]
+
+19094:A:2 (front): If unattached, the first player claims Crypt Key and attaches it to a hero he controls.
+  19094:constant:2: Constant
+    - [json ClaimWhenFree {"verb":"ClaimWhenFree"}]
+
+19094:A:3 (front): Response: When the players travel to a Discover location, exhaust Crypt Key to either increase or decrease its Discover value by 1 before resolving it.
+  19094:response:1: Response after the players travel (heard about location (any player controls); cost: exhaust this card)
+    only if not ([json condition {"kind":"discoverUnavailable"}])
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose location (any player controls) [also {"active":true}]
+    - the acting player chooses one of:
+      * option "increase":
+        - the picked card: stat discoverValue 1, until the end of the phase
+      * option "decrease":
+        - the picked card: stat discoverValue -1, until the end of the phase
+
+## 19095 Old Lantern
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19095:A:1 (front): Loot.
+  19095:constant:1: Constant
+    - [json Loot {"verb":"Loot"}]
+
+19095:A:2 (front): If unattached, the first player claims Old Lantern and attaches it to a hero he controls.
+  19095:constant:2: Constant
+    - [json ClaimWhenFree {"verb":"ClaimWhenFree"}]
+
+19095:A:3 (front): Action: Exhaust Old Lantern to choose a player to look at the top X cards of his deck, where X is the Discover value of the active location. He adds one of those cards to his hand and places the rest on the bottom of his deck.
+  19095:action:1: Action (cost: exhaust this card)
+    only if not ([json condition {"kind":"discoverUnavailable"}])
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose player (any player controls)
+    - [json SwitchActor {"verb":"SwitchActor","to":"picked"}]
+    - [json LookAtTop {"verb":"LookAtTop","count":{"discoverValue":true},"deck":"own"}]
+    - choose card (you control) in the deck [also {"looked":true}]
+    - move the picked card to hand
+    - for each card (you control) in the deck [also {"looked":true}]:
+      - [json PutOnDeck {"verb":"PutOnDeck","position":"bottom","target":"picked"}]
+
+## 19096 Scatha's Teeth
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19096:A:1 (front): Loot.
+  19096:constant:1: Constant
+    - [json Loot {"verb":"Loot"}]
+
+19096:A:2 (front): If unattached, the first player claims Scatha's Teeth and attaches it to a hero he controls.
+  19096:constant:2: Constant
+    - [json ClaimWhenFree {"verb":"ClaimWhenFree"}]
+
+19096:A:3 (front): Action: Exhaust Scatha's Teeth and attached hero to choose a player. That player reduces his threat by 2.
+  19096:action:1: Action (cost: exhaust this card and exhaust the attached card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose player (any player controls)
+    - lower threat by 2 (the picked player)
+
+## 19097 The Cursed Tomb
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+19097:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+19097:A:2 (front): The players cannot travel to The Cursed Tomb unless they control 3 Loot objectives.
+  19097:constant:1: Constant
+    only if not (the number of objective (any player controls) [also {"controlled":true,"lootKeyword":true}] is at least 3)
+    - the players cannot travel to any location while this holds
+
+19097:A:3 (front): Forced: After the players travel to The Cursed Tomb, search the encounter deck and discard pile for Fram's Shade and add it to the staging area. Shuffle the encounter deck. Fram's Shade makes an immediate attack against each player in turn order.
+  19097:forced:1: Forced after the players travel (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SearchToStaging {"verb":"SearchToStaging","code":"19098"}]
+    - shuffle the encounter deck
+    - for each player, first player first:
+      - choose enemy (any player controls) or in the staging area, named "Fram's Shade"
+      - the picked enemy attacks the acting player now, from the staging area (or engaged)
+
+## 19098 Fram's Shade
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19098:A:1 (front): Cannot have non-objective attachments.
+  19098:constant:1: Constant
+    only if this card is in play
+    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"objective"}]
+
+19098:A:2 (front): Fram's Shade gets +1 Threat, +1 Attack, and +1 Defense for each Loot objective the players control.
+  19098:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat threat the number of objective (any player controls) [also {"controlled":true,"lootKeyword":true}], while this card is in play
+    - this card: stat attack the number of objective (any player controls) [also {"controlled":true,"lootKeyword":true}], while this card is in play
+    - this card: stat defense the number of objective (any player controls) [also {"controlled":true,"lootKeyword":true}], while this card is in play
+
+19098:A:3 (front): When Fram's Shade is dealt shadow cards, deal it a number of shadow cards equal to the number of Loot objectives the players control (to a minimum of 1).
+  19098:constant:3: Constant
+    - this card: stat dealtShadows the number of objective (any player controls) [also {"controlled":true,"lootKeyword":true}], while this card is in play
+
+## 19099 Crypt Stalker
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19099:A:1 (front): X is the tens digit of the first player's threat.
+  19099:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat threat [json amount {"firstPlayerTens":true}], while this card is in play
+    - this card: stat attack [json amount {"firstPlayerTens":true}], while this card is in play
+    - this card: stat defense [json amount {"firstPlayerTens":true}], while this card is in play
+
+19099:A:2 (front): Forced: When Crypt Stalker attacks, raise the defending player's threat by 1.
+  19099:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    - raise threat by 1 (the acting player)
+
+19099:A:3 (shadow): Shadow: Either raise your threat by 2, or return attacking enemy to the staging area.
+  19099:shadow:1: Shadow
+    - the acting player chooses one of:
+      * option "threat":
+        - raise threat by 2 (the acting player)
+      * option "staging":
+        - return the attacking enemy to the staging area
+
+## 19100 Evil Spectre
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19100:A:1 (front): Forced: When Evil Spectre is destroyed, shuffle it back into the encounter deck if the active location has the Dark trait.
+  19100:forced:1: Forced after an enemy is destroyed (heard about this card)
+    only if the active location is a Dark location (any player controls)
+    - [json ShuffleSelfIntoEncounterDeck {"verb":"ShuffleSelfIntoEncounterDeck"}]
+
+19100:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the active location has the Dark trait.)
+  19100:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the active location is a Dark location (any player controls): the attacking enemy: stat attack 2, until the end of the attack
+    - then, if not (the active location is a Dark location (any player controls)) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
+
+## 19101 Forgotten Crypt
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+19101:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+19101:A:2 (front): Forced: After Forgotten Crypt becomes the active location, discard cards from the top of the encounter deck until an Undead enemy is discarded and add it to the staging area. Then, attach a Loot objective in the encounter discard pile to that enemy as a guarded objective.
+  19101:forced:1: Forced after this location becomes the active location (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy","trait":"Undead"}]
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging"}]
+    - [json AttachLootFromDiscard {"verb":"AttachLootFromDiscard"}]
+
+## 19102 Haunted Hall
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+19102:A:1 (front): Discover 4.
+  19102:forced:1: Forced after this location becomes the active location (heard about this card)
+    - [json Discover {"verb":"Discover","amount":4}]
+
+19102:A:2 (front): While Haunted Hall is in the staging area, it gains, "Forced: After a player places any amount of progress on a Dark location in the staging area, he raises his threat by 1."
+  19102:forced:2: Forced on the event progressPlaced (heard about Dark location (any player controls) in the staging area only)
+    only if this card is in the staging area
+    - raise threat by 1 (the player the event is about)
+
+## 19103 Hidden Staircase
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+19103:A:1 (front): Discover X.
+  19103:forced:1: Forced after this location becomes the active location (heard about this card)
+    - [json Discover {"verb":"Discover","amount":{"firstPlayerTens":true}}]
+
+19103:A:2 (front): X is the tens digit of the first player's threat.
+  19103:constant:1: Constant
+    - this card: stat threat [json amount {"firstPlayerTens":true}], while this card is in play
+
+19103:A:3 (front): Forced: After resolving the Discover keyword on Hidden Staircase, reduce each player's threat by X if no Hazard cards were revealed by it.
+  19103:forced:2: Forced on the event discovered (heard about this card)
+    - if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)): lower threat by [json amount {"firstPlayerTens":true}] (each player)
+
+## 19104 Moonlit Passage
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+19104:A:1 (front): Discover 2.
+  19104:forced:1: Forced after this location becomes the active location (heard about this card)
+    - [json Discover {"verb":"Discover","amount":2}]
+
+19104:A:2 (front): While Moonlit Passage is in the staging area, each player's threat cannot be reduced by more than 1 via player card effects each round.
+  19104:constant:1: Constant
+    only if this card is in the staging area
+    - each player: stat playerThreatReductionCap 1, while this card is in play
+
+19104:A:3 (shadow): Shadow: Raise your threat by 1.
+  19104:shadow:1: Shadow
+    - raise threat by 1 (the acting player)
+
+## 19105 Cursed Tower
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+19105:A:1 (front): Discover 3.
+  19105:forced:1: Forced after this location becomes the active location (heard about this card)
+    - [json Discover {"verb":"Discover","amount":3}]
+
+19105:A:2 (front): While Cursed Tower is in the staging area, it gains: "Forced: After a player plays an event, raise his threat by 1."
+  19105:forced:2: Forced after this card is played (heard about card (any player controls) of card type event)
+    only if this card is in the staging area
+    - raise threat by 1 (the player the event is about)
+
+19105:A:3 (shadow): Shadow: Discard a non-objective attachment you control.
+  19105:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (you control)
+    - discard the picked card
+
+## 19106 Abandoned Ruins
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19106:A:1 (front): When Revealed: Each player resolves the Discover keyword of the active location in turn order. If they cannot, Abandoned Ruins gains surge and doomed 2.
+  19106:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - [json ResolveDiscover {"verb":"ResolveDiscover"}]
+    - [json GainSurge {"verb":"GainSurge","when":{"kind":"discoverUnavailable"}}]
+    - [json Doomed {"verb":"Doomed","amount":2,"when":{"kind":"discoverUnavailable"}}]
+
+19106:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
+  19106:shadow:1: Shadow
+    - when the attack in progress ends:
+      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt no shadow card
+
+## 19107 Terrible Shadows
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19107:A:1 (front): When Revealed: Each character gets -1 Willpower, -1 Attack, and -1 Defense until the end of the round.
+  19107:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - every character in play, now and entering later: stat willpower -1, until the end of the round
+    - every character in play, now and entering later: stat attack -1, until the end of the round
+    - every character in play, now and entering later: stat defense -1, until the end of the round
+
+19107:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, raise the defending player's threat by 3.
+  19107:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): raise threat by 3 (the acting player)
+
+## 19108 Slammed Shut
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19108:A:1: Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+19108:A:2 (front): When Revealed: Each player chooses and exhausts a character he controls. Until the end of the round, characters cannot be readied by player card effects.
+  19108:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - choose ready character (you control)
+      - exhaust the picked card
+    - every character in play, now and entering later: stat cannotReadyByPlayerCard 1, until the end of the round
+
+## 19109 The Haunted Keep
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+19109:A:1 (front): Setup: Set The Cursed Tomb aside, out of play. Each player searches the encounter deck for a different location and adds it to the staging area. Shuffle the encounter deck.
+  19109:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - [json SearchMove {"verb":"SearchMove","type":"location","to":"staging","different":true}]
+    - shuffle the encounter deck
+
+19109:B:1 (back): This stage cannot be defeated unless the players control at least 1 Loot objective.
+  19109:constant:1: Constant
+    only if not (the number of objective (any player controls) [also {"controlled":true,"lootKeyword":true}] is at least 1)
+    - the players cannot defeat this stage while this holds
+
+## 19110 Searching the Ruins
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+19110:A:1 (front): When Revealed: Shuffle the encounter discard pile into the encounter deck. Then, each player reveals an encounter card.
+  19110:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+19110:B:1 (back): Forced: At the beginning of the quest phase, the first player must choose: either raise each player's threat by 2, or discard cards from the top of the encounter deck until a location is discarded and add that location to the staging area.
+  19110:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    - the first player chooses one of:
+      * option "threat":
+        - raise threat by 2 (each player)
+      * option "location":
+        - [json DiscardUntil {"verb":"DiscardUntil","type":"location"}]
+        - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging"}]
+
+19110:B:2 (back): This stage cannot be defeated unless the players control at least 2 Loot objectives.
+  19110:constant:1: Constant
+    only if not (the number of objective (any player controls) [also {"controlled":true,"lootKeyword":true}] is at least 2)
+    - the players cannot defeat this stage while this holds
+
+## 19111 The Cursed Shade
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+19111:A:1 (front): When Revealed: The first player adds The Cursed Tomb to the staging area. Each other player searches the encounter deck and discard pile for a non-unique Undead enemy and adds it to the staging area. Shuffle the encounter deck.
+  19111:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"19097","when":{"kind":"firstPlayer"}}]
+      - [json SearchMove {"verb":"SearchMove","type":"enemy","trait":"Undead","nonUnique":true,"to":"staging","when":{"kind":"not","condition":{"kind":"firstPlayer"}}}]
+    - shuffle the encounter deck
+
+19111:B:1 (back): Fram's Shade is immune to player card effects.
+  19111:constant:1: Constant
+    - each card (any player controls) named "Fram's Shade", (enemies engaged with a player included): stat immuneToPlayerCards 1, while this card is in play
+
+19111:B:2 (back): While The Cursed Tomb is in the victory display, Fram's Shade gains victory 6.
+  19111:constant:2: Constant
+    only if [json condition {"kind":"inVictory","code":"19097","is":true}]
+    - each card (any player controls) named "Fram's Shade", (enemies engaged with a player included): stat gainsVictory 6, while this card is in play
+
+19111:B:3 (back): This stage cannot be defeated unless Fram's Shade is in the victory display. When the players defeat this stage, they win the game.
+  19111:constant:3: Constant
+    only if [json condition {"kind":"inVictory","code":"19098","is":false}]
+    - the players cannot defeat this stage while this holds
+
+(rendered pieces: 171 by template, 56 as JSON)

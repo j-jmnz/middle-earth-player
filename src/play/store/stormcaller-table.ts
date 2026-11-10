@@ -1,11 +1,11 @@
 // Rules: dcce.stormcallers-area, dcce.stormcallers-area-stages (data/rules/entries.json). What the table reads of the Stormcaller's area (docs/design-system-table.md, Cards, "The Stormcaller's area"): which cards
-// make its group, where each stands, and the numbers the reader labels say. Pure; the words are in words/stormcaller.ts. A game with no Stormcaller's area has no group and no role.
+// make its group, where each stands, and the numbers the reader labels say. Pure; the words are in words/scenarios/stormcaller.ts. A game with no Stormcaller's area has no group and no role.
 import { areaOf } from "../../rules/families/stormcaller/zone.ts";
 import { stageNumber } from "../../rules/families/caves/progress.ts";
 import { areaPlace, atStormcallersStage, stormcallerLastStage } from "../../rules/families/stormcaller/values.ts";
 import type { CardInstance, ScenarioState } from "../../rules/core/state.ts";
 
-import { memberSpeech, stageSpeech, type StageFacts } from "../words/stormcaller.ts";
+import { memberSpeech, stageSpeech, type StageFacts } from "../words/scenarios/stormcaller.ts";
 
 /** Where a card of the area's group stands: the Stormcaller's current quest stage, a card of the area while the players are at another stage (`apart`: in the area zone, veiled), or a card of the area
  * at the players' stage (`together`: it counts as a staging card, in place). */

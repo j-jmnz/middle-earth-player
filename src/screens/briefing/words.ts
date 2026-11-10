@@ -2,7 +2,7 @@
 // collector code; the bar shows them without codes, and words the missing Ring-bearer as the seat that needs one rather than
 // naming the first hero. Pure, so a test reads it.
 import type { Problem } from "../../campaign/briefing";
-import { COUNSEL } from "../../play/words/aflame";
+import { COUNSEL } from "../../play/words/scenarios/aflame";
 import { ruleSource } from "../rules/glossary";
 
 // The rule name the briefing gives a missing Ring-bearer (src/campaign/briefing.ts, RULE_OF).

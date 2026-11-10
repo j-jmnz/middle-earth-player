@@ -1,7 +1,8 @@
-// Rules: rr.guarded, rr.attachment-cards, rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 01108:A:1-2, 01107:A:1, 01123:B:1, 01105:A:1.
+// Rules: rr.guarded, rr.attachment-cards, rr.in-play-and-out-of-play, rr.ownership-and-control (data/rules/entries.json); ledger lines 01108:A:1-2, 01107:A:1, 01123:B:1, 01105:A:1.
 // The one line a card of Escape from Dol Guldur says about itself in the card preview (table-preview.ts) when it has more to say than its text:
 // an objective's guard, the prisoner, an Orc Guard's card, Iron Shackles on a deck; and of A Storm on Cobas Haven, a tower the players control and the Ship enemy a location holds out of play. The engine decided each; nothing here changes one.
 import { freeOfEncounters } from "../../rules/families/objectives/index.ts";
+import { captivesUnder } from "../../rules/families/captives/values.ts";
 import { heroGuardedBy } from "../../rules/families/wilderland/carried.ts";
 import { cardsUnder } from "../../rules/core/zones.ts";
 import { flagged, heldAmount } from "../../rules/core/state.ts";
@@ -37,6 +38,8 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
   if (!card) return null;
   if (card.code === ORC_GUARD_CODE) return "The facedown card under it returns to its owner's discard pile when it leaves play.";
   if (card.prisoner === true && card.zone === "captive" && card.host == null) return prisonerWords(name(cardId));
+  const captive = captiveDetail(game, ctx, card, name);
+  if (captive) return captive;
   const lost = kingsQuestDetail(game, ctx, card, name) ?? lostInMirkwoodDetail(game, ctx, card, name) ?? heathDetail(game, ctx, card, name) ?? rhovanionDetail(game, ctx, card);
   if (lost) return lost;
   if (game.seats.some((seat) => seat.deckAttached?.includes(cardId))) return `${name(cardId)}: your next draw is discarded`;
@@ -60,6 +63,22 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
 
 // Whose a seat's hero or hand is, as the preview says it: "Player 2's" two-handed, "your" solo.
 const ownerWords = (game: ScenarioState, seat: number): string => (game.seatCount > 1 ? `Player ${seat + 1}'s` : "your");
+
+// The Captives of The Uruk-hai (ledger lines 143022:A:1, 143024:A:1, 143024:A:2, 143070:B:3): a Captive says who holds it and that its text box is blank, as a live card's text is not; the card that holds Captives names them. The engine decided each; this only says it.
+function captiveDetail(game: ScenarioState, ctx: ReduceContext, card: ScenarioState["cards"][string], name: (id: string) => string): string | null {
+  if (card.captive === true && card.zone === "captive") {
+    const host = card.host != null ? game.cards[card.host] : undefined;
+    const hero = card.owner != null ? `${ownerWords(game, card.owner)} hero` : "A hero";
+    if (host && ctx.cards.get(host.code)?.type === "enemy") return `${hero}, a Captive held by ${name(host.id)}. No one controls it and its text box is blank. It takes 1 damage at the end of each quest phase until ${name(host.id)} leaves play.`;
+    return `${hero}, a Captive held under ${host ? name(host.id) : "To Isengard!"} No one controls it and its text box is blank until the players win.`;
+  }
+  const held = captivesUnder(game, card.id);
+  if (held.length === 0) return null;
+  const list = held.map(name).join(", ");
+  return ctx.cards.get(card.code)?.type === "enemy"
+    ? `Holds ${list}, a Captive. It takes 1 damage at the end of each quest phase until ${name(card.id)} leaves play.`
+    : `Holds ${list} as ${held.length === 1 ? "a Captive" : "Captives"}. No one controls ${held.length === 1 ? "it" : "them"}, and ${held.length === 1 ? "its" : "their"} text ${held.length === 1 ? "box is" : "boxes are"} blank until the players win.`;
+}
 
 // Lost in Mirkwood's cards (ledger lines 18074:B:2, 18075:B:2, 18075:B:3, 18076:B:1 to 18076:B:3): an enemy that holds a hero facedown, a location with a hand facedown under it, and the nemesis. The engine decided each; this only says it.
 function lostInMirkwoodDetail(game: ScenarioState, ctx: ReduceContext, card: ScenarioState["cards"][string], name: (id: string) => string): string | null {

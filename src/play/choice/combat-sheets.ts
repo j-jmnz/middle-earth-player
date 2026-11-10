@@ -7,9 +7,9 @@
 import { defenseAsDefender, modifiedStat } from "../../rules/core/keywords.ts";
 import { legalTargets, type LegalIntent, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../rules/engine/reduce.ts";
 
-import { fateAttackNote, fateTargetNote } from "../words/fate.ts";
-import { attackSource } from "../words/grapple.ts";
-import { nightDefenderExcess, nightStageAttack } from "../words/night.ts";
+import { fateAttackNote, fateTargetNote } from "../words/scenarios/fate.ts";
+import { attackSource } from "../words/scenarios/grapple.ts";
+import { nightDefenderExcess, nightStageAttack } from "../words/scenarios/night.ts";
 import { damageOutcome, defenseDamage, undefendedDamage } from "../store/foresight.ts";
 import { has, option, statOf } from "./sheet-parts.ts";
 import type { Alternative, MultiSheet, OptionMark, Sheet, SheetNames, SheetStat } from "./sheet-types.ts";

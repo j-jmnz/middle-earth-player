@@ -1,11 +1,12 @@
 import type { PrintedKeywords, RingsDbCard, RingsDbPack } from "../../../src/catalog/boundary.ts";
 import { cardSchema, type Card, type Printing } from "../../../src/catalog/card-facts.ts";
 import { deckLegal } from "../../../src/catalog/deck-legal.ts";
-import { PRODUCTS, REPRINTS, type ReprintDef } from "../campaign-defs.ts";
+import { PRODUCTS, REPRINTS } from "../campaign-defs.ts";
 import type { HobCard } from "../sources/hallofbeorn.ts";
 import { parseKeywordTokens } from "./keywords.ts";
 import type { RawData } from "./load-raw.ts";
 import { titleKey } from "./names.ts";
+import { pairTwins, sameCard, twinSetsOf } from "./card-twins.ts";
 import { addDragnBacks, addNightmareCards, addProductCards, dragnOnlyCards, dragnRowOf, fillShipSets, fillSideQuestSets, foldTwoSided, productCodeOf, setName } from "./product-cards.ts";
 import type { Overrides } from "./overrides.ts";
 import { timingLabels } from "./timings.ts";
@@ -78,6 +79,15 @@ type HobFacts = Pick<Card, "traits" | "threat" | "willpower" | "attack" | "defen
 
 type DragnRow = Record<string, string> | undefined;
 
+// A location that prints X for its quest points.
+const locationPrintsX = (card: HobCard): boolean => card.Front.Stats.QuestPoints === "X" && card.CardType === "Location";
+
+// The boxes whose quest stages the engine plays and whose side B prints X ("X is the pursuit value", The Uruk-hai 143069:B:1 and Rescue the Captives 143070:B:1): the Two Towers box and its Treason of Saruman printing. The other stages
+// with an X on side B (The Paths of the Dead, Retreat from Osgiliath, On the Trail, Goblin Ambush) are in scenarios that are not built, and flagging them would change their cards before a record gives X its value, so they do not count yet.
+// Neither the campaign definitions nor Hall of Beorn's card carry the box as a field, so it is read from the folder of side B's image.
+const BUILT_BOXES = /\/Cards\/The-(Two-Towers|Treason-of-Saruman)\//;
+const stagePrintsX = (card: HobCard): boolean => card.CardType === "Quest" && card.Back?.Stats.QuestPoints === "X" && BUILT_BOXES.test(card.Back.ImagePath ?? "");
+
 // Hall of Beorn's keyword list can miss one that the card text and DragnCards carry (Bucklebury Ferry's
 // Immune, Bag End's Victory 1). The two sources are merged; DragnCards' free-text keywords field is only
 // read for sentences that parse as keywords.
@@ -92,8 +102,8 @@ function keywordsOf(card: HobCard, dragn: DragnRow, report: BuildReport): { keyw
   const fromDragn = parseKeywordTokens((dragn?.keywords ?? "").split(/(?<=\.)\s+/).filter((sentence) => parseKeywordTokens([sentence]).unknown.length === 0));
   Object.assign(parsed.keywords, fromDragn.keywords);
   for (const token of parsed.unknown) report.unknownKeywords[token] = (report.unknownKeywords[token] ?? 0) + 1;
-  // A location that prints X for its quest points (the number stays null; a record sets the value).
-  if (card.Front.Stats.QuestPoints === "X" && card.CardType === "Location") parsed.keywords.questPointsX = true;
+  // A location or a built quest stage that prints X for its quest points (the number stays null; a record sets the value).
+  if (locationPrintsX(card) || stagePrintsX(card)) parsed.keywords.questPointsX = true;
   return { keywords: parsed.keywords, victory };
 }
 
@@ -212,62 +222,6 @@ function assertRulesMatch(code: string, left: RingsDbCard, right: RingsDbCard): 
   for (const field of RULE_FIELDS) {
     if ((left[field] ?? null) !== (right[field] ?? null)) throw new Error(`Card ${code}: pack files disagree on ${field}`);
   }
-}
-
-// Hall of Beorn's type names for the RingsDB deck-legal types.
-const PLAYER_TYPE_BY_HOB: Readonly<Record<string, string>> = {
-  Hero: "hero",
-  Ally: "ally",
-  Attachment: "attachment",
-  Event: "event",
-  Contract: "contract",
-  Player_Side_Quest: "player-side-quest",
-};
-
-// Hall of Beorn's RingsDbCardId is not unique: the Nightmare decks, The Dark of Mirkwood and the hero and campaign
-// expansions reuse the codes of the cycle they belong to (02004 is Winged Guardian and also Forest Flies), and The
-// Mountain of Fire swaps three. A record is the same card only when the title matches and, for a deck-legal card, the
-// type and the sides do: a player card prints a side B only when its own text says Side A (contracts, Sméagol), and a
-// shadow effect only with the Encounter keyword.
-function sameCard(card: RingsDbCard, hob: HobCard): boolean {
-  if (titleKey(hob.Title) !== titleKey(card.name)) return false;
-  if (!deckLegal(card.type_code, card.type_name)) return true;
-  const encounter = hob.Front.Keywords.some((keyword) => /^Encounter\.?$/i.test(keyword.trim()));
-  return PLAYER_TYPE_BY_HOB[hob.CardType] === card.type_code && (!hob.Back || /\bSide A\b/.test(card.text ?? "")) && (!hob.Front.Shadow?.trim() || encounter);
-}
-
-function twinKey(card: HobCard): string {
-  return `${card.Title}\u0000${card.CardType}`;
-}
-
-// A reprint card (a saga box's, MEC109 or MEC112) and its twin in the box's adventure packs share a title and type. Several of each (Frodo,
-// Pursued by the Enemy) pair up in campaign order, then collector number. The twins are those of the one reprint: a title the two saga boxes
-// both print (Aragorn, Frodo Baggins, The One Ring, Gollum) pairs within its own box.
-function pairTwins(box: readonly HobCard[], twins: readonly HobCard[], setOrder: readonly string[]): Map<HobCard, HobCard> {
-  const order = (a: HobCard, b: HobCard) => setOrder.indexOf(a.CardSet) - setOrder.indexOf(b.CardSet) || a.Number - b.Number;
-  const groups = new Map<string, { box: HobCard[]; twins: HobCard[] }>();
-  for (const [list, side] of [[box, "box"], [twins, "twins"]] as const) {
-    for (const card of list) {
-      const group = groups.get(twinKey(card)) ?? { box: [], twins: [] };
-      group[side].push(card);
-      groups.set(twinKey(card), group);
-    }
-  }
-  const pairs = new Map<HobCard, HobCard>();
-  for (const group of groups.values()) {
-    group.box.sort((a, b) => a.Number - b.Number);
-    group.twins.sort(order);
-    group.box.forEach((card, index) => {
-      const twin = group.twins[index];
-      if (twin) pairs.set(card, twin);
-    });
-  }
-  return pairs;
-}
-
-// The Hall of Beorn sets of a reprint's twin products, in campaign order.
-function twinSetsOf(reprint: ReprintDef): string[] {
-  return PRODUCTS.filter((product) => product.reprint?.set === reprint.set && product.twinPack !== null).map((product) => product.name);
 }
 
 function overrideFor(overrides: Overrides, probe: { code?: string; name: string; set?: string; number?: number }) {

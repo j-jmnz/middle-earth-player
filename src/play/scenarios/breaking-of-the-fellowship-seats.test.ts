@@ -10,10 +10,10 @@ import { printedOf } from "../../rules/core/printed.ts";
 import { loadBreakingWorld, makeBreaking, type BreakingLayout, type BreakingWorld } from "../../../test/scenarios/breaking-of-the-fellowship/scene.ts";
 import { first } from "../../../test/harness/scene-kit.ts";
 
-import { areaWords, seatTag, stagingWord } from "../words/area.ts";
-import { breakingBranchWords, breakingPickWords, breakingWords } from "../words/breaking.ts";
+import { areaWords, seatTag, stagingWord } from "../words/scenarios/area.ts";
+import { breakingBranchWords, breakingPickWords, breakingWords } from "../words/scenarios/breaking.ts";
 import { standInText } from "../cards/dungeon-preview.ts";
-import { moriaWords } from "../words/moria.ts";
+import { moriaWords } from "../words/scenarios/moria.ts";
 import { momentOf } from "../store/outcome.ts";
 import { seatDial } from "../store/peek.ts";
 import { advancedTo, advanceWords } from "../readouts/quest-advance.ts";

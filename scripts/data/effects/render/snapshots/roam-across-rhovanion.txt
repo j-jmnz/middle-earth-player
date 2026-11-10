@@ -1,0 +1,427 @@
+Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; quest: 19048 Rescue Tiny; quest: 19049 Retrieve Urdug's Horn; quest: 19050 Find Durin's Key; quest: 19051 Urdug's Gambit; setAside: 19036 Durin's Key; setAside: 19037 Urdug's Horn; setAside: 19052 Urdug; setAside: 19054 Tiny)
+
+## 12184 Roam Across Rhovanion
+
+12184:A:1 (front): You are playing campaign mode.
+  (inert: the engine applies it by rule, no record)
+
+12184:A:2 (front): Setup: A player may search their deck for a unique boon ally and add it to their hand. If "Melanwar has given you guidance on traversing Wilderland," search the encounter deck for 3 non-unique enemies not named Grey Mountain Giant and remove them from the game. The first player may put their trust in Urdug by placing a resource on him (from the token pool). If they don't, shuffle a copy of the Urdug's Cunning burden into the encounter deck. Flip this card over.
+  12184:campaignSetup:1: Campaign setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SearchBoonAllyToHand {"verb":"SearchBoonAllyToHand"}]
+    - if the Campaign Log holds "melanwar": remove 3 non-unique enemies from the encounter deck except "Grey Mountain Giant"
+    - [json PutTrust {"verb":"PutTrust","code":"19052","burden":"12185"}]
+
+12184:B:1 (back): Forced: After the first player claims an objective, they may put their trust in Urdug by placing a resource on him (from the token pool). If they don't, shuffle a copy of the Urdug's Cunning burden into the encounter deck.
+  12184:forced:1: Forced on the event claimed (heard about objective (any player controls))
+    only if the actor holds the first player token
+    - [json PutTrust {"verb":"PutTrust","code":"19052","burden":"12185"}]
+
+12184:B:2 (back): Ignore the deep keyword. Urdug gets +1 Willpower, +1 Threat, +1 Attack, and +1 Defense for each resource on him.
+  12184:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - ignore the deep keyword(s)
+    - each card (any player controls) named "Urdug", (enemies engaged with a player included): stat willpower the resource tokens on card (any player controls) named "Urdug", (enemies engaged with a player included), while this card is in play
+    - each card (any player controls) named "Urdug", (enemies engaged with a player included): stat threat the resource tokens on card (any player controls) named "Urdug", (enemies engaged with a player included), while this card is in play
+    - each card (any player controls) named "Urdug", (enemies engaged with a player included): stat attack the resource tokens on card (any player controls) named "Urdug", (enemies engaged with a player included), while this card is in play
+    - each card (any player controls) named "Urdug", (enemies engaged with a player included): stat defense the resource tokens on card (any player controls) named "Urdug", (enemies engaged with a player included), while this card is in play
+
+12184:B:3 (back): Resolution: If there are 3 or more resources on Urdug, each player adds a copy of Misplaced Trust to the campaign pool (and their deck). Otherwise, each player adds a copy of Urdug's Cunning to the campaign pool.
+  12184:resolution:1: Resolution
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json Earn {"verb":"Earn","codes":["12186"],"eachPlayer":true,"afterHand":true,"when":{"kind":"less","left":2,"right":{"resourcesOn":{"type":"card","control":"any","names":["Urdug"],"engagedEnemies":true}}}}]
+    - [json Earn {"verb":"Earn","codes":["12185"],"eachPlayer":true,"when":{"kind":"not","condition":{"kind":"less","left":2,"right":{"resourcesOn":{"type":"card","control":"any","names":["Urdug"],"engagedEnemies":true}}}}}]
+
+12184:B:4 (back): Each player chooses a location in the staging area and adds a copy of it to the campaign pool. Players must choose different locations, if able.
+  12184:resolution:2: Resolution
+    - [json ChooseStagedLocationForPool {"verb":"ChooseStagedLocationForPool"}]
+
+## 19036 Durin's Key
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+19036:A:1 (front): While Durin's Key is free of encounters, the first player attaches it to a hero he controls.
+  19036:constant:1: Constant
+    - [json ClaimWhenFree {"verb":"ClaimWhenFree"}]
+
+19036:A:2 (front): Action: Exhaust Durin's Key to give each location -1 Threat until the end of the phase.
+  19036:action:1: Action (cost: exhaust this card)
+    - each location (any player controls): stat threat -1, until the end of the phase
+
+19036:A:3 (front): Forced: At the beginning of the quest phase, the player who controls Durin's Key looks at the top 3 cards of the encounter deck, chooses 1 to reveal, and discards the rest.
+  19036:forced:1: Forced when a phase begins
+    only if all of: (it is the Quest phase) and (the number of objective (any player controls) named "Durin's Key" [also {"controlled":true}] is at least 1)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json LookAtTop {"verb":"LookAtTop","count":3}]
+    - [json PickEncounter {"verb":"PickEncounter","from":"looked"}]
+    - [json DiscardOtherLooked {"verb":"DiscardOtherLooked"}]
+    - the acting player reveals an encounter card
+
+## 19037 Urdug's Horn
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+19037:A:1 (front): While Urdug's Horn is free of encounters, attach it to Urdug.
+  19037:constant:1: Constant
+    - [json ClaimWhenFree {"verb":"ClaimWhenFree","host":"Urdug"}]
+
+19037:A:2 (front): Forced: When Urdug attacks, discard the top card of the encounter deck and add its Threat to his Attack until the end of the phase.
+  19037:forced:1: Forced after a character is declared as an attacker (heard about the host)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard 1 card(s) from the top of the encounter deck
+    - its host: stat attack printed threat of the top card of the encounter discard pile, until the end of the phase
+  19037:forced:2: Forced when this enemy attacks, before the defender is declared (heard about the host)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard 1 card(s) from the top of the encounter deck
+    - its host: stat attack printed threat of the top card of the encounter discard pile, until the end of the phase
+
+## 19038 Grey Mountain Giant
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19038:A:1 (front): Cannot have non-objective attachments.
+  19038:constant:1: Constant
+    only if this card is in play
+    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"objective"}]
+
+19038:A:2 (front): Forced: When Grey Mountain Giant engages you, discard the top 5 cards of your deck. Assign damage among characters you control equal to the number of allies discarded by this effect.
+  19038:forced:1: Forced after an enemy engages a player (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json DiscardFromDeck {"verb":"DiscardFromDeck","amount":5,"count":{"type":"ally","control":"any","looked":true}}]
+    - [json AssignDamage {"verb":"AssignDamage","amount":{"x":true},"pick":{"type":"character","control":"you"}}]
+
+## 19039 Hunting Eagle
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19039:A:1 (front): Surge. Cannot be optionally engaged.
+  (the keyword part is owned by the card's keywords; the records cover: Cannot be optionally engaged.)
+  19039:constant:1: Constant
+    - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
+
+19039:A:2 (front): Forced: When the encounter phase begins, Hunting Eagle engages the first player.
+  19039:forced:1: Forced when a phase begins
+    only if it is the Encounter phase
+    - for each player, first player first:
+      - if the actor holds the first player token: engage this card
+
+19039:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if attacking enemy has the Creature trait).
+  19039:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attacking enemy is a Creature enemy (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the attacking enemy is a Creature enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 19040 Wilderland Bear
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19040:A:1 (front): When Revealed: The first player must choose: either Wilderland Bear makes an immediate attack against him, or each player discards 1 random card from his hand.
+  19040:whenRevealed:1: When revealed
+    - the first player chooses one of:
+      * option "attack":
+        - this card attacks the first player now, from the staging area
+      * option "discard":
+        - each player discards 1 random card(s) from hand
+
+## 19041 Grey Moorland
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19041:A:1 (front): Forced: After Grey Moorland becomes the active location, shuffle the encounter discard pile into the encounter deck and discard cards from it until a treachery is discarded. Resolve the 'When Revealed' effect on that treachery.
+  19041:forced:1: Forced after this location becomes the active location (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - [json DiscardUntil {"verb":"DiscardUntil","type":"treachery"}]
+    - [json ResolveWhenRevealed {"verb":"ResolveWhenRevealed","when":{"kind":"matches","card":"picked","pick":{"type":"treachery","control":"any"},"inPlay":false}}]
+
+19041:A:2 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
+  19041:shadow:1: Shadow
+    - when the attack in progress ends:
+      - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 19042 Deep Ravine
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19042:A:1 (front): While Deep Ravine is in the staging area, no more than 1 progress can be placed on locations in the staging area each round.
+  19042:constant:1: Constant
+    only if this card is in the staging area
+    - each location (any player controls) in the staging area only: stat progressCapShared 1, while this card is in play
+
+19042:A:2 (front): Travel: The first player must either exhaust Urdug, or raise each player's threat by 2 to travel here.
+  19042:travel:1: Travel
+    - the first player chooses one of:
+      * option "exhaust" (only if there is a ready card (you control) named "Urdug", chosen by the first player to choose):
+        - choose ready card (you control) named "Urdug", chosen by the first player
+        - exhaust the picked card
+      * option "threat":
+        - raise threat by 2 (each player)
+
+## 19043 Slopes of Ered Mithrin
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19043:A:1: Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+19043:A:2 (front): Response: After the players travel to Slopes of Ered Mithrin, the first player may ready a character he controls.
+  19043:response:1: Response after the players travel
+    only if there is a exhausted character (you control) chosen by the first player to choose
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose exhausted character (you control) chosen by the first player
+    - ready the picked card
+
+19043:A:3 (shadow): Shadow: If the first player controls Urdug, exhaust him.
+  19043:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the number of card (you control) named "Urdug", chosen by the first player is at least 1: choose card (you control) named "Urdug", chosen by the first player
+    - then, if the number of card (you control) named "Urdug", chosen by the first player is at least 1 (checked when this step runs, after the steps above; not tied to whether they did anything): exhaust the picked card
+
+## 19044 Sneaking Off
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19044:A:1 (front): When Revealed: The first player loses control of Urdug, then attach Urdug to a location in the staging area as a guarded objective. If he cannot, add 5 to the total Threat in the staging area until the end of the phase. In either case, remove Sneaking Off from the game.
+  19044:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the number of card (you control) named "Urdug", chosen by the first player is at least 1: choose location (any player controls) in the staging area only, chosen by the first player
+    - [json GuardReturnedBy {"verb":"GuardReturnedBy","code":"19052","when":{"kind":"matches","card":"picked","pick":{"type":"location","control":"any"}}}]
+    - [json RaiseStagingThreat {"verb":"RaiseStagingThreat","amount":5,"until":"endOfPhase","when":{"kind":"not","condition":{"kind":"matches","card":"picked","pick":{"type":"location","control":"any"}}}}]
+    - [json RemoveSourceFromGame {"verb":"RemoveSourceFromGame"}]
+
+## 19045 Harsh Weather
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19045:A:1 (front): When Revealed: For each ready character a player controls, he must choose: either exhaust that character or raise his threat by 1.
+  19045:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - [json ExhaustOrDamageEachReady {"verb":"ExhaustOrDamageEachReady","amount":1,"or":"threat"}]
+
+19045:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, exhaust a character you control.
+  19045:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): choose ready character (you control)
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): exhaust the picked card
+
+## 19046 Wild Creatures
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19046:A:1 (front): When Revealed: Starting with the first player, each player chooses an enemy in the staging area and engages it. Then, if any player did not engage an enemy this way, discard cards from the encounter deck until a Creature enemy is discarded and add it to the staging area.
+  19046:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - [json AddToX {"verb":"AddToX","amount":1,"when":{"kind":"not","condition":{"kind":"canPick","pick":{"type":"enemy","control":"any","stagingOnly":true,"engageable":true}}}}]
+      - then, if there is a enemy (any player controls) in the staging area only [also {"engageable":true}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) in the staging area only [also {"engageable":true}]
+      - then, if there is a enemy (any player controls) in the staging area only [also {"engageable":true}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): engage the picked card
+    - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy","trait":"Creature","when":{"kind":"x","min":1}}]
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"},"inPlay":false}}]
+
+## 19047 The Goblin's Task
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+19047:A:1 (front): Setup: The first player takes control of Urdug, objective side face-up. Set each other objective and objective-ally aside, out of play. Shuffle the encounter deck and discard cards from the top until X locations are discarded, where X is the number of players. Add each discarded location to the staging area.
+  19047:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json TakeControlOfSetAside {"verb":"TakeControlOfSetAside","code":"19052"}]
+    - shuffle the encounter deck
+    - for each player, first player first:
+      - [json DiscardUntil {"verb":"DiscardUntil","type":"location"}]
+      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"location","control":"any"},"inPlay":false}}]
+
+19047:B:1 (back): Progress cannot be placed on locations in the staging area.
+  19047:constant:1: Constant
+    - each location (any player controls) in the staging area only: stat noProgressPlaced 1, while this card is in play
+
+19047:B:2 (back): Forced: When the active location is explored, if the first player controls Urdug, advance to a random stage 2A.
+  19047:forced:1: Forced on the event activeExplored
+    only if the number of card (you control) named "Urdug", chosen by the first player is at least 1
+    - [json AdvanceToRandomStage {"verb":"AdvanceToRandomStage","codes":["19048","19049","19050"],"otherwise":"19051"}]
+
+## 19048 Rescue Tiny
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+19048:A:1 (front): When Revealed: The first player searches the encounter deck, discard pile, and victory display for a Grey Moorland, adds it to the staging area, and attaches the set-aside Tiny objective-ally to it as a guarded objective. Shuffle the encounter deck. Each other player reveals an encounter card.
+  19048:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SearchMove {"verb":"SearchMove","code":"19041","to":"staging","remember":true}]
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"19054"}]
+    - then, if the picked card is a card (any player controls) named "Grey Moorland" [also {"inPlay":true}] (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) in the staging area only, named "Tiny"
+    - [json AttachGuard {"verb":"AttachGuard","guard":"previous","to":"picked","when":{"kind":"matches","card":"picked","pick":{"type":"card","control":"any","names":["Tiny"]},"inPlay":true}}]
+    - shuffle the encounter deck
+    - for each player, first player first:
+      - if not (the actor holds the first player token): the acting player reveals an encounter card
+
+19048:B:1 (back): The "when revealed" effects of treachery cards cannot be canceled.
+  19048:constant:1: Constant
+    - [json UncancelableWhenRevealed {"verb":"UncancelableWhenRevealed","cardType":"treachery"}]
+
+19048:B:2 (back): Forced: When the players defeat this stage, remove it from the game. Advance to a random stage 2A, if able. Otherwise, advance to stage 3A.
+  19048:forced:1: Forced on the event questCardDefeated (heard about this card)
+    - [json AdvanceToRandomStage {"verb":"AdvanceToRandomStage","codes":["19048","19049","19050"],"otherwise":"19051","remove":true}]
+
+19048:B:3 (back): The players cannot travel to the Grey Moorland guarding Tiny unless there is at least 5 progress on this stage. This stage cannot be defeated unless the first player controls Urdug and Tiny.
+  19048:constant:2: Constant
+    only if not ([json condition {"kind":"stageProgress","min":5}])
+    - the players cannot travel to the location with code 19041 that guards Tiny while this holds
+  19048:constant:3: Constant
+    only if not (the number of card (you control) named "Urdug", chosen by the first player is at least 1)
+    - the players cannot defeat this stage while this holds
+  19048:constant:4: Constant
+    only if not (the number of card (you control) named "Tiny", chosen by the first player is at least 1)
+    - the players cannot defeat this stage while this holds
+
+## 19049 Retrieve Urdug's Horn
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+19049:A:1 (front): When Revealed: The first player searches the encounter deck, discard pile, and victory display for a Grey Mountain Giant, adds it to the staging area, and attaches the set-aside Urdug's Horn to it as a guarded objective. Shuffle the encounter deck. Each other player reveals an encounter card.
+  19049:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SearchMove {"verb":"SearchMove","code":"19038","to":"staging","remember":true}]
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"19037"}]
+    - then, if the picked card is a card (any player controls) named "Grey Mountain Giant" [also {"inPlay":true}] (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) in the staging area only, named "Urdug's Horn"
+    - [json AttachGuard {"verb":"AttachGuard","guard":"previous","to":"picked","when":{"kind":"matches","card":"picked","pick":{"type":"card","control":"any","names":["Urdug's Horn"]},"inPlay":true}}]
+    - shuffle the encounter deck
+    - for each player, first player first:
+      - if not (the actor holds the first player token): the acting player reveals an encounter card
+
+19049:B:1 (back): Each enemy with 1 or more guarded attachments gets +2 Threat and +2 Defense.
+  19049:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy (any player controls) or in the staging area [also {"guardsCard":true}]: stat threat 2, while this card is in play
+    - each enemy (any player controls) or in the staging area [also {"guardsCard":true}]: stat defense 2, while this card is in play
+
+19049:B:2 (back): Forced: When the players defeat this stage, remove it from the game. Advance to a random stage 2A, if able. Otherwise, advance to stage 3A.
+  19049:forced:1: Forced on the event questCardDefeated (heard about this card)
+    - [json AdvanceToRandomStage {"verb":"AdvanceToRandomStage","codes":["19048","19049","19050"],"otherwise":"19051","remove":true}]
+
+19049:B:3 (back): The Grey Mountain Giant guarding Urdug's Horn cannot take damage unless there is at least 5 progress on this stage. This stage cannot be defeated unless the first player controls Urdug with Urdug's Horn attached.
+  19049:constant:2: Constant
+    only if not ([json condition {"kind":"stageProgress","min":5}])
+    - each enemy (any player controls) or in the staging area, named "Grey Mountain Giant" [also {"guardsNamed":"Urdug's Horn"}]: stat cannotTakeDamage 1, while this card is in play
+  19049:constant:3: Constant
+    only if not (the number of card (you control) named "Urdug", chosen by the first player [also {"hasAttachment":{"names":["Urdug's Horn"]}}] is at least 1)
+    - the players cannot defeat this stage while this holds
+
+## 19050 Find Durin's Key
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+19050:A:1 (front): When Revealed: The first player searches the encounter deck, discard pile, and victory display for a Deep Ravine, adds it to the staging area, and attaches the set-aside Durin's Key to it as a guarded objective. Shuffle the encounter deck. Each other player reveals an encounter card.
+  19050:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SearchMove {"verb":"SearchMove","code":"19042","to":"staging","remember":true}]
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"19036"}]
+    - then, if the picked card is a card (any player controls) named "Deep Ravine" [also {"inPlay":true}] (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) in the staging area only, named "Durin's Key"
+    - [json AttachGuard {"verb":"AttachGuard","guard":"previous","to":"picked","when":{"kind":"matches","card":"picked","pick":{"type":"card","control":"any","names":["Durin's Key"]},"inPlay":true}}]
+    - shuffle the encounter deck
+    - for each player, first player first:
+      - if not (the actor holds the first player token): the acting player reveals an encounter card
+
+19050:B:1 (back): Each encounter card guarding a card is immune to player card effects.
+  19050:constant:1: Constant
+    - each card (any player controls) (enemies engaged with a player included) [also {"guardsCard":true}]: stat immuneToPlayerCards 1, while this card is in play
+
+19050:B:2 (back): Forced: When the players defeat this stage, remove it from the game. Advance to a random stage 2A, if able. Otherwise, advance to stage 3A.
+  19050:forced:1: Forced on the event questCardDefeated (heard about this card)
+    - [json AdvanceToRandomStage {"verb":"AdvanceToRandomStage","codes":["19048","19049","19050"],"otherwise":"19051","remove":true}]
+
+19050:B:3 (back): The players cannot travel to the Deep Ravine guarding Durin's Key unless there is at least 5 progress on this stage. This stage cannot be defeated unless the players control Urdug and Durin's Key.
+  19050:constant:2: Constant
+    only if not ([json condition {"kind":"stageProgress","min":5}])
+    - the players cannot travel to the location with code 19042 that guards Durin's Key while this holds
+  19050:constant:3: Constant
+    only if not (the number of card (you control) named "Urdug", chosen by the first player is at least 1)
+    - the players cannot defeat this stage while this holds
+  19050:constant:4: Constant
+    only if not (the number of objective (any player controls) named "Durin's Key" [also {"controlled":true}] is at least 1)
+    - the players cannot defeat this stage while this holds
+
+## 19051 Urdug's Gambit
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+19051:A:1 (front): When Revealed: The first player loses control of both Urdug and Tiny, flips them to their enemy sides, and adds them to the staging area. (Remove any damage that was on them.) Each other player reveals an encounter card.
+  19051:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json FlipToEnemySide {"verb":"FlipToEnemySide","code":"19052","into":"19053"}]
+    - [json FlipToEnemySide {"verb":"FlipToEnemySide","code":"19054","into":"19055"}]
+    - for each player, first player first:
+      - if not (the actor holds the first player token): the acting player reveals an encounter card
+
+19051:B:1 (back): Progress cannot be placed on this quest from questing successfully.
+  19051:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the table: stat noQuestProgress 1, while this card is in play
+    - the players cannot defeat this stage while this holds
+
+19051:B:2 (back): Forced: When the players quest unsuccessfully, they do not raise their threat. Instead, place X progress here, where X is the amount by which they would have raised their threat. Then, if this stage has progress equal to its quest points, the players lose the game.
+  19051:forced:1: Forced after the players quest unsuccessfully (event happened to the controller)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json WaiveQuestThreat {"verb":"WaiveQuestThreat","who":"eachSeat","until":"endOfPhase"}]
+    - [json AddStageProgress {"verb":"AddStageProgress","amount":{"x":true}}]
+    - then, if [json condition {"kind":"stageProgress","min":5}] (checked when this step runs, after the steps above; not tied to whether they did anything): the players lose the game (Urdug's Gambit holds as much progress as it has quest points)
+
+19051:B:3 (back): When Urdug has no hit points remaining, the players win the game.
+  19051:constant:3: Constant
+    only if all of: (there is a enemy (any player controls) or in the staging area, named "Urdug" to choose) and (hit points of "Urdug" is less than damage of "Urdug" + 1)
+    - the players win the game
+
+## 19052 Urdug
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+19052:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+19052:A:2 (front): While Urdug is free of encounters, the first player gains control of Urdug.
+  19052:constant:1: Constant
+    - [json GainControlWhenFree {"verb":"GainControlWhenFree","who":"firstPlayer","claim":true}]
+
+19052:A:3 (front): If Urdug is destroyed, the players lose the game.
+  19052:forced:1: Forced on the event characterDestroyed (heard about this card)
+    - the players lose the game (Urdug was destroyed)
+
+## 19053 Urdug
+
+19053:A:1: Indestructible. Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+19053:A:2 (front): While Urdug is engaged with a player, he gains, "Forced: At the beginning of the quest phase, Urdug makes an immediate attack. If this attack deals damage, return Urdug and Tiny (if he is in play) to the staging area."
+  19053:forced:1: Forced when a phase begins
+    only if all of: (it is the Quest phase) and (this card is engaged with the player)
+    - this enemy attacks now, dealt a new shadow card after its old ones are discarded
+  19053:forced:2: Forced on the event damagedByAttack (heard about character (any player controls))
+    only if all of: (it is the Quest phase) and (this card is engaged with the player) and (the event's other card is a enemy (any player controls) named "Urdug")
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Tiny"
+    - then, if the picked card is a card (any player controls) named "Tiny" (checked when this step runs, after the steps above; not tied to whether they did anything): return the picked card to the staging area
+    - return this card to the staging area
+  19053:forced:3: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
+    only if all of: (it is the Quest phase) and (this card is engaged with the player) and (the event's other card is a enemy (any player controls) named "Urdug")
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Tiny"
+    - then, if the picked card is a card (any player controls) named "Tiny" (checked when this step runs, after the steps above; not tied to whether they did anything): return the picked card to the staging area
+    - return this card to the staging area
+
+## 19054 Tiny
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+19054:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+19054:A:2 (front): While Tiny is free of encounters, the first player gains control of Tiny.
+  19054:constant:1: Constant
+    - [json GainControlWhenFree {"verb":"GainControlWhenFree","who":"firstPlayer","claim":true}]
+
+19054:A:3 (front): Forced: After Tiny exhausts, raise your threat by 2.
+  19054:forced:1: Forced on the event exhausted (heard about this card)
+    - raise threat by 2 (the first player)
+
+19054:A:4 (front): If Tiny is destroyed, the players lose the game.
+  19054:forced:2: Forced on the event characterDestroyed (heard about this card)
+    - the players lose the game (Tiny was destroyed)
+
+## 19055 Tiny
+
+19055:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+19055:A:2 (front): Urdug cannot take damage.
+  19055:constant:1: Constant
+    - each enemy (any player controls) or in the staging area, named "Urdug": stat cannotTakeDamage 1, while this card is in play
+
+19055:A:3 (front): Forced: After Urdug engages a player, Tiny engages that player.
+  19055:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls) named "Urdug")
+    - engage this card
+
+(rendered pieces: 262 by template, 63 as JSON)

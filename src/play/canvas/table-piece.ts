@@ -63,7 +63,7 @@ export type PieceProps = BodyProps & {
   tokens: TokenImages;
 };
 
-/** The marks the Stormcaller's stage wears (words/stormcaller.ts, stagePill). */
+/** The marks the Stormcaller's stage wears (words/scenarios/stormcaller.ts, stagePill). */
 export type StageMarksView = { pill: { text: string; danger: boolean }; apart: boolean };
 
 /** What the canvas knows for one render, from which every slot's props are made. */

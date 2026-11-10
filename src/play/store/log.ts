@@ -1,7 +1,7 @@
 // The table's log: this round's engine steps in words, each with its cause from phase 8d (the rule title, or the card and
 // its printed line), so a player can check a number against its source. It is text, not a control.
-import { detachLine, grappleLine } from "../words/grapple.ts";
-import { discoverLogLine, setAsideLine } from "../words/wilderland.ts";
+import { detachLine, grappleLine } from "../words/scenarios/grapple.ts";
+import { discoverLogLine, setAsideLine } from "../words/scenarios/wilderland.ts";
 import type { Cause } from "../../rules/core/cause.ts";
 import type { EngineStep } from "../../rules/core/intents.ts";
 

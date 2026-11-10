@@ -4,8 +4,8 @@ import { pickCandidates } from "../../rules/interpret/pick.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 
 import { damageOutcome, discardLoss } from "../store/foresight.ts";
-import { fateBranchCaution } from "../words/fate.ts";
-import { framsburgBranchCaution } from "../words/framsburg.ts";
+import { fateBranchCaution } from "../words/scenarios/fate.ts";
+import { framsburgBranchCaution } from "../words/scenarios/framsburg.ts";
 
 /** "Tap again: Beorn is destroyed" for a branch that deals damage to each card its filter finds, when that destroys one; null otherwise. The game is lost when the card's leaving loses it (damageOutcome). Deadly Cold (19021:A:1) deals its damage to the one character `picked`. */
 export function branchCaution(game: ScenarioState, ctx: ReduceContext, choose: Extract<Instruction, { verb: "Choose" }>, optionId: string, seat: number, sourceId: string | null, name: (id: string) => string, picked: string | null = null): string | null {

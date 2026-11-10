@@ -15,7 +15,7 @@ import { Pressable } from "react-native";
 import { useStore } from "zustand";
 
 import type { Carousel } from "../phases/carousel.ts";
-import { grappleDetail } from "../words/grapple.ts";
+import { grappleDetail } from "../words/scenarios/grapple.ts";
 import { threatRows, threatVerdict } from "../store/foresight.ts";
 import { logLines, type LogNames } from "../store/log.ts";
 import { useDialsEdge } from "./bar-edge.ts";
@@ -32,7 +32,7 @@ import { IslandPanel } from "../dream-chaser/island-panel.tsx";
 import { WAITING, islandFit, islandPanelWidth, islandReadout, standingWords } from "../dream-chaser/island-table.ts";
 import { foldTitle } from "../layout/row-fold.ts";
 import { areaRoleOf } from "../store/stormcaller-table.ts";
-import { AREA_LIST_TITLE } from "../words/stormcaller.ts";
+import { AREA_LIST_TITLE } from "../words/scenarios/stormcaller.ts";
 import { alwaysRows } from "./settings-words.ts";
 import { useReaderMode, useScreenReader } from "../../ui/screen-reader.ts";
 import { hidesFace, PILE_WORDS, pileIds, type PileId } from "../store/selectors.ts";

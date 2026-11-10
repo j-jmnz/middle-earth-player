@@ -9,7 +9,7 @@ import {
   type Placement,
   type ScenarioData,
 } from "../../../src/catalog/scenario-data.ts";
-import { CAMPAIGNS, CAMPAIGN_SUFFIX, PRODUCTS, productOf, scenarioDefs, scenarioSlug, type CampaignDef } from "../campaign-defs.ts";
+import { CAMPAIGNS, CAMPAIGN_SUFFIX, productOf, scenarioDefs, scenarioSlug, type CampaignDef } from "../campaign-defs.ts";
 import { PLAYER_TYPES, type Overrides } from "./cards.ts";
 import { clausesOf, codesOf, nameIndex, parseSetup, type ParsedSetup } from "./setup-text.ts";
 import { pileAccepts, questFacts } from "./scenario-piles.ts";
@@ -22,6 +22,7 @@ import { nightmareOf } from "./nightmare.ts";
 import { sagaStartOf } from "./saga-start.ts";
 import { reprintsOf, isReprint } from "./reprints.ts";
 import { dragnResolver } from "./dragn-resolve.ts";
+import { campaignsOf, indexCards, mentions } from "./scenario-indexes.ts";
 import { isNightmareCard } from "../nightmare-defs.ts";
 import type { RawData } from "./load-raw.ts";
 
@@ -40,8 +41,6 @@ const GROUP_PILE: Readonly<Record<string, Pile>> = {
 // Ered Mithrin's decks (evilCreaturesDeck, cavesDeck, sideQuestDeck, spidersDeck, orcsDeck) are built by the Setup's deck steps the same way, and
 // The Two Towers' second encounter decks (haradDeck, greatSpiderDeck) by the Setup's encounter set that is shuffled under a card or set aside.
 const EXTRA_DECKS: ReadonlySet<string> = new Set(["corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests", "evilCreaturesDeck", "cavesDeck", "sideQuestDeck", "spidersDeck", "orcsDeck", "haradDeck", "greatSpiderDeck"]);
-// The RingsDB twin packs (PRODUCTS): DragnCards names the Fellowship boxes by product, RingsDB by these pack codes.
-const TWIN_PACKS: ReadonlySet<string> = new Set(PRODUCTS.flatMap((product) => (product.twinPack ? [product.twinPack] : [])));
 
 // A scenario is written only when every check passes. The rest are listed in problems and stay unbuilt
 // until an override or a template resolves them.
@@ -60,22 +59,7 @@ function isHero(cards: ReadonlyMap<string, Card>, code: string): boolean {
 export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: Overrides, rules: readonly RuleEntry[], campaignDefs: readonly CampaignDef[] = CAMPAIGNS): ScenarioResult {
   const problems: string[] = [];
   const decks = (parseJsonc(raw.dragnRaw.preBuiltDecks) as { preBuiltDecks: Record<string, Deck> }).preBuiltDecks;
-  const byCode = new Map(cards.map((card) => [card.code, card]));
-  const byGuid = new Map<string, Card>();
-  const byPackNumber = new Map<string, Card>();
-  const bySlug = new Map<string, Card>();
-  const revCoreSlugs = new Map<string, Card>();
-  for (const card of cards) {
-    for (const printing of card.printings) {
-      if (printing.octgnGuid) byGuid.set(printing.octgnGuid, card);
-      if (TWIN_PACKS.has(printing.pack)) byPackNumber.set(`${printing.pack}:${printing.number}`, card);
-      if (printing.hobSlug) bySlug.set(printing.hobSlug, card);
-      // Hall of Beorn's scenario lists name a Revised Core Set card by its original Core Set slug ("Forest-Spider-Core"): Ered Mithrin's first two
-      // scenarios deal the Revised Core Set's reprints of those cards (overrides.dragnPackAliases).
-      if (printing.hobSlug?.endsWith("-RevCore")) revCoreSlugs.set(printing.hobSlug.replace(/-RevCore$/, "-Core"), card);
-    }
-  }
-  for (const [slug, card] of revCoreSlugs) if (!bySlug.has(slug)) bySlug.set(slug, card);
+  const { byCode, byGuid, byPackNumber, bySlug } = indexCards(cards);
   const ruleById = new Map(rules.map((entry) => [entry.id, entry]));
   // The booklet's name for a set, as the cards print it (overrides.encounterSetAliases).
   const aliases = new Map(overrides.encounterSetAliases.map((alias) => [plain(alias.booklet), plain(alias.set)]));
@@ -145,12 +129,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     const ownBox = productOf(def.product).packs;
     const inCampaignText = (card: Card) => {
       if (card.campaignKind != null || PLAYER_TYPES.has(card.type) || !card.printings.some((p) => ownBox.includes(p.pack))) return false;
-      let pattern = mentioned.get(card.name);
-      if (!pattern) {
-        pattern = new RegExp(`\\b${card.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&").replace(/['\u2019]/g, "['\u2019]")}\\b`);
-        mentioned.set(card.name, pattern);
-      }
-      return pattern.test(campaignText);
+      return mentions(mentioned, card.name, campaignText);
     };
     // A Two Towers campaign card removes cards of the earlier box from the Campaign Pool by name ("Remove Gildor Inglorion and Mr. Underhill"): those boons are named, never dealt.
     const poolCards = product.sagaStart ? cards.filter((card) => card.campaignKind != null && !card.printings.some((p) => cardPacks.includes(p.pack))) : [];
@@ -462,21 +441,6 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     );
   }
 
-  // Each campaign lists the scenarios of it that were built, in its own order. A campaign whose first scenario is a saga's
-  // takes that scenario's player-1 play area as its prelude (the Fellowship's Ring-bearer attachments).
-  const campaigns = campaignDefs.map((def) => {
-    const built = def.scenarios.filter((scenario) => scenarios.some((item) => item.id === scenario.id));
-    const data: CampaignData = {
-      id: def.id,
-      name: def.name,
-      scenarios: built.map((scenario) => scenario.id),
-      campaignCards: Object.fromEntries(built.map((scenario) => [scenario.id, campaignCards[scenario.id] ?? ""])),
-      bookletId: def.bookletId,
-      saga: def.saga,
-      prelude: preludes.get(built[0]?.id ?? "") ?? [],
-      starterDecks: [],
-    };
-    return { data, def };
-  });
+  const campaigns = campaignsOf(campaignDefs, scenarios, campaignCards, preludes);
   return { scenarios, campaigns, problems };
 }

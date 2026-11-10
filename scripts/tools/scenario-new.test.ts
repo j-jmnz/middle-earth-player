@@ -61,7 +61,7 @@ describe("pnpm scenario:new", () => {
   it("refuses a scenario that has its files, and lists them", () => {
     const { plan, problems } = planScenario("the-thing-in-the-depths", {}, repo, exists);
     expect(plan).toBeNull();
-    expect(problems.join(" ")).toContain("test/scenarios/the-thing-in-the-depths/scene.ts");
+    expect(problems.join(" ")).toContain("test/scenarios/the-thing-in-the-depths/game.ts");
     expect(problems.join(" ")).toContain("src/effects/authored/the-thing-in-the-depths.ts");
     expect(cli("the-thing-in-the-depths", "--dry-run").status).toBe(1);
   });
@@ -126,10 +126,11 @@ describe("pnpm scenario:new", () => {
     const { plan, problems } = planScenario(id, {}, view.repo, view.exists);
     expect(problems).toEqual([]);
     expect(plan?.files.map((item) => item.file)).toEqual([
-      `test/scenarios/${id}/scene.ts`,
       `test/scenarios/${id}/game.ts`,
       `src/campaign/scenarios/${id}/golden.test.ts`,
       `src/campaign/scenarios/${id}/campaign.test.ts`,
+      `src/campaign/scenarios/${id}/spec.test.ts`,
+      `src/play/words/asks/${id}.ts`,
       `scripts/e2e/${id}.ts`,
       `.maestro/scenarios/${id}/${id}.yaml`,
       `.maestro/scenarios/${id}/${id}-loss.yaml`,
@@ -146,73 +147,17 @@ describe("pnpm scenario:new", () => {
     }
     const golden = plan?.edits.find((edit) => edit.file === "test/harness/golden-registry.ts");
     expect(golden?.after.split("\n").filter((line) => line.includes(id)).every((line) => line.trimStart().startsWith("//"))).toBe(true);
-    // The scene's codes come from the scenario's data.
-    const scene = plan?.files[0]?.text ?? "";
-    expect(scene).toContain('campaignCard: "');
-    for (const code of JSON.parse(readFileSync(path.join(ROOT, "data", "scenarios", `${id}.json`), "utf8")).stages as string[]) expect(scene).toContain(`"${code}"`);
+    // The skeleton reads the scenario from data/ (there is no scene file) and writes spec rows and an asks file.
+    const text = (name: string): string => plan?.files.find((item) => item.file.endsWith(name))?.text ?? "";
+    expect(plan?.files.map((item) => item.file)).not.toContain(`test/scenarios/${id}/scene.ts`);
+    for (const item of plan?.files ?? []) expect(item.text, item.file).not.toMatch(/\/scene\.ts"/);
+    expect(text("spec.test.ts")).toContain(`cardSpecs("${id}"`);
+    expect(text(`asks/${id}.ts`)).toContain("export const ASKS");
+    expect(text("game.ts")).toContain(`loadScenario("${id}")`);
+    expect(text("campaign.test.ts")).toContain(`toBe("${(JSON.parse(readFileSync(path.join(ROOT, "data", "scenarios", `${id}.json`), "utf8")) as { campaignCard: string }).campaignCard}")`);
 
     for (const item of plan?.files ?? []) expect(view.exists(item.file), item.file).toBe(false);
     for (const edit of plan?.edits ?? []) expect(view.repo.read(edit.file), edit.file).toBe(edit.before);
-  });
-
-  // The fast track (docs/handover/fast-track.md) writes no scene file: its game, golden and campaign tests read the scenario from data/, and it adds the spec rows and the asks file.
-  describe("--track", () => {
-    const id = "the-drowned-ruins";
-    const classic = [
-      `test/scenarios/${id}/scene.ts`,
-      `test/scenarios/${id}/game.ts`,
-      `src/campaign/scenarios/${id}/golden.test.ts`,
-      `src/campaign/scenarios/${id}/campaign.test.ts`,
-      `scripts/e2e/${id}.ts`,
-      `.maestro/scenarios/${id}/${id}.yaml`,
-      `.maestro/scenarios/${id}/${id}-loss.yaml`,
-      `src/effects/authored/${id}.ts`,
-      `src/campaign/fixtures/${id}.json`,
-    ];
-
-    it("lists today's files without --track and with --track classic, with the same text", () => {
-      const view = without(id);
-      const bare = planScenario(id, {}, view.repo, view.exists);
-      const named = planScenario(id, { track: "classic" }, view.repo, view.exists);
-      expect(bare.plan?.files.map((item) => item.file)).toEqual(classic);
-      expect(named.plan).toEqual(bare.plan);
-    });
-
-    it("lists the fast skeleton: an asks file and spec rows, no scene file, and no file that imports one", () => {
-      const view = without(id);
-      const { plan, problems } = planScenario(id, { track: "fast" }, view.repo, view.exists);
-      expect(problems).toEqual([]);
-      const files = plan?.files.map((item) => item.file) ?? [];
-      expect(files).toEqual([
-        `test/scenarios/${id}/game.ts`,
-        `src/campaign/scenarios/${id}/golden.test.ts`,
-        `src/campaign/scenarios/${id}/campaign.test.ts`,
-        `src/campaign/scenarios/${id}/spec.test.ts`,
-        `src/play/words/asks/${id}.ts`,
-        `scripts/e2e/${id}.ts`,
-        `.maestro/scenarios/${id}/${id}.yaml`,
-        `.maestro/scenarios/${id}/${id}-loss.yaml`,
-        `src/effects/authored/${id}.ts`,
-        `src/campaign/fixtures/${id}.json`,
-      ]);
-      expect(files).not.toContain(`test/scenarios/${id}/scene.ts`);
-      for (const item of plan?.files ?? []) expect(item.text, item.file).not.toMatch(/\/scene\.ts"/);
-      const text = (name: string): string => plan?.files.find((item) => item.file.endsWith(name))?.text ?? "";
-      expect(text("spec.test.ts")).toContain(`cardSpecs("${id}"`);
-      expect(text(`asks/${id}.ts`)).toContain("export const ASKS");
-      expect(text("game.ts")).toContain(`loadScenario("${id}")`);
-      // The registries are the classic track's.
-      expect(plan?.edits.map((edit) => edit.file)).toEqual(planScenario(id, {}, view.repo, view.exists).plan?.edits.map((edit) => edit.file));
-    });
-
-    it("refuses a scenario that has files on either track, and a track that is not one", () => {
-      const run = cli("the-thing-in-the-depths", "--track", "fast", "--dry-run");
-      expect(run.status).toBe(1);
-      expect(run.output).toContain("already has");
-      const bad = cli(id, "--track", "quick", "--dry-run");
-      expect(bad.status).toBe(1);
-      expect(bad.output).toContain("is not a track");
-    });
   });
 
   // The CLI reads the real repo, so it runs on a scenario the real repo has not scaffolded yet (none, once every scenario has its files).
@@ -222,7 +167,7 @@ describe("pnpm scenario:new", () => {
     expect(problems).toEqual([]);
     const run = cli(id, "--dry-run");
     expect(run.status).toBe(0);
-    expect(run.output).toContain(`test/scenarios/${id}/scene.ts`);
+    expect(run.output).toContain(`src/campaign/scenarios/${id}/spec.test.ts`);
     for (const item of plan?.files ?? []) expect(exists(item.file), item.file).toBe(false);
     for (const edit of plan?.edits ?? []) expect(repo.read(edit.file), edit.file).toBe(edit.before);
   });

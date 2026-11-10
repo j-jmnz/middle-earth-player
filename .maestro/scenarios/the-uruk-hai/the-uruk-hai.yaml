@@ -1,0 +1,23 @@
+appId: com.middleearth.lcg
+tags:
+  - scenario
+---
+# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `hai-won` (scripts/e2e/the-uruk-hai.ts): a real two-handed game of The Uruk-hai (the Defenders of
+# Gondor and Swords of the Noldor lists, Easy), parked on its win (Rescue the Captives defeated with Uglúk defeated, the Captives rescued). The fixture is OPEN: scripts/e2e/fixtures.ts found no win of the two starter
+# decklists in its seeds (docs/phases/STATUS.md), so the flow cannot run until one is found.
+# The Resolution (143071:B:1) asks nothing when the pursuit value is above 25; at 25 or lower the first player chooses between a Skill boon for each player and Beyond All Hope, which is offered only while the list of
+# fallen heroes holds a hero (a fresh log holds none), so the one option is the Skill boons. The campaign has no XP. The win unlocks Helm's Deep, which the app cannot deal yet (scripts/checks/maestro.test.ts, path-soon).
+- runFlow:
+    file: ../../subflows/scenario-win.yaml
+    env:
+      FIXTURE: hai-won
+      SCENARIO_ID: the-uruk-hai
+      NO_XP: "true"
+# The win unlocks Helm's Deep, whose node reads Next and the path says it is coming soon.
+- assertVisible:
+    id: node-helms-deep-status
+    text: "Next"
+- assertVisible:
+    id: path-soon
+- assertNotVisible:
+    id: begin

@@ -6,7 +6,7 @@ import type { ScenarioState } from "../../src/rules/core/state.ts";
 import type { ReduceContext } from "../../src/rules/interpret/interpret.ts";
 import { askWords } from "../../src/play/words/ask.ts";
 import { asksOption, asksPick } from "../../src/play/words/asks.ts";
-import { dealtNow } from "../../src/play/words/aflame.ts";
+import { dealtNow } from "../../src/play/words/scenarios/aflame.ts";
 import { branchWords, pickWords, type ChoiceNames } from "../../src/play/words/choice.ts";
 import { askedSeat } from "../../src/play/words/seat.ts";
 

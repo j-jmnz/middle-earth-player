@@ -1,4 +1,4 @@
-// The staging area the table draws, once stage 2B has split the table, as one accessible line (words/area.ts): near-invisible, takes no touch, and 1 pt in size, so it
+// The staging area the table draws, once stage 2B has split the table, as one accessible line (words/scenarios/area.ts): near-invisible, takes no touch, and 1 pt in size, so it
 // changes nothing on the canvas. A screen reader reads it where the canvas has no element per card (its alpha is not 0: VoiceOver skips a view that is), the
 // end-to-end flow asserts it by id, and the new words are announced when the area, the stage or the card count changes while no peek is open. The words
 // are computed in a selector, so this renders only when they change.
@@ -6,7 +6,7 @@ import { useEffect, useRef } from "react";
 import { View } from "react-native";
 import { useStore } from "zustand";
 
-import { areaWords } from "../words/area.ts";
+import { areaWords } from "../words/scenarios/area.ts";
 import { shownSeat } from "../store/selectors.ts";
 import type { TableStore } from "../store/store.ts";
 import { announce } from "../../ui/announce.ts";

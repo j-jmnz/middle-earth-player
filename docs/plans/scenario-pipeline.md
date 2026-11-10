@@ -77,7 +77,7 @@ Narrowed to what a new family needs (user decision, 2026-11-04):
 - The hooks are the places where the core now calls a family by name: settle, travel, pick, condition and amount. The core calls each hook through the ordered list. The settle chain in `src/rules/engine/machine.ts` moves behind the settle hook in this section; the other direct calls move behind their hooks when their family is next changed, with the goldens byte-identical each time.
 - A test fails when a verb in `FAMILY_VERBS` has no runner, or a runner answers a verb no family declares.
 - The verb allowlists are flags on each verb's schema entry: `src/catalog/verb-flags.ts` marks a schema entry with `setupRole` (`src/campaign/start.ts` deals the verb or resolves it after the quest card's Setup), `runsInFrame` (a Shadow runs the verb in a frame), `setupRuns` (a quest card's Setup runs it, at the top, in each player's turn or in each objective) and `collection` (the verb takes a hero or a card from the collection). `src/catalog/verb-sets.ts` reads the sets off the schema, `shadow.ts`, `quest/setup.ts` and `world.ts` use them, and `verb-sets.test.ts` pins them. A new simple verb is flagged in its family file.
-- Not in this section: moving every direct family import behind hooks, and turning the card codes the core or the table reads by number (the Burn in `src/rules/interpret/conditions.ts`, Change of Plans in the settle loop, the torch and axe in `src/play/words/aflame.ts`) into family flags.
+- Not in this section: moving every direct family import behind hooks, and turning the card codes the core or the table reads by number (the Burn in `src/rules/interpret/search.ts`, Change of Plans in the settle loop, the torch and axe in `src/play/words/scenarios/aflame.ts`) into family flags.
 
 Exit: the plan's checks (Verification).
 
@@ -147,7 +147,11 @@ Ordered by what they save per scenario. A step that is built is deleted from thi
    - Each one gets a card test, or a golden reaches it.
    - Exit: the list is empty or each entry has a card test.
 3. **The draft marks the Setup sentences the piles already carry out.** Not built. For a campaign card's Setup, `effects:draft` marks each sentence that the scenario's `scenarioPiles` or the Setup parser already carries out, so the author writes no record for it. Exit: the draft of a scenario whose Setup the piles carry lists no such sentence as open.
-4. **The win finder** (section F). Not built. It is the only way the Dream-chaser win flows can run. Exit: a won fixture for each scenario in `docs/phases/STATUS.md`, Fixtures and Maestro.
+4. **The win finder** (section F). Not built.
+   - It is the search player: a beam search over legal intents, built on `test/harness/auto-player.ts` and scored on threat, progress, hero health and stage.
+   - It replaces each scenario's policy in `game.ts`.
+   - It is the only way the Dream-chaser win flows can run.
+   - Exit: a won fixture for each scenario in `docs/phases/STATUS.md`, Fixtures and Maestro.
 
 ## After each scenario phase
 
@@ -158,7 +162,7 @@ Ordered by what they save per scenario. A step that is built is deleted from thi
   - the review findings by class;
   - the fix-pass lines by area, with the words and the sheets apart from the rest;
   - the readings asked and the readings ruled (`.claude/agents/orchestrator.md`, Implementer tasks);
-  - the time each task took.
+  - for each task, its full runs, its wait minutes and its writing minutes.
 - **Feed back.** For each finding class that recurs, add a check, a template or a line in the author's readings to Next steps. Delete a step when it is built.
 
 ## Order

@@ -3,7 +3,7 @@
 // the order the engine resolved them (who attacks whom, the shadow and its effect, the damage, a destroyed card), so the announcer's queue
 // (src/ui/announce.ts) gives each its time and a long attack is not cut off. Pure.
 import type { Moment, MomentLine } from "../store/outcome.ts";
-import { lookIdsOf, lookStripWords } from "../words/wilderland.ts";
+import { lookIdsOf, lookStripWords } from "../words/scenarios/wilderland.ts";
 
 /** What a screen reader hears of a line: the line that lays cards in the Discover look strip names the strip (emce.discover), every other line its text. */
 export function lineSpeech(line: MomentLine): string {

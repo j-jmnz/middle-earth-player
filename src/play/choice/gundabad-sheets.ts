@@ -1,10 +1,10 @@
 // Rules: rr.damage, rr.destroy, rr.restricted (data/rules/entries.json); ledger lines 19141:B:1, 19131:A:3, 19143:A:3, 19144:A:3.
 // The rows of the picks that put damage on a character of the players in Mount Gundabad: a stage's "deal 2 damage to a questing character you control" and the one damage at a time of an AssignDamage. A row that would destroy its character arms the confirm (damageOutcome reads the
-// engine, the flag of a hero who carries Wormsbane included): the first tap says it, the second sends. Told only in Mount Gundabad (words/gundabad.ts, inGundabad). Pure.
+// engine, the flag of a hero who carries Wormsbane included): the first tap says it, the second sends. Told only in Mount Gundabad (words/scenarios/gundabad.ts, inGundabad). Pure.
 import type { Instruction } from "../../catalog/boundary.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 
-import { inGundabad } from "../words/gundabad.ts";
+import { inGundabad } from "../words/scenarios/gundabad.ts";
 import { damagedCharacterRow, type FireRow } from "./aflame-sheets.ts";
 
 /**

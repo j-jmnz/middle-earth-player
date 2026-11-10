@@ -15,6 +15,10 @@ const TREE = [
   "src/campaign/fixtures.test.ts",
   "scripts/checks/effect-coverage.test.ts",
   "scripts/checks/effect-migration.test.ts",
+  "scripts/checks/layout.test.ts",
+  "scripts/checks/spec-coverage.test.ts",
+  "scripts/docs/index.test.ts",
+  "scripts/checks/maestro.test.ts",
   "src/effects/copies.test.ts",
   "src/effects/effects.test.ts",
   "src/effects/authored/pool/index.test.ts",
@@ -28,7 +32,7 @@ const TREE = [
   "src/play/store/island-place.test.ts",
   "src/play/choice/stormcaller-sheets.test.ts",
   "src/play/store/unrelated.test.ts",
-  "src/play/words/sea.test.ts",
+  "src/play/words/scenarios/sea.test.ts",
   "src/play/words/the-oath.test.ts",
 ];
 const SOURCES: Record<string, string> = {
@@ -94,7 +98,7 @@ describe("selectTests", () => {
   it("gathers the parts, and skips the golden tests for a scenario with no registry entry", () => {
     const selected = selectTests("the-oath", [], TREE, "The Oath", read);
     expect(selected.goldens).toEqual({ files: ["src/campaign/causes.test.ts", "src/campaign/replay.test.ts", "src/campaign/fixtures.test.ts"], title: "The Oath" });
-    expect(selected.coverage).toEqual(["scripts/checks/effect-coverage.test.ts", "scripts/checks/effect-migration.test.ts", "src/effects/copies.test.ts", "test/harness/golden-registry.test.ts", "src/play/words/sea.test.ts"]);
+    expect(selected.coverage).toEqual(["scripts/checks/effect-coverage.test.ts", "scripts/checks/effect-migration.test.ts", "src/effects/copies.test.ts", "test/harness/golden-registry.test.ts", "scripts/checks/layout.test.ts", "scripts/checks/spec-coverage.test.ts", "scripts/docs/index.test.ts", "scripts/checks/maestro.test.ts", "src/play/words/scenarios/sea.test.ts"]);
     expect(selected.families).toEqual([]);
     expect(selectTests("the-oath", [], TREE, null, read).goldens.files).toEqual([]);
   });
@@ -110,7 +114,7 @@ describe("selectTests", () => {
   it("runs every choice-words test, the scenario's own in tests", () => {
     const selected = selectTests("the-oath", [], TREE, "The Oath", read);
     expect(selected.tests).toContain("src/play/words/the-oath.test.ts");
-    expect(selected.coverage).toContain("src/play/words/sea.test.ts");
+    expect(selected.coverage).toContain("src/play/words/scenarios/sea.test.ts");
     expect(selected.coverage).not.toContain("src/play/words/the-oath.test.ts");
   });
 

@@ -7,7 +7,7 @@ import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts"
 import { modifierActive } from "../../rules/core/state.ts";
 
 import type { Readout } from "./readout.ts";
-import { headingChangeWords, sailingLookWords, shiftReadoutWords } from "../words/sea.ts";
+import { headingChangeWords, sailingLookWords, shiftReadoutWords } from "../words/scenarios/sea.ts";
 import { successesOf } from "../choice/sea-sheets.ts";
 import type { SheetNames } from "../choice/sheet-types.ts";
 

@@ -12,20 +12,20 @@ const index = campaignIndexSchema.parse(JSON.parse(readFileSync(path.join(DATA_D
 
 describe("data/campaigns/index.json", () => {
   it("lists the built campaigns playable and the later campaigns locked, with the scenario counts Hall of Beorn lists", () => {
-    expect(index.filter((entry) => entry.playable).map((entry) => entry.id)).toEqual(["fellowship-of-the-ring", "mirkwood-paths", "the-dark-of-mirkwood", "dream-chaser", "ered-mithrin"]);
+    expect(index.filter((entry) => entry.playable).map((entry) => entry.id)).toEqual(["fellowship-of-the-ring", "mirkwood-paths", "the-dark-of-mirkwood", "dream-chaser", "ered-mithrin", "the-two-towers"]);
     expect(index.find((entry) => entry.id === "fellowship-of-the-ring")?.scenarioCount).toBe(loadCampaign().scenarios.length);
     // The campaigns built from the Revised Core Set and The Dark of Mirkwood are listed and stay locked until one of their
     // scenarios is in PLAYABLE_SCENARIOS (Mirkwood Paths since phase 29, The Dark of Mirkwood since phase 32: both hold The Oath; Dream-chaser since phase 40: Voyage Across Belegaer); The Two Towers is built
-    // (scripts/data/two-towers.test.ts) and locked, The Return of the King has no scenario files at all.
+    // (scripts/data/two-towers.test.ts) and playable since The Uruk-hai, The Return of the King has no scenario files at all.
     // Ered Mithrin has been playable since phase 52 (Journey Up the Anduin).
     const locked = index.filter((entry) => !entry.playable);
-    expect(locked.map((entry) => entry.name)).toEqual(["The Two Towers", "The Return of the King"]);
+    expect(locked.map((entry) => entry.name)).toEqual(["The Return of the King"]);
     expect(locked.filter((entry) => ["The Two Towers", "The Return of the King"].includes(entry.name)).every((entry) => entry.scenarioCount === 6)).toBe(true);
   });
 
-  it("lists The Two Towers, built from six scenario files, as a locked campaign of six scenarios after Ered Mithrin", () => {
+  it("lists The Two Towers, built from six scenario files, as a playable campaign of six scenarios after Ered Mithrin", () => {
     expect(index.map((entry) => entry.id)).toEqual(["fellowship-of-the-ring", "mirkwood-paths", "the-dark-of-mirkwood", "dream-chaser", "ered-mithrin", "the-two-towers", "the-return-of-the-king"]);
-    expect(index.find((entry) => entry.id === "the-two-towers")).toMatchObject({ name: "The Two Towers", scenarioCount: 6, playable: false });
+    expect(index.find((entry) => entry.id === "the-two-towers")).toMatchObject({ name: "The Two Towers", scenarioCount: 6, playable: true });
     expect(loadCampaign("the-two-towers").scenarios).toHaveLength(6);
   });
 

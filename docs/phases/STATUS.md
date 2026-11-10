@@ -85,7 +85,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 59 | Mount Gundabad | completed | 2026-11-06. Review round done. |
 | 60 | The Fate of Wilderland | completed | 2026-11-06. Review round done. |
 | 61 | The Two Towers data | completed | 2026-11-07. Review round done. Open: MEC112 2023 wording unverified. |
-| 62 | The Two Towers campaign shell | completed | 2026-11-07. Review round done. No Two Towers scenario is playable yet. |
+| 62 | The Two Towers campaign shell | completed | 2026-11-07. Review round done. |
+| 63 | The Uruk-hai | completed | 2026-11-10. Review round done. Open: `hai-won`. |
 
 ## Open items
 
@@ -93,6 +94,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - The Android release key is not set up (`docs/releasing.md`, Android key), so no release has been cut; the release workflow has not run yet, dry run first. TestFlight (optional) is not set up.
 
 ### Fixtures and Maestro
+- `hai-won` is not committed: no seed in 100 wins The Uruk-hai with the starter decklists. Until it exists `.maestro/scenarios/the-uruk-hai/the-uruk-hai.yaml` cannot run.
 - `wilderland-won` is not committed: none of 100 seeds (and 750 more under five other policies) wins The Fate of Wilderland with the starter decklists. Until it exists `.maestro/scenarios/the-fate-of-wilderland/the-fate-of-wilderland.yaml` cannot run.
 - `gundabad-won` is not committed: none of 100 seeds wins Mount Gundabad with the starter decklists; the hero carrying Wormsbane leaves play in the first rounds or threat runs out. Until it exists `.maestro/scenarios/mount-gundabad/mount-gundabad.yaml` cannot run.
 - `framsburg-won` is not committed: none of 100 seeds wins The Ghost of Framsburg with the starter decklists. Until it exists `.maestro/scenarios/the-ghost-of-framsburg/the-ghost-of-framsburg.yaml` cannot run; its `CHOICE_*` lines are commented out.
@@ -148,7 +150,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - The Oath: the Tokens dial does not open the quest preview; the Resolution joins used Adaptations with a comma, not "and".
 - Escape from Dol Guldur: the claim prompt does not name the lasting effect.
 - A confirmed "another" defender cannot be backed out of (the declaration frame has no pass).
-- Phase 13 reviewer notes, not fixed: one function for passing the first player token; one immediate attack; the 141028 Setup record that setup does not read; the module-level map in `announceProgress`; non-burden verbs in the burden family; a hard-coded "Ring-bearer's" in `words/burden.ts`.
+- Phase 13 reviewer notes, not fixed: one function for passing the first player token; one immediate attack; the 141028 Setup record that setup does not read; the module-level map in `announceProgress`; non-burden verbs in the burden family; a hard-coded "Ring-bearer's" in `words/scenarios/burden.ts`.
 - `CountsAs` and `byEncounterDeck` live in the shared schema, not a family. `why.ts` matches the "different heroes" refusal by its wording.
 - Ledger readings 41050.A, 41012.A and 01090.A were re-checked against the scans, not user-confirmed.
 - Frodo's Choice (142068:A:2): its Ring-bearer clauses find nothing, since stage 2A removed the Ring-bearer from the game; the revealer takes the first player token for the game. Not user-confirmed.
@@ -185,7 +187,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 
 ### Rules and engine (The Two Towers)
 - Beyond All Hope readings not user-confirmed (143071:B:1): the trim to three non-Fellowship heroes counts the living heroes on the log, not only those in the game; the fallen list is one shared list; the first player picks who earns the boon.
-- The Uruk-hai: its quest card's captive step (143069:A, reading `campaignFacts.heroLog.captives`) and the setter of `ScenarioState.pursuit` are the scenario's records, not built.
+- Not fixed from The Uruk-hai's review: `engagedThreatSeat` (143065:A:2) is declared in the pursuit family, not with `engagedThreat`.
+- Six older records put `shadow: false` on a printed additional attack (18035:A:2 and its copies), against `faq.additional-attacks`, which deals the additional attack a new shadow card.
 - The Two Towers ledger reads the pinned 2014 and 2015 Treason of Saruman and Land of Shadow scans; no pinned scan shows MEC112's 2023 wording, so a rewording cannot be found (`scripts/data/printed/scope.ts`, `MEC112_CHANGED`).
 - Easy: the DragnCards `E0C.12` deck keeps all ten Great Spider cards where Hall of Beorn keeps six; the E0C decks lead (user decision, 2026-11-07).
 
@@ -205,3 +208,4 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - The combat spotlight stage is always dark, a lone attack runs about 2.2 s, and a destroyed target burns (user, 2026-10-29).
 - Page art has no hard edges: it fades to black or into the fog; framed tiles and panels keep theirs (user, 2026-10-30).
 - The screen reader path is independent of ordinary play: with no phone screen reader on, nothing drawn, touched, heard or timed changes, the web build included; new reader behaviour is gated on `useReaderMode()`, which the Table as a list setting set to Always also turns on (user, 2026-11-05, 2026-11-07).
+- One scenario pipeline; no more A/B tests (user decision, 2026-11-08). The procedure is in `docs/handover/agent-brief.md` (Scenario procedure).

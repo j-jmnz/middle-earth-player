@@ -1,5 +1,5 @@
 // Rules: rr.first-player, rr.response, rr.shadow-effects (data/rules/entries.json); ledger lines 19156:A:2, 19157:A:2, 19158:A:1, 19167:A:1.
-// The words of The Fate of Wilderland are told only in The Fate of Wilderland (words/fate.ts, inFate). Each record below is a copy of one of the scenario's own, laid on a card of another scenario's table (The Withered Heath): the Choose that exhausts a character or puts progress on a named
+// The words of The Fate of Wilderland are told only in The Fate of Wilderland (words/scenarios/fate.ts, inFate). Each record below is a copy of one of the scenario's own, laid on a card of another scenario's table (The Withered Heath): the Choose that exhausts a character or puts progress on a named
 // objective, the Response that puts a resource on the card that counts them, the attack that discards the encounter deck's top card for its Threat, the treachery that raises the staging area's Threat. In The Withered Heath they read as they did before this scenario had words; the same
 // record on the scenario's own table reads with them (the positive control, so a gate that never opens would fail here).
 import { beforeAll, describe, expect, it } from "vitest";
@@ -16,8 +16,8 @@ import type { ReduceContext } from "../../rules/interpret/interpret.ts";
 import { CODES as HEATH, heathTable, loadHeathWorld, type HeathWorld } from "../../../test/scenarios/the-withered-heath/scene.ts";
 import { CODES, idOf, loadWilderlandWorld, send, start, wilderlandTable, type Run, type WilderlandWorld } from "../../../test/scenarios/the-fate-of-wilderland/scene.ts";
 
-import { fateAsk, fateBranchCaution, fateBranchRows, fateBranchWords, fateChooseNote, fateTargetNote } from "../words/fate.ts";
-import { fateNames, fateShieldedLine, fateStrikeLine } from "../words/fate-beats.ts";
+import { fateAsk, fateBranchCaution, fateBranchRows, fateBranchWords, fateChooseNote, fateTargetNote } from "../words/scenarios/fate.ts";
+import { fateNames, fateShieldedLine, fateStrikeLine } from "../words/scenarios/fate-beats.ts";
 import { sheetFor } from "./sheets.ts";
 
 let fate: WilderlandWorld;

@@ -1,0 +1,744 @@
+Scenario piles that place cards with no record (staging: 11022 Scouting Ship; staging: 11051 Rolling Seas; quest: 11016 Departure from the Havens; quest: 11017 Into the Storm; quest: 11018 Cursed Mists; quest: 11019 Calphon's Divination; quest: 11020 The Star's Guidance; quest: 11021 Corsair Pursuit; staging: 11084 Navigation; setAside: 110138 Duskbringer; setAside: 110139 Glórinaith; setAside: 11080 Dream-chaser; setAside: 11081 Dawn Star; setAside: 11082 Nárelenya; setAside: 11083 Silver Wing; corsairDeck: 11060 Southron Sailor; corsairDeck: 11061 Cunning Pirate; corsairDeck: 11062 Vicious Marauder; corsairDeck: 11063 Umbar Captain)
+
+## 110136 Dream-chaser
+
+110136:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110136:A:2: Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110136:A:3 (front): The Dream-chaser can be committed to Sailing tests (even if you are not the first player) and counts as 2 characters when committed to a Sailing test.
+  110136:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat sailsAnyTest 1, while this card is in play
+    - this card: stat sailingExtra 1, while this card is in play
+
+110136:A:4 (front): If the Dream-chaser is destroyed, the players lose the game.
+  110136:triggered:2: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    - the players lose the game
+
+110136:B:1 (back): Campaign Mode only.
+  (inert: the engine applies it by rule, no record)
+
+110136:B:2: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110136:B:3: Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110136:B:4 (back): The Dream-chaser can be committed to any Sailing test and counts as 3 characters when committed to a Sailing test.
+  110136:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat sailsAnyTest 1, while this card is in play
+    - this card: stat sailingExtra 2, while this card is in play
+
+110136:B:5 (back): If the Dream-chaser is destroyed, the players lose the game.
+  110136:triggered:3: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    - the players lose the game
+
+## 110137 Dawn Star
+
+110137:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110137:A:2: Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110137:A:3 (front): Raise your starting threat by 3.
+  110137:setup:1: Setup
+    - raise threat by 3 (the acting player)
+
+110137:A:4 (front): Draw 1 additional card during the resource phase.
+  110137:constant:2: Constant
+    - actorSeat: stat extraDraw 1, while this card is in play
+
+110137:A:5 (front): If the Dawn Star is destroyed, its controller is eliminated from the game.
+  110137:triggered:3: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    - [json EliminatePlayer {"verb":"EliminatePlayer"}]
+
+110137:B:1 (back): Campaign Mode only.
+  (inert: the engine applies it by rule, no record)
+
+110137:B:2: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110137:B:3: Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110137:B:4 (back): Draw 1 additional card during the resource phase.
+  110137:constant:3: Constant
+    - actorSeat: stat extraDraw 1, while this card is in play
+
+110137:B:5 (back): If the Dawn Star is destroyed, its controller is eliminated from the game.
+  110137:triggered:4: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    - [json EliminatePlayer {"verb":"EliminatePlayer"}]
+
+## 110138 Duskbringer
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+110138:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110138:A:2: Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110138:A:3 (front): Response: After you play a card with an odd printed cost, add 1 resource to a hero's resource pool. (Limit once per round.)
+  110138:response:1: Response after this card is played (heard about card (you control) [also {"oddCost":true}]; limit once per round)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (you control)
+    - add 1 resources to the picked card
+
+110138:A:4 (front): If the Duskbringer is destroyed, its controller is eliminated from the game.
+  110138:triggered:2: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    - [json EliminatePlayer {"verb":"EliminatePlayer"}]
+
+110138:B:1 (back): Campaign Mode only.
+  (inert: the engine applies it by rule, no record)
+
+110138:B:2: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110138:B:3: Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110138:B:4 (back): Response: After you play a card with an odd printed cost, add 1 resource to a hero's resource pool. (Limit twice per round.)
+  110138:response:2: Response after this card is played (heard about card (you control) [also {"oddCost":true}]; limit twice per round)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (you control)
+    - add 1 resources to the picked card
+
+110138:B:5 (back): If the Duskbringer is destroyed, its controller is eliminated from the game.
+  110138:triggered:3: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    - [json EliminatePlayer {"verb":"EliminatePlayer"}]
+
+## 110139 Glórinaith
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+110139:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110139:A:2: Ranged.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110139:A:3: Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110139:A:4 (front): Action: Discard the top 2 cards of any deck to deal 1 damage to an engaged non-unique enemy. (Limit once per round.)
+  110139:action:1: Action (limit once per round)
+    only if there is a non-unique enemy (any player controls) to choose
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose non-unique enemy (any player controls)
+    - [json DiscardFromAnyDeck {"verb":"DiscardFromAnyDeck","count":2}]
+    - deal 1 damage to the picked card
+
+110139:A:5 (front): If the Glórinaith is destroyed, its controller is eliminated from the game.
+  110139:triggered:2: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    - [json EliminatePlayer {"verb":"EliminatePlayer"}]
+
+110139:B:1 (back): Campaign Mode only.
+  (inert: the engine applies it by rule, no record)
+
+110139:B:2: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110139:B:3: Ranged.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110139:B:4: Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110139:B:5 (back): Action: Name a card. Discard the top 3 cards of any deck to deal 1 damage to a non-unique enemy (2 damage instead if the named card is discarded this way). (Limit once per round.)
+  110139:action:2: Action (limit once per round)
+    only if there is a non-unique enemy (any player controls) or in the staging area to choose
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json NameCard {"verb":"NameCard"}]
+    - choose non-unique enemy (any player controls) or in the staging area
+    - [json DiscardFromAnyDeck {"verb":"DiscardFromAnyDeck","count":3}]
+    - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 1 damage to the picked card
+    - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the picked card
+
+110139:B:6 (back): If the Glórinaith is destroyed, its controller is eliminated from the game.
+  110139:triggered:3: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    - [json EliminatePlayer {"verb":"EliminatePlayer"}]
+
+## 110140 Nárelenya
+
+110140:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110140:A:2: Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110140:A:3 (front): Reduce the cost of the first ally you play each round by 1.
+  110140:constant:2: Constant
+    - [json ReduceCostOf {"verb":"ReduceCostOf","pick":{"type":"card","control":"you","cardType":"ally"},"amount":1,"firstEachRound":true}]
+
+110140:A:4 (front): If the Nárelenya is destroyed, its controller is eliminated from the game.
+  110140:triggered:3: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    - [json EliminatePlayer {"verb":"EliminatePlayer"}]
+
+110140:B:1 (back): Campaign Mode only.
+  (inert: the engine applies it by rule, no record)
+
+110140:B:2: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110140:B:3: Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110140:B:4 (back): Reduce the cost of the first card you play each round by 1.
+  110140:constant:3: Constant
+    - [json ReduceCostOf {"verb":"ReduceCostOf","pick":{"type":"card","control":"you"},"amount":1,"firstEachRound":true}]
+
+110140:B:5 (back): If the Nárelenya is destroyed, its controller is eliminated from the game.
+  110140:triggered:4: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    - [json EliminatePlayer {"verb":"EliminatePlayer"}]
+
+## 110141 Silver Wing
+
+110141:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110141:A:2: Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110141:A:3: Ranged.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110141:A:4 (front): Reduce your starting threat by 3.
+  110141:setup:1: Setup
+    - lower threat by 3 (the acting player)
+
+110141:A:5 (front): Each hero you control gets +1 Attack.
+  110141:constant:2: Constant
+    - each hero (you control): stat attack 1, while this card is in play
+
+110141:A:6 (front): If the Silver Wing is destroyed, its controller is eliminated from the game.
+  110141:triggered:3: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    - [json EliminatePlayer {"verb":"EliminatePlayer"}]
+
+110141:B:1 (back): Campaign Mode only.
+  (inert: the engine applies it by rule, no record)
+
+110141:B:2: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110141:B:3: Ranged.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110141:B:4: Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+110141:B:5 (back): Reduce your starting threat by 6.
+  110141:setup:2: Setup
+    - lower threat by 6 (the acting player)
+
+110141:B:6 (back): Each hero you control gets +1 Attack.
+  110141:constant:3: Constant
+    - each hero (you control): stat attack 1, while this card is in play
+
+110141:B:7 (back): If the Silver Wing is destroyed, its controller is eliminated from the game.
+  110141:triggered:4: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    - [json EliminatePlayer {"verb":"EliminatePlayer"}]
+
+## 11016 Departure from the Havens
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+11016:A:1 (front): Setup: Prepare the Corsair deck. Players prepare their fleet. Shuffle each stage 2 card in the quest deck so that their order is random, leaving stage 3 on the bottom. Search the encounter deck for 1 copy of Rolling Seas and 1 copy of Scouting Ship, and add them to the staging area. Shuffle the encounter deck.
+  11016:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json PrepareCorsairDeck {"verb":"PrepareCorsairDeck"}]
+    - [json PrepareFleet {"verb":"PrepareFleet"}]
+    - [json ShuffleStages {"verb":"ShuffleStages","codes":["11017","11018","11019","11020"]}]
+    - shuffle the encounter deck
+
+11016:B:1: Sailing.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+11016:B:2 (back): While you are on-course (Sun), each Ship objective gets +2 Willpower.
+  11016:constant:1: Constant
+    - if [json condition {"kind":"heading","is":"onCourse"}]: each Ship character (any player controls): stat willpower 2, while this card is in play
+
+11016:B:3 (back): When this stage is defeated, if you are on-course (Sun), look at the top 2 stages of the quest deck and advance to one of your choice, placing the other on the bottom of the quest deck. Otherwise, advance to the top stage of the quest deck.
+  11016:constant:2: Constant
+    - [json LookAtStages {"verb":"LookAtStages","count":2}]
+
+## 11017 Into the Storm
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+11017:A:1 (front): When Revealed: Search the encounter deck and discard pile for 1 copy of Waterspout and add it to the staging area. Shuffle the encounter deck.
+  11017:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SearchMove {"verb":"SearchMove","code":"11054","to":"staging"}]
+    - shuffle the encounter deck
+
+11017:B:1: Sailing.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+11017:B:2 (back): Forced: At the end of the quest phase, if you are off-course (Cloud, Rain, or Storm), each player must distribute 5 damage among characters he controls.
+  11017:forced:1: Forced at the end of the phase
+    only if all of: (it is the Quest phase) and ([json condition {"kind":"heading","is":"offCourse"}])
+    - [json AssignDamage {"verb":"AssignDamage","amount":5,"pick":{"type":"character","control":"you"},"who":"eachSeat"}]
+
+11017:B:3 (back): When this stage is defeated, if you are on-course (Sun), look at the top 2 stages of the quest deck and advance to one of your choice, placing the other on the bottom of the quest deck. Otherwise, advance to the top stage of the quest deck.
+  11017:constant:1: Constant
+    - [json LookAtStages {"verb":"LookAtStages","count":2}]
+
+## 11018 Cursed Mists
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+11018:A:1 (front): When Revealed: Search the encounter deck and discard pile for 1 copy of Fog Bank and add it to the staging area. Shuffle the encounter deck.
+  11018:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SearchMove {"verb":"SearchMove","code":"11024","to":"staging"}]
+    - shuffle the encounter deck
+
+11018:B:1: Sailing.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+11018:B:2 (back): While you are off-course (Cloud, Rain, or Storm), each non-Ship ally gets -2 Willpower.
+  11018:constant:1: Constant
+    - if [json condition {"kind":"heading","is":"offCourse"}]: each ally (any player controls) without Ship: stat willpower -2, while this card is in play
+
+11018:B:3 (back): When this stage is defeated, if you are on-course (Sun), look at the top 2 stages of the quest deck and advance to one of your choice, placing the other on the bottom of the quest deck. Otherwise, advance to the top stage of the quest deck.
+  11018:constant:2: Constant
+    - [json LookAtStages {"verb":"LookAtStages","count":2}]
+
+## 11019 Calphon's Divination
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+11019:A:1 (front): When Revealed: Search the encounter deck and discard pile for 1 copy of Scouting Ship and add it to the staging area. Shuffle the encounter deck.
+  11019:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SearchMove {"verb":"SearchMove","code":"11022","to":"staging"}]
+    - shuffle the encounter deck
+
+11019:B:1: Sailing.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+11019:B:2 (back): While you are off-course (Cloud, Rain, or Storm), each Ship enemy gains Boarding 1.
+  11019:constant:1: Constant
+    - if [json condition {"kind":"heading","is":"offCourse"}]: each Ship enemy (any player controls) or in the staging area: stat boarding 1, while this card is in play
+
+11019:B:3 (back): When this stage is defeated, if you are on-course (Sun), look at the top 2 stages of the quest deck and advance to one of your choice, placing the other on the bottom of the quest deck. Otherwise, advance to the top stage of the quest deck.
+  11019:constant:2: Constant
+    - [json LookAtStages {"verb":"LookAtStages","count":2}]
+
+## 11020 The Star's Guidance
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+11020:A:1 (front): When Revealed: Search the encounter deck and discard pile for 1 copy of Starlit Sea and add it to the staging area. Shuffle the encounter deck.
+  11020:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SearchMove {"verb":"SearchMove","code":"11023","to":"staging"}]
+    - shuffle the encounter deck
+
+11020:B:1: Sailing.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+11020:B:2 (back): While you are off-course (Cloud, Rain, or Storm), each Ocean location gets +1 Threat.
+  11020:constant:1: Constant
+    - if [json condition {"kind":"heading","is":"offCourse"}]: each Ocean location (any player controls) or in the staging area: stat threat 1, while this card is in play
+
+11020:B:3 (back): When this stage is defeated, if you are on-course (Sun), look at the top 2 stages of the quest deck and advance to one of your choice, placing the other on the bottom of the quest deck. Otherwise, advance to the top stage of the quest deck.
+  11020:constant:2: Constant
+    - [json LookAtStages {"verb":"LookAtStages","count":2}]
+
+## 11021 Corsair Pursuit
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+11021:A:1 (front): When Revealed: Search the encounter deck and discard pile for the Ship enemy with the highest Threat and add it to the staging area (2 Ship enemies with the highest Threat instead if there are 3 or more players in the game). Shuffle the encounter deck.
+  11021:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SearchShips {"verb":"SearchShips","count":1,"when":{"kind":"not","condition":{"kind":"count","pick":{"type":"player","control":"any"},"min":3}}}]
+    - [json SearchShips {"verb":"SearchShips","count":2,"when":{"kind":"count","pick":{"type":"player","control":"any"},"min":3}}]
+    - shuffle the encounter deck
+
+11021:B:1: Sailing.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+11021:B:2 (back): You cannot place progress on Corsair Pursuit unless you are on-course (Sun).
+  11021:constant:1: Constant
+    - if [json condition {"kind":"heading","is":"offCourse"}]: the table: stat noQuestProgress 1, while this card is in play
+
+11021:B:3 (back): If there are no Ship enemies in play, you have defeated your pursuers, and win the game.
+  11021:constant:2: Constant
+    only if [json condition {"kind":"enemyInPlay","trait":"Ship","is":false}]
+    - the players win the game
+
+11021:B:4 (back): If this stage has 10 or more progress on it, you have lost your pursuers, and win the game.
+  11021:constant:3: Constant
+    only if [json condition {"kind":"stageProgress","min":10}]
+    - the players win the game
+
+## 11022 Scouting Ship
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+11022:A:1: Boarding 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+11022:A:2 (front): Cannot have attachments.
+  11022:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+11022:A:3 (front): Scouting Ship gets -15 engagement cost while you are off-course (Cloud, Rain, or Storm).
+  11022:constant:2: Constant
+    - if [json condition {"kind":"heading","is":"offCourse"}]: this card: stat engagementCost -15, while this card is in play
+
+## 11023 Starlit Sea
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+11023:A:1 (front): While you are off-course (Cloud, Rain, or Storm), Starlit Sea gains: "Travel: Raise each player's threat by 3."
+  11023:travel:1: Travel
+    - if [json condition {"kind":"heading","is":"offCourse"}]: raise threat by 3 (each player)
+
+11023:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if you are off-course).
+  11023:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not ([json condition {"kind":"heading","is":"offCourse"}]): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if [json condition {"kind":"heading","is":"offCourse"}] (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 11024 Fog Bank
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+11024:A:1 (front): While Fog Bank is the active location, Ship enemies do not make engagement checks, cannot attack, and cannot be attacked.
+  11024:constant:1: Constant
+    only if this card is the active location
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each Ship enemy (any player controls) or in the staging area: stat noEngagementChecks 1, while this card is in play
+    - each Ship enemy (any player controls) or in the staging area: stat cannotAttack 1, while this card is in play
+    - each Ship enemy (any player controls) or in the staging area: stat cannotBeAttacked 1, while this card is in play
+
+11024:A:2 (shadow): Shadow: If your heading is at the worst setting (Storm), attacking enemy makes an additional attack after this one.
+  11024:shadow:1: Shadow
+    - if [json condition {"kind":"heading","is":"worst"}]: when the attack in progress ends:
+      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+
+## 11050 Calm Waters
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+11050:A:1 (front): While Calm Waters is the active location, look at 2 additional cards from the top of the encounter deck during each Sailing test.
+  11050:constant:1: Constant
+    only if this card is the active location
+    - the table: stat sailingLook 2, while this card is in play
+
+11050:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if attacking enemy is a Ship enemy).
+  11050:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attacking enemy is a Ship enemy (any player controls) or in the staging area): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the attacking enemy is a Ship enemy (any player controls) or in the staging area (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
+
+## 11051 Rolling Seas
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+11051:A:1 (front): Travel: Shift your heading off-course to travel here.
+  11051:travel:1: Travel
+    - [json ShiftHeading {"verb":"ShiftHeading","direction":"offCourse"}]
+
+11051:A:2 (shadow): Shadow: If this attack deals damage to a Ship objective, shift your heading off-course.
+  11051:shadow:1: Shadow
+    - when the attack in progress ends:
+      - [json ShiftHeading {"verb":"ShiftHeading","direction":"offCourse","when":{"kind":"all","conditions":[{"kind":"dealt"},{"kind":"matches","card":"other","pick":{"type":"character","control":"any","trait":"Ship"}}]}}]
+
+## 11052 Thrown Off Course
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+11052:A:1 (front): When Revealed: Either remove all progress from the current quest and raise each player's threat by 4, or shift your heading off-course.
+  11052:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "progress":
+        - [json RemoveAllQuestProgress {"verb":"RemoveAllQuestProgress"}]
+        - raise threat by 4 (each player)
+      * option "heading":
+        - [json ShiftHeading {"verb":"ShiftHeading","direction":"offCourse"}]
+
+11052:A:2 (shadow): Shadow: If this attack destroys a character, shift your heading off-course.
+  11052:shadow:1: Shadow
+    - when the attack in progress ends:
+      - [json ShiftHeading {"verb":"ShiftHeading","direction":"offCourse","when":{"kind":"x","min":1}}]
+
+## 11053 Rough Waters
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+11053:A:1 (front): While Rough Waters is in the staging area, cancel the first Sailing success symbol found during each Sailing test.
+  11053:constant:1: Constant
+    only if this card is in the staging area
+    - the table: stat sailingCancel 1, while this card is in play
+
+11053:A:2 (shadow): Shadow: If you are off-course (Cloud, Rain, or Storm), attacking enemy gets +2 Attack.
+  11053:shadow:1: Shadow
+    - if [json condition {"kind":"heading","is":"offCourse"}]: the attacking enemy: stat attack 2, until the end of the attack
+
+## 11054 Waterspout
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+11054:A:1 (front): While your heading is at the worst setting (Storm), when faced with the option to travel, the players must travel to Waterspout, if able.
+  11054:constant:1: Constant
+    - [json Restrict {"verb":"Restrict","what":"travelOnly","when":{"kind":"heading","is":"worst"}}]
+
+11054:A:2 (front): Forced: After traveling to Waterspout, deal 4 damage to each Ship objective.
+  11054:forced:1: Forced after the players travel (heard about this card)
+    - deal 4 damage to each Ship character (any player controls)
+
+## 11055 Sudden Storms
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+11055:A:1 (front): When Revealed: Either shift your heading off-course or deal 1 damage to each exhausted character.
+  11055:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "heading":
+        - [json ShiftHeading {"verb":"ShiftHeading","direction":"offCourse"}]
+      * option "damage":
+        - deal 1 damage to each exhausted character (any player controls)
+
+11055:A:2 (shadow): Shadow: Excess damage from this attack is dealt to a Ship objective you control.
+  11055:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat excessToShip 1, until the end of the attack
+    - when the attack in progress ends:
+      - if [json condition {"kind":"excess","min":1}]: choose Ship character (you control)
+      - [json DamageShip {"verb":"DamageShip","amount":{"excess":true},"when":{"kind":"excess","min":1}}]
+
+## 11056 Winds of Wrath
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+11056:A:1 (front): When Revealed: If you are off-course, deal 1 damage to each character in play. If your heading is at the worst setting (Storm), this effect cannot be canceled.
+  11056:whenRevealed:1: When revealed (cannot be canceled while [json condition {"kind":"heading","is":"worst"}])
+    - if [json condition {"kind":"heading","is":"offCourse"}]: deal 1 damage to each character (any player controls)
+
+11056:A:2 (shadow): Shadow: Either shift your heading off-course or treat this attack as undefended.
+  11056:shadow:1: Shadow
+    - the acting player chooses one of:
+      * option "heading":
+        - [json ShiftHeading {"verb":"ShiftHeading","direction":"offCourse"}]
+      * option "undefended":
+        - this attack is considered undefended
+
+## 11057 Light Cruiser
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+11057:A:1: Boarding 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+11057:A:2 (front): Cannot have attachments.
+  11057:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+11057:A:3 (front): Each Raider enemy revealed from the Corsair deck by Light Cruiser's boarding keyword enters play with 1 resource on it.
+  11057:constant:2: Constant
+    - this card: stat boardingResource 1, while this card is in play
+
+## 11058 Corsair Warship
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+11058:A:1: Boarding 3.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+11058:A:2 (front): Cannot have attachments.
+  11058:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+11058:A:3 (front): While Corsair Warship is in the staging area, it cannot be damaged and gains archery 4.
+  11058:constant:2: Constant
+    only if this card is in the staging area
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat cannotTakeDamage 1, while this card is in play
+    - this card: stat archery 4, while this card is in play
+
+## 11059 Boarding Party
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+11059:A:1 (front): When Revealed: Each player reveals the top card of the Corsair deck and puts it into play, engaged with him.
+  11059:whenRevealed:1: When revealed
+    - [json RevealCorsair {"verb":"RevealCorsair","who":"eachSeat"}]
+
+11059:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if you control an exhausted Ship objective).
+  11059:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the number of exhausted Ship character (you control) is at least 1): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the number of exhausted Ship character (you control) is at least 1 (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 11060 Southron Sailor
+(the scenario deals it into the corsairDeck pile; the piles place it, no record does)
+
+11060:A:1 (front): While Southron Sailor is engaged with you, each Ship enemy engaged with you contributes its Threat to the total Threat in the staging area.
+  11060:constant:1: Constant
+    only if this card is engaged with the player
+    - each Ship enemy (any player controls) engaged with you: stat engagedThreat 1, while this card is in play
+
+## 11061 Cunning Pirate
+(the scenario deals it into the corsairDeck pile; the piles place it, no record does)
+
+11061:A:1 (front): Cunning Pirate gets +1 Attack and +1 Defense for each resource on it.
+  11061:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat attack resources of this card, while this card is in play
+    - this card: stat defense resources of this card, while this card is in play
+
+11061:A:2 (front): Forced: When Cunning Pirate engages you, discard an attachment you control and place resources on Cunning Pirate equal to that attachment's printed cost.
+  11061:forced:1: Forced after an enemy engages a player (heard about this card; event happened to the controller)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if there is a attachment (you control) to choose: choose attachment (you control)
+    - then, if there is a attachment (you control) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): add cost of the picked card resources to this card
+    - then, if there is a attachment (you control) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+
+## 11062 Vicious Marauder
+(the scenario deals it into the corsairDeck pile; the piles place it, no record does)
+
+11062:A:1 (front): Forced: When Vicious Marauder engages you, discard a random card from your hand and place resources on it equal to that card's printed cost.
+  11062:forced:1: Forced after an enemy engages a player (heard about this card; event happened to the controller)
+    - [json PlunderHand {"verb":"PlunderHand"}]
+
+11062:A:2 (front): Forced: When Vicious Marauder attacks you, distribute damage among characters you control equal to the number of resources on it.
+  11062:forced:2: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    - [json AssignDamage {"verb":"AssignDamage","amount":{"stat":"resources","of":"self"},"pick":{"type":"character","control":"you"}}]
+
+## 11063 Umbar Captain
+(the scenario deals it into the corsairDeck pile; the piles place it, no record does)
+
+11063:A:1 (front): While you are engaged with Umbar Captain, characters you control cannot attack Ship enemies.
+  11063:constant:1: Constant
+    only if this card is engaged with the player
+    - each character (you control): stat cannotAttackShips 1, while this card is in play
+
+## 11080 Dream-chaser
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+11080:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+11080:A:2: Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+11080:A:3 (front): The Dream-chaser can always be committed to Sailing tests (even if you are not the first player), and counts as 2 characters when committed to a Sailing test.
+  11080:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat sailsAnyTest 1, while this card is in play
+    - this card: stat sailingExtra 1, while this card is in play
+
+11080:A:4 (front): If the Dream-chaser is destroyed, the players lose the game.
+  11080:triggered:2: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    - the players lose the game
+
+## 11081 Dawn Star
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+11081:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+11081:A:2: Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+11081:A:3 (front): Raise your starting threat by 3.
+  11081:setup:1: Setup
+    - raise threat by 3 (the acting player)
+
+11081:A:4 (front): Draw 1 additional card during the resource phase.
+  11081:constant:2: Constant
+    - actorSeat: stat extraDraw 1, while this card is in play
+
+11081:A:5 (front): If the Dawn Star is destroyed, its controller is eliminated from the game.
+  11081:triggered:3: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    - [json EliminatePlayer {"verb":"EliminatePlayer"}]
+
+## 11082 Nárelenya
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+11082:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+11082:A:2: Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+11082:A:3 (front): Reduce the cost of the first ally you play each round by 1.
+  11082:constant:2: Constant
+    - [json ReduceCostOf {"verb":"ReduceCostOf","pick":{"type":"card","control":"you","cardType":"ally"},"amount":1,"firstEachRound":true}]
+
+11082:A:4 (front): If the Nárelenya is destroyed, its controller is eliminated from the game.
+  11082:triggered:3: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    - [json EliminatePlayer {"verb":"EliminatePlayer"}]
+
+## 11083 Silver Wing
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+11083:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+11083:A:2: Sentinel.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+11083:A:3: Ranged.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+11083:A:4 (front): Reduce your starting threat by 3.
+  11083:setup:1: Setup
+    - lower threat by 3 (the acting player)
+
+11083:A:5 (front): Each hero you control gets +1 Attack.
+  11083:constant:2: Constant
+    - each hero (you control): stat attack 1, while this card is in play
+
+11083:A:6 (front): If the Silver Wing is destroyed, its controller is eliminated from the game.
+  11083:triggered:3: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    - [json EliminatePlayer {"verb":"EliminatePlayer"}]
+
+## 11171 Voyage Across Belegaer
+
+11171:A:1 (front): You are playing Campaign Mode.
+  (inert: the engine applies it by rule, no record)
+
+11171:A:2 (front): Setup: Each player chooses a Modification boon for each of their ship-objectives and attaches it to that ship-objective. For each ship-objective, its controller may deal 2 damage to it to add 1 resource to a hero's resource pool. Shuffle Ominous Fate and Thunderstruck into the encounter deck. Shuffle Crowley into the Corsair deck.
+  11171:campaignSetup:1: Campaign setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SetAside {"verb":"SetAside","code":"11172"}]
+    - [json SetAside {"verb":"SetAside","code":"11173"}]
+    - [json SetAside {"verb":"SetAside","code":"11174"}]
+    - [json SetAside {"verb":"SetAside","code":"11175"}]
+    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"11176"}]
+    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"11177"}]
+    - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
+    - [json FitShips {"verb":"FitShips","codes":["11172","11173","11174","11175"]}]
+    - [json TradeShipDamage {"verb":"TradeShipDamage","damage":2,"resources":1}]
+
+11171:B:1 (back): Resolution: Add Ominous Fate to the Campaign Pool.
+  11171:resolution:1: Resolution
+    - [json Earn {"verb":"Earn","codes":["11176"]}]
+
+11171:B:2 (back): Gain the following:
+  11171:resolution:2: Resolution (record also names 11171:B:3)
+    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"survivingPlayer"}}]
+
+11171:B:3 (back): • 1 XP for each surviving player.
+  11171:resolution:2: Resolution (record also names 11171:B:2)
+    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"survivingPlayer"}}]
+
+11171:B:4 (back): • 1 XP if 4 stage 2B quest cards are in the victory display.
+  11171:resolution:3: Resolution
+    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Into the Storm","Cursed Mists","Calphon's Divination","The Star's Guidance"]},"min":4}}]
+
+11171:B:5 (back): • 1 XP if you ended the game on-course (Sun).
+  11171:resolution:4: Resolution
+    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"heading","is":"onCourse"}}]
+
+11171:B:6 (back): • 1 XP if no Ship enemies are in play.
+  11171:resolution:5: Resolution
+    - [json GainXp {"verb":"GainXp","amount":1,"when":{"kind":"enemyInPlay","trait":"Ship","is":false}}]
+
+11171:B:7 (back): • 1 XP for each Corsair Warship in the victory display.
+  11171:resolution:6: Resolution
+    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"inVictory","codes":["11058"]}}]
+
+11171:B:8 (back): • 1 XP if Crowley is in the victory display.
+  11171:resolution:7: Resolution
+    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"inVictory","codes":["11178"]},"max":1}]
+
+11171:B:9 (back): • 2 XP if Thunderstruck is in the victory display.
+  11171:resolution:8: Resolution
+    - [json GainXp {"verb":"GainXp","amount":2,"each":{"kind":"inVictory","codes":["11177"]},"max":2}]
+
+11171:B:10 (back): • -1 XP if Ominous Fate is in the victory display.
+  11171:resolution:9: Resolution
+    - [json GainXp {"verb":"GainXp","amount":-1,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Ominous Fate"]},"min":1}}]
+
+(rendered pieces: 245 by template, 84 as JSON)

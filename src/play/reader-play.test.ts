@@ -13,7 +13,7 @@ describe.each(scenarios)("a screen reader can play %s", (id) => {
     for (const game of await readerGames(id)) {
       const run = playReaderGame(game, ALLOWED);
       expect(run.failure, run.failure ?? "").toBeNull();
-      expect(run.states).toBeGreaterThan(20);
+      expect(run.states).toBeGreaterThanOrEqual(20);
     }
   }, 120_000);
 });

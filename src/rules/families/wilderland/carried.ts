@@ -1,7 +1,8 @@
 // Rules: rr.player-elimination, rr.ownership-and-control, rr.guarded (data/rules/entries.json); ledger lines 18074:A:1, 18074:B:1, 18074:B:2, 18074:B:3.
 // Carried Away: an enemy guards a hero. The hero is in play, facedown under the enemy and controlled by no one (the captive zone the Ring-bearer under the Watcher uses, families/south/captive.ts), flagged `guardedHero` so its
-// owner is not eliminated for want of heroes (core/keywords.ts eliminateEmpties). The enemy that guards it is the card the hero lies under.
-import { eliminateEmpties, releaseAttachments } from "../../core/keywords.ts";
+// owner is not eliminated for want of heroes (core/eliminate.ts eliminateEmpties). The enemy that guards it is the card the hero lies under.
+import { releaseAttachments } from "../../core/keywords.ts";
+import { eliminateEmpties } from "../../core/eliminate.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { pickedList } from "../../interpret/player-verbs.ts";

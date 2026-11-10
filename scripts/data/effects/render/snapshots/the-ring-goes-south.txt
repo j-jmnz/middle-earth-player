@@ -1,0 +1,336 @@
+Scenario piles that place cards with no record (quest: 142020 The Council of Elrond; quest: 142021 The Nine Walkers; quest: 142022 The Hunt is Up!; quest: 142023 The Gates of Moria; setAside: 142024 Watcher in the Water; setAside: 142029 Redhorn Pass; setAside: 142030 Doors of Durin; setAside: 142084 Lust for the Ring)
+
+## 142020 The Council of Elrond
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+142020:A:1 (front): Setup: Set Lust for the Ring, Redhorn Pass, Doors of Durin and Watcher in the Water aside, out of play. Shuffle the encounter deck.
+  142020:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SetAside {"verb":"SetAside","code":"142084"}]
+    - [json SetAside {"verb":"SetAside","code":"142029"}]
+    - [json SetAside {"verb":"SetAside","code":"142030"}]
+    - [json SetAside {"verb":"SetAside","code":"142024"}]
+    - shuffle the encounter deck
+
+142020:B:1 (back): Forced: At the end of the planning phase, each player places the top card of his deck faceup in front of him, in player order, until there are a total of 4 faceup cards between the players. The first player chooses 1 faceup card to be played for 0 cost, 1 to add to its owner's hand, 1 to discard, and 1 to shuffle into its owner's deck. Then, either shuffle Lust for the Ring into the encounter deck, or raise each player's threat by 5. Advance to stage 2.
+  142020:forced:1: Forced at the end of the phase
+    only if it is the Planning phase
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AssignFaceup {"verb":"AssignFaceup","cards":4,"outcomes":["play","hand","discard","shuffle"]}]
+    - the first player chooses one of:
+      * option "lust" (only if [json condition {"kind":"outOfPlay","code":"142084"}]):
+        - [json ShuffleOutOfPlayIntoEncounterDeck {"verb":"ShuffleOutOfPlayIntoEncounterDeck","code":"142084"}]
+      * option "threat":
+        - raise threat by 5 (each player)
+    - advance to the next quest stage
+
+## 142021 The Nine Walkers
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+142021:A:1 (front): When Revealed: Make Redhorn Pass the active location. The first player reveals cards from the encounter deck until there is at least X Threat in the staging area. X is twice the number of players in the game.
+  142021:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json MakeSetAsideActive {"verb":"MakeSetAsideActive","code":"142029"}]
+    - [json RevealUntilThreat {"verb":"RevealUntilThreat","threat":{"players":true,"times":2}}]
+
+142021:B:1 (back): During the travel phase, the players must travel to a location, if able.
+  142021:constant:1: Constant
+    - the table: stat mustTravel 1, while this card is in play
+
+142021:B:2 (back): Forced: After an enemy engages a player, place 1 damage on the active location, if able.
+  142021:forced:1: Forced after an enemy engages a player
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose location (any player controls) chosen by the first player [also {"active":true}]
+    - [json PlaceDamage {"verb":"PlaceDamage","amount":1,"card":"picked"}]
+
+## 142022 The Hunt is Up!
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+142022:A:1 (front): When Revealed: Each player searches the encounter deck and discard pile for an enemy and adds it to the staging area. One of those enemies must be Great Warg Chief, if able. Shuffle the encounter deck.
+  142022:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - [json SearchMove {"verb":"SearchMove","type":"enemy","to":"staging","require":"142025"}]
+    - shuffle the encounter deck
+
+142022:B:1 (back): During the travel phase, the players must travel to a location, if able.
+  142022:constant:1: Constant
+    - the table: stat mustTravel 1, while this card is in play
+
+142022:B:2 (back): Forced: After a location enters play, place 1 damage on it.
+  142022:forced:1: Forced on the event encounterEnteredPlay (heard about location (any player controls))
+    - [json PlaceDamage {"verb":"PlaceDamage","amount":1,"card":"subject"}]
+
+142022:B:3 (back): Forced: After an enemy engages a player, place 1 damage on the active location, if able.
+  142022:forced:2: Forced after an enemy engages a player
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose location (any player controls) chosen by the first player [also {"active":true}]
+    - [json PlaceDamage {"verb":"PlaceDamage","amount":1,"card":"picked"}]
+
+## 142023 The Gates of Moria
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+142023:A:1 (front): When Revealed: Make Doors of Durin the active location. Add Watcher in the Water to the staging area. Discard all tokens from the Ring-bearer and place it (and each card attached to it) facedown under Watcher in the Water.
+  142023:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json MakeSetAsideActive {"verb":"MakeSetAsideActive","code":"142030"}]
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"142024"}]
+    - [json CaptureRingBearer {"verb":"CaptureRingBearer","under":"142024"}]
+
+142023:B:1 (back): There can be 2 active locations. During the travel phase, the players must travel to a location, if able.
+  142023:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the table: stat extraActiveLocation 1, while this card is in play
+    - the table: stat mustTravel 1, while this card is in play
+
+142023:B:2 (back): Forced: After an enemy engages a player, place 1 damage on each active location.
+  142023:forced:1: Forced after an enemy engages a player
+    - for each location (any player controls) [also {"active":true}]:
+      - [json PlaceDamage {"verb":"PlaceDamage","amount":1,"card":"picked"}]
+
+142023:B:3 (back): If Doors of Durin is explored, the players win the game.
+  142023:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about location (any player controls) named "Doors of Durin")
+    only if the card the event is about had enough progress to be explored
+    - the players win the game
+
+## 142024 Watcher in the Water
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+142024:A:1: Indestructible. Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+142024:A:2 (front): Cannot leave the staging area but is considered to be engaged with each player.
+  142024:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat engagedWithAll 1, while this card is in play
+    - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
+    - this card: stat noThreatContribution 1, while this card is in play
+    - this card: stat attackableByAny 1, while this card is in play
+
+142024:A:3 (front): Forced: After placing the 6th damage here, the first player takes control of the Ring-bearer, exhausted with 1 damage on it.
+  142024:forced:1: Forced after a card takes damage (heard about this card)
+    only if [json condition {"kind":"damageReached","nth":6}]
+    - [json ReleaseRingBearer {"verb":"ReleaseRingBearer","damage":1}]
+
+## 142025 Great Warg Chief
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+142025:A:1 (front): Cannot have attachments.
+  142025:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+142025:A:2 (front): Forced: After Great Warg Chief engages you, discard cards from the encounter deck until a Warg enemy is discarded. Put that enemy into play engaged with you.
+  142025:forced:1: Forced after an enemy engages a player (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy","trait":"Warg"}]
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","to":"engaged"}]
+
+## 142026 Hound of Sauron
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+142026:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+142026:A:2 (front): Hound of Sauron gets -5 engagement cost for each enemy in the staging area.
+  142026:constant:1: Constant
+    - this card: stat engagementCost minus the number of enemy (any player controls) in the staging area only x 5, while this card is in play
+
+142026:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if it was engaged this round).
+  142026:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attacking enemy is a enemy (any player controls) [also {"engagedThisRound":true}]): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the attacking enemy is a enemy (any player controls) [also {"engagedThisRound":true}] (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 142027 Howling Warg
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+142027:A:1 (front): Forced: When Howling Warg attacks, place 1 damage on an active location.
+  142027:forced:1: Forced when this enemy attacks, before the defender is declared
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose location (any player controls) chosen by the first player [also {"active":true}]
+    - [json PlaceDamage {"verb":"PlaceDamage","amount":1,"card":"picked"}]
+
+142027:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, place 1 damage on an active location.
+  142027:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): choose location (any player controls) chosen by the first player [also {"active":true}]
+      - [json PlaceDamage {"verb":"PlaceDamage","amount":1,"card":"picked","when":{"kind":"x","min":1}}]
+
+## 142028 Crebain from Dunland
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+142028:A:1: Peril.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+142028:A:2 (front): When Revealed: Either exhaust a hero you control, or engage Crebain from Dunland.
+  142028:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "exhaust" (only if there is a ready hero (you control) to choose):
+        - choose ready hero (you control)
+        - exhaust the picked card
+      * option "engage":
+        - engage this card
+
+142028:A:3 (front): Forced: After Crebain from Dunland engages a player, reveal the top card of the encounter deck.
+  142028:forced:1: Forced after an enemy engages a player (heard about this card)
+    - the player the event is about reveals an encounter card
+
+## 142029 Redhorn Pass
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+142029:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+142029:A:2 (front): Forced: When Redhorn Pass is explored, each player assigns X damage among characters he controls. X is the number of damage here.
+  142029:forced:1: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    - [json AssignDamage {"verb":"AssignDamage","amount":{"stat":"damage","of":"self"},"pick":{"type":"character","control":"you"},"who":"eachSeat"}]
+
+## 142030 Doors of Durin
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+142030:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+142030:A:2 (front): Progress must be placed on each other active location before it can be placed here. Progress cannot be placed here unless the first player controls the Ring-bearer.
+  142030:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat progressAfterOthers 1, while this card is in play
+    - this card: stat progressNeedsRingBearer 1, while this card is in play
+
+142030:A:3 (front): If there are 9 damage tokens here, the players lose the game.
+  142030:constant:2: Constant
+    - this card: stat loseAtDamage 9, while this card is in play
+
+## 142031 Tree-crowned Hill
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+142031:A:1 (front): While Tree-crowned Hill is the active location, each enemy gets -1 Threat.
+  142031:constant:1: Constant
+    only if this card is the active location
+    - every enemy in play: stat threat -1, while this card is in play
+
+142031:A:2 (front): Forced: When Tree-crowned Hill is explored, the players, as a group, exhaust X characters in play. X is the number of damage here.
+  142031:forced:1: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    - repeat damage of this card times:
+      - choose ready character (any player controls) chosen by the first player
+      - exhaust the picked card
+
+## 142032 Hills of Hollin
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+142032:A:1 (front): While Hills of Hollin is the active location, each enemy in the staging area gets +5 engagement cost.
+  142032:constant:1: Constant
+    only if this card is the active location
+    - each enemy (any player controls) in the staging area only: stat engagementCost 5, while this card is in play
+
+142032:A:2 (front): Forced: When Hills of Hollin is explored, each player raises his threat by 1 for each damage here.
+  142032:forced:1: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    - raise threat by damage of this card (each player)
+
+## 142033 Redhorn Foothills
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+142033:A:1 (front): While Redhorn Foothills is the active location, it gains: "Forced: After an enemy is added to the staging area, it gets -5 engagement cost until the end of the round."
+  142033:forced:1: Forced after an encounter card is added to the staging area (heard about enemy (any player controls))
+    only if this card is the active location
+    - the card the event is about: stat engagementCost -5, until the end of the round
+
+142033:A:2 (front): Forced: When Redhorn Foothills is explored, each player must discard X cards from his hand at random. X is the number of damage here.
+  142033:forced:2: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    - for each player, first player first:
+      - the acting player discards damage of this card random card(s) from hand
+
+## 142034 Eregion
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+142034:A:1 (front): Forced: When Eregion is explored, the players, as a group, must discard X allies from play. X is the number of damage here.
+  142034:forced:1: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    - repeat damage of this card times:
+      - choose ally (any player controls) chosen by the first player
+      - discard the picked card
+
+142034:A:2 (shadow): Shadow: Defending player discards a non-objective attachment he controls.
+  142034:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (you control)
+    - discard the picked card
+
+## 142035 Regiments of Crows
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+142035:A:1 (front): When Revealed: Place 3 damage on each active location.
+  142035:whenRevealed:1: When revealed
+    - for each location (any player controls) [also {"active":true}]:
+      - [json PlaceDamage {"verb":"PlaceDamage","amount":3,"card":"picked"}]
+
+142035:A:2 (shadow): Shadow: Undefended damage from this attack must be assigned to the active location.
+  142035:shadow:1: Shadow
+    - [json DamageActiveLocation {"verb":"DamageActiveLocation"}]
+
+## 142036 Snowdrifts
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+142036:A:1 (front): When Revealed: Attach to the active location. (Counts as a Condition attachment with the text, "Limit 1 per location. No more than 3 progress can be placed on attached location each round.") If Snowdrifts is not attached to the active location, it gains surge.
+  142036:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AttachToActiveLocation {"verb":"AttachToActiveLocation"}]
+    - [json GainSurge {"verb":"GainSurge","when":{"kind":"not","condition":{"kind":"x","min":1}}}]
+  142036:constant:1: Constant
+    - its host: stat progressCap 3, while this card is in play
+
+## 142037 Bitter Cold
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+142037:A:1 (front): When Revealed: Each player must choose: either discard each ally he controls, or raise his threat by 1 for each ally he controls.
+  142037:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "discard":
+          - [json DiscardEach {"verb":"DiscardEach","pick":{"type":"ally","control":"you"}}]
+        * option "threat":
+          - raise threat by the number of ally (you control) (the acting player)
+
+142037:A:2 (shadow): Shadow: Attacking enemy makes an additional attack after this one.
+  142037:shadow:1: Shadow
+    - when the attack in progress ends:
+      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+
+## 142038 Storm of Howls
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+142038:A:1: Peril.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+142038:A:2 (front): When Revealed: Either the Warg enemy in the staging area with the highest engagement cost attacks you, or each Warg enemy gets -20 engagement cost until the end of the round. If no Warg enemy is in the staging area, Storm of Howls gains surge.
+  142038:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player chooses one of:
+      * option "attack" (only if there is a Warg enemy (any player controls) in the staging area only to choose):
+        - [json PickHighestEngagement {"verb":"PickHighestEngagement","trait":"Warg"}]
+        - the picked enemy attacks the acting player now, from the staging area
+      * option "engagement":
+        - each Warg enemy (any player controls) in the staging area only: stat engagementCost -20, until the end of the round
+    - [json GainSurge {"verb":"GainSurge","when":{"kind":"not","condition":{"kind":"count","pick":{"type":"enemy","control":"any","stagingOnly":true,"trait":"Warg"},"min":1}}}]
+
+## 142084 Lust for the Ring
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+142084:A:1: Peril. Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+142084:A:2 (front): When Revealed: Attach to a non-Fellowship hero in play. Counts as a Condition attachment with the text: "Forced: After The One Ring exhausts, raise each player's threat by 1 and reduce attached hero's Willpower to 0 until the end of the round."
+  142084:whenRevealed:1: When revealed
+    - attach this card to a hero
+  142084:forced:1: Forced on the event exhausted (heard about card (any player controls) named "The One Ring")
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - raise threat by 1 (each player)
+    - [json SetStatUntil {"verb":"SetStatUntil","stat":"willpower","value":0,"until":"endOfRound","holders":{"type":"hero","control":"any","isHost":true}}]
+
+(rendered pieces: 147 by template, 40 as JSON)

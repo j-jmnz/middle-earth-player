@@ -6,9 +6,11 @@ import type { CampaignFacts } from "../rules/core/campaign-state.ts";
 import type { PrintedCard } from "../rules/core/printed.ts";
 import { legalIntents, reduce } from "../rules/engine/reduce.ts";
 import { holds } from "../rules/interpret/conditions.ts";
-import { openResolution, resolutionResult } from "../rules/setup/resolution.ts";
+import { resolutionResult } from "../rules/setup/resolution.ts";
+import { settle } from "../rules/engine/machine.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
 import { spawn } from "../rules/core/zones.ts";
+import { holdCaptive } from "../rules/families/captives/index.ts";
 import { loadPrinted } from "../../test/harness/catalog.ts";
 import { loadWorld, table, type World as SceneWorld } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
@@ -34,7 +36,7 @@ const BRACE = "144014";
 const EYE = "144015";
 const GATE = "144027";
 const HARAD = "144040";
-const CARDS = [...HEROES, THEODRED, ...BOONS, HOPE, PALANTIR, COUNSELS, VOICE, BRACE, EYE, GATE, HARAD, "141001", "141002", "141003"];
+const CARDS = [...HEROES, THEODRED, "143022", ...BOONS, HOPE, PALANTIR, COUNSELS, VOICE, BRACE, EYE, GATE, HARAD, "141001", "141002", "141003"];
 
 let scene: SceneWorld;
 let cards: Map<string, PrintedCard>;
@@ -53,7 +55,8 @@ const facts = (heroLog?: Omit<NonNullable<CampaignFacts["heroLog"]>, "captives">
 function won(code: string, seats: 1 | 2 = 1, place: Place = (state) => state) {
   const { state, ctx } = table(scene, { seats });
   const resolving: ScenarioState = { ...place(state), phase: "Quest", window: null, stageCleared: true, resolution: recordInstructions(EFFECTS, code, "resolution") };
-  return { state: openResolution(resolving, ctx), ctx };
+  // The settle loop rescues each Captive as the stage is defeated, then opens the Resolution.
+  return { state: settle(resolving, ctx, []), ctx };
 }
 
 const options = (state: ScenarioState, ctx: ReturnType<typeof table>["ctx"]): string[] => legalIntents(state, ctx).flatMap((intent) => (intent.type === "ChooseResolution" ? [intent.optionId] : []));
@@ -75,19 +78,50 @@ describe("143071 The Uruk-hai: the pursuit value gates the choice (mec112.pursui
   });
 });
 
-describe("143071 The Uruk-hai: the Skill boons", () => {
-  it("answers 'boons' itself when no hero has fallen, then each player takes a different Skill boon onto a hero", () => {
-    const { state, ctx } = won("143071", 2, (s) => ({ ...s, pursuit: 20, campaignFacts: facts({ heroes: [[ARAGORN], []], fallen: [[], []], fellowship: [] }) }));
+describe("143071 The Uruk-hai: the Skill boons (user ruling C1, 2026-11-08)", () => {
+  // The table's own heroes are Hobbits, which no Skill boon fits; Théodred (a Warrior) is seat 0's and Beravor (a Ranger) seat 1's.
+  const withHeroes: Place = (s) => {
+    const first = spawn(s, THEODRED, { zone: "heroes", seat: 0 });
+    const second = spawn(first.state, "01012", { zone: "heroes", seat: 1 });
+    return { ...second.state, pursuit: 20, campaignFacts: facts({ heroes: [[ARAGORN], []], fallen: [[], []], fellowship: [] }) };
+  };
+
+  it("answers 'boons' itself when no hero has fallen, then each player takes a different Skill boon onto a hero with its trait", () => {
+    const { state, ctx } = won("143071", 2, withHeroes);
     expect(state.resolutionLog.picks).toEqual([{ name: "uruk", seat: 0, option: "boons" }]);
-    const first = options(state, ctx);
-    expect(first).toContain(`${BOONS[0]}>${heroId(state, "141001")}`);
-    const one = choose(state, ctx, `${BOONS[0]}>${heroId(state, "141001")}`);
-    expect(options(one, ctx).some((id) => id.startsWith(`${BOONS[0]}>`))).toBe(false);
-    const done = choose(one, ctx, `${BOONS[1]}>${heroId(one, "141003")}`);
+    const theodred = heroId(state, THEODRED);
+    // Théodred is a Noble Warrior: Intimidation and Leader of Men fit him, Hands of a Healer and Forewarned fit no hero of seat 0.
+    expect(options(state, ctx)).toEqual([`${BOONS[0]}>${theodred}`, `${BOONS[3]}>${theodred}`]);
+    const one = choose(state, ctx, `${BOONS[0]}>${theodred}`);
+    // Seat 1 holds Beravor, a Ranger: Forewarned only.
+    expect(options(one, ctx)).toEqual([`${BOONS[2]}>${heroId(one, "01012")}`]);
+    const done = choose(one, ctx, `${BOONS[2]}>${heroId(one, "01012")}`);
     expect(resolutionResult(done)?.earned.map((item) => [item.code, item.to, item.seat, item.hero])).toEqual([
-      [BOONS[0], "hero", 0, "141001"],
-      [BOONS[1], "hero", 1, "141003"],
+      [BOONS[0], "hero", 0, THEODRED],
+      [BOONS[2], "hero", 1, "01012"],
     ]);
+  });
+
+  it("rescues each Captive first (143070:B:3): a seat whose only Warrior is its Captive is offered Intimidation on that hero", () => {
+    const { state, ctx } = won("143071", 1, (s) => {
+      const hero = spawn(s, THEODRED, { zone: "heroes", seat: 0 });
+      const host = spawn(hero.state, "143022", { zone: "staging" });
+      const held = holdCaptive(host.state, hero.id, host.id);
+      expect(held.cards[hero.id]?.captive).toBe(true);
+      return { ...held, pursuit: 20, campaignFacts: facts({ heroes: [[ARAGORN]], fallen: [[]], fellowship: [] }) };
+    });
+    const theodred = heroId(state, THEODRED);
+    expect(theodred).not.toBe("");
+    expect(state.cards[theodred]).toMatchObject({ zone: "heroes", controller: 0, face: "up" });
+    expect(state.cards[theodred]?.captive).toBeUndefined();
+    expect(state.seats[0].heroes).toContain(theodred);
+    expect(options(state, ctx)).toEqual([`${BOONS[0]}>${theodred}`, `${BOONS[3]}>${theodred}`]);
+  });
+
+  it("offers a seat none of them when no hero it controls has a Skill's trait", () => {
+    const { state, ctx } = won("143071", 1, (s) => ({ ...s, pursuit: 20, campaignFacts: facts({ heroes: [[ARAGORN]], fallen: [[]], fellowship: [] }) }));
+    expect(options(state, ctx)).toEqual([]);
+    expect(resolutionResult(state)?.earned).toEqual([]);
   });
 });
 

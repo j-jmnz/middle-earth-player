@@ -1,0 +1,355 @@
+Scenario piles that place cards with no record (activeLocation: 143027 Eastemnet; quest: 143069 Follow the Orcs; quest: 143070 Rescue the Captives; staging: 143022 To Isengard!; staging: 143023 Uglúk)
+
+## 143015 Intimidation
+
+143015:A:1: Permanent.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+143015:A:2 (front): Setup: Attach to a Warrior hero.
+  143015:setup:1: Setup
+    - attach this card to a Warrior hero
+
+143015:A:3 (front): Response: After attached hero is declared as the only attacker against a non-unique enemy, exhaust Intimidation to give that enemy -2 Defense for this attack.
+  143015:response:1: Response after a character is declared as an attacker (heard about the host; cost: exhaust this card)
+    only if all of: (exactly one character was declared as an attacker in this attack) and (the event's other card is a non-unique enemy (any player controls))
+    - the event's other card: stat defense -2, until the end of the attack
+
+## 143016 Hands of a Healer
+
+143016:A:1: Permanent.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+143016:A:2 (front): Setup: Attach to a Healer hero.
+  143016:setup:1: Setup
+    - attach this card to a Healer hero
+
+143016:A:3 (front): Action: Exhaust attached hero and Hands of a Healer to heal up to 3 damage from a hero.
+  143016:action:1: Action (cost: exhaust this card and exhaust the attached card)
+    only if there is a damaged hero (any player controls) (Captives included) to choose
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose damaged hero (any player controls) (Captives included)
+    - heal 3 damage from the picked card
+
+## 143017 Forewarned
+
+143017:A:1: Permanent.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+143017:A:2 (front): Setup: Attach to a Ranger hero.
+  143017:setup:1: Setup
+    - attach this card to a Ranger hero
+
+143017:A:3 (front): Response: After attached hero is declared as a defender against a non-unique enemy, exhaust Forewarned to discard 1 shadow card from that enemy.
+  143017:response:1: Response after a character is declared as a defender (heard about the host; cost: exhaust this card)
+    only if the event's other card is a non-unique enemy (any player controls) with a shadow card
+    - discard a shadow card dealt to the event's other card
+
+## 143018 Leader of Men
+
+143018:A:1: Permanent.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+143018:A:2 (front): Setup: Attach to a Noble hero.
+  143018:setup:1: Setup
+    - attach this card to a Noble hero
+
+143018:A:3 (front): Response: After attached hero quests successfully, exhaust Leader of Men to add 1 resource to attached hero's pool.
+  143018:response:1: Response on the event questedSuccessfully (heard about the host; cost: exhaust this card)
+    - add 1 resources to its host
+
+## 143019 Beyond All Hope
+
+143019:A:1: Permanent.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+143019:A:2 (front): Setup: Attach to a hero.
+  143019:setup:1: Setup
+    - attach this card to a hero
+
+143019:A:3 (front): Attached hero gets +1 Willpower, +1 Attack, +1 Defense and cannot have treachery card attachments.
+  143019:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - its host: stat willpower 1, while this card is in play
+    - its host: stat attack 1, while this card is in play
+    - its host: stat defense 1, while this card is in play
+    - its host: stat cannotHaveTreachery (no treachery card can be attached to it) 1, while this card is in play
+
+## 143022 To Isengard!
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+143022:A:1 (front): Treat each Captive's text box as blank. Captives are in play but are not under any player's control. If there are no Captives in play, the players lose the game.
+  143022:constant:1: Constant
+    - each hero (in play, controlled by no player) that is a Captive (held by an enemy or lying free): stat blankText (its text box is blank) 1, while this card is in play
+  143022:constant:2: Constant
+    only if the number of Captives in play is at most 0
+    - the players lose the game (No Captive is left in play)
+
+143022:A:2 (front): Forced: At the end of the refresh phase, increase the pursuit value by 1. Then, if the pursuit value is 30 or greater, the players lose the game.
+  143022:forced:1: Forced at the end of the phase
+    only if it is the Refresh phase
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - increase the pursuit value by 1
+    - then, if the pursuit value is at least 30 (checked when this step runs, after the steps above; not tied to whether they did anything): the players lose the game (To Isengard!: the pursuit value reached 30)
+
+## 143023 Uglúk
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+143023:A:1 (front): Toughness 3. Cannot have attachments.
+  (the keyword part is owned by the card's keywords; the records cover: Cannot have attachments.)
+  143023:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+143023:A:2 (front): Allies cannot be declared as attackers or defenders against Uglúk.
+  143023:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each card (any player controls) named "Uglúk", (enemies engaged with a player included): stat alliesCannotAttack (allies cannot be declared as attackers against it) 1, while this card is in play
+    - allies cannot be declared as defenders against this card's attacks (only this card's, not another enemy's)
+
+## 143024 Grishnákh
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143024:A:1 (front): Forced: After Grishnákh enters play, the first player attaches 1 of the Captives to him. If Grishnákh is defeated, place the attached Captive faceup underneath To Isengard!
+  143024:forced:1: Forced on the event encounterEnteredPlay (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (in play, controlled by no player) that is a Captive that no enemy holds, chosen by the first player
+    - the picked Captive is attached to this card
+  143024:forced:2: Forced after a card leaves play (heard about this card)
+    - the Captive this card holds lies faceup under the card with code 143022 again
+
+143024:A:2 (front): Forced: At the end of the quest phase, deal 1 damage to the attached Captive.
+  143024:forced:3: Forced at the end of the phase
+    only if it is the Quest phase
+    - deal 1 damage to the Captive this card holds
+
+## 143025 Uglúk's Uruk-hai
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143025:A:1: Peril. Toughness 1. Archery 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+143025:A:2 (front): When Revealed: Either increase the pursuit value by 3, or reveal an additional encounter card.
+  143025:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "pursuit":
+        - increase the pursuit value by 3
+      * option "reveal":
+        - the acting player reveals an encounter card
+
+## 143026 The Wold
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143026:A:1 (front): While The Wold is the active location, it gains: "Response: After The Wold is explored, each player draws 1 card."
+  143026:response:1: Response on the event activeExplored (heard about this card)
+    - for each player, first player first:
+      - the acting player draws 1 card(s)
+
+143026:A:2 (front): Travel: Increase the pursuit value by 1.
+  143026:travel:1: Travel
+    - increase the pursuit value by 1
+
+## 143027 Eastemnet
+(the scenario deals it into the activeLocation pile; the piles place it, no record does)
+
+143027:A:1 (front): While Eastemnet is the active location, it gains: "Response: After Eastemnet is explored, add 1 resource to each hero's resource pool."
+  143027:response:1: Response on the event activeExplored (heard about this card)
+    - for each hero (any player controls) (Captives included):
+      - add 1 resources to the picked card
+
+143027:A:2 (front): Travel: Increase the pursuit value by 1.
+  143027:travel:1: Travel
+    - increase the pursuit value by 1
+
+## 143028 Plains of Rohan
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143028:A:1 (front): X is the number of locations in the staging area.
+  143028:constant:1: Constant
+    - this card: stat threat the number of location (any player controls) in the staging area only, while this card is in play
+
+143028:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, increase the pursuit value by 1.
+  143028:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): increase the pursuit value by 1
+
+## 143029 Banks of Entwash
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143029:A:1 (front): Forced: After any amount of progress is placed on Banks of Entwash, increase the pursuit value by 1.
+  143029:forced:1: Forced on the event progressPlaced (heard about this card)
+    - increase the pursuit value by 1
+
+143029:A:2 (shadow): Shadow: Either increase the pursuit value by 1, or this attack is considered undefended.
+  143029:shadow:1: Shadow
+    - the acting player chooses one of:
+      * option "pursuit":
+        - increase the pursuit value by 1
+      * option "undefended":
+        - this attack is considered undefended
+
+## 143030 Rest by Night?
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143030:A:1 (front): When Revealed: Either immediately end the quest phase and increase the pursuit value by 3, or deal 1 damage to each character committed to the quest. This effect cannot be canceled.
+  143030:whenRevealed:1: When revealed (cannot be canceled while the number of hero (any player controls) is at least 0)
+    - the acting player chooses one of:
+      * option "pursuit":
+        - increase the pursuit value by 3
+        - end the quest phase at once (no quest resolution)
+      * option "damage":
+        - deal 1 damage to each character (any player controls) committed to the quest
+
+## 143031 Strange Weariness
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143031:A:1 (front): When Revealed: Each character committed to the quest gets -1 Willpower until the end of the round.
+  143031:whenRevealed:1: When revealed
+    - each character (any player controls) committed to the quest: stat willpower -1, until the end of the round
+
+143031:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
+  143031:shadow:1: Shadow
+    - when the attack in progress ends:
+      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+
+## 143032 Unseen Barrier
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143032:A:1 (front): When Revealed: The players cannot place more than 3 progress on the current quest this round. (This does not count progress placed on any active location.)
+  143032:whenRevealed:1: When revealed
+    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 3, until the end of the round
+
+143032:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, increase the pursuit value by 1.
+  143032:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): increase the pursuit value by 1
+
+## 143063 Isengard Uruk
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143063:A:1: Peril. Toughness 1. Archery 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+143063:A:2 (front): When Revealed: Either assign 3 damage among characters you control, or reveal an additional encounter card.
+  143063:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "damage":
+        - [json AssignDamage {"verb":"AssignDamage","amount":3,"pick":{"type":"character","control":"you"}}]
+      * option "reveal":
+        - the acting player reveals an encounter card
+
+## 143064 Uruk-hai Fighter
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143064:A:1: Toughness 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+143064:A:2 (front): Forced: After Uruk-hai Fighter attacks and destroys a character, return it to the staging area.
+  143064:forced:1: Forced when this enemy attacks, before the defender is declared
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+143064:A:3 (shadow): Shadow: Discard a non-objective attachment you control.
+  143064:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (you control) that is not an objective
+    - discard the picked card
+
+## 143065 Fighting Uruk-hai
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143065:A:1: Peril.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+143065:A:2 (front): When Revealed: Search the encounter deck and discard pile for an Uruk-hai enemy, reveal it, and put it into play engaged with you. Shuffle the encounter deck. Until the end of the round, each enemy engaged with you adds its Threat to the total Threat in the staging area.
+  143065:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player searches the encounter deck and discard pile for a Uruk-hai enemy, reveals it and puts it into play engaged with them
+    - shuffle the encounter deck
+    - actorSeat: stat engagedThreatSeat (each enemy engaged with that player adds its Threat to the staging area's total, counted live: an enemy that engages later counts too) 1, until the end of the round
+
+## 143066 Snaga
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143066:A:1: Peril. Archery 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+143066:A:2 (front): When Revealed: Discard 1 random card from your hand. Snaga gets +X Threat until the end of the round, where X is the discarded card's printed cost.
+  143066:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player discards 1 random card(s) from hand (the last card discarded becomes the picked card)
+    - this card: stat threat printed cost of the picked card, until the end of the round
+
+## 143067 Saruman's Orders
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+143067:A:1 (front): When Revealed: Each player must choose: either return an enemy engaged with him to the staging area, or reveal an encounter card.
+  143067:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "return" (only if the actor has an enemy engaged):
+          - return one enemy engaged with the acting player (that player picks which) to the staging area
+        * option "reveal":
+          - the acting player reveals an encounter card
+
+143067:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, return attacking enemy to the staging area.
+  143067:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 143069 Follow the Orcs
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+143069:A:1 (front): Setup: Make Eastemnet the active location. Add Uglúk and To Isengard! to the staging area. Each player chooses 1 non-Fellowship hero he controls to be a Captive and places it faceup underneath To Isengard! (If playing campaign mode, choose each "captive" from the Campaign Log instead). Set the pursuit value to 10.
+  143069:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each seat the Campaign Log names a Captive for has that hero lie faceup under the card with code 143022
+    - for each player, first player first:
+      - if the number of Captives in play that belong to the acting seat is at most 0: choose hero (you control) that is not a fellowship card
+      - then, if the number of Captives in play that belong to the acting seat is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): the picked hero becomes a Captive: it lies faceup under the card with code 143022, in play and controlled by no one
+    - set the pursuit value to 10
+
+143069:B:1 (back): X is the pursuit value.
+  143069:constant:1: Constant
+    - this card: stat questPoints the pursuit value, while this card is in play
+
+143069:B:2 (back): Uglúk cannot leave the staging area or take damage.
+  143069:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy (any player controls) or in the staging area, named "Uglúk": stat cannotTakeDamage 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Uglúk": stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Uglúk": stat cannotLeaveStaging (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect) 1, while this card is in play
+
+143069:B:3 (back): Forced: At the end of the combat phase, increase the pursuit value by 1 for each enemy in the staging area.
+  143069:forced:1: Forced at the end of the phase
+    only if it is the Combat phase
+    - increase the pursuit value by the number of enemy (any player controls) in the staging area only
+
+## 143070 Rescue the Captives
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+143070:A:1 (front): When Revealed: Each player searches the encounter deck and discard pile for an Uruk-hai enemy, reveals it, and adds it to the staging area. Shuffle the encounter deck.
+  143070:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player searches the encounter deck and discard pile for a Uruk-hai enemy, reveals it and adds it to the staging area
+    - shuffle the encounter deck
+
+143070:B:1 (back): X is the pursuit value.
+  143070:constant:1: Constant
+    - this card: stat questPoints the pursuit value, while this card is in play
+
+143070:B:2 (back): Response: After an enemy is defeated, reduce the pursuit value by 1.
+  143070:response:1: Response after an enemy is destroyed
+    - reduce the pursuit value by 1 (never below 0)
+
+143070:B:3 (back): The players cannot defeat this stage while Uglúk is in play. If the players defeat this stage, they have rescued each Captive hero and won the game.
+  143070:constant:2: Constant
+    only if the card with code 143023 is in play
+    - the players cannot defeat this stage while this holds
+
+(rendered pieces: 191 by template, 1 as JSON)

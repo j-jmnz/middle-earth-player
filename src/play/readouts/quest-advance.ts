@@ -15,7 +15,7 @@ import { isOver } from "../../rules/engine/undo.ts";
 import { topFrame } from "../../rules/windows/windows.ts";
 
 import { advanceHold, questObjective, stagePoints } from "./objective.ts";
-import { STAGE_LOSS } from "../words/stormcaller.ts";
+import { STAGE_LOSS } from "../words/scenarios/stormcaller.ts";
 import type { TableMoment } from "../store/store.ts";
 
 /**

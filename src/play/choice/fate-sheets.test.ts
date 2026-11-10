@@ -12,7 +12,7 @@ import { pushCardEffects, pushEffectFrame } from "../../rules/interpret/effect-f
 import { CODES, idOf, loadWilderlandWorld, send, start, wilderlandTable, type Run, type WilderlandWorld } from "../../../test/scenarios/the-fate-of-wilderland/scene.ts";
 
 import { momentOf } from "../store/outcome.ts";
-import { fateNames } from "../words/fate-beats.ts";
+import { fateNames } from "../words/scenarios/fate-beats.ts";
 import { sheetFor } from "./sheets.ts";
 
 let world: WilderlandWorld;

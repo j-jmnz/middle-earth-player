@@ -13,7 +13,7 @@ import { slotNumbers } from "../../play/cards/card-effects";
 import { CardPreview } from "../../play/cards/card-preview";
 import { standInText } from "../../play/cards/dungeon-preview";
 import { causeKey, type LogNames } from "../../play/store/log";
-import { dockPills, dockTextWidth, foldAids, footPadOf } from "../../play/choice/dock/extras";
+import { dockPills, dockTextWidth, foldAids } from "../../play/choice/dock/extras";
 import { ChoiceTray } from "../../play/choice/tray";
 import { isDense } from "../../play/choice/dock/budget";
 import { MorePopoverView, useMorePopover } from "../../play/choice/dock/more";
@@ -21,7 +21,6 @@ import { railFor } from "../../play/phases/rail";
 import { dialTicksSelector, threatSelector } from "../../play/store/selectors";
 import { effectById, type ReduceContext, type TableStore } from "../../play/store/store";
 import { createHandoff } from "../../play/spotlight/handoff";
-import type { StageArea } from "../../play/spotlight/stage";
 import { PicturedCanvas, PicturedSpotlight } from "./pictured";
 import type { TableCanvasProps } from "../../play/canvas/table-canvas-types";
 import { MomentBanner } from "../../play/readouts/moment-banner";
@@ -39,7 +38,7 @@ import { pictureKey } from "../../play/canvas/picture-key";
 import { advanceButton, advanceFace, advanceWords } from "../../play/readouts/quest-advance";
 import { QuestAdvanceView } from "../../play/readouts/quest-advance-view";
 import { useQuestAdvance } from "../../play/readouts/use-quest-advance";
-import { PEEK_ROOM, PEEK_TOP } from "../../play/readouts/peek-banner";
+import { PEEK_ROOM } from "../../play/readouts/peek-banner";
 import { usePeek } from "../../play/store/use-peek";
 import { AreaSummary } from "../../play/canvas/area-summary";
 import { useTableChoice } from "../../play/choice/use-table-choice";
@@ -50,16 +49,16 @@ import { useTableTokens } from "../../ui/use-table-tokens";
 import { dockReadout } from "../../play/readouts/readout";
 import { questScaleOf } from "../../play/readouts/quest-scale";
 import { CommandHead } from "../../play/readouts/command-head-view";
-import { dockWithNumbers, HEAD_GAP, headPlan, headRoom, NUMBERS_ROW } from "../../play/readouts/command-head";
-import { columnReach, coveredTop, type RowFeet } from "../../play/layout/column-reach";
-import { campaignTokens, heldDial, nightmareCardId, widgetReadouts } from "../../play/readouts/widgets";
+import { HEAD_GAP, NUMBERS_ROW } from "../../play/readouts/command-head";
+import type { RowFeet } from "../../play/layout/column-reach";
+import { campaignTokens, heldDials, nightmareCardId, usePursuitReadout, widgetReadouts } from "../../play/readouts/widgets";
 import { whyNotChosen } from "../../play/choice/why";
 import { ledgerLine, ruleTitle, sideText } from "../../play/cards/ledger";
 import { notApplied } from "../../play/cards/not-applied";
 import { BodyText, NavBar, Screen } from "../kit/chrome";
 import { useTableBack } from "./use-table-back";
 import { TableTopBar, TOP_BAR } from "./top-bar";
-import { barTopOf } from "../../play/chrome/top-bar-layout";
+import { useTableLayout } from "./use-table-layout";
 import { goBack } from "../nav/go-back";
 import { useTablePictures } from "./use-table-pictures";
 import { pictureAt, useCardLookups } from "./card-lookups";
@@ -252,38 +251,15 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
   const tokenName = campaign?.name ?? null;
   const tokenCount = campaign?.tokens ?? null;
   const tokens = useMemo(() => (tokenName == null || tokenCount == null ? null : { name: tokenName, tokens: tokenCount }), [tokenName, tokenCount]);
-  const held = useMemo(() => heldDial(game, nameOf), [game, nameOf]);
+  const held = useMemo(() => heldDials(game, nameOf, (code) => ctx.cards.get(code)?.type === "enemy"), [game, nameOf, ctx]);
+  const pursuit = usePursuitReadout(game);
   // The Nightmare setup card next to the quest deck, on Nightmare: the Eye in the top bar opens it.
   const nightmareId = useMemo(() => nightmareCardId(game), [game]);
-  const commandWidth = commandWidthOf(screen.width, s);
-  // The head stands in the column's room above the dock (command-head.ts), the quest meter in the Quest phase only; while it shows, the dock keeps only the readout's result line.
-  const footPad = footPadOf(insets.bottom, s);
-  // Once stage 2B has split the table a peek shows the other seat's staging row, which the pill would cover: the canvas leaves the pill its room above the row.
-  const peekRoom = peek.words && game.separate === true ? (PEEK_ROOM - PEEK_TOP) * s : 0;
-  // The reach (the top rows wholly above the dock, which a crowded row may run on under, column-reach.ts) is planned without the head, against the dock with its
-  // numbers row, the same height whether or not the meter has taken it; the head then gets only the room under the rows the reach covers (no flip between the two).
   const questNumbers = choice.readout?.kind === "quest" && choice.readout.stats.length > 0;
-  const planDock = dockWithNumbers(dockHeight, numbersRow, questNumbers && !dockHasNumbers);
-  const column = { height: columnHeight, foot: footPad, dock: planDock, margin: 8 * s, top: peekRoom };
-  const reach = columnReach(column, feet);
-  const covered = coveredTop(column, feet, reach);
-  const room = headRoom(columnHeight, footPad, dockHeight, HEAD_GAP * s, covered);
-  const planRoom = headRoom(columnHeight, footPad, planDock, HEAD_GAP * s, covered);
-  const headShown = columnHeight > 0 && dockHeight > 0 && headPlan(planRoom, s, scale.live) !== "hidden";
-  const meterShown = headShown && scale.live;
-  // The screen the combat spotlight fills: its size, where the canvas's corner is on it (under the top bar, after the left inset and
-  // the left inset) and the safe insets (spotlight/stage.ts).
-  // The bar's top: under the top inset, and never at the screen's very edge (BAR_TOP).
-  const barTop = barTopOf(insets.top, s);
-  const barBottom = barTop + TOP_BAR * s;
-  const canvasX = size?.x ?? 0;
-  const stageArea = useMemo<StageArea>(
-    () => ({ width: screen.width, height: screen.height, origin: { x: insets.left + canvasX, y: barBottom }, safe: { top: insets.top, right: insets.right, bottom: insets.bottom, left: insets.left } }),
-    [screen.width, screen.height, insets.left, insets.top, insets.right, insets.bottom, canvasX, barBottom],
-  );
-  const narrow = (screen.width - insets.left - insets.right) / s < 760;
-  // A tap on a covered row reaches the canvas, which folds the tray or picks, so the tray's outside layer over the column starts under it.
-  const columnClear = reach === 0 || !feet ? 0 : peekRoom + (reach === 2 ? feet.engaged : feet.staging);
+  // The plan of the command column's room, the reach of the top rows and the spotlight's screen (use-table-layout.ts).
+  const { commandWidth, footPad, peekRoom, reach, room, meterShown, barTop, barBottom, stageArea, narrow, columnClear } = useTableLayout({
+    screen, insets, s, canvasX: size?.x ?? 0, columnHeight, dockHeight, numbersRow, dockHasNumbers, feet, peekWords: peek.words != null, separate: game.separate === true, questNumbers, scaleLive: scale.live,
+  });
   // How a card code is shown large, by picture key (src/play/canvas/picture-key.ts): the preview's cards and the advanced stage.
   const describe = (code: string, key = code) => ({
     name: nameOf(key),
@@ -343,9 +319,8 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
           stopAhead={stopAhead} carouselOpen={carouselOpen}
           narrow={narrow} areas={game.separate === true}
           ticks={ticks}
-          ringSeat={held?.seat}
-          ringWords={held?.words}
-          ringMark={held?.mark}
+          pursuit={pursuit}
+          held={held}
           menuOpen={menuOpen}
           onThreat={(threatSeat) => { choice.foldOutside(); setReading(peek.tap(threatSeat) ? null : { kind: "threat", seat: threatSeat }); }}
           onRail={() => setReading((now) => openReading(now, { kind: "carousel" }))}
@@ -355,7 +330,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
           {/* The command column's fade (below), under the canvas. */}
           <View pointerEvents="none" style={{ position: "absolute", top: 0, right: 0, bottom: 0, width: commandWidth, backgroundImage: `radial-gradient(100% 100% at 100% 100%, ${t.night} 0%, ${withAlphaHex(t.night, 0.92)} 35%, ${withAlphaHex(t.night, 0)} 100%)` }} />
           <View className="min-h-0 flex-1" style={{ paddingTop: peekRoom }} onLayout={onLayout}>
-            {/* Once stage 2B splits the table: whose staging area, which stage and how many cards, as one accessible line (words/area.ts). */}
+            {/* Once stage 2B splits the table: whose staging area, which stage and how many cards, as one accessible line (words/scenarios/area.ts). */}
             <AreaSummary store={store} nameOf={nameOf} />
             {size ? (
               <PicturedCanvas

@@ -9,10 +9,10 @@ import { effectsOf } from "../../rules/windows/listen.ts";
 
 import { asksPick, type AskedWords } from "./asks.ts";
 import { pickWords, type ChoiceNames } from "./choice.ts";
-import { grappleAsk, grappleFactsOf } from "./grapple.ts";
-import { seaAsk } from "./sea.ts";
-import { tradeWords } from "./uncharted.ts";
-import { wilderlandAsk } from "./wilderland.ts";
+import { grappleAsk, grappleFactsOf } from "./scenarios/grapple.ts";
+import { seaAsk } from "./scenarios/sea.ts";
+import { tradeWords } from "./scenarios/uncharted.ts";
+import { wilderlandAsk } from "./scenarios/wilderland.ts";
 
 /** What the instruction a player is asked about says to ask. `queue` is the instructions after the asked one (`queue[0]` is the next instruction), `picked` the card the effect last picked. */
 export function askWords(a: {

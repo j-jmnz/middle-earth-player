@@ -1,6 +1,6 @@
 ---
 name: reading-judge
-description: Reads each effect record, rendered as English, against the printed ledger line it implements and says ok, wrong or ambiguous. Use as soon as a scenario's or card's records are written, after `pnpm effects:render`, before tests or goldens. Read-only.
+description: Reads each effect record, rendered as English, against the printed ledger line it implements and says ok, wrong, ambiguous or render-gap. Use as soon as a scenario's or card's records are written, after `pnpm effects:render`, before tests or goldens. Read-only.
 model: opus
 tools: Read, Grep, Glob, Bash
 ---
@@ -17,18 +17,19 @@ The caller gives you the render (`pnpm effects:render <scenario-id | codes>`, wr
 
 ## What you judge
 
-For each ledger line, read the printed words first, then the English, and compare clause by clause: who acts, who chooses, when it happens, the amount and what it counts, the scope of a filter, the condition on each part, and what happens when the condition fails. Judge the English, not the renderer's wording: a stiff phrase is `ok` if the clause is right. Do not call a line `wrong` for a clause the English cannot show (a stat's engine name, a flag): say `ambiguous` and name it.
+For each ledger line, read the printed words first, then the English, and compare clause by clause: who acts, who chooses, when it happens, the amount and what it counts, the scope of a filter, the condition on each part, and what happens when the condition fails. Judge the English, not the renderer's wording: a stiff phrase is `ok` if the clause is right. Do not call a line `wrong` for a clause the English cannot show (a stat's engine name, a flag): say `render-gap` and name it.
 
 - `ok`: every clause of the printed line is in the English and nothing is added.
 - `wrong`: a clause is missing, extra, reversed or mis-scoped. Name the clause and what it should say.
-- `ambiguous`: the printed words, or a rule they lean on, allow two readings and the English picks one; or the English cannot show whether a clause holds. A line with no record, or with `[json ...]` you cannot read, is `ambiguous` unless the ledger marks it inert.
+- `ambiguous`: the printed words, or a rule they lean on, allow two readings and the English picks one. A line with no record, or with `[json ...]` you cannot read, is `ambiguous` unless the ledger marks it inert.
+- `render-gap`: the record may be right, but the English cannot show whether a clause holds (a stat's engine name, a flag, a field the template leaves out). Name the clause. It is not `ambiguous`, which is two readings of the card: the orchestrator files it (`docs/handover/agent-brief.md`, Scenario procedure, Judge).
 
 ## Output
 
 Exactly this, nothing before or after:
 
 ```
-<line id> | ok|wrong|ambiguous | <clause, or why>
+<line id> | ok|wrong|ambiguous|render-gap | <clause, or why>
 ```
 
 one row per ledger line in the render's order, then:
@@ -38,4 +39,4 @@ Needs ruling
 - <line id>: reading A / reading B (<rule id or card line that decides it, or "none found">)
 ```
 
-One entry for each reading that needs a ruling, and for each `ambiguous` row that is a real choice between two readings; write `Needs ruling` followed by `- none` when there is none. The author fixes every `wrong` before going on; a ruling is the caller's to ask for.
+One entry for each reading that needs a ruling, and for each `ambiguous` row that is a real choice between two readings; write `Needs ruling` followed by `- none` when there is none. The author fixes every `wrong` before going on, and a `render-gap` is not theirs to fix (Judge, in the same procedure); a ruling is the caller's to ask for.

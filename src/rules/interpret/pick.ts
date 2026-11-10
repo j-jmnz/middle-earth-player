@@ -1,4 +1,5 @@
 // Rules: rr.in-play-and-out-of-play, mec109.immune-to-player-card-effects, mec109.permanent (data/rules/entries.json).
+import { captiveIds } from "../families/captives/values.ts";
 import type { Instruction, PickSpec } from "../../catalog/boundary.ts";
 
 import { attachmentHostIds } from "../player/attach.ts";
@@ -78,6 +79,8 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
       .filter((card) => (inPlay(card.zone) || card.zone === "encounterDeck" || card.zone === "encounterDiscard") && printedOf(ctx.cards, card.code).campaignKind === "burden")
       .map((card) => card.id);
   }
+  // The Uruk-hai's Captives, alone or among the heroes (families/captives).
+  if (spec.captive === "only" || spec.captive === "free") return captiveIds(state, spec.captive, ctx.cards);
   const from = spec.from ?? "play";
   // Only the cards the running effect looked at or discarded (families/deck/pick.ts).
   if (spec.looked) return lookedPool(state, spec, seats);
@@ -133,6 +136,7 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
   } else {
     for (const index of seats) raw.push(...characters(state, index, ctx.cards));
   }
+  if (spec.captive === "include" && spec.control !== "you") raw.push(...captiveIds(state, "include", ctx.cards));
   return raw;
 }
 
@@ -297,7 +301,7 @@ export function pickCandidates(
     const instance = state.cards[id];
     if (!instance) return false;
     // Only an attachment a player may discard is offered for one (141071:A:2): a Permanent card on a hero is not.
-    if (spec.type === "attachment" && !counting && printedOf(ctx.cards, instance.code).keywords.permanent && state.cards[instance.host ?? ""]?.zone === "heroes") return false;
+    if (spec.type === "attachment" && !counting && printedOf(ctx.cards, instance.code).keywords.permanent && (state.cards[instance.host ?? ""]?.zone === "heroes" || state.cards[instance.host ?? ""]?.captive === true)) return false;
     if (playerEffect && !playerCardEffectCanChoose(printedOf(ctx.cards, instance.code), state, id)) return false;
     // "Immune to non-Master card effects": a card without that Trait cannot choose or affect it (families/misc/guards.ts).
     if (!counting && immuneToSource(state, id, sourceId, ctx)) return false;

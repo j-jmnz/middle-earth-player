@@ -43,7 +43,7 @@ export function attachHeroHosts(state: ScenarioState, to: Extract<Instruction, {
   const printed = (id: string): PrintedCard => printedOf(cards, state.cards[id]?.code ?? "");
   const heroes = seats.flatMap((seat) => state.seats[seat]?.heroes ?? []);
   const top = to.control === "highestThreatCost" ? Math.max(...heroes.map((id) => printed(id).threat ?? 0)) : null;
-  return heroes.filter((id) => (top == null || (printed(id).threat ?? 0) === top) && (to.exceptSphere == null || printed(id).sphere !== to.exceptSphere));
+  return heroes.filter((id) => (top == null || (printed(id).threat ?? 0) === top) && (to.exceptSphere == null || printed(id).sphere !== to.exceptSphere) && (to.trait == null || printed(id).traits.includes(to.trait)));
 }
 
 // The seat that chooses the host of an AttachSelf card that goes to a hero: the first player when it may go to any player's hero, the

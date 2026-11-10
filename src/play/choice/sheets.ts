@@ -8,32 +8,28 @@ import type { Effect } from "../../catalog/boundary.ts";
 import { rejectionReason } from "../../rules/engine/legal.ts";
 import { effectById, effectsOf } from "../../rules/windows/listen.ts";
 import { isLocationCard, isLocationId, printedOf } from "../../rules/core/printed.ts";
-import { hideWillpower } from "../../rules/quest/hide.ts";
 import { engagementCostOf, questPointsOf } from "../../rules/quest/quest.ts";
 import { legalTargets, type LegalIntent, type ReduceContext, type ScenarioState } from "../../rules/engine/reduce.ts";
-import type { Frame, GameEvent, ResponseOffer } from "../../rules/core/state.ts";
 import { topFrame } from "../../rules/windows/windows.ts";
 import { asksPlayers } from "../../rules/setup/resolution.ts";
 
 import { askWords } from "../words/ask.ts";
 import { askAt, asksChoose, asksOption, type AskedWords } from "../words/asks.ts";
 import { branchThreat, branchWords, outOfPlayLabel, type ChoiceNames } from "../words/choice.ts";
-import { islandBlocked, islandBlockedTitle, islandOptionLabel, islandTravelNote, islandTravelRow } from "../words/island.ts";
-import { grantedTravelWords, grappleOptionLabel, grappleTravel, returnsNote, travelNote } from "../words/grapple.ts";
-import { isFreedTreasureClaim, isTreasureDraw, wilderlandBranchNow, wilderlandChooseNote, wilderlandOptionLabel, wilderlandTravel } from "../words/wilderland.ts";
+import { islandBlocked, islandBlockedTitle, islandOptionLabel, islandTravelNote, islandTravelRow } from "../words/scenarios/island.ts";
+import { grantedTravelWords, grappleOptionLabel, grappleTravel, returnsNote, travelNote } from "../words/scenarios/grapple.ts";
+import { isFreedTreasureClaim, isTreasureDraw, wilderlandBranchNow, wilderlandChooseNote, wilderlandOptionLabel, wilderlandTravel } from "../words/scenarios/wilderland.ts";
 import { branchCaution, discardCaution } from "./wilderland-sheets.ts";
-import { heathLookNote } from "../words/heath.ts";
-import { seaOptionLabel, travelTaxCaution } from "../words/sea.ts";
-import { switchNote, unchartedNote, unchartedOptionLabel } from "../words/uncharted.ts";
+import { heathLookNote } from "../words/scenarios/heath.ts";
+import { seaOptionLabel, travelTaxCaution } from "../words/scenarios/sea.ts";
+import { unchartedNote, unchartedOptionLabel } from "../words/scenarios/uncharted.ts";
 import { commandDone, commandNote } from "../words/command.ts";
 import { DONE } from "../../rules/families/deck/choose.ts";
-import { branchNow, dealtNow } from "../words/aflame.ts";
+import { branchNow, dealtNow } from "../words/scenarios/aflame.ts";
 import { fireRow } from "./aflame-sheets.ts";
 import { committedNote, stormcallerTravel } from "./stormcaller-sheets.ts";
-import { cavesXChoice } from "../words/caves.ts";
+import { cavesXChoice } from "../words/scenarios/caves.ts";
 import { archerySheet, defenseSheet, extraDefender, playerAttackSheet } from "./combat-sheets.ts";
-import { threatRows } from "../store/foresight.ts";
-import { tokenOutcome } from "../words/oath.ts";
 import { cancelRequest, triggerRequest } from "./pay.ts";
 import { pictureKey } from "../canvas/picture-key.ts";
 import { STEP_WORDS } from "../phases/rail.ts";
@@ -46,13 +42,14 @@ import { islandMayTravel } from "../../rules/families/island/travel.ts";
 import { hideCommitLimit } from "../../rules/families/nightmare/guards.ts";
 import { sailingSheet, shipRow } from "./sea-sheets.ts";
 import { asksCollection, collectionLabel, collectionOrder } from "./collection-sheets.ts";
-import { cardLabel, has, option, statOf, step } from "./sheet-parts.ts";
-import { nightActionNote, nightResponseNote } from "../words/night.ts";
-import { framsburgActionCaution, framsburgActionNote, framsburgEngageNote, framsburgResponseNote } from "../words/framsburg.ts";
-import { fateEngageNote, fatePassCaution, fateResponseNote } from "../words/fate.ts";
-import { gundabadOptionLabel, gundabadPassCaution, gundabadResponseNote } from "../words/gundabad.ts";
+import { answeredCard, hideCommitNote, hideNumbers, lookNote, optionalEngageNote, responseNote } from "./sheet-notes.ts";
+import { captiveLabel, cardLabel, has, option, statOf, step } from "./sheet-parts.ts";
+import { nightActionNote } from "../words/scenarios/night.ts";
+import { framsburgActionCaution, framsburgActionNote } from "../words/scenarios/framsburg.ts";
+import { fatePassCaution } from "../words/scenarios/fate.ts";
+import { gundabadOptionLabel, gundabadPassCaution } from "../words/scenarios/gundabad.ts";
 import { gundabadRow } from "./gundabad-sheets.ts";
-import { TIMING_WORDS, type SheetStat, type HideNumbers, type PickOption, type Sheet, type SheetNames, type TriggerOption, type Unavailable } from "./sheet-types.ts";
+import { TIMING_WORDS, type SheetStat, type PickOption, type Sheet, type SheetNames, type TriggerOption, type Unavailable } from "./sheet-types.ts";
 
 function effectOf(ctx: ReduceContext, effectId: string): Effect | undefined {
   return effectById(ctx, effectId);
@@ -86,17 +83,6 @@ export function triggerOptions(game: ScenarioState, ctx: ReduceContext, legal: r
   return options;
 }
 
-function hideNumbers(game: ScenarioState, ctx: ReduceContext, frame: Frame | undefined): HideNumbers | null {
-  for (let index = game.stack.length - 1; index >= 0; index -= 1) {
-    const hide = game.stack[index];
-    const data = hide?.data;
-    if (!hide || data?.kind !== "hide") continue;
-    // The engine's own total: committed characters in play plus what the seat and the table hold for the test.
-    return { x: data.x, threat: data.threat, willpower: hideWillpower(game, hide.seat, data.committedIds, ctx), committed: data.committedIds };
-  }
-  return frame?.data.kind === "hide" ? { x: frame.data.x, threat: frame.data.threat, willpower: 0, committed: [] } : null;
-}
-
 /**
  * The locations in staging the players cannot travel to, each with the reducer's reason and the card's Travel line
  * (Weathertop while The One Ring is exhausted or gone: 141046:A:3, rr.travel). Nothing is listed while the active location slots are full.
@@ -115,45 +101,6 @@ export function travelRefusals(whole: ScenarioState, ctx: ReduceContext, names: 
     const line = lineOf(travel, names) ?? grantedTravelWords(game, id);
     return [{ id, label: cardLabel(game, names, id), code: pictureKey(card), reason: line ? `${reason}. ${line}` : `${reason}.` }];
   });
-}
-
-// The card the listed Responses answer. One window may hold the Responses of one occurrence (each character of one commit,
-// rr.triggering-condition): it is named after the card they answer when they share one, and not named when they do not.
-function answeredCard(event: GameEvent, offers: readonly ResponseOffer[], listed: readonly TriggerOption[]): string | null {
-  const about = (answered: GameEvent) => answered.subject ?? answered.cardId ?? null;
-  const cards = new Set(listed.flatMap((item) => offers.filter((offer) => offer.cardId === item.cardId && offer.effectId === item.effectId).map((offer) => about(offer.event ?? event))));
-  if (cards.size === 0) return about(event);
-  return cards.size === 1 ? ([...cards][0] ?? null) : null;
-}
-
-// A response window's sentence, naming the Responses of this occurrence that wait for a cost another one may pay
-// (rr.triggering-condition: Aragorn's ready waits for Théodred's resource).
-function responseNote(game: ScenarioState, names: SheetNames, offers: readonly { cardId: string; effectId: string; seat: number }[], listed: readonly TriggerOption[], ctx: ReduceContext, event: GameEvent | null): string {
-  const seat = game.window?.kind === "response" ? game.window.seat : game.activeSeat;
-  const waiting = offers.filter((offer) => offer.seat === seat && !listed.some((item) => item.cardId === offer.cardId && item.effectId === offer.effectId));
-  // At the end of the round, a card that counts tokens says what the count leads to (41050:B:1).
-  const leads = event?.trigger === "endOfRound" ? offers.flatMap((offer) => tokenOutcome(ctx, game.cards[offer.cardId]?.code ?? "")).slice(0, 1) : [];
-  const night = nightResponseNote(game, names, event, listed.map((item) => item.cardId)) ?? framsburgResponseNote(game, ctx, names, event, listed.map((item) => item.cardId)) ?? gundabadResponseNote(game, ctx, names, event, listed.map((item) => item.cardId)) ?? fateResponseNote(game, ctx, names, event, listed.map((item) => item.cardId));
-  const base = night ?? ["A Response may be used now, or passed.", ...leads].join(" ");
-  if (waiting.length === 0) return base;
-  // The side quest's sentence already says that passing gives it up.
-  return `${base} Waiting for its cost, and offered once it can be paid: ${waiting.map((offer) => names.card(offer.cardId)).join(", ")}.${night ? "" : " Passing gives it up too."}`;
-}
-
-// What the optional engagement is against: the seat's threat, and which enemies the engagement checks engage anyway or
-// leave in staging (rr.optional-engagement, rr.engagement-check).
-function optionalEngageNote(game: ScenarioState, ctx: ReduceContext, names: SheetNames): string {
-  const seat = game.activeSeat;
-  const rows = threatRows(game, ctx, seat);
-  const threat = game.seats[seat]?.threat ?? 0;
-  const anyway = rows.filter((row) => row.engagesSeat === seat).map((row) => `${names.card(row.id)} (${row.cost})`);
-  const stays = rows.filter((row) => row.engagesSeat == null).map((row) => `${names.card(row.id)} (${row.cost})`);
-  const parts = [`You may engage one enemy in staging. Your threat is ${threat}.`];
-  if (anyway.length > 0) parts.push(`The checks engage ${anyway.join(", ")} anyway.`);
-  if (stays.length > 0) parts.push(`${stays.join(", ")} ${stays.length === 1 ? "stays" : "stay"} in staging.`);
-  const barred = framsburgEngageNote(game, ctx, names, seat) ?? fateEngageNote(game, ctx, names);
-  if (barred) parts.push(barred);
-  return parts.join(" ");
 }
 
 /**
@@ -326,7 +273,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const kingsCaution = wait?.kind === "target" ? discardCaution(game, ctx, source, wait.item.instruction, data?.queue[0]?.instruction, id, names.card) : undefined;
           // An asks entry's warning is the row's own (asks.ts): it arms the confirm on that row only.
           const rowCaution = asked.cautions?.[id] ?? fire?.caution ?? ship?.caution ?? kingsCaution;
-          const label = (game.cards[id] ? undefined : asked.labels?.[id]) ?? fire?.label ?? sea ?? ship?.label ?? (collection ? collectionLabel(game, ctx, id, window.options, names) : outOfPlay ? outOfPlayLabel(game, id, words) : card.label);
+          const label = (game.cards[id] ? undefined : asked.labels?.[id]) ?? fire?.label ?? sea ?? ship?.label ?? captiveLabel(game, ctx, names, id, window.options) ?? (collection ? collectionLabel(game, ctx, id, window.options, names) : outOfPlay ? outOfPlayLabel(game, id, words) : card.label);
           // Another defender's pooled damage (Stand Together, families/defense/defenders.ts).
           const pooled = data?.effectId === DEFENDERS_FRAME ? extraDefender(game, ctx, id) : null;
           return { ...card, label, ...(wait?.kind === "target" && (isTreasureDraw(wait.item.instruction)) ? { code: id } : {}), ...(willpower.length > 0 ? { stats: willpower } : {}), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(rowCaution ? { caution: rowCaution } : {}), intent: { type: "Choose", optionId: id } };
@@ -342,7 +289,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       const sole = endOfRound && options.length > 0 && options.every((item) => item.cardId === options[0]?.cardId) ? (options[0]?.cardId ?? null) : null;
       const about = sole ?? (data?.kind === "responses" ? answeredCard(data.event, data.offers, options) : (frame?.cardId ?? null));
       const cancel = window.kind === "cancelOffer";
-      // A Response whose passing leaves the game unwinnable arms the Pass (words/gundabad.ts).
+      // A Response whose passing leaves the game unwinnable arms the Pass (words/scenarios/gundabad.ts).
       const passCaution = data?.kind === "responses" ? (gundabadPassCaution(game, ctx, data.event, options.map((item) => item.cardId)) ?? fatePassCaution(game, ctx, data.event, options.map((item) => item.cardId))) : null;
       return {
         kind: "trigger",
@@ -404,7 +351,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const travel = location ? recordsOfFace(location, effectsOf(ctx, location.code)).find((effect) => effect.timing === "travel") : undefined;
           const line = lineOf(travel, names);
           const base = option(game, names, id);
-          // On the Island Map: how far the location is, what a Temple location brings back, who attacks when the players go right (words/island.ts).
+          // On the Island Map: how far the location is, what a Temple location brings back, who attacks when the players go right (words/scenarios/island.ts).
           const mapped = islandTravelRow(game, ctx, id, names.card);
           // A Travel line that moves progress onto the Stormcaller's stage states what it leaves there, and arms the confirm when it advances the Stormcaller or loses the game.
           const caller = stormcallerTravel(game, ctx, id);
@@ -463,27 +410,4 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
     case "resolution":
       return wonSheet(game);
   }
-}
-
-// What a look window shows: a shadow card dealt to an enemy, the top of a player's deck, or the top of the encounter deck.
-function lookNote(game: ScenarioState, cardIds: readonly string[], seat: number, side?: "A"): string {
-  if (side === "A") return "The facedown side of a Lost Island. Nothing on it happens and it stays facedown.";
-  if (cardIds.some((id) => game.cards[id]?.zone === "shadow")) return "A shadow card dealt to an enemy attacking you. Nothing moves.";
-  const first = game.cards[cardIds[0] ?? ""];
-  if (first?.zone === "deck") {
-    const deck = game.seats[first.controller ?? seat]?.deck ?? [];
-    const end = deck[0] === first.id ? "top" : "bottom";
-    const count = cardIds.length;
-    const cards = count > 1 ? `The ${end} ${count} cards of` : `The ${end} of`;
-    return `${cards} ${first.controller === seat ? "your" : "that player's"} deck. ${switchNote(game, count) ?? "Nothing moves."}`;
-  }
-  const deck = game.encounterDeck;
-  return `The ${deck[0] === cardIds[0] || deck.length === 0 ? "top" : "bottom"} of the encounter deck. Nothing moves.`;
-}
-
-// The Hide sheet's note, with the most characters a card lets commit ("players cannot commit more than 2 characters to a Hide test",
-// 906106:A:1).
-function hideCommitNote(limit: number | null): string {
-  const base = "Commit characters to the Hide test. Their willpower is compared with the threat of the cards discarded.";
-  return limit == null ? base : `${base} No more than ${limit} can commit.`;
 }

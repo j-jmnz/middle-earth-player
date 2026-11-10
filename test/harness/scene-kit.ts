@@ -148,6 +148,7 @@ const STAND_INS = {
   raider: () => enemyCard("raider", { traits: ["Corsair", "Raider"], threat: 1, engagementCost: 10, attack: 2, defense: 1, health: 3 }),
   place: () => definePrinted({ code: "place", name: "place", type: "location", threat: 2, questPoints: 2 }),
   treachery: () => definePrinted({ code: "treachery", name: "treachery", type: "treachery" }),
+  attachment: () => definePrinted({ code: "attachment", name: "attachment", type: "attachment", sphere: "neutral", cost: 0 }),
   filler: () => eventCard("filler", 0),
   event: () => eventCard("event", 1),
   ally: () => allyCard("ally", 1),

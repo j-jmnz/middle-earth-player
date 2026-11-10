@@ -12,8 +12,8 @@ import type { Sheet, SheetNames } from "./sheet-types.ts";
 import { followAnswers, passableWindow, tableAnswer, usableIds, type StopSettings } from "../phases/stops.ts";
 import { effectsOf } from "../../rules/windows/listen.ts";
 import { stageName } from "../../rules/families/wilderland/gundabad.ts";
-import { fateNames } from "../words/fate-beats.ts";
-import { mustBypassLead } from "../words/gundabad-beats.ts";
+import { fateNames } from "../words/scenarios/fate-beats.ts";
+import { mustBypassLead } from "../words/scenarios/gundabad-beats.ts";
 import type { LegalIntent, ReduceContext, ScenarioState, TableMoment, TableStore } from "../store/store.ts";
 import { tableSettings, type TableSettings } from "../../ui/table-settings.ts";
 import { momentHoldMs, summaryHoldMs } from "../readouts/banner-time.ts";
@@ -48,7 +48,7 @@ export function useBanner(store: TableStore, ctx: ReduceContext, names: SheetNam
     (cardId: string) => stageText(ctx, store.getState().game.cards[cardId]?.code ?? "", names.line),
     [store, ctx, names],
   );
-  // The printed When Revealed lines of a stage, for the beat of the Stormcaller's advance (words/stormcaller.ts).
+  // The printed When Revealed lines of a stage, for the beat of the Stormcaller's advance (words/scenarios/stormcaller.ts).
   const revealed = useCallback(
     (cardId: string) => {
       const code = store.getState().game.cards[cardId]?.code ?? "";
@@ -57,10 +57,10 @@ export function useBanner(store: TableStore, ctx: ReduceContext, names: SheetNam
     },
     [store, ctx, names],
   );
-  // A stage of Mount Gundabad's quest deck by its reading (the stages print one title), and the lead of a bypass the stage forces (words/gundabad-beats.ts).
+  // A stage of Mount Gundabad's quest deck by its reading (the stages print one title), and the lead of a bypass the stage forces (words/scenarios/gundabad-beats.ts).
   const stageNamed = useCallback((cardId: string) => stageName(store.getState().game, ctx, cardId, names.card(cardId)), [store, ctx, names]);
   const mustBypass = useCallback((cardId: string) => mustBypassLead(ctx, store.getState().game.cards[cardId]?.code ?? ""), [store, ctx]);
-  // The lines of The Fate of Wilderland's banner: where the objective stands, the card an attack discards, the enemy that took no damage, the treachery that raises the staging area's Threat (words/fate-beats.ts).
+  // The lines of The Fate of Wilderland's banner: where the objective stands, the card an attack discards, the enemy that took no damage, the treachery that raises the staging area's Threat (words/scenarios/fate-beats.ts).
   const fate = useMemo(() => fateNames(ctx, names.card), [ctx, names]);
   // After it, the state it made. Read once per moment.
   const said = useMemo((): Moment | null => {

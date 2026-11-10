@@ -1,0 +1,508 @@
+Scenario piles that place cards with no record (quest: 19134 The Side Door; quest: 19135 Exploring Gundabad; quest: 19137 Exploring Gundabad; quest: 19138 Exploring Gundabad; quest: 19139 Exploring Gundabad; quest: 19140 Exploring Gundabad; quest: 19141 Exploring Gundabad; quest: 19142 Exploring Gundabad; staging: 19125 Dagnir; setAside: 19122 The First Forge; attachedChosen: 19143 Wormsbane; cavesDeck: 19123 Dagnir's Hoard; cavesDeck: 19124 Throat of the Mountain; cavesDeck: 18060 Lost Armory; cavesDeck: 18061 Ancient Treasury; cavesDeck: 18062 Frightful Den; cavesDeck: 18063 Lightless Grotto; cavesDeck: 18064 Crumbling Cavern; cavesDeck: 18065 Underground Lake)
+
+## 12193 Mount Gundabad
+
+12193:A:1 (front): You are playing campaign mode.
+  (inert: the engine applies it by rule, no record)
+
+12193:A:2 (front): Setup: If there are 6 or more treasures recorded in the campaign log, shuffle Dragon-sickness into the encounter deck. A player may search their deck for a unique boon ally and add it to their hand. If "Melanwar has given you guidance on traversing Wilderland," search the encounter deck for 2 non-unique locations and the Caves deck for 1 location and remove them from the game. If "Beldis's care has bolstered the heroes' spirits," search the encounter deck for 3 treacheries and remove them from the game. Flip this card.
+  12193:campaignSetup:1: Campaign setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"12194","when":{"kind":"treasuresLogged","min":6}}]
+    - [json SearchBoonAllyToHand {"verb":"SearchBoonAllyToHand"}]
+    - if the Campaign Log holds "melanwar": remove 2 non-unique locations from the encounter deck
+    - [json RemoveFromCavesIfLogged {"verb":"RemoveFromCavesIfLogged","line":"melanwar","count":1,"cardType":"location"}]
+    - if the Campaign Log holds "beldis": remove 3 treacheries from the encounter deck
+
+12193:B:1 (back): Ignore the discover keyword. Unique locations cannot be discarded from play by encounter card effects.
+  12193:constant:1: Constant
+    - ignore the discover keyword(s)
+  12193:constant:2: Constant
+    - each unique location (any player controls) or in the staging area: stat cannotBeDiscardedByEncounter 1, while this card is in play
+
+12193:B:2 (back): Resolution: The players may, as a group, look at 3 random undiscovered treasures and choose 1 to attach to an eligible character.
+  12193:resolution:1: Resolution
+    - [json ChooseRandomTreasure {"verb":"ChooseRandomTreasure","count":3}]
+
+12193:B:3 (back): The players discover each treasure they control.
+  12193:resolution:2: Resolution
+    - [json DiscoverTreasure {"verb":"DiscoverTreasure"}]
+
+12193:B:4 (back): Remove A Growing Threat from the campaign pool.
+  12193:resolution:3: Resolution
+    - [json RemoveFromPool {"verb":"RemoveFromPool","codes":["12167"]}]
+
+12193:B:5 (back): If there are 6 or more treasures recorded in the campaign log, add Dragon-sickness to the campaign pool.
+  12193:resolution:4: Resolution
+    - [json AddEncounterToPool {"verb":"AddEncounterToPool","codes":["12194"],"when":{"kind":"treasuresLogged","min":6}}]
+
+## 19122 The First Forge
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+19122:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+19122:A:2 (front): Forced: After The First Forge becomes the active location, exhaust the hero with Wormsbane attached. That hero cannot ready while The First Forge is the active location.
+  19122:forced:1: Forced after this location becomes the active location (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (any player controls) [also {"hasAttachment":{"names":["Wormsbane"]}}]
+    - exhaust the picked card
+    - the picked card: stat cannotReady 1, while this card is active
+
+19122:A:3 (front): Response: After The First Forge is explored, flip Wormsbane to its Reforged side and attach it to any hero.
+  19122:response:1: Response after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (any player controls)
+    - [json FlipInPlace {"verb":"FlipInPlace","code":"19143","into":"19144","attachTo":"picked"}]
+
+## 19123 Dagnir's Hoard
+(the scenario deals it into the cavesDeck pile; the piles place it, no record does)
+
+19123:A:1 (front): Forced: When Dagnir's Hoard is explored, Dagnir returns to the staging area and makes an immediate attack against each player in turn order.
+  19123:forced:1: Forced on the event locationExplored (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Dagnir"
+    - return the picked card to the staging area
+    - for each player, first player first:
+      - the picked enemy attacks the acting player now, from the staging area
+
+19123:A:2 (front): Response: After Dagnir's Hoard is explored, each player may search his deck for an Item attachment, add it to his hand, and shuffle his deck.
+  19123:response:1: Response after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "do" (only if there is a Item card (you control) in the deck, of card type attachment to choose):
+          - choose Item card (you control) in the deck, of card type attachment
+          - move the picked card to hand
+          - [json ShuffleDeck {"verb":"ShuffleDeck"}]
+        * option "decline":
+
+## 19124 Throat of the Mountain
+(the scenario deals it into the cavesDeck pile; the piles place it, no record does)
+
+19124:A:1 (front): Response: When Throat of the Mountain is explored, search the quest deck for a quest card and make it the current main quest. Then, flip it over. Shuffle the rest of the quest deck.
+  19124:response:1: Response after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    - [json SearchQuestDeck {"verb":"SearchQuestDeck"}]
+
+## 19125 Dagnir
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+19125:A:1 (front): Indestructible. Immune to player card effects. X is 1 more than the number of quest cards in the victory display.
+  (the keyword part is owned by the card's keywords; the records cover: X is 1 more than the number of quest cards in the victory display.)
+  19125:constant:1: Constant (record also names 19125:A:2)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat damageCap the number of card (any player controls) in the victory display, of card type quest + 1, while this card is in play
+    - this card: stat damageCapSparesQuest 1, while this card is in play
+
+19125:A:2 (front): Cannot take more than X damage each round.
+  19125:constant:1: Constant (record also names 19125:A:1)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat damageCap the number of card (any player controls) in the victory display, of card type quest + 1, while this card is in play
+    - this card: stat damageCapSparesQuest 1, while this card is in play
+
+19125:A:3 (front): While there are 5 or more quest cards in the victory display, Dagnir cannot leave the staging area and is considered to be engaged with each player.
+  19125:constant:2: Constant
+    only if the number of card (any player controls) in the victory display, of card type quest is at least 5
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
+    - this card: stat engagedWithAll 1, while this card is in play
+    - this card: stat attackableByAny 1, while this card is in play
+
+## 19126 Guardian of Gundabad
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19126:A:1 (front): While there are 3 or more quest cards in the victory display, Guardian of Gundabad gets +2 Defense.
+  19126:constant:1: Constant
+    only if the number of card (any player controls) in the victory display, of card type quest is at least 3
+    - this card: stat defense 2, while this card is in play
+
+19126:A:2 (shadow): Shadow: Attacking enemy gets +2 Defense until the end of the phase.
+  19126:shadow:1: Shadow
+    - the attacking enemy: stat defense 2, until the end of the phase
+
+## 19127 Dagnir's Slave
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19127:A:1 (front): Dagnir cannot take damage from non-quest effects.
+  19127:constant:1: Constant
+    - each enemy (any player controls) or in the staging area, named "Dagnir": stat cannotTakeNonQuestDamage 1, while this card is in play
+
+19127:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if Dagnir is engaged with you).
+  19127:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (there is a enemy (any player controls) engaged with you, named "Dagnir" to choose): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if there is a enemy (any player controls) engaged with you, named "Dagnir" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 19128 Deep-dweller
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19128:A:1 (front): Forced: When Deep-dweller engages you, it makes an immediate attack.
+  19128:forced:1: Forced after an enemy engages a player (heard about this card)
+    - this enemy attacks now, dealt a new shadow card after its old ones are discarded
+
+19128:A:2 (front): Forced: After Deep-dweller takes any amount of damage (and survives), return it to the staging area.
+  19128:forced:2: Forced after a card takes damage (heard about this card)
+    - return this card to the staging area
+
+## 19129 Mines of Gundabad
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19129:A:1 (front): Deep.
+  19129:constant:1: Constant
+    - [json Deep {"verb":"Deep"}]
+
+19129:A:2 (front): Dagnir gets -10 engagement cost.
+  19129:constant:2: Constant
+    - each enemy (any player controls) or in the staging area, named "Dagnir": stat engagementCost -10, while this card is in play
+
+19129:A:3 (shadow): Shadow: If attacking enemy is Dagnir, the defending player must assign X damage among characters he controls, where X is 1 more than the number of quest cards in the victory display.
+  19129:shadow:1: Shadow
+    - [json AssignDamage {"verb":"AssignDamage","amount":{"count":{"type":"card","control":"any","from":"victory","cardType":"quest"},"plus":1},"pick":{"type":"character","control":"you"},"when":{"kind":"matches","card":"attacker","pick":{"type":"enemy","control":"any","staging":true,"names":["Dagnir"]}}}]
+
+## 19130 Narrow Stair
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19130:A:1 (front): Deep.
+  19130:constant:1: Constant
+    - [json Deep {"verb":"Deep"}]
+
+19130:A:2 (front): When faced with the option to travel, the players must travel to Narrow Stair.
+  19130:constant:2: Constant
+    - [json Restrict {"verb":"Restrict","what":"travelOnly"}]
+
+19130:A:3 (shadow): Shadow: Until the end of the round, defending character cannot be readied by player card effects.
+  19130:shadow:1: Shadow
+    - the defender: stat cannotReadyByPlayerCard 1, until the end of the round
+
+## 19131 Desecrated Ruins
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19131:A:1 (front): Deep.
+  19131:constant:1: Constant
+    - [json Deep {"verb":"Deep"}]
+
+19131:A:2 (front): While there are 3 or more quest cards in the victory display, Desecrated Ruins gets +2 Threat.
+  19131:constant:2: Constant
+    only if the number of card (any player controls) in the victory display, of card type quest is at least 3
+    - this card: stat threat 2, while this card is in play
+
+19131:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, each player discards a random card from his hand.
+  19131:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): each player discards 1 random card(s) from hand
+
+## 19132 Wilderland's Bane
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19132:A:1 (front): When Revealed: Dagnir makes an immediate attack against each engaged player. If no attacks were made this way, Dagnir gets -30 engagement cost until the end of the round.
+  19132:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Dagnir"
+    - for each player, first player first:
+      - if any of: (there is a enemy (any player controls) engaged with you, named "Dagnir" to choose) or (the number of card (any player controls) in the victory display, of card type quest is at least 5): the picked enemy attacks the acting player now, from the staging area (or engaged)
+    - then, if [json condition {"kind":"noneReturned"}] (checked when this step runs, after the steps above; not tied to whether they did anything): each enemy (any player controls) or in the staging area, named "Dagnir": stat engagementCost -30, until the end of the round
+
+19132:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
+  19132:shadow:1: Shadow
+    - when the attack in progress ends:
+      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt no shadow card
+
+## 19133 Suffocating Shadows
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+19133:A:1 (front): When Revealed: Each player assigns X damage among allies he controls, where X is 1 more than the number of quest cards in the victory display.
+  19133:whenRevealed:1: When revealed
+    - [json AssignDamage {"verb":"AssignDamage","amount":{"count":{"type":"card","control":"any","from":"victory","cardType":"quest"},"plus":1},"pick":{"type":"ally","control":"you"},"who":"eachSeat"}]
+
+19133:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if there are 3 or more quests in the victory display).
+  19133:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the number of card (any player controls) in the victory display, of card type quest is at least 3): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the number of card (any player controls) in the victory display, of card type quest is at least 3 (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
+
+## 19134 The Side Door
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+19134:A:1 (front): Setup: Add Dagnir to the staging area and set The First Forge aside, out of play. Create the Caves deck and the quest deck (see insert). Attach Wormsbane to a hero, Broken side face-up. Shuffle the encounter deck and discard cards from the top until X locations have been discarded, where X is 1 less than the number of players in the game. Add those locations to the staging area.
+  19134:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json ShufflePile {"verb":"ShufflePile","pile":"caves"}]
+    - [json ShuffleStages {"verb":"ShuffleStages","codes":["19135","19137","19138","19139","19140","19141","19142"]}]
+    - [json SetAside {"verb":"SetAside","code":"19143"}]
+    - choose hero (you control) [also {"attachable":"19143"}]
+    - [json AttachSetAside {"verb":"AttachSetAside","code":"19143"}]
+    - shuffle the encounter deck
+    - for each player, first player first:
+      - [json DiscardUntil {"verb":"DiscardUntil","type":"location","when":{"kind":"not","condition":{"kind":"firstPlayer"}}}]
+      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"location","control":"any"},"inPlay":false}}]
+
+19134:B:1 (back): Forced: At the end of the planning phase, the first player looks at the top 2 cards of the quest deck and chooses 1 to place on the bottom of the quest deck. Then, add The Side Door to the victory display and advance to the top stage 2A of the quest deck.
+  19134:forced:1: Forced at the end of the phase
+    only if it is the Planning phase
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - advance to the next quest stage
+    - [json FlipCurrentQuest {"verb":"FlipCurrentQuest"}]
+  19134:forced:2: Forced on the event questCardDefeated (heard about this card)
+    - [json LookAtStages {"verb":"LookAtStages","count":2,"bottom":true}]
+
+## 19135 Exploring Gundabad
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+19135:A:1 (front): When Revealed: Return Dagnir to the staging area.
+  19135:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Dagnir"
+    - return the picked card to the staging area
+
+19135:A:2 (front): If Exploring Gundabad is the current main quest, do not flip it over until the beginning of the quest phase.
+  19135:constant:1: Constant
+    - [json FlipAtQuestPhase {"verb":"FlipAtQuestPhase"}]
+  19135:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    - [json FlipCurrentQuest {"verb":"FlipCurrentQuest"}]
+
+19135:B:1 (back): Forced: After characters are committed to the quest, raise each player's threat by 1.
+  19135:forced:2: Forced when the staging step begins, before the first card is revealed
+    - raise threat by 1 (each player)
+
+19135:B:2 (back): Forced: When this stage is defeated, shuffle The First Forge into the Caves deck.
+  19135:forced:3: Forced on the event questCardDefeated (heard about this card)
+    - [json ShuffleSetAsideIntoPile {"verb":"ShuffleSetAsideIntoPile","pile":"caves","code":"19122","count":1}]
+
+19135:B:3 (back): At the end of the combat phase, the players may bypass this stage.
+  19135:forced:4: Forced at the end of the phase
+    only if it is the Combat phase
+    - the first player chooses one of:
+      * option "bypass" (only if [json condition {"kind":"questDeck"}]):
+        - [json BypassStage {"verb":"BypassStage"}]
+      * option "stay":
+
+## 19137 Exploring Gundabad
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+19137:A:1 (front): When Revealed: Return Dagnir to the staging area.
+  19137:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Dagnir"
+    - return the picked card to the staging area
+
+19137:A:2 (front): If Exploring Gundabad is the current main quest, do not flip it over until the beginning of the quest phase.
+  19137:constant:1: Constant
+    - [json FlipAtQuestPhase {"verb":"FlipAtQuestPhase"}]
+  19137:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    - [json FlipCurrentQuest {"verb":"FlipCurrentQuest"}]
+
+19137:B:1 (back): The "when revealed" effects of the first treachery revealed each round cannot be canceled.
+  19137:constant:2: Constant
+    - [json UncancelableWhenRevealed {"verb":"UncancelableWhenRevealed","cardType":"treachery","firstRevealedEachRound":true}]
+
+19137:B:2 (back): Forced: When this stage is defeated, search the Caves deck for a location and make it the active location. Shuffle the Caves deck.
+  19137:forced:2: Forced on the event questCardDefeated (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json ActivateFromCaves {"verb":"ActivateFromCaves"}]
+    - [json ShufflePile {"verb":"ShufflePile","pile":"caves"}]
+
+19137:B:3 (back): At the end of the combat phase, the players may bypass this stage.
+  19137:forced:3: Forced at the end of the phase
+    only if it is the Combat phase
+    - the first player chooses one of:
+      * option "bypass" (only if [json condition {"kind":"questDeck"}]):
+        - [json BypassStage {"verb":"BypassStage"}]
+      * option "stay":
+
+## 19138 Exploring Gundabad
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+19138:A:1 (front): When Revealed: Return Dagnir to the staging area.
+  19138:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Dagnir"
+    - return the picked card to the staging area
+
+19138:A:2 (front): If Exploring Gundabad is the current main quest, do not flip it over until the beginning of the quest phase.
+  19138:constant:1: Constant
+    - [json FlipAtQuestPhase {"verb":"FlipAtQuestPhase"}]
+  19138:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    - [json FlipCurrentQuest {"verb":"FlipCurrentQuest"}]
+
+19138:B:1 (back): Forced: After characters are committed to the quest, discard the top 5 cards of the encounter deck. Add a random enemy discarded this way to the staging area.
+  19138:forced:2: Forced when the staging step begins, before the first card is revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard 5 card(s) from the top of the encounter deck
+    - [json StageRandomDiscarded {"verb":"StageRandomDiscarded","type":"enemy"}]
+
+19138:B:2 (back): Forced: When this stage is defeated, reduce each player's threat by 5.
+  19138:forced:3: Forced on the event questCardDefeated (heard about this card)
+    - lower threat by 5 (each player)
+
+19138:B:3 (back): At the end of the combat phase, the players may bypass this stage.
+  19138:forced:4: Forced at the end of the phase
+    only if it is the Combat phase
+    - the first player chooses one of:
+      * option "bypass" (only if [json condition {"kind":"questDeck"}]):
+        - [json BypassStage {"verb":"BypassStage"}]
+      * option "stay":
+
+## 19139 Exploring Gundabad
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+19139:A:1 (front): When Revealed: Return Dagnir to the staging area.
+  19139:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Dagnir"
+    - return the picked card to the staging area
+
+19139:A:2 (front): If Exploring Gundabad is the current main quest, do not flip it over until the beginning of the quest phase.
+  19139:constant:1: Constant
+    - [json FlipAtQuestPhase {"verb":"FlipAtQuestPhase"}]
+  19139:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    - [json FlipCurrentQuest {"verb":"FlipCurrentQuest"}]
+
+19139:B:1 (back): Forced: After characters are committed to the quest, Dagnir makes an immediate attack against each player with 6 or more characters.
+  19139:forced:2: Forced when the staging step begins, before the first card is revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Dagnir"
+    - for each player, first player first:
+      - if the number of character (you control) is at least 6: the picked enemy attacks the acting player now, from the staging area (or engaged)
+
+19139:B:2 (back): Forced: When this stage is defeated, deal 5 damage to Dagnir. This damage is not limited by Dagnir's text, and does not count toward her X value.
+  19139:forced:3: Forced on the event questCardDefeated (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Dagnir"
+    - deal 5 damage to the picked card
+
+19139:B:3 (back): At the end of the combat phase, the players may bypass this stage.
+  19139:forced:4: Forced at the end of the phase
+    only if it is the Combat phase
+    - the first player chooses one of:
+      * option "bypass" (only if [json condition {"kind":"questDeck"}]):
+        - [json BypassStage {"verb":"BypassStage"}]
+      * option "stay":
+
+## 19140 Exploring Gundabad
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+19140:A:1 (front): When Revealed: Return Dagnir to the staging area.
+  19140:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Dagnir"
+    - return the picked card to the staging area
+
+19140:A:2 (front): If Exploring Gundabad is the current main quest, do not flip it over until the beginning of the quest phase.
+  19140:constant:1: Constant
+    - [json FlipAtQuestPhase {"verb":"FlipAtQuestPhase"}]
+  19140:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    - [json FlipCurrentQuest {"verb":"FlipCurrentQuest"}]
+
+19140:B:1 (back): Each player cannot play more than 1 card each phase.
+  19140:constant:2: Constant
+    - [json LimitPlaysPerPhase {"verb":"LimitPlaysPerPhase","max":1}]
+
+19140:B:2 (back): Forced: When this stage is defeated, the first player looks at the top 2 cards of the quest deck and chooses 1 to place on the bottom of the quest deck. Then, flip over the top card of the quest deck.
+  19140:forced:2: Forced on the event questCardDefeated (heard about this card)
+    - [json LookAtStages {"verb":"LookAtStages","count":2,"bottom":true}]
+
+19140:B:3 (back): At the end of the combat phase, the players may bypass this stage.
+  19140:forced:3: Forced at the end of the phase
+    only if it is the Combat phase
+    - the first player chooses one of:
+      * option "bypass" (only if [json condition {"kind":"questDeck"}]):
+        - [json BypassStage {"verb":"BypassStage"}]
+      * option "stay":
+
+## 19141 Exploring Gundabad
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+19141:A:1 (front): When Revealed: Return Dagnir to the staging area.
+  19141:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Dagnir"
+    - return the picked card to the staging area
+
+19141:A:2 (front): If Exploring Gundabad is the current main quest, do not flip it over until the beginning of the quest phase.
+  19141:constant:1: Constant
+    - [json FlipAtQuestPhase {"verb":"FlipAtQuestPhase"}]
+  19141:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    - [json FlipCurrentQuest {"verb":"FlipCurrentQuest"}]
+
+19141:B:1 (back): Forced: After characters are committed to the quest, each player must deal 2 damage to a questing character he controls.
+  19141:forced:2: Forced when the staging step begins, before the first card is revealed
+    - for each player, first player first:
+      - if there is a character (you control) committed to the quest to choose: choose character (you control) committed to the quest
+      - then, if there is a character (you control) committed to the quest to choose (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the picked card
+
+19141:B:2 (back): Forced: When this stage is defeated, discard a non-unique enemy from play.
+  19141:forced:3: Forced on the event questCardDefeated (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if there is a non-unique enemy (any player controls) or in the staging area to choose: choose non-unique enemy (any player controls) or in the staging area, chosen by the first player
+    - then, if there is a non-unique enemy (any player controls) or in the staging area to choose (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+
+19141:B:3 (back): At the end of the combat phase, the players may bypass this stage.
+  19141:forced:4: Forced at the end of the phase
+    only if it is the Combat phase
+    - the first player chooses one of:
+      * option "bypass" (only if [json condition {"kind":"questDeck"}]):
+        - [json BypassStage {"verb":"BypassStage"}]
+      * option "stay":
+
+## 19142 Exploring Gundabad
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+19142:A:1 (front): When Revealed: Return Dagnir to the staging area.
+  19142:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Dagnir"
+    - return the picked card to the staging area
+
+19142:A:2 (front): If Exploring Gundabad is the current main quest, do not flip it over until the beginning of the quest phase.
+  19142:constant:1: Constant
+    - [json FlipAtQuestPhase {"verb":"FlipAtQuestPhase"}]
+  19142:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    - [json FlipCurrentQuest {"verb":"FlipCurrentQuest"}]
+
+19142:B:1 (back): Dagnir gets -5 engagement cost for each character the first player controls.
+  19142:constant:2: Constant
+    - each enemy (any player controls) or in the staging area, named "Dagnir": stat engagementCost minus (the number of character (you control) chosen by the first player x 5), while this card is in play
+
+19142:B:2 (back): Response: After a player resolves an attack against Dagnir, if Dagnir has no hit points remaining, that player may discard a Reforged Wormsbane he controls to add Dagnir to the victory display. Then, the players win the game.
+  19142:response:1: Response on the event attacked (heard about character (any player controls); answered by the player the event happened to)
+    only if all of: (the event's other card is a enemy (any player controls) or in the staging area, named "Dagnir") and (hit points of "Dagnir" - 1 is less than damage of "Dagnir")
+    - the acting player chooses one of:
+      * option "do" (only if there is a Reforged card (you control) named "Wormsbane" to choose):
+        - choose Reforged card (you control) named "Wormsbane"
+        - discard the picked card
+        - choose enemy (any player controls) or in the staging area, named "Dagnir"
+        - [json AddToVictory {"verb":"AddToVictory","target":"picked"}]
+        - the players win the game
+      * option "decline":
+
+19142:B:3 (back): At the end of the combat phase, if there are 4 or fewer quests in the victory display, the players must bypass this stage.
+  19142:forced:2: Forced at the end of the phase
+    only if all of: (it is the Combat phase) and (the number of card (any player controls) in the victory display, of card type quest is at most 4)
+    - [json BypassStage {"verb":"BypassStage"}]
+
+## 19144 Wormsbane
+
+19144:A:1 (front): Attach to a hero. Restricted.
+  19144:constant:1: Constant
+    - [json AttachesTo {"verb":"AttachesTo","host":{"kind":"hero"}}]
+
+19144:A:2 (front): Attached hero gets +X Attack, where X is 1 more than the number of quest cards in the victory display.
+  19144:constant:2: Constant
+    - its host: stat attack the number of card (any player controls) in the victory display, of card type quest + 1, while this card is in play
+
+19144:A:3 (front): If attached hero leaves play, the players lose the game.
+  19144:constant:3: Constant
+    - its host: stat lossOnLeavingPlay 1, while this card is in play
+
+(rendered pieces: 281 by template, 63 as JSON)

@@ -1,0 +1,254 @@
+Scenario piles that place cards with no record (quest: 01126 To the River...; quest: 01127 Anduin Passage; quest: 01128 Ambush on the Shore)
+
+## 01081 Wolf Rider
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01081:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+01081:A:2 (shadow): Shadow: Wolf Rider attacks the defending player. That player may declare 1 character as a defender. Deal Wolf Rider its own Shadow card. After combat, return Wolf Rider to the top of the encounter deck.
+  01081:shadow:1: Shadow
+    - [json ShadowAttacks {"verb":"ShadowAttacks"}]
+
+## 01082 Hill Troll
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01082:A:1 (front): Excess combat damage dealt by Hill Troll (damage that is dealt beyond the remaining hit points of the character damaged by its attack) must be assigned as an increase to your threat.
+  01082:constant:1: Constant
+    - this card: stat excessToThreat 1, while this card is in play
+
+## 01083 Goblin Sniper
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01083:A:1 (front): During the encounter phase, players cannot optionally engage Goblin Sniper if there are other enemies in the staging area.
+  01083:constant:1: Constant
+    only if all of: (it is the Encounter phase) and (this card is in the staging area) and (the number of enemy (any player controls) in the staging area only [also {"other":true}] is at least 1)
+    - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
+
+01083:A:2 (front): Forced: If Goblin Sniper is in the staging area at the end of the combat phase, each player deals 1 point of damage to 1 character he controls.
+  01083:forced:1: Forced at the end of the phase
+    only if all of: (it is the Combat phase) and (this card is in the staging area)
+    - for each player, first player first:
+      - choose character (you control)
+      - deal 1 damage to the picked card
+
+## 01084 Marsh Adder
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01084:A:1 (front): Forced: Each time Marsh Adder attacks you, raise your threat by 1.
+  01084:forced:1: Forced when this enemy attacks, before the defender is declared
+    - raise threat by 1 (the acting player)
+
+## 01085 Wargs
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01085:A:1 (front): Forced: If Wargs is dealt a shadow card with no effect, return Wargs to the staging area after it attacks.
+  01085:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    only if the enemy held a shadow card with no shadow effect (read when the attack ends, as the card the event is about)
+    - return this card to the staging area
+
+01085:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if this attack is undefended.)
+  01085:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attack has no defender): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 01086 Despair
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01086:A:1 (front): When Revealed: Remove 4 progress tokens from the current quest card. (If there are fewer than 4 progress tokens on the quest, remove all progress tokens from that quest.)
+  01086:whenRevealed:1: When revealed
+    - [json RemoveProgressFromQuest {"verb":"RemoveProgressFromQuest","amount":4}]
+
+01086:A:2 (shadow): Shadow: Defending character does not count its Defense.
+  01086:shadow:1: Shadow
+    - the defender: stat defense minus (defense of the defender), until the end of the attack
+
+## 01087 The Brown Lands
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01087:A:1 (front): Forced: After the players travel to The Brown Lands, place 1 progress token on it.
+  01087:forced:1: Forced after this location becomes the active location (heard about this card)
+    - place 1 progress on this card
+
+## 01088 The East Bight
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01088:A:1 (front): When faced with the option to travel, the players must travel to The East Bight if there is no active location.
+  01088:constant:1: Constant
+    - [json Restrict {"verb":"Restrict","what":"travelOnly"}]
+
+## 01111 Misty Mountain Goblins
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01111:A:1 (front): Forced: After Misty Mountain Goblins attacks, remove 1 progress token from the current quest.
+  01111:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    - [json RemoveProgressFromQuest {"verb":"RemoveProgressFromQuest","amount":1}]
+
+01111:A:2 (shadow): Shadow: Remove 1 progress token from the current quest. (3 progress tokens instead if this attack is undefended.)
+  01111:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json RemoveProgressFromQuest {"verb":"RemoveProgressFromQuest","amount":1,"when":{"kind":"not","condition":{"kind":"undefended"}}}]
+    - [json RemoveProgressFromQuest {"verb":"RemoveProgressFromQuest","amount":3,"when":{"kind":"undefended"}}]
+
+## 01112 Massing at Night
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01112:A:1 (front): When Revealed: Reveal X additional cards from the encounter deck. X is the number of players in the game.
+  01112:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+01112:A:2 (shadow): Shadow: Deal X shadow cards to this attacker. X is the number of players in the game.
+  01112:shadow:1: Shadow
+    - repeat the number of players times:
+      - [json DealShadowTo {"verb":"DealShadowTo","target":"attacker"}]
+
+## 01113 Banks of the Anduin
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01113:A:1 (front): Forced: If Banks of the Anduin leaves play, return it to the top of the encounter deck instead of placing it in the discard pile.
+  01113:forced:1: Forced after a card leaves play (heard about this card)
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"self","to":"deckTop"}]
+
+## 01114 Gladden Fields
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01114:A:1 (front): Forced: While Gladden Fields is the active location, each player must raise his threat by an additional point during the refresh phase.
+  01114:forced:1: Forced at the end of the phase
+    only if all of: (it is the Refresh phase) and (this card is the active location)
+    - raise threat by 1 (each player)
+
+## 01115 Eastern Crows
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01115:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+01115:A:2 (front): Forced: After Eastern Crows is defeated, shuffle it back into the encounter deck.
+  01115:forced:1: Forced after an enemy is destroyed (heard about this card)
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"self","to":"shuffle"}]
+
+01115:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if defending player's threat is 35 or higher.)
+  01115:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the actor's threat is at most 34: the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the actor's threat is at least 35 (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 01116 Evil Storm
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01116:A:1 (front): When Revealed: Deal 1 damage to each character controlled by each player with a threat of 35 or higher.
+  01116:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - if the actor's threat is at least 35: deal 1 damage to each character (you control)
+
+## 01117 Pursued by Shadow
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01117:A:1 (front): When Revealed: Each player raises his threat by 1 for each character he controls that is not currently committed to a quest.
+  01117:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - raise threat by the number of character (you control) not committed to the quest (the acting player)
+
+01117:A:2 (shadow): Shadow: Defending player chooses and returns 1 exhausted ally he controls to its owner's hand. If he controls no exhausted allies, raise his threat by 3.
+  01117:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (there is a exhausted ally (you control) to choose): raise threat by 3 (the acting player)
+    - then, if there is a exhausted ally (you control) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose exhausted ally (you control)
+    - [json ReturnToHand {"verb":"ReturnToHand","target":"picked","when":{"kind":"canPick","pick":{"type":"ally","control":"you","state":"exhausted"}}}]
+
+## 01118 Treacherous Fog
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01118:A:1 (front): When Revealed: Each location in the staging area gets +1 Threat until the end of the phase. Then, each player with a threat of 35 or higher chooses and discards 1 card from his hand.
+  01118:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each location (any player controls) in the staging area only: stat threat 1, until the end of the phase
+    - for each player, first player first:
+      - if the actor's threat is at least 35: discard 1 cards from hand
+
+## 01126 To the River...
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+01126:A:1 (front): Setup: Each player reveals 1 card from the top of the encounter deck, and adds it to the staging area.
+  01126:setup:1: Setup
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+01126:B:1 (back): When Revealed: Search the encounter deck for 1 Hill Troll (if one is not already in play), and place it in the staging area. Shuffle the encounter deck.
+  01126:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SearchMove {"verb":"SearchMove","code":"01082","to":"staging","when":{"kind":"inPlay","code":"01082","is":false}}]
+    - shuffle the encounter deck
+
+01126:B:2 (back): Players cannot defeat this stage while any Hill Troll cards are in play.
+  01126:constant:1: Constant
+    only if the card with code 01082 is in play
+    - the players cannot defeat this stage while this holds
+
+## 01127 Anduin Passage
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+01127:B:1 (back): Reveal 1 additional card from the encounter deck each quest phase. Do not make engagement checks during the encounter phase. (Each player may still optionally engage 1 enemy each encounter phase.)
+  01127:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the table: stat revealMore 1, while this card is in play
+    - the table: stat noEngagementChecks 1, while this card is in play
+
+## 01128 Ambush on the Shore
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+01128:B:1 (back): When Revealed: Reveal 2 encounter cards per player, and add them to the staging area.
+  01128:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+      - the acting player reveals an encounter card
+
+01128:B:2 (back): Skip the staging step of the quest phase for the remainder of the game.
+  01128:constant:1: Constant
+    - the table: stat skipStaging 1, while this card is in play
+
+01128:B:3 (back): Once there are no enemies in play, the players have won the game.
+  01128:constant:2: Constant
+    only if [json condition {"kind":"enemyInPlay","is":false}]
+    - the players win the game
+  01128:constant:3: Constant
+    - the players cannot defeat this stage while this holds
+
+## 01130 Journey Along the Anduin
+
+01130:A:1 (front): You are playing Campaign Mode.
+  (inert: the engine applies it by rule, no record)
+
+01130:A:2 (front): Setup: Put Mendor into play. Set each copy of Valor and Scarred aside, out of play.
+  01130:campaignSetup:1: Campaign setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json PutObjectiveAllyIntoPlay {"verb":"PutObjectiveAllyIntoPlay","code":"01135"}]
+    - [json SetAsideEachPlayer {"verb":"SetAsideEachPlayer","code":"01133"}]
+    - [json SetAsideEachPlayer {"verb":"SetAsideEachPlayer","code":"01138"}]
+
+01130:A:3 (front): Response: After a Hill Troll is defeated, each player attaches 1 set-aside copy of Valor to a hero they control, if able.
+  01130:response:1: Response after an enemy is destroyed (heard about enemy (any player controls) named "Hill Troll")
+    - for each player, first player first:
+      - choose hero (you control) [also {"attachable":"01133"}]
+      - [json AttachSetAside {"verb":"AttachSetAside","code":"01133"}]
+
+01130:A:4 (front): Forced: After a character is destroyed by a Hill Troll, each player attaches 1 set-aside copy of Scarred to a hero they control. (Limit once per game.)
+  01130:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls); limit once per game)
+    only if the event's other card is a enemy (any player controls) named "Hill Troll"
+    - for each player, first player first:
+      - choose hero (you control) [also {"attachable":"01138"}]
+      - [json AttachSetAside {"verb":"AttachSetAside","code":"01138"}]
+
+01130:A:5 (front): If Mendor leaves play, the players lose the game.
+  01130:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about card (any player controls) named "Mendor")
+    - the players lose the game
+
+01130:B:1 (back): Resolution: Add each copy of Valor and Scarred in play to the Campaign Pool. Record the names of heroes with Valor and/or Scarred attached in the notes section of the Campaign Log and attach them to those heroes when setting up each subsequent scenario in this campaign. The hero with the most damage will be taken prisoner at the beginning of Escape from Dol Guldur (in case of a tie, randomly select among the heroes with the most damage). Record the name of the "prisoner" in the notes section of the Campaign Log.
+  01130:resolution:1: Resolution
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json EarnAttached {"verb":"EarnAttached","codes":["01133","01138"]}]
+    - [json NamePrisoner {"verb":"NamePrisoner"}]
+
+(rendered pieces: 116 by template, 22 as JSON)

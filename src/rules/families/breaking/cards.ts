@@ -4,7 +4,7 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
-import { eliminateEmpties } from "../../core/keywords.ts";
+import { eliminateEmpties } from "../../core/eliminate.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
 import { fallenBase, FALLEN_SUFFIX } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";

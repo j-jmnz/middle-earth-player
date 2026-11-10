@@ -35,6 +35,7 @@ function base(expr: Obj, ctx: Ctx, pick: PickRenderer): { text: string; read: st
     return { text: `${expr.printed === true ? "printed " : ""}${statName(expr.stat)} of ${whose}`, read };
   }
   if (expr.players === true) return { text: "the number of players", read: ["players"] };
+  if (expr.pursuit === true) return { text: "the pursuit value", read: ["pursuit"] };
   if (expr.x === true) return { text: "X", read: ["x"] };
   if (expr.stage === true) return { text: "the stage number of the quest", read: ["stage"] };
   if (typeof expr.threat === "string") return { text: expr.threat === "tens" ? "the tens digit of your threat" : "your threat", read: ["threat"] };

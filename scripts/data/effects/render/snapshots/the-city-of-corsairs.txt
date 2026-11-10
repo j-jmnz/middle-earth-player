@@ -1,0 +1,415 @@
+Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar; quest: 12148 Fate of the Dream-chaser; quest: 12149 The Haven of Umbar; quest: 12150 Final Confrontation; staging: 12151 Stormcaller; staging: 12154 Southern Belfalas; setAside: 110138 Duskbringer; setAside: 110139 Glórinaith; setAside: 11080 Dream-chaser; setAside: 11081 Dawn Star; setAside: 11082 Nárelenya; setAside: 11083 Silver Wing; setAside: 11084 Navigation; corsairDeck: 12153 Umbar Slaver; corsairDeck: 11064 Umbar Raider; corsairDeck: 11065 Corsair Infiltrator; corsairDeck: 11066 Raid Leader; encounterDeck2: 12158 Captain Sahír; encounterDeck2: 12159 The Shattered Monument; encounterDeck2: 12160 Streets of Umbar; encounterDeck2: 12161 City of Corsairs; encounterDeck2: 12162 Umbar Harbor; encounterDeck2: 12163 Foes of Ecthelion; encounterDeck2: 12164 Umbar Patrol; encounterDeck2: 12165 Fury and Malice)
+
+## 110129 The Shattered Monument
+
+110129:A:1 (front): Each Raider enemy with at least 1 resource on it is immune to player events.
+  110129:constant:1: Constant
+    - each Raider enemy (any player controls) or in the staging area, with resources on it: stat immuneToPlayerEvents 1, while this card is in play
+
+110129:A:2 (front): Forced: At the beginning of the resource phase, place 1 resource on each Raider enemy in play.
+  110129:forced:1: Forced when a phase begins (record also names 110129:B:2)
+    only if it is the Resource phase
+    - for each Raider enemy (any player controls) or in the staging area:
+      - place 1 resource tokens on the picked card
+
+110129:B:1 (back): Campaign Mode only.
+  (inert: the engine applies it by rule, no record)
+
+110129:B:2 (back): Forced: At the beginning of the resource phase, place 1 resource on each Raider enemy in play.
+  110129:forced:1: Forced when a phase begins (record also names 110129:A:2)
+    only if it is the Resource phase
+    - for each Raider enemy (any player controls) or in the staging area:
+      - place 1 resource tokens on the picked card
+
+## 11215 The City of Corsairs
+
+11215:A:1 (front): You are playing Campaign Mode.
+  (inert: the engine applies it by rule, no record)
+
+11215:A:2 (front): Setup: Flip the Stormcaller to its "Campaign Mode only" side, then attach Black Key (burden) to it. Each player chooses a Modification boon for each of their ship-objectives and attaches it to that ship-objective. Shuffle Thunderstruck into the encounter deck. Shuffle Crowley into the Corsair deck.
+  11215:campaignSetup:1: Campaign setup (record also names 11215:A:3)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SetAside {"verb":"SetAside","code":"11172"}]
+    - [json SetAside {"verb":"SetAside","code":"11173"}]
+    - [json SetAside {"verb":"SetAside","code":"11174"}]
+    - [json SetAside {"verb":"SetAside","code":"11175"}]
+    - [json SetAside {"verb":"SetAside","code":"11192"}]
+    - [json SetAside {"verb":"SetAside","code":"11193"}]
+    - [json SetAside {"verb":"SetAside","code":"11210"}]
+    - [json SetAside {"verb":"SetAside","code":"11211"}]
+    - [json SetAside {"verb":"SetAside","code":"11212"}]
+    - [json SetAside {"verb":"SetAside","code":"11213"}]
+    - [json SetAside {"verb":"SetAside","code":"11214"}]
+    - [json SetAside {"verb":"SetAside","code":"11216"}]
+    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"11177"}]
+    - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
+    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Stormcaller"}]
+    - [json FitShips {"verb":"FitShips","codes":["11172","11173","11174","11175"]}]
+    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Calaerion","withCard":"Dream-chaser"}]
+    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Gavin","to":"anyPlayer","when":{"kind":"upgraded","code":"11210"}}]
+    - [json ChooseCards {"verb":"ChooseCards","codes":["11205","11206","11207","11208"],"who":"onePlayer","to":"hand","optional":true,"unearned":true,"afterMulligan":true}]
+
+11215:A:3 (front): Put Calaerion into play under the control of the player with the Dream-chaser. One player may choose a copy of Círdan's Blessing not in the Campaign Pool and add it to their hand. If "Gavin returned," put him into play under any player's control. Flip this card over.
+  11215:campaignSetup:1: Campaign setup (record also names 11215:A:2)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SetAside {"verb":"SetAside","code":"11172"}]
+    - [json SetAside {"verb":"SetAside","code":"11173"}]
+    - [json SetAside {"verb":"SetAside","code":"11174"}]
+    - [json SetAside {"verb":"SetAside","code":"11175"}]
+    - [json SetAside {"verb":"SetAside","code":"11192"}]
+    - [json SetAside {"verb":"SetAside","code":"11193"}]
+    - [json SetAside {"verb":"SetAside","code":"11210"}]
+    - [json SetAside {"verb":"SetAside","code":"11211"}]
+    - [json SetAside {"verb":"SetAside","code":"11212"}]
+    - [json SetAside {"verb":"SetAside","code":"11213"}]
+    - [json SetAside {"verb":"SetAside","code":"11214"}]
+    - [json SetAside {"verb":"SetAside","code":"11216"}]
+    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"11177"}]
+    - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
+    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Stormcaller"}]
+    - [json FitShips {"verb":"FitShips","codes":["11172","11173","11174","11175"]}]
+    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Calaerion","withCard":"Dream-chaser"}]
+    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Gavin","to":"anyPlayer","when":{"kind":"upgraded","code":"11210"}}]
+    - [json ChooseCards {"verb":"ChooseCards","codes":["11205","11206","11207","11208"],"who":"onePlayer","to":"hand","optional":true,"unearned":true,"afterMulligan":true}]
+
+11215:B:1 (back): Forced: When stage 2B is revealed, search the encounter deck and discard pile for each boon and non-Ship burden and shuffle them into the second encounter deck.
+  11215:forced:1: Forced on the event stageRevealed
+    only if the card the event is about is a card (any player controls) named "Fate of the Dream-chaser"
+    - [json CarryToSecondDeck {"verb":"CarryToSecondDeck","exceptBurdenTrait":"Ship"}]
+
+11215:B:2 (back): Forced: When Captain Sahír enters play, attach Black Key (burden) and The Black Sword to him.
+  11215:forced:2: Forced on the event encounterEnteredPlay (heard about enemy (any player controls) or in the staging area, named "Captain Sahír")
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Captain Sahír"}]
+    - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11216","to":"Captain Sahír"}]
+
+11215:B:3 (back): Refresh Action: Exhaust a hero to move 1 resource from The Black Sword to that hero's resource pool. If The Black Sword has no resources on it, remove it from the game. (Group limit once per round.)
+  11215:action:1: Action (limit once per round; any player may use it)
+    only if all of: (it is the Refresh phase) and (there is a card (any player controls) named "The Black Sword", with resources on it to choose) and (there is a ready hero (you control) to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose card (any player controls) named "The Black Sword", with resources on it
+    - choose ready hero (you control)
+    - exhaust the picked card
+    - [json MoveResources {"verb":"MoveResources","amount":1}]
+    - [json RemoveNamedFromGame {"verb":"RemoveNamedFromGame","name":"The Black Sword","when":{"kind":"count","pick":{"type":"card","control":"any","names":["The Black Sword"],"hasResources":true},"max":0}}]
+
+11215:B:4 (back): Resolution: The players win the campaign!
+  11215:resolution:1: Resolution
+    (no instructions)
+
+11215:B:5 (back): Gain the following:
+  11215:resolution:2: Resolution (record also names 11215:B:6)
+    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"survivingPlayer"}}]
+
+11215:B:6 (back): • 1 XP for each surviving player.
+  11215:resolution:2: Resolution (record also names 11215:B:5)
+    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"survivingPlayer"}}]
+
+11215:B:7 (back): • 1 XP for each of the following cards in the victory display: Corsair Warship, Shattered Monument, Crowley, and Stormcaller.
+  11215:resolution:3: Resolution
+    - [json GainXp {"verb":"GainXp","amount":1,"each":{"kind":"inVictory","codes":["11058","12159","110129","11178","12151"]}}]
+
+11215:B:8 (back): • 2 XP if Thunderstruck is in the victory display.
+  11215:resolution:4: Resolution
+    - [json GainXp {"verb":"GainXp","amount":2,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Thunderstruck"]},"min":1}}]
+
+11215:B:9 (back): • -1 XP if Ominous Fate is in the victory display.
+  11215:resolution:5: Resolution
+    - [json GainXp {"verb":"GainXp","amount":-1,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Ominous Fate"]},"min":1}}]
+
+## 12147 The Coast of Umbar
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+12147:A:1 (front): Setup: Shuffle the Coast of Umbar, Corsair Raiders, Stormy Weather, Umbar Fleet, and Voyage Across Belegaer encounter sets into one encounter deck and make it the active encounter deck. Set The City of Corsairs encounter set aside, as an inactive second encounter deck. Prepare the Corsair deck. Players prepare their fleet. Add the Stormcaller to the staging area. Add 1 copy of Southern Belfalas to the staging area (2 instead if there are 3 or 4 players in the game). Shuffle the encounter deck.
+  12147:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json PrepareCorsairDeck {"verb":"PrepareCorsairDeck"}]
+    - [json PrepareFleet {"verb":"PrepareFleet"}]
+    - shuffle the encounter deck
+
+12147:B:1: Sailing.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12147:B:2 (back): Progress cannot be placed on The Coast of Umbar if the players are off-course (Cloud, Rain, or Storm).
+  12147:constant:1: Constant
+    - if [json condition {"kind":"heading","is":"offCourse"}]: the table: stat noQuestProgress 1, while this card is in play
+
+12147:B:3 (back): If the Stormcaller is destroyed (or if this stage has 15 or more progress on it), advance to stage 2.
+  12147:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, named "Stormcaller")
+    - advance to the next quest stage
+
+## 12148 Fate of the Dream-chaser
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+12148:A:1 (front): When Revealed: Each player assigns damage among non-Ship characters he controls equal to the total damage on each Ship objective he controls. Discard all Ship enemies, Ship objectives, and Ocean locations in play.
+  12148:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - [json AssignDamage {"verb":"AssignDamage","amount":{"damageOn":{"type":"character","control":"you","trait":"Ship"}},"pick":{"type":"character","control":"you","notTraits":["Ship"]}}]
+    - [json DiscardAllInPlay {"verb":"DiscardAllInPlay","pick":{"type":"enemy","control":"any","staging":true,"trait":"Ship"}}]
+    - [json DiscardAllInPlay {"verb":"DiscardAllInPlay","pick":{"type":"character","control":"any","trait":"Ship"}}]
+    - [json DiscardAllInPlay {"verb":"DiscardAllInPlay","pick":{"type":"location","control":"any","trait":"Ocean"}}]
+
+12148:B:1 (back): When Revealed: Shuffle the Corsair deck and Corsair discard pile into the second encounter deck. Search the encounter deck and discard pile for each copy of Battle-hardened and each copy of Watch Tower, and shuffle them into the second encounter deck. Set the current encounter deck and discard pile aside, inactive. The second encounter deck becomes the active encounter deck. Advance to stage 3.
+  12148:whenRevealed:2: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SetAsideEncounterDeck {"verb":"SetAsideEncounterDeck","carry":["12156","11067"]}]
+    - [json ShuffleSetAsideSet {"verb":"ShuffleSetAsideSet","set":"The City of Corsairs"}]
+    - [json EndCorsairDeck {"verb":"EndCorsairDeck"}]
+    - advance to the next quest stage
+
+## 12149 The Haven of Umbar
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+12149:A:1 (front): When Revealed: Search the encounter deck for The Shattered Monument and Captain Sahír, and set them aside, out of play. Each player searches the encounter deck for 1 enemy and 1 location, and adds them to the staging area. If the Stormcaller was not destroyed at stage 1, add 1 resource to each Raider enemy in play.
+  12149:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SetAsideFromDeck {"verb":"SetAsideFromDeck","code":"12158"}]
+    - [json SetAsideFromDeck {"verb":"SetAsideFromDeck","code":"12159"}]
+    - [json SetAsideFromDeck {"verb":"SetAsideFromDeck","code":"110129"}]
+    - for each player, first player first:
+      - [json SearchMove {"verb":"SearchMove","type":"enemy","to":"staging"}]
+      - [json SearchMove {"verb":"SearchMove","type":"location","to":"staging"}]
+    - then, if [json condition {"kind":"inVictory","code":"12151","is":false}] (checked when this step runs, after the steps above; not tied to whether they did anything): for each Raider enemy (any player controls) or in the staging area:
+      - place 1 resource tokens on the picked card
+
+## 12150 Final Confrontation
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+12150:A:1 (front): When Revealed: Add The Shattered Monument to the staging area. Put Captain Sahír into play, engaged with the first player. Each player searches the encounter deck and discard pile for an enemy and adds it to the staging area. Shuffle the encounter deck. Add 1 resource to each Raider enemy in play.
+  12150:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"12159"}]
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"110129"}]
+    - [json EngageSetAside {"verb":"EngageSetAside","code":"12158"}]
+    - for each player, first player first:
+      - [json SearchMove {"verb":"SearchMove","type":"enemy","to":"staging"}]
+    - shuffle the encounter deck
+    - for each Raider enemy (any player controls) or in the staging area:
+      - place 1 resource tokens on the picked card
+
+12150:B:1 (back): While any enemy has resources on it, Captain Sahír gains indestructible.
+  12150:constant:1: Constant
+    only if the number of enemy (any player controls) or in the staging area, with resources on it is at least 1
+    - each enemy (any player controls) or in the staging area, named "Captain Sahír": stat indestructible 1, while this card is in play
+
+12150:B:2 (back): Forced: When a hero or enemy is destroyed, add its resources to Captain Sahír.
+  12150:forced:1: Forced on the event characterDestroyed (heard about hero (any player controls))
+    - for each enemy (any player controls) or in the staging area, named "Captain Sahír":
+      - place resources of the card the event is about resource tokens on the picked card
+  12150:forced:2: Forced after an enemy is destroyed (heard about enemy (any player controls))
+    - for each enemy (any player controls) or in the staging area, named "Captain Sahír":
+      - place resources of the card the event is about resource tokens on the picked card
+
+12150:B:3 (back): If Captain Sahír is destroyed, the players have finally put an end to the Corsairs' treacherous plot and win the game.
+  12150:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, named "Captain Sahír")
+    - the players win the game
+
+## 12151 Stormcaller
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+12151:A:1: Boarding 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12151:A:2 (front): Cannot have attachments.
+  12151:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+12151:A:3 (front): Forced: At the end of the round, if the Stormcaller is engaged with a player, either return it to the staging area or shift your heading off-course.
+  12151:forced:1: Forced at the end of the round
+    only if this card is engaged with the player
+    - the acting player chooses one of:
+      * option "staging":
+        - return this card to the staging area
+      * option "heading":
+        - [json ShiftHeading {"verb":"ShiftHeading","direction":"offCourse"}]
+
+## 12152 Slave Ship
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12152:A:1: Boarding 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+12152:A:2 (front): Cannot have attachments.
+  12152:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+12152:A:3 (front): For each point of damage that is dealt to a Ship objective by Slave Ship's attack, deal 1 point of damage to a non-Ship character controlled by the defending player, as well.
+  12152:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    - when the attack in progress ends:
+      - [json AssignDamage {"verb":"AssignDamage","amount":{"dealt":true},"pick":{"type":"character","control":"you","notTraits":["Ship"]},"when":{"kind":"all","conditions":[{"kind":"dealt"},{"kind":"matches","card":"other","pick":{"type":"character","control":"any","trait":"Ship"}}]}}]
+
+## 12153 Umbar Slaver
+(the scenario deals it into the corsairDeck pile; the piles place it, no record does)
+
+12153:A:1 (front): Umbar Slaver gets +1 Attack and +1 Threat for each resource on it.
+  12153:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat attack resources of this card, while this card is in play
+    - this card: stat threat resources of this card, while this card is in play
+
+12153:A:2 (front): Forced: After the engaged player spends any number of resources, place 1 of those resources on Umbar Slaver.
+  12153:forced:1: Forced on the event resourcesSpent (event happened to the controller)
+    only if this card is engaged with the player
+    - place 1 resource tokens on this card
+
+## 12154 Southern Belfalas
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+12154:A:1 (front): Travel: One player must reveal the top card of the Corsair deck and engage it to travel here.
+  12154:travel:1: Travel
+    - [json RevealCorsair {"verb":"RevealCorsair","who":"anyPlayer"}]
+
+12154:A:2 (shadow): Shadow: If this attack destroys a character, discard an ally controlled by the defending player.
+  12154:shadow:1: Shadow
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): choose ally (you control)
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+
+## 12155 Corsair Waters
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12155:A:1 (front): While Corsair Waters is the active location, no more than 1 ally can enter play each round.
+  12155:constant:1: Constant
+    only if this card is the active location
+    - [json LimitEntries {"verb":"LimitEntries","cardType":"ally","max":1}]
+
+12155:A:2 (shadow): Shadow: Either shift your heading off-course, or treat this attack as undefended.
+  12155:shadow:1: Shadow
+    - the acting player chooses one of:
+      * option "heading":
+        - [json ShiftHeading {"verb":"ShiftHeading","direction":"offCourse"}]
+      * option "undefended":
+        - this attack is considered undefended
+
+## 12156 Watch Tower
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12156:A:1 (front): While Watch Tower is in the staging area, it gains: "Forced: When a Raider enemy enters play, add 1 resource to it."
+  12156:forced:1: Forced on the event encounterEnteredPlay (heard about Raider enemy (any player controls) or in the staging area)
+    only if this card is in the staging area
+    - place 1 resource tokens on the card the event is about
+
+12156:A:2 (shadow): Shadow: If this attack destroys an ally, add resources to a Raider enemy in play equal to that character's printed resource cost.
+  12156:shadow:1: Shadow
+    - when the attack in progress ends:
+      - if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (the event's other card is a card (any player controls) of card type ally [also {"inPlay":false}]): choose Raider enemy (any player controls) or in the staging area
+      - then, if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (the event's other card is a card (any player controls) of card type ally [also {"inPlay":false}]) (checked when this step runs, after the steps above; not tied to whether they did anything): place cost of the event's other card resource tokens on the picked card
+
+## 12157 Serpent's Tail
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+12157:A:1 (front): When Revealed: Deal 1 shadow card to each Ship enemy in play. Then, if you are off-course (Cloud, Rain, or Storm), each Ship enemy in play gets -10 engagement cost until the end of the round.
+  12157:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each Ship enemy (any player controls) or in the staging area:
+      - [json DealShadowTo {"verb":"DealShadowTo","target":"picked"}]
+    - then, if [json condition {"kind":"heading","is":"offCourse"}] (checked when this step runs, after the steps above; not tied to whether they did anything): for each Ship enemy (any player controls) or in the staging area:
+      - the picked card: stat engagementCost -10, until the end of the round
+
+## 12158 Captain Sahír
+(the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
+
+12158:A:1 (front): Captain Sahír engages the first player.
+  12158:forced:1: Forced after an encounter card is added to the staging area (heard about this card)
+    - [json EngageFirstPlayer {"verb":"EngageFirstPlayer"}]
+
+12158:A:2 (front): For each point of damage Captain Sahír would take, discard 1 resource from him and cancel that damage.
+  12158:constant:1: Constant
+    - this card: stat resourceShield 1, while this card is in play
+
+12158:A:3 (front): For every 5 resources on Captain Sahír, he makes an additional attack against the engaged player each combat phase.
+  12158:forced:2: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card; limit once per round)
+    only if it is the Combat phase
+    - repeat resources of this card divided by 5, rounded down times:
+      - this enemy attacks now, dealt a new shadow card after its old ones are discarded
+
+## 12159 The Shattered Monument
+(the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
+
+12159:A:1 (front): Each Raider enemy with at least 1 resource on it is immune to player events.
+  12159:constant:1: Constant
+    - each Raider enemy (any player controls) or in the staging area, with resources on it: stat immuneToPlayerEvents 1, while this card is in play
+
+12159:A:2 (front): Forced: At the beginning of the resource phase, add 1 resource to each Raider enemy in play.
+  12159:forced:1: Forced when a phase begins
+    only if it is the Resource phase
+    - for each Raider enemy (any player controls) or in the staging area:
+      - place 1 resource tokens on the picked card
+
+## 12160 Streets of Umbar
+(the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
+
+12160:A:1 (front): When faced with the option to travel, if Streets of Umbar is in the staging area, the players must either travel to a location named Streets of Umbar or add 2 resources to a Raider enemy in play.
+  12160:constant:1: Constant
+    only if this card is in the staging area
+    - [json TravelOrAddResources {"verb":"TravelOrAddResources","amount":2,"pick":{"type":"enemy","control":"any","staging":true,"trait":"Raider"}}]
+
+12160:A:2 (shadow): Shadow: If attacking enemy is a Raider, deal it an additional shadow card for each resource token on it, to a maximum of 3 additional shadow cards.
+  12160:shadow:1: Shadow
+    - repeat resources of the attacking enemy, at most 3 times:
+      - [json DealShadowTo {"verb":"DealShadowTo","target":"attacker","when":{"kind":"matches","card":"attacker","pick":{"type":"enemy","control":"any","trait":"Raider"}}}]
+
+## 12161 City of Corsairs
+(the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
+
+12161:A:1 (front): X is the highest number of resources on a Raider enemy in play.
+  12161:constant:1: Constant
+    - this card: stat threat the resource tokens on Raider enemy (any player controls) or in the staging area (the most on any one), while this card is in play
+
+12161:A:2 (front): Travel: Search the encounter deck and discard pile for a Corsair enemy and add it to the staging area. Shuffle the encounter deck.
+  12161:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SearchMove {"verb":"SearchMove","trait":"Corsair","type":"enemy","to":"staging"}]
+    - shuffle the encounter deck
+
+## 12162 Umbar Harbor
+(the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
+
+12162:A:1 (front): While Umbar Harbor is the active location, Corsair enemies get +2 Defense.
+  12162:constant:1: Constant
+    only if this card is the active location
+    - each Corsair enemy (any player controls) or in the staging area: stat defense 2, while this card is in play
+
+12162:A:2 (shadow): Shadow: If attacking enemy is a Raider, move 1 resource from a hero you control to attacking enemy.
+  12162:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the attacking enemy is a Raider enemy (any player controls): choose hero (you control) with resources on it
+    - then, if the attacking enemy is a Raider enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) [also {"attackingEnemy":true}]
+    - [json MoveResources {"verb":"MoveResources","amount":1,"when":{"kind":"matches","card":"attacker","pick":{"type":"enemy","control":"any","trait":"Raider"}}}]
+
+## 12163 Foes of Ecthelion
+(the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
+
+12163:A:1 (front): When Revealed: Add 2 resources to a Raider enemy in the staging area. Each Raider enemy in the staging area gets +1 Threat for each resource on it until the end of the phase. If there are no Raider enemies in the staging area, Foes of Ecthelion gains surge.
+  12163:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose Raider enemy (any player controls) in the staging area only
+    - place 2 resource tokens on the picked card
+    - for each Raider enemy (any player controls) in the staging area only:
+      - the picked card: stat threat resources of the picked card, until the end of the phase
+    - [json GainSurge {"verb":"GainSurge","when":{"kind":"count","pick":{"type":"enemy","control":"any","stagingOnly":true,"trait":"Raider"},"max":0}}]
+
+## 12164 Umbar Patrol
+(the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
+
+12164:A:1 (front): When Revealed: Each player returns an enemy engaged with him to the staging area. Until the end of the round, enemies cannot be optionally engaged. If there are no enemies in the staging area, search the encounter deck and discard pile for an enemy and add it to the staging area.
+  12164:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - return one enemy engaged with a player (that player picks which) to the staging area
+    - the table: stat cannotBeOptionallyEngaged 1, until the end of the round
+    - [json SearchMove {"verb":"SearchMove","type":"enemy","to":"staging","when":{"kind":"count","pick":{"type":"enemy","control":"any","stagingOnly":true},"max":0}}]
+
+## 12165 Fury and Malice
+(the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
+
+12165:A:1 (front): When Revealed: Add 1 resource to each engaged Raider enemy. Then, each player assigns damage among characters he controls equal to the number of resource tokens on Raider enemies engaged with him. If no damage is assigned by this effect, Fury and Malice gains surge.
+  12165:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each Raider enemy (any player controls):
+      - place 1 resource tokens on the picked card
+    - for each player, first player first:
+      - [json AssignDamage {"verb":"AssignDamage","amount":{"resourcesOn":{"type":"enemy","control":"any","engaged":"you","trait":"Raider"}},"pick":{"type":"character","control":"you"}}]
+    - [json GainSurge {"verb":"GainSurge","when":{"kind":"count","pick":{"type":"enemy","control":"any","trait":"Raider"},"max":0}}]
+
+(rendered pieces: 192 by template, 87 as JSON)

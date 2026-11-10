@@ -1,5 +1,5 @@
 // Rules: rr.first-player, rr.search, rr.cancel, rr.damage (data/rules/entries.json); ledger lines 11176:A:3, 18060:A:1, 01089:A:1.
-// The words of Mount Gundabad are told only in Mount Gundabad (words/gundabad.ts, inGundabad). Each expectation below is what the sheet said before Mount Gundabad had words (run against the commit before it). The cards below share the shape of one of its choices with a record of another game, and their sheets read as they did before Mount Gundabad had words: the Choose that discards
+// The words of Mount Gundabad are told only in Mount Gundabad (words/scenarios/gundabad.ts, inGundabad). Each expectation below is what the sheet said before Mount Gundabad had words (run against the commit before it). The cards below share the shape of one of its choices with a record of another game, and their sheets read as they did before Mount Gundabad had words: the Choose that discards
 // to add a card to the victory display (Ominous Fate, Dream-chaser), the "may" that searches the deck for an attachment (Lost Armory, The King's Quest and The Withered Heath), and the pick of a questing character that is damaged (Passage Through Mirkwood).
 import { beforeAll, describe, expect, it } from "vitest";
 

@@ -1,0 +1,576 @@
+Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; quest: 141026 Into the Wild; quest: 141027 The Ringwraiths Attack; staging: 141045 The Prancing Pony; staging: 141051 Bill Ferny; setAside: 141046 Weathertop; setAside: 141048 Midgewater; setAside: 141068 The Witch-king; setAside: 141069 Ringwraith)
+
+## 141018 Tireless Ranger
+
+141018:A:1: Permanent.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+141018:A:2 (front): Setup: Attach to a hero.
+  141018:setup:1: Setup
+    - attach this card to a hero
+
+141018:A:3 (front): Attached hero gets +1 Defense and gains the Ranger trait.
+  141018:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - its host: stat defense 1, while this card is in play
+    - [json GrantTrait {"verb":"GrantTrait","trait":"Ranger"}]
+
+## 141019 Skilled Healer
+
+141019:A:1: Permanent.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+141019:A:2 (front): Setup: Attach to a hero.
+  141019:setup:1: Setup
+    - attach this card to a hero
+
+141019:A:3 (front): Attached hero gets +2 hit points and gains the Healer trait.
+  141019:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - its host: stat hitPoints 2, while this card is in play
+    - [json GrantTrait {"verb":"GrantTrait","trait":"Healer"}]
+
+## 141020 Valiant Warrior
+
+141020:A:1: Permanent.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+141020:A:2 (front): Setup: Attach to a hero.
+  141020:setup:1: Setup
+    - attach this card to a hero
+
+141020:A:3 (front): Attached hero gets +1 Attack and gains the Warrior trait.
+  141020:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - its host: stat attack 1, while this card is in play
+    - [json GrantTrait {"verb":"GrantTrait","trait":"Warrior"}]
+
+## 141021 Noble Hero
+
+141021:A:1: Permanent.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+141021:A:2 (front): Setup: Attach to a hero.
+  141021:setup:1: Setup
+    - attach this card to a hero
+
+141021:A:3 (front): Attached hero gets +1 Willpower and gains the Noble trait.
+  141021:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - its host: stat willpower 1, while this card is in play
+    - [json GrantTrait {"verb":"GrantTrait","trait":"Noble"}]
+
+## 141025 Trouble in Bree
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+141025:A:1 (front): Setup: Set all copies of Ringwraith, The Witch-king, Midgewater, and Weathertop aside, out of play. Add The Prancing Pony and Bill Ferny to the staging area. Shuffle the encounter deck.
+  141025:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SetAside {"verb":"SetAside","code":"141046"}]
+    - [json SetAside {"verb":"SetAside","code":"141048"}]
+    - [json SetAside {"verb":"SetAside","code":"141068"}]
+    - [json SetAside {"verb":"SetAside","code":"141069"}]
+    - [json AddToStaging {"verb":"AddToStaging","code":"141045"}]
+    - [json AddToStaging {"verb":"AddToStaging","code":"141051"}]
+    - shuffle the encounter deck
+
+141025:B:1 (back): The players cannot advance while The Prancing Pony is in play.
+  141025:constant:1: Constant
+    only if the card with code 141045 is in play
+    - the players cannot defeat this stage while this holds
+
+## 141026 Into the Wild
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+141026:B:1 (back): When Revealed: Add Midgewater to the staging area. Each player places 1 progress on the current quest.
+  141026:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"141048"}]
+    - [json PlaceQuestProgress {"verb":"PlaceQuestProgress","perPlayer":1}]
+
+141026:B:2 (back): Forced: At the end of the round, either remove X progress from the current quest or shuffle 1 out of play Ringwraith into the encounter deck. X is the number of players in the game.
+  141026:forced:1: Forced at the end of the round
+    - the first player chooses one of:
+      * option "progress" (only if [json condition {"kind":"questProgress"}]):
+        - [json RemoveQuestProgress {"verb":"RemoveQuestProgress","perPlayer":1}]
+      * option "ringwraith" (only if [json condition {"kind":"outOfPlay","code":"141069"}]):
+        - [json ShuffleOutOfPlayIntoEncounterDeck {"verb":"ShuffleOutOfPlayIntoEncounterDeck","code":"141069"}]
+
+141026:B:3 (back): The players cannot advance while Midgewater is in play.
+  141026:constant:1: Constant
+    only if the card with code 141048 is in play
+    - the players cannot defeat this stage while this holds
+
+## 141027 The Ringwraiths Attack
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+141027:A:1 (front): When Revealed: Add Weathertop and The Witch-king to the staging area. Search the encounter deck and discard pile and add each Nazgûl enemy found to the staging area. Shuffle the encounter deck.
+  141027:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"141046"}]
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"141068"}]
+    - [json SearchMove {"verb":"SearchMove","trait":"Nazgûl","type":"enemy","to":"staging","each":true}]
+    - shuffle the encounter deck
+
+141027:B:1 (back): If there are no Nazgûl enemies in play, the players win the game.
+  141027:constant:1: Constant
+    only if [json condition {"kind":"enemyInPlay","trait":"Nazgûl","is":false}]
+    - the players win the game
+
+## 141044 A Knife in the Dark
+
+141044:A:1 (front): You are playing Campaign Mode.
+  (inert: the engine applies it by rule, no record)
+
+141044:B:1 (back): Resolution: Starting with the first player, each player may choose one of the following boon cards and attach it to a hero he controls: Tireless Ranger, Skilled Healer, Valiant Warrior, Noble Hero. The chosen cards have been earned by the players.
+  141044:resolution:1: Resolution
+    - [json ChooseCards {"verb":"ChooseCards","codes":["141018","141019","141020","141021"],"who":"eachSeat","to":"hero","optional":true}]
+
+## 141045 The Prancing Pony
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+141045:A:1 (front): Response: After the players travel here, the first player puts 1 ally into play from his hand.
+  141045:response:1: Response after the players travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ally (you control) in hand, chosen by the first player [also {"intoPlay":true}]
+    - move the picked card into play under the first player's control
+
+141045:A:2 (front): Forced: After The Prancing Pony leaves play, discard cards from the top of the encounter deck until X enemies have been discarded. X is the number of players in the game. Put each enemy discarded by this effect into play engaged with the first player.
+  141045:forced:1: Forced after a card leaves play
+    - discard from the top of the encounter deck until 1 enemy for each player is discarded
+
+## 141046 Weathertop
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+141046:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+141046:A:2 (front): While Weathertop is in the victory display, each enemy in play gets -1 Threat.
+  141046:constant:1: Constant
+    only if this card is in the victory display
+    - every enemy in play: stat threat -1, while this card is in play
+
+141046:A:3 (front): Travel: The first player must exhaust The One Ring to travel here.
+  141046:travel:1: Travel
+    - exhaust the card with code 141085 (controlled by the first player)
+
+## 141047 Chetwood
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+141047:A:1 (front): While Chetwood is in the staging area, Spy enemies get +1 Threat and +1 Attack.
+  141047:constant:1: Constant
+    only if this card is in the staging area
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - every enemy in play (Spy only): stat threat 1, while this card is in play
+    - every enemy in play (Spy only): stat attack 1, while this card is in play
+
+141047:A:2 (shadow): Shadow: Defending player discards 1 random card from his hand.
+  141047:shadow:1: Shadow
+    - the acting player discards 1 random card(s) from hand
+
+## 141048 Midgewater
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+141048:A:1 (front): While Midgewater is the active location, enemies cannot attack, take damage, or be engaged.
+  141048:constant:1: Constant
+    only if this card is the active location
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - every enemy in play: stat cannotAttack 1, while this card is in play
+    - every enemy in play: stat cannotTakeDamage 1, while this card is in play
+    - every enemy in play: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
+
+141048:A:2 (front): Forced: After Midgewater becomes the active location, return each engaged enemy in play to the staging area.
+  141048:forced:1: Forced after this location becomes the active location
+    - return every enemy engaged with a player to the staging area
+
+## 141049 Weather Hills
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+141049:A:1 (front): Response: After the players travel here, place 1 non-unique enemy in play facedown under this location. While an enemy is under this location, it is out of play.
+  141049:response:1: Response after the players travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose non-unique enemy (any player controls) or in the staging area
+    - [json PlaceUnderSelf {"verb":"PlaceUnderSelf"}]
+
+141049:A:2 (front): Forced: After this location leaves play, return each enemy under it to the staging area face-up.
+  141049:forced:1: Forced after a card leaves play
+    - [json ReturnUnderToStaging {"verb":"ReturnUnderToStaging"}]
+
+## 141050 Rider of Mordor
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+141050:A:1 (front): Cannot have non-Morgul attachments.
+  141050:constant:1: Constant
+    only if this card is in play
+    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"Morgul"}]
+
+141050:A:2 (front): While Rider of Mordor is engaged with a player, characters that player controls get -1 Willpower.
+  141050:constant:2: Constant
+    only if this card is engaged with the player
+    - engagedSeatCharacters: stat willpower -1, while this card is in play
+
+141050:A:3 (front): While The One Ring is exhausted, Rider of Mordor gets -10 engagement cost.
+  141050:constant:3: Constant
+    only if the card with code 141085 in play is exhausted
+    - this card: stat engagementCost -10, while this card is in play
+
+## 141051 Bill Ferny
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+141051:A:1 (front): Players cannot optionally engage Bill Ferny.
+  141051:constant:1: Constant
+    - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
+
+141051:A:2 (front): Forced: At the beginning of the staging step, either shuffle 1 out of play Ringwraith into the encounter deck or each player raises his threat by 1 for each non-Fellowship hero he committed to the quest.
+  141051:forced:1: Forced when the staging step begins, before the first card is revealed
+    - the first player chooses one of:
+      * option "ringwraith" (only if [json condition {"kind":"outOfPlay","code":"141069"}]):
+        - [json ShuffleOutOfPlayIntoEncounterDeck {"verb":"ShuffleOutOfPlayIntoEncounterDeck","code":"141069"}]
+      * option "threat" (only if there is a hero (any player controls) committed to the quest, that is not a fellowship card to choose):
+        - raise threat by 1 (each player) for each non-fellowship hero committed to the quest
+
+## 141052 Shady Bree-Lander
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+141052:A:1 (front): While The One Ring is exhausted, Shady Bree-lander gains: "Cannot be optionally engaged."
+  141052:constant:1: Constant
+    only if the card with code 141085 in play is exhausted
+    - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
+
+141052:A:2 (shadow): Shadow: Defending character gets -1 Defense (-2 Defense instead if The One Ring is exhausted).
+  141052:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the defender: stat defense -1, until the end of the attack
+    - then, if the card with code 141085 in play is exhausted (checked when this step runs, after the steps above; not tied to whether they did anything): the defender: stat defense -1, until the end of the attack
+
+## 141053 Squint-Eyed Southerner
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+141053:A:1 (front): When Revealed: You must either shuffle an out of play Ringwraith into the encounter deck or reveal an additional encounter card.
+  141053:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "ringwraith" (only if [json condition {"kind":"outOfPlay","code":"141069"}]):
+        - [json ShuffleOutOfPlayIntoEncounterDeck {"verb":"ShuffleOutOfPlayIntoEncounterDeck","code":"141069"}]
+      * option "reveal":
+        - [json GainSurge {"verb":"GainSurge"}]
+
+## 141054 Unwanted Attention
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+141054:A:1: Peril.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+141054:A:2 (front): When Revealed: You must either remove 2 heroes you control from the quest or shuffle an out of play Ringwraith into the encounter deck.
+  141054:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "heroes" (only if there is a hero (you control) committed to the quest to choose):
+        - choose hero (you control) committed to the quest
+        - [json RemoveFromQuest {"verb":"RemoveFromQuest"}]
+        - choose hero (you control) committed to the quest
+        - [json RemoveFromQuest {"verb":"RemoveFromQuest"}]
+      * option "ringwraith" (only if [json condition {"kind":"outOfPlay","code":"141069"}]):
+        - [json ShuffleOutOfPlayIntoEncounterDeck {"verb":"ShuffleOutOfPlayIntoEncounterDeck","code":"141069"}]
+
+141054:A:3 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
+  141054:shadow:1: Shadow
+    - when the attack in progress ends:
+      - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 141055 Black Breath
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+141055:A:1: Peril.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+141055:A:2 (front): When Revealed: Attach to a hero you control. (Counts as a Condition attachment with the text: "Limit 1 per hero. Reduce attached hero's Willpower, Attack, and Defense to 0.")
+  141055:whenRevealed:1: When revealed
+    - attach this card to a hero
+  141055:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SetStat {"verb":"SetStat","stat":"willpower","value":0,"target":"host"}]
+    - [json SetStat {"verb":"SetStat","stat":"attack","value":0,"target":"host"}]
+    - [json SetStat {"verb":"SetStat","stat":"defense","value":0,"target":"host"}]
+    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+
+## 141068 The Witch-king
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+141068:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+141068:A:2 (front): The Witch-king gets -30 engagement cost while The One Ring is exhausted.
+  141068:constant:1: Constant
+    only if the card with code 141085 in play is exhausted
+    - this card: stat engagementCost -30, while this card is in play
+
+141068:A:3 (front): Characters with 1 Willpower or less cannot defend attacks made by The Witch-king.
+  141068:constant:2: Constant
+    - characters with Willpower 1 or less cannot be declared as defenders against this card's attacks (only this card's, not another enemy's)
+
+## 141069 Ringwraith
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+141069:A:1 (front): Cannot have non-Morgul attachments.
+  141069:constant:1: Constant
+    only if this card is in play
+    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"Morgul"}]
+
+141069:A:2 (front): Forced: When Ringwraith attacks, deal it an additional shadow card if The One Ring is exhausted.
+  141069:forced:1: Forced when this enemy attacks, before the defender is declared
+    only if the card with code 141085 in play is exhausted
+    - [json DealShadow {"verb":"DealShadow","additional":true}]
+
+141069:A:3 (shadow): Shadow: Shuffle this card into the encounter deck.
+  141069:shadow:1: Shadow
+    - [json ShuffleSelfIntoEncounterDeck {"verb":"ShuffleSelfIntoEncounterDeck"}]
+
+## 141070 Pale Blade
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+141070:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+141070:A:2 (front): When Revealed: Attach to a Nazgûl enemy in play, if able. (Counts as a Weapon attachment with the text: "Limit 1 per enemy. Attached enemy gets +1 Attack and cannot take non-combat damage.")
+  141070:whenRevealed:1: When revealed
+    - [json AttachSelf {"verb":"AttachSelf","to":{"kind":"enemy","trait":"Nazgûl"}}]
+  141070:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - its host: stat attack 1, while this card is in play
+    - its host: stat cannotTakeNonCombatDamage 1, while this card is in play
+
+## 141071 Power In Their Terror
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+141071:A:1 (front): When Revealed: Each ally gets -1 Willpower until the end of the round. Deal 2 damage to each ally with 0 Willpower.
+  141071:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - every ally in play, now and entering later: stat willpower -1, until the end of the round
+    - [json DamageAll {"verb":"DamageAll","amount":2,"type":"ally","maxWillpower":0}]
+
+141071:A:2 (shadow): Shadow: Discard a non-objective attachment you control.
+  141071:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (you control)
+    - discard the picked card
+
+## 141072 Pathless Country
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+141072:A:1 (front): Pathless Country gets +4 quest points while in the staging area.
+  141072:constant:1: Constant
+    only if this card is in the staging area
+    - this card: stat questPoints 4, while this card is in play
+
+141072:A:2 (shadow): Shadow: After this attack, the attacking enemy engages the next player then makes an immediate attack.
+  141072:shadow:1: Shadow
+    - when the attack in progress ends:
+      - [json EngageNextPlayer {"verb":"EngageNextPlayer","when":{"kind":"otherPlayer"}}]
+      - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+
+## 141073 Piercing Cry
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+141073:A:1: Peril.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+141073:A:2 (front): When Revealed: Search the encounter deck and discard pile for a Nazgûl enemy. Either add it to the staging area or put it into play engaged with the first player. Shuffle the encounter deck.
+  141073:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player chooses one of:
+      * option "staging" (only if [json condition {"kind":"searchable","trait":"Nazgûl"}]):
+        - [json SearchMove {"verb":"SearchMove","trait":"Nazgûl","to":"staging"}]
+      * option "engage" (only if [json condition {"kind":"searchable","trait":"Nazgûl"}]):
+        - [json SearchMove {"verb":"SearchMove","trait":"Nazgûl","to":"engagedFirstPlayer"}]
+    - shuffle the encounter deck
+
+141073:A:3 (shadow): Shadow: Attacking enemy makes an additional attack after this one.
+  141073:shadow:1: Shadow
+    - when the attack in progress ends:
+      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+
+## 141076 Lure of the Ring
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+141076:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+141076:A:2 (front): When Revealed: The first player must either exhaust The One Ring or raise his threat by 3.
+  141076:whenRevealed:1: When revealed
+    - the first player chooses one of:
+      * option "exhaust" (only if the card with code 141085 in play is ready):
+        - exhaust the card with code 141085
+      * option "threat":
+        - raise threat by 3 (the first player)
+
+141076:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if The One Ring is exhausted).
+  141076:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the card with code 141085 in play is exhausted (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
+
+## 141085 The One Ring
+
+141085:A:1 (front): Setup: The first player claims The One Ring and attaches it to the Ring-bearer.
+  141085:setup:1: Setup
+    - [json AttachToRingBearer {"verb":"AttachToRingBearer","code":"141085"}]
+
+141085:A:2 (front): Attached hero does not count against the hero limit. The first player gains control of attached hero.
+  141085:constant:1: Constant
+    only if this card is in play
+    - [json Restrict {"verb":"Restrict","what":"heroLimit"}]
+  141085:forced:1: Forced on the event firstPlayerTokenPassed
+    - [json TransferHost {"verb":"TransferHost","who":"firstPlayer"}]
+
+141085:A:3 (front): If The One Ring leaves play, the players lose the game.
+  (inert: the engine applies it by rule, no record)
+
+## 906201 A Knife in the Dark Nightmare
+
+906201:A:1 (front): You are playing Nightmare mode.
+  (inert: the engine applies it by rule, no record)
+
+906201:A:2 (front): While Bill Ferny is in the staging area, he gains: "Immune to player card effects."
+  906201:constant:1: Constant
+    - each enemy (any player controls) in the staging area only, named "Bill Ferny": stat immuneToPlayerCards 1, while this card is in play
+
+906201:B:1 (back): Begin with the standard quest deck and encounter deck for the A Knife in the Dark scenario.
+  (inert: the engine applies it by rule, no record)
+
+906201:B:2 (back): Remove the following cards, in the specified quantities, from the standard encounter deck:
+  (inert: the engine applies it by rule, no record)
+
+906201:B:3 (back): 4x Shady Bree-lander
+  (inert: the engine applies it by rule, no record)
+
+906201:B:4 (back): 3x Weather Hills
+  (inert: the engine applies it by rule, no record)
+
+906201:B:5 (back): 1x Unwanted Attention
+  (inert: the engine applies it by rule, no record)
+
+906201:B:6 (back): 3x Pathless Country
+  (inert: the engine applies it by rule, no record)
+
+906201:B:7 (back): 1x Weathertop
+  (inert: the engine applies it by rule, no record)
+
+906201:B:8 (back): Then, shuffle the encounter cards in this Nightmare Deck into the remainder of the standard A Knife in the Dark encounter deck.
+  (inert: the engine applies it by rule, no record)
+
+906201:B:9 (back): Finally, flip this setup card over and place it next to the quest deck. Its effect remains active throughout the game, which is now ready to begin.
+  (inert: the engine applies it by rule, no record)
+
+## 906202 Menacing Wraith
+
+906202:A:1 (front): Cannot have non-Morgul attachments.
+  906202:constant:1: Constant
+    only if this card is in play
+    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"Morgul"}]
+
+906202:A:2 (front): Forced: After The One Ring is exhausted, Menacing Wraith engages the first player and makes an immediate attack.
+  906202:forced:1: Forced on the event exhausted (heard about card (any player controls) named "The One Ring")
+    - for each player, first player first:
+      - if the actor holds the first player token: engage this card
+      - then, if the actor holds the first player token (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
+
+## 906203 Southern Spy
+
+906203:A:1 (front): When Revealed: Either shuffle an out of play Ringwraith into the encounter deck, or Southern Spy makes an immediate attack against you.
+  906203:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "ringwraith" (only if [json condition {"kind":"outOfPlay","code":"141069"}]):
+        - [json ShuffleOutOfPlayIntoEncounterDeck {"verb":"ShuffleOutOfPlayIntoEncounterDeck","code":"141069"}]
+      * option "attack":
+        - [json AttackActor {"verb":"AttackActor"}]
+
+906203:A:2 (shadow): Shadow: Defending character gets -1 Defense (-3 Defense instead if The One Ring is exhausted).
+  906203:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the defender: stat defense -1, until the end of the attack
+    - then, if the card with code 141085 in play is exhausted (checked when this step runs, after the steps above; not tied to whether they did anything): the defender: stat defense -2, until the end of the attack
+
+## 906204 Weathertop
+
+906204:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+906204:A:2 (front): The Witch-king cannot be damaged.
+  906204:constant:1: Constant
+    - each enemy (any player controls) named "The Witch-king": stat cannotTakeDamage 1, while this card is in play
+
+906204:A:3 (front): Forced: After Weathertop becomes the active location, exhaust The One Ring. The One Ring cannot ready while Weathertop is the active location.
+  906204:forced:1: Forced after this location becomes the active location
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - exhaust the card with code 141085
+    - choose card (any player controls) named "The One Ring"
+    - the picked card: stat cannotReady 1, while this card is in play
+
+## 906205 Weather Hills
+
+906205:A:1 (front): While the players are at stage 1, progress cannot be placed here.
+  906205:constant:1: Constant
+    only if the card with code 141025 is in play
+    - this card: stat noProgressPlaced 1, while this card is in play
+
+906205:A:2 (front): While The One Ring is exhausted, Weather Hills gets +2 Threat.
+  906205:constant:2: Constant
+    only if the card with code 141085 in play is exhausted
+    - this card: stat threat 2, while this card is in play
+
+906205:A:3 (shadow): Shadow: Attacking enemy gets +2 Attack.
+  906205:shadow:1: Shadow
+    - the attacking enemy: stat attack 2, until the end of the attack
+
+## 906206 The Old Road
+
+906206:A:1 (front): The Old Road enters play with 3 resource tokens on it.
+  906206:triggered:1: Triggered (mandatory, not printed as Forced) on the event encounterEnteredPlay (heard about this card)
+    - [json PlaceToken {"verb":"PlaceToken","amount":3}]
+
+906206:A:2 (front): Forced: At the end of the round, discard 1 resource token here. Then, if there are no resource tokens here, shuffle 1 out of play Ringwraith into the encounter deck.
+  906206:forced:1: Forced at the end of the round
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"self"}]
+    - [json ShuffleOutOfPlayIntoEncounterDeck {"verb":"ShuffleOutOfPlayIntoEncounterDeck","code":"141069","when":{"kind":"not","condition":{"kind":"matches","card":"self","pick":{"type":"location","control":"any","hasResources":true}}}}]
+
+## 906207 Forsaken Inn
+
+906207:A:1 (front): X is the number of characters the first player controls.
+  906207:constant:1: Constant
+    - this card: stat threat the number of character (you control) chosen by the first player, while this card is in play
+
+906207:A:2 (front): Travel: The first player searches the encounter deck and discard pile for a Spy enemy, reveals it, and adds it to the staging area. Shuffle the encounter deck.
+  906207:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the first player searches the encounter deck and discard pile for a Spy enemy, reveals it and adds it to the staging area
+    - shuffle the encounter deck
+
+## 906208 The Ring's Will
+
+906208:A:1 (front): When Revealed: Raise each player's threat by 5. This effect cannot be canceled by the Ring-bearer's effect, or if The One Ring is exhausted.
+  906208:whenRevealed:1: When revealed (cannot be canceled while the card with code 141085 in play is exhausted)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json NotCanceledBy {"verb":"NotCanceledBy","trait":"Ring-bearer"}]
+    - raise threat by 5 (each player)
+
+906208:A:2 (shadow): Shadow: After this attack, attacking enemy engages the next player then makes an immediate attack.
+  906208:shadow:1: Shadow
+    - when the attack in progress ends:
+      - [json EngageNextPlayer {"verb":"EngageNextPlayer","when":{"kind":"otherPlayer"}}]
+      - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+
+## 906209 Blade Tip
+
+906209:A:1: Surge. Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+906209:A:2 (shadow): Shadow: If the defending character is damaged by this attack, attach Blade Tip to that character. (Counts as a Condition attachment with the text: "Forced: At the end of the refresh phase, raise your threat by 2.")
+  906209:shadow:1: Shadow
+    - [json AttachToDamagedDefender {"verb":"AttachToDamagedDefender"}]
+  906209:forced:1: Forced at the end of the phase
+    only if it is the Refresh phase
+    - raise threat by 2 (hostController)
+  906209:constant:1: Constant
+    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+
+(rendered pieces: 212 by template, 62 as JSON)

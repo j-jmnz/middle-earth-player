@@ -7,20 +7,20 @@ import { useStore } from "zustand";
 
 import type { CardInstance, ScenarioState } from "../../rules/core/state.ts";
 
-import { stagingWord } from "../words/area.ts";
+import { stagingWord } from "../words/scenarios/area.ts";
 import { beatIds } from "../store/beat-store.ts";
-import { lookIdsOf, lookStripWords } from "../words/wilderland.ts";
+import { lookIdsOf, lookStripWords } from "../words/scenarios/wilderland.ts";
 import { treasureSpeech } from "../cards/dungeon-preview.ts";
 import { lookedIds } from "../../rules/families/sea/sailing.ts";
 
 import { NO_HIGHLIGHT } from "../store/peek.ts";
 import { nameOfCard, pictureKey } from "./picture-key.ts";
-import { grappleTell } from "../words/grapple.ts";
-import { islandTell } from "../words/uncharted.ts";
+import { grappleTell } from "../words/scenarios/grapple.ts";
+import { islandTell } from "../words/scenarios/uncharted.ts";
 import { stageFactsOf } from "../store/stormcaller-table.ts";
-import { areaTell } from "../words/stormcaller.ts";
+import { areaTell } from "../words/scenarios/stormcaller.ts";
 import { headingStepOf, headingLook } from "../dream-chaser/heading.ts";
-import { headingLine, pileCountWords, secondSlotLine, shipsLine } from "../words/sea.ts";
+import { headingLine, pileCountWords, secondSlotLine, shipsLine } from "../words/scenarios/sea.ts";
 import { PILE_WORDS, PILES, hidesFace, isPrisoner, pileIds, secondPilesOf, TABLE_ZONES, pileSelector, shownSeat, zoneSelector, type PileId, type ZoneId } from "../store/selectors.ts";
 import type { SlotInfo, TableCanvasProps } from "./table-canvas-types.ts";
 import type { TableTokens } from "../../ui/tokens.ts";

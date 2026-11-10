@@ -1,0 +1,335 @@
+Scenario piles that place cards with no record (quest: 18066 Traveling North; quest: 18067 Woodmen Under Attack; quest: 18068 The Passage of the Ford; setAside: 18016 The Old Ford; setAside: 18069 Woodmen Village; evilCreaturesDeck: 01081 Wolf Rider; evilCreaturesDeck: 01082 Hill Troll; evilCreaturesDeck: 01083 Goblin Sniper; evilCreaturesDeck: 01084 Marsh Adder; evilCreaturesDeck: 01085 Wargs)
+
+## 120165 Journey Up the Anduin
+
+120165:A:1 (front): You are playing campaign mode.
+  (inert: the engine applies it by rule, no record)
+
+120165:A:2 (front): Setup: Any player gains control of Turayn. Shuffle A Growing Threat into the encounter deck.
+  120165:campaignSetup:1: Campaign setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json PutObjectiveAllyIntoPlay {"verb":"PutObjectiveAllyIntoPlay","code":"12166"}]
+    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"12167"}]
+
+120165:A:3 (front): Response: After you explore a non-unique location, put a resource here. Then, if there are X resources here, the players look at 3 random undiscovered treasures and choose 1 to attach to an eligible character. X is 3 more than the number of players in the game.
+  120165:response:1: Response on the event locationExplored (heard about non-unique location (any player controls))
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json PlaceToken {"verb":"PlaceToken","amount":1}]
+    - [json ClaimRandomTreasure {"verb":"ClaimRandomTreasure","count":3,"when":{"kind":"all","conditions":[{"kind":"less","left":{"players":true,"plus":2},"right":{"stat":"resources","of":"self"}},{"kind":"less","left":{"stat":"resources","of":"self"},"right":{"players":true,"plus":4}}]}}]
+    - then, if all of: (the number of players + 2 is less than resources of this card) and (resources of this card is less than the number of players + 4) (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) chosen by the first player [also {"hostForPicked":true}]
+    - [json AttachPicked {"verb":"AttachPicked","when":{"kind":"all","conditions":[{"kind":"less","left":{"players":true,"plus":2},"right":{"stat":"resources","of":"self"}},{"kind":"less","left":{"stat":"resources","of":"self"},"right":{"players":true,"plus":4}}]}}]
+
+120165:B:1 (back): Resolution: The heroes' selfless valor in protecting the refugees from Harad has inspired Turayn. If the heroes choose to accept his aid, add Turayn to the campaign pool (any player may add him to their deck). Otherwise, mark in the campaign log that "Turayn has taken an oath of vigilance" (he will follow the heroes' example and continue to protect the free folk of Wilderland).
+  120165:resolution:1: Resolution
+    - [json BoonAllyOrLogLine {"verb":"BoonAllyOrLogLine","ally":"12166","line":"turayn"}]
+
+120165:B:2 (back): The players discover each treasure they control.
+  120165:resolution:2: Resolution
+    - [json DiscoverTreasure {"verb":"DiscoverTreasure"}]
+
+120165:B:3 (back): Add A Growing Threat and each Evil Creatures enemy in play to the campaign pool.
+  120165:resolution:3: Resolution
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AddEncounterToPool {"verb":"AddEncounterToPool","codes":["12167"]}]
+    - [json AddEncounterToPool {"verb":"AddEncounterToPool","fromDeck":"evilCreatures"}]
+
+## 18016 The Old Ford
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+18016:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+18016:A:2 (front): The Old Ford gets +5 quest points for each enemy in play.
+  18016:constant:1: Constant
+    - this card: stat questPoints the number of enemy (any player controls) or in the staging area x 5, while this card is in play
+
+18016:A:3 (front): Forced: After The Old Ford becomes the active location, each enemy in the staging area makes an immediate attack against the first player.
+  18016:forced:1: Forced after this location becomes the active location (heard about this card)
+    - for each enemy (any player controls) in the staging area only:
+      - the picked enemy attacks the first player now, from the staging area
+
+## 18017 Wooded Riverbank
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+18017:A:1 (front): Forced: When Wooded Riverbank is explored, put the top card of the Evil Creatures deck into play engaged with the first player.
+  18017:forced:1: Forced on the event locationExplored (heard about this card)
+    - [json AddFromPile {"verb":"AddFromPile","pile":"evilCreatures","to":"engaged","who":"firstPlayer"}]
+
+18017:A:2 (shadow): Shadow: Deal 1 damage to the defending character.
+  18017:shadow:1: Shadow
+    - deal 1 damage to the defender
+
+## 18018 Frenzied Creature
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+18018:A:1 (front): When Revealed: Add the top card of the Evil Creatures deck to the staging area and attach Frenzied Creature to it. (Counts as a Condition attachment with the text: "Attached enemy gets +1 Threat, +1 Attack, +1 Defense and is immune to player card effects.")
+  18018:whenRevealed:1: When revealed
+    - [json AddFromPile {"verb":"AddFromPile","pile":"evilCreatures","to":"staging","attachSource":true}]
+  18018:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - its host: stat threat 1, while this card is in play
+    - its host: stat attack 1, while this card is in play
+    - its host: stat defense 1, while this card is in play
+    - its host: stat immuneToPlayerCards 1, while this card is in play
+
+18018:A:2 (shadow): Shadow: Attach this card to attacking enemy.
+  18018:shadow:1: Shadow
+    - [json AttachSelf {"verb":"AttachSelf","to":{"kind":"attackingEnemy"}}]
+
+## 18019 Dangerous Crossing
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+18019:A:1 (front): When Revealed: Each player assigns X damage among characters he controls, where X is the Threat of the active location. If X is less than 3, Dangerous Crossing gains surge.
+  18019:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AssignDamage {"verb":"AssignDamage","amount":{"stat":"threat","of":"activeLocation"},"pick":{"type":"character","control":"you"},"who":"eachSeat"}]
+    - [json GainSurge {"verb":"GainSurge","when":{"kind":"less","left":{"stat":"threat","of":"activeLocation"},"right":3}}]
+
+18019:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defender is damaged).
+  18019:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the defender is a damaged character (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the defender is a damaged character (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 18020 Goblin Troop
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+18020:A:1 (front): Cannot have player card attachments.
+  18020:constant:1: Constant
+    - this card: stat noPlayerAttachments 1, while this card is in play
+
+18020:A:2 (front): While Goblin Troop is engaged with you, each other Goblin enemy engaged with you gets +1 Attack and +1 Defense.
+  18020:constant:2: Constant
+    only if this card is engaged with the player
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each Goblin enemy (any player controls) engaged with you [also {"other":true}]: stat attack 1, while this card is in play
+    - each Goblin enemy (any player controls) engaged with you [also {"other":true}]: stat defense 1, while this card is in play
+
+18020:A:3 (shadow): Shadow: Attacking enemy gets +2 Attack.
+  18020:shadow:1: Shadow
+    - the attacking enemy: stat attack 2, until the end of the attack
+
+## 18021 Stray Goblin
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+18021:A:1 (front): Surge. Cannot be optionally engaged.
+  (the keyword part is owned by the card's keywords; the records cover: Cannot be optionally engaged.)
+  18021:constant:1: Constant
+    - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
+
+18021:A:2 (front): While Stray Goblin is in the staging area, it gains: "Forced: After a player engages an enemy, Stray Goblin engages that player."
+  18021:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls) [also {"other":true}])
+    only if this card is in the staging area
+    - engage this card
+
+18021:A:3 (shadow): Shadow: Add Stray Goblin to staging area.
+  18021:shadow:1: Shadow
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"self","to":"staging"}]
+
+## 18022 Pack of Wargs
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+18022:A:1 (front): Forced: If Pack of Wargs is dealt a shadow card with no effect, it makes an additional attack after this one. (Do not deal it a shadow card.)
+  18022:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    only if the enemy held a shadow card with no shadow effect (read when the attack ends, as the card the event is about)
+    - this enemy attacks now, dealt no shadow card
+
+18022:A:2 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
+  18022:shadow:1: Shadow
+    - when the attack in progress ends:
+      - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 18023 Hills of Wilderland
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+18023:A:1 (front): X is the number of characters controlled by the player with the most characters.
+  18023:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat threat [json amount {"mostPerPlayer":{"type":"character","control":"you"}}], while this card is in play
+    - this card: stat questPoints [json amount {"mostPerPlayer":{"type":"character","control":"you"}}], while this card is in play
+
+18023:A:2 (front): Quest Action: Exhaust a character to reduce Hills of Wilderland Threat by 1 until the end of the phase. Only the first player can trigger this ability.
+  18023:action:1: Action
+    only if all of: (it is the Quest phase) and (the actor holds the first player token) and (there is a ready character (you control) to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+    - this card: stat threat -1, until the end of the phase
+
+## 18024 Lonely Lands
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+18024:A:1 (front): Lonely Lands gets +2 Threat for each facedown card under it.
+  18024:constant:1: Constant
+    - this card: stat threat [json amount {"facedown":true,"times":2}], while this card is in play
+
+18024:A:2 (front): While Lonely Lands is in the staging area, it gains: "Forced: After an event is played during the quest phase, place it facedown under Lonely Lands."
+  18024:forced:1: Forced after this card is played (heard about card (any player controls) of card type event)
+    only if all of: (it is the Quest phase) and (this card is in the staging area)
+    - [json AttachFacedown {"verb":"AttachFacedown"}]
+
+## 18025 Ruined Supplies
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+18025:A:1: Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+18025:A:2 (front): When Revealed: Each player must choose: either raise your threat by 1 for each ally you control, or deal 1 damage to each ally you control.
+  18025:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "threat":
+          - raise threat by the number of ally (you control) (the acting player)
+        * option "damage":
+          - deal 1 damage to each ally (you control)
+
+18025:A:3 (shadow): Shadow: Raise your threat by 1 for each enemy engaged with you.
+  18025:shadow:1: Shadow
+    - raise threat by the number of enemy (any player controls) engaged with you (the acting player)
+
+## 18026 Lost in the Wild
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+18026:A:1 (front): When Revealed: The player with the most cards in his hand without a copy of Lost in the Wild adds Lost in the Wild to his hand. (While in a player's hand, Lost in the Wild gains: "Cannot be discarded by player card effects. Forced: After you play a card, discard each card in your hand.")
+  18026:whenRevealed:1: When revealed
+    - [json AddSourceToHandOfMost {"verb":"AddSourceToHandOfMost"}]
+  18026:constant:1: Constant
+    - [json Undiscardable {"verb":"Undiscardable"}]
+  18026:forced:1: Forced after this card is played (heard about card (you control); event happened to the controller; used from hand)
+    only if this card is in its player's hand
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json DiscardEach {"verb":"DiscardEach","pick":{"type":"card","control":"you","from":"hand"}}]
+    - discard this card
+
+## 18027 Weighed Down
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+18027:A:1 (front): When Revealed: Attach to the hero with the most attachments without Weighed Down attached. Then, exhaust attached hero. (Counts as a Condition attachment with the text: "Forced: After attached hero readies, choose and discard an attachment from it. You cannot choose Weighed Down unless attached hero has no other non-objective attachments.")
+  18027:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - attach this card to a hero
+    - exhaust its host
+  18027:constant:1: Constant
+    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+  18027:forced:1: Forced on the event readied (heard about the host)
+    - the acting player chooses one of:
+      * option "other" (only if there is a card (any player controls) that is not an objective [also {"attachedTo":"host","other":true}] to choose):
+        - choose card (any player controls) [also {"attachedTo":"host","other":true}]
+        - discard the picked card
+      * option "self" (only if not (there is a card (any player controls) that is not an objective [also {"attachedTo":"host","other":true}] to choose)):
+        - choose card (any player controls) [also {"attachedTo":"host"}]
+        - discard the picked card
+
+## 18066 Traveling North
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+18066:A:1 (front): Setup: Set Woodmen Village and The Old Ford aside, out of play. Create the Evil Creatures deck (see insert) and place it next to the quest deck. Shuffle the encounter deck and discard cards from the top until X locations are discarded, where X is the number of players. Add each discarded location to the staging area.
+  18066:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SetAside {"verb":"SetAside","code":"18069"}]
+    - [json SetAside {"verb":"SetAside","code":"18016"}]
+  18066:setup:2: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json ShufflePile {"verb":"ShufflePile","pile":"evilCreatures"}]
+    - shuffle the encounter deck
+    - repeat the number of players times:
+      - [json DiscardUntil {"verb":"DiscardUntil","type":"location"}]
+      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging"}]
+
+18066:B:1 (back): Forced: After placing progress here from questing successfully, place 1 resource here.
+  18066:forced:1: Forced on the event progressPlaced (heard about this card)
+    only if all of: (it is the Quest phase) and (the quest succeeded)
+    - [json PlaceToken {"verb":"PlaceToken","amount":1}]
+
+18066:B:2 (back): Forced: At the beginning of the encounter phase, remove 1 resource from this stage. Then, add the top card of the Evil Creatures deck to the staging area.
+  18066:forced:2: Forced when a phase begins
+    only if it is the Encounter phase
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AddFromPile {"verb":"AddFromPile","pile":"evilCreatures","to":"staging","when":{"kind":"less","left":0,"right":{"stat":"resources","of":"self"}}}]
+    - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"self"}]
+
+18066:B:3 (back): This stage cannot be defeated while an enemy from the Evil Creatures deck is in play.
+  18066:constant:1: Constant
+    only if there is a enemy (any player controls) or in the staging area [also {"fromDeck":"evilCreatures"}] to choose
+    - the players cannot defeat this stage while this holds
+
+## 18067 Woodmen Under Attack
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+18067:A:1 (front): When Revealed: The first player adds Woodmen Village to the staging area. Each other player reveals an encounter card.
+  18067:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"18069"}]
+    - for each player, first player first:
+      - if not (the actor holds the first player token): the acting player reveals an encounter card
+
+18067:B:1 (back): No more than 1 progress can be placed on each location in the staging area each round.
+  18067:constant:1: Constant
+    - each location (any player controls) in the staging area only: stat progressCap 1, while this card is in play
+
+18067:B:2 (back): Forced: After the players travel to a location, add the top card of the Evil Creatures deck to the staging area.
+  18067:forced:1: Forced after the players travel (heard about location (any player controls))
+    - [json AddFromPile {"verb":"AddFromPile","pile":"evilCreatures","to":"staging"}]
+
+18067:B:3 (back): The players cannot defeat this stage unless the first player controls Haldan.
+  18067:constant:2: Constant
+    only if not (the actor controls the card with code 18070)
+    - the players cannot defeat this stage while this holds
+
+## 18068 The Passage of the Ford
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+18068:A:1 (front): When Revealed: The first player adds The Old Ford to the staging area. Each other player adds the top card of the Evil Creatures deck to the staging area.
+  18068:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"18016"}]
+    - for each player, first player first:
+      - [json AddFromPile {"verb":"AddFromPile","pile":"evilCreatures","to":"staging","when":{"kind":"not","condition":{"kind":"firstPlayer"}}}]
+
+18068:B:1 (back): The players cannot travel to The Old Ford unless there is at least 5 progress here.
+  18068:constant:1: Constant
+    only if not ([json condition {"kind":"stageProgress","min":5}])
+    - the players cannot travel to the location with code 18016 while this holds
+
+18068:B:2 (back): Forced: At the beginning of the quest phase, add the top card of the Evil Creatures deck to the staging area.
+  18068:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    - [json AddFromPile {"verb":"AddFromPile","pile":"evilCreatures","to":"staging"}]
+
+18068:B:3 (back): This stage cannot be defeated while The Old Ford is in play. When The Old Ford is explored, the players win the game.
+  18068:constant:2: Constant
+    only if the card with code 18016 is in play
+    - the players cannot defeat this stage while this holds
+  18068:forced:2: Forced on the event locationExplored (heard about location (any player controls) named "The Old Ford")
+    - the players win the game
+
+## 18069 Woodmen Village
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+18069:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+18069:A:2 (front): Forced: When Woodmen Village is explored, add the top card of the Evil Creatures deck to the staging area. Then, flip over Woodmen Village and attach Haldan to the just-added enemy as a guarded objective.
+  18069:forced:1: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AddFromPile {"verb":"AddFromPile","pile":"evilCreatures","to":"staging"}]
+    - [json FlipOver {"verb":"FlipOver","into":"18070","guardedBy":"picked"}]
+
+## 18070 Haldan
+
+18070:A:1 (front): The first player gains control of Haldan while he is free of encounters.
+  18070:constant:1: Constant
+    - [json GainControlWhenFree {"verb":"GainControlWhenFree","who":"firstPlayer"}]
+
+18070:A:2 (front): While there is an active location, Haldan does not exhaust to quest.
+  18070:constant:2: Constant
+    only if there is a location (any player controls) [also {"active":true}] to choose
+    - this card: stat noExhaustQuest 1, while this card is in play
+
+18070:A:3 (front): If Haldan leaves play, the players lose the game.
+  18070:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    - the players lose the game
+
+(rendered pieces: 165 by template, 51 as JSON)

@@ -210,6 +210,11 @@ export function markReached(state: ScenarioState, step: string): ScenarioState {
   return { ...state, stepWindows: [...state.stepWindows.filter((key) => key.startsWith(`${state.round}:`)), at] };
 }
 
+/** A hero an enemy holds, in play and in nobody's hands: a Captive of The Uruk-hai or a hero an enemy guards (Carried Away). It lies in the captive zone. */
+export function heldHero(card: CardInstance): boolean {
+  return (card.guardedHero === true || card.captive === true) && card.zone === "captive";
+}
+
 export function inPlay(zone: ZoneName): boolean {
   return (
     zone === "heroes" ||

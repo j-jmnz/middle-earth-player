@@ -64,14 +64,16 @@ export function stagingThreatSources(state: ScenarioState, cards: Cards, seat?: 
   }
   // An enemy engaged with a player that contributes its Threat to the staging area's ("each Ship enemy engaged with you contributes its Threat", 11060:A:1; "While engaged with a player, Faithless Desecrator
   // contributes its Threat", 12075:A:1). Only the games with ships (`sea`) or an Uncharted deck (`uncharted`) have such a card, so no other game reads the engaged enemies here.
-  const hasEngagedContributors = view.sea || view.uncharted;
+  // `engagedThreatSeat` on a seat ("each enemy engaged with you adds its Threat ... until the end of the round", 143065:A:2) is read live: an enemy that engages that seat later counts too (rr.lasting-effects).
+  const hasEngagedContributors = view.sea || view.uncharted || view.modifiers.some((modifier) => modifier.stat === "engagedThreat" || modifier.stat === "engagedThreatSeat");
   if (hasEngagedContributors) {
-    for (const seat of view.seats) {
+    view.seats.forEach((seat, index) => {
+      const whole = flagged(view, `seat:${index}`, "engagedThreatSeat");
       for (const id of seat.engaged) {
         const instance = view.cards[id];
-        if (instance && flagged(view, id, "engagedThreat") && !flagged(view, id, "noThreatContribution")) sources.push({ id, threat: modifiedStat(view, instance, "threat", cards), from: "engaged" });
+        if (instance && (whole || flagged(view, id, "engagedThreat")) && !flagged(view, id, "noThreatContribution")) sources.push({ id, threat: modifiedStat(view, instance, "threat", cards), from: "engaged" });
       }
-    }
+    });
   }
   // An active location that contributes its Threat to the staging area's ("While Flooded Ruins is the active location, it contributes its Threat", 11072:A:1).
   for (const id of [view.activeLocation, view.secondActiveLocation]) {

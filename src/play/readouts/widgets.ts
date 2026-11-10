@@ -1,7 +1,10 @@
 // The numbers of the table pieces a scenario's script declares (docs/brief.md, Table): the Ring-bearer's life and the burden
 // deck's count. A piece shows only when the scenario's definition declares it (`widgets`) and the game holds it, so a game of
 // A Shadow of the Past or A Knife in the Dark shows neither. The engine wrote both numbers; nothing here changes one.
+import { useMemo } from "react";
+
 import type { Effect } from "../../catalog/boundary.ts";
+import { captivesOf } from "../../rules/families/captives/values.ts";
 import { stageOf } from "../../rules/families/breaking/areas.ts";
 import type { ScenarioState } from "../../rules/engine/reduce.ts";
 
@@ -59,9 +62,43 @@ export function heldDial(game: ScenarioState, nameOf: (code: string) => string):
   return held && held.owner != null ? { seat: held.owner, words: `${nameOf(held.code)} is held facedown${holder ? ` by ${nameOf(holder.code)}` : ""}`, mark: "hero" } : null;
 }
 
+/**
+ * Every seat's held dial: the one `heldDial` finds, and a seat with a Captive of The Uruk-hai (mec112.pursuit, families/captives): "Legolas is a Captive under To Isengard!" or "Legolas is a Captive held by Grishnákh".
+ * A seat that holds two things says both. `isEnemy` tells an enemy holder from the card the Captives lie under.
+ */
+export function heldDials(game: ScenarioState, nameOf: (code: string) => string, isEnemy: (code: string) => boolean): readonly HeldDial[] {
+  const dials = new Map<number, HeldDial>();
+  const first = heldDial(game, nameOf);
+  if (first) dials.set(first.seat, first);
+  for (const card of captivesOf(game)) {
+    if (card.owner == null) continue;
+    const host = card.host ? game.cards[card.host] : undefined;
+    const words = `${nameOf(card.code)} is a Captive${host ? ` ${isEnemy(host.code) ? "held by" : "under"} ${nameOf(host.code)}` : ""}`;
+    const before = dials.get(card.owner);
+    dials.set(card.owner, { seat: card.owner, words: before ? `${before.words}. ${words}` : words, mark: before?.mark ?? "hero" });
+  }
+  return [...dials.values()];
+}
+
 /** What a prisoner's name says wherever it is shown: the dial, the preview, the list. */
 export function prisonerWords(name: string): string {
   return `${name} is the prisoner, face down`;
+}
+
+// The pursuit tracker of The Uruk-hai (mec112.pursuit): its value and the value at which the players lose, or null for a scenario without one or before its Setup sets it. The engine wrote the value; nothing here changes it.
+export type PursuitReadout = { value: number; limit: number };
+
+export function pursuitReadout(game: ScenarioState): PursuitReadout | null {
+  const limit = game.widgets.pursuitTracker;
+  return limit != null && game.pursuit != null ? { value: game.pursuit, limit } : null;
+}
+
+/** The pursuit dial's numbers for the top bar: the same object while its value and its limit are the same, so the bar re-renders only when the pursuit value moves. */
+export function usePursuitReadout(game: ScenarioState): PursuitReadout | null {
+  const now = pursuitReadout(game);
+  const value = now?.value ?? null;
+  const limit = now?.limit ?? null;
+  return useMemo(() => (value == null || limit == null ? null : { value, limit }), [value, limit]);
 }
 
 export type TokenReadout = { name: string; tokens: number };

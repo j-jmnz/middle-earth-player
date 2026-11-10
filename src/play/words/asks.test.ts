@@ -19,7 +19,7 @@ import { walk } from "../../../test/harness/record-walk.ts";
 import { judgeBranch, judgePick } from "../../../test/harness/words-judge.ts";
 
 import { askWords } from "./ask.ts";
-import { dealtNow } from "./aflame.ts";
+import { dealtNow } from "./scenarios/aflame.ts";
 import { askAt, askKey, askValues, asksChoose, asksOption, asksPick, fill, placeholdersOf, templatesOf, textsOf, unknownPlaceholders, type Ask, type AsksTable } from "./asks.ts";
 import { ASKS_BY_SCENARIO } from "./asks/index.ts";
 import { pickWords, type ChoiceNames } from "./choice.ts";
@@ -71,11 +71,16 @@ describe("an asks entry", () => {
     expect(asksChoose(facts(choose), loose)).toEqual({ note: "Urdug's Elite was explored.", owned: false });
   });
 
-  it("leads an owned note with no reason as every family does: \"Player 1: Choose ...\" two-handed, capitalised solo", () => {
+  it("leads an owned note with no reason as every family does: \"Player 1: choose ...\" two-handed, capitalised solo, whichever way the entry wrote the first word", () => {
     const own: AsksTable = { [askKey(RECORD, "0", "Choose")]: { note: "Choose how {card} is paid.", owned: true } };
-    expect(asksChoose(facts(choose), own)).toEqual({ note: "Player 1: Choose how Urdug's Elite is paid.", owned: true });
+    expect(asksChoose(facts(choose), own)).toEqual({ note: "Player 1: choose how Urdug's Elite is paid.", owned: true });
     const lower: AsksTable = { [askKey(RECORD, "0", "Choose")]: { note: "choose how {card} is paid.", owned: true } };
     expect(asksChoose(facts(choose, 1), lower)).toEqual({ note: "Choose how Urdug's Elite is paid.", owned: false });
+  });
+
+  it("keeps the capital of a card's name that opens an owned note", () => {
+    const named: AsksTable = { [askKey(RECORD, "0", "Choose")]: { note: "Grishnákh takes {card}.", owned: true } };
+    expect(asksChoose(facts(choose), named)).toEqual({ note: "Player 1: Grishnákh takes Urdug's Elite.", owned: true });
   });
 
   it("words a branch: its row from the entry keyed with the option id, and its caution only when the condition holds", () => {
@@ -88,7 +93,7 @@ describe("an asks entry", () => {
   });
 
   it("words a Pick: the verb, the sentence, the rows that are no card, and no caution while its condition fails", () => {
-    expect(asksPick(facts(pick), table)).toEqual({ verb: "Exhaust", prompt: "Player 1: Choose a ready character you control to exhaust.", owned: true, labels: { skip: "Exhaust no one (Player 1)" } });
+    expect(asksPick(facts(pick), table)).toEqual({ verb: "Exhaust", prompt: "Player 1: choose a ready character you control to exhaust.", owned: true, labels: { skip: "Exhaust no one (Player 1)" } });
     expect(asksPick(facts(pick, 1), table)?.prompt).toBe("Choose a ready character you control to exhaust.");
   });
 
@@ -195,7 +200,7 @@ describe("the barrel of asks files", () => {
   });
 });
 
-// A scenario with an asks file is on the fast track: its words are data, and these checks stand in for the words code it has none of.
+// A scenario with an asks file has its words as data, and these checks stand in for the words code it has none of.
 const dump = process.env.WORDS_DUMP;
 const LIMIT = 25;
 const wordsIn = (text: string): number => text.trim().split(/\s+/).filter(Boolean).length;

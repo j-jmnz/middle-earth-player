@@ -82,6 +82,8 @@ export const pickSchema = z.strictObject({
   who: z.enum(["actor", "firstPlayer"]).optional(),
   // Not the source card itself: "another character". The source is never offered from a hand, a discard pile or a deck.
   other: z.boolean().optional(),
+  // The Uruk-hai's Captives (families/captives): `only` picks among them, `free` among those lying under To Isengard! (none held by an enemy), `include` adds them to the heroes or characters the filter picks among ("a hero" may be a Captive, 143016:A:3).
+  captive: z.enum(["only", "free", "include"]).optional(),
   // A character committed to the quest (`false`: one that is not).
   committed: z.boolean().optional(),
   // A character that took part in the attack the Response answers (not the card itself).

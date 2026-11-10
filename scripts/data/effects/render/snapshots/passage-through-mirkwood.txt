@@ -1,0 +1,275 @@
+Scenario piles that place cards with no record (staging: 01096 Forest Spider; staging: 01099 Old Forest Road; quest: 01119 Flies and Spiders; quest: 01120 A Fork in the Road; quest: 01121 A Chosen Path; quest: 01122 A Chosen Path)
+
+## 01074 King Spider
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01074:A:1 (front): When Revealed: Each player must choose and exhaust 1 character he controls.
+  01074:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - choose ready character (you control)
+      - exhaust the picked card
+
+01074:A:2 (shadow): Shadow: Defending player must choose and exhaust 1 character he controls. (2 characters instead if this attack is undefended.)
+  01074:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): choose ready character (you control)
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): exhaust the picked card
+
+## 01075 Hummerhorns
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01075:A:1 (front): Forced: After Hummerhorns engages you, deal 5 damage to a single hero you control.
+  01075:forced:1: Forced after an enemy engages a player (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (you control)
+    - deal 5 damage to the picked card
+
+01075:A:2 (shadow): Shadow: Deal 1 damage to each character the defending player controls. (2 damage instead if this attack is undefended.)
+  01075:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attack has no defender): deal 1 damage to each character (you control)
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to each character (you control)
+
+## 01076 Ungoliant's Spawn
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01076:A:1 (front): When Revealed: Each character currently committed to a quest gets -1 Willpower until the end of the phase.
+  01076:whenRevealed:1: When revealed
+    - each character (any player controls) committed to the quest: stat willpower -1, until the end of the phase
+
+01076:A:2 (shadow): Shadow: Raise defending player's threat by 4. (Raise defending player's threat by 8 instead if this attack is undefended.)
+  01076:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attack has no defender): raise threat by 4 (the acting player)
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): raise threat by 8 (the acting player)
+
+## 01077 Great Forest Web
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01077:A:1 (front): Travel: Each player must exhaust 1 hero he controls to travel here.
+  01077:travel:1: Travel
+    - for each player, first player first:
+      - choose ready hero (you control)
+      - exhaust the picked card
+
+## 01078 Mountains of Mirkwood
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01078:A:1 (front): Travel: Reveal the top card of the encounter deck and add it to the staging area to travel here.
+  01078:travel:1: Travel
+    - the acting player reveals an encounter card
+
+01078:A:2 (front): Response: After Mountains of Mirkwood leaves play as an explored location, each player may search the top 5 cards of his deck for 1 card and add it to his hand. Shuffle the rest of the searched cards back into their owners' decks.
+  01078:response:1: Response after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "search":
+          - choose card (you control) in the deck, among the top 5
+          - move the picked card to hand
+          - [json ShuffleDeck {"verb":"ShuffleDeck"}]
+        * option "skip":
+
+## 01079 Eyes of the Forest
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01079:A:1 (front): When Revealed: Each player discards all event cards in his hand.
+  01079:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - [json DiscardEach {"verb":"DiscardEach","pick":{"type":"card","control":"you","from":"hand","cardType":"event"}}]
+
+## 01080 Caught in a Web
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01080:A:1 (front): When Revealed: The player with the highest threat level attaches this card to one of his heroes. (Counts as a Condition attachment with the text: "Attached hero does not ready during the refresh phase unless you pay 2 resources from that hero's pool.")
+  01080:whenRevealed:1: When revealed
+    - attach this card to a hero
+  01080:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - its host: stat doesNotReady 1, while this card is in play
+    - its host: stat readyPayment 2, while this card is in play
+
+## 01089 Dol Guldur Orcs
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01089:A:1 (front): When Revealed: The first player chooses 1 character currently committed to a quest. Deal 2 damage to that character.
+  01089:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (any player controls) committed to the quest, chosen by the first player
+    - deal 2 damage to the picked card
+
+01089:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+3 Attack instead if this attack is undefended.)
+  01089:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attack has no defender): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
+
+## 01090 Chieftan Ufthak
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01090:A:1 (front): Chieftain Ufthak gets +2 Attack for each resource token on him.
+  01090:constant:1: Constant
+    - this card: stat attack resources of this card x 2, while this card is in play
+
+01090:A:2 (front): Forced: After Chieftain Ufthak attacks, place 1 resource token on him.
+  01090:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    - add 1 resources to this card
+
+## 01091 Dol Guldur Beastmaster
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01091:A:1 (front): Forced: When Dol Guldur Beastmaster attacks, deal it 1 additional shadow card.
+  01091:forced:1: Forced when this enemy attacks, before the defender is declared
+    - [json DealShadow {"verb":"DealShadow","additional":true}]
+
+## 01092 Driven by Shadow
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01092:A:1 (front): When Revealed: Each enemy and each location currently in the staging area gets +1 Threat until the end of the phase. If there are no cards in the staging area, Driven by Shadow gains surge.
+  01092:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy (any player controls) in the staging area only: stat threat 1, until the end of the phase
+    - each location (any player controls) in the staging area only: stat threat 1, until the end of the phase
+    - [json GainSurge {"verb":"GainSurge","when":{"kind":"count","pick":{"type":"card","control":"any","stagingOnly":true,"other":true},"max":0}}]
+
+01092:A:2 (shadow): Shadow: Choose and discard 1 attachment from the defending character. (If this attack is undefended, discard all attachments you control.)
+  01092:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attack has no defender): choose attachment (any player controls) [also {"attachedTo":"defender"}]
+    - then, if not (the attack has no defender) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): for each attachment (you control):
+      - discard the picked card
+
+## 01093 The Necromancer's Reach
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01093:A:1 (front): When Revealed: Deal 1 damage to each exhausted character.
+  01093:whenRevealed:1: When revealed
+    - deal 1 damage to each exhausted character (any player controls)
+
+## 01094 Necromancer's Pass
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01094:A:1 (front): Travel: The first player must discard 2 cards from his hand at random to travel here.
+  01094:travel:1: Travel
+    - the first player discards 2 random card(s) from hand
+
+## 01095 Enchanted Stream
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01095:A:1 (front): While Enchanted Stream is the active location, players cannot draw cards.
+  01095:constant:1: Constant
+    only if this card is the active location
+    - the table: stat cannotDraw 1, while this card is in play
+
+## 01096 Forest Spider
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+01096:A:1 (front): Forced: After Forest Spider engages a player, it gets +1 Attack until the end of the round.
+  01096:forced:1: Forced after an enemy engages a player (heard about this card)
+    - this card: stat attack 1, until the end of the round
+
+01096:A:2 (shadow): Shadow: Defending player must choose and discard 1 attachment he controls.
+  01096:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (you control)
+    - discard the picked card
+
+## 01097 East Bight Patrol
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01097:A:1 (shadow): Shadow: Attacking enemy gets +1 Attack. (If this attack is undefended, also raise your threat by 3.)
+  01097:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): raise threat by 3 (the acting player)
+
+## 01098 Black Forest Bats
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01098:A:1 (front): When Revealed: Each player must choose 1 character currently committed to a quest, and remove that character from the quest. (The chosen character does not ready.)
+  01098:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - choose character (you control) committed to the quest
+      - [json RemoveFromQuest {"verb":"RemoveFromQuest"}]
+
+## 01099 Old Forest Road
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+01099:A:1 (front): Response: After you travel to Old Forest Road, the first player may choose and ready 1 character he controls.
+  01099:response:1: Response after the players travel
+    only if there is a exhausted character (you control) chosen by the first player to choose
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose exhausted character (you control) chosen by the first player
+    - ready the picked card
+
+## 01100 Forest Gate
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+01100:A:1 (front): Response: After you travel to Forest Gate, the first player may draw 2 cards.
+  01100:response:1: Response after the players travel
+    - the first player draws 2 card(s)
+
+## 01119 Flies and Spiders
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+01119:A:1 (front): Setup: Search the encounter deck for 1 copy of the Forest Spider and 1 copy of the Old Forest Road, and add them to the staging area. Then, shuffle the encounter deck.
+  01119:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AddToStaging {"verb":"AddToStaging","code":"01096"}]
+    - [json AddToStaging {"verb":"AddToStaging","code":"01099"}]
+    - shuffle the encounter deck
+
+## 01120 A Fork in the Road
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+01120:B:1 (back): Forced: When you defeat this stage, proceed to one of the 2 "A Chosen Path" stages, at random.
+  01120:forced:1: Forced on the event questCardDefeated (heard about this card)
+    - [json BranchStage {"verb":"BranchStage","codes":["01121","01122"]}]
+
+## 01121 A Chosen Path
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+01121:B:1 (back): When Revealed: Each player must search the encounter deck and discard pile for 1 Spider card of his choice, and add it to the staging area.
+  01121:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - [json SearchMove {"verb":"SearchMove","trait":"Spider","to":"staging"}]
+
+01121:B:2 (back): The players must find and defeat Ungoliant's Spawn to win this game.
+  01121:constant:1: Constant
+    - the players cannot defeat this stage while this holds
+  01121:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) named "Ungoliant's Spawn")
+    - the players win the game
+
+## 01122 A Chosen Path
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+01122:B:1 (back): Players cannot defeat this stage while Ungoliant's Spawn is in play. If players defeat this stage, they have won the game.
+  01122:constant:1: Constant
+    only if the card with code 01076 is in play
+    - the players cannot defeat this stage while this holds
+
+## 01129 Passage Through Mirkwood
+
+01129:A:1 (front): You are playing Campaign Mode.
+  (inert: the engine applies it by rule, no record)
+
+01129:A:2 (front): Setup: Put Mendor into play.
+  01129:campaignSetup:1: Campaign setup
+    - [json PutObjectiveAllyIntoPlay {"verb":"PutObjectiveAllyIntoPlay","code":"01135"}]
+
+01129:A:3 (front): If Mendor leaves play, the players lose the game.
+  01129:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about card (any player controls) named "Mendor")
+    - the players lose the game
+
+01129:B:1 (back): Resolution: Each player earns 1 copy of the Mendor's Support boon card. Add the earned cards to the Campaign Pool. If stage 3B was Beorn's Path, add the Ungoliant's Swarm burden card to the Campaign Pool. If stage 3B was Don't Leave the Path, add the Lingering Venom burden card to the Campaign Pool.
+  01129:resolution:1: Resolution
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json Earn {"verb":"Earn","codes":["01132"],"eachPlayer":true}]
+    - [json Earn {"verb":"Earn","codes":["01136"],"when":{"kind":"stageReached","code":"01122","is":true}}]
+    - [json Earn {"verb":"Earn","codes":["01137"],"when":{"kind":"stageReached","code":"01121","is":true}}]
+
+(rendered pieces: 138 by template, 15 as JSON)

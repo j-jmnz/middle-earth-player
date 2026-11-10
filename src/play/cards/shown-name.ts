@@ -3,7 +3,7 @@
 import type { PrintedCard } from "../../rules/core/printed.ts";
 
 import { pictureCode } from "../canvas/picture-key.ts";
-import { LOST_ISLAND_NAME, TEMPLE_NAME } from "../words/uncharted.ts";
+import { LOST_ISLAND_NAME, TEMPLE_NAME } from "../words/scenarios/uncharted.ts";
 
 export function shownName(key: string, printed: Pick<PrintedCard, "name" | "keywords" | "upgraded"> | undefined): string {
   const code = pictureCode(key);
