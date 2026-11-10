@@ -74,7 +74,7 @@ describe("Escape from Dol Guldur in a campaign", () => {
     // Each card attached to that hero went facedown with it, blank, until it is rescued.
     for (const id of prisoner?.attachments ?? []) {
       expect(state.cards[id]?.face, state.cards[id]?.code).toBe("down");
-      expect(textBlank(state, id)).toBe(true);
+      expect(textBlank(state, id, cards)).toBe(true);
     }
     // The others kept theirs, faceup.
     const others = Object.values(state.cards).filter((card) => (card.code === "01133" || card.code === "01138" || card.code === "01134") && card.host != null && card.host !== prisoner?.id);

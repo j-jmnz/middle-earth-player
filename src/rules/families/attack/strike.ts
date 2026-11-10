@@ -12,7 +12,7 @@ import { effectsOf, subjectMatches } from "../../windows/listen.ts";
 import { printedOf } from "../../core/printed.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import type { CardInstance, PendingStrike, ScenarioState } from "../../core/state.ts";
-import { flagged, heldAmount, inPlay } from "../../core/state.ts";
+import { flagged, inPlay } from "../../core/state.ts";
 import { heard } from "./events.ts";
 
 type Attacking = Extract<Condition, { kind: "attacking" }>;
@@ -78,12 +78,12 @@ export function struck(
   const strike = before.pendingStrike?.enemyId === enemyId ? before.pendingStrike : undefined;
   if (destroyed && strike?.excessTo && next.cards[strike.excessTo]) {
     const remaining = Math.max(0, modifiedStat(before, was, "hitPoints", ctx.cards) - was.damage);
-    const excess = placedAmount(printedOf(ctx.cards, was.code), raw, heldAmount(before, enemyId, "toughness")) - remaining;
+    const excess = placedAmount(before, enemyId, printedOf(ctx.cards, was.code), raw) - remaining;
     if (excess > 0) next = placeDamage(next, strike.excessTo, excess, ctx.cards, steps, "combat", ruleCause("rr.step-6-8-3"));
   }
   const about = { seat, other: enemyId, participants: attackerIds };
   // The damage the attack dealt is the event's amount, and so the Response's X ("a Dwarf deals X damage", 04105:A:1).
-  const dealt = destroyed ? placedAmount(printedOf(ctx.cards, was.code), raw, heldAmount(before, enemyId, "toughness")) : (now?.damage ?? 0) - was.damage;
+  const dealt = destroyed ? placedAmount(before, enemyId, printedOf(ctx.cards, was.code), raw) : (now?.damage ?? 0) - was.damage;
   if (hurt && heard(next, ctx, "attackDamaged")) for (const attackerId of attackerIds) next = queueEvent(next, { trigger: "attackDamaged", cardId: attackerId, amount: dealt, ...about });
   if (!destroyed) return next;
   for (const attackerId of attackerIds) next = queueEvent(next, { trigger: "attackDestroyed", seat, cardId: attackerId, subject: enemyId, other: enemyId, participants: attackerIds });

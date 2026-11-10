@@ -8,7 +8,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 
 143021:A:2 (front): Forced: After you draw this card, discard all other cards in your hand.
   143021:forced:1: Forced on the event enteredHand (heard about this card)
-    - [json DiscardHand {"verb":"DiscardHand","except":"self"}]
+    - [json DiscardEach {"verb":"DiscardEach","pick":{"type":"card","control":"you","from":"hand"}}]
 
 ## 143033 The Defense of Helm's Deep
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -253,8 +253,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
   143073:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"143033"}]
-    - repeat 4 times:
-      - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"143036"}]
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"143036","all":true}]
     - [json MakeSetAsideActive {"verb":"MakeSetAsideActive","code":"143038"}]
     - shuffle the encounter deck
     - for each player, first player first:
@@ -289,7 +288,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
     - this card: stat defenseKeyword 1, while this card is in play
 
 143074:B:2 (back): Forced: After resolving the quest, if the encounter deck did not place at least 1 progress on this stage as the result of questing, the first player reveals 1 encounter card.
-  143074:forced:1: Forced on the event questResolved (heard about this card)
+  143074:forced:1: Forced on the event defenseQuestResolved (heard about this card)
     only if not ([json condition {"kind":"encounterPlacedOnStage"}])
     - the acting player reveals an encounter card
 
@@ -334,4 +333,4 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
     only if [json condition {"kind":"enemyInPlay","is":false}]
     - the players win the game
 
-(rendered pieces: 147 by template, 35 as JSON)
+(rendered pieces: 146 by template, 35 as JSON)

@@ -19,7 +19,7 @@ import { ignoresKeyword } from "./markers.ts";
 /** The players traveled to the location: when it is a Deep location whose keyword is not blanked, a frame that resolves the keyword goes under the Responses to the travel. Any other location leaves the state as it is. */
 export function pushDeep(state: ScenarioState, locationId: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const card = state.cards[locationId];
-  if (!card || !constantVerbCodes(ctx, "Deep").has(card.code) || textBlank(state, locationId)) return state;
+  if (!card || !constantVerbCodes(ctx, "Deep").has(card.code) || textBlank(state, locationId, ctx.cards)) return state;
   const record = effectsOf(ctx, card.code).find((effect) => effect.timing === "constant" && effect.instructions.some((instruction) => instruction.verb === "Deep"));
   if (!record) return state;
   return pushEffectFrame(state, { frame: "ResolveEffect", sourceId: locationId, actor: state.firstPlayer, peril: false, effectId: record.id, instructions: [{ verb: "Deep" }], cancel: null, blockCancel: null, cause: effectCause(record) }, steps);
@@ -51,7 +51,7 @@ export function replaceFromCaves(state: ScenarioState, focus: Focus, ctx: Reduce
 // The guarded keyword of a Dragon Sign added to the staging area: each typed GuardObjective of its When Revealed records, run for the sign itself.
 export function resolveGuarded(state: ScenarioState, signId: string, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const sign = state.cards[signId];
-  if (!sign || textBlank(state, signId)) return state;
+  if (!sign || textBlank(state, signId, ctx.cards)) return state;
   let next = state;
   for (const effect of effectsOf(ctx, sign.code)) {
     if (effect.timing !== "whenRevealed") continue;

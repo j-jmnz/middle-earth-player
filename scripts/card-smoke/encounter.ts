@@ -4,6 +4,7 @@ import path from "node:path";
 import { PLAYABLE_SCENARIOS } from "../../src/campaign/playable.ts";
 import { legalIntents, reduce, type PlayerIntent, type ScenarioState } from "../../src/rules/engine/reduce.ts";
 import { flagged } from "../../src/rules/core/state.ts";
+import { expectOk } from "../../src/rules/core/test-fixture.ts";
 
 import { DATA_DIR } from "../data/paths.ts";
 import { describeError, duration, runScript, type Log } from "../log.ts";
@@ -45,7 +46,8 @@ export function probeTable(world: EncounterWorld): ScenarioState {
   let state = kept(encounterStart(world, 1, 1), ctx);
   for (let guard = 0; guard < 20 && state.window?.kind === "choose" && state.phase === "Beginning of round"; guard += 1) {
     const offered = legalIntents(state, ctx);
-    const answers = offered.map((intent) => reduce(state, intent as PlayerIntent, ctx)).flatMap((result) => (result.ok ? [result.state] : []));
+    // An answer the engine offers and then refuses is a fault of the table, not a probe to skip.
+    const answers = offered.map((intent) => expectOk(reduce(state, intent as PlayerIntent, ctx)).state);
     const next = answers.find((answer) => !flagged(answer, "table", "skipCombat")) ?? answers[0];
     if (!next) break;
     state = next;

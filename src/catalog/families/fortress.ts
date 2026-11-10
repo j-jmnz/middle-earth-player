@@ -13,7 +13,7 @@ const VERBS = [
 
 const TRIGGERS = [
   // About the current quest stage: the quest was resolved while it had the Defense keyword, once the progress the encounter deck placed is on it ("After resolving the quest", 143074:B:2).
-  "questResolved",
+  "defenseQuestResolved",
 ] as const;
 
 const FLAGS = [

@@ -266,9 +266,9 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       if (condition.inStaging != null && (card.zone === "staging") !== condition.inStaging) return false;
       // "While attached enemy is engaged with you": an enemy filter's `engaged` is read against the actor here too.
       if (condition.pick?.type === "enemy" && condition.pick.engaged && !engagedAs(card, condition.pick.engaged, scope.actor)) return false;
-      // `isSource`: the card is the one whose record is being read (the copy of Soldier of Isengard that attacked, 143036:A:2); the pick itself reads no source.
-      if (condition.pick?.isSource && id !== scope.sourceId) return false;
-      return condition.pick == null || matchesPick(state, id, condition.pick, { seat: scope.actor, sourceId: null, counting: true }, ctx);
+      // `isSource` (the fortress family's pick hook, 143036:A:2) reads the scope's source; every other filter reads none.
+      const sourceId = condition.pick?.isSource ? scope.sourceId : null;
+      return condition.pick == null || matchesPick(state, id, condition.pick, { seat: scope.actor, sourceId, counting: true }, ctx);
     }
     case "copiesPlayedThisRound": {
       const code = scope.sourceId ? state.cards[scope.sourceId]?.code : undefined;

@@ -30,7 +30,7 @@ describe("Helm's Deep golden", () => {
         expect(zonesOf(state, "143033"), golden.name).toEqual(["setAside"]);
         expect(zonesOf(state, "143038").filter((zone) => zone === "setAside"), golden.name).toHaveLength(1);
         expect(zonesOf(state, "143036").filter((zone) => zone === "setAside"), golden.name).toHaveLength(golden.seatCount);
-        // One copy for each seat, shuffled in after the starting hands (a seat's second mulligan window may have drawn it already).
+        // One copy for each seat, shuffled in after the starting hands (round 1's resource draw may have drawn it into a hand already).
         const copies = zonesOf(state, COUNSELS);
         expect(copies, golden.name).toHaveLength(golden.seatCount);
         for (const zone of copies) expect(["deck", "hand"], golden.name).toContain(zone);

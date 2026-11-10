@@ -41,7 +41,7 @@ function deepEnough(state: ScenarioState, depth: number, steps: EngineStep[]): S
 /** The Discover instruction a location prints (its Forced record on becameActive), unless its text is blank. */
 function keywordOf(state: ScenarioState, locationId: string, ctx: ReduceContext): { record: Effect; instruction: Verb } | null {
   const card = state.cards[locationId];
-  if (!card || textBlank(state, locationId)) return null;
+  if (!card || textBlank(state, locationId, ctx.cards)) return null;
   for (const record of effectsOf(ctx, card.code)) {
     if (record.timing !== "forced" || record.trigger !== "becameActive") continue;
     const instruction = record.instructions.find((item): item is Verb => item.verb === "Discover");

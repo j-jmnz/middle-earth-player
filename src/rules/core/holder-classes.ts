@@ -16,6 +16,11 @@ export const STAGING_CLASS = "stagingCards";
 export const ENEMIES_CLASS = "enemies";
 export type ClassHolder = typeof ALLIES_CLASS | typeof CHARACTERS_CLASS | typeof STAGING_CLASS | typeof ENEMIES_CLASS;
 
+// Whether a modifier's holder id names a class of cards rather than one card.
+export function isClassHolder(id: string): id is ClassHolder {
+  return id === ALLIES_CLASS || id === CHARACTERS_CLASS || id === STAGING_CLASS || id === ENEMIES_CLASS;
+}
+
 // Whether a modifier is held by this card: by its id, or by a class it belongs to.
 export function heldBy(modifier: { instanceId: string }, instance: CardInstance, printed: PrintedCard): boolean {
   if (modifier.instanceId === instance.id) return true;

@@ -98,7 +98,7 @@ describe("143074:B:2 the encounter deck placed progress on this stage", () => {
 
   it("is announced to the stage once the quest resolved, and the first player reveals when none was placed", () => {
     const after = familyQuestResult(table, { willpower: 9, threat: 5 }, cardsOf(), [], open)!;
-    expect((after.pendingEvents ?? []).some((event) => event.trigger === "questResolved" && event.subject === table.questStage)).toBe(true);
+    expect((after.pendingEvents ?? []).some((event) => event.trigger === "defenseQuestResolved" && event.subject === table.questStage)).toBe(true);
     const hosts = resolveRecords({ ...after, defensePlaced: false, phase: "Quest" }, ctxOf(), "143074", "forced", undefined, undefined, false);
     expect(hosts.id).toBeTruthy();
   });

@@ -61,7 +61,7 @@ describe("143021:A:1 functions like a player card", () => {
     const table = probeTable(world);
     const placed = spawn(table, COUNSELS, { zone: "hand", seat: 0 });
     expect(placed.state.seats[0]?.hand).toContain(placed.id);
-    const discarded = run(placed.state, { verb: "DiscardHand" });
+    const discarded = run(placed.state, { verb: "DiscardEach", pick: { type: "card", control: "you", from: "hand" } });
     expect(discarded.seats[0]?.discard).toContain(placed.id);
     expect(discarded.cards[placed.id]?.zone).toBe("discard");
   });
@@ -90,10 +90,10 @@ describe("143021:A:2 after it is drawn the rest of the hand is discarded", () =>
     for (const id of hand) expect(done.seats[0]?.discard).toContain(id);
   });
 
-  it("DiscardHand with `except: self` leaves the source card in the hand", () => {
+  it("DiscardEach from the hand leaves the source card in the hand", () => {
     const table = probeTable(world);
     const placed = spawn(table, COUNSELS, { zone: "hand", seat: 0 });
-    const done = runInstruction(placed.state, { verb: "DiscardHand", except: "self" }, { seat: 0, sourceId: placed.id }, ctxOf(), []);
+    const done = runInstruction(placed.state, { verb: "DiscardEach", pick: { type: "card", control: "you", from: "hand" } }, { seat: 0, sourceId: placed.id }, ctxOf(), []);
     expect(done.seats[0]?.hand).toEqual([placed.id]);
     expect(updateCard(done, placed.id, {}).seats[0]?.discard.length).toBe(table.seats[0]?.hand.length);
   });

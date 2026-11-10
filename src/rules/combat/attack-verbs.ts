@@ -10,7 +10,7 @@ import { pickCandidates } from "../interpret/pick.ts";
 import { lastPicked, seatOf } from "../interpret/player-verbs.ts";
 import { topFrame } from "../windows/windows.ts";
 import { addModifier } from "../core/keywords.ts";
-import { addClassModifier, ALLIES_CLASS, CHARACTERS_CLASS, ENEMIES_CLASS, STAGING_CLASS } from "../core/holder-classes.ts";
+import { addClassModifier, ALLIES_CLASS, CHARACTERS_CLASS, ENEMIES_CLASS, isClassHolder, STAGING_CLASS } from "../core/holder-classes.ts";
 import type { ScenarioState } from "../core/state.ts";
 import { livingSeats } from "../core/state.ts";
 import type { VerbFocus } from "../interpret/verbs.ts";
@@ -137,7 +137,7 @@ export function modifyStat(
     if (trait != null && !id.startsWith("seat:") && !hasTrait(next, id, trait, ctx)) continue;
     if (id === "table") next = { ...next, modifiers: [...next.modifiers, { instanceId: "table", sourceId, stat: instruction.stat, amount, until: instruction.until }] };
     else if (id.startsWith("seat:")) next = { ...next, modifiers: [...next.modifiers, { instanceId: id, sourceId, stat: instruction.stat, amount, until: instruction.until }] };
-    else next = id === ALLIES_CLASS || id === CHARACTERS_CLASS || id === STAGING_CLASS || id === ENEMIES_CLASS
+    else next = isClassHolder(id)
       ? addClassModifier(next, id, sourceId, instruction.stat, amount, instruction.until)
       : addModifier(next, id, sourceId, instruction.stat, amount, instruction.until);
   }

@@ -25,7 +25,7 @@ function questResult(state: ScenarioState, totals: QuestTotals, cards: Cards, st
   const before = state.cards[stageId]?.progress ?? 0;
   const placed = totals.threat > totals.willpower ? placeQuestProgress(state, totals.threat - totals.willpower, cards, steps, canAdvance, false) : state;
   const onStage = placed.questStage !== stageId || (placed.cards[stageId]?.progress ?? 0) > before;
-  return queueEvent({ ...placed, defensePlaced: onStage }, { trigger: "questResolved", seat: null, subject: stageId });
+  return queueEvent({ ...placed, defensePlaced: onStage }, { trigger: "defenseQuestResolved", seat: null, subject: stageId });
 }
 
 // RemoveResourceTokens: up to `amount` tokens come off the card in play with this code.
@@ -47,9 +47,9 @@ function condition(state: ScenarioState, found: Condition): boolean | null {
   return null;
 }
 
-// `isSource`: only the card whose record is being read (the copy that attacked). A condition's `matches` reads no source here and checks it itself (conditions.ts).
+// `isSource`: only the card whose record is being read (the copy that attacked); with no source it matches nothing. The one implementation: a condition's `matches` passes the scope's source here.
 function pick(_state: ScenarioState, id: string, spec: PickSpec, at: PickContext): boolean {
-  return !spec.isSource || at.sourceId == null || id === at.sourceId;
+  return !spec.isSource || (at.sourceId != null && id === at.sourceId);
 }
 
 // "Until the end of the round, players cannot declare attacks" (143040:A:2): no character is declared as an attacker while the table holds the flag.

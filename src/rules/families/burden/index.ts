@@ -12,7 +12,7 @@ import { immediateAttackEach } from "./attack.ts";
 import { attachSelfToRingBearer, moveBurden, revealBurden, shuffleBurdenDeck } from "./deck.ts";
 import { announceProgress, endQuestPhase, passFirstPlayer, removeAllQuestProgress, setStatUntil } from "./effects.ts";
 import { reduceLife } from "./life.ts";
-import { discardHand, shuffleCopyIntoEachDeck } from "./player-deck.ts";
+import { shuffleCopyIntoEachDeck } from "./player-deck.ts";
 
 // The verbs src/catalog/families/burden.ts adds, for the burden deck, the Ring-bearer's life and the other encounter effects of
 // Flight to the Ford. Null when the verb is not one of them.
@@ -42,11 +42,9 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return removeAllQuestProgress(state, steps);
     case "ShuffleCopyIntoEachDeck":
       return shuffleCopyIntoEachDeck(state, instruction.code);
-    case "DiscardHand":
-      return discardHand(state, instruction, focus);
     default:
       return null;
   }
 }
 
-export const manifest: RulesFamily = { name: "burden", settle: { before: (state, ctx, steps) => announceProgress(state, steps, ctx) }, verbs: ["SetLife", "ReduceLife", "ShuffleBurdenDeck", "RevealBurden", "MoveBurden", "AttachSelfToRingBearer", "ImmediateAttackEach", "PassFirstPlayer", "EndQuestPhase", "SetStatUntil", "RemoveAllQuestProgress", "ShuffleCopyIntoEachDeck", "DiscardHand"], run };
+export const manifest: RulesFamily = { name: "burden", settle: { before: (state, ctx, steps) => announceProgress(state, steps, ctx) }, verbs: ["SetLife", "ReduceLife", "ShuffleBurdenDeck", "RevealBurden", "MoveBurden", "AttachSelfToRingBearer", "ImmediateAttackEach", "PassFirstPlayer", "EndQuestPhase", "SetStatUntil", "RemoveAllQuestProgress", "ShuffleCopyIntoEachDeck"], run };

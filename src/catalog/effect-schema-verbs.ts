@@ -146,8 +146,8 @@ export const simpleVerbs = [
   codeVerb("MakeActiveLocation"),
   verbFlags(codeVerb("SetAside"), { setupRole: "dealt" }),
   verbFlags(codeVerb("AttachToRingBearer"), { setupRole: "dealt" }),
-  // Moves a card that was set aside, out of play, into the staging area. It is not a reveal.
-  codeVerb("AddSetAsideToStaging"),
+  // Moves a card that was set aside, out of play, into the staging area. It is not a reveal. `all`: every set aside copy of the code joins it ("each set aside Soldier of Isengard", 143073:A:1), not one.
+  z.strictObject({ verb: z.literal("AddSetAsideToStaging"), code: z.string().min(1), all: z.literal(true).optional(), ...when }),
   // During play: one out-of-play copy of the card (the `outOfPlay` condition's zones) joins the encounter deck, which is
   // shuffled ("shuffle 1 out of play Ringwraith into the encounter deck", 141026:B:2, 141051:A:2, 141053:A:1, 141054:A:2).
   // When copies are out of play in more than one zone, the first player chooses which (rr.first-player). Nothing happens

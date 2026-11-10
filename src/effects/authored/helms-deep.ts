@@ -35,7 +35,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     // 143021 Poisoned Counsels (burden, Helm's Deep). It functions like a player card (a marker: it sits in a deck, is drawn, held, discarded from the hand or the deck, and prints no cost, so it is never
     // played; mec112.poisoned-counsels-searching-eye). Forced: after it is drawn the rest of the hand is discarded.
     { id: "143021:constant:1", cardCode: "143021", lines: ["143021:A:1"], timing: "constant", instructions: [] },
-    { id: "143021:forced:1", cardCode: "143021", lines: ["143021:A:2"], timing: "forced", trigger: "enteredHand", subject: "self", instructions: [{ verb: "DiscardHand", except: "self" }] },
+    { id: "143021:forced:1", cardCode: "143021", lines: ["143021:A:2"], timing: "forced", trigger: "enteredHand", subject: "self", instructions: [{ verb: "DiscardEach", pick: { type: "card", control: "you", from: "hand" } }] },
 
     // 143033 The Defense of Helm's Deep (objective). Its tokens add to the total Threat in the staging area, read live. At the end of the quest phase it gains a token; with 8 it goes to the victory display and
     // the players advance to stage 5A, from whichever stage they are on (the tokens change only here, so the check follows the placing).
@@ -272,7 +272,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "whenRevealed",
       instructions: [
         { verb: "AddSetAsideToStaging", code: DEFENSE },
-        { verb: "Repeat", times: 4, instructions: [{ verb: "AddSetAsideToStaging", code: SOLDIER }] },
+        { verb: "AddSetAsideToStaging", code: SOLDIER, all: true },
         { verb: "MakeSetAsideActive", code: DEEPING_WALL },
         { verb: "ShuffleEncounterDeck" },
         EACH_PLAYER([{ verb: "RevealEncounter" }]),
@@ -311,7 +311,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       cardCode: "143074",
       lines: ["143074:B:2"],
       timing: "forced",
-      trigger: "questResolved",
+      trigger: "defenseQuestResolved",
       subject: "self",
       condition: { kind: "not", condition: { kind: "encounterPlacedOnStage" } },
       instructions: [{ verb: "RevealEncounter" }],

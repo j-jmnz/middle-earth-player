@@ -1,5 +1,5 @@
-// The Maestro fixtures of Helm's Deep (the-two-towers part 2), written into src/campaign/fixtures/helms-deep.json by scripts/e2e/fixtures.ts: real games of saved decklists (the Defenders of
-// Gondor and Swords of the Noldor lists of data/decks/prebuilt.json), two-handed, Easy, so each is a real save. `deep-won` is the first seed that wins, parked on the win (the Resolution waits); `deep-lost` the first
+// The Maestro fixtures of Helm's Deep (the-two-towers part 2), written into src/campaign/fixtures/helms-deep.json by scripts/e2e/fixtures.ts: real games of saved decklists (the One Deck and the
+// Defenders of Gondor lists of data/decks/prebuilt.json, `FIXTURE_DECKS`), two-handed, Easy, so each is a real save. `deep-won` is the first seed that wins, parked on the win (the Resolution waits); `deep-lost` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.
 // The Campaign Setup asks nothing (the previous part's boons are in the log, the checklist places them); the quest card's Setup asks the first player for the group, and the saved decklists take Poisoned Counsels in each deck (the first
@@ -19,7 +19,7 @@ const say = createLog("e2e-deep");
 export type DeepFixture = { campaignId: string; seatCount: 2; loadout: StoredLoadout; seed: number; intents: PlayerIntent[]; log: CampaignLog };
 export type DeepFixtureName = "deep-won" | "deep-lost";
 
-// The log of a playthrough whose first 1 part was won: the The Uruk-hai golden's two-handed win, resolved onto a blank log, their heroes and what hangs on them left out.
+// The log of a playthrough whose first part was won: The Uruk-hai golden's two-handed win, resolved onto a blank log, their heroes and what hangs on them left out.
 export async function haiWonLog(): Promise<CampaignLog> {
   return wonLog({ title: "The Uruk-hai", golden: "two-handed, won, Normal", goldens: HAI_GOLDENS, world: haiWorld, play: playHai });
 }

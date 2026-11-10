@@ -54,8 +54,8 @@ export function releaseGuarded(state: ScenarioState, id: string): ScenarioState 
 }
 
 // A card whose printed text box is blank (rr.blank): its own records do not apply while it holds the flag.
-// An encounter card's lasting effect on every character (`target: "characters"`) holds for the characters that enter play later too (rr.lasting-effects, 143043:A:1): `cards` (when given) reads the card's type; a caller without it sees only a card's own flag.
-export function textBlank(state: ScenarioState, id: string, cards?: ReadonlyMap<string, PrintedCard>): boolean {
+// An encounter card's lasting effect on every character (`target: "characters"`) holds for the characters that enter play later too (rr.lasting-effects, 143043:A:1): `cards` reads the card's type.
+export function textBlank(state: ScenarioState, id: string, cards: ReadonlyMap<string, PrintedCard>): boolean {
   const instance = state.cards[id];
   if (instance?.prisoner === true) return true;
   for (const modifier of state.modifiers) {
