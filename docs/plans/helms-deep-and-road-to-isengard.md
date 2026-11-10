@@ -11,7 +11,7 @@ The rules are `mec112.defense`, `mec112.wizardry`, `mec112.poisoned-counsels-sea
 ## Base and landing
 
 - The work runs on the branch the session's harness names, from `main`.
-- `orchestrator` runs the sections in order (`.claude/agents/orchestrator.md`). Sections 1 and 2 are each one scenario, run as the tasks of `docs/handover/agent-brief.md` (Scenario procedure): Read, the rulings asked once, Build, Judge, Finish, one review round, Fix. Section 2 starts after section 1's Fix: its campaign test continues from Helm's Deep's real Resolution.
+- `orchestrator` runs the sections in order (`.claude/agents/orchestrator.md`). Section 0 is one implementer task. Sections 1 and 2 are each one scenario, run as the tasks of `docs/handover/agent-brief.md` (Scenario procedure): Read, Build, Judge, Finish, one review round, Fix. Section 2 starts after section 1's Fix: its campaign test continues from Helm's Deep's real Resolution.
 - Commit and push often (`.claude/rules/commit-standards.md`, Checkpoints). Each writing task pushes a typed checkpoint after every green step, and the orchestrator commits and pushes at the end of each task. Section 1's checkpoints are `feat: Helm's Deep …, checkpoint` and section 2's are `feat: The Road to Isengard …, checkpoint`. The branch lands on `main` squashed.
 - No task waits on the user for a reading. Read researches every reading, and Build applies it as researched or recommended.
 
@@ -22,6 +22,19 @@ The rules are `mec112.defense`, `mec112.wizardry`, `mec112.poisoned-counsels-sea
 - The campaign card records of 143077 and 143081. A Read finding against one goes to the orchestrator, not into a silent edit.
 
 ## Sections
+
+### 0. The One Deck plays the fixture games
+
+`repo`. The user's decision (2026-11-10): the tests that play real decklists play The One Deck, RingsDB decklist 8682 (https://www.ringsdb.com/decklist/view/8682/the-one-deck-1.0), in place of the starter and printed decklists. Its heroes are Arwen Undómiel (10140), Éowyn (145002) and Elrond (04128), with a 50-card deck. Every card is in `data/cards`, and none has an open line in `src/effects/open-lines.ts`.
+
+- **Source.** `pnpm data:sync ringsdb` fetches the list from RingsDB's public decklist API (`/api/public/decklist/8682`) into `data/raw/`, recorded in `data/sources.json`. `pnpm data:build` writes it to `data/decks/test-decks.json` (id `the-one-deck`). It is not a printed product, so it stays out of `data/prebuilt-decks.json` and the app does not offer it. A test in `scripts/data/` checks its 3 heroes and 50 cards, that each code is in `data/cards`, and that no card has an open line.
+- **Who plays it.** The first seat of every fixture seed finder: `FIXTURE_DECKS` in `scripts/e2e/seed-kit.ts`, and the Fellowship's starter seats in `scripts/e2e/fixtures.ts`. That seat is the first player, who takes ☺ Aragorn or the Ring-bearer.
+- **The second seat.** Two-handed fixtures cannot play the deck twice: a hero title may be in only one seat. The second seat plays a printed decklist that shares no hero title with The One Deck. Unique allies may share a title, since the engine's uniqueness rule refuses the second copy in play. `swords-of-the-noldor` has Arwen as a hero, so it leaves the list. The recommended second seats are `defenders-of-gondor`, and `wisdom-and-wizardry` for the Fellowship. The task confirms that neither shares a hero title, and a test checks it.
+- **Legality per campaign.** The task checks the deck against each campaign's deck rules: The Two Towers' banned titles and the Fellowship-sphere rule (no other Aragorn or Frodo Baggins; the deck has neither). The Uruk-hai's pool removal of Gildor Inglorion names the saga boon (141077), not the deck's ally (02079); the task checks that the record matches by code.
+- **What stays.** The goldens' stand-in heroes, the per-starter-deck goldens (`src/campaign/starter/golden/`) and the reader-play starter game. They test those decks or the engine, not a fixture's win.
+- **Rerun.** `node --experimental-strip-types scripts/e2e/fixtures.ts` for every scenario. A committed fixture that moves is rewritten in the same commit, and each one is named in the commit body. Each `*-won` fixture now found is committed, and its line in `docs/phases/STATUS.md` (Fixtures and Maestro) is deleted. A Maestro flow that asserts a seat's hero codes is updated. The commit body records each scenario's search time and seeds tried, under `Pipeline measure:`.
+- **What does not move.** Every golden, `ENGINE_VERSION`, and `data/` apart from the new deck, its raw file and its source entry.
+- **Docs.** `docs/architecture.md` (Tests) says which deck the fixture games play. The standing decision in `docs/phases/STATUS.md` is deleted once this section lands.
 
 ### 1. Helm's Deep (phase 64)
 
@@ -58,6 +71,8 @@ The rules are `mec112.defense`, `mec112.wizardry`, `mec112.poisoned-counsels-sea
 - While the stage has Defense, the quest-resolution readout says the encounter deck places the difference as progress, not the players' threat (143073:B:1). The quest dial says which way the progress goes.
 - Stage 4B's progress shows the loss at its quest points (143075:B:3).
 - No held dial: no line holds a card for a seat.
+
+**Fixtures.** The seed finder (`scripts/e2e/helms-deep.ts`) plays The One Deck in the first seat (section 0).
 
 **Campaign test.** It continues from The Uruk-hai's real Resolution. The Skill boons or Beyond All Hope reach Helm's Deep through the Campaign Setup Checklist. The +1 hero-change penalty is waived (143077:A:2). A seat that took Poisoned Counsels at stage 1A and still holds it when the game is won earns it (143077:B:1).
 
@@ -110,6 +125,8 @@ The rules are `mec112.defense`, `mec112.wizardry`, `mec112.poisoned-counsels-sea
 - A choice that triggers a Wizardry names the location. Saruman's names the defending player as the only player.
 - Saruman's Voice is drawn under its hero.
 
+**Fixtures.** The seed finder (`scripts/e2e/the-road-to-isengard.ts`) plays The One Deck in the first seat (section 0).
+
 **Campaign test.** It continues from Helm's Deep's real Resolution. An earned Poisoned Counsels is shuffled into its owner's deck after the starting hand (`mec112.poisoned-counsels-searching-eye`), and The Road to Isengard's Setup does not take it out (the player-deck removal is for scenarios 10 to 12). The win runs 143081's Resolution on the hands at the win: Saruman's Voice, the Palantír for the first player, or both.
 
 ### 3. Closing
@@ -123,7 +140,7 @@ The rules are `mec112.defense`, `mec112.wizardry`, `mec112.poisoned-counsels-sea
 
 ## Risks
 
-- **Wins.** Helm's Deep (difficulty 8) and stage 3B's elimination at 0 cards may leave the starter decks with no auto-played win, as for The Uruk-hai. The goldens may win with synthetic heroes, as the Dream-chaser goldens do. A missing `*-won` fixture is an open item, not a blocker.
+- **Wins.** Helm's Deep (difficulty 8) and stage 3B's elimination at 0 cards may leave even The One Deck with no auto-played win, as the starter decks found none for The Uruk-hai. The goldens may win with synthetic heroes, as the Dream-chaser goldens do. A missing `*-won` fixture is an open item, not a blocker.
 - **Core hooks.** Defense changes quest resolution, and Orthanc's return changes what an explored location does. Both are core paths every scenario replays. Each goes behind a family hook, and every other golden stays byte-identical. If one cannot, the task stops and reports.
 - **File limits.** The new family folders and the asks files count against `scripts/checks/layout.test.ts` and `scripts/checks/file-size.test.ts`, which `pnpm test:scenario` runs.
 

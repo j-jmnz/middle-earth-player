@@ -71,7 +71,7 @@ Read the sections your task touches.
   - 295–300 Images (~940) ← 6
   - 301–353 Screens (~3.8K) ← 1
   - 354–359 Catalog build (~410)
-  - 360–377 Tests (~1.7K) ← 5
+  - 360–377 Tests (~1.7K) ← 6
   - 378–393 Performance (~1.2K) ← 4
 - `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~85.7K tok)
   - 17–38 Sections (~410)
@@ -198,7 +198,7 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~7.2K tok)
+- `docs/phases/STATUS.md` — Phase status (~7.3K tok)
   - 5–15 Rules (~410)
   - 16–92 Phases (~1.5K)
   - 93–196 Open items (~4.7K)
@@ -207,7 +207,7 @@ STATUS.md, then the active phase file.
     - 121–168 Rules and engine (~2.2K)
     - 169–189 Screens and code (~900)
     - 190–196 Rules and engine (The Two Towers) (~240)
-  - 197–214 Standing decisions (~550)
+  - 197–215 Standing decisions (~600)
 
 ## Live plans
 
@@ -227,16 +227,17 @@ Read when a task names the plan.
   - 237–273 Mechanic families: engine and records together (~1.4K) ← 1
   - 274–287 Readings the review catches (~490) ← 4
   - 288–307 Not expressible yet: leave open, report (~390)
-- `docs/plans/helms-deep-and-road-to-isengard.md` — Plan: Helm's Deep and The Road to Isengard (~4.3K tok)
+- `docs/plans/helms-deep-and-road-to-isengard.md` — Plan: Helm's Deep and The Road to Isengard (~5.1K tok)
   - 3–10 Context (~310)
   - 11–17 Base and landing (~240)
   - 18–23 What does not move (~110)
-  - 24–123 Sections (~3.3K)
-    - 26–63 1. Helm's Deep (phase 64) (~1.5K)
-    - 64–114 2. The Road to Isengard (phase 65) (~1.7K)
-    - 115–123 3. Closing (~140)
-  - 124–129 Risks (~190)
-  - 130–137 Measure (~70)
+  - 24–140 Sections (~4.2K)
+    - 26–38 0. The One Deck plays the fixture games (~770)
+    - 39–78 1. Helm's Deep (phase 64) (~1.6K)
+    - 79–131 2. The Road to Isengard (phase 65) (~1.7K)
+    - 132–140 3. Closing (~140)
+  - 141–146 Risks (~200)
+  - 147–154 Measure (~70)
 - `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.7K tok)
   - 3–14 Context (~450)
   - 15–24 What does not move (~190)
