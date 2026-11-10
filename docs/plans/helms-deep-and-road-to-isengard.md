@@ -10,7 +10,7 @@ The rules are `mec112.defense`, `mec112.wizardry`, `mec112.poisoned-counsels-sea
 
 ## Base and landing
 
-- The work runs on the branch the session's harness names, from `main`.
+- The work runs on `feat/helms-deep-and-road-to-isengard`, from `main` (`.claude/rules/release-standards.md`, Branches). Every checkpoint and task commit is pushed there.
 - `orchestrator` runs the sections in order (`.claude/agents/orchestrator.md`). Section 0 is one implementer task. Sections 1 and 2 are each one scenario, run as the tasks of `docs/handover/agent-brief.md` (Scenario procedure): Read, Build, Judge, Finish, one review round, Fix. Section 2 starts after section 1's Fix: its campaign test continues from Helm's Deep's real Resolution.
 - Commit and push often (`.claude/rules/commit-standards.md`, Checkpoints). Each writing task pushes a typed checkpoint after every green step, and the orchestrator commits and pushes at the end of each task. Section 1's checkpoints are `feat: Helm's Deep …, checkpoint` and section 2's are `feat: The Road to Isengard …, checkpoint`. The branch lands on `main` squashed.
 - No task waits on the user for a reading. Read researches every reading, and Build applies it as researched or recommended.

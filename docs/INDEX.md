@@ -229,7 +229,7 @@ Read when a task names the plan.
   - 288–307 Not expressible yet: leave open, report (~390)
 - `docs/plans/helms-deep-and-road-to-isengard.md` — Plan: Helm's Deep and The Road to Isengard (~5.1K tok)
   - 3–10 Context (~310)
-  - 11–17 Base and landing (~240)
+  - 11–17 Base and landing (~270)
   - 18–23 What does not move (~110)
   - 24–140 Sections (~4.2K)
     - 26–38 0. The One Deck plays the fixture games (~770)
