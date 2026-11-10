@@ -33,6 +33,7 @@ import framsburgFixtures from "./fixtures/the-ghost-of-framsburg.json";
 import gundabadFixtures from "./fixtures/mount-gundabad.json";
 import wilderlandFixtures from "./fixtures/the-fate-of-wilderland.json";
 import haiFixtures from "./fixtures/the-uruk-hai.json";
+import deepFixtures from "./fixtures/helms-deep.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -82,6 +83,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "mount-gundabad": gundabadFixtures,
   "the-fate-of-wilderland": wilderlandFixtures,
   "the-uruk-hai": haiFixtures,
+  "helms-deep": deepFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(
