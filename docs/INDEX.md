@@ -204,16 +204,16 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~9.3K tok)
+- `docs/phases/STATUS.md` — Phase status (~9.4K tok)
   - 5–15 Rules (~410)
-  - 16–95 Phases (~1.6K)
-  - 96–218 Open items (~6.6K)
-    - 98–102 Releases (~150)
-    - 103–130 Fixtures and Maestro (~1.5K)
-    - 131–178 Rules and engine (~2.2K)
-    - 179–203 Screens and code (~1.6K)
-    - 204–218 Rules and engine (The Two Towers) (~1.2K)
-  - 219–237 Standing decisions (~590)
+  - 16–103 Phases (~1.7K)
+  - 104–226 Open items (~6.6K)
+    - 106–110 Releases (~150)
+    - 111–138 Fixtures and Maestro (~1.5K)
+    - 139–186 Rules and engine (~2.2K)
+    - 187–211 Screens and code (~1.6K)
+    - 212–226 Rules and engine (The Two Towers) (~1.2K)
+  - 227–245 Standing decisions (~590)
 
 ## Live plans
 
@@ -234,6 +234,7 @@ Read when a task names the plan.
   - 274–288 Readings the review catches (~550) ← 4
   - 289–308 Not expressible yet: leave open, report (~390)
 - `docs/plans/readme-showcase.md` — README showcase (~180 tok)
+- `docs/plans/return-of-the-king.md` — Plan: The Return of the King (~1.1K tok)
 - `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.7K tok)
   - 3–14 Context (~450)
   - 15–24 What does not move (~190)
@@ -258,7 +259,7 @@ Open work; read when a task names it.
   - 38–56 Files you own (edit freely) (~490)
   - 57–70 Shared files (~300)
   - 71–85 Approach (~670) ← 1
-  - 86–124 Scenario procedure (~2.0K) ← 16
+  - 86–124 Scenario procedure (~2.0K) ← 17
   - 125–134 Checkpoints (API usage limits can stop you mid-task) (~210)
   - 135–149 Checks before committing (~310)
   - 150–156 Merge (~140) ← 1
