@@ -22,7 +22,7 @@ import type { RuleEntry } from "../rules/spans.ts";
 import { generateEffects, segmentsOf, selfNamed, type Segment, type Unmatched } from "./generate.ts";
 import { vocabulary, vocabularyMarkdown } from "./vocabulary.ts";
 
-// Usage: node --experimental-strip-types scripts/data/effects/draft.ts <scenario-id | starter-deck-id | prebuilt-deck-id | pack | code,code,... | code code ...>
+// Usage: pnpm effects:draft <scenario-id | starter-deck-id | prebuilt-deck-id | pack | code,code,... | code code ...>
 // Writes .agent/drafts/<code>.md for every card in the scenario, the starter or pre-built deck (data/decks/prebuilt.json), the player pack (a data/cards file name,
 // "Core", "TRD"), or the list of codes (separated by commas or spaces), that has a printed line no record covers yet. With --all it also drafts the lines
 // that authored records already cover, to review or redo them.

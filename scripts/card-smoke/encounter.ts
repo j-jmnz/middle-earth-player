@@ -18,7 +18,7 @@ import { encounterStart, encounterWorld, kept, type EncounterWorld } from "./enc
 // that does not replay to the same state is a problem, reported with the card or the game, the intent and the step. It proves that
 // the records run without breaking the game, not that they do what the cards say. `pnpm test:scenario` runs it for each scenario.
 //
-// Usage: node --experimental-strip-types scripts/card-smoke/encounter.ts <scenario-id>... [--all] [--games=<n>] [--cards-only] [--games-only] [--verbose]
+// Usage: pnpm smoke:encounter <scenario-id>... [--all] [--games=<n>] [--cards-only] [--games-only] [--verbose]
 // --all smokes every playable scenario (src/campaign/playable.ts).
 
 /**

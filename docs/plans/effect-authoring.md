@@ -20,7 +20,7 @@ something else.
 3. `pnpm effects:open` rewrites `src/effects/open-lines.ts`, the list of printed lines with no record. The coverage test
    compares it with the data, so run it after adding or removing records.
 4. Check: `pnpm typecheck`, `pnpm vitest run src/effects scripts/checks/effect-coverage.test.ts`, and
-   `node --experimental-strip-types scripts/card-smoke/run.ts <code> <code> ...` for the cards you wrote. Card-smoke plays a
+   `pnpm smoke:cards <code> <code> ...` for the cards you wrote. Card-smoke plays a
    seeded game with the card in hand or on the table and fails on a throw, a refusal or `state.failure`; it shows the
    records run, not that they do what the card says. For that, write a test next to the family
    (`src/rules/families/<family>/index.test.ts`) that names the rule ids it implements.

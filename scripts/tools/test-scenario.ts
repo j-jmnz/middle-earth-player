@@ -159,7 +159,7 @@ export function playerCodes(id: string, recorded: readonly string[]): string[] {
   return [...new Set(dealt)].filter((code) => withRecords.has(code));
 }
 
-const SMOKE_NODE = ["--experimental-strip-types", "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON"];
+const SMOKE_NODE = ["--disable-warning=MODULE_TYPELESS_PACKAGE_JSON"];
 
 /** The card smokes of the scenario: the player cards' (skipped when it deals none), and the encounter smoke, which every scenario has. */
 export function smokeRuns(id: string, playerCards: readonly string[]): { name: "smoke" | "encounter"; args: string[]; detail: string }[] {

@@ -125,7 +125,7 @@ No personal data collected; saves stay on your device. See [PRIVACY.md](PRIVACY.
 
 ### Requirements
 
-- Node 22
+- Node 22.18 or later (runs the `.ts` scripts without a build step)
 - pnpm 10.34.1 (`corepack enable` installs the version pinned in `package.json`)
 - Optional: `poppler` (`pdftoppm`) to render campaign, boon and burden cards from FFG's PDFs. Without it those cards use their scans and the build warns.
 
@@ -153,11 +153,10 @@ A Codespaces devcontainer (`.devcontainer/devcontainer.json`) installs dependenc
 iOS needs macOS and Xcode. Android needs Android Studio, SDK Platform 36 and `ANDROID_HOME`. App id `com.middleearth.lcg`; uses `expo-dev-client`, so not Expo Go.
 
 ```bash
-pnpm catalog:build
-pnpm scans:pack
+pnpm assets
 ```
 
-The first `scans:pack` downloads every pinned card picture into `.cache/` (about 5 GB), checks each sha256, and writes 1200 px copies to `assets/scans/`. Later runs pack only changed pictures. Start and build scripts run both steps. Don't commit the rewritten `src/screens/images/scan-map.ts`.
+`pnpm assets` runs `catalog:build`, `booklets:pack` and `scans:pack`. The first `scans:pack` downloads every pinned card picture into `.cache/` (about 5 GB), checks each sha256, and writes 1200 px copies to `assets/scans/`. Later runs pack only changed pictures. `pnpm start`, `pnpm android` and `pnpm ios` run it first. Don't commit the rewritten `src/screens/images/scan-map.ts`.
 
 Release build (offline, all data bundled):
 
@@ -195,14 +194,15 @@ Flows are in `.maestro/scenarios/<scenario-id>/` and `.maestro/features/`. Run `
 | `pnpm a11y:web` | Audits the main web screens with axe-core in Chromium; fails on serious or critical findings. Needs `pnpm exec playwright install chromium` once, or `A11Y_CHROMIUM=<path>`. |
 | `pnpm catalog:build` | Writes `assets/catalog.db` (never committed) and `src/catalog/version.ts` (committed). |
 | `pnpm scans:pack` / `pnpm booklets:pack` | Packs card pictures / booklet PDFs into `assets/`. |
+| `pnpm assets` | `catalog:build`, `booklets:pack` and `scans:pack` in one; the native builds run it. |
 | `pnpm release:plan --dry-run` | Prints the next tag and its notes (`git fetch --tags` first). Changes nothing. |
 | `pnpm release:source --tag <tag> --ipa <file> --notes <file> --out <file>` | Writes a release's SideStore and AltStore source; run by the release workflow. |
 | `pnpm commit:check "<subject>"` | Checks commit subjects against `.claude/rules/commit-standards.md`; `--range <base>..<head>` for a range. Installed as the `commit-msg` hook. |
 | `pnpm move <old> <new>` | Moves files and rewrites every reference. `--dry-run` first. |
 | `pnpm docs:index` / `pnpm docs:section <file> "<heading>"` | Regenerates `docs/INDEX.md` / prints one doc section. |
-| `node --experimental-strip-types scripts/card-smoke/run.ts <codes>` | Plays a seeded game with those cards; reports errors and stalls. `--all` for every card. |
-| `node --experimental-strip-types scripts/card-smoke/encounter.ts <scenario-id>...` | Plays every encounter-side card of a scenario (reveal, Shadow, travel, quest Setup) and seeded games with random legal intents; reports errors, stalls and replay differences. `--all` for every playable scenario. |
-| `node --experimental-strip-types scripts/e2e/fixtures.ts [scenario-id]` | Regenerates the Maestro save fixtures in `src/campaign/fixtures/`. |
+| `pnpm smoke:cards <codes>` | Plays a seeded game with those cards; reports errors and stalls. `--all` for every card. |
+| `pnpm smoke:encounter <scenario-id>...` | Plays every encounter-side card of a scenario (reveal, Shadow, travel, quest Setup) and seeded games with random legal intents; reports errors, stalls and replay differences. `--all` for every playable scenario. |
+| `pnpm e2e:fixtures [scenario-id]` | Regenerates the Maestro save fixtures in `src/campaign/fixtures/`. |
 
 Scripts log to stderr. `--verbose`, `--quiet`, or `LOG_LEVEL` (`debug`, `info`, `warn`, `error`, `silent`).
 

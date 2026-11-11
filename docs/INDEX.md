@@ -8,7 +8,7 @@ Read a section, not a file: `pnpm docs:section <file> "<heading>"` prints one se
 
 Read whole.
 
-- `CLAUDE.md` — Claude Code (~2.6K tok)
+- `CLAUDE.md` — Claude Code (~2.5K tok)
 - `.claude/rules/authority.md` — Authority (~470 tok)
 - `.claude/rules/code-standards.md` — Code standards (~1.9K tok)
 - `.claude/rules/commit-standards.md` — Commit standards (~890 tok)
@@ -46,12 +46,12 @@ Read the sections your task touches.
     - 107–110 Check a download (optional) (~60)
     - 111–119 If something goes wrong (~160)
     - 120–123 Privacy (~30)
-  - 124–176 Local setup (~620)
-    - 126–140 Requirements (~120)
+  - 124–175 Local setup (~650)
+    - 126–140 Requirements (~130)
     - 141–150 In a browser (~100)
-    - 151–172 On a phone (~270)
-    - 173–176 Maestro (~130)
-  - 177–208 Commands (~870)
+    - 151–171 On a phone (~290)
+    - 172–175 Maestro (~130)
+  - 176–208 Commands (~870)
   - 209–212 Contributing (~80)
   - 213–222 Documentation (~170)
   - 223–240 Attribution (~470)
@@ -214,7 +214,7 @@ STATUS.md, then the active phase file.
 Read when a task names the plan.
 
 - `docs/plans/effect-authoring.md` — Authoring effect records (~7.4K tok)
-  - 12–33 Workflow (~470)
+  - 12–33 Workflow (~460)
   - 34–50 Where records live (~370)
   - 51–75 Templates and copied lines (~690) ← 5
   - 76–100 The record (~500)
@@ -230,12 +230,12 @@ Read when a task names the plan.
 - `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.7K tok)
   - 3–14 Context (~450)
   - 15–24 What does not move (~190)
-  - 25–48 A. Effects: draft better, template the repeats, copy identical lines (~970)
+  - 25–48 A. Effects: draft better, template the repeats, copy identical lines (~960)
   - 49–57 B. One registry for scenarios, fixtures and goldens (~280)
   - 58–71 C. A shared scenario kit and `pnpm scenario:new` (~610)
   - 72–83 D. One manifest per family (~460)
   - 84–92 E. Data: seed what can be seeded (~300)
-  - 93–113 F. Faster feedback while authoring (~880)
+  - 93–113 F. Faster feedback while authoring (~870)
   - 114–138 Where a scenario's cost is now (~790)
   - 139–155 Next steps (~410)
   - 156–167 After each scenario phase (~220)
@@ -253,7 +253,7 @@ Open work; read when a task names it.
   - 71–85 Approach (~690) ← 1
   - 86–124 Scenario procedure (~2.0K) ← 13
   - 125–134 Checkpoints (API usage limits can stop you mid-task) (~210)
-  - 135–149 Checks before committing (~320)
+  - 135–149 Checks before committing (~310)
   - 150–156 Merge (~140) ← 1
   - 157–163 Commit (~130)
   - 164–171 Report (your final message) (~90) ← 1

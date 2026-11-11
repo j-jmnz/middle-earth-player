@@ -27,7 +27,7 @@ exact match: copy them) or the nearest existing records. The vocabulary is in `.
 3. Take rule wording from `data/rules/entries.json` (`pnpm data:query`), not from memory. Rule ids you cite must exist there.
 4. Run `pnpm effects:open` (it rewrites `src/effects/open-lines.ts`; commit the change only when the task is to burn the
    list down), `pnpm typecheck`, `pnpm lint`, `pnpm vitest run src/effects scripts/checks/effect-coverage.test.ts`, and
-   `node --experimental-strip-types scripts/card-smoke/run.ts <codes>` for the cards you wrote. Report what is green and every
+   `pnpm smoke:cards <codes>` for the cards you wrote. Report what is green and every
    line you could not express, with the mechanic it needs.
 
 A test of a scenario's records builds its table with the scenario's scene (`test/scenarios/<scenario-id>/scene.ts`, written by `pnpm scenario:new` on the helpers of `test/harness/scene-kit.ts`: `resolveRecords`, `finish`, `answer`, the fight) next to the scenario's other tests in `src/campaign/scenarios/<scenario-id>/`.

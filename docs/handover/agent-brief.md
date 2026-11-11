@@ -140,7 +140,7 @@ change) says, and never kill processes you did not start (no `pkill`).
 - `pnpm typecheck`
 - `pnpm lint`
 - `pnpm effects:open`, then `pnpm vitest run scripts/checks/effect-coverage.test.ts src/effects src/rules/families`
-- `node --experimental-strip-types scripts/card-smoke/run.ts <codes>` for every card you wrote records for: no problems reported.
+- `pnpm smoke:cards <codes>` for every card you wrote records for: no problems reported.
 - `pnpm data:check` if you touched anything under `data/` or `scripts/data/`.
 - `pnpm test:scenario <scenario-id>` while authoring (the scenario's tests, its goldens, the coverage checks, the card smoke on its player cards and the encounter smoke).
 - Full `pnpm test` once at the end (Scenario procedure). The golden snapshots (`src/campaign/scenarios/<scenario-id>/golden.json` for the scenario games, `src/campaign/starter/golden/` for the

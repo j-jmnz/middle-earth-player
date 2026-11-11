@@ -234,7 +234,7 @@ function main(log: Log): void {
   if (id === undefined || args.length > 1) throw new Error("Usage: pnpm author:pack <scenario-id> [--no-draft]");
   if (!existsSync(path.join(ROOT, "data", "scenarios", `${id}.json`))) throw new Error(`${id} is not a scenario in data/scenarios`);
   if (!process.argv.includes("--no-draft")) {
-    const drafted = spawnSync("node", ["--experimental-strip-types", "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "scripts/data/effects/draft.ts", id], { cwd: ROOT, encoding: "utf8" });
+    const drafted = spawnSync("node", ["--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "scripts/data/effects/draft.ts", id], { cwd: ROOT, encoding: "utf8" });
     if (drafted.status !== 0) throw new Error(`effects:draft ${id} failed:\n${drafted.stdout}${drafted.stderr}`);
     log.debug(drafted.stderr.trim());
   }

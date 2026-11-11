@@ -15,7 +15,7 @@ import { syncRules } from "./sources/rules.ts";
 import { syncScans } from "./sources/scans.ts";
 
 // The only network command. Refreshes data/raw and .cache/pdf, then records every pin in data/sources.json.
-// Usage: node --experimental-strip-types scripts/data/sync.ts [ringsdb|hallofbeorn|dragncards|rules|scans|pictures|nightmare|icons]... [--verbose]
+// Usage: pnpm data:sync [ringsdb|hallofbeorn|dragncards|rules|scans|pictures|nightmare|icons]... [--verbose]
 // --verbose logs every request with its status, size and time.
 const ADAPTERS: Record<string, (log: Log) => Promise<SourceRecord>> = {
   ringsdb: syncRingsDb,

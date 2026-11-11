@@ -44,7 +44,7 @@ Every section keeps these. A task that cannot keep one stops and reports.
    - Stay authored: "If ~ is destroyed, its controller is eliminated" (the records' numbers skip slots a generated record would take) and "While ~ is in the staging area, it gains: "…"" (no template reads any of the quoted sentences).
 5. **Migration check.** A test or script under `scripts/checks/` lists every authored record whose id and lines a template now writes. An authored record is deleted only when the generated record is deep-equal to it.
 
-Exit: the plan's checks (Verification), the migration check clean, and `node --experimental-strip-types scripts/card-smoke/run.ts --all` green.
+Exit: the plan's checks (Verification), the migration check clean, and `pnpm smoke:cards --all` green.
 
 ## B. One registry for scenarios, fixtures and goldens
 
@@ -97,7 +97,7 @@ Exit: the plan's checks (Verification), and `pnpm data:check` shows no differenc
 - `scripts/data/rules.test.ts` reads every rule-id prefix in `data/rules/entries.json`, so a rule id cited in code, docs or tests that names no span fails.
 - `src/play/words/scenario-words.test.ts` reads the records of each playable and scaffolded scenario's dealt cards (`test/harness/record-walk.ts` walks them) and words each pick with `askWords` (`src/play/words/ask.ts`), the function the sheet calls, so the test reads the sentence the player reads. It fails on a bare "Choose a/an X." or a fallback sentence; an allowlist, keyed by record id and the instruction's path in the record, holds the cases left as they read, and fails on an entry no sentence needs. `WORDS_DUMP=<id>` prints every sentence.
 - A scenario whose lines are all owned may wait outside `PLAYABLE_SCENARIOS` while its `golden.test.ts` exists and its `golden.json` does not, so the coverage test does not block the goldens task.
-- `node --experimental-strip-types scripts/card-smoke/encounter.ts <scenario-id>... | --all` is the encounter-card smoke, and `pnpm test:scenario` runs it for every scenario on both tracks. On a table made from the scenario's own opening it:
+- `pnpm smoke:encounter <scenario-id>... | --all` is the encounter-card smoke, and `pnpm test:scenario` runs it for every scenario on both tracks. On a table made from the scenario's own opening it:
   - reveals each encounter-side card the scenario deals (its piles, its Nightmare deck, the other side of a two-code card);
   - resolves each card's Shadow in an attack on a plain enemy, defended and undefended;
   - travels to each location (the Island Map's, never in the staging area, are left out);

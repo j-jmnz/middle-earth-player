@@ -44,7 +44,7 @@ function addedAt(before: string, after: string): { at: number; line: string }[] 
 }
 
 function cli(...args: string[]): { status: number | null; output: string } {
-  const run = spawnSync("node", ["--experimental-strip-types", "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", path.join(ROOT, "scripts", "tools", "scenario-new.ts"), ...args], { cwd: ROOT, encoding: "utf8", env: { ...process.env, LOG_LEVEL: "info" } });
+  const run = spawnSync("node", ["--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", path.join(ROOT, "scripts", "tools", "scenario-new.ts"), ...args], { cwd: ROOT, encoding: "utf8", env: { ...process.env, LOG_LEVEL: "info" } });
   return { status: run.status, output: `${run.stdout}${run.stderr}` };
 }
 
