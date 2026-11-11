@@ -1,7 +1,7 @@
 // Rules: mec113.minas-tirith, rr.damage (data/rules/entries.json); ledger lines 145046:A:1, 145043:A:1. City Wall: the flag `damageFirst` on Minas Tirith names the card that takes its damage first.
 import { printedOf, type PrintedCard } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { modifierActive } from "../../core/state.ts";
+import { inPlay, modifierActive } from "../../core/state.ts";
 
 export const MINAS_TIRITH = "145043";
 
@@ -15,4 +15,9 @@ export function wallRoom(state: ScenarioState, assigned: string, cards: Readonly
     if (room > 0) return { wall: wall.id, room };
   }
   return null;
+}
+
+/** The objective Minas Tirith while it is in play (stage 3A adds it to the staging area; before that it is set aside, out of play). */
+export function minasTirithId(state: ScenarioState): string | undefined {
+  return Object.values(state.cards).find((card) => card.code === MINAS_TIRITH && inPlay(card.zone))?.id;
 }

@@ -247,6 +247,8 @@ export const simpleVerbs = [
     // With "travel" and `location`: only the location with that code that guards the objective with this title ("the Grey Moorland guarding Tiny", 19048:B:3).
     guarding: z.string().min(1).optional(),
     exceptTrait: z.string().min(1).optional(),
+    // With "travel" on a card that is not the location: the players cannot travel to a location with this trait ("The players cannot travel to Pelennor locations", 145075:B:3).
+    trait: z.string().min(1).optional(),
     maxWillpower: z.number().int().min(0).optional(),
     // With "defend": every ally (not only those with little Willpower) cannot defend the source's attacks ("Allies cannot defend against
     // Orc-chieftain", 142045:A:1).

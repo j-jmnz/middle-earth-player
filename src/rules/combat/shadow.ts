@@ -1,5 +1,6 @@
 // Rules: rr.step-6-2, rr.step-6-4-2, rr.step-6-4-3, rr.shadow-effects, rr.cancel, rr.attacks-outside-the-combat-phase,
 // faq.enemy-attacks-outside-combat, faq.additional-attacks, ltp.shadow-discard (data/rules/entries.json).
+import { undefendedToCity } from "../families/pelennor/combat.ts";
 import { verbsRunningInFrame, type Effect } from "../../catalog/boundary.ts";
 
 import { pushEffectFrame } from "../interpret/effect-frames.ts";
@@ -210,7 +211,7 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
     return damaged.lost ? damaged : afterDamage(damaged, ctx, steps);
   }
   // A shadow effect sent the damage to an active location (families/south/watcher.ts).
-  const located = attack.toLocation ? locationDamage(next, attack, ctx, steps) : null;
+  const located = attack.toLocation || undefendedToCity(next, attack.enemyId) ? locationDamage(next, attack, ctx, steps) : null;
   if (located) return located.lost || located.window ? located : afterDamage(noteAttackDamage(next, located, ctx), ctx, steps);
   // A shadow effect made a defended attack undefended: the player still names the hero who takes it.
   if (attack.heroId == null) return { ...next, window: { kind: "defense", enemyId: attack.enemyId, seat: attack.seat } };

@@ -42,6 +42,8 @@ const FLAGS = [
   "singleAttacker",
   // On the table: a player card effect that would cancel the effects of a treachery card just revealed from the encounter deck is itself canceled, and the source of this flag is discarded ("cancel the effects of that event. Then, discard Fire-filled Trench", 145048:A:1).
   "cancelCountered",
+  // On an enemy (target `self`): the damage of its undefended attacks is placed on Minas Tirith, through the City Wall, while Minas Tirith is in play, and on no hero ("undefended damage dealt by Mordor Orc must be dealt to Minas Tirith", 145055:A:2).
+  "undefendedToMinasTirith",
 ] as const;
 
 export const manifest = { name: "pelennor", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

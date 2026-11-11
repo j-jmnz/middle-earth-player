@@ -4,6 +4,7 @@
 // An enemy that attacks without being engaged: the Watcher in the Water stays in the staging area but is considered engaged with each
 // player, so it attacks every player once in the combat phase; Storm of Howls makes the enemy in the staging area with the highest
 // engagement cost attack the player who revealed it. The combat code asks `attackHere` instead of reading the enemy's zone.
+import { undefendedToCity } from "../pelennor/combat.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { ruleCause } from "../../core/cause.ts";
@@ -106,7 +107,11 @@ export function markLocationDamage(state: ScenarioState): ScenarioState {
 
 // The cards the damage of an undefended attack may be assigned to: the active locations when a shadow effect says it goes on one.
 export function undefendedLocations(state: ScenarioState): string[] {
-  return state.pendingAttack?.toLocation ? activeLocations(state) : [];
+  const attack = state.pendingAttack;
+  if (attack?.toLocation) return activeLocations(state);
+  // Mordor Orc's undefended damage goes on Minas Tirith while it is in play (families/pelennor/combat.ts).
+  const city = attack ? undefendedToCity(state, attack.enemyId) : undefined;
+  return city ? [city] : [];
 }
 
 // The damage of the undefended attack in progress goes on an active location (142035:A:2): the one location, or the one the defending

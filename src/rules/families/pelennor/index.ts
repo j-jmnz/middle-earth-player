@@ -6,7 +6,6 @@ import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { placeDamage } from "../../core/keywords.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { inPlay } from "../../core/state.ts";
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
@@ -15,12 +14,7 @@ import { discardAllyToStaging, stagedAlliesCost, takeControlOfStagedAllies } fro
 import { attackerBarredByEngagement } from "./combat.ts";
 import { attachShadowToHero, engageShadowCard, putTopmostFromEncounterDiscard } from "./moves.ts";
 import { assaultQuestResult, placeProgressActiveFirst } from "./assault.ts";
-import { MINAS_TIRITH } from "./wall.ts";
-
-/** The objective Minas Tirith while it is in play (3A adds it to the staging area; before that it is set aside, out of play). */
-export function minasTirithId(state: ScenarioState): string | undefined {
-  return Object.values(state.cards).find((card) => card.code === MINAS_TIRITH && inPlay(card.zone))?.id;
-}
+import { minasTirithId } from "./wall.ts";
 
 function damageMinasTirith(state: ScenarioState, instruction: Extract<Instruction, { verb: "DamageMinasTirith" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const id = minasTirithId(state);

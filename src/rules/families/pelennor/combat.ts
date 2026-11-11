@@ -5,6 +5,7 @@ import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { flagged, modifierActive, updateCard } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
+import { minasTirithId } from "./wall.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
 
@@ -43,4 +44,9 @@ export function counterCancel(state: ScenarioState, ctx: ReduceContext): Scenari
   const canceled = patchTop(state, { data: { ...running.data, canceled: true } });
   const trench = canceled.cards[held.sourceId];
   return trench ? updateCard(moveCard(canceled, trench.id, { zone: "encounterDiscard" }), trench.id, { face: "up", controller: null }) : canceled;
+}
+
+/** The objective an undefended attack of this enemy must damage instead of a hero, while Minas Tirith is in play (145055:A:2); undefined for any other enemy. */
+export function undefendedToCity(state: ScenarioState, enemyId: string): string | undefined {
+  return flagged(state, enemyId, "undefendedToMinasTirith") ? minasTirithId(state) : undefined;
 }
