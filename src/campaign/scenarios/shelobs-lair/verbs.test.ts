@@ -209,6 +209,12 @@ describe("a Condition attachment from the encounter deck that stays on a hero", 
     expect(flagged(run.state, hero?.id ?? "", "cannotReady")).toBe(true);
   });
 
+  it("144060:A:1 attaches only to a hero the revealing player controls: the second seat's hero when it reveals", () => {
+    const made = table({ seats: 2, firstPlayer: 1, stage: "144072" });
+    const run = resolveRecords(made.state, made.ctx, "144060", "whenRevealed");
+    expect(attachedTo(run.state, "144060")).toBe("dh3");
+  });
+
   it("144060:A:1 is not attached to a hero that carries one already, and is discarded with no hero left", () => {
     const made = table({ stage: "144072", attached: [{ code: "144060", to: "dh1" }, { code: "144060", to: "dh2" }] });
     const run = resolveRecords(made.state, made.ctx, "144060", "whenRevealed");
