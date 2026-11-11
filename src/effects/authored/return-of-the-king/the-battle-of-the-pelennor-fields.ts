@@ -87,8 +87,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       condition: { kind: "sourceIn", zone: "activeLocation" },
       instructions: [{ verb: "ModifyStat", stat: "engagementCost", amount: -30, until: "whileSourceInPlay", holders: { type: "enemy", control: "any", staging: true } }],
     },
-    { id: "145045:forced:1", cardCode: "145045", lines: ["145045:A:3"], timing: "forced", trigger: "activeExplored", subject: "self", instructions: [{ verb: "ReturnToStaging", target: { kind: "engagedEnemies", who: "each", pick: "all" } }] },
-    { id: "145045:forced:2", cardCode: "145045", lines: ["145045:A:3"], timing: "forced", trigger: "locationExplored", subject: "self", instructions: [{ verb: "ReturnToStaging", target: { kind: "engagedEnemies", who: "each", pick: "all" } }] },
+    { id: "145045:forced:1", cardCode: "145045", lines: ["145045:A:3"], timing: "forced", trigger: "locationExplored", subject: "self", instructions: [{ verb: "ReturnToStaging", target: { kind: "engagedEnemies", who: "each", pick: "all" } }] },
 
     // 145046 City Wall. While it is the active location, damage that would be placed on Minas Tirith is placed here first, up to its quest points, and the rest on Minas Tirith (the flag damageFirst; with Minas Tirith out of play nothing is redirected).
     // Forced: when it holds damage equal to its quest points (4) it is discarded, then each player raises their threat by 3.
@@ -304,7 +303,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     },
 
     // 145060 Dread and Despair (Doomed 1 and Peril are keywords). When Revealed: the revealing player discards an ally they control (their pick); until the end of the phase the total Threat in the staging area is raised by 1 for each ally in their discard pile, the one
-    // just discarded counting. Shadow: the defending player discards a non-objective attachment they control.
+    // just discarded counting, read live (faq.lasting-effects). Shadow: the defending player discards a non-objective attachment they control.
     {
       id: "145060:whenRevealed:1",
       cardCode: "145060",
@@ -313,7 +312,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       instructions: [
         { verb: "Pick", pick: { type: "ally", control: "you" } },
         { verb: "Discard", target: { kind: "picked" }, when: { kind: "canPick", pick: { type: "ally", control: "you" } } },
-        { verb: "RaiseStagingThreat", amount: { count: { type: "card", control: "you", from: "discard", cardType: "ally" } }, until: "endOfPhase" },
+        { verb: "RaiseStagingThreat", amount: 1, until: "endOfPhase", live: "alliesInDiscard" },
       ],
     },
     { id: "145060:shadow:1", cardCode: "145060", lines: ["145060:A:3"], timing: "shadow", instructions: [{ verb: "Pick", pick: { type: "attachment", control: "you", nonObjective: true } }, { verb: "DiscardPicked" }] },

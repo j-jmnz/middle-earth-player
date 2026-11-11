@@ -26,6 +26,8 @@ export type Modifier = {
   against?: string;
   // The stat is set to `amount`, overriding every modifier that is not a set (rr.modifiers).
   set?: boolean;
+  // A `moreStagingThreat` modifier that counts 1 for each ally in this seat's discard pile each time it is read (RaiseStagingThreat `live`, families/dungeon).
+  allyDiscardSeat?: number;
   // The Trait a `traitGained` modifier gives its holder ("gain a Trait of your choice", 11195:A:5).
   trait?: string;
 };

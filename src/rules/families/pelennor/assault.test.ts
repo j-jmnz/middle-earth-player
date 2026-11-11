@@ -88,6 +88,14 @@ describe("progressAsDamage (145076:B:1)", () => {
   });
 });
 
+describe("145076:B:1 (player card progress)", () => {
+  it("places progress from a player card effect on the stage as usual: only questing successfully is replaced", () => {
+    const state = atQuest("progressAsDamage");
+    const placed = runInstruction(state, { verb: "PlaceQuestProgress", perPlayer: 2 }, { seat: 0, sourceId: null }, { effects: [], cards }, []);
+    expect(placed.cards[placed.questStage ?? ""]?.progress).toBe(2);
+  });
+});
+
 describe("the Threat an enemy's destruction places (145075:B:4)", () => {
   const destroyed = (flag: boolean) => {
     const base = atQuest("assault");

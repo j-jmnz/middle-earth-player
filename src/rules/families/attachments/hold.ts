@@ -67,9 +67,22 @@ export function textBlank(state: ScenarioState, id: string, cards: ReadonlyMap<s
 
 // The total Threat in the staging area less the table's lessStagingThreat modifiers ("reduce the total Threat in the staging
 // area by X"), not below 0.
-export function withStagingThreat(state: ScenarioState, total: number): number {
+export function withStagingThreat(state: ScenarioState, total: number, cards: ReadonlyMap<string, PrintedCard>): number {
   const less = heldAmount(state, "table", "lessStagingThreat");
-  // "Raise the total Threat in the staging area by X" (moreStagingThreat, families/dungeon.ts).
-  const more = heldAmount(state, "table", "moreStagingThreat");
+  // "Raise the total Threat in the staging area by X" (moreStagingThreat, families/dungeon.ts); one counting the allies in a discard pile is read live (faq.lasting-effects).
+  const more = heldAmount(state, "table", "moreStagingThreat") + liveAllyRaise(state, cards);
   return less === 0 && more === 0 ? total : Math.max(0, total + more - less);
+}
+
+// The live part of the table's moreStagingThreat: 1 for each ally in the discard pile of the seat a RaiseStagingThreat `live` named, while it holds.
+function liveAllyRaise(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): number {
+  let total = 0;
+  for (const modifier of state.modifiers) {
+    if (modifier.stat !== "moreStagingThreat" || modifier.allyDiscardSeat == null || !modifierActive(state, modifier)) continue;
+    for (const id of state.seats[modifier.allyDiscardSeat]?.discard ?? []) {
+      const instance = state.cards[id];
+      if (instance && printedOf(cards, instance.code).type === "ally") total += 1;
+    }
+  }
+  return total;
 }

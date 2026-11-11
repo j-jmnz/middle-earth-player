@@ -21,6 +21,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "AttachToDeck":
       return attachToDeck(state, focus);
     case "RaiseStagingThreat": {
+      if (instruction.live === "alliesInDiscard") return { ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: focus.sourceId ?? "table", stat: "moreStagingThreat", amount: 0, until: instruction.until, allyDiscardSeat: focus.seat }] };
       const amount = resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
       return amount > 0 ? { ...state, modifiers: [...state.modifiers, { instanceId: "table", sourceId: focus.sourceId ?? "table", stat: "moreStagingThreat", amount, until: instruction.until }] } : state;
     }

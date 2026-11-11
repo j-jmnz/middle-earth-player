@@ -82,7 +82,7 @@ export function stagingThreatSources(state: ScenarioState, cards: Cards, seat?: 
     if (instance && flagged(view, instance.id, "activeThreat") && !flagged(view, instance.id, "noThreatContribution")) sources.push({ id: instance.id, threat: modifiedStat(view, instance, "threat", cards), from: "active" });
   }
   const sum = sources.reduce((total, source) => total + source.threat, 0);
-  return { sources, adjust: withStagingThreat(view, sum) - sum };
+  return { sources, adjust: withStagingThreat(view, sum, cards) - sum };
 }
 
 // The total Threat in the staging area; with `seat`, once stages are separate, in that seat's staging area (families/breaking/areas.ts).
@@ -218,8 +218,8 @@ export function placeQuestProgress(
     next = queueEvent(next, { trigger: "progressReplaced", seat: null, cardId: next.questStage, amount: remaining });
     remaining = 0;
   }
-  // Progress a stage turns into damage among the enemies in play (families/pelennor, 145076:B:1): its record hears the amount.
-  if (remaining > 0 && next.questStage && flagged(next, next.questStage, "progressAsDamage")) {
+  // Progress placed on the stage by questing successfully turns into damage among the enemies in play (families/pelennor, 145076:B:1): its record hears the amount. A player card's progress is placed as usual.
+  if (remaining > 0 && questing && next.questStage && flagged(next, next.questStage, "progressAsDamage")) {
     next = queueEvent(next, { trigger: "progressReplaced", seat: null, cardId: next.questStage, amount: remaining });
     remaining = 0;
   }

@@ -89,9 +89,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     - each enemy (any player controls) or in the staging area: stat engagementCost -30, while this card is in play
 
 145045:A:3 (front): Forced: When Gate of Gondor is explored, return each engaged enemy to the staging area.
-  145045:forced:1: Forced on the event activeExplored (heard about this card)
-    - return every enemy engaged with a player to the staging area
-  145045:forced:2: Forced on the event locationExplored (heard about this card)
+  145045:forced:1: Forced on the event locationExplored (heard about this card)
     - return every enemy engaged with a player to the staging area
 
 ## 145046 City Wall
@@ -328,7 +326,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ally (you control)
     - then, if there is a ally (you control) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
-    - [json RaiseStagingThreat {"verb":"RaiseStagingThreat","amount":{"count":{"type":"card","control":"you","from":"discard","cardType":"ally"}},"until":"endOfPhase"}]
+    - [json RaiseStagingThreat {"verb":"RaiseStagingThreat","amount":1,"until":"endOfPhase","live":"alliesInDiscard"}]
 
 145060:A:3 (shadow): Shadow: Discard a non-objective attachment you control.
   145060:shadow:1: Shadow
@@ -529,7 +527,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     - [json RemoveBurdenSets {"verb":"RemoveBurdenSets","sets":["A Shadow of the Past","Flight to the Ford","The Ring Goes South","The Passage of the Marshes","Shelob's Lair"]}]
 
 145078:B:1 (back): Forced: When the players advance to stage 5B, add each set aside Harad enemy to the staging area.
-  145078:forced:1: Forced on the event stageRevealed
+  145078:forced:1: Forced on the event afterStageRevealed
     only if the card the event is about is a card (any player controls) named "Fighting in the Fields"
     - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","trait":"Harad","all":true}]
 
@@ -571,4 +569,4 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     - [json EngageFirstPlayer {"verb":"EngageFirstPlayer"}]
     - then, if this card is engaged with the player (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
-(rendered pieces: 265 by template, 71 as JSON)
+(rendered pieces: 263 by template, 71 as JSON)

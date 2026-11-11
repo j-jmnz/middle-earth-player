@@ -162,7 +162,7 @@ export const STAGE_RECORDS: readonly Effect[] = [
       cardCode: "145078",
       lines: ["145078:B:1"],
       timing: "forced",
-      trigger: "stageRevealed",
+      trigger: "afterStageRevealed",
       condition: { kind: "matches", card: "subject", pick: { type: "card", control: "any", names: ["Fighting in the Fields"] } },
       instructions: [{ verb: "AddSetAsideToStaging", trait: "Harad", all: true }],
     },
