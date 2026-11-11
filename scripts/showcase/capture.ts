@@ -1,13 +1,13 @@
-// `pnpm assets capture --app <App.app>`: takes the README showcase's captures (docs/plans/readme-showcase.md, Capture flows) on the iOS simulators, on
-// macOS with Xcode and Maestro. The app is a Release simulator build with EXPO_PUBLIC_SHOWCASE=1 and EXPO_PUBLIC_E2E_SEED=1 and every picture packed
-// (`pnpm assets`), as .github/workflows/showcase.yml builds it. For each device (shots.ts) it boots the newest simulator of that kind, sets a clean
+// `pnpm assets capture`: takes the README showcase's captures (docs/showcase.md, Capture flows) on the iOS simulators, on macOS with Xcode and
+// Maestro. The app is a Release simulator build with EXPO_PUBLIC_SHOWCASE=1 and EXPO_PUBLIC_E2E_SEED=1 and every picture packed: `--build` makes it
+// (expo prebuild, then xcodebuild into .cache/showcase/build; run `pnpm assets` first), `--app <App.app>` takes one already built. For each device (shots.ts) it boots the newest simulator of that kind, sets a clean
 // status bar, installs the app, and runs each of the device's flows in .maestro/showcase/ once per theme, with THEME and DEVICE. What a flow writes
 // (a screenshot, a recording) lands in --out (default .cache/showcase/raw) as <device>-<theme>-<shot>.png or .mp4, with capture.json saying which
 // captures were taken and which failed. A flow that fails is run once more; the script fails when any capture is still missing.
 //
-// Flags: --out <dir>, --only <shot,shot>, --device <iphone|ipad>, --theme <dark|light>.
+// Flags: --build or --app <App.app>, --out <dir>, --only <shot,shot>, --device <iphone|ipad>, --theme <dark|light>.
 import { spawnSync } from "node:child_process";
-import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -26,12 +26,30 @@ function flag(name: string): string | null {
   return at >= 0 ? (process.argv[at + 1] ?? null) : null;
 }
 
-function run(log: Log, command: string, args: readonly string[], cwd: string = ROOT): boolean {
+function run(log: Log, command: string, args: readonly string[], cwd: string = ROOT, env: NodeJS.ProcessEnv = process.env): boolean {
   log.debug(`${command} ${args.join(" ")}`);
-  const child = spawnSync(command, args, { cwd, stdio: verbose() ? "inherit" : "pipe", encoding: "utf8" });
+  const child = spawnSync(command, args, { cwd, env, stdio: verbose() ? "inherit" : "pipe", encoding: "utf8", maxBuffer: 256 * 1024 * 1024 });
   if (child.status === 0) return true;
   if (!verbose()) log.warn(`${command} ${args[0] ?? ""} failed:\n${child.stdout ?? ""}${child.stderr ?? ""}`);
   return false;
+}
+
+// The showcase build: the native project generated, then a Release build for the simulator with the showcase's variables, which Metro inlines
+// when Xcode bundles the JavaScript. The pictures must already be packed (`pnpm assets` rewrites scan-map.ts with them).
+function buildApp(log: Log): string {
+  const scanMap = readFileSync(path.join(ROOT, "src", "screens", "images", "scan-map.ts"), "utf8");
+  if (!/moduleId/.test(scanMap.split("export const scanAssets")[1] ?? "")) throw new Error("No card picture is packed: run pnpm assets first (the first run downloads about 5 GB)");
+  const env = { ...process.env, EXPO_PUBLIC_E2E_SEED: "1", EXPO_PUBLIC_SHOWCASE: "1" };
+  if (!run(log, "pnpm", ["exec", "expo", "prebuild", "--platform", "ios"], ROOT, env)) throw new Error("expo prebuild failed");
+  const workspace = readdirSync(path.join(ROOT, "ios")).find((name) => name.endsWith(".xcworkspace"));
+  if (!workspace) throw new Error("expo prebuild wrote no ios/*.xcworkspace");
+  const derived = path.join(ROOT, ".cache", "showcase", "build");
+  const built = run(log, "xcodebuild", ["-quiet", "-workspace", path.join("ios", workspace), "-scheme", path.basename(workspace, ".xcworkspace"), "-configuration", "Release", "-sdk", "iphonesimulator", "-destination", "generic/platform=iOS Simulator", "-derivedDataPath", derived, "CODE_SIGNING_ALLOWED=NO", "build"], ROOT, env);
+  if (!built) throw new Error("xcodebuild failed: run again with --verbose for its output");
+  const products = path.join(derived, "Build", "Products", "Release-iphonesimulator");
+  const app = readdirSync(products).find((name) => name.endsWith(".app"));
+  if (!app) throw new Error(`No .app in ${products}`);
+  return path.join(products, app);
 }
 
 type SimDevice = { name: string; udid: string; isAvailable: boolean };
@@ -90,8 +108,9 @@ function capture(log: Log, sim: SimDevice, device: Device, theme: Theme, shot: S
 }
 
 void runScript("showcase-capture", (log) => {
-  const app = flag("app");
-  if (!app || !existsSync(app)) throw new Error("Usage: pnpm assets capture --app <App.app> [--out <dir>] [--only <shot,shot>] [--device <iphone|ipad>] [--theme <dark|light>]");
+  const given = flag("app");
+  const app = process.argv.includes("--build") ? log.step("build the showcase app", () => buildApp(log)) : given;
+  if (!app || !existsSync(app)) throw new Error("Usage: pnpm assets capture --build | --app <App.app> [--out <dir>] [--only <shot,shot>] [--device <iphone|ipad>] [--theme <dark|light>]");
   const out = path.resolve(flag("out") ?? path.join(ROOT, ".cache", "showcase", "raw"));
   mkdirSync(out, { recursive: true });
   const only = flag("only")?.split(",") ?? null;

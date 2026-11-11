@@ -1,4 +1,4 @@
-// The README showcase's saves of A Shadow of the Past (docs/plans/readme-showcase.md, Saves and decks), written into src/campaign/fixtures/scenario-1.json
+// The README showcase's saves of A Shadow of the Past (docs/showcase.md, Saves and decks), written into src/campaign/fixtures/scenario-1.json
 // by scripts/e2e/fixtures.ts beside `duo`: the same two decklists (The One Deck with the saga Frodo, and Stealth and Steadfastness), two-handed, Easy,
 // played by the auto-player's answers, each parked on a moment the capture flows open (.maestro/showcase/).
 //

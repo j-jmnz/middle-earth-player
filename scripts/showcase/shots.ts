@@ -1,5 +1,6 @@
-// The README showcase's shots (docs/plans/readme-showcase.md, Shot list): one per flow in .maestro/showcase/, the devices it is taken on, and the
-// caption and alt text the README gives it. capture.ts runs the flows, build.ts turns what they write into the images, and the README links them.
+// The README showcase's shots (docs/showcase.md, Shot list): one per flow in .maestro/showcase/, the devices it is taken on, and the
+// caption and alt text the README gives it. The iPad takes every shot in landscape; the iPhone takes the table in landscape and the rest in
+// portrait (user decision, 2026-11-11). capture.ts runs the flows, build.ts turns what they write into the images, and the README links them.
 
 export type Device = "iphone" | "ipad";
 export type Theme = "dark" | "light";
@@ -14,16 +15,11 @@ export type Shot = {
   alt: string;
 };
 
-export const DEVICES: Readonly<Record<Device, { simulator: string }>> = {
-  iphone: { simulator: "iPhone 16 Pro" },
-  ipad: { simulator: "iPad Pro 13-inch (M4)" },
-};
-
 /** Ringwraiths is the Dark theme, Rivendell the Light (docs/design-system.md, Color). */
 export const THEMES: Readonly<Record<Theme, string>> = { dark: "Ringwraiths", light: "Rivendell" };
 
 const BOTH: readonly Device[] = ["iphone", "ipad"];
-const TABLE: readonly Device[] = ["ipad"];
+const TABLE = BOTH;
 
 export const SHOTS: readonly Shot[] = [
   { id: "table-quest", kind: "gif", devices: TABLE, caption: "The quest phase", alt: "A Shadow of the Past, round 3: the players commit their characters and the encounter cards are revealed into the staging area." },
@@ -41,7 +37,19 @@ export const SHOTS: readonly Shot[] = [
   { id: "settings", kind: "still", devices: BOTH, caption: "Settings", alt: "Settings: the Theme, UI scale and table choices." },
 ];
 
+/** How a shot stands on a device: the table always lies landscape, and the iPad lies landscape for every screen. */
+export function orientationOf(shot: string, device: Device): "portrait" | "landscape" {
+  return device === "ipad" || shot.startsWith("table-") ? "landscape" : "portrait";
+}
+
 /** A capture's file name, without its extension. */
 export function captureName(device: Device, theme: Theme, shot: string): string {
   return `${device}-${theme}-${shot}`;
+}
+
+/** The quarter turn a capture needs to stand as its shot does on its device: none when it already does, else clockwise (or counter-clockwise). */
+export function turnFor(shot: Shot, device: Device, width: number, height: number, counter: boolean): 0 | 90 | 270 {
+  const landscape = orientationOf(shot.id, device) === "landscape";
+  if (landscape === width >= height) return 0;
+  return counter ? 270 : 90;
 }

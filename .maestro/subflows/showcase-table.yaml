@@ -1,6 +1,6 @@
 appId: com.middleearth.lcg
 ---
-# A showcase save opened on the table (docs/plans/readme-showcase.md, Capture flows): the fixture route writes it and opens its campaign path,
+# A showcase save opened on the table (docs/showcase.md, Capture flows): the fixture route writes it and opens its campaign path,
 # Begin resumes it on the table, and the quest stage the table opens on is closed. Then every picture on it has drawn (pictures-ready).
 # Env: FIXTURE (a showcase fixture of src/campaign/fixtures/registry.ts).
 # Optional env: THEME (dark or light), given by scripts/showcase/capture.ts with -e.

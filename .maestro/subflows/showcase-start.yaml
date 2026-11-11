@@ -1,11 +1,22 @@
 appId: com.middleearth.lcg
 ---
-# The README showcase's start (docs/plans/readme-showcase.md, Capture flows): a fresh app, its Theme set to the one the capture asks for, then
+# The README showcase's start (docs/showcase.md, Capture flows): a fresh app, its Theme set to the one the capture asks for, then
 # the link the shot opens. The showcase build (EXPO_PUBLIC_SHOWCASE=1, EXPO_PUBLIC_E2E_SEED=1) is the only one that runs it.
 # Env: LINK (the path after middleearthlcg://, a fixture as e2e/<name>), READY (the testID that says the opened screen has settled).
-# Optional env: THEME (dark or light), given by scripts/showcase/capture.ts with -e; dark when it is not.
+# Optional env: THEME (dark or light) and DEVICE (iphone or ipad), given by scripts/showcase/capture.ts with -e; dark and an iPhone when they are not.
+# The iPad lies landscape for every shot; the iPhone stays portrait, and the table turns itself landscape (shots.ts, orientationOf).
 - launchApp:
     clearState: true
+- runFlow:
+    when:
+      true: "${typeof DEVICE !== 'undefined' && DEVICE === 'ipad'}"
+    commands:
+      - setOrientation: LANDSCAPE_LEFT
+- runFlow:
+    when:
+      true: "${typeof DEVICE === 'undefined' || DEVICE !== 'ipad'}"
+    commands:
+      - setOrientation: PORTRAIT
 - openLink: "middleearthlcg://settings"
 - extendedWaitUntil:
     visible:

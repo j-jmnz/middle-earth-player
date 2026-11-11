@@ -7,7 +7,7 @@
 // committed ones. The scenario's JSON holds the saves; each is a real loadout, a seed and the intents that reach the moment
 // (`won`, `lost` and `duo` are scenario 1 from an empty log; `knife-lost` starts from the log `won` writes; the rest are
 // two-handed games of one scenario, parked on its win or loss, and a part after the first starts from the log the earlier
-// parts' wins write). The names with `showcase` are the README's captures (docs/plans/readme-showcase.md), parked on a full table.
+// parts' wins write). The names with `showcase` are the README's captures (docs/showcase.md), parked on a full table.
 export const FIXTURE_REGISTRY = [
   { scenarioId: "a-shadow-of-the-past", file: "scenario-1", names: ["won", "lost", "duo", "past-showcase-board", "past-showcase-quest", "past-showcase-combat"] },
   { scenarioId: "a-knife-in-the-dark", names: ["knife-lost"] },

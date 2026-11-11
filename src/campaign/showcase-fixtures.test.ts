@@ -17,7 +17,7 @@ import { fixture, fixtureSave, hasFixture, type FixtureName } from "./fixtures.t
 import { contextOf, resume } from "./session.ts";
 import { loadWorld, logCodes } from "./world.ts";
 
-// The README showcase's saves (docs/plans/readme-showcase.md, Saves and decks) replay to the moments the capture flows open: a full table on a planning window,
+// The README showcase's saves (docs/showcase.md, Saves and decks) replay to the moments the capture flows open: a full table on a planning window,
 // a quest commit and an enemy's attack waiting for a defender. What a flow taps (`showcase` in scenario-1.json) is a move the moment offers.
 const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
 const TAPS = scenarioOne as unknown as Record<string, { showcase?: { commit?: string[]; defender?: string } }>;

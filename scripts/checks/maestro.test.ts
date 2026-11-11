@@ -188,7 +188,7 @@ describe("the Maestro flows", () => {
     for (const flow of FLOWS) expect(flow.config.appId, flow.rel).toBe("com.middleearth.lcg");
   });
 
-  // showcase/ holds the README's capture flows (docs/plans/readme-showcase.md, Capture flows): scripts/showcase/capture.ts runs them by name, never config.yaml.
+  // showcase/ holds the README's capture flows (docs/showcase.md, Capture flows): scripts/showcase/capture.ts runs them by name, never config.yaml.
   it("are run by config.yaml only from scenarios/<scenario-id>/ and features/, never the subflows or the showcase", () => {
     const config = readFileSync(path.join(MAESTRO, "config.yaml"), "utf8");
     const globs = [...config.matchAll(/^\s*- "([^"]+)"$/gm)].map((found) => found[1]);

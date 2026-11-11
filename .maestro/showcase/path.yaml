@@ -2,7 +2,7 @@ appId: com.middleearth.lcg
 tags:
   - showcase
 ---
-# The README showcase's campaign path of The Fellowship of the Ring, A Shadow of the Past on the table (docs/plans/readme-showcase.md, Shot list), on the iPhone and the iPad. scripts/showcase/capture.ts runs it with THEME and DEVICE.
+# The README showcase's campaign path of The Fellowship of the Ring, A Shadow of the Past on the table (docs/showcase.md, Shot list), on the iPhone (portrait) and the iPad (landscape). scripts/showcase/capture.ts runs it with THEME and DEVICE.
 - runFlow:
     file: ../subflows/showcase-start.yaml
     env:

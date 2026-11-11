@@ -1,6 +1,6 @@
 name: showcase
 
-# Takes the README's screenshots and GIFs (docs/plans/readme-showcase.md): a Release simulator build of the app with every card picture packed and
+# Takes the README's screenshots and GIFs (docs/showcase.md): a Release simulator build of the app with every card picture packed and
 # the showcase marker on, the flows in .maestro/showcase/ on the newest iPhone Pro and iPad Pro simulators in both themes, then the post-process.
 # The images, the contact sheet and the manifest are a workflow artifact; with publish on, the images replace the one commit of the `showcase`
 # branch, which the README links. Start it from the Actions tab or with `gh workflow run showcase.yml --ref main -f publish=true`.
@@ -35,10 +35,6 @@ jobs:
     timeout-minutes: 240
     outputs:
       complete: ${{ steps.capture.outcome == 'success' }}
-    env:
-      # Inlined into the bundle by Metro: the fixture route writes saves, and the pictures-ready marker shows (src/ui/showcase/picture-loads.ts).
-      EXPO_PUBLIC_E2E_SEED: "1"
-      EXPO_PUBLIC_SHOWCASE: "1"
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
       - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
@@ -49,16 +45,6 @@ jobs:
           distribution: temurin
           java-version: 17
       - uses: ./.github/actions/pack-assets
-      - name: Generate the native project
-        run: pnpm exec expo prebuild --platform ios
-      - name: Build the simulator app
-        run: |
-          workspace=$(ls -d ios/*.xcworkspace | head -1)
-          scheme=$(basename "$workspace" .xcworkspace)
-          xcodebuild -quiet -workspace "$workspace" -scheme "$scheme" -configuration Release -sdk iphonesimulator \
-            -destination "generic/platform=iOS Simulator" -derivedDataPath "$RUNNER_TEMP/build" CODE_SIGNING_ALLOWED=NO build
-          app=$(ls -d "$RUNNER_TEMP"/build/Build/Products/Release-iphonesimulator/*.app | head -1)
-          echo "APP=$app" >> "$GITHUB_ENV"
       - name: Install Maestro and ffmpeg
         run: |
           curl -fsSL "https://get.maestro.mobile.dev" | bash
@@ -70,7 +56,7 @@ jobs:
         run: |
           only=()
           if [ -n "${{ inputs.only || '' }}" ]; then only=(--only "${{ inputs.only }}"); fi
-          pnpm assets capture --app "$APP" --out "$RUNNER_TEMP/raw" "${only[@]}"
+          pnpm assets capture --build --out "$RUNNER_TEMP/raw" "${only[@]}"
       - name: Post-process
         run: pnpm assets showcase --from "$RUNNER_TEMP/raw" --out "$RUNNER_TEMP/out"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2

@@ -212,6 +212,8 @@ Scripts are grouped: `pnpm <group> <command> [args]`, and `pnpm <group>` alone l
 | `pnpm assets` | `catalog`, `booklets` and `scans` in order; `start`, `android`, `ios` and the native release builds run it (`start` with `--optional`). |
 | `pnpm assets catalog` | Writes `assets/catalog.db` (never committed) and `src/catalog/version.ts` (committed). |
 | `pnpm assets scans` / `pnpm assets booklets` | Packs card pictures / booklet PDFs into `assets/`. |
+| `pnpm assets capture --build` | Takes the README's screenshots and GIFs on the iOS simulators (macOS, Xcode and Maestro; [docs/showcase.md](docs/showcase.md)). |
+| `pnpm assets showcase [--publish]` | Turns the captures into the README's images and a contact sheet; `--publish` replaces the `showcase` branch with them. |
 | `pnpm docs index` / `pnpm docs section <file> "<heading>"` | Regenerates `docs/INDEX.md` / prints one doc section. |
 | `pnpm release plan --dry-run` | Prints the next tag and its notes (`git fetch --tags` first). Changes nothing. |
 | `pnpm release source --tag <tag> --ipa <file> --notes <file> --out <file>` | Writes a release's SideStore and AltStore source; run by the release workflow. |
@@ -229,6 +231,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT
 - [docs/brief.md](docs/brief.md): product decisions and implemented rules.
 - [docs/architecture.md](docs/architecture.md): code layout, state, engine, tests.
 - [docs/design-system.md](docs/design-system.md), [docs/design-system-table.md](docs/design-system-table.md): screens and game table.
+- [docs/showcase.md](docs/showcase.md): the README's screenshots and GIFs, and how to take them again on a Mac.
 - [docs/releasing.md](docs/releasing.md): the release pipeline; rules in [.claude/rules/release-standards.md](./.claude/rules/release-standards.md).
 - [docs/phases/STATUS.md](docs/phases/STATUS.md): open work.
 - [ACCESSIBILITY.md](ACCESSIBILITY.md): support, gaps, reporting a barrier.

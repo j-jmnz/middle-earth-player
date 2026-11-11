@@ -1,24 +1,25 @@
 // `pnpm assets showcase`: turns the README showcase's captures (capture.ts, default .cache/showcase/raw) into the images the README shows
-// (docs/plans/readme-showcase.md, Post-process), in --out (default .cache/showcase/out): each still as WebP with the device's rounded corners, each
+// (docs/showcase.md, Post-process), in --out (default .cache/showcase/out): each still as WebP with the device's rounded corners, each
 // recording as a looping GIF, a contact sheet of them all (contact.png) to look at before they are published, and manifest.json naming each file's
-// shot, device, theme and the commit it was taken from. Needs ffmpeg for the GIFs.
+// shot, device, theme and the commit it was taken from. Needs ffmpeg for the GIFs. `--publish` then replaces the one commit of the `showcase` branch
+// on origin with these files (docs/showcase.md, Publish), and refuses while a capture is missing.
 //
-// The table is landscape: a table capture that comes out portrait (the simulator's framebuffer keeps the device's own orientation) is turned a
-// quarter turn, clockwise unless --turn ccw.
+// A shot stands as orientationOf (shots.ts) says: a capture that comes out the other way (a simulator's framebuffer can keep the device's own
+// orientation) is turned a quarter turn, clockwise unless --turn ccw.
 import { execFileSync, spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync, readFileSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
 import sharp from "sharp";
 
 import { runScript, type Log } from "../log.ts";
-import { captureName, SHOTS, type Device, type Shot, type Theme } from "./shots.ts";
+import { captureName, orientationOf, SHOTS, turnFor, type Device, type Shot, type Theme } from "./shots.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "..", "..");
 
-/** The width a still is published at, in pixels, and its corner radius as a share of that width. */
-export const STILL: Readonly<Record<Device, { width: number; corner: number }>> = { iphone: { width: 540, corner: 0.105 }, ipad: { width: 1200, corner: 0.03 } };
+/** The long side a still is published at, in pixels, and its corner radius as a share of its short side (the device's own rounding). */
+export const STILL: Readonly<Record<Device, { long: number; corner: number }>> = { iphone: { long: 1170, corner: 0.105 }, ipad: { long: 1200, corner: 0.04 } };
 /** The GIF widths tried in turn until the file is under GIF_BUDGET bytes, and its frame rate. */
 export const GIF_WIDTHS = [960, 800, 680, 560] as const;
 export const GIF_BUDGET = 6 * 1024 * 1024;
@@ -29,12 +30,6 @@ function flag(name: string): string | null {
   return at >= 0 ? (process.argv[at + 1] ?? null) : null;
 }
 
-/** The quarter turn a table capture needs to stand landscape: none when it already does. */
-export function turnFor(shot: Shot, width: number, height: number, counter: boolean): 0 | 90 | 270 {
-  if (!shot.id.startsWith("table-") || width >= height) return 0;
-  return counter ? 270 : 90;
-}
-
 // A rounded-rectangle mask of `width` x `height` with corners of `radius` pixels.
 function mask(width: number, height: number, radius: number): Buffer {
   return Buffer.from(`<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}"><rect width="${width}" height="${height}" rx="${radius}" ry="${radius}" fill="#fff"/></svg>`);
@@ -42,11 +37,12 @@ function mask(width: number, height: number, radius: number): Buffer {
 
 async function still(source: string, target: string, shot: Shot, device: Device, counter: boolean): Promise<{ width: number; height: number }> {
   const meta = await sharp(source).metadata();
-  const turn = turnFor(shot, meta.width ?? 0, meta.height ?? 0, counter);
+  const turn = turnFor(shot, device, meta.width ?? 0, meta.height ?? 0, counter);
   const turned = await sharp(source).rotate(turn).toBuffer();
-  const sized = await sharp(turned).resize({ width: STILL[device].width }).toBuffer({ resolveWithObject: true });
+  const landscape = orientationOf(shot.id, device) === "landscape";
+  const sized = await sharp(turned).resize(landscape ? { width: STILL[device].long } : { height: STILL[device].long }).toBuffer({ resolveWithObject: true });
   const { width, height } = sized.info;
-  const radius = Math.round(width * STILL[device].corner);
+  const radius = Math.round(Math.min(width, height) * STILL[device].corner);
   await sharp(sized.data).composite([{ input: mask(width, height, radius), blend: "dest-in" }]).webp({ quality: 86, alphaQuality: 90 }).toFile(target);
   return { width, height };
 }
@@ -58,9 +54,9 @@ function probe(source: string): { width: number; height: number } {
 }
 
 // The recording as a looping GIF at the largest width in GIF_WIDTHS that fits the budget, and its first frame for the contact sheet.
-function gif(log: Log, source: string, target: string, first: string, shot: Shot, counter: boolean): { width: number; bytes: number } {
+function gif(log: Log, source: string, target: string, first: string, shot: Shot, device: Device, counter: boolean): { width: number; bytes: number } {
   const size = probe(source);
-  const turn = turnFor(shot, size.width, size.height, counter);
+  const turn = turnFor(shot, device, size.width, size.height, counter);
   const rotate = turn === 90 ? "transpose=1," : turn === 270 ? "transpose=2," : "";
   for (const width of GIF_WIDTHS) {
     const filter = `${rotate}fps=${GIF_FPS},scale=${width}:-2:flags=lanczos,split[a][b];[a]palettegen=max_colors=192:stats_mode=diff[p];[b][p]paletteuse=dither=bayer:bayer_scale=4:diff_mode=rectangle`;
@@ -129,7 +125,7 @@ void runScript("showcase-build", async (log) => {
         } else {
           const target = path.join(out, `${name}.gif`);
           const first = path.join(frames, `${name}.png`);
-          const made = gif(log, source, target, first, shot, counter);
+          const made = gif(log, source, target, first, shot, device, counter);
           files.push({ file: path.basename(target), shot: shot.id, device, theme, kind: "gif", width: made.width, bytes: made.bytes });
           tiles.push({ file: first, label: `${name} (GIF)` });
         }
@@ -143,4 +139,25 @@ void runScript("showcase-build", async (log) => {
   writeFileSync(path.join(out, "manifest.json"), `${JSON.stringify({ commit, simulators: taken.simulators ?? {}, total, files, missing }, null, 2)}\n`);
   if (missing.length > 0) log.warn(`${missing.length} captures missing: ${missing.join(", ")}`);
   log.info(`${files.length} files, ${Math.round(total / 1024)} KB, in ${out}`);
+  if (!process.argv.includes("--publish")) return;
+  if (missing.length > 0) throw new Error("Not published: every capture must be taken first");
+  publish(log, out, commit);
 });
+
+// Replaces the `showcase` branch on origin with one orphan commit of the images and the manifest (not the contact sheet), so the images never
+// pile up in the history. It pushes with the remote and credentials of this checkout.
+function publish(log: Log, out: string, commit: string): void {
+  const remote = spawnSync("git", ["remote", "get-url", "origin"], { cwd: ROOT, encoding: "utf8" }).stdout.trim();
+  if (!remote) throw new Error("No origin remote to publish to");
+  const work = path.join(tmpdir(), `showcase-publish-${process.pid}`);
+  rmSync(work, { recursive: true, force: true });
+  mkdirSync(work, { recursive: true });
+  for (const name of readdirSync(out)) if (name !== "contact.png") copyFileSync(path.join(out, name), path.join(work, name));
+  const git = (...args: string[]) => execFileSync("git", args, { cwd: work, stdio: "pipe" });
+  git("init", "-q", "-b", "showcase");
+  git("add", "-A");
+  git("commit", "-q", "-m", `repo: README showcase captured from ${commit.slice(0, 12)}`);
+  git("push", "-q", "--force", remote, "showcase:showcase");
+  rmSync(work, { recursive: true, force: true });
+  log.info(`published to the showcase branch of ${remote}`);
+}

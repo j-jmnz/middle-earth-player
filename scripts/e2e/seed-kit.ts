@@ -162,7 +162,7 @@ export async function wonLog<G extends { name: string; decks: string }>(part: Wo
   return { ...written, heroesBySeat: blank.heroesBySeat, fallenHeroesBySeat: blank.fallenHeroesBySeat, campaignPool: written.campaignPool.filter((card) => card.attachedTo == null) };
 }
 
-/** How full a table is, for the showcase fixtures (docs/plans/readme-showcase.md, Saves and decks): the seats' cards in play, the cards attached to them, the engaged enemies, staging and the active location. */
+/** How full a table is, for the showcase fixtures (docs/showcase.md, Saves and decks): the seats' cards in play, the cards attached to them, the engaged enemies, staging and the active location. */
 export type Board = { play: number; attached: number; engaged: number; staging: number; location: boolean };
 
 export function boardOf(state: ScenarioState): Board {
