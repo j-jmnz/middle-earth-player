@@ -27,6 +27,7 @@ const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   RaiseThreat: [{ verb: "RaiseThreat", amount: 2, who: "eachSeat", perCommitted: { type: "hero", exceptSphere: "fellowship" } }],
   LowerThreat: [{ verb: "LowerThreat", amount: 2, who: "eachSeat" }],
   ReturnToStaging: [{ verb: "ReturnToStaging", target: "picked" }],
+  PlaceFacedownUnder: [{ verb: "PlaceFacedownUnder", code: "144027", target: "self", afterAttack: true }],
   SetPursuit: [{ verb: "SetPursuit", value: 10 }],
   RaisePursuit: [{ verb: "RaisePursuit", amount: 3 }],
   LowerPursuit: [{ verb: "LowerPursuit", amount: 1 }],
@@ -196,6 +197,8 @@ describe("effects:render read fields, conditions", () => {
     logged: [{ kind: "logged", line: "A line", is: false }],
     onStage: [{ kind: "onStage", stage: 2 }],
     pursuit: [{ kind: "pursuit", min: 3, max: 6 }],
+    pileHas: [{ kind: "pileHas", pile: "harad", min: 1, max: 3 }],
+    facedownUnder: [{ kind: "facedownUnder", code: "144027", min: 3, max: 8, players: true }],
     soleAttacker: [{ kind: "soleAttacker" }],
     captives: [{ kind: "captives", min: 1, max: 2, of: "actor" }],
     matches: [{ kind: "matches", card: "picked", pick: { type: "enemy", control: "any" } }],
@@ -251,6 +254,8 @@ describe("effects:render read fields, picks", () => {
     who: "firstPlayer",
     engagedEnemies: true,
     hasShadow: true,
+    lowestAttack: true,
+    lowestThreat: true,
   };
   const SAMPLES: readonly Obj[] = [
     BIG,
@@ -284,6 +289,7 @@ describe("effects:render read fields, amounts", () => {
     { stat: "willpower", ofNamed: "A Card" },
     { players: true },
     { pursuit: true },
+    { pile: "harad" },
     { x: true },
     { stage: true },
     { threat: "tens" },

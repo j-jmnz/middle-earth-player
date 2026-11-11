@@ -105,6 +105,10 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     if (found?.kind === "self" && ctx.attacker === true) return { text: "return the attacking enemy (the card whose shadow this is the attacker of) to the staging area", read: ["target"] };
     return { text: `return ${target(i.target)} to the staging area`, read: ["target"] };
   },
+  PlaceFacedownUnder: (i) => ({
+    text: `${i.afterAttack === true ? "once the attack in progress has ended, " : ""}place ${cardRef(i.target ?? "picked")} facedown under the card with code ${str(i.code)} in play (out of play there; its attachments are discarded, its tokens go)`,
+    read: ["code", "target", "afterAttack"],
+  }),
   SetPursuit: (i) => ({ text: `set the pursuit value to ${str(i.value)}`, read: ["value"] }),
   RaisePursuit: (i, ctx) => ({ text: `increase the pursuit value by ${amount(i.amount, ctx)}`, read: ["amount"] }),
   LowerPursuit: (i, ctx) => ({ text: `reduce the pursuit value by ${amount(i.amount, ctx)} (never below 0)`, read: ["amount"] }),

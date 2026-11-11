@@ -14,4 +14,12 @@ tags:
       # CHOICE_ID: "TODO"
       # CHOICE_PROMPT: "TODO"
       # CHOICE_CONSEQUENCE: "TODO"
-# TODO: this scenario's own assertions on the path screen after the win (the next part's node, a carried card).
+# The win unlocks Shelob's Lair, whose node reads Next while the line under the road says it is coming soon (scripts/checks/maestro.test.ts, path-soon): the part is not playable yet.
+# TODO: a carried card, if the Resolution earns one.
+- assertVisible:
+    id: node-shelobs-lair-status
+    text: "Next"
+- assertVisible:
+    id: path-soon
+- assertNotVisible:
+    id: begin

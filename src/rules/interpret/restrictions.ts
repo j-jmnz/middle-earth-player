@@ -7,6 +7,7 @@ import { effectsOfCard } from "../families/misc/text.ts";
 import { recordsOfFace } from "../families/dreamchaser/faces.ts";
 import { grantedTravel } from "../families/grapple/travel.ts";
 import { familyForcedTravel, familyTravelUnpayable } from "./family-hooks.ts";
+import { NAMED_PILES, pileOf } from "../core/piles.ts";
 import { modifiedStat } from "../core/keywords.ts";
 import { pickCandidates } from "./pick.ts";
 import { spendablePools } from "../families/costs/verbs.ts";
@@ -106,6 +107,11 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
       if (instruction.verb === "SpendResources") return spendablePools(state, state.firstPlayer, instruction, ctx).total < instruction.amount;
       // "Reveal the top card of the burden deck to travel here" (141058:A:3): an empty burden deck has none to reveal.
       if (instruction.verb === "RevealBurden") return (state.burdenDeck?.length ?? 0) === 0;
+      // "The first player reveals the top facedown card under The Cross-roads and adds it to the staging area to travel here" (144032:A:2): a deck beside the encounter deck with no card to reveal (nor a discard pile to refill it from) cannot pay it.
+      if (instruction.verb === "AddFromPile") {
+        const zones = NAMED_PILES[instruction.pile];
+        return pileOf(state, zones.deck).length + (zones.discard ? pileOf(state, zones.discard).length : 0) === 0;
+      }
       // A family's own Travel cost the players cannot pay (the Corsair deck of Southern Belfalas is empty, 12154:A:1, families/sea/index.ts).
       if (familyTravelUnpayable(state, instruction)) return true;
       // "The first player must discard 2 cards at random from his hand to travel here" (01094:A:1): a hand of fewer cannot pay it.

@@ -10,7 +10,7 @@ import { pickCandidates } from "../interpret/pick.ts";
 import { lastPicked, seatOf } from "../interpret/player-verbs.ts";
 import { topFrame } from "../windows/windows.ts";
 import { addModifier } from "../core/keywords.ts";
-import { addClassModifier, ALLIES_CLASS, CHARACTERS_CLASS, DAMAGED_CHARACTERS_CLASS, ENEMIES_CLASS, isClassHolder, STAGING_CLASS } from "../core/holder-classes.ts";
+import { addClassModifier, ALLIES_CLASS, CHARACTERS_CLASS, DAMAGED_CHARACTERS_CLASS, ENEMIES_CLASS, isClassHolder, STAGING_CLASS, traitedEnemies } from "../core/holder-classes.ts";
 import type { ScenarioState } from "../core/state.ts";
 import { livingSeats } from "../core/state.ts";
 import type { VerbFocus } from "../interpret/verbs.ts";
@@ -97,7 +97,7 @@ export function modifyStat(
       break;
     // Every enemy in play, staged or engaged, now and entering later (143041:A:2): the holder is the class, read by heldBy.
     case "enemies":
-      targets = [ENEMIES_CLASS];
+      targets = [instruction.trait != null ? traitedEnemies(instruction.trait) : ENEMIES_CLASS];
       break;
     // Every enemy and location in the staging area, now and arriving later (19167:A:1): the holder is the class, read by heldBy.
     case "stagingCards":
@@ -138,7 +138,7 @@ export function modifyStat(
   let next = state;
   const trait = instruction.trait;
   for (const id of targets) {
-    if (trait != null && !id.startsWith("seat:") && !hasTrait(next, id, trait, ctx)) continue;
+    if (trait != null && !id.startsWith("seat:") && !id.startsWith(`${ENEMIES_CLASS}:`) && !hasTrait(next, id, trait, ctx)) continue;
     if (id === "table") next = { ...next, modifiers: [...next.modifiers, { instanceId: "table", sourceId, stat: instruction.stat, amount, until: instruction.until }] };
     else if (id.startsWith("seat:")) next = { ...next, modifiers: [...next.modifiers, { instanceId: id, sourceId, stat: instruction.stat, amount, until: instruction.until }] };
     else next = isClassHolder(id)

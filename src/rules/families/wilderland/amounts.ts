@@ -5,6 +5,7 @@ import type { AmountScope } from "../../interpret/amounts.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { countMatching, matchesPick } from "../../interpret/pick.ts";
 import { effectData } from "../encounter/moves.ts";
+import { NAMED_PILES, pileOf } from "../../core/piles.ts";
 import { printedOf } from "../../core/printed.ts";
 import { livingSeats, type ScenarioState } from "../../core/state.ts";
 import { cardsUnder } from "../../core/zones.ts";
@@ -28,6 +29,8 @@ export function wilderlandAmount(state: ScenarioState, amount: Exclude<Amount, n
     const pick = amount.discardedMatching;
     return (effectData(state)?.looked ?? []).filter((id) => state.cards[id]?.zone === "encounterDiscard" && matchesPick(state, id, pick, { seat: scope.actor, sourceId: scope.sourceId, counting: true }, ctx)).length;
   }
+  // "For each facedown card under it" (144030:A:2): the cards left in the named deck.
+  if (amount.pile !== undefined) return pileOf(state, NAMED_PILES[amount.pile].deck).length;
   // "X is the tens digit of the first player's threat" (19099:A:1): whoever reads it.
   if (amount.firstPlayerTens) return Math.floor(seatThreat(state, state.firstPlayer) / 10);
   // "The Discover value of the active location" (19095:A:3).

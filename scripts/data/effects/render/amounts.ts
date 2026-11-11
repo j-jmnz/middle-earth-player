@@ -35,6 +35,7 @@ function base(expr: Obj, ctx: Ctx, pick: PickRenderer): { text: string; read: st
     return { text: `${expr.printed === true ? "printed " : ""}${statName(expr.stat)} of ${whose}`, read };
   }
   if (expr.players === true) return { text: "the number of players", read: ["players"] };
+  if (typeof expr.pile === "string") return { text: `the number of cards left in the ${expr.pile === "harad" ? "Harad" : str(expr.pile)} deck`, read: ["pile"] };
   if (expr.pursuit === true) return { text: "the pursuit value", read: ["pursuit"] };
   if (expr.x === true) return { text: "X", read: ["x"] };
   if (expr.stage === true) return { text: "the stage number of the quest", read: ["stage"] };

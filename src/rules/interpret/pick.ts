@@ -28,6 +28,7 @@ import { canDeclareDefender, isDefending } from "../families/defense/defenders.t
 import { facedownShadow } from "../families/defense/shadow.ts";
 import { deckPool, unchartedPickMatches } from "../families/uncharted/pick.ts";
 import { aflamePickMatches, lowestAflame } from "../families/aflame/pick.ts";
+import { lowestOf } from "../families/harad/pick.ts";
 import { highestAttack } from "../families/sea/ramming.ts";
 import { chosenCopies, levelAmount } from "../families/aflame/values.ts";
 import { sidePickMatches } from "../families/grapple/values.ts";
@@ -314,6 +315,9 @@ export function pickCandidates(
   }
   // "The Aflame location in play with the lowest Aflame value" (families/aflame/pick.ts).
   if (spec.lowestAflame) return lowestAflame(state, found, ctx);
+  // "The Harad enemy engaged with you with the lowest Attack" (families/harad/pick.ts).
+  if (spec.lowestAttack) return lowestOf(state, found, "attack", ctx);
+  if (spec.lowestThreat) return lowestOf(state, found, "threat", ctx);
   // "The engaged Ship enemy with the highest Attack" (families/sea/ramming.ts).
   return spec.highestAttack ? highestAttack(state, found, ctx) : found;
 }

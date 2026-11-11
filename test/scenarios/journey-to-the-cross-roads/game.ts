@@ -1,11 +1,12 @@
 import { emptyLog, type CampaignLog } from "../../../src/campaign/log.ts";
 import type { Difficulty } from "../../../src/catalog/scenario-data.ts";
 import type { CampaignFacts, ModeCard } from "../../../src/rules/core/campaign-state.ts";
+import type { LoadoutSeat } from "../../../src/campaign/loadout.ts";
 import { legalIntents, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 
 import { loadCampaign, loadScenario } from "../../../scripts/data/load-scenarios.ts";
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
-import { campaignGame, fillerLoadout, HERO_STATS, type PlayedGame } from "../../harness/game-kit.ts";
+import { campaignGame, fillerLoadout, HERO_STATS, RING_BEARER, type PlayedGame } from "../../harness/game-kit.ts";
 
 const campaign = loadCampaign("the-two-towers");
 const roads = loadScenario("journey-to-the-cross-roads");
@@ -16,13 +17,26 @@ export const ROADS_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "",
 // "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
 export type RoadsDecks = "strong" | "weak" | "brittle";
 
-export const roadsLoadout = fillerLoadout;
+// The first player holds the Ring-bearer with The One Ring attached (the saga start of scenarios 10 to 12, mec112.setting-up-the-game): Frodo, beside two stand-in heroes; a second seat has three.
+export const roadsLoadout = (seatCount: 1 | 2): LoadoutSeat[] => {
+  const [, second] = fillerLoadout(2);
+  const deck = fillerLoadout(1)[0]!.deck;
+  const first = { heroes: [RING_BEARER, "q1", "q2"], deck };
+  return seatCount === 1 ? [first] : [first, second!];
+};
 
 // The goldens' world, the plan and start of a game, and the log of a campaign whose earlier parts were won: the seeded game's parts every scenario shares (test/harness/game-kit.ts).
-export const roadsWorld = (decks: RoadsDecks = "strong") => game.world(decks);
+// Frodo, the Ring-bearer, takes the numbers of the deck like the stand-in heroes beside him (his printed numbers could not quest or defend a game of auto-played turns).
+export const roadsWorld = async (decks: RoadsDecks = "strong") => {
+  const world = await game.world(decks);
+  world.cards.set(RING_BEARER, { ...world.cards.get(RING_BEARER)!, ...HERO_STATS[decks] });
+  return world;
+};
 export const afterMarshes = (seatCount: 1 | 2) => game.after(seatCount);
-export const roadsPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount)) => game.plan(seatCount, log);
-export const roadsStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard) => game.start(seatCount, seed, difficulty, { facts, log, modeCard });
+// 144069's Campaign Setup asks each player for a copy of Brace of Coneys or a resource on each hero: the goldens' players take the resources.
+export const ROADS_CHOICES: readonly string[] = ["resources", "resources"];
+export const roadsPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), choices: readonly string[] = ROADS_CHOICES) => game.plan(seatCount, log, choices);
+export const roadsStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, choices: readonly string[] = ROADS_CHOICES) => game.start(seatCount, seed, difficulty, { facts, log, modeCard, choices });
 
 export type RoadsPolicy = {
   // The option a Choose window with these answers takes: the first or the last.
@@ -50,8 +64,9 @@ const game = campaignGame<RoadsDecks, RoadsPolicy>({
   campaign,
   scenario: roads,
   stats: HERO_STATS,
+  loadout: roadsLoadout,
   // TODO: the cards a game loads besides the scenario's piles, its campaign card's and the campaign's game codes.
-  codes: [...roads.cards.map((card) => card.code)],
+  codes: [...roads.cards.map((card) => card.code), RING_BEARER, "144063", "144014", "144015", "143015", "143016", "143017", "143018", "143019", "143020", "143021", "143068"],
   intent: roadsIntent,
   policy: DEFAULT_POLICY,
   limit: 6000,

@@ -177,6 +177,8 @@ export const simpleVerbs = [
     // `stormcallerArea`: into the Stormcaller's area ("add it to the Stormcaller's area", 12017:A:1; dcce.stormcallers-area).
     to: z.enum(["staging", "engagedFirstPlayer", "engaged", "stormcallerArea"]),
     each: z.boolean().optional(),
+    // The encounter deck alone is searched, not its discard pile ("search the encounter deck for a Harad enemy", 144037:A:1; rr.search: the discard pile is searched only when the line says so).
+    deckOnly: z.literal(true).optional(),
     // While a card with this code is in the encounter deck or its discard pile, the search must take it ("one of those enemies must be
     // Great Warg Chief, if able", 142022:A:1).
     require: z.string().min(1).optional(),

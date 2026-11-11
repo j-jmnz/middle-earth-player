@@ -2,7 +2,7 @@
 import { z } from "zod";
 
 import { ALLY_LINES } from "./ally-lines.ts";
-import { amountSchema } from "./effect-schema-amount.ts";
+import { amountSchema, pileNameSchema } from "./effect-schema-amount.ts";
 import { pickSchema } from "./effect-schema-pick.ts";
 
 export const phaseNameSchema = z.enum([
@@ -64,7 +64,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("heroExhausted") }),
   // The attack in progress has no defender (declared or considered).
   z.strictObject({ kind: z.literal("undefended") }),
-  z.strictObject({ kind: z.literal("searchable"), trait: z.string().min(1).optional(), code: z.string().min(1).optional() }),
+  z.strictObject({ kind: z.literal("searchable"), trait: z.string().min(1).optional(), code: z.string().min(1).optional(), deckOnly: z.literal(true).optional() }),
   // Some card matches this pick (for the actor now): a choice that could be made.
   z.strictObject({ kind: z.literal("canPick"), pick: pickSchema }),
   // Each of the actor's heroes has this trait, and the actor has one ("Play only if each of your heroes is a Hobbit",
@@ -141,6 +141,12 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("beldisBox") }),
   // The Caves deck (emce.caves-deck) holds at least `min` cards (1 by default): "look at the top 2 cards of the Caves deck" (18055:A:2). Read by the wilderland family; a game with no Caves deck holds none.
   z.strictObject({ kind: z.literal("cavesDeck"), min: z.number().int().positive().optional() }),
+  // The deck beside the encounter deck holds at least `min` and at most `max` cards (a game that did not deal it holds none): "The players cannot travel here unless there are no facedown cards under The Cross-roads" (144030:A:2; `max` 0) and the Travel cost of
+  // Southward Road, which reveals the top card of that deck (144032:A:2). Read by the wilderland family, which also reads `cavesDeck`.
+  z.strictObject({ kind: z.literal("pileHas"), pile: pileNameSchema, min: z.number().int().positive().optional(), max: z.number().int().min(0).optional() }),
+  // The cards facedown under the card in play with this code number at least `min` and at most `max`, each plus the number of players with `players` ("If there are at least X facedown cards under The Black Gate, the players lose the game. X is 3 more than the
+  // number of players", 144027:A:2). 0 with no such card in play. The count of a card in the zone `under`, as `underBurn` reads it for The Havens Burn. Read by the harad family.
+  z.strictObject({ kind: z.literal("facedownUnder"), code: z.string().min(1), min: z.number().int().min(0).optional(), max: z.number().int().min(0).optional(), players: z.literal(true).optional() }),
   // The quest deck holds at least `min` stages (1 by default): the stage 2s Mount Gundabad's current quest can be bypassed in favor of (19135:B:3; emce.bypassing). Read by the wilderland family.
   z.strictObject({ kind: z.literal("questDeck"), min: z.number().int().positive().optional() }),
   // The enemy with this title has resolved an attack in the combat phase now under way ("unless he has resolved an attack this phase", 19155:A:1): false in any other phase. Read by the wilderland family.

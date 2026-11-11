@@ -32,7 +32,7 @@ import { carryAwayHero, discardGuardedHeroes, releaseGuardedHero } from "./carri
 import { discardFacedownUnder, placeHandUnderLocation, returnFacedownToHands } from "./lost.ts";
 import { clearNemesis, nemesisAttacks, searchNemesis } from "./nemesis.ts";
 import { topFrame } from "../../windows/windows.ts";
-import { pileOf } from "../../core/piles.ts";
+import { NAMED_PILES, pileOf } from "../../core/piles.ts";
 
 // The verbs src/catalog/families/wilderland.ts adds. AttachRandomTreasure runs in the game. The others are not run by the engine: the Resolution
 // ones (DiscoverTreasure, BoonAllyOrLogLine, AddEncounterToPool, RemoveFromPool) are run by rules/setup/resolution.ts, and RemoveFromEncounterDeckIfLogged is dealt by
@@ -207,6 +207,10 @@ function condition(state: ScenarioState, found: Condition, scope: { actor: numbe
   if (found.kind === "discoverUnavailable") return discoverUnavailable(state, ctx);
   if (found.kind === "beldisBox") return beldisBoxLeft(state, scope.actor);
   if (found.kind === "cavesDeck") return pileOf(state, "cavesDeck").length >= (found.min ?? 1);
+  if (found.kind === "pileHas") {
+    const left = pileOf(state, NAMED_PILES[found.pile].deck).length;
+    return left >= (found.min ?? 0) && left <= (found.max ?? Infinity);
+  }
   if (found.kind === "questDeck") return state.questDeck.length >= (found.min ?? 1);
   if (found.kind === "attackedThisPhase") return attackedThisPhase(state, found.name, ctx);
   if (found.kind === "namedFlag") return namedFlagHeld(state, found.name, found.stat, ctx);

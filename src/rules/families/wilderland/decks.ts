@@ -6,11 +6,12 @@ import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
 import { refillDeck } from "../../core/decks.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
-import { DECKS, NAMED_PILES, pileDealt, pileOf, shufflePile } from "../../core/piles.ts";
+import { DECKS, NAMED_PILES, pileDealt, pileOf, shufflePile, topOf } from "../../core/piles.ts";
 import { livingSeats, updateCard } from "../../core/state.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { shuffleEncounterDeck } from "../../interpret/verbs.ts";
 import { moveCard } from "../../core/zones.ts";
+import { startReveal } from "../../windows/frames.ts";
 import { revealTop } from "../encounter/named-decks.ts";
 import { attachSelf } from "../../interpret/effect-targeted.ts";
 import { markPicked } from "../play/refs.ts";
@@ -46,6 +47,13 @@ export function addFromNamed(state: ScenarioState, instruction: Extract<Instruct
   const zones = NAMED_PILES[instruction.pile];
   const count = instruction.count == null ? 1 : resolveAmount(state, instruction.count, frameScope(state, focus.seat, focus.sourceId), ctx);
   const seats = instruction.to === "staging" ? [focus.seat] : instruction.who === "eachSeat" ? livingSeats(state) : [instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat];
+  // `reveal` (the Harad deck, 144068:B:1, 144032:A:2, 144036:A:2): the top card is revealed (rr.reveal), so its Surge and When Revealed effects resolve, and then enters the staging area or is engaged with the seat; the effect goes on once it is resolved.
+  if (instruction.reveal) {
+    const seat = seats[0] ?? focus.seat;
+    const top = topOf(state, zones.deck);
+    if (top === undefined || state.seats[seat]?.eliminated) return state;
+    return startReveal(markPicked(state, top), seat, ctx, steps, top, undefined, instruction.to === "engaged");
+  }
   let next = state;
   for (const seat of seats) {
     for (let revealed = 0; revealed < count; revealed += 1) {
