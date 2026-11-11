@@ -7,16 +7,16 @@
 // committed ones. The scenario's JSON holds the saves; each is a real loadout, a seed and the intents that reach the moment
 // (`won`, `lost` and `duo` are scenario 1 from an empty log; `knife-lost` starts from the log `won` writes; the rest are
 // two-handed games of one scenario, parked on its win or loss, and a part after the first starts from the log the earlier
-// parts' wins write).
+// parts' wins write). The names with `showcase` are the README's captures (docs/showcase.md), parked on a full table.
 export const FIXTURE_REGISTRY = [
-  { scenarioId: "a-shadow-of-the-past", file: "scenario-1", names: ["won", "lost", "duo"] },
+  { scenarioId: "a-shadow-of-the-past", file: "scenario-1", names: ["won", "lost", "duo", "past-showcase-board", "past-showcase-quest", "past-showcase-combat"] },
   { scenarioId: "a-knife-in-the-dark", names: ["knife-lost"] },
   { scenarioId: "passage-through-mirkwood", names: ["mirkwood-won", "mirkwood-lost"] },
   { scenarioId: "journey-along-the-anduin", names: ["anduin-won", "anduin-lost"] },
   { scenarioId: "escape-from-dol-guldur", names: ["dol-guldur-won", "dol-guldur-lost"] },
   { scenarioId: "the-oath", names: ["oath-won", "oath-lost"] },
   { scenarioId: "the-caves-of-nibin-dum", names: ["nibin-dum-won", "nibin-dum-lost"] },
-  { scenarioId: "voyage-across-belegaer", names: ["sea-solo", "sea-duo", "voyage-won", "voyage-lost"] },
+  { scenarioId: "voyage-across-belegaer", names: ["sea-solo", "sea-duo", "voyage-won", "voyage-lost", "sea-showcase"] },
   { scenarioId: "the-fate-of-numenor", names: ["fate-won", "fate-lost"] },
   { scenarioId: "raid-on-the-grey-havens", names: ["raid-won", "raid-lost"] },
   { scenarioId: "flight-of-the-stormcaller", names: ["stormcaller-won", "stormcaller-lost"] },
@@ -35,7 +35,7 @@ export const FIXTURE_REGISTRY = [
   { scenarioId: "mount-gundabad", names: ["gundabad-won", "gundabad-lost"] },
   { scenarioId: "the-fate-of-wilderland", names: ["wilderland-won", "wilderland-lost"] },
   { scenarioId: "the-uruk-hai", names: ["hai-won", "hai-lost"] },
-  { scenarioId: "helms-deep", names: ["deep-won", "deep-lost"] },
+  { scenarioId: "helms-deep", names: ["deep-won", "deep-lost", "deep-showcase"] },
   { scenarioId: "the-road-to-isengard", names: ["isengard-won", "isengard-lost"] },
   { scenarioId: "the-passage-of-the-marshes", names: ["marshes-won", "marshes-lost"] },
   { scenarioId: "journey-to-the-cross-roads", names: ["roads-won", "roads-lost"] },

@@ -1,0 +1,27 @@
+appId: com.middleearth.lcg
+tags:
+  - showcase
+---
+# The README showcase's combat GIF: an enemy's attack in A Shadow of the Past, defended by the fixture's `showcase.defender`, played by the combat spotlight (past-showcase-combat) (docs/showcase.md, Shot list), on the iPhone and the iPad, landscape. scripts/showcase/capture.ts runs it with THEME and DEVICE.
+- runFlow:
+    file: ../subflows/showcase-table.yaml
+    env:
+      FIXTURE: past-showcase-combat
+- startRecording: "${typeof DEVICE !== 'undefined' ? DEVICE : 'device'}-${typeof THEME !== 'undefined' ? THEME : 'dark'}-table-combat"
+- runFlow:
+    when:
+      notVisible:
+        id: sheet-list
+    commands:
+      - tapOn:
+          id: dock-more-actions
+- tapOn:
+    id: sheet-list
+- tapOn:
+    id: sheet-option-i88
+- tapOn:
+    id: sheet-primary
+    optional: true
+- waitForAnimationToEnd:
+    timeout: 15000
+- stopRecording

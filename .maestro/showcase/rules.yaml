@@ -1,0 +1,14 @@
+appId: com.middleearth.lcg
+tags:
+  - showcase
+---
+# The README showcase's rules reference (docs/showcase.md, Shot list), on the iPhone (portrait) and the iPad (landscape). scripts/showcase/capture.ts runs it with THEME and DEVICE.
+- runFlow:
+    file: ../subflows/showcase-start.yaml
+    env:
+      LINK: "rules"
+      READY: rules
+- runFlow:
+    file: ../subflows/showcase-shot.yaml
+    env:
+      SHOT: rules
