@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { EFFECTS } from "../../../effects/index.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { reduce, startScenario } from "../../../rules/engine/reduce.ts";
+import { checksOf } from "../../../../test/harness/golden-suite.ts";
 import { playOut } from "../../../../test/harness/auto-player.ts";
 import { pastContext } from "../../../../test/scenarios/a-shadow-of-the-past/play.ts";
 import { campaign, loadWorld, scenario } from "../../../../test/scenarios/a-shadow-of-the-past/scene.ts";
@@ -25,7 +26,7 @@ describe("golden: a whole game of A Shadow of the Past", () => {
       const start = buildStart({ campaign, scenario, seatCount: 1, seed, threatModifier: 0, seats: [loadout], effects: EFFECTS });
       const kept = expectOk(reduce(startScenario(start, ctx), { type: "Keep" }, ctx)).state;
       const run = playOut(kept, ctx, { scout: "scout", prefer: "141035", protect: RING_BEARER });
-      out.push({ seed, intents: run.intents, state: run.state });
+      out.push({ seed, intents: run.intents, state: run.state, checks: checksOf({ kept, intents: run.intents }, ctx) });
     }
     await expect(JSON.stringify(out)).toMatchFileSnapshot(file);
   });

@@ -1,4 +1,5 @@
 import { checklist } from "../../src/campaign/checklist.ts";
+import { tableDigest } from "../../src/campaign/digest.ts";
 import type { LoadoutSeat } from "../../src/campaign/loadout.ts";
 import { emptyLog, poolCard, type CampaignLog } from "../../src/campaign/log.ts";
 import { buildStart } from "../../src/campaign/start.ts";
@@ -47,7 +48,8 @@ export async function standInWorld(codes: readonly string[], stats: HeroStats): 
   return cards;
 }
 
-export type PlayedGame = { start: StartScenario; kept: ScenarioState; state: ScenarioState; intents: PlayerIntent[]; steps: EngineStep[] };
+// `checks` is the tableDigest of the table after each of `intents` (src/campaign/digest.ts): the golden snapshot pins them, so a scenario's checks move only when a change reaches its games.
+export type PlayedGame = { start: StartScenario; kept: ScenarioState; state: ScenarioState; intents: PlayerIntent[]; steps: EngineStep[]; checks?: number[] };
 
 /**
  * Plays a game from its start: the first seat keeps its opening hand (a second seat's Keep is the first of `intents`), then
@@ -59,6 +61,7 @@ export function playToEnd(start: StartScenario, ctx: ReduceContext, answer: (sta
   const steps: EngineStep[] = [...opened.steps];
   let state = kept;
   const intents: PlayerIntent[] = [];
+  const checks: number[] = [];
   const memory = new Set<string>();
   for (let turn = 0; turn < limit && !state.lost && !(state.stageCleared && state.window == null); turn += 1) {
     const intent = answer(state, memory);
@@ -66,11 +69,12 @@ export function playToEnd(start: StartScenario, ctx: ReduceContext, answer: (sta
     state = result.state;
     steps.push(...result.steps);
     intents.push(intent);
+    checks.push(tableDigest(state));
     // A card in the staging area, engaged or active shows its face (face-check.ts).
     const facedown = faceProblems(state);
     if (facedown.length > 0) throw new Error(`After intent ${intents.length} (${JSON.stringify(intent)}): ${facedown.join("; ")}`);
   }
-  return { start, kept, state, intents, steps };
+  return { start, kept, state, intents, steps, checks };
 }
 
 /**
