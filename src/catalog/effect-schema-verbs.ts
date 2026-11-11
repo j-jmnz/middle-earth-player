@@ -179,8 +179,8 @@ export const simpleVerbs = [
     each: z.boolean().optional(),
     // The encounter deck alone is searched, not its discard pile ("search the encounter deck for a Harad enemy", 144037:A:1; rr.search: the discard pile is searched only when the line says so).
     deckOnly: z.literal(true).optional(),
-    // While a card with this code is in the encounter deck or its discard pile, the search must take it ("one of those enemies must be
-    // Great Warg Chief, if able", 142022:A:1).
+    // While a card with this code is in the encounter deck or its discard pile, the search must take it, until an earlier search of the same effect has taken one ("one of those enemies must be
+    // Great Warg Chief, if able", 142022:A:1; "one of those enemies must be Corsair Captain, if able", 145030:A:3: the first search takes it, the others are free).
     require: z.string().min(1).optional(),
     // The card found is the effect's picked card afterward, for the instructions that follow ("add it to the staging area. Then, attach Heavy Cruiser to that objective", 12127:A:3).
     remember: z.literal(true).optional(),

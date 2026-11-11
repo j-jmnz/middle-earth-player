@@ -278,6 +278,9 @@ export const pickSchema = z.strictObject({
   // when tied, and then the chooser (the player who reveals) decides. Read by the harad family (src/rules/families/harad/pick.ts).
   lowestAttack: z.literal(true).optional(),
   lowestThreat: z.literal(true).optional(),
+  // Of the cards that match, only those with the highest printed cost, a card with no printed cost counting as 0 ("discard the highest cost attachment you control", 145041:A:1); every one of them when tied, and then the
+  // chooser decides. Read by the costs family (src/rules/families/costs/pick.ts).
+  highestCost: z.literal(true).optional(),
 });
 
 export type PickSpec = z.infer<typeof pickSchema>;

@@ -71,11 +71,13 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
     case "SearchMove":
     case "SearchReveal": {
       const found = searchable(state, instruction, ctx);
-      const required = instruction.verb === "SearchMove" && instruction.require ? searchable(state, { code: instruction.require }, ctx) : [];
+      const data = topFrame(state)?.data;
+      // "One of those enemies must be Corsair Captain, if able" (145030:A:3): the requirement is met once an earlier search of this effect has found a card with that code (the frame's picked cards, kept by applyTargeted).
+      const met = instruction.verb === "SearchMove" && instruction.require != null && data?.kind === "effect" && (data.picked ?? []).some((id) => state.cards[id]?.code === instruction.require);
+      const required = instruction.verb === "SearchMove" && instruction.require && !met ? searchable(state, { code: instruction.require }, ctx) : [];
       if (required.length > 0) return required;
       if (instruction.verb !== "SearchMove" || !instruction.different) return found;
-      // A different title: not one an earlier search of this effect has found (the frame's picked cards, kept by applyTargeted).
-      const data = topFrame(state)?.data;
+      // A different title: not one an earlier search of this effect has found.
       const taken = new Set((data?.kind === "effect" ? (data.picked ?? []) : []).map((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").name));
       return found.filter((id) => !taken.has(printedOf(ctx.cards, state.cards[id]?.code ?? "").name));
     }
@@ -177,7 +179,7 @@ function applyTargeted(
       // A `different` search tells the next one which titles are taken.
       const data = topFrame(next)?.data;
       const moved = instruction.each ? ids : ids.slice(0, 1);
-      return (instruction.different || instruction.remember) && data?.kind === "effect" ? patchTop(next, { data: { ...data, picked: [...(data.picked ?? []), ...moved] } }) : next;
+      return (instruction.different || instruction.remember || instruction.require) && data?.kind === "effect" ? patchTop(next, { data: { ...data, picked: [...(data.picked ?? []), ...moved] } }) : next;
     }
     case "SearchReveal":
       return first ? startReveal(state, seatFor(state, instruction.who, item.seat), ctx, steps, first, undefined, instruction.to === "engaged") : state;

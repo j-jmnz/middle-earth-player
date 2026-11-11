@@ -14,14 +14,15 @@ import { inPlay, updateCard } from "../../core/state.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { threatCostOf } from "../costs/stats.ts";
+import { healAllowed, noteHealed } from "../dreamchaser/heal-cap.ts";
 
 // The verbs src/catalog/families/moria.ts adds. Null when the verb is not one of them.
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   switch (instruction.verb) {
     case "PlaceDamageOn":
-      return changeDamage(state, instruction.code, instruction.amount, steps);
+      return changeDamage(state, instruction.code, instruction.amount, steps, ctx);
     case "RemoveDamageFrom":
-      return changeDamage(state, instruction.code, -instruction.amount, steps);
+      return changeDamage(state, instruction.code, -instruction.amount, steps, ctx);
     case "SacrificeForDamage":
       return sacrificeForDamage(state, instruction.code, ctx, steps);
     case "AttachToSubject":
@@ -37,14 +38,16 @@ function inPlayWith(state: ScenarioState, code: string): string | undefined {
 
 // Damage tokens come on (positive) or off (negative, no further than 0) the card in play with this code: tokens, not dealt damage, so nothing
 // answers them and no keyword changes them (142040:A:1, 142043:A:1). The step records the change.
-function changeDamage(state: ScenarioState, code: string, change: number, steps: EngineStep[]): ScenarioState {
+function changeDamage(state: ScenarioState, code: string, change: number, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
   const id = inPlayWith(state, code);
   const card = id ? state.cards[id] : undefined;
   if (!id || !card) return state;
-  const amount = change > 0 ? change : -Math.min(card.damage, -change);
+  // Damage taken off a character is healed damage, so a healCap (145033:A:1) limits it.
+  const amount = change > 0 ? change : -healAllowed(state, id, Math.min(card.damage, -change), ctx);
   if (amount === 0) return state;
   steps.push({ kind: "damage", targetId: id, amount, cause: currentCause(steps, UNATTRIBUTED) });
-  return updateCard(state, id, { damage: card.damage + amount });
+  const changed = updateCard(state, id, { damage: card.damage + amount });
+  return amount < 0 ? noteHealed(changed, id, -amount, ctx) : changed;
 }
 
 // SacrificeForDamage (142050:A:2): the last picked hero is discarded from play, the card with `code` takes damage equal to the hero's threat cost,

@@ -319,6 +319,8 @@ export type ScenarioState = {
   // The damage each card has taken this round, for a card that takes no more than a number each round (the flag `damageCap`), and the threat each seat's
   // effects have lowered this round (the flag `threatReductionCap`). Kept only in a game that has such a card; cleared as the round ends.
   roundDamage?: Readonly<Record<string, number>>;
+  // The damage healed from each character this round, for the flag `healCap` (145033:A:1). Kept only in a game that has such a card; cleared as the round ends.
+  roundHealed?: Readonly<Record<string, number>>;
   threatLoweredBy?: Readonly<Record<number, number>>;
   // The threat each seat's player card effects have lowered this round (the flag `playerThreatReductionCap`, 19104:A:2). Kept only in a game that has such a card; cleared as the round ends.
   playerThreatLoweredBy?: Readonly<Record<number, number>>;

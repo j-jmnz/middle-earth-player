@@ -144,6 +144,8 @@ const FLAGS = [
   "engagedThreat",
   // On a card: it takes no more than this much damage each round ("cannot take more than 4 damage each round", 11177:A:4).
   "damageCap",
+  // On the table: no more than this much damage can be healed from each character each round, by every effect together ("no more than 1 damage can be healed from each character each round", 145033:A:1; families/dreamchaser/heal-cap.ts).
+  "healCap",
   // On an enemy: it has this Victory value while the flag holds ("he gains victory 3", 11178:A:1), for where it goes when it is destroyed and for the score.
   "gainsVictory",
   // On an enemy: only a Ship objective can be declared as an attacker against it ("Only Ship objectives can be declared as attackers against Raider Flagship", 12124:A:3; families/sea/ships.ts).

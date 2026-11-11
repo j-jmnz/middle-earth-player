@@ -9,6 +9,8 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { effectsOf } from "../../windows/listen.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { topFrame } from "../../windows/windows.ts";
+import { printedOf } from "../../core/printed.ts";
+import { tiedExtreme } from "../../interpret/tied-extreme.ts";
 import { threatCostOf } from "./stats.ts";
 
 const VALOUR = new WeakMap<readonly unknown[], Map<string, boolean>>();
@@ -25,6 +27,14 @@ export function hasValour(ctx: ReduceContext, code: string): boolean {
   const found = effectsOf(ctx, code).some((effect) => /"kind":"threat","min":40[,}]/.test(JSON.stringify(effect)));
   known.set(code, found);
   return found;
+}
+
+// "The highest cost attachment you control" (145041:A:1): of the cards that matched, those with the highest printed cost, one with no printed cost counting as 0; every one when tied, and the chooser decides.
+export function highestCost(state: ScenarioState, found: readonly string[], ctx: ReduceContext): string[] {
+  return found.length === 0 ? [] : tiedExtreme(found, (id) => {
+    const card = state.cards[id];
+    return card ? (printedOf(ctx.cards, card.code).cost ?? 0) : 0;
+  }, "highest");
 }
 
 export function costsPickMatches(state: ScenarioState, id: string, spec: PickSpec, picked: readonly string[] | undefined, ctx: ReduceContext): boolean {

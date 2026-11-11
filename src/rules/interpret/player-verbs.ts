@@ -24,6 +24,7 @@ import { patchTop, topFrame } from "../windows/windows.ts";
 import { attachTo, discardFromHand, moveCard } from "../core/zones.ts";
 import { afterCancel } from "../families/defense/damage.ts";
 import { healBlocked } from "../families/burden/life.ts";
+import { healAllowed, noteHealed } from "../families/dreamchaser/heal-cap.ts";
 import { mayGainResources } from "../families/misc/guards.ts";
 import { addToVictory } from "../families/sidequests/victory.ts";
 import { isQuestSource } from "../families/wilderland/night-quest.ts";
@@ -106,11 +107,12 @@ export function runPlayerVerb(
       const id = refCard(state, instruction.target ?? "picked", scope) ?? "";
       const card = state.cards[id];
       if (!card || card.damage <= 0 || healBlocked(state, id)) return state;
-      const amount = instruction.all ? card.damage : Math.min(card.damage, resolveAmount(state, instruction.amount ?? 1, scope, ctx));
+      // "No more than 1 damage can be healed from each character each round" (145033:A:1) leaves what room the cap has.
+      const amount = healAllowed(state, id, instruction.all ? card.damage : Math.min(card.damage, resolveAmount(state, instruction.amount ?? 1, scope, ctx)), ctx);
       if (amount <= 0) return state;
       // The step records the damage removed as a negative amount, the way a progress removal is recorded (the table's log).
       steps.push({ kind: "damage", targetId: id, amount: -amount, cause: currentCause(steps, UNATTRIBUTED) });
-      return queueEvent(updateCard(state, id, { damage: card.damage - amount }), { trigger: "healed", seat: card.controller, cardId: id, ...(playerSource(state, focus.sourceId, ctx) ? { byPlayerCard: true } : {}) });
+      return queueEvent(noteHealed(updateCard(state, id, { damage: card.damage - amount }), id, amount, ctx), { trigger: "healed", seat: card.controller, cardId: id, ...(playerSource(state, focus.sourceId, ctx) ? { byPlayerCard: true } : {}) });
     }
     case "PutOnDeck": {
       const id = refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId)) ?? "";

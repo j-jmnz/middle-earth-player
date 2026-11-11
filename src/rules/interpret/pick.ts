@@ -6,7 +6,7 @@ import { attachmentHostIds } from "../player/attach.ts";
 import { canAttack, characters, legalAttackEnemies } from "../combat/combat.ts";
 import { countsAsAttachment, hasTrait } from "./conditions.ts";
 import { attachmentsPickMatches } from "../families/attachments/pick.ts";
-import { costsPickMatches } from "../families/costs/pick.ts";
+import { costsPickMatches, highestCost } from "../families/costs/pick.ts";
 import { attackPickMatches } from "../families/attack/pick.ts";
 import { miscPickMatches } from "../families/misc/pick.ts";
 import { familyPickMatches } from "./family-hooks.ts";
@@ -318,6 +318,8 @@ export function pickCandidates(
   // "The Harad enemy engaged with you with the lowest Attack" (families/harad/pick.ts).
   if (spec.lowestAttack) return lowestOf(state, found, "attack", ctx);
   if (spec.lowestThreat) return lowestOf(state, found, "threat", ctx);
+  // "The highest cost attachment you control" (families/costs/pick.ts).
+  if (spec.highestCost) return highestCost(state, found, ctx);
   // "The engaged Ship enemy with the highest Attack" (families/sea/ramming.ts).
   return spec.highestAttack ? highestAttack(state, found, ctx) : found;
 }
