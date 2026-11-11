@@ -79,7 +79,7 @@ export const modifyStatSchema = z.strictObject({
   // the event a Response answers was about. `actorSeat` and `pickedSeat` hold a seat number (extraDraw). `other` is the second card
   // the answered event names (the enemy a character defends against or attacks), `pickedPlayerHeroes` every hero the picked
   // player controls, fixed when the effect resolves. `currentQuest` is the quest card being attempted now (it keeps the change if
-  // another stage replaces it later in the phase). `stagingCards` is every enemy and location in the staging area, now and arriving later: an encounter card's lasting effect (rr.lasting-effects, 19167:A:1).
+  // another stage replaces it later in the phase). `stagingCards` is every enemy and location in the staging area, now and arriving later: an encounter card's lasting effect (rr.lasting-effects, 19167:A:1); with `trait`, only those with the Trait (145040:A:2).
   target: z
     .enum(["self", "attacker", "host", "table", "engagedSeat", "eachSeat", "heroes", "hobbitCharacters", "enemies", "picked", "pickedPlayerCharacters", "ownHeroes", "defender", "allies", "characters", "ownCharacters", "engagedSeatCharacters", "subject", "actorSeat", "pickedSeat", "other", "pickedPlayerHeroes", "currentQuest", "stormcaller", "stagingCards", "damagedCharacters"])
     .optional(),

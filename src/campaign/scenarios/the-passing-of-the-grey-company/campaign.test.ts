@@ -115,11 +115,12 @@ describe("The Passing of the Grey Company in the the-return-of-the-king campaign
     expect(log.campaignPool.filter((card) => card.code === ARMY_BOON)).toHaveLength(1);
   });
 
-  it("145066:B:1 unlocks The Siege of Gondor, the next part, on the log the win writes; the app cannot deal it yet, so the path says it is coming soon", () => {
+  it("145066:B:1 unlocks The Siege of Gondor, the next part, on the log the win writes, which the app deals", () => {
     const state = goldenState("the-passing-of-the-grey-company", "two-handed, won, Normal");
     const log = applyResolution(afterTwoTowers, state.scenarioId, state, world.cards, NO_COPY_LIMITS);
     const path = campaignPath(campaign, {}, log);
-    expect(path.map((node) => [node.id, node.status]).slice(0, 2)).toEqual([["the-passing-of-the-grey-company", "completed"], ["the-siege-of-gondor", "soon"]]);
+    expect(path.map((node) => [node.id, node.status]).slice(0, 2)).toEqual([["the-passing-of-the-grey-company", "completed"], ["the-siege-of-gondor", "current"]]);
+    expect(PLAYABLE_SCENARIOS).toContain("the-siege-of-gondor");
   });
 
   it("a lost game writes nothing: the Resolution is for a win only, so the save keeps the log it began with", () => {

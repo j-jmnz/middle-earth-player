@@ -144,8 +144,10 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
     - the acting player chooses one of:
       * option "return" (only if the actor has a Corsair enemy engaged):
         - return every enemy with the trait Corsair engaged with the acting player to the staging area
-      * option "discard" (only if [json condition {"kind":"searchable","trait":"Corsair"}]):
+      * option "discard" (only if [json condition {"kind":"searchable"}]):
         - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy","trait":"Corsair"}]
+        - then, if not (the picked card is a Corsair enemy (any player controls) [also {"inPlay":false}]) (checked when this step runs, after the steps above; not tied to whether they did anything): shuffle the encounter discard pile into the encounter deck
+        - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy","trait":"Corsair","when":{"kind":"not","condition":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any","trait":"Corsair"},"inPlay":false}}}]
         - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"engaged","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any","trait":"Corsair"},"inPlay":false}}]
 
 ## 145040 Black Sails
@@ -157,7 +159,7 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
 145040:A:2 (front): When Revealed: Each Ship location in the staging area gets +1 Threat until the end of the phase. If there are no non-unique Ship locations in the staging area, search the encounter deck and discard pile for a Ship location and add it to the staging area. Shuffle the encounter deck.
   145040:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each Ship location (any player controls) in the staging area only: stat threat 1, until the end of the phase
+    - every enemy and location in the staging area, now and arriving there later while the effect lasts (Ship only): stat threat 1, until the end of the phase
     - [json SearchMove {"verb":"SearchMove","trait":"Ship","type":"location","to":"staging","when":{"kind":"not","condition":{"kind":"canPick","pick":{"type":"location","control":"any","trait":"Ship","nonUnique":true,"stagingOnly":true}}}}]
     - shuffle the encounter deck
 
@@ -252,4 +254,4 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
         * option "damage" (only if there is a character (you control) to choose):
           - [json AssignDamage {"verb":"AssignDamage","amount":{"resourcesOn":{"type":"objective","control":"any","names":["The Corsair Fleet"]}},"pick":{"type":"character","control":"you"}}]
 
-(rendered pieces: 142 by template, 19 as JSON)
+(rendered pieces: 144 by template, 21 as JSON)

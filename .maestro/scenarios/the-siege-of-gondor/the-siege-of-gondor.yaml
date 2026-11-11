@@ -2,16 +2,24 @@ appId: com.middleearth.lcg
 tags:
   - scenario
 ---
-# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `gondor-won` (scripts/e2e/the-siege-of-gondor.ts): a real two-handed
-# game of The Siege of Gondor, parked on its win. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
-# The steps are the shared subflow's (.maestro/subflows/scenario-win.yaml); add this scenario's own assertions after the call.
+# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `gondor-won` (scripts/e2e/the-siege-of-gondor.ts): a real two-handed game of The Siege of Gondor (the Defenders of Gondor and
+# Swords of the Noldor lists, Easy, Aragorn the first player's saga hero, after The Passing of the Grey Company's win), parked on its win (Great Corsair Ship explored with 20 or more progress on Attack on Pelargir). The fixture is OPEN until
+# scripts/e2e/fixtures.ts finds a win of those lists in its seeds (docs/phases/STATUS.md).
+# The Resolution (145070) asks nothing: the resources on The Corsair Fleet are written in the campaign log and the Army of the Dead boon leaves the pool. The campaign has no XP. The Corsair Fleet's resources are shown on its top-bar dial (`siege-fleet`),
+# which is still on the win table (the Fleet stays in the staging area); the Ships, hold and heal dials are gone with Great Corsair Ship and the Port.
+# The win unlocks The Battle of the Pelennor Fields, which the app cannot deal yet: its node reads Next and the line under the road says it is coming soon (scripts/checks/maestro.test.ts, path-soon).
 - runFlow:
     file: ../../subflows/scenario-win.yaml
     env:
       FIXTURE: gondor-won
       SCENARIO_ID: the-siege-of-gondor
-      # A Resolution that asks one choice: the code of the card it offers, the choice's eyebrow text and the sentence the confirm line shows.
-      # CHOICE_ID: "TODO"
-      # CHOICE_PROMPT: "TODO"
-      # CHOICE_CONSEQUENCE: "TODO"
-# TODO: this scenario's own assertions on the path screen after the win (the next part's node, a carried card).
+      TABLE_WIDGET: siege-fleet
+      NO_XP: "true"
+# The win unlocks The Battle of the Pelennor Fields, whose node reads Next while the line under the road says it is coming soon: the part is not playable yet.
+- assertVisible:
+    id: node-the-battle-of-the-pelennor-fields-status
+    text: "Next"
+- assertVisible:
+    id: path-soon
+- assertNotVisible:
+    id: begin

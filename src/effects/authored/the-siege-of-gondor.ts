@@ -37,6 +37,9 @@ const DISCARD_UNTIL_CORSAIR: Instruction[] = [
   { verb: "MoveEncounterCard", card: "picked", to: "staging", when: { kind: "matches", card: "picked", pick: { type: "enemy", control: "any", trait: "Corsair" }, inPlay: false } },
 ];
 
+// The card the last DiscardUntil picked is no Corsair enemy: it found none (the deck ran out).
+const NO_CORSAIR_PICKED: Cond = { kind: "not", condition: { kind: "matches", card: "picked", pick: { type: "enemy", control: "any", trait: "Corsair" }, inPlay: false } };
+
 // "Exhaust a character you control" as the Forced effect of an engaged enemy: the engaged player chooses a ready one.
 const EXHAUST_ONE: Instruction[] = [{ verb: "Pick", pick: { type: "character", control: "you", state: "ready" } }, { verb: "Exhaust", target: { kind: "picked" } }];
 
@@ -156,7 +159,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     },
 
     // 145039 Fell Folk of Umbar (Peril; the revealing player chooses alone). Either return each Corsair enemy engaged with them to the staging area, or discard from the top of the encounter deck until a Corsair enemy is discarded and put it into
-    // play engaged with them. An option that cannot be done is not offered (rr.effects): the first needs a Corsair enemy engaged with them, the second one in the deck or the discard pile.
+    // play engaged with them. An option that cannot change the game is not offered (rr.effects): the first needs a Corsair enemy engaged with them, the second a card in the deck or the discard pile (the deck is discarded through a reset until a Corsair enemy comes up).
     {
       id: "145039:whenRevealed:1",
       cardCode: "145039",
@@ -170,9 +173,12 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
             { id: "return", requires: { kind: "hasEngaged", trait: "Corsair" }, instructions: [{ verb: "ReturnToStaging", target: { kind: "engagedEnemies", who: "actor", trait: "Corsair", pick: "all" } }] },
             {
               id: "discard",
-              requires: { kind: "searchable", trait: "Corsair" },
+              requires: { kind: "searchable" },
               instructions: [
                 { verb: "DiscardUntil", type: "enemy", trait: "Corsair" },
+                // The deck ran out before a Corsair enemy came up: the discard pile is shuffled back in and the discarding goes on (rr.running-out-of-cards, faq.last-encounter-card); with none left anywhere it ends there.
+                { verb: "ShuffleEncounterDiscard", when: NO_CORSAIR_PICKED },
+                { verb: "DiscardUntil", type: "enemy", trait: "Corsair", when: NO_CORSAIR_PICKED },
                 { verb: "MoveEncounterCard", card: "picked", to: "engaged", when: { kind: "matches", card: "picked", pick: { type: "enemy", control: "any", trait: "Corsair" }, inPlay: false } },
               ],
             },
@@ -181,7 +187,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       ],
     },
 
-    // 145040 Black Sails (Doomed 1 is a keyword). Each Ship location in the staging area gets +1 Threat until the end of the phase, one that arrives later this phase too (rr.lasting-effects); then, with no non-unique Ship location in the staging area
+    // 145040 Black Sails (Doomed 1 is a keyword). Each Ship location in the staging area gets +1 Threat until the end of the phase, one that arrives later this phase too (rr.lasting-effects: the stagingCards class with the trait Ship); then, with no non-unique Ship location in the staging area
     // (Great Corsair Ship is unique), the revealing player searches the encounter deck and discard pile for a Ship location and adds it to the staging area. The encounter deck is shuffled either way.
     {
       id: "145040:whenRevealed:1",
@@ -189,7 +195,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       lines: ["145040:A:2"],
       timing: "whenRevealed",
       instructions: [
-        { verb: "ModifyStat", stat: "threat", amount: 1, until: "endOfPhase", holders: { ...SHIP_LOCATION, stagingOnly: true } },
+        { verb: "ModifyStat", stat: "threat", amount: 1, until: "endOfPhase", target: "stagingCards", trait: "Ship" },
         { verb: "SearchMove", trait: "Ship", type: "location", to: "staging", when: { kind: "not", condition: { kind: "canPick", pick: { ...SHIP_LOCATION, nonUnique: true, stagingOnly: true } } } },
         { verb: "ShuffleEncounterDeck" },
       ],
