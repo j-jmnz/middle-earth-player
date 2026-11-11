@@ -1,6 +1,7 @@
 // Rules: rr.constant-ability, rr.step-6-4-1, rr.travel, rr.first-player (data/rules/entries.json).
 import type { Instruction } from "../../catalog/boundary.ts";
 
+import { holds } from "./conditions.ts";
 import { constantInstructions, memoOf, type StateMemo } from "./constant-records.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { effectsOfCard } from "../families/misc/text.ts";
@@ -104,6 +105,13 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
       }
       // "Spend 1 Fellowship resource to travel here" (144020:A:3): a hero of the players must hold the resources, the record says whose (`group`: any player's).
       if (instruction.verb === "SpendResources") return spendablePools(state, state.firstPlayer, instruction, ctx).total < instruction.amount;
+      // "Place 1 resource on Shelob to travel here" (144045:A:3): the card the resources go on is picked and must be in play.
+      if (instruction.verb === "PlaceResourceTokens" && instruction.on === "picked") {
+        const pick = instructions.find((other) => other.verb === "Pick");
+        return pick?.verb === "Pick" && pickCandidates(state, pick.pick, state.activeSeat, [], locationId, ctx).length === 0;
+      }
+      // "Either exhaust Sméagol, or discard 1 random card from each player's hand" (144044:A:2): a cost of a choice is payable when some option can be taken (rr.effects, rr.cost).
+      if (instruction.verb === "Choose") return !instruction.options.some((option) => option.requires == null || holds(state, option.requires, { actor: state.firstPlayer, sourceId: locationId, returned: 0 }, ctx));
       // "Reveal the top card of the burden deck to travel here" (141058:A:3): an empty burden deck has none to reveal.
       if (instruction.verb === "RevealBurden") return (state.burdenDeck?.length ?? 0) === 0;
       // A family's own Travel cost the players cannot pay (the Corsair deck of Southern Belfalas is empty, 12154:A:1, families/sea/index.ts).

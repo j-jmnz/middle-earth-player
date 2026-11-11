@@ -300,7 +300,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   // earns Beyond All Hope" (143071:B:1). False until the option is chosen. Read by src/rules/families/campaign/resolution.ts.
   z.strictObject({ kind: z.literal("picked"), name: z.string().min(1), option: z.string().min(1) }),
   // Some living player's hand holds at least `min` and at most `max` cards: "If any player has 3 or fewer cards in his hand" (143081:B:1, `max: 3`), "3 or more" (`min: 3`).
-  z.strictObject({ kind: z.literal("anyHand"), min: z.number().int().min(0).optional(), max: z.number().int().min(0).optional() }),
+  // With `every`: every living player's hand does ("each player holds at least 3 cards", the cost of 144070:B:2 paid by each hand; rr.cost).
+  z.strictObject({ kind: z.literal("anyHand"), min: z.number().int().min(0).optional(), max: z.number().int().min(0).optional(), every: z.literal(true).optional() }),
 ]);
 
 export const conditionSchema = z.discriminatedUnion("kind", [

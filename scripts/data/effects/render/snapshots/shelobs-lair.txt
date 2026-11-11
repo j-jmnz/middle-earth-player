@@ -1,0 +1,372 @@
+Scenario piles that place cards with no record (quest: 144070 The Stairs of Cirith Ungol; quest: 144071 The Spider's Pass; quest: 144072 Gollum's Betrayal; staging: 144044 Sméagol's Secret Way; activeLocation: 144043 Morgul Vale; setAside: 144040 Shelob; setAside: 144045 Cleft of Cirith Ungol; setAside: 144076 Sméagol; greatSpiderDeck: 144059 Blocked Tunnel; greatSpiderDeck: 144060 Shelob's Poison; greatSpiderDeck: 144061 Lurking Malice; greatSpiderDeck: 144062 Rage and Hunger)
+
+## 144040 Shelob
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+144040:A:1 (front): Indestructible. Cannot have attachments.
+  (the keyword part is owned by the card's keywords; the records cover: Cannot have attachments.)
+  144040:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+144040:A:2 (front): Shelob gets +1 Threat for each resource on her.
+  144040:constant:2: Constant
+    - this card: stat threat resources of this card, while this card is in play
+
+144040:A:3 (front): Forced: At the beginning of the quest phase, either place 1 resource on Shelob, or she makes an immediate attack against the first player.
+  144040:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    - the first player chooses one of:
+      * option "place":
+        - place 1 resource tokens on this card
+      * option "attack":
+        - this card attacks the first player now, from the staging area (or engaged)
+
+## 144041 Morgul Orc
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144041:A:1: Peril.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+144041:A:2 (front): When Revealed: Either discard 1 random card from your hand, or reveal an additional encounter card.
+  144041:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "discard" (only if the actor has a card in hand):
+        - the acting player discards 1 random card(s) from hand
+      * option "reveal":
+        - the acting player reveals an encounter card
+
+144041:A:3 (shadow): Shadow: If this attack destroys a character, discard 1 random card from your hand.
+  144041:shadow:1: Shadow
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the acting player discards 1 random card(s) from hand
+
+## 144042 Orc of Cirith Ungol
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144042:A:1: Peril.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+144042:A:2 (front): When Revealed: Either discard 1 random card from each player's hand, or Orc of Cirith Ungol makes an immediate attack against you.
+  144042:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "discard" (only if [json condition {"kind":"anyHand","min":1}]):
+        - each player discards 1 random card(s) from hand
+      * option "attack":
+        - this card attacks the acting player now, from the staging area
+
+## 144043 Morgul Vale
+(the scenario deals it into the activeLocation pile; the piles place it, no record does)
+
+144043:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+144043:A:2 (front): Forced: After Morgul Vale is explored, search the encounter deck and discard pile for a Morgul Wraith and add it to the staging area. Shuffle the encounter deck. Then, the first player must either exhaust The One Ring, or discard 1 random card from each player's hand.
+  144043:forced:1: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SearchMove {"verb":"SearchMove","code":"144053","to":"staging"}]
+    - shuffle the encounter deck
+    - the first player chooses one of:
+      * option "exhaust" (only if the card with code 144063 in play is ready):
+        - exhaust the card with code 144063
+      * option "discard" (only if [json condition {"kind":"anyHand","min":1}]):
+        - each player discards 1 random card(s) from hand
+
+## 144044 Sméagol's Secret Way
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+144044:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+144044:A:2 (front): Travel: Either exhaust Sméagol, or discard 1 random card from each player's hand.
+  144044:travel:1: Travel
+    - the first player chooses one of:
+      * option "exhaust" (only if the card with code 144076 in play is ready):
+        - exhaust the card with code 144076
+      * option "discard" (only if [json condition {"kind":"anyHand","min":1,"every":true}]):
+        - each player discards 1 random card(s) from hand
+
+144044:A:3 (front): Forced: After Sméagol's Secret Way is explored, each player either exhausts a character he controls, or discards 1 random card from his hand.
+  144044:forced:1: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "exhaust" (only if there is a ready character (you control) to choose):
+          - choose ready character (you control)
+          - exhaust the picked card
+        * option "discard" (only if the actor has a card in hand):
+          - the acting player discards 1 random card(s) from hand
+
+## 144045 Cleft of Cirith Ungol
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+144045:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+144045:A:2 (front): While Cleft of Cirith Ungol is in the victory display, Shelob gets +2 Attack, loses Indestructible, and gains: "Shelob engages the first player."
+  144045:constant:1: Constant
+    only if this card is in the victory display
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy (any player controls) or in the staging area, named "Shelob": stat attack 2, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Shelob": stat losesKeywords 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Shelob": stat engagedWithFirst 1, while this card is in play
+
+144045:A:3 (front): Travel: Place 1 resource on Shelob to travel here.
+  144045:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Shelob"
+    - place 1 resource tokens on the picked card
+
+## 144046 The Spider's Lair
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144046:A:1 (front): Forced: When The Spider's Lair is explored, remove 1 resource from Shelob.
+  144046:forced:1: Forced after a card leaves play (heard about this card)
+    only if the card the event is about had enough progress to be explored
+    - [json RemoveResourceTokens {"verb":"RemoveResourceTokens","code":"144040","amount":1}]
+
+144046:A:2 (front): Forced: After The Spider's Lair becomes the active location, Shelob makes an immediate attack against the first player.
+  144046:forced:2: Forced after this location becomes the active location (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Shelob"
+    - then, if there is a enemy (any player controls) or in the staging area, named "Shelob" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area (or engaged)
+
+## 144047 The Under-way
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144047:A:1 (front): While The Under-way is in the staging area, each Orc enemy gets -5 engagement cost and gains: "Forced: After this enemy engages a player, deal it a shadow card."
+  144047:constant:1: Constant
+    only if this card is in the staging area
+    - each Orc enemy (any player controls) or in the staging area: stat engagementCost -5, while this card is in play
+  144047:forced:1: Forced after an enemy engages a player (heard about Orc enemy (any player controls))
+    only if this card is in the staging area
+    - [json DealShadowTo {"verb":"DealShadowTo","target":"subject"}]
+
+144047:A:2 (shadow): Shadow: Deal the attacking enemy 2 additional shadow cards.
+  144047:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json DealShadowTo {"verb":"DealShadowTo","target":"attacker"}]
+    - [json DealShadowTo {"verb":"DealShadowTo","target":"attacker"}]
+
+## 144048 Deep Dark Passage
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144048:A:1 (front): While Deep Dark Passage is in the staging area, it gains: "Forced: When any amount of progress would be placed on a location in the staging area, reduce that amount by 1."
+  144048:constant:1: Constant
+    only if this card is in the staging area
+    - each location (any player controls) in the staging area only: stat progressReduced 1, while this card is in play
+
+144048:A:2 (front): Travel: Exhaust Sméagol to travel here.
+  144048:travel:1: Travel
+    - exhaust the card with code 144076
+
+## 144049 Den of Night
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144049:A:1 (front): While Den of Night is in the staging area, it gains: "Forced: After a 'When Revealed' effect is canceled, place 1 resource on Shelob."
+  144049:forced:1: Forced on the event whenRevealedCanceled
+    only if this card is in the staging area
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Shelob"
+    - place 1 resource tokens on the picked card
+
+144049:A:2 (front): Travel: Place 1 resource on Shelob to travel here.
+  144049:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) or in the staging area, named "Shelob"
+    - place 1 resource tokens on the picked card
+
+## 144050 Exhalation of Decay
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144050:A:1 (front): When Revealed: Each player discards 1 random card from his hand and 1 non-objective attachment he controls.
+  144050:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player discards 1 random card(s) from hand
+      - choose attachment (you control) that is not an objective
+      - discard the picked card
+
+144050:A:2 (shadow): Shadow: Discard a non-objective attachment you control.
+  144050:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (you control) that is not an objective
+    - discard the picked card
+
+## 144051 Many Openings
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144051:A:1 (front): When Revealed: Each location in the staging area gets +1 Threat until the end of the round. If the number of locations in the staging area is less than the number of players in the game, reveal an additional encounter card.
+  144051:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each location (any player controls) in the staging area only: stat threat 1, until the end of the round
+    - then, if the number of location (any player controls) in the staging area only is less than the number of players (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player reveals an encounter card
+
+144051:A:2 (shadow): Shadow: Attacking enemy gets +X Attack, where X is the active location's Threat.
+  144051:shadow:1: Shadow
+    - the attacking enemy: stat attack threat of the active location, until the end of the attack
+
+## 144052 A Heavy Burden
+
+144052:A:1: Permanent.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+144052:A:2 (front): Setup: Attach to the Ring-bearer.
+  144052:setup:1: Setup
+    - [json AttachToRingBearer {"verb":"AttachToRingBearer","code":"144052"}]
+
+144052:A:3 (front): Forced: At the end of the planning phase, either raise each player's threat by 1, or exhaust the Ring-bearer.
+  144052:forced:1: Forced at the end of the phase
+    only if it is the Planning phase
+    - the first player chooses one of:
+      * option "threat":
+        - raise threat by 1 (each player)
+      * option "exhaust" (only if its host is a ready hero (any player controls)):
+        - exhaust its host
+
+## 144059 Blocked Tunnel
+(the scenario deals it into the greatSpiderDeck pile; the piles place it, no record does)
+
+144059:A:1 (front): When Revealed: Make Blocked Tunnel the active location, returning any other active location to the staging area.
+  144059:whenRevealed:1: When revealed
+    - [json MakeActive {"verb":"MakeActive","target":"self"}]
+
+144059:A:2 (front): Action: Exhaust a character with a Weapon attachment to place 3 progress on Blocked Tunnel. (Any player may trigger this effect.)
+  144059:action:1: Action (any player may use it)
+    only if there is a ready character (you control) [also {"hasAttachment":{"trait":"Weapon"}}] to choose
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control) [also {"hasAttachment":{"trait":"Weapon"}}]
+    - exhaust the picked card
+    - place 3 progress on this card
+
+## 144060 Shelob's Poison
+(the scenario deals it into the greatSpiderDeck pile; the piles place it, no record does)
+
+144060:A:1 (front): When Revealed: Attach to a hero you control and exhaust that hero. (Counts as a Condition attachment with the text: "Limit 1 per hero. Treat attached hero's text box as blank, except for Traits. Attached hero cannot ready.").
+  144060:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - attach this card to a hero
+    - exhaust its host
+  144060:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - its host: stat blankText (its text box is blank) 1, while this card is in play
+    - its host: stat cannotReady 1, while this card is in play
+
+144060:A:2 (shadow): Shadow: If attacking enemy is Shelob, resolve the 'When Revealed' effect on Shelob's Poison.
+  144060:shadow:1: Shadow
+    - [json ResolveWhenRevealed {"verb":"ResolveWhenRevealed","card":"self","when":{"kind":"matches","card":"attacker","pick":{"type":"enemy","control":"any","names":["Shelob"]}}}]
+
+## 144061 Lurking Malice
+(the scenario deals it into the greatSpiderDeck pile; the piles place it, no record does)
+
+144061:A:1: Peril. Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+144061:A:2 (front): When Revealed: Either place 1 resource on Shelob, or she makes an immediate attack against you.
+  144061:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "place" (only if there is a enemy (any player controls) or in the staging area, named "Shelob" to choose):
+        - choose enemy (any player controls) or in the staging area, named "Shelob"
+        - place 1 resource tokens on the picked card
+      * option "attack" (only if there is a enemy (any player controls) or in the staging area, named "Shelob" to choose):
+        - choose enemy (any player controls) or in the staging area, named "Shelob"
+        - the picked enemy attacks the acting player now, from the staging area (or engaged)
+
+144061:A:3 (shadow): Shadow: If attacking enemy is Shelob, place 1 resource on her. Then, she gets +1 Attack for each resource on her.
+  144061:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if the attacking enemy is a enemy (any player controls) named "Shelob": place 1 resource tokens on the attacking enemy
+    - then, if the attacking enemy is a enemy (any player controls) named "Shelob" (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack resources of the attacking enemy, until the end of the attack
+
+## 144062 Rage and Hunger
+(the scenario deals it into the greatSpiderDeck pile; the piles place it, no record does)
+
+144062:A:1 (front): When Revealed: Shelob gets +2 Attack until the end of the phase. Shelob makes an immediate attack against each player, in player order.
+  144062:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy (any player controls) or in the staging area, named "Shelob": stat attack 2, until the end of the phase
+    - choose enemy (any player controls) or in the staging area, named "Shelob"
+    - for each player, first player first:
+      - if there is a enemy (any player controls) or in the staging area, named "Shelob" to choose: the picked enemy attacks the acting player now, from the staging area (or engaged)
+
+144062:A:2 (shadow): Shadow: If attacking enemy is Shelob, she makes an additional attack against you after this one.
+  144062:shadow:1: Shadow
+    - if the attacking enemy is a enemy (any player controls) named "Shelob": this enemy attacks now, dealt a new shadow card after its old ones are discarded [also {"afterThis":true}]
+
+## 144070 The Stairs of Cirith Ungol
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+144070:A:1 (front): Setup: Set Cleft of Cirith Ungol, Shelob, and The Great Spider encounter set aside, out of play. Put Sméagol into play under the first player's control. Make Morgul Vale the active location. Add Sméagol's Secret Way to the staging area. Shuffle the encounter deck.
+  144070:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json TakeControlOfSetAside {"verb":"TakeControlOfSetAside","code":"144076"}]
+    - shuffle the encounter deck
+
+144070:B:1 (back): Progress cannot be placed on Underground locations.
+  144070:constant:1: Constant
+    - each Underground location (any player controls): stat noProgressPlaced 1, while this card is in play
+
+144070:B:2 (back): Response: After Sméagol's Secret Way is explored, discard 3 random cards from each player's hand to discard each Nazgûl enemy in the staging area.
+  144070:response:1: Response on the event locationExplored (heard about location (any player controls) named "Sméagol's Secret Way"; any player may use it)
+    only if all of: (there is a Nazgûl enemy (any player controls) in the staging area only to choose) and ([json condition {"kind":"anyHand","min":3,"every":true}])
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each player discards 3 random card(s) from hand
+    - for each Nazgûl enemy (any player controls) in the staging area only:
+      - discard the picked card
+
+144070:B:3 (back): Forced: At the end of the quest phase, if Sméagol's Secret Way is in the victory display, advance to stage 2A.
+  144070:forced:1: Forced at the end of the phase
+    only if all of: (it is the Quest phase) and ([json condition {"kind":"inVictory","code":"144044","is":true}])
+    - advance to the next quest stage
+
+## 144071 The Spider's Pass
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+144071:A:1 (front): When Revealed: Add Shelob to the staging area and shuffle all cards from The Great Spider encounter set and the encounter discard pile into the encounter deck.
+  144071:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"144040"}]
+    - shuffle the encounter discard pile into the encounter deck
+    - [json ShufflePileIntoEncounterDeck {"verb":"ShufflePileIntoEncounterDeck","pile":"greatSpider"}]
+
+144071:B:1 (back): Shelob cannot leave the staging area and Sméagol cannot attack or defend.
+  144071:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy (any player controls) or in the staging area, named "Shelob": stat cannotLeaveStaging (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect) 1, while this card is in play
+    - each character (any player controls) named "Sméagol": stat cannotAttack 1, while this card is in play
+    - each character (any player controls) named "Sméagol": stat cannotDefend 1, while this card is in play
+
+144071:B:2 (back): Each player cannot play, or put into play, more than 1 ally each round.
+  144071:constant:2: Constant
+    - [json LimitEntries {"verb":"LimitEntries","cardType":"ally","max":1,"perPlayer":true}]
+
+144071:B:3 (back): No more than 4 progress can be placed on this stage each round.
+  144071:constant:3: Constant
+    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 4, while this card is in play
+
+## 144072 Gollum's Betrayal
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+144072:A:1 (front): When Revealed: Add Cleft of Cirith Ungol to the staging area. Flip Sméagol to Gollum and heal all damage from Shelob. Each player places 1 resource on Shelob.
+  144072:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"144045"}]
+    - flip Sméagol to Gollum: discard his damage; he enters play ready, engaged with the first player (nothing if Sméagol is not in play)
+    - choose enemy (any player controls) or in the staging area, named "Shelob"
+    - then, if there is a enemy (any player controls) or in the staging area, named "Shelob" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): heal all damage from the picked card
+    - place the number of players resource tokens on the picked card
+
+144072:B:1 (back): If Gollum is defeated, add him to the victory display. (Do not flip him over.)
+  144072:forced:1: Forced after an enemy is destroyed (heard about enemy (any player controls) named "Gollum")
+    - [json AddToVictory {"verb":"AddToVictory","target":"subject"}]
+
+144072:B:2 (back): While Shelob has at least 1 resource on her, she gains: "Forced: When Shelob is dealt any amount of damage, cancel that damage and discard 1 resource from Shelob instead."
+  144072:constant:1: Constant
+    - each enemy (any player controls) or in the staging area, named "Shelob", with resources on it: stat resourceCancel 1, while this card is in play
+
+144072:B:3 (back): The players cannot defeat this stage unless both Shelob and Gollum are in the victory display. If the players defeat this stage, they win the game.
+  144072:constant:2: Constant
+    only if any of: ([json condition {"kind":"inVictory","code":"144040","is":false}]) or ([json condition {"kind":"inVictory","code":"144075","is":false}])
+    - the players cannot defeat this stage while this holds
+
+(rendered pieces: 226 by template, 25 as JSON)

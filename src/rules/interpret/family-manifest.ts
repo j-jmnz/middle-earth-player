@@ -43,8 +43,8 @@ export type TravelHooks = {
 /** Whether a family bars playing a card, or putting it into play (`putting`), from the hand or by an effect: true bars it. Asked after the core's own bars. */
 export type PlayHook = (state: ScenarioState, cardId: string, ctx: ReduceContext, how: PlayHow) => boolean;
 
-/** What a play bar is asked about: `putting`, the card is put into play rather than played. */
-export type PlayHow = { readonly putting?: boolean };
+/** What a play bar is asked about: `putting`, the card is put into play rather than played; `seat`, the player who plays or puts it into play. */
+export type PlayHow = { readonly putting?: boolean; readonly seat?: number };
 
 /** The words for a refused play that a family bars (the hook of `play` says whether; this one says why): null when the family does not bar the card. Asked where the refusal reason of a play is built. */
 export type PlayReasonHook = (state: ScenarioState, cardId: string, ctx: ReduceContext) => string | null;

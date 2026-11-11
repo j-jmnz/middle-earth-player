@@ -10,7 +10,7 @@ import { activeOf, stagingOf } from "../families/breaking/areas.ts";
 import { cancelAttack } from "../families/defense/defenders.ts";
 import { printedOf } from "../core/printed.ts";
 import { questPointsOf } from "../quest/quest.ts";
-import { notePlaced, progressRoom } from "../families/south/locations.ts";
+import { notePlaced, progressRoom, reducedProgress } from "../families/south/locations.ts";
 import { announceLeftPlay } from "../quest/stage-reveal.ts";
 import type { ScenarioState } from "../core/state.ts";
 import { livingSeats, updateCard } from "../core/state.ts";
@@ -117,7 +117,7 @@ export function placeProgress(state: ScenarioState, id: string, amount: number, 
   if (!location) return state;
   const points = questPointsOf(state, location, ctx.cards);
   // What a gate or a cap leaves out (Doors of Durin, Snowdrifts; families/south/locations.ts).
-  const placed = Math.min(amount, progressRoom(state, id, ctx.cards));
+  const placed = Math.min(reducedProgress(state, id, amount), progressRoom(state, id, ctx.cards));
   if (placed <= 0) return state;
   steps.push({ kind: "progress", targetId: id, amount: placed, cause: currentCause(steps, UNATTRIBUTED), ...(placedBy != null ? { seat: placedBy } : {}) });
   const next = notePlaced(updateCard(state, id, { progress: location.progress + placed }), id, placed);

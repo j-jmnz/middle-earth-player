@@ -20,7 +20,7 @@ export function campaignHolds(state: ScenarioState, condition: Extract<Condition
     case "picked":
       return pickedOption(state, condition.name, condition.option);
     case "anyHand":
-      return livingSeats(state).some((seat) => {
+      return livingSeats(state)[condition.every ? "every" : "some"]((seat) => {
         const size = state.seats[seat]?.hand.length ?? 0;
         return size >= (condition.min ?? 0) && size <= (condition.max ?? Infinity);
       });

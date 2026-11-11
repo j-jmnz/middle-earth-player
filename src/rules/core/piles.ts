@@ -6,7 +6,7 @@ import type { CardInstance, ScenarioState } from "./state.ts";
 import { updateCard } from "./state.ts";
 
 /** The zones of Ered Mithrin's decks, kept in `ScenarioState.piles`. The one list the zone types (`PileZone`, `ZoneName`, `Destination`, the dealt zones of the Setup) and the zone guard derive from. */
-export const PILE_ZONES = ["cavesDeck", "evilCreaturesDeck", "evilCreaturesDiscard", "spidersDeck", "orcsDeck", "sideQuestDeck", "haradDeck"] as const;
+export const PILE_ZONES = ["cavesDeck", "evilCreaturesDeck", "evilCreaturesDiscard", "spidersDeck", "orcsDeck", "sideQuestDeck", "haradDeck", "greatSpiderDeck"] as const;
 export type PileZone = (typeof PILE_ZONES)[number];
 /** A zone that holds a list of card ids apart from the encounter deck: the Dream-chaser box's keep theirs in `corsairDeck`, `corsairDiscard` and `uncharted.deck`. */
 const DECK_ZONES = [...PILE_ZONES, "corsairDeck", "corsairDiscard", "unchartedDeck"] as const;
@@ -31,6 +31,8 @@ const PLAIN_PILES = {
   sideQuests: { deck: "sideQuestDeck", discard: null },
   // Journey to the Cross-roads' Harad deck (mec112.setup-journey-to-the-cross-roads): the Men of Harad set, shuffled facedown under The Cross-roads; its cards are revealed into the staging area or engaged, never discarded from it.
   harad: { deck: "haradDeck", discard: null },
+  // Shelob's Lair's Great Spider set (mec112.setup-shelobs-lair): set aside out of play, shuffled into the encounter deck by The Spider's Pass; its cards are never discarded from it.
+  greatSpider: { deck: "greatSpiderDeck", discard: null },
 } as const satisfies Record<string, DeckZones>;
 
 /** The piles a record names (`pile` of the wilderland verbs): every deck of Ered Mithrin. */
