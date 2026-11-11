@@ -17,7 +17,7 @@ import { putOnStage } from "../../../rules/quest/quest.ts";
 import { pileOf } from "../../../rules/core/piles.ts";
 import { flagged, updateCard, withMode, withSeat, type ScenarioState } from "../../../rules/core/state.ts";
 import { moveCard } from "../../../rules/core/zones.ts";
-import { entriesBarred, noteEntries } from "../../../rules/families/sea/entries.ts";
+import { entriesBarred, entriesRefusal, noteEntries } from "../../../rules/families/sea/entries.ts";
 import { fightEnemy, finish, idOf, legalIntents, resolveRecords, send, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const SHELOB = "144040";
@@ -58,6 +58,13 @@ describe("a limit on the allies each player brings into play", () => {
     expect(entriesBarred(entered, other, made.ctx, 1)).toBe(false);
     const both = noteEntries(moveCard(entered, other, { zone: "play", seat: 1 }), made.ctx);
     expect(both.entries?.bySeat).toEqual([1, 1]);
+  });
+
+  it("144071:B:2 refuses the second ally in words that name the card and the limit", () => {
+    const { made, state, first, second } = limited();
+    expect(entriesRefusal(state, second, made.ctx)).toBeNull();
+    const entered = noteEntries(moveCard(state, first, { zone: "play", seat: 0 }), made.ctx);
+    expect(entriesRefusal({ ...entered, activeSeat: 0 }, second, made.ctx)).toBe("The Spider's Pass: each player may play or put into play only 1 ally each round.");
   });
 
   it("144071:B:2 counts an ally that left play again, and counts again in the next round", () => {

@@ -29,10 +29,10 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "144044:forced:1 @0.0 exhaust": { label: "Exhaust a ready character you control" },
   "144044:forced:1 @0.0 discard": { label: "Discard 1 card at random from your hand" },
   "144044:forced:1 @0.0.exhaust.0 Pick": { owned: true, note: "Sméagol's Secret Way: choose a ready character you control to exhaust.", verb: "Exhaust" },
-  // 144045:A:3 and 144049:A:2: the Travel cost; 144049:A:1: Den of Night hears a canceled effect. The resource goes on Shelob.
+  // 144045:A:3 and 144049:A:2: the Travel cost; 144049:A:1: Den of Night hears a canceled When Revealed effect. The resource goes on Shelob.
   "144045:travel:1 @0 Pick": { note: "Cleft of Cirith Ungol: choose Shelob to place 1 resource on, the cost to travel here. She gets +1 Threat for each resource.", verb: "Place" },
   "144049:travel:1 @0 Pick": { note: "Den of Night: choose Shelob to place 1 resource on, the cost to travel here. She gets +1 Threat for each resource.", verb: "Place" },
-  "144049:forced:1 @0 Pick": { note: "Den of Night: the effects of an encounter card were canceled. Choose Shelob to place 1 resource on.", verb: "Place" },
+  "144049:forced:1 @0 Pick": { note: "Den of Night: a When Revealed effect was canceled. Choose Shelob to place 1 resource on.", verb: "Place" },
   // 144046:A:2: after The Spider's Lair becomes the active location Shelob attacks the first player.
   "144046:forced:2 @0 Pick": { note: "The Spider's Lair is the active location: choose Shelob to attack the first player now.", verb: "Attack" },
   // 144050:A:1 and A:2: an attachment of the player's own, not an objective.

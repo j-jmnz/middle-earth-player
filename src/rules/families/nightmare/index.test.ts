@@ -378,6 +378,25 @@ describe("Flight to the Ford Nightmare's vocabulary (906301:A:2, 906304:A:1; rr.
     expect(resolved.life).toBe(9);
   });
 
+  it("announces a cancel of a revealed card's effects only when that card has a When Revealed effect (144049:A:1)", () => {
+    const { state: base } = table();
+    const placed = spawn({ ...base, life: 10 }, "906304", { zone: "staging" });
+    const forest = placed.state;
+    const withRecord: ReduceContext = { ...fordCtx, effects: [...FORD_EFFECTS, { id: "906304:whenRevealed:1", cardCode: "906304", lines: [], timing: "whenRevealed", instructions: [{ verb: "ReduceLife", amount: 1 }] }] };
+    const revealing = (target: string): ScenarioState => ({
+      ...forest,
+      stack: [
+        { frame: "reveal", cardId: target, seat: 0, peril: false, data: { kind: "reveal", hide: null, surge: false } },
+        { frame: "responses", cardId: null, seat: 0, peril: false, data: { kind: "responses", event: { trigger: "encounterRevealed", seat: 0, cardId: target } } },
+      ] as unknown as ScenarioState["stack"],
+    });
+    const open = revealing(placed.id);
+    const changed = { ...open, round: open.round };
+    // No When Revealed record on the revealed card: nothing was canceled that Den of Night hears.
+    expect(announceCanceled(changed, open, fordCtx)).toBe(changed);
+    expect(announceCanceled(changed, open, withRecord).pendingEvents?.at(-1)).toMatchObject({ trigger: "whenRevealedCanceled" });
+  });
+
   it("announces nothing while no card that listens for a canceled when revealed effect is in play", () => {
     const { state: base } = table();
     const discarded = spawn({ ...base, life: 10 }, "906304", { zone: "encounterDiscard" }).state;

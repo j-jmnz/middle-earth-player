@@ -1,4 +1,4 @@
-import type { Effect, Instruction, PickSpec } from "../../catalog/boundary.ts";
+import type { Effect, PickSpec, SimpleInstruction } from "../../catalog/boundary.ts";
 
 import { AUTHORED_EFFECTS as JOURNEY_TO_THE_CROSS_ROADS } from "./journey-to-the-cross-roads.ts";
 import { copyLine, withCopies } from "./reprint.ts";
@@ -16,8 +16,6 @@ const ONE_RING = "144063";
 const GOLLUM = "144075";
 const SMEAGOL = "144076";
 type Cond = NonNullable<Effect["condition"]>;
-// An instruction a choice's option may hold (a simple verb), which a record's own instructions may hold too.
-type Simple = Extract<Instruction, { verb: "Choose" }>["options"][number]["instructions"][number];
 // Shelob in play, in the staging area or engaged with a player.
 const SHELOB_IN_PLAY: PickSpec = { type: "enemy", control: "any", staging: true, names: ["Shelob"] };
 const SHELOB_PLAYING: Cond = { kind: "canPick", pick: SHELOB_IN_PLAY };
@@ -27,11 +25,11 @@ const WHEN_EXPLORED = { trigger: "leftPlay", subject: "self", condition: { kind:
 const RING_READY: Cond = { kind: "exhausted", code: ONE_RING, is: false };
 const SOME_HAND_HOLDS_A_CARD: Cond = { kind: "anyHand", min: 1 };
 const EVERY_HAND_HOLDS_A_CARD: Cond = { kind: "anyHand", min: 1, every: true };
-const EACH_PLAYER_DISCARDS_ONE: Simple = { verb: "DiscardRandomFromHand", amount: 1, who: "eachSeat" };
+const EACH_PLAYER_DISCARDS_ONE: SimpleInstruction = { verb: "DiscardRandomFromHand", amount: 1, who: "eachSeat" };
 // "Place 1 resource on Shelob": Shelob is picked first, the resource goes on the picked card (nothing when she is out of play).
-const PLACE_ON_SHELOB: Simple[] = [{ verb: "Pick", pick: SHELOB_IN_PLAY }, { verb: "PlaceResourceTokens", amount: 1, on: "picked" }];
+const PLACE_ON_SHELOB: SimpleInstruction[] = [{ verb: "Pick", pick: SHELOB_IN_PLAY }, { verb: "PlaceResourceTokens", amount: 1, on: "picked" }];
 // "Shelob makes an immediate attack against" the actor (the player who revealed the card), as she is, engaged or not; she is dealt a shadow card (faq.enemy-attacks-outside-combat).
-const SHELOB_ATTACKS: Simple[] = [{ verb: "Pick", pick: SHELOB_IN_PLAY }, { verb: "AttackFromStaging", orEngaged: true }];
+const SHELOB_ATTACKS: SimpleInstruction[] = [{ verb: "Pick", pick: SHELOB_IN_PLAY }, { verb: "AttackFromStaging", orEngaged: true }];
 
 export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
   [
@@ -201,7 +199,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [{ verb: "ModifyStat", stat: "progressReduced", amount: 1, until: "whileSourceInPlay", holders: STAGING_LOCATIONS }],
     },
 
-    // 144049 Den of Night. While it is in the staging area, after the effects of an encounter card are canceled (We Hates Them!'s own cancel counts), 1 resource goes on Shelob; each copy in the staging area places one. Travel is a copy of Cleft's.
+    // 144049 Den of Night. While it is in the staging area, after a "When Revealed" effect is canceled (We Hates Them!'s own cancel counts; a card with no When Revealed effect has none to cancel), 1 resource goes on Shelob; each copy in the staging area places one. Travel is a copy of Cleft's.
     {
       id: "144049:forced:1",
       cardCode: "144049",

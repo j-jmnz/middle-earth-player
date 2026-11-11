@@ -213,7 +213,7 @@ STATUS.md, then the active phase file.
 
 Read when a task names the plan.
 
-- `docs/plans/effect-authoring.md` — Authoring effect records (~7.4K tok)
+- `docs/plans/effect-authoring.md` — Authoring effect records (~7.5K tok)
   - 12–33 Workflow (~460)
   - 34–50 Where records live (~370)
   - 51–75 Templates and copied lines (~690) ← 5
@@ -225,8 +225,8 @@ Read when a task names the plan.
   - 155–174 Triggers and stat flags (~440)
   - 175–236 Patterns (~1.4K)
   - 237–273 Mechanic families: engine and records together (~1.4K) ← 1
-  - 274–287 Readings the review catches (~490) ← 4
-  - 288–307 Not expressible yet: leave open, report (~390)
+  - 274–288 Readings the review catches (~550) ← 4
+  - 289–308 Not expressible yet: leave open, report (~390)
 - `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.7K tok)
   - 3–14 Context (~450)
   - 15–24 What does not move (~190)

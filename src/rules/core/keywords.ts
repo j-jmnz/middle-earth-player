@@ -212,9 +212,10 @@ export function placeDamage(state: ScenarioState, assigned: string, amount: numb
   // "Cannot take damage from non-quest effects" (19127:A:1): the damage of a combat or of a quest card's effect is still placed.
   if (source !== "combat" && source !== "quest" && flagged(state, id, "cannotTakeNonQuestDamage")) return state;
   if (source === "combat" && flagged(state, id, "combatDamageCanceled")) return state;
-  // "When attached enemy would take any amount of damage, cancel all of that damage. Then, discard Dragon Scales" (18059:A:2).
+  // "While Shelob has at least 1 resource, cancel all damage she would be dealt and discard 1 resource from her instead" (144072:B:2).
   const paid = resourceCancel(state, id, amount);
   if (paid) return paid;
+  // "When attached enemy would take any amount of damage, cancel all of that damage. Then, discard Dragon Scales" (18059:A:2).
   const scaled = flagged(state, id, "cancelsDamage") ? cancelAllDamage(state, id, amount) : null;
   if (scaled) return scaled;
   // A card that takes no more than a number of damage each round ("cannot take more than 4 damage each round", 11177:A:4) takes what is left of it.
