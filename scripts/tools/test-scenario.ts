@@ -1,5 +1,6 @@
 import { spawnSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync } from "node:fs";
+import os from "node:os";
 import path from "node:path";
 
 import { loadCards } from "../data/load-cards.ts";
@@ -21,10 +22,11 @@ import { WORDS_SCENARIOS } from "../../test/harness/words-scenarios.ts";
 // Parts, each its own vitest run (or the card smoke), so a failure names its part:
 //   tests      the test files that belong to the scenario: those whose path names it (its folder under src/campaign/scenarios/, src/play/scenarios/<id>-*.test.ts, ...)
 //              and those that import from test/scenarios/<id>/ or src/campaign/scenarios/<id>/ (a Temple table test named for the island, say)
-//   goldens    the registry-wide golden tests, filtered (-t) to the scenario's title in test/harness/golden-registry.ts: causes, replay and the Maestro
-//              fixtures. A scenario with no entry skips them, except a-shadow-of-the-past, whose goldens replay.test.ts and causes.test.ts read directly: those two run
+//   goldens    the registry-wide golden tests, filtered (-t) to the scenario's title in test/harness/golden-registry.ts: the Maestro fixtures (the
+//              causes and the replay of a scenario's goldens are in its own golden.test.ts, in tests). A scenario with no entry skips them, except
+//              a-shadow-of-the-past, whose goldens replay.test.ts and causes.test.ts read directly: those two run
 //              whole (in the tests part, as they import its scene)
-//   coverage   the effect coverage, migration and record-route checks, the copied-lines test, the golden registry's own test, the file-size test and the rule-id
+//   coverage   the effect coverage, migration and record-route checks, the copied-lines test, the golden registry's own test, the file-size and test-cost checks and the rule-id
 //              test (COVERAGE_TESTS), and every
 //              choice-words test (src/play/words): a record on a card another scenario's words test reads (a campaign card, a recurring ally) can break it
 //   reader     src/play/reader-play.test.ts for the scenario (READER_PLAY_SCENARIO=<id>): a seeded game played through what a screen reader can reach, which fails
@@ -35,7 +37,42 @@ import { WORDS_SCENARIOS } from "../../test/harness/words-scenarios.ts";
 //              whichever track built it and whether or not it deals player cards
 //   families   the family and pool tests, and the manifest tests, when files of those changed since the merge base with origin/main (HEAD when there is
 //              none), committed, staged, unstaged or untracked (changedFamilyTests)
+//   budget     the tests part's time, held to the scenario's budget on a full run (Test budget, below)
 // `--list` prints the files and codes without running anything. A file runs once, in the first part that names it.
+
+// Test budget: the scenario's own tests (the tests part) take at most TEST_BUDGET_SECONDS of test time in all, summed over their files as
+// Vitest counts each (scripts/tools/test-cost-reporter.ts), on a full run (`--quick` skips the goldens, so it does not check). It holds the
+// suite lean as scenarios are added (.claude/rules/code-standards.md, Test cost). The scenarios over it today are listed at what they took,
+// measured on a 4-core cloud session, with BUDGET_SLACK for a busier machine; they may not grow past that, and a new scenario gets the default.
+export const TEST_BUDGET_SECONDS = 40;
+export const BUDGET_SLACK = 1.25;
+export const OVER_BUDGET: Readonly<Record<string, number>> = {
+  // Its tests part holds every test that imports its scene, the first scenario's, across the engine.
+  "a-shadow-of-the-past": 103,
+  "mount-gundabad": 77,
+  "the-city-of-corsairs": 70,
+  "roam-across-rhovanion": 60,
+  "the-ghost-of-framsburg": 56,
+  "the-withered-heath": 52,
+  "fire-in-the-night": 48,
+  "a-knife-in-the-dark": 47,
+  "helms-deep": 43,
+  "the-fate-of-wilderland": 41,
+};
+
+/** The budget problem of a run of the scenario's tests, from each file's ms, or null when it is within its budget. */
+export function budgetProblem(id: string, times: Readonly<Record<string, number>>): string | null {
+  const seconds = Object.values(times).reduce((sum, ms) => sum + ms, 0) / 1000;
+  const listed = OVER_BUDGET[id];
+  const limit = listed === undefined ? TEST_BUDGET_SECONDS : Math.round(listed * BUDGET_SLACK);
+  if (seconds <= limit) return null;
+  const slowest = Object.entries(times)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3)
+    .map(([file, ms]) => `${file} ${Math.round(ms / 1000)} s`)
+    .join(", ");
+  return `the scenario's tests took ${Math.round(seconds)} s, over its budget of ${limit} s (slowest: ${slowest}); see .claude/rules/code-standards.md, Test cost`;
+}
 
 export type Selection = {
   tests: string[];
@@ -44,12 +81,12 @@ export type Selection = {
   families: string[];
 };
 
-export const COVERAGE_TESTS = ["scripts/checks/effect-coverage.test.ts", "scripts/checks/effect-migration.test.ts", "scripts/checks/record-routes.test.ts", "src/effects/copies.test.ts", "test/harness/golden-registry.test.ts", "scripts/checks/file-size.test.ts", "scripts/checks/box-dealt.test.ts", "scripts/data/rules.test.ts", "scripts/checks/layout.test.ts", "scripts/checks/spec-coverage.test.ts", "scripts/docs/index.test.ts", "scripts/checks/maestro.test.ts"];
+export const COVERAGE_TESTS = ["scripts/checks/effect-coverage.test.ts", "scripts/checks/effect-migration.test.ts", "scripts/checks/record-routes.test.ts", "src/effects/copies.test.ts", "test/harness/golden-registry.test.ts", "scripts/checks/file-size.test.ts", "scripts/checks/test-cost.test.ts", "scripts/checks/box-dealt.test.ts", "scripts/data/rules.test.ts", "scripts/checks/layout.test.ts", "scripts/checks/spec-coverage.test.ts", "scripts/docs/index.test.ts", "scripts/checks/maestro.test.ts"];
 export const READER_TEST = "src/play/reader-play.test.ts";
 const WORDS_ROOT = "src/play/words/";
 const WORDS_TEST = `${WORDS_ROOT}scenario-words.test.ts`;
 const ASKS_TEST = `${WORDS_ROOT}asks.test.ts`;
-export const GOLDEN_TESTS = ["src/campaign/causes.test.ts", "src/campaign/replay.test.ts", "src/campaign/fixtures.test.ts"];
+export const GOLDEN_TESTS = ["src/campaign/fixtures.test.ts"];
 
 const escapeRegExp = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
@@ -190,7 +227,8 @@ function run(command: string, args: string[], env?: Record<string, string>): { o
   return { ok: result.status === 0, ms: performance.now() - begin };
 }
 
-const vitest = (files: string[], filter?: string): string[] => ["exec", "vitest", "run", ...files, ...(filter === undefined ? [] : ["-t", escapeRegExp(filter)])];
+const vitest = (files: string[], filter?: string, reporters: string[] = []): string[] => ["exec", "vitest", "run", ...files, ...(filter === undefined ? [] : ["-t", escapeRegExp(filter)]), ...reporters];
+const COST_REPORTERS = ["--reporter=default", "--reporter=./scripts/tools/test-cost-reporter.ts"];
 
 async function main(log: Log): Promise<void> {
   const args = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
@@ -246,8 +284,19 @@ async function main(log: Log): Promise<void> {
       results.push({ name: part.name, ok: true, ms: 0, detail: `skipped${part.note ? ` (${part.note})` : ""}` });
       continue;
     }
-    const outcome = run("pnpm", vitest(part.files, part.filter), part.env);
+    // The scenario's own tests are timed on a full run, for the budget.
+    const timed = part.name === "tests" && !quick;
+    const costDir = timed ? mkdtempSync(path.join(os.tmpdir(), "test-cost-")) : null;
+    const costFile = costDir ? path.join(costDir, "times.json") : null;
+    const outcome = run("pnpm", vitest(part.files, part.filter, timed ? COST_REPORTERS : []), { ...part.env, ...(costFile ? { TEST_COST_OUT: costFile } : {}) });
     results.push({ name: part.name, ok: outcome.ok, ms: outcome.ms, detail: `${part.files.length} files${part.filter ? `, -t ${part.filter}` : ""}` });
+    if (costFile && costDir) {
+      const times = existsSync(costFile) ? (JSON.parse(readFileSync(costFile, "utf8")) as Record<string, number>) : null;
+      rmSync(costDir, { recursive: true, force: true });
+      const problem = times ? budgetProblem(id, times) : "the test times were not written";
+      const seconds = times ? Math.round(Object.values(times).reduce((sum, ms) => sum + ms, 0) / 1000) : 0;
+      results.push({ name: "budget", ok: problem === null, ms: 0, detail: problem ?? `${seconds} s of test time, within the budget` });
+    }
   }
   for (const smoked of smokeRuns(id, smoke)) {
     if (smoked.args.length === 0) {

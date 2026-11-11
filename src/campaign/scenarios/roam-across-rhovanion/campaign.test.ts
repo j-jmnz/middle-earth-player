@@ -8,7 +8,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { EFFECTS } from "../../../effects/index.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../../../rules/engine/reduce.ts";
-import { RHOVANION_GOLDENS, afterHeath, logBeforeGolden, playGolden, rawEarlier, rhovanionChoices, rhovanionLoadout, rhovanionPlan, rhovanionSetupChoices, rhovanionStart, rhovanionWorld } from "../../../../test/scenarios/roam-across-rhovanion/game.ts";
+import { RHOVANION_GOLDENS, afterHeath, logBeforeGolden, rawEarlier, rhovanionChoices, rhovanionLoadout, rhovanionPlan, rhovanionSetupChoices, rhovanionStart, rhovanionWorld } from "../../../../test/scenarios/roam-across-rhovanion/game.ts";
 import { CODES, campaign, rhovanion } from "../../../../test/scenarios/roam-across-rhovanion/scene.ts";
 import { nextPartId, nextPartStatus } from "../../../../test/harness/next-part.ts";
 
@@ -20,6 +20,7 @@ import { campaignPath, nextStep } from "../../path.ts";
 import { newSave } from "../../save.ts";
 import { PLAYABLE_SCENARIOS } from "../../playable.ts";
 import { NO_COPY_LIMITS, poolEncounterCopies, wilderlandFacts } from "../../wilderland.ts";
+import { goldenState } from "../../../../test/harness/golden-state.ts";
 
 let ctx: ReduceContext;
 let cards: Awaited<ReturnType<typeof rhovanionWorld>>["cards"];
@@ -168,7 +169,7 @@ describe("Roam Across Rhovanion in the ered-mithrin campaign", { timeout: 60_000
   it("writes Misplaced Trust or Urdug's Cunning, the copy of a location and the log to the campaign when won, unlocks Fire in the Night (coming soon), and writes nothing when lost", async () => {
     // Two-handed, after the earlier parts, 3 or more resources: a Misplaced Trust for each player joins the pool (after the starting hand), and a copy of each chosen location joins the pool's encounter cards.
     const win = golden("two-handed, won, after the earlier parts, Horn, Tiny, Key");
-    const state = playGolden(win, ctx).state;
+    const state = goldenState("roam-across-rhovanion", win.name);
     const before = logBeforeGolden(win);
     const log = applyResolution(before, state.scenarioId, state, cards, NO_COPY_LIMITS);
     expect(log.completed).toEqual([...before.completed, rhovanion.id]);
@@ -189,20 +190,20 @@ describe("Roam Across Rhovanion in the ered-mithrin campaign", { timeout: 60_000
     expect(nextStep(path, null)).toMatchObject({ node: { id: "fire-in-the-night" } });
     // With fewer than 3 resources each player earns Urdug's Cunning, a burden, instead.
     const cunning = golden("two-handed, won, after the earlier parts, Key, Horn, Tiny, trust twice");
-    const cunningState = playGolden(cunning, ctx).state;
+    const cunningState = goldenState("roam-across-rhovanion", cunning.name);
     const written = applyResolution(logBeforeGolden(cunning), cunningState.scenarioId, cunningState, cards, NO_COPY_LIMITS);
     expect(written.campaignPool.filter((card) => card.code === CODES.urdugSCunning).map((card) => card.seat).sort()).toEqual([0, 1]);
     expect(written.campaignPool.some((card) => card.code === CODES.misplacedTrust)).toBe(false);
     // The lines written by the earlier parts stay on the log.
     const lined = golden("two-handed, Easy, won, Melanwar's and Isolde's lines, Horn");
-    const lineState = playGolden(lined, ctx).state;
+    const lineState = goldenState("roam-across-rhovanion", lined.name);
     const linedLog = applyResolution(logBeforeGolden(lined), lineState.scenarioId, lineState, cards, NO_COPY_LIMITS);
     expect(linedLog.allyLines).toEqual(expect.arrayContaining(["turayn", "melanwar", "isolde"]));
     expect(linedLog.completed).toHaveLength(5);
     // A loss writes nothing.
     const lostGolden = RHOVANION_GOLDENS.find((item) => item.outcome === "lost")!;
     const weak = await rhovanionWorld(lostGolden.decks);
-    const lost = playGolden(lostGolden, weak.ctx).state;
+    const lost = goldenState("roam-across-rhovanion", lostGolden.name);
     expect(lost.lost).toBe(true);
     const blank = emptyLog(lostGolden.seatCount);
     expect(applyResolution(blank, lost.scenarioId, lost, weak.cards, NO_COPY_LIMITS)).toBe(blank);

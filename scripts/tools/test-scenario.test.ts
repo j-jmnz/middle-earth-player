@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { changedFamilyTests, hasReaderGames, quickParts, registryTitle, scenarioTests, selectTests, smokeRuns } from "./test-scenario.ts";
+import { BUDGET_SLACK, budgetProblem, changedFamilyTests, hasReaderGames, OVER_BUDGET, quickParts, registryTitle, scenarioTests, selectTests, smokeRuns, TEST_BUDGET_SECONDS } from "./test-scenario.ts";
 
 // pnpm test scenario <id>: the selection is a pure function of the id, the changed paths and the tree of test files.
 const TREE = [
@@ -97,7 +97,7 @@ describe("registryTitle", () => {
 describe("selectTests", () => {
   it("gathers the parts, and skips the golden tests for a scenario with no registry entry", () => {
     const selected = selectTests("the-oath", [], TREE, "The Oath", read);
-    expect(selected.goldens).toEqual({ files: ["src/campaign/causes.test.ts", "src/campaign/replay.test.ts", "src/campaign/fixtures.test.ts"], title: "The Oath" });
+    expect(selected.goldens).toEqual({ files: ["src/campaign/fixtures.test.ts"], title: "The Oath" });
     expect(selected.coverage).toEqual(["scripts/checks/effect-coverage.test.ts", "scripts/checks/effect-migration.test.ts", "src/effects/copies.test.ts", "test/harness/golden-registry.test.ts", "scripts/checks/layout.test.ts", "scripts/checks/spec-coverage.test.ts", "scripts/docs/index.test.ts", "scripts/checks/maestro.test.ts", "src/play/words/scenarios/sea.test.ts"]);
     expect(selected.families).toEqual([]);
     expect(selectTests("the-oath", [], TREE, null, read).goldens.files).toEqual([]);
@@ -153,7 +153,7 @@ describe("the card smokes (smokeRuns)", () => {
 describe("quickParts (--quick)", () => {
   const parts = [
     { name: "tests", files: ["src/campaign/scenarios/the-oath/golden.test.ts", "src/campaign/scenarios/the-oath/quest.test.ts"] },
-    { name: "goldens", files: ["src/campaign/causes.test.ts", "src/campaign/replay.test.ts"], filter: "The Oath" },
+    { name: "goldens", files: ["src/campaign/fixtures.test.ts"], filter: "The Oath" },
     { name: "coverage", files: ["scripts/checks/effect-coverage.test.ts"] },
     { name: "families", files: [] as string[], note: "no pool, family or manifest file changed" },
     { name: "reader", files: ["src/play/reader-play.test.ts"] },
@@ -184,5 +184,26 @@ describe("quickParts (--quick)", () => {
     expect(quick.find((part) => part.name === "coverage")).toEqual(parts[2]);
     expect(quick.find((part) => part.name === "families")).toEqual(parts[3]);
     expect(quick.find((part) => part.name === "tests")).toEqual(parts[0]);
+  });
+});
+
+describe("the test budget (budgetProblem)", () => {
+  const seconds = (n: number) => ({ "a.test.ts": n * 600, "b.test.ts": n * 400 });
+
+  it("passes a new scenario within the default budget and fails one over it, naming the slowest files", () => {
+    expect(budgetProblem("a-new-scenario", seconds(TEST_BUDGET_SECONDS))).toBeNull();
+    const problem = budgetProblem("a-new-scenario", seconds(TEST_BUDGET_SECONDS + 1));
+    expect(problem).toContain(`over its budget of ${TEST_BUDGET_SECONDS} s`);
+    expect(problem).toContain("a.test.ts");
+  });
+
+  it("holds a listed scenario to what it took, with the slack", () => {
+    const [id, listed] = Object.entries(OVER_BUDGET)[0]!;
+    expect(budgetProblem(id, seconds(listed))).toBeNull();
+    expect(budgetProblem(id, seconds(Math.round(listed * BUDGET_SLACK) + 1))).toContain("over its budget");
+  });
+
+  it("lists only scenarios over the default budget", () => {
+    expect(Object.entries(OVER_BUDGET).filter(([, listed]) => listed <= TEST_BUDGET_SECONDS)).toEqual([]);
   });
 });

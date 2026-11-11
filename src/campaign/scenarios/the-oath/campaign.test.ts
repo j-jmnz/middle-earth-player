@@ -13,8 +13,8 @@ import { reduce, startScenario, type PlayerIntent, type ReduceContext } from "..
 import { openResolution, resolutionResult } from "../../../rules/setup/resolution.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { loadPrinted } from "../../../../test/harness/catalog.ts";
-import { ANDUIN_GOLDENS, anduinWorld, playGolden as playAnduin } from "../../../../test/scenarios/journey-along-the-anduin/game.ts";
-import { DOL_GULDUR_GOLDENS, dolGuldurWorld, playGolden as playDolGuldur } from "../../../../test/scenarios/escape-from-dol-guldur/game.ts";
+import { anduinWorld } from "../../../../test/scenarios/journey-along-the-anduin/game.ts";
+import { dolGuldurWorld } from "../../../../test/scenarios/escape-from-dol-guldur/game.ts";
 import { loadCampaign, loadScenario } from "../../../../scripts/data/load-scenarios.ts";
 import { OATH_GOLDENS, oathLoadout, oathWorld } from "../../../../test/scenarios/the-oath/game.ts";
 import { campaign, loadOathWorld, oathTable, type OathWorld } from "../../../../test/scenarios/the-oath/scene.ts";
@@ -28,6 +28,7 @@ import { campaignPath } from "../../path.ts";
 import { newSave } from "../../save.ts";
 import { buildStart } from "../../start.ts";
 import { NO_COPY_LIMITS } from "../../wilderland.ts";
+import { goldenState } from "../../../../test/harness/golden-state.ts";
 
 const oath = loadScenario("the-oath");
 const mini = loadCampaign("the-dark-of-mirkwood");
@@ -42,11 +43,11 @@ beforeAll(async () => {
   scene = await loadOathWorld();
   // Passage Through Mirkwood is skipped: Journey Along the Anduin's win on a blank log, then Escape from Dol Guldur's on top of it.
   const brittle = await anduinWorld("brittle");
-  const anduin = playAnduin(ANDUIN_GOLDENS.find((item) => item.name === "two-handed, brittle heroes, won with a Valor and a Scarred")!, brittle.ctx);
+  const anduin = goldenState("journey-along-the-anduin", "two-handed, brittle heroes, won with a Valor and a Scarred");
   const dol = await dolGuldurWorld("strong");
-  const afterAnduin = applyResolution({ ...emptyLog(2), completed: ["passage-through-mirkwood"] }, anduin.state.scenarioId, anduin.state, new Map([...brittle.cards, ...dol.cards]), NO_COPY_LIMITS);
-  const escape = playDolGuldur(DOL_GULDUR_GOLDENS.find((item) => item.name === "two-handed, won")!, dol.ctx);
-  escapeLog = applyResolution(afterAnduin, escape.state.scenarioId, escape.state, dol.cards, NO_COPY_LIMITS);
+  const afterAnduin = applyResolution({ ...emptyLog(2), completed: ["passage-through-mirkwood"] }, anduin.scenarioId, anduin, new Map([...brittle.cards, ...dol.cards]), NO_COPY_LIMITS);
+  const escape = goldenState("escape-from-dol-guldur", "two-handed, won");
+  escapeLog = applyResolution(afterAnduin, escape.scenarioId, escape, dol.cards, NO_COPY_LIMITS);
   // The Caves of Nibin-Dûm, dealt below as the later scenario, hands each seat a "No Time to Waste!" and shuffles Shiny Distraction in.
   const caves = new Map(await loadPrinted(["41042", "41048", "41049"]));
   cards = new Map([...brittle.cards, ...dol.cards, ...world.cards, ...caves]);

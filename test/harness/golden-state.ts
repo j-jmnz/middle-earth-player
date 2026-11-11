@@ -1,0 +1,33 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
+
+import type { ScenarioState } from "../../src/rules/engine/reduce.ts";
+
+// Test helper. The final state of an earlier part's golden game, read from its golden.json instead of played again. The scenario's own
+// golden test plays every golden and fails while golden.json differs from the played game (test/harness/golden-suite.ts), and checks
+// that each state reads back from JSON as it was played, so this is the state that game ends in. A later part's world builds the log
+// its campaign hands on from it (the earlier parts' Resolutions written onto a log): one read and parse, where playing the earlier
+// game again cost as much as the earlier part's whole golden test, and a campaign's later parts chained every earlier one.
+
+const SCENARIOS = path.resolve(import.meta.dirname, "..", "..", "src", "campaign", "scenarios");
+
+type Pinned = { name: string; state: ScenarioState };
+
+// One parse per scenario; there are as many entries as scenarios with goldens.
+const files = new Map<string, readonly Pinned[]>();
+
+function pinned(scenarioId: string): readonly Pinned[] {
+  let goldens = files.get(scenarioId);
+  if (!goldens) {
+    goldens = JSON.parse(readFileSync(path.join(SCENARIOS, scenarioId, "golden.json"), "utf8")) as Pinned[];
+    files.set(scenarioId, goldens);
+  }
+  return goldens;
+}
+
+/** The final state of the golden named `name` of `scenarioId`, as its golden.json pins it. A fresh copy: the caller may keep it. */
+export function goldenState(scenarioId: string, name: string): ScenarioState {
+  const golden = pinned(scenarioId).find((item) => item.name === name);
+  if (!golden) throw new Error(`${scenarioId}/golden.json has no golden named ${name}`);
+  return structuredClone(golden.state);
+}

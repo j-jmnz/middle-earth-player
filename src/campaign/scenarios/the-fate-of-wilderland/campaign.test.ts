@@ -7,7 +7,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { EFFECTS } from "../../../effects/index.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../../../rules/engine/reduce.ts";
-import { WILDERLAND_GOLDENS, afterGundabad, logBeforeGolden, playGolden, prepareEarlier, rawEarlier, wilderlandPlan, wilderlandSetupChoices, wilderlandStart, wilderlandWorld } from "../../../../test/scenarios/the-fate-of-wilderland/game.ts";
+import { WILDERLAND_GOLDENS, afterGundabad, logBeforeGolden, prepareEarlier, rawEarlier, wilderlandPlan, wilderlandSetupChoices, wilderlandStart, wilderlandWorld } from "../../../../test/scenarios/the-fate-of-wilderland/game.ts";
 import { CODES, campaign, wilderland } from "../../../../test/scenarios/the-fate-of-wilderland/scene.ts";
 import { nextPartId, nextPartStatus } from "../../../../test/harness/next-part.ts";
 
@@ -22,6 +22,7 @@ import { PLAYABLE_SCENARIOS } from "../../playable.ts";
 import { NO_COPY_LIMITS, poolEncounterCopies, wilderlandFacts } from "../../wilderland.ts";
 import { resolutionView, settledSentence, type ResolutionView } from "../../resolution-view.ts";
 import type { World } from "../../world.ts";
+import { goldenState } from "../../../../test/harness/golden-state.ts";
 
 let ctx: ReduceContext;
 beforeAll(async () => {
@@ -168,7 +169,7 @@ describe("The Fate of Wilderland in the ered-mithrin campaign", { timeout: 60_00
     const wins = WILDERLAND_GOLDENS.filter((golden) => golden.outcome === "won" && golden.after);
     expect(wins.length).toBeGreaterThanOrEqual(3);
     for (const golden of wins) {
-      const state = playGolden(golden, ctx).state;
+      const state = goldenState("the-fate-of-wilderland", golden.name);
       const before = logBeforeGolden(golden);
       const after = applyResolution(before, state.scenarioId, state, ctx.cards, NO_COPY_LIMITS);
       expect(after.completed, golden.name).toEqual([...campaign.scenarios]);
@@ -191,7 +192,7 @@ describe("The Fate of Wilderland in the ered-mithrin campaign", { timeout: 60_00
     const losses = WILDERLAND_GOLDENS.filter((golden) => golden.outcome === "lost" && golden.after);
     expect(losses.length).toBeGreaterThanOrEqual(3);
     for (const golden of losses) {
-      const state = playGolden(golden, ctx).state;
+      const state = goldenState("the-fate-of-wilderland", golden.name);
       const before = { ...logBeforeGolden(golden), completed: campaign.scenarios.slice(0, 8) };
       expect(applyResolution(before, state.scenarioId, state, ctx.cards, NO_COPY_LIMITS), golden.name).toBe(before);
       expect(nextStep(campaignPath(campaign, {}, before), null), golden.name).toMatchObject({ kind: "begin", node: { id: wilderland.id } });

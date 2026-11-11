@@ -8,7 +8,7 @@ import { EFFECTS } from "../../../effects/index.ts";
 import { undiscoveredTreasures } from "../../../rules/families/wilderland/treasure.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../../../rules/engine/reduce.ts";
-import { KINGSQUEST_GOLDENS, afterEarlier, kingsquestLoadout, kingsquestPlan, kingsquestStart, kingsquestWorld, oathChoices, playGolden, rawEarlier } from "../../../../test/scenarios/the-kings-quest/game.ts";
+import { KINGSQUEST_GOLDENS, afterEarlier, kingsquestLoadout, kingsquestPlan, kingsquestStart, kingsquestWorld, oathChoices, rawEarlier } from "../../../../test/scenarios/the-kings-quest/game.ts";
 import { CODES, TREASURES, campaign, kingsquest } from "../../../../test/scenarios/the-kings-quest/scene.ts";
 import { nextPartId, nextPartStatus } from "../../../../test/harness/next-part.ts";
 
@@ -18,6 +18,7 @@ import { campaignPath, nextStep } from "../../path.ts";
 import { newSave } from "../../save.ts";
 import { PLAYABLE_SCENARIOS } from "../../playable.ts";
 import { NO_COPY_LIMITS, poolEncounterCopies, wilderlandFacts } from "../../wilderland.ts";
+import { goldenState } from "../../../../test/harness/golden-state.ts";
 
 let ctx: ReduceContext;
 let cards: Awaited<ReturnType<typeof kingsquestWorld>>["cards"];
@@ -127,7 +128,7 @@ describe("The King's Quest in the ered-mithrin campaign", { timeout: 60_000 }, (
   it("hands its pool, treasure and log lines to the next part when won, unlocks The Withered Heath, and writes nothing when lost", async () => {
     // Two-handed, after the earlier parts: Isolde, Abandoned Ruin and The Threat to Wilderland join the pool next to Turayn and Melanwar, and the treasure is added to the ones discovered.
     const win = golden("two-handed, won, after the earlier parts, a treasure discovered");
-    const state = playGolden(win, ctx).state;
+    const state = goldenState("the-kings-quest", win.name);
     const before = afterEarlier(2);
     const log = applyResolution(before, state.scenarioId, state, cards, NO_COPY_LIMITS);
     expect(log.completed).toEqual(["journey-up-the-anduin", "lost-in-mirkwood", kingsquest.id]);
@@ -148,7 +149,7 @@ describe("The King's Quest in the ered-mithrin campaign", { timeout: 60_000 }, (
     expect(step).toMatchObject({ kind: "begin", node: { id: "the-withered-heath" } });
     // The lines instead of the allies: Isolde's line is written, and Dagnir's Spawn joins the pool.
     const lined = golden("two-handed, Easy, won, Turayn's oath");
-    const lineState = playGolden(lined, ctx).state;
+    const lineState = goldenState("the-kings-quest", lined.name);
     const written = applyResolution(afterEarlier(2, true), lineState.scenarioId, lineState, cards, NO_COPY_LIMITS);
     expect(written.allyLines).toEqual(expect.arrayContaining(["turayn", "melanwar", "isolde"]));
     expect(written.campaignPool.map((card) => card.code)).toEqual(expect.arrayContaining([CODES.abandonedRuin, CODES.dagnirSSpawn]));
@@ -156,7 +157,7 @@ describe("The King's Quest in the ered-mithrin campaign", { timeout: 60_000 }, (
     // A loss writes nothing.
     const lostGolden = KINGSQUEST_GOLDENS.find((item) => item.outcome === "lost")!;
     const weak = await kingsquestWorld(lostGolden.decks);
-    const lost = playGolden(lostGolden, weak.ctx).state;
+    const lost = goldenState("the-kings-quest", lostGolden.name);
     expect(lost.lost).toBe(true);
     const blank = emptyLog(lostGolden.seatCount);
     expect(applyResolution(blank, lost.scenarioId, lost, weak.cards, NO_COPY_LIMITS)).toBe(blank);

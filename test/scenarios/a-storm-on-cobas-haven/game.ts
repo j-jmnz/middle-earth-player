@@ -118,7 +118,7 @@ export function havenIntent(state: ScenarioState, ctx: ReduceContext, memory: Se
 
 export type HavenGame = PlayedGame;
 
-// The goldens (src/campaign/scenarios/a-storm-on-cobas-haven/golden.test.ts), also played by the causes and replay tests once test/harness/golden-registry.ts lists them.
+// The goldens (src/campaign/scenarios/a-storm-on-cobas-haven/golden.test.ts).
 // `after`: the log of a campaign whose earlier parts were won. `upgraded`: the Upgraded sides. `mode`: the Hard or Expert Mode card.
 export type HavenGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: HavenDecks; outcome: "won" | "lost"; policy?: Partial<HavenPolicy>; after?: boolean; upgraded?: boolean; mode?: ModeCard; lossReason?: string; choices?: readonly string[] };
 

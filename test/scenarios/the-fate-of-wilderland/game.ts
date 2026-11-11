@@ -10,13 +10,14 @@ import { characters } from "../../../src/rules/combat/combat.ts";
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 
 import type { FramsburgVariant } from "../the-ghost-of-framsburg/game.ts";
-import { GUNDABAD_GOLDENS, gundabadWorld, logBeforeGolden as logBeforeGundabad, playGolden as playGundabad } from "../mount-gundabad/game.ts";
+import { GUNDABAD_GOLDENS, gundabadWorld, logBeforeGolden as logBeforeGundabad } from "../mount-gundabad/game.ts";
 import { EARLIER_POOL } from "../the-ghost-of-framsburg/scene.ts";
 import { TREASURES } from "../the-withered-heath/scene.ts";
 import { campaign, CODES, wilderland } from "./scene.ts";
 import { loadScenario } from "../../../scripts/data/load-scenarios.ts";
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
 import { campaignGame, engageOneEach, fillerLoadout, HERO_STATS, type PlayedGame, type StartOptions } from "../../harness/game-kit.ts";
+import { goldenState } from "../../harness/golden-state.ts";
 
 // Test helper. A whole game of The Fate of Wilderland in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
 // events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. The first character of a seat quests (the others stay ready to attack and defend), the players travel to the first location they may,
@@ -145,14 +146,14 @@ const earlierLogs = new Map<string, CampaignLog>();
 const rawLogs = new Map<string, CampaignLog>();
 const keyOf = (seatCount: 1 | 2, variant: FramsburgVariant = "pool") => `${seatCount}:${variant}`;
 
-/** Plays the Mount Gundabad goldens that follow the first seven parts and writes their Resolutions onto the log those parts wrote, once for each (seats, variant): what The Fate of Wilderland is handed. */
+/** Reads the final states of the Mount Gundabad goldens that follow the first seven parts from golden.json (test/harness/golden-state.ts) and writes their Resolutions onto the log those parts wrote, once for each (seats, variant): what The Fate of Wilderland is handed. */
 export async function prepareEarlier(): Promise<void> {
   const gundabad = await gundabadWorld("strong");
   for (const [key, name] of Object.entries(EARLIER)) {
     if (rawLogs.has(key)) continue;
     const golden = GUNDABAD_GOLDENS.find((item) => item.name === name);
     if (!golden) throw new Error(`No Mount Gundabad golden named ${name}`);
-    const played = playGundabad(golden, gundabad.ctx).state;
+    const played = goldenState("mount-gundabad", golden.name);
     const written = applyResolution(logBeforeGundabad(golden), played.scenarioId, played, gundabad.cards, NO_COPY_LIMITS);
     rawLogs.set(key, written);
     // The stand-in heroes of the golden seats are not the heroes the earlier games lost or carried: they start fresh, and what hangs on a hero stays behind.
@@ -164,18 +165,18 @@ export async function prepareEarlier(): Promise<void> {
 /** The log of a campaign that won the first eight parts, their real Resolutions chained: the fresh heroes' log the next game starts from. */
 export function afterGundabad(seatCount: 1 | 2, variant: FramsburgVariant = "pool"): CampaignLog {
   const log = earlierLogs.get(keyOf(seatCount, variant));
-  if (!log) throw new Error("Call prepareEarlier first: it plays the earlier parts");
+  if (!log) throw new Error("Call prepareEarlier first: it builds the earlier parts' log");
   return log;
 }
 
 /** The log the eight earlier parts' real Resolutions write, with the heroes of their games still on it (what the campaign test reads). */
 export function rawEarlier(seatCount: 1 | 2, variant: FramsburgVariant = "pool"): CampaignLog {
   const log = rawLogs.get(keyOf(seatCount, variant));
-  if (!log) throw new Error("Call prepareEarlier first: it plays the earlier parts");
+  if (!log) throw new Error("Call prepareEarlier first: it builds the earlier parts' log");
   return log;
 }
 
-// The goldens (src/campaign/scenarios/the-fate-of-wilderland/golden.test.ts), also played by the causes and replay tests once test/harness/golden-registry.ts lists them.
+// The goldens (src/campaign/scenarios/the-fate-of-wilderland/golden.test.ts).
 // `after`: the log of a campaign whose first eight parts were won (Journey Up the Anduin through Mount Gundabad, their real Resolutions chained: `afterGundabad`) and `variant` the way they were won (the Mount Gundabad goldens' variants and their seats).
 // `upgraded`: the Upgraded sides. `mode`: the Hard or Expert Mode card.
 export type WilderlandGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: WilderlandDecks; outcome: "won" | "lost"; policy?: Partial<WilderlandPolicy>; after?: boolean; variant?: FramsburgVariant; upgraded?: boolean; mode?: ModeCard; lossReason?: string };

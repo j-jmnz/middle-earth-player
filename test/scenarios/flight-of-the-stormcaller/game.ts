@@ -82,7 +82,7 @@ export function flightIntent(state: ScenarioState, ctx: ReduceContext, memory: S
 
 export type FlightGame = PlayedGame;
 
-// The goldens (src/campaign/scenarios/flight-of-the-stormcaller/golden.test.ts), also played by the causes and replay tests. A win runs the campaign card's Resolution and awards its XP; a loss writes nothing.
+// The goldens (src/campaign/scenarios/flight-of-the-stormcaller/golden.test.ts). A win runs the campaign card's Resolution and awards its XP; a loss writes nothing.
 // `upgraded`: the cards the log marks as upgraded (the ships, the Modification boons, Black Key and Calaerion), dealt on their Upgraded side. `mode`: the Hard or Expert Mode card.
 export type FlightGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: FlightDecks; outcome: "won" | "lost"; policy?: Partial<FlightPolicy>; upgraded?: boolean; mode?: ModeCard; after?: boolean; lossReason?: string };
 

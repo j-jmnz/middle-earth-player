@@ -9,7 +9,7 @@ import { EFFECTS } from "../../../effects/index.ts";
 import { undiscoveredTreasures } from "../../../rules/families/wilderland/treasure.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../../../rules/engine/reduce.ts";
-import { HEATH_GOLDENS, afterKingsquest, heathLoadout, heathPlan, heathSetupChoices, heathStart, heathWorld, logBeforeGolden, playGolden, rawEarlier } from "../../../../test/scenarios/the-withered-heath/game.ts";
+import { HEATH_GOLDENS, afterKingsquest, heathLoadout, heathPlan, heathSetupChoices, heathStart, heathWorld, logBeforeGolden, rawEarlier } from "../../../../test/scenarios/the-withered-heath/game.ts";
 import { CODES, TREASURES, campaign, heath } from "../../../../test/scenarios/the-withered-heath/scene.ts";
 import { nextPartId, nextPartStatus } from "../../../../test/harness/next-part.ts";
 
@@ -21,6 +21,7 @@ import { campaignPath, nextStep } from "../../path.ts";
 import { newSave } from "../../save.ts";
 import { PLAYABLE_SCENARIOS } from "../../playable.ts";
 import { NO_COPY_LIMITS, poolEncounterCopies, wilderlandFacts } from "../../wilderland.ts";
+import { goldenState } from "../../../../test/harness/golden-state.ts";
 
 let ctx: ReduceContext;
 let cards: Awaited<ReturnType<typeof heathWorld>>["cards"];
@@ -151,7 +152,7 @@ describe("The Withered Heath in the ered-mithrin campaign", { timeout: 60_000 },
   it("writes its Accolade boons, Songs and treasure to the log when won, unlocks Roam Across Rhovanion (coming soon), and writes nothing when lost", async () => {
     // Two-handed, after the earlier parts: each player's Accolade boon joins the pool on its hero, each Song joins the pool, the treasure chosen is added to the ones discovered.
     const win = golden("two-handed, won, after the earlier parts, an Accolade boon for each player");
-    const state = playGolden(win, ctx).state;
+    const state = goldenState("the-withered-heath", win.name);
     const before = logBeforeGolden(win);
     const log = applyResolution(before, state.scenarioId, state, cards, NO_COPY_LIMITS);
     expect(log.completed).toEqual([...before.completed, heath.id]);
@@ -171,14 +172,14 @@ describe("The Withered Heath in the ered-mithrin campaign", { timeout: 60_000 },
     expect(nextStep(path, null)).toMatchObject({ node: { id: "roam-across-rhovanion" } });
     // The lines written by the earlier parts stay on the log; nothing this part writes removes them.
     const lined = golden("two-handed, Easy, won, Melanwar's and Isolde's lines");
-    const lineState = playGolden(lined, ctx).state;
+    const lineState = goldenState("the-withered-heath", lined.name);
     const written = applyResolution(logBeforeGolden(lined), lineState.scenarioId, lineState, cards, NO_COPY_LIMITS);
     expect(written.allyLines).toEqual(expect.arrayContaining(["turayn", "melanwar", "isolde"]));
     expect(written.completed).toHaveLength(4);
     // A loss writes nothing.
     const lostGolden = HEATH_GOLDENS.find((item) => item.outcome === "lost")!;
     const weak = await heathWorld(lostGolden.decks);
-    const lost = playGolden(lostGolden, weak.ctx).state;
+    const lost = goldenState("the-withered-heath", lostGolden.name);
     expect(lost.lost).toBe(true);
     const blank = emptyLog(lostGolden.seatCount);
     expect(applyResolution(blank, lost.scenarioId, lost, weak.cards, NO_COPY_LIMITS)).toBe(blank);

@@ -63,7 +63,7 @@ export function depthsIntent(state: ScenarioState, ctx: ReduceContext, memory: S
 
 export type DepthsGame = PlayedGame;
 
-// The goldens (src/campaign/scenarios/the-thing-in-the-depths/golden.test.ts), also played by the causes and replay tests. A win runs the campaign card's Resolution and awards its XP; a loss writes nothing.
+// The goldens (src/campaign/scenarios/the-thing-in-the-depths/golden.test.ts). A win runs the campaign card's Resolution and awards its XP; a loss writes nothing.
 // `after`: the log of a campaign whose first four parts were won (the pool, XP and marks reach this part). `upgraded`: the Upgraded sides (Black Key, Come Together's level). `mode`: the Hard or Expert Mode card.
 export type DepthsGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: DepthsDecks; outcome: "won" | "lost"; policy?: Partial<DepthsPolicy>; after?: boolean; upgraded?: boolean; mode?: ModeCard; lossReason?: string };
 

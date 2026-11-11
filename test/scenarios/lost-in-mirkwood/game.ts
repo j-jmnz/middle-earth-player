@@ -74,7 +74,7 @@ export function lostmirkIntent(state: ScenarioState, ctx: ReduceContext, memory:
 
 export type LostmirkGame = PlayedGame;
 
-// The goldens (src/campaign/scenarios/lost-in-mirkwood/golden.test.ts), also played by the causes and replay tests once test/harness/golden-registry.ts lists them.
+// The goldens (src/campaign/scenarios/lost-in-mirkwood/golden.test.ts).
 // `after`: the log of a campaign whose earlier parts were won. `upgraded`: the Upgraded sides. `mode`: the Hard or Expert Mode card.
 export type LostmirkGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: LostmirkDecks; outcome: "won" | "lost"; policy?: Partial<LostmirkPolicy>; after?: boolean; upgraded?: boolean; mode?: ModeCard; lossReason?: string };
 

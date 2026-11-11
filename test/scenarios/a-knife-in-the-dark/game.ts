@@ -80,7 +80,7 @@ export function playKnife(seatCount: 1 | 2, seed: number, difficulty: Difficulty
   return playToEnd(start, ctx, (state, memory) => knifeIntent(state, ctx, memory), limit);
 }
 
-// The A Knife in the Dark goldens (src/campaign/scenarios/a-knife-in-the-dark/golden.test.ts), also played by causes.test.ts and replay.test.ts.
+// The A Knife in the Dark goldens (src/campaign/scenarios/a-knife-in-the-dark/golden.test.ts).
 // The wins use the strong loadout. The auto-player lost every starter-deck game it played in phase 12 (Easy and Normal,
 // seeds 1 to 12, true solo and two-handed), and the seeded beam search below (searchKnifeWin, Easy) found no win either:
 // true solo seeds 1 to 4 and two-handed seed 1 at width 12 and 10 tries a round, after earlier runs at widths 4 to 16 on

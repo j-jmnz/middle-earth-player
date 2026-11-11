@@ -10,7 +10,7 @@ Read whole.
 
 - `CLAUDE.md` — Claude Code (~2.6K tok)
 - `.claude/rules/authority.md` — Authority (~470 tok)
-- `.claude/rules/code-standards.md` — Code standards (~1.9K tok)
+- `.claude/rules/code-standards.md` — Code standards (~2.4K tok)
 - `.claude/rules/commit-standards.md` — Commit standards (~890 tok)
 - `.claude/rules/docs-standards.md` — Docs standards (~1.1K tok)
 - `.claude/rules/release-standards.md` — Release standards (~1.0K tok)
@@ -51,12 +51,12 @@ Read the sections your task touches.
     - 141–150 In a browser (~100)
     - 151–171 On a phone (~290)
     - 172–175 Maestro (~130)
-  - 176–210 Commands (~990)
+  - 176–210 Commands (~1.0K)
   - 211–214 Contributing (~80)
   - 215–224 Documentation (~170)
   - 225–242 Attribution (~470)
   - 243–246 License (~50)
-- `docs/architecture.md` — Architecture (~21.8K tok)
+- `docs/architecture.md` — Architecture (~21.9K tok)
   - 7–41 Stack (~1.1K)
   - 42–77 Processes (~680)
   - 78–160 Modules (~2.3K) ← 3
@@ -71,7 +71,7 @@ Read the sections your task touches.
   - 295–300 Images (~940) ← 6
   - 301–353 Screens (~3.8K) ← 1
   - 354–359 Catalog build (~410)
-  - 360–377 Tests (~1.9K) ← 5
+  - 360–377 Tests (~2.0K) ← 5
   - 378–393 Performance (~1.2K) ← 4
 - `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~94.8K tok)
   - 17–38 Sections (~410)
@@ -231,7 +231,7 @@ Read when a task names the plan.
   - 3–14 Context (~450)
   - 15–24 What does not move (~190)
   - 25–48 A. Effects: draft better, template the repeats, copy identical lines (~960)
-  - 49–57 B. One registry for scenarios, fixtures and goldens (~280)
+  - 49–57 B. One registry for scenarios, fixtures and goldens (~300)
   - 58–71 C. A shared scenario kit and `pnpm scenario new` (~610)
   - 72–83 D. One manifest per family (~460)
   - 84–92 E. Data: seed what can be seeded (~300)
@@ -250,7 +250,7 @@ Open work; read when a task names it.
   - 19–37 Setup (~440)
   - 38–56 Files you own (edit freely) (~490)
   - 57–70 Shared files (~300)
-  - 71–85 Approach (~690) ← 1
+  - 71–85 Approach (~670) ← 1
   - 86–124 Scenario procedure (~2.0K) ← 15
   - 125–134 Checkpoints (API usage limits can stop you mid-task) (~210)
   - 135–149 Checks before committing (~310)
@@ -264,12 +264,12 @@ The sections each area's comments cite, most cited first. Read these before chan
 
 - `scripts/build`: brief.md, Card images (2)
 - `scripts/card-smoke`: brief.md, Standalone play (1)
-- `scripts/checks`: brief.md, Nightmare (2); design-system.md, Screen reader (2); architecture.md, Modules (1); architecture.md, Repository map (1)
+- `scripts/checks`: brief.md, Nightmare (2); design-system.md, Screen reader (2); .claude/rules/code-standards.md, Test cost (1); architecture.md, Modules (1); architecture.md, Repository map (1)
 - `scripts/data`: brief.md, Nightmare (4); brief.md, Dream-chaser (3); brief.md, Ered Mithrin (3); design-system.md, Icons (3); brief.md, Mirkwood Paths and The Dark of Mirkwood (2); brief.md, Card images (1); brief.md, The Two Towers (1)
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/git`: .claude/rules/commit-standards.md, Subject line (2)
 - `scripts/release`: .claude/rules/release-standards.md, Versioning (3); .claude/rules/release-standards.md, Release notes (2); releasing.md, Jobs (2); .claude/rules/release-standards.md, Branches (1)
-- `scripts/tools`: handover/agent-brief.md, Scenario procedure (4); architecture.md, Modules (1); design-system-table.md, Choice tray (1)
+- `scripts/tools`: handover/agent-brief.md, Scenario procedure (4); .claude/rules/code-standards.md, Test cost (2); architecture.md, Modules (1); design-system-table.md, Choice tray (1)
 - `src/campaign`: brief.md, The Two Towers (6); handover/agent-brief.md, Scenario procedure (5); brief.md, Nightmare (4); architecture.md, Tests (2); brief.md, Ered Mithrin (2)
 - `src/catalog`: architecture.md, Mechanic families (2); brief.md, Nightmare (2); brief.md, The Two Towers (2); brief.md, A Knife in the Dark (1); brief.md, Dream-chaser (1); brief.md, Ered Mithrin (1); brief.md, Flight to the Ford burden deck and life (1); brief.md, Three layers (1)
 - `src/effects`: brief.md, The Two Towers (4); brief.md, Breaking of the Fellowship, stage 2B (1); brief.md, Nightmare (1)

@@ -9,10 +9,11 @@ import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type
 
 import { loadScenario } from "../../../scripts/data/load-scenarios.ts";
 import { TREASURES } from "../the-withered-heath/scene.ts";
-import { NIGHT_GOLDENS, nightWorld, playGolden as playNight, rawEarlier as rawNightEarlier, type NightVariant } from "../fire-in-the-night/game.ts";
+import { NIGHT_GOLDENS, nightWorld, rawEarlier as rawNightEarlier, type NightVariant } from "../fire-in-the-night/game.ts";
 import { CODES, campaign, EARLIER_POOL, framsburg } from "./scene.ts";
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
 import { attackTogether, campaignGame, engageOneEach, fillerLoadout, HERO_STATS, type PlayedGame } from "../../harness/game-kit.ts";
+import { goldenState } from "../../harness/golden-state.ts";
 
 // Test helper. A whole game of The Ghost of Framsburg in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
 // events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. The first two characters of a seat quest (their willpower is far above the staging area's threat) and the others stay ready. The
@@ -112,7 +113,7 @@ export function framsburgIntent(state: ScenarioState, ctx: ReduceContext, memory
 
 export type FramsburgGame = PlayedGame;
 
-// The goldens (src/campaign/scenarios/the-ghost-of-framsburg/golden.test.ts), also played by the causes and replay tests once test/harness/golden-registry.ts lists them.
+// The goldens (src/campaign/scenarios/the-ghost-of-framsburg/golden.test.ts).
 // `after`: the log of a campaign whose first six parts were won (Journey Up the Anduin, Lost in Mirkwood, The King's Quest, The Withered Heath, Roam Across Rhovanion and Fire in the Night, their real Resolutions chained: `afterNight`) and `variant` the way they were won
 // (the night goldens' variants and their seats). `upgraded`: the Upgraded sides. `mode`: the Hard or Expert Mode card.
 export type FramsburgVariant = "pool" | "cunning" | "oath" | "oathline" | "beldis";
@@ -155,13 +156,13 @@ const rawLogs = new Map<string, CampaignLog>();
 const keyOf = (seatCount: 1 | 2, variant: FramsburgVariant = "pool") => `${seatCount}:${variant}`;
 let worldCards: ReadonlyMap<string, PrintedCard> | null = null;
 
-/** Plays the Fire in the Night goldens that follow the first five parts and writes their Resolutions onto the log those parts wrote, once for each (seats, variant): what The Ghost of Framsburg is handed. */
+/** Reads the final states of the Fire in the Night goldens that follow the first five parts from golden.json (test/harness/golden-state.ts) and writes their Resolutions onto the log those parts wrote, once for each (seats, variant): what The Ghost of Framsburg is handed. */
 export async function prepareEarlier(): Promise<void> {
   const night = await nightWorld("strong");
   for (const [key, row] of Object.entries(EARLIER)) {
     const golden = NIGHT_GOLDENS.find((item) => item.name === row.golden);
     if (!golden) throw new Error(`No Fire in the Night golden named ${row.golden}`);
-    const played = playNight(golden, night.ctx).state;
+    const played = goldenState("fire-in-the-night", golden.name);
     const written = applyResolution(rawNightEarlier(golden.seatCount, row.variant), played.scenarioId, played, night.cards, NO_COPY_LIMITS);
     rawLogs.set(key, written);
     // The stand-in heroes of the golden seats are not the heroes the earlier games lost or carried: they start fresh, and what hangs on a hero stays behind.
@@ -173,14 +174,14 @@ export async function prepareEarlier(): Promise<void> {
 /** The log of a campaign that won the first six parts, their real Resolutions chained. */
 export function afterNight(seatCount: 1 | 2, variant: FramsburgVariant = "pool"): CampaignLog {
   const log = earlierLogs.get(keyOf(seatCount, variant));
-  if (!log) throw new Error("Call framsburgWorld first: it plays the earlier parts");
+  if (!log) throw new Error("Call framsburgWorld first: it builds the earlier parts' log");
   return log;
 }
 
 /** The log the six earlier parts' real Resolutions write, with the heroes of their games still on it (what the campaign test reads). */
 export function rawEarlier(seatCount: 1 | 2, variant: FramsburgVariant = "pool"): CampaignLog {
   const log = rawLogs.get(keyOf(seatCount, variant));
-  if (!log) throw new Error("Call framsburgWorld first: it plays the earlier parts");
+  if (!log) throw new Error("Call framsburgWorld first: it builds the earlier parts' log");
   return log;
 }
 
