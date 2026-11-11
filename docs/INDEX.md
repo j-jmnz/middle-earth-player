@@ -67,7 +67,7 @@ Read the sections your task touches.
     - 223–234 Mechanic families (~4.3K) ← 5
   - 235–240 Effects (~530)
   - 241–273 Scenario definition (~800)
-  - 274–318 Persistence (~3.0K) ← 2
+  - 274–318 Persistence (~3.0K) ← 1
     - 295–298 Open games across an update (~50)
     - 299–305 Open game rows (~650)
     - 306–311 Opening a game (~350)
@@ -203,16 +203,16 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~8.5K tok)
+- `docs/phases/STATUS.md` — Phase status (~8.7K tok)
   - 5–15 Rules (~410)
   - 16–94 Phases (~1.6K)
-  - 95–210 Open items (~6.0K)
-    - 97–99 Releases (~50)
-    - 100–126 Fixtures and Maestro (~1.5K)
-    - 127–174 Rules and engine (~2.2K)
-    - 175–198 Screens and code (~1.4K)
-    - 199–210 Rules and engine (The Two Towers) (~820)
-  - 211–228 Standing decisions (~550)
+  - 95–212 Open items (~6.1K)
+    - 97–101 Releases (~150)
+    - 102–128 Fixtures and Maestro (~1.5K)
+    - 129–176 Rules and engine (~2.2K)
+    - 177–200 Screens and code (~1.4K)
+    - 201–212 Rules and engine (The Two Towers) (~820)
+  - 213–231 Standing decisions (~590)
 
 ## Live plans
 
@@ -232,7 +232,6 @@ Read when a task names the plan.
   - 237–273 Mechanic families: engine and records together (~1.4K) ← 1
   - 274–287 Readings the review catches (~490) ← 4
   - 288–307 Not expressible yet: leave open, report (~390)
-- `docs/plans/keep-open-games.md` — Plan: keep open games through updates (~2.3K tok)
 - `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.7K tok)
   - 3–14 Context (~450)
   - 15–24 What does not move (~190)
