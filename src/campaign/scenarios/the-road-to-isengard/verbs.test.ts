@@ -15,6 +15,7 @@ import { runInstruction } from "../../../rules/interpret/interpret.ts";
 import { restricted } from "../../../rules/interpret/restrictions.ts";
 import { textBlank } from "../../../rules/families/attachments/hold.ts";
 import { revealSkipped, revealsAllowed } from "../../../rules/families/encounter/reveal.ts";
+import { resolutionStep } from "../../../rules/quest/stage-reveal.ts";
 import { stagingStep } from "../../../rules/windows/frames.ts";
 import { legalIntents } from "../../../rules/engine/reduce.ts";
 import { fightEnemy, finish, idOf, resolveRecords, send, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
@@ -175,6 +176,45 @@ describe("143080:B:2 Orthanc explored", () => {
     expect(done.state.cards[orthanc]?.zone).toBe("staging");
     expect(done.state.cards[orthanc]?.progress).toBe(0);
     expect(done.state.encounterDiscard).not.toContain(orthanc);
+  });
+});
+
+describe("143080:B:2 Orthanc explored with Saruman's gate open", () => {
+  // Saruman at 6 damage: 143048:A:2 no longer holds the stage, so the overflow of the explore could defeat it before Orthanc's Forced effect cancels the progress.
+  it("143080:B:2 does not defeat the stage: the overflow waits for the Forced effect, Orthanc returns to staging and the stage's progress is cancelled", () => {
+    const made = at({ stage: "143080", active: "143053", staging: [{ code: "143047", damage: 6 }], attached: [{ code: "143048", to: "143047" }], deck: ["f0", "f0"], hand: ["filler", "filler"] });
+    const orthanc = idOf(made.state, "143053");
+    const stage = idOf(made.state, "143080");
+    const steps: EngineStep[] = [];
+    const placed = runInstruction(made.state, { verb: "ProgressQuest", amount: 40 }, { seat: 0, sourceId: null }, made.ctx, steps);
+    expect(placed.stageCleared).toBeFalsy();
+    const done = finish({ state: rest(placed, made.ctx, steps), steps }, made.ctx);
+    expect(done.state.stageCleared).toBeFalsy();
+    expect(done.state.lost).toBeFalsy();
+    expect(done.state.cards[stage]?.progress).toBe(0);
+    expect(done.state.cards[orthanc]?.zone).toBe("staging");
+    expect(done.state.cards[orthanc]?.progress).toBe(0);
+  });
+
+  it("143080:B:2 does not defeat the stage when the quest resolution explores Orthanc and the overflow fills the stage", () => {
+    const made = at({ stage: "143080", progress: 14, active: "143053", play: ["ally", "ally", "ally"], committed: ["dh1", "dh2", "ally"], staging: [{ code: "143047", damage: 6 }], attached: [{ code: "143048", to: "143047" }], deck: ["f0", "f0"], hand: ["filler", "filler"] });
+    const orthanc = idOf(made.state, "143053");
+    const stage = idOf(made.state, "143080");
+    const steps: EngineStep[] = [];
+    const resolved = resolutionStep(made.state, made.ctx, steps);
+    expect(resolved.stageCleared).toBeFalsy();
+    const done = finish({ state: rest(resolved, made.ctx, steps), steps }, made.ctx);
+    expect(done.state.stageCleared).toBeFalsy();
+    expect(done.state.cards[stage]?.progress).toBe(14);
+    expect(done.state.cards[orthanc]?.zone).toBe("staging");
+  });
+
+  it("143080:B:2 defeats the stage once the gate is open and an ordinary location is explored with the overflow", () => {
+    const made = at({ stage: "143080", active: "143059", staging: [{ code: "143047", damage: 6 }], attached: [{ code: "143048", to: "143047" }], deckOf: ["filler", "filler"], hand: ["filler"] });
+    const steps: EngineStep[] = [];
+    const placed = runInstruction(made.state, { verb: "ProgressQuest", amount: 40 }, { seat: 0, sourceId: null }, made.ctx, steps);
+    const done = finish({ state: rest(placed, made.ctx, steps), steps }, made.ctx);
+    expect(done.state.stageCleared).toBe(true);
   });
 });
 

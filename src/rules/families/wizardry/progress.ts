@@ -5,6 +5,7 @@
 // effects resolve), and forgets it.
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
+import { isLocationId, type PrintedCard } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { flagged } from "../../core/state.ts";
 import { removeQuestProgress } from "../caves/progress.ts";
@@ -22,4 +23,14 @@ export function cancelPhaseProgress(state: ScenarioState, steps: EngineStep[]): 
   const total = noted.reduce((sum, modifier) => sum + modifier.amount, 0);
   const cleared: ScenarioState = { ...state, modifiers: state.modifiers.filter((modifier) => !noted.includes(modifier)) };
   return removeQuestProgress(cleared, total, steps, currentCause(steps, UNATTRIBUTED));
+}
+
+/**
+ * Whether the overflow of a placing waits instead of defeating the quest card: the table tracks the phase's progress (The Voice of Saruman) and the placing explored a location (from `steps[from]` on),
+ * whose Forced effect may cancel that progress (Orthanc, 143080:B:2). The stage then takes what it needs but does not advance in the placing; `advanceFreed` advances it once the Forced effects have resolved
+ * and the progress is still there. Every other table's overflow advances at once.
+ */
+export function overflowWaits(state: ScenarioState, steps: readonly EngineStep[], from: number, cards: ReadonlyMap<string, PrintedCard>): boolean {
+  if (!flagged(state, "table", "trackQuestProgress")) return false;
+  return steps.slice(from).some((step) => step.kind === "destroy" && isLocationId(state, step.targetId, cards));
 }

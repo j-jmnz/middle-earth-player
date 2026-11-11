@@ -56,8 +56,10 @@ export function isengardIntent(state: ScenarioState, ctx: ReduceContext, memory:
   }
   if (state.window?.kind === "travel") {
     // Orthanc first: it is the active location that engages Saruman with the first player (143080:B:1), whom the attack must wound before the last stage can be defeated (143048:A:2).
+    // Once Saruman has taken his 6 damage and Orthanc has been explored (143080:B:2 cancels that phase's progress and sends it back to staging), the players stay away from it: the next quest fills the stage.
     const targets = legalTargets(state, { type: "Travel" }, ctx);
-    const wanted = targets.find((id) => state.cards[id]?.code === ORTHANC) ?? targets[0];
+    const wounded = Object.values(state.cards).some((card) => card.code === SARUMAN && card.damage >= 6);
+    const wanted = wounded ? targets.find((id) => state.cards[id]?.code !== ORTHANC) : (targets.find((id) => state.cards[id]?.code === ORTHANC) ?? targets[0]);
     return wanted ? { type: "Travel", locationId: wanted } : { type: "DeclineTravel" };
   }
   if (state.window?.kind === "playerAttack" && policy.engage) {
