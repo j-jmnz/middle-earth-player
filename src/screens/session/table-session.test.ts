@@ -10,7 +10,6 @@ import { fixtureSave, hasFixture, type FixtureName } from "../../campaign/fixtur
 import { CATALOG_VERSION } from "../../catalog/version.ts";
 import { readCheckpoint, readSave, savedAt, writeActive, writeCheckpoint, writeDealt, writeSave } from "../data/campaign-store.ts";
 import { ENGINE_VERSION } from "../../campaign/replay.ts";
-import { ENGINE_CHANGES } from "../../campaign/changes.ts";
 import { continueTable, openTable, recordUnclosedRun, restartTable, sessionStore } from "./table-open.ts";
 import { writeOpenedTable } from "./write-opened.ts";
 import { EFFECTS } from "../../effects/index.ts";
@@ -42,8 +41,8 @@ describe("opening the table", () => {
     const old = { ...save, active: { ...save.active!, engineVersion: ENGINE_VERSION - 1 } };
     writeSave(user, old);
     const before = savedAt(user).get("s1");
-    // What changed under it is the engine line of the version it missed (version 26 reaches every scenario).
-    expect(openTable(catalog, user, "s1")).toMatchObject({ ok: false, reason: "stale", write: null, changes: [ENGINE_CHANGES.at(-1)!.note] });
+    // No engine line is recorded for the version it missed, so the sheet shows its generic sentence only.
+    expect(openTable(catalog, user, "s1")).toMatchObject({ ok: false, reason: "stale", write: null, changes: [] });
     expect(readSave(user, "s1")).toEqual(old);
     expect(savedAt(user).get("s1")).toBe(before);
   });

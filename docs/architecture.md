@@ -218,7 +218,7 @@ One call to `reduce` runs `rejectionReason` (legality), `applyIntent` (`machine.
 - **Constants.** `syncConstants` (`constants.ts`) turns each `ModifyStat` of a `constant` record into entries of the modifier list, rebuilt as cards enter and leave play; `modifiedStat` is the only reader. A stat flag (`FLAGS`) is such an entry with a boolean meaning, read with `flagged` or `heldStat`.
 - **Causes.** Every step that changes a number carries a `Cause` (`cause.ts`): a rule span id, or an effect record with its printed line. A test plays the goldens and refuses any step without one.
 - **Hidden information and randomness.** Shuffles use `seed.ts` and advance `seedCursor`. `showedHidden` (`undo.ts`) is true when an intent revealed something the player had not seen or moved the cursor; the table's Undo cannot take such an intent back.
-- **Version.** `ENGINE_VERSION` (`version.ts`) is bumped when a change can move a replayed game, and the bump adds an `ENGINE_CHANGES` entry beside it: the scenarios it reaches and one line for players. A save from another version is replayed checked and asks the player to continue or restart on a mismatch (Persistence); the sheet lists the lines after the save's version that reach its scenario.
+- **Version.** `ENGINE_VERSION` (`version.ts`) is bumped when a change can move a replayed game, and the bump adds an `ENGINE_CHANGES` entry beside it: the scenarios it reaches and one line for players. A save from another version is replayed checked and asks the player to continue or restart on a mismatch (Persistence); the sheet lists the lines after the save's version that reach its scenario (the list starts after `ENGINE_CHANGES_SINCE`; a save from before it gets the generic sentence).
 
 ### Mechanic families
 

@@ -3,17 +3,21 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { changesReaching, ENGINE_CHANGES, ENGINE_VERSION } from "./version.ts";
+import { changesReaching, ENGINE_CHANGES, ENGINE_CHANGES_SINCE, ENGINE_VERSION, type EngineChange } from "./version.ts";
 
 const SCENARIOS = path.resolve(import.meta.dirname, "..", "..", "..", "data", "scenarios");
 
 describe("ENGINE_CHANGES (src/rules/engine/version.ts)", () => {
-  it("has an entry for each version, ascending (a version may have one entry for each scope it reaches), the last being ENGINE_VERSION", () => {
-    const versions = [...new Set(ENGINE_CHANGES.map((change) => change.version))];
-    const first = versions[0] ?? 0;
-    expect(versions).toEqual(versions.map((_, at) => first + at));
-    expect(ENGINE_CHANGES.map((change) => change.version)).toEqual(ENGINE_CHANGES.map((change) => change.version).toSorted((a, b) => a - b));
-    expect(versions.at(-1)).toBe(ENGINE_VERSION);
+  it("has entries only for versions after the baseline up to ENGINE_VERSION, ascending, and one for each bump (none while the version is the baseline)", () => {
+    const versions = ENGINE_CHANGES.map((change) => change.version);
+    expect(versions).toEqual(versions.toSorted((a, b) => a - b));
+    for (const version of versions) {
+      expect(version).toBeGreaterThan(ENGINE_CHANGES_SINCE);
+      expect(version).toBeLessThanOrEqual(ENGINE_VERSION);
+    }
+    const distinct = [...new Set(versions)];
+    expect(distinct).toEqual(distinct.map((_, at) => ENGINE_CHANGES_SINCE + 1 + at));
+    expect(distinct.at(-1) ?? ENGINE_CHANGES_SINCE).toBe(ENGINE_VERSION);
   });
 
   it("names scenarios that exist and writes one sentence for players", () => {
@@ -24,9 +28,20 @@ describe("ENGINE_CHANGES (src/rules/engine/version.ts)", () => {
     }
   });
 
-  it("lists the notes after a version that reach a scenario", () => {
-    expect(changesReaching("the-drowned-ruins", 25)).toEqual([ENGINE_CHANGES.at(-1)!.note]);
-    expect(changesReaching("the-drowned-ruins", 21)).toHaveLength(3);
-    expect(changesReaching("the-oath", ENGINE_VERSION)).toEqual([]);
+  it("lists the notes after a version, up to the build's, that reach a scenario, from the list it is given", () => {
+    const list: readonly EngineChange[] = [
+      { version: 25, scenarios: "all", note: "A." },
+      { version: 25, scenarios: ["the-oath"], note: "B." },
+      { version: 26, scenarios: ["the-drowned-ruins"], note: "C." },
+      { version: ENGINE_VERSION + 1, scenarios: "all", note: "Not yet." },
+    ];
+    expect(changesReaching("the-oath", 24, list)).toEqual(["A.", "B."]);
+    expect(changesReaching("the-drowned-ruins", 24, list)).toEqual(["A.", "C."]);
+    expect(changesReaching("the-drowned-ruins", 25, list)).toEqual(["C."]);
+    expect(changesReaching("the-oath", ENGINE_VERSION, list)).toEqual([]);
+  });
+
+  it("lists nothing for a game dealt before the baseline while no change is recorded", () => {
+    if (ENGINE_CHANGES.length === 0) expect(changesReaching("the-oath", 12)).toEqual([]);
   });
 });
