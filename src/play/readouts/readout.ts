@@ -22,6 +22,7 @@ import { defenseQuestResult } from "../words/scenarios/fortress.ts";
 import { defenseOutcome, stageHasDefense } from "./fortress.ts";
 import { companyProgressWords } from "./company.ts";
 import { lairProgressWords } from "./lair.ts";
+import { pelennorQuestWords } from "./pelennor.ts";
 import { siegeProgressWords } from "./siege.ts";
 import { sailingReadout } from "./sea-readout.ts";
 import type { Sheet, SheetStat } from "../choice/sheet-types.ts";
@@ -171,6 +172,9 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     if (game.mode === "questCommit") return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: commitWords(game, ctx, picked) };
     // A stage with Defense (mec112.defense): the Threat that beats the Willpower is progress the encounter deck places, so no player's threat rises and no elimination is warned of.
     if (stageHasDefense(game)) return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: defenseQuestResult(willpower, threat, defenseOutcome(game, ctx)) };
+    // Stage 3B of The Battle of the Pelennor Fields (Assault) places no progress on the stage and damages Minas Tirith instead of raising threat, and stage 4B deals the progress as damage: neither warns of an elimination.
+    const pelennor = pelennorQuestWords(game, ctx, willpower - threat);
+    if (pelennor) return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: pelennor };
     // Shelob's Lair holds some progress back (stage 2B's cap, an Underground location on stage 1): the split the engine would place; stage 3B of The Passing of the Grey Company says the progress pays the Stone's travel; stage 1B of The Siege of Gondor says Great Corsair Ship holds it.
     const held = lairProgressWords(game, ctx, willpower - threat) ?? companyProgressWords(game, ctx, willpower - threat);
     // The Siege's words carry their own "if nothing changes" ("4 progress if nothing changes: held while Great Corsair Ship is in play").

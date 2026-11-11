@@ -1,4 +1,4 @@
-// The extra top-bar dials of the scenarios that have them, in the order the bar draws them: The Road to Isengard's (readouts/isengard.ts), The Passage of the Marshes' (readouts/marshes.ts), Journey to the Cross-roads' (readouts/roads.ts), Shelob's Lair's (readouts/lair.ts), The Passing of the Grey Company's (readouts/company.ts) and The Siege of Gondor's (readouts/siege.ts).
+// The extra top-bar dials of the scenarios that have them, in the order the bar draws them: The Road to Isengard's (readouts/isengard.ts), The Passage of the Marshes' (readouts/marshes.ts), Journey to the Cross-roads' (readouts/roads.ts), Shelob's Lair's (readouts/lair.ts), The Passing of the Grey Company's (readouts/company.ts) The Siege of Gondor's (readouts/siege.ts) and The Battle of the Pelennor Fields' (readouts/pelennor.ts).
 // Each scenario's list is empty in any other scenario, so a new scenario's dials are one more line in `scenarioDials`. The engine decided each number; nothing here changes one. Pure, so a test reads it.
 import { useMemo } from "react";
 
@@ -10,12 +10,13 @@ import { useStableDials } from "./dials.ts";
 import { isengardDials, isengardHands, type HandMark } from "./isengard.ts";
 import { lairDials, lairHands } from "./lair.ts";
 import { marshesDials } from "./marshes.ts";
+import { pelennorDials } from "./pelennor.ts";
 import { roadsDials } from "./roads.ts";
 import { siegeDials, siegeHands } from "./siege.ts";
 
 /** Every scenario dial the game holds now. */
 export function scenarioDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code: string) => string): readonly TableDial[] {
-  return [...isengardDials(game, ctx, nameOf), ...marshesDials(game, ctx, nameOf), ...roadsDials(game, ctx, nameOf), ...lairDials(game, ctx, nameOf), ...companyDials(game, ctx, nameOf), ...siegeDials(game, ctx, nameOf)];
+  return [...isengardDials(game, ctx, nameOf), ...marshesDials(game, ctx, nameOf), ...roadsDials(game, ctx, nameOf), ...lairDials(game, ctx, nameOf), ...companyDials(game, ctx, nameOf), ...siegeDials(game, ctx, nameOf), ...pelennorDials(game, ctx, nameOf)];
 }
 
 /** The dials for the top bar: the same list while no dial's words or number changed, so the bar re-renders only when a token, a hit point or a card moves. */
