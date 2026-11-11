@@ -21,6 +21,7 @@ import { tableSettings, type ThemeOption } from "../../ui/table-settings";
 import { ThemeContext, useResolvedTheme, type ThemeName } from "../../ui/theme";
 import { REM_BASE, UiScaleContext, uiFactor } from "../../ui/ui-scale";
 import { useIsTablet } from "../../ui/use-size-class";
+import { PicturesReady } from "../../ui/pictures-ready";
 
 void SplashScreen.preventAutoHideAsync();
 
@@ -195,6 +196,7 @@ export default function RootLayout() {
                   <Stack.Screen name="glossary" options={{ orientation: "all" }} />
                   <Stack.Screen name="rule/[id]" options={{ orientation: "all" }} />
                 </Stack>
+                <PicturesReady />
               </DatabaseProvider>
             </DatabaseBoundary>
           ) : null}

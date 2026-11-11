@@ -33,6 +33,7 @@ import { actingSeat, lookedOf, shownSeat, stacksUnder } from "../store/selectors
 import type { TableCanvasProps } from "./table-canvas-types.ts";
 import { ReaderTable } from "./reader-table.tsx";
 import { useReaderMode } from "../../ui/screen-reader.ts";
+import { usePictureHold } from "../../ui/use-picture-hold.ts";
 import { sphereRing, stripText, useViews } from "./table-canvas-views.ts";
 import { useBackImages, useTokenImages } from "./table-assets.native.ts";
 import { useTableFonts } from "./table-fonts.native.ts";
@@ -131,6 +132,9 @@ function Table({ store, width, height, column, reach, onRowFeet, picture, pictur
   const boxes = useMemo(() => pictureBoxes([...layout.slots, ...moves.ghosts.map((ghost) => ghost.slot)], layout.card), [layout, moves]);
   const quality = useStore(tableSettings, (state) => state.settings.cardQuality);
   const images = useTableImages(boxes, picture, pictureRevision, pictureRatio(PixelRatio.get(), quality));
+  // The showcase build waits while a face-up card with a picture is still drawn as its name (picture-loads.ts).
+  const decoding = [...boxes.keys()].some((code) => !images.has(code) && picture(code) != null);
+  usePictureHold(decoding);
   const tokens = useTokenImages();
   const backs = useBackImages();
   const fonts = useTableFonts(s, usePlainTitles());
