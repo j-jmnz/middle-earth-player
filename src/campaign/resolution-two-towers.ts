@@ -1,8 +1,8 @@
-// Rules: mec112.campaign-mode-aragorn, rr.campaign-cards, rr.fellowship-of-heroes (data/rules/entries.json).
+// Rules: mec112.campaign-mode-aragorn, mec113.campaign-mode, rr.campaign-cards, rr.fellowship-of-heroes (data/rules/entries.json).
 //
 // What the resolution screen shows for The Two Towers' own choices (src/catalog/families/campaign.ts): the options of a ChooseOption in words, the fallen hero a boon brings back (one tile for each
 // player and hero), the hero a player removes from the Campaign Log, and the notes of the settled view (the threat penalty each player took, the hero who returned, the heroes removed, the enemies
-// under The Black Gate). The options are the ChooseResolution intents the reducer lists; this module only gives them words.
+// under The Black Gate, and The Return of the King's notes). The options are the ChooseResolution intents the reducer lists; this module only gives them words.
 import type { Instruction } from "../catalog/boundary.ts";
 import type { ResolutionLog } from "../rules/core/campaign-state.ts";
 import type { ScenarioState } from "../rules/engine/reduce.ts";
@@ -24,6 +24,9 @@ const OPTIONS: Readonly<Record<string, { label: string; says: (who: string) => s
   "uruk:boons": { label: "Each player earns a Skill boon", says: () => "Each player earns one of the Skill boons and attaches it to a hero they control." },
   "uruk:hope": { label: "One player earns Beyond All Hope", says: () => "One player earns Beyond All Hope, takes control of a fallen hero and attaches the boon to it." },
   "marshes:penalty": { label: "Take a permanent +2 starting threat penalty", says: (who) => `${who} ${who === YOU ? "take" : "takes"} a permanent +2 starting threat penalty, recorded in the campaign log.` },
+  // Mount Doom's Resolution (146079:B:1): the first player keeps The One Ring or destroys it.
+  "ring:keep": { label: "Keep The One Ring and succumb to the power of Sauron", says: () => "The One Ring is kept and the power of Sauron wins: the players lose the campaign." },
+  "ring:destroy": { label: "Destroy The One Ring and defeat the power of Sauron", says: () => "The One Ring is destroyed and the power of Sauron is defeated: the players win the campaign." },
   "marshes:searchingEye": { label: "Earn 1 copy of The Searching Eye", says: (who) => `${who} ${who === YOU ? "earn" : "earns"} 1 copy of The Searching Eye, recorded in the campaign log.`, code: SEARCHING_EYE },
 };
 
@@ -94,6 +97,10 @@ export function twoTowersNotes(log: ResolutionLog, seatCount: number, name: (cod
   for (const penalty of log.threatPenalties ?? []) notes.push(`${who(penalty.seat)} ${seatCount === 1 ? "take" : "takes"} a permanent +${penalty.amount} starting threat penalty.`);
   for (const item of log.revived ?? []) notes.push(`${name(item.hero)} leaves the list of fallen heroes and joins ${seatCount > 1 ? `Player ${item.seat + 1}'s` : "your"} heroes, with no +1 threat penalty.`);
   for (const item of log.removedHeroes ?? []) notes.push(`${name(item.hero)} is removed from the campaign log.`);
+  if (log.recorded?.corsairFleet != null) notes.push(`${log.recorded.corsairFleet} ${log.recorded.corsairFleet === 1 ? "resource" : "resources"} on The Corsair Fleet, recorded in the notes section of the campaign log.`);
+  if (log.recorded?.blackGateTokens != null) notes.push(`${log.recorded.blackGateTokens} ${log.recorded.blackGateTokens === 1 ? "resource token" : "resource tokens"} on The Black Gate, recorded in the notes section of the campaign log.`);
+  if (log.discardedNotFallen) notes.push("A hero in its controller's discard pile is not added to the list of fallen heroes.");
+  if (log.campaignEnd) notes.push(log.campaignEnd === "won" ? "The One Ring is destroyed. The players win the campaign." : "The One Ring is kept. The players lose the campaign.");
   const gate = Object.entries(log.underneath ?? {});
   if (gate.length > 0) notes.push(`Under The Black Gate: ${andList(gate.map(([code, count]) => `${count} \u00d7 ${name(code)}`))}, recorded in the campaign log.`);
   return notes;

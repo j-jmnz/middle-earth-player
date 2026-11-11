@@ -1,4 +1,4 @@
-// Rules: rr.campaign-cards, rr.campaign-setup-checklist, ltp.campaign-setup-checklist (data/rules/entries.json). The Two Towers' Resolution verbs run in resolution.ts beside this file.
+// Rules: rr.campaign-cards, rr.campaign-setup-checklist, ltp.campaign-setup-checklist (data/rules/entries.json). The Two Towers' Resolution verbs run in resolution.ts beside this file, The Return of the King's in saga-end.ts.
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
@@ -36,6 +36,12 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "ReviveFallenHero":
     case "TrimHeroes":
     case "RecordUnderneath":
+    case "EarnOnThreatDial":
+    case "RecordTokens":
+    case "RemoveFromPoolByCode":
+    case "LoseGuardedBoons":
+    case "IgnoreDiscardedHeroes":
+    case "EndCampaign":
       // Resolution verbs: rules/setup/resolution.ts runs them.
       return state;
     case "AttachChosen":
@@ -46,6 +52,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "RemoveBurdenSets":
     case "ShuffleIntoEachDeck":
     case "ChooseCopyOrResources":
+    case "SearchDeckForCard":
       return state;
     default:
       return null;
@@ -72,4 +79,4 @@ function attachSetAside(state: ScenarioState, code: string, hostId: string): Sce
   return queueEvent(attachTo(placed, copy, hostId), { trigger: "attached", seat: host.controller, subject: copy, other: hostId });
 }
 
-export const manifest: RulesFamily = { name: "campaign", verbs: ["PutObjectiveAllyIntoPlay", "SetAsideEachPlayer", "AttachSetAside", "PlaceToken", "EarnAttached", "NamePrisoner", "AttachChosen", "AddToHandAfterMulligan", "AddToPool", "CarryOver", "RemovePoolCards", "RemoveBurdenSets", "ShuffleIntoEachDeck", "ChooseCopyOrResources", "ChooseOption", "ThreatPenaltyForPick", "EarnForPick", "EarnHeldCopies", "ReviveFallenHero", "TrimHeroes", "RecordUnderneath"], run };
+export const manifest: RulesFamily = { name: "campaign", verbs: ["PutObjectiveAllyIntoPlay", "SetAsideEachPlayer", "AttachSetAside", "PlaceToken", "EarnAttached", "NamePrisoner", "AttachChosen", "AddToHandAfterMulligan", "AddToPool", "CarryOver", "RemovePoolCards", "RemoveBurdenSets", "ShuffleIntoEachDeck", "ChooseCopyOrResources", "ChooseOption", "ThreatPenaltyForPick", "EarnForPick", "EarnHeldCopies", "ReviveFallenHero", "TrimHeroes", "RecordUnderneath", "SearchDeckForCard", "EarnOnThreatDial", "RecordTokens", "RemoveFromPoolByCode", "LoseGuardedBoons", "IgnoreDiscardedHeroes", "EndCampaign"], run };

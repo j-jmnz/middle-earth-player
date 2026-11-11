@@ -16,6 +16,7 @@ export const BOOKLET_SOURCES: Record<BookletId, string> = {
   "dream-chaser": "mec111_dream-chaser_campaign_expansion.pdf",
   "ered-mithrin": "mec115_rules-web.pdf",
   "the-two-towers": "mec112_rulebook_eng.pdf",
+  "the-return-of-the-king": "mec113_rules-web.pdf",
 };
 
 export type PackedBooklet = {

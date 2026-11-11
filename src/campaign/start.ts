@@ -55,7 +55,7 @@ const DEALT_VERBS = setupRoleVerbs("dealt");
 const AFTER_SETUP_VERBS = setupRoleVerbs("afterSetup");
 
 function hasFacts(facts: CampaignFacts): boolean {
-  return facts.prisoner != null || facts.usedOnce.length > 0 || Object.keys(facts.counters).length > 0 || facts.levels != null || facts.upgraded != null || facts.modeCard != null || facts.treasures != null || facts.allyLines != null || facts.beldisUses != null || facts.encounterPool != null || facts.pool != null || facts.heroLog != null;
+  return facts.prisoner != null || facts.usedOnce.length > 0 || Object.keys(facts.counters).length > 0 || facts.levels != null || facts.upgraded != null || facts.modeCard != null || facts.treasures != null || facts.allyLines != null || facts.beldisUses != null || facts.encounterPool != null || facts.pool != null || facts.heroLog != null || facts.notes != null;
 }
 
 // The facts the engine gets: the log's, and the Hard/Expert Mode card chosen for this game (the log records it when the scenario is won).

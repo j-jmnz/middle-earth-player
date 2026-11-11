@@ -16,6 +16,7 @@ import { discardToPoolFromSets } from "../families/wilderland/mirkwood.ts";
 import { addEncounterCards, allyOrLineOptions, applyAllyOrLine, applyRemoval, applyStagedLocation, discoverTreasures, noteRemovalAnswer, playerOptions, removalOptions, removeEncounterCards, stagedLocationOptions } from "../families/wilderland/pool.ts";
 import { drawTreasures } from "../families/wilderland/treasure.ts";
 import { applyHazard, discardHazards, hazardOptions } from "../families/wilderland/hazards.ts";
+import { endCampaign, ignoreDiscardedHeroes, loseGuardedBoons, recordTokens, removeFromPool, threatDialCopies } from "../families/campaign/saga-end.ts";
 import { applyChooseOption, applyRevive, applyTrim, boonHeroes, chooseOptionIds, earnForPick, earnHeldCopies, reviveOptions, threatPenalties, trimOptions, underneath } from "../families/campaign/resolution.ts";
 
 // A won scenario runs the campaign card's Resolution instructions in order. An instruction that opens a choice asks
@@ -149,6 +150,25 @@ export function advanceResolution(state: ScenarioState, ctx: ReduceContext): Sce
         break;
       case "RecordUnderneath":
         next = stepOver(next, { ...next.resolutionLog, underneath: underneath(next, instruction.code) });
+        break;
+      // The Return of the King (families/campaign/saga-end.ts).
+      case "EarnOnThreatDial":
+        next = stepOver(next, earn(next, threatDialCopies(next, instruction)));
+        break;
+      case "RecordTokens":
+        next = stepOver(next, recordTokens(next, instruction));
+        break;
+      case "RemoveFromPoolByCode":
+        next = stepOver(next, removeFromPool(next, instruction.codes));
+        break;
+      case "LoseGuardedBoons":
+        next = stepOver(next, loseGuardedBoons(next, instruction, ctx));
+        break;
+      case "IgnoreDiscardedHeroes":
+        next = stepOver(next, ignoreDiscardedHeroes(next));
+        break;
+      case "EndCampaign":
+        next = stepOver(next, endCampaign(next, instruction));
         break;
       // The copies of these cards the game holds, whoever played them (families/aflame/cards.ts).
       case "EarnDealt":

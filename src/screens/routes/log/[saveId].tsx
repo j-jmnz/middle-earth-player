@@ -4,6 +4,7 @@ import { ScrollView, View } from "react-native";
 
 import { printedMap, type CatalogRow } from "../../../campaign/cards";
 import { SAGA_PREVIOUS } from "../../../campaign/continue";
+import { returnOfTheKingRows } from "../../../campaign/log-return-of-the-king";
 import { blackGateEnemies, keepsTwoTowersLog, marshesLines, SEARCHING_EYE, threatWords } from "../../../campaign/two-towers-view";
 import { copiesMark, encounterSpeech, keepsWilderlandLog, wilderlandView } from "../../../campaign/wilderland-view";
 import { MODE_CARD_NAME, type ModeCard } from "../../../campaign/xp";
@@ -141,6 +142,8 @@ export default function Log() {
   const twoTowers = keepsTwoTowersLog(campaign);
   const marshes = twoTowers ? marshesLines(log, save.seatCount, nameOf) : [];
   const blackGate = twoTowers ? blackGateEnemies(log) : [];
+  // The Return of the King's notes: the resources on The Corsair Fleet, the tokens on The Black Gate and how the saga ended, each once recorded.
+  const sagaNotes = twoTowers ? returnOfTheKingRows(log) : [];
   const names = scenarioNames(campaign);
   const notes = edited ?? log.notes;
 
@@ -207,6 +210,7 @@ export default function Log() {
             })}
           </View>
           {marshes.length > 0 ? <Row label="The Passage of the Marshes" lines={marshes} onCard={card} testID="log-marshes" /> : null}
+          {sagaNotes.map((row) => <Row key={row.id} label={row.label} value={row.value} testID={row.id} />)}
           {/* A continued save's total carries on from the finished campaign's: its score is a line of its own so the total adds up. */}
           {log.scoreBase > 0 ? (
             <View testID="log-score-base" className="flex-row items-baseline gap-1.5 py-2">

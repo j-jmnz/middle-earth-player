@@ -85,6 +85,25 @@ const VERBS = [
   // Resolution: the enemies facedown underneath the card with this code are recorded in the Campaign Log by card code and quantity ("Record the name and quantity of each enemy underneath The Black Gate in the notes
   // section of the campaign log", 144069:B:1).
   z.strictObject({ verb: z.literal("RecordUnderneath"), code, ...when }),
+  // The Return of the King's campaign cards (docs/brief.md, The Return of the King; src/campaign/checklist.ts deals the Setup one, src/rules/families/campaign/saga-end.ts runs the Resolution ones).
+  // Campaign Setup: the first player may raise each player's threat by `raiseThreat` for this game to search his deck for the card and add it to his hand ("The first player may raise each player's threat by 1 to search his deck
+  // for Andúril and add it to his hand", 145066:A:1). The card is taken from the deck, or from the pool where step 7 would shuffle it in, and joins the hand after the mulligan; with no copy to find nothing is asked.
+  z.strictObject({ verb: z.literal("SearchDeckForCard"), code, raiseThreat: z.number().int().positive() }),
+  // Resolution: each copy of these cards attached to a player's threat dial joins the Campaign Pool, recorded for that player ("Add each copy of Overcome by Fear attached to a player's threat dial to the campaign pool and record
+  // the name of each player it was attached to", 145066:B:1). One entry for each player holding a copy.
+  z.strictObject({ verb: z.literal("EarnOnThreatDial"), codes: z.array(code).min(1), ...when }),
+  // Resolution: the resources on the cards in play with these codes are counted and recorded in the notes section of the Campaign Log under `as` ("Count the number of resources on The Corsair Fleet and record that number in
+  // the notes section", 145070:B:1; "Record the number of resource tokens on The Black Gate", 146074:B:1). A card of two sides is two codes; the count is their sum.
+  z.strictObject({ verb: z.literal("RecordTokens"), codes: z.array(code).min(1), as: z.enum(["corsairFleet", "blackGateTokens"]), ...when }),
+  // Resolution: each card with one of these codes leaves the Campaign Pool, once ("Remove Army of the Dead from the campaign pool", 145070:B:1; "If a Wraith on Wings is in the victory display, remove that copy from the campaign
+  // pool", 146074:B:1). Nothing happens for a code the pool does not hold. The Setup's RemovePoolCards is the same removal before a game.
+  z.strictObject({ verb: z.literal("RemoveFromPoolByCode"), codes: z.array(code).min(1), ...when }),
+  // Resolution: each boon attached to the card with this code in play leaves the Campaign Pool ("If Shagrat is in play, remove each Item boon attached to it from the campaign pool", 146069:B:2): the players have lost it.
+  z.strictObject({ verb: z.literal("LoseGuardedBoons"), host: code, ...when }),
+  // Resolution: a hero in its controller's discard pile is not added to the list of fallen heroes ("If a hero is in its controller's discard pile, do not add that hero's name to the list of fallen heroes", 146074:B:1).
+  z.strictObject({ verb: z.literal("IgnoreDiscardedHeroes"), ...when }),
+  // Resolution: the saga ends, the players winning or losing the campaign ("Keep The One Ring ... the players lose the campaign", "Destroy The One Ring ... the players win the campaign", 146079:B:2, 146079:B:3). The Campaign Log records it.
+  z.strictObject({ verb: z.literal("EndCampaign"), result: z.enum(["won", "lost"]), ...when }),
 ] as const;
 
 const TRIGGERS = [] as const;

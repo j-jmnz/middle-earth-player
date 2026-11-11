@@ -89,20 +89,23 @@ function searchCaves(table: Table, instruction: Extract<Instruction, { verb: "Re
   table.out.did.push(...found.removed.map((code) => `The first player searches the Caves deck and removes ${table.name(code)} from the game.`));
 }
 
-// SearchBoonAllyToHand (12175:A) and SearchBoonOrTreasureToHand (12195:A): each player in turn, first player first, may take a card of their deck that `eligible` names (a pool card that step 7 would shuffle into it, or one the deck holds) into their hand, or skip. `untilFirst`: the offer ends
-// with the first who takes one ("a player may search"); otherwise every player is asked ("each player may search").
+// SearchBoonAllyToHand (12175:A), SearchBoonOrTreasureToHand (12195:A) and SearchDeckForCard (145066:A:1): each player in turn, first player first, may take a card of their deck that `eligible` names (a pool card that step 7 would shuffle into it, or one the deck holds) into their hand, or skip. `untilFirst`: the offer ends
+// with the first who takes one ("a player may search"); otherwise every player is asked ("each player may search"). `firstOnly`: only the first player is asked ("The first player may ... search his deck"). `raise`: the search costs each player's threat that much for this game ("raise each player's threat by 1"), added to every seat's starting threat when the first player takes it.
 // Setup follows the opening hand and any mulligan (rr.setup step 7), so the card joins the hand after the mulligan, as AddToHandAfterMulligan's cards do; a pool card stays in the pool but is not shuffled into the deck.
-function searchToHand(table: Table, search: { eligible: (printed: PrintedCard) => boolean; looksFor: string; untilFirst: boolean; skipped: (seat: number, seatCount: number) => string }): void {
+type HandSearch = { eligible: (printed: PrintedCard) => boolean; looksFor: string; untilFirst: boolean; skipped: (seat: number, seatCount: number) => string; firstOnly?: boolean; raise?: number };
+
+function searchToHand(table: Table, search: HandSearch): void {
   const { seats, pool, fresh, input, name } = table;
   const isEligible = (code: string): boolean => {
     const printed = input.cards.get(code);
     return printed != null && search.eligible(printed);
   };
-  for (const [index, seat] of seats.entries()) {
+  for (const [index, seat] of (search.firstOnly ? seats.slice(0, 1) : seats).entries()) {
     const pooled = pool.filter((card) => card.attachedTo == null && card.back === "player" && !card.afterHand && !fresh.has(card) && poolSeat(card, seats.length) === index && isEligible(card.code));
     const options = [...new Set([...seat.deck.filter(isEligible), ...pooled.map((card) => card.code)])];
     if (options.length === 0) continue;
-    const answer = takeAnswer(table, [...options, "skip"], index, `Search your deck for ${search.looksFor} to add to your hand, or skip. It joins your hand after the mulligan${search.untilFirst ? ", and if you take one no other player does" : ""}.`);
+    const cost = search.raise != null ? `Raise each player's threat by ${search.raise} to search your deck for ${search.looksFor} and add it to your hand, or skip.` : `Search your deck for ${search.looksFor} to add to your hand, or skip.`;
+    const answer = takeAnswer(table, [...options, "skip"], index, `${cost} It joins your hand after the mulligan${search.untilFirst ? ", and if you take one no other player does" : ""}.`);
     if (answer == null) return;
     if (answer === "skip") {
       table.out.did.push(search.skipped(index, seats.length));
@@ -115,12 +118,19 @@ function searchToHand(table: Table, search: { eligible: (printed: PrintedCard) =
       if (taken) fresh.add(taken);
     }
     seat.afterMulligan.push(answer);
+    if (search.raise != null) {
+      for (const each of seats) each.threatPenalty = (each.threatPenalty ?? 0) + (search.raise ?? 0);
+      table.out.did.push(`Each player's threat is raised by ${search.raise} for this game.`);
+    }
     table.out.did.push(`Seat ${index + 1} searches their deck for ${name(answer)} and adds it to their hand after the mulligan.`);
     if (search.untilFirst) return;
   }
 }
 
 const searchBoonAlly = (table: Table): void => searchToHand(table, { eligible: (printed) => printed.type === "ally" && printed.isUnique && printed.campaignKind === "boon", looksFor: "a unique boon ally", untilFirst: true, skipped: (seat) => `Seat ${seat + 1} does not search for a boon ally.` });
+// SearchDeckForCard: the first player alone may pay the threat to search for the named card.
+const searchDeckForCard = (table: Table, instruction: Extract<Instruction, { verb: "SearchDeckForCard" }>): void =>
+  searchToHand(table, { eligible: (printed) => printed.code === instruction.code, looksFor: table.name(instruction.code), untilFirst: true, firstOnly: true, raise: instruction.raiseThreat, skipped: () => `The first player does not search for ${table.name(instruction.code)}.` });
 const searchBoonOrTreasure = (table: Table): void => searchToHand(table, { eligible: (printed) => printed.campaignKind === "boon" || printed.campaignKind === "treasure", looksFor: "a boon or treasure card", untilFirst: false, skipped: (seat, seatCount) => `${seatCount === 1 ? "You do" : `Player ${seat + 1} does`} not search for a boon or treasure card.` });
 
 // AttachChosen: the first player chooses any hero at the table, their own or another player's.
@@ -213,6 +223,7 @@ function campaignSetupSteps(campaignSetup: readonly Instruction[], input: Checkl
     else if (instruction.verb === "RemoveFromCavesIfLogged") searchCaves(table, instruction);
     else if (instruction.verb === "SearchBoonAllyToHand") searchBoonAlly(table);
     else if (instruction.verb === "SearchBoonOrTreasureToHand") searchBoonOrTreasure(table);
+    else if (instruction.verb === "SearchDeckForCard") searchDeckForCard(table, instruction);
     else if (instruction.verb === "RemovePoolCards") table.out.did.push(...removePoolCards(table.pool, table.seats, instruction).map((code) => `${table.name(code)} is removed from the Campaign Pool.`));
     else if (instruction.verb === "RemoveBurdenSets") table.burdens.push({ sets: instruction.sets, playerDecks: instruction.playerDecks === true });
     else if (instruction.verb === "ShuffleIntoEachDeck") {

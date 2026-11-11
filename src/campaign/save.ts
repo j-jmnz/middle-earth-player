@@ -61,6 +61,10 @@ export const campaignLogSchema = z.strictObject({
   marshesChoice: z.array(z.enum(MARSHES_CHOICES).nullable()).default([]),
   blackGate: z.record(z.string(), z.number().int().positive()).default({}),
   scoreBase: z.number().int().default(0),
+  // The Return of the King's notes (docs/brief.md, The Return of the King). A log saved before them reads with these defaults.
+  corsairFleet: z.number().int().min(0).nullable().default(null),
+  blackGateTokens: z.number().int().min(0).nullable().default(null),
+  campaignEnd: z.enum(["won", "lost"]).nullable().default(null),
 });
 
 // The intents are checked by the reducer when they are replayed: one it does not know is refused, and the open

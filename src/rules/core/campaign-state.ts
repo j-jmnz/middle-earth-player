@@ -50,7 +50,18 @@ export type ResolutionLog = {
   revived?: readonly { seat: number; hero: string }[];
   removedHeroes?: readonly { seat: number; hero: string }[];
   underneath?: Readonly<Record<string, number>>;
+  // The Return of the King (docs/brief.md, The Return of the King), each left out while it holds nothing: the number of tokens a Resolution counted on a card for the log's notes (RecordTokens), the cards it
+  // took out of the Campaign Pool by code (`poolRemoved` above holds them), whether a hero in a discard pile stays off the list of fallen heroes (IgnoreDiscardedHeroes), and how the saga ends (EndCampaign).
+  recorded?: Readonly<Partial<Record<RecordedCount, number>>>;
+  discardedNotFallen?: true;
+  campaignEnd?: CampaignEnd;
 };
+
+/** The counts a Resolution records in the Campaign Log's notes section: the resources on The Corsair Fleet and the resource tokens on The Black Gate (location). */
+export type RecordedCount = "corsairFleet" | "blackGateTokens";
+
+/** How the saga ends: the players keep The One Ring and lose the campaign, or destroy it and win (Mount Doom's Resolution). */
+export type CampaignEnd = "won" | "lost";
 
 // The campaign log's structured facts, handed to the engine at the start of a scenario in Campaign Mode (campaign/log.ts writes
 // them back from the won game). Absent in a standalone game and in a campaign whose log holds none.
@@ -78,4 +89,7 @@ export type CampaignFacts = {
   pool?: readonly { code: string; seat: number | null }[];
   // The Campaign Log's hero lists by seat, the codes of the saga's Fellowship heroes among them, and the captives the log names (a quest card's Setup in Campaign Mode takes each captive from them), for the Resolution that changes the lists (ReviveFallenHero, TrimHeroes); left out in a game of another campaign.
   heroLog?: { heroes: readonly (readonly string[])[]; fallen: readonly (readonly string[])[]; fellowship: readonly string[]; captives: readonly { seat: number; hero: string }[] };
+  // What The Two Towers' Resolutions recorded in the notes and the saga's later campaign cards' Setup reads (The Return of the King; left out in a game of another campaign): the enemies under The Black Gate
+  // by card code and quantity, and the two counts of `RecordedCount` (null until recorded).
+  notes?: { blackGate: Readonly<Record<string, number>>; corsairFleet: number | null; blackGateTokens: number | null };
 };
