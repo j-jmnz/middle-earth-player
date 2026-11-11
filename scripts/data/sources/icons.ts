@@ -9,7 +9,7 @@
 // - The Dream-chaser Campaign Expansion's rulebook (MEC111): the Heading's four steps and the Sailing success symbol are glyphs
 //   of its embedded LOTRLCGIcons font, which no web icon font carries (mec111-font.ts). The TrueType program and its ToUnicode map
 //   are kept, 6 KB; the PDF itself stays out of git.
-// Every file is kept verbatim under data/raw/icons and pinned by sha256; `pnpm data:build` cuts the icons out offline.
+// Every file is kept verbatim under data/raw/icons and pinned by sha256; `pnpm data build` cuts the icons out offline.
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
@@ -27,8 +27,8 @@ export const DRAGNCARDS_CARDBACKS = "https://dragncards-lotrlcg.s3.amazonaws.com
 export const DRAGNCARDS_CARDBACK_FILES = ["player", "encounter"] as const;
 export type CardBackName = (typeof DRAGNCARDS_CARDBACK_FILES)[number];
 
-// The PDF the icons are cut from is the one `pnpm data:sync rules` pinned (the dcce rulebook): a different file would give different glyphs under the same URL. With no pin yet it is only
-// reported, so a first `data:sync icons` still works; with one, a different hash stops the sync.
+// The PDF the icons are cut from is the one `pnpm data sync rules` pinned (the dcce rulebook): a different file would give different glyphs under the same URL. With no pin yet it is only
+// reported, so a first `data sync icons` still works; with one, a different hash stops the sync.
 function checkPinned(file: string, url: string, body: Uint8Array, log: Log): void {
   let pinned: string | undefined;
   try {
@@ -38,11 +38,11 @@ function checkPinned(file: string, url: string, body: Uint8Array, log: Log): voi
     pinned = undefined;
   }
   if (!pinned) {
-    log.warn(`${url} is not pinned in data/sources.json: run pnpm data:sync rules to pin it`);
+    log.warn(`${url} is not pinned in data/sources.json: run pnpm data sync rules to pin it`);
     return;
   }
   const actual = sha256(body);
-  if (actual !== pinned) throw new Error(`${url} is not the PDF data/sources.json pins as ${file} (sha256 ${actual}, pinned ${pinned}): run pnpm data:sync rules, then icons again`);
+  if (actual !== pinned) throw new Error(`${url} is not the PDF data/sources.json pins as ${file} (sha256 ${actual}, pinned ${pinned}): run pnpm data sync rules, then icons again`);
 }
 
 export async function syncIcons(log: Log = createLog("icons")): Promise<SourceRecord> {

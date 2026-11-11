@@ -1,0 +1,103 @@
+// The package scripts' dispatcher: `pnpm <group> <command> [args]` runs the command's steps in order, each a child
+// process with the arguments after the command, and stops at the first that fails (README.md, Commands).
+// `pnpm <group>` alone lists the group's commands; `assets` alone runs all three packs, and `test` with no command
+// (or with a file filter) is a plain `vitest run`.
+import { spawnSync } from "node:child_process";
+import { createRequire } from "node:module";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import { runScript, type Log } from "./log.ts";
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const VITEST = path.join(path.dirname(createRequire(import.meta.url).resolve("vitest/package.json")), "vitest.mjs");
+
+/** One child process: a script under `scripts/` (or vitest), the node flags and leading arguments it needs, and its env. */
+export type Step = { script: string; node?: string[]; args?: string[]; env?: Record<string, string> };
+export type Command = { steps: Step[]; about: string };
+
+const catalog: Step = { script: "build/catalog.ts" };
+const booklets: Step = { script: "build/pack-booklets.ts" };
+const scans: Step = { script: "build/pack-scans.ts" };
+
+export const GROUPS: Record<string, Record<string, Command>> = {
+  assets: {
+    all: { steps: [catalog, booklets, scans], about: "catalog, booklets and scans in order (`--optional` lets a pack fail)" },
+    catalog: { steps: [catalog], about: "writes assets/catalog.db and src/catalog/version.ts" },
+    booklets: { steps: [booklets], about: "packs the booklet PDFs into assets/booklets" },
+    scans: { steps: [scans], about: "packs every card picture into assets/scans" },
+  },
+  data: {
+    sync: { steps: [{ script: "data/sync.ts" }], about: "refreshes data/raw and .cache (the only networked command)" },
+    build: { steps: [{ script: "data/build.ts" }], about: "builds data/ and the generated code from data/raw, offline" },
+    check: { steps: [{ script: "data/check.ts" }], about: "rebuilds into a temporary directory and fails on any difference" },
+    query: { steps: [{ script: "data/query.ts", node: ["--disable-warning=ExperimentalWarning"] }], about: "runs SQL over cards, scenario_cards and rules" },
+  },
+  effects: {
+    draft: { steps: [{ script: "data/effects/draft.ts" }], about: "writes .agent/drafts for printed lines no record owns" },
+    render: { steps: [{ script: "data/effects/render.ts" }], about: "prints each card's lines with its records in plain English" },
+    open: { steps: [{ script: "data/effects/open.ts" }], about: "rewrites src/effects/open-lines.ts" },
+  },
+  scenario: {
+    new: { steps: [{ script: "tools/scenario-new.ts" }], about: "writes and registers a scenario's skeleton files (--dry-run first)" },
+    pack: { steps: [{ script: "tools/author-pack.ts" }], about: "writes .agent/pack/<id>.md, the scenario author's context" },
+    fixtures: { steps: [{ script: "e2e/fixtures.ts" }], about: "rewrites the Maestro save fixtures in src/campaign/fixtures" },
+  },
+  test: {
+    all: { steps: [{ script: VITEST, args: ["run"] }], about: "vitest run (any arguments go to vitest)" },
+    fast: { steps: [{ script: VITEST, args: ["run"], env: { VITEST_FAST: "1" } }], about: "vitest run without the slow files" },
+    changed: { steps: [{ script: VITEST, args: ["run", "--changed"] }], about: "the tests that import a file changed since the last commit" },
+    scenario: { steps: [{ script: "tools/test-scenario.ts" }], about: "one scenario's tests, goldens, checks and smokes" },
+    smoke: { steps: [{ script: "card-smoke/run.ts" }], about: "plays seeded games with player cards' records" },
+    encounter: { steps: [{ script: "card-smoke/encounter.ts" }], about: "plays a scenario's encounter cards and seeded games" },
+    a11y: { steps: [catalog, { script: "checks/a11y-web.ts" }], about: "audits the web screens with axe-core in Chromium" },
+  },
+  docs: {
+    index: { steps: [{ script: "docs/index.ts" }], about: "regenerates docs/INDEX.md" },
+    section: { steps: [{ script: "docs/index.ts", args: ["section"] }], about: 'prints one doc section: <file> "<heading>"' },
+  },
+  release: {
+    plan: { steps: [{ script: "release/plan.ts" }], about: "prints the next tag and its notes (--dry-run)" },
+    source: { steps: [{ script: "release/sideload-source.ts" }], about: "writes a release's SideStore and AltStore source" },
+  },
+};
+
+/** The command a group's arguments name, and the arguments left for its steps. A group with `all` runs it when the first argument names no command. */
+export function resolve(group: string, args: readonly string[]): { command: Command; rest: string[] } | null {
+  const commands = GROUPS[group];
+  if (!commands) return null;
+  const [first = "", ...rest] = args;
+  const named = Object.hasOwn(commands, first) && first !== "all" ? commands[first] : undefined;
+  if (named) return { command: named, rest };
+  const fallback = commands["all"];
+  return fallback ? { command: fallback, rest: [...args] } : null;
+}
+
+function usage(group: string): string {
+  const commands = GROUPS[group] ?? {};
+  const names = Object.keys(commands).map((name) => (name === "all" ? `pnpm ${group}` : `pnpm ${group} ${name}`));
+  const width = Math.max(0, ...names.map((name) => name.length));
+  const lines = Object.values(commands).map((command, i) => `  ${(names[i] ?? "").padEnd(width)}  ${command.about}`);
+  return [`usage: pnpm <${Object.keys(GROUPS).join("|")}> <command> [args]`, ...lines].join("\n");
+}
+
+function run(log: Log, steps: readonly Step[], rest: readonly string[]): void {
+  for (const step of steps) {
+    const file = path.isAbsolute(step.script) ? step.script : path.join(ROOT, "scripts", step.script);
+    const argv = [...(step.node ?? []), file, ...(step.args ?? []), ...rest];
+    log.debug(`node ${argv.join(" ")}`);
+    const child = spawnSync(process.execPath, argv, { cwd: ROOT, stdio: "inherit", env: { ...process.env, ...step.env } });
+    if (child.status === 0) continue;
+    process.exitCode = child.status ?? 1;
+    return;
+  }
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const [group = "", ...args] = process.argv.slice(2);
+  void runScript(group || "cli", (log) => {
+    const resolved = resolve(group, args);
+    if (resolved) return run(log, resolved.command.steps, resolved.rest);
+    log.error(usage(group));
+    process.exitCode = 1;
+  }, { done: false });
+}

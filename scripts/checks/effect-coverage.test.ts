@@ -24,7 +24,7 @@ import { dealtCodes, loadCampaign, loadCampaigns, loadCampaignsInOrder, loadScen
 // Every printed line of a card the Fellowship scenarios deal is owned: by an effect record that names it in
 // `lines`, by a keyword the engine reads (a line that is only keywords), or by an `inert` entry in the printed-text
 // ledger (data/printed). Every record names lines that exist and belong to its own card. A line no template reads
-// is listed by `pnpm effects:draft` for an agent to author.
+// is listed by `pnpm effects draft` for an agent to author.
 const cards = loadCards();
 const scenarios = loadScenarios();
 const campaign = loadCampaign();
@@ -158,14 +158,14 @@ describe("generated and authored records", () => {
     expect([...GENERATED_EFFECTS].sort(byId)).toEqual([...regenerated.effects].sort(byId));
   });
 
-  it("are all in the barrel pnpm data:build writes (src/effects/generated/authored.ts), in campaign order", () => {
+  it("are all in the barrel pnpm data build writes (src/effects/generated/authored.ts), in campaign order", () => {
     const authored = path.join(ROOT, "src", "effects", "authored");
     const fresh = renderAuthoredBarrel(authoredOrder(authoredFileNames(authored), loadCampaignsInOrder(), scenarios));
-    expect(readFileSync(path.join(ROOT, "src", "effects", "generated", "authored.ts"), "utf8"), "run pnpm data:build").toBe(fresh);
+    expect(readFileSync(path.join(ROOT, "src", "effects", "generated", "authored.ts"), "utf8"), "run pnpm data build").toBe(fresh);
   });
 
-  it("list every printed line still without a record in open-lines.ts (pnpm effects:open rewrites it)", () => {
-    // Every built campaign, as pnpm effects:open reads them: a campaign with XP also deals the Hard/Expert Mode card.
+  it("list every printed line still without a record in open-lines.ts (pnpm effects open rewrites it)", () => {
+    // Every built campaign, as pnpm effects open reads them: a campaign with XP also deals the Hard/Expert Mode card.
     expect(OPEN_LINES).toEqual(openLines(cards, lines, loadCampaigns(), scenarios, EFFECTS));
   });
 

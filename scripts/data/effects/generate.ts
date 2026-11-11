@@ -296,7 +296,7 @@ export function renderGenerated(effects: readonly Effect[], campaignId: string, 
   return [
     `import type { Effect } from "../../catalog/boundary.ts";`,
     ``,
-    `// Written by pnpm data:build from data/cards and data/scenarios (${campaignId}). Do not edit.`,
+    `// Written by pnpm data build from data/cards and data/scenarios (${campaignId}). Do not edit.`,
     `// scripts/data/effects/templates.ts holds the sentence patterns; src/effects/authored/ holds the rest.`,
     `export const ${name}: readonly Effect[] = [`,
     ...lines,

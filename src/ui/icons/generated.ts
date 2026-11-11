@@ -1,4 +1,4 @@
-// Written by pnpm data:build (scripts/data/icons.ts). Do not edit.
+// Written by pnpm data build (scripts/data/icons.ts). Do not edit.
 // Each game icon the app draws: its source, and its size (a vector's viewBox in font units, a raster's pixels).
 export type IconRecord =
   | { name: string; kind: "vector"; source: string; glyph: string; viewBox: readonly [number, number, number, number]; d: string }

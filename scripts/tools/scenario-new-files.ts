@@ -1,4 +1,4 @@
-// The skeleton files `pnpm scenario:new` writes (scripts/tools/scenario-new.ts). Each function returns one file's text from the plan's facts.
+// The skeleton files `pnpm scenario new` writes (scripts/tools/scenario-new.ts). Each function returns one file's text from the plan's facts.
 // A skeleton compiles, passes lint and leaves the suite green: its golden test is a skipped suite and its campaign test one real check and some
 // todos, until the person filling it in removes the markers. Every TODO marker names what the scenario still has to say.
 
@@ -289,8 +289,8 @@ export function lossFlowFile(facts: Facts): string {
 export function authoredFile(facts: Facts): string {
   return `import type { Effect } from "../../catalog/boundary.ts";
 
-// Records for ${facts.name} (${facts.campaignId} part ${facts.part}, campaign card ${facts.campaignCard}). Every line is read from the scan ledger (data/printed/); a line a template already writes (pnpm data:build) or another card prints
-// word for word needs no record here. \`pnpm effects:draft ${facts.id}\` writes the bundle of open lines and the effect-author agent turns it into records.
+// Records for ${facts.name} (${facts.campaignId} part ${facts.part}, campaign card ${facts.campaignCard}). Every line is read from the scan ledger (data/printed/); a line a template already writes (pnpm data build) or another card prints
+// word for word needs no record here. \`pnpm effects draft ${facts.id}\` writes the bundle of open lines and the effect-author agent turns it into records.
 // Rules: TODO name the rule ids the records implement (data/rules/entries.json).
 // TODO: wrap the list in withCopies(...) from ./reprint.ts when a card takes the records of another card's identical line.
 export const AUTHORED_EFFECTS: readonly Effect[] = [];
@@ -299,12 +299,12 @@ export const AUTHORED_REPLACES: readonly string[] = [];
 `;
 }
 
-/** src/play/words/asks/<id>.ts the scenario's choice words as data (src/play/words/asks.ts). pnpm data:build adds it to the barrel. */
+/** src/play/words/asks/<id>.ts the scenario's choice words as data (src/play/words/asks.ts). pnpm data build adds it to the barrel. */
 export function asksFile(facts: Facts): string {
   return `import type { Ask } from "../asks.ts";
 
 // The choice words of ${facts.name} (${facts.campaignId} part ${facts.part}), one entry for each Pick and Choose of its records: \`<record id> @<instruction path> <verb | option id>\` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
-// \`pnpm test:scenario ${facts.id} --words\` fails on a Pick or Choose with neither an entry nor words of its own, and \`WORDS_DUMP=${facts.id}\` prints each sentence.
+// \`pnpm test scenario ${facts.id} --words\` fails on a Pick or Choose with neither an entry nor words of its own, and \`WORDS_DUMP=${facts.id}\` prints each sentence.
 export const ASKS: Readonly<Record<string, Ask>> = {};
 `;
 }

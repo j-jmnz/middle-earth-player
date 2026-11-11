@@ -156,7 +156,7 @@ iOS needs macOS and Xcode. Android needs Android Studio, SDK Platform 36 and `AN
 pnpm assets
 ```
 
-`pnpm assets` runs `catalog:build`, `booklets:pack` and `scans:pack`. The first `scans:pack` downloads every pinned card picture into `.cache/` (about 5 GB), checks each sha256, and writes 1200 px copies to `assets/scans/`. Later runs pack only changed pictures. `pnpm start`, `pnpm android` and `pnpm ios` run it first. Don't commit the rewritten `src/screens/images/scan-map.ts`.
+`pnpm assets` runs `assets catalog`, `assets booklets` and `assets scans`. The first `assets scans` downloads every pinned card picture into `.cache/` (about 5 GB), checks each sha256, and writes 1200 px copies to `assets/scans/`. Later runs pack only changed pictures. `pnpm start`, `pnpm android` and `pnpm ios` run it first. Don't commit the rewritten `src/screens/images/scan-map.ts`.
 
 Release build (offline, all data bundled):
 
@@ -175,34 +175,36 @@ Flows are in `.maestro/scenarios/<scenario-id>/` and `.maestro/features/`. Run `
 
 ## Commands
 
+Scripts are grouped: `pnpm <group> <command> [args]`, and `pnpm <group>` alone lists its commands (`scripts/cli.ts`), except `pnpm test` and `pnpm assets`, which run everything. The groups are `test`, `data`, `effects`, `scenario`, `assets`, `docs` and `release`; `lint`, `typecheck`, `move` and `commit:check` stand alone. A first argument to `pnpm test` that is not one of its commands goes to Vitest as a filter.
+
 | Command | Does |
 | --- | --- |
 | `pnpm test` | All Vitest tests. |
-| `pnpm test:fast` | All but the slow files (`slowFiles` in `vitest.config.mts`). |
-| `pnpm test:changed` | Tests that import a file changed since the last commit. |
-| `pnpm test:scenario <scenario-id>` | One scenario's goldens, effect coverage, file-size, rule-id and wording checks, the card smoke on its player cards and the encounter smoke; also the family and manifest tests if pool, family or manifest files changed since the merge base with `origin/main`. `--list` prints the selection; `--quick` skips the goldens and the reader check. |
+| `pnpm test fast` | All but the slow files (`slowFiles` in `vitest.config.mts`). |
+| `pnpm test changed` | Tests that import a file changed since the last commit. |
+| `pnpm test scenario <scenario-id>` | One scenario's goldens, effect coverage, file-size, rule-id and wording checks, the card smoke on its player cards and the encounter smoke; also the family and manifest tests if pool, family or manifest files changed since the merge base with `origin/main`. `--list` prints the selection; `--quick` skips the goldens and the reader check. |
+| `pnpm test smoke <codes>` | Plays a seeded game with those cards; reports errors and stalls. `--all` for every card. |
+| `pnpm test encounter <scenario-id>...` | Plays every encounter-side card of a scenario (reveal, Shadow, travel, quest Setup) and seeded games with random legal intents; reports errors, stalls and replay differences. `--all` for every playable scenario. |
+| `pnpm test a11y` | Audits the main web screens with axe-core in Chromium; fails on serious or critical findings. Needs `pnpm exec playwright install chromium` once, or `A11Y_CHROMIUM=<path>`. |
 | `pnpm lint` | Oxlint (`.oxlintrc.json`). |
 | `pnpm typecheck` | tsrs type check. |
-| `pnpm data:sync [ringsdb\|hallofbeorn\|dragncards\|rules\|scans\|pictures\|icons]` | Refreshes `data/raw/` and `.cache/`. The only networked command. `scans` and `pictures` run only when named, after `data:build`. |
-| `pnpm data:build` | Builds `data/`, `src/effects/generated/` and the game icons from `data/raw/`. Offline, deterministic. |
-| `pnpm data:check` | Rebuilds into a temp directory; fails on any difference. |
-| `pnpm data:query "<sql>"` | Queries `cards`, `scenario_cards` and `rules` in memory. |
-| `pnpm effects:draft <scenario \| deck \| pack \| codes>` | Writes `.agent/drafts/<code>.md` per card with an uncovered printed line. |
-| `pnpm effects:open` | Regenerates `src/effects/open-lines.ts`. |
-| `pnpm scenario:new <scenario-id>` | Writes and registers a new scenario's skeleton files. `--dry-run` first. |
-| `pnpm author:pack <scenario-id>` | Writes `.agent/pack/<id>.md`, the scenario author's context: vocabulary, schema entries, cookbook sections and drafts. |
-| `pnpm a11y:web` | Audits the main web screens with axe-core in Chromium; fails on serious or critical findings. Needs `pnpm exec playwright install chromium` once, or `A11Y_CHROMIUM=<path>`. |
-| `pnpm catalog:build` | Writes `assets/catalog.db` (never committed) and `src/catalog/version.ts` (committed). |
-| `pnpm scans:pack` / `pnpm booklets:pack` | Packs card pictures / booklet PDFs into `assets/`. |
-| `pnpm assets` | `catalog:build`, `booklets:pack` and `scans:pack` in one; the native builds run it. |
-| `pnpm release:plan --dry-run` | Prints the next tag and its notes (`git fetch --tags` first). Changes nothing. |
-| `pnpm release:source --tag <tag> --ipa <file> --notes <file> --out <file>` | Writes a release's SideStore and AltStore source; run by the release workflow. |
+| `pnpm data sync [ringsdb\|hallofbeorn\|dragncards\|rules\|scans\|pictures\|icons]` | Refreshes `data/raw/` and `.cache/`. The only networked command. `scans` and `pictures` run only when named, after `data build`. |
+| `pnpm data build` | Builds `data/`, `src/effects/generated/` and the game icons from `data/raw/`. Offline, deterministic. |
+| `pnpm data check` | Rebuilds into a temp directory; fails on any difference. |
+| `pnpm data query "<sql>"` | Queries `cards`, `scenario_cards` and `rules` in memory. |
+| `pnpm effects draft <scenario \| deck \| pack \| codes>` | Writes `.agent/drafts/<code>.md` per card with an uncovered printed line. |
+| `pnpm effects open` | Regenerates `src/effects/open-lines.ts`. |
+| `pnpm scenario new <scenario-id>` | Writes and registers a new scenario's skeleton files. `--dry-run` first. |
+| `pnpm scenario pack <scenario-id>` | Writes `.agent/pack/<id>.md`, the scenario author's context: vocabulary, schema entries, cookbook sections and drafts. |
+| `pnpm scenario fixtures [scenario-id]` | Regenerates the Maestro save fixtures in `src/campaign/fixtures/`. |
+| `pnpm assets` | `catalog`, `booklets` and `scans` in order; `start`, `android`, `ios` and the native release builds run it (`start` with `--optional`). |
+| `pnpm assets catalog` | Writes `assets/catalog.db` (never committed) and `src/catalog/version.ts` (committed). |
+| `pnpm assets scans` / `pnpm assets booklets` | Packs card pictures / booklet PDFs into `assets/`. |
+| `pnpm docs index` / `pnpm docs section <file> "<heading>"` | Regenerates `docs/INDEX.md` / prints one doc section. |
+| `pnpm release plan --dry-run` | Prints the next tag and its notes (`git fetch --tags` first). Changes nothing. |
+| `pnpm release source --tag <tag> --ipa <file> --notes <file> --out <file>` | Writes a release's SideStore and AltStore source; run by the release workflow. |
 | `pnpm commit:check "<subject>"` | Checks commit subjects against `.claude/rules/commit-standards.md`; `--range <base>..<head>` for a range. Installed as the `commit-msg` hook. |
 | `pnpm move <old> <new>` | Moves files and rewrites every reference. `--dry-run` first. |
-| `pnpm docs:index` / `pnpm docs:section <file> "<heading>"` | Regenerates `docs/INDEX.md` / prints one doc section. |
-| `pnpm smoke:cards <codes>` | Plays a seeded game with those cards; reports errors and stalls. `--all` for every card. |
-| `pnpm smoke:encounter <scenario-id>...` | Plays every encounter-side card of a scenario (reveal, Shadow, travel, quest Setup) and seeded games with random legal intents; reports errors, stalls and replay differences. `--all` for every playable scenario. |
-| `pnpm e2e:fixtures [scenario-id]` | Regenerates the Maestro save fixtures in `src/campaign/fixtures/`. |
 
 Scripts log to stderr. `--verbose`, `--quiet`, or `LOG_LEVEL` (`debug`, `info`, `warn`, `error`, `silent`).
 

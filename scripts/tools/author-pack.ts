@@ -10,9 +10,9 @@ import { sectionText } from "../docs/index.ts";
 
 // The context a scenario author reads in place of the brief's full list (docs/handover/agent-brief.md, Scenario procedure):
 //
-//   pnpm author:pack <scenario-id> [--no-draft]
+//   pnpm scenario pack <scenario-id> [--no-draft]
 //
-// Runs `pnpm effects:draft <id>` (`--no-draft` reads the drafts already in .agent/drafts), then writes .agent/pack/<id>.md, which is not committed. It holds, in this order:
+// Runs `pnpm effects draft <id>` (`--no-draft` reads the drafts already in .agent/drafts), then writes .agent/pack/<id>.md, which is not committed. It holds, in this order:
 //   - the vocabulary file the drafts link to (.agent/drafts/vocabulary.md);
 //   - the schema entries (and the comment on each) of the verbs the drafts' nearest records and exact matches use, from the core schema files and the family manifests (src/catalog/families/<family>.ts)
 //     that declare them: an entry, not the whole manifest, since one manifest is tens of KB;
@@ -132,7 +132,7 @@ export function entriesFor(text: string, verbs: ReadonlySet<string>): { header: 
   return { header, entries };
 }
 
-/** The drafts of `names` (file names, `<code>.md`) that belong to the scenario, those of a card it deals, and the others, which another scenario's run (or `effects:draft` for a pack) left in the folder. */
+/** The drafts of `names` (file names, `<code>.md`) that belong to the scenario, those of a card it deals, and the others, which another scenario's run (or `effects draft` for a pack) left in the folder. */
 export function draftsOfScenario(names: readonly string[], dealt: ReadonlySet<string>): { kept: string[]; others: string[] } {
   const kept = names.filter((name) => dealt.has(name.slice(0, -3)));
   return { kept, others: names.filter((name) => !kept.includes(name)) };
@@ -181,7 +181,7 @@ export function renderPack(parts: PackParts): string {
   const out = [
     `# Author pack for ${parts.id}`,
     ``,
-    `Written by \`pnpm author:pack ${parts.id}\`; not committed. It replaces the brief's full reading list (docs/handover/agent-brief.md, Scenario procedure): the vocabulary, the schema entries of the verbs the drafts' records use (from ${parts.plan.families.join(", ") || "no file"}), the cookbook sections those records need, and the ${parts.drafts.length} draft${parts.drafts.length === 1 ? "" : "s"}.`,
+    `Written by \`pnpm scenario pack ${parts.id}\`; not committed. It replaces the brief's full reading list (docs/handover/agent-brief.md, Scenario procedure): the vocabulary, the schema entries of the verbs the drafts' records use (from ${parts.plan.families.join(", ") || "no file"}), the cookbook sections those records need, and the ${parts.drafts.length} draft${parts.drafts.length === 1 ? "" : "s"}.`,
     `An entry is cut from its file: a helper it names (\`code\`, \`pile\`, \`when\`) is declared higher in that file. The fields a verb takes are the entry's.`,
     ``,
     `# Part 1: the vocabulary`,
@@ -231,16 +231,16 @@ function engineFilesOf(families: readonly string[]): EngineFamily[] {
 function main(log: Log): void {
   const args = process.argv.slice(2).filter((arg) => !arg.startsWith("--"));
   const id = args[0];
-  if (id === undefined || args.length > 1) throw new Error("Usage: pnpm author:pack <scenario-id> [--no-draft]");
+  if (id === undefined || args.length > 1) throw new Error("Usage: pnpm scenario pack <scenario-id> [--no-draft]");
   if (!existsSync(path.join(ROOT, "data", "scenarios", `${id}.json`))) throw new Error(`${id} is not a scenario in data/scenarios`);
   if (!process.argv.includes("--no-draft")) {
     const drafted = spawnSync("node", ["--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "scripts/data/effects/draft.ts", id], { cwd: ROOT, encoding: "utf8" });
-    if (drafted.status !== 0) throw new Error(`effects:draft ${id} failed:\n${drafted.stdout}${drafted.stderr}`);
+    if (drafted.status !== 0) throw new Error(`effects draft ${id} failed:\n${drafted.stdout}${drafted.stderr}`);
     log.debug(drafted.stderr.trim());
   }
   const draftsDir = path.join(ROOT, DRAFTS_DIR);
   const vocabularyPath = path.join(draftsDir, "vocabulary.md");
-  if (!existsSync(vocabularyPath)) throw new Error(`${DRAFTS_DIR}/vocabulary.md is missing: run pnpm effects:draft ${id} first`);
+  if (!existsSync(vocabularyPath)) throw new Error(`${DRAFTS_DIR}/vocabulary.md is missing: run pnpm effects draft ${id} first`);
   // Only the drafts of the scenario's own cards: with --no-draft the folder may hold another scenario's.
   const present = readdirSync(draftsDir).filter((name) => name.endsWith(".md") && name !== "vocabulary.md").sort();
   const { kept, others } = draftsOfScenario(present, dealtCodes(loadCampaigns(), [loadScenario(id)], { nightmare: true }));

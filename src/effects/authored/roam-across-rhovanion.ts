@@ -9,7 +9,7 @@ import { AUTHORED_EFFECTS as THE_WITHERED_HEATH } from "./the-withered-heath.ts"
 import { copyLine, withCopies } from "./reprint.ts";
 
 // Records for Roam Across Rhovanion (Ered Mithrin part 5, campaign card 12184): the encounter cards no template reads, the four objectives Urdug, Tiny, Durin's Key and Urdug's Horn, the five quest stages and the campaign card. Urdug's Cunning (12185) and Misplaced Trust (12186) are in pool/EMCE.ts.
-// Every line is read from the scan ledger (data/printed/ered-mithrin.json); a line a template already writes (pnpm data:build) or another card prints word for word needs no record here. The piles place the objectives set aside (Durin's Key, Urdug's Horn, Urdug with his enemy side, Tiny with his enemy side);
+// Every line is read from the scan ledger (data/printed/ered-mithrin.json); a line a template already writes (pnpm data build) or another card prints word for word needs no record here. The piles place the objectives set aside (Durin's Key, Urdug's Horn, Urdug with his enemy side, Tiny with his enemy side);
 // stage 1A's Setup puts Urdug under the first player. The campaign card's Setup is dealt by src/campaign/checklist.ts (the boon ally search, the Melanwar removal) and src/rules/setup/setup.ts (the trust in Urdug, after the quest card's Setup); its back stays in the campaign zone all game.
 // Rules: emce.setup-roam-across-rhovanion, emce.indestructible, emce.guarded-x, emce.deep, emce.caves-deck, rr.objective-cards, rr.guarded, rr.cancel, rr.search, rr.victory (data/rules/entries.json).
 const URDUG = "19052";

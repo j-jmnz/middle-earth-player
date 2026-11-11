@@ -15,7 +15,7 @@ import { syncRules } from "./sources/rules.ts";
 import { syncScans } from "./sources/scans.ts";
 
 // The only network command. Refreshes data/raw and .cache/pdf, then records every pin in data/sources.json.
-// Usage: pnpm data:sync [ringsdb|hallofbeorn|dragncards|rules|scans|pictures|nightmare|icons]... [--verbose]
+// Usage: pnpm data sync [ringsdb|hallofbeorn|dragncards|rules|scans|pictures|nightmare|icons]... [--verbose]
 // --verbose logs every request with its status, size and time.
 const ADAPTERS: Record<string, (log: Log) => Promise<SourceRecord>> = {
   ringsdb: syncRingsDb,
@@ -44,10 +44,10 @@ void runScript("data:sync", async (log) => {
   const unknown = wanted.filter((id) => !ADAPTERS[id]);
   if (unknown.length > 0) throw new Error(`Unknown source ${unknown.join(", ")}. Sources: ${Object.keys(ADAPTERS).join(", ")}`);
   const ids = wanted.length > 0 ? wanted : Object.keys(ADAPTERS);
-  // scans, pictures and nightmare read data/cards, so they run after a build; a bare `data:sync` leaves them to the explicit command.
+  // scans, pictures and nightmare read data/cards, so they run after a build; a bare `data sync` leaves them to the explicit command.
   if (wanted.length === 0) {
     for (const id of ["scans", "pictures", "nightmare"]) ids.splice(ids.indexOf(id), 1);
-    log.info("scans, pictures and nightmare are skipped without naming them (they read data/cards: run pnpm data:build, then pnpm data:sync scans pictures nightmare)");
+    log.info("scans, pictures and nightmare are skipped without naming them (they read data/cards: run pnpm data build, then pnpm data sync scans pictures nightmare)");
   }
   log.info(`sources: ${ids.join(", ")}`);
   const file = path.join(DATA_DIR, "sources.json");
@@ -74,7 +74,7 @@ void runScript("data:sync", async (log) => {
   const sorted = Object.fromEntries(Object.entries(records).sort(([a], [b]) => a.localeCompare(b)));
   mkdirSync(DATA_DIR, { recursive: true });
   writeFileSync(file, `${JSON.stringify({ sources: sorted }, null, 2)}\n`);
-  log.info(`wrote ${path.relative(process.cwd(), file)}; run pnpm data:build next`);
+  log.info(`wrote ${path.relative(process.cwd(), file)}; run pnpm data build next`);
   // The booklet PDFs the app bundles come from the rules just fetched (assets/booklets, read by metro.config.js).
   if (ids.includes("rules")) await packBookletsHere(log.child("booklets"));
 });

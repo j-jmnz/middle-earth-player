@@ -1,5 +1,5 @@
 // The scripts' one logger. Every line carries the time since the script started, the script's tag and, for a warning or an
-// error, the level: "+1.4s data:sync › ringsdb  141 packs". Lines go to stderr, so stdout stays for data (data:query's rows).
+// error, the level: "+1.4s data:sync › ringsdb  141 packs". Lines go to stderr, so stdout stays for data (data query's rows).
 //
 // Level: --verbose (or LOG_LEVEL=debug) adds the per-file detail and error stacks; --quiet (or LOG_LEVEL=warn) keeps
 // warnings and errors only; LOG_LEVEL=silent drops everything. Under Vitest the default is silent, so a test that calls

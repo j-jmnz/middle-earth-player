@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-// One rule span of data/rules/entries.json: `pnpm data:build` cuts it out of its PDF column from the hand-checked quotes in
+// One rule span of data/rules/entries.json: `pnpm data build` cuts it out of its PDF column from the hand-checked quotes in
 // data/rules/index.json (scripts/data/rules/spans.ts). `page` is the PDF page, the page the booklet reader opens on.
 export const ruleEntrySchema = z.strictObject({
   id: z.string().min(1),

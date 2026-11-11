@@ -36,7 +36,7 @@ export type PackBookletsOptions = {
 /**
  * Copies each book's pinned PDF into the app's assets and writes the map the reader installs from. The `.cache/pdf` copy
  * is used when its hash matches the pin; otherwise the pinned URL is fetched (an EAS machine has no cache). Bytes that do
- * not match the pin fail the build: run `pnpm data:sync rules` to move the pin.
+ * not match the pin fail the build: run `pnpm data sync rules` to move the pin.
  */
 export async function packBooklets(options: PackBookletsOptions, log: Log): Promise<PackedBooklet[]> {
   const { sources } = JSON.parse(readFileSync(options.sourcesPath, "utf8")) as { sources: Partial<Record<string, SourceRecord>> };
@@ -58,7 +58,7 @@ export async function packBooklets(options: PackBookletsOptions, log: Log): Prom
       log.info(`${id}: ${file} not in the cache at its pin, fetching ${pin.url}`);
       const body = await fetchPdf(pin.url);
       const hash = sha256(body);
-      if (hash !== pin.sha256) throw new Error(`${pin.url} has sha256 ${hash}, pinned ${pin.sha256}. Run pnpm data:sync rules and check the change.`);
+      if (hash !== pin.sha256) throw new Error(`${pin.url} has sha256 ${hash}, pinned ${pin.sha256}. Run pnpm data sync rules and check the change.`);
       writeFileSync(target, body);
     }
     packed.push({ id, filename, bytes: pin.bytes, sha256: pin.sha256 });
@@ -79,7 +79,7 @@ function writeBookletMap(mapPath: string, packed: readonly PackedBooklet[]): voi
   );
 }
 
-/** Packs from this checkout's pins and PDF cache into `assets/booklets`. `data:sync rules` runs it after a fetch. */
+/** Packs from this checkout's pins and PDF cache into `assets/booklets`. `data sync rules` runs it after a fetch. */
 export function packBookletsHere(log: Log): Promise<PackedBooklet[]> {
   return packBooklets({ sourcesPath: path.join(DATA_DIR, "sources.json"), pdfCacheDir: PDF_CACHE_DIR, outDir: BOOKLET_PACK_DIR }, log);
 }

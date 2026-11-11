@@ -1,4 +1,4 @@
-// Written by pnpm data:build (scripts/data/icons.ts). Do not edit.
+// Written by pnpm data build (scripts/data/icons.ts). Do not edit.
 // The asset of each icon, for expo-image (SVG and PNG) and Skia images. Imported by components only: Node tests read
 // ./generated.ts.
 import type { CardBackName, IconName } from "./generated";

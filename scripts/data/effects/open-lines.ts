@@ -27,7 +27,7 @@ export function openLines(cards: readonly Card[], ledger: Ledger, campaign: Camp
 
 export function renderOpenLines(open: readonly string[]): string {
   return [
-    `// Written by pnpm effects:open from data/ and src/effects. Do not edit.`,
+    `// Written by pnpm effects open from data/ and src/effects. Do not edit.`,
     `// Printed lines that no effect record owns yet ("<code>:<side>:<n>"). A card with one here shows its text as inactive.`,
     `export const OPEN_LINES: readonly string[] = [`,
     ...open.map((id) => `  "${id}",`),

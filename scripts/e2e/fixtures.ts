@@ -2,9 +2,9 @@
 // (A Knife in the Dark) and the file of every other scenario in the registry, for the Maestro flows. Run it again when
 // src/campaign/fixtures.test.ts reports that a fixture no longer reaches its moment:
 //
-//   pnpm e2e:fixtures                 # `lost` and `duo`, then every other scenario's file
-//   pnpm e2e:fixtures --won           # also search for `won`, then write `knife-lost`
-//   pnpm e2e:fixtures <scenario-id>   # only that scenario's file (scenario 1's block for its two ids)
+//   pnpm scenario fixtures                 # `lost` and `duo`, then every other scenario's file
+//   pnpm scenario fixtures --won           # also search for `won`, then write `knife-lost`
+//   pnpm scenario fixtures <scenario-id>   # only that scenario's file (scenario 1's block for its two ids)
 //
 // With a scenario id, a part after the first takes the earlier parts' won games from their committed files, so the other files are not rewritten.
 //

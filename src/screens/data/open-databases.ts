@@ -65,7 +65,7 @@ async function openDatabasesOnce(): Promise<AppDatabases> {
     catalogSqlite = await openCatalog(true);
     replaced = true;
     if (!catalogFileIsCurrent(await stampOf(catalogSqlite), CATALOG_VERSION)) {
-      console.warn("The bundled catalog.db does not match this build's CATALOG_VERSION: run pnpm catalog:build and rebuild");
+      console.warn("The bundled catalog.db does not match this build's CATALOG_VERSION: run pnpm assets catalog and rebuild");
     }
   }
   await catalogSqlite.execAsync("PRAGMA query_only = ON");

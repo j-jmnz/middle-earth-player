@@ -5,7 +5,7 @@ import { AUTHORED_EFFECTS as THE_WITHERED_HEATH } from "./the-withered-heath.ts"
 import { copyLine, withCopies } from "./reprint.ts";
 
 // Records for Fire in the Night (Ered Mithrin part 6, campaign card 12187): Hrogar's Hill, the eight encounter side quests, Dagnir, the encounter cards no template reads, Beldis and the campaign card.
-// Every line is read from the scan ledger (data/printed/ered-mithrin.json); a line a template already writes (pnpm data:build) or another card prints word for word needs no record here. The piles place Dagnir in the staging area and the side quests in the side quest deck
+// Every line is read from the scan ledger (data/printed/ered-mithrin.json); a line a template already writes (pnpm data build) or another card prints word for word needs no record here. The piles place Dagnir in the staging area and the side quests in the side quest deck
 // (`sideQuestDeck`, a pile of its own: families/wilderland/night.ts); the quest card's Setup shuffles it. A side quest is a quest card and an encounter card: it is revealed into the staging area, cannot have its When Revealed canceled, may be the current quest and is added to the victory display when it
 // is defeated (emce.side-quests, emce.side-quests-in-play). The campaign card's Setup is dealt by src/campaign/start.ts and src/campaign/checklist.ts.
 // Rules: emce.setup-fire-in-the-night, emce.side-quests, emce.side-quests-in-play, emce.boon-allies, emce.treasure, emce.campaign-log, emce.immune, rr.attacks-outside-the-combat-phase, rr.damage, rr.first-player (data/rules/entries.json).

@@ -67,7 +67,7 @@ describe("pictures", () => {
     expect(keys.filter((key) => key.endsWith(".B")).sort()).toEqual(["01129.B", "01130.B", "01131.B", "41050.B", "41051.B"]);
   });
 
-  // A card added to data/cards after the last `pnpm data:sync pictures` has no picture pin, and the app bundles its small scan instead (the
+  // A card added to data/cards after the last `pnpm data sync pictures` has no picture pin, and the app bundles its small scan instead (the
   // Dream-chaser cards did, user report 2026-10-31). Every card a built scenario deals has a side A picture, except the cards no source pictures.
   it("pins a picture for every card a built scenario deals", () => {
     const { sources } = JSON.parse(readFileSync(path.join(DATA_DIR, "sources.json"), "utf8")) as { sources: Record<string, { files: { path: string }[] } | undefined> };
@@ -86,8 +86,8 @@ describe("pictures", () => {
         if (!pinned.has(code) && !unpictured.has(code)) missing.push(`${id} ${code}`);
       }
     }
-    expect(missing, "Run pnpm data:sync pictures").toEqual([]);
+    expect(missing, "Run pnpm data sync pictures").toEqual([]);
     const scanned = new Set((sources.scans?.files ?? []).map((file) => /^scans\/(\w+)\.A\./.exec(file.path)?.[1]).filter((code) => code != null));
-    expect(emce.filter((code) => !scanned.has(code)), "Run pnpm data:sync scans").toEqual([]);
+    expect(emce.filter((code) => !scanned.has(code)), "Run pnpm data sync scans").toEqual([]);
   });
 });

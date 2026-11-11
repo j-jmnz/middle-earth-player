@@ -17,7 +17,7 @@ import { describeError, runScript, type Log } from "../log.ts";
 // is one the engine offered; a throw, a refusal or `state.failure` is a problem, reported with the intent and the step.
 // It proves that the records run without breaking the game, not that they do what the card says.
 //
-// Usage: pnpm smoke:cards <code>... [--all] [--deal=<n>] [--seed=<n>] [--steps=<n>] [--verbose]
+// Usage: pnpm test smoke <code>... [--all] [--deal=<n>] [--seed=<n>] [--steps=<n>] [--verbose]
 // --deal seeds the starter game, --seed the dice that choose among the card's intents.
 
 export { smokeCodes, smokeWorld, type SmokeWorld };

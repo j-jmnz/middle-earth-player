@@ -6,7 +6,7 @@ import { AUTHORED_EFFECTS as LOST_IN_MIRKWOOD } from "./lost-in-mirkwood.ts";
 import { copyLine, withCopies } from "./reprint.ts";
 
 // Records for The Ghost of Framsburg (Ered Mithrin part 7, campaign card 12189): the Loot objectives, the locations with the Discover keyword, the encounter cards no template reads, Fram's Shade, the three quest stages and the campaign card. Ashen Brazier (12190),
-// Gundabad Hunter (12191) and Gundabad Stalker (12192) are in pool/EMCE.ts. Every line is read from the scan ledger (data/printed/ered-mithrin.json); a line a template already writes (pnpm data:build) or another card prints word for word needs no record here.
+// Gundabad Hunter (12191) and Gundabad Stalker (12192) are in pool/EMCE.ts. Every line is read from the scan ledger (data/printed/ered-mithrin.json); a line a template already writes (pnpm data build) or another card prints word for word needs no record here.
 // A Loot objective enters play only through the Discover keyword of the active location, which attaches it to the location as a guarded objective (emce.discover, emce.loot); once nothing guards it the first player claims it (`ClaimWhenFree`) and attaches it to a hero.
 // "The Loot objectives the players control" is a count of the claimed ones (`lootKeyword`, `controlled`). The Discover keyword is a Forced effect of the location when it becomes the active location; the Response of Crypt Key adjusts its value before it resolves (families/wilderland/discover.ts).
 // Rules: emce.discover, emce.loot, emce.setup-the-ghost-of-framsburg, emce.guarded-x, emce.treasure, emce.campaign-pool-encounter, emce.immune, rr.guarded, rr.first-player, rr.travel (data/rules/entries.json).

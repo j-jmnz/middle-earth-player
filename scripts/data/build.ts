@@ -23,7 +23,7 @@ import { buildSteps } from "./rules/steps.ts";
 import { buildEntries, indexSchema } from "./rules/spans.ts";
 
 // Offline and deterministic: data/raw -> data/cards. The same input writes the same bytes.
-// DATA_OUT overrides the output directory so data:check can build into a temporary one.
+// DATA_OUT overrides the output directory so data check can build into a temporary one.
 function cardsFile(card: Card): string {
   return card.printings[0]?.pack ?? "unknown";
 }

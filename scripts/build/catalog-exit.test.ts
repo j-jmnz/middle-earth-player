@@ -18,7 +18,7 @@ describe("built catalog", () => {
   it("is the catalog src/catalog/version.ts says it is", () => {
     const scratch = mkdtempSync(path.join(tmpdir(), "catalog-version-"));
     const built = buildCatalog({ dbPath: path.join(scratch, "catalog.db"), versionPath: path.join(scratch, "version.ts") });
-    expect(built.version, "Run pnpm catalog:build and commit src/catalog/version.ts").toBe(CATALOG_VERSION);
+    expect(built.version, "Run pnpm assets catalog and commit src/catalog/version.ts").toBe(CATALOG_VERSION);
   });
 
   it("reads the Fellowship hero and campaign rows from the built database", async () => {

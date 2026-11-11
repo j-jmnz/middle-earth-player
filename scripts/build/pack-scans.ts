@@ -54,7 +54,7 @@ type Pin = SourceFile & { cacheDir: string };
  * `<code>.B` and keyed so in the map (src/play/canvas/picture-key.ts). The file is the
  * card's `pictures` file of data/sources.json when it has one, else its `scans` file: the cached copy is used when its
  * hash matches the pin; otherwise the pinned URL is fetched (an EAS machine has no cache), and a PDF page is rendered from
- * the pinned PDF. Bytes that do not match the pin fail the build: run `pnpm data:sync scans pictures` to move the pins.
+ * the pinned PDF. Bytes that do not match the pin fail the build: run `pnpm data sync scans pictures` to move the pins.
  * A picture larger than MAX_SIDE is scaled down to it. A card with neither is drawn as its text.
  */
 export async function packScans(options: PackScansOptions, log: Log): Promise<PackedScan[]> {
@@ -145,7 +145,7 @@ export async function packScans(options: PackScansOptions, log: Log): Promise<Pa
   writeFileSync(path.join(options.scansDir, STAMP_FILE), `${JSON.stringify(stamp)}\n`);
   if (notes.noPdftoppm.length > 0) {
     log.warn(
-      `pdftoppm is not installed, so ${notes.noPdftoppm.length} cards drawn from FFG's PDFs use their older scans (${notes.noPdftoppm.sort().join(", ")}). Install poppler (macOS: brew install poppler; Debian or Ubuntu: apt install poppler-utils) and run pnpm scans:pack again.`,
+      `pdftoppm is not installed, so ${notes.noPdftoppm.length} cards drawn from FFG's PDFs use their older scans (${notes.noPdftoppm.sort().join(", ")}). Install poppler (macOS: brew install poppler; Debian or Ubuntu: apt install poppler-utils) and run pnpm assets scans again.`,
     );
   }
   if (notes.rehashed.length > 0) log.info(`${notes.rehashed.length} PDF pages rendered with a different poppler version than their pins; the fresh renders are bundled`);
@@ -204,11 +204,11 @@ async function loadPin(pin: Pin, context: LoadContext, log: Log): Promise<{ body
   const page = pageOf(pin.url);
   if (page) {
     const pdfPin = context.pdfPins.get(page.pdf);
-    if (!pdfPin) throw new Error(`${pin.path} is a page of ${page.pdf}, which data/sources.json does not pin. Run pnpm data:sync pictures.`);
+    if (!pdfPin) throw new Error(`${pin.path} is a page of ${page.pdf}, which data/sources.json does not pin. Run pnpm data sync pictures.`);
     const pdfFile = path.join(context.pdfCacheDir, path.basename(pdfPin.path));
     if (!existsSync(pdfFile) || sha256(readFileSync(pdfFile)) !== pdfPin.sha256) {
       const body = await context.fetchScan(pdfPin.url);
-      if (sha256(body) !== pdfPin.sha256) throw new Error(`${pdfPin.url} has sha256 ${sha256(body)}, pinned ${pdfPin.sha256}. Run pnpm data:sync pictures and check the change.`);
+      if (sha256(body) !== pdfPin.sha256) throw new Error(`${pdfPin.url} has sha256 ${sha256(body)}, pinned ${pdfPin.sha256}. Run pnpm data sync pictures and check the change.`);
       mkdirSync(context.pdfCacheDir, { recursive: true });
       writeFileSync(pdfFile, body);
     }
@@ -228,7 +228,7 @@ async function loadPin(pin: Pin, context: LoadContext, log: Log): Promise<{ body
   log.debug(`${pin.path} not in the cache at its pin, fetching ${pin.url}`);
   const body = await context.fetchScan(pin.url);
   const hash = sha256(body);
-  if (hash !== pin.sha256) throw new Error(`${pin.url} has sha256 ${hash}, pinned ${pin.sha256}. Run pnpm data:sync scans pictures and check the change.`);
+  if (hash !== pin.sha256) throw new Error(`${pin.url} has sha256 ${hash}, pinned ${pin.sha256}. Run pnpm data sync scans pictures and check the change.`);
   mkdirSync(pin.cacheDir, { recursive: true });
   writeFileSync(cached, body);
   return { body, fetched: true };

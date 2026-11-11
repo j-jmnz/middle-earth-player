@@ -8,7 +8,7 @@ import { copyLine, withCopies } from "./reprint.ts";
 
 // Records for The Uruk-hai (the-two-towers part 1, campaign card 143071, whose records are in the-two-towers.ts): the boons the Fellowship campaign places (Permanent, attached to a hero), the pursuit tracker
 // (mec112.pursuit: set by the quest card's Setup, raised and lowered by the cards below, read as X by both quest stages), the Captives (heroes lying faceup under To Isengard! or held by Grishnákh,
-// families/captives) and the encounter cards no template reads. Every line is read from the scan ledger (data/printed/the-two-towers.json); a line a template already writes (pnpm data:build) or another card prints
+// families/captives) and the encounter cards no template reads. Every line is read from the scan ledger (data/printed/the-two-towers.json); a line a template already writes (pnpm data build) or another card prints
 // word for word needs no record here. The piles place Uglúk, To Isengard! and Eastemnet (the first two sentences of 143069:A:1); its record chooses the Captives and sets the pursuit value.
 // Rules: mec112.pursuit, mec112.permanent, mec112.toughness, rr.attachment-cards, rr.lasting-effects, rr.step-6-8b, rr.player-elimination, rr.quest-advancement, rr.reveal, rr.travel, faq.additional-attacks (data/rules/entries.json).
 const NON_UNIQUE_ENEMY: PickSpec = { type: "enemy", control: "any", nonUnique: true };

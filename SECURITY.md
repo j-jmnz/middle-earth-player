@@ -6,11 +6,11 @@ What the app stores and sends: [PRIVACY.md](PRIVACY.md). No accounts, backend, a
 
 A release phone build makes one kind of request: a pasted RingsDB deck link fetches that deck's public JSON from `ringsdb.com`, plus the name of any card the app does not know (`src/screens/routes/deck-import.tsx`). Nothing else calls `fetch`.
 
-Card pictures are bundled (`pnpm scans:pack`). In a release build `remotePictureUrl` (`src/screens/images/remote.native.ts`) returns no URL, so a card without a bundled picture is drawn as text. Development and web builds (`remote.ts`) download such pictures from `ringsdb.com` or the Hall of Beorn and DragnCards buckets on `s3.amazonaws.com`. `src/screens/images/policy.ts` refuses any other host, non-HTTPS URLs and URLs with credentials, a port, a query or `..`.
+Card pictures are bundled (`pnpm assets scans`). In a release build `remotePictureUrl` (`src/screens/images/remote.native.ts`) returns no URL, so a card without a bundled picture is drawn as text. Development and web builds (`remote.ts`) download such pictures from `ringsdb.com` or the Hall of Beorn and DragnCards buckets on `s3.amazonaws.com`. `src/screens/images/policy.ts` refuses any other host, non-HTTPS URLs and URLs with credentials, a port, a query or `..`.
 
 Android permissions: `INTERNET` (deck import) and `VIBRATE` (haptics). `app.json` (`android.blockedPermissions`) removes the overlay and external-storage permissions Expo and its libraries would add. iOS: none. Rulebook PDFs open through the system file picker, which needs no permission.
 
-At build time only `pnpm data:sync` uses the network. It fetches the sources in `data/sources.json` and checks each against its pinned sha256 or git commit.
+At build time only `pnpm data sync` uses the network. It fetches the sources in `data/sources.json` and checks each against its pinned sha256 or git commit.
 
 ## Supply chain
 

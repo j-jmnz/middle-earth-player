@@ -272,7 +272,7 @@ function writeDatabase(
 function fetchedDay(dataDir: string): string {
   const sources = JSON.parse(readFileSync(path.join(dataDir, "sources.json"), "utf8")) as { sources: Record<string, { fetchedAt: string }> };
   const fetchedAt = sources.sources.ringsdb?.fetchedAt;
-  if (!fetchedAt) throw new Error("data/sources.json has no ringsdb fetchedAt. Run pnpm data:sync.");
+  if (!fetchedAt) throw new Error("data/sources.json has no ringsdb fetchedAt. Run pnpm data sync.");
   return fetchedAt.slice(0, 10);
 }
 
