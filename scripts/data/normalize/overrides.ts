@@ -97,6 +97,8 @@ const overridesSchema = z.object({
         kind: z.enum(["campaign", "cycle"]),
         rco: z.boolean(),
         box: z.string().min(1).optional(),
+        // The US release of its first product (hallofgondor.com/release-dates), the order the hubs list it in.
+        released: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
         products: z.array(z.string().min(1)).min(1),
         reason: z.string().min(1),
         source: z.string().min(1),

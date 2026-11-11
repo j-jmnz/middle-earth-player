@@ -9,7 +9,8 @@ import type { RawData } from "./load-raw.ts";
 // data/campaigns/index.json. A built campaign lists the scenario count Hall of Beorn gives its products and is playable when
 // at least one of its scenarios is (src/campaign/playable.ts); otherwise its tile stays locked. Each override campaign or box is
 // locked, counted from the scenarios Hall of Beorn lists under its products, which no other entry names. A campaign
-// override names its RCO box; a cycle has none.
+// override names its RCO box; a cycle has none. The file keeps the build order (the effect barrel's); the catalog query sorts by
+// `released`.
 export function buildCampaignIndex(
   raw: Pick<RawData, "scenarioIndex">,
   overrides: Pick<Overrides, "campaigns">,
@@ -28,7 +29,7 @@ export function buildCampaignIndex(
     const listed = count(new Set(def.products));
     if (listed !== campaign.scenarios.length) throw new Error(`campaign index: ${campaign.id} builds ${campaign.scenarios.length} scenarios, Hall of Beorn lists ${listed}`);
     for (const product of def.products) claimed.set(product, campaign.id);
-    index.push({ id: campaign.id, name: campaign.name, scenarioCount: campaign.scenarios.length, playable: campaign.scenarios.some((id) => playable.includes(id)), kind: "campaign", rco: def.rco, box: null });
+    index.push({ id: campaign.id, name: campaign.name, scenarioCount: campaign.scenarios.length, playable: campaign.scenarios.some((id) => playable.includes(id)), kind: "campaign", rco: def.rco, box: null, released: def.released });
   }
   for (const campaign of overrides.campaigns) {
     const empty = campaign.products.filter((product) => count(new Set([product])) === 0);
@@ -40,7 +41,7 @@ export function buildCampaignIndex(
       claimed.set(product, campaign.id);
     }
     if ((campaign.kind === "campaign") !== (campaign.box !== undefined)) throw new Error(`campaign index: ${campaign.id} is a ${campaign.kind}; a campaign names its box and a cycle does not`);
-    index.push({ id: campaign.id, name: campaign.name, scenarioCount, playable: false, kind: campaign.kind, rco: campaign.rco, box: campaign.box ?? null });
+    index.push({ id: campaign.id, name: campaign.name, scenarioCount, playable: false, kind: campaign.kind, rco: campaign.rco, box: campaign.box ?? null, released: campaign.released });
   }
   return index;
 }

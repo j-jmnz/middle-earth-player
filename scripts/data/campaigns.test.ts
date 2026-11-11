@@ -40,6 +40,28 @@ describe("data/campaigns/index.json", () => {
     expect(index.filter((entry) => !entry.playable && entry.kind === "campaign").map((entry) => entry.box)).toEqual(["The Return of the King Saga Expansion", "Angmar Awakened Campaign Expansion"]);
   });
 
+  it("dates every campaign and cycle by the US release of the product that starts it, the order the hubs list them in", () => {
+    const byRelease = [...index].sort((left, right) => left.released.localeCompare(right.released) || left.id.localeCompare(right.id)).map((entry) => `${entry.released} ${entry.id}`);
+    expect(byRelease).toEqual([
+      "2011-07-22 shadows-of-mirkwood",
+      "2011-09-21 standalone-scenarios",
+      "2012-01-06 dwarrowdelf",
+      "2012-08-17 the-hobbit",
+      "2012-11-26 against-the-shadow",
+      "2014-02-21 the-ring-maker",
+      "2016-11-23 haradrim",
+      "2019-08-02 vengeance-of-mordor",
+      "2022-01-28 mirkwood-paths",
+      "2022-02-25 the-dark-of-mirkwood",
+      "2022-08-19 angmar-awakened",
+      "2022-10-14 fellowship-of-the-ring",
+      "2023-07-07 dream-chaser",
+      "2023-10-06 the-two-towers",
+      "2024-06-28 ered-mithrin",
+      "2024-10-10 the-return-of-the-king",
+    ]);
+  });
+
   it("accounts for every official product Hall of Beorn lists: built, coming later, or a reprint the app plays from its revised box", () => {
     const products = new Set(hobScenarioIndexSchema.parse(JSON.parse(readFileSync(path.join(DATA_DIR, "raw", "hallofbeorn", "Scenarios.json"), "utf8"))).map((entry) => entry.Product));
     const listed = new Set([...CAMPAIGNS.flatMap((campaign) => campaign.products), ...overrides.campaigns.flatMap((campaign) => campaign.products)]);
@@ -134,7 +156,7 @@ describe("data/campaigns/index.json", () => {
 
   it("refuses an override whose packs Hall of Beorn lists no scenario for", () => {
     const campaign = loadCampaign();
-    const entry = { id: "x", name: "X", kind: "cycle" as const, rco: false, products: ["Some Pack", "No Such Pack"], reason: "r", source: "s" };
+    const entry = { id: "x", name: "X", kind: "cycle" as const, rco: false, released: "2011-01-01", products: ["Some Pack", "No Such Pack"], reason: "r", source: "s" };
     const scenarioIndex = [
       ...campaign.scenarios.map((id, at) => ({ Title: id, Slug: id, Product: at < 3 ? "The Black Riders" : "The Road Darkens", Number: at + 1 })),
       { Title: "Some Scenario", Slug: "Some-Scenario", Product: "Some Pack", Number: 1 },
@@ -148,8 +170,8 @@ describe("data/campaigns/index.json", () => {
       ...campaign.scenarios.map((id, at) => ({ Title: id, Slug: id, Product: at < 3 ? "The Black Riders" : "The Road Darkens", Number: at + 1 })),
       { Title: "Some Scenario", Slug: "Some-Scenario", Product: "Some Pack", Number: 1 },
     ];
-    const box = { id: "x", name: "X", kind: "cycle" as const, rco: false, products: ["Some Pack"], reason: "r", source: "s" };
-    expect(buildCampaignIndex({ scenarioIndex }, { campaigns: [box] }, campaign).at(-1)).toEqual({ id: "x", name: "X", scenarioCount: 1, playable: false, kind: "cycle", rco: false, box: null });
+    const box = { id: "x", name: "X", kind: "cycle" as const, rco: false, released: "2011-01-01", products: ["Some Pack"], reason: "r", source: "s" };
+    expect(buildCampaignIndex({ scenarioIndex }, { campaigns: [box] }, campaign).at(-1)).toEqual({ id: "x", name: "X", scenarioCount: 1, playable: false, kind: "cycle", rco: false, box: null, released: "2011-01-01" });
     expect(buildCampaignIndex({ scenarioIndex }, { campaigns: [{ ...box, kind: "campaign", rco: true, box: "X Saga Expansion" }] }, campaign).at(-1)).toMatchObject({ kind: "campaign", rco: true, box: "X Saga Expansion" });
     expect(() => buildCampaignIndex({ scenarioIndex }, { campaigns: [{ ...box, kind: "campaign" }] }, campaign)).toThrow("a campaign names its box");
     expect(() => buildCampaignIndex({ scenarioIndex }, { campaigns: [{ ...box, products: ["The Black Riders"] }] }, campaign)).toThrow("x and fellowship-of-the-ring both name the product The Black Riders");

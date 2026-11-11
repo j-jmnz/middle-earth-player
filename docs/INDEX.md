@@ -35,8 +35,8 @@ Read the sections your task touches.
   - 12–27 Contents (~190)
   - 28–33 Privacy and security (~120)
   - 34–39 How the code is written (~120)
-  - 40–48 Features (~220)
-  - 49–71 Roadmap (~690)
+  - 40–48 Features (~230)
+  - 49–71 Roadmap (~710)
   - 72–75 Accessibility (~90)
   - 76–85 Architecture (~200)
   - 86–135 Install (~850)
@@ -168,7 +168,7 @@ Read the sections your task touches.
   - 230–244 Icons (~480) ← 7
   - 245–263 Card art (~740) ← 2
   - 264–278 Tablets (~510) ← 13
-  - 279–460 Screens (~15.3K)
+  - 279–460 Screens (~15.4K)
     - 283–286 Splash (~40)
     - 287–290 App icon (~80)
     - 291–306 Campaigns (campaign list) (~1.5K) ← 6

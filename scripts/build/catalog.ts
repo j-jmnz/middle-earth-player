@@ -309,7 +309,7 @@ export function buildCatalog(options: BuildCatalogOptions = {}): BuildCatalogRes
   const metaRows = included.map((pack) => rowFrom(meta, { pack_code: pack.code, fetched_at: day }));
   const campaignRows = campaignIndexSchema
     .parse(JSON.parse(readFileSync(path.join(dataDir, "campaigns", "index.json"), "utf8")) as unknown)
-    .map((entry) => rowFrom(campaigns, { id: entry.id, name: entry.name, scenario_count: entry.scenarioCount, playable: bit(entry.playable), kind: entry.kind, rco: bit(entry.rco), box: entry.box }));
+    .map((entry) => rowFrom(campaigns, { id: entry.id, name: entry.name, scenario_count: entry.scenarioCount, playable: bit(entry.playable), kind: entry.kind, rco: bit(entry.rco), box: entry.box, released: entry.released }));
 
   const version = contentVersion([packRows, cardRows, campaignRows]);
   const before = existsSync(versionPath) ? /CATALOG_VERSION = (\d+);/.exec(readFileSync(versionPath, "utf8"))?.[1] : undefined;
