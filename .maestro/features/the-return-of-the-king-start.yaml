@@ -1,6 +1,6 @@
 appId: com.middleearth.lcg
 ---
-# Phase 70. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and a catalog in which `the-return-of-the-king`
+# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and a catalog in which `the-return-of-the-king`
 # is marked playable (its first scenario in PLAYABLE_SCENARIOS; until then the campaign tile is locked and `locked-the-return-of-the-king` is the one thing to see).
 # Starts The Return of the King from a fresh phone: no finished Two Towers playthrough, so no "Continue the saga" section, and an empty log. The first scenario,
 # The Passing of the Grey Company, grants the first player Aragorn, so the briefing asks for no Ring-bearer slot. The log's notes rows (the resources on The Corsair
@@ -36,7 +36,7 @@ appId: com.middleearth.lcg
 - assertNotVisible:
     id: log-black-gate-tokens
 - assertNotVisible:
-    id: log-ring
+    id: log-campaign-end
 - tapOn:
     id: log-back
 - tapOn:

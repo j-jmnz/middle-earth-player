@@ -17,7 +17,7 @@ import { seatWord } from "../data/seats";
 export type CarryChoice = { saveId: string; label: string; source: string; words: string; cards: readonly PoolCard[] };
 
 /** One finished save of the box before this one that a new save may continue (docs/brief.md, The Two Towers): the whole log is copied, so the choice carries the save's log and seat count. */
-export type ContinueChoice = { saveId: string; label: string; source: string; words: string; seatCount: 1 | 2; from: Pick<Save, "id" | "seatCount" | "log"> };
+export type ContinueChoice = { saveId: string; label: string; source: string; words: string; seatCount: 1 | 2; from: Pick<Save, "id" | "campaignId" | "seatCount" | "log"> };
 
 type Stores = { saves: ListedSave[]; archived: ListedSave[]; saved: ReadonlyMap<string, number> };
 
@@ -50,7 +50,7 @@ export function useCarryChoices(catalog: AppDatabases["catalog"], user: AppDatab
   const continues = continuing.flatMap((offer): ContinueChoice[] => {
     const from = every.find((save) => save.id === offer.saveId);
     return from
-      ? [{ saveId: offer.saveId, label: campaignOf(offer.campaignId)?.name ?? offer.campaignId, source: carrySource(seatWord(offer.seatCount), stores.saved.get(offer.saveId) ?? null, offer.score), words: continueWords(offer), seatCount: offer.seatCount, from: { id: from.id, seatCount: from.seatCount, log: from.log } }]
+      ? [{ saveId: offer.saveId, label: campaignOf(offer.campaignId)?.name ?? offer.campaignId, source: carrySource(seatWord(offer.seatCount), stores.saved.get(offer.saveId) ?? null, offer.score), words: continueWords(offer), seatCount: offer.seatCount, from: { id: from.id, campaignId: from.campaignId, seatCount: from.seatCount, log: from.log } }]
       : [];
   });
   return { carry, continues };

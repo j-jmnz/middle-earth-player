@@ -12,7 +12,7 @@ import {
 import { CAMPAIGNS, CAMPAIGN_SUFFIX, productOf, scenarioDefs, scenarioSlug, type CampaignDef } from "../campaign-defs.ts";
 import { PLAYER_TYPES, type Overrides } from "./cards.ts";
 import { clausesOf, codesOf, nameIndex, parseSetup, type ParsedSetup } from "./setup-text.ts";
-import { pileAccepts, questFacts } from "./scenario-piles.ts";
+import { loggedHarad, pileAccepts, questFacts } from "./scenario-piles.ts";
 import { bookletSetsOf, setupOf } from "./scenario-text.ts";
 import { burdenSetProblems, crossCheckProblems, easyRemovals, easySheetProblem, plain, PLAYER_GROUP, type Deck } from "./scenario-checks.ts";
 import { pilesFromSetup, type Loaded } from "./setup-piles.ts";
@@ -133,7 +133,8 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     };
     // A saga campaign card names cards it does not deal: the earlier box's boons ("Remove Gildor Inglorion and Mr. Underhill from the Campaign Pool") and the box's Fellowship cards ("attaches Andúril and Banner of Elendil to Aragorn").
     const poolCards = product.sagaStart ? cards.filter((card) => (card.campaignKind != null && !card.printings.some((p) => cardPacks.includes(p.pack))) || (card.sphere === "fellowship" && card.printings.some((p) => cardPacks.includes(p.pack)))) : [];
-    const extras = def.deck === undefined ? [...poolCards, ...(product.sagaStart ? cards.filter((card) => !scope.includes(card) && !isReprint(card) && inCampaignText(card)) : [])] : cards.filter((card) => !scope.includes(card) && !isReprint(card) && (card.printings.some((p) => cardPacks.includes(p.pack)) || reprintOf.has(card.code) || inCampaignText(card)));
+    const sagaNamed = product.sagaStart ? cards.filter((card) => !scope.includes(card) && !isReprint(card) && inCampaignText(card)) : [];
+    const extras = def.deck === undefined ? [...poolCards, ...sagaNamed] : cards.filter((card) => !scope.includes(card) && !isReprint(card) && (card.printings.some((p) => cardPacks.includes(p.pack)) || reprintOf.has(card.code) || inCampaignText(card)));
     const names = nameIndex([...scope, ...extras], new Set(scope.filter((card) => card.type !== "quest").map((card) => card.code)));
 
     // Stages in printed order: the Hall of Beorn quest cards give it, the Dragncards deck must agree.
@@ -272,7 +273,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       }
       if (!pileAccepts({ code, pile, printed, quest, facts })) {
         // The Harad enemies the campaign log records (Setup: "Set each Harad enemy recorded in the campaign log aside"): the campaign record deals them.
-        if (namedByCampaign || (clausesOf(camp, "step").some((clause) => clause.step === "asideLogged") && printed?.traits.includes("Harad") === true)) campaignPlaced.add(code);
+        if (namedByCampaign || loggedHarad(camp, printed)) campaignPlaced.add(code);
         else local.push(`${id}: ${nameOf(code)} is in the ${pile} pile and no Setup line puts it there`);
         continue;
       }

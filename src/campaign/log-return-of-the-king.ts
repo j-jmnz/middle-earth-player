@@ -12,15 +12,13 @@ export function returnOfTheKingFacts(log: Pick<CampaignLog, "blackGate" | "corsa
 }
 
 /** One row of the log's notes section that The Return of the King adds: what it records, and where it was recorded. */
-export type NoteRow = { id: "log-corsair-fleet" | "log-black-gate-tokens" | "log-ring"; label: string; value: string };
-
-const plural = (count: number, one: string, many: string): string => `${count} ${count === 1 ? one : many}`;
+export type NoteRow = { id: "log-corsair-fleet" | "log-black-gate-tokens" | "log-campaign-end"; label: string; value: string };
 
 /** The notes rows a log holds, in the order the scenarios record them: the resources on The Corsair Fleet, the resource tokens on The Black Gate, how the saga ended. A row appears once it holds something. */
 export function returnOfTheKingRows(log: Pick<CampaignLog, "corsairFleet" | "blackGateTokens" | "campaignEnd">): NoteRow[] {
   const rows: NoteRow[] = [];
-  if (log.corsairFleet != null) rows.push({ id: "log-corsair-fleet", label: "The Siege of Gondor", value: `${plural(log.corsairFleet, "resource", "resources")} on The Corsair Fleet` });
-  if (log.blackGateTokens != null) rows.push({ id: "log-black-gate-tokens", label: "The Black Gate Opens", value: `${plural(log.blackGateTokens, "resource token", "resource tokens")} on The Black Gate` });
-  if (log.campaignEnd != null) rows.push({ id: "log-ring", label: "The One Ring", value: log.campaignEnd === "won" ? "Destroyed: the players win the campaign" : "Kept: the players lose the campaign" });
+  if (log.corsairFleet != null) rows.push({ id: "log-corsair-fleet", label: "Resources on The Corsair Fleet", value: String(log.corsairFleet) });
+  if (log.blackGateTokens != null) rows.push({ id: "log-black-gate-tokens", label: "Resource tokens on The Black Gate", value: String(log.blackGateTokens) });
+  if (log.campaignEnd != null) rows.push({ id: "log-campaign-end", label: "The One Ring", value: log.campaignEnd === "won" ? "Destroyed: the players win the campaign" : "Kept: the players lose the campaign" });
   return rows;
 }

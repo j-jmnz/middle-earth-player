@@ -6,13 +6,13 @@ import { loadPrinted } from "../../test/harness/catalog.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
 
 import { loadoutProblems, needsRingBearerSlot } from "./briefing.ts";
-import { continuedLog, continueOffers } from "./continue.ts";
+import { continuedLog, continueOffers, scoreBaseName } from "./continue.ts";
 import { emptyLog, type CampaignLog, type PoolCard } from "./log.ts";
 import { returnOfTheKingFacts, returnOfTheKingRows } from "./log-return-of-the-king.ts";
 import { keepsSagaColumns, RETURN_OF_THE_KING_CAMPAIGN, sagaRoleOf, titleBansOf } from "./saga.ts";
 import { newSave, parseLog, type Save } from "./save.ts";
 import { buildStart } from "./start.ts";
-import { blackGateEnemies, keepsTwoTowersLog, threatWords } from "./two-towers-view.ts";
+import { blackGateEnemies, threatWords } from "./two-towers-view.ts";
 import type { World } from "./world.ts";
 
 // Rules: mec113.setting-up-the-game, mec113.aragorn, mec113.campaign-mode, mec113.campaign-mode-aragorn, mec113.campaign-mode-ring-bearer, mec113.fellowship-sphere-heroes, mec113.the-one-ring (data/rules/entries.json).
@@ -99,7 +99,6 @@ describe("the log's columns for the box", () => {
     expect(keepsSagaColumns(campaign)).toBe(true);
     expect(keepsSagaColumns(twoTowers)).toBe(true);
     expect(keepsSagaColumns(loadCampaign())).toBe(false);
-    expect(keepsTwoTowersLog(campaign)).toBe(true);
     expect(RETURN_OF_THE_KING_CAMPAIGN).toBe(campaign.id);
   });
 
@@ -115,11 +114,11 @@ describe("the log's columns for the box", () => {
   it("show a note row once it holds something, in the order the scenarios record them", () => {
     expect(returnOfTheKingRows(emptyLog(1))).toEqual([]);
     expect(returnOfTheKingRows({ ...emptyLog(1), corsairFleet: 1, blackGateTokens: 6, campaignEnd: "lost" })).toEqual([
-      { id: "log-corsair-fleet", label: "The Siege of Gondor", value: "1 resource on The Corsair Fleet" },
-      { id: "log-black-gate-tokens", label: "The Black Gate Opens", value: "6 resource tokens on The Black Gate" },
-      { id: "log-ring", label: "The One Ring", value: "Kept: the players lose the campaign" },
+      { id: "log-corsair-fleet", label: "Resources on The Corsair Fleet", value: "1" },
+      { id: "log-black-gate-tokens", label: "Resource tokens on The Black Gate", value: "6" },
+      { id: "log-campaign-end", label: "The One Ring", value: "Kept: the players lose the campaign" },
     ]);
-    expect(returnOfTheKingRows({ ...emptyLog(1), blackGateTokens: 0, campaignEnd: "won" }).map((row) => row.value)).toEqual(["0 resource tokens on The Black Gate", "Destroyed: the players win the campaign"]);
+    expect(returnOfTheKingRows({ ...emptyLog(1), blackGateTokens: 0, campaignEnd: "won" }).map((row) => row.value)).toEqual(["0", "Destroyed: the players win the campaign"]);
   });
 
   it("reach the game as facts in this box only", () => {
@@ -160,7 +159,7 @@ describe("continuing the saga from The Two Towers (docs/brief.md, The Return of 
     const fellowship = finished("c", { completed: loadCampaign().scenarios }, "fellowship-of-the-ring");
     const other = finished("d", {}, "dream-chaser");
     const offers = continueOffers([done, unfinished, fellowship, other], "the-return-of-the-king", scenariosOf);
-    expect(offers).toEqual([{ saveId: "a", campaignId: "the-two-towers", seatCount: 1, score: 260, heroes: 3, fallen: 1, captives: 1, pool: 1, penalty: 2 }]);
+    expect(offers).toEqual([{ saveId: "a", campaignId: "the-two-towers", seatCount: 1, score: 260, heroes: 3, fallen: 1, captives: 1, pool: 1, penalty: 2, penaltyBySeat: [1], enemies: 2 }]);
     // The Two Towers still continues the Fellowship, and the Fellowship continues nothing.
     expect(continueOffers([done, fellowship], "the-two-towers", scenariosOf).map((offer) => offer.saveId)).toEqual(["c"]);
     expect(continueOffers([done], "the-two-towers", scenariosOf)).toEqual([]);
@@ -184,6 +183,7 @@ describe("continuing the saga from The Two Towers (docs/brief.md, The Return of 
       notes: "Rescued Beravor.",
       blackGate: { [HARAD]: 2 },
       scoreBase: 260,
+      scoreBaseCampaigns: ["the-two-towers"],
       score: 260,
       continuedFrom: "a",
     });
@@ -195,6 +195,21 @@ describe("continuing the saga from The Two Towers (docs/brief.md, The Return of 
     // The finished save stays as it was.
     expect(JSON.stringify(done)).toBe(before);
     expect(continuedLog(done).continuedFrom).toBe("a");
+  });
+
+  it("names the score base for the saga so far, from the campaigns the base adds up", () => {
+    const name = (id: string) => ({ "fellowship-of-the-ring": "Fellowship of the Ring", "the-two-towers": "The Two Towers" })[id] ?? null;
+    const fellowship = finished("f", {}, "fellowship-of-the-ring");
+    const towers = newSave("t", "the-two-towers", 1, { continued: fellowship });
+    expect(scoreBaseName(towers.log, "the-two-towers", name)).toBe("Fellowship of the Ring");
+    const towersSave = { id: "t", campaignId: "the-two-towers", seatCount: 1 as const, log: { ...towers.log, score: 290 } };
+    const next = newSave("n", "the-return-of-the-king", 1, { continued: towersSave });
+    expect(scoreBaseName(next.log, "the-return-of-the-king", name)).toBe("Fellowship of the Ring and The Two Towers");
+    // A Two Towers save that started on its own: the base is the box alone.
+    expect(scoreBaseName(newSave("m", "the-return-of-the-king", 1, { continued: finished("a") }).log, "the-return-of-the-king", name)).toBe("The Two Towers");
+    // A log saved before the list reads the box before this one.
+    const { scoreBaseCampaigns: _gone, ...older } = next.log;
+    expect(scoreBaseName(parseLog(JSON.parse(JSON.stringify(older))), "the-return-of-the-king", name)).toBe("The Two Towers");
   });
 
   it("takes the finished save's seat count, a log being per seat", () => {

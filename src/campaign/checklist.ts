@@ -119,7 +119,7 @@ function searchToHand(table: Table, search: HandSearch): void {
     }
     seat.afterMulligan.push(answer);
     if (search.raise != null) {
-      for (const each of seats) each.threatPenalty = (each.threatPenalty ?? 0) + (search.raise ?? 0);
+      for (const each of seats) each.threatPenalty = (each.threatPenalty ?? 0) + search.raise;
       table.out.did.push(`Each player's threat is raised by ${search.raise} for this game.`);
     }
     table.out.did.push(`Seat ${index + 1} searches their deck for ${name(answer)} and adds it to their hand after the mulligan.`);

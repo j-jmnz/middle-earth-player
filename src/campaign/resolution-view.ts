@@ -7,6 +7,7 @@
 // intents the reducer lists; the screen sends the one the player picks and nothing else. A choice the card lets a seat pass
 // ("each player may choose") lists the reducer's `skip` as `decline`, a visible "No boon", not as one more tile.
 import type { Instruction } from "../catalog/boundary.ts";
+import type { CampaignEnd } from "../catalog/campaign-record.ts";
 import { andList, carryVerb, carryWords } from "./carry-words.ts";
 import { legalIntents, type ScenarioState } from "../rules/engine/reduce.ts";
 import { answeredSeats, asksPlayers, resolutionResult, SKIP } from "../rules/setup/resolution.ts";
@@ -87,6 +88,8 @@ export type ResolutionView =
       beldis?: readonly string[];
       // What The Two Towers' Resolution records: the threat penalties, the hero who returned, the heroes removed, the enemies under The Black Gate.
       notes?: readonly string[];
+      // How the saga ended, when this Resolution decided it (Mount Doom's ChooseOption): the Resolution screen words the campaign's end from it.
+      campaignEnd?: CampaignEnd;
     };
 
 // The boxes beside Beldis this game marks (the Action of 12188 marks one for the player who used it), one sentence a seat whose count rose above the log's (`logged`), in the log screen's count: "Player 1 marks 1 box beside Beldis (3 of 4 marked)", solo "You mark 1 box ...".
@@ -148,6 +151,7 @@ export function resolutionView(state: ScenarioState, world: World, logged: reado
       ...(gone.length > 0 ? { poolRemoved: gone } : {}),
       ...beldisBoxes(state, logged),
       ...(notes.length > 0 ? { notes } : {}),
+      ...(settled.campaignEnd ? { campaignEnd: settled.campaignEnd } : {}),
       earned: settled.earned.map((item) => ({ code: item.code, hero: item.to === "hero" ? item.hero : null, seat: item.seat })),
       fallen: [...settled.fallen],
       captives: settled.captives.map((item) => item.hero),

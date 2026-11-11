@@ -53,7 +53,7 @@ describe("the registry", () => {
     }
   });
 
-  it("splits the scenarios into six boxes, each scenario in one, each box inside its own campaign", () => {
+  it("splits the scenarios into the boxes, each scenario in one, each box inside its own campaign", () => {
     expect(BOXES.map((box) => box.name)).toEqual(["Revised Core Set", "The Dark of Mirkwood", "The Fellowship of the Ring Saga Expansion", "The Two Towers Saga Expansion", "The Return of the King Saga Expansion", "Dream-chaser Campaign Expansion", "Ered Mithrin Campaign Expansion"]);
     // The boxes are in the campaigns table's order (`position`): by release, the saga boxes together at the Fellowship's.
     const positions = BOXES.map((box) => index.find((entry) => entry.id === box.campaignId)?.position ?? 0);

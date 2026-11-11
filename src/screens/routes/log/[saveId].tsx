@@ -3,9 +3,10 @@ import { useMemo, useState } from "react";
 import { ScrollView, View } from "react-native";
 
 import { printedMap, type CatalogRow } from "../../../campaign/cards";
-import { SAGA_PREVIOUS } from "../../../campaign/continue";
+import { scoreBaseName } from "../../../campaign/continue";
 import { returnOfTheKingRows } from "../../../campaign/log-return-of-the-king";
-import { blackGateEnemies, keepsTwoTowersLog, marshesLines, SEARCHING_EYE, threatWords } from "../../../campaign/two-towers-view";
+import { keepsSagaColumns } from "../../../campaign/saga";
+import { blackGateEnemies, marshesLines, SEARCHING_EYE, threatWords } from "../../../campaign/two-towers-view";
 import { copiesMark, encounterSpeech, keepsWilderlandLog, wilderlandView } from "../../../campaign/wilderland-view";
 import { MODE_CARD_NAME, type ModeCard } from "../../../campaign/xp";
 import { markedRows, markedSpeech, xpWords } from "../../../campaign/xp-view";
@@ -139,11 +140,10 @@ export default function Log() {
   // The Ered Mithrin columns (emce.campaign-log): treasures, the allies' lines, Beldis's boxes, the pool's encounter cards.
   const wilderland = keepsWilderlandLog(campaign) ? wilderlandView(log, save.seatCount) : null;
   // The Two Towers columns: each seat's own threat penalty, the Marshes choices and the enemies under The Black Gate, shown with the notes.
-  const twoTowers = keepsTwoTowersLog(campaign);
-  const marshes = twoTowers ? marshesLines(log, save.seatCount, nameOf) : [];
-  const blackGate = twoTowers ? blackGateEnemies(log) : [];
-  // The Return of the King's notes: the resources on The Corsair Fleet, the tokens on The Black Gate and how the saga ended, each once recorded.
-  const sagaNotes = twoTowers ? returnOfTheKingRows(log) : [];
+  const sagaColumns = keepsSagaColumns(campaign);
+  const marshes = sagaColumns ? marshesLines(log, save.seatCount, nameOf) : [];
+  const blackGate = sagaColumns ? blackGateEnemies(log) : [];
+  const sagaNotes = sagaColumns ? returnOfTheKingRows(log) : [];
   const names = scenarioNames(campaign);
   const notes = edited ?? log.notes;
 
@@ -168,7 +168,7 @@ export default function Log() {
           {/* A card's name in a row opens its preview (user request, 2026-11-01). */}
           <Row label="Heroes" lines={bySeat(log.heroesBySeat)} onCard={card} testID="log-heroes" />
           <Row label="Fallen Heroes" lines={bySeat(log.fallenHeroesBySeat)} onCard={card} testID="log-fallen" />
-          <Row label="Threat Modifiers" value={twoTowers ? threatWords(log, save.seatCount) : log.threatPenalty === 0 ? "None" : `+${log.threatPenalty}`} testID="log-threat" icon="threat" />
+          <Row label="Threat Modifiers" value={sagaColumns ? threatWords(log, save.seatCount) : log.threatPenalty === 0 ? "None" : `+${log.threatPenalty}`} testID="log-threat" icon="threat" />
           {/* Dream-chaser: the XP the Resolutions gave and what is unspent, and the boxes marked beside the scalable and upgradable cards (MEC111 p31). */}
           {campaign.xp ? <Row label="XP" value={xpWords(log)} testID="log-xp" /> : null}
           {campaign.xp ? <Row label="Scalable Cards" lines={marked("scalable")} onCard={card} speech={markedSpeech(log, "scalable")} testID="log-scalable" /> : null}
@@ -210,11 +210,10 @@ export default function Log() {
             })}
           </View>
           {marshes.length > 0 ? <Row label="The Passage of the Marshes" lines={marshes} onCard={card} testID="log-marshes" /> : null}
-          {sagaNotes.map((row) => <Row key={row.id} label={row.label} value={row.value} testID={row.id} />)}
           {/* A continued save's total carries on from the finished campaign's: its score is a line of its own so the total adds up. */}
           {log.scoreBase > 0 ? (
             <View testID="log-score-base" className="flex-row items-baseline gap-1.5 py-2">
-              <Text className="shrink text-body text-ink">{(SAGA_PREVIOUS[save.campaignId] ? campaignOf(SAGA_PREVIOUS[save.campaignId] ?? "")?.name : null) ?? "Finished campaign"}</Text>
+              <Text className="shrink text-body text-ink">{scoreBaseName(log, save.campaignId, (id) => campaignOf(id)?.name ?? null)}</Text>
               <View className="min-w-3 flex-1" style={{ borderBottomWidth: 1.5, borderStyle: "dotted", borderColor: withAlphaHex(palette.inkLine, 0.4), marginBottom: 4 * s }} />
               <Text className="font-display text-label text-ink">{log.scoreBase}</Text>
             </View>
@@ -222,6 +221,8 @@ export default function Log() {
           <Row label="Campaign Total" value={String(log.score)} testID="log-score" />
           {/* Journey to the Cross-roads' Resolution: "the name and quantity of each enemy underneath The Black Gate" goes in the notes section. */}
           {blackGate.length > 0 ? <Row label="Enemies under The Black Gate" lines={blackGate.map((enemy): Line => [{ text: `${enemy.count} \u00d7 ` }, cardSegment(enemy.code, nameOf)])} onCard={card} testID="log-black-gate" /> : null}
+          {/* The Return of the King's records: the resources on The Corsair Fleet, the resource tokens on The Black Gate and how the saga ended, each once recorded. */}
+          {sagaNotes.map((row) => <Row key={row.id} label={row.label} value={row.value} testID={row.id} />)}
           <View className="py-3">
             <Text className="font-bold text-eyebrow uppercase text-inkLabel">Notes</Text>
             <TextInput

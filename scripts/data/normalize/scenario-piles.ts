@@ -28,6 +28,11 @@ export function questFacts(args: { quest: ParsedSetup; code: string; printed: Ca
   };
 }
 
+// A Harad enemy the campaign log records: a Setup that sets "each Harad enemy recorded in the campaign log" aside deals the card, whatever its own pile (Journey to the Cross-roads and The Battle of the Pelennor Fields).
+export function loggedHarad(setup: ParsedSetup, printed: Card | undefined): boolean {
+  return clausesOf(setup, "step").some((clause) => clause.step === "asideLogged") && printed?.traits.includes("Harad") === true;
+}
+
 // A pile a card sits in must be one a Setup line of the quest card puts it in (the campaign card's lines are checked by the caller). The
 // Dream-chaser decks are dealt by their "Prepare the ... deck" step, the fleet by "Players prepare their fleet", the second encounter deck
 // by the encounter set the Setup sets aside.
@@ -40,7 +45,7 @@ export function pileAccepts(args: { code: string; pile: string; printed: Card | 
   const fleet = stepExists("prepareFleet") && /Fleet/.test(printed?.encounterSet ?? "");
   switch (pile) {
     case "setAside":
-      return said(["aside"]) || putEngaged || steps("takeControl", "attach", "prepareStormcallerArea", "attachToDifferentHeroes", "attachToThreatDial") || setAsideBySet || (stepExists("asideLogged") && printed?.traits.includes("Harad") === true) || (fleet && (printed?.type === "ship-objective" || printed?.type === "objective")) || (stepExists("asideEachOtherObjective") && printed?.type === "objective");
+      return said(["aside"]) || putEngaged || steps("takeControl", "attach", "prepareStormcallerArea", "attachToDifferentHeroes", "attachToThreatDial") || setAsideBySet || loggedHarad(quest, printed) || (fleet && (printed?.type === "ship-objective" || printed?.type === "objective")) || (stepExists("asideEachOtherObjective") && printed?.type === "objective");
     case "activeLocation":
       return said(["active"]);
     case "attachedChosen":

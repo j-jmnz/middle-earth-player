@@ -29,9 +29,11 @@ export function recordTokens(state: ScenarioState, instruction: Verb<"RecordToke
   return { ...state.resolutionLog, recorded: { ...(state.resolutionLog.recorded ?? {}), [instruction.as]: count } };
 }
 
-/** RemoveFromPoolByCode: one pool entry of each code is struck out when the log is written (`poolRemoved`). */
-export function removeFromPool(state: ScenarioState, codes: readonly string[]): ResolutionLog {
-  return { ...state.resolutionLog, poolRemoved: [...(state.resolutionLog.poolRemoved ?? []), ...codes.map((code) => ({ code, seat: null }))] };
+/** RemoveFromPoolByCode: one pool entry of each code is struck out when the log is written (`poolRemoved`); with `perCopyInVictory`, one entry for each copy of the code in the victory display. */
+export function removeFromPool(state: ScenarioState, instruction: Verb<"RemoveFromPoolByCode">): ResolutionLog {
+  const copies = (code: string): number => (instruction.perCopyInVictory ? state.victory.filter((id) => state.cards[id]?.code === code).length : 1);
+  const removed = instruction.codes.flatMap((code) => Array.from({ length: copies(code) }, () => ({ code, seat: null })));
+  return { ...state.resolutionLog, poolRemoved: [...(state.resolutionLog.poolRemoved ?? []), ...removed] };
 }
 
 /** LoseGuardedBoons: every boon attached to a card in play with the host's code, struck out of the pool for the seat that owns it. */

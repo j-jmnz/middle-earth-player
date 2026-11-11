@@ -1,6 +1,7 @@
 // What a campaign scenario hands to and takes from the campaign log: the Resolution's record and the facts the log gives the game.
 // Types only; state.ts holds the rest of the scenario state.
 import type { AllyLine } from "../../catalog/ally-lines.ts";
+import type { CampaignEnd, RecordedCount } from "../../catalog/campaign-record.ts";
 
 // What a won scenario writes for the campaign: cards earned (and where each went), heroes that fell, captives.
 export type Earned = {
@@ -56,12 +57,6 @@ export type ResolutionLog = {
   discardedNotFallen?: true;
   campaignEnd?: CampaignEnd;
 };
-
-/** The counts a Resolution records in the Campaign Log's notes section: the resources on The Corsair Fleet and the resource tokens on The Black Gate (location). */
-export type RecordedCount = "corsairFleet" | "blackGateTokens";
-
-/** How the saga ends: the players keep The One Ring and lose the campaign, or destroy it and win (Mount Doom's Resolution). */
-export type CampaignEnd = "won" | "lost";
 
 // The campaign log's structured facts, handed to the engine at the start of a scenario in Campaign Mode (campaign/log.ts writes
 // them back from the won game). Absent in a standalone game and in a campaign whose log holds none.

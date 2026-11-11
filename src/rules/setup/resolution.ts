@@ -159,7 +159,7 @@ export function advanceResolution(state: ScenarioState, ctx: ReduceContext): Sce
         next = stepOver(next, recordTokens(next, instruction));
         break;
       case "RemoveFromPoolByCode":
-        next = stepOver(next, removeFromPool(next, instruction.codes));
+        next = stepOver(next, removeFromPool(next, instruction));
         break;
       case "LoseGuardedBoons":
         next = stepOver(next, loseGuardedBoons(next, instruction, ctx));

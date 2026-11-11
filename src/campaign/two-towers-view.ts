@@ -1,12 +1,6 @@
 // Rules: mec112.campaign-mode-aragorn (data/rules/entries.json); the Campaign Log columns of The Two Towers (docs/brief.md, The Two Towers). How the log's own columns
 // read on the log screen: the threat each seat starts with, the choice each seat made in The Passage of the Marshes and the enemies under The Black Gate. Pure, so a test reads it.
 import type { CampaignLog, MarshesChoice } from "./log.ts";
-import { keepsSagaColumns } from "./saga.ts";
-
-/** Whether the campaign keeps The Two Towers columns: The Two Towers, and The Return of the King, which continues them. */
-export function keepsTwoTowersLog(campaign: { id: string }): boolean {
-  return keepsSagaColumns(campaign);
-}
 
 /** The permanent starting threat penalty a seat takes: the table's `threatPenalty` and the seat's own. */
 export function seatPenalty(log: Pick<CampaignLog, "threatPenalty" | "threatPenaltyBySeat">, seat: number): number {

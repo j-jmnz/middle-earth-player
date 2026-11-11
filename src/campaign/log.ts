@@ -2,7 +2,7 @@
 // (data/rules/entries.json). The log is what a won scenario writes and the next scenario's checklist reads.
 import { heldCopy, holdsCopy, resolutionResult } from "../rules/setup/resolution.ts";
 import { printedOf, type PrintedCard } from "../rules/core/printed.ts";
-import type { CampaignEnd } from "../rules/core/campaign-state.ts";
+import type { CampaignEnd } from "../catalog/campaign-record.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
 
 import type { AllyLine } from "../catalog/ally-lines.ts";
@@ -81,6 +81,8 @@ export type CampaignLog = {
   blackGate: Readonly<Record<string, number>>;
   // The campaign total the finished Fellowship save carried on (a continued save, docs/brief.md, The Two Towers): added to the scenario scores. 0 in a fresh save.
   scoreBase: number;
+  // The campaigns `scoreBase` adds up, in saga order (a Return of the King save continued from a continued Two Towers save: Fellowship and Two Towers), so the log names the base for the whole saga so far. Empty in a fresh save and in one saved before it.
+  scoreBaseCampaigns: readonly string[];
   // The Return of the King's notes section (docs/brief.md, The Return of the King). The resources on The Corsair Fleet counted when The Siege of Gondor was won, and the resource tokens on The Black Gate when The Black Gate Opens was; null
   // until recorded. How the saga ended once Mount Doom was won ("won", or "lost" when the players kept The One Ring); null until then.
   corsairFleet: number | null;
@@ -93,7 +95,7 @@ export type MarshesChoice = (typeof MARSHES_CHOICES)[number];
 
 export function emptyLog(seatCount: number): CampaignLog {
   const seats = Array.from({ length: seatCount }, () => [] as readonly string[]);
-  return { heroesBySeat: seats, fallenHeroesBySeat: seats, threatPenalty: 0, campaignPool: [], captives: [], completed: [], earned: {}, scenarios: {}, score: 0, notes: "", prisoner: null, usedOnce: [], counters: {}, carryOver: [], carryIn: [], xpGained: {}, marks: {}, modes: {}, modeDefault: null, treasures: [], allyLines: [], beldisUses: [], encounterPool: {}, threatPenaltyBySeat: [], marshesChoice: [], blackGate: {}, scoreBase: 0, corsairFleet: null, blackGateTokens: null, campaignEnd: null };
+  return { heroesBySeat: seats, fallenHeroesBySeat: seats, threatPenalty: 0, campaignPool: [], captives: [], completed: [], earned: {}, scenarios: {}, score: 0, notes: "", prisoner: null, usedOnce: [], counters: {}, carryOver: [], carryIn: [], xpGained: {}, marks: {}, modes: {}, modeDefault: null, treasures: [], allyLines: [], beldisUses: [], encounterPool: {}, threatPenaltyBySeat: [], marshesChoice: [], blackGate: {}, scoreBase: 0, scoreBaseCampaigns: [], corsairFleet: null, blackGateTokens: null, campaignEnd: null };
 }
 
 // The Ring-bearer may have moved to another seat with the first player token (mec109.multiplayer-the-one-ring).
@@ -194,6 +196,7 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
     marshesChoice: marshesAfter(log.marshesChoice, result, state.seatCount),
     blackGate: result.underneath ?? log.blackGate,
     scoreBase: log.scoreBase,
+    scoreBaseCampaigns: log.scoreBaseCampaigns,
     corsairFleet: result.recorded?.corsairFleet ?? log.corsairFleet,
     blackGateTokens: result.recorded?.blackGateTokens ?? log.blackGateTokens,
     campaignEnd: result.campaignEnd ?? log.campaignEnd,

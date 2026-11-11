@@ -130,7 +130,7 @@ export default function CampaignPath() {
   const waiting = kept.length > 0 ? carryWords(kept, name) : null;
   // The campaign's end: "Ered Mithrin won. The players win the campaign!", the line the last campaign card prints.
   const lastId = nodes.at(-1)?.id;
-  const end = complete ? campaignEnd(campaign, lastId ? (scenarioOf(lastId)?.campaignCard ?? null) : null) : null;
+  const end = complete ? campaignEnd(campaign, lastId ? (scenarioOf(lastId)?.campaignCard ?? null) : null, save.log.campaignEnd) : null;
 
   const navBar = (
     <NavBar
@@ -226,7 +226,7 @@ export default function CampaignPath() {
     if (complete) {
       return (
         <View>
-          <Label testID="path-complete" className="mb-2.5 text-center">
+          <Label testID="path-complete" tone={end?.tone === "danger" ? "danger" : "muted"} className="mb-2.5 text-center">
             {end?.won ?? `${campaign.name} won.`}
           </Label>
           {waiting ? (

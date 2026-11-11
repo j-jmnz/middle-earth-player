@@ -144,7 +144,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
   // The last scenario of the campaign: the win completes it.
   const completes = !done && at >= 0 && nextId == null ? (campaign?.name ?? null) : null;
   // The words of the campaign's end: the campaign card's printed line, and where the campaign stands.
-  const end = completes && campaign ? campaignEnd(campaign, scenarioOf(game.scenarioId)?.campaignCard ?? null) : null;
+  const end = completes && campaign ? campaignEnd(campaign, scenarioOf(game.scenarioId)?.campaignCard ?? null, view.kind === "settled" ? (view.campaignEnd ?? null) : null) : null;
   const picked = view.kind === "choosing" ? (view.tiles.find((tile) => tile.optionId === chosen) ?? null) : null;
   const declined = view.kind === "choosing" && view.decline != null && chosen === view.decline.optionId;
   const answer = picked?.optionId ?? (declined && view.kind === "choosing" ? (view.decline?.optionId ?? null) : null);
@@ -157,13 +157,15 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
       {end && view.kind === "settled" ? (
         <View className="mt-3 items-center" testID="resolution-campaign-end">
           {end.line ? (
-            <Text className="text-center font-display text-heading text-bone" testID="resolution-campaign-line">
+            <Text className={`text-center font-display text-heading ${end.tone === "danger" ? "text-danger" : "text-bone"}`} testID="resolution-campaign-line">
               {end.line}
             </Text>
           ) : null}
-          <BodyText className="mt-1 text-center" testID="resolution-campaign-summary">
-            {end.summary}
-          </BodyText>
+          {end.summary ? (
+            <BodyText className="mt-1 text-center" testID="resolution-campaign-summary">
+              {end.summary}
+            </BodyText>
+          ) : null}
         </View>
       ) : null}
       <View className="mt-4 flex-row gap-2" testID="resolution-tiles">

@@ -183,9 +183,10 @@ describe("146074 The Black Gate Opens: the notes, the Wraith, Gwaihir and the fa
     expect(write(won("146074").state).blackGateTokens).toBe(0);
   });
 
-  it("removes one Wraith on Wings from the pool when one is in the victory display, and none when it is not", () => {
+  it("removes one Wraith on Wings from the pool for each one in the victory display, and none when there is none", () => {
     const before = { ...emptyLog(2), campaignPool: [pooled(WRAITH, 0, { perPlayer: true }), pooled(WRAITH, 1, { perPlayer: true })] };
     expect(write(won("146074", 2, place(WRAITH, "victory")).state, before).campaignPool).toHaveLength(1);
+    expect(write(won("146074", 2, all(place(WRAITH, "victory"), place(WRAITH, "victory"))).state, before).campaignPool).toHaveLength(0);
     expect(write(won("146074", 2).state, before).campaignPool).toHaveLength(2);
   });
 
@@ -228,6 +229,11 @@ describe("146079 Mount Doom: keeping or destroying The One Ring", () => {
     expect(write(destroyed).campaignEnd).toBe("won");
     const view = resolutionView(destroyed, world);
     expect(view.kind === "settled" && view.notes).toEqual(["The One Ring is destroyed. The players win the campaign."]);
+    // The settled view carries how the saga ended, for the words of the campaign's end.
+    expect(view.kind === "settled" && view.campaignEnd).toBe("won");
+    const lost = resolutionView(kept, world);
+    expect(lost.kind === "settled" && lost.campaignEnd).toBe("lost");
+    expect(lost.kind === "settled" && lost.notes).toEqual(["The One Ring is kept. The players lose the campaign."]);
   });
 
   it("writes no ending for any other Resolution, and keeps one already recorded", () => {

@@ -35,12 +35,12 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 146069 The Tower of Cirith Ungol. Resolution: with Shagrat in play, the boons attached to him are lost from the pool.
   {"id":"146069:resolution:1","cardCode":"146069","lines":["146069:B:2"],"timing":"resolution","instructions":[{"verb":"LoseGuardedBoons","host":SHAGRAT,"when":{"kind":"inPlay","code":SHAGRAT,"is":true}}]},
 
-  // 146074 The Black Gate Opens. Setup: no +1 for changing heroes, the Andúril search and the five burden sets. Resolution: the tokens on The Black Gate are recorded; a Wraith on Wings in the victory display leaves the pool; the first
+  // 146074 The Black Gate Opens. Setup: no +1 for changing heroes, the Andúril search and the five burden sets. Resolution: the tokens on The Black Gate are recorded; each Wraith on Wings in the victory display leaves the pool; the first
   // player's Gwaihir is earned; a hero in a discard pile is not a fallen hero.
   {"id":"146074:campaignSetup:1","cardCode":"146074","lines":["146074:A:1"],"timing":"campaignSetup","instructions":[{"verb":"WaiveThreatPenalty"},{"verb":"SearchDeckForCard","code":ANDURIL,"raiseThreat":1},{"verb":"RemoveBurdenSets","sets":FELLOWSHIP_AND_TWO_TOWERS_SETS}]},
   {"id":"146074:resolution:1","cardCode":"146074","lines":["146074:B:1"],"timing":"resolution","instructions":[
     {"verb":"RecordTokens","codes":[BLACK_GATE],"as":"blackGateTokens"},
-    {"verb":"RemoveFromPoolByCode","codes":[WRAITH_ON_WINGS],"when":{"kind":"inVictory","code":WRAITH_ON_WINGS,"is":true}},
+    {"verb":"RemoveFromPoolByCode","codes":[WRAITH_ON_WINGS],"perCopyInVictory":true},
     {"verb":"Earn","codes":[GWAIHIR],"when":{"kind":"controls","code":GWAIHIR}},
     {"verb":"IgnoreDiscardedHeroes"}]},
 
