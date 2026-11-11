@@ -1,6 +1,6 @@
 # Middle Earth LCG
 
-[![Accessibility: WCAG 2.2 AA](https://img.shields.io/badge/accessibility-WCAG%202.2%20AA)](ACCESSIBILITY.md)
+[![Accessibility: WCAG 2.2 AA](https://img.shields.io/badge/accessibility-WCAG%202.2%20AA-3E5A48)](ACCESSIBILITY.md)
 [![Screen readers: VoiceOver and TalkBack](https://img.shields.io/badge/screen%20readers-VoiceOver%20%7C%20TalkBack-3E5A48)](ACCESSIBILITY.md#what-the-app-supports)
 [![Switch and voice control: Table as a list](https://img.shields.io/badge/switch%20%26%20voice%20control-Table%20as%20a%20list-3E5A48)](ACCESSIBILITY.md#what-the-app-supports)
 
