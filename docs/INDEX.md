@@ -193,7 +193,7 @@ Read the sections your task touches.
     - 457–460 Database (~20)
   - 461–480 States (~620)
 - `docs/releasing.md` — Releasing (~2.3K tok)
-- `docs/showcase.md` — README showcase (~1.7K tok)
+- `docs/showcase.md` — README showcase (~1.8K tok)
 
 ## Phases
 

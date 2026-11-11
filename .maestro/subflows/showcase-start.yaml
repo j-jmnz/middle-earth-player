@@ -17,7 +17,14 @@ appId: com.middleearth.lcg
       true: "${typeof DEVICE === 'undefined' || DEVICE !== 'ipad'}"
     commands:
       - setOrientation: PORTRAIT
-- openLink: "middleearthlcg://settings"
+# A link sent while the app is still opening its databases is dropped, so the flow waits for the Campaigns screen first and reaches Settings
+# through the tab bar's gear, as features/settings.yaml does; the shot's own link is sent once the app is running.
+- extendedWaitUntil:
+    visible:
+      id: campaign-list
+    timeout: 90000
+- tapOn:
+    id: settings-open
 - extendedWaitUntil:
     visible:
       id: app-settings
