@@ -29,7 +29,7 @@ function opened(name: FixtureName) {
   const { loadout, log, campaignId } = fixture(name);
   const codes = [...(loadout.ringBearer ? [loadout.ringBearer] : []), ...loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck]), ...logCodes(log)];
   const world = loadWorld(catalog, loadCampaign(campaignId), loadScenario(loadout.scenarioId), EFFECTS, codes);
-  const resumed = resume(fixtureSave(name, "s", CATALOG_VERSION), world, CATALOG_VERSION);
+  const resumed = resume(fixtureSave(name, "s", CATALOG_VERSION), world);
   if (!resumed.ok) throw new Error(`${name}: ${resumed.reason}`);
   return { state: resumed.state, ctx: contextOf(world) };
 }
