@@ -1,5 +1,9 @@
 # Middle Earth LCG
 
+[![Accessibility: WCAG 2.2 AA target](https://img.shields.io/badge/accessibility-WCAG%202.2%20AA%20target-3E5A48)](ACCESSIBILITY.md)
+[![Screen readers: VoiceOver and TalkBack](https://img.shields.io/badge/screen%20readers-VoiceOver%20%7C%20TalkBack-3E5A48)](ACCESSIBILITY.md#what-the-app-supports)
+[![Switch and voice control: Table as a list](https://img.shields.io/badge/switch%20%26%20voice%20control-Table%20as%20a%20list-3E5A48)](ACCESSIBILITY.md#what-the-app-supports)
+
 An offline app for playing The Lord of the Rings: The Card Game solo, on iOS and Android. Built with Expo and React Native; it also runs in a desktop browser for development.
 
 > [!IMPORTANT]
