@@ -4,6 +4,7 @@ appId: com.middleearth.lcg
 # the link the shot opens. The showcase build (EXPO_PUBLIC_SHOWCASE=1, EXPO_PUBLIC_E2E_SEED=1) is the only one that runs it.
 # Env: LINK (the path after middleearthlcg://, a fixture as e2e/<name>), READY (the testID that says the opened screen has settled).
 # Optional env: THEME (dark or light) and DEVICE (iphone or ipad), given by scripts/showcase/capture.ts with -e; dark and an iPhone when they are not.
+# The UI scale follows the device: Small on the iPhone, Large on the iPad.
 # The iPad lies landscape for every shot; the iPhone stays portrait, and the table turns itself landscape (shots.ts, orientationOf).
 - launchApp:
     clearState: true
@@ -49,6 +50,12 @@ appId: com.middleearth.lcg
     timeout: 30000
 - tapOn:
     id: "${'app-settings-theme-' + (typeof THEME !== 'undefined' ? THEME : 'dark')}"
+# UI scale Small on the iPhone and Large on the iPad (user decision, 2026-11-11), checked as chosen before the shot's link.
+- tapOn:
+    id: "${'app-settings-scale-' + (typeof DEVICE !== 'undefined' && DEVICE === 'ipad' ? 'large' : 'small')}"
+- assertVisible:
+    id: "${'app-settings-scale-' + (typeof DEVICE !== 'undefined' && DEVICE === 'ipad' ? 'large' : 'small')}"
+    selected: true
 - openLink: "middleearthlcg://${LINK}"
 - extendedWaitUntil:
     visible: "Open in .*Middle Earth LCG.*"

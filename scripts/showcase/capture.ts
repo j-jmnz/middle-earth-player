@@ -33,6 +33,7 @@ const FLOWS = path.join(ROOT, ".maestro", "showcase");
 
 // The simulator each device is captured on: the newest one of its kind that Xcode offers (the names move with each Xcode).
 const KINDS: Readonly<Record<Device, RegExp>> = { iphone: /^iPhone \d+ Pro$/, ipad: /^iPad Pro 13-inch/ };
+const PREFERRED: Readonly<Partial<Record<Device, RegExp>>> = { ipad: /\(M4\)/ };
 const THEMES: readonly Theme[] = ["dark", "light"];
 const captures = (count: number) => `${count} capture${count === 1 ? "" : "s"}`;
 // How often a long step says it is still running (s), and how many of its last output lines a failure prints.
@@ -181,7 +182,9 @@ function simulator(device: Device): SimDevice {
   const version = flag("ios")?.replace(".", "-");
   const ios = Object.entries(runtimes).filter(([runtime]) => runtime.includes("iOS") && (!version || new RegExp(`iOS-${version}(-|$)`).test(runtime))).sort(([left], [right]) => right.localeCompare(left, undefined, { numeric: true }));
   for (const [runtime, devices] of ios) {
-    const found = devices.filter((item) => item.isAvailable && KINDS[device].test(item.name)).sort((left, right) => right.name.localeCompare(left.name, undefined, { numeric: true }))[0];
+    const kind = devices.filter((item) => item.isAvailable && KINDS[device].test(item.name)).sort((left, right) => right.name.localeCompare(left.name, undefined, { numeric: true }));
+    // The iPad Pro 13-inch (M4) when the runtime has it (user decision, 2026-11-11), else the newest of its kind.
+    const found = kind.find((item) => PREFERRED[device]?.test(item.name)) ?? kind[0];
     if (found) return { ...found, name: `${found.name} (${runtime.split(".").at(-1)?.replace(/-/g, " ").replace(/^iOS (\d+) (\d+)/, "iOS $1.$2") ?? runtime})` };
   }
   throw new Error(`No available ${device} simulator matches ${KINDS[device]}${version ? ` on iOS ${flag("ios")}` : ""}: install an iOS runtime in Xcode, Settings, Components (\`xcrun simctl list runtimes\` lists them)`);
