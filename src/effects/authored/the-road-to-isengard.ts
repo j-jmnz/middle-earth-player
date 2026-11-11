@@ -10,7 +10,7 @@ import { copyLine, withCopies } from "./reprint.ts";
 // (data/printed/the-two-towers.json); a line a template already writes (pnpm data:build) or another card prints word for word needs no record here. The piles place Gates of Isengard, Orthanc, Saruman and
 // Saruman's Staff aside and the Ents of Fangorn in the staging area (the first two sentences of 143078:A:1); its record shuffles the encounter deck. See docs/brief.md, The Two Towers, for each reading.
 // A Wizardry line's record is a `forced` effect with the trigger `wizardry`: it answers the exploring of its location (in the staging area too), and TriggerWizardry runs it for Machines of Isengard and Saruman.
-// Rules: mec112.wizardry, mec112.saga-staging-rules, mec112.peril, rr.explored, rr.forced, rr.triggered-ability, rr.constant-ability, rr.lasting-effects, rr.player-elimination, rr.resources, rr.objective-cards,
+// Rules: mec112.wizardry, mec112.saga-staging-rules, mec112.peril, rr.explored, rr.forced, faq.triggering-forced-effects, rr.triggered-ability, rr.constant-ability, rr.lasting-effects, faq.lasting-effects, rr.player-elimination, rr.resources, rr.objective-cards,
 // faq.additional-attacks (data/rules/entries.json).
 const ENT = "143046";
 const SARUMAN = "143047";

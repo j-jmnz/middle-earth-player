@@ -198,16 +198,16 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~7.9K tok)
+- `docs/phases/STATUS.md` — Phase status (~7.8K tok)
   - 5–15 Rules (~410)
   - 16–92 Phases (~1.5K)
-  - 93–204 Open items (~5.4K)
+  - 93–203 Open items (~5.3K)
     - 95–97 Releases (~50)
     - 98–122 Fixtures and Maestro (~1.4K)
     - 123–170 Rules and engine (~2.2K)
     - 171–192 Screens and code (~1.1K)
-    - 193–204 Rules and engine (The Two Towers) (~580)
-  - 205–222 Standing decisions (~550)
+    - 193–203 Rules and engine (The Two Towers) (~530)
+  - 204–221 Standing decisions (~550)
 
 ## Live plans
 
