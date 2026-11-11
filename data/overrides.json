@@ -933,6 +933,18 @@
       },
       "reason": "Army of the Dead prints \"Phantom. Immune to player card effects.\"; Hall of Beorn lists only Phantom, so the engine would read no immunity.",
       "source": "scan 145067.A (data/printed/the-return-of-the-king.json)"
+    },
+    {
+      "match": {
+        "code": "145064"
+      },
+      "set": {
+        "keywords": {
+          "questPointsX": true
+        }
+      },
+      "reason": "The Paths of the Dead prints X for its quest points on side 2B (\"X is the threat of the player with the highest threat\"). Hall of Beorn lists X in its stats, but the builder reads that X only for the Two Towers boxes, so the stage would have no quest points and never advance; the record 145064:constant:1 sets the value.",
+      "source": "scan 145064.B (data/printed/the-return-of-the-king.json); Hall of Beorn QuestCards.json (Back.Stats.QuestPoints X)"
     }
   ],
   "scenarioPiles": [

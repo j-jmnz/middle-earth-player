@@ -10,7 +10,7 @@ import { pickCandidates } from "../interpret/pick.ts";
 import { lastPicked, seatOf } from "../interpret/player-verbs.ts";
 import { topFrame } from "../windows/windows.ts";
 import { addModifier } from "../core/keywords.ts";
-import { addClassModifier, ALLIES_CLASS, CHARACTERS_CLASS, DAMAGED_CHARACTERS_CLASS, ENEMIES_CLASS, isClassHolder, isTraitedEnemies, STAGING_CLASS, traitedEnemies } from "../core/holder-classes.ts";
+import { addClassModifier, ALLIES_CLASS, CHARACTERS_CLASS, DAMAGED_CHARACTERS_CLASS, ENEMIES_CLASS, isClassHolder, isTraitedEnemies, STAGING_CLASS, traitedEnemies, ownCharacters } from "../core/holder-classes.ts";
 import type { ScenarioState } from "../core/state.ts";
 import { livingSeats } from "../core/state.ts";
 import type { VerbFocus } from "../interpret/verbs.ts";
@@ -90,6 +90,10 @@ export function modifyStat(
     // Every character, hero or ally, now and entering play later (19020:A:2): the holder is the class, read by heldBy.
     case "characters":
       targets = [CHARACTERS_CLASS];
+      break;
+    // Every character the actor controls, now and entering play later (145028:A:2): the holder is the class, read by heldBy.
+    case "ownCharacters":
+      targets = [ownCharacters(focus.seat)];
       break;
     // Every character that is damaged, now and when it is damaged later (143061:A:2): the holder is the class, read by heldBy.
     case "damagedCharacters":

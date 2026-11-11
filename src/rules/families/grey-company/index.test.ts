@@ -7,6 +7,8 @@ import { runInstruction } from "../../interpret/interpret.ts";
 import { withThreat } from "../../core/state.ts";
 import { familyPlayBarred } from "../../interpret/family-hooks.ts";
 import type { ScenarioState } from "../../core/state.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { spawn } from "../../core/zones.ts";
 import { ally, enemy, hero, send, table, treachery, until, type TableSpec } from "../defense/table.ts";
 
 // Rules: mec113.phantom, rr.step-6-4-3, rr.defending-player, rr.play-and-put-into-play, rr.threat-threat-dial (data/rules/entries.json); ledger lines 145022:A:1, 145023:A:3, 145065:B:1, 145063:B:2, 145064:B:3, 145064:B:1, 145021:A:1.
@@ -141,5 +143,20 @@ describe("an AfterAttack inside a Choose option (145021:A:3)", () => {
     const { done, ids, threat } = played("threat");
     expect(done.cards[ids.brute!]?.zone).toBe("engaged");
     expect(done.seats[0].threat).toBe(threat + 2);
+  });
+});
+
+// Rules: rr.lasting-effects (data/rules/entries.json); ledger line 145028:A:2.
+describe("ModifyStat target ownCharacters (145028:A:2)", () => {
+  it("holds for each character the actor controls, one that enters play later too, and for no other player's", () => {
+    const built = table({ seatCount: 2, cards: [hero("a"), hero("c"), ally("b"), ally("d")], effects: [], heroes: [{ code: "a" }, { code: "c", seat: 1 }] });
+    const { ctx, ids } = built;
+    const lowered = runInstruction(built.state, { verb: "ModifyStat", stat: "willpower", amount: -1, until: "endOfRound", target: "ownCharacters" }, { seat: 0, sourceId: ids.a! }, ctx, []);
+    const later = spawn(spawn(lowered, "b", { zone: "play", seat: 0 }).state, "d", { zone: "play", seat: 1 });
+    const read = (id: string) => modifiedStat(later.state, later.state.cards[id]!, "willpower", ctx.cards);
+    expect(read(ids.a!)).toBe(0);
+    expect(read(ids.c!)).toBe(1);
+    expect(read(Object.keys(later.state.cards).find((id) => later.state.cards[id]?.code === "b")!)).toBe(0);
+    expect(read(later.id)).toBe(1);
   });
 });

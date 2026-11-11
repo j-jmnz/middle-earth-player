@@ -109,6 +109,16 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     text: `${i.afterAttack === true ? "once the attack in progress has ended, " : ""}place ${cardRef(i.target ?? "picked")} facedown under the card with code ${str(i.code)} in play (out of play there; its attachments are discarded, its tokens go)`,
     read: ["code", "target", "afterAttack"],
   }),
+  AttachToDial: (i) => ({
+    text: typeof i.code === "string" ? `the acting player attaches a set-aside copy of the card with code ${str(i.code)} to their threat dial (nothing when the dial holds one already, Limit 1 per threat dial, or none is set aside)` : "this card attaches itself to the acting player's threat dial (nothing when the dial holds a copy already)",
+    read: ["code"],
+  }),
+  DetachFromDial: (i) => ({
+    text: typeof i.code === "string" ? `the copy of the card with code ${str(i.code)} on the acting player's threat dial is detached and set aside, out of play` : "this card is detached from the acting player's threat dial and set aside, out of play",
+    read: ["code"],
+  }),
+  RemoveSetAside: (i) => ({ text: `every set-aside copy of the card with code ${str(i.code)} is removed from the game`, read: ["code"] }),
+  DiscardHand: () => ({ text: "the acting player discards all the cards in their hand", read: [] }),
   SetPursuit: (i) => ({ text: `set the pursuit value to ${str(i.value)}`, read: ["value"] }),
   RaisePursuit: (i, ctx) => ({ text: `increase the pursuit value by ${amount(i.amount, ctx)}`, read: ["amount"] }),
   LowerPursuit: (i, ctx) => ({ text: `reduce the pursuit value by ${amount(i.amount, ctx)} (never below 0)`, read: ["amount"] }),
