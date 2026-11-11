@@ -1,6 +1,6 @@
 # README showcase
 
-The README's screenshots and GIFs: the game table and the main screens, taken from real games of real decks with every card's picture drawn, in both themes, Ringwraiths (Dark) and Rivendell (Light). The iPad takes every shot in landscape; the iPhone takes the table in landscape and the other screens in portrait (user decisions, 2026-11-11). They are taken on the iOS simulators of a Mac, by `pnpm assets capture`, and published to the `showcase` branch, which the README links.
+The README's screenshots and GIFs: the game table and the main screens, taken from real games of real decks with every card's picture drawn, in both themes, Ringwraiths (Dark) and Rivendell (Light). The iPad (the iPad Pro 13-inch (M4) when Xcode has it) takes every shot in landscape at UI scale Large; the iPhone takes the table in landscape and the other screens in portrait, at UI scale Small (user decisions, 2026-11-11). They are taken on the iOS simulators of a Mac, by `pnpm assets capture`, and published to the `showcase` branch, which the README links.
 
 ## Take the captures on a Mac
 
