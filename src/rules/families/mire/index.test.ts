@@ -3,12 +3,13 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import type { EngineStep } from "../../core/intents.ts";
 import { settle } from "../../engine/machine.ts";
+import { resolveRecords } from "../../../../test/harness/scene-kit.ts";
 import { runInstruction } from "../../interpret/interpret.ts";
 import { syncConstants } from "../../interpret/constants.ts";
 import { crossBoundary } from "../../windows/triggers.ts";
 import { holds } from "../../interpret/conditions.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { spawn } from "../../core/zones.ts";
+import { moveCard, spawn } from "../../core/zones.ts";
 import { probeTable } from "../../../../scripts/card-smoke/encounter.ts";
 import { encounterWorld, type EncounterWorld } from "../../../../scripts/card-smoke/encounter-world.ts";
 import { mireAtRefreshEnd, mireOf, mireTally } from "./index.ts";
@@ -113,6 +114,24 @@ describe("the end of the refresh phase (144024:A:2)", () => {
     expect(ended.cards[id]?.resources).toBe(1);
     const other = crossBoundary({ ...state, boundaryPhase: "Combat", phase: "Refresh" }, ctxOf(), []);
     expect(other.cards[id]?.resources).toBe(0);
+  });
+
+  it("144024:A:2 Creeping Marshes attaches to the quest, then puts a token on each staging location after the keyword's own and is discarded", () => {
+    // The dealt table's own staging area (a Mire 1 location that would go at once) is cleared away first.
+    const bare = table.staging.reduce((state, id) => moveCard(state, id, { zone: "encounterDiscard" }), table);
+    const fens = spawn(bare, "144019", { zone: "staging" });
+    const id = fens.id;
+    const state = syncConstants(fens.state, ctxOf());
+    const plain = spawn(state, "144053", { zone: "staging" });
+    const revealed = resolveRecords(plain.state, ctxOf(), "144024", "whenRevealed", undefined, undefined, false);
+    const marshes = revealed.id;
+    expect(revealed.state.cards[marshes]?.host).toBe(revealed.state.questStage);
+    const crossed = crossBoundary({ ...revealed.state, boundaryPhase: "Refresh", phase: "End of round", window: null }, ctxOf(), []);
+    const settled = settle({ ...crossed, window: null, mode: "stopped" }, ctxOf(), []);
+    // The keyword's token and Creeping Marshes' own: 2 on the Fens (Mire 3); an enemy in the staging area is no location and gets none.
+    expect(settled.cards[id]?.resources).toBe(2);
+    expect(settled.cards[plain.id]?.resources).toBe(0);
+    expect(settled.cards[marshes]?.zone).toBe("encounterDiscard");
   });
 
   it("does not place a token on the active location", () => {

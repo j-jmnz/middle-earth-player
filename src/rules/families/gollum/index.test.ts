@@ -2,13 +2,15 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { settle } from "../../engine/machine.ts";
+import { legalIntents, reduce, startScenario, type PlayerIntent } from "../../engine/reduce.ts";
+import { expectOk } from "../../core/test-fixture.ts";
 import { runInstruction } from "../../interpret/interpret.ts";
 import { syncConstants } from "../../interpret/constants.ts";
 import { immuneToSource } from "../misc/guards.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { probeTable } from "../../../../scripts/card-smoke/encounter.ts";
-import { encounterWorld, type EncounterWorld } from "../../../../scripts/card-smoke/encounter-world.ts";
+import { encounterStart, encounterWorld, type EncounterWorld } from "../../../../scripts/card-smoke/encounter-world.ts";
 import { idOf } from "../../../../test/harness/scene-kit.ts";
 
 let world: EncounterWorld;
@@ -19,6 +21,17 @@ beforeAll(async () => {
   world = await encounterWorld("the-passage-of-the-marshes");
   table = probeTable(world);
 });
+
+/** The scenario dealt to two seats, the opening hands kept and the Setup's searches answered with the first intent offered. */
+function twoSeats(): ScenarioState {
+  let state = startScenario(encounterStart(world, 2, 1), ctxOf());
+  for (let guard = 0; guard < 40 && (state.window?.kind === "mulligan" || (state.window?.kind === "choose" && state.phase !== "Planning")); guard += 1) {
+    const intent = legalIntents(state, ctxOf())[0];
+    if (!intent) break;
+    state = expectOk(reduce(state, intent as PlayerIntent, ctxOf())).state;
+  }
+  return state;
+}
 
 const flip = (state: ScenarioState, to: "smeagol" | "gollum") => runInstruction(state, { verb: "FlipGollum", to }, { seat: 0, sourceId: null }, ctxOf(), []);
 const quiet = (state: ScenarioState): ScenarioState => settle({ ...state, window: null, mode: "stopped" }, ctxOf(), []);
@@ -86,16 +99,35 @@ describe("FlipGollum", () => {
 });
 
 describe("FollowFirstPlayer (144075:A:1)", () => {
-  const two = (): ScenarioState => ({ ...table, seatCount: 2, seats: [table.seats[0]!, { ...table.seats[1]!, eliminated: false }] });
+  const two = twoSeats;
 
   it("moves Gollum to the new first player and announces the engagement", () => {
-    const gollum = idOf(table, "144075");
-    const passed = { ...two(), firstPlayer: 1 };
+    const base = two();
+    const gollum = idOf(base, "144075");
+    const passed = { ...base, firstPlayer: 1 };
     const moved = runInstruction(passed, { verb: "FollowFirstPlayer" }, { seat: 1, sourceId: gollum }, ctxOf(), []);
     expect(moved.cards[gollum]?.controller).toBe(1);
     expect(moved.seats[1]?.engaged).toContain(gollum);
     expect(moved.seats[0]?.engaged).not.toContain(gollum);
     expect(moved.pendingEvents?.some((event) => event.trigger === "engaged" && event.subject === gollum && event.seat === 1)).toBe(true);
+  });
+
+  it("144075:A:2 runs through the refresh phase: the token passes, Gollum engages the new first player and attacks them", () => {
+    const base = two();
+    const gollum = idOf(base, "144075");
+    const refresh: ScenarioState = { ...base, mode: "refresh", phase: "Refresh", boundaryPhase: "Refresh", window: null };
+    const settled = settle(refresh, ctxOf(), []);
+    expect(settled.firstPlayer).toBe(1);
+    expect(settled.cards[gollum]?.controller).toBe(1);
+    expect(settled.pendingAttack?.enemyId).toBe(gollum);
+  });
+
+  it("144075:A:2 makes no attack in a game of one player, where the token never moves", () => {
+    const gollum = idOf(table, "144075");
+    const refresh: ScenarioState = { ...table, mode: "refresh", phase: "Refresh", boundaryPhase: "Refresh", window: null };
+    const settled = settle(refresh, ctxOf(), []);
+    expect(settled.cards[gollum]?.controller).toBe(0);
+    expect(settled.pendingAttack).toBeFalsy();
   });
 
   it("does nothing for a Gollum already engaged with the first player", () => {

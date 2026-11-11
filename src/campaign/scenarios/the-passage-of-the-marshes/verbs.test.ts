@@ -1,15 +1,18 @@
-// Rules: rr.defending-player, rr.travel, rr.search, mec112.saga-staging-rules (data/rules/entries.json); ledger lines 144017:A:2, 144020:A:3, 144026:A:2, 144066:A:1. The shared verbs The Passage of the Marshes widened, on its own table: the defending player a RaiseThreat names,
+// Rules: mec112.poisoned-counsels-searching-eye, rr.defending-player, rr.travel, rr.search, mec112.saga-staging-rules (data/rules/entries.json); ledger lines 144015:A:2, 144017:A:2, 144020:A:3, 144026:A:2, 144066:A:1. The shared verbs The Passage of the Marshes widened, on its own table: the draw that fires The Searching Eye, the defending player a RaiseThreat names,
 // a Travel cost of Fellowship resources, the topmost Undead enemy of the discard pile an effect picks, the Undead enemies engaged with the actor that attack, and the victory display shuffled into the deck. Each test title starts with the line it covers
 // (scripts/checks/spec-coverage.test.ts). The mire and gollum families' own tests are src/rules/families/mire/index.test.ts and src/rules/families/gollum/index.test.ts.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { syncConstants } from "../../../rules/interpret/constants.ts";
+import { settle } from "../../../rules/engine/machine.ts";
+import { expectOk } from "../../../rules/core/test-fixture.ts";
+import { reduce, startScenario } from "../../../rules/engine/reduce.ts";
 import { runInstruction } from "../../../rules/interpret/interpret.ts";
 import { travelCostUnpayable } from "../../../rules/interpret/restrictions.ts";
-import type { ScenarioState } from "../../../rules/core/state.ts";
+import { withSeat, type ScenarioState } from "../../../rules/core/state.ts";
 import { spawn } from "../../../rules/core/zones.ts";
 import { probeTable } from "../../../../scripts/card-smoke/encounter.ts";
-import { encounterWorld, type EncounterWorld } from "../../../../scripts/card-smoke/encounter-world.ts";
+import { encounterStart, encounterWorld, type EncounterWorld } from "../../../../scripts/card-smoke/encounter-world.ts";
 import { idOf, resolveRecords } from "../../../../test/harness/scene-kit.ts";
 
 let world: EncounterWorld;
@@ -92,5 +95,44 @@ describe("the victory display shuffled into the encounter deck", () => {
     expect(run.encounterDeck).toContain(first.id);
     expect(run.encounterDeck).toContain(second.id);
     expect(idOf(run, "144075")).toBe(idOf(table, "144075"));
+  });
+});
+
+describe("The Searching Eye", () => {
+  it("144015:A:2 asks the player who drew it to exhaust each hero or reveal the top encounter card, and exhausts every hero when chosen", () => {
+    const eye = spawn(table, "144015", { zone: "deck", seat: 0 });
+    const held = eye.state.seats[0]!;
+    const topped = withSeat(eye.state, 0, { ...held, deck: [eye.id, ...held.deck.filter((id) => id !== eye.id)] });
+    const drawn = runInstruction(topped, { verb: "Draw", amount: 1 }, { seat: 0, sourceId: null }, ctxOf(), []);
+    expect(drawn.seats[0]?.hand).toContain(eye.id);
+    const asked = settle({ ...drawn, window: null, mode: "stopped" }, ctxOf(), []);
+    expect(asked.window?.kind).toBe("choose");
+    expect(asked.window?.kind === "choose" ? asked.window.options : []).toEqual(["exhaust", "reveal"]);
+  });
+
+  it("144015:A:2 offers only the reveal when every hero is exhausted", () => {
+    const eye = spawn(table, "144015", { zone: "deck", seat: 0 });
+    const held = eye.state.seats[0]!;
+    const tired = held.heroes.reduce((state, id) => ({ ...state, cards: { ...state.cards, [id]: { ...state.cards[id]!, exhausted: true } } }), eye.state);
+    const topped = withSeat(tired, 0, { ...held, deck: [eye.id, ...held.deck.filter((id) => id !== eye.id)] });
+    const drawn = runInstruction(topped, { verb: "Draw", amount: 1 }, { seat: 0, sourceId: null }, ctxOf(), []);
+    const asked = settle({ ...drawn, window: null, mode: "stopped" }, ctxOf(), []);
+    // The only option left is taken without asking: the top card of the encounter deck is revealed (and its own effects go on).
+    expect(asked.window?.kind === "choose" ? asked.window.options : []).not.toContain("exhaust");
+    expect(asked.encounterDeck.length).toBeLessThan(topped.encounterDeck.length);
+  });
+
+  it("144015:A:2 fires for each copy of the kept opening hand once the mulligan is settled, and not for a hand a mulligan shuffled back", () => {
+    const ctx = ctxOf();
+    const start = encounterStart(world, 1, 1);
+    const seat = start.seats[0]!;
+    const eyes = startScenario({ ...start, seats: [{ ...seat, deck: Array.from({ length: 30 }, () => "144015") }, ...start.seats.slice(1)] } as typeof start, ctx);
+    expect(eyes.window?.kind).toBe("mulligan");
+    const frames = (state: ScenarioState): number => state.stack.filter((frame) => frame.frame === "forced").length;
+    const kept = expectOk(reduce(eyes, { type: "Keep" }, ctx)).state;
+    expect(kept.window?.kind).toBe("choose");
+    expect(frames(kept)).toBe(6);
+    const taken = expectOk(reduce(eyes, { type: "Mulligan" }, ctx)).state;
+    expect(frames(taken)).toBe(6);
   });
 });

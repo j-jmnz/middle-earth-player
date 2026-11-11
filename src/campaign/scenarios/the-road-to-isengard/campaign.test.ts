@@ -168,8 +168,8 @@ describe("The Road to Isengard in the the-two-towers campaign", () => {
     }
   });
 
-  it("143081:B:1 unlocks The Passage of the Marshes on the path, which the app cannot deal yet", () => {
+  it("143081:B:1 unlocks The Passage of the Marshes on the path, which the app deals", () => {
     const path = campaignPath(campaign, {}, { ...afterDeep, completed: ["the-uruk-hai", "helms-deep", "the-road-to-isengard"] });
-    expect(path.slice(0, 4).map((node) => [node.id, node.status])).toEqual([["the-uruk-hai", "completed"], ["helms-deep", "completed"], ["the-road-to-isengard", "completed"], ["the-passage-of-the-marshes", "soon"]]);
+    expect(path.slice(0, 4).map((node) => [node.id, node.status])).toEqual([["the-uruk-hai", "completed"], ["helms-deep", "completed"], ["the-road-to-isengard", "completed"], ["the-passage-of-the-marshes", "current"]]);
   });
 });
