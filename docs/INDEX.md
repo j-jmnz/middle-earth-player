@@ -67,7 +67,7 @@ Read the sections your task touches.
     - 223–234 Mechanic families (~4.3K) ← 5
   - 235–240 Effects (~530)
   - 241–273 Scenario definition (~800)
-  - 274–294 Persistence (~1.5K)
+  - 274–294 Persistence (~1.5K) ← 1
   - 295–300 Images (~940) ← 6
   - 301–353 Screens (~3.9K) ← 1
   - 354–359 Catalog build (~410)
@@ -117,7 +117,7 @@ Read the sections your task touches.
     - 963–966 Coverage test (~270)
   - 967–987 Data sources (~530)
   - 988–1006 Card images (~1.2K) ← 9
-  - 1007–1032 Persistence and shipping (~1.8K)
+  - 1007–1032 Persistence and shipping (~1.8K) ← 1
   - 1033–1074 Screens (~4.9K) ← 1
     - 1059–1074 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~43.4K tok)
@@ -227,6 +227,7 @@ Read when a task names the plan.
   - 237–273 Mechanic families: engine and records together (~1.4K) ← 1
   - 274–287 Readings the review catches (~490) ← 4
   - 288–307 Not expressible yet: leave open, report (~390)
+- `docs/plans/keep-open-games.md` — Plan: keep open games through updates (~2.3K tok)
 - `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.7K tok)
   - 3–14 Context (~450)
   - 15–24 What does not move (~190)
