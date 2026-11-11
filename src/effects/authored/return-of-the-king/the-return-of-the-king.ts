@@ -3,7 +3,7 @@ import type { Effect } from "../../../catalog/boundary.ts";
 // The campaign cards of The Return of the King (145066, 145070, 145078, 146069, 146074, 146079; Setup on the front, Resolution on the back, ledger data/printed/the-return-of-the-king.json). Their vocabulary is the campaign
 // family's (src/catalog/families/campaign.ts): the checklist deals the Setup verbs (src/campaign/checklist.ts) and the Resolution runs the rest (src/rules/setup/resolution.ts, src/rules/families/campaign/saga-end.ts).
 // Written here: the Setup of the cards that only change the pool, the decks and the hand (145066, 145070, 146074), and every Resolution. Left to the scenarios that play them, since each needs a mechanic that scenario builds: the Setup lines
-// that set cards aside, attach them or place tokens in the game (145078:A:1, 146069:A:1, 146079:A:1) and the Forced lines of the campaign cards in play (145078:B:1, 146069:B:1, 146079:A:2).
+// that set cards aside, attach them or place tokens in the game (146069:A:1, 146079:A:1) and the Forced lines of the campaign cards in play (146069:B:1, 146079:A:2). 145078's Setup and Forced are in pelennor/stages.ts.
 const FELLOWSHIP_AND_TWO_TOWERS_SETS = ["A Shadow of the Past", "Flight to the Ford", "The Ring Goes South", "The Passage of the Marshes", "Shelob's Lair"];
 const ANDURIL = "142014";
 const OVERCOME_BY_FEAR = "145016";
