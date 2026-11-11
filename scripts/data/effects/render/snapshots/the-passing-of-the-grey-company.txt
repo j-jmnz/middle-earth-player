@@ -61,7 +61,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
 145019:A:2 (front): Travel: The first player searches the encounter deck and discard pile for an Oathbreaker enemy and puts it into play engaged with him. Shuffle the encounter deck.
   145019:travel:1: Travel
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchMove {"verb":"SearchMove","trait":"Oathbreaker","type":"enemy","to":"engagedFirstPlayer"}]
+    - [json SearchMove {"verb":"SearchMove","trait":"Oathbreaker","type":"enemy","to":"engaged"}]
     - shuffle the encounter deck
 
 ## 145020 Deadly Road
@@ -308,8 +308,8 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
   145065:constant:1: Constant
     only if the active location is a location (any player controls) named "The Stone of Erech"
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each Oathbreaker enemy (any player controls): stat losesPhantom 1, while this card is in play
-    - each Oathbreaker enemy (any player controls): stat engagementCost -20, while this card is in play
+    - each Oathbreaker enemy (any player controls) or in the staging area: stat losesPhantom 1, while this card is in play
+    - each Oathbreaker enemy (any player controls) or in the staging area: stat engagementCost -20, while this card is in play
 
 145065:B:2 (back): When The Stone of Erech leaves play as an explored location, the players win the game.
   145065:constant:2: Constant

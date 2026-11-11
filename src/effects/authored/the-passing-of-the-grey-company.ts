@@ -21,7 +21,7 @@ const ATTACH: Option = { id: "attach", requires: { kind: "canAttachToDial", code
 const choose = (...options: Option[]): Extract<Instruction, { verb: "Choose" }> => ({ verb: "Choose", who: "actor", options: [ATTACH, ...options] });
 const EACH_PLAYER = (instructions: Extract<Instruction, { verb: "ForEachPlayer" }>["instructions"]): Instruction => ({ verb: "ForEachPlayer", order: "firstFirst", instructions });
 const YOUR_ALLY: PickSpec = { type: "ally", control: "you" };
-const OATHBREAKER_ENEMY: PickSpec = { type: "enemy", control: "any", trait: "Oathbreaker" };
+const OATHBREAKER_ENEMY: PickSpec = { type: "enemy", control: "any", trait: "Oathbreaker", staging: true };
 const STONE_ACTIVE: Cond = { kind: "matches", card: "activeLocation", pick: { type: "location", control: "any", names: ["The Stone of Erech"] } };
 // "Discard an ally you control": an option only while the player controls one.
 const DISCARD_ALLY: Option = { id: "discard", requires: { kind: "canPick", pick: YOUR_ALLY }, instructions: [{ verb: "Pick", pick: YOUR_ALLY }, { verb: "Discard", target: { kind: "picked" } }] };
@@ -80,7 +80,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       condition: { kind: "sourceIn", zone: "staging" },
       instructions: [{ verb: "ModifyStat", stat: "cannotTakeDamage", amount: 1, until: "whileSourceInPlay", holders: { type: "enemy", control: "any", stagingOnly: true } }],
     },
-    { id: "145019:travel:1", cardCode: "145019", lines: ["145019:A:2"], timing: "travel", instructions: [{ verb: "SearchMove", trait: "Oathbreaker", type: "enemy", to: "engagedFirstPlayer" }, { verb: "ShuffleEncounterDeck" }] },
+    { id: "145019:travel:1", cardCode: "145019", lines: ["145019:A:2"], timing: "travel", instructions: [{ verb: "SearchMove", trait: "Oathbreaker", type: "enemy", to: "engaged" }, { verb: "ShuffleEncounterDeck" }] },
 
     // 145020 Deadly Road. While it is in the staging area it gains: "Forced: After a 'when revealed' effect is canceled, raise each player's threat by 1" (it hears only the cancel of a card that has a When Revealed effect). Travel: spend 1 Fellowship resource (a copy of
     // Shifting Quagmire's line).
