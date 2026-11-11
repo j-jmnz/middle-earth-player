@@ -9,7 +9,7 @@ import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { spawn } from "../../core/zones.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { CARDS, table } from "../wilderland/fixture.ts";
-import { healAllowed, noteHealed } from "./heal-cap.ts";
+import { healAllowed, healDamage, noteHealed } from "./heal-cap.ts";
 import { pruneRoundCaps } from "./index.ts";
 
 // The Port's own record (145033:constant:1): the table holds the cap while the Port is in the staging area.
@@ -49,6 +49,17 @@ describe("healCap (145033:A:1)", () => {
     expect(healAllowed(healed, hero, 2, ctx)).toBe(0);
     expect(pruneRoundCaps(healed).roundHealed).toBeUndefined();
     expect(healAllowed(pruneRoundCaps(healed), hero, 2, ctx)).toBe(1);
+  });
+
+  it("healDamage takes what the cap allows, notes it and says how much came off", () => {
+    const { state, hero } = held();
+    const first = healDamage(state, hero, 3, ctx);
+    expect(first.healed).toBe(1);
+    expect(first.state.cards[hero]?.damage).toBe(3);
+    expect(first.state.roundHealed).toEqual({ [hero]: 1 });
+    const second = healDamage(first.state, hero, 1, ctx);
+    expect(second.healed).toBe(0);
+    expect(second.state).toBe(first.state);
   });
 
   it("limits HealQuietly and offers HealAmong no character with no room left", () => {

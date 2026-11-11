@@ -119,8 +119,9 @@ const game = campaignGame<GondorDecks, GondorPolicy>({
   policy: DEFAULT_POLICY,
   limit: 6000,
   upgraded: [],
-  // The Passing of the Grey Company earns no XP; it leaves the Army of the Dead boon in the pool (earned when the Army of the Dead enemy is in its victory display).
-  earlier: { xp: [0], pool: [{ code: "145068" }], marks: {} },
+  // The Passing of the Grey Company earns no XP; it leaves the Army of the Dead boon in the pool (earned when the Army of the Dead enemy is in its victory display) and an Overcome by Fear for each seat whose dial held one (145066:B:1;
+  // a true solo game reads both rows for its one seat, and the second copy stays set aside).
+  earlier: { xp: [0], pool: [{ code: "145068" }, { code: "145016", seat: 0 }, { code: "145016", seat: 1 }], marks: {} },
 });
 
 export const playGolden = (golden: GondorGolden, ctx: ReduceContext): GondorGame => game.playGolden(golden, ctx);

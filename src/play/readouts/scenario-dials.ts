@@ -23,9 +23,31 @@ export function useScenarioDials(game: ScenarioState, ctx: ReduceContext, nameOf
   return useStableDials(scenarioDials(game, ctx, nameOf));
 }
 
-/** The marks the seat dials wear: The Road to Isengard's cards in hand on stage 3B and Shelob's Lair's allies this round The Passing of the Grey Company's Overcome by Fear and threat floor and The Siege of Gondor's Army of the Dead. */
+/** The marks the seat dials wear: The Road to Isengard's cards in hand on stage 3B, Shelob's Lair's allies this round, The Passing of the Grey Company's Overcome by Fear and threat floor, and The Siege of Gondor's Army of the Dead.
+ * A seat wears one mark: when two scenarios' pieces fall on the same seat (Fear and the Army) their labels, notes and notches are merged into it. */
 export function seatMarks(game: ScenarioState, ctx: ReduceContext): readonly HandMark[] {
-  return [...isengardHands(game), ...lairHands(game, ctx), ...companyHands(game, ctx), ...siegeHands(game)];
+  return mergedBySeat([...isengardHands(game), ...lairHands(game, ctx), ...companyHands(game, ctx), ...siegeHands(game)]);
+}
+
+// The label after the seat prefix ("P1 · Fear" is "Fear"); a bare seat ("P1") or "Threat" says nothing more.
+const labelTail = (label: string): string => label.replace(/^P\d+( · )?/, "").replace(/^Threat$/, "");
+
+function mergedBySeat(marks: readonly HandMark[]): readonly HandMark[] {
+  const bySeat = new Map<number, HandMark>();
+  for (const mark of marks) {
+    const held = bySeat.get(mark.seat);
+    if (!held) {
+      bySeat.set(mark.seat, mark);
+      continue;
+    }
+    const tail = labelTail(mark.label);
+    const label = tail === "" ? held.label : labelTail(held.label) === "" ? mark.label : `${held.label} · ${tail}`;
+    const warn = held.warn?.level === "critical" || !mark.warn ? held.warn : mark.warn;
+    const note = [held.note, mark.note].filter((words) => words != null).join(" ");
+    const notch = held.notch ?? mark.notch;
+    bySeat.set(mark.seat, { seat: mark.seat, label, ...(warn ? { warn } : {}), ...(note !== "" ? { note } : {}), ...(notch != null ? { notch } : {}) });
+  }
+  return [...bySeat.values()];
 }
 
 /** The seat marks for the top bar, stable the same way. */

@@ -8,7 +8,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { gameReads } from "../../core/game-reads.ts";
 import { isCharacterType, printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { heldLeast } from "../../core/state.ts";
+import { heldLeast, updateCard } from "../../core/state.ts";
 
 function isCharacter(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
   const card = state.cards[id];
@@ -26,4 +26,12 @@ export function healAllowed(state: ScenarioState, id: string, amount: number, ct
 export function noteHealed(state: ScenarioState, id: string, amount: number, ctx: ReduceContext): ScenarioState {
   if (amount <= 0 || !gameReads(state, ctx, '"healCap"') || !isCharacter(state, id, ctx)) return state;
   return { ...state, roundHealed: { ...state.roundHealed, [id]: (state.roundHealed?.[id] ?? 0) + amount } };
+}
+
+// Damage comes off a card: as much of `amount` as is on it and the cap allows, the damage removed and noted for the cap. Every verb that heals a card goes through here, so the cap is read and noted in one place.
+export function healDamage(state: ScenarioState, id: string, amount: number, ctx: ReduceContext): { state: ScenarioState; healed: number } {
+  const card = state.cards[id];
+  const healed = card ? healAllowed(state, id, Math.min(card.damage, amount), ctx) : 0;
+  if (!card || healed <= 0) return { state, healed: 0 };
+  return { state: noteHealed(updateCard(state, id, { damage: card.damage - healed }), id, healed, ctx), healed };
 }

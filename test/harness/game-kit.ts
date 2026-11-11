@@ -239,6 +239,7 @@ export function campaignGame<D extends string, P extends object>(spec: CampaignG
       effects: EFFECTS,
       difficulty,
       poolEncounterCards: checked.poolEncounterCards,
+      poolEncounterOwners: checked.poolEncounterOwners,
       poolIntoPlay: checked.poolIntoPlay,
       removedFromEncounter: checked.removedFromEncounter,
       removedFromCaves: checked.removedFromCaves,

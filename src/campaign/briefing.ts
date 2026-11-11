@@ -209,6 +209,7 @@ export function startFor(input: BriefingInput, seed: number): StartScenario {
     difficulty: input.difficulty,
     effects: world.effects,
     poolEncounterCards: plan.poolEncounterCards,
+    poolEncounterOwners: plan.poolEncounterOwners,
     poolIntoPlay: plan.poolIntoPlay,
     removedFromEncounter: plan.removedFromEncounter,
     removedFromCaves: plan.removedFromCaves,

@@ -28,7 +28,13 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   // 145041:A:1 (each player in turn, the first player first) and A:2 (the defending player).
   "145041:whenRevealed:1 @0.0 Choose": { owned: true, note: "Raiding the Coasts: add 3 to the staging area's Threat this phase, or discard your highest cost attachment." },
   "145041:whenRevealed:1 @0.0 threat": { label: "Add 3 to the staging area's Threat until the end of the phase" },
-  "145041:whenRevealed:1 @0.0 discard": { label: "Discard the highest cost attachment you control" },
+  // The label cannot name the attachment (an asks template names only the record's own card and numbers), so it says whether the highest cost is one attachment or a tie the follow-up pick settles.
+  "145041:whenRevealed:1 @0.0 discard": {
+    label: [
+      { when: { kind: "count", pick: { type: "attachment", control: "you", highestCost: true }, min: 2 }, text: "Discard your highest cost attachment: you choose among those tied for the highest cost" },
+      { text: "Discard your highest cost attachment: it is the only one at the highest cost" },
+    ],
+  },
   "145041:whenRevealed:1 @0.0.discard.0 Pick": { owned: true, note: "Raiding the Coasts: choose, among your attachments tied for the highest cost, the one to discard.", verb: "Discard" },
   "145041:shadow:1 @1.0 Pick": { owned: true, note: "Raiding the Coasts shadow destroyed a character: choose an attachment you control to discard.", verb: "Discard" },
   // 145039:A:2 (Peril): the revealing player chooses alone.
@@ -43,7 +49,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   // 145069:A:1 (Setup): each player in turn, the first player first, searches the encounter deck (not its discard pile).
   "145069:setup:1 @0.0 SearchMove": { owned: true, note: "Attack on Pelargir: search the encounter deck, not its discard pile, for a Ship location. Add it to the staging area.", verb: "Add" },
   // 145071:A:1: at the beginning of the staging step each player in turn, the first player first, chooses.
-  "145071:forced:1 @1.0 Choose": { owned: true, note: "The Corsair Fleet: you either reveal an encounter card on your own, or assign {x} damage among the characters you control.", bind: { x: FLEET_X } },
+  "145071:forced:1 @1.0 Choose": { owned: true, note: "The Corsair Fleet: you either reveal 1 encounter card, or assign {x} damage among the characters you control.", bind: { x: FLEET_X } },
   "145071:forced:1 @1.0 reveal": { label: "Reveal an encounter card" },
   "145071:forced:1 @1.0 damage": { label: "Assign {x} damage among your characters", bind: { x: FLEET_X } },
   "145071:forced:1 @1.0.damage.0 AssignDamage": { owned: true, note: "The Corsair Fleet: assign {x} damage among the characters you control.", bind: { x: FLEET_X }, verb: "Assign" },

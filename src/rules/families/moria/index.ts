@@ -14,7 +14,7 @@ import { inPlay, updateCard } from "../../core/state.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { threatCostOf } from "../costs/stats.ts";
-import { healAllowed, noteHealed } from "../dreamchaser/heal-cap.ts";
+import { healDamage } from "../dreamchaser/heal-cap.ts";
 
 // The verbs src/catalog/families/moria.ts adds. Null when the verb is not one of them.
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
@@ -43,11 +43,11 @@ function changeDamage(state: ScenarioState, code: string, change: number, steps:
   const card = id ? state.cards[id] : undefined;
   if (!id || !card) return state;
   // Damage taken off a character is healed damage, so a healCap (145033:A:1) limits it.
-  const amount = change > 0 ? change : -healAllowed(state, id, Math.min(card.damage, -change), ctx);
+  const healed = change > 0 ? null : healDamage(state, id, -change, ctx);
+  const amount = healed ? -healed.healed : change;
   if (amount === 0) return state;
   steps.push({ kind: "damage", targetId: id, amount, cause: currentCause(steps, UNATTRIBUTED) });
-  const changed = updateCard(state, id, { damage: card.damage + amount });
-  return amount < 0 ? noteHealed(changed, id, -amount, ctx) : changed;
+  return healed ? healed.state : updateCard(state, id, { damage: card.damage + amount });
 }
 
 // SacrificeForDamage (142050:A:2): the last picked hero is discarded from play, the card with `code` takes damage equal to the hero's threat cost,

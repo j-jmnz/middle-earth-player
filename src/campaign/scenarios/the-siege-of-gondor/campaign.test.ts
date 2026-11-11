@@ -23,6 +23,7 @@ const ARMY_BOON = "145068";
 const ANDURIL = "142014";
 const HEAVY_BURDEN = "144052";
 const FLEET = "145071";
+const FEAR = "145016";
 let ctx: ReduceContext;
 let world: Awaited<ReturnType<typeof gondorWorld>>;
 let afterCompany: CampaignLog;
@@ -111,6 +112,22 @@ describe("The Siege of Gondor in the the-return-of-the-king campaign", () => {
     const without = opened(2, { ...afterCompany, campaignPool: afterCompany.campaignPool.filter((card) => card.code !== ARMY_BOON) });
     expect(copies(without, ARMY_BOON)).toHaveLength(0);
     expect(copies(opened(1, emptyLog(1)), ARMY_BOON)).toHaveLength(0);
+  });
+
+  // 145066:B:1 records each Overcome by Fear for its seat; the checklist carries the seat into the encounter deck so that copy's Setup (145016:A:1) attaches it to that seat's own dial.
+  it("145016:A:1 attaches each Overcome by Fear the Grey Company's win left to the dial of the seat it was recorded for", () => {
+    const recorded = afterCompany.campaignPool.filter((card) => card.code === FEAR).map((card) => card.seat).sort();
+    expect(recorded).toEqual([0, 1]);
+    const state = opened(2, afterCompany);
+    const onDials = copies(state, FEAR).filter((card) => card.zone === "play");
+    expect(onDials.map((card) => card.controller).sort()).toEqual([0, 1]);
+    expect(copies(state, FEAR).filter((card) => card.zone === "setAside")).toHaveLength(0);
+  });
+
+  it("145016:A:1 attaches a pooled Overcome by Fear recorded only for the second seat to that seat's dial", () => {
+    const log: CampaignLog = { ...afterCompany, campaignPool: [poolCard(world.cards.get(FEAR)!, FEAR, null, 1)] };
+    const state = opened(2, log);
+    expect(copies(state, FEAR).map((card) => [card.zone, card.controller])).toEqual([["play", 1]]);
   });
 
   // The Resolution (145070:B:1): the golden's final state is resolved onto the log of the part before (goldenState, not a game played again).

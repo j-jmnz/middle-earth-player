@@ -10,7 +10,8 @@ import { idOf, tableFromLayout, type Layout } from "../../../test/harness/scene-
 import { dialProps } from "../readouts/dials.ts";
 import { scenarioDials, seatMarks } from "../readouts/scenario-dials.ts";
 import { siegeDials, siegeHands, siegeProgressWords } from "../readouts/siege.ts";
-import { ARMY_WORDS, fleetWords, heldProgressWords, holdWords, portReachedWords, portWords, quaysNearWords, quaysWords, shipsWords } from "../words/scenarios/siege.ts";
+import { FEAR_WORDS } from "../words/scenarios/company.ts";
+import { ARMY_WORDS, fleetWords, heldProgressWords, portReachedWords, portWords, quaysNearWords, quaysWords, shipsWords } from "../words/scenarios/siege.ts";
 
 const ID = "the-siege-of-gondor";
 const GREAT_SHIP = "145030";
@@ -22,6 +23,7 @@ describe("The Corsair Fleet's resources", () => {
   it("145071:A:1 is a dial of the resources on the Fleet, X, with no limit and no warning, gone while the Fleet is not in play", () => {
     const made = table({ staging: [{ code: "145071", resources: 3 }] });
     expect(dial(made, "fleet")).toMatchObject({ id: "fleet", testID: "siege-fleet", label: "Fleet", value: 3, note: fleetWords(3) });
+    expect(dial(made, "fleet")?.note).toContain("If you win, this number is written in the campaign log.");
     expect(dial(made, "fleet")?.limit).toBeUndefined();
     expect(dial(made, "fleet")?.warms).toBeUndefined();
     expect(dialProps(dial(made, "fleet")!)).toMatchObject({ elimination: false, testID: "siege-fleet" });
@@ -66,7 +68,15 @@ describe("Pelargir Quays' damage tokens", () => {
     const made = table({ staging: [{ code: "145034", damage: 2 }], active: "145034" });
     const shown = siegeDials(made.state, made.ctx, names(made)).filter((one) => one.id.startsWith("quays"));
     expect(shown.map((one) => [one.testID, one.label])).toEqual([["siege-quays", "Quays"], ["siege-quays-2", "Quays 2"]]);
+    expect(shown.map((one) => one.name)).toEqual([expect.stringContaining(", in the staging area, 4 to discard it:"), expect.stringContaining(", the active location, 4 to discard it:")]);
     expect(siegeDials(table().state, table().ctx, names(table())).filter((one) => one.id.startsWith("quays"))).toEqual([]);
+  });
+});
+
+describe("the order of the dials", () => {
+  it("145034:A:1 draws the dials that can warn (Quays, Healed) before the Fleet and the Ships", () => {
+    const made = table({ staging: ["145033", "145034", GREAT_SHIP, { code: "145071", resources: 2 }] });
+    expect(siegeDials(made.state, made.ctx, names(made)).map((one) => one.id)).toEqual(["quays-1", "port", "fleet", "ships"]);
   });
 });
 
@@ -76,7 +86,12 @@ describe("the Port's heal cap", () => {
     expect(dial(made, "port")).toMatchObject({ testID: "siege-port", label: "Healed", value: 0, limit: 1, limitWords: portWords(1) });
     expect(dial(made, "port")?.warn).toBeUndefined();
     const healed = { ...made.state, roundHealed: { [made.hero]: 1 } };
-    expect(siegeDials(healed, made.ctx, names(made)).find((one) => one.id === "port")).toMatchObject({ value: 1, warn: { level: "near", words: portReachedWords(1) } });
+    expect(siegeDials(healed, made.ctx, names(made)).find((one) => one.id === "port")).toMatchObject({ value: 1, warn: { level: "near", words: portReachedWords(1, [names(made)(made.state.cards[made.hero]?.code ?? "")]) } });
+  });
+
+  it("145033:A:1 names the characters at the cap, several joined", () => {
+    expect(portReachedWords(1, ["Aragorn"])).toBe("Aragorn has had 1 damage healed this round: no more can be healed from it until the round ends");
+    expect(portReachedWords(1, ["Aragorn", "Boromir", "Faramir"])).toBe("Aragorn, Boromir and Faramir have each had 1 damage healed this round: no more can be healed from them until the round ends");
   });
 
   it("145033:A:1 is held only while the Port is in the staging area", () => {
@@ -85,17 +100,9 @@ describe("the Port's heal cap", () => {
   });
 });
 
-describe("stage 1B's held progress", () => {
-  it("145069:B:2 is a goal dial of the stage's progress against its 20 while Great Corsair Ship is in play, never warming, and reads above it", () => {
-    const made = table({ staging: [GREAT_SHIP], progress: 23 });
-    const shown = dial(made, "hold");
-    expect(shown).toMatchObject({ id: "hold", testID: "siege-hold", label: "To win", value: 23, limit: 20, goal: true, limitWords: holdWords(20) });
-    expect(shown?.warms).toBeUndefined();
-    expect(shown?.warn).toBeUndefined();
-  });
-
-  it("145069:B:2 is gone once the Ship has left play, and the meter says the stage is held only while it is in play and the progress would reach 20", () => {
-    expect(dial(table({ progress: 23 }), "hold")).toBeUndefined();
+describe("stage 1B's held progress, said by the quest meter", () => {
+  it("145069:B:2 has no dial of its own: the meter says the stage is held only while it is in play and the progress would reach 20", () => {
+    expect(dial(table({ staging: [GREAT_SHIP], progress: 23 }), "hold")).toBeUndefined();
     const made = table({ staging: [GREAT_SHIP], progress: 17 });
     expect(siegeProgressWords(made.state, made.ctx, 4)).toBe(heldProgressWords(4));
     expect(siegeProgressWords(made.state, made.ctx, 2)).toBeNull();
@@ -114,6 +121,15 @@ describe("the Army of the Dead's seat", () => {
     expect(seatMarks(pair.state, pair.ctx)).toEqual([{ seat: 1, label: "P2 · Army", note: ARMY_WORDS }]);
     const passed = updateCard(pair.state, idOf(pair.state, "145068"), { controller: 0 });
     expect(siegeHands(passed)).toEqual([{ seat: 0, label: "P1 · Army", note: ARMY_WORDS }]);
+  });
+
+  it("145068:A:1 and 145016:A:2 share a seat's one mark when Fear and the Army are on the same seat: the labels and the spoken notes join", () => {
+    const both = table({ seats: 2, play: [{ code: "145068", seat: 1 }, { code: "145016", seat: 1 }] });
+    const marks = seatMarks(both.state, both.ctx);
+    expect(marks).toHaveLength(1);
+    expect(marks[0]).toMatchObject({ seat: 1, label: "P2 · Fear · Army" });
+    expect(marks[0]?.note).toContain(ARMY_WORDS);
+    expect(marks[0]?.note).toContain(FEAR_WORDS);
   });
 
   it("145068:A:3 has no mark once the Army has left play", () => {

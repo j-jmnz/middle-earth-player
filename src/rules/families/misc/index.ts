@@ -1,5 +1,5 @@
 // Rules: rr.damage, rr.hit-points, rr.first-player, rr.search, rr.unique-cards, rr.framework-steps (data/rules/entries.json).
-import { healAllowed, noteHealed } from "../dreamchaser/heal-cap.ts";
+import { healDamage } from "../dreamchaser/heal-cap.ts";
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
@@ -38,8 +38,7 @@ function healQuietly(state: ScenarioState, instruction: Verb<"HealQuietly">, foc
   const id = refCard(state, instruction.target ?? "subject", scope) ?? "";
   const card = state.cards[id];
   if (!card || card.damage <= 0) return state;
-  const amount = healAllowed(state, id, Math.min(card.damage, resolveAmount(state, instruction.amount, scope, ctx)), ctx);
-  return amount > 0 ? noteHealed(updateCard(state, id, { damage: card.damage - amount }), id, amount, ctx) : state;
+  return healDamage(state, id, resolveAmount(state, instruction.amount, scope, ctx), ctx).state;
 }
 
 // MoveDamage: damage tokens go from the card picked before the last to the last picked card (rr.damage).

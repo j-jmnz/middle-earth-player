@@ -59,6 +59,8 @@ export type StartScenario = {
   definition: ScenarioDefinition;
   seats: readonly StartSeat[];
   encounterDeck: readonly string[];
+  // Encounter-deck copies the campaign pool recorded for a seat (one entry per copy): the copy's controller, which its Setup line reads as the acting seat (search.ts).
+  encounterOwners?: readonly { code: string; seat: number }[];
   questDeck: readonly string[];
   // The burden deck of the scenario, when it has one. It is shuffled into a deck beside the quest deck.
   burdenDeck?: readonly string[];
@@ -77,6 +79,16 @@ export type StartScenario = {
   facts?: CampaignFacts;
 };
 
+// Each recorded copy takes the next encounter-deck card of its code that has no controller yet.
+function ownEncounterCopies(state: ScenarioState, owners: readonly { code: string; seat: number }[]): ScenarioState {
+  let next = state;
+  for (const owner of owners) {
+    const id = next.encounterDeck.find((candidate) => next.cards[candidate]?.code === owner.code && next.cards[candidate]?.controller == null);
+    if (id) next = updateCard(next, id, { controller: owner.seat });
+  }
+  return next;
+}
+
 export function startScenario(input: StartScenario, ctx: ReduceContext): ScenarioState {
   let state = blankScenario({
     seatCount: input.seatCount,
@@ -92,6 +104,7 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
   for (const code of input.encounterDeck) {
     state = spawn(state, code, { zone: "encounterDeck" }).state;
   }
+  state = ownEncounterCopies(state, input.encounterOwners ?? []);
   state = shuffleZone(state, "encounter");
   if (input.burdenDeck && input.burdenDeck.length > 0) {
     for (const code of input.burdenDeck) state = spawn(state, code, { zone: "burdenDeck" }).state;

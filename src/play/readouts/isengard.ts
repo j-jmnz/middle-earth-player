@@ -25,7 +25,7 @@ const STAFF = "143048";
 export type HandMark = { seat: number; label: string; warn?: { level: "near" | "critical"; words: string }; note?: string; notch?: number };
 
 // The number a record's `less` condition on an instruction names, plus 1: "2 less than the resources" (143046:A:1) is the 3 resources that end it, "4 less than the damage" (143079:B:2) the 5 damage that advance.
-function reaches(ctx: ReduceContext, code: string, verb: string): number | null {
+export function reaches(ctx: ReduceContext, code: string, verb: string): number | null {
   for (const effect of effectsOf(ctx, code) as readonly Effect[]) {
     for (const instruction of effect.instructions) {
       if (instruction.verb !== verb) continue;

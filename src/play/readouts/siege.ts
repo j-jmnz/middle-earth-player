@@ -5,14 +5,14 @@
 // the seat that controls the Army of the Dead. The engine decided every number (the Fleet's tokens, `roundHealed`, the records' limits); nothing here changes one. Pure, so a test reads it.
 import type { Effect } from "../../catalog/boundary.ts";
 import { modifiedStat } from "../../rules/core/keywords.ts";
-import { isCharacterType, printedOf } from "../../rules/core/printed.ts";
 import { heldLeast, inPlay } from "../../rules/core/state.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
+import { countMatching } from "../../rules/interpret/pick.ts";
 import { effectsOf } from "../../rules/windows/listen.ts";
 
-import { armyLabel, ARMY_WORDS, fleetWords, heldProgressWords, holdWords, portReachedWords, portWords, quaysNearWords, quaysWords, shipsWords } from "../words/scenarios/siege.ts";
+import { armyLabel, ARMY_WORDS, fleetWords, heldProgressWords, portReachedWords, portWords, quaysNearWords, quaysWords, shipsWords } from "../words/scenarios/siege.ts";
 import type { TableDial } from "./dials.ts";
-import type { HandMark } from "./isengard.ts";
+import { reaches, type HandMark } from "./isengard.ts";
 
 const GREAT_SHIP = "145030";
 const FLEET = "145071";
@@ -24,39 +24,25 @@ const ARMY = "145068";
 /** The cards of a code that are in play (the staging area, the active location, a play area). */
 const cardsOf = (game: ScenarioState, code: string) => Object.values(game.cards).filter((card) => card.code === code && inPlay(card.zone));
 
-/** How many Ship locations must be in the victory display to travel to Great Corsair Ship: one more than the record's bar ("cannot travel here unless 3 or more", 145030:A:2). Null when the record holds no such count. */
-function shipsNeeded(ctx: ReduceContext): number | null {
+type ShipsRule = { needed: number; pick: Extract<NonNullable<Effect["condition"]>, { kind: "count" }>["pick"] };
+
+/** The Ship locations that bar the travel to Great Corsair Ship: the condition's own pick ("cannot travel here unless 3 or more", 145030:A:2) and one more than its bar, the number the players need. Null when the record holds no such count. */
+function shipsRule(ctx: ReduceContext): ShipsRule | null {
   for (const effect of effectsOf(ctx, GREAT_SHIP) as readonly Effect[]) {
     const condition = effect.condition;
-    if (effect.timing === "constant" && condition?.kind === "count" && condition.pick.from === "victory" && typeof condition.max === "number") return condition.max + 1;
-  }
-  return null;
-}
-
-/** The damage tokens at which Pelargir Quays is discarded and deals its damage: the amount its Forced effect assigns (145034:A:1). Null when the record holds no plain number. */
-function quaysLimit(ctx: ReduceContext): number | null {
-  for (const effect of effectsOf(ctx, QUAYS) as readonly Effect[]) {
-    for (const instruction of effect.instructions) if (instruction.verb === "AssignDamage" && typeof instruction.amount === "number") return instruction.amount;
+    if (effect.timing === "constant" && condition?.kind === "count" && condition.pick.from === "victory" && typeof condition.max === "number") return { needed: condition.max + 1, pick: condition.pick };
   }
   return null;
 }
 
 /**
- * The dials The Siege of Gondor's pieces hold now, in the order the top bar draws them: The Corsair Fleet's resources (X, no limit), the Ship locations in the victory display (a goal dial toward the travel to Great Corsair Ship, while it is in the
- * staging area), each Pelargir Quays' damage tokens (it warms one short of the limit: it deals damage to the characters), the heal cap (while the Port is in the staging area: it warms once a character has used its allowance) and the stage's progress
- * against its 20 (a goal dial while Great Corsair Ship is in play). Empty in any other scenario.
+ * The dials The Siege of Gondor's pieces hold now, in the order the top bar draws them: the ones that can warn first, each Pelargir Quays' damage tokens (it warms one short of the limit: it deals damage to the characters) and the heal cap (while
+ * the Port is in the staging area: it warns once a character has used its allowance), then The Corsair Fleet's resources (X, no limit) and the Ship locations in the victory display (a goal dial toward the travel to Great Corsair Ship, while it
+ * is in the staging area). Empty in any other scenario. The stage's held progress is the quest meter's (`siegeProgressWords`), not a dial.
  */
 export function siegeDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code: string) => string): readonly TableDial[] {
   const dials: TableDial[] = [];
-  const fleet = cardsOf(game, FLEET)[0];
-  if (fleet) dials.push({ id: "fleet", testID: "siege-fleet", label: "Fleet", name: `Resources on ${nameOf(FLEET)}, X:`, value: fleet.resources, note: fleetWords(fleet.resources) });
-  const ship = cardsOf(game, GREAT_SHIP)[0];
-  const needed = shipsNeeded(ctx);
-  if (ship?.zone === "staging" && needed != null) {
-    const count = Object.values(game.cards).filter((card) => card.zone === "victory" && printedOf(ctx.cards, card.code).type === "location" && printedOf(ctx.cards, card.code).traits.includes("Ship")).length;
-    dials.push({ id: "ships", testID: "siege-ships", label: "Ships", name: `Ship locations in the victory display, ${needed} to travel to ${nameOf(GREAT_SHIP)}:`, value: count, limit: needed, goal: true, limitWords: shipsWords(needed, count) });
-  }
-  const limit = quaysLimit(ctx);
+  const limit = reaches(ctx, QUAYS, "AssignDamage");
   const quays = cardsOf(game, QUAYS).filter((card) => card.zone === "staging" || card.id === game.activeLocation);
   if (limit != null) {
     quays.forEach((card, index) => {
@@ -64,7 +50,7 @@ export function siegeDials(game: ScenarioState, ctx: ReduceContext, nameOf: (cod
         id: `quays-${index + 1}`,
         testID: index === 0 ? "siege-quays" : `siege-quays-${index + 1}`,
         label: index === 0 ? "Quays" : `Quays ${index + 1}`,
-        name: `Damage tokens on ${nameOf(QUAYS)}, ${limit} to discard it:`,
+        name: `Damage tokens on ${nameOf(QUAYS)}, ${card.id === game.activeLocation ? "the active location" : "in the staging area"}, ${limit} to discard it:`,
         value: card.damage,
         limit,
         warms: true,
@@ -75,11 +61,19 @@ export function siegeDials(game: ScenarioState, ctx: ReduceContext, nameOf: (cod
   }
   const cap = cardsOf(game, PORT).some((card) => card.zone === "staging") ? heldLeast(game, "table", "healCap") : 0;
   if (cap > 0) {
-    const healed = Math.max(0, ...Object.entries(game.roundHealed ?? {}).filter(([id]) => game.cards[id] != null && isCharacterType(printedOf(ctx.cards, game.cards[id]?.code ?? ""))).map(([, amount]) => amount));
-    dials.push({ id: "port", testID: "siege-port", label: "Healed", name: `Most damage healed from one character this round, ${cap} allowed each by ${nameOf(PORT)}:`, value: Math.min(healed, cap), limit: cap, ...(healed >= cap ? { warn: { level: "near" as const, words: portReachedWords(cap) } } : {}), limitWords: portWords(cap) });
+    const healed = Object.entries(game.roundHealed ?? {}).filter(([id]) => game.cards[id] != null);
+    const most = Math.max(0, ...healed.map(([, amount]) => amount));
+    const atCap = healed.filter(([, amount]) => amount >= cap).map(([id]) => nameOf(game.cards[id]?.code ?? ""));
+    dials.push({ id: "port", testID: "siege-port", label: "Healed", name: `Most damage healed from one character this round, ${cap} allowed each by ${nameOf(PORT)}:`, value: Math.min(most, cap), limit: cap, ...(atCap.length > 0 ? { warn: { level: "near" as const, words: portReachedWords(cap, atCap) } } : {}), limitWords: portWords(cap) });
   }
-  const stage = game.questStage ? game.cards[game.questStage] : undefined;
-  if (stage?.code === STAGE && ship) dials.push({ id: "hold", testID: "siege-hold", label: "To win", name: `Progress on ${nameOf(STAGE)}, held while ${nameOf(GREAT_SHIP)} is in play:`, value: stage.progress, limit: modifiedStat(game, stage, "questPoints", ctx.cards), goal: true, limitWords: holdWords(modifiedStat(game, stage, "questPoints", ctx.cards)) });
+  const fleet = cardsOf(game, FLEET)[0];
+  if (fleet) dials.push({ id: "fleet", testID: "siege-fleet", label: "Fleet", name: `Resources on ${nameOf(FLEET)}, X:`, value: fleet.resources, note: fleetWords(fleet.resources) });
+  const ship = cardsOf(game, GREAT_SHIP)[0];
+  const rule = shipsRule(ctx);
+  if (ship?.zone === "staging" && rule) {
+    const count = countMatching(game, rule.pick, game.firstPlayer, ship.id, ctx);
+    dials.push({ id: "ships", testID: "siege-ships", label: "Ships", name: `Ship locations in the victory display, ${rule.needed} to travel to ${nameOf(GREAT_SHIP)}:`, value: count, limit: rule.needed, goal: true, limitWords: shipsWords(rule.needed, count) });
+  }
   return dials;
 }
 

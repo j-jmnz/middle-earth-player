@@ -26,6 +26,8 @@ export type StartInput = {
   effects?: readonly Effect[];
   // Cards the campaign pool shuffles into the encounter deck (Campaign Setup Checklist step 8).
   poolEncounterCards?: readonly string[];
+  // The seats those copies were recorded for, when their Setup line acts for a seat (the checklist's poolEncounterOwners).
+  poolEncounterOwners?: readonly { code: string; seat: number }[];
   // Pool cards that are put into play at the start of each scenario (Mendor): the checklist's step 8 left them out of the encounter
   // deck, and each enters play under the first player after the campaign card's own Setup.
   poolIntoPlay?: readonly string[];
@@ -130,6 +132,7 @@ export function buildStart(start: StartInput): StartScenario {
       ],
     },
     seats: input.seats,
+    ...(input.poolEncounterOwners && input.poolEncounterOwners.length > 0 && !standalone ? { encounterOwners: input.poolEncounterOwners } : {}),
     encounterDeck: withoutCards([...encounterCodes(input.scenario, input.difficulty, input.seatCount), ...shuffledIn, ...(input.poolEncounterCards ?? [])], standalone ? [] : (input.removedFromEncounter ?? [])),
     questDeck: input.scenario.stages,
     ...(burden.length > 0 ? { burdenDeck: burden } : {}),

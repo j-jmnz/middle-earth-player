@@ -77,7 +77,7 @@ Read the sections your task touches.
   - 378–383 Catalog build (~410)
   - 384–401 Tests (~2.0K) ← 5
   - 402–417 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~106.7K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~106.8K tok)
   - 17–39 Sections (~450)
   - 40–51 Product (~590)
   - 52–65 Non-goals (~540)
@@ -112,9 +112,9 @@ Read the sections your task touches.
   - 636–693 Dream-chaser (~15.6K) ← 4
   - 694–720 Ered Mithrin (~15.8K) ← 7
   - 721–857 The Two Towers (~15.5K) ← 21
-  - 858–942 The Return of the King (~8.1K) ← 12
+  - 858–942 The Return of the King (~8.2K) ← 12
     - 885–910 The Passing of the Grey Company (~2.5K) ← 1
-    - 911–942 The Siege of Gondor (~3.9K)
+    - 911–942 The Siege of Gondor (~4.0K)
   - 943–951 Nightmare (~410) ← 19
   - 952–990 Deckbuilding (~1.9K)
   - 991–1069 Effects (~3.2K)
@@ -127,7 +127,7 @@ Read the sections your task touches.
   - 1110–1135 Persistence and shipping (~2.6K) ← 6
   - 1136–1177 Screens (~4.9K) ← 1
     - 1162–1177 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~45.0K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~45.2K tok)
   - 5–8 Overview (~130) ← 1
   - 9–23 Top bar (~3.0K) ← 4
   - 24–27 Table menu (~490) ← 2
@@ -135,7 +135,7 @@ Read the sections your task touches.
   - 36–39 Canvas (~560)
   - 40–52 Spacing and the play area's rows (~1.9K) ← 9
   - 53–58 Pictures on the table (~320) ← 1
-  - 59–93 Cards (~8.8K) ← 21
+  - 59–93 Cards (~8.9K) ← 21
   - 94–99 The Sailing test (~690) ← 5
   - 100–113 The Island Map (~1.8K) ← 8
   - 114–117 Tokens and effects (~320)

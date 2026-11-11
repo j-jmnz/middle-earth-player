@@ -18,7 +18,7 @@ import { flagged, inPlay, updateCard } from "../../core/state.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
 import { openStrike } from "../attack/index.ts";
 import { healBlocked } from "../burden/life.ts";
-import { healAllowed, noteHealed } from "../dreamchaser/heal-cap.ts";
+import { healAllowed, healDamage } from "../dreamchaser/heal-cap.ts";
 import { effectData } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 import { playerSource } from "../quest/threat.ts";
@@ -42,7 +42,7 @@ export function healAmong(state: ScenarioState, instruction: Extract<Instruction
   if (!chosen) return effectData(state) ? askTarget(state, { instruction, seat: focus.seat, chosen: null }, [...options, DONE]) : state;
   const card = state.cards[chosen];
   if (!card) return state;
-  const healedOne = queueEvent(noteHealed(updateCard(state, chosen, { damage: card.damage - 1 }), chosen, 1, ctx), { trigger: "healed", seat: card.controller, cardId: chosen, ...(playerSource(state, focus.sourceId, ctx) ? { byPlayerCard: true } : {}) });
+  const healedOne = queueEvent(healDamage(state, chosen, 1, ctx).state, { trigger: "healed", seat: card.controller, cardId: chosen, ...(playerSource(state, focus.sourceId, ctx) ? { byPlayerCard: true } : {}) });
   return again(healedOne, { ...instruction, healed: healed + 1 }, focus.seat);
 }
 

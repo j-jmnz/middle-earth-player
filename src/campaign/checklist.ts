@@ -34,8 +34,11 @@ export type ChecklistInput = {
   difficulty?: Difficulty;
 };
 
+// An encounter-deck copy the campaign pool recorded for a seat: the seat its Setup line acts for (the start sets the copy's controller).
+export type PoolEncounterOwner = { code: string; seat: number };
+
 export type ChecklistPlan =
-  | { ok: true; steps: ChecklistStep[]; threatModifier: number; forcedPenalty: number; seats: StartSeat[]; poolEncounterCards: string[]; poolIntoPlay: string[]; removedFromEncounter: string[]; removedFromCaves: string[]; log: CampaignLog }
+  | { ok: true; steps: ChecklistStep[]; threatModifier: number; forcedPenalty: number; seats: StartSeat[]; poolEncounterCards: string[]; poolEncounterOwners: PoolEncounterOwner[]; poolIntoPlay: string[]; removedFromEncounter: string[]; removedFromCaves: string[]; log: CampaignLog }
   | { ok: false; errors: string[]; needs: Need | null };
 
 const TEXT: Readonly<Record<number, string>> = {
@@ -357,6 +360,7 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
   const did7: string[] = [];
   const did8: string[] = [];
   const poolEncounterCards: string[] = [];
+  const poolEncounterOwners: PoolEncounterOwner[] = [];
   const poolIntoPlay: string[] = [];
   const toDeck = new Set(encounterDeal(pool, input.effects, (card) => fresh.has(card) || dealt(card) || six.leftOut(card)));
   for (const card of pool) {
@@ -369,6 +373,8 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
     }
     if (toDeck.has(card)) {
       poolEncounterCards.push(card.code);
+      // A copy recorded for a seat whose Setup line acts for that seat (Overcome by Fear's dial) keeps the seat into the encounter deck.
+      if (card.seat != null && input.effects.some((effect) => effect.cardCode === card.code && effect.timing === "setup")) poolEncounterOwners.push({ code: card.code, seat: poolSeat(card, seatCount) });
       did8.push(`${name(card.code)} is shuffled into the encounter deck.`);
       continue;
     }
@@ -405,6 +411,7 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
     forcedPenalty,
     seats,
     poolEncounterCards,
+    poolEncounterOwners,
     poolIntoPlay,
     removedFromEncounter: six.removed,
     removedFromCaves: six.removedCaves,
