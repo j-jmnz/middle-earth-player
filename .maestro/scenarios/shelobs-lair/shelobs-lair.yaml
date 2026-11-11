@@ -6,7 +6,7 @@ tags:
 # lists, Easy, the saga Frodo as the Ring-bearer with The One Ring and A Heavy Burden, after Journey to the Cross-roads' win), parked on its win (stage 3B is defeated with Shelob and Gollum in the victory display). The fixture is OPEN until
 # scripts/e2e/fixtures.ts finds a win of those lists in its seeds (docs/phases/STATUS.md).
 # The Resolution (144073) asks nothing: A Heavy Burden joins the campaign pool. The campaign has no XP, and Shelob's Lair is its last part, so the flow passes NO_XP and LAST_PART.
-# Shelob's resource tokens are shown as tokens on her card (no widget of their own), so the flow passes no TABLE_WIDGET.
+# Shelob's resource tokens are shown as tokens on her card and on her top-bar dial (`lair-shelob`), but the dial is gone on the win table (Shelob is in the victory display), so the flow passes no TABLE_WIDGET.
 - runFlow:
     file: ../../subflows/scenario-win.yaml
     env:

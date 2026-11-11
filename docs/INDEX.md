@@ -120,7 +120,7 @@ Read the sections your task touches.
   - 1023–1048 Persistence and shipping (~1.8K)
   - 1049–1090 Screens (~4.7K) ← 1
     - 1075–1090 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~43.8K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~44.0K tok)
   - 5–8 Overview (~130) ← 1
   - 9–23 Top bar (~2.9K) ← 4
   - 24–27 Table menu (~490) ← 2
@@ -128,7 +128,7 @@ Read the sections your task touches.
   - 36–39 Canvas (~560)
   - 40–52 Spacing and the play area's rows (~1.9K) ← 9
   - 53–58 Pictures on the table (~320) ← 1
-  - 59–91 Cards (~7.6K) ← 19
+  - 59–91 Cards (~7.9K) ← 19
   - 92–97 The Sailing test (~690) ← 5
   - 98–111 The Island Map (~1.8K) ← 8
   - 112–115 Tokens and effects (~320)

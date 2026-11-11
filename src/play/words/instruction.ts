@@ -85,6 +85,11 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
     // The Passage of the Marshes (the asks file words them again for the sheet): Shifting Quagmire, We Hates Them!.
     case "ReturnRandomVictoryLocation":
       return "return a random location from the victory display to the staging area";
+    // Shelob's Lair: Shelob's resources (144040:A:3, 144061:A:2; the asks file words the choice again for the sheet).
+    case "PlaceResourceTokens": {
+      const amount = amountWords(instruction.amount);
+      return `place ${amount} resource${amount === "1" ? "" : "s"} on ${instruction.on === "self" ? "this card" : "the card you chose"}`;
+    }
     case "FlipGollum":
       return instruction.to === "smeagol" ? "flip Gollum to Sméagol" : "flip Sméagol to Gollum";
     case "GollumAttacks":

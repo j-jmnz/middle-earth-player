@@ -4,7 +4,7 @@ import type { Ask } from "../asks.ts";
 // `pnpm test scenario shelobs-lair --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=shelobs-lair` prints each sentence.
 export const ASKS: Readonly<Record<string, Ask>> = {
   // 144040:A:3: Forced at the beginning of the quest phase; "either ... or" for the first player (rr.first-player). The attack option is offered only while Shelob is in play.
-  "144040:forced:1 @0 Choose": { note: "Shelob: {owner} chooses for all the players. Either place 1 resource on Shelob, or she makes an immediate attack against the first player." },
+  "144040:forced:1 @0 Choose": { note: "Shelob: {owner} chooses for all the players. Either place 1 resource on Shelob, or she makes an immediate attack against {owner}." },
   "144040:forced:1 @0 place": { label: "Place 1 resource on Shelob: she gets +1 Threat" },
   "144040:forced:1 @0 attack": { label: "Shelob makes an immediate attack against {owner}" },
   // 144041:A:2 (Peril): the revealing player chooses.
@@ -34,7 +34,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "144049:travel:1 @0 Pick": { note: "Den of Night: choose Shelob to place 1 resource on, the cost to travel here. She gets +1 Threat for each resource.", verb: "Place" },
   "144049:forced:1 @0 Pick": { note: "Den of Night: a When Revealed effect was canceled. Choose Shelob to place 1 resource on.", verb: "Place" },
   // 144046:A:2: after The Spider's Lair becomes the active location Shelob attacks the first player.
-  "144046:forced:2 @0 Pick": { note: "The Spider's Lair is the active location: choose Shelob to attack the first player now.", verb: "Attack" },
+  "144046:forced:2 @0 Pick": { note: "The Spider's Lair is the active location: choose Shelob to attack {owner} now.", verb: "Attack" },
   // 144050:A:1 and A:2: an attachment of the player's own, not an objective.
   "144050:whenRevealed:1 @0.1 Pick": { owned: true, note: "Exhalation of Decay: choose a non-objective attachment you control to discard.", verb: "Discard" },
   "144050:shadow:1 @0 Pick": { owned: true, note: "Exhalation of Decay: choose a non-objective attachment you control to discard.", verb: "Discard" },
@@ -47,7 +47,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "144054:whenRevealed:1 @0 search": { label: "Search the encounter deck and discard pile for a Nazgûl enemy and add it to the staging area" },
   "144054:whenRevealed:1 @0 reveal": { label: "Exhaust The One Ring and reveal the top card of the encounter deck" },
   "144054:whenRevealed:1 @0.search.0 SearchMove": { owned: true, note: "Call of the Ring: choose a Nazgûl enemy from the encounter deck or discard pile to add to the staging area.", verb: "Add" },
-  "144055:whenRevealed:1 @0 Choose": { note: "We Hates Them!: {owner} chooses for all the players. Either flip Sméagol to Gollum, or Gollum makes an immediate attack against the first player. Or cancel this effect." },
+  "144055:whenRevealed:1 @0 Choose": { note: "We Hates Them!: {owner} chooses for all the players. Either flip Sméagol to Gollum, or Gollum makes an immediate attack against {owner}. Or cancel this effect." },
   "144055:whenRevealed:1 @0 flip": { label: "Flip Sméagol to Gollum, engaged with the first player" },
   "144055:whenRevealed:1 @0 attack": { label: "Gollum makes an immediate attack against {owner}" },
   "144055:whenRevealed:1 @0 cancel": { label: "Cancel this effect: spend 1 Fellowship resource and exhaust The One Ring. Surge still reveals 1 more card" },
