@@ -93,7 +93,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 67 | Journey to the Cross-roads | completed | 2026-11-11. Review round done. Open: `roads-won`. |
 | 68 | Shelob's Lair | completed | 2026-11-11. Review round done. Open: `lair-won`. |
 | 69 | The Return of the King data | active | 2026-11-11. Data built; its review runs with phase 70's. Plan: `docs/plans/return-of-the-king.md`. |
-| 70 | The Return of the King campaign shell | not started | |
+| 70 | The Return of the King campaign shell | active | 2026-11-11. |
 | 71 | The Return of the King, part 1 | not started | |
 | 72 | The Return of the King, part 2 | not started | |
 | 73 | The Return of the King, part 3 | not started | |
