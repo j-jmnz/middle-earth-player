@@ -25,11 +25,13 @@ open .cache/showcase/out/contact.png
 
 `--build` runs `expo prebuild` and a Release simulator build with `EXPO_PUBLIC_E2E_SEED=1` and `EXPO_PUBLIC_SHOWCASE=1` into `.cache/showcase/build` (`ios/` is regenerated; it is gitignored). Later runs can skip the build with `--app .cache/showcase/build/Build/Products/Release-iphonesimulator/<App>.app`. Leave the Mac awake while it runs: the simulators open and the flows tap through them on their own. The terminal says where it is: the three build steps, each simulator as it boots and installs the app, each capture as `[n/total]` with its time, and every 30 seconds a long step (the Xcode build, a flow) says it is still running with its latest output line. A step that fails prints the end of its output; `--verbose` streams every tool's whole output instead.
 
+A capture already in `.cache/showcase/raw/` is kept, not taken again, while nothing it depends on has changed since it was taken: the app's JavaScript and the files bundled with it, the simulator, its flow, the showcase subflows and the save it opens (each capture's fingerprint is its `key` in `capture.json`). So a run after fixing one flow retakes only that flow's captures, and a run stopped halfway goes on where it stopped. A capture that failed is always taken again; `--force` takes every capture again.
+
 The raw captures land in `.cache/showcase/raw/` with `capture.json`; the images in `.cache/showcase/out/` with `contact.png` and `manifest.json`. None of `.cache/` is committed.
 
 Look at the contact sheet: every card should show its picture, the table should lie landscape, and the GIFs' first frames should be the table before the move. When the images are right, publish them (Publish).
 
-Narrower runs, while fixing one shot: `--only table-quest,deck`, `--device iphone` or `ipad`, `--theme dark` or `light` (on `capture`), and `--verbose` to see Maestro's and Xcode's output. A capture that came out turned the wrong way is fixed with `pnpm assets showcase --turn ccw`.
+Narrower runs, while fixing one shot: `--only table-quest,deck`, `--device iphone` or `ipad`, `--theme dark` or `light`, `--force` (on `capture`), and `--verbose` to see Maestro's and Xcode's output. A capture that came out turned the wrong way is fixed with `pnpm assets showcase --turn ccw`.
 
 If something goes wrong:
 
