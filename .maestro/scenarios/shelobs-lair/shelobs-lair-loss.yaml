@@ -2,12 +2,11 @@ appId: com.middleearth.lcg
 tags:
   - scenario
 ---
-# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `lair-lost` (scripts/e2e/shelobs-lair.ts): a real two-handed
-# game of Shelob's Lair, parked on its loss. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
-# The steps are the shared subflow's (.maestro/subflows/scenario-loss.yaml); add this scenario's own assertions after the call.
+# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `lair-lost` (scripts/e2e/shelobs-lair.ts): a real two-handed game of Shelob's Lair (The One Ring and A Heavy Burden on the
+# saga Frodo, Easy, after Journey to the Cross-roads' win), parked on its loss (a loss of the scenario's own is the players' threat at 50, every hero destroyed or The One Ring leaving play).
+# A loss writes nothing, so the subflow's own assertions on the log screen are all it checks (docs/handover/agent-brief.md, Scenario procedure).
 - runFlow:
     file: ../../subflows/scenario-loss.yaml
     env:
       FIXTURE: lair-lost
       SCENARIO_ID: shelobs-lair
-# TODO: this scenario's own assertions on the log screen after the loss.
