@@ -165,11 +165,22 @@ export function cancelNotAllowed(state: ScenarioState, offer: ResponseOffer, eff
 
 // A Response canceled the "when revealed" effects of an encounter card being revealed (cancelAnswered, rules/interpret/player-verbs.ts): a card that
 // listens hears it ("Forced: After a 'when revealed' effect is canceled, reduce the Ring-bearer's life by 1", 906304:A:1; rr.cancel). `before`
-// is the state the cancel was made in: the event is announced only when the cancel changed it, and only while a card that listens is in play.
+// is the state the cancel was made in: the event is announced only when the cancel changed it, only while a card that listens is in play,
+// and only when the canceled card has a When Revealed effect to cancel (a revealed enemy with none announces nothing, 144049:A:1).
 export function announceCanceled(state: ScenarioState, before: ScenarioState, ctx: ReduceContext): ScenarioState {
   if (state === before || !listenerInPlay(state, "whenRevealedCanceled", ctx.effects)) return state;
+  if (revealedWithoutWhenRevealed(before, ctx)) return state;
   if (state.pendingAttack?.shadowCanceled && !before.pendingAttack?.shadowCanceled) return state;
   return queueEvent(state, { trigger: "whenRevealedCanceled", seat: null });
+}
+
+// The innermost open Response window is on a card's reveal and that card has no When Revealed record: a cancel there cancels no When Revealed effect.
+function revealedWithoutWhenRevealed(before: ScenarioState, ctx: ReduceContext): boolean {
+  const index = before.stack.findLastIndex((frame) => frame.data.kind === "responses");
+  const window = before.stack[index];
+  if (window?.data.kind !== "responses" || window.data.event.trigger !== "encounterRevealed") return false;
+  const code = before.cards[before.stack[index - 1]?.cardId ?? ""]?.code;
+  return code != null && !effectsOf(ctx, code).some((record) => record.timing === "whenRevealed");
 }
 
 // SetAsideFromDeck: each copy in the encounter deck or its discard pile goes out of play, set aside facedown (906401:A:2).

@@ -60,9 +60,9 @@ export type GoldenSuiteSpec<G extends SuiteGolden<D>, D extends string, P extend
   checks?: (suite: { game: (golden: G) => P; world: (golden: G) => SuiteWorld; opened: (golden: G) => ScenarioState }) => void;
 };
 
-/** The causes of the number-changing steps that name a record of the scenario's own cards (its campaign card, quest cards and encounter cards). */
+/** The causes of the number-changing steps that name a record of the scenario's own cards (its campaign card, quest cards, encounter cards and the cards its campaign card places, A Heavy Burden). */
 export function ownCauses(scenario: ScenarioData, steps: readonly EngineStep[]): Cause[] {
-  const own = new Set([scenario.campaignCard, ...scenario.stages, ...scenario.cards.map((card) => card.code)]);
+  const own = new Set([scenario.campaignCard, ...scenario.stages, ...scenario.campaignPlaced, ...scenario.cards.map((card) => card.code)]);
   return steps
     .filter((step) => NUMBER_STEPS.has(step.kind))
     .map((step) => (step as { cause: Cause }).cause)

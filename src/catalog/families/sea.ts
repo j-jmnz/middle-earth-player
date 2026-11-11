@@ -108,7 +108,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("TravelOrAddResources"), amount: z.number().int().positive(), pick: pickSchema, ...when }),
   // Constant on a card in play: no more than `max` cards of this type can enter play each round, played or put into play ("While Corsair Waters is the active location, no more than 1 ally can enter play each
   // round", 12155:A:1). An ally that entered play and left again counts (families/sea/entries.ts).
-  z.strictObject({ verb: z.literal("LimitEntries"), cardType: z.literal("ally"), max: z.number().int().min(0), ...when }),
+  // `perPlayer`: each player's own count, by the seat that controls the ally as it enters ("Each player cannot play, or put into play, more than 1 ally each round", 144071:B:2; rr.play-and-put-into-play).
+  z.strictObject({ verb: z.literal("LimitEntries"), cardType: z.literal("ally"), max: z.number().int().min(0), perPlayer: z.literal(true).optional(), ...when }),
 ] as const;
 
 // About a Ship objective: it became exhausted by any means, defending, attacking, questing, Sailing or an effect ("When attached objective exhausts", 12132:A:1). Announced by a settle sweep (families/sea/water.ts) only in a game

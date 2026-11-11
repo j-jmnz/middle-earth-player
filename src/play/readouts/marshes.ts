@@ -13,6 +13,9 @@ import { GOLLUM_WORDS, gollumHeldWords, listNames, mireWarn, mireWords, nearestR
 import type { TableDial } from "./dials.ts";
 import type { HeldDial } from "./widgets.ts";
 
+// Shelob's Lair's last stage (144072), where Gollum is defeated into the victory display.
+const LAIR_STAGE_THREE = "144072";
+
 /**
  * The dials The Passage of the Marshes' pieces hold now, in the order the top bar draws them: Mire (a location in the staging area or the active one with the keyword), then Gollum's hit points while he is an enemy in play.
  * The Mire dial warms toward its limit, never the accent: a location that reaches it is discarded, and it warns when 1 mire token is left. Empty in any other scenario.
@@ -34,7 +37,8 @@ export function marshesDials(game: ScenarioState, ctx: ReduceContext, nameOf: (c
     dials.push({ id: "mire", testID: "marshes-mire", label: "Mire", name: `Mire tokens on ${listNames(closest)}, closest to discard:`, value: nearest.tokens, limit: nearest.limit, warms: true, ...(warn ? { warn } : {}), limitWords: mireWords(rows, closest) });
   }
   const gollum = gollumCard(game);
-  if (gollum?.code === GOLLUM && inPlay(gollum.zone)) {
+  // On Shelob's Lair's stage 3B a defeated Gollum goes to the victory display, so that scenario's own dial (readouts/lair.ts) says so instead.
+  if (gollum?.code === GOLLUM && inPlay(gollum.zone) && game.cards[game.questStage ?? ""]?.code !== LAIR_STAGE_THREE) {
     const hitPoints = modifiedStat(game, gollum, "hitPoints", ctx.cards);
     dials.push({ id: "gollum", testID: "marshes-gollum", label: "Gollum · HP", name: `${nameOf(GOLLUM)}'s hit points left`, value: Math.max(0, hitPoints - gollum.damage), limit: hitPoints, filled: Math.min(hitPoints, gollum.damage), goal: true, limitWords: GOLLUM_WORDS });
   }

@@ -79,6 +79,7 @@ import { deepFixtures } from "./helms-deep.ts";
 import { isengardFixtures } from "./the-road-to-isengard.ts";
 import { marshesFixtures } from "./the-passage-of-the-marshes.ts";
 import { roadsFixtures } from "./journey-to-the-cross-roads.ts";
+import { lairFixtures } from "./shelobs-lair.ts";
 import { FIXTURE_REGISTRY, fixtureFile, type FixtureName, type FixtureScenarioId } from "../../src/campaign/fixtures/registry.ts";
 import { createLog, runScript } from "../log.ts";
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
@@ -401,6 +402,7 @@ const WRITERS: Record<Chained, (written: Written) => Promise<object> | object> =
   "the-road-to-isengard": () => isengardFixtures(),
   "the-passage-of-the-marshes": () => marshesFixtures(),
   "journey-to-the-cross-roads": () => roadsFixtures(),
+  "shelobs-lair": () => lairFixtures(),
 };
 
 // The won game is open: no legal win of the two starter decks has been found on this engine (docs/phases/STATUS.md), so

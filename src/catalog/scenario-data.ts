@@ -267,7 +267,7 @@ export function corsairCodes(data: ScenarioData, difficulty: Difficulty = "Norma
 }
 
 // The decks of Ered Mithrin a scenario deals, copy by copy (emce.caves-deck, emce.evil-creatures-deck): each of these piles at the difficulty played, by pile. A pile the scenario does not deal is left out.
-export const DEAL_PILES = ["cavesDeck", "evilCreaturesDeck", "spidersDeck", "orcsDeck", "sideQuestDeck", "haradDeck"] as const;
+export const DEAL_PILES = ["cavesDeck", "evilCreaturesDeck", "spidersDeck", "orcsDeck", "sideQuestDeck", "haradDeck", "greatSpiderDeck"] as const;
 export function dealtPiles(data: ScenarioData, difficulty: Difficulty = "Normal"): Partial<Record<(typeof DEAL_PILES)[number], string[]>> {
   const piles: Partial<Record<(typeof DEAL_PILES)[number], string[]>> = {};
   for (const card of placementsAt(data, difficulty)) {

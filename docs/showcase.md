@@ -23,7 +23,7 @@ pnpm assets showcase              # turns them into the README's images
 open .cache/showcase/out/contact.png
 ```
 
-`--build` runs `expo prebuild` and a Release simulator build with `EXPO_PUBLIC_E2E_SEED=1` and `EXPO_PUBLIC_SHOWCASE=1` into `.cache/showcase/build` (`ios/` is regenerated; it is gitignored). Later runs can skip the build with `--app .cache/showcase/build/Build/Products/Release-iphonesimulator/<App>.app`. Leave the Mac awake while it runs: the simulators open and the flows tap through them on their own.
+`--build` runs `expo prebuild` and a Release simulator build with `EXPO_PUBLIC_E2E_SEED=1` and `EXPO_PUBLIC_SHOWCASE=1` into `.cache/showcase/build` (`ios/` is regenerated; it is gitignored). Later runs can skip the build with `--app .cache/showcase/build/Build/Products/Release-iphonesimulator/<App>.app`. Leave the Mac awake while it runs: the simulators open and the flows tap through them on their own. The terminal says where it is: the three build steps, each simulator as it boots and installs the app, each capture as `[n/total]` with its time, and every 30 seconds a long step (the Xcode build, a flow) says it is still running with its latest output line. A step that fails prints the end of its output; `--verbose` streams every tool's whole output instead.
 
 The raw captures land in `.cache/showcase/raw/` with `capture.json`; the images in `.cache/showcase/out/` with `contact.png` and `manifest.json`. None of `.cache/` is committed.
 

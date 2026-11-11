@@ -3,8 +3,6 @@
 // The numbers of The Road to Isengard's table dials (docs/design-system-table.md, Cards, The Road to Isengard): the resources on stage 1B (the cards revealed on advancing), the damage on stage 2B against the 5 that advance the
 // players, each Ent of Fangorn's resources against the 3 that give a player control of it, Saruman's hit points (the win gate, while the Staff is on him) and, on stage 3B, each seat's cards in hand, which its threat dial wears in its label and warns with at 1 and 0. The
 // limits are read from the records that use them. The engine decided every number; nothing here changes one. Pure, so a test reads it.
-import { useMemo } from "react";
-
 import type { Effect } from "../../catalog/boundary.ts";
 import { flagged, inPlay, livingSeats, type CardInstance } from "../../rules/core/state.ts";
 import { modifiedStat } from "../../rules/core/keywords.ts";
@@ -76,10 +74,4 @@ export function isengardHands(game: ScenarioState): readonly HandMark[] {
     const warn = handWarning(count);
     return { seat, label: handLabel(count, seats.length > 1 ? seat : null), ...(warn ? { warn } : {}) };
   });
-}
-
-/** The hand marks for the seat dials, stable the same way. */
-export function useIsengardHands(game: ScenarioState): readonly HandMark[] {
-  const key = JSON.stringify(isengardHands(game));
-  return useMemo((): readonly HandMark[] => JSON.parse(key), [key]);
 }

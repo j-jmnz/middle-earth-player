@@ -37,6 +37,7 @@ import deepFixtures from "./fixtures/helms-deep.json";
 import isengardFixtures from "./fixtures/the-road-to-isengard.json";
 import marshesFixtures from "./fixtures/the-passage-of-the-marshes.json";
 import roadsFixtures from "./fixtures/journey-to-the-cross-roads.json";
+import lairFixtures from "./fixtures/shelobs-lair.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -90,6 +91,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-road-to-isengard": isengardFixtures,
   "the-passage-of-the-marshes": marshesFixtures,
   "journey-to-the-cross-roads": roadsFixtures,
+  "shelobs-lair": lairFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(
