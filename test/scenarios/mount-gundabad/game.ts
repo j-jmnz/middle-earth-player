@@ -8,12 +8,13 @@ import type { PrintedCard } from "../../../src/rules/core/printed.ts";
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 
 import { loadScenario } from "../../../scripts/data/load-scenarios.ts";
-import { FRAMSBURG_GOLDENS, framsburgWorld, playGolden as playFramsburg, rawEarlier as rawFramsburgEarlier, type FramsburgVariant } from "../the-ghost-of-framsburg/game.ts";
+import { FRAMSBURG_GOLDENS, framsburgWorld, rawEarlier as rawFramsburgEarlier, type FramsburgVariant } from "../the-ghost-of-framsburg/game.ts";
 import { EARLIER_POOL } from "../the-ghost-of-framsburg/scene.ts";
 import { TREASURES } from "../the-withered-heath/scene.ts";
 import { campaign, CODES, gundabad } from "./scene.ts";
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
 import { attackTogether, campaignGame, engageOneEach, fillerLoadout, HERO_STATS, type PlayedGame } from "../../harness/game-kit.ts";
+import { goldenState } from "../../harness/golden-state.ts";
 
 // Test helper. A whole game of Mount Gundabad in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
 // events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. The first two characters of a seat quest (their willpower is a little above the staging area's threat, so a stage can outlast a
@@ -143,13 +144,13 @@ const rawLogs = new Map<string, CampaignLog>();
 const keyOf = (seatCount: 1 | 2, variant: FramsburgVariant = "pool") => `${seatCount}:${variant}`;
 let worldCards: ReadonlyMap<string, PrintedCard> | null = null;
 
-/** Plays the Ghost of Framsburg goldens that follow the first six parts and writes their Resolutions onto the log those parts wrote, once for each (seats, variant): what Mount Gundabad is handed. */
+/** Reads the final states of the Ghost of Framsburg goldens that follow the first six parts from golden.json (test/harness/golden-state.ts) and writes their Resolutions onto the log those parts wrote, once for each (seats, variant): what Mount Gundabad is handed. */
 export async function prepareEarlier(): Promise<void> {
   const framsburg = await framsburgWorld("strong");
   for (const [key, name] of Object.entries(EARLIER)) {
     const golden = FRAMSBURG_GOLDENS.find((item) => item.name === name);
     if (!golden) throw new Error(`No Ghost of Framsburg golden named ${name}`);
-    const played = playFramsburg(golden, framsburg.ctx).state;
+    const played = goldenState("the-ghost-of-framsburg", golden.name);
     const written = applyResolution(rawFramsburgEarlier(golden.seatCount, golden.variant), played.scenarioId, played, framsburg.cards, NO_COPY_LIMITS);
     rawLogs.set(key, written);
     // The stand-in heroes of the golden seats are not the heroes the earlier games lost or carried: they start fresh, and what hangs on a hero stays behind.
@@ -161,14 +162,14 @@ export async function prepareEarlier(): Promise<void> {
 /** The log of a campaign that won the first seven parts, their real Resolutions chained. */
 export function afterFramsburg(seatCount: 1 | 2, variant: FramsburgVariant = "pool"): CampaignLog {
   const log = earlierLogs.get(keyOf(seatCount, variant));
-  if (!log) throw new Error("Call gundabadWorld first: it plays the earlier parts");
+  if (!log) throw new Error("Call gundabadWorld first: it builds the earlier parts' log");
   return log;
 }
 
 /** The log the seven earlier parts' real Resolutions write, with the heroes of their games still on it (what the campaign test reads). */
 export function rawEarlier(seatCount: 1 | 2, variant: FramsburgVariant = "pool"): CampaignLog {
   const log = rawLogs.get(keyOf(seatCount, variant));
-  if (!log) throw new Error("Call gundabadWorld first: it plays the earlier parts");
+  if (!log) throw new Error("Call gundabadWorld first: it builds the earlier parts' log");
   return log;
 }
 

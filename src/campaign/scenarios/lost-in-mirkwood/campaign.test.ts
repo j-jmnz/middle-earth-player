@@ -7,7 +7,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { EFFECTS } from "../../../effects/index.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../../../rules/engine/reduce.ts";
-import { UPANDUIN_GOLDENS, upanduinWorld, playGolden as playUpanduin } from "../../../../test/scenarios/journey-up-the-anduin/game.ts";
+import { UPANDUIN_GOLDENS, upanduinWorld } from "../../../../test/scenarios/journey-up-the-anduin/game.ts";
 import { LOSTMIRK_GOLDENS, afterUpanduin, lostmirkLoadout, lostmirkPlan, lostmirkStart, lostmirkWorld, playGolden } from "../../../../test/scenarios/lost-in-mirkwood/game.ts";
 import { CODES, TREASURES, campaign, lostmirk } from "../../../../test/scenarios/lost-in-mirkwood/scene.ts";
 
@@ -17,6 +17,7 @@ import { campaignPath } from "../../path.ts";
 import { newSave } from "../../save.ts";
 import { PLAYABLE_SCENARIOS } from "../../playable.ts";
 import { NO_COPY_LIMITS, poolEncounterCopies, wilderlandFacts } from "../../wilderland.ts";
+import { goldenState } from "../../../../test/harness/golden-state.ts";
 
 let ctx: ReduceContext;
 let upanduinCards: Awaited<ReturnType<typeof upanduinWorld>>;
@@ -37,7 +38,7 @@ function opened(start: ReturnType<typeof lostmirkStart>): ScenarioState {
 // The log Journey Up the Anduin's real Resolution writes for one of its golden wins, onto a blank log.
 function afterJourney(name: string): CampaignLog {
   const golden = UPANDUIN_GOLDENS.find((item) => item.name.startsWith(name))!;
-  const state = playUpanduin(golden, upanduinCards.ctx).state;
+  const state = goldenState("journey-up-the-anduin", golden.name);
   return applyResolution(emptyLog(golden.seatCount), state.scenarioId, state, upanduinCards.cards, NO_COPY_LIMITS);
 }
 
@@ -150,7 +151,7 @@ describe("Lost in Mirkwood in the ered-mithrin campaign", () => {
     // A loss writes nothing.
     const lostGolden = LOSTMIRK_GOLDENS.find((item) => item.outcome === "lost")!;
     const weak = await lostmirkWorld(lostGolden.decks);
-    const lost = playGolden(lostGolden, weak.ctx).state;
+    const lost = goldenState("lost-in-mirkwood", lostGolden.name);
     const blank = emptyLog(lostGolden.seatCount);
     expect(applyResolution(blank, lost.scenarioId, lost, weak.cards, NO_COPY_LIMITS)).toBe(blank);
   }, 60_000);

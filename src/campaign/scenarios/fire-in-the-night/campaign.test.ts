@@ -8,7 +8,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { EFFECTS } from "../../../effects/index.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../../../rules/engine/reduce.ts";
-import { NIGHT_GOLDENS, afterRhovanion, logBeforeGolden, nightChoices, nightLoadout, nightPlan, nightSetupChoices, nightStart, nightWorld, playGolden, rawEarlier } from "../../../../test/scenarios/fire-in-the-night/game.ts";
+import { NIGHT_GOLDENS, afterRhovanion, logBeforeGolden, nightChoices, nightLoadout, nightPlan, nightSetupChoices, nightStart, nightWorld, rawEarlier } from "../../../../test/scenarios/fire-in-the-night/game.ts";
 import { CODES, campaign, night } from "../../../../test/scenarios/fire-in-the-night/scene.ts";
 import { CODES as ROAM } from "../../../../test/scenarios/roam-across-rhovanion/scene.ts";
 import { nextPartId, nextPartStatus } from "../../../../test/harness/next-part.ts";
@@ -21,6 +21,7 @@ import { campaignPath, nextStep } from "../../path.ts";
 import { newSave } from "../../save.ts";
 import { PLAYABLE_SCENARIOS } from "../../playable.ts";
 import { NO_COPY_LIMITS, poolEncounterCopies, wilderlandFacts } from "../../wilderland.ts";
+import { goldenState } from "../../../../test/harness/golden-state.ts";
 
 let ctx: ReduceContext;
 let cards: Awaited<ReturnType<typeof nightWorld>>["cards"];
@@ -145,7 +146,7 @@ describe("Fire in the Night in the ered-mithrin campaign", { timeout: 60_000 }, 
   it("writes Beldis, the treasure, the cards removed from the pool, the boxes beside Beldis and the log to the campaign when won, unlocks The Ghost of Framsburg, and keeps the earlier parts' pool", () => {
     // Two-handed, after the earlier parts, the pool's cards removed: the earlier parts' pool stays beside Beldis, minus what each player removed, and the treasure chosen is discovered.
     const win = golden("two-handed, won, after the earlier parts, Misplaced Trust");
-    const state = playGolden(win, ctx).state;
+    const state = goldenState("fire-in-the-night", win.name);
     const before = logBeforeGolden(win);
     const log = applyResolution(before, state.scenarioId, state, cards, NO_COPY_LIMITS);
     expect(log.completed).toEqual([...before.completed, night.id]);
@@ -166,18 +167,18 @@ describe("Fire in the Night in the ered-mithrin campaign", { timeout: 60_000 }, 
     expect(nextPartStatus(campaign, night.id)).toBe("current");
     // Beldis's line, written instead of the ally, with the boxes beside her marked by the players who used her.
     const healed = golden("two-handed, Easy, won from a blank log, Hill attack defended, enemies engaged, Beldis heals");
-    const healedState = playGolden(healed, ctx).state;
+    const healedState = goldenState("fire-in-the-night", healed.name);
     expect(healedState.campaignFacts?.beldisUses?.some((used) => used > 0)).toBe(true);
     expect(applyResolution(emptyLog(2), healedState.scenarioId, healedState, cards, NO_COPY_LIMITS).beldisUses).toEqual(healedState.campaignFacts?.beldisUses);
     const lined = golden("two-handed, won from a blank log, every other round, Hill attack defended, the last treasure, Beldis's line");
-    const linedState = playGolden(lined, ctx).state;
+    const linedState = goldenState("fire-in-the-night", lined.name);
     const linedLog = applyResolution(emptyLog(2), linedState.scenarioId, linedState, cards, NO_COPY_LIMITS);
     expect(linedLog.allyLines).toContain("beldis");
     expect(linedLog.campaignPool.some((card) => card.code === CODES.beldis)).toBe(false);
     expect(linedLog.treasures).toHaveLength(1);
     // A Resolution that removes nothing leaves the pool as the earlier parts wrote it.
     const kept = golden("two-handed, Easy, won, Melanwar's and Isolde's lines");
-    const keptState = playGolden(kept, ctx).state;
+    const keptState = goldenState("fire-in-the-night", kept.name);
     const keptBefore = logBeforeGolden(kept);
     const keptLog = applyResolution(keptBefore, keptState.scenarioId, keptState, cards, NO_COPY_LIMITS);
     expect(keptLog.allyLines).toEqual(expect.arrayContaining(["turayn", "melanwar", "isolde"]));
@@ -187,7 +188,7 @@ describe("Fire in the Night in the ered-mithrin campaign", { timeout: 60_000 }, 
   it("writes nothing when lost: the log is the one the game started from", async () => {
     for (const lostGolden of NIGHT_GOLDENS.filter((item) => item.outcome === "lost" && (item.after || item.decks !== "strong")).slice(0, 4)) {
       const world = await nightWorld(lostGolden.decks);
-      const lost = playGolden(lostGolden, world.ctx).state;
+      const lost = goldenState("fire-in-the-night", lostGolden.name);
       expect(lost.lost, lostGolden.name).toBe(true);
       const before = logBeforeGolden(lostGolden);
       expect(applyResolution(before, lost.scenarioId, lost, world.cards, NO_COPY_LIMITS), lostGolden.name).toBe(before);

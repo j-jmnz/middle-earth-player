@@ -20,6 +20,7 @@ import { campaignPath } from "../../path.ts";
 import { buildStart } from "../../start.ts";
 import type { World } from "../../world.ts";
 import { NO_COPY_LIMITS } from "../../wilderland.ts";
+import { goldenState } from "../../../../test/harness/golden-state.ts";
 
 const FRODO = "141001";
 const SAM = "141002";
@@ -151,7 +152,7 @@ describe("a whole game's Resolution on the campaign log", () => {
     const lost = MORIA_GOLDENS.find((item) => item.outcome === "lost")!;
     const cards = new Map([...strong.cards, ...ctx.cards]);
     const screen: World = { campaign, scenario: moria, effects: EFFECTS, cards, sets: new Map() };
-    expect(resolutionView(playGolden(won, strong.ctx).state, screen).kind).toBe("settled");
+    expect(resolutionView(goldenState("journey-in-the-dark", won.name), screen).kind).toBe("settled");
     expect(resolutionView(playGolden(lost, (await moriaWorld(lost.decks)).ctx).state, screen).kind).toBe("lost");
   });
 });

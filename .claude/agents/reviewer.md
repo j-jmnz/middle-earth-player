@@ -47,6 +47,7 @@ Search the surrounding module before you accept a new helper, type, or branch. R
 - A screen that rechecks a rule the reducer already enforces is a second implementation. The screen asks `legalIntents`.
 - A record is checked against the card bugs reviews find (`docs/plans/effect-authoring.md`, Readings the review catches); a finding of a kind that list does not name gets a line there in the fix pass.
 - A sentence written by hand on several cards belongs in a template, and a line printed the same as another card's takes that card's records with `copyLine` (`docs/plans/effect-authoring.md`, Templates and copied lines).
+- A test that plays a golden game outside its scenario's golden test, a scenario game that plays an earlier part's goldens, or a golden added beyond the paths the others cover (`.claude/rules/code-standards.md`, Test cost).
 - A scenario's test, game, seed finder or Maestro flow that repeats what the shared kit holds (`test/harness/scene-kit.ts`, `game-kit.ts`, `golden-suite.ts`, `scripts/e2e/seed-kit.ts`, `.maestro/subflows/`) is a copy; so is a scenario scene that imports another scenario's scene.
 
 Do not demand a shared abstraction for two lines that happen to look similar and mean different things. Name the behavior that is actually repeated.

@@ -19,6 +19,7 @@ import { campaignPath, nextStep } from "../../path.ts";
 import { newSave } from "../../save.ts";
 import { PLAYABLE_SCENARIOS } from "../../playable.ts";
 import { gavinReturned, levelOf, xpFacts } from "../../xp.ts";
+import { goldenState } from "../../../../test/harness/golden-state.ts";
 
 let ctx: ReduceContext;
 
@@ -142,7 +143,7 @@ describe("The City of Corsairs in the Dream-chaser campaign", () => {
   it("ends the campaign with a win: the Resolution runs, the XP is awarded, and the path is finished", () => {
     const golden = CORSAIRS_GOLDENS.find((item) => item.name === "true solo, after A Storm on Cobas Haven, Ominous Fate in the victory display, won");
     expect(golden).toBeDefined();
-    const won = playGolden(golden!, ctx).state;
+    const won = goldenState("the-city-of-corsairs", golden!.name);
     expect(won.stageCleared).toBe(true);
     const before = afterHaven(1);
     const log = applyResolution(before, won.scenarioId, won, ctx.cards, NO_COPY_LIMITS);

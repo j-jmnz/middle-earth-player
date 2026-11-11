@@ -120,6 +120,8 @@ export function goldenSuite<G extends SuiteGolden<D>, D extends string, P extend
         return { ...golden, intents: played?.intents, state: played?.state };
       });
       await expect(JSON.stringify(out)).toMatchFileSnapshot(spec.file);
+      // A later part reads these states back from golden.json in place of playing the games again (test/harness/golden-state.ts).
+      for (const golden of spec.goldens) expect(JSON.parse(JSON.stringify(game(golden).state)), golden.name).toEqual(game(golden).state);
     });
 
     it(spec.opening.title, () => {

@@ -8,12 +8,13 @@ import type { CampaignFacts, ModeCard } from "../../../src/rules/core/campaign-s
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 
 import { loadScenario } from "../../../scripts/data/load-scenarios.ts";
-import { UPANDUIN_GOLDENS, upanduinWorld, playGolden as playUpanduin } from "../journey-up-the-anduin/game.ts";
-import { LOSTMIRK_GOLDENS, lostmirkWorld, playGolden as playLostmirk } from "../lost-in-mirkwood/game.ts";
-import { KINGSQUEST_GOLDENS, kingsquestWorld, playGolden as playKingsquest } from "../the-kings-quest/game.ts";
+import { UPANDUIN_GOLDENS, upanduinWorld } from "../journey-up-the-anduin/game.ts";
+import { LOSTMIRK_GOLDENS, lostmirkWorld } from "../lost-in-mirkwood/game.ts";
+import { KINGSQUEST_GOLDENS, kingsquestWorld } from "../the-kings-quest/game.ts";
 import { CODES, TREASURES, campaign, heath } from "./scene.ts";
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
 import { campaignGame, fillerLoadout, HERO_STATS, type PlayedGame } from "../../harness/game-kit.ts";
+import { goldenState } from "../../harness/golden-state.ts";
 
 // Test helper. A whole game of The Withered Heath in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
 // events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. The players travel to a Deep location (or Creature Den) when one is offered, so the Dragon Signs come out of the Caves deck, engage one enemy at a time
@@ -165,7 +166,7 @@ const rawLogs = new Map<string, CampaignLog>();
 
 const keyOf = (seatCount: 1 | 2, variant: HeathVariant = "pool") => `${seatCount}:${variant}`;
 
-/** Plays the three earlier parts' goldens and writes their Resolutions onto a blank log, once for each (seats, variant): what The Withered Heath is handed. */
+/** Reads the final states of the three earlier parts' goldens from golden.json (test/harness/golden-state.ts) and writes their Resolutions onto a blank log, once for each (seats, variant): what The Withered Heath is handed. */
 export async function prepareEarlier(): Promise<void> {
   const upanduin = await upanduinWorld("strong");
   const lostmirk = await lostmirkWorld("strong");
@@ -174,12 +175,12 @@ export async function prepareEarlier(): Promise<void> {
     const first = UPANDUIN_GOLDENS.find((item) => item.name === names.upanduin)!;
     const second = LOSTMIRK_GOLDENS.find((item) => item.name === names.lostmirk)!;
     const third = KINGSQUEST_GOLDENS.find((item) => item.name === names.kingsquest)!;
-    const one = playUpanduin(first, upanduin.ctx).state;
+    const one = goldenState("journey-up-the-anduin", first.name);
     const log = applyResolution(emptyLog(first.seatCount), one.scenarioId, one, upanduin.cards, NO_COPY_LIMITS);
-    const two = playLostmirk(second, lostmirk.ctx).state;
+    const two = goldenState("lost-in-mirkwood", second.name);
     const logged = applyResolution(log, two.scenarioId, two, lostmirk.cards, NO_COPY_LIMITS);
     // The King's Quest golden is played from the log of the first two parts with the stand-in heroes dropped (its own `afterEarlier`); its Resolution is written onto the real log of the first two.
-    const three = playKingsquest(third, kingsquest.ctx).state;
+    const three = goldenState("the-kings-quest", third.name);
     const written = applyResolution(logged, three.scenarioId, three, kingsquest.cards, NO_COPY_LIMITS);
     rawLogs.set(key, written);
     // The stand-in heroes of the golden seats are not the heroes the earlier games lost or carried: they start fresh, and what hangs on a hero stays behind.
@@ -191,14 +192,14 @@ export async function prepareEarlier(): Promise<void> {
 /** The log of a campaign that won Journey Up the Anduin, Lost in Mirkwood and The King's Quest, their real Resolutions chained: `oath` and `oathline` for the lines in place of the allies in the pool. */
 export function afterKingsquest(seatCount: 1 | 2, variant: HeathVariant = "pool"): CampaignLog {
   const log = earlierLogs.get(keyOf(seatCount, variant));
-  if (!log) throw new Error("Call heathWorld first: it plays the earlier parts");
+  if (!log) throw new Error("Call heathWorld first: it builds the earlier parts' log");
   return log;
 }
 
 /** The log the three earlier parts' real Resolutions write, with the heroes of their games still on it (what the campaign test reads). */
 export function rawEarlier(seatCount: 1 | 2, variant: HeathVariant = "pool"): CampaignLog {
   const log = rawLogs.get(keyOf(seatCount, variant));
-  if (!log) throw new Error("Call heathWorld first: it plays the earlier parts");
+  if (!log) throw new Error("Call heathWorld first: it builds the earlier parts' log");
   return log;
 }
 

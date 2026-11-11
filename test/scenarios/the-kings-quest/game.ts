@@ -5,11 +5,12 @@ import type { CampaignFacts, ModeCard } from "../../../src/rules/core/campaign-s
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 
 import { loadScenario } from "../../../scripts/data/load-scenarios.ts";
-import { UPANDUIN_GOLDENS, upanduinWorld, playGolden as playUpanduin } from "../journey-up-the-anduin/game.ts";
-import { LOSTMIRK_GOLDENS, lostmirkWorld, playGolden as playLostmirk } from "../lost-in-mirkwood/game.ts";
+import { UPANDUIN_GOLDENS, upanduinWorld } from "../journey-up-the-anduin/game.ts";
+import { LOSTMIRK_GOLDENS, lostmirkWorld } from "../lost-in-mirkwood/game.ts";
 import { CODES, TREASURES, campaign, kingsquest } from "./scene.ts";
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
 import { campaignGame, fillerLoadout, HERO_STATS, type PlayedGame } from "../../harness/game-kit.ts";
+import { goldenState } from "../../harness/golden-state.ts";
 
 // Test helper. A whole game of The King's Quest in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
 // events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. The players travel to the Abandoned Ruin when it is offered (its treasure), engage Fire-drake once the stage allows it and
@@ -109,17 +110,17 @@ const EARLIER: Readonly<Record<string, { upanduin: string; lostmirk: string }>> 
 const earlierLogs = new Map<string, CampaignLog>();
 const rawLogs = new Map<string, CampaignLog>();
 
-/** Plays the two earlier parts' goldens and writes their Resolutions onto a blank log, once for each (seats, variant): what The King's Quest is handed. */
+/** Reads the final states of the two earlier parts' goldens from golden.json (test/harness/golden-state.ts) and writes their Resolutions onto a blank log, once for each (seats, variant): what The King's Quest is handed. */
 export async function prepareEarlier(): Promise<void> {
   const upanduin = await upanduinWorld("strong");
   const lostmirk = await lostmirkWorld("strong");
   for (const [key, names] of Object.entries(EARLIER)) {
     const first = UPANDUIN_GOLDENS.find((item) => item.name === names.upanduin)!;
     const second = LOSTMIRK_GOLDENS.find((item) => item.name === names.lostmirk)!;
-    const one = playUpanduin(first, upanduin.ctx).state;
+    const one = goldenState("journey-up-the-anduin", first.name);
     const log = applyResolution(emptyLog(first.seatCount), one.scenarioId, one, upanduin.cards, NO_COPY_LIMITS);
     // Lost in Mirkwood's golden is played from its own after-Upanduin log (`after`) unless it starts blank; the Resolution is written onto the real log of the first part.
-    const two = playLostmirk(second, lostmirk.ctx).state;
+    const two = goldenState("lost-in-mirkwood", second.name);
     const written = applyResolution(log, two.scenarioId, two, lostmirk.cards, NO_COPY_LIMITS);
     rawLogs.set(key, written);
     // The stand-in heroes of the golden seats are not the heroes the earlier games lost or carried: they start fresh, and what hangs on a hero stays behind.
@@ -131,14 +132,14 @@ export async function prepareEarlier(): Promise<void> {
 /** The log of a campaign that won Journey Up the Anduin and Lost in Mirkwood, their real Resolutions chained: `oath` for Turayn's oath line (and the guidance line) in place of the allies in the pool. */
 export function afterEarlier(seatCount: 1 | 2, oath = false): CampaignLog {
   const log = earlierLogs.get(`${seatCount}:${oath ? "oath" : "pool"}`);
-  if (!log) throw new Error("Call kingsquestWorld first: it plays the earlier parts");
+  if (!log) throw new Error("Call kingsquestWorld first: it builds the earlier parts' log");
   return log;
 }
 
 /** The log the two earlier parts' real Resolutions write, with the heroes of their games still on it (what the campaign test reads). */
 export function rawEarlier(seatCount: 1 | 2, oath = false): CampaignLog {
   const log = rawLogs.get(`${seatCount}:${oath ? "oath" : "pool"}`);
-  if (!log) throw new Error("Call kingsquestWorld first: it plays the earlier parts");
+  if (!log) throw new Error("Call kingsquestWorld first: it builds the earlier parts' log");
   return log;
 }
 

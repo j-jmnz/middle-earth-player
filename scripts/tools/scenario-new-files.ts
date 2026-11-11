@@ -88,7 +88,7 @@ export type ${P}Game = PlayedGame;
 // \`after\`: the log of a campaign whose earlier parts were won. \`upgraded\`: the Upgraded sides. \`mode\`: the Hard or Expert Mode card.
 export type ${P}Golden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: ${P}Decks; outcome: "won" | "lost"; policy?: Partial<${P}Policy>; after?: boolean; upgraded?: boolean; mode?: ModeCard; lossReason?: string };
 
-// TODO: the games to pin, a few wins (true solo and two-handed, Normal and Easy, a Mode card, after the earlier parts) and a few losses (each way the scenario can be lost), each on a fixed seed.
+// TODO: the games to pin (at most 3000 intents in all, .claude/rules/code-standards.md, Test cost), a few wins (true solo and two-handed, Normal and Easy, a Mode card, after the earlier parts) and a few losses (each way the scenario can be lost), each on a fixed seed.
 export const ${U}_GOLDENS: readonly ${P}Golden[] = [];
 
 const game = campaignGame<${P}Decks, ${P}Policy>({
@@ -173,6 +173,8 @@ describe("${facts.name} in the ${facts.campaignId} campaign", () => {
 
   it.todo("is playable (src/campaign/playable.ts), and the path offers it after the earlier parts");
   it.todo("deals the Campaign Setup: the cards the campaign card places, set aside as it says");
+  // The previous parts' logs come from their golden states (goldenState, test/harness/golden-state.ts), never from playing their goldens again;
+  // this scenario's own won or lost state too, once its goldens are pinned (.claude/rules/code-standards.md, Test cost).
   it.todo("hands the previous parts to this one: the pool, the XP and the marks reach the game");
   it.todo("deals the original card in a standalone game, with no campaign card");
 });
