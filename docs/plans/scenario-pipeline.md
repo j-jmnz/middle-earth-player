@@ -51,7 +51,7 @@ Exit: the plan's checks (Verification), the migration check clean, and `node --e
 - `src/campaign/fixtures/` gets one const registry of `{ scenarioId, names }`. `FixtureName`, `FIXTURE_NAMES` and `STORED` in `src/campaign/fixtures.ts` derive from it. So do the writers in `scripts/e2e/fixtures.ts`, in the campaign's order from `data/campaigns/<id>.json`, and one `describe.each` in `src/campaign/fixtures.test.ts`. The comment lists of fixture names in `src/screens/routes/e2e/[fixture].tsx` point to the registry instead.
 - `pnpm data:build` writes the barrel of authored effect files (Metro cannot glob). `src/effects/index.ts` imports it. The coverage test fails when the barrel is stale.
 - `src/campaign/standalone.test.ts` stops repeating `PLAYABLE_SCENARIOS`; `scripts/checks/effect-coverage.test.ts` keeps the list honest. `src/campaign/path.test.ts` reads the campaign order from `data/campaigns`.
-- A golden registry lists every scenario's goldens. `causes.test.ts` and `replay.test.ts` read it, so every scenario's games are checked there.
+- A golden registry lists every scenario's goldens. Each scenario's golden suite (`test/harness/golden-suite.ts`) checks the causes of every golden and replays one from its save, so every scenario's games are checked once, where they are played.
 
 Exit: the plan's checks (Verification). Adding a fixture name is one registry line.
 

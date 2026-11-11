@@ -84,7 +84,7 @@ export function isengardIntent(state: ScenarioState, ctx: ReduceContext, memory:
 
 export type IsengardGame = PlayedGame;
 
-// The goldens (src/campaign/scenarios/the-road-to-isengard/golden.test.ts), also played by the causes and replay tests once test/harness/golden-registry.ts lists them.
+// The goldens (src/campaign/scenarios/the-road-to-isengard/golden.test.ts).
 // `after`: the log of a campaign whose earlier parts were won. `upgraded`: the Upgraded sides. `mode`: the Hard or Expert Mode card.
 export type IsengardGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: IsengardDecks; outcome: "won" | "lost"; policy?: Partial<IsengardPolicy>; after?: boolean; upgraded?: boolean; mode?: ModeCard; lossReason?: string };
 

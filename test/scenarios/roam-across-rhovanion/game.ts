@@ -100,7 +100,7 @@ export function rhovanionIntent(state: ScenarioState, ctx: ReduceContext, memory
 
 export type RhovanionGame = PlayedGame;
 
-// The goldens (src/campaign/scenarios/roam-across-rhovanion/golden.test.ts), also played by the causes and replay tests once test/harness/golden-registry.ts lists them.
+// The goldens (src/campaign/scenarios/roam-across-rhovanion/golden.test.ts).
 // `after`: the log of a campaign whose first four parts were won (Journey Up the Anduin, Lost in Mirkwood, The King's Quest and The Withered Heath, their real Resolutions chained: `afterHeath`) and `variant` the way they were won: the allies in the pool (pool),
 // or Turayn's oath and Melanwar's guidance lines (oath), Isolde's line too (oathline). `ally`: the unique boon ally the boon-ally search of the Campaign Setup (12184:A:2) takes (a card code), or "skip"; by default the first one offered.
 // `upgraded`: the Upgraded sides. `mode`: the Hard or Expert Mode card.

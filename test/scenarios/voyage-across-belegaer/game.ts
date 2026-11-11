@@ -85,7 +85,7 @@ export function voyageIntent(state: ScenarioState, ctx: ReduceContext, memory: S
 
 export type VoyageGame = PlayedGame;
 
-// The goldens (src/campaign/scenarios/voyage-across-belegaer/golden.test.ts), also played by the causes and replay tests. A win runs the campaign card's Resolution and awards its XP; a loss writes nothing.
+// The goldens (src/campaign/scenarios/voyage-across-belegaer/golden.test.ts). A win runs the campaign card's Resolution and awards its XP; a loss writes nothing.
 // `upgraded`: the cards the log marks as upgraded (the ships and the Modification boons), dealt on their Upgraded side. `mode`: the Hard or Expert Mode card.
 export type VoyageGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: VoyageDecks; outcome: "won" | "lost"; policy?: Partial<VoyagePolicy>; upgraded?: boolean; mode?: ModeCard; lossReason?: string };
 

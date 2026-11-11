@@ -84,7 +84,7 @@ export function ${c}Intent(state: ScenarioState, ctx: ReduceContext, memory: Set
 
 export type ${P}Game = PlayedGame;
 
-// The goldens (src/campaign/scenarios/${facts.id}/golden.test.ts), also played by the causes and replay tests once test/harness/golden-registry.ts lists them.
+// The goldens (src/campaign/scenarios/${facts.id}/golden.test.ts).
 // \`after\`: the log of a campaign whose earlier parts were won. \`upgraded\`: the Upgraded sides. \`mode\`: the Hard or Expert Mode card.
 export type ${P}Golden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: ${P}Decks; outcome: "won" | "lost"; policy?: Partial<${P}Policy>; after?: boolean; upgraded?: boolean; mode?: ModeCard; lossReason?: string };
 

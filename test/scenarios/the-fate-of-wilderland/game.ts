@@ -175,7 +175,7 @@ export function rawEarlier(seatCount: 1 | 2, variant: FramsburgVariant = "pool")
   return log;
 }
 
-// The goldens (src/campaign/scenarios/the-fate-of-wilderland/golden.test.ts), also played by the causes and replay tests once test/harness/golden-registry.ts lists them.
+// The goldens (src/campaign/scenarios/the-fate-of-wilderland/golden.test.ts).
 // `after`: the log of a campaign whose first eight parts were won (Journey Up the Anduin through Mount Gundabad, their real Resolutions chained: `afterGundabad`) and `variant` the way they were won (the Mount Gundabad goldens' variants and their seats).
 // `upgraded`: the Upgraded sides. `mode`: the Hard or Expert Mode card.
 export type WilderlandGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: WilderlandDecks; outcome: "won" | "lost"; policy?: Partial<WilderlandPolicy>; after?: boolean; variant?: FramsburgVariant; upgraded?: boolean; mode?: ModeCard; lossReason?: string };

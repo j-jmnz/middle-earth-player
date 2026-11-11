@@ -104,7 +104,7 @@ export function gundabadIntent(state: ScenarioState, ctx: ReduceContext, memory:
 
 export type GundabadGame = PlayedGame;
 
-// The goldens (src/campaign/scenarios/mount-gundabad/golden.test.ts), also played by the causes and replay tests once test/harness/golden-registry.ts lists them.
+// The goldens (src/campaign/scenarios/mount-gundabad/golden.test.ts).
 // `growing`: A Growing Threat is still in the campaign pool (no earlier game revealed it), which the Resolution removes. `after`: the log of a campaign whose first seven parts were won (Journey Up the Anduin, Lost in Mirkwood, The King's Quest, The Withered Heath, Roam Across Rhovanion, Fire in the Night and The Ghost of Framsburg, their real Resolutions chained: `afterFramsburg`) and `variant` the way
 // they were won (the Ghost of Framsburg goldens' variants and their seats). `upgraded`: the Upgraded sides. `mode`: the Hard or Expert Mode card.
 export type GundabadGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: GundabadDecks; outcome: "won" | "lost"; policy?: Partial<GundabadPolicy>; after?: boolean; variant?: FramsburgVariant; growing?: boolean; upgraded?: boolean; mode?: ModeCard; lossReason?: string };

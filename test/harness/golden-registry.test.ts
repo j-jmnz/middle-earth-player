@@ -7,7 +7,7 @@ import { scenarioOrder } from "../../scripts/data/load-scenarios.ts";
 
 import { GOLDEN_REGISTRY } from "./golden-registry.ts";
 
-// The registry lists every scenario's goldens, once, in campaign order (A Shadow of the Past's are read by causes.test.ts and replay.test.ts directly).
+// The registry lists every scenario's goldens, once, in campaign order (A Shadow of the Past's are read by src/campaign/causes.test.ts and replay.test.ts directly).
 const ROOT = path.resolve(import.meta.dirname, "..", "..");
 const SCENARIOS = path.join(ROOT, "src", "campaign", "scenarios");
 const DIRECT = "a-shadow-of-the-past";

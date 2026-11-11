@@ -74,7 +74,7 @@ function chosen(state: ScenarioState, options: readonly string[], policy: Kingsq
 
 export type KingsquestGame = PlayedGame;
 
-// The goldens (src/campaign/scenarios/the-kings-quest/golden.test.ts), also played by the causes and replay tests once test/harness/golden-registry.ts lists them.
+// The goldens (src/campaign/scenarios/the-kings-quest/golden.test.ts).
 // `after`: the log of a campaign whose earlier parts were won (Journey Up the Anduin and Lost in Mirkwood, their real Resolutions chained: `afterEarlier`); `oath`: the log with Turayn's oath line instead of Turayn in the pool.
 // `upgraded`: the Upgraded sides. `mode`: the Hard or Expert Mode card.
 export type KingsquestGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: KingsquestDecks; outcome: "won" | "lost"; policy?: Partial<KingsquestPolicy>; after?: boolean; oath?: boolean; upgraded?: boolean; mode?: ModeCard; lossReason?: string };

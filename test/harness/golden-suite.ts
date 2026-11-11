@@ -2,20 +2,24 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { applyResolution, emptyLog, type CampaignLog } from "../../src/campaign/log.ts";
 import { campaignPath, nextStep, type PathNode } from "../../src/campaign/path.ts";
+import { beginActive, recordIntent, replay } from "../../src/campaign/replay.ts";
 import { xpAwarded } from "../../src/campaign/xp.ts";
 import type { CampaignData, ScenarioData } from "../../src/catalog/scenario-data.ts";
 import type { PrintedCard } from "../../src/rules/core/printed.ts";
 import { expectOk } from "../../src/rules/core/test-fixture.ts";
+import type { Cause } from "../../src/rules/core/cause.ts";
+import type { EngineStep } from "../../src/rules/core/intents.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
 
-import { causeProblems } from "./cause-check.ts";
+import { causeProblems, NUMBER_STEPS } from "./cause-check.ts";
 import type { CampaignGoldenBase, PlayedGame } from "./game-kit.ts";
 import { nextPartId, nextPartStatus, nextStepKind } from "./next-part.ts";
 import { NO_COPY_LIMITS } from "../../src/campaign/wilderland.ts";
 
 // Test helper. The suite every campaign scenario's golden test (src/campaign/scenarios/<scenario-id>/golden.test.ts) registers: the
-// snapshot of the games, the opening, the cause of every number, the won loop (the Resolution, the XP, the next part on the campaign
-// path) and the lost loop (nothing is written). The scenario passes its opening assertions, its expected XP and its own checks.
+// snapshot of the games, the opening, the cause of every number (the scenario's own records among them), a golden replayed from its
+// save, the won loop (the Resolution, the XP, the next part on the campaign path) and the lost loop (nothing is written). The scenario
+// passes its opening assertions, its expected XP and its own checks. Each golden is played once, here.
 
 export type SuiteWorld = { cards: Map<string, PrintedCard>; ctx: ReduceContext };
 export type SuiteGolden<D extends string> = CampaignGoldenBase & { name: string; decks: D; outcome: "won" | "lost"; lossReason?: string };
@@ -55,6 +59,25 @@ export type GoldenSuiteSpec<G extends SuiteGolden<D>, D extends string, P extend
   /** The scenario's own tests, registered after the cause test. */
   checks?: (suite: { game: (golden: G) => P; world: (golden: G) => SuiteWorld; opened: (golden: G) => ScenarioState }) => void;
 };
+
+/** The causes of the number-changing steps that name a record of the scenario's own cards (its campaign card, quest cards and encounter cards). */
+export function ownCauses(scenario: ScenarioData, steps: readonly EngineStep[]): Cause[] {
+  const own = new Set([scenario.campaignCard, ...scenario.stages, ...scenario.cards.map((card) => card.code)]);
+  return steps
+    .filter((step) => NUMBER_STEPS.has(step.kind))
+    .map((step) => (step as { cause: Cause }).cause)
+    .filter((cause) => "effect" in cause && own.has(cause.effect.split(":")[0] ?? ""));
+}
+
+/** Expects the game, saved as its intents (src/campaign/replay.ts) and read back as JSON, to replay to the state it was played to. */
+export function expectReplays(game: Pick<PlayedGame, "start" | "intents" | "state">, ctx: ReduceContext): void {
+  const HASH = 7;
+  let active = beginActive(game.start, HASH);
+  for (const intent of [{ type: "Keep" } as const, ...game.intents]) active = recordIntent(active, intent);
+  const replayed = replay(JSON.parse(JSON.stringify(active)), game.start, HASH, ctx);
+  expect(replayed.ok).toBe(true);
+  if (replayed.ok) expect(replayed.state).toEqual(game.state);
+}
 
 /** The log of a campaign whose parts before this scenario were won (nothing else written). */
 export function logBefore(campaign: CampaignData, scenario: ScenarioData, seatCount: 1 | 2): CampaignLog {
@@ -108,6 +131,15 @@ export function goldenSuite<G extends SuiteGolden<D>, D extends string, P extend
         expect(causeProblems(game(golden).steps), golden.name).toEqual([]);
         spec.cause?.(game(golden), golden);
       }
+      // Across the goldens the scenario's own records move numbers too, not only the rules and the player cards.
+      expect(ownCauses(spec.scenario, spec.goldens.flatMap((golden) => game(golden).steps)).length).toBeGreaterThan(0);
+    });
+
+    it("replays a golden from its save to the same final state", () => {
+      // One golden is enough: the save holds plain intents and the reducer is deterministic, which the snapshot pins for every golden.
+      const golden = spec.goldens[0];
+      if (!golden) throw new Error(`${spec.title} has no golden`);
+      expectReplays(game(golden), worldOf(golden).ctx);
     });
 
     spec.checks?.({ game, world: worldOf, opened });

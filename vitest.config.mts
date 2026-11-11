@@ -6,13 +6,11 @@ import { configDefaults, defineConfig, type Plugin } from "vitest/config";
 
 const root = path.dirname(fileURLToPath(import.meta.url));
 
-// The files that play whole games or compile every component: about three quarters of the suite's time.
+// The files that play many whole games or compile every component.
 // `pnpm test:fast` (VITEST_FAST=1) leaves them out; `pnpm test` and CI run them.
 const slowFiles = [
   "scripts/card-smoke/**",
   "src/play/compiler.test.ts",
-  "src/campaign/replay.test.ts",
-  "src/campaign/causes.test.ts",
   "src/campaign/fixtures.test.ts",
   "src/play/choice/*-sheets.test.ts",
 ];

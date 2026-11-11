@@ -141,7 +141,7 @@ export function templeIntent(state: ScenarioState, ctx: ReduceContext, memory: S
 
 export type TempleGame = PlayedGame;
 
-// The goldens (src/campaign/scenarios/temple-of-the-deceived/golden.test.ts), also played by the causes and replay tests. A win runs the campaign card's Resolution and awards its XP; a loss writes nothing.
+// The goldens (src/campaign/scenarios/temple-of-the-deceived/golden.test.ts). A win runs the campaign card's Resolution and awards its XP; a loss writes nothing.
 // `after`: the log of a campaign whose first five parts were won (the pool, XP and marks reach this part). `upgraded`: the Upgraded sides (Black Key, Gate Key). `mode`: the Hard or Expert Mode card.
 export type TempleGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: TempleDecks; outcome: "won" | "lost"; policy?: Partial<TemplePolicy>; after?: boolean; upgraded?: boolean; mode?: ModeCard; lossReason?: string };
 

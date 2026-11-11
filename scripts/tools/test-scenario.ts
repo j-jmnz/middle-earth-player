@@ -21,8 +21,9 @@ import { WORDS_SCENARIOS } from "../../test/harness/words-scenarios.ts";
 // Parts, each its own vitest run (or the card smoke), so a failure names its part:
 //   tests      the test files that belong to the scenario: those whose path names it (its folder under src/campaign/scenarios/, src/play/scenarios/<id>-*.test.ts, ...)
 //              and those that import from test/scenarios/<id>/ or src/campaign/scenarios/<id>/ (a Temple table test named for the island, say)
-//   goldens    the registry-wide golden tests, filtered (-t) to the scenario's title in test/harness/golden-registry.ts: causes, replay and the Maestro
-//              fixtures. A scenario with no entry skips them, except a-shadow-of-the-past, whose goldens replay.test.ts and causes.test.ts read directly: those two run
+//   goldens    the registry-wide golden tests, filtered (-t) to the scenario's title in test/harness/golden-registry.ts: the Maestro fixtures (the
+//              causes and the replay of a scenario's goldens are in its own golden.test.ts, in tests). A scenario with no entry skips them, except
+//              a-shadow-of-the-past, whose goldens replay.test.ts and causes.test.ts read directly: those two run
 //              whole (in the tests part, as they import its scene)
 //   coverage   the effect coverage, migration and record-route checks, the copied-lines test, the golden registry's own test, the file-size test and the rule-id
 //              test (COVERAGE_TESTS), and every
@@ -49,7 +50,7 @@ export const READER_TEST = "src/play/reader-play.test.ts";
 const WORDS_ROOT = "src/play/words/";
 const WORDS_TEST = `${WORDS_ROOT}scenario-words.test.ts`;
 const ASKS_TEST = `${WORDS_ROOT}asks.test.ts`;
-export const GOLDEN_TESTS = ["src/campaign/causes.test.ts", "src/campaign/replay.test.ts", "src/campaign/fixtures.test.ts"];
+export const GOLDEN_TESTS = ["src/campaign/fixtures.test.ts"];
 
 const escapeRegExp = (text: string): string => text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 

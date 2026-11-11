@@ -140,7 +140,7 @@ export function corsairsIntent(state: ScenarioState, ctx: ReduceContext, memory:
 
 export type CorsairsGame = PlayedGame;
 
-// The goldens (src/campaign/scenarios/the-city-of-corsairs/golden.test.ts), also played by the causes and replay tests once test/harness/golden-registry.ts lists them.
+// The goldens (src/campaign/scenarios/the-city-of-corsairs/golden.test.ts).
 // `after`: the log of a campaign whose earlier parts were won. `upgraded`: the Upgraded sides. `mode`: the Hard or Expert Mode card.
 export type CorsairsGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: CorsairsDecks; outcome: "won" | "lost"; policy?: Partial<CorsairsPolicy>; after?: boolean; upgraded?: boolean; mode?: ModeCard; lossReason?: string; choices?: readonly string[] };
 

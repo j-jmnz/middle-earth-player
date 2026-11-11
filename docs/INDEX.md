@@ -227,11 +227,11 @@ Read when a task names the plan.
   - 237–273 Mechanic families: engine and records together (~1.4K) ← 1
   - 274–287 Readings the review catches (~490) ← 4
   - 288–307 Not expressible yet: leave open, report (~390)
-- `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.7K tok)
+- `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.8K tok)
   - 3–14 Context (~450)
   - 15–24 What does not move (~190)
   - 25–48 A. Effects: draft better, template the repeats, copy identical lines (~970)
-  - 49–57 B. One registry for scenarios, fixtures and goldens (~280)
+  - 49–57 B. One registry for scenarios, fixtures and goldens (~300)
   - 58–71 C. A shared scenario kit and `pnpm scenario:new` (~610)
   - 72–83 D. One manifest per family (~460)
   - 84–92 E. Data: seed what can be seeded (~300)
@@ -250,7 +250,7 @@ Open work; read when a task names it.
   - 19–37 Setup (~440)
   - 38–56 Files you own (edit freely) (~490)
   - 57–70 Shared files (~300)
-  - 71–85 Approach (~690) ← 1
+  - 71–85 Approach (~670) ← 1
   - 86–124 Scenario procedure (~2.0K) ← 13
   - 125–134 Checkpoints (API usage limits can stop you mid-task) (~210)
   - 135–149 Checks before committing (~320)

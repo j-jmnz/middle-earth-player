@@ -95,7 +95,7 @@ export function playMoria(seatCount: 1 | 2, seed: number, difficulty: Difficulty
   return playToEnd(start, ctx, (state, memory) => moriaIntent(state, ctx, memory), limit);
 }
 
-// The goldens (src/campaign/scenarios/journey-in-the-dark/golden.test.ts), also played by the causes and replay tests. A win runs the campaign card's Resolution (the Balrog
+// The goldens (src/campaign/scenarios/journey-in-the-dark/golden.test.ts). A win runs the campaign card's Resolution (the Balrog
 // still in play earns all four burdens, else the first player chooses one of each pair); a loss writes nothing.
 export type MoriaGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: MoriaDecks; outcome: "won" | "lost"; lossReason?: string; balrog?: "in play" | "not in play" };
 

@@ -78,7 +78,7 @@ export function ruinsIntent(state: ScenarioState, ctx: ReduceContext, memory: Se
 
 export type RuinsGame = PlayedGame;
 
-// The goldens (src/campaign/scenarios/the-drowned-ruins/golden.test.ts), also played by the causes and replay tests once test/harness/golden-registry.ts lists them.
+// The goldens (src/campaign/scenarios/the-drowned-ruins/golden.test.ts).
 // `after`: the log of a campaign whose earlier parts were won. `upgraded`: the Upgraded sides (Black Key). `mode`: the Hard or Expert Mode card.
 export type RuinsGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: RuinsDecks; outcome: "won" | "lost"; policy?: Partial<RuinsPolicy>; after?: boolean; upgraded?: boolean; mode?: ModeCard; lossReason?: string; choices?: readonly string[] };
 

@@ -126,7 +126,7 @@ function chosen(state: ScenarioState, options: readonly string[], policy: HeathP
 
 export type HeathGame = PlayedGame;
 
-// The goldens (src/campaign/scenarios/the-withered-heath/golden.test.ts), also played by the causes and replay tests once test/harness/golden-registry.ts lists them.
+// The goldens (src/campaign/scenarios/the-withered-heath/golden.test.ts).
 // `after`: the log of a campaign whose first three parts were won (Journey Up the Anduin, Lost in Mirkwood and The King's Quest, their real Resolutions chained: `afterKingsquest`) and `variant` the way they were won: the allies in the pool (pool),
 // or Turayn's oath and Melanwar's guidance lines (oath), Isolde's line too (oathline). `upgraded`: the Upgraded sides. `mode`: the Hard or Expert Mode card.
 export type HeathVariant = "pool" | "oath" | "oathline";

@@ -56,7 +56,7 @@ export function fateIntent(state: ScenarioState, ctx: ReduceContext, memory: Set
 
 export type FateGame = PlayedGame;
 
-// The goldens (src/campaign/scenarios/the-fate-of-numenor/golden.test.ts), also played by the causes and replay tests. A win runs the campaign card's Resolution and awards its XP; a loss writes nothing.
+// The goldens (src/campaign/scenarios/the-fate-of-numenor/golden.test.ts). A win runs the campaign card's Resolution and awards its XP; a loss writes nothing.
 // `after`: the log of a campaign whose first part was won (the pool, XP and marks reach this part). `upgraded`: Calphon and Spyglass on their Upgraded sides. `mode`: the Hard or Expert Mode card.
 export type FateGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: FateDecks; outcome: "won" | "lost"; policy?: Partial<FatePolicy>; after?: boolean; upgraded?: boolean; mode?: ModeCard; lossReason?: string };
 

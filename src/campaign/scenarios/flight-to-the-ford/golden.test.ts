@@ -5,7 +5,7 @@ import type { PrintedCard } from "../../../rules/core/printed.ts";
 import { inPlay, type ScenarioState } from "../../../rules/core/state.ts";
 import { FORD_GOLDENS, fordLoadout, fordWorld, playGolden, type FordDecks, type FordGolden } from "../../../../test/scenarios/flight-to-the-ford/game.ts";
 import { BURDENS, campaign, ford } from "../../../../test/scenarios/flight-to-the-ford/scene.ts";
-import { goldenSuite } from "../../../../test/harness/golden-suite.ts";
+import { goldenSuite, ownCauses } from "../../../../test/harness/golden-suite.ts";
 import { applyResolution, emptyLog } from "../../log.ts";
 import { campaignPath } from "../../path.ts";
 import { validateLoadout } from "../../loadout.ts";
@@ -64,9 +64,17 @@ goldenSuite<FordGolden, FordDecks>({
     // Life 0 is a loss, and only life 0 is: the other loss leaves the life where it was.
     expect(state.life === 0).toBe(golden.lossReason === "The Ring-bearer's life reached 0");
   },
-  checks: ({ world }) => {
+  checks: ({ game, world }) => {
     it("deals legal loadouts", () => {
       for (const golden of FORD_GOLDENS) expect(validateLoadout(fordLoadout(golden.seatCount, golden.decks), world(golden).cards, true), golden.name).toEqual([]);
+    });
+
+    it("moves the Ring-bearer's life by the scenario's own records and by the rules", () => {
+      // The quest stages, the locations, the treacheries and the Fell Riders change the life, and so does the round's rules.
+      const lives = FORD_GOLDENS.flatMap((golden) => game(golden).steps).filter((step) => step.kind === "life");
+      expect(lives.length).toBeGreaterThan(20);
+      expect(ownCauses(ford, lives).length).toBeGreaterThan(0);
+      expect(lives.some((step) => "rule" in step.cause)).toBe(true);
     });
   },
 });

@@ -111,7 +111,7 @@ export function nightIntent(state: ScenarioState, ctx: ReduceContext, memory: Se
 
 export type NightGame = PlayedGame;
 
-// The goldens (src/campaign/scenarios/fire-in-the-night/golden.test.ts), also played by the causes and replay tests once test/harness/golden-registry.ts lists them.
+// The goldens (src/campaign/scenarios/fire-in-the-night/golden.test.ts).
 // `after`: the log of a campaign whose first five parts were won (Journey Up the Anduin, Lost in Mirkwood, The King's Quest, The Withered Heath and Roam Across Rhovanion, their real Resolutions chained: `afterRhovanion`) and `variant` the way they were won: the allies in the pool
 // with Misplaced Trust (pool) or Urdug's Cunning (cunning) in it, or Turayn's oath and Melanwar's guidance lines (oath), Isolde's line too (oathline). `upgraded`: the Upgraded sides. `mode`: the Hard or Expert Mode card.
 export type NightVariant = "pool" | "cunning" | "oath" | "oathline";

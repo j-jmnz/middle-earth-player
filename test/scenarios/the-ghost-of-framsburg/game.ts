@@ -112,7 +112,7 @@ export function framsburgIntent(state: ScenarioState, ctx: ReduceContext, memory
 
 export type FramsburgGame = PlayedGame;
 
-// The goldens (src/campaign/scenarios/the-ghost-of-framsburg/golden.test.ts), also played by the causes and replay tests once test/harness/golden-registry.ts lists them.
+// The goldens (src/campaign/scenarios/the-ghost-of-framsburg/golden.test.ts).
 // `after`: the log of a campaign whose first six parts were won (Journey Up the Anduin, Lost in Mirkwood, The King's Quest, The Withered Heath, Roam Across Rhovanion and Fire in the Night, their real Resolutions chained: `afterNight`) and `variant` the way they were won
 // (the night goldens' variants and their seats). `upgraded`: the Upgraded sides. `mode`: the Hard or Expert Mode card.
 export type FramsburgVariant = "pool" | "cunning" | "oath" | "oathline" | "beldis";
