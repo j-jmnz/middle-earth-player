@@ -18,7 +18,7 @@ appId: com.middleearth.lcg
     commands:
       - setOrientation: PORTRAIT
 # iOS asks "Open in “Middle Earth LCG”?" when a link is sent to the simulator, and while the alert is up Maestro sees nothing of the app. One
-# left from an earlier run is answered here, and each link's below.
+# left from an earlier run is canceled here (opening it would leave the Campaigns screen for that run's link); the shot's own link is opened below.
 - extendedWaitUntil:
     visible: "Open in .*Middle Earth LCG.*"
     timeout: 3000
@@ -27,12 +27,13 @@ appId: com.middleearth.lcg
     when:
       visible: "Open in .*Middle Earth LCG.*"
     commands:
-      - tapOn: "^Open$"
-# A link sent while the app is still opening its databases is dropped, so the flow waits for the Campaigns screen first and reaches Settings
-# through the tab bar's gear, as features/settings.yaml does; the shot's own link is sent once the app is running.
+      - tapOn: "^Cancel$"
+# A link sent while the app is still opening its databases is dropped, so the flow waits for the app to be running (the Campaigns screen's
+# Settings gear, a button whose id iOS always shows Maestro) and reaches Settings through it, as features/settings.yaml does; the shot's own
+# link is sent once the app is running.
 - extendedWaitUntil:
     visible:
-      id: campaign-list
+      id: settings-open
     timeout: 90000
 - tapOn:
     id: settings-open
