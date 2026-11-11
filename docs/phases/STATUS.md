@@ -92,8 +92,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 66 | The Passage of the Marshes | completed | 2026-11-11. Review round done. Open: `marshes-won`. |
 | 67 | Journey to the Cross-roads | completed | 2026-11-11. Review round done. Open: `roads-won`. |
 | 68 | Shelob's Lair | completed | 2026-11-11. Review round done. Open: `lair-won`. |
-| 69 | The Return of the King data | active | 2026-11-11. Data built; its review runs with phase 70's. Plan: `docs/plans/return-of-the-king.md`. |
-| 70 | The Return of the King campaign shell | active | 2026-11-11. |
+| 69 | The Return of the King data | completed | 2026-11-11. Review round done (with phase 70). Plan: `docs/plans/return-of-the-king.md`. |
+| 70 | The Return of the King campaign shell | completed | 2026-11-11. Review round done. Open: six campaign-card lines left to their scenarios. |
 | 71 | The Return of the King, part 1 | not started | |
 | 72 | The Return of the King, part 2 | not started | |
 | 73 | The Return of the King, part 3 | not started | |
@@ -224,6 +224,9 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - The lasting-effect class holder `enemies:<Trait>` reads printed traits (`heldBy`, `src/rules/core/holder-classes.ts`): a card that gains a trait is not reached. No card in play gains Harad.
 - The Return of the King: the ledger's `eyeIcons` (Sauron's Eye icons on Mountain of Fire encounter cards) is not carried onto catalog cards; the Fortitude test needs it. The Dire, Assault and Phantom keywords are unknown to the build.
 - The Return of the King data readings not user-confirmed: The Battle of the Pelennor Fields deals the Harad enemies the campaign log records from the campaign card, not an aside pile; Reeking Moat's Easy count 3 has no printed source; the burden-set icons of the last campaign cards rest on Hall of Beorn's names.
+- The Return of the King campaign cards' lines left to their scenarios' Build: 145078:A:1 and B:1 (phase 73), 146069:A:1 and B:1 (phase 74), 146079:A:1 and A:2 (phase 76). Until then the waived hero-change penalty and burden sets of those Setups are not applied.
+- The Return of the King shell readings not user-confirmed (`docs/brief.md`, The Return of the King): the Andúril search asks the first player and costs every seat +1 starting threat (a community reading); either side of the Army of the Dead in the victory display earns its boon; the Corsair Fleet count reads whichever side is in play.
+- Mount Doom's Keep resolution repeats "The players lose the campaign." in the heading and the settled note under it.
 - Easy: the DragnCards `E0C.12` deck keeps all ten Great Spider cards where Hall of Beorn keeps six; the E0C decks lead (user decision, 2026-11-07).
 
 ## Standing decisions
