@@ -87,7 +87,7 @@ export function runExtraVerb(
     case "ShuffleEncounterDeck":
       return shuffleEncounterDeck(state);
     case "AddSetAsideToStaging": {
-      const copies = state.setAside.filter((candidate) => state.cards[candidate]?.code === instruction.code);
+      const copies = state.setAside.filter((candidate) => (instruction.code != null ? state.cards[candidate]?.code === instruction.code : instruction.trait != null && hasTrait(state, candidate, instruction.trait, ctx)));
       // Into the acting seat's own staging area once stages are separate (mec109.multiple-staging-areas).
       return (instruction.all === true ? copies : copies.slice(0, 1)).reduce((next, id) => updateCard(moveCard(next, id, stagingDest(next, focus.seat)), id, { face: "up" }), state);
     }

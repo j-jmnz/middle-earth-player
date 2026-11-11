@@ -106,6 +106,13 @@ const VERBS = [
   z.strictObject({ verb: z.literal("IgnoreDiscardedHeroes"), ...when }),
   // Resolution: the saga ends, the players winning or losing the campaign ("Keep The One Ring ... the players lose the campaign", "Destroy The One Ring ... the players win the campaign", 146079:B:2, 146079:B:3). The Campaign Log records it.
   z.strictObject({ verb: z.literal("EndCampaign"), result: z.enum(CAMPAIGN_ENDS), ...when }),
+  // The Battle of the Pelennor Fields' campaign card (docs/brief.md, The Return of the King). Campaign Setup: the first player attaches these cards to the hero with this code and sets him aside, out of play ("The first player attaches Andúril and Banner of Elendil
+  // to Aragorn and sets him aside, out of play", 145078:A:1). The attachments come from the supply; the hero and they leave no `leftPlay` behind (nothing in play left it) and the hero keeps his resources.
+  verbFlags(z.strictObject({ verb: z.literal("SetAsideHeroWithAttachments"), hero: code, attach: z.array(code).min(1) }), { setupRole: "dealt" }),
+  // The first player takes control of the set aside hero with the code, with the cards attached to him ("the first player takes control of Aragorn", 145072:A:1). He enters play ready under the first player; with no such hero set aside nothing happens.
+  z.strictObject({ verb: z.literal("ReturnSetAsideHero"), code, ...when }),
+  // Campaign Setup: each enemy recorded in the Campaign Log under The Black Gate with this trait is set aside, out of play, one copy for each recorded ("Set each Harad enemy recorded in the campaign log aside, out of play", 145078:A:1). With no log, nothing is set aside.
+  verbFlags(z.strictObject({ verb: z.literal("SetAsideLogged"), trait: z.string().min(1) }), { setupRole: "dealt" }),
 ] as const;
 
 const TRIGGERS = [] as const;

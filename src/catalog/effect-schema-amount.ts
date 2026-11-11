@@ -2,6 +2,7 @@
 // enemies engaged with you", "for each Hobbit hero you control", "equal to that enemy's Threat"). A player never supplies one.
 import { z } from "zod";
 
+import { RECORDED_COUNTS } from "./campaign-record.ts";
 import { pickSchema } from "./effect-schema-pick.ts";
 
 // The card a stat is read from: the source, its host, the last picked card, the card the event was about (`subject`), or
@@ -95,6 +96,8 @@ export const amountExprSchema = z.strictObject({
   damageOn: pickSchema.optional(),
   // The total printed cost of the allies in the staging area ("X is the total cost of all allies in the staging area", 145074:B:1; a card with no printed cost counts 0). Read by the pelennor family.
   stagedAlliesCost: z.literal(true).optional(),
+  // A count the earlier Resolution recorded in the Campaign Log's notes ("X is the number recorded in the campaign log", 145078:A:1), 0 when none is recorded or the game has no log. Read by the campaign family.
+  recorded: z.enum(RECORDED_COUNTS).optional(),
 });
 
 export const amountSchema = z.union([z.number().int(), amountExprSchema]);
