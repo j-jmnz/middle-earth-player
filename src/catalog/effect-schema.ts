@@ -141,6 +141,9 @@ const optionEachSchema = z.strictObject({
   ...when,
 });
 
+// An AfterAttack inside a choice's option: the instructions run once the attack in progress ends, as a record's own AfterAttack runs them ("Either raise your threat by 2, or return attacking enemy to the staging area after this attack", 145021:A:3).
+const optionAfterAttackSchema = z.strictObject({ verb: z.literal("AfterAttack"), instructions: z.array(simpleInstructionSchema), ...when });
+
 const choiceSchema = verbFlags(z.strictObject({
   verb: z.literal("Choose"),
   who: whoSchema,
@@ -156,7 +159,7 @@ const choiceSchema = verbFlags(z.strictObject({
       z.strictObject({
         id: z.string().min(1),
         requires: conditionSchema.optional(),
-        instructions: z.array(z.discriminatedUnion("verb", [...simpleVerbs, simpleChoiceSchema, optionEachSchema])),
+        instructions: z.array(z.discriminatedUnion("verb", [...simpleVerbs, simpleChoiceSchema, optionEachSchema, optionAfterAttackSchema])),
       }),
     )
     .min(1),

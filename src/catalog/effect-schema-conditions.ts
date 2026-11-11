@@ -147,6 +147,10 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The cards facedown under the card in play with this code number at least `min` and at most `max`, each plus the number of players with `players` ("If there are at least X facedown cards under The Black Gate, the players lose the game. X is 3 more than the
   // number of players", 144027:A:2). 0 with no such card in play. The count of a card in the zone `under`, as `underBurn` reads it for The Havens Burn. Read by the harad family.
   z.strictObject({ kind: z.literal("facedownUnder"), code: z.string().min(1), min: z.number().int().min(0).optional(), max: z.number().int().min(0).optional(), players: z.literal(true).optional() }),
+  // The actor's threat dial holds a copy of the card with this code (`onDial`: "attached to your threat dial"), or a copy of it is set aside and the dial holds none (`canAttachToDial`: the option "attach a set aside Overcome by Fear to your threat dial" can be done;
+  // Limit 1 per threat dial). Read by the attachments family (src/rules/families/attachments/dial.ts).
+  z.strictObject({ kind: z.literal("onDial"), code: z.string().min(1) }),
+  z.strictObject({ kind: z.literal("canAttachToDial"), code: z.string().min(1) }),
   // The quest deck holds at least `min` stages (1 by default): the stage 2s Mount Gundabad's current quest can be bypassed in favor of (19135:B:3; emce.bypassing). Read by the wilderland family.
   z.strictObject({ kind: z.literal("questDeck"), min: z.number().int().positive().optional() }),
   // The enemy with this title has resolved an attack in the combat phase now under way ("unless he has resolved an attack this phase", 19155:A:1): false in any other phase. Read by the wilderland family.

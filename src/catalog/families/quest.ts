@@ -126,6 +126,9 @@ const FLAGS = [
   // On an enemy, for the modifier's seat only: it makes no engagement checks against that player; it cannot engage that player.
   "noChecksAgainst",
   "cannotEngageSeat",
+  // On a seat: its threat cannot be reduced below its starting threat level, the threat set at Setup step 2 (rr.initial-threat-level; "Each player cannot reduce his threat below his initial threat level", 145064:B:2): a reduction stops at that level.
+  // The game keeps the starting level while a card of it holds this flag (recordStartingThreat).
+  "threatFloor",
   // On "table": the staging step of the quest phase is skipped (01128:B:2, "for the remainder of the game" while the stage is current).
   "skipStaging",
 ] as const;

@@ -102,3 +102,44 @@ describe("the threat amounts (145064:B:1, 145021:A:1)", () => {
     expect(resolveAmount(at(20, 20), { playersAtThreat: 35 }, scope, built.ctx)).toBe(0);
   });
 });
+
+// Rules: rr.shadow-effects, rr.step-6-4-2 (data/rules/entries.json); ledger line 145021:A:3.
+describe("an AfterAttack inside a Choose option (145021:A:3)", () => {
+  const haunted: Effect = {
+    id: "path:shadow:1",
+    cardCode: "path",
+    lines: ["path:A:3"],
+    timing: "shadow",
+    instructions: [
+      {
+        verb: "Choose",
+        who: "actor",
+        options: [
+          { id: "threat", instructions: [{ verb: "RaiseThreat", amount: 2 }] },
+          { id: "staging", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "ReturnToStaging", target: { kind: "self" } }] }] },
+        ],
+      },
+    ],
+  };
+
+  function played(option: string) {
+    const built = table({ cards: [hero("a"), enemy("brute", { attack: 1 }), treachery("path")], effects: [haunted], heroes: [{ code: "a" }], enemies: [{ code: "brute" }], encounter: ["path"] });
+    const { ids, ctx } = built;
+    const defense = until(send(built.state, { type: "DeclineEngage" }, ctx), ctx, defenseWindow);
+    const answered = send(defense, { type: "Undefended", heroId: ids.a! }, ctx);
+    const asked = until(answered, ctx, (current, legal) => legal.some((intent) => intent.type === "Choose") || current.pendingAttack == null);
+    const done = until(send(asked, { type: "Choose", optionId: option }, ctx), ctx, (current) => current.pendingAttack == null && current.stack.length === 0);
+    return { done, ids, threat: defense.seats[0].threat };
+  }
+
+  it("returns the attacker to the staging area once the attack has ended", () => {
+    const { done, ids } = played("staging");
+    expect(done.cards[ids.brute!]?.zone).toBe("staging");
+  });
+
+  it("leaves it engaged when the other option is taken", () => {
+    const { done, ids, threat } = played("threat");
+    expect(done.cards[ids.brute!]?.zone).toBe("engaged");
+    expect(done.seats[0].threat).toBe(threat + 2);
+  });
+});
