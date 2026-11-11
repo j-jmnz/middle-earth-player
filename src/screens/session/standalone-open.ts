@@ -2,10 +2,10 @@
 // not replayed again (session/cache.ts). Pure of React: the hooks that open it for a screen are in standalone-session.ts.
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
-import { addActive, stampedWorld, staleReason } from "../../campaign/replay";
+import { addActive, fullChecks, staleReason } from "../../campaign/replay";
 import { isWon, record, unrecord } from "../../campaign/session";
 import { continueStandalone, dropStandalone, resumeStandalone, restartStandalone, type StandaloneGame } from "../../campaign/standalone";
-import { loadWorld, worldHash } from "../../campaign/world";
+import { loadWorld } from "../../campaign/world";
 import { CATALOG_VERSION } from "../../catalog/version";
 import { EFFECTS } from "../../effects";
 import type { TableStore } from "../../play/store/store";
@@ -21,9 +21,9 @@ import { CANNOT_CONTINUE, MISSING_GAME, restartProblems, type StaleChoice } from
 type Db<TRun> = BaseSQLiteDatabase<"sync", TRun>;
 
 export type StandaloneSession =
-  // `stamp` is the game to write when it was saved before it carried a world hash and is current: the first open stamps it.
+  // `stamp` is the game to write once when the open left it different from its row (table-open.ts, TableSession). `takenBack` on a stale result is how many moves Continue would take back, when a checked replay found one that does not match.
   | ({ ok: true; stored: StandaloneGame; stamp: StandaloneGame | null } & ReplayedGame)
-  | { ok: false; reason: "missing" | "none" | "dropped" | "stale"; stored: StandaloneGame | null; write: StandaloneGame | null };
+  | { ok: false; reason: "missing" | "none" | "dropped" | "stale"; stored: StandaloneGame | null; write: StandaloneGame | null; takenBack?: number | null };
 
 /** The codes the game can show: the Ring-bearer and every card of each dealt deck. */
 export function standaloneCodes(game: StandaloneGame): string[] {
@@ -53,21 +53,19 @@ export function openStandalone<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<
     const dropped = dropStandalone(stored);
     return { ok: false, reason: "dropped", stored: dropped, write: dropped };
   }
-  // Without a world: the engine version, and the catalog version of a game that has no world stamp yet.
-  if (staleReason(stored.active, null)) return { ok: false, reason: "stale", stored, write: null };
+  // Without a world: the engine version, and the catalog version of a game that has no world stamp yet. One of another engine version
+  // without checks to compare has nothing to replay: the player chooses, without loading the world.
+  if (staleReason(stored.active, null) && (stored.active.intents.length === 0 || !fullChecks(stored.active))) return { ok: false, reason: "stale", stored, write: null, takenBack: null };
   const cache = sessionCacheOf<Opened>(user, "standalone");
   const kept = cache.get(stored.id, fingerprintOf(stored, CATALOG_VERSION));
   if (kept) return kept;
   const world = loadWorld(catalog, campaign, scenario, EFFECTS, standaloneCodes(stored));
-  const hash = worldHash(world);
-  if (staleReason(stored.active, hash)) return { ok: false, reason: "stale", stored, write: null };
-  // A game from before the world stamp is current: it is stamped, and written once by the hook that opened it.
-  const stamped: StandaloneGame = { ...stored, active: stampedWorld(stored.active, hash) };
-  const replayed = replayForTable(catalog, world, (observe) => resumeStandalone(stamped, world, observe));
-  if (!replayed) return { ok: false, reason: "stale", stored, write: null };
-  const opened: Opened = { ok: true, stored: stamped, stamp: null, ...replayed };
+  const replayed = replayForTable(catalog, world, (observe) => resumeStandalone(stored, world, observe));
+  if (!replayed.ok) return { ok: false, reason: "stale", stored, write: null, takenBack: replayed.at == null ? null : stored.active.intents.length - replayed.at };
+  const stamped: StandaloneGame = replayed.stamp ? { ...stored, active: replayed.stamp } : stored;
+  const opened: Opened = { ok: true, stored: stamped, stamp: null, ...replayed.game };
   cache.set(stored.id, fingerprintOf(stamped, CATALOG_VERSION), opened);
-  return stamped.active === stored.active ? opened : { ...opened, stamp: stamped };
+  return stamped === stored ? opened : { ...opened, stamp: stamped };
 }
 
 function worldOf<TCatalog>(catalog: Db<TCatalog>, game: StandaloneGame) {
@@ -126,8 +124,8 @@ export function standaloneStore<TRun>(session: Opened, user: Db<TRun>): Standalo
   };
   const store = committingStore(
     session,
-    (intent) => {
-      saved = fold(record(saved, intent));
+    (intent, game) => {
+      saved = fold(record(saved, intent, game));
       writeStandaloneActive(user, saved);
       follow();
     },

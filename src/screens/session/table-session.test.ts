@@ -1,6 +1,8 @@
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
-import { describe, expect, it, vi } from "vitest";
+import { describe, expect, it, onTestFinished, vi } from "vitest";
+
+import * as digest from "../../campaign/digest.ts";
 
 import migrations from "../../../drizzle/migrations";
 import { temporaryCatalog } from "../../../test/harness/temp-catalog.ts";
@@ -49,11 +51,83 @@ describe("opening the table", () => {
     expect(opened.save).toBe(opened.stamp);
     writeActive(user, opened.stamp!);
     const stamped = readSave(user, "s1")!;
-    expect(stamped.active).toEqual({ ...save.active, world: opened.stamp!.active!.world });
-    // Once stamped, the next open is current with nothing to write, and a stamp of another world asks for a choice.
+    expect(stamped.active).toEqual({ ...save.active, world: opened.stamp!.active!.world, checks: opened.stamp!.active!.checks });
+    // Once stamped, the next open is current with nothing to write.
     expect(openTable(catalog, user, "s1")).toMatchObject({ ok: true, stamp: null });
-    writeActive(user, { id: "s1", active: { ...stamped.active!, world: stamped.active!.world! + 1 } });
-    expect(openTable(catalog, user, "s1")).toMatchObject({ ok: false, reason: "stale", write: null });
+  });
+
+  it("a game with every check matching resumes with no message across another engine version or world, and is restamped", () => {
+    const { user } = openUser();
+    const save = fixtureSave(name, "s1", CATALOG_VERSION);
+    writeSave(user, save);
+    const first = openTable(catalog, user, "s1");
+    if (!first.ok || !first.stamp?.active) throw new Error("fixture did not open");
+    const { active } = first.stamp;
+    expect(active.checks).toHaveLength(active.intents.length);
+    for (const moved of [{ engineVersion: ENGINE_VERSION - 1 }, { world: active.world! + 1 }, { engineVersion: ENGINE_VERSION - 1, world: active.world! + 1 }]) {
+      writeActive(user, { id: "s1", active: { ...active, ...moved } });
+      const opened = openTable(catalog, user, "s1");
+      if (!opened.ok) throw new Error(`${opened.reason} on ${JSON.stringify(moved)}`);
+      expect(opened.stamp?.active).toEqual(active);
+      expect(opened.game).toEqual(first.game);
+    }
+  });
+
+  it("a changed check is a mismatch at that move: the sheet says how many moves Continue takes back, and Continue keeps the moves before it", () => {
+    const { user } = openUser();
+    writeSave(user, fixtureSave(name, "s1", CATALOG_VERSION));
+    const first = openTable(catalog, user, "s1");
+    if (!first.ok || !first.stamp?.active) throw new Error("fixture did not open");
+    const { active } = first.stamp;
+    const at = 3;
+    const checks = active.checks!.map((check, index) => (index === at ? check + 1 : check));
+    const tampered = { ...active, engineVersion: ENGINE_VERSION - 1, checks };
+    writeActive(user, { id: "s1", active: tampered });
+    expect(openTable(catalog, user, "s1")).toMatchObject({ ok: false, reason: "stale", write: null, takenBack: active.intents.length - at });
+    expect(readSave(user, "s1")!.active).toEqual(tampered);
+    expect(continueTable(catalog, user, "s1")).toEqual({ ok: true });
+    const kept = readSave(user, "s1")!.active!;
+    expect(kept.intents).toEqual(active.intents.slice(0, at));
+    expect(kept.checks).toEqual(active.checks!.slice(0, at));
+    expect(kept.engineVersion).toBe(ENGINE_VERSION);
+    expect(openTable(catalog, user, "s1")).toMatchObject({ ok: true });
+  });
+
+  it("a game of another engine version with no checks asks for a choice; a current one gets its checks once, with a digest for each move", () => {
+    const { sqlite, user } = openUser();
+    const save = fixtureSave(name, "s1", CATALOG_VERSION);
+    writeSave(user, { ...save, active: { ...save.active!, engineVersion: ENGINE_VERSION - 1 } });
+    expect(openTable(catalog, user, "s1")).toMatchObject({ ok: false, reason: "stale", takenBack: null });
+    writeSave(user, save);
+    // The count of digests an open computes: the spy is restored with the test (this config shares modules across files).
+    const spy = vi.spyOn(digest, "tableDigest");
+    onTestFinished(() => spy.mockRestore());
+    const opened = openTable(catalog, user, "s1");
+    if (!opened.ok) throw new Error("fixture did not open");
+    expect(spy).toHaveBeenCalledTimes(save.active!.intents.length);
+    expect(opened.stamp?.active?.checks).toHaveLength(save.active!.intents.length);
+    writeActive(user, opened.stamp!);
+    // With its checks written, a current game replays with no digest at all.
+    spy.mockClear();
+    const cold = openTable(catalog, drizzle(sqlite), "s1");
+    expect(cold).toMatchObject({ ok: true, stamp: null });
+    expect(spy).not.toHaveBeenCalled();
+  });
+
+  it("each intent the table sends appends the digest of its table to the save, and Undo takes it off", () => {
+    const { user } = openUser();
+    const save = fixtureSave(name, "s1", CATALOG_VERSION);
+    writeSave(user, { ...save, active: { ...save.active!, intents: save.active!.intents.slice(0, -1) } });
+    const opened = openTable(catalog, user, "s1");
+    if (!opened.ok) throw new Error("fixture did not open");
+    const live = sessionStore(opened, user);
+    const before = live.save().active!.checks!.length;
+    expect(live.store.getState().dispatch(save.active!.intents.at(-1)!)).toBe(true);
+    const written = readSave(user, "s1")!.active!;
+    expect(written.checks).toHaveLength(before + 1);
+    expect(written.checks!.at(-1)).toBe(digest.tableDigest(live.store.getState().game));
+    expect(live.store.getState().undo()).toBe(true);
+    expect(readSave(user, "s1")!.active!.checks).toHaveLength(before);
   });
 
   it("a game from before the world stamp that was dealt on other card data asks for a choice and is not written", () => {

@@ -52,6 +52,7 @@ export default function TableScreen() {
           <StaleSheet
             title={scenarioName(session.save?.loadout?.scenarioId ?? "")}
             error={refused}
+            takenBack={session.takenBack}
             onContinue={() => choose(continueTable(catalog, user, saveId))}
             onRestart={() => choose(restartTable(catalog, user, saveId))}
             onLeave={leave}

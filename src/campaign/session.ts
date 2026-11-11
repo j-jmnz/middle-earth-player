@@ -8,7 +8,8 @@ import type { StartScenario } from "../rules/setup/setup.ts";
 
 import { briefing, checklistPlan, startFor, type Briefing, type BriefingInput, type BriefingSeat } from "./briefing.ts";
 import { applyResolution } from "./log.ts";
-import { beginActive, dropLastIntent, recordIntent, replay, replayAccepted, restamped, staleReason, type ActiveScenario, type ReplayObserver } from "./replay.ts";
+import { tableDigest } from "./digest.ts";
+import { beginActive, dropLastIntent, fullChecks, recordIntent, replay, replayAccepted, restamped, stampedWorld, staleReason, type ActiveScenario, type ReplayObserver } from "./replay.ts";
 import type { Save, StoredLoadout } from "./save.ts";
 import { NO_COPY_LIMITS } from "./wilderland.ts";
 import { worldHash, type World } from "./world.ts";
@@ -44,24 +45,43 @@ export function deal(save: Save, world: World, loadout: StoredLoadout, seed: num
   return { ok: true, save: { ...save, loadout, active: beginActive(start, worldHash(world), startedAt) } };
 }
 
-export type Resumed = { ok: true; state: ScenarioState } | { ok: false; reason: "none" | "engineVersion" | "dataHash" | "seed" | "intent" | "loadout" };
+// `stamp` is the game to write once when the replay left it different from what was stored: a stale one that every move matched,
+// restamped with the engine version and world it now plays on; a save from before the world stamp; a current one that had no checks.
+// `at` on a failure is the index of the first intent a checked replay refused or did not match (it is absent for a game with no checks).
+export type Resumed = { ok: true; state: ScenarioState; stamp: ActiveScenario | null } | { ok: false; reason: "none" | "engineVersion" | "dataHash" | "seed" | "intent" | "loadout"; at?: number };
 
-// Replays an open game, a campaign save's scenario or a standalone game, from the start `startOf` builds for its seed. One
-// from another engine version or data hash is not rebuilt at all, and a start that no longer builds is reported as the
-// loadout. A failure leaves the game as it is: the caller asks the player to continue it or restart it.
+// Replays an open game, a campaign save's scenario or a standalone game, from the start `startOf` builds for its seed. A game
+// current on this engine and world replays as it stands, with no digest, unless it has no checks: then the replay writes them, once.
+// One from another engine version or world is replayed checked when it has checks: every move accepted and matching resumes it with
+// no message, and the first that is not is reported (`at`). One with no checks to compare is not rebuilt at all. A start that no longer
+// builds is reported as the loadout. A failure leaves the game as it is: the caller asks the player to continue it or restart it.
 export function resumeFrom(active: ActiveScenario | null, startOf: ((seed: number) => StartScenario) | null, world: World, observe?: ReplayObserver): Resumed {
   if (!active || !startOf) return { ok: false, reason: "none" };
   const hash = worldHash(world);
   const stale = staleReason(active, hash);
-  if (stale) return { ok: false, reason: stale };
+  if (stale && (active.intents.length === 0 || !fullChecks(active))) return { ok: false, reason: stale };
   let start;
   try {
     start = startOf(active.seed);
   } catch {
     return { ok: false, reason: "loadout" };
   }
-  const replayed = replay(active, start, hash, contextOf(world), observe);
-  return replayed.ok ? { ok: true, state: replayed.state } : { ok: false, reason: replayed.reason };
+  const ctx = contextOf(world);
+  if (stale) {
+    const checked = replayAccepted(active, start, ctx, observe);
+    if (checked.at != null) return { ok: false, reason: stale, at: checked.at };
+    return { ok: true, state: checked.state, stamp: restamped(active, checked.accepted, hash, checked.checks) };
+  }
+  const checks: number[] = [];
+  const backfill = !fullChecks(active);
+  const replayed = replay(active, start, hash, ctx, backfill ? (before, after, steps, intent) => {
+    checks.push(tableDigest(after));
+    observe?.(before, after, steps, intent);
+  } : observe);
+  if (!replayed.ok) return { ok: false, reason: replayed.reason };
+  const stamped = stampedWorld(active, hash);
+  const stamp = backfill ? { ...stamped, checks } : stamped;
+  return { ok: true, state: replayed.state, stamp: stamp === active ? null : stamp };
 }
 
 // Replays the open scenario of a save. A failure leaves the save as it is (the log, the decks and the image index are never touched).
@@ -72,19 +92,19 @@ export function resume(save: Save, world: World, observe?: ReplayObserver): Resu
 
 export type Continued<T> = { ok: true; holder: T; accepted: number; total: number } | { ok: false; reason: "none" | "loadout" };
 
-// Continue: replays the open game on the current rules as far as the reducer accepts its intents, and keeps that prefix, stamped
-// with the engine version and the data hash it now plays on. Whatever came after the first refused intent is gone, so the table
-// may not be the one the player left. Pure: the caller writes the holder it gets back.
+// Continue: replays the open game on the current rules as far as the reducer accepts its intents and, when the game has checks, as far
+// as each move rebuilds the table the check saw; keeps that prefix and its checks, stamped with the engine version and the world it now
+// plays on. Whatever came after the first refused or unmatched intent is gone, so the table may not be the one the player left. Pure: the caller writes the holder it gets back.
 export function continueFrom<T extends { active: ActiveScenario | null }>(holder: T, startOf: ((seed: number) => StartScenario) | null, world: World): Continued<T> {
   const { active } = holder;
   if (!active || !startOf) return { ok: false, reason: "none" };
-  let accepted;
+  let kept;
   try {
-    accepted = replayAccepted(active, startOf(active.seed), contextOf(world)).accepted;
+    kept = replayAccepted(active, startOf(active.seed), contextOf(world));
   } catch {
     return { ok: false, reason: "loadout" };
   }
-  return { ok: true, holder: { ...holder, active: restamped(active, accepted, worldHash(world)) }, accepted, total: active.intents.length };
+  return { ok: true, holder: { ...holder, active: restamped(active, kept.accepted, worldHash(world), kept.checks) }, accepted: kept.accepted, total: active.intents.length };
 }
 
 // Continue on a save's open scenario.
@@ -103,9 +123,12 @@ export function drop(save: Save): Save {
   return { ...save, active: null, loadout: null };
 }
 
-// Records one intent the reducer accepted on the open game: a save's scenario or a standalone game.
-export function record<T extends { active: ActiveScenario | null }>(holder: T, intent: PlayerIntent): T {
-  return holder.active ? { ...holder, active: recordIntent(holder.active, intent) } : holder;
+// Records one intent the reducer accepted on the open game, a save's scenario or a standalone game, with the digest of the table it
+// left (`state`, when the caller has it) when the game keeps checks. The one digest of a tap.
+export function record<T extends { active: ActiveScenario | null }>(holder: T, intent: PlayerIntent, state?: ScenarioState): T {
+  const { active } = holder;
+  if (!active) return holder;
+  return { ...holder, active: state && fullChecks(active) ? recordIntent(active, intent, tableDigest(state)) : recordIntent(active, intent) };
 }
 
 // Takes back the last intent of the open scenario (the table's Undo, brief: Rules engine).

@@ -3,6 +3,7 @@ import { reduce } from "../rules/engine/reduce.ts";
 import { startScenario, type StartScenario } from "../rules/setup/setup.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
 import { CATALOG_VERSION } from "../catalog/version.ts";
+import { tableDigest } from "./digest.ts";
 
 export { ENGINE_VERSION };
 
@@ -18,6 +19,9 @@ export type ActiveScenario = {
   world: number | null;
   seed: number;
   intents: PlayerIntent[];
+  // The tableDigest of the table after each intent, one for one with `intents` (digest.ts). A replay on another engine version or
+  // other card data compares them move by move. Absent on a save that has none: a list of another length is read as none.
+  checks?: number[];
   // When it was dealt (ms since the epoch), for the run history. A scenario dealt before phase 28b has none.
   startedAt?: number;
   // The ms the table was on screen with the app in the foreground (the run's playtime). A scenario played before it has none.
@@ -28,8 +32,16 @@ export function beginActive(start: StartScenario, world: number, startedAt?: num
   return { engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, world, seed: start.seed, intents: [], ...(startedAt == null ? {} : { startedAt }) };
 }
 
-export function recordIntent(active: ActiveScenario, intent: PlayerIntent): ActiveScenario {
-  return { ...active, intents: [...active.intents, intent] };
+// Whether `checks` has one digest for each intent, so a replay can compare them. A game with no intents has them trivially.
+export function fullChecks(active: Pick<ActiveScenario, "intents" | "checks">): boolean {
+  return (active.checks?.length ?? 0) === active.intents.length;
+}
+
+// Appends an intent and, when the save carries a digest for each intent so far, the digest of the table after it. A save that has no
+// checks stays without (an open writes them once, session.ts resumeFrom).
+export function recordIntent(active: ActiveScenario, intent: PlayerIntent, check?: number): ActiveScenario {
+  const intents = [...active.intents, intent];
+  return check !== undefined && fullChecks(active) ? { ...active, intents, checks: [...(active.checks ?? []), check] } : { ...active, intents };
 }
 
 // Adds the foreground ms the table counted since the last write; nothing to add leaves the scenario as it is.
@@ -38,8 +50,12 @@ export function addActive(active: ActiveScenario, ms: number): ActiveScenario {
 }
 
 // Takes the last intent back (the table's Undo): replaying the rest gives the state before it.
+// The last digest goes with it; checks that did not match the intents one for one are dropped.
 export function dropLastIntent(active: ActiveScenario): ActiveScenario {
-  return { ...active, intents: active.intents.slice(0, -1) };
+  const { checks, ...rest } = active;
+  const intents = active.intents.slice(0, -1);
+  if (!checks) return { ...rest, intents };
+  return fullChecks(active) ? { ...rest, intents, checks: checks.slice(0, -1) } : { ...rest, intents };
 }
 
 export type Replayed =
@@ -80,24 +96,30 @@ export function replay(active: ActiveScenario, start: StartScenario, world: numb
   return { ok: true, state };
 }
 
-// The state after the intents the current reducer accepts, and how many that was: a replay that stops at the first refused intent
-// instead of failing. It checks no version and no hash; it is what Continue plays on a game a change reached (session.ts, continueFrom).
-export type Accepted = { state: ScenarioState; accepted: number };
+// The state after the intents the current reducer accepts and the tableDigest after each, and how many that was: a replay that stops at
+// the first intent it refuses or, when the save has a digest for each intent, whose table does not match its digest. `at` is that
+// intent's index, or null when every intent was accepted and matched. It checks no version and no hash; it is the checked replay that
+// lets a game another engine version reached resume with no message, and what Continue plays (session.ts, resumeFrom, continueFrom).
+export type Accepted = { state: ScenarioState; accepted: number; checks: number[]; at: number | null };
 
-export function replayAccepted(active: Pick<ActiveScenario, "intents">, start: StartScenario, ctx: ReduceContext): Accepted {
+export function replayAccepted(active: Pick<ActiveScenario, "intents" | "checks">, start: StartScenario, ctx: ReduceContext, observe?: ReplayObserver): Accepted {
+  const stored = fullChecks(active) ? active.checks : undefined;
   let state = startScenario(start, ctx);
-  let accepted = 0;
-  for (const intent of active.intents) {
+  const checks: number[] = [];
+  for (const [index, intent] of active.intents.entries()) {
     const result = reduce(state, intent, ctx);
-    if (!result.ok) break;
+    if (!result.ok) return { state, accepted: index, checks, at: index };
+    const digest = tableDigest(result.state);
+    if (stored && stored[index] !== digest) return { state, accepted: index, checks, at: index };
+    observe?.(state, result.state, result.steps, intent);
     state = result.state;
-    accepted += 1;
+    checks.push(digest);
   }
-  return { state, accepted };
+  return { state, accepted: checks.length, checks, at: null };
 }
 
-// The open scenario as Continue keeps it: the first `accepted` intents, stamped with the engine version and the world it now
-// plays on. The seed, when it was dealt and the foreground time stay.
-export function restamped(active: ActiveScenario, accepted: number, world: number): ActiveScenario {
-  return { ...active, engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, world, intents: active.intents.slice(0, accepted) };
+// The open scenario as Continue keeps it: the first `accepted` intents and their digests, stamped with the engine version and the world
+// it now plays on. The seed, when it was dealt and the foreground time stay.
+export function restamped(active: ActiveScenario, accepted: number, world: number, checks: readonly number[]): ActiveScenario {
+  return { ...active, engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, world, intents: active.intents.slice(0, accepted), checks: checks.slice(0, accepted) };
 }

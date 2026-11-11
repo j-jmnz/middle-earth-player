@@ -6,7 +6,7 @@ import { eq, inArray } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import { contextOf, type Resumed } from "../../campaign/session";
-import type { ReplayObserver } from "../../campaign/replay";
+import type { ActiveScenario, ReplayObserver } from "../../campaign/replay";
 import type { World } from "../../campaign/world";
 import { cards, packs } from "../../catalog/schema";
 import { createTableStore, keepIntent, type EngineStep, type Kept, type PlayerIntent, type ReduceContext, type ScenarioState, type TableStore } from "../../play/store/store";
@@ -27,15 +27,18 @@ export function factsOf<TRun>(catalog: Db<TRun>, codes: Iterable<string>): Map<s
 
 export type ReplayedGame = { world: World; ctx: ReduceContext; game: ScenarioState; roundSteps: readonly EngineStep[]; history: readonly Undoable[]; facts: ReadonlyMap<string, CardFacts> };
 
-/** Replays a game through `resume` and gathers what the table draws. Null when the replay fails: the caller drops the game. */
-export function replayForTable<TRun>(catalog: Db<TRun>, world: World, resume: (observe: ReplayObserver) => Resumed): ReplayedGame | null {
+/** A replay for the table: the game and the open scenario to write once (`stamp`, session.ts Resumed), or the index of the first intent a checked replay refused or did not match (`at`, null when there was nothing to check). */
+export type ReplayedOpen = { ok: true; game: ReplayedGame; stamp: ActiveScenario | null } | { ok: false; at: number | null };
+
+/** Replays a game through `resume` and gathers what the table draws. Not ok when the replay fails: the caller asks for a choice. */
+export function replayForTable<TRun>(catalog: Db<TRun>, world: World, resume: (observe: ReplayObserver) => Resumed): ReplayedOpen {
   // The same fold the store runs on each intent it sends (keepIntent), so a reopened game can be undone as far as before.
   let kept: Kept = { roundSteps: [], history: [] };
   const resumed = resume((before, after, steps, intent) => {
     kept = keepIntent(kept, before, after, steps, intent);
   });
-  if (!resumed.ok) return null;
-  return { world, ctx: contextOf(world), game: resumed.state, ...kept, facts: factsOf(catalog, world.cards.keys()) };
+  if (!resumed.ok) return { ok: false, at: resumed.at ?? null };
+  return { ok: true, game: { world, ctx: contextOf(world), game: resumed.state, ...kept, facts: factsOf(catalog, world.cards.keys()) }, stamp: resumed.stamp };
 }
 
 /**

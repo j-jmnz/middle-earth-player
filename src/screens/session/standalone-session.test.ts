@@ -5,6 +5,8 @@ import { describe, expect, it } from "vitest";
 import migrations from "../../../drizzle/migrations";
 import { loadCampaign } from "../../../scripts/data/load-scenarios.ts";
 import { temporaryCatalog } from "../../../test/harness/temp-catalog.ts";
+import { ENGINE_VERSION } from "../../campaign/replay.ts";
+import { record } from "../../campaign/session.ts";
 import { dealStandalone, type StandaloneLoadout } from "../../campaign/standalone.ts";
 import { CATALOG_VERSION } from "../../catalog/version.ts";
 import { loadWorld } from "../../campaign/world.ts";
@@ -57,5 +59,20 @@ describe("opening a standalone game", () => {
     expect(readStandalone(user, "game-1")!.game.active).toEqual(old.active);
     writeStandalone(user, { ...dealt.game, active: { ...dealt.game.active!, world: dealt.game.active!.world! + 1 } });
     expect(openStandalone(catalog, user, "game-1")).toMatchObject({ ok: false, reason: "stale", write: null });
+  });
+
+  it("backfills the checks of a current game once; with them, another engine version resumes with no message when every move matches, and a changed check asks for a choice", () => {
+    const user = openUser();
+    writeStandalone(user, record(dealt.game, { type: "Keep" }));
+    const opened = openStandalone(catalog, user, "game-1");
+    if (!opened.ok) throw new Error(opened.reason);
+    const active = opened.stamp!.active!;
+    expect(active.checks).toHaveLength(1);
+    writeStandaloneActive(user, { ...opened.stamp!, active: { ...active, engineVersion: ENGINE_VERSION - 1 } });
+    const moved = openStandalone(catalog, user, "game-1");
+    expect(moved).toMatchObject({ ok: true });
+    expect(moved.ok && moved.stamp?.active).toEqual(active);
+    writeStandaloneActive(user, { ...opened.stamp!, active: { ...active, engineVersion: ENGINE_VERSION - 1, checks: [active.checks![0]! + 1] } });
+    expect(openStandalone(catalog, user, "game-1")).toMatchObject({ ok: false, reason: "stale", write: null, takenBack: 1 });
   });
 });

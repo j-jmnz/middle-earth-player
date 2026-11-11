@@ -5,10 +5,10 @@
 // that open it for a screen are in table-session.ts.
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
-import { addActive, stampedWorld, staleReason } from "../../campaign/replay";
+import { addActive, fullChecks, staleReason } from "../../campaign/replay";
 import type { Save } from "../../campaign/save";
 import { continueSave, drop, finish, isWon, record, restartSave, resume, unrecord } from "../../campaign/session";
-import { logCodes, loadWorld, worldHash, type World } from "../../campaign/world";
+import { logCodes, loadWorld, type World } from "../../campaign/world";
 import { CATALOG_VERSION } from "../../catalog/version";
 import { dealSeed } from "../nav/e2e";
 import { CANNOT_CONTINUE, MISSING_GAME, restartProblems, type StaleChoice } from "./stale-words";
@@ -27,8 +27,12 @@ import { fingerprintOf, sessionCacheOf } from "./cache";
 
 type Db<TRun> = BaseSQLiteDatabase<"sync", TRun>;
 
-// `stamp` is the save to write when the open game was saved before it carried a world hash and is current: the first open stamps it.
-export type TableSession = ({ ok: true; save: Save; stamp: Save | null } & ReplayedGame) | { ok: false; reason: "missing" | "none" | "dropped" | "stale"; save: Save | null; write: Save | null };
+// `stamp` is the save to write once when the open left the game different from its row: stamped with the world (a save from before it), restamped
+// after a checked replay matched every move on another engine version, or given the checks it lacked. `takenBack` on a stale result is how many moves Continue would take back
+// when a checked replay found the first that does not match (null: nothing was compared).
+export type TableSession =
+  | ({ ok: true; save: Save; stamp: Save | null } & ReplayedGame)
+  | { ok: false; reason: "missing" | "none" | "dropped" | "stale"; save: Save | null; write: Save | null; takenBack?: number | null };
 
 /** The codes the open scenario can show: the log's cards, the Ring-bearer and every card of each dealt deck. */
 export function loadoutCodes(save: Save): string[] {
@@ -65,24 +69,23 @@ function openRead<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TUser>, read:
     const dropped = drop(save);
     return { ok: false, reason: "dropped", save: dropped, write: dropped };
   }
-  // Without a world: the engine version, and the catalog version of a save that has no world stamp yet.
-  if (staleReason(save.active, null)) return { ok: false, reason: "stale", save, write: null };
+  // Without a world: the engine version, and the catalog version of a save that has no world stamp yet. One of another engine
+  // version without checks to compare has nothing to replay: the player chooses, without loading the world.
+  if (staleReason(save.active, null) && (save.active.intents.length === 0 || !fullChecks(save.active))) return { ok: false, reason: "stale", save, write: null, takenBack: null };
   const cache = sessionCacheOf<Opened>(user, "save");
   const kept = cache.get(save.id, fingerprintOf(save, CATALOG_VERSION));
   if (kept) return kept;
   const world = loadWorld(catalog, campaign, scenario, EFFECTS, loadoutCodes(save));
-  const hash = worldHash(world);
-  if (staleReason(save.active, hash)) return { ok: false, reason: "stale", save, write: null };
-  // A save from before the world stamp is current: it is stamped, and written once by the hook that opened it.
-  const stamped: Save = { ...save, active: stampedWorld(save.active, hash) };
-  const replayed = replayForTable(catalog, world, (observe) => resume(stamped, world, observe));
-  if (!replayed) {
-    // The reducer refused a stored intent, or the start no longer builds: the player chooses, nothing is dropped.
-    return { ok: false, reason: "stale", save, write: null };
+  const replayed = replayForTable(catalog, world, (observe) => resume(save, world, observe));
+  if (!replayed.ok) {
+    // Another engine version or world that did not match, the reducer refused a stored intent, or the start no longer builds: the player chooses, nothing is dropped.
+    return { ok: false, reason: "stale", save, write: null, takenBack: replayed.at == null ? null : save.active.intents.length - replayed.at };
   }
-  const opened: Opened = { ok: true, save: stamped, stamp: null, ...replayed };
+  // The row as the replay leaves it (stamped, restamped, or given its checks) is the save the table opens on, and the hook that opened it writes it once.
+  const stamped: Save = replayed.stamp ? { ...save, active: replayed.stamp } : save;
+  const opened: Opened = { ok: true, save: stamped, stamp: null, ...replayed.game };
   cache.set(save.id, fingerprintOf(stamped, CATALOG_VERSION), opened);
-  return stamped.active === save.active ? opened : { ...opened, stamp: stamped };
+  return stamped === save ? opened : { ...opened, stamp: stamped };
 }
 
 // The world of an open scenario, or null when its campaign or scenario is not in the build or its cards do not load.
@@ -149,7 +152,7 @@ export function sessionStore<TRun>(session: Opened, user: Db<TRun>): SessionStor
   const store = committingStore(
     session,
     (intent, game) => {
-      saved = fold(record(saved, intent));
+      saved = fold(record(saved, intent, game));
       writeActive(user, saved);
       // A lost game can no longer be undone, and its run id is fixed: write the run now, so closing the Resolution any way (or never)
       // still leaves it. A win waits for its Resolution choices (the reward).

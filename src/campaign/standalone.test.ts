@@ -209,7 +209,7 @@ describe("a standalone game", () => {
     const continued = continueStandalone(stale, world);
     if (!continued.ok) throw new Error(continued.reason);
     expect(continued).toMatchObject({ accepted: 1, total: 3 });
-    expect(continued.holder.active).toEqual({ engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, world: worldHash(world), seed: SEED, intents: [{ type: "Keep" }], startedAt: 5, activeMs: 7 });
+    expect(continued.holder.active).toEqual({ engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, world: worldHash(world), seed: SEED, intents: [{ type: "Keep" }], checks: [expect.any(Number)], startedAt: 5, activeMs: 7 });
     expect(resumeStandalone(continued.holder, world).ok).toBe(true);
     expect(continueStandalone({ ...stale, loadout: null }, world)).toEqual({ ok: false, reason: "none" });
 

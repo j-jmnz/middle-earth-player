@@ -5,10 +5,10 @@ import { View } from "react-native";
 
 import { PaperSheet, PrimaryButton, TextButton } from "../kit/chrome";
 import { SheetModal } from "../kit/sheet-modal";
-import { CONTINUE_NOTE, RESTART_NOTE, STALE_SENTENCE, STALE_STEP } from "../session/stale-words";
+import { CONTINUE_NOTE, RESTART_NOTE, STALE_SENTENCE, STALE_STEP, takenBackNote } from "../session/stale-words";
 import { Text } from "../../ui/text";
 
-export function StaleSheet({ title, error, onContinue, onRestart, onLeave }: { title: string; error: string | null; onContinue: () => void; onRestart: () => void; onLeave: () => void }) {
+export function StaleSheet({ title, error, takenBack, onContinue, onRestart, onLeave }: { title: string; error: string | null; takenBack?: number | null; onContinue: () => void; onRestart: () => void; onLeave: () => void }) {
   return (
     <SheetModal visible onRequestClose={onLeave} scrimLabel="Leave without choosing">
       <PaperSheet step={STALE_STEP} title={title}>
@@ -16,6 +16,11 @@ export function StaleSheet({ title, error, onContinue, onRestart, onLeave }: { t
           {STALE_SENTENCE}
         </Text>
         <Text className="mt-2 text-body text-ink">{CONTINUE_NOTE}</Text>
+        {takenBack ? (
+          <Text testID="stale-taken-back" className="mt-2 text-body text-ink">
+            {takenBackNote(takenBack)}
+          </Text>
+        ) : null}
         <Text className="mt-2 text-body text-ink">{RESTART_NOTE}</Text>
         {error ? (
           <Text testID="stale-error" className="mt-2 text-body text-danger">

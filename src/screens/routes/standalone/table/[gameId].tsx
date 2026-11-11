@@ -52,6 +52,7 @@ export default function StandaloneTableScreen() {
           <StaleSheet
             title={scenarioName(session.stored?.scenarioId ?? "")}
             error={refused}
+            takenBack={session.takenBack}
             onContinue={() => choose(continueStandaloneGame(catalog, user, gameId))}
             onRestart={() => choose(restartStandaloneGame(catalog, user, gameId))}
             onLeave={leave}

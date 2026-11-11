@@ -4,6 +4,10 @@
 export const STALE_STEP = "Needs a choice";
 export const STALE_SENTENCE = "The rules or the card data changed since this game was dealt.";
 export const CONTINUE_NOTE = "Continue plays your moves again on the new rules, as far as they are accepted. The table may not be the one you left.";
+/** What a checked replay found: the move the new rules first play differently, so Continue takes back that move and every move after it. */
+export function takenBackNote(count: number): string {
+  return count === 1 ? "On the new rules, 1 move is taken back." : `On the new rules, ${count} moves are taken back.`;
+}
 export const RESTART_NOTE = "Restart deals the scenario again with the same decks and a new shuffle. Your log and decks are kept.";
 export const STALE_CLOSED = "This game needs a choice before it can open.";
 export const CANNOT_CONTINUE = "This game could not be played again on the new rules. You can restart it.";
