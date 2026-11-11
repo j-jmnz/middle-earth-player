@@ -167,6 +167,12 @@ export function addStandIns(cards: Map<string, PrintedCard>, names: readonly Sta
   for (const cost of costs) cards.set(`c${cost}`, eventCard(`c${cost}`, cost));
 }
 
+// The card an undefended attack lands on: the hero asked for, or the only target the engine offers when a card sends the damage elsewhere (Mordor Orc's damage goes to Minas Tirith, 145055:A:2).
+function undefendedTarget(state: ScenarioState, ctx: ReduceContext, hero: string): string {
+  const targets = legalTargets(state, { type: "Undefended" }, ctx);
+  return targets.includes(hero) || targets.length === 0 ? hero : (targets[0] ?? hero);
+}
+
 export type FightTable = { state: ScenarioState; ctx: ReduceContext; hero: string; hero2: string };
 export type FightOptions<T> = { undefended?: boolean; defender?: (made: T) => string; pick?: (state: ScenarioState) => string; tweak?: (state: ScenarioState, made: T) => ScenarioState };
 export type Fight<T> = { run: Run; ctx: ReduceContext; made: T; start: ScenarioState; during: ScenarioState };
@@ -203,13 +209,13 @@ export function fightEnemy<T extends FightTable, L>(table: (layout: L) => T, sha
   if (run.state.window?.kind !== "defense") throw new Error(`no defense window: ${JSON.stringify(run.state.window)}`);
   const defender = options.defender ? options.defender(made) : made.hero;
   let during = run.state;
-  run = send(run, options.undefended ? { type: "Undefended", heroId: defender } : { type: "DeclareDefender", defenderId: defender }, made.ctx);
+  run = send(run, options.undefended ? { type: "Undefended", heroId: undefendedTarget(run.state, made.ctx, defender) } : { type: "DeclareDefender", defenderId: defender }, made.ctx);
   for (let guard = 0; guard < 40 && (run.state.pendingAttack != null || run.state.window?.kind === "choose" || run.state.window?.kind === "look" || run.state.window?.kind === "defense"); guard += 1) {
     const window = run.state.window;
     // A second attack (the attacking enemy attacks again): defended as the first was, unless the defender is exhausted by then, and then by the second hero when the first is no hero.
     if (window?.kind === "defense") {
       const canDefend = legalTargets(run.state, { type: "DeclareDefender" }, made.ctx).includes(defender);
-      run = send(run, options.undefended || !canDefend ? { type: "Undefended", heroId: run.state.cards[defender]?.zone === "heroes" ? defender : made.hero2 } : { type: "DeclareDefender", defenderId: defender }, made.ctx);
+      run = send(run, options.undefended || !canDefend ? { type: "Undefended", heroId: undefendedTarget(run.state, made.ctx, run.state.cards[defender]?.zone === "heroes" ? defender : made.hero2) } : { type: "DeclareDefender", defenderId: defender }, made.ctx);
       continue;
     }
     if (window?.kind === "choose") {
