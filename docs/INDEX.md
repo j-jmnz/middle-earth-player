@@ -71,7 +71,7 @@ Read the sections your task touches.
   - 295–300 Images (~940) ← 6
   - 301–353 Screens (~3.8K) ← 1
   - 354–359 Catalog build (~410)
-  - 360–377 Tests (~1.9K) ← 6
+  - 360–377 Tests (~1.9K) ← 5
   - 378–393 Performance (~1.2K) ← 4
 - `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~89.6K tok)
   - 17–38 Sections (~410)
@@ -198,16 +198,16 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~7.2K tok)
+- `docs/phases/STATUS.md` — Phase status (~7.9K tok)
   - 5–15 Rules (~410)
   - 16–92 Phases (~1.5K)
-  - 93–196 Open items (~4.7K)
+  - 93–204 Open items (~5.4K)
     - 95–97 Releases (~50)
-    - 98–120 Fixtures and Maestro (~1.3K)
-    - 121–168 Rules and engine (~2.2K)
-    - 169–189 Screens and code (~900)
-    - 190–196 Rules and engine (The Two Towers) (~240)
-  - 197–214 Standing decisions (~550)
+    - 98–122 Fixtures and Maestro (~1.4K)
+    - 123–170 Rules and engine (~2.2K)
+    - 171–192 Screens and code (~1.1K)
+    - 193–204 Rules and engine (The Two Towers) (~580)
+  - 205–222 Standing decisions (~550)
 
 ## Live plans
 
@@ -216,7 +216,7 @@ Read when a task names the plan.
 - `docs/plans/effect-authoring.md` — Authoring effect records (~7.4K tok)
   - 12–33 Workflow (~470)
   - 34–50 Where records live (~370)
-  - 51–75 Templates and copied lines (~690) ← 6
+  - 51–75 Templates and copied lines (~690) ← 5
   - 76–100 The record (~500)
   - 101–117 Which card an instruction acts on (~380)
   - 118–138 Pick filters (~410)
@@ -227,17 +227,6 @@ Read when a task names the plan.
   - 237–273 Mechanic families: engine and records together (~1.4K) ← 1
   - 274–287 Readings the review catches (~490) ← 4
   - 288–307 Not expressible yet: leave open, report (~390)
-- `docs/plans/helms-deep-and-road-to-isengard.md` — Plan: Helm's Deep and The Road to Isengard (~5.1K tok)
-  - 3–10 Context (~310)
-  - 11–17 Base and landing (~270)
-  - 18–23 What does not move (~110)
-  - 24–140 Sections (~4.2K)
-    - 26–38 0. The One Deck plays the fixture games (~770)
-    - 39–78 1. Helm's Deep (phase 64) (~1.6K)
-    - 79–131 2. The Road to Isengard (phase 65) (~1.7K)
-    - 132–140 3. Closing (~140)
-  - 141–146 Risks (~200)
-  - 147–154 Measure (~70)
 - `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.7K tok)
   - 3–14 Context (~450)
   - 15–24 What does not move (~190)
@@ -262,7 +251,7 @@ Open work; read when a task names it.
   - 38–56 Files you own (edit freely) (~490)
   - 57–70 Shared files (~300)
   - 71–85 Approach (~690) ← 1
-  - 86–124 Scenario procedure (~2.0K) ← 14
+  - 86–124 Scenario procedure (~2.0K) ← 13
   - 125–134 Checkpoints (API usage limits can stop you mid-task) (~210)
   - 135–149 Checks before committing (~320)
   - 150–156 Merge (~140) ← 1
