@@ -2,16 +2,31 @@ appId: com.middleearth.lcg
 tags:
   - scenario
 ---
-# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `marshes-won` (scripts/e2e/the-passage-of-the-marshes.ts): a real two-handed
-# game of The Passage of the Marshes, parked on its win. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
-# The steps are the shared subflow's (.maestro/subflows/scenario-win.yaml); add this scenario's own assertions after the call.
+# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `marshes-won` (scripts/e2e/the-passage-of-the-marshes.ts): a real two-handed game of The Passage of the Marshes
+# (The One Deck and the Defenders of Gondor lists, Easy, the saga Frodo as the Ring-bearer with The One Ring, after The Road to Isengard's win), parked on its win (the first player controls Sméagol and stage 3B is defeated). The fixture is
+# OPEN until scripts/e2e/fixtures.ts finds a win of those lists in its seeds (docs/phases/STATUS.md).
+# The Resolution (144067) asks each player in turn for a permanent +2 starting threat penalty or a copy of The Searching Eye: the first player takes the penalty (the first option), the second player the Eye. The campaign has no XP. The win unlocks
+# Journey to the Cross-roads, which the app cannot deal yet.
+# TABLE_WIDGET: the Gollum / Sméagol chip (144075:A:1, 144076:A:1), read while the victory is on the table.
 - runFlow:
     file: ../../subflows/scenario-win.yaml
     env:
       FIXTURE: marshes-won
       SCENARIO_ID: the-passage-of-the-marshes
-      # A Resolution that asks one choice: the code of the card it offers, the choice's eyebrow text and the sentence the confirm line shows.
-      # CHOICE_ID: "TODO"
-      # CHOICE_PROMPT: "TODO"
-      # CHOICE_CONSEQUENCE: "TODO"
-# TODO: this scenario's own assertions on the path screen after the win (the next part's node, a carried card).
+      CHOICE_ID: "penalty"
+      CHOICE_PROMPT: "The players choose"
+      CHOICE_CONSEQUENCE: ".*Player 1 takes a permanent \\+2 starting threat penalty.*"
+      CHOICE2_SEAT: "Player 2 chooses"
+      CHOICE2_ID: "searchingEye"
+      CHOICE2_PROMPT: "The players choose"
+      CHOICE2_CONSEQUENCE: ".*Player 2 earns 1 copy of The Searching Eye.*"
+      NO_XP: "true"
+      TABLE_WIDGET: gollum-chip
+# The win unlocks Journey to the Cross-roads, whose node reads Next while the line under the road says it is coming soon (scripts/checks/maestro.test.ts, path-soon): the part is not playable yet.
+- assertVisible:
+    id: node-journey-to-the-cross-roads-status
+    text: "Next"
+- assertVisible:
+    id: path-soon
+- assertNotVisible:
+    id: begin
