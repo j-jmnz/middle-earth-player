@@ -85,10 +85,23 @@ const overridesSchema = z.object({
   outOfScope: z
     .array(z.object({ pack: z.string().min(1).optional(), code: z.string().min(1).optional(), reason: z.string().min(1), source: z.string().min(1) }))
     .default([]),
-  // A campaign no scenario file is built for yet. The sources group its scenarios under packs; the override names the
-  // campaign and the packs (Hall of Beorn products), because no source names a campaign.
+  // A campaign or a cycle no scenario file is built for yet. The sources group its scenarios under packs; the override names it
+  // and the packs (Hall of Beorn products), because no source names a campaign or a cycle. `kind` "campaign" is played in
+  // Campaign Mode (a saga, a Campaign Expansion); "cycle" is a grouping of scenarios that is part of no campaign. `rco` marks the
+  // revised, repackaged products; `box` is the RCO product a campaign is printed in, the name the Scenarios tab gives it.
   campaigns: z
-    .array(z.object({ id: z.string().min(1), name: z.string().min(1), products: z.array(z.string().min(1)).min(1), reason: z.string().min(1), source: z.string().min(1) }))
+    .array(
+      z.object({
+        id: z.string().min(1),
+        name: z.string().min(1),
+        kind: z.enum(["campaign", "cycle"]),
+        rco: z.boolean(),
+        box: z.string().min(1).optional(),
+        products: z.array(z.string().min(1)).min(1),
+        reason: z.string().min(1),
+        source: z.string().min(1),
+      }),
+    )
     .default([]),
 });
 export type Overrides = z.infer<typeof overridesSchema>;

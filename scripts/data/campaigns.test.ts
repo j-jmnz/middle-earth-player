@@ -6,25 +6,61 @@ import { describe, expect, it } from "vitest";
 import { campaignIndexSchema } from "../../src/catalog/scenario-data.ts";
 import { DATA_DIR } from "./paths.ts";
 import { loadCampaign } from "./load-scenarios.ts";
+import { CAMPAIGNS } from "./campaign-defs.ts";
 import { buildCampaignIndex } from "./normalize/campaigns.ts";
+import { parseOverrides } from "./normalize/overrides.ts";
+import { hobScenarioIndexSchema } from "./sources/hallofbeorn.ts";
 
+const overrides = parseOverrides(JSON.parse(readFileSync(path.join(DATA_DIR, "overrides.json"), "utf8")));
 const index = campaignIndexSchema.parse(JSON.parse(readFileSync(path.join(DATA_DIR, "campaigns", "index.json"), "utf8")));
 
 describe("data/campaigns/index.json", () => {
-  it("lists the built campaigns playable and the later campaigns locked, with the scenario counts Hall of Beorn lists", () => {
+  it("lists the built campaigns playable and the later campaigns and cycles locked, with the scenario counts Hall of Beorn lists", () => {
     expect(index.filter((entry) => entry.playable).map((entry) => entry.id)).toEqual(["fellowship-of-the-ring", "mirkwood-paths", "the-dark-of-mirkwood", "dream-chaser", "ered-mithrin", "the-two-towers"]);
     expect(index.find((entry) => entry.id === "fellowship-of-the-ring")?.scenarioCount).toBe(loadCampaign().scenarios.length);
-    // The campaigns built from the Revised Core Set and The Dark of Mirkwood are listed and stay locked until one of their
-    // scenarios is in PLAYABLE_SCENARIOS (Mirkwood Paths since phase 29, The Dark of Mirkwood since phase 32: both hold The Oath; Dream-chaser since phase 40: Voyage Across Belegaer); The Two Towers is built
-    // (scripts/data/two-towers.test.ts) and playable since The Uruk-hai, The Return of the King has no scenario files at all.
-    // Ered Mithrin has been playable since phase 52 (Journey Up the Anduin).
-    const locked = index.filter((entry) => !entry.playable);
-    expect(locked.map((entry) => entry.name)).toEqual(["The Return of the King"]);
-    expect(locked.filter((entry) => ["The Two Towers", "The Return of the King"].includes(entry.name)).every((entry) => entry.scenarioCount === 6)).toBe(true);
+    // A campaign is playable once one of its scenarios is in PLAYABLE_SCENARIOS. The locked entries have no scenario files: the
+    // campaigns played in Campaign Mode, under their RCO boxes, then the cycles: scenarios that are part of no campaign (data/overrides.json, campaigns).
+    const locked = index.filter((entry) => !entry.playable).map((entry) => [entry.name, entry.kind, entry.scenarioCount]);
+    expect(locked).toEqual([
+      ["The Return of the King", "campaign", 6],
+      ["Angmar Awakened", "campaign", 9],
+      ["Shadows of Mirkwood", "cycle", 6],
+      ["Dwarrowdelf", "cycle", 9],
+      ["The Hobbit", "cycle", 6],
+      ["Against the Shadow", "cycle", 9],
+      ["The Ring-maker", "cycle", 9],
+      ["Haradrim", "cycle", 9],
+      ["Vengeance of Mordor", "cycle", 9],
+      ["Standalone scenarios", "cycle", 14],
+    ]);
+    expect(index.filter((entry) => entry.playable).every((entry) => entry.kind === "campaign")).toBe(true);
+    // Every campaign is played from the revised, repackaged products (RCO); no cycle is.
+    expect(index.filter((entry) => entry.rco).map((entry) => entry.kind === "campaign")).toEqual(index.filter((entry) => entry.kind === "campaign").map(() => true));
+    expect(index.filter((entry) => entry.kind === "cycle").every((entry) => !entry.rco && entry.box === null)).toBe(true);
+    expect(index.filter((entry) => !entry.playable && entry.kind === "campaign").map((entry) => entry.box)).toEqual(["The Return of the King Saga Expansion", "Angmar Awakened Campaign Expansion"]);
+  });
+
+  it("accounts for every official product Hall of Beorn lists: built, coming later, or a reprint the app plays from its revised box", () => {
+    const products = new Set(hobScenarioIndexSchema.parse(JSON.parse(readFileSync(path.join(DATA_DIR, "raw", "hallofbeorn", "Scenarios.json"), "utf8"))).map((entry) => entry.Product));
+    const listed = new Set([...CAMPAIGNS.flatMap((campaign) => campaign.products), ...overrides.campaigns.flatMap((campaign) => campaign.products)]);
+    // The 2011 Core Set and the Two-Player Limited Edition Starter print the scenarios the Revised Core Set and The Dark of Mirkwood reprint.
+    const reprinted = ["Core Set", "Two-Player Limited Edition Starter"];
+    // Fan-made: A Long-extended Party's packs (RingsDB names them "ALeP - ...") and the scenarios RingsDB lists no pack for. The
+    // roadmap takes ALeP after the official content (README.md, Roadmap).
+    const fanMade = [
+      "Children of Eorl", "The Aldburg Plot", "Fire on the Eastemnet", "The Gap of Rohan", "The Glittering Caves", "Mustering of the Rohirrim", "Blood in the Isen",
+      "The Scouring of the Shire", "The Nine are Abroad", "The Siege of Erebor", "The Shire's Reckoning", "The Hobbit", "Strange News in Bree", "Fangs in the Dark",
+      "First Age", "Trial Upon the Marches", "Among the Outlaws", "The Betrayal of Mîm", "The Fall of Nargothrond", "Skirmish in the Shire", "Down the Baranduin", "Dwarf Lord Battle",
+    ];
+    const unaccounted = [...products].filter((product) => !listed.has(product) && !reprinted.includes(product) && !fanMade.includes(product));
+    expect(unaccounted).toEqual([]);
+    // Each name above is a product Hall of Beorn lists, so a rename upstream fails here rather than hiding a product.
+    expect([...reprinted, ...fanMade].filter((product) => !products.has(product))).toEqual([]);
+    expect([...reprinted, ...fanMade].filter((product) => listed.has(product))).toEqual([]);
   });
 
   it("lists The Two Towers, built from six scenario files, as a playable campaign of six scenarios after Ered Mithrin", () => {
-    expect(index.map((entry) => entry.id)).toEqual(["fellowship-of-the-ring", "mirkwood-paths", "the-dark-of-mirkwood", "dream-chaser", "ered-mithrin", "the-two-towers", "the-return-of-the-king"]);
+    expect(index.map((entry) => entry.id).slice(0, 7)).toEqual(["fellowship-of-the-ring", "mirkwood-paths", "the-dark-of-mirkwood", "dream-chaser", "ered-mithrin", "the-two-towers", "the-return-of-the-king"]);
     expect(index.find((entry) => entry.id === "the-two-towers")).toMatchObject({ name: "The Two Towers", scenarioCount: 6, playable: true });
     expect(loadCampaign("the-two-towers").scenarios).toHaveLength(6);
   });
@@ -98,9 +134,26 @@ describe("data/campaigns/index.json", () => {
 
   it("refuses an override whose packs Hall of Beorn lists no scenario for", () => {
     const campaign = loadCampaign();
-    const entry = { id: "x", name: "X", products: ["No Such Pack"], reason: "r", source: "s" };
-    const scenarioIndex = campaign.scenarios.map((id, at) => ({ Title: id, Slug: id, Product: "The Black Riders", Number: at + 1 }));
-    expect(() => buildCampaignIndex({ scenarioIndex }, { campaigns: [entry] }, campaign)).toThrow("lists no scenario for");
+    const entry = { id: "x", name: "X", kind: "cycle" as const, rco: false, products: ["Some Pack", "No Such Pack"], reason: "r", source: "s" };
+    const scenarioIndex = [
+      ...campaign.scenarios.map((id, at) => ({ Title: id, Slug: id, Product: at < 3 ? "The Black Riders" : "The Road Darkens", Number: at + 1 })),
+      { Title: "Some Scenario", Slug: "Some-Scenario", Product: "Some Pack", Number: 1 },
+    ];
+    expect(() => buildCampaignIndex({ scenarioIndex }, { campaigns: [entry] }, campaign)).toThrow("lists no scenario for: No Such Pack");
+  });
+
+  it("refuses an override that names a product another entry already counts, and keeps the override's kind", () => {
+    const campaign = loadCampaign();
+    const scenarioIndex = [
+      ...campaign.scenarios.map((id, at) => ({ Title: id, Slug: id, Product: at < 3 ? "The Black Riders" : "The Road Darkens", Number: at + 1 })),
+      { Title: "Some Scenario", Slug: "Some-Scenario", Product: "Some Pack", Number: 1 },
+    ];
+    const box = { id: "x", name: "X", kind: "cycle" as const, rco: false, products: ["Some Pack"], reason: "r", source: "s" };
+    expect(buildCampaignIndex({ scenarioIndex }, { campaigns: [box] }, campaign).at(-1)).toEqual({ id: "x", name: "X", scenarioCount: 1, playable: false, kind: "cycle", rco: false, box: null });
+    expect(buildCampaignIndex({ scenarioIndex }, { campaigns: [{ ...box, kind: "campaign", rco: true, box: "X Saga Expansion" }] }, campaign).at(-1)).toMatchObject({ kind: "campaign", rco: true, box: "X Saga Expansion" });
+    expect(() => buildCampaignIndex({ scenarioIndex }, { campaigns: [{ ...box, kind: "campaign" }] }, campaign)).toThrow("a campaign names its box");
+    expect(() => buildCampaignIndex({ scenarioIndex }, { campaigns: [{ ...box, products: ["The Black Riders"] }] }, campaign)).toThrow("x and fellowship-of-the-ring both name the product The Black Riders");
+    expect(() => buildCampaignIndex({ scenarioIndex }, { campaigns: [box, { ...box, id: "y" }] }, campaign)).toThrow("y and x both name the product Some Pack");
   });
 
   it("lists Ered Mithrin with its nine scenarios, playable once one of them is in PLAYABLE_SCENARIOS (Journey Up the Anduin, phase 52)", () => {

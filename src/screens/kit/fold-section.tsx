@@ -55,6 +55,8 @@ export function FoldSection({ children, id, ...header }: FoldHeaderProps & { chi
 export type FoldHeaderProps = {
   id: string;
   title: string;
+  // A short label always shown after the title ("RCO" on a revised, repackaged box), and said after it.
+  tag?: string;
   folded: boolean;
   onFold: (folded: boolean) => void;
   // What the section holds, said beside the title while folded ("3 scenarios" with a unit, else the bare number).
@@ -69,7 +71,7 @@ export type FoldHeaderProps = {
 };
 
 /** The header alone: a FlashList row (History) folds a group without mounting its rows, so the header cannot own the body. */
-export function FoldHeader({ id, title, folded, onFold, count, unit, summary, lead, attention, testID }: FoldHeaderProps) {
+export function FoldHeader({ id, title, tag, folded, onFold, count, unit, summary, lead, attention, testID }: FoldHeaderProps) {
   const palette = usePalette();
   const t = useTableTokens();
   const s = useUiScale();
@@ -84,7 +86,7 @@ export function FoldHeader({ id, title, folded, onFold, count, unit, summary, le
         collapsable={false}
         accessibilityRole="button"
         accessibilityState={{ expanded: !folded }}
-        accessibilityLabel={foldWords(title, folded, counted)}
+        accessibilityLabel={foldWords(tag ? `${title}, ${tag}` : title, folded, counted)}
         onPress={() => {
           onFold(!folded);
           announce(`${title} ${folded ? "unfolded" : "folded"}`);
@@ -101,6 +103,7 @@ export function FoldHeader({ id, title, folded, onFold, count, unit, summary, le
               <Text className="shrink font-display text-moon" style={sectionTitleStyle(s, plain)}>
                 {title}
               </Text>
+              {tag ? <Text className="shrink-0 text-label text-muted">{tag}</Text> : null}
               <View className="min-w-3 flex-1" />
               {folded && summary != null ? (
                 <>

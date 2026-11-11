@@ -45,8 +45,8 @@ describe("splitRuns", () => {
 
 describe("comingScenarios", () => {
   const boxes: Box[] = [
-    { id: "one", name: "Box One", campaignId: "one", scenarios: ["a", "b", "c"] },
-    { id: "two", name: "Box Two", campaignId: "two", scenarios: ["d", "e"] },
+    { id: "one", name: "Box One", rco: true, campaignId: "one", scenarios: ["a", "b", "c"] },
+    { id: "two", name: "Box Two", rco: false, campaignId: "two", scenarios: ["d", "e"] },
   ];
   const nameOf = (id: string) => `Name of ${id}`;
 

@@ -59,7 +59,7 @@ describe("history cards", () => {
     const words = gameWords(lost, run("g", { kind: "standalone", result: "lost", lossCause: "Threat reached 50", rounds: 3, threats: [50], score: null }), "See the outcome", false, name);
     expect(words.chip).toEqual({ label: "Lost", tone: "danger" });
     expect(words.lines).toEqual([
-      { text: "True solo · Normal · Fellowship of the Ring", tone: "muted" },
+      { text: "True solo · Normal · The Fellowship of the Ring Saga Expansion", tone: "muted" },
       { text: "N1, N2", tone: "muted" },
       { text: "Threat reached 50", tone: "danger" },
       { text: "24 Oct 2026 · 3 rounds · threat 50", tone: "muted" },

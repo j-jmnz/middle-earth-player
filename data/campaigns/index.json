@@ -3,42 +3,144 @@
     "id": "fellowship-of-the-ring",
     "name": "Fellowship of the Ring",
     "scenarioCount": 6,
-    "playable": true
+    "playable": true,
+    "kind": "campaign",
+    "rco": true,
+    "box": null
   },
   {
     "id": "mirkwood-paths",
     "name": "Mirkwood Paths",
     "scenarioCount": 5,
-    "playable": true
+    "playable": true,
+    "kind": "campaign",
+    "rco": true,
+    "box": null
   },
   {
     "id": "the-dark-of-mirkwood",
     "name": "The Dark of Mirkwood",
     "scenarioCount": 2,
-    "playable": true
+    "playable": true,
+    "kind": "campaign",
+    "rco": true,
+    "box": null
   },
   {
     "id": "dream-chaser",
     "name": "Dream-chaser",
     "scenarioCount": 9,
-    "playable": true
+    "playable": true,
+    "kind": "campaign",
+    "rco": true,
+    "box": null
   },
   {
     "id": "ered-mithrin",
     "name": "Ered Mithrin",
     "scenarioCount": 9,
-    "playable": true
+    "playable": true,
+    "kind": "campaign",
+    "rco": true,
+    "box": null
   },
   {
     "id": "the-two-towers",
     "name": "The Two Towers",
     "scenarioCount": 6,
-    "playable": true
+    "playable": true,
+    "kind": "campaign",
+    "rco": true,
+    "box": null
   },
   {
     "id": "the-return-of-the-king",
     "name": "The Return of the King",
     "scenarioCount": 6,
-    "playable": false
+    "playable": false,
+    "kind": "campaign",
+    "rco": true,
+    "box": "The Return of the King Saga Expansion"
+  },
+  {
+    "id": "angmar-awakened",
+    "name": "Angmar Awakened",
+    "scenarioCount": 9,
+    "playable": false,
+    "kind": "campaign",
+    "rco": true,
+    "box": "Angmar Awakened Campaign Expansion"
+  },
+  {
+    "id": "shadows-of-mirkwood",
+    "name": "Shadows of Mirkwood",
+    "scenarioCount": 6,
+    "playable": false,
+    "kind": "cycle",
+    "rco": false,
+    "box": null
+  },
+  {
+    "id": "dwarrowdelf",
+    "name": "Dwarrowdelf",
+    "scenarioCount": 9,
+    "playable": false,
+    "kind": "cycle",
+    "rco": false,
+    "box": null
+  },
+  {
+    "id": "the-hobbit",
+    "name": "The Hobbit",
+    "scenarioCount": 6,
+    "playable": false,
+    "kind": "cycle",
+    "rco": false,
+    "box": null
+  },
+  {
+    "id": "against-the-shadow",
+    "name": "Against the Shadow",
+    "scenarioCount": 9,
+    "playable": false,
+    "kind": "cycle",
+    "rco": false,
+    "box": null
+  },
+  {
+    "id": "the-ring-maker",
+    "name": "The Ring-maker",
+    "scenarioCount": 9,
+    "playable": false,
+    "kind": "cycle",
+    "rco": false,
+    "box": null
+  },
+  {
+    "id": "haradrim",
+    "name": "Haradrim",
+    "scenarioCount": 9,
+    "playable": false,
+    "kind": "cycle",
+    "rco": false,
+    "box": null
+  },
+  {
+    "id": "vengeance-of-mordor",
+    "name": "Vengeance of Mordor",
+    "scenarioCount": 9,
+    "playable": false,
+    "kind": "cycle",
+    "rco": false,
+    "box": null
+  },
+  {
+    "id": "standalone-scenarios",
+    "name": "Standalone scenarios",
+    "scenarioCount": 14,
+    "playable": false,
+    "kind": "cycle",
+    "rco": false,
+    "box": null
   }
 ]

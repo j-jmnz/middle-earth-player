@@ -6,7 +6,7 @@ import { PillButton } from "../../kit/chrome";
 import { FoldSection, useFolds } from "../../kit/fold-section";
 import { heroFace } from "../../art/hero-tile";
 import { deckFaces } from "../../deck/store";
-import { campaignListQueries, lockedTiles } from "../../campaign/list";
+import { campaignListQueries, campaignWords, lockedCampaignTiles } from "../../campaign/list";
 import { campaignOf } from "../../data/campaign-data";
 import { listSaves, type ListedSave } from "../../data/campaign-store";
 import { useDatabases } from "../../data/databases";
@@ -33,7 +33,8 @@ export default function CampaignList() {
   const startAt = useRef(0);
   const scrollPending = useRef(false);
   const campaigns = campaignListQueries(catalog).campaigns.all();
-  const locked = lockedTiles(campaigns);
+  // A cycle (scenarios that are part of no campaign) waits only on the Scenarios tab.
+  const locked = lockedCampaignTiles(campaigns);
   const nameOf = (id: string) => campaigns.find((campaign) => campaign.id === id)?.name ?? id;
   // Each save's progress line reads its own campaign.
   const lineOf = (save: ListedSave): SaveLine => saveLine(save, nameOf(save.campaignId));
@@ -104,7 +105,7 @@ export default function CampaignList() {
   // Every campaign the catalog marks playable starts from its tile: the setup screen takes the seats and the carry-over.
   const startable = campaigns.flatMap((row) => {
     const data = row.playable ? campaignOf(row.id) : null;
-    return data ? [{ id: row.id, name: row.name, data }] : [];
+    return data ? [{ id: row.id, name: row.name, rco: row.rco, data }] : [];
   });
   const posters = size === "compact" ? 0 : 3;
   const newBlock =
@@ -112,9 +113,8 @@ export default function CampaignList() {
       <View testID="new-playthrough-tiles">
         <FoldSection id="new-playthrough" title="New playthrough" count={startable.length} unit="campaign" folded={folds.folded("new-playthrough", false)} onFold={(next) => folds.setFolded("new-playthrough", next, false)}>
           <CatalogGrid posters={posters}>
-          {startable.map(({ id, name, data }) => {
-            const count = data.scenarios.length;
-            const words = `${count} ${count === 1 ? "scenario" : "scenarios"}`;
+          {startable.map(({ id, name, rco, data }) => {
+            const words = campaignWords({ rco }, data.scenarios.length);
             return (
               <CatalogTile
                 key={id}

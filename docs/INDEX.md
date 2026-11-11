@@ -31,31 +31,31 @@ Each agent reads its own file.
 
 Read the sections your task touches.
 
-- `README.md` — Middle Earth LCG (~4.5K tok)
+- `README.md` — Middle Earth LCG (~5.2K tok)
   - 12–27 Contents (~190)
   - 28–33 Privacy and security (~120)
   - 34–39 How the code is written (~120)
-  - 40–48 Features (~160)
-  - 49–59 Roadmap (~140)
-  - 60–63 Accessibility (~90)
-  - 64–73 Architecture (~200)
-  - 74–123 Install (~850)
-    - 78–83 What you need (~70)
-    - 84–93 Android (~140)
-    - 94–106 iPhone and iPad (~310)
-    - 107–110 Check a download (optional) (~60)
-    - 111–119 If something goes wrong (~160)
-    - 120–123 Privacy (~30)
-  - 124–175 Local setup (~650)
-    - 126–140 Requirements (~130)
-    - 141–150 In a browser (~100)
-    - 151–171 On a phone (~290)
-    - 172–175 Maestro (~130)
-  - 176–210 Commands (~1.0K)
-  - 211–214 Contributing (~80)
-  - 215–224 Documentation (~170)
-  - 225–242 Attribution (~470)
-  - 243–246 License (~50)
+  - 40–48 Features (~220)
+  - 49–71 Roadmap (~690)
+  - 72–75 Accessibility (~90)
+  - 76–85 Architecture (~200)
+  - 86–135 Install (~850)
+    - 90–95 What you need (~70)
+    - 96–105 Android (~140)
+    - 106–118 iPhone and iPad (~310)
+    - 119–122 Check a download (optional) (~60)
+    - 123–131 If something goes wrong (~160)
+    - 132–135 Privacy (~30)
+  - 136–187 Local setup (~650)
+    - 138–152 Requirements (~130)
+    - 153–162 In a browser (~100)
+    - 163–183 On a phone (~290)
+    - 184–187 Maestro (~130)
+  - 188–222 Commands (~1.0K)
+  - 223–226 Contributing (~80)
+  - 227–236 Documentation (~170)
+  - 237–254 Attribution (~470)
+  - 255–258 License (~50)
 - `docs/architecture.md` — Architecture (~21.9K tok)
   - 7–41 Stack (~1.1K)
   - 42–77 Processes (~680)
@@ -69,11 +69,11 @@ Read the sections your task touches.
   - 241–273 Scenario definition (~800)
   - 274–294 Persistence (~1.5K)
   - 295–300 Images (~940) ← 6
-  - 301–353 Screens (~3.8K) ← 1
+  - 301–353 Screens (~3.9K) ← 1
   - 354–359 Catalog build (~410)
   - 360–377 Tests (~2.0K) ← 5
   - 378–393 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~94.8K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~95.0K tok)
   - 17–38 Sections (~410)
   - 39–50 Product (~590)
   - 51–64 Non-goals (~540)
@@ -118,7 +118,7 @@ Read the sections your task touches.
   - 967–987 Data sources (~530)
   - 988–1006 Card images (~1.2K) ← 9
   - 1007–1032 Persistence and shipping (~1.8K)
-  - 1033–1074 Screens (~4.7K) ← 1
+  - 1033–1074 Screens (~4.9K) ← 1
     - 1059–1074 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~43.4K tok)
   - 5–8 Overview (~130) ← 1
@@ -153,7 +153,7 @@ Read the sections your task touches.
   - 338–349 Banner (~750) ← 5
   - 350–369 Screen reader (~2.8K) ← 17
   - 370–373 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~28.2K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~28.3K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~580)
   - 34–44 Performance (~680) ← 4
@@ -168,11 +168,11 @@ Read the sections your task touches.
   - 230–244 Icons (~480) ← 7
   - 245–263 Card art (~740) ← 2
   - 264–278 Tablets (~510) ← 13
-  - 279–460 Screens (~15.2K)
+  - 279–460 Screens (~15.3K)
     - 283–286 Splash (~40)
     - 287–290 App icon (~80)
-    - 291–306 Campaigns (campaign list) (~1.4K) ← 6
-    - 307–320 Scenarios (~810) ← 1
+    - 291–306 Campaigns (campaign list) (~1.5K) ← 6
+    - 307–320 Scenarios (~920) ← 1
     - 321–332 History (~1.3K) ← 4
     - 333–350 Briefing (~1.8K) ← 5
     - 351–354 Campaign setup (~1.0K) ← 3

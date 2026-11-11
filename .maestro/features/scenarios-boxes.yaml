@@ -1,8 +1,8 @@
 appId: com.middleearth.lcg
 ---
-# Written in a cloud session: it has not run. The Scenarios tab lists one section for each box that has a playable
-# scenario; the Dream-chaser box (`box-dream-chaser`, all nine scenarios) has none until phase 40, so its scenarios wait under Coming later. The Ered Mithrin box
-# (`box-ered-mithrin`, all nine scenarios) has none until phase 52, so its nine scenarios wait under Coming later as well.
+# Written in a cloud session: it has not run. The Scenarios tab lists one section for each box that has a playable scenario,
+# named by its printed RCO product and tagged RCO; Coming later holds the locked campaigns under their RCO boxes and the cycles
+# (scenarios that are part of no campaign), tagged Cycle.
 - launchApp:
     clearState: true
 - tapOn:
@@ -11,7 +11,8 @@ appId: com.middleearth.lcg
     id: scenarios
 - assertVisible:
     id: box-fellowship-of-the-ring
-- assertVisible: "Fellowship of the Ring"
+- assertVisible: "The Fellowship of the Ring Saga Expansion"
+- assertVisible: "RCO"
 - scrollUntilVisible:
     element:
       id: box-revised-core
@@ -26,30 +27,29 @@ appId: com.middleearth.lcg
     id: standalone-the-oath
 - assertVisible:
     id: standalone-the-caves-of-nibin-dum
-# Dream-chaser: no scenario is playable yet, so there is no box section, and the nine scenarios and the locked box are under Coming later.
-- assertNotVisible:
-    id: box-dream-chaser
 - scrollUntilVisible:
     element:
-      id: locked-voyage-across-belegaer
-- assertVisible: "Dream-chaser · 1"
-- assertVisible:
-    id: locked-the-city-of-corsairs
-# Ered Mithrin: the same, nine scenarios in one box under Coming later until the first of them is playable.
-- assertNotVisible:
-    id: box-ered-mithrin
+      id: box-dream-chaser
+- assertVisible: "Dream-chaser Campaign Expansion"
 - scrollUntilVisible:
     element:
-      id: locked-journey-up-the-anduin
-- assertVisible: "Ered Mithrin · 1"
-- assertVisible:
-    id: locked-the-fate-of-wilderland
-# The Two Towers: the same, six scenarios in one box under Coming later until the first of them is playable.
-- assertNotVisible:
-    id: box-the-two-towers
+      id: box-ered-mithrin
+- assertVisible: "Ered Mithrin Campaign Expansion"
 - scrollUntilVisible:
     element:
-      id: locked-the-uruk-hai
-- assertVisible: "The Two Towers · 1"
-- assertVisible:
-    id: locked-shelobs-lair
+      id: box-the-two-towers
+- assertVisible: "The Two Towers Saga Expansion"
+# Coming later: Shelob's Lair waits in its box, The Return of the King under its RCO box, and the cycles.
+- scrollUntilVisible:
+    element:
+      id: locked-shelobs-lair
+- assertVisible: "Coming soon · The Two Towers Saga Expansion · 6"
+- scrollUntilVisible:
+    element:
+      id: locked-the-return-of-the-king
+- assertVisible: "The Return of the King Saga Expansion"
+- assertVisible: "RCO · 6 scenarios · Coming soon"
+- scrollUntilVisible:
+    element:
+      id: locked-dwarrowdelf
+- assertVisible: "Cycle · 9 scenarios · Coming soon"
