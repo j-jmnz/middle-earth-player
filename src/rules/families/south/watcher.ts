@@ -66,10 +66,17 @@ export function dealForAttack(state: ScenarioState, enemyId: string, steps: Engi
   return state.cards[enemyId]?.zone === "engaged" ? state : dealOneShadow(discardShadowOf(state, enemyId), enemyId, steps);
 }
 
+// The enemy that attacks: the source itself, the card the source is attached to, or the one a Pick chose.
+function attackerOf(state: ScenarioState, target: "self" | "host" | undefined, focus: Focus): string {
+  if (target === "self") return focus.sourceId ?? "";
+  if (target === "host") return state.cards[focus.sourceId ?? ""]?.host ?? "";
+  return lastPicked(state);
+}
+
 // AttackFromStaging: the picked enemy in the staging area (or the source, `target: self`) attacks the actor now (142038:A:2), or the first
 // player (`who: firstPlayer`, 142043:A:2).
 export function attackFromStaging(state: ScenarioState, instruction: Extract<Instruction, { verb: "AttackFromStaging" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const id = instruction.target === "self" ? (focus.sourceId ?? "") : instruction.target === "host" ? (state.cards[focus.sourceId ?? ""]?.host ?? "") : lastPicked(state);
+  const id = attackerOf(state, instruction.target, focus);
   const seat = instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat;
   // "Undefended damage from this attack must be dealt to Hrogar's Hill" (19081:A:1): the main quest card takes it.
   return attackNowFromStaging(state, id, seat, ctx, steps, { shadow: true, ...(instruction.shadows ? { shadows: instruction.shadows } : {}), ...(instruction.undefendedToStage ? { toStage: true } : {}), ...(instruction.orEngaged ? { engaged: true } : {}) });
@@ -86,7 +93,7 @@ export function attackNowFromStaging(state: ScenarioState, id: string, seat: num
   const counted = data ? patchTop(state, { data: { ...data, returned: data.returned + 1 } }) : state;
   // "Deal and resolve 2 shadow cards for this attack" (143048:A:1): the first as any attack from the staging area, the others additional ones.
   let dealt = shadow ? dealForAttack(counted, id, steps) : counted;
-  for (let more = 1; more < (shadows ?? 1); more += 1) dealt = dealAdditionalShadow(dealt, id, steps);
+  for (let more = 1; shadow && more < (shadows ?? 1); more += 1) dealt = dealAdditionalShadow(dealt, id, steps);
   const begun = beginEnemyAttack(dealt, seat, id, ctx, steps, { fromStaging: enemy?.zone === "staging", shadow });
   return begun.pendingAttack ? { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true, ...marks } } : begun;
 }

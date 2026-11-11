@@ -86,7 +86,7 @@ const TRIGGERS = [
 
 const FLAGS = [
   // Held by the table while a card in play says so: no player gains resources, the resource phase's collection and every effect that adds resources to a pool included, not the heroes' starting resources (rr.resources: "Players cannot draw cards or gain
-  // resources", 143078:B:1). Read by gainSeatResources and AddResources (rules/interpret/interpret.ts).
+  // resources", 143078:B:1). Read by gainSeatResources (rules/interpret/interpret.ts) and by mayGainResources (rules/families/misc/guards.ts), which every effect that adds resources to a pool asks.
   "cannotGainResources",
   // Held by the table while a card in play says so: a player with 0 cards in hand is eliminated from the game, checked at each settle once what emptied the hand has finished (rr.constant-ability, "If a player has 0 cards in his hand", 143080:B:3; settle hook of the deck family).
   "eliminatedAtEmptyHand",

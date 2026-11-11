@@ -29,6 +29,24 @@ function dealtWizardry(state: ScenarioState, enemy: string, seat: number, code =
   return { state: { ...dealt, pendingAttack: { enemyId: enemy, seat, shadowsDone: true } }, shadow: shadow.id };
 }
 
+describe("asOnlyPlayer", () => {
+  it("leaves no number of players, no `eachSeat` and no ForEachPlayer in any Wizardry record of the game", () => {
+    const { ctx } = table();
+    const records = ctx.effects.filter((effect) => effect.trigger === "wizardry");
+    expect(records.length).toBeGreaterThan(0);
+    for (const effect of records) {
+      const text = JSON.stringify(asOnlyPlayer(effect.instructions));
+      expect(text, effect.id).not.toContain('"players"');
+      expect(text, effect.id).not.toContain("eachSeat");
+      expect(text, effect.id).not.toContain("ForEachPlayer");
+    }
+  });
+
+  it("throws on a number of players that is combined with another reading", () => {
+    expect(() => asOnlyPlayer([{ verb: "AssignDamage", amount: { players: true, hand: true }, pick: { type: "character", control: "any" } }])).toThrow(/number of players/);
+  });
+});
+
 describe("143059:A:2 a Wizardry location explored", () => {
   it("triggers its Wizardry in the staging area: each player raises their threat by 2", () => {
     const made = table({ staging: ["143059"], seats: 2, threat: [20, 30] });

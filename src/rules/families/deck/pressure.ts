@@ -7,8 +7,8 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { markLoss } from "../../core/eliminate.ts";
-import { flagged, livingSeats, withSeat } from "../../core/state.ts";
+import { eliminateSeat } from "../../core/eliminate.ts";
+import { flagged } from "../../core/state.ts";
 
 /** An Action or a Response a card's controller initiated, or a Forced effect of the card that triggered: the card hears it triggered, once. Only a game with a record on `abilityTriggered` announces it. */
 export function announceAbility(state: ScenarioState, cardId: string, seat: number, ctx: ReduceContext): ScenarioState {
@@ -27,8 +27,7 @@ export function eliminateEmptyHands(state: ScenarioState, _ctx: ReduceContext, s
   for (let index = 0; index < next.seatCount; index += 1) {
     const seat = next.seats[index];
     if (!seat || seat.eliminated || seat.hand.length > 0) continue;
-    steps.push({ kind: "eliminate", seat: index });
-    next = withSeat(next, index, { ...seat, eliminated: true });
+    next = eliminateSeat(next, index, steps);
   }
-  return livingSeats(next).length === 0 ? markLoss(next, "No seats remain") : next;
+  return next;
 }

@@ -72,7 +72,7 @@ const VERBS = [
   // was not revealed from the encounter deck, so they are not offered to cancels of a card just revealed.
   verbFlags(z.strictObject({ verb: z.literal("ResolveWhenRevealed"), card: cardRefSchema.optional(), ...when }), { runsInFrame: true }),
   // The staging step of this phase reveals `amount` fewer cards (rr.step-3-3), to a minimum of `min` (0 or 1). With `who: picked`, the player picked last reveals that many fewer
-  // ("That player reveals 1 fewer encounter card this phase (to a minimum of 0)", 143020:A:2): the reveals the players make in turn skip that player's, and nothing else is shortened.
+  // ("That player reveals 1 fewer encounter card this phase (to a minimum of 0)", 143020:A:2): the reveals the players make in turn skip that player's, and nothing else is shortened. A player's own reveal is one card, so `min: 1` leaves it as it is.
   z.strictObject({ verb: z.literal("RevealFewer"), amount: z.number().int().positive(), min: z.union([z.literal(0), z.literal(1)]), who: z.literal("picked").optional(), ...when }),
   // The staging step of this phase reveals `amount` more cards (rr.step-3-3): "reveal an additional encounter card this phase"
   // (141080:A:2). The extra cards are revealed by the players in turn, from the first player on.

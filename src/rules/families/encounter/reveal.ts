@@ -64,9 +64,15 @@ export function revealsAllowed(state: ScenarioState, base: number): number {
   return Math.max(0, floored - toZero) + more;
 }
 
-// The reduction one player holds on their own reveals (RevealFewer `who: picked`): the modifier that skips the reveal this seat is about to make, or null.
+// The reduction one player holds on their own reveals (RevealFewer `who: picked`): the modifier that skips the reveal this seat is about to make, or null. A reduction "to a minimum of 1" (revealFewerMinOne) never
+// skips: a player's own reveal is one card, so it stays one.
 export function revealSkipped(state: ScenarioState, seat: number): Modifier | null {
   return state.modifiers.find((modifier) => modifier.stat === "revealFewer" && modifier.seat === seat && modifier.amount > 0 && modifierActive(state, modifier)) ?? null;
+}
+
+// The reveal was skipped: one of the reduction's cards is used up, and the modifier ends with the last.
+export function spendSkippedReveal(state: ScenarioState, skipped: Modifier): ScenarioState {
+  return { ...state, modifiers: state.modifiers.flatMap((modifier) => (modifier !== skipped ? [modifier] : modifier.amount > 1 ? [{ ...modifier, amount: modifier.amount - 1 }] : [])) };
 }
 
 // The seat that makes the index-th reveal of the staging step: the seats in turn. While stages are separate the cards beyond one per seat

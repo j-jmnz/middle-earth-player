@@ -189,7 +189,7 @@ function drawOne(state: ScenarioState, seat: number, steps: EngineStep[], fallba
 
 export function gainSeatResources(state: ScenarioState, seat: number, steps: EngineStep[], fallback: Cause): ScenarioState {
   // "Players cannot gain resources" (143078:B:1) bars the resource phase's collection.
-  if (state.modifiers.length > 0 && heldAmount(state, "table", "cannotGainResources") > 0) return state;
+  if (state.modifiers.length > 0 && flagged(state, "table", "cannotGainResources")) return state;
   const heroes = state.seats[seat]?.heroes ?? [];
   let next = state;
   for (const heroId of heroes) {
