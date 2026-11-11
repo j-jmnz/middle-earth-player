@@ -37,6 +37,8 @@ const THEMES: readonly Theme[] = ["dark", "light"];
 const captures = (count: number) => `${count} capture${count === 1 ? "" : "s"}`;
 // How often a long step says it is still running (s), and how many of its last output lines a failure prints.
 const HEARTBEAT = 30;
+// How long Maestro may take to read the screen after a failed flow (s): it can hang on a simulator it cannot drive.
+const SCREEN_WAIT = 60;
 const TAIL = 40;
 
 function flag(name: string): string | null {
@@ -210,15 +212,25 @@ function written(dir: string, extensions: readonly string[]): string[] {
 // What is on the simulator's screen after a failed flow, from Maestro's hierarchy: written beside the debug output, and its ids and words
 // logged, so the log alone says where the app was (a screen still loading, an error, another screen than the flow expected).
 function onScreen(log: Log, sim: SimDevice, label: string, kept: string): void {
-  const read = spawnSync("maestro", ["--device", sim.udid, "hierarchy"], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+  mkdirSync(kept, { recursive: true });
+  // The simulator's own screenshot first: it needs no Maestro, so it shows the screen even when Maestro cannot read it.
+  const shot = path.join(kept, "simulator-screen.png");
+  const taken = spawnSync("xcrun", ["simctl", "io", sim.udid, "screenshot", shot], { stdio: "ignore", timeout: 30_000 });
+  log.warn(`${label}: ${taken.status === 0 ? `the screen after the failure: ${shot}` : "the simulator took no screenshot"}`);
+  log.info(`${label}: asking Maestro what is on screen (up to ${SCREEN_WAIT} s)...`);
+  const read = spawnSync("maestro", ["--device", sim.udid, "hierarchy"], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024, timeout: SCREEN_WAIT * 1000 });
+  if (read.error || read.status !== 0) {
+    const timedOut = read.signal === "SIGTERM" || (read.error as NodeJS.ErrnoException | undefined)?.code === "ETIMEDOUT";
+    log.warn(`${label}: Maestro could not read the screen${timedOut ? ` within ${SCREEN_WAIT} s, so it cannot drive this simulator: look at the screenshot, and try an older iOS with --ios 18` : `: ${lastLines(`${read.stdout ?? ""}${read.stderr ?? ""}`, 5)}`}`);
+    return;
+  }
   const json = read.stdout.slice(read.stdout.indexOf("{"));
   try {
     const words = screenWords(JSON.parse(json));
-    mkdirSync(kept, { recursive: true });
     writeFileSync(path.join(kept, "hierarchy.json"), json);
     log.warn(`${label}: on screen after the failure: ${words.length > 0 ? words.slice(0, 40).join(" ") : "nothing Maestro can read (the app may have crashed, or still be on its splash screen)"}`);
   } catch {
-    log.warn(`${label}: Maestro could not read the screen after the failure${read.stderr ? `: ${lastLines(read.stderr, 3)}` : ""}`);
+    log.warn(`${label}: Maestro's answer was not a hierarchy: ${lastLines(read.stdout, 5)}`);
   }
 }
 
