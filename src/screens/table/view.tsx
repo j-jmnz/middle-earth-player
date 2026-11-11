@@ -52,7 +52,8 @@ import { CommandHead } from "../../play/readouts/command-head-view";
 import { HEAD_GAP, NUMBERS_ROW } from "../../play/readouts/command-head";
 import type { RowFeet } from "../../play/layout/column-reach";
 import { useDefenseTokens } from "../../play/readouts/fortress";
-import { useIsengardDials, useIsengardHands } from "../../play/readouts/isengard";
+import { useIsengardHands } from "../../play/readouts/isengard";
+import { useScenarioDials } from "../../play/readouts/scenario-dials";
 import { campaignTokens, heldDials, nightmareCardId, usePursuitReadout, widgetReadouts } from "../../play/readouts/widgets";
 import { whyNotChosen } from "../../play/choice/why";
 import { ledgerLine, ruleTitle, sideText } from "../../play/cards/ledger";
@@ -256,7 +257,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
   const held = useMemo(() => heldDials(game, nameOf, (code) => ctx.cards.get(code)?.type === "enemy"), [game, nameOf, ctx]);
   const pursuit = usePursuitReadout(game);
   const defense = useDefenseTokens(game, nameOf);
-  const isengard = useIsengardDials(game, ctx, nameOf);
+  const dials = useScenarioDials(game, ctx, nameOf);
   const hands = useIsengardHands(game);
   // The Nightmare setup card next to the quest deck, on Nightmare: the Eye in the top bar opens it.
   const nightmareId = useMemo(() => nightmareCardId(game), [game]);
@@ -326,7 +327,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
           ticks={ticks}
           pursuit={pursuit}
           defense={defense}
-          isengard={isengard}
+          scenarioDials={dials}
           hands={hands}
           held={held}
           menuOpen={menuOpen}

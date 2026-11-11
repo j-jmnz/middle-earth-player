@@ -10,7 +10,7 @@ type Template = (ins: Obj, ctx: Ctx) => Made | null;
 
 const amount = (value: unknown, ctx: Ctx): string => renderAmount(value, ctx, renderPick);
 const pick = (value: unknown, ctx: Ctx): string => renderPick(value, ctx);
-const WHO: Readonly<Record<string, string>> = { actor: "the acting player", firstPlayer: "the first player", picked: "the picked player", eventSeat: "the player the event is about", eachSeat: "each player" };
+const WHO: Readonly<Record<string, string>> = { actor: "the acting player", firstPlayer: "the first player", picked: "the picked player", eventSeat: "the player the event is about", eachSeat: "each player", defendingPlayer: "the defending player (the player this enemy is engaged with)" };
 const who = (value: unknown): string => WHO[str(value)] ?? str(value);
 
 // A target: a card reference (`self`) or a target object (`{ kind: "picked" }`).
@@ -71,6 +71,11 @@ function eachLimits(i: Obj, ctx: Ctx): string {
   return `${bound === "" ? "" : ` (${bound})`}${taken}`;
 }
 
+const FLIP_GOLLUM = {
+  smeagol: "flip Gollum to Sméagol: discard his damage; he enters play exhausted, controlled by the first player (not the discard pile or the victory display)",
+  gollum: "flip Sméagol to Gollum: discard his damage; he enters play ready, engaged with the first player (nothing if Sméagol is not in play)",
+} as const;
+
 export const TEMPLATES: Readonly<Record<string, Template>> = {
   ModifyStat: (i, ctx) => {
     const holders = isObj(i.holders) ? `each ${pick(i.holders, ctx)}` : typeof i.target === "string" ? targetStat(i.target) : "this card";
@@ -100,6 +105,10 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     if (found?.kind === "self" && ctx.attacker === true) return { text: "return the attacking enemy (the card whose shadow this is the attacker of) to the staging area", read: ["target"] };
     return { text: `return ${target(i.target)} to the staging area`, read: ["target"] };
   },
+  PlaceFacedownUnder: (i) => ({
+    text: `${i.afterAttack === true ? "once the attack in progress has ended, " : ""}place ${cardRef(i.target ?? "picked")} facedown under the card with code ${str(i.code)} in play (out of play there; its attachments are discarded, its tokens go)`,
+    read: ["code", "target", "afterAttack"],
+  }),
   SetPursuit: (i) => ({ text: `set the pursuit value to ${str(i.value)}`, read: ["value"] }),
   RaisePursuit: (i, ctx) => ({ text: `increase the pursuit value by ${amount(i.amount, ctx)}`, read: ["amount"] }),
   LowerPursuit: (i, ctx) => ({ text: `reduce the pursuit value by ${amount(i.amount, ctx)} (never below 0)`, read: ["amount"] }),
@@ -132,6 +141,12 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     if (i.what === "travel") return { text: `the players cannot travel to ${typeof i.location === "string" ? `the location with code ${i.location}${typeof i.guarding === "string" ? ` that guards ${i.guarding}` : ""}` : "any location"} while this holds`, read: ["what", "location", "guarding"] };
     return null;
   },
+  PlaceMireToken: (i, ctx) => ({ text: `place ${amount(i.amount, ctx)} mire token(s) (resources) on ${cardRef(i.on)}; a location whose mire tokens then reach its Mire X is discarded by the Mire keyword`, read: ["on", "amount"] }),
+  ReturnRandomVictoryLocation: () => ({ text: "return a random location from the victory display to the staging area (chosen with the game's seed)", read: [] }),
+  ShuffleVictoryIntoEncounterDeck: () => ({ text: "shuffle every location in the victory display into the encounter deck", read: [] }),
+  FlipGollum: (i) => ({ text: i.to === "smeagol" ? FLIP_GOLLUM.smeagol : FLIP_GOLLUM.gollum, read: ["to"] }),
+  FollowFirstPlayer: () => ({ text: "this enemy moves to the first player's play area and engages them (nothing if it is not engaged, or already engaged with them)", read: [] }),
+  GollumAttacks: () => ({ text: "Gollum, if he is in play, makes an immediate attack against the player he is engaged with", read: [] }),
   ShuffleEncounterDeck: () => ({ text: "shuffle the encounter deck", read: [] }),
   ShuffleEncounterDiscard: () => ({ text: "shuffle the encounter discard pile into the encounter deck", read: [] }),
   DiscardEncounterTop: (i, ctx) => ({ text: `discard ${amount(i.count, ctx)} card(s) from the top of the encounter deck`, read: ["count"] }),

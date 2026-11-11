@@ -9,6 +9,7 @@ import { grantedTravel } from "../families/grapple/travel.ts";
 import { familyForcedTravel, familyTravelUnpayable } from "./family-hooks.ts";
 import { modifiedStat } from "../core/keywords.ts";
 import { pickCandidates } from "./pick.ts";
+import { spendablePools } from "../families/costs/verbs.ts";
 import { guardsTitled } from "../families/objectives/pick.ts";
 import { isPlayerType, printedOf } from "../core/printed.ts";
 import { flagged, heldAmount, inPlay, livingSeats, type CardInstance, type ScenarioState } from "../core/state.ts";
@@ -101,6 +102,8 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
         const pick = instructions.find((other) => other.verb === "Pick");
         return pick?.verb === "Pick" && pickCandidates(state, pick.pick, state.activeSeat, [], locationId, ctx).length === 0;
       }
+      // "Spend 1 Fellowship resource to travel here" (144020:A:3): a hero of the players must hold the resources, the record says whose (`group`: any player's).
+      if (instruction.verb === "SpendResources") return spendablePools(state, state.firstPlayer, instruction, ctx).total < instruction.amount;
       // "Reveal the top card of the burden deck to travel here" (141058:A:3): an empty burden deck has none to reveal.
       if (instruction.verb === "RevealBurden") return (state.burdenDeck?.length ?? 0) === 0;
       // A family's own Travel cost the players cannot pay (the Corsair deck of Southern Belfalas is empty, 12154:A:1, families/sea/index.ts).

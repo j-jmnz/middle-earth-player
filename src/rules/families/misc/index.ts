@@ -51,7 +51,7 @@ function moveDamage(state: ScenarioState, instruction: Verb<"MoveDamage">, focus
   const amount = Math.min(from.damage, wanted);
   if (amount <= 0) return state;
   const taken = updateCard(state, from.id, { damage: from.damage - amount });
-  return placeDamage(taken, to.id, amount, ctx.cards, steps, "player", currentCause(steps, UNATTRIBUTED));
+  return placeDamage(taken, to.id, amount, ctx.cards, steps, "player", currentCause(steps, UNATTRIBUTED), focus.sourceId);
 }
 
 // The verbs src/catalog/families/misc.ts adds, for constants and responses no other family takes, and the saga heroes and One Ring cards. Null when the verb is not one of them.

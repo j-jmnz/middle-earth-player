@@ -21,7 +21,7 @@ export type DeepFixtureName = "deep-won" | "deep-lost";
 
 // The log of a playthrough whose first part was won: The Uruk-hai golden's two-handed win, resolved onto a blank log, their heroes and what hangs on them left out.
 export async function haiWonLog(): Promise<CampaignLog> {
-  return wonLog({ title: "The Uruk-hai", golden: "two-handed, won, Normal", goldens: HAI_GOLDENS, world: haiWorld, play: playHai });
+  return wonLog({ title: "The Uruk-hai", golden: "two-handed, won, Normal", goldens: HAI_GOLDENS, world: haiWorld, play: playHai, scenarioId: "the-uruk-hai" });
 }
 
 export async function deepFixtures(): Promise<Partial<Record<DeepFixtureName, DeepFixture>>> {

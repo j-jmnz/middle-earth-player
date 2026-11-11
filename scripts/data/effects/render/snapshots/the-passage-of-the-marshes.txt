@@ -1,0 +1,364 @@
+Scenario piles that place cards with no record (quest: 144064 The Taming of Sméagol; quest: 144065 Across the Marshes; quest: 144066 Don't Look at the Lights!; setAside: 144075 Gollum)
+
+## 144015 The Searching Eye
+
+144015:A:1 (front): The Searching Eye functions like a player card.
+  144015:constant:1: Constant
+    (no instructions)
+
+144015:A:2 (front): Forced: After you draw this card, either exhaust each hero you control, or reveal the top card of the encounter deck.
+  144015:forced:1: Forced on the event enteredHand (heard about this card)
+    - the acting player chooses one of:
+      * option "exhaust" (only if there is a ready hero (you control) to choose):
+        - [json ExhaustEach {"verb":"ExhaustEach","pick":{"type":"hero","control":"you"}}]
+      * option "reveal":
+        - the acting player reveals an encounter card
+
+## 144016 Groping Dead
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144016:A:1 (front): The engaged player cannot reduce his threat.
+  144016:constant:1: Constant
+    only if this card is engaged with the player
+    - engagedSeat: stat threatReductionBarred 1, while this card is in play
+
+144016:A:2 (front): Forced: After Groping Dead destroys a character, place 1 mire token on the active location.
+  144016:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
+    only if the event's other card is a enemy (any player controls) [also {"isSource":true}]
+    - place 1 mire token(s) (resources) on the active location; a location whose mire tokens then reach its Mire X is discarded by the Mire keyword
+
+144016:A:3 (shadow): Shadow: If this attack destroys a character, place 1 mire token on the active location.
+  144016:shadow:1: Shadow
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): place 1 mire token(s) (resources) on the active location; a location whose mire tokens then reach its Mire X is discarded by the Mire keyword
+
+## 144017 Dead Things
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144017:A:1 (front): The engaged player cannot reduce his threat.
+  144017:constant:1: Constant
+    only if this card is engaged with the player
+    - engagedSeat: stat threatReductionBarred 1, while this card is in play
+
+144017:A:2 (front): Forced: After Dead Things destroys a character, the defending player must raise his threat by 3.
+  144017:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
+    only if the event's other card is a enemy (any player controls) [also {"isSource":true}]
+    - raise threat by 3 (the defending player (the player this enemy is engaged with))
+
+144017:A:3 (shadow): Shadow: Raise your threat by 1 for each Undead enemy engaged with you.
+  144017:shadow:1: Shadow
+    - raise threat by the number of Undead enemy (any player controls) engaged with you (the acting player)
+
+## 144018 Candle-bearer
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144018:A:1 (front): The engaged player cannot reduce his threat.
+  144018:constant:1: Constant
+    only if this card is engaged with the player
+    - engagedSeat: stat threatReductionBarred 1, while this card is in play
+
+144018:A:2 (front): Forced: After Candle-bearer destroys a character, it cannot take damage until the end of the round.
+  144018:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
+    only if the event's other card is a enemy (any player controls) [also {"isSource":true}]
+    - this card: stat cannotTakeDamage 1, until the end of the round
+
+144018:A:3 (shadow): Shadow: Until the end of the round, attacking enemy cannot take damage.
+  144018:shadow:1: Shadow
+    - the attacking enemy: stat cannotTakeDamage 1, until the end of the round
+
+## 144019 Evil-smelling Fens
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144019:A:1 (front): Mire 3. Forced: When Evil-smelling Fens is discarded by the Mire keyword, deal 1 damage to each character.
+  144019:constant:1: Constant
+    - this card: stat mire 3, while this card is in play
+  144019:forced:1: Forced on the event discardedByMire (heard about this card)
+    - deal 1 damage to each character (any player controls)
+
+144019:A:2 (front): Travel: Each player must raise his threat by 1 to travel here.
+  144019:travel:1: Travel
+    - raise threat by 1 (each player)
+
+144019:A:3 (shadow): Shadow: Deal 1 damage to defending character.
+  144019:shadow:1: Shadow
+    - deal 1 damage to the defender
+
+## 144020 Shifting Quagmire
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144020:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+144020:A:2 (front): Mire 1. Forced: When Shifting Quagmire is discarded by the Mire keyword, either return a random location from the victory display to the staging area, or raise each player's threat by 1 for each location in the victory display.
+  144020:constant:1: Constant
+    - this card: stat mire 1, while this card is in play
+  144020:forced:1: Forced on the event discardedByMire (heard about this card)
+    - the first player chooses one of:
+      * option "return" (only if the number of location (any player controls) in the victory display is at least 1):
+        - return a random location from the victory display to the staging area (chosen with the game's seed)
+      * option "threat" (only if the number of location (any player controls) in the victory display is at least 1):
+        - raise threat by the number of location (any player controls) in the victory display (each player)
+
+144020:A:3 (front): Travel: Spend 1 Fellowship resource to travel here.
+  144020:travel:1: Travel
+    - [json SpendResources {"verb":"SpendResources","amount":1,"sphere":"fellowship","group":true}]
+
+## 144021 Haunted Mere
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144021:A:1 (front): Mire 2. Forced: When Haunted Mere is discarded by the Mire keyword, search the encounter deck and discard pile for an Undead enemy, reveal it, and add it to the staging area. Shuffle the encounter deck.
+  144021:constant:1: Constant
+    - this card: stat mire 2, while this card is in play
+  144021:forced:1: Forced on the event discardedByMire (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SearchMove {"verb":"SearchMove","trait":"Undead","type":"enemy","to":"staging"}]
+    - shuffle the encounter deck
+
+144021:A:2 (front): Travel: Exhaust Sméagol to travel here.
+  144021:travel:1: Travel
+    - exhaust the card with code 144076
+
+## 144022 Stagnant Pools
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144022:A:1 (front): Mire 5. Forced: When Stagnant Pools is discarded by the Mire keyword, each player must raise his threat by 5.
+  144022:constant:1: Constant
+    - this card: stat mire 5, while this card is in play
+  144022:forced:1: Forced on the event discardedByMire (heard about this card)
+    - raise threat by 5 (each player)
+
+144022:A:2 (front): Stagnant Pools gets +1 Threat for each mire token on it.
+  144022:constant:2: Constant
+    - this card: stat threat resources of this card, while this card is in play
+
+144022:A:3 (front): Travel: Exhaust Sméagol to travel here.
+  144022:travel:1: Travel
+    - exhaust the card with code 144076
+
+## 144023 Soft Mires
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144023:A:1 (front): Mire 1. Forced: When Soft Mires is discarded by the Mire keyword, the first player reveals the top card of the encounter deck.
+  144023:constant:1: Constant
+    - this card: stat mire 1, while this card is in play
+  144023:forced:1: Forced on the event discardedByMire (heard about this card)
+    - the first player reveals an encounter card
+
+144023:A:2 (front): Travel: Each player must raise his threat by 1 to travel here.
+  144023:travel:1: Travel
+    - raise threat by 1 (each player)
+
+## 144024 Creeping Marshes
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144024:A:1: Surge. Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+144024:A:2 (front): When Revealed: Attach to the current quest. (Counts as a Condition attachment with the text: "Forced: At the end of the refresh phase, place 1 mire token on each location in the staging area. Then, discard Creeping Marshes.")
+  144024:whenRevealed:1: When revealed
+    - [json AttachToQuest {"verb":"AttachToQuest"}]
+  144024:constant:1: Constant
+    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+  144024:forced:1: Forced at the end of the phase
+    only if it is the Refresh phase
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each location (any player controls) in the staging area only:
+      - place 1 mire token(s) (resources) on the picked card; a location whose mire tokens then reach its Mire X is discarded by the Mire keyword
+    - discard this card
+
+## 144025 Bitter Reek
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144025:A:1: Peril.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+144025:A:2 (front): When Revealed: Either raise your threat by 1 for each character you control that is committed to the quest, or deal 1 damage to each character committed to the quest.
+  144025:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "threat" (only if the number of character (you control) committed to the quest is at least 1):
+        - raise threat by the number of character (you control) committed to the quest (the acting player)
+      * option "damage" (only if the number of character (any player controls) committed to the quest is at least 1):
+        - deal 1 damage to each character (any player controls) committed to the quest
+
+144025:A:3 (shadow): Shadow: Raise your threat by the attacking enemy's Threat.
+  144025:shadow:1: Shadow
+    - raise threat by threat of the attacking enemy (the acting player)
+
+## 144026 A Fell Light
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144026:A:1: Peril.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+144026:A:2 (front): When Revealed: Put the topmost Undead enemy in the encounter discard pile into play engaged with you. Each Undead enemy engaged with you makes an immediate attack.
+  144026:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json PickDiscardTop {"verb":"PickDiscardTop","types":["enemy"],"trait":"Undead"}]
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"engaged"}]
+    - [json ImmediateAttackEach {"verb":"ImmediateAttackEach","trait":"Undead","own":true}]
+
+144026:A:3 (shadow): Shadow: Return the topmost Undead enemy in the encounter discard pile to the staging area.
+  144026:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json PickDiscardTop {"verb":"PickDiscardTop","types":["enemy"],"trait":"Undead"}]
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging"}]
+
+## 144053 Morgul Wraith
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144053:A:1 (front): Cannot have non-Morgul attachments.
+  144053:constant:1: Constant
+    only if this card is in play
+    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"Morgul"}]
+
+144053:A:2 (front): While The One Ring is exhausted, Morgul Wraith gets -30 engagement cost and gains: "Immune to player card effects."
+  144053:constant:2: Constant
+    only if the card with code 144063 in play is exhausted
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat engagementCost -30, while this card is in play
+    - this card: stat immuneToPlayerCards 1, while this card is in play
+
+## 144054 Call of the Ring
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144054:A:1 (front): When Revealed: The first player must choose: either search the encounter deck, discard pile, and victory display for a Nazgûl enemy and add it to the staging area, or exhaust The One Ring and reveal the top card of the encounter deck.
+  144054:whenRevealed:1: When revealed
+    - the first player chooses one of:
+      * option "search" (only if [json condition {"kind":"searchable","trait":"Nazgûl"}]):
+        - [json SearchMove {"verb":"SearchMove","trait":"Nazgûl","type":"enemy","to":"staging"}]
+      * option "reveal":
+        - exhaust the card with code 144063
+        - the acting player reveals an encounter card
+
+144054:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
+  144054:shadow:1: Shadow
+    - when the attack in progress ends:
+      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt no shadow card
+
+## 144055 We Hates Them!
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144055:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+144055:A:2 (front): When Revealed: Either flip Sméagol to Gollum, or Gollum makes an immediate attack. The first player may spend 1 Fellowship resource and exhaust The One Ring to cancel this effect.
+  144055:whenRevealed:1: When revealed
+    - the first player chooses one of:
+      * option "flip" (only if the card with code 144076 is in play):
+        - flip Sméagol to Gollum: discard his damage; he enters play ready, engaged with the first player (nothing if Sméagol is not in play)
+      * option "attack" (only if the card with code 144075 is in play):
+        - Gollum, if he is in play, makes an immediate attack against the player he is engaged with
+      * option "cancel" (only if all of: (the number of card (any player controls) named "Gollum" or "Sméagol", (enemies engaged with a player included) is at least 1) and ([json condition {"kind":"resources","min":1,"sphere":"fellowship"}]) and (the card with code 144063 in play is ready)):
+        - [json SpendResources {"verb":"SpendResources","amount":1,"sphere":"fellowship"}]
+        - exhaust the card with code 144063
+
+144055:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if the attacking enemy is Gollum).
+  144055:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attacking enemy is a enemy (any player controls) named "Gollum"): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the attacking enemy is a enemy (any player controls) named "Gollum" (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
+
+## 144064 The Taming of Sméagol
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+144064:A:1 (front): Setup: Put Gollum into play engaged with the first player. Each player searches the encounter deck for 1 location, reveals it, and adds it to the staging area. Shuffle the encounter deck.
+  144064:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json EngageSetAside {"verb":"EngageSetAside","code":"144075"}]
+    - for each player, first player first:
+      - [json SearchMove {"verb":"SearchMove","type":"location","to":"staging"}]
+    - shuffle the encounter deck
+
+144064:B:1 (back): The players cannot advance unless the first player controls Sméagol.
+  144064:constant:1: Constant
+    only if not (the actor controls the card with code 144076)
+    - the players cannot defeat this stage while this holds
+
+144064:B:2 (back): Forced: After a player declares any number of attackers against Gollum, discard the top card of the encounter deck. Gollum gets +X Defense for this attack, where X is the discarded card's Threat.
+  144064:forced:1: Forced on the event enemyAttacked (heard about enemy (any player controls) named "Gollum")
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"}]
+    - the card the event is about: stat defense threat of the picked card, until the end of the attack
+
+## 144065 Across the Marshes
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+144065:A:1 (front): When Revealed: If the number of locations in the staging area is less than the number of players in the game, discard cards from the encounter deck until a location is discarded. Then, add the discarded location to the staging area.
+  144065:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json DiscardUntil {"verb":"DiscardUntil","type":"location","when":{"kind":"less","left":{"count":{"type":"location","control":"any","stagingOnly":true}},"right":{"players":true}}}]
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"less","left":{"count":{"type":"location","control":"any","stagingOnly":true}},"right":{"players":true}}}]
+
+144065:B:1 (back): Progress cannot be placed on locations in the staging area.
+  144065:constant:1: Constant
+    - each location (any player controls) in the staging area only: stat noProgressPlaced 1, while this card is in play
+
+144065:B:2 (back): The players cannot advance unless the first player controls Sméagol and there are at least 4 locations in the victory display.
+  144065:constant:2: Constant
+    only if not (the actor controls the card with code 144076)
+    - the players cannot defeat this stage while this holds
+  144065:constant:3: Constant
+    only if the number of location (any player controls) in the victory display is at most 3
+    - the players cannot defeat this stage while this holds
+
+144065:B:3 (back): Forced: At the end of the staging step, if the number of locations in the staging area is less than the number of players in the game, reveal the top card of the encounter deck.
+  144065:forced:1: Forced on the event stagingStepEnds
+    only if the number of location (any player controls) in the staging area only is less than the number of players
+    - the first player reveals an encounter card
+
+## 144066 Don't Look at the Lights!
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+144066:A:1 (front): When Revealed: Each player searches the encounter deck and discard pile for an Undead enemy and puts it into play engaged with him. Shuffle all locations in the victory display into the encounter deck.
+  144066:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - [json SearchMove {"verb":"SearchMove","trait":"Undead","type":"enemy","to":"engaged"}]
+    - shuffle every location in the victory display into the encounter deck
+
+144066:B:1 (back): While any player is engaged with an Undead enemy, progress cannot be placed on this stage.
+  144066:constant:1: Constant
+    only if any of: (there is a Undead enemy (any player controls) engaged with you to choose) or (there is a Undead enemy (any player controls) engaged with another player to choose)
+    - the table: stat noQuestProgress 1, while this card is in play
+
+144066:B:2 (back): The players cannot defeat this stage unless the first player controls Sméagol. If the players defeat this stage, they win the game.
+  144066:constant:2: Constant
+    only if not (the actor controls the card with code 144076)
+    - the players cannot defeat this stage while this holds
+
+## 144075 Gollum
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+144075:A:1 (front): Immune to non-Fellowship player card effects. Gollum engages the first player.
+  144075:constant:1: Constant
+    - this card: stat immuneToNonFellowship 1, while this card is in play
+  144075:triggered:1: Triggered (mandatory, not printed as Forced) on the event firstPlayerTokenPassed
+    - this enemy moves to the first player's play area and engages them (nothing if it is not engaged, or already engaged with them)
+
+144075:A:2 (front): Forced: After Gollum engages the first player during the refresh phase, he makes an immediate attack.
+  144075:forced:1: Forced after an enemy engages a player (heard about this card)
+    only if it is the Refresh phase
+    - this enemy attacks now, dealt a new shadow card after its old ones are discarded
+
+144075:A:3 (front): Forced: When Gollum is defeated, flip him to Sméagol and exhaust Sméagol.
+  144075:forced:2: Forced after an enemy is destroyed (heard about this card)
+    - flip Gollum to Sméagol: discard his damage; he enters play exhausted, controlled by the first player (not the discard pile or the victory display)
+
+## 144076 Sméagol
+
+144076:A:1 (front): Immune to player card effects. The first player gains control of Sméagol.
+  (the keyword part is owned by the card's keywords; the records cover: The first player gains control of Sméagol.)
+  144076:constant:1: Constant
+    - this card: stat immuneToPlayerCards 1, while this card is in play
+  144076:constant:2: Constant
+    - [json ControlledBy {"verb":"ControlledBy","who":"firstPlayer","card":"self"}]
+
+144076:A:2 (front): Forced: After the players quest unsuccessfully, flip Sméagol to Gollum.
+  144076:forced:1: Forced after the players quest unsuccessfully
+    - flip Sméagol to Gollum: discard his damage; he enters play ready, engaged with the first player (nothing if Sméagol is not in play)
+
+144076:A:3 (front): If Sméagol is destroyed, the players lose the game.
+  144076:triggered:1: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
+    - the players lose the game (Sméagol was destroyed)
+
+(rendered pieces: 206 by template, 25 as JSON)

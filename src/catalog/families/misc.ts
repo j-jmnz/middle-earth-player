@@ -89,6 +89,8 @@ const FLAGS = [
   // chooses or affects it.
   "immuneToNonMaster",
   "immuneToNonGollum",
+  // The holder is immune to the effects of player cards that are not Fellowship cards ("Immune to non-Fellowship player card effects", 144075:A:1): no such card's effect chooses or affects it (families/misc/guards.ts).
+  "immuneToNonFellowship",
   // The holder gains no resources from player card effects (1), or from cards that are not treasures (2).
   "noPlayerCardResources",
   "noNonTreasureResources",

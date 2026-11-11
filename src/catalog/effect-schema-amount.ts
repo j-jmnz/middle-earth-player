@@ -11,6 +11,9 @@ import { pickSchema } from "./effect-schema-pick.ts";
 // `previous` is the card picked before the last, `discardTop` the top card of the encounter discard pile (the last card put there), `questStage` the main quest card now (Hrogar's Hill, 19083:B:1).
 export const cardRefSchema = z.enum(["self", "host", "picked", "subject", "other", "attacker", "defender", "activeLocation", "previous", "discardTop", "questStage"]);
 
+// The decks beside the encounter deck a record names (emce.caves-deck, emce.evil-creatures-deck, mec112.setup-journey-to-the-cross-roads; src/rules/core/piles.ts NAMED_PILES): the one list `pile` of a wilderland verb, the amount `pile` and the condition `pileHas` share.
+export const pileNameSchema = z.enum(["caves", "evilCreatures", "spiders", "orcs", "sideQuests", "harad"]);
+
 export const amountExprSchema = z.strictObject({
   // How many cards match, from the actor's side ("each enemy engaged with you", "each side quest in the victory display").
   count: pickSchema.optional(),
@@ -80,6 +83,8 @@ export const amountExprSchema = z.strictObject({
   resourcesOn: pickSchema.optional(),
   // With `resourcesOn`: the most resource tokens on any one of those cards, not the sum ("X is the highest number of resources on a Raider enemy in play", 12161:A:1). 0 when none matches.
   max: z.literal(true).optional(),
+  // The number of cards left in this deck beside the encounter deck ("gets -1 Threat for each facedown card under it", 144030:A:2: the Harad deck lies under The Cross-roads). 0 in a game that did not deal it. Read by the wilderland family.
+  pile: pileNameSchema.optional(),
   // The pursuit value (mec112.pursuit; `pursuit`), 0 while no tracker is set: "X is the pursuit value" (143069:B:1). Read by the pursuit family.
   pursuit: z.literal(true).optional(),
   // The damage tokens on the cards that match, added up ("equal to the total damage on each Ship objective he controls", 12148:A:1; read by the sea family, src/rules/families/sea/swap.ts).

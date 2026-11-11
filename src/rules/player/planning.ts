@@ -250,7 +250,7 @@ export function playReason(
     // The staging area or a seat's play area, for a card that goes there (families/attachments/play.ts).
     const targets = playTargets(state, state.activeSeat, instance.code, ctx) ?? attachmentHostIds(state, state.activeSeat, instance.code, ctx);
     if (!targets.includes(intent.hostId)) {
-      if (host && !playerCardEffectCanChoose(printedOf(ctx.cards, host.code), state, host.id)) {
+      if (host && !playerCardEffectCanChoose(printedOf(ctx.cards, host.code), state, host.id, printed)) {
         return "Immune to player card effects";
       }
       if (host && attachBlocked(state, ctx, host.id, instance.code)) return "That card cannot have that attachment";

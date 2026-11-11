@@ -158,7 +158,7 @@ export function runPlayerVerb(
       const id = refCard(state, instruction.target ?? "picked", scope) ?? "";
       const amount = resolveAmount(state, instruction.amount, scope, ctx);
       if (!state.cards[id] || amount <= 0) return state;
-      if (playerSource(state, focus.sourceId, ctx)) return placePlayerDamage(state, focus.seat, id, amount, ctx, steps);
+      if (playerSource(state, focus.sourceId, ctx)) return placePlayerDamage(state, focus.seat, id, amount, ctx, steps, focus.sourceId);
       // An encounter or campaign card's damage is no player card effect, so a Ship objective's immunity to those does not stop it (dcce.ship-objectives). A quest card's or a side quest's is a quest effect (Dagnir's cap, 19074:A:2).
       return placeDamage(state, id, amount, ctx.cards, steps, isQuestSource(state, focus.sourceId, ctx) ? "quest" : "framework", currentCause(steps, UNATTRIBUTED));
     }
@@ -345,7 +345,7 @@ export function putOnDeck(state: ScenarioState, id: string, position: "top" | "b
 // The effect's source is a player card (not an encounter card).
 // Damage a player card's effect deals for the seat that used it (DamageCard, DamageEach, DealDamage). "You cannot ... deal damage (through
 // effects) to enemies with a title other than Marshland Outlaws": an enemy the seat is barred from takes none (attackOnlyTitle, 900202:A:1).
-export function placePlayerDamage(state: ScenarioState, seat: number, id: string, amount: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+export function placePlayerDamage(state: ScenarioState, seat: number, id: string, amount: number, ctx: ReduceContext, steps: EngineStep[], sourceId?: string | null): ScenarioState {
   if (titleBarred(state, seat, id, ctx.cards)) return state;
-  return placeDamage(state, id, amount, ctx.cards, steps, "player", currentCause(steps, UNATTRIBUTED));
+  return placeDamage(state, id, amount, ctx.cards, steps, "player", currentCause(steps, UNATTRIBUTED), sourceId);
 }

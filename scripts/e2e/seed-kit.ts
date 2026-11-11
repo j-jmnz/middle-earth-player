@@ -9,6 +9,7 @@ import { newSave, type Save, type StoredLoadout } from "../../src/campaign/save.
 import { loadWorld, logCodes, type World } from "../../src/campaign/world.ts";
 import { CATALOG_VERSION } from "../../src/catalog/version.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
+import { goldenState } from "../../test/harness/golden-state.ts";
 import type { PrintedCard } from "../../src/rules/core/printed.ts";
 import { reduce, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
 
@@ -141,6 +142,8 @@ export type WonPart<G extends { name: string; decks: string }> = {
   goldens: readonly G[];
   world: (decks: G["decks"]) => Promise<{ cards: Map<string, PrintedCard>; ctx: ReduceContext }>;
   play: (golden: G, ctx: ReduceContext) => { state: ScenarioState };
+  /** The scenario whose golden.json pins the golden's final state: read with `goldenState` instead of played again (.claude/rules/code-standards.md, Test cost). */
+  scenarioId?: string;
 };
 
 /**
@@ -152,7 +155,7 @@ export async function wonLog<G extends { name: string; decks: string }>(part: Wo
   const golden = part.goldens.find((item) => item.name === wanted);
   if (!golden) throw new Error(`The ${part.title} golden "${wanted}" is gone`);
   const world = await part.world(golden.decks);
-  const game = part.play(golden, world.ctx);
+  const game = part.scenarioId ? { state: goldenState(part.scenarioId, golden.name) } : part.play(golden, world.ctx);
   if (!game.state.stageCleared || game.state.lost) throw new Error(`The ${part.title} golden no longer wins`);
   const written = applyResolution(before, game.state.scenarioId, game.state, world.cards, NO_COPY_LIMITS);
   const blank = emptyLog(2);

@@ -29,7 +29,7 @@ import { rowFeet } from "../layout/column-reach.ts";
 import { areaFacts } from "../store/stormcaller-table.ts";
 import { stagePill } from "../words/scenarios/stormcaller.ts";
 import { NO_DRAG, NO_HIGHLIGHT, NO_TARGETS } from "../store/peek.ts";
-import { actingSeat, lookedOf, shownSeat } from "../store/selectors.ts";
+import { actingSeat, lookedOf, shownSeat, stacksUnder } from "../store/selectors.ts";
 import type { TableCanvasProps } from "./table-canvas-types.ts";
 import { ReaderTable } from "./reader-table.tsx";
 import { useReaderMode } from "../../ui/screen-reader.ts";
@@ -84,8 +84,8 @@ function Table({ store, width, height, column, reach, onRowFeet, picture, pictur
   const discovered = useMemo(() => (discoverKey === "" ? NO_CARDS : discoverKey.split(",").flatMap((id) => (game.cards[id]?.zone === "encounterDiscard" ? [game.cards[id]] : []))), [discoverKey, game]);
   const strip = useMemo(() => [...lookedCards.map((card) => ({ card, success: success(card.code) })), ...discovered.map((card) => ({ card, success: 0 }))], [lookedCards, discovered, success]);
   const looking = lookedCards.length > 0 || discovered.length > 0;
-  // A sea game stacks the cards under a staging card into one counted peek (layout.ts); every other game peeks each as it always did.
-  const seaGame = useStore(store, (state) => state.game.sea != null);
+  // A sea game, or one with the Harad deck (the enemies under The Black Gate), stacks the cards under a staging card into one counted peek (layout.ts); every other game peeks each as it always did.
+  const stacks = useStore(store, stacksUnder);
   const selected = useStore(store, (state) => state.selected);
   const targets = useStore(store, (state) => (state.viewedSeat != null ? NO_TARGETS : state.targets));
   const draggable = useStore(store, (state) => (state.viewedSeat != null ? NO_DRAG : state.draggable));
@@ -102,8 +102,8 @@ function Table({ store, width, height, column, reach, onRowFeet, picture, pictur
   // The moment's own cards (`marked.keep`) count while the tray is open or the table peeks, when nothing glows.
   const keep = useMemo(() => new Set([...marked.keep, ...targetIds, ...beating, ...(selected ? [selected] : [])]), [marked, targetIds, beating, selected]);
   const layout = useMemo(
-    () => tableLayout(width, height, views, piles, { raised, deckTop, attacker, preview: fight, bottomInset, scale: s, keep, look: strip, lookLeavesStaging: discovered.length > 0, stacks: seaGame, column, reach: reach ?? 0 }),
-    [width, height, views, piles, raised, deckTop, attacker, fight, bottomInset, s, keep, strip, discovered, seaGame, column, reach],
+    () => tableLayout(width, height, views, piles, { raised, deckTop, attacker, preview: fight, bottomInset, scale: s, keep, look: strip, lookLeavesStaging: discovered.length > 0, stacks, column, reach: reach ?? 0 }),
+    [width, height, views, piles, raised, deckTop, attacker, fight, bottomInset, s, keep, strip, discovered, stacks, column, reach],
   );
   // The rows' feet go up to the screen, which counts how many the command column's empty top covers (column-reach.ts). They do not move with the reach.
   const feet = rowFeet(layout);
@@ -218,8 +218,8 @@ function RowFeetProbe({ store, width, height, column, onRowFeet, facts, bottomIn
   const s = useUiScale();
   const seat = useStore(store, (state) => shownSeat(state.game, state.viewedSeat));
   const { views, piles } = useViews(store, seat, facts);
-  const seaGame = useStore(store, (state) => state.game.sea != null);
-  const feet = rowFeet(tableLayout(width, height, views, piles, { bottomInset, scale: s, stacks: seaGame, column }));
+  const stacks = useStore(store, stacksUnder);
+  const feet = rowFeet(tableLayout(width, height, views, piles, { bottomInset, scale: s, stacks, column }));
   useLayoutEffect(() => {
     onRowFeet?.({ staging: feet.staging, engaged: feet.engaged });
   }, [onRowFeet, feet.staging, feet.engaged]);

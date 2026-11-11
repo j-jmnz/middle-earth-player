@@ -897,6 +897,18 @@
       },
       "reason": "Hall of Beorn gives the encounter side quest Face the Dragon no quest points (its Victory 10 is the only number it exports; DragnCards files the same 10 under questPoints for all eight). The scan prints a quest points box of 10 and Victory 10, so progress can be placed on it once it is the current quest (emce.side-quests-in-play).",
       "source": "scan 19073.A (hallofbeorn-resources Fire-in-the-Night/Face-the-Dragon.jpg, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "144075"
+      },
+      "set": {
+        "keywords": {
+          "immune": false
+        }
+      },
+      "reason": "Gollum prints \"Immune to non-Fellowship player card effects\": a card of the Fellowship sphere may still affect him. Hall of Beorn lists an Immune keyword, which the engine reads as immunity to every player card effect, so the keyword is turned off and the record's flag immuneToNonFellowship holds the real rule.",
+      "source": "scan 144075.A (data/printed/the-two-towers.json); MEC112 booklet, Gollum and Sméagol (mec112.gollum-smeagol)"
     }
   ],
   "scenarioPiles": [

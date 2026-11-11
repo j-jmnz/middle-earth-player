@@ -1,5 +1,6 @@
 // Elimination (rr.player-elimination): a seat out of heroes or at the threat elimination level leaves the game, and the cards it held go with it.
 import { threatSaved } from "../families/quest/threat.ts";
+import { GOLLUM, SMEAGOL, isGollum } from "../families/gollum/index.ts";
 import { discardArea } from "../families/breaking/areas.ts";
 import type { EngineStep } from "./intents.ts";
 import { fromEncounterDeck, printedOf, type PrintedCard } from "./printed.ts";
@@ -19,17 +20,25 @@ export function markLoss(state: ScenarioState, reason: string): ScenarioState {
 export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): ScenarioState {
   if (state.lost) return state;
   let next = state;
+  // Gollum is engaged with the first player and Sméagol is controlled by them (144075:A:1, 144076:A:1): when that seat leaves they pass to the new first player, keeping their exhaustion and damage (agent recommendation, docs/brief.md, The Two Towers).
+  const heir = livingSuccessor(next);
   for (let index = 0; index < next.seatCount; index += 1) {
     const seat = next.seats[index];
     if (!seat?.eliminated) continue;
     const controlled = Object.values(next.cards).filter(
-      (card) => card.controller === index && (inPlay(card.zone) || card.zone === "hand" || card.zone === "deck") && card.zone !== "engaged" && card.zone !== "staging" && card.zone !== "questStage",
+      (card) => !(heir != null && isGollum(card.code)) && card.controller === index && (inPlay(card.zone) || card.zone === "hand" || card.zone === "deck") && card.zone !== "engaged" && card.zone !== "staging" && card.zone !== "questStage",
     );
-    if (controlled.length === 0 && seat.engaged.length === 0) continue;
+    const smeagol = heir == null ? undefined : Object.values(next.cards).find((card) => card.code === SMEAGOL && card.controller === index && card.zone === "play");
+    if (controlled.length === 0 && seat.engaged.length === 0 && !smeagol) continue;
     for (const enemyId of seat.engaged) {
+      if (heir != null && next.cards[enemyId]?.code === GOLLUM) {
+        next = moveCard(next, enemyId, { zone: "engaged", seat: heir });
+        continue;
+      }
       next = moveCard(next, enemyId, { zone: "staging" });
       next = updateCard(next, enemyId, { controller: null });
     }
+    if (smeagol && heir != null) next = moveCard(next, smeagol.id, { zone: "play", seat: heir });
     for (const card of controlled) {
       const current = next.cards[card.id];
       if (!current || current.controller !== index) continue;
@@ -55,16 +64,17 @@ export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string,
   // Stages that are separate: the stage of an eliminated seat is discarded with the encounter cards at it (mec109.multiple-staging-areas). The
   // enemies that were engaged with it returned to its staging area above.
   if (next.separate) for (let index = 0; index < next.seatCount; index += 1) if (next.seats[index]?.eliminated) next = discardArea(next, index);
-  if (next.seats[next.firstPlayer]?.eliminated) {
-    for (let step = 1; step <= next.seatCount; step += 1) {
-      const candidate = (next.firstPlayer + step) % next.seatCount;
-      if (!next.seats[candidate]?.eliminated) {
-        next = { ...next, firstPlayer: candidate };
-        break;
-      }
-    }
-  }
+  if (heir != null && heir !== next.firstPlayer) next = { ...next, firstPlayer: heir };
   return next;
+}
+
+// The seat that holds the first player token: the current one, or the next living seat clockwise when it is eliminated (null with none).
+function livingSuccessor(state: ScenarioState): number | null {
+  for (let step = 0; step <= state.seatCount; step += 1) {
+    const candidate = (state.firstPlayer + step) % state.seatCount;
+    if (!state.seats[candidate]?.eliminated) return candidate;
+  }
+  return null;
 }
 
 // A seat leaves the game (rr.player-elimination): the step is recorded and the seat marked eliminated; settle moves its cards (clearEliminated). With no seat left the game is lost. Every elimination goes through here.

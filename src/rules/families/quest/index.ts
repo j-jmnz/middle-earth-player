@@ -148,7 +148,7 @@ function damageEach(state: ScenarioState, instruction: Verb<"DamageEach">, focus
   let next = state;
   if (amount <= 0) return next;
   for (const id of targets) {
-    next = player ? placePlayerDamage(next, focus.seat, id, amount, ctx, steps) : placeDamage(next, id, amount, ctx.cards, steps, "framework", currentCause(steps, UNATTRIBUTED));
+    next = player ? placePlayerDamage(next, focus.seat, id, amount, ctx, steps, focus.sourceId) : placeDamage(next, id, amount, ctx.cards, steps, "framework", currentCause(steps, UNATTRIBUTED));
   }
   return next;
 }

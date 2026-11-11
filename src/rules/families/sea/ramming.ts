@@ -9,17 +9,16 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { modifiedStat } from "../../core/keywords.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
+import { tiedExtreme } from "../../interpret/tied-extreme.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { attackWith } from "../attack/immediate.ts";
 
 /** Of the cards that matched, only those with the highest Attack as the table shows it; all of them when tied. */
 export function highestAttack(state: ScenarioState, found: readonly string[], ctx: ReduceContext): string[] {
-  const values = found.map((id) => {
+  return tiedExtreme(found, (id) => {
     const card = state.cards[id];
     return card ? modifiedStat(state, card, "attack", ctx.cards) : 0;
-  });
-  const top = Math.max(...values);
-  return found.filter((_id, at) => values[at] === top);
+  }, "highest");
 }
 
 /** AttackWithPicked: the last picked enemy, if it is engaged and may attack, makes an immediate attack. */

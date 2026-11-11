@@ -7,12 +7,19 @@ import type { AmountExpr } from "../../../catalog/boundary.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { inPlay } from "../../core/state.ts";
+import { inPlay, livingSeats } from "../../core/state.ts";
 
 // The facedown attachments of a card (AttachFacedown) are out of play under it: zone "under", hosted by the card.
 export function facedownCount(state: ScenarioState, hostId: string | null): number {
   if (!hostId) return 0;
   return Object.values(state.cards).filter((card) => card.zone === "under" && card.host === hostId).length;
+}
+
+/** Whether the cards facedown under a host number at least `min` and at most `max`, each plus the number of players with `players` (the `underBurn` and `facedownUnder` conditions). */
+export function facedownWithin(state: ScenarioState, hostId: string | null, bounds: { min?: number; max?: number; players?: true }): boolean {
+  const extra = bounds.players ? livingSeats(state).length : 0;
+  const count = facedownCount(state, hostId);
+  return (bounds.min == null || count >= bounds.min + extra) && (bounds.max == null || count <= bounds.max + extra);
 }
 
 // Keeping Count (04005:A:2): for the copies of the source card in play, the most resource tokens one holds, less the number the

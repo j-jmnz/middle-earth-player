@@ -61,6 +61,8 @@ export type Layout = {
   pursuit?: number;
   // A hero stand-in lies faceup as a Captive under the card with the code `under` (The Uruk-hai, 143069:A:1).
   captive?: { hero: string; under: string };
+  // Cards lying facedown under the first card with the code `to` (the enemies under The Black Gate, 144027:A:2).
+  under?: readonly { code: string; to: string }[];
   // Other zones that hold a list of cards (a second deck, a named pile).
   piles?: Partial<Record<PileZone, readonly Entry[]>>;
 };
@@ -75,6 +77,9 @@ export type LayoutTable = { state: ScenarioState; ctx: ReduceContext; hero: stri
 type Loaded = { data: ScenarioData; dealt: ScenarioData; campaign: CampaignData; cards: ReadonlyMap<string, PrintedCard> };
 const LOADED = new Map<string, Loaded>();
 
+// The saga hero or the attachments the first player starts the scenario with (The One Ring in The Passage of the Marshes), so a layout can place them.
+const sagaStartCodes = (data: ScenarioData): string[] => (data.sagaStart ? ("hero" in data.sagaStart ? [data.sagaStart.hero] : [...data.sagaStart.attached]) : []);
+
 // The scenario's data, its campaign and the printed cards it deals (and the stand-ins), read once for each scenario.
 function loadedWorld(scenarioId: string): Loaded {
   const known = LOADED.get(scenarioId);
@@ -83,7 +88,7 @@ function loadedWorld(scenarioId: string): Loaded {
   const campaign = loadCampaigns().find((one) => one.scenarios.includes(scenarioId));
   if (!campaign) throw new Error(`no campaign plays ${scenarioId}`);
   const dealt = campaignScenario(data);
-  const codes = new Set([...dealt.cards.flatMap((card) => (card.back != null ? [card.code, card.back] : [card.code])), ...dealt.campaignPlaced, dealt.campaignCard, ...dealt.stages, ...gameCodes(campaign, data)]);
+  const codes = new Set([...dealt.cards.flatMap((card) => (card.back != null ? [card.code, card.back] : [card.code])), ...dealt.campaignPlaced, dealt.campaignCard, ...dealt.stages, ...gameCodes(campaign, data), ...sagaStartCodes(data)]);
   const byCode = new Map(loadCards().map((card) => [card.code, card]));
   const cards = new Map<string, PrintedCard>();
   for (const code of codes) {
@@ -158,6 +163,10 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
     const host = idOf(state, attachment.to);
     const spawned = spawn(state, attachment.code, { zone: "play", seat: 0 });
     state = attachTo(spawned.state, spawned.id, host);
+  }
+  for (const hidden of layout.under ?? []) {
+    const spawned = spawn(state, hidden.code, { zone: "under", locationId: idOf(state, hidden.to) }, "down");
+    state = spawned.state;
   }
   if (layout.captive) state = holdCaptive(state, idOf(state, layout.captive.hero), idOf(state, layout.captive.under));
   if (layout.pursuit != null) state = { ...state, pursuit: layout.pursuit };

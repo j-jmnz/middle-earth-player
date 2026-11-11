@@ -393,3 +393,11 @@ describe("the words of The Caves of Nibin-Dûm choices", () => {
     expect(first(run.state, "41029")).toBeDefined();
   });
 });
+
+describe("a Pick followed by PlaceFacedownUnder (144036:A:2, 144038:A:2)", () => {
+  it("says what the card is for and names the host", () => {
+    const names: ChoiceNames = { card: (id) => id, code: (code) => (code === "144027" ? "The Black Gate" : code) };
+    const pick: Instruction = { verb: "Pick", pick: { type: "enemy", control: "any", trait: "Harad", engaged: "you" } };
+    expect(pickWords(pick, { verb: "PlaceFacedownUnder", code: "144027", target: "picked" }, names, "144036")).toEqual({ verb: "Place", prompt: "Choose an enemy to place facedown under The Black Gate." });
+  });
+});

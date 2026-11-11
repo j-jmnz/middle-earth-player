@@ -8,13 +8,13 @@ import { z } from "zod";
 
 import type { CatalogFamily } from "../family-manifest.ts";
 import { ALLY_LINES } from "../ally-lines.ts";
-import { cardRefSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
+import { cardRefSchema, pileNameSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { verbFlags } from "../verb-flags.ts";
 
 const code = z.string().min(1);
 // The decks beside the encounter deck (emce.caves-deck, emce.evil-creatures-deck; src/rules/core/piles.ts): the Caves deck, the Evil Creatures deck, and the two encounter sets Lost in Mirkwood sets aside.
-const pile = z.enum(["caves", "evilCreatures", "spiders", "orcs", "sideQuests"]);
+const pile = pileNameSchema;
 
 const VERBS = [
   // "Look at 3 random undiscovered treasures and attach 1 of them to ~ as a guarded objective" (12168:A:2, 12170:A, 12189:B:2): `count` treasures (3 by default) the log has not recorded and
@@ -46,7 +46,8 @@ const VERBS = [
   // "Add the top card of the Evil Creatures deck to the staging area" / "Put the top card ... into play engaged with the first player" (18017:A, 18066:B, 18068:A; emce.evil-creatures-deck): `count` cards (1 by default) come off the top of the deck
   // into the staging area or engaged with the actor, the first player or each player (`who`, the actor by default; the staging area ignores it). A deck with a discard pile of its own (Evil Creatures) is refilled from it first when it is empty. The card enters play, and the last one added is the picked card of the running effect (a later AttachGuard or FlipOver reads it). With `attachSource`
   // the source card is attached to each card added ("Add the top card of the Evil Creatures deck to the staging area and attach Frenzied Creature to it", 18018:A:1); with no card to add it stays where it is.
-  z.strictObject({ verb: z.literal("AddFromPile"), pile, to: z.enum(["staging", "engaged"]), count: positiveAmountSchema.optional(), who: z.enum(["actor", "firstPlayer", "eachSeat"]).optional(), attachSource: z.boolean().optional(), ...when }),
+  // `reveal`: the top card is revealed, not only added (rr.reveal; the Harad deck, 144068:B:1 "reveal the top facedown card from under The Cross-roads and add it to the staging area"): its Surge, Peril and When Revealed resolve, then it is staged or put into play engaged; one card, for the first seat the verb names.
+  z.strictObject({ verb: z.literal("AddFromPile"), pile, to: z.enum(["staging", "engaged"]), count: positiveAmountSchema.optional(), who: z.enum(["actor", "firstPlayer", "eachSeat"]).optional(), attachSource: z.boolean().optional(), reveal: z.literal(true).optional(), ...when }).refine((verb) => verb.reveal !== true || (verb.count == null && verb.attachSource !== true && verb.who !== "eachSeat"), "AddFromPile reveal reveals one card for one seat: it takes no count, no attachSource and not who eachSeat"),
   // "Shuffle the Spiders of Mirkwood encounter set into the encounter deck" (18072:A): the cards of the set-aside deck join the encounter deck, which is shuffled, and the deck stays empty (emce.setup-lost-in-mirkwood).
   z.strictObject({ verb: z.literal("ShufflePileIntoEncounterDeck"), pile, ...when }),
   // Constant on a location, the Deep keyword (emce.deep; 18046:A, 19016:A): after the players travel to it and the Responses to the travel are done, they discard it and the top card of the Caves deck replaces it as the active location. Ignored with the Caves

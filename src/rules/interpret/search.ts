@@ -33,9 +33,10 @@ export function outOfPlayChoices(state: ScenarioState, code: string): string[] {
 
 export function searchable(
   state: ScenarioState,
-  selector: { code?: string; trait?: string; type?: string; nonUnique?: boolean },
+  selector: { code?: string; trait?: string; type?: string; nonUnique?: boolean; deckOnly?: boolean },
   ctx: ReduceContext,
-  zones: readonly ("encounterDeck" | "encounterDiscard")[] = ["encounterDeck", "encounterDiscard"],
+  // `deckOnly`: the encounter deck alone, not its discard pile ("search the encounter deck for a Harad enemy", 144037:A:1).
+  zones: readonly ("encounterDeck" | "encounterDiscard")[] = selector.deckOnly === true ? ["encounterDeck"] : ["encounterDeck", "encounterDiscard"],
 ): string[] {
   const found: string[] = [];
   for (const zone of zones) {
