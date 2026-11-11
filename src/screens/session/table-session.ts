@@ -3,14 +3,18 @@ import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 import { useEffect, useMemo } from "react";
 
 import { useOpenedAfterPaint } from "../nav/after-paint";
-import { writeSave } from "../data/campaign-store";
+import { writeActive, writeSave } from "../data/campaign-store";
 import { useDatabases } from "../data/databases";
 import { cachedTable, openTable, type TableSession } from "./table-open";
 
 export { continueTable, loadoutCodes, openTable, restartTable, recordUnclosedRun, sessionStore, type SessionStore, type TableSession } from "./table-open";
 
+// The one write an open makes: a drop (the open scenario does not read), or the world stamp of a current save from before it existed.
 function writeDropped<TUser>(user: BaseSQLiteDatabase<"sync", TUser>, session: TableSession | null): void {
-  if (session && !session.ok && session.write) writeSave(user, session.write);
+  if (!session) return;
+  if (session.ok) {
+    if (session.stamp) writeActive(user, session.stamp);
+  } else if (session.write) writeSave(user, session.write);
 }
 
 /** The open scenario of a save, opened once per save id, during the render (the Resolution: the table just left it cached). */

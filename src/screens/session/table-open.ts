@@ -5,10 +5,10 @@
 // that open it for a screen are in table-session.ts.
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
-import { addActive } from "../../campaign/replay";
+import { addActive, stampedWorld, staleReason } from "../../campaign/replay";
 import type { Save } from "../../campaign/save";
-import { continueSave, drop, finish, isWon, record, restartSave, resume, staleReason, unrecord } from "../../campaign/session";
-import { logCodes, loadWorld, type World } from "../../campaign/world";
+import { continueSave, drop, finish, isWon, record, restartSave, resume, unrecord } from "../../campaign/session";
+import { logCodes, loadWorld, worldHash, type World } from "../../campaign/world";
 import { CATALOG_VERSION } from "../../catalog/version";
 import { dealSeed } from "../nav/e2e";
 import { CANNOT_CONTINUE, MISSING_GAME, restartProblems, type StaleChoice } from "./stale-words";
@@ -27,7 +27,8 @@ import { fingerprintOf, sessionCacheOf } from "./cache";
 
 type Db<TRun> = BaseSQLiteDatabase<"sync", TRun>;
 
-export type TableSession = ({ ok: true; save: Save } & ReplayedGame) | { ok: false; reason: "missing" | "none" | "dropped" | "stale"; save: Save | null; write: Save | null };
+// `stamp` is the save to write when the open game was saved before it carried a world hash and is current: the first open stamps it.
+export type TableSession = ({ ok: true; save: Save; stamp: Save | null } & ReplayedGame) | { ok: false; reason: "missing" | "none" | "dropped" | "stale"; save: Save | null; write: Save | null };
 
 /** The codes the open scenario can show: the log's cards, the Ring-bearer and every card of each dealt deck. */
 export function loadoutCodes(save: Save): string[] {
@@ -64,20 +65,24 @@ function openRead<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TUser>, read:
     const dropped = drop(save);
     return { ok: false, reason: "dropped", save: dropped, write: dropped };
   }
-  if (staleReason(save.active, CATALOG_VERSION)) return { ok: false, reason: "stale", save, write: null };
+  // Without a world: the engine version, and the catalog version of a save that has no world stamp yet.
+  if (staleReason(save.active, null)) return { ok: false, reason: "stale", save, write: null };
   const cache = sessionCacheOf<Opened>(user, "save");
-  const fingerprint = fingerprintOf(save, CATALOG_VERSION);
-  const kept = cache.get(save.id, fingerprint);
+  const kept = cache.get(save.id, fingerprintOf(save, CATALOG_VERSION));
   if (kept) return kept;
   const world = loadWorld(catalog, campaign, scenario, EFFECTS, loadoutCodes(save));
-  const replayed = replayForTable(catalog, world, (observe) => resume(save, world, CATALOG_VERSION, observe));
+  const hash = worldHash(world);
+  if (staleReason(save.active, hash)) return { ok: false, reason: "stale", save, write: null };
+  // A save from before the world stamp is current: it is stamped, and written once by the hook that opened it.
+  const stamped: Save = { ...save, active: stampedWorld(save.active, hash) };
+  const replayed = replayForTable(catalog, world, (observe) => resume(stamped, world, observe));
   if (!replayed) {
     // The reducer refused a stored intent, or the start no longer builds: the player chooses, nothing is dropped.
     return { ok: false, reason: "stale", save, write: null };
   }
-  const opened: Opened = { ok: true, save, ...replayed };
-  cache.set(save.id, fingerprint, opened);
-  return opened;
+  const opened: Opened = { ok: true, save: stamped, stamp: null, ...replayed };
+  cache.set(save.id, fingerprintOf(stamped, CATALOG_VERSION), opened);
+  return stamped.active === save.active ? opened : { ...opened, stamp: stamped };
 }
 
 // The world of an open scenario, or null when its campaign or scenario is not in the build or its cards do not load.
@@ -94,13 +99,13 @@ function worldOf<TCatalog>(catalog: Db<TCatalog>, save: Save): World | null {
 
 /**
  * Continue (the stale sheet): replays the open scenario on the new rules as far as its intents are accepted and writes that prefix,
- * stamped with the engine version and data hash it now plays on. The session cache misses on the new save, so the next open replays it.
+ * stamped with the engine version and world it now plays on. The session cache misses on the new save, so the next open replays it.
  */
 export function continueTable<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TUser>, saveId: string): StaleChoice {
   const save = readSaveChecked(user, saveId)?.save;
   const world = save ? worldOf(catalog, save) : null;
   if (!save || !world) return { ok: false, message: MISSING_GAME };
-  const continued = continueSave(save, world, CATALOG_VERSION);
+  const continued = continueSave(save, world);
   if (!continued.ok) return { ok: false, message: CANNOT_CONTINUE };
   writeActive(user, continued.holder);
   return { ok: true };
@@ -111,7 +116,7 @@ export function restartTable<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TU
   const save = readSaveChecked(user, saveId)?.save;
   const world = save ? worldOf(catalog, save) : null;
   if (!save || !world) return { ok: false, message: MISSING_GAME };
-  const dealt = restartSave(save, world, dealSeed(), CATALOG_VERSION, Date.now());
+  const dealt = restartSave(save, world, dealSeed(), Date.now());
   if (!dealt.ok) return { ok: false, message: restartProblems(dealt.briefing?.problems ?? null) };
   writeActive(user, dealt.save);
   return { ok: true };

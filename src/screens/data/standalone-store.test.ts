@@ -36,7 +36,7 @@ function gameOf(id: string, overrides: Partial<StandaloneGame> = {}): Standalone
     scenarioId: "a-shadow-of-the-past",
     seatCount: 1,
     loadout: { scenarioId: "a-shadow-of-the-past", difficulty: "Normal", seats: [{ deckId: "d", heroes: ["141002"], deck: ["01040"] }], ringBearer: "141001" },
-    active: { engineVersion: ENGINE_VERSION, dataHash: 7, seed: 3, intents: [{ type: "Keep" }] },
+    active: { engineVersion: ENGINE_VERSION, dataHash: 7, world: null, seed: 3, intents: [{ type: "Keep" }] },
     result: null,
     ...overrides,
   };
@@ -44,14 +44,14 @@ function gameOf(id: string, overrides: Partial<StandaloneGame> = {}): Standalone
 
 // The list row: the open game as its version and hash.
 function listing(game: StandaloneGame) {
-  return { ...game, active: game.active && { engineVersion: game.active.engineVersion, dataHash: game.active.dataHash } };
+  return { ...game, active: game.active && { engineVersion: game.active.engineVersion, dataHash: game.active.dataHash, world: game.active.world } };
 }
 
 describe("standalone store", () => {
   it("listStandaloneMarked marks a game played on other data as needing a choice and writes nothing", () => {
     const user = openUser();
     writeStandalone(user, gameOf("game-old"), 1000);
-    writeStandalone(user, gameOf("game-new", { active: { engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, seed: 3, intents: [] } }), 2000);
+    writeStandalone(user, gameOf("game-new", { active: { engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, world: null, seed: 3, intents: [] } }), 2000);
     const listed = listStandaloneMarked(user);
     expect(listed.find((game) => game.id === "game-old")).toMatchObject({ needsChoice: true, active: { engineVersion: ENGINE_VERSION, dataHash: 7 } });
     expect(listed.find((game) => game.id === "game-new")?.needsChoice).toBeUndefined();

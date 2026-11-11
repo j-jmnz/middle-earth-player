@@ -3,7 +3,6 @@ import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import { parseSeatCount } from "../../campaign/save";
 import { markedIfStale, parseStandaloneActive, parseStandaloneLoadout, parseStandaloneResult, type ListedStandalone, type StandaloneGame } from "../../campaign/standalone";
-import { CATALOG_VERSION } from "../../catalog/version";
 import { stored } from "./campaign-store";
 import { standaloneGames } from "./user-schema";
 
@@ -25,7 +24,7 @@ function parseRow(row: typeof standaloneGames.$inferSelect): ReadStandalone {
   };
 }
 
-// The columns a list row reads. The open game is read as its engine version and data hash (what tells a stale one), never its intents.
+// The columns a list row reads. The open game is read as its engine version, data hash and world stamp (what tells a stale one without a world: the table compares the world when it opens), never its intents.
 const listed = {
   id: standaloneGames.id,
   campaignId: standaloneGames.campaignId,
@@ -35,9 +34,10 @@ const listed = {
   result: standaloneGames.result,
   engineVersion: sql<number | null>`json_extract(${standaloneGames.activeScenario}, '$.engineVersion')`,
   dataHash: sql<number | null>`json_extract(${standaloneGames.activeScenario}, '$.dataHash')`,
+  world: sql<number | null>`json_extract(${standaloneGames.activeScenario}, '$.world')`,
 };
 
-function listedRow(row: { id: string; campaignId: string; scenarioId: string; seatCount: number; loadout: unknown; result: unknown; engineVersion: number | null; dataHash: number | null }): ListedStandalone {
+function listedRow(row: { id: string; campaignId: string; scenarioId: string; seatCount: number; loadout: unknown; result: unknown; engineVersion: number | null; dataHash: number | null; world: number | null }): ListedStandalone {
   const loadout = parseStandaloneLoadout(row.loadout);
   const open = loadout && typeof row.engineVersion === "number" && typeof row.dataHash === "number";
   return {
@@ -46,7 +46,7 @@ function listedRow(row: { id: string; campaignId: string; scenarioId: string; se
     scenarioId: row.scenarioId,
     seatCount: parseSeatCount(row.seatCount),
     loadout,
-    active: open ? { engineVersion: row.engineVersion as number, dataHash: row.dataHash as number } : null,
+    active: open ? { engineVersion: row.engineVersion as number, dataHash: row.dataHash as number, world: typeof row.world === "number" ? row.world : null } : null,
     result: parseStandaloneResult(row.result),
   };
 }
@@ -59,7 +59,7 @@ export function listStandalone<TRun>(user: UserDb<TRun>): ListedStandalone[] {
 // The open games as a screen shows them: a game in progress from another engine version or against other card data is marked as
 // needing a choice (the table asks to continue or restart it). Nothing is written: the row stays as it was stored.
 export function listStandaloneMarked<TRun>(user: UserDb<TRun>): ListedStandalone[] {
-  return listStandalone(user).map((game) => markedIfStale(game, CATALOG_VERSION));
+  return listStandalone(user).map((game) => markedIfStale(game));
 }
 
 // The archived games, the last one put away first.

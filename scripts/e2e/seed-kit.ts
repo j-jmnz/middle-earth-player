@@ -7,7 +7,6 @@ import { applyResolution, emptyLog, type CampaignLog } from "../../src/campaign/
 import { contextOf, deal, resume } from "../../src/campaign/session.ts";
 import { newSave, type Save, type StoredLoadout } from "../../src/campaign/save.ts";
 import { loadWorld, logCodes, type World } from "../../src/campaign/world.ts";
-import { CATALOG_VERSION } from "../../src/catalog/version.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
 import { goldenState } from "../../test/harness/golden-state.ts";
 import type { PrintedCard } from "../../src/rules/core/printed.ts";
@@ -46,9 +45,9 @@ export function playDealt(
   answer: (state: ScenarioState, ctx: ReduceContext, memory: Set<string>) => PlayerIntent,
   stop: (state: ScenarioState, played: number) => boolean = () => false,
 ): { intents: PlayerIntent[]; state: ScenarioState } {
-  const dealt = deal(save, world, loadout, seed, CATALOG_VERSION);
+  const dealt = deal(save, world, loadout, seed);
   if (!dealt.ok) throw new Error(dealt.briefing.problems.map((problem) => problem.message).join(" "));
-  const resumed = resume(dealt.save, world, CATALOG_VERSION);
+  const resumed = resume(dealt.save, world);
   if (!resumed.ok) throw new Error(resumed.reason);
   const ctx = contextOf(world);
   let state = resumed.state;

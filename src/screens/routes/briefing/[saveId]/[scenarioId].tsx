@@ -11,7 +11,6 @@ import { logCodes, loadWorld } from "../../../../campaign/world";
 import { xpUnspentOf, type ModeCard } from "../../../../campaign/xp";
 import type { Difficulty } from "../../../../catalog/scenario-data";
 import { cards } from "../../../../catalog/schema";
-import { CATALOG_VERSION } from "../../../../catalog/version";
 import { EFFECTS } from "../../../../effects";
 import { BodyText, Label, Section, TextButton } from "../../../kit/chrome";
 import { bookletParams, campaignOf, scenarioOf } from "../../../data/campaign-data";
@@ -160,7 +159,7 @@ export default function Briefing() {
       ...(modeCard ? { modeCard } : {}),
     };
     const problem = attempt(() => {
-      const dealt = deal(save, world ?? input.world, stored, dealSeed(), CATALOG_VERSION, Date.now());
+      const dealt = deal(save, world ?? input.world, stored, dealSeed(), Date.now());
       if (!dealt.ok) return dealt.briefing.problems.map((problem) => problem.message).join(" ");
       // The open scenario this deal drops may be over (lost or won, not yet closed): it keeps its run.
       if (save.active) recordUnclosedRun(catalog, user, save.id);

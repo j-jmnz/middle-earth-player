@@ -30,7 +30,7 @@ import {
   standaloneStatus,
   type StandaloneLoadout,
 } from "./standalone.ts";
-import { loadWorld, type World } from "./world.ts";
+import { loadWorld, worldHash, type World } from "./world.ts";
 
 // Standalone play (mec109.campaign-mode): the saga rules run and the campaign's do not. No campaign card Setup, no
 // Resolution, no boon or burden (rr.campaign-cards, rr.boons, rr.burdens); a win is scored (ltp.scoring).
@@ -156,7 +156,7 @@ describe("standalone briefing", () => {
 
 describe("a standalone game", () => {
   function dealt() {
-    const result = dealStandalone("game-1", worldOf(PAST), 1, loadoutOf(), SEED, CATALOG_VERSION);
+    const result = dealStandalone("game-1", worldOf(PAST), 1, loadoutOf(), SEED);
     if (!result.ok) throw new Error(result.briefing.problems.map((problem) => problem.message).join(" "));
     return result.game;
   }
@@ -164,18 +164,18 @@ describe("a standalone game", () => {
   it("deals a game that is playing, with no intents and no result", () => {
     const game = dealt();
     expect(game).toMatchObject({ id: "game-1", campaignId: "fellowship-of-the-ring", scenarioId: PAST, seatCount: 1, result: null });
-    expect(game.active).toEqual({ engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, seed: SEED, intents: [] });
+    expect(game.active).toEqual({ engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, world: worldHash(worldOf(PAST)), seed: SEED, intents: [] });
     expect(standaloneStatus(game)).toBe("playing");
   });
 
   it("refuses to deal what the briefing refuses", () => {
-    expect(dealStandalone("game-2", worldOf(PAST), 1, loadoutOf({ ringBearer: null }), SEED, CATALOG_VERSION).ok).toBe(false);
+    expect(dealStandalone("game-2", worldOf(PAST), 1, loadoutOf({ ringBearer: null }), SEED).ok).toBe(false);
   });
 
   it("replays the recorded intents to the same state", () => {
     const world = worldOf(PAST);
     const game = record(dealt(), { type: "Keep" });
-    const resumed = resumeStandalone(game, world, CATALOG_VERSION);
+    const resumed = resumeStandalone(game, world);
     if (!resumed.ok) throw new Error(resumed.reason);
     const direct = expectOk(reduce(opening(PAST), { type: "Keep" }, contextOf(world))).state;
     expect(JSON.stringify(resumed.state)).toBe(JSON.stringify(direct));
@@ -183,13 +183,19 @@ describe("a standalone game", () => {
 
   it("is not replayed against another engine version or other data, is marked rather than dropped, and a drop keeps the loadout", () => {
     const game = dealt();
-    expect(markedIfStale(game, CATALOG_VERSION)).toBe(game);
-    const marked = markedIfStale(game, CATALOG_VERSION + 1);
-    expect(marked.active).toEqual(game.active);
+    expect(markedIfStale(game)).toBe(game);
+    // A list row has no world: a game with a world stamp is marked only for the engine; the table compares the world when it opens.
+    const otherWorld = { ...game, active: { ...game.active!, world: worldHash(worldOf(PAST)) + 1 } };
+    expect(markedIfStale(otherWorld)).toBe(otherWorld);
+    expect(resumeStandalone(otherWorld, worldOf(PAST))).toEqual({ ok: false, reason: "dataHash" });
+    // A game from before the world stamp is current on the catalog version, and marked on another.
+    const legacy = { ...game, active: { ...game.active!, world: null } };
+    expect(markedIfStale(legacy)).toBe(legacy);
+    const marked = markedIfStale({ ...legacy, active: { ...legacy.active, dataHash: CATALOG_VERSION + 1 } });
     expect(standaloneStatus(marked)).toBe("needsChoice");
-    expect(resumeStandalone(game, worldOf(PAST), CATALOG_VERSION + 1)).toEqual({ ok: false, reason: "dataHash" });
     const old = { ...game, active: game.active ? { ...game.active, engineVersion: ENGINE_VERSION - 1 } : null };
-    expect(resumeStandalone(old, worldOf(PAST), CATALOG_VERSION)).toEqual({ ok: false, reason: "engineVersion" });
+    expect(resumeStandalone(old, worldOf(PAST))).toEqual({ ok: false, reason: "engineVersion" });
+    expect(standaloneStatus(markedIfStale(old))).toBe("needsChoice");
     const dropped = dropStandalone(game);
     expect(standaloneStatus(dropped)).toBe("dropped");
     expect(dropped.loadout).toEqual(game.loadout);
@@ -199,19 +205,19 @@ describe("a standalone game", () => {
     const world = worldOf(PAST);
     const bogus = { type: "NoSuchIntent" } as never;
     const old = record(record(record(dealt(), { type: "Keep" }), bogus), { type: "Keep" });
-    const stale = { ...old, active: { ...old.active!, engineVersion: ENGINE_VERSION - 1, dataHash: CATALOG_VERSION + 1, startedAt: 5, activeMs: 7 } };
-    const continued = continueStandalone(stale, world, CATALOG_VERSION);
+    const stale = { ...old, active: { ...old.active!, engineVersion: ENGINE_VERSION - 1, world: 1, startedAt: 5, activeMs: 7 } };
+    const continued = continueStandalone(stale, world);
     if (!continued.ok) throw new Error(continued.reason);
     expect(continued).toMatchObject({ accepted: 1, total: 3 });
-    expect(continued.holder.active).toEqual({ engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, seed: SEED, intents: [{ type: "Keep" }], startedAt: 5, activeMs: 7 });
-    expect(resumeStandalone(continued.holder, world, CATALOG_VERSION).ok).toBe(true);
-    expect(continueStandalone({ ...stale, loadout: null }, world, CATALOG_VERSION)).toEqual({ ok: false, reason: "none" });
+    expect(continued.holder.active).toEqual({ engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, world: worldHash(world), seed: SEED, intents: [{ type: "Keep" }], startedAt: 5, activeMs: 7 });
+    expect(resumeStandalone(continued.holder, world).ok).toBe(true);
+    expect(continueStandalone({ ...stale, loadout: null }, world)).toEqual({ ok: false, reason: "none" });
 
-    const restarted = restartStandalone(stale, world, 99, CATALOG_VERSION);
+    const restarted = restartStandalone(stale, world, 99);
     if (!restarted.ok) throw new Error("not dealt");
     expect(restarted.game).toMatchObject({ id: stale.id, loadout: stale.loadout, result: null });
-    expect(restarted.game.active).toEqual({ engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, seed: 99, intents: [] });
-    expect(restartStandalone({ ...stale, loadout: null }, world, 99, CATALOG_VERSION)).toEqual({ ok: false, briefing: null });
+    expect(restarted.game.active).toEqual({ engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, world: worldHash(world), seed: 99, intents: [] });
+    expect(restartStandalone({ ...stale, loadout: null }, world, 99)).toEqual({ ok: false, briefing: null });
   });
 
   it("records a loss with its reason and the rounds played", () => {

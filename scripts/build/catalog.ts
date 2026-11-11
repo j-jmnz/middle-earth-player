@@ -9,7 +9,8 @@ import { parseRingsDbPacks, type RingsDbPack } from "../../src/catalog/boundary.
 import type { Card } from "../../src/catalog/card-facts.ts";
 import { campaignIndexSchema } from "../../src/catalog/scenario-data.ts";
 import { campaigns, cards, catalogTables, meta, packs } from "../../src/catalog/schema.ts";
-import { contentVersion, writeCatalogVersion } from "./catalog-version.ts";
+import { contentVersion } from "../../src/catalog/content-hash.ts";
+import { writeCatalogVersion } from "./catalog-version.ts";
 import { catalogStamp } from "../../src/catalog/version.ts";
 import { bytes, createLog, runScript } from "../log.ts";
 import { PACK_CAMPAIGN, REPRINT_PACKS } from "../data/campaign-defs.ts";

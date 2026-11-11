@@ -29,7 +29,7 @@ const node = { id: "flight-to-the-ford", number: 3, name: "Flight to the Ford", 
 
 describe("history cards", () => {
   it("leads a game to its table, its outcome, a new deal, or nowhere", () => {
-    expect(gameDestination(game({ active: { engineVersion: 6, dataHash: 1 } }), false)).toMatchObject({ to: "table", word: "Resume" });
+    expect(gameDestination(game({ active: { engineVersion: 6, dataHash: 1, world: null } }), false)).toMatchObject({ to: "table", word: "Resume" });
     expect(gameDestination(game({ result: { outcome: "lost", reason: null, rounds: 3 } }), true)).toMatchObject({ to: "outcome", word: "See the outcome" });
     expect(gameDestination(game(), false)).toMatchObject({ to: "again", word: "Play again" });
     expect(gameDestination(game({ loadout: null }), false)).toBeNull();

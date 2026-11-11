@@ -37,7 +37,7 @@ describe("campaign store", () => {
     const save = {
       ...newSave("save-w", "fellowship-of-the-ring", 1),
       log: { ...emptyLog(1), notes: "kept" },
-      active: { engineVersion: ENGINE_VERSION, dataHash: 7, seed: 3, intents: [{ type: "Keep" as const }] },
+      active: { engineVersion: ENGINE_VERSION, dataHash: 7, world: null, seed: 3, intents: [{ type: "Keep" as const }] },
       loadout: { scenarioId: "a-knife-in-the-dark", difficulty: "Easy" as const, seats: [{ deckId: "d", heroes: ["141002"], deck: ["01040"] }], ringBearer: "141001", choices: [], acceptPenalty: false },
     };
     writeSave(user, save, 1000);
@@ -58,7 +58,7 @@ describe("campaign store", () => {
     const user = openUser();
     const save = {
       ...newSave("save-l1", "fellowship-of-the-ring", 1),
-      active: { engineVersion: ENGINE_VERSION, dataHash: 7, seed: 3, intents: [{ type: "Keep" as const }] },
+      active: { engineVersion: ENGINE_VERSION, dataHash: 7, world: null, seed: 3, intents: [{ type: "Keep" as const }] },
       loadout: { scenarioId: "a-knife-in-the-dark", difficulty: "Easy" as const, seats: [{ deckId: "d", heroes: ["141002"], deck: ["01040"] }], ringBearer: "141001", choices: [], acceptPenalty: false },
     };
     writeSave(user, save);
@@ -81,7 +81,7 @@ describe("campaign store", () => {
     const save = {
       ...newSave("save-a", "fellowship-of-the-ring", 1),
       log: { ...emptyLog(1), notes: "Frodo's burden", completed: ["a-shadow-of-the-past"], earned: { "a-shadow-of-the-past": ["141078"] } },
-      active: { engineVersion: ENGINE_VERSION, dataHash: 7, seed: 3, intents: [{ type: "Keep" as const }, { type: "Pass" as const }] },
+      active: { engineVersion: ENGINE_VERSION, dataHash: 7, world: null, seed: 3, intents: [{ type: "Keep" as const }, { type: "Pass" as const }] },
       loadout: { scenarioId: "a-knife-in-the-dark", difficulty: "Easy" as const, seats: [{ deckId: "d", heroes: ["141002"], deck: ["01040"] }], ringBearer: "141001", choices: [], acceptPenalty: false },
     };
     writeSave(user, save);
@@ -111,7 +111,7 @@ describe("campaign store", () => {
 
   it("a dropped scenario written back leaves the log, and no deck or image row is touched", () => {
     const user = openUser();
-    const active = { engineVersion: ENGINE_VERSION - 1, dataHash: 1, seed: 1, intents: [] };
+    const active = { engineVersion: ENGINE_VERSION - 1, dataHash: 1, world: null, seed: 1, intents: [] };
     const loadout = { scenarioId: "a-shadow-of-the-past", difficulty: "Normal" as const, seats: [], ringBearer: null, choices: [], acceptPenalty: false };
     const save = { ...newSave("save-c", "fellowship-of-the-ring", 1), log: { ...emptyLog(1), notes: "kept" }, active, loadout };
     writeSave(user, save);
@@ -121,7 +121,7 @@ describe("campaign store", () => {
 
   it("archives a save out of the open list and restores it whole, and a later write keeps it archived", () => {
     const user = openUser();
-    const active = { engineVersion: ENGINE_VERSION, dataHash: 7, seed: 3, intents: [{ type: "Keep" as const }] };
+    const active = { engineVersion: ENGINE_VERSION, dataHash: 7, world: null, seed: 3, intents: [{ type: "Keep" as const }] };
     const loadout = { scenarioId: "a-shadow-of-the-past", difficulty: "Normal" as const, seats: [], ringBearer: null, choices: [], acceptPenalty: false };
     const kept = { ...newSave("save-d", "fellowship-of-the-ring", 1), log: { ...emptyLog(1), notes: "kept" }, active, loadout };
     const other = createSave(user, "fellowship-of-the-ring", 2, { now: 2000 });

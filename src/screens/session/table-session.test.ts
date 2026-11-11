@@ -6,7 +6,7 @@ import migrations from "../../../drizzle/migrations";
 import { temporaryCatalog } from "../../../test/harness/temp-catalog.ts";
 import { fixtureSave, hasFixture, type FixtureName } from "../../campaign/fixtures.ts";
 import { CATALOG_VERSION } from "../../catalog/version.ts";
-import { readSave, savedAt, writeSave } from "../data/campaign-store.ts";
+import { readSave, savedAt, writeActive, writeSave } from "../data/campaign-store.ts";
 import { ENGINE_VERSION } from "../../campaign/replay.ts";
 import { continueTable, openTable, recordUnclosedRun, restartTable, sessionStore } from "./table-open.ts";
 import { flushRuns } from "../data/pending-runs.ts";
@@ -37,6 +37,33 @@ describe("opening the table", () => {
     expect(savedAt(user).get("s1")).toBe(before);
   });
 
+  it("a current game saved before the world stamp opens with no message and hands back the stamped save to write once; the row is not written by the open", () => {
+    const { user } = openUser();
+    const save = fixtureSave(name, "s1", CATALOG_VERSION);
+    expect(save.active!.world).toBeNull();
+    writeSave(user, save);
+    const opened = openTable(catalog, user, "s1");
+    if (!opened.ok) throw new Error(opened.reason);
+    expect(readSave(user, "s1")!.active!.world).toBeNull();
+    expect(typeof opened.stamp?.active?.world).toBe("number");
+    expect(opened.save).toBe(opened.stamp);
+    writeActive(user, opened.stamp!);
+    const stamped = readSave(user, "s1")!;
+    expect(stamped.active).toEqual({ ...save.active, world: opened.stamp!.active!.world });
+    // Once stamped, the next open is current with nothing to write, and a stamp of another world asks for a choice.
+    expect(openTable(catalog, user, "s1")).toMatchObject({ ok: true, stamp: null });
+    writeActive(user, { id: "s1", active: { ...stamped.active!, world: stamped.active!.world! + 1 } });
+    expect(openTable(catalog, user, "s1")).toMatchObject({ ok: false, reason: "stale", write: null });
+  });
+
+  it("a game from before the world stamp that was dealt on other card data asks for a choice and is not written", () => {
+    const { user } = openUser();
+    const save = fixtureSave(name, "s1", CATALOG_VERSION + 1);
+    writeSave(user, save);
+    expect(openTable(catalog, user, "s1")).toMatchObject({ ok: false, reason: "stale", write: null });
+    expect(readSave(user, "s1")).toEqual(save);
+  });
+
   it("Continue keeps the accepted intents, restamped, and the table opens on them", () => {
     const { user } = openUser();
     const save = fixtureSave(name, "s1", CATALOG_VERSION);
@@ -45,6 +72,7 @@ describe("opening the table", () => {
     expect(continueTable(catalog, user, "s1")).toEqual({ ok: true });
     const kept = readSave(user, "s1")!;
     expect(kept.active).toMatchObject({ engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, seed: save.active!.seed });
+    expect(typeof kept.active!.world).toBe("number");
     expect(kept.active!.intents).toEqual(save.active!.intents);
     expect(kept.active!.intents.length).toBe(total);
     expect(kept.log).toEqual(save.log);
@@ -58,6 +86,7 @@ describe("opening the table", () => {
     expect(restartTable(catalog, user, "s1")).toEqual({ ok: true });
     const restarted = readSave(user, "s1")!;
     expect(restarted.active).toMatchObject({ engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, intents: [] });
+    expect(typeof restarted.active!.world).toBe("number");
     expect(restarted.loadout).toEqual(save.loadout);
     expect(restarted.log).toEqual(save.log);
     expect(openTable(catalog, user, "s1")).toMatchObject({ ok: true });
@@ -68,7 +97,11 @@ describe("opening the table", () => {
     writeSave(user, fixtureSave(name, "s1", CATALOG_VERSION));
     const first = openTable(catalog, user, "s1");
     expect(first.ok).toBe(true);
-    expect(openTable(catalog, user, "s1")).toBe(first);
+    // The hook stamps a save from before the world stamp once; the stamped save is the one the cache holds.
+    if (first.ok && first.stamp) writeActive(user, first.stamp);
+    const second = openTable(catalog, user, "s1");
+    expect(second.ok && second.save).toEqual(first.ok && first.save);
+    expect(openTable(catalog, user, "s1")).toBe(second);
   });
 
   it("does not hand it back once the save changed under it (a new deal on the same id, an intent more)", () => {

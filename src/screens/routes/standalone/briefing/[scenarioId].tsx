@@ -9,7 +9,6 @@ import { dealStandalone, standaloneBriefing, type StandaloneInput, type Standalo
 import { isNightmarePlayable } from "../../../../campaign/playable";
 import { loadWorld } from "../../../../campaign/world";
 import type { Difficulty } from "../../../../catalog/scenario-data";
-import { CATALOG_VERSION } from "../../../../catalog/version";
 import { EFFECTS } from "../../../../effects";
 import { BriefingScreen, DealBar, DifficultyPicker, EncounterDetails, expand, ScenarioBanner, useBriefingDecks } from "../../../briefing/parts";
 import { SeatPicker } from "../../../briefing/seat-picker";
@@ -98,7 +97,7 @@ export default function StandaloneBriefing() {
       ringBearer,
     };
     try {
-      const dealt = dealStandalone(newStandaloneId(), ready, seatCount, loadout, dealSeed(), CATALOG_VERSION);
+      const dealt = dealStandalone(newStandaloneId(), ready, seatCount, loadout, dealSeed());
       if (!dealt.ok) {
         setDealError(dealt.briefing.problems.map((problem) => problem.message).join(" "));
         return;

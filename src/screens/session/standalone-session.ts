@@ -5,12 +5,16 @@ import { useEffect, useMemo } from "react";
 import { useOpenedAfterPaint } from "../nav/after-paint";
 import { useDatabases } from "../data/databases";
 import { cachedStandalone, openStandalone, type StandaloneSession } from "./standalone-open";
-import { writeStandalone } from "../data/standalone-store";
+import { writeStandalone, writeStandaloneActive } from "../data/standalone-store";
 
 export { continueStandaloneGame, openStandalone, restartStandaloneGame, standaloneCodes, standaloneStore, type StandaloneSession, type StandaloneTable } from "./standalone-open";
 
+// The one write an open makes: a drop (the game does not read), or the world stamp of a current game from before it existed.
 function writeDropped<TUser>(user: BaseSQLiteDatabase<"sync", TUser>, session: StandaloneSession | null): void {
-  if (session && !session.ok && session.write) writeStandalone(user, session.write);
+  if (!session) return;
+  if (session.ok) {
+    if (session.stamp) writeStandaloneActive(user, session.stamp);
+  } else if (session.write) writeStandalone(user, session.write);
 }
 
 /** The open game, opened once per id, during the render (the outcome screen: the table just left it cached). A drop it decided on is written after the render. */

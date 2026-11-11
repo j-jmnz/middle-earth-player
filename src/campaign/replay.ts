@@ -2,6 +2,7 @@ import type { EngineStep, PlayerIntent, ReduceContext, ScenarioState } from "../
 import { reduce } from "../rules/engine/reduce.ts";
 import { startScenario, type StartScenario } from "../rules/setup/setup.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
+import { CATALOG_VERSION } from "../catalog/version.ts";
 
 export { ENGINE_VERSION };
 
@@ -10,8 +11,11 @@ export { ENGINE_VERSION };
 // from the rules. brief: Save.
 export type ActiveScenario = {
   engineVersion: number;
-  // The catalog version (a hash of data/) the intents were played against.
+  // The catalog version (a hash of data/) the intents were played against. Kept for a save that has no `world`.
   dataHash: number;
+  // The worldHash (world.ts) of the cards, scenario and records the game reads, which the table compares on open. Null for a save
+  // dealt before it existed: it is current while its dataHash is the build's catalog version, and is stamped on open.
+  world: number | null;
   seed: number;
   intents: PlayerIntent[];
   // When it was dealt (ms since the epoch), for the run history. A scenario dealt before phase 28b has none.
@@ -20,8 +24,8 @@ export type ActiveScenario = {
   activeMs?: number;
 };
 
-export function beginActive(start: StartScenario, dataHash: number, startedAt?: number): ActiveScenario {
-  return { engineVersion: ENGINE_VERSION, dataHash, seed: start.seed, intents: [], ...(startedAt == null ? {} : { startedAt }) };
+export function beginActive(start: StartScenario, world: number, startedAt?: number): ActiveScenario {
+  return { engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, world, seed: start.seed, intents: [], ...(startedAt == null ? {} : { startedAt }) };
 }
 
 export function recordIntent(active: ActiveScenario, intent: PlayerIntent): ActiveScenario {
@@ -46,12 +50,25 @@ export type Replayed =
 // The table uses it to rebuild the log of the round it reopens on and what Undo can take back.
 export type ReplayObserver = (before: ScenarioState, after: ScenarioState, steps: readonly EngineStep[], intent: PlayerIntent) => void;
 
+// Why an open game is not replayed as it stands: another engine version, or other data. `world` is the worldHash of the world the
+// game opens on, or null where none is built (a list row): then only a save with no `world` is compared, on the catalog version.
+export function staleReason(active: Pick<ActiveScenario, "engineVersion" | "dataHash" | "world">, world: number | null): "engineVersion" | "dataHash" | null {
+  if (active.engineVersion !== ENGINE_VERSION) return "engineVersion";
+  if (active.world == null) return active.dataHash === CATALOG_VERSION ? null : "dataHash";
+  return world != null && world !== active.world ? "dataHash" : null;
+}
+
+// The game stamped with the world it is current on: a save from before `world` existed, on its first open.
+export function stampedWorld(active: ActiveScenario, world: number): ActiveScenario {
+  return active.world === world ? active : { ...active, world };
+}
+
 // Replays a save. A save from another engine version or another data hash is not replayed here: the caller asks the player to
 // continue it or restart it (session.ts, continueFrom and the restarts); the log, the decks and the image index are never touched.
 // An intent the reducer now refuses fails the replay the same way.
-export function replay(active: ActiveScenario, start: StartScenario, dataHash: number, ctx: ReduceContext, observe?: ReplayObserver): Replayed {
-  if (active.engineVersion !== ENGINE_VERSION) return { ok: false, reason: "engineVersion" };
-  if (active.dataHash !== dataHash) return { ok: false, reason: "dataHash" };
+export function replay(active: ActiveScenario, start: StartScenario, world: number, ctx: ReduceContext, observe?: ReplayObserver): Replayed {
+  const stale = staleReason(active, world);
+  if (stale) return { ok: false, reason: stale };
   if (active.seed !== start.seed) return { ok: false, reason: "seed" };
   let state = startScenario(start, ctx);
   for (const intent of active.intents) {
@@ -79,8 +96,8 @@ export function replayAccepted(active: Pick<ActiveScenario, "intents">, start: S
   return { state, accepted };
 }
 
-// The open scenario as Continue keeps it: the first `accepted` intents, stamped with the engine version and the data hash it now
+// The open scenario as Continue keeps it: the first `accepted` intents, stamped with the engine version and the world it now
 // plays on. The seed, when it was dealt and the foreground time stay.
-export function restamped(active: ActiveScenario, accepted: number, dataHash: number): ActiveScenario {
-  return { ...active, engineVersion: ENGINE_VERSION, dataHash, intents: active.intents.slice(0, accepted) };
+export function restamped(active: ActiveScenario, accepted: number, world: number): ActiveScenario {
+  return { ...active, engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, world, intents: active.intents.slice(0, accepted) };
 }

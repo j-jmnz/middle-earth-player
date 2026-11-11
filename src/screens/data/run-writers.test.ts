@@ -41,7 +41,7 @@ function openSave(seed: number, startedAt?: number): Save {
   return {
     ...newSave("save-a", "fellowship-of-the-ring", 1),
     loadout: { scenarioId: scenario.id, difficulty: "Normal", seats: [{ deckId: "d", heroes: ["scout"], deck: [] }], ringBearer: RING_BEARER, choices: [], acceptPenalty: false },
-    active: { engineVersion: ENGINE_VERSION, dataHash: 1, seed, intents: [], ...(startedAt == null ? {} : { startedAt }) },
+    active: { engineVersion: ENGINE_VERSION, dataHash: 1, world: null, seed, intents: [], ...(startedAt == null ? {} : { startedAt }) },
   };
 }
 

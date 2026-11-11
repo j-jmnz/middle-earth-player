@@ -105,9 +105,9 @@ const stealth = starter("stealth-and-steadfastness");
 function opened(seatCount: 1 | 2, loadout: StoredLoadout, seed: number): { state: ScenarioState; ctx: ReduceContext } {
   const codes = [FRODO, ...loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck])];
   const world = loadWorld(catalog, campaign, scenario, EFFECTS, codes);
-  const dealt = deal(newSave("fixture", campaign.id, seatCount), world, loadout, seed, CATALOG_VERSION);
+  const dealt = deal(newSave("fixture", campaign.id, seatCount), world, loadout, seed);
   if (!dealt.ok) throw new Error(dealt.briefing.problems.map((problem) => problem.message).join(" "));
-  const resumed = resume(dealt.save, world, CATALOG_VERSION);
+  const resumed = resume(dealt.save, world);
   if (!resumed.ok) throw new Error(resumed.reason);
   return { state: resumed.state, ctx: contextOf(world) };
 }
@@ -290,8 +290,8 @@ const PAST_CHOICES = ["141078", "141077"];
 function logOfPastResolution(won: { seed: number; loadout: StoredLoadout; intents: PlayerIntent[] }): { log: CampaignLog; choices: string[] } {
   const codes = [FRODO, ...won.loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck])];
   const world = loadWorld(catalog, campaign, scenario, EFFECTS, codes);
-  const save: Save = { ...newSave("fixture", campaign.id, 2), active: { engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, seed: won.seed, intents: [...won.intents] }, loadout: won.loadout };
-  const resumed = resume(save, world, CATALOG_VERSION);
+  const save: Save = { ...newSave("fixture", campaign.id, 2), active: { engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, world: null, seed: won.seed, intents: [...won.intents] }, loadout: won.loadout };
+  const resumed = resume(save, world);
   if (!resumed.ok) throw new Error(resumed.reason);
   let state = resumed.state;
   const choices: string[] = [];
@@ -337,9 +337,9 @@ function playKnifeLoss(log: CampaignLog): { seed: number; loadout: StoredLoadout
   const codes = [FRODO, ...loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck]), ...logCodes(log)];
   const world = loadWorld(catalog, campaign, knife, EFFECTS, codes);
   const seed = 1;
-  const dealt = deal({ ...newSave("fixture", campaign.id, 2), log }, world, loadout, seed, CATALOG_VERSION);
+  const dealt = deal({ ...newSave("fixture", campaign.id, 2), log }, world, loadout, seed);
   if (!dealt.ok) throw new Error(dealt.briefing.problems.map((problem) => problem.message).join(" "));
-  const resumed = resume(dealt.save, world, CATALOG_VERSION);
+  const resumed = resume(dealt.save, world);
   if (!resumed.ok) throw new Error(resumed.reason);
   const ctx = contextOf(world);
   let state = resumed.state;

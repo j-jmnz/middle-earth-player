@@ -4,6 +4,7 @@ import { and, eq, inArray } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import { collectionVerbs, type Effect } from "../catalog/boundary.ts";
+import { contentVersion } from "../catalog/content-hash.ts";
 import type { DeckSaveCard } from "../catalog/deck-save.ts";
 import { cards } from "../catalog/schema.ts";
 import { campaignGameCodes, recordInstructions, scenarioCards, type CampaignData, type ScenarioData } from "../catalog/scenario-data.ts";
@@ -26,6 +27,23 @@ export type World = {
   // How many copies of each card one collection holds (the catalog's quantity), which caps the encounter cards the Campaign Pool tallies (emce.campaign-pool-encounter).
   copies?: ReadonlyMap<string, number>;
 };
+
+const sortedEntries = <V>(map: ReadonlyMap<string, V> | undefined): [string, V][] => (map ? [...map].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)) : []);
+
+const HASHES = new WeakMap<World, number>();
+
+// What a replay of a game reads, as a number: the printed rows of the codes the world holds (the scenario's, the loadout's and the
+// log's: loadWorld loaded exactly worldCodes plus those), the scenario and the campaign data, and the effect records of those
+// codes. A save stamps it (ActiveScenario.world) and the table compares it on open, so a card, a scenario or a record that is not
+// in this game never moves it. The codes are sorted, so it does not depend on the order a Map was filled in. Computed once for a world.
+export function worldHash(world: World): number {
+  const known = HASHES.get(world);
+  if (known != null) return known;
+  const effects = world.effects.filter((effect) => world.cards.has(effect.cardCode));
+  const hash = contentVersion([world.campaign, world.scenario, sortedEntries(world.cards), sortedEntries(world.sets), sortedEntries(world.deckFacts), sortedEntries(world.copies), effects]);
+  HASHES.set(world, hash);
+  return hash;
+}
 
 function instructionCodes(effects: readonly Effect[], card: string): string[] {
   const codes: string[] = [];
