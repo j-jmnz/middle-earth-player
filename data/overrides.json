@@ -909,6 +909,30 @@
       },
       "reason": "Gollum prints \"Immune to non-Fellowship player card effects\": a card of the Fellowship sphere may still affect him. Hall of Beorn lists an Immune keyword, which the engine reads as immunity to every player card effect, so the keyword is turned off and the record's flag immuneToNonFellowship holds the real rule.",
       "source": "scan 144075.A (data/printed/the-two-towers.json); MEC112 booklet, Gollum and Sméagol (mec112.gollum-smeagol)"
+    },
+    {
+      "match": {
+        "code": "145017"
+      },
+      "set": {
+        "keywords": {
+          "immune": true
+        }
+      },
+      "reason": "The Stone of Erech prints \"Immune to player card effects.\" as its first line; Hall of Beorn lists no keyword for it, so the engine would read no immunity.",
+      "source": "scan 145017.A (data/printed/the-return-of-the-king.json)"
+    },
+    {
+      "match": {
+        "code": "145067"
+      },
+      "set": {
+        "keywords": {
+          "immune": true
+        }
+      },
+      "reason": "Army of the Dead prints \"Phantom. Immune to player card effects.\"; Hall of Beorn lists only Phantom, so the engine would read no immunity.",
+      "source": "scan 145067.A (data/printed/the-return-of-the-king.json)"
     }
   ],
   "scenarioPiles": [

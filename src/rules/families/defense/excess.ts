@@ -1,4 +1,4 @@
-// Rules: rr.damage, rr.hit-points, rr.step-6-4-3 (data/rules/entries.json); ledger lines 01082:A:1, 41030:A:2, 19080:A:3, 19083:B:1.
+// Rules: rr.damage, rr.hit-points, rr.step-6-4-3, mec113.phantom (data/rules/entries.json); ledger lines 01082:A:1, 41030:A:2, 19080:A:3, 19083:B:1.
 //
 // Hill Troll's excess combat damage. An enemy that holds `excessToThreat` (a constant on itself) sends the damage its attack deals
 // beyond the remaining hit points of the character it damages to its controller's threat: "Excess combat damage dealt by Hill Troll
@@ -17,6 +17,7 @@ import { flagged, inPlay } from "../../core/state.ts";
 import { readsAmount, readsCondition } from "../../interpret/amounts.ts";
 import { gameReads } from "../../core/game-reads.ts";
 import { removeQuestProgress } from "../caves/progress.ts";
+import { cancelPhantomDamage } from "../grey-company/phantom.ts";
 import { damageGoesTo } from "./damage.ts";
 
 // The damage this attack has dealt so far, kept on the attack only while a shadow effect waits to read it after the attack ("Raise your threat by 1
@@ -54,6 +55,9 @@ export function combatDamage(
   steps: EngineStep[],
   cause = ruleCause("rr.step-6-4-3"),
 ): ScenarioState {
+  // Phantom (mec113.phantom): the damage is canceled and the defending player raises their threat by as much instead, before the character is dealt any.
+  const phantom = cancelPhantomDamage(state, enemyId, raw, ctx, steps);
+  if (phantom) return phantom;
   const logged = steps.length;
   const targetId = damageGoesTo(state, assigned);
   const damaged = placeDamage(state, assigned, raw, ctx.cards, steps, "combat", cause);
