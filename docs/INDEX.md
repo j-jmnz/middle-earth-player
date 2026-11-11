@@ -10,7 +10,7 @@ Read whole.
 
 - `CLAUDE.md` — Claude Code (~2.6K tok)
 - `.claude/rules/authority.md` — Authority (~470 tok)
-- `.claude/rules/code-standards.md` — Code standards (~2.3K tok)
+- `.claude/rules/code-standards.md` — Code standards (~2.4K tok)
 - `.claude/rules/commit-standards.md` — Commit standards (~890 tok)
 - `.claude/rules/docs-standards.md` — Docs standards (~1.1K tok)
 - `.claude/rules/release-standards.md` — Release standards (~1.0K tok)
@@ -24,7 +24,7 @@ Each agent reads its own file.
 - `.claude/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~2.0K tok)
 - `.claude/agents/reading-judge.md` — Reads each effect record, rendered as English, against the printed ledger line it implements and says ok, wrong, ambiguous or render-gap (~960 tok)
 - `.claude/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~2.4K tok)
-- `.claude/agents/scenario-author.md` — Builds one scenario's engine half, one task per run (Read, Build or Finish), each run fresh from the hand-off note (~1.1K tok)
+- `.claude/agents/scenario-author.md` — Builds one scenario's engine half, one task per run (Read, Build or Finish), each run fresh from the hand-off note (~1.2K tok)
 - `.claude/agents/ux.md` — Reviews the current screens for phone UX and visual design, and changes the design system when asked (~1.3K tok)
 
 ## Product, code and design
@@ -51,12 +51,12 @@ Read the sections your task touches.
     - 141–150 In a browser (~100)
     - 151–172 On a phone (~270)
     - 173–176 Maestro (~130)
-  - 177–208 Commands (~880)
+  - 177–208 Commands (~890)
   - 209–212 Contributing (~80)
   - 213–222 Documentation (~170)
   - 223–240 Attribution (~470)
   - 241–244 License (~50)
-- `docs/architecture.md` — Architecture (~21.6K tok)
+- `docs/architecture.md` — Architecture (~21.7K tok)
   - 7–41 Stack (~1.1K)
   - 42–77 Processes (~680)
   - 78–160 Modules (~2.3K) ← 3
@@ -269,7 +269,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/git`: .claude/rules/commit-standards.md, Subject line (2)
 - `scripts/release`: .claude/rules/release-standards.md, Versioning (3); .claude/rules/release-standards.md, Release notes (2); releasing.md, Jobs (2); .claude/rules/release-standards.md, Branches (1)
-- `scripts/tools`: handover/agent-brief.md, Scenario procedure (4); .claude/rules/code-standards.md, Test cost (1); architecture.md, Modules (1); design-system-table.md, Choice tray (1)
+- `scripts/tools`: handover/agent-brief.md, Scenario procedure (4); .claude/rules/code-standards.md, Test cost (2); architecture.md, Modules (1); design-system-table.md, Choice tray (1)
 - `src/campaign`: brief.md, The Two Towers (6); brief.md, Nightmare (4); handover/agent-brief.md, Scenario procedure (3); architecture.md, Tests (2); brief.md, Ered Mithrin (2)
 - `src/catalog`: architecture.md, Mechanic families (2); brief.md, Nightmare (2); brief.md, The Two Towers (2); brief.md, A Knife in the Dark (1); brief.md, Dream-chaser (1); brief.md, Ered Mithrin (1); brief.md, Flight to the Ford burden deck and life (1); brief.md, Three layers (1)
 - `src/effects`: brief.md, The Two Towers (2); brief.md, Breaking of the Fellowship, stage 2B (1); brief.md, Nightmare (1)

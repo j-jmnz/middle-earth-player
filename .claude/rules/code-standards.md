@@ -56,7 +56,7 @@ Whole games are what the suite spends its time on, so a scenario adds its games 
 - A test of one card, one rule or one choice builds its moment with the scene kit (`tableFromLayout`, a spec row in `card-spec.ts`) instead of playing from the Setup to it.
 - The goldens are a few wins (true solo and two-handed, a variant that changes the Resolution) and a loss for each way to lose, not every seed or option: at most 3000 intents in all for a scenario.
 - A new sweep over every card or every scenario is split into shards that run side by side (`scripts/card-smoke/suite.ts`) and listed in `slowFiles` (`vitest.config.mts`).
-- An added test file that plays games reports its time in the commit body, measured with `pnpm vitest run <file>`.
+- A scenario's own tests (the tests part of `pnpm test:scenario`) stay within the test budget that command holds them to on a full run (`scripts/tools/test-scenario.ts`, Test budget). An added test file that plays games reports its time in the commit body, measured with `pnpm vitest run <file>`.
 
 ## Checking a change
 

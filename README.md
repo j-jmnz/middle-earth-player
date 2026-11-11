@@ -181,7 +181,7 @@ Flows are in `.maestro/scenarios/<scenario-id>/` and `.maestro/features/`. Run `
 | `pnpm test` | All Vitest tests. |
 | `pnpm test:fast` | All but the slow files (`slowFiles` in `vitest.config.mts`). |
 | `pnpm test:changed` | Tests that import a file changed since the last commit. |
-| `pnpm test:scenario <scenario-id>` | One scenario's goldens, effect coverage, file-size, test-cost, rule-id and wording checks, the card smoke on its player cards and the encounter smoke; also the family and manifest tests if pool, family or manifest files changed since the merge base with `origin/main`. `--list` prints the selection; `--quick` skips the goldens and the reader check. |
+| `pnpm test:scenario <scenario-id>` | One scenario's tests held to their time budget, its goldens, effect coverage, file-size, test-cost, rule-id and wording checks, the card smoke on its player cards and the encounter smoke; also the family and manifest tests if pool, family or manifest files changed since the merge base with `origin/main`. `--list` prints the selection; `--quick` skips the goldens and the reader check. |
 | `pnpm lint` | Oxlint (`.oxlintrc.json`). |
 | `pnpm typecheck` | tsrs type check. |
 | `pnpm data:sync [ringsdb\|hallofbeorn\|dragncards\|rules\|scans\|pictures\|icons]` | Refreshes `data/raw/` and `.cache/`. The only networked command. `scans` and `pictures` run only when named, after `data:build`. |

@@ -16,7 +16,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  test:
+  checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
@@ -29,7 +29,35 @@ jobs:
       - run: pnpm data:check
       - run: pnpm lint
       - run: pnpm typecheck
-      - run: pnpm test
+
+  # The full suite split by file across runners (vitest --shard), so its wall time stays flat as scenarios are added. Every shard runs
+  # the same tests a local `pnpm test` does; together they are the whole suite.
+  shard:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4]
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.3.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test --shard=${{ matrix.shard }}/4
+
+  # One result for branch protection and the release workflow: green only when the checks and every shard are.
+  test:
+    if: always()
+    needs: [checks, shard]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checks and every shard passed
+        env:
+          RESULTS: ${{ needs.checks.result }} ${{ needs.shard.result }}
+        run: test "$RESULTS" = "success success"
 
   # The web build audited with axe-core in Chromium (README.md, Commands). Its own job, so `test` stays as fast.
   a11y-web:
