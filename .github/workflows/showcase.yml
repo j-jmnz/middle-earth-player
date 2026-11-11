@@ -16,11 +16,6 @@ on:
         description: "Only these shots, comma separated (scripts/showcase/shots.ts); empty for all"
         type: string
         default: ""
-  # While the showcase is being built (docs/plans/readme-showcase.md, Steps): its branch runs it on each push that changes the capture, and publishes.
-  # Removed before the branch lands on main.
-  push:
-    branches: [claude/readme-visual-showcase-hw2zl9]
-    paths: [".github/workflows/showcase.yml", ".maestro/showcase/**", ".maestro/subflows/showcase-*", "scripts/showcase/**", "src/ui/showcase/**", "src/campaign/fixtures/**"]
 
 permissions:
   contents: read
@@ -55,7 +50,7 @@ jobs:
         continue-on-error: true
         run: |
           only=()
-          if [ -n "${{ inputs.only || '' }}" ]; then only=(--only "${{ inputs.only }}"); fi
+          if [ -n "${{ inputs.only }}" ]; then only=(--only "${{ inputs.only }}"); fi
           pnpm assets capture --build --out "$RUNNER_TEMP/raw" "${only[@]}"
       - name: Post-process
         run: pnpm assets showcase --from "$RUNNER_TEMP/raw" --out "$RUNNER_TEMP/out"
@@ -76,7 +71,7 @@ jobs:
 
   publish:
     needs: capture
-    if: ${{ (inputs.publish || github.event_name == 'push') && needs.capture.outputs.complete == 'true' && !inputs.only }}
+    if: ${{ inputs.publish && needs.capture.outputs.complete == 'true' && !inputs.only }}
     runs-on: ubuntu-latest
     permissions:
       contents: write

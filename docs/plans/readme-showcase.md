@@ -4,6 +4,6 @@ The capture is built: `docs/showcase.md` says what it takes, how and how to run 
 
 ## Steps
 
-1. A first full run (on a Mac, docs/showcase.md, Take the captures on a Mac, or the workflow), its contact sheet looked at, and the flows fixed where a capture failed or looks wrong. The two GIF flows tap through the tray and are the likeliest to need it. While this branch is open, a push that changes the capture also runs the workflow and publishes; that `push` trigger is removed before the branch lands.
+1. A first full run (on a Mac, docs/showcase.md, Take the captures on a Mac, or the workflow), its contact sheet looked at, and the flows fixed where a capture failed or looks wrong. The two GIF flows tap through the tray and are the likeliest to need it.
 2. The README section once the `showcase` branch holds the images: the table GIF under the badges and a Screens section, each image a `<picture>` with the Rivendell capture for GitHub's light theme and the Ringwraiths one otherwise, with the captions and alt text of `scripts/showcase/shots.ts`.
 3. Delete this plan.
