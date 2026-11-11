@@ -11,13 +11,19 @@
 // (prebuild, xcodebuild, a flow) a line every HEARTBEAT seconds with the step's latest output line, so a run of an hour shows where it is. A step
 // that fails prints the end of its output; --verbose streams every tool's whole output instead (user request, 2026-11-11).
 //
-// Flags: --build or --app <App.app>, --out <dir>, --only <shot,shot>, --device <iphone|ipad>, --theme <dark|light>, --verbose.
+// A capture whose file is already in --out, taken from the same inputs as now (its `key` in capture.json: the app's JavaScript bundle and asset
+// list, the simulator, the flow and the showcase subflows, and the fixture file it opens), is kept and not taken again (user request,
+// 2026-11-11); --force takes every capture again.
+//
+// Flags: --build or --app <App.app>, --out <dir>, --only <shot,shot>, --device <iphone|ipad>, --theme <dark|light>, --force, --verbose.
 import { spawn, spawnSync } from "node:child_process";
+import { createHash } from "node:crypto";
 import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
 import { duration, runScript, verbose, type Log } from "../log.ts";
+import { FIXTURE_REGISTRY } from "../../src/campaign/fixtures/registry.ts";
 import { captureName, SHOTS, type Device, type Shot, type Theme } from "./shots.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "..", "..");
@@ -120,6 +126,48 @@ async function buildApp(log: Log): Promise<string> {
 
 type SimDevice = { name: string; udid: string; isAvailable: boolean };
 
+function sha(...parts: readonly (string | Buffer)[]): string {
+  const hash = createHash("sha256");
+  for (const part of parts) hash.update(part).update("\0");
+  return hash.digest("hex").slice(0, 16);
+}
+
+// What the app draws: its JavaScript bundle and the name and size of every file in it (the packed pictures, the fonts), so a rebuild of the
+// same code and pictures has the same fingerprint and a changed picture, screen or rule does not.
+function appFingerprint(app: string): string {
+  const files: string[] = [];
+  const walk = (at: string) => {
+    for (const name of readdirSync(at).sort()) {
+      const full = path.join(at, name);
+      const info = statSync(full);
+      if (info.isDirectory()) walk(full);
+      else if (!/^(_CodeSignature|embedded\.mobileprovision)$/.test(name)) files.push(`${path.relative(app, full)} ${info.size}`);
+    }
+  };
+  walk(app);
+  const bundle = path.join(app, "main.jsbundle");
+  return sha(existsSync(bundle) ? readFileSync(bundle) : "", files.join("\n"));
+}
+
+// The inputs of one capture besides the app and the simulator: its flow, the showcase subflows every flow runs through, and the fixture file it opens.
+function flowFingerprint(shot: Shot): string {
+  const flow = readFileSync(path.join(FLOWS, `${shot.id}.yaml`), "utf8");
+  const subflows = readdirSync(path.join(ROOT, ".maestro", "subflows")).filter((name) => name.startsWith("showcase-")).sort().map((name) => readFileSync(path.join(ROOT, ".maestro", "subflows", name), "utf8"));
+  const fixture = /(?:FIXTURE: |e2e\/)([\w-]+)/.exec(flow)?.[1];
+  const entry = fixture ? FIXTURE_REGISTRY.find((item) => (item.names as readonly string[]).includes(fixture)) : undefined;
+  const saves = entry ? readFileSync(path.join(ROOT, "src", "campaign", "fixtures", `${"file" in entry ? entry.file : entry.scenarioId}.json`), "utf8") : "";
+  return sha(flow, ...subflows, saves);
+}
+
+type Result = { name: string; device: Device; theme: Theme; shot: string; ok: boolean; key: string; kept?: boolean };
+
+function earlier(out: string): Map<string, Result> {
+  const file = path.join(out, "capture.json");
+  if (!existsSync(file)) return new Map();
+  const read = JSON.parse(readFileSync(file, "utf8")) as { results?: Result[] };
+  return new Map((read.results ?? []).filter((result) => result.ok && result.key).map((result) => [result.name, result]));
+}
+
 function simulator(device: Device): SimDevice {
   const listed = spawnSync("xcrun", ["simctl", "list", "devices", "available", "-j"], { encoding: "utf8" });
   if (listed.status !== 0) throw new Error(`xcrun simctl list failed: ${listed.stderr}`);
@@ -202,32 +250,57 @@ void runScript("showcase-capture", async (log) => {
   const total = devices.reduce((sum, device) => sum + shotsOf(device).length * themes.length, 0);
   if (total === 0) throw new Error("No shot matches --only, --device and --theme (scripts/showcase/shots.ts lists the shots)");
   log.info(`${captures(total)} to take: ${devices.join(" and ")}, ${themes.join(" and ")} theme${themes.length > 1 ? "s" : ""}, into ${out}`);
-  const results: { name: string; device: Device; theme: Theme; shot: string; ok: boolean }[] = [];
+  const results: Result[] = [];
   const simulators: Record<string, string> = {};
+  const before = process.argv.includes("--force") ? new Map<string, Result>() : earlier(out);
+  const appKey = appFingerprint(app);
+  // capture.json is written after every capture, so a run stopped halfway keeps what it took; it also keeps the earlier runs' captures this one did not touch.
+  const save = () => {
+    const touched = new Set(results.map((result) => result.name));
+    const all = [...[...before.values()].filter((result) => !touched.has(result.name)), ...results];
+    writeFileSync(path.join(out, "capture.json"), `${JSON.stringify({ simulators: { ...simulators }, results: all }, null, 2)}\n`);
+  };
   for (const device of devices) {
     const shots = shotsOf(device);
     if (shots.length === 0) continue;
     const sim = simulator(device);
     simulators[device] = sim.name;
-    log.info(`${device}: ${captures(shots.length * themes.length)} on ${sim.name}`);
-    await prepare(log, sim, app);
+    const keyOf = (theme: Theme, shot: Shot) => sha(appKey, sim.name, theme, flowFingerprint(shot));
+    const unchanged = (theme: Theme, shot: Shot) => {
+      const name = captureName(device, theme, shot.id);
+      return before.get(name)?.key === keyOf(theme, shot) && existsSync(path.join(out, `${name}${shot.kind === "gif" ? ".mp4" : ".png"}`));
+    };
+    const todo = themes.flatMap((theme) => shots.map((shot) => ({ theme, shot }))).filter(({ theme, shot }) => !unchanged(theme, shot));
+    log.info(`${device}: ${captures(shots.length * themes.length)} on ${sim.name}, ${todo.length} to take${todo.length < shots.length * themes.length ? `, ${shots.length * themes.length - todo.length} unchanged since the last run and kept (--force takes them again)` : ""}`);
     for (const theme of themes) {
       for (const shot of shots) {
-        const step = `[${results.length + 1}/${total}]`;
-        results.push({ name: captureName(device, theme, shot.id), device, theme, shot: shot.id, ok: await capture(log, sim, device, theme, shot, out, step) });
-        // Two failures before any capture is taken are almost always one cause (the app, the build, a step every flow shares): stop there
-        // rather than fail every capture the same way for an hour.
-        if (results.length === 2 && results.every((result) => !result.ok) && total > 2) {
-          run(log, "xcrun", ["simctl", "shutdown", sim.udid]);
-          throw new Error(`The first two captures failed, so the run stops: look at ${path.join(out, "failures")}, fix it, then run again`);
-        }
+        if (todo.some((item) => item.theme === theme && item.shot === shot)) continue;
+        const name = captureName(device, theme, shot.id);
+        log.info(`[${results.length + 1}/${total}] ${name}: unchanged, kept`);
+        results.push({ name, device, theme, shot: shot.id, ok: true, key: keyOf(theme, shot), kept: true });
+      }
+    }
+    save();
+    if (todo.length === 0) continue;
+    await prepare(log, sim, app);
+    for (const { theme, shot } of todo) {
+      const step = `[${results.length + 1}/${total}]`;
+      results.push({ name: captureName(device, theme, shot.id), device, theme, shot: shot.id, ok: await capture(log, sim, device, theme, shot, out, step), key: keyOf(theme, shot) });
+      save();
+      // Two failures before any capture is taken are almost always one cause (the app, the build, a step every flow shares): stop there
+      // rather than fail every capture the same way for an hour.
+      const taken = results.filter((result) => !result.kept);
+      if (taken.length === 2 && taken.every((result) => !result.ok) && todo.length > 2) {
+        run(log, "xcrun", ["simctl", "shutdown", sim.udid]);
+        throw new Error(`The first two captures failed, so the run stops: look at ${path.join(out, "failures")}, fix it, then run again`);
       }
     }
     log.info(`${sim.name}: shutting down`);
     run(log, "xcrun", ["simctl", "shutdown", sim.udid]);
   }
-  writeFileSync(path.join(out, "capture.json"), `${JSON.stringify({ simulators, results }, null, 2)}\n`);
+  save();
   const failed = results.filter((result) => !result.ok).map((result) => result.name);
   if (failed.length > 0) throw new Error(`${failed.length} of ${results.length} captures failed: ${failed.join(", ")}`);
-  log.info(`${captures(results.length)} in ${out}; next: pnpm assets showcase`);
+  const kept = results.filter((result) => result.kept).length;
+  log.info(`${captures(results.length)} in ${out} (${results.length - kept} taken, ${kept} kept); next: pnpm assets showcase`);
 });
