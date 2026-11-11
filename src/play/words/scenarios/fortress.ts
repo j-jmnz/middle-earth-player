@@ -9,8 +9,11 @@ export type DefenseOutcome = {
   reveals: boolean;
 };
 
-/** What a screen reader hears after the Defense dial's number: how many tokens the objective still needs, and where the players go ("2 more and the players advance to stage 5"). */
-export const defenseLimitWords = (value: number, limit: number, stage: number): string => `${Math.max(0, limit - value)} more and the players advance to stage ${stage}`;
+/** What a screen reader hears after a goal dial's number: how many more the stage or objective still needs, and where the players go ("2 more and the players advance to stage 5"). Helm's Deep's Defense dial and The Road to Isengard's Damage dial. */
+export const advanceLimitWords = (value: number, limit: number, destination: string): string => `${Math.max(0, limit - value)} more and the players advance to ${destination}`;
+
+/** The Defense dial's words: the stage the objective's record advances to. */
+export const defenseLimitWords = (value: number, limit: number, stage: number): string => advanceLimitWords(value, limit, `stage ${stage}`);
 
 function outcomeWords(outcome: DefenseOutcome): string {
   const fills = outcome.fills === "nothing" ? "" : `; the stage fills: ${outcome.fills === "loses" ? "the players lose" : `advance to stage ${outcome.fills.advancesTo}`}`;

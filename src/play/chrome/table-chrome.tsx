@@ -36,6 +36,23 @@ const dialOf = (t: TableTokens): Record<ThreatLevel, { edge: string; fill: strin
   critical: { edge: t.threatEdge, fill: t.threat, meter: t.onThreat },
 });
 
+const LEVELS: readonly ThreatLevel[] = ["calm", "near", "critical"];
+
+// The dial's level and its colors (threat-level.ts). A dial that counts toward the elimination level or a limit that loses warms as it nears it; a goal dial (a way out) never warms; a dial that
+// warns by its own rule (a hand of 1 or 0 on The Voice of Saruman) takes the worse of that level and its own. `own` is the level the number alone says.
+function dialLook(t: TableTokens, dial: { threat: number; eliminated: boolean; elimination: boolean; goal: boolean; limit: number | undefined; warn: { level: "near" | "critical" } | undefined }) {
+  const own: ThreatLevel = dial.elimination && !dial.goal ? threatLevel(dial.threat, dial.limit) : "calm";
+  const level = dial.warn && LEVELS.indexOf(dial.warn.level) > LEVELS.indexOf(own) ? dial.warn.level : own;
+  const look = dial.eliminated
+    ? { edge: t.hairline, fill: t.night, meter: t.hairline }
+    : dial.goal
+      ? { edge: t.accent, fill: t.night, meter: t.accent }
+      : dial.warn || dial.elimination
+        ? dialOf(t)[level]
+        : { edge: t.accent, fill: t.night, meter: t.accent };
+  return { own, level, look };
+}
+
 /**
  * The threat dial of the top bar (`compact`): a round dial, the number alone in Marcellus SC on a dark disc, ringed by
  * an arc of threat red that fills toward 50, the elimination level, with a tick at each staging enemy's engagement cost. It warms near elimination,
@@ -58,6 +75,7 @@ export function ThreatRing({
   ring = null,
   ringMark = "oneRing",
   limit,
+  filled,
   limitWords,
   goal,
   warn,
@@ -90,6 +108,8 @@ export function ThreatRing({
   ringMark?: "oneRing" | "hero";
   // The number at which the players lose, when it is not the elimination level (the pursuit dial, 30): the meter fills toward it, the dial warms near it, and the reader hears it. Needs `elimination`.
   limit?: number;
+  // The number the ring fills with when it is not the disc's: Saruman's gate shows his hit points left on the disc and fills the ring with the damage toward his hit points (`limit`).
+  filled?: number;
   // What a screen reader hears of the limit ("the players lose at 30" when absent): the Defense dial's limit advances the stage instead (fortress.ts).
   limitWords?: string;
   // The limit is the players' way out, not a loss (the Defense dial): the ring fills toward it in the accent, and the dial never warms or says "near the limit".
@@ -103,7 +123,7 @@ export function ThreatRing({
 }) {
   const s = useUiScale();
   const id = testID ?? `threat-${threat.seat}`;
-  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} spokenWord={spokenWord} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} limit={limit} limitWords={limitWords} goal={goal} warn={warn} note={note} onPress={onPress} />;
+  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} spokenWord={spokenWord} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} limit={limit} filled={filled} limitWords={limitWords} goal={goal} warn={warn} note={note} onPress={onPress} />;
   return (
     <View testID={id} accessible accessibilityLabel={`${label} ${threat.threat}`} className="items-center">
       <View className="h-12 w-12 items-center justify-center rounded-control">
@@ -133,6 +153,7 @@ function ThreatDial({
   ring,
   ringMark,
   limit,
+  filled,
   limitWords,
   goal,
   warn,
@@ -152,6 +173,7 @@ function ThreatDial({
   ring: string | null;
   ringMark: "oneRing" | "hero";
   limit?: number;
+  filled?: number;
   limitWords?: string;
   goal?: boolean;
   warn?: { level: "near" | "critical"; words: string };
@@ -163,8 +185,7 @@ function ThreatDial({
   const s = useUiScale();
   const focus = useFocusRing();
   const badge = useMemo(() => ({ in: layoutAnim(FadeIn, MOTION.threatBadgeIn, speed), out: layoutAnim(FadeOut, MOTION.threatBadgeOut, speed) }), [speed]);
-  const level = warn ? warn.level : elimination && !goal ? threatLevel(threat.threat, limit) : "calm";
-  const look = threat.eliminated ? { edge: t.hairline, fill: t.night, meter: t.hairline } : goal ? { edge: t.accent, fill: t.night, meter: t.accent } : warn || elimination ? dialOf(t)[level] : { edge: t.accent, fill: t.night, meter: t.accent };
+  const { own, level, look } = dialLook(t, { threat: threat.threat, eliminated: threat.eliminated, elimination, goal: goal === true, limit, warn });
   // The change since the number last moved, shown beside the dial for DELTA_MS. A new change replaces it.
   const seen = useRef(threat.threat);
   const [change, setChange] = useState<{ before: number; after: number; at: number } | null>(null);
@@ -196,12 +217,15 @@ function ThreatDial({
   const delta = change ? threatDelta(change.before, change.after) : null;
   const deltaWords = change ? threatDeltaWords(name, change.before, change.after) : null;
   const critical = level === "critical" && !threat.eliminated;
+  // The words for a dial near its limit: its own warning first, then what the number alone says.
+  const nearWords = own === "critical" ? (limit != null ? ", near the limit" : ", near elimination") : "";
+  const levelWords = warn ? `, ${warn.words}${nearWords}` : critical ? nearWords : "";
   // The glow, the track and the disc wash are threat red, or the accent on a dial that counts toward a goal.
   const hue = goal ? t.accent : t.threat;
   const engaging = ticks.filter((cost) => cost <= threat.threat).length;
   const tickWords = ticks.length === 0 ? "" : ticks.length === 1 ? `, the enemy in staging ${engaging === 1 ? "engages" : "does not engage"} at this threat` : `, ${engaging} of the ${ticks.length} enemies in staging engage at this threat`;
   // The dial is one control with one name (the change badge's words included), so Android gives it one focus stop.
-  const dialWords = `${spokenWord ? dialSpeech(spokenWord, threat.threat, label, role) : `${name} ${threat.threat}`}${threat.eliminated ? ", eliminated" : warn ? `, ${warn.words}` : critical ? (limit != null ? ", near the limit" : ", near elimination") : ""}${note ? `, ${note}` : ""}${limit != null ? `, ${limitWords ?? `the players lose at ${limit}`}` : ""}${tickWords}${ring ? `. ${ring}` : ""}${deltaWords ? `. ${deltaWords}` : ""}`;
+  const dialWords = `${spokenWord ? dialSpeech(spokenWord, threat.threat, label, role) : `${name} ${threat.threat}`}${threat.eliminated ? ", eliminated" : levelWords}${note ? `, ${note}` : ""}${limit != null ? `, ${limitWords ?? `the players lose at ${limit}`}` : ""}${tickWords}${ring ? `. ${ring}` : ""}${deltaWords ? `. ${deltaWords}` : ""}`;
   return (
     <Pressable
       {...focus.props}
@@ -216,7 +240,7 @@ function ThreatDial({
       <Animated.View style={pop}>
         <View testID={id} style={{ width: DIAL * s, height: DIAL * s, borderRadius: (DIAL / 2) * s, boxShadow: threat.eliminated ? undefined : `0 0 22px ${withAlphaHex(hue, critical ? 0.6 : 0.4)}` }}>
           {/* The threat's share of 50, the elimination level, as an arc round the dial (rr.threat-elimination-level). */}
-          <ArcRing size={DIAL * s} stroke={4 * s} parts={elimination && !threat.eliminated ? [{ key: "threat", share: threatMeter(threat.threat, limit), color: look.meter }] : []} track={withAlphaHex(hue, 0.16)}>
+          <ArcRing size={DIAL * s} stroke={4 * s} parts={(elimination || limit != null) && !threat.eliminated ? [{ key: "threat", share: threatMeter(filled ?? threat.threat, limit), color: look.meter }] : []} track={withAlphaHex(hue, 0.16)}>
             <View
               className="items-center justify-center"
               style={{
@@ -224,6 +248,8 @@ function ThreatDial({
                 height: (DIAL - 8) * s,
                 borderRadius: ((DIAL - 8) / 2) * s,
                 backgroundColor: look.fill,
+                // A dial that warns by its own rule (a last card in hand) wears the level's edge on its disc, apart from the ring's own meter.
+                ...(warn && !threat.eliminated ? { borderWidth: 2 * s, borderColor: look.edge } : {}),
                 backgroundImage: critical ? undefined : `radial-gradient(circle, ${withAlphaHex(hue, 0.28)}, ${withAlphaHex(t.night, 0.92)})`,
               }}
             >

@@ -107,7 +107,7 @@ Read the sections your task touches.
     - 616–633 The Caves of Nibin-Dûm (~2.4K)
   - 634–691 Dream-chaser (~15.6K) ← 4
   - 692–718 Ered Mithrin (~15.8K) ← 7
-  - 719–796 The Two Towers (~7.5K) ← 17
+  - 719–796 The Two Towers (~7.6K) ← 17
   - 797–805 Nightmare (~410) ← 19
   - 806–844 Deckbuilding (~1.9K)
   - 845–923 Effects (~3.2K)
@@ -120,9 +120,9 @@ Read the sections your task touches.
   - 964–989 Persistence and shipping (~1.8K)
   - 990–1031 Screens (~4.7K) ← 1
     - 1016–1031 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~42.0K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~42.1K tok)
   - 5–8 Overview (~130) ← 1
-  - 9–23 Top bar (~2.8K) ← 4
+  - 9–23 Top bar (~2.9K) ← 4
   - 24–27 Table menu (~430) ← 2
   - 28–35 Quest scale (~830) ← 2
   - 36–39 Canvas (~560)
