@@ -11,7 +11,7 @@ import type { SaveLine } from "./save-line";
 const name = (code: string) => `N${code}`;
 
 function run(id: string, overrides: Partial<RunRecord> = {}): RunRecord {
-  return { id, kind: "campaign", refId: "save-a", campaignId: "fellowship-of-the-ring", box: "fellowship-of-the-ring", scenarioId: "a-shadow-of-the-past", result: "won", lossCause: null, seatCount: 1, heroes: [["1", "2"]], rounds: 4, threats: [30], victoryPoints: 0, score: 44, reward: null, startedAt: null, endedAt: Date.UTC(2026, 9, 24, 12), activeMs: null, engineVersion: 6, backfilled: false, ...overrides };
+  return { id, kind: "campaign", refId: "save-a", campaignId: "fellowship-of-the-ring", box: "fellowship-of-the-ring", scenarioId: "a-shadow-of-the-past", result: "won", lossCause: null, seatCount: 1, heroes: [["1", "2"]], rounds: 4, threats: [30], victoryPoints: 0, score: 44, reward: null, startedAt: null, endedAt: Date.UTC(2026, 9, 24, 12), activeMs: null, engineVersion: 6, backfilled: false, rebased: false, ...overrides };
 }
 
 const loadout = { difficulty: "Normal", seats: [{ heroes: ["1", "2"] }] } as unknown as StandaloneLoadout;

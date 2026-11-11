@@ -56,24 +56,24 @@ Read the sections your task touches.
   - 227–236 Documentation (~170)
   - 237–254 Attribution (~470)
   - 255–258 License (~50)
-- `docs/architecture.md` — Architecture (~22.7K tok)
+- `docs/architecture.md` — Architecture (~23.3K tok)
   - 7–41 Stack (~1.1K)
   - 42–77 Processes (~680)
   - 78–160 Modules (~2.3K) ← 3
     - 126–160 Repository map (~870) ← 1
-  - 161–186 State (~1.0K) ← 9
+  - 161–186 State (~1.1K) ← 9
   - 187–208 Play loop (~250)
   - 209–234 Engine (~5.2K)
     - 223–234 Mechanic families (~4.3K) ← 5
   - 235–240 Effects (~530)
   - 241–273 Scenario definition (~800)
-  - 274–294 Persistence (~2.3K) ← 2
+  - 274–294 Persistence (~2.9K) ← 2
   - 295–300 Images (~940) ← 6
   - 301–353 Screens (~3.9K) ← 1
   - 354–359 Catalog build (~410)
   - 360–377 Tests (~2.0K) ← 5
   - 378–393 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~95.4K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~95.6K tok)
   - 17–38 Sections (~410)
   - 39–50 Product (~590)
   - 51–64 Non-goals (~540)
@@ -117,7 +117,7 @@ Read the sections your task touches.
     - 964–967 Coverage test (~270)
   - 968–988 Data sources (~530)
   - 989–1007 Card images (~1.2K) ← 9
-  - 1008–1033 Persistence and shipping (~2.2K) ← 2
+  - 1008–1033 Persistence and shipping (~2.4K) ← 2
   - 1034–1075 Screens (~4.9K) ← 1
     - 1060–1075 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~43.4K tok)
@@ -153,7 +153,7 @@ Read the sections your task touches.
   - 338–349 Banner (~750) ← 5
   - 350–369 Screen reader (~2.8K) ← 17
   - 370–373 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~28.7K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~28.8K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~580)
   - 34–44 Performance (~680) ← 4
@@ -168,19 +168,19 @@ Read the sections your task touches.
   - 230–244 Icons (~480) ← 7
   - 245–263 Card art (~740) ← 2
   - 264–278 Tablets (~510) ← 13
-  - 279–464 Screens (~15.7K)
+  - 279–464 Screens (~15.8K)
     - 283–286 Splash (~40)
     - 287–290 App icon (~80)
     - 291–306 Campaigns (campaign list) (~1.5K) ← 6
     - 307–320 Scenarios (~920) ← 1
-    - 321–332 History (~1.3K) ← 4
+    - 321–332 History (~1.4K) ← 4
     - 333–350 Briefing (~1.8K) ← 5
     - 351–354 Campaign setup (~1.0K) ← 3
     - 355–360 Campaign path (~780) ← 4
     - 361–364 Campaign log (~600) ← 1
     - 365–368 Spend XP (~610) ← 1
     - 369–372 Table — landscape (~30) ← 1
-    - 373–376 Table opens stale (~320) ← 1
+    - 373–376 Table opens stale (~390) ← 1
     - 377–388 Resolution and standalone outcome (~1.6K) ← 1
     - 389–398 Decks (~920) ← 2
     - 399–408 Deck builder (deck editor) (~840) ← 3

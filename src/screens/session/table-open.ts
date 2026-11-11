@@ -5,19 +5,20 @@
 // that open it for a screen are in table-session.ts.
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
+import { atPhaseBoundary, checkpointOf } from "../../campaign/checkpoint";
 import { addActive, fullChecks, staleReason } from "../../campaign/replay";
 import type { Save } from "../../campaign/save";
-import { continueSave, drop, finish, isWon, record, restartSave, resume, unrecord } from "../../campaign/session";
+import { continueSave, continuesFromCheckpoint, drop, finish, isWon, record, restartSave, resume, unrecord } from "../../campaign/session";
 import { logCodes, loadWorld, type World } from "../../campaign/world";
 import { CATALOG_VERSION } from "../../catalog/version";
 import { dealSeed } from "../nav/e2e";
 import { CANNOT_CONTINUE, MISSING_GAME, restartProblems, type StaleChoice } from "./stale-words";
 import { EFFECTS } from "../../effects";
-import type { TableStore } from "../../play/store/store";
+import type { ScenarioState, TableStore } from "../../play/store/store";
 
 import { afterPaint } from "../nav/after-paint";
 import { campaignOf, scenarioOf } from "../data/campaign-data";
-import { readSaveChecked, writeActive, type ReadSave } from "../data/campaign-store";
+import { clearCheckpointPast, readCheckpoint, readSaveChecked, writeActive, writeCheckpoint, writeReplaced, type ReadSave } from "../data/campaign-store";
 import { committingStore, replayForTable, type ReplayedGame } from "./open-game";
 import { flushRunsOnLeave } from "./flush-runs-on-leave";
 import { flushRuns, queueRun } from "../data/pending-runs";
@@ -29,10 +30,11 @@ type Db<TRun> = BaseSQLiteDatabase<"sync", TRun>;
 
 // `stamp` is the save to write once when the open left the game different from its row: stamped with the world (a save from before it), restamped
 // after a checked replay matched every move on another engine version, or given the checks it lacked. `takenBack` on a stale result is how many moves Continue would take back
-// when a checked replay found the first that does not match (null: nothing was compared).
+// when a checked replay found the first that does not match (null: nothing was compared). `fromCheckpoint` says Continue will rebase onto the game's checkpoint instead
+// (it passes the check): then no move is taken back but the ones after it that do not match.
 export type TableSession =
   | ({ ok: true; save: Save; stamp: Save | null } & ReplayedGame)
-  | { ok: false; reason: "missing" | "none" | "dropped" | "stale"; save: Save | null; write: Save | null; takenBack?: number | null };
+  | { ok: false; reason: "missing" | "none" | "dropped" | "stale"; save: Save | null; write: Save | null; takenBack?: number | null; fromCheckpoint?: boolean };
 
 /** The codes the open scenario can show: the log's cards, the Ring-bearer and every card of each dealt deck. */
 export function loadoutCodes(save: Save): string[] {
@@ -79,7 +81,7 @@ function openRead<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TUser>, read:
   const replayed = replayForTable(catalog, world, (observe) => resume(save, world, observe));
   if (!replayed.ok) {
     // Another engine version or world that did not match, the reducer refused a stored intent, or the start no longer builds: the player chooses, nothing is dropped.
-    return { ok: false, reason: "stale", save, write: null, takenBack: replayed.at == null ? null : save.active.intents.length - replayed.at };
+    return { ok: false, reason: "stale", save, write: null, takenBack: replayed.at == null ? null : save.active.intents.length - replayed.at, fromCheckpoint: continuesFromCheckpoint(save.active, readCheckpoint(user, save.id), world, save.seatCount) };
   }
   // The row as the replay leaves it (stamped, restamped, or given its checks) is the save the table opens on, and the hook that opened it writes it once.
   const stamped: Save = replayed.stamp ? { ...save, active: replayed.stamp } : save;
@@ -101,16 +103,17 @@ function worldOf<TCatalog>(catalog: Db<TCatalog>, save: Save): World | null {
 }
 
 /**
- * Continue (the stale sheet): replays the open scenario on the new rules as far as its intents are accepted and writes that prefix,
- * stamped with the engine version and world it now plays on. The session cache misses on the new save, so the next open replays it.
+ * Continue (the stale sheet): rebases the open scenario onto its checkpoint when that passes the check, and otherwise replays it on the new rules as far as its
+ * intents are accepted. It writes the result (with its rebase, the checkpoint cleared), stamped with the engine version and world it now plays on. The session
+ * cache misses on the new save, so the next open replays it.
  */
 export function continueTable<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TUser>, saveId: string): StaleChoice {
   const save = readSaveChecked(user, saveId)?.save;
   const world = save ? worldOf(catalog, save) : null;
   if (!save || !world) return { ok: false, message: MISSING_GAME };
-  const continued = continueSave(save, world);
+  const continued = continueSave(save, world, readCheckpoint(user, saveId));
   if (!continued.ok) return { ok: false, message: CANNOT_CONTINUE };
-  writeActive(user, continued.holder);
+  writeReplaced(user, continued.holder);
   return { ok: true };
 }
 
@@ -121,7 +124,7 @@ export function restartTable<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TU
   if (!save || !world) return { ok: false, message: MISSING_GAME };
   const dealt = restartSave(save, world, dealSeed(), Date.now());
   if (!dealt.ok) return { ok: false, message: restartProblems(dealt.briefing?.problems ?? null) };
-  writeActive(user, dealt.save);
+  writeReplaced(user, dealt.save);
   return { ok: true };
 }
 
@@ -137,6 +140,14 @@ export function sessionStore<TRun>(session: Opened, user: Db<TRun>): SessionStor
   let saved: Save = session.save;
   const cache = sessionCacheOf<Opened>(user, "save");
   const base = createPlayClock();
+  // How many intents the checkpoint this session last wrote counted, or null when it has written none (the row may still hold an earlier one).
+  let checkpointed: number | null = null;
+  // Writes the table as the checkpoint of the intents saved so far, unless that is the checkpoint already written. A separate statement from the intent's.
+  const checkpoint = (game: ScenarioState) => {
+    if (!saved.active || checkpointed === saved.active.intents.length) return;
+    writeCheckpoint(user, saved.id, checkpointOf(game, saved.active));
+    checkpointed = saved.active.intents.length;
+  };
   // The foreground time since the last write, added to the open scenario.
   // Nothing taken leaves the save as it is (the same object), so a pause with no new time writes nothing.
   const fold = (save: Save): Save => {
@@ -154,6 +165,8 @@ export function sessionStore<TRun>(session: Opened, user: Db<TRun>): SessionStor
     (intent, game) => {
       saved = fold(record(saved, intent, game));
       writeActive(user, saved);
+      // The table at each phase boundary, never per intent: Continue rebases onto it when the rules change under the game (campaign/checkpoint.ts).
+      if (atPhaseBoundary(game) && !game.lost && !isWon(game)) checkpoint(game);
       // A lost game can no longer be undone, and its run id is fixed: write the run now, so closing the Resolution any way (or never)
       // still leaves it. A win waits for its Resolution choices (the reward).
       if (game.lost) recordCampaignRun(user, saved, finish(saved, session.world, game), session.world, game);
@@ -162,10 +175,15 @@ export function sessionStore<TRun>(session: Opened, user: Db<TRun>): SessionStor
     () => {
       saved = fold(unrecord(saved));
       writeActive(user, saved);
+      // A checkpoint that counted more intents than the game has now is behind it: it goes, so a different move cannot meet it again.
+      if (saved.active) {
+        clearCheckpointPast(user, saved.id, saved.active.intents.length);
+        if (checkpointed != null && checkpointed > saved.active.intents.length) checkpointed = null;
+      }
       follow();
     },
   );
-  // A pause (the table left, the app in the background) writes the time since the last write, once; a game that is over, won or lost, writes nothing
+  // A pause (the table left, the app in the background) writes the time since the last write, once, and the checkpoint when the game moved since it; a game that is over, won or lost, writes nothing
   // (its last intent folded the time already, and a pause must never write a finished scenario back).
   const clock: PlayClock = {
     resume: base.resume,
@@ -175,10 +193,12 @@ export function sessionStore<TRun>(session: Opened, user: Db<TRun>): SessionStor
       const { game } = store.getState();
       if (game.lost || isWon(game)) return;
       const folded = fold(saved);
-      if (folded === saved) return;
-      saved = folded;
-      writeActive(user, saved);
-      follow();
+      if (folded !== saved) {
+        saved = folded;
+        writeActive(user, saved);
+        follow();
+      }
+      checkpoint(game);
     },
   };
   follow();

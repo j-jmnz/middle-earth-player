@@ -35,7 +35,7 @@ export default function StandaloneOutcome() {
     if (!ended || !finished) return;
     writeStandalone(user, finished);
     // One run for the game, written once (History); a reopened outcome writes nothing more.
-    if (session?.ok) recordStandaloneRun(user, finished, session.world, session.game, Date.now(), session.stored.active?.activeMs ?? null);
+    if (session?.ok) recordStandaloneRun(user, finished, session.world, session.game, Date.now(), session.stored.active?.activeMs ?? null, session.stored.active?.from != null);
   }, [ended, finished, session, user]);
   const back = <NavBar onBack={() => goBack(router, "/scenarios")} backTestID="outcome-back" backLabel="Scenarios" />;
 

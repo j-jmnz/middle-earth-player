@@ -71,6 +71,13 @@
       "when": 1761984000000,
       "tag": "0009_deck_position",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "6",
+      "when": 1762070400000,
+      "tag": "0010_checkpoint",
+      "breakpoints": true
     }
   ]
 }

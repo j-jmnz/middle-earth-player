@@ -2,28 +2,29 @@
 // not replayed again (session/cache.ts). Pure of React: the hooks that open it for a screen are in standalone-session.ts.
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
+import { atPhaseBoundary, checkpointOf } from "../../campaign/checkpoint";
 import { addActive, fullChecks, staleReason } from "../../campaign/replay";
-import { isWon, record, unrecord } from "../../campaign/session";
+import { continuesFromCheckpoint, isWon, record, unrecord } from "../../campaign/session";
 import { continueStandalone, dropStandalone, resumeStandalone, restartStandalone, type StandaloneGame } from "../../campaign/standalone";
 import { loadWorld } from "../../campaign/world";
 import { CATALOG_VERSION } from "../../catalog/version";
 import { EFFECTS } from "../../effects";
-import type { TableStore } from "../../play/store/store";
+import type { ScenarioState, TableStore } from "../../play/store/store";
 
 import { campaignOf, scenarioOf } from "../data/campaign-data";
 import { committingStore, replayForTable, type ReplayedGame } from "./open-game";
 import { createPlayClock, type PlayClock } from "./play-clock";
 import { fingerprintOf, sessionCacheOf } from "./cache";
-import { readStandalone, writeStandaloneActive } from "../data/standalone-store";
+import { clearStandaloneCheckpointPast, readStandalone, readStandaloneCheckpoint, writeStandaloneActive, writeStandaloneCheckpoint, writeStandaloneReplaced } from "../data/standalone-store";
 import { dealSeed } from "../nav/e2e";
 import { CANNOT_CONTINUE, MISSING_GAME, restartProblems, type StaleChoice } from "./stale-words";
 
 type Db<TRun> = BaseSQLiteDatabase<"sync", TRun>;
 
 export type StandaloneSession =
-  // `stamp` is the game to write once when the open left it different from its row (table-open.ts, TableSession). `takenBack` on a stale result is how many moves Continue would take back, when a checked replay found one that does not match.
+  // `stamp` is the game to write once when the open left it different from its row (table-open.ts, TableSession). `takenBack` on a stale result is how many moves Continue would take back, when a checked replay found one that does not match; `fromCheckpoint` says Continue will rebase onto the game's checkpoint instead.
   | ({ ok: true; stored: StandaloneGame; stamp: StandaloneGame | null } & ReplayedGame)
-  | { ok: false; reason: "missing" | "none" | "dropped" | "stale"; stored: StandaloneGame | null; write: StandaloneGame | null; takenBack?: number | null };
+  | { ok: false; reason: "missing" | "none" | "dropped" | "stale"; stored: StandaloneGame | null; write: StandaloneGame | null; takenBack?: number | null; fromCheckpoint?: boolean };
 
 /** The codes the game can show: the Ring-bearer and every card of each dealt deck. */
 export function standaloneCodes(game: StandaloneGame): string[] {
@@ -61,7 +62,7 @@ export function openStandalone<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<
   if (kept) return kept;
   const world = loadWorld(catalog, campaign, scenario, EFFECTS, standaloneCodes(stored));
   const replayed = replayForTable(catalog, world, (observe) => resumeStandalone(stored, world, observe));
-  if (!replayed.ok) return { ok: false, reason: "stale", stored, write: null, takenBack: replayed.at == null ? null : stored.active.intents.length - replayed.at };
+  if (!replayed.ok) return { ok: false, reason: "stale", stored, write: null, takenBack: replayed.at == null ? null : stored.active.intents.length - replayed.at, fromCheckpoint: continuesFromCheckpoint(stored.active, readStandaloneCheckpoint(user, stored.id), world, stored.seatCount) };
   const stamped: StandaloneGame = replayed.stamp ? { ...stored, active: replayed.stamp } : stored;
   const opened: Opened = { ok: true, stored: stamped, stamp: null, ...replayed.game };
   cache.set(stored.id, fingerprintOf(stamped, CATALOG_VERSION), opened);
@@ -79,14 +80,14 @@ function worldOf<TCatalog>(catalog: Db<TCatalog>, game: StandaloneGame) {
   }
 }
 
-/** Continue (the stale sheet): replays the game on the new rules as far as its intents are accepted and writes that prefix, restamped. */
+/** Continue (the stale sheet): rebases the game onto its checkpoint when that passes the check, otherwise replays it on the new rules as far as its intents are accepted; writes the result, restamped, with the checkpoint cleared. */
 export function continueStandaloneGame<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TUser>, gameId: string): StaleChoice {
   const game = readStandalone(user, gameId)?.game;
   const world = game ? worldOf(catalog, game) : null;
   if (!game || !world) return { ok: false, message: MISSING_GAME };
-  const continued = continueStandalone(game, world);
+  const continued = continueStandalone(game, world, readStandaloneCheckpoint(user, gameId));
   if (!continued.ok) return { ok: false, message: CANNOT_CONTINUE };
-  writeStandaloneActive(user, continued.holder);
+  writeStandaloneReplaced(user, continued.holder);
   return { ok: true };
 }
 
@@ -97,7 +98,7 @@ export function restartStandaloneGame<TCatalog, TUser>(catalog: Db<TCatalog>, us
   if (!game || !world) return { ok: false, message: MISSING_GAME };
   const dealt = restartStandalone(game, world, dealSeed());
   if (!dealt.ok) return { ok: false, message: restartProblems(dealt.briefing?.problems ?? null) };
-  writeStandaloneActive(user, dealt.game);
+  writeStandaloneReplaced(user, dealt.game);
   return { ok: true };
 }
 
@@ -111,6 +112,13 @@ export function standaloneStore<TRun>(session: Opened, user: Db<TRun>): Standalo
   let saved: StandaloneGame = session.stored;
   const cache = sessionCacheOf<Opened>(user, "standalone");
   const base = createPlayClock();
+  // How many intents the checkpoint this session last wrote counted (table-open.ts, sessionStore).
+  let checkpointed: number | null = null;
+  const checkpoint = (state: ScenarioState) => {
+    if (!saved.active || checkpointed === saved.active.intents.length) return;
+    writeStandaloneCheckpoint(user, saved.id, checkpointOf(state, saved.active));
+    checkpointed = saved.active.intents.length;
+  };
   // Nothing taken leaves the game as it is (the same object), so a pause with no new time writes nothing.
   const fold = (game: StandaloneGame): StandaloneGame => {
     if (!game.active) return game;
@@ -127,11 +135,17 @@ export function standaloneStore<TRun>(session: Opened, user: Db<TRun>): Standalo
     (intent, game) => {
       saved = fold(record(saved, intent, game));
       writeStandaloneActive(user, saved);
+      // The table at each phase boundary, never per intent.
+      if (atPhaseBoundary(game) && !game.lost && !isWon(game)) checkpoint(game);
       follow();
     },
     () => {
       saved = fold(unrecord(saved));
       writeStandaloneActive(user, saved);
+      if (saved.active) {
+        clearStandaloneCheckpointPast(user, saved.id, saved.active.intents.length);
+        if (checkpointed != null && checkpointed > saved.active.intents.length) checkpointed = null;
+      }
       follow();
     },
   );
@@ -144,10 +158,12 @@ export function standaloneStore<TRun>(session: Opened, user: Db<TRun>): Standalo
       const { game } = store.getState();
       if (game.lost || isWon(game)) return;
       const folded = fold(saved);
-      if (folded === saved) return;
-      saved = folded;
-      writeStandaloneActive(user, saved);
-      follow();
+      if (folded !== saved) {
+        saved = folded;
+        writeStandaloneActive(user, saved);
+        follow();
+      }
+      checkpoint(game);
     },
   };
   follow();

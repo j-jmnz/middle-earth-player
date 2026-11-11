@@ -39,6 +39,7 @@ export function recordCampaignRun<TRun>(user: UserDb<TRun>, before: Save, after:
     endedAt: now,
     activeMs: active.activeMs ?? null,
     engineVersion: ENGINE_VERSION,
+    rebased: active.from != null,
   });
   if (run) writeRun(user, run);
   return run;
@@ -46,7 +47,7 @@ export function recordCampaignRun<TRun>(user: UserDb<TRun>, before: Save, after:
 
 /**
  * Writes the run of a standalone game that ended. Its start is when it was dealt. A finished game has no open scenario left, so the
- * outcome screen passes the foreground ms the table counted (`activeMs`); by default they are read from the game's own scenario.
+ * outcome screen passes the foreground ms the table counted (`activeMs`) and whether the game was rebased onto a checkpoint; by default they are read from the game's own scenario.
  */
 export function recordStandaloneRun<TRun>(
   user: UserDb<TRun>,
@@ -55,6 +56,7 @@ export function recordStandaloneRun<TRun>(
   state: ScenarioState,
   now: number = Date.now(),
   activeMs: number | null = game.active?.activeMs ?? null,
+  rebased: boolean = game.active?.from != null,
 ): RunRecord | null {
   const dealt = user.select({ createdAt: standaloneGames.createdAt }).from(standaloneGames).where(eq(standaloneGames.id, game.id)).get();
   const run = runOf({
@@ -71,6 +73,7 @@ export function recordStandaloneRun<TRun>(
     endedAt: now,
     activeMs,
     engineVersion: ENGINE_VERSION,
+    rebased,
   });
   if (run) writeRun(user, run);
   return run;

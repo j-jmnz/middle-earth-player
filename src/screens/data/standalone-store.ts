@@ -1,9 +1,10 @@
-import { desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
+import { and, desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import { parseSeatCount } from "../../campaign/save";
+import { parseCheckpoint, type Checkpoint } from "../../campaign/checkpoint";
 import { markedIfStale, parseStandaloneActive, parseStandaloneLoadout, parseStandaloneResult, type ListedStandalone, type StandaloneGame } from "../../campaign/standalone";
-import { stored } from "./campaign-store";
+import { activeJson, rebaseOf, stored } from "./campaign-store";
 import { standaloneGames } from "./user-schema";
 
 // user.db `standalone_games`, read and written whole. The rules stay in src/campaign/standalone.ts.
@@ -15,8 +16,10 @@ export type ReadStandalone = { game: StandaloneGame; unreadable: boolean };
 function parseRow(row: typeof standaloneGames.$inferSelect): ReadStandalone {
   // The open game is only a cache of the intents: when it or the loadout does not read, it is dropped and the row stays.
   const loadout = parseStandaloneLoadout(row.loadout);
-  const parsed = parseStandaloneActive(row.activeScenario);
-  const active = loadout ? parsed : null;
+  const rebase = rebaseOf(row.rebase);
+  const parsed = rebase.unreadable ? null : parseStandaloneActive(row.activeScenario);
+  const read = loadout && parsed && rebase.from ? { ...parsed, from: rebase.from } : parsed;
+  const active = loadout ? read : null;
   const unreadable = row.activeScenario != null && active == null;
   return {
     game: { id: row.id, campaignId: row.campaignId, scenarioId: row.scenarioId, seatCount: parseSeatCount(row.seatCount), loadout, active, result: parseStandaloneResult(row.result) },
@@ -80,8 +83,11 @@ export function writeStandalone<TRun>(user: UserDb<TRun>, game: StandaloneGame, 
     seatCount: game.seatCount,
     // A loadout that no longer read stays unreadable: `{}` reads back as none.
     loadout: stored(game.loadout ?? {}),
-    activeScenario: game.active ? stored(game.active) : null,
+    activeScenario: game.active ? activeJson(game.active) : null,
     result: game.result ? stored(game.result) : null,
+    // A game with no open scenario has no checkpoint either; one with an open scenario keeps its (campaign-store.ts, writeSave).
+    ...(game.active ? {} : { checkpoint: null }),
+    rebase: game.active?.from ? stored(game.active.from) : null,
   };
   user
     .insert(standaloneGames)
@@ -95,9 +101,38 @@ export function writeStandalone<TRun>(user: UserDb<TRun>, game: StandaloneGame, 
 export function writeStandaloneActive<TRun>(user: UserDb<TRun>, game: Pick<StandaloneGame, "id" | "active">): void {
   user
     .update(standaloneGames)
-    .set({ activeScenario: game.active ? stored(game.active) : null })
+    .set({ activeScenario: game.active ? activeJson(game.active) : null })
     .where(eq(standaloneGames.id, game.id))
     .run();
+}
+
+// The open game replaced whole: Continue and Restart (campaign-store.ts, writeReplaced).
+export function writeStandaloneReplaced<TRun>(user: UserDb<TRun>, game: Pick<StandaloneGame, "id" | "active">): void {
+  user
+    .update(standaloneGames)
+    .set({ activeScenario: game.active ? activeJson(game.active) : null, rebase: game.active?.from ? stored(game.active.from) : null, checkpoint: null })
+    .where(eq(standaloneGames.id, game.id))
+    .run();
+}
+
+// The open game's checkpoint (campaign-store.ts, writeCheckpoint); null clears it.
+export function writeStandaloneCheckpoint<TRun>(user: UserDb<TRun>, id: string, checkpoint: Checkpoint | null): void {
+  user.update(standaloneGames).set({ checkpoint: checkpoint ? stored(checkpoint) : null }).where(eq(standaloneGames.id, id)).run();
+}
+
+// An Undo past the checkpoint clears it (campaign-store.ts, clearCheckpointPast).
+export function clearStandaloneCheckpointPast<TRun>(user: UserDb<TRun>, id: string, intents: number): void {
+  user
+    .update(standaloneGames)
+    .set({ checkpoint: null })
+    .where(and(eq(standaloneGames.id, id), sql`json_extract(${standaloneGames.checkpoint}, '$.intentCount') > ${intents}`))
+    .run();
+}
+
+/** The checkpoint stored for the open game, or null when there is none or it does not read. */
+export function readStandaloneCheckpoint<TRun>(user: UserDb<TRun>, id: string): Checkpoint | null {
+  const row = user.select({ checkpoint: standaloneGames.checkpoint }).from(standaloneGames).where(eq(standaloneGames.id, id)).get();
+  return row ? parseCheckpoint(row.checkpoint) : null;
 }
 
 export function archiveStandalone<TRun>(user: UserDb<TRun>, id: string, now: number = Date.now()): void {

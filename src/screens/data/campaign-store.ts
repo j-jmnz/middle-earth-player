@@ -1,6 +1,8 @@
-import { asc, desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
+import { parseCheckpoint, parseRebase, type Checkpoint } from "../../campaign/checkpoint";
+import type { ActiveScenario } from "../../campaign/replay";
 import { parseActive, parseLoadout, parseLog, parseSeatCount, newSave, type NewSaveOptions, type Save } from "../../campaign/save";
 import { booklets, saves, type StoredJson } from "./user-schema";
 
@@ -11,6 +13,20 @@ type UserDb<TRun> = BaseSQLiteDatabase<"sync", TRun>;
 // on the write, so no copy is made here: this only changes the type.
 export function stored(value: unknown): StoredJson {
   return value as StoredJson;
+}
+
+// The open scenario as the `active_scenario` column holds it: without its rebase, which has a column of its own (user-schema.ts), so the write of an intent stays the size it is.
+export function activeJson(active: ActiveScenario): StoredJson {
+  if (!active.from) return stored(active);
+  const { from: _from, ...rest } = active;
+  return stored(rest);
+}
+
+// The rebase column as a game's base, or null for none. A column that holds something that does not read is `unreadable`.
+export function rebaseOf(value: unknown): { from: ActiveScenario["from"]; unreadable: boolean } {
+  if (value == null) return { from: undefined, unreadable: false };
+  const from = parseRebase(value);
+  return { from: from ?? undefined, unreadable: from == null };
 }
 
 // A save as read, and whether an open scenario was stored but did not read, so the player is told it is gone.
@@ -25,6 +41,9 @@ function parseRow(row: typeof saves.$inferSelect): ReadSave {
   try {
     active = parseActive(row.activeScenario);
     loadout = parseLoadout(row.loadout);
+    const rebase = rebaseOf(row.rebase);
+    if (rebase.unreadable) throw new Error("The rebase does not read");
+    if (active && rebase.from) active = { ...active, from: rebase.from };
   } catch {
     active = null;
     loadout = null;
@@ -91,14 +110,17 @@ export function readSaveChecked<TRun>(user: UserDb<TRun>, id: string): ReadSave 
 }
 
 export function writeSave<TRun>(user: UserDb<TRun>, save: Save, now: number = Date.now()): void {
+  // A save with no open scenario has no checkpoint either; one with an open scenario keeps its checkpoint (the seed it holds tells a new deal's apart).
   const values = {
+    ...(save.active ? {} : { checkpoint: null }),
+    rebase: save.active?.from ? stored(save.active.from) : null,
     id: save.id,
     campaignId: save.campaignId,
     seatCount: save.seatCount,
     log: stored(save.log),
     // The pool is the log's pool; the column is kept for the sheet's reader and written from the same value.
     pool: stored(save.log.campaignPool),
-    activeScenario: save.active ? stored(save.active) : null,
+    activeScenario: save.active ? activeJson(save.active) : null,
     loadout: save.loadout ? stored(save.loadout) : null,
     updatedAt: now,
   };
@@ -114,9 +136,39 @@ export function writeSave<TRun>(user: UserDb<TRun>, save: Save, now: number = Da
 export function writeActive<TRun>(user: UserDb<TRun>, save: Pick<Save, "id" | "active">, now: number = Date.now()): void {
   user
     .update(saves)
-    .set({ activeScenario: save.active ? stored(save.active) : null, updatedAt: now })
+    .set({ activeScenario: save.active ? activeJson(save.active) : null, updatedAt: now })
     .where(eq(saves.id, save.id))
     .run();
+}
+
+// The open scenario replaced whole: Continue (rebased or cut back) and Restart. Its rebase is written with it and the checkpoint is cleared, since the
+// intents it counted are not these. One statement, so a kill leaves the old game or the new one.
+export function writeReplaced<TRun>(user: UserDb<TRun>, save: Pick<Save, "id" | "active">, now: number = Date.now()): void {
+  user
+    .update(saves)
+    .set({ activeScenario: save.active ? activeJson(save.active) : null, rebase: save.active?.from ? stored(save.active.from) : null, checkpoint: null, updatedAt: now })
+    .where(eq(saves.id, save.id))
+    .run();
+}
+
+// The checkpoint of the open scenario (src/campaign/checkpoint.ts), written at a phase boundary and on a pause; null clears it. Only that column is written.
+export function writeCheckpoint<TRun>(user: UserDb<TRun>, id: string, checkpoint: Checkpoint | null): void {
+  user.update(saves).set({ checkpoint: checkpoint ? stored(checkpoint) : null }).where(eq(saves.id, id)).run();
+}
+
+// An Undo that took the game back past the checkpoint leaves it behind the game: clear it when it counted more intents than the game has now.
+export function clearCheckpointPast<TRun>(user: UserDb<TRun>, id: string, intents: number): void {
+  user
+    .update(saves)
+    .set({ checkpoint: null })
+    .where(and(eq(saves.id, id), sql`json_extract(${saves.checkpoint}, '$.intentCount') > ${intents}`))
+    .run();
+}
+
+/** The checkpoint stored for the open scenario, or null when there is none or it does not read. */
+export function readCheckpoint<TRun>(user: UserDb<TRun>, id: string): Checkpoint | null {
+  const row = user.select({ checkpoint: saves.checkpoint }).from(saves).where(eq(saves.id, id)).get();
+  return row ? parseCheckpoint(row.checkpoint) : null;
 }
 
 // Archiving keeps the whole row: the log, the open scenario and the loadout come back as they were on restore.

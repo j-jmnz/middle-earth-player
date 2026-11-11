@@ -53,6 +53,7 @@ export default function StandaloneTableScreen() {
             title={scenarioName(session.stored?.scenarioId ?? "")}
             error={refused}
             takenBack={session.takenBack}
+            fromCheckpoint={session.fromCheckpoint}
             onContinue={() => choose(continueStandaloneGame(catalog, user, gameId))}
             onRestart={() => choose(restartStandaloneGame(catalog, user, gameId))}
             onLeave={leave}

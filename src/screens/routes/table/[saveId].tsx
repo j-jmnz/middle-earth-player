@@ -53,6 +53,7 @@ export default function TableScreen() {
             title={scenarioName(session.save?.loadout?.scenarioId ?? "")}
             error={refused}
             takenBack={session.takenBack}
+            fromCheckpoint={session.fromCheckpoint}
             onContinue={() => choose(continueTable(catalog, user, saveId))}
             onRestart={() => choose(restartTable(catalog, user, saveId))}
             onLeave={leave}

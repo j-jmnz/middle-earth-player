@@ -4,7 +4,7 @@ Middle Earth LCG collects no personal data. No accounts, analytics, advertising,
 
 ## What stays on your device
 
-Campaigns, games, logs, decks, notes and settings are saved only in the app's own storage (a SQLite database, `user.db`). Booklets or deck files you open with the system file picker are copied there; the app reads only the file you pick.
+Campaigns, games, logs, decks, notes and settings are saved only in the app's own storage (a SQLite database, `user.db`). An open game also keeps a checkpoint there: a copy of its table (the cards and where they lie) taken at the start of each phase and when you leave the table, so the game can go on from where you were after an update changes the rules. Booklets or deck files you open with the system file picker are copied there; the app reads only the file you pick.
 
 Your phone's backup (iCloud or Google) may include these saves; that copy goes to your Apple or Google account, not to this project. Uninstalling the app deletes everything it saved.
 

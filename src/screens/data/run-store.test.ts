@@ -44,6 +44,7 @@ function run(overrides: Partial<RunRecord> = {}): RunRecord {
     activeMs: 7,
     engineVersion: 6,
     backfilled: false,
+    rebased: false,
     ...overrides,
   };
 }

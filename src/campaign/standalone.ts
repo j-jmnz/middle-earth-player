@@ -17,6 +17,7 @@ import type { StartScenario } from "../rules/setup/setup.ts";
 
 import { comingSoonProblems, difficultyProblems, loadoutProblems, needsRingBearerSlot, type LoadoutInput, type Problem } from "./briefing.ts";
 import type { LoadoutSeat } from "./loadout.ts";
+import type { Checkpoint } from "./checkpoint.ts";
 import { beginActive, staleReason, type ActiveScenario, type ReplayObserver } from "./replay.ts";
 import { dealtLoadoutSchema, parseActive } from "./save.ts";
 import { completedRounds, scoreOf, type ScenarioScore } from "./score.ts";
@@ -134,7 +135,7 @@ export function dealStandalone(id: string, world: World, seatCount: 1 | 2, loado
 // Replays the open game. One from another engine version or data hash is not rebuilt; the table asks for a choice (continueStandalone, restartStandalone).
 export function resumeStandalone(game: StandaloneGame, world: World, observe?: ReplayObserver): Resumed {
   const { loadout } = game;
-  return resumeFrom(game.active, loadout ? (seed) => standaloneStart(world, game.seatCount, loadout, seed) : null, world, observe);
+  return resumeFrom(game.active, loadout ? (seed) => standaloneStart(world, game.seatCount, loadout, seed) : null, world, observe, game.seatCount);
 }
 
 // Drops the open game and keeps the row, its loadout and any result.
@@ -148,11 +149,11 @@ export function markedIfStale<G extends ListedStandalone>(game: G): G {
   return game.active && staleReason(game.active, null) ? { ...game, needsChoice: true } : game;
 }
 
-// Continue: the open game replayed on the current rules as far as its intents are accepted, stamped with what it now plays on.
-// The caller writes the game it gets back.
-export function continueStandalone(game: StandaloneGame, world: World): Continued<StandaloneGame> {
+// Continue: the open game rebased onto its checkpoint when it has one that passes the check, otherwise replayed on the current rules as far as its intents
+// are accepted, stamped with what it now plays on (session.ts, continueFrom). The caller writes the game it gets back.
+export function continueStandalone(game: StandaloneGame, world: World, checkpoint: Checkpoint | null = null): Continued<StandaloneGame> {
   const { loadout } = game;
-  return continueFrom(game, loadout ? (seed) => standaloneStart(world, game.seatCount, loadout, seed) : null, world);
+  return continueFrom(game, loadout ? (seed) => standaloneStart(world, game.seatCount, loadout, seed) : null, world, checkpoint, game.seatCount);
 }
 
 // Restart: deals the same game again with its stored loadout and a new seed. The row, its id and its loadout stay.

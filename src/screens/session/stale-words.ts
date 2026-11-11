@@ -4,6 +4,8 @@
 export const STALE_STEP = "Needs a choice";
 export const STALE_SENTENCE = "The rules or the card data changed since this game was dealt.";
 export const CONTINUE_NOTE = "Continue plays your moves again on the new rules, as far as they are accepted. The table may not be the one you left.";
+/** What Continue does when the game has a checkpoint that passes the check: the table as it was at the start of the phase or when it was last left, and the moves since played on the new rules. */
+export const CHECKPOINT_NOTE = "Continue picks your table up as it was when you last left it or began a phase, and plays your moves since on the new rules. You cannot undo back past that point.";
 /** What a checked replay found: the move the new rules first play differently, so Continue takes back that move and every move after it. */
 export function takenBackNote(count: number): string {
   return count === 1 ? "On the new rules, 1 move is taken back." : `On the new rules, ${count} moves are taken back.`;
