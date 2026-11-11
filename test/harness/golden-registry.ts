@@ -31,6 +31,7 @@ import * as wilderland from "../scenarios/the-fate-of-wilderland/game.ts";
 import * as hai from "../scenarios/the-uruk-hai/game.ts";
 import * as deep from "../scenarios/helms-deep/game.ts";
 import * as isengard from "../scenarios/the-road-to-isengard/game.ts";
+// import * as marshes from "../scenarios/the-passage-of-the-marshes/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -87,4 +88,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-uruk-hai", "The Uruk-hai", hai.HAI_GOLDENS, hai.haiWorld, hai.playGolden),
   entry("helms-deep", "Helm's Deep", deep.DEEP_GOLDENS, deep.deepWorld, deep.playGolden),
   entry("the-road-to-isengard", "The Road to Isengard", isengard.ISENGARD_GOLDENS, isengard.isengardWorld, isengard.playGolden),
+  // entry("the-passage-of-the-marshes", "The Passage of the Marshes", marshes.MARSHES_GOLDENS, marshes.marshesWorld, marshes.playGolden),
 ];

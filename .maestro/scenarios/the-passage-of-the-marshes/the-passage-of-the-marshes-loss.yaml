@@ -1,0 +1,13 @@
+appId: com.middleearth.lcg
+tags:
+  - scenario
+---
+# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `marshes-lost` (scripts/e2e/the-passage-of-the-marshes.ts): a real two-handed
+# game of The Passage of the Marshes, parked on its loss. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
+# The steps are the shared subflow's (.maestro/subflows/scenario-loss.yaml); add this scenario's own assertions after the call.
+- runFlow:
+    file: ../../subflows/scenario-loss.yaml
+    env:
+      FIXTURE: marshes-lost
+      SCENARIO_ID: the-passage-of-the-marshes
+# TODO: this scenario's own assertions on the log screen after the loss.
