@@ -68,9 +68,9 @@ export type TopBarProps = {
   pursuit?: { value: number; limit: number } | null;
   // The tokens on The Defense of Helm's Deep, its name and the number that ends it and the stage it advances to (mec112.defense, 143033:A:3), or null: a dial after Pursuit whose ring fills toward the limit in the accent.
   defense?: { name: string; value: number; limit: number; stage: number } | null;
-  // The dials of the scenario's own pieces, in the order they are drawn (readouts/scenario-dials.ts): The Road to Isengard's, The Passage of the Marshes' and Journey to the Cross-roads'.
+  // The dials of the scenario's own pieces, in the order they are drawn (readouts/scenario-dials.ts): The Road to Isengard's, The Passage of the Marshes', Journey to the Cross-roads' and Shelob's Lair's.
   scenarioDials?: readonly TableDial[];
-  // Each seat's cards in hand on stage 3B, which its threat dial wears in its label and warns with at 1 card and 0 (143080:B:3; readouts/isengard.ts).
+  // Each seat's cards in hand on stage 3B (143080:B:3; readouts/isengard.ts) or its allies this round in Shelob's Lair (144071:B:2; readouts/lair.ts), which its threat dial wears in its label and warns with.
   hands?: readonly HandMark[];
   // The seats that hold something facedown or as a Captive and what to say of each (a mark on its dial): the Ring-bearer under the Watcher, a prisoner, a hero an enemy holds, a Captive.
   held?: readonly HeldDial[];

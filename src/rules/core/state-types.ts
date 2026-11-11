@@ -395,7 +395,7 @@ export type ScenarioState = {
   // `phase`: the phase it was played in when that was not the Planning phase ("the first non-unique card you play each planning phase").
   played?: readonly { id: string; code: string; seat: number; round: number; phase?: string; paid?: readonly { heroId: string; amount: number }[] }[];
   // The allies that entered play this round and the clock reading the count was taken at, in a game whose cards limit it (LimitEntries, families/sea/entries.ts).
-  entries?: { round: number; mark: number; count: number };
+  entries?: { round: number; mark: number; count: number; bySeat?: readonly number[] };
   // The cards that spent resources this round ("each hero ... that did not spend any resources this round").
   spent?: { round: number; ids: readonly string[] };
   // This round's quest (rr.step-3-4): the characters committed to it, and the seats whose quest succeeded ("If you quest

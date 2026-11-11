@@ -12,7 +12,7 @@ import { claimedDestination } from "../families/objectives/claimed.ts";
 import { inPlay, moveCard, releaseGrappled, type Destination } from "./zones.ts";
 import { damageGoesTo, defenseFromWillpower } from "../families/defense/damage.ts";
 import { attackingHolds } from "../families/attack/strike.ts";
-import { resourceShield } from "../families/aflame/attack.ts";
+import { resourceCancel, resourceShield } from "../families/aflame/attack.ts";
 import { cancelAllDamage, damageShield } from "../families/wilderland/shield.ts";
 import { discardedFromPlay, doomedRaised, seatThreat } from "../families/play/hooks.ts";
 import { alliesToHandDestination } from "../families/deck/rules.ts";
@@ -212,6 +212,9 @@ export function placeDamage(state: ScenarioState, assigned: string, amount: numb
   // "Cannot take damage from non-quest effects" (19127:A:1): the damage of a combat or of a quest card's effect is still placed.
   if (source !== "combat" && source !== "quest" && flagged(state, id, "cannotTakeNonQuestDamage")) return state;
   if (source === "combat" && flagged(state, id, "combatDamageCanceled")) return state;
+  // "While Shelob has at least 1 resource, cancel all damage she would be dealt and discard 1 resource from her instead" (144072:B:2).
+  const paid = resourceCancel(state, id, amount);
+  if (paid) return paid;
   // "When attached enemy would take any amount of damage, cancel all of that damage. Then, discard Dragon Scales" (18059:A:2).
   const scaled = flagged(state, id, "cancelsDamage") ? cancelAllDamage(state, id, amount) : null;
   if (scaled) return scaled;

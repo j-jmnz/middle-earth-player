@@ -30,7 +30,7 @@ import type { ChoiceNames } from "./choice.ts";
 export const PICK_NOUNS: Readonly<Record<string, string>> = { hero: "hero", ally: "ally", attachment: "attachment", enemy: "enemy", character: "character", location: "location", player: "player", objective: "objective" };
 
 // The decks beside the encounter deck a record names (src/rules/core/piles.ts NAMED_PILES), as a sentence says them.
-const PILE_NAMES = { caves: "Caves", evilCreatures: "Evil Creatures", spiders: "Spiders of Mirkwood", orcs: "Orcs", sideQuests: "side quest", harad: "Harad" } as const;
+const PILE_NAMES = { caves: "Caves", evilCreatures: "Evil Creatures", spiders: "Spiders of Mirkwood", orcs: "Orcs", sideQuests: "side quest", harad: "Harad", greatSpider: "Great Spider" } as const;
 
 export function article(noun: string): string {
   return /^[aeiou]/.test(noun) ? `an ${noun}` : `a ${noun}`;
@@ -85,6 +85,11 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
     // The Passage of the Marshes (the asks file words them again for the sheet): Shifting Quagmire, We Hates Them!.
     case "ReturnRandomVictoryLocation":
       return "return a random location from the victory display to the staging area";
+    // Shelob's Lair: Shelob's resources (144040:A:3, 144061:A:2; the asks file words the choice again for the sheet).
+    case "PlaceResourceTokens": {
+      const amount = amountWords(instruction.amount);
+      return `place ${amount} resource${amount === "1" ? "" : "s"} on ${instruction.on === "self" ? "this card" : "the card you chose"}`;
+    }
     case "FlipGollum":
       return instruction.to === "smeagol" ? "flip Gollum to Sméagol" : "flip Sméagol to Gollum";
     case "GollumAttacks":

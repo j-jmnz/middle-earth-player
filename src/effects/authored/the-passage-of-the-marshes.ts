@@ -30,6 +30,8 @@ const COMMITTED_OF_ANY: PickSpec = { type: "character", control: "any", committe
 type Cond = NonNullable<Effect["condition"]>;
 const FEWER_LOCATIONS_THAN_PLAYERS: Cond = { kind: "less", left: { count: STAGING_LOCATIONS }, right: { players: true } };
 const FIRST_PLAYER_LACKS_SMEAGOL: Cond = { kind: "not", condition: { kind: "controls", code: SMEAGOL } };
+// Shelob's Lair stage 3B (144072:B:1) adds a defeated Gollum to the victory display "Do not flip him over": the flip of 144075:A:3 holds while that stage is not the current quest card.
+const NOT_BETRAYAL: Cond = { kind: "inPlay", code: "144072", is: false };
 const EACH_PLAYER = (instructions: Extract<Instruction, { verb: "ForEachPlayer" }>["instructions"]): Instruction => ({ verb: "ForEachPlayer", order: "firstFirst", instructions });
 const ENGAGED_UNDEAD_ANY: Cond = { kind: "any", conditions: [{ kind: "canPick", pick: UNDEAD_ENGAGED_WITH_YOU }, { kind: "canPick", pick: { ...UNDEAD_ENGAGED_WITH_YOU, engaged: "other" } }] };
 
@@ -233,7 +235,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
                   { kind: "exhausted", code: ONE_RING, is: false },
                 ],
               },
-              instructions: [{ verb: "SpendResources", amount: 1, sphere: "fellowship" }, { verb: "Exhaust", target: { kind: "byCode", code: ONE_RING } }],
+              instructions: [{ verb: "SpendResources", amount: 1, sphere: "fellowship" }, { verb: "Exhaust", target: { kind: "byCode", code: ONE_RING } }, { verb: "CancelEffect" }],
             },
           ],
         },
@@ -308,11 +310,11 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "144066:constant:2", cardCode: "144066", lines: ["144066:B:2"], timing: "constant", condition: FIRST_PLAYER_LACKS_SMEAGOL, instructions: [{ verb: "Restrict", what: "advance" }] },
 
     // 144075 Gollum (the enemy side of the one card Gollum / Sméagol). Immune to the effects of non-Fellowship player cards. He always engages the first player: when the token passes he moves to the new first player, and (Forced) during the refresh
-    // phase that move makes him attack at once. Forced: when he is defeated he flips to Sméagol, damage discarded, exhausted, controlled by the first player (he leaves for neither the discard pile nor the victory display).
+    // phase that move makes him attack at once. Forced: when he is defeated he flips to Sméagol, damage discarded, exhausted, controlled by the first player (he leaves for neither the discard pile nor the victory display), except on Shelob's Lair stage 3 (144072:B:1).
     { id: "144075:constant:1", cardCode: GOLLUM, lines: ["144075:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "immuneToNonFellowship", amount: 1, until: "whileSourceInPlay", target: "self" }] },
     { id: "144075:triggered:1", cardCode: GOLLUM, lines: ["144075:A:1"], timing: "triggered", trigger: "firstPlayerTokenPassed", instructions: [{ verb: "FollowFirstPlayer" }] },
     { id: "144075:forced:1", cardCode: GOLLUM, lines: ["144075:A:2"], timing: "forced", trigger: "engaged", subject: "self", condition: { kind: "phase", is: "Refresh" }, instructions: [{ verb: "ImmediateAttack" }] },
-    { id: "144075:forced:2", cardCode: GOLLUM, lines: ["144075:A:3"], timing: "forced", trigger: "enemyDestroyed", subject: "self", instructions: [{ verb: "FlipGollum", to: "smeagol" }] },
+    { id: "144075:forced:2", cardCode: GOLLUM, lines: ["144075:A:3"], timing: "forced", trigger: "enemyDestroyed", subject: "self", condition: NOT_BETRAYAL, instructions: [{ verb: "FlipGollum", to: "smeagol" }] },
 
     // 144076 Sméagol (the objective-ally side). Immune to player card effects; the first player controls him. Forced: after the players quest unsuccessfully he flips to Gollum, damage discarded, ready, engaged with the first player. If he is
     // destroyed the players lose the game (a flip is not destruction).

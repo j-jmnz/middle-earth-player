@@ -25,10 +25,16 @@ function cap(state: ScenarioState): number | null {
 // How much more progress the quest card can take now; Number.MAX_SAFE_INTEGER when nothing limits it.
 export function questRoom(state: ScenarioState): number {
   if (flagged(state, "table", "noQuestProgress")) return 0;
+  const tally = questCapTally(state);
+  return tally ? Math.max(0, tally.limit - tally.placed) : Number.MAX_SAFE_INTEGER;
+}
+
+// The progress placed on the quest card this round against the cap in force, for the table's readout (Shelob's Lair stage 2B); null when nothing caps it.
+export function questCapTally(state: ScenarioState): { placed: number; limit: number } | null {
   const limit = cap(state);
-  if (limit == null) return Number.MAX_SAFE_INTEGER;
+  if (limit == null) return null;
   const placed = state.modifiers.filter((modifier) => modifier.stat === "questProgressPlaced" && modifier.instanceId === "table").reduce((sum, modifier) => sum + modifier.amount, 0);
-  return Math.max(0, limit - placed);
+  return { placed, limit };
 }
 
 // Notes progress placed on the quest card this round, for a cap.

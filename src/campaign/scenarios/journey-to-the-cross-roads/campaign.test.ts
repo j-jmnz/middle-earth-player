@@ -152,10 +152,10 @@ describe("Journey to the Cross-roads in the the-two-towers campaign", () => {
     expect(some).toBe(true);
   });
 
-  it("144069:B:1 unlocks Shelob's Lair on the path, which the app cannot deal yet", () => {
+  it("144069:B:1 unlocks Shelob's Lair on the path, which the app deals", () => {
     const path = campaignPath(campaign, {}, { ...afterMarshes, completed: [...afterMarshes.completed, "journey-to-the-cross-roads"] });
-    expect(path.slice(4, 6).map((node) => [node.id, node.status])).toEqual([["journey-to-the-cross-roads", "completed"], ["shelobs-lair", "soon"]]);
-    expect(PLAYABLE_SCENARIOS).not.toContain("shelobs-lair");
+    expect(path.slice(4, 6).map((node) => [node.id, node.status])).toEqual([["journey-to-the-cross-roads", "completed"], ["shelobs-lair", "current"]]);
+    expect(PLAYABLE_SCENARIOS).toContain("shelobs-lair");
   });
 
   it("deals no campaign card from a fresh log in the Setup's place, and starts on stage 1", () => {

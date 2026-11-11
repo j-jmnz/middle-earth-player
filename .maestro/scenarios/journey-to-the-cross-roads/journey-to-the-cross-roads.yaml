@@ -14,11 +14,11 @@ tags:
       SCENARIO_ID: journey-to-the-cross-roads
       TABLE_WIDGET: roads-gate
       NO_XP: "true"
-# The win unlocks Shelob's Lair, whose node reads Next while the line under the road says it is coming soon (scripts/checks/maestro.test.ts, path-soon): the part is not playable yet.
+# The win unlocks Shelob's Lair, whose node reads Next and the path offers Begin (the part is playable, so no line says it is coming soon).
 - assertVisible:
     id: node-shelobs-lair-status
     text: "Next"
 - assertVisible:
-    id: path-soon
-- assertNotVisible:
     id: begin
+- assertNotVisible:
+    id: path-soon
