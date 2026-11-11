@@ -35,10 +35,10 @@ import { AUTHORED_EFFECTS as THE_ROAD_TO_ISENGARD_EFFECTS, AUTHORED_REPLACES as 
 import { AUTHORED_EFFECTS as THE_PASSAGE_OF_THE_MARSHES_EFFECTS, AUTHORED_REPLACES as THE_PASSAGE_OF_THE_MARSHES_REPLACES } from "../authored/the-passage-of-the-marshes.ts";
 import { AUTHORED_EFFECTS as JOURNEY_TO_THE_CROSS_ROADS_EFFECTS, AUTHORED_REPLACES as JOURNEY_TO_THE_CROSS_ROADS_REPLACES } from "../authored/journey-to-the-cross-roads.ts";
 import { AUTHORED_EFFECTS as SHELOBS_LAIR_EFFECTS, AUTHORED_REPLACES as SHELOBS_LAIR_REPLACES } from "../authored/shelobs-lair.ts";
-import { AUTHORED_EFFECTS as THE_RETURN_OF_THE_KING_EFFECTS, AUTHORED_REPLACES as THE_RETURN_OF_THE_KING_REPLACES } from "../authored/the-return-of-the-king.ts";
-import { AUTHORED_EFFECTS as THE_PASSING_OF_THE_GREY_COMPANY_EFFECTS, AUTHORED_REPLACES as THE_PASSING_OF_THE_GREY_COMPANY_REPLACES } from "../authored/the-passing-of-the-grey-company.ts";
-import { AUTHORED_EFFECTS as THE_SIEGE_OF_GONDOR_EFFECTS, AUTHORED_REPLACES as THE_SIEGE_OF_GONDOR_REPLACES } from "../authored/the-siege-of-gondor.ts";
-import { AUTHORED_EFFECTS as THE_BATTLE_OF_THE_PELENNOR_FIELDS_EFFECTS, AUTHORED_REPLACES as THE_BATTLE_OF_THE_PELENNOR_FIELDS_REPLACES } from "../authored/the-battle-of-the-pelennor-fields.ts";
+import { AUTHORED_EFFECTS as THE_RETURN_OF_THE_KING_EFFECTS, AUTHORED_REPLACES as THE_RETURN_OF_THE_KING_REPLACES } from "../authored/return-of-the-king/the-return-of-the-king.ts";
+import { AUTHORED_EFFECTS as THE_PASSING_OF_THE_GREY_COMPANY_EFFECTS, AUTHORED_REPLACES as THE_PASSING_OF_THE_GREY_COMPANY_REPLACES } from "../authored/return-of-the-king/the-passing-of-the-grey-company.ts";
+import { AUTHORED_EFFECTS as THE_SIEGE_OF_GONDOR_EFFECTS, AUTHORED_REPLACES as THE_SIEGE_OF_GONDOR_REPLACES } from "../authored/return-of-the-king/the-siege-of-gondor.ts";
+import { AUTHORED_EFFECTS as THE_BATTLE_OF_THE_PELENNOR_FIELDS_EFFECTS, AUTHORED_REPLACES as THE_BATTLE_OF_THE_PELENNOR_FIELDS_REPLACES } from "../authored/return-of-the-king/the-battle-of-the-pelennor-fields.ts";
 import { NIGHTMARE_AUTHORED_EFFECTS, NIGHTMARE_AUTHORED_REPLACES } from "../authored/nightmare/index.ts";
 import { POOL_AUTHORED_EFFECTS, POOL_AUTHORED_REPLACES } from "../authored/pool/index.ts";
 import { FAMILY_AUTHORED_EFFECTS, FAMILY_AUTHORED_REPLACES } from "../authored/families/index.ts";

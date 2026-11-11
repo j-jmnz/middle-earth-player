@@ -1,8 +1,8 @@
-import type { Effect, Instruction, PickSpec } from "../../catalog/boundary.ts";
+import type { Effect, Instruction, PickSpec } from "../../../catalog/boundary.ts";
 
-import { AUTHORED_EFFECTS as RAID } from "./raid-on-the-grey-havens.ts";
-import { AUTHORED_EFFECTS as THE_PASSAGE_OF_THE_MARSHES } from "./the-passage-of-the-marshes.ts";
-import { copyLine, withCopies } from "./reprint.ts";
+import { AUTHORED_EFFECTS as RAID } from "../raid-on-the-grey-havens.ts";
+import { AUTHORED_EFFECTS as THE_PASSAGE_OF_THE_MARSHES } from "../the-passage-of-the-marshes.ts";
+import { copyLine, withCopies } from "../reprint.ts";
 
 // Records for The Passing of the Grey Company (the-return-of-the-king part 1, campaign card 145066, whose records are in the-return-of-the-king.ts): Overcome by Fear (a card on a player's threat dial), the three stages, the
 // locations, the Oathbreaker enemies (Phantom is a printed keyword, mec113.phantom) and the treacheries no template reads. Every line is read from the scan ledger (data/printed/the-return-of-the-king.json); a line a template

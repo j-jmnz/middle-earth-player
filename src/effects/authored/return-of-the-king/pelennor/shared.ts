@@ -1,4 +1,4 @@
-import type { Effect, Instruction, PickSpec } from "../../../catalog/boundary.ts";
+import type { Effect, Instruction, PickSpec } from "../../../../catalog/boundary.ts";
 
 // The codes, picks, conditions and instruction runs the records of The Battle of the Pelennor Fields share (the cards in ../the-battle-of-the-pelennor-fields.ts, the quest stages and the Witch-king's two sides in ./stages.ts).
 export const MINAS_TIRITH = "145043";

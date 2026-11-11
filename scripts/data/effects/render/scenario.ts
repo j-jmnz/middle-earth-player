@@ -13,6 +13,7 @@ import { dealtCodes, loadCampaigns, loadScenario } from "../../load-scenarios.ts
 import { ROOT } from "../../paths.ts";
 import { keyOf, lineId, loadLedger } from "../../printed/ledger.ts";
 import { withPool } from "../../printed/pool.ts";
+import { authoredRelOfScenario } from "../authored-paths.ts";
 import { segmentsOf } from "../generate.ts";
 import { renderCard } from "./cards.ts";
 import type { Tally } from "./kit.ts";
@@ -40,13 +41,14 @@ export function loadRenderEnv(): RenderEnv {
 
 // The cards the scenario's authored file has records for, or null when it has no such file (the caller says so and renders every dealt card). A file that fails to load throws: it is not "no file".
 async function authoredCodes(scenarioId: string, log: Log): Promise<Set<string> | null> {
-  const file = path.join(ROOT, "src", "effects", "authored", `${scenarioId}.ts`);
+  const rel = `src/effects/authored/${authoredRelOfScenario(scenarioId)}.ts`;
+  const file = path.join(ROOT, rel);
   if (!existsSync(file)) {
-    log.warn(`src/effects/authored/${scenarioId}.ts does not exist: rendering every card the scenario deals (as --all-dealt does)`);
+    log.warn(`${rel} does not exist: rendering every card the scenario deals (as --all-dealt does)`);
     return null;
   }
   const loaded = (await import(pathToFileURL(file).href)) as { AUTHORED_EFFECTS?: readonly Effect[] };
-  if (!loaded.AUTHORED_EFFECTS) throw new Error(`src/effects/authored/${scenarioId}.ts exports no AUTHORED_EFFECTS`);
+  if (!loaded.AUTHORED_EFFECTS) throw new Error(`${rel} exports no AUTHORED_EFFECTS`);
   return new Set(loaded.AUTHORED_EFFECTS.map((effect) => effect.cardCode));
 }
 

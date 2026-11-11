@@ -1,4 +1,4 @@
-import type { Effect } from "../../catalog/boundary.ts";
+import type { Effect } from "../../../catalog/boundary.ts";
 
 // The campaign cards of The Return of the King (145066, 145070, 145078, 146069, 146074, 146079; Setup on the front, Resolution on the back, ledger data/printed/the-return-of-the-king.json). Their vocabulary is the campaign
 // family's (src/catalog/families/campaign.ts): the checklist deals the Setup verbs (src/campaign/checklist.ts) and the Resolution runs the rest (src/rules/setup/resolution.ts, src/rules/families/campaign/saga-end.ts).

@@ -19,7 +19,7 @@ Read `CLAUDE.md`, `.claude/rules/authority.md`, `.claude/rules/code-standards.md
 ## Build
 
 - Inputs: the hand-off note and the Readings, researched or recommended (apply them as given; a reading that conflicts with a line goes back, it is not worked around).
-- Do: the new verbs with their engine and tests, then the records in `src/effects/authored/<id>.ts`, `pnpm effects open`, the scenario in `src/campaign/playable.ts` once none of its lines is open, then `pnpm effects render <id> --out .agent/render/<id>.md` and the scenario's render snapshot (`pnpm effects render --all --out scripts/data/effects/render/snapshots`).
+- Do: the new verbs with their engine and tests, then the records in the file `pnpm scenario new` wrote (`src/effects/authored/<id>.ts`, or `return-of-the-king/<id>.ts` for that box), `pnpm effects open`, the scenario in `src/campaign/playable.ts` once none of its lines is open, then `pnpm effects render <id> --out .agent/render/<id>.md` and the scenario's render snapshot (`pnpm effects render --all --out scripts/data/effects/render/snapshots`).
 - Hand back: the render's path, the verbs and families added with the engine files touched, the lines still open with the reason. Do not judge your own render.
 - Checks: `pnpm lint`, `pnpm typecheck`, `pnpm test scenario <id> --quick`, `pnpm test smoke <codes>` for the player cards you wrote records for.
 

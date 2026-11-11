@@ -13,7 +13,7 @@ new mechanic). Other agents may work on other assignments at the same time. Belo
 `<BASE>` the integration branch the main session names in your task.
 
 The families that exist are listed in `src/catalog/families/index.ts`. A scenario's own records are in
-`src/effects/authored/<scenario-id>.ts` (`fellowship-of-the-ring.ts` for scenarios 1 and 2); families used only by scenario
+`src/effects/authored/<scenario-id>.ts` (`fellowship-of-the-ring.ts` for scenarios 1 and 2; a campaign listed in `scripts/data/effects/authored-paths.ts` keeps them in its own folder, `return-of-the-king/<scenario-id>.ts`); families used only by scenario
 cards have no file under `src/effects/authored/families/`.
 
 ## Setup
@@ -94,7 +94,7 @@ The one way to build a scenario. A subagent cannot start agents, so the orchestr
    - It hands back the Readings list (`.claude/agents/orchestrator.md`, Implementer tasks) and the mechanics that need a new verb, trigger or flag, each with its family. No engine code and no records. The orchestrator does not wait on the user: every reading is applied as researched or recommended. Each goes to `docs/brief.md` under its scenario, with its source URL or "agent recommendation", and each `recommended` reading, or one settled only by a community discussion, also goes to Open items in `docs/phases/STATUS.md` as not user-confirmed.
 2. **Build**, by a fresh `scenario-author` handed the Read note and the rulings, applied as given (a ruling that conflicts with a line goes back, it is not worked around).
    - Verbs in their families, each with its own test: a new verb is engine work in the mechanic family it belongs to (`src/catalog/families/<family>.ts` for the schema, `src/rules/families/<family>/` for the engine), cites a ledger line or a rule span, and reuses the keyword framework and the existing verbs where they fit.
-   - The records in `src/effects/authored/<id>.ts`, a repeated sentence as a template and a line printed the same as another card's as a copy (`docs/plans/effect-authoring.md`, Templates and copied lines); `pnpm effects open`; the scenario in `PLAYABLE_SCENARIOS` (`src/campaign/playable.ts`) once none of its lines is open, until ownership coverage is green for every line of every dealt card, the campaign card's Setup and Resolution included.
+   - The records in `src/effects/authored/<id>.ts` (in `return-of-the-king/` for that box: `pnpm scenario new` writes the path), a repeated sentence as a template and a line printed the same as another card's as a copy (`docs/plans/effect-authoring.md`, Templates and copied lines); `pnpm effects open`; the scenario in `PLAYABLE_SCENARIOS` (`src/campaign/playable.ts`) once none of its lines is open, until ownership coverage is green for every line of every dealt card, the campaign card's Setup and Resolution included.
    - Then the render, `pnpm effects render <id> --out .agent/render/<id>.md` (a piece printed as `[json ...]` or `[also {...}]` has no template yet), and the scenario's snapshot, `pnpm effects render --all --out scripts/data/effects/render/snapshots`, which `snapshots.test.ts` compares for every playable scenario.
 3. **Judge.** The orchestrator runs `reading-judge` on the render and the ledger, with a fresh context. A `render-gap` row (`.claude/agents/reading-judge.md`) is filed as a renderer open item in `docs/phases/STATUS.md`, not sent to the author.
 4. **Finish**, by a fresh `scenario-author` handed the Build note and the judge's rows. It writes:

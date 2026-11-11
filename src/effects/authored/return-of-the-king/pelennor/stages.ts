@@ -1,4 +1,4 @@
-import type { Effect } from "../../../catalog/boundary.ts";
+import type { Effect } from "../../../../catalog/boundary.ts";
 
 import { ANDURIL, ARAGORN, BANNER, DISCARD_UNTIL_ENEMY, EACH_PLAYER, ESQUIRE_OF_GONDOR, ESQUIRE_OF_ROHAN, FIVE_BURDEN_SETS, FLEET, GROND, MINAS_TIRITH, NOT_FIRST_PLAYER, QUEST_PHASE, STAGED_ALLIES, STAGED_ENEMIES, STAGE_4, STAGE_5, WITCH_KING, WITCH_KING_CAPTAIN, WITCH_KING_SORCERER, WRAITH } from "./shared.ts";
 

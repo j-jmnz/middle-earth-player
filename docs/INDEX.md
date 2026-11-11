@@ -24,7 +24,7 @@ Each agent reads its own file.
 - `.claude/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~2.0K tok)
 - `.claude/agents/reading-judge.md` — Reads each effect record, rendered as English, against the printed ledger line it implements and says ok, wrong, ambiguous or render-gap (~960 tok)
 - `.claude/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~2.4K tok)
-- `.claude/agents/scenario-author.md` — Builds one scenario's engine half, one task per run (Read, Build or Finish), each run fresh from the hand-off note (~1.1K tok)
+- `.claude/agents/scenario-author.md` — Builds one scenario's engine half, one task per run (Read, Build or Finish), each run fresh from the hand-off note (~1.2K tok)
 - `.claude/agents/ux.md` — Reviews the current screens for phone UX and visual design, and changes the design system when asked (~1.3K tok)
 
 ## Product, code and design
@@ -60,12 +60,12 @@ Read the sections your task touches.
   - 7–41 Stack (~1.1K)
   - 42–77 Processes (~680)
   - 78–160 Modules (~2.3K) ← 3
-    - 126–160 Repository map (~870) ← 1
+    - 126–160 Repository map (~880) ← 1
   - 161–186 State (~1.1K) ← 9
   - 187–208 Play loop (~250)
   - 209–234 Engine (~5.6K)
     - 223–234 Mechanic families (~4.6K) ← 5
-  - 235–240 Effects (~530)
+  - 235–240 Effects (~600)
   - 241–273 Scenario definition (~800)
   - 274–318 Persistence (~3.0K) ← 1
     - 295–298 Open games across an update (~50)
@@ -77,7 +77,7 @@ Read the sections your task touches.
   - 378–383 Catalog build (~410)
   - 384–401 Tests (~2.0K) ← 5
   - 402–417 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~106.8K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~106.9K tok)
   - 17–39 Sections (~450)
   - 40–51 Product (~590)
   - 52–65 Non-goals (~540)
@@ -112,7 +112,7 @@ Read the sections your task touches.
   - 636–693 Dream-chaser (~15.6K) ← 4
   - 694–720 Ered Mithrin (~15.8K) ← 7
   - 721–857 The Two Towers (~15.5K) ← 21
-  - 858–942 The Return of the King (~8.2K) ← 14
+  - 858–942 The Return of the King (~8.3K) ← 14
     - 885–910 The Passing of the Grey Company (~2.5K) ← 1
     - 911–942 The Siege of Gondor (~4.0K) ← 1
   - 943–951 Nightmare (~410) ← 19
@@ -224,7 +224,7 @@ Read when a task names the plan.
 
 - `docs/plans/effect-authoring.md` — Authoring effect records (~7.5K tok)
   - 12–33 Workflow (~460)
-  - 34–50 Where records live (~370)
+  - 34–50 Where records live (~400)
   - 51–75 Templates and copied lines (~690) ← 5
   - 76–100 The record (~500)
   - 101–117 Which card an instruction acts on (~380)
@@ -262,7 +262,7 @@ Open work; read when a task names it.
   - 38–56 Files you own (edit freely) (~490)
   - 57–70 Shared files (~300)
   - 71–85 Approach (~670) ← 1
-  - 86–124 Scenario procedure (~2.0K) ← 20
+  - 86–124 Scenario procedure (~2.1K) ← 20
   - 125–134 Checkpoints (API usage limits can stop you mid-task) (~210)
   - 135–149 Checks before committing (~310)
   - 150–156 Merge (~140) ← 1

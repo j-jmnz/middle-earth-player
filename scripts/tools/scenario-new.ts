@@ -6,7 +6,7 @@ import { loadCards } from "../data/load-cards.ts";
 import { loadCampaignsInOrder, loadScenario } from "../data/load-scenarios.ts";
 import { ROOT } from "../data/paths.ts";
 import { runScript, type Log } from "../log.ts";
-import { asksFile, authoredFile, campaignTestFile, camel, gameFile, goldenTestFile, lossFlowFile, seedFinderFile, specTestFile, winFlowFile, type Facts, type PreviousPart } from "./scenario-new-files.ts";
+import { asksFile, authoredFile, authoredPath, campaignTestFile, camel, gameFile, goldenTestFile, lossFlowFile, seedFinderFile, specTestFile, winFlowFile, type Facts, type PreviousPart } from "./scenario-new-files.ts";
 
 // Writes the skeleton of a scenario that data/scenarios already has, and the lines that register it, so the work left is the scenario's own
 // (docs/handover/agent-brief.md, Scenario procedure):
@@ -15,7 +15,7 @@ import { asksFile, authoredFile, campaignTestFile, camel, gameFile, goldenTestFi
 //
 // Files (never overwritten: if any exists the command refuses, listing them): the game (test/scenarios/<id>/), the golden test, the campaign test and the
 // spec rows (src/campaign/scenarios/<id>/), the choice words as an asks file (src/play/words/asks/<id>.ts, listed in its barrel by pnpm data build), the seed finder
-// (scripts/e2e/<id>.ts), both Maestro flows (.maestro/scenarios/<id>/), the authored effects file (src/effects/authored/<id>.ts) and the empty fixture file
+// (scripts/e2e/<id>.ts), both Maestro flows (.maestro/scenarios/<id>/), the authored effects file (src/effects/authored/<id>.ts, or in the campaign's folder: scripts/data/effects/authored-paths.ts) and the empty fixture file
 // (src/campaign/fixtures/<id>.json). There is no scene file: the game, the golden test and the campaign test read the scenario from data/, and the card tests are spec rows
 // (on tableFromLayout).
 // Registry lines: the fixture registry, the JSON import and FILES entry in src/campaign/fixtures.ts, the writer in scripts/e2e/fixtures.ts,
@@ -174,7 +174,7 @@ export function planScenario(id: string, options: { short?: string }, repo: Repo
     { file: `scripts/e2e/${id}.ts`, text: seedFinderFile(facts) },
     { file: `.maestro/scenarios/${id}/${id}.yaml`, text: winFlowFile(facts) },
     { file: `.maestro/scenarios/${id}/${id}-loss.yaml`, text: lossFlowFile(facts) },
-    { file: `src/effects/authored/${id}.ts`, text: authoredFile(facts) },
+    { file: authoredPath(facts), text: authoredFile(facts) },
     { file: `src/campaign/fixtures/${id}.json`, text: "{}\n" },
   ];
   const present = files.filter((item) => exists(item.file)).map((item) => item.file);

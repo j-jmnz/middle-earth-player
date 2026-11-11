@@ -1,10 +1,10 @@
-import type { Effect } from "../../catalog/boundary.ts";
+import type { Effect } from "../../../catalog/boundary.ts";
 
 import { ADDITIONAL_ATTACK, ARAGORN, BLACK_DART, CITY, CITY_IN_PLAY, CITY_OR, DISCARD_UNTIL_ENEMY, EACH_PLAYER, ESQUIRE_OF_GONDOR, ESQUIRE_OF_ROHAN, FELL_BEAST, FLEET, GROND, HARAD_ATTACKER, MINAS_TIRITH, MORDOR_ATTACKER, MY_HERO, QUEST_PHASE, STAGED_ENEMIES, STAGING_LOCATIONS, WITCH_KING, WRAITH } from "./pelennor/shared.ts";
 import { STAGE_RECORDS } from "./pelennor/stages.ts";
 
 // Records for The Battle of the Pelennor Fields (the-return-of-the-king part 3, campaign card 145078, whose Resolution record is in the-return-of-the-king.ts): the Esquires, Minas Tirith and the siege locations, the Harad and Mordor enemies, the
-// treacheries and the Corsair Fleet; the quest stages, the campaign card and the Witch-king's two sides are in pelennor/stages.ts. The cards the quest card's piles set aside (Minas Tirith, Grond, the Wraiths on Wings, the Witch-king, the Esquires) are
+// treacheries and the Corsair Fleet; the quest stages, the campaign card and the Witch-king's two sides are in return-of-the-king/pelennor/stages.ts. The cards the quest card's piles set aside (Minas Tirith, Grond, the Wraiths on Wings, the Witch-king, the Esquires) are
 // dealt by the data; no record places them. Every line is read from the scan ledger (data/printed/the-return-of-the-king.json); a line a template already writes (pnpm data build) or another card prints word for word needs no record here.
 // See docs/brief.md, The Return of the King, for each reading.
 // Rules: mec113.minas-tirith, mec113.assault, mec113.setting-up-the-game, mec113.aragorn, mec113.multiplayer-aragorn, mec113.saga-staging-rules, mec113.immune-to-player-card-effects, mec113.peril, mec113.archery, rr.effects, rr.search,

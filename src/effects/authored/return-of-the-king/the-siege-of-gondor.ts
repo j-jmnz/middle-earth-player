@@ -1,10 +1,10 @@
-import type { Effect, Instruction, PickSpec } from "../../catalog/boundary.ts";
+import type { Effect, Instruction, PickSpec } from "../../../catalog/boundary.ts";
 
-import { AUTHORED_EFFECTS as THE_FATE_OF_WILDERLAND } from "./the-fate-of-wilderland.ts";
-import { AUTHORED_EFFECTS as TEMPLE } from "./temple-of-the-deceived.ts";
-import { AUTHORED_EFFECTS as THE_PASSAGE_OF_THE_MARSHES } from "./the-passage-of-the-marshes.ts";
-import { RECORDS as REVCORE } from "./pool/RevCore.ts";
-import { copyLine, withCopies } from "./reprint.ts";
+import { AUTHORED_EFFECTS as THE_FATE_OF_WILDERLAND } from "../the-fate-of-wilderland.ts";
+import { AUTHORED_EFFECTS as TEMPLE } from "../temple-of-the-deceived.ts";
+import { AUTHORED_EFFECTS as THE_PASSAGE_OF_THE_MARSHES } from "../the-passage-of-the-marshes.ts";
+import { RECORDS as REVCORE } from "../pool/RevCore.ts";
+import { copyLine, withCopies } from "../reprint.ts";
 
 // Records for The Siege of Gondor (the-return-of-the-king part 2, campaign card 145070, whose records are in the-return-of-the-king.ts): the Ship locations, the Corsair enemies, the treacheries, Army of the Dead (the objective
 // ally) and the quest card. The Corsair Fleet and Great Corsair Ship are placed by the scenario's staging pile, so no record places them. Every line is read from the scan ledger (data/printed/the-return-of-the-king.json); a line a

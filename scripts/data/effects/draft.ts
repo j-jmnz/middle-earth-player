@@ -12,6 +12,7 @@ import type { Effect } from "../../../src/catalog/boundary.ts";
 import type { Card } from "../../../src/catalog/card-facts.ts";
 import { MODE_CARD_CODE } from "../../../src/catalog/scenario-data.ts";
 import { prebuiltDecksSchema } from "../../../src/catalog/prebuilt-deck.ts";
+import { authoredRel } from "./authored-paths.ts";
 import { HOB_ONLY_PACKS } from "../campaign-defs.ts";
 import { loadCards } from "../load-cards.ts";
 import { dealtCodes, gameCodes, loadCampaigns, loadScenario, loadScenarios, nightmareCodes, starterCodes } from "../load-scenarios.ts";
@@ -102,7 +103,7 @@ async function main(log: Log): Promise<void> {
   // Where a card's records go: a pool card's pack file, a boon or burden of a Hall-of-Beorn-only box (the Revised Core Set, The Dark
   // of Mirkwood; HOB_ONLY_PACKS) in that pack's pool file (src/effects/authored/pool/RevCore.ts, TDoM.ts: the plan's phases 29 to
   // 33 table puts them there), the Fellowship box's cards in the Fellowship file, and any other box card in the file of the
-  // first scenario that deals it (src/effects/authored/<scenario-id>.ts).
+  // first scenario that deals it (src/effects/authored/<scenario-id>.ts, or in its campaign's folder: scripts/data/effects/authored-paths.ts).
   const starters = starterCodes(campaigns);
   const fellowship = new Set(campaigns.find((entry) => entry.id === "fellowship-of-the-ring")?.scenarios ?? []);
   const scenarios = loadScenarios();
@@ -115,7 +116,7 @@ async function main(log: Log): Promise<void> {
     const nightmareOf = scenarios.find((entry) => nightmareCodes([entry]).has(card.code));
     if (nightmareOf) return `src/effects/authored/nightmare/${nightmareOf.id}.ts`;
     const dealer = scenarios.find((entry) => dealtCodes([], [entry]).has(card.code) || gameCodes(campaigns, entry).includes(card.code));
-    return dealer && !fellowship.has(dealer.id) ? `src/effects/authored/${dealer.id}.ts` : "src/effects/authored/fellowship-of-the-ring.ts";
+    return dealer && !fellowship.has(dealer.id) ? `src/effects/authored/${authoredRel(dealer.id, campaigns.find((entry) => entry.scenarios.includes(dealer.id))?.id ?? null)}.ts` : "src/effects/authored/fellowship-of-the-ring.ts";
   };
 
   // Every printed line of every card, by its text as generate.ts normalizes it, and the records that own each line.
