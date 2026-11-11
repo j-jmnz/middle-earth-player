@@ -1,7 +1,7 @@
 appId: com.middleearth.lcg
 ---
 # A showcase save opened on the table (docs/showcase.md, Capture flows): the fixture route writes it and opens its campaign path,
-# Begin resumes it on the table, and the quest stage the table opens on is closed. Then every picture on it has drawn (pictures-ready).
+# Begin resumes it on the table, and the quest stage the table opens on is closed once it has shown. Then every picture on it has drawn (pictures-ready).
 # Env: FIXTURE (a showcase fixture of src/campaign/fixtures/registry.ts).
 # Optional env: THEME (dark or light), given by scripts/showcase/capture.ts with -e.
 - runFlow:
@@ -15,9 +15,23 @@ appId: com.middleearth.lcg
     visible:
       id: table
     timeout: 30000
-- tapOn:
-    id: quest-advance-progress
+# The table opens on the quest stage in play (quest-advance.ts, openingLatch), a moment after the table itself: the flow waits for it and taps
+# Continue until it is gone, so it covers neither the shot nor the dock.
+- extendedWaitUntil:
+    visible:
+      id: quest-advance-progress
+    timeout: 10000
     optional: true
+- repeat:
+    while:
+      visible:
+        id: quest-advance-progress
+    times: 3
+    commands:
+      - tapOn:
+          id: quest-advance-progress
+      - waitForAnimationToEnd:
+          timeout: 5000
 - waitForAnimationToEnd:
     timeout: 10000
 - extendedWaitUntil:
