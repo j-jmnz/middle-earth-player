@@ -1,0 +1,255 @@
+Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir; staging: 145030 Great Corsair Ship; staging: 145071 The Corsair Fleet)
+
+## 145030 Great Corsair Ship
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+145030:A:1 (front): X is the number of resources on The Corsair Fleet.
+  145030:constant:1: Constant
+    - this card: stat threat the resource tokens on objective (any player controls) named "The Corsair Fleet", while this card is in play
+
+145030:A:2 (front): The players cannot travel here unless there are at least 3 Ship locations in the victory display.
+  145030:constant:2: Constant
+    only if the number of Ship location (any player controls) in the victory display is at most 2
+    - the players cannot travel to any location while this holds
+
+145030:A:3 (front): Travel: Each player searches the encounter deck and discard pile for a Corsair enemy and adds it to the staging area. One of those enemies must be Corsair Captain, if able.
+  145030:travel:1: Travel
+    - for each player, first player first:
+      - [json SearchMove {"verb":"SearchMove","trait":"Corsair","type":"enemy","to":"staging","require":"145035"}]
+
+## 145031 Umbar War Galley
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145031:A:1 (front): While Umbar War Galley is the active location, each Corsair enemy gets -10 engagement cost.
+  145031:constant:1: Constant
+    only if this card is the active location
+    - each Corsair enemy (any player controls) or in the staging area: stat engagementCost -10, while this card is in play
+
+145031:A:2 (front): Travel: Shuffle the encounter discard pile into the encounter deck and discard cards from the encounter deck until a Corsair enemy is discarded. Add the discarded enemy to the staging area.
+  145031:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy","trait":"Corsair"}]
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any","trait":"Corsair"},"inPlay":false}}]
+
+## 145032 Corsair Dromon
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145032:A:1 (front): While Corsair Dromon is the active location, each Corsair enemy gains Archery 1.
+  145032:constant:1: Constant
+    only if this card is the active location
+    - each Corsair enemy (any player controls) or in the staging area: stat archery 1, while this card is in play
+
+145032:A:2 (front): Travel: Shuffle the encounter discard pile into the encounter deck and discard cards from the top until a Corsair enemy is discarded. Add the discarded enemy to the staging area.
+  145032:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy","trait":"Corsair"}]
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any","trait":"Corsair"},"inPlay":false}}]
+
+## 145033 Port of Pelargir
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145033:A:1 (front): While Port of Pelargir is in the staging area, no more than 1 damage can be healed from each character each round.
+  145033:constant:1: Constant
+    only if this card is in the staging area
+    - the table: stat healCap 1, while this card is in play
+
+145033:A:2 (shadow): Shadow: If this attack damages a character, that character cannot ready until the end of the round.
+  145033:shadow:1: Shadow
+    - when the attack in progress ends:
+      - if [json condition {"kind":"dealt"}]: the event's other card: stat cannotReady 1, until the end of the round
+
+## 145034 Pelargir Quays
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145034:A:1 (front): Forced: At the end of the round, place a damage token here. Then, if there are 4 damage tokens here, discard Pelargir Quays and assign 4 damage among characters in play.
+  145034:forced:1: Forced at the end of the round
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json PlaceDamage {"verb":"PlaceDamage","amount":1,"card":"self"}]
+    - [json AssignDamage {"verb":"AssignDamage","amount":4,"pick":{"type":"character","control":"any","who":"firstPlayer"},"when":{"kind":"less","left":3,"right":{"stat":"damage","of":"self"}}}]
+    - then, if 3 is less than damage of this card (checked when this step runs, after the steps above; not tied to whether they did anything): discard this card
+
+## 145035 Corsair Captain
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145035:A:1 (front): Cannot be optionally engaged.
+  145035:constant:1: Constant
+    - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
+
+145035:A:2 (front): If the active location is a Ship, Corsair Captain gets -30 engagement cost and gains: "Forced: When Corsair Captain engages you, it makes an immediate attack."
+  145035:constant:2: Constant
+    only if the active location is a Ship location (any player controls)
+    - this card: stat engagementCost -30, while this card is in play
+  145035:forced:1: Forced after an enemy engages a player (heard about this card)
+    only if the active location is a Ship location (any player controls)
+    - this enemy attacks now, dealt a new shadow card after its old ones are discarded
+
+## 145036 Corsair of Umbar
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145036:A:1 (front): If the active location is a Ship, Corsair of Umbar gets +2 Attack and +2 Defense.
+  145036:constant:1: Constant
+    only if the active location is a Ship location (any player controls)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat attack 2, while this card is in play
+    - this card: stat defense 2, while this card is in play
+
+145036:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the active location is a Ship).
+  145036:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the active location is a Ship location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
+
+## 145037 Umbar Pirate Crew
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145037:A:1 (front): Cannot have attachments.
+  145037:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+145037:A:2 (front): Forced: When Umbar Pirate Crew engages you, exhaust a character you control.
+  145037:forced:1: Forced after an enemy engages a player (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+
+145037:A:3 (shadow): Shadow: If the active location is a Ship, return attacking enemy to the staging area after this attack.
+  145037:shadow:1: Shadow
+    - if the active location is a Ship location (any player controls): when the attack in progress ends:
+      - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 145038 Haradrim Pirate
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145038:A:1 (front): Forced: When Haradrim Pirate engages you, deal 1 damage to a character you control (2 damage instead if the active location is a Ship).
+  145038:forced:1: Forced after an enemy engages a player (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (you control)
+    - then, if not (the active location is a Ship location (any player controls)) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 1 damage to the picked card
+    - then, if the active location is a Ship location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the picked card
+
+145038:A:2 (shadow): Shadow: Defending character gets -1 Defense for each damage on it.
+  145038:shadow:1: Shadow
+    - the defender: stat defense minus (damage of the defender), until the end of the attack
+
+## 145039 Fell Folk of Umbar
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145039:A:1: Peril.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+145039:A:2 (front): When Revealed: Either return each Corsair enemy engaged with you to the staging area, or discard cards from the top of the encounter deck until a Corsair enemy is discarded and put that enemy into play engaged with you.
+  145039:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "return" (only if the actor has a Corsair enemy engaged):
+        - return every enemy with the trait Corsair engaged with the acting player to the staging area
+      * option "discard" (only if [json condition {"kind":"searchable","trait":"Corsair"}]):
+        - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy","trait":"Corsair"}]
+        - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"engaged","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any","trait":"Corsair"},"inPlay":false}}]
+
+## 145040 Black Sails
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145040:A:1: Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+145040:A:2 (front): When Revealed: Each Ship location in the staging area gets +1 Threat until the end of the phase. If there are no non-unique Ship locations in the staging area, search the encounter deck and discard pile for a Ship location and add it to the staging area. Shuffle the encounter deck.
+  145040:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each Ship location (any player controls) in the staging area only: stat threat 1, until the end of the phase
+    - [json SearchMove {"verb":"SearchMove","trait":"Ship","type":"location","to":"staging","when":{"kind":"not","condition":{"kind":"canPick","pick":{"type":"location","control":"any","trait":"Ship","nonUnique":true,"stagingOnly":true}}}}]
+    - shuffle the encounter deck
+
+## 145041 Raiding the Coasts
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145041:A:1 (front): When Revealed: Each player must choose: either add 3 to the total Threat in the staging area until the end of the phase, or discard the highest cost attachment you control.
+  145041:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "threat":
+          - [json RaiseStagingThreat {"verb":"RaiseStagingThreat","amount":3,"until":"endOfPhase"}]
+        * option "discard" (only if there is a attachment (you control) to choose):
+          - choose attachment (you control) with the highest printed cost of those (no printed cost counts as 0; ties: the chooser decides)
+          - discard the picked card
+
+145041:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, discard an attachment you control.
+  145041:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): choose attachment (you control)
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+
+## 145042 Driven to the Brink
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145042:A:1: Peril.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+145042:A:2 (front): When Revealed: Either immediately end the quest phase (without resolving the quest), or assign X damage among questing characters you control. X is the number of resources on The Corsair Fleet.
+  145042:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "end":
+        - end the quest phase at once (no quest resolution)
+      * option "damage" (only if all of: (there is a character (you control) committed to the quest to choose) and (0 is less than the resource tokens on objective (any player controls) named "The Corsair Fleet")):
+        - [json AssignDamage {"verb":"AssignDamage","amount":{"resourcesOn":{"type":"objective","control":"any","names":["The Corsair Fleet"]}},"pick":{"type":"character","control":"you","committed":true}}]
+
+145042:A:3 (shadow): Shadow: Exhaust a character you control.
+  145042:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+
+## 145068 Army of the Dead
+
+145068:A:1 (front): Immune to player card effects. The first player gains control of Army of the Dead.
+  (the keyword part is owned by the card's keywords; the records cover: The first player gains control of Army of the Dead.)
+  145068:constant:1: Constant
+    - this card: stat immuneToPlayerCards 1, while this card is in play
+  145068:constant:2: Constant
+    - [json ControlledBy {"verb":"ControlledBy","who":"firstPlayer","card":"self"}]
+
+145068:A:2 (front): Setup: The first player takes control of Army of the Dead.
+  145068:campaignSetup:1: Campaign setup
+    - [json PutObjectiveAllyIntoPlay {"verb":"PutObjectiveAllyIntoPlay","code":"145068"}]
+
+145068:A:3 (front): If Army of the Dead leaves play, remove it from the game.
+  145068:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"self","to":"removed"}]
+
+## 145069 Attack on Pelargir
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+145069:A:1 (front): Setup: Add The Corsair Fleet (Corsair side faceup) and Great Corsair Ship to the staging area. Each player searches the encounter deck for a Ship location and adds it to the staging area. Shuffle the encounter deck.
+  145069:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - [json SearchMove {"verb":"SearchMove","type":"location","trait":"Ship","to":"staging","deckOnly":true}]
+    - shuffle the encounter deck
+
+145069:B:1 (back): Each Ship location in the staging area is immune to player card effects.
+  145069:constant:1: Constant
+    - each Ship location (any player controls) in the staging area only: stat immuneToPlayerCards 1, while this card is in play
+
+145069:B:2 (back): The players cannot defeat this stage while Great Corsair Ship is in play. When this stage is defeated, the players win the game.
+  145069:constant:2: Constant
+    only if the card with code 145030 is in play
+    - the players cannot defeat this stage while this holds
+
+## 145071 The Corsair Fleet
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+145071:A:1 (front): Forced: At the beginning of the staging step, place 1 resource on this objective. Then, each player must choose: either reveal an encounter card, or assign X damage among characters he controls. X is the number of resources here.
+  145071:forced:1: Forced when the staging step begins, before the first card is revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - place 1 resource tokens on this card
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "reveal":
+          - the acting player reveals an encounter card
+        * option "damage" (only if there is a character (you control) to choose):
+          - [json AssignDamage {"verb":"AssignDamage","amount":{"resourcesOn":{"type":"objective","control":"any","names":["The Corsair Fleet"]}},"pick":{"type":"character","control":"you"}}]
+
+(rendered pieces: 142 by template, 19 as JSON)

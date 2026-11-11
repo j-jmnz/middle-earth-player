@@ -262,6 +262,7 @@ describe("effects render read fields, picks", () => {
     hasShadow: true,
     lowestAttack: true,
     lowestThreat: true,
+    highestCost: true,
   };
   const SAMPLES: readonly Obj[] = [
     BIG,
