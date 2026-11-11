@@ -161,3 +161,24 @@ export async function wonLog<G extends { name: string; decks: string }>(part: Wo
   const blank = emptyLog(2);
   return { ...written, heroesBySeat: blank.heroesBySeat, fallenHeroesBySeat: blank.fallenHeroesBySeat, campaignPool: written.campaignPool.filter((card) => card.attachedTo == null) };
 }
+
+/** How full a table is, for the showcase fixtures (docs/plans/readme-showcase.md, Saves and decks): the seats' cards in play, the cards attached to them, the engaged enemies, staging and the active location. */
+export type Board = { play: number; attached: number; engaged: number; staging: number; location: boolean };
+
+export function boardOf(state: ScenarioState): Board {
+  const seats = state.seats.slice(0, state.seatCount);
+  const attached = Object.values(state.cards).filter((card) => card.host != null && (card.zone === "play" || card.zone === "heroes")).length;
+  return { play: seats.reduce((sum, seat) => sum + seat.heroes.length + seat.play.length, 0), attached, engaged: seats.reduce((sum, seat) => sum + seat.engaged.length, 0), staging: state.staging.length, location: state.activeLocation != null };
+}
+
+/** True when the table is at least as full as `least` asks, in every count it names. */
+export function boardHolds(state: ScenarioState, least: Partial<Board>): boolean {
+  const board = boardOf(state);
+  return (
+    board.play >= (least.play ?? 0) &&
+    board.attached >= (least.attached ?? 0) &&
+    board.engaged >= (least.engaged ?? 0) &&
+    board.staging >= (least.staging ?? 0) &&
+    (!least.location || board.location)
+  );
+}

@@ -50,6 +50,7 @@ import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceConte
 import { nextIntent } from "../../test/harness/auto-player.ts";
 import { loadCampaign, loadScenario, scenarioOrder } from "../data/load-scenarios.ts";
 import { prebuiltDeck } from "./seed-kit.ts";
+import { pastShowcase } from "./showcase-past.ts";
 import { anduinFixtures } from "./journey-along-the-anduin.ts";
 import { dolGuldurFixtures } from "./escape-from-dol-guldur.ts";
 import { mirkwoodFixtures } from "./passage-through-mirkwood.ts";
@@ -428,10 +429,12 @@ function writeScenarioOne(dir: string, searching: boolean): void {
   const lost = say.step("play scenario 1's loss", () => playLoss());
   const won = searching ? say.step("search scenario 1's won game", () => searchWin()) : null;
   const duo = say.step("play scenario 1 to a two-handed planning window", () => playDuo());
+  const showcase = say.step("play scenario 1 to the README showcase's moments", () => pastShowcase());
   const out = {
     ...(won ? { won: { seatCount: 2, ...won } } : {}),
     lost: { seatCount: 1, ...lost },
     duo: { seatCount: 2, ...duo },
+    ...showcase,
   };
   const file = path.join(dir, "scenario-1.json");
   writeFileSync(file, `${JSON.stringify(out)}\n`);

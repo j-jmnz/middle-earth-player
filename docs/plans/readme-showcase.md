@@ -29,7 +29,7 @@ Stills are phone portrait (iPhone 16 Pro, 1206 × 2622 px) except the table, whi
 | --- | --- | --- | --- |
 | 1 | Table, hero GIF | Passage Through Mirkwood, two-handed, round 3: the quest phase reveals the encounter cards into staging, then combat plays one spotlight (an enemy against a defender) | New fixture `showcase-mirkwood-combat` |
 | 2 | Table still | A full board: heroes with attachments, allies, two enemies engaged, an active location, progress on the stage | New fixture `showcase-mirkwood-board` |
-| 3 | Table still | Voyage Across Belegaer: the Heading dial, the ships and the sea piles | Fixture `sea-duo`, moved on to a later round in a new `showcase-sea` |
+| 3 | Table still | Voyage Across Belegaer: the Heading dial, the ships and the sea piles | Fixture `sea-duo`, moved on to a later round in a new `sea-showcase` |
 | 4 | Table still | Helm's Deep: a staging row and a busy engagement area | New fixture `showcase-helms-deep` |
 | 5 | Campaigns | The campaign list with its scene art, one campaign under way | Fixture `mirkwood-won` written first, so a campaign shows progress |
 | 6 | Campaign path | Mirkwood Paths, the first part won, the second open | Fixture `mirkwood-won` |
