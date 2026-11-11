@@ -1,5 +1,5 @@
 // Which game icon stands for which word the app shows: a sphere, a card type, a stat. The icons themselves are in
-// ./icons/generated.ts (written by pnpm data:build; docs/design-system.md, Icons). Pure data, so tests read it in Node.
+// ./icons/generated.ts (written by pnpm data build; docs/design-system.md, Icons). Pure data, so tests read it in Node.
 import { ICONS, type IconName } from "./icons/generated.ts";
 
 export type { IconName };

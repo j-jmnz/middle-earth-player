@@ -9,7 +9,7 @@ import { ROOT, tracked } from "./tracked.ts";
 // current counts: one may not grow, and an entry whose file is back under the limit is stale and goes. Move files with pnpm move.
 const MOST_LINES = 500;
 
-// Generated files are exempt: pnpm data:build and pnpm effects:open write them.
+// Generated files are exempt: pnpm data build and pnpm effects open write them.
 const GENERATED = ["src/effects/generated/", "src/effects/open-lines.ts", "src/ui/icons/", "src/catalog/version.ts"];
 
 const OVER_LIMIT: Readonly<Record<string, number>> = {

@@ -177,7 +177,7 @@ function dragnOtherSide(card: Card): string | null {
 
 const CORE_ORDER = ["Revised Core Set", "Core Set"];
 
-// The Nightmare proxies' picture of each side (sources/nightmare.ts), from the listing `pnpm data:sync nightmare` keeps. A deck's
+// The Nightmare proxies' picture of each side (sources/nightmare.ts), from the listing `pnpm data sync nightmare` keeps. A deck's
 // files are matched against the whole deck, as the sync matches them, so a fallback match (a near title, a collector number)
 // lands on the same file; then only the codes in scope are kept.
 function nightmarePictures(cards: readonly Card[], scope: ReadonlySet<string>): Map<string, string> {

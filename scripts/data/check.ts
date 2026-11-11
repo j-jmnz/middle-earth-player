@@ -47,7 +47,7 @@ void runScript("data:check", (log) => {
     ...compare("src/ui/icons", path.join(ROOT, "src", "ui", "icons"), path.join(scratch, "icon-modules")),
   ]);
   if (problems.length > 0) {
-    log.error(`${problems.length} difference(s). Run pnpm data:build and commit the result.\n  ${problems.join("\n  ")}`);
+    log.error(`${problems.length} difference(s). Run pnpm data build and commit the result.\n  ${problems.join("\n  ")}`);
     log.info(`the fresh build is kept in ${scratch} to diff against`);
     process.exitCode = 1;
   } else {

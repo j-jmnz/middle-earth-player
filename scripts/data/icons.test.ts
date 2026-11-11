@@ -12,7 +12,7 @@ import { ROOT } from "./paths.ts";
 
 // The game icons and the printed card backs (docs/design-system.md, Icons): every icon and back the app names is a committed
 // file, each clears the resolution bar (vector, or a raster at its bar: 256 px in chrome, 96 px for a token drawn on a card,
-// a card scan's 600 px for a back), and data:build writes the same bytes every time.
+// a card scan's 600 px for a back), and data build writes the same bytes every time.
 const ASSETS = path.join(ROOT, "assets", "icons");
 
 function files(dir: string): Map<string, Buffer> {

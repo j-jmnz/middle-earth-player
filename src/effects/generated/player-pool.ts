@@ -1,6 +1,6 @@
 import type { Effect } from "../../catalog/boundary.ts";
 
-// Written by pnpm data:build from data/cards and data/scenarios (player pool). Do not edit.
+// Written by pnpm data build from data/cards and data/scenarios (player pool). Do not edit.
 // scripts/data/effects/templates.ts holds the sentence patterns; src/effects/authored/ holds the rest.
 export const POOL_GENERATED_EFFECTS: readonly Effect[] = [
   {"id":"01012:action:1","cardCode":"01012","lines":["01012:A:1"],"timing":"action","cost":{"kind":"exhaustSelf"},"instructions":[{"verb":"Pick","pick":{"type":"player","control":"any"}},{"verb":"Draw","amount":2,"who":"picked"}],"limit":"oncePerRound"},

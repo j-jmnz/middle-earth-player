@@ -10,7 +10,7 @@ import type { RuleEntry } from "./rules/spans.ts";
 
 // Loads data/cards, data/scenarios and data/rules/entries.json into an in-memory database and prints the rows
 // of one query. There is no database file: the JSON stays canonical and diffable.
-//   pnpm data:query "select code,name,text from cards where encounterSet='Hunted'"
+//   pnpm data query "select code,name,text from cards where encounterSet='Hunted'"
 // Tables: cards (arrays and objects are JSON text), scenario_cards, rules.
 export function openDataDatabase(dataDir = DATA_DIR): DatabaseSync {
   const db = new DatabaseSync(":memory:");
@@ -43,7 +43,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === path.resolve(import.met
       .filter((arg) => arg !== "--" && arg !== "--verbose" && arg !== "--quiet")
       .join(" ")
       .trim();
-    if (sql === "") throw new Error('Usage: pnpm data:query "select code, name from cards where encounterSet = \'Hunted\'"\nTables: cards, scenario_cards, rules');
+    if (sql === "") throw new Error('Usage: pnpm data query "select code, name from cards where encounterSet = \'Hunted\'"\nTables: cards, scenario_cards, rules');
     const begin = performance.now();
     const db = openDataDatabase();
     log.debug(`loaded data/ into memory in ${duration(performance.now() - begin)}; sql: ${sql}`);

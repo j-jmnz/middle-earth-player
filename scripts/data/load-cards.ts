@@ -6,7 +6,7 @@ import { z } from "zod";
 import { cardSchema, type Card } from "../../src/catalog/card-facts.ts";
 import { DATA_DIR } from "./paths.ts";
 
-// Reads data/cards. Offline. The tests, the catalog build and data:query all start here.
+// Reads data/cards. Offline. The tests, the catalog build and data query all start here.
 export function loadCards(dataDir = DATA_DIR): Card[] {
   const dir = path.join(dataDir, "cards");
   return readdirSync(dir)

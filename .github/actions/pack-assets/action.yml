@@ -26,4 +26,4 @@ runs:
         restore-keys: scans-${{ runner.os }}-
     - name: Catalog, booklets and pictures
       shell: bash
-      run: pnpm catalog:build && pnpm booklets:pack && pnpm scans:pack --quiet
+      run: pnpm assets --quiet

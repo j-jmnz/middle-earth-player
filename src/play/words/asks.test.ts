@@ -1,5 +1,5 @@
 // Rules: rr.the-word-choose, rr.first-player (data/rules/entries.json). The asks files (src/play/words/asks/<scenario-id>.ts, read by asks.ts): templates, bindings, variants, cautions, the lookup by record and path
-// (a filled-in copy of an instruction included), the barrel pnpm data:build writes, and the checks a scenario with an asks file passes: every Pick and Choose is worded (by the shared judgement of
+// (a filled-in copy of an instruction included), the barrel pnpm data build writes, and the checks a scenario with an asks file passes: every Pick and Choose is worded (by the shared judgement of
 // test/harness/words-judge.ts), every key names a record path of a card the scenario deals, every template fills, every sentence is short. `WORDS_DUMP=<scenario-id>` (or `all`) prints each sentence.
 import { readFileSync } from "node:fs";
 import path from "node:path";
@@ -182,9 +182,9 @@ describe("an asks entry", () => {
 });
 
 describe("the barrel of asks files", () => {
-  it("is the one pnpm data:build writes (src/play/words/asks/index.ts)", () => {
+  it("is the one pnpm data build writes (src/play/words/asks/index.ts)", () => {
     const dir = path.join(ROOT, "src", "play", "words", "asks");
-    expect(readFileSync(path.join(dir, "index.ts"), "utf8"), "run pnpm data:build").toBe(renderAsksBarrel(asksFileNames(dir)));
+    expect(readFileSync(path.join(dir, "index.ts"), "utf8"), "run pnpm data build").toBe(renderAsksBarrel(asksFileNames(dir)));
   });
 
   it("imports each file under an upper-case name and lists them by scenario id", () => {

@@ -229,7 +229,7 @@ VoiceOver and TalkBack drive every screen as it is drawn; what only a reader mee
 
 ## Icons
 
-The game's printed icons. `pnpm data:sync icons` fetches the sources into `data/raw/icons` (pinned by sha256 in `data/sources.json`); `pnpm data:build` cuts them out offline into `assets/icons` and writes `src/ui/icons/generated.ts` and `src/ui/icons/files.generated.ts`.
+The game's printed icons. `pnpm data sync icons` fetches the sources into `data/raw/icons` (pinned by sha256 in `data/sources.json`); `pnpm data build` cuts them out offline into `assets/icons` and writes `src/ui/icons/generated.ts` and `src/ui/icons/files.generated.ts`.
 
 | Icons | Source | Format |
 | --- | --- | --- |

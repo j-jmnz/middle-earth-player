@@ -1,4 +1,4 @@
-// Offline: cuts the game's icons out of the snapshots `pnpm data:sync icons` keeps under data/raw/icons, and writes
+// Offline: cuts the game's icons out of the snapshots `pnpm data sync icons` keeps under data/raw/icons, and writes
 // assets/icons (one standalone SVG per vector glyph, the PNG tokens and the JPEG card backs copied as they are) and two
 // modules under src/ui/icons: `generated.ts` (each icon's and card back's source, size and, for a vector, its path for the
 // Skia canvas) and `files.generated.ts` (the asset requires for expo-image and Skia images). Deterministic: the same
@@ -311,7 +311,7 @@ export function iconRecords(rawDir: string = RAW_DIR): IconRecord[] {
 function renderData(records: readonly IconRecord[], backs: readonly CardBackRecord[]): string {
   const lines = records.map((record) => `  ${JSON.stringify(record.name)}: ${JSON.stringify(record)},`);
   const backLines = backs.map((back) => `  ${JSON.stringify(back.name)}: ${JSON.stringify(back)},`);
-  return `// Written by pnpm data:build (scripts/data/icons.ts). Do not edit.
+  return `// Written by pnpm data build (scripts/data/icons.ts). Do not edit.
 // Each game icon the app draws: its source, and its size (a vector's viewBox in font units, a raster's pixels).
 export type IconRecord =
   | { name: string; kind: "vector"; source: string; glyph: string; viewBox: readonly [number, number, number, number]; d: string }
@@ -336,7 +336,7 @@ export type CardBackName = keyof typeof CARD_BACKS;
 function renderFiles(records: readonly IconRecord[], backs: readonly CardBackRecord[]): string {
   const lines = records.map((record) => `  ${JSON.stringify(record.name)}: require("../../../assets/icons/${record.name}.${record.kind === "vector" ? "svg" : "png"}") as number,`);
   const backLines = backs.map((back) => `  ${JSON.stringify(back.name)}: require("../../../assets/icons/${backAsset(back.name)}") as number,`);
-  return `// Written by pnpm data:build (scripts/data/icons.ts). Do not edit.
+  return `// Written by pnpm data build (scripts/data/icons.ts). Do not edit.
 // The asset of each icon, for expo-image (SVG and PNG) and Skia images. Imported by components only: Node tests read
 // ./generated.ts.
 import type { CardBackName, IconName } from "./generated";
@@ -351,7 +351,7 @@ ${backLines.join("\n")}
 `;
 }
 
-/** Writes assets/icons and the two icon modules. `assetsDir` and `modulesDir` let data:check build into a scratch dir. */
+/** Writes assets/icons and the two icon modules. `assetsDir` and `modulesDir` let data check build into a scratch dir. */
 export function buildIcons(assetsDir: string, modulesDir: string, rawDir: string = RAW_DIR): IconRecord[] {
   const records = iconRecords(rawDir);
   const backs = cardBackRecords(rawDir);

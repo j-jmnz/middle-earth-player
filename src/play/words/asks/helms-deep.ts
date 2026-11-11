@@ -1,7 +1,7 @@
 import type { Ask } from "../asks.ts";
 
 // The choice words of Helm's Deep (the-two-towers part 2), one entry for each Pick and Choose of its records: `<record id> @<instruction path> <verb | option id>` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
-// `pnpm test:scenario helms-deep --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=helms-deep` prints each sentence.
+// `pnpm test scenario helms-deep --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=helms-deep` prints each sentence.
 export const ASKS: Readonly<Record<string, Ask>> = {
   // 143072:A:1: "the players must choose": the first player answers for the group. The first option is the one a player who wants Poisoned Counsels in their deck takes; the second bypasses stage 1B (its When Revealed never resolves).
   "143072:setup:1 @0 Choose": { note: "The King of the Golden Hall: {owner} chooses for all the players. Either each player shuffles 1 Poisoned Counsels into their deck, or advance to stage 2A (Assault on Helm's Deep), bypassing stage 1B." },

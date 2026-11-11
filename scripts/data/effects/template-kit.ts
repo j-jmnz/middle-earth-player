@@ -2,7 +2,7 @@ import type { Condition, Effect, Instruction } from "../../../src/catalog/bounda
 import type { Card } from "../../../src/catalog/card-facts.ts";
 
 // A template turns one whole line of card text into effect records. A line that no template matches in full
-// is not partially matched: it goes to the drafts list for an agent (.agent/drafts, pnpm effects:draft).
+// is not partially matched: it goes to the drafts list for an agent (.agent/drafts, pnpm effects draft).
 // Records carry no id; generate.ts numbers them per card and timing, in text order.
 export type Draft = Omit<Effect, "id" | "cardCode" | "lines">;
 

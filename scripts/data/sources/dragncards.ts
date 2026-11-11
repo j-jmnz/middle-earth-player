@@ -17,7 +17,7 @@ const FILES: readonly { from: string; to: string; jsonc?: boolean }[] = [
   { from: "jsons/imageUrlPrefix.json", to: "imageUrlPrefix.json" },
   { from: "jsons/playerCards.json", to: "playerCards.json", jsonc: true },
   { from: "jsons/encounterCards.json", to: "encounterCards.json", jsonc: true },
-  // Card automation the plugin writes from jsonnet families and per quest; effects:draft shows it to the effect author.
+  // Card automation the plugin writes from jsonnet families and per quest; effects draft shows it to the effect author.
   { from: "jsons/basicAttachments-GENERATED.json", to: "basicAttachments-GENERATED.json", jsonc: true },
   { from: "jsons/globalPassiveEffects-GENERATED.json", to: "globalPassiveEffects-GENERATED.json", jsonc: true },
   { from: "jsons/localPassiveEffects-GENERATED.json", to: "localPassiveEffects-GENERATED.json", jsonc: true },

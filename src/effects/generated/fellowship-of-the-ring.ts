@@ -1,6 +1,6 @@
 import type { Effect } from "../../catalog/boundary.ts";
 
-// Written by pnpm data:build from data/cards and data/scenarios (fellowship-of-the-ring). Do not edit.
+// Written by pnpm data build from data/cards and data/scenarios (fellowship-of-the-ring). Do not edit.
 // scripts/data/effects/templates.ts holds the sentence patterns; src/effects/authored/ holds the rest.
 export const GENERATED_EFFECTS: readonly Effect[] = [
   {"id":"01002:response:1","cardCode":"01002","lines":["01002:A:1"],"timing":"response","trigger":"committed","instructions":[{"verb":"Pick","pick":{"type":"hero","control":"any","committed":true}},{"verb":"AddResources","amount":1,"to":"picked"}]},

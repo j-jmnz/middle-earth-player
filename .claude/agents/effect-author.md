@@ -1,6 +1,6 @@
 ---
 name: effect-author
-description: Writes effect records for card lines no template reads. Use after `pnpm effects:draft <scenario | starter deck | pack | codes>` has written bundles under .agent/drafts.
+description: Writes effect records for card lines no template reads. Use after `pnpm effects draft <scenario | starter deck | pack | codes>` has written bundles under .agent/drafts.
 tools: Read, Grep, Glob, Bash, Edit, Write, Monitor
 ---
 
@@ -14,7 +14,7 @@ exact match: copy them) or the nearest existing records. The vocabulary is in `.
 1. Write the records where the card belongs. A player card whose mechanic has a family goes in
    `src/effects/authored/families/<family>.ts` (`RECORDS`, `REPLACES`; the families are listed in `src/catalog/families/index.ts`). Any other player card goes in `src/effects/authored/pool/<PACK>.ts`. A
    scenario's cards (and the saga box's) go in `src/effects/authored/<scenario-id>.ts` (`fellowship-of-the-ring.ts` for
-   scenarios 1 and 2; `pnpm scenario:new <scenario-id>` writes the empty file with the scenario's other skeletons, and `pnpm data:build` adds it to the barrel `src/effects/generated/authored.ts`).
+   scenarios 1 and 2; `pnpm scenario new <scenario-id>` writes the empty file with the scenario's other skeletons, and `pnpm data build` adds it to the barrel `src/effects/generated/authored.ts`).
    Ids are `<code>:<timing>:<n>`, numbered in text order per timing (front, then side B, then shadow) and unique across
    every file: `grep -rn '"<code>:' src/effects`. An id a template already produces replaces the generated record; list it in
    `REPLACES` (`AUTHORED_REPLACES` in a scenario file) and say why. A line that only restates a rule the engine applies
@@ -24,13 +24,13 @@ exact match: copy them) or the nearest existing records. The vocabulary is in `.
    `effect-schema-amount.ts`, and each family's `VERBS`, `TRIGGERS` and `FLAGS` in `src/catalog/families/`. If a line needs
    something that is not there, leave it open and report it. Adding a verb is engine work in the schema and in
    `src/rules` (`src/rules/families/<family>/index.ts`), not data.
-3. Take rule wording from `data/rules/entries.json` (`pnpm data:query`), not from memory. Rule ids you cite must exist there.
-4. Run `pnpm effects:open` (it rewrites `src/effects/open-lines.ts`; commit the change only when the task is to burn the
+3. Take rule wording from `data/rules/entries.json` (`pnpm data query`), not from memory. Rule ids you cite must exist there.
+4. Run `pnpm effects open` (it rewrites `src/effects/open-lines.ts`; commit the change only when the task is to burn the
    list down), `pnpm typecheck`, `pnpm lint`, `pnpm vitest run src/effects scripts/checks/effect-coverage.test.ts`, and
-   `node --experimental-strip-types scripts/card-smoke/run.ts <codes>` for the cards you wrote. Report what is green and every
+   `pnpm test smoke <codes>` for the cards you wrote. Report what is green and every
    line you could not express, with the mechanic it needs.
 
-A test of a scenario's records builds its table with the scenario's scene (`test/scenarios/<scenario-id>/scene.ts`, written by `pnpm scenario:new` on the helpers of `test/harness/scene-kit.ts`: `resolveRecords`, `finish`, `answer`, the fight) next to the scenario's other tests in `src/campaign/scenarios/<scenario-id>/`.
+A test of a scenario's records builds its table with the scenario's scene (`test/scenarios/<scenario-id>/scene.ts`, written by `pnpm scenario new` on the helpers of `test/harness/scene-kit.ts`: `resolveRecords`, `finish`, `answer`, the fight) next to the scenario's other tests in `src/campaign/scenarios/<scenario-id>/`.
 
 A line with an exact match is a copy (`copyLine` or `copyLines` in `withCopies`, `src/effects/authored/reprint.ts`), not a
 record typed again with a hand-picked number. If the same sentence pattern shows up on several cards, say so: it belongs in a

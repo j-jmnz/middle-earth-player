@@ -3,7 +3,7 @@ import path from "node:path";
 
 import type { CampaignData, ScenarioData } from "../../../src/catalog/scenario-data.ts";
 
-// The barrel of the authored effect files (src/effects/generated/authored.ts). Metro cannot glob, so pnpm data:build lists
+// The barrel of the authored effect files (src/effects/generated/authored.ts). Metro cannot glob, so pnpm data build lists
 // them. A top-level file of src/effects/authored/ that exports AUTHORED_EFFECTS is named for a campaign (its box's cards) or
 // a scenario (its records). The merge order is the order the engine resolves records in: for each campaign in data/campaigns
 // order, its own file and then its scenarios' files (a scenario in two campaigns counts once), then the scenarios no campaign
@@ -50,7 +50,7 @@ export function renderAuthoredBarrel(order: readonly string[]): string {
     ...imports,
     ...folders,
     ``,
-    `// Written by pnpm data:build from src/effects/authored/ and data/campaigns (scripts/data/effects/barrel.ts). Do not edit.`,
+    `// Written by pnpm data build from src/effects/authored/ and data/campaigns (scripts/data/effects/barrel.ts). Do not edit.`,
     `// The merge order is the engine's resolution order: the campaigns' files in campaign order, then nightmare, pool and families.`,
     `export const AUTHORED_EFFECTS: readonly Effect[] = [${effects.join(", ")}];`,
     `export const AUTHORED_REPLACES: readonly string[] = [${replaces.join(", ")}];`,

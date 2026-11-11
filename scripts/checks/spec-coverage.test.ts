@@ -9,7 +9,7 @@ import { ROOT } from "./tracked.ts";
 
 // Every ledger line a scenario's records name (src/effects/authored/<id>.ts, `lines`) has a card-spec row (test/harness/card-spec.ts: `line: "<id>"`) or a test whose title starts with the line id, in the
 // scenario's own folder (src/campaign/scenarios/<id>/), and a test file's header cannot claim a line no test of the folder covers (a header may point to a sibling file's test). It holds the scenarios that have a spec.test.ts (the card-spec track); an older scenario
-// with scene files is not held to it. `pnpm test:scenario <id>` runs it (scripts/tools/test-scenario.ts, COVERAGE_TESTS). A line with no behaviour a test can show is listed in EXEMPT with its reason.
+// with scene files is not held to it. `pnpm test scenario <id>` runs it (scripts/tools/test-scenario.ts, COVERAGE_TESTS). A line with no behaviour a test can show is listed in EXEMPT with its reason.
 
 /** Lines a test cannot show, by scenario: the reason each is left without a row or a titled test. */
 const EXEMPT: Readonly<Record<string, Readonly<Record<string, string>>>> = {};

@@ -54,17 +54,17 @@ modules/*/android/.cxx/
 assets/catalog.db
 agent-tools/
 
-# RingsDB payloads outside data/; data/raw/ringsdb is the committed snapshot data:build reads
+# RingsDB payloads outside data/; data/raw/ringsdb is the committed snapshot data build reads
 **/ringsdb/**
 !data/raw/ringsdb/**
 
-# booklet PDFs, and the map pnpm booklets:pack writes beside them
+# booklet PDFs, and the map pnpm assets booklets writes beside them
 *.pdf
 assets/booklets/
 
 # card images; shell icons stay
 *.jpg
-# what scans:pack packed each picture from
+# what assets scans packed each picture from
 assets/scans/.packed.json
 *.jpeg
 *.webp
@@ -72,7 +72,7 @@ assets/scans/.packed.json
 !assets/images/*.png
 !assets/images/**/*.png
 !assets/expo.icon/**/*.png
-# game icons: the raw DragnCards token art and card backs data:build reads, and the built icons the app requires
+# game icons: the raw DragnCards token art and card backs data build reads, and the built icons the app requires
 !data/raw/icons/**/*.png
 !assets/icons/*.png
 !data/raw/icons/dragncards/cardbacks/*.jpg

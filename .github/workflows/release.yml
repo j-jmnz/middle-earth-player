@@ -50,7 +50,7 @@ jobs:
           BUMP: ${{ inputs.bump }}
           DRY_RUN: ${{ inputs.dry_run }}
           TESTFLIGHT_URL: ${{ vars.TESTFLIGHT_URL }}
-        run: pnpm --silent release:plan --bump "$BUMP" --github-output $([ "$DRY_RUN" = "true" ] && echo --dry-run)
+        run: pnpm --silent release plan --bump "$BUMP" --github-output $([ "$DRY_RUN" = "true" ] && echo --dry-run)
       # A release needs the Android key; the Apple signing is optional and turns on TestFlight (docs/releasing.md, Signing).
       - name: Signing
         id: signing
@@ -247,9 +247,9 @@ jobs:
         run: |
           apk=$(ls "$RUNNER_TEMP"/out/*.apk)
           ipa=$(ls "$RUNNER_TEMP"/out/*.ipa)
-          pnpm --silent release:plan --bump "$BUMP" --expect "$TAG" --apk "$apk" --ipa "$ipa" \
+          pnpm --silent release plan --bump "$BUMP" --expect "$TAG" --apk "$apk" --ipa "$ipa" \
             --cert-sha256 "$(cat "$RUNNER_TEMP/out/certificate.sha256")" --notes "$RUNNER_TEMP/notes.md"
-          pnpm --silent release:source --tag "$TAG" --ipa "$ipa" --notes "$RUNNER_TEMP/notes.md" --out "$RUNNER_TEMP/out/source.json"
+          pnpm --silent release source --tag "$TAG" --ipa "$ipa" --notes "$RUNNER_TEMP/notes.md" --out "$RUNNER_TEMP/out/source.json"
       - name: Tag and release
         env:
           GH_TOKEN: ${{ github.token }}

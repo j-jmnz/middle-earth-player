@@ -11,16 +11,16 @@ something else.
 
 ## Workflow
 
-1. `pnpm effects:draft <scenario-id | starter-deck-id | pack | code,code,...>` writes `.agent/drafts/<code>.md` for each card
+1. `pnpm effects draft <scenario-id | starter-deck-id | pack | code,code,...>` writes `.agent/drafts/<code>.md` for each card
    with a printed line no record owns: the line ids, the card text, DragnCards' automation (a hint about intent, never a
    rule), related rules text, and for each line the id its record takes and either the records that own the same text on
    another card or the nearest existing records. The vocabulary is one shared `.agent/drafts/vocabulary.md`. `--all` drafts
    covered lines too.
 2. Write the records (see Where records live).
-3. `pnpm effects:open` rewrites `src/effects/open-lines.ts`, the list of printed lines with no record. The coverage test
+3. `pnpm effects open` rewrites `src/effects/open-lines.ts`, the list of printed lines with no record. The coverage test
    compares it with the data, so run it after adding or removing records.
 4. Check: `pnpm typecheck`, `pnpm vitest run src/effects scripts/checks/effect-coverage.test.ts`, and
-   `node --experimental-strip-types scripts/card-smoke/run.ts <code> <code> ...` for the cards you wrote. Card-smoke plays a
+   `pnpm test smoke <code> <code> ...` for the cards you wrote. Card-smoke plays a
    seeded game with the card in hand or on the table and fails on a throw, a refusal or `state.failure`; it shows the
    records run, not that they do what the card says. For that, write a test next to the family
    (`src/rules/families/<family>/index.test.ts`) that names the rule ids it implements.
@@ -33,8 +33,8 @@ belongs in a template (`scripts/data/effects/*-templates.ts`), not in more autho
 
 ## Where records live
 
-Generated records (`src/effects/generated`, written by `pnpm data:build` from the templates) and authored ones are merged in
-`src/effects/index.ts`. The authored files are listed by the barrel `src/effects/generated/authored.ts`, which `pnpm data:build` writes from
+Generated records (`src/effects/generated`, written by `pnpm data build` from the templates) and authored ones are merged in
+`src/effects/index.ts`. The authored files are listed by the barrel `src/effects/generated/authored.ts`, which `pnpm data build` writes from
 `src/effects/authored/` (a file named for a scenario or campaign id, in campaign order); a new scenario file needs no edit to `index.ts`. An authored record with the id of a generated one replaces it; list that id in the file's `REPLACES`
 with the reason, and the coverage test checks that no other id is replaced.
 
@@ -71,7 +71,7 @@ printed the same as a line another card's record already owns is a copy, not a r
   in the same list or in `pool`, and a card whose records of one timing live in several files is not copied this way.
   `src/effects/copies.test.ts` fails when a copied pair's two ledger lines no longer read the same.
 - A copy compares both lines with each card's own name as `{self}`. It refuses a source record that holds its own card code in a field other than `id`, `cardCode` and `lines`, and one that names its own card when the two cards' names differ (a same-named reprint passes): a copy changes only the code, the line ids and the id, so such a record is written again for the target card.
-- `pnpm effects:draft` groups a batch's twins: the first line is written, the others take it with `copyLine` (record ids named). A twin owned in another file prints the `copyLine` and the `{ pool: ALIAS }` import, which makes the pool file's records a source (`withCopies` reads `pool`).
+- `pnpm effects draft` groups a batch's twins: the first line is written, the others take it with `copyLine` (record ids named). A twin owned in another file prints the `copyLine` and the `{ pool: ALIAS }` import, which makes the pool file's records a source (`withCopies` reads `pool`).
 
 ## The record
 
@@ -266,10 +266,10 @@ family owns files that are composed by the `index.ts` next to them, so families 
 - A campaign card's Setup verb that `src/campaign/start.ts` deals in Setup (`dealt`) or resolves after the quest card's Setup (`afterSetup`) is wrapped in
   flagged `setupRole: "dealt"` or `"afterSetup"` (`verbFlags`, `src/catalog/verb-flags.ts`) in its schema entry; `verb-sets.test.ts` pins the two sets.
 
-Adding a family is therefore: the three files, one line in each of the three lists (`CATALOG_FAMILIES`, `RULES_FAMILIES`, authored), a test, and `pnpm effects:open`.
+Adding a family is therefore: the three files, one line in each of the three lists (`CATALOG_FAMILIES`, `RULES_FAMILIES`, authored), a test, and `pnpm effects open`.
 Adding a verb to an existing family is the schema entry with its comment, a case in the family's `run` and its name in the rules manifest's `verbs`, and a test. Adding a
 verb is engine work, never data. Bump `ENGINE_VERSION` (`src/rules/engine/version.ts`) when the change can move a game replayed from its intents.
-A new verb extends an existing one where it can. Before adding one, read the draft's nearest records and run `git grep <rule-id> src/rules` for code that cites the same rule id. A new verb is flagged in its schema entry (`src/catalog/verb-flags.ts`): `setupRuns` when a quest card's Setup uses it, `runsInFrame` when a Shadow line uses it and it asks a player or pushes effects, and `collection` when it takes a hero or a card from the player's collection; `verb-sets.test.ts` pins the sets. `scripts/checks/record-routes.test.ts` (in `pnpm test:scenario`) fails, naming the record, on a quest card's Setup record that is neither run nor placed by the scenario's data, on a Shadow record with a verb only a frame runs that is not in `runsInFrame`, and on a campaign card's Setup verb nothing reads. It does not catch a Shadow verb that runs outside a frame but pushes effects: a golden that reaches the card does.
+A new verb extends an existing one where it can. Before adding one, read the draft's nearest records and run `git grep <rule-id> src/rules` for code that cites the same rule id. A new verb is flagged in its schema entry (`src/catalog/verb-flags.ts`): `setupRuns` when a quest card's Setup uses it, `runsInFrame` when a Shadow line uses it and it asks a player or pushes effects, and `collection` when it takes a hero or a card from the player's collection; `verb-sets.test.ts` pins the sets. `scripts/checks/record-routes.test.ts` (in `pnpm test scenario`) fails, naming the record, on a quest card's Setup record that is neither run nor placed by the scenario's data, on a Shadow record with a verb only a frame runs that is not in `runsInFrame`, and on a campaign card's Setup verb nothing reads. It does not catch a Shadow verb that runs outside a frame but pushes effects: a golden that reaches the card does.
 
 ## Readings the review catches
 
@@ -281,13 +281,13 @@ Read each new record against these before the review. Each one is a card bug a r
 - **"For any reason" and "cannot enter …".** The route must cover every way a card can arrive: discards made by player cards, searches, reshuffles, and both sides of a two-sided card.
 - **The trigger's scope.** "After a location is explored" hears a location explored in the staging area too (`locationExplored`), not only the active one (`activeExplored`). Check which zones the trigger's event is queued from.
 - **The card's own name in a filter.** A count "for each copy of ~" or "~ chosen" counts cards with that printed title, not every chosen card.
-- **An optional ability whose whole effect is barred.** A Response or Action must not be offered while another card's flag stops everything it does (`noResourcesPlaced` on "place 1 resource here"): give it a `condition` on that flag. `pnpm effects:render` prints a `note:` on such a record, saying whether it is offered while barred.
+- **An optional ability whose whole effect is barred.** A Response or Action must not be offered while another card's flag stops everything it does (`noResourcesPlaced` on "place 1 resource here"): give it a `condition` on that flag. `pnpm effects render` prints a `note:` on such a record, saying whether it is offered while barred.
 - **New core state.** Test it at its boundaries, not only on the normal path: a phase's end, an Undo, a save and load.
 - **The options of a choice.** Every new `Choose` or `Pick` gets words in `src/play/words` that name the number, the side and whose deck (`docs/design-system-table.md`, Choice tray).
 
 ## Not expressible yet: leave open, report
 
-`pnpm effects:open` lists the open lines in `src/effects/open-lines.ts`. Every player-card line is closed except
+`pnpm effects open` lists the open lines in `src/effects/open-lines.ts`. Every player-card line is closed except
 the two below.
 
 - **21072:B:1 and 21072:B:2, not expressible (Sméagol's Gollum side).** "Immune to non-Gollum card effects. Gollum engages the

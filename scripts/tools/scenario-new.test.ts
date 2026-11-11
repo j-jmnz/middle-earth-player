@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 
 import { planScenario, type Repo } from "./scenario-new.ts";
 
-// pnpm scenario:new <scenario-id>: it plans from data/scenarios and the registries as they are, edits them only by inserting lines, never
+// pnpm scenario new <scenario-id>: it plans from data/scenarios and the registries as they are, edits them only by inserting lines, never
 // overwrites a file, and refuses an id that has no scenario file. Nothing is written here: the plan is read, and the CLI runs with --dry-run.
 const ROOT = path.resolve(import.meta.dirname, "..", "..");
 const repo: Repo = { read: (file) => (existsSync(path.join(ROOT, file)) ? readFileSync(path.join(ROOT, file), "utf8") : null) };
@@ -44,11 +44,11 @@ function addedAt(before: string, after: string): { at: number; line: string }[] 
 }
 
 function cli(...args: string[]): { status: number | null; output: string } {
-  const run = spawnSync("node", ["--experimental-strip-types", "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", path.join(ROOT, "scripts", "tools", "scenario-new.ts"), ...args], { cwd: ROOT, encoding: "utf8", env: { ...process.env, LOG_LEVEL: "info" } });
+  const run = spawnSync("node", ["--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", path.join(ROOT, "scripts", "tools", "scenario-new.ts"), ...args], { cwd: ROOT, encoding: "utf8", env: { ...process.env, LOG_LEVEL: "info" } });
   return { status: run.status, output: `${run.stdout}${run.stderr}` };
 }
 
-describe("pnpm scenario:new", () => {
+describe("pnpm scenario new", () => {
   it("refuses an id that is not in data/scenarios", () => {
     const { plan, problems } = planScenario("the-lost-road", {}, repo, exists);
     expect(plan).toBeNull();

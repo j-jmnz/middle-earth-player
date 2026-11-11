@@ -12,7 +12,7 @@ import { BUMP_REQUESTS, branchProblem, nextVersion, parseCommit, parseTag, tagOf
 
 // Plans a release from git: the next tag and its notes (.claude/rules/release-standards.md; docs/releasing.md says how the
 // release workflow calls it). Offline; reads only this checkout, so `git fetch --tags` first.
-// Usage: pnpm release:plan [--bump auto|patch|minor|major] prints the next tag and its notes. In CI:
+// Usage: pnpm release plan [--bump auto|patch|minor|major] prints the next tag and its notes. In CI:
 //   --branch <name>        the branch being released (default: GITHUB_REF_NAME, else the checked-out branch)
 //   --expect <tag>         fails unless the planned tag is this one (the publish job re-plans the tag the plan job chose)
 //   --notes <file>         writes the notes there instead of printing them

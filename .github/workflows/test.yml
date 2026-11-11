@@ -26,7 +26,7 @@ jobs:
           node-version: 22
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm data:check
+      - run: pnpm data check
       - run: pnpm lint
       - run: pnpm typecheck
       - run: pnpm test
@@ -43,7 +43,7 @@ jobs:
           cache: pnpm
       - run: pnpm install --frozen-lockfile
       - run: pnpm exec playwright install --with-deps chromium
-      - run: pnpm a11y:web
+      - run: pnpm test a11y
 
   # The pull request title becomes the squash commit's subject (.claude/rules/commit-standards.md, Squash).
   commits:

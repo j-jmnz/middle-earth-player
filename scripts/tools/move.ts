@@ -26,7 +26,7 @@ import { runScript, type Log } from "../log.ts";
 // and its test (x.test.ts), so a `.native` pair never separates (docs/architecture.md, Modules).
 //
 // It cannot follow a path built at run time (path.join(dirname, ".."), a template literal); it lists the moved files that
-// build one, to check by hand. data/, assets/, docs/INDEX.md (pnpm docs:index rewrites it), golden and fixture JSON are
+// build one, to check by hand. data/, assets/, docs/INDEX.md (pnpm docs index rewrites it), golden and fixture JSON are
 // never read or rewritten.
 
 const CODE = /\.(ts|tsx|js|mjs|cjs|mts)$/;

@@ -88,7 +88,7 @@ const textOf = (verb: string, ins: Obj): { text: string; read: readonly string[]
   return made;
 };
 
-describe("effects:render read fields", () => {
+describe("effects render read fields", () => {
   it("has a sample for every verb with a template, and none for a verb without", () => {
     expect(Object.keys(SAMPLES).sort()).toEqual(Object.keys(TEMPLATES).sort());
   });
@@ -163,7 +163,7 @@ function checkPiece(render: Render, samples: readonly Obj[], skip: ReadonlySet<s
   };
 }
 
-describe("effects:render read fields, conditions", () => {
+describe("effects render read fields, conditions", () => {
   const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
     sourceIn: [{ kind: "sourceIn", zone: "staging" }],
     less: [{ kind: "less", left: 2, right: 3 }],
@@ -211,7 +211,7 @@ describe("effects:render read fields, conditions", () => {
   });
 });
 
-describe("effects:render read fields, picks", () => {
+describe("effects render read fields, picks", () => {
   // Every key renderPick words, spread over samples because `captive` replaces the control words.
   const BIG: Obj = {
     type: "enemy",
@@ -270,7 +270,7 @@ describe("effects:render read fields, picks", () => {
   });
 });
 
-describe("effects:render read fields, amounts", () => {
+describe("effects render read fields, amounts", () => {
   const PICK = { type: "hero", control: "you" };
   const SAMPLES: readonly Obj[] = [
     { count: PICK, distinct: true, every: 2, times: 3, plus: 1, limit: 5 },

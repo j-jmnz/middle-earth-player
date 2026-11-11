@@ -105,7 +105,7 @@ export function extractAll(outDir: string, pinned: ReadonlyMap<string, string>, 
       writeFileSync(target, renderDoc(extracted));
       docs.push(extracted);
     } else {
-      throw new Error(`data/rules/${pdf.doc}.md is stale or missing and ${pdf.file} is not cached. Run pnpm data:sync rules.`);
+      throw new Error(`data/rules/${pdf.doc}.md is stale or missing and ${pdf.file} is not cached. Run pnpm data sync rules.`);
     }
   }
   return docs;
