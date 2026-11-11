@@ -8,6 +8,8 @@ import { when } from "../effect-schema-conditions.ts";
 import { pickSchema } from "../effect-schema-pick.ts";
 
 const icon = z.enum(["leadership", "tactics", "spirit", "lore"]);
+// The sphere a spent resource may be: an icon, or Fellowship ("Spend 1 Fellowship resource to travel here", 144020:A:3).
+const spendIcon = z.enum(["leadership", "tactics", "spirit", "lore", "fellowship"]);
 
 const VERBS = [
   // Constant on a hero: while it pays for a card that matches `pick`, it counts as having these resource icons (resource match
@@ -43,7 +45,7 @@ const VERBS = [
   // a hero for each resource: their own heroes, or (`group`) any player's ("the players as a group may spend 2 Leadership
   // resources"). With fewer resources than that, nothing is spent: an option that spends names the `resources` condition.
   // `paid` is engine use: the pools chosen so far, one entry per resource.
-  z.strictObject({ verb: z.literal("SpendResources"), amount: z.number().int().positive(), sphere: icon.optional(), group: z.boolean().optional(), paid: z.array(z.string()).optional(), ...when }),
+  z.strictObject({ verb: z.literal("SpendResources"), amount: z.number().int().positive(), sphere: spendIcon.optional(), group: z.boolean().optional(), paid: z.array(z.string()).optional(), ...when }),
   // Each hero the actor (or the picked player) controls gains `amount` resources; with `unspent`, only each one that did not
   // spend a resource this round.
   z.strictObject({ verb: z.literal("HeroesGainResources"), amount: positiveAmountSchema, who: z.enum(["actor", "picked"]).optional(), unspent: z.boolean().optional(), ...when }),

@@ -121,7 +121,8 @@ export const simpleVerbs = [
     verb: z.literal("RaiseThreat"),
     amount: positiveAmountSchema.optional(),
     // `hostController`: the controller of the card the source is attached to ("raise attached hero's controller's threat by 2", 01109:A:3).
-    who: z.enum(["actor", "firstPlayer", "otherPlayer", "eachSeat", "picked", "eventSeat", "hostController"]).optional(),
+    // `defendingPlayer`: the player the source enemy is engaged with, the defending player of its attack ("the defending player must raise his threat by 3", 144017:A:2; rr.defending-player), the actor with none.
+    who: z.enum(["actor", "firstPlayer", "otherPlayer", "eachSeat", "picked", "eventSeat", "hostController", "defendingPlayer"]).optional(),
     perCommitted: z
       .strictObject({
         type: z.literal("hero"),

@@ -195,7 +195,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("copiesPlayedThisRound"), max: z.number().int().min(0), you: z.boolean().optional() }),
   // The actor's heroes with a resource icon that pays `sphere` (every player's, with `group`) hold at least `min` resources
   // ("the players as a group may spend 2 Leadership resources").
-  z.strictObject({ kind: z.literal("resources"), min: z.number().int().positive(), sphere: z.enum(["leadership", "tactics", "spirit", "lore"]).optional(), group: z.boolean().optional() }),
+  z.strictObject({ kind: z.literal("resources"), min: z.number().int().positive(), sphere: z.enum(["leadership", "tactics", "spirit", "lore", "fellowship"]).optional(), group: z.boolean().optional() }),
   // The actor's quest succeeded this round (rr.step-3-4): "If you quest successfully this phase", read in the quest phase.
   // `committed`: and the source card was committed to it ("After Hirgon quests successfully").
   z.strictObject({ kind: z.literal("questSucceeded"), committed: z.boolean().optional() }),

@@ -1,6 +1,7 @@
 // Rules: rr.forced, rr.triggered-ability, rr.in-play-and-out-of-play, rr.timing-of-ability-resolution (data/rules/entries.json).
 import type { Effect } from "../../catalog/boundary.ts";
 import { burnAtRoundEnd } from "../families/aflame/sweep.ts";
+import { mireAtRefreshEnd } from "../families/mire/index.ts";
 
 import { holds } from "../interpret/conditions.ts";
 import { aboutCard, hears, hearsFromAnywhere } from "./listen.ts";
@@ -132,6 +133,8 @@ export function crossBoundary(state: ScenarioState, ctx: ReduceContext, steps: E
   if (ctx.effects.length === 0 && next.delayed.length === 0) return next;
   next = pushDue(next, ended, "endOfRound", steps);
   next = pushDue(next, ended, "endOfPhase", steps);
+  // Mire X: each Mire location in the staging area gets a mire token as the refresh phase ends, before the Forced effects of that moment (families/mire/index.ts).
+  if (ended === "Refresh") next = mireAtRefreshEnd(next, ctx, steps);
   if (ended === "End of round") {
     // Aflame X: each Aflame location in the staging area takes 1 damage (families/aflame/sweep.ts).
     next = burnAtRoundEnd(next, ctx, steps);

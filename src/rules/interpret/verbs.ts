@@ -218,7 +218,7 @@ function transferHost(state: ScenarioState, focus: VerbFocus, seat: number, step
 
 // The seats a RaiseThreat raises: the host's controller for `hostController`, the seats the actor names for the multi-seat words, else the one seat.
 function raisedSeats(state: ScenarioState, who: Extract<Instruction, { verb: "RaiseThreat" }>["who"], actor: number, hostController: number | null | undefined): number[] {
-  if (who === "hostController") return [hostController ?? actor];
+  if (who === "hostController" || who === "defendingPlayer") return [hostController ?? actor];
   if (who === "eachSeat" || who === "picked" || who === "eventSeat") return seatsFor(state, who, actor);
   return [seatFor(state, who, actor)];
 }
@@ -234,7 +234,9 @@ export function raiseFor(
   // The controller of the card the source is attached to (a claimed objective on a hero): nobody when it is attached to nothing.
   const host = who === "hostController" && focus.sourceId ? state.cards[state.cards[focus.sourceId]?.host ?? ""] : undefined;
   if (who === "hostController" && host?.controller == null) return state;
-  const seats = raisedSeats(state, who, focus.seat, host?.controller);
+  // The defending player: the player the source enemy is engaged with (rr.defending-player).
+  const attacker = who === "defendingPlayer" && focus.sourceId ? state.cards[focus.sourceId] : undefined;
+  const seats = raisedSeats(state, who, focus.seat, who === "defendingPlayer" ? (attacker?.zone === "engaged" ? attacker.controller : undefined) : host?.controller);
   const amount = instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
   let next = state;
   for (const seat of seats) {

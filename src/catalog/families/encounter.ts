@@ -64,6 +64,9 @@ const VERBS = [
   z.strictObject({ verb: z.literal("SearchCollection"), code: z.string().min(1), to: z.literal("staging"), ...when }),
   // The encounter discard pile is shuffled into the encounter deck.
   z.strictObject({ verb: z.literal("ShuffleEncounterDiscard"), ...when }),
+
+  // Every location in the victory display goes back into the encounter deck, which is then shuffled ("Shuffle all locations in the victory display into the encounter deck", 144066:A:1). They lose nothing they had: a card in the display has no tokens.
+  z.strictObject({ verb: z.literal("ShuffleVictoryIntoEncounterDeck"), ...when }),
   // Discards cards from the top of the encounter deck until one of `type` is discarded, or the deck is empty (rr.effects).
   // That card becomes the picked card. With `trait`, the card must have that trait too ("a Warg enemy", 142025:A:2).
   // `types` instead of `type`: a card of any of them ("until he discards an enemy or location", 18078:A:1).

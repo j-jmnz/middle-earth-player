@@ -145,6 +145,13 @@ export function shuffleDiscardIn(state: ScenarioState): ScenarioState {
   return shuffleEncounterDeck(next);
 }
 
+// Each location in the victory display goes into the encounter deck, which is shuffled once (144066:A:1).
+export function shuffleVictoryIn(state: ScenarioState, ctx: ReduceContext): ScenarioState {
+  let next = state;
+  for (const id of [...state.victory]) if (typeOf(state, id, ctx) === "location") next = updateCard(moveCard(next, id, { zone: "encounterDeck" }), id, { face: "down", controller: null });
+  return shuffleEncounterDeck(next);
+}
+
 // Cards come off the top of the encounter deck into its discard pile until one of `type` is among them, or the deck is empty.
 // That card is the picked card ("" when none came). A list of types stops at a card of any of them.
 export function discardUntil(state: ScenarioState, wanted: CardType | readonly CardType[], ctx: ReduceContext, trait?: string): ScenarioState {
