@@ -278,7 +278,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
   144064:forced:1: Forced on the event enemyAttacked (heard about enemy (any player controls) named "Gollum")
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"}]
-    - the card the event is about: stat defense threat of the top card of the encounter discard pile, until the end of the attack
+    - the card the event is about: stat defense threat of the picked card, until the end of the attack
 
 ## 144065 Across the Marshes
 (the scenario deals it into the quest pile; the piles place it, no record does)

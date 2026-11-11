@@ -71,6 +71,11 @@ function eachLimits(i: Obj, ctx: Ctx): string {
   return `${bound === "" ? "" : ` (${bound})`}${taken}`;
 }
 
+const FLIP_GOLLUM = {
+  smeagol: "flip Gollum to Sméagol: discard his damage; he enters play exhausted, controlled by the first player (not the discard pile or the victory display)",
+  gollum: "flip Sméagol to Gollum: discard his damage; he enters play ready, engaged with the first player (nothing if Sméagol is not in play)",
+} as const;
+
 export const TEMPLATES: Readonly<Record<string, Template>> = {
   ModifyStat: (i, ctx) => {
     const holders = isObj(i.holders) ? `each ${pick(i.holders, ctx)}` : typeof i.target === "string" ? targetStat(i.target) : "this card";
@@ -135,7 +140,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   PlaceMireToken: (i, ctx) => ({ text: `place ${amount(i.amount, ctx)} mire token(s) (resources) on ${cardRef(i.on)}; a location whose mire tokens then reach its Mire X is discarded by the Mire keyword`, read: ["on", "amount"] }),
   ReturnRandomVictoryLocation: () => ({ text: "return a random location from the victory display to the staging area (chosen with the game's seed)", read: [] }),
   ShuffleVictoryIntoEncounterDeck: () => ({ text: "shuffle every location in the victory display into the encounter deck", read: [] }),
-  FlipGollum: (i) => ({ text: i.to === "smeagol" ? "flip Gollum to Sméagol: discard his damage; he enters play exhausted, controlled by the first player (not the discard pile or the victory display)" : i.to !== "gollum" ? "flip Gollum / Sméagol" : "flip Sméagol to Gollum: discard his damage; he enters play ready, engaged with the first player (nothing if Sméagol is not in play)", read: ["to"] }),
+  FlipGollum: (i) => ({ text: i.to === "smeagol" ? FLIP_GOLLUM.smeagol : FLIP_GOLLUM.gollum, read: ["to"] }),
   FollowFirstPlayer: () => ({ text: "this enemy moves to the first player's play area and engages them (nothing if it is not engaged, or already engaged with them)", read: [] }),
   GollumAttacks: () => ({ text: "Gollum, if he is in play, makes an immediate attack against the player he is engaged with", read: [] }),
   ShuffleEncounterDeck: () => ({ text: "shuffle the encounter deck", read: [] }),

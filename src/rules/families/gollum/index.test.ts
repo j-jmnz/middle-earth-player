@@ -1,14 +1,19 @@
 // Rules: mec112.gollum-smeagol, rr.first-player, faq.additional-attacks (data/rules/entries.json); ledger lines 144075:A:1, 144075:A:2, 144075:A:3, 144076:A:1, 144076:A:2, 144076:A:3, 144055:A:2. Gollum and Sméagol on a table of The Passage of the Marshes.
 import { beforeAll, describe, expect, it } from "vitest";
 
+import { clearEliminated, eliminateSeat } from "../../core/eliminate.ts";
 import { settle } from "../../engine/machine.ts";
 import { legalIntents, reduce, startScenario, type PlayerIntent } from "../../engine/reduce.ts";
+import type { EngineStep } from "../../core/intents.ts";
 import { expectOk } from "../../core/test-fixture.ts";
-import { runInstruction } from "../../interpret/interpret.ts";
+import { resetEncounterDeck } from "../../interpret/verbs.ts";
+import { runInstruction, type ReduceContext } from "../../interpret/interpret.ts";
 import { syncConstants } from "../../interpret/constants.ts";
-import { immuneToSource } from "../misc/guards.ts";
+import { placeDamage, playerCardEffectCanChoose } from "../../core/keywords.ts";
+import { attachmentHostIds } from "../../player/attach.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { moveCard } from "../../core/zones.ts";
+import { definePrinted } from "../../core/printed.ts";
+import { moveCard, spawn } from "../../core/zones.ts";
 import { probeTable } from "../../../../scripts/card-smoke/encounter.ts";
 import { encounterStart, encounterWorld, type EncounterWorld } from "../../../../scripts/card-smoke/encounter-world.ts";
 import { idOf } from "../../../../test/harness/scene-kit.ts";
@@ -122,6 +127,23 @@ describe("FollowFirstPlayer (144075:A:1)", () => {
     expect(settled.pendingAttack?.enemyId).toBe(gollum);
   });
 
+  it("rr.step-7-4 before rr.step-7-5: Gollum engages the new first player before Mire discards at the end of the refresh phase", () => {
+    const base = two();
+    const gollum = idOf(base, "144075");
+    const soft = Object.values(base.cards).find((card) => card.code === "144023" && card.zone !== "staging")!.id;
+    const refresh: ScenarioState = { ...moveCard(base, soft, { zone: "staging" }), mode: "refresh", phase: "Refresh", boundaryPhase: "Refresh", window: null };
+    const steps: EngineStep[] = [];
+    const settled = settle(refresh, ctxOf(), steps);
+    // The attack by Gollum is pending and the Mire location is still in staging: its token is placed after the pass frames resolve.
+    expect(settled.pendingAttack?.enemyId).toBe(gollum);
+    expect(settled.cards[gollum]?.controller).toBe(1);
+    expect(settled.cards[soft]?.zone).toBe("staging");
+    expect(settled.cards[soft]?.resources).toBe(0);
+    const kinds = steps.map((step) => step.kind);
+    expect(kinds.indexOf("engage")).toBeGreaterThanOrEqual(0);
+    expect(kinds).not.toContain("reveal");
+  });
+
   it("144075:A:2 makes no attack in a game of one player, where the token never moves", () => {
     const gollum = idOf(table, "144075");
     const refresh: ScenarioState = { ...table, mode: "refresh", phase: "Refresh", boundaryPhase: "Refresh", window: null };
@@ -133,6 +155,53 @@ describe("FollowFirstPlayer (144075:A:1)", () => {
   it("does nothing for a Gollum already engaged with the first player", () => {
     const gollum = idOf(table, "144075");
     expect(runInstruction(table, { verb: "FollowFirstPlayer" }, { seat: 0, sourceId: gollum }, ctxOf(), [])).toBe(table);
+  });
+});
+
+describe("the first player is eliminated (144075:A:1, 144076:A:1, agent recommendation)", () => {
+  const out = (state: ScenarioState): ScenarioState => clearEliminated(eliminateSeat(state, 0, []), ctxOf().cards);
+
+  it("Gollum is engaged with the new first player, damage kept", () => {
+    const base = twoSeats();
+    const gollum = idOf(base, "144075");
+    const hurt = { ...base, cards: { ...base.cards, [gollum]: { ...base.cards[gollum]!, damage: 2 } } };
+    const left = out(hurt);
+    expect(left.firstPlayer).toBe(1);
+    expect(left.cards[gollum]?.zone).toBe("engaged");
+    expect(left.cards[gollum]?.controller).toBe(1);
+    expect(left.cards[gollum]?.damage).toBe(2);
+    expect(left.seats[1]?.engaged).toContain(gollum);
+    expect(left.staging).not.toContain(gollum);
+  });
+
+  it("Sméagol passes to the new first player, exhausted and with his damage", () => {
+    const base = twoSeats();
+    const gollum = idOf(base, "144075");
+    const smeagol = flip(base, "smeagol");
+    const hurt = { ...smeagol, cards: { ...smeagol.cards, [gollum]: { ...smeagol.cards[gollum]!, damage: 1 } } };
+    expect(hurt.cards[gollum]?.controller).toBe(0);
+    const left = out(hurt);
+    expect(left.cards[gollum]?.code).toBe("144076");
+    expect(left.cards[gollum]?.zone).toBe("play");
+    expect(left.cards[gollum]?.controller).toBe(1);
+    expect(left.cards[gollum]?.exhausted).toBe(true);
+    expect(left.cards[gollum]?.damage).toBe(1);
+    expect(left.encounterDiscard).not.toContain(gollum);
+    expect(left.lost).toBeFalsy();
+  });
+});
+
+describe("the encounter deck refill", () => {
+  it("never shuffles Gollum into the encounter deck (mec112.gollum-smeagol)", () => {
+    const gollum = idOf(table, "144075");
+    const other = idOf(table, "144022");
+    const emptied = { ...moveCard(moveCard(table, gollum, { zone: "encounterDiscard" }), other, { zone: "encounterDiscard" }), phase: "Quest" as const, encounterDeck: [] };
+    const refilled = resetEncounterDeck(emptied, []);
+    expect(refilled.encounterDeck).toEqual([other]);
+    expect(refilled.encounterDiscard).toEqual([gollum]);
+    // With only Gollum in the discard pile the refill does nothing.
+    const only = { ...moveCard(table, gollum, { zone: "encounterDiscard" }), phase: "Quest" as const, encounterDeck: [], encounterDiscard: [gollum] };
+    expect(resetEncounterDeck(only, [])).toBe(only);
   });
 });
 
@@ -152,15 +221,32 @@ describe("Immune to non-Fellowship player card effects (144075:A:1)", () => {
   it("shuts out the effects of player cards that are not Fellowship cards, and no others", () => {
     const gollum = idOf(table, "144075");
     const synced = syncConstants(table, ctxOf());
+    const gollumPrinted = ctxOf().cards.get("144075")!;
     const heroId = synced.seats[0]?.heroes[0] ?? "";
-    const hero = synced.cards[heroId];
-    const printed = ctxOf().cards.get(hero?.code ?? "");
+    const printed = ctxOf().cards.get(synced.cards[heroId]?.code ?? "");
     // The table's hero is a Fellowship hero: its effects reach Gollum; the same card as a Leadership one does not.
     expect(printed?.sphere).toBe("fellowship");
-    expect(immuneToSource(synced, gollum, heroId, ctxOf())).toBe(false);
-    const leadership = { ...ctxOf(), cards: new Map([...ctxOf().cards, [hero?.code ?? "", { ...printed!, sphere: "leadership" as const }]]) };
-    expect(immuneToSource(synced, gollum, heroId, leadership)).toBe(true);
+    expect(playerCardEffectCanChoose(gollumPrinted, synced, gollum, printed)).toBe(true);
+    expect(playerCardEffectCanChoose(gollumPrinted, synced, gollum, { ...printed!, sphere: "leadership" })).toBe(false);
     // An encounter card's effect is not a player card effect.
-    expect(immuneToSource(synced, gollum, idOf(synced, "144064"), ctxOf())).toBe(false);
+    expect(playerCardEffectCanChoose(gollumPrinted, synced, gollum, ctxOf().cards.get("144064"))).toBe(true);
+  });
+
+  it("an attachment of another sphere has no host in Gollum (Forest Snare, 01069), a Fellowship one has", () => {
+    const synced = syncConstants(table, ctxOf());
+    const gollum = idOf(synced, "144075");
+    const withSnare = (sphere: "lore" | "fellowship") => ({ ...ctxOf(), cards: new Map([...ctxOf().cards, ["01069", definePrinted({ code: "01069", name: "Forest Snare", type: "attachment", sphere, cost: 3 })]]) });
+    expect(attachmentHostIds(synced, 0, "01069", withSnare("lore"))).not.toContain(gollum);
+    const asFellowship = withSnare("fellowship");
+    expect(attachmentHostIds(synced, 0, "01069", asFellowship)).toContain(gollum);
+  });
+
+  it("a Tactics ally's damage response cannot hurt Gollum (Gondorian Spearman, 01029); a Fellowship card's damage can", () => {
+    const withSpearman = (sphere: "tactics" | "fellowship") => ({ ...ctxOf(), cards: new Map([...ctxOf().cards, ["01029", definePrinted({ code: "01029", name: "Gondorian Spearman", type: "ally", sphere, cost: 2, attack: 1, defense: 1, health: 1 })]]) });
+    const made = spawn(syncConstants(table, ctxOf()), "01029", { zone: "play", seat: 0 });
+    const gollum = idOf(made.state, "144075");
+    const hit = (state: ScenarioState, ctx: ReduceContext) => placeDamage(state, gollum, 1, ctx.cards, [], "player", { rule: "rr.effects" }, made.id).cards[gollum]?.damage ?? 0;
+    expect(hit(made.state, withSpearman("tactics"))).toBe(0);
+    expect(hit(made.state, withSpearman("fellowship"))).toBe(1);
   });
 });

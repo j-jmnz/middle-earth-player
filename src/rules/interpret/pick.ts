@@ -18,7 +18,7 @@ import { playBlocked } from "../families/sidequests/contract.ts";
 import { sidequestsPickMatches } from "../families/sidequests/pick.ts";
 import { lookedPool } from "../families/deck/pick.ts";
 import type { ReduceContext } from "./interpret.ts";
-import { hasKeyword, isPlayerCardEffect, modifiedStat, playerCardEffectCanChoose, uniqueBlocked } from "../core/keywords.ts";
+import { hasKeyword, isPlayerCardEffect, modifiedStat, playerCardEffectCanChoose, sourcePrinted, uniqueBlocked } from "../core/keywords.ts";
 import { cardTypeOf, isAllyLike, isPlayerType, printedOf } from "../core/printed.ts";
 import { activeFor, sharedStaging } from "../families/breaking/areas.ts";
 import { breakingPickMatches } from "../families/breaking/attack.ts";
@@ -302,7 +302,7 @@ export function pickCandidates(
     if (!instance) return false;
     // Only an attachment a player may discard is offered for one (141071:A:2): a Permanent card on a hero is not.
     if (spec.type === "attachment" && !counting && printedOf(ctx.cards, instance.code).keywords.permanent && (state.cards[instance.host ?? ""]?.zone === "heroes" || state.cards[instance.host ?? ""]?.captive === true)) return false;
-    if (playerEffect && !playerCardEffectCanChoose(printedOf(ctx.cards, instance.code), state, id)) return false;
+    if (playerEffect && !playerCardEffectCanChoose(printedOf(ctx.cards, instance.code), state, id, sourcePrinted(state, ctx.cards, sourceId))) return false;
     // "Immune to non-Master card effects": a card without that Trait cannot choose or affect it (families/misc/guards.ts).
     if (!counting && immuneToSource(state, id, sourceId, ctx)) return false;
     return matchesPick(state, id, spec, at, ctx);

@@ -128,6 +128,8 @@ export function crossBoundary(state: ScenarioState, ctx: ReduceContext, steps: E
   // An additional instance of the phase in progress (phaseSeq, state.ts) ends the instance before it.
   const instance = state.phaseSeq ?? 0;
   if (state.phase === state.boundaryPhase && instance === (state.boundarySeq ?? 0)) return state;
+  // The frames the refresh phase's first player token pass pushed (Gollum follows the token, rr.step-7-4) resolve before the phase's end (rr.step-7-5).
+  if (state.boundaryPhase === "Refresh" && state.stack.length > 0) return state;
   const ended = state.boundaryPhase;
   let next: ScenarioState = { ...state, boundaryPhase: state.phase, ...(instance > 0 ? { boundarySeq: instance } : {}) };
   if (ctx.effects.length === 0 && next.delayed.length === 0) return next;

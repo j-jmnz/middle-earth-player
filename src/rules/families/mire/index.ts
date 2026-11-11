@@ -8,10 +8,9 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { heldAmount, inPlay } from "../../core/state.ts";
-import { printedOf } from "../../core/printed.ts";
 import { shuffleIds } from "../../core/seed.ts";
 import { queueEvent } from "../../windows/queue.ts";
-import { moveEncounter } from "../encounter/moves.ts";
+import { moveEncounter, typeOf } from "../encounter/moves.ts";
 import { addResourceTokens } from "../nightmare/dungeon.ts";
 import type { Focus } from "../index.ts";
 
@@ -53,7 +52,7 @@ export function mireAtRefreshEnd(state: ScenarioState, ctx: ReduceContext, steps
 
 /** ReturnRandomVictoryLocation: a location of the victory display, chosen with the seed, joins the staging area (144020:A:2). */
 export function returnRandomVictory(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const locations = state.victory.filter((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "location");
+  const locations = state.victory.filter((id) => typeOf(state, id, ctx) === "location");
   if (locations.length === 0) return state;
   const shuffled = shuffleIds(locations, state.seed, state.seedCursor);
   const chosen = shuffled.ids[0];

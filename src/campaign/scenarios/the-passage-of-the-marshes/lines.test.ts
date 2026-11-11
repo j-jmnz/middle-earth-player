@@ -167,6 +167,13 @@ describe("The Taming of Sméagol's Forced effect", () => {
     // Evil-smelling Fens and Stagnant Pools, Threat 3 each.
     expect(defense).toBe(6);
   });
+
+  it("144064:B:2 gives Gollum no Defense when the encounter deck is empty, whatever lies on top of the discard pile", () => {
+    const { made, state } = defeatX({ deck: [], discard: ["144019"] }, 1);
+    const gollum = idOf(made.state, "144075");
+    const defense = state.modifiers.filter((modifier) => modifier.stat === "defense" && modifier.instanceId === gollum).reduce((sum, modifier) => sum + modifier.amount, 0);
+    expect(defense).toBe(0);
+  });
 });
 
 describe("a defeated Gollum and a destroyed Sméagol", () => {

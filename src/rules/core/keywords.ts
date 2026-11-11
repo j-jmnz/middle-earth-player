@@ -161,9 +161,17 @@ export function lowerThreat(state: ScenarioState, seat: number, amount: number, 
 }
 
 // Immune to player card effects: printed, or gained while a card says so (`immuneToPlayerCards`, families/nightmare.ts, 906201:A:2).
-export function playerCardEffectCanChoose(printed: PrintedCard, state?: ScenarioState, id?: string): boolean {
+// `source` is the printed player card whose effect it is, when known: "Immune to non-Fellowship player card effects" (`immuneToNonFellowship`, 144075:A:1) lets a Fellowship card's effect through. Every path a player card's effect takes (a pick, an attachment host, damage, the enemy list) asks this one predicate.
+export function playerCardEffectCanChoose(printed: PrintedCard, state?: ScenarioState, id?: string, source?: PrintedCard | null): boolean {
   if (state && id && flagged(state, id, "immuneToPlayerCards")) return false;
+  if (state && id && source && isPlayerType(source) && source.sphere !== "fellowship" && flagged(state, id, "immuneToNonFellowship")) return false;
   return !printed.keywords.immuneToPlayerCardEffects;
+}
+
+/** The printed card behind an effect's source, for playerCardEffectCanChoose. */
+export function sourcePrinted(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, sourceId: string | null | undefined): PrintedCard | null {
+  const card = sourceId ? state.cards[sourceId] : undefined;
+  return card ? printedOf(cards, card.code) : null;
 }
 
 /** Whether an effect from `sourceId` is an encounter card effect: a card that is neither a player card nor a quest or campaign card (a quest card's effect is not an encounter card's, "Unique locations cannot be discarded from play by encounter card effects", 12193:B:1). */
@@ -187,14 +195,14 @@ function indestructible(state: ScenarioState, id: string, printed: PrintedCard):
   return printed.type === "enemy" && (printed.keywords.indestructible || flagged(state, id, "indestructible")) && !flagged(state, id, "losesKeywords");
 }
 
-export function placeDamage(state: ScenarioState, assigned: string, amount: number, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[], source: DamageSource, cause: Cause): ScenarioState {
+export function placeDamage(state: ScenarioState, assigned: string, amount: number, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[], source: DamageSource, cause: Cause, sourceId?: string | null): ScenarioState {
   // Damage assigned to a card another takes for it ("attached hero takes all damage assigned to the chosen hero", 02099).
   const id = damageGoesTo(state, assigned);
   const instance = state.cards[id];
   // Damage goes only on a card in play (rr.in-play-and-out-of-play): a defender that already left play takes none.
   if (!instance || !inPlay(instance.zone)) return state;
   const printed = printedOf(cards, instance.code);
-  if (source === "player" && !playerCardEffectCanChoose(printed, state, id)) return state;
+  if (source === "player" && !playerCardEffectCanChoose(printed, state, id, sourcePrinted(state, cards, sourceId))) return state;
   // "When attached hero would take any amount of damage, reduce the Ring-bearer's life by an equal amount instead" (141057:A:2).
   if (takesLifeInstead(state, id)) return reduceLife(state, amount, steps, cause);
   // "Enemies cannot take damage" (141048:A:1), "cannot take non-combat damage" (141070:A:2): no damage is placed.

@@ -5,7 +5,7 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
-import type { ScenarioState } from "../../core/state.ts";
+import type { CardInstance, ScenarioState } from "../../core/state.ts";
 import { inPlay, updateCard } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { queueEvent } from "../../windows/queue.ts";
@@ -16,9 +16,18 @@ import type { Focus } from "../index.ts";
 export const GOLLUM = "144075";
 export const SMEAGOL = "144076";
 
-// The one card that shows this code now, wherever it lies.
+/** Whether the code is the one physical card, on either side. */
+export const isGollum = (code: string | undefined): boolean => code === GOLLUM || code === SMEAGOL;
+
+/** The one physical card, whichever side it shows and wherever it lies (undefined outside a game of The Passage of the Marshes). */
+export function gollumCard(state: ScenarioState): CardInstance | undefined {
+  return Object.values(state.cards).find((card) => isGollum(card.code));
+}
+
+// The card, when it shows this code now.
 function showing(state: ScenarioState, code: string): string | null {
-  return Object.values(state.cards).find((card) => card.code === code)?.id ?? null;
+  const card = gollumCard(state);
+  return card?.code === code ? card.id : null;
 }
 
 /** FlipGollum: the card shows its other side with its damage discarded: Sméagol exhausted under the first player, Gollum ready and engaged with the first player (mec112.gollum-smeagol). */

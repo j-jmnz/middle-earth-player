@@ -269,7 +269,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       subject: { type: "enemy", control: "any", names: ["Gollum"] },
       instructions: [
         { verb: "MoveEncounterCard", card: "deckTop", to: "discard" },
-        { verb: "ModifyStat", stat: "defense", amount: { stat: "threat", of: "discardTop" }, until: "endOfAttack", target: "subject" },
+        { verb: "ModifyStat", stat: "defense", amount: { stat: "threat", of: "picked" }, until: "endOfAttack", target: "subject" },
       ],
     },
 

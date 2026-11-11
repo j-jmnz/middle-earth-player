@@ -83,8 +83,8 @@ const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   ForEachPlayer: [{ verb: "ForEachPlayer", order: "lastFirst", instructions: [] }],
 };
 
-// A key whose value in a sample reads as its absence does (the only value of `to` on Travel is "self"; `to: "play"` is what a MovePicked without `to` words).
-const SAME_EITHER_WAY = new Set(["Travel.to", "MovePicked[1].to"]);
+// A key whose value in a sample reads as its absence does (the only value of `to` on Travel is "self"; `to: "play"` is what a MovePicked without `to` words; a FlipGollum without `to` words as its "gollum" side).
+const SAME_EITHER_WAY = new Set(["Travel.to", "MovePicked[1].to", "FlipGollum[1].to"]);
 // Keys that hold instructions: the renderer prints them beneath, not in the line.
 const NESTED = new Set(["instructions", "options"]);
 

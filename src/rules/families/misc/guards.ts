@@ -15,11 +15,6 @@ export function immuneToSource(state: ScenarioState, targetId: string, sourceId:
   if (!sourceId || sourceId === targetId || state.modifiers.length === 0 || !state.cards[sourceId]) return false;
   if (flagged(state, targetId, "immuneToNonMaster") && !hasTrait(state, sourceId, "Master", ctx)) return true;
   if (flagged(state, targetId, "immuneToNonGollum") && !hasTrait(state, sourceId, "Gollum", ctx)) return true;
-  // "Immune to non-Fellowship player card effects" (144075:A:1): the effect of a player card that is not a Fellowship card.
-  if (flagged(state, targetId, "immuneToNonFellowship")) {
-    const printed = printedOf(ctx.cards, state.cards[sourceId]?.code ?? "");
-    if (isPlayerType(printed) && printed.sphere !== "fellowship") return true;
-  }
   return false;
 }
 

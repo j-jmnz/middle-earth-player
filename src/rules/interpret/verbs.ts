@@ -31,6 +31,7 @@ import { takeProgressOff } from "../core/progress.ts";
 import { noteEncounterThreat } from "../families/encounter/reveal.ts";
 import { moveEncounter } from "../families/encounter/moves.ts";
 import { stagingDest } from "../families/breaking/areas.ts";
+import { isGollum } from "../families/gollum/index.ts";
 
 export type VerbFocus = { seat: number; sourceId: string | null };
 
@@ -50,9 +51,12 @@ export function shuffleEncounterDeck(state: ScenarioState): ScenarioState {
 export function resetEncounterDeck(state: ScenarioState, steps: EngineStep[]): ScenarioState {
   // In any phase while the Nightmare setup card says so (encounterRefill, 900201:A:3).
   if ((state.phase !== "Quest" && !refillsAnyTime(state)) || state.encounterDeck.length > 0 || state.encounterDiscard.length === 0) return state;
-  const count = state.encounterDiscard.length;
+  // Gollum and Sméagol are never shuffled into the encounter deck (mec112.gollum-smeagol): a defeated Gollum lies in the discard pile only until his Forced effect flips him.
+  const returning = state.encounterDiscard.filter((id) => !isGollum(state.cards[id]?.code));
+  if (returning.length === 0) return state;
+  const count = returning.length;
   let next = state;
-  for (const id of [...state.encounterDiscard]) {
+  for (const id of returning) {
     next = updateCard(moveCard(next, id, { zone: "encounterDeck" }), id, { face: "down" });
   }
   steps.push({ kind: "resetEncounterDeck", count, cause: ruleCause("rr.running-out-of-cards") });
@@ -216,6 +220,12 @@ function transferHost(state: ScenarioState, focus: VerbFocus, seat: number, step
   return eliminateEmpties(next, steps);
 }
 
+// The player the source enemy is engaged with (rr.defending-player), when it is engaged.
+function defendingPlayer(state: ScenarioState, sourceId: string | null): number | null | undefined {
+  const attacker = sourceId ? state.cards[sourceId] : undefined;
+  return attacker?.zone === "engaged" ? attacker.controller : undefined;
+}
+
 // The seats a RaiseThreat raises: the host's controller for `hostController`, the seats the actor names for the multi-seat words, else the one seat.
 function raisedSeats(state: ScenarioState, who: Extract<Instruction, { verb: "RaiseThreat" }>["who"], actor: number, hostController: number | null | undefined): number[] {
   if (who === "hostController" || who === "defendingPlayer") return [hostController ?? actor];
@@ -235,8 +245,7 @@ export function raiseFor(
   const host = who === "hostController" && focus.sourceId ? state.cards[state.cards[focus.sourceId]?.host ?? ""] : undefined;
   if (who === "hostController" && host?.controller == null) return state;
   // The defending player: the player the source enemy is engaged with (rr.defending-player).
-  const attacker = who === "defendingPlayer" && focus.sourceId ? state.cards[focus.sourceId] : undefined;
-  const seats = raisedSeats(state, who, focus.seat, who === "defendingPlayer" ? (attacker?.zone === "engaged" ? attacker.controller : undefined) : host?.controller);
+  const seats = raisedSeats(state, who, focus.seat, who === "defendingPlayer" ? defendingPlayer(state, focus.sourceId) : host?.controller);
   const amount = instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
   let next = state;
   for (const seat of seats) {
