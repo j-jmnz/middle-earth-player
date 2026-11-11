@@ -11,6 +11,7 @@ import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Focus } from "../index.ts";
+import { discardAllyToStaging, stagedAlliesCost, takeControlOfStagedAllies } from "./allies.ts";
 import { assaultQuestResult, placeProgressActiveFirst } from "./assault.ts";
 import { MINAS_TIRITH } from "./wall.ts";
 
@@ -31,6 +32,10 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return damageMinasTirith(state, instruction, focus, ctx, steps);
     case "PlaceProgressActiveFirst":
       return placeProgressActiveFirst(state, instruction, focus, ctx, steps);
+    case "DiscardAllyToStaging":
+      return discardAllyToStaging(state, instruction, focus, ctx, steps);
+    case "TakeControlOfStagedAllies":
+      return takeControlOfStagedAllies(state, instruction, focus, ctx);
     default:
       return null;
   }
@@ -38,7 +43,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "pelennor",
-  verbs: ["DamageMinasTirith", "PlaceProgressActiveFirst"],
+  verbs: ["DamageMinasTirith", "PlaceProgressActiveFirst", "DiscardAllyToStaging", "TakeControlOfStagedAllies"],
   run,
+  amount: (state, found, _scope, ctx) => (found.stagedAlliesCost ? stagedAlliesCost(state, ctx) : null),
   questResult: (state, totals, cards, steps) => assaultQuestResult(state, totals, cards, steps, minasTirithId(state)),
 };

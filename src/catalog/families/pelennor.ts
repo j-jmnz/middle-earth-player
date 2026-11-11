@@ -12,6 +12,11 @@ const VERBS = [
   // "Progress must be placed on the active location first" (145075:B:4): `amount` progress on the active location, up to its quest points, and what it cannot take on the current quest stage, whatever bars the stage's progress from questing or player cards
   // (the flag `assault`). The stage advances when it is full.
   z.strictObject({ verb: z.literal("PlaceProgressActiveFirst"), amount: positiveAmountSchema, ...when }),
+  // "Each player discards cards from the top of his deck until he discards an ally that is not in play. Put the discarded ally into play in the staging area and treat its text box as if it were blank until the end of the phase" (145074:A:1), for the actor:
+  // an ally whose title a unique ally in play already holds is skipped as one in play (rr.in-play-and-out-of-play); with no ally in the deck nothing is staged. The ally stays its owner's, under nobody's control (145074:B:2), and a destroyed one goes to its owner's discard pile.
+  z.strictObject({ verb: z.literal("DiscardAllyToStaging"), ...when }),
+  // "Each player takes control of each ally he owns in the staging area and exhausts it" (145075:A:1), for the actor: the allies come into their owner's play area.
+  z.strictObject({ verb: z.literal("TakeControlOfStagedAllies"), ...when }),
 ] as const;
 
 const TRIGGERS = [] as const;

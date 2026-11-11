@@ -93,6 +93,8 @@ export const amountExprSchema = z.strictObject({
   playersAtThreat: z.number().int().positive().optional(),
   // The damage tokens on the cards that match, added up ("equal to the total damage on each Ship objective he controls", 12148:A:1; read by the sea family, src/rules/families/sea/swap.ts).
   damageOn: pickSchema.optional(),
+  // The total printed cost of the allies in the staging area ("X is the total cost of all allies in the staging area", 145074:B:1; a card with no printed cost counts 0). Read by the pelennor family.
+  stagedAlliesCost: z.literal(true).optional(),
 });
 
 export const amountSchema = z.union([z.number().int(), amountExprSchema]);
