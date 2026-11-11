@@ -128,7 +128,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
 
     // 144023 Soft Mires (Mire 1): discarded by Mire the first player reveals the top card of the encounter deck. Travel: each player raises their threat by 1.
     { id: "144023:constant:1", cardCode: "144023", lines: ["144023:A:1"], timing: "constant", instructions: [MIRE(1)] },
-    { id: "144023:forced:1", cardCode: "144023", lines: ["144023:A:1"], timing: "forced", ...WHEN_MIRED, instructions: [{ verb: "RevealEncounter" }] },
+    { id: "144023:forced:1", cardCode: "144023", lines: ["144023:A:1"], timing: "forced", ...WHEN_MIRED, instructions: [{ verb: "RevealEncounter", who: "firstPlayer" }] },
     copyLine("144019:A:2", "144023:A:2"),
 
     // 144024 Creeping Marshes (Surge, Doomed 1). When Revealed it attaches to the current quest as a Condition. Its Forced effect: at the end of the refresh phase, after the keyword's own placement, 1 mire token on each location in the staging
@@ -286,7 +286,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     copyLine("19047:B:1", "144065:B:1"),
     { id: "144065:constant:2", cardCode: "144065", lines: ["144065:B:2"], timing: "constant", condition: FIRST_PLAYER_LACKS_SMEAGOL, instructions: [{ verb: "Restrict", what: "advance" }] },
     { id: "144065:constant:3", cardCode: "144065", lines: ["144065:B:2"], timing: "constant", condition: { kind: "count", pick: VICTORY_LOCATIONS, max: 3 }, instructions: [{ verb: "Restrict", what: "advance" }] },
-    { id: "144065:forced:1", cardCode: "144065", lines: ["144065:B:3"], timing: "forced", trigger: "stagingStepEnds", condition: FEWER_LOCATIONS_THAN_PLAYERS, instructions: [{ verb: "RevealEncounter" }] },
+    { id: "144065:forced:1", cardCode: "144065", lines: ["144065:B:3"], timing: "forced", trigger: "stagingStepEnds", condition: FEWER_LOCATIONS_THAN_PLAYERS, instructions: [{ verb: "RevealEncounter", who: "firstPlayer" }] },
 
     // 144066 Don't Look at the Lights! (stage 3). When Revealed: each player in order searches the encounter deck and discard pile for an Undead enemy and puts it into play engaged with them; then every location of the victory display is shuffled
     // into the encounter deck. While any player is engaged with an Undead enemy no progress can be placed on this stage (the active location still takes its share). The players cannot defeat this stage unless the first player controls Sméagol.

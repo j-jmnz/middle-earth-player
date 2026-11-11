@@ -142,7 +142,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
   144023:constant:1: Constant
     - this card: stat mire 1, while this card is in play
   144023:forced:1: Forced on the event discardedByMire (heard about this card)
-    - the acting player reveals an encounter card
+    - the first player reveals an encounter card
 
 144023:A:2 (front): Travel: Each player must raise his threat by 1 to travel here.
   144023:travel:1: Travel
@@ -304,7 +304,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 144065:B:3 (back): Forced: At the end of the staging step, if the number of locations in the staging area is less than the number of players in the game, reveal the top card of the encounter deck.
   144065:forced:1: Forced on the event stagingStepEnds
     only if the number of location (any player controls) in the staging area only is less than the number of players
-    - the acting player reveals an encounter card
+    - the first player reveals an encounter card
 
 ## 144066 Don't Look at the Lights!
 (the scenario deals it into the quest pile; the piles place it, no record does)

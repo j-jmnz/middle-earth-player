@@ -45,7 +45,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "CountEncounterTop":
       return countTop(state, instruction, ctx);
     case "RevealEncounter": {
-      const seat = instruction.who === "eventSeat" ? (effectData(state)?.eventSeat ?? focus.seat) : focus.seat;
+      const seat = instruction.who === "eventSeat" ? (effectData(state)?.eventSeat ?? focus.seat) : instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat;
       if (state.seats[seat]?.eliminated) return state;
       // `times` cards, one after the other: the rest wait in the effect's queue behind this reveal.
       const times = instruction.times == null ? 1 : resolveAmount(state, instruction.times, frameScope(state, focus.seat, focus.sourceId), ctx);
