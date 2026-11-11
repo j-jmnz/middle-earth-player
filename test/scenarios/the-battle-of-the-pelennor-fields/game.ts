@@ -145,8 +145,8 @@ const game = campaignGame<FieldsDecks, FieldsPolicy>({
   scenario: fields,
   stats: FIELDS_STATS,
   loadout: fieldsLoadout,
-  // The scenario's cards, Aragorn, Andúril, Banner of Elendil and The Witch-king's Sorcerer side (145077 adds it) the campaign card or the quest cards place, and the Overcome by Fear the Grey Company earned; the campaign card's and the campaign's game codes are added by the kit.
-  codes: [...fields.cards.map((card) => card.code), "145080", "145001", "142014", "145013", "145016"],
+  // The scenario's cards, Aragorn, Andúril, Banner of Elendil and The Witch-king's Sorcerer side (145077 adds it) the campaign card or the quest cards place, the Overcome by Fear the Grey Company earned and the pool cards the Two Towers' log carries over; the campaign card's and the campaign's game codes are added by the kit.
+  codes: [...fields.cards.map((card) => card.code), "145080", "145001", "142014", "145013", "145016", "144052", "144014", "144075", "144076", "144015", "143015", "143016", "143017", "143018", "143019", "143020", "143021", "143068"],
   intent: fieldsIntent,
   policy: DEFAULT_POLICY,
   limit: 6000,

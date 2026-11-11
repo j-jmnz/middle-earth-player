@@ -7,7 +7,7 @@ tags:
 # scripts/e2e/fixtures.ts finds a win of those lists in its seeds (docs/phases/STATUS.md).
 # The Resolution (145070) asks nothing: the resources on The Corsair Fleet are written in the campaign log and the Army of the Dead boon leaves the pool. The campaign has no XP. The Corsair Fleet's resources are shown on its top-bar dial (`siege-fleet`),
 # which is still on the win table (the Fleet stays in the staging area); the Ships, hold and heal dials are gone with Great Corsair Ship and the Port.
-# The win unlocks The Battle of the Pelennor Fields, which the app cannot deal yet: its node reads Next and the line under the road says it is coming soon (scripts/checks/maestro.test.ts, path-soon).
+# The win unlocks The Battle of the Pelennor Fields, whose node reads Next and the path offers Begin.
 - runFlow:
     file: ../../subflows/scenario-win.yaml
     env:
@@ -15,11 +15,11 @@ tags:
       SCENARIO_ID: the-siege-of-gondor
       TABLE_WIDGET: siege-fleet
       NO_XP: "true"
-# The win unlocks The Battle of the Pelennor Fields, whose node reads Next while the line under the road says it is coming soon: the part is not playable yet.
+# The win unlocks The Battle of the Pelennor Fields, whose node reads Next and the path offers Begin (the part is playable, so no line says it is coming soon).
 - assertVisible:
     id: node-the-battle-of-the-pelennor-fields-status
     text: "Next"
 - assertVisible:
-    id: path-soon
-- assertNotVisible:
     id: begin
+- assertNotVisible:
+    id: path-soon

@@ -144,12 +144,12 @@ describe("The Siege of Gondor in the the-return-of-the-king campaign", () => {
     }
   });
 
-  it("145070:B:1 unlocks The Battle of the Pelennor Fields, the next part, on the log the win writes; the app cannot deal it yet, so the path says it is coming soon", () => {
+  it("145070:B:1 unlocks The Battle of the Pelennor Fields, the next part, on the log the win writes, and the app can deal it", () => {
     const state = goldenState("the-siege-of-gondor", "two-handed, won, Normal");
     const log = applyResolution(afterCompany, state.scenarioId, state, world.cards, NO_COPY_LIMITS);
     const path = campaignPath(campaign, {}, log);
-    expect(path.map((node) => [node.id, node.status]).slice(0, 3)).toEqual([["the-passing-of-the-grey-company", "completed"], ["the-siege-of-gondor", "completed"], ["the-battle-of-the-pelennor-fields", "soon"]]);
-    expect(PLAYABLE_SCENARIOS).not.toContain("the-battle-of-the-pelennor-fields");
+    expect(path.map((node) => [node.id, node.status]).slice(0, 3)).toEqual([["the-passing-of-the-grey-company", "completed"], ["the-siege-of-gondor", "completed"], ["the-battle-of-the-pelennor-fields", "current"]]);
+    expect(PLAYABLE_SCENARIOS).toContain("the-battle-of-the-pelennor-fields");
   });
 
   it("a lost game writes nothing: the Resolution is for a win only, so the save keeps the log it began with", () => {
