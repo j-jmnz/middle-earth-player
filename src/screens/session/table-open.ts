@@ -6,10 +6,11 @@
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import { atPhaseBoundary, checkpointOf } from "../../campaign/checkpoint";
+import { staleChanges } from "../../campaign/changes";
 import { addActive, fullChecks, staleReason } from "../../campaign/replay";
 import type { Save } from "../../campaign/save";
 import { continueSave, continuesFromCheckpoint, drop, finish, isWon, record, restartSave, resume, unrecord } from "../../campaign/session";
-import { logCodes, loadWorld, type World } from "../../campaign/world";
+import { logCodes, loadWorld, worldHash, type World } from "../../campaign/world";
 import { CATALOG_VERSION } from "../../catalog/version";
 import { dealSeed } from "../nav/e2e";
 import { CANNOT_CONTINUE, MISSING_GAME, restartProblems, type StaleChoice } from "./stale-words";
@@ -31,10 +32,10 @@ type Db<TRun> = BaseSQLiteDatabase<"sync", TRun>;
 // `stamp` is the save to write once when the open left the game different from its row: stamped with the world (a save from before it), restamped
 // after a checked replay matched every move on another engine version, or given the checks it lacked. `takenBack` on a stale result is how many moves Continue would take back
 // when a checked replay found the first that does not match (null: nothing was compared). `fromCheckpoint` says Continue will rebase onto the game's checkpoint instead
-// (it passes the check): then no move is taken back but the ones after it that do not match.
+// (it passes the check): then no move is taken back but the ones after it that do not match. `changes` is what changed under the game, for the sheet (campaign/changes.ts).
 export type TableSession =
   | ({ ok: true; save: Save; stamp: Save | null } & ReplayedGame)
-  | { ok: false; reason: "missing" | "none" | "dropped" | "stale"; save: Save | null; write: Save | null; takenBack?: number | null; fromCheckpoint?: boolean };
+  | { ok: false; reason: "missing" | "none" | "dropped" | "stale"; save: Save | null; write: Save | null; takenBack?: number | null; fromCheckpoint?: boolean; changes?: readonly string[] };
 
 /** The codes the open scenario can show: the log's cards, the Ring-bearer and every card of each dealt deck. */
 export function loadoutCodes(save: Save): string[] {
@@ -73,7 +74,7 @@ function openRead<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TUser>, read:
   }
   // Without a world: the engine version, and the catalog version of a save that has no world stamp yet. One of another engine
   // version without checks to compare has nothing to replay: the player chooses, without loading the world.
-  if (staleReason(save.active, null) && (save.active.intents.length === 0 || !fullChecks(save.active))) return { ok: false, reason: "stale", save, write: null, takenBack: null };
+  if (staleReason(save.active, null) && (save.active.intents.length === 0 || !fullChecks(save.active))) return { ok: false, reason: "stale", save, write: null, takenBack: null, changes: staleChanges(save.active, save.loadout.scenarioId, null) };
   const cache = sessionCacheOf<Opened>(user, "save");
   const kept = cache.get(save.id, fingerprintOf(save, CATALOG_VERSION));
   if (kept) return kept;
@@ -81,7 +82,7 @@ function openRead<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TUser>, read:
   const replayed = replayForTable(catalog, world, (observe) => resume(save, world, observe));
   if (!replayed.ok) {
     // Another engine version or world that did not match, the reducer refused a stored intent, or the start no longer builds: the player chooses, nothing is dropped.
-    return { ok: false, reason: "stale", save, write: null, takenBack: replayed.at == null ? null : save.active.intents.length - replayed.at, fromCheckpoint: continuesFromCheckpoint(save.active, readCheckpoint(user, save.id), world, save.seatCount) };
+    return { ok: false, reason: "stale", save, write: null, changes: staleChanges(save.active, scenario.id, worldHash(world)), takenBack: replayed.at == null ? null : save.active.intents.length - replayed.at, fromCheckpoint: continuesFromCheckpoint(save.active, readCheckpoint(user, save.id), world, save.seatCount) };
   }
   // The row as the replay leaves it (stamped, restamped, or given its checks) is the save the table opens on, and the hook that opened it writes it once.
   const stamped: Save = replayed.stamp ? { ...save, active: replayed.stamp } : save;

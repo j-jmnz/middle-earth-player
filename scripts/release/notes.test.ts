@@ -16,7 +16,7 @@ const base: NotesInput = {
   repository: "j-jmnz/middle-earth-lcg",
   catalogVersion: 123,
   engineVersion: 25,
-  previousEngineVersion: 25,
+  reach: undefined,
 };
 
 describe("release notes (.claude/rules/release-standards.md, Release notes)", () => {
@@ -33,14 +33,16 @@ describe("release notes (.claude/rules/release-standards.md, Release notes)", ()
     expect(notes.indexOf("Before you update")).toBeLessThan(notes.indexOf("## New"));
   });
 
-  it("warns that an open scenario is dropped when the engine version moved", () => {
-    const notes = renderNotes({ ...base, changes: [], previousEngineVersion: 24 });
-    expect(notes).toContain("## Before you update\n\n- A scenario left open in an earlier release is dropped");
+  it("names the scenarios whose open games the update can reach, and warns of nothing when none", () => {
+    const some = renderNotes({ ...base, changes: [], reach: { all: false, names: ["The Oath", "The Drowned Ruins"] } });
+    expect(some).toContain("## Before you update\n\n- Open games of The Oath and The Drowned Ruins may ask you to continue or restart");
+    expect(renderNotes({ ...base, changes: [], reach: { all: true, names: [] } })).toContain("- Open games of any scenario may ask you to continue or restart");
+    expect(renderNotes({ ...base, changes: [], reach: { all: false, names: [] } })).not.toContain("Before you update");
   });
 
   it("adds the APK's checksums, and marks the first release without a project count or comparison", () => {
     const apk = { name: "middle-earth-lcg-v0.1.0.apk", sha256: "ab12", certificateSha256: "cd34" };
-    const notes = renderNotes({ ...base, tag: "v0.1.0", previousTag: undefined, previousEngineVersion: undefined, apk });
+    const notes = renderNotes({ ...base, tag: "v0.1.0", previousTag: undefined, reach: undefined, apk });
     expect(notes.startsWith("The first release.\n")).toBe(true);
     expect(notes).not.toContain("Plus ");
     expect(notes).not.toContain("compare/");

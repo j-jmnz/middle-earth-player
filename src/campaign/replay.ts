@@ -78,8 +78,13 @@ export type ReplayObserver = (before: ScenarioState, after: ScenarioState, steps
 // game opens on, or null where none is built (a list row): then only a save with no `world` is compared, on the catalog version.
 export function staleReason(active: Pick<ActiveScenario, "engineVersion" | "dataHash" | "world">, world: number | null): "engineVersion" | "dataHash" | null {
   if (active.engineVersion !== ENGINE_VERSION) return "engineVersion";
-  if (active.world == null) return active.dataHash === CATALOG_VERSION ? null : "dataHash";
-  return world != null && world !== active.world ? "dataHash" : null;
+  return worldChanged(active, world) ? "dataHash" : null;
+}
+
+// Whether the cards or the scenario the game was dealt on changed (the world stamp, or for a save without one the catalog version).
+export function worldChanged(active: Pick<ActiveScenario, "dataHash" | "world">, world: number | null): boolean {
+  if (active.world == null) return active.dataHash !== CATALOG_VERSION;
+  return world != null && world !== active.world;
 }
 
 // The game stamped with the world it is current on: a save from before `world` existed, on its first open.

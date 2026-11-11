@@ -5,16 +5,21 @@ import { View } from "react-native";
 
 import { PaperSheet, PrimaryButton, TextButton } from "../kit/chrome";
 import { SheetModal } from "../kit/sheet-modal";
-import { CHECKPOINT_NOTE, CONTINUE_NOTE, RESTART_NOTE, STALE_SENTENCE, STALE_STEP, takenBackNote } from "../session/stale-words";
+import { changeLines, CHECKPOINT_NOTE, CONTINUE_NOTE, RESTART_NOTE, STALE_SENTENCE, STALE_STEP, takenBackNote } from "../session/stale-words";
 import { Text } from "../../ui/text";
 
-export function StaleSheet({ title, error, takenBack, fromCheckpoint, onContinue, onRestart, onLeave }: { title: string; error: string | null; takenBack?: number | null; fromCheckpoint?: boolean; onContinue: () => void; onRestart: () => void; onLeave: () => void }) {
+export function StaleSheet({ title, error, takenBack, fromCheckpoint, changes, onContinue, onRestart, onLeave }: { title: string; error: string | null; takenBack?: number | null; fromCheckpoint?: boolean; changes?: readonly string[]; onContinue: () => void; onRestart: () => void; onLeave: () => void }) {
   return (
     <SheetModal visible onRequestClose={onLeave} scrimLabel="Leave without choosing">
       <PaperSheet step={STALE_STEP} title={title}>
         <Text testID="stale-sentence" className="text-body text-ink">
           {STALE_SENTENCE}
         </Text>
+        {changeLines(changes).map((line, index) => (
+          <Text key={line} testID={`stale-change-${index}`} className="mt-1 text-body text-ink">
+            {line}
+          </Text>
+        ))}
         <Text testID={fromCheckpoint ? "stale-checkpoint" : undefined} className="mt-2 text-body text-ink">
           {fromCheckpoint ? CHECKPOINT_NOTE : CONTINUE_NOTE}
         </Text>

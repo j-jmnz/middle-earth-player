@@ -3,10 +3,11 @@
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import { atPhaseBoundary, checkpointOf } from "../../campaign/checkpoint";
+import { staleChanges } from "../../campaign/changes";
 import { addActive, fullChecks, staleReason } from "../../campaign/replay";
 import { continuesFromCheckpoint, isWon, record, unrecord } from "../../campaign/session";
 import { continueStandalone, dropStandalone, resumeStandalone, restartStandalone, type StandaloneGame } from "../../campaign/standalone";
-import { loadWorld } from "../../campaign/world";
+import { loadWorld, worldHash } from "../../campaign/world";
 import { CATALOG_VERSION } from "../../catalog/version";
 import { EFFECTS } from "../../effects";
 import type { ScenarioState, TableStore } from "../../play/store/store";
@@ -22,9 +23,9 @@ import { CANNOT_CONTINUE, MISSING_GAME, restartProblems, type StaleChoice } from
 type Db<TRun> = BaseSQLiteDatabase<"sync", TRun>;
 
 export type StandaloneSession =
-  // `stamp` is the game to write once when the open left it different from its row (table-open.ts, TableSession). `takenBack` on a stale result is how many moves Continue would take back, when a checked replay found one that does not match; `fromCheckpoint` says Continue will rebase onto the game's checkpoint instead.
+  // `stamp` is the game to write once when the open left it different from its row (table-open.ts, TableSession). `takenBack` on a stale result is how many moves Continue would take back, when a checked replay found one that does not match; `fromCheckpoint` says Continue will rebase onto the game's checkpoint instead; `changes` is what changed under the game, for the sheet.
   | ({ ok: true; stored: StandaloneGame; stamp: StandaloneGame | null } & ReplayedGame)
-  | { ok: false; reason: "missing" | "none" | "dropped" | "stale"; stored: StandaloneGame | null; write: StandaloneGame | null; takenBack?: number | null; fromCheckpoint?: boolean };
+  | { ok: false; reason: "missing" | "none" | "dropped" | "stale"; stored: StandaloneGame | null; write: StandaloneGame | null; takenBack?: number | null; fromCheckpoint?: boolean; changes?: readonly string[] };
 
 /** The codes the game can show: the Ring-bearer and every card of each dealt deck. */
 export function standaloneCodes(game: StandaloneGame): string[] {
@@ -56,13 +57,13 @@ export function openStandalone<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<
   }
   // Without a world: the engine version, and the catalog version of a game that has no world stamp yet. One of another engine version
   // without checks to compare has nothing to replay: the player chooses, without loading the world.
-  if (staleReason(stored.active, null) && (stored.active.intents.length === 0 || !fullChecks(stored.active))) return { ok: false, reason: "stale", stored, write: null, takenBack: null };
+  if (staleReason(stored.active, null) && (stored.active.intents.length === 0 || !fullChecks(stored.active))) return { ok: false, reason: "stale", stored, write: null, takenBack: null, changes: staleChanges(stored.active, stored.scenarioId, null) };
   const cache = sessionCacheOf<Opened>(user, "standalone");
   const kept = cache.get(stored.id, fingerprintOf(stored, CATALOG_VERSION));
   if (kept) return kept;
   const world = loadWorld(catalog, campaign, scenario, EFFECTS, standaloneCodes(stored));
   const replayed = replayForTable(catalog, world, (observe) => resumeStandalone(stored, world, observe));
-  if (!replayed.ok) return { ok: false, reason: "stale", stored, write: null, takenBack: replayed.at == null ? null : stored.active.intents.length - replayed.at, fromCheckpoint: continuesFromCheckpoint(stored.active, readStandaloneCheckpoint(user, stored.id), world, stored.seatCount) };
+  if (!replayed.ok) return { ok: false, reason: "stale", stored, write: null, changes: staleChanges(stored.active, stored.scenarioId, worldHash(world)), takenBack: replayed.at == null ? null : stored.active.intents.length - replayed.at, fromCheckpoint: continuesFromCheckpoint(stored.active, readStandaloneCheckpoint(user, stored.id), world, stored.seatCount) };
   const stamped: StandaloneGame = replayed.stamp ? { ...stored, active: replayed.stamp } : stored;
   const opened: Opened = { ok: true, stored: stamped, stamp: null, ...replayed.game };
   cache.set(stored.id, fingerprintOf(stamped, CATALOG_VERSION), opened);

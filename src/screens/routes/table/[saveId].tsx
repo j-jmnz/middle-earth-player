@@ -54,6 +54,7 @@ export default function TableScreen() {
             error={refused}
             takenBack={session.takenBack}
             fromCheckpoint={session.fromCheckpoint}
+            changes={session.changes}
             onContinue={() => choose(continueTable(catalog, user, saveId))}
             onRestart={() => choose(restartTable(catalog, user, saveId))}
             onLeave={leave}

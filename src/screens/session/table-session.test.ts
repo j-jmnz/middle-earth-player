@@ -10,6 +10,7 @@ import { fixtureSave, hasFixture, type FixtureName } from "../../campaign/fixtur
 import { CATALOG_VERSION } from "../../catalog/version.ts";
 import { readSave, savedAt, writeActive, writeSave } from "../data/campaign-store.ts";
 import { ENGINE_VERSION } from "../../campaign/replay.ts";
+import { ENGINE_CHANGES } from "../../campaign/changes.ts";
 import { continueTable, openTable, recordUnclosedRun, restartTable, sessionStore } from "./table-open.ts";
 import { flushRuns } from "../data/pending-runs.ts";
 import { listRuns } from "../data/run-store.ts";
@@ -34,7 +35,8 @@ describe("opening the table", () => {
     const old = { ...save, active: { ...save.active!, engineVersion: ENGINE_VERSION - 1 } };
     writeSave(user, old);
     const before = savedAt(user).get("s1");
-    expect(openTable(catalog, user, "s1")).toMatchObject({ ok: false, reason: "stale", write: null });
+    // What changed under it is the engine line of the version it missed (version 26 reaches every scenario).
+    expect(openTable(catalog, user, "s1")).toMatchObject({ ok: false, reason: "stale", write: null, changes: [ENGINE_CHANGES.at(-1)!.note] });
     expect(readSave(user, "s1")).toEqual(old);
     expect(savedAt(user).get("s1")).toBe(before);
   });

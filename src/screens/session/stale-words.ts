@@ -3,6 +3,15 @@
 
 export const STALE_STEP = "Needs a choice";
 export const STALE_SENTENCE = "The rules or the card data changed since this game was dealt.";
+/** How many lines of what changed the sheet shows before it says how many more there are. */
+export const CHANGE_LINES = 3;
+/** What changed under the game, at most CHANGE_LINES lines and then "and 2 more changes.". */
+export function changeLines(changes: readonly string[] | undefined): string[] {
+  const all = changes ?? [];
+  if (all.length <= CHANGE_LINES) return [...all];
+  const more = all.length - CHANGE_LINES;
+  return [...all.slice(0, CHANGE_LINES), more === 1 ? "and 1 more change." : `and ${more} more changes.`];
+}
 export const CONTINUE_NOTE = "Continue plays your moves again on the new rules, as far as they are accepted. The table may not be the one you left.";
 /** What Continue does when the game has a checkpoint that passes the check: the table as it was at the start of the phase or when it was last left, and the moves since played on the new rules. */
 export const CHECKPOINT_NOTE = "Continue picks your table up as it was when you last left it or began a phase, and plays your moves since on the new rules. You cannot undo back past that point.";

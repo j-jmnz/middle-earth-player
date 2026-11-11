@@ -56,14 +56,14 @@ Read the sections your task touches.
   - 227–236 Documentation (~170)
   - 237–254 Attribution (~470)
   - 255–258 License (~50)
-- `docs/architecture.md` — Architecture (~23.3K tok)
+- `docs/architecture.md` — Architecture (~23.4K tok)
   - 7–41 Stack (~1.1K)
   - 42–77 Processes (~680)
   - 78–160 Modules (~2.3K) ← 3
     - 126–160 Repository map (~870) ← 1
   - 161–186 State (~1.1K) ← 9
   - 187–208 Play loop (~250)
-  - 209–234 Engine (~5.2K)
+  - 209–234 Engine (~5.3K)
     - 223–234 Mechanic families (~4.3K) ← 5
   - 235–240 Effects (~530)
   - 241–273 Scenario definition (~800)
@@ -168,7 +168,7 @@ Read the sections your task touches.
   - 230–244 Icons (~480) ← 7
   - 245–263 Card art (~740) ← 2
   - 264–278 Tablets (~510) ← 13
-  - 279–464 Screens (~15.8K)
+  - 279–464 Screens (~15.9K)
     - 283–286 Splash (~40)
     - 287–290 App icon (~80)
     - 291–306 Campaigns (campaign list) (~1.5K) ← 6
@@ -180,7 +180,7 @@ Read the sections your task touches.
     - 361–364 Campaign log (~600) ← 1
     - 365–368 Spend XP (~610) ← 1
     - 369–372 Table — landscape (~30) ← 1
-    - 373–376 Table opens stale (~390) ← 1
+    - 373–376 Table opens stale (~460) ← 2
     - 377–388 Resolution and standalone outcome (~1.6K) ← 1
     - 389–398 Decks (~920) ← 2
     - 399–408 Deck builder (deck editor) (~840) ← 3
@@ -193,7 +193,7 @@ Read the sections your task touches.
     - 455–460 Booklet (~280) ← 2
     - 461–464 Database (~20)
   - 465–484 States (~620)
-- `docs/releasing.md` — Releasing (~2.3K tok)
+- `docs/releasing.md` — Releasing (~2.4K tok)
 
 ## Phases
 
@@ -271,9 +271,9 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/docs`: brief.md, Card images (2); design-system-table.md, Spotlight (1); design-system.md, Tablets (1)
 - `scripts/e2e`: .claude/rules/code-standards.md, Test cost (1)
 - `scripts/git`: .claude/rules/commit-standards.md, Subject line (2)
-- `scripts/release`: .claude/rules/release-standards.md, Versioning (3); .claude/rules/release-standards.md, Release notes (2); releasing.md, Jobs (2); .claude/rules/release-standards.md, Branches (1)
+- `scripts/release`: .claude/rules/release-standards.md, Release notes (3); .claude/rules/release-standards.md, Versioning (3); releasing.md, Jobs (2); .claude/rules/release-standards.md, Branches (1)
 - `scripts/tools`: handover/agent-brief.md, Scenario procedure (4); .claude/rules/code-standards.md, Test cost (2); architecture.md, Modules (1); design-system-table.md, Choice tray (1)
-- `src/campaign`: brief.md, The Two Towers (6); handover/agent-brief.md, Scenario procedure (5); brief.md, Nightmare (4); architecture.md, Tests (2); brief.md, Ered Mithrin (2); architecture.md, Persistence (1)
+- `src/campaign`: brief.md, The Two Towers (6); handover/agent-brief.md, Scenario procedure (5); brief.md, Nightmare (4); architecture.md, Tests (2); brief.md, Ered Mithrin (2); architecture.md, Persistence (1); design-system.md, Table opens stale (1)
 - `src/catalog`: architecture.md, Mechanic families (2); brief.md, Nightmare (2); brief.md, The Two Towers (2); brief.md, A Knife in the Dark (1); brief.md, Dream-chaser (1); brief.md, Ered Mithrin (1); brief.md, Flight to the Ford burden deck and life (1); brief.md, Three layers (1)
 - `src/effects`: brief.md, The Two Towers (4); brief.md, Breaking of the Fellowship, stage 2B (1); brief.md, Nightmare (1)
 - `src/play`: design-system-table.md, Spotlight (29); design-system-table.md, Choice tray (20); design-system-table.md, Cards (17); design-system-table.md, Screen reader (12); design-system-table.md, Command column (11); design-system-table.md, Spacing and the play area's rows (9); design-system-table.md, The Island Map (8); architecture.md, State (6); design-system-table.md, Piles (6); architecture.md, Images (5); design-system-table.md, Motion (5); design-system-table.md, Reading panels (5); design-system-table.md, The Sailing test (5); design-system.md, Type (5); architecture.md, Performance (4); brief.md, Three layers (4); design-system-table.md, Banner (4); design-system-table.md, Gestures (4); brief.md, Table screen (3); design-system-table.md, Top bar (3); architecture.md, Tests (2); design-system-table.md, Quest scale (2); design-system.md, Settings (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Table menu (1); design-system-table.md, Two taps (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Screen reader (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1)
