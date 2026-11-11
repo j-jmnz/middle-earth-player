@@ -167,7 +167,7 @@ Read the sections your task touches.
   - 215–229 Screen reader (~920) ← 8
   - 230–244 Icons (~480) ← 7
   - 245–263 Card art (~740) ← 2
-  - 264–278 Tablets (~510) ← 13
+  - 264–278 Tablets (~510) ← 14
   - 279–460 Screens (~15.4K)
     - 283–286 Splash (~40)
     - 287–290 App icon (~80)
@@ -227,6 +227,7 @@ Read when a task names the plan.
   - 237–273 Mechanic families: engine and records together (~1.4K) ← 1
   - 274–287 Readings the review catches (~490) ← 4
   - 288–307 Not expressible yet: leave open, report (~390)
+- `docs/plans/readme-showcase.md` — README showcase (~2.7K tok)
 - `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.7K tok)
   - 3–14 Context (~450)
   - 15–24 What does not move (~190)
