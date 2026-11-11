@@ -9,25 +9,26 @@ import { updateCard, type ScenarioState } from "../../rules/core/state.ts";
 
 import { gollumHeld, marshesDials } from "../readouts/marshes.ts";
 import { heldDials } from "../readouts/widgets.ts";
-import type { IsengardDial } from "../readouts/isengard.ts";
+import type { TableDial } from "../readouts/dials.ts";
 import type { AsksTable } from "../words/asks.ts";
 import { ASKS } from "../words/asks/the-passage-of-the-marshes.ts";
-import { GOLLUM_WORDS, gollumHeldWords, mireWords } from "../words/scenarios/marshes.ts";
+import { dialProps } from "../readouts/dials.ts";
+import { GOLLUM_WORDS, gollumHeldWords, mireWords, nearestRows } from "../words/scenarios/marshes.ts";
 
 const ID = "the-passage-of-the-marshes";
 const table = (layout: Layout = {}) => tableFromLayout(ID, layout);
 const names = (made: ReturnType<typeof table>) => (code: string) => made.cards.get(code)?.name ?? code;
-const dialsOf = (layout: Layout): readonly IsengardDial[] => {
+const dialsOf = (layout: Layout): readonly TableDial[] => {
   const made = table(layout);
   return marshesDials(syncConstants(made.state, made.ctx), made.ctx, names(made));
 };
-const dial = (dials: readonly IsengardDial[], id: string) => dials.find((one) => one.id === id);
+const dial = (dials: readonly TableDial[], id: string) => dials.find((one) => one.id === id);
 
 describe("the Mire dial", () => {
   it("144019:A:1 shows the mire tokens on the location closest to its Mire X against that X, warming toward it (no goal)", () => {
     const shown = dial(dialsOf({ staging: [{ code: "144019", resources: 1 }, { code: "144021", resources: 1 }] }), "mire");
     // Evil-smelling Fens (Mire 3) has 1 of 3, Haunted Mere (Mire 2) 1 of 2: the Mere is nearer.
-    expect(shown).toMatchObject({ label: "Mire", value: 1, limit: 2, testID: "marshes-mire", name: "Mire tokens on Haunted Mere, the location closest to its limit" });
+    expect(shown).toMatchObject({ label: "Mire", value: 1, limit: 2, testID: "marshes-mire", name: "Mire tokens on Haunted Mere, closest to discard:", warms: true, warn: { level: "critical", words: "1 mire token more and Haunted Mere is discarded" } });
     expect(shown?.goal).toBeUndefined();
     expect(shown?.limitWords).toBe("Evil-smelling Fens 1 of 3, Haunted Mere 1 of 2; 1 mire token more and Haunted Mere is discarded by Mire");
   });
@@ -53,8 +54,37 @@ describe("the Mire dial", () => {
   });
 
   it("144019:A:1 words each location's tokens, and what the nearest still needs", () => {
-    expect(mireWords([{ name: "Soft Mires", tokens: 0, limit: 1 }])).toBe("Soft Mires 0 of 1; 1 mire token more and Soft Mires is discarded by Mire");
-    expect(mireWords([{ name: "Stagnant Pools", tokens: 3, limit: 5 }, { name: "Soft Mires", tokens: 0, limit: 1 }])).toBe("Stagnant Pools 3 of 5, Soft Mires 0 of 1; 1 mire token more and Soft Mires is discarded by Mire");
+    const mires = [{ name: "Soft Mires", tokens: 0, limit: 1 }];
+    expect(mireWords(mires, nearestRows(mires))).toBe("Soft Mires 0 of 1; 1 mire token more and Soft Mires is discarded by Mire");
+    const both = [{ name: "Stagnant Pools", tokens: 3, limit: 5 }, { name: "Soft Mires", tokens: 0, limit: 1 }];
+    expect(mireWords(both, nearestRows(both))).toBe("Stagnant Pools 3 of 5, Soft Mires 0 of 1; 1 mire token more and Soft Mires is discarded by Mire");
+  });
+});
+
+describe("the Mire dial warms and warns, and the top bar hands the ring those props", () => {
+  const fens = { code: "144019", resources: 1 };
+  const pools = { code: "144022", resources: 3 };
+
+  it("144019:A:1 names every location tied for the discard in the dial's name and words, and reads against the larger limit", () => {
+    // Evil-smelling Fens (Mire 3) at 2 and Stagnant Pools (Mire 5) at 4 are each 1 token from being discarded.
+    const tied = dial(dialsOf({ staging: [{ code: "144019", resources: 2 }, { code: "144022", resources: 4 }] }), "mire");
+    expect(tied).toMatchObject({ value: 4, limit: 5, name: "Mire tokens on Evil-smelling Fens and Stagnant Pools, closest to discard:" });
+    expect(tied?.limitWords).toBe("Evil-smelling Fens 2 of 3, Stagnant Pools 4 of 5; 1 mire token more and Evil-smelling Fens and Stagnant Pools are discarded by Mire");
+    expect(tied?.warn?.words).toBe("1 mire token more and Evil-smelling Fens and Stagnant Pools are discarded");
+  });
+
+  it("144019:A:1 warns critical at 1 token left and is quiet with more left, whatever the proportion", () => {
+    expect(dial(dialsOf({ staging: [fens] }), "mire")?.warn).toBeUndefined();
+    expect(dial(dialsOf({ staging: [{ code: "144019", resources: 2 }] }), "mire")?.warn?.level).toBe("critical");
+    expect(dial(dialsOf({ staging: [pools] }), "mire")?.warn).toBeUndefined();
+  });
+
+  it("144019:A:1 the top bar gives the Mire ring the elimination look with its warning, never a goal; Gollum's ring a goal that never warms", () => {
+    const shown = dialsOf({ staging: [{ code: "144019", resources: 2 }], engaged: [{ code: "144075", seat: 0 }] });
+    const mire = dialProps(dial(shown, "mire")!);
+    expect(mire).toMatchObject({ elimination: true, goal: undefined, testID: "marshes-mire", limit: 3, warn: { level: "critical" } });
+    const gollum = dialProps(dial(shown, "gollum")!);
+    expect(gollum).toMatchObject({ elimination: false, goal: true, testID: "marshes-gollum", warn: undefined });
   });
 });
 

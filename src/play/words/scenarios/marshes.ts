@@ -5,12 +5,29 @@ export type MireRow = { name: string; tokens: number; limit: number };
 
 const tokensWord = (count: number): string => (count === 1 ? "1 mire token" : `${count} mire tokens`);
 
-/** What the Mire dial reads (mec112.mire): the location closest to being discarded is the dial's number, and each location's tokens against its limit are said here, with what the limit does. */
-export function mireWords(rows: readonly MireRow[]): string {
+/** The locations nearest to being discarded: the fewest mire tokens left, every one of them on a tie. */
+export function nearestRows(rows: readonly MireRow[]): readonly MireRow[] {
+  const fewest = Math.min(...rows.map((row) => row.limit - row.tokens));
+  return rows.filter((row) => row.limit - row.tokens === fewest);
+}
+
+/** "A", "A and B", "A, B and C". */
+export function listNames(rows: readonly MireRow[]): string {
+  const names = rows.map((row) => row.name);
+  return names.length < 2 ? (names[0] ?? "") : `${names.slice(0, -1).join(", ")} and ${names.at(-1)}`;
+}
+
+/** The Mire dial's own warning (mec112.mire): at 1 mire token left a location is one token from being discarded; with more left the ring's proportion speaks alone. */
+export function mireWarn(left: number, closest: readonly MireRow[]): { level: "critical"; words: string } | undefined {
+  return left === 1 ? { level: "critical", words: `1 mire token more and ${listNames(closest)} ${closest.length > 1 ? "are" : "is"} discarded` } : undefined;
+}
+
+/** What the Mire dial reads (mec112.mire): the locations closest to being discarded give the dial's number, and each location's tokens against its limit are said here, with what the limit does. */
+export function mireWords(rows: readonly MireRow[], closest: readonly MireRow[]): string {
   const each = rows.map((row) => `${row.name} ${row.tokens} of ${row.limit}`).join(", ");
-  const nearest = rows.reduce<MireRow | null>((best, row) => (best == null || row.limit - row.tokens < best.limit - best.tokens ? row : best), null);
-  const left = nearest ? Math.max(0, nearest.limit - nearest.tokens) : 0;
-  return `${each}; ${nearest ? `${tokensWord(left)} more and ${nearest.name} is discarded by Mire` : "none left"}`;
+  const first = closest[0];
+  const left = first ? Math.max(0, first.limit - first.tokens) : 0;
+  return `${each}; ${first ? `${tokensWord(left)} more and ${listNames(closest)} ${closest.length > 1 ? "are" : "is"} discarded by Mire` : "none left"}`;
 }
 
 /** What Gollum's hit points are (144064:B:1, 144075:A:3): defeating him flips him to Sméagol, and the first player must control Sméagol for the players to advance. */

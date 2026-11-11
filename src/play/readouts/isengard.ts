@@ -11,6 +11,7 @@ import { modifiedStat } from "../../rules/core/keywords.ts";
 import { effectsOf } from "../../rules/windows/listen.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 
+import { useStableDials, type TableDial } from "./dials.ts";
 import { advanceLimitWords } from "../words/scenarios/fortress.ts";
 import { entLimitWords, gateWords, handLabel, handWarning, REVEALS_WORDS } from "../words/scenarios/isengard.ts";
 
@@ -20,21 +21,6 @@ const STAGE_3 = "143080";
 const ENT = "143046";
 const SARUMAN = "143047";
 const STAFF = "143048";
-
-/** One dial of the top bar: its label, what a screen reader calls it, its number, and what it counts toward. `goal`: the limit is the players' way out (the ring fills in the accent, never warms). `filled`: the number the ring fills with when it is not the disc's (the gate's damage). */
-export type IsengardDial = {
-  id: string;
-  // The dial's test id when it is not `isengard-<id>` (The Passage of the Marshes' dials, readouts/marshes.ts).
-  testID?: string;
-  label: string;
-  name: string;
-  value: number;
-  limit?: number;
-  filled?: number;
-  goal?: true;
-  limitWords?: string;
-  note?: string;
-};
 
 /** What a seat's threat dial says of its hand on stage 3B: its label (the count, which a screen reader hears with it) and the warning at 1 card and 0. */
 export type HandMark = { seat: number; label: string; warn?: { level: "near" | "critical"; words: string } };
@@ -57,8 +43,8 @@ function currentStage(game: ScenarioState, code: string): CardInstance | undefin
 }
 
 /** Every dial The Road to Isengard's pieces hold now, in the order the top bar draws them. Empty in any other scenario and before a piece exists. */
-export function isengardDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code: string) => string): readonly IsengardDial[] {
-  const dials: IsengardDial[] = [];
+export function isengardDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code: string) => string): readonly TableDial[] {
+  const dials: TableDial[] = [];
   const first = currentStage(game, STAGE_1);
   if (first) dials.push({ id: "reveals", label: "Reveals", name: `Resource tokens on ${nameOf(STAGE_1)}`, value: first.resources, note: REVEALS_WORDS });
   const second = currentStage(game, STAGE_2);
@@ -93,9 +79,8 @@ export function isengardHands(game: ScenarioState): readonly HandMark[] {
 }
 
 /** The dials for the top bar: the same list while no dial's words or number changed, so the bar re-renders only when a token, a hit point or a card moves. */
-export function useIsengardDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code: string) => string): readonly IsengardDial[] {
-  const key = JSON.stringify(isengardDials(game, ctx, nameOf));
-  return useMemo((): readonly IsengardDial[] => JSON.parse(key), [key]);
+export function useIsengardDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code: string) => string): readonly TableDial[] {
+  return useStableDials(isengardDials(game, ctx, nameOf));
 }
 
 /** The hand marks for the seat dials, stable the same way. */

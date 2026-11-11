@@ -18,7 +18,8 @@ import { IslandChip } from "../../play/dream-chaser/island-chip";
 import type { IslandReadout } from "../../play/dream-chaser/island-table";
 import type { HeadingStep } from "../../play/dream-chaser/heading";
 import { MenuButton } from "../../play/chrome/table-menu";
-import type { HandMark, IsengardDial } from "../../play/readouts/isengard";
+import type { HandMark } from "../../play/readouts/isengard";
+import { dialProps, type TableDial } from "../../play/readouts/dials";
 import { defenseLimitWords } from "../../play/words/scenarios/fortress";
 import { useTableTokens } from "../../ui/use-table-tokens";
 import { withAlphaHex } from "../../ui/tokens";
@@ -31,8 +32,8 @@ const FADE_BANDS = 7;
 const FADE_BAND = EDGE_FADE / FADE_BANDS;
 const NO_TICKS: readonly number[] = [];
 const NO_HELD: readonly HeldDial[] = [];
-const NO_ISENGARD: readonly IsengardDial[] = [];
-const NO_MARSHES: readonly IsengardDial[] = [];
+const NO_ISENGARD: readonly TableDial[] = [];
+const NO_MARSHES: readonly TableDial[] = [];
 const NO_HANDS: readonly HandMark[] = [];
 
 export type TopBarProps = {
@@ -69,9 +70,9 @@ export type TopBarProps = {
   // The tokens on The Defense of Helm's Deep, its name and the number that ends it and the stage it advances to (mec112.defense, 143033:A:3), or null: a dial after Pursuit whose ring fills toward the limit in the accent.
   defense?: { name: string; value: number; limit: number; stage: number } | null;
   // The dials of The Road to Isengard's pieces (readouts/isengard.ts): the resources on stage 1B, the damage on stage 2B, the Ent closest to control and Saruman's hit points left.
-  isengard?: readonly IsengardDial[];
+  isengard?: readonly TableDial[];
   // The dials of The Passage of the Marshes' pieces (readouts/marshes.ts): the mire tokens on the location closest to its limit, and Gollum's hit points left.
-  marshes?: readonly IsengardDial[];
+  marshes?: readonly TableDial[];
   // Each seat's cards in hand on stage 3B, which its threat dial wears in its label and warns with at 1 card and 0 (143080:B:3; readouts/isengard.ts).
   hands?: readonly HandMark[];
   // The seats that hold something facedown or as a Captive and what to say of each (a mark on its dial): the Ring-bearer under the Watcher, a prisoner, a hero an enemy holds, a Captive.
@@ -178,7 +179,7 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
             {pursuit != null ? <ThreatRing threat={{ seat: 0, threat: pursuit.value, eliminated: false }} label="Pursuit" accessibilityName="Pursuit value" testID="pursuit" icon={null} limit={pursuit.limit} compact /> : null}
             {defense != null ? <ThreatRing threat={{ seat: 0, threat: defense.value, eliminated: false }} label="Tokens" accessibilityName={`Resource tokens on ${defense.name}`} testID="defense-tokens" icon={null} limit={defense.limit} limitWords={defenseLimitWords(defense.value, defense.limit, defense.stage)} goal compact /> : null}
             {[...(isengard ?? NO_ISENGARD), ...(marshes ?? NO_MARSHES)].map((dial) => (
-              <ThreatRing key={dial.id} threat={{ seat: 0, threat: dial.value, eliminated: false }} label={dial.label} accessibilityName={dial.name} testID={dial.testID ?? `isengard-${dial.id}`} icon={null} elimination={false} limit={dial.limit} filled={dial.filled} limitWords={dial.limitWords} goal={dial.goal} note={dial.note} compact />
+              <ThreatRing key={dial.id} {...dialProps(dial)} compact />
             ))}
             {tokens != null ? <ThreatRing threat={{ seat: 0, threat: tokens.tokens, eliminated: false }} label="Tokens" accessibilityName={`Resource tokens on ${tokens.name}`} testID="campaign-tokens" icon="resource" elimination={false} compact /> : null}
             {burdenDeck != null ? <ThreatRing threat={{ seat: 0, threat: burdenDeck, eliminated: false }} label="Burden" accessibilityName="Burden deck" testID="burden-deck" icon={null} elimination={false} compact /> : null}

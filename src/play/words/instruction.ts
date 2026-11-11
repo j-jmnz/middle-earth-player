@@ -79,6 +79,13 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
       return `shuffle an out-of-play ${names.code(instruction.code)} into the encounter deck`;
     case "GainSurge":
       return "reveal an additional encounter card";
+    // The Passage of the Marshes (the asks file words them again for the sheet): Shifting Quagmire, We Hates Them!.
+    case "ReturnRandomVictoryLocation":
+      return "return a random location from the victory display to the staging area";
+    case "FlipGollum":
+      return instruction.to === "smeagol" ? "flip Gollum to Sméagol" : "flip Sméagol to Gollum";
+    case "GollumAttacks":
+      return "Gollum makes an immediate attack against the player he is engaged with";
     case "RaiseThreat": {
       if (instruction.perCommitted) {
         const except = instruction.perCommitted.exceptSphere ? ` other than ${capital(instruction.perCommitted.exceptSphere)}` : "";

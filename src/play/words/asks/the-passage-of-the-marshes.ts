@@ -37,8 +37,8 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   // 144055:A:2: the first player chooses and may cancel the whole effect for 1 Fellowship resource and the exhausted Ring.
   "144055:whenRevealed:1 @0 Choose": { note: "We Hates Them!: {owner} chooses for all the players. Either flip Sméagol to Gollum, or Gollum makes an immediate attack against the first player. Or cancel this effect." },
   "144055:whenRevealed:1 @0 flip": { label: "Flip Sméagol to Gollum, engaged with the first player" },
-  "144055:whenRevealed:1 @0 attack": { label: "Gollum makes an immediate attack against the first player" },
-  "144055:whenRevealed:1 @0 cancel": { label: "Cancel this effect: spend 1 Fellowship resource and exhaust The One Ring" },
+  "144055:whenRevealed:1 @0 attack": { label: "Gollum makes an immediate attack against {owner}" },
+  "144055:whenRevealed:1 @0 cancel": { label: "Cancel this effect: spend 1 Fellowship resource and exhaust The One Ring. Surge still reveals 1 more card" },
   "144055:whenRevealed:1 @0.cancel.0 SpendResources": { owned: true, note: "We Hates Them!: choose the hero whose Fellowship resource pays to cancel this effect.", verb: "Pay" },
   // 144064:A:1 (Setup): each player in order searches the encounter deck for 1 location.
   "144064:setup:1 @1.0 SearchMove": { owned: true, note: "The Taming of Sméagol: search the encounter deck for 1 location. Reveal it and add it to the staging area.", verb: "Add" },
