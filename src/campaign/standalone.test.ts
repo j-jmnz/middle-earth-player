@@ -13,12 +13,12 @@ import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 
 import { scenarioFacts, startFor } from "./briefing.ts";
 import { emptyLog } from "./log.ts";
+import { needsChoiceBeforeOpen } from "./replay.ts";
 import { contextOf, record } from "./session.ts";
 import {
   dealStandalone,
   dropStandalone,
   continueStandalone,
-  markedIfStale,
   restartStandalone,
   finishStandalone,
   parseStandaloneActive,
@@ -30,7 +30,7 @@ import {
   standaloneStatus,
   type StandaloneLoadout,
 } from "./standalone.ts";
-import { loadWorld, worldHash, type World } from "./world.ts";
+import { dealtCodes, loadWorld, worldHash, type World } from "./world.ts";
 
 // Standalone play (mec109.campaign-mode): the saga rules run and the campaign's do not. No campaign card Setup, no
 // Resolution, no boon or burden (rr.campaign-cards, rr.boons, rr.burdens); a win is scored (ltp.scoring).
@@ -164,7 +164,7 @@ describe("a standalone game", () => {
   it("deals a game that is playing, with no intents and no result", () => {
     const game = dealt();
     expect(game).toMatchObject({ id: "game-1", campaignId: "fellowship-of-the-ring", scenarioId: PAST, seatCount: 1, result: null });
-    expect(game.active).toEqual({ engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, world: worldHash(worldOf(PAST)), seed: SEED, intents: [] });
+    expect(game.active).toEqual({ engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, world: worldHash(worldOf(PAST), dealtCodes(loadoutOf())), seed: SEED, intents: [] });
     expect(standaloneStatus(game)).toBe("playing");
   });
 
@@ -183,19 +183,22 @@ describe("a standalone game", () => {
 
   it("is not replayed against another engine version or other data, is marked rather than dropped, and a drop keeps the loadout", () => {
     const game = dealt();
-    expect(markedIfStale(game)).toBe(game);
     // A list row has no world: a game with a world stamp is marked only for the engine; the table compares the world when it opens.
-    const otherWorld = { ...game, active: { ...game.active!, world: worldHash(worldOf(PAST)) + 1 } };
-    expect(markedIfStale(otherWorld)).toBe(otherWorld);
+    const otherWorld = { ...game, active: { ...game.active!, world: worldHash(worldOf(PAST), dealtCodes(loadoutOf())) + 1 } };
+    expect(needsChoiceBeforeOpen(otherWorld.active, 0, null)).toBe(false);
     expect(resumeStandalone(otherWorld, worldOf(PAST))).toEqual({ ok: false, reason: "dataHash" });
-    // A game from before the world stamp is current on the catalog version, and marked on another.
+    // A game from before the world stamp is current on the catalog version, and needs a choice on another when it has no digests to compare.
     const legacy = { ...game, active: { ...game.active!, world: null } };
-    expect(markedIfStale(legacy)).toBe(legacy);
-    const marked = markedIfStale({ ...legacy, active: { ...legacy.active, dataHash: CATALOG_VERSION + 1 } });
-    expect(standaloneStatus(marked)).toBe("needsChoice");
+    expect(needsChoiceBeforeOpen(legacy.active, 0, null)).toBe(false);
+    expect(needsChoiceBeforeOpen({ ...legacy.active, dataHash: CATALOG_VERSION + 1 }, 0, null)).toBe(true);
+    expect(standaloneStatus({ ...legacy, needsChoice: true })).toBe("needsChoice");
     const old = { ...game, active: game.active ? { ...game.active, engineVersion: ENGINE_VERSION - 1 } : null };
     expect(resumeStandalone(old, worldOf(PAST))).toEqual({ ok: false, reason: "engineVersion" });
-    expect(standaloneStatus(markedIfStale(old))).toBe("needsChoice");
+    // Another engine version is a choice for sure with no move or no digest per move, and silent to try when every move has its digest.
+    expect(needsChoiceBeforeOpen(old.active!, 0, null)).toBe(true);
+    expect(needsChoiceBeforeOpen(old.active!, 2, null)).toBe(true);
+    expect(needsChoiceBeforeOpen(old.active!, 2, 1)).toBe(true);
+    expect(needsChoiceBeforeOpen(old.active!, 2, 2)).toBe(false);
     const dropped = dropStandalone(game);
     expect(standaloneStatus(dropped)).toBe("dropped");
     expect(dropped.loadout).toEqual(game.loadout);
@@ -209,14 +212,14 @@ describe("a standalone game", () => {
     const continued = continueStandalone(stale, world);
     if (!continued.ok) throw new Error(continued.reason);
     expect(continued).toMatchObject({ accepted: 1, total: 3 });
-    expect(continued.holder.active).toEqual({ engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, world: worldHash(world), seed: SEED, intents: [{ type: "Keep" }], checks: [expect.any(Number)], startedAt: 5, activeMs: 7 });
+    expect(continued.holder.active).toEqual({ engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, continued: true, world: worldHash(world, dealtCodes(loadoutOf())), seed: SEED, intents: [{ type: "Keep" }], checks: [expect.any(Number)], startedAt: 5, activeMs: 7 });
     expect(resumeStandalone(continued.holder, world).ok).toBe(true);
     expect(continueStandalone({ ...stale, loadout: null }, world)).toEqual({ ok: false, reason: "none" });
 
-    const restarted = restartStandalone(stale, world, 99);
+    const restarted = restartStandalone(stale, world, 99, 123);
     if (!restarted.ok) throw new Error("not dealt");
     expect(restarted.game).toMatchObject({ id: stale.id, loadout: stale.loadout, result: null });
-    expect(restarted.game.active).toEqual({ engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, world: worldHash(world), seed: 99, intents: [] });
+    expect(restarted.game.active).toEqual({ engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, world: worldHash(world, dealtCodes(loadoutOf())), seed: 99, intents: [], startedAt: 123 });
     expect(restartStandalone({ ...stale, loadout: null }, world, 99)).toEqual({ ok: false, briefing: null });
   });
 

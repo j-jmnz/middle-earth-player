@@ -2,6 +2,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useMemo, useState } from "react";
 import { View } from "react-native";
 
+import { needsChoiceBeforeOpen } from "../../../campaign/replay";
 import { campaignPath, openNode, soonNode, soonWords, type PathNode } from "../../../campaign/path";
 import { rowSurface } from "../../../ui/surfaces";
 import { useTableTokens } from "../../../ui/use-table-tokens";
@@ -27,6 +28,7 @@ import { seatWord } from "../../data/seats";
 import { goBack } from "../../nav/go-back";
 import { useBottomInset } from "../../nav/use-bottom-inset";
 import { droppedSentence, useSave } from "../../data/use-save";
+import { STALE_STEP } from "../../session/stale-words";
 import { useUiScale } from "../../../ui/ui-scale";
 import { useSizeClass } from "../../../ui/use-size-class";
 import { Text } from "../../../ui/text";
@@ -108,6 +110,8 @@ export default function CampaignPath() {
   const done = nodes.filter((node) => node.status === "completed").length;
   // The same open scenario the campaign list's Continue resumes (nextStep).
   const open = openNode(nodes, save.loadout?.scenarioId);
+  // The open scenario asks to be continued or restarted when it opens (the same rule as the lists: needsChoiceBeforeOpen).
+  const asksChoice = open != null && save.active != null && needsChoiceBeforeOpen(save.active, save.active.intents.length, save.active.checks?.length ?? null);
   const name = (code: string) => names.get(code) ?? code;
   // The pool on one line, the cards a comma apart, each name opening its card.
   const poolLines: Line[] = save.log.campaignPool.length === 0 ? [] : [save.log.campaignPool.flatMap((card, at) => [...(at > 0 ? [{ text: ", " }] : []), ...poolCardLine(card, save.log.usedOnce, name)])];
@@ -269,7 +273,7 @@ export default function CampaignPath() {
                 <Panel padded={false}>
                   <SceneArt scenarioId={goNode.id} height={200 * s} fade={0.45} fadeTo={palette.dusk} />
                   <View className="px-4 pb-4" style={{ marginTop: -44 * s, gap: 10 * s }}>
-                    <Eyebrow>{`Scenario ${goNode.number} · ${open ? "On the table" : "Next"}`}</Eyebrow>
+                    <Eyebrow>{`Scenario ${goNode.number} · ${open ? (asksChoice ? STALE_STEP : "On the table") : "Next"}`}</Eyebrow>
                     <Text className="font-display text-bone" style={{ fontSize: 26 * s, lineHeight: 30 * s }}>
                       {goNode.name}
                     </Text>

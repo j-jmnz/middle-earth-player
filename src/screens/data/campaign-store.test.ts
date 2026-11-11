@@ -5,7 +5,8 @@ import { describe, expect, it } from "vitest";
 
 import migrations from "../../../drizzle/migrations";
 import { emptyLog } from "../../campaign/log";
-import { newSave } from "../../campaign/save";
+import { newSave, type Save } from "../../campaign/save";
+import { CATALOG_VERSION } from "../../catalog/version";
 import { ENGINE_VERSION } from "../../campaign/replay";
 import { drop } from "../../campaign/session";
 import { archiveSave, createSave, deleteSave, listArchivedSaves, listSaves, readBooklet, restoreSave, readSave, readSaveChecked, writeActive, writeBooklet, writeLastPage, writeSave } from "./campaign-store";
@@ -62,7 +63,21 @@ describe("campaign store", () => {
       loadout: { scenarioId: "a-knife-in-the-dark", difficulty: "Easy" as const, seats: [{ deckId: "d", heroes: ["141002"], deck: ["01040"] }], ringBearer: "141001", choices: [], acceptPenalty: false },
     };
     writeSave(user, save);
-    expect(listSaves(user)).toEqual([{ id: "save-l1", campaignId: save.campaignId, seatCount: 1, log: save.log, loadout: save.loadout, active: true }]);
+    // Another data hash with no digests to compare: opening it will ask for a choice, which the list says without a world.
+    expect(listSaves(user)).toEqual([{ id: "save-l1", campaignId: save.campaignId, seatCount: 1, log: save.log, loadout: save.loadout, active: true, needsChoice: true }]);
+  });
+
+  it("a list row marks only a scenario that will ask for a choice: not a current one, nor another version with a digest for every move", () => {
+    const user = openUser();
+    const loadout = { scenarioId: "a-knife-in-the-dark", difficulty: "Easy" as const, seats: [{ deckId: "d", heroes: ["141002"], deck: ["01040"] }], ringBearer: "141001", choices: [], acceptPenalty: false };
+    const open = (id: string, active: NonNullable<Save["active"]>) => writeSave(user, { ...newSave(id, "fellowship-of-the-ring", 1), active, loadout });
+    const keep = { type: "Keep" as const };
+    open("current", { engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, world: 5, seed: 3, intents: [keep] });
+    open("checked", { engineVersion: ENGINE_VERSION - 1, dataHash: CATALOG_VERSION, world: 5, seed: 3, intents: [keep], checks: [1] });
+    open("unchecked", { engineVersion: ENGINE_VERSION - 1, dataHash: CATALOG_VERSION, world: 5, seed: 3, intents: [keep] });
+    open("fresh", { engineVersion: ENGINE_VERSION - 1, dataHash: CATALOG_VERSION, world: 5, seed: 3, intents: [] });
+    const marked = new Map(listSaves(user).map((row) => [row.id, row.needsChoice === true]));
+    expect(Object.fromEntries(marked)).toEqual({ current: false, checked: false, unchecked: true, fresh: true });
   });
 
   it("a new playthrough stores the carry-over it took in, and an older stored log reads with the facts' defaults", () => {

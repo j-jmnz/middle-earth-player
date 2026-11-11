@@ -56,7 +56,7 @@ Read the sections your task touches.
   - 227–236 Documentation (~170)
   - 237–254 Attribution (~470)
   - 255–258 License (~50)
-- `docs/architecture.md` — Architecture (~23.4K tok)
+- `docs/architecture.md` — Architecture (~23.6K tok)
   - 7–41 Stack (~1.1K)
   - 42–77 Processes (~680)
   - 78–160 Modules (~2.3K) ← 3
@@ -67,13 +67,17 @@ Read the sections your task touches.
     - 223–234 Mechanic families (~4.3K) ← 5
   - 235–240 Effects (~530)
   - 241–273 Scenario definition (~800)
-  - 274–294 Persistence (~2.9K) ← 2
-  - 295–300 Images (~940) ← 6
-  - 301–353 Screens (~3.9K) ← 1
-  - 354–359 Catalog build (~410)
-  - 360–377 Tests (~2.0K) ← 5
-  - 378–393 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~95.6K tok)
+  - 274–318 Persistence (~3.0K) ← 2
+    - 295–298 Open games across an update (~50)
+    - 299–305 Open game rows (~650)
+    - 306–311 Opening a game (~350)
+    - 312–318 Continue, Restart and the checkpoint (~380)
+  - 319–324 Images (~940) ← 6
+  - 325–377 Screens (~3.9K) ← 1
+  - 378–383 Catalog build (~410)
+  - 384–401 Tests (~2.0K) ← 5
+  - 402–417 Performance (~1.2K) ← 4
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~95.8K tok)
   - 17–38 Sections (~410)
   - 39–50 Product (~590)
   - 51–64 Non-goals (~540)
@@ -117,7 +121,7 @@ Read the sections your task touches.
     - 964–967 Coverage test (~270)
   - 968–988 Data sources (~530)
   - 989–1007 Card images (~1.2K) ← 9
-  - 1008–1033 Persistence and shipping (~2.4K) ← 2
+  - 1008–1033 Persistence and shipping (~2.6K) ← 6
   - 1034–1075 Screens (~4.9K) ← 1
     - 1060–1075 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~43.4K tok)
@@ -153,7 +157,7 @@ Read the sections your task touches.
   - 338–349 Banner (~750) ← 5
   - 350–369 Screen reader (~2.8K) ← 17
   - 370–373 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~28.8K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~29.1K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~580)
   - 34–44 Performance (~680) ← 4
@@ -168,7 +172,7 @@ Read the sections your task touches.
   - 230–244 Icons (~480) ← 7
   - 245–263 Card art (~740) ← 2
   - 264–278 Tablets (~510) ← 13
-  - 279–464 Screens (~15.9K)
+  - 279–464 Screens (~16.1K)
     - 283–286 Splash (~40)
     - 287–290 App icon (~80)
     - 291–306 Campaigns (campaign list) (~1.5K) ← 6
@@ -180,7 +184,7 @@ Read the sections your task touches.
     - 361–364 Campaign log (~600) ← 1
     - 365–368 Spend XP (~610) ← 1
     - 369–372 Table — landscape (~30) ← 1
-    - 373–376 Table opens stale (~460) ← 2
+    - 373–376 Table opens stale (~750) ← 4
     - 377–388 Resolution and standalone outcome (~1.6K) ← 1
     - 389–398 Decks (~920) ← 2
     - 399–408 Deck builder (deck editor) (~840) ← 3
@@ -273,11 +277,11 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/git`: .claude/rules/commit-standards.md, Subject line (2)
 - `scripts/release`: .claude/rules/release-standards.md, Release notes (3); .claude/rules/release-standards.md, Versioning (3); releasing.md, Jobs (2); .claude/rules/release-standards.md, Branches (1)
 - `scripts/tools`: handover/agent-brief.md, Scenario procedure (4); .claude/rules/code-standards.md, Test cost (2); architecture.md, Modules (1); design-system-table.md, Choice tray (1)
-- `src/campaign`: brief.md, The Two Towers (6); handover/agent-brief.md, Scenario procedure (5); brief.md, Nightmare (4); architecture.md, Tests (2); brief.md, Ered Mithrin (2); architecture.md, Persistence (1); design-system.md, Table opens stale (1)
+- `src/campaign`: brief.md, The Two Towers (6); handover/agent-brief.md, Scenario procedure (5); brief.md, Nightmare (4); architecture.md, Tests (2); brief.md, Ered Mithrin (2); architecture.md, Persistence (1); brief.md, Persistence and shipping (1); design-system.md, Table opens stale (1)
 - `src/catalog`: architecture.md, Mechanic families (2); brief.md, Nightmare (2); brief.md, The Two Towers (2); brief.md, A Knife in the Dark (1); brief.md, Dream-chaser (1); brief.md, Ered Mithrin (1); brief.md, Flight to the Ford burden deck and life (1); brief.md, Three layers (1)
 - `src/effects`: brief.md, The Two Towers (4); brief.md, Breaking of the Fellowship, stage 2B (1); brief.md, Nightmare (1)
 - `src/play`: design-system-table.md, Spotlight (29); design-system-table.md, Choice tray (20); design-system-table.md, Cards (17); design-system-table.md, Screen reader (12); design-system-table.md, Command column (11); design-system-table.md, Spacing and the play area's rows (9); design-system-table.md, The Island Map (8); architecture.md, State (6); design-system-table.md, Piles (6); architecture.md, Images (5); design-system-table.md, Motion (5); design-system-table.md, Reading panels (5); design-system-table.md, The Sailing test (5); design-system.md, Type (5); architecture.md, Performance (4); brief.md, Three layers (4); design-system-table.md, Banner (4); design-system-table.md, Gestures (4); brief.md, Table screen (3); design-system-table.md, Top bar (3); architecture.md, Tests (2); design-system-table.md, Quest scale (2); design-system.md, Settings (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Table menu (1); design-system-table.md, Two taps (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Screen reader (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1)
 - `src/rules`: brief.md, Nightmare (5); brief.md, The Two Towers (4); architecture.md, Mechanic families (3); brief.md, The engine plays the game (3); architecture.md, State (1)
-- `src/screens`: design-system.md, Tablets (8); design-system.md, Campaigns (campaign list) (6); brief.md, Three layers (5); design-system.md, Briefing (5); design-system.md, Components (5); brief.md, Card images (4); design-system.md, Campaign path (4); design-system.md, History (4); design-system.md, Settings (4); design-system.md, Campaign setup (3); design-system.md, Card pool (the Cards tab) (3); design-system.md, Deck builder (deck editor) (3); design-system.md, Navigation (3); design-system.md, Performance (3); design-system.md, Screen reader (3); brief.md, The Two Towers (2); design-system.md, Backdrops (2); design-system.md, Booklet (2); design-system.md, Card (2); design-system.md, Card art (2); design-system.md, Decks (2); architecture.md, Images (1); architecture.md, State (1); architecture.md, Tests (1); brief.md, Campaign (1); brief.md, Nightmare (1); brief.md, Persistence and shipping (1); brief.md, Screens (1); design-system-table.md, Marks of the open moment (1); design-system-table.md, Screen reader (1); design-system.md, Campaign log (1); design-system.md, Color (1); design-system.md, Icons (1); design-system.md, Resolution and standalone outcome (1); design-system.md, Rule (1); design-system.md, Rules (1); design-system.md, Scenarios (1); design-system.md, Spend XP (1); design-system.md, Table opens stale (1); design-system.md, Type (1); releasing.md, TestFlight (optional) (1)
+- `src/screens`: design-system.md, Tablets (8); design-system.md, Campaigns (campaign list) (6); brief.md, Three layers (5); design-system.md, Briefing (5); design-system.md, Components (5); brief.md, Card images (4); design-system.md, Campaign path (4); design-system.md, History (4); design-system.md, Settings (4); design-system.md, Campaign setup (3); design-system.md, Card pool (the Cards tab) (3); design-system.md, Deck builder (deck editor) (3); design-system.md, Navigation (3); design-system.md, Performance (3); design-system.md, Screen reader (3); brief.md, Persistence and shipping (2); brief.md, The Two Towers (2); design-system.md, Backdrops (2); design-system.md, Booklet (2); design-system.md, Card (2); design-system.md, Card art (2); design-system.md, Decks (2); design-system.md, Table opens stale (2); architecture.md, Images (1); architecture.md, State (1); architecture.md, Tests (1); brief.md, Campaign (1); brief.md, Nightmare (1); brief.md, Screens (1); design-system-table.md, Marks of the open moment (1); design-system-table.md, Screen reader (1); design-system.md, Campaign log (1); design-system.md, Color (1); design-system.md, Icons (1); design-system.md, Resolution and standalone outcome (1); design-system.md, Rule (1); design-system.md, Rules (1); design-system.md, Scenarios (1); design-system.md, Spend XP (1); design-system.md, Type (1); releasing.md, TestFlight (optional) (1)
 - `src/ui`: design-system.md, Settings (4); design-system.md, Type (4); design-system.md, Components (3); design-system-table.md, Screen reader (2); design-system.md, Backdrops (2); design-system.md, Screen reader (2); design-system.md, Tablets (2); design-system-table.md, Banner (1); design-system-table.md, Motion (1); design-system-table.md, Overview (1); design-system-table.md, Spotlight (1); design-system-table.md, Table menu (1); design-system.md, Icons (1); design-system.md, Performance (1); design-system.md, Spacing, radius, border (1); design-system.md, Surfaces (1)
 - `tailwind.config.js`: design-system.md, Spacing, radius, border (1); design-system.md, Type (1)

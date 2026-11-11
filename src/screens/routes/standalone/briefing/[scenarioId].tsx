@@ -19,7 +19,7 @@ import { dealSeed } from "../../../nav/e2e";
 import { goBack } from "../../../nav/go-back";
 import { routeCode } from "../../../nav/route-code";
 import { SEAT_WORDS, seatCountOf, seatWord } from "../../../data/seats";
-import { newStandaloneId, readStandalone, writeStandalone } from "../../../data/standalone-store";
+import { newStandaloneId, readStandalone, writeStandaloneDealt } from "../../../data/standalone-store";
 
 export default function StandaloneBriefing() {
   const router = useRouter();
@@ -97,12 +97,12 @@ export default function StandaloneBriefing() {
       ringBearer,
     };
     try {
-      const dealt = dealStandalone(newStandaloneId(), ready, seatCount, loadout, dealSeed());
+      const dealt = dealStandalone(newStandaloneId(), ready, seatCount, loadout, dealSeed(), Date.now());
       if (!dealt.ok) {
         setDealError(dealt.briefing.problems.map((problem) => problem.message).join(" "));
         return;
       }
-      writeStandalone(user, dealt.game);
+      writeStandaloneDealt(user, dealt.game);
       router.replace({ pathname: "/standalone/table/[gameId]", params: { gameId: dealt.game.id } });
     } catch (error: unknown) {
       setDealError(error instanceof Error ? error.message : "The scenario could not be dealt.");

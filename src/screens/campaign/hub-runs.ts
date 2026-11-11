@@ -2,6 +2,7 @@
 // scenarios wait under Coming later, and the words over a hero's next stop. hub-parts.tsx draws them.
 import type { NextStep, PathNode } from "../../campaign/path";
 import type { Box } from "../data/campaign-data";
+import { nextWord } from "../history/save-line";
 
 /** The hub's hero and the runs under it: the first unfinished run in list order, and the other unfinished runs after it. */
 export function splitRuns<T>(runs: readonly T[], unfinished: (run: T) => boolean): { hero: T | null; others: T[] } {
@@ -19,9 +20,9 @@ export function comingScenarios(boxes: readonly Box[], isPlayable: (scenarioId: 
   );
 }
 
-/** The eyebrow over a hero's next stop: "Next · Scenario 3 of 6", "On the table · Scenario 3 of 6" for the open scenario, or "Coming soon · Scenario 7 of 9" for one the app cannot deal yet. */
+/** The eyebrow over a hero's next stop: "Next · Scenario 3 of 6", "On the table · Scenario 3 of 6" for the open scenario ("Needs a choice · Scenario 3 of 6" when it asks to be continued or restarted), or "Coming soon · Scenario 7 of 9" for one the app cannot deal yet. */
 export function nextLabel(next: NextStep, path: readonly PathNode[]): string {
   if (next.kind === "finished") return "Campaign won";
   if (next.kind === "soon") return `Coming soon \u00b7 Scenario ${next.node.number} of ${path.length}`;
-  return `${next.kind === "resume" ? "On the table" : "Next"} · Scenario ${next.node.number} of ${path.length}`;
+  return `${nextWord(next)} · Scenario ${next.node.number} of ${path.length}`;
 }

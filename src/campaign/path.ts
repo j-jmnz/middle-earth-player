@@ -58,16 +58,17 @@ export function soonWords(node: Pick<PathNode, "name">): string {
 // What a playthrough's next tap does: go back to the open scenario, begin the current one, or nothing is left to play (every
 // scenario is won, or the next one is coming soon). The open scenario is the one the stored loadout dealt; like the path, a
 // locked or coming-soon node is never resumed.
-export type NextStep = { kind: "resume" | "begin" | "soon"; node: PathNode } | { kind: "finished" };
+// A resume that `needsChoice` opens the table on the stale sheet (docs/brief.md, Persistence and shipping): the lists word it so.
+export type NextStep = { kind: "resume"; node: PathNode; needsChoice?: true } | { kind: "begin" | "soon"; node: PathNode } | { kind: "finished" };
 
 /** The node of the open scenario, when the loadout names one the path has reached and the app can deal. */
 export function openNode(path: readonly PathNode[], openScenarioId: string | null | undefined): PathNode | null {
   return (openScenarioId && path.find((node) => node.id === openScenarioId && node.status !== "locked" && node.status !== "soon")) || null;
 }
 
-export function nextStep(path: readonly PathNode[], openScenarioId: string | null | undefined): NextStep {
+export function nextStep(path: readonly PathNode[], openScenarioId: string | null | undefined, needsChoice?: boolean): NextStep {
   const open = openNode(path, openScenarioId);
-  if (open) return { kind: "resume", node: open };
+  if (open) return needsChoice ? { kind: "resume", node: open, needsChoice: true } : { kind: "resume", node: open };
   const current = currentNode(path);
   if (current) return { kind: "begin", node: current };
   const soon = soonNode(path);

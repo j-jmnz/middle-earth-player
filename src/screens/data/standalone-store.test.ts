@@ -11,7 +11,6 @@ import {
   deleteStandalone,
   listArchivedStandalone,
   listStandalone,
-  listStandaloneMarked,
   newStandaloneId,
   readStandalone,
   restoreStandalone,
@@ -42,17 +41,17 @@ function gameOf(id: string, overrides: Partial<StandaloneGame> = {}): Standalone
   };
 }
 
-// The list row: the open game as its version and hash.
+// The list row: the open game as its version and hash, marked when it will ask for a choice (the fixtures' data hash 7 is not the build's and they have no digests).
 function listing(game: StandaloneGame) {
-  return { ...game, active: game.active && { engineVersion: game.active.engineVersion, dataHash: game.active.dataHash, world: game.active.world } };
+  return { ...game, active: game.active && { engineVersion: game.active.engineVersion, dataHash: game.active.dataHash, world: game.active.world }, ...(game.active?.dataHash === 7 ? { needsChoice: true } : {}) };
 }
 
 describe("standalone store", () => {
-  it("listStandaloneMarked marks a game played on other data as needing a choice and writes nothing", () => {
+  it("listStandalone marks a game played on other data, with no digests to compare, as needing a choice and writes nothing", () => {
     const user = openUser();
     writeStandalone(user, gameOf("game-old"), 1000);
     writeStandalone(user, gameOf("game-new", { active: { engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, world: null, seed: 3, intents: [] } }), 2000);
-    const listed = listStandaloneMarked(user);
+    const listed = listStandalone(user);
     expect(listed.find((game) => game.id === "game-old")).toMatchObject({ needsChoice: true, active: { engineVersion: ENGINE_VERSION, dataHash: 7 } });
     expect(listed.find((game) => game.id === "game-new")?.needsChoice).toBeUndefined();
     expect(readStandalone(user, "game-old")?.game).toEqual(gameOf("game-old"));

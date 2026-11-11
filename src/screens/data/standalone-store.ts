@@ -1,9 +1,10 @@
-import { and, desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
+import { desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
+import { needsChoiceBeforeOpen } from "../../campaign/replay";
 import { parseSeatCount } from "../../campaign/save";
 import { parseCheckpoint, type Checkpoint } from "../../campaign/checkpoint";
-import { markedIfStale, parseStandaloneActive, parseStandaloneLoadout, parseStandaloneResult, type ListedStandalone, type StandaloneGame } from "../../campaign/standalone";
+import { parseStandaloneActive, parseStandaloneLoadout, parseStandaloneResult, type ListedStandalone, type StandaloneGame } from "../../campaign/standalone";
 import { activeJson, rebaseOf, stored } from "./campaign-store";
 import { standaloneGames } from "./user-schema";
 
@@ -27,7 +28,7 @@ function parseRow(row: typeof standaloneGames.$inferSelect): ReadStandalone {
   };
 }
 
-// The columns a list row reads. The open game is read as its engine version, data hash and world stamp (what tells a stale one without a world: the table compares the world when it opens), never its intents.
+// The columns a list row reads. The open game is read as its engine version, data hash and world stamp (what tells a stale one without a world: the table compares the world when it opens) and the lengths of its intents and checks (whether a checked replay is possible), never its intents.
 const listed = {
   id: standaloneGames.id,
   campaignId: standaloneGames.campaignId,
@@ -38,31 +39,29 @@ const listed = {
   engineVersion: sql<number | null>`json_extract(${standaloneGames.activeScenario}, '$.engineVersion')`,
   dataHash: sql<number | null>`json_extract(${standaloneGames.activeScenario}, '$.dataHash')`,
   world: sql<number | null>`json_extract(${standaloneGames.activeScenario}, '$.world')`,
+  intents: sql<number | null>`json_array_length(${standaloneGames.activeScenario}, '$.intents')`,
+  checks: sql<number | null>`json_array_length(${standaloneGames.activeScenario}, '$.checks')`,
 };
 
-function listedRow(row: { id: string; campaignId: string; scenarioId: string; seatCount: number; loadout: unknown; result: unknown; engineVersion: number | null; dataHash: number | null; world: number | null }): ListedStandalone {
+function listedRow(row: { id: string; campaignId: string; scenarioId: string; seatCount: number; loadout: unknown; result: unknown; engineVersion: number | null; dataHash: number | null; world: number | null; intents: number | null; checks: number | null }): ListedStandalone {
   const loadout = parseStandaloneLoadout(row.loadout);
   const open = loadout && typeof row.engineVersion === "number" && typeof row.dataHash === "number";
+  const active = open ? { engineVersion: row.engineVersion as number, dataHash: row.dataHash as number, world: typeof row.world === "number" ? row.world : null } : null;
   return {
     id: row.id,
     campaignId: row.campaignId,
     scenarioId: row.scenarioId,
     seatCount: parseSeatCount(row.seatCount),
     loadout,
-    active: open ? { engineVersion: row.engineVersion as number, dataHash: row.dataHash as number, world: typeof row.world === "number" ? row.world : null } : null,
+    active,
     result: parseStandaloneResult(row.result),
+    ...(active && needsChoiceBeforeOpen(active, row.intents ?? 0, row.checks) ? { needsChoice: true as const } : {}),
   };
 }
 
-// The open games, the newest first. An archived game is listed by listArchivedStandalone.
+// The open games, the newest first. An open game that will ask for a choice when it opens (another engine version or other card data, with no digests to compare) is marked `needsChoice`; nothing is written, the row stays as it was stored. An archived game is listed by listArchivedStandalone.
 export function listStandalone<TRun>(user: UserDb<TRun>): ListedStandalone[] {
   return user.select(listed).from(standaloneGames).where(isNull(standaloneGames.archivedAt)).orderBy(desc(standaloneGames.createdAt)).all().map(listedRow);
-}
-
-// The open games as a screen shows them: a game in progress from another engine version or against other card data is marked as
-// needing a choice (the table asks to continue or restart it). Nothing is written: the row stays as it was stored.
-export function listStandaloneMarked<TRun>(user: UserDb<TRun>): ListedStandalone[] {
-  return listStandalone(user).map((game) => markedIfStale(game));
 }
 
 // The archived games, the last one put away first.
@@ -75,9 +74,9 @@ export function readStandalone<TRun>(user: UserDb<TRun>, id: string): ReadStanda
   return row ? parseRow(row) : null;
 }
 
-// Writes the game. A new row is stamped with `now`; an existing one keeps its time and its archive mark.
-export function writeStandalone<TRun>(user: UserDb<TRun>, game: StandaloneGame, now: number = Date.now()): void {
-  const values = {
+// The columns writeStandalone writes. A game with no open scenario has no checkpoint either; one with an open scenario keeps its (campaign-store.ts, writeSave).
+function gameValues(game: StandaloneGame) {
+  return {
     campaignId: game.campaignId,
     scenarioId: game.scenarioId,
     seatCount: game.seatCount,
@@ -85,15 +84,27 @@ export function writeStandalone<TRun>(user: UserDb<TRun>, game: StandaloneGame, 
     loadout: stored(game.loadout ?? {}),
     activeScenario: game.active ? activeJson(game.active) : null,
     result: game.result ? stored(game.result) : null,
-    // A game with no open scenario has no checkpoint either; one with an open scenario keeps its (campaign-store.ts, writeSave).
     ...(game.active ? {} : { checkpoint: null }),
     rebase: game.active?.from ? stored(game.active.from) : null,
   };
+}
+
+function upsertGame<TRun>(user: UserDb<TRun>, id: string, values: ReturnType<typeof gameValues>, now: number): void {
   user
     .insert(standaloneGames)
-    .values({ id: game.id, createdAt: now, ...values })
+    .values({ id, createdAt: now, ...values })
     .onConflictDoUpdate({ target: standaloneGames.id, set: values })
     .run();
+}
+
+// Writes the game. A new row is stamped with `now`; an existing one keeps its time and its archive mark.
+export function writeStandalone<TRun>(user: UserDb<TRun>, game: StandaloneGame, now: number = Date.now()): void {
+  upsertGame(user, game.id, gameValues(game), now);
+}
+
+// A deal's game: writeStandalone with the checkpoint of any game the row held cleared in the same statement (campaign-store.ts, writeDealt).
+export function writeStandaloneDealt<TRun>(user: UserDb<TRun>, game: StandaloneGame, now: number = Date.now()): void {
+  upsertGame(user, game.id, { ...gameValues(game), checkpoint: null }, now);
 }
 
 // An intent or an Undo changes only the open game: the loadout and the result are not serialized again, and the row keeps its
@@ -120,12 +131,16 @@ export function writeStandaloneCheckpoint<TRun>(user: UserDb<TRun>, id: string, 
   user.update(standaloneGames).set({ checkpoint: checkpoint ? stored(checkpoint) : null }).where(eq(standaloneGames.id, id)).run();
 }
 
-// An Undo past the checkpoint clears it (campaign-store.ts, clearCheckpointPast).
-export function clearStandaloneCheckpointPast<TRun>(user: UserDb<TRun>, id: string, intents: number): void {
+// An Undo: the game without its last intent, and the checkpoint cleared when it is behind the game (campaign-store.ts, writeUndone). One statement.
+export function writeStandaloneUndone<TRun>(user: UserDb<TRun>, game: Pick<StandaloneGame, "id" | "active">): void {
+  const intents = game.active?.intents.length ?? 0;
   user
     .update(standaloneGames)
-    .set({ checkpoint: null })
-    .where(and(eq(standaloneGames.id, id), sql`json_extract(${standaloneGames.checkpoint}, '$.intentCount') > ${intents}`))
+    .set({
+      activeScenario: game.active ? activeJson(game.active) : null,
+      checkpoint: sql`case when json_extract(${standaloneGames.checkpoint}, '$.intentCount') > ${intents} then null else ${standaloneGames.checkpoint} end`,
+    })
+    .where(eq(standaloneGames.id, game.id))
     .run();
 }
 

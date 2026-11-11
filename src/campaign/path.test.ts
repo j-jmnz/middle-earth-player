@@ -18,6 +18,9 @@ describe("nextStep", () => {
   it("resumes the open scenario", () => {
     expect(nextStep(path, "two")).toEqual({ kind: "resume", node: path[1] });
     expect(nextStep(path, "one")).toEqual({ kind: "resume", node: path[0] });
+    // An open scenario that asks for a choice when it opens says so; a scenario not open has nothing to choose.
+    expect(nextStep(path, "two", true)).toEqual({ kind: "resume", node: path[1], needsChoice: true });
+    expect(nextStep(path, null, true)).toEqual(nextStep(path, null));
   });
 
   it("begins the current scenario when none is open, or the open one is locked", () => {

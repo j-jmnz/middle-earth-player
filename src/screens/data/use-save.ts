@@ -3,10 +3,11 @@ import { useCallback, useState } from "react";
 
 import type { Save } from "../../campaign/save";
 import { readSaveChecked, writeSave } from "./campaign-store";
+import { DROPPED_SAVE } from "../session/stale-words";
 import { useDatabases } from "./databases";
 
 export function droppedSentence(): string {
-  return "The scenario in progress could not be read, so it was dropped. Your log and decks are kept.";
+  return DROPPED_SAVE;
 }
 
 /**

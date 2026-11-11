@@ -30,34 +30,43 @@ describe("worldHash", () => {
   const base = world();
 
   it("is the same for the same world, however its maps were filled", () => {
-    expect(worldHash(world())).toBe(worldHash(base));
+    expect(worldHash(world(), HEROES)).toBe(worldHash(base, HEROES));
     const reversed: World = { ...base, cards: new Map([...base.cards].reverse()), sets: new Map([...base.sets].reverse()) };
-    expect(worldHash(reversed)).toBe(worldHash(base));
+    expect(worldHash(reversed, HEROES)).toBe(worldHash(base, HEROES));
   });
 
   it("does not move for a card, a scenario or a record the game does not read", () => {
     sqlite.exec("CREATE TEMP TABLE spare AS SELECT * FROM cards WHERE code = '141001'; UPDATE spare SET code = '999991'; INSERT INTO cards SELECT * FROM spare; DROP TABLE spare;");
-    expect(worldHash(world())).toBe(worldHash(base));
+    expect(worldHash(world(), HEROES)).toBe(worldHash(base, HEROES));
     const stray = { ...EFFECTS[0]!, cardCode: "999991x" };
-    expect(worldHash(loadWorld(catalog, campaign, scenario, [...EFFECTS, stray], HEROES))).toBe(worldHash(base));
+    expect(worldHash(loadWorld(catalog, campaign, scenario, [...EFFECTS, stray], HEROES), HEROES)).toBe(worldHash(base, HEROES));
+  });
+
+  it("covers the codes the game can reach and no others: a world loaded with every saved deck hashes as the game's own world", () => {
+    // The briefing loads the heroes and cards of every saved deck; the table loads the one deal's. A card of another deck, or the record of one, is not the game's.
+    const wide = loadWorld(catalog, campaign, scenario, EFFECTS, [...HEROES, "01001", "01002", "01003", "01004", "01005"]);
+    expect(wide.cards.size).toBeGreaterThan(base.cards.size);
+    expect(worldHash(wide, HEROES)).toBe(worldHash(base, HEROES));
+    // ... and a card the game does reach (a hero named in the loadout) moves it when its row changes.
+    expect(worldHash(wide, [...HEROES, "01001"])).not.toBe(worldHash(wide, HEROES));
   });
 
   it("moves when one of its cards, its scenario data or one of its records changes", () => {
-    const hash = worldHash(base);
+    const hash = worldHash(base, HEROES);
     const frodo = base.cards.get("141001")!;
-    expect(worldHash({ ...base, cards: new Map(base.cards).set("141001", { ...frodo, willpower: (frodo.willpower ?? 0) + 1 }) })).not.toBe(hash);
-    expect(worldHash({ ...base, scenario: { ...scenario, campaignPlaced: [...scenario.campaignPlaced, "141001"] } })).not.toBe(hash);
-    expect(worldHash({ ...base, campaign: { ...campaign, id: `${campaign.id}-x` } })).not.toBe(hash);
+    expect(worldHash({ ...base, cards: new Map(base.cards).set("141001", { ...frodo, willpower: (frodo.willpower ?? 0) + 1 }) }, HEROES)).not.toBe(hash);
+    expect(worldHash({ ...base, scenario: { ...scenario, campaignPlaced: [...scenario.campaignPlaced, "141001"] } }, HEROES)).not.toBe(hash);
+    expect(worldHash({ ...base, campaign: { ...campaign, id: `${campaign.id}-x` } }, HEROES)).not.toBe(hash);
     const own = base.effects.findIndex((effect) => base.cards.has(effect.cardCode));
     expect(own).toBeGreaterThanOrEqual(0);
     const edited = base.effects.map((effect, index) => (index === own ? { ...effect, lines: [...(effect.lines ?? []), "changed"] } : effect));
-    expect(worldHash({ ...base, effects: edited })).not.toBe(hash);
+    expect(worldHash({ ...base, effects: edited }, HEROES)).not.toBe(hash);
   });
 
   it("moves when a row the game loads changes in the catalog", () => {
-    const hash = worldHash(base);
+    const hash = worldHash(base, HEROES);
     sqlite.exec("UPDATE cards SET willpower = willpower + 1 WHERE code = '141001'");
-    expect(worldHash(world())).not.toBe(hash);
+    expect(worldHash(world(), HEROES)).not.toBe(hash);
   });
 });
 

@@ -15,7 +15,7 @@ import { EFFECTS } from "../../../../effects";
 import { BodyText, Label, Section, TextButton } from "../../../kit/chrome";
 import { bookletParams, campaignOf, scenarioOf } from "../../../data/campaign-data";
 import { goBack } from "../../../nav/go-back";
-import { writeSave } from "../../../data/campaign-store";
+import { writeDealt } from "../../../data/campaign-store";
 import { useDatabases } from "../../../data/databases";
 import { recordUnclosedRun } from "../../../session/table-session";
 import { dealSeed } from "../../../nav/e2e";
@@ -163,7 +163,7 @@ export default function Briefing() {
       if (!dealt.ok) return dealt.briefing.problems.map((problem) => problem.message).join(" ");
       // The open scenario this deal drops may be over (lost or won, not yet closed): it keeps its run.
       if (save.active) recordUnclosedRun(catalog, user, save.id);
-      writeSave(user, dealt.save);
+      writeDealt(user, dealt.save);
       router.replace({ pathname: "/table/[saveId]", params: { saveId: save.id } });
       return null;
     });

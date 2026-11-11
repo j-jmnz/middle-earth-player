@@ -6,6 +6,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useMemo } from "react";
 import { View } from "react-native";
 
+import { isContinued } from "../../../../campaign/replay";
 import { gameReport } from "../../../../campaign/report";
 import { finishStandalone } from "../../../../campaign/standalone";
 import { ActionBar, BodyText, Label, NavBar, OutcomeTitle, PrimaryButton, Screen, ScreenScroll, StatTile, TextButton, TwoPane } from "../../../kit/chrome";
@@ -35,7 +36,7 @@ export default function StandaloneOutcome() {
     if (!ended || !finished) return;
     writeStandalone(user, finished);
     // One run for the game, written once (History); a reopened outcome writes nothing more.
-    if (session?.ok) recordStandaloneRun(user, finished, session.world, session.game, Date.now(), session.stored.active?.activeMs ?? null, session.stored.active?.from != null);
+    if (session?.ok) recordStandaloneRun(user, finished, session.world, session.game, Date.now(), session.stored.active?.activeMs ?? null, session.stored.active != null && isContinued(session.stored.active), session.stored.active?.startedAt ?? null);
   }, [ended, finished, session, user]);
   const back = <NavBar onBack={() => goBack(router, "/scenarios")} backTestID="outcome-back" backLabel="Scenarios" />;
 

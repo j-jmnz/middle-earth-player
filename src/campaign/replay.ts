@@ -25,6 +25,8 @@ export type ActiveScenario = {
   checks?: number[];
   // The state a replay starts from when the game was rebased onto a checkpoint; absent for a game that replays from its seed.
   from?: Rebase;
+  // Set when the player chose Continue on a game an update changed (session.ts, continueFrom): the run it ends is marked as finished across an update.
+  continued?: true;
   // When it was dealt (ms since the epoch), for the run history. A scenario dealt before phase 28b has none.
   startedAt?: number;
   // The ms the table was on screen with the app in the foreground (the run's playtime). A scenario played before it has none.
@@ -35,6 +37,11 @@ export type ActiveScenario = {
 // (session.ts, continueFrom). `intents` and `checks` then hold only the moves after it, and Undo cannot go back past it. It is kept in a column of its own
 // (user-schema.ts, saves.rebase), never in the per-intent write.
 export type Rebase = { stateVersion: number; state: StoredState };
+
+// Whether the game was continued across an update: Continue cut moves back from it or rebased it onto a checkpoint.
+export function isContinued(active: Pick<ActiveScenario, "continued" | "from">): boolean {
+  return active.continued === true || active.from != null;
+}
 
 export function beginActive(start: StartScenario, world: number, startedAt?: number): ActiveScenario {
   return { engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, world, seed: start.seed, intents: [], ...(startedAt == null ? {} : { startedAt }) };
@@ -87,6 +94,14 @@ export function worldChanged(active: Pick<ActiveScenario, "dataHash" | "world">,
   return world != null && world !== active.world;
 }
 
+// Whether opening the game will ask for a choice, as far as a list can tell without building a world: its engine version (or, with no `world` stamp, its catalog
+// version) moved, and a checked replay is not possible, because it has no digest for each move or no move to compare. A game that has them may still match when
+// the table opens, with no message, or mismatch (the world changed); the list says "Needs a choice" only for a game that will show the sheet for sure.
+// `intents` and `checks` are the lengths of the two lists (`checks` null when there are none).
+export function needsChoiceBeforeOpen(active: Pick<ActiveScenario, "engineVersion" | "dataHash" | "world">, intents: number, checks: number | null): boolean {
+  return staleReason(active, null) != null && (intents === 0 || (checks ?? 0) !== intents);
+}
+
 // The game stamped with the world it is current on: a save from before `world` existed, on its first open.
 export function stampedWorld(active: ActiveScenario, world: number): ActiveScenario {
   return active.world === world ? active : { ...active, world };
@@ -111,10 +126,6 @@ export function replay(active: ActiveScenario, start: StartScenario | null, worl
   return { ok: true, state };
 }
 
-// The state after the intents the current reducer accepts, played from `initial` (baseOf), and the tableDigest after each, and how many that was: a replay that stops at
-// the first intent it refuses or, when the save has a digest for each intent, whose table does not match its digest. `at` is that
-// intent's index, or null when every intent was accepted and matched. It checks no version and no hash; it is the checked replay that
-// lets a game another engine version reached resume with no message, and what Continue plays (session.ts, resumeFrom, continueFrom).
 // The table a replay of the game starts from: its rebase (migrated to the current state version, so a game rebased under an older build still opens), or the
 // opening state `start` deals. Null when there is neither, or the rebase's version is one this build does not know. It does not check the rebase (checkState).
 export function baseOf(active: Pick<ActiveScenario, "from">, start: StartScenario | null, ctx: ReduceContext): ScenarioState | null {
@@ -125,8 +136,29 @@ export function baseOf(active: Pick<ActiveScenario, "from">, start: StartScenari
   return start ? startScenario(start, ctx) : null;
 }
 
+// What a replay of the game starts from: the start `startOf` builds for its seed (none for a rebased game, which replays from its base) and its base table. A
+// start that no longer builds is the loadout's fault; a base that is not there (no start, or a rebase of a version this build does not know) is the intents'.
+export type Opening = { start: StartScenario | null; base: ScenarioState } | { reason: "loadout" | "intent" };
+
+export function openingOf(active: Pick<ActiveScenario, "from" | "seed">, startOf: ((seed: number) => StartScenario) | null, ctx: ReduceContext): Opening {
+  let start: StartScenario | null = null;
+  if (!active.from && startOf) {
+    try {
+      start = startOf(active.seed);
+    } catch {
+      return { reason: "loadout" };
+    }
+  }
+  const base = baseOf(active, start, ctx);
+  return base ? { start, base } : { reason: "intent" };
+}
+
 export type Accepted = { state: ScenarioState; accepted: number; checks: number[]; at: number | null };
 
+// The state after the intents the current reducer accepts, played from `initial` (baseOf), and the tableDigest after each, and how many that was: a replay that stops at
+// the first intent it refuses or, when the save has a digest for each intent, whose table does not match its digest. `at` is that
+// intent's index, or null when every intent was accepted and matched. It checks no version and no hash; it is the checked replay that
+// lets a game another engine version reached resume with no message, and what Continue plays (session.ts, resumeFrom, continueFrom).
 export function replayAccepted(active: Pick<ActiveScenario, "intents" | "checks">, initial: ScenarioState, ctx: ReduceContext, observe?: ReplayObserver): Accepted {
   const stored = fullChecks(active) ? active.checks : undefined;
   let state = initial;
@@ -149,11 +181,14 @@ export function restamped(active: ActiveScenario, accepted: number, world: numbe
   return { ...active, engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, world, intents: active.intents.slice(0, accepted), checks: checks.slice(0, accepted) };
 }
 
-// The open scenario as Continue rebases it onto a checkpoint: the checkpoint's state is the base, and the moves after its `intentCount` that were accepted
+// Where Continue's rebase cuts the moves: `checkpointed` intents were played when the checkpoint was taken, and `accepted` of those after it were accepted and matched.
+export type RebaseCut = { checkpointed: number; accepted: number };
+
+// The open scenario as Continue rebases it onto a checkpoint: the checkpoint's state is the base, and the moves after the checkpoint that were accepted
 // and matched are what remains, with their digests, stamped with the engine version and the world it now plays on.
-export function rebased(active: ActiveScenario, from: Rebase, intentCount: number, accepted: number, world: number, checks: readonly number[]): ActiveScenario {
+export function rebased(active: ActiveScenario, from: Rebase, cut: RebaseCut, world: number, checks: readonly number[]): ActiveScenario {
   const { checks: _old, ...rest } = active;
-  return { ...rest, engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, world, from, intents: active.intents.slice(intentCount, intentCount + accepted), checks: checks.slice(0, accepted) };
+  return { ...rest, continued: true, engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, world, from, intents: active.intents.slice(cut.checkpointed, cut.checkpointed + cut.accepted), checks: checks.slice(0, cut.accepted) };
 }
 
 /** Whether the game's base needs checking against the engine before it is replayed: its stored version is not the current one. */

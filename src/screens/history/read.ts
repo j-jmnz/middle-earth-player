@@ -8,7 +8,7 @@ import { campaignOf } from "../data/campaign-data";
 import { listArchivedSaves, listSaves, type ListedSave } from "../data/campaign-store";
 import { listRuns } from "../data/run-store";
 import { saveLine, type SaveLine } from "./save-line";
-import { listArchivedStandalone, listStandaloneMarked } from "../data/standalone-store";
+import { listArchivedStandalone, listStandalone } from "../data/standalone-store";
 
 type UserDb<TRun> = BaseSQLiteDatabase<"sync", TRun>;
 
@@ -26,7 +26,7 @@ export function readLibrary<TRun>(user: UserDb<TRun>): Library {
     runs: listRuns(user),
     saves: listSaves(user).map(worded),
     archivedSaves: listArchivedSaves(user).map(worded),
-    games: listStandaloneMarked(user),
+    games: listStandalone(user),
     archivedGames: listArchivedStandalone(user),
   };
 }

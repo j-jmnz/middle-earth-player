@@ -8,10 +8,11 @@ import { changesReaching, ENGINE_CHANGES, ENGINE_VERSION } from "./version.ts";
 const SCENARIOS = path.resolve(import.meta.dirname, "..", "..", "..", "data", "scenarios");
 
 describe("ENGINE_CHANGES (src/rules/engine/version.ts)", () => {
-  it("has one entry for each version, ascending, the last being ENGINE_VERSION", () => {
-    const versions = ENGINE_CHANGES.map((change) => change.version);
+  it("has an entry for each version, ascending (a version may have one entry for each scope it reaches), the last being ENGINE_VERSION", () => {
+    const versions = [...new Set(ENGINE_CHANGES.map((change) => change.version))];
     const first = versions[0] ?? 0;
     expect(versions).toEqual(versions.map((_, at) => first + at));
+    expect(ENGINE_CHANGES.map((change) => change.version)).toEqual(ENGINE_CHANGES.map((change) => change.version).toSorted((a, b) => a - b));
     expect(versions.at(-1)).toBe(ENGINE_VERSION);
   });
 

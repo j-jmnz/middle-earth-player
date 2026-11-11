@@ -74,6 +74,7 @@ export const activeScenarioSchema = z.strictObject({
   intents: z.array(z.looseObject({ type: z.string() })),
   // The tableDigest after each intent (digest.ts); absent on a save written before it, and a list of another length reads as none.
   checks: z.array(z.number().int()).optional(),
+  continued: z.literal(true).optional(),
   startedAt: z.number().optional(),
   activeMs: z.number().optional(),
 });

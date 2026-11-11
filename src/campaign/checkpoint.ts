@@ -9,18 +9,18 @@ import type { ActiveScenario, Rebase } from "./replay.ts";
 
 export { restoredState, STATE_VERSION, storedState };
 
-// `intentCount` is how many of the open game's intents had been played when the state was stored, and `seed` is the game's, so a checkpoint is never read against
-// another deal.
-export type Checkpoint = { stateVersion: number; intentCount: number; seed: number; state: StoredState };
+// `intentCount` is how many of the open game's intents had been played when the state was stored, and `seed` and `startedAt` (when it was dealt) are the game's, so a
+// checkpoint is never read against another deal, even one with the same seed.
+export type Checkpoint = { stateVersion: number; intentCount: number; seed: number; startedAt?: number; state: StoredState };
 
 const stateSchema = z.custom<StoredState>((value) => typeof value === "object" && value !== null && !Array.isArray(value));
 
-const checkpointSchema = z.object({ stateVersion: z.number().int(), intentCount: z.number().int().min(0), seed: z.number().int(), state: stateSchema });
+const checkpointSchema = z.object({ stateVersion: z.number().int(), intentCount: z.number().int().min(0), seed: z.number().int(), startedAt: z.number().optional(), state: stateSchema });
 const rebaseSchema = z.object({ stateVersion: z.number().int(), state: stateSchema });
 
 /** The checkpoint of a table, after `active.intents.length` intents. */
-export function checkpointOf(state: ScenarioState, active: Pick<ActiveScenario, "intents" | "seed">): Checkpoint {
-  return { stateVersion: STATE_VERSION, intentCount: active.intents.length, seed: active.seed, state: storedState(state) };
+export function checkpointOf(state: ScenarioState, active: Pick<ActiveScenario, "intents" | "seed" | "startedAt">): Checkpoint {
+  return { stateVersion: STATE_VERSION, intentCount: active.intents.length, seed: active.seed, ...(active.startedAt == null ? {} : { startedAt: active.startedAt }), state: storedState(state) };
 }
 
 /** A stored checkpoint, or null when there is none or it does not read. */
@@ -40,7 +40,7 @@ export function atPhaseBoundary(state: ScenarioState): boolean {
   return state.undo.intents.length === 0;
 }
 
-/** The checkpoint when it belongs to this deal and was taken within the intents the game has now; otherwise null (it is ignored, never played). */
-export function usableCheckpoint(checkpoint: Checkpoint | null, active: Pick<ActiveScenario, "intents" | "seed">): Checkpoint | null {
-  return checkpoint && checkpoint.seed === active.seed && checkpoint.intentCount <= active.intents.length ? checkpoint : null;
+/** The checkpoint when it belongs to this deal (the same seed and the same time dealt, where the game has one) and was taken within the intents the game has now; otherwise null (it is ignored, never played). */
+export function usableCheckpoint(checkpoint: Checkpoint | null, active: Pick<ActiveScenario, "intents" | "seed" | "startedAt">): Checkpoint | null {
+  return checkpoint && checkpoint.seed === active.seed && checkpoint.startedAt === active.startedAt && checkpoint.intentCount <= active.intents.length ? checkpoint : null;
 }

@@ -16,7 +16,8 @@ import { comingScenarios, splitRuns } from "../../campaign/hub-runs";
 import { usePalette } from "../../kit/palette-hook";
 import { seatWord } from "../../data/seats";
 import { gameCaption, statusWord } from "../../history/standalone-words";
-import { listStandaloneMarked } from "../../data/standalone-store";
+import { listStandalone } from "../../data/standalone-store";
+import { STALE_STEP } from "../../session/stale-words";
 import { useUiScale } from "../../../ui/ui-scale";
 import { useSizeClass } from "../../../ui/use-size-class";
 
@@ -36,7 +37,7 @@ export default function Scenarios() {
 
   useFocusEffect(
     useCallback(() => {
-      setGames(listStandaloneMarked(user));
+      setGames(listStandalone(user));
     }, [user]),
   );
 
@@ -76,7 +77,7 @@ export default function Scenarios() {
             key={game.id}
             testID={`other-game-${game.id}`}
             title={scenarioName(game.scenarioId)}
-            line={[seatWord(game.seatCount), game.loadout?.difficulty, "On the table"].filter((part) => part != null).join(" · ")}
+            line={[seatWord(game.seatCount), game.loadout?.difficulty, standaloneStatus(game) === "needsChoice" ? STALE_STEP : "On the table"].filter((part) => part != null).join(" · ")}
             heroes={(seatsOf(game)[0] ?? []).map((code) => heroFace(faces, code))}
             accessibilityLabel={`Resume ${spoken(game)}`}
             onPress={() => resume(game)}
@@ -149,6 +150,6 @@ export default function Scenarios() {
 // "Revised Core Set · Scenario 2 · Normal": the hero's box, the scenario's place in its book and the difficulty it was dealt on.
 function detailOf(game: ListedStandalone): string {
   const box = boxOf(game.scenarioId);
-  const parts = [box?.name, box ? `Scenario ${box.scenarios.indexOf(game.scenarioId) + 1}` : undefined, game.loadout?.difficulty];
+  const parts = [standaloneStatus(game) === "needsChoice" ? STALE_STEP : undefined, box?.name, box ? `Scenario ${box.scenarios.indexOf(game.scenarioId) + 1}` : undefined, game.loadout?.difficulty];
   return parts.filter((part): part is string => part != null).join(" · ");
 }

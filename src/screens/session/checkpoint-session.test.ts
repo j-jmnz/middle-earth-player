@@ -16,7 +16,7 @@ import { loadWorld } from "../../campaign/world.ts";
 import { CATALOG_VERSION } from "../../catalog/version.ts";
 import { EFFECTS } from "../../effects/index.ts";
 import type { ScenarioState } from "../../play/store/store.ts";
-import { readCheckpoint, readSave, writeActive, writeCheckpoint, writeSave } from "../data/campaign-store.ts";
+import { readCheckpoint, readSave, writeActive, writeCheckpoint, writeSave, writeUndone } from "../data/campaign-store.ts";
 import { campaignOf, scenarioOf } from "../data/campaign-data";
 import { listRuns } from "../data/run-store.ts";
 import { recordCampaignRun } from "../data/run-writers.ts";
@@ -175,6 +175,38 @@ describe("Continue after the rules changed", () => {
     writeSave(user, { ...rebased, active: { ...rebased.active!, from, engineVersion: ENGINE_VERSION - 1 } });
     expect(openTable(catalog, user, "s1")).toMatchObject({ ok: false, reason: "stale", write: null });
     expect(continueTable(catalog, user, "s1")).toEqual({ ok: false, message: CANNOT_CONTINUE });
+  });
+});
+
+describe("an Undo is one statement", () => {
+  it("writes the shorter game and clears a checkpoint that counted more intents, and keeps one that did not", () => {
+    const game = openedGame();
+    const { user, active, states } = game;
+    const cp = checkpointOf(states[24]!, { intents: active.intents.slice(0, 25), seed: active.seed });
+    writeCheckpoint(user, "s1", cp);
+    writeUndone(user, { id: "s1", active: { ...active, intents: active.intents.slice(0, 30), checks: active.checks!.slice(0, 30) } });
+    expect(readSave(user, "s1")!.active!.intents).toHaveLength(30);
+    expect(readCheckpoint(user, "s1")).toEqual(cp);
+    writeUndone(user, { id: "s1", active: { ...active, intents: active.intents.slice(0, 24), checks: active.checks!.slice(0, 24) } });
+    expect(readSave(user, "s1")!.active!.intents).toHaveLength(24);
+    expect(readCheckpoint(user, "s1")).toBeNull();
+  });
+});
+
+describe("Continue marks the game as finished across an update", () => {
+  it("a Continue that cut moves back sets the flag, so the run it ends says so; a silent resume does not", () => {
+    const game = openedGame();
+    const { user, active } = game;
+    moved(game, 27);
+    expect(continueTable(catalog, user, "s1")).toEqual({ ok: true });
+    const row = readSave(user, "s1")!;
+    expect(row.active).toMatchObject({ continued: true });
+    expect(row.active!.from).toBeUndefined();
+    // The run reads the game's open scenario and the table it ended on (the fixture's own lost table stands in for the one the player reached).
+    recordCampaignRun(user, row, row, game.opened.world, game.opened.game);
+    expect(listRuns(user).find((run) => run.refId === "s1")?.rebased).toBe(true);
+    // The same game untouched by an update carries no flag.
+    expect(active.continued).toBeUndefined();
   });
 });
 

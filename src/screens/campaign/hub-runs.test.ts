@@ -77,6 +77,11 @@ describe("nextLabel", () => {
     expect(nextLabel(next, path)).toBe("On the table · Scenario 3 of 6");
   });
 
+  it("says Needs a choice for an open scenario that asks to be continued or restarted", () => {
+    const next: NextStep = { kind: "resume", node: node(3), needsChoice: true };
+    expect(nextLabel(next, path)).toBe("Needs a choice · Scenario 3 of 6");
+  });
+
   it("says Coming soon for a scenario the app cannot deal yet", () => {
     const next: NextStep = { kind: "soon", node: node(7, "soon") };
     expect(nextLabel(next, [1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => node(n)))).toBe("Coming soon · Scenario 7 of 9");
