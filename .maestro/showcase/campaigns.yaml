@@ -1,0 +1,20 @@
+appId: com.middleearth.lcg
+tags:
+  - showcase
+---
+# The README showcase's Campaigns hub with The Fellowship of the Ring under way (docs/plans/readme-showcase.md, Shot list), on the iPhone and the iPad. scripts/showcase/capture.ts runs it with THEME and DEVICE.
+- runFlow:
+    file: ../subflows/showcase-start.yaml
+    env:
+      LINK: "e2e/past-showcase-board"
+      READY: campaign-path
+- tapOn:
+    id: path-back
+- extendedWaitUntil:
+    visible:
+      id: campaign-list
+    timeout: 15000
+- runFlow:
+    file: ../subflows/showcase-shot.yaml
+    env:
+      SHOT: campaigns

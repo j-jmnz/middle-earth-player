@@ -25,6 +25,8 @@ export const GROUPS: Record<string, Record<string, Command>> = {
     catalog: { steps: [catalog], about: "writes assets/catalog.db and src/catalog/version.ts" },
     booklets: { steps: [booklets], about: "packs the booklet PDFs into assets/booklets" },
     scans: { steps: [scans], about: "packs every card picture into assets/scans" },
+    capture: { steps: [{ script: "showcase/capture.ts" }], about: "takes the README showcase's captures on the iOS simulators (--app <App.app>, macOS)" },
+    showcase: { steps: [{ script: "showcase/build.ts" }], about: "turns the captures into the README's images, GIFs and contact sheet" },
   },
   data: {
     sync: { steps: [{ script: "data/sync.ts" }], about: "refreshes data/raw and .cache (the only networked command)" },

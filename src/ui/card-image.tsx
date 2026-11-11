@@ -9,7 +9,7 @@ import { View } from "react-native";
 import { cardCorner, containIn } from "./card-corner.ts";
 import { DECORATIVE_ALT } from "./decorative.ts";
 import { cachePolicyFor, type CachePolicy } from "./image-cache.ts";
-import { usePictureHold } from "./use-picture-hold.ts";
+import { usePictureHold } from "./showcase/use-picture-hold.ts";
 
 type Props = {
   source: ImageSource | number | string;
@@ -25,7 +25,7 @@ export function CardImage({ source, recyclingKey, width, height, accessibilityLa
   const [loaded, setLoaded] = useState<{ key: string; width: number; height: number } | null>(null);
   const shape = loaded && loaded.key === recyclingKey ? loaded : null;
   const fit = containIn(shape, width, height);
-  // The showcase build waits for this picture until it has loaded (picture-loads.ts).
+  // The showcase build waits for this picture until it has loaded (ui/showcase/picture-loads.ts).
   usePictureHold(shape == null);
   const onLoad = (event: ImageLoadEventData) => {
     const { width: w, height: h } = event.source;

@@ -1,0 +1,20 @@
+appId: com.middleearth.lcg
+---
+# The README showcase's start (docs/plans/readme-showcase.md, Capture flows): a fresh app, its Theme set to the one the capture asks for, then
+# the link the shot opens. The showcase build (EXPO_PUBLIC_SHOWCASE=1, EXPO_PUBLIC_E2E_SEED=1) is the only one that runs it.
+# Env: LINK (the path after middleearthlcg://, a fixture as e2e/<name>), READY (the testID that says the opened screen has settled).
+# Optional env: THEME (dark or light), given by scripts/showcase/capture.ts with -e; dark when it is not.
+- launchApp:
+    clearState: true
+- openLink: "middleearthlcg://settings"
+- extendedWaitUntil:
+    visible:
+      id: app-settings
+    timeout: 30000
+- tapOn:
+    id: "${'app-settings-theme-' + (typeof THEME !== 'undefined' ? THEME : 'dark')}"
+- openLink: "middleearthlcg://${LINK}"
+- extendedWaitUntil:
+    visible:
+      id: "${READY}"
+    timeout: 30000

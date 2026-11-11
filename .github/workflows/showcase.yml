@@ -1,0 +1,116 @@
+name: showcase
+
+# Takes the README's screenshots and GIFs (docs/plans/readme-showcase.md): a Release simulator build of the app with every card picture packed and
+# the showcase marker on, the flows in .maestro/showcase/ on the newest iPhone Pro and iPad Pro simulators in both themes, then the post-process.
+# The images, the contact sheet and the manifest are a workflow artifact; with publish on, the images replace the one commit of the `showcase`
+# branch, which the README links. Start it from the Actions tab or with `gh workflow run showcase.yml --ref main -f publish=true`.
+
+on:
+  workflow_dispatch:
+    inputs:
+      publish:
+        description: "Replace the showcase branch's images with this run's, when every capture was taken"
+        type: boolean
+        default: false
+      only:
+        description: "Only these shots, comma separated (scripts/showcase/shots.ts); empty for all"
+        type: string
+        default: ""
+  # While the showcase is being built (docs/plans/readme-showcase.md, Steps): its branch runs it on each push that changes the capture, and publishes.
+  # Removed before the branch lands on main.
+  push:
+    branches: [claude/readme-visual-showcase-hw2zl9]
+    paths: [".github/workflows/showcase.yml", ".maestro/showcase/**", ".maestro/subflows/showcase-*", "scripts/showcase/**", "src/ui/showcase/**", "src/campaign/fixtures/**"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: showcase
+  cancel-in-progress: true
+
+jobs:
+  capture:
+    runs-on: macos-latest
+    timeout-minutes: 240
+    outputs:
+      complete: ${{ steps.capture.outcome == 'success' }}
+    env:
+      # Inlined into the bundle by Metro: the fixture route writes saves, and the pictures-ready marker shows (src/ui/showcase/picture-loads.ts).
+      EXPO_PUBLIC_E2E_SEED: "1"
+      EXPO_PUBLIC_SHOWCASE: "1"
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: maxim-lobanov/setup-xcode@ed7a3b1fda3918c0306d1b724322adc0b8cc0a90 # v1.7.0
+        with:
+          xcode-version: latest-stable
+      - uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4.9.1
+        with:
+          distribution: temurin
+          java-version: 17
+      - uses: ./.github/actions/pack-assets
+      - name: Generate the native project
+        run: pnpm exec expo prebuild --platform ios
+      - name: Build the simulator app
+        run: |
+          workspace=$(ls -d ios/*.xcworkspace | head -1)
+          scheme=$(basename "$workspace" .xcworkspace)
+          xcodebuild -quiet -workspace "$workspace" -scheme "$scheme" -configuration Release -sdk iphonesimulator \
+            -destination "generic/platform=iOS Simulator" -derivedDataPath "$RUNNER_TEMP/build" CODE_SIGNING_ALLOWED=NO build
+          app=$(ls -d "$RUNNER_TEMP"/build/Build/Products/Release-iphonesimulator/*.app | head -1)
+          echo "APP=$app" >> "$GITHUB_ENV"
+      - name: Install Maestro and ffmpeg
+        run: |
+          curl -fsSL "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
+          brew install ffmpeg
+      - name: Capture
+        id: capture
+        continue-on-error: true
+        run: |
+          only=()
+          if [ -n "${{ inputs.only || '' }}" ]; then only=(--only "${{ inputs.only }}"); fi
+          pnpm assets capture --app "$APP" --out "$RUNNER_TEMP/raw" "${only[@]}"
+      - name: Post-process
+        run: pnpm assets showcase --from "$RUNNER_TEMP/raw" --out "$RUNNER_TEMP/out"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: showcase
+          path: ${{ runner.temp }}/out/
+          retention-days: 14
+      # Maestro's own logs and screenshots of each run, for a flow that failed.
+      - if: steps.capture.outcome != 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: maestro-logs
+          path: |
+            ~/.maestro/tests/
+            ${{ runner.temp }}/raw/capture.json
+          retention-days: 7
+
+  publish:
+    needs: capture
+    if: ${{ (inputs.publish || github.event_name == 'push') && needs.capture.outputs.complete == 'true' && !inputs.only }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: showcase
+          path: showcase
+      # One orphan commit, replaced on every publish, so the images never pile up in the repository's history.
+      - name: Replace the showcase branch
+        env:
+          REPO: ${{ github.repository }}
+          TOKEN: ${{ github.token }}
+          SHA: ${{ github.sha }}
+        run: |
+          cd showcase
+          rm -f contact.png
+          git init -q -b showcase
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -q -m "repo: README showcase captured from ${SHA}"
+          git push -q --force "https://x-access-token:${TOKEN}@github.com/${REPO}.git" showcase:showcase

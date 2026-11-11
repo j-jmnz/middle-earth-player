@@ -1,0 +1,13 @@
+appId: com.middleearth.lcg
+---
+# One still of the README showcase (docs/plans/readme-showcase.md, Capture flows): once the screen is still and every picture on it has drawn
+# (pictures-ready), the screenshot is taken as <DEVICE>-<THEME>-<SHOT>.png in the folder scripts/showcase/capture.ts runs Maestro from.
+# Env: SHOT (the shot's id, scripts/showcase/shots.ts).
+# Optional env: THEME, DEVICE (iphone or ipad), given by the capture script with -e.
+- waitForAnimationToEnd:
+    timeout: 10000
+- extendedWaitUntil:
+    visible:
+      id: pictures-ready
+    timeout: 60000
+- takeScreenshot: "${typeof DEVICE !== 'undefined' ? DEVICE : 'device'}-${typeof THEME !== 'undefined' ? THEME : 'dark'}-${SHOT}"

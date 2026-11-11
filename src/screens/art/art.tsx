@@ -28,7 +28,7 @@ import { usePalette } from "../kit/palette-hook";
 import { ITEM_RADIUS } from "../../ui/radius";
 import { useTheme } from "../../ui/theme";
 import { useUiScale } from "../../ui/ui-scale";
-import { usePictureHold } from "../../ui/use-picture-hold";
+import { usePictureHold } from "../../ui/showcase/use-picture-hold";
 
 export type ArtCard = { code: string; imagesrc: string | null };
 
@@ -73,7 +73,7 @@ export function CroppedArt({
     if (!card?.imagesrc) return;
     enqueueImageDownloads([{ code: card.code, imagesrc: card.imagesrc }]);
   }, [card?.code, card?.imagesrc]);
-  // The showcase build waits for the scene until it has loaded (picture-loads.ts).
+  // The showcase build waits for the scene until it has loaded (ui/showcase/picture-loads.ts).
   const [loaded, setLoaded] = useState<string | null>(null);
   const drawn = card != null && source != null;
   usePictureHold(drawn && loaded !== card.code);
