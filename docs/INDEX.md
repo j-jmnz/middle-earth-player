@@ -107,7 +107,7 @@ Read the sections your task touches.
     - 616–633 The Caves of Nibin-Dûm (~2.4K)
   - 634–691 Dream-chaser (~15.6K) ← 4
   - 692–718 Ered Mithrin (~15.8K) ← 7
-  - 719–855 The Two Towers (~15.4K) ← 21
+  - 719–855 The Two Towers (~15.5K) ← 21
   - 856–864 Nightmare (~410) ← 19
   - 865–903 Deckbuilding (~1.9K)
   - 904–982 Effects (~3.2K)
@@ -198,16 +198,16 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~8.5K tok)
+- `docs/phases/STATUS.md` — Phase status (~9.1K tok)
   - 5–15 Rules (~410)
-  - 16–94 Phases (~1.6K)
-  - 95–210 Open items (~6.0K)
-    - 97–99 Releases (~50)
-    - 100–126 Fixtures and Maestro (~1.5K)
-    - 127–174 Rules and engine (~2.2K)
-    - 175–198 Screens and code (~1.4K)
-    - 199–210 Rules and engine (The Two Towers) (~820)
-  - 211–228 Standing decisions (~550)
+  - 16–95 Phases (~1.6K)
+  - 96–216 Open items (~6.5K)
+    - 98–100 Releases (~50)
+    - 101–128 Fixtures and Maestro (~1.5K)
+    - 129–176 Rules and engine (~2.2K)
+    - 177–201 Screens and code (~1.6K)
+    - 202–216 Rules and engine (The Two Towers) (~1.2K)
+  - 217–234 Standing decisions (~550)
 
 ## Live plans
 
