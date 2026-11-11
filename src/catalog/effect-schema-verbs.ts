@@ -121,7 +121,8 @@ export const simpleVerbs = [
     verb: z.literal("RaiseThreat"),
     amount: positiveAmountSchema.optional(),
     // `hostController`: the controller of the card the source is attached to ("raise attached hero's controller's threat by 2", 01109:A:3).
-    who: z.enum(["actor", "firstPlayer", "otherPlayer", "eachSeat", "picked", "eventSeat", "hostController"]).optional(),
+    // `defendingPlayer`: the player the source enemy is engaged with, the defending player of its attack ("the defending player must raise his threat by 3", 144017:A:2; rr.defending-player), the actor with none.
+    who: z.enum(["actor", "firstPlayer", "otherPlayer", "eachSeat", "picked", "eventSeat", "hostController", "defendingPlayer"]).optional(),
     perCommitted: z
       .strictObject({
         type: z.literal("hero"),
@@ -176,6 +177,8 @@ export const simpleVerbs = [
     // `stormcallerArea`: into the Stormcaller's area ("add it to the Stormcaller's area", 12017:A:1; dcce.stormcallers-area).
     to: z.enum(["staging", "engagedFirstPlayer", "engaged", "stormcallerArea"]),
     each: z.boolean().optional(),
+    // The encounter deck alone is searched, not its discard pile ("search the encounter deck for a Harad enemy", 144037:A:1; rr.search: the discard pile is searched only when the line says so).
+    deckOnly: z.literal(true).optional(),
     // While a card with this code is in the encounter deck or its discard pile, the search must take it ("one of those enemies must be
     // Great Warg Chief, if able", 142022:A:1).
     require: z.string().min(1).optional(),
@@ -222,7 +225,7 @@ export const simpleVerbs = [
   z.strictObject({ verb: z.literal("HideTest"), x: z.number().int().positive(), ...when }),
   // The source enemy attacks now, dealt a shadow card of its own; with `shadow: false` it is dealt none ("makes an additional attack after this one. (Do not deal it a shadow card.)", 18022:A:1).
   // `afterThis`: while the source enemy's attack is in progress the new attack is made once this one has ended ("makes an additional attack against you after this one", 143052:A:1); with no attack under way nothing happens.
-  z.strictObject({ verb: z.literal("ImmediateAttack"), shadow: z.literal(false).optional(), afterThis: z.literal(true).optional(), ...when }),
+  verbFlags(z.strictObject({ verb: z.literal("ImmediateAttack"), shadow: z.literal(false).optional(), afterThis: z.literal(true).optional(), ...when }), { runsInFrame: true }),
   // The attack in progress counts as undefended, even if a defender was declared.
   verb("ConsiderUndefended"),
   // The actor readies one hero they control.

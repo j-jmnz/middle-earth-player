@@ -29,6 +29,9 @@ import type { ChoiceNames } from "./choice.ts";
 
 export const PICK_NOUNS: Readonly<Record<string, string>> = { hero: "hero", ally: "ally", attachment: "attachment", enemy: "enemy", character: "character", location: "location", player: "player", objective: "objective" };
 
+// The decks beside the encounter deck a record names (src/rules/core/piles.ts NAMED_PILES), as a sentence says them.
+const PILE_NAMES = { caves: "Caves", evilCreatures: "Evil Creatures", spiders: "Spiders of Mirkwood", orcs: "Orcs", sideQuests: "side quest", harad: "Harad" } as const;
+
 export function article(noun: string): string {
   return /^[aeiou]/.test(noun) ? `an ${noun}` : `a ${noun}`;
 }
@@ -79,6 +82,13 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
       return `shuffle an out-of-play ${names.code(instruction.code)} into the encounter deck`;
     case "GainSurge":
       return "reveal an additional encounter card";
+    // The Passage of the Marshes (the asks file words them again for the sheet): Shifting Quagmire, We Hates Them!.
+    case "ReturnRandomVictoryLocation":
+      return "return a random location from the victory display to the staging area";
+    case "FlipGollum":
+      return instruction.to === "smeagol" ? "flip Gollum to Sméagol" : "flip Sméagol to Gollum";
+    case "GollumAttacks":
+      return "Gollum makes an immediate attack against the player he is engaged with";
     case "RaiseThreat": {
       if (instruction.perCommitted) {
         const except = instruction.perCommitted.exceptSphere ? ` other than ${capital(instruction.perCommitted.exceptSphere)}` : "";
@@ -219,6 +229,13 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
       return instruction.to === "play" ? "put it into play" : "put it into your hand";
     case "PlaceUnderSelf":
       return `place it facedown under ${sourceId ? names.card(sourceId) : "the location"}`;
+    case "AddFromPile": {
+      const deck = `the ${PILE_NAMES[instruction.pile]} deck`;
+      const where = instruction.to === "engaged" ? "put it into play engaged with you" : "add it to the staging area";
+      return instruction.reveal ? `reveal the top card of ${deck} and ${where}` : `${instruction.to === "engaged" ? "put" : "add"} the top card of ${deck} ${instruction.to === "engaged" ? "into play engaged with you" : "to the staging area"}`;
+    }
+    case "PlaceFacedownUnder":
+      return `place ${instruction.target === "self" ? "the attacking enemy" : "it"} facedown under ${names.code(instruction.code)}${instruction.afterAttack ? " after this attack" : ""}`;
     case "ShuffleEncounterDeck":
       return null;
     // The quest family's verbs (src/catalog/families/quest.ts).

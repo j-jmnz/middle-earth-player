@@ -67,6 +67,13 @@ export function leavePlay(state: ScenarioState, id: string, ctx: ReduceContext, 
   return updateCard(releaseAttachments(state, id, ctx.cards, steps), id, { damage: 0, progress: 0, resources: 0, exhausted: false });
 }
 
+/** A card in play goes facedown underneath a host, out of play (rr.in-play-and-out-of-play): what it had in play is lost, `placedUnder` is queued about it and the table is told it is destroyed. */
+export function placeUnderHost(state: ScenarioState, id: string, host: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const left = leavePlay(releaseAttachments(state, id, ctx.cards, steps), id, ctx, steps);
+  steps.push({ kind: "destroy", targetId: id, under: true });
+  return queueEvent(moveCard(left, id, { zone: "under", locationId: host }), { trigger: "placedUnder", seat: null, subject: id });
+}
+
 function toDeck(state: ScenarioState, id: string, top: boolean): ScenarioState {
   const moved = updateCard(moveCard(state, id, { zone: "encounterDeck" }), id, { face: "down", controller: null });
   const rest = moved.encounterDeck.filter((entry) => entry !== id);
@@ -142,6 +149,13 @@ export function travelThere(state: ScenarioState, id: string, ctx: ReduceContext
 export function shuffleDiscardIn(state: ScenarioState): ScenarioState {
   let next = state;
   for (const id of [...state.encounterDiscard]) next = updateCard(moveCard(next, id, { zone: "encounterDeck" }), id, { face: "down", controller: null });
+  return shuffleEncounterDeck(next);
+}
+
+// Each location in the victory display goes into the encounter deck, which is shuffled once (144066:A:1).
+export function shuffleVictoryIn(state: ScenarioState, ctx: ReduceContext): ScenarioState {
+  let next = state;
+  for (const id of [...state.victory]) if (typeOf(state, id, ctx) === "location") next = updateCard(moveCard(next, id, { zone: "encounterDeck" }), id, { face: "down", controller: null });
   return shuffleEncounterDeck(next);
 }
 

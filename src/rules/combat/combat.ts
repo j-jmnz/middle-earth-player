@@ -6,6 +6,7 @@ import { announceEnemyAttacked, attackerLimitReached } from "../families/aflame/
 import { attackBarred } from "../interpret/constants.ts";
 import type { EngineStep } from "../core/intents.ts";
 import { modifiedStat, placeDamage } from "../core/keywords.ts";
+import { heldAmountByClass } from "../core/holder-classes.ts";
 import { isAllyLike, isCharacterType, printedOf, type PrintedCard } from "../core/printed.ts";
 import type { ScenarioState } from "../core/state.ts";
 import { flagged, heldAmount, livingSeats, updateCard } from "../core/state.ts";
@@ -38,7 +39,7 @@ export function archeryTotal(state: ScenarioState, cards: Cards, seat?: number):
   for (const instance of Object.values(state.cards)) {
     if (!inPlay(instance.zone) || (stage && !stage.has(instance.id))) continue;
     // Archery gained ("gains archery 4", dcce.archery) adds to the printed value; the effects of several cards are cumulative.
-    const value = (printedOf(cards, instance.code).keywords.archery ?? 0) + heldAmount(state, instance.id, "archery");
+    const value = (printedOf(cards, instance.code).keywords.archery ?? 0) + heldAmountByClass(state, instance, printedOf(cards, instance.code), "archery");
     if (value > 0) total += value;
     // Archery a card in play gives itself (142070:A:1, 142078:A:1).
     if (state.modifiers.length > 0) total += heldAmount(state, instance.id, "archeryBonus") + (flagged(state, instance.id, "archeryPlayers") ? players : 0);

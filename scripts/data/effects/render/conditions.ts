@@ -47,6 +47,8 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   questFailed: () => ({ text: "the quest failed", read: [] }),
   logged: (c) => ({ text: `the Campaign Log ${c.is === false ? "does not hold" : "holds"} the line "${str(c.line)}"`, read: ["line", "is"] }),
   onStage: (c) => ({ text: `the players are on stage ${str(c.stage)}`, read: ["stage"] }),
+  pileHas: (c) => ({ text: `the number of cards in the ${c.pile === "harad" ? "Harad" : str(c.pile)} deck is ${range(c.min, c.max)}`, read: ["pile", "min", "max"] }),
+  facedownUnder: (c) => ({ text: `the number of cards facedown under the card with code ${str(c.code)} in play is ${range(typeof c.min === "number" ? c.min : undefined, c.max)}${c.players === true ? ", each plus the number of players" : ""}`, read: ["code", "min", "max", "players"] }),
   pursuit: (c) => ({ text: `the pursuit value is ${range(c.min, c.max)}`, read: ["min", "max"] }),
   soleAttacker: () => ({ text: "exactly one character was declared as an attacker in this attack", read: [] }),
   captives: (c) => ({ text: `the number of Captives in play${c.of === "actor" ? " that belong to the acting seat" : ""} is ${range(c.min, c.max)}`, read: ["min", "max", "of"] }),

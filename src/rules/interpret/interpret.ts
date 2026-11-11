@@ -3,7 +3,7 @@ import type { Effect, Instruction } from "../../catalog/boundary.ts";
 
 import { currentCause, effectCause, inCause, ruleCause, UNATTRIBUTED, type Cause } from "../core/cause.ts";
 import type { EngineStep } from "../core/intents.ts";
-import { placeDamage, playerCardEffectCanChoose } from "../core/keywords.ts";
+import { placeDamage, playerCardEffectCanChoose, sourcePrinted } from "../core/keywords.ts";
 import { isPlayerType, printedOf, type PrintedCard } from "../core/printed.ts";
 import { modifyStat } from "../combat/attack-verbs.ts";
 import { frameScope, refCard } from "./amounts.ts";
@@ -249,7 +249,7 @@ function dealInstructionDamage(
   const playerEffect = printed != null && isPlayerType(printed);
   let next = state;
   for (const id of damageTargets(state, ctx, focus.sourceId, playerEffect)) {
-    next = playerEffect ? placePlayerDamage(next, focus.seat, id, 1, ctx, steps) : placeDamage(next, id, 1, ctx.cards, steps, "framework", currentCause(steps, UNATTRIBUTED));
+    next = playerEffect ? placePlayerDamage(next, focus.seat, id, 1, ctx, steps, focus.sourceId) : placeDamage(next, id, 1, ctx.cards, steps, "framework", currentCause(steps, UNATTRIBUTED));
   }
   return next;
 }
@@ -272,7 +272,7 @@ function damageTargets(
     if (!instance) continue;
     const printed = printedOf(ctx.cards, instance.code);
     if (printed.type !== "enemy") continue;
-    if (playerEffect && !playerCardEffectCanChoose(printed, state, id)) continue;
+    if (playerEffect && !playerCardEffectCanChoose(printed, state, id, sourcePrinted(state, ctx.cards, sourceId))) continue;
     ids.push(id);
   }
   return ids;

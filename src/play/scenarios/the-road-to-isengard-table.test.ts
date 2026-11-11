@@ -6,7 +6,8 @@ import { idOf, tableFromLayout, type Layout } from "../../../test/harness/scene-
 import { syncConstants } from "../../rules/interpret/constants.ts";
 import { updateCard } from "../../rules/core/state.ts";
 
-import { isengardDials, isengardHands, type IsengardDial } from "../readouts/isengard.ts";
+import { isengardDials, isengardHands } from "../readouts/isengard.ts";
+import type { TableDial } from "../readouts/dials.ts";
 import { zoneSelector } from "../store/selectors.ts";
 import type { Instruction } from "../../catalog/boundary.ts";
 import { asksChoose, asksOption, type AsksTable } from "../words/asks.ts";
@@ -19,7 +20,7 @@ const dialsOf = (layout: Layout) => {
   const made = table(layout);
   return isengardDials(syncConstants(made.state, made.ctx), made.ctx, (code) => made.cards.get(code)?.name ?? code);
 };
-const dial = (dials: readonly IsengardDial[], id: string) => dials.find((one) => one.id === id);
+const dial = (dials: readonly TableDial[], id: string) => dials.find((one) => one.id === id);
 
 describe("the dials of The Road to Isengard", () => {
   it("143078:B:2 shows the resources on stage 1B as the encounter cards revealed on advancing", () => {

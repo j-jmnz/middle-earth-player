@@ -1,0 +1,302 @@
+Scenario piles that place cards with no record (quest: 144068 Ambush the Men of Harad; staging: 144027 The Black Gate; staging: 144030 The Cross-roads; haradDeck: 144056 Oliphaunt; haradDeck: 144057 Haradrim Soldier; haradDeck: 144058 Haradrim Archer)
+
+## 144014 Brace of Coneys
+
+144014:A:1 (front): Play only if you control the Ring-bearer.
+  144014:constant:1: Constant
+    - [json PlayOnlyIf {"verb":"PlayOnlyIf","condition":{"kind":"count","pick":{"type":"hero","control":"you","trait":"Ring-bearer"},"min":1}}]
+
+144014:A:2 (front): Planning Action: Add Brace of Coneys to the victory display to (choose 2): heal up to 2 damage from a hero, add 2 resources to a hero's pool, choose a player to draw 2 cards, or reduce a player's threat by 2.
+  144014:action:1: Action
+    only if it is the Planning phase
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AddSourceToVictory {"verb":"AddSourceToVictory"}]
+    - the acting player chooses (each option once) one of:
+      * option "heal" (only if there is a damaged hero (any player controls) to choose):
+        - choose damaged hero (any player controls)
+        - heal 2 damage from the picked card
+      * option "resources" (only if there is a hero (any player controls) to choose):
+        - choose hero (any player controls)
+        - add 2 resources to the picked card
+      * option "draw":
+        - choose player (any player controls)
+        - the picked player draws 2 card(s)
+      * option "threat":
+        - choose player (any player controls)
+        - lower threat by 2 (the picked player)
+    - the acting player chooses (each option once) one of:
+      * option "heal" (only if there is a damaged hero (any player controls) to choose):
+        - choose damaged hero (any player controls)
+        - heal 2 damage from the picked card
+      * option "resources" (only if there is a hero (any player controls) to choose):
+        - choose hero (any player controls)
+        - add 2 resources to the picked card
+      * option "draw":
+        - choose player (any player controls)
+        - the picked player draws 2 card(s)
+      * option "threat":
+        - choose player (any player controls)
+        - lower threat by 2 (the picked player)
+
+## 144027 The Black Gate
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+144027:A:1 (front): Forced: At the end of the planning phase, place each Harad enemy in the staging area facedown under The Black Gate.
+  144027:forced:1: Forced at the end of the phase
+    only if all of: (it is the Planning phase) and (the number of location (any player controls) named "Henneth Annûn" [also {"active":true}] is at most 0)
+    - for each Harad enemy (any player controls) in the staging area only:
+      - place the picked card facedown under the card with code 144027 in play (out of play there; its attachments are discarded, its tokens go)
+
+144027:A:2 (front): If there are at least X facedown cards under The Black Gate, the players lose the game. X is 3 more than the number of players.
+  144027:constant:1: Constant
+    only if the number of cards facedown under the card with code 144027 in play is at least 3, each plus the number of players
+    - the players lose the game (The Black Gate has taken too many Harad enemies)
+
+## 144028 Man of Harad
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144028:A:1: Surge. Archery 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+144028:A:2 (front): Forced: After Man of Harad engages you, discard 1 random card from your hand.
+  144028:forced:1: Forced after an enemy engages a player (heard about this card)
+    - the acting player discards 1 random card(s) from hand
+
+144028:A:3 (shadow): Shadow: Discard 1 random card from your hand.
+  144028:shadow:1: Shadow
+    - the acting player discards 1 random card(s) from hand
+
+## 144029 Captain of Harad
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144029:A:1 (front): Forced: After Captain of Harad engages you, each Harad enemy gets +1 Attack and -10 engagement cost until the end of the round.
+  144029:forced:1: Forced after an enemy engages a player (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - every enemy in play (Harad only): stat attack 1, until the end of the round
+    - every enemy in play (Harad only): stat engagementCost -10, until the end of the round
+
+144029:A:2 (shadow): Shadow: If this attack destroys a character, return attacking enemy to the staging area.
+  144029:shadow:1: Shadow
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 144030 The Cross-roads
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+144030:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+144030:A:2 (front): The Cross-roads gets -1 Threat for each facedown card under it. The players cannot travel here unless there are no facedown cards under The Cross-roads and at least 20 progress tokens on stage 1B.
+  144030:constant:1: Constant
+    - this card: stat threat minus (the number of cards left in the Harad deck), while this card is in play
+  144030:constant:2: Constant
+    only if the number of cards in the Harad deck is at least 1
+    - the players cannot travel to any location while this holds
+  144030:constant:3: Constant
+    only if not ([json condition {"kind":"stageProgress","min":20}])
+    - the players cannot travel to any location while this holds
+
+## 144031 Henneth Annûn
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144031:A:1 (front): While Henneth Annûn is the active location, skip both the encounter phase and combat phase, and ignore the Forced effects on stage 1B and The Black Gate.
+  144031:constant:1: Constant
+    only if this card is the active location
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the table: stat skipEncounter 1, while this card is in play
+    - the table: stat skipCombat 1, while this card is in play
+
+144031:A:2 (front): Forced: After Henneth Annûn becomes the active location, return each engaged enemy to the staging area.
+  144031:forced:1: Forced after this location becomes the active location
+    - return every enemy engaged with a player to the staging area
+
+## 144032 Southward Road
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144032:A:1 (front): While Southward Road is the active location, each player may optionally engage an additional enemy during the encounter phase.
+  144032:constant:1: Constant
+    only if this card is the active location
+    - each player: stat extraOptionalEngage 1, while this card is in play
+
+144032:A:2 (front): Travel: The first player reveals the top facedown card under The Cross-roads and adds it to the staging area to travel here.
+  144032:travel:1: Travel
+    - [json AddFromPile {"verb":"AddFromPile","pile":"harad","to":"staging","reveal":true}]
+
+## 144033 Foothills of Ephel Dúath
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144033:A:1 (front): While Foothills of Ephel Dúath is the active location, each Harad enemy gets -1 Threat.
+  144033:constant:1: Constant
+    only if this card is the active location
+    - every enemy in play (Harad only): stat threat -1, while this card is in play
+
+144033:A:2 (front): Travel: The first player engages an enemy in the staging area to travel here.
+  144033:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) in the staging area only, chosen by the first player
+    - engage the picked card
+
+## 144034 Ithilien Woods
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144034:A:1 (front): While Ithilien Woods is the active location, it gains: "Forced: After a player engages a Harad enemy, he readies a character he controls."
+  144034:forced:1: Forced after an enemy engages a player (heard about Harad enemy (any player controls))
+    only if this card is the active location
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose exhausted character (you control)
+    - ready the picked card
+
+144034:A:2 (front): Travel: The first player reveals the top card of the encounter deck to travel here.
+  144034:travel:1: Travel
+    - the first player reveals an encounter card
+
+## 144035 Hills of Ithilien
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144035:A:1 (front): While Hills of Ithilien is the active location, it gains: "Forced: After a player engages a Harad enemy, deal 1 damage to that enemy."
+  144035:forced:1: Forced after an enemy engages a player (heard about Harad enemy (any player controls))
+    only if this card is the active location
+    - deal 1 damage to the card the event is about
+
+144035:A:2 (shadow): Shadow: Discard a non-objective attachment you control.
+  144035:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (you control) that is not an objective
+    - discard the picked card
+
+## 144036 The Dark Lord's Summons
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144036:A:1: Peril.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+144036:A:2 (front): When Revealed: Either place the lowest Attack Harad enemy engaged with you facedown under The Black Gate, or reveal the top facedown card from under The Cross-roads and put it into play engaged with you.
+  144036:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "place" (only if there is a Harad enemy (any player controls) engaged with you to choose):
+        - choose Harad enemy (any player controls) engaged with you, with the lowest Attack of those (ties: the chooser decides)
+        - place the picked card facedown under the card with code 144027 in play (out of play there; its attachments are discarded, its tokens go)
+      * option "reveal" (only if the number of cards in the Harad deck is at least 1):
+        - [json AddFromPile {"verb":"AddFromPile","pile":"harad","to":"engaged","reveal":true}]
+
+## 144037 Marching Up the Road
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144037:A:1 (front): When Revealed: Each player must either return an enemy engaged with him to the staging area, or search the encounter deck for a Harad enemy and put it into play engaged with him.
+  144037:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "return" (only if the actor has an enemy engaged):
+          - return one enemy engaged with the acting player (that player picks which) to the staging area
+        * option "search" (only if [json condition {"kind":"searchable","trait":"Harad","deckOnly":true}]):
+          - [json SearchMove {"verb":"SearchMove","trait":"Harad","type":"enemy","to":"engaged","deckOnly":true}]
+
+144037:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, place attacking enemy facedown under The Black Gate.
+  144037:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): place this card facedown under the card with code 144027 in play (out of play there; its attachments are discarded, its tokens go)
+
+## 144038 Fierce Southrons
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144038:A:1: Peril.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+144038:A:2 (front): When Revealed: Either place the lowest Threat Harad enemy in the staging area facedown under The Black Gate and reveal an additional encounter card, or each enemy in the staging area makes an immediate attack against you.
+  144038:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "place" (only if there is a Harad enemy (any player controls) in the staging area only to choose):
+        - choose Harad enemy (any player controls) in the staging area only, with the lowest Threat of those (ties: the chooser decides)
+        - place the picked card facedown under the card with code 144027 in play (out of play there; its attachments are discarded, its tokens go)
+        - the acting player reveals an encounter card
+      * option "attack" (only if there is a enemy (any player controls) in the staging area only to choose):
+        - for each enemy (any player controls) in the staging area only:
+          - the picked enemy attacks the acting player now, from the staging area
+
+## 144039 Arrows Thick in the Air
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+144039:A:1 (front): When Revealed: Each Harad enemy gains Archery 2 until the end of the round.
+  144039:whenRevealed:1: When revealed
+    - every enemy in play (Harad only): stat archery 2, until the end of the round
+
+144039:A:2 (shadow): Shadow: Either place attacking enemy facedown under The Black Gate after this attack, or it makes an additional attack against you after this one.
+  144039:shadow:1: Shadow
+    - the acting player chooses one of:
+      * option "place":
+        - once the attack in progress has ended, place this card facedown under the card with code 144027 in play (out of play there; its attachments are discarded, its tokens go)
+      * option "attack":
+        - this enemy attacks now, dealt a new shadow card after its old ones are discarded [also {"afterThis":true}]
+
+## 144056 Oliphaunt
+(the scenario deals it into the haradDeck pile; the piles place it, no record does)
+
+144056:A:1 (front): Cannot have attachments or take more than 3 damage each round.
+  144056:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+    - this card: stat damageCap 3, while this card is in play
+
+144056:A:2 (front): Forced: After Oliphaunt engages you, exhaust each ally you control.
+  144056:forced:1: Forced after an enemy engages a player (heard about this card)
+    - for each ally (you control):
+      - exhaust the picked card
+
+144056:A:3 (shadow): Shadow: Attacking enemy gets +3 Attack.
+  144056:shadow:1: Shadow
+    - the attacking enemy: stat attack 3, until the end of the attack
+
+## 144057 Haradrim Soldier
+(the scenario deals it into the haradDeck pile; the piles place it, no record does)
+
+144057:A:1 (front): Forced: After Haradrim Soldier engages you, it makes an immediate attack.
+  144057:forced:1: Forced after an enemy engages a player (heard about this card)
+    - this enemy attacks now, dealt a new shadow card after its old ones are discarded
+
+144057:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
+  144057:shadow:1: Shadow
+    - this enemy attacks now, dealt a new shadow card after its old ones are discarded [also {"afterThis":true}]
+
+## 144058 Haradrim Archer
+(the scenario deals it into the haradDeck pile; the piles place it, no record does)
+
+144058:A:1 (front): Archery X. X is the number of players in the game.
+  144058:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat threat the number of players, while this card is in play
+    - this card: stat archery the number of players, while this card is in play
+
+144058:A:2 (front): Forced: After Haradrim Archer engages you, assign X damage among characters you control.
+  144058:forced:1: Forced after an enemy engages a player (heard about this card)
+    - [json AssignDamage {"verb":"AssignDamage","amount":{"players":true},"pick":{"type":"character","control":"you"}}]
+
+144058:A:3 (shadow): Shadow: Deal 1 damage to the defending character.
+  144058:shadow:1: Shadow
+    - deal 1 damage to the defender
+
+## 144068 Ambush the Men of Harad
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+144068:A:1 (front): Setup: Add The Black Gate and The Cross-roads to the staging area. Shuffle the Men of Harad encounter set and place it facedown under The Cross-roads. Each player, except the first player, searches the encounter deck for a different non-unique location and adds it to the staging area. Shuffle the encounter deck.
+  144068:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json ShufflePile {"verb":"ShufflePile","pile":"harad"}]
+    - for each player, first player first:
+      - [json SearchMove {"verb":"SearchMove","type":"location","nonUnique":true,"to":"staging","different":true,"when":{"kind":"not","condition":{"kind":"firstPlayer"}}}]
+    - shuffle the encounter deck
+
+144068:B:1 (back): Forced: At the beginning of the quest phase, reveal the top facedown card from under The Cross-roads and add it to the staging area.
+  144068:forced:1: Forced when a phase begins
+    only if all of: (it is the Quest phase) and (the number of location (any player controls) named "Henneth Annûn" [also {"active":true}] is at most 0)
+    - [json AddFromPile {"verb":"AddFromPile","pile":"harad","to":"staging","reveal":true}]
+
+144068:B:2 (back): The players cannot defeat this stage while The Cross-roads is in play. When The Cross-roads is explored, the players win the game.
+  144068:constant:1: Constant
+    only if the card with code 144030 is in play
+    - the players cannot defeat this stage while this holds
+  144068:forced:2: Forced on the event locationExplored (heard about location (any player controls) named "The Cross-roads")
+    - the players win the game
+
+(rendered pieces: 185 by template, 15 as JSON)

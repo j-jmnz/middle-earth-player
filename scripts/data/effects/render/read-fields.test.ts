@@ -27,6 +27,7 @@ const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   RaiseThreat: [{ verb: "RaiseThreat", amount: 2, who: "eachSeat", perCommitted: { type: "hero", exceptSphere: "fellowship" } }],
   LowerThreat: [{ verb: "LowerThreat", amount: 2, who: "eachSeat" }],
   ReturnToStaging: [{ verb: "ReturnToStaging", target: "picked" }],
+  PlaceFacedownUnder: [{ verb: "PlaceFacedownUnder", code: "144027", target: "self", afterAttack: true }],
   SetPursuit: [{ verb: "SetPursuit", value: 10 }],
   RaisePursuit: [{ verb: "RaisePursuit", amount: 3 }],
   LowerPursuit: [{ verb: "LowerPursuit", amount: 1 }],
@@ -64,6 +65,12 @@ const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   RemoveFromEncounterDeckIfLogged: [{ verb: "RemoveFromEncounterDeckIfLogged", line: "A line", count: 2, cardType: "enemy", nonUnique: true, except: ["Urdug"] }],
   IgnoreKeyword: [{ verb: "IgnoreKeyword", keywords: ["Surge"] }],
   AttackFromStaging: [{ verb: "AttackFromStaging", who: "firstPlayer", target: "self", orEngaged: true, undefendedToStage: true }],
+  PlaceMireToken: [{ verb: "PlaceMireToken", on: "activeLocation", amount: 1 }],
+  ReturnRandomVictoryLocation: [{ verb: "ReturnRandomVictoryLocation" }],
+  ShuffleVictoryIntoEncounterDeck: [{ verb: "ShuffleVictoryIntoEncounterDeck" }],
+  FlipGollum: [{ verb: "FlipGollum", to: "smeagol" }, { verb: "FlipGollum", to: "gollum" }],
+  FollowFirstPlayer: [{ verb: "FollowFirstPlayer" }],
+  GollumAttacks: [{ verb: "GollumAttacks" }],
   DiscardPicked: [{ verb: "DiscardPicked" }],
   Engage: [{ verb: "Engage", target: "self" }],
   Travel: [{ verb: "Travel" }],
@@ -77,8 +84,8 @@ const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   ForEachPlayer: [{ verb: "ForEachPlayer", order: "lastFirst", instructions: [] }],
 };
 
-// A key whose value in a sample reads as its absence does (the only value of `to` on Travel is "self"; `to: "play"` is what a MovePicked without `to` words).
-const SAME_EITHER_WAY = new Set(["Travel.to", "MovePicked[1].to"]);
+// A key whose value in a sample reads as its absence does (the only value of `to` on Travel is "self"; `to: "play"` is what a MovePicked without `to` words; a FlipGollum without `to` words as its "gollum" side).
+const SAME_EITHER_WAY = new Set(["Travel.to", "MovePicked[1].to", "FlipGollum[1].to"]);
 // Keys that hold instructions: the renderer prints them beneath, not in the line.
 const NESTED = new Set(["instructions", "options"]);
 
@@ -190,6 +197,8 @@ describe("effects render read fields, conditions", () => {
     logged: [{ kind: "logged", line: "A line", is: false }],
     onStage: [{ kind: "onStage", stage: 2 }],
     pursuit: [{ kind: "pursuit", min: 3, max: 6 }],
+    pileHas: [{ kind: "pileHas", pile: "harad", min: 1, max: 3 }],
+    facedownUnder: [{ kind: "facedownUnder", code: "144027", min: 3, max: 8, players: true }],
     soleAttacker: [{ kind: "soleAttacker" }],
     captives: [{ kind: "captives", min: 1, max: 2, of: "actor" }],
     matches: [{ kind: "matches", card: "picked", pick: { type: "enemy", control: "any" } }],
@@ -245,6 +254,8 @@ describe("effects render read fields, picks", () => {
     who: "firstPlayer",
     engagedEnemies: true,
     hasShadow: true,
+    lowestAttack: true,
+    lowestThreat: true,
   };
   const SAMPLES: readonly Obj[] = [
     BIG,
@@ -278,6 +289,7 @@ describe("effects render read fields, amounts", () => {
     { stat: "willpower", ofNamed: "A Card" },
     { players: true },
     { pursuit: true },
+    { pile: "harad" },
     { x: true },
     { stage: true },
     { threat: "tens" },

@@ -162,6 +162,8 @@ export type CampaignGameSpec<D extends string, P extends object> = {
   policy: P;
   /** The most intents a game may take. */
   limit: number;
+  /** The seats a game deals when its start names none (the stand-in heroes and the filler deck by default): a scenario whose first player holds a saga hero (the Ring-bearer) names it here. */
+  loadout?: (seatCount: 1 | 2) => LoadoutSeat[];
   /** The cards a golden marked `upgraded` deals on their Upgraded side, and the levels a golden played `after` the earlier parts reads. */
   upgraded: readonly string[];
   levels?: Readonly<Record<string, number>>;
@@ -211,7 +213,7 @@ export function campaignGame<D extends string, P extends object>(spec: CampaignG
     };
   }
 
-  function plan(seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), choices?: readonly string[], difficulty?: Difficulty, loadout: LoadoutSeat[] = fillerLoadout(seatCount)) {
+  function plan(seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), choices?: readonly string[], difficulty?: Difficulty, loadout: LoadoutSeat[] = spec.loadout?.(seatCount) ?? fillerLoadout(seatCount)) {
     const checked = checklist({ log, scenario: campaignScenario(spec.scenario), seats: loadout, effects: EFFECTS, cards: cardsOrThrow(), ...(difficulty ? { difficulty } : {}), ...(choices ? { choices } : {}) });
     if (!checked.ok) throw new Error(checked.errors.join("; ") || "The campaign card asks for a choice");
     return checked;

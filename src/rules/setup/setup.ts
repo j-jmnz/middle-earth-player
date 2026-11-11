@@ -207,13 +207,21 @@ function campaignAfterSetup(state: ScenarioState, ctx: ReduceContext, steps: Eng
 }
 
 export function mulliganSeat(state: ScenarioState, seat: number, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
-  let next = state;
+  let next = unannounceHand(state, seat);
   for (const id of [...(next.seats[seat]?.hand ?? [])]) next = moveCard(next, id, { zone: "deck", seat });
   const seatState = next.seats[seat];
   if (!seatState) return next;
   const shuffled = shuffleIds(seatState.deck, next.seed, next.seedCursor);
   next = { ...withSeat(next, seat, { ...seatState, deck: shuffled.ids }), seedCursor: shuffled.cursor };
   return drawOpeningHand(next, seat, steps, ctx, ruleCause("rr.mulligan"));
+}
+
+// A card of the hand a mulligan shuffles back never entered the player's hand for good: the draw's announcement of it ("Forced: After you draw this card",
+// mec112.poisoned-counsels-searching-eye) is withdrawn, and only the cards of the new hand are announced.
+function unannounceHand(state: ScenarioState, seat: number): ScenarioState {
+  const hand = new Set(state.seats[seat]?.hand ?? []);
+  const kept = (state.pendingEvents ?? []).filter((event) => !(event.trigger === "enteredHand" && event.cardId != null && hand.has(event.cardId)));
+  return kept.length === (state.pendingEvents ?? []).length ? state : { ...state, pendingEvents: kept };
 }
 
 export function finishMulliganChoice(state: ScenarioState, took: boolean): ScenarioState {

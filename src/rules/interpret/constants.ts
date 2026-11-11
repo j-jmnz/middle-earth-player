@@ -162,7 +162,7 @@ export function constantWin(state: ScenarioState, ctx: ReduceContext): ScenarioS
     if (instruction.verb === "WinGame") return { ...state, stageCleared: true, window: null, pendingAttack: null };
     // A constant that loses the game while it holds ("If Torture Chamber has 4 or more resource tokens on it, ... the players have lost the
     // game", 900305:A:1).
-    if (instruction.verb === "LoseGame") return { ...state, lost: true, lossReason: `${printedOf(ctx.cards, source.code).name}: the players lost`, window: null, pendingAttack: null };
+    if (instruction.verb === "LoseGame") return { ...state, lost: true, lossReason: instruction.reason ?? `${printedOf(ctx.cards, source.code).name}: the players lost`, window: null, pendingAttack: null };
   }
   return state;
 }

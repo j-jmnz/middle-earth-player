@@ -9,6 +9,7 @@ import { stageOf } from "../../rules/families/breaking/areas.ts";
 import type { ScenarioState } from "../../rules/engine/reduce.ts";
 
 import { headingStepOf, type HeadingStep } from "../dream-chaser/heading.ts";
+import { gollumHeld } from "./marshes.ts";
 
 export type WidgetReadouts = {
   // The Ring-bearer's life (mec109.ringbearers-life), or null when the scenario has no life tracker.
@@ -64,7 +65,7 @@ export function heldDial(game: ScenarioState, nameOf: (code: string) => string):
 
 /**
  * Every seat's held dial: the one `heldDial` finds, and a seat with a Captive of The Uruk-hai (mec112.pursuit, families/captives): "Legolas is a Captive under To Isengard!" or "Legolas is a Captive held by Grishnákh".
- * A seat that holds two things says both. `isEnemy` tells an enemy holder from the card the Captives lie under.
+ * A seat that holds two things says both. `isEnemy` tells an enemy holder from the card the Captives lie under. The seat that holds the card Gollum / Sméagol of The Passage of the Marshes says so too (readouts/marshes.ts).
  */
 export function heldDials(game: ScenarioState, nameOf: (code: string) => string, isEnemy: (code: string) => boolean): readonly HeldDial[] {
   const dials = new Map<number, HeldDial>();
@@ -76,6 +77,10 @@ export function heldDials(game: ScenarioState, nameOf: (code: string) => string,
     const words = `${nameOf(card.code)} is a Captive${host ? ` ${isEnemy(host.code) ? "held by" : "under"} ${nameOf(host.code)}` : ""}`;
     const before = dials.get(card.owner);
     dials.set(card.owner, { seat: card.owner, words: before ? `${before.words}. ${words}` : words, mark: before?.mark ?? "hero" });
+  }
+  for (const gollum of gollumHeld(game)) {
+    const before = dials.get(gollum.seat);
+    dials.set(gollum.seat, { seat: gollum.seat, words: before ? `${before.words}. ${gollum.words}` : gollum.words, mark: before?.mark ?? gollum.mark });
   }
   return [...dials.values()];
 }

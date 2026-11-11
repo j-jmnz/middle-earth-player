@@ -55,4 +55,6 @@
 // 25 (The Road to Isengard review): a seat a settle sweep eliminates hands its open window on at once and a sweep that ends in a loss clears the window (machine.ts, handoffEliminated after every sweep), so a replayed
 // two-seat game in which a seat is eliminated by the sweep (lethal damage held and then swept) can offer the next window to the other seat sooner; while a table tracks the phase's progress and an explored location
 // may cancel it (The Voice of Saruman only) the full stage advances after the Forced effects resolve: a replayed The Road to Isengard game can take a different path.
-export const ENGINE_VERSION = 25;
+// 26 (The Passage of the Marshes): a hand a mulligan shuffles back no longer announces its draws (setup.ts, unannounceHand), so a Searching Eye, Poisoned Counsels or Recurring Nightmare in a mulliganed-away hand
+// does not fire (before, it did, and Poisoned Counsels discarded the new hand): a replayed game that took a mulligan with such a card in its first hand can take a different path.
+export const ENGINE_VERSION = 26;

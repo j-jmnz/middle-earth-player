@@ -287,6 +287,9 @@ describe.each(Object.keys(ASKS_BY_SCENARIO))("the asks of %s", (id) => {
           // The sentence the sheet opens with, led as the sheet leads it.
           const said = tail === "Choose" ? asksChoose(asked, asks)?.note : tail === instruction.verb ? asksPick(asked, asks)?.prompt : undefined;
           if (typeof entry.note === "string" && said === undefined && tail === instruction.verb) problems.push(`${key}: the note does not render`);
+          // The sheet says the entry's own sentence: a record that holds the same object at two paths (Brace of Coneys' two Chooses) would match the first and say the other's.
+          const own = typeof entry.note === "string" ? fill(entry.note, values) : null;
+          if (own !== null && said !== undefined && !said.toLowerCase().includes(own.toLowerCase())) problems.push(`${key}: the sheet says "${said}", not the entry's "${own}" (another instruction of the record was matched)`);
           if (said !== undefined) texts.push(said);
           lines.push(`${key}: ${[...new Set(texts)].join(" / ")}`);
           for (const text of texts) {

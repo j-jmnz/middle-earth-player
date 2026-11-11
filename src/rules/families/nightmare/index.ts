@@ -65,7 +65,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return pickMost(state, instruction, seats, (id) => seatThreat(state, Number(id.slice("seat:".length))), focus, steps);
     }
     case "PickDiscardTop":
-      return pickDiscardTop(state, instruction.types, ctx);
+      return pickDiscardTop(state, instruction.types, ctx, instruction.trait);
     case "DealShadowFromDiscard":
       return dealShadowFromDiscard(state, ctx);
     case "EngageSeatWith":
@@ -190,8 +190,8 @@ function engageSetAside(state: ScenarioState, code: string, focus: Focus, ctx: R
 }
 
 // PickDiscardTop: the topmost card of the encounter discard pile (its last card) of one of these printed types is picked (900107:A:2).
-function pickDiscardTop(state: ScenarioState, types: readonly string[], ctx: ReduceContext): ScenarioState {
-  const found = [...state.encounterDiscard].reverse().find((id) => types.includes(printedOf(ctx.cards, state.cards[id]?.code ?? "").type));
+function pickDiscardTop(state: ScenarioState, types: readonly string[], ctx: ReduceContext, trait?: string): ScenarioState {
+  const found = [...state.encounterDiscard].reverse().find((id) => types.includes(printedOf(ctx.cards, state.cards[id]?.code ?? "").type) && (trait == null || hasTrait(state, id, trait, ctx)));
   return found ? markPicked(state, found) : state;
 }
 

@@ -42,8 +42,8 @@ const VERBS = [
   // the highest threat exhausts all heroes he controls. Then, attach this card to one of that player's heroes" (900106:A:1).
   z.strictObject({ verb: z.literal("PickHighestThreat"), ...when }),
   // The topmost card of the encounter discard pile of one of these printed types becomes the picked card ("The topmost enemy or location
-  // card in the encounter discard pile", 900107:A:2). Nothing is picked with none there.
-  z.strictObject({ verb: z.literal("PickDiscardTop"), types: z.array(z.enum(["enemy", "location", "treachery"])).min(1), ...when }),
+  // card in the encounter discard pile", 900107:A:2). `trait`: it must have that Trait too ("The topmost Undead enemy in the encounter discard pile", 144026:A:2). Nothing is picked with none there.
+  z.strictObject({ verb: z.literal("PickDiscardTop"), types: z.array(z.enum(["enemy", "location", "treachery"])).min(1), trait: z.string().min(1).optional(), ...when }),
   // A shadow effect: the topmost card of the encounter discard pile that has a Shadow effect is dealt to the attacking enemy as one more
   // shadow card, and resolves in this attack after the ones it has ("Deal and resolve the topmost Shadow effect in the encounter discard
   // pile for this attack", 900107:A:3; rr.step-6-4-2). Nothing happens with none there.

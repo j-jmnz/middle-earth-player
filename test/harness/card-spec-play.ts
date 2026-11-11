@@ -12,12 +12,14 @@ import { fightEnemy, finish, first, idOf, legalIntents, opening, resolveRecords,
 // Test helper. Plays the actions of a card-spec row (card-spec-types.ts, Act) on a table built from its layout: each action is the scene kit's helper for it (`resolveRecords`, `revealFromTop`, `fightEnemy`, `send` of an
 // intent from `legalIntents`). Rules: rr.forced, rr.response, rr.reveal, rr.cancel, rr.travel (data/rules/entries.json).
 
-// The answers an action's choices take, in order: a listed option that is not offered is an error; with none left, the first option. A `lenient` picker (the run without the row's records, which may open no
+// The answers an action's choices take, in order (an option, or the code of the card a Pick offers): a listed option that is not offered is an error; with none left, the first option. A `lenient` picker (the run without the row's records, which may open no
 // choice at all) takes the first option instead of failing: an answer the records never asked for is not what the row is checked on.
 function picker(queue: string[], lenient: boolean): (state: ScenarioState) => string {
   return (state) => {
     if (state.window?.kind !== "choose") return "";
-    const wanted = queue.shift();
+    const asked = queue.shift();
+    // A choice among cards (a Pick) offers instance ids: an answer may name the card's code instead.
+    const wanted = asked === undefined ? undefined : state.window.options.includes(asked) ? asked : (state.window.options.find((option) => state.cards[option]?.code === asked) ?? asked);
     if (wanted === undefined || (lenient && !state.window.options.includes(wanted))) return state.window.options[0] ?? "";
     if (!state.window.options.includes(wanted)) throw new Error(`option ${wanted} is not offered (${state.window.options.join(", ")})`);
     return wanted;
