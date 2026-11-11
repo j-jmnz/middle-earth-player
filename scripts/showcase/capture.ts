@@ -15,7 +15,8 @@
 // list, the simulator, the flow and the showcase subflows, and the fixture file it opens), is kept and not taken again (user request,
 // 2026-11-11); --force takes every capture again.
 //
-// Flags: --build or --app <App.app>, --out <dir>, --only <shot,shot>, --device <iphone|ipad>, --theme <dark|light>, --force, --verbose.
+// Flags: --build or --app <App.app>, --out <dir>, --only <shot,shot>, --device <iphone|ipad>, --theme <dark|light>, --ios <version>, --force,
+// --verbose. After a failed flow, the ids and words on screen are logged (Maestro's hierarchy), and the hierarchy kept with its debug output.
 import { spawn, spawnSync } from "node:child_process";
 import { createHash } from "node:crypto";
 import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
@@ -24,6 +25,7 @@ import path from "node:path";
 
 import { duration, runScript, verbose, type Log } from "../log.ts";
 import { FIXTURE_REGISTRY } from "../../src/campaign/fixtures/registry.ts";
+import { screenWords } from "./screen.ts";
 import { captureName, SHOTS, type Device, type Shot, type Theme } from "./shots.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "..", "..");
@@ -173,12 +175,14 @@ function simulator(device: Device): SimDevice {
   if (listed.status !== 0) throw new Error(`xcrun simctl list failed: ${listed.stderr}`);
   const runtimes = (JSON.parse(listed.stdout) as { devices: Record<string, SimDevice[]> }).devices;
   // The newest iOS runtime first, then the highest model number in it.
-  const ios = Object.entries(runtimes).filter(([runtime]) => runtime.includes("iOS")).sort(([left], [right]) => right.localeCompare(left, undefined, { numeric: true }));
+  // --ios <version> keeps the runtimes of that iOS version (18 or 18.2), when the newest one does not suit the tools.
+  const version = flag("ios")?.replace(".", "-");
+  const ios = Object.entries(runtimes).filter(([runtime]) => runtime.includes("iOS") && (!version || new RegExp(`iOS-${version}(-|$)`).test(runtime))).sort(([left], [right]) => right.localeCompare(left, undefined, { numeric: true }));
   for (const [runtime, devices] of ios) {
     const found = devices.filter((item) => item.isAvailable && KINDS[device].test(item.name)).sort((left, right) => right.name.localeCompare(left.name, undefined, { numeric: true }))[0];
     if (found) return { ...found, name: `${found.name} (${runtime.split(".").at(-1)?.replace(/-/g, " ").replace(/^iOS (\d+) (\d+)/, "iOS $1.$2") ?? runtime})` };
   }
-  throw new Error(`No available ${device} simulator matches ${KINDS[device]}: install an iOS runtime in Xcode, Settings, Components`);
+  throw new Error(`No available ${device} simulator matches ${KINDS[device]}${version ? ` on iOS ${flag("ios")}` : ""}: install an iOS runtime in Xcode, Settings, Components (\`xcrun simctl list runtimes\` lists them)`);
 }
 
 async function prepare(log: Log, sim: SimDevice, app: string): Promise<void> {
@@ -201,6 +205,21 @@ function written(dir: string, extensions: readonly string[]): string[] {
       return statSync(full).isDirectory() ? walk(full) : [full];
     });
   return walk(dir).filter((file) => extensions.includes(path.extname(file))).sort((left, right) => statSync(right).mtimeMs - statSync(left).mtimeMs);
+}
+
+// What is on the simulator's screen after a failed flow, from Maestro's hierarchy: written beside the debug output, and its ids and words
+// logged, so the log alone says where the app was (a screen still loading, an error, another screen than the flow expected).
+function onScreen(log: Log, sim: SimDevice, label: string, kept: string): void {
+  const read = spawnSync("maestro", ["--device", sim.udid, "hierarchy"], { encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
+  const json = read.stdout.slice(read.stdout.indexOf("{"));
+  try {
+    const words = screenWords(JSON.parse(json));
+    mkdirSync(kept, { recursive: true });
+    writeFileSync(path.join(kept, "hierarchy.json"), json);
+    log.warn(`${label}: on screen after the failure: ${words.length > 0 ? words.slice(0, 40).join(" ") : "nothing Maestro can read (the app may have crashed, or still be on its splash screen)"}`);
+  } catch {
+    log.warn(`${label}: Maestro could not read the screen after the failure${read.stderr ? `: ${lastLines(read.stderr, 3)}` : ""}`);
+  }
 }
 
 // Runs one flow and moves what it wrote into `out` under its capture name. Maestro writes a screenshot or a recording into the folder it runs in, or
@@ -229,6 +248,7 @@ async function capture(log: Log, sim: SimDevice, device: Device, theme: Theme, s
       cpSync(path.join(work, "output"), kept, { recursive: true });
       log.warn(`${label}: Maestro's debug output (screenshot and UI hierarchy) is in ${kept}`);
     }
+    if (!ok) onScreen(log, sim, label, kept);
     rmSync(work, { recursive: true, force: true });
   }
   log.warn(`${step} ${name}: failed twice, left out (run it alone with --only ${shot.id} --device ${device} --theme ${theme} --verbose)`);
@@ -238,7 +258,7 @@ async function capture(log: Log, sim: SimDevice, device: Device, theme: Theme, s
 void runScript("showcase-capture", async (log) => {
   const given = flag("app");
   const app = process.argv.includes("--build") ? await buildApp(log) : given;
-  if (!app || !existsSync(app)) throw new Error("Usage: pnpm assets capture --build | --app <App.app> [--out <dir>] [--only <shot,shot>] [--device <iphone|ipad>] [--theme <dark|light>] [--verbose]");
+  if (!app || !existsSync(app)) throw new Error("Usage: pnpm assets capture --build | --app <App.app> [--out <dir>] [--only <shot,shot>] [--device <iphone|ipad>] [--theme <dark|light>] [--ios <version>] [--force] [--verbose]");
   const out = path.resolve(flag("out") ?? path.join(ROOT, ".cache", "showcase", "raw"));
   mkdirSync(out, { recursive: true });
   // The debug output of an earlier run's failures would read as this run's.
