@@ -20,6 +20,7 @@ import { reduceLife, takesLifeInstead } from "../families/burden/life.ts";
 import { placedLimit } from "../families/uncharted/limit.ts";
 import { grappleThreat } from "../families/grapple/values.ts";
 import { printedStat, victoryOf } from "./printed-stat.ts";
+import { wallRoom } from "../families/pelennor/wall.ts";
 import { heldBy } from "./holder-classes.ts";
 import { eliminateEmpties, markLoss } from "./eliminate.ts";
 
@@ -196,6 +197,15 @@ function indestructible(state: ScenarioState, id: string, printed: PrintedCard):
 }
 
 export function placeDamage(state: ScenarioState, assigned: string, amount: number, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[], source: DamageSource, cause: Cause, sourceId?: string | null): ScenarioState {
+  // "Damage that would be placed on Minas Tirith must be placed on City Wall first" (145046:A:1): the wall takes what it has room for, the rest goes on the card.
+  const wall = amount > 0 ? wallRoom(state, assigned, cards) : null;
+  if (!wall) return placeDamageHere(state, assigned, amount, cards, steps, source, cause, sourceId);
+  const onWall = Math.min(amount, wall.room);
+  const first = placeDamageHere(state, wall.wall, onWall, cards, steps, source, cause, sourceId);
+  return amount > onWall ? placeDamageHere(first, assigned, amount - onWall, cards, steps, source, cause, sourceId) : first;
+}
+
+function placeDamageHere(state: ScenarioState, assigned: string, amount: number, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[], source: DamageSource, cause: Cause, sourceId?: string | null): ScenarioState {
   // Damage assigned to a card another takes for it ("attached hero takes all damage assigned to the chosen hero", 02099).
   const id = damageGoesTo(state, assigned);
   const instance = state.cards[id];
