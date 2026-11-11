@@ -466,7 +466,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 
 145075:B:4 (back): Forced: When an enemy is destroyed, place progress on this stage equal to that enemy's total Threat (progress must be placed on the active location first).
   145075:forced:1: Forced after an enemy is destroyed
-    - [json PlaceProgressActiveFirst {"verb":"PlaceProgressActiveFirst","amount":{"stat":"threat","of":"subject"}}]
+    - [json PlaceProgressActiveFirst {"verb":"PlaceProgressActiveFirst","amount":{"x":true}}]
 
 ## 145076 Rohan has Come!
 (the scenario deals it into the quest pile; the piles place it, no record does)

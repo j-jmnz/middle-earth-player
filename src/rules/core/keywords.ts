@@ -267,7 +267,9 @@ function destroyAndAnnounce(state: ScenarioState, instance: CardInstance, printe
   if (printed.type === "enemy" || printed.type === "hero") next = noteHostDefeated(next, instance.id, printed.type === "hero" ? cards : undefined);
   next = destroyCard(next, instance.id, cards, steps, false, true);
   if (isCharacterType(printed)) next = queueEvent(next, { trigger: "characterDestroyed", seat: instance.controller, subject: instance.id });
-  if (printed.type === "enemy") next = queueEvent(next, { trigger: "enemyDestroyed", seat: instance.controller, subject: instance.id });
+  // Under Assault (145075:B:4) the event carries the enemy's total Threat as it stood in play, for the progress its destruction places (a Wraith on Wings' resources count; they stop counting once it has left play).
+  const threat = printed.type === "enemy" && state.questStage != null && flagged(state, state.questStage, "assault") ? { amount: modifiedStat(state, instance, "threat", cards) } : {};
+  if (printed.type === "enemy") next = queueEvent(next, { trigger: "enemyDestroyed", seat: instance.controller, subject: instance.id, ...threat });
   return next;
 }
 

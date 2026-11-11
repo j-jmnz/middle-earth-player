@@ -5,6 +5,8 @@ import type { Effect } from "../../../catalog/boundary.ts";
 import { cardMap, expectOk, fixtureDefinition, hero } from "../../core/test-fixture.ts";
 import { definePrinted } from "../../core/printed.ts";
 import { runInstruction } from "../../interpret/interpret.ts";
+import { ruleCause } from "../../core/cause.ts";
+import { placeDamage } from "../../core/keywords.ts";
 import { reduce } from "../../engine/reduce.ts";
 import { blankScenario, updateCard, type ScenarioState } from "../../core/state.ts";
 import { spawn } from "../../core/zones.ts";
@@ -83,5 +85,24 @@ describe("progressAsDamage (145076:B:1)", () => {
     const after = expectOk(reduce(state, { type: "Pass" }, { effects: [record], cards })).state;
     expect(after.cards[after.questStage ?? ""]?.progress).toBe(0);
     expect(after.cards[after.questStage ?? ""]?.resources).toBe(2);
+  });
+});
+
+describe("the Threat an enemy's destruction places (145075:B:4)", () => {
+  const destroyed = (flag: boolean) => {
+    const base = atQuest("assault");
+    const wolfCard = spawn(base, "wolf", { zone: "staging" });
+    const bonus = { instanceId: wolfCard.id, sourceId: wolfCard.id, stat: "threat" as const, amount: 2, until: "whileSourceInPlay" as const };
+    const state = { ...wolfCard.state, modifiers: [...wolfCard.state.modifiers.filter((modifier) => flag || modifier.stat !== "assault"), bonus] };
+    const after = placeDamage(state, wolfCard.id, 9, cards, [], "combat", ruleCause("rr.damage"));
+    return (after.pendingEvents ?? []).find((event) => event.trigger === "enemyDestroyed");
+  };
+
+  it("is stamped on the event as it stood in play, the Threat of a Wraith on Wings with its resources", () => {
+    expect(destroyed(true)?.amount).toBe(5);
+  });
+
+  it("is left off the event when the stage has no Assault", () => {
+    expect(destroyed(false)?.amount).toBeUndefined();
   });
 });
