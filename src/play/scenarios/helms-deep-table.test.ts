@@ -7,7 +7,10 @@ import { scenarioDefinition } from "../../catalog/scenario-data.ts";
 import { updateCard } from "../../rules/core/state.ts";
 import { loadCampaign, loadScenario } from "../../../scripts/data/load-scenarios.ts";
 
+import { slotNumbers } from "../cards/card-effects.ts";
 import { questTitle } from "../cards/table-preview.ts";
+import { stripText } from "../canvas/table-canvas-views.ts";
+import type { CardSlot } from "../layout/layout.ts";
 import { defenseOutcome, defenseTokens, stageDefeatLoses, stageDetail, stageHasDefense } from "../readouts/fortress.ts";
 import { advanceWords } from "../readouts/quest-advance.ts";
 import { readoutFor } from "../readouts/readout.ts";
@@ -114,5 +117,16 @@ describe("the stage that loses when it is full", () => {
     expect(stageDetail(second.state, second.ctx, "143073", 8, null, "8 quest points to complete it")).toEqual(["The encounter deck advances it at 8 progress", DEFENSE_STAGE]);
     const first = table({ stage: "143072" });
     expect(stageDetail(first.state, first.ctx, "143072", 8, null, "8 quest points to complete it")).toEqual(["8 quest points to complete it"]);
+  });
+
+  it("143075:B:3 says it on the quest card's progress strip on the table, in a word beside the threat red: \"5 / 8 · lose\" on 4B, the plain count on 3B", () => {
+    const wall = table({ stage: "143075", progress: 5 });
+    const numbers = slotNumbers(wall.state, wall.ctx, idOf(wall.state, "143075"));
+    expect(numbers.stageLoses).toBe(true);
+    expect(stripText({ progress: 5 } as CardSlot, numbers.questPoints, null, numbers.stageLoses)).toBe("5 / 8 · lose");
+    const hosts = table({ stage: "143074", progress: 5 });
+    const plain = slotNumbers(hosts.state, hosts.ctx, idOf(hosts.state, "143074"));
+    expect(plain.stageLoses).toBe(false);
+    expect(stripText({ progress: 5 } as CardSlot, plain.questPoints, null, plain.stageLoses)).toBe(`5 / ${plain.questPoints}`);
   });
 });

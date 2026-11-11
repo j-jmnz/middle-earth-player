@@ -27,6 +27,7 @@ import { flagged, inPlay, modifierActive, type ScenarioState } from "../../rules
 import { engagesAt } from "../store/foresight.ts";
 import type { IconName } from "../../ui/icon-map.ts";
 import { stagePoints } from "../readouts/objective.ts";
+import { stageDefeatLoses } from "../readouts/fortress.ts";
 
 export type BadgeStat = "willpower" | "attack" | "defense" | "hitPoints" | "threat" | "questPoints" | "engagementCost";
 
@@ -255,6 +256,7 @@ function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, 
     willpower: card?.committed ? modifiedStat(game, card, "willpower", ctx.cards) : null,
     // A stage that progress never defeats has no strip (objective.ts): "25 / 0" would read as a stage that should be won.
     questPoints: questing ? (card.zone === "questStage" ? stagePoints(game, card, ctx) : questPointsOf(game, card, ctx.cards)) : null,
+    stageLoses: card != null && card.zone === "questStage" && stageDefeatLoses(ctx, card.code),
     engagement: cost != null ? { cost, engages: engagesAt(game, ctx).get(cardId) === seat } : null,
     delayed: game.delayed.some((entry) => actsOn(entry, cardId)),
     // The cards underneath The Havens Burn against the number that loses (11038:A:2); `loses` when one more card does.
@@ -320,6 +322,8 @@ export type SlotNumbers = {
   effects: CardEffects;
   willpower: number | null;
   questPoints: number | null;
+  // The current stage's defeat loses the game (The Wall is Breached!, 143075:B:3): its strip says so in threat red.
+  stageLoses: boolean;
   engagement: { cost: number; engages: boolean } | null;
   delayed: boolean;
   under: UnderMark | null;
