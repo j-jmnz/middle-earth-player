@@ -61,6 +61,8 @@ export type Layout = {
   pursuit?: number;
   // A hero stand-in lies faceup as a Captive under the card with the code `under` (The Uruk-hai, 143069:A:1).
   captive?: { hero: string; under: string };
+  // Cards lying facedown under the first card with the code `to` (the enemies under The Black Gate, 144027:A:2).
+  under?: readonly { code: string; to: string }[];
   // Other zones that hold a list of cards (a second deck, a named pile).
   piles?: Partial<Record<PileZone, readonly Entry[]>>;
 };
@@ -161,6 +163,10 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
     const host = idOf(state, attachment.to);
     const spawned = spawn(state, attachment.code, { zone: "play", seat: 0 });
     state = attachTo(spawned.state, spawned.id, host);
+  }
+  for (const hidden of layout.under ?? []) {
+    const spawned = spawn(state, hidden.code, { zone: "under", locationId: idOf(state, hidden.to) }, "down");
+    state = spawned.state;
   }
   if (layout.captive) state = holdCaptive(state, idOf(state, layout.captive.hero), idOf(state, layout.captive.under));
   if (layout.pursuit != null) state = { ...state, pursuit: layout.pursuit };

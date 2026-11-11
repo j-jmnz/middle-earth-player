@@ -309,10 +309,11 @@ function expandDiscards(state: ScenarioState, item: QueueItem, frame: Frame, ctx
   return patchTop(state, { data: { ...data, queue: [...expanded, ...data.queue] } });
 }
 
-// "Makes an additional attack after this one" (143052:A:1, faq.additional-attacks): the attack in progress is the source enemy's own, and the new one is left for its end, dealt a shadow card of its own.
+// "Makes an additional attack after this one" (143052:A:1, faq.additional-attacks): the attack in progress is the source enemy's own, or the one its shadow card (the source of a Shadow effect, 144039:A:2) was dealt for, and the new one is left for its end, dealt a shadow card of its own.
 function attackAfterThis(state: ScenarioState, sourceId: string | null, steps: EngineStep[]): ScenarioState {
   const attack = state.pendingAttack;
-  if (!attack || !sourceId || attack.enemyId !== sourceId) return state;
+  const source = sourceId ? state.cards[sourceId] : undefined;
+  if (!attack || !sourceId || (attack.enemyId !== sourceId && !(source?.zone === "shadow" && source.host === attack.enemyId))) return state;
   return { ...state, pendingAttack: { ...attack, after: [...(attack.after ?? []), { verb: "ImmediateAttack" }], afterCause: currentCause(steps, UNATTRIBUTED) } };
 }
 

@@ -161,7 +161,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
           verb: "Choose", who: "actor",
           options: [
             { id: "place", instructions: [{ verb: "PlaceFacedownUnder", code: BLACK_GATE, target: "self", afterAttack: true }] },
-            { id: "attack", instructions: [{ verb: "ImmediateAttack", shadow: false, afterThis: true }] },
+            { id: "attack", instructions: [{ verb: "ImmediateAttack", afterThis: true }] },
           ],
         },
       ],
@@ -173,7 +173,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
 
     // 144057 Haradrim Soldier.
     copyLine("18035:A:1", "144057:A:1"),
-    copyLine("18035:A:2", "144057:A:2"),
+    // The additional attack its Shadow grants is dealt a new shadow card, the old ones discarded first (faq.additional-attacks); written on its own, not copied from 18035:A:2 (which deals none).
+    { id: "144057:shadow:1", cardCode: "144057", lines: ["144057:A:2"], timing: "shadow", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "ImmediateAttack" }] }] },
 
     // 144058 Haradrim Archer: Threat X and Archery X, X the number of players (the card prints Threat X).
     { id: "144058:constant:1", cardCode: "144058", lines: ["144058:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "threat", amount: { players: true }, until: "whileSourceInPlay" }, { verb: "ModifyStat", stat: "archery", amount: { players: true }, until: "whileSourceInPlay" }] },
