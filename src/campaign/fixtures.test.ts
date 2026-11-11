@@ -86,7 +86,7 @@ describe("Maestro fixtures", () => {
     expect(found.past?.fixture).toBe("won");
     const world = worldFor("won");
     let save = fixtureSave("won", "s", CATALOG_VERSION);
-    const resumed = resume(save, world, CATALOG_VERSION);
+    const resumed = resume(save, world);
     if (!resumed.ok) throw new Error(resumed.reason);
     let state = resumed.state;
     for (const optionId of found.past?.choices ?? []) {
@@ -106,7 +106,7 @@ describe("Maestro fixtures", () => {
   it.skipIf(!KNIFE)("knife-lost: replays to a loss, and finishing it leaves the log as it was", () => {
     const world = worldFor("knife-lost");
     const save = fixtureSave("knife-lost", "s", CATALOG_VERSION);
-    const resumed = resume(save, world, CATALOG_VERSION);
+    const resumed = resume(save, world);
     expect(resumed.ok && resumed.state.lost).toBe(true);
     if (!resumed.ok) return;
     expect(resolutionView(resumed.state, world)).toEqual({ kind: "lost", reason: resumed.state.lossReason });
@@ -130,7 +130,7 @@ describe("Maestro fixtures", () => {
 
   it.skipIf(!WON)("won: replays to the first Resolution choice, a burden then a boon, one choice at a time", () => {
     const world = worldFor("won");
-    const resumed = resume(fixtureSave("won", "s", CATALOG_VERSION), world, CATALOG_VERSION);
+    const resumed = resume(fixtureSave("won", "s", CATALOG_VERSION), world);
     expect(resumed.ok).toBe(true);
     if (!resumed.ok) return;
     const burden = resolutionView(resumed.state, world);
@@ -160,7 +160,7 @@ describe("Maestro fixtures", () => {
 
   it("lost: replays to a loss", () => {
     const world = worldFor("lost");
-    const resumed = resume(fixtureSave("lost", "s", CATALOG_VERSION), world, CATALOG_VERSION);
+    const resumed = resume(fixtureSave("lost", "s", CATALOG_VERSION), world);
     expect(resumed.ok && resumed.state.lost).toBe(true);
     if (resumed.ok) expect(resolutionView(resumed.state, world)).toEqual({ kind: "lost", reason: resumed.state.lossReason });
   });
@@ -182,7 +182,7 @@ describe("Passage Through Mirkwood (Mirkwood Paths part 1, phase 29)", () => {
   it("mirkwood-won replays to a win with nothing to answer, and confirming it writes the Resolution and unlocks Journey Along the Anduin", () => {
     const world = worldFor("mirkwood-won");
     const save = fixtureSave("mirkwood-won", "s", CATALOG_VERSION);
-    const resumed = resume(save, world, CATALOG_VERSION);
+    const resumed = resume(save, world);
     expect(resumed.ok && resumed.state.stageCleared && !resumed.state.lost).toBe(true);
     if (!resumed.ok) return;
     const view = resolutionView(resumed.state, world);
@@ -199,7 +199,7 @@ describe("Passage Through Mirkwood (Mirkwood Paths part 1, phase 29)", () => {
   it("mirkwood-lost replays to a loss when Mendor leaves play, and finishing it leaves the log as it was", () => {
     const world = worldFor("mirkwood-lost");
     const save = fixtureSave("mirkwood-lost", "s", CATALOG_VERSION);
-    const resumed = resume(save, world, CATALOG_VERSION);
+    const resumed = resume(save, world);
     expect(resumed.ok && resumed.state.lost).toBe(true);
     if (!resumed.ok) return;
     expect(resumed.state.lossReason).toBe("Mendor left play");
@@ -218,7 +218,7 @@ describe("Journey Along the Anduin (Mirkwood Paths part 2, phase 30)", () => {
     const past = fixture("mirkwood-won");
     const world = worldFor("mirkwood-won");
     const passageSave = fixtureSave("mirkwood-won", "s", CATALOG_VERSION);
-    const resumed = resume(passageSave, world, CATALOG_VERSION);
+    const resumed = resume(passageSave, world);
     if (!resumed.ok) throw new Error(resumed.reason);
     const written = finish(passageSave, world, resumed.state).log;
     for (const name of ["anduin-won", "anduin-lost"] as const) {
@@ -238,7 +238,7 @@ describe("Journey Along the Anduin (Mirkwood Paths part 2, phase 30)", () => {
   it.skipIf(!ANDUIN_LOST)("anduin-lost replays to a loss, and finishing it leaves the log as it was", () => {
     const world = worldFor("anduin-lost");
     const save = fixtureSave("anduin-lost", "s", CATALOG_VERSION);
-    const resumed = resume(save, world, CATALOG_VERSION);
+    const resumed = resume(save, world);
     expect(resumed.ok && resumed.state.lost).toBe(true);
     if (!resumed.ok) return;
     expect(resolutionView(resumed.state, world)).toEqual({ kind: "lost", reason: resumed.state.lossReason });
@@ -250,7 +250,7 @@ describe("Journey Along the Anduin (Mirkwood Paths part 2, phase 30)", () => {
   it.skipIf(!ANDUIN_WON)("anduin-won replays to a win with nothing to answer, and confirming it writes the prisoner and unlocks Escape from Dol Guldur", () => {
     const world = worldFor("anduin-won");
     const save = fixtureSave("anduin-won", "s", CATALOG_VERSION);
-    const resumed = resume(save, world, CATALOG_VERSION);
+    const resumed = resume(save, world);
     expect(resumed.ok && resumed.state.stageCleared && !resumed.state.lost).toBe(true);
     if (!resumed.ok) return;
     const view = resolutionView(resumed.state, world);
@@ -273,7 +273,7 @@ describe("Escape from Dol Guldur (Mirkwood Paths part 3, phase 31)", () => {
     const world = worldFor("dol-guldur-lost");
     const save = fixtureSave("dol-guldur-lost", "s", CATALOG_VERSION);
     expect(save.log.prisoner).toBeTruthy();
-    const resumed = resume(save, world, CATALOG_VERSION);
+    const resumed = resume(save, world);
     expect(resumed.ok && resumed.state.lost).toBe(true);
     if (!resumed.ok) return;
     expect(resolutionView(resumed.state, world)).toEqual({ kind: "lost", reason: resumed.state.lossReason });
@@ -300,7 +300,7 @@ describe("The Oath (The Dark of Mirkwood part 1, phase 32)", () => {
   it("oath-won replays to a win with nothing to answer, and confirming it writes the used Adaptation and the pool, and unlocks The Caves of Nibin-Dûm", () => {
     const world = worldFor("oath-won");
     const save = fixtureSave("oath-won", "s", CATALOG_VERSION);
-    const resumed = resume(save, world, CATALOG_VERSION);
+    const resumed = resume(save, world);
     expect(resumed.ok && resumed.state.stageCleared && !resumed.state.lost).toBe(true);
     if (!resumed.ok) return;
     const view = resolutionView(resumed.state, world);
@@ -324,7 +324,7 @@ describe("The Oath (The Dark of Mirkwood part 1, phase 32)", () => {
   it("oath-lost replays to a loss, and finishing it writes nothing", () => {
     const world = worldFor("oath-lost");
     const save = fixtureSave("oath-lost", "s", CATALOG_VERSION);
-    const resumed = resume(save, world, CATALOG_VERSION);
+    const resumed = resume(save, world);
     expect(resumed.ok && resumed.state.lost).toBe(true);
     if (!resumed.ok) return;
     expect(resolutionView(resumed.state, world)).toEqual({ kind: "lost", reason: resumed.state.lossReason });
@@ -340,7 +340,7 @@ describe("The Caves of Nibin-Dûm (The Dark of Mirkwood part 2, phase 33)", () =
 
   it("start from the log a real oath-won game writes when it is confirmed, in a The Dark of Mirkwood save, each seat's cards from the pool", () => {
     const oathSave = fixtureSave("oath-won", "s", CATALOG_VERSION);
-    const resumed = resume(oathSave, worldFor("oath-won"), CATALOG_VERSION);
+    const resumed = resume(oathSave, worldFor("oath-won"));
     if (!resumed.ok) throw new Error(resumed.reason);
     const written = finish(oathSave, worldFor("oath-won"), resumed.state).log;
     for (const name of ["nibin-dum-won", "nibin-dum-lost"] as const) {
@@ -359,7 +359,7 @@ describe("The Caves of Nibin-Dûm (The Dark of Mirkwood part 2, phase 33)", () =
   it("nibin-dum-lost replays to a loss, and finishing it writes nothing: The Caves of Nibin-Dûm stays current and nothing is carried over", () => {
     const world = worldFor("nibin-dum-lost");
     const save = fixtureSave("nibin-dum-lost", "s", CATALOG_VERSION);
-    const resumed = resume(save, world, CATALOG_VERSION);
+    const resumed = resume(save, world);
     expect(resumed.ok && resumed.state.lost).toBe(true);
     if (!resumed.ok) return;
     expect(resolutionView(resumed.state, world)).toEqual({ kind: "lost", reason: resumed.state.lossReason });
@@ -372,7 +372,7 @@ describe("The Caves of Nibin-Dûm (The Dark of Mirkwood part 2, phase 33)", () =
   it.skipIf(!WON)("nibin-dum-won replays to a win with nothing to answer, and confirming it completes the campaign and writes the Ranger Sense carry-over", () => {
     const world = worldFor("nibin-dum-won");
     const save = fixtureSave("nibin-dum-won", "s", CATALOG_VERSION);
-    const resumed = resume(save, world, CATALOG_VERSION);
+    const resumed = resume(save, world);
     expect(resumed.ok && resumed.state.stageCleared && !resumed.state.lost).toBe(true);
     if (!resumed.ok) return;
     const view = resolutionView(resumed.state, world);
@@ -397,7 +397,7 @@ describe("duo (the peek's two-handed fixture, phase 26)", () => {
 
   it("replays to the first player's planning window of round 1: two seats, neither eliminated, seat 0 acting, nothing won or lost", () => {
     const world = worldFor("duo");
-    const resumed = resume(fixtureSave("duo", "s", CATALOG_VERSION), world, CATALOG_VERSION);
+    const resumed = resume(fixtureSave("duo", "s", CATALOG_VERSION), world);
     expect(resumed.ok).toBe(true);
     if (!resumed.ok) return;
     const state = resumed.state;
@@ -430,7 +430,7 @@ describe("Voyage Across Belegaer (Dream-chaser part 1, phase 40)", () => {
 
   it("sea-solo replays to the first Sailing test's commit with the Heading off-course, and the Dream-chaser and one other ship in play", () => {
     const world = worldFor("sea-solo");
-    const resumed = resume(fixtureSave("sea-solo", "s", CATALOG_VERSION), world, CATALOG_VERSION);
+    const resumed = resume(fixtureSave("sea-solo", "s", CATALOG_VERSION), world);
     expect(resumed.ok).toBe(true);
     if (!resumed.ok) return;
     expect(askingToCommit(resumed.state)).toBe(true);
@@ -441,7 +441,7 @@ describe("Voyage Across Belegaer (Dream-chaser part 1, phase 40)", () => {
   });
 
   it("sea-duo replays to the first player's planning window of round 1", () => {
-    const resumed = resume(fixtureSave("sea-duo", "s", CATALOG_VERSION), worldFor("sea-duo"), CATALOG_VERSION);
+    const resumed = resume(fixtureSave("sea-duo", "s", CATALOG_VERSION), worldFor("sea-duo"));
     expect(resumed.ok).toBe(true);
     if (!resumed.ok) return;
     expect(resumed.state.mode).toBe("planning");
@@ -452,7 +452,7 @@ describe("Voyage Across Belegaer (Dream-chaser part 1, phase 40)", () => {
   it("voyage-lost replays to a loss, and finishing it writes nothing", () => {
     const world = worldFor("voyage-lost");
     const save = fixtureSave("voyage-lost", "s", CATALOG_VERSION);
-    const resumed = resume(save, world, CATALOG_VERSION);
+    const resumed = resume(save, world);
     expect(resumed.ok && resumed.state.lost).toBe(true);
     if (!resumed.ok) return;
     expect(resolutionView(resumed.state, world)).toEqual({ kind: "lost", reason: resumed.state.lossReason });
@@ -491,7 +491,7 @@ describe.each(LATER_PARTS)("$scenarioId (Dream-chaser part $part)", ({ scenarioI
     for (const name of names) {
       const world = worldFor(name);
       const save = fixtureSave(name, "s", CATALOG_VERSION);
-      const resumed = resume(save, world, CATALOG_VERSION);
+      const resumed = resume(save, world);
       expect(resumed.ok, name).toBe(true);
       if (!resumed.ok) continue;
       if (name === lost) {

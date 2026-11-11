@@ -45,6 +45,8 @@ export type RunRecord = {
   engineVersion: number | null;
   // True for a row written from what the store already knew, when the table was added.
   backfilled: boolean;
+  // The game was rebased onto a checkpoint at some point (ActiveScenario.from): it was finished across an update that changed the rules. History marks it.
+  rebased: boolean;
 };
 
 // The seed alone repeats (the e2e saves all deal seed 1), so the deal time joins the id when the open scenario has one.
@@ -80,6 +82,7 @@ export type RunInput = {
   endedAt: number;
   activeMs: number | null;
   engineVersion: number;
+  rebased?: boolean;
 };
 
 // The run a finished game makes, read from its final state; null while the game is still going (neither lost nor won).
@@ -109,6 +112,7 @@ export function runOf(input: RunInput): RunRecord | null {
     activeMs: input.activeMs,
     engineVersion: input.engineVersion,
     backfilled: false,
+    rebased: input.rebased === true,
   };
 }
 
@@ -145,6 +149,7 @@ export function backfillRuns(saves: readonly KnownSave[], games: readonly KnownG
         activeMs: null,
         engineVersion: null,
         backfilled: true,
+        rebased: false,
       });
     }
   }
@@ -172,6 +177,7 @@ export function backfillRuns(saves: readonly KnownSave[], games: readonly KnownG
       activeMs: null,
       engineVersion: null,
       backfilled: true,
+      rebased: false,
     });
   }
   return out;

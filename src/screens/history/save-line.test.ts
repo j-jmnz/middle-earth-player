@@ -17,6 +17,7 @@ describe("the next step of a playthrough", () => {
   it("still words a scenario to begin or resume, and a finished campaign", () => {
     expect(nextSummary({ kind: "begin", node: node("a", "A Knife in the Dark", "current") })).toBe("Next: A Knife in the Dark");
     expect(nextSummary({ kind: "resume", node: node("a", "A Knife in the Dark", "current") })).toBe("On the table: A Knife in the Dark");
+    expect(nextSummary({ kind: "resume", node: node("a", "A Knife in the Dark", "current"), needsChoice: true })).toBe("Needs a choice: A Knife in the Dark");
     expect(nextSummary({ kind: "finished" })).toBe("Campaign won");
     expect(nextStepHref("save-1", { kind: "begin", node: node("a", "A Knife in the Dark", "current") })).toEqual({ pathname: "/briefing/[saveId]/[scenarioId]", params: { saveId: "save-1", scenarioId: "a" } });
   });

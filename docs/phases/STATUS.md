@@ -97,6 +97,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 
 ### Releases
 - The Android release key is not set up (`docs/releasing.md`, Android key), so no release has been cut; the release workflow has not run yet, dry run first. TestFlight (optional) is not set up.
+- The first release with the open-game checks (world hash, per-move checks, checkpoints) carries no card, campaign or engine change, so open games convert cleanly (`docs/brief.md`, Persistence and shipping).
+- The release notes' golden-check comparison (`scripts/release/reach.ts`) has not run against a real previous tag; the first tag after it compares by `ENGINE_CHANGES` only.
 
 ### Fixtures and Maestro
 - `marshes-won` is not committed: no seed in 600 wins The Passage of the Marshes with The One Deck and Defenders of Gondor (every game reaches threat 50 by round 4). Until it exists `.maestro/scenarios/the-passage-of-the-marshes/the-passage-of-the-marshes.yaml` cannot run.
@@ -231,3 +233,4 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - Page art has no hard edges: it fades to black or into the fog; framed tiles and panels keep theirs (user, 2026-10-30).
 - The screen reader path is independent of ordinary play: with no phone screen reader on, nothing drawn, touched, heard or timed changes, the web build included; new reader behaviour is gated on `useReaderMode()`, which the Table as a list setting set to Always also turns on (user, 2026-11-05, 2026-11-07).
 - One scenario pipeline; no more A/B tests (user decision, 2026-11-08). The procedure is in `docs/handover/agent-brief.md` (Scenario procedure).
+- An open game is never dropped by the app: after an update the player chooses Continue (from the saved table, checked against the engine) or Restart (user decision, 2026-11-11).

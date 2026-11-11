@@ -17,12 +17,13 @@ import type { StartScenario } from "../rules/setup/setup.ts";
 
 import { comingSoonProblems, difficultyProblems, loadoutProblems, needsRingBearerSlot, type LoadoutInput, type Problem } from "./briefing.ts";
 import type { LoadoutSeat } from "./loadout.ts";
+import type { Checkpoint } from "./checkpoint.ts";
 import { beginActive, type ActiveScenario, type ReplayObserver } from "./replay.ts";
 import { dealtLoadoutSchema, parseActive } from "./save.ts";
 import { completedRounds, scoreOf, type ScenarioScore } from "./score.ts";
-import { resumeFrom, staleReason, type Resumed } from "./session.ts";
+import { continueFrom, resumeFrom, type Continued, type Resumed } from "./session.ts";
 import { buildStart } from "./start.ts";
-import type { World } from "./world.ts";
+import { dealtCodes, worldHash, type World } from "./world.ts";
 
 // What the standalone briefing chose: the scenario, the difficulty, each seat's deck as it was dealt (so editing a deck
 // later does not move a game in progress) and the Ring-bearer slot. Play again picks the same decks by id, as they are now.
@@ -37,7 +38,7 @@ const resultSchema = z.discriminatedUnion("outcome", [
 ]);
 
 // One standalone game: one deal of one scenario. `active` is the open game (the seed and the intents, never the table);
-// `result` is set when it ends. With neither, the open game was dropped (another engine version or card data).
+// `result` is set when it ends. With neither, the open game was dropped (it did not read at all).
 export type StandaloneGame = {
   id: string;
   campaignId: string;
@@ -49,14 +50,21 @@ export type StandaloneGame = {
   result: StandaloneResult | null;
 };
 
-// A game as the lists show it: the open game is its engine version and data hash, never its intents (a list row does not parse a long game).
-export type ListedStandalone = Omit<StandaloneGame, "active"> & { active: Pick<ActiveScenario, "engineVersion" | "dataHash"> | null };
+// A game as the lists show it: the open game is its engine version, data hash and world, never its intents (a list row does not parse a long game).
+// `needsChoice` is set by the store's list (needsChoiceBeforeOpen) on an open game that will ask for a choice when it opens: the row is as it was stored.
+export type ListedStandalone = Omit<StandaloneGame, "active"> & { active: Pick<ActiveScenario, "engineVersion" | "dataHash" | "world"> | null; needsChoice?: true };
 
-export type StandaloneStatus = "playing" | "won" | "lost" | "dropped";
+export type StandaloneStatus = "playing" | "needsChoice" | "won" | "lost" | "dropped";
 
 export function standaloneStatus(game: ListedStandalone): StandaloneStatus {
   if (game.result) return game.result.outcome;
-  return game.active && game.loadout ? "playing" : "dropped";
+  if (!game.active || !game.loadout) return "dropped";
+  return game.needsChoice ? "needsChoice" : "playing";
+}
+
+// Whether the game is still open: playing, or waiting for the player to continue it or restart it.
+export function isOpenStatus(status: StandaloneStatus): boolean {
+  return status === "playing" || status === "needsChoice";
 }
 
 export function parseStandaloneLoadout(value: unknown): StandaloneLoadout | null {
@@ -116,18 +124,18 @@ export function standaloneStart(world: World, seatCount: 1 | 2, loadout: Standal
 
 export type StandaloneDeal = { ok: true; game: StandaloneGame } | { ok: false; briefing: StandaloneBriefing };
 
-// Deals a new standalone game with its own id. The caller writes it.
-export function dealStandalone(id: string, world: World, seatCount: 1 | 2, loadout: StandaloneLoadout, seed: number, dataHash: number): StandaloneDeal {
+// Deals a new standalone game with its own id. `startedAt` is when it was dealt, which a run reads as its start. The caller writes it.
+export function dealStandalone(id: string, world: World, seatCount: 1 | 2, loadout: StandaloneLoadout, seed: number, startedAt?: number): StandaloneDeal {
   const { briefing, seats } = plan(inputOf(world, seatCount, loadout));
   if (!briefing.dealable) return { ok: false, briefing };
   const start = startOf(world, seatCount, loadout, seats, seed);
-  return { ok: true, game: { id, campaignId: world.campaign.id, scenarioId: loadout.scenarioId, seatCount, loadout, active: beginActive(start, dataHash), result: null } };
+  return { ok: true, game: { id, campaignId: world.campaign.id, scenarioId: loadout.scenarioId, seatCount, loadout, active: beginActive(start, worldHash(world, dealtCodes(loadout)), startedAt), result: null } };
 }
 
-// Replays the open game. One from another engine version or data hash is not rebuilt; the caller drops it.
-export function resumeStandalone(game: StandaloneGame, world: World, dataHash: number, observe?: ReplayObserver): Resumed {
+// Replays the open game. One from another engine version or data hash is not rebuilt; the table asks for a choice (continueStandalone, restartStandalone).
+export function resumeStandalone(game: StandaloneGame, world: World, observe?: ReplayObserver): Resumed {
   const { loadout } = game;
-  return resumeFrom(game.active, loadout ? (seed) => standaloneStart(world, game.seatCount, loadout, seed) : null, world, dataHash, observe);
+  return resumeFrom(game.active, loadout ? (seed) => standaloneStart(world, game.seatCount, loadout, seed) : null, world, worldHash(world, dealtCodes(loadout)), observe, game.seatCount);
 }
 
 // Drops the open game and keeps the row, its loadout and any result.
@@ -135,10 +143,16 @@ export function dropStandalone(game: StandaloneGame): StandaloneGame {
   return { ...game, active: null };
 }
 
-// The game with its open game dropped when that was played on another engine version or against other data; null when
-// nothing needs dropping.
-export function droppedIfStale<G extends ListedStandalone>(game: G, dataHash: number): (Omit<G, "active"> & { active: null }) | null {
-  return game.active && staleReason(game.active, dataHash) ? { ...game, active: null } : null;
+// Continue: the open game rebased onto its checkpoint when it has one that passes the check, otherwise replayed on the current rules as far as its intents
+// are accepted, stamped with what it now plays on (session.ts, continueFrom). The caller writes the game it gets back.
+export function continueStandalone(game: StandaloneGame, world: World, checkpoint: Checkpoint | null = null): Continued<StandaloneGame> {
+  const { loadout } = game;
+  return continueFrom(game, loadout ? (seed) => standaloneStart(world, game.seatCount, loadout, seed) : null, world, worldHash(world, dealtCodes(loadout)), checkpoint, game.seatCount);
+}
+
+// Restart: deals the same game again with its stored loadout and a new seed. The row, its id and its loadout stay.
+export function restartStandalone(game: StandaloneGame, world: World, seed: number, startedAt?: number): StandaloneDeal | { ok: false; briefing: null } {
+  return game.loadout ? dealStandalone(game.id, world, game.seatCount, game.loadout, seed, startedAt) : { ok: false, briefing: null };
 }
 
 // Ends the open game. A loss records the reason and the rounds completed; a win records its score. With no campaign card

@@ -11,7 +11,6 @@ import {
   deleteStandalone,
   listArchivedStandalone,
   listStandalone,
-  listStandaloneFresh,
   newStandaloneId,
   readStandalone,
   restoreStandalone,
@@ -36,27 +35,26 @@ function gameOf(id: string, overrides: Partial<StandaloneGame> = {}): Standalone
     scenarioId: "a-shadow-of-the-past",
     seatCount: 1,
     loadout: { scenarioId: "a-shadow-of-the-past", difficulty: "Normal", seats: [{ deckId: "d", heroes: ["141002"], deck: ["01040"] }], ringBearer: "141001" },
-    active: { engineVersion: ENGINE_VERSION, dataHash: 7, seed: 3, intents: [{ type: "Keep" }] },
+    active: { engineVersion: ENGINE_VERSION, dataHash: 7, world: null, seed: 3, intents: [{ type: "Keep" }] },
     result: null,
     ...overrides,
   };
 }
 
-// The list row: the open game as its version and hash.
+// The list row: the open game as its version and hash, marked when it will ask for a choice (the fixtures' data hash 7 is not the build's and they have no digests).
 function listing(game: StandaloneGame) {
-  return { ...game, active: game.active && { engineVersion: game.active.engineVersion, dataHash: game.active.dataHash } };
+  return { ...game, active: game.active && { engineVersion: game.active.engineVersion, dataHash: game.active.dataHash, world: game.active.world }, ...(game.active?.dataHash === 7 ? { needsChoice: true } : {}) };
 }
 
 describe("standalone store", () => {
-  it("listStandaloneFresh drops and writes a game played on other data, and leaves a current one", () => {
+  it("listStandalone marks a game played on other data, with no digests to compare, as needing a choice and writes nothing", () => {
     const user = openUser();
     writeStandalone(user, gameOf("game-old"), 1000);
-    writeStandalone(user, gameOf("game-new", { active: { engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, seed: 3, intents: [] } }), 2000);
-    const listed = listStandaloneFresh(user);
-    expect(listed.find((game) => game.id === "game-old")?.active).toBeNull();
-    expect(listed.find((game) => game.id === "game-new")?.active).not.toBeNull();
-    expect(readStandalone(user, "game-old")?.game).toMatchObject({ active: null, loadout: gameOf("game-old").loadout });
-    expect(readStandalone(user, "game-new")?.game.active).not.toBeNull();
+    writeStandalone(user, gameOf("game-new", { active: { engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, world: null, seed: 3, intents: [] } }), 2000);
+    const listed = listStandalone(user);
+    expect(listed.find((game) => game.id === "game-old")).toMatchObject({ needsChoice: true, active: { engineVersion: ENGINE_VERSION, dataHash: 7 } });
+    expect(listed.find((game) => game.id === "game-new")?.needsChoice).toBeUndefined();
+    expect(readStandalone(user, "game-old")?.game).toEqual(gameOf("game-old"));
   });
 
   it("writeStandaloneActive changes only the open game, and a list row carries its version and hash", () => {

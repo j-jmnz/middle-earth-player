@@ -8,7 +8,7 @@ import { campaignRunId, dealtHeroes, runOf, standaloneRunId, type RunRecord } fr
 import type { Save } from "../../campaign/save";
 import type { StandaloneGame } from "../../campaign/standalone";
 import type { World } from "../../campaign/world";
-import { ENGINE_VERSION } from "../../campaign/replay";
+import { ENGINE_VERSION, isContinued } from "../../campaign/replay";
 import type { ScenarioState } from "../../play/store/store";
 import { boxOf } from "./campaign-data";
 import { writeRun } from "./run-store";
@@ -39,6 +39,7 @@ export function recordCampaignRun<TRun>(user: UserDb<TRun>, before: Save, after:
     endedAt: now,
     activeMs: active.activeMs ?? null,
     engineVersion: ENGINE_VERSION,
+    rebased: isContinued(active),
   });
   if (run) writeRun(user, run);
   return run;
@@ -46,7 +47,7 @@ export function recordCampaignRun<TRun>(user: UserDb<TRun>, before: Save, after:
 
 /**
  * Writes the run of a standalone game that ended. Its start is when it was dealt. A finished game has no open scenario left, so the
- * outcome screen passes the foreground ms the table counted (`activeMs`); by default they are read from the game's own scenario.
+ * outcome screen passes the foreground ms the table counted (`activeMs`) whether the game was continued across an update and when it was dealt; by default they are read from the game's own scenario.
  */
 export function recordStandaloneRun<TRun>(
   user: UserDb<TRun>,
@@ -55,6 +56,8 @@ export function recordStandaloneRun<TRun>(
   state: ScenarioState,
   now: number = Date.now(),
   activeMs: number | null = game.active?.activeMs ?? null,
+  rebased: boolean = game.active != null && isContinued(game.active),
+  startedAt: number | null = game.active?.startedAt ?? null,
 ): RunRecord | null {
   const dealt = user.select({ createdAt: standaloneGames.createdAt }).from(standaloneGames).where(eq(standaloneGames.id, game.id)).get();
   const run = runOf({
@@ -67,10 +70,11 @@ export function recordStandaloneRun<TRun>(
     cards: world.cards,
     heroes: dealtHeroes(game.loadout?.seats ?? [], game.loadout?.ringBearer ?? null),
     reward: null,
-    startedAt: dealt?.createdAt ?? null,
+    startedAt: startedAt ?? dealt?.createdAt ?? null,
     endedAt: now,
     activeMs,
     engineVersion: ENGINE_VERSION,
+    rebased,
   });
   if (run) writeRun(user, run);
   return run;

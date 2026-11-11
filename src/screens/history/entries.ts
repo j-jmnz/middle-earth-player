@@ -1,6 +1,6 @@
 // How History words each card (docs/design-system.md, History): a playthrough, a standalone game, as the title, lines, chip and the sentence a screen reader hears. Where a card leads is the view's. Pure.
 import type { RunRecord } from "../../campaign/runs";
-import { standaloneStatus, type ListedStandalone, type StandaloneStatus } from "../../campaign/standalone";
+import { isOpenStatus, standaloneStatus, type ListedStandalone, type StandaloneStatus } from "../../campaign/standalone";
 import { BOXES, boxOf, scenarioName } from "../data/campaign-data";
 import type { LibrarySave } from "./read";
 import { heroesWords, playthroughWords, plural, runDate, runDetail, runLabel } from "./words";
@@ -26,7 +26,7 @@ export type CardState = "live" | "archived";
 export type GameDestination = { to: "table" | "outcome" | "again"; verb: string; word: string };
 
 export function gameDestination(game: ListedStandalone, hasRun: boolean): GameDestination | null {
-  if (standaloneStatus(game) === "playing") return { to: "table", verb: "Resume", word: "Resume" };
+  if (isOpenStatus(standaloneStatus(game))) return { to: "table", verb: "Resume", word: "Resume" };
   if (hasRun) return { to: "outcome", verb: "Outcome of", word: "See the outcome" };
   if (game.loadout) return { to: "again", verb: "Play again", word: "Play again" };
   return null;
@@ -41,6 +41,7 @@ export type CardWords = { title: string; lines: CardLine[]; chip: CardChip | nul
 
 const STATUS_CHIP: Record<StandaloneStatus, CardChip> = {
   playing: { label: "In progress", tone: "neutral" },
+  needsChoice: { label: "Needs a choice", tone: "neutral" },
   won: { label: "Won", tone: "accent" },
   lost: { label: "Lost", tone: "danger" },
   dropped: { label: "Dropped", tone: "faint" },

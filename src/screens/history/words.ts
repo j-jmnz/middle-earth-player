@@ -92,15 +92,20 @@ export function playtimeSpoken(run: RunRecord): string | null {
   return playtime(run, durationSpoken, ", ", "in all");
 }
 
-/** "4 rounds · threat 28 / 33 · Score 41 · Reward: Mendor · played 42 min": how a run went, or null when the store knew none of it. */
+/** "continued after an update": a game finished across an update that changed the rules, continued from a saved table (run.rebased). */
+export function rebasedWords(run: RunRecord): string | null {
+  return run.rebased ? "continued after an update" : null;
+}
+
+/** "4 rounds · threat 28 / 33 · Score 41 · Reward: Mendor · played 42 min · continued after an update": how a run went, or null when the store knew none of it. */
 export function runDetail(run: RunRecord, nameOf: (code: string) => string): string | null {
-  const parts = [courseWords(run), scoreWords(run, nameOf), playtimeWords(run)].filter((part) => part != null);
+  const parts = [courseWords(run), scoreWords(run, nameOf), playtimeWords(run), rebasedWords(run)].filter((part) => part != null);
   return parts.length > 0 ? parts.join(" · ") : null;
 }
 
 /** The one line the screen reader gets for a run. */
 export function runLabel(run: RunRecord, scenario: string, nameOf: (code: string) => string): string {
-  return [scenario, resultWords(run), runDate(run), seatsWords(run, nameOf), courseWords(run), scoreWords(run, nameOf), playtimeSpoken(run)].filter((part) => part != null).join(", ");
+  return [scenario, resultWords(run), runDate(run), seatsWords(run, nameOf), courseWords(run), scoreWords(run, nameOf), playtimeSpoken(run), rebasedWords(run)].filter((part) => part != null).join(", ");
 }
 
 /** The one line an empty library says. */

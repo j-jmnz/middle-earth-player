@@ -39,8 +39,8 @@ export function passageLog(won: MirkwoodFixture): CampaignLog {
   const scenario = loadScenario("passage-through-mirkwood");
   const codes = won.loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck]);
   const world = loadWorld(catalog, campaign, scenario, EFFECTS, codes);
-  const save: Save = { ...newSave("fixture", campaign.id, 2), loadout: won.loadout, active: { engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, seed: won.seed, intents: [...won.intents] } };
-  const resumed = resume(save, world, CATALOG_VERSION);
+  const save: Save = { ...newSave("fixture", campaign.id, 2), loadout: won.loadout, active: { engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, world: null, seed: won.seed, intents: [...won.intents] } };
+  const resumed = resume(save, world);
   if (!resumed.ok) throw new Error(resumed.reason);
   if (!resumed.state.stageCleared || resumed.state.lost) throw new Error("The mirkwood-won fixture does not replay to a win");
   return finish(save, world, resumed.state).log;
@@ -51,8 +51,8 @@ export function anduinWonLog(won: AnduinFixture): CampaignLog {
   const scenario = loadScenario("journey-along-the-anduin");
   const codes = [...won.loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck]), ...logCodes(won.log)];
   const world = loadWorld(catalog, campaign, scenario, EFFECTS, codes);
-  const save: Save = { ...newSave("fixture", campaign.id, 2), log: won.log, loadout: won.loadout, active: { engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, seed: won.seed, intents: [...won.intents] } };
-  const resumed = resume(save, world, CATALOG_VERSION);
+  const save: Save = { ...newSave("fixture", campaign.id, 2), log: won.log, loadout: won.loadout, active: { engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, world: null, seed: won.seed, intents: [...won.intents] } };
+  const resumed = resume(save, world);
   if (!resumed.ok) throw new Error(resumed.reason);
   if (!resumed.state.stageCleared || resumed.state.lost) throw new Error("The anduin-won fixture does not replay to a win");
   return finish(save, world, resumed.state).log;

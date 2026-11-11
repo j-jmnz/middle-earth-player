@@ -11,7 +11,7 @@ import type { SaveLine } from "./save-line";
 const name = (code: string) => `N${code}`;
 
 function run(id: string, overrides: Partial<RunRecord> = {}): RunRecord {
-  return { id, kind: "campaign", refId: "save-a", campaignId: "fellowship-of-the-ring", box: "fellowship-of-the-ring", scenarioId: "a-shadow-of-the-past", result: "won", lossCause: null, seatCount: 1, heroes: [["1", "2"]], rounds: 4, threats: [30], victoryPoints: 0, score: 44, reward: null, startedAt: null, endedAt: Date.UTC(2026, 9, 24, 12), activeMs: null, engineVersion: 6, backfilled: false, ...overrides };
+  return { id, kind: "campaign", refId: "save-a", campaignId: "fellowship-of-the-ring", box: "fellowship-of-the-ring", scenarioId: "a-shadow-of-the-past", result: "won", lossCause: null, seatCount: 1, heroes: [["1", "2"]], rounds: 4, threats: [30], victoryPoints: 0, score: 44, reward: null, startedAt: null, endedAt: Date.UTC(2026, 9, 24, 12), activeMs: null, engineVersion: 6, backfilled: false, rebased: false, ...overrides };
 }
 
 const loadout = { difficulty: "Normal", seats: [{ heroes: ["1", "2"] }] } as unknown as StandaloneLoadout;
@@ -29,7 +29,7 @@ const node = { id: "flight-to-the-ford", number: 3, name: "Flight to the Ford", 
 
 describe("history cards", () => {
   it("leads a game to its table, its outcome, a new deal, or nowhere", () => {
-    expect(gameDestination(game({ active: { engineVersion: 6, dataHash: 1 } }), false)).toMatchObject({ to: "table", word: "Resume" });
+    expect(gameDestination(game({ active: { engineVersion: 6, dataHash: 1, world: null } }), false)).toMatchObject({ to: "table", word: "Resume" });
     expect(gameDestination(game({ result: { outcome: "lost", reason: null, rounds: 3 } }), true)).toMatchObject({ to: "outcome", word: "See the outcome" });
     expect(gameDestination(game(), false)).toMatchObject({ to: "again", word: "Play again" });
     expect(gameDestination(game({ loadout: null }), false)).toBeNull();

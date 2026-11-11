@@ -41,7 +41,7 @@ function openSave(seed: number, startedAt?: number): Save {
   return {
     ...newSave("save-a", "fellowship-of-the-ring", 1),
     loadout: { scenarioId: scenario.id, difficulty: "Normal", seats: [{ deckId: "d", heroes: ["scout"], deck: [] }], ringBearer: RING_BEARER, choices: [], acceptPenalty: false },
-    active: { engineVersion: ENGINE_VERSION, dataHash: 1, seed, intents: [], ...(startedAt == null ? {} : { startedAt }) },
+    active: { engineVersion: ENGINE_VERSION, dataHash: 1, world: null, seed, intents: [], ...(startedAt == null ? {} : { startedAt }) },
   };
 }
 
@@ -138,5 +138,21 @@ describe("the standalone run writer", () => {
     expect(run?.activeMs).toBeNull();
     recordStandaloneRun(user, game, asWorld(), state, 9999);
     expect(listRuns(user)).toHaveLength(1);
+  });
+
+  it("starts the run when the game was last dealt (a Restart), not when the row was first made, and says when it was continued across an update", () => {
+    const user = openUser();
+    const game: StandaloneGame = {
+      id: "game-2",
+      campaignId: "fellowship-of-the-ring",
+      scenarioId: "a-shadow-of-the-past",
+      seatCount: 1,
+      loadout: { scenarioId: "a-shadow-of-the-past", difficulty: "Normal", seats: [{ deckId: "d", heroes: ["scout"], deck: [] }], ringBearer: RING_BEARER },
+      active: { engineVersion: 1, dataHash: 1, world: null, seed: 1, intents: [], startedAt: 7000, continued: true },
+      result: null,
+    };
+    writeStandalone(user, game, 4242);
+    const run = recordStandaloneRun(user, game, asWorld(), play(2), 9000);
+    expect(run).toMatchObject({ startedAt: 7000, rebased: true });
   });
 });

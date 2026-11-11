@@ -3,7 +3,7 @@ import { useCallback, useState } from "react";
 import { View } from "react-native";
 
 import { isPlayable } from "../../../campaign/playable";
-import { standaloneStatus, type ListedStandalone } from "../../../campaign/standalone";
+import { isOpenStatus, standaloneStatus, type ListedStandalone } from "../../../campaign/standalone";
 import { BOXES, boxOf, scenarioName, scenarioOf } from "../../data/campaign-data";
 import { campaignListQueries } from "../../campaign/list";
 import { PillButton, PrimaryButton } from "../../kit/chrome";
@@ -16,7 +16,8 @@ import { comingLater, splitRuns } from "../../campaign/hub-runs";
 import { usePalette } from "../../kit/palette-hook";
 import { seatWord } from "../../data/seats";
 import { gameCaption, statusWord } from "../../history/standalone-words";
-import { listStandaloneFresh } from "../../data/standalone-store";
+import { listStandalone } from "../../data/standalone-store";
+import { STALE_STEP } from "../../session/stale-words";
 import { useUiScale } from "../../../ui/ui-scale";
 import { useSizeClass } from "../../../ui/use-size-class";
 
@@ -36,7 +37,7 @@ export default function Scenarios() {
 
   useFocusEffect(
     useCallback(() => {
-      setGames(listStandaloneFresh(user));
+      setGames(listStandalone(user));
     }, [user]),
   );
 
@@ -48,7 +49,7 @@ export default function Scenarios() {
     router.push({ pathname: "/standalone/table/[gameId]", params: { gameId: game.id } });
   }
 
-  const { hero, others } = splitRuns(games, (game) => standaloneStatus(game) === "playing");
+  const { hero, others } = splitRuns(games, (game) => isOpenStatus(standaloneStatus(game)));
   const seatsOf = (game: ListedStandalone) => game.loadout?.seats.map((seat) => seat.heroes) ?? [];
   const faces = deckFaces(catalog, [hero, ...others].flatMap((game) => (game ? seatsOf(game).flat() : [])));
   const spoken = (game: ListedStandalone) => `${scenarioName(game.scenarioId)}, ${gameCaption(game)}`;
@@ -76,7 +77,7 @@ export default function Scenarios() {
             key={game.id}
             testID={`other-game-${game.id}`}
             title={scenarioName(game.scenarioId)}
-            line={[seatWord(game.seatCount), game.loadout?.difficulty, "On the table"].filter((part) => part != null).join(" · ")}
+            line={[seatWord(game.seatCount), game.loadout?.difficulty, standaloneStatus(game) === "needsChoice" ? STALE_STEP : "On the table"].filter((part) => part != null).join(" · ")}
             heroes={(seatsOf(game)[0] ?? []).map((code) => heroFace(faces, code))}
             accessibilityLabel={`Resume ${spoken(game)}`}
             onPress={() => resume(game)}
@@ -91,6 +92,7 @@ export default function Scenarios() {
     const state = game ? standaloneStatus(game) : null;
     if (game && state === "won") return { line: statusWord(game), tone: palette.ok };
     if (state === "playing") return { line: "In progress", tone: palette.accentHigh };
+    if (state === "needsChoice") return { line: "Needs a choice", tone: palette.accentHigh };
     const stages = scenarioOf(id)?.stages.length ?? 0;
     return { line: stages > 0 ? `${stages} quest ${stages === 1 ? "stage" : "stages"}` : "", tone: palette.faint };
   };
@@ -147,6 +149,6 @@ export default function Scenarios() {
 // "Revised Core Set · Scenario 2 · Normal": the hero's box, the scenario's place in its book and the difficulty it was dealt on.
 function detailOf(game: ListedStandalone): string {
   const box = boxOf(game.scenarioId);
-  const parts = [box?.name, box ? `Scenario ${box.scenarios.indexOf(game.scenarioId) + 1}` : undefined, game.loadout?.difficulty];
+  const parts = [standaloneStatus(game) === "needsChoice" ? STALE_STEP : undefined, box?.name, box ? `Scenario ${box.scenarios.indexOf(game.scenarioId) + 1}` : undefined, game.loadout?.difficulty];
   return parts.filter((part): part is string => part != null).join(" · ");
 }

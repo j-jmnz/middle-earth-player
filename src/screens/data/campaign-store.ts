@@ -1,6 +1,8 @@
 import { asc, desc, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
+import { parseCheckpoint, parseRebase, type Checkpoint } from "../../campaign/checkpoint";
+import { needsChoiceBeforeOpen, type ActiveScenario } from "../../campaign/replay";
 import { parseActive, parseLoadout, parseLog, parseSeatCount, newSave, type NewSaveOptions, type Save } from "../../campaign/save";
 import { booklets, saves, type StoredJson } from "./user-schema";
 
@@ -11,6 +13,20 @@ type UserDb<TRun> = BaseSQLiteDatabase<"sync", TRun>;
 // on the write, so no copy is made here: this only changes the type.
 export function stored(value: unknown): StoredJson {
   return value as StoredJson;
+}
+
+// The open scenario as the `active_scenario` column holds it: without its rebase, which has a column of its own (user-schema.ts), so the write of an intent stays the size it is.
+export function activeJson(active: ActiveScenario): StoredJson {
+  if (!active.from) return stored(active);
+  const { from: _from, ...rest } = active;
+  return stored(rest);
+}
+
+// The rebase column as a game's base, or null for none. A column that holds something that does not read is `unreadable`.
+export function rebaseOf(value: unknown): { from: ActiveScenario["from"]; unreadable: boolean } {
+  if (value == null) return { from: undefined, unreadable: false };
+  const from = parseRebase(value);
+  return { from: from ?? undefined, unreadable: from == null };
 }
 
 // A save as read, and whether an open scenario was stored but did not read, so the player is told it is gone.
@@ -25,6 +41,9 @@ function parseRow(row: typeof saves.$inferSelect): ReadSave {
   try {
     active = parseActive(row.activeScenario);
     loadout = parseLoadout(row.loadout);
+    const rebase = rebaseOf(row.rebase);
+    if (rebase.unreadable) throw new Error("The rebase does not read");
+    if (active && rebase.from) active = { ...active, from: rebase.from };
   } catch {
     active = null;
     loadout = null;
@@ -38,10 +57,11 @@ function parseRow(row: typeof saves.$inferSelect): ReadSave {
   return { save: { id: row.id, campaignId: row.campaignId, seatCount: parseSeatCount(row.seatCount), log, active, loadout }, unreadable };
 }
 
-// A save as the lists show it: the open scenario is whether one is stored, never its intents (a long game is not parsed to draw a row).
-export type ListedSave = Omit<Save, "active"> & { active: boolean };
+// A save as the lists show it: the open scenario is whether one is stored, never its intents (a long game is not parsed to draw a row). `needsChoice` is set on
+// an open scenario that will ask to be continued or restarted when it opens, as far as a list can tell (needsChoiceBeforeOpen).
+export type ListedSave = Omit<Save, "active"> & { active: boolean; needsChoice?: true };
 
-// The columns a list row reads. The open scenario is only tested for, so its json is neither read nor parsed.
+// The columns a list row reads. The open scenario is only tested for, and read as its engine version, data hash, world stamp and the lengths of its intents and checks, so its json is not parsed.
 const listed = {
   id: saves.id,
   campaignId: saves.campaignId,
@@ -49,9 +69,16 @@ const listed = {
   log: saves.log,
   loadout: saves.loadout,
   hasActive: sql<number>`${saves.activeScenario} is not null`,
+  engineVersion: sql<number | null>`json_extract(${saves.activeScenario}, '$.engineVersion')`,
+  dataHash: sql<number | null>`json_extract(${saves.activeScenario}, '$.dataHash')`,
+  world: sql<number | null>`json_extract(${saves.activeScenario}, '$.world')`,
+  intents: sql<number | null>`json_array_length(${saves.activeScenario}, '$.intents')`,
+  checks: sql<number | null>`json_array_length(${saves.activeScenario}, '$.checks')`,
 };
 
-function listedRow(row: { id: string; campaignId: string; seatCount: number; log: unknown; loadout: unknown; hasActive: number }): ListedSave {
+type ListRow = { id: string; campaignId: string; seatCount: number; log: unknown; loadout: unknown; hasActive: number; engineVersion: number | null; dataHash: number | null; world: number | null; intents: number | null; checks: number | null };
+
+function listedRow(row: ListRow): ListedSave {
   const log = parseLog(row.log);
   let loadout = null;
   try {
@@ -61,7 +88,8 @@ function listedRow(row: { id: string; campaignId: string; seatCount: number; log
   }
   // As parseRow: the loadout reads only with an open scenario, and an open scenario only with a loadout that reads.
   const open = row.hasActive === 1 && loadout != null;
-  return { id: row.id, campaignId: row.campaignId, seatCount: parseSeatCount(row.seatCount), log, active: open, loadout: open ? loadout : null };
+  const waiting = open && typeof row.engineVersion === "number" && typeof row.dataHash === "number" && needsChoiceBeforeOpen({ engineVersion: row.engineVersion, dataHash: row.dataHash, world: typeof row.world === "number" ? row.world : null }, row.intents ?? 0, row.checks);
+  return { id: row.id, campaignId: row.campaignId, seatCount: parseSeatCount(row.seatCount), log, active: open, loadout: open ? loadout : null, ...(waiting ? { needsChoice: true as const } : {}) };
 }
 
 // The open playthroughs, the one written last first; rows never written since 0003 follow in the order they were made. An
@@ -90,18 +118,24 @@ export function readSaveChecked<TRun>(user: UserDb<TRun>, id: string): ReadSave 
   return row ? parseRow(row) : null;
 }
 
-export function writeSave<TRun>(user: UserDb<TRun>, save: Save, now: number = Date.now()): void {
-  const values = {
+// The columns writeSave writes. A save with no open scenario has no checkpoint either; one with an open scenario keeps its checkpoint (a deal drops it: writeDealt).
+function saveValues(save: Save, now: number) {
+  return {
+    ...(save.active ? {} : { checkpoint: null }),
+    rebase: save.active?.from ? stored(save.active.from) : null,
     id: save.id,
     campaignId: save.campaignId,
     seatCount: save.seatCount,
     log: stored(save.log),
     // The pool is the log's pool; the column is kept for the sheet's reader and written from the same value.
     pool: stored(save.log.campaignPool),
-    activeScenario: save.active ? stored(save.active) : null,
+    activeScenario: save.active ? activeJson(save.active) : null,
     loadout: save.loadout ? stored(save.loadout) : null,
     updatedAt: now,
   };
+}
+
+function upsertSave<TRun>(user: UserDb<TRun>, values: ReturnType<typeof saveValues>): void {
   user
     .insert(saves)
     .values(values)
@@ -109,14 +143,59 @@ export function writeSave<TRun>(user: UserDb<TRun>, save: Save, now: number = Da
     .run();
 }
 
+export function writeSave<TRun>(user: UserDb<TRun>, save: Save, now: number = Date.now()): void {
+  upsertSave(user, saveValues(save, now));
+}
+
+// A deal's save: the same write as writeSave, with the checkpoint of the game it replaces cleared in the same statement (a fixed seed or time cannot match it to the new game).
+export function writeDealt<TRun>(user: UserDb<TRun>, save: Save, now: number = Date.now()): void {
+  upsertSave(user, { ...saveValues(save, now), checkpoint: null });
+}
+
 // An intent or an Undo changes only the open scenario, so only it (and the time) is written: the log, the pool and the loadout
 // are not serialized again. The same values writeSave would write for these two columns. Nothing is inserted: the row exists.
 export function writeActive<TRun>(user: UserDb<TRun>, save: Pick<Save, "id" | "active">, now: number = Date.now()): void {
   user
     .update(saves)
-    .set({ activeScenario: save.active ? stored(save.active) : null, updatedAt: now })
+    .set({ activeScenario: save.active ? activeJson(save.active) : null, updatedAt: now })
     .where(eq(saves.id, save.id))
     .run();
+}
+
+// The open scenario replaced whole: Continue (rebased or cut back) and Restart. Its rebase is written with it and the checkpoint is cleared, since the
+// intents it counted are not these. One statement, so a kill leaves the old game or the new one.
+export function writeReplaced<TRun>(user: UserDb<TRun>, save: Pick<Save, "id" | "active">, now: number = Date.now()): void {
+  user
+    .update(saves)
+    .set({ activeScenario: save.active ? activeJson(save.active) : null, rebase: save.active?.from ? stored(save.active.from) : null, checkpoint: null, updatedAt: now })
+    .where(eq(saves.id, save.id))
+    .run();
+}
+
+// The checkpoint of the open scenario (src/campaign/checkpoint.ts), written at a phase boundary and on a pause; null clears it. Only that column is written.
+export function writeCheckpoint<TRun>(user: UserDb<TRun>, id: string, checkpoint: Checkpoint | null): void {
+  user.update(saves).set({ checkpoint: checkpoint ? stored(checkpoint) : null }).where(eq(saves.id, id)).run();
+}
+
+// An Undo: the open scenario without its last intent, and the checkpoint cleared when it counted more intents than the game has now (it is behind the game, so a
+// different move cannot meet it again). One statement, so a kill leaves the game and its checkpoint as they were or as they are.
+export function writeUndone<TRun>(user: UserDb<TRun>, save: Pick<Save, "id" | "active">, now: number = Date.now()): void {
+  const intents = save.active?.intents.length ?? 0;
+  user
+    .update(saves)
+    .set({
+      activeScenario: save.active ? activeJson(save.active) : null,
+      checkpoint: sql`case when json_extract(${saves.checkpoint}, '$.intentCount') > ${intents} then null else ${saves.checkpoint} end`,
+      updatedAt: now,
+    })
+    .where(eq(saves.id, save.id))
+    .run();
+}
+
+/** The checkpoint stored for the open scenario, or null when there is none or it does not read. */
+export function readCheckpoint<TRun>(user: UserDb<TRun>, id: string): Checkpoint | null {
+  const row = user.select({ checkpoint: saves.checkpoint }).from(saves).where(eq(saves.id, id)).get();
+  return row ? parseCheckpoint(row.checkpoint) : null;
 }
 
 // Archiving keeps the whole row: the log, the open scenario and the loadout come back as they were on restore.

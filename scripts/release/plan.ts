@@ -1,13 +1,14 @@
 import { execFileSync } from "node:child_process";
-import { appendFileSync, createReadStream, readFileSync, writeFileSync } from "node:fs";
+import { appendFileSync, createReadStream, existsSync, readdirSync, readFileSync, writeFileSync } from "node:fs";
 import { createHash } from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { CATALOG_VERSION } from "../../src/catalog/version.ts";
-import { ENGINE_VERSION } from "../../src/rules/engine/version.ts";
+import { ENGINE_CHANGES, ENGINE_VERSION } from "../../src/rules/engine/version.ts";
 import { runScript, type Log } from "../log.ts";
 import { renderNotes } from "./notes.ts";
+import { reachedScenarios, type GoldenChecks } from "./reach.ts";
 import { BUMP_REQUESTS, branchProblem, nextVersion, parseCommit, parseTag, tagOf, type BumpRequest, type Change } from "./version.ts";
 
 // Plans a release from git: the next tag and its notes (.claude/rules/release-standards.md; docs/releasing.md says how the
@@ -71,6 +72,29 @@ function engineVersionAt(tag: string): number | undefined {
   return match ? Number(match[1]) : undefined;
 }
 
+const SCENARIOS = "src/campaign/scenarios";
+
+function checksOf(json: string): GoldenChecks {
+  return (JSON.parse(json) as { name: string; checks?: number[] }[]).map(({ name, checks }) => ({ name, checks }));
+}
+
+/** The checks each scenario's golden.json pins, at a tag or (no tag) in this checkout. */
+function goldenChecks(tag: string | undefined): Map<string, GoldenChecks> {
+  const out = new Map<string, GoldenChecks>();
+  for (const id of readdirSync(path.join(ROOT, SCENARIOS))) {
+    const file = `${SCENARIOS}/${id}/golden.json`;
+    const json = tag ? tryGit(["show", `${tag}:${file}`]) : existsSync(path.join(ROOT, file)) ? readFileSync(path.join(ROOT, file), "utf8") : undefined;
+    if (json) out.set(id, checksOf(json));
+  }
+  return out;
+}
+
+/** A scenario as players read it in the notes: its name without the campaign suffix. */
+function scenarioName(id: string): string {
+  const data = JSON.parse(readFileSync(path.join(ROOT, "data", "scenarios", `${id}.json`), "utf8")) as { name: string };
+  return data.name.replace(/ \(Campaign\)$/, "");
+}
+
 function repository(): string {
   if (process.env.GITHUB_REPOSITORY) return process.env.GITHUB_REPOSITORY;
   const pkg = JSON.parse(readFileSync(path.join(ROOT, "package.json"), "utf8")) as { repository?: { url?: string } };
@@ -83,6 +107,12 @@ async function fileSha256(file: string): Promise<string> {
   const hash = createHash("sha256");
   for await (const chunk of createReadStream(file)) hash.update(chunk as Buffer);
   return hash.digest("hex");
+}
+
+/** The scenarios whose open games this release can reach: golden checks that changed since the previous tag, and ENGINE_CHANGES lines after its engine version (reach.ts). */
+function reach(previous: string): { all: boolean; names: string[] } {
+  const found = reachedScenarios({ previousEngineVersion: engineVersionAt(previous), engineChanges: ENGINE_CHANGES, previous: goldenChecks(previous), current: goldenChecks(undefined) });
+  return { all: found.all, names: found.scenarios.map(scenarioName) };
 }
 
 async function main(log: Log): Promise<void> {
@@ -118,7 +148,7 @@ async function main(log: Log): Promise<void> {
     repository: repository(),
     catalogVersion: CATALOG_VERSION,
     engineVersion: ENGINE_VERSION,
-    previousEngineVersion: previous ? engineVersionAt(previous) : undefined,
+    reach: previous ? reach(previous) : undefined,
     apk,
     ipa,
     testflightUrl: process.env.TESTFLIGHT_URL || undefined,

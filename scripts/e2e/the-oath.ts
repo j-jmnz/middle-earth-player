@@ -33,8 +33,8 @@ export function oathWonLog(won: OathFixture): CampaignLog {
   const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
   const codes = [...won.loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck]), ...ADAPTATIONS];
   const world = loadWorld(catalog, loadCampaign(won.campaignId), scenario, EFFECTS, codes);
-  const save: Save = { ...newSave("fixture", won.campaignId, 2), loadout: won.loadout, active: { engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, seed: won.seed, intents: [...won.intents] } };
-  const resumed = resume(save, world, CATALOG_VERSION);
+  const save: Save = { ...newSave("fixture", won.campaignId, 2), loadout: won.loadout, active: { engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, world: null, seed: won.seed, intents: [...won.intents] } };
+  const resumed = resume(save, world);
   if (!resumed.ok) throw new Error(resumed.reason);
   if (!resumed.state.stageCleared || resumed.state.lost) throw new Error("The oath-won fixture does not replay to a win");
   return finish(save, world, resumed.state).log;
