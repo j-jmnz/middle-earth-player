@@ -32,6 +32,7 @@ import * as hai from "../scenarios/the-uruk-hai/game.ts";
 import * as deep from "../scenarios/helms-deep/game.ts";
 import * as isengard from "../scenarios/the-road-to-isengard/game.ts";
 import * as marshes from "../scenarios/the-passage-of-the-marshes/game.ts";
+// import * as roads from "../scenarios/journey-to-the-cross-roads/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -89,4 +90,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("helms-deep", "Helm's Deep", deep.DEEP_GOLDENS, deep.deepWorld, deep.playGolden),
   entry("the-road-to-isengard", "The Road to Isengard", isengard.ISENGARD_GOLDENS, isengard.isengardWorld, isengard.playGolden),
   entry("the-passage-of-the-marshes", "The Passage of the Marshes", marshes.MARSHES_GOLDENS, marshes.marshesWorld, marshes.playGolden),
+  // entry("journey-to-the-cross-roads", "Journey to the Cross-roads", roads.ROADS_GOLDENS, roads.roadsWorld, roads.playGolden),
 ];
