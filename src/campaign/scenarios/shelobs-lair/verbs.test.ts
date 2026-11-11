@@ -8,11 +8,14 @@ import { settle } from "../../../rules/engine/machine.ts";
 import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { placeProgress } from "../../../rules/interpret/effect-verbs.ts";
-import { travelCostUnpayable } from "../../../rules/interpret/restrictions.ts";
+import { restricted, travelCostUnpayable } from "../../../rules/interpret/restrictions.ts";
 import { ruleCause } from "../../../rules/core/cause.ts";
 import { placeDamage } from "../../../rules/core/keywords.ts";
+import { definePrinted } from "../../../rules/core/printed.ts";
+import { questRoom } from "../../../rules/families/caves/progress.ts";
+import { putOnStage } from "../../../rules/quest/quest.ts";
 import { pileOf } from "../../../rules/core/piles.ts";
-import { flagged, updateCard, withSeat, type ScenarioState } from "../../../rules/core/state.ts";
+import { flagged, updateCard, withMode, withSeat, type ScenarioState } from "../../../rules/core/state.ts";
 import { moveCard } from "../../../rules/core/zones.ts";
 import { entriesBarred, noteEntries } from "../../../rules/families/sea/entries.ts";
 import { fightEnemy, finish, idOf, legalIntents, resolveRecords, send, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
@@ -103,6 +106,23 @@ describe("Travel costs that may not be payable", () => {
     const made = table({ staging: ["144045", SHELOB] });
     const run = resolveRecords(made.state, made.ctx, "144045", "travel", idOf(made.state, "144045"));
     expect(run.state.cards[idOf(run.state, SHELOB)]?.resources).toBe(1);
+  });
+
+  it("144049:A:2 (Den of Night, the same cost as Cleft) cannot be paid while Shelob is out of play, and can once she is in the staging area", () => {
+    const out = table({ staging: ["144049"] });
+    expect(travelCostUnpayable(out.state, out.ctx, idOf(out.state, "144049"))).toBe(true);
+    const staged = table({ staging: ["144049", SHELOB] });
+    expect(travelCostUnpayable(staged.state, staged.ctx, idOf(staged.state, "144049"))).toBe(false);
+  });
+
+  it("144048:A:2 (Deep Dark Passage) cannot be paid without a ready Sméagol in play, and can with one", () => {
+    const absent = table({ staging: ["144048"] });
+    expect(travelCostUnpayable(absent.state, absent.ctx, idOf(absent.state, "144048"))).toBe(true);
+    const ready = table({ staging: ["144048"], play: [SMEAGOL] });
+    const way = idOf(ready.state, "144048");
+    expect(travelCostUnpayable(ready.state, ready.ctx, way)).toBe(false);
+    const tired = updateCard(ready.state, idOf(ready.state, SMEAGOL), { exhausted: true });
+    expect(travelCostUnpayable(tired, ready.ctx, way)).toBe(true);
   });
 
   it("144044:A:2 can be paid by exhausting a ready Sméagol, or by every hand holding a card, and by neither when he is exhausted and a hand is empty", () => {
@@ -230,5 +250,53 @@ describe("a Response to the exploring of a location that every hand pays for", (
 
   it("144070:B:2 is not offered while some hand holds fewer than 3 cards", () => {
     expect(explored(2).intent).toBeUndefined();
+  });
+});
+
+describe("an Action that needs a Weapon, a cap on the quest's progress and a stage that cannot be defeated", () => {
+  // The attachment stand-in is a Weapon here (the scenario deals none); it lies on the first hero.
+  const armed = (weapon: boolean) => {
+    const made = table({ stage: "144072", staging: ["144059"], attached: [{ code: "attachment", to: "dh1" }] });
+    if (weapon) made.cards.set("attachment", definePrinted({ code: "attachment", name: "attachment", type: "attachment", sphere: "neutral", cost: 0, traits: ["Weapon"] }));
+    return made;
+  };
+  const offered = (made: ReturnType<typeof table>): boolean => legalIntents(made.state, made.ctx).some((intent) => intent.type === "Trigger" && intent.cardId === idOf(made.state, "144059"));
+
+  it("144059:A:2 is offered while a ready character the player controls carries a Weapon, and places 3 progress on Blocked Tunnel for exhausting it", () => {
+    const made = armed(true);
+    expect(offered(made)).toBe(true);
+    const run = finish(send({ state: made.state, steps: [] }, legalIntents(made.state, made.ctx).find((intent) => intent.type === "Trigger" && intent.cardId === idOf(made.state, "144059")) as PlayerIntent, made.ctx), made.ctx);
+    expect(run.state.cards[idOf(run.state, "144059")]?.progress).toBe(3);
+    expect(run.state.cards[idOf(run.state, "dh1")]?.exhausted).toBe(true);
+  });
+
+  it("144059:A:2 is not offered when no character carries a Weapon, or the one that does is exhausted", () => {
+    expect(offered(armed(false))).toBe(false);
+    const made = armed(true);
+    const tired = updateCard(made.state, idOf(made.state, "dh1"), { exhausted: true });
+    expect(offered({ ...made, state: tired })).toBe(false);
+  });
+
+  it("144071:B:3 holds the quest card to 4 progress for the round, however the progress comes, and the count starts again the next round", () => {
+    const made = table({ stage: "144071" });
+    const stage = idOf(made.state, "144071");
+    expect(questRoom(made.state)).toBe(4);
+    const placed = putOnStage(made.state, stage, 3, 16, made.ctx.cards, [], () => true, ruleCause("rr.step-3-4"), true);
+    expect(placed.cards[stage]?.progress).toBe(3);
+    expect(questRoom(placed)).toBe(1);
+    expect(placed.modifiers.find((modifier) => modifier.stat === "questProgressPlaced")?.until).toBe("endOfRound");
+    const next = withMode({ ...placed, mode: "refresh", phase: "Refresh" }, "beginRound");
+    expect(questRoom(next)).toBe(4);
+  });
+
+  it("144072:B:3 bars defeating the stage until both Shelob and Gollum are in the victory display", () => {
+    const rule = (layout: Layout) => {
+      const made = table({ stage: "144072", ...layout });
+      return restricted(made.state, made.ctx, "advance").length;
+    };
+    expect(rule({})).toBe(1);
+    expect(rule({ victory: [SHELOB] })).toBe(1);
+    expect(rule({ victory: [GOLLUM] })).toBe(1);
+    expect(rule({ victory: [SHELOB, GOLLUM] })).toBe(0);
   });
 });

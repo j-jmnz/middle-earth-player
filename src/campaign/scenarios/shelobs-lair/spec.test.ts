@@ -1,12 +1,32 @@
 // Rules: mec112.setup-shelobs-lair, mec112.saga-staging-rules, rr.shadow-effects, rr.step-6-4-2, rr.damage, rr.attachment-cards, rr.victory (data/rules/entries.json).
 import { describe, it } from "vitest";
 
-import { announce, answer, attack, cardSpecs, damageOn, endPhase, exhausted, flag, handCount, resolve, resourcesOn, reveal, stagingThreat, threat, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, attackersOf, cardSpecs, damageOn, deckCount, defend, endPhase, exhausted, flag, handCount, resolve, resourcesOn, reveal, stagingThreat, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Shelob's Lair (the-two-towers part 6): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/handover/agent-brief.md, Scenario procedure, Finish).
 const ROWS: readonly Row[] = [
-  // The behaviours the engine half's new vocabulary rests on; the Finish task writes the rest of the rows.
+  { line: "144040:A:2", name: "+1 Threat for each resource on her", layout: { staging: [{ code: "144040", resources: 2 }] }, act: [], expect: stagingThreat(6) },
+  { line: "144040:A:3", name: "or she makes an immediate attack against the first player", layout: { staging: ["144040"] }, act: [announce("beginningOfPhase", "144040"), answer("attack"), endPhase], expect: damageOn("dh1", 4) },
+  { line: "144041:A:2", name: "When Revealed: the revealing player discards 1 random card from their hand", layout: { hand: ["filler", "filler"] }, act: [reveal("144041"), answer("discard")], expect: handCount(1) },
+  { line: "144041:A:2", name: "or reveals an additional encounter card", layout: { hand: ["filler"], deck: ["f0"] }, act: [reveal("144041"), answer("reveal")], expect: zone("f0", "staging") },
+  { line: "144041:A:3", name: "Shadow: when the attack destroys a character, the defending player discards 1 random card", layout: { hand: ["filler", "filler"], play: ["ally"] }, act: [attack("144040", { shadow: "144041" }), defend("ally")], expect: handCount(1) },
+  { line: "144042:A:2", name: "When Revealed: each player discards 1 random card from their hand", layout: { seats: 2, hand: ["filler", "filler"] }, act: [reveal("144042"), answer("discard")], expect: [handCount(1, 0), handCount(1, 1)] },
+  { line: "144042:A:2", name: "or the Orc attacks the revealing player", layout: { hand: ["filler"] }, act: [reveal("144042"), answer("attack"), endPhase], expect: damageOn("dh1", 4) },
+  { line: "144046:A:2", name: "after it becomes the active location Shelob makes an immediate attack against the first player", layout: { active: "144046", staging: ["144040"] }, act: [announce("becameActive", "144046"), endPhase], expect: damageOn("dh1", 4) },
+  { line: "144047:A:1", name: "while in the staging area each Orc enemy gets -5 engagement cost", layout: { staging: ["144047", "144042"] }, act: [], expect: stat("144042", "engagementCost", 35) },
+  { line: "144047:A:1", name: "and after an Orc engages a player it is dealt a shadow card", layout: { staging: ["144047"], engaged: [{ code: "144042", seat: 0 }], deck: ["f0", "f0"] }, act: announce("engaged", "144042"), expect: deckCount(1) },
+  { line: "144049:A:2", name: "Travel: place 1 resource on Shelob", layout: { phase: "Travel", staging: ["144049", "144040"] }, act: travel("144049"), expect: resourcesOn("144040", 1) },
+  { line: "144050:A:2", name: "Shadow: the defending player discards a non-objective attachment they control", layout: { attached: [{ code: "attachment", to: "dh1" }] }, act: attack("f3", { shadow: "144050", undefended: true }), expect: zone("attachment", "discard") },
+  { line: "144051:A:2", name: "Shadow: the attacking enemy gets +X Attack, X the active location's Threat", layout: { active: "144043" }, act: attack("f3", { shadow: "144051", undefended: true }), expect: damageOn("dh1", 5) },
+  { line: "144061:A:2", name: "When Revealed: the revealing player places 1 resource on Shelob", layout: { staging: ["144040"], deck: ["f0", "f0"] }, act: [reveal("144061"), answer("place")], expect: resourcesOn("144040", 1) },
+  { line: "144061:A:2", name: "or Shelob attacks the revealing player", layout: { staging: ["144040"], deck: ["f0", "f0"] }, act: [reveal("144061"), answer("attack"), endPhase], expect: damageOn("dh1", 4) },
+  { line: "144061:A:3", name: "Shadow: with Shelob attacking, 1 resource goes on her and she gets +1 Attack for each resource on her", layout: {}, act: attack("144040", { shadow: "144061", undefended: true }), expect: [resourcesOn("144040", 1), damageOn("dh1", 5)] },
+  { line: "144062:A:1", name: "When Revealed: Shelob gets +2 Attack and attacks the player (6 damage destroys a hero of 6 hit points)", layout: { staging: ["144040"] }, act: [reveal("144062"), endPhase], expect: zone("dh1", "discard") },
+  { line: "144062:A:2", name: "Shadow: with Shelob attacking she makes an additional attack against the defending player", layout: {}, act: attack("144040", { shadow: "144062", undefended: true }), expect: attackersOf("dh1", ["144040", "144040"]) },
+  { line: "144070:A:1", name: "Setup: Sméagol enters play under the first player's control", layout: { stage: "144070", setAside: ["144076"] }, act: resolve("144070", "setup"), expect: zone("144076", "play") },
+  { line: "144070:B:1", name: "no progress can be placed on an Underground location", layout: { stage: "144070", staging: ["144046", "144044"] }, act: [], expect: [flag("144046", "noProgressPlaced"), flag("144044", "noProgressPlaced", false)] },
+  { line: "144071:B:1", name: "Shelob cannot leave the staging area and Sméagol cannot attack or defend", layout: { stage: "144071", staging: ["144040"], play: ["144076"] }, act: [], expect: [flag("144040", "cannotLeaveStaging"), flag("144076", "cannotAttack"), flag("144076", "cannotDefend")] },
   { line: "144047:A:2", name: "Shadow: the attacking enemy is dealt 2 additional shadow cards, which resolve in this attack", layout: { deck: ["144055", "144055"] }, act: attack("f0", { shadow: "144047", undefended: true }), expect: damageOn("dh1", 3) },
   { line: "144045:A:2", name: "while it is in the victory display Shelob loses Indestructible and is engaged with the first player", layout: { victory: ["144045"], staging: ["144040"] }, act: [], expect: [flag("144040", "losesKeywords"), flag("144040", "engagedWithFirst")] },
   { line: "144072:B:2", name: "while Shelob has a resource she holds the damage shield", layout: { stage: "144072", staging: [{ code: "144040", resources: 1 }] }, act: [], expect: flag("144040", "resourceCancel") },

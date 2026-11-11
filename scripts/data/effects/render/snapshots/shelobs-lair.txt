@@ -249,6 +249,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
   144060:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - [json AttachesTo {"verb":"AttachesTo","host":{"kind":"hero"},"limitPerHost":true}]
     - its host: stat blankText (its text box is blank) 1, while this card is in play
     - its host: stat cannotReady 1, while this card is in play
 
@@ -369,4 +370,4 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
     only if any of: ([json condition {"kind":"inVictory","code":"144040","is":false}]) or ([json condition {"kind":"inVictory","code":"144075","is":false}])
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 226 by template, 25 as JSON)
+(rendered pieces: 226 by template, 26 as JSON)

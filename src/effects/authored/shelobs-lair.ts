@@ -283,7 +283,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       cardCode: "144060",
       lines: ["144060:A:1"],
       timing: "constant",
-      instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Condition" }, { verb: "ModifyStat", stat: "blankText", amount: 1, until: "whileSourceInPlay", target: "host" }, { verb: "ModifyStat", stat: "cannotReady", amount: 1, until: "whileSourceInPlay", target: "host" }],
+      instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Condition" }, { verb: "AttachesTo", host: { kind: "hero" }, limitPerHost: true }, { verb: "ModifyStat", stat: "blankText", amount: 1, until: "whileSourceInPlay", target: "host" }, { verb: "ModifyStat", stat: "cannotReady", amount: 1, until: "whileSourceInPlay", target: "host" }],
     },
     { id: "144060:shadow:1", cardCode: "144060", lines: ["144060:A:2"], timing: "shadow", instructions: [{ verb: "ResolveWhenRevealed", card: "self", when: SHELOB_IS_ATTACKER }] },
 
