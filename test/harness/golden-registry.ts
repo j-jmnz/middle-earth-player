@@ -34,6 +34,7 @@ import * as isengard from "../scenarios/the-road-to-isengard/game.ts";
 import * as marshes from "../scenarios/the-passage-of-the-marshes/game.ts";
 import * as roads from "../scenarios/journey-to-the-cross-roads/game.ts";
 import * as lair from "../scenarios/shelobs-lair/game.ts";
+// import * as company from "../scenarios/the-passing-of-the-grey-company/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -93,4 +94,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-passage-of-the-marshes", "The Passage of the Marshes", marshes.MARSHES_GOLDENS, marshes.marshesWorld, marshes.playGolden),
   entry("journey-to-the-cross-roads", "Journey to the Cross-roads", roads.ROADS_GOLDENS, roads.roadsWorld, roads.playGolden),
   entry("shelobs-lair", "Shelob's Lair", lair.LAIR_GOLDENS, lair.lairWorld, lair.playGolden),
+  // entry("the-passing-of-the-grey-company", "The Passing of the Grey Company", company.COMPANY_GOLDENS, company.companyWorld, company.playGolden),
 ];
