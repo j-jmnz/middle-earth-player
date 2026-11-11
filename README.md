@@ -39,7 +39,7 @@ CI must pass tests, lint, type check and data check before anything lands. Engin
 
 ## Features
 
-- Official campaigns, from the revised, repackaged products (RCO), in release order: Mirkwood Paths (Revised Core Set and The Dark of Mirkwood), The Dark of Mirkwood, The Fellowship of the Ring (The Fellowship of the Ring Saga Expansion, MEC109), Dream-chaser (Dream-chaser Campaign Expansion), The Two Towers (The Two Towers Saga Expansion, MEC112) and Ered Mithrin (Ered Mithrin Campaign Expansion). Each scenario also plays standalone; some have Nightmare mode.
+- Official campaigns, from the revised, repackaged products (RCO), in release order with the saga boxes together: Mirkwood Paths (Revised Core Set and The Dark of Mirkwood), The Dark of Mirkwood, The Fellowship of the Ring (The Fellowship of the Ring Saga Expansion, MEC109), The Two Towers (The Two Towers Saga Expansion, MEC112), Dream-chaser (Dream-chaser Campaign Expansion) and Ered Mithrin (Ered Mithrin Campaign Expansion). Each scenario also plays standalone; some have Nightmare mode.
 - The engine applies all rules and card effects and computes every number. You pick from the legal moves it lists.
 - True solo (one seat) or two-handed (two seats, one device). No online multiplayer.
 - Deck builder with the full player-card pool and the pre-built decks; campaign log, run history and rules reference.
@@ -52,10 +52,10 @@ Every official campaign and scenario, then the fan-made content from [A Long-ext
 
 Next:
 
-- The Two Towers campaign (RCO, The Two Towers Saga Expansion): Shelob's Lair.
-- The Return of the King campaign (RCO, The Return of the King Saga Expansion): The Passing of the Grey Company, The Siege of Gondor, The Battle of the Pelennor Fields, The Tower of Cirith Ungol, The Black Gate Opens, Mount Doom.
+- The Two Towers campaign (The Two Towers Saga Expansion): Shelob's Lair.
+- The Return of the King campaign (The Return of the King Saga Expansion): The Passing of the Grey Company, The Siege of Gondor, The Battle of the Pelennor Fields, The Tower of Cirith Ungol, The Black Gate Opens, Mount Doom.
 
-Then the other official campaign, and the cycles: the groupings of scenarios that are part of no campaign, which play standalone only. Each waits under Coming later until one of its scenarios is playable (`data/overrides.json`, campaigns). In release order (the US release of the product that starts each, `released`), as the app lists them:
+Then the other official campaign, and the cycles: the groupings of scenarios that are part of no campaign, which play standalone only. Each waits under Coming later until one of its scenarios is playable (`data/overrides.json`, campaigns). In release order (the US release of the product that starts each), as the app lists them:
 
 - The Shadows of Mirkwood cycle: The Hunt for Gollum, Conflict at the Carrock, A Journey to Rhosgobel, The Hills of Emyn Muil, The Dead Marshes, Return to Mirkwood.
 - The Standalone scenarios cycle: The Massing at Osgiliath, The Battle of Lake-town, The Stone of Erech, The Old Forest, Fog on the Barrow-downs, The Ruins of Belegost, Murder at the Prancing Pony, The Siege of Annúminas, Attack on Dol Guldur, The Wizard's Quest, The Woodland Realm, The Mines of Moria, Escape from Khazad-dûm, The Hunt for the Dreadnaught.
@@ -65,7 +65,7 @@ Then the other official campaign, and the cycles: the groupings of scenarios tha
 - The Ring-maker cycle: The Fords of Isen, To Catch an Orc, Into Fangorn, The Dunland Trap, The Three Trials, Trouble in Tharbad, The Nîn-in-Eilph, Celebrimbor's Secret, The Antlered Crown.
 - The Haradrim cycle: Escape from Umbar, Desert Crossing, The Long Arm of Mordor, The Mûmakil, Race Across Harad, Beneath the Sands, The Black Serpent, The Dungeons of Cirith Gurat, The Crossings of Poros.
 - The Vengeance of Mordor cycle: The River Running, Danger in Dorwinion, The Temple of Doom, Wrath and Ruin, The City of Ulfast, Challenge of the Wainriders, Under the Ash Mountains, The Land of Sorrow, The Fortress of Nurn.
-- The Angmar Awakened campaign (RCO, Angmar Awakened Campaign Expansion): Intruders in Chetwood, The Weather Hills, Deadmen's Dike, The Wastes of Eriador, Escape from Mount Gram, Across the Ettenmoors, The Treachery of Rhudaur, The Battle of Carn Dûm, The Dread Realm.
+- The Angmar Awakened campaign (Angmar Awakened Campaign Expansion): Intruders in Chetwood, The Weather Hills, Deadmen's Dike, The Wastes of Eriador, Escape from Mount Gram, Across the Ettenmoors, The Treachery of Rhudaur, The Battle of Carn Dûm, The Dread Realm.
 
 Then ALeP.
 

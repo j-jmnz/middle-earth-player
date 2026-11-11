@@ -2,7 +2,8 @@ import { describe, expect, it } from "vitest";
 
 import type { NextStep, PathNode } from "../../campaign/path.ts";
 import type { Box } from "../data/campaign-data.ts";
-import { comingScenarios, nextLabel, splitRuns } from "./hub-runs.ts";
+import { comingLater, comingScenarios, nextLabel, splitRuns } from "./hub-runs.ts";
+import type { CampaignRow } from "./list.ts";
 
 const node = (number: number, status: PathNode["status"] = "current"): PathNode => ({ id: `s${number}`, number, name: `Scenario ${number}`, status, reward: [], score: null });
 
@@ -45,8 +46,8 @@ describe("splitRuns", () => {
 
 describe("comingScenarios", () => {
   const boxes: Box[] = [
-    { id: "one", name: "Box One", rco: true, campaignId: "one", scenarios: ["a", "b", "c"] },
-    { id: "two", name: "Box Two", rco: false, campaignId: "two", scenarios: ["d", "e"] },
+    { id: "one", name: "Box One", campaignId: "one", scenarios: ["a", "b", "c"] },
+    { id: "two", name: "Box Two", campaignId: "two", scenarios: ["d", "e"] },
   ];
   const nameOf = (id: string) => `Name of ${id}`;
 
@@ -84,5 +85,22 @@ describe("nextLabel", () => {
 
   it("says every scenario is won when none is left", () => {
     expect(nextLabel({ kind: "finished" }, path)).toBe("Campaign won");
+  });
+});
+
+describe("comingLater", () => {
+  const boxes: Box[] = [
+    { id: "saga-1", name: "Saga One", campaignId: "one", scenarios: ["a"] },
+    { id: "saga-2", name: "Saga Two Expansion", campaignId: "two", scenarios: ["b", "c"] },
+    { id: "loose", name: "Loose", campaignId: "none", scenarios: ["d"] },
+  ];
+  const row = (id: string, playable: boolean, kind: CampaignRow["kind"] = "campaign", box: string | null = null): CampaignRow => ({ id, name: `Name ${id}`, scenarioCount: 3, playable, kind, box });
+  const rows = [row("cycle", false, "cycle"), row("one", true), row("two", true), row("three", false, "campaign", "Saga Three Expansion"), row("later", false, "cycle")];
+
+  it("puts a box's waiting scenarios at its campaign's place, so a saga's last scenario sits beside the next saga box", () => {
+    const tiles = comingLater(boxes, rows, (id) => id === "a" || id === "b", (id) => `Scenario ${id}`);
+    expect(tiles.map((tile) => tile.id)).toEqual(["cycle", "c", "three", "later", "d"]);
+    expect(tiles.find((tile) => tile.id === "three")).toEqual({ id: "three", name: "Saga Three Expansion", caption: "3 scenarios \u00b7 Coming soon" });
+    expect(tiles[0]?.caption).toBe("Cycle \u00b7 3 scenarios \u00b7 Coming soon");
   });
 });

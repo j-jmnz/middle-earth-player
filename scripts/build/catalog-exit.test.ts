@@ -123,9 +123,11 @@ describe("built catalog", () => {
       expect(database.prepare("select campaign_id from cards where code = ?").get("12019")?.campaign_id).toBe("dream-chaser");
       // Ered Mithrin: built and listed locked (phase 50 registers it), its cards tagged with it, a treasure carrying its campaign kind and no deck legality.
       expect(database.prepare("select name, scenario_count, playable from campaigns where id = ?").get("ered-mithrin")).toMatchObject({ name: "Ered Mithrin", scenario_count: 9, playable: 1 });
+      // The Return of the King follows The Two Towers, at the Fellowship's place (`position`).
+      expect((database.prepare("select id from campaigns order by position").all() as { id: string }[]).map((row) => row.id).slice(11, 14)).toEqual(["fellowship-of-the-ring", "the-two-towers", "the-return-of-the-king"]);
       // A campaign the Campaigns tab lists, under its RCO box, and a cycle (part of no campaign) that only the Scenarios tab lists, both locked.
-      expect(database.prepare("select kind, rco, box, playable from campaigns where id = ?").get("angmar-awakened")).toMatchObject({ kind: "campaign", rco: 1, box: "Angmar Awakened Campaign Expansion", playable: 0 });
-      expect(database.prepare("select kind, rco, box, scenario_count, playable from campaigns where id = ?").get("dwarrowdelf")).toMatchObject({ kind: "cycle", rco: 0, box: null, scenario_count: 9, playable: 0 });
+      expect(database.prepare("select kind, box, playable from campaigns where id = ?").get("angmar-awakened")).toMatchObject({ kind: "campaign", box: "Angmar Awakened Campaign Expansion", playable: 0 });
+      expect(database.prepare("select kind, box, scenario_count, playable from campaigns where id = ?").get("dwarrowdelf")).toMatchObject({ kind: "cycle", box: null, scenario_count: 9, playable: 0 });
       for (const code of ["12168", "120165", "18020", "19099", "12204"]) expect(database.prepare("select campaign_id from cards where code = ?").get(code)?.campaign_id, code).toBe("ered-mithrin");
       expect(database.prepare("select name, type_code, campaign_kind, deck_legal from cards where code = ?").get("12204")).toMatchObject({ name: "Masterwork Bow", type_code: "treasure", campaign_kind: "treasure", deck_legal: 0 });
       expect(database.prepare("select imagesrc from cards where code = ?").get("141031")?.imagesrc).toBe(

@@ -159,13 +159,14 @@ export const campaignIndexSchema = z.array(
     // "campaign": played in Campaign Mode, listed on the Campaigns tab. "cycle": a grouping of scenarios that is part of no
     // campaign, listed only on the Scenarios tab.
     kind: z.enum(["campaign", "cycle"]),
-    // Played from the revised, repackaged products (RCO), which the hubs tag "RCO".
-    rco: z.boolean(),
     // The RCO product a locked campaign is printed in ("The Return of the King Saga Expansion"), the name the Scenarios tab gives
     // its tile; null for a built campaign (the Scenarios tab names its boxes, src/screens/data/campaign-data.ts) and for a cycle.
     box: z.string().min(1).nullable(),
-    // The US release of the product that starts it (YYYY-MM-DD), the order the hubs list campaigns and cycles in.
+    // The US release of the product that starts it (YYYY-MM-DD).
     released: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+    // The order every list shows the entries in, from 1: by release, the three Lord of the Rings saga boxes together in book order
+    // at the Fellowship's release (scripts/data/normalize/campaigns.ts).
+    position: z.number().int().positive(),
   }),
 );
 export type CampaignIndexEntry = z.infer<typeof campaignIndexSchema>[number];

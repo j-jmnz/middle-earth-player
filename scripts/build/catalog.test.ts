@@ -42,9 +42,9 @@ function workspace(): Workspace {
   writeFileSync(path.join(dataDir, "raw", "ringsdb", "packs.json"), JSON.stringify(PACKS));
   mkdirSync(path.join(dataDir, "campaigns"), { recursive: true });
   writeFileSync(path.join(dataDir, "campaigns", "index.json"), JSON.stringify([
-    { id: "fellowship-of-the-ring", name: "Fellowship of the Ring", scenarioCount: 6, playable: true, kind: "campaign", rco: true, box: null, released: "2022-01-28" },
-    { id: "mirkwood-paths", name: "Mirkwood Paths", scenarioCount: 5, playable: false, kind: "campaign", rco: true, box: null, released: "2022-01-28" },
-    { id: "the-dark-of-mirkwood", name: "The Dark of Mirkwood", scenarioCount: 2, playable: false, kind: "campaign", rco: true, box: null, released: "2022-01-28" },
+    { id: "fellowship-of-the-ring", name: "Fellowship of the Ring", scenarioCount: 6, playable: true, kind: "campaign", box: null, released: "2022-01-28", position: 1 },
+    { id: "mirkwood-paths", name: "Mirkwood Paths", scenarioCount: 5, playable: false, kind: "campaign", box: null, released: "2022-01-28", position: 2 },
+    { id: "the-dark-of-mirkwood", name: "The Dark of Mirkwood", scenarioCount: 2, playable: false, kind: "campaign", box: null, released: "2022-01-28", position: 3 },
   ]));
   writeFileSync(path.join(dataDir, "sources.json"), JSON.stringify({ sources: { ringsdb: { fetchedAt: "2026-10-24T10:00:00.000Z" } } }));
   return { dataDir, dbPath: path.join(root, "catalog.db"), versionPath: path.join(root, "version.ts") };
