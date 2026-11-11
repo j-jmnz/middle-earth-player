@@ -6,7 +6,7 @@ import type { PrintedCard } from "../core/printed.ts";
 import type { ScenarioState } from "../core/state.ts";
 import type { AmountScope } from "./amounts.ts";
 import type { Scope } from "./conditions.ts";
-import type { PlayHow, RulesFamily, SettleHook, SettleHooks, TravelCharge } from "./family-manifest.ts";
+import type { PlayHow, QuestTotals, RulesFamily, SettleHook, SettleHooks, TravelCharge } from "./family-manifest.ts";
 import type { ReduceContext } from "./interpret.ts";
 import type { PickContext } from "./pick.ts";
 
@@ -59,6 +59,7 @@ type Hooked = {
   readonly attached: readonly RulesFamily[];
   readonly combat: readonly RulesFamily[];
   readonly optionalEngage: readonly RulesFamily[];
+  readonly questResult: readonly RulesFamily[];
 };
 const hookedBy = new WeakMap<readonly RulesFamily[], Hooked>();
 
@@ -80,6 +81,7 @@ function hooked(families: readonly RulesFamily[]): Hooked {
       attached: families.filter((family) => family.attached != null),
       combat: families.filter((family) => family.combat != null),
       optionalEngage: families.filter((family) => family.optionalEngage != null),
+      questResult: families.filter((family) => family.questResult != null),
     };
     hookedBy.set(families, found);
   }
@@ -245,4 +247,13 @@ export function familyUndefendedTargets(state: ScenarioState, candidates: () => 
     if (found && found.length > 0) return found;
   }
   return NONE;
+}
+
+/** The state a family leaves when it places the progress or the threat of a resolved quest itself (the Defense keyword), or null when none does and the core resolves it (the first family's answer). */
+export function familyQuestResult(state: ScenarioState, totals: QuestTotals, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[], canAdvance: (state: ScenarioState) => boolean, families: readonly RulesFamily[] = active()): ScenarioState | null {
+  for (const family of hooked(families).questResult) {
+    const next = family.questResult?.(state, totals, cards, steps, canAdvance);
+    if (next) return next;
+  }
+  return null;
 }

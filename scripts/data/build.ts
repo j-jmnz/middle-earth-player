@@ -14,6 +14,7 @@ import { applyPrinted } from "./normalize/printed.ts";
 import { buildCampaignIndex } from "./normalize/campaigns.ts";
 import { buildScenarios } from "./normalize/scenarios.ts";
 import { loadPrebuiltDecks } from "./prebuilt-decks.ts";
+import { loadTestDecks } from "./test-decks.ts";
 import { loadStarterDecks } from "./starter-decks.ts";
 import { loadLedger, verifyScans } from "./printed/ledger.ts";
 import { withPool } from "./printed/pool.ts";
@@ -112,6 +113,9 @@ export function build(outDir = process.env.DATA_OUT ?? DATA_DIR, log: Log = buil
   writeFileSync(path.join(outDir, "decks", "prebuilt.json"), `${JSON.stringify(prebuilt, null, 2)}\n`);
   log.info(`pre-built decks: ${prebuilt.length}`);
   log.debug(`  ${prebuilt.map((deck) => deck.id).join(", ")}`);
+  // The RingsDB decklists the fixture games play (data/decks/test-decks.json), kept apart from the pre-built decks.
+  const testDecks = log.step("test decks", () => loadTestDecks(cards));
+  writeFileSync(path.join(outDir, "decks", "test-decks.json"), `${JSON.stringify(testDecks, null, 2)}\n`);
   const campaignIndex = buildCampaignIndex(raw, overrides, built.campaigns);
   writeFileSync(path.join(campaignDir, "index.json"), `${JSON.stringify(campaignIndex, null, 2)}\n`);
   const effectsDir = process.env.EFFECTS_OUT ?? path.join(ROOT, "src", "effects", "generated");

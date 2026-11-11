@@ -16,7 +16,7 @@ import { eventStep, fireForced } from "./triggers.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { resetEncounterDeck, shuffleEncounterDeck } from "../interpret/verbs.ts";
 import { attachTo, moveCard } from "../core/zones.ts";
-import { announceEntered, noteEncounterThreat, revealSeat, revealsAllowed, watchReveal } from "../families/encounter/reveal.ts";
+import { announceEntered, noteEncounterThreat, revealSeat, revealSkipped, revealsAllowed, spendSkippedReveal, watchReveal } from "../families/encounter/reveal.ts";
 import { discardsAfterReveal } from "../families/sidequests/encounter.ts";
 import { engageWith } from "../quest/quest.ts";
 import { stagingDest } from "../families/breaking/areas.ts";
@@ -114,6 +114,9 @@ export function stagingStep(state: ScenarioState, ctx: ReduceContext, steps: Eng
   }
   const advanced: ScenarioState = { ...state, revealCursor: { seats: cursor.seats, index: cursor.index + 1 } };
   if (advanced.seats[seat]?.eliminated) return advanced;
+  // A player who reveals fewer cards this phase skips this reveal (RevealFewer `who: picked`).
+  const skipped = state.modifiers.length > 0 ? revealSkipped(state, seat) : null;
+  if (skipped) return spendSkippedReveal(advanced, skipped);
   return startReveal(advanced, seat, ctx, steps);
 }
 

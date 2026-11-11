@@ -3,7 +3,7 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { livingSeats, withSeat } from "../../core/state.ts";
+import { eliminateSeat } from "../../core/eliminate.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import { flipCard } from "./contract.ts";
 import { attachLoot, buildLootDeck } from "./loot.ts";
@@ -16,7 +16,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   void ctx;
   switch (instruction.verb) {
     case "EliminatePlayer":
-      return eliminate(state, focus.seat, steps);
+      // "A player is eliminated from the game if ... a card effect forces their elimination" (rr.player-elimination).
+      return eliminateSeat(state, focus.seat, steps);
     // "Setup: Attach to a hero in play." run by the Setup search (setup/search.ts), where nobody can be asked: the card found in a
     // player's deck goes on the first hero of that player that has no copy of it (effect frames attach an encounter card themselves).
     case "AttachSelf":
@@ -46,17 +47,6 @@ function attachSetupCard(state: ScenarioState, focus: Focus): ScenarioState {
   const host = (state.seats[focus.seat]?.heroes ?? []).find((id) => !(state.cards[id]?.attachments ?? []).some((other) => state.cards[other]?.code === source.code));
   if (!host) return state;
   return attachTo(moveCard(state, source.id, { zone: "play", seat: focus.seat }), source.id, host);
-}
-
-// "A player is eliminated from the game if ... a card effect forces their elimination" (rr.player-elimination): the seat leaves
-// the game, and settle puts its cards in their owners' discard piles and returns its enemies to the staging area (clearEliminated).
-// With no player left, the game is lost.
-function eliminate(state: ScenarioState, seatIndex: number, steps: EngineStep[]): ScenarioState {
-  const seat = state.seats[seatIndex];
-  if (!seat || seat.eliminated) return state;
-  steps.push({ kind: "eliminate", seat: seatIndex });
-  const next = withSeat(state, seatIndex, { ...seat, eliminated: true });
-  return livingSeats(next).length === 0 && !next.lost ? { ...next, lost: true, lossReason: "No seats remain" } : next;
 }
 
 export const manifest: RulesFamily = { name: "sidequests", verbs: ["EliminatePlayer", "AttachSelf", "ShuffleSetAsideIntoEncounterDeck", "FlipCard", "BuildLootDeck", "AttachLoot", "TakeRevealedCard", "RemoveFromCampaignPool"], run };

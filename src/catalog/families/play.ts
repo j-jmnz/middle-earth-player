@@ -52,6 +52,8 @@ const VERBS = [
     from: z.enum(["actor", "picked", "any"]).optional(),
     upTo: z.number().int().positive().optional(),
     anyController: z.boolean().optional(),
+    // The choice is not optional ("Each player chooses 1 ally in his hand ... and puts it into play", 143072:B:1): the chooser may not stop while a card matches; with none that matches nothing enters play.
+    required: z.literal(true).optional(),
     card: z.string().optional(),
     ...temporary,
     ...when,

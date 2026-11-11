@@ -103,7 +103,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
   switch (condition.kind) {
     // A family's condition hook answers these before this switch (south: noneDiscarded; wilderland: the campaign log, the Caves deck, the quest deck, Discover, the Fate of Wilderland's); the cases only complete the switch.
     case "noneDiscarded": case "logged": case "treasuresLogged": case "beldisBox": case "cavesDeck": case "questDeck": case "soleAttacker": case "captives":
-    case "attackedThisPhase": case "namedFlag": case "discoverUnavailable":
+    case "attackedThisPhase": case "namedFlag": case "discoverUnavailable": case "encounterPlacedOnStage": case "playerUnengaged": case "hasWizardry":
       return false;
     case "hideFailed":
       return state.hideFailures.some(
@@ -266,7 +266,9 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       if (condition.inStaging != null && (card.zone === "staging") !== condition.inStaging) return false;
       // "While attached enemy is engaged with you": an enemy filter's `engaged` is read against the actor here too.
       if (condition.pick?.type === "enemy" && condition.pick.engaged && !engagedAs(card, condition.pick.engaged, scope.actor)) return false;
-      return condition.pick == null || matchesPick(state, id, condition.pick, { seat: scope.actor, sourceId: null, counting: true }, ctx);
+      // `isSource` (the fortress family's pick hook, 143036:A:2) reads the scope's source; every other filter reads none.
+      const sourceId = condition.pick?.isSource ? scope.sourceId : null;
+      return condition.pick == null || matchesPick(state, id, condition.pick, { seat: scope.actor, sourceId, counting: true }, ctx);
     }
     case "copiesPlayedThisRound": {
       const code = scope.sourceId ? state.cards[scope.sourceId]?.code : undefined;

@@ -53,7 +53,7 @@ const VERBS = [
   // an encounter-backed burden misses the encounter deck and, with `playerDecks`, one a player shuffles into their deck (a burden that functions like a player card) misses that deck too.
   z.strictObject({ verb: z.literal("RemoveBurdenSets"), sets: z.array(z.string().min(1)).min(1), playerDecks: z.literal(true).optional() }),
   // Campaign Setup: each player shuffles one copy of the card into their own deck ("Each player shuffles 1 copy of The Searching Eye into his deck", 144067:A:2). The copy is dealt for this
-  // game only: nothing joins the pool until a Resolution earns one.
+  // game only: nothing joins the pool until a Resolution earns one. Only in a Campaign Setup record; a scenario's Setup that shuffles a copy in uses `ShuffleCopyIntoEachDeck` (burden family).
   z.strictObject({ verb: z.literal("ShuffleIntoEachDeck"), code }),
   // Campaign Setup: each player in turn chooses either to shuffle one copy of the card into their deck or to add `resources` resources to each of their heroes' pools ("either add 1 resource to
   // each of his heroes' pools, or shuffle 1 copy of Brace of Coneys into his deck", 144069:A:2). A copy is recorded as chosen at Setup (ScenarioState.chosenAtSetup), so the Resolution's EarnDealt earns it.

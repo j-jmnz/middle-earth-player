@@ -76,6 +76,13 @@ export type CombatHooks = {
 /** Whether a family bars a seat from optionally engaging an enemy in the staging area (rr.optional-engagement): true bars it. Asked after the core's own bars, with the cards the game plays. */
 export type OptionalEngageHook = (state: ScenarioState, enemyId: string, seat: number, cards: ReadonlyMap<string, PrintedCard>) => boolean;
 
+/** What quest resolution measured (src/rules/quest/quest.ts resolveQuest): the committed Willpower and the total Threat in the staging area, and the seat when stages are separate. */
+export type QuestTotals = { readonly willpower: number; readonly threat: number; readonly only?: number };
+
+/** How a family changes what questing does with the totals (rr.step-3-4): returns the state it leaves when the family places the progress or the threat itself, or null to leave both to the core.
+ * `canAdvance` is the core's gate on advancing; the first family with an answer wins. */
+export type QuestResultHook = (state: ScenarioState, totals: QuestTotals, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[], canAdvance: (state: ScenarioState) => boolean) => ScenarioState | null;
+
 export type RulesFamily = {
   /** The folder name, which is also the catalog file name in src/catalog/families. */
   readonly name: string;
@@ -94,4 +101,5 @@ export type RulesFamily = {
   readonly playReason?: PlayReasonHook;
   readonly revealed?: RevealHook;
   readonly optionalEngage?: OptionalEngageHook;
+  readonly questResult?: QuestResultHook;
 };

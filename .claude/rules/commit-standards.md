@@ -24,6 +24,12 @@ Every session, agent and contributor that commits follows these (user instructio
 - A change that loses something a player saved or removes a feature or setting carries a `Breaking: <what players lose>` line, written for players: it makes the next release a major one and heads its notes (`.claude/rules/release-standards.md`, Versioning).
 - End with the attribution lines the session's instructions give, if any.
 
+## Checkpoints
+
+- Commit and push often (user instruction, 2026-11-10). An agent that writes code, records, tests or docs commits a typed checkpoint and pushes it to the session's work branch after each step that leaves `pnpm lint`, `pnpm typecheck` and its quick tests green: a verb with its test, a batch of records, the goldens, a fix. `feat: Helm's Deep Defense keyword, checkpoint`.
+- A checkpoint follows these standards like any commit, holds no file that must not be committed (a scan, a PDF, `catalog.db`, a scratch script), and never moves another scenario's golden or fixture. The orchestrator still checks each task's whole diff before its own commit (`.claude/agents/orchestrator.md`, After each task).
+- Push with `git push -u origin <branch>` to the branch the session's harness or brief names, never to `main`.
+
 ## Squash
 
 - Every branch lands on `main` as one squash commit. No merge commits and no rebased stacks on `main`.

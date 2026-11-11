@@ -9,6 +9,7 @@ import { isPlayerType, printedOf } from "../core/printed.ts";
 import { syncConstants } from "../interpret/constants.ts";
 import { pushDue } from "./delayed.ts";
 import { effectCause } from "../core/cause.ts";
+import { announceAbility } from "../families/deck/pressure.ts";
 import { limitSpent, noteForcedUse } from "../player/usage.ts";
 import { pushEffectFrame } from "../interpret/effect-frames.ts";
 import { offerResponses } from "./responses.ts";
@@ -63,13 +64,14 @@ function collect(state: ScenarioState, event: GameEvent, ctx: ReduceContext, tim
 function pushFound(state: ScenarioState, found: readonly Found[], event: GameEvent, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let next = state;
   for (const { effect, instance } of [...found].reverse()) {
-    next = noteForcedUse(next, effect, instance.id, forcedActor(state, instance, event, ctx));
+    const actor = forcedActor(state, instance, event, ctx);
+    next = announceAbility(noteForcedUse(next, effect, instance.id, actor), instance.id, actor, ctx);
     next = pushEffectFrame(
       next,
       {
         frame: "forced",
         sourceId: instance.id,
-        actor: forcedActor(state, instance, event, ctx),
+        actor,
         eventSeat: event.seat,
         ...(aboutCard(event) ? { subject: aboutCard(event) } : {}),
         ...(event.other ? { other: event.other } : {}),

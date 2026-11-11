@@ -14,6 +14,7 @@ import { queueEvent } from "../../windows/queue.ts";
 import type { CardInstance, PendingStrike, ScenarioState } from "../../core/state.ts";
 import { flagged, inPlay } from "../../core/state.ts";
 import { heard } from "./events.ts";
+import { playerSource } from "../quest/threat.ts";
 
 type Attacking = Extract<Condition, { kind: "attacking" }>;
 
@@ -78,12 +79,12 @@ export function struck(
   const strike = before.pendingStrike?.enemyId === enemyId ? before.pendingStrike : undefined;
   if (destroyed && strike?.excessTo && next.cards[strike.excessTo]) {
     const remaining = Math.max(0, modifiedStat(before, was, "hitPoints", ctx.cards) - was.damage);
-    const excess = placedAmount(printedOf(ctx.cards, was.code), raw) - remaining;
+    const excess = placedAmount(before, enemyId, printedOf(ctx.cards, was.code), raw) - remaining;
     if (excess > 0) next = placeDamage(next, strike.excessTo, excess, ctx.cards, steps, "combat", ruleCause("rr.step-6-8-3"));
   }
   const about = { seat, other: enemyId, participants: attackerIds };
   // The damage the attack dealt is the event's amount, and so the Response's X ("a Dwarf deals X damage", 04105:A:1).
-  const dealt = destroyed ? placedAmount(printedOf(ctx.cards, was.code), raw) : (now?.damage ?? 0) - was.damage;
+  const dealt = destroyed ? placedAmount(before, enemyId, printedOf(ctx.cards, was.code), raw) : (now?.damage ?? 0) - was.damage;
   if (hurt && heard(next, ctx, "attackDamaged")) for (const attackerId of attackerIds) next = queueEvent(next, { trigger: "attackDamaged", cardId: attackerId, amount: dealt, ...about });
   if (!destroyed) return next;
   for (const attackerId of attackerIds) next = queueEvent(next, { trigger: "attackDestroyed", seat, cardId: attackerId, subject: enemyId, other: enemyId, participants: attackerIds });
@@ -93,7 +94,7 @@ export function struck(
   }
   for (const modifier of next.modifiers.filter((entry) => entry.stat === "drawOnAttackDestroy" && entry.instanceId === `seat:${seat}`)) {
     const cause = sourceCause(next, modifier.sourceId, ctx);
-    next = drawMany(next, seat, modifier.amount, steps, cause, ctx);
+    next = drawMany(next, seat, modifier.amount, steps, cause, ctx, false, playerSource(next, modifier.sourceId, ctx));
   }
   return next;
 }

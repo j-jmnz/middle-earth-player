@@ -1,5 +1,4 @@
-// The Maestro fixtures of The King's Quest (ered-mithrin part 3), written into src/campaign/fixtures/the-kings-quest.json by scripts/e2e/fixtures.ts: real games of saved decklists (the Defenders of
-// Gondor and Swords of the Noldor lists of data/decks/prebuilt.json), two-handed, Easy, so each is a real save. `kingsquest-won` is the first seed that wins, parked on the win (the Resolution waits); `kingsquest-lost` the first
+// The Maestro fixtures of The King's Quest (ered-mithrin part 3), written into src/campaign/fixtures/the-kings-quest.json by scripts/e2e/fixtures.ts: real games of saved decklists (The One Deck and the Defenders of Gondor lists of data/decks/test-decks.json and data/decks/prebuilt.json), two-handed, Easy, so each is a real save. `kingsquest-won` is the first seed that wins, parked on the win (the Resolution waits); `kingsquest-lost` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.
 // The Campaign Setup asks nothing of a log without Turayn's oath line (the log is the two-handed wins of parts 1 and 2 that put the allies in the pool); the Resolution asks the first player two questions, whether Isolde joins the pool

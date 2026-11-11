@@ -1,5 +1,5 @@
 // The Maestro fixtures of Escape from Dol Guldur (Mirkwood Paths part 3), written into src/campaign/fixtures/escape-from-dol-guldur.json by
-// scripts/e2e/fixtures.ts: two real games of saved decklists (the Dwarves of Durin and Elves of Lórien lists of data/decks/prebuilt.json), two-handed,
+// scripts/e2e/fixtures.ts: two real games of saved decklists (The One Deck and the Elves of Lórien lists of data/decks/test-decks.json and data/decks/prebuilt.json), two-handed,
 // Easy, from the log the `anduin-won` game writes when it is confirmed (scripts/e2e/journey-along-the-anduin.ts): its prisoner, its pool. That win is open (no fixture,
 // docs/phases/STATUS.md), and nothing here builds a log by hand, so no fixture of this scenario is written until `anduin-won` exists. Played by the auto-player,
 // every intent one the reducer listed.

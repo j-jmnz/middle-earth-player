@@ -21,6 +21,7 @@ import { placeQuestingProgress } from "../families/defense/damage.ts";
 import { travelsOverActive } from "../families/grapple/travel.ts";
 import { freeSlot, makeActiveIn, placeOnActive } from "../families/south/locations.ts";
 import { noteQuestPlaced, questRoom } from "../families/caves/progress.ts";
+import { noteQuestPhase, overflowWaits } from "../families/wizardry/progress.ts";
 import { branchFrom, reached as reachedStage } from "../families/quest/branch.ts";
 import { randomStageFrom } from "../families/wilderland/random-stage.ts";
 import { viewOf, withView } from "../families/breaking/areas.ts";
@@ -29,7 +30,7 @@ import { arrivalFace, orderedNext, stageToVictory } from "../families/quest/orde
 import { caughtUp } from "../families/stormcaller/values.ts";
 import { islandTravelTo } from "../families/island/travel.ts";
 import { hasSideQuests, placeOnCurrentSideQuest } from "../families/wilderland/night-quest.ts";
-import { familyOptionalEngageBarred } from "../interpret/family-hooks.ts";
+import { familyOptionalEngageBarred, familyQuestResult } from "../interpret/family-hooks.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
 
@@ -147,13 +148,17 @@ export function resolveQuest(
   // The game has a card whose record answers a failed quest with an X amount (gameReadsOnTrigger): the event carries the shortfall for it.
   stampAmount = false,
 ): ScenarioState {
+  const started = steps.length;
   const willpower = committedWillpower(state, cards, only);
   const threat = stagingThreat(state, cards, only);
   steps.push({ kind: "quest", willpower, threat, cause: ruleCause("rr.step-3-4") });
   // The seats that hear it: the one that quested, or every living seat.
   const hearing = only == null ? livingSeats(state) : [only];
   let next = state;
-  if (willpower < threat) {
+  // A family that places the progress or the threat itself (the Defense keyword, families/fortress) answers first; the core resolves the quest otherwise.
+  const family = familyQuestResult(state, { willpower, threat, ...(only != null ? { only } : {}) }, cards, steps, canAdvance);
+  if (family) next = family;
+  else if (willpower < threat) {
     // Learn to Play p12-13: every player's threat dial goes up by the difference. An eliminated seat has no dial.
     next = failQuest(next, threat - willpower, steps, hearing, raise);
   } else if (willpower > threat) {
@@ -166,7 +171,8 @@ export function resolveQuest(
     const stamped = willpower < threat && stampAmount;
     for (const seat of hearing) next = queueEvent(next, { trigger: willpower > threat ? "questSucceeded" : "questFailed", seat, ...(stamped ? { amount: threat - willpower } : {}) });
   }
-  const ready = withView(next, only, (view) => advanceReady(view, cards, steps, canAdvance));
+  // A full stage whose progress an explored location's Forced effect may cancel advances once it has resolved (advanceFreed; families/wizardry/progress.ts).
+  const ready = overflowWaits(next, steps, started, cards) ? next : withView(next, only, (view) => advanceReady(view, cards, steps, canAdvance));
   return only == null ? clearCommitted(ready) : ready;
 }
 
@@ -191,6 +197,7 @@ export function placeQuestProgress(
   // Progress from questing successfully (rr.step-3-4): a location that may take it before the quest does (families/attachments/quest.ts).
   questing = false,
 ): ScenarioState {
+  const started = steps.length;
   // The active locations take it first (rr.active-location); stage 4 of The Ring Goes South has two (families/south/locations.ts).
   const placedOn = placeOnActive(state, amount, cards, steps);
   let next = placedOn.state;
@@ -219,7 +226,10 @@ export function placeQuestProgress(
     // A card in play may limit the progress the quest card takes this round, or stop it (families/caves/progress.ts).
     remaining = Math.min(remaining, questRoom(next));
     if (stage && remaining > 0) {
-      next = putOnStage(next, stageId, remaining, questPointsOf(next, stage, cards), cards, steps, canAdvance, ruleCause("rr.step-3-4"), true);
+      // The explored location's Forced effect may cancel this progress (Orthanc): the stage takes what it needs and advances once those effects have resolved (families/wizardry/progress.ts).
+      const waits = overflowWaits(next, steps, started, cards);
+      const points = questPointsOf(next, stage, cards);
+      next = putOnStage(next, stageId, waits && points != null ? Math.min(remaining, Math.max(0, points - stage.progress)) : remaining, points, cards, steps, waits ? () => false : canAdvance, ruleCause("rr.step-3-4"), true);
     }
   }
   return next;
@@ -236,6 +246,7 @@ export function putOnStage(state: ScenarioState, stageId: string, amount: number
   if (placed > 0) {
     next = updateCard(next, stageId, { progress: stage.progress + placed });
     if (counted) next = noteQuestPlaced(next, placed);
+    next = noteQuestPhase(next, placed);
     steps.push({ kind: "progress", targetId: stageId, amount: placed, cause });
   }
   const updated = next.cards[stageId];

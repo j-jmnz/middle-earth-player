@@ -9,7 +9,15 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 
-export function playPickMatches(state: ScenarioState, id: string, spec: PickSpec, sourceId: string | null, ctx: ReduceContext): boolean {
+// `heroSphere`: the card's printed sphere is one of the spheres of the heroes `seat` controls; a neutral card and a Fellowship hero match none.
+function matchesHeroSphere(state: ScenarioState, id: string, seat: number, ctx: ReduceContext): boolean {
+  const sphere = printedOf(ctx.cards, state.cards[id]?.code ?? "").sphere;
+  if (sphere == null || sphere === "neutral" || sphere === "fellowship") return false;
+  return (state.seats[seat]?.heroes ?? []).some((hero) => printedOf(ctx.cards, state.cards[hero]?.code ?? "").sphere === sphere);
+}
+
+export function playPickMatches(state: ScenarioState, id: string, spec: PickSpec, sourceId: string | null, ctx: ReduceContext, seat: number): boolean {
+  if (spec.heroSphere && !matchesHeroSphere(state, id, seat, ctx)) return false;
   if (spec.sharesTrait !== "self" && spec.sharesTrait !== "host") return true;
   const source = sourceId ? state.cards[sourceId] : undefined;
   const other = spec.sharesTrait === "self" ? source : source?.host ? state.cards[source.host] : undefined;

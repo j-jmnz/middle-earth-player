@@ -67,6 +67,15 @@ export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string,
   return next;
 }
 
+// A seat leaves the game (rr.player-elimination): the step is recorded and the seat marked eliminated; settle moves its cards (clearEliminated). With no seat left the game is lost. Every elimination goes through here.
+export function eliminateSeat(state: ScenarioState, index: number, steps: EngineStep[]): ScenarioState {
+  const seat = state.seats[index];
+  if (!seat || seat.eliminated) return state;
+  steps.push({ kind: "eliminate", seat: index });
+  const next = withSeat(state, index, { ...seat, eliminated: true });
+  return livingSeats(next).length === 0 ? markLoss(next, "No seats remain") : next;
+}
+
 // `final`: the play sweep has already let an ally gain the hero card type, so a seat in heroSavers with no heroes is eliminated now.
 export function eliminateEmpties(state: ScenarioState, steps: EngineStep[], final = false): ScenarioState {
   let next = state;
@@ -86,8 +95,7 @@ export function eliminateEmpties(state: ScenarioState, steps: EngineStep[], fina
         next = saved;
         continue;
       }
-      next = withSeat(next, index, { ...seat, eliminated: true });
-      steps.push({ kind: "eliminate", seat: index });
+      next = eliminateSeat(next, index, steps);
     }
   }
   if (!next.lost && livingSeats(next).length === 0) next = markLoss(next, "No seats remain");

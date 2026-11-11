@@ -3,8 +3,8 @@ tags:
   - scenario
 ---
 # Phase 52. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `upanduin-won` (scripts/e2e/journey-up-the-anduin.ts): a real two-handed game of
-# Journey Up the Anduin (the Defenders of Gondor and Swords of the Noldor lists, Easy) from a new Ered Mithrin save, parked on its win (stage 3, the Ford explored). The fixture is OPEN when scripts/e2e/fixtures.ts found no
-# win of the two starter decklists in its seeds (docs/phases/STATUS.md). The Resolution asks one choice, whether Turayn joins the pool or the oath line is written; the flow writes the line. Confirming records the win with
+# Journey Up the Anduin (The One Deck and the Defenders of Gondor lists, Easy) from a new Ered Mithrin save, parked on its win (stage 3, the Ford explored). The fixture is OPEN when scripts/e2e/fixtures.ts found no
+# win of The One Deck and the Defenders of Gondor lists in its seeds (docs/phases/STATUS.md). The Resolution asks one choice, whether Turayn joins the pool or the oath line is written; the flow writes the line. Confirming records the win with
 # A Growing Threat in the pool and unlocks Lost in Mirkwood, whose node reads Next (src/campaign/scenarios/journey-up-the-anduin/golden.test.ts pins the path).
 - runFlow:
     file: ../../subflows/scenario-win.yaml

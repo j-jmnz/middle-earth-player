@@ -10,7 +10,7 @@ import { pickCandidates } from "../interpret/pick.ts";
 import { lastPicked, seatOf } from "../interpret/player-verbs.ts";
 import { topFrame } from "../windows/windows.ts";
 import { addModifier } from "../core/keywords.ts";
-import { addClassModifier, ALLIES_CLASS, CHARACTERS_CLASS, STAGING_CLASS } from "../core/holder-classes.ts";
+import { addClassModifier, ALLIES_CLASS, CHARACTERS_CLASS, DAMAGED_CHARACTERS_CLASS, ENEMIES_CLASS, isClassHolder, STAGING_CLASS } from "../core/holder-classes.ts";
 import type { ScenarioState } from "../core/state.ts";
 import { livingSeats } from "../core/state.ts";
 import type { VerbFocus } from "../interpret/verbs.ts";
@@ -91,6 +91,14 @@ export function modifyStat(
     case "characters":
       targets = [CHARACTERS_CLASS];
       break;
+    // Every character that is damaged, now and when it is damaged later (143061:A:2): the holder is the class, read by heldBy.
+    case "damagedCharacters":
+      targets = [DAMAGED_CHARACTERS_CLASS];
+      break;
+    // Every enemy in play, staged or engaged, now and entering later (143041:A:2): the holder is the class, read by heldBy.
+    case "enemies":
+      targets = [ENEMIES_CLASS];
+      break;
     // Every enemy and location in the staging area, now and arriving later (19167:A:1): the holder is the class, read by heldBy.
     case "stagingCards":
       targets = [STAGING_CLASS];
@@ -133,7 +141,7 @@ export function modifyStat(
     if (trait != null && !id.startsWith("seat:") && !hasTrait(next, id, trait, ctx)) continue;
     if (id === "table") next = { ...next, modifiers: [...next.modifiers, { instanceId: "table", sourceId, stat: instruction.stat, amount, until: instruction.until }] };
     else if (id.startsWith("seat:")) next = { ...next, modifiers: [...next.modifiers, { instanceId: id, sourceId, stat: instruction.stat, amount, until: instruction.until }] };
-    else next = id === ALLIES_CLASS || id === CHARACTERS_CLASS || id === STAGING_CLASS
+    else next = isClassHolder(id)
       ? addClassModifier(next, id, sourceId, instruction.stat, amount, instruction.until)
       : addModifier(next, id, sourceId, instruction.stat, amount, instruction.until);
   }

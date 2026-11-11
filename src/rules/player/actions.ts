@@ -13,6 +13,7 @@ import { textBlank } from "../families/attachments/hold.ts";
 import { printedOf } from "../core/printed.ts";
 import { inPlay, type ScenarioState } from "../core/state.ts";
 import { payUsage, usable, usageReason } from "./usage.ts";
+import { announceAbility } from "../families/deck/pressure.ts";
 
 type TriggerIntent = Extract<PlayerIntent, { type: "Trigger" }>;
 
@@ -28,7 +29,7 @@ function actionEffect(state: ScenarioState, ctx: ReduceContext, cardId: string, 
   const instance = state.cards[cardId];
   if (!instance) return undefined;
   // A card whose printed text box is blank has none of its abilities (rr.blank).
-  if (textBlank(state, instance.id)) return undefined;
+  if (textBlank(state, instance.id, ctx.cards)) return undefined;
   const effect = effectsOfCard(state, ctx, instance).find((entry) => entry.id === effectId && entry.timing === "action");
   // An objective, quest or location in play belongs to no player: any player may initiate its Action (rr.action).
   // The campaign card next to the quest deck belongs to no player either, and its Action is any player's (11197:A:3, "Travel Action").
@@ -85,7 +86,7 @@ export function applyTrigger(
   const seat = state.activeSeat;
   // What the cost changes (threat raised to claim an objective, damage on the source) is the effect's doing.
   const paid = inCause(steps, effectCause(effect), () => payUsage(state, effect, intent.cardId, intent.payments ?? [], ctx, steps, seat));
-  return pushEffectFrame(
+  const framed = pushEffectFrame(
     { ...paid, window: null },
     {
       frame: "ResolveEffect",
@@ -101,4 +102,5 @@ export function applyTrigger(
     },
     steps,
   );
+  return announceAbility(framed, intent.cardId, seat, ctx);
 }

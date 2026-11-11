@@ -199,7 +199,7 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   // event's card, printed hit points, the top of a discard pile (families/attack/pick.ts).
   if (!attackPickMatches(state, id, spec, at, ctx)) return false;
   // The play family's filters: a Trait shared with the source or its host (families/play/pick.ts).
-  if (!playPickMatches(state, id, spec, at.sourceId, ctx)) return false;
+  if (!playPickMatches(state, id, spec, at.sourceId, ctx, at.seat)) return false;
   // The misc family's filters: controlled by the picked player, attached to the picked card, a player card, a Defense limit, drawn
   // in the resource phase (families/misc/pick.ts).
   if (!miscPickMatches(state, id, spec, at, ctx)) return false;

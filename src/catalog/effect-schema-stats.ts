@@ -8,9 +8,9 @@ import { FAMILY_FLAGS } from "./families/index.ts";
 
 
 // `whileSourceInVictory`: a constant that works from the victory display ("While Weathertop is in the victory display",
-// 141046:A:2). The engine writes it; a record names `whileSourceInPlay`. `endOfGame`: "for the rest of the game", whatever happens to the source
+// 141046:A:2). The engine writes it; a record names `whileSourceInPlay`. `endOfCombat`: until the combat phase ends (143061:A:2). `endOfGame`: "for the rest of the game", whatever happens to the source
 // (the engine writes it; no expiry boundary ends it). `whileSourceActive`: while the source location is an active location ("cannot ready while The First Forge is the active location", 19122:A:2).
-export const modifierUntilSchema = z.enum(["endOfPhase", "endOfRound", "endOfAttack", "whileSourceInPlay", "whileSourceActive", "whileSourceInVictory", "endOfGame"]);
+export const modifierUntilSchema = z.enum(["endOfPhase", "endOfRound", "endOfCombat", "endOfAttack", "whileSourceInPlay", "whileSourceActive", "whileSourceInVictory", "endOfGame"]);
 
 // Stats on a card, plus Hide numbers held by a seat or the table, and a flag that bars an enemy's attack.
 export const modifierStatSchema = z.enum([
@@ -81,7 +81,7 @@ export const modifyStatSchema = z.strictObject({
   // player controls, fixed when the effect resolves. `currentQuest` is the quest card being attempted now (it keeps the change if
   // another stage replaces it later in the phase). `stagingCards` is every enemy and location in the staging area, now and arriving later: an encounter card's lasting effect (rr.lasting-effects, 19167:A:1).
   target: z
-    .enum(["self", "attacker", "host", "table", "engagedSeat", "eachSeat", "heroes", "hobbitCharacters", "enemies", "picked", "pickedPlayerCharacters", "ownHeroes", "defender", "allies", "characters", "engagedSeatCharacters", "subject", "actorSeat", "pickedSeat", "other", "pickedPlayerHeroes", "currentQuest", "stormcaller", "stagingCards"])
+    .enum(["self", "attacker", "host", "table", "engagedSeat", "eachSeat", "heroes", "hobbitCharacters", "enemies", "picked", "pickedPlayerCharacters", "ownHeroes", "defender", "allies", "characters", "engagedSeatCharacters", "subject", "actorSeat", "pickedSeat", "other", "pickedPlayerHeroes", "currentQuest", "stormcaller", "stagingCards", "damagedCharacters"])
     .optional(),
   // Only holders with this trait ("Spy enemies get +1 Threat", 141047:A:1).
   trait: z.string().min(1).optional(),

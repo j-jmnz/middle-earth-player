@@ -102,6 +102,8 @@ const TRIGGERS = [
 ] as const;
 
 const FLAGS = [
+  // On "table": no character may be committed to the quest ("Do not commit characters to the quest", 143078:B:1; rules/engine/legal.ts committers).
+  "cannotCommit",
   // On a seat: it does not raise threat from questing unsuccessfully; a player card effect that reduces its threat reduces it by
   // at most 1 (22054:A:1); it may optionally engage this many additional enemies (09002:A:2), and the optional engagements it
   // made this phase (engine use).

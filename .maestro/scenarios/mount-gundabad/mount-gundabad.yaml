@@ -3,8 +3,8 @@ tags:
   - scenario
 ---
 # Phase 59. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `gundabad-won` (scripts/e2e/mount-gundabad.ts): a real two-handed game of Mount Gundabad
-# (the Defenders of Gondor and Swords of the Noldor lists, Easy) dealt from the log the first seven parts' wins write (Misplaced Trust for each player, Gundabad Hunter or Gundabad Stalker, 5 treasures), parked on its win (Dagnir
-# slain at the Great Worm with the Reforged Wormsbane and added to the victory display). The fixture is OPEN: scripts/e2e/fixtures.ts found no win of the two starter decklists in its 100 seeds (the hero who carries Wormsbane
+# (The One Deck and the Defenders of Gondor lists, Easy) dealt from the log the first seven parts' wins write (Misplaced Trust for each player, Gundabad Hunter or Gundabad Stalker, 5 treasures), parked on its win (Dagnir
+# slain at the Great Worm with the Reforged Wormsbane and added to the victory display). The fixture is OPEN: scripts/e2e/fixtures.ts found no win of The One Deck and the Defenders of Gondor lists in its 100 seeds (the hero who carries Wormsbane
 # leaves play in the first rounds, docs/phases/STATUS.md), so this flow cannot run until a seed wins.
 # The Resolution discovers the treasures the players control (no question), then asks the first player for 1 of 3 random undiscovered treasures (12193:B:2, the eyebrow "Choose a treasure", the seat label "Player 1 (first player) chooses");
 # the prompt also says what confirming does to the pool: A Growing Threat leaves it when the pool holds it, and Dragon-sickness joins it (the log holds 5 treasures, so this one makes 6). When the fixture exists, set CHOICE_ID to the code of

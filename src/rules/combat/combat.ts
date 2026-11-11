@@ -57,6 +57,14 @@ export function archeryRecipients(state: ScenarioState, cards: Cards, seat?: num
     if (!owner || owner.eliminated || (seat != null && state.separate && index !== seat)) continue;
     ids.push(...characters(state, index, cards));
   }
+  // "Archery damage must be assigned to allies, if able" (143058:A:2).
+  if (state.modifiers.length > 0 && flagged(state, "table", "archeryToAllies")) {
+    const allies = ids.filter((id) => {
+      const instance = state.cards[id];
+      return instance != null && isAllyLike(printedOf(cards, instance.code));
+    });
+    if (allies.length > 0) return allies;
+  }
   return ids;
 }
 

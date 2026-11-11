@@ -8,6 +8,7 @@ import type { ScenarioState } from "../../core/state.ts";
 import { actAs, addToX, discardFromDeck, givePicked, moveCardVerb, shuffleDiscardIn, shuffleHandIn, swapPicked } from "./moves.ts";
 import { keepOpeningHand, playFrom } from "./play.ts";
 import type { Focus } from "../index.ts";
+import { eliminateEmptyHands } from "./pressure.ts";
 
 // The verbs src/catalog/families/deck.ts adds, for the player's deck, hand and discard pile: look, arrange, search, return, play from the discard pile. Null when the verb is not one of them.
 // ReducePlayCost is read when its card is played (deck-play.ts): it does nothing when run.
@@ -43,4 +44,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "deck", verbs: ["MoveCard", "GivePicked", "SwapPicked", "ShuffleDiscardIntoDeck", "ShuffleHandIntoDeck", "DiscardFromDeck", "AddToX", "ActAs", "PlayFrom", "ReduceNextDoomed", "KeepOpeningHand", "ReducePlayCost"], run };
+export const manifest: RulesFamily = { name: "deck", verbs: ["MoveCard", "GivePicked", "SwapPicked", "ShuffleDiscardIntoDeck", "ShuffleHandIntoDeck", "DiscardFromDeck", "AddToX", "ActAs", "PlayFrom", "ReduceNextDoomed", "KeepOpeningHand", "ReducePlayCost"], run, settle: { sweep: eliminateEmptyHands } };

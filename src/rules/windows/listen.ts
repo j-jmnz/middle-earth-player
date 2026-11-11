@@ -62,8 +62,10 @@ export function subjectMatches(state: ScenarioState, id: string, spec: PickSpec,
 export function hears(state: ScenarioState, effect: Effect, listener: CardInstance, event: GameEvent, ctx: ReduceContext): boolean {
   if (!triggerHears(effect.trigger, event.trigger)) return false;
   // A card whose printed text box is blank has none of its abilities (rr.blank).
-  if (textBlank(state, listener.id)) return false;
+  if (textBlank(state, listener.id, ctx.cards)) return false;
   if (effect.byEncounterDeck && !event.fromDeck) return false;
+  // An event stamped with the clock is heard only by cards that were in play when it occurred (rr.forced: a Forced effect must be in play and active at the time its trigger occurs).
+  if (event.at != null && listener.enteredPlay > event.at) return false;
   if (effect.eventSeat) {
     const mine = listener.controller ?? state.firstPlayer;
     if (event.seat == null || (effect.eventSeat === "you") !== (event.seat === mine)) return false;

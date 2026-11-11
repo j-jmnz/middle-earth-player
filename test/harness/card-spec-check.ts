@@ -1,6 +1,7 @@
 import { flagged, type ScenarioState } from "../../src/rules/core/state.ts";
 import { declaredDefenders } from "../../src/rules/families/defense/defenders.ts";
 import { modifiedStat } from "../../src/rules/core/keywords.ts";
+import { stagingThreat } from "../../src/rules/quest/quest.ts";
 
 import type { CounterName, Done, Expect } from "./card-spec-types.ts";
 import { idOf, idsOf, legalIntents } from "./scene-kit.ts";
@@ -98,6 +99,26 @@ export function failures(done: Done, wanted: readonly Expect[]): string[] {
         case "deckCount":
           if (state.encounterDeck.length !== item.value) problems.push(`the encounter deck holds ${state.encounterDeck.length} cards, not ${item.value}`);
           break;
+        case "exhausted": {
+          const got = state.cards[idOf(state, item.code)]?.exhausted === true;
+          if (got !== item.value) problems.push(`${item.code} is ${got ? "" : "not "}exhausted`);
+          break;
+        }
+        case "stagingThreat": {
+          const got = stagingThreat(state, done.table.cards);
+          if (got !== item.value) problems.push(`the staging area's total Threat is ${got}, not ${item.value}`);
+          break;
+        }
+        case "threat": {
+          const got = state.seats[item.seat]?.threat;
+          if (got !== item.value) problems.push(`seat ${item.seat} has threat ${got}, not ${item.value}`);
+          break;
+        }
+        case "revealedBy": {
+          const seats = steps.flatMap((step) => (step.kind === "reveal" && state.cards[step.cardId]?.code === item.code ? [step.seat] : []));
+          if (!seats.includes(item.seat)) problems.push(`${item.code} was revealed by ${seats.length > 0 ? `seat ${seats.join(", ")}` : "nobody"}, not seat ${item.seat}`);
+          break;
+        }
         case "lost":
           if (!state.lost) problems.push("the game is not lost");
           break;

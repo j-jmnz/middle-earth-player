@@ -42,6 +42,9 @@ export const pickSchema = z.strictObject({
   engagedEnemies: z.literal(true).optional(),
   // A card of this sphere of influence, for a card picked from the hand or a discard pile.
   sphere: z.enum(["leadership", "tactics", "spirit", "lore", "neutral"]).optional(),
+  // A card whose printed sphere is the printed sphere of a hero the chooser controls ("an ally that matches the sphere of a hero he controls", 143072:B:1). A neutral card or a Fellowship hero matches
+  // no sphere (rr.neutral-cards). Read by the play family.
+  heroSphere: z.literal(true).optional(),
   // A card of any of these spheres ("a Leadership or Lore character"), its printed sphere.
   spheres: z.array(sphereSchema).min(1).optional(),
   // A hero with this printed resource icon ("each hero you control with a printed Spirit resource icon").
@@ -125,6 +128,8 @@ export const pickSchema = z.strictObject({
   engagedThisRound: z.boolean().optional(),
   // Only the card the source is attached to ("attached hero" for a Condition that sets its stat).
   isHost: z.boolean().optional(),
+  // Only the source card itself, among the cards that match: "After Soldier of Isengard attacks and destroys a character" is heard by the one copy that attacked (143036:A:2). Read by the fortress family.
+  isSource: z.literal(true).optional(),
   // A location that is an active location now (either slot), not one in the staging area (142021:B:2, 142027:A:1).
   active: z.boolean().optional(),
   // A hero with at least one resource in its pool; with at least this many (`minResources`).

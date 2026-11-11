@@ -2,7 +2,7 @@ import { withTwin } from "../families/nightmare/guards.ts";
 import type { Condition, Effect, Instruction } from "../../catalog/boundary.ts";
 import { frameScope, resolveAmount } from "./amounts.ts";
 import { beginEffect } from "../windows/cancel.ts";
-import { effectCause, inCause, type Cause } from "../core/cause.ts";
+import { currentCause, effectCause, inCause, UNATTRIBUTED, type Cause } from "../core/cause.ts";
 import { beginEnemyAttack } from "../combat/combat.ts";
 import { attackBarred } from "./constants.ts";
 import { dealForAttack } from "../families/south/watcher.ts";
@@ -222,7 +222,7 @@ function runItemNow(
     case "HideTest":
       return pushHide(state, { cardId: frame.cardId, seat: item.seat, peril: frame.peril }, instruction.x, steps);
     case "ImmediateAttack":
-      return immediateAttack(state, frame.cardId, item.seat, ctx, steps, instruction.shadow !== false);
+      return instruction.afterThis ? attackAfterThis(state, frame.cardId, steps) : immediateAttack(state, frame.cardId, item.seat, ctx, steps, instruction.shadow !== false);
     case "ReadyHero":
     case "BarAttack":
     case "PlaceProgressOnLocation":
@@ -307,6 +307,13 @@ function expandDiscards(state: ScenarioState, item: QueueItem, frame: Frame, ctx
     { instruction: { verb: "DiscardPicked" as const }, seat: item.seat, chosen: null, ...cause },
   ]).flat();
   return patchTop(state, { data: { ...data, queue: [...expanded, ...data.queue] } });
+}
+
+// "Makes an additional attack after this one" (143052:A:1, faq.additional-attacks): the attack in progress is the source enemy's own, and the new one is left for its end, dealt a shadow card of its own.
+function attackAfterThis(state: ScenarioState, sourceId: string | null, steps: EngineStep[]): ScenarioState {
+  const attack = state.pendingAttack;
+  if (!attack || !sourceId || attack.enemyId !== sourceId) return state;
+  return { ...state, pendingAttack: { ...attack, after: [...(attack.after ?? []), { verb: "ImmediateAttack" }], afterCause: currentCause(steps, UNATTRIBUTED) } };
 }
 
 // The enemy attacks the player it is engaged with, and the frame waits for the defense window.

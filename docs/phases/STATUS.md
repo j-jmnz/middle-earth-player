@@ -87,6 +87,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 61 | The Two Towers data | completed | 2026-11-07. Review round done. Open: MEC112 2023 wording unverified. |
 | 62 | The Two Towers campaign shell | completed | 2026-11-07. Review round done. |
 | 63 | The Uruk-hai | completed | 2026-11-10. Review round done. Open: `hai-won`. |
+| 64 | Helm's Deep | completed | 2026-11-11. Review round done. Open: `deep-won`. |
+| 65 | The Road to Isengard | completed | 2026-11-11. Review round done. Open: `isengard-won`. |
 
 ## Open items
 
@@ -94,7 +96,9 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - The Android release key is not set up (`docs/releasing.md`, Android key), so no release has been cut; the release workflow has not run yet, dry run first. TestFlight (optional) is not set up.
 
 ### Fixtures and Maestro
-- `hai-won` is not committed: no seed in 100 wins The Uruk-hai with the starter decklists. Until it exists `.maestro/scenarios/the-uruk-hai/the-uruk-hai.yaml` cannot run.
+- `isengard-won` is not committed: no seed in 600 wins The Road to Isengard with The One Deck and Defenders of Gondor. Until it exists `.maestro/scenarios/the-road-to-isengard/the-road-to-isengard.yaml` cannot run.
+- `deep-won` is not committed: no seed in 100 wins Helm's Deep with The One Deck and Defenders of Gondor. Until it exists `.maestro/scenarios/helms-deep/helms-deep.yaml` cannot run.
+- `hai-won` is not committed: no seed in 1000 wins The Uruk-hai with The One Deck and Defenders of Gondor. Until it exists `.maestro/scenarios/the-uruk-hai/the-uruk-hai.yaml` cannot run.
 - `wilderland-won` is not committed: none of 100 seeds (and 750 more under five other policies) wins The Fate of Wilderland with the starter decklists. Until it exists `.maestro/scenarios/the-fate-of-wilderland/the-fate-of-wilderland.yaml` cannot run.
 - `gundabad-won` is not committed: none of 100 seeds wins Mount Gundabad with the starter decklists; the hero carrying Wormsbane leaves play in the first rounds or threat runs out. Until it exists `.maestro/scenarios/mount-gundabad/mount-gundabad.yaml` cannot run.
 - `framsburg-won` is not committed: none of 100 seeds wins The Ghost of Framsburg with the starter decklists. Until it exists `.maestro/scenarios/the-ghost-of-framsburg/the-ghost-of-framsburg.yaml` cannot run; its `CHOICE_*` lines are commented out.
@@ -183,6 +187,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - Accessibility: the drawn canvas takes no keyboard focus and its own text and fixed alphas do not follow Bold Text or Reduce Transparency; on iOS, Escape and Z do nothing (React Native sends no key events there).
 - Accessibility: at font scale 2 on a phone in landscape the dock's worst moment (a why line, a three-line primary, Cancel and More, an attack readout) passes its column even with the aids folded (`it.fails` in `dock/text-size-fit.test.ts`); at font scale 1 the longest caution with an attack readout passes it by up to 16 pt (`HAND_SLACK`, `budget.test.ts`). Needs a dock design.
 - Accessibility: the Label in Name entries held in `OPEN` (`scripts/checks/a11y-web.ts`) are axe joining sibling text with no space on react-native-web; the names start with their visible words.
+- Renderer gaps (`pnpm effects:render`; behaviour proven by spec rows): Helm's Deep's `PlaceToken` names no token type or host (143033:A:2), `archeryBonus` and `archeryToAllies` show as flags (143037:A:1, 143058:A:2), the acting player is not shown to be the first player (143041:A:1, 143073:B:2) or the discarding player (143050:A:1, 143055:A:1, 143068:A:2), a Siege attachment's trait (143042:A:2), an `x` condition's count (143042:A:3), the Traits kept by a blank text (143043:A:1, 143061:A:2), searched zones (143074:A:1, 143054:A:2), `RevealFewer`'s duration (143020:A:2), `TriggerWizardry`'s only-player reading (143047:A:2, 143062:A:1), the Wolf's attack target (143052:A:1), a count taken before its stage leaves (143078:B:2), an ally-or-objective filter (143079:B:3) and a win shown as `trackQuestProgress` (143080:B:3); about 40 fortress, burden and wizardry pieces print as JSON.
 - Effect templates: an unlabelled conditional constant ("If you are on-course, ~ gets +2 …") is read as triggered by `unreadBefore`; `SPLIT_LINES` in `scripts/data/effects/generate.ts` names one card's line.
 
 ### Rules and engine (The Two Towers)
@@ -190,6 +195,11 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - Not fixed from The Uruk-hai's review: `engagedThreatSeat` (143065:A:2) is declared in the pursuit family, not with `engagedThreat`.
 - Six older records put `shadow: false` on a printed additional attack (18035:A:2 and its copies), against `faq.additional-attacks`, which deals the additional attack a new shadow card.
 - The Two Towers ledger reads the pinned 2014 and 2015 Treason of Saruman and Land of Shadow scans; no pinned scan shows MEC112's 2023 wording, so a rewording cannot be found (`scripts/data/printed/scope.ts`, `MEC112_CHANGED`).
+- Helm's Deep readings not user-confirmed (agent recommendation; `docs/brief.md`, The Two Towers): 143074:B:2 (progress on the active location only is not placed on the stage); 143074:A:1 (a staged Helm's Gate becomes active when none is found); 143033:A:1 (the tokens are a live staging amount).
+- The Road to Isengard readings not user-confirmed (`docs/brief.md`, The Two Towers): agent recommendations on Saruman's Voice's hero (143068:A:2), the elimination at 0 cards once an effect ends (143080:B:3), "as if he is the only player" (143047:A:2), the Wolf outside an attack (143052:A:1), Orthanc cancelling the overflow and returning without tokens (143080:B:2), Orthanc revealing before discarding (143053:A:2) and Ring-wall's owner for an Ent (143055:A:1); community readings only on the Staff once per drawing player (143048:A:1) and a Wizardry shadow firing at its flip (143047:A:2, 143052:A:1).
+- FAQ 1.55 (Poisoned Vapour) and 1.58 (a Forced effect on a card that enters play in the same effect) are not split into `faq.*` spans in `data/rules/index.json`; the readings cite `rr.lasting-effects` and `rr.forced`.
+- Helm's Deep: the 4B loss is on the stage preview and the advance screen, not on the canvas strip's text.
+- The Road to Isengard's campaign test cannot tell 143081's Saruman's Voice shuffle from the standalone deal: both give one copy.
 - Easy: the DragnCards `E0C.12` deck keeps all ten Great Spider cards where Hall of Beorn keeps six; the E0C decks lead (user decision, 2026-11-07).
 
 ## Standing decisions

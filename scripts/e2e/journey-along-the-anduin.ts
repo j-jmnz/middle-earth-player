@@ -1,5 +1,5 @@
 // The Maestro fixtures of Journey Along the Anduin (Mirkwood Paths part 2), written into src/campaign/fixtures/journey-along-the-anduin.json by
-// scripts/e2e/fixtures.ts: two real games of saved decklists (the Dwarves of Durin and Elves of Lórien lists of data/decks/prebuilt.json), two-handed,
+// scripts/e2e/fixtures.ts: two real games of saved decklists (The One Deck and the Elves of Lórien lists of data/decks/test-decks.json and data/decks/prebuilt.json), two-handed,
 // Easy, from the log the `mirkwood-won` game (scripts/e2e/passage-through-mirkwood.ts) writes when it is confirmed (Passage Through Mirkwood's earned pool reaches
 // this scenario through the Campaign Setup Checklist), played by the auto-player, every intent one the reducer listed.
 // `anduin-won`: the first seed that wins, parked on the win (01130's Resolution asks nothing: each Valor and Scarred attached to a hero goes to the
@@ -91,14 +91,17 @@ const REPLACEMENT: Readonly<Record<string, string>> = { leadership: "01001", tac
 export function replaced(loadout: StoredLoadout, log: CampaignLog, after = "Passage Through Mirkwood"): StoredLoadout {
   const fallen = log.fallenHeroesBySeat.flat();
   const spheres = new Map(catalog.select().from(cardRows).where(inArray(cardRows.code, fallen)).all().map((row) => [row.code, row.sphereCode]));
-  const taken = new Set(loadout.seats.flatMap((seat) => seat.heroes));
+  // A hero title may be in only one seat (The One Deck has an Éowyn of its own beside the Core Set's), so a candidate is taken by its title.
+  const candidates = [...Object.values(REPLACEMENT), "01002", "01005", "01008", "01011"];
+  const titles = new Map(catalog.select().from(cardRows).where(inArray(cardRows.code, [...candidates, ...loadout.seats.flatMap((seat) => seat.heroes)])).all().map((row) => [row.code, row.name]));
+  const taken = new Set(loadout.seats.flatMap((seat) => seat.heroes.map((code) => titles.get(code) ?? code)));
   const seats = loadout.seats.map((seat, index) => ({
     ...seat,
     heroes: seat.heroes.map((code) => {
       if (!(log.fallenHeroesBySeat[index] ?? []).includes(code)) return code;
       const sphere = spheres.get(code) ?? "neutral";
-      const candidate = [REPLACEMENT[sphere] ?? "01001", "01002", "01005", "01008", "01011"].find((hero) => !taken.has(hero)) ?? "01001";
-      taken.add(candidate);
+      const candidate = [REPLACEMENT[sphere] ?? "01001", "01002", "01005", "01008", "01011"].find((hero) => !taken.has(titles.get(hero) ?? hero)) ?? "01001";
+      taken.add(titles.get(candidate) ?? candidate);
       say.info(`${code} fell in ${after}: seat ${index + 1} starts ${candidate} in its place`);
       return candidate;
     }),

@@ -3,7 +3,7 @@ tags:
   - scenario
 ---
 # Phase 29. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json). The fixture
-# `mirkwood-won` is a real two-handed game of the Dwarves of Durin and Elves of Lórien lists, Easy, from an empty Mirkwood Paths log,
+# `mirkwood-won` is a real two-handed game of The One Deck and the Elves of Lórien lists, Easy, from an empty Mirkwood Paths log,
 # parked on its win through stage 3B "Beorn's Path" (src/campaign/fixtures/passage-through-mirkwood.json, scripts/e2e/passage-through-mirkwood.ts).
 # 01129's Resolution asks nothing: each player earns a Mendor's Support, and Beorn's Path adds Ungoliant's Swarm. Confirming writes
 # the log and unlocks Journey Along the Anduin. Mirkwood Paths is not a saga: no life tracker, no burden deck on this table.

@@ -51,7 +51,7 @@ describe("TakePrisoner (01123:B:1)", () => {
     expect(card?.owner).toBe(0);
     expect(run.state.seats[0].heroes).not.toContain(prisoner);
     expect(run.state.seats[0].heroes.length).toBe(1);
-    expect(textBlank(run.state, prisoner ?? "")).toBe(true);
+    expect(textBlank(run.state, prisoner ?? "", ctx.cards)).toBe(true);
     // It cannot be picked, so nothing can damage or use it, and it collects no resources.
     expect(pickCandidates(run.state, { type: "hero", control: "any" }, 0, [], null, ctx)).not.toContain(prisoner);
     expect(causeProblems(run.steps)).toEqual([]);
@@ -82,14 +82,14 @@ describe("the campaign card's Forced effect (01131:A:3)", () => {
   it("selects the prisoner from the Campaign Log instead, captures Mendor and Appointed by Fate's hero's cards with it and flips the card", async () => {
     for (const seatCount of [1, 2] as const) {
       for (let seed = 1; seed <= 6; seed += 1) {
-        const { state } = await started(seatCount, seed, LOGGED_PRISONER);
+        const { state, ctx } = await started(seatCount, seed, LOGGED_PRISONER);
         const prisoner = state.cards[prisonerHero(state) ?? ""];
         expect(prisoner?.code, `${seatCount} seats, seed ${seed}`).toBe("q2");
         const mendor = byCode(state, MENDOR)[0];
         expect(mendor?.zone).toBe("captive");
         expect(mendor?.host).toBe(prisoner?.id);
         expect(mendor?.face).toBe("down");
-        expect(textBlank(state, mendor?.id ?? "")).toBe(true);
+        expect(textBlank(state, mendor?.id ?? "", ctx.cards)).toBe(true);
         const campaignCard = byCode(state, "01131")[0];
         expect(campaignCard?.face).toBe("B");
         // The hero the log named is out of the heroes, every other hero is where it was (the one chosen at random came back to its own place).
@@ -107,11 +107,11 @@ describe("the campaign card's Forced effect (01131:A:3)", () => {
   });
 
   it("holds the cards attached to the prisoner facedown and blank until the rescue (Appointed by Fate on the first player's hero q1)", async () => {
-    const { state } = await started(1, 4, { prisoner: "q1", usedOnce: [], counters: {} });
+    const { state, ctx } = await started(1, 4, { prisoner: "q1", usedOnce: [], counters: {} });
     const appointed = byCode(state, "01134")[0];
     expect(appointed?.face).toBe("down");
     expect(appointed?.prisoner).toBe(true);
-    expect(textBlank(state, appointed?.id ?? "")).toBe(true);
+    expect(textBlank(state, appointed?.id ?? "", ctx.cards)).toBe(true);
     expect(appointed?.host).toBe(prisonerHero(state));
   });
 });
@@ -154,7 +154,7 @@ describe("the rescue (01124:B:1) and the cards that hear it (01102:A:2, 01131:B:
     expect(appointed?.face).toBe("up");
     expect(appointed?.host).toBe(prisoner);
     expect(appointed?.prisoner).toBeUndefined();
-    expect(textBlank(run.state, appointed?.id ?? "")).toBe(false);
+    expect(textBlank(run.state, appointed?.id ?? "", ctx.cards)).toBe(false);
     // The Nazgûl of Dol Guldur, set aside faceup, came into the staging area when the prisoner was rescued.
     const nazgul = Object.values(run.state.cards).find((card) => card.code === "01102");
     expect(nazgul?.zone).toBe("staging");

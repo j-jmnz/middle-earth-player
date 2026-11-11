@@ -145,11 +145,12 @@ function effectsOnCard(game: ScenarioState, ctx: ReduceContext, cardId: string):
 }
 
 // The effects that end on their own with a phase, a round or an attack.
-const TEMPORARY: ReadonlySet<ModifierUntil> = new Set(["endOfPhase", "endOfRound", "endOfAttack"]);
+const TEMPORARY: ReadonlySet<ModifierUntil> = new Set(["endOfPhase", "endOfRound", "endOfCombat", "endOfAttack"]);
 
 const UNTIL: Readonly<Record<ModifierUntil, string>> = {
   endOfPhase: "until the end of the phase",
   endOfRound: "until the end of the round",
+  endOfCombat: "until the end of the combat phase",
   endOfAttack: "until the end of the attack",
   whileSourceInPlay: "while it is in play",
   whileSourceActive: "while it is the active location",

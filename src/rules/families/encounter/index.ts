@@ -16,11 +16,13 @@ import { afterProgress } from "../../quest/stage-reveal.ts";
 import type { Modifier, ScenarioState } from "../../core/state.ts";
 import { inPlay, withThreat } from "../../core/state.ts";
 import { patchTop } from "../../windows/windows.ts";
+import { lastPicked, seatOf } from "../../interpret/player-verbs.ts";
 import type { Focus } from "../index.ts";
 import { runEncounterItem } from "./items.ts";
 import { countTop, discardUntil, effectData, encounterCard, lookAtTop, moveEncounter, pushPicked, shuffleDiscardIn, travelThere } from "./moves.ts";
 import { answeredRaise } from "./reveal.ts";
 import { searchCollection } from "./collection.ts";
+import { queueFront } from "../play/refs.ts";
 
 const WATCH_STATS = { threatZero: "watchThreatZero", damage: "watchDamage", discard: "watchDiscard", readyHost: "watchReadyHost" } as const;
 
@@ -44,7 +46,13 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return countTop(state, instruction, ctx);
     case "RevealEncounter": {
       const seat = instruction.who === "eventSeat" ? (effectData(state)?.eventSeat ?? focus.seat) : focus.seat;
-      return state.seats[seat]?.eliminated ? state : startReveal(state, seat, ctx, steps);
+      if (state.seats[seat]?.eliminated) return state;
+      // `times` cards, one after the other: the rest wait in the effect's queue behind this reveal.
+      const times = instruction.times == null ? 1 : resolveAmount(state, instruction.times, frameScope(state, focus.seat, focus.sourceId), ctx);
+      if (times <= 0) return state;
+      const rest: Instruction = { verb: "RevealEncounter", ...(instruction.who ? { who: instruction.who } : {}), times: times - 1 };
+      const queued = times > 1 && effectData(state) ? queueFront(state, [{ instruction: rest, seat: focus.seat, chosen: null }]) : state;
+      return startReveal(queued, seat, ctx, steps);
     }
     case "SearchCollection":
       return searchCollection(state, instruction, focus, ctx, steps);
@@ -59,8 +67,12 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       const effects = ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "whenRevealed");
       return pushCardEffects(state, "whenRevealed", id, focus.seat, false, effects, ctx, steps);
     }
-    case "RevealFewer":
-      return addTableModifier(state, { stat: instruction.min === 1 ? "revealFewerMinOne" : "revealFewer", amount: instruction.amount, until: "endOfPhase" }, focus);
+    case "RevealFewer": {
+      // The player picked last skips that many of their reveals; the other players' are not shortened (143020:A:2).
+      const seat = instruction.who === "picked" ? seatOf(lastPicked(state)) : null;
+      if (instruction.who === "picked" && seat == null) return state;
+      return addTableModifier(state, { stat: instruction.min === 1 ? "revealFewerMinOne" : "revealFewer", amount: instruction.amount, until: "endOfPhase", ...(seat != null ? { seat } : {}) }, focus);
+    }
     case "RevealMore":
       return addTableModifier(state, { stat: "revealMore", amount: instruction.amount, until: "endOfPhase" }, focus);
     case "WatchReveals": {

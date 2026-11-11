@@ -148,7 +148,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     read: ["line", "count", "cardType", "nonUnique", "except"],
   }),
   IgnoreKeyword: (i) => ({ text: `ignore the ${Array.isArray(i.keywords) ? joinAnd(i.keywords.map(str)) : compact(i.keywords)} keyword(s)`, read: ["keywords"] }),
-  AttackFromStaging: (i) => ({ text: `${i.target === "self" ? "this card" : "the picked enemy"} attacks ${i.who === "firstPlayer" ? "the first player" : "the acting player"} now, from the staging area${i.orEngaged === true ? " (or engaged)" : ""}${i.undefendedToStage === true ? ", undefended damage going to the stage" : ""}`, read: ["who", "target", "orEngaged", "undefendedToStage"] }),
+  AttackFromStaging: (i) => ({ text: `${i.target === "self" ? "this card" : i.target === "host" ? "its host" : "the picked enemy"} attacks ${i.who === "firstPlayer" ? "the first player" : "the acting player"} now, from the staging area${i.shadows ? `, dealt ${i.shadows} shadow cards` : ""}${i.orEngaged === true ? " (or engaged)" : ""}${i.undefendedToStage === true ? ", undefended damage going to the stage" : ""}`, read: ["who", "target", "shadows", "orEngaged", "undefendedToStage"] }),
   DiscardPicked: () => ({ text: "discard the picked card", read: [] }),
   Engage: (i) => ({ text: `engage ${cardRef(i.target ?? "picked")}`, read: ["target"] }),
   Travel: () => ({ text: "travel to this location", read: ["to"] }),

@@ -3,7 +3,7 @@ tags:
   - scenario
 ---
 # Phases 19, 20, 21 and 23 (the Log is a reading panel, `log-sheet`). Written in a cloud session: it has not run (no phone, simulator or Maestro there). Needs the e2e-test build
-# (EXPO_PUBLIC_E2E_SEED=1, eas.json). The fixture is the solo game of Stealth and Steadfastness parked on its loss
+# (EXPO_PUBLIC_E2E_SEED=1, eas.json). The fixture is the solo game of The One Deck parked on its loss
 # (src/campaign/fixtures). The top bar holds the dials, the rail and the menu button; Back, Log, Rules, Booklet and Table
 # settings are rows of the menu. A tap on the rail opens the phase carousel (phase 20).
 - launchApp:

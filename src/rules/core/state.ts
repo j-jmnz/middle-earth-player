@@ -186,6 +186,8 @@ function enterMode(state: ScenarioState, mode: ModeName, crossed: boolean): Scen
   const changed: ScenarioState = { ...state, mode, phase, passed: [], ...begun, ...instance };
   const expiring: ModifierUntil[] = [];
   if (entering) expiring.push("endOfPhase");
+  // "Until the end of the combat phase" (143061:A:2): the combat phase has just ended.
+  if (entering && state.phase === "Combat") expiring.push("endOfCombat");
   if (mode === "beginRound" && state.mode !== "beginRound") expiring.push("endOfRound");
   if (expiring.length === 0) return changed;
   const discounts = (changed.discounts ?? []).filter((discount) => discount.until === "used" || !expiring.includes(discount.until));

@@ -32,6 +32,8 @@ export type PileZone = Extract<Destination, { area?: number }>["zone"];
  */
 export type Layout = {
   seats?: 1 | 2;
+  // The first player (the first seat by default): an effect that says "the first player" reads this seat, not the seat an event happened to.
+  firstPlayer?: 0 | 1;
   seed?: number;
   stage?: string;
   progress?: number;
@@ -160,6 +162,6 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   if (layout.captive) state = holdCaptive(state, idOf(state, layout.captive.hero), idOf(state, layout.captive.under));
   if (layout.pursuit != null) state = { ...state, pursuit: layout.pursuit };
   for (const code of layout.committed ?? []) for (const id of idsOf(state, code)) state = updateCard(state, id, { committed: true });
-  state = { ...state, ...opening(layout.phase ?? "Quest") };
+  state = { ...state, ...opening(layout.phase ?? "Quest"), ...(layout.firstPlayer != null ? { firstPlayer: layout.firstPlayer } : {}) };
   return { state: syncConstants(state, ctx), ctx, hero: first.id, hero2: secondHero.id, seat1Hero, definition, cards };
 }

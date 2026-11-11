@@ -3,7 +3,7 @@ tags:
   - scenario
 ---
 # Phase 32. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json). The fixture `oath-won` is a real
-# two-handed game of The Oath (the Defenders of Gondor and Swords of the Noldor lists, each seat with an Adaptation) from the blank log a new The Dark of Mirkwood
+# two-handed game of The Oath (The One Deck and the Defenders of Gondor lists, each seat with an Adaptation) from the blank log a new The Dark of Mirkwood
 # playthrough starts on (tdom.mini-campaign), parked on its win. 41050's Resolution asks nothing: 6 or more tokens on the campaign card earn Guilty
 # Conscience. Confirming writes the log and unlocks The Caves of Nibin-Dûm. The same win in Mirkwood Paths (part 4, from Escape from Dol
 # Guldur's log) unlocks the same scenario there: that is checked in Node (src/campaign/scenarios/the-oath/golden.test.ts) and stays open on the phone until a real

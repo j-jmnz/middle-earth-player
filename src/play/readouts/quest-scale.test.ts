@@ -9,9 +9,10 @@ import { dockReadout, type Readout } from "./readout.ts";
 
 describe("scaleMarker", () => {
   it("says Ahead in green when willpower beats the threat, Short in red when it falls short, Even otherwise", () => {
-    expect(scaleMarker(2)).toEqual({ value: "+2", word: "Ahead", tone: "ok" });
-    expect(scaleMarker(-1)).toEqual({ value: "−1", word: "Short", tone: "danger" });
-    expect(scaleMarker(0)).toEqual({ value: "0", word: "Even", tone: "muted" });
+    const at = (delta: number): QuestScale => ({ threat: 0, willpower: 0, delta, live: true, seat: null });
+    expect(scaleMarker(at(2))).toEqual({ value: "+2", word: "Ahead", tone: "ok", caption: null });
+    expect(scaleMarker(at(-1))).toEqual({ value: "−1", word: "Short", tone: "danger", caption: null });
+    expect(scaleMarker(at(0))).toEqual({ value: "0", word: "Even", tone: "muted", caption: null });
   });
 });
 

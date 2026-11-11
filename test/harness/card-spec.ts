@@ -66,6 +66,14 @@ export const counter = (name: CounterName, value: number): Expect => ({ expect: 
 export const heldBy = (code: string, host: string): Expect => ({ expect: "heldBy", code, host });
 /** The encounter deck holds this many cards: one is gone for each shadow card or reveal drawn from it (an additional attack is dealt a new shadow card, faq.additional-attacks). */
 export const deckCount = (value: number): Expect => ({ expect: "deckCount", value });
+/** The card is (or is not) exhausted. */
+export const exhausted = (code: string, value = true): Expect => ({ expect: "exhausted", code, value });
+/** The total Threat in the staging area (the printed Threats, the modifiers and what the table adds). */
+export const stagingThreat = (value: number): Expect => ({ expect: "stagingThreat", value });
+/** The seat's threat (the first seat by default; every seat starts at 28). */
+export const threat = (value: number, seat = 0): Expect => ({ expect: "threat", value, seat });
+/** The card was revealed from the encounter deck by this seat (a reveal step names the seat that revealed it). */
+export const revealedBy = (code: string, seat: number): Expect => ({ expect: "revealedBy", code, seat });
 export const lost: Expect = { expect: "lost" };
 export const won: Expect = { expect: "won" };
 /** A frame of this name was pushed while the action ran. */

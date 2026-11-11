@@ -3,8 +3,8 @@ tags:
   - scenario
 ---
 # Phase 48. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `corsairs-won` (scripts/e2e/the-city-of-corsairs.ts): a real two-handed
-# game of The City of Corsairs (the Defenders of Gondor and Swords of the Noldor lists) from the log the first eight parts' wins write (parts 1 to 8 recorded as won, so the path resumes it), parked on its win
-# (stage 4, Captain Sahír destroyed). The fixture is OPEN when scripts/e2e/fixtures.ts found no win of the two starter decklists in its seeds (docs/phases/STATUS.md). The Resolution asks no choice ("The players
+# game of The City of Corsairs (The One Deck and the Defenders of Gondor lists) from the log the first eight parts' wins write (parts 1 to 8 recorded as won, so the path resumes it), parked on its win
+# (stage 4, Captain Sahír destroyed). The fixture is OPEN when scripts/e2e/fixtures.ts found no win of The One Deck and the Defenders of Gondor lists in its seeds (docs/phases/STATUS.md). The Resolution asks no choice ("The players
 # win the campaign!"); confirming writes the XP from the campaign card (1 for each surviving player, Corsair Warships, the Shattered Monument, Crowley, the Stormcaller, Thunderstruck, Ominous Fate) and, this being the
 # last part of the campaign, completes it: the path has nothing to begin and its foot reads "Dream-chaser won. The players win the campaign!" (src/campaign/scenarios/the-city-of-corsairs/golden.test.ts pins the path).
 # The steps are the shared subflow's (.maestro/subflows/scenario-win.yaml).

@@ -3,7 +3,7 @@ tags:
   - scenario
 ---
 # Phase 57. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `night-lost` (scripts/e2e/fire-in-the-night.ts): a real two-handed game of Fire in the
-# Night (the Defenders of Gondor and Swords of the Noldor lists, Easy) dealt from the log Journey Up the Anduin's, Lost in Mirkwood's, The King's Quest's, The Withered Heath's and Roam Across Rhovanion's wins write, parked on its
+# Night (The One Deck and the Defenders of Gondor lists, Easy) dealt from the log Journey Up the Anduin's, Lost in Mirkwood's, The King's Quest's, The Withered Heath's and Roam Across Rhovanion's wins write, parked on its
 # loss (the threat: no seats remain). A loss has no reward screen and writes nothing: the scenario stays current, and neither Beldis, a treasure nor a removal from the pool reaches the log or the pool. The steps are the shared
 # subflow's (.maestro/subflows/scenario-loss.yaml).
 - runFlow:

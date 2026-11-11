@@ -172,10 +172,11 @@ export function drawOpeningHand(state: ScenarioState, seat: number, steps: Engin
 
 // A draw of `count` cards: one draw action, which Iron Shackles on the deck replaces as a whole (families/dungeon/deck.ts).
 // An eliminated player and a table that "cannot draw" draw nothing, so nothing is replaced either. `bottom`: the cards come off the bottom of the deck.
-export function drawMany(state: ScenarioState, seat: number, count: number, steps: EngineStep[], fallback: Cause, ctx: ReduceContext, bottom = false): ScenarioState {
+// `byPlayerCard`: a player card's effect draws them, which a card that hears the draw can ask (143059:A:1).
+export function drawMany(state: ScenarioState, seat: number, count: number, steps: EngineStep[], fallback: Cause, ctx: ReduceContext, bottom = false, byPlayerCard = false): ScenarioState {
   if (state.seats[seat]?.eliminated || heldAmount(state, "table", "cannotDraw") > 0) return state;
   const drawn = drawCards(state, seat, count, (current) => drawOne(current, seat, steps, fallback, bottom));
-  return announceEnteredHand(state, announceDraw(state, drawn, seat), seat, ctx);
+  return announceEnteredHand(state, announceDraw(state, drawn, seat, ctx, byPlayerCard), seat, ctx);
 }
 
 function drawOne(state: ScenarioState, seat: number, steps: EngineStep[], fallback: Cause, bottom: boolean): ScenarioState {
@@ -187,6 +188,8 @@ function drawOne(state: ScenarioState, seat: number, steps: EngineStep[], fallba
 }
 
 export function gainSeatResources(state: ScenarioState, seat: number, steps: EngineStep[], fallback: Cause): ScenarioState {
+  // "Players cannot gain resources" (143078:B:1) bars the resource phase's collection.
+  if (state.modifiers.length > 0 && flagged(state, "table", "cannotGainResources")) return state;
   const heroes = state.seats[seat]?.heroes ?? [];
   let next = state;
   for (const heroId of heroes) {

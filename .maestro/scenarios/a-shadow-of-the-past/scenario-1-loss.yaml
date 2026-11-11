@@ -1,7 +1,7 @@
 appId: com.middleearth.lcg
 ---
 # Phase 11. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json). The
-# fixture is a real solo game of Stealth and Steadfastness parked on its loss (src/campaign/fixtures). A loss has no reward
+# fixture is a real solo game of The One Deck parked on its loss (src/campaign/fixtures). A loss has no reward
 # screen and writes nothing to the log.
 - launchApp:
     clearState: true

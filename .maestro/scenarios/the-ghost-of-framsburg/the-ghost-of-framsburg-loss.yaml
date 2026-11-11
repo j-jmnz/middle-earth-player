@@ -3,7 +3,7 @@ tags:
   - scenario
 ---
 # Phase 58. Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `framsburg-lost` (scripts/e2e/the-ghost-of-framsburg.ts): a real two-handed game of The Ghost of
-# Framsburg (the Defenders of Gondor and Swords of the Noldor lists, Easy) dealt from the log the first six parts' wins write (Fire in the Night's two-handed win on the log of the five before it), parked on its loss (the threat: no seats
+# Framsburg (The One Deck and the Defenders of Gondor lists, Easy) dealt from the log the first six parts' wins write (Fire in the Night's two-handed win on the log of the five before it), parked on its loss (the threat: no seats
 # remain). A loss has no reward screen and writes nothing: the scenario stays current, and neither Gundabad Hunter, Gundabad Stalker, a Hazard card nor a treasure reaches the log or the pool. The steps are the shared subflow's
 # (.maestro/subflows/scenario-loss.yaml).
 - runFlow:

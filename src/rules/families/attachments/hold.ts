@@ -4,8 +4,10 @@
 // happens to the cards attached to a host that is destroyed or defeated, a Guarded attachment whose guard leaves play, and a
 // card whose text box is blank. Kept free of engine imports beyond the state, so those modules can call it.
 import { queueEvent } from "../../windows/queue.ts";
+import { CHARACTERS_CLASS, DAMAGED_CHARACTERS_CLASS, heldBy } from "../../core/holder-classes.ts";
+import { printedOf, type PrintedCard } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { flagged, heldAmount, inPlay, updateCard } from "../../core/state.ts";
+import { heldAmount, inPlay, modifierActive, updateCard } from "../../core/state.ts";
 
 // The cards attached to a host that an enemy's destruction or a quest card's defeat is announced to: the player cards in play
 // (a Guarded attachment it guarded hears `unguarded` instead; an encounter card attached to it has no such ability).
@@ -52,8 +54,15 @@ export function releaseGuarded(state: ScenarioState, id: string): ScenarioState 
 }
 
 // A card whose printed text box is blank (rr.blank): its own records do not apply while it holds the flag.
-export function textBlank(state: ScenarioState, id: string): boolean {
-  return flagged(state, id, "blankText") || state.cards[id]?.prisoner === true;
+// An encounter card's lasting effect on every character (`target: "characters"`) holds for the characters that enter play later too (rr.lasting-effects, 143043:A:1): `cards` reads the card's type.
+export function textBlank(state: ScenarioState, id: string, cards: ReadonlyMap<string, PrintedCard>): boolean {
+  const instance = state.cards[id];
+  if (instance?.prisoner === true) return true;
+  for (const modifier of state.modifiers) {
+    if (modifier.stat !== "blankText" || modifier.amount <= 0 || !modifierActive(state, modifier)) continue;
+    if (modifier.instanceId === id || (instance != null && cards != null && (modifier.instanceId === CHARACTERS_CLASS || modifier.instanceId === DAMAGED_CHARACTERS_CLASS) && heldBy(modifier, instance, printedOf(cards, instance.code)))) return true;
+  }
+  return false;
 }
 
 // The total Threat in the staging area less the table's lessStagingThreat modifiers ("reduce the total Threat in the staging

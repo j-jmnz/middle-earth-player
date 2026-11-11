@@ -3,6 +3,8 @@ import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 import type { XpCount } from "../../../catalog/families/dreamchaser.ts";
 
+import { gameReads } from "../../core/game-reads.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { livingSeats, type ScenarioState } from "../../core/state.ts";
 import { tokensOn } from "../campaign/index.ts";
@@ -28,12 +30,13 @@ export function xpOf(state: ScenarioState, instruction: Extract<Instruction, { v
   return instruction.max != null ? Math.min(total, instruction.max) : total;
 }
 
-// The Hard/Expert Mode card hears "a player draws any number of cards" (dcce.hard-expert): the draw from `before` to `after` is announced with the
-// number of cards drawn as its amount, only while a mode card is in the game (no other game announces it).
-export function announceDraw(before: ScenarioState, after: ScenarioState, seat: number): ScenarioState {
-  if (!Object.values(after.cards).some((card) => card.zone === "modeCard")) return after;
+// "After a player draws any number of cards" (dcce.hard-expert, 143048:A:1, 143059:A:1): the draw from `before` to `after` is announced with the number of cards drawn as its amount, only while a mode card is in the
+// game or a card in the game has a record that hears it (no other game announces it). The event is stamped with the clock, so a card that enters play after the draw does not hear it (a Forced effect must be in
+// play and active when its trigger occurs, rr.forced), and with whether a player card's effect drew them.
+export function announceDraw(before: ScenarioState, after: ScenarioState, seat: number, ctx: ReduceContext, byPlayerCard: boolean): ScenarioState {
+  if (!Object.values(after.cards).some((card) => card.zone === "modeCard") && !gameReads(after, ctx, '"trigger":"cardsDrawn"')) return after;
   const got = (after.seats[seat]?.hand.length ?? 0) - (before.seats[seat]?.hand.length ?? 0);
-  return got > 0 ? queueEvent(after, { trigger: "cardsDrawn", seat, amount: got }) : after;
+  return got > 0 ? queueEvent(after, { trigger: "cardsDrawn", seat, amount: got, at: after.clock, ...(byPlayerCard ? { byPlayerCard: true as const } : {}) }) : after;
 }
 
 // What a card was dealt and a seat was relieved of this round (the flags damageCap, threatReductionCap and playerThreatReductionCap) lasts one round: the new round clears it.

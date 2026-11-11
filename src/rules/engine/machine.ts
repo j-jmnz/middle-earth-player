@@ -103,7 +103,8 @@ export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineSt
     // The play family's constants (families/play/sweep.ts): hero card type, first player control, discard at a stat.
     const swept = current.lost || current.failure ? current : runSettle("sweep", destroyOverwhelmed(playSweep(clearEliminated(current, ctx.cards), ctx, steps), ctx.cards, steps, held), ctx, steps);
     if (swept !== current) {
-      current = swept;
+      // A seat a sweep eliminated (an empty hand on stage 3B) hands its open window on at once, as one eliminated by an intent does.
+      current = handoffEliminated(swept);
       continue;
     }
     if (current.lost || current.stageCleared || current.failure || current.window) return current;

@@ -47,7 +47,7 @@ describe("the Captive chosen at Setup (143069:A:1)", () => {
   it("is blank under To Isengard!'s constant, picked only by a filter that asks for it, and not found by 'you control'", () => {
     const state = syncConstants(table, ctxOf());
     const [captive] = captivesOf(state);
-    expect(textBlank(state, captive?.id ?? "")).toBe(true);
+    expect(textBlank(state, captive?.id ?? "", ctxOf().cards)).toBe(true);
     expect(pickCandidates(state, { type: "hero", control: "any", captive: "only" }, 0, [], null, ctxOf())).toEqual([captive?.id]);
     expect(pickCandidates(state, { type: "hero", control: "any", captive: "include" }, 0, [], null, ctxOf())).toContain(captive?.id);
     expect(pickCandidates(state, { type: "hero", control: "any" }, 0, [], null, ctxOf())).not.toContain(captive?.id);
@@ -82,7 +82,7 @@ describe("the rescue at the win (143070:B:3)", () => {
     expect(rescued.cards[id]?.host ?? null).toBeNull();
     expect(slot).toBeDefined();
     expect(rescued.seats[0].heroes.indexOf(id)).toBe(slot);
-    expect(textBlank(syncConstants(rescued, ctxOf()), id)).toBe(false);
+    expect(textBlank(syncConstants(rescued, ctxOf()), id, ctxOf().cards)).toBe(false);
   });
 
   it("changes nothing when no Captive is held", () => {

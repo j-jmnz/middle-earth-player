@@ -40,6 +40,8 @@ export function openPools(state: ScenarioState, seat: number, cardId: string | u
 // effects" / "from non-treasure cards").
 export function mayGainResources(state: ScenarioState, heroId: string, sourceId: string | null, ctx: ReduceContext): boolean {
   if (state.modifiers.length === 0) return true;
+  // "Players cannot gain resources" (143078:B:1): whatever the source.
+  if (flagged(state, "table", "cannotGainResources")) return false;
   const source = sourceId ? state.cards[sourceId] : undefined;
   if (!source) return true;
   const printed = printedOf(ctx.cards, source.code);

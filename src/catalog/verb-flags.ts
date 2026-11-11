@@ -5,7 +5,8 @@ import { z } from "zod";
 // Whether a quest card's Setup record is run in a frame of its own after the deal (src/rules/families/quest/setup.ts revealsPerPlayer), a record the scenario's piles cannot place:
 // - "top": the record runs when one of its top-level instructions is this verb.
 // - "inForEachPlayer", "inEach": the record runs when a top-level ForEachPlayer (or Each) holds this verb. Alone, the verb is placed by the piles or runs nowhere in Setup. The suffix names the wrapper verb.
-export type SetupRuns = "top" | "inForEachPlayer" | "inEach";
+// - "inChoose": the record runs when a top-level Choose has an option that holds this verb (the players choose how the Setup goes on, 143072:A:1).
+export type SetupRuns = "top" | "inForEachPlayer" | "inEach" | "inChoose";
 
 // What a record that names the verb needs from the player's collection (src/campaign/world.ts loadWorld):
 // - "hero": it chooses a hero card of the collection, so every deck-legal hero is loaded.
@@ -36,7 +37,7 @@ export function verbFlagsOf(schema: z.ZodType): VerbFlags {
   const meta = z.globalRegistry.get(schema);
   const flags: VerbFlags = {};
   if (meta?.runsInFrame === true) flags.runsInFrame = true;
-  if (meta?.setupRuns === "top" || meta?.setupRuns === "inForEachPlayer" || meta?.setupRuns === "inEach") flags.setupRuns = meta.setupRuns;
+  if (meta?.setupRuns === "top" || meta?.setupRuns === "inForEachPlayer" || meta?.setupRuns === "inEach" || meta?.setupRuns === "inChoose") flags.setupRuns = meta.setupRuns;
   if (meta?.setupRole === "dealt" || meta?.setupRole === "afterSetup") flags.setupRole = meta.setupRole;
   if (meta?.collection === "hero" || meta?.collection === "card" || meta?.collection === "treasure") flags.collection = meta.collection;
   return flags;

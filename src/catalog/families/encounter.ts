@@ -55,7 +55,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("CountEncounterTop"), top: z.number().int().positive(), type: encounterType, not: z.boolean().optional(), ...when }),
   // Reveals the top card of the encounter deck for the actor, or for the player the answered event happened to
   // (`eventSeat`), in a staging of its own (rr.reveal, rr.staging): the effect goes on once that card is resolved.
-  verbFlags(z.strictObject({ verb: z.literal("RevealEncounter"), who: z.enum(["actor", "eventSeat"]).optional(), ...when }), { runsInFrame: true, setupRuns: "inForEachPlayer" }),
+  // `times`: that many cards, one after the other, each in a staging of its own ("reveals 1 encounter card for each resource here", 143078:B:2; read once, when the first is revealed).
+  verbFlags(z.strictObject({ verb: z.literal("RevealEncounter"), who: z.enum(["actor", "eventSeat"]).optional(), times: positiveAmountSchema.optional(), ...when }), { runsInFrame: true, setupRuns: "inForEachPlayer" }),
   // Searches the encounter deck, then its discard pile, then the player's collection (in that order, "search the encounter deck, discard pile, and
   // your collection for a Goblin Sniper", 41041:A:1) for a card with the printed title of `code`, and adds it to the staging area. The app tracks
   // no collection (docs/brief.md): the collection holds every card the game knows, so a copy of `code` is made when neither the deck nor the pile
@@ -70,8 +71,9 @@ const VERBS = [
   // The "when revealed" effects of the picked card (or `card`) resolve for the actor, as if it had just been revealed. It
   // was not revealed from the encounter deck, so they are not offered to cancels of a card just revealed.
   verbFlags(z.strictObject({ verb: z.literal("ResolveWhenRevealed"), card: cardRefSchema.optional(), ...when }), { runsInFrame: true }),
-  // The staging step of this phase reveals `amount` fewer cards (rr.step-3-3), to a minimum of `min` (0 or 1).
-  z.strictObject({ verb: z.literal("RevealFewer"), amount: z.number().int().positive(), min: z.union([z.literal(0), z.literal(1)]), ...when }),
+  // The staging step of this phase reveals `amount` fewer cards (rr.step-3-3), to a minimum of `min` (0 or 1). With `who: picked`, the player picked last reveals that many fewer
+  // ("That player reveals 1 fewer encounter card this phase (to a minimum of 0)", 143020:A:2): the reveals the players make in turn skip that player's, and nothing else is shortened. A player's own reveal is one card, so `min: 1` leaves it as it is.
+  z.strictObject({ verb: z.literal("RevealFewer"), amount: z.number().int().positive(), min: z.union([z.literal(0), z.literal(1)]), who: z.literal("picked").optional(), ...when }),
   // The staging step of this phase reveals `amount` more cards (rr.step-3-3): "reveal an additional encounter card this phase"
   // (141080:A:2). The extra cards are revealed by the players in turn, from the first player on.
   z.strictObject({ verb: z.literal("RevealMore"), amount: z.number().int().positive(), ...when }),
