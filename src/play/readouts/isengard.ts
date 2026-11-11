@@ -11,7 +11,7 @@ import { modifiedStat } from "../../rules/core/keywords.ts";
 import { effectsOf } from "../../rules/windows/listen.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 
-import { useStableDials, type TableDial } from "./dials.ts";
+import type { TableDial } from "./dials.ts";
 import { advanceLimitWords } from "../words/scenarios/fortress.ts";
 import { entLimitWords, gateWords, handLabel, handWarning, REVEALS_WORDS } from "../words/scenarios/isengard.ts";
 
@@ -76,11 +76,6 @@ export function isengardHands(game: ScenarioState): readonly HandMark[] {
     const warn = handWarning(count);
     return { seat, label: handLabel(count, seats.length > 1 ? seat : null), ...(warn ? { warn } : {}) };
   });
-}
-
-/** The dials for the top bar: the same list while no dial's words or number changed, so the bar re-renders only when a token, a hit point or a card moves. */
-export function useIsengardDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code: string) => string): readonly TableDial[] {
-  return useStableDials(isengardDials(game, ctx, nameOf));
 }
 
 /** The hand marks for the seat dials, stable the same way. */

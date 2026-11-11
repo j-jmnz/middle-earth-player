@@ -50,9 +50,11 @@ export function addFromNamed(state: ScenarioState, instruction: Extract<Instruct
   // `reveal` (the Harad deck, 144068:B:1, 144032:A:2, 144036:A:2): the top card is revealed (rr.reveal), so its Surge and When Revealed effects resolve, and then enters the staging area or is engaged with the seat; the effect goes on once it is resolved.
   if (instruction.reveal) {
     const seat = seats[0] ?? focus.seat;
-    const top = topOf(state, zones.deck);
-    if (top === undefined || state.seats[seat]?.eliminated) return state;
-    return startReveal(markPicked(state, top), seat, ctx, steps, top, undefined, instruction.to === "engaged");
+    // The deck refills from its discard pile first, as the other reveals do (revealTop); the refusal in pileTravelUnpayable counts that pile too.
+    const filled = refillDeck(state, zones);
+    const top = topOf(filled, zones.deck);
+    if (top === undefined || filled.seats[seat]?.eliminated) return filled;
+    return startReveal(markPicked(filled, top), seat, ctx, steps, top, undefined, instruction.to === "engaged");
   }
   let next = state;
   for (const seat of seats) {
@@ -65,6 +67,13 @@ export function addFromNamed(state: ScenarioState, instruction: Extract<Instruct
     }
   }
   return next;
+}
+
+/** "The first player reveals the top facedown card under The Cross-roads and adds it to the staging area to travel here" (144032:A:2, rr.travel): a deck beside the encounter deck with no card to reveal, nor a discard pile to refill it from, cannot pay the cost. */
+export function pileTravelUnpayable(state: ScenarioState, instruction: Instruction): boolean {
+  if (instruction.verb !== "AddFromPile") return false;
+  const zones = NAMED_PILES[instruction.pile];
+  return pileOf(state, zones.deck).length + (zones.discard ? pileOf(state, zones.discard).length : 0) === 0;
 }
 
 /** "Shuffle the Spiders of Mirkwood encounter set into the encounter deck": every card of the deck goes into the encounter deck, facedown, and the encounter deck is shuffled. */

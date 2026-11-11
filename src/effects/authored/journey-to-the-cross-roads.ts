@@ -40,7 +40,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
   [
     // 144014 Brace of Coneys: the Ring-bearer is a hero the player controls (mec112.multiplayer-the-one-ring).
     { id: "144014:constant:1", cardCode: "144014", lines: ["144014:A:1"], timing: "constant", instructions: [{ verb: "PlayOnlyIf", condition: { kind: "count", pick: { type: "hero", control: "you", trait: "Ring-bearer" }, min: 1 } }] },
-    { id: "144014:action:1", cardCode: "144014", lines: ["144014:A:2"], timing: "action", condition: { kind: "phase", is: "Planning" }, instructions: [{ verb: "AddSourceToVictory" }, CONEYS_CHOICE, CONEYS_CHOICE] },
+    { id: "144014:action:1", cardCode: "144014", lines: ["144014:A:2"], timing: "action", condition: { kind: "phase", is: "Planning" }, instructions: [{ verb: "AddSourceToVictory" }, CONEYS_CHOICE, { ...CONEYS_CHOICE }] },
 
     // 144027 The Black Gate. A card placed under it is out of play (the zone `under`). The Forced effect is ignored while Henneth Annûn is the active location; the loss line is not.
     {
@@ -48,9 +48,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       condition: { kind: "all", conditions: [{ kind: "phase", is: "Planning" }, HENNETH_NOT_ACTIVE] },
       instructions: [{ verb: "Each", pick: HARAD_IN_STAGING, instructions: [PLACE_UNDER_GATE("picked")] }],
     },
-    // X is 3 more than the number of players; the loss is at once, as a card is placed under it (as 11038:A:2).
+    // X is 3 more than the number of players, so the loss holds whenever the cards under it reach that number, a seat's elimination included (as 143022:constant:2). gateTally reads the number from here.
     {
-      id: "144027:triggered:1", cardCode: BLACK_GATE, lines: ["144027:A:2"], timing: "triggered", trigger: "placedUnder", subject: { type: "enemy", control: "any" },
+      id: "144027:constant:1", cardCode: BLACK_GATE, lines: ["144027:A:2"], timing: "constant",
       condition: { kind: "facedownUnder", code: BLACK_GATE, min: 3, players: true }, instructions: [{ verb: "LoseGame", reason: "The Black Gate has taken too many Harad enemies" }],
     },
 
@@ -174,7 +174,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     // 144057 Haradrim Soldier.
     copyLine("18035:A:1", "144057:A:1"),
     // The additional attack its Shadow grants is dealt a new shadow card, the old ones discarded first (faq.additional-attacks); written on its own, not copied from 18035:A:2 (which deals none).
-    { id: "144057:shadow:1", cardCode: "144057", lines: ["144057:A:2"], timing: "shadow", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "ImmediateAttack" }] }] },
+    { id: "144057:shadow:1", cardCode: "144057", lines: ["144057:A:2"], timing: "shadow", instructions: [{ verb: "ImmediateAttack", afterThis: true }] },
 
     // 144058 Haradrim Archer: Threat X and Archery X, X the number of players (the card prints Threat X).
     { id: "144058:constant:1", cardCode: "144058", lines: ["144058:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "threat", amount: { players: true }, until: "whileSourceInPlay" }, { verb: "ModifyStat", stat: "archery", amount: { players: true }, until: "whileSourceInPlay" }] },

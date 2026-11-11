@@ -10,7 +10,7 @@ import { mireTally } from "../../rules/families/mire/index.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 
 import { GOLLUM_WORDS, gollumHeldWords, listNames, mireWarn, mireWords, nearestRows } from "../words/scenarios/marshes.ts";
-import { useStableDials, type TableDial } from "./dials.ts";
+import type { TableDial } from "./dials.ts";
 import type { HeldDial } from "./widgets.ts";
 
 /**
@@ -47,9 +47,4 @@ export function gollumHeld(game: ScenarioState): readonly HeldDial[] {
   if (!card || !inPlay(card.zone) || card.controller == null) return [];
   const who = game.seatCount > 1 ? `Player ${card.controller + 1}` : "you";
   return [{ seat: card.controller, words: gollumHeldWords(card.code === GOLLUM ? "gollum" : "smeagol", who, card.exhausted), mark: "hero" }];
-}
-
-/** The dials for the top bar: the same list while no dial's words or number changed. */
-export function useMarshesDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code: string) => string): readonly TableDial[] {
-  return useStableDials(marshesDials(game, ctx, nameOf));
 }

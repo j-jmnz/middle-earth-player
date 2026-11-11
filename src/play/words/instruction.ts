@@ -226,6 +226,8 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
       return instruction.to === "play" ? "put it into play" : "put it into your hand";
     case "PlaceUnderSelf":
       return `place it facedown under ${sourceId ? names.card(sourceId) : "the location"}`;
+    case "PlaceFacedownUnder":
+      return `place ${instruction.target === "self" ? "the attacking enemy" : "it"} facedown under ${names.code(instruction.code)}${instruction.afterAttack ? " after this attack" : ""}`;
     case "ShuffleEncounterDeck":
       return null;
     // The quest family's verbs (src/catalog/families/quest.ts).

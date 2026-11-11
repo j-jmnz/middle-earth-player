@@ -313,7 +313,9 @@ function expandDiscards(state: ScenarioState, item: QueueItem, frame: Frame, ctx
 function attackAfterThis(state: ScenarioState, sourceId: string | null, steps: EngineStep[]): ScenarioState {
   const attack = state.pendingAttack;
   const source = sourceId ? state.cards[sourceId] : undefined;
-  if (!attack || !sourceId || (attack.enemyId !== sourceId && !(source?.zone === "shadow" && source.host === attack.enemyId))) return state;
+  // The source is the attacking enemy, or the shadow card dealt to it for this attack (144039:A:2, 144057:A:2).
+  const isItsShadowCard = source?.zone === "shadow" && source.host === attack?.enemyId;
+  if (!attack || !sourceId || (attack.enemyId !== sourceId && !isItsShadowCard)) return state;
   return { ...state, pendingAttack: { ...attack, after: [...(attack.after ?? []), { verb: "ImmediateAttack" }], afterCause: currentCause(steps, UNATTRIBUTED) } };
 }
 

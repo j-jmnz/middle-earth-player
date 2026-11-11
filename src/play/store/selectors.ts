@@ -2,6 +2,7 @@
 // the same objects, so a Zustand subscriber of one zone does not render when another zone changes: a threat change leaves
 // the hand slice alone (docs/architecture.md, State). The reducer keeps the references of the zones it did not touch;
 // these selectors only keep that property through the join of ids and instances.
+import { BLACK_GATE } from "../../rules/families/harad/under.ts";
 import type { ReduceContext } from "../../rules/engine/reduce.ts";
 import type { CardInstance, ScenarioState } from "../../rules/core/state.ts";
 import { cardsUnder, shadowCards } from "../../rules/core/zones.ts";
@@ -49,8 +50,9 @@ export function isPrisoner(card: Pick<CardInstance, "prisoner" | "zone" | "host"
   return card.prisoner === true && card.zone === "captive" && card.host == null;
 }
 
-// The Black Gate of Journey to the Cross-roads (144027): the enemies facedown under it are drawn under it.
-const BLACK_GATE = "144027";
+/** Whether a staging card with more than one card under it shows one counted peek (layout.ts, `stacks`): a sea game (a grappled arm, Black Key) and a game with the Harad deck (the enemies under The Black Gate, 144027:A:2); every other game peeks each card. */
+export const stacksUnder = (state: { game: ScenarioState }): boolean => state.game.sea != null || state.game.piles?.haradDeck !== undefined;
+
 const NONE: readonly string[] = [];
 const EMPTY: readonly CardInstance[] = [];
 

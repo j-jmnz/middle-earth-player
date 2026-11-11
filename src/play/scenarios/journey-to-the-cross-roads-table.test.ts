@@ -3,6 +3,9 @@
 // peek, and the Harad deck as the second slot's pile. The engine decided each number; nothing here changes one.
 import { describe, expect, it } from "vitest";
 
+import { EFFECTS } from "../../effects/index.ts";
+import { holds } from "../../rules/interpret/conditions.ts";
+import { ASKS_BY_SCENARIO } from "../words/asks/index.ts";
 import { settle } from "../../rules/engine/machine.ts";
 import { syncConstants } from "../../rules/interpret/constants.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
@@ -47,6 +50,22 @@ describe("the Gate dial", () => {
     expect(dial(dialsOf({ seats: 2, staging: [GATE], under: under("144057", "144058", "144028") }), "gate")).toMatchObject({ value: 3, limit: 5, warn: { level: "near" } });
   });
 
+  it("144027:A:2 arms the two-tap caution of each option that places an enemy when the Gate is one enemy short of the loss, from the same number", () => {
+    const entries = Object.entries(ASKS_BY_SCENARIO[ID] ?? {}).filter(([key]) => key.endsWith(" place") || key.endsWith(" @0 place"));
+    expect(entries.map(([key]) => key.split(" ")[0])).toEqual(["144036:whenRevealed:1", "144038:whenRevealed:1", "144039:shadow:1"]);
+    const loss = EFFECTS.find((effect) => effect.id === "144027:constant:1")?.condition;
+    expect(loss).toMatchObject({ kind: "facedownUnder", min: 3, players: true });
+    const armed = (layout: Layout): boolean[] => {
+      const made = table(layout);
+      return entries.map(([, entry]) => holds(syncConstants(made.state, made.ctx), entry.caution!.when, { actor: 0, sourceId: null, returned: 0 }, made.ctx));
+    };
+    expect(armed({ staging: [GATE], under: under("144057", "144058") })).toEqual([false, false, false]);
+    expect(armed({ staging: [GATE], under: under("144057", "144058", "144028") })).toEqual([true, true, true]);
+    expect(armed({ seats: 2, staging: [GATE], under: under("144057", "144058", "144028") })).toEqual([false, false, false]);
+    expect(armed({ seats: 2, staging: [GATE], under: under("144057", "144058", "144028", "144029") })).toEqual([true, true, true]);
+    for (const [, entry] of entries) expect(entry.caution?.when).toMatchObject({ kind: "facedownUnder", min: 3 - 1, players: true });
+  });
+
   it("144027:A:1 is not there with no Black Gate in play", () => {
     expect(dial(dialsOf({}), "gate")).toBeUndefined();
   });
@@ -57,15 +76,21 @@ describe("the Harad deck dial", () => {
     const shown = dial(dialsOf({ staging: ["144030"], piles: { haradDeck: ["144057", "144058", "144028"] } }), "harad");
     expect(shown).toMatchObject({ label: "Harad", value: 3, testID: "roads-harad", name: "Cards facedown under The Cross-roads:" });
     expect(shown?.limit).toBeUndefined();
-    expect(shown?.note).toBe(haradWords(3, 6));
+    expect(shown?.note).toBe(haradWords(3, 6, false));
     // The last card revealed leaves the pile empty, not undealt: the dial stays at 0.
     const made = table({ staging: ["144030"], piles: { haradDeck: ["144057"] } });
     const emptied = { ...made.state, piles: { ...made.state.piles, haradDeck: [] } };
-    expect(dial(roadsDials(syncConstants(emptied, made.ctx), made.ctx, names(made)), "harad")).toMatchObject({ value: 0, note: haradWords(0, 9) });
+    expect(dial(roadsDials(syncConstants(emptied, made.ctx), made.ctx, names(made)), "harad")).toMatchObject({ value: 0, note: haradWords(0, 9, false) });
+  });
+
+  it("144030:A:2 at 0 cards drops the reveal and the card bar and says what still holds", () => {
+    expect(haradWords(0, 9, false)).toBe("No cards left under The Cross-roads; The Cross-roads has 9 Threat. The players can travel there once 20 progress is on the stage");
+    expect(haradWords(0, 9, true)).toBe("No cards left under The Cross-roads; The Cross-roads has 9 Threat. The players can travel there now");
+    expect(haradWords(0, null, true)).not.toMatch(/revealed|any is left/);
   });
 
   it("144068:B:1 follows the deck down by one card at a time and is not there in a game that did not deal it", () => {
-    expect(haradWords(1, 8)).toBe("1 card facedown under The Cross-roads; The Cross-roads has 8 Threat. One is revealed each quest phase. The players cannot travel there while any is left, nor before 20 progress is on the stage");
+    expect(haradWords(1, 8, false)).toBe("1 card facedown under The Cross-roads; The Cross-roads has 8 Threat. One is revealed each quest phase. The players cannot travel there while any is left, nor before 20 progress is on the stage");
     expect(dial(dialsOf({ staging: ["144030"] }), "harad")).toBeUndefined();
   });
 });

@@ -19,7 +19,9 @@ import { pileOf } from "../../core/piles.ts";
 import { moveCard, spawn } from "../../core/zones.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
+import { tiedExtreme } from "../../interpret/tied-extreme.ts";
 import { deal, table } from "../wilderland/fixture.ts";
+import { gateTally } from "./under.ts";
 
 const CARDS = cardMap([
   hero("frodo", "lore"),
@@ -37,8 +39,9 @@ const CARDS = cardMap([
 const FORCED_ENGAGED = (code: string, instructions: Instruction[]): Effect => ({ id: `${code}:forced:1`, cardCode: code, lines: [`${code}:A:1`], timing: "forced", trigger: "engaged", subject: "self", instructions });
 const DISCARD = FORCED_ENGAGED("soldier", [{ verb: "DiscardRandomFromHand" }]);
 const TRAVEL: Effect = { id: "roads:travel:1", cardCode: "roads", lines: ["roads:A:2"], timing: "travel", instructions: [{ verb: "AddFromPile", pile: "harad", to: "staging", reveal: true }] };
+// The loss as the Black Gate's own record writes it (144027:constant:1): it holds whenever the cards under it reach the number.
 const LOSS: Effect = {
-  id: "gate:triggered:1", cardCode: "gate", lines: ["gate:A:2"], timing: "triggered", trigger: "placedUnder", subject: { type: "enemy", control: "any" },
+  id: "gate:constant:1", cardCode: "gate", lines: ["gate:A:2"], timing: "constant",
   condition: { kind: "facedownUnder", code: "gate", min: 2, players: true }, instructions: [{ verb: "LoseGame" }],
 };
 const ctxOf = (effects: readonly Effect[] = []): ReduceContext => ({ effects, cards: CARDS });
@@ -96,6 +99,14 @@ describe("the Harad deck (mec112.setup-journey-to-the-cross-roads)", () => {
     expect(resolveAmount(table(), { pile: "harad" }, frameScope(table(), 0, null), ctxOf())).toBe(0);
   });
 
+  it("a Travel cost of AddFromPile is unpayable for a pile with no card and no discard pile to refill it, and payable with a discard pile that holds one (rr.travel)", () => {
+    const cost: Effect = { ...TRAVEL, instructions: [{ verb: "AddFromPile", pile: "evilCreatures", to: "staging" }] };
+    const place = spawn(table(), "roads", { zone: "staging" });
+    expect(travelCostUnpayable(place.state, ctxOf([cost]), place.id)).toBe(true);
+    const discarded = spawn(place.state, "soldier", { zone: "evilCreaturesDiscard" }).state;
+    expect(travelCostUnpayable(discarded, ctxOf([cost]), place.id)).toBe(false);
+  });
+
   it("144032:A:2 cannot be paid with no card left in the Harad deck (rr.travel)", () => {
     const full = spawn(withHarad(["man"]), "roads", { zone: "staging" });
     expect(travelCostUnpayable(full.state, ctxOf([TRAVEL]), full.id)).toBe(false);
@@ -146,6 +157,26 @@ describe("PlaceFacedownUnder and facedownUnder (144027:A:1, 144027:A:2)", () => 
     expect(state.lost).toBeTruthy();
   });
 
+  it("holds the loss after a seat is eliminated: two players, 4 under (the limit 2 + 2), then one is out and the limit is 3 (144027:A:2)", () => {
+    let state = spawn(table(2), "gate", { zone: "staging" }).state;
+    const gate = Object.values(state.cards).find((card) => card.code === "gate")!;
+    for (let at = 0; at < 3; at += 1) state = spawn(state, "soldier", { zone: "under", locationId: gate.id }).state;
+    state = settle(state, ctxOf([LOSS]), []);
+    expect(state.lost).toBeFalsy();
+    expect(gateTally(state, ctxOf([LOSS]), "gate")).toEqual({ count: 3, limit: 4 });
+    const [first, second] = state.seats;
+    const one: ScenarioState = { ...state, seats: [first, { ...second, eliminated: true }] };
+    expect(gateTally(one, ctxOf([LOSS]), "gate")).toEqual({ count: 3, limit: 3 });
+    expect(settle(one, ctxOf([LOSS]), []).lost).toBeTruthy();
+  });
+
+  it("gateTally reads the number from the record, and is null with no Black Gate or no loss record", () => {
+    const state = withHarad([]);
+    expect(gateTally(state, ctxOf([LOSS]), "gate")).toEqual({ count: 0, limit: 3 });
+    expect(gateTally(state, ctxOf(), "gate")).toBeNull();
+    expect(gateTally(table(), ctxOf([LOSS]), "gate")).toBeNull();
+  });
+
   it("144039:A:2 afterAttack waits for the attack in progress to end", () => {
     const state = withHarad([]);
     const enemy = spawn(state, "soldier", { zone: "engaged", seat: 0 });
@@ -168,6 +199,15 @@ describe("the lowestAttack and lowestThreat filters (144036:A:2, 144038:A:2)", (
     expect(found({ lowestAttack: true })).toEqual(["soldier", "soldier"]);
     // The Orc has the highest Threat but is not a Harad enemy: it takes no part.
     expect(found({ lowestAttack: true, lowestThreat: true })).toEqual(["soldier", "soldier"]);
+  });
+});
+
+describe("tiedExtreme (the filters lowestAttack, lowestThreat, lowestAflame and highestAttack)", () => {
+  it("keeps every card tied on the lowest or the highest value", () => {
+    const values: Record<string, number> = { a: 3, b: 1, c: 1, d: 3 };
+    expect(tiedExtreme(["a", "b", "c", "d"], (id) => values[id]!, "lowest")).toEqual(["b", "c"]);
+    expect(tiedExtreme(["a", "b", "c", "d"], (id) => values[id]!, "highest")).toEqual(["a", "d"]);
+    expect(tiedExtreme([], (id) => values[id]!, "lowest")).toEqual([]);
   });
 });
 

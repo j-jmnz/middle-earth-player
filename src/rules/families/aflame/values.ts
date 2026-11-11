@@ -8,7 +8,7 @@ import type { ScenarioState } from "../../core/state.ts";
 import { livingSeats } from "../../core/state.ts";
 import { effectsOf } from "../../windows/listen.ts";
 import { levelOfCard } from "../dreamchaser/facts.ts";
-import { facedownCount, namedInPlay } from "../misc/amounts.ts";
+import { facedownCount, facedownWithin, namedInPlay } from "../misc/amounts.ts";
 
 /** The title of the objective the destroyed Aflame locations are placed underneath (dcce.aflame). */
 export const HAVENS_BURN = "The Havens Burn";
@@ -34,9 +34,7 @@ export function underBurn(state: ScenarioState, ctx: ReduceContext): number {
 
 /** The `underBurn` condition: the cards underneath number at least `min` and at most `max`, each plus the number of players with `players`. */
 export function underBurnHolds(state: ScenarioState, condition: Extract<Condition, { kind: "underBurn" }>, ctx: ReduceContext): boolean {
-  const extra = condition.players ? livingSeats(state).length : 0;
-  const count = underBurn(state, ctx);
-  return (condition.min == null || count >= condition.min + extra) && (condition.max == null || count <= condition.max + extra);
+  return facedownWithin(state, burnId(state, ctx), condition);
 }
 
 /** The `encounterHas` condition: the encounter discard pile (or the deck as well) holds a card of the printed type, with Aflame when asked. */

@@ -21,9 +21,12 @@ const TRAITED_ENEMIES = `${ENEMIES_CLASS}:`;
 export const traitedEnemies = (trait: string): ClassHolder => `${TRAITED_ENEMIES}${trait}`;
 export type ClassHolder = typeof ALLIES_CLASS | typeof CHARACTERS_CLASS | typeof STAGING_CLASS | typeof ENEMIES_CLASS | typeof DAMAGED_CHARACTERS_CLASS | `enemies:${string}`;
 
+/** Whether a holder id is the class of the enemies with one Trait (`enemies:Harad`). */
+export const isTraitedEnemies = (id: string): boolean => id.startsWith(TRAITED_ENEMIES);
+
 // Whether a modifier's holder id names a class of cards rather than one card.
 export function isClassHolder(id: string): id is ClassHolder {
-  return id === ALLIES_CLASS || id === CHARACTERS_CLASS || id === STAGING_CLASS || id === ENEMIES_CLASS || id === DAMAGED_CHARACTERS_CLASS || id.startsWith(TRAITED_ENEMIES);
+  return id === ALLIES_CLASS || id === CHARACTERS_CLASS || id === STAGING_CLASS || id === ENEMIES_CLASS || id === DAMAGED_CHARACTERS_CLASS || isTraitedEnemies(id);
 }
 
 // Whether a modifier is held by this card: by its id, or by a class it belongs to.
@@ -33,7 +36,7 @@ export function heldBy(modifier: { instanceId: string }, instance: CardInstance,
   if (modifier.instanceId === ALLIES_CLASS) return cardTypeOf(instance, printed) === "ally";
   if (modifier.instanceId === STAGING_CLASS) return instance.zone === "staging" && (cardTypeOf(instance, printed) === "enemy" || cardTypeOf(instance, printed) === "location");
   if (modifier.instanceId === ENEMIES_CLASS) return cardTypeOf(instance, printed) === "enemy";
-  if (modifier.instanceId.startsWith(TRAITED_ENEMIES)) return cardTypeOf(instance, printed) === "enemy" && printed.traits.includes(modifier.instanceId.slice(TRAITED_ENEMIES.length));
+  if (isTraitedEnemies(modifier.instanceId)) return cardTypeOf(instance, printed) === "enemy" && printed.traits.includes(modifier.instanceId.slice(TRAITED_ENEMIES.length));
   if (modifier.instanceId === DAMAGED_CHARACTERS_CLASS) return instance.damage > 0 && (instance.zone === "heroes" || isCharacterType(printed));
   return modifier.instanceId === CHARACTERS_CLASS && (instance.zone === "heroes" || isCharacterType(printed));
 }

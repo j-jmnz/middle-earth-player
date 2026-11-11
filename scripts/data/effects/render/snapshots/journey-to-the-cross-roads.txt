@@ -48,7 +48,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
       - place the picked card facedown under the card with code 144027 in play (out of play there; its attachments are discarded, its tokens go)
 
 144027:A:2 (front): If there are at least X facedown cards under The Black Gate, the players lose the game. X is 3 more than the number of players.
-  144027:triggered:1: Triggered (mandatory, not printed as Forced) on the event placedUnder (heard about enemy (any player controls))
+  144027:constant:1: Constant
     only if the number of cards facedown under the card with code 144027 in play is at least 3, each plus the number of players
     - the players lose the game (The Black Gate has taken too many Harad enemies)
 
@@ -257,8 +257,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
 
 144057:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   144057:shadow:1: Shadow
-    - when the attack in progress ends:
-      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+    - this enemy attacks now, dealt a new shadow card after its old ones are discarded [also {"afterThis":true}]
 
 ## 144058 Haradrim Archer
 (the scenario deals it into the haradDeck pile; the piles place it, no record does)
@@ -300,4 +299,4 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
   144068:forced:2: Forced on the event locationExplored (heard about location (any player controls) named "The Cross-roads")
     - the players win the game
 
-(rendered pieces: 188 by template, 14 as JSON)
+(rendered pieces: 185 by template, 15 as JSON)

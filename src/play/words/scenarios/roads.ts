@@ -11,9 +11,10 @@ export function gateWarn(left: number): { level: "near" | "critical"; words: str
   return left === 2 ? { level: "near", words: "2 more enemies under The Black Gate and the players lose the game" } : undefined;
 }
 
-/** What the Harad deck dial reads (144030:A:2, 144068:B:1): the cards left under The Cross-roads, the Threat they take from it and the two bars on travelling there. */
-export function haradWords(left: number, threat: number | null): string {
-  const cards = `${left} ${left === 1 ? "card" : "cards"} facedown under The Cross-roads`;
+/** What the Harad deck dial reads (144030:A:2, 144068:B:1): the cards left under The Cross-roads, the Threat they take from it and the two bars on travelling there. With none left only the progress bar holds, and `progressed` says it is met. */
+export function haradWords(left: number, threat: number | null, progressed: boolean): string {
   const taken = threat == null ? "" : `; The Cross-roads has ${threat} Threat`;
+  if (left === 0) return `No cards left under The Cross-roads${taken}. The players can travel there ${progressed ? "now" : "once 20 progress is on the stage"}`;
+  const cards = `${left} ${left === 1 ? "card" : "cards"} facedown under The Cross-roads`;
   return `${cards}${taken}. One is revealed each quest phase. The players cannot travel there while any is left, nor before 20 progress is on the stage`;
 }

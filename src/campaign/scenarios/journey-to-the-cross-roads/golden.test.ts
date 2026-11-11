@@ -72,7 +72,8 @@ describe("Journey to the Cross-roads golden", () => {
       it("144027:A:2 the Harad enemies under The Black Gate lose the game at players + 3 in the losing games of strong heroes, and never in the wins", () => {
         for (const golden of ROADS_GOLDENS.filter((item) => item.decks === "strong")) {
           const state = game(golden).state;
-          expect(Object.values(state.cards).filter((card) => card.zone === "under").length, golden.name).toBe(golden.seatCount + 3);
+          // The loss is a constant read once the Forced effect has placed every staged Harad enemy, so a game can end with more than players + 3 under the Gate.
+          expect(Object.values(state.cards).filter((card) => card.zone === "under").length, golden.name).toBeGreaterThanOrEqual(golden.seatCount + 3);
         }
         for (const golden of ROADS_GOLDENS.filter((item) => item.outcome === "won")) {
           const state = game(golden).state;

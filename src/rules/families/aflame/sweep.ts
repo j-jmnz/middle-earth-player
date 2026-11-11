@@ -3,11 +3,9 @@
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { ruleCause } from "../../core/cause.ts";
-import { placeDamage, releaseAttachments } from "../../core/keywords.ts";
-import { queueEvent } from "../../windows/queue.ts";
+import { placeDamage } from "../../core/keywords.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { moveCard } from "../../core/zones.ts";
-import { leavePlay } from "../encounter/moves.ts";
+import { placeUnderHost } from "../encounter/moves.ts";
 import { aflameOf, burnId } from "./values.ts";
 
 /** "At the end of each round, the players must place 1 damage on each Aflame location in the staging area." */
@@ -27,8 +25,7 @@ export function aflameSweep(state: ScenarioState, ctx: ReduceContext, steps: Eng
     const value = id ? aflameOf(next, id, ctx) : null;
     const card = id ? next.cards[id] : undefined;
     if (!id || !card || value == null || card.damage < value) continue;
-    next = queueEvent(moveCard(leavePlay(releaseAttachments(next, id, ctx.cards, steps), id, ctx, steps), id, { zone: "under", locationId: burn }), { trigger: "placedUnder", seat: null, subject: id });
-    steps.push({ kind: "destroy", targetId: id, under: true });
+    next = placeUnderHost(next, id, burn, ctx, steps);
   }
   return next;
 }

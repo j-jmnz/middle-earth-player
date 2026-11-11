@@ -67,6 +67,13 @@ export function leavePlay(state: ScenarioState, id: string, ctx: ReduceContext, 
   return updateCard(releaseAttachments(state, id, ctx.cards, steps), id, { damage: 0, progress: 0, resources: 0, exhausted: false });
 }
 
+/** A card in play goes facedown underneath a host, out of play (rr.in-play-and-out-of-play): what it had in play is lost, `placedUnder` is queued about it and the table is told it is destroyed. */
+export function placeUnderHost(state: ScenarioState, id: string, host: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const left = leavePlay(releaseAttachments(state, id, ctx.cards, steps), id, ctx, steps);
+  steps.push({ kind: "destroy", targetId: id, under: true });
+  return queueEvent(moveCard(left, id, { zone: "under", locationId: host }), { trigger: "placedUnder", seat: null, subject: id });
+}
+
 function toDeck(state: ScenarioState, id: string, top: boolean): ScenarioState {
   const moved = updateCard(moveCard(state, id, { zone: "encounterDeck" }), id, { face: "down", controller: null });
   const rest = moved.encounterDeck.filter((entry) => entry !== id);

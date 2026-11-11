@@ -12,7 +12,7 @@ const campaign = loadCampaign("the-two-towers");
 const roads = loadScenario("journey-to-the-cross-roads");
 
 // Test helper. A whole game of Journey to the Cross-roads in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
-// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. TODO: say how the players travel, engage and answer the choices this scenario asks.
+// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. The players engage the staging area, travel to the first location they may (roadsIntent) and answer each choice with the policy's first or last option.
 export const ROADS_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: false, act: false };
 // "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack; "tense": strong, with a starting threat the Haradrim's engagement costs fall below, so
 // the engagement checks put every enemy but the Oliphaunt into play against them.
@@ -126,13 +126,13 @@ const game = campaignGame<RoadsDecks, RoadsPolicy>({
   scenario: roads,
   stats: ROADS_STATS,
   loadout: roadsLoadout,
-  // TODO: the cards a game loads besides the scenario's piles, its campaign card's and the campaign's game codes.
+  // The scenario's cards, the Ring-bearer with The One Ring (144063), the cards 144069 hands out (Brace of Coneys 144014, The Searching Eye 144015) and the Helm's Deep and Isengard burden and player cards a Two Towers log removes or earns.
   codes: [...roads.cards.map((card) => card.code), RING_BEARER, "144063", "144014", "144015", "143015", "143016", "143017", "143018", "143019", "143020", "143021", "143068"],
   intent: roadsIntent,
   policy: DEFAULT_POLICY,
   limit: 6000,
   upgraded: [],
-  // TODO: the XP each earlier part gained (in campaign order), the cards they put in the pool and the marks on the cards, as a campaign that won them leaves the log.
+  // The earlier parts leave no XP, pool card or mark in a golden's log: a game that wants their real Resolutions reads scripts/e2e/journey-to-the-cross-roads.ts (marshesWonLog).
   earlier: { xp: [0, 0, 0, 0], pool: [], marks: {} },
 });
 

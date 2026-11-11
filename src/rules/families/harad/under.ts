@@ -6,14 +6,15 @@ import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import { frameScope, refCard } from "../../interpret/amounts.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
-import { releaseAttachments } from "../../core/keywords.ts";
-import { queueEvent } from "../../windows/queue.ts";
+import { effectsOf } from "../../windows/listen.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { inPlay, livingSeats } from "../../core/state.ts";
-import { moveCard } from "../../core/zones.ts";
-import { leavePlay } from "../encounter/moves.ts";
-import { facedownCount } from "../misc/amounts.ts";
+import { placeUnderHost } from "../encounter/moves.ts";
+import { facedownCount, facedownWithin } from "../misc/amounts.ts";
 import type { Focus } from "../index.ts";
+
+/** The code of The Black Gate (144027): the card the Harad enemies lie facedown under. */
+export const BLACK_GATE = "144027";
 
 /** The card in play with this code, the host of the facedown cards (null in a game without it). */
 function hostOf(state: ScenarioState, code: string): string | null {
@@ -32,14 +33,20 @@ export function placeFacedownUnder(state: ScenarioState, instruction: Extract<In
   const card = id ? state.cards[id] : undefined;
   const host = hostOf(state, instruction.code);
   if (!id || !card || host == null || host === id || !inPlay(card.zone)) return state;
-  const left = leavePlay(releaseAttachments(state, id, ctx.cards, steps), id, ctx, steps);
-  steps.push({ kind: "destroy", targetId: id, under: true });
-  return queueEvent(moveCard(left, id, { zone: "under", locationId: host }), { trigger: "placedUnder", seat: null, subject: id });
+  return placeUnderHost(state, id, host, ctx, steps);
 }
 
 /** The `facedownUnder` condition: the cards facedown under the card in play with this code number at least `min` and at most `max`, each plus the number of players with `players` (144027:A:2). */
 export function facedownUnderHolds(state: ScenarioState, condition: Extract<Condition, { kind: "facedownUnder" }>): boolean {
-  const extra = condition.players ? livingSeats(state).length : 0;
-  const count = facedownCount(state, hostOf(state, condition.code));
-  return (condition.min == null || count >= condition.min + extra) && (condition.max == null || count <= condition.max + extra);
+  return facedownWithin(state, hostOf(state, condition.code), condition);
+}
+
+/** The cards facedown under the card in play with this code (The Black Gate, BLACK_GATE) and the number that loses the game, read from its own record (144027:constant:1, a LoseGame under `facedownUnder` with `min` and `players`): the one place the number lives. Null in a game without one. */
+export function gateTally(state: ScenarioState, ctx: ReduceContext, code: string): { count: number; limit: number } | null {
+  const host = hostOf(state, code);
+  if (!host) return null;
+  const loses = effectsOf(ctx, code).find((effect) => effect.condition?.kind === "facedownUnder" && effect.instructions.some((instruction) => instruction.verb === "LoseGame"));
+  const condition = loses?.condition;
+  if (condition?.kind !== "facedownUnder" || condition.min == null) return null;
+  return { count: facedownCount(state, host), limit: condition.min + (condition.players ? livingSeats(state).length : 0) };
 }

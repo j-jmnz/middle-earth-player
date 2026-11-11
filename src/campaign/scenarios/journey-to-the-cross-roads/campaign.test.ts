@@ -77,6 +77,22 @@ describe("Journey to the Cross-roads in the the-two-towers campaign", () => {
     expect(heroResources(both, 1).every((amount) => amount >= 1)).toBe(true);
   });
 
+  // What The Passage of the Marshes' Resolution (144067:B:1) leaves reaches this deal: a seat that took the penalty starts 2 higher, a seat that earned The Searching Eye has it in its deck.
+  it("144067:B:1 the penalty and the Searching Eye the Marshes earned reach this Setup, each seat its own", () => {
+    const threats = (state: ScenarioState) => state.seats.map((seat) => seat.threat);
+    const nowhere = opened(2, { ...afterMarshes, threatPenaltyBySeat: [0, 0], marshesChoice: ["searchingEye", "searchingEye"] }, ["resources", "resources"]);
+    const penalised = opened(2, afterMarshes, ["resources", "resources"]);
+    expect(threats(penalised).map((value, seat) => value - (threats(nowhere)[seat] ?? 0))).toEqual([2, 2]);
+    // Seat 1 took the Searching Eye in the Marshes, seat 0 the penalty.
+    const eye = { code: "144015", back: "player", burdenSet: null, attachedTo: null, seat: 1 } as const;
+    const mixed = opened(2, { ...afterMarshes, threatPenaltyBySeat: [2, 0], marshesChoice: ["penalty", "searchingEye"], campaignPool: [...afterMarshes.campaignPool, eye] }, ["resources", "resources"]);
+    expect(threats(mixed).map((value, seat) => value - (threats(nowhere)[seat] ?? 0))).toEqual([2, 0]);
+    const held = copies(mixed, "144015").filter((card) => card.owner === 1 || card.controller === 1);
+    expect(held).toHaveLength(1);
+    expect(copies(mixed, "144015").filter((card) => card.owner === 0 || card.controller === 0)).toHaveLength(0);
+    expect(copies(penalised, "144015")).toHaveLength(0);
+  });
+
   it("144069:A:2 leaves the Two Towers burdens out of the decks and deals the Ring-bearer with The One Ring to the first player", () => {
     const state = opened(2, afterMarshes, ["resources", "resources"]);
     for (const code of ["143021", "143068"]) expect(copies(state, code)).toHaveLength(0);

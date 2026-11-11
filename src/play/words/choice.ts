@@ -145,6 +145,8 @@ export function pickWords(pick: Instruction, next: Instruction | undefined, name
       return next.to === "play" ? { verb: "Put into play", prompt: `Choose ${one} to put into play from your hand.` } : { verb: "Take", prompt: `Choose ${one} to put into your hand.` };
     case "PlaceUnderSelf":
       return { verb: "Place", prompt: `Choose ${one} to place facedown under ${sourceId ? names.card(sourceId) : "the location"}.` };
+    case "PlaceFacedownUnder":
+      return { verb: "Place", prompt: `Choose ${one} to place facedown under ${names.code(next.code)}.` };
     // Defenders (rr.multiple-defenders): one more declared, and the one that takes all the attack's damage.
     case "AddDefender":
       return { verb: "Defend", prompt: `Choose ${one} to declare as a defender.` };
