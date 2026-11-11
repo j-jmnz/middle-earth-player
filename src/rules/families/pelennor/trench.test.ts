@@ -19,6 +19,7 @@ const trench = definePrinted({ code: "trench", name: "Fire-filled Trench", type:
 const stage = definePrinted({ code: "stage", name: "Stage", type: "quest", questPoints: 20 });
 const cards = cardMap([hero("a", "tactics", 9, 1), bad, hasty, trench, stage]);
 const records: Effect[] = [
+  { id: "trench:forced:1", cardCode: "trench", lines: ["trench:A:1"], timing: "forced", trigger: "whenRevealedCanceled", instructions: [{ verb: "CounterCancel" }] },
   { id: "bad:whenRevealed:1", cardCode: "bad", lines: ["bad:A:1"], timing: "whenRevealed", instructions: [{ verb: "RaiseThreat", amount: 5 }] },
   { id: "hasty:response:1", cardCode: "hasty", lines: ["hasty:A:1"], timing: "response", trigger: "whenRevealedPending", cost: { kind: "playEvent" }, instructions: [{ verb: "CancelEffect" }, { verb: "RaiseThreat", amount: 1 }] },
 ];
@@ -30,7 +31,7 @@ function revealed(withTrench: boolean) {
   const card = spawn(updateCard(a.state, a.id, { resources: 3 }), "hasty", { zone: "hand", seat: 0 });
   state = spawn(card.state, "bad", { zone: "encounterDeck" }, "down").state;
   const staged = withTrench ? spawn(state, "trench", { zone: "staging" }) : { state, id: "" };
-  state = withTrench ? { ...staged.state, modifiers: [...staged.state.modifiers, { instanceId: "table", sourceId: staged.id, stat: "cancelCountered" as const, amount: 1, until: "whileSourceInPlay" as const }] } : staged.state;
+  state = staged.state;
   const ctx = { effects: records, cards };
   const open = settle({ ...withMode(state, "staging"), boundaryPhase: "Quest" }, ctx, []);
   return { state: open, ctx, ids: { hasty: card.id, trench: staged.id } };

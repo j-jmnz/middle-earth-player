@@ -34,6 +34,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return takeControlOfStagedAllies(state, instruction, focus, ctx);
     case "PutTopmostFromEncounterDiscard":
       return putTopmostFromEncounterDiscard(state, instruction, focus, ctx, steps);
+    case "CounterCancel":
+      return state;
     case "EngageShadowCard":
       return engageShadowCard(state, focus, ctx, steps);
     case "AttachShadowToHero":
@@ -45,7 +47,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "pelennor",
-  verbs: ["DamageMinasTirith", "PlaceProgressActiveFirst", "DiscardAllyToStaging", "TakeControlOfStagedAllies", "PutTopmostFromEncounterDiscard", "EngageShadowCard", "AttachShadowToHero"],
+  verbs: ["DamageMinasTirith", "PlaceProgressActiveFirst", "DiscardAllyToStaging", "TakeControlOfStagedAllies", "PutTopmostFromEncounterDiscard", "EngageShadowCard", "AttachShadowToHero", "CounterCancel"],
   run,
   combat: { attack: (state, enemyId, _attacker, _target, attackerId) => attackerBarredByEngagement(state, enemyId, attackerId) },
   amount: (state, found, _scope, ctx) => (found.stagedAlliesCost ? stagedAlliesCost(state, ctx) : null),

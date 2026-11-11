@@ -433,6 +433,8 @@ function grants(state: ScenarioState, id: string, ctx: ReduceContext): { trait?:
     if (lentSphere && lentSphere !== "neutral" && lentSphere !== "fellowship" && lentSphere !== "baggins") found.push({ sphere: lentSphere });
     for (const effect of effectsOf(ctx, attachment.code)) {
       if (effect.timing !== "constant") continue;
+      // Only a record that grants a trait or an icon is read here: another record's condition may itself ask for a trait (Esquire of Gondor, 145015:A:4), which would read this one again.
+      if (!effect.instructions.some((instruction) => instruction.verb === "GrantTrait" || instruction.verb === "GrantIcon")) continue;
       const scope = { actor: attachment.controller ?? state.firstPlayer, sourceId: attachment.id, returned: 0 };
       if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;
       for (const instruction of effect.instructions) {

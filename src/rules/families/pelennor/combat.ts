@@ -3,7 +3,7 @@
 import type { PrintedCard } from "../../core/printed.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { flagged, modifierActive, updateCard } from "../../core/state.ts";
+import { flagged, inPlay, updateCard } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { minasTirithId } from "./wall.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -35,17 +35,21 @@ function revealedTreachery(state: ScenarioState, cards: ReadonlyMap<string, Prin
   return false;
 }
 
-/** The cancel of a player event that would cancel the effects of a treachery card just revealed, while the table holds `cancelCountered` (145048:A:1): the event's effects are canceled instead (its remaining instructions do not run) and the card that holds the flag is discarded. Null when the cancel is not one. */
-export function counterCancel(state: ScenarioState, ctx: ReduceContext): ScenarioState | null {
-  const held = state.modifiers.find((modifier) => modifier.stat === "cancelCountered" && modifier.instanceId === "table" && modifier.amount > 0 && modifierActive(state, modifier));
-  const running = topFrame(state);
-  const event = running?.cardId ? state.cards[running.cardId] : undefined;
-  if (!held || running?.data.kind !== "effect" || !event || printedOf(ctx.cards, event.code).type !== "event" || !revealedTreachery(state, ctx.cards)) return null;
-  const canceled = patchTop(state, { data: { ...running.data, canceled: true } });
-  const trench = canceled.cards[held.sourceId];
-  return trench ? updateCard(moveCard(canceled, trench.id, { zone: "encounterDiscard" }), trench.id, { face: "up", controller: null }) : canceled;
+/** The card in play whose Forced record holds the marker CounterCancel (Fire-filled Trench), if any. */
+function counterOf(state: ScenarioState, ctx: ReduceContext): string | undefined {
+  return Object.values(state.cards).find((card) => inPlay(card.zone) && ctx.effects.some((effect) => effect.cardCode === card.code && effect.timing === "forced" && effect.instructions.some((instruction) => instruction.verb === "CounterCancel")))?.id;
 }
 
+/** The cancel of a player event that would cancel the effects of a treachery card just revealed, while a card with the marker CounterCancel is in play (145048:A:1): the event's effects are canceled instead (its remaining instructions do not run) and that card is discarded. Null when the cancel is not one. */
+export function counterCancel(state: ScenarioState, ctx: ReduceContext): ScenarioState | null {
+  const running = topFrame(state);
+  const event = running?.cardId ? state.cards[running.cardId] : undefined;
+  if (running?.data.kind !== "effect" || !event || printedOf(ctx.cards, event.code).type !== "event" || !revealedTreachery(state, ctx.cards)) return null;
+  const trench = counterOf(state, ctx);
+  if (!trench) return null;
+  const canceled = patchTop(state, { data: { ...running.data, canceled: true } });
+  return updateCard(moveCard(canceled, trench, { zone: "encounterDiscard" }), trench, { face: "up", controller: null });
+}
 /** The objective an undefended attack of this enemy must damage instead of a hero, while Minas Tirith is in play (145055:A:2); undefined for any other enemy. */
 export function undefendedToCity(state: ScenarioState, enemyId: string): string | undefined {
   return flagged(state, enemyId, "undefendedToMinasTirith") ? minasTirithId(state) : undefined;

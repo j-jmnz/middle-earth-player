@@ -24,6 +24,9 @@ const VERBS = [
   // "If this attack damages a hero, attach Black Dart to that hero" (145058:A:2), read in the effect an AfterAttack leaves for the attack's end: the attacking enemy's shadow card with this code attaches faceup to the hero the attack damaged
   // (its defender, or the hero an undefended attack landed on), unless that hero carries one already (Limit 1 per hero). A damaged ally or no damage attaches nothing. The record carries `when: {kind: "dealt"}`, so the attack keeps the damage it dealt for the effect that reads it.
   z.strictObject({ verb: z.literal("AttachShadowToHero"), code: z.string().min(1), ...when }),
+  // A marker in a Forced record of the card that does the countering ("cancel the effects of that event. Then, discard Fire-filled Trench", 145048:A:1): while the card is in play, a player event whose effect would cancel the effects of a treachery card just revealed from
+  // the encounter deck has its own effects canceled instead and the card is discarded (families/pelennor/combat.ts counterCancel, called by CancelEffect). Running the instruction does nothing.
+  z.strictObject({ verb: z.literal("CounterCancel"), ...when }),
 ] as const;
 
 const TRIGGERS = [] as const;
@@ -40,8 +43,6 @@ const FLAGS = [
   "attackOnlyByEngaged",
   // On an enemy (target `self`): a player attack against it is declared with one attacker ("cannot be attacked by more than 1 character at a time", 145050:A:1). The limit is on one attack; each ranged character of another seat may attack in turn.
   "singleAttacker",
-  // On the table: a player card effect that would cancel the effects of a treachery card just revealed from the encounter deck is itself canceled, and the source of this flag is discarded ("cancel the effects of that event. Then, discard Fire-filled Trench", 145048:A:1).
-  "cancelCountered",
   // On an enemy (target `self`): the damage of its undefended attacks is placed on Minas Tirith, through the City Wall, while Minas Tirith is in play, and on no hero ("undefended damage dealt by Mordor Orc must be dealt to Minas Tirith", 145055:A:2).
   "undefendedToMinasTirith",
 ] as const;
