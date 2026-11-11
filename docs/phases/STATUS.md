@@ -94,12 +94,12 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 68 | Shelob's Lair | completed | 2026-11-11. Review round done. Open: `lair-won`. |
 | 69 | The Return of the King data | completed | 2026-11-11. Review round done (with phase 70). Plan: `docs/plans/return-of-the-king.md`. |
 | 70 | The Return of the King campaign shell | completed | 2026-11-11. Review round done. Open: six campaign-card lines left to their scenarios. |
-| 71 | The Return of the King, part 1 | not started | |
-| 72 | The Return of the King, part 2 | not started | |
-| 73 | The Return of the King, part 3 | not started | |
-| 74 | The Return of the King, part 4 | not started | |
-| 75 | The Return of the King, part 5 | not started | |
-| 76 | The Return of the King, part 6 | not started | |
+| 71 | The Passing of the Grey Company | active | 2026-11-11. |
+| 72 | The Siege of Gondor | not started | |
+| 73 | The Battle of the Pelennor Fields | not started | |
+| 74 | The Tower of Cirith Ungol | not started | |
+| 75 | The Black Gate Opens | not started | |
+| 76 | Mount Doom | not started | |
 
 ## Open items
 
