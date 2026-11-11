@@ -36,7 +36,7 @@ import * as roads from "../scenarios/journey-to-the-cross-roads/game.ts";
 import * as lair from "../scenarios/shelobs-lair/game.ts";
 import * as company from "../scenarios/the-passing-of-the-grey-company/game.ts";
 import * as gondor from "../scenarios/the-siege-of-gondor/game.ts";
-// import * as fields from "../scenarios/the-battle-of-the-pelennor-fields/game.ts";
+import * as fields from "../scenarios/the-battle-of-the-pelennor-fields/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -98,5 +98,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("shelobs-lair", "Shelob's Lair", lair.LAIR_GOLDENS, lair.lairWorld, lair.playGolden),
   entry("the-passing-of-the-grey-company", "The Passing of the Grey Company", company.COMPANY_GOLDENS, company.companyWorld, company.playGolden),
   entry("the-siege-of-gondor", "The Siege of Gondor", gondor.GONDOR_GOLDENS, gondor.gondorWorld, gondor.playGolden),
-  // entry("the-battle-of-the-pelennor-fields", "The Battle of the Pelennor Fields", fields.FIELDS_GOLDENS, fields.fieldsWorld, fields.playGolden),
+  entry("the-battle-of-the-pelennor-fields", "The Battle of the Pelennor Fields", fields.FIELDS_GOLDENS, fields.fieldsWorld, fields.playGolden),
 ];
