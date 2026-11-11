@@ -24,6 +24,8 @@ const STAFF = "143048";
 /** One dial of the top bar: its label, what a screen reader calls it, its number, and what it counts toward. `goal`: the limit is the players' way out (the ring fills in the accent, never warms). `filled`: the number the ring fills with when it is not the disc's (the gate's damage). */
 export type IsengardDial = {
   id: string;
+  // The dial's test id when it is not `isengard-<id>` (The Passage of the Marshes' dials, readouts/marshes.ts).
+  testID?: string;
   label: string;
   name: string;
   value: number;

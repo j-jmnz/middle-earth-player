@@ -7,7 +7,7 @@ tags:
 # OPEN until scripts/e2e/fixtures.ts finds a win of those lists in its seeds (docs/phases/STATUS.md).
 # The Resolution (144067) asks each player in turn for a permanent +2 starting threat penalty or a copy of The Searching Eye: the first player takes the penalty (the first option), the second player the Eye. The campaign has no XP. The win unlocks
 # Journey to the Cross-roads, which the app cannot deal yet.
-# TABLE_WIDGET: the Gollum / Sméagol chip (144075:A:1, 144076:A:1), read while the victory is on the table.
+# The Mire dial (marshes-mire) and Gollum's hit points (marshes-gollum) are on the table only while a location with Mire or Gollum is in play, so the win's table has neither and the flow passes no TABLE_WIDGET.
 - runFlow:
     file: ../../subflows/scenario-win.yaml
     env:
@@ -21,7 +21,6 @@ tags:
       CHOICE2_PROMPT: "The players choose"
       CHOICE2_CONSEQUENCE: ".*Player 2 earns 1 copy of The Searching Eye.*"
       NO_XP: "true"
-      TABLE_WIDGET: gollum-chip
 # The win unlocks Journey to the Cross-roads, whose node reads Next while the line under the road says it is coming soon (scripts/checks/maestro.test.ts, path-soon): the part is not playable yet.
 - assertVisible:
     id: node-journey-to-the-cross-roads-status
