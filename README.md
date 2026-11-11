@@ -182,7 +182,7 @@ Scripts are grouped: `pnpm <group> <command> [args]`, and `pnpm <group>` alone l
 | `pnpm test` | All Vitest tests. |
 | `pnpm test fast` | All but the slow files (`slowFiles` in `vitest.config.mts`). |
 | `pnpm test changed` | Tests that import a file changed since the last commit. |
-| `pnpm test scenario <scenario-id>` | One scenario's goldens, effect coverage, file-size, rule-id and wording checks, the card smoke on its player cards and the encounter smoke; also the family and manifest tests if pool, family or manifest files changed since the merge base with `origin/main`. `--list` prints the selection; `--quick` skips the goldens and the reader check. |
+| `pnpm test scenario <scenario-id>` | One scenario's tests held to their time budget, its goldens, effect coverage, file-size, test-cost, rule-id and wording checks, the card smoke on its player cards and the encounter smoke; also the family and manifest tests if pool, family or manifest files changed since the merge base with `origin/main`. `--list` prints the selection; `--quick` skips the goldens and the reader check. |
 | `pnpm test smoke <codes>` | Plays a seeded game with those cards; reports errors and stalls. `--all` for every card. |
 | `pnpm test encounter <scenario-id>...` | Plays every encounter-side card of a scenario (reveal, Shadow, travel, quest Setup) and seeded games with random legal intents; reports errors, stalls and replay differences. `--all` for every playable scenario. |
 | `pnpm test a11y` | Audits the main web screens with axe-core in Chromium; fails on serious or critical findings. Needs `pnpm exec playwright install chromium` once, or `A11Y_CHROMIUM=<path>`. |

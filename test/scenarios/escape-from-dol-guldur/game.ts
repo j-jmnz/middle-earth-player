@@ -76,7 +76,7 @@ export function playDolGuldur(seatCount: 1 | 2, seed: number, difficulty: Diffic
   return game.play(seatCount, seed, difficulty, ctx, { facts, choices: CHOICES, limit });
 }
 
-// The goldens (src/campaign/scenarios/escape-from-dol-guldur/golden.test.ts), also played by the causes and replay tests. A win runs the campaign card's Resolution;
+// The goldens (src/campaign/scenarios/escape-from-dol-guldur/golden.test.ts). A win runs the campaign card's Resolution;
 // a loss writes nothing.
 export type DolGuldurGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: DolGuldurDecks; outcome: "won" | "lost"; facts?: CampaignFacts; lossReason?: string };
 

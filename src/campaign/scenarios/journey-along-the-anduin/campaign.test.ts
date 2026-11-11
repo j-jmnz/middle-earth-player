@@ -21,7 +21,7 @@ import { attachTo, spawn } from "../../../rules/core/zones.ts";
 import { loadScenario } from "../../../../scripts/data/load-scenarios.ts";
 import { ANDUIN_GOLDENS, anduinLoadout, anduinWorld, playGolden, type AnduinGame } from "../../../../test/scenarios/journey-along-the-anduin/game.ts";
 import { anduin, anduinTable, campaign, fight, loadAnduinWorld, MENDOR, type AnduinLayout, type AnduinWorld } from "../../../../test/scenarios/journey-along-the-anduin/scene.ts";
-import { MIRKWOOD_GOLDENS, mirkwoodWorld, playGolden as playPassage } from "../../../../test/scenarios/passage-through-mirkwood/game.ts";
+import { MIRKWOOD_GOLDENS } from "../../../../test/scenarios/passage-through-mirkwood/game.ts";
 import { loadPrinted } from "../../../../test/harness/catalog.ts";
 import { temporaryCatalog } from "../../../../test/harness/temp-catalog.ts";
 import { first, type Run, send, start } from "../../../../test/harness/scene-kit.ts";
@@ -33,6 +33,7 @@ import { applyResolution, emptyLog } from "../../log.ts";
 import { campaignPath } from "../../path.ts";
 import { buildStart } from "../../start.ts";
 import { NO_COPY_LIMITS } from "../../wilderland.ts";
+import { goldenState } from "../../../../test/harness/golden-state.ts";
 
 let world: AnduinWorld;
 let cards: Map<string, PrintedCard>;
@@ -92,8 +93,8 @@ describe("Journey Along the Anduin in a campaign", () => {
 
   it("receives Passage Through Mirkwood's earned pool through the Campaign Setup Checklist (01129:B:1)", async () => {
     const golden = MIRKWOOD_GOLDENS.find((item) => item.outcome === "won" && item.seatCount === 2)!;
-    const passage = playPassage(golden, (await mirkwoodWorld("strong")).ctx);
-    const log = applyResolution(emptyLog(2), passage.state.scenarioId, passage.state, cards, NO_COPY_LIMITS);
+    const passage = goldenState("passage-through-mirkwood", golden.name);
+    const log = applyResolution(emptyLog(2), passage.scenarioId, passage, cards, NO_COPY_LIMITS);
     expect(log.completed).toEqual(["passage-through-mirkwood"]);
     expect(campaignPath(campaign, {}, log).map((node) => node.status).slice(0, 3)).toEqual(["completed", "current", "locked"]);
     const plan = checklist({ log, scenario: anduin, seats: anduinLoadout(2), effects: EFFECTS, cards });

@@ -7,7 +7,6 @@ import { reduce } from "../rules/engine/reduce.ts";
 import { startScenario } from "../rules/setup/setup.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
 import { playOut } from "../../test/harness/auto-player.ts";
-import { GOLDEN_REGISTRY } from "../../test/harness/golden-registry.ts";
 import { campaign, loadWorld, scenario } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 import { playStarter, starterWorld } from "../../test/scenarios/a-shadow-of-the-past/game.ts";
 
@@ -30,6 +29,8 @@ async function game(seed: number) {
   return { start, ctx };
 }
 
+// A Shadow of the Past's games replayed from their save. Every other scenario's golden test replays one of its goldens
+// (test/harness/golden-suite.ts).
 describe("saves.activeScenario replay", () => {
   it.each([1, 2, 9])("replays the golden game of seed %i to the same final state", async (seed) => {
     const { start, ctx } = await game(seed);
@@ -51,21 +52,6 @@ describe("saves.activeScenario replay", () => {
     expect(replayed.ok).toBe(true);
     if (replayed.ok) expect(replayed.state).toEqual(run.state);
   });
-
-  // Every other scenario's goldens (test/harness/golden-registry.ts).
-  const GOLDEN_CASES = GOLDEN_REGISTRY.flatMap((entry) => entry.goldens.map((golden) => ({ title: entry.title, name: golden.name, entry })));
-
-  it.each(GOLDEN_CASES)("replays the $title golden game ($name) to the same final state", async ({ name, entry }) => {
-    const golden = entry.goldens.find((item) => item.name === name);
-    if (!golden) throw new Error(name);
-    const { ctx } = await entry.world(golden.decks);
-    const game = entry.play(golden, ctx);
-    let active = beginActive(game.start, HASH);
-    for (const intent of [{ type: "Keep" } as const, ...game.intents]) active = recordIntent(active, intent);
-    const replayed = replay(JSON.parse(JSON.stringify(active)), game.start, HASH, ctx);
-    expect(replayed.ok).toBe(true);
-    if (replayed.ok) expect(replayed.state).toEqual(game.state);
-  }, 60_000);
 
   it("drops a save from another engine version, another data hash, another seed, or a refused intent", async () => {
     const { start, ctx } = await game(1);

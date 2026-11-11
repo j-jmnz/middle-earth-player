@@ -11,7 +11,8 @@ import type { PrintedCard } from "../../../rules/core/printed.ts";
 import { reduce, startScenario, type ReduceContext } from "../../../rules/engine/reduce.ts";
 import { prisonerHero } from "../../../rules/families/prisoner/index.ts";
 import { textBlank } from "../../../rules/families/attachments/hold.ts";
-import { ANDUIN_GOLDENS, anduinWorld, playGolden as playAnduin } from "../../../../test/scenarios/journey-along-the-anduin/game.ts";
+import { ANDUIN_GOLDENS, anduinWorld } from "../../../../test/scenarios/journey-along-the-anduin/game.ts";
+import { goldenState } from "../../../../test/harness/golden-state.ts";
 import { DOL_GULDUR_GOLDENS, dolGuldurLoadout, dolGuldurStart, dolGuldurWorld, playGolden } from "../../../../test/scenarios/escape-from-dol-guldur/game.ts";
 import { campaign, dolGuldur } from "../../../../test/scenarios/escape-from-dol-guldur/scene.ts";
 import { loadScenario } from "../../../../scripts/data/load-scenarios.ts";
@@ -41,9 +42,9 @@ beforeAll(async () => {
   ctx = world.ctx;
   const brittle = await anduinWorld("brittle");
   const golden = ANDUIN_GOLDENS.find((item) => item.name === "two-handed, brittle heroes, won with a Valor and a Scarred")!;
-  const game = playAnduin(golden, brittle.ctx);
+  const anduin = goldenState("journey-along-the-anduin", golden.name);
   // Journey Along the Anduin's win on top of Passage Through Mirkwood's: the pool on its heroes, the prisoner named.
-  anduinLog = applyResolution({ ...emptyLog(2), completed: ["passage-through-mirkwood"] }, game.state.scenarioId, game.state, new Map([...brittle.cards, ...cards]), NO_COPY_LIMITS);
+  anduinLog = applyResolution({ ...emptyLog(2), completed: ["passage-through-mirkwood"] }, anduin.scenarioId, anduin, new Map([...brittle.cards, ...cards]), NO_COPY_LIMITS);
   await dolGuldurWorld("strong");
   oathCards = new Map(await loadPrinted(["41041", "41044", "41045"]));
 }, 120_000);

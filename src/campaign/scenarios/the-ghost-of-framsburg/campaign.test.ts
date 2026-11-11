@@ -8,7 +8,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { EFFECTS } from "../../../effects/index.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../../../rules/engine/reduce.ts";
-import { FRAMSBURG_GOLDENS, afterNight, framsburgChoices, framsburgLoadout, framsburgPlan, framsburgSetupChoices, framsburgStart, framsburgWorld, logBeforeGolden, playGolden, rawEarlier } from "../../../../test/scenarios/the-ghost-of-framsburg/game.ts";
+import { FRAMSBURG_GOLDENS, afterNight, framsburgChoices, framsburgLoadout, framsburgPlan, framsburgSetupChoices, framsburgStart, framsburgWorld, logBeforeGolden, rawEarlier } from "../../../../test/scenarios/the-ghost-of-framsburg/game.ts";
 import { CODES, campaign, framsburg } from "../../../../test/scenarios/the-ghost-of-framsburg/scene.ts";
 import { CODES as NIGHT } from "../../../../test/scenarios/fire-in-the-night/scene.ts";
 import { CODES as ROAM } from "../../../../test/scenarios/roam-across-rhovanion/scene.ts";
@@ -22,6 +22,7 @@ import { campaignPath, nextStep } from "../../path.ts";
 import { newSave } from "../../save.ts";
 import { PLAYABLE_SCENARIOS } from "../../playable.ts";
 import { NO_COPY_LIMITS, poolEncounterCopies, wilderlandFacts } from "../../wilderland.ts";
+import { goldenState } from "../../../../test/harness/golden-state.ts";
 
 let ctx: ReduceContext;
 let cards: Awaited<ReturnType<typeof framsburgWorld>>["cards"];
@@ -138,7 +139,7 @@ describe("The Ghost of Framsburg in the ered-mithrin campaign", { timeout: 60_00
   it("writes Gundabad Hunter or Stalker, the Hazard card and the treasure to the campaign when won, keeps the earlier parts' pool and unlocks Mount Gundabad", () => {
     // Two-handed, after the earlier parts, a treasure attached to Fram's Shade and claimed: the earlier pool stays and the Hunter joins it.
     const win = golden("two-handed, won, after the earlier parts, Urdug's Cunning");
-    const state = playGolden(win, ctx).state;
+    const state = goldenState("the-ghost-of-framsburg", win.name);
     const before = logBeforeGolden(win);
     const log = applyResolution(before, state.scenarioId, state, cards, NO_COPY_LIMITS);
     expect(log.completed).toEqual([...before.completed, framsburg.id]);
@@ -157,7 +158,7 @@ describe("The Ghost of Framsburg in the ered-mithrin campaign", { timeout: 60_00
     expect(nextPartStatus(campaign, framsburg.id)).toBe("current");
     // Gundabad Stalker for the pool, the Hazard card a burden: both burdens join the pool.
     const both = golden("true solo, Easy, won, Melanwar's and Isolde's lines, a burden");
-    const bothState = playGolden(both, ctx).state;
+    const bothState = goldenState("the-ghost-of-framsburg", both.name);
     const bothLog = applyResolution(logBeforeGolden(both), bothState.scenarioId, bothState, cards, NO_COPY_LIMITS);
     expect(bothLog.campaignPool.map((card) => card.code)).toEqual(expect.arrayContaining([CODES.gundabadHunter, CODES.gundabadStalker]));
   }, 180_000);
@@ -165,7 +166,7 @@ describe("The Ghost of Framsburg in the ered-mithrin campaign", { timeout: 60_00
   it("writes nothing when lost: the log is the one the game started from", async () => {
     for (const lostGolden of FRAMSBURG_GOLDENS.filter((item) => item.outcome === "lost" && (item.after || item.decks !== "strong")).slice(0, 4)) {
       const world = await framsburgWorld(lostGolden.decks);
-      const lost = playGolden(lostGolden, world.ctx).state;
+      const lost = goldenState("the-ghost-of-framsburg", lostGolden.name);
       expect(lost.lost, lostGolden.name).toBe(true);
       const before = logBeforeGolden(lostGolden);
       expect(applyResolution(before, lost.scenarioId, lost, world.cards, NO_COPY_LIMITS), lostGolden.name).toBe(before);

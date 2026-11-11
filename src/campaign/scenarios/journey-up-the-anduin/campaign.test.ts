@@ -6,7 +6,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { EFFECTS } from "../../../effects/index.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../../../rules/engine/reduce.ts";
-import { UPANDUIN_GOLDENS, playGolden, upanduinLoadout, upanduinPlan, upanduinStart, upanduinWorld } from "../../../../test/scenarios/journey-up-the-anduin/game.ts";
+import { UPANDUIN_GOLDENS, upanduinLoadout, upanduinPlan, upanduinStart, upanduinWorld } from "../../../../test/scenarios/journey-up-the-anduin/game.ts";
 import { CODES, TREASURES, campaign, upanduin } from "../../../../test/scenarios/journey-up-the-anduin/scene.ts";
 
 import { buildStart } from "../../start.ts";
@@ -15,6 +15,7 @@ import { campaignPath } from "../../path.ts";
 import { newSave } from "../../save.ts";
 import { PLAYABLE_SCENARIOS } from "../../playable.ts";
 import { NO_COPY_LIMITS, poolEncounterCopies, wilderlandFacts } from "../../wilderland.ts";
+import { goldenState } from "../../../../test/harness/golden-state.ts";
 
 let ctx: ReduceContext;
 beforeAll(async () => {
@@ -76,7 +77,7 @@ describe("Journey Up the Anduin in the ered-mithrin campaign", () => {
     const cards = (await upanduinWorld("strong")).cards;
     const won = (name: string) => {
       const golden = UPANDUIN_GOLDENS.find((item) => item.name.startsWith(name))!;
-      return playGolden(golden, ctx).state;
+      return goldenState("journey-up-the-anduin", golden.name);
     };
     // Two-handed, a treasure discovered, Turayn joins the pool: the log holds the treasure, A Growing Threat, the card A Growing Threat set aside and Turayn in a player's pool.
     const first = won("two-handed, won, a treasure discovered");
@@ -100,7 +101,7 @@ describe("Journey Up the Anduin in the ered-mithrin campaign", () => {
     // A loss writes nothing.
     const lostGolden = UPANDUIN_GOLDENS.find((item) => item.outcome === "lost")!;
     const weak = await upanduinWorld("weak");
-    const lost = playGolden(lostGolden, weak.ctx).state;
+    const lost = goldenState("journey-up-the-anduin", lostGolden.name);
     const blank = emptyLog(lostGolden.seatCount);
     expect(applyResolution(blank, lost.scenarioId, lost, weak.cards, NO_COPY_LIMITS)).toBe(blank);
   });

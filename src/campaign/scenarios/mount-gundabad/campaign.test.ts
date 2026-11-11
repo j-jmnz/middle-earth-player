@@ -8,7 +8,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { EFFECTS } from "../../../effects/index.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../../../rules/engine/reduce.ts";
-import { GUNDABAD_GOLDENS, afterFramsburg, gundabadChoices, gundabadLoadout, gundabadPlan, gundabadSetupChoices, gundabadStart, gundabadWorld, logBeforeGolden, playGolden, rawEarlier } from "../../../../test/scenarios/mount-gundabad/game.ts";
+import { GUNDABAD_GOLDENS, afterFramsburg, gundabadChoices, gundabadLoadout, gundabadPlan, gundabadSetupChoices, gundabadStart, gundabadWorld, logBeforeGolden, rawEarlier } from "../../../../test/scenarios/mount-gundabad/game.ts";
 import { CODES, campaign, gundabad } from "../../../../test/scenarios/mount-gundabad/scene.ts";
 import { CODES as FRAMSBURG } from "../../../../test/scenarios/the-ghost-of-framsburg/scene.ts";
 import { CODES as ROAM } from "../../../../test/scenarios/roam-across-rhovanion/scene.ts";
@@ -20,6 +20,7 @@ import { campaignPath, nextStep } from "../../path.ts";
 import { newSave } from "../../save.ts";
 import { PLAYABLE_SCENARIOS } from "../../playable.ts";
 import { NO_COPY_LIMITS, poolEncounterCopies, wilderlandFacts } from "../../wilderland.ts";
+import { goldenState } from "../../../../test/harness/golden-state.ts";
 
 let ctx: ReduceContext;
 let cards: Awaited<ReturnType<typeof gundabadWorld>>["cards"];
@@ -144,7 +145,7 @@ describe("Mount Gundabad in the ered-mithrin campaign", { timeout: 60_000 }, () 
   it("writes a treasure, the treasures the players control and Dragon-sickness to the campaign when won, keeps the earlier parts' pool and unlocks The Fate of Wilderland", () => {
     // Two-handed, after the earlier parts, Urdug's Cunning, 6 treasures logged: the pool stays, the treasures are added and Dragon-sickness joins the pool.
     const win = golden("two-handed, won, after the earlier parts, Urdug's Cunning, Dragon-sickness in the encounter deck, a stage bypassed");
-    const state = playGolden(win, ctx).state;
+    const state = goldenState("mount-gundabad", win.name);
     const before = logBeforeGolden(win);
     const log = applyResolution(before, state.scenarioId, state, cards, NO_COPY_LIMITS);
     expect(log.completed).toEqual([...before.completed, gundabad.id]);
@@ -167,7 +168,7 @@ describe("Mount Gundabad in the ered-mithrin campaign", { timeout: 60_000 }, () 
     const win = golden("true solo, won, after the earlier parts, A Growing Threat in the pool");
     const before = logBeforeGolden(win);
     expect(before.encounterPool?.[CODES.aGrowingThreat]).toBe(1);
-    const state = playGolden(win, ctx).state;
+    const state = goldenState("mount-gundabad", win.name);
     expect(state.campaignFacts?.encounterPool?.[CODES.aGrowingThreat]).toBe(1);
     const log = applyResolution(before, state.scenarioId, state, cards, NO_COPY_LIMITS);
     expect(log.encounterPool?.[CODES.aGrowingThreat]).toBeUndefined();
@@ -179,7 +180,7 @@ describe("Mount Gundabad in the ered-mithrin campaign", { timeout: 60_000 }, () 
     expect(log.encounterPool?.[CODES.dragonSickness] ?? 0).toBe(log.treasures.length >= 6 ? 1 : 0);
     // Lost: nothing is written, A Growing Threat stays.
     const lost = golden("two-handed, lost after the earlier parts, Misplaced Trust, A Growing Threat stays in the pool");
-    const lostState = playGolden(lost, ctx).state;
+    const lostState = goldenState("mount-gundabad", lost.name);
     expect(lostState.lost).toBe(true);
     const lostBefore = logBeforeGolden(lost);
     expect(applyResolution(lostBefore, lostState.scenarioId, lostState, cards, NO_COPY_LIMITS)).toBe(lostBefore);
@@ -188,7 +189,7 @@ describe("Mount Gundabad in the ered-mithrin campaign", { timeout: 60_000 }, () 
 
   it("writes nothing when lost: the log is the one the game started from", () => {
     for (const lostGolden of GUNDABAD_GOLDENS.filter((item) => item.outcome === "lost" && (item.after || item.decks === "strong")).slice(0, 4)) {
-      const lost = playGolden(lostGolden, ctx).state;
+      const lost = goldenState("mount-gundabad", lostGolden.name);
       expect(lost.lost, lostGolden.name).toBe(true);
       const before = logBeforeGolden(lostGolden);
       expect(applyResolution(before, lost.scenarioId, lost, cards, NO_COPY_LIMITS), lostGolden.name).toBe(before);

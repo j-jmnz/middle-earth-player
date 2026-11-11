@@ -97,7 +97,7 @@ export function playCaves(seatCount: 1 | 2, seed: number, difficulty: Difficulty
   return game.play(seatCount, seed, difficulty, ctx, { facts, log, policy, limit });
 }
 
-// The goldens (src/campaign/scenarios/the-caves-of-nibin-dum/golden.test.ts), also played by the causes and replay tests. A win runs the campaign card's Resolution; a loss writes nothing.
+// The goldens (src/campaign/scenarios/the-caves-of-nibin-dum/golden.test.ts). A win runs the campaign card's Resolution; a loss writes nothing.
 export type CavesGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: CavesDecks; outcome: "won" | "lost"; boon?: "play" | "keep"; facts?: CampaignFacts; lossReason?: string };
 
 const THREAT_LOST = "No seats remain";

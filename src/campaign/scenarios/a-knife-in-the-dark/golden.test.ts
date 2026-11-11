@@ -2,7 +2,9 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import type { PrintedCard } from "../../../rules/core/printed.ts";
 import type { ReduceContext } from "../../../rules/engine/reduce.ts";
-import { KNIFE_GOLDENS, knifeLoadout, knifeWorld, playGolden, type KnifeGame } from "../../../../test/scenarios/a-knife-in-the-dark/game.ts";
+import { KNIFE_GOLDENS, knife, knifeLoadout, knifeWorld, playGolden, type KnifeGame } from "../../../../test/scenarios/a-knife-in-the-dark/game.ts";
+import { causeProblems } from "../../../../test/harness/cause-check.ts";
+import { expectReplays, ownCauses } from "../../../../test/harness/golden-suite.ts";
 
 import { validateLoadout } from "../../loadout.ts";
 import { applyResolution, emptyLog } from "../../log.ts";
@@ -38,6 +40,17 @@ describe("golden: a whole game of A Knife in the Dark", () => {
       return { ...golden, intents: game?.intents, state: game?.state };
     });
     await expect(JSON.stringify(out)).toMatchFileSnapshot(file);
+  });
+
+  it("names a cause for every number a step changes, the scenario's own records among them", () => {
+    for (const golden of KNIFE_GOLDENS) expect(causeProblems(games.get(golden.name)?.steps ?? []), golden.name).toEqual([]);
+    expect(ownCauses(knife, KNIFE_GOLDENS.flatMap((golden) => games.get(golden.name)?.steps ?? [])).length).toBeGreaterThan(0);
+  });
+
+  it("replays a golden from its save to the same final state", () => {
+    const game = games.get(KNIFE_GOLDENS[0]?.name ?? "");
+    if (!game) throw new Error("no golden");
+    expectReplays(game, ctx);
   });
 
   for (const golden of KNIFE_GOLDENS.filter((item) => item.outcome === "won")) {

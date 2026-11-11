@@ -81,7 +81,7 @@ export function haiIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<
 
 export type HaiGame = PlayedGame;
 
-// The goldens (src/campaign/scenarios/the-uruk-hai/golden.test.ts), also played by the causes and replay tests once test/harness/golden-registry.ts lists them.
+// The goldens (src/campaign/scenarios/the-uruk-hai/golden.test.ts).
 // `after`: the log of a campaign whose earlier parts were won. `upgraded`: the Upgraded sides. `mode`: the Hard or Expert Mode card.
 export type HaiGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: HaiDecks; outcome: "won" | "lost"; policy?: Partial<HaiPolicy>; after?: boolean; upgraded?: boolean; mode?: ModeCard; lossReason?: string };
 

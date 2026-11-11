@@ -47,6 +47,17 @@ Every agent that changes code follows these. `docs/architecture.md` (State, Pers
 - A hook or script an agent runs prints only what the agent needs to act on. Progress bars, banners and success chatter go behind `--verbose` (scripts log through `scripts/log.ts`); a failure prints its full output.
 - `pnpm test`, `pnpm lint` and `pnpm typecheck` are green before a commit; `pnpm data check` too when the engine or `data/` could move.
 
+## Test cost
+
+Whole games are what the suite spends its time on, so a scenario adds its games once and never makes another file play them (user instruction, 2026-11-11). `scripts/checks/test-cost.test.ts` holds these: the files that break them today are listed at their count, none may grow, and a new file may not join them.
+
+- A golden game is played once, in its scenario's `golden.test.ts` (`goldenSuite`, `test/harness/golden-suite.ts`). A check on the golden games (causes, a replay, the outcome, a scenario's extra) goes in the golden suite or the scenario's `checks`. No test loops over the golden registry.
+- Any other test that needs a golden's final state (a campaign test writing the Resolution, the log the earlier parts hand on) reads it with `goldenState` (`test/harness/golden-state.ts`), not `playGolden`. A scenario's game (`test/scenarios/<id>/game.ts`) never plays another scenario's goldens.
+- A test of one card, one rule or one choice builds its moment with the scene kit (`tableFromLayout`, a spec row in `card-spec.ts`) instead of playing from the Setup to it.
+- The goldens are a few wins (true solo and two-handed, a variant that changes the Resolution) and a loss for each way to lose, not every seed or option: at most 3000 intents in all for a scenario.
+- A new sweep over every card or every scenario is split into shards that run side by side (`scripts/card-smoke/suite.ts`) and listed in `slowFiles` (`vitest.config.mts`).
+- A scenario's own tests (the tests part of `pnpm test scenario`) stay within the test budget that command holds them to on a full run (`scripts/tools/test-scenario.ts`, Test budget). An added test file that plays games reports its time in the commit body, measured with `pnpm vitest run <file>`.
+
 ## Checking a change
 
 Run the cheap checks often and the full suite once.

@@ -11,9 +11,10 @@ import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type
 import { loadScenario } from "../../../scripts/data/load-scenarios.ts";
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
 import { attackTogether, campaignGame, engageOneEach, fillerLoadout, HERO_STATS, type PlayedGame } from "../../harness/game-kit.ts";
-import { RHOVANION_GOLDENS, rawEarlier as rawRhovanionEarlier, rhovanionWorld, playGolden as playRhovanion, type RhovanionVariant } from "../roam-across-rhovanion/game.ts";
+import { RHOVANION_GOLDENS, rawEarlier as rawRhovanionEarlier, rhovanionWorld, type RhovanionVariant } from "../roam-across-rhovanion/game.ts";
 import { TREASURES } from "../the-withered-heath/scene.ts";
 import { CODES, campaign, night } from "./scene.ts";
+import { goldenState } from "../../harness/golden-state.ts";
 
 // Test helper. A whole game of Fire in the Night in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
 // events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. The first character of a seat quests alone (its willpower is far above the staging area's threat) and the others stay ready. At the
@@ -111,7 +112,7 @@ export function nightIntent(state: ScenarioState, ctx: ReduceContext, memory: Se
 
 export type NightGame = PlayedGame;
 
-// The goldens (src/campaign/scenarios/fire-in-the-night/golden.test.ts), also played by the causes and replay tests once test/harness/golden-registry.ts lists them.
+// The goldens (src/campaign/scenarios/fire-in-the-night/golden.test.ts).
 // `after`: the log of a campaign whose first five parts were won (Journey Up the Anduin, Lost in Mirkwood, The King's Quest, The Withered Heath and Roam Across Rhovanion, their real Resolutions chained: `afterRhovanion`) and `variant` the way they were won: the allies in the pool
 // with Misplaced Trust (pool) or Urdug's Cunning (cunning) in it, or Turayn's oath and Melanwar's guidance lines (oath), Isolde's line too (oathline). `upgraded`: the Upgraded sides. `mode`: the Hard or Expert Mode card.
 export type NightVariant = "pool" | "cunning" | "oath" | "oathline";
@@ -153,12 +154,12 @@ const rawLogs = new Map<string, CampaignLog>();
 const keyOf = (seatCount: 1 | 2, variant: NightVariant = "pool") => `${seatCount}:${variant}`;
 let worldCards: ReadonlyMap<string, PrintedCard> | null = null;
 
-/** Plays the Roam Across Rhovanion goldens that follow the first four parts and writes their Resolutions onto the log those parts wrote, once for each (seats, variant): what Fire in the Night is handed. */
+/** Reads the final states of the Roam Across Rhovanion goldens that follow the first four parts from golden.json (test/harness/golden-state.ts) and writes their Resolutions onto the log those parts wrote, once for each (seats, variant): what Fire in the Night is handed. */
 export async function prepareEarlier(): Promise<void> {
   const roam = await rhovanionWorld("strong");
   for (const [key, row] of Object.entries(EARLIER)) {
     const golden = RHOVANION_GOLDENS.find((item) => item.name === row.golden)!;
-    const played = playRhovanion(golden, roam.ctx).state;
+    const played = goldenState("roam-across-rhovanion", golden.name);
     const written = applyResolution(rawRhovanionEarlier(golden.seatCount, row.variant), played.scenarioId, played, roam.cards, NO_COPY_LIMITS);
     rawLogs.set(key, written);
     // The stand-in heroes of the golden seats are not the heroes the earlier games lost or carried: they start fresh, and what hangs on a hero stays behind.
@@ -170,14 +171,14 @@ export async function prepareEarlier(): Promise<void> {
 /** The log of a campaign that won the first five parts, their real Resolutions chained. */
 export function afterRhovanion(seatCount: 1 | 2, variant: NightVariant = "pool"): CampaignLog {
   const log = earlierLogs.get(keyOf(seatCount, variant));
-  if (!log) throw new Error("Call nightWorld first: it plays the earlier parts");
+  if (!log) throw new Error("Call nightWorld first: it builds the earlier parts' log");
   return log;
 }
 
 /** The log the five earlier parts' real Resolutions write, with the heroes of their games still on it (what the campaign test reads). */
 export function rawEarlier(seatCount: 1 | 2, variant: NightVariant = "pool"): CampaignLog {
   const log = rawLogs.get(keyOf(seatCount, variant));
-  if (!log) throw new Error("Call nightWorld first: it plays the earlier parts");
+  if (!log) throw new Error("Call nightWorld first: it builds the earlier parts' log");
   return log;
 }
 

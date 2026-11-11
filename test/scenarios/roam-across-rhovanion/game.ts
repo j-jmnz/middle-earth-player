@@ -8,11 +8,12 @@ import type { PrintedCard } from "../../../src/rules/core/printed.ts";
 import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 
 import { loadScenario } from "../../../scripts/data/load-scenarios.ts";
-import { HEATH_GOLDENS, heathWorld, playGolden as playHeath, rawEarlier as rawHeathEarlier } from "../the-withered-heath/game.ts";
+import { HEATH_GOLDENS, heathWorld, rawEarlier as rawHeathEarlier } from "../the-withered-heath/game.ts";
 import { TREASURES } from "../the-withered-heath/scene.ts";
 import { CODES, campaign, rhovanion } from "./scene.ts";
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
 import { campaignGame, fillerLoadout, HERO_STATS, type PlayedGame } from "../../harness/game-kit.ts";
+import { goldenState } from "../../harness/golden-state.ts";
 
 // Test helper. A whole game of Roam Across Rhovanion in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
 // events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. The players travel to the location that guards an objective as soon as the stage lets them (5 progress on it), engage one enemy
@@ -100,7 +101,7 @@ export function rhovanionIntent(state: ScenarioState, ctx: ReduceContext, memory
 
 export type RhovanionGame = PlayedGame;
 
-// The goldens (src/campaign/scenarios/roam-across-rhovanion/golden.test.ts), also played by the causes and replay tests once test/harness/golden-registry.ts lists them.
+// The goldens (src/campaign/scenarios/roam-across-rhovanion/golden.test.ts).
 // `after`: the log of a campaign whose first four parts were won (Journey Up the Anduin, Lost in Mirkwood, The King's Quest and The Withered Heath, their real Resolutions chained: `afterHeath`) and `variant` the way they were won: the allies in the pool (pool),
 // or Turayn's oath and Melanwar's guidance lines (oath), Isolde's line too (oathline). `ally`: the unique boon ally the boon-ally search of the Campaign Setup (12184:A:2) takes (a card code), or "skip"; by default the first one offered.
 // `upgraded`: the Upgraded sides. `mode`: the Hard or Expert Mode card.
@@ -142,12 +143,12 @@ const rawLogs = new Map<string, CampaignLog>();
 const keyOf = (seatCount: 1 | 2, variant: RhovanionVariant = "pool") => `${seatCount}:${variant}`;
 let worldCards: ReadonlyMap<string, PrintedCard> | null = null;
 
-/** Plays the four earlier parts' goldens and writes their Resolutions onto a blank log, once for each (seats, variant): what Roam Across Rhovanion is handed. */
+/** Reads the final states of the four earlier parts' goldens from golden.json (test/harness/golden-state.ts) and writes their Resolutions onto a blank log, once for each (seats, variant): what Roam Across Rhovanion is handed. */
 export async function prepareEarlier(): Promise<void> {
   const heath = await heathWorld("strong");
   for (const [key, name] of Object.entries(EARLIER)) {
     const golden = HEATH_GOLDENS.find((item) => item.name === name)!;
-    const played = playHeath(golden, heath.ctx).state;
+    const played = goldenState("the-withered-heath", golden.name);
     const written = applyResolution(rawHeathEarlier(golden.seatCount, golden.variant), played.scenarioId, played, heath.cards, NO_COPY_LIMITS);
     rawLogs.set(key, written);
     // The stand-in heroes of the golden seats are not the heroes the earlier games lost or carried: they start fresh, and what hangs on a hero stays behind.
@@ -159,14 +160,14 @@ export async function prepareEarlier(): Promise<void> {
 /** The log of a campaign that won the first four parts, their real Resolutions chained: `oath` and `oathline` for the lines in place of the allies in the pool. */
 export function afterHeath(seatCount: 1 | 2, variant: RhovanionVariant = "pool"): CampaignLog {
   const log = earlierLogs.get(keyOf(seatCount, variant));
-  if (!log) throw new Error("Call rhovanionWorld first: it plays the earlier parts");
+  if (!log) throw new Error("Call rhovanionWorld first: it builds the earlier parts' log");
   return log;
 }
 
 /** The log the four earlier parts' real Resolutions write, with the heroes of their games still on it (what the campaign test reads). */
 export function rawEarlier(seatCount: 1 | 2, variant: RhovanionVariant = "pool"): CampaignLog {
   const log = rawLogs.get(keyOf(seatCount, variant));
-  if (!log) throw new Error("Call rhovanionWorld first: it plays the earlier parts");
+  if (!log) throw new Error("Call rhovanionWorld first: it builds the earlier parts' log");
   return log;
 }
 

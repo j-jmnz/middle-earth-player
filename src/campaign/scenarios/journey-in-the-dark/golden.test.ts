@@ -7,7 +7,7 @@ import { printedOf } from "../../../rules/core/printed.ts";
 import type { ScenarioState } from "../../../rules/engine/reduce.ts";
 import { MORIA_GOLDENS, moriaWorld, playGolden, type MoriaDecks, type MoriaGolden } from "../../../../test/scenarios/journey-in-the-dark/game.ts";
 import { BALROG, BRIDGE, campaign, CHAMBER, DOOM, moria } from "../../../../test/scenarios/journey-in-the-dark/scene.ts";
-import { goldenSuite } from "../../../../test/harness/golden-suite.ts";
+import { goldenSuite, ownCauses } from "../../../../test/harness/golden-suite.ts";
 
 import { applyResolution, emptyLog } from "../../log.ts";
 import { campaignPath } from "../../path.ts";
@@ -76,6 +76,11 @@ goldenSuite<MoriaGolden, MoriaDecks>({
       expect(attacks.length).toBeGreaterThan(1);
       const doom = Object.values(solo.state.cards).find((card) => card.code === DOOM);
       expect(doom?.damage).toBe(0);
+    });
+
+    it("moves numbers by Doom, Doom, Doom's record: its damage tokens and the Balrog's attacks", () => {
+      const causes = ownCauses(moria, MORIA_GOLDENS.flatMap((golden) => game(golden).steps));
+      expect(causes.some((cause) => "effect" in cause && cause.effect.startsWith(`${DOOM}:`))).toBe(true);
     });
   },
 });
