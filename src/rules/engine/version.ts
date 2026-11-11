@@ -52,4 +52,7 @@
 // damages it, and Captain Sahír of The City of Corsairs, whose indestructible lapses with lethal damage on him, ends that scenario: a replayed game of either can take a different path.
 // 24 (Ered Mithrin, phase 54 fix pass): a location that prints X quest points (Hills of Wilderland, Underground Lake) has the quest points its record sets, so it takes progress as the active location
 // and is explored (before, it had none and was never explored): a replayed Journey Up the Anduin game can take a different path.
-export const ENGINE_VERSION = 24;
+// 25 (The Road to Isengard review): a seat a settle sweep eliminates hands its open window on at once and a sweep that ends in a loss clears the window (machine.ts, handoffEliminated after every sweep), so a replayed
+// two-seat game in which a seat is eliminated by the sweep (lethal damage held and then swept) can offer the next window to the other seat sooner; while a table tracks the phase's progress and an explored location
+// may cancel it (The Voice of Saruman only) the full stage advances after the Forced effects resolve: a replayed The Road to Isengard game can take a different path.
+export const ENGINE_VERSION = 25;
