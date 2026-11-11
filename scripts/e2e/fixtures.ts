@@ -82,6 +82,7 @@ import { roadsFixtures } from "./journey-to-the-cross-roads.ts";
 import { lairFixtures } from "./shelobs-lair.ts";
 import { companyFixtures } from "./the-passing-of-the-grey-company.ts";
 import { gondorFixtures } from "./the-siege-of-gondor.ts";
+import { fieldsFixtures } from "./the-battle-of-the-pelennor-fields.ts";
 import { FIXTURE_REGISTRY, fixtureFile, type FixtureName, type FixtureScenarioId } from "../../src/campaign/fixtures/registry.ts";
 import { createLog, runScript } from "../log.ts";
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
@@ -407,6 +408,7 @@ const WRITERS: Record<Chained, (written: Written) => Promise<object> | object> =
   "shelobs-lair": () => lairFixtures(),
   "the-passing-of-the-grey-company": () => companyFixtures(),
   "the-siege-of-gondor": () => gondorFixtures(),
+  "the-battle-of-the-pelennor-fields": () => fieldsFixtures(),
 };
 
 // The won game is open: no legal win of the two starter decks has been found on this engine (docs/phases/STATUS.md), so
