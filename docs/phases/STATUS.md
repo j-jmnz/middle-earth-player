@@ -92,7 +92,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 66 | The Passage of the Marshes | completed | 2026-11-11. Review round done. Open: `marshes-won`. |
 | 67 | Journey to the Cross-roads | completed | 2026-11-11. Review round done. Open: `roads-won`. |
 | 68 | Shelob's Lair | completed | 2026-11-11. Review round done. Open: `lair-won`. |
-| 69 | The Return of the King data | not started | Plan: `docs/plans/return-of-the-king.md`. |
+| 69 | The Return of the King data | active | 2026-11-11. Data built; its review runs with phase 70's. Plan: `docs/plans/return-of-the-king.md`. |
 | 70 | The Return of the King campaign shell | not started | |
 | 71 | The Return of the King, part 1 | not started | |
 | 72 | The Return of the King, part 2 | not started | |
@@ -222,6 +222,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - The Passage of the Marshes readings not user-confirmed (`docs/brief.md`, The Two Towers): agent recommendations on the Mire token on the active location (144016:A:2), Creeping Marshes after the keyword and always discarded (144024:A:2), Haunted Mere's reveal as a showing (144021:A:1), Evil-smelling Fens hitting Sméagol (144019:A:1), travel costs that eliminate (144019:A:2, 144023:A:2), the Searching Eye in the kept hand (144015:A:2), We Hates Them!'s chooser (144055:A:2), Gollum always engaged with the first player (144075:A:1), stacked Gollum discards (144064:B:2), no reshuffle on 2A (144065:A:1), one reveal on 2B (144065:B:3) and Gollum and Sméagol passing on the first player's elimination; forum readings only on an OR option that does nothing (144020:A:2, 144054:A:1).
 - Journey to the Cross-roads readings not user-confirmed (`docs/brief.md`, The Two Towers): agent recommendations on Fierce Southrons' first option needing a Harad enemy in staging (144038:A:2), Brace of Coneys' two different options (144014:A:2), placing under The Black Gate after the attack (144037:A:2, 144039:A:2) and a Harad deck card being revealed, not only added (144068:B:1, 144032:A:2, 144036:A:2).
 - The lasting-effect class holder `enemies:<Trait>` reads printed traits (`heldBy`, `src/rules/core/holder-classes.ts`): a card that gains a trait is not reached. No card in play gains Harad.
+- The Return of the King: the ledger's `eyeIcons` (Sauron's Eye icons on Mountain of Fire encounter cards) is not carried onto catalog cards; the Fortitude test needs it. The Dire, Assault and Phantom keywords are unknown to the build.
+- The Return of the King data readings not user-confirmed: The Battle of the Pelennor Fields deals the Harad enemies the campaign log records from the campaign card, not an aside pile; Reeking Moat's Easy count 3 has no printed source; the burden-set icons of the last campaign cards rest on Hall of Beorn's names.
 - Easy: the DragnCards `E0C.12` deck keeps all ten Great Spider cards where Hall of Beorn keeps six; the E0C decks lead (user decision, 2026-11-07).
 
 ## Standing decisions
