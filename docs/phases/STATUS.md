@@ -94,8 +94,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 68 | Shelob's Lair | completed | 2026-11-11. Review round done. Open: `lair-won`. |
 | 69 | The Return of the King data | completed | 2026-11-11. Review round done (with phase 70). Plan: `docs/plans/return-of-the-king.md`. |
 | 70 | The Return of the King campaign shell | completed | 2026-11-11. Review round done. Open: six campaign-card lines left to their scenarios. |
-| 71 | The Passing of the Grey Company | active | 2026-11-11. |
-| 72 | The Siege of Gondor | not started | |
+| 71 | The Passing of the Grey Company | completed | 2026-11-11. Review round done. Open: `company-won`. |
+| 72 | The Siege of Gondor | active | 2026-11-11. |
 | 73 | The Battle of the Pelennor Fields | not started | |
 | 74 | The Tower of Cirith Ungol | not started | |
 | 75 | The Black Gate Opens | not started | |
@@ -110,6 +110,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 
 ### Fixtures and Maestro
 - `marshes-won` is not committed: no seed in 600 wins The Passage of the Marshes with The One Deck and Defenders of Gondor (every game reaches threat 50 by round 4). Until it exists `.maestro/scenarios/the-passage-of-the-marshes/the-passage-of-the-marshes.yaml` cannot run.
+- `company-won` is not committed: no seed in 400 wins The Passing of the Grey Company with the saved decklists (threat ends every game by round 4). Until it exists `.maestro/scenarios/the-passing-of-the-grey-company/the-passing-of-the-grey-company.yaml` cannot run.
 - `lair-won` is not committed: no seed in 600 wins Shelob's Lair with The One Deck and Defenders of Gondor. Until it exists `.maestro/scenarios/shelobs-lair/shelobs-lair.yaml` cannot run.
 - `roads-won` is not committed: no seed in 600 wins Journey to the Cross-roads with The One Deck and Defenders of Gondor. Until it exists `.maestro/scenarios/journey-to-the-cross-roads/journey-to-the-cross-roads.yaml` cannot run.
 - `isengard-won` is not committed: no seed in 600 wins The Road to Isengard with The One Deck and Defenders of Gondor. Until it exists `.maestro/scenarios/the-road-to-isengard/the-road-to-isengard.yaml` cannot run.
@@ -227,6 +228,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - The Return of the King campaign cards' lines left to their scenarios' Build: 145078:A:1 and B:1 (phase 73), 146069:A:1 and B:1 (phase 74), 146079:A:1 and A:2 (phase 76). Until then the waived hero-change penalty and burden sets of those Setups are not applied.
 - The Return of the King shell readings not user-confirmed (`docs/brief.md`, The Return of the King): the Andúril search asks the first player and costs every seat +1 starting threat (a community reading); either side of the Army of the Dead in the victory display earns its boon; the Corsair Fleet count reads whichever side is in play.
 - Mount Doom's Keep resolution repeats "The players lose the campaign." in the heading and the settled note under it.
+- The Passing of the Grey Company readings not user-confirmed (`docs/brief.md`, The Passing of the Grey Company): agent recommendations on stage 3B never defeated by progress, the Stone of Erech being the win (145065:B:2), X read live as the highest threat (145064:B:1), Phantom cancelling damage before any damage window (145022 to 145025, 145067), only the first player paying the Fellowship resource (145016:A:3, 145020:A:2), and "engages you" heard on engagement (145022, 145025, 145067).
+- Renderer gaps, The Passing of the Grey Company (behaviour proven by spec rows): `SearchMove`, `SpendResources`, `RemoveProgressFromQuest`, `HeroesGainResources`, `AddSetAsideToStaging` and the `resources` condition print as JSON (145016:A:3, 145017:A:2, 145017:A:3, 145019:A:2, 145020:A:2, 145063:B:1, 145064:A:1, 145065:A:1); the dial owner as `actorSeat` (145016:A:2); `noQuestProgress`'s scope (145027:A:2); `afterThis` and its defender (145029:A:2); `threatFloor` as each player's own starting threat (145064:B:2); campaign card 145066's records.
 - Easy: the DragnCards `E0C.12` deck keeps all ten Great Spider cards where Hall of Beorn keeps six; the E0C decks lead (user decision, 2026-11-07).
 
 ## Standing decisions
