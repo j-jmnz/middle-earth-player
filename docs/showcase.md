@@ -35,7 +35,7 @@ If something goes wrong:
 
 - "No card picture is packed": run `pnpm assets` first.
 - "No available iphone simulator": install an iOS runtime in Xcode, Settings, Components.
-- A flow fails: run it alone with `--only <shot> --verbose`; Maestro's own log and screenshot of the failure are under `~/.maestro/tests/`. `maestro studio` shows the screen's testIDs.
+- A flow fails: run it alone with `--only <shot> --verbose`; Maestro's log, the screen at the failure and its UI hierarchy are kept in `.cache/showcase/raw/failures/<capture>-attempt-<n>/`. A run whose first two captures both fail stops there, since every capture would fail the same way. `maestro studio` shows the screen's testIDs.
 - `xcodebuild failed`: run again with `--verbose`; `rm -rf ios .cache/showcase/build` and run again clears a stale native project.
 
 ## Publish

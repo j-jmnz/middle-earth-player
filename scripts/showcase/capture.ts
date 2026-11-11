@@ -4,7 +4,8 @@
 // (shots.ts) it boots the newest simulator of that kind, sets a clean status bar, installs the app, and runs each of the device's flows in
 // .maestro/showcase/ once per theme, with THEME and DEVICE. What a flow writes (a screenshot, a recording) lands in --out (default
 // .cache/showcase/raw) as <device>-<theme>-<shot>.png or .mp4, with capture.json saying which captures were taken and which failed. A flow that
-// fails is run once more; the script fails when any capture is still missing.
+// fails is run once more, with Maestro's debug output kept in <out>/failures/; the script fails when any capture is still missing, and stops early
+// when its first two captures both fail.
 //
 // It logs each stage as it starts and ends (the build's steps, the simulators, each capture as [n/total] with its time), and while a long step runs
 // (prebuild, xcodebuild, a flow) a line every HEARTBEAT seconds with the step's latest output line, so a run of an hour shows where it is. A step
@@ -12,7 +13,7 @@
 //
 // Flags: --build or --app <App.app>, --out <dir>, --only <shot,shot>, --device <iphone|ipad>, --theme <dark|light>, --verbose.
 import { spawn, spawnSync } from "node:child_process";
-import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
+import { copyFileSync, cpSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -174,9 +175,15 @@ async function capture(log: Log, sim: SimDevice, device: Device, theme: Theme, s
       return true;
     }
     if (ok) log.warn(`${label}: the flow passed but wrote no ${extension}`);
+    // Maestro's debug output (its log, the screen at the failure and its UI hierarchy) is kept, out of the temporary folder.
+    const kept = path.join(out, "failures", `${name}-attempt-${attempt}`);
+    if (existsSync(path.join(work, "output"))) {
+      cpSync(path.join(work, "output"), kept, { recursive: true });
+      log.warn(`${label}: Maestro's debug output (screenshot and UI hierarchy) is in ${kept}`);
+    }
     rmSync(work, { recursive: true, force: true });
   }
-  log.warn(`${step} ${name}: failed twice, left out (run it alone with --only ${shot.id} --device ${device} --theme ${theme} --verbose; Maestro's log is under ~/.maestro/tests/)`);
+  log.warn(`${step} ${name}: failed twice, left out (run it alone with --only ${shot.id} --device ${device} --theme ${theme} --verbose)`);
   return false;
 }
 
@@ -186,6 +193,8 @@ void runScript("showcase-capture", async (log) => {
   if (!app || !existsSync(app)) throw new Error("Usage: pnpm assets capture --build | --app <App.app> [--out <dir>] [--only <shot,shot>] [--device <iphone|ipad>] [--theme <dark|light>] [--verbose]");
   const out = path.resolve(flag("out") ?? path.join(ROOT, ".cache", "showcase", "raw"));
   mkdirSync(out, { recursive: true });
+  // The debug output of an earlier run's failures would read as this run's.
+  rmSync(path.join(out, "failures"), { recursive: true, force: true });
   const only = flag("only")?.split(",") ?? null;
   const devices = (["iphone", "ipad"] as const).filter((device) => (flag("device") ?? device) === device);
   const themes = THEMES.filter((theme) => (flag("theme") ?? theme) === theme);
@@ -206,6 +215,12 @@ void runScript("showcase-capture", async (log) => {
       for (const shot of shots) {
         const step = `[${results.length + 1}/${total}]`;
         results.push({ name: captureName(device, theme, shot.id), device, theme, shot: shot.id, ok: await capture(log, sim, device, theme, shot, out, step) });
+        // Two failures before any capture is taken are almost always one cause (the app, the build, a step every flow shares): stop there
+        // rather than fail every capture the same way for an hour.
+        if (results.length === 2 && results.every((result) => !result.ok) && total > 2) {
+          run(log, "xcrun", ["simctl", "shutdown", sim.udid]);
+          throw new Error(`The first two captures failed, so the run stops: look at ${path.join(out, "failures")}, fix it, then run again`);
+        }
       }
     }
     log.info(`${sim.name}: shutting down`);
