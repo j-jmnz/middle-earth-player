@@ -1,7 +1,7 @@
 // Rules: mec113.phantom, mec113.saga-staging-rules, mec113.peril, rr.forced, rr.travel, rr.search, rr.shadow-effects, rr.lasting-effects, rr.effects, rr.step-6-4-3 (data/rules/entries.json).
 import { describe, it } from "vitest";
 
-import { announce, answer, attack, attackersOf, cardSpecs, damageOn, defend, deckCount, endPhase, flag, handCount, progressOn, quest, resolve, resourcesOn, reveal, revealedBy, stagingThreat, stat, threat, travel, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, attackersOf, cardSpecs, damageOn, defend, endPhase, flag, handCount, progressOn, quest, resolve, resourcesOn, reveal, revealedBy, stagingThreat, stat, threat, travel, won, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for The Passing of the Grey Company (the-return-of-the-king part 1): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/handover/agent-brief.md, Scenario procedure, Finish). Phantom is a keyword, so its lines are tested in verbs.test.ts.

@@ -34,7 +34,11 @@ export const companyWorld = async (decks: CompanyDecks = "strong") => {
   return world;
 };
 export const companyPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount)) => game.plan(seatCount, log);
-export const companyStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard) => game.start(seatCount, seed, difficulty, { facts, log, modeCard });
+// `extra`: the Campaign Setup's answers (the first player's search for Andúril: its code, or "skip") and the seats' own decks.
+export const companyStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, extra: { choices?: readonly string[]; loadout?: LoadoutSeat[] } = {}) => game.start(seatCount, seed, difficulty, { facts, log, modeCard, ...extra });
+
+/** The first seat's deck holds one Andúril (142014), so the campaign card's Setup asks the first player about the search. */
+export const andurilLoadout = (seatCount: 1 | 2): LoadoutSeat[] => companyLoadout(seatCount).map((seat, index) => (index === 0 ? { ...seat, deck: ["142014", ...seat.deck.slice(1)] } : seat));
 
 export type CompanyPolicy = {
   // The option a Choose window takes: the first, the last, or the first of SAFE_CHOICES that is offered (the choices that cost the players no threat and no card).
@@ -118,7 +122,7 @@ const game = campaignGame<CompanyDecks, CompanyPolicy>({
   stats: HERO_STATS,
   loadout: companyLoadout,
   // The scenario's cards and Overcome by Fear, Andúril and the Army of the Dead boon the campaign card places or earns; the campaign card's and the campaign's game codes are added by the kit.
-  codes: [...company.cards.map((card) => card.code), "145016", "142014", "145001", "145068"],
+  codes: [...company.cards.map((card) => card.code), "145016", "142014", "145001", "145068", "144052", "144014", "144075", "144076", "144015", "143015", "143016", "143017", "143018", "143019", "143020", "143021", "143068"],
   intent: companyIntent,
   policy: DEFAULT_POLICY,
   limit: 6000,

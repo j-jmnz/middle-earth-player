@@ -1,5 +1,5 @@
 // Rules: mec113.phantom, mec113.setting-up-the-game, mec113.saga-staging-rules, rr.winning-the-game, rr.player-elimination, rr.threat-elimination-level, rr.initial-threat-level (data/rules/entries.json).
-import { describe, expect } from "vitest";
+import { describe, expect, it } from "vitest";
 
 import type { ScenarioState } from "../../../rules/core/state.ts";
 
@@ -40,6 +40,34 @@ describe("The Passing of the Grey Company golden", () => {
       expect(state.cards[state.questStage ?? ""]?.code, golden.name).toBe("145065");
       expect(state.stageCleared, golden.name).toBe(true);
       for (const seat of state.seats.slice(0, golden.seatCount)) expect(seat.eliminated, golden.name).toBe(false);
+    },
+    checks({ game }) {
+      it("covers the wins and losses it names: seats, Easy, a threat loss and the loss of Aragorn", () => {
+        const won = COMPANY_GOLDENS.filter((golden) => golden.outcome === "won");
+        expect(won.filter((golden) => golden.seatCount === 1).length).toBeGreaterThanOrEqual(2);
+        expect(won.filter((golden) => golden.seatCount === 2).length).toBeGreaterThanOrEqual(2);
+        expect(won.filter((golden) => golden.difficulty === "Easy").length).toBeGreaterThanOrEqual(2);
+        const lost = COMPANY_GOLDENS.filter((golden) => golden.outcome === "lost");
+        expect(lost.some((golden) => golden.decks === "weak")).toBe(true);
+        expect(lost.some((golden) => golden.lossReason === "Aragorn left play")).toBe(true);
+      });
+
+      it("145065:B:2 a win has explored The Stone of Erech out of play, and stage 3B is still the current stage", () => {
+        for (const golden of COMPANY_GOLDENS.filter((item) => item.outcome === "won")) {
+          const state = game(golden).state;
+          expect(cardsOf(state, "145017").map((card) => card.zone), golden.name).toEqual(["encounterDiscard"]);
+          expect(state.cards[state.questStage ?? ""]?.zone, golden.name).toBe("questStage");
+        }
+      });
+
+      it("145063:A:1 every game starts with one Overcome by Fear on each dial and the other copies out of the game", () => {
+        for (const golden of COMPANY_GOLDENS) {
+          const state = game(golden).state;
+          const copies = cardsOf(state, "145016");
+          expect(copies, golden.name).toHaveLength(4);
+          expect(copies.filter((card) => card.zone === "removed"), golden.name).toHaveLength(4 - golden.seatCount);
+        }
+      });
     },
   });
 });
