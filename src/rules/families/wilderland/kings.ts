@@ -71,7 +71,7 @@ export function attachSearched(state: ScenarioState, instruction: Verb<"AttachSe
   const candidates = [...state.encounterDeck, ...state.encounterDiscard].filter((id) => {
     const card = state.cards[id];
     const printed = card ? printedOf(ctx.cards, card.code) : null;
-    if (!card || !printed || printed.type !== instruction.type || !printed.traits.includes(instruction.trait) || carried.has(card.code) || titles.has(printed.name)) return false;
+    if (!card || !printed || printed.type !== instruction.type || !printed.traits.includes(instruction.trait) || (instruction.name != null && printed.name !== instruction.name) || carried.has(card.code) || titles.has(printed.name)) return false;
     titles.add(printed.name);
     return true;
   });

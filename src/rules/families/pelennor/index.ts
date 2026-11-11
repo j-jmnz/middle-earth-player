@@ -12,6 +12,8 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Focus } from "../index.ts";
 import { discardAllyToStaging, stagedAlliesCost, takeControlOfStagedAllies } from "./allies.ts";
+import { attackerBarredByEngagement } from "./combat.ts";
+import { attachShadowToHero, engageShadowCard, putTopmostFromEncounterDiscard } from "./moves.ts";
 import { assaultQuestResult, placeProgressActiveFirst } from "./assault.ts";
 import { MINAS_TIRITH } from "./wall.ts";
 
@@ -36,6 +38,12 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return discardAllyToStaging(state, instruction, focus, ctx, steps);
     case "TakeControlOfStagedAllies":
       return takeControlOfStagedAllies(state, instruction, focus, ctx);
+    case "PutTopmostFromEncounterDiscard":
+      return putTopmostFromEncounterDiscard(state, instruction, focus, ctx, steps);
+    case "EngageShadowCard":
+      return engageShadowCard(state, focus, ctx, steps);
+    case "AttachShadowToHero":
+      return attachShadowToHero(state, instruction, focus, ctx);
     default:
       return null;
   }
@@ -43,8 +51,9 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "pelennor",
-  verbs: ["DamageMinasTirith", "PlaceProgressActiveFirst", "DiscardAllyToStaging", "TakeControlOfStagedAllies"],
+  verbs: ["DamageMinasTirith", "PlaceProgressActiveFirst", "DiscardAllyToStaging", "TakeControlOfStagedAllies", "PutTopmostFromEncounterDiscard", "EngageShadowCard", "AttachShadowToHero"],
   run,
+  combat: { attack: (state, enemyId, _attacker, _target, attackerId) => attackerBarredByEngagement(state, enemyId, attackerId) },
   amount: (state, found, _scope, ctx) => (found.stagedAlliesCost ? stagedAlliesCost(state, ctx) : null),
   questResult: (state, totals, cards, steps) => assaultQuestResult(state, totals, cards, steps, minasTirithId(state)),
 };

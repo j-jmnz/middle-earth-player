@@ -17,6 +17,13 @@ const VERBS = [
   z.strictObject({ verb: z.literal("DiscardAllyToStaging"), ...when }),
   // "Each player takes control of each ally he owns in the staging area and exhausts it" (145075:A:1), for the actor: the allies come into their owner's play area.
   z.strictObject({ verb: z.literal("TakeControlOfStagedAllies"), ...when }),
+  // "Put the topmost Orc enemy in the discard pile into play engaged with you" (145053:A:2): the last card of the encounter discard pile of this type and trait enters play engaged with the actor. It is put into play, not revealed (no When Revealed effect). Nothing happens when none is there.
+  z.strictObject({ verb: z.literal("PutTopmostFromEncounterDiscard"), type: z.literal("enemy"), trait: z.string().min(1), ...when }),
+  // "If Minas Tirith is in play, engage Mordor Orc" (145055:A:3): the shadow card the source is, an enemy, leaves its attacker and engages the player the attack is against; it enters play there.
+  z.strictObject({ verb: z.literal("EngageShadowCard"), ...when }),
+  // "If this attack damages a hero, attach Black Dart to that hero" (145058:A:2), read in the effect an AfterAttack leaves for the attack's end: the attacking enemy's shadow card with this code attaches faceup to the hero the attack damaged
+  // (its defender, or the hero an undefended attack landed on), unless that hero carries one already (Limit 1 per hero). A damaged ally or no damage attaches nothing. The record carries `when: {kind: "dealt"}`, so the attack keeps the damage it dealt for the effect that reads it.
+  z.strictObject({ verb: z.literal("AttachShadowToHero"), code: z.string().min(1), ...when }),
 ] as const;
 
 const TRIGGERS = [] as const;
@@ -29,6 +36,12 @@ const FLAGS = [
   "assault",
   // On a quest stage (target `self`): progress that would be placed on it by questing is not placed, and its record hears it as `progressReplaced` with the amount (145076:B:1: it is assigned as damage among the enemies in play). The active location took its share first.
   "progressAsDamage",
+  // On an enemy (target `self`): only the player it is engaged with may declare attackers against it, no other seat's characters, ranged or not ("Only the engaged player can declare attackers against The Witch-king", 145080:A:1).
+  "attackOnlyByEngaged",
+  // On an enemy (target `self`): a player attack against it is declared with one attacker ("cannot be attacked by more than 1 character at a time", 145050:A:1). The limit is on one attack; each ranged character of another seat may attack in turn.
+  "singleAttacker",
+  // On the table: a player card effect that would cancel the effects of a treachery card just revealed from the encounter deck is itself canceled, and the source of this flag is discarded ("cancel the effects of that event. Then, discard Fire-filled Trench", 145048:A:1).
+  "cancelCountered",
 ] as const;
 
 export const manifest = { name: "pelennor", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

@@ -1,4 +1,5 @@
 // Rules: rr.exhausted, rr.in-play-and-out-of-play, rr.ownership-and-control, rr.damage, rr.explored, rr.cancel, rr.shadow-effects, rr.restricted, rr.initiating-abilities-playing-cards (data/rules/entries.json).
+import { counterCancel } from "../families/pelennor/combat.ts";
 import { sendAway } from "../families/objectives/claimed.ts";
 import type { Instruction } from "../../catalog/boundary.ts";
 
@@ -223,7 +224,8 @@ export function runPlayerVerb(
       return enemy?.shadowId ? moveCard(state, enemy.shadowId, { zone: "encounterDiscard" }) : state;
     }
     case "CancelEffect":
-      return announceCanceled(cancelAnswered(state), state, ctx);
+      // Fire-filled Trench cancels a player event's cancel of a revealed treachery (families/pelennor/combat.ts).
+      return counterCancel(state, ctx) ?? announceCanceled(cancelAnswered(state), state, ctx);
     case "LookAtEncounterTop": {
       const top = state.encounterDeck[0];
       return top ? { ...state, window: { kind: "look", seat: focus.seat, cardIds: [top] }, activeSeat: focus.seat, passed: [] } : state;
