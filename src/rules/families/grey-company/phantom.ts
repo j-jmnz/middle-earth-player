@@ -21,5 +21,5 @@ export function hasPhantom(state: ScenarioState, enemyId: string, ctx: ReduceCon
 export function cancelPhantomDamage(state: ScenarioState, enemyId: string, raw: number, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
   if (raw <= 0 || !hasPhantom(state, enemyId, ctx)) return null;
   const seat = state.pendingAttack?.seat ?? state.cards[enemyId]?.controller;
-  return seat == null ? state : raiseThreat(state, seat, raw, steps, ruleCause("mec113.phantom"));
+  return seat == null ? null : raiseThreat(state, seat, raw, steps, ruleCause("mec113.phantom"));
 }

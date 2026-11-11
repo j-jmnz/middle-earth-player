@@ -12,7 +12,9 @@ type AttachmentVerb = Extract<
       | "GuardWith"
       | "HealAmong"
       | "ChooseAttackers"
-      | "QuestProgressFirst";
+      | "QuestProgressFirst"
+      | "AttachToDial"
+      | "DetachFromDial";
   }
 >;
 
@@ -21,7 +23,7 @@ function amountWords(amount: unknown): string {
 }
 
 /** One of the attachments family's instructions in words, or null when it is not one of them. */
-export function attachmentWords(instruction: Instruction): string | null {
+export function attachmentWords(instruction: Instruction, codeName?: (code: string) => string): string | null {
   const verb = instruction as AttachmentVerb;
   switch (verb.verb) {
     case "AttachSourceTo":
@@ -34,6 +36,11 @@ export function attachmentWords(instruction: Instruction): string | null {
       return verb.first ? "place progress from questing on the location before the quest" : "place progress from questing on the quest";
     case "GuardWith":
       return "reveal encounter cards until this card is guarded";
+    // Overcome by Fear (145016): the copy goes onto, or comes off, the acting player's threat dial; no code names the card the record sits on.
+    case "AttachToDial":
+      return `attach ${verb.code && codeName ? codeName(verb.code) : "this card"} to your threat dial`;
+    case "DetachFromDial":
+      return `detach ${verb.code && codeName ? codeName(verb.code) : "this card"} from your threat dial and set it aside`;
     case "PlayInto":
     case "Guarded":
       return null;

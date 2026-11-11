@@ -70,7 +70,8 @@ export type TopBarProps = {
   defense?: { name: string; value: number; limit: number; stage: number } | null;
   // The dials of the scenario's own pieces, in the order they are drawn (readouts/scenario-dials.ts): The Road to Isengard's, The Passage of the Marshes', Journey to the Cross-roads' and Shelob's Lair's.
   scenarioDials?: readonly TableDial[];
-  // Each seat's cards in hand on stage 3B (143080:B:3; readouts/isengard.ts) or its allies this round in Shelob's Lair (144071:B:2; readouts/lair.ts), which its threat dial wears in its label and warns with.
+  // What a seat's threat dial wears besides its number (readouts/scenario-dials.ts, `seatMarks`): its cards in hand on stage 3B of The Road to Isengard (143080:B:3), its allies this round in Shelob's Lair (144071:B:2), and The Passing of the Grey
+  // Company's Overcome by Fear (its label and spoken note) and starting-level notch (145064:B:2). Each is a label, a spoken note, a warning or a notch on the ring.
   hands?: readonly HandMark[];
   // The seats that hold something facedown or as a Captive and what to say of each (a mark on its dial): the Ring-bearer under the Watcher, a prisoner, a hero an enemy holds, a Captive.
   held?: readonly HeldDial[];
@@ -155,6 +156,8 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
                     ring={holding?.words ?? null}
                     ringMark={holding?.mark}
                     warn={hand?.warn}
+                    note={hand?.note}
+                    notch={hand?.notch}
                     onPress={() => onThreat(threat.seat)}
                   />
                 </UiScaleContext.Provider>

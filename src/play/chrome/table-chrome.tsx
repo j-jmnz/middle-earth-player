@@ -80,6 +80,7 @@ export function ThreatRing({
   goal,
   warn,
   note,
+  notch,
   onPress,
 }: {
   threat: SeatThreat;
@@ -118,12 +119,14 @@ export function ThreatRing({
   warn?: { level: "near" | "critical"; words: string };
   // What a screen reader hears after the number and the limit: what the number is (Saruman's hit points left, the win gate).
   note?: string;
+  // A threat value the ring marks with a short radial bar (the starting level stage 2B of The Passing of the Grey Company keeps the threat above), distinct from the engagement-cost dots.
+  notch?: number;
   // A tap opens the threat panel (each enemy's cost against the threat), or peeks at the seat (a dial that is not shown).
   onPress?: () => void;
 }) {
   const s = useUiScale();
   const id = testID ?? `threat-${threat.seat}`;
-  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} spokenWord={spokenWord} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} limit={limit} filled={filled} limitWords={limitWords} goal={goal} warn={warn} note={note} onPress={onPress} />;
+  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} spokenWord={spokenWord} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} limit={limit} filled={filled} limitWords={limitWords} goal={goal} warn={warn} note={note} notch={notch} onPress={onPress} />;
   return (
     <View testID={id} accessible accessibilityLabel={`${label} ${threat.threat}`} className="items-center">
       <View className="h-12 w-12 items-center justify-center rounded-control">
@@ -158,6 +161,7 @@ function ThreatDial({
   goal,
   warn,
   note,
+  notch,
   onPress,
 }: {
   threat: SeatThreat;
@@ -178,6 +182,7 @@ function ThreatDial({
   goal?: boolean;
   warn?: { level: "near" | "critical"; words: string };
   note?: string;
+  notch?: number;
   onPress?: () => void;
 }) {
   const speed = useMotionScale();
@@ -273,6 +278,14 @@ function ThreatDial({
                 );
               })
             : null}
+          {/* A notch on the ring at a level the threat is kept above (stage 2B's starting level): a short radial bar across the arc, apart from the engagement ticks' dots. */}
+          {notch != null && !threat.eliminated ? (
+            <View
+              testID={`${id}-notch`}
+              pointerEvents="none"
+              style={{ position: "absolute", left: (DIAL / 2) * s - 1 * s, top: -2.5 * s, width: 2 * s, height: 9 * s, borderRadius: 1 * s, backgroundColor: t.bone, transformOrigin: `${1 * s}px ${(DIAL / 2 + 2.5) * s}px`, transform: [{ rotate: `${threatMeter(notch) * 360}deg` }] }}
+            />
+          ) : null}
         </View>
         <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { borderRadius: 999, borderWidth: 2 * s, borderColor: t.accent }, ringStyle]} />
         {/* Peeking at this seat: a bone ring just outside the dial and an eye on its corner, clear of the label and its Ring mark. */}

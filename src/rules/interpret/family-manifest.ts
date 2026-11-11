@@ -37,7 +37,7 @@ export type TravelHooks = {
   readonly reach?: (state: ScenarioState, ctx: ReduceContext) => readonly string[];
   readonly cost?: (state: ScenarioState, ctx: ReduceContext, locationId: string | null) => TravelCharge | null;
   readonly forced?: (state: ScenarioState, ctx: ReduceContext) => readonly string[];
-  readonly unpayable?: (state: ScenarioState, instruction: Instruction) => boolean;
+  readonly unpayable?: (state: ScenarioState, instruction: Instruction, ctx: ReduceContext, locationId: string) => boolean;
 };
 
 /** Whether a family bars playing a card, or putting it into play (`putting`), from the hand or by an effect: true bars it. Asked after the core's own bars. */

@@ -112,7 +112,7 @@ Read the sections your task touches.
   - 636–693 Dream-chaser (~15.6K) ← 4
   - 694–720 Ered Mithrin (~15.8K) ← 7
   - 721–857 The Two Towers (~15.5K) ← 21
-  - 858–910 The Return of the King (~4.1K) ← 11
+  - 858–910 The Return of the King (~4.2K) ← 11
     - 885–910 The Passing of the Grey Company (~2.5K)
   - 911–919 Nightmare (~410) ← 19
   - 920–958 Deckbuilding (~1.9K)
@@ -126,15 +126,15 @@ Read the sections your task touches.
   - 1078–1103 Persistence and shipping (~2.6K) ← 6
   - 1104–1145 Screens (~4.9K) ← 1
     - 1130–1145 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~44.3K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~44.5K tok)
   - 5–8 Overview (~130) ← 1
-  - 9–23 Top bar (~2.9K) ← 4
+  - 9–23 Top bar (~3.0K) ← 4
   - 24–27 Table menu (~490) ← 2
   - 28–35 Quest scale (~830) ← 2
   - 36–39 Canvas (~560)
   - 40–52 Spacing and the play area's rows (~1.9K) ← 9
   - 53–58 Pictures on the table (~320) ← 1
-  - 59–92 Cards (~8.2K) ← 20
+  - 59–92 Cards (~8.3K) ← 20
   - 93–98 The Sailing test (~690) ← 5
   - 99–112 The Island Map (~1.8K) ← 8
   - 113–116 Tokens and effects (~320)

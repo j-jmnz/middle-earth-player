@@ -72,8 +72,8 @@ describe("travel hooks", () => {
     expect(familyTravelCost(state, ctx, null, some)).toBe(charge);
     expect(familyForcedTravel(state, ctx, [family("a")])).toEqual([]);
     expect(familyForcedTravel(state, ctx, some)).toEqual(["x", "y"]);
-    expect(familyTravelUnpayable(state, { verb: "Heal", target: "self", amount: 1 }, some)).toBe(true);
-    expect(familyTravelUnpayable(state, { verb: "Heal", target: "self", amount: 1 }, [family("a")])).toBe(false);
+    expect(familyTravelUnpayable(state, { verb: "Heal", target: "self", amount: 1 }, ctx, "loc", some)).toBe(true);
+    expect(familyTravelUnpayable(state, { verb: "Heal", target: "self", amount: 1 }, ctx, "loc", [family("a")])).toBe(false);
   });
 
   it("change nothing for the real families", () => {

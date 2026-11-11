@@ -20,8 +20,9 @@ const ENT = "143046";
 const SARUMAN = "143047";
 const STAFF = "143048";
 
-/** What a seat's threat dial says of its hand on stage 3B: its label (the count, which a screen reader hears with it) and the warning at 1 card and 0. */
-export type HandMark = { seat: number; label: string; warn?: { level: "near" | "critical"; words: string } };
+/** What a seat's threat dial says of its hand on stage 3B: its label (the count, which a screen reader hears with it) and the warning at 1 card and 0. `note` is spoken after the dial's number (a card on the dial and what it does) and
+ * `notch` is a threat value the ring marks with a short radial bar (the level a stage keeps the threat above). */
+export type HandMark = { seat: number; label: string; warn?: { level: "near" | "critical"; words: string }; note?: string; notch?: number };
 
 // The number a record's `less` condition on an instruction names, plus 1: "2 less than the resources" (143046:A:1) is the 3 resources that end it, "4 less than the damage" (143079:B:2) the 5 damage that advance.
 function reaches(ctx: ReduceContext, code: string, verb: string): number | null {

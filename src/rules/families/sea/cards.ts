@@ -12,7 +12,7 @@ import { nextUint } from "../../core/seed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { livingSeats, updateCard } from "../../core/state.ts";
 import { topFrame, patchTop } from "../../windows/windows.ts";
-import { moveCard } from "../../core/zones.ts";
+import { discardFromHand, moveCard } from "../../core/zones.ts";
 import { effectData } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 
@@ -25,7 +25,7 @@ export function plunderHand(state: ScenarioState, focus: Focus, ctx: ReduceConte
   const rolled = { ...state, seedCursor: state.seedCursor + 1 };
   const cost = printedOf(ctx.cards, card.code).cost ?? 0;
   const seat = card.owner ?? focus.seat;
-  const discarded = queueEvent(moveCard(rolled, id, { zone: "discard", seat }), { trigger: "discardedFromHand", seat, cardId: id });
+  const discarded = discardFromHand(rolled, id, seat);
   const source = focus.sourceId ? discarded.cards[focus.sourceId] : undefined;
   return source && cost > 0 ? updateCard(discarded, source.id, { resources: source.resources + cost }) : discarded;
 }

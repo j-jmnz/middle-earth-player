@@ -111,7 +111,7 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
       // "Reveal the top card of the burden deck to travel here" (141058:A:3): an empty burden deck has none to reveal.
       if (instruction.verb === "RevealBurden") return (state.burdenDeck?.length ?? 0) === 0;
       // A family's own Travel cost the players cannot pay (the Corsair deck of Southern Belfalas is empty, 12154:A:1, families/sea/index.ts).
-      if (familyTravelUnpayable(state, instruction)) return true;
+      if (familyTravelUnpayable(state, instruction, ctx, locationId)) return true;
       // "The first player must discard 2 cards at random from his hand to travel here" (01094:A:1): a hand of fewer cannot pay it.
       if (instruction.verb === "DiscardRandomFromHand" && instruction.who === "firstPlayer" && typeof instruction.amount === "number") {
         return (state.seats[state.firstPlayer]?.hand.length ?? 0) < instruction.amount;

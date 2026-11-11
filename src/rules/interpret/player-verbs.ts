@@ -21,7 +21,7 @@ import { printedOf, type PrintedCard } from "../core/printed.ts";
 import { readyBarred } from "../core/holder-classes.ts";
 import { titleBarred } from "../families/nightmare/guards.ts";
 import { patchTop, topFrame } from "../windows/windows.ts";
-import { attachTo, moveCard } from "../core/zones.ts";
+import { attachTo, discardFromHand, moveCard } from "../core/zones.ts";
 import { afterCancel } from "../families/defense/damage.ts";
 import { healBlocked } from "../families/burden/life.ts";
 import { mayGainResources } from "../families/misc/guards.ts";
@@ -188,9 +188,9 @@ export function runPlayerVerb(
       if (!card || seat == null) return state;
       // "Discarded objective cards are returned to the staging area" (01103:A:2, families/objectives/claimed.ts).
       if (card.claimed) return sendAway(state, id, { zone: "discard", seat });
-      const moved = moveCard(state, id, { zone: "discard", seat });
       // "After 1 or more cards are discarded from your hand", "After ~ is discarded from your deck".
-      if (card.zone === "hand") return queueEvent(moved, { trigger: "discardedFromHand", seat, cardId: id });
+      if (card.zone === "hand") return discardFromHand(state, id, seat);
+      const moved = moveCard(state, id, { zone: "discard", seat });
       if (card.zone === "deck") return queueEvent(moved, { trigger: "discardedFromDeck", seat, cardId: id });
       return moved;
     }

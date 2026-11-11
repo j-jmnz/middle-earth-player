@@ -158,8 +158,8 @@ export function familyForcedTravel(state: ScenarioState, ctx: ReduceContext, fam
 }
 
 /** Whether some family says the players cannot pay this instruction of a Travel line now. */
-export function familyTravelUnpayable(state: ScenarioState, instruction: Instruction, families: readonly RulesFamily[] = active()): boolean {
-  for (const family of hooked(families).unpayable) if (family.travel?.unpayable?.(state, instruction) === true) return true;
+export function familyTravelUnpayable(state: ScenarioState, instruction: Instruction, ctx: ReduceContext, locationId: string, families: readonly RulesFamily[] = active()): boolean {
+  for (const family of hooked(families).unpayable) if (family.travel?.unpayable?.(state, instruction, ctx, locationId) === true) return true;
   return false;
 }
 

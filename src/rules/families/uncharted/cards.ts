@@ -17,7 +17,7 @@ import { queueEvent } from "../../windows/queue.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
 import { patchTop } from "../../windows/windows.ts";
-import { attachTo, moveCard } from "../../core/zones.ts";
+import { attachTo, discardFromHand, moveCard } from "../../core/zones.ts";
 import { dealtFace } from "../dreamchaser/facts.ts";
 import { effectData } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
@@ -130,7 +130,7 @@ export function discardCostlier(state: ScenarioState, instruction: Verb<"Discard
   let next = state;
   for (const id of [...(state.seats[seat]?.hand ?? [])]) {
     const cost = printedOf(ctx.cards, state.cards[id]?.code ?? "").cost;
-    if (cost != null && cost > base) next = queueEvent(moveCard(next, id, { zone: "discard", seat: state.cards[id]?.owner ?? seat }), { trigger: "discardedFromHand", seat, cardId: id });
+    if (cost != null && cost > base) next = discardFromHand(next, id, state.cards[id]?.owner ?? seat, seat);
   }
   return next;
 }

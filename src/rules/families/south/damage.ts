@@ -11,14 +11,13 @@ import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { placeDamage } from "../../core/keywords.ts";
-import { moveCard } from "../../core/zones.ts";
+import { discardFromHand, moveCard } from "../../core/zones.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { inPlay, livingSeats } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { effectData } from "../encounter/moves.ts";
 import { queueFront } from "../play/refs.ts";
-import { queueEvent } from "../../windows/queue.ts";
 import { patchTop } from "../../windows/windows.ts";
 
 type Assign = Extract<Instruction, { verb: "AssignDamage" }>;
@@ -49,10 +48,9 @@ export function discardEach(state: ScenarioState, instruction: Extract<Instructi
     const card = next.cards[id];
     const seat = card?.owner ?? card?.controller;
     if (!card || seat == null) continue;
-    next = moveCard(next, id, { zone: "discard", seat });
-    count += 1;
     // A card from a hand is "discarded from your hand" (01079:A:1, Eyes of the Forest, makes each player discard the events in his).
-    if (card.zone === "hand") next = queueEvent(next, { trigger: "discardedFromHand", seat, cardId: id });
+    next = card.zone === "hand" ? discardFromHand(next, id, seat) : moveCard(next, id, { zone: "discard", seat });
+    count += 1;
   }
   const data = count > 0 ? effectData(next) : undefined;
   return data ? patchTop(next, { data: { ...data, discardedCount: (data.discardedCount ?? 0) + count } }) : next;

@@ -33,7 +33,9 @@ export function attachToDial(state: ScenarioState, instruction: Verb<"AttachToDi
   const code = codeOf(state, instruction, focus);
   const seat = focus.seat;
   if (!code || state.seats[seat]?.eliminated || dialCopy(state, seat, code)) return state;
-  const id = instruction.code ? setAsideCopy(state, code) : focus.sourceId && state.cards[focus.sourceId] && !inPlay(state.cards[focus.sourceId]?.zone ?? "removed") ? focus.sourceId : undefined;
+  const source = focus.sourceId ? state.cards[focus.sourceId] : undefined;
+  const sourceWaiting = source != null && !inPlay(source.zone) ? source.id : undefined;
+  const id = instruction.code ? setAsideCopy(state, code) : sourceWaiting;
   if (!id) return state;
   const placed = updateCard(moveCard(state, id, { zone: "play", seat }), id, { face: "up", exhausted: false, host: null, controller: seat });
   return queueEvent(placed, { trigger: "enteredPlay", seat, cardId: id });

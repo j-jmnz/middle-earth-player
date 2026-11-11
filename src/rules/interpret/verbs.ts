@@ -25,7 +25,7 @@ import { refillsAnyTime } from "../families/nightmare/guards.ts";
 import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
 import { encounterRaised } from "../families/quest/threat.ts";
 import { flagged, livingSeats, updateCard, type ScenarioState } from "../core/state.ts";
-import { attachTo, cardsUnder, moveCard } from "../core/zones.ts";
+import { attachTo, cardsUnder, discardFromHand, moveCard } from "../core/zones.ts";
 import { currentCause, ruleCause, UNATTRIBUTED } from "../core/cause.ts";
 import { takeProgressOff } from "../core/progress.ts";
 import { noteEncounterThreat } from "../families/encounter/reveal.ts";
@@ -318,7 +318,7 @@ function discardRandom(state: ScenarioState, seat: number, amount: number, sourc
     const card = id ? next.cards[id] : undefined;
     if (!id || !card) break;
     // "After a card is discarded from your hand" hears a random discard too.
-    next = queueEvent(moveCard(next, id, { zone: "discard", seat: card.owner ?? seat }), { trigger: "discardedFromHand", seat: card.owner ?? seat, cardId: id });
+    next = discardFromHand(next, id, card.owner ?? seat);
   }
   return next;
 }

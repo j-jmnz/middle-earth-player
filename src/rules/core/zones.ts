@@ -413,3 +413,8 @@ export function spawn(
 }
 
 export { inPlay } from "./state.ts";
+
+/** A card of a hand goes to `owner`'s discard pile and "discarded from your hand" is queued for `eventSeat` (the owner unless a card's own wording says otherwise). */
+export function discardFromHand(state: ScenarioState, id: string, owner: number, eventSeat: number = owner): ScenarioState {
+  return queueEvent(moveCard(state, id, { zone: "discard", seat: owner }), { trigger: "discardedFromHand", seat: eventSeat, cardId: id });
+}

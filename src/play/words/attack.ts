@@ -9,7 +9,12 @@ export function attackWords(instruction: Instruction): string | null {
     case "OfferAttacks":
       return "declare an attack against each of those enemies";
     case "ImmediateAttack":
-      return instruction.afterThis ? "make an additional attack against the defending player after this one" : null;
+      return instruction.afterThis ? "make an additional attack against the defending player after this one" : "make an immediate attack against you";
+    case "AttackFromStaging":
+      return instruction.target === "host" ? "make the attached enemy attack from the staging area" : "make an immediate attack against you from the staging area";
+    // An AfterAttack inside a Choose option (145021:A:3, Haunted Path's shadow): the enemy that attacked returns to the staging area once the attack has ended.
+    case "AfterAttack":
+      return instruction.instructions.length > 0 && instruction.instructions.every((inner) => inner.verb === "ReturnToStaging") ? "return the attacking enemy to the staging area after this attack" : null;
     case "QuestProgress":
       return `place ${typeof instruction.amount === "number" ? instruction.amount : "X"} progress on the current quest`;
     case "ExcessDamageTo":

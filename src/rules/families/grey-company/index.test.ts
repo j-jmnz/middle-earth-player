@@ -5,10 +5,11 @@ import type { Effect } from "../../../catalog/boundary.ts";
 import { resolveAmount, frameScope } from "../../interpret/amounts.ts";
 import { runInstruction } from "../../interpret/interpret.ts";
 import { withThreat } from "../../core/state.ts";
-import { familyPlayBarred } from "../../interpret/family-hooks.ts";
+import { familyPlayBarred, familyPlayRefusal } from "../../interpret/family-hooks.ts";
 import type { ScenarioState } from "../../core/state.ts";
+import { printedOf } from "../../core/printed.ts";
 import { modifiedStat } from "../../core/keywords.ts";
-import { spawn } from "../../core/zones.ts";
+import { moveCard, spawn } from "../../core/zones.ts";
 import { ally, enemy, hero, send, table, treachery, until, type TableSpec } from "../defense/table.ts";
 
 // Rules: mec113.phantom, rr.step-6-4-3, rr.defending-player, rr.play-and-put-into-play, rr.threat-threat-dial (data/rules/entries.json); ledger lines 145022:A:1, 145023:A:3, 145065:B:1, 145063:B:2, 145064:B:3, 145064:B:1, 145021:A:1.
@@ -81,6 +82,9 @@ describe("cannotPlayCards (145064:B:3)", () => {
     expect(familyPlayBarred(seatFlag, ids.b!, ctx, undefined, { seat: 0 })).toBe(true);
     expect(familyPlayBarred(seatFlag, ids.b!, ctx, undefined, { seat: 0, putting: true })).toBe(false);
     expect(familyPlayBarred(seatFlag, ids.b!, ctx, undefined, { seat: 1 })).toBe(false);
+    // The words name the card, from any zone.
+    const discarded = moveCard(seatFlag, ids.b!, { zone: "discard", seat: 0 });
+    expect(familyPlayRefusal(discarded, ids.b!, ctx)).toContain(printedOf(ctx.cards, "b").name);
   });
 });
 
@@ -93,6 +97,16 @@ describe("the threat amounts (145064:B:1, 145021:A:1)", () => {
     expect(resolveAmount(at(31, 40), { highestThreat: true }, scope, ctx)).toBe(40);
     expect(resolveAmount(at(45, 40), { highestThreat: true }, scope, ctx)).toBe(45);
     expect(resolveAmount(at(31, 40), { highestThreat: true, times: 1 }, scope, ctx)).toBe(40);
+  });
+
+  it("reads a seat under a threat ceiling (Swift Departure, 12011) at the ceiling", () => {
+    const built = table({ seatCount: 2, cards: [hero("a"), hero("c")], effects: [], heroes: [{ code: "a" }, { code: "c", seat: 1 }] });
+    const scope = frameScope(built.state, 0, null);
+    const capped = withThreat(withThreat(built.state, 0, 40), 1, 22);
+    const state = { ...capped, modifiers: [...capped.modifiers, { instanceId: "seat:0", sourceId: "x", stat: "threatCeiling" as const, amount: 20, until: "endOfPhase" as const }] };
+    expect(resolveAmount(state, { highestThreat: true }, scope, built.ctx)).toBe(22);
+    expect(resolveAmount(state, { playersAtThreat: 35 }, scope, built.ctx)).toBe(0);
+    expect(resolveAmount(state, { playersAtThreat: 20 }, scope, built.ctx)).toBe(2);
   });
 
   it("counts the living players at or above a threat", () => {

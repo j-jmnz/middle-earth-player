@@ -20,6 +20,7 @@ import { topFrame } from "../../rules/windows/windows.ts";
 import { damageOutcome, enemiesToFace, lossWords, outcomeWords } from "../store/foresight.ts";
 import { defenseQuestResult } from "../words/scenarios/fortress.ts";
 import { defenseOutcome, stageHasDefense } from "./fortress.ts";
+import { companyProgressWords } from "./company.ts";
 import { lairProgressWords } from "./lair.ts";
 import { sailingReadout } from "./sea-readout.ts";
 import type { Sheet, SheetStat } from "../choice/sheet-types.ts";
@@ -169,8 +170,8 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     if (game.mode === "questCommit") return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: commitWords(game, ctx, picked) };
     // A stage with Defense (mec112.defense): the Threat that beats the Willpower is progress the encounter deck places, so no player's threat rises and no elimination is warned of.
     if (stageHasDefense(game)) return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: defenseQuestResult(willpower, threat, defenseOutcome(game, ctx)) };
-    // Shelob's Lair holds some progress back (stage 2B's cap, an Underground location on stage 1): the split the engine would place.
-    const held = lairProgressWords(game, ctx, willpower - threat);
+    // Shelob's Lair holds some progress back (stage 2B's cap, an Underground location on stage 1): the split the engine would place; stage 3B of The Passing of the Grey Company says the progress pays the Stone's travel.
+    const held = lairProgressWords(game, ctx, willpower - threat) ?? companyProgressWords(game, ctx, willpower - threat);
     return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: `${held ? `${held} if nothing changes` : questResult(willpower, threat)}${eliminationWords(game, threat - willpower, seat)}` };
   }
   return null;
