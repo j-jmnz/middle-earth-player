@@ -11,6 +11,7 @@ import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Focus } from "../index.ts";
+import { assaultQuestResult, placeProgressActiveFirst } from "./assault.ts";
 import { MINAS_TIRITH } from "./wall.ts";
 
 /** The objective Minas Tirith while it is in play (3A adds it to the staging area; before that it is set aside, out of play). */
@@ -28,9 +29,16 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   switch (instruction.verb) {
     case "DamageMinasTirith":
       return damageMinasTirith(state, instruction, focus, ctx, steps);
+    case "PlaceProgressActiveFirst":
+      return placeProgressActiveFirst(state, instruction, focus, ctx, steps);
     default:
       return null;
   }
 }
 
-export const manifest: RulesFamily = { name: "pelennor", verbs: ["DamageMinasTirith"], run };
+export const manifest: RulesFamily = {
+  name: "pelennor",
+  verbs: ["DamageMinasTirith", "PlaceProgressActiveFirst"],
+  run,
+  questResult: (state, totals, cards, steps) => assaultQuestResult(state, totals, cards, steps, minasTirithId(state)),
+};

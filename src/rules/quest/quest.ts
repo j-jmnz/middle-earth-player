@@ -218,6 +218,13 @@ export function placeQuestProgress(
     next = queueEvent(next, { trigger: "progressReplaced", seat: null, cardId: next.questStage, amount: remaining });
     remaining = 0;
   }
+  // Progress a stage turns into damage among the enemies in play (families/pelennor, 145076:B:1): its record hears the amount.
+  if (remaining > 0 && next.questStage && flagged(next, next.questStage, "progressAsDamage")) {
+    next = queueEvent(next, { trigger: "progressReplaced", seat: null, cardId: next.questStage, amount: remaining });
+    remaining = 0;
+  }
+  // Assault (mec113.assault): no progress is placed on the stage by questing or by a player card effect; the active location above took its share as usual.
+  if (remaining > 0 && next.questStage && flagged(next, next.questStage, "assault")) remaining = 0;
   // A side quest that is the current quest takes it instead of the main quest card; what it cannot take is discarded (emce.side-quests-in-play, families/wilderland/night-quest.ts).
   if (remaining > 0 && hasSideQuests(next)) ({ state: next, remaining } = placeOnCurrentSideQuest(next, remaining, cards, steps));
   if (remaining > 0 && next.questStage && !next.stageCleared) {
