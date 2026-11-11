@@ -1,17 +1,22 @@
 // `pnpm assets capture`: takes the README showcase's captures (docs/showcase.md, Capture flows) on the iOS simulators, on macOS with Xcode and
 // Maestro. The app is a Release simulator build with EXPO_PUBLIC_SHOWCASE=1 and EXPO_PUBLIC_E2E_SEED=1 and every picture packed: `--build` makes it
-// (expo prebuild, then xcodebuild into .cache/showcase/build; run `pnpm assets` first), `--app <App.app>` takes one already built. For each device (shots.ts) it boots the newest simulator of that kind, sets a clean
-// status bar, installs the app, and runs each of the device's flows in .maestro/showcase/ once per theme, with THEME and DEVICE. What a flow writes
-// (a screenshot, a recording) lands in --out (default .cache/showcase/raw) as <device>-<theme>-<shot>.png or .mp4, with capture.json saying which
-// captures were taken and which failed. A flow that fails is run once more; the script fails when any capture is still missing.
+// (expo prebuild, then xcodebuild into .cache/showcase/build; run `pnpm assets` first), `--app <App.app>` takes one already built. For each device
+// (shots.ts) it boots the newest simulator of that kind, sets a clean status bar, installs the app, and runs each of the device's flows in
+// .maestro/showcase/ once per theme, with THEME and DEVICE. What a flow writes (a screenshot, a recording) lands in --out (default
+// .cache/showcase/raw) as <device>-<theme>-<shot>.png or .mp4, with capture.json saying which captures were taken and which failed. A flow that
+// fails is run once more; the script fails when any capture is still missing.
 //
-// Flags: --build or --app <App.app>, --out <dir>, --only <shot,shot>, --device <iphone|ipad>, --theme <dark|light>.
-import { spawnSync } from "node:child_process";
+// It logs each stage as it starts and ends (the build's steps, the simulators, each capture as [n/total] with its time), and while a long step runs
+// (prebuild, xcodebuild, a flow) a line every HEARTBEAT seconds with the step's latest output line, so a run of an hour shows where it is. A step
+// that fails prints the end of its output; --verbose streams every tool's whole output instead (user request, 2026-11-11).
+//
+// Flags: --build or --app <App.app>, --out <dir>, --only <shot,shot>, --device <iphone|ipad>, --theme <dark|light>, --verbose.
+import { spawn, spawnSync } from "node:child_process";
 import { copyFileSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
-import { runScript, verbose, type Log } from "../log.ts";
+import { duration, runScript, verbose, type Log } from "../log.ts";
 import { captureName, SHOTS, type Device, type Shot, type Theme } from "./shots.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "..", "..");
@@ -20,35 +25,95 @@ const FLOWS = path.join(ROOT, ".maestro", "showcase");
 // The simulator each device is captured on: the newest one of its kind that Xcode offers (the names move with each Xcode).
 const KINDS: Readonly<Record<Device, RegExp>> = { iphone: /^iPhone \d+ Pro$/, ipad: /^iPad Pro 13-inch/ };
 const THEMES: readonly Theme[] = ["dark", "light"];
+const captures = (count: number) => `${count} capture${count === 1 ? "" : "s"}`;
+// How often a long step says it is still running (s), and how many of its last output lines a failure prints.
+const HEARTBEAT = 30;
+const TAIL = 40;
 
 function flag(name: string): string | null {
   const at = process.argv.indexOf(`--${name}`);
   return at >= 0 ? (process.argv[at + 1] ?? null) : null;
 }
 
-function run(log: Log, command: string, args: readonly string[], cwd: string = ROOT, env: NodeJS.ProcessEnv = process.env): boolean {
+// A short command, its output kept unless it fails.
+function run(log: Log, command: string, args: readonly string[], cwd: string = ROOT): boolean {
   log.debug(`${command} ${args.join(" ")}`);
-  const child = spawnSync(command, args, { cwd, env, stdio: verbose() ? "inherit" : "pipe", encoding: "utf8", maxBuffer: 256 * 1024 * 1024 });
+  const child = spawnSync(command, args, { cwd, stdio: verbose() ? "inherit" : "pipe", encoding: "utf8", maxBuffer: 64 * 1024 * 1024 });
   if (child.status === 0) return true;
-  if (!verbose()) log.warn(`${command} ${args[0] ?? ""} failed:\n${child.stdout ?? ""}${child.stderr ?? ""}`);
+  if (!verbose()) log.warn(`${command} ${args.slice(0, 2).join(" ")} failed:\n${lastLines(`${child.stdout ?? ""}${child.stderr ?? ""}`, TAIL)}`);
   return false;
+}
+
+function lastLines(text: string, count: number): string {
+  return text.split("\n").map((line) => line.trimEnd()).filter((line) => line !== "").slice(-count).join("\n");
+}
+
+// The line a heartbeat shows: the step's latest output line that says something, cut to fit.
+function latest(text: string): string {
+  const line = text.split("\n").map((item) => item.replace(/\x1b\[[0-9;]*m/g, "").trim()).filter((item) => item !== "").at(-1) ?? "";
+  return line.length > 140 ? `${line.slice(0, 137)}...` : line;
+}
+
+/**
+ * A long step: runs `command`, says every HEARTBEAT seconds that it is still running with its latest output line, and when it ends how long it
+ * took. A failure prints the last TAIL lines of its output. With --verbose the output streams as it comes and there is no heartbeat.
+ */
+function runLong(log: Log, label: string, command: string, args: readonly string[], options: { cwd?: string; env?: NodeJS.ProcessEnv; quiet?: boolean } = {}): Promise<boolean> {
+  log.debug(`${command} ${args.join(" ")}`);
+  const started = performance.now();
+  if (!options.quiet) log.info(`${label}...`);
+  return new Promise((resolve) => {
+    const child = spawn(command, args, { cwd: options.cwd ?? ROOT, env: options.env ?? process.env, stdio: verbose() ? "inherit" : "pipe" });
+    let output = "";
+    const keep = (chunk: Buffer) => {
+      // Only the end is ever read: keep the last 256 KB.
+      output = (output + chunk.toString("utf8")).slice(-256 * 1024);
+    };
+    child.stdout?.on("data", keep);
+    child.stderr?.on("data", keep);
+    const beat = verbose()
+      ? null
+      : setInterval(() => {
+          const last = latest(output);
+          log.info(`${label}: still running, ${duration(performance.now() - started)}${last ? ` (${last})` : ""}`);
+        }, HEARTBEAT * 1000);
+    child.on("close", (code) => {
+      if (beat) clearInterval(beat);
+      const took = duration(performance.now() - started);
+      if (code === 0) {
+        if (!options.quiet) log.info(`${label}: done in ${took}`);
+        resolve(true);
+        return;
+      }
+      log.warn(`${label}: failed after ${took} (exit ${code ?? "signal"})${verbose() ? "" : `, its last lines:\n${lastLines(output, TAIL)}`}`);
+      resolve(false);
+    });
+    child.on("error", (error) => {
+      if (beat) clearInterval(beat);
+      log.warn(`${label}: could not start ${command}: ${error.message}`);
+      resolve(false);
+    });
+  });
 }
 
 // The showcase build: the native project generated, then a Release build for the simulator with the showcase's variables, which Metro inlines
 // when Xcode bundles the JavaScript. The pictures must already be packed (`pnpm assets` rewrites scan-map.ts with them).
-function buildApp(log: Log): string {
+async function buildApp(log: Log): Promise<string> {
   const scanMap = readFileSync(path.join(ROOT, "src", "screens", "images", "scan-map.ts"), "utf8");
-  if (!/moduleId/.test(scanMap.split("export const scanAssets")[1] ?? "")) throw new Error("No card picture is packed: run pnpm assets first (the first run downloads about 5 GB)");
+  const packed = [...(scanMap.split("export const scanAssets")[1] ?? "").matchAll(/moduleId/g)].length;
+  if (packed === 0) throw new Error("No card picture is packed: run pnpm assets first (the first run downloads about 5 GB)");
+  log.info(`build 1/3: ${packed} card pictures are packed`);
   const env = { ...process.env, EXPO_PUBLIC_E2E_SEED: "1", EXPO_PUBLIC_SHOWCASE: "1" };
-  if (!run(log, "pnpm", ["exec", "expo", "prebuild", "--platform", "ios"], ROOT, env)) throw new Error("expo prebuild failed");
+  if (!(await runLong(log, "build 2/3: expo prebuild (the native project in ios/, with its CocoaPods)", "pnpm", ["exec", "expo", "prebuild", "--platform", "ios"], { env }))) throw new Error("expo prebuild failed");
   const workspace = readdirSync(path.join(ROOT, "ios")).find((name) => name.endsWith(".xcworkspace"));
   if (!workspace) throw new Error("expo prebuild wrote no ios/*.xcworkspace");
   const derived = path.join(ROOT, ".cache", "showcase", "build");
-  const built = run(log, "xcodebuild", ["-quiet", "-workspace", path.join("ios", workspace), "-scheme", path.basename(workspace, ".xcworkspace"), "-configuration", "Release", "-sdk", "iphonesimulator", "-destination", "generic/platform=iOS Simulator", "-derivedDataPath", derived, "CODE_SIGNING_ALLOWED=NO", "build"], ROOT, env);
-  if (!built) throw new Error("xcodebuild failed: run again with --verbose for its output");
+  const args = ["-workspace", path.join("ios", workspace), "-scheme", path.basename(workspace, ".xcworkspace"), "-configuration", "Release", "-sdk", "iphonesimulator", "-destination", "generic/platform=iOS Simulator", "-derivedDataPath", derived, "CODE_SIGNING_ALLOWED=NO", "build"];
+  if (!(await runLong(log, "build 3/3: xcodebuild Release for the simulator (often 15 to 30 minutes, longest on the first run)", "xcodebuild", args, { env }))) throw new Error("xcodebuild failed: run again with --verbose for its whole output");
   const products = path.join(derived, "Build", "Products", "Release-iphonesimulator");
   const app = readdirSync(products).find((name) => name.endsWith(".app"));
   if (!app) throw new Error(`No .app in ${products}`);
+  log.info(`built ${path.join(products, app)}`);
   return path.join(products, app);
 }
 
@@ -60,77 +125,94 @@ function simulator(device: Device): SimDevice {
   const runtimes = (JSON.parse(listed.stdout) as { devices: Record<string, SimDevice[]> }).devices;
   // The newest iOS runtime first, then the highest model number in it.
   const ios = Object.entries(runtimes).filter(([runtime]) => runtime.includes("iOS")).sort(([left], [right]) => right.localeCompare(left, undefined, { numeric: true }));
-  for (const [, devices] of ios) {
+  for (const [runtime, devices] of ios) {
     const found = devices.filter((item) => item.isAvailable && KINDS[device].test(item.name)).sort((left, right) => right.name.localeCompare(left.name, undefined, { numeric: true }))[0];
-    if (found) return found;
+    if (found) return { ...found, name: `${found.name} (${runtime.split(".").at(-1)?.replace(/-/g, " ").replace(/^iOS (\d+) (\d+)/, "iOS $1.$2") ?? runtime})` };
   }
-  throw new Error(`No available ${device} simulator matches ${KINDS[device]}`);
+  throw new Error(`No available ${device} simulator matches ${KINDS[device]}: install an iOS runtime in Xcode, Settings, Components`);
 }
 
-function prepare(log: Log, sim: SimDevice, app: string): void {
+async function prepare(log: Log, sim: SimDevice, app: string): Promise<void> {
+  log.info(`${sim.name}: booting`);
   // `boot` fails on a simulator that is already booted, which is fine; `bootstatus -b` waits until it has.
-  run(log, "xcrun", ["simctl", "boot", sim.udid]);
-  if (!run(log, "xcrun", ["simctl", "bootstatus", sim.udid, "-b"])) throw new Error(`${sim.name} did not boot`);
+  spawnSync("xcrun", ["simctl", "boot", sim.udid], { stdio: "ignore" });
+  spawnSync("open", ["-a", "Simulator"], { stdio: "ignore" });
+  if (!(await runLong(log, `${sim.name}: waiting for it to boot`, "xcrun", ["simctl", "bootstatus", sim.udid, "-b"], { quiet: true }))) throw new Error(`${sim.name} did not boot`);
+  log.info(`${sim.name}: status bar set to 9:41, full bars`);
   run(log, "xcrun", ["simctl", "status_bar", sim.udid, "override", "--time", "9:41", "--dataNetwork", "wifi", "--wifiMode", "active", "--wifiBars", "3", "--cellularMode", "active", "--cellularBars", "4", "--batteryState", "charged", "--batteryLevel", "100"]);
-  if (!run(log, "xcrun", ["simctl", "install", sim.udid, app])) throw new Error(`The app did not install on ${sim.name}`);
+  if (!(await runLong(log, `${sim.name}: installing the app`, "xcrun", ["simctl", "install", sim.udid, app]))) throw new Error(`The app did not install on ${sim.name}`);
 }
 
 // Every file under `dir` with one of `extensions`, newest first.
 function written(dir: string, extensions: readonly string[]): string[] {
   if (!existsSync(dir)) return [];
-  const walk = (at: string): string[] => readdirSync(at).flatMap((name) => {
-    const full = path.join(at, name);
-    return statSync(full).isDirectory() ? walk(full) : [full];
-  });
+  const walk = (at: string): string[] =>
+    readdirSync(at).flatMap((name) => {
+      const full = path.join(at, name);
+      return statSync(full).isDirectory() ? walk(full) : [full];
+    });
   return walk(dir).filter((file) => extensions.includes(path.extname(file))).sort((left, right) => statSync(right).mtimeMs - statSync(left).mtimeMs);
 }
 
 // Runs one flow and moves what it wrote into `out` under its capture name. Maestro writes a screenshot or a recording into the folder it runs in, or
 // into its test output folder, by version; both are searched.
-function capture(log: Log, sim: SimDevice, device: Device, theme: Theme, shot: Shot, out: string): boolean {
+async function capture(log: Log, sim: SimDevice, device: Device, theme: Theme, shot: Shot, out: string, step: string): Promise<boolean> {
   const name = captureName(device, theme, shot.id);
   const extension = shot.kind === "gif" ? ".mp4" : ".png";
+  const started = performance.now();
   for (let attempt = 1; attempt <= 2; attempt += 1) {
     const work = mkdtempSync(path.join(tmpdir(), "showcase-"));
     const flow = path.join(FLOWS, `${shot.id}.yaml`);
-    const ok = run(log, "maestro", ["--device", sim.udid, "test", "--test-output-dir", path.join(work, "output"), "-e", `THEME=${theme}`, "-e", `DEVICE=${device}`, flow], work);
+    const label = `${step} ${name}${attempt > 1 ? `, attempt ${attempt}` : ""}`;
+    log.info(`${label}: ${shot.kind === "gif" ? "recording" : "taking"} ${shot.caption}`);
+    const ok = await runLong(log, label, "maestro", ["--device", sim.udid, "test", "--test-output-dir", path.join(work, "output"), "-e", `THEME=${theme}`, "-e", `DEVICE=${device}`, flow], { cwd: work, quiet: true });
     const file = written(work, [extension]).find((item) => path.basename(item, extension) === name);
     if (ok && file) {
       copyFileSync(file, path.join(out, `${name}${extension}`));
       rmSync(work, { recursive: true, force: true });
-      log.info(`${name}${extension}`);
+      log.info(`${step} ${name}${extension}: taken in ${duration(performance.now() - started)}`);
       return true;
     }
-    log.warn(`${name}: attempt ${attempt} ${ok ? `wrote no ${extension}` : "failed"}`);
+    if (ok) log.warn(`${label}: the flow passed but wrote no ${extension}`);
     rmSync(work, { recursive: true, force: true });
   }
+  log.warn(`${step} ${name}: failed twice, left out (run it alone with --only ${shot.id} --device ${device} --theme ${theme} --verbose; Maestro's log is under ~/.maestro/tests/)`);
   return false;
 }
 
-void runScript("showcase-capture", (log) => {
+void runScript("showcase-capture", async (log) => {
   const given = flag("app");
-  const app = process.argv.includes("--build") ? log.step("build the showcase app", () => buildApp(log)) : given;
-  if (!app || !existsSync(app)) throw new Error("Usage: pnpm assets capture --build | --app <App.app> [--out <dir>] [--only <shot,shot>] [--device <iphone|ipad>] [--theme <dark|light>]");
+  const app = process.argv.includes("--build") ? await buildApp(log) : given;
+  if (!app || !existsSync(app)) throw new Error("Usage: pnpm assets capture --build | --app <App.app> [--out <dir>] [--only <shot,shot>] [--device <iphone|ipad>] [--theme <dark|light>] [--verbose]");
   const out = path.resolve(flag("out") ?? path.join(ROOT, ".cache", "showcase", "raw"));
   mkdirSync(out, { recursive: true });
   const only = flag("only")?.split(",") ?? null;
   const devices = (["iphone", "ipad"] as const).filter((device) => (flag("device") ?? device) === device);
   const themes = THEMES.filter((theme) => (flag("theme") ?? theme) === theme);
+  const shotsOf = (device: Device) => SHOTS.filter((shot) => shot.devices.includes(device) && (!only || only.includes(shot.id)));
+  const total = devices.reduce((sum, device) => sum + shotsOf(device).length * themes.length, 0);
+  if (total === 0) throw new Error("No shot matches --only, --device and --theme (scripts/showcase/shots.ts lists the shots)");
+  log.info(`${captures(total)} to take: ${devices.join(" and ")}, ${themes.join(" and ")} theme${themes.length > 1 ? "s" : ""}, into ${out}`);
   const results: { name: string; device: Device; theme: Theme; shot: string; ok: boolean }[] = [];
   const simulators: Record<string, string> = {};
   for (const device of devices) {
-    const shots = SHOTS.filter((shot) => shot.devices.includes(device) && (!only || only.includes(shot.id)));
+    const shots = shotsOf(device);
     if (shots.length === 0) continue;
     const sim = simulator(device);
     simulators[device] = sim.name;
-    log.step(`prepare ${sim.name}`, () => prepare(log, sim, app));
+    log.info(`${device}: ${captures(shots.length * themes.length)} on ${sim.name}`);
+    await prepare(log, sim, app);
     for (const theme of themes) {
-      for (const shot of shots) results.push({ name: captureName(device, theme, shot.id), device, theme, shot: shot.id, ok: capture(log, sim, device, theme, shot, out) });
+      for (const shot of shots) {
+        const step = `[${results.length + 1}/${total}]`;
+        results.push({ name: captureName(device, theme, shot.id), device, theme, shot: shot.id, ok: await capture(log, sim, device, theme, shot, out, step) });
+      }
     }
+    log.info(`${sim.name}: shutting down`);
     run(log, "xcrun", ["simctl", "shutdown", sim.udid]);
   }
   writeFileSync(path.join(out, "capture.json"), `${JSON.stringify({ simulators, results }, null, 2)}\n`);
   const failed = results.filter((result) => !result.ok).map((result) => result.name);
   if (failed.length > 0) throw new Error(`${failed.length} of ${results.length} captures failed: ${failed.join(", ")}`);
-  log.info(`${results.length} captures in ${out}`);
+  log.info(`${captures(results.length)} in ${out}; next: pnpm assets showcase`);
 });
