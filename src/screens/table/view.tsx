@@ -54,6 +54,7 @@ import type { RowFeet } from "../../play/layout/column-reach";
 import { useDefenseTokens } from "../../play/readouts/fortress";
 import { useIsengardDials, useIsengardHands } from "../../play/readouts/isengard";
 import { useMarshesDials } from "../../play/readouts/marshes";
+import { useRoadsDials } from "../../play/readouts/roads";
 import { campaignTokens, heldDials, nightmareCardId, usePursuitReadout, widgetReadouts } from "../../play/readouts/widgets";
 import { whyNotChosen } from "../../play/choice/why";
 import { ledgerLine, ruleTitle, sideText } from "../../play/cards/ledger";
@@ -259,6 +260,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
   const defense = useDefenseTokens(game, nameOf);
   const isengard = useIsengardDials(game, ctx, nameOf);
   const marshes = useMarshesDials(game, ctx, nameOf);
+  const roads = useRoadsDials(game, ctx, nameOf);
   const hands = useIsengardHands(game);
   // The Nightmare setup card next to the quest deck, on Nightmare: the Eye in the top bar opens it.
   const nightmareId = useMemo(() => nightmareCardId(game), [game]);
@@ -330,6 +332,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
           defense={defense}
           isengard={isengard}
           marshes={marshes}
+          roads={roads}
           hands={hands}
           held={held}
           menuOpen={menuOpen}

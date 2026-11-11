@@ -34,6 +34,7 @@ const NO_TICKS: readonly number[] = [];
 const NO_HELD: readonly HeldDial[] = [];
 const NO_ISENGARD: readonly TableDial[] = [];
 const NO_MARSHES: readonly TableDial[] = [];
+const NO_ROADS: readonly TableDial[] = [];
 const NO_HANDS: readonly HandMark[] = [];
 
 export type TopBarProps = {
@@ -73,6 +74,8 @@ export type TopBarProps = {
   isengard?: readonly TableDial[];
   // The dials of The Passage of the Marshes' pieces (readouts/marshes.ts): the mire tokens on the location closest to its limit, and Gollum's hit points left.
   marshes?: readonly TableDial[];
+  // The dials of Journey to the Cross-roads' pieces (readouts/roads.ts): the enemies under The Black Gate against the limit, and the Harad deck's cards left.
+  roads?: readonly TableDial[];
   // Each seat's cards in hand on stage 3B, which its threat dial wears in its label and warns with at 1 card and 0 (143080:B:3; readouts/isengard.ts).
   hands?: readonly HandMark[];
   // The seats that hold something facedown or as a Captive and what to say of each (a mark on its dial): the Ring-bearer under the Watcher, a prisoner, a hero an enemy holds, a Captive.
@@ -83,7 +86,7 @@ export type TopBarProps = {
   onMenu: () => void;
 };
 
-export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens = null, heading = null, island = null, onIsland, onNightmare = null, rail, stopAhead, carouselOpen, narrow, areas, ticks, pursuit = null, defense = null, isengard, marshes, hands, held, menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
+export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens = null, heading = null, island = null, onIsland, onNightmare = null, rail, stopAhead, carouselOpen, narrow, areas, ticks, pursuit = null, defense = null, isengard, marshes, roads, hands, held, menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
   const t = useTableTokens();
   const s = useUiScale();
   const screen = useWindowDimensions();
@@ -178,7 +181,7 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
             {life != null ? <ThreatRing threat={{ seat: 0, threat: life, eliminated: false }} label="Life" testID="life" icon={null} elimination={false} compact /> : null}
             {pursuit != null ? <ThreatRing threat={{ seat: 0, threat: pursuit.value, eliminated: false }} label="Pursuit" accessibilityName="Pursuit value" testID="pursuit" icon={null} limit={pursuit.limit} compact /> : null}
             {defense != null ? <ThreatRing threat={{ seat: 0, threat: defense.value, eliminated: false }} label="Tokens" accessibilityName={`Resource tokens on ${defense.name}`} testID="defense-tokens" icon={null} limit={defense.limit} limitWords={defenseLimitWords(defense.value, defense.limit, defense.stage)} goal compact /> : null}
-            {[...(isengard ?? NO_ISENGARD), ...(marshes ?? NO_MARSHES)].map((dial) => (
+            {[...(isengard ?? NO_ISENGARD), ...(marshes ?? NO_MARSHES), ...(roads ?? NO_ROADS)].map((dial) => (
               <ThreatRing key={dial.id} {...dialProps(dial)} compact />
             ))}
             {tokens != null ? <ThreatRing threat={{ seat: 0, threat: tokens.tokens, eliminated: false }} label="Tokens" accessibilityName={`Resource tokens on ${tokens.name}`} testID="campaign-tokens" icon="resource" elimination={false} compact /> : null}

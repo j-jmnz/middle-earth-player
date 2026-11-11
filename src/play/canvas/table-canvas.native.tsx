@@ -84,8 +84,8 @@ function Table({ store, width, height, column, reach, onRowFeet, picture, pictur
   const discovered = useMemo(() => (discoverKey === "" ? NO_CARDS : discoverKey.split(",").flatMap((id) => (game.cards[id]?.zone === "encounterDiscard" ? [game.cards[id]] : []))), [discoverKey, game]);
   const strip = useMemo(() => [...lookedCards.map((card) => ({ card, success: success(card.code) })), ...discovered.map((card) => ({ card, success: 0 }))], [lookedCards, discovered, success]);
   const looking = lookedCards.length > 0 || discovered.length > 0;
-  // A sea game stacks the cards under a staging card into one counted peek (layout.ts); every other game peeks each as it always did.
-  const seaGame = useStore(store, (state) => state.game.sea != null);
+  // A sea game, or one with the Harad deck (the enemies under The Black Gate), stacks the cards under a staging card into one counted peek (layout.ts); every other game peeks each as it always did.
+  const seaGame = useStore(store, (state) => state.game.sea != null || state.game.piles?.haradDeck !== undefined);
   const selected = useStore(store, (state) => state.selected);
   const targets = useStore(store, (state) => (state.viewedSeat != null ? NO_TARGETS : state.targets));
   const draggable = useStore(store, (state) => (state.viewedSeat != null ? NO_DRAG : state.draggable));
@@ -218,7 +218,7 @@ function RowFeetProbe({ store, width, height, column, onRowFeet, facts, bottomIn
   const s = useUiScale();
   const seat = useStore(store, (state) => shownSeat(state.game, state.viewedSeat));
   const { views, piles } = useViews(store, seat, facts);
-  const seaGame = useStore(store, (state) => state.game.sea != null);
+  const seaGame = useStore(store, (state) => state.game.sea != null || state.game.piles?.haradDeck !== undefined);
   const feet = rowFeet(tableLayout(width, height, views, piles, { bottomInset, scale: s, stacks: seaGame, column }));
   useLayoutEffect(() => {
     onRowFeet?.({ staging: feet.staging, engaged: feet.engaged });

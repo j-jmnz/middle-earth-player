@@ -4,7 +4,7 @@
 // these selectors only keep that property through the join of ids and instances.
 import type { ReduceContext } from "../../rules/engine/reduce.ts";
 import type { CardInstance, ScenarioState } from "../../rules/core/state.ts";
-import { shadowCards } from "../../rules/core/zones.ts";
+import { cardsUnder, shadowCards } from "../../rules/core/zones.ts";
 import { lookedIds } from "../../rules/families/sea/sailing.ts";
 import { captivesOf, captivesUnder } from "../../rules/families/captives/values.ts";
 import { captiveUnder } from "../../rules/families/south/captive.ts";
@@ -49,6 +49,8 @@ export function isPrisoner(card: Pick<CardInstance, "prisoner" | "zone" | "host"
   return card.prisoner === true && card.zone === "captive" && card.host == null;
 }
 
+// The Black Gate of Journey to the Cross-roads (144027): the enemies facedown under it are drawn under it.
+const BLACK_GATE = "144027";
 const NONE: readonly string[] = [];
 const EMPTY: readonly CardInstance[] = [];
 
@@ -206,7 +208,9 @@ function entriesOf(game: ScenarioState, ids: readonly string[], pairs: ReturnTyp
     const captives = card.zone === "staging" || card.zone === "engaged" || card.zone === "captive" ? (held.length === 0 ? NONE : captivesUnder(game, id, held)) : NONE;
     const under = captives.length > 0 ? captives : captive ? [captive] : NONE;
     // The enemies grappled with a location are drawn facedown under it, as its attachments are (dcce.grapple).
-    const attached = cardsOf(game, [...card.attachments.filter((other) => game.cards[other]?.guard !== true), ...shadowCards(card), ...under, ...(card.zone === "staging" ? grappledWith(game, id) : [])]);
+    // The enemies facedown under The Black Gate lie under it, one counted peek (144027:A:2).
+    const gated = card.code === BLACK_GATE ? cardsUnder(game, id) : NONE;
+    const attached = cardsOf(game, [...card.attachments.filter((other) => game.cards[other]?.guard !== true), ...shadowCards(card), ...under, ...gated, ...(card.zone === "staging" ? grappledWith(game, id) : [])]);
     const pair = pairs.get(id);
     const rank = facts?.shipRank(card.code) ?? null;
     const area = game.sea?.stormcaller ? areaRoleOf(game, id) : null;
@@ -261,6 +265,7 @@ export function pileIds(game: ScenarioState, pile: PileId, seat: number): readon
     case "evilCreaturesDeck":
     case "evilCreaturesDiscard":
     case "cavesDeck":
+    case "haradDeck":
       return game.piles?.[pile] ?? NONE;
     case "victory":
       return game.victory;

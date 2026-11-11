@@ -51,7 +51,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     // X is 3 more than the number of players; the loss is at once, as a card is placed under it (as 11038:A:2).
     {
       id: "144027:triggered:1", cardCode: BLACK_GATE, lines: ["144027:A:2"], timing: "triggered", trigger: "placedUnder", subject: { type: "enemy", control: "any" },
-      condition: { kind: "facedownUnder", code: BLACK_GATE, min: 3, players: true }, instructions: [{ verb: "LoseGame" }],
+      condition: { kind: "facedownUnder", code: BLACK_GATE, min: 3, players: true }, instructions: [{ verb: "LoseGame", reason: "The Black Gate has taken too many Harad enemies" }],
     },
 
     // 144028 Man of Harad (Surge and Archery 1 are keywords).

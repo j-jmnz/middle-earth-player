@@ -50,7 +50,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
 144027:A:2 (front): If there are at least X facedown cards under The Black Gate, the players lose the game. X is 3 more than the number of players.
   144027:triggered:1: Triggered (mandatory, not printed as Forced) on the event placedUnder (heard about enemy (any player controls))
     only if the number of cards facedown under the card with code 144027 in play is at least 3, each plus the number of players
-    - the players lose the game
+    - the players lose the game (The Black Gate has taken too many Harad enemies)
 
 ## 144028 Man of Harad
 (the scenario deals it into the encounter pile; the piles place it, no record does)

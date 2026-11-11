@@ -74,7 +74,15 @@ export function healLocations(state: ScenarioState, instruction: Verb<"HealLocat
 /** EarnDealt, at a Resolution: one pool entry for each card the Setup let a seat choose with one of these codes, for the seat that chose it, wherever the copy is now (a hand, a discard pile, the victory
  * display after it was played). */
 export function dealtCopies(state: ScenarioState, codes: readonly string[], step: number): Earned[] {
-  return (state.chosenAtSetup ?? []).filter((chosen) => codes.includes(chosen.code)).map((chosen) => ({ code: chosen.code, to: "pool" as const, seat: chosen.seat, hero: null, step }));
+  const chosen = (state.chosenAtSetup ?? []).filter((one) => codes.includes(one.code));
+  const counted = new Map<string, number>();
+  // A code that several seats chose is one numbered copy for each of them (a Brace of Coneys for each player who shuffled one in, 144069:B:1), not one card the second seat's copy is lost to.
+  return chosen.map((one) => {
+    const number = (counted.get(one.code) ?? 0) + 1;
+    counted.set(one.code, number);
+    const shared = chosen.filter((other) => other.code === one.code).length > 1;
+    return { code: one.code, to: "pool" as const, seat: one.seat, hero: null, step, ...(shared ? { copy: number } : {}) };
+  });
 }
 
 /** StageSetAside: the set-aside card with this code joins the staging area, announced as added to it and as entering play (its Forced effects hear that). */

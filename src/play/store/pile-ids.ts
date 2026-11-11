@@ -4,9 +4,9 @@ import type { ScenarioState } from "../../rules/core/state.ts";
 
 // The four piles every table shows, and the second slot's: the Corsair deck and its discard pile while the scenario has a Corsair deck (dcce.corsair-deck), the Evil Creatures deck and its
 // discard pile while it deals that (emce.evil-creatures-deck), or one deck alone: the Uncharted deck (dcce.uncharted-deck), the Grotto deck (dcce.grotto-deck) or the Caves deck
-// (emce.caves-deck). The victory display is a pile too, at staging's right end, only while a card is in it (ltp.victory-display). Only the discard piles and the victory display open a list.
+// (emce.caves-deck), or the Harad deck lying under The Cross-roads (mec112.setup-journey-to-the-cross-roads). The victory display is a pile too, at staging's right end, only while a card is in it (ltp.victory-display). Only the discard piles and the victory display open a list.
 export type BasePileId = "deck" | "discard" | "encounterDeck" | "encounterDiscard";
-export type SecondPileId = "corsairDeck" | "corsairDiscard" | "unchartedDeck" | "grottoDeck" | "evilCreaturesDeck" | "evilCreaturesDiscard" | "cavesDeck";
+export type SecondPileId = "corsairDeck" | "corsairDiscard" | "unchartedDeck" | "grottoDeck" | "evilCreaturesDeck" | "evilCreaturesDiscard" | "cavesDeck" | "haradDeck";
 export type VictoryPileId = "victory";
 export type PileId = BasePileId | SecondPileId | VictoryPileId;
 
@@ -16,6 +16,7 @@ const EVIL_CREATURES_PILES: readonly SecondPileId[] = ["evilCreaturesDeck", "evi
 const UNCHARTED_PILES: readonly SecondPileId[] = ["unchartedDeck"];
 const GROTTO_PILES: readonly SecondPileId[] = ["grottoDeck"];
 const CAVES_PILES: readonly SecondPileId[] = ["cavesDeck"];
+const HARAD_PILES: readonly SecondPileId[] = ["haradDeck"];
 const NONE_PILES: readonly SecondPileId[] = [];
 
 export const PILE_WORDS: Readonly<Record<PileId, string>> = {
@@ -30,15 +31,17 @@ export const PILE_WORDS: Readonly<Record<PileId, string>> = {
   evilCreaturesDeck: "Evil Creatures deck",
   evilCreaturesDiscard: "Evil Creatures discard pile",
   cavesDeck: "Caves deck",
+  haradDeck: "Harad deck",
   victory: "Victory display",
 };
 
-/** The second slot's piles this game has, one family of them: the Corsair pair once the Corsair deck is prepared, until it ends (families/sea/corsair.ts); the Evil Creatures pair once the scenario has dealt that deck; else the Grotto deck while the scenario deals one (dcce.grotto-deck), else the Uncharted deck while it deals that, else the Caves deck once dealt. */
+/** The second slot's piles this game has, one family of them: the Corsair pair once the Corsair deck is prepared, until it ends (families/sea/corsair.ts); the Evil Creatures pair once the scenario has dealt that deck; else the Grotto deck while the scenario deals one (dcce.grotto-deck), else the Uncharted deck while it deals that, else the Harad deck once dealt (Journey to the Cross-roads), else the Caves deck once dealt. */
 export function secondPilesOf(game: Pick<ScenarioState, "corsairDeck" | "uncharted" | "piles">): readonly SecondPileId[] {
   if (game.corsairDeck !== undefined) return SECOND_PILES;
   if (game.piles?.evilCreaturesDeck !== undefined) return EVIL_CREATURES_PILES;
   if (game.uncharted?.grotto === true) return GROTTO_PILES;
   if (game.uncharted !== undefined) return UNCHARTED_PILES;
+  if (game.piles?.haradDeck !== undefined) return HARAD_PILES;
   return game.piles?.cavesDeck !== undefined ? CAVES_PILES : NONE_PILES;
 }
 
