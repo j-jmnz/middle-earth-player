@@ -197,7 +197,6 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - The Two Towers ledger reads the pinned 2014 and 2015 Treason of Saruman and Land of Shadow scans; no pinned scan shows MEC112's 2023 wording, so a rewording cannot be found (`scripts/data/printed/scope.ts`, `MEC112_CHANGED`).
 - Helm's Deep readings not user-confirmed (agent recommendation; `docs/brief.md`, The Two Towers): 143074:B:2 (progress on the active location only is not placed on the stage); 143074:A:1 (a staged Helm's Gate becomes active when none is found); 143033:A:1 (the tokens are a live staging amount).
 - The Road to Isengard readings not user-confirmed (`docs/brief.md`, The Two Towers): agent recommendations on Saruman's Voice's hero (143068:A:2), the elimination at 0 cards once an effect ends (143080:B:3), "as if he is the only player" (143047:A:2), the Wolf outside an attack (143052:A:1), Orthanc cancelling the overflow and returning without tokens (143080:B:2), Orthanc revealing before discarding (143053:A:2) and Ring-wall's owner for an Ent (143055:A:1); community readings only on the Staff once per drawing player (143048:A:1) and a Wizardry shadow firing at its flip (143047:A:2, 143052:A:1).
-- The Road to Isengard's campaign test cannot tell 143081's Saruman's Voice shuffle from the standalone deal: both give one copy.
 - Easy: the DragnCards `E0C.12` deck keeps all ten Great Spider cards where Hall of Beorn keeps six; the E0C decks lead (user decision, 2026-11-07).
 
 ## Standing decisions
