@@ -22,7 +22,7 @@ import type { RuleEntry } from "../rules/spans.ts";
 import { generateEffects, segmentsOf, selfNamed, type Segment, type Unmatched } from "./generate.ts";
 import { vocabulary, vocabularyMarkdown } from "./vocabulary.ts";
 
-// Usage: node --experimental-strip-types scripts/data/effects/draft.ts <scenario-id | starter-deck-id | prebuilt-deck-id | pack | code,code,... | code code ...>
+// Usage: pnpm effects draft <scenario-id | starter-deck-id | prebuilt-deck-id | pack | code,code,... | code code ...>
 // Writes .agent/drafts/<code>.md for every card in the scenario, the starter or pre-built deck (data/decks/prebuilt.json), the player pack (a data/cards file name,
 // "Core", "TRD"), or the list of codes (separated by commas or spaces), that has a printed line no record covers yet. With --all it also drafts the lines
 // that authored records already cover, to review or redo them.
@@ -67,7 +67,7 @@ async function main(log: Log): Promise<void> {
   const known = new Set(cards.map((card) => card.code));
   const asCodes = pieces.length > 0 && pieces.every((piece) => known.has(piece));
   const scenarioId = asCodes ? pieces.join(",") : targets[0];
-  if (!scenarioId) throw new Error("Usage: effects:draft <scenario-id | starter-deck-id | prebuilt-deck-id | pack | code,code,... | code code ...>");
+  if (!scenarioId) throw new Error("Usage: effects draft <scenario-id | starter-deck-id | prebuilt-deck-id | pack | code,code,... | code code ...>");
   const prebuilt = prebuiltDecksSchema.parse(JSON.parse(readFileSync(path.join(DATA_DIR, "decks", "prebuilt.json"), "utf8")) as unknown).find((entry) => entry.id === scenarioId);
   const deck = campaigns.flatMap((campaign) => campaign.starterDecks).find((entry) => entry.id === scenarioId) ?? (prebuilt ? { id: prebuilt.id, rows: [...prebuilt.heroes.map((code) => ({ code })), ...prebuilt.cards] } : undefined);
   const packCodes = cards.filter((card) => isPoolCard(card) && card.printings[0]?.pack === scenarioId).map((card) => card.code);
@@ -228,7 +228,7 @@ async function main(log: Log): Promise<void> {
     const sections: string[] = [
       `# ${code} ${card.name}`,
       ``,
-      `Scenario: ${scenarioId}. Write the records into ${targetOf(card)}, each with \`lines\` naming the line ids above, then run \`pnpm effects:open\`, \`pnpm vitest run scripts/checks/effect-coverage.test.ts\` and the scenario tests.`,
+      `Scenario: ${scenarioId}. Write the records into ${targetOf(card)}, each with \`lines\` naming the line ids above, then run \`pnpm effects open\`, \`pnpm vitest run scripts/checks/effect-coverage.test.ts\` and the scenario tests.`,
       ``,
       `## Lines without a record`,
       ...lines.map((line) => `- ${line.lineId} (${line.side}${line.timing ? `, ${line.timing}` : ""}) ${line.line}`),

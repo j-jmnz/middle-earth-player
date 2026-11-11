@@ -17,7 +17,7 @@ import { extensionOf, widthOf } from "./scans.ts";
 // "NNN - 2A - Name.jpg", the setup card as "NNN - <Scenario>.jpg" (side A, "You are playing Nightmare mode") and "NNN - Setup.jpg"
 // (side B, the recipe), the pack's insert as "000 - Introduction.jpg" and "000 - <Pack>.jpg" (not a card), and a cardlist.txt
 // ("3 Forest Flies" a line). About 2348×3200 each. The listing and the card lists are kept under data/raw/nightmare; the pictures
-// are cached in .cache/pictures and pinned like the `pictures` source's, so `pnpm scans:pack` bundles them.
+// are cached in .cache/pictures and pinned like the `pictures` source's, so `pnpm assets scans` bundles them.
 export const NIGHTMARE_FOLDER = "10pz9RF2e1QrJXqsmmLWPkO1Hu1auQuxB";
 export const NIGHTMARE_SITE = `https://drive.google.com/drive/folders/${NIGHTMARE_FOLDER}`;
 

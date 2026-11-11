@@ -1,6 +1,6 @@
 import type { Effect } from "../../catalog/boundary.ts";
 
-// Written by pnpm data:build from data/cards and data/scenarios (mirkwood-paths). Do not edit.
+// Written by pnpm data build from data/cards and data/scenarios (mirkwood-paths). Do not edit.
 // scripts/data/effects/templates.ts holds the sentence patterns; src/effects/authored/ holds the rest.
 export const GENERATED_EFFECTS: readonly Effect[] = [
   {"id":"01078:travel:1","cardCode":"01078","lines":["01078:A:1"],"timing":"travel","instructions":[{"verb":"RevealEncounter"}]},

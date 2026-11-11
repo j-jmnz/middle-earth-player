@@ -9,7 +9,7 @@ import { GENERATED_EFFECTS as TDOM_GENERATED } from "./generated/the-dark-of-mir
 import { GENERATED_EFFECTS as TWO_TOWERS_GENERATED } from "./generated/the-two-towers.ts";
 import { POOL_GENERATED_EFFECTS } from "./generated/player-pool.ts";
 
-// Generated records (pnpm data:build) plus authored records. An authored record with the id of a generated
+// Generated records (pnpm data build) plus authored records. An authored record with the id of a generated
 // one replaces it, so a wrong template can be overridden without editing the template.
 export function mergeEffects(generated: readonly Effect[], authored: readonly Effect[]): Effect[] {
   const replaced = new Set(authored.map((effect) => effect.id));
@@ -20,7 +20,7 @@ export function mergeEffects(generated: readonly Effect[], authored: readonly Ef
 // per mechanic family.
 export const GENERATED_EFFECTS: readonly Effect[] = [...BOX_GENERATED, ...MIRKWOOD_GENERATED, ...TDOM_GENERATED, ...DREAM_CHASER_GENERATED, ...ERED_MITHRIN_GENERATED, ...TWO_TOWERS_GENERATED, ...POOL_GENERATED_EFFECTS];
 
-// The authored files, in the order pnpm data:build writes them (src/effects/generated/authored.ts, scripts/data/effects/barrel.ts):
+// The authored files, in the order pnpm data build writes them (src/effects/generated/authored.ts, scripts/data/effects/barrel.ts):
 // a scenario's records are src/effects/authored/<scenario-id>.ts, and a new file there needs only that build.
 export { AUTHORED_EFFECTS, AUTHORED_REPLACES };
 

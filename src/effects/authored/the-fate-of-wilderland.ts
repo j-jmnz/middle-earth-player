@@ -6,7 +6,7 @@ import { AUTHORED_EFFECTS as THE_WITHERED_HEATH } from "./the-withered-heath.ts"
 import { copyLine, withCopies } from "./reprint.ts";
 
 // Records for The Fate of Wilderland (Ered Mithrin part 9, campaign card 12195): the three stages, Urdug and the two objectives that decide the fight (The Goblins' Assault, The Heroes' Defense), the cards of the scenario's own encounter set and the campaign card.
-// Every line is read from the scan ledger (data/printed/ered-mithrin.json); a line a template already writes (pnpm data:build) or another card prints word for word needs no record here. The piles place the two objectives and Urdug in the staging area.
+// Every line is read from the scan ledger (data/printed/ered-mithrin.json); a line a template already writes (pnpm data build) or another card prints word for word needs no record here. The piles place the two objectives and Urdug in the staging area.
 // The players lose by progress on The Goblins' Assault (stage 3) and win when Urdug is destroyed. A win ends the campaign (12195:B:1).
 // Rules: emce.campaign-log, emce.boon-allies, emce.treasure, emce.deep, emce.discover, rr.engaged, rr.immune, rr.guarded, rr.explored, rr.search, rr.quest-advancement (data/rules/entries.json).
 const ASSAULT = "The Goblins' Assault";

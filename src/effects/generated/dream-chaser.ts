@@ -1,6 +1,6 @@
 import type { Effect } from "../../catalog/boundary.ts";
 
-// Written by pnpm data:build from data/cards and data/scenarios (dream-chaser). Do not edit.
+// Written by pnpm data build from data/cards and data/scenarios (dream-chaser). Do not edit.
 // scripts/data/effects/templates.ts holds the sentence patterns; src/effects/authored/ holds the rest.
 export const GENERATED_EFFECTS: readonly Effect[] = [
   {"id":"110013:triggered:1","cardCode":"110013","lines":["110013:A:3"],"timing":"triggered","trigger":"leftPlay","subject":"self","instructions":[{"verb":"LoseGame"}]},

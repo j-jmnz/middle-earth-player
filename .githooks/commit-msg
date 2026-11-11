@@ -1,4 +1,4 @@
 #!/bin/sh
 # Refuses a commit whose subject breaks .claude/rules/commit-standards.md (Subject line).
 # pnpm install points git here (core.hooksPath); git commit --no-verify skips it.
-exec node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/git/commit-message.ts --quiet --file "$1"
+exec node --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/git/commit-message.ts --quiet --file "$1"

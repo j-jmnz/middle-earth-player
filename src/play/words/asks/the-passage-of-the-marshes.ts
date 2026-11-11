@@ -1,7 +1,7 @@
 import type { Ask } from "../asks.ts";
 
 // The choice words of The Passage of the Marshes (the-two-towers part 4), one entry for each Pick and Choose of its records: `<record id> @<instruction path> <verb | option id>` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
-// `pnpm test:scenario the-passage-of-the-marshes --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=the-passage-of-the-marshes` prints each sentence.
+// `pnpm test scenario the-passage-of-the-marshes --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=the-passage-of-the-marshes` prints each sentence.
 // Where a card says "the first player" or "the players must choose" the first player answers for the group (`rr.first-player`, `rr.the-word-choose`): the sentence names that player with {owner}.
 export const ASKS: Readonly<Record<string, Ask>> = {
   // 144015:A:2: the player who drew The Searching Eye chooses; exhausting is offered only while a hero of theirs is ready.

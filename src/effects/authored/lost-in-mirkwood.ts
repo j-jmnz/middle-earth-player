@@ -1,7 +1,7 @@
 import type { Condition, Effect, Instruction } from "../../catalog/boundary.ts";
 
 // Records for Lost in Mirkwood (Ered Mithrin part 2, campaign card 12168): the encounter cards no template reads, the Objective-Locations of Searching for a Way Out, the seven quest stages and the campaign card. Melanwar (12169) is in pool/EMCE.ts. Every line is read from the scan ledger
-// (data/printed/ered-mithrin.json); a line a template already writes (pnpm data:build) needs no record here. The piles place the cards set aside (the Spiders of Mirkwood and Dol Guldur Orcs sets, Haldan) and the staging area; stage 1A's Setup takes control of Haldan.
+// (data/printed/ered-mithrin.json); a line a template already writes (pnpm data build) needs no record here. The piles place the cards set aside (the Spiders of Mirkwood and Dol Guldur Orcs sets, Haldan) and the staging area; stage 1A's Setup takes control of Haldan.
 // Rules: emce.setup-lost-in-mirkwood, emce.guarded-x, emce.immune, emce.treasure, emce.haldan, rr.victory, rr.guarded, rr.travel, rr.quest-advancement, rr.explored, rr.surge (data/rules/entries.json).
 const MY_CHARACTER = { type: "character", control: "you" } as const;
 const MY_ALLY = { type: "ally", control: "you" } as const;

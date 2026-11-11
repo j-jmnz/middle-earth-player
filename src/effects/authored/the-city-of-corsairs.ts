@@ -4,7 +4,7 @@ import { copyLines, withCopies } from "./reprint.ts";
 import { AUTHORED_EFFECTS as RAID } from "./raid-on-the-grey-havens.ts";
 
 // Records for The City of Corsairs (dream-chaser part 9, campaign card 11215): the four quest stages, the quest's two decks and the swap between them. Every line is read from the scan ledger (data/printed/); a line a template already
-// writes (pnpm data:build) or another card prints word for word needs no record here. `pnpm effects:draft the-city-of-corsairs` writes the bundle of open lines.
+// writes (pnpm data build) or another card prints word for word needs no record here. `pnpm effects draft the-city-of-corsairs` writes the bundle of open lines.
 // The scenario's piles deal the Corsair deck, the second encounter deck (The City of Corsairs set, set aside as the inactive second deck), the fleet, the Stormcaller and Southern Belfalas to the staging area
 // (data/scenarios/the-city-of-corsairs.json); the stage 2B record makes the second deck the active one.
 // Rules: dcce.from-sea-to-land, dcce.setup-the-city-of-corsairs, dcce.corsair-deck, dcce.heading, dcce.indestructible, dcce.ship-objectives, dcce.campaign-mode, rr.victory, rr.search, rr.quest-advancement, rr.destroy

@@ -8,7 +8,7 @@ import { buildGraph, citationsIn, headingsOf, INDEX_PATH, renderIndex, resolveSe
 describe("docs index", () => {
   const graph = buildGraph();
 
-  it("is current (pnpm docs:index rewrites docs/INDEX.md)", () => {
+  it("is current (pnpm docs index rewrites docs/INDEX.md)", () => {
     expect(readFileSync(path.join(ROOT, INDEX_PATH), "utf8")).toBe(renderIndex(graph));
   });
 

@@ -6,3 +6,5 @@ onlyBuiltDependencies:
 # sharp loads its prebuilt binary; its install script only builds from source.
 ignoredBuiltDependencies:
   - sharp
+# Every script runs its .ts file with Node's built-in type stripping; this hides the reparse notice.
+nodeOptions: --disable-warning=MODULE_TYPELESS_PACKAGE_JSON

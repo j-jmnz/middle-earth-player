@@ -10,11 +10,11 @@
       "Bash(pnpm lint)",
       "Bash(pnpm lint *)",
       "Bash(pnpm vitest *)",
-      "Bash(pnpm test:fast)",
-      "Bash(pnpm test:changed)",
+      "Bash(pnpm test fast)",
+      "Bash(pnpm test changed)",
       "Bash(pnpm typecheck)",
       "Bash(pnpm exec tsc --noEmit)",
-      "Bash(pnpm catalog:build)"
+      "Bash(pnpm assets catalog)"
     ]
   },
   "hooks": {

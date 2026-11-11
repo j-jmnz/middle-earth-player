@@ -2,7 +2,7 @@
 // every card the scenario deals (dealtCodes, the cards its campaign places and the player pool included) has its Pick and Choose worded as a sentence that names the number,
 // the side and whose deck (docs/design-system-table.md, Choice tray). A pick is worded by `askWords`, the function the sheet calls (grapple and sea questions before `pickWords`), and `branchWords` by the same skeleton table (blankScenario). The test fails on
 // a bare "Choose a player." and on a fallback sentence: one equal to what the same function returns for a verb or an option it does not know.
-// `WORDS_DUMP=<scenario-id>` (or `all`) prints every sentence; `pnpm test:scenario <scenario-id> --words` runs only this file with it set.
+// `WORDS_DUMP=<scenario-id>` (or `all`) prints every sentence; `pnpm test scenario <scenario-id> --words` runs only this file with it set.
 import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 

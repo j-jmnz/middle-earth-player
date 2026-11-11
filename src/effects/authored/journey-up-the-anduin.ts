@@ -1,7 +1,7 @@
 import type { Condition, Effect } from "../../catalog/boundary.ts";
 
 // Records for Journey Up the Anduin (Ered Mithrin part 1, campaign card 120165): the encounter cards no template reads, the three quest stages, Woodmen Village, Haldan, The Old Ford and the campaign card. Turayn, A Growing Threat and the
-// treasures the campaign card names are in pool/EMCE.ts. Every line is read from the scan ledger (data/printed/ered-mithrin.json); a line a template already writes (pnpm data:build) needs no record here.
+// treasures the campaign card names are in pool/EMCE.ts. Every line is read from the scan ledger (data/printed/ered-mithrin.json); a line a template already writes (pnpm data build) needs no record here.
 // The piles place the cards set aside and the Evil Creatures deck (emce.evil-creatures-deck); the stage's Setup shuffles them. The Wilderlands enemies the scenario deals (01081 to 01085) have their records in journey-along-the-anduin.ts.
 // Rules: emce.evil-creatures-deck, emce.treasure, emce.boon-allies, emce.campaign-pool-encounter, emce.setup-journey-up-the-anduin, rr.guarded, rr.travel, rr.explored, rr.step-3-3 (data/rules/entries.json).
 const EVIL_CREATURES = { verb: "AddFromPile", pile: "evilCreatures", to: "staging" } as const;

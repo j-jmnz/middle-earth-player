@@ -1,4 +1,4 @@
-// What `pnpm effects:render` prints: a list of cards (or a scenario's cards) as each card's printed ledger lines with the records that name them rendered as plain English, and the snapshot test that
+// What `pnpm effects render` prints: a list of cards (or a scenario's cards) as each card's printed ledger lines with the records that name them rendered as plain English, and the snapshot test that
 // compares every playable scenario's text (render/snapshots.test.ts) reads through the same functions.
 import { existsSync } from "node:fs";
 import path from "node:path";

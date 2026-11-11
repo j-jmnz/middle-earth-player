@@ -11,10 +11,10 @@ import { asksFile, authoredFile, campaignTestFile, camel, gameFile, goldenTestFi
 // Writes the skeleton of a scenario that data/scenarios already has, and the lines that register it, so the work left is the scenario's own
 // (docs/handover/agent-brief.md, Scenario procedure):
 //
-//   pnpm scenario:new <scenario-id> [--short <name>] [--dry-run]
+//   pnpm scenario new <scenario-id> [--short <name>] [--dry-run]
 //
 // Files (never overwritten: if any exists the command refuses, listing them): the game (test/scenarios/<id>/), the golden test, the campaign test and the
-// spec rows (src/campaign/scenarios/<id>/), the choice words as an asks file (src/play/words/asks/<id>.ts, listed in its barrel by pnpm data:build), the seed finder
+// spec rows (src/campaign/scenarios/<id>/), the choice words as an asks file (src/play/words/asks/<id>.ts, listed in its barrel by pnpm data build), the seed finder
 // (scripts/e2e/<id>.ts), both Maestro flows (.maestro/scenarios/<id>/), the authored effects file (src/effects/authored/<id>.ts) and the empty fixture file
 // (src/campaign/fixtures/<id>.json). There is no scene file: the game, the golden test and the campaign test read the scenario from data/, and the card tests are spec rows
 // (on tableFromLayout).
@@ -154,7 +154,7 @@ export function planScenario(id: string, options: { short?: string }, repo: Repo
   try {
     loadScenario(id);
   } catch {
-    return { plan: null, problems: [`${id} is not in data/scenarios (the scenario files are built by pnpm data:build)`] };
+    return { plan: null, problems: [`${id} is not in data/scenarios (the scenario files are built by pnpm data build)`] };
   }
   const short = options.short ?? defaultShort(id);
   // The short name starts identifiers (`${camel}Fixtures`, `${SHORT}_SEEDS`, `import * as ${short}`), so it must be one.
@@ -262,9 +262,9 @@ function addedLines(before: readonly string[], after: readonly string[]): string
 
 function nextSteps(facts: Facts, log: Log): void {
   log.info("next (docs/handover/agent-brief.md, Scenario procedure):");
-  log.info("  pnpm data:build                   rewrites the barrels of authored effect files (src/effects/generated/authored.ts) and of asks files (src/play/words/asks/index.ts)");
-  log.info(`  pnpm author:pack ${facts.id}   runs effects:draft and writes .agent/pack/${facts.id}.md: the vocabulary, the families' manifests the drafts need, the cookbook sections and the drafts`);
-  log.info("  pnpm effects:open                 after the records, then add the scenario to src/campaign/playable.ts when none of its lines is open");
+  log.info("  pnpm data build                   rewrites the barrels of authored effect files (src/effects/generated/authored.ts) and of asks files (src/play/words/asks/index.ts)");
+  log.info(`  pnpm scenario pack ${facts.id}   runs effects draft and writes .agent/pack/${facts.id}.md: the vocabulary, the families' manifests the drafts need, the cookbook sections and the drafts`);
+  log.info("  pnpm effects open                 after the records, then add the scenario to src/campaign/playable.ts when none of its lines is open");
   log.info(`  fill the skeletons: spec rows (src/campaign/scenarios/${facts.id}/spec.test.ts), asks (src/play/words/asks/${facts.id}.ts), test/scenarios/${facts.id}/game.ts, the golden test (a skipped suite), the seed finder, the Maestro flows; then list the goldens in test/harness/golden-registry.ts`);
 }
 
@@ -275,7 +275,7 @@ function main(log: Log): void {
   const short = shortAt >= 0 ? args[shortAt + 1] : undefined;
   const taken = (index: number): boolean => shortAt >= 0 && index === shortAt + 1;
   const id = args.find((arg, index) => !arg.startsWith("--") && !taken(index));
-  if (!id) throw new Error("usage: pnpm scenario:new <scenario-id> [--short <name>] [--dry-run]");
+  if (!id) throw new Error("usage: pnpm scenario new <scenario-id> [--short <name>] [--dry-run]");
   const repo: Repo = {
     read: (file) => {
       try {

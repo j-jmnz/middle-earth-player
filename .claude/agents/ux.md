@@ -9,7 +9,7 @@ You have two jobs. Do the one you were asked for. Do not mix them.
 
 When the user asks to change the design system, change `docs/design-system.md` or, for the table, `docs/design-system-table.md` (rewrite the passage the change supersedes, as `.claude/rules/docs-standards.md` says; no dated or was/now notes), `src/screens/kit/palette.js` (and its copy `src/ui/tokens.ts`), `tailwind.config.js`, `src/ui/surfaces.ts` and `src/screens/kit/chrome.tsx` together, and apply it to the screens that use the changed token or piece. `docs/design-system.md` (its Standards section lists what every screen does) supersedes any phase file or plan where they differ. Do not start another phase. Do not review your own diff.
 
-Look at the card images, scenario scans, and booklet PDFs before you choose a color or a type scale (`pnpm data:sync scans` and `rules` fetch them into `.cache/`). The system has to fit those materials and stay smooth on a phone. The performance rules in `docs/design-system.md` are exit conditions, and a change you make to code follows `.claude/rules/code-standards.md`.
+Look at the card images, scenario scans, and booklet PDFs before you choose a color or a type scale (`pnpm data sync scans` and `rules` fetch them into `.cache/`). The system has to fit those materials and stay smooth on a phone. The performance rules in `docs/design-system.md` are exit conditions, and a change you make to code follows `.claude/rules/code-standards.md`.
 
 ## Review
 

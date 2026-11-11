@@ -14,7 +14,7 @@ import { renderRecord } from "./record.ts";
 import { renderInstruction } from "./verbs.ts";
 
 // The reading aid (scripts/data/effects/render.ts): a template per piece, JSON for a piece with none, and no field hidden.
-describe("effects:render templates", () => {
+describe("effects render templates", () => {
   it("renders a pick as a noun phrase", () => {
     const ctx = newCtx();
     expect(renderPick({ type: "enemy", control: "any", stagingOnly: true, names: ["Urdug"] }, ctx)).toBe('enemy (any player controls) in the staging area only, named "Urdug"');

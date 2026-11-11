@@ -122,7 +122,7 @@ export default function Booklet() {
   }
 
   const reason = bookletPdfAvailable() ? null : bookletPdfUnavailableReason();
-  // A build packed without the books (Metro started before `pnpm booklets:pack`) says so, so it is not taken for a lost file.
+  // A build packed without the books (Metro started before `pnpm assets booklets`) says so, so it is not taken for a lost file.
   const notCarried = hasBundledBooklet(id) ? "" : " This build does not carry it; add it from your files.";
   const missing = reason ? `This build cannot show PDFs. ${reason}` : `This booklet is not on this phone.${notCarried} Scenarios still play without it.`;
 

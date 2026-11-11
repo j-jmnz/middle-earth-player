@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import { changedFamilyTests, hasReaderGames, quickParts, registryTitle, scenarioTests, selectTests, smokeRuns } from "./test-scenario.ts";
 
-// pnpm test:scenario <id>: the selection is a pure function of the id, the changed paths and the tree of test files.
+// pnpm test scenario <id>: the selection is a pure function of the id, the changed paths and the tree of test files.
 const TREE = [
   "src/campaign/scenarios/the-oath/golden.test.ts",
   "src/campaign/scenarios/the-oath/quest.test.ts",

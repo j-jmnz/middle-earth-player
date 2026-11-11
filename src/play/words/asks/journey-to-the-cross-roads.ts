@@ -1,7 +1,7 @@
 import type { Ask } from "../asks.ts";
 
 // The choice words of Journey to the Cross-roads (the-two-towers part 5), one entry for each Pick and Choose of its records: `<record id> @<instruction path> <verb | option id>` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
-// `pnpm test:scenario journey-to-the-cross-roads --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=journey-to-the-cross-roads` prints each sentence.
+// `pnpm test scenario journey-to-the-cross-roads --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=journey-to-the-cross-roads` prints each sentence.
 // Every choice here is one player's own (the player who plays Brace of Coneys, reveals a Peril card, is dealt the shadow card, or answers for themselves): `owned` names that player two-handed. A pick over heroes or players says "any player's".
 // Ties for the lowest Attack or Threat go to the player who chooses (the card prints no tiebreaker, so the chooser settles them): only the tied enemies are offered.
 const CONEYS = (path: string, step: string, left: string): Record<string, Ask> => ({

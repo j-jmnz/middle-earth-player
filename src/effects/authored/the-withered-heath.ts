@@ -8,7 +8,7 @@ import { AUTHORED_EFFECTS as THE_THING_IN_THE_DEPTHS } from "./the-thing-in-the-
 import { copyLine, withCopies } from "./reprint.ts";
 
 // Records for The Withered Heath (Ered Mithrin part 4, campaign card 12175): the encounter cards no template reads, the four quest stages and the campaign card. The Accolade boons (12176 to 12179) and the Song boons (12180 to 12183) are in pool/EMCE.ts.
-// Every line is read from the scan ledger (data/printed/ered-mithrin.json); a line a template already writes (pnpm data:build) or another card prints word for word needs no record here. The piles place the cards set aside (Cold-Drake, the four Dragon Signs) and the Caves deck
+// Every line is read from the scan ledger (data/printed/ered-mithrin.json); a line a template already writes (pnpm data build) or another card prints word for word needs no record here. The piles place the cards set aside (Cold-Drake, the four Dragon Signs) and the Caves deck
 // (the Lost Caves set); stage 1A's Setup shuffles the deck and two Dragon Signs into it. The campaign card's Setup is dealt by src/campaign/start.ts and src/campaign/checklist.ts; its back stays in the campaign zone all game, so its Forced effect hears the stages defeated.
 // Rules: emce.setup-the-withered-heath, emce.dragon-signs, emce.caves-deck, emce.deep, emce.guarded-x, emce.immune, emce.treasure, emce.boon-allies, rr.guarded, rr.victory, rr.explored, rr.cancel, rr.search (data/rules/entries.json).
 const COLD_DRAKE: PickSpec = { type: "enemy", control: "any", staging: true, names: ["Cold-Drake"] };

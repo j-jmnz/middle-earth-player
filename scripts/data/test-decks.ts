@@ -7,7 +7,7 @@ import type { Card } from "../../src/catalog/card-facts.ts";
 import { RAW_DIR } from "./paths.ts";
 import { TEST_DECKLISTS } from "./sources/ringsdb.ts";
 
-// data/decks/test-decks.json: the RingsDB decklists the fixture games play (`pnpm data:sync ringsdb` fetches them into
+// data/decks/test-decks.json: the RingsDB decklists the fixture games play (`pnpm data sync ringsdb` fetches them into
 // data/raw/ringsdb/decklists/). They are not a printed product, so they stay out of data/decks/prebuilt.json and the app
 // does not offer them. The deck is the list's `slots` without its heroes; the list prints a hero in both.
 export const testDeckSchema = z.strictObject({

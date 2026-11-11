@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import { ALWAYS_SECTIONS, draftsOfScenario, entriesFor, headingsIn, packPlan, recordsOf, renderPack, takeSpans, verbFamilies } from "./author-pack.ts";
 
-// pnpm author:pack <scenario-id>: what goes into the pack is a pure function of the drafts' text and the schema files' text.
+// pnpm scenario pack <scenario-id>: what goes into the pack is a pure function of the drafts' text and the schema files' text.
 const ROOT = path.resolve(import.meta.dirname, "..", "..");
 
 const MANIFEST = `// Header of the south family.

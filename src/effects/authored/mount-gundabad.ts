@@ -5,7 +5,7 @@ import { AUTHORED_EFFECTS as THE_WITHERED_HEATH } from "./the-withered-heath.ts"
 import { copyLine, withCopies } from "./reprint.ts";
 
 // Records for Mount Gundabad (Ered Mithrin part 8, campaign card 12193): the quest cards, Dagnir, the cards of the scenario's own encounter set, the First Forge and the Caves cards it adds, Wormsbane's Reforged side and the campaign card. Dragon-sickness (12194) is in pool/EMCE.ts.
-// Every line is read from the scan ledger (data/printed/ered-mithrin.json); a line a template already writes (pnpm data:build) or another card prints word for word needs no record here. The piles place Dagnir in the staging area and set The First Forge aside; the quest card's Setup builds
+// Every line is read from the scan ledger (data/printed/ered-mithrin.json); a line a template already writes (pnpm data build) or another card prints word for word needs no record here. The piles place Dagnir in the staging area and set The First Forge aside; the quest card's Setup builds
 // the quest deck: the seven Exploring Gundabad stage 2s are shuffled with side A up (`FlipAtQuestPhase`, which marks each as a stage of a quest deck: families/quest/order.ts), the Caves deck is shuffled and Wormsbane, Broken side up, is attached to a hero. The current stage is flipped
 // to side B at the beginning of the quest phase, may be bypassed at the end of the combat phase (families/wilderland/gundabad.ts) and goes to the victory display when it is defeated.
 // Rules: emce.gundabad-quest-deck, emce.bypassing, emce.setup-mount-gundabad, emce.caves-deck-gundabad, emce.treasure, emce.campaign-log, emce.campaign-pool-encounter, emce.immune, emce.indestructible, rr.guarded, rr.quest-advancement, rr.first-player (data/rules/entries.json).

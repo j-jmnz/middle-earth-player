@@ -8,7 +8,7 @@ import { AUTHORED_EFFECTS as THE_OATH } from "./the-oath.ts";
 import { copyLine, withCopies } from "./reprint.ts";
 
 // Records for The King's Quest (Ered Mithrin part 3, campaign card 12170): the encounter cards no template reads, the three quest stages, the Caves deck's locations and the campaign card. Isolde (12171) and the three burdens the campaign card places (12172 to 12174) are in pool/EMCE.ts.
-// Every line is read from the scan ledger (data/printed/ered-mithrin.json); a line a template already writes (pnpm data:build) or another card prints word for word needs no record here. The piles place the cards set aside (Fire-drake, Dragon Hoard and the Dragon Might set) and the
+// Every line is read from the scan ledger (data/printed/ered-mithrin.json); a line a template already writes (pnpm data build) or another card prints word for word needs no record here. The piles place the cards set aside (Fire-drake, Dragon Hoard and the Dragon Might set) and the
 // Caves deck (the Lost Caves set); stage 1A's Setup shuffles the deck. The campaign card's Setup is dealt by src/campaign/start.ts (the "dealt" and "afterSetup" verbs).
 // Rules: emce.setup-the-kings-quest, emce.caves-deck, emce.deep, emce.guarded-x, emce.treasure, emce.haldan, emce.boon-allies, emce.campaign-pool-encounter, rr.then, rr.victory, rr.explored, rr.travel, rr.search (data/rules/entries.json).
 const MY_CHARACTER = { type: "character", control: "you" } as const;

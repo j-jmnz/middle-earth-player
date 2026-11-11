@@ -10,7 +10,7 @@ import { parseTag } from "./version.ts";
 // too, attached to every release as `source.json`. A player adds its "latest" URL once, and the app offers each new release
 // as an update. It lists only the release it is attached to; the tag's version is its version and app.config.js's build
 // number its buildVersion, as in the IPA.
-// Usage: pnpm release:source --tag v0.2.0 --ipa <file> --notes <notes.md> --out <source.json>
+// Usage: pnpm release source --tag v0.2.0 --ipa <file> --notes <notes.md> --out <source.json>
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
 const require = createRequire(import.meta.url);

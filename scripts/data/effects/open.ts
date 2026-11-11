@@ -10,7 +10,7 @@ import { loadLedger } from "../printed/ledger.ts";
 import { withPool } from "../printed/pool.ts";
 import { openLines, renderOpenLines } from "./open-lines.ts";
 
-// Usage: pnpm effects:open. Rewrites src/effects/open-lines.ts after records are added or changed.
+// Usage: pnpm effects open. Rewrites src/effects/open-lines.ts after records are added or changed.
 function main(log: Log): void {
   const cards = loadCards();
   const open = openLines(cards, withPool(loadLedger(), cards), loadCampaigns(), loadScenarios(), EFFECTS);

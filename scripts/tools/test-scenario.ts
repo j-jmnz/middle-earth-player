@@ -11,10 +11,10 @@ import { WORDS_SCENARIOS } from "../../test/harness/words-scenarios.ts";
 
 // The tests to run while a scenario is being authored, a fraction of the full suite (README.md, Commands; docs/handover/agent-brief.md, Scenario procedure):
 //
-//   pnpm test:scenario <scenario-id> [--list]
-//   pnpm test:scenario <scenario-id> --quick      the loop while authoring: skips the goldens (the registry-wide golden tests and the scenario's own golden.test.ts) and the reader
+//   pnpm test scenario <scenario-id> [--list]
+//   pnpm test scenario <scenario-id> --quick      the loop while authoring: skips the goldens (the registry-wide golden tests and the scenario's own golden.test.ts) and the reader
 //                                                 check; the full run, once before the hand-back, runs them (docs/handover/agent-brief.md, Scenario procedure)
-//   pnpm test:scenario <scenario-id> --words      only src/play/words/scenario-words.test.ts for the scenario, and src/play/words/asks.test.ts when it has an asks file
+//   pnpm test scenario <scenario-id> --words      only src/play/words/scenario-words.test.ts for the scenario, and src/play/words/asks.test.ts when it has an asks file
 //                                                 (src/play/words/asks/<id>.ts), with WORDS_DUMP=<id>: it prints every sentence the scenario's choices say (the
 //                                                 check for a bare "Choose a player." or a fallback sentence, and for a scenario with an asks file every asks entry rendered)
 //
@@ -159,7 +159,7 @@ export function playerCodes(id: string, recorded: readonly string[]): string[] {
   return [...new Set(dealt)].filter((code) => withRecords.has(code));
 }
 
-const SMOKE_NODE = ["--experimental-strip-types", "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON"];
+const SMOKE_NODE = ["--disable-warning=MODULE_TYPELESS_PACKAGE_JSON"];
 
 /** The card smokes of the scenario: the player cards' (skipped when it deals none), and the encounter smoke, which every scenario has. */
 export function smokeRuns(id: string, playerCards: readonly string[]): { name: "smoke" | "encounter"; args: string[]; detail: string }[] {
@@ -198,7 +198,7 @@ async function main(log: Log): Promise<void> {
   const wordsOnly = process.argv.includes("--words");
   const quick = process.argv.includes("--quick");
   const id = args[0];
-  if (id === undefined || args.length > 1) throw new Error("Usage: pnpm test:scenario <scenario-id> [--list | --quick | --words]");
+  if (id === undefined || args.length > 1) throw new Error("Usage: pnpm test scenario <scenario-id> [--list | --quick | --words]");
   if (!existsSync(path.join(DATA_DIR, "scenarios", `${id}.json`))) throw new Error(`${id} is not a scenario in data/scenarios`);
 
   if (wordsOnly) {

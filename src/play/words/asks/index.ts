@@ -5,5 +5,5 @@ import { ASKS as THE_PASSAGE_OF_THE_MARSHES } from "./the-passage-of-the-marshes
 import { ASKS as THE_ROAD_TO_ISENGARD } from "./the-road-to-isengard.ts";
 import { ASKS as THE_URUK_HAI } from "./the-uruk-hai.ts";
 
-// Written by pnpm data:build from src/play/words/asks/ (scripts/data/effects/asks-barrel.ts). Do not edit.
+// Written by pnpm data build from src/play/words/asks/ (scripts/data/effects/asks-barrel.ts). Do not edit.
 export const ASKS_BY_SCENARIO: Readonly<Record<string, Readonly<Record<string, Ask>>>> = { "helms-deep": HELMS_DEEP, "journey-to-the-cross-roads": JOURNEY_TO_THE_CROSS_ROADS, "the-passage-of-the-marshes": THE_PASSAGE_OF_THE_MARSHES, "the-road-to-isengard": THE_ROAD_TO_ISENGARD, "the-uruk-hai": THE_URUK_HAI };

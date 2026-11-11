@@ -11,7 +11,7 @@ import { encounterWorld } from "./encounter-world.ts";
 
 // The encounter smoke (scripts/card-smoke/encounter.ts) on one scenario, and proof that it reports what it should: a record the engine
 // cannot run fails the probe that plays it, a game replays to the same state. The whole sweep (every playable scenario) runs in
-// `pnpm test:scenario <id>` and `node --experimental-strip-types scripts/card-smoke/encounter.ts --all`, not here: it takes minutes.
+// `pnpm test scenario <id>` and `pnpm test encounter --all`, not here: it takes minutes.
 const SCENARIO = "the-thing-in-the-depths";
 // A Forced-free card of the scenario for each probe: a treachery with a Shadow, a location, a stage with a Setup.
 const REVEALED = "12048";

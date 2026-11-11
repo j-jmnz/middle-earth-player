@@ -1,4 +1,4 @@
-// `pnpm a11y:web`: the web build audited with axe-core. The static web export (`expo export -p web`, with the e2e seed so the fixture route writes
+// `pnpm test a11y`: the web build audited with axe-core. The static web export (`expo export -p web`, with the e2e seed so the fixture route writes
 // saves) is served from a temporary folder on localhost and opened in Playwright's Chromium at phone width. Each main screen is opened in a fresh
 // page, waited on until its testID is there, and run through axe; a serious or critical violation fails the run. Nothing leaves localhost: every other
 // request is aborted (card pictures come from the network in the web build), so the check runs offline.

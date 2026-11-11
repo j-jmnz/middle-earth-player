@@ -133,7 +133,7 @@ describe("pack scans", () => {
     const again = await packScans({ ...staged.options, shrink, fetch: () => Promise.reject(new Error("offline")) }, log);
     expect(shrunk).toEqual([]);
     expect(again).toEqual(first);
-    // Bag End's side A pin moves (a data:sync pictures): only it is packed again.
+    // Bag End's side A pin moves (a data sync pictures): only it is packed again.
     const sources = JSON.parse(readFileSync(staged.sources, "utf8")) as { sources: { scans: { files: { path: string }[] } } };
     sources.sources.scans.files = sources.sources.scans.files.map((file) => (file.path === "scans/141031.A.jpg" ? staged.pin("141031", BAG_END_URL, jpeg(700)) : file));
     writeFileSync(staged.sources, JSON.stringify(sources));
@@ -146,7 +146,7 @@ describe("pack scans", () => {
   it("fails when the fetched bytes do not match the pin", async () => {
     const staged = stage();
     await expect(packScans({ ...staged.options, fetch: () => Promise.resolve(new Uint8Array(jpeg(300))) }, log)).rejects.toThrow(
-      /pinned .*pnpm data:sync scans/,
+      /pinned .*pnpm data sync scans/,
     );
   });
 

@@ -4,8 +4,8 @@ import { MANY_PLAYERS } from "./conditions.ts";
 import { copyLine, copyLines, withCopies } from "./reprint.ts";
 import { AUTHORED_EFFECTS as VOYAGE } from "./voyage-across-belegaer.ts";
 
-// Records for A Storm on Cobas Haven (dream-chaser part 8, campaign card 11209). Every line is read from the scan ledger (data/printed/); a line a template already writes (pnpm data:build) or another card prints
-// word for word needs no record here. `pnpm effects:draft a-storm-on-cobas-haven` writes the bundle of open lines and the effect-author agent turns it into records.
+// Records for A Storm on Cobas Haven (dream-chaser part 8, campaign card 11209). Every line is read from the scan ledger (data/printed/); a line a template already writes (pnpm data build) or another card prints
+// word for word needs no record here. `pnpm effects draft a-storm-on-cobas-haven` writes the bundle of open lines and the effect-author agent turns it into records.
 // The four Dol Amroth towers, Guarded by Ship enemies (the objectives family, src/rules/families/objectives/) and the cards that attach a Ship enemy to an objective, guarding it.
 // Rules: rr.guarded, wor.guarded-x, rr.objective-cards, rr.ownership-and-control, rr.action, mec109.archery, dcce.ship-enemies, dcce.ships, dcce.sailing-tests, dcce.heading, dcce.corsair-deck, dcce.boarding,
 // rr.engagement-check, rr.in-play-and-out-of-play, rr.travel, rr.search (data/rules/entries.json).

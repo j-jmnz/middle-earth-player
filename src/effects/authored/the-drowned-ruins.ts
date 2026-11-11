@@ -7,7 +7,7 @@ import { AUTHORED_EFFECTS as NUMENOR } from "./the-fate-of-numenor.ts";
 import { AUTHORED_EFFECTS as DEPTHS } from "./the-thing-in-the-depths.ts";
 
 // Records for The Drowned Ruins (Dream-chaser part 7, campaign card 11200): the campaign card, the two quest stages, the Grotto and Underwater locations and the encounter cards. Every line is read from the scan
-// ledger (data/printed/dream-chaser.json) and is covered (pnpm effects:open lists none). The Grotto deck and the flip are the uncharted family's (src/rules/families/uncharted/grotto.ts), the Stormcaller Elite's
+// ledger (data/printed/dream-chaser.json) and is covered (pnpm effects open lists none). The Grotto deck and the flip are the uncharted family's (src/rules/families/uncharted/grotto.ts), the Stormcaller Elite's
 // attack the grapple family's. The Command events and Círdan's Blessing (boons) are in pool/DCCEDrownedRuins.ts.
 // Rules: dcce.grotto-deck, dcce.setup-the-drowned-ruins, dcce.campaign-setup-the-drowned-ruins, dcce.campaign-mode, dcce.gaining-xp, dcce.scalable-upgradable, dcce.encounter-cards, rr.active-location, rr.victory,
 // rr.explored, rr.engaged, rr.cannot, rr.winning-the-game (data/rules/entries.json).
