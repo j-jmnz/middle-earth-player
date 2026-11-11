@@ -125,8 +125,8 @@ const game = campaignGame<MarshesDecks, MarshesPolicy>({
   campaign,
   scenario: marshes,
   stats: HERO_STATS,
-  // The scenario's own cards, Sméagol (the back of Gollum), the Ring-bearer with The One Ring and The Searching Eye, which the campaign card shuffles into each deck; the campaign card's and the campaign's game codes are added by the kit.
-  codes: [...marshes.cards.map((card) => card.code), RING_BEARER, "144063", "144015", "144076"],
+  // The scenario's own cards, Sméagol (the back of Gollum), the Ring-bearer with The One Ring, The Searching Eye (which the campaign card shuffles into each deck) and the boons and burdens the earlier Resolutions leave in the pool (Helm's Deep's Poisoned Counsels, The Road to Isengard's Saruman's Voice and Palantír); the campaign card's and the campaign's game codes are added by the kit.
+  codes: [...marshes.cards.map((card) => card.code), RING_BEARER, "144063", "144015", "144076", "143015", "143016", "143017", "143018", "143019", "143020", "143021", "143068"],
   intent: marshesIntent,
   loadout: marshesLoadout,
   policy: DEFAULT_POLICY,

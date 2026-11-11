@@ -144,9 +144,9 @@ describe("The Passage of the Marshes in the the-two-towers campaign", () => {
     expect(log.marshesChoice).toEqual(["penalty"]);
   });
 
-  it("144067:B:1 unlocks Journey to the Cross-roads on the path, which the app cannot deal yet", () => {
+  it("144067:B:1 is followed by Journey to the Cross-roads on the path, which the app cannot deal yet: its node reads soon", () => {
     const path = campaignPath(campaign, {}, { ...afterIsengard, completed: [...afterIsengard.completed, "the-passage-of-the-marshes"] });
-    expect(path.slice(3, 5).map((node) => [node.id, node.status])).toEqual([["the-passage-of-the-marshes", "completed"], ["journey-to-the-cross-roads", "current"]]);
+    expect(path.slice(3, 5).map((node) => [node.id, node.status])).toEqual([["the-passage-of-the-marshes", "completed"], ["journey-to-the-cross-roads", "soon"]]);
     expect(PLAYABLE_SCENARIOS).not.toContain("journey-to-the-cross-roads");
   });
 });
