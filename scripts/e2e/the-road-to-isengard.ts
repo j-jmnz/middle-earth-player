@@ -22,7 +22,7 @@ export type IsengardFixtureName = "isengard-won" | "isengard-lost";
 
 // The log of a playthrough whose first 2 parts were won: the log of the parts before Helm's Deep (scripts/e2e/helms-deep.ts), then the Helm's Deep golden's two-handed win, resolved onto it, their heroes and what hangs on them left out.
 export async function deepWonLog(): Promise<CampaignLog> {
-  return wonLog({ title: "Helm's Deep", golden: "two-handed, won, Normal", goldens: DEEP_GOLDENS, world: deepWorld, play: playDeep }, await haiWonLog());
+  return wonLog({ title: "Helm's Deep", golden: "two-handed, won, Normal", goldens: DEEP_GOLDENS, world: deepWorld, play: playDeep, scenarioId: "helms-deep" }, await haiWonLog());
 }
 
 export async function isengardFixtures(): Promise<Partial<Record<IsengardFixtureName, IsengardFixture>>> {

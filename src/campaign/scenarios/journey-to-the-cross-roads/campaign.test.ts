@@ -6,10 +6,11 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { EFFECTS } from "../../../effects/index.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../../../rules/engine/reduce.ts";
-import { ROADS_GOLDENS, playGoldenWith, roadsStart, roadsWorld } from "../../../../test/scenarios/journey-to-the-cross-roads/game.ts";
+import { ROADS_GOLDENS, roadsStart, roadsWorld } from "../../../../test/scenarios/journey-to-the-cross-roads/game.ts";
 import { loadCampaign, loadScenario } from "../../../../scripts/data/load-scenarios.ts";
 import { marshesWonLog } from "../../../../scripts/e2e/journey-to-the-cross-roads.ts";
 import { prebuiltDeck } from "../../../../scripts/e2e/seed-kit.ts";
+import { goldenState } from "../../../../test/harness/golden-state.ts";
 import { temporaryCatalog } from "../../../../test/harness/temp-catalog.ts";
 
 import { startFor } from "../../briefing.ts";
@@ -112,35 +113,32 @@ describe("Journey to the Cross-roads in the the-two-towers campaign", () => {
     expect(braces(campaignStart)).toBe(1);
   });
 
-  // The Resolution (144069:B:1) earns each Brace of Coneys chosen at Setup, for the seat that chose it, and writes the enemies facedown under The Black Gate to the log.
-  // A copy of Brace of Coneys in a deck changes what the seed deals, so each answer plays the golden's seed or the next until a game wins (the first seeds' wins are pinned by the golden).
-  const resolved = (choices: readonly string[], name: string) => {
-    const golden = ROADS_GOLDENS.find((item) => item.name === name)!;
-    for (let seed = golden.seed; seed < golden.seed + 30; seed += 1) {
-      const game = playGoldenWith({ ...golden, seed }, tense.ctx, choices);
-      if (game.state.stageCleared) return { game, log: applyResolution(emptyLog(golden.seatCount), game.state.scenarioId, game.state, tense.cards, NO_COPY_LIMITS) };
-    }
-    throw new Error(`no seed from ${golden.seed} wins ${name} with ${choices.join(", ")}`);
+  // The Resolution (144069:B:1) earns each Brace of Coneys chosen at Setup, for the seat that chose it, and writes the enemies facedown under The Black Gate to the log. A copy of Brace of Coneys in a deck changes what the
+  // seed deals, so each answer has a golden of its own (test/scenarios/journey-to-the-cross-roads/game.ts); the test reads its final state from golden.json.
+  const resolved = (name: string) => {
+    const state = goldenState("journey-to-the-cross-roads", name);
+    expect(state.stageCleared, name).toBe(true);
+    return { game: { state }, log: applyResolution(emptyLog(state.seatCount), state.scenarioId, state, tense.cards, NO_COPY_LIMITS) };
   };
 
   it("144069:B:1 earns a Brace of Coneys for each player who chose it at Setup, and none for the player who took the resources", () => {
-    const { log } = resolved([BRACE, "resources"], "two-handed, won, Normal");
+    const { log } = resolved("two-handed, won, Normal, one player takes Brace of Coneys");
     expect(log.campaignPool.filter((card) => card.code === BRACE).map((card) => card.seat)).toEqual([0]);
     expect(log.completed).toEqual(["journey-to-the-cross-roads"]);
-    const both = resolved([BRACE, BRACE], "two-handed, won, Normal").log;
+    const both = resolved("two-handed, won, Normal, both players take Brace of Coneys").log;
     expect(both.campaignPool.filter((card) => card.code === BRACE).map((card) => card.seat).sort()).toEqual([0, 1]);
-    const none = resolved(["resources", "resources"], "two-handed, won, Normal").log;
+    const none = resolved("two-handed, won, Normal").log;
     expect(none.campaignPool.some((card) => card.code === BRACE)).toBe(false);
   });
 
   it("144069:B:1 a true solo win earns the one copy the player chose", () => {
-    const { log } = resolved([BRACE], "true solo, won, Normal");
+    const { log } = resolved("true solo, won, Normal, the player takes Brace of Coneys");
     expect(log.campaignPool.filter((card) => card.code === BRACE).map((card) => card.seat)).toEqual([0]);
   });
 
   it("144069:B:1 writes the enemies lying facedown under The Black Gate to the campaign log, by code", () => {
     for (const name of ["two-handed, won, Normal", "two-handed, won, Easy", "true solo, won, Normal", "true solo, won, Easy"]) {
-      const { game, log } = resolved(["resources", "resources"], name);
+      const { game, log } = resolved(name);
       const gate = Object.values(game.state.cards).find((card) => card.code === BLACK_GATE)!;
       const under = Object.values(game.state.cards).filter((card) => card.zone === "under" && card.host === gate.id);
       const counted: Record<string, number> = {};
@@ -148,7 +146,7 @@ describe("Journey to the Cross-roads in the the-two-towers campaign", () => {
       expect(log.blackGate, name).toEqual(counted);
     }
     const some = ROADS_GOLDENS.filter((golden) => golden.outcome === "won").some((golden) => {
-      const { game } = resolved(["resources", "resources"], golden.name);
+      const { game } = resolved(golden.name);
       return Object.values(game.state.cards).some((card) => card.zone === "under");
     });
     expect(some).toBe(true);

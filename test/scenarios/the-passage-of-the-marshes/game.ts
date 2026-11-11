@@ -114,6 +114,8 @@ export const MARSHES_GOLDENS: readonly MarshesGolden[] = [
   { name: "true solo, won, Easy", seatCount: 1, seed: 3, difficulty: "Easy", decks: "strong", outcome: "won", after: true },
   { name: "two-handed, won, Normal", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
   { name: "two-handed, won, Easy", seatCount: 2, seed: 4, difficulty: "Easy", decks: "strong", outcome: "won", after: true },
+  // The variant whose Resolution differs: each player takes The Searching Eye in place of the threat penalty (144067:B:1).
+  { name: "two-handed, won, Normal, each player takes the Searching Eye", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won", policy: { choose: "last" }, after: true },
   { name: "true solo, lost, threat reaches 50", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", after: true, lossReason: "No seats remain" },
   { name: "two-handed, lost, threat reaches 50", seatCount: 2, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", after: true, lossReason: "No seats remain" },
   { name: "two-handed, lost, the Ring-bearer's seat is eliminated", seatCount: 2, seed: 3, difficulty: "Normal", decks: "weak", outcome: "lost", after: true, lossReason: "The One Ring left play" },

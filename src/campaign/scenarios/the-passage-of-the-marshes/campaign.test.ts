@@ -7,7 +7,7 @@ import { EFFECTS } from "../../../effects/index.ts";
 import type { PrintedCard } from "../../../rules/core/printed.ts";
 import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../../../rules/engine/reduce.ts";
-import { MARSHES_GOLDENS, marshesStart, marshesWorld, playGolden } from "../../../../test/scenarios/the-passage-of-the-marshes/game.ts";
+import { marshesStart, marshesWorld } from "../../../../test/scenarios/the-passage-of-the-marshes/game.ts";
 import { loadCampaign, loadScenario } from "../../../../scripts/data/load-scenarios.ts";
 import { isengardWonLog } from "../../../../scripts/e2e/the-passage-of-the-marshes.ts";
 import { prebuiltDeck } from "../../../../scripts/e2e/seed-kit.ts";
@@ -18,6 +18,7 @@ import { applyResolution, emptyLog, type CampaignLog } from "../../log.ts";
 import { standaloneStart } from "../../standalone.ts";
 import { loadWorld } from "../../world.ts";
 import { campaignPath, nextStep } from "../../path.ts";
+import { goldenState } from "../../../../test/harness/golden-state.ts";
 import { PLAYABLE_SCENARIOS } from "../../playable.ts";
 import { NO_COPY_LIMITS } from "../../wilderland.ts";
 
@@ -116,15 +117,15 @@ describe("The Passage of the Marshes in the the-two-towers campaign", () => {
   });
 
   // The Resolution (144067:B:1) asks each player in turn for a permanent +2 starting threat penalty or a copy of The Searching Eye, and records the choice in the log.
-  const resolved = (name: string, choose: "first" | "last") => {
-    const golden = MARSHES_GOLDENS.find((item) => item.name === name)!;
-    const game = playGolden({ ...golden, policy: { choose } }, ctx);
-    expect(game.state.stageCleared, name).toBe(true);
-    return { golden, log: applyResolution(emptyLog(golden.seatCount), game.state.scenarioId, game.state, cards, NO_COPY_LIMITS) };
+  // The goldens' final states (their golden.json): the penalty is the policy's first option, the Searching Eye its last.
+  const resolved = (name: string) => {
+    const state = goldenState("the-passage-of-the-marshes", name);
+    expect(state.stageCleared, name).toBe(true);
+    return { log: applyResolution(emptyLog(state.seatCount), state.scenarioId, state, cards, NO_COPY_LIMITS) };
   };
 
   it("144067:B:1 each player who chooses the penalty starts the next scenarios 2 higher, and the choice is in the log", () => {
-    const { log } = resolved("two-handed, won, Normal", "first");
+    const { log } = resolved("two-handed, won, Normal");
     expect(log.threatPenaltyBySeat).toEqual([2, 2]);
     expect(log.marshesChoice).toEqual(["penalty", "penalty"]);
     expect(log.campaignPool.some((card) => card.code === SEARCHING_EYE)).toBe(false);
@@ -132,14 +133,14 @@ describe("The Passage of the Marshes in the the-two-towers campaign", () => {
   });
 
   it("144067:B:1 each player who chooses the Searching Eye earns a copy for themselves and no penalty", () => {
-    const { log } = resolved("two-handed, won, Normal", "last");
+    const { log } = resolved("two-handed, won, Normal, each player takes the Searching Eye");
     expect((log.threatPenaltyBySeat ?? []).reduce((sum, amount) => sum + amount, 0)).toBe(0);
     expect(log.marshesChoice).toEqual(["searchingEye", "searchingEye"]);
     expect(log.campaignPool.filter((card) => card.code === SEARCHING_EYE).map((card) => card.seat).sort()).toEqual([0, 1]);
   });
 
   it("144067:B:1 a true solo win asks the one player the same question", () => {
-    const { log } = resolved("true solo, won, Normal", "first");
+    const { log } = resolved("true solo, won, Normal");
     expect(log.threatPenaltyBySeat).toEqual([2]);
     expect(log.marshesChoice).toEqual(["penalty"]);
   });

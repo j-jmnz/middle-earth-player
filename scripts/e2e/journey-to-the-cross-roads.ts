@@ -25,7 +25,7 @@ export type RoadsFixtureName = "roads-won" | "roads-lost";
 
 // The log of a playthrough whose first 4 parts were won: the log of the parts before The Passage of the Marshes (scripts/e2e/the-passage-of-the-marshes.ts), then the The Passage of the Marshes golden's two-handed win, resolved onto it, their heroes and what hangs on them left out.
 export async function marshesWonLog(): Promise<CampaignLog> {
-  return wonLog({ title: "The Passage of the Marshes", golden: "two-handed, won, Normal", goldens: MARSHES_GOLDENS, world: marshesWorld, play: playMarshes }, await isengardWonLog());
+  return wonLog({ title: "The Passage of the Marshes", golden: "two-handed, won, Normal", goldens: MARSHES_GOLDENS, world: marshesWorld, play: playMarshes, scenarioId: "the-passage-of-the-marshes" }, await isengardWonLog());
 }
 
 export async function roadsFixtures(): Promise<Partial<Record<RoadsFixtureName, RoadsFixture>>> {

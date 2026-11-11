@@ -102,7 +102,7 @@ export type RoadsGame = PlayedGame;
 
 // The goldens (src/campaign/scenarios/journey-to-the-cross-roads/golden.test.ts), also played by the causes and replay tests once test/harness/golden-registry.ts lists them.
 // `after`: the log of a campaign whose earlier parts were won. `upgraded`: the Upgraded sides. `mode`: the Hard or Expert Mode card.
-export type RoadsGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: RoadsDecks; outcome: "won" | "lost"; policy?: Partial<RoadsPolicy>; after?: boolean; upgraded?: boolean; mode?: ModeCard; lossReason?: string };
+export type RoadsGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: RoadsDecks; outcome: "won" | "lost"; policy?: Partial<RoadsPolicy>; after?: boolean; upgraded?: boolean; mode?: ModeCard; lossReason?: string; choices?: readonly string[] };
 
 // Wins (true solo and two-handed, Normal and Easy) and the ways to lose that a game of stand-ins reaches: the facedown cards under The Black Gate reaching the players + 3 (strong heroes that take the Choose's first option, the one
 // that places an enemy under the Gate, and engage one enemy a round), the players' threat at 50 (heroes too small to quest), and every hero destroyed (heroes too brittle to survive). The wins start the players' threat high enough
@@ -113,6 +113,10 @@ export const ROADS_GOLDENS: readonly RoadsGolden[] = [
   { name: "true solo, won, Easy", seatCount: 1, seed: 3, difficulty: "Easy", decks: "tense", outcome: "won", after: true },
   { name: "two-handed, won, Normal", seatCount: 2, seed: 1, difficulty: "Normal", decks: "tense", outcome: "won", after: true },
   { name: "two-handed, won, Easy", seatCount: 2, seed: 1, difficulty: "Easy", decks: "tense", outcome: "won", after: true },
+  // The variants whose Resolution differs: the players take a copy of Brace of Coneys in place of the resources (144069:A:2, B:1), and the campaign test reads their final states.
+  { name: "two-handed, won, Normal, one player takes Brace of Coneys", seatCount: 2, seed: 1, difficulty: "Normal", decks: "tense", outcome: "won", after: true, choices: ["144014", "resources"] },
+  { name: "two-handed, won, Normal, both players take Brace of Coneys", seatCount: 2, seed: 1, difficulty: "Normal", decks: "tense", outcome: "won", after: true, choices: ["144014", "144014"] },
+  { name: "true solo, won, Normal, the player takes Brace of Coneys", seatCount: 1, seed: 1, difficulty: "Normal", decks: "tense", outcome: "won", after: true, choices: ["144014"] },
   { name: "true solo, lost, the Harad enemies under The Black Gate", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost", policy: { choose: "first" }, after: true, lossReason: "The Black Gate has taken too many Harad enemies" },
   { name: "two-handed, lost, the Harad enemies under The Black Gate", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost", policy: { choose: "first" }, after: true, lossReason: "The Black Gate has taken too many Harad enemies" },
   { name: "true solo, lost, threat reaches 50", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", after: true, lossReason: "No seats remain" },
@@ -136,7 +140,5 @@ const game = campaignGame<RoadsDecks, RoadsPolicy>({
   earlier: { xp: [0, 0, 0, 0], pool: [], marks: {} },
 });
 
-export const playGolden = (golden: RoadsGolden, ctx: ReduceContext): RoadsGame => game.playGolden(golden, ctx, ROADS_CHOICES);
+export const playGolden = (golden: RoadsGolden, ctx: ReduceContext): RoadsGame => game.playGolden(golden, ctx, golden.choices ?? ROADS_CHOICES);
 
-// A golden played with other answers to the Campaign Setup (144069:A:2): the card's code for a copy of Brace of Coneys, or `resources`, one for each seat.
-export const playGoldenWith = (golden: RoadsGolden, ctx: ReduceContext, choices: readonly string[]): RoadsGame => game.playGolden(golden, ctx, choices);

@@ -25,7 +25,7 @@ export type MarshesFixtureName = "marshes-won" | "marshes-lost";
 
 // The log of a playthrough whose first 3 parts were won: the log of the parts before The Road to Isengard (scripts/e2e/the-road-to-isengard.ts), then the The Road to Isengard golden's two-handed win, resolved onto it, their heroes and what hangs on them left out.
 export async function isengardWonLog(): Promise<CampaignLog> {
-  return wonLog({ title: "The Road to Isengard", golden: "two-handed, won, Normal", goldens: ISENGARD_GOLDENS, world: isengardWorld, play: playIsengard }, await deepWonLog());
+  return wonLog({ title: "The Road to Isengard", golden: "two-handed, won, Normal", goldens: ISENGARD_GOLDENS, world: isengardWorld, play: playIsengard, scenarioId: "the-road-to-isengard" }, await deepWonLog());
 }
 
 export async function marshesFixtures(): Promise<Partial<Record<MarshesFixtureName, MarshesFixture>>> {
