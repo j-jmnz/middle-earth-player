@@ -1,3 +1,5 @@
+import { existsSync, readFileSync } from "node:fs";
+
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 
@@ -103,12 +105,22 @@ export function playSeed<S extends 1 | 2>(spec: SeedSpec<S>, seed: number): Seed
   return { loadout, ...playDealt(world, spec.log ? { ...save, log: spec.log } : save, loadout, seed, spec.limit ?? 8000, spec.answer, spec.stop) };
 }
 
+/** The seed the committed fixture `label` was found at (src/campaign/fixtures/<scenario-id>.json, keyed by the fixture's name), or 0 when none is committed. */
+export function committedSeed(scenarioId: string, label: string): number {
+  const file = new URL(`../../src/campaign/fixtures/${scenarioId}.json`, import.meta.url);
+  if (!existsSync(file)) return 0;
+  const entry = (JSON.parse(readFileSync(file, "utf8")) as Record<string, { seed?: unknown } | undefined>)[label];
+  return typeof entry?.seed === "number" ? entry.seed : 0;
+}
+
 /**
- * The first seed, from 1 to the count in the environment variable `seedsVar` (100 by default), whose game `wanted` accepts. Null, with a
- * warning, when none is.
+ * The first seed, from 1 to the count in the environment variable `seedsVar` (the spec's `seeds`, else 100, by default), whose game
+ * `wanted` accepts. Null, with a warning, when none is. The search always reaches the seed of the fixture already committed under
+ * `label`, so a bare rerun writes the same fixture: the games are deterministic, and a committed fixture found with a raised seed count
+ * (`oath-won` at seed 909) is not lost to the default, nor is a fixture that chains from it.
  */
 export function firstSeed<S extends 1 | 2>(say: Log, spec: SeedSpec<S>, seedsVar: string, wanted: (state: ScenarioState) => boolean, label: string): SeedFixture<S> | null {
-  const limit = Number(process.env[seedsVar] ?? spec.seeds ?? 100);
+  const limit = Math.max(Number(process.env[seedsVar] ?? spec.seeds ?? 100), committedSeed(spec.scenarioId, label));
   for (let seed = 1; seed <= limit; seed += 1) {
     const game = playSeed(spec, seed);
     const outcome = game.state.lost ? game.state.lossReason : game.state.stageCleared ? "won" : "parked";

@@ -195,7 +195,7 @@ function Table({ store, width, height, column, reach, onRowFeet, picture, pictur
           ))}
           {layout.slots.filter((slot) => slot.zone !== "hand").map(piece)}
           <HandScrub slots={layout.slots.filter((slot) => slot.zone === "hand")} scrub={scrub} width={drawnWidth} height={height} t={t} piece={piece} />
-          <TokenFx fx={moves.fx} layout={layout} clock={fxClock} images={tokens} fonts={fonts} t={t} s={s} ringOf={(code) => sphereRing(sphereOf(code), t)} stripOf={(slot) => stripText(slot, info(game, seat, slot.id).questPoints, slot.zone === "questStage" ? owner : null)} contrast={contrast} />
+          <TokenFx fx={moves.fx} layout={layout} clock={fxClock} images={tokens} fonts={fonts} t={t} s={s} ringOf={(code) => sphereRing(sphereOf(code), t)} stripOf={(slot) => stripText(slot, info(game, seat, slot.id).questPoints, slot.zone === "questStage" ? owner : null, info(game, seat, slot.id).stageLoses)} contrast={contrast} />
           {attackerSlot ? <AttackerMark rect={slotBounds(attackerSlot)} t={t} s={s} /> : null}
           {layout.marks.map((mark) => (
             <CombatMarkView key={`mark:${mark.enemyId}`} mark={mark} t={t} s={s} />

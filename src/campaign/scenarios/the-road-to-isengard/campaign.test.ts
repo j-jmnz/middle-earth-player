@@ -1,4 +1,6 @@
 // Rules: mec112.setup-the-road-to-isengard, mec112.campaign-mode, mec112.poisoned-counsels-searching-eye, rr.campaign-setup-checklist, ltp.campaign-setup-checklist (data/rules/entries.json); ledger lines 143081:A:2 and 143081:B:1.
+import Database from "better-sqlite3";
+import { drizzle } from "drizzle-orm/better-sqlite3";
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { EFFECTS } from "../../../effects/index.ts";
@@ -11,8 +13,13 @@ import { DEEP_GOLDENS, deepWorld, playGolden as playDeep } from "../../../../tes
 import { ISENGARD_GOLDENS, isengardStart, isengardWorld, playGolden } from "../../../../test/scenarios/the-road-to-isengard/game.ts";
 import { HAI_GOLDENS, haiWorld, playGolden as playHai } from "../../../../test/scenarios/the-uruk-hai/game.ts";
 import { loadCampaign, loadScenario } from "../../../../scripts/data/load-scenarios.ts";
+import { prebuiltDeck } from "../../../../scripts/e2e/seed-kit.ts";
+import { temporaryCatalog } from "../../../../test/harness/temp-catalog.ts";
 
+import { startFor } from "../../briefing.ts";
 import { applyResolution, emptyLog, type CampaignLog } from "../../log.ts";
+import { standaloneStart } from "../../standalone.ts";
+import { loadWorld } from "../../world.ts";
 import { campaignPath, nextStep } from "../../path.ts";
 import { PLAYABLE_SCENARIOS } from "../../playable.ts";
 import { NO_COPY_LIMITS } from "../../wilderland.ts";
@@ -82,17 +89,26 @@ describe("The Road to Isengard in the the-two-towers campaign", () => {
 
   it("143081:A:2 does not take the Poisoned Counsels out: the Setup removes only the Fellowship's burdens, and the encounter deck holds Saruman's Voice", () => {
     const campaignDeal = opened(2, afterDeep);
-    const standalone = opened(2, emptyLog(2));
+    const freshLog = opened(2, emptyLog(2));
     expect(Object.values(campaignDeal.cards).some((card) => card.code === "143081")).toBe(false);
     expect(Object.values(campaignDeal.cards).some((card) => ["141078", "141080", "142085"].includes(card.code))).toBe(false);
-    // Saruman's Voice is shuffled into the encounter deck by the Setup (the original card's own copy is the same card, so a standalone game holds one too): one copy lies there, and the Setup's shuffle added no second.
+    // Saruman's Voice is shuffled into the encounter deck by the Setup, once, with or without the earlier parts' log (the next test shows a standalone deal holds none).
     const inDeck = (state: ScenarioState) => copies(state, VOICE).filter((card) => card.zone === "encounterDeck").length;
     expect(inDeck(campaignDeal)).toBe(1);
-    expect(inDeck(standalone)).toBe(1);
+    expect(inDeck(freshLog)).toBe(1);
     expect(copies(campaignDeal, COUNSELS).every((card) => card.zone === "deck")).toBe(true);
   });
 
-  it("deals the original card in a standalone game, with no campaign card and no burden", () => {
+  it("143081:A:2 is what puts Saruman's Voice in the encounter deck: a standalone deal of the same seat holds none, a campaign deal one", () => {
+    const seat = { deckId: "the-one-deck", ...prebuiltDeck("the-one-deck") };
+    const world = loadWorld(drizzle(new Database(temporaryCatalog(), { readonly: true })), campaign, isengard, EFFECTS, [...seat.heroes, ...seat.deck]);
+    const standalone = standaloneStart(world, 1, { scenarioId: isengard.id, difficulty: "Normal", seats: [seat], ringBearer: null }, 1);
+    const campaignStart = startFor({ world, log: emptyLog(1), seatCount: 1, seats: [seat], ringBearer: null, difficulty: "Normal" }, 1);
+    expect(standalone.encounterDeck.filter((code) => code === VOICE)).toHaveLength(0);
+    expect(campaignStart.encounterDeck.filter((code) => code === VOICE)).toHaveLength(1);
+  });
+
+  it("deals no campaign card and no Poisoned Counsels from a fresh log, and starts on stage 1", () => {
     const state = opened(1, emptyLog(1));
     expect(Object.values(state.cards).some((card) => card.code === "143081")).toBe(false);
     expect(copies(state, COUNSELS)).toHaveLength(0);

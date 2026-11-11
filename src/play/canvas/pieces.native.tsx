@@ -261,6 +261,7 @@ export function Badges({
   willpower,
   questPoints,
   owner,
+  stageLoses,
   fonts,
   images,
   t,
@@ -274,6 +275,8 @@ export function Badges({
   questPoints: number | null;
   // Whose stage this is ("P2") once stages are separate between players: told on the progress strip.
   owner?: string | null;
+  // Filling the stage loses the game (143075:B:3): the strip's numbers are threat red, with the word.
+  stageLoses?: boolean;
   fonts: Fonts;
   images: TokenImages;
   t: TableTokens;
@@ -342,7 +345,7 @@ export function Badges({
       {questPoints != null ? (
         <Group>
           <RoundedRect x={x} y={y + h - strip} width={w} height={strip} r={0} color={stripOf(t)} />
-          <Outlined x={x + w / 2} y={y + h - 3 * s} text={stripText(slot, questPoints, owner) ?? ""} font={fonts.numbers} t={t} s={s} />
+          <Outlined x={x + w / 2} y={y + h - 3 * s} text={stripText(slot, questPoints, owner, stageLoses ?? false) ?? ""} font={fonts.numbers} t={t} s={s} {...(stageLoses ? { color: t.threat } : {})} />
         </Group>
       ) : null}
     </Group>
