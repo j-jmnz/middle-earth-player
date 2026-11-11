@@ -2,7 +2,6 @@
 import { standaloneStatus, type ListedStandalone, type StandaloneResult } from "../../campaign/standalone";
 import { seatWord } from "../data/seats";
 
-export const STANDALONE_DROPPED = "The game in progress was dropped because the rules or the card data changed. Your decks are kept; deal it again from Scenarios.";
 
 /** The game's line under its scenario name on the list: seats, difficulty, and how it stands. */
 export function gameCaption(game: ListedStandalone): string {
@@ -14,6 +13,8 @@ export function statusWord(game: ListedStandalone): string {
   switch (standaloneStatus(game)) {
     case "playing":
       return "In progress";
+    case "needsChoice":
+      return "Needs a choice";
     case "won":
       return game.result?.outcome === "won" ? `Won · score ${game.result.score.score}` : "Won";
     case "lost":

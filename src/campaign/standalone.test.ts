@@ -17,7 +17,9 @@ import { contextOf, record } from "./session.ts";
 import {
   dealStandalone,
   dropStandalone,
-  droppedIfStale,
+  continueStandalone,
+  markedIfStale,
+  restartStandalone,
   finishStandalone,
   parseStandaloneActive,
   parseStandaloneLoadout,
@@ -179,16 +181,37 @@ describe("a standalone game", () => {
     expect(JSON.stringify(resumed.state)).toBe(JSON.stringify(direct));
   });
 
-  it("is not replayed against another engine version or other data, and a drop keeps the loadout", () => {
+  it("is not replayed against another engine version or other data, is marked rather than dropped, and a drop keeps the loadout", () => {
     const game = dealt();
-    expect(droppedIfStale(game, CATALOG_VERSION)).toBeNull();
-    expect(droppedIfStale(game, CATALOG_VERSION + 1)?.active).toBeNull();
+    expect(markedIfStale(game, CATALOG_VERSION)).toBe(game);
+    const marked = markedIfStale(game, CATALOG_VERSION + 1);
+    expect(marked.active).toEqual(game.active);
+    expect(standaloneStatus(marked)).toBe("needsChoice");
     expect(resumeStandalone(game, worldOf(PAST), CATALOG_VERSION + 1)).toEqual({ ok: false, reason: "dataHash" });
     const old = { ...game, active: game.active ? { ...game.active, engineVersion: ENGINE_VERSION - 1 } : null };
     expect(resumeStandalone(old, worldOf(PAST), CATALOG_VERSION)).toEqual({ ok: false, reason: "engineVersion" });
     const dropped = dropStandalone(game);
     expect(standaloneStatus(dropped)).toBe("dropped");
     expect(dropped.loadout).toEqual(game.loadout);
+  });
+
+  it("Continue keeps the accepted prefix and restamps; Restart keeps the row with a new seed and no intents", () => {
+    const world = worldOf(PAST);
+    const bogus = { type: "NoSuchIntent" } as never;
+    const old = record(record(record(dealt(), { type: "Keep" }), bogus), { type: "Keep" });
+    const stale = { ...old, active: { ...old.active!, engineVersion: ENGINE_VERSION - 1, dataHash: CATALOG_VERSION + 1, startedAt: 5, activeMs: 7 } };
+    const continued = continueStandalone(stale, world, CATALOG_VERSION);
+    if (!continued.ok) throw new Error(continued.reason);
+    expect(continued).toMatchObject({ accepted: 1, total: 3 });
+    expect(continued.holder.active).toEqual({ engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, seed: SEED, intents: [{ type: "Keep" }], startedAt: 5, activeMs: 7 });
+    expect(resumeStandalone(continued.holder, world, CATALOG_VERSION).ok).toBe(true);
+    expect(continueStandalone({ ...stale, loadout: null }, world, CATALOG_VERSION)).toEqual({ ok: false, reason: "none" });
+
+    const restarted = restartStandalone(stale, world, 99, CATALOG_VERSION);
+    if (!restarted.ok) throw new Error("not dealt");
+    expect(restarted.game).toMatchObject({ id: stale.id, loadout: stale.loadout, result: null });
+    expect(restarted.game.active).toEqual({ engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, seed: 99, intents: [] });
+    expect(restartStandalone({ ...stale, loadout: null }, world, 99, CATALOG_VERSION)).toEqual({ ok: false, briefing: null });
   });
 
   it("records a loss with its reason and the rounds played", () => {

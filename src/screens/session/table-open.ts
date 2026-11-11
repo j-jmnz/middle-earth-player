@@ -1,14 +1,17 @@
-// Opens the scenario a save has in progress for the table: reads the save, drops an open scenario played on another engine
-// version or other card data (the log and decks stay), loads the cards from catalog.db, and replays the intents through the
-// reducer (open-game.ts). A save already opened as it now stands is not replayed again (session/cache.ts). Pure of React: the hooks
+// Opens the scenario a save has in progress for the table: reads the save, loads the cards from catalog.db, and replays the intents
+// through the reducer (open-game.ts). An open scenario played on another engine version or other card data, or one the reducer
+// refuses now, is not dropped: the open is "stale" and the table asks the player to continue it or restart it (continueTable,
+// restartTable), the only writes. One that does not read at all is dropped, the log and decks staying. A save already opened as it now stands is not replayed again (session/cache.ts). Pure of React: the hooks
 // that open it for a screen are in table-session.ts.
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import { addActive } from "../../campaign/replay";
 import type { Save } from "../../campaign/save";
-import { drop, finish, isWon, record, resume, staleReason, unrecord } from "../../campaign/session";
-import { logCodes, loadWorld } from "../../campaign/world";
+import { continueSave, drop, finish, isWon, record, restartSave, resume, staleReason, unrecord } from "../../campaign/session";
+import { logCodes, loadWorld, type World } from "../../campaign/world";
 import { CATALOG_VERSION } from "../../catalog/version";
+import { dealSeed } from "../nav/e2e";
+import { CANNOT_CONTINUE, MISSING_GAME, restartProblems, type StaleChoice } from "./stale-words";
 import { EFFECTS } from "../../effects";
 import type { TableStore } from "../../play/store/store";
 
@@ -24,7 +27,7 @@ import { fingerprintOf, sessionCacheOf } from "./cache";
 
 type Db<TRun> = BaseSQLiteDatabase<"sync", TRun>;
 
-export type TableSession = ({ ok: true; save: Save } & ReplayedGame) | { ok: false; reason: "missing" | "none" | "dropped"; save: Save | null; write: Save | null };
+export type TableSession = ({ ok: true; save: Save } & ReplayedGame) | { ok: false; reason: "missing" | "none" | "dropped" | "stale"; save: Save | null; write: Save | null };
 
 /** The codes the open scenario can show: the log's cards, the Ring-bearer and every card of each dealt deck. */
 export function loadoutCodes(save: Save): string[] {
@@ -36,8 +39,8 @@ export function loadoutCodes(save: Save): string[] {
 type Opened = Extract<TableSession, { ok: true }>;
 
 /**
- * Reads and replays the open scenario. It writes nothing: when the open scenario has to be dropped, the save to write is
- * returned as `write`, and useTableSession writes it in an effect, never during a render. A save already opened as it now stands
+ * Reads and replays the open scenario. It writes nothing: when the open scenario has to be dropped (it does not read), the save to write is
+ * returned as `write`; a stale one returns reason "stale" and no write, and useTableSession writes it in an effect, never during a render. A save already opened as it now stands
  * (session/cache.ts) is not replayed again.
  */
 export function openTable<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TUser>, saveId: string): TableSession {
@@ -57,10 +60,11 @@ function openRead<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TUser>, read:
   if (!save.active || !save.loadout) return { ok: false, reason: read.unreadable ? "dropped" : "none", save, write: read.unreadable ? save : null };
   const campaign = campaignOf(save.campaignId);
   const scenario = scenarioOf(save.loadout.scenarioId);
-  if (!campaign || !scenario || staleReason(save.active, CATALOG_VERSION)) {
+  if (!campaign || !scenario) {
     const dropped = drop(save);
     return { ok: false, reason: "dropped", save: dropped, write: dropped };
   }
+  if (staleReason(save.active, CATALOG_VERSION)) return { ok: false, reason: "stale", save, write: null };
   const cache = sessionCacheOf<Opened>(user, "save");
   const fingerprint = fingerprintOf(save, CATALOG_VERSION);
   const kept = cache.get(save.id, fingerprint);
@@ -68,13 +72,49 @@ function openRead<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TUser>, read:
   const world = loadWorld(catalog, campaign, scenario, EFFECTS, loadoutCodes(save));
   const replayed = replayForTable(catalog, world, (observe) => resume(save, world, CATALOG_VERSION, observe));
   if (!replayed) {
-    // The reducer refused a stored intent, or the start no longer builds: drop the open scenario and keep the log.
-    const dropped = drop(save);
-    return { ok: false, reason: "dropped", save: dropped, write: dropped };
+    // The reducer refused a stored intent, or the start no longer builds: the player chooses, nothing is dropped.
+    return { ok: false, reason: "stale", save, write: null };
   }
   const opened: Opened = { ok: true, save, ...replayed };
   cache.set(save.id, fingerprint, opened);
   return opened;
+}
+
+// The world of an open scenario, or null when its campaign or scenario is not in the build or its cards do not load.
+function worldOf<TCatalog>(catalog: Db<TCatalog>, save: Save): World | null {
+  const campaign = campaignOf(save.campaignId);
+  const scenario = save.loadout ? scenarioOf(save.loadout.scenarioId) : null;
+  if (!campaign || !scenario) return null;
+  try {
+    return loadWorld(catalog, campaign, scenario, EFFECTS, loadoutCodes(save));
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Continue (the stale sheet): replays the open scenario on the new rules as far as its intents are accepted and writes that prefix,
+ * stamped with the engine version and data hash it now plays on. The session cache misses on the new save, so the next open replays it.
+ */
+export function continueTable<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TUser>, saveId: string): StaleChoice {
+  const save = readSaveChecked(user, saveId)?.save;
+  const world = save ? worldOf(catalog, save) : null;
+  if (!save || !world) return { ok: false, message: MISSING_GAME };
+  const continued = continueSave(save, world, CATALOG_VERSION);
+  if (!continued.ok) return { ok: false, message: CANNOT_CONTINUE };
+  writeActive(user, continued.holder);
+  return { ok: true };
+}
+
+/** Restart (the stale sheet): deals the scenario again with the stored loadout and a new seed; the log and the decks stay. */
+export function restartTable<TCatalog, TUser>(catalog: Db<TCatalog>, user: Db<TUser>, saveId: string): StaleChoice {
+  const save = readSaveChecked(user, saveId)?.save;
+  const world = save ? worldOf(catalog, save) : null;
+  if (!save || !world) return { ok: false, message: MISSING_GAME };
+  const dealt = restartSave(save, world, dealSeed(), CATALOG_VERSION, Date.now());
+  if (!dealt.ok) return { ok: false, message: restartProblems(dealt.briefing?.problems ?? null) };
+  writeActive(user, dealt.save);
+  return { ok: true };
 }
 
 export type SessionStore = { store: TableStore; save: () => Save; clock: PlayClock };

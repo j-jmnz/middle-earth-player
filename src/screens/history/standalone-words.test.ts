@@ -18,6 +18,7 @@ describe("standalone list words", () => {
     expect(gameCaption(game)).toBe("True solo · Easy · In progress");
     expect(statusWord({ ...game, active: null, result: { outcome: "won", score: { rounds: 5, victoryPoints: 3, score: 88 } } })).toBe("Won · score 88");
     expect(statusWord({ ...game, active: null, result: { outcome: "lost", reason: null, rounds: 2 } })).toBe("Lost");
+    expect(gameCaption({ ...game, needsChoice: true })).toBe("True solo · Easy · Needs a choice");
     expect(gameCaption({ ...game, seatCount: 2, active: null, loadout: null })).toBe("Two-handed · Dropped");
   });
 

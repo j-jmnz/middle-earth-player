@@ -9,7 +9,7 @@ import { ENGINE_VERSION } from "../rules/engine/version.ts";
 
 import { briefing, checklistPlan, startFor, type Briefing, type BriefingInput, type BriefingSeat } from "./briefing.ts";
 import { applyResolution } from "./log.ts";
-import { beginActive, dropLastIntent, recordIntent, replay, type ActiveScenario, type ReplayObserver } from "./replay.ts";
+import { beginActive, dropLastIntent, recordIntent, replay, replayAccepted, restamped, type ActiveScenario, type ReplayObserver } from "./replay.ts";
 import type { Save, StoredLoadout } from "./save.ts";
 import { NO_COPY_LIMITS } from "./wilderland.ts";
 import type { World } from "./world.ts";
@@ -45,7 +45,8 @@ export function deal(save: Save, world: World, loadout: StoredLoadout, seed: num
   return { ok: true, save: { ...save, loadout, active: beginActive(start, dataHash, startedAt) } };
 }
 
-// An open scenario played on another engine version or against other data is not replayed. This needs no start.
+// An open scenario played on another engine version or against other data is not replayed. This needs no start. It is not
+// dropped either: the table asks the player to continue it or restart it.
 export function staleReason(active: Pick<ActiveScenario, "engineVersion" | "dataHash">, dataHash: number): "engineVersion" | "dataHash" | null {
   if (active.engineVersion !== ENGINE_VERSION) return "engineVersion";
   if (active.dataHash !== dataHash) return "dataHash";
@@ -56,7 +57,7 @@ export type Resumed = { ok: true; state: ScenarioState } | { ok: false; reason: 
 
 // Replays an open game, a campaign save's scenario or a standalone game, from the start `startOf` builds for its seed. One
 // from another engine version or data hash is not rebuilt at all, and a start that no longer builds is reported as the
-// loadout. The caller drops the game on any failure.
+// loadout. A failure leaves the game as it is: the caller asks the player to continue it or restart it.
 export function resumeFrom(active: ActiveScenario | null, startOf: ((seed: number) => StartScenario) | null, world: World, dataHash: number, observe?: ReplayObserver): Resumed {
   if (!active || !startOf) return { ok: false, reason: "none" };
   const stale = staleReason(active, dataHash);
@@ -71,11 +72,38 @@ export function resumeFrom(active: ActiveScenario | null, startOf: ((seed: numbe
   return replayed.ok ? { ok: true, state: replayed.state } : { ok: false, reason: replayed.reason };
 }
 
-// Replays the open scenario of a save. The caller drops the scenario on any failure and keeps the log, the decks and the
-// image index.
+// Replays the open scenario of a save. A failure leaves the save as it is (the log, the decks and the image index are never touched).
 export function resume(save: Save, world: World, dataHash: number, observe?: ReplayObserver): Resumed {
   const { loadout } = save;
   return resumeFrom(save.active, loadout ? (seed) => startFor(inputOf(save, world, loadout), seed) : null, world, dataHash, observe);
+}
+
+export type Continued<T> = { ok: true; holder: T; accepted: number; total: number } | { ok: false; reason: "none" | "loadout" };
+
+// Continue: replays the open game on the current rules as far as the reducer accepts its intents, and keeps that prefix, stamped
+// with the engine version and the data hash it now plays on. Whatever came after the first refused intent is gone, so the table
+// may not be the one the player left. Pure: the caller writes the holder it gets back.
+export function continueFrom<T extends { active: ActiveScenario | null }>(holder: T, startOf: ((seed: number) => StartScenario) | null, world: World, dataHash: number): Continued<T> {
+  const { active } = holder;
+  if (!active || !startOf) return { ok: false, reason: "none" };
+  let accepted;
+  try {
+    accepted = replayAccepted(active, startOf(active.seed), contextOf(world)).accepted;
+  } catch {
+    return { ok: false, reason: "loadout" };
+  }
+  return { ok: true, holder: { ...holder, active: restamped(active, accepted, dataHash) }, accepted, total: active.intents.length };
+}
+
+// Continue on a save's open scenario.
+export function continueSave(save: Save, world: World, dataHash: number): Continued<Save> {
+  const { loadout } = save;
+  return continueFrom(save, loadout ? (seed) => startFor(inputOf(save, world, loadout), seed) : null, world, dataHash);
+}
+
+// Restart: deals the scenario again with the stored loadout and a new seed. The log and the decks stay, as they do on a drop.
+export function restartSave(save: Save, world: World, seed: number, dataHash: number, startedAt?: number): DealResult | { ok: false; briefing: null } {
+  return save.loadout ? deal(save, world, save.loadout, seed, dataHash, startedAt) : { ok: false, briefing: null };
 }
 
 // Drops the open scenario and keeps everything else.

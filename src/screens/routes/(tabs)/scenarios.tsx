@@ -3,7 +3,7 @@ import { useCallback, useState } from "react";
 import { View } from "react-native";
 
 import { isPlayable } from "../../../campaign/playable";
-import { standaloneStatus, type ListedStandalone } from "../../../campaign/standalone";
+import { isOpenStatus, standaloneStatus, type ListedStandalone } from "../../../campaign/standalone";
 import { BOXES, boxOf, scenarioName, scenarioOf } from "../../data/campaign-data";
 import { campaignListQueries, lockedBoxTiles } from "../../campaign/list";
 import { PillButton, PrimaryButton } from "../../kit/chrome";
@@ -16,7 +16,7 @@ import { comingScenarios, splitRuns } from "../../campaign/hub-runs";
 import { usePalette } from "../../kit/palette-hook";
 import { seatWord } from "../../data/seats";
 import { gameCaption, statusWord } from "../../history/standalone-words";
-import { listStandaloneFresh } from "../../data/standalone-store";
+import { listStandaloneMarked } from "../../data/standalone-store";
 import { useUiScale } from "../../../ui/ui-scale";
 import { useSizeClass } from "../../../ui/use-size-class";
 
@@ -36,7 +36,7 @@ export default function Scenarios() {
 
   useFocusEffect(
     useCallback(() => {
-      setGames(listStandaloneFresh(user));
+      setGames(listStandaloneMarked(user));
     }, [user]),
   );
 
@@ -48,7 +48,7 @@ export default function Scenarios() {
     router.push({ pathname: "/standalone/table/[gameId]", params: { gameId: game.id } });
   }
 
-  const { hero, others } = splitRuns(games, (game) => standaloneStatus(game) === "playing");
+  const { hero, others } = splitRuns(games, (game) => isOpenStatus(standaloneStatus(game)));
   const seatsOf = (game: ListedStandalone) => game.loadout?.seats.map((seat) => seat.heroes) ?? [];
   const faces = deckFaces(catalog, [hero, ...others].flatMap((game) => (game ? seatsOf(game).flat() : [])));
   const spoken = (game: ListedStandalone) => `${scenarioName(game.scenarioId)}, ${gameCaption(game)}`;
@@ -91,6 +91,7 @@ export default function Scenarios() {
     const state = game ? standaloneStatus(game) : null;
     if (game && state === "won") return { line: statusWord(game), tone: palette.ok };
     if (state === "playing") return { line: "In progress", tone: palette.accentHigh };
+    if (state === "needsChoice") return { line: "Needs a choice", tone: palette.accentHigh };
     const stages = scenarioOf(id)?.stages.length ?? 0;
     return { line: stages > 0 ? `${stages} quest ${stages === 1 ? "stage" : "stages"}` : "", tone: palette.faint };
   };

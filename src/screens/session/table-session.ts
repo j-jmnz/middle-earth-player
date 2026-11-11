@@ -7,7 +7,7 @@ import { writeSave } from "../data/campaign-store";
 import { useDatabases } from "../data/databases";
 import { cachedTable, openTable, type TableSession } from "./table-open";
 
-export { loadoutCodes, openTable, recordUnclosedRun, sessionStore, type SessionStore, type TableSession } from "./table-open";
+export { continueTable, loadoutCodes, openTable, restartTable, recordUnclosedRun, sessionStore, type SessionStore, type TableSession } from "./table-open";
 
 function writeDropped<TUser>(user: BaseSQLiteDatabase<"sync", TUser>, session: TableSession | null): void {
   if (session && !session.ok && session.write) writeSave(user, session.write);
@@ -26,9 +26,10 @@ export function useTableSession(saveId: string | null): TableSession | null {
  * state meanwhile. A replay of a long game no longer holds back the frame the screen opens on. A session already cached (the
  * Resolution's Back to the table) is held from the first render, with no loading frame.
  */
-export function useTableSessionAfterPaint(saveId: string | null): TableSession | null {
+export function useTableSessionAfterPaint(saveId: string | null, attempt: number = 0): TableSession | null {
   const { catalog, user } = useDatabases();
-  const session = useOpenedAfterPaint(saveId, () => (saveId ? cachedTable(user, saveId) : null), () => (saveId ? openTable(catalog, user, saveId) : null));
+  // `attempt` counts the stale sheet's choices (Continue, Restart): a new count opens the save again, as a new key does.
+  const session = useOpenedAfterPaint(saveId == null ? null : `${saveId}:${attempt}`, () => (saveId ? cachedTable(user, saveId) : null), () => (saveId ? openTable(catalog, user, saveId) : null));
   useEffect(() => writeDropped(user, session), [session, user]);
   return session;
 }

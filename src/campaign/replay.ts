@@ -46,8 +46,9 @@ export type Replayed =
 // The table uses it to rebuild the log of the round it reopens on and what Undo can take back.
 export type ReplayObserver = (before: ScenarioState, after: ScenarioState, steps: readonly EngineStep[], intent: PlayerIntent) => void;
 
-// Replays a save. A save from another engine version or another data hash is dropped, not migrated; the caller
-// keeps the log, the decks and the image index. An intent the reducer now refuses also drops it.
+// Replays a save. A save from another engine version or another data hash is not replayed here: the caller asks the player to
+// continue it or restart it (session.ts, continueFrom and the restarts); the log, the decks and the image index are never touched.
+// An intent the reducer now refuses fails the replay the same way.
 export function replay(active: ActiveScenario, start: StartScenario, dataHash: number, ctx: ReduceContext, observe?: ReplayObserver): Replayed {
   if (active.engineVersion !== ENGINE_VERSION) return { ok: false, reason: "engineVersion" };
   if (active.dataHash !== dataHash) return { ok: false, reason: "dataHash" };
@@ -60,4 +61,26 @@ export function replay(active: ActiveScenario, start: StartScenario, dataHash: n
     state = result.state;
   }
   return { ok: true, state };
+}
+
+// The state after the intents the current reducer accepts, and how many that was: a replay that stops at the first refused intent
+// instead of failing. It checks no version and no hash; it is what Continue plays on a game a change reached (session.ts, continueFrom).
+export type Accepted = { state: ScenarioState; accepted: number };
+
+export function replayAccepted(active: Pick<ActiveScenario, "intents">, start: StartScenario, ctx: ReduceContext): Accepted {
+  let state = startScenario(start, ctx);
+  let accepted = 0;
+  for (const intent of active.intents) {
+    const result = reduce(state, intent, ctx);
+    if (!result.ok) break;
+    state = result.state;
+    accepted += 1;
+  }
+  return { state, accepted };
+}
+
+// The open scenario as Continue keeps it: the first `accepted` intents, stamped with the engine version and the data hash it now
+// plays on. The seed, when it was dealt and the foreground time stay.
+export function restamped(active: ActiveScenario, accepted: number, dataHash: number): ActiveScenario {
+  return { ...active, engineVersion: ENGINE_VERSION, dataHash, intents: active.intents.slice(0, accepted) };
 }

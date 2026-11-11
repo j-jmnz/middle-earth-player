@@ -7,7 +7,7 @@ import { useDatabases } from "../data/databases";
 import { cachedStandalone, openStandalone, type StandaloneSession } from "./standalone-open";
 import { writeStandalone } from "../data/standalone-store";
 
-export { openStandalone, standaloneCodes, standaloneStore, type StandaloneSession, type StandaloneTable } from "./standalone-open";
+export { continueStandaloneGame, openStandalone, restartStandaloneGame, standaloneCodes, standaloneStore, type StandaloneSession, type StandaloneTable } from "./standalone-open";
 
 function writeDropped<TUser>(user: BaseSQLiteDatabase<"sync", TUser>, session: StandaloneSession | null): void {
   if (session && !session.ok && session.write) writeStandalone(user, session.write);
@@ -22,9 +22,10 @@ export function useStandaloneSession(gameId: string | null): StandaloneSession |
 }
 
 /** The same, opened in an effect after the first paint and the push animation: null until then (the table shows its loading state). A cached game is held from the first render. */
-export function useStandaloneSessionAfterPaint(gameId: string | null): StandaloneSession | null {
+export function useStandaloneSessionAfterPaint(gameId: string | null, attempt: number = 0): StandaloneSession | null {
   const { catalog, user } = useDatabases();
-  const session = useOpenedAfterPaint(gameId, () => (gameId ? cachedStandalone(user, gameId) : null), () => (gameId ? openStandalone(catalog, user, gameId) : null));
+  // `attempt` counts the stale sheet's choices (Continue, Restart): a new count opens the game again, as a new key does.
+  const session = useOpenedAfterPaint(gameId == null ? null : `${gameId}:${attempt}`, () => (gameId ? cachedStandalone(user, gameId) : null), () => (gameId ? openStandalone(catalog, user, gameId) : null));
   useEffect(() => writeDropped(user, session), [session, user]);
   return session;
 }

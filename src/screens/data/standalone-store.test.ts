@@ -11,7 +11,7 @@ import {
   deleteStandalone,
   listArchivedStandalone,
   listStandalone,
-  listStandaloneFresh,
+  listStandaloneMarked,
   newStandaloneId,
   readStandalone,
   restoreStandalone,
@@ -48,15 +48,14 @@ function listing(game: StandaloneGame) {
 }
 
 describe("standalone store", () => {
-  it("listStandaloneFresh drops and writes a game played on other data, and leaves a current one", () => {
+  it("listStandaloneMarked marks a game played on other data as needing a choice and writes nothing", () => {
     const user = openUser();
     writeStandalone(user, gameOf("game-old"), 1000);
     writeStandalone(user, gameOf("game-new", { active: { engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, seed: 3, intents: [] } }), 2000);
-    const listed = listStandaloneFresh(user);
-    expect(listed.find((game) => game.id === "game-old")?.active).toBeNull();
-    expect(listed.find((game) => game.id === "game-new")?.active).not.toBeNull();
-    expect(readStandalone(user, "game-old")?.game).toMatchObject({ active: null, loadout: gameOf("game-old").loadout });
-    expect(readStandalone(user, "game-new")?.game.active).not.toBeNull();
+    const listed = listStandaloneMarked(user);
+    expect(listed.find((game) => game.id === "game-old")).toMatchObject({ needsChoice: true, active: { engineVersion: ENGINE_VERSION, dataHash: 7 } });
+    expect(listed.find((game) => game.id === "game-new")?.needsChoice).toBeUndefined();
+    expect(readStandalone(user, "game-old")?.game).toEqual(gameOf("game-old"));
   });
 
   it("writeStandaloneActive changes only the open game, and a list row carries its version and hash", () => {

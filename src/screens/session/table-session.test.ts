@@ -7,7 +7,8 @@ import { temporaryCatalog } from "../../../test/harness/temp-catalog.ts";
 import { fixtureSave, hasFixture, type FixtureName } from "../../campaign/fixtures.ts";
 import { CATALOG_VERSION } from "../../catalog/version.ts";
 import { readSave, savedAt, writeSave } from "../data/campaign-store.ts";
-import { openTable, recordUnclosedRun, sessionStore } from "./table-open.ts";
+import { ENGINE_VERSION } from "../../campaign/replay.ts";
+import { continueTable, openTable, recordUnclosedRun, restartTable, sessionStore } from "./table-open.ts";
 import { flushRuns } from "../data/pending-runs.ts";
 import { listRuns } from "../data/run-store.ts";
 import { runs } from "../data/user-schema.ts";
@@ -25,6 +26,43 @@ const catalog = drizzle(new Database(temporaryCatalog(), { readonly: true }));
 const name: FixtureName = hasFixture("duo") ? "duo" : "lost";
 
 describe("opening the table", () => {
+  it("a game a change reached is not written on read: it asks for a choice and the row stays", () => {
+    const { user } = openUser();
+    const save = fixtureSave(name, "s1", CATALOG_VERSION);
+    const old = { ...save, active: { ...save.active!, engineVersion: ENGINE_VERSION - 1 } };
+    writeSave(user, old);
+    const before = savedAt(user).get("s1");
+    expect(openTable(catalog, user, "s1")).toMatchObject({ ok: false, reason: "stale", write: null });
+    expect(readSave(user, "s1")).toEqual(old);
+    expect(savedAt(user).get("s1")).toBe(before);
+  });
+
+  it("Continue keeps the accepted intents, restamped, and the table opens on them", () => {
+    const { user } = openUser();
+    const save = fixtureSave(name, "s1", CATALOG_VERSION);
+    const total = save.active!.intents.length;
+    writeSave(user, { ...save, active: { ...save.active!, engineVersion: ENGINE_VERSION - 1, dataHash: CATALOG_VERSION + 1, intents: [...save.active!.intents, { type: "NoSuchIntent" } as never] } });
+    expect(continueTable(catalog, user, "s1")).toEqual({ ok: true });
+    const kept = readSave(user, "s1")!;
+    expect(kept.active).toMatchObject({ engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, seed: save.active!.seed });
+    expect(kept.active!.intents).toEqual(save.active!.intents);
+    expect(kept.active!.intents.length).toBe(total);
+    expect(kept.log).toEqual(save.log);
+    expect(openTable(catalog, user, "s1")).toMatchObject({ ok: true });
+  });
+
+  it("Restart deals again with the stored loadout and a new seed, keeping the log", () => {
+    const { user } = openUser();
+    const save = fixtureSave(name, "s1", CATALOG_VERSION);
+    writeSave(user, { ...save, active: { ...save.active!, engineVersion: ENGINE_VERSION - 1 } });
+    expect(restartTable(catalog, user, "s1")).toEqual({ ok: true });
+    const restarted = readSave(user, "s1")!;
+    expect(restarted.active).toMatchObject({ engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, intents: [] });
+    expect(restarted.loadout).toEqual(save.loadout);
+    expect(restarted.log).toEqual(save.log);
+    expect(openTable(catalog, user, "s1")).toMatchObject({ ok: true });
+  });
+
   it("replays a save once and hands the same session back while the save is as it was", () => {
     const { user } = openUser();
     writeSave(user, fixtureSave(name, "s1", CATALOG_VERSION));

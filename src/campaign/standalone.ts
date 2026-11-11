@@ -20,7 +20,7 @@ import type { LoadoutSeat } from "./loadout.ts";
 import { beginActive, type ActiveScenario, type ReplayObserver } from "./replay.ts";
 import { dealtLoadoutSchema, parseActive } from "./save.ts";
 import { completedRounds, scoreOf, type ScenarioScore } from "./score.ts";
-import { resumeFrom, staleReason, type Resumed } from "./session.ts";
+import { continueFrom, resumeFrom, staleReason, type Continued, type Resumed } from "./session.ts";
 import { buildStart } from "./start.ts";
 import type { World } from "./world.ts";
 
@@ -37,7 +37,7 @@ const resultSchema = z.discriminatedUnion("outcome", [
 ]);
 
 // One standalone game: one deal of one scenario. `active` is the open game (the seed and the intents, never the table);
-// `result` is set when it ends. With neither, the open game was dropped (another engine version or card data).
+// `result` is set when it ends. With neither, the open game was dropped (it did not read at all).
 export type StandaloneGame = {
   id: string;
   campaignId: string;
@@ -50,13 +50,20 @@ export type StandaloneGame = {
 };
 
 // A game as the lists show it: the open game is its engine version and data hash, never its intents (a list row does not parse a long game).
-export type ListedStandalone = Omit<StandaloneGame, "active"> & { active: Pick<ActiveScenario, "engineVersion" | "dataHash"> | null };
+// `needsChoice` is set by `markedIfStale` on an open game another engine version or other data reached: the row is as it was stored.
+export type ListedStandalone = Omit<StandaloneGame, "active"> & { active: Pick<ActiveScenario, "engineVersion" | "dataHash"> | null; needsChoice?: true };
 
-export type StandaloneStatus = "playing" | "won" | "lost" | "dropped";
+export type StandaloneStatus = "playing" | "needsChoice" | "won" | "lost" | "dropped";
 
 export function standaloneStatus(game: ListedStandalone): StandaloneStatus {
   if (game.result) return game.result.outcome;
-  return game.active && game.loadout ? "playing" : "dropped";
+  if (!game.active || !game.loadout) return "dropped";
+  return game.needsChoice ? "needsChoice" : "playing";
+}
+
+// Whether the game is still open: playing, or waiting for the player to continue it or restart it.
+export function isOpenStatus(status: StandaloneStatus): boolean {
+  return status === "playing" || status === "needsChoice";
 }
 
 export function parseStandaloneLoadout(value: unknown): StandaloneLoadout | null {
@@ -124,7 +131,7 @@ export function dealStandalone(id: string, world: World, seatCount: 1 | 2, loado
   return { ok: true, game: { id, campaignId: world.campaign.id, scenarioId: loadout.scenarioId, seatCount, loadout, active: beginActive(start, dataHash), result: null } };
 }
 
-// Replays the open game. One from another engine version or data hash is not rebuilt; the caller drops it.
+// Replays the open game. One from another engine version or data hash is not rebuilt; the table asks for a choice (continueStandalone, restartStandalone).
 export function resumeStandalone(game: StandaloneGame, world: World, dataHash: number, observe?: ReplayObserver): Resumed {
   const { loadout } = game;
   return resumeFrom(game.active, loadout ? (seed) => standaloneStart(world, game.seatCount, loadout, seed) : null, world, dataHash, observe);
@@ -135,10 +142,22 @@ export function dropStandalone(game: StandaloneGame): StandaloneGame {
   return { ...game, active: null };
 }
 
-// The game with its open game dropped when that was played on another engine version or against other data; null when
-// nothing needs dropping.
-export function droppedIfStale<G extends ListedStandalone>(game: G, dataHash: number): (Omit<G, "active"> & { active: null }) | null {
-  return game.active && staleReason(game.active, dataHash) ? { ...game, active: null } : null;
+// The game marked as needing a choice when its open game was played on another engine version or against other data; the same
+// object otherwise. The row is never written for it.
+export function markedIfStale<G extends ListedStandalone>(game: G, dataHash: number): G {
+  return game.active && staleReason(game.active, dataHash) ? { ...game, needsChoice: true } : game;
+}
+
+// Continue: the open game replayed on the current rules as far as its intents are accepted, stamped with what it now plays on.
+// The caller writes the game it gets back.
+export function continueStandalone(game: StandaloneGame, world: World, dataHash: number): Continued<StandaloneGame> {
+  const { loadout } = game;
+  return continueFrom(game, loadout ? (seed) => standaloneStart(world, game.seatCount, loadout, seed) : null, world, dataHash);
+}
+
+// Restart: deals the same game again with its stored loadout and a new seed. The row, its id and its loadout stay.
+export function restartStandalone(game: StandaloneGame, world: World, seed: number, dataHash: number): StandaloneDeal | { ok: false; briefing: null } {
+  return game.loadout ? dealStandalone(game.id, world, game.seatCount, game.loadout, seed, dataHash) : { ok: false, briefing: null };
 }
 
 // Ends the open game. A loss records the reason and the rounds completed; a win records its score. With no campaign card

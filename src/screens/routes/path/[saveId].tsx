@@ -76,7 +76,7 @@ export default function CampaignPath() {
   const saveId = routeCode(params.saveId);
   const { catalog } = useDatabases();
   const { save, loaded, dropped } = useSave(saveId ?? undefined);
-  const notice = dropped ? droppedSentence(dropped) : null;
+  const notice = dropped ? droppedSentence() : null;
   const [picked, setPicked] = useState<string | null>(null);
   const [roadWidth, setRoadWidth] = useState(0);
   const palette = usePalette();
