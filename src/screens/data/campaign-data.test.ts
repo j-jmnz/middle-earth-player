@@ -54,9 +54,12 @@ describe("the registry", () => {
   });
 
   it("splits the scenarios into six boxes, each scenario in one, each box inside its own campaign", () => {
-    expect(BOXES.map((box) => box.name)).toEqual(["The Fellowship of the Ring Saga Expansion", "Revised Core Set", "The Dark of Mirkwood", "Dream-chaser Campaign Expansion", "Ered Mithrin Campaign Expansion", "The Two Towers Saga Expansion"]);
+    expect(BOXES.map((box) => box.name)).toEqual(["Revised Core Set", "The Dark of Mirkwood", "The Fellowship of the Ring Saga Expansion", "Dream-chaser Campaign Expansion", "The Two Towers Saga Expansion", "Ered Mithrin Campaign Expansion"]);
     // Every box the app deals is a revised, repackaged (RCO) product.
     expect(BOXES.every((box) => box.rco)).toBe(true);
+    // The boxes are in release order, the order the campaigns table sorts by (the release of each box's campaign).
+    const released = BOXES.map((box) => index.find((entry) => entry.id === box.campaignId)?.released ?? "");
+    expect(released).toEqual([...released].sort());
     const listed = BOXES.flatMap((box) => box.scenarios);
     expect(new Set(listed).size).toBe(listed.length);
     const every = new Set(campaignIds().flatMap((id) => campaignOf(id)?.scenarios ?? []));

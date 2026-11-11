@@ -25,6 +25,8 @@ export const campaigns = sqliteTable("campaigns", {
   rco: integer("rco", { mode: "boolean" }).notNull(),
   // The RCO product a locked campaign is printed in, the Scenarios tab's name for its tile; null for a built campaign or a cycle.
   box: text("box"),
+  // The US release of the product that starts it (YYYY-MM-DD): the hubs list the rows in this order.
+  released: text("released").notNull(),
 });
 
 export const cards = sqliteTable("cards", {

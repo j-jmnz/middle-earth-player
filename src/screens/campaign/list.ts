@@ -1,3 +1,4 @@
+import { asc } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import { campaigns } from "../../catalog/schema";
@@ -7,7 +8,9 @@ export function campaignListQueries<TCatalogRun>(catalog: BaseSQLiteDatabase<"sy
   return {
     campaigns: catalog
       .select({ id: campaigns.id, name: campaigns.name, scenarioCount: campaigns.scenarioCount, playable: campaigns.playable, kind: campaigns.kind, rco: campaigns.rco, box: campaigns.box })
-      .from(campaigns),
+      .from(campaigns)
+      // Release order (the US release of the product that starts each), then id for one day's releases.
+      .orderBy(asc(campaigns.released), asc(campaigns.id)),
   };
 }
 

@@ -19,6 +19,7 @@ describe("campaignListQueries", () => {
     expect(campaignSql).toContain('"kind"');
     expect(campaignSql).toContain('"rco"');
     expect(campaignSql).toContain('"box"');
+    expect(campaignSql).toMatch(/order by "campaigns"\."released" asc, "campaigns"\."id" asc/);
   });
 });
 

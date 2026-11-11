@@ -164,6 +164,8 @@ export const campaignIndexSchema = z.array(
     // The RCO product a locked campaign is printed in ("The Return of the King Saga Expansion"), the name the Scenarios tab gives
     // its tile; null for a built campaign (the Scenarios tab names its boxes, src/screens/data/campaign-data.ts) and for a cycle.
     box: z.string().min(1).nullable(),
+    // The US release of the product that starts it (YYYY-MM-DD), the order the hubs list campaigns and cycles in.
+    released: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
   }),
 );
 export type CampaignIndexEntry = z.infer<typeof campaignIndexSchema>[number];
