@@ -33,6 +33,11 @@ export const MEC109_CHANGED = ["141078", "141080", "141081", "141082", "141083",
 // cannot be found from these scans: the list stays empty until a scan of the MEC112 cards is read.
 export const MEC112_CHANGED: readonly string[] = [];
 
+// Cards the 2024 MEC113 printing words differently from the 2016 and 2017 Flame of the West and Mountain of Fire printings it reprints. Hall of Beorn's TRotK front text, keywords, stats,
+// shadow and quantity equal the twins' for all 162 pairs, and the pinned scans are of the twin printings (copyright lines 2016 and 2017), so a MEC113 rewording cannot be found from
+// these scans: the list stays empty until a scan of the MEC113 cards is read.
+export const MEC113_CHANGED: readonly string[] = [];
+
 // Quest cards whose Hall of Beorn text has a known error the ledger corrects (typos, a duplicated line). They belong
 // to scenarios 2 to 6; phase 8d ledgers the rest of those scenarios.
 export const KNOWN_ERRORS = ["141025", "141026", "141029", "142062"];
@@ -51,6 +56,10 @@ const SCAN_URL_FIXES: Readonly<Record<string, readonly string[]>> = {
   "11208": [`${DREAM_CHASER_SCANS}/Cirdan's-Blessing-Lore.jpg`],
   "142075": ["https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/The-Argonath.jpg"],
   "141064": ["https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Stricken-Dumb.jpg"],
+  // Hall of Beorn's SetupB image of The Siege of Gondor's campaign card is a blank parchment, and The Battle of the Pelennor Fields' shows only the flavor quotation; DragnCards' pictures of the
+  // backs (423 x 600) print the Resolution (and the Forced line).
+  "145070.B": ["https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/949e2607-cbb5-4ae3-af26-f9d7e00e09d2.B.jpg"],
+  "145078.B": ["https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/10557685-71b2-4f2e-b831-4b19d023ee46.B.jpg"],
 };
 
 // Player cards outside the box that the player's own decks play and reported doing nothing (user request, 2026-10-25):

@@ -88,9 +88,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "a5421bacc79c0121d000b73bb4b22e8af3e8cc3acd0b63a14586ea1f7b5b09a7"
+        "value": "8e2580e7c4bf9dba8a525ec6c4d64b8c234aa14f826e68e706e36dce69cedfdb"
       },
-      "fetchedAt": "2026-11-07T19:25:24.123Z",
+      "fetchedAt": "2026-11-11T17:13:08.689Z",
       "files": [
         {
           "path": "raw/hallofbeorn/EncounterCards.json",
@@ -217,6 +217,42 @@
           "url": "https://hallofbeorn.com/Export/Scenarios/Shelob's-Lair",
           "sha256": "fff1ca6fe6750d7e3427a7021c7f9d2f854289d62b89163b2bd00c71295feeca",
           "bytes": 14108
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Passing-of-the-Grey-Company.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Passing-of-the-Grey-Company",
+          "sha256": "e818452f8946cc722b89d9fc8b0ad3c3f51e6ff7be788032243807e682c62166",
+          "bytes": 10955
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Siege-of-Gondor.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Siege-of-Gondor",
+          "sha256": "fee521e75452613ab83c4d6a4b5f3c4fcc832295967f488659ddb95308ebd1b2",
+          "bytes": 5982
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Battle-of-the-Pelennor-Fields.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Battle-of-the-Pelennor-Fields",
+          "sha256": "cc19f7e64af8d0f82b719f40ceb481b218614c90af688232c824669099bcb1ff",
+          "bytes": 17154
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Tower-of-Cirith-Ungol.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Tower-of-Cirith-Ungol",
+          "sha256": "a4b164bb108fcd640c90166f55e963bf61d8e8eb63f1eb7aee18215033abffb9",
+          "bytes": 11533
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Black-Gate-Opens.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Black-Gate-Opens",
+          "sha256": "f0f5af94a99528fc05a9f86549ddf5daee93d1330854a2a2a5463105817165c0",
+          "bytes": 10617
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Mount-Doom.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Mount-Doom",
+          "sha256": "61eb72531cbca0d5725ce7bdf7aeb4f3085bf59eaf469d0db3e2ec60415c8afa",
+          "bytes": 14716
         },
         {
           "path": "raw/hallofbeorn/Scenarios/Voyage-Across-Belegaer.json",
@@ -5239,9 +5275,9 @@
       "site": "https://drive.google.com/drive/folders/1jEy_yvRaPXGylPfilxhweQjffo9AZQsQ",
       "pin": {
         "kind": "sha256",
-        "value": "2c091843ad6a5cc8aba8dd470e8e09223de5e4328d58712d4f5d39e8b8004a1d"
+        "value": "cac896e6caede2bf95bf686198e63aea6da4cd7b12995f9d98bdd0af2be15a85"
       },
-      "fetchedAt": "2026-11-07T19:50:55.827Z",
+      "fetchedAt": "2026-11-11T17:41:07.929Z",
       "files": [
         {
           "path": "pdf/core_set_campaign_cards.pdf",
@@ -13434,16 +13470,460 @@
           "bytes": 4653939
         },
         {
+          "path": "pictures/145017.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1IleM_BLJImZegVDTm-qBGrt2f9BKyiod&export=download&confirm=t",
+          "sha256": "3708eb730e862347c2d0fc54330bea145bd0e9864927c39f45ea5b78cef5f2e5",
+          "bytes": 5115925
+        },
+        {
+          "path": "pictures/145018.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1IcANys7CkbiNMDeS0fUmvdLrRk_BpmKS&export=download&confirm=t",
+          "sha256": "5d14407a5012441d434958babc128c8f2cf6a580df4a4a96325974a0237b7e14",
+          "bytes": 4901639
+        },
+        {
+          "path": "pictures/145019.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1I_XhKE11wNnZUP0EnheFz6pEn2I3f9oB&export=download&confirm=t",
+          "sha256": "38e3f17359d344bcb643a28c341722f9888b36303f5c0cdea9c4d01d390fa3ef",
+          "bytes": 4922476
+        },
+        {
+          "path": "pictures/145020.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1IsbU1jbqZ3siApa-SvyGSze9ky2nWaOI&export=download&confirm=t",
+          "sha256": "7f3d6dff11198d341bed758d751fe6d893667f26079cd466f257ad504c671681",
+          "bytes": 4843914
+        },
+        {
+          "path": "pictures/145021.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1IoEAfwRnfAOrea2FbAjsnp8XF3wR_KTB&export=download&confirm=t",
+          "sha256": "982799c3c831e9ad6f09bbbddc1e5816245f2a62006a8de985802d95474afd3c",
+          "bytes": 4758442
+        },
+        {
+          "path": "pictures/145022.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1InSf1nrRr5hbNZb0BmlXJ9R8zjeShGfo&export=download&confirm=t",
+          "sha256": "5d45f2bdc65ce7bf65f61fb2982a298c647f986650c80963e65aaf7d7edb27a2",
+          "bytes": 4718945
+        },
+        {
+          "path": "pictures/145023.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1J6dlsSjeF78pVJn0DzF9NXZPSfOp7gAw&export=download&confirm=t",
+          "sha256": "5413cb9a7e1b3842d5cf956bebc671e9449ea875b96d6a670853a2a3a3eafb00",
+          "bytes": 4663491
+        },
+        {
+          "path": "pictures/145024.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Iwlsf7n4kZupj0un-H7ki_lAzfxP31ey&export=download&confirm=t",
+          "sha256": "b8f00aac19b32643baf7a072e0bddd45ed951cad3fe481893a937f17c43fe9c2",
+          "bytes": 4568175
+        },
+        {
+          "path": "pictures/145025.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1ItnUdv00i8rCP7Tc2I05JEaalVje24hZ&export=download&confirm=t",
+          "sha256": "363f042bfe97921979149334b566db5af35594e1a349b75eeee37628423fe809",
+          "bytes": 4668908
+        },
+        {
+          "path": "pictures/145026.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1ItM_DyTAsSI62rH6JCX6OkXNGF5nUTzk&export=download&confirm=t",
+          "sha256": "9ae43132897fdaee849f705c87a2db8d6f8f006639b65e945ce57cb3dd312c54",
+          "bytes": 4469435
+        },
+        {
+          "path": "pictures/145027.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1JETRFDWAMtIAkcIrJUEWH5oizkD3Ho3r&export=download&confirm=t",
+          "sha256": "aab3c83fc1da671ac957f0a59208759d07048f576c9bd76aa8b61ecaf98e1765",
+          "bytes": 4510492
+        },
+        {
+          "path": "pictures/145028.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1JCxtBHZ-B32muoV_D0TMfPoGkMBhl_0e&export=download&confirm=t",
+          "sha256": "598e61439ddc6e9661656fc30534abcb612908091f11b181f9ce0b7806df1f05",
+          "bytes": 4903267
+        },
+        {
+          "path": "pictures/145029.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1J7ldjq-SQKMq2yCe5xYgRJajjvS8YL0M&export=download&confirm=t",
+          "sha256": "677959e0af70582d37c06cddd363a308101f4c7633237b15227c9ffd1ca56616",
+          "bytes": 4994702
+        },
+        {
+          "path": "pictures/145030.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1JJSFMvGNfPgmOCrexgGHXfs8MHaEo3OE&export=download&confirm=t",
+          "sha256": "67bd64983919279b954097d0ce3750babd84bc9b62432319a107e5f1729e0c54",
+          "bytes": 4907060
+        },
+        {
+          "path": "pictures/145031.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1JREQZmN3HEIrcZNAOZJS3R5KEubUMdGV&export=download&confirm=t",
+          "sha256": "0ebb9c3e565ebb6f5c0a4044a023db5b8d7e39432ddebb3c175847e4b643581c",
+          "bytes": 4971333
+        },
+        {
+          "path": "pictures/145032.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1JOv-fLUc0GZ1iyLrDIlq5oKpn1lbMyY0&export=download&confirm=t",
+          "sha256": "11fa40f7eecbdb189a32664236e7cb52084c9e5b42615da2ede0104f6f56b255",
+          "bytes": 5168183
+        },
+        {
+          "path": "pictures/145033.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1JMcwkGGXxHP-nAGbwU3MOlzfRTx_Z8j9&export=download&confirm=t",
+          "sha256": "dd69fe65d837dd5118a9b71c0eda41e01ded3863d66076f802f61f8e680458ad",
+          "bytes": 5015078
+        },
+        {
+          "path": "pictures/145034.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1J_0jtnqlzkl220ZVmCpCWVBDrLnos_NV&export=download&confirm=t",
+          "sha256": "6d857ff958e114bedef662b7f6637346f8ebdc3adf67c301ea79b10ef5afd351",
+          "bytes": 4968130
+        },
+        {
+          "path": "pictures/145035.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1JXDWKVtw1lglHSkaBHHjUK_STpQCGZm8&export=download&confirm=t",
+          "sha256": "9fb26dd2cfbb3655a5e1f2bef705d8f0f617f11c0cafa013eea2814a1aa49569",
+          "bytes": 4662668
+        },
+        {
+          "path": "pictures/145036.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1JTMuOvZV1JEELjTek9RABV79i2RSxnDV&export=download&confirm=t",
+          "sha256": "1b64fb481c593032d7819d0acafe19b5c83ed055a09f08eb3963dd9a0be51c7f",
+          "bytes": 4773351
+        },
+        {
+          "path": "pictures/145037.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1JiHFIgFrgJtnipXA0RqJbatt4weeyUeo&export=download&confirm=t",
+          "sha256": "de6628e6ad0c3298791818cfd7207f27a99b0f9367e96444b8d26fae13006c04",
+          "bytes": 4730869
+        },
+        {
+          "path": "pictures/145038.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Jf-vhC2Be89KlIBp_rJKAY1ZIAa-hBJs&export=download&confirm=t",
+          "sha256": "2c22423068d20274a849db677480da346b1fa799ca5a3a5c9b861229a2631aee",
+          "bytes": 4724034
+        },
+        {
+          "path": "pictures/145039.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Jb3qfPzELdp2Gq0pGA98rmkswlY8ReqC&export=download&confirm=t",
+          "sha256": "4cfa5e2e106d1e5efb9dd1e3eedf5ea5c9963eb186dba840569fb713461c5c6e",
+          "bytes": 4853677
+        },
+        {
+          "path": "pictures/145040.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Jout1XjhSjxarrbJZ1-nqFj6FehEmHNb&export=download&confirm=t",
+          "sha256": "1f8ec12197c3c96eedb6ab419161ee0c0a4134529ff7f8142f10a33efae8f79a",
+          "bytes": 4602787
+        },
+        {
+          "path": "pictures/145041.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1JmIKknbay6FJgD8EaaDdUt7e3hgEuC_O&export=download&confirm=t",
+          "sha256": "0e12d500904a78e99b033dce18a49274ad30db249adc8b77f2e571eee08f5910",
+          "bytes": 4698094
+        },
+        {
+          "path": "pictures/145042.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Jm3CCL9AoWqCucMWa_Rm14eJftpB8PtE&export=download&confirm=t",
+          "sha256": "82d8d7aa3fbe35e5e1d8c112b2099c86f1a678d6445e0c1bb537e6f0dc43ab4c",
+          "bytes": 4655662
+        },
+        {
+          "path": "pictures/145043.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1HCIdN956FuUP4PdKCmyHA_obEy0QMNjt&export=download&confirm=t",
+          "sha256": "f8130360e99b21af9553f8a989ecb7fc3f1c2e17a4a981a2c953f64ac10674d0",
+          "bytes": 4671229
+        },
+        {
+          "path": "pictures/145044.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1H8mHFTRQUTDqy5IZkC7YFiWQTsbdukP_&export=download&confirm=t",
+          "sha256": "06960ffe15934db1cf587d3094473d42ced4852ee0569a7e38c09b97150234e4",
+          "bytes": 4952814
+        },
+        {
+          "path": "pictures/145045.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1HcMbBsfrP3zlE0vHJbhMKv80E9CoPkRC&export=download&confirm=t",
+          "sha256": "7d4b254c6aad43d7320deab30ea5887a3792f94dbf921ced2bb08fe15b4f2f36",
+          "bytes": 5131144
+        },
+        {
+          "path": "pictures/145046.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1HW8noUEQV-JadCU8Rrg9YJlhc-I-A96A&export=download&confirm=t",
+          "sha256": "cc998c25657bb43a6b101b29143d6cc486d5ba0bc29620b43b4cb79f78d5c173",
+          "bytes": 5145988
+        },
+        {
+          "path": "pictures/145047.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1HNTYixjANiay4RjH7r5blNtONUowiKTS&export=download&confirm=t",
+          "sha256": "faf47aa17a65e6a63f8dda1ca97c59c88e1468458588e95fdc7c3d940942eaad",
+          "bytes": 4970177
+        },
+        {
+          "path": "pictures/145048.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Hr_VCo9yonPyD2832mnAKAesOKCOXBFu&export=download&confirm=t",
+          "sha256": "d3e93e1dec3ddf7f3d77fcfe354a5064040b8764fb1c48a3a58527ae05a85101",
+          "bytes": 4861906
+        },
+        {
+          "path": "pictures/145049.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1HjQSdV4vL4KnWNOfuVsuRI3B5Ou13bpU&export=download&confirm=t",
+          "sha256": "f624d41bbb20870f8d03b9df2924cab61300c80fe5d6e220d2c8ec71026920e3",
+          "bytes": 5202224
+        },
+        {
+          "path": "pictures/145050.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1HeljOEqqswclFo6htpvKffSFYPog-QRG&export=download&confirm=t",
+          "sha256": "80a6bf0af3be0a93075b4d21784447425c64cad10b723306ec0b0c5b223e25e1",
+          "bytes": 4751007
+        },
+        {
+          "path": "pictures/145051.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1HyQmYtTV7dq94QxL_UYdRp9wxkS8LB7L&export=download&confirm=t",
+          "sha256": "56c7fdfe6d9b5b0431916029e3faca20e21eb44b0be5255d6f4096e43460db09",
+          "bytes": 4762184
+        },
+        {
+          "path": "pictures/145052.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1HwDmW3s8BgeEfYx_0SrEUM1rpSjCFgUF&export=download&confirm=t",
+          "sha256": "c9e1c73a31f243b7781e624bcec776596c63bc3ac1215e5ce9fadcb45df20c35",
+          "bytes": 4588230
+        },
+        {
+          "path": "pictures/145053.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1HsobSyugoDiDZWRVk1WOdn3bwvhdSxL0&export=download&confirm=t",
+          "sha256": "49874990d2ba765a977d23d65f9b6a0208556c5ebac7b4461b8984364673f01f",
+          "bytes": 4847710
+        },
+        {
+          "path": "pictures/145054.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1I75atmBLXqzpQwKwKoTfAkX-smgZSTxl&export=download&confirm=t",
+          "sha256": "05e254d4d4990150cd683125eddecb312c4c6d6d3a335f4bf8fb92a9a752a959",
+          "bytes": 4858126
+        },
+        {
+          "path": "pictures/145055.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1I3eq5rISth1KHZtpcePcUKfhhe8Z5Eza&export=download&confirm=t",
+          "sha256": "f783b23cf20e78d63a6977b0bc5c7bc3b2c23ff8eb68b72b980265ffb346a82d",
+          "bytes": 4925135
+        },
+        {
+          "path": "pictures/145056.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1I1uUUsp_bj8IpuESk8Hmwa1On4E_XgVU&export=download&confirm=t",
+          "sha256": "f179fc0c9cbedcaa819e82a849ecf614bbcff1bb2caddc1a301e22e63bea043d",
+          "bytes": 4784958
+        },
+        {
+          "path": "pictures/145057.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1IE8P7xqjuA-pV-XAVoYn-jBJ9d2pU27E&export=download&confirm=t",
+          "sha256": "fbf3e7aa8430225409da39f776c114b19b41351b33afaa96d9ec1da321b2f257",
+          "bytes": 4845395
+        },
+        {
+          "path": "pictures/145058.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1I9fD1Ik-fyxiJuUnFCjy-vdhv-MT4SdW&export=download&confirm=t",
+          "sha256": "e67b3e6e3adac50d8d922498076f1d516d7b76a6bd95823d08cbb90c1b933b11",
+          "bytes": 4574622
+        },
+        {
+          "path": "pictures/145059.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1I8sjH_tDeQwgGxU0DmzRUcJ3eEjJdoKN&export=download&confirm=t",
+          "sha256": "6cf16bb859e455763a765f08a9aebdf293f858eb2f14819aa7f6ce38b2006cd0",
+          "bytes": 4880145
+        },
+        {
+          "path": "pictures/145060.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1IOevdQhrEXNMHZfDRH-jm5x-O0v3hfjm&export=download&confirm=t",
+          "sha256": "438436141fab6d07fb27116e0e094ea4dc378d0471ca88b0608dc562fb6bf40a",
+          "bytes": 4506399
+        },
+        {
+          "path": "pictures/145061.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1IHl6EjEmyj2NBfFDaxdx5hT_CTCmr_lk&export=download&confirm=t",
+          "sha256": "dd3ec6c332d68474763287527c0b158a8df30d67e8f6dcb4a08b2fa41e3b10a3",
+          "bytes": 4854834
+        },
+        {
           "path": "pictures/145062.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1IFvpd8jpFy0RNfLAPhCA1QQ1N3te9a3q&export=download&confirm=t",
           "sha256": "c60f97abd0363df6dc771d36337e635f0ed8686e016021143f7b638d70f0ca36",
           "bytes": 4943762
         },
         {
+          "path": "pictures/145063.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1DP5TxFxbykNKRsVnu9uoOUyVV0y2v6AU&export=download&confirm=t",
+          "sha256": "d692636c0d73097c01b050ad330656968d9c5e50a73bf36173bf0223e4ed8721",
+          "bytes": 3875225
+        },
+        {
+          "path": "pictures/145063.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1DKz_4g9HP1mBGyGDkacyPjWFDQT-CvAD&export=download&confirm=t",
+          "sha256": "78428a2ffbc32a4bd442d3ffb3f550c7baf32611d4d4591507e9de5f04d35740",
+          "bytes": 3609866
+        },
+        {
+          "path": "pictures/145064.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1DkLTFqVokZfVRR674nRDhmXWTj_NtX-3&export=download&confirm=t",
+          "sha256": "a32ee64ccfe977c5ca48b7c92d74d7016295bcc1a50ad5786bcdaef619e795d2",
+          "bytes": 3744824
+        },
+        {
+          "path": "pictures/145064.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1DffgMCp2dH5_qhMGskGjto9KGyHd_Sa1&export=download&confirm=t",
+          "sha256": "9fd8651a1482b61f55c4148e8e5279535aea45cbd9df51dbc3423fb024ebbdc4",
+          "bytes": 3652639
+        },
+        {
+          "path": "pictures/145065.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1DdECQM2GPFcTTwRuIb7n7CSNN7Bo7rWF&export=download&confirm=t",
+          "sha256": "16479914983bcd534d56ee286e095be4b28f950fb2b217d552740b100bff6909",
+          "bytes": 3725826
+        },
+        {
+          "path": "pictures/145065.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1DWPhValEtc-n3RYP8iV1mei3X7H306YP&export=download&confirm=t",
+          "sha256": "ef35399638b70bfb12297b87c4af15ca6c5dbd194c8cddb3bb691d7d453bba45",
+          "bytes": 3465577
+        },
+        {
+          "path": "pictures/145066.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1JqF34yTCcRCZlbUqqFi-ARyhmpnig0-G&export=download&confirm=t",
+          "sha256": "21ce09c0f09a8ecff3ec223c1d1502e051e0e5063dc76bd3a1d85325a81f81b0",
+          "bytes": 3415732
+        },
+        {
+          "path": "pictures/145066.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC54-66-back-Campaign-The_Passing_of_the_Grey_Company-The_Lord_of_the_Rings_Part_13-A-The_Passing_of_the_Grey_Company.jpg",
+          "sha256": "13d903b7d9a844978d292c1851070791821ed1036b45dc2d852460879b32a419",
+          "bytes": 1002170
+        },
+        {
+          "path": "pictures/145067.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1JJs0V6KubHJWanZbTEaPuqsIvZ4VWRlH&export=download&confirm=t",
+          "sha256": "1434a35b20fe77b04f3bb10c1c431281628beb0f809679762dbf4d5aeebc053c",
+          "bytes": 4834620
+        },
+        {
           "path": "pictures/145068.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1JJ_WzhmB7-3oO2l99n3Jb0aiPv8vYkj8&export=download&confirm=t",
           "sha256": "5dbad1e49ad70b9a06093f9ab980c824c7b03ccba2494d076f2511c35badbea6",
           "bytes": 4834440
+        },
+        {
+          "path": "pictures/145069.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1JowZXVMQsccSw7crPG3uqJSe0XRQOMuY&export=download&confirm=t",
+          "sha256": "49447b27d448e8b04f05b4481eb93544f265f9756e896f867c85f62320dadff1",
+          "bytes": 3540717
+        },
+        {
+          "path": "pictures/145069.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1KPH_E9TZPqJMCnbn_jzimvoh0WOf4_RP&export=download&confirm=t",
+          "sha256": "da4b3829e663432e88b667ae7219da8fe4600239459927bba38f26c448fb30f0",
+          "bytes": 3500950
+        },
+        {
+          "path": "pictures/145070.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1KEO552dVFKmOx7LLYDbbYuDUtkHT9eH2&export=download&confirm=t",
+          "sha256": "e992fec51709bd4c5052439d0d85a503ec327e9f1e200029c48ba5569a580f5b",
+          "bytes": 3318132
+        },
+        {
+          "path": "pictures/145070.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC54-70-back-Campaign-The_Siege_of_Gondor-The_Lord_of_the_Rings_Part_14-A-The_Siege_of_Gondor.jpg",
+          "sha256": "266762859b33fe24994659f9c3aaa69ea13109968ee602ee4f72259957a0ead0",
+          "bytes": 935274
+        },
+        {
+          "path": "pictures/145071.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1JlbBWixIzpo6eBmC6dPrQDIf4Hj8kXKH&export=download&confirm=t",
+          "sha256": "18f74b93844c12f6cfb959bee500278f777956a636b37df2b77c93adea91c832",
+          "bytes": 4824946
+        },
+        {
+          "path": "pictures/145072.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1JyB6CAWMncKTWMMJj7XzzkuqTxIeB1k_&export=download&confirm=t",
+          "sha256": "b93a53a2badfb66e8ac68c4a0d193892dd401d58826fdb2d60b7e5812b6f24cd",
+          "bytes": 4848928
+        },
+        {
+          "path": "pictures/145073.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1KBRQT6e6WnyfMw5c8-wryZ9XDI7HX315&export=download&confirm=t",
+          "sha256": "08bdda1b12e97e50c537eb9c3978c288506fa588401d5ac90c7cca5e44241f7f",
+          "bytes": 3592916
+        },
+        {
+          "path": "pictures/145073.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1K4XecwKhUhSJfhbUTL5MrAdAwp19K5ua&export=download&confirm=t",
+          "sha256": "1809b748cdfac1e0e11723c299a3d3036aa6253e5ffd121cb8cb1b329f778104",
+          "bytes": 3434803
+        },
+        {
+          "path": "pictures/145074.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1KVwfv1d97xvBbzlE5pADe66NP_oVWFlH&export=download&confirm=t",
+          "sha256": "72accfd40292d2b38535ac66c46ab2e4d8399ae861edf67d309427fa73b50070",
+          "bytes": 3655671
+        },
+        {
+          "path": "pictures/145074.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1KTsvRowJhIdy2KHwBNPmTgQ9nsDOFQ_a&export=download&confirm=t",
+          "sha256": "c7182e2a991a5e9100f9b3c00fb5294f578f5a4a1edc6463d5c05bbb5e9b85f1",
+          "bytes": 3582470
+        },
+        {
+          "path": "pictures/145075.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1KTXUh1GzH9MQjSIIhbm8DER3RQ3JkMOF&export=download&confirm=t",
+          "sha256": "8962c0b30272abacf63359fa72539d0b7f39cbf2859797d5f76ee6ee10b84c7a",
+          "bytes": 3757014
+        },
+        {
+          "path": "pictures/145075.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1KPHr7GDPvXJd2r51r_yEAxjklXN6h23c&export=download&confirm=t",
+          "sha256": "23bff43d089e03e3e03fa83e1de6d40acbf70e412a5706d40363e5b45e389ae4",
+          "bytes": 3572543
+        },
+        {
+          "path": "pictures/145076.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1KfI_Zwz3Iic-rBKV_Ga0dSM84L5g_uib&export=download&confirm=t",
+          "sha256": "6d493b1f4b0f2b9d47b3f84cd6287d6d7872ec2e41b13f619d69157a4a712dcd",
+          "bytes": 3461121
+        },
+        {
+          "path": "pictures/145076.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1KbsUURHimr4EiXj_0-xJQBt4thcBhsBx&export=download&confirm=t",
+          "sha256": "5c38f624fdb1232ff4fb5a74e17dbc13aa828c1c2a0931d9c06ca6e5e8b01085",
+          "bytes": 3400198
+        },
+        {
+          "path": "pictures/145077.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1K_cNhAd0gxC5SFBYxf6aIdGMJY-RfpYR&export=download&confirm=t",
+          "sha256": "9029fccfe38651119b249f74a62ff76b0e58cbc5b0039508e4713247b80393a2",
+          "bytes": 3584782
+        },
+        {
+          "path": "pictures/145077.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1KY0i-959CKUh8YIRvBqKHBNhkYstZuIp&export=download&confirm=t",
+          "sha256": "9f05cab66328c08328e4c90fadc2852485698ec3da680b96cbd316181e5c5ae7",
+          "bytes": 3455031
+        },
+        {
+          "path": "pictures/145078.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1LRVh0S0WlJRLUxmNCv3fcvCNwX7cLXvM&export=download&confirm=t",
+          "sha256": "44f0e0d1f136ac00d4e1ca03bced1f9a31b8d3caf10998eeebe38e7a8f23c2cc",
+          "bytes": 3290255
+        },
+        {
+          "path": "pictures/145078.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC54-78-back-Campaign-The_Battle_of_the_Pelennor_Fields-The_Lord_of_the_Rings_Part_15-A-The_Battle_of_the_Pelennor_Fields.jpg",
+          "sha256": "4bf69fc8979e48b2772989af4ee3f4493f597f82d33d5373936d53ba12cedb87",
+          "bytes": 831845
+        },
+        {
+          "path": "pictures/145079.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1IT5d80a5ljRg6EY6eKuB04Zgd42jODAL&export=download&confirm=t",
+          "sha256": "5075d326eb8577a2d868f47b55a2f26fc1c5840e691c3ae1c1d7cc2d017063e3",
+          "bytes": 5012436
+        },
+        {
+          "path": "pictures/145080.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1IQdydLzRQ8gfRiNnM2s2kJl2PWuP1uFF&export=download&confirm=t",
+          "sha256": "f378e0228cff0b3b13ef0937dba34e8508c33065ba7809e1895a28cc7a15d925",
+          "bytes": 4837260
         },
         {
           "path": "pictures/146001.A.jpg",
@@ -13524,10 +14004,496 @@
           "bytes": 4781080
         },
         {
+          "path": "pictures/146014.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1VEDhMO1rreA5wqQ_I6o0VqJLwUdnomfP&export=download&confirm=t",
+          "sha256": "e9ca493ccd75e431f376bf2bd34ca311421633b6d840b357e46205161b6ddbea",
+          "bytes": 4816015
+        },
+        {
+          "path": "pictures/146015.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1VaMFA0qMh-FQ-ykL06QagQ20r-BlKPA1&export=download&confirm=t",
+          "sha256": "3b536df7482165a0cd01d009a8abe70513d5916e6863cf8a4b8819e8758a171d",
+          "bytes": 5074965
+        },
+        {
+          "path": "pictures/146016.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1VXGU612cOxWUEU0Mh5UHIwLJxglLhhyt&export=download&confirm=t",
+          "sha256": "b7cb8d13572eedc5a8e877eb0d74854f11e194f545ba207681ab3eddd43bef7e",
+          "bytes": 5274131
+        },
+        {
+          "path": "pictures/146017.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1VOxoLMMNZ-xW8dPYanYBdJPVF1p_P6cy&export=download&confirm=t",
+          "sha256": "01c16f59f6a806e7f2ff19878f37dae5c7e51d1f496b5c0b5e1541092054e566",
+          "bytes": 5193975
+        },
+        {
+          "path": "pictures/146018.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Vex0wembOK-Brg-ui8G72KrYdxWwzSq6&export=download&confirm=t",
+          "sha256": "e1acf0dff04d8f38513c32939b561530032582c51d7ad89ce8287ab1bfda15f2",
+          "bytes": 5157096
+        },
+        {
+          "path": "pictures/146019.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1VdR5BvrZSvXdxD70HULMrtfMdh29aFNt&export=download&confirm=t",
+          "sha256": "6fed34440d4ca7ac28857c5bc7f67765b17163544a734c785154a6e5d6a2647a",
+          "bytes": 5183434
+        },
+        {
+          "path": "pictures/146020.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1VdEOA4O0FH35ZAQ5rLscTpBexVxixLu-&export=download&confirm=t",
+          "sha256": "85bad3c22e1ccd1cbc7424fdb7b2c6973feb73f5a87bcec1787749134bafe47d",
+          "bytes": 5133809
+        },
+        {
+          "path": "pictures/146021.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Vo8-33eOlbgw8XCuJ6CIAhNe23Sp1UfX&export=download&confirm=t",
+          "sha256": "f647c733135f5003ca0d3b7fa89bd4aaf09e638045b4fe5695c9f7fad8650c27",
+          "bytes": 4839976
+        },
+        {
+          "path": "pictures/146022.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1VmnAHZ8zJMePvnclXmrh6eWOyustWtp8&export=download&confirm=t",
+          "sha256": "3d2df85d4f9b96c00a6edee00e938e53f7134a7a683209b11ef9f9fc1d08cd81",
+          "bytes": 4819948
+        },
+        {
+          "path": "pictures/146023.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1VhZL3IkV6C4k6PzTCbUEVFPRTPEfGvnk&export=download&confirm=t",
+          "sha256": "6e61d9141f334586f9d8476099411fb09b67a37c12e230fc90d24aae4db106aa",
+          "bytes": 4780137
+        },
+        {
+          "path": "pictures/146024.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1ULWJMnA2vsef2GLmSG88RYdlJUJKGwWb&export=download&confirm=t",
+          "sha256": "17ff9240da884bfb1d45fd6581d5dd9aaa6f085efb4d875c163edc592d02b945",
+          "bytes": 5162140
+        },
+        {
+          "path": "pictures/146025.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1UDZ8g3SH7IzruprSqt-UVaGxdx5aPN8U&export=download&confirm=t",
+          "sha256": "5b13e9adb2f80d7e7fef36a75d49cb1ec6bf6b1faaec8c8cedf1bb21fefe42d6",
+          "bytes": 5186663
+        },
+        {
+          "path": "pictures/146026.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1UTaEYX-Jvm0pqV4ggxT67ZJwSCQML7Nw&export=download&confirm=t",
+          "sha256": "c21c457a58f657fc68ce4867ad78abf67b6473d50606a4690b5d3a99098b08cf",
+          "bytes": 5234102
+        },
+        {
+          "path": "pictures/146027.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1UQeg7OiEDOTHSyabNZCNUoU0QIE7gf57&export=download&confirm=t",
+          "sha256": "360261b61483838d6b1ae47663458f713eae5fc0d451808c1a5c3912aec059ff",
+          "bytes": 5128388
+        },
+        {
+          "path": "pictures/146028.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Upgl39Dc4mbQc4ncZvice7ubLwnJRMIU&export=download&confirm=t",
+          "sha256": "61d419a191a85ac27b13613a92bd970b8252e05f4fc12c08febf13e581a94d1d",
+          "bytes": 5181512
+        },
+        {
+          "path": "pictures/146029.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Up9f6kCpugZIaakWT86Lvq6H7XUZIuoz&export=download&confirm=t",
+          "sha256": "004618463d2caea7dabbad14aafcd16c121a5003a21223238b76f7c14cd2f8a3",
+          "bytes": 5415803
+        },
+        {
+          "path": "pictures/146030.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1U_QecGwO8RF00kJL-Yc9EJYamW8RE-PP&export=download&confirm=t",
+          "sha256": "f92334c896401731c544f21e4694c1f74b2191e85aa279fe5b2a4e33936afa28",
+          "bytes": 5138060
+        },
+        {
+          "path": "pictures/146031.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1V0RbdlTSQvlUObZFw6dDmca4C0490m5X&export=download&confirm=t",
+          "sha256": "db586f88436649410dcf2b392079e79acfc851c9a28f4ab5dfd31f5216705e89",
+          "bytes": 4866334
+        },
+        {
+          "path": "pictures/146032.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1UvnEP9WbQcpZIyu0dyAtQCnFIq9LOK-P&export=download&confirm=t",
+          "sha256": "6d3901874649ee125ef4fd040fddd29d42d52502d3c15e570ac32a0ee258f01f",
+          "bytes": 5118486
+        },
+        {
+          "path": "pictures/146033.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1UtFXW32CcQXLRckwUt4v3aHAK9RRgRJa&export=download&confirm=t",
+          "sha256": "7b9d7a5e48d8dc7463fec49a9cf5cb743fb164af0c86d3d3a4af622c5bac44cb",
+          "bytes": 4917534
+        },
+        {
+          "path": "pictures/146034.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1V55NvXjsSNUVxB7IaAKEKhn21VqtIYki&export=download&confirm=t",
+          "sha256": "c66c55b94dcb2e004ad71c42ec7a7c465de5bb6341e8dec20285e273219dc669",
+          "bytes": 4858613
+        },
+        {
+          "path": "pictures/146035.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1V41fXQWqkbIdymyWvbOg4H6vCqCYft-g&export=download&confirm=t",
+          "sha256": "290bab0c8b296aa1214e7a289bff24392a2381326fb920a8e7860f56660fb821",
+          "bytes": 4947681
+        },
+        {
+          "path": "pictures/146036.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1V31wgFMgYk9Wn-98p44zMjMBJgyCkATe&export=download&confirm=t",
+          "sha256": "ffffd703b734f659b454dbf47b1f1d012d955e7ec2adec431fcac1d06e114ef7",
+          "bytes": 4866198
+        },
+        {
+          "path": "pictures/146037.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1VCsexT82ZpYdFxAJF-pUn9L_O3n_iDpJ&export=download&confirm=t",
+          "sha256": "729187a9c6cd1d42ff302b4cbe7dd834786cf812d29d6ff5e68a08d97eaa7441",
+          "bytes": 4702222
+        },
+        {
+          "path": "pictures/146038.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1VCWzpIpi8FLcCFVe0zzy6sfpB3TfHauX&export=download&confirm=t",
+          "sha256": "d24c04180663e2ed07fcb3d01824bf725ffc4c3e5d640cd0b8a3c9dc7f5b77df",
+          "bytes": 5041310
+        },
+        {
+          "path": "pictures/146039.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1V5n_JDifJonT4gIdYuJ80zi9uq7UemPT&export=download&confirm=t",
+          "sha256": "37c3e1e6ff2f1cf127f8dbdc21949402655061030fe9a77ffce70bc9ca617037",
+          "bytes": 4912926
+        },
+        {
+          "path": "pictures/146040.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1VLLzikKPrr3H0K_17UOuZbDYhNLcV615&export=download&confirm=t",
+          "sha256": "304e887732dd5969fbedc9d9a12ceeaf14f421b006d7d952bb96d21f7c417879",
+          "bytes": 5159677
+        },
+        {
           "path": "pictures/146041.A.jpg",
           "url": "https://drive.usercontent.google.com/download?id=1VIxIVa89_QxT5f-WbRWkruO6uAQ_ix1p&export=download&confirm=t",
           "sha256": "b60cb712951131a8c574056ed15fd749aaea895d22b67e17279721c1078f5cad",
           "bytes": 4657764
+        },
+        {
+          "path": "pictures/146042.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1TZeLLQ8Rx4zbW5bYQigAHK2hXdBvsH8Y&export=download&confirm=t",
+          "sha256": "c254a376136d7cc3ede7c886bffb576f5335585d33ab1574e6e661c53d242fa4",
+          "bytes": 4914608
+        },
+        {
+          "path": "pictures/146043.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1TV6YPq1-cNd806g3KnHe4zOxobhuLpLK&export=download&confirm=t",
+          "sha256": "c119e6b06e496def8aa7831c9414e343f1fe735d3c6eec8fcddd17726c166201",
+          "bytes": 5004249
+        },
+        {
+          "path": "pictures/146044.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1TUrQg_X_1iIMKx70EnAUtVtZAIVlEfZC&export=download&confirm=t",
+          "sha256": "1f41218379dd136b9b9641ca952c464542d920efb57776d86ccfd98938703e13",
+          "bytes": 5299057
+        },
+        {
+          "path": "pictures/146045.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1TjkgN9eYQj3xmoaMCgOg09Wc8Dbias9O&export=download&confirm=t",
+          "sha256": "6a193b0816d4317194c98b1237d2fdc75176b4bd7b925e6412b22226d0d345bb",
+          "bytes": 5148366
+        },
+        {
+          "path": "pictures/146046.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1TfjIOyo9_HIssshnmXd6aT_jQgwPL3sJ&export=download&confirm=t",
+          "sha256": "3bba345add4839c9a88044e1ea81fba751578b28f895143e40fc437a0cdc31a2",
+          "bytes": 5077744
+        },
+        {
+          "path": "pictures/146047.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1TbWDWLT_L45M7WOM8bzu-w8cYQTFE0-m&export=download&confirm=t",
+          "sha256": "69abca4cbbb87ef05d5d97d2f8e5b1e0b0b2bcb223cbcbe9ef8914e42e42c540",
+          "bytes": 5293447
+        },
+        {
+          "path": "pictures/146048.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1TsIljxf1_rpd3R7q1cv_FNbLS2uXIiC6&export=download&confirm=t",
+          "sha256": "45564daba31becadc7795b55ed0e52ed234b0edfe6bd510a4e4f055e3da3eafc",
+          "bytes": 5260984
+        },
+        {
+          "path": "pictures/146049.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1ToSeNtBsuIgFd5fBgL0ystGeow0sWRih&export=download&confirm=t",
+          "sha256": "732074649a236d38b1ccfa96b04a88b72468f7c28b07fce875fcb4ac665fee66",
+          "bytes": 5051329
+        },
+        {
+          "path": "pictures/146050.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1TnejS31kp8tl5qwx7opB5qIz86da19_2&export=download&confirm=t",
+          "sha256": "315f12c709279a1414d88ad4050db9c9c192fb63cb006001f6504109266f0f9b",
+          "bytes": 4805998
+        },
+        {
+          "path": "pictures/146051.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1TxQlVyOe9J_lCiylYGzijeFA_qy-uQKs&export=download&confirm=t",
+          "sha256": "bd131743437fe9995b4073e1b1c81e9375a760af04e1e02bb8c4084001876bc5",
+          "bytes": 4960901
+        },
+        {
+          "path": "pictures/146052.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Twe2z-pkhxBw1y50X_yi8Hv1oxjNQFT2&export=download&confirm=t",
+          "sha256": "627599af0cf26e119e3b76e2f3327872ecba533d535a89406e032fe75caebc3e",
+          "bytes": 4877383
+        },
+        {
+          "path": "pictures/146053.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1TtWqmK4b-lkEaEU1v83yBtul5ds7VFe2&export=download&confirm=t",
+          "sha256": "0a926fa51a2529cebf1122df3696d90f52a7a6d06531e35e285e38cc4ef0d87d",
+          "bytes": 4700245
+        },
+        {
+          "path": "pictures/146054.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1UAbsWskY0cx4dzh7TGOeG_f9ZCzZVUA_&export=download&confirm=t",
+          "sha256": "76d40488088b0ad07b8b6c29d4784a16812156f5c1d6e7065906f941b4ee514f",
+          "bytes": 4771395
+        },
+        {
+          "path": "pictures/146055.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1U4l_HBdcQcZrzXHm6hPQtxXsn7JZAC1l&export=download&confirm=t",
+          "sha256": "c1518e2ebae14c2ea607909aeddf769b0b67ff8aeb4104b4ade7a9a886cd29a6",
+          "bytes": 4682015
+        },
+        {
+          "path": "pictures/146056.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1TzqSmMwNbbVUmqDYEhlFdAJTCssDu62c&export=download&confirm=t",
+          "sha256": "3cbd6e53064c56fb8e392a60d67130b62eb4cc61a4f1769fddff9bd8bc11e358",
+          "bytes": 4753961
+        },
+        {
+          "path": "pictures/146057.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1UDYp3XLGQsmXZtEzPFQpVDWBnWP8LYsF&export=download&confirm=t",
+          "sha256": "6231989ffbdd68b424d80694d33e40d4d0b0f6382ee0efda332593b32b869eaf",
+          "bytes": 4788677
+        },
+        {
+          "path": "pictures/146058.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1UBP20BwMc5pNXaBIC9-8QArKfR-lofDY&export=download&confirm=t",
+          "sha256": "ad2d70bcd4461901b1690665eea7eac57ff1bb9ef679e61866c013883cb64c56",
+          "bytes": 4846018
+        },
+        {
+          "path": "pictures/146059.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1UB3XVsjNulNyWPnYrjtAQsBoQI-AaEa_&export=download&confirm=t",
+          "sha256": "d5066296eefc078c97c22996ee56fbd821b9b5aedab31f0aca621b0024f83994",
+          "bytes": 4907962
+        },
+        {
+          "path": "pictures/146060.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1UMzFOoi7hxW2MGnlIs1f0N__cAEkun0C&export=download&confirm=t",
+          "sha256": "1151ef65efd67b398343a1ec4db7e69eb660bb73451cf0f97f72fbc7ac7383dd",
+          "bytes": 4875953
+        },
+        {
+          "path": "pictures/146061.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1SxoCODx4K_NBQicjoZmvWYD7Rtx-n5zH&export=download&confirm=t",
+          "sha256": "883768e17fa10afcf5c544cb1b5afa0fd274907a8331a5433ebc260c62ba15b6",
+          "bytes": 5082333
+        },
+        {
+          "path": "pictures/146062.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1SwdZS81o7wFyTqjH5FUssj1EujGjG9op&export=download&confirm=t",
+          "sha256": "9e4a9bc4e016f8a9aa66fc6194fd9d475e097a228219982d6ad3822014a840ba",
+          "bytes": 4716222
+        },
+        {
+          "path": "pictures/146063.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1StubpHfJovj9W1Rj9VzluMFOiv9DIw1W&export=download&confirm=t",
+          "sha256": "7ba23575c97c9abed5b0210585e5335938eb9fcd2c0654ffb67f23e6c4e731d0",
+          "bytes": 4908960
+        },
+        {
+          "path": "pictures/146064.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1THGj7qxhfcOewrS36VFTXHLrQzKIj8WV&export=download&confirm=t",
+          "sha256": "a7324082d2922dca1e937c4e52c742650a4e86d081dfdd5afc5c4831db062fc4",
+          "bytes": 4719046
+        },
+        {
+          "path": "pictures/146065.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1MYc-arZehgfSTUip-5sdILXpVW9V_ppn&export=download&confirm=t",
+          "sha256": "8c291ebe63acb91ecfba23d7f7930a34c9c600297b2935a36ad6cf6fd7088aad",
+          "bytes": 4331102
+        },
+        {
+          "path": "pictures/146066.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1MPtM5NvFTlfk37qBqFDxU77uvlECm24J&export=download&confirm=t",
+          "sha256": "75e52621d5263b48bc66c315fc6edd74fbc99fd52cf74e01e3a258704505b375",
+          "bytes": 3794006
+        },
+        {
+          "path": "pictures/146066.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1ML5Mo5KTAFcphbBrX7V8fFwGMHtS-hWB&export=download&confirm=t",
+          "sha256": "3f0b450fce031af1a248840ae1e6d9bc2e4b380647cb3bd896123706a8466a90",
+          "bytes": 3831374
+        },
+        {
+          "path": "pictures/146067.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1MqiOGagpx1DSATxWDXGkS01xtK3sEguW&export=download&confirm=t",
+          "sha256": "77e723c5dcb3e6239be948935bb8146992aa7797c368bb0ce7d82f49d690743d",
+          "bytes": 3717767
+        },
+        {
+          "path": "pictures/146067.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Mpa7CjcN_ZtXkhF4RaP87sU8EbpAVRte&export=download&confirm=t",
+          "sha256": "cc9ed3ed795630e24391cfea48c984f6e4fd944d30b62b7574dc21774fe035cd",
+          "bytes": 3744816
+        },
+        {
+          "path": "pictures/146068.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1MmiwpxcAuIFby31m3HHuY1x30uK2S6aX&export=download&confirm=t",
+          "sha256": "077a3e681751cc7bde1e4c2aab84037e2cba6abeaa75222d2b159046c3e7157e",
+          "bytes": 3779288
+        },
+        {
+          "path": "pictures/146068.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1MmhewwSNlAbZonB4sNSQkoKrik91Qza8&export=download&confirm=t",
+          "sha256": "8e137b2779124dbcf4ca0636f3a6517e3c42ff55f36297a40d0fc1b9d9c7eb6a",
+          "bytes": 3762734
+        },
+        {
+          "path": "pictures/146069.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1N9HRYkRpmuZbQ2agZuaqFv0fmBBWUJAR&export=download&confirm=t",
+          "sha256": "9e5d012ca0edd5032fa04f56a1f334be80a91cce1f835734c3e1d691b13b1aea",
+          "bytes": 3310577
+        },
+        {
+          "path": "pictures/146069.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC62-69-back-Campaign-The_Tower_of_Cirith_Ungol-The_Lord_of_the_Rings_Part_16-A-The_Tower_of_Cirith_Ungol.jpg",
+          "sha256": "786056fd6921903eb03d6964598d027a16a72d5fcff5c57f0d9f1936c094dbe1",
+          "bytes": 1014827
+        },
+        {
+          "path": "pictures/146070.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1W2dIvi6G5I3czEAf6sB0Vn_aXxr6tHLW&export=download&confirm=t",
+          "sha256": "c6cba73c7703ef088ff19a5109ac95cc83ef035e0187f1c396137e36fc4a7925",
+          "bytes": 5137824
+        },
+        {
+          "path": "pictures/146071.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1W2cACfALx_w2pFEnA293XLJc_nRJ--_u&export=download&confirm=t",
+          "sha256": "fde789672f75b44ea6d96ac46ea0ebb79e634d4134153f2c9e38c1af128d14f5",
+          "bytes": 4980963
+        },
+        {
+          "path": "pictures/146072.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1N8N0jtH1swZeUPoLH2Zy_C7ClaoOR8lp&export=download&confirm=t",
+          "sha256": "e192d3e29dc39495a865ad372f8431682b718b2f4cc6fda660876954f1a4b69a",
+          "bytes": 3933862
+        },
+        {
+          "path": "pictures/146072.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1MwnDO0XuYl9cEMR0vqa0xliMTMcAscwr&export=download&confirm=t",
+          "sha256": "1e779b191e41ccb49d9c90156489f14afd0c333038347f63608689eb0d130dd2",
+          "bytes": 3687226
+        },
+        {
+          "path": "pictures/146073.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Mw4sMp0M9mO8XVO0YHSF5K6JPWkTPtvw&export=download&confirm=t",
+          "sha256": "52b442a2905a211ce25cafc2fa8c472409ef9cce27db79bcc98056d7a9529c0e",
+          "bytes": 3972298
+        },
+        {
+          "path": "pictures/146073.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1NUO-RGygHY97hAkK3bf92kot76O_SAjB&export=download&confirm=t",
+          "sha256": "34cb77dd6aa9311bf8bde1031dbf4ebe9ce56000d05c3b7ce45f6bdc730d76d6",
+          "bytes": 3726797
+        },
+        {
+          "path": "pictures/146074.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1NK46K0PJ4W4Cglj2uzYftswqJrA55RFi&export=download&confirm=t",
+          "sha256": "8341e04e2c8f90daf7ed586d8198eb3e8b2af8587f72040651b29ddc21f1d0bb",
+          "bytes": 4562550
+        },
+        {
+          "path": "pictures/146074.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC62-74-back-Campaign-The_Black_Gate_Opens-The_Lord_of_the_Rings_Part_17-A-The_Black_Gate_Opens.jpg",
+          "sha256": "f8cc71e13d3eea65c2118cc7a593c513ed81bda7a4f8dead7f06929e4d4a44eb",
+          "bytes": 1002206
+        },
+        {
+          "path": "pictures/146075.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1NIbx4Ffvne_rlB5Ft7Pbw0__w0CwnfrJ&export=download&confirm=t",
+          "sha256": "11f534861ca2a2a7b666b8ea74ecd6d588988dfe25ddbe133cf0be4eab7092a1",
+          "bytes": 3812960
+        },
+        {
+          "path": "pictures/146075.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Nf76Gs111XGsGk0P9gRuJDpzgBLjlqJ-&export=download&confirm=t",
+          "sha256": "008bca75d79c56ce737bc2b1ffb5952c3285c4cc304566d158d1ad8bd1ad8dbe",
+          "bytes": 3610680
+        },
+        {
+          "path": "pictures/146076.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1NbTW4Lps19HrZYlrCanZE9Ri2i-J1wt1&export=download&confirm=t",
+          "sha256": "739638bf26d1142bab42749fcaadad0d16527aa5a91d192c3623d141946dc5fe",
+          "bytes": 3982225
+        },
+        {
+          "path": "pictures/146076.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1N_lKh-8FevhS4ySlWfuVnzKWUCT_LyBV&export=download&confirm=t",
+          "sha256": "445ec4ae3f5ac93287fc9d2a75f0f5cdebfc931fc64bfc43172ce4865e5386ef",
+          "bytes": 3662508
+        },
+        {
+          "path": "pictures/146077.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1NVYZEMfnmCSIJacACcwqCoEBJ0IM6CzX&export=download&confirm=t",
+          "sha256": "63660531df0dcf202c0eb22b5faef9c6fa8f478b2cc2c8ebc5d2fa9fa31d2f10",
+          "bytes": 3808852
+        },
+        {
+          "path": "pictures/146077.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Nuz0vGn8Gs-F3RET41m2U_sjR2G7X4UJ&export=download&confirm=t",
+          "sha256": "bc00669c798f44f398e3864f96a0d1d318242a7586860847d0b1e1c7dab5f4f1",
+          "bytes": 3539205
+        },
+        {
+          "path": "pictures/146078.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1NoLZpmy6UdK2mf_RnHT9RF3WK3JPPQ6F&export=download&confirm=t",
+          "sha256": "14440ff707d183c7818ca3b526e2f17f847f35e29782b5f0a4c20c7efc1d9788",
+          "bytes": 3804119
+        },
+        {
+          "path": "pictures/146078.B.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1Ngk8gP8aWglCm0-6lssSqhgsgJWJFWiu&export=download&confirm=t",
+          "sha256": "d3072d80b7b92a1b815ea4655d1b549534940aff35b9ea72c2e061c351e257de",
+          "bytes": 3530987
+        },
+        {
+          "path": "pictures/146079.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1NfveqDlF8fvuUAkcG7QshsX-PajqJaL3&export=download&confirm=t",
+          "sha256": "99cea27fecc117bf1aa6a0e242a037040aa7d62132781e04c03afedf29c3db74",
+          "bytes": 3193162
+        },
+        {
+          "path": "pictures/146079.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC62-79-back-Campaign-Mount_Doom-The_Lord_of_the_Rings_Part_18-A-Mount_Doom.jpg",
+          "sha256": "8cee47a90b535e26a0539e10ae4cbbcd58686cf1f3c3af5237d47b02802a6ab1",
+          "bytes": 1013354
+        },
+        {
+          "path": "pictures/146080.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1OGcyZ0EPGEvuWDrLwko1XWu6jcDJslnB&export=download&confirm=t",
+          "sha256": "6226daa48ffb3e7397da3a70a74d04c3acc3430f6ed7947e5c25d4d99af2c0fa",
+          "bytes": 3347599
+        },
+        {
+          "path": "pictures/146080.B.jpg",
+          "url": "https://images.cardgame.tools/lotr/MEC62-80-back-Campaign-Epic_Multiplayer_Mode-The_Black_Gate_Opens_and_Mount_Doom-A-Mountain_of_Fire_Epic_Multiplayer.jpg",
+          "sha256": "47712d093673e3ca66f7af230e417d272250d8c6822323e9ac684be5a017d5b6",
+          "bytes": 1020292
+        },
+        {
+          "path": "pictures/146081.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1TDkgP058_b0mCMOnJBbPQxvO1YAS-I4Z&export=download&confirm=t",
+          "sha256": "b317d43639f0e1f8309d0e3f64c7ab31976eb1580029673d8825d4c5eb6efb30",
+          "bytes": 4910425
+        },
+        {
+          "path": "pictures/146082.A.jpg",
+          "url": "https://drive.usercontent.google.com/download?id=1T4Ybx3XfjsLUZCVl7aHQsirWNG4cG8Fg&export=download&confirm=t",
+          "sha256": "4006deaa99de70f0289f13c1cd7b3341baa4f9c723a8039b38a94601e122d946",
+          "bytes": 4942097
         },
         {
           "path": "pictures/147024.A.jpg",
@@ -17860,9 +18826,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "3d8b74c1f76563cb682224c9fb623721c8d91bc3fd2b8321ed1f5fdc59cfac2e"
+        "value": "dff821e34ca2ce5c20393feec1ceec5c295f0b3170a5966b0f61a0046ffdb918"
       },
-      "fetchedAt": "2026-11-07T19:45:45.308Z",
+      "fetchedAt": "2026-11-11T17:36:17.150Z",
       "files": [
         {
           "path": "scans/01001.A.jpg",
@@ -21495,6 +22461,12 @@
           "bytes": 150072
         },
         {
+          "path": "scans/142005.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Elrond.jpg",
+          "sha256": "281af676450fb6e95469560529e9c43eaf4bc2ffeca6ae82cc9509bf3f14b76f",
+          "bytes": 146363
+        },
+        {
           "path": "scans/142006.A.jpg",
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Bilbo-Baggins.jpg",
           "sha256": "cf23218e3e197aa3e4e8a0a8af6983f93ac991f48f3cf072121e28952ca29448",
@@ -22149,6 +23121,12 @@
           "bytes": 151531
         },
         {
+          "path": "scans/143008.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Arod.jpg",
+          "sha256": "0e75918602b346f61ff49af95708c7e3cd0e33bb55285cff72540b6c7460cc24",
+          "bytes": 152449
+        },
+        {
           "path": "scans/143009.A.jpg",
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Ent-Draught.jpg",
           "sha256": "76e8801db037ce43c924cd3e6e740b0a7154a0d343fe48efe019bd277ad114cb",
@@ -22159,6 +23137,12 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Herugrim.jpg",
           "sha256": "ce7c60fbb099573b7ff3b697b5b259b4e1249bb88d7e4d3339e2dc5654bf04c5",
           "bytes": 145719
+        },
+        {
+          "path": "scans/143014.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Shadowfax.jpg",
+          "sha256": "17bbc4f214ee85a90b6f91eafbb45f05932a0ce6b8321277663e3e0a59cd389c",
+          "bytes": 142573
         },
         {
           "path": "scans/143015.A.jpg",
@@ -23113,6 +24097,1056 @@
           "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Sméagol.jpg",
           "sha256": "01f4b6e18528f298d31176fc479b570bf5005b1385d556d31faf8d2d8faa2d74",
           "bytes": 139544
+        },
+        {
+          "path": "scans/145001.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Aragorn-TFotW.jpg",
+          "sha256": "1ddf2555aca88eda41590146ebde62160a0b1516c33e7a121656c13d237e0761",
+          "bytes": 1290424
+        },
+        {
+          "path": "scans/145002.A.png",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Éowyn.jpg",
+          "sha256": "bf380232b052387799dc429b8d947e4475f3d1019729b8633538e4b1985b4a4f",
+          "bytes": 278576
+        },
+        {
+          "path": "scans/145003.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Beregond.jpg",
+          "sha256": "8e20bc65690dbe24a802f76dfccd6fc16b14214fa0e8930b5debe103906652c9",
+          "bytes": 1183503
+        },
+        {
+          "path": "scans/145005.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Prince-Imrahil.jpg",
+          "sha256": "036fae907867e39e411076c566da6f28db108a006c4cb73d983f5b9acf5b7760",
+          "bytes": 1157134
+        },
+        {
+          "path": "scans/145006.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Halbarad.jpg",
+          "sha256": "fd63b509f27f66d40d4e6480435e0d14f08fbdbfb7c5ec77d886ef0916e66a75",
+          "bytes": 1134079
+        },
+        {
+          "path": "scans/145007.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Ghân-buri-Ghân.jpg",
+          "sha256": "7ba649a700d9fa6af90efc6480853e2093bae891d0756075487163839ac2029e",
+          "bytes": 1203851
+        },
+        {
+          "path": "scans/145009.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Desperate-Defense.jpg",
+          "sha256": "8b935f14080986244db6d0b4e5d03eacd0fe151398f265c165a92c3897d68fea",
+          "bytes": 1163619
+        },
+        {
+          "path": "scans/145010.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Golden-Shield.jpg",
+          "sha256": "d8dfaaedf39b22647dfddb5624000a6f7661f63c7c9a3f9c24850a9a47b4f942",
+          "bytes": 1249460
+        },
+        {
+          "path": "scans/145013.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Banner-of-Elendil.jpg",
+          "sha256": "3851669240fff3de15d34119eb817c0444abc13567d6b4606ea56d54112c1ca0",
+          "bytes": 1242585
+        },
+        {
+          "path": "scans/145014.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Esquire-of-Rohan.jpg",
+          "sha256": "fec8b75a70e6e7397f5b1f97f8037bf4558039b402e0c923e7b09359ecd84177",
+          "bytes": 1193569
+        },
+        {
+          "path": "scans/145015.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Esquire-of-Gondor.jpg",
+          "sha256": "aae7d747fe96c77714a91391f643ba8a7f4def99ca26a3506bf1d2a5b34befda",
+          "bytes": 1185422
+        },
+        {
+          "path": "scans/145016.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Overcome-by-Fear.jpg",
+          "sha256": "65e9c6dc6b33cd10b6e132d26079cfcc0fb1e2e7d6e132c8b376b8a598d94f94",
+          "bytes": 1255287
+        },
+        {
+          "path": "scans/145017.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Stone-of-Erech.jpg",
+          "sha256": "2f7a4a177fb5d192033312da4d856af70c140c1b035869a5f4f699680b8a79fb",
+          "bytes": 1211096
+        },
+        {
+          "path": "scans/145018.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Dark-Door.jpg",
+          "sha256": "86a7386918c6b0e054b240957618087eb4b01d4399ffd15093ff2a8983810e68",
+          "bytes": 1212503
+        },
+        {
+          "path": "scans/145019.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Trysting-Place.jpg",
+          "sha256": "79ef1ea0d7c8b1ea8f320686b13419da7985a678bebdfe9a55b69003ad4bfcbb",
+          "bytes": 1203757
+        },
+        {
+          "path": "scans/145020.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Deadly-Road.jpg",
+          "sha256": "fbdaa751dbade02f9224072c9209f4931d189003151ef9f17f905c87f565048b",
+          "bytes": 1209266
+        },
+        {
+          "path": "scans/145021.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Haunted-Path.jpg",
+          "sha256": "6783142840251225b4046844665af95e549f83da4b07f5b1912e48f937f86a74",
+          "bytes": 1155428
+        },
+        {
+          "path": "scans/145022.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Dead-Man-of-Dunharrow.jpg",
+          "sha256": "a23ead05d481bd7d27152312136fc4022214b0586de6f11bd17b6b1e04f831f7",
+          "bytes": 1167974
+        },
+        {
+          "path": "scans/145023.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Faithless-Dead.jpg",
+          "sha256": "ced26a04ea81af3c966942d212377c73ac24b77a701812b1732dbcae774b42b0",
+          "bytes": 1224174
+        },
+        {
+          "path": "scans/145024.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Ghosts-of-Men.jpg",
+          "sha256": "98f54bd7d29a418706ab63d7cacf3015611794c1055f9e7f3940672c33e20589",
+          "bytes": 1082567
+        },
+        {
+          "path": "scans/145025.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Shadow-Host.jpg",
+          "sha256": "426fa5724ab128992f88baaeac52e6e53cb3c6350a5f806b3657e4724617f4fa",
+          "bytes": 1176259
+        },
+        {
+          "path": "scans/145026.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Blood-Runs-Chill.jpg",
+          "sha256": "603fb559c4bbf87c0c71cadd264bfe35a7f6680c50d9697dc045c31a322ffec2",
+          "bytes": 1207622
+        },
+        {
+          "path": "scans/145027.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Way-is-Shut.jpg",
+          "sha256": "2e4a180c1aee0d5c18a3a6e06f2724751256d96efcfab472895a186b1d8b7131",
+          "bytes": 1266167
+        },
+        {
+          "path": "scans/145028.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Whispers-in-the-Dark.jpg",
+          "sha256": "a062faa3d751561db863943bd8ad7e4b5b2eb2208cd301a2b15890ca6b63edc6",
+          "bytes": 1242116
+        },
+        {
+          "path": "scans/145029.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/No-Turning-Back.jpg",
+          "sha256": "2d2ec41f85223bdcf35445708fd96555f271bd0bc9a257ec5fed2722e8209432",
+          "bytes": 1307266
+        },
+        {
+          "path": "scans/145030.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Great-Corsair-Ship.jpg",
+          "sha256": "64a172ab13cfce96324adf7e99761b9b7fed99abf95c5e008092ade66e74cdfc",
+          "bytes": 1279708
+        },
+        {
+          "path": "scans/145031.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Umbar-War-Galley.jpg",
+          "sha256": "4161f9d9900ff87aef2ced823c0e3a0a984f4197ba1f60917ec9877e85d526af",
+          "bytes": 1240349
+        },
+        {
+          "path": "scans/145032.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Corsair-Dromon.jpg",
+          "sha256": "abfc4f4772a2e8c9957493d7a5b13dff812bc37b28b9f8fb2dbaf5b409fd53c0",
+          "bytes": 1224029
+        },
+        {
+          "path": "scans/145033.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Port-of-Pelargir.jpg",
+          "sha256": "13c355d5b30f0a3679a7f60e7b71f061f21f570470a961583dd7b6943e28bf91",
+          "bytes": 1261732
+        },
+        {
+          "path": "scans/145034.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Pelargir-Quays.jpg",
+          "sha256": "ead03e40e1ded5f7f0e6db29cf19431acdddc9fa3852adf63106434d5ad208e5",
+          "bytes": 1230610
+        },
+        {
+          "path": "scans/145035.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Corsair-Captain.jpg",
+          "sha256": "c0d811389e0ad79bf31e082701e82d99e8eb857ec90f1d28cb8ae71078180ab6",
+          "bytes": 1196186
+        },
+        {
+          "path": "scans/145036.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Corsair-of-Umbar.jpg",
+          "sha256": "59b86ce9faafcef0b095368d03a209c7984cd8329f330fbac756825c553f4f58",
+          "bytes": 1201197
+        },
+        {
+          "path": "scans/145037.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Umbar-Pirate-Crew.jpg",
+          "sha256": "6c31f857f1574fcefc16624dce844a4bfc79d3a1550c90f011f15199be867f44",
+          "bytes": 1233574
+        },
+        {
+          "path": "scans/145038.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Haradrim-Pirate.jpg",
+          "sha256": "f15549e77aaf7ffe1a2dfea9bc1f6508ce9af979742d24f42f2f3da424200638",
+          "bytes": 1202414
+        },
+        {
+          "path": "scans/145039.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Fell-Folk-of-Umbar.jpg",
+          "sha256": "78b6829d1b0c3c2b2c5f6485b3b6ba767303ae11504b60a0359d24f13b1b22c1",
+          "bytes": 1278395
+        },
+        {
+          "path": "scans/145040.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Black-Sails.jpg",
+          "sha256": "d2ffbbc9ed994eb8d3ea7c700a15867dbd919eb4ac9c20833bdc040560c1b5dc",
+          "bytes": 1253411
+        },
+        {
+          "path": "scans/145041.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Raiding-the-Coasts.jpg",
+          "sha256": "e4a3d889faa51991a037d46b61471a566581bb855ed3f4dcffa2011b5375e1a5",
+          "bytes": 1244921
+        },
+        {
+          "path": "scans/145042.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Driven-to-the-Brink.jpg",
+          "sha256": "faa401443b53f42f27717bfc5ef574610e4f4993b7c3eb42a1eb03b6b3407b70",
+          "bytes": 1302530
+        },
+        {
+          "path": "scans/145043.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Minas-Tirith.jpg",
+          "sha256": "f5d208155a8263f93724918d8eb46ed285b2b57967a74d3f949b7b705cb59d96",
+          "bytes": 1128547
+        },
+        {
+          "path": "scans/145044.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Grond.jpg",
+          "sha256": "1d0c855f87fef9b2c46ac22e58e947d5862571bc22e858ffcbff28605541fbb4",
+          "bytes": 1220427
+        },
+        {
+          "path": "scans/145045.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Gate-of-Gondor.jpg",
+          "sha256": "82a72747383de5a6d3e6b5b690bd7ce23cc02a7ea5ee85ad6060966f64f1ebd1",
+          "bytes": 1224179
+        },
+        {
+          "path": "scans/145046.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/City-Wall.jpg",
+          "sha256": "7635fc7ac0437cf4326be5fd704e0e9af796cbaa08028c37cb9956ddd81f053a",
+          "bytes": 1207061
+        },
+        {
+          "path": "scans/145047.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Pelennor-Field.jpg",
+          "sha256": "2eb5ef9e756c6944d597f19cf5863141bd0caf2cecf7b5924d1df2cfc8803a6a",
+          "bytes": 1208756
+        },
+        {
+          "path": "scans/145048.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Fire-filled-Trench.jpg",
+          "sha256": "aa0fa55de379ec0f326fcac79e9433762bd58a9b775b0c1c1ba2e5ab6b0a33f7",
+          "bytes": 1241281
+        },
+        {
+          "path": "scans/145049.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Siege-Tower.jpg",
+          "sha256": "d71bc2bc45d4743cffa81116efccec5c5934b35dc38a24b040a2cdb18ff5fe0c",
+          "bytes": 1218879
+        },
+        {
+          "path": "scans/145050.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Black-Serpent.jpg",
+          "sha256": "5fee7ff532c9ab965acf0e358f99ab362976f21bdf8b3fb855735896bd28fc0a",
+          "bytes": 1209444
+        },
+        {
+          "path": "scans/145051.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/War-Mûmak.jpg",
+          "sha256": "830edd290a485ddf95d026e3fb6df1e802380bcb3d770925e9d032e5134c0c9e",
+          "bytes": 1187525
+        },
+        {
+          "path": "scans/145052.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Southron-Champion.jpg",
+          "sha256": "91ab2c45883dcb69a622efa0b3a9ab7d06c9b042729a0507bf4d4537263aa47c",
+          "bytes": 1209798
+        },
+        {
+          "path": "scans/145053.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Morgul-Captain.jpg",
+          "sha256": "38c2cf36d70b677b241e8fbeb4c1ab92f187113fa89e5c765b083b05a896a8b1",
+          "bytes": 1185795
+        },
+        {
+          "path": "scans/145054.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Orc-of-the-Eye.jpg",
+          "sha256": "7dd453223c2f0a3495700059b2e075c5d6d16353b7558773fcf41b8672328521",
+          "bytes": 1204641
+        },
+        {
+          "path": "scans/145055.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Mordor-Orc.jpg",
+          "sha256": "f203c3c473deefe678e5a8fce5f66bc1232df8e6bd9543fcffe6e1273cc23b80",
+          "bytes": 1232492
+        },
+        {
+          "path": "scans/145056.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Rammas-is-Breached.jpg",
+          "sha256": "fa39ca216cba567f0aff74b6fc3cc528d35c3d6bc0b9fddabe008101d81e8812",
+          "bytes": 1237277
+        },
+        {
+          "path": "scans/145057.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Fell-Beast.jpg",
+          "sha256": "7b236e71c8658cc6a81959c00aa018b4d17c95e7f94e0d72c96fd2ebc00d8173",
+          "bytes": 1247445
+        },
+        {
+          "path": "scans/145058.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Black-Dart.jpg",
+          "sha256": "7f5fe2f3d4954d67871f573bd1be655f2c6af609068bfcde78c817538c63a1b4",
+          "bytes": 1274573
+        },
+        {
+          "path": "scans/145059.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Spells-of-Ruin.jpg",
+          "sha256": "93bfd2f9ccc7989858eb41bd954aea1aeb13960b63b2ccfe2173fd6e85de6a9a",
+          "bytes": 1255029
+        },
+        {
+          "path": "scans/145060.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Dread-and-Despair.jpg",
+          "sha256": "9bef56ef524acd9344ec6b47ced32d4d08b5272538a40b8d8a816fa40a42e04e",
+          "bytes": 1246860
+        },
+        {
+          "path": "scans/145061.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Shadow-of-Mordor.jpg",
+          "sha256": "cc44807de3bd47cd42491ff2fd6295ad264fe4c2119c2502977cb52c94210860",
+          "bytes": 1234310
+        },
+        {
+          "path": "scans/145062.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Wraith-on-Wings.jpg",
+          "sha256": "9ff503056cb7a933ec85fbff029aa2bd91e5cb55eb356b1165c61bad9e2640d6",
+          "bytes": 1291509
+        },
+        {
+          "path": "scans/145063.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Forbidden-Door-1A.jpg",
+          "sha256": "e333084147c4cd8f50235230488aaa7bbab1970f8482838b9698b52e0368986c",
+          "bytes": 1282116
+        },
+        {
+          "path": "scans/145063.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Forbidden-Door-1B.jpg",
+          "sha256": "30d1824fef6ece80941db03d6b802e9cfe50e72a9ff2c86fbd9640490b3913cc",
+          "bytes": 1248390
+        },
+        {
+          "path": "scans/145064.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Paths-of-the-Dead-2A.jpg",
+          "sha256": "6dd06d40456d707e1e678c5112fc8fe8ea8f4f64b8df3eeec587e859bdf2fee0",
+          "bytes": 1266524
+        },
+        {
+          "path": "scans/145064.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Paths-of-the-Dead-2B.jpg",
+          "sha256": "33feb5cfe682f281a2c7cd2df5c2b474cc21a6d4190306d599f186320d212608",
+          "bytes": 1208819
+        },
+        {
+          "path": "scans/145065.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Dead-are-Following-3A.jpg",
+          "sha256": "519721d032cf019ecb3a83cb8881c4568889e1afc87384979319061229a2dfeb",
+          "bytes": 1258525
+        },
+        {
+          "path": "scans/145065.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Dead-are-Following-3B.jpg",
+          "sha256": "c0023ebc3ac9aac81656a4257cdcf7d9c309e45648541c4d934996cfaaaf9484",
+          "bytes": 1199136
+        },
+        {
+          "path": "scans/145066.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Passing-of-the-Grey-Company-SetupA.jpg",
+          "sha256": "25618305c509b5c37dc8ef6d7a95510e785e422a6de1bc838f45e15724e742f4",
+          "bytes": 1248677
+        },
+        {
+          "path": "scans/145066.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Passing-of-the-Grey-Company-SetupB.jpg",
+          "sha256": "ab4381c1d76631ddc632bb5dd3b42a1deeba0f5b4056422ab5651fbff1d6d1ae",
+          "bytes": 1119437
+        },
+        {
+          "path": "scans/145067.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Army-of-the-Dead-Enemy.jpg",
+          "sha256": "024cb40dc882821d05c220e0876ce9dfd79216e3f08e2fad0c33cb1039d74222",
+          "bytes": 1170130
+        },
+        {
+          "path": "scans/145068.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Army-of-the-Dead-Objective-Ally.jpg",
+          "sha256": "40a2502b169647fcddc7e279bce9eb658ad69bdd86bece0c2c7c35c4e2434046",
+          "bytes": 1139887
+        },
+        {
+          "path": "scans/145069.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Attack-on-Pelargir-1A.jpg",
+          "sha256": "e11e917dc48c33764a139c3c47e90acd41b6279b403531f23f143d337d0f2575",
+          "bytes": 1199417
+        },
+        {
+          "path": "scans/145069.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Attack-on-Pelargir-1B.jpg",
+          "sha256": "df11a9a9edfcfe377f0a6f101a6e9577cb13c6571167fe23753498b6bd3170f8",
+          "bytes": 1182114
+        },
+        {
+          "path": "scans/145070.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Siege-of-Gondor-SetupA.jpg",
+          "sha256": "2834706b91190c95820aa3ac9f94910b59609676fb71a0b72f9159ceb25eab3a",
+          "bytes": 1201305
+        },
+        {
+          "path": "scans/145070.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/949e2607-cbb5-4ae3-af26-f9d7e00e09d2.B.jpg",
+          "sha256": "05fef5a0e6831565ef52ab48e25e0e8264e6f0217e6f4a8a5ad57426c60502b9",
+          "bytes": 111935
+        },
+        {
+          "path": "scans/145071.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Corsair-Fleet-Corsair.jpg",
+          "sha256": "4ed511a420c140253ca001c7f57fbec8fa9f5610a35e6602041736eb027fc515",
+          "bytes": 1198746
+        },
+        {
+          "path": "scans/145072.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Corsair-Fleet-Gondor.jpg",
+          "sha256": "d519b972cf4a1b1f05a4c3003c8e5c6f69043c950ef825d431d101f821063afb",
+          "bytes": 1212811
+        },
+        {
+          "path": "scans/145073.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Garrison-of-Gondor-1A.jpg",
+          "sha256": "0578b46fb0662028d1976f791b37cff3ef31845c19aec73e479d367550ba7ecd",
+          "bytes": 1254921
+        },
+        {
+          "path": "scans/145073.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Garrison-of-Gondor-1B.jpg",
+          "sha256": "6ec5a9d459d75e0cc0aae3b32f5d4db2a6db5b063b739b8660ee53444b69c40e",
+          "bytes": 1213149
+        },
+        {
+          "path": "scans/145074.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Retreat-from-Osgiliath-2A.jpg",
+          "sha256": "a70691471b33a90ee404bbd2ce1306229e9677f79340a70080b3c6e61e6af8a4",
+          "bytes": 1230769
+        },
+        {
+          "path": "scans/145074.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Retreat-from-Osgiliath-2B.jpg",
+          "sha256": "c657055142ab1dcccc60d668d3363b695dfa1ce93e8f720d4da002306787f17c",
+          "bytes": 1186686
+        },
+        {
+          "path": "scans/145075.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-White-City-Besieged-3A.jpg",
+          "sha256": "6e185aba5499f1790dfc2831e0e7c1d587a3a3c3238e6717ba18b74da79d7aee",
+          "bytes": 1258031
+        },
+        {
+          "path": "scans/145075.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-White-City-Besieged-3B.jpg",
+          "sha256": "a0b7b04b5816b8d57bab1028e25c4cb2d9f8620b6ad2ac4cefc1f449e8e94a7a",
+          "bytes": 1190769
+        },
+        {
+          "path": "scans/145076.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Rohan-has-Come-4A.jpg",
+          "sha256": "5a0af6b8bf895563fa7766065cbc9b86599a6aacbe5644561ee946bb33a9c525",
+          "bytes": 1182244
+        },
+        {
+          "path": "scans/145076.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Rohan-has-Come-4B.jpg",
+          "sha256": "b8f1a05c834a473085d35b2080b05072b6c93896088daea6c7139c871c23a361",
+          "bytes": 1145158
+        },
+        {
+          "path": "scans/145077.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Fighting-in-the-Fields-5A.jpg",
+          "sha256": "c7be010a73bb415a50a278391c0849f585554002526cddd9682236ab6458ccb1",
+          "bytes": 1245696
+        },
+        {
+          "path": "scans/145077.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Fighting-in-the-Fields-5B.jpg",
+          "sha256": "9a3b7c380a5ec8a3e6468f0d9254e82d6328a9f13277e65a409f4a04b49d8753",
+          "bytes": 1175674
+        },
+        {
+          "path": "scans/145078.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Battle-of-the-Pelennor-Fields-SetupA.jpg",
+          "sha256": "e460cd4d81090ef902f2f3968de38b287d04d27fa95ca85b5e9a794334a193b1",
+          "bytes": 1238008
+        },
+        {
+          "path": "scans/145078.B.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/10557685-71b2-4f2e-b831-4b19d023ee46.B.jpg",
+          "sha256": "f00b5ddf95179520e83daec5dc61bb60062a63139ebe5388e683ee1d944921a6",
+          "bytes": 123641
+        },
+        {
+          "path": "scans/145079.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Witch-king-Captain.jpg",
+          "sha256": "47de114b8c1e98b78ca15b9d9df9053d8eda152a1b48ccc97f4c07960049b0b4",
+          "bytes": 1210278
+        },
+        {
+          "path": "scans/145080.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Witch-king-Sorcerer.jpg",
+          "sha256": "579e9ac8db54d25787237b48dad36ebfccae81ed2835e398e9289a5d036ab96a",
+          "bytes": 1205091
+        },
+        {
+          "path": "scans/146001.A.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/b937644c-ccbb-4a39-ae3c-24857d1d4d57.jpg",
+          "sha256": "a45de0e4d268e549363271b3bad666ac0fec98b0ba4fb11fc2f7b491d939fa5e",
+          "bytes": 82552
+        },
+        {
+          "path": "scans/146002.A.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/f1cc6057-ced3-4105-9172-869d26a54af5.jpg",
+          "sha256": "14933a9bf7309d879dff58601fbf5b5aad93f3b172946a2a8b5a57d4882211f5",
+          "bytes": 87757
+        },
+        {
+          "path": "scans/146005.A.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/0baaf661-4bfd-48ed-80d4-bfa98217da1c.jpg",
+          "sha256": "3407ce4a5b7f7d8b2a1569b763f3eb97fea2d37f4a90c2f09a1adf936db4b173",
+          "bytes": 84980
+        },
+        {
+          "path": "scans/146007.A.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/51512531-0697-4005-9fb6-884da5b02f75.jpg",
+          "sha256": "a7cbd20cefd958a9ae102202f32d091ffe5d3d2874cbdbf348e0cbf1c4fc6d34",
+          "bytes": 84142
+        },
+        {
+          "path": "scans/146008.A.jpg",
+          "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/769dbf59-9e02-4750-9605-b1ad6c8783e2.jpg",
+          "sha256": "58ad17425df11e5518f2f8ee5f509e8f31d723c2c685d555afd1e3de5b662764",
+          "bytes": 86033
+        },
+        {
+          "path": "scans/146014.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Last-of-the-Company.jpg",
+          "sha256": "27bd328cfaf817c6eef1339a21e7e1d2f15a6a3d96706a9b24206c61e6b9cdb6",
+          "bytes": 1018784
+        },
+        {
+          "path": "scans/146015.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Topmost-Chamber.jpg",
+          "sha256": "2ea812938bfcb481fc256c9021105a87cb030c82401b3bb0fa340622bd75088d",
+          "bytes": 988371
+        },
+        {
+          "path": "scans/146016.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Echoing-Passage.jpg",
+          "sha256": "af26294518fcbb94526efe90268eb3800005dcf75e05167241791c38abff362c",
+          "bytes": 984938
+        },
+        {
+          "path": "scans/146017.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Bloodied-Courtyard.jpg",
+          "sha256": "6cf61c18cc4b8b96e7965ca1b9205b6700c08b5ee5b8714083e92845e62738ea",
+          "bytes": 998423
+        },
+        {
+          "path": "scans/146018.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Winding-Stairs.jpg",
+          "sha256": "69168ee537e1b885da5aafe9f634adcc852eb301379da1aa685ae7d0bac6a779",
+          "bytes": 949134
+        },
+        {
+          "path": "scans/146019.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Torch-lit-Hall.jpg",
+          "sha256": "0a9e45deece0ffbf0bcb20d862eb4832b46a93ad094c0366cc9766adaa48c0f7",
+          "bytes": 963840
+        },
+        {
+          "path": "scans/146020.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Shagrat.jpg",
+          "sha256": "cb29f0d7f2e7c70412c9cfb1f5f27933fa621330cfe820de7bd3b30d3ba1747a",
+          "bytes": 906145
+        },
+        {
+          "path": "scans/146021.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Gorbag.jpg",
+          "sha256": "223bc383bc01483d38775dec88cb8bdbf26de4b087eb6c76491a61979e127107",
+          "bytes": 894724
+        },
+        {
+          "path": "scans/146022.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Wounded-Uruk.jpg",
+          "sha256": "b69bfc43e766dd9d34f26c27a1cc3c71660f50e87ffd8ab8ecdb8e471c0d14c4",
+          "bytes": 899626
+        },
+        {
+          "path": "scans/146023.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Orcish-Howls.jpg",
+          "sha256": "035fa30defe93d36bb12f4b0e42b45be8519c1abf18f14659e2656c63a8e8b38",
+          "bytes": 941717
+        },
+        {
+          "path": "scans/146024.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Black-Gate.jpg",
+          "sha256": "0eff263c934b3ac9e88fea0924d7d1e1d5c1488fa431708067e0e139552c53b5",
+          "bytes": 962039
+        },
+        {
+          "path": "scans/146025.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Towers-of-the-Teeth.jpg",
+          "sha256": "35eab662a233358bcb3fcbe3adc67a25175cf5f3df2686d97561fab33f836921",
+          "bytes": 974654
+        },
+        {
+          "path": "scans/146026.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Beleaguered-Hills.jpg",
+          "sha256": "c1735970e96170a5950b9a45b53a215c1632ef8af85e283a67dc53e26e681646",
+          "bytes": 1000878
+        },
+        {
+          "path": "scans/146027.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Waste-of-Dagorlad.jpg",
+          "sha256": "f80d827d9fdeba5198cdf22d792d81ea208d017f5ff098b5394bf0e026221eff",
+          "bytes": 992107
+        },
+        {
+          "path": "scans/146028.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Slopes-of-Cirith-Gorgor.jpg",
+          "sha256": "7849d5976d1d8e2ee606efdf3cbfb1f37c0341780fc64466413932e75b11a18c",
+          "bytes": 1010965
+        },
+        {
+          "path": "scans/146029.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Reeking-Moat.jpg",
+          "sha256": "f89179759179a3e200c1541de5d56183b75c283970d0dca93edba9f3893b687f",
+          "bytes": 987200
+        },
+        {
+          "path": "scans/146030.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Wall-of-Morannon.jpg",
+          "sha256": "ba9f00889a0625b2297f6fecb9edcbb5c2475a50e72a3ad8ac1e01008b21e6d1",
+          "bytes": 988938
+        },
+        {
+          "path": "scans/146031.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Mouth-of-Sauron.jpg",
+          "sha256": "edb4ee0c363bc37167f3baca3c23d4db24dab60179f66aae3aeb05ad2d0f626a",
+          "bytes": 925603
+        },
+        {
+          "path": "scans/146032.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Nazgûl-of-Mordor.jpg",
+          "sha256": "d3afd3c565b0fd108f58ae8fbcb2ee07d202bdfdfa79f38156e7c35bb71ccd53",
+          "bytes": 982237
+        },
+        {
+          "path": "scans/146033.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Gorgoroth-Hill-troll.jpg",
+          "sha256": "f090c9aad6218a2b4924c09059e008aa617c7a7461364151c9e7779e40617544",
+          "bytes": 931251
+        },
+        {
+          "path": "scans/146034.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Easterling-Bowman.jpg",
+          "sha256": "745e816e88d0501e3a19c2a45080504e68711511e0d9275b2336b6e6cbefe6c3",
+          "bytes": 934700
+        },
+        {
+          "path": "scans/146035.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Warrior-of-Rhûn.jpg",
+          "sha256": "6fd0bdae4764ebde4cb289c48e5114f137f38b0500e41a9f745080abb392e0bf",
+          "bytes": 950526
+        },
+        {
+          "path": "scans/146036.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Hell-hawk.jpg",
+          "sha256": "7aeb272f5be400efdd1732326c7632b02cae005e860e4626327baaac188451dc",
+          "bytes": 946234
+        },
+        {
+          "path": "scans/146037.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Hour-of-Doom.jpg",
+          "sha256": "c7a7ce07920e2a737c859eab84872e3454debd40f25f8bf3054e89ec5ac65cea",
+          "bytes": 969721
+        },
+        {
+          "path": "scans/146038.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Jaws-of-Steel.jpg",
+          "sha256": "897ea147fe03c2ec12353d4a721e69cf2f518244b2b92f71fcbda752e25b0b33",
+          "bytes": 991213
+        },
+        {
+          "path": "scans/146039.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Rage-Filled-Him.jpg",
+          "sha256": "d76ada05a4518f8dd9410b22d2b07cea9d23cce784c34bb2ec354e1f95fa031e",
+          "bytes": 941776
+        },
+        {
+          "path": "scans/146040.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Onslaught-of-Mordor.jpg",
+          "sha256": "25d7bc4fcbaea16a9f2c040ffaf89b40d065fb5fb1b2b2b5d9be3b5608f23c94",
+          "bytes": 1010424
+        },
+        {
+          "path": "scans/146041.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Gwaihir.jpg",
+          "sha256": "8b04f55efb795c88bfff1e0f0ebfdeada56053cfe82d931fc2c588f2ddf461b9",
+          "bytes": 943021
+        },
+        {
+          "path": "scans/146042.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Tower-of-Barad-dûr.jpg",
+          "sha256": "eb22066d2842348f185d965ba8bc1cc51ce8fa1e5db153287d8fc9169d9e3576",
+          "bytes": 1044346
+        },
+        {
+          "path": "scans/146043.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Mount-Doom.jpg",
+          "sha256": "fe5fca6a2b2497944f24300633d4244bb32b75f14ec28a0e3006e09aafecb375",
+          "bytes": 965373
+        },
+        {
+          "path": "scans/146044.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Orc-hold.jpg",
+          "sha256": "212901c7bc6c88aa9b9802b40ad2dd8ffc6bb0073645efee4ee72bb8bd42072e",
+          "bytes": 990441
+        },
+        {
+          "path": "scans/146045.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Mordor-Road.jpg",
+          "sha256": "3ea3cb708d535a181b4f0fee71a290d6dcf67476f7298685d083c546d1a6f2cc",
+          "bytes": 977368
+        },
+        {
+          "path": "scans/146046.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Plain-of-Gorgoroth.jpg",
+          "sha256": "1cf09d2bcd4254e74f380be933bbdb0bd09020ea59b7fd6b85303d068c690b8f",
+          "bytes": 976477
+        },
+        {
+          "path": "scans/146047.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Brake-of-Thorns.jpg",
+          "sha256": "832e679af0c4c9074e4030d0b5fce70938a1143cdf0937dd75d7126d2d2fa349",
+          "bytes": 1001877
+        },
+        {
+          "path": "scans/146048.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Old-Water-course.jpg",
+          "sha256": "d9021de45169185947d7c3e8ede5c46cd7d67d42099225f5cbe4a861d18dd406",
+          "bytes": 998212
+        },
+        {
+          "path": "scans/146049.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Gollum.jpg",
+          "sha256": "bae54ac4da6516e7b3358ae0911788ba9d428e0f0ee2fbefd0292e1ca636312d",
+          "bytes": 914547
+        },
+        {
+          "path": "scans/146050.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Ringwraith-of-Sauron.jpg",
+          "sha256": "9f10ab27c66798d8aec9e0858a152941f4284500401ed010178aafff4d339416",
+          "bytes": 932324
+        },
+        {
+          "path": "scans/146051.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Orc-Captain.jpg",
+          "sha256": "2ae1c7a55d13a34e1a5875c0b9dd603903957a930026f8a45a50936553cec75a",
+          "bytes": 902402
+        },
+        {
+          "path": "scans/146052.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Big-Uruk.jpg",
+          "sha256": "e70aca27d62b04d1bd2ec90c4295bfde7e887a26a62c7d6db4e03399f0c715a9",
+          "bytes": 903974
+        },
+        {
+          "path": "scans/146053.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Little-Snuffler.jpg",
+          "sha256": "deb258790c6e200ae6158d2c7e700b50f535709fec8c65eac731ceaa5b3d4634",
+          "bytes": 892779
+        },
+        {
+          "path": "scans/146054.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/'Wicked-Master'.jpg",
+          "sha256": "039e5b9699f112f3faa3823f810a6c702e9df084de7f8b7019299c4547bbb0f5",
+          "bytes": 951153
+        },
+        {
+          "path": "scans/146055.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Lidless-Eye.jpg",
+          "sha256": "8339b9926089e4f4df837b66692fc88da3c92fd09d8c10b90afcd9a4cf4d4ffd",
+          "bytes": 902864
+        },
+        {
+          "path": "scans/146056.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Foul-Fumes.jpg",
+          "sha256": "623e5446cc5ddf34b2ae7b2fc1cce5aa63c972f073394258403d7b0c13030d09",
+          "bytes": 959666
+        },
+        {
+          "path": "scans/146057.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Heavy-and-Tired.jpg",
+          "sha256": "10202e62577e00d2f301d6cf628d947ebf71d1d3cf8c28e34fedf103d58b06fb",
+          "bytes": 926348
+        },
+        {
+          "path": "scans/146058.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Orc-of-Mordor.jpg",
+          "sha256": "3dab8ab37968d5b72a8d4bd0dab7945e8173696cf47d3ab7053cb3f4a7db703f",
+          "bytes": 891093
+        },
+        {
+          "path": "scans/146059.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Snaga-Archer.jpg",
+          "sha256": "c8b5efa97c44acefa5e491e17077cc0ca50d0d981f3e4ea245a712d8807791d2",
+          "bytes": 928145
+        },
+        {
+          "path": "scans/146060.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Uruk-Soldier.jpg",
+          "sha256": "758f057ace27a711bad03ae65b1a58fd7aac59de15cd826279af9b70d2cdf630",
+          "bytes": 912232
+        },
+        {
+          "path": "scans/146061.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Drawn-to-the-Ring.jpg",
+          "sha256": "75866f580270f251839a6a2ba38391b2f8ac857d735c54348e263ffcecd5500b",
+          "bytes": 960295
+        },
+        {
+          "path": "scans/146062.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Deep-Shadows.jpg",
+          "sha256": "a6d44ceffdcd3e36acd4ce637db235adc21967dde142f359cbb971a6415b12a7",
+          "bytes": 947161
+        },
+        {
+          "path": "scans/146063.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Evil-Vigilance.jpg",
+          "sha256": "0a493c994beb33477001336772da3baadce8ca404db752e622ef37eaba48dc3c",
+          "bytes": 906881
+        },
+        {
+          "path": "scans/146064.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/In-Darkness-Bind-Them.jpg",
+          "sha256": "9f546f61ab88a9ac3a3758e1fbe5f189617a6598e67f19f25c9277af1494609d",
+          "bytes": 962121
+        },
+        {
+          "path": "scans/146065.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-One-Ring.jpg",
+          "sha256": "b0df915cc50d69f482a4b2b99708e971dcf783fddf7cae14a3f2f425b65ec95a",
+          "bytes": 903801
+        },
+        {
+          "path": "scans/146066.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Pass-the-Two-Watchers-1A.jpg",
+          "sha256": "15e066a367e6cb9329f9070afa37372192065ad3069cb713d227432fca2a2771",
+          "bytes": 954929
+        },
+        {
+          "path": "scans/146066.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Pass-the-Two-Watchers-1B.jpg",
+          "sha256": "13891077e093e9bdb1516e79d4ae5edb1c1dcddd6b65ac46aa264ee0d4aa9210",
+          "bytes": 953910
+        },
+        {
+          "path": "scans/146067.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Fighting-in-the-Tower-2A.jpg",
+          "sha256": "173f6cb4e7f07f04cf31a76c6ff6cbab4a26b628a810fc3f8ddeb3b95c55e6ca",
+          "bytes": 946588
+        },
+        {
+          "path": "scans/146067.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Fighting-in-the-Tower-2B.jpg",
+          "sha256": "01e5efa7fe3ea877d87d8be67887d0fcc54a5304f79285d1d50b002b3fedb44d",
+          "bytes": 952971
+        },
+        {
+          "path": "scans/146068.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Escape-from-Cirith-Ungol-3A.jpg",
+          "sha256": "b5276f9dffdf872128522f5820a0b011a8d3cc10f06185a713e467b3a2838d3b",
+          "bytes": 941842
+        },
+        {
+          "path": "scans/146068.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Escape-from-Cirith-Ungol-3B.jpg",
+          "sha256": "1aa745681ca6affa49eb573ae401112ac6cb9958d959fecfe2b09cd12ad2dad3",
+          "bytes": 944480
+        },
+        {
+          "path": "scans/146069.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Tower-of-Cirith-Ungol-SetupA.jpg",
+          "sha256": "636f7e7696be286434ffa0f8652affd0a08f086a57fe19bff95cddfac3952578",
+          "bytes": 1002991
+        },
+        {
+          "path": "scans/146069.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Tower-of-Cirith-Ungol-SetupB.jpg",
+          "sha256": "786056fd6921903eb03d6964598d027a16a72d5fcff5c57f0d9f1936c094dbe1",
+          "bytes": 1014827
+        },
+        {
+          "path": "scans/146070.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Two-Watchers-Location.jpg",
+          "sha256": "077ab32645fef0c37ad7e968dcea4dffda90027e8458ff03324450f02a491d41",
+          "bytes": 973374
+        },
+        {
+          "path": "scans/146071.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Two-Watchers-Enemy.jpg",
+          "sha256": "caeac71eb1a15730bef48bbdb367a6fefe3c3911a2a5521c21a3ecf611cdbb2d",
+          "bytes": 942503
+        },
+        {
+          "path": "scans/146072.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Embassy-from-the-Dark-Tower-1A.jpg",
+          "sha256": "35e8555d8536133fdae02fed2effbded6fab7cca2b5d05a719644d15f26d6100",
+          "bytes": 1001644
+        },
+        {
+          "path": "scans/146072.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Embassy-from-the-Dark-Tower-1B.jpg",
+          "sha256": "2e8f9698d7d2c977cec8bc24f5550dc048363a0bf7f95130811536738482d6e9",
+          "bytes": 957620
+        },
+        {
+          "path": "scans/146073.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Battle-of-the-Morannon-2A.jpg",
+          "sha256": "74ae3437408bf054f9a9fdb5072b125c4127592efb04dc1da90520c7620b8652",
+          "bytes": 1019676
+        },
+        {
+          "path": "scans/146073.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Battle-of-the-Morannon-2B.jpg",
+          "sha256": "0f8d00398ec4243691ae54e73a1deef1c73d7140483c2e87e07983f264efc037",
+          "bytes": 949261
+        },
+        {
+          "path": "scans/146074.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Black-Gate-Opens-SetupA.jpg",
+          "sha256": "493ce607b2b472fdec7165a54009967f3295e001b1641aa6843c4e207543dc77",
+          "bytes": 990508
+        },
+        {
+          "path": "scans/146074.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Black-Gate-Opens-SetupB.jpg",
+          "sha256": "f8cc71e13d3eea65c2118cc7a593c513ed81bda7a4f8dead7f06929e4d4a44eb",
+          "bytes": 1002206
+        },
+        {
+          "path": "scans/146075.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Land-of-Mordor-1A.jpg",
+          "sha256": "4e5eae5ace7b2ccd1cd9a856e1135e547cc53d6750c76788a1a4145d0122f6db",
+          "bytes": 1016453
+        },
+        {
+          "path": "scans/146075.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Land-of-Mordor-1B.jpg",
+          "sha256": "42222abcb228beed3d51d650e5a5972f172bf826742d9d618ac36fc8a9cb223e",
+          "bytes": 967380
+        },
+        {
+          "path": "scans/146076.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Road-to-Isenmouthe-2A.jpg",
+          "sha256": "638273965caf641a3f145ac7960da5c66a900b9675ee58d11e147c1955aa55a5",
+          "bytes": 996860
+        },
+        {
+          "path": "scans/146076.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Road-to-Isenmouthe-2B.jpg",
+          "sha256": "71e808b5cbf175f879039851c5d1fdf7046d477f73ed124d15cead96a40ccb8a",
+          "bytes": 942897
+        },
+        {
+          "path": "scans/146077.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Last-Gasp-3A.jpg",
+          "sha256": "d9eac3404e5a4cddc98682fe9a14e6b261ddb02489309ae0f7bb7290eee21de5",
+          "bytes": 1042213
+        },
+        {
+          "path": "scans/146077.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Last-Gasp-3B.jpg",
+          "sha256": "cfe94f41594633ebf4bc1a5d97f55e5b738b418ea6be266d831a1010605358d2",
+          "bytes": 984743
+        },
+        {
+          "path": "scans/146078.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Crack-of-Doom-4A.jpg",
+          "sha256": "6966e1d1f3e4c7a53b9f695e17558aa6465e2e1232e3fda985beb6c51db22040",
+          "bytes": 973420
+        },
+        {
+          "path": "scans/146078.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Crack-of-Doom-4B.jpg",
+          "sha256": "4ec1feec987f8ae6c0dd5624dbefbebe34362fdfd3a2c1455180df377dc195b3",
+          "bytes": 913322
+        },
+        {
+          "path": "scans/146079.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Mount-Doom-SetupA.jpg",
+          "sha256": "2f034e928dc2c23725dfb2510c7611cf669a1d73e1fafabb21c1882c0098d73b",
+          "bytes": 1000306
+        },
+        {
+          "path": "scans/146079.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Mount-Doom-SetupB.jpg",
+          "sha256": "8cee47a90b535e26a0539e10ae4cbbcd58686cf1f3c3af5237d47b02802a6ab1",
+          "bytes": 1013354
+        },
+        {
+          "path": "scans/146080.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Epic-Multiplayer-Mode-SetupA.jpg",
+          "sha256": "e30b9d131af6f2d2a7f00e509b40b5e8e8ca2ac1db4b65b62888d08ceb49e11f",
+          "bytes": 1004981
+        },
+        {
+          "path": "scans/146080.B.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Epic-Multiplayer-Mode-SetupB.jpg",
+          "sha256": "47712d093673e3ca66f7af230e417d272250d8c6822323e9ac684be5a017d5b6",
+          "bytes": 1020292
+        },
+        {
+          "path": "scans/146081.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Eye-of-Sauron-Mount-Doom.jpg",
+          "sha256": "e661ddd8709889f70034e7ab798b9bcf2b2a4aa859017d629bb8a75b3b4ee0e5",
+          "bytes": 982878
+        },
+        {
+          "path": "scans/146082.A.jpg",
+          "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Eye-of-Sauron-The-Black-Gate-Opens.jpg",
+          "sha256": "88d15e7abdebc3fd08ffed68a4a93338f7e3485cf1072585fbf42591cefec268",
+          "bytes": 996900
         },
         {
           "path": "scans/18016.A.jpg",

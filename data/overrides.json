@@ -1063,6 +1063,22 @@
       "pile": "setAside",
       "reason": "DragnCards loads the Gollum / Sméagol card in the staging area (Q0C.12, E0C.12). Stage 1A (The Stairs of Cirith Ungol, 144070) prints \"Put Sméagol into play under the first player's control.\", so he starts out of play, set aside, on his Sméagol side.",
       "source": "dragncards preBuiltDecks.json (Q0C.12, E0C.12); scan 144070.A; hallofbeorn.com/Export/QuestCards (The Stairs of Cirith Ungol, The Two Towers #123)"
+    },
+    {
+      "scenario": "the-tower-of-cirith-ungol",
+      "code": "146014",
+      "from": "staging",
+      "pile": "attachedChosen",
+      "reason": "DragnCards loads Last of the Company in the staging area (Q0C.16, E0C.16). Stage 1A (Pass the Two Watchers, 146066) prints \"Then, the first player attaches Last of the Company to a hero he controls and attaches The One Ring to that hero.\", so it is attached to a hero of the first player's choice at Setup, not staged.",
+      "source": "dragncards preBuiltDecks.json (Q0C.16, E0C.16); scan 146066.A; scan 146014.A"
+    },
+    {
+      "scenario": "the-passing-of-the-grey-company",
+      "code": "145016",
+      "from": "staging",
+      "pile": "setAside",
+      "reason": "DragnCards loads the four Overcome by Fear in the staging area (Q0C.13, E0C.13). Stage 1A (The Forbidden Door, 145063) prints \"Each player attaches a copy of Overcome by Fear to his threat dial. Remove each unattached copy of Overcome by Fear from the game.\", so none is staged: they wait set aside, out of play, until each player attaches one and the rest leave the game.",
+      "source": "dragncards preBuiltDecks.json (Q0C.13, E0C.13); scan 145063.A; scan 145016.A"
     }
   ],
   "scenarioRemovals": [
@@ -1178,22 +1194,17 @@
       "easy": 1,
       "reason": "Hall of Beorn's Easy count is used for Taking on Water (1 of 2 in Easy). No scan prints an Easy mark (a card prints only its set size, 10/26), and DragnCards' E06.8 removes nothing from this scenario's own encounter set while its Easy decks for the other scenarios (E06.1 to E06.9) do, so E06.8 reads as incomplete for the set. Not confirmed by a printed source.",
       "source": "hallofbeorn.com Scenarios/A-Storm-on-Cobas-Haven (EasyQuantity); dragncards E06.8"
+    },
+    {
+      "scenario": "the-black-gate-opens",
+      "code": "146029",
+      "normal": 3,
+      "easy": 3,
+      "reason": "The Black Gate Opens set prints 40 cards (Reeking Moat 11/40, scan 146029.A). Hall of Beorn's quantities for the set's encounter cards sum to 40 with 3 Reeking Moat; DragnCards' Q0C.17 and E0C.17 load 2, which makes 39. Hall of Beorn lists 3 in both Normal and Easy; no printed source shows an Easy mark, and the DragnCards Easy deck repeats the Normal count, so Easy keeps all 3. Not confirmed by a printed source.",
+      "source": "scan 146029.A (11/40); hallofbeorn.com/Export/Scenarios/The-Black-Gate-Opens; dragncards Q0C.17, E0C.17"
     }
   ],
   "campaigns": [
-    {
-      "id": "the-return-of-the-king",
-      "name": "The Return of the King",
-      "kind": "campaign",
-      "box": "The Return of the King Saga Expansion",
-      "products": [
-        "The Flame of the West",
-        "The Mountain of Fire"
-      ],
-      "released": "2024-10-10",
-      "reason": "No source names a campaign. Hall of Beorn numbers the Saga scenarios 1-18 in book order: The Flame of the West 13-15 and The Mountain of Fire 16-18 follow the Two Towers scenarios. The pairing of the packs into one campaign and the campaign's name (the title of the book its scenarios follow) are the saga's published structure, and The Return of the King Saga Expansion is the RCO box that reprints both packs, recorded here because no fetched source states them; the scenario count is Hall of Beorn's listing.",
-      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 41; hallofgondor.com/release-dates (released: US release of the first product)"
-    },
     {
       "id": "angmar-awakened",
       "name": "Angmar Awakened",
@@ -1440,6 +1451,22 @@
       "code": "144076",
       "reason": "Gollum / Sméagol is one physical card with two sides (mec112.gollum-smeagol): DragnCards files it as one OCTGN guid with two rows, Gollum (the guid) and Smeagol (the .B picture), both collector number 75. Hall of Beorn files the sides as two cards, #75 Gollum (the guid) and #76 Sméagol (no guid), so no guid or pack and number match finds Sméagol. Side B of the DragnCards card is Sméagol.",
       "source": "dragncards cardDb.tsv (The Land of Shadow 75, Gollum and Smeagol rows) and preBuiltDecks.json (Q0C.10, Q0C.12); hallofbeorn.com/Export/EncounterCards (Gollum-TLoS, Smeagol-TLoS); MEC112 rulebook p4 (mec112.gollum-smeagol)"
+    },
+    {
+      "dragncards": "The Flame of the West",
+      "number": 79,
+      "side": "b",
+      "code": "145080",
+      "reason": "The Witch-king is one physical card with two sides, Captain and Sorcerer: DragnCards files it as one OCTGN guid with two rows (the guid and its .B picture), both collector number 79. Hall of Beorn files the sides as two cards, #79 (The Witch-king, Captain) and #80 (The Witch-king, Sorcerer, no guid), so no guid or pack and number match finds the Sorcerer side. Side B of the DragnCards card is the Sorcerer side.",
+      "source": "dragncards cardDb.tsv (The Flame of the West 79, The Witch-king rows) and preBuiltDecks.json (Q0C.15); hallofbeorn.com/Export/EncounterCards (The-Witch-king-TFotW); scans 145079.A and 145080.A"
+    },
+    {
+      "dragncards": "The Mountain of Fire",
+      "number": 70,
+      "side": "b",
+      "code": "146071",
+      "reason": "The Two Watchers is one physical card with two sides, location and enemy: DragnCards files it as one OCTGN guid with two rows (the guid and its .B picture), both collector number 70. Hall of Beorn files the sides as two cards, #70 (the location) and #71 (the enemy, no guid), so no guid or pack and number match finds the enemy side. Side B of the DragnCards card is the enemy side.",
+      "source": "dragncards cardDb.tsv (The Mountain of Fire 70, The Two Watchers rows) and preBuiltDecks.json (Q0C.16); hallofbeorn.com/Export/EncounterCards (The-Two-Watchers-TMoF); scans 146070.A and 146071.A"
     }
   ],
   "encounterSetAliases": [
@@ -1448,6 +1475,73 @@
       "set": "Journey Along the Anduin",
       "reason": "The Revised Core Set's Learn to Play (p25) and the Easy Mode sheet (p2) call the second core scenario and its encounter set \"Journey Down the Anduin\". The scenario's own campaign card, quest cards and encounter set icon print \"Journey Along the Anduin\" (Mirkwood Paths - Part 2, scan 01130.A), and Hall of Beorn follows the cards. The card wins (authority order); the booklet's name is an alias.",
       "source": "Learn to Play p25 (ltp.setup-journey-along-the-anduin); scan 01130.A; hallofbeorn.com/Export/Scenarios/Journey-Along-the-Anduin-(Campaign)"
+    }
+  ],
+  "scenarioExcluded": [
+    {
+      "scenario": "the-siege-of-gondor",
+      "code": "145072",
+      "reason": "The Corsair Fleet is one physical card with two sides, Corsair and Gondor. Hall of Beorn's scenario list counts both sides as cards; DragnCards' Q0C.14 deals the Corsair side (145071) and the Setup of The Battle of the Pelennor Fields adds the Gondor side to the staging area, so The Siege of Gondor deals no Gondor side of its own.",
+      "source": "hallofbeorn.com/Export/Scenarios/The-Siege-of-Gondor; dragncards preBuiltDecks.json (Q0C.14, Q0C.15); scans 145071.A and 145072.A"
+    },
+    {
+      "scenario": "the-black-gate-opens",
+      "code": "146064",
+      "reason": "The card belongs to epic multiplayer mode (mec113.epic-multiplayer-mode): the scenario's Hall of Beorn list counts it, but the DragnCards load list of the scenario holds none, and the Epic Multiplayer Mode campaign card's Setup (146080) deals it: \"Shuffle 1 copy of In Darkness Bind Them into each encounter deck. Place The Eye of Sauron in the Mount Doom staging area\".",
+      "source": "hallofbeorn.com/Export/Scenarios (The-Black-Gate-Opens); dragncards preBuiltDecks.json (Q0C.17, Q0C.18); scan 146080.A; scan 146064.A"
+    },
+    {
+      "scenario": "the-black-gate-opens",
+      "code": "146081",
+      "reason": "The card belongs to epic multiplayer mode (mec113.epic-multiplayer-mode): the scenario's Hall of Beorn list counts it, but the DragnCards load list of the scenario holds none, and the Epic Multiplayer Mode campaign card's Setup (146080) deals it: \"Shuffle 1 copy of In Darkness Bind Them into each encounter deck. Place The Eye of Sauron in the Mount Doom staging area\".",
+      "source": "hallofbeorn.com/Export/Scenarios (The-Black-Gate-Opens); dragncards preBuiltDecks.json (Q0C.17, Q0C.18); scan 146080.A; scan 146081.A"
+    },
+    {
+      "scenario": "the-black-gate-opens",
+      "code": "146082",
+      "reason": "The card belongs to epic multiplayer mode (mec113.epic-multiplayer-mode): the scenario's Hall of Beorn list counts it, but the DragnCards load list of the scenario holds none, and the Epic Multiplayer Mode campaign card's Setup (146080) deals it: \"Shuffle 1 copy of In Darkness Bind Them into each encounter deck. Place The Eye of Sauron in the Mount Doom staging area\".",
+      "source": "hallofbeorn.com/Export/Scenarios (The-Black-Gate-Opens); dragncards preBuiltDecks.json (Q0C.17, Q0C.18); scan 146080.A; scan 146082.A"
+    },
+    {
+      "scenario": "mount-doom",
+      "code": "146064",
+      "reason": "The card belongs to epic multiplayer mode (mec113.epic-multiplayer-mode): the scenario's Hall of Beorn list counts it, but the DragnCards load list of the scenario holds none, and the Epic Multiplayer Mode campaign card's Setup (146080) deals it: \"Shuffle 1 copy of In Darkness Bind Them into each encounter deck. Place The Eye of Sauron in the Mount Doom staging area\".",
+      "source": "hallofbeorn.com/Export/Scenarios (Mount-Doom); dragncards preBuiltDecks.json (Q0C.17, Q0C.18); scan 146080.A; scan 146064.A"
+    },
+    {
+      "scenario": "mount-doom",
+      "code": "146081",
+      "reason": "The card belongs to epic multiplayer mode (mec113.epic-multiplayer-mode): the scenario's Hall of Beorn list counts it, but the DragnCards load list of the scenario holds none, and the Epic Multiplayer Mode campaign card's Setup (146080) deals it: \"Shuffle 1 copy of In Darkness Bind Them into each encounter deck. Place The Eye of Sauron in the Mount Doom staging area\".",
+      "source": "hallofbeorn.com/Export/Scenarios (Mount-Doom); dragncards preBuiltDecks.json (Q0C.17, Q0C.18); scan 146080.A; scan 146081.A"
+    },
+    {
+      "scenario": "mount-doom",
+      "code": "146082",
+      "reason": "The card belongs to epic multiplayer mode (mec113.epic-multiplayer-mode): the scenario's Hall of Beorn list counts it, but the DragnCards load list of the scenario holds none, and the Epic Multiplayer Mode campaign card's Setup (146080) deals it: \"Shuffle 1 copy of In Darkness Bind Them into each encounter deck. Place The Eye of Sauron in the Mount Doom staging area\".",
+      "source": "hallofbeorn.com/Export/Scenarios (Mount-Doom); dragncards preBuiltDecks.json (Q0C.17, Q0C.18); scan 146080.A; scan 146082.A"
+    }
+  ],
+  "hobRingsDbCodes": [
+    {
+      "set": "The Mountain of Fire",
+      "number": 9,
+      "code": "146010",
+      "reason": "Hall of Beorn gives The Mountain of Fire's Captains of the West (#9) the RingsDbCardId of another card of the pack: it numbers the player cards in collector order, RingsDB numbers Orc Disguise 146009, Captains of the West 146010 and Raise the Shire 146013. RingsDB's own record of the pack names the card with this code.",
+      "source": "ringsdb.com/api/public/cards (MoF 146009 Orc Disguise, 146010 Captains of the West, 146013 Raise the Shire); hallofbeorn.com/Export/PlayerCards (The Mountain of Fire #9, #10, #13)"
+    },
+    {
+      "set": "The Mountain of Fire",
+      "number": 10,
+      "code": "146013",
+      "reason": "Hall of Beorn gives The Mountain of Fire's Raise the Shire (#10) the RingsDbCardId of another card of the pack: it numbers the player cards in collector order, RingsDB numbers Orc Disguise 146009, Captains of the West 146010 and Raise the Shire 146013. RingsDB's own record of the pack names the card with this code.",
+      "source": "ringsdb.com/api/public/cards (MoF 146009 Orc Disguise, 146010 Captains of the West, 146013 Raise the Shire); hallofbeorn.com/Export/PlayerCards (The Mountain of Fire #9, #10, #13)"
+    },
+    {
+      "set": "The Mountain of Fire",
+      "number": 13,
+      "code": "146009",
+      "reason": "Hall of Beorn gives The Mountain of Fire's Orc Disguise (#13) the RingsDbCardId of another card of the pack: it numbers the player cards in collector order, RingsDB numbers Orc Disguise 146009, Captains of the West 146010 and Raise the Shire 146013. RingsDB's own record of the pack names the card with this code.",
+      "source": "ringsdb.com/api/public/cards (MoF 146009 Orc Disguise, 146010 Captains of the West, 146013 Raise the Shire); hallofbeorn.com/Export/PlayerCards (The Mountain of Fire #9, #10, #13)"
     }
   ]
 }

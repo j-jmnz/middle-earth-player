@@ -9,6 +9,10 @@ import { boxPacks, undealtBoxCards } from "./box-dealt.ts";
 const EXCEPTIONS: Readonly<Record<string, string>> = {
   "140077": "Stricken Dumb as printed in The Road Darkens (TRD 77), Flight to the Ford: the same card as 141064 (TBR 64), which Flight to the Ford deals; the app deals the Black Riders print.",
   "140151": "The Argonath as printed in The Road Darkens (TRD 151), Breaking of the Fellowship: the same card as 142075 (TRD 75), which Breaking of the Fellowship deals.",
+  "146064": "In Darkness Bind Them (epic multiplayer mode only): the Epic Multiplayer Mode campaign card's Setup shuffles one copy into each encounter deck (mec113.epic-multiplayer-mode); epic multiplayer mode is not built.",
+  "146080": "Epic Multiplayer Mode, the double-sided setup card of the last two scenarios played together (mec113.epic-multiplayer-mode); epic multiplayer mode is not built.",
+  "146081": "The Eye of Sauron (The Black Gate Opens side), an epic multiplayer mode objective that the Epic Multiplayer Mode card's Setup places (mec113.epic-multiplayer-mode); epic multiplayer mode is not built.",
+  "146082": "The Eye of Sauron (Mount Doom side), an epic multiplayer mode objective that the Epic Multiplayer Mode card's Setup places (mec113.epic-multiplayer-mode); epic multiplayer mode is not built.",
   "142091": "The One Ring as printed in The Road Darkens (TRD 91): the app deals 141085 (TBR 85, TFotR 166), the same card, attached through the campaign card's setup.",
 };
 

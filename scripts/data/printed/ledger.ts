@@ -29,6 +29,9 @@ export const ledgerEntrySchema = z.strictObject({
   // prints two), which a Sailing test counts (dcce.sailing-tests). No source carries it, so the reader records it, 0 included, for every
   // card the encounter deck can hold.
   sailingSuccess: z.number().int().nonnegative().optional(),
+  // The Return of the King's encounter cards: how many Sauron's Eye icons the card prints in the bottom left corner of its text box (Orc-hold prints one,
+  // The Lidless Eye two), which a Fortitude test counts (mec113.fortitude-tests). The line that prints the icon in its text is written with the words Sauron's Eye.
+  eyeIcons: z.number().int().nonnegative().optional(),
 });
 export type LedgerEntry = z.infer<typeof ledgerEntrySchema>;
 

@@ -18,8 +18,10 @@ export function readTwoTowers(sentence: string, names: NameIndex): SetupClause[]
     const pool = named(match[1]);
     return pool.length === 0 ? null : [step("removeFromPool", { to: pool })];
   }
-  if ((match = /^Remove each burden with (?:the following|these) burden set icons from the encounter deck( and each player['’]s deck)?:?\s*(.+)$/i.exec(sentence))) {
-    return [step("removeBurdens", { sets: setsOf(match[2] ?? ""), ...(match[1] ? { players: true } : {}) })];
+  // The Return of the King's campaign cards add ", then flip this card over" before the colon (the card turns to its standing back).
+  if ((match = /^Remove each burden with (?:the following|these) burden set icons from the encounter deck( and each player['’]s deck)?(, then flip this card over)?:?\s*(.+)$/i.exec(sentence))) {
+    const removed = step("removeBurdens", { sets: setsOf(match[3] ?? ""), ...(match[1] ? { players: true } : {}) });
+    return match[2] ? [removed, step("flipCampaignCard")] : [removed];
   }
   if ((match = /^Each player shuffles (\d+|an?|one) cop(?:y|ies) of (.+?) into (?:his|their) deck$/i.exec(sentence))) {
     const codes = names.codesOf(match[2] ?? "");

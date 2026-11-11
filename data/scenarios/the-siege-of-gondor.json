@@ -1,0 +1,124 @@
+{
+  "id": "the-siege-of-gondor",
+  "name": "The Siege of Gondor",
+  "number": 14,
+  "stages": [
+    "145069"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Siege of Gondor",
+      "count": 30
+    }
+  ],
+  "cards": [
+    {
+      "code": "145031",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "145032",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "145033",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "145034",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "145035",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "145036",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "145037",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "145038",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "145039",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "145040",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "145041",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "145042",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "145069",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "145030",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "145071",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    }
+  ],
+  "campaignCard": "145070",
+  "campaignPlaced": [
+    "142014",
+    "145068"
+  ],
+  "sagaStart": {
+    "hero": "145001"
+  },
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q0C.14",
+    "dragnEasy": "E0C.14",
+    "hobSlug": "The-Siege-of-Gondor"
+  }
+}

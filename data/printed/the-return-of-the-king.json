@@ -1,0 +1,3197 @@
+{
+  "campaign": "the-return-of-the-king",
+  "conventions": [
+    "One entry per code and side. Side A is the front, side B the back of a double-sided card; a shadow effect is a line of side A.",
+    "lines are the ability text of the text box in print order, one ability per line: no title, traits, stats, flavor text, or Victory line. Keyword lines (Surge., Doomed 1., Loot., Discover 4.) stay.",
+    "Icons are written as the words Hall of Beorn uses (Willpower, Attack, Defense, Threat, Lore, Fellowship). Apostrophes and quotation marks are straight.",
+    "A printed typo is written corrected in lines, and the printed wording is kept under misprints.",
+    "inert lists line numbers that need no effect record, with the reason. A line that is only keywords the engine reads is owned by the keyword.",
+    "A campaign card's side A opens with the marker line \"You are playing campaign mode.\"; its side B holds the Resolution paragraphs, each paragraph one line. The Campaign Log's divider between a Forced line and the Resolution is not a line.",
+    "A card whose 2024 wording differs from the 2016 Flame of the West or 2017 Mountain of Fire printing it reprints is listed in MEC113_CHANGED (scripts/data/printed/scope.ts).",
+    "The Sauron's Eye icon is written Sauron's Eye. eyeIcons counts the icons a card prints in the bottom left corner of its text box, 0 included, for each encounter card of The Mountain of Fire.",
+    "A card's keyword that opens a paragraph of text (\"Dire. When Revealed: ...\") stays on that line, as printed; a keyword line of its own is its own line.",
+    "Burden set icons that the scan prints as pictures are written as the set names Hall of Beorn gives, in the printed order."
+  ],
+  "entries": [
+    {
+      "code": "142005",
+      "side": "A",
+      "printing": "TRD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Fellowship-of-the-Ring/Elrond.jpg",
+        "sha256": "281af676450fb6e95469560529e9c43eaf4bc2ffeca6ae82cc9509bf3f14b76f"
+      },
+      "lines": [
+        "At the end of the round, discard Elrond from play.",
+        "Response: After Elrond enters play, choose one: heal all damage from a hero, discard a Condition attachment, or each player draws 1 card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's candidate prints \"heal all damage on a hero\"; the scan prints \"from a hero\"."
+    },
+    {
+      "code": "143008",
+      "side": "A",
+      "printing": "ToS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Arod.jpg",
+        "sha256": "0e75918602b346f61ff49af95708c7e3cd0e33bb55285cff72540b6c7460cc24"
+      },
+      "lines": [
+        "Attach to a hero or Legolas.",
+        "Response: After attached character participates in an attack that destroys an enemy, exhaust Arod to place 1 progress token on any location."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "143014",
+      "side": "A",
+      "printing": "ToS",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Two-Towers/Shadowfax.jpg",
+        "sha256": "17bbc4f214ee85a90b6f91eafbb45f05932a0ce6b8321277663e3e0a59cd389c"
+      },
+      "lines": [
+        "Attach to Gandalf.",
+        "Gandalf gains ranged and sentinel.",
+        "Action: Exhaust Shadowfax to ready Gandalf."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145001",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Aragorn-TFotW.jpg",
+        "sha256": "1ddf2555aca88eda41590146ebde62160a0b1516c33e7a121656c13d237e0761"
+      },
+      "lines": [
+        "The first player gains control of Aragorn. If Aragorn leaves play, the players lose the game.",
+        "While Aragorn has an Artifact attached, he gains sentinel and does not exhaust to quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145002",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Éowyn.jpg",
+        "sha256": "bf380232b052387799dc429b8d947e4475f3d1019729b8633538e4b1985b4a4f"
+      },
+      "lines": [
+        "Setup: Reduce your threat by 3.",
+        "Action: Raise your threat by 3 to ready Éowyn. She gets +9 Attack until the end of the phase. (Limit once per game for the group.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145003",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Beregond.jpg",
+        "sha256": "8e20bc65690dbe24a802f76dfccd6fc16b14214fa0e8930b5debe103906652c9"
+      },
+      "lines": [
+        "Sentinel.",
+        "Response: After Beregond defends an attack and takes no damage, reduce the defending player's threat by 1. (Limit once per round.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145005",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Prince-Imrahil.jpg",
+        "sha256": "036fae907867e39e411076c566da6f28db108a006c4cb73d983f5b9acf5b7760"
+      },
+      "lines": [
+        "While there is a hero card in your discard pile, Prince Imrahil loses the ally card type and gains the hero card type."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "RingsDB's candidate prints \"a hero in your discard pile\"; the scan prints \"a hero card in your discard pile\"."
+    },
+    {
+      "code": "145006",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Halbarad.jpg",
+        "sha256": "fd63b509f27f66d40d4e6480435e0d14f08fbdbfb7c5ec77d886ef0916e66a75"
+      },
+      "lines": [
+        "Reduce the cost to play Halbarad by 1 for each enemy engaged with you.",
+        "Each enemy engaged with you gets +10 engagement cost."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145007",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Ghân-buri-Ghân.jpg",
+        "sha256": "7ba649a700d9fa6af90efc6480853e2093bae891d0756075487163839ac2029e"
+      },
+      "lines": [
+        "X is the Threat of the active location.",
+        "Travel Action: Discard Ghân-buri-Ghân to travel to a location without resolving its Travel effect."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145009",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Desperate-Defense.jpg",
+        "sha256": "8b935f14080986244db6d0b4e5d03eacd0fe151398f265c165a92c3897d68fea"
+      },
+      "lines": [
+        "Response: After a sentinel character is declared as a defender, it gets +2 Defense for this attack. If this attack deals no damage, ready the defending character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145010",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Golden-Shield.jpg",
+        "sha256": "d8dfaaedf39b22647dfddb5624000a6f7661f63c7c9a3f9c24850a9a47b4f942"
+      },
+      "lines": [
+        "Attach to a Rohan hero. Restricted.",
+        "Response: After attached hero is declared as a defender, exhaust Golden Shield to add attached hero's Willpower to its Defense for this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "RingsDB's candidate prints \"it's Defense\"; the scan prints \"its\"."
+    },
+    {
+      "code": "145013",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Banner-of-Elendil.jpg",
+        "sha256": "3851669240fff3de15d34119eb817c0444abc13567d6b4606ea56d54112c1ca0"
+      },
+      "lines": [
+        "Attach to Aragorn.",
+        "While Aragorn is committed to the quest, each other questing character you control gets +1 Willpower.",
+        "While Aragorn is attacking, each other attacking character you control gets +1 Attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's candidate prints \"While Aragorn is questing\"; the scan prints \"is committed to the quest\"."
+    },
+    {
+      "code": "145014",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Esquire-of-Rohan.jpg",
+        "sha256": "fec8b75a70e6e7397f5b1f97f8037bf4558039b402e0c923e7b09359ecd84177"
+      },
+      "lines": [
+        "Permanent.",
+        "Permanent.",
+        "Setup: Attach to a hero.",
+        "Attached hero gains the Rohan trait.",
+        "Attached hero gets +1 Attack while attacking with another Rohan character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145015",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Esquire-of-Gondor.jpg",
+        "sha256": "aae7d747fe96c77714a91391f643ba8a7f4def99ca26a3506bf1d2a5b34befda"
+      },
+      "lines": [
+        "Permanent.",
+        "Setup: Attach to a hero.",
+        "Attached hero gains the Gondor trait.",
+        "Attached hero gets +1 Willpower while committed to the quest with another Gondor character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's candidate prints \"commited\"; the scan prints \"committed\"."
+    },
+    {
+      "code": "145016",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Overcome-by-Fear.jpg",
+        "sha256": "65e9c6dc6b33cd10b6e132d26079cfcc0fb1e2e7d6e132c8b376b8a598d94f94"
+      },
+      "lines": [
+        "Setup: Attach to your threat dial. Limit 1 per threat dial.",
+        "Your threat cannot be reduced.",
+        "Forced: At the end of the round, raise your threat by 1. Then, you may spend 1 Fellowship resource to detach Overcome by Fear and set it aside, out of play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The scan prints the Fellowship sphere icon, written Fellowship as Hall of Beorn does; Hall of Beorn's candidate omits the comma after \"Then\"."
+    },
+    {
+      "code": "145017",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Stone-of-Erech.jpg",
+        "sha256": "2f7a4a177fb5d192033312da4d856af70c140c1b035869a5f4f699680b8a79fb"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Forced: After The Stone of Erech becomes the active location, each player searches the encounter deck and discard pile for an Oathbreaker enemy and adds it to the staging area. Shuffle the encounter deck.",
+        "Travel: Remove 5 progress from stage 3B to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145018",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Dark-Door.jpg",
+        "sha256": "86a7386918c6b0e054b240957618087eb4b01d4399ffd15093ff2a8983810e68"
+      },
+      "lines": [
+        "While Dark Door is in the staging area, progress cannot be placed on locations in the staging area.",
+        "Travel: The first player reveals an encounter card to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145019",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Trysting-Place.jpg",
+        "sha256": "79ef1ea0d7c8b1ea8f320686b13419da7985a678bebdfe9a55b69003ad4bfcbb"
+      },
+      "lines": [
+        "While Trysting Place is in the staging area, each enemy in the staging area cannot take damage.",
+        "Travel: The first player searches the encounter deck and discard pile for an Oathbreaker enemy and puts it into play engaged with him. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145020",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Deadly-Road.jpg",
+        "sha256": "fbdaa751dbade02f9224072c9209f4931d189003151ef9f17f905c87f565048b"
+      },
+      "lines": [
+        "While Deadly Road is in the staging area, it gains: \"Forced: After a 'when revealed' effect is canceled, raise each player's threat by 1.\"",
+        "Travel: Spend 1 Fellowship resource to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The scan prints the Fellowship sphere icon, written Fellowship as Hall of Beorn does; the quoted ability is printed in double quotes, its inner quotation in single quotes."
+    },
+    {
+      "code": "145021",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Haunted-Path.jpg",
+        "sha256": "6783142840251225b4046844665af95e549f83da4b07f5b1912e48f937f86a74"
+      },
+      "lines": [
+        "Haunted Path gets +1 Threat for each player with a threat of 35 or higher.",
+        "Travel: Raise each player's threat by 1 to travel here.",
+        "Shadow: Either raise your threat by 2, or return attacking enemy to the staging area after this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's candidate prints \"raise your your threat\"; the scan prints \"raise your threat\"."
+    },
+    {
+      "code": "145022",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Dead-Man-of-Dunharrow.jpg",
+        "sha256": "a23ead05d481bd7d27152312136fc4022214b0586de6f11bd17b6b1e04f831f7"
+      },
+      "lines": [
+        "Phantom.",
+        "Forced: After Dead Man of Dunharrow engages you, either attach a set aside Overcome by Fear to your threat dial, or raise your threat by 2.",
+        "Shadow: Attacking enemy gets +1 Attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145023",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Faithless-Dead.jpg",
+        "sha256": "ced26a04ea81af3c966942d212377c73ac24b77a701812b1732dbcae774b42b0"
+      },
+      "lines": [
+        "Peril. Phantom.",
+        "When Revealed: Either raise each player's threat by 2, or reveal an additional encounter card.",
+        "Shadow: Attacking enemy gets +1 Attack and loses the Phantom keyword for this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145024",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Ghosts-of-Men.jpg",
+        "sha256": "98f54bd7d29a418706ab63d7cacf3015611794c1055f9e7f3940672c33e20589"
+      },
+      "lines": [
+        "Peril. Phantom.",
+        "When Revealed: Either attach a set aside Overcome by Fear to your threat dial, or Ghosts of Men makes an immediate attack against you."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145025",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Shadow-Host.jpg",
+        "sha256": "426fa5724ab128992f88baaeac52e6e53cb3c6350a5f806b3657e4724617f4fa"
+      },
+      "lines": [
+        "Phantom.",
+        "Forced: When Shadow Host engages you, either attach a set aside Overcome by Fear to your threat dial, or it makes an immediate attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145026",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Blood-Runs-Chill.jpg",
+        "sha256": "603fb559c4bbf87c0c71cadd264bfe35a7f6680c50d9697dc045c31a322ffec2"
+      },
+      "lines": [
+        "Doomed 1.",
+        "When Revealed: Each player with a threat of 35 or higher deals 1 damage to each exhausted character he controls.",
+        "Shadow: If your threat is 35 or higher, defending character cannot ready until the end of the round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's candidate prints \"deal 1 damage\"; the scan prints \"deals\"."
+    },
+    {
+      "code": "145027",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Way-is-Shut.jpg",
+        "sha256": "2e4a180c1aee0d5c18a3a6e06f2724751256d96efcfab472895a186b1d8b7131"
+      },
+      "lines": [
+        "Peril. Surge.",
+        "When Revealed: Either attach a set aside Overcome by Fear to your threat dial, or progress cannot be placed on the current quest until the end of the round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145028",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Whispers-in-the-Dark.jpg",
+        "sha256": "a062faa3d751561db863943bd8ad7e4b5b2eb2208cd301a2b15890ca6b63edc6"
+      },
+      "lines": [
+        "Peril.",
+        "When Revealed: Either attach a set aside Overcome by Fear to your threat dial, or each character you control gets -1 Willpower, -1 Attack, and -1 Defense until the end of the round.",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if undefended)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145029",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/No-Turning-Back.jpg",
+        "sha256": "2d2ec41f85223bdcf35445708fd96555f271bd0bc9a257ec5fed2722e8209432"
+      },
+      "lines": [
+        "When Revealed: Each player must choose: either attach a set aside Overcome by Fear to your threat dial, or discard an ally you control.",
+        "Shadow: Either attach a set aside Overcome by Fear to your threat dial, or attacking enemy makes an additional attack after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's candidate omits the final period of the When Revealed line."
+    },
+    {
+      "code": "145030",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Great-Corsair-Ship.jpg",
+        "sha256": "64a172ab13cfce96324adf7e99761b9b7fed99abf95c5e008092ade66e74cdfc"
+      },
+      "lines": [
+        "X is the number of resources on The Corsair Fleet.",
+        "The players cannot travel here unless there are at least 3 Ship locations in the victory display.",
+        "Travel: Each player searches the encounter deck and discard pile for a Corsair enemy and adds it to the staging area. One of those enemies must be Corsair Captain, if able."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145031",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Umbar-War-Galley.jpg",
+        "sha256": "4161f9d9900ff87aef2ced823c0e3a0a984f4197ba1f60917ec9877e85d526af"
+      },
+      "lines": [
+        "While Umbar War Galley is the active location, each Corsair enemy gets -10 engagement cost.",
+        "Travel: Shuffle the encounter discard pile into the encounter deck and discard cards from the encounter deck until a Corsair enemy is discarded. Add the discarded enemy to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145032",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Corsair-Dromon.jpg",
+        "sha256": "abfc4f4772a2e8c9957493d7a5b13dff812bc37b28b9f8fb2dbaf5b409fd53c0"
+      },
+      "lines": [
+        "While Corsair Dromon is the active location, each Corsair enemy gains Archery 1.",
+        "Travel: Shuffle the encounter discard pile into the encounter deck and discard cards from the top until a Corsair enemy is discarded. Add the discarded enemy to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145033",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Port-of-Pelargir.jpg",
+        "sha256": "13c355d5b30f0a3679a7f60e7b71f061f21f570470a961583dd7b6943e28bf91"
+      },
+      "lines": [
+        "While Port of Pelargir is in the staging area, no more than 1 damage can be healed from each character each round.",
+        "Shadow: If this attack damages a character, that character cannot ready until the end of the round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145034",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Pelargir-Quays.jpg",
+        "sha256": "ead03e40e1ded5f7f0e6db29cf19431acdddc9fa3852adf63106434d5ad208e5"
+      },
+      "lines": [
+        "Forced: At the end of the round, place a damage token here. Then, if there are 4 damage tokens here, discard Pelargir Quays and assign 4 damage among characters in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145035",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Corsair-Captain.jpg",
+        "sha256": "c0d811389e0ad79bf31e082701e82d99e8eb857ec90f1d28cb8ae71078180ab6"
+      },
+      "lines": [
+        "Cannot be optionally engaged.",
+        "If the active location is a Ship, Corsair Captain gets -30 engagement cost and gains: \"Forced: When Corsair Captain engages you, it makes an immediate attack.\""
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145036",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Corsair-of-Umbar.jpg",
+        "sha256": "59b86ce9faafcef0b095368d03a209c7984cd8329f330fbac756825c553f4f58"
+      },
+      "lines": [
+        "If the active location is a Ship, Corsair of Umbar gets +2 Attack and +2 Defense.",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the active location is a Ship)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145037",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Umbar-Pirate-Crew.jpg",
+        "sha256": "6c31f857f1574fcefc16624dce844a4bfc79d3a1550c90f011f15199be867f44"
+      },
+      "lines": [
+        "Cannot have attachments.",
+        "Forced: When Umbar Pirate Crew engages you, exhaust a character you control.",
+        "Shadow: If the active location is a Ship, return attacking enemy to the staging area after this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145038",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Haradrim-Pirate.jpg",
+        "sha256": "f15549e77aaf7ffe1a2dfea9bc1f6508ce9af979742d24f42f2f3da424200638"
+      },
+      "lines": [
+        "Forced: When Haradrim Pirate engages you, deal 1 damage to a character you control (2 damage instead if the active location is a Ship).",
+        "Shadow: Defending character gets -1 Defense for each damage on it."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145039",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Fell-Folk-of-Umbar.jpg",
+        "sha256": "78b6829d1b0c3c2b2c5f6485b3b6ba767303ae11504b60a0359d24f13b1b22c1"
+      },
+      "lines": [
+        "Peril.",
+        "When Revealed: Either return each Corsair enemy engaged with you to the staging area, or discard cards from the top of the encounter deck until a Corsair enemy is discarded and put that enemy into play engaged with you."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145040",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Black-Sails.jpg",
+        "sha256": "d2ffbbc9ed994eb8d3ea7c700a15867dbd919eb4ac9c20833bdc040560c1b5dc"
+      },
+      "lines": [
+        "Doomed 1.",
+        "When Revealed: Each Ship location in the staging area gets +1 Threat until the end of the phase. If there are no non-unique Ship locations in the staging area, search the encounter deck and discard pile for a Ship location and add it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145041",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Raiding-the-Coasts.jpg",
+        "sha256": "e4a3d889faa51991a037d46b61471a566581bb855ed3f4dcffa2011b5375e1a5"
+      },
+      "lines": [
+        "When Revealed: Each player must choose: either add 3 to the total Threat in the staging area until the end of the phase, or discard the highest cost attachment you control.",
+        "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, discard an attachment you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145042",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Driven-to-the-Brink.jpg",
+        "sha256": "faa401443b53f42f27717bfc5ef574610e4f4993b7c3eb42a1eb03b6b3407b70"
+      },
+      "lines": [
+        "Peril.",
+        "When Revealed: Either immediately end the quest phase (without resolving the quest), or assign X damage among questing characters you control. X is the number of resources on The Corsair Fleet.",
+        "Shadow: Exhaust a character you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145043",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Minas-Tirith.jpg",
+        "sha256": "f5d208155a8263f93724918d8eb46ed285b2b57967a74d3f949b7b705cb59d96"
+      },
+      "lines": [
+        "Minas Tirith has 30 hit points plus 10 for each player.",
+        "Forced: At the end of the round, deal 1 damage to Minas Tirith for each enemy in the staging area. Then, if Minas Tirith has no hit points remaining, the players lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145044",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Grond.jpg",
+        "sha256": "1d0c855f87fef9b2c46ac22e58e947d5862571bc22e858ffcbff28605541fbb4"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "X is the number of resources on Grond.",
+        "Forced: At the beginning of the quest phase, place 1 resource on Grond. Then, deal X damage to Minas Tirith.",
+        "Travel: The Witch-king makes an immediate attack against each player, in turn order."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145045",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Gate-of-Gondor.jpg",
+        "sha256": "82a72747383de5a6d3e6b5b690bd7ce23cc02a7ea5ee85ad6060966f64f1ebd1"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "While Gate of Gondor is the active location, each enemy in play gets -30 engagement cost.",
+        "Forced: When Gate of Gondor is explored, return each engaged enemy to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145046",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/City-Wall.jpg",
+        "sha256": "7635fc7ac0437cf4326be5fd704e0e9af796cbaa08028c37cb9956ddd81f053a"
+      },
+      "lines": [
+        "While City Wall is the active location, damage that would be placed on Minas Tirith must be placed here first.",
+        "Forced: When City Wall has damage equal to its quest points, discard it. Then, each player raises his threat by 3."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's candidate prints \"City Walls\"; the scan prints \"City Wall\"."
+    },
+    {
+      "code": "145047",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Pelennor-Field.jpg",
+        "sha256": "2eb5ef9e756c6944d597f19cf5863141bd0caf2cecf7b5924d1df2cfc8803a6a"
+      },
+      "lines": [
+        "While at least 1 enemy is in the staging area, progress cannot be placed on locations in the staging area.",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if it has the Harad trait)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145048",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Fire-filled-Trench.jpg",
+        "sha256": "aa0fa55de379ec0f326fcac79e9433762bd58a9b775b0c1c1ba2e5ab6b0a33f7"
+      },
+      "lines": [
+        "Forced: When a player plays an event that would cancel the effects of a treachery card just revealed from the encounter deck, cancel the effects of that event. Then, discard Fire-filled Trench."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145049",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Siege-Tower.jpg",
+        "sha256": "d71bc2bc45d4743cffa81116efccec5c5934b35dc38a24b040a2cdb18ff5fe0c"
+      },
+      "lines": [
+        "While Siege Tower is in the staging area, it gains Archery 3.",
+        "Forced: After Siege Tower becomes the active location, shuffle the encounter discard pile into the encounter deck and discard cards from the top until an enemy is discarded. Add the discarded enemy to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145050",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Black-Serpent.jpg",
+        "sha256": "5fee7ff532c9ab965acf0e358f99ab362976f21bdf8b3fb855735896bd28fc0a"
+      },
+      "lines": [
+        "Cannot have attachments or be attacked by more than 1 character at a time.",
+        "When Revealed: The Black Serpent makes an immediate attack against the first player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145051",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/War-Mûmak.jpg",
+        "sha256": "830edd290a485ddf95d026e3fb6df1e802380bcb3d770925e9d032e5134c0c9e"
+      },
+      "lines": [
+        "Archery 2.",
+        "Cannot have attachments or take more than 3 damage each round.",
+        "Forced: When War Mûmak is defeated, reduce each player's threat by 4."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn lists the Victory 4 badge in the keyword line; it is not a printed line of the text box."
+    },
+    {
+      "code": "145052",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Southron-Champion.jpg",
+        "sha256": "91ab2c45883dcb69a622efa0b3a9ab7d06c9b042729a0507bf4d4537263aa47c"
+      },
+      "lines": [
+        "Forced: After Southron Champion is dealt a shadow card with no shadow effect, either deal 3 damage to Minas Tirith, or it makes an additional attack after this one.",
+        "Shadow: Deal 1 damage to Minas Tirith."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's candidate omits the final period of the Shadow line."
+    },
+    {
+      "code": "145053",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Morgul-Captain.jpg",
+        "sha256": "38c2cf36d70b677b241e8fbeb4c1ab92f187113fa89e5c765b083b05a896a8b1"
+      },
+      "lines": [
+        "Peril.",
+        "When Revealed: Put the topmost Orc enemy in the discard pile into play engaged with you.",
+        "Shadow: If this attack destroys a character, return attacking enemy to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145054",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Orc-of-the-Eye.jpg",
+        "sha256": "7dd453223c2f0a3495700059b2e075c5d6d16353b7558773fcf41b8672328521"
+      },
+      "lines": [
+        "Peril. Archery 1.",
+        "When Revealed: Either deal 2 damage to a hero you control, or deal 2 damage to Minas Tirith.",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if it has the Mordor trait)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145055",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Mordor-Orc.jpg",
+        "sha256": "f203c3c473deefe678e5a8fce5f66bc1232df8e6bd9543fcffe6e1273cc23b80"
+      },
+      "lines": [
+        "Surge.",
+        "While Minas Tirith is in play, undefended damage dealt by Mordor Orc must be dealt to Minas Tirith.",
+        "Shadow: If Minas Tirith is in play, engage Mordor Orc and deal it a shadow card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145056",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Rammas-is-Breached.jpg",
+        "sha256": "fa39ca216cba567f0aff74b6fc3cc528d35c3d6bc0b9fddabe008101d81e8812"
+      },
+      "lines": [
+        "When Revealed: Each player searches the encounter deck and discard pile for an enemy and puts it into play engaged with him. Shuffle the encounter deck.",
+        "Shadow: Either deal 3 damage to Minas Tirith or attacking enemy makes an additional attack after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145057",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Fell-Beast.jpg",
+        "sha256": "7b236e71c8658cc6a81959c00aa018b4d17c95e7f94e0d72c96fd2ebc00d8173"
+      },
+      "lines": [
+        "Surge.",
+        "When Revealed: Attach to a Nazgûl enemy. Limit 1 per enemy. (Counts as a Mount attachment with the text: \"Attached enemy gets +1 Threat, +1 Attack, +1 Defense and -10 engagement cost. Forced: At the end of the round, return attached enemy to the staging area.\")"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's candidate prints the quotation in single quotes and leaves the closing quotation mark and parenthesis out."
+    },
+    {
+      "code": "145058",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Black-Dart.jpg",
+        "sha256": "7f5fe2f3d4954d67871f573bd1be655f2c6af609068bfcde78c817538c63a1b4"
+      },
+      "lines": [
+        "When Revealed: Remove a hero you control from the quest and attach Black Dart to that hero. Limit 1 per hero. (Counts as a Condition attachment with the text: \"Forced: At the end of the round, deal 1 damage to attached hero.\")",
+        "Shadow: If this attack damages a hero, attach Black Dart to that hero."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145059",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Spells-of-Ruin.jpg",
+        "sha256": "93bfd2f9ccc7989858eb41bd954aea1aeb13960b63b2ccfe2173fd6e85de6a9a"
+      },
+      "lines": [
+        "When Revealed: Either deal 1 damage to each exhausted character, or deal 5 damage to Minas Tirith.",
+        "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, deal 2 damage to Minas Tirith."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145060",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Dread-and-Despair.jpg",
+        "sha256": "9bef56ef524acd9344ec6b47ced32d4d08b5272538a40b8d8a816fa40a42e04e"
+      },
+      "lines": [
+        "Peril. Doomed 1.",
+        "When Revealed: Discard an ally you control. Until the end of the phase, add 1 to the total Threat in the staging area for each ally in your discard pile.",
+        "Shadow: Discard a non-objective attachment you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145061",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Shadow-of-Mordor.jpg",
+        "sha256": "cc44807de3bd47cd42491ff2fd6295ad264fe4c2119c2502977cb52c94210860"
+      },
+      "lines": [
+        "Doomed 1.",
+        "When Revealed: Each player deals 1 damage to a hero he controls. Until the end of the round, treat the printed text box of each damaged character as if it were blank, except for Traits."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145062",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Wraith-on-Wings.jpg",
+        "sha256": "9ff503056cb7a933ec85fbff029aa2bd91e5cb55eb356b1165c61bad9e2640d6"
+      },
+      "lines": [
+        "Setup: Add Wraith on Wings to the staging area.",
+        "Cannot have non-Morgul attachments.",
+        "Wraith on Wings gets +1 Threat and -1 engagement cost for each resource on it.",
+        "Forced: At the beginning of the quest phase, place 1 resource on Wraith on Wings. (Limit 5 resources.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's candidate prints \"enagement\" and has no period before the limit; the card's own title bar reads Burden."
+    },
+    {
+      "code": "145063",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Forbidden-Door-1A.jpg",
+        "sha256": "e333084147c4cd8f50235230488aaa7bbab1970f8482838b9698b52e0368986c"
+      },
+      "lines": [
+        "Setup: Set The Stone of Erech and Army of the Dead aside, out of play. Each player attaches a copy of Overcome by Fear to his threat dial. Remove each unattached copy of Overcome by Fear from the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145063",
+      "side": "B",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Forbidden-Door-1B.jpg",
+        "sha256": "30d1824fef6ece80941db03d6b802e9cfe50e72a9ff2c86fbd9640490b3913cc"
+      },
+      "lines": [
+        "When Revealed: Each player may add 1 resource to the resource pool of each hero he controls. Each player who does so must raise his threat by 3.",
+        "Forced: At the end of the planning phase, discard all cards in each player's hand and advance to stage 2A."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145064",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Paths-of-the-Dead-2A.jpg",
+        "sha256": "6dd06d40456d707e1e678c5112fc8fe8ea8f4f64b8df3eeec587e859bdf2fee0"
+      },
+      "lines": [
+        "When Revealed: Each player searches the encounter deck for a different location and adds it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145064",
+      "side": "B",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Paths-of-the-Dead-2B.jpg",
+        "sha256": "33feb5cfe682f281a2c7cd2df5c2b474cc21a6d4190306d599f186320d212608"
+      },
+      "lines": [
+        "X is the threat of the player with the highest threat.",
+        "Each player cannot reduce his threat below his initial threat level.",
+        "Forced: At the beginning of the planning phase each player must choose: either raise your threat by 1, or you cannot play cards this phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145065",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Dead-are-Following-3A.jpg",
+        "sha256": "519721d032cf019ecb3a83cb8881c4568889e1afc87384979319061229a2dfeb"
+      },
+      "lines": [
+        "When Revealed: Add The Stone of Erech and Army of the Dead (enemy side faceup) to the staging area. Each player may raise his threat by 3 to detach Overcome by Fear from his threat dial and set it aside, out of play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145065",
+      "side": "B",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Dead-are-Following-3B.jpg",
+        "sha256": "c0023ebc3ac9aac81656a4257cdcf7d9c309e45648541c4d934996cfaaaf9484"
+      },
+      "lines": [
+        "While The Stone of Erech is the active location, each Oathbreaker enemy loses the Phantom keyword and gets -20 engagement cost.",
+        "When The Stone of Erech leaves play as an explored location, the players win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's candidate prints \"While Stone of Erech\"; the scan prints \"The Stone of Erech\"."
+    },
+    {
+      "code": "145066",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Passing-of-the-Grey-Company-SetupA.jpg",
+        "sha256": "25618305c509b5c37dc8ef6d7a95510e785e422a6de1bc838f45e15724e742f4"
+      },
+      "lines": [
+        "Setup: Each player may change heroes without incurring the +1 threat penalty. The first player may raise each player's threat by 1 to search his deck for Andúril and add it to his hand. Remove each burden with the following burden set icons from the encounter deck: A Shadow of the Past, Flight to the Ford, The Ring Goes South, The Passage of the Marshes, Shelob's Lair"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Titled \"The Lord of the Rings - Part 13\" on the card. Hall of Beorn's candidate prints \"may trade heroes without incurring a threat penalty\"; the scan prints \"change heroes without incurring the +1 threat penalty\". The scan prints the burden set icons as pictures, written as the set names Hall of Beorn gives, in the printed order; the first three icons are the ones the Uruk-hai campaign card (143071) prints for A Shadow of the Past, Flight to the Ford and The Ring Goes South."
+    },
+    {
+      "code": "145066",
+      "side": "B",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Passing-of-the-Grey-Company-SetupB.jpg",
+        "sha256": "ab4381c1d76631ddc632bb5dd3b42a1deeba0f5b4056422ab5651fbff1d6d1ae"
+      },
+      "lines": [
+        "Resolution: Add each copy of Overcome by Fear attached to a player's threat dial to the campaign pool and record the name of each player it was attached to. If Army of the Dead is in the victory display, add the Army of the Dead boon to the campaign pool. The players have earned each card added to the campaign pool."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's candidate omits the final period."
+    },
+    {
+      "code": "145067",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Army-of-the-Dead-Enemy.jpg",
+        "sha256": "024cb40dc882821d05c220e0876ce9dfd79216e3f08e2fad0c33cb1039d74222"
+      },
+      "lines": [
+        "Phantom. Immune to player card effects.",
+        "X is twice the number of players in the game.",
+        "Forced: When Army of the Dead attacks, you must either attach a set aside Overcome by Fear to your threat dial, or discard an ally you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn lists the Victory 6 badge in the keyword line; it is not a printed line of the text box."
+    },
+    {
+      "code": "145068",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Army-of-the-Dead-Objective-Ally.jpg",
+        "sha256": "40a2502b169647fcddc7e279bce9eb658ad69bdd86bece0c2c7c35c4e2434046"
+      },
+      "lines": [
+        "Immune to player card effects. The first player gains control of Army of the Dead.",
+        "Setup: The first player takes control of Army of the Dead.",
+        "If Army of the Dead leaves play, remove it from the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145069",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Attack-on-Pelargir-1A.jpg",
+        "sha256": "e11e917dc48c33764a139c3c47e90acd41b6279b403531f23f143d337d0f2575"
+      },
+      "lines": [
+        "Setup: Add The Corsair Fleet (Corsair side faceup) and Great Corsair Ship to the staging area. Each player searches the encounter deck for a Ship location and adds it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145069",
+      "side": "B",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Attack-on-Pelargir-1B.jpg",
+        "sha256": "df11a9a9edfcfe377f0a6f101a6e9577cb13c6571167fe23753498b6bd3170f8"
+      },
+      "lines": [
+        "Each Ship location in the staging area is immune to player card effects.",
+        "The players cannot defeat this stage while Great Corsair Ship is in play. When this stage is defeated, the players win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145070",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Siege-of-Gondor-SetupA.jpg",
+        "sha256": "2834706b91190c95820aa3ac9f94910b59609676fb71a0b72f9159ceb25eab3a"
+      },
+      "lines": [
+        "Setup: The first player may raise each player's threat by 1 to search his deck for Andúril and add it to his hand. Remove each burden with the following burden set icons from the encounter deck: A Shadow of the Past, Flight to the Ford, The Ring Goes South, The Passage of the Marshes, Shelob's Lair"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Titled \"The Lord of the Rings - Part 14\" on the card. The scan prints the burden set icons as pictures, written as the set names Hall of Beorn gives for the same five icons on the Passing of the Grey Company card (145066), in the printed order."
+    },
+    {
+      "code": "145070",
+      "side": "B",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/949e2607-cbb5-4ae3-af26-f9d7e00e09d2.B.jpg",
+        "sha256": "05fef5a0e6831565ef52ab48e25e0e8264e6f0217e6f4a8a5ad57426c60502b9"
+      },
+      "lines": [
+        "Resolution: Count the number of resources on The Corsair Fleet and record that number in the notes section of the quest log. Remove Army of the Dead from the campaign pool."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's SetupB image of this card is a blank parchment; the Resolution is read from DragnCards' picture of the back (scripts/data/printed/scope.ts, SCAN_URL_FIXES). It prints \"campaign pool\" in lower case."
+    },
+    {
+      "code": "145071",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Corsair-Fleet-Corsair.jpg",
+        "sha256": "4ed511a420c140253ca001c7f57fbec8fa9f5610a35e6602041736eb027fc515"
+      },
+      "lines": [
+        "Forced: At the beginning of the staging step, place 1 resource on this objective. Then, each player must choose: either reveal an encounter card, or assign X damage among characters he controls. X is the number of resources here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145072",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Corsair-Fleet-Gondor.jpg",
+        "sha256": "d519b972cf4a1b1f05a4c3003c8e5c6f69043c950ef825d431d101f821063afb"
+      },
+      "lines": [
+        "Forced: At the beginning of the quest phase, remove 1 resource from The Corsair Fleet. Then, if there are no resources here, the first player takes control of Aragorn and adds The Corsair Fleet to the victory display."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145073",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Garrison-of-Gondor-1A.jpg",
+        "sha256": "0578b46fb0662028d1976f791b37cff3ef31845c19aec73e479d367550ba7ecd"
+      },
+      "lines": [
+        "Setup: Set Minas Tirith, Grond, The Witch-king, and each copy of Wraith on Wings aside, out of play. Search the encounter deck for a copy of Pelennor Field and make it the active location. Shuffle the encounter deck. The players may attach Esquire of Rohan and Esquire of Gondor to different heroes."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's candidate prints \"Wraith of Wings\"; the scan prints \"Wraith on Wings\"."
+    },
+    {
+      "code": "145073",
+      "side": "B",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Garrison-of-Gondor-1B.jpg",
+        "sha256": "6ec5a9d459d75e0cc0aae3b32f5d4db2a6db5b063b739b8660ee53444b69c40e"
+      },
+      "lines": [
+        "Skip the quest phase and combat phase.",
+        "Forced: At the end of the planning phase, place 1 progress here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145074",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Retreat-from-Osgiliath-2A.jpg",
+        "sha256": "a70691471b33a90ee404bbd2ce1306229e9677f79340a70080b3c6e61e6af8a4"
+      },
+      "lines": [
+        "When Revealed: Each player adds 1 set aside Wraith on Wings to the staging area and reveals an encounter card. Starting with the first player, each player discards cards from the top of his deck until he discards an ally that is not in play. Put the discarded ally into play in the staging area and treat its text box as if it were blank until the end of the phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145074",
+      "side": "B",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Retreat-from-Osgiliath-2B.jpg",
+        "sha256": "c657055142ab1dcccc60d668d3363b695dfa1ce93e8f720d4da002306787f17c"
+      },
+      "lines": [
+        "X is the total cost of all allies in the staging area.",
+        "Allies in the staging area are treated as if their text box is blank, are immune to player card effects, and are under no player's control.",
+        "Forced: At the end of the round, assign damage among allies in the staging area equal to the number of enemies in the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's candidate prints \"among the allies\"; the scan prints \"among allies\"."
+    },
+    {
+      "code": "145075",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-White-City-Besieged-3A.jpg",
+        "sha256": "6e185aba5499f1790dfc2831e0e7c1d587a3a3c3238e6717ba18b74da79d7aee"
+      },
+      "lines": [
+        "When Revealed: Each player takes control of each ally he owns in the staging area and exhausts it. The first player adds Minas Tirith, Grond, and The Witch-king (Captain side faceup) to the staging area. Each other player searches the encounter deck and discard pile for a different enemy and adds it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn lists the Assault keyword on side A; the scan prints it on side B (stage 3B)."
+    },
+    {
+      "code": "145075",
+      "side": "B",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-White-City-Besieged-3B.jpg",
+        "sha256": "a0b7b04b5816b8d57bab1028e25c4cb2d9f8620b6ad2ac4cefc1f449e8e94a7a"
+      },
+      "lines": [
+        "Assault.",
+        "The White City Besieged gets +4 quest points for each player in the game.",
+        "The players cannot travel to Pelennor locations.",
+        "Forced: When an enemy is destroyed, place progress on this stage equal to that enemy's total Threat (progress must be placed on the active location first)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145076",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Rohan-has-Come-4A.jpg",
+        "sha256": "5a0af6b8bf895563fa7766065cbc9b86599a6aacbe5644561ee946bb33a9c525"
+      },
+      "lines": [
+        "When Revealed: Set The Witch-king aside, out of play. Each player searches the top 10 cards of his deck for an ally that matches the sphere of a hero he controls and puts it into play under his control. Each player shuffles his deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's candidate prints \"Set the Witch-king\" and \"and put it\"; the scan prints \"Set The Witch-king\" and \"and puts it\"."
+    },
+    {
+      "code": "145076",
+      "side": "B",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Rohan-has-Come-4B.jpg",
+        "sha256": "b8f1a05c834a473085d35b2080b05072b6c93896088daea6c7139c871c23a361"
+      },
+      "lines": [
+        "Progress that would be placed on this stage by questing successfully is instead assigned as damage among enemies in play. (Progress must be placed on the active location first.)",
+        "Forced: At the end of the quest phase, advance to stage 5A."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's candidate prints \"Progress cannot be placed on this stage by questing successfully is instead assigned\"; the scan prints \"Progress that would be placed on this stage by questing successfully is instead assigned\"."
+    },
+    {
+      "code": "145077",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Fighting-in-the-Fields-5A.jpg",
+        "sha256": "c7be010a73bb415a50a278391c0849f585554002526cddd9682236ab6458ccb1"
+      },
+      "lines": [
+        "When Revealed: The first player adds The Witch-king to the staging area (Sorcerer side faceup). Then, he searches the encounter deck and discard pile for a Fell Beast and attaches it to The Witch-king, if able. Shuffle the encounter deck. Each other player reveals an encounter card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145077",
+      "side": "B",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Fighting-in-the-Fields-5B.jpg",
+        "sha256": "9a3b7c380a5ec8a3e6468f0d9254e82d6328a9f13277e65a409f4a04b49d8753"
+      },
+      "lines": [
+        "The Witch-king and shadow cards dealt to The Witch-king are immune to player card effects.",
+        "Forced: When an enemy attacks and destroys a character, deal 1 damage to Minas Tirith.",
+        "This stage cannot be defeated unless Aragorn is in play and The Witch-king is in the victory display. If the players defeat this stage, they win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's candidate prints \"shadow cards deal to\"; the scan prints \"dealt to\"."
+    },
+    {
+      "code": "145078",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Battle-of-the-Pelennor-Fields-SetupA.jpg",
+        "sha256": "e460cd4d81090ef902f2f3968de38b287d04d27fa95ca85b5e9a794334a193b1"
+      },
+      "lines": [
+        "Setup: Set each Harad enemy recorded in the campaign log aside, out of play. The first player attaches Andúril and Banner of Elendil to Aragorn and sets him aside, out of play. Add The Corsair Fleet to the staging area (Gondor side faceup) and place X resources on it, where X is the number recorded in the campaign log. Remove each burden with the following burden set icons from the encounter deck, then flip this card over: A Shadow of the Past, Flight to the Ford, The Ring Goes South, The Passage of the Marshes, Shelob's Lair"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Titled \"The Lord of the Rings - Part 15\" on the card. Hall of Beorn's candidate prints \"and set him aside\"; the scan prints \"sets\". The scan prints the burden set icons as pictures, written as the set names Hall of Beorn gives for the same five icons on the Passing of the Grey Company card (145066), in the printed order."
+    },
+    {
+      "code": "145078",
+      "side": "B",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/10557685-71b2-4f2e-b831-4b19d023ee46.B.jpg",
+        "sha256": "f00b5ddf95179520e83daec5dc61bb60062a63139ebe5388e683ee1d944921a6"
+      },
+      "lines": [
+        "Forced: When the players advance to stage 5B, add each set aside Harad enemy to the staging area.",
+        "Resolution: Add 1 copy, per player, of Wraith on Wings to the campaign pool. The players have earned those burdens. If Esquire of Gondor, or Esquire of Rohan, is attached to a hero, that hero's controller has earned that boon."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's SetupB image of this card shows only the flavor quotation; the Forced and Resolution paragraphs are read from DragnCards' picture of the back (scripts/data/printed/scope.ts, SCAN_URL_FIXES)."
+    },
+    {
+      "code": "145079",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Witch-king-Captain.jpg",
+        "sha256": "47de114b8c1e98b78ca15b9d9df9053d8eda152a1b48ccc97f4c07960049b0b4"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Cannot be optionally engaged or take damage.",
+        "Forced: At the beginning of the quest phase, discard cards from the encounter deck until an enemy is discarded. Add the discarded enemy to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "145080",
+      "side": "A",
+      "printing": "FotW",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Witch-king-Sorcerer.jpg",
+        "sha256": "579e9ac8db54d25787237b48dad36ebfccae81ed2835e398e9289a5d036ab96a"
+      },
+      "lines": [
+        "Only the engaged player can declare attackers against The Witch-king.",
+        "Forced: At the beginning of the encounter phase, The Witch-king engages the first player. Then, it makes an immediate attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's candidate prints \"against the Witch-king\"; the scan prints \"The Witch-king\"."
+    },
+    {
+      "code": "146001",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/b937644c-ccbb-4a39-ae3c-24857d1d4d57.jpg",
+        "sha256": "a45de0e4d268e549363271b3bad666ac0fec98b0ba4fb11fc2f7b491d939fa5e"
+      },
+      "lines": [
+        "Planning Action: Exhaust The One Ring to add 1 resource to a hero's pool."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "146002",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/f1cc6057-ced3-4105-9172-869d26a54af5.jpg",
+        "sha256": "14933a9bf7309d879dff58601fbf5b5aad93f3b172946a2a8b5a57d4882211f5"
+      },
+      "lines": [
+        "Sentinel. The first player gains control of Aragorn.",
+        "Action: Spend 1 resource from Aragorn's pool to ready him. (Limit once per phase.)",
+        "If Aragorn leaves play, the players lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The scan is a 422 px image (Hall of Beorn's widest). Hall of Beorn's candidate omits the comma after \"leaves play\"."
+    },
+    {
+      "code": "146005",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/0baaf661-4bfd-48ed-80d4-bfa98217da1c.jpg",
+        "sha256": "3407ce4a5b7f7d8b2a1569b763f3eb97fea2d37f4a90c2f09a1adf936db4b173"
+      },
+      "lines": [
+        "Action: Exhaust Rosie Cotton to choose a Hobbit hero and an attribute (Willpower, Attack, or Defense). Add Rosie Cotton's Willpower to that hero's chosen attribute until the end of the phase. (Limit once per phase.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The scan prints the stat icons; they are written as Willpower, Attack and Defense. Hall of Beorn's candidate omits the \"or\"."
+    },
+    {
+      "code": "146007",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/51512531-0697-4005-9fb6-884da5b02f75.jpg",
+        "sha256": "a7cbd20cefd958a9ae102202f32d091ffe5d3d2874cbdbf348e0cbf1c4fc6d34"
+      },
+      "lines": [
+        "While Elrohir is in play, Elladan gets +2 Attack.",
+        "Response: After you optionally engage an Orc enemy, ready Elladan."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "146008",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://dragncards-lotrlcg.s3.amazonaws.com/cards/English/769dbf59-9e02-4750-9605-b1ad6c8783e2.jpg",
+        "sha256": "58ad17425df11e5518f2f8ee5f509e8f31d723c2c685d555afd1e3de5b662764"
+      },
+      "lines": [
+        "While Elladan is in play, Elrohir gets +2 Defense.",
+        "Response: After you optionally engage an Orc enemy, ready Elrohir."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "146014",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Last-of-the-Company.jpg",
+        "sha256": "27bd328cfaf817c6eef1339a21e7e1d2f15a6a3d96706a9b24206c61e6b9cdb6"
+      },
+      "lines": [
+        "Attached hero gains the Ring-bearer trait and the Fellowship sphere. You cannot lose control of the first player token.",
+        "Action: Exhaust The One Ring and raise your threat by 1 to choose an enemy. Until the end of the phase, that enemy gets -X Threat, where X is the attached hero's Willpower."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0,
+      "notes": "The scan prints the Fellowship sphere icon, written Fellowship as Hall of Beorn does. Hall of Beorn's candidate prints \"Exhaut\"."
+    },
+    {
+      "code": "146015",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Topmost-Chamber.jpg",
+        "sha256": "2ea812938bfcb481fc256c9021105a87cb030c82401b3bb0fa340622bd75088d"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "The players cannot travel here unless there is at least 18 progress on stage 2B.",
+        "Travel: Add Shagrat to the staging area to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0,
+      "notes": "Hall of Beorn's candidate prints \"player card effect\"; the scan prints \"effects\"."
+    },
+    {
+      "code": "146016",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Echoing-Passage.jpg",
+        "sha256": "af26294518fcbb94526efe90268eb3800005dcf75e05167241791c38abff362c"
+      },
+      "lines": [
+        "Echoing Passage gets +1 Threat for each enemy in the staging area.",
+        "While Echoing Passage is the active location, each enemy gets +2 Defense."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146017",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Bloodied-Courtyard.jpg",
+        "sha256": "6cf61c18cc4b8b96e7965ca1b9205b6700c08b5ee5b8714083e92845e62738ea"
+      },
+      "lines": [
+        "While Bloodied Courtyard is the active location, it gains: \"Forced: After an enemy enters the staging area, deal 1 damage to it.\"",
+        "Travel: Raise each player's threat by 1 to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146018",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Winding-Stairs.jpg",
+        "sha256": "69168ee537e1b885da5aafe9f634adcc852eb301379da1aa685ae7d0bac6a779"
+      },
+      "lines": [
+        "While Winding Stairs is the active location, each enemy in the staging area gets +10 engagement cost.",
+        "Travel: Each player must exhaust a character he controls to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146019",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Torch-lit-Hall.jpg",
+        "sha256": "0a9e45deece0ffbf0bcb20d862eb4832b46a93ad094c0366cc9766adaa48c0f7"
+      },
+      "lines": [
+        "Forced: After the players travel to Torch-lit Hall, discard cards from the top of the encounter deck until an enemy is discarded. If there is a copy of that enemy in the staging area, discard that copy as well. If there is not, add the just discarded enemy to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146020",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Shagrat.jpg",
+        "sha256": "cb29f0d7f2e7c70412c9cfb1f5f27933fa621330cfe820de7bd3b30d3ba1747a"
+      },
+      "lines": [
+        "Cannot have non-boon attachments. Cannot take non-combat damage.",
+        "Allies cannot attack or defend against Shagrat.",
+        "Forced: After progress is placed on the quest, Shagrat gets -X engagement cost until the end of the round. X is the amount of progress just placed."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0,
+      "notes": "Hall of Beorn's candidate prints \"Cannot have attachments\"; the scan prints \"non-boon attachments\"."
+    },
+    {
+      "code": "146021",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Gorbag.jpg",
+        "sha256": "223bc383bc01483d38775dec88cb8bdbf26de4b087eb6c76491a61979e127107"
+      },
+      "lines": [
+        "Cannot have attachments.",
+        "Forced: After Gorbag engages you, it makes an immediate attack.",
+        "Shadow: Attacking enemy makes an additional attack against you after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146022",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Wounded-Uruk.jpg",
+        "sha256": "b69bfc43e766dd9d34f26c27a1cc3c71660f50e87ffd8ab8ecdb8e471c0d14c4"
+      },
+      "lines": [
+        "Wounded Uruk enters play with 2 damage on it.",
+        "Forced: After Wounded Uruk engages you, it gets +2 Attack until the end of the round.",
+        "Shadow: Attacking enemy gets +1 Attack for each damage on it."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146023",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Orcish-Howls.jpg",
+        "sha256": "035fa30defe93d36bb12f4b0e42b45be8519c1abf18f14659e2656c63a8e8b38"
+      },
+      "lines": [
+        "When Revealed: Deal 1 damage to each enemy in the staging area. Until the end of the phase, each enemy gets +1 Threat for each damage on it. If there are no enemies in the staging area, Orcish Howls gains surge.",
+        "Shadow: If you are engaged with another enemy, resolve this attack against that enemy."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146024",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Black-Gate.jpg",
+        "sha256": "0eff263c934b3ac9e88fea0924d7d1e1d5c1488fa431708067e0e139552c53b5"
+      },
+      "lines": [
+        "Immune to player card effects. The players cannot travel here.",
+        "The Black Gate gets +1 Threat for each resource on it.",
+        "Forced: At the beginning of the quest phase, place 1 resource here and raise each player's threat by 1."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146025",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Towers-of-the-Teeth.jpg",
+        "sha256": "35eab662a233358bcb3fcbe3adc67a25175cf5f3df2686d97561fab33f836921"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "X is the number of characters controlled by the player with the most characters.",
+        "While Towers of the Teeth is the active location, players cannot play allies."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146026",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Beleaguered-Hills.jpg",
+        "sha256": "c1735970e96170a5950b9a45b53a215c1632ef8af85e283a67dc53e26e681646"
+      },
+      "lines": [
+        "While Beleaguered Hills is the active location, reduce the total Threat in the staging area by X, where X is the total Threat of each engaged enemy.",
+        "Forced: After Beleaguered Hills becomes the active location, each player engages a non-unique enemy in the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146027",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Waste-of-Dagorlad.jpg",
+        "sha256": "f80d827d9fdeba5198cdf22d792d81ea208d017f5ff098b5394bf0e026221eff"
+      },
+      "lines": [
+        "While Waste of Dagorlad is the active location, treat the printed text box of each ally as if it were blank (except for Traits)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146028",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Slopes-of-Cirith-Gorgor.jpg",
+        "sha256": "7849d5976d1d8e2ee606efdf3cbfb1f37c0341780fc64466413932e75b11a18c"
+      },
+      "lines": [
+        "Forced: When Slopes of Cirith Gorgor leaves play, the first player shuffles the encounter discard pile into the encounter deck and discards cards from the top until an enemy is discarded. Then, he puts that enemy into play engaged with him."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0,
+      "notes": "Hall of Beorn's candidate prints \"leaves play. the first player\"; the scan prints a comma."
+    },
+    {
+      "code": "146029",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Reeking-Moat.jpg",
+        "sha256": "f89179759179a3e200c1541de5d56183b75c283970d0dca93edba9f3893b687f"
+      },
+      "lines": [
+        "Forced: After Reeking Moat becomes the active location, choose a non-unique, non-Nazgûl enemy in the staging area and place it facedown under Reeking Moat.",
+        "Forced: When Reeking Moat leaves play, put each enemy under it into play engaged with the first player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146030",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Wall-of-Morannon.jpg",
+        "sha256": "ba9f00889a0625b2297f6fecb9edcbb5c2475a50e72a3ad8ac1e01008b21e6d1"
+      },
+      "lines": [
+        "While Wall of Morannon is the active location, each enemy and location in the staging area is immune to player card effects.",
+        "Forced: After Wall of Morannon becomes the active location, return each engaged enemy to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0,
+      "notes": "Hall of Beorn's candidate prints \"becomes of the active location\"; the scan prints \"becomes the active location\"."
+    },
+    {
+      "code": "146031",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Mouth-of-Sauron.jpg",
+        "sha256": "edb4ee0c363bc37167f3baca3c23d4db24dab60179f66aae3aeb05ad2d0f626a"
+      },
+      "lines": [
+        "Immune to player card effects. Cannot leave the staging area.",
+        "Forced: After a player cancels a 'when revealed' effect, The Mouth of Sauron makes an immediate attack against that player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146032",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Nazgûl-of-Mordor.jpg",
+        "sha256": "d3afd3c565b0fd108f58ae8fbcb2ee07d202bdfdfa79f38156e7c35bb71ccd53"
+      },
+      "lines": [
+        "Cannot have non-Morgul attachments.",
+        "Forced: After Nazgûl of Mordor attacks, either raise your threat by 4, or return Nazgûl of Mordor to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146033",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Gorgoroth-Hill-troll.jpg",
+        "sha256": "f090c9aad6218a2b4924c09059e008aa617c7a7461364151c9e7779e40617544"
+      },
+      "lines": [
+        "Cannot have attachments.",
+        "Forced: After Gorgoroth Hill-troll attacks and destroys a character, the defending player discards a random card from his hand and raises his threat by that card's printed cost."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0,
+      "notes": "Hall of Beorn's candidate prints \"from his and hand\"; the scan prints \"from his hand and\"."
+    },
+    {
+      "code": "146034",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Easterling-Bowman.jpg",
+        "sha256": "745e816e88d0501e3a19c2a45080504e68711511e0d9275b2336b6e6cbefe6c3"
+      },
+      "lines": [
+        "Peril. Archery 1.",
+        "When Revealed: Deal 1 damage to a questing character you control.",
+        "Shadow: After this attack, attacking enemy engages the next player then makes an attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146035",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Warrior-of-Rhûn.jpg",
+        "sha256": "6fd0bdae4764ebde4cb289c48e5114f137f38b0500e41a9f745080abb392e0bf"
+      },
+      "lines": [
+        "Peril.",
+        "When Revealed: Choose a questing character you control and remove it from the quest.",
+        "Shadow: Defending character cannot ready until the end of the round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146036",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Hell-hawk.jpg",
+        "sha256": "7aeb272f5be400efdd1732326c7632b02cae005e860e4626327baaac188451dc"
+      },
+      "lines": [
+        "Peril.",
+        "When Revealed: Either search the encounter deck, discard pile, and victory display for a Nazgûl enemy and add it to the staging area, or attach Hell-hawk to a Nazgûl enemy in play. (Counts as a Mount attachment with the text: \"Limit 1 per enemy. Attached enemy gets +2 Threat, +2 Attack, +2 Defense and is immune to player card effects.\")"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0,
+      "notes": "Hall of Beorn's candidate prints the quotation in single quotes, without the closing parenthesis, and \"play card effects\"; the scan prints double quotes and \"player card effects\"."
+    },
+    {
+      "code": "146037",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Hour-of-Doom.jpg",
+        "sha256": "c7a7ce07920e2a737c859eab84872e3454debd40f25f8bf3054e89ec5ac65cea"
+      },
+      "lines": [
+        "Doomed 1.",
+        "When Revealed: Each player must choose: either raise your threat by 1 for each character you control, or discard the highest cost ally you control.",
+        "Shadow: Discard a non-objective attachment you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146038",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Jaws-of-Steel.jpg",
+        "sha256": "897ea147fe03c2ec12353d4a721e69cf2f518244b2b92f71fcbda752e25b0b33"
+      },
+      "lines": [
+        "When Revealed: Each player assigns X damage among characters he controls, where X is the number of resources on The Black Gate.",
+        "Shadow: Attacking enemy gets +1 Attack for each resource on The Black Gate."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0,
+      "notes": "Hall of Beorn's candidate repeats the word \"Shadow:\" on the Shadow line."
+    },
+    {
+      "code": "146039",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Rage-Filled-Him.jpg",
+        "sha256": "d76ada05a4518f8dd9410b22d2b07cea9d23cce784c34bb2ec354e1f95fa031e"
+      },
+      "lines": [
+        "Peril.",
+        "When Revealed: The Mouth of Sauron makes an immediate attack against you. If this attack destroys a character, raise your threat by 4.",
+        "Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if it is The Mouth of Sauron)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146040",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Onslaught-of-Mordor.jpg",
+        "sha256": "25d7bc4fcbaea16a9f2c040ffaf89b40d065fb5fb1b2b2b5d9be3b5608f23c94"
+      },
+      "lines": [
+        "When Revealed: Each player deals 1 damage to a questing character he controls. Until the end of the phase, each damaged character gets -1 Willpower and cannot be healed.",
+        "Shadow: Choose a non-unique enemy in the staging area. Engage it and deal it a shadow card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146041",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Gwaihir.jpg",
+        "sha256": "8b04f55efb795c88bfff1e0f0ebfdeada56053cfe82d931fc2c588f2ddf461b9"
+      },
+      "lines": [
+        "Ranged. Sentinel.",
+        "When Revealed: The first player must choose: either take control of Gwaihir, or spend 1 Fellowship resource and discard Gwaihir to discard a non-unique enemy in the staging area.",
+        "Shadow: This attack deals no damage."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0,
+      "notes": "The scan prints the Fellowship sphere icon, written Fellowship as Hall of Beorn does. Hall of Beorn's candidate lists the keyword line twice."
+    },
+    {
+      "code": "146042",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Tower-of-Barad-dûr.jpg",
+        "sha256": "eb22066d2842348f185d965ba8bc1cc51ce8fa1e5db153287d8fc9169d9e3576"
+      },
+      "lines": [
+        "Players do not raise their threat at the end of the refresh phase.",
+        "Forced: At the end of the round, each player raises his threat by 1 for each non-Fellowship character he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146043",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Mount-Doom.jpg",
+        "sha256": "fe5fca6a2b2497944f24300633d4244bb32b75f14ec28a0e3006e09aafecb375"
+      },
+      "lines": [
+        "Immune to player card effects. X is the tens digit of the first player's threat dial.",
+        "The players cannot travel here unless there is at least 20 progress on stage 3B.",
+        "Travel: Each player makes a Fortitude test. If a player fails this test, raise his threat by 9."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146044",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Orc-hold.jpg",
+        "sha256": "212901c7bc6c88aa9b9802b40ad2dd8ffc6bb0073645efee4ee72bb8bd42072e"
+      },
+      "lines": [
+        "While Orc-hold is in the staging area, progress cannot be placed on other locations in the staging area.",
+        "Forced: After Orc-hold becomes the active location, shuffle the encounter discard pile into the encounter deck. Discard cards from the top until an Orc enemy is discarded. Put that enemy into play engaged with the first player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 1,
+      "notes": "Prints 1 Sauron's Eye icon in the bottom left corner of its text box (mec113.fortitude-tests)."
+    },
+    {
+      "code": "146045",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Mordor-Road.jpg",
+        "sha256": "3ea3cb708d535a181b4f0fee71a290d6dcf67476f7298685d083c546d1a6f2cc"
+      },
+      "lines": [
+        "Mordor Road gets +1 Threat for each ally controlled by the player who controls the most allies.",
+        "Forced: After Mordor Road becomes the active location, each player discards the top card of the encounter deck. Add each enemy discarded this way to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 1,
+      "notes": "Prints 1 Sauron's Eye icon in the bottom left corner of its text box (mec113.fortitude-tests). Hall of Beorn's candidate omits the word \"ally\" in the first line."
+    },
+    {
+      "code": "146046",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Plain-of-Gorgoroth.jpg",
+        "sha256": "1cf09d2bcd4254e74f380be933bbdb0bd09020ea59b7fd6b85303d068c690b8f"
+      },
+      "lines": [
+        "If a player has failed a Fortitude test this round, Plain of Gorgoroth gets +2 Threat.",
+        "Travel: The first player makes a Fortitude test to travel here. If he fails this test, raise each player's threat by 4."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146047",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Brake-of-Thorns.jpg",
+        "sha256": "832e679af0c4c9074e4030d0b5fce70938a1143cdf0937dd75d7126d2d2fa349"
+      },
+      "lines": [
+        "While Brake of Thorns is in the staging area, add Sauron's Eye to each Fortitude test.",
+        "Forced: After Brake of Thorns becomes the active location, each player assigns X damage among characters he controls, where X is the tens digit of his threat dial."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 1,
+      "notes": "The scan prints the Sauron's Eye icon in the first line, written Sauron's Eye. Prints 1 Sauron's Eye icon in the bottom left corner of its text box (mec113.fortitude-tests)."
+    },
+    {
+      "code": "146048",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Old-Water-course.jpg",
+        "sha256": "d9021de45169185947d7c3e8ede5c46cd7d67d42099225f5cbe4a861d18dd406"
+      },
+      "lines": [
+        "While Old Water-course is the active location, it gains: \"Response: When Old Water-course is explored, reduce each player's threat by 5.\"",
+        "Travel: Each player must exhaust a hero he controls to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146049",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Gollum.jpg",
+        "sha256": "bae54ac4da6516e7b3358ae0911788ba9d428e0f0ee2fbefd0292e1ca636312d"
+      },
+      "lines": [
+        "Surge. Immune to non-Fellowship player card effects.",
+        "Gollum engages the first player.",
+        "*Forced: After Gollum is discarded during a Fortitude test, put him into play engaged with the first player. Then, choose an encounter card discarded for this test and ignore its Sauron's Eye icons."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0,
+      "notes": "The scan prints the Fellowship sphere icon in the first line, written Fellowship, and the Sauron's Eye icon in the last, written Sauron's Eye; the asterisk before Forced is printed. Hall of Beorn's candidate prints \"discarded from this test\"."
+    },
+    {
+      "code": "146050",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Ringwraith-of-Sauron.jpg",
+        "sha256": "9f10ab27c66798d8aec9e0858a152941f4284500401ed010178aafff4d339416"
+      },
+      "lines": [
+        "Cannot have non-Morgul attachments.",
+        "While Ringwraith of Sauron is in the staging area, it gains: \"Forced: After a player fails a Fortitude test, Ringwraith of Sauron engages that player and makes an immediate attack.\""
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 2,
+      "notes": "Hall of Beorn's candidate prints single quotes and omits the comma after \"staging area\". Prints 2 Sauron's Eye icons in the bottom left corner of its text box (mec113.fortitude-tests)."
+    },
+    {
+      "code": "146051",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Orc-Captain.jpg",
+        "sha256": "2ae1c7a55d13a34e1a5875c0b9dd603903957a930026f8a45a50936553cec75a"
+      },
+      "lines": [
+        "Forced: After Orc Captain engages you, make a Fortitude test. If you fail this test, reveal the top card of the encounter deck.",
+        "Shadow: If this attack destroys a character, return attacking enemy to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 2,
+      "notes": "Prints 2 Sauron's Eye icons in the bottom left corner of its text box (mec113.fortitude-tests)."
+    },
+    {
+      "code": "146052",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Big-Uruk.jpg",
+        "sha256": "e70aca27d62b04d1bd2ec90c4295bfde7e887a26a62c7d6db4e03399f0c715a9"
+      },
+      "lines": [
+        "Forced: After Big Uruk engages you, either raise your threat by 4, or Big Uruk makes an immediate attack against you.",
+        "Shadow: Attacking enemy gets +1 Attack for each ally you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 1,
+      "notes": "Prints 1 Sauron's Eye icon in the bottom left corner of its text box (mec113.fortitude-tests)."
+    },
+    {
+      "code": "146053",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Little-Snuffler.jpg",
+        "sha256": "deb258790c6e200ae6158d2c7e700b50f535709fec8c65eac731ceaa5b3d4634"
+      },
+      "lines": [
+        "Peril. Surge.",
+        "When Revealed: Either raise your threat by 1 for each ally you control, or discard an ally you control.",
+        "Shadow: Exhaust a character you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 1,
+      "notes": "Prints 1 Sauron's Eye icon in the bottom left corner of its text box (mec113.fortitude-tests)."
+    },
+    {
+      "code": "146054",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/'Wicked-Master'.jpg",
+        "sha256": "039e5b9699f112f3faa3823f810a6c702e9df084de7f8b7019299c4547bbb0f5"
+      },
+      "lines": [
+        "When Revealed: Gollum makes an immediate attack against the first player. If Gollum is not in play, search the encounter deck and discard pile for Gollum and put him into play engaged with the first player.",
+        "Shadow: If attacking enemy is Gollum, he makes an additional attack after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 3,
+      "notes": "Prints 3 Sauron's Eye icons in the bottom left corner of its text box (mec113.fortitude-tests)."
+    },
+    {
+      "code": "146055",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Lidless-Eye.jpg",
+        "sha256": "8339b9926089e4f4df837b66692fc88da3c92fd09d8c10b90afcd9a4cf4d4ffd"
+      },
+      "lines": [
+        "Peril.",
+        "When Revealed: Make a Fortitude test. If The One Ring is exhausted, add Sauron's Eye Sauron's Eye to the test. If you fail this test, raise your threat by 10.",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if you failed a Fortitude test this round)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 2,
+      "notes": "The scan prints the Sauron's Eye icon twice in the When Revealed line, written Sauron's Eye twice. Prints 2 Sauron's Eye icons in the bottom left corner of its text box (mec113.fortitude-tests)."
+    },
+    {
+      "code": "146056",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Foul-Fumes.jpg",
+        "sha256": "623e5446cc5ddf34b2ae7b2fc1cce5aa63c972f073394258403d7b0c13030d09"
+      },
+      "lines": [
+        "When Revealed: Each player makes a Fortitude test. If you fail this test, deal 1 damage to each character you control. Until the end of the round, treat the printed text box of each damaged character as if it were blank (except for Traits).",
+        "Shadow: If you failed a Fortitude test this round, this attack is considered undefended."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 2,
+      "notes": "Prints 2 Sauron's Eye icons in the bottom left corner of its text box (mec113.fortitude-tests)."
+    },
+    {
+      "code": "146057",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Heavy-and-Tired.jpg",
+        "sha256": "10202e62577e00d2f301d6cf628d947ebf71d1d3cf8c28e34fedf103d58b06fb"
+      },
+      "lines": [
+        "When Revealed: Attach Heavy and Tired to the hero with the most attachments and exhaust that hero. (Counts as a Condition attachment with the text: \"Limit 1 per hero. Attached hero cannot commit to Fortitude tests. Forced: After you fail a Fortitude test, exhaust attached hero and discard each non-objective attachment on it.\")"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 1,
+      "notes": "Prints 1 Sauron's Eye icon in the bottom left corner of its text box (mec113.fortitude-tests). Hall of Beorn's candidate prints single quotes, no closing parenthesis and \"you Fail\"."
+    },
+    {
+      "code": "146058",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Orc-of-Mordor.jpg",
+        "sha256": "3dab8ab37968d5b72a8d4bd0dab7945e8173696cf47d3ab7053cb3f4a7db703f"
+      },
+      "lines": [
+        "Surge.",
+        "Forced: After Orc of Mordor engages you, exhaust a character you control.",
+        "Shadow: Exhaust a character you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146059",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Snaga-Archer.jpg",
+        "sha256": "c8b5efa97c44acefa5e491e17077cc0ca50d0d981f3e4ea245a712d8807791d2"
+      },
+      "lines": [
+        "Archery 2.",
+        "Forced: After Snaga Archer engages you, deal 2 damage to a character you control.",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending character is damaged)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146060",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Uruk-Soldier.jpg",
+        "sha256": "758f057ace27a711bad03ae65b1a58fd7aac59de15cd826279af9b70d2cdf630"
+      },
+      "lines": [
+        "Forced: After Uruk Soldier engages you, raise your threat by 2.",
+        "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, return attacking enemy to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0,
+      "notes": "Hall of Beorn's candidate prints \"Uru Soldier\"."
+    },
+    {
+      "code": "146061",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Drawn-to-the-Ring.jpg",
+        "sha256": "75866f580270f251839a6a2ba38391b2f8ac857d735c54348e263ffcecd5500b"
+      },
+      "lines": [
+        "When Revealed: The first player must choose: either exhaust The One Ring and reveal an encounter card, or discard cards from the top of the encounter deck until an enemy is discarded and put it into play engaged with him.",
+        "Shadow: Discard a non-objective attachment you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146062",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Deep-Shadows.jpg",
+        "sha256": "a6d44ceffdcd3e36acd4ce637db235adc21967dde142f359cbb971a6415b12a7"
+      },
+      "lines": [
+        "Doomed 2.",
+        "When Revealed: Each player must choose: either discard your hand (with at least 3 cards in it), or reveal an encounter card.",
+        "Shadow: Attacking enemy makes an additional attack after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0,
+      "notes": "Hall of Beorn's candidate prints \"reveal and encounter card\"."
+    },
+    {
+      "code": "146063",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Evil-Vigilance.jpg",
+        "sha256": "0a493c994beb33477001336772da3baadce8ca404db752e622ef37eaba48dc3c"
+      },
+      "lines": [
+        "When Revealed: Each player must choose: either discard a questing character you control, or raise your threat by 1 for each questing character you control.",
+        "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, reveal the top card of the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146064",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/In-Darkness-Bind-Them.jpg",
+        "sha256": "9f546f61ab88a9ac3a3758e1fbe5f189617a6598e67f19f25c9277af1494609d"
+      },
+      "lines": [
+        "When Revealed: Each player exhausts a character he controls. If The Eye of Sauron is in the staging area, characters cannot be readied by player card effects this round.",
+        "Shadow: If The Eye of Sauron is in the staging area, attacking enemy gets +2 Attack and returns to the staging area after this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146065",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-One-Ring.jpg",
+        "sha256": "b0df915cc50d69f482a4b2b99708e971dcf783fddf7cae14a3f2f425b65ec95a"
+      },
+      "lines": [
+        "Setup: The first player claims The One Ring and attaches it to the Ring-bearer.",
+        "Attached hero does not count against the hero limit. The first player gains control of attached hero.",
+        "If The One Ring leaves play, the players lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146066",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Pass-the-Two-Watchers-1A.jpg",
+        "sha256": "15e066a367e6cb9329f9070afa37372192065ad3069cb713d227432fca2a2771"
+      },
+      "lines": [
+        "Setup: Set Shagrat aside, out of play. Add The Two Watchers (location side faceup) and Topmost Chamber to the staging area. The first player loses control of the Ring-bearer and places it faceup under Topmost Chamber as a guarded objective. Then, the first player attaches Last of the Company to a hero he controls and attaches The One Ring to that hero."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's candidate prints \"The Two Wachers\" and \"and place it faceup\"; the scan prints \"The Two Watchers\" and \"places\"."
+    },
+    {
+      "code": "146066",
+      "side": "B",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Pass-the-Two-Watchers-1B.jpg",
+        "sha256": "13891077e093e9bdb1516e79d4ae5edb1c1dcddd6b65ac46aa264ee0d4aa9210"
+      },
+      "lines": [
+        "Each non-unique location gets -1 Threat and cannot leave the staging area.",
+        "While The Two Watchers is in the staging area (enemy side faceup), it is considered to be engaged with each player.",
+        "This stage cannot be defeated while The Two Watchers is in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's candidate prints \"The stage cannot be defeated\"; the scan prints \"This stage\"."
+    },
+    {
+      "code": "146067",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Fighting-in-the-Tower-2A.jpg",
+        "sha256": "173f6cb4e7f07f04cf31a76c6ff6cbab4a26b628a810fc3f8ddeb3b95c55e6ca"
+      },
+      "lines": [
+        "When Revealed: Shuffle the encounter discard pile into the encounter deck and discard cards from the top until X enemies are discarded, where X is the number of players in the game. Add each enemy discarded by this effect to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "146067",
+      "side": "B",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Fighting-in-the-Tower-2B.jpg",
+        "sha256": "01e5efa7fe3ea877d87d8be67887d0fcc54a5304f79285d1d50b002b3fedb44d"
+      },
+      "lines": [
+        "Forced: At the beginning of the quest phase, discard cards from the top of the encounter deck until an enemy is discarded. If there is a copy of that enemy in the staging area, discard that copy as well. If there is not, add the discarded enemy to the staging area.",
+        "This stage cannot be defeated unless Topmost Chamber is in the victory display. When the Ring-bearer is free of encounters, the first player gains control of it."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's candidate prints \"this first player\"; the scan prints \"the first player\"."
+    },
+    {
+      "code": "146068",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Escape-from-Cirith-Ungol-3A.jpg",
+        "sha256": "b5276f9dffdf872128522f5820a0b011a8d3cc10f06185a713e467b3a2838d3b"
+      },
+      "lines": [
+        "When Revealed: Add Last of the Company to the victory display. Attach The One Ring to the Ring-bearer and exhaust the Ring-bearer. The first player moves The Two Watchers from the victory display to the staging area (location side faceup). Each other player reveals an encounter card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "146068",
+      "side": "B",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Escape-from-Cirith-Ungol-3B.jpg",
+        "sha256": "1aa745681ca6affa49eb573ae401112ac6cb9958d959fecfe2b09cd12ad2dad3"
+      },
+      "lines": [
+        "The players cannot travel to The Two Watchers unless there is at least 12 progress on this stage.",
+        "While The Two Watchers is in the staging area (enemy side faceup), it gets +3 Threat and +3 Defense and is considered to be engaged with each player.",
+        "This stage cannot be defeated while The Two Watchers is in play. If this stage is defeated, the players win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's candidate prints \"enenmy\" and \"The stage cannot be defeated\"; the scan prints \"enemy\" and \"This stage\"."
+    },
+    {
+      "code": "146069",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Tower-of-Cirith-Ungol-SetupA.jpg",
+        "sha256": "636f7e7696be286434ffa0f8652affd0a08f086a57fe19bff95cddfac3952578"
+      },
+      "lines": [
+        "Setup: Each player may change heroes he controls without incurring the +1 threat penalty. Attach A Heavy Burden to the hero with Last of the Company attached. Each player chooses an Item boon (excluding Andúril) from the campaign pool and sets it aside, out of play. Remove each burden with the following burden set icons from the encounter deck, then flip this card over: Helm's Deep, The Road to Isengard, The Passing of the Grey Company"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Titled \"The Lord of the Rings - Part 16\" on the card. The scan prints the burden set icons as pictures (a ladder, a tower, a skeletal hand), written as the set names Hall of Beorn gives, in the printed order; the skeletal hand is the Passing of the Grey Company set icon of the Undead cards (145063)."
+    },
+    {
+      "code": "146069",
+      "side": "B",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Tower-of-Cirith-Ungol-SetupB.jpg",
+        "sha256": "786056fd6921903eb03d6964598d027a16a72d5fcff5c57f0d9f1936c094dbe1"
+      },
+      "lines": [
+        "Forced: When the players advance to stage 3A, attach A Heavy Burden to the Ring-bearer. Attach each set aside Item boon to Shagrat as a guarded objective. When Shagrat is defeated, return each guarded boon to its owner's hand.",
+        "Resolution: If Shagrat is in play, remove each Item boon attached to it from the campaign pool. (The players have lost those boons.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "146070",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Two-Watchers-Location.jpg",
+        "sha256": "077ab32645fef0c37ad7e968dcea4dffda90027e8458ff03324450f02a491d41"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "X is twice the stage number of the main quest.",
+        "Forced: After the players travel here, flip The Two Watchers to its enemy side and move it to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146071",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Two-Watchers-Enemy.jpg",
+        "sha256": "caeac71eb1a15730bef48bbdb367a6fefe3c3911a2a5521c21a3ecf611cdbb2d"
+      },
+      "lines": [
+        "Immune to player card effects. Cannot be optionally engaged.",
+        "Forced: When The Two Watchers deals any amount of damage, cancel that damage and raise the defending player's threat by X instead. X is the amount of damage just canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0
+    },
+    {
+      "code": "146072",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Embassy-from-the-Dark-Tower-1A.jpg",
+        "sha256": "35e8555d8536133fdae02fed2effbded6fab7cca2b5d05a719644d15f26d6100"
+      },
+      "lines": [
+        "Setup: Add The Black Gate and The Mouth of Sauron to the staging area. Set Gwaihir aside, out of play. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn lists the Dire keyword on side A; the scan prints it at the start of the When Revealed paragraph of side B."
+    },
+    {
+      "code": "146072",
+      "side": "B",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Embassy-from-the-Dark-Tower-1B.jpg",
+        "sha256": "2e8f9698d7d2c977cec8bc24f5550dc048363a0bf7f95130811536738482d6e9"
+      },
+      "lines": [
+        "Dire. When Revealed: In player order, each player places the top card of his deck faceup in front of him until there are a total of 4 faceup player cards between the players. Place the top 4 cards of the encounter deck faceup. Starting with the highest cost player card, pair each player card with the highest threat encounter card remaining until there are 4 pairs. For each pair, the first player must choose: either discard both cards in that pair, or reveal the encounter card to play the player card at no cost."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's candidate prints \"until their are\" twice and \"cards in the pair\"; the scan prints \"there are\" and \"in that pair\". The keyword Dire opens the paragraph."
+    },
+    {
+      "code": "146073",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Battle-of-the-Morannon-2A.jpg",
+        "sha256": "74ae3437408bf054f9a9fdb5072b125c4127592efb04dc1da90520c7620b8652"
+      },
+      "lines": [
+        "Dire. When Revealed: Each player searches the encounter deck and discard pile for a different Orc, Troll, or Nazgûl enemy and adds it to the staging area. Shuffle Gwaihir into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The keyword Dire opens the paragraph."
+    },
+    {
+      "code": "146073",
+      "side": "B",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Battle-of-the-Morannon-2B.jpg",
+        "sha256": "0f8d00398ec4243691ae54e73a1deef1c73d7140483c2e87e07983f264efc037"
+      },
+      "lines": [
+        "Dire. During the staging step, the first player does not reveal an encounter card as normal. Instead, he reveals 1 encounter card for each resource on The Black Gate.",
+        "Forced: After the players quest unsuccessfully, discard the active location.",
+        "This stage cannot be defeated. Each round the players survive gives the Ring-bearer more time to fulfill the quest to Mount Doom."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The keyword Dire opens the first paragraph."
+    },
+    {
+      "code": "146074",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Black-Gate-Opens-SetupA.jpg",
+        "sha256": "493ce607b2b472fdec7165a54009967f3295e001b1641aa6843c4e207543dc77"
+      },
+      "lines": [
+        "Setup: Each player may change heroes he controls without incurring the +1 threat penalty. The first player may raise each player's threat by 1 to search his deck for Andúril and add it to his hand. Remove each burden with the following burden set icons from the encounter deck: A Shadow of the Past, Flight to the Ford, The Ring Goes South, The Passage of the Marshes, Shelob's Lair"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Titled \"The Lord of the Rings - Part 17\" on the card. The scan prints the burden set icons as pictures, written as the set names Hall of Beorn gives for the same five icons on the Passing of the Grey Company card (145066), in the printed order."
+    },
+    {
+      "code": "146074",
+      "side": "B",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Black-Gate-Opens-SetupB.jpg",
+        "sha256": "f8cc71e13d3eea65c2118cc7a593c513ed81bda7a4f8dead7f06929e4d4a44eb"
+      },
+      "lines": [
+        "Resolution: Record the number of resource tokens on The Black Gate in the notes section of the campaign log. If a Wraith on Wings is in the victory display, remove that copy from the campaign pool. If the first player controls Gwaihir, add him to the campaign pool. The players have earned that boon. If a hero is in its controller's discard pile, do not add that hero's name to the list of fallen heroes."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "146075",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Land-of-Mordor-1A.jpg",
+        "sha256": "4e5eae5ace7b2ccd1cd9a856e1135e547cc53d6750c76788a1a4145d0122f6db"
+      },
+      "lines": [
+        "Setup: Add Mount Doom and The Tower of Barad-dûr to the staging area. Make Brake of Thorns the active location. Each player searches the encounter deck for a different location and adds it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn lists the Dire keyword on side A; the scan prints it at the start of the first paragraph of side B."
+    },
+    {
+      "code": "146075",
+      "side": "B",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Land-of-Mordor-1B.jpg",
+        "sha256": "42222abcb228beed3d51d650e5a5972f172bf826742d9d618ac36fc8a9cb223e"
+      },
+      "lines": [
+        "Dire. This stage gets +4 quest points for each player.",
+        "The first treachery revealed each quest phase is immune to player card effects and gains surge."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The keyword Dire opens the first paragraph."
+    },
+    {
+      "code": "146076",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Road-to-Isenmouthe-2A.jpg",
+        "sha256": "638273965caf641a3f145ac7960da5c66a900b9675ee58d11e147c1955aa55a5"
+      },
+      "lines": [
+        "Dire. When Revealed: Search the encounter deck, discard pile, and victory display for Mordor Road and add it to the staging area. Shuffle the encounter discard pile into the encounter deck and travel to Mordor Road."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The keyword Dire opens the paragraph. Hall of Beorn's candidate prints \"deck and discard pile and victory display\"."
+    },
+    {
+      "code": "146076",
+      "side": "B",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Road-to-Isenmouthe-2B.jpg",
+        "sha256": "71e808b5cbf175f879039851c5d1fdf7046d477f73ed124d15cead96a40ccb8a"
+      },
+      "lines": [
+        "Dire. Forced: After placing progress here from questing successfully, each player makes a Fortitude test. If a player passes this test, he places a resource here. If a player fails this test, he discards cards from the top of the encounter deck until an enemy is discarded and puts that enemy into play engaged with him.",
+        "At the end of the quest phase, if the number of resources here is equal to or greater than the number of players, advance to stage 3A."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The keyword Dire opens the first paragraph."
+    },
+    {
+      "code": "146077",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Last-Gasp-3A.jpg",
+        "sha256": "d9eac3404e5a4cddc98682fe9a14e6b261ddb02489309ae0f7bb7290eee21de5"
+      },
+      "lines": [
+        "Dire. When Revealed: Shuffle the encounter discard pile into the encounter deck and discard cards from the top until X locations are discarded, where X is the number of players in the game. Add each location discarded this way to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The keyword Dire opens the paragraph."
+    },
+    {
+      "code": "146077",
+      "side": "B",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Last-Gasp-3B.jpg",
+        "sha256": "cfe94f41594633ebf4bc1a5d97f55e5b738b418ea6be266d831a1010605358d2"
+      },
+      "lines": [
+        "Dire. The first treachery revealed each quest phase is immune to player card effects and gains surge.",
+        "Forced: At the beginning of the quest phase, the first player makes a Fortitude test. If the first player fails this test, no more than 5 progress can be placed here this round.",
+        "This stage cannot be defeated unless Mount Doom is the active location."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "146078",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Crack-of-Doom-4A.jpg",
+        "sha256": "6966e1d1f3e4c7a53b9f695e17558aa6465e2e1232e3fda985beb6c51db22040"
+      },
+      "lines": [
+        "Dire. When Revealed: Shuffle the encounter discard pile into the encounter deck and discard cards from the top until X enemies are discarded, where X is the number of players. Add each enemy discarded this way to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The keyword Dire opens the paragraph."
+    },
+    {
+      "code": "146078",
+      "side": "B",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Crack-of-Doom-4B.jpg",
+        "sha256": "4ec1feec987f8ae6c0dd5624dbefbebe34362fdfd3a2c1455180df377dc195b3"
+      },
+      "lines": [
+        "Dire. Allies cannot enter play and 'when revealed' effects cannot be canceled.",
+        "Forced: When Mount Doom is explored, the first player makes a Fortitude test. Discard 1 extra encounter card for each player. If the first player fails this test, the Ring-bearer claims The One Ring and the players lose the game. If the test is successful, the Ring-bearer completes the quest and the players win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "146079",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Mount-Doom-SetupA.jpg",
+        "sha256": "2f034e928dc2c23725dfb2510c7611cf669a1d73e1fafabb21c1882c0098d73b"
+      },
+      "lines": [
+        "Setup: Each player may change heroes he controls without incurring the +1 threat penalty. Place X resource tokens on this card, where X is the number of resource tokens on The Black Gate, as recorded in the campaign log. Remove each burden with the following burden set icons from the encounter deck: Helm's Deep, The Road to Isengard, The Passing of the Grey Company",
+        "Forced: At the end of the round, remove 1 resource token from this card. Then, if there are no resource tokens here, the players lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "146079",
+      "side": "B",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Mount-Doom-SetupB.jpg",
+        "sha256": "8cee47a90b535e26a0539e10ae4cbbcd58686cf1f3c3af5237d47b02802a6ab1"
+      },
+      "lines": [
+        "Resolution: The first player must choose:",
+        "- Keep The One Ring card and succumb to the power of Sauron. Then, the players lose the campaign.",
+        "- Destroy The One Ring card and defeat the power of Sauron. Then, the players win the campaign."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "The Resolution is the header line and the two printed choices, each choice one paragraph."
+    },
+    {
+      "code": "146080",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Epic-Multiplayer-Mode-SetupA.jpg",
+        "sha256": "e30b9d131af6f2d2a7f00e509b40b5e8e8ca2ac1db4b65b62888d08ceb49e11f"
+      },
+      "lines": [
+        "Setup: Create two separate staging areas: one for The Black Gate Opens and one for Mount Doom. Divide the players into 2 teams, one for each scenario. No more than 4 players can be assigned to each scenario and the number of players assigned to Mount Doom cannot be more than the number assigned to The Black Gate Opens. Shuffle 1 copy of In Darkness Bind Them into each encounter deck. Place The Eye of Sauron in the Mount Doom staging area with its corresponding side faceup. Flip this card over and set it next to the Mount Doom quest deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Subtitled \"The Black Gate Opens & Mount Doom\" on the card. Hall of Beorn's candidate prints \"correspdonding\" and \"the number of assigned to\"; the scan prints \"corresponding\" and \"the number assigned to\"."
+    },
+    {
+      "code": "146080",
+      "side": "B",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/Epic-Multiplayer-Mode-SetupB.jpg",
+        "sha256": "47712d093673e3ca66f7af230e417d272250d8c6822323e9ac684be5a017d5b6"
+      },
+      "lines": [
+        "Ignore the Forced effect on the Mount Doom campaign card if it is in play.",
+        "Forced: At the end of the round, the first player chooses a scenario (The Black Gate Opens or Mount Doom). Each player at the chosen scenario draws 1 card. Each player at the other scenario reduces his threat by 3. Then, the player who controls the Gwaihir objective-ally may give control of it to another player (at either scenario).",
+        "At the end of the round, if the last player at either scenario is eliminated, both teams lose the game. If the Mount Doom scenario is defeated, both teams win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "notes": "Hall of Beorn's candidate prints \"is defeated\" for the last player; the scan prints \"is eliminated\"."
+    },
+    {
+      "code": "146081",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Eye-of-Sauron-Mount-Doom.jpg",
+        "sha256": "e661ddd8709889f70034e7ab798b9bcf2b2a4aa859017d629bb8a75b3b4ee0e5"
+      },
+      "lines": [
+        "Add Sauron's Eye to each Fortitude test.",
+        "Forced: At the end of the round, flip The Eye of Sauron, then move it and each Nazgûl enemy in the staging area to The Black Gate Opens staging area. The first player may raise each player's threat by 3 to cancel this effect."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0,
+      "notes": "The scan prints the Sauron's Eye icon in the first line, written Sauron's Eye."
+    },
+    {
+      "code": "146082",
+      "side": "A",
+      "printing": "MoF",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Return-of-the-King/The-Eye-of-Sauron-The-Black-Gate-Opens.jpg",
+        "sha256": "88d15e7abdebc3fd08ffed68a4a93338f7e3485cf1072585fbf42591cefec268"
+      },
+      "lines": [
+        "Each enemy in the staging area gets +1 Threat and -10 engagement cost.",
+        "Forced: At the end of the round, flip The Eye of Sauron, then move it and each Nazgûl enemy in the staging area to the Mount Doom staging area. The first player may raise each player's threat by 3 to cancel this effect."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqFZ92evCLttuyaRnzD, read from the scan image",
+      "confirmedBy": null,
+      "eyeIcons": 0,
+      "notes": "Hall of Beorn's candidate prints \"the move it\"."
+    }
+  ]
+}

@@ -40,11 +40,11 @@ export function pileAccepts(args: { code: string; pile: string; printed: Card | 
   const fleet = stepExists("prepareFleet") && /Fleet/.test(printed?.encounterSet ?? "");
   switch (pile) {
     case "setAside":
-      return said(["aside"]) || putEngaged || steps("takeControl", "attach", "prepareStormcallerArea") || setAsideBySet || (fleet && (printed?.type === "ship-objective" || printed?.type === "objective")) || (stepExists("asideEachOtherObjective") && printed?.type === "objective");
+      return said(["aside"]) || putEngaged || steps("takeControl", "attach", "prepareStormcallerArea", "attachToDifferentHeroes", "attachToThreatDial") || setAsideBySet || (stepExists("asideLogged") && printed?.traits.includes("Harad") === true) || (fleet && (printed?.type === "ship-objective" || printed?.type === "objective")) || (stepExists("asideEachOtherObjective") && printed?.type === "objective");
     case "activeLocation":
       return said(["active"]);
     case "attachedChosen":
-      return said(["attachChosen"]);
+      return said(["attachChosen"]) || steps("attachToRingBearerHero");
     case "attached":
       return said(["attachRingBearer"]) || /Setup: Attach to the Ring-bearer/.test(own);
     case "staging": {

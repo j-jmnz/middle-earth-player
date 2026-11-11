@@ -1,0 +1,32 @@
+{
+  "id": "the-return-of-the-king",
+  "name": "The Return of the King",
+  "scenarios": [
+    "the-passing-of-the-grey-company",
+    "the-siege-of-gondor",
+    "the-battle-of-the-pelennor-fields",
+    "the-tower-of-cirith-ungol",
+    "the-black-gate-opens",
+    "mount-doom"
+  ],
+  "campaignCards": {
+    "the-passing-of-the-grey-company": "145066",
+    "the-siege-of-gondor": "145070",
+    "the-battle-of-the-pelennor-fields": "145078",
+    "the-tower-of-cirith-ungol": "146069",
+    "the-black-gate-opens": "146074",
+    "mount-doom": "146079"
+  },
+  "prelude": [],
+  "starterDecks": [],
+  "bookletPages": {
+    "the-passing-of-the-grey-company": 5,
+    "the-siege-of-gondor": 6,
+    "the-battle-of-the-pelennor-fields": 6,
+    "the-tower-of-cirith-ungol": 7,
+    "the-black-gate-opens": 8,
+    "mount-doom": 8
+  },
+  "bookletId": "the-return-of-the-king",
+  "saga": true
+}

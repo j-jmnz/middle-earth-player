@@ -6,6 +6,7 @@ import { GENERATED_EFFECTS as ERED_MITHRIN_GENERATED } from "./generated/ered-mi
 import { GENERATED_EFFECTS as BOX_GENERATED } from "./generated/fellowship-of-the-ring.ts";
 import { GENERATED_EFFECTS as MIRKWOOD_GENERATED } from "./generated/mirkwood-paths.ts";
 import { GENERATED_EFFECTS as TDOM_GENERATED } from "./generated/the-dark-of-mirkwood.ts";
+import { GENERATED_EFFECTS as RETURN_OF_THE_KING_GENERATED } from "./generated/the-return-of-the-king.ts";
 import { GENERATED_EFFECTS as TWO_TOWERS_GENERATED } from "./generated/the-two-towers.ts";
 import { POOL_GENERATED_EFFECTS } from "./generated/player-pool.ts";
 
@@ -16,9 +17,9 @@ export function mergeEffects(generated: readonly Effect[], authored: readonly Ef
   return [...generated.filter((effect) => !replaced.has(effect.id)), ...authored];
 }
 
-// The records of each box (scenario cards and both starter lists: the Fellowship's, the Revised Core Set's, The Dark of Mirkwood's, Dream-chaser's, Ered Mithrin's and The Two Towers') and the rest of the player pool's, one file per pack or
+// The records of each box (scenario cards and both starter lists: the Fellowship's, the Revised Core Set's, The Dark of Mirkwood's, Dream-chaser's, Ered Mithrin's, The Two Towers' and The Return of the King's) and the rest of the player pool's, one file per pack or
 // per mechanic family.
-export const GENERATED_EFFECTS: readonly Effect[] = [...BOX_GENERATED, ...MIRKWOOD_GENERATED, ...TDOM_GENERATED, ...DREAM_CHASER_GENERATED, ...ERED_MITHRIN_GENERATED, ...TWO_TOWERS_GENERATED, ...POOL_GENERATED_EFFECTS];
+export const GENERATED_EFFECTS: readonly Effect[] = [...BOX_GENERATED, ...MIRKWOOD_GENERATED, ...TDOM_GENERATED, ...DREAM_CHASER_GENERATED, ...ERED_MITHRIN_GENERATED, ...TWO_TOWERS_GENERATED, ...RETURN_OF_THE_KING_GENERATED, ...POOL_GENERATED_EFFECTS];
 
 // The authored files, in the order pnpm data build writes them (src/effects/generated/authored.ts, scripts/data/effects/barrel.ts):
 // a scenario's records are src/effects/authored/<scenario-id>.ts, and a new file there needs only that build.

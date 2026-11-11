@@ -2,6 +2,7 @@ import dreamChaser from "../../../data/campaigns/dream-chaser.json";
 import fellowship from "../../../data/campaigns/fellowship-of-the-ring.json";
 import darkOfMirkwood from "../../../data/campaigns/the-dark-of-mirkwood.json";
 import eredMithrin from "../../../data/campaigns/ered-mithrin.json";
+import returnOfTheKing from "../../../data/campaigns/the-return-of-the-king.json";
 import twoTowers from "../../../data/campaigns/the-two-towers.json";
 import mirkwoodPaths from "../../../data/campaigns/mirkwood-paths.json";
 import anduin from "../../../data/scenarios/journey-along-the-anduin.json";
@@ -39,6 +40,12 @@ import isengard from "../../../data/scenarios/the-road-to-isengard.json";
 import marshes from "../../../data/scenarios/the-passage-of-the-marshes.json";
 import crossRoads from "../../../data/scenarios/journey-to-the-cross-roads.json";
 import shelob from "../../../data/scenarios/shelobs-lair.json";
+import greyCompany from "../../../data/scenarios/the-passing-of-the-grey-company.json";
+import siege from "../../../data/scenarios/the-siege-of-gondor.json";
+import pelennor from "../../../data/scenarios/the-battle-of-the-pelennor-fields.json";
+import cirithUngol from "../../../data/scenarios/the-tower-of-cirith-ungol.json";
+import blackGate from "../../../data/scenarios/the-black-gate-opens.json";
+import mountDoom from "../../../data/scenarios/mount-doom.json";
 import { printedScenarioName } from "../../campaign/printed-name";
 import { campaignDataSchema, parseScenarioData, type CampaignData, type ScenarioData } from "../../catalog/scenario-data";
 
@@ -46,8 +53,8 @@ import { campaignDataSchema, parseScenarioData, type CampaignData, type Scenario
 // source for them. Metro needs static JSON imports, so the map is written by hand; campaign-data.test.ts checks it against
 // data/campaigns/index.json and data/scenarios. Each file is parsed (zod) the first time it is asked for, not when the module
 // loads, and kept: the app opens without parsing every scenario, and a screen pays only for the ones it shows.
-const RAW_CAMPAIGNS: Readonly<Record<string, unknown>> = Object.fromEntries([fellowship, mirkwoodPaths, darkOfMirkwood, dreamChaser, eredMithrin, twoTowers].map((raw) => [raw.id, raw]));
-const RAW_SCENARIOS: Readonly<Record<string, unknown>> = Object.fromEntries([past, knife, flight, south, journey, breaking, passage, anduin, dolGuldur, oath, caves, voyage, fate, raid, stormcaller, depths, temple, ruins, cobas, corsairs, upTheAnduin, lostInMirkwood, kingsQuest, witheredHeath, roam, fireInTheNight, framsburg, gundabad, wilderland, urukHai, helmsDeep, isengard, marshes, crossRoads, shelob].map((raw) => [raw.id, raw]));
+const RAW_CAMPAIGNS: Readonly<Record<string, unknown>> = Object.fromEntries([fellowship, mirkwoodPaths, darkOfMirkwood, dreamChaser, eredMithrin, twoTowers, returnOfTheKing].map((raw) => [raw.id, raw]));
+const RAW_SCENARIOS: Readonly<Record<string, unknown>> = Object.fromEntries([past, knife, flight, south, journey, breaking, passage, anduin, dolGuldur, oath, caves, voyage, fate, raid, stormcaller, depths, temple, ruins, cobas, corsairs, upTheAnduin, lostInMirkwood, kingsQuest, witheredHeath, roam, fireInTheNight, framsburg, gundabad, wilderland, urukHai, helmsDeep, isengard, marshes, crossRoads, shelob, greyCompany, siege, pelennor, cirithUngol, blackGate, mountDoom].map((raw) => [raw.id, raw]));
 
 const campaigns = new Map<string, CampaignData>();
 const scenarios = new Map<string, ScenarioData>();
@@ -71,6 +78,8 @@ export const BOXES: readonly Box[] = [
   { id: "fellowship-of-the-ring", name: "The Fellowship of the Ring Saga Expansion", campaignId: "fellowship-of-the-ring", scenarios: ["a-shadow-of-the-past", "a-knife-in-the-dark", "flight-to-the-ford", "the-ring-goes-south", "journey-in-the-dark", "breaking-of-the-fellowship"] },
   // The Treason of Saruman and The Land of Shadow are the second saga box (MEC112); its standalone games follow its campaign's saga flag and the per-scenario saga start.
   { id: "the-two-towers", name: "The Two Towers Saga Expansion", campaignId: "the-two-towers", scenarios: ["the-uruk-hai", "helms-deep", "the-road-to-isengard", "the-passage-of-the-marshes", "journey-to-the-cross-roads", "shelobs-lair"] },
+  // The Flame of the West and The Mountain of Fire are the third saga box (MEC113), played after The Two Towers.
+  { id: "the-return-of-the-king", name: "The Return of the King Saga Expansion", campaignId: "the-return-of-the-king", scenarios: ["the-passing-of-the-grey-company", "the-siege-of-gondor", "the-battle-of-the-pelennor-fields", "the-tower-of-cirith-ungol", "the-black-gate-opens", "mount-doom"] },
   // The Grey Havens, the six Adventure Packs and the Campaign Expansion are one box on the Scenarios tab (user decision, 2026-10-30),
   // named by the RCO product that prints its nine scenarios.
   { id: "dream-chaser", name: "Dream-chaser Campaign Expansion", campaignId: "dream-chaser", scenarios: ["voyage-across-belegaer", "the-fate-of-numenor", "raid-on-the-grey-havens", "flight-of-the-stormcaller", "the-thing-in-the-depths", "temple-of-the-deceived", "the-drowned-ruins", "a-storm-on-cobas-haven", "the-city-of-corsairs"] },

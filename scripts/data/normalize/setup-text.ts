@@ -1,5 +1,6 @@
 import type { Card } from "../../../src/catalog/card-facts.ts";
 import { readEredMithrin } from "./setup-ered-mithrin.ts";
+import { readReturnOfTheKing } from "./setup-return-of-the-king.ts";
 import { readTwoTowers } from "./setup-two-towers.ts";
 import { isNameList, namedBy, setsOf, stepWith } from "./setup-names.ts";
 
@@ -43,7 +44,7 @@ export type SetupClause =
   | { kind: "addToCampaignPool"; codes: string[] }
   // "Each player adds 1 copy of X to their hand after drawing their starting hand (including taking a mulligan)."
   | { kind: "addToHandAfterMulligan"; codes: string[]; count: number }
-  | { kind: "step"; step: SetupStep; codes: string[]; to?: string[]; count?: number; copies?: number; resources?: number; many?: { count: number; from: number }; sets?: string[]; asideSets?: string[]; players?: boolean }
+  | { kind: "step"; step: SetupStep; codes: string[]; to?: string[]; count?: number; copies?: number; resources?: number; many?: { count: number; from: number }; sets?: string[]; asideSets?: string[]; players?: boolean; trait?: string }
   // Ered Mithrin (docs/brief.md, Ered Mithrin), each quoted from data/printed/ered-mithrin.json.
   // "Shuffle the encounter deck and discard cards from the top until X locations are discarded, where X is the number of players. Add each
   // discarded location to the staging area." (`amount` "playersLessOne": "X is 1 less than the number of players in the game";
@@ -109,7 +110,19 @@ export type SetupStep =
   | "chooseResourceOrCopy" // "Each player must choose: either add 1 resource to each of his heroes' pools, or shuffle 1 copy of Brace of Coneys into his deck": `resources` the resources for each hero, `count` the copies
   | "chooseCounselsOrAdvance" // "the players must choose: either each player shuffles 1 copy of Poisoned Counsels into his deck, or advance to stage 2A (bypassing stage 1B)": `count` the stage, `copies` the copies each player shuffles in
   | "eachOtherPlayerAddsLocation" // "Each player, except the first player, searches the encounter deck for a different non-unique location and adds it to the staging area"
-  | "shuffleSetUnder"; // "Shuffle the Men of Harad encounter set and place it facedown under The Cross-roads": `asideSets` the set, `to` the card
+  | "shuffleSetUnder" // "Shuffle the Men of Harad encounter set and place it facedown under The Cross-roads": `asideSets` the set, `to` the card
+  // The Return of the King (mec113.*): each quoted from a stage 1A or campaign card Setup.
+  | "attachToThreatDial" // "Each player attaches a copy of Overcome by Fear to his threat dial"
+  | "removeFromGame" // "Remove each unattached copy of Overcome by Fear from the game"
+  | "raiseThreatForSearch" // "The first player may raise each player's threat by 1 to search his deck for Andúril and add it to his hand": `count` the threat, `codes` the card
+  | "eachPlayerAddsTraitLocation" // "Each player searches the encounter deck for a Ship location and adds it to the staging area": `trait` the location's trait
+  | "attachToDifferentHeroes" // "The players may attach Esquire of Rohan and Esquire of Gondor to different heroes"
+  | "asideLogged" // "Set each Harad enemy recorded in the campaign log aside, out of play": the enemies the campaign log records, not named by the card
+  | "placeLoggedResources" // "place X resources on it, where X is the number recorded in the campaign log" (and the Mount Doom card's "X is the number of resource tokens on The Black Gate"): `codes` the card
+  | "loseRingBearer" // "The first player loses control of the Ring-bearer and place it faceup under Topmost Chamber as a guarded objective": `to` the objective
+  | "attachToRingBearerHero" // "Then, the first player attaches Last of the Company to a hero he controls and attaches The One Ring to that hero"
+  | "attachToCarrier" // "Attach A Heavy Burden to the hero with Last of the Company attached": `to` the attachment that marks the hero
+  | "chooseItemBoons"; // "Each player chooses an Item boon (excluding Andúril) from the campaign pool and sets it aside, out of play": `codes` the excluded boon
 
 export type ParsedSetup = { clauses: SetupClause[]; unread: string[] };
 
@@ -306,7 +319,7 @@ export function parseSetup(text: string, names: NameIndex, set: (name: string) =
   for (const raw of sentencesOf(text.replace(/^Setup:\s*/i, ""))) {
     const sentence = raw.replace(/\.$/, "");
     let match: RegExpExecArray | null;
-    const campaignStep = readDreamChaser(sentence, names) ?? readEredMithrin(sentence, names, clauses) ?? readTwoTowers(sentence, names);
+    const campaignStep = readDreamChaser(sentence, names) ?? readEredMithrin(sentence, names, clauses) ?? readTwoTowers(sentence, names) ?? readReturnOfTheKing(sentence, names);
     if (campaignStep) {
       clauses.push(...campaignStep);
     } else if ((match = /^Set (all copies of |each copy of )?(.+?) aside,? out of play$/i.exec(sentence))) {
