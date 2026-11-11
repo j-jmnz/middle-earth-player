@@ -1185,7 +1185,6 @@
       "id": "the-return-of-the-king",
       "name": "The Return of the King",
       "kind": "campaign",
-      "rco": true,
       "box": "The Return of the King Saga Expansion",
       "products": [
         "The Flame of the West",
@@ -1199,7 +1198,6 @@
       "id": "angmar-awakened",
       "name": "Angmar Awakened",
       "kind": "campaign",
-      "rco": true,
       "box": "Angmar Awakened Campaign Expansion",
       "products": [
         "The Lost Realm",
@@ -1218,7 +1216,6 @@
       "id": "shadows-of-mirkwood",
       "name": "Shadows of Mirkwood",
       "kind": "cycle",
-      "rco": false,
       "products": [
         "The Hunt for Gollum",
         "Conflict at the Carrock",
@@ -1235,7 +1232,6 @@
       "id": "dwarrowdelf",
       "name": "Dwarrowdelf",
       "kind": "cycle",
-      "rco": false,
       "products": [
         "Khazad-dûm",
         "The Redhorn Gate",
@@ -1253,7 +1249,6 @@
       "id": "the-hobbit",
       "name": "The Hobbit",
       "kind": "cycle",
-      "rco": false,
       "products": [
         "The Hobbit: Over Hill and Under Hill",
         "The Hobbit: On the Doorstep"
@@ -1266,7 +1261,6 @@
       "id": "against-the-shadow",
       "name": "Against the Shadow",
       "kind": "cycle",
-      "rco": false,
       "products": [
         "Heirs of Númenor",
         "The Steward's Fear",
@@ -1284,7 +1278,6 @@
       "id": "the-ring-maker",
       "name": "The Ring-maker",
       "kind": "cycle",
-      "rco": false,
       "products": [
         "The Voice of Isengard",
         "The Dunland Trap",
@@ -1302,7 +1295,6 @@
       "id": "haradrim",
       "name": "Haradrim",
       "kind": "cycle",
-      "rco": false,
       "products": [
         "The Sands of Harad",
         "The Mûmakil",
@@ -1320,7 +1312,6 @@
       "id": "vengeance-of-mordor",
       "name": "Vengeance of Mordor",
       "kind": "cycle",
-      "rco": false,
       "products": [
         "A Shadow in the East",
         "Wrath and Ruin",
@@ -1338,7 +1329,6 @@
       "id": "standalone-scenarios",
       "name": "Standalone scenarios",
       "kind": "cycle",
-      "rco": false,
       "products": [
         "2011",
         "2012",

@@ -1,8 +1,9 @@
 appId: com.middleearth.lcg
 ---
 # Written in a cloud session: it has not run. The Scenarios tab lists one section for each box that has a playable scenario,
-# in release order, named by its printed RCO product and tagged RCO; Coming later holds the scenarios no box deals yet, then,
-# in release order, the cycles (scenarios that are part of no campaign), tagged Cycle, and the locked campaigns under their RCO boxes.
+# in release order with the three saga boxes together at the Fellowship's place, named by its printed product; Coming later holds,
+# in the same order, the cycles (scenarios that are part of no campaign), captioned Cycle, the scenarios no box deals yet and the
+# locked campaigns under their RCO boxes.
 - launchApp:
     clearState: true
 - tapOn:
@@ -13,7 +14,6 @@ appId: com.middleearth.lcg
     element:
       id: box-revised-core
 - assertVisible: "Revised Core Set"
-- assertVisible: "RCO"
 - assertVisible:
     id: standalone-passage-through-mirkwood
 - scrollUntilVisible:
@@ -30,21 +30,18 @@ appId: com.middleearth.lcg
 - assertVisible: "The Fellowship of the Ring Saga Expansion"
 - scrollUntilVisible:
     element:
-      id: box-dream-chaser
-- assertVisible: "Dream-chaser Campaign Expansion"
-- scrollUntilVisible:
-    element:
       id: box-the-two-towers
 - assertVisible: "The Two Towers Saga Expansion"
 - scrollUntilVisible:
     element:
-      id: box-ered-mithrin
-- assertVisible: "Ered Mithrin Campaign Expansion"
-# Coming later: Shelob's Lair waits in its box, then the cycles from Shadows of Mirkwood (2011) and the locked campaigns, The Return of the King last.
+      id: box-dream-chaser
+- assertVisible: "Dream-chaser Campaign Expansion"
 - scrollUntilVisible:
     element:
-      id: locked-shelobs-lair
-- assertVisible: "Coming soon · The Two Towers Saga Expansion · 6"
+      id: box-ered-mithrin
+- assertVisible: "Ered Mithrin Campaign Expansion"
+# Coming later: the cycles from Shadows of Mirkwood (2011), then Shelob's Lair, waiting in The Two Towers' box, right before The
+# Return of the King.
 - scrollUntilVisible:
     element:
       id: locked-shadows-of-mirkwood
@@ -55,6 +52,10 @@ appId: com.middleearth.lcg
 - assertVisible: "Cycle · 9 scenarios · Coming soon"
 - scrollUntilVisible:
     element:
+      id: locked-shelobs-lair
+- assertVisible: "Coming soon · The Two Towers Saga Expansion · 6"
+- scrollUntilVisible:
+    element:
       id: locked-the-return-of-the-king
 - assertVisible: "The Return of the King Saga Expansion"
-- assertVisible: "RCO · 6 scenarios · Coming soon"
+- assertVisible: "6 scenarios · Coming soon"

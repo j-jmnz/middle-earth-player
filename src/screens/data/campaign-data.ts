@@ -60,23 +60,22 @@ export function campaignIds(): readonly string[] {
 /**
  * A box: the scenarios one product prints, as the Scenarios tab lists them and standalone play deals them. `campaignId` is the
  * campaign whose flags (saga, booklet) the box's standalone games follow. The Oath and The Caves of Nibin-Dûm are in two campaigns
- * but one box, The Dark of Mirkwood. `name` is the printed product; `rco` marks the revised, repackaged products, which the
- * Scenarios tab tags "RCO".
+ * but one box, The Dark of Mirkwood. `name` is the printed product.
  */
-export type Box = { id: string; name: string; rco: boolean; campaignId: string; scenarios: readonly string[] };
+export type Box = { id: string; name: string; campaignId: string; scenarios: readonly string[] };
 
 export const BOXES: readonly Box[] = [
-  // In release order: the US release of each RCO product (hallofgondor.com/release-dates), as the campaigns table sorts by `released`.
-  { id: "revised-core", name: "Revised Core Set", rco: true, campaignId: "mirkwood-paths", scenarios: ["passage-through-mirkwood", "journey-along-the-anduin", "escape-from-dol-guldur"] },
-  { id: "the-dark-of-mirkwood", name: "The Dark of Mirkwood", rco: true, campaignId: "the-dark-of-mirkwood", scenarios: ["the-oath", "the-caves-of-nibin-dum"] },
-  { id: "fellowship-of-the-ring", name: "The Fellowship of the Ring Saga Expansion", rco: true, campaignId: "fellowship-of-the-ring", scenarios: ["a-shadow-of-the-past", "a-knife-in-the-dark", "flight-to-the-ford", "the-ring-goes-south", "journey-in-the-dark", "breaking-of-the-fellowship"] },
+  // In the campaigns table's order (`position`): by release, the Lord of the Rings saga boxes together at the Fellowship's.
+  { id: "revised-core", name: "Revised Core Set", campaignId: "mirkwood-paths", scenarios: ["passage-through-mirkwood", "journey-along-the-anduin", "escape-from-dol-guldur"] },
+  { id: "the-dark-of-mirkwood", name: "The Dark of Mirkwood", campaignId: "the-dark-of-mirkwood", scenarios: ["the-oath", "the-caves-of-nibin-dum"] },
+  { id: "fellowship-of-the-ring", name: "The Fellowship of the Ring Saga Expansion", campaignId: "fellowship-of-the-ring", scenarios: ["a-shadow-of-the-past", "a-knife-in-the-dark", "flight-to-the-ford", "the-ring-goes-south", "journey-in-the-dark", "breaking-of-the-fellowship"] },
+  // The Treason of Saruman and The Land of Shadow are the second saga box (MEC112); its standalone games follow its campaign's saga flag and the per-scenario saga start.
+  { id: "the-two-towers", name: "The Two Towers Saga Expansion", campaignId: "the-two-towers", scenarios: ["the-uruk-hai", "helms-deep", "the-road-to-isengard", "the-passage-of-the-marshes", "journey-to-the-cross-roads", "shelobs-lair"] },
   // The Grey Havens, the six Adventure Packs and the Campaign Expansion are one box on the Scenarios tab (user decision, 2026-10-30),
   // named by the RCO product that prints its nine scenarios.
-  { id: "dream-chaser", name: "Dream-chaser Campaign Expansion", rco: true, campaignId: "dream-chaser", scenarios: ["voyage-across-belegaer", "the-fate-of-numenor", "raid-on-the-grey-havens", "flight-of-the-stormcaller", "the-thing-in-the-depths", "temple-of-the-deceived", "the-drowned-ruins", "a-storm-on-cobas-haven", "the-city-of-corsairs"] },
-  // The Treason of Saruman and The Land of Shadow are the second saga box (MEC112); its standalone games follow its campaign's saga flag and the per-scenario saga start.
-  { id: "the-two-towers", name: "The Two Towers Saga Expansion", rco: true, campaignId: "the-two-towers", scenarios: ["the-uruk-hai", "helms-deep", "the-road-to-isengard", "the-passage-of-the-marshes", "journey-to-the-cross-roads", "shelobs-lair"] },
+  { id: "dream-chaser", name: "Dream-chaser Campaign Expansion", campaignId: "dream-chaser", scenarios: ["voyage-across-belegaer", "the-fate-of-numenor", "raid-on-the-grey-havens", "flight-of-the-stormcaller", "the-thing-in-the-depths", "temple-of-the-deceived", "the-drowned-ruins", "a-storm-on-cobas-haven", "the-city-of-corsairs"] },
   // The Wilds of Rhovanion and the six Adventure Packs are one box with the Campaign Expansion on the Scenarios tab, as Dream-chaser's are.
-  { id: "ered-mithrin", name: "Ered Mithrin Campaign Expansion", rco: true, campaignId: "ered-mithrin", scenarios: ["journey-up-the-anduin", "lost-in-mirkwood", "the-kings-quest", "the-withered-heath", "roam-across-rhovanion", "fire-in-the-night", "the-ghost-of-framsburg", "mount-gundabad", "the-fate-of-wilderland"] },
+  { id: "ered-mithrin", name: "Ered Mithrin Campaign Expansion", campaignId: "ered-mithrin", scenarios: ["journey-up-the-anduin", "lost-in-mirkwood", "the-kings-quest", "the-withered-heath", "roam-across-rhovanion", "fire-in-the-night", "the-ghost-of-framsburg", "mount-gundabad", "the-fate-of-wilderland"] },
 ];
 
 /** The box a scenario is printed in, or null for an id no box lists. */
