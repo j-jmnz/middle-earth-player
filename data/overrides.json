@@ -984,6 +984,42 @@
     },
     {
       "match": {
+        "code": "146015"
+      },
+      "set": {
+        "keywords": {
+          "immune": true
+        }
+      },
+      "reason": "Topmost Chamber prints \"Immune to player card effects.\" as its first line; Hall of Beorn lists no keyword for it, so the engine would read no immunity.",
+      "source": "scan 146015.A (data/printed/the-return-of-the-king.json)"
+    },
+    {
+      "match": {
+        "code": "146070"
+      },
+      "set": {
+        "keywords": {
+          "immune": true
+        }
+      },
+      "reason": "The Two Watchers (location side) prints \"Immune to player card effects.\" as its first line; Hall of Beorn lists no keyword for it, so the engine would read no immunity.",
+      "source": "scan 146070.A (data/printed/the-return-of-the-king.json)"
+    },
+    {
+      "match": {
+        "code": "146071"
+      },
+      "set": {
+        "keywords": {
+          "immune": true
+        }
+      },
+      "reason": "The Two Watchers (enemy side) prints \"Immune to player card effects.\" as its first line; Hall of Beorn lists no keyword for it, so the engine would read no immunity.",
+      "source": "scan 146071.A (data/printed/the-return-of-the-king.json)"
+    },
+    {
+      "match": {
         "code": "145074"
       },
       "set": {
