@@ -20,7 +20,7 @@ export const UNGOL_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "",
 // "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
 export type UngolDecks = "strong" | "weak" | "brittle";
 
-// The strong stand-ins start at a threat of 3 each and Frodo, who lies under Topmost Chamber, at 0: the Watchers' attacks (each raises the threat by its Attack) and Overcome by Fear (the pool entries below) raise a seat's threat every round and it cannot be reduced, so a game of ten rounds or so ends under 50.
+// The strong stand-ins start at a threat of 3 each and Frodo, who lies under Topmost Chamber, at 0: the Watchers' attacks (each raises the threat by its Attack) and the refresh raise a seat's threat every round and it cannot be reduced, so a game of ten rounds or so ends under 50.
 const UNGOL_STATS = { strong: { ...HERO_STATS.strong, attack: 30, defense: 20 }, weak: HERO_STATS.weak, brittle: { ...HERO_STATS.brittle, threat: 8 } } as const satisfies Record<UngolDecks, HeroStats>;
 
 // The first player holds the Ring-bearer with The One Ring attached (the saga start of scenario 16, mec113.setting-up-the-game): Frodo, beside three stand-in heroes (Setup lays him under Topmost Chamber and gives Last of the Company to one of them); a second seat has three.
@@ -135,18 +135,18 @@ export const ITEM_CHOICES = (seatCount: 1 | 2): readonly string[] => (seatCount 
 // Wins (true solo and two-handed, Normal and Easy, after the earlier parts with the Item boons in the pool and once with an empty log; the boons come home when Shagrat is defeated, stay set aside when he is defeated before stage 3A and are lost when he is
 // still in play at the end) and the two ways to lose that a game of stand-ins reaches: the threat at 50 (heroes too small to quest) and the hero with The One Ring destroyed (heroes too brittle to survive the Watchers' and the Orcs' attacks).
 export const UNGOL_GOLDENS: readonly UngolGolden[] = [
-  { name: "true solo, won, Normal, after the earlier parts, Shagrat defeated", seatCount: 1, seed: 7, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
-  { name: "true solo, won, Easy, after the earlier parts, the other options", seatCount: 1, seed: 4, difficulty: "Easy", decks: "strong", outcome: "won", after: true, policy: { choose: "last" } },
+  { name: "true solo, won, Normal, after the earlier parts, Shagrat defeated", seatCount: 1, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
+  { name: "true solo, won, Easy, after the earlier parts, the other options", seatCount: 1, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won", after: true, policy: { choose: "last" } },
   { name: "true solo, won, Normal, with no earlier log", seatCount: 1, seed: 3, difficulty: "Normal", decks: "strong", outcome: "won" },
-  { name: "true solo, won, Normal, after the earlier parts, Shagrat left in play", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won", after: true, policy: { hunt: false } },
-  { name: "two-handed, won, Normal, after the earlier parts, Shagrat defeated", seatCount: 2, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
+  { name: "true solo, won, Normal, after the earlier parts, Shagrat left in play", seatCount: 1, seed: 5, difficulty: "Normal", decks: "strong", outcome: "won", after: true, policy: { hunt: false } },
+  { name: "two-handed, won, Normal, after the earlier parts, Shagrat defeated", seatCount: 2, seed: 7, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
   { name: "two-handed, won, Easy, after the earlier parts, the other options", seatCount: 2, seed: 4, difficulty: "Easy", decks: "strong", outcome: "won", after: true, policy: { choose: "last" } },
-  { name: "two-handed, won, Normal, after the earlier parts, Shagrat left in play", seatCount: 2, seed: 5, difficulty: "Normal", decks: "strong", outcome: "won", after: true, policy: { hunt: false } },
-  { name: "two-handed, won, Normal, after the earlier parts, Shagrat defeated before stage 3A", seatCount: 2, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
+  { name: "two-handed, won, Normal, after the earlier parts, Shagrat left in play", seatCount: 2, seed: 8, difficulty: "Normal", decks: "strong", outcome: "won", after: true, policy: { hunt: false } },
+  { name: "two-handed, won, Easy, after the earlier parts, Shagrat defeated before stage 3A", seatCount: 2, seed: 44, difficulty: "Easy", decks: "strong", outcome: "won", after: true },
   { name: "true solo, lost, threat reaches 50", seatCount: 1, seed: 4, difficulty: "Normal", decks: "weak", outcome: "lost", after: true, lossReason: "No seats remain", lossKind: "threat" },
-  { name: "two-handed, lost, threat reaches 50", seatCount: 2, seed: 4, difficulty: "Normal", decks: "weak", outcome: "lost", after: true, lossReason: "No seats remain", lossKind: "threat" },
-  { name: "true solo, lost, The One Ring leaves play", seatCount: 1, seed: 3, difficulty: "Normal", decks: "brittle", outcome: "lost", after: true, lossReason: "The One Ring left play", lossKind: "ring" },
-  { name: "two-handed, lost, The One Ring leaves play", seatCount: 2, seed: 4, difficulty: "Normal", decks: "brittle", outcome: "lost", after: true, lossReason: "The One Ring left play", lossKind: "ring" },
+  { name: "two-handed, lost, threat reaches 50", seatCount: 2, seed: 2, difficulty: "Normal", decks: "weak", outcome: "lost", after: true, lossReason: "No seats remain", lossKind: "threat" },
+  { name: "true solo, lost, The One Ring leaves play", seatCount: 1, seed: 4, difficulty: "Normal", decks: "brittle", outcome: "lost", after: true, lossReason: "The One Ring left play", lossKind: "ring" },
+  { name: "two-handed, lost, The One Ring leaves play", seatCount: 2, seed: 2, difficulty: "Normal", decks: "brittle", outcome: "lost", after: true, lossReason: "The One Ring left play", lossKind: "ring" },
 ];
 
 const game = campaignGame<UngolDecks, UngolPolicy>({
@@ -154,15 +154,15 @@ const game = campaignGame<UngolDecks, UngolPolicy>({
   scenario: ungol,
   stats: UNGOL_STATS,
   // TODO: the cards a game loads besides the scenario's piles, its campaign card's and the campaign's game codes.
-  codes: [...ungol.cards.map((card) => card.code), RING_BEARER, "144052", "146065", "146071", ...ITEM_BOONS, "145014", "145015", "145016", "145062", "143020", "143021"],
+  codes: [...ungol.cards.map((card) => card.code), RING_BEARER, "144052", "146065", "146071", ...ITEM_BOONS, "145014", "145015", "145016", "145062", "143020", "143021", "145001", "142014", "145013"],
   loadout: ungolLoadout,
   intent: ungolIntent,
   policy: DEFAULT_POLICY,
   limit: 6000,
   upgraded: [],
-  // The three earlier parts earn no XP. What the Pelennor's chain leaves in the pool: an Overcome by Fear for each seat (the Grey Company's), a Wraith on Wings for each seat and the two Esquires on the first seat's heroes (the Pelennor's, 145078:B:2), the Two Towers' cards
-  // the real chain carries (143020, 143021), and the Item boons written above.
-  earlier: { xp: [0, 0, 0], pool: [{ code: "145016", seat: 0 }, { code: "145016", seat: 1 }, { code: "145062", seat: 0 }, { code: "145062", seat: 1 }, { code: "145014", seat: 0 }, { code: "145015", seat: 0 }, ...ITEM_POOL], marks: {} },
+  // The three earlier parts earn no XP. What the Pelennor's chain leaves in the pool: an Overcome by Fear for each seat (the Grey Company's; this Setup leaves it out of the game), a Wraith on Wings for each seat and the two Esquires on the first seat's heroes (the Pelennor's, 145078:B:2), the Two Towers' cards
+  // the real chain carries (Poisoned Counsels for each seat, 143021, whose burden set this Setup leaves out, and the Palantír of Orthanc, 143020, an Item boon), and the Item boons written above.
+  earlier: { xp: [0, 0, 0], pool: [{ code: "143021", seat: 0 }, { code: "143021", seat: 1 }, { code: "143020", seat: 0 }, { code: "145016", seat: 0 }, { code: "145016", seat: 1 }, { code: "145062", seat: 0 }, { code: "145062", seat: 1 }, { code: "145014", seat: 0 }, { code: "145015", seat: 0 }, ...ITEM_POOL], marks: {} },
 });
 
 // A golden: the log of the earlier parts it plays after, its policy over the default, the Setup's boon choices answered.

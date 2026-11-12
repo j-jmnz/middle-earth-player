@@ -205,7 +205,7 @@ function entriesOf(game: ScenarioState, ids: readonly string[], pairs: ReturnTyp
     // The Ring-bearer facedown under the Watcher in the Water is drawn under it, in play and facedown (mec109.stage-4).
     // Mendor, captured with the prisoner, is drawn under it (01131:A:3). An encounter card guarding an objective is a card of the staging area
     // beside it, not a card drawn under it.
-    const captive = card.zone === "staging" || card.zone === "captive" ? captiveUnder(game, id) : null;
+    const captive = card.zone === "staging" || card.zone === "captive" || card.zone === "activeLocation" ? captiveUnder(game, id) : null;
     // The Captives of The Uruk-hai lie under To Isengard! or the enemy that holds one, wherever that enemy is (staging or engaged): every one of them is drawn (families/captives).
     const captives = card.zone === "staging" || card.zone === "engaged" || card.zone === "captive" ? (held.length === 0 ? NONE : captivesUnder(game, id, held)) : NONE;
     const under = captives.length > 0 ? captives : captive ? [captive] : NONE;

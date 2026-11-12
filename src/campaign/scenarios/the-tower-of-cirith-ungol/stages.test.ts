@@ -10,6 +10,7 @@ import { legalTargets, reduce, type ReduceContext, type ScenarioState } from "..
 import { settle } from "../../../rules/engine/machine.ts";
 import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
+import { pickCandidates } from "../../../rules/interpret/pick.ts";
 import { runInstruction } from "../../../rules/interpret/interpret.ts";
 import { flagged, updateCard } from "../../../rules/core/state.ts";
 import { moveCard, spawn } from "../../../rules/core/zones.ts";
@@ -181,5 +182,15 @@ describe("the-tower-of-cirith-ungol stages", () => {
     const gone = moveCard(full, byCode(full, "146070").id, { zone: "victory" });
     const won = settle(syncConstants({ ...gone, window: null }, ctx), ctx, []);
     expect(won.stageCleared).toBe(true);
+  });
+
+  it("146069:B:1 a boon guarded on Shagrat is no attachment a player controls, and it returns to its owner's hand when he is defeated", () => {
+    const at3 = stage3();
+    const sting = byCode(at3, STING);
+    const offered = pickCandidates(at3, { type: "attachment", control: "you", nonObjective: true }, 0, [], null, ctx);
+    expect(offered).not.toContain(sting.id);
+    const defeated = settle(syncConstants({ ...moveCard(at3, byCode(at3, "146020").id, { zone: "victory" }), window: null }, ctx), ctx, []);
+    const home = byCode(defeated, STING);
+    expect([home.zone, home.controller, defeated.seats[0].hand.includes(home.id)]).toEqual(["hand", 0, true]);
   });
 });

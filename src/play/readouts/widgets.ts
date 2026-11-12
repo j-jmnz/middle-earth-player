@@ -9,6 +9,7 @@ import { stageOf } from "../../rules/families/breaking/areas.ts";
 import type { ScenarioState } from "../../rules/engine/reduce.ts";
 
 import { headingStepOf, type HeadingStep } from "../dream-chaser/heading.ts";
+import { captiveDialWords } from "../words/scenarios/ungol.ts";
 import { gollumHeld } from "./marshes.ts";
 
 export type WidgetReadouts = {
@@ -60,6 +61,8 @@ export function heldDial(game: ScenarioState, nameOf: (code: string) => string):
   // A hero an enemy holds (Carried Away, 18074:A:1): the first seat that has one, its dial says which enemy holds which hero.
   const held = Object.values(game.cards).find((card) => card.zone === "captive" && card.guardedHero === true && card.owner != null);
   const holder = held?.host ? game.cards[held.host] : undefined;
+  // The Ring-bearer lying faceup under Topmost Chamber, a guarded objective (146066:A:1): the first player takes it back, and its dial wears the Ring mark.
+  if (held && held.owner != null && held.face === "up" && holder) return { seat: held.owner, words: captiveDialWords(nameOf(held.code), nameOf(holder.code)), mark: "oneRing" };
   return held && held.owner != null ? { seat: held.owner, words: `${nameOf(held.code)} is held facedown${holder ? ` by ${nameOf(holder.code)}` : ""}`, mark: "hero" } : null;
 }
 

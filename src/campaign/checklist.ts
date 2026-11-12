@@ -148,7 +148,7 @@ function setAsideBoon(table: Table, instruction: Extract<Instruction, { verb: "S
     const pooled = pool.filter((card) => card.attachedTo == null && card.back === "player" && !fresh.has(card) && !table.aside.has(card) && eligible(card.code));
     const options = [...new Set(pooled.map((card) => card.code))];
     if (options.length === 0) continue;
-    const answer = takeAnswer(table, options, index, `Choose an ${instruction.trait} boon of the campaign pool to set aside, out of play. It is left out of the decks this game.`);
+    const answer = takeAnswer(table, options, index, `Choose an ${instruction.trait} boon from the pool to set aside. Shagrat guards it at stage 3, and it is lost if he is in play at the end.`);
     if (answer == null) return;
     const taken = pooled.find((card) => card.code === answer && poolSeat(card, seats.length) === index) ?? pooled.find((card) => card.code === answer);
     if (taken) table.aside.add(taken);
