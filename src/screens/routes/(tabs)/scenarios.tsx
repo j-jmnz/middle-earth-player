@@ -5,14 +5,14 @@ import { View } from "react-native";
 import { isPlayable } from "../../../campaign/playable";
 import { isOpenStatus, standaloneStatus, type ListedStandalone } from "../../../campaign/standalone";
 import { BOXES, boxOf, scenarioName, scenarioOf } from "../../data/campaign-data";
-import { campaignListQueries, lockedBoxTiles } from "../../campaign/list";
+import { campaignListQueries } from "../../campaign/list";
 import { PillButton, PrimaryButton } from "../../kit/chrome";
 import { deckFaces } from "../../deck/store";
 import { useDatabases } from "../../data/databases";
 import { FoldSection, useFolds } from "../../kit/fold-section";
 import { heroFace } from "../../art/hero-tile";
 import { CatalogGrid, CatalogTile, HubPage, LockedTiles, OtherRuns, PrimaryPlate, RunHero, RunRow } from "../../campaign/hub-parts";
-import { comingScenarios, splitRuns } from "../../campaign/hub-runs";
+import { comingLater, splitRuns } from "../../campaign/hub-runs";
 import { usePalette } from "../../kit/palette-hook";
 import { seatWord } from "../../data/seats";
 import { gameCaption, statusWord } from "../../history/standalone-words";
@@ -106,7 +106,7 @@ export default function Scenarios() {
     <View testID="standalone-scenarios" style={{ gap: 18 * s }}>
       {boxes.map(({ box, playable }) => (
         <View key={box.id} testID={`box-${box.id}`}>
-          <FoldSection id={`box-${box.id}`} title={box.name} tag={box.rco ? "RCO" : undefined} count={playable.length} unit="scenario" {...fold(`box-${box.id}`)}>
+          <FoldSection id={`box-${box.id}`} title={box.name} count={playable.length} unit="scenario" {...fold(`box-${box.id}`)}>
             <CatalogGrid posters={posters}>
               {playable.map(({ id, number }) => {
                 const { line, tone } = standing(id);
@@ -121,9 +121,8 @@ export default function Scenarios() {
     </View>
   );
 
-  // The scenarios no box can deal yet, then the locked campaigns under their RCO boxes and the cycles (the campaigns table only; no
-  // card is read for them).
-  const waiting = [...comingScenarios(BOXES, isPlayable, scenarioName), ...lockedBoxTiles(campaignListQueries(catalog).campaigns.all())];
+  // The scenarios no box can deal yet and the locked campaigns and cycles, in the campaigns table's order (no card is read for them).
+  const waiting = comingLater(BOXES, campaignListQueries(catalog).campaigns.all(), isPlayable, scenarioName);
   const coming =
     waiting.length > 0 ? (
       <FoldSection id="scenarios-coming" title="Coming later" count={waiting.length} {...fold("scenarios-coming")}>

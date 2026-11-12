@@ -20,7 +20,7 @@ import { pickCandidates } from "../../interpret/pick.ts";
 import { attachTo, moveCard, spawn } from "../../core/zones.ts";
 import { opening } from "../../../../test/harness/scene-kit.ts";
 import { updateCard } from "../../core/state.ts";
-import { entriesBarred, noteEntries } from "./entries.ts";
+import { entriesBarred, entriesRefusal, noteEntries } from "./entries.ts";
 import { stampRoutes } from "./routes.ts";
 import { carryToSecondDeck, setAsideEncounterDeck } from "./swap.ts";
 
@@ -133,6 +133,7 @@ describe("LimitEntries (12155:A:1)", () => {
     // The ally that entered is discarded: it entered play this round all the same.
     const gone = noteEntries(moveCard(entered, first ?? "", { zone: "discard", seat: 0 }), made.ctx);
     expect(entriesBarred(gone, second ?? "", made.ctx)).toBe(true);
+    expect(entriesRefusal(gone, second ?? "", made.ctx)).toMatch(/^Corsair Waters: the players may play or put into play only 1 ally each round\.$/);
   });
 
   it("bars nothing in a game with no card that reads the limit", () => {

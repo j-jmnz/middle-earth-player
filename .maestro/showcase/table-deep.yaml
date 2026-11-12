@@ -1,0 +1,13 @@
+appId: com.middleearth.lcg
+tags:
+  - showcase
+---
+# The README showcase's Helm's Deep table in round 3, enemies engaged on both seats (deep-showcase) (docs/showcase.md, Shot list), on the iPhone and the iPad, landscape. scripts/showcase/capture.ts runs it with THEME and DEVICE.
+- runFlow:
+    file: ../subflows/showcase-table.yaml
+    env:
+      FIXTURE: deep-showcase
+- runFlow:
+    file: ../subflows/showcase-shot.yaml
+    env:
+      SHOT: table-deep

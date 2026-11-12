@@ -3,6 +3,7 @@
 import type { NextStep, PathNode } from "../../campaign/path";
 import type { Box } from "../data/campaign-data";
 import { nextWord } from "../history/save-line";
+import { lockedBoxTiles, type CampaignRow, type LockedTile } from "./list";
 
 /** The hub's hero and the runs under it: the first unfinished run in list order, and the other unfinished runs after it. */
 export function splitRuns<T>(runs: readonly T[], unfinished: (run: T) => boolean): { hero: T | null; others: T[] } {
@@ -18,6 +19,22 @@ export function comingScenarios(boxes: readonly Box[], isPlayable: (scenarioId: 
   return boxes.flatMap((box) =>
     box.scenarios.flatMap((id, index) => (isPlayable(id) ? [] : [{ id, name: nameOf(id), caption: `Coming soon · ${box.name} · ${index + 1}` }])),
   );
+}
+
+/**
+ * The Scenarios tab's Coming later, in the campaigns table's order: for each row, the waiting scenarios of the boxes that follow
+ * its campaign, then the row itself when it is locked. Shelob's Lair, waiting in The Two Towers' box, sits beside The Return of
+ * the King. A box whose campaign has no row goes last.
+ */
+export function comingLater(boxes: readonly Box[], rows: readonly CampaignRow[], isPlayable: (scenarioId: string) => boolean, nameOf: (scenarioId: string) => string): LockedTile[] {
+  const locked = new Map(lockedBoxTiles(rows).map((tile) => [tile.id, tile]));
+  const ids = new Set(rows.map((row) => row.id));
+  const waiting = (campaignId: string) => comingScenarios(boxes.filter((box) => box.campaignId === campaignId), isPlayable, nameOf);
+  const placed = rows.flatMap((row) => {
+    const tile = locked.get(row.id);
+    return tile ? [...waiting(row.id), tile] : waiting(row.id);
+  });
+  return [...placed, ...comingScenarios(boxes.filter((box) => !ids.has(box.campaignId)), isPlayable, nameOf)];
 }
 
 /** The eyebrow over a hero's next stop: "Next · Scenario 3 of 6", "On the table · Scenario 3 of 6" for the open scenario ("Needs a choice · Scenario 3 of 6" when it asks to be continued or restarted), or "Coming soon · Scenario 7 of 9" for one the app cannot deal yet. */

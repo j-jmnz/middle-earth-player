@@ -5,8 +5,9 @@
     "scenarioCount": 6,
     "playable": true,
     "kind": "campaign",
-    "rco": true,
-    "box": null
+    "box": null,
+    "released": "2022-10-14",
+    "position": 12
   },
   {
     "id": "mirkwood-paths",
@@ -14,8 +15,9 @@
     "scenarioCount": 5,
     "playable": true,
     "kind": "campaign",
-    "rco": true,
-    "box": null
+    "box": null,
+    "released": "2022-01-28",
+    "position": 9
   },
   {
     "id": "the-dark-of-mirkwood",
@@ -23,8 +25,9 @@
     "scenarioCount": 2,
     "playable": true,
     "kind": "campaign",
-    "rco": true,
-    "box": null
+    "box": null,
+    "released": "2022-02-25",
+    "position": 10
   },
   {
     "id": "dream-chaser",
@@ -32,8 +35,9 @@
     "scenarioCount": 9,
     "playable": true,
     "kind": "campaign",
-    "rco": true,
-    "box": null
+    "box": null,
+    "released": "2023-07-07",
+    "position": 15
   },
   {
     "id": "ered-mithrin",
@@ -41,8 +45,9 @@
     "scenarioCount": 9,
     "playable": true,
     "kind": "campaign",
-    "rco": true,
-    "box": null
+    "box": null,
+    "released": "2024-06-28",
+    "position": 16
   },
   {
     "id": "the-two-towers",
@@ -50,8 +55,9 @@
     "scenarioCount": 6,
     "playable": true,
     "kind": "campaign",
-    "rco": true,
-    "box": null
+    "box": null,
+    "released": "2023-10-06",
+    "position": 13
   },
   {
     "id": "the-return-of-the-king",
@@ -59,8 +65,9 @@
     "scenarioCount": 6,
     "playable": false,
     "kind": "campaign",
-    "rco": true,
-    "box": "The Return of the King Saga Expansion"
+    "box": "The Return of the King Saga Expansion",
+    "released": "2024-10-10",
+    "position": 14
   },
   {
     "id": "angmar-awakened",
@@ -68,8 +75,9 @@
     "scenarioCount": 9,
     "playable": false,
     "kind": "campaign",
-    "rco": true,
-    "box": "Angmar Awakened Campaign Expansion"
+    "box": "Angmar Awakened Campaign Expansion",
+    "released": "2022-08-19",
+    "position": 11
   },
   {
     "id": "shadows-of-mirkwood",
@@ -77,8 +85,9 @@
     "scenarioCount": 6,
     "playable": false,
     "kind": "cycle",
-    "rco": false,
-    "box": null
+    "box": null,
+    "released": "2011-07-22",
+    "position": 1
   },
   {
     "id": "dwarrowdelf",
@@ -86,8 +95,9 @@
     "scenarioCount": 9,
     "playable": false,
     "kind": "cycle",
-    "rco": false,
-    "box": null
+    "box": null,
+    "released": "2012-01-06",
+    "position": 3
   },
   {
     "id": "the-hobbit",
@@ -95,8 +105,9 @@
     "scenarioCount": 6,
     "playable": false,
     "kind": "cycle",
-    "rco": false,
-    "box": null
+    "box": null,
+    "released": "2012-08-17",
+    "position": 4
   },
   {
     "id": "against-the-shadow",
@@ -104,8 +115,9 @@
     "scenarioCount": 9,
     "playable": false,
     "kind": "cycle",
-    "rco": false,
-    "box": null
+    "box": null,
+    "released": "2012-11-26",
+    "position": 5
   },
   {
     "id": "the-ring-maker",
@@ -113,8 +125,9 @@
     "scenarioCount": 9,
     "playable": false,
     "kind": "cycle",
-    "rco": false,
-    "box": null
+    "box": null,
+    "released": "2014-02-21",
+    "position": 6
   },
   {
     "id": "haradrim",
@@ -122,8 +135,9 @@
     "scenarioCount": 9,
     "playable": false,
     "kind": "cycle",
-    "rco": false,
-    "box": null
+    "box": null,
+    "released": "2016-11-23",
+    "position": 7
   },
   {
     "id": "vengeance-of-mordor",
@@ -131,8 +145,9 @@
     "scenarioCount": 9,
     "playable": false,
     "kind": "cycle",
-    "rco": false,
-    "box": null
+    "box": null,
+    "released": "2019-08-02",
+    "position": 8
   },
   {
     "id": "standalone-scenarios",
@@ -140,7 +155,8 @@
     "scenarioCount": 14,
     "playable": false,
     "kind": "cycle",
-    "rco": false,
-    "box": null
+    "box": null,
+    "released": "2011-09-21",
+    "position": 2
   }
 ]

@@ -1,11 +1,12 @@
 import { Image, type ImageContentPosition } from "expo-image";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { View } from "react-native";
 
 import { cardCorner } from "../../ui/card-corner";
 import { CardImage } from "../../ui/card-image";
 import { DECORATIVE_ALT } from "../../ui/decorative";
 import { cachePolicyFor } from "../../ui/image-cache";
+import { usePictureHold } from "../../ui/showcase/use-picture-hold";
 
 import { shownCardImage } from "./policy";
 import { remotePictureUrl } from "./remote";
@@ -60,7 +61,10 @@ export function InspectCardImage({
   width: number;
   height: number;
 }) {
-  return <Image recyclingKey={code} contentFit="contain" accessible accessibilityRole="image" accessibilityLabel={name} aria-label={name} cachePolicy={cachePolicyFor(source)} source={source} style={{ width, height }} />;
+  // The showcase build waits for the picture until it has loaded (ui/showcase/picture-loads.ts).
+  const [loaded, setLoaded] = useState<string | null>(null);
+  usePictureHold(loaded !== code);
+  return <Image recyclingKey={code} contentFit="contain" accessible accessibilityRole="image" accessibilityLabel={name} aria-label={name} cachePolicy={cachePolicyFor(source)} source={source} onLoad={() => setLoaded(code)} style={{ width, height }} />;
 }
 
 export function CoverCardImage({
@@ -74,9 +78,12 @@ export function CoverCardImage({
   width: number;
   height: number;
 }) {
+  const [loaded, setLoaded] = useState<string | null>(null);
+  usePictureHold(loaded !== code);
   return (
     <Image
       recyclingKey={code}
+      onLoad={() => setLoaded(code)}
       contentFit="cover"
       contentPosition={focusTop}
       accessible={false}

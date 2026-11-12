@@ -1,0 +1,13 @@
+appId: com.middleearth.lcg
+tags:
+  - showcase
+---
+# The README showcase's sea table: Voyage Across Belegaer in round 3, the ships and the Heading dial (sea-showcase) (docs/showcase.md, Shot list), on the iPhone and the iPad, landscape. scripts/showcase/capture.ts runs it with THEME and DEVICE.
+- runFlow:
+    file: ../subflows/showcase-table.yaml
+    env:
+      FIXTURE: sea-showcase
+- runFlow:
+    file: ../subflows/showcase-shot.yaml
+    env:
+      SHOT: table-sea

@@ -78,6 +78,11 @@ export function progressRoom(state: ScenarioState, id: string, cards: Cards): nu
   return room;
 }
 
+// "When any amount of progress would be placed on a location in the staging area, reduce that amount by 1" (144048:A:1; rr.forced): one placement, however it was made, is cut by the reduction the location holds.
+export function reducedProgress(state: ScenarioState, id: string, amount: number): number {
+  return Math.max(0, amount - heldAmount(state, id, "progressReduced"));
+}
+
 // A card that holds `loseAtDamage` damage tokens loses the game (142030:A:3: "If there are 9 damage tokens here, the players lose the
 // game"). Read each time the engine settles.
 export function damageLoss(state: ScenarioState, cards: Cards): ScenarioState {

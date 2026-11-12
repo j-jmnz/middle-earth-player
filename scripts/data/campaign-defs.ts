@@ -147,9 +147,9 @@ export type CampaignDef = {
   bookletDoc: string;
   // A saga campaign carries the Ring-bearer and the Fellowship rules (the Fellowship of the Ring and The Two Towers).
   saga: boolean;
-  // Played from the revised, repackaged products (RCO: the Revised Core Set, the revised saga boxes, The Dark of Mirkwood and the
-  // Campaign Expansions), which the hubs tag "RCO".
-  rco: boolean;
+  // The US release of the product that starts the campaign (hallofgondor.com/release-dates): the hubs list campaigns in this order
+  // (a saga box at the Fellowship's, LORD_OF_THE_RINGS_SAGA).
+  released: string;
   // A campaign whose campaign cards award XP, which the players spend on the log's scalable and upgradable cards (Dream-chaser only).
   xp?: boolean;
   // Where the scan-read ledger for this campaign lives (data/printed/<ledger>.json).
@@ -180,11 +180,15 @@ function twoTowers(id: string, product: string, extra: Partial<ScenarioDef> = {}
   return { id, product, setupSpan: `mec112.setup-${id}`, ...extra };
 }
 
+// The three saga boxes of The Lord of the Rings, in book order. Every list keeps them together, placed by the Fellowship's release
+// (scripts/data/normalize/campaigns.ts, positions).
+export const LORD_OF_THE_RINGS_SAGA: readonly string[] = ["fellowship-of-the-ring", "the-two-towers", "the-return-of-the-king"];
+
 export const CAMPAIGNS: readonly CampaignDef[] = [
   {
     id: "fellowship-of-the-ring",
     name: "Fellowship of the Ring",
-    rco: true,
+    released: "2022-10-14",
     products: ["The Black Riders", "The Road Darkens"],
     scenarios: [
       { id: "a-shadow-of-the-past", product: "The Black Riders", setupSpan: "mec109.setup-a-shadow-of-the-past" },
@@ -203,7 +207,7 @@ export const CAMPAIGNS: readonly CampaignDef[] = [
   {
     id: "mirkwood-paths",
     name: "Mirkwood Paths",
-    rco: true,
+    released: "2022-01-28",
     products: ["Revised Core Set", "The Dark of Mirkwood"],
     scenarios: [
       { id: "passage-through-mirkwood", product: "Revised Core Set", setupSpan: "ltp.setup-passage-through-mirkwood", crossCheck: { normal: "Q01.1", easy: "E01.1" } },
@@ -220,7 +224,7 @@ export const CAMPAIGNS: readonly CampaignDef[] = [
   {
     id: "the-dark-of-mirkwood",
     name: "The Dark of Mirkwood",
-    rco: true,
+    released: "2022-02-25",
     products: ["The Dark of Mirkwood"],
     scenarios: [
       OATH,
@@ -234,7 +238,7 @@ export const CAMPAIGNS: readonly CampaignDef[] = [
   {
     id: "dream-chaser",
     name: "Dream-chaser",
-    rco: true,
+    released: "2023-07-07",
     products: ["The Grey Havens", "Flight of the Stormcaller", "The Thing in the Depths", "Temple of the Deceived", "The Drowned Ruins", "A Storm on Cobas Haven", "The City of Corsairs", DCCE],
     scenarios: [
       dreamChaser(1, "voyage-across-belegaer", "The Grey Havens", { sharedEncounterDeck2: "corsairDeck" }),
@@ -256,7 +260,7 @@ export const CAMPAIGNS: readonly CampaignDef[] = [
   {
     id: "ered-mithrin",
     name: "Ered Mithrin",
-    rco: true,
+    released: "2024-06-28",
     products: ["The Wilds of Rhovanion", "The Withered Heath", "Roam Across Rhovanion", "Fire in the Night", "The Ghost of Framsburg", "Mount Gundabad", "The Fate of Wilderland", EMCE],
     scenarios: [
       eredMithrin(1, "journey-up-the-anduin", "The Wilds of Rhovanion", { sharedEncounterDeck2: "evilCreaturesDeck" }),
@@ -277,7 +281,7 @@ export const CAMPAIGNS: readonly CampaignDef[] = [
   {
     id: "the-two-towers",
     name: "The Two Towers",
-    rco: true,
+    released: "2023-10-06",
     products: ["The Treason of Saruman", "The Land of Shadow"],
     scenarios: [
       twoTowers("the-uruk-hai", "The Treason of Saruman"),

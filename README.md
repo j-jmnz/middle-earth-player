@@ -39,7 +39,7 @@ CI must pass tests, lint, type check and data check before anything lands. Engin
 
 ## Features
 
-- Official campaigns, from the revised, repackaged products (RCO): The Fellowship of the Ring (The Fellowship of the Ring Saga Expansion, MEC109), Mirkwood Paths (Revised Core Set and The Dark of Mirkwood), The Dark of Mirkwood, Dream-chaser (Dream-chaser Campaign Expansion), Ered Mithrin (Ered Mithrin Campaign Expansion) and The Two Towers (The Two Towers Saga Expansion, MEC112). Each scenario also plays standalone; some have Nightmare mode.
+- Official campaigns, from the revised, repackaged products (RCO), in release order with the saga boxes together: Mirkwood Paths (Revised Core Set and The Dark of Mirkwood), The Dark of Mirkwood, The Fellowship of the Ring (The Fellowship of the Ring Saga Expansion, MEC109), The Two Towers (The Two Towers Saga Expansion, MEC112), Dream-chaser (Dream-chaser Campaign Expansion) and Ered Mithrin (Ered Mithrin Campaign Expansion). Each scenario also plays standalone; some have Nightmare mode.
 - The engine applies all rules and card effects and computes every number. You pick from the legal moves it lists.
 - True solo (one seat) or two-handed (two seats, one device). No online multiplayer.
 - Deck builder with the full player-card pool and the pre-built decks; campaign log, run history and rules reference.
@@ -52,20 +52,20 @@ Every official campaign and scenario, then the fan-made content from [A Long-ext
 
 Next:
 
-- The Two Towers campaign (RCO, The Two Towers Saga Expansion): Shelob's Lair.
-- The Return of the King campaign (RCO, The Return of the King Saga Expansion): The Passing of the Grey Company, The Siege of Gondor, The Battle of the Pelennor Fields, The Tower of Cirith Ungol, The Black Gate Opens, Mount Doom.
+- The Two Towers campaign (The Two Towers Saga Expansion): Shelob's Lair.
+- The Return of the King campaign (The Return of the King Saga Expansion): The Passing of the Grey Company, The Siege of Gondor, The Battle of the Pelennor Fields, The Tower of Cirith Ungol, The Black Gate Opens, Mount Doom.
 
-Then the other official campaign, and the cycles: the groupings of scenarios that are part of no campaign, which play standalone only. Each waits under Coming later until one of its scenarios is playable (`data/overrides.json`, campaigns).
+Then the other official campaign, and the cycles: the groupings of scenarios that are part of no campaign, which play standalone only. Each waits under Coming later until one of its scenarios is playable (`data/overrides.json`, campaigns). In release order (the US release of the product that starts each), as the app lists them:
 
-- The Angmar Awakened campaign (RCO, Angmar Awakened Campaign Expansion): Intruders in Chetwood, The Weather Hills, Deadmen's Dike, The Wastes of Eriador, Escape from Mount Gram, Across the Ettenmoors, The Treachery of Rhudaur, The Battle of Carn Dûm, The Dread Realm.
 - The Shadows of Mirkwood cycle: The Hunt for Gollum, Conflict at the Carrock, A Journey to Rhosgobel, The Hills of Emyn Muil, The Dead Marshes, Return to Mirkwood.
+- The Standalone scenarios cycle: The Massing at Osgiliath, The Battle of Lake-town, The Stone of Erech, The Old Forest, Fog on the Barrow-downs, The Ruins of Belegost, Murder at the Prancing Pony, The Siege of Annúminas, Attack on Dol Guldur, The Wizard's Quest, The Woodland Realm, The Mines of Moria, Escape from Khazad-dûm, The Hunt for the Dreadnaught.
 - The Dwarrowdelf cycle: Into the Pit, The Seventh Level, Flight from Moria, The Redhorn Gate, Road to Rivendell, The Watcher in the Water, The Long Dark, Foundations of Stone, Shadow and Flame.
 - The Hobbit cycle (the two Hobbit saga boxes): "We Must Away, Ere Break of Day", Over the Misty Mountains Grim, Dungeons Deep and Caverns Dim, Flies and Spiders, The Lonely Mountain, The Battle of Five Armies.
 - The Against the Shadow cycle: Peril in Pelargir, Into Ithilien, The Siege of Cair Andros, The Steward's Fear, The Drúadan Forest, Encounter at Amon Dîn, Assault on Osgiliath, The Blood of Gondor, The Morgul Vale.
 - The Ring-maker cycle: The Fords of Isen, To Catch an Orc, Into Fangorn, The Dunland Trap, The Three Trials, Trouble in Tharbad, The Nîn-in-Eilph, Celebrimbor's Secret, The Antlered Crown.
 - The Haradrim cycle: Escape from Umbar, Desert Crossing, The Long Arm of Mordor, The Mûmakil, Race Across Harad, Beneath the Sands, The Black Serpent, The Dungeons of Cirith Gurat, The Crossings of Poros.
 - The Vengeance of Mordor cycle: The River Running, Danger in Dorwinion, The Temple of Doom, Wrath and Ruin, The City of Ulfast, Challenge of the Wainriders, Under the Ash Mountains, The Land of Sorrow, The Fortress of Nurn.
-- The Standalone scenarios cycle: The Massing at Osgiliath, The Battle of Lake-town, The Stone of Erech, The Old Forest, Fog on the Barrow-downs, The Ruins of Belegost, Murder at the Prancing Pony, The Siege of Annúminas, Attack on Dol Guldur, The Wizard's Quest, The Woodland Realm, The Mines of Moria, Escape from Khazad-dûm, The Hunt for the Dreadnaught.
+- The Angmar Awakened campaign (Angmar Awakened Campaign Expansion): Intruders in Chetwood, The Weather Hills, Deadmen's Dike, The Wastes of Eriador, Escape from Mount Gram, Across the Ettenmoors, The Treachery of Rhudaur, The Battle of Carn Dûm, The Dread Realm.
 
 Then ALeP.
 
@@ -212,6 +212,8 @@ Scripts are grouped: `pnpm <group> <command> [args]`, and `pnpm <group>` alone l
 | `pnpm assets` | `catalog`, `booklets` and `scans` in order; `start`, `android`, `ios` and the native release builds run it (`start` with `--optional`). |
 | `pnpm assets catalog` | Writes `assets/catalog.db` (never committed) and `src/catalog/version.ts` (committed). |
 | `pnpm assets scans` / `pnpm assets booklets` | Packs card pictures / booklet PDFs into `assets/`. |
+| `pnpm assets capture --build` | Takes the README's screenshots on the iOS simulators (macOS, Xcode and Maestro; [docs/showcase.md](docs/showcase.md)). |
+| `pnpm assets showcase [--publish]` | Turns the captures into the README's images and a contact sheet; `--publish` replaces the `showcase` branch with them. |
 | `pnpm docs index` / `pnpm docs section <file> "<heading>"` | Regenerates `docs/INDEX.md` / prints one doc section. |
 | `pnpm release plan --dry-run` | Prints the next tag and its notes (`git fetch --tags` first). Changes nothing. |
 | `pnpm release source --tag <tag> --ipa <file> --notes <file> --out <file>` | Writes a release's SideStore and AltStore source; run by the release workflow. |
@@ -229,6 +231,7 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) and the [Code of Conduct](CODE_OF_CONDUCT
 - [docs/brief.md](docs/brief.md): product decisions and implemented rules.
 - [docs/architecture.md](docs/architecture.md): code layout, state, engine, tests.
 - [docs/design-system.md](docs/design-system.md), [docs/design-system-table.md](docs/design-system-table.md): screens and game table.
+- [docs/showcase.md](docs/showcase.md): the README's screenshots, and how to take them again on a Mac.
 - [docs/releasing.md](docs/releasing.md): the release pipeline; rules in [.claude/rules/release-standards.md](./.claude/rules/release-standards.md).
 - [docs/phases/STATUS.md](docs/phases/STATUS.md): open work.
 - [ACCESSIBILITY.md](ACCESSIBILITY.md): support, gaps, reporting a barrier.

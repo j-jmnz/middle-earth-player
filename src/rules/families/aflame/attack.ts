@@ -21,6 +21,15 @@ export function resourceShield(state: ScenarioState, id: string, amount: number)
   return paid > 0 ? { state: updateCard(state, id, { resources: card.resources - paid }), amount: amount - paid } : { state, amount };
 }
 
+/** "While Shelob has at least 1 resource on her, she gains: Forced: When Shelob is dealt any amount of damage, cancel that damage and discard 1 resource from Shelob instead" (144072:B:2; rr.damage, rr.cancel): a card
+ * holding the flag resourceCancel that has a resource takes none of the damage it would be dealt, however much, and pays 1 resource for the whole instance (one attack, one effect). The state after, or null when the card
+ * holds no such flag, has no resource or would take no damage. */
+export function resourceCancel(state: ScenarioState, id: string, amount: number): ScenarioState | null {
+  const card = state.cards[id];
+  if (!card || amount <= 0 || card.resources < 1 || !flagged(state, id, "resourceCancel")) return null;
+  return updateCard(state, id, { resources: card.resources - 1 });
+}
+
 /** Each seat collected its resources in the resource phase (rr.step-1-2): it hears `resourcesCollected` ("After the engaged player collects resources", 11065:A:2). The event is queued before the grant draws, and the
  * queue drains in settle after the draws, so the Forced effect resolves once they are done. Queued only in a game with a card that hears it. */
 export function announceCollected(state: ScenarioState, ctx: ReduceContext): ScenarioState {

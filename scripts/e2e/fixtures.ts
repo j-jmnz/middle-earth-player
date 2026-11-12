@@ -50,6 +50,7 @@ import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceConte
 import { nextIntent } from "../../test/harness/auto-player.ts";
 import { loadCampaign, loadScenario, scenarioOrder } from "../data/load-scenarios.ts";
 import { prebuiltDeck } from "./seed-kit.ts";
+import { pastShowcase } from "./showcase-past.ts";
 import { anduinFixtures } from "./journey-along-the-anduin.ts";
 import { dolGuldurFixtures } from "./escape-from-dol-guldur.ts";
 import { mirkwoodFixtures } from "./passage-through-mirkwood.ts";
@@ -78,6 +79,7 @@ import { deepFixtures } from "./helms-deep.ts";
 import { isengardFixtures } from "./the-road-to-isengard.ts";
 import { marshesFixtures } from "./the-passage-of-the-marshes.ts";
 import { roadsFixtures } from "./journey-to-the-cross-roads.ts";
+import { lairFixtures } from "./shelobs-lair.ts";
 import { FIXTURE_REGISTRY, fixtureFile, type FixtureName, type FixtureScenarioId } from "../../src/campaign/fixtures/registry.ts";
 import { createLog, runScript } from "../log.ts";
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
@@ -400,6 +402,7 @@ const WRITERS: Record<Chained, (written: Written) => Promise<object> | object> =
   "the-road-to-isengard": () => isengardFixtures(),
   "the-passage-of-the-marshes": () => marshesFixtures(),
   "journey-to-the-cross-roads": () => roadsFixtures(),
+  "shelobs-lair": () => lairFixtures(),
 };
 
 // The won game is open: no legal win of the two starter decks has been found on this engine (docs/phases/STATUS.md), so
@@ -428,10 +431,12 @@ function writeScenarioOne(dir: string, searching: boolean): void {
   const lost = say.step("play scenario 1's loss", () => playLoss());
   const won = searching ? say.step("search scenario 1's won game", () => searchWin()) : null;
   const duo = say.step("play scenario 1 to a two-handed planning window", () => playDuo());
+  const showcase = say.step("play scenario 1 to the README showcase's moments", () => pastShowcase());
   const out = {
     ...(won ? { won: { seatCount: 2, ...won } } : {}),
     lost: { seatCount: 1, ...lost },
     duo: { seatCount: 2, ...duo },
+    ...showcase,
   };
   const file = path.join(dir, "scenario-1.json");
   writeFileSync(file, `${JSON.stringify(out)}\n`);

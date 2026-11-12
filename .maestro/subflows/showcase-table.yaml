@@ -1,0 +1,44 @@
+appId: com.middleearth.lcg
+---
+# A showcase save opened on the table (docs/showcase.md, Capture flows): the fixture route writes it and opens its campaign path,
+# Begin resumes it on the table, and the quest stage the table opens on is closed once it has shown. Then every picture on it has drawn (pictures-ready).
+# Env: FIXTURE (a showcase fixture of src/campaign/fixtures/registry.ts).
+# Optional env: THEME (dark or light), given by scripts/showcase/capture.ts with -e.
+- runFlow:
+    file: showcase-start.yaml
+    env:
+      LINK: "e2e/${FIXTURE}"
+      READY: campaign-path
+- tapOn:
+    id: begin
+- extendedWaitUntil:
+    visible:
+      id: table
+    timeout: 30000
+# The table lies landscape on both devices, but the start left the iPhone's simulator in portrait: Maestro then reads the table's controls
+# as off the screen. The simulator turns with the table.
+- setOrientation: LANDSCAPE_LEFT
+# The table shows its id while the save is still replaying; the board, and the quest stage in play it opens on (quest-advance.ts,
+# openingLatch), come once the replay is done, and every showcase save has a stage in play. So the stage's Continue is what says the board
+# is there: the flow waits for it, then taps it until it is gone, so it covers neither the shot nor the dock, and only then waits for the
+# pictures (which, during the replay, has nothing to wait for).
+- extendedWaitUntil:
+    visible:
+      id: quest-advance-progress
+    timeout: 60000
+- repeat:
+    while:
+      visible:
+        id: quest-advance-progress
+    times: 3
+    commands:
+      - tapOn:
+          id: quest-advance-progress
+      - waitForAnimationToEnd:
+          timeout: 5000
+- waitForAnimationToEnd:
+    timeout: 10000
+- extendedWaitUntil:
+    visible:
+      id: pictures-ready
+    timeout: 60000

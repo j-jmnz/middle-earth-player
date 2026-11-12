@@ -277,7 +277,7 @@ Two files, two handles, both reachable from screens.
 
 | File | Contents | Replacement |
 | --- | --- | --- |
-| `catalog.db` | `packs`, `cards`, `campaigns` (id, name, scenario count, playable, kind: `campaign` or a `cycle` of scenarios that is part of no campaign, `rco` for the revised, repackaged products, and `box`, the RCO product a locked campaign is printed in; from `data/campaigns/index.json`), `meta` | New asset when `CATALOG_VERSION` differs from the applied one. Not migrated in place. |
+| `catalog.db` | `packs`, `cards`, `campaigns` (id, name, scenario count, playable, kind: `campaign` or a `cycle` of scenarios that is part of no campaign, `box`, the RCO product a locked campaign is printed in, `released`, and `position`, the order the hubs read the rows in; from `data/campaigns/index.json`), `meta` | New asset when `CATALOG_VERSION` differs from the applied one. Not migrated in place. |
 | `user.db` | `decks`, `saves`, `standalone_games`, `image_files`, `booklets`, `settings`, `meta` | SQL migrations in `drizzle/`, run on open. Never replaced by a catalog update. |
 
 `catalog.db` is a Metro asset. `CATALOG_VERSION` is a hash of the catalog rows, so any change moves it. `forceOverwrite` is true when the bundled version differs from `user.db` `meta.appliedCatalogVersion`. First launch has no applied version, so the copy runs. `cards.deck_legal` is set at build time. `cards.campaign_id` is set only for rows a campaign owns. Errata text is what the app stores and shows when RingsDB sets `has_errata`.

@@ -87,16 +87,17 @@ const overridesSchema = z.object({
     .default([]),
   // A campaign or a cycle no scenario file is built for yet. The sources group its scenarios under packs; the override names it
   // and the packs (Hall of Beorn products), because no source names a campaign or a cycle. `kind` "campaign" is played in
-  // Campaign Mode (a saga, a Campaign Expansion); "cycle" is a grouping of scenarios that is part of no campaign. `rco` marks the
-  // revised, repackaged products; `box` is the RCO product a campaign is printed in, the name the Scenarios tab gives it.
+  // Campaign Mode (a saga, a Campaign Expansion); "cycle" is a grouping of scenarios that is part of no campaign. `box` is the
+  // RCO product a campaign is printed in, the name the Scenarios tab gives it.
   campaigns: z
     .array(
       z.object({
         id: z.string().min(1),
         name: z.string().min(1),
         kind: z.enum(["campaign", "cycle"]),
-        rco: z.boolean(),
         box: z.string().min(1).optional(),
+        // The US release of its first product (hallofgondor.com/release-dates), the order the hubs list it in.
+        released: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
         products: z.array(z.string().min(1)).min(1),
         reason: z.string().min(1),
         source: z.string().min(1),

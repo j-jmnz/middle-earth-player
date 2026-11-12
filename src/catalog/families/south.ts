@@ -84,6 +84,9 @@ const FLAGS = [
   // (engine use).
   "progressCap",
   "progressPlaced",
+  // On a location in the staging area: each placement of progress on it is reduced by this much, a placement of 1 becoming 0 ("When any amount of progress would be placed on a location in the staging area, reduce that amount by 1", 144048:A:1).
+  // Several holders add. Read where progress is placed (rules/interpret/effect-verbs.ts placeProgress, families/south/locations.ts reducedProgress).
+  "progressReduced",
 ] as const;
 
 export const manifest = { name: "south", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

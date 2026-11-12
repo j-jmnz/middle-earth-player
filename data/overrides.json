@@ -1185,20 +1185,19 @@
       "id": "the-return-of-the-king",
       "name": "The Return of the King",
       "kind": "campaign",
-      "rco": true,
       "box": "The Return of the King Saga Expansion",
       "products": [
         "The Flame of the West",
         "The Mountain of Fire"
       ],
+      "released": "2024-10-10",
       "reason": "No source names a campaign. Hall of Beorn numbers the Saga scenarios 1-18 in book order: The Flame of the West 13-15 and The Mountain of Fire 16-18 follow the Two Towers scenarios. The pairing of the packs into one campaign and the campaign's name (the title of the book its scenarios follow) are the saga's published structure, and The Return of the King Saga Expansion is the RCO box that reprints both packs, recorded here because no fetched source states them; the scenario count is Hall of Beorn's listing.",
-      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 41"
+      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 41; hallofgondor.com/release-dates (released: US release of the first product)"
     },
     {
       "id": "angmar-awakened",
       "name": "Angmar Awakened",
       "kind": "campaign",
-      "rco": true,
       "box": "Angmar Awakened Campaign Expansion",
       "products": [
         "The Lost Realm",
@@ -1209,14 +1208,14 @@
         "The Battle of Carn Dûm",
         "The Dread Realm"
       ],
+      "released": "2022-08-19",
       "reason": "No source names the campaign's scenarios together. RingsDB lists the Angmar Awakened Campaign Expansion (AACE, cycle 19), which plays The Lost Realm and its six Adventure Packs (cycles 17 and 18) as one campaign, as the Dream-chaser and Ered Mithrin expansions do theirs; Hall of Beorn lists the nine scenarios under the original products and has no product for the expansion, which is the RCO box the campaign is printed in. The scenario count is Hall of Beorn's listing.",
-      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycles 17, 18 and 19"
+      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycles 17, 18 and 19; hallofgondor.com/release-dates (released: US release of the first product)"
     },
     {
       "id": "shadows-of-mirkwood",
       "name": "Shadows of Mirkwood",
       "kind": "cycle",
-      "rco": false,
       "products": [
         "The Hunt for Gollum",
         "Conflict at the Carrock",
@@ -1225,14 +1224,14 @@
         "The Dead Marshes",
         "Return to Mirkwood"
       ],
+      "released": "2011-07-22",
       "reason": "No source names a cycle. Hall of Beorn lists the scenario of each of the cycle's six Adventure Packs, The Hunt for Gollum to Return to Mirkwood, under its product; RingsDB numbers the six packs as cycle 10. The cycle has no Campaign Mode, so it is a cycle the Scenarios tab lists, not a campaign; the scenario count is Hall of Beorn's listing.",
-      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 10"
+      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 10; hallofgondor.com/release-dates (released: US release of the first product)"
     },
     {
       "id": "dwarrowdelf",
       "name": "Dwarrowdelf",
       "kind": "cycle",
-      "rco": false,
       "products": [
         "Khazad-dûm",
         "The Redhorn Gate",
@@ -1242,26 +1241,26 @@
         "Foundations of Stone",
         "Shadow and Flame"
       ],
+      "released": "2012-01-06",
       "reason": "No source names a cycle. Hall of Beorn lists the scenarios of Khazad-dûm and of its six Adventure Packs under each product; RingsDB numbers the deluxe expansion and the six packs as cycles 11 and 12. The cycle has no Campaign Mode, so it is a cycle the Scenarios tab lists, not a campaign; the scenario count is Hall of Beorn's listing.",
-      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 11 and 12"
+      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 11 and 12; hallofgondor.com/release-dates (released: US release of the first product)"
     },
     {
       "id": "the-hobbit",
       "name": "The Hobbit",
       "kind": "cycle",
-      "rco": false,
       "products": [
         "The Hobbit: Over Hill and Under Hill",
         "The Hobbit: On the Doorstep"
       ],
+      "released": "2012-08-17",
       "reason": "No source names the saga. Hall of Beorn lists the three scenarios of each of the two Hobbit saga boxes, which RingsDB numbers as cycle 40. The boxes have no Campaign Mode, so they are one cycle the Scenarios tab lists, not a campaign; the scenario count is Hall of Beorn's listing.",
-      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 40"
+      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 40; hallofgondor.com/release-dates (released: US release of the first product)"
     },
     {
       "id": "against-the-shadow",
       "name": "Against the Shadow",
       "kind": "cycle",
-      "rco": false,
       "products": [
         "Heirs of Númenor",
         "The Steward's Fear",
@@ -1271,14 +1270,14 @@
         "The Blood of Gondor",
         "The Morgul Vale"
       ],
+      "released": "2012-11-26",
       "reason": "No source names a cycle. Hall of Beorn lists the scenarios of Heirs of Númenor and of its six Adventure Packs under each product; RingsDB numbers the deluxe expansion and the six packs as cycles 13 and 14. The cycle has no Campaign Mode, so it is a cycle the Scenarios tab lists, not a campaign; the scenario count is Hall of Beorn's listing.",
-      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 13 and 14"
+      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 13 and 14; hallofgondor.com/release-dates (released: US release of the first product)"
     },
     {
       "id": "the-ring-maker",
       "name": "The Ring-maker",
       "kind": "cycle",
-      "rco": false,
       "products": [
         "The Voice of Isengard",
         "The Dunland Trap",
@@ -1288,14 +1287,14 @@
         "Celebrimbor's Secret",
         "The Antlered Crown"
       ],
+      "released": "2014-02-21",
       "reason": "No source names a cycle. Hall of Beorn lists the scenarios of The Voice of Isengard and of its six Adventure Packs under each product; RingsDB numbers the deluxe expansion and the six packs as cycles 15 and 16. The cycle has no Campaign Mode, so it is a cycle the Scenarios tab lists, not a campaign; the scenario count is Hall of Beorn's listing.",
-      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 15 and 16"
+      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 15 and 16; hallofgondor.com/release-dates (released: US release of the first product)"
     },
     {
       "id": "haradrim",
       "name": "Haradrim",
       "kind": "cycle",
-      "rco": false,
       "products": [
         "The Sands of Harad",
         "The Mûmakil",
@@ -1305,14 +1304,14 @@
         "The Dungeons of Cirith Gurat",
         "The Crossings of Poros"
       ],
+      "released": "2016-11-23",
       "reason": "No source names a cycle. Hall of Beorn lists the scenarios of The Sands of Harad and of its six Adventure Packs under each product; RingsDB numbers the deluxe expansion and the six packs as cycles 23 and 24. The cycle has no Campaign Mode, so it is a cycle the Scenarios tab lists, not a campaign; the scenario count is Hall of Beorn's listing.",
-      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 23 and 24"
+      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 23 and 24; hallofgondor.com/release-dates (released: US release of the first product)"
     },
     {
       "id": "vengeance-of-mordor",
       "name": "Vengeance of Mordor",
       "kind": "cycle",
-      "rco": false,
       "products": [
         "A Shadow in the East",
         "Wrath and Ruin",
@@ -1322,14 +1321,14 @@
         "The Land of Sorrow",
         "The Fortress of Nurn"
       ],
+      "released": "2019-08-02",
       "reason": "No source names a cycle. Hall of Beorn lists the scenarios of A Shadow in the East and of its six Adventure Packs under each product; RingsDB numbers the deluxe expansion and the six packs as cycles 28 and 29. The cycle has no Campaign Mode, so it is a cycle the Scenarios tab lists, not a campaign; the scenario count is Hall of Beorn's listing.",
-      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 28 and 29"
+      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 28 and 29; hallofgondor.com/release-dates (released: US release of the first product)"
     },
     {
       "id": "standalone-scenarios",
       "name": "Standalone scenarios",
       "kind": "cycle",
-      "rco": false,
       "products": [
         "2011",
         "2012",
@@ -1344,8 +1343,9 @@
         "Escape from Khazad-dûm",
         "The Hunt for the Dreadnaught"
       ],
+      "released": "2011-09-21",
       "reason": "The official scenarios printed on their own, outside a cycle or a saga: RingsDB's cycle 50 packs that are not A Long-extended Party's (The Massing at Osgiliath to The Hunt for the Dreadnaught). Hall of Beorn lists the event scenarios of 2011 to 2017 under the year and the others under their own product. They have no Campaign Mode, so they are grouped as one cycle the Scenarios tab lists; the scenario count is Hall of Beorn's listing.",
-      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 50"
+      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycle 50; hallofgondor.com/release-dates (released: US release of the first product)"
     }
   ],
   "outOfScope": [

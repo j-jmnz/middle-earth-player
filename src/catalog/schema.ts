@@ -21,10 +21,12 @@ export const campaigns = sqliteTable("campaigns", {
   playable: integer("playable", { mode: "boolean" }).notNull(),
   // "campaign" (the Campaigns tab lists it) or "cycle" (scenarios that are part of no campaign: the Scenarios tab only).
   kind: text("kind", { enum: ["campaign", "cycle"] }).notNull(),
-  // True for the revised, repackaged products (RCO), which the hubs tag "RCO".
-  rco: integer("rco", { mode: "boolean" }).notNull(),
   // The RCO product a locked campaign is printed in, the Scenarios tab's name for its tile; null for a built campaign or a cycle.
   box: text("box"),
+  // The US release of the product that starts it (YYYY-MM-DD).
+  released: text("released").notNull(),
+  // The order the hubs list the rows in: by release, the Lord of the Rings saga boxes together at the Fellowship's.
+  position: integer("position").notNull(),
 });
 
 export const cards = sqliteTable("cards", {

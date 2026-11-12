@@ -55,6 +55,8 @@ const FLAGS = [
   "progressHeals",
   // On a card: "For each point of damage ~ would take, discard 1 resource from him and cancel that damage" (11076:A:2). The damage placed on it is what its resources cannot pay.
   "resourceShield",
+  // On a card: "cancel that damage and discard 1 resource from Shelob instead" (144072:B:2): damage it would be dealt, all of one instance, is canceled for 1 resource while it has one. Set by a constant ModifyStat of the stage.
+  "resourceCancel",
   // On an enemy: no more than this many characters can attack it each round ("No more than 1 character can attack Graxar each round", 11188:A:2). `attackersThisRound` is engine use: the characters
   // declared against it so far this round.
   "attackerLimit",

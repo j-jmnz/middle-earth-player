@@ -172,12 +172,12 @@ const inOrder = (line: string, parts: readonly string[]): boolean => {
   return true;
 };
 
-// The static part of an id: a scenario id, a card code or a ${variable} is built at run time, so only the text around it is looked up.
+// The static part of an id: a scenario id, a card code, a card's instance id (i88, the showcase's taps) or a ${variable} is built at run time, so only the text around it is looked up.
 function fragments(id: string): string[] {
   let pattern = id.replace(/\$\{[^}]*\}/g, "\0");
   for (const scenario of SCENARIO_IDS) pattern = pattern.split(scenario).join("\0");
   return pattern
-    .replace(/\d+/g, "\0")
+    .replace(/(?<=-)i\d+|\d+/g, "\0")
     .split(/\0|\.\*/)
     .filter((part) => part.replace(/-/g, "").length >= 3);
 }
@@ -188,12 +188,14 @@ describe("the Maestro flows", () => {
     for (const flow of FLOWS) expect(flow.config.appId, flow.rel).toBe("com.middleearth.lcg");
   });
 
-  it("are run by config.yaml only from scenarios/<scenario-id>/ and features/, never the subflows", () => {
+  // showcase/ holds the README's capture flows (docs/showcase.md, Capture flows): scripts/showcase/capture.ts runs them by name, never config.yaml.
+  it("are run by config.yaml only from scenarios/<scenario-id>/ and features/, never the subflows or the showcase", () => {
     const config = readFileSync(path.join(MAESTRO, "config.yaml"), "utf8");
     const globs = [...config.matchAll(/^\s*- "([^"]+)"$/gm)].map((found) => found[1]);
     expect(globs).toEqual(["scenarios/*/*", "features/*"]);
     expect(SUBFLOWS.length).toBeGreaterThan(0);
-    for (const flow of RUNNABLE) expect(/^(scenarios\/[^/]+|features)\/[^/]+$/.test(flow.rel), flow.rel).toBe(true);
+    for (const flow of RUNNABLE) expect(/^(scenarios\/[^/]+|features|showcase)\/[^/]+$/.test(flow.rel), flow.rel).toBe(true);
+    for (const flow of RUNNABLE.filter((item) => item.rel.startsWith("showcase/"))) expect(flow.config.tags, flow.rel).toEqual(["showcase"]);
     for (const flow of SUBFLOWS) expect(/^subflows\/[^/]+$/.test(flow.rel), flow.rel).toBe(true);
     for (const flow of RUNNABLE.filter((item) => item.rel.startsWith("scenarios/"))) expect(SCENARIO_IDS, flow.rel).toContain(flow.rel.split("/")[1]);
   });
