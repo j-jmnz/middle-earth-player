@@ -35,13 +35,13 @@ belongs in a template (`scripts/data/effects/*-templates.ts`), not in more autho
 
 Generated records (`src/effects/generated`, written by `pnpm data build` from the templates) and authored ones are merged in
 `src/effects/index.ts`. The authored files are listed by the barrel `src/effects/generated/authored.ts`, which `pnpm data build` writes from
-`src/effects/authored/` (a file named for a scenario or campaign id, in campaign order); a new scenario file needs no edit to `index.ts`. An authored record with the id of a generated one replaces it; list that id in the file's `REPLACES`
+`src/effects/authored/` (where a scenario's file lives is in `docs/architecture.md`, Effects; in campaign order); a new scenario file needs no edit to `index.ts`. An authored record with the id of a generated one replaces it; list that id in the file's `REPLACES`
 with the reason, and the coverage test checks that no other id is replaced.
 
 - `src/effects/authored/pool/<PACK>.ts`: a player card's lines that no template reads and no family owns (`RECORDS`,
   `REPLACES`). The pack is the card's `data/cards/<PACK>.json`; a new pack file is added to `pool/index.ts`.
 - `src/effects/authored/families/<family>.ts`: records written with a mechanic family (below).
-- `src/effects/authored/<scenario-id>.ts`: the cards of a scenario box (`fellowship-of-the-ring.ts` holds scenarios 1 and 2
+- A scenario's authored file (`docs/architecture.md`, Effects): the cards of a scenario box (`fellowship-of-the-ring.ts` holds scenarios 1 and 2
   and the starter lists, `flight-to-the-ford.ts`, `the-ring-goes-south.ts`). The `burden` and `south` families' records
   live here, with their scenarios. A scenario becomes playable (`playable.ts`) when none of its dealt cards has an open line.
 

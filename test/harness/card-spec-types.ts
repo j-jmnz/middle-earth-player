@@ -17,7 +17,7 @@ export type CounterName = "pursuit" | "life";
 export type Act =
   | { act: "resolve"; code: string; timing: Effect["timing"]; source?: string }
   | { act: "quest"; outcome: "success" | "fail" }
-  | { act: "attack"; enemy: string; shadow?: string; undefended?: boolean }
+  | { act: "attack"; enemy: string; shadow?: string; undefended?: boolean; lands?: Readonly<Record<string, string>> }
   | { act: "defend"; with: string }
   | { act: "reveal"; code: string }
   | { act: "travel"; code: string }
@@ -26,6 +26,7 @@ export type Act =
   | { act: "answer"; id: string }
   | { act: "respond"; code: string }
   | { act: "cancel" }
+  | { act: "commit"; heroes: readonly string[] }
   | { act: "announce"; trigger: GameEvent["trigger"]; code?: string; extra?: Partial<GameEvent> };
 
 export type Expect =

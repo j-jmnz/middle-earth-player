@@ -21,6 +21,8 @@ function codeVerb<const Verb extends string>(name: Verb) {
 const searchSelector = {
   code: z.string().min(1).optional(),
   trait: z.string().min(1).optional(),
+  // A card with any one of these traits ("an Orc, Troll, or Nazgûl enemy", 146073:A:1).
+  traits: z.array(z.string().min(1)).min(2).optional(),
   // A non-unique card ("searches the encounter deck and discard pile for a non-unique Undead enemy", 19111:A:1).
   nonUnique: z.boolean().optional(),
   type: z.enum(["enemy", "location", "treachery", "objective"]).optional(),
@@ -148,7 +150,8 @@ export const simpleVerbs = [
   verbFlags(codeVerb("SetAside"), { setupRole: "dealt" }),
   verbFlags(codeVerb("AttachToRingBearer"), { setupRole: "dealt" }),
   // Moves a card that was set aside, out of play, into the staging area. It is not a reveal. `all`: every set aside copy of the code joins it ("each set aside Soldier of Isengard", 143073:A:1), not one.
-  z.strictObject({ verb: z.literal("AddSetAsideToStaging"), code: z.string().min(1), all: z.literal(true).optional(), ...when }),
+  // Exactly one of `code` and `trait` (the effect schema refuses neither and both). `trait` instead of `code`: the set aside cards with that trait ("add each set aside Harad enemy to the staging area", 145078:B:1; with `all`).
+  z.strictObject({ verb: z.literal("AddSetAsideToStaging"), code: z.string().min(1).optional(), trait: z.string().min(1).optional(), all: z.literal(true).optional(), ...when }),
   // During play: one out-of-play copy of the card (the `outOfPlay` condition's zones) joins the encounter deck, which is
   // shuffled ("shuffle 1 out of play Ringwraith into the encounter deck", 141026:B:2, 141051:A:2, 141053:A:1, 141054:A:2).
   // When copies are out of play in more than one zone, the first player chooses which (rr.first-player). Nothing happens
@@ -179,8 +182,10 @@ export const simpleVerbs = [
     each: z.boolean().optional(),
     // The encounter deck alone is searched, not its discard pile ("search the encounter deck for a Harad enemy", 144037:A:1; rr.search: the discard pile is searched only when the line says so).
     deckOnly: z.literal(true).optional(),
-    // While a card with this code is in the encounter deck or its discard pile, the search must take it ("one of those enemies must be
-    // Great Warg Chief, if able", 142022:A:1).
+    // The victory display is searched too ("search the encounter deck, discard pile, and victory display for a Nazgûl enemy", 146036:A:2).
+    victory: z.literal(true).optional(),
+    // While a card with this code is in the encounter deck or its discard pile, the search must take it, until an earlier search of the same effect has taken one ("one of those enemies must be
+    // Great Warg Chief, if able", 142022:A:1; "one of those enemies must be Corsair Captain, if able", 145030:A:3: the first search takes it, the others are free).
     require: z.string().min(1).optional(),
     // The card found is the effect's picked card afterward, for the instructions that follow ("add it to the staging area. Then, attach Heavy Cruiser to that objective", 12127:A:3).
     remember: z.literal(true).optional(),
@@ -246,6 +251,10 @@ export const simpleVerbs = [
     // With "travel" and `location`: only the location with that code that guards the objective with this title ("the Grey Moorland guarding Tiny", 19048:B:3).
     guarding: z.string().min(1).optional(),
     exceptTrait: z.string().min(1).optional(),
+    // With "attach": the card may have boons attached though it has no other attachments ("Cannot have non-boon attachments", 146020:A:1). A boon is a card the campaign pool holds as one (`campaignKind`), which no trait names.
+    exceptBoon: z.literal(true).optional(),
+    // With "travel" on a card that is not the location: the players cannot travel to a location with this trait ("The players cannot travel to Pelennor locations", 145075:B:3).
+    trait: z.string().min(1).optional(),
     maxWillpower: z.number().int().min(0).optional(),
     // With "defend": every ally (not only those with little Willpower) cannot defend the source's attacks ("Allies cannot defend against
     // Orc-chieftain", 142045:A:1).
@@ -347,7 +356,8 @@ export const simpleVerbs = [
   z.strictObject({ verb: z.literal("DeckLimit"), copies: z.number().int().positive(), ...when }),
   // Constants on an attachment: the attached card gains this trait, or this resource icon.
   z.strictObject({ verb: z.literal("GrantTrait"), trait: z.string().min(1), ...when }),
-  z.strictObject({ verb: z.literal("GrantIcon"), sphere: z.enum(["leadership", "tactics", "spirit", "lore"]), ...when }),
+  // `fellowship`: the hero also pays for Fellowship cards and counts as a Fellowship hero for a filter that reads the sphere ("Attached hero gains the Ring-bearer trait and the Fellowship sphere", 146014:A:1).
+  z.strictObject({ verb: z.literal("GrantIcon"), sphere: z.enum(["leadership", "tactics", "spirit", "lore", "fellowship"]), ...when }),
   // Engine use (Restricted): the source card's controller moves one of its restricted attachments to its owner's discard pile.
   verb("DiscardRestricted"),
   // Adds resources to the pool of the hero the source card is attached to.
@@ -376,11 +386,12 @@ export const simpleVerbs = [
   // discarded, or the deck is empty, and puts each of those enemies into play engaged with the first player (141045:A:2).
   // `to: staging`: they are added to the staging area instead ("Add each enemy discarded this way to the staging area", 142056:A:2).
   // As a quest card's Setup it is run in a frame of its own after the deal ("Shuffle the encounter deck and discard cards from the top until X enemies are discarded", 19168:A:1).
-  verbFlags(z.strictObject({ verb: z.literal("DiscardUntilEnemies"), perPlayer: z.number().int().positive(), to: z.literal("staging").optional(), ...when }), { setupRuns: "top" }),
+  // `cardType: location`: locations are counted instead, and with `to: staging` each is added to the staging area ("Discard cards from the top until X locations are discarded... Add each location discarded this way to the staging area", 146077:A:1).
+  verbFlags(z.strictObject({ verb: z.literal("DiscardUntilEnemies"), perPlayer: z.number().int().positive(), to: z.literal("staging").optional(), cardType: z.literal("location").optional(), ...when }), { setupRuns: "top" }),
   // The last picked card is placed facedown under the source location. While it is there it is out of play (141049:A:1).
   verb("PlaceUnderSelf"),
-  // Each card under the source location returns to the staging area face up (141049:A:2).
-  verb("ReturnUnderToStaging"),
+  // Each card under the source location returns to the staging area face up (141049:A:2). `to: "engaged"`: each is put into play engaged with the first player instead, and counts as engaging him ("put each enemy under it into play engaged with the first player", 146029:A:2).
+  z.strictObject({ verb: z.literal("ReturnUnderToStaging"), to: z.literal("engaged").optional(), ...when }),
   // The source card (a shadow card) is shuffled into the encounter deck instead of being discarded (141069:A:3).
   verb("ShuffleSelfIntoEncounterDeck"),
   // The actor (or, with `who`, the first player) discards cards at random from their hand, `amount` (1 by default; read, so X works). The seed

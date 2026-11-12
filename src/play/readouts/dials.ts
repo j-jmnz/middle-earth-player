@@ -1,6 +1,8 @@
 // The shape every scenario's extra top-bar dial shares (The Road to Isengard's readouts/isengard.ts, The Passage of the Marshes' readouts/marshes.ts) and what the top bar hands the ThreatRing for one. The engine decided each number; nothing here changes one. Pure, so a test reads it.
 import { useMemo } from "react";
 
+import { inPlay, type ScenarioState } from "../../rules/core/state.ts";
+
 /** One dial of the top bar: its label, what a screen reader calls it, its number, and what it counts toward. `goal`: the limit is the players' way out (the ring fills in the accent, never warms). `warms`: the limit loses or discards, so the ring warms toward it as the pursuit dial does. `warn`: the dial's own level and words (a last card, one mire token from a discard). `filled`: the number the ring fills with when it is not the disc's (the gate's damage). */
 export type TableDial = {
   id: string;
@@ -17,6 +19,9 @@ export type TableDial = {
   limitWords?: string;
   note?: string;
 };
+
+/** The cards of a code that are in play (the staging area, the active location, a play area): what a scenario's dial reads its tokens from. */
+export const cardsOf = (game: ScenarioState, code: string) => Object.values(game.cards).filter((card) => card.code === code && inPlay(card.zone));
 
 /** The ThreatRing props one dial gets: only a `warms` dial counts toward an elimination-like limit; a goal dial never warms. */
 export function dialProps(dial: TableDial) {

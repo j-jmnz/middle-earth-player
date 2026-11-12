@@ -63,9 +63,9 @@
     "id": "the-return-of-the-king",
     "name": "The Return of the King",
     "scenarioCount": 6,
-    "playable": false,
+    "playable": true,
     "kind": "campaign",
-    "box": "The Return of the King Saga Expansion",
+    "box": null,
     "released": "2024-10-10",
     "position": 14
   },

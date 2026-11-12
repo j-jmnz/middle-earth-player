@@ -13,9 +13,8 @@ import { timingLabels } from "./timings.ts";
 
 // Hall of Beorn card sets whose twin codes are RingsDB codes, with the RingsDB pack of each (PRODUCTS, in campaign order).
 const TWIN_SETS: ReadonlyMap<string, string> = new Map(PRODUCTS.flatMap((product) => (product.twinPack ? [[product.name, product.twinPack] as const] : [])));
-// Sets Hall of Beorn numbers from 00001 with no RingsDB code of their own: each saga box's reprint set (PRODUCTS, `reprint`) and the box
-// not built yet.
-const UNCODED_SETS = new Set([...REPRINTS.map((reprint) => reprint.set), "The Return of the King"]);
+// Sets Hall of Beorn numbers from 00001 with no RingsDB code of their own: each saga box's reprint set (PRODUCTS, `reprint`).
+const UNCODED_SETS = new Set(REPRINTS.map((reprint) => reprint.set));
 
 const TYPE_BY_HOB: Readonly<Record<string, { type: string; typeName: string }>> = {
   Hero: { type: "hero", typeName: "Hero" },
@@ -244,7 +243,11 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
 
   const hobCode = productCodeOf(overrides);
   const folded = foldTwoSided(raw.hob).cards;
-  const hobCards = [...folded, ...dragnOnlyCards(raw, folded)];
+  // A twin card whose Hall of Beorn RingsDbCardId is another card's takes the code RingsDB gives it (overrides.hobRingsDbCodes).
+  const hobCards = [...folded, ...dragnOnlyCards(raw, folded)].map((card) => {
+    const fixed = overrides.hobRingsDbCodes.find((rule) => rule.set === card.CardSet && rule.number === card.Number);
+    return fixed ? { ...card, RingsDbCardId: fixed.code } : card;
+  });
   const hobByCode = new Map<string, HobCard[]>();
   const hobByTitle = new Map<string, HobCard[]>();
   for (const card of hobCards) {

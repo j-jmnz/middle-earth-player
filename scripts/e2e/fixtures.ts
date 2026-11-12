@@ -80,6 +80,12 @@ import { isengardFixtures } from "./the-road-to-isengard.ts";
 import { marshesFixtures } from "./the-passage-of-the-marshes.ts";
 import { roadsFixtures } from "./journey-to-the-cross-roads.ts";
 import { lairFixtures } from "./shelobs-lair.ts";
+import { companyFixtures } from "./the-passing-of-the-grey-company.ts";
+import { gondorFixtures } from "./the-siege-of-gondor.ts";
+import { fieldsFixtures } from "./the-battle-of-the-pelennor-fields.ts";
+import { ungolFixtures } from "./the-tower-of-cirith-ungol.ts";
+import { opensFixtures } from "./the-black-gate-opens.ts";
+import { doomFixtures } from "./mount-doom.ts";
 import { FIXTURE_REGISTRY, fixtureFile, type FixtureName, type FixtureScenarioId } from "../../src/campaign/fixtures/registry.ts";
 import { createLog, runScript } from "../log.ts";
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
@@ -149,6 +155,7 @@ function varied(state: ScenarioState, ctx: ReduceContext, random: () => number, 
     const other = legalIntents(state, ctx).find((intent) => intent.type === "Choose" && state.cards[intent.optionId]?.code !== FRODO);
     if (other?.type === "Choose") return { type: "Choose", optionId: other.optionId };
   }
+  if (base.type === "CommitFortitude") return { type: "CommitFortitude", cardIds: legalTargets(state, { type: "CommitFortitude" }, ctx) };
   if (base.type === "CommitHide") return { type: "CommitHide", cardIds: legalTargets(state, { type: "CommitHide" }, ctx).slice(0, hideCommitLimit(state) ?? undefined) };
   // On A Shortcut to Mushrooms each ally adds 1 to every Hide test's threat (141023:B:2), so the search holds allies back.
   const stage = state.cards[state.questStage ?? ""]?.code;
@@ -403,6 +410,12 @@ const WRITERS: Record<Chained, (written: Written) => Promise<object> | object> =
   "the-passage-of-the-marshes": () => marshesFixtures(),
   "journey-to-the-cross-roads": () => roadsFixtures(),
   "shelobs-lair": () => lairFixtures(),
+  "the-passing-of-the-grey-company": () => companyFixtures(),
+  "the-siege-of-gondor": () => gondorFixtures(),
+  "the-battle-of-the-pelennor-fields": () => fieldsFixtures(),
+  "the-tower-of-cirith-ungol": () => ungolFixtures(),
+  "the-black-gate-opens": () => opensFixtures(),
+  "mount-doom": () => doomFixtures(),
 };
 
 // The won game is open: no legal win of the two starter decks has been found on this engine (docs/phases/STATUS.md), so

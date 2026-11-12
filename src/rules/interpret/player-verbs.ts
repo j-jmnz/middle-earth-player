@@ -1,4 +1,5 @@
 // Rules: rr.exhausted, rr.in-play-and-out-of-play, rr.ownership-and-control, rr.damage, rr.explored, rr.cancel, rr.shadow-effects, rr.restricted, rr.initiating-abilities-playing-cards (data/rules/entries.json).
+import { counterCancel } from "../families/pelennor/combat.ts";
 import { sendAway } from "../families/objectives/claimed.ts";
 import type { Instruction } from "../../catalog/boundary.ts";
 
@@ -21,9 +22,10 @@ import { printedOf, type PrintedCard } from "../core/printed.ts";
 import { readyBarred } from "../core/holder-classes.ts";
 import { titleBarred } from "../families/nightmare/guards.ts";
 import { patchTop, topFrame } from "../windows/windows.ts";
-import { attachTo, moveCard } from "../core/zones.ts";
+import { attachTo, discardFromHand, moveCard } from "../core/zones.ts";
 import { afterCancel } from "../families/defense/damage.ts";
 import { healBlocked } from "../families/burden/life.ts";
+import { healDamage } from "../families/dreamchaser/heal-cap.ts";
 import { mayGainResources } from "../families/misc/guards.ts";
 import { addToVictory } from "../families/sidequests/victory.ts";
 import { isQuestSource } from "../families/wilderland/night-quest.ts";
@@ -106,11 +108,12 @@ export function runPlayerVerb(
       const id = refCard(state, instruction.target ?? "picked", scope) ?? "";
       const card = state.cards[id];
       if (!card || card.damage <= 0 || healBlocked(state, id)) return state;
-      const amount = instruction.all ? card.damage : Math.min(card.damage, resolveAmount(state, instruction.amount ?? 1, scope, ctx));
-      if (amount <= 0) return state;
+      // "No more than 1 damage can be healed from each character each round" (145033:A:1) leaves what room the cap has.
+      const healed = healDamage(state, id, instruction.all ? card.damage : resolveAmount(state, instruction.amount ?? 1, scope, ctx), ctx);
+      if (healed.healed <= 0) return state;
       // The step records the damage removed as a negative amount, the way a progress removal is recorded (the table's log).
-      steps.push({ kind: "damage", targetId: id, amount: -amount, cause: currentCause(steps, UNATTRIBUTED) });
-      return queueEvent(updateCard(state, id, { damage: card.damage - amount }), { trigger: "healed", seat: card.controller, cardId: id, ...(playerSource(state, focus.sourceId, ctx) ? { byPlayerCard: true } : {}) });
+      steps.push({ kind: "damage", targetId: id, amount: -healed.healed, cause: currentCause(steps, UNATTRIBUTED) });
+      return queueEvent(healed.state, { trigger: "healed", seat: card.controller, cardId: id, ...(playerSource(state, focus.sourceId, ctx) ? { byPlayerCard: true } : {}) });
     }
     case "PutOnDeck": {
       const id = refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId)) ?? "";
@@ -188,9 +191,9 @@ export function runPlayerVerb(
       if (!card || seat == null) return state;
       // "Discarded objective cards are returned to the staging area" (01103:A:2, families/objectives/claimed.ts).
       if (card.claimed) return sendAway(state, id, { zone: "discard", seat });
-      const moved = moveCard(state, id, { zone: "discard", seat });
       // "After 1 or more cards are discarded from your hand", "After ~ is discarded from your deck".
-      if (card.zone === "hand") return queueEvent(moved, { trigger: "discardedFromHand", seat, cardId: id });
+      if (card.zone === "hand") return discardFromHand(state, id, seat);
+      const moved = moveCard(state, id, { zone: "discard", seat });
       if (card.zone === "deck") return queueEvent(moved, { trigger: "discardedFromDeck", seat, cardId: id });
       return moved;
     }
@@ -221,7 +224,8 @@ export function runPlayerVerb(
       return enemy?.shadowId ? moveCard(state, enemy.shadowId, { zone: "encounterDiscard" }) : state;
     }
     case "CancelEffect":
-      return announceCanceled(cancelAnswered(state), state, ctx);
+      // Fire-filled Trench cancels a player event's cancel of a revealed treachery (families/pelennor/combat.ts).
+      return counterCancel(state, ctx) ?? announceCanceled(cancelAnswered(state), state, ctx, focus.seat);
     case "LookAtEncounterTop": {
       const top = state.encounterDeck[0];
       return top ? { ...state, window: { kind: "look", seat: focus.seat, cardIds: [top] }, activeSeat: focus.seat, passed: [] } : state;

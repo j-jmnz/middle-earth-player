@@ -12,13 +12,12 @@ import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { printedOf } from "../../core/printed.ts";
-import { dealtFace } from "../dreamchaser/facts.ts";
 import { recordsOfFace } from "../dreamchaser/faces.ts";
 import { pushCardEffects } from "../../interpret/effect-frames.ts";
 import { effectsOf } from "../../windows/listen.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
-import { attachTo, moveCard } from "../../core/zones.ts";
+import { attachTo, moveCard, turnedUp } from "../../core/zones.ts";
 import { effectData } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 import { FLEET_SET } from "./routes.ts";
@@ -111,6 +110,6 @@ export function prepareFleet(state: ScenarioState, instruction: Extract<Instruct
     const picked = answer && options.includes(answer) ? answer : options.length === 1 ? options[0] : undefined;
     answer = undefined;
     if (!picked) return effectData(next) ? askTarget(next, { instruction, seat, chosen: null, cause }, options) : { ...next, failure: "Preparing the fleet needs a choice, and no effect is asking" };
-    next = updateCard(moveCard(next, picked, { zone: "play", seat }), picked, { face: dealtFace(next, next.cards[picked]?.code ?? "", "up") });
+    next = updateCard(moveCard(next, picked, { zone: "play", seat }), picked, { face: turnedUp(next, picked) });
   }
 }

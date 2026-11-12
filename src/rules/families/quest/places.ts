@@ -15,6 +15,7 @@ import { isLocationId } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { updateCard } from "../../core/state.ts";
 import { fireForced } from "../../windows/triggers.ts";
+import { effectsOfCard } from "../misc/text.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
 import type { Focus } from "../index.ts";
 import { makeActiveIn } from "../south/locations.ts";
@@ -29,6 +30,15 @@ export function makeActive(state: ScenarioState, instruction: Verb<"MakeActive">
   if (!id || !isLocationId(state, id, ctx.cards) || state.cards[id]?.zone !== "staging") return state;
   const next = makeActiveIn(state, id);
   return fireForced(next, { trigger: "becameActive", seat: null, cardId: id }, ctx, steps);
+}
+
+// A location a scenario's Setup makes the active location ("Make Brake of Thorns the active location", 146075:A:1) becomes the active location then: its own Forced effect "after it becomes the active location" resolves (146047:A:2). Only a card with such a record
+// hears it, so a Setup whose active location has none is as it was.
+export function announceSetupActive(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const id = state.activeLocation;
+  const card = id ? state.cards[id] : undefined;
+  if (!id || !card || !effectsOfCard(state, ctx, card).some((effect) => effect.timing === "forced" && effect.trigger === "becameActive" && effect.subject === "self")) return state;
+  return fireForced(state, { trigger: "becameActive", seat: null, cardId: id }, ctx, steps);
 }
 
 // Where moved progress comes from: the source card, the current quest card, or the card picked before the last.

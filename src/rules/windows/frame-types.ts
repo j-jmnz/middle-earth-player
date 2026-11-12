@@ -26,6 +26,8 @@ export type Modifier = {
   against?: string;
   // The stat is set to `amount`, overriding every modifier that is not a set (rr.modifiers).
   set?: boolean;
+  // A `moreStagingThreat` modifier that counts 1 for each ally in this seat's discard pile each time it is read (RaiseStagingThreat `live`, families/dungeon).
+  allyDiscardSeat?: number;
   // The Trait a `traitGained` modifier gives its holder ("gain a Trait of your choice", 11195:A:5).
   trait?: string;
 };
@@ -33,6 +35,7 @@ export type Modifier = {
 export type FrameName =
   | "reveal"
   | "hide"
+  | "fortitude"
   | "whenRevealed"
   | "forced"
   | "shadow"
@@ -44,6 +47,9 @@ export type FrameName =
   | "ResolveEffect";
 
 export type HideResult = { success: boolean; willpower: number; threat: number };
+
+// A finished Fortitude test (mec113.fortitude-tests): the committed heroes' total Willpower against the Sauron's Eye icons counted; it passes only when the Willpower is greater.
+export type FortitudeResult = { success: boolean; willpower: number; eyes: number };
 
 // One instruction still to run, with the seat it runs for. `chosen` is the card a player picked for it.
 // `offset` is where ArrangeTop has got to in the deck.
@@ -105,6 +111,8 @@ export type EffectData = {
   discardedCount?: number;
   // The last Hide test this effect made failed (HideTest; the `lastHideFailed` condition, families/nightmare/guards.ts).
   hideFailed?: boolean;
+  // The last Fortitude test this effect made (FortitudeTest; the `lastFortitudeFailed` and `lastFortitudePassed` conditions, families/mount-doom/conditions.ts).
+  fortitude?: "failed" | "passed";
 };
 
 // A window to open again once the frames above this one are done. Under a response or a Forced frame raised while an action
@@ -118,6 +126,18 @@ export type HideData = {
   discardedIds: readonly string[];
   threat: number;
   result: HideResult | null;
+};
+
+// A Fortitude test under way (families/mount-doom/fortitude.ts). `extraCards` and `extraEyes` are what the verb added, read as the test was made; `ignored` are the discarded cards whose icons a Forced effect set aside; `eyes` is the count once the cards are discarded.
+export type FortitudeData = {
+  kind: "fortitude";
+  extraCards: number;
+  extraEyes: number;
+  committedIds: readonly string[];
+  discardedIds: readonly string[];
+  ignored: readonly string[];
+  eyes: number;
+  result: FortitudeResult | null;
 };
 
 // An event the engine announces. `seat` is the player it happened to. `phase` is the phase that just ended.
@@ -145,6 +165,7 @@ export type FrameData =
   // `guards`: the card is revealed as the guard of this objective (rr.guarded): it is attached to it as it is placed in the staging area. `engage`: an enemy found by a search is put into play engaged with the revealing seat instead (SearchReveal `to: engaged`).
   | { kind: "reveal"; hide: HideResult | null; surge: boolean; fromDeck?: boolean; canceled?: boolean; discard?: boolean; guards?: string; engage?: true }
   | HideData
+  | FortitudeData
   | EffectData;
 
 export type Frame = {

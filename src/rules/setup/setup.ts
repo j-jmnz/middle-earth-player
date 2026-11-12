@@ -37,6 +37,8 @@ export type StartSeat = {
   hand?: readonly string[];
   // The permanent starting threat penalty this seat takes of its own, on top of the table's `threatModifier` (The Passage of the Marshes, docs/brief.md, The Two Towers).
   threatPenalty?: number;
+  // A raise of this seat's threat that step 7 of Setup makes after the initial threat level is set (the first player's search for Andúril, 145066:A:1: "raise each player's threat"), so it is not part of the starting threat level (rr.setup, rr.initial-threat-level).
+  threatRaise?: number;
   // Resources each of this seat's heroes starts with beyond the usual (The Two Towers: "add 1 resource to each of his heroes' pools", 144069:A:2).
   resources?: number;
   // Cards a campaign card's Setup adds to the hand once the mulligan is over (AddToHandAfterMulligan): not drawn, not shuffled
@@ -45,6 +47,8 @@ export type StartSeat = {
   afterMulligan?: readonly string[];
   // The cards the campaign card's Setup let this seat choose and a Resolution earns (ChooseCards `unearned`): recorded as a game fact (ScenarioState.chosenAtSetup).
   chosen?: readonly string[];
+  // The boons this seat set aside, out of play, at Setup (SetAsideBoon, 146069:A:1): dealt to the set-aside area as the seat's own, so a later effect (GuardWithSetAside) can find and return them.
+  setAside?: readonly string[];
   // The 14 Item or Artifact attachments a Burglar's Turn player chose from their collection: their loot deck (families/sidequests/loot.ts).
   loot?: readonly string[];
 };
@@ -59,6 +63,8 @@ export type StartScenario = {
   definition: ScenarioDefinition;
   seats: readonly StartSeat[];
   encounterDeck: readonly string[];
+  // Encounter-deck copies the campaign pool recorded for a seat (one entry per copy): the copy's controller, which its Setup line reads as the acting seat (search.ts).
+  encounterOwners?: readonly { code: string; seat: number }[];
   questDeck: readonly string[];
   // The burden deck of the scenario, when it has one. It is shuffled into a deck beside the quest deck.
   burdenDeck?: readonly string[];
@@ -77,6 +83,16 @@ export type StartScenario = {
   facts?: CampaignFacts;
 };
 
+// Each recorded copy takes the next encounter-deck card of its code that has no controller yet.
+function ownEncounterCopies(state: ScenarioState, owners: readonly { code: string; seat: number }[]): ScenarioState {
+  let next = state;
+  for (const owner of owners) {
+    const id = next.encounterDeck.find((candidate) => next.cards[candidate]?.code === owner.code && next.cards[candidate]?.controller == null);
+    if (id) next = updateCard(next, id, { controller: owner.seat });
+  }
+  return next;
+}
+
 export function startScenario(input: StartScenario, ctx: ReduceContext): ScenarioState {
   let state = blankScenario({
     seatCount: input.seatCount,
@@ -92,6 +108,7 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
   for (const code of input.encounterDeck) {
     state = spawn(state, code, { zone: "encounterDeck" }).state;
   }
+  state = ownEncounterCopies(state, input.encounterOwners ?? []);
   state = shuffleZone(state, "encounter");
   if (input.burdenDeck && input.burdenDeck.length > 0) {
     for (const code of input.burdenDeck) state = spawn(state, code, { zone: "burdenDeck" }).state;
@@ -136,6 +153,10 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     }
     for (const code of seat.hand ?? []) state = spawn(state, code, { zone: "hand", seat: index }).state;
     for (const code of seat.deck) state = spawn(state, code, { zone: "deck", seat: index }).state;
+    for (const code of seat.setAside ?? []) {
+      const aside = spawn(state, code, { zone: "setAside" }, "down");
+      state = updateCard(aside.state, aside.id, { owner: index });
+    }
     // The cards with the Encounter keyword are set aside, not drawn (families/sidequests/encounter.ts).
     state = setAsideEncounterCards(state, index, ctx);
     // A contract in the deck begins the game in its player's play area (families/sidequests/contract.ts).
@@ -150,6 +171,11 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
   state = stampRoutes(state, ctx.cards);
   // The starting threat level, for a card that reduces threat back to it (04053:A:2).
   state = recordStartingThreat(state, ctx);
+  // The raises of Setup step 7 come after the initial threat level is recorded.
+  for (let index = 0; index < input.seatCount; index += 1) {
+    const raise = input.seats[index]?.threatRaise ?? 0;
+    if (raise > 0) state = withThreat(state, index, (state.seats[index]?.threat ?? 0) + raise);
+  }
   const quiet: EngineStep[] = [];
   state = searchSetup(state, "player", ctx, quiet);
   state = handSetup(state, ctx, quiet);

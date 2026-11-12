@@ -17,8 +17,7 @@ import { queueEvent } from "../../windows/queue.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
 import { patchTop } from "../../windows/windows.ts";
-import { attachTo, moveCard } from "../../core/zones.ts";
-import { dealtFace } from "../dreamchaser/facts.ts";
+import { attachTo, discardFromHand, moveCard, turnedUp, turnedUpCode } from "../../core/zones.ts";
 import { effectData } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 import { queueFront } from "../play/refs.ts";
@@ -42,7 +41,7 @@ export function putSetAsideInPlay(state: ScenarioState, instruction: Verb<"PutSe
     if (seat == null) return effectData(state) ? askTarget(state, { instruction, seat: state.firstPlayer, chosen: null }, seats.map((index) => `seat:${index}`)) : state;
   }
   const holder = instruction.withCard ? Object.values(state.cards).find((card) => inPlay(card.zone) && card.controller != null && printedOf(ctx.cards, card.code).name === instruction.withCard) : undefined;
-  return updateCard(moveCard(state, id, { zone: "play", seat: seat ?? holder?.controller ?? (instruction.to === "actor" ? focus.seat : instruction.to === "lastPlayer" ? lastPlayer(state) : state.firstPlayer) }), id, { face: dealtFace(state, state.cards[id]?.code ?? "", "up") });
+  return updateCard(moveCard(state, id, { zone: "play", seat: seat ?? holder?.controller ?? (instruction.to === "actor" ? focus.seat : instruction.to === "lastPlayer" ? lastPlayer(state) : state.firstPlayer) }), id, { face: turnedUp(state, id) });
 }
 
 /** AttachSetAside: the set-aside copy of the card with this code is attached to the card in play with that name. */
@@ -51,7 +50,7 @@ export function attachSetAsideTo(state: ScenarioState, instruction: Verb<"Attach
   const host = Object.values(state.cards).find((card) => inPlay(card.zone) && printedOf(ctx.cards, card.code).name === instruction.to);
   if (!id || !host) return state;
   const seat = host.controller ?? state.firstPlayer;
-  const placed = updateCard(moveCard(state, id, { zone: "play", seat }), id, { face: dealtFace(state, instruction.code, "up") });
+  const placed = updateCard(moveCard(state, id, { zone: "play", seat }), id, { face: turnedUpCode(state, instruction.code) });
   return queueEvent(attachTo(placed, id, host.id), { trigger: "attached", seat, subject: id, other: host.id });
 }
 
@@ -130,7 +129,7 @@ export function discardCostlier(state: ScenarioState, instruction: Verb<"Discard
   let next = state;
   for (const id of [...(state.seats[seat]?.hand ?? [])]) {
     const cost = printedOf(ctx.cards, state.cards[id]?.code ?? "").cost;
-    if (cost != null && cost > base) next = queueEvent(moveCard(next, id, { zone: "discard", seat: state.cards[id]?.owner ?? seat }), { trigger: "discardedFromHand", seat, cardId: id });
+    if (cost != null && cost > base) next = discardFromHand(next, id, state.cards[id]?.owner ?? seat, seat);
   }
   return next;
 }

@@ -4,6 +4,7 @@ import path from "node:path";
 
 import { describe, expect, it } from "vitest";
 
+import { authoredRelOfScenario } from "../data/effects/authored-paths.ts";
 import { planScenario, type Repo } from "./scenario-new.ts";
 
 // pnpm scenario new <scenario-id>: it plans from data/scenarios and the registries as they are, edits them only by inserting lines, never
@@ -13,7 +14,7 @@ const repo: Repo = { read: (file) => (existsSync(path.join(ROOT, file)) ? readFi
 const exists = (file: string): boolean => existsSync(path.join(ROOT, file));
 const SCENARIOS = readdirSync(path.join(ROOT, "data", "scenarios")).filter((name) => name.endsWith(".json")).map((name) => name.slice(0, -".json".length));
 // A scenario that has no authored file yet is one the scaffold has not been run for.
-const NEW = SCENARIOS.find((id) => !exists(`src/effects/authored/${id}.ts`) && !exists(`test/scenarios/${id}`));
+const NEW = SCENARIOS.find((id) => !exists(`src/effects/authored/${authoredRelOfScenario(id)}.ts`) && !exists(`test/scenarios/${id}`));
 
 // A view of the repo as if `ids` had none of their lines in the registries and none of their files: the planner is tested on explicit ids,
 // whether or not the real repo has scaffolded them yet. (Every registry line that names a scenario carries its id.)
@@ -97,6 +98,18 @@ describe("pnpm scenario new", () => {
     const from = writerLines.findIndex((line) => /^const WRITERS\b/.test(line));
     const to = writerLines.findIndex((line, index) => index > from && /^};$/.test(line));
     expect(writerLines.slice(from, to).some((line) => line.startsWith(`  "${id}": () => `))).toBe(true);
+  });
+
+  it("writes a scenario of a campaign with an authored folder into that folder, with the imports of its depth", () => {
+    const id = "the-tower-of-cirith-ungol";
+    const view = without(id);
+    const { plan, problems } = planScenario(id, {}, view.repo, view.exists);
+    expect(problems).toEqual([]);
+    const authored = plan?.files.find((item) => item.file.startsWith("src/effects/authored/"));
+    expect(authored?.file).toBe(`src/effects/authored/return-of-the-king/${id}.ts`);
+    expect(authored?.text).toContain('from "../../../catalog/boundary.ts"');
+    expect(authored?.text).toContain("from ../reprint.ts when");
+    expect(cli(id, "--dry-run").output).toContain(`src/effects/authored/return-of-the-king/${id}.ts`);
   });
 
   it("refuses a short name that is not an identifier", () => {

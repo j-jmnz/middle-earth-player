@@ -199,7 +199,7 @@ export const WILDERLAND_GOLDENS: readonly WilderlandGolden[] = [
   { name: "two-handed, Easy, won from a blank log", seatCount: 2, seed: 7, difficulty: "Easy", decks: "strong", outcome: "won" },
   { name: "two-handed, won, after the earlier parts, Misplaced Trust", seatCount: 2, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won", after: true, variant: "pool" },
   { name: "two-handed, won, after the earlier parts, Urdug's Cunning, the last option of every Choose window", seatCount: 2, seed: 11, difficulty: "Normal", decks: "strong", outcome: "won", after: true, variant: "cunning", policy: { choose: "last" } },
-  { name: "two-handed, Easy, won, the oath and guidance lines, the attacks made together", seatCount: 2, seed: 3, difficulty: "Easy", decks: "strong", outcome: "won", after: true, variant: "oath", policy: TOGETHER },
+  { name: "two-handed, Easy, won, the oath and guidance lines, the attacks made together", seatCount: 2, seed: 2, difficulty: "Easy", decks: "strong", outcome: "won", after: true, variant: "oath", policy: TOGETHER },
   { name: "true solo, weak, lost on threat", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
   { name: "two-handed, weak, lost on threat", seatCount: 2, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", lossReason: "No seats remain" },
   { name: "true solo, brittle, lost with every hero destroyed", seatCount: 1, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", lossReason: "No seats remain" },

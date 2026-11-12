@@ -7,6 +7,7 @@
 import type { Effect } from "../../catalog/boundary.ts";
 import { rejectionReason } from "../../rules/engine/legal.ts";
 import { effectById, effectsOf } from "../../rules/windows/listen.ts";
+import { endedInDefeat } from "../../rules/core/eliminate.ts";
 import { isLocationCard, isLocationId, printedOf } from "../../rules/core/printed.ts";
 import { engagementCostOf, questPointsOf } from "../../rules/quest/quest.ts";
 import { legalTargets, type LegalIntent, type ReduceContext, type ScenarioState } from "../../rules/engine/reduce.ts";
@@ -19,6 +20,7 @@ import { branchThreat, branchWords, outOfPlayLabel, type ChoiceNames } from "../
 import { islandBlocked, islandBlockedTitle, islandOptionLabel, islandTravelNote, islandTravelRow } from "../words/scenarios/island.ts";
 import { grantedTravelWords, grappleOptionLabel, grappleTravel, returnsNote, travelNote } from "../words/scenarios/grapple.ts";
 import { isFreedTreasureClaim, isTreasureDraw, wilderlandBranchNow, wilderlandChooseNote, wilderlandOptionLabel, wilderlandTravel } from "../words/scenarios/wilderland.ts";
+import { embassyPairCards } from "../readouts/black-gate.ts";
 import { branchCaution, discardCaution } from "./wilderland-sheets.ts";
 import { heathLookNote } from "../words/scenarios/heath.ts";
 import { seaOptionLabel, travelTaxCaution } from "../words/scenarios/sea.ts";
@@ -40,10 +42,11 @@ import { freeSlot } from "../../rules/families/south/locations.ts";
 import { recordsOfFace } from "../../rules/families/dreamchaser/faces.ts";
 import { islandMayTravel } from "../../rules/families/island/travel.ts";
 import { hideCommitLimit } from "../../rules/families/nightmare/guards.ts";
+import { eyesStat, fortitudeCommitCheck, fortitudeCommitNote, fortitudeCountNote, fortitudePassCaution } from "../readouts/fortitude.ts";
 import { sailingSheet, shipRow } from "./sea-sheets.ts";
 import { asksCollection, collectionLabel, collectionOrder } from "./collection-sheets.ts";
 import { answeredCard, hideCommitNote, hideNumbers, lookNote, optionalEngageNote, responseNote } from "./sheet-notes.ts";
-import { captiveLabel, cardLabel, has, option, statOf, step } from "./sheet-parts.ts";
+import { captiveLabel, cardLabel, has, option, stagedAllyLabel, statOf, step } from "./sheet-parts.ts";
 import { nightActionNote } from "../words/scenarios/night.ts";
 import { framsburgActionCaution, framsburgActionNote } from "../words/scenarios/framsburg.ts";
 import { fatePassCaution } from "../words/scenarios/fate.ts";
@@ -108,7 +111,7 @@ export function travelRefusals(whole: ScenarioState, ctx: ReduceContext, names: 
  * like any action window, with Pass, the Actions list and the hand.
  */
 export function isStepWindow(game: ScenarioState): boolean {
-  return game.window?.kind === "frameAction" && topFrame(game)?.frame !== "hide";
+  return game.window?.kind === "frameAction" && topFrame(game)?.frame !== "hide" && topFrame(game)?.frame !== "fortitude";
 }
 
 /**
@@ -119,6 +122,8 @@ export function isStepWindow(game: ScenarioState): boolean {
 // win has nothing to choose, and the outcome screen shows the score.
 export function wonSheet(game: ScenarioState): Sheet {
   const rewards = game.resolution.length > 0;
+  // A scenario that ends when its last player falls (The Black Gate Opens) is no victory: the sheet says what happened and that the Resolution is next.
+  if (endedInDefeat(game)) return { kind: "outcome", key: "won", result: "won", step: "Resolution", title: "The end", note: "Every player has fallen. The scenario ends here, and the campaign card's Resolution is next.", action: "See the Resolution" };
   // A Resolution that asks nothing (The Oath's: the tokens and the burden they earn) has no rewards to choose: the screen after it only shows what is recorded.
   const asks = game.resolution.some(asksPlayers);
   return {
@@ -177,21 +182,45 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         alternative: null,
       };
     }
+    case "fortitudeCommit": {
+      const source = frame?.cardId ?? null;
+      const heroes = legalTargets(game, { type: "CommitFortitude" }, ctx);
+      const check = fortitudeCommitCheck(game, ctx, heroes);
+      return {
+        kind: "multi",
+        key: `fortitudeCommit:${frame?.id ?? ""}`,
+        step: "Fortitude test",
+        title: source ? `${names.card(source)}: Fortitude test` : "Fortitude test",
+        note: fortitudeCommitNote(game, ctx),
+        verb: "Commit",
+        options: heroes.map((id) => ({ ...option(game, names, id), stats: statOf(game, ctx, id, "willpower") })),
+        build: { kind: "CommitFortitude" },
+        allowEmpty: true,
+        preselected: [],
+        alternative: null,
+        ...(check ? { fortitude: check } : {}),
+      };
+    }
     case "frameAction": {
       if (isStepWindow(game)) return null;
       const hide = game.widgets.hide && frame?.data.kind === "hide" ? hideNumbers(game, ctx, frame) : null;
+      // A Fortitude test's action window: the Willpower against the icons counted, the cards discarded and the icons ignored.
+      const fortitude = frame?.data.kind === "fortitude" ? fortitudeCountNote(game, ctx, names.card) : null;
+      // While the count fails, Continue says so and what it costs, as the other sheets that can lose something do.
+      const fortitudeCaution = fortitude ? fortitudePassCaution(game, ctx) : null;
       const source = frame?.cardId ?? null;
       return {
         kind: "trigger",
         key: `frameAction:${frame?.id ?? ""}:${frame?.step ?? 0}`,
-        step: hide ? "Hide test" : step(game),
+        step: hide ? "Hide test" : fortitude ? "Fortitude test" : step(game),
         title: source ? names.card(source) : "Action window",
         sourceId: source,
         timing: "Action",
-        note: hide ? `Hide ${hide.x}: willpower ${hide.willpower} against threat ${hide.threat}.` : "Actions may be used before this resolves.",
+        note: hide ? `Hide ${hide.x}: willpower ${hide.willpower} against threat ${hide.threat}.` : (fortitude ?? "Actions may be used before this resolves."),
         hide,
         options: triggerOptions(game, ctx, legal, names),
         pass: "Continue",
+        ...(fortitudeCaution ? { passCaution: fortitudeCaution } : {}),
       };
     }
     case "choose": {
@@ -233,6 +262,8 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           note: [`${ask}${/^Player \d+[:,] /.test(ask) ? "" : who}`, line].filter((part) => part != null).join(" "),
           verb: "Choose",
           confirm: "Confirm",
+          // The Embassy's pair: the Read button opens the player card and the encounter card it is paired with.
+          ...(embassyPairCards(game).length > 0 ? { about: embassyPairCards(game) } : {}),
           alternative: stop ? { label: stop.label, intent: { type: "Choose", optionId: stop.optionId }, caution: stop.caution } : null,
           options: window.options.filter((id) => !(stop && id === DONE)).map((id): PickOption => {
             // A branch that raises or lowers threat carries the threat icon with the record's amount.
@@ -263,6 +294,8 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const card = option(game, names, id);
           // The Willpower each character the players may remove from the quest adds up (11075:A:1), as the commit sheet shows it.
           const willpower = wait?.kind === "target" && wait.item.instruction.verb === "RemoveWillpowerFromQuest" ? statOf(game, ctx, id, "willpower") : [];
+          // Gollum's pick of the card whose Sauron's Eye icons are not counted: each row shows the icons it adds.
+          const eyes = data?.queue[0]?.instruction.verb === "IgnoreFortitudeEyes" ? [eyesStat(game, ctx, id)] : [];
           // An option of a sea verb that is no card: trade or keep the damage, the deck to discard from, the title named.
           const sea = wait?.kind === "target" ? (seaOptionLabel(wait.item.instruction, id, game, ctx.cards) ?? grappleOptionLabel(wait.item.instruction, id) ?? wilderlandOptionLabel(wait.item.instruction, id, words) ?? unchartedOptionLabel(wait.item.instruction, id, game, words) ?? islandOptionLabel(wait.item.instruction, id, game, words) ?? gundabadOptionLabel(wait.item.instruction, id, game, ctx, words)) : null;
           // Copies of one card in different zones are told apart by where each one is.
@@ -273,10 +306,10 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const kingsCaution = wait?.kind === "target" ? discardCaution(game, ctx, source, wait.item.instruction, data?.queue[0]?.instruction, id, names.card) : undefined;
           // An asks entry's warning is the row's own (asks.ts): it arms the confirm on that row only.
           const rowCaution = asked.cautions?.[id] ?? fire?.caution ?? ship?.caution ?? kingsCaution;
-          const label = (game.cards[id] ? undefined : asked.labels?.[id]) ?? fire?.label ?? sea ?? ship?.label ?? captiveLabel(game, ctx, names, id, window.options) ?? (collection ? collectionLabel(game, ctx, id, window.options, names) : outOfPlay ? outOfPlayLabel(game, id, words) : card.label);
+          const label = (game.cards[id] ? undefined : asked.labels?.[id]) ?? fire?.label ?? sea ?? ship?.label ?? captiveLabel(game, ctx, names, id, window.options) ?? stagedAllyLabel(game, ctx, names, id, window.options) ?? (collection ? collectionLabel(game, ctx, id, window.options, names) : outOfPlay ? outOfPlayLabel(game, id, words) : card.label);
           // Another defender's pooled damage (Stand Together, families/defense/defenders.ts).
           const pooled = data?.effectId === DEFENDERS_FRAME ? extraDefender(game, ctx, id) : null;
-          return { ...card, label, ...(wait?.kind === "target" && (isTreasureDraw(wait.item.instruction)) ? { code: id } : {}), ...(willpower.length > 0 ? { stats: willpower } : {}), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(rowCaution ? { caution: rowCaution } : {}), intent: { type: "Choose", optionId: id } };
+          return { ...card, label, ...(wait?.kind === "target" && (isTreasureDraw(wait.item.instruction)) ? { code: id } : {}), ...(willpower.length > 0 || eyes.length > 0 ? { stats: [...willpower, ...eyes] } : {}), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(rowCaution ? { caution: rowCaution } : {}), intent: { type: "Choose", optionId: id } };
         }),
       };
     }

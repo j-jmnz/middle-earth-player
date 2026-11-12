@@ -83,12 +83,13 @@ describe("The Two Towers codes", () => {
     }
   });
 
-  it("names one reprint set and pack per saga box, the Fellowship's unchanged", () => {
+  it("names one reprint set and pack per saga box, the Fellowship's and The Two Towers' unchanged", () => {
     expect(REPRINTS.map((reprint) => [reprint.set, reprint.pack, reprint.product])).toEqual([
       ["The Fellowship of the Ring", "TFotR", "MEC109"],
       ["The Two Towers", "TTwT", "MEC112"],
+      ["The Return of the King", "TRotK", "MEC113"],
     ]);
-    expect([...REPRINT_PACKS]).toEqual(["TFotR", "TTwT"]);
+    expect([...REPRINT_PACKS]).toEqual(["TFotR", "TTwT", "TRotK"]);
   });
 });
 

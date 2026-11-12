@@ -32,6 +32,7 @@ const BOOK_SCENE: Readonly<Record<string, string>> = {
   "dream-chaser": "voyage-across-belegaer",
   "ered-mithrin": "journey-up-the-anduin",
   "the-two-towers": "the-uruk-hai",
+  "the-return-of-the-king": "the-passing-of-the-grey-company",
 };
 
 // The books as tiles 150 pt tall: the scene of the book dimmed under its name, the Lore book glowing in the corner. Two to a row at

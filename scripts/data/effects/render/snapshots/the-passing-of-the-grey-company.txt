@@ -1,0 +1,339 @@
+Scenario piles that place cards with no record (quest: 145063 The Forbidden Door; quest: 145064 The Paths of the Dead; quest: 145065 The Dead are Following; setAside: 145016 Overcome by Fear; setAside: 145017 The Stone of Erech; setAside: 145067 Army of the Dead)
+
+## 145016 Overcome by Fear
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+145016:A:1 (front): Setup: Attach to your threat dial. Limit 1 per threat dial.
+  145016:setup:1: Setup
+    - this card attaches itself to the acting player's threat dial (nothing when the dial holds a copy already)
+
+145016:A:2 (front): Your threat cannot be reduced.
+  145016:constant:1: Constant
+    - actorSeat: stat threatReductionBarred 1, while this card is in play
+
+145016:A:3 (front): Forced: At the end of the round, raise your threat by 1. Then, you may spend 1 Fellowship resource to detach Overcome by Fear and set it aside, out of play.
+  145016:forced:1: Forced at the end of the round
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - raise threat by 1 (the acting player)
+    - the acting player chooses one of:
+      * option "detach" (only if [json condition {"kind":"resources","min":1,"sphere":"fellowship"}]):
+        - [json SpendResources {"verb":"SpendResources","amount":1,"sphere":"fellowship"}]
+        - this card is detached from the acting player's threat dial and set aside, out of play
+      * option "keep":
+
+## 145017 The Stone of Erech
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+145017:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+145017:A:2 (front): Forced: After The Stone of Erech becomes the active location, each player searches the encounter deck and discard pile for an Oathbreaker enemy and adds it to the staging area. Shuffle the encounter deck.
+  145017:forced:1: Forced after this location becomes the active location (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - [json SearchMove {"verb":"SearchMove","trait":"Oathbreaker","type":"enemy","to":"staging"}]
+    - shuffle the encounter deck
+
+145017:A:3 (front): Travel: Remove 5 progress from stage 3B to travel here.
+  145017:travel:1: Travel
+    - [json RemoveProgressFromQuest {"verb":"RemoveProgressFromQuest","amount":5}]
+
+## 145018 Dark Door
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145018:A:1 (front): While Dark Door is in the staging area, progress cannot be placed on locations in the staging area.
+  145018:constant:1: Constant
+    only if this card is in the staging area
+    - each location (any player controls) in the staging area only: stat noProgressPlaced 1, while this card is in play
+
+145018:A:2 (front): Travel: The first player reveals an encounter card to travel here.
+  145018:travel:1: Travel
+    - the first player reveals an encounter card
+
+## 145019 Trysting Place
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145019:A:1 (front): While Trysting Place is in the staging area, each enemy in the staging area cannot take damage.
+  145019:constant:1: Constant
+    only if this card is in the staging area
+    - each enemy (any player controls) in the staging area only: stat cannotTakeDamage 1, while this card is in play
+
+145019:A:2 (front): Travel: The first player searches the encounter deck and discard pile for an Oathbreaker enemy and puts it into play engaged with him. Shuffle the encounter deck.
+  145019:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SearchMove {"verb":"SearchMove","trait":"Oathbreaker","type":"enemy","to":"engaged"}]
+    - shuffle the encounter deck
+
+## 145020 Deadly Road
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145020:A:1 (front): While Deadly Road is in the staging area, it gains: "Forced: After a 'when revealed' effect is canceled, raise each player's threat by 1."
+  145020:forced:1: Forced on the event whenRevealedCanceled
+    only if this card is in the staging area
+    - raise threat by 1 (each player)
+
+145020:A:2 (front): Travel: Spend 1 Fellowship resource to travel here.
+  145020:travel:1: Travel
+    - [json SpendResources {"verb":"SpendResources","amount":1,"sphere":"fellowship","group":true}]
+
+## 145021 Haunted Path
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145021:A:1 (front): Haunted Path gets +1 Threat for each player with a threat of 35 or higher.
+  145021:constant:1: Constant
+    - this card: stat threat the number of living players with a threat of 35 or higher, while this card is in play
+
+145021:A:2 (front): Travel: Raise each player's threat by 1 to travel here.
+  145021:travel:1: Travel
+    - raise threat by 1 (each player)
+
+145021:A:3 (shadow): Shadow: Either raise your threat by 2, or return attacking enemy to the staging area after this attack.
+  145021:shadow:1: Shadow
+    - the acting player chooses one of:
+      * option "threat":
+        - raise threat by 2 (the acting player)
+      * option "staging":
+        - when the attack in progress ends:
+          - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 145022 Dead Man of Dunharrow
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145022:A:1: Phantom.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+145022:A:2 (front): Forced: After Dead Man of Dunharrow engages you, either attach a set aside Overcome by Fear to your threat dial, or raise your threat by 2.
+  145022:forced:1: Forced after an enemy engages a player (heard about this card)
+    - the acting player chooses one of:
+      * option "attach" (only if a copy of the card with code 145016 is set aside and the actor's threat dial holds none):
+        - the acting player attaches a set-aside copy of the card with code 145016 to their threat dial (nothing when the dial holds one already, Limit 1 per threat dial, or none is set aside)
+      * option "threat":
+        - raise threat by 2 (the acting player)
+
+145022:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack.
+  145022:shadow:1: Shadow
+    - the attacking enemy: stat attack 1, until the end of the attack
+
+## 145023 Faithless Dead
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145023:A:1: Peril. Phantom.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+145023:A:2 (front): When Revealed: Either raise each player's threat by 2, or reveal an additional encounter card.
+  145023:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "threat":
+        - raise threat by 2 (each player)
+      * option "reveal":
+        - the acting player reveals an encounter card
+
+145023:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack and loses the Phantom keyword for this attack.
+  145023:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - the attacking enemy: stat losesPhantom 1, until the end of the attack
+
+## 145024 Ghosts of Men
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145024:A:1: Peril. Phantom.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+145024:A:2 (front): When Revealed: Either attach a set aside Overcome by Fear to your threat dial, or Ghosts of Men makes an immediate attack against you.
+  145024:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "attach" (only if a copy of the card with code 145016 is set aside and the actor's threat dial holds none):
+        - the acting player attaches a set-aside copy of the card with code 145016 to their threat dial (nothing when the dial holds one already, Limit 1 per threat dial, or none is set aside)
+      * option "attack":
+        - this card attacks the acting player now, from the staging area
+
+## 145025 Shadow Host
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145025:A:1: Phantom.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+145025:A:2 (front): Forced: When Shadow Host engages you, either attach a set aside Overcome by Fear to your threat dial, or it makes an immediate attack.
+  145025:forced:1: Forced after an enemy engages a player (heard about this card)
+    - the acting player chooses one of:
+      * option "attach" (only if a copy of the card with code 145016 is set aside and the actor's threat dial holds none):
+        - the acting player attaches a set-aside copy of the card with code 145016 to their threat dial (nothing when the dial holds one already, Limit 1 per threat dial, or none is set aside)
+      * option "attack":
+        - this enemy attacks now, dealt a new shadow card after its old ones are discarded
+
+## 145026 Blood Runs Chill
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145026:A:1: Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+145026:A:2 (front): When Revealed: Each player with a threat of 35 or higher deals 1 damage to each exhausted character he controls.
+  145026:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - if the actor's threat is at least 35: deal 1 damage to each exhausted character (you control)
+
+145026:A:3 (shadow): Shadow: If your threat is 35 or higher, defending character cannot ready until the end of the round.
+  145026:shadow:1: Shadow
+    - if the actor's threat is at least 35: the defender: stat cannotReady 1, until the end of the round
+
+## 145027 The Way is Shut
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145027:A:1: Peril. Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+145027:A:2 (front): When Revealed: Either attach a set aside Overcome by Fear to your threat dial, or progress cannot be placed on the current quest until the end of the round.
+  145027:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "attach" (only if a copy of the card with code 145016 is set aside and the actor's threat dial holds none):
+        - the acting player attaches a set-aside copy of the card with code 145016 to their threat dial (nothing when the dial holds one already, Limit 1 per threat dial, or none is set aside)
+      * option "noProgress":
+        - the table: stat noQuestProgress 1, until the end of the round
+
+## 145028 Whispers in the Dark
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145028:A:1: Peril.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+145028:A:2 (front): When Revealed: Either attach a set aside Overcome by Fear to your threat dial, or each character you control gets -1 Willpower, -1 Attack, and -1 Defense until the end of the round.
+  145028:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "attach" (only if a copy of the card with code 145016 is set aside and the actor's threat dial holds none):
+        - the acting player attaches a set-aside copy of the card with code 145016 to their threat dial (nothing when the dial holds one already, Limit 1 per threat dial, or none is set aside)
+      * option "weaken":
+        - ownCharacters: stat willpower -1, until the end of the round
+        - ownCharacters: stat attack -1, until the end of the round
+        - ownCharacters: stat defense -1, until the end of the round
+
+145028:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if undefended).
+  145028:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attack has no defender): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 145029 No Turning Back
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145029:A:1 (front): When Revealed: Each player must choose: either attach a set aside Overcome by Fear to your threat dial, or discard an ally you control.
+  145029:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "attach" (only if a copy of the card with code 145016 is set aside and the actor's threat dial holds none):
+          - the acting player attaches a set-aside copy of the card with code 145016 to their threat dial (nothing when the dial holds one already, Limit 1 per threat dial, or none is set aside)
+        * option "discard" (only if there is a ally (you control) to choose):
+          - choose ally (you control)
+          - discard the picked card
+
+145029:A:2 (shadow): Shadow: Either attach a set aside Overcome by Fear to your threat dial, or attacking enemy makes an additional attack after this one.
+  145029:shadow:1: Shadow
+    - the acting player chooses one of:
+      * option "attach" (only if a copy of the card with code 145016 is set aside and the actor's threat dial holds none):
+        - the acting player attaches a set-aside copy of the card with code 145016 to their threat dial (nothing when the dial holds one already, Limit 1 per threat dial, or none is set aside)
+      * option "attack":
+        - this enemy attacks now, dealt a new shadow card after its old ones are discarded [also {"afterThis":true}]
+
+## 145063 The Forbidden Door
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+145063:A:1 (front): Setup: Set The Stone of Erech and Army of the Dead aside, out of play. Each player attaches a copy of Overcome by Fear to his threat dial. Remove each unattached copy of Overcome by Fear from the game.
+  145063:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player attaches a set-aside copy of the card with code 145016 to their threat dial (nothing when the dial holds one already, Limit 1 per threat dial, or none is set aside)
+    - every set-aside copy of the card with code 145016 is removed from the game
+
+145063:B:1 (back): When Revealed: Each player may add 1 resource to the resource pool of each hero he controls. Each player who does so must raise his threat by 3.
+  145063:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "add":
+          - [json HeroesGainResources {"verb":"HeroesGainResources","amount":1,"who":"actor"}]
+          - raise threat by 3 (the acting player)
+        * option "decline":
+
+145063:B:2 (back): Forced: At the end of the planning phase, discard all cards in each player's hand and advance to stage 2A.
+  145063:forced:1: Forced at the end of the phase
+    only if it is the Planning phase
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player discards all the cards in their hand
+    - advance to the next quest stage
+
+## 145064 The Paths of the Dead
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+145064:A:1 (front): When Revealed: Each player searches the encounter deck for a different location and adds it to the staging area. Shuffle the encounter deck.
+  145064:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - [json SearchMove {"verb":"SearchMove","type":"location","to":"staging","deckOnly":true,"different":true}]
+    - shuffle the encounter deck
+
+145064:B:1 (back): X is the threat of the player with the highest threat.
+  145064:constant:1: Constant
+    - this card: stat questPoints the highest threat among the living players, while this card is in play
+
+145064:B:2 (back): Each player cannot reduce his threat below his initial threat level.
+  145064:constant:2: Constant
+    - each player: stat threatFloor 1, while this card is in play
+
+145064:B:3 (back): Forced: At the beginning of the planning phase each player must choose: either raise your threat by 1, or you cannot play cards this phase.
+  145064:forced:1: Forced when a phase begins
+    only if it is the Planning phase
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "threat":
+          - raise threat by 1 (the acting player)
+        * option "noPlay":
+          - actorSeat: stat cannotPlayCards 1, until the end of the phase
+
+## 145065 The Dead are Following
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+145065:A:1 (front): When Revealed: Add The Stone of Erech and Army of the Dead (enemy side faceup) to the staging area. Each player may raise his threat by 3 to detach Overcome by Fear from his threat dial and set it aside, out of play.
+  145065:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"145017"}]
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"145067"}]
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "detach" (only if the actor's threat dial holds a copy of the card with code 145016):
+          - raise threat by 3 (the acting player)
+          - the copy of the card with code 145016 on the acting player's threat dial is detached and set aside, out of play
+        * option "keep":
+
+145065:B:1 (back): While The Stone of Erech is the active location, each Oathbreaker enemy loses the Phantom keyword and gets -20 engagement cost.
+  145065:constant:1: Constant
+    only if the active location is a location (any player controls) named "The Stone of Erech"
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each Oathbreaker enemy (any player controls) or in the staging area: stat losesPhantom 1, while this card is in play
+    - each Oathbreaker enemy (any player controls) or in the staging area: stat engagementCost -20, while this card is in play
+
+145065:B:2 (back): When The Stone of Erech leaves play as an explored location, the players win the game.
+  145065:constant:2: Constant
+    - the players cannot defeat this stage while this holds
+  145065:forced:1: Forced on the event locationExplored (heard about location (any player controls) named "The Stone of Erech")
+    - the players win the game
+
+## 145067 Army of the Dead
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+145067:A:1: Phantom. Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+145067:A:2 (front): X is twice the number of players in the game.
+  145067:constant:1: Constant
+    - this card: stat threat the number of players x 2, while this card is in play
+
+145067:A:3 (front): Forced: When Army of the Dead attacks, you must either attach a set aside Overcome by Fear to your threat dial, or discard an ally you control.
+  145067:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    - the acting player chooses one of:
+      * option "attach" (only if a copy of the card with code 145016 is set aside and the actor's threat dial holds none):
+        - the acting player attaches a set-aside copy of the card with code 145016 to their threat dial (nothing when the dial holds one already, Limit 1 per threat dial, or none is set aside)
+      * option "discard" (only if there is a ally (you control) to choose):
+        - choose ally (you control)
+        - discard the picked card
+
+(rendered pieces: 187 by template, 11 as JSON)

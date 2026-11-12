@@ -1,10 +1,11 @@
-// Rules: rr.attachment-cards, rr.guarded, rr.blank, rr.step-6-8-1 (data/rules/entries.json).
+// Rules: rr.attachment-cards, rr.guarded, rr.blank, rr.step-6-8-1 (data/rules/entries.json). The conditions `onDial` and `canAttachToDial` are read in dial.ts.
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
+import { attachToDial, detachFromDial, dialCondition, removeSetAside } from "./dial.ts";
 import { attachSourceTo, guardWith } from "./play.ts";
 import { answerQuestProgress } from "./quest.ts";
 import { declareAttack, healAmong } from "./verbs.ts";
@@ -16,6 +17,12 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "PlayInto":
     case "Guarded":
       return state;
+    case "AttachToDial":
+      return attachToDial(state, instruction, focus);
+    case "DetachFromDial":
+      return detachFromDial(state, instruction, focus);
+    case "RemoveSetAside":
+      return removeSetAside(state, instruction);
     case "AttachSourceTo":
       return attachSourceTo(state, instruction, focus, ctx);
     case "GuardWith":
@@ -31,4 +38,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "attachments", verbs: ["PlayInto", "Guarded", "AttachSourceTo", "GuardWith", "HealAmong", "ChooseAttackers", "QuestProgressFirst"], run };
+export const manifest: RulesFamily = { name: "attachments", condition: (state, condition, scope) => dialCondition(state, condition, scope.actor), verbs: ["PlayInto", "Guarded", "AttachToDial", "DetachFromDial", "RemoveSetAside", "AttachSourceTo", "GuardWith", "HealAmong", "ChooseAttackers", "QuestProgressFirst"], run };

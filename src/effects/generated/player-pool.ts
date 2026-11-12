@@ -89,8 +89,6 @@ export const POOL_GENERATED_EFFECTS: readonly Effect[] = [
   {"id":"144010:constant:1","cardCode":"144010","lines":["144010:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"hero","trait":"Rohan"}}]},
   {"id":"145010:constant:1","cardCode":"145010","lines":["145010:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"hero","trait":"Rohan"}}]},
   {"id":"145011:constant:1","cardCode":"145011","lines":["145011:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"hero","trait":"Gondor"}}]},
-  {"id":"145013:constant:1","cardCode":"145013","lines":["145013:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"character","name":"Aragorn"}}]},
-  {"id":"146002:triggered:1","cardCode":"146002","lines":["146002:A:3"],"timing":"triggered","trigger":"leftPlay","subject":"self","instructions":[{"verb":"LoseGame"}]},
   {"id":"146011:constant:1","cardCode":"146011","lines":["146011:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"hero","trait":"Rohan"}}]},
   {"id":"16010:constant:1","cardCode":"16010","lines":["16010:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"hero","trait":"Dwarf"}}]},
   {"id":"16011:constant:1","cardCode":"16011","lines":["16011:A:1"],"timing":"constant","instructions":[{"verb":"AttachesTo","host":{"kind":"hero","trait":"Silvan"}}]},

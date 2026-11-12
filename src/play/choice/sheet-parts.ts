@@ -42,6 +42,17 @@ export function captiveLabel(game: ScenarioState, ctx: ReduceContext, names: She
   return `${names.card(id)} · Captive · ${damage}${card.owner != null && owners.size > 1 ? ` · Player ${card.owner + 1}` : ""}`;
 }
 
+/**
+ * The row of an ally lying in the staging area under nobody's control in a pick (Retreat from Osgiliath's damage among them, 145074:B:3): "Gimli · Player 2's ally", the owner named when the options hold the allies of more than one player.
+ * Undefined for any other row.
+ */
+export function stagedAllyLabel(game: ScenarioState, ctx: ReduceContext, names: SheetNames, id: string, options: readonly string[]): string | undefined {
+  const card = game.cards[id];
+  if (card?.zone !== "staging" || card.controller != null || card.owner == null || printedOf(ctx.cards, card.code).type !== "ally") return undefined;
+  const owners = new Set(options.map((other) => game.cards[other]?.owner).filter((owner) => owner != null));
+  return owners.size > 1 ? `${names.card(id)} · Player ${card.owner + 1}'s ally` : undefined;
+}
+
 export function option(game: ScenarioState, names: SheetNames, id: string): SheetOption {
   if (id.startsWith("seat:")) return { id, label: `Player ${Number(id.slice(5)) + 1}`, code: null };
   // The staging area, where a Trap or a Guarded attachment is played (src/rules/families/attachments/play.ts).

@@ -3,6 +3,7 @@ import { familyCondition } from "./family-hooks.ts";
 import { outOfPlayCopies, searchable } from "./search.ts";
 import { locationThreatHolds } from "../families/grapple/values.ts";
 import { islandHolds } from "../families/island/pick.ts";
+import { DIRE_VALOUR_SHIFT } from "../families/black-gate/dire.ts";
 import type { Condition } from "../../catalog/boundary.ts";
 
 import { resolveAmount, type AmountScope } from "./amounts.ts";
@@ -87,6 +88,8 @@ function conditionCard(state: ScenarioState, card: Extract<Condition, { kind: "m
       return state.activeLocation;
     case "picked":
       return scope.picked?.at(-1) || null;
+    case "previous":
+      return scope.picked?.at(-2) || null;
     case "attacker":
       return state.pendingAttack?.enemyId ?? state.pendingStrike?.enemyId ?? null;
     case "defender":
@@ -101,9 +104,9 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
   const familial = familyCondition(state, condition, scope, ctx);
   if (familial !== null) return familial;
   switch (condition.kind) {
-    // A family's condition hook answers these before this switch (south: noneDiscarded; wilderland: the campaign log, the Caves deck, the quest deck, Discover, the Fate of Wilderland's); the cases only complete the switch.
+    // A family's condition hook answers these before this switch (south: noneDiscarded; black-gate: embassy; wilderland: the campaign log, the Caves deck, the quest deck, Discover, the Fate of Wilderland's); the cases only complete the switch.
     case "noneDiscarded": case "logged": case "treasuresLogged": case "beldisBox": case "cavesDeck": case "pileHas": case "facedownUnder": case "questDeck": case "soleAttacker": case "captives":
-    case "attackedThisPhase": case "namedFlag": case "discoverUnavailable": case "encounterPlacedOnStage": case "playerUnengaged": case "hasWizardry":
+    case "attackedThisPhase": case "namedFlag": case "discoverUnavailable": case "encounterPlacedOnStage": case "playerUnengaged": case "hasWizardry": case "onDial": case "canAttachToDial": case "embassy": case "lastFortitudeFailed": case "lastFortitudePassed": case "fortitudeFailed": case "hostControlledByActor":
       return false;
     case "hideFailed":
       return state.hideFailures.some(
@@ -218,7 +221,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return scope.explored === true;
     }
     case "canPick":
-      return pickCandidates(state, condition.pick, scope.actor, [], scope.sourceId, ctx, undefined, undefined, false, { subject: scope.subject, other: scope.other }).length > 0;
+      // A pick for the copy of the last picked card (`sameTitleAs: picked`) reads what the effect picked; every other filter asks as if nothing were picked (its `different` has nothing to leave out).
+      return pickCandidates(state, condition.pick, scope.actor, condition.pick.sameTitleAs === "picked" ? (scope.picked ?? []) : [], scope.sourceId, ctx, undefined, undefined, false, { subject: scope.subject, other: scope.other }).length > 0;
     case "handHasCard":
       return (state.seats[scope.actor]?.hand ?? []).some((id) => id !== scope.sourceId);
     case "engagedAboveThreat": {
@@ -246,7 +250,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return found === condition.is;
     }
     case "count": {
-      const found = countMatching(state, condition.pick, scope.actor, scope.sourceId, ctx);
+      const found = countMatching(state, condition.pick, scope.actor, scope.sourceId, ctx, undefined, condition.pick.sameTitleAs === "picked" ? scope.picked : undefined);
       return (condition.min == null || found >= condition.min) && (condition.max == null || found <= condition.max);
     }
     case "allMatch": {
@@ -256,7 +260,9 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     }
     case "threat": {
       const threat = seatThreat(state, scope.actor);
-      return (condition.min == null || threat >= condition.min) && (condition.max == null || threat <= condition.max);
+      // Valour's threshold is 80 while the main quest has Dire (mec113.dire): the marked bounds move up by 40.
+      const shift = condition.valour && state.dire ? DIRE_VALOUR_SHIFT : 0;
+      return (condition.min == null || threat >= condition.min + shift) && (condition.max == null || threat <= condition.max + shift);
     }
     case "matches": {
       const id = conditionCard(state, condition.card, scope);
@@ -306,6 +312,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return Object.values(state.cards).some((card) => card.zone === "campaign");
     case "upgraded":
       return state.campaignFacts?.upgraded?.includes(condition.code) === true;
+    case "campaignCopyOutside":
+      return holds(state, { kind: "campaign" }, scope, ctx) && !Object.values(state.cards).some((card) => card.code === condition.code && (inPlay(card.zone) || card.zone === "removed"));
     case "x":
       return (scope.x ?? 0) >= condition.min;
     case "discardedCost":
@@ -433,6 +441,8 @@ function grants(state: ScenarioState, id: string, ctx: ReduceContext): { trait?:
     if (lentSphere && lentSphere !== "neutral" && lentSphere !== "fellowship" && lentSphere !== "baggins") found.push({ sphere: lentSphere });
     for (const effect of effectsOf(ctx, attachment.code)) {
       if (effect.timing !== "constant") continue;
+      // Only a record that grants a trait or an icon is read here: another record's condition may itself ask for a trait (Esquire of Gondor, 145015:A:4), which would read this one again.
+      if (!effect.instructions.some((instruction) => instruction.verb === "GrantTrait" || instruction.verb === "GrantIcon")) continue;
       const scope = { actor: attachment.controller ?? state.firstPlayer, sourceId: attachment.id, returned: 0 };
       if (effect.condition && !holds(state, effect.condition, scope, ctx)) continue;
       for (const instruction of effect.instructions) {

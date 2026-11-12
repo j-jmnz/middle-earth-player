@@ -25,7 +25,8 @@ export function doRefresh(state: ScenarioState, ctx: ReduceContext, steps: Engin
   }
   let next = updateCards(state, patches);
   for (const event of readied) next = queueEvent(next, event);
-  for (const seat of livingSeats(next)) next = raiseThreat(next, seat, 1, steps, ruleCause("rr.step-7-3"));
+  // "Players do not raise their threat at the end of the refresh phase" (noRefreshThreat, 146042:A:1).
+  if (!flagged(next, "table", "noRefreshThreat")) for (const seat of livingSeats(next)) next = raiseThreat(next, seat, 1, steps, ruleCause("rr.step-7-3"));
   return withMode(passToken(next, ctx, steps), "endRound");
 }
 

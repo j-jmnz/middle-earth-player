@@ -1,4 +1,4 @@
-// Rules: rr.attachment-cards, rr.forced, rr.action, rr.exhausted, dcce.ship-objectives (data/rules/entries.json); ledger lines 12132:A:1, 12132:A:2.
+// Rules: rr.attachment-cards, rr.forced, rr.action, rr.cost, rr.exhausted, dcce.ship-objectives (data/rules/entries.json); ledger lines 12132:A:1, 12132:A:2.
 // Taking on Water: When Revealed it attaches to a Ship objective, as a Condition attachment; Forced: when the attached objective exhausts, it takes 2 damage; Action: exhaust 3 characters you control to discard it;
 // Shadow: it attaches to a defending Ship. AttachSelf to a ship (`kind: "ship"`) and the family's `attached` hook, the trigger shipExhausted and its settle sweep, each on the table of the scenario.
 import { beforeAll, describe, expect, it } from "vitest";
@@ -106,7 +106,7 @@ describe("12132:A:1 Taking on Water: Forced, when the attached objective exhaust
 
 describe("12132:A:1 Taking on Water: the Action", () => {
   const actionsOf = (made: Table, water: string) => legalIntents(made.state, made.ctx).filter((intent) => intent.type === "Trigger" && intent.cardId === water);
-  it("exhausts 3 characters the player controls to discard it, and is not offered with fewer than 3 ready", () => {
+  it("rr.cost: exhausting 3 characters the player controls is the cost (the Action is not offered with fewer than 3 ready), and discarding Taking on Water is the effect", () => {
     const base = make({ play: [CODES.dreamChaser, "ally1"] });
     const { made, water } = soaked(base, CODES.dreamChaser);
     // The Dream-chaser, the ally and two heroes: four ready characters.

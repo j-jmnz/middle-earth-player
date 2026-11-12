@@ -44,7 +44,7 @@ const herugrim = card("143010", "attachment", "tactics", 2);
 const rider = card("rider", "ally", "tactics", 2, { traits: ["Rohan"] });
 
 const CARDS = [grima, anyAlly, tacAlly, king, daleHero, daleAlly, ring, walls, smoke, pipe, lorien, silvan, meal, hobbitHero, spiritEvent, loreEvent, hope, valour, plain, sea, noldorHero, noldorAlly, beregond, sword, theoden, herugrim, rider];
-const VALOUR: Effect = { id: "valour:action:1", cardCode: "valour", lines: ["valour:A:1"], timing: "action", condition: { kind: "threat", min: 40 }, instructions: [{ verb: "Draw" }] };
+const VALOUR: Effect = { id: "valour:action:1", cardCode: "valour", lines: ["valour:A:1"], timing: "action", condition: { kind: "threat", min: 40, valour: true }, instructions: [{ verb: "Draw" }] };
 const PLAIN: Effect = { id: "plainev:action:1", cardCode: "plainev", lines: ["plainev:A:1"], timing: "action", instructions: [{ verb: "Draw" }] };
 
 function attach(state: ScenarioState, id: string, host: string): ScenarioState {

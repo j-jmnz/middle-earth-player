@@ -242,7 +242,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     },
 
     // 12132 Taking on Water: attaches to a Ship objective the first player chooses, as a Condition attachment; Forced: when the attached objective exhausts it takes 2 damage (an encounter card's damage, which a Ship's immunity to
-    // player card effects does not stop); Action (the Ship's controller): exhaust 3 characters you control to discard it. Shadow: it attaches to the defending character if that is a Ship.
+    // player card effects does not stop); Action (the Ship's controller): exhaust 3 characters you control to discard it ("to" marks the exhaust as the cost, rr.cost: the Action is offered only with 3 ready characters to pay it, and the discard is the effect; the characters are chosen, so the cost is the first instructions behind that condition, as costSchema says). Shadow: it attaches to the defending character if that is a Ship.
     { id: "12132:whenRevealed:1", cardCode: "12132", lines: ["12132:A:1"], timing: "whenRevealed", instructions: [{ verb: "AttachSelf", to: { kind: "ship" } }] },
     { id: "12132:constant:1", cardCode: "12132", lines: ["12132:A:1"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Condition" }] },
     { id: "12132:forced:1", cardCode: "12132", lines: ["12132:A:1"], timing: "forced", trigger: "shipExhausted", subject: "host", instructions: [{ verb: "DamageCard", amount: 2, target: "host" }] },

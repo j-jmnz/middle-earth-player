@@ -6,6 +6,7 @@ import { currentCause, ruleCause } from "../core/cause.ts";
 import type { EngineStep } from "../core/intents.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
 import { hideStep, pushHide } from "../quest/hide.ts";
+import { fortitudeStep } from "../families/mount-doom/fortitude.ts";
 import { encounterRaised } from "../families/quest/threat.ts";
 import { raiseThreat } from "../core/keywords.ts";
 import { queueEvent } from "./queue.ts";
@@ -15,7 +16,7 @@ import { flagged, inPlay, livingSeats, updateCard, withMode, type Frame, type Sc
 import { eventStep, fireForced } from "./triggers.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { resetEncounterDeck, shuffleEncounterDeck } from "../interpret/verbs.ts";
-import { attachTo, moveCard } from "../core/zones.ts";
+import { attachTo, moveCard, turnedUp } from "../core/zones.ts";
 import { announceEntered, noteEncounterThreat, revealSeat, revealSkipped, revealsAllowed, spendSkippedReveal, watchReveal } from "../families/encounter/reveal.ts";
 import { discardsAfterReveal } from "../families/sidequests/encounter.ts";
 import { engageWith } from "../quest/quest.ts";
@@ -38,6 +39,8 @@ export function advanceFrame(state: ScenarioState, ctx: ReduceContext, steps: En
       return revealStep(state, frame, ctx, steps);
     case "hide":
       return hideStep(state, frame, ctx, steps);
+    case "fortitude":
+      return fortitudeStep(state, frame, ctx, steps);
     case "response":
       return responseStep(state, ctx, steps);
     default:
@@ -134,7 +137,7 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
       // Into the revealing seat's own staging area once stages are separate (mec109.multiple-staging-areas).
       const engages = frame.data.engage === true && printed.type === "enemy";
       let next = engages ? engageWith(state, seat, id, steps) : moveCard(state, id, stagingDest(state, seat));
-      next = updateCard(next, id, { face: "up", controller: seat });
+      next = updateCard(next, id, { face: turnedUp(next, id), controller: seat });
       // A guard is attached to its objective as it is placed (rr.guarded); the objective may have left play since.
       if (frame.data.guards && next.cards[frame.data.guards] && inPlay(next.cards[frame.data.guards]?.zone ?? "removed")) next = updateCard(attachTo(next, id, frame.data.guards), id, { guard: true });
       steps.push({ kind: "reveal", seat, cardId: id, cause: currentCause(steps, ruleCause("mec109.saga-staging-rules")) });

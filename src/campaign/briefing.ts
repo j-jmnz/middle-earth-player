@@ -11,6 +11,7 @@ import type { StartScenario } from "../rules/setup/setup.ts";
 import { checklist, type ChecklistPlan, type ChecklistStep, type Need } from "./checklist.ts";
 import { heroBansOf, validateLoadout, type HeroBan, type LoadoutSeat, type SagaRules } from "./loadout.ts";
 import type { CampaignLog } from "./log.ts";
+import { returnOfTheKingFacts } from "./log-return-of-the-king.ts";
 import { twoTowersFacts } from "./log-two-towers.ts";
 import { isNightmarePlayable, isPlayable } from "./playable.ts";
 import { printedScenarioName } from "./printed-name.ts";
@@ -208,12 +209,13 @@ export function startFor(input: BriefingInput, seed: number): StartScenario {
     difficulty: input.difficulty,
     effects: world.effects,
     poolEncounterCards: plan.poolEncounterCards,
+    poolEncounterOwners: plan.poolEncounterOwners,
     poolIntoPlay: plan.poolIntoPlay,
     removedFromEncounter: plan.removedFromEncounter,
     removedFromCaves: plan.removedFromCaves,
     ...(input.modeCard ? { modeCard: input.modeCard } : {}),
     // The log's structured facts (the pool as the checklist leaves it, with the cards the campaign card's Setup added); a Dream-chaser log adds its scalable cards' levels and its upgraded cards (buildStart adds the Hard/Expert card in play).
-    facts: { prisoner: input.log.prisoner, usedOnce: input.log.usedOnce, counters: input.log.counters, ...xpFacts(input.log), ...wilderlandFacts(plan.log, world.campaign.id), ...twoTowersFacts(plan.log, world.campaign.id, world.cards) },
+    facts: { prisoner: input.log.prisoner, usedOnce: input.log.usedOnce, counters: input.log.counters, ...xpFacts(input.log), ...wilderlandFacts(plan.log, world.campaign.id), ...twoTowersFacts(plan.log, world.campaign.id, world.cards), ...returnOfTheKingFacts(plan.log, world.campaign.id) },
   });
 }
 

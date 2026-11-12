@@ -7,7 +7,7 @@ import type { EngineStep } from "../../src/rules/core/intents.ts";
 import type { PlayerIntent } from "../../src/rules/engine/reduce.ts";
 
 import type { Act, Done, Row } from "./card-spec-types.ts";
-import { fightEnemy, finish, first, idOf, legalIntents, opening, resolveRecords, revealFromTop, send, start as begin, tableFromLayout, type Layout, type LayoutTable, type Run, type ScenePhase } from "./scene-kit.ts";
+import { fightEnemy, finish, first, idOf, legalIntents, opening, resolveRecords, revealFromTop, secondSeatHero, send, start as begin, tableFromLayout, type Layout, type LayoutTable, type Run, type ScenePhase } from "./scene-kit.ts";
 
 // Test helper. Plays the actions of a card-spec row (card-spec-types.ts, Act) on a table built from its layout: each action is the scene kit's helper for it (`resolveRecords`, `revealFromTop`, `fightEnemy`, `send` of an
 // intent from `legalIntents`). Rules: rr.forced, rr.response, rr.reveal, rr.cancel, rr.travel (data/rules/entries.json).
@@ -26,13 +26,20 @@ function picker(queue: string[], lenient: boolean): (state: ScenarioState) => st
   };
 }
 
+// The hero an undefended attack lands on: a hero of the seat attacked (a second seat has its own hero), else the first hero, or the second when the first has gone.
+function undefendedHero(state: ScenarioState, table: LayoutTable): string {
+  const other = secondSeatHero(state);
+  if (other != null) return other;
+  return state.cards[table.hero]?.zone === "heroes" ? table.hero : table.hero2;
+}
+
 // Plays the first window that asks for nothing until `done`: the passes, the declines and the defenses nobody makes.
 function passOn(run: Run, table: LayoutTable, done: (state: ScenarioState) => boolean, pick: (state: ScenarioState) => string): Run {
   let current = run;
   for (let guard = 0; guard < 400 && !done(current.state) && !current.state.lost && !current.state.stageCleared; guard += 1) {
     const window = current.state.window;
     if (window?.kind === "choose" || window?.kind === "look") current = finish(current, table.ctx, pick);
-    else if (window?.kind === "defense") current = send(current, { type: "Undefended", heroId: current.state.cards[table.hero]?.zone === "heroes" ? table.hero : table.hero2 }, table.ctx);
+    else if (window?.kind === "defense") current = send(current, { type: "Undefended", heroId: undefendedHero(current.state, table) }, table.ctx);
     else if (window?.kind === "chooseEnemy") current = send(current, { type: "ChooseEnemy", enemyId: window.options[0] ?? "" }, table.ctx);
     else {
       const next = legalIntents(current.state, table.ctx).find((intent) => intent.type === "Pass" || intent.type === "DeclineAttack" || intent.type === "DeclineEngage" || intent.type === "DeclineTravel");
@@ -133,6 +140,16 @@ function perform(done: Done, act: Act, next: Act | undefined, picks: string[], s
       if (lenient && !run.state.window.options.includes(act.id)) return run;
       return finish(send(run, { type: "Choose", optionId: act.id }, table.ctx), table.ctx, pick);
     }
+    case "commit": {
+      if (run.state.window?.kind !== "fortitudeCommit") {
+        // Without the row's records no test is made: the commit is skipped, and the expectation says whether the row held.
+        if (lenient) return run;
+        throw new Error(`commit(${act.heroes.join(", ")}) with no Fortitude test waiting (window ${run.state.window?.kind ?? "none"})`);
+      }
+      let sent = send(run, { type: "CommitFortitude", cardIds: act.heroes.map((code) => idOf(run.state, code)) }, table.ctx);
+      for (let guard = 0; guard < 20 && sent.state.window?.kind === "frameAction" && topFrame(sent.state)?.frame === "fortitude"; guard += 1) sent = send(sent, { type: "Pass" }, table.ctx);
+      return finish(sent, table.ctx, pick);
+    }
     case "respond":
       return playResponse(done, act.code, pick, lenient);
     case "cancel":
@@ -171,7 +188,7 @@ export function play(scenarioId: string, row: Row, effects: readonly Effect[], l
     const picks = takeAnswers();
     const engaged = [...(layout.engaged ?? []), ...((layout.engaged ?? []).some((item) => (typeof item === "string" ? item : item.code) === firstAct.enemy) ? [] : [{ code: firstAct.enemy, seat: 0 }])];
     const dealt = firstAct.shadow ? { deck: [firstAct.shadow, ...(layout.deck ?? ["f0", "f0", "f0"])] } : {};
-    const options = { undefended: firstAct.undefended === true, pick: picker(picks, lenient), ...(defender ? { defender: (made: LayoutTable) => idOf(made.state, defender) } : {}) };
+    const options = { undefended: firstAct.undefended === true, ...(firstAct.lands ? { lands: firstAct.lands } : {}), pick: picker(picks, lenient), ...(defender ? { defender: (made: LayoutTable) => idOf(made.state, defender) } : {}) };
     const fought = fightEnemy(build, firstAct.shadow ?? "f0", firstAct.enemy, { ...layout, engaged, ...dealt }, options);
     done = { run: fought.run, table: fought.made, during: fought.during };
   } else {

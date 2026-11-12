@@ -23,6 +23,7 @@ import { countTop, discardUntil, effectData, encounterCard, lookAtTop, moveEncou
 import { answeredRaise } from "./reveal.ts";
 import { searchCollection } from "./collection.ts";
 import { queueFront } from "../play/refs.ts";
+import { freeSlot } from "../south/locations.ts";
 
 const WATCH_STATS = { threatZero: "watchThreatZero", damage: "watchDamage", discard: "watchDiscard", readyHost: "watchReadyHost" } as const;
 
@@ -82,6 +83,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return addTableModifier(state, { stat: WATCH_STATS[instruction.effect], amount: instruction.amount ?? 1, until: instruction.until, seat: focus.seat, ...when }, focus);
     }
     case "TravelTo": {
+      if (instruction.unlessActive === true && freeSlot(state) == null) return state;
       const id = refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId));
       return id ? travelThere(state, id, ctx, steps) : state;
     }

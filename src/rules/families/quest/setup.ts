@@ -16,6 +16,7 @@ import type { ScenarioState } from "../../core/state.ts";
 // first player attach a card to a hero (41004:A:1, AttachSetAside: the Cave Torch), or has each player choose a ship (PrepareFleet), or prepares the Uncharted deck (PrepareUnchartedDeck) or the Grotto deck (PrepareGrottoDeck): the Setup the piles cannot place.
 // A Setup that searches the encounter deck for each player (142040:A:1, "each player adds 1 different location") or puts damage tokens on a
 // card (PlaceDamageOn) is run here too.
+// A Choose whose option holds a verb that runs at the top level runs it too (145073:A:1: the first player may attach a set aside Esquire).
 // Which verbs do it is on their schema entries (`setupRuns`, src/catalog/verb-flags.ts): a verb run at the top level, or one inside a top-level ForEachPlayer or Each.
 export function revealsPerPlayer(effect: Effect): boolean {
   if (effect.timing !== "setup") return false;
@@ -28,7 +29,7 @@ export function revealsPerPlayer(effect: Effect): boolean {
       top.has(instruction.verb) ||
       (instruction.verb === "ForEachPlayer" && instruction.instructions.some((inner) => inForEachPlayer.has(inner.verb))) ||
       (instruction.verb === "Each" && instruction.instructions.some((inner) => inEach.has(inner.verb))) ||
-      (instruction.verb === "Choose" && instruction.options.some((option) => option.instructions.some((inner) => inChoose.has(inner.verb)))),
+      (instruction.verb === "Choose" && instruction.options.some((option) => option.instructions.some((inner) => inChoose.has(inner.verb) || top.has(inner.verb)))),
   );
 }
 

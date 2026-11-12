@@ -71,7 +71,7 @@ export function attachSearched(state: ScenarioState, instruction: Verb<"AttachSe
   const candidates = [...state.encounterDeck, ...state.encounterDiscard].filter((id) => {
     const card = state.cards[id];
     const printed = card ? printedOf(ctx.cards, card.code) : null;
-    if (!card || !printed || printed.type !== instruction.type || !printed.traits.includes(instruction.trait) || carried.has(card.code) || titles.has(printed.name)) return false;
+    if (!card || !printed || printed.type !== instruction.type || !printed.traits.includes(instruction.trait) || (instruction.name != null && printed.name !== instruction.name) || carried.has(card.code) || titles.has(printed.name)) return false;
     titles.add(printed.name);
     return true;
   });
@@ -109,10 +109,10 @@ export function guardWithDeckTop(state: ScenarioState, focus: Focus): ScenarioSt
 
 /**
  * The settle sweep for ReturnGuardedToHand ("When Hobgoblin leaves play, return the card it was guarding to its owner's hand"): a card held under an enemy that is no longer in play returns to its owner's hand. Only a game whose records hold a card
- * (a card of the game has a record with the verb) looks.
+ * (a card of the game has a record with GuardWithDeckTop, or GuardWithSetAside for the boons Shagrat guards, 146069:B:1) looks.
  */
 export function returnHeld(state: ScenarioState, ctx: ReduceContext): ScenarioState {
-  if (!gameReads(state, ctx, '"GuardWithDeckTop"')) return state;
+  if (!gameReads(state, ctx, '"GuardWithDeckTop"') && !gameReads(state, ctx, '"GuardWithSetAside"')) return state;
   let next = state;
   for (const card of Object.values(state.cards)) {
     if (card.held !== true) continue;
@@ -120,7 +120,8 @@ export function returnHeld(state: ScenarioState, ctx: ReduceContext): ScenarioSt
     const host = card.zone === "under" && card.host ? state.cards[card.host] : undefined;
     if (card.zone === "under" && host && inPlay(host.zone)) continue;
     const owner = card.zone === "discard" ? state.seats.findIndex((seat) => seat.discard.includes(card.id)) : (card.owner ?? card.controller ?? -1);
-    if (owner >= 0 && (card.zone === "discard" || card.zone === "under")) next = updateCard(moveCard(next, card.id, { zone: "hand", seat: owner }), card.id, { owner: undefined, face: "up", held: undefined });
+    // A boon guarded on Shagrat lands in the encounter discard pile when he leaves play (nobody controls it); its owner is kept on it.
+    if (owner >= 0 && (card.zone === "discard" || card.zone === "under" || card.zone === "encounterDiscard")) next = updateCard(moveCard(next, card.id, { zone: "hand", seat: owner }), card.id, { owner: undefined, face: "up", held: undefined });
   }
   return next;
 }

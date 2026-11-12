@@ -1,5 +1,5 @@
-// Rules: mec109.setting-up-the-game, mec112.setting-up-the-game, mec112.aragorn, mec112.fellowship-sphere-heroes,
-// mec112.saruman-grima-smeagol, mec112.campaign-mode-aragorn (data/rules/entries.json). Who the first player takes control of at
+// Rules: mec109.setting-up-the-game, mec112.setting-up-the-game, mec113.setting-up-the-game, mec112.aragorn, mec113.aragorn, mec112.fellowship-sphere-heroes,
+// mec112.saruman-grima-smeagol, mec112.campaign-mode-aragorn, mec113.campaign-mode-ring-bearer (data/rules/entries.json). Who the first player takes control of at
 // the start of a saga scenario, and the title bans of the box. Pure.
 import type { CampaignData, ScenarioData } from "../catalog/scenario-data.ts";
 
@@ -40,10 +40,24 @@ const NO_FRODO: TitleBan = { title: "Frodo Baggins", types: null, rule: "mec112.
 /** The campaign whose log keeps the Two Towers columns and whose box bans the titles above (data/campaigns/the-two-towers.json). */
 export const TWO_TOWERS_CAMPAIGN = "the-two-towers";
 
+/** The saga's third box (data/campaigns/the-return-of-the-king.json): it reads the Two Towers columns of the log, and adds its own notes. */
+export const RETURN_OF_THE_KING_CAMPAIGN = "the-return-of-the-king";
+
+// "When playing the scenarios that feature Aragorn as a Fellowship hero in campaign mode, players cannot use any card that shares a title with the Ring-bearer of the campaign" (mec113.campaign-mode-ring-bearer). The Ring-bearer is
+// Frodo Baggins, the one Fellowship hero with the trait, so the ban is the Two Towers' (docs/brief.md, The Return of the King). The box bans no other title.
+const NO_RING_BEARER: TitleBan = { title: "Frodo Baggins", types: null, rule: "mec113.campaign-mode-ring-bearer" };
+
 /** The titles the players cannot use in this scenario of this campaign. */
 export function titleBansOf(campaign: Pick<CampaignData, "id">, scenario: Pick<ScenarioData, "sagaStart">): readonly TitleBan[] {
+  const grantsHero = scenario.sagaStart != null && "hero" in scenario.sagaStart;
+  if (campaign.id === RETURN_OF_THE_KING_CAMPAIGN) return grantsHero ? [NO_RING_BEARER] : [];
   if (campaign.id !== TWO_TOWERS_CAMPAIGN) return [];
-  return scenario.sagaStart && "hero" in scenario.sagaStart ? [...TWO_TOWERS_BANS, NO_FRODO] : TWO_TOWERS_BANS;
+  return grantsHero ? [...TWO_TOWERS_BANS, NO_FRODO] : TWO_TOWERS_BANS;
+}
+
+/** Whether the campaign is one of the saga's later boxes, whose log keeps the Two Towers columns (the per-seat threat penalty, the enemies under The Black Gate) and the heroes of the Fellowship sphere. */
+export function keepsSagaColumns(campaign: Pick<CampaignData, "id">): boolean {
+  return campaign.id === TWO_TOWERS_CAMPAIGN || campaign.id === RETURN_OF_THE_KING_CAMPAIGN;
 }
 
 /** A card title compared without case or accents, as the printed names of the bans are ("Gríma" and "Grima" are one title). */

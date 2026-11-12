@@ -1,0 +1,26 @@
+appId: com.middleearth.lcg
+---
+# Written in a cloud session: it has not run. Needs no PDF (like booklet.yaml): the reader opens empty with the book's name.
+# The Return of the King campaign rulebook (MEC113) is the eighth book on the Rules tab, and the one the Return of the King campaign opens.
+- launchApp:
+    clearState: true
+- tapOn:
+    id: rules-tab
+- assertVisible:
+    id: rules
+- scrollUntilVisible:
+    element:
+      id: booklet-open-the-return-of-the-king
+- tapOn:
+    id: booklet-open-the-return-of-the-king
+- extendedWaitUntil:
+    visible:
+      id: booklet-empty
+    timeout: 15000
+- assertVisible:
+    id: booklet-name
+- assertVisible: "The Return of the King campaign rulebook"
+- tapOn:
+    id: booklet-close
+- assertVisible:
+    id: rules

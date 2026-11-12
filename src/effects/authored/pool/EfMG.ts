@@ -4,7 +4,7 @@ import type { Effect } from "../../../catalog/boundary.ts";
 // produces replaces the generated record; list it in REPLACES.
 export const RECORDS: readonly Effect[] = [
   // 10029 Veteran of Osgiliath
-  {"id":"10029:constant:1","cardCode":"10029","lines":["10029:A:1"],"timing":"constant","condition":{"kind":"threat","min":40},"instructions":[{"verb":"ModifyStat","stat":"willpower","amount":1,"until":"whileSourceInPlay"},{"verb":"ModifyStat","stat":"attack","amount":1,"until":"whileSourceInPlay"},{"verb":"ModifyStat","stat":"defense","amount":1,"until":"whileSourceInPlay"}]},
+  {"id":"10029:constant:1","cardCode":"10029","lines":["10029:A:1"],"timing":"constant","condition":{"kind":"threat","min":40,"valour":true},"instructions":[{"verb":"ModifyStat","stat":"willpower","amount":1,"until":"whileSourceInPlay"},{"verb":"ModifyStat","stat":"attack","amount":1,"until":"whileSourceInPlay"},{"verb":"ModifyStat","stat":"defense","amount":1,"until":"whileSourceInPlay"}]},
   // 10031 Derndingle Warrior (line 1 is Sentinel). The granted Action is usable while it defends, once per attack.
   {"id":"10031:constant:1","cardCode":"10031","lines":["10031:A:2"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotHaveRestricted","amount":1,"until":"whileSourceInPlay"}]},
   {"id":"10031:constant:2","cardCode":"10031","lines":["10031:A:3"],"timing":"constant","instructions":[{"verb":"EntersPlayExhausted"}]},

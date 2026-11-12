@@ -9,11 +9,21 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { effectsOf } from "../../windows/listen.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { topFrame } from "../../windows/windows.ts";
+import { printedOf } from "../../core/printed.ts";
+import { tiedExtreme } from "../../interpret/tied-extreme.ts";
 import { threatCostOf } from "./stats.ts";
 
 const VALOUR = new WeakMap<readonly unknown[], Map<string, boolean>>();
 
-// A card with a Valour ability: one of its records asks for a threat of 40 or more (a Valour Action or Response).
+// A record asks for the Valour threshold: a `threat` condition marked `valour` with a minimum, in the record's condition or inside an instruction (PlayOnlyIf).
+function asksValour(value: unknown): boolean {
+  if (value == null || typeof value !== "object") return false;
+  const fields = value as Record<string, unknown>;
+  if (fields.kind === "threat" && fields.valour === true && typeof fields.min === "number") return true;
+  return Object.values(fields).some(asksValour);
+}
+
+// A card with a Valour ability: one of its records asks for the Valour threshold (`valour` on a `threat` condition: a Valour Action or Response).
 export function hasValour(ctx: ReduceContext, code: string): boolean {
   let known = VALOUR.get(ctx.effects);
   if (!known) {
@@ -22,9 +32,17 @@ export function hasValour(ctx: ReduceContext, code: string): boolean {
   }
   const cached = known.get(code);
   if (cached != null) return cached;
-  const found = effectsOf(ctx, code).some((effect) => /"kind":"threat","min":40[,}]/.test(JSON.stringify(effect)));
+  const found = effectsOf(ctx, code).some((effect) => asksValour(effect));
   known.set(code, found);
   return found;
+}
+
+// "The highest cost attachment you control" (145041:A:1): of the cards that matched, those with the highest printed cost, one with no printed cost counting as 0; every one when tied, and the chooser decides.
+export function highestCost(state: ScenarioState, found: readonly string[], ctx: ReduceContext): string[] {
+  return found.length === 0 ? [] : tiedExtreme(found, (id) => {
+    const card = state.cards[id];
+    return card ? (printedOf(ctx.cards, card.code).cost ?? 0) : 0;
+  }, "highest");
 }
 
 export function costsPickMatches(state: ScenarioState, id: string, spec: PickSpec, picked: readonly string[] | undefined, ctx: ReduceContext): boolean {

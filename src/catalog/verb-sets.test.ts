@@ -12,17 +12,17 @@ describe("verb flags", () => {
 
   it("mark exactly the verbs that make a quest card's Setup run", () => {
     expect(sorted(setupRunVerbs("top"))).toEqual(["AttachSetAside", "DiscardUntilAflame", "DiscardUntilEnemies", "PlaceDamageOn", "PrepareFleet", "PrepareGrottoDeck", "PrepareIslandMap", "PrepareUnchartedDeck", "ShufflePile", "TakeControlOfSetAside", "TakeLoggedCaptives"]);
-    expect(sorted(setupRunVerbs("inForEachPlayer"))).toEqual(["RevealEncounter", "SearchMove"]);
+    expect(sorted(setupRunVerbs("inForEachPlayer"))).toEqual(["AttachToDial", "RevealEncounter", "SearchMove"]);
     expect(sorted(setupRunVerbs("inChoose"))).toEqual(["ShuffleCopyIntoEachDeck"]);
     expect(sorted(setupRunVerbs("inEach"))).toEqual(["GuardObjective"]);
   });
 
   it("mark exactly the verbs the start deals in Setup", () => {
-    expect(sorted(setupRoleVerbs("dealt"))).toEqual(["AddToStaging", "AddToStagingWithResources", "AttachToRingBearer", "PutObjectiveAllyIntoPlay", "SetAside", "SetAsideEachPlayer"]);
+    expect(sorted(setupRoleVerbs("dealt"))).toEqual(["AddToStaging", "AddToStagingWithResources", "AttachToRingBearer", "PlaceTokensOnCampaignCard", "PutObjectiveAllyIntoPlay", "SetAside", "SetAsideEachPlayer", "SetAsideHeroWithAttachments", "SetAsideLogged"]);
   });
 
   it("mark exactly the verbs the start resolves after the quest card's Setup", () => {
-    expect(sorted(setupRoleVerbs("afterSetup"))).toEqual(["AttachSetAsideTo", "FitShips", "FlipSetAside", "FlipStormcaller", "PlaceSecrets", "PutSetAsideInPlay", "PutTrust", "RaiseThreatToAttach", "SearchGuardForTreasure", "ShuffleIntoPile", "TradeDamageForThreat", "TradeShipDamage"]);
+    expect(sorted(setupRoleVerbs("afterSetup"))).toEqual(["AttachSetAsideTo", "AttachToHeroWith", "FitShips", "FlipSetAside", "FlipStormcaller", "PlaceSecrets", "PutSetAsideInPlay", "PutTrust", "RaiseThreatToAttach", "SearchGuardForTreasure", "ShuffleIntoPile", "TradeDamageForThreat", "TradeShipDamage"]);
   });
 
   it("mark exactly the verbs that reach into the collection", () => {

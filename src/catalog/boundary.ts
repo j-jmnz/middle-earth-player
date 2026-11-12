@@ -73,9 +73,15 @@ export const printedKeywordsSchema = z.strictObject({
   aflame: z.number().int().positive().optional(),
   // Grapple (highest or lowest printed Threat or quest points) on an enemy (dcce.grapple): the staging-area location it attaches to, facedown, when it is revealed (src/rules/families/grapple/).
   grapple: z.enum(["highestThreat", "lowestThreat", "highestQuestPoints", "lowestQuestPoints"]).optional(),
+  // Phantom on an enemy (mec113.phantom): the damage its attack would deal is canceled and the defending player raises their threat by that much (src/rules/families/grey-company/).
+  phantom: z.boolean().optional(),
+  // Dire on a quest card (mec113.dire): while the main quest has it, each player's elimination level is 99, non-boon player card effects lower a player's threat by at most 1 each round and Valour triggers at 80 threat (src/rules/families/black-gate/dire.ts).
+  dire: z.boolean().optional(),
   // Not a keyword but a printed mark, kept here with the rule flags: the Sailing success symbols an encounter card prints in the bottom left
   // corner of its text box, read from the scan into the ledger (dcce.sailing-tests). Absent when the card prints none.
   sailingSuccess: z.number().int().positive().optional(),
+  // Also a printed mark: the Sauron's Eye icons an encounter card prints in the bottom left corner of its text box, which a Fortitude test counts when the card is discarded for it (mec113.fortitude-tests, src/rules/families/mount-doom/). Absent when the card prints none.
+  eyeIcons: z.number().int().positive().optional(),
   // Not a keyword either: the location prints X for its quest points (`quest` stays null), and a constant record sets them (Hills of Wilderland, Underground Lake): the engine lets it take progress and be explored.
   questPointsX: z.boolean().optional(),
 });

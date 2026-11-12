@@ -1,0 +1,12 @@
+appId: com.middleearth.lcg
+tags:
+  - scenario
+---
+# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `company-lost` (scripts/e2e/the-passing-of-the-grey-company.ts): a real two-handed game of The Passing of the Grey Company (the Defenders
+# of Gondor and Swords of the Noldor lists, Easy), parked on its loss (a threat of 50 sends a player out, and Aragorn leaving play loses the game for the players: Aragorn's player is eliminated first).
+# A loss writes nothing, so the subflow's own assertions on the log screen are all it checks (docs/handover/agent-brief.md, Scenario procedure).
+- runFlow:
+    file: ../../subflows/scenario-loss.yaml
+    env:
+      FIXTURE: company-lost
+      SCENARIO_ID: the-passing-of-the-grey-company

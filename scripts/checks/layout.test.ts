@@ -10,8 +10,8 @@ import { ROOT, tracked } from "./tracked.ts";
 
 // More source files than this in one folder (tests aside) and it wants subfolders.
 const MOST_FILES = 40;
-// Folders that are a list by design: one record file per product pack, named by its pack code.
-const LISTS = new Set(["src/effects/authored/pool"]);
+// Folders that are a list by design: one record file per product pack, named by its pack code; one vocabulary file per mechanic family, named as its folder in src/rules/families.
+const LISTS = new Set(["src/effects/authored/pool", "src/catalog/families"]);
 
 function folders(dir: string): string[] {
   return readdirSync(path.join(ROOT, dir)).filter((name) => statSync(path.join(ROOT, dir, name)).isDirectory()).sort();

@@ -79,7 +79,7 @@ describe("Response events (rr.response, rr.resource-match)", () => {
   });
 
   it("are not offered without a resource match, even at 0 cost, nor when their play restriction fails", () => {
-    const blocked: Effect = { id: "answer:constant:1", cardCode: "answer", lines: ["answer:A:1"], timing: "constant", instructions: [{ verb: "PlayOnlyIf", condition: { kind: "threat", min: 40 } }] };
+    const blocked: Effect = { id: "answer:constant:1", cardCode: "answer", lines: ["answer:A:1"], timing: "constant", instructions: [{ verb: "PlayOnlyIf", condition: { kind: "threat", min: 40, valour: true } }] };
     for (const [heroes, effects, offered] of [
       [["tac"], [answerRecord()], false],
       [["lore"], [answerRecord()], true],

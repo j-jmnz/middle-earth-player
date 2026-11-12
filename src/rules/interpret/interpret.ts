@@ -21,7 +21,7 @@ import { flagged, heldAmount, updateCard } from "../core/state.ts";
 import { raiseFor, refillEncounterDeck, runExtraVerb } from "./verbs.ts";
 import { readyNamedCard } from "./restrictions.ts";
 import { withFrame } from "../windows/windows.ts";
-import { moveCard } from "../core/zones.ts";
+import { moveCard, turnedUp } from "../core/zones.ts";
 import { shadowFace } from "../families/defense/shadow.ts";
 import { drawCards } from "../families/dungeon/deck.ts";
 import { withView } from "../families/breaking/areas.ts";
@@ -29,6 +29,7 @@ import { isBreakingVerb } from "../families/breaking/index.ts";
 import { announceDraw } from "../families/dreamchaser/index.ts";
 import { announceEnteredHand } from "../families/island/hand.ts";
 import { playerSource } from "../families/quest/threat.ts";
+import { announceSetupActive } from "../families/quest/places.ts";
 
 export type ReduceContext = {
   effects: readonly Effect[];
@@ -42,7 +43,7 @@ export function addToStaging(state: ScenarioState, id: string): ScenarioState {
   const instance = state.cards[id];
   if (!instance) return state;
   const moved = moveCard(state, id, { zone: "staging" });
-  return updateCard(moved, id, { face: "up" });
+  return updateCard(moved, id, { face: turnedUp(moved, id) });
 }
 
 export function runEffects(
@@ -152,8 +153,9 @@ function runTwinned(state: ScenarioState, instruction: Instruction, focus: Focus
       return focus.sourceId
         ? updateCard(state, focus.sourceId, { committed: true, exhausted: true })
         : state;
-    case "AddToStaging":
     case "MakeActiveLocation":
+      return announceSetupActive(runSetupVerb(state, instruction, ctx, focus.sourceId), ctx, steps);
+    case "AddToStaging":
     case "SetAside":
     case "AttachToRingBearer":
       return runSetupVerb(state, instruction, ctx, focus.sourceId);

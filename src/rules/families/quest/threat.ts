@@ -18,6 +18,7 @@ import { queueEvent } from "../../windows/queue.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { flagged, heldAmount, heldLeast, inPlay, livingSeats } from "../../core/state.ts";
 import { heard, queueHeard } from "./events.ts";
+import { DIRE_REDUCTION_CAP, isBoon } from "../black-gate/dire.ts";
 
 const QUEST_FAILURE: Cause = ruleCause("rr.step-3-4");
 
@@ -36,12 +37,18 @@ export function lowerThreatByEffect(state: ScenarioState, seat: number, amount: 
   const barred = player ? heldAmount(state, `seat:${seat}`, "noThreatReduction") : 0;
   const fromContract = sourceId != null && state.cards[sourceId] != null && printedOf(ctx.cards, state.cards[sourceId]?.code ?? "").type === "contract";
   const reduced = barred === 1 || (barred > 1 && !fromContract) || heldAmount(state, `seat:${seat}`, "threatReductionBarred") > 0 ? 0 : amount;
-  const once = player && heldAmount(state, `seat:${seat}`, "threatReductionToOne") > 0 ? Math.min(reduced, 1) : reduced;
+  // "Cannot reduce his threat below his initial threat level" (145064:B:2, `threatFloor`): the reduction stops at the starting threat level; a threat already below it is not reduced further.
+  const above = heldAmount(state, `seat:${seat}`, "threatFloor") > 0 ? Math.max(0, Math.min(reduced, (state.seats[seat]?.threat ?? 0) - startingThreat(state, seat, ctx))) : reduced;
+  const once = player && heldAmount(state, `seat:${seat}`, "threatReductionToOne") > 0 ? Math.min(above, 1) : above;
   // "Cannot be reduced by more than 1 each round" (11217:A:1, dcce.hard-expert): what the round has already taken off counts.
   const roundCap = heldAmount(state, `seat:${seat}`, "threatReductionCap");
   const capped = roundCap > 0 ? Math.max(0, Math.min(once, roundCap - (state.threatLoweredBy?.[seat] ?? 0))) : once;
   // "Cannot be reduced by more than 1 via player card effects each round" (19104:A:2): only what player card effects took off counts, and only they are held to it. Copies of the card do not add up: the smallest cap holds.
-  const playerCap = player ? heldLeast(state, `seat:${seat}`, "playerThreatReductionCap") : 0;
+  // While the main quest is Dire the same cap is 1 for every non-boon player card (mec113.dire).
+  const dire = player && state.dire === true && !isBoon(state, sourceId, ctx);
+  const printedCap = player ? heldLeast(state, `seat:${seat}`, "playerThreatReductionCap") : 0;
+  const caps = [printedCap, dire ? DIRE_REDUCTION_CAP : 0].filter((cap) => cap > 0);
+  const playerCap = caps.length > 0 ? Math.min(...caps) : 0;
   const held = playerCap > 0 ? Math.max(0, Math.min(capped, playerCap - (state.playerThreatLoweredBy?.[seat] ?? 0))) : capped;
   const before = state.seats[seat]?.threat ?? 0;
   const moved = lowerThreat(state, seat, held, steps, cause);
@@ -88,7 +95,7 @@ export function encounterRaised(state: ScenarioState, seats: readonly number[], 
   return next;
 }
 
-// The starting threat level: the threat set at setup, kept when a card of the game reads it (recordStartingThreat), or else the
+// The starting threat level: the threat set at setup, kept when a card of the game reads it (recordStartingThreat: a ResetThreat, or the flag threatFloor), or else the
 // combined threat cost of the seat's heroes (rr.initial-threat-level).
 export function startingThreat(state: ScenarioState, seat: number, ctx: ReduceContext): number {
   const kept = state.startingThreat?.[seat];
@@ -104,7 +111,9 @@ export function resetThreat(state: ScenarioState, seat: number, sourceId: string
 
 // Setup: each seat's threat is its starting threat level. It is kept only when some card of the game resets threat to it.
 export function recordStartingThreat(state: ScenarioState, ctx: ReduceContext): ScenarioState {
-  const reads = Object.values(state.cards).some((card) => effectsOf(ctx, card.code).some((effect) => effect.instructions.some((instruction) => instruction.verb === "ResetThreat")));
+  const reads = Object.values(state.cards).some((card) =>
+    effectsOf(ctx, card.code).some((effect) => effect.instructions.some((instruction) => instruction.verb === "ResetThreat" || (instruction.verb === "ModifyStat" && instruction.stat === "threatFloor"))),
+  );
   return reads ? { ...state, startingThreat: state.seats.slice(0, state.seatCount).map((seat) => seat.threat) } : state;
 }
 

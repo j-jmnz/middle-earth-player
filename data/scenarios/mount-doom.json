@@ -1,0 +1,216 @@
+{
+  "id": "mount-doom",
+  "name": "Mount Doom",
+  "number": 18,
+  "stages": [
+    "146075",
+    "146076",
+    "146077",
+    "146078"
+  ],
+  "encounterSets": [
+    {
+      "name": "Mount Doom",
+      "count": 28
+    },
+    {
+      "name": "Deep Shadows",
+      "count": 8
+    }
+  ],
+  "cards": [
+    {
+      "code": "146044",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "146045",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "146046",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "146047",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "146049",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "146050",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "146051",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "146052",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "146053",
+      "normal": 4,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "146054",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "146055",
+      "normal": 4,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "146056",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "146057",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "146061",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "146062",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "146063",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "146075",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "146076",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "146077",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "146078",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "146042",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "146043",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "146044",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging",
+      "searched": true
+    },
+    {
+      "code": "146045",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging",
+      "searched": true
+    },
+    {
+      "code": "146046",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging",
+      "searched": true
+    },
+    {
+      "code": "146047",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging",
+      "searched": true
+    },
+    {
+      "code": "146048",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging",
+      "searched": true
+    },
+    {
+      "code": "146047",
+      "normal": 1,
+      "easy": 1,
+      "pile": "activeLocation"
+    }
+  ],
+  "campaignCard": "146079",
+  "campaignPlaced": [
+    "146024"
+  ],
+  "sagaStart": {
+    "ringBearer": true,
+    "attached": [
+      "146065"
+    ]
+  },
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q0C.18",
+    "dragnEasy": "E0C.18",
+    "hobSlug": "Mount-Doom"
+  }
+}

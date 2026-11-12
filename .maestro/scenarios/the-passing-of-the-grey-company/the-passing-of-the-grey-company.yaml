@@ -1,0 +1,24 @@
+appId: com.middleearth.lcg
+tags:
+  - scenario
+---
+# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `company-won` (scripts/e2e/the-passing-of-the-grey-company.ts): a real two-handed game of The Passing of the Grey Company
+# (the Defenders of Gondor and Swords of the Noldor lists, Easy; Aragorn the first player's saga hero, an Overcome by Fear on each threat dial), parked on its win (The Stone of Erech explored on stage 3B). The fixture is OPEN: scripts/e2e/fixtures.ts found
+# no win of those lists in its seeds, since their heroes' threat climbs past the elimination level before stage 3 (docs/phases/STATUS.md), so the flow cannot run until one is found.
+# The Resolution (145066) asks nothing: each Overcome by Fear on a dial joins the campaign pool for its player and the Army of the Dead boon joins it when the Army is in the victory display. The campaign has no XP. The win unlocks The Siege of Gondor,
+# whose node reads Next and the path offers Begin.
+# The stage 3B dial (`company-stone`) is gone once the Stone has left play, so the flow passes no TABLE_WIDGET.
+- runFlow:
+    file: ../../subflows/scenario-win.yaml
+    env:
+      FIXTURE: company-won
+      SCENARIO_ID: the-passing-of-the-grey-company
+      NO_XP: "true"
+# The win unlocks The Siege of Gondor, whose node reads Next and the path offers Begin (the part is playable, so no line says it is coming soon).
+- assertVisible:
+    id: node-the-siege-of-gondor-status
+    text: "Next"
+- assertVisible:
+    id: begin
+- assertNotVisible:
+    id: path-soon

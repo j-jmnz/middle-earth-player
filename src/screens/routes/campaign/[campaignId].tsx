@@ -5,6 +5,7 @@ import { useRef, useState } from "react";
 import { View } from "react-native";
 
 import { FELLOWSHIP_ID } from "../../../campaign/save";
+import { RETURN_OF_THE_KING_CAMPAIGN } from "../../../campaign/saga";
 import type { ModeCard } from "../../../campaign/xp";
 import { BriefingScreen, CampaignBanner, ModePicker } from "../../briefing/parts";
 import { campaignListQueries } from "../../campaign/list";
@@ -85,7 +86,7 @@ export default function CampaignSetup() {
       {continues.length > 0 ? (
         <View className="gap-2" testID="continue-saga">
           <Section title="Continue the saga" className="mt-4" />
-          <Text className="text-label text-muted">{"The heroes, fallen heroes, threat penalty, pool, captives and notes of a finished campaign carry on. The finished campaign is not changed."}</Text>
+          <Text className="text-label text-muted">{id === RETURN_OF_THE_KING_CAMPAIGN ? "The heroes, fallen heroes, threat penalties (each player's own included), pool, captives, notes and the enemies under The Black Gate of a finished campaign carry on. The finished campaign is not changed." : "The heroes, fallen heroes, threat penalty, pool, captives and notes of a finished campaign carry on. The finished campaign is not changed."}</Text>
           <View className="gap-2" accessibilityRole="radiogroup" accessibilityLabel={`Continue the saga in ${name}`}>
             <RadioTile selected={continuing == null} testID="continue-none" label={`Start a new saga, ${name}`} onPress={() => setContinuing(null)} className="min-h-touch justify-center rounded-item px-4 py-2">
               <Text className={continuing == null ? "text-body font-semibold text-bone" : "text-body text-muted"}>Start a new saga</Text>

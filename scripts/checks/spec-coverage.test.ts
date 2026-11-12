@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../src/catalog/boundary.ts";
 
+import { authoredRelOfScenario } from "../data/effects/authored-paths.ts";
 import { ROOT } from "./tracked.ts";
 
 // Every ledger line a scenario's records name (src/effects/authored/<id>.ts, `lines`) has a card-spec row (test/harness/card-spec.ts: `line: "<id>"`) or a test whose title starts with the line id, in the
@@ -39,7 +40,7 @@ function claimedByHeader(source: string): string[] {
 }
 
 async function recordLines(id: string): Promise<Set<string>> {
-  const file = path.join(ROOT, "src/effects/authored", `${id}.ts`);
+  const file = path.join(ROOT, "src/effects/authored", `${authoredRelOfScenario(id)}.ts`);
   if (!existsSync(file)) return new Set();
   const made = (await import(/* @vite-ignore */ file)) as { AUTHORED_EFFECTS?: readonly Effect[] };
   return new Set((made.AUTHORED_EFFECTS ?? []).flatMap((effect) => effect.lines));

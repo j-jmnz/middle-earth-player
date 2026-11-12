@@ -1,3 +1,5 @@
+import { authoredRel } from "../data/effects/authored-paths.ts";
+
 // The skeleton files `pnpm scenario new` writes (scripts/tools/scenario-new.ts). Each function returns one file's text from the plan's facts.
 // A skeleton compiles, passes lint and leaves the suite green: its golden test is a skipped suite and its campaign test one real check and some
 // todos, until the person filling it in removes the markers. Every TODO marker names what the scenario still has to say.
@@ -287,14 +289,22 @@ export function lossFlowFile(facts: Facts): string {
 `;
 }
 
-/** src/effects/authored/<id>.ts */
+/** Where the scenario's authored effect file is: src/effects/authored/<id>.ts, or in its campaign's folder (scripts/data/effects/authored-paths.ts). */
+export function authoredPath(facts: Pick<Facts, "id" | "campaignId">): string {
+  return `src/effects/authored/${authoredRel(facts.id, facts.campaignId)}.ts`;
+}
+
+/** The file at authoredPath(facts). */
 export function authoredFile(facts: Facts): string {
-  return `import type { Effect } from "../../catalog/boundary.ts";
+  const nested = authoredPath(facts).split("/").length - 4;
+  const up = "../".repeat(2 + nested);
+  const reprint = nested > 0 ? "../reprint.ts" : "./reprint.ts";
+  return `import type { Effect } from "${up}catalog/boundary.ts";
 
 // Records for ${facts.name} (${facts.campaignId} part ${facts.part}, campaign card ${facts.campaignCard}). Every line is read from the scan ledger (data/printed/); a line a template already writes (pnpm data build) or another card prints
 // word for word needs no record here. \`pnpm effects draft ${facts.id}\` writes the bundle of open lines and the effect-author agent turns it into records.
 // Rules: TODO name the rule ids the records implement (data/rules/entries.json).
-// TODO: wrap the list in withCopies(...) from ./reprint.ts when a card takes the records of another card's identical line.
+// TODO: wrap the list in withCopies(...) from ${reprint} when a card takes the records of another card's identical line.
 export const AUTHORED_EFFECTS: readonly Effect[] = [];
 
 export const AUTHORED_REPLACES: readonly string[] = [];

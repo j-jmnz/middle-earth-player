@@ -19,6 +19,7 @@ import { xpWords } from "../../../campaign/xp-view";
 import { xpUnspentOf } from "../../../campaign/xp";
 import { campaignEnd } from "../../campaign/campaign-end";
 import { bookletParams, campaignOf, scenarioNames, scenarioOf } from "../../data/campaign-data";
+import { scenarioEndsInDefeat } from "../../data/scenario-ends";
 import { cardNames } from "../../data/card-names";
 import { useDatabases } from "../../data/databases";
 import { usePalette } from "../../kit/palette-hook";
@@ -89,7 +90,7 @@ export default function CampaignPath() {
   const preview = useListPreview();
 
   const campaign = save ? campaignOf(save.campaignId) : null;
-  const nodes = useMemo(() => (save && campaign ? campaignPath(campaign, scenarioNames(campaign), save.log) : []), [save, campaign]);
+  const nodes = useMemo(() => (save && campaign ? campaignPath(campaign, scenarioNames(campaign), save.log, scenarioEndsInDefeat) : []), [save, campaign]);
   const stageNames = useMemo(() => cardNames(catalog, campaign ? campaign.scenarios.flatMap((id) => scenarioOf(id)?.stages ?? []) : []), [catalog, campaign]);
   const names = useMemo(() => {
     if (!save) return new Map<string, string>();
@@ -130,7 +131,7 @@ export default function CampaignPath() {
   const waiting = kept.length > 0 ? carryWords(kept, name) : null;
   // The campaign's end: "Ered Mithrin won. The players win the campaign!", the line the last campaign card prints.
   const lastId = nodes.at(-1)?.id;
-  const end = complete ? campaignEnd(campaign, lastId ? (scenarioOf(lastId)?.campaignCard ?? null) : null) : null;
+  const end = complete ? campaignEnd(campaign, lastId ? (scenarioOf(lastId)?.campaignCard ?? null) : null, save.log.campaignEnd) : null;
 
   const navBar = (
     <NavBar
@@ -226,7 +227,7 @@ export default function CampaignPath() {
     if (complete) {
       return (
         <View>
-          <Label testID="path-complete" className="mb-2.5 text-center">
+          <Label testID="path-complete" tone={end?.tone === "danger" ? "danger" : "muted"} className="mb-2.5 text-center">
             {end?.won ?? `${campaign.name} won.`}
           </Label>
           {waiting ? (

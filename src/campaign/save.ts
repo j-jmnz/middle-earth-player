@@ -3,6 +3,7 @@
 import { z } from "zod";
 
 import { ALLY_LINES, BELDIS_BOXES } from "../catalog/ally-lines.ts";
+import { CAMPAIGN_ENDS } from "../catalog/campaign-record.ts";
 import { DIFFICULTIES, type Difficulty } from "../catalog/scenario-data.ts";
 import type { PlayerIntent } from "../rules/core/intents.ts";
 
@@ -61,6 +62,11 @@ export const campaignLogSchema = z.strictObject({
   marshesChoice: z.array(z.enum(MARSHES_CHOICES).nullable()).default([]),
   blackGate: z.record(z.string(), z.number().int().positive()).default({}),
   scoreBase: z.number().int().default(0),
+  scoreBaseCampaigns: z.array(z.string()).default([]),
+  // The Return of the King's notes (docs/brief.md, The Return of the King). A log saved before them reads with these defaults.
+  corsairFleet: z.number().int().min(0).nullable().default(null),
+  blackGateTokens: z.number().int().min(0).nullable().default(null),
+  campaignEnd: z.enum(CAMPAIGN_ENDS).nullable().default(null),
 });
 
 // The intents are checked by the reducer when they are replayed: one it does not know is refused, and the open
@@ -120,7 +126,7 @@ export type Save = {
 // pool. A copy for each player becomes one entry for each of this save's seats, whatever the finished save had. `carriedFrom` is the finished
 // save's id. `modeDefault` is the Hard/Expert Mode card the campaign setup offers each briefing first (Dream-chaser).
 // `continued` is a finished save of the box before this one in the saga (continue.ts): the new save takes its log columns and its seat count, a log being per seat.
-export type NewSaveOptions = { carried?: readonly PoolCard[]; carriedFrom?: string | null; modeDefault?: ModeCard | null; continued?: Pick<Save, "id" | "seatCount" | "log"> | null };
+export type NewSaveOptions = { carried?: readonly PoolCard[]; carriedFrom?: string | null; modeDefault?: ModeCard | null; continued?: Pick<Save, "id" | "campaignId" | "seatCount" | "log"> | null };
 
 // A new save starts on a blank log (the Dark of Mirkwood mini campaign included).
 export function newSave(id: string, campaignId: string, seatCount: 1 | 2, options: NewSaveOptions = {}): Save {

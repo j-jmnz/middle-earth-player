@@ -2,6 +2,7 @@
 // enemies engaged with you", "for each Hobbit hero you control", "equal to that enemy's Threat"). A player never supplies one.
 import { z } from "zod";
 
+import { RECORDED_COUNTS } from "./campaign-record.ts";
 import { pickSchema } from "./effect-schema-pick.ts";
 
 // The card a stat is read from: the source, its host, the last picked card, the card the event was about (`subject`), or
@@ -87,8 +88,20 @@ export const amountExprSchema = z.strictObject({
   pile: pileNameSchema.optional(),
   // The pursuit value (mec112.pursuit; `pursuit`), 0 while no tracker is set: "X is the pursuit value" (143069:B:1). Read by the pursuit family.
   pursuit: z.literal(true).optional(),
+  // The highest threat among the living players ("X is the threat of the player with the highest threat", 145064:B:1), and the number of living players whose threat is at least this ("+1 Threat for each player with a threat of 35 or higher",
+  // 145021:A:1). Read by the grey-company family (src/rules/families/grey-company/amounts.ts).
+  highestThreat: z.literal(true).optional(),
+  playersAtThreat: z.number().int().positive().optional(),
+  // With `stat`: the stat of every card that matches the pick, added up, read live ("X is the total Threat of each engaged enemy", 146026:A:1). Read by the black-gate family.
+  totalOf: pickSchema.optional(),
   // The damage tokens on the cards that match, added up ("equal to the total damage on each Ship objective he controls", 12148:A:1; read by the sea family, src/rules/families/sea/swap.ts).
   damageOn: pickSchema.optional(),
+  // The total printed cost of the allies in the staging area ("X is the total cost of all allies in the staging area", 145074:B:1; a card with no printed cost counts 0). Read by the pelennor family.
+  stagedAlliesCost: z.literal(true).optional(),
+  // The damage that destroys Minas Tirith: its hit points less its damage, plus what the active City Wall can still take first (mec113.minas-tirith, 145046:A:1); a number no damage reaches while Minas Tirith is not in play. Read by the pelennor family.
+  minasTirithLeft: z.literal(true).optional(),
+  // A count the earlier Resolution recorded in the Campaign Log's notes ("X is the number recorded in the campaign log", 145078:A:1), 0 when none is recorded or the game has no log. Read by the campaign family.
+  recorded: z.enum(RECORDED_COUNTS).optional(),
 });
 
 export const amountSchema = z.union([z.number().int(), amountExprSchema]);

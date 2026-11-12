@@ -6,6 +6,7 @@ import type { CatalogFamily } from "../family-manifest.ts";
 import { cardRefSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { pickSchema } from "../effect-schema-pick.ts";
+import { verbFlags } from "../verb-flags.ts";
 
 // The encounter card types a Guarded keyword names: "Guarded (enemy)", "Guarded (location)", "Guarded (enemy or location)".
 const guardType = z.enum(["enemy", "location"]);
@@ -48,6 +49,14 @@ const VERBS = [
     attackers: z.array(z.string()).optional(),
     ...when,
   }),
+  // "Attach a set aside Overcome by Fear to your threat dial", "Each player attaches a copy of Overcome by Fear to his threat dial" (145022:A:2, 145063:A:1): a set-aside copy of the card goes onto the actor's threat dial, in their play area under their control
+  // (rr.attachment-cards). Without `code` it is the source card itself ("Setup: Attach to your threat dial", 145016:A:1). Nothing happens when the dial already holds a copy (Limit 1 per threat dial) or no copy is left; an option that does this names
+  // the condition `canAttachToDial`.
+  verbFlags(z.strictObject({ verb: z.literal("AttachToDial"), code: z.string().min(1).optional(), ...when }), { setupRuns: "inForEachPlayer" }),
+  // "Detach Overcome by Fear and set it aside, out of play" (145016:A:3, 145065:A:1): the copy on the actor's threat dial (of this `code`, or the source itself) goes back to the set-aside cards. Nothing happens with none on the dial (`onDial`).
+  z.strictObject({ verb: z.literal("DetachFromDial"), code: z.string().min(1).optional(), ...when }),
+  // "Remove each unattached copy of Overcome by Fear from the game" (145063:A:1): every set-aside copy of the code leaves the game.
+  z.strictObject({ verb: z.literal("RemoveSetAside"), code: z.string().min(1), ...when }),
   // Engine use (takesProgressFirst): the player answers whether progress from questing successfully goes on the locations
   // that may take it first (`first`), this quest phase.
   z.strictObject({ verb: z.literal("QuestProgressFirst"), first: z.boolean(), ...when }),

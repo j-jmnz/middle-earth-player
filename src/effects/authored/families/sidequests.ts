@@ -782,7 +782,7 @@ export const RECORDS: readonly Effect[] = [
     trigger: "questedSuccessfully",
     subject: "host",
     cost: { kind: "addSelfToVictory" },
-    condition: { kind: "threat", min: 40 },
+    condition: { kind: "threat", min: 40, valour: true },
     instructions: [{ verb: "Pick", pick: { type: "card", control: "you", from: "deck", top: 5, cardType: "ally", intoPlay: true } }, { verb: "MovePicked", to: "play" }],
   },
   // Black Arrow: "Response: After attached hero declares an attack, add Black Arrow to the victory display to give attached hero +5

@@ -88,9 +88,12 @@ export function applyPrinted(cards: readonly Card[], ledger: Ledger): { cards: C
     const back = b || card.back ? { name: card.back?.name ?? null, text: backText, questPoints: card.back?.questPoints ?? null, stage: card.back?.stage ?? null, ...pickBackStats(card.back) } : null;
     // A quest stage is played on its side B, so its keywords (Sailing) are read from that side too.
     const sea = a && LEDGER_KEYWORD_PACKS.has(a.printing) ? { keywords: { ...(card.keywords ?? {}), ...ledgerKeywords(a), ...(card.type === "quest" && b ? ledgerKeywords(b) : {}), ...(card.type === "location" && b ? uncharted(b) : {}) } } : {};
+    // The Sauron's Eye icons an encounter card prints (mec113.fortitude-tests) come from the ledger in any pack.
+    const eyes = a?.eyeIcons ? { keywords: { ...(sea.keywords ?? card.keywords ?? {}), eyeIcons: a.eyeIcons } } : {};
     return {
       ...card,
       ...sea,
+      ...eyes,
       text: front.text,
       shadowText: front.shadow,
       back,

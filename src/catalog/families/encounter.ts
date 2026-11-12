@@ -95,7 +95,8 @@ const VERBS = [
   }),
   // The players travel to the location (the picked card, or `target`) without resolving its Travel effect (rr.travel); an
   // active location already there returns to the staging area first. Nothing happens if the players cannot travel there.
-  z.strictObject({ verb: z.literal("TravelTo"), target: cardRefSchema.optional(), ...when }),
+  // With `unlessActive` the players travel only when no location is active ("The players cannot travel if another location card is active", rr.active-location; "travel to Mordor Road", 146076:A:1): an active location stays, and the location stays in the staging area.
+  z.strictObject({ verb: z.literal("TravelTo"), target: cardRefSchema.optional(), unlessActive: z.literal(true).optional(), ...when }),
   // Places `amount` progress on the current quest; the active location takes it first (rr.active-location).
   z.strictObject({ verb: z.literal("ProgressQuest"), amount: positiveAmountSchema, ...when }),
   // The actor's threat becomes `amount` if it is lower ("set your threat equal to the engagement cost of that enemy").
@@ -110,8 +111,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("ReturnEventToHand"), ...when }),
   // The picked card (the top card of the actor's deck) is played for no cost if it can be: an ally enters play, an
   // attachment is attached to a host the actor chooses, an event's Action resolves. Otherwise it goes to the bottom of
-  // the deck.
-  z.strictObject({ verb: z.literal("PlayRevealedFree"), ...when }),
+  // the deck. `embassy`: the player card of the Embassy from the Dark Tower's current pair (EmbassyNext), lying faceup in front of its owner, is played by its owner instead; when it cannot be played it goes to its owner's discard pile (146072:B:1).
+  z.strictObject({ verb: z.literal("PlayRevealedFree"), embassy: z.literal(true).optional(), ...when }),
 ] as const;
 
 const TRIGGERS = [
@@ -133,6 +134,10 @@ const FLAGS = [
   "revealFewerMinOne",
   // Held by the table until the end of the phase: the staging step reveals this many more cards (`RevealMore`).
   "revealMore",
+  // Held by the table while its source is in play: the first player's reveal of the staging step is replaced by `firstPlayerRevealCount` reveals, all his, before the next player's own ("the first player does not reveal an encounter card as normal. Instead, he
+  // reveals 1 encounter card for each resource on The Black Gate", 146073:B:1; mec113.saga-staging-rules). `firstPlayerReveals` is the marker (a count of 0 is no modifier at all, so it cannot say "none"); the count is a live amount and is absent at 0.
+  "firstPlayerReveals",
+  "firstPlayerRevealCount",
   // Held by the table: the lasting effects WatchReveals sets (its `when` names the type of card it watches for).
   "watchThreatZero",
   "watchDamage",

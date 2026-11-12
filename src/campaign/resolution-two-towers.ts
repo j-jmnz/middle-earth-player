@@ -1,12 +1,13 @@
-// Rules: mec112.campaign-mode-aragorn, rr.campaign-cards, rr.fellowship-of-heroes (data/rules/entries.json).
+// Rules: mec112.campaign-mode-aragorn, mec113.campaign-mode, rr.campaign-cards, rr.fellowship-of-heroes (data/rules/entries.json).
 //
 // What the resolution screen shows for The Two Towers' own choices (src/catalog/families/campaign.ts): the options of a ChooseOption in words, the fallen hero a boon brings back (one tile for each
-// player and hero), the hero a player removes from the Campaign Log, and the notes of the settled view (the threat penalty each player took, the hero who returned, the heroes removed, the enemies
-// under The Black Gate). The options are the ChooseResolution intents the reducer lists; this module only gives them words.
+// player and hero), the hero a player removes from the Campaign Log, and the notes of the settled view (the threat penalty each player took, the hero who returned, the heroes removed and the enemies
+// under The Black Gate, with The Return of the King's notes beside them: return-of-the-king-words.ts). The options are the ChooseResolution intents the reducer lists; this module only gives them words.
 import type { Instruction } from "../catalog/boundary.ts";
 import type { ResolutionLog } from "../rules/core/campaign-state.ts";
 import type { ScenarioState } from "../rules/engine/reduce.ts";
 import { andList } from "./carry-words.ts";
+import { returnOfTheKingNotes, RING_OPTIONS } from "./return-of-the-king-words.ts";
 import { SEARCHING_EYE } from "./two-towers-view.ts";
 
 const YOU = "You";
@@ -20,11 +21,13 @@ export function isTwoTowersChoice(instruction: Instruction | undefined): instruc
 
 // The words of an option, by the instruction's name and the option's id: the label on the tile and the sentence above Confirm.
 // `says` is told for the seat that answers (`who`: "You", or "Player 2"); `code` is the card an option is about, so its tile shows the card.
-const OPTIONS: Readonly<Record<string, { label: string; says: (who: string) => string; code?: string }>> = {
+const OPTIONS: Readonly<Record<string, { label: string; says: (who: string) => string; code?: string; loses?: true }>> = {
   "uruk:boons": { label: "Each player earns a Skill boon", says: () => "Each player earns one of the Skill boons and attaches it to a hero they control." },
   "uruk:hope": { label: "One player earns Beyond All Hope", says: () => "One player earns Beyond All Hope, takes control of a fallen hero and attaches the boon to it." },
   "marshes:penalty": { label: "Take a permanent +2 starting threat penalty", says: (who) => `${who} ${who === YOU ? "take" : "takes"} a permanent +2 starting threat penalty, recorded in the campaign log.` },
   "marshes:searchingEye": { label: "Earn 1 copy of The Searching Eye", says: (who) => `${who} ${who === YOU ? "earn" : "earns"} 1 copy of The Searching Eye, recorded in the campaign log.`, code: SEARCHING_EYE },
+  // Mount Doom's Resolution: the first player keeps The One Ring or destroys it.
+  ...RING_OPTIONS,
 };
 
 /** The fields of the choosing view for one of these instructions (the caller adds the step, the seat and the answers already given). */
@@ -32,7 +35,7 @@ export type TwoTowersView = {
   eyebrow: string;
   noun: string;
   prompt: string;
-  tiles: readonly { optionId: string; code: string | null; name: string; hero: string | null; label: string; says: string; wide?: true }[];
+  tiles: readonly { optionId: string; code: string | null; name: string; hero: string | null; label: string; says: string; wide?: true; loses?: true }[];
   firstPlayerAnswers: boolean;
   eachSeat: boolean;
 };
@@ -48,7 +51,7 @@ export function twoTowersChoosing(state: ScenarioState, instruction: TwoTowersCh
       prompt: instruction.who === "eachSeat" || state.seatCount === 1 ? "Choose one option. Your choice is written to the campaign log when you confirm." : "The players choose one option; the first player confirms.",
       tiles: optionIds.map((id) => {
         const words = OPTIONS[`${instruction.name}:${id}`] ?? { label: id, says: () => id };
-        return { optionId: id, code: words.code ?? null, name: words.label, hero: null, label: words.label, says: words.says(seatWords(state, seat)), wide: true as const };
+        return { optionId: id, code: words.code ?? null, name: words.label, hero: null, label: words.label, says: words.says(seatWords(state, seat)), wide: true as const, ...("loses" in words && words.loses ? { loses: true as const } : {}) };
       }),
       firstPlayerAnswers: instruction.who === "firstPlayer",
       eachSeat: instruction.who === "eachSeat",
@@ -94,6 +97,7 @@ export function twoTowersNotes(log: ResolutionLog, seatCount: number, name: (cod
   for (const penalty of log.threatPenalties ?? []) notes.push(`${who(penalty.seat)} ${seatCount === 1 ? "take" : "takes"} a permanent +${penalty.amount} starting threat penalty.`);
   for (const item of log.revived ?? []) notes.push(`${name(item.hero)} leaves the list of fallen heroes and joins ${seatCount > 1 ? `Player ${item.seat + 1}'s` : "your"} heroes, with no +1 threat penalty.`);
   for (const item of log.removedHeroes ?? []) notes.push(`${name(item.hero)} is removed from the campaign log.`);
+  notes.push(...returnOfTheKingNotes(log));
   const gate = Object.entries(log.underneath ?? {});
   if (gate.length > 0) notes.push(`Under The Black Gate: ${andList(gate.map(([code, count]) => `${count} \u00d7 ${name(code)}`))}, recorded in the campaign log.`);
   return notes;

@@ -12,7 +12,7 @@ import {
 import { CAMPAIGNS, CAMPAIGN_SUFFIX, productOf, scenarioDefs, scenarioSlug, type CampaignDef } from "../campaign-defs.ts";
 import { PLAYER_TYPES, type Overrides } from "./cards.ts";
 import { clausesOf, codesOf, nameIndex, parseSetup, type ParsedSetup } from "./setup-text.ts";
-import { pileAccepts, questFacts } from "./scenario-piles.ts";
+import { loggedHarad, pileAccepts, questFacts } from "./scenario-piles.ts";
 import { bookletSetsOf, setupOf } from "./scenario-text.ts";
 import { burdenSetProblems, crossCheckProblems, easyRemovals, easySheetProblem, plain, PLAYER_GROUP, type Deck } from "./scenario-checks.ts";
 import { pilesFromSetup, type Loaded } from "./setup-piles.ts";
@@ -131,9 +131,10 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       if (card.campaignKind != null || PLAYER_TYPES.has(card.type) || !card.printings.some((p) => ownBox.includes(p.pack))) return false;
       return mentions(mentioned, card.name, campaignText);
     };
-    // A Two Towers campaign card removes cards of the earlier box from the Campaign Pool by name ("Remove Gildor Inglorion and Mr. Underhill"): those boons are named, never dealt.
-    const poolCards = product.sagaStart ? cards.filter((card) => card.campaignKind != null && !card.printings.some((p) => cardPacks.includes(p.pack))) : [];
-    const extras = def.deck === undefined ? poolCards : cards.filter((card) => !scope.includes(card) && !isReprint(card) && (card.printings.some((p) => cardPacks.includes(p.pack)) || reprintOf.has(card.code) || inCampaignText(card)));
+    // A saga campaign card names cards it does not deal: the earlier box's boons ("Remove Gildor Inglorion and Mr. Underhill from the Campaign Pool") and the box's Fellowship cards ("attaches Andúril and Banner of Elendil to Aragorn").
+    const poolCards = product.sagaStart ? cards.filter((card) => (card.campaignKind != null && !card.printings.some((p) => cardPacks.includes(p.pack))) || (card.sphere === "fellowship" && card.printings.some((p) => cardPacks.includes(p.pack)))) : [];
+    const sagaNamed = product.sagaStart ? cards.filter((card) => !scope.includes(card) && !isReprint(card) && inCampaignText(card)) : [];
+    const extras = def.deck === undefined ? [...poolCards, ...sagaNamed] : cards.filter((card) => !scope.includes(card) && !isReprint(card) && (card.printings.some((p) => cardPacks.includes(p.pack)) || reprintOf.has(card.code) || inCampaignText(card)));
     const names = nameIndex([...scope, ...extras], new Set(scope.filter((card) => card.type !== "quest").map((card) => card.code)));
 
     // Stages in printed order: the Hall of Beorn quest cards give it, the Dragncards deck must agree.
@@ -175,7 +176,13 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
           if (name !== hob.Title) local.push(`${deck.label}: no card for "${name}" (${line.databaseId})`);
           continue;
         }
-        if (card.type === "campaign") continue;
+        if (card.type === "campaign" || raw.dragn.get(line.databaseId)?.type === "Campaign") continue;
+        // The saga start the load list sets aside (Mount Doom's Ring-bearer and The One Ring): the scenario's `sagaStart`, not a pile.
+        if (def.sagaStartAside === true && line.loadGroupId === "sharedSetAside" && (isHero(byCode, card.code) || card.name === "The One Ring")) {
+          if (!isHero(byCode, card.code)) player.push(card.code);
+          else if (deck === normalDeck) heroes.push(card.code);
+          continue;
+        }
         if (line.loadGroupId === PLAYER_GROUP && def.groups?.[line.loadGroupId] === undefined) {
           if (!isHero(byCode, card.code)) player.push(card.code);
           else if (deck === normalDeck) heroes.push(card.code);
@@ -265,14 +272,15 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
         continue;
       }
       if (!pileAccepts({ code, pile, printed, quest, facts })) {
-        if (namedByCampaign) campaignPlaced.add(code);
+        // The Harad enemies the campaign log records (Setup: "Set each Harad enemy recorded in the campaign log aside"): the campaign record deals them.
+        if (namedByCampaign || loggedHarad(camp, printed)) campaignPlaced.add(code);
         else local.push(`${id}: ${nameOf(code)} is in the ${pile} pile and no Setup line puts it there`);
         continue;
       }
       // "Each player sets 1 copy of X aside" (143072:A:1, an `aside` clause with `eachPlayer`) places one copy for each player, as the `stage` clauses of a per-player Setup do.
       const perPlayer = clausesOf(quest, "stage").find((clause) => clause.perPlayer != null && clause.codes.includes(code))?.perPlayer ?? clausesOf(quest, "aside").find((clause) => clause.eachPlayer != null && clause.codes.includes(code))?.eachPlayer;
-      // A location the quest's Setup has each player add (found in the encounter deck): dealt with the deck, found by the Setup record.
-      const searched = pile === "staging" && printed?.type === "location" && clausesOf(quest, "eachPlayerAddsLocation").length > 0;
+      // A location the quest's Setup has each player add (found in the encounter deck): dealt with the deck, found by the Setup record. A location the Setup stages (Mount Doom) is staged as it says; one it makes the active location (Brake of Thorns, of which the set holds more copies) is made active by one copy, and its other copies are found like any location.
+      const searched = pile === "staging" && printed?.type === "location" && clausesOf(quest, "eachPlayerAddsLocation").length > 0 && !facts.said(["stage"]);
       // "(2 copies instead if there are 3 or more players in the game)": the copies of this card the Setup stages.
       const staged = pile === "staging" ? clausesOf(quest, "stage").find((clause) => clause.many != null && clause.codes.includes(code)) : undefined;
       const byPlayers = staged?.many ? { few: staged.count, many: staged.many.count, from: staged.many.from } : undefined;
@@ -378,6 +386,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       if (!card || /\(Campaign\)$/.test(item.Title) || /Nightmare$/.test(item.EncounterSet ?? "")) continue;
       // A card of a set the scenario's Setup removes from the game (overrides.scenarioRemovals) is not dealt.
       if (overrides.scenarioRemovals.some((rule) => rule.scenario === id && canon(card.encounterSet ?? "") === canon(rule.set) && rule.types.includes(card.type))) continue;
+      if (overrides.scenarioExcluded.some((rule) => rule.scenario === id && rule.code === card.code)) continue;
       // Boons and burdens are dealt by the campaign (the pool, a campaign card, or the burden deck), not by the load list.
       if (campaignPlaced.has(card.code) || card.campaignKind != null) continue;
       const mine = placed.filter((p) => (p.code === card.code || p.back === card.code) && p.pile !== "quest");

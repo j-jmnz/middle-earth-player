@@ -18,6 +18,7 @@ import { shareHint, shareValue, wordOf } from "../choice/tray-logic.ts";
 import type { OptionMark, Sheet } from "../choice/sheet-types.ts";
 import { actingSeat, hidesFace, isLooked, isPrisoner, type ZoneFacts, type ZoneId } from "../store/selectors.ts";
 import { areaRoleOf, areaSpeech } from "../store/stormcaller-table.ts";
+import { plural } from "./list.ts";
 import { seatTag } from "./scenarios/area.ts";
 import { grappleDetail } from "./scenarios/grapple.ts";
 import { areaTell } from "./scenarios/stormcaller.ts";
@@ -41,7 +42,6 @@ export type CardSpeechDeps = {
 
 export type CardWords = { label: string; hint: string | null };
 
-const plural = (count: number, one: string, many: string): string => `${count} ${count === 1 ? one : many}`;
 
 const capital = (word: string): string => `${word.slice(0, 1).toUpperCase()}${word.slice(1)}`;
 

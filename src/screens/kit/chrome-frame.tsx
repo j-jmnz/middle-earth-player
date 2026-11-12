@@ -392,18 +392,19 @@ export function PaperSheet({ step, title, children, footer, maxHeight }: { step?
 }
 
 /**
- * Victory or Defeat: the outcome word in Marcellus SC 50 pt (72 on a tablet), tracked wide, inside a glowing ring with the One Ring
+ * Victory or Defeat (The end for a scenario that ends when its last player falls, The Black Gate Opens): the outcome word in Marcellus SC 50 pt (72 on a tablet), tracked wide, inside a glowing ring with the One Ring
  * faint in it, and the scenario's name under it. Silver for a win, threat red for a loss. Resolution and the standalone outcome both
  * say it this way.
  */
-export function OutcomeTitle({ won, scenario, testID }: { won: boolean; scenario: string; testID: string }) {
+export function OutcomeTitle({ won, scenario, testID, ended }: { won: boolean; scenario: string; testID: string; ended?: boolean }) {
   const palette = usePalette();
   const t = useTableTokens();
   const { size, s } = useSizeClass();
   const big = size === "compact" ? 50 : 72;
   const ring = (size === "compact" ? 240 : 330) * s;
   const light = t.depth === "light";
-  const tone = won ? (light ? palette.accent : palette.glow) : palette.threat;
+  // An end (The Black Gate Opens) is neither: muted, with no glow or red.
+  const tone = ended === true ? palette.muted : won ? (light ? palette.accent : palette.glow) : palette.threat;
   return (
     <View className="items-center justify-center" style={{ height: ring }}>
       <View
@@ -421,21 +422,21 @@ export function OutcomeTitle({ won, scenario, testID }: { won: boolean; scenario
         }}
       >
         <View style={{ opacity: 0.12 }}>
-          <GameIcon name="oneRing" size={ring * 0.62} tint={won ? "bone" : "danger"} />
+          <GameIcon name="oneRing" size={ring * 0.62} tint={won || ended === true ? "bone" : "danger"} />
         </View>
       </View>
       <Text
         testID={testID}
         accessibilityRole="header"
-        className={`text-center font-display ${won ? "text-accentHigh" : "text-danger"}`}
+        className={`text-center font-display ${ended === true ? "text-bone" : won ? "text-accentHigh" : "text-danger"}`}
         style={{
           fontSize: big * s,
           lineHeight: big * 1.2 * s,
           letterSpacing: (big >= 72 ? 8 : 6) * s,
-          ...(light ? {} : { textShadowColor: won ? withAlphaHex(palette.glow, 0.7) : withAlphaHex(palette.threat, 0.7), textShadowRadius: 24, textShadowOffset: { width: 0, height: 0 } }),
+          ...(light || ended === true ? {} : { textShadowColor: won ? withAlphaHex(palette.glow, 0.7) : withAlphaHex(palette.threat, 0.7), textShadowRadius: 24, textShadowOffset: { width: 0, height: 0 } }),
         }}
       >
-        {won ? "Victory" : "Defeat"}
+        {ended ? "The end" : won ? "Victory" : "Defeat"}
       </Text>
       <Text className="mt-1 text-center font-display text-heading text-muted">{scenario}</Text>
     </View>

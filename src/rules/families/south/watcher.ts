@@ -4,14 +4,15 @@
 // An enemy that attacks without being engaged: the Watcher in the Water stays in the staging area but is considered engaged with each
 // player, so it attacks every player once in the combat phase; Storm of Howls makes the enemy in the staging area with the highest
 // engagement cost attack the player who revealed it. The combat code asks `attackHere` instead of reading the enemy's zone.
+import { undefendedToCity } from "../pelennor/combat.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
-import { ruleCause } from "../../core/cause.ts";
+import { currentCause, ruleCause, UNATTRIBUTED } from "../../core/cause.ts";
 import { attackBarred } from "../../interpret/constants.ts";
 import { beginEnemyAttack } from "../../combat/combat.ts";
 import { dealAdditionalShadow, dealOneShadow, type ReduceContext } from "../../interpret/interpret.ts";
 import { modifiedStat, placeDamage } from "../../core/keywords.ts";
-import { lastPicked } from "../../interpret/player-verbs.ts";
+import { lastPicked, seatsFor } from "../../interpret/player-verbs.ts";
 import type { PendingAttack, ScenarioState } from "../../core/state.ts";
 import { flagged } from "../../core/state.ts";
 import { discardShadowOf } from "../../combat/shadow.ts";
@@ -77,25 +78,31 @@ function attackerOf(state: ScenarioState, target: "self" | "host" | undefined, f
 // player (`who: firstPlayer`, 142043:A:2).
 export function attackFromStaging(state: ScenarioState, instruction: Extract<Instruction, { verb: "AttackFromStaging" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const id = attackerOf(state, instruction.target, focus);
-  const seat = instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat;
+  // `eventSeat`: the player the event happened to (the one who canceled a When Revealed, 146031:A:2); with none the attack is not made.
+  const seat = instruction.who === "firstPlayer" ? state.firstPlayer : instruction.who === "eventSeat" ? seatsFor(state, "eventSeat", focus.seat)[0] : focus.seat;
+  if (seat == null) return state;
   // "Undefended damage from this attack must be dealt to Hrogar's Hill" (19081:A:1): the main quest card takes it.
-  return attackNowFromStaging(state, id, seat, ctx, steps, { shadow: true, ...(instruction.shadows ? { shadows: instruction.shadows } : {}), ...(instruction.undefendedToStage ? { toStage: true } : {}), ...(instruction.orEngaged ? { engaged: true } : {}) });
+  return attackNowFromStaging(state, id, seat, ctx, steps, { shadow: true, ...(instruction.shadows ? { shadows: instruction.shadows } : {}), ...(instruction.undefendedToStage ? { toStage: true } : {}), ...(instruction.orEngaged ? { engaged: true } : {}), ...(instruction.raiseThreatIfDestroys ? { raiseIfDestroys: instruction.raiseThreatIfDestroys } : {}) });
 }
 
 // The enemy `id` in the staging area attacks `seat` outside the combat phase, now, and the running effect counts the attack (its frames wait for it). `shadow: false`: no shadow card is dealt. `toStage` and `excessToStage` mark the attack
 // in progress (PendingAttack): the main quest card takes the damage left undefended, and the excess past a defender. `engaged`: an enemy engaged with a player attacks too, as an engaged enemy does (its shadow card stays).
-export function attackNowFromStaging(state: ScenarioState, id: string, seat: number, ctx: ReduceContext, steps: EngineStep[], flags: { shadow: boolean; shadows?: number; toStage?: boolean; excessToStage?: boolean; engaged?: boolean }): ScenarioState {
+export function attackNowFromStaging(state: ScenarioState, id: string, seat: number, ctx: ReduceContext, steps: EngineStep[], flags: { shadow: boolean; shadows?: number; toStage?: boolean; excessToStage?: boolean; engaged?: boolean; raiseIfDestroys?: number }): ScenarioState {
   const enemy = id ? state.cards[id] : undefined;
   const placed = enemy?.zone === "staging" || (flags.engaged === true && enemy?.zone === "engaged");
   if (!id || !placed || attackBarred(state, id, seat) || state.seats[seat]?.eliminated) return state;
-  const { shadow, shadows, engaged: _engaged, ...marks } = flags;
+  const { shadow, shadows, engaged: _engaged, raiseIfDestroys, ...marks } = flags;
   const data = effectData(state);
   const counted = data ? patchTop(state, { data: { ...data, returned: data.returned + 1 } }) : state;
   // "Deal and resolve 2 shadow cards for this attack" (143048:A:1): the first as any attack from the staging area, the others additional ones.
   let dealt = shadow ? dealForAttack(counted, id, steps) : counted;
   for (let more = 1; shadow && more < (shadows ?? 1); more += 1) dealt = dealAdditionalShadow(dealt, id, steps);
   const begun = beginEnemyAttack(dealt, seat, id, ctx, steps, { fromStaging: enemy?.zone === "staging", shadow });
-  return begun.pendingAttack ? { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true, ...marks } } : begun;
+  // `raiseIfDestroys`: the effect the attack leaves for its end, with X the characters it destroyed (146039:A:2).
+  const attack = begun.pendingAttack;
+  if (!attack) return begun;
+  const after = raiseIfDestroys ? { after: [...(attack.after ?? []), { verb: "RaiseThreat" as const, amount: raiseIfDestroys, who: "actor" as const, when: { kind: "x" as const, min: 1 } }], afterCause: attack.afterCause ?? currentCause(steps, UNATTRIBUTED) } : {};
+  return { ...begun, pendingAttack: { ...attack, immediate: true, ...marks, ...after } };
 }
 
 // DamageActiveLocation: a shadow effect marks the attack in progress: its undefended damage goes on an active location.
@@ -106,7 +113,11 @@ export function markLocationDamage(state: ScenarioState): ScenarioState {
 
 // The cards the damage of an undefended attack may be assigned to: the active locations when a shadow effect says it goes on one.
 export function undefendedLocations(state: ScenarioState): string[] {
-  return state.pendingAttack?.toLocation ? activeLocations(state) : [];
+  const attack = state.pendingAttack;
+  if (attack?.toLocation) return activeLocations(state);
+  // Mordor Orc's undefended damage goes on Minas Tirith while it is in play (families/pelennor/combat.ts).
+  const city = attack ? undefendedToCity(state, attack.enemyId) : undefined;
+  return city ? [city] : [];
 }
 
 // The damage of the undefended attack in progress goes on an active location (142035:A:2): the one location, or the one the defending

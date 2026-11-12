@@ -39,6 +39,11 @@ import { manifest as wizardry } from "./wizardry/index.ts";
 import { manifest as mire } from "./mire/index.ts";
 import { manifest as gollum } from "./gollum/index.ts";
 import { manifest as harad } from "./harad/index.ts";
+import { manifest as greyCompany } from "./grey-company/index.ts";
+import { manifest as pelennor } from "./pelennor/index.ts";
+import { manifest as cirithUngol } from "./cirith-ungol/index.ts";
+import { manifest as blackGate } from "./black-gate/index.ts";
+import { manifest as mountDoom } from "./mount-doom/index.ts";
 import { registerFamilies } from "../interpret/family-hooks.ts";
 
 export type { Focus };
@@ -46,7 +51,7 @@ export type { Focus };
 // The mechanic families' rules, in play order: where two runners could answer one verb, the first in this list does (docs/architecture.md, Mechanic families).
 // The order is the catalog list's (src/catalog/families/index.ts).
 export const RULES_FAMILIES: readonly RulesFamily[] = [
-  attack, defense, encounter, quest, play, costs, deck, attachments, sidequests, misc, burden, south, campaign, objectives, prisoner, dungeon, caves, nightmare, moria, breaking, dreamchaser, sea, uncharted, aflame, stormcaller, grapple, island, wilderland, pursuit, captives, fortress, wizardry, mire, gollum, harad,
+  attack, defense, encounter, quest, play, costs, deck, attachments, sidequests, misc, burden, south, campaign, objectives, prisoner, dungeon, caves, nightmare, moria, breaking, dreamchaser, sea, uncharted, aflame, stormcaller, grapple, island, wilderland, pursuit, captives, fortress, wizardry, mire, gollum, harad, greyCompany, pelennor, cirithUngol, blackGate, mountDoom,
 ];
 
 // The order the families' settle hooks run in within a phase (src/rules/engine/machine.ts, settle), in this order.
@@ -55,7 +60,7 @@ export const RULES_FAMILIES: readonly RulesFamily[] = [
 export const SETTLE_ORDER: Readonly<Record<"before" | "after" | "sweep", readonly string[]>> = {
   before: ["burden", "island", "south"],
   after: ["sea", "stormcaller", "island", "wilderland", "captives"],
-  sweep: ["aflame", "objectives", "sea", "wilderland", "deck"],
+  sweep: ["aflame", "objectives", "sea", "wilderland", "south", "deck"],
 };
 
 /** Runs a verb a mechanic family adds (src/catalog/families), or returns null when no family owns it. */

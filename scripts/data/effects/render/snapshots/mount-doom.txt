@@ -1,0 +1,357 @@
+Scenario piles that place cards with no record (staging: 146044 Orc-hold; staging: 146045 Mordor Road; staging: 146046 Plain of Gorgoroth; activeLocation: 146047 Brake of Thorns; quest: 146075 The Land of Mordor; quest: 146076 The Road to Isenmouthe; quest: 146077 The Last Gasp; quest: 146078 The Crack of Doom; staging: 146042 The Tower of Barad-dûr; staging: 146043 Mount Doom; staging: 146048 Old Water-course)
+
+## 146042 The Tower of Barad-dûr
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+146042:A:1 (front): Players do not raise their threat at the end of the refresh phase.
+  146042:constant:1: Constant
+    only if this card is in the staging area
+    - the table: stat noRefreshThreat 1, while this card is in play
+
+146042:A:2 (front): Forced: At the end of the round, each player raises his threat by 1 for each non-Fellowship character he controls.
+  146042:forced:1: Forced at the end of the round
+    - for each player, first player first:
+      - raise threat by the number of character (you control) that is not a fellowship card (the acting player)
+
+## 146043 Mount Doom
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+146043:A:1 (front): Immune to player card effects. X is the tens digit of the first player's threat dial.
+  (the keyword part is owned by the card's keywords; the records cover: X is the tens digit of the first player's threat dial.)
+  146043:constant:1: Constant
+    - this card: stat threat [json amount {"firstPlayerTens":true}], while this card is in play
+
+146043:A:2 (front): The players cannot travel here unless there is at least 20 progress on stage 3B.
+  146043:constant:2: Constant
+    only if not (the players are on stage 3)
+    - the players cannot travel to any location while this holds
+  146043:constant:3: Constant
+    only if not ([json condition {"kind":"stageProgress","min":20}])
+    - the players cannot travel to any location while this holds
+
+146043:A:3 (front): Travel: Each player makes a Fortitude test. If a player fails this test, raise his threat by 9.
+  146043:travel:1: Travel
+    - for each player, first player first:
+      - the acting player makes a Fortitude test: exhausts any number of ready heroes to commit them, discards the top X cards of the encounter deck (X the tens digit of their threat), counts the Sauron's Eye icons on them, the players take actions, and the committed heroes' total Willpower must be greater than the icons to pass (equal or fewer fails)
+      - then, if the last Fortitude test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): raise threat by 9 (the acting player)
+
+## 146044 Orc-hold
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+146044:A:1 (front): While Orc-hold is in the staging area, progress cannot be placed on other locations in the staging area.
+  146044:constant:1: Constant
+    only if this card is in the staging area
+    - each location (any player controls) in the staging area only [also {"other":true}]: stat noProgressPlaced 1, while this card is in play
+
+146044:A:2 (front): Forced: After Orc-hold becomes the active location, shuffle the encounter discard pile into the encounter deck. Discard cards from the top until an Orc enemy is discarded. Put that enemy into play engaged with the first player.
+  146044:forced:1: Forced after this location becomes the active location (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy","trait":"Orc"}]
+    - for each player, first player first:
+      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"engaged","when":{"kind":"all","conditions":[{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"},"inPlay":false},{"kind":"firstPlayer"}]}}]
+
+## 146045 Mordor Road
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+146045:A:1 (front): Mordor Road gets +1 Threat for each ally controlled by the player who controls the most allies.
+  146045:constant:1: Constant
+    - this card: stat threat [json amount {"mostPerPlayer":{"type":"ally","control":"you"}}], while this card is in play
+
+146045:A:2 (front): Forced: After Mordor Road becomes the active location, each player discards the top card of the encounter deck. Add each enemy discarded this way to the staging area.
+  146045:forced:1: Forced after this location becomes the active location (heard about this card)
+    - for each player, first player first:
+      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"}]
+      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"},"inPlay":false}}]
+
+## 146046 Plain of Gorgoroth
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+146046:A:1 (front): If a player has failed a Fortitude test this round, Plain of Gorgoroth gets +2 Threat.
+  146046:constant:1: Constant
+    only if any player has failed a Fortitude test this round
+    - this card: stat threat 2, while this card is in play
+
+146046:A:2 (front): Travel: The first player makes a Fortitude test to travel here. If he fails this test, raise each player's threat by 4.
+  146046:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the first player makes a Fortitude test: exhausts any number of ready heroes to commit them, discards the top X cards of the encounter deck (X the tens digit of their threat), counts the Sauron's Eye icons on them, the players take actions, and the committed heroes' total Willpower must be greater than the icons to pass (equal or fewer fails)
+    - then, if the last Fortitude test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): raise threat by 4 (each player)
+
+## 146047 Brake of Thorns
+(the scenario deals it into the activeLocation pile; the piles place it, no record does)
+
+146047:A:1 (front): While Brake of Thorns is in the staging area, add Sauron's Eye to each Fortitude test.
+  146047:constant:1: Constant
+    only if this card is in the staging area
+    - the table: stat fortitudeEyes 1, while this card is in play
+
+146047:A:2 (front): Forced: After Brake of Thorns becomes the active location, each player assigns X damage among characters he controls, where X is the tens digit of his threat dial.
+  146047:forced:1: Forced after this location becomes the active location (heard about this card)
+    - [json AssignDamage {"verb":"AssignDamage","amount":{"threat":"tens"},"pick":{"type":"character","control":"you"},"who":"eachSeat"}]
+
+## 146048 Old Water-course
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+146048:A:1 (front): While Old Water-course is the active location, it gains: "Response: When Old Water-course is explored, reduce each player's threat by 5."
+  146048:response:1: Response on the event activeExplored (heard about this card)
+    - lower threat by 5 (each player)
+
+146048:A:2 (front): Travel: Each player must exhaust a hero he controls to travel here.
+  146048:travel:1: Travel
+    - for each player, first player first:
+      - choose ready hero (you control)
+      - exhaust the picked card
+
+## 146049 Gollum
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+146049:A:1 (front): Surge. Immune to non-Fellowship player card effects.
+  (the keyword part is owned by the card's keywords; the records cover: Immune to non-Fellowship player card effects.)
+  146049:constant:1: Constant
+    - this card: stat immuneToNonFellowship 1, while this card is in play
+
+146049:A:2 (front): Gollum engages the first player.
+  146049:forced:1: Forced after an encounter card is added to the staging area (heard about this card)
+    - [json EngageFirstPlayer {"verb":"EngageFirstPlayer"}]
+  146049:triggered:1: Triggered (mandatory, not printed as Forced) on the event firstPlayerTokenPassed
+    - this enemy moves to the first player's play area and engages them (nothing if it is not engaged, or already engaged with them)
+  146049:forced:2: Forced on the event returnedToStaging (heard about this card)
+    - [json EngageFirstPlayer {"verb":"EngageFirstPlayer"}]
+
+146049:A:3 (front): *Forced: After Gollum is discarded during a Fortitude test, put him into play engaged with the first player. Then, choose an encounter card discarded for this test and ignore its Sauron's Eye icons.
+  146049:forced:3: Forced on the event discardedInFortitude (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"self","to":"engaged","when":{"kind":"all","conditions":[{"kind":"matches","card":"self","inPlay":false},{"kind":"firstPlayer"}]}}]
+    - then, if there is a card (any player controls) discarded for the Fortitude test in progress and still in the encounter discard pile, chosen by the first player to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) discarded for the Fortitude test in progress and still in the encounter discard pile, chosen by the first player
+    - then, if there is a card (any player controls) discarded for the Fortitude test in progress and still in the encounter discard pile, chosen by the first player to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the card just chosen (discarded for the Fortitude test in progress) adds no Sauron's Eye icons to that test
+
+## 146050 Ringwraith of Sauron
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+146050:A:1 (front): Cannot have non-Morgul attachments.
+  146050:constant:1: Constant
+    only if this card is in play
+    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"Morgul"}]
+
+146050:A:2 (front): While Ringwraith of Sauron is in the staging area, it gains: "Forced: After a player fails a Fortitude test, Ringwraith of Sauron engages that player and makes an immediate attack."
+  146050:forced:1: Forced on the event fortitudeFailed
+    only if this card is in the staging area
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - engage this card
+    - then, if this card is engaged with the player (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
+
+## 146051 Orc Captain
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+146051:A:1 (front): Forced: After Orc Captain engages you, make a Fortitude test. If you fail this test, reveal the top card of the encounter deck.
+  146051:forced:1: Forced after an enemy engages a player (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player makes a Fortitude test: exhausts any number of ready heroes to commit them, discards the top X cards of the encounter deck (X the tens digit of their threat), counts the Sauron's Eye icons on them, the players take actions, and the committed heroes' total Willpower must be greater than the icons to pass (equal or fewer fails)
+    - then, if the last Fortitude test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player reveals an encounter card
+
+146051:A:2 (shadow): Shadow: If this attack destroys a character, return attacking enemy to the staging area.
+  146051:shadow:1: Shadow
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 146052 Big Uruk
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+146052:A:1 (front): Forced: After Big Uruk engages you, either raise your threat by 4, or Big Uruk makes an immediate attack against you.
+  146052:forced:1: Forced after an enemy engages a player (heard about this card)
+    - the acting player chooses one of:
+      * option "threat":
+        - raise threat by 4 (the acting player)
+      * option "attack":
+        - this enemy attacks now, dealt a new shadow card after its old ones are discarded
+
+146052:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each ally you control.
+  146052:shadow:1: Shadow
+    - the attacking enemy: stat attack the number of ally (you control), until the end of the attack
+
+## 146053 Little Snuffler
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+146053:A:1: Peril. Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+146053:A:2 (front): When Revealed: Either raise your threat by 1 for each ally you control, or discard an ally you control.
+  146053:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "threat":
+        - raise threat by the number of ally (you control) (the acting player)
+      * option "discard" (only if there is a ally (you control) to choose):
+        - choose ally (you control)
+        - discard the picked card
+
+146053:A:3 (shadow): Shadow: Exhaust a character you control.
+  146053:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+
+## 146054 'Wicked Master!'
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+146054:A:1 (front): When Revealed: Gollum makes an immediate attack against the first player. If Gollum is not in play, search the encounter deck and discard pile for Gollum and put him into play engaged with the first player.
+  146054:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if there is a enemy (any player controls) named "Gollum" to choose: choose enemy (any player controls) named "Gollum"
+    - then, if there is a enemy (any player controls) named "Gollum" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area (or engaged)
+    - [json SearchMove {"verb":"SearchMove","code":"146049","to":"engagedFirstPlayer","when":{"kind":"not","condition":{"kind":"canPick","pick":{"type":"enemy","control":"any","names":["Gollum"]}}}}]
+
+146054:A:2 (shadow): Shadow: If attacking enemy is Gollum, he makes an additional attack after this one.
+  146054:shadow:1: Shadow
+    - if the attacking enemy is a enemy (any player controls) named "Gollum": when the attack in progress ends:
+      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt no shadow card
+
+## 146055 The Lidless Eye
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+146055:A:1: Peril.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+146055:A:2 (front): When Revealed: Make a Fortitude test. If The One Ring is exhausted, add Sauron's Eye Sauron's Eye to the test. If you fail this test, raise your threat by 10.
+  146055:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player makes a Fortitude test: exhausts any number of ready heroes to commit them, discards the top X cards of the encounter deck (X the tens digit of their threat), counts the Sauron's Eye icons on them, plus 2 icons if the card with code 146065 in play is exhausted as the test is made, the players take actions, and the committed heroes' total Willpower must be greater than the icons to pass (equal or fewer fails)
+    - then, if the last Fortitude test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): raise threat by 10 (the acting player)
+
+146055:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if you failed a Fortitude test this round).
+  146055:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the actor has failed a Fortitude test this round (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
+
+## 146056 Foul Fumes
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+146056:A:1 (front): When Revealed: Each player makes a Fortitude test. If you fail this test, deal 1 damage to each character you control. Until the end of the round, treat the printed text box of each damaged character as if it were blank (except for Traits).
+  146056:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player makes a Fortitude test: exhausts any number of ready heroes to commit them, discards the top X cards of the encounter deck (X the tens digit of their threat), counts the Sauron's Eye icons on them, the players take actions, and the committed heroes' total Willpower must be greater than the icons to pass (equal or fewer fails)
+      - then, if the last Fortitude test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 1 damage to each character (you control)
+    - damagedCharacters: stat blankText (its text box is blank) 1, until the end of the round
+
+146056:A:2 (shadow): Shadow: If you failed a Fortitude test this round, this attack is considered undefended.
+  146056:shadow:1: Shadow
+    - if the actor has failed a Fortitude test this round: this attack is considered undefended
+
+## 146057 Heavy and Tired
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+146057:A:1 (front): When Revealed: Attach Heavy and Tired to the hero with the most attachments and exhaust that hero. (Counts as a Condition attachment with the text: "Limit 1 per hero. Attached hero cannot commit to Fortitude tests. Forced: After you fail a Fortitude test, exhaust attached hero and discard each non-objective attachment on it.")
+  146057:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - attach this card to a hero
+    - exhaust its host
+  146057:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - its host: stat noFortitudeCommit 1, while this card is in play
+  146057:forced:1: Forced on the event fortitudeFailed
+    only if the card this one is attached to is controlled by the acting player
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - exhaust its host
+    - [json DiscardEach {"verb":"DiscardEach","pick":{"type":"card","control":"any","attachedTo":"host","nonObjective":true}}]
+
+## 146075 The Land of Mordor
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+146075:A:1 (front): Setup: Add Mount Doom and The Tower of Barad-dûr to the staging area. Make Brake of Thorns the active location. Each player searches the encounter deck for a different location and adds it to the staging area. Shuffle the encounter deck.
+  146075:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - [json SearchMove {"verb":"SearchMove","type":"location","to":"staging","different":true}]
+    - shuffle the encounter deck
+
+146075:B:1 (back): Dire. This stage gets +4 quest points for each player.
+  (the keyword part is owned by the card's keywords; the records cover: This stage gets +4 quest points for each player.)
+  146075:constant:1: Constant
+    - this card: stat questPoints the number of players x 4, while this card is in play
+
+146075:B:2 (back): The first treachery revealed each quest phase is immune to player card effects and gains surge.
+  146075:constant:2: Constant
+    - while this card is in play, the first treachery the encounter deck reveals each quest phase is immune to player card effects until it leaves play and gains surge (marked as it is revealed, before its When Revealed effects)
+
+## 146076 The Road to Isenmouthe
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+146076:A:1 (front): Dire. When Revealed: Search the encounter deck, discard pile, and victory display for Mordor Road and add it to the staging area. Shuffle the encounter discard pile into the encounter deck and travel to Mordor Road.
+  (the keyword part is owned by the card's keywords; the records cover: When Revealed: Search the encounter deck, discard pile, and victory display for Mordor Road and add it to the staging area. Shuffle the encounter discard pile into the encounter deck and travel to Mordor Road.)
+  146076:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SearchMove {"verb":"SearchMove","code":"146045","to":"staging","victory":true,"remember":true}]
+    - shuffle the encounter discard pile into the encounter deck
+    - [json TravelTo {"verb":"TravelTo","target":"picked","unlessActive":true}]
+
+146076:B:1 (back): Dire. Forced: After placing progress here from questing successfully, each player makes a Fortitude test. If a player passes this test, he places a resource here. If a player fails this test, he discards cards from the top of the encounter deck until an enemy is discarded and puts that enemy into play engaged with him.
+  (the keyword part is owned by the card's keywords; the records cover: Forced: After placing progress here from questing successfully, each player makes a Fortitude test. If a player passes this test, he places a resource here. If a player fails this test, he discards cards from the top of the encounter deck until an enemy is discarded and puts that enemy into play engaged with him.)
+  146076:forced:1: Forced on the event progressPlaced (heard about this card)
+    only if all of: (it is the Quest phase) and (the quest succeeded)
+    - for each player, first player first:
+      - the acting player makes a Fortitude test: exhausts any number of ready heroes to commit them, discards the top X cards of the encounter deck (X the tens digit of their threat), counts the Sauron's Eye icons on them, the players take actions, and the committed heroes' total Willpower must be greater than the icons to pass (equal or fewer fails)
+      - then, if the last Fortitude test the running effect made was passed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 resource tokens on this card
+      - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy","when":{"kind":"lastFortitudeFailed"}}]
+      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"engaged","when":{"kind":"all","conditions":[{"kind":"lastFortitudeFailed"},{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"},"inPlay":false}]}}]
+
+146076:B:2 (back): At the end of the quest phase, if the number of resources here is equal to or greater than the number of players, advance to stage 3A.
+  146076:forced:2: Forced at the end of the phase
+    only if it is the Quest phase
+    - if not (resources of this card is less than the number of players): advance to the next quest stage
+
+## 146077 The Last Gasp
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+146077:A:1 (front): Dire. When Revealed: Shuffle the encounter discard pile into the encounter deck and discard cards from the top until X locations are discarded, where X is the number of players in the game. Add each location discarded this way to the staging area.
+  (the keyword part is owned by the card's keywords; the records cover: When Revealed: Shuffle the encounter discard pile into the encounter deck and discard cards from the top until X locations are discarded, where X is the number of players in the game. Add each location discarded this way to the staging area.)
+  146077:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - discard cards from the top of the encounter deck until 1 location(s) for each player in the game are discarded, or the deck is empty, and add each location discarded to the staging area
+
+146077:B:1 (back): Dire. The first treachery revealed each quest phase is immune to player card effects and gains surge.
+  (the keyword part is owned by the card's keywords; the records cover: The first treachery revealed each quest phase is immune to player card effects and gains surge.)
+  146077:constant:1: Constant
+    - while this card is in play, the first treachery the encounter deck reveals each quest phase is immune to player card effects until it leaves play and gains surge (marked as it is revealed, before its When Revealed effects)
+
+146077:B:2 (back): Forced: At the beginning of the quest phase, the first player makes a Fortitude test. If the first player fails this test, no more than 5 progress can be placed here this round.
+  146077:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the first player makes a Fortitude test: exhausts any number of ready heroes to commit them, discards the top X cards of the encounter deck (X the tens digit of their threat), counts the Sauron's Eye icons on them, the players take actions, and the committed heroes' total Willpower must be greater than the icons to pass (equal or fewer fails)
+    - then, if the last Fortitude test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 5, until the end of the round
+
+146077:B:3 (back): This stage cannot be defeated unless Mount Doom is the active location.
+  146077:constant:2: Constant
+    only if not (the active location is a location (any player controls) named "Mount Doom")
+    - the players cannot defeat this stage while this holds
+
+## 146078 The Crack of Doom
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+146078:A:1 (front): Dire. When Revealed: Shuffle the encounter discard pile into the encounter deck and discard cards from the top until X enemies are discarded, where X is the number of players. Add each enemy discarded this way to the staging area.
+  (the keyword part is owned by the card's keywords; the records cover: When Revealed: Shuffle the encounter discard pile into the encounter deck and discard cards from the top until X enemies are discarded, where X is the number of players. Add each enemy discarded this way to the staging area.)
+  146078:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - discard from the top of the encounter deck until 1 enemy for each player is discarded; add those enemies to the staging area
+
+146078:B:1 (back): Dire. Allies cannot enter play and 'when revealed' effects cannot be canceled.
+  (the keyword part is owned by the card's keywords; the records cover: Allies cannot enter play and 'when revealed' effects cannot be canceled.)
+  146078:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json LimitEntries {"verb":"LimitEntries","cardType":"ally","max":0}]
+    - [json UncancelableWhenRevealed {"verb":"UncancelableWhenRevealed"}]
+
+146078:B:2 (back): Forced: When Mount Doom is explored, the first player makes a Fortitude test. Discard 1 extra encounter card for each player. If the first player fails this test, the Ring-bearer claims The One Ring and the players lose the game. If the test is successful, the Ring-bearer completes the quest and the players win the game.
+  146078:forced:1: Forced on the event locationExplored (heard about location (any player controls) named "Mount Doom")
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the first player makes a Fortitude test: exhausts any number of ready heroes to commit them, discards the top X cards of the encounter deck (X the tens digit of their threat, plus the number of players more cards), counts the Sauron's Eye icons on them, the players take actions, and the committed heroes' total Willpower must be greater than the icons to pass (equal or fewer fails)
+    - then, if the last Fortitude test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the players lose the game (The Ring-bearer claimed The One Ring)
+    - then, if the last Fortitude test the running effect made was passed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the players win the game
+
+(rendered pieces: 198 by template, 23 as JSON)

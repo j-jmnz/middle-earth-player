@@ -1,12 +1,19 @@
 // Elimination (rr.player-elimination): a seat out of heroes or at the threat elimination level leaves the game, and the cards it held go with it.
 import { threatSaved } from "../families/quest/threat.ts";
 import { GOLLUM, SMEAGOL, isGollum } from "../families/gollum/index.ts";
+import { DIRE_ELIMINATION_LEVEL } from "../families/black-gate/dire.ts";
 import { discardArea } from "../families/breaking/areas.ts";
+import type { ReduceContext } from "../interpret/interpret.ts";
+import { queueEvent } from "../windows/queue.ts";
+import { gameReads } from "./game-reads.ts";
 import type { EngineStep } from "./intents.ts";
 import { fromEncounterDeck, printedOf, type PrintedCard } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
 import { flagged, heldAmount, heldHero, livingSeats, updateCard, withSeat } from "./state.ts";
 import { inPlay, moveCard, type Destination } from "./zones.ts";
+
+/** The threat at which a player is eliminated (rr.player-elimination); a Dire quest raises it (`DIRE_ELIMINATION_LEVEL`). */
+export const ELIMINATION_LEVEL = 50;
 
 export function markLoss(state: ScenarioState, reason: string): ScenarioState {
   if (state.lost) return state;
@@ -16,8 +23,8 @@ export function markLoss(state: ScenarioState, reason: string): ScenarioState {
 // An eliminated seat leaves the game (rr.player-elimination): its hand, its deck and every card it controls go to their
 // owners' discard piles, and the enemies engaged with it return to the staging area with their damage. An attack on
 // that seat ends, and a Peril lock it held is released. If it held the first player token, the token passes clockwise at once (rr.first-player,
-// faq.first-player-elimination). Nothing is cleared once the game is lost.
-export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): ScenarioState {
+// faq.first-player-elimination). Nothing is cleared once the game is lost. With `ctx`, an enemy that returns to the staging area queues "returnedToStaging" in a game whose records name it (146017:A:1).
+export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, ctx?: ReduceContext): ScenarioState {
   if (state.lost) return state;
   let next = state;
   // Gollum is engaged with the first player and Sméagol is controlled by them (144075:A:1, 144076:A:1): when that seat leaves they pass to the new first player, keeping their exhaustion and damage (agent recommendation, docs/brief.md, The Two Towers).
@@ -37,6 +44,7 @@ export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string,
       }
       next = moveCard(next, enemyId, { zone: "staging" });
       next = updateCard(next, enemyId, { controller: null });
+      if (ctx && gameReads(next, ctx, '"trigger":"returnedToStaging"')) next = queueEvent(next, { trigger: "returnedToStaging", seat: index, cardId: enemyId });
     }
     if (smeagol && heir != null) next = moveCard(next, smeagol.id, { zone: "play", seat: heir });
     for (const card of controlled) {
@@ -77,10 +85,29 @@ function livingSuccessor(state: ScenarioState): number | null {
   return null;
 }
 
+/** The scenario's records say its last player's elimination is its Resolution, not a loss (the flag `endsInDefeat`, held from the campaign card). */
+export function endsInDefeat(state: ScenarioState): boolean {
+  return heldAmount(state, "table", "endsInDefeat") > 0;
+}
+
+/** What a run list and the end screens say of that end: the scenario was cleared by its last player's elimination and not by a win (mec113.dire, docs/brief.md, The Black Gate Opens). */
+export const ENDED_BY_DEFEAT = "Every player fell";
+
+/** The scenario ended on its last player's elimination, which is its Resolution (`endsInDefeat`), not on a win: every other end of every other scenario is false here. */
+export function endedInDefeat(state: ScenarioState): boolean {
+  return state.stageCleared && !state.lost && endsInDefeat(state);
+}
+
 // A seat leaves the game (rr.player-elimination): the step is recorded and the seat marked eliminated; settle moves its cards (clearEliminated). With no seat left the game is lost. Every elimination goes through here.
 export function eliminateSeat(state: ScenarioState, index: number, steps: EngineStep[]): ScenarioState {
   const seat = state.seats[index];
   if (!seat || seat.eliminated) return state;
+  // A scenario whose records hold `endsInDefeat` ends when its last player is eliminated, and the end is its Resolution (The Black Gate Opens): the seat stays as it stood and the scenario is cleared, so a win's Resolution reads that state.
+  if (endsInDefeat(state) && livingSeats(state).length === 1) {
+    if (state.stageCleared) return state;
+    steps.push({ kind: "eliminate", seat: index });
+    return { ...state, stageCleared: true, window: null, pendingAttack: null };
+  }
   steps.push({ kind: "eliminate", seat: index });
   const next = withSeat(state, index, { ...seat, eliminated: true });
   return livingSeats(next).length === 0 ? markLoss(next, "No seats remain") : next;
@@ -92,8 +119,8 @@ export function eliminateEmpties(state: ScenarioState, steps: EngineStep[], fina
   for (let index = 0; index < next.seatCount; index += 1) {
     const seat = next.seats[index];
     if (!seat || seat.eliminated) continue;
-    // The elimination level, lowered by a card the seat holds (The One Ring, families/misc.ts).
-    const level = 50 - Math.max(0, heldAmount(next, `seat:${index}`, "eliminationReduction"));
+    // The elimination level (99 while the main quest is Dire, mec113.dire), lowered by a card the seat holds (The One Ring, families/misc.ts).
+    const level = (next.dire ? DIRE_ELIMINATION_LEVEL : ELIMINATION_LEVEL) - Math.max(0, heldAmount(next, `seat:${index}`, "eliminationReduction"));
     if (!final && seat.threat < level && seat.heroes.length === 0 && (state.heroSavers ?? []).includes(index)) continue;
     // A hero an enemy guards is in play, not killed (Carried Away, 18074:B:1; rr.player-elimination): its owner is not out of heroes while it is held.
     const held = seat.threat < level && seat.heroes.length === 0 && Object.values(next.cards).some((card) => heldHero(card) && card.owner === index);

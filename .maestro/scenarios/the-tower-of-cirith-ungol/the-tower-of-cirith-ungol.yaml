@@ -1,0 +1,23 @@
+appId: com.middleearth.lcg
+tags:
+  - scenario
+---
+# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `ungol-won` (scripts/e2e/the-tower-of-cirith-ungol.ts): a real two-handed game of The Tower of Cirith Ungol (The One Deck and the Defenders of Gondor
+# list, Easy, the saga Frodo the first player's Ring-bearer, after The Battle of the Pelennor Fields' win), parked on its win (Escape from Cirith Ungol defeated with The Two Watchers out of play). The fixture is OPEN until scripts/e2e/fixtures.ts finds a win of those lists in its seeds
+# (docs/phases/STATUS.md).
+# The Resolution (146069) asks nothing: a boon still guarded on Shagrat, in play, leaves the pool, and the others stay. The Campaign Setup asked each player for an Item boon of the pool to set aside (the Palantir of Orthanc; the fixture's loadout answers it). The campaign has no XP.
+# The scenario's top-bar dials (`ungol-chamber`, `ungol-watchers`, `ungol-x`) are gone on the win table (Topmost Chamber and The Two Watchers are in the victory display), so the flow passes no TABLE_WIDGET.
+# The win unlocks The Black Gate Opens: its node reads Next and the road offers Begin.
+- runFlow:
+    file: ../../subflows/scenario-win.yaml
+    env:
+      FIXTURE: ungol-won
+      SCENARIO_ID: the-tower-of-cirith-ungol
+      NO_XP: "true"
+- assertVisible:
+    id: node-the-black-gate-opens-status
+    text: "Next"
+- assertVisible:
+    id: begin
+- assertNotVisible:
+    id: path-soon

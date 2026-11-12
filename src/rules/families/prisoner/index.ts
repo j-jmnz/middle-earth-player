@@ -73,7 +73,7 @@ function takePrisoner(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   if (!chosen) return state;
   const next = { ...state, seedCursor: rolled.cursor };
   const seat = next.cards[chosen]?.controller ?? null;
-  return queueEvent(captureHero(next, chosen, null, true, campaignTurnsDown(next)), { trigger: "prisonerTaken", seat, cardId: chosen, subject: chosen });
+  return queueEvent(captureHero(next, chosen, null, { prisoner: true, attachmentsDown: campaignTurnsDown(next) }), { trigger: "prisonerTaken", seat, cardId: chosen, subject: chosen });
 }
 
 // SelectLoggedPrisoner: the Campaign Log's prisoner takes the place of the one just selected.
@@ -84,7 +84,7 @@ function selectLogged(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   const logged = heroesOf(state, ctx).find((id) => state.cards[id]?.code === named);
   if (!logged) return state;
   const released = unholdPrisoner(state, 0);
-  return captureHero(released, logged, null, true, campaignTurnsDown(released));
+  return captureHero(released, logged, null, { prisoner: true, attachmentsDown: campaignTurnsDown(released) });
 }
 
 // CaptureWithPrisoner: the card in play with this code is placed facedown next to the prisoner (held under it): in play, controlled by

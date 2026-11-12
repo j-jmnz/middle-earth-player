@@ -10,6 +10,8 @@ appId: com.middleearth.lcg
 # ("Confirming records ..."), writes the log.
 # Optional env: CHOICE2_ID, CHOICE2_PROMPT, CHOICE2_CONSEQUENCE (all three or none, and only with CHOICE_ID): a Resolution that asks a second choice once the first is confirmed (The King's Quest: Isolde, then the burden for Abandoned Ruin). They read as CHOICE_ID, CHOICE_PROMPT and CHOICE_CONSEQUENCE do, and the second Confirm sends the second choice and settles the screen.
 # Optional env: CHOICE2_SEAT (only with CHOICE2_ID): the seat label the second choice shows ("Player 2 chooses"), read before the choice is tapped, for a Resolution whose two questions share a prompt (The Withered Heath's Songs).
+# Optional env: RAIL_WORD (the word the rail shows when the scenario is over, "Victory" when absent: a scenario that ends when its last player falls says "The end"; the flow then reads The end on the Resolution too, OUTCOME_WORD).
+# Optional env: OUTCOME_WORD (the word the Resolution screen opens on, read before its choices; absent for a win).
 # Optional env: LAST_PART (any value: the scenario is the last of its campaign). The campaign is then complete, so the XP total stays on the path and Spend XP is gone; the flow asserts only the total.
 - launchApp:
     clearState: true
@@ -31,7 +33,7 @@ appId: com.middleearth.lcg
     id: life
 - assertVisible:
     id: rail-current
-    text: "Victory"
+    text: "${typeof RAIL_WORD !== 'undefined' && RAIL_WORD !== '' ? RAIL_WORD : 'Victory'}"
 - runFlow:
     when:
       true: "${typeof TABLE_WIDGET !== 'undefined' && TABLE_WIDGET !== ''}"
@@ -44,6 +46,14 @@ appId: com.middleearth.lcg
     visible:
       id: resolution
     timeout: 30000
+# A scenario that ends when its last player falls reads The end on the Resolution (OUTCOME_WORD), with the sentence that says so.
+- runFlow:
+    when:
+      true: "${typeof OUTCOME_WORD !== 'undefined' && OUTCOME_WORD !== ''}"
+    commands:
+      - assertVisible:
+          id: resolution-outcome
+          text: "${OUTCOME_WORD}"
 # A campaign card whose Resolution asks one choice: the card is chosen, the confirm line names it, the first Confirm sends the choice and the screen settles on what the log will hold. One that asks none goes straight to the final confirm.
 - runFlow:
     when:

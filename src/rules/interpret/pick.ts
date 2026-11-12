@@ -6,7 +6,7 @@ import { attachmentHostIds } from "../player/attach.ts";
 import { canAttack, characters, legalAttackEnemies } from "../combat/combat.ts";
 import { countsAsAttachment, hasTrait } from "./conditions.ts";
 import { attachmentsPickMatches } from "../families/attachments/pick.ts";
-import { costsPickMatches } from "../families/costs/pick.ts";
+import { costsPickMatches, highestCost } from "../families/costs/pick.ts";
 import { attackPickMatches } from "../families/attack/pick.ts";
 import { miscPickMatches } from "../families/misc/pick.ts";
 import { familyPickMatches } from "./family-hooks.ts";
@@ -33,6 +33,8 @@ import { highestAttack } from "../families/sea/ramming.ts";
 import { chosenCopies, levelAmount } from "../families/aflame/values.ts";
 import { sidePickMatches } from "../families/grapple/values.ts";
 import { islandPool, outsideCells } from "../families/island/pick.ts";
+import { embassyPool, highestThreatOf } from "../families/black-gate/pick.ts";
+import { fortitudePool } from "../families/mount-doom/pick.ts";
 import { seatPickMatches } from "../families/wilderland/seat-pick.ts";
 
 // What a filter is read against: who is choosing or counting, the effect's source, what it has picked, its X, and the
@@ -74,6 +76,12 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
   // The Island Map's filters start from its own cards (families/island/pick.ts).
   const mapped = islandPool(state, spec);
   if (mapped) return mapped;
+  // The Embassy from the Dark Tower's faceup row (families/black-gate/pick.ts).
+  const embassy = embassyPool(state, spec);
+  if (embassy) return embassy;
+  // The cards discarded for the Fortitude test in progress (families/mount-doom/pick.ts).
+  const fortitude = fortitudePool(state, spec);
+  if (fortitude) return fortitude;
   // A burden card in play or in the encounter deck or its discard pile (142074:A:2).
   if (spec.burden) {
     return Object.values(state.cards)
@@ -106,6 +114,8 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
   else if (spec.type === "attachment") {
     for (const instance of Object.values(state.cards)) {
       if (instance.host == null || (instance.zone !== "play" && instance.zone !== "attached")) continue;
+      // A boon guarded on an enemy is held for its owner, not an attachment any player controls (146069:B:1).
+      if (instance.held === true) continue;
       // An encounter attachment (a Condition) has no controller: any player's filter sees it.
       if (instance.controller != null && !seats.includes(instance.controller)) continue;
       raw.push(instance.id);
@@ -128,7 +138,8 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
     if (!spec.stagingOnly) raw.push(...Object.values(state.cards).filter((card) => card.claimed === true && card.controller != null && seats.includes(card.controller)).map((card) => card.id));
     // `controlled` also counts a tower the players control as a group: freed of encounters, in the staging area, claimed with no controller (ControlWhenFree, families/objectives/control.ts).
     if (spec.controlled && spec.control !== "you") raw.push(...stagingFor(state, spec, asking).filter((id) => state.cards[id]?.claimed === true));
-  } else if (spec.type === "card" && spec.stagingOnly) {
+  } else if ((spec.type === "ally" || spec.type === "card") && spec.stagingOnly) {
+    // The cards lying in the staging area; for allies, those under nobody's control (families/pelennor/allies.ts, 145074:B:2).
     raw.push(...stagingFor(state, spec, asking));
   } else if (spec.type === "card") {
     for (const index of seats) raw.push(...(state.seats[index]?.heroes ?? []), ...(state.seats[index]?.play ?? []));
@@ -318,6 +329,10 @@ export function pickCandidates(
   // "The Harad enemy engaged with you with the lowest Attack" (families/harad/pick.ts).
   if (spec.lowestAttack) return lowestOf(state, found, "attack", ctx);
   if (spec.lowestThreat) return lowestOf(state, found, "threat", ctx);
+  // "The highest threat encounter card remaining" (families/black-gate/pick.ts).
+  if (spec.highestThreat) return highestThreatOf(state, found, ctx);
+  // "The highest cost attachment you control" (families/costs/pick.ts).
+  if (spec.highestCost) return highestCost(state, found, ctx);
   // "The engaged Ship enemy with the highest Attack" (families/sea/ramming.ts).
   return spec.highestAttack ? highestAttack(state, found, ctx) : found;
 }
@@ -337,8 +352,8 @@ export function feedsDiscard(instructions: readonly Instruction[]): boolean {
 }
 
 // How many cards match a filter from a seat's side: the count an amount or a condition reads.
-export function countMatching(state: ScenarioState, spec: PickSpec, seat: number, sourceId: string | null, ctx: ReduceContext, participants?: readonly string[]): number {
-  const found = pickCandidates(state, spec, seat, [], sourceId, ctx, undefined, participants, true);
+export function countMatching(state: ScenarioState, spec: PickSpec, seat: number, sourceId: string | null, ctx: ReduceContext, participants?: readonly string[], picked: readonly string[] = []): number {
+  const found = pickCandidates(state, spec, seat, picked, sourceId, ctx, undefined, participants, true);
   // "When counting the number of Dwarf characters you control, Bombur counts as two" (families/misc/traits.ts).
   return found.length + countsExtra(state, found, spec);
 }

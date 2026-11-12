@@ -40,6 +40,15 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("noneReturned") }),
   // The running effect has discarded no card with DiscardEach ("If no cards are discarded by this effect, ~ gains surge", 12106:A:1). Read by src/rules/families/south/damage.ts.
   z.strictObject({ kind: z.literal("noneDiscarded") }),
+  // The Embassy from the Dark Tower's pair the running effect is on (EmbassyNext): `pair`, there is one (its player card still lies faceup); `playable`, its player card can be played at no cost by its owner now (146072:B:1). Read by src/rules/families/black-gate/embassy.ts.
+  z.strictObject({ kind: z.literal("embassy"), is: z.enum(["pair", "playable"]) }),
+  // The mount-doom family's conditions (src/rules/families/mount-doom/conditions.ts). `lastFortitudeFailed`, `lastFortitudePassed`: the last Fortitude test the running effect made was failed, or passed ("If you fail this test", 146051:A:1; "If a player passes this test", 146076:B:1);
+  // false before the effect has made one. `fortitudeFailed`: a player failed a Fortitude test this round, `who` the actor ("If you failed a Fortitude test this round", 146055:A:3) or any player ("If a player has failed a Fortitude test this round", 146046:A:1).
+  z.strictObject({ kind: z.literal("lastFortitudeFailed") }),
+  z.strictObject({ kind: z.literal("lastFortitudePassed") }),
+  z.strictObject({ kind: z.literal("fortitudeFailed"), scope: z.literal("round"), who: z.enum(["actor", "any"]) }),
+  // The source card is attached to a card the actor controls ("After you fail a Fortitude test, exhaust attached hero", 146057:A:1): an encounter card attached to a hero is controlled by nobody, so the Forced effect's actor, the player the event happened to, is compared with the host's controller.
+  z.strictObject({ kind: z.literal("hostControlledByActor") }),
   z.strictObject({ kind: z.literal("phase"), is: phaseNameSchema }),
   // The encounter deck or discard pile holds a card with this code or trait.
   // Where the source card is now. `play` means any zone the source's controller plays from.
@@ -64,7 +73,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("heroExhausted") }),
   // The attack in progress has no defender (declared or considered).
   z.strictObject({ kind: z.literal("undefended") }),
-  z.strictObject({ kind: z.literal("searchable"), trait: z.string().min(1).optional(), code: z.string().min(1).optional(), deckOnly: z.literal(true).optional() }),
+  // `type`: only a card of this printed type counts ("discard cards from the top of the encounter deck until an enemy is discarded" is offered while an enemy is left in the deck, 146061:A:1). `victory`: the victory display is read too (146036:A:2).
+  z.strictObject({ kind: z.literal("searchable"), trait: z.string().min(1).optional(), code: z.string().min(1).optional(), type: z.enum(["enemy", "location", "treachery", "objective"]).optional(), deckOnly: z.literal(true).optional(), victory: z.literal(true).optional() }),
   // Some card matches this pick (for the actor now): a choice that could be made.
   z.strictObject({ kind: z.literal("canPick"), pick: pickSchema }),
   // Each of the actor's heroes has this trait, and the actor has one ("Play only if each of your heroes is a Hobbit",
@@ -147,6 +157,10 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The cards facedown under the card in play with this code number at least `min` and at most `max`, each plus the number of players with `players` ("If there are at least X facedown cards under The Black Gate, the players lose the game. X is 3 more than the
   // number of players", 144027:A:2). 0 with no such card in play. The count of a card in the zone `under`, as `underBurn` reads it for The Havens Burn. Read by the harad family.
   z.strictObject({ kind: z.literal("facedownUnder"), code: z.string().min(1), min: z.number().int().min(0).optional(), max: z.number().int().min(0).optional(), players: z.literal(true).optional() }),
+  // The actor's threat dial holds a copy of the card with this code (`onDial`: "attached to your threat dial"), or a copy of it is set aside and the dial holds none (`canAttachToDial`: the option "attach a set aside Overcome by Fear to your threat dial" can be done;
+  // Limit 1 per threat dial). Read by the attachments family (src/rules/families/attachments/dial.ts).
+  z.strictObject({ kind: z.literal("onDial"), code: z.string().min(1) }),
+  z.strictObject({ kind: z.literal("canAttachToDial"), code: z.string().min(1) }),
   // The quest deck holds at least `min` stages (1 by default): the stage 2s Mount Gundabad's current quest can be bypassed in favor of (19135:B:3; emce.bypassing). Read by the wilderland family.
   z.strictObject({ kind: z.literal("questDeck"), min: z.number().int().positive().optional() }),
   // The enemy with this title has resolved an attack in the combat phase now under way ("unless he has resolved an attack this phase", 19155:A:1): false in any other phase. Read by the wilderland family.
@@ -183,14 +197,16 @@ const atomSchema = z.discriminatedUnion("kind", [
   // Every card of `of` also matches `match`, and there is at least one ("if each hero you control has a printed Leadership
   // resource icon"; heroesAll is the Hobbit case).
   z.strictObject({ kind: z.literal("allMatch"), of: pickSchema, match: pickSchema }),
-  // The actor's threat is at least `min` and at most `max` (Valour: 40 or higher; Secrecy: 20 or less).
-  z.strictObject({ kind: z.literal("threat"), min: z.number().int().min(0).optional(), max: z.number().int().min(0).optional() }),
+  // The actor's threat is at least `min` and at most `max` (Valour: 40 or higher; Secrecy: 20 or less). `valour` marks Valour's own
+  // threshold (`min: 40`) or its complement (`max: 39`): both read 40 higher while the main quest has Dire (mec113.dire).
+  z.strictObject({ kind: z.literal("threat"), min: z.number().int().min(0).optional(), max: z.number().int().min(0).optional(), valour: z.boolean().optional() }),
   // The source card, its host, the card the event was about, or the active location matches the filter (its zone is not
   // checked): "while ~ is committed to a quest", "if attached hero is a Dwarf", "if that enemy is an Orc".
   // `inPlay`: the card is in play now (`false`: it is not), for "if that ally is still in play".
   z.strictObject({
     kind: z.literal("matches"),
-    card: z.enum(["self", "host", "subject", "other", "activeLocation", "picked", "attacker", "defender"]),
+    // `previous`: the card picked before the last one ("if that copy was discarded", 146019:A:1).
+    card: z.enum(["self", "host", "subject", "other", "activeLocation", "picked", "previous", "attacker", "defender"]),
     pick: pickSchema.optional(),
     inPlay: z.boolean().optional(),
     // The card is in a staging area now (`false`: it is not): "raise your threat by its Threat to engage that enemy" needs the enemy still there (142067:B:2).
@@ -250,6 +266,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("campaign") }),
   // The Campaign Log marks this card upgraded (every box beside it is marked, dcce.scalable-upgradable): "If \"Gavin returned,\" put him into play" (11215:A:3). False in a game with no campaign facts.
   z.strictObject({ kind: z.literal("upgraded"), code: z.string().min(1) }),
+  // The scenario is played in Campaign Mode and no card with this code is in play: the campaign's own copy of the card is outside the game, where an effect may put it into play from ("Put Spyglass into play", 11203:A:5, dcce.campaign-mode).
+  z.strictObject({ kind: z.literal("campaignCopyOutside"), code: z.string().min(1) }),
   // The card DiscardBottom discarded in this effect has a printed cost of `max` or less ("If that card's printed cost is 2 or less", 11032:A:2); a card with no printed cost does not, and nothing
   // discarded does not. Read by the uncharted family (src/rules/families/uncharted/cards.ts).
   z.strictObject({ kind: z.literal("discardedCost"), max: z.number().int().min(0) }),

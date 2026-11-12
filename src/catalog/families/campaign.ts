@@ -3,7 +3,9 @@
 // them. src/campaign/start.ts and checklist.ts deal the Setup ones; src/rules/families/campaign/index.ts and resolution.ts run the rest.
 import { z } from "zod";
 
+import { CAMPAIGN_ENDS, RECORDED_COUNTS } from "../campaign-record.ts";
 import type { CatalogFamily } from "../family-manifest.ts";
+import { positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { verbFlags } from "../verb-flags.ts";
 
@@ -45,6 +47,8 @@ const VERBS = [
   // Places `amount` resource tokens (1 by default) on the source card: the campaign card counts them ("Response: At the end of each round, place 1
   // resource token here", 41050:A:3). It is no hero's resource pool, so nothing collects it and no `resourcesAdded` is announced.
   z.strictObject({ verb: z.literal("PlaceToken"), amount: z.number().int().positive().optional(), ...when }),
+  // Campaign Setup: "Place X resource tokens on this card, where X is the number of resource tokens on The Black Gate, as recorded in the campaign log" (146079:A:1). The campaign card, which the game keeps because it has a Forced effect, takes `amount` resource tokens (an amount: `recorded`, 0 with no record). The engine deals it in Setup.
+  verbFlags(z.strictObject({ verb: z.literal("PlaceTokensOnCampaignCard"), amount: positiveAmountSchema, ...when }), { setupRole: "dealt" }),
   // The Two Towers' campaign cards (docs/brief.md, The Two Towers; src/campaign/checklist-two-towers.ts deals the Setup ones, src/rules/families/campaign/resolution.ts runs the Resolution ones).
   // Campaign Setup: these cards leave the Campaign Pool ("Remove Gildor Inglorion and Mr. Underhill from the Campaign Pool", 143071:A:2). The log loses them; a card on a hero goes with it.
   z.strictObject({ verb: z.literal("RemovePoolCards"), codes: z.array(code).min(1) }),
@@ -85,9 +89,51 @@ const VERBS = [
   // Resolution: the enemies facedown underneath the card with this code are recorded in the Campaign Log by card code and quantity ("Record the name and quantity of each enemy underneath The Black Gate in the notes
   // section of the campaign log", 144069:B:1).
   z.strictObject({ verb: z.literal("RecordUnderneath"), code, ...when }),
+  // The Return of the King's campaign cards (docs/brief.md, The Return of the King; src/campaign/checklist.ts deals the Setup one, src/rules/families/campaign/saga-end.ts runs the Resolution ones).
+  // Campaign Setup: the first player may raise each player's threat by `raiseThreat` for this game to search his deck for the card and add it to his hand ("The first player may raise each player's threat by 1 to search his deck
+  // for Andúril and add it to his hand", 145066:A:1). The card is taken from the deck, or from the pool where step 7 would shuffle it in, and joins the hand after the mulligan; with no copy to find nothing is asked.
+  z.strictObject({ verb: z.literal("SearchDeckForCard"), code, raiseThreat: z.number().int().positive() }),
+  // Resolution: each copy of these cards attached to a player's threat dial joins the Campaign Pool, recorded for that player ("Add each copy of Overcome by Fear attached to a player's threat dial to the campaign pool and record
+  // the name of each player it was attached to", 145066:B:1). One entry for each player holding a copy.
+  z.strictObject({ verb: z.literal("EarnOnThreatDial"), codes: z.array(code).min(1), ...when }),
+  // Resolution: the resources on the cards in play with these codes are counted and recorded in the notes section of the Campaign Log under `as` ("Count the number of resources on The Corsair Fleet and record that number in
+  // the notes section", 145070:B:1; "Record the number of resource tokens on The Black Gate", 146074:B:1). A card of two sides is two codes; the count is their sum.
+  z.strictObject({ verb: z.literal("RecordTokens"), codes: z.array(code).min(1), as: z.enum(RECORDED_COUNTS), ...when }),
+  // Resolution: each card with one of these codes leaves the Campaign Pool, once ("Remove Army of the Dead from the campaign pool", 145070:B:1). With `perCopyInVictory`, one entry leaves for each copy of the code in the
+  // victory display and none when there is none ("If a Wraith on Wings is in the victory display, remove that copy from the campaign pool", 146074:B:1). Nothing happens for a code the pool does not hold. The Setup's
+  // RemovePoolCards is the same removal before a game.
+  z.strictObject({ verb: z.literal("RemoveFromPoolByCode"), codes: z.array(code).min(1), perCopyInVictory: z.literal(true).optional(), ...when }),
+  // Resolution: each boon attached to the card with this code in play leaves the Campaign Pool ("If Shagrat is in play, remove each Item boon attached to it from the campaign pool", 146069:B:2): the players have lost it.
+  z.strictObject({ verb: z.literal("LoseGuardedBoons"), host: code, ...when }),
+  // Resolution: a hero in its controller's discard pile is not added to the list of fallen heroes ("If a hero is in its controller's discard pile, do not add that hero's name to the list of fallen heroes", 146074:B:1).
+  z.strictObject({ verb: z.literal("IgnoreDiscardedHeroes"), ...when }),
+  // Resolution: the saga ends, the players winning or losing the campaign ("Keep The One Ring ... the players lose the campaign", "Destroy The One Ring ... the players win the campaign", 146079:B:2, 146079:B:3). The Campaign Log records it.
+  z.strictObject({ verb: z.literal("EndCampaign"), result: z.enum(CAMPAIGN_ENDS), ...when }),
+  // The Battle of the Pelennor Fields' campaign card (docs/brief.md, The Return of the King). Campaign Setup: the first player attaches these cards to the hero with this code and sets him aside, out of play ("The first player attaches Andúril and Banner of Elendil
+  // to Aragorn and sets him aside, out of play", 145078:A:1). The attachments come from the supply; the hero and they leave no `leftPlay` behind (nothing in play left it) and the hero is set aside with an empty resource pool (Setup runs before the first round) and returns with an empty one (docs/brief.md, The Return of the King, 145072:A:1).
+  verbFlags(z.strictObject({ verb: z.literal("SetAsideHeroWithAttachments"), hero: code, attach: z.array(code).min(1) }), { setupRole: "dealt" }),
+  // The first player takes control of the set aside hero with the code, with the cards attached to him ("the first player takes control of Aragorn", 145072:A:1). He enters play ready under the first player; with no such hero set aside nothing happens.
+  z.strictObject({ verb: z.literal("ReturnSetAsideHero"), code, ...when }),
+  // Campaign Setup: each enemy recorded in the Campaign Log under The Black Gate with this trait is set aside, out of play, one copy for each recorded ("Set each Harad enemy recorded in the campaign log aside, out of play", 145078:A:1). With no log, nothing is set aside.
+  verbFlags(z.strictObject({ verb: z.literal("SetAsideLogged"), trait: z.string().min(1) }), { setupRole: "dealt" }),
+  // The Tower of Cirith Ungol's campaign card (docs/brief.md, The Return of the King). Campaign Setup: A Heavy Burden-like card from the supply is attached to the hero that has the card `with` attached ("Attach A Heavy Burden to the hero with Last of the Company attached", 146069:A:1). It resolves after the quest card's Setup,
+  // which attaches `with`; with no such hero nothing happens.
+  verbFlags(z.strictObject({ verb: z.literal("AttachToHeroWith"), code, with: code }), { setupRole: "afterSetup" }),
+  // Campaign Setup: each player in turn chooses a boon of the campaign pool with this trait, other than `except`, from the pool cards dealt to them, and sets it aside, out of play: it is left out of their deck this game ("Each player chooses an Item boon (excluding Andúril) from the campaign pool and sets it aside, out of play", 146069:A:1).
+  // The checklist asks (src/campaign/checklist.ts, step 6) and the start spawns the set-aside copy (StartSeat.setAside); a player with no such boon, and a game with no pool, choose nothing.
+  z.strictObject({ verb: z.literal("SetAsideBoon"), trait: z.string().min(1), except: code }),
+  // "Attach each set aside Item boon to Shagrat as a guarded objective" (146069:B:1): each set-aside card of the campaign pool of the kind `boon` goes onto the card in play with the code `host` as its guarded objective, held for its owner: it leaves play with the host and then returns to its owner's hand
+  // (ReturnGuardedToHand), unless the Resolution finds the host still in play (LoseGuardedBoons). With the host out of play the boons stay set aside.
+  z.strictObject({ verb: z.literal("GuardWithSetAside"), host: code, kind: z.literal("boon"), ...when }),
+  // "Attach A Heavy Burden to the Ring-bearer" (146069:B:1): the card in play with this code moves to the hero `to` names, the last picked hero or the Ring-bearer, with the cards it is attached to unchanged: one card moves, no copy is added, and it does not leave play. Nothing happens with no such card or no such hero.
+  z.strictObject({ verb: z.literal("MoveAttachment"), code, to: z.enum(["picked", "ringBearer"]), ...when }),
 ] as const;
 
 const TRIGGERS = [] as const;
-const FLAGS = [] as const;
+const FLAGS = [
+  // On "table" (target `table`), from the campaign card, for the whole scenario: the scenario has no win, and it ends when the last player is eliminated, which runs the Resolution as a win does (The Black Gate Opens, 146073:B:3 and 146074:B:1; docs/brief.md,
+  // The Return of the King). The last seat is not marked eliminated, so the Resolution reads the state as it stood when it fell. Held by no other scenario: every other scenario's loss writes nothing.
+  "endsInDefeat",
+] as const;
 
 export const manifest = { name: "campaign", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

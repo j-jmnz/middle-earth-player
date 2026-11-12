@@ -161,6 +161,12 @@ export async function wonLog<G extends { name: string; decks: string }>(part: Wo
   return { ...written, heroesBySeat: blank.heroesBySeat, fallenHeroesBySeat: blank.fallenHeroesBySeat, campaignPool: written.campaignPool.filter((card) => card.attachedTo == null) };
 }
 
+/** The log after the win `golden` of `scenarioId` pins is resolved onto `before` (its golden.json state read with `goldenState`, never played again): the step each later part of a campaign repeats for the parts before it. */
+export function goldenResolved(before: CampaignLog, scenarioId: string, golden: string, cards: ReadonlyMap<string, PrintedCard>): CampaignLog {
+  const state = goldenState(scenarioId, golden);
+  return applyResolution(before, state.scenarioId, state, cards, NO_COPY_LIMITS);
+}
+
 /** How full a table is, for the showcase fixtures (docs/showcase.md, Saves and decks): the seats' cards in play, the cards attached to them, the engaged enemies, staging and the active location. */
 export type Board = { play: number; attached: number; engaged: number; staging: number; location: boolean };
 

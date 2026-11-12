@@ -167,8 +167,22 @@ export function addStandIns(cards: Map<string, PrintedCard>, names: readonly Sta
   for (const cost of costs) cards.set(`c${cost}`, eventCard(`c${cost}`, cost));
 }
 
+/** The hero an undefended attack of a second seat lands on (the attacking enemy engaged the next player): that seat's own first hero; null when the attack is the first seat's. */
+export function secondSeatHero(state: ScenarioState): string | null {
+  const seat = state.pendingAttack?.seat ?? 0;
+  return seat === 0 ? null : (state.seats[seat]?.heroes[0] ?? null);
+}
+
+// The card an undefended attack lands on: the one `lands` names for the attacking enemy's code, else the hero asked for.
+function undefendedOn(state: ScenarioState, lands: Readonly<Record<string, string>> | undefined, hero: string): string {
+  const attacker = state.pendingAttack ? state.cards[state.pendingAttack.enemyId]?.code : undefined;
+  const code = attacker == null ? undefined : lands?.[attacker];
+  return code == null ? hero : idOf(state, code);
+}
+
 export type FightTable = { state: ScenarioState; ctx: ReduceContext; hero: string; hero2: string };
-export type FightOptions<T> = { undefended?: boolean; defender?: (made: T) => string; pick?: (state: ScenarioState) => string; tweak?: (state: ScenarioState, made: T) => ScenarioState };
+// `lands`: for an attacker's code, the code of the card its undefended attack must land on when a card sends its damage elsewhere (Mordor Orc's goes to Minas Tirith, 145055:A:2); the defender (a hero) for any other attacker.
+export type FightOptions<T> = { undefended?: boolean; lands?: Readonly<Record<string, string>>; defender?: (made: T) => string; pick?: (state: ScenarioState) => string; tweak?: (state: ScenarioState, made: T) => ScenarioState };
 export type Fight<T> = { run: Run; ctx: ReduceContext; made: T; start: ScenarioState; during: ScenarioState };
 
 /**
@@ -203,13 +217,18 @@ export function fightEnemy<T extends FightTable, L>(table: (layout: L) => T, sha
   if (run.state.window?.kind !== "defense") throw new Error(`no defense window: ${JSON.stringify(run.state.window)}`);
   const defender = options.defender ? options.defender(made) : made.hero;
   let during = run.state;
-  run = send(run, options.undefended ? { type: "Undefended", heroId: defender } : { type: "DeclareDefender", defenderId: defender }, made.ctx);
+  run = send(run, options.undefended ? { type: "Undefended", heroId: undefendedOn(run.state, options.lands, defender) } : { type: "DeclareDefender", defenderId: defender }, made.ctx);
   for (let guard = 0; guard < 40 && (run.state.pendingAttack != null || run.state.window?.kind === "choose" || run.state.window?.kind === "look" || run.state.window?.kind === "defense"); guard += 1) {
     const window = run.state.window;
     // A second attack (the attacking enemy attacks again): defended as the first was, unless the defender is exhausted by then, and then by the second hero when the first is no hero.
     if (window?.kind === "defense") {
       const canDefend = legalTargets(run.state, { type: "DeclareDefender" }, made.ctx).includes(defender);
-      run = send(run, options.undefended || !canDefend ? { type: "Undefended", heroId: run.state.cards[defender]?.zone === "heroes" ? defender : made.hero2 } : { type: "DeclareDefender", defenderId: defender }, made.ctx);
+      const otherHero = secondSeatHero(run.state);
+      if (otherHero != null) {
+        run = send(run, { type: "Undefended", heroId: otherHero }, made.ctx);
+        continue;
+      }
+      run = send(run, options.undefended || !canDefend ? { type: "Undefended", heroId: undefendedOn(run.state, options.lands, run.state.cards[defender]?.zone === "heroes" ? defender : made.hero2) } : { type: "DeclareDefender", defenderId: defender }, made.ctx);
       continue;
     }
     if (window?.kind === "choose") {

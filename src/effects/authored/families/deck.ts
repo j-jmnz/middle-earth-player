@@ -41,7 +41,7 @@ function search(pick: Omit<PickSpec, "type" | "control" | "from">): Instruction[
 }
 
 const gondorAlly: PickSpec = { type: "card", control: "you", from: "deck", top: 5, cardType: "ally", trait: "Gondor" };
-const lowThreat: Condition = { kind: "threat", max: 39 };
+const lowThreat: Condition = { kind: "threat", max: 39, valour: true };
 
 export const RECORDS: readonly Effect[] = [
   // 01049 Will of the West: the event is removed from the game instead of going to the discard pile.
@@ -85,9 +85,9 @@ export const RECORDS: readonly Effect[] = [
   // 10003 Rallying Cry: the Response moves the ally that left play from the discard pile; the Valour Action is a lasting effect
   // the engine reads where an ally leaves play.
   {"id":"10003:response:1","cardCode":"10003","lines":["10003:A:1"],"timing":"response","trigger":"allyLeftPlay","subject":{"type":"ally","control":"any"},"cost":{"kind":"playEvent"},"instructions":[{"verb":"MoveCard","card":"subject","to":"hand","from":["discard"]}]},
-  {"id":"10003:action:1","cardCode":"10003","lines":["10003:A:2"],"timing":"action","condition":{"kind":"threat","min":40},"instructions":[{"verb":"ModifyStat","stat":"alliesToHand","amount":1,"until":"endOfPhase","target":"actorSeat"}]},
+  {"id":"10003:action:1","cardCode":"10003","lines":["10003:A:2"],"timing":"action","condition":{"kind":"threat","min":40,"valour":true},"instructions":[{"verb":"ModifyStat","stat":"alliesToHand","amount":1,"until":"endOfPhase","target":"actorSeat"}]},
   // 10063 Hope Rekindled: the Valour Action (its Action is 10063:action:1; the player uses one of the two).
-  {"id":"10063:action:2","cardCode":"10063","lines":["10063:A:2"],"timing":"action","condition":{"kind":"threat","min":40},"instructions":search({ top: 10, cardType: "event", valour: true })},
+  {"id":"10063:action:2","cardCode":"10063","lines":["10063:A:2"],"timing":"action","condition":{"kind":"threat","min":40,"valour":true},"instructions":search({ top: 10, cardType: "event", valour: true })},
   // 10090 Silver Harp
   {"id":"10090:response:1","cardCode":"10090","lines":["10090:A:3"],"timing":"response","trigger":"discardedFromHand","subject":{"type":"card","control":"you"},"cost":{"kind":"exhaustSelf"},"instructions":[{"verb":"MoveCard","card":"subject","to":"hand","from":["discard"]}]},
   // 10145 Elven-light: played from the discard pile (10145:constant:1), it goes back to the hand instead of the discard pile.
@@ -128,7 +128,7 @@ export const RECORDS: readonly Effect[] = [
   // 19153 Reforged: X is what was paid for it.
   {"id":"19153:action:1","cardCode":"19153","lines":["19153:A:1"],"timing":"action","instructions":[{"verb":"PlayFrom","pick":{"type":"card","control":"any","from":"discard","cardType":"attachment","trait":"Item","costIsX":true},"free":true}]},
   // 22002 Soldier of Gondor
-  {"id":"22002:response:1","cardCode":"22002","lines":["22002:A:1"],"timing":"response","trigger":"enteredPlay","subject":"self","instructions":[{"verb":"Pick","pick":gondorAlly,"when":lowThreat},{"verb":"MovePicked","to":"hand","when":lowThreat},{"verb":"Each","pick":gondorAlly,"upTo":"any","when":{"kind":"threat","min":40},"instructions":[{"verb":"MovePicked","to":"hand"}]},{"verb":"ShuffleDeck"}]},
+  {"id":"22002:response:1","cardCode":"22002","lines":["22002:A:1"],"timing":"response","trigger":"enteredPlay","subject":"self","instructions":[{"verb":"Pick","pick":gondorAlly,"when":lowThreat},{"verb":"MovePicked","to":"hand","when":lowThreat},{"verb":"Each","pick":gondorAlly,"upTo":"any","when":{"kind":"threat","min":40,"valour":true},"instructions":[{"verb":"MovePicked","to":"hand"}]},{"verb":"ShuffleDeck"}]},
   // 22027 Lothíriel (line 1 is another record's): only an ally that shares a Trait with her can enter play, so the choice is
   // among those.
   {"id":"22027:response:1","cardCode":"22027","lines":["22027:A:2"],"timing":"response","trigger":"committed","subject":"self","condition":{"kind":"canPick","pick":{"type":"card","control":"you","from":"hand","cardType":"ally","sharesTrait":"self","intoPlay":true}},"instructions":[{"verb":"Pick","pick":{"type":"card","control":"you","from":"hand","cardType":"ally","sharesTrait":"self","intoPlay":true}},{"verb":"PutIntoPlay","card":"picked","committed":true},{"verb":"Delay","until":"endOfPhase","subject":"picked","instructions":[{"verb":"MoveCard","to":"deckShuffle","from":["play"]}]}]},

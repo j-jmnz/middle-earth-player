@@ -123,6 +123,8 @@ export function nextIntent(
       }
       return { type: "Pass" };
     }
+    case "fortitudeCommit":
+      return { type: "CommitFortitude", cardIds: legalTargets(state, { type: "CommitFortitude" }, ctx) };
     case "hideCommit":
       return { type: "CommitHide", cardIds: legalTargets(state, { type: "CommitHide" }, ctx).slice(0, hideCommitLimit(state) ?? undefined) };
     case "choose":

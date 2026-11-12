@@ -13,8 +13,11 @@ export function levelOfCard(state: Pick<ScenarioState, "campaignFacts">, code: s
  * upgradable, but no text for their other side exists. They are never upgraded and never dealt on a side with no lines. */
 export const NO_UPGRADED_SIDE: ReadonlySet<string> = new Set(["11038", "11039"]);
 
-/** The face a card is dealt on: an upgraded card (every box marked) has its Upgraded side up, side B, for the rest of the campaign, unless that side has no text (NO_UPGRADED_SIDE); any other
+/** The cards that print no Upgraded side (the ledger, data/printed/dream-chaser.json, has side A only) although the log can mark them: the two above, Gavin (his mark means "Gavin returned") and the four Send for Help events. They are never dealt on side B. */
+const NO_B_SIDE: ReadonlySet<string> = new Set([...NO_UPGRADED_SIDE, "11210", "11211", "11212", "11213", "11214"]);
+
+/** The face a card is dealt on: an upgraded card (every box marked) has its Upgraded side up, side B, for the rest of the campaign, unless that side has no text (NO_B_SIDE); any other
  * dealt faceup card keeps its face. */
 export function dealtFace(state: Pick<ScenarioState, "campaignFacts">, code: string, face: CardFace): CardFace {
-  return face === "up" && state.campaignFacts?.upgraded?.includes(code) && !NO_UPGRADED_SIDE.has(code) ? "B" : face;
+  return face === "up" && state.campaignFacts?.upgraded?.includes(code) && !NO_B_SIDE.has(code) ? "B" : face;
 }

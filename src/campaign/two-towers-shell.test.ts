@@ -14,10 +14,10 @@ import { continueWords } from "./carry-words.ts";
 import { checklist, type ChecklistPlan } from "./checklist.ts";
 import { continuedLog, continueOffers } from "./continue.ts";
 import { emptyLog, type CampaignLog, type PoolCard } from "./log.ts";
-import { sagaRoleOf, titleBansOf } from "./saga.ts";
+import { keepsSagaColumns, sagaRoleOf, titleBansOf } from "./saga.ts";
 import { newSave, parseLog, type Save } from "./save.ts";
 import { buildStart } from "./start.ts";
-import { blackGateEnemies, keepsTwoTowersLog, marshesLines, SEARCHING_EYE, threatWords } from "./two-towers-view.ts";
+import { blackGateEnemies, marshesLines, SEARCHING_EYE, threatWords } from "./two-towers-view.ts";
 import type { World } from "./world.ts";
 
 // Rules: mec112.setting-up-the-game, mec112.aragorn, mec112.fellowship-sphere-heroes, mec112.saruman-grima-smeagol, mec112.campaign-mode-aragorn, mec112.campaign-mode,
@@ -229,6 +229,14 @@ describe("the offer words of a continued save", () => {
     expect(continueWords({ heroes: 3, fallen: 0, captives: 0, pool: 0, penalty: 0 })).toBe("3 heroes");
     expect(continueWords({ heroes: 0, fallen: 0, captives: 0, pool: 0, penalty: 0 })).toBe("an empty log");
   });
+
+  it("name each seat's own threat penalty and the enemies under The Black Gate, as the log's Threat Modifiers row does", () => {
+    const base = { heroes: 3, fallen: 0, captives: 0, pool: 0 };
+    expect(continueWords({ ...base, penalty: 2, penaltyBySeat: [2], seatCount: 1, enemies: 0 })).toBe("3 heroes and a +4 threat penalty");
+    expect(continueWords({ ...base, penalty: 1, penaltyBySeat: [2, 0], seatCount: 2, enemies: 1 })).toBe("3 heroes, threat penalties (Player 1: +3 · Player 2: +1) and 1 enemy under The Black Gate");
+    expect(continueWords({ ...base, penalty: 0, penaltyBySeat: [], seatCount: 1, enemies: 3 })).toBe("3 heroes and 3 enemies under The Black Gate");
+    expect(continueWords({ ...base, penalty: 1, penaltyBySeat: [0, 0], seatCount: 2, enemies: 0 })).toBe("3 heroes and a +1 threat penalty");
+  });
 });
 
 describe("the Fellowship's own scenarios are read as before", () => {
@@ -274,8 +282,8 @@ describe("a seat's own threat penalty (The Passage of the Marshes)", () => {
     expect(marshesLines(log({ marshesChoice: ["penalty", "searchingEye"] }), 2, eye)).toEqual([[{ text: "Player 1: " }, { text: "a permanent +2 starting threat penalty" }], [{ text: "Player 2: " }, { text: "The Searching Eye", code: SEARCHING_EYE }]]);
     expect(marshesLines(log({ marshesChoice: [null, "searchingEye"] }), 2, eye)).toEqual([[{ text: "Player 2: " }, { text: "The Searching Eye", code: SEARCHING_EYE }]]);
     expect(blackGateEnemies(log({ blackGate: { "144040": 2, "144030": 1 } }))).toEqual([{ code: "144030", count: 1 }, { code: "144040", count: 2 }]);
-    expect(keepsTwoTowersLog(campaign)).toBe(true);
-    expect(keepsTwoTowersLog({ id: "fellowship-of-the-ring" })).toBe(false);
+    expect(keepsSagaColumns(campaign)).toBe(true);
+    expect(keepsSagaColumns({ id: "fellowship-of-the-ring" })).toBe(false);
   });
 });
 
@@ -320,7 +328,7 @@ describe("continuing the saga (docs/brief.md, The Two Towers)", () => {
     const unfinished = finished("b", { completed: ["a-shadow-of-the-past"] });
     const other = finished("c", {}, "dream-chaser");
     const offers = continueOffers([done, unfinished, other], "the-two-towers", scenariosOf);
-    expect(offers).toEqual([{ saveId: "a", campaignId: "fellowship-of-the-ring", seatCount: 1, score: 142, heroes: 3, fallen: 1, captives: 1, pool: 1, penalty: 2 }]);
+    expect(offers).toEqual([{ saveId: "a", campaignId: "fellowship-of-the-ring", seatCount: 1, score: 142, heroes: 3, fallen: 1, captives: 1, pool: 1, penalty: 2, penaltyBySeat: [], enemies: 0 }]);
     expect(continueOffers([done], "fellowship-of-the-ring", scenariosOf)).toEqual([]);
     const taken = newSave("n", "the-two-towers", 1, { continued: done });
     expect(continueOffers([done, taken], "the-two-towers", scenariosOf)).toEqual([]);
@@ -341,6 +349,7 @@ describe("continuing the saga (docs/brief.md, The Two Towers)", () => {
       captives: done.log.captives,
       notes: "Rescued Beravor.",
       scoreBase: 142,
+      scoreBaseCampaigns: ["fellowship-of-the-ring"],
       score: 142,
       continuedFrom: "a",
     });

@@ -37,6 +37,7 @@ import { previewCards } from "../../play/cards/table-preview";
 import { pictureKey } from "../../play/canvas/picture-key";
 import { advanceButton, advanceFace, advanceWords } from "../../play/readouts/quest-advance";
 import { QuestAdvanceView } from "../../play/readouts/quest-advance-view";
+import { dialLimit } from "../../play/readouts/threat-level";
 import { useQuestAdvance } from "../../play/readouts/use-quest-advance";
 import { PEEK_ROOM } from "../../play/readouts/peek-banner";
 import { usePeek } from "../../play/store/use-peek";
@@ -324,6 +325,7 @@ export function TableView({ session, store, clock, nav }: { session: OpenedTable
           stopAhead={stopAhead} carouselOpen={carouselOpen}
           narrow={narrow} areas={game.separate === true}
           ticks={ticks}
+          direLimit={dialLimit(game.dire === true)}
           pursuit={pursuit}
           defense={defense}
           scenarioDials={dials}

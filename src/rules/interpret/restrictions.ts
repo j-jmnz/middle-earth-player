@@ -16,7 +16,7 @@ import { isPlayerType, printedOf } from "../core/printed.ts";
 import { flagged, heldAmount, inPlay, livingSeats, type CardInstance, type ScenarioState } from "../core/state.ts";
 
 type Restrict = Extract<Instruction, { verb: "Restrict" }>;
-export type Restriction = { sourceId: string; what: Restrict["what"]; location?: string; guarding?: string; exceptTrait?: string; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean };
+export type Restriction = { sourceId: string; what: Restrict["what"]; location?: string; guarding?: string; trait?: string; exceptTrait?: string; exceptBoon?: true; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean };
 
 // Rules from constant effects that forbid something. The question names what is being asked about, and
 // each record names the card it came from, so a caller can tell whose rule it is.
@@ -42,7 +42,9 @@ function scanRestricted(state: ScenarioState, ctx: ReduceContext, what: Restrict
       what,
       ...(instruction.location ? { location: instruction.location } : {}),
       ...(instruction.guarding ? { guarding: instruction.guarding } : {}),
+      ...(instruction.trait ? { trait: instruction.trait } : {}),
       ...(instruction.exceptTrait ? { exceptTrait: instruction.exceptTrait } : {}),
+      ...(instruction.exceptBoon ? { exceptBoon: true as const } : {}),
       ...(instruction.maxWillpower != null ? { maxWillpower: instruction.maxWillpower } : {}),
       ...(instruction.allies ? { allies: true } : {}),
       ...(instruction.belowSourceHitPoints ? { belowSourceHitPoints: true } : {}),
@@ -52,8 +54,17 @@ function scanRestricted(state: ScenarioState, ctx: ReduceContext, what: Restrict
 }
 
 export function travelBlocked(state: ScenarioState, ctx: ReduceContext, locationId: string): boolean {
-  // A restriction on the location itself, or one a card puts on the location with this code ("The players cannot travel to The Old Ford", 18068:B:1).
-  return restricted(state, ctx, "travel").some((rule) => (rule.location == null ? rule.sourceId === locationId : state.cards[locationId]?.code === rule.location && (rule.guarding == null || guardsTitled(state, ctx, locationId, rule.guarding))));
+  const location = state.cards[locationId];
+  // A location that cannot leave the staging area cannot become the active location ("Each non-unique location ... cannot leave the staging area", 146066:B:1).
+  if (flagged(state, locationId, "cannotLeaveStaging")) return true;
+  return restricted(state, ctx, "travel").some((rule) => {
+    // Every location with a trait (Grond's, 145044:A:1 and the Gate's kin).
+    if (rule.trait != null) return printedOf(ctx.cards, location?.code ?? "").traits.includes(rule.trait);
+    // A restriction on the location itself.
+    if (rule.location == null) return rule.sourceId === locationId;
+    // One a card puts on the location with this code ("The players cannot travel to The Old Ford", 18068:B:1).
+    return location?.code === rule.location && (rule.guarding == null || guardsTitled(state, ctx, locationId, rule.guarding));
+  });
 }
 
 /**
@@ -111,7 +122,7 @@ export function travelCostUnpayable(state: ScenarioState, ctx: ReduceContext, lo
       // "Reveal the top card of the burden deck to travel here" (141058:A:3): an empty burden deck has none to reveal.
       if (instruction.verb === "RevealBurden") return (state.burdenDeck?.length ?? 0) === 0;
       // A family's own Travel cost the players cannot pay (the Corsair deck of Southern Belfalas is empty, 12154:A:1, families/sea/index.ts).
-      if (familyTravelUnpayable(state, instruction)) return true;
+      if (familyTravelUnpayable(state, instruction, ctx, locationId)) return true;
       // "The first player must discard 2 cards at random from his hand to travel here" (01094:A:1): a hand of fewer cannot pay it.
       if (instruction.verb === "DiscardRandomFromHand" && instruction.who === "firstPlayer" && typeof instruction.amount === "number") {
         return (state.seats[state.firstPlayer]?.hand.length ?? 0) < instruction.amount;
@@ -158,7 +169,7 @@ export function attachBlocked(state: ScenarioState, ctx: ReduceContext, hostId: 
   if (flagged(state, hostId, "cannotHaveTreachery") && printedOf(ctx.cards, attachmentCode).type === "treachery") return true;
   if (flagged(state, hostId, "cannotHaveRestricted") && printedOf(ctx.cards, attachmentCode).keywords.restricted) return true;
   return restricted(state, ctx, "attach").some(
-    (rule) => rule.sourceId === hostId && !(rule.exceptTrait != null && traits.includes(rule.exceptTrait)),
+    (rule) => rule.sourceId === hostId && !(rule.exceptTrait != null && traits.includes(rule.exceptTrait)) && !(rule.exceptBoon === true && printedOf(ctx.cards, attachmentCode).campaignKind === "boon"),
   );
 }
 

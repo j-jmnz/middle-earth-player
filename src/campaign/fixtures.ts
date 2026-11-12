@@ -38,6 +38,12 @@ import isengardFixtures from "./fixtures/the-road-to-isengard.json";
 import marshesFixtures from "./fixtures/the-passage-of-the-marshes.json";
 import roadsFixtures from "./fixtures/journey-to-the-cross-roads.json";
 import lairFixtures from "./fixtures/shelobs-lair.json";
+import companyFixtures from "./fixtures/the-passing-of-the-grey-company.json";
+import gondorFixtures from "./fixtures/the-siege-of-gondor.json";
+import fieldsFixtures from "./fixtures/the-battle-of-the-pelennor-fields.json";
+import ungolFixtures from "./fixtures/the-tower-of-cirith-ungol.json";
+import opensFixtures from "./fixtures/the-black-gate-opens.json";
+import doomFixtures from "./fixtures/mount-doom.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -92,6 +98,12 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-passage-of-the-marshes": marshesFixtures,
   "journey-to-the-cross-roads": roadsFixtures,
   "shelobs-lair": lairFixtures,
+  "the-passing-of-the-grey-company": companyFixtures,
+  "the-siege-of-gondor": gondorFixtures,
+  "the-battle-of-the-pelennor-fields": fieldsFixtures,
+  "the-tower-of-cirith-ungol": ungolFixtures,
+  "the-black-gate-opens": opensFixtures,
+  "mount-doom": doomFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(

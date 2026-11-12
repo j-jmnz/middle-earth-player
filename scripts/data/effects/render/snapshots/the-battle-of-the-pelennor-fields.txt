@@ -1,0 +1,572 @@
+Scenario piles that place cards with no record (activeLocation: 145047 Pelennor Field; quest: 145073 The Garrison of Gondor; quest: 145074 Retreat from Osgiliath; quest: 145075 The White City Besieged; quest: 145076 Rohan has Come!; quest: 145077 Fighting in the Fields; setAside: 145043 Minas Tirith; setAside: 145044 Grond; setAside: 145062 Wraith on Wings; setAside: 145079 The Witch-king; setAside: 145014 Esquire of Rohan; setAside: 145015 Esquire of Gondor)
+
+## 145014 Esquire of Rohan
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+145014:A:1: Permanent.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+145014:A:2: Permanent.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+145014:A:3 (front): Setup: Attach to a hero.
+  145014:setup:1: Setup
+    - attach this card to a hero
+
+145014:A:4 (front): Attached hero gains the Rohan trait.
+  145014:constant:1: Constant
+    - [json GrantTrait {"verb":"GrantTrait","trait":"Rohan"}]
+
+145014:A:5 (front): Attached hero gets +1 Attack while attacking with another Rohan character.
+  145014:constant:2: Constant
+    only if all of: (its host is a character (any player controls) attacking) and (the number of Rohan character (any player controls) attacking [also {"notHost":true}] is at least 1)
+    - its host: stat attack 1, while this card is in play
+
+## 145015 Esquire of Gondor
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+145015:A:1: Permanent.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+145015:A:2 (front): Setup: Attach to a hero.
+  145015:setup:1: Setup
+    - attach this card to a hero
+
+145015:A:3 (front): Attached hero gains the Gondor trait.
+  145015:constant:1: Constant
+    - [json GrantTrait {"verb":"GrantTrait","trait":"Gondor"}]
+
+145015:A:4 (front): Attached hero gets +1 Willpower while committed to the quest with another Gondor character.
+  145015:constant:2: Constant
+    only if all of: (its host is a character (any player controls) committed to the quest) and (the number of Gondor character (any player controls) committed to the quest [also {"notHost":true}] is at least 1)
+    - its host: stat willpower 1, while this card is in play
+
+## 145043 Minas Tirith
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+145043:A:1 (front): Minas Tirith has 30 hit points plus 10 for each player.
+  145043:constant:1: Constant
+    - this card: stat hitPoints the number of players x 10 + 30, while this card is in play
+
+145043:A:2 (front): Forced: At the end of the round, deal 1 damage to Minas Tirith for each enemy in the staging area. Then, if Minas Tirith has no hit points remaining, the players lose the game.
+  145043:forced:1: Forced at the end of the round
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json DamageMinasTirith {"verb":"DamageMinasTirith","amount":{"count":{"type":"enemy","control":"any","stagingOnly":true}}}]
+    - then, if not (damage of this card is less than hit points of this card) (checked when this step runs, after the steps above; not tied to whether they did anything): the players lose the game (Minas Tirith has no hit points remaining)
+
+## 145044 Grond
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+145044:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+145044:A:2 (front): X is the number of resources on Grond.
+  145044:constant:1: Constant
+    - this card: stat threat resources of this card, while this card is in play
+
+145044:A:3 (front): Forced: At the beginning of the quest phase, place 1 resource on Grond. Then, deal X damage to Minas Tirith.
+  145044:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - place 1 resource tokens on this card
+    - [json DamageMinasTirith {"verb":"DamageMinasTirith","amount":{"stat":"resources","of":"self"}}]
+
+145044:A:4 (front): Travel: The Witch-king makes an immediate attack against each player, in turn order.
+  145044:travel:1: Travel
+    - for each player, first player first:
+      - choose enemy (any player controls) or in the staging area, named "The Witch-king"
+      - then, if there is a enemy (any player controls) or in the staging area, named "The Witch-king" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the acting player now, from the staging area (or engaged)
+
+## 145045 Gate of Gondor
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145045:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+145045:A:2 (front): While Gate of Gondor is the active location, each enemy in play gets -30 engagement cost.
+  145045:constant:1: Constant
+    only if this card is the active location
+    - each enemy (any player controls) or in the staging area: stat engagementCost -30, while this card is in play
+
+145045:A:3 (front): Forced: When Gate of Gondor is explored, return each engaged enemy to the staging area.
+  145045:forced:1: Forced on the event locationExplored (heard about this card)
+    - return every enemy engaged with a player to the staging area
+
+## 145046 City Wall
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145046:A:1 (front): While City Wall is the active location, damage that would be placed on Minas Tirith must be placed here first.
+  145046:constant:1: Constant
+    only if this card is the active location
+    - each objective (any player controls) named "Minas Tirith": stat damageFirst 1, while this card is in play
+
+145046:A:2 (front): Forced: When City Wall has damage equal to its quest points, discard it. Then, each player raises his threat by 3.
+  145046:forced:1: Forced after a card takes damage (heard about this card)
+    only if [json condition {"kind":"damageReached","nth":4}]
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard this card
+    - raise threat by 3 (each player)
+
+## 145047 Pelennor Field
+(the scenario deals it into the activeLocation pile; the piles place it, no record does)
+
+145047:A:1 (front): While at least 1 enemy is in the staging area, progress cannot be placed on locations in the staging area.
+  145047:constant:1: Constant
+    only if the number of enemy (any player controls) in the staging area only is at least 1
+    - each location (any player controls) in the staging area only: stat noProgressPlaced 1, while this card is in play
+
+145047:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if it has the Harad trait).
+  145047:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attacking enemy is a Harad enemy (any player controls) or in the staging area): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the attacking enemy is a Harad enemy (any player controls) or in the staging area (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 145048 Fire-filled Trench
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145048:A:1 (front): Forced: When a player plays an event that would cancel the effects of a treachery card just revealed from the encounter deck, cancel the effects of that event. Then, discard Fire-filled Trench.
+  145048:forced:1: Forced on the event counterCanceled
+    - discard this card
+
+## 145049 Siege Tower
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145049:A:1 (front): While Siege Tower is in the staging area, it gains Archery 3.
+  145049:constant:1: Constant
+    only if this card is in the staging area
+    - this card: stat archery 3, while this card is in play
+
+145049:A:2 (front): Forced: After Siege Tower becomes the active location, shuffle the encounter discard pile into the encounter deck and discard cards from the top until an enemy is discarded. Add the discarded enemy to the staging area.
+  145049:forced:1: Forced after this location becomes the active location (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy"}]
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"},"inPlay":false}}]
+
+## 145050 The Black Serpent
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145050:A:1 (front): Cannot have attachments or be attacked by more than 1 character at a time.
+  145050:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+    - this card: stat singleAttacker 1, while this card is in play
+
+145050:A:2 (front): When Revealed: The Black Serpent makes an immediate attack against the first player.
+  145050:whenRevealed:1: When revealed
+    - this card attacks the first player now, from the staging area
+
+## 145051 War Mûmak
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145051:A:1: Archery 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+145051:A:2 (front): Cannot have attachments or take more than 3 damage each round.
+  145051:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+    - this card: stat damageCap 3, while this card is in play
+
+145051:A:3 (front): Forced: When War Mûmak is defeated, reduce each player's threat by 4.
+  145051:forced:1: Forced after an enemy is destroyed (heard about this card)
+    - lower threat by 4 (each player)
+
+## 145052 Southron Champion
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145052:A:1 (front): Forced: After Southron Champion is dealt a shadow card with no shadow effect, either deal 3 damage to Minas Tirith, or it makes an additional attack after this one.
+  145052:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    only if the enemy held a shadow card with no shadow effect (read when the attack ends, as the card the event is about)
+    - the acting player chooses one of:
+      * option "city" (only if the card with code 145043 is in play):
+        - [json DamageMinasTirith {"verb":"DamageMinasTirith","amount":3}]
+      * option "attack":
+        - this enemy attacks now, dealt a new shadow card after its old ones are discarded
+
+145052:A:2 (shadow): Shadow: Deal 1 damage to Minas Tirith.
+  145052:shadow:1: Shadow
+    - [json DamageMinasTirith {"verb":"DamageMinasTirith","amount":1}]
+
+## 145053 Morgul Captain
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145053:A:1: Peril.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+145053:A:2 (front): When Revealed: Put the topmost Orc enemy in the discard pile into play engaged with you.
+  145053:whenRevealed:1: When revealed
+    - [json PutTopmostFromEncounterDiscard {"verb":"PutTopmostFromEncounterDiscard","type":"enemy","trait":"Orc"}]
+
+145053:A:3 (shadow): Shadow: If this attack destroys a character, return attacking enemy to the staging area.
+  145053:shadow:1: Shadow
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 145054 Orc of the Eye
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145054:A:1: Peril. Archery 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+145054:A:2 (front): When Revealed: Either deal 2 damage to a hero you control, or deal 2 damage to Minas Tirith.
+  145054:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "hero" (only if there is a hero (you control) to choose):
+        - choose hero (you control)
+        - deal 2 damage to the picked card
+      * option "city" (only if the card with code 145043 is in play):
+        - [json DamageMinasTirith {"verb":"DamageMinasTirith","amount":2}]
+
+145054:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if it has the Mordor trait).
+  145054:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attacking enemy is a Mordor enemy (any player controls) or in the staging area): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the attacking enemy is a Mordor enemy (any player controls) or in the staging area (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 145055 Mordor Orc
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145055:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+145055:A:2 (front): While Minas Tirith is in play, undefended damage dealt by Mordor Orc must be dealt to Minas Tirith.
+  145055:constant:1: Constant
+    only if the card with code 145043 is in play
+    - this card: stat undefendedToMinasTirith 1, while this card is in play
+
+145055:A:3 (shadow): Shadow: If Minas Tirith is in play, engage Mordor Orc and deal it a shadow card.
+  145055:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json EngageShadowCard {"verb":"EngageShadowCard","when":{"kind":"inPlay","code":"145043","is":true}}]
+    - [json DealShadow {"verb":"DealShadow","when":{"kind":"sourceIn","zone":"engaged"}}]
+
+## 145056 The Rammas is Breached
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145056:A:1 (front): When Revealed: Each player searches the encounter deck and discard pile for an enemy and puts it into play engaged with him. Shuffle the encounter deck.
+  145056:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - [json SearchMove {"verb":"SearchMove","type":"enemy","to":"engaged"}]
+    - shuffle the encounter deck
+
+145056:A:2 (shadow): Shadow: Either deal 3 damage to Minas Tirith or attacking enemy makes an additional attack after this one.
+  145056:shadow:1: Shadow
+    - the acting player chooses one of:
+      * option "city" (only if the card with code 145043 is in play):
+        - [json DamageMinasTirith {"verb":"DamageMinasTirith","amount":3}]
+      * option "attack":
+        - this enemy attacks now, dealt a new shadow card after its old ones are discarded [also {"afterThis":true}]
+
+## 145057 Fell Beast
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145057:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+145057:A:2 (front): When Revealed: Attach to a Nazgûl enemy. Limit 1 per enemy. (Counts as a Mount attachment with the text: "Attached enemy gets +1 Threat, +1 Attack, +1 Defense and -10 engagement cost. Forced: At the end of the round, return attached enemy to the staging area.")
+  145057:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose Nazgûl enemy (any player controls) or in the staging area [also {"hasAttachment":{"names":["Fell Beast"],"none":true}}]
+    - [json AttachSelfToPicked {"verb":"AttachSelfToPicked","when":{"kind":"canPick","pick":{"type":"enemy","control":"any","staging":true,"trait":"Nazgûl","hasAttachment":{"names":["Fell Beast"],"none":true}}}}]
+  145057:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - its host: stat threat 1, while this card is in play
+    - its host: stat attack 1, while this card is in play
+    - its host: stat defense 1, while this card is in play
+    - its host: stat engagementCost -10, while this card is in play
+  145057:forced:1: Forced at the end of the round
+    - return its host to the staging area
+
+## 145058 Black Dart
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145058:A:1 (front): When Revealed: Remove a hero you control from the quest and attach Black Dart to that hero. Limit 1 per hero. (Counts as a Condition attachment with the text: "Forced: At the end of the round, deal 1 damage to attached hero.")
+  145058:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose hero (you control) [also {"hasAttachment":{"names":["Black Dart"],"none":true}}]
+    - [json RemoveFromQuest {"verb":"RemoveFromQuest","when":{"kind":"canPick","pick":{"type":"hero","control":"you","hasAttachment":{"names":["Black Dart"],"none":true}}}}]
+    - [json AttachSelfToPicked {"verb":"AttachSelfToPicked","when":{"kind":"canPick","pick":{"type":"hero","control":"you","hasAttachment":{"names":["Black Dart"],"none":true}}}}]
+  145058:forced:1: Forced at the end of the round
+    - deal 1 damage to its host
+
+145058:A:2 (shadow): Shadow: If this attack damages a hero, attach Black Dart to that hero.
+  145058:shadow:1: Shadow
+    - when the attack in progress ends:
+      - [json AttachShadowToHero {"verb":"AttachShadowToHero","code":"145058","when":{"kind":"dealt"}}]
+
+## 145059 Spells of Ruin
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145059:A:1 (front): When Revealed: Either deal 1 damage to each exhausted character, or deal 5 damage to Minas Tirith.
+  145059:whenRevealed:1: When revealed
+    - the acting player chooses one of:
+      * option "exhausted" (only if there is a exhausted character (any player controls) to choose):
+        - for each exhausted character (any player controls):
+          - deal 1 damage to the picked card
+      * option "city" (only if the card with code 145043 is in play):
+        - [json DamageMinasTirith {"verb":"DamageMinasTirith","amount":5}]
+
+145059:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, deal 2 damage to Minas Tirith.
+  145059:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - [json DamageMinasTirith {"verb":"DamageMinasTirith","amount":2,"when":{"kind":"x","min":1}}]
+
+## 145060 Dread and Despair
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145060:A:1: Peril. Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+145060:A:2 (front): When Revealed: Discard an ally you control. Until the end of the phase, add 1 to the total Threat in the staging area for each ally in your discard pile.
+  145060:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ally (you control)
+    - then, if there is a ally (you control) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+    - [json RaiseStagingThreat {"verb":"RaiseStagingThreat","until":"endOfPhase","live":"alliesInDiscard"}]
+
+145060:A:3 (shadow): Shadow: Discard a non-objective attachment you control.
+  145060:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (you control) that is not an objective
+    - discard the picked card
+
+## 145061 Shadow of Mordor
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+145061:A:1: Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+145061:A:2 (front): When Revealed: Each player deals 1 damage to a hero he controls. Until the end of the round, treat the printed text box of each damaged character as if it were blank, except for Traits.
+  145061:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - choose hero (you control)
+      - deal 1 damage to the picked card
+    - damagedCharacters: stat blankText (its text box is blank) 1, until the end of the round
+
+## 145062 Wraith on Wings
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+145062:A:1 (front): Setup: Add Wraith on Wings to the staging area.
+  145062:setup:1: Setup
+    - [json AddToStaging {"verb":"AddToStaging","code":"145062"}]
+
+145062:A:2 (front): Cannot have non-Morgul attachments.
+  145062:constant:1: Constant
+    only if this card is in play
+    - [json Restrict {"verb":"Restrict","what":"attach","exceptTrait":"Morgul"}]
+
+145062:A:3 (front): Wraith on Wings gets +1 Threat and -1 engagement cost for each resource on it.
+  145062:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat threat resources of this card, while this card is in play
+    - this card: stat engagementCost minus (resources of this card), while this card is in play
+
+145062:A:4 (front): Forced: At the beginning of the quest phase, place 1 resource on Wraith on Wings. (Limit 5 resources.)
+  145062:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    - if resources of this card is less than 5: place 1 resource tokens on this card
+
+## 145072 The Corsair Fleet
+
+145072:A:1 (front): Forced: At the beginning of the quest phase, remove 1 resource from The Corsair Fleet. Then, if there are no resources here, the first player takes control of Aragorn and adds The Corsair Fleet to the victory display.
+  145072:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json RemoveResourceTokens {"verb":"RemoveResourceTokens","code":"145072","amount":1}]
+    - [json ReturnSetAsideHero {"verb":"ReturnSetAsideHero","code":"145001","when":{"kind":"less","left":{"stat":"resources","of":"self"},"right":1}}]
+    - [json AddSourceToVictory {"verb":"AddSourceToVictory","when":{"kind":"less","left":{"stat":"resources","of":"self"},"right":1}}]
+
+## 145073 The Garrison of Gondor
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+145073:A:1 (front): Setup: Set Minas Tirith, Grond, The Witch-king, and each copy of Wraith on Wings aside, out of play. Search the encounter deck for a copy of Pelennor Field and make it the active location. Shuffle the encounter deck. The players may attach Esquire of Rohan and Esquire of Gondor to different heroes.
+  145073:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the first player chooses one of:
+      * option "rohan" (only if there is a hero (any player controls) chosen by the first player [also {"attachable":"145014"}] to choose):
+        - choose hero (any player controls) chosen by the first player [also {"attachable":"145014"}]
+        - [json AttachSetAside {"verb":"AttachSetAside","code":"145014"}]
+      * option "none":
+    - the first player chooses one of:
+      * option "gondor" (only if there is a hero (any player controls) chosen by the first player [also {"attachable":"145015","hasAttachment":{"names":["Esquire of Rohan"],"none":true}}] to choose):
+        - choose hero (any player controls) chosen by the first player [also {"attachable":"145015","hasAttachment":{"names":["Esquire of Rohan"],"none":true}}]
+        - [json AttachSetAside {"verb":"AttachSetAside","code":"145015"}]
+      * option "none":
+
+145073:B:1 (back): Skip the quest phase and combat phase.
+  145073:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the table: stat skipQuestPhase 1, while this card is in play
+    - the table: stat skipCombat 1, while this card is in play
+
+145073:B:2 (back): Forced: At the end of the planning phase, place 1 progress here.
+  145073:forced:1: Forced at the end of the phase
+    only if it is the Planning phase
+    - [json AddStageProgress {"verb":"AddStageProgress","amount":1}]
+
+## 145074 Retreat from Osgiliath
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+145074:A:1 (front): When Revealed: Each player adds 1 set aside Wraith on Wings to the staging area and reveals an encounter card. Starting with the first player, each player discards cards from the top of his deck until he discards an ally that is not in play. Put the discarded ally into play in the staging area and treat its text box as if it were blank until the end of the phase.
+  145074:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"145062"}]
+      - the acting player reveals an encounter card
+    - for each player, first player first:
+      - [json DiscardAllyToStaging {"verb":"DiscardAllyToStaging"}]
+
+145074:B:1 (back): X is the total cost of all allies in the staging area.
+  145074:constant:1: Constant
+    - this card: stat questPoints [json amount {"stagedAlliesCost":true}], while this card is in play
+
+145074:B:2 (back): Allies in the staging area are treated as if their text box is blank, are immune to player card effects, and are under no player's control.
+  145074:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each ally (any player controls) in the staging area only: stat blankText (its text box is blank) 1, while this card is in play
+    - each ally (any player controls) in the staging area only: stat immuneToPlayerCards 1, while this card is in play
+
+145074:B:3 (back): Forced: At the end of the round, assign damage among allies in the staging area equal to the number of enemies in the staging area.
+  145074:forced:1: Forced at the end of the round
+    - [json AssignDamage {"verb":"AssignDamage","amount":{"count":{"type":"enemy","control":"any","stagingOnly":true}},"pick":{"type":"ally","control":"any","stagingOnly":true,"who":"firstPlayer"}}]
+
+## 145075 The White City Besieged
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+145075:A:1 (front): When Revealed: Each player takes control of each ally he owns in the staging area and exhausts it. The first player adds Minas Tirith, Grond, and The Witch-king (Captain side faceup) to the staging area. Each other player searches the encounter deck and discard pile for a different enemy and adds it to the staging area. Shuffle the encounter deck.
+  145075:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - [json TakeControlOfStagedAllies {"verb":"TakeControlOfStagedAllies"}]
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"145043"}]
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"145044"}]
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"145079"}]
+    - for each player, first player first:
+      - [json SearchMove {"verb":"SearchMove","type":"enemy","to":"staging","different":true,"when":{"kind":"not","condition":{"kind":"firstPlayer"}}}]
+    - shuffle the encounter deck
+
+145075:B:1 (back): Assault.
+  145075:constant:1: Constant
+    - this card: stat assault 1, while this card is in play
+
+145075:B:2 (back): The White City Besieged gets +4 quest points for each player in the game.
+  145075:constant:2: Constant
+    - this card: stat questPoints the number of players x 4, while this card is in play
+
+145075:B:3 (back): The players cannot travel to Pelennor locations.
+  145075:constant:3: Constant
+    - the players cannot travel to any location while this holds [also {"trait":"Pelennor"}]
+
+145075:B:4 (back): Forced: When an enemy is destroyed, place progress on this stage equal to that enemy's total Threat (progress must be placed on the active location first).
+  145075:forced:1: Forced after an enemy is destroyed
+    - [json PlaceProgressActiveFirst {"verb":"PlaceProgressActiveFirst","amount":{"x":true}}]
+
+## 145076 Rohan has Come!
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+145076:A:1 (front): When Revealed: Set The Witch-king aside, out of play. Each player searches the top 10 cards of his deck for an ally that matches the sphere of a hero he controls and puts it into play under his control. Each player shuffles his deck.
+  145076:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"145079"}]
+    - for each player, first player first:
+      - choose card (you control) in the deck, among the top 10, of card type ally [also {"heroSphere":true,"intoPlay":true}]
+      - [json PutIntoPlay {"verb":"PutIntoPlay","card":"picked","who":"actor"}]
+      - [json ShuffleDeck {"verb":"ShuffleDeck"}]
+
+145076:B:1 (back): Progress that would be placed on this stage by questing successfully is instead assigned as damage among enemies in play. (Progress must be placed on the active location first.)
+  145076:constant:1: Constant
+    - this card: stat progressAsDamage 1, while this card is in play
+  145076:triggered:1: Triggered (mandatory, not printed as Forced) on the event progressReplaced
+    - [json AssignDamage {"verb":"AssignDamage","amount":{"x":true},"pick":{"type":"enemy","control":"any","staging":true,"who":"firstPlayer"}}]
+
+145076:B:2 (back): Forced: At the end of the quest phase, advance to stage 5A.
+  145076:forced:1: Forced at the end of the phase
+    only if it is the Quest phase
+    - [json AdvanceToStage {"verb":"AdvanceToStage","code":"145077"}]
+
+## 145077 Fighting in the Fields
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+145077:A:1 (front): When Revealed: The first player adds The Witch-king to the staging area (Sorcerer side faceup). Then, he searches the encounter deck and discard pile for a Fell Beast and attaches it to The Witch-king, if able. Shuffle the encounter deck. Each other player reveals an encounter card.
+  145077:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AddToStaging {"verb":"AddToStaging","code":"145080"}]
+    - [json AttachSearched {"verb":"AttachSearched","type":"treachery","trait":"Morgul","to":"The Witch-king","name":"Fell Beast"}]
+    - shuffle the encounter deck
+    - for each player, first player first:
+      - if not (the actor holds the first player token): the acting player reveals an encounter card
+
+145077:B:1 (back): The Witch-king and shadow cards dealt to The Witch-king are immune to player card effects.
+  145077:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy (any player controls) or in the staging area, named "The Witch-king": stat immuneToPlayerCards 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "The Witch-king": stat shadowsImmune 1, while this card is in play
+
+145077:B:2 (back): Forced: When an enemy attacks and destroys a character, deal 1 damage to Minas Tirith.
+  145077:forced:1: Forced on the event characterDestroyedByAttack
+    - [json DamageMinasTirith {"verb":"DamageMinasTirith","amount":1}]
+
+145077:B:3 (back): This stage cannot be defeated unless Aragorn is in play and The Witch-king is in the victory display. If the players defeat this stage, they win the game.
+  145077:constant:2: Constant
+    only if any of: (the card with code 145001 is not in play) or ([json condition {"kind":"inVictory","code":"145080","is":false}])
+    - the players cannot defeat this stage while this holds
+
+## 145078 The Battle of the Pelennor Fields
+
+145078:A:1 (front): Setup: Set each Harad enemy recorded in the campaign log aside, out of play. The first player attaches Andúril and Banner of Elendil to Aragorn and sets him aside, out of play. Add The Corsair Fleet to the staging area (Gondor side faceup) and place X resources on it, where X is the number recorded in the campaign log. Remove each burden with the following burden set icons from the encounter deck, then flip this card over: A Shadow of the Past, Flight to the Ford, The Ring Goes South, The Passage of the Marshes, Shelob's Lair
+  145078:campaignSetup:1: Campaign setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SetAsideLogged {"verb":"SetAsideLogged","trait":"Harad"}]
+    - [json SetAsideHeroWithAttachments {"verb":"SetAsideHeroWithAttachments","hero":"145001","attach":["142014","145013"]}]
+    - [json AddToStagingWithResources {"verb":"AddToStagingWithResources","code":"145072","amount":{"recorded":"corsairFleet"}}]
+    - [json RemoveBurdenSets {"verb":"RemoveBurdenSets","sets":["A Shadow of the Past","Flight to the Ford","The Ring Goes South","The Passage of the Marshes","Shelob's Lair"]}]
+
+145078:B:1 (back): Forced: When the players advance to stage 5B, add each set aside Harad enemy to the staging area.
+  145078:forced:1: Forced on the event afterStageRevealed
+    only if the card the event is about is a card (any player controls) named "Fighting in the Fields"
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","trait":"Harad","all":true}]
+
+145078:B:2 (back): Resolution: Add 1 copy, per player, of Wraith on Wings to the campaign pool. The players have earned those burdens. If Esquire of Gondor, or Esquire of Rohan, is attached to a hero, that hero's controller has earned that boon.
+  145078:resolution:1: Resolution
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json Earn {"verb":"Earn","codes":["145062"],"eachPlayer":true}]
+    - [json EarnAttached {"verb":"EarnAttached","codes":["145015","145014"]}]
+
+## 145079 The Witch-king
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+145079:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+145079:A:2 (front): Cannot be optionally engaged or take damage.
+  145079:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
+    - this card: stat cannotTakeDamage 1, while this card is in play
+
+145079:A:3 (front): Forced: At the beginning of the quest phase, discard cards from the encounter deck until an enemy is discarded. Add the discarded enemy to the staging area.
+  145079:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy"}]
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"},"inPlay":false}}]
+
+## 145080 The Witch-king
+
+145080:A:1 (front): Only the engaged player can declare attackers against The Witch-king.
+  145080:constant:1: Constant
+    - this card: stat attackOnlyByEngaged 1, while this card is in play
+
+145080:A:2 (front): Forced: At the beginning of the encounter phase, The Witch-king engages the first player. Then, it makes an immediate attack.
+  145080:forced:1: Forced when a phase begins
+    only if it is the Encounter phase
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json EngageFirstPlayer {"verb":"EngageFirstPlayer"}]
+    - then, if this card is engaged with the player (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
+
+(rendered pieces: 264 by template, 70 as JSON)

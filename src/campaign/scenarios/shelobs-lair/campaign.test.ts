@@ -8,9 +8,11 @@ import { loadCampaign, loadScenario } from "../../../../scripts/data/load-scenar
 import { roadsWonLog } from "../../../../scripts/e2e/shelobs-lair.ts";
 import { goldenState } from "../../../../test/harness/golden-state.ts";
 
+import { continuedLog, continueOffers } from "../../continue.ts";
 import { applyResolution, emptyLog, type CampaignLog } from "../../log.ts";
 import { campaignPath, nextStep } from "../../path.ts";
 import { PLAYABLE_SCENARIOS } from "../../playable.ts";
+import { newSave } from "../../save.ts";
 import { NO_COPY_LIMITS } from "../../wilderland.ts";
 
 const campaign = loadCampaign("the-two-towers");
@@ -84,6 +86,24 @@ describe("Shelob's Lair in the the-two-towers campaign", () => {
       expect(log.campaignPool.filter((card) => card.code === HEAVY_BURDEN), name).toHaveLength(1);
       expect(log.completed, name).toEqual(["shelobs-lair"]);
     }
+  });
+
+  // The box is finished by this win: all six scenarios are on the log, so the save can be taken in by The Return of the King (continue.ts, SAGA_PREVIOUS): the offer is made, and the new save carries the log on.
+  it("144073:B:1 finishes The Two Towers on the log of the parts before, which continuedLog carries into the next box", () => {
+    const state = goldenState("shelobs-lair", "two-handed, won, Normal");
+    const log = applyResolution(afterRoads, state.scenarioId, state, world.cards, NO_COPY_LIMITS);
+    expect(log.completed).toEqual(campaign.scenarios);
+    expect(nextStep(campaignPath(campaign, {}, log), null)).toEqual({ kind: "finished" });
+    const save = { id: "tt", campaignId: campaign.id, seatCount: state.seatCount, log };
+    const next = continuedLog(save);
+    expect(next).toMatchObject({ continuedFrom: "tt", scoreBase: log.score, heroesBySeat: log.heroesBySeat, campaignPool: log.campaignPool, completed: [] });
+    expect(next.campaignPool.filter((card) => card.code === HEAVY_BURDEN)).toHaveLength(1);
+    const finished = { ...newSave("tt", campaign.id, state.seatCount), log };
+    const offers = continueOffers([finished], "the-return-of-the-king", (id) => (id === campaign.id ? campaign.scenarios : null));
+    expect(offers.map((offer) => [offer.saveId, offer.campaignId, offer.score])).toEqual([["tt", campaign.id, log.score]]);
+    const continued = newSave("rk", "the-return-of-the-king", state.seatCount, { continued: finished });
+    expect(continued.log).toMatchObject({ continuedFrom: "tt", scoreBase: log.score, heroesBySeat: log.heroesBySeat, completed: [] });
+    expect(continueOffers([finished, continued], "the-return-of-the-king", () => campaign.scenarios)).toEqual([]);
   });
 
   it("deals no campaign card from a fresh log in the Setup's place, and starts on stage 1", () => {

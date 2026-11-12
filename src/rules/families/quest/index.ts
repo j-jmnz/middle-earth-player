@@ -1,4 +1,4 @@
-// Rules: rr.step-3-2, rr.step-3-4, rr.resources, rr.engagement-check, rr.lasting-effects, rr.ownership-and-control,
+// Rules: rr.step-3-2, rr.step-3-4, rr.travel, rr.resources, rr.engagement-check, rr.lasting-effects, rr.ownership-and-control,
 // rr.attachment-cards, rr.the-word-choose (data/rules/entries.json).
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction, SimpleInstruction } from "../../../catalog/boundary.ts";
@@ -165,4 +165,11 @@ function reattachSelf(state: ScenarioState, instruction: Verb<"ReattachSelf">, f
   return updateCard(moved, source.id, { owner: owner === host.controller ? undefined : owner });
 }
 
-export const manifest: RulesFamily = { name: "quest", verbs: ["CommitToQuest", "MakeActive", "MoveProgress", "LowerCardThreat", "DamageEach", "ExhaustEach", "ReadyAll", "BarEngagement", "WaiveQuestThreat", "SkipQuestPhase", "AdvanceStage", "RaiseQuestThreat", "ResetThreat", "ReattachSelf", "BranchStage", "ShuffleStages", "LookAtStages", "RemoveProgressFromQuest"], run };
+/** "Remove 5 progress from stage 3B to travel here" (145017:A:3, rr.travel): the players cannot pay it, and so cannot travel, while the current quest holds fewer progress than the amount (resolved for the location's own Travel line). */
+function removeProgressUnpayable(state: ScenarioState, instruction: Instruction, ctx: ReduceContext, locationId: string): boolean {
+  if (instruction.verb !== "RemoveProgressFromQuest") return false;
+  const needed = resolveAmount(state, instruction.amount, frameScope(state, state.firstPlayer, locationId), ctx);
+  return (state.questStage ? (state.cards[state.questStage]?.progress ?? 0) : 0) < needed;
+}
+
+export const manifest: RulesFamily = { name: "quest", travel: { unpayable: removeProgressUnpayable }, verbs: ["CommitToQuest", "MakeActive", "MoveProgress", "LowerCardThreat", "DamageEach", "ExhaustEach", "ReadyAll", "BarEngagement", "WaiveQuestThreat", "SkipQuestPhase", "AdvanceStage", "RaiseQuestThreat", "ResetThreat", "ReattachSelf", "BranchStage", "ShuffleStages", "LookAtStages", "RemoveProgressFromQuest"], run };

@@ -90,6 +90,13 @@ export function redirectAttack(state: ScenarioState, enemyId: string, ctx: Reduc
   const shadowId = state.cards[attack.enemyId]?.shadowId;
   const revealed = shadowId ? updateCard(state, shadowId, { face: "up" }) : state;
   if (shadowId && hasShadowEffect(state, shadowId, ctx)) return revealed;
-  const current = revealed.pendingAttack ?? attack;
-  return { ...revealed, pendingAttack: withDefense(current, { redirectTo: enemyId }) };
+  return resolveAgainst(revealed, enemyId);
+}
+
+// The attack in progress is resolved against the enemy `enemyId` instead of the defenders: that enemy takes the damage, read against its Defense (specialStrike). The attacking enemy is never its own target.
+// A shadow effect that says "resolve this attack against that enemy" (146023:A:2) does this once its shadow card is revealed; RedirectAttack does it when the shadow card it revealed has no effect.
+export function resolveAgainst(state: ScenarioState, enemyId: string): ScenarioState {
+  const attack = state.pendingAttack;
+  if (!attack || !state.cards[enemyId] || enemyId === attack.enemyId) return state;
+  return { ...state, pendingAttack: withDefense(attack, { redirectTo: enemyId }) };
 }

@@ -412,4 +412,19 @@ export function spawn(
   return { state: stampEntry(attach(recorded, id, dest), id, "removed"), id };
 }
 
+/** The face a card shows when it is turned faceup from a deck, the encounter discard pile or the set-aside cards: its Upgraded side, side B, in a campaign that has upgraded it (dcce.scalable-upgradable), else faceup. */
+export function turnedUp(state: Pick<ScenarioState, "campaignFacts" | "cards">, id: string): CardFace {
+  return turnedUpCode(state, state.cards[id]?.code ?? "");
+}
+
+/** `turnedUp` for a card named by its code. */
+export function turnedUpCode(state: Pick<ScenarioState, "campaignFacts">, code: string): CardFace {
+  return dealtFace(state, code, "up");
+}
+
 export { inPlay } from "./state.ts";
+
+/** A card of a hand goes to `owner`'s discard pile and "discarded from your hand" is queued for `eventSeat` (the owner unless a card's own wording says otherwise). */
+export function discardFromHand(state: ScenarioState, id: string, owner: number, eventSeat: number = owner): ScenarioState {
+  return queueEvent(moveCard(state, id, { zone: "discard", seat: owner }), { trigger: "discardedFromHand", seat: eventSeat, cardId: id });
+}

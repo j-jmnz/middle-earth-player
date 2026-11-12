@@ -85,6 +85,18 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     return { text: `${holders}${trait}: stat ${str(i.stat)}${STAT_NOTE[str(i.stat)] ?? ""} ${sign}${amount(i.amount, ctx)}${per}, ${untilWords(i.until)}`, read: ["stat", "amount", "until", "holders", "target", "per", "trait", "subtract"] };
   },
   Pick: (i, ctx) => ({ text: `choose ${pick(i.pick, ctx)}`, read: ["pick"] }),
+  // The mount-doom family (src/catalog/families/mount-doom.ts).
+  FortitudeTest: (i, ctx) => {
+    const extraCards = i.extraCards === undefined ? "" : `, plus ${amount(i.extraCards, ctx)} more cards`;
+    const extraEyes = isObj(i.extraEyes) ? `, plus ${str(i.extraEyes.amount)} icons if ${renderCondition(i.extraEyes.when, ctx)} as the test is made` : "";
+    return {
+      text: `${who(i.who ?? "actor")} makes a Fortitude test: exhausts any number of ready heroes to commit them, discards the top X cards of the encounter deck (X the tens digit of their threat${extraCards}), counts the Sauron's Eye icons on them${extraEyes}, the players take actions, and the committed heroes' total Willpower must be greater than the icons to pass (equal or fewer fails)`,
+      read: ["who", "extraCards", "extraEyes"],
+    };
+  },
+  IgnoreFortitudeEyes: () => ({ text: "the card just chosen (discarded for the Fortitude test in progress) adds no Sauron's Eye icons to that test", read: [] }),
+  FirstTreacheryImmuneSurge: () => ({ text: "while this card is in play, the first treachery the encounter deck reveals each quest phase is immune to player card effects until it leaves play and gains surge (marked as it is revealed, before its When Revealed effects)", read: [] }),
+  PlaceTokensOnCampaignCard: (i, ctx) => ({ text: `place ${amount(i.amount, ctx)} resource tokens on the campaign card (kept in the game)`, read: ["amount"] }),
   PlaceProgressOn: (i, ctx) => ({ text: `place ${amount(i.amount, ctx)} progress on ${cardRef(i.target)}`, read: ["amount", "target"] }),
   RemoveProgressFrom: (i, ctx) => ({ text: `remove ${amount(i.amount, ctx)} progress from "${str(i.named)}"`, read: ["amount", "named"] }),
   PlaceResourceTokens: (i, ctx) => ({ text: `place ${amount(i.amount, ctx)} resource tokens on ${cardRef(i.on)}`, read: ["amount", "on"] }),
@@ -109,6 +121,29 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     text: `${i.afterAttack === true ? "once the attack in progress has ended, " : ""}place ${cardRef(i.target ?? "picked")} facedown under the card with code ${str(i.code)} in play (out of play there; its attachments are discarded, its tokens go)`,
     read: ["code", "target", "afterAttack"],
   }),
+  AttachToDial: (i) => ({
+    text: typeof i.code === "string" ? `the acting player attaches a set-aside copy of the card with code ${str(i.code)} to their threat dial (nothing when the dial holds one already, Limit 1 per threat dial, or none is set aside)` : "this card attaches itself to the acting player's threat dial (nothing when the dial holds a copy already)",
+    read: ["code"],
+  }),
+  DetachFromDial: (i) => ({
+    text: typeof i.code === "string" ? `the copy of the card with code ${str(i.code)} on the acting player's threat dial is detached and set aside, out of play` : "this card is detached from the acting player's threat dial and set aside, out of play",
+    read: ["code"],
+  }),
+  RemoveSetAside: (i) => ({ text: `every set-aside copy of the card with code ${str(i.code)} is removed from the game`, read: ["code"] }),
+  DiscardHand: () => ({ text: "the acting player discards all the cards in their hand", read: [] }),
+  FreeRingBearer: () => ({ text: "(rule marker) the first player gains control of the Ring-bearer a card guards as soon as that card is out of play: it returns among their heroes where it was, as it was held", read: [] }),
+  AttachToHeroWith: (i) => ({ text: `a copy of the card with code ${str(i.code)}, from the supply, is attached to the hero that has the card with code ${str(i.with)} attached (nothing with no such hero)`, read: ["code", "with"] }),
+  SetAsideBoon: (i) => ({
+    text: `each player chooses a boon with the trait ${str(i.trait)}, other than the card with code ${str(i.except)}, from the campaign pool cards dealt to them and sets it aside, out of play, leaving it out of their deck this game (nothing for a player with none)`,
+    read: ["trait", "except"],
+  }),
+  GuardWithSetAside: (i) => ({
+    text: `each set-aside ${str(i.kind)} is attached faceup to the card with code ${str(i.host)} in play as a guarded objective, held for its owner and returning to their hand when that card leaves play (it stays set aside while that card is not in play)`,
+    read: ["host", "kind"],
+  }),
+  MoveAttachment: (i) => ({ text: `the card with code ${str(i.code)} in play moves, with what is on it, to ${i.to === "ringBearer" ? "the Ring-bearer" : "the last picked hero"} (one card moves; it never leaves play)`, read: ["code", "to"] }),
+  ReturnFromVictory: (i) => ({ text: `the card with code ${str(i.code)} in the victory display returns to the staging area as the card with code ${str(i.into)}, faceup, ready, controlled by no one and with no damage`, read: ["code", "into"] }),
+  ResolveAttackAgainst: () => ({ text: "the attack in progress is resolved against the last picked enemy instead of the defenders: that enemy takes the damage after its Defense", read: [] }),
   SetPursuit: (i) => ({ text: `set the pursuit value to ${str(i.value)}`, read: ["value"] }),
   RaisePursuit: (i, ctx) => ({ text: `increase the pursuit value by ${amount(i.amount, ctx)}`, read: ["amount"] }),
   LowerPursuit: (i, ctx) => ({ text: `reduce the pursuit value by ${amount(i.amount, ctx)} (never below 0)`, read: ["amount"] }),
@@ -150,7 +185,9 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   ShuffleEncounterDeck: () => ({ text: "shuffle the encounter deck", read: [] }),
   ShuffleEncounterDiscard: () => ({ text: "shuffle the encounter discard pile into the encounter deck", read: [] }),
   DiscardEncounterTop: (i, ctx) => ({ text: `discard ${amount(i.count, ctx)} card(s) from the top of the encounter deck`, read: ["count"] }),
-  DiscardUntilEnemies: (i) => ({ text: `discard from the top of the encounter deck until ${str(i.perPlayer)} enem${i.perPlayer === 1 ? "y" : "ies"} for each player ${i.perPlayer === 1 ? "is" : "are"} discarded${i.to === "staging" ? "; add those enemies to the staging area" : ""}`, read: ["perPlayer", "to"] }),
+  DiscardUntilEnemies: (i) => i.cardType === "location"
+    ? { text: `discard cards from the top of the encounter deck until ${str(i.perPlayer)} location(s) for each player in the game are discarded, or the deck is empty, and add each location discarded to the staging area`, read: ["perPlayer", "to", "cardType"] }
+    : ({ text: `discard from the top of the encounter deck until ${str(i.perPlayer)} enem${i.perPlayer === 1 ? "y" : "ies"} for each player ${i.perPlayer === 1 ? "is" : "are"} discarded${i.to === "staging" ? "; add those enemies to the staging area" : ""}`, read: ["perPlayer", "to", "cardType"] }),
   RevealEncounter: (i) => ({ text: `${who(i.who ?? "actor")} reveals an encounter card`, read: ["who"] }),
   AdvanceStage: () => ({ text: "advance to the next quest stage", read: [] }),
   WinGame: () => ({ text: "the players win the game", read: [] }),

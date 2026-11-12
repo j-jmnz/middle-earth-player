@@ -17,7 +17,7 @@ import { reduce } from "../../engine/reduce.ts";
 import { updateCard, withMode, withThreat, type ScenarioState } from "../../core/state.ts";
 import { attachTo } from "../../core/zones.ts";
 import { deck, encounterCtx, offered, play, put, resolveChoices, seat, send } from "./fixture.ts";
-import { revealsAllowed } from "./reveal.ts";
+import { revealSeat, revealsAllowed } from "./reveal.ts";
 
 // Mist: "When Revealed: Raise your threat by 3." (a fixture).
 const mistRevealed: Effect = { id: "mist:whenRevealed:1", cardCode: "mist", lines: ["fixture:A:1"], timing: "whenRevealed", instructions: [{ verb: "RaiseThreat", amount: 3 }] };
@@ -43,6 +43,32 @@ describe("the number of cards the staging step reveals (rr.step-3-3)", () => {
     expect(revealsAllowed({ ...state, modifiers: [flag("revealFewerMinOne", 2)] }, 2)).toBe(1);
     expect(revealsAllowed({ ...state, modifiers: [flag("revealFewer", 1)] }, 1)).toBe(0);
     expect(revealsAllowed({ ...state, modifiers: [flag("revealFewer", 1), flag("revealFewerMinOne", 1)] }, 3)).toBe(1);
+  });
+});
+
+describe("the first player's reveal replaced by a count (146073:B:1)", () => {
+  const flag = (stat: "firstPlayerReveals" | "firstPlayerRevealCount", amount: number) => ({ instanceId: "table", sourceId: "x", stat, amount, until: "endOfPhase" as const });
+  const held = (count: number) => [flag("firstPlayerReveals", 1), ...(count > 0 ? [flag("firstPlayerRevealCount", count)] : [])];
+
+  it("gives the first player that many reveals in a row, then each other player one", () => {
+    const state = seat(2).state;
+    expect(revealsAllowed({ ...state, modifiers: held(3) }, 2)).toBe(4);
+    expect([0, 1, 2, 3].map((index) => revealSeat({ ...state, modifiers: held(3) }, index, [1, 0]))).toEqual([1, 1, 1, 0]);
+    expect(revealsAllowed({ ...state, modifiers: held(3) }, 1)).toBe(3);
+    expect([0, 1, 2].map((index) => revealSeat({ ...state, modifiers: held(3) }, index, [0]))).toEqual([0, 0, 0]);
+  });
+
+  it("reveals nothing for the first player at a count of 0, and the other players still reveal", () => {
+    const state = seat(2).state;
+    expect(revealsAllowed({ ...state, modifiers: held(0) }, 2)).toBe(1);
+    expect(revealSeat({ ...state, modifiers: held(0) }, 0, [1, 0])).toBe(0);
+    expect(revealsAllowed({ ...state, modifiers: held(0) }, 1)).toBe(0);
+  });
+
+  it("changes nothing without the flag", () => {
+    const state = seat(2).state;
+    expect(revealsAllowed(state, 2)).toBe(2);
+    expect([0, 1].map((index) => revealSeat(state, index, [1, 0]))).toEqual([1, 0]);
   });
 });
 

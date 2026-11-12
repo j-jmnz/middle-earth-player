@@ -15,8 +15,7 @@ import { queueEvent } from "../../windows/queue.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
-import { attachTo, moveCard } from "../../core/zones.ts";
-import { dealtFace } from "../dreamchaser/facts.ts";
+import { attachTo, moveCard, turnedUpCode } from "../../core/zones.ts";
 import { effectData } from "../encounter/moves.ts";
 import { queueFront } from "../play/refs.ts";
 import type { Focus } from "../index.ts";
@@ -56,7 +55,7 @@ export function fitShips(state: ScenarioState, instruction: Fit, focus: Focus, c
     answer = undefined;
     if (!picked) return effectData(next) ? askTarget(next, { instruction, seat, chosen: null, cause }, options) : { ...next, failure: "Fitting the ships needs a choice, and no effect is asking" };
     const code = next.cards[picked]?.code ?? "";
-    next = updateCard(moveCard(next, picked, { zone: "play", seat }), picked, { face: dealtFace(next, code, "up") });
+    next = updateCard(moveCard(next, picked, { zone: "play", seat }), picked, { face: turnedUpCode(next, code) });
     next = attachTo(next, picked, ship);
   }
 }

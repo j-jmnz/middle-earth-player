@@ -9,7 +9,10 @@ import { flagged, heldAmount } from "../../rules/core/state.ts";
 import { FALLEN_SUFFIX, ORC_GUARD_CODE, fallenBase, isShipObjectiveCode, printedOf, type PrintedCard } from "../../rules/core/printed.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 
+import { ownerWords } from "../words/owner.ts";
 import { prisonerWords } from "../readouts/widgets.ts";
+import { pelennorDetail } from "./pelennor-preview.ts";
+import { ungolDetail } from "./ungol-preview.ts";
 import { rhovanionDetail } from "./rhovanion-preview.ts";
 
 /**
@@ -38,9 +41,12 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
   if (!card) return null;
   if (card.code === ORC_GUARD_CODE) return "The facedown card under it returns to its owner's discard pile when it leaves play.";
   if (card.prisoner === true && card.zone === "captive" && card.host == null) return prisonerWords(name(cardId));
+  // The Ring-bearer under Topmost Chamber, the boons on Shagrat and Last of the Company are told before the held-hero words of Lost in Mirkwood, which would call the Chamber an enemy that holds a hero facedown.
+  const ungol = ungolDetail(game, card, name);
+  if (ungol) return ungol;
   const captive = captiveDetail(game, ctx, card, name);
   if (captive) return captive;
-  const lost = kingsQuestDetail(game, ctx, card, name) ?? lostInMirkwoodDetail(game, ctx, card, name) ?? heathDetail(game, ctx, card, name) ?? rhovanionDetail(game, ctx, card);
+  const lost = kingsQuestDetail(game, ctx, card, name) ?? lostInMirkwoodDetail(game, ctx, card, name) ?? heathDetail(game, ctx, card, name) ?? rhovanionDetail(game, ctx, card) ?? pelennorDetail(game, ctx, card);
   if (lost) return lost;
   if (game.seats.some((seat) => seat.deckAttached?.includes(cardId))) return `${name(cardId)}: your next draw is discarded`;
   // A treasure attached as a guarded objective (AttachRandomTreasure) is told like an objective: who guards it, or that it is free of encounters (emce.treasure).
@@ -62,13 +68,12 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
 }
 
 // Whose a seat's hero or hand is, as the preview says it: "Player 2's" two-handed, "your" solo.
-const ownerWords = (game: ScenarioState, seat: number): string => (game.seatCount > 1 ? `Player ${seat + 1}'s` : "your");
 
 // The Captives of The Uruk-hai (ledger lines 143022:A:1, 143024:A:1, 143024:A:2, 143070:B:3): a Captive says who holds it and that its text box is blank, as a live card's text is not; the card that holds Captives names them. The engine decided each; this only says it.
 function captiveDetail(game: ScenarioState, ctx: ReduceContext, card: ScenarioState["cards"][string], name: (id: string) => string): string | null {
   if (card.captive === true && card.zone === "captive") {
     const host = card.host != null ? game.cards[card.host] : undefined;
-    const hero = card.owner != null ? `${ownerWords(game, card.owner)} hero` : "A hero";
+    const hero = card.owner != null ? `${ownerWords(game.seatCount, card.owner)} hero` : "A hero";
     if (host && ctx.cards.get(host.code)?.type === "enemy") return `${hero}, a Captive held by ${name(host.id)}. No one controls it and its text box is blank. It takes 1 damage at the end of each quest phase until ${name(host.id)} leaves play.`;
     return `${hero}, a Captive held under ${host ? name(host.id) : "To Isengard!"} No one controls it and its text box is blank until the players win.`;
   }
@@ -84,14 +89,14 @@ function captiveDetail(game: ScenarioState, ctx: ReduceContext, card: ScenarioSt
 function lostInMirkwoodDetail(game: ScenarioState, ctx: ReduceContext, card: ScenarioState["cards"][string], name: (id: string) => string): string | null {
   const heroId = heroGuardedBy(game, card.id);
   const hero = heroId ? game.cards[heroId] : undefined;
-  if (heroId && hero?.owner != null) return `Holds ${name(heroId)}, ${ownerWords(game, hero.owner)} hero, facedown. Defeat or discard it to free the hero, exhausted.`;
+  if (heroId && hero?.owner != null) return `Holds ${name(heroId)}, ${ownerWords(game.seatCount, hero.owner)} hero, facedown. Defeat or discard it to free the hero, exhausted.`;
   const hands = new Map<number, number>();
   for (const id of cardsUnder(game, card.id)) {
     const owner = game.cards[id]?.owner;
     if (owner != null) hands.set(owner, (hands.get(owner) ?? 0) + 1);
   }
   if (hands.size > 0) {
-    return [...hands].map(([seat, count]) => `${ownerWords(game, seat).replace(/^./, (first) => first.toUpperCase())} hand, ${count} ${count === 1 ? "card" : "cards"}, facedown under it: back to hand when explored, discarded if the players advance`).join(". ");
+    return [...hands].map(([seat, count]) => `${ownerWords(game.seatCount, seat).replace(/^./, (first) => first.toUpperCase())} hand, ${count} ${count === 1 ? "card" : "cards"}, facedown under it: back to hand when explored, discarded if the players advance`).join(". ");
   }
   if (card.nemesis !== true) return null;
   const stage = game.questStage ? ctx.cards.get(game.cards[game.questStage]?.code ?? "")?.questPoints : null;
@@ -101,7 +106,7 @@ function lostInMirkwoodDetail(game: ScenarioState, ctx: ReduceContext, card: Sce
 // The King's Quest's cards (ledger lines 18050:A:2, 18043:A:3, 12172:A:2): the card Hobgoblin holds faceup under it, an Artifact guarded in the staging area, and The Threat to Wilderland's resources. The engine decided each; this only says it.
 function kingsQuestDetail(game: ScenarioState, ctx: ReduceContext, card: ScenarioState["cards"][string], name: (id: string) => string): string | null {
   const held = cardsUnder(game, card.id).map((id) => game.cards[id]).find((other) => other?.held === true);
-  if (held) return `Holds ${name(held.id)}, ${held.owner != null ? ownerWords(game, held.owner) : "a player's"} card, faceup. It returns to its owner's hand when ${name(card.id)} leaves play.`;
+  if (held) return `Holds ${name(held.id)}, ${held.owner != null ? ownerWords(game.seatCount, held.owner) : "a player's"} card, faceup. It returns to its owner's hand when ${name(card.id)} leaves play.`;
   if (card.zone !== "staging") return null;
   // The Artifact Dragon Hoard set up (GuardPickedAttachment remembers the record on it), not any attachment that lies in the staging area.
   if (ctx.cards.get(card.code)?.type === "attachment" && card.setUpBy != null) {

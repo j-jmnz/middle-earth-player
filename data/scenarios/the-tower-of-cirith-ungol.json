@@ -1,0 +1,168 @@
+{
+  "id": "the-tower-of-cirith-ungol",
+  "name": "The Tower of Cirith Ungol",
+  "number": 16,
+  "stages": [
+    "146066",
+    "146067",
+    "146068"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Tower of Cirith Ungol",
+      "count": 19
+    },
+    {
+      "name": "Orcs of Mordor",
+      "count": 9
+    },
+    {
+      "name": "Deep Shadows",
+      "count": 8
+    }
+  ],
+  "cards": [
+    {
+      "code": "146016",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "146017",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "146018",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "146019",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "146021",
+      "normal": 1,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "146022",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "146023",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "146058",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "146059",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "146060",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "146061",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "146062",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "146063",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "146066",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "146067",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "146068",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "146015",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "146070",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging",
+      "back": "146071"
+    },
+    {
+      "code": "146020",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "146014",
+      "normal": 1,
+      "easy": 1,
+      "pile": "attachedChosen"
+    }
+  ],
+  "campaignCard": "146069",
+  "campaignPlaced": [
+    "142014",
+    "144052"
+  ],
+  "sagaStart": {
+    "ringBearer": true,
+    "attached": [
+      "146065"
+    ]
+  },
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q0C.16",
+    "dragnEasy": "E0C.16",
+    "hobSlug": "The-Tower-of-Cirith-Ungol"
+  }
+}

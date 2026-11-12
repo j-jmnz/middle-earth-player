@@ -57,7 +57,9 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["captive"], typeof pick.captive === "string" ? (pick.captive === "only" ? "that is a Captive (held by an enemy or lying free)" : pick.captive === "free" ? "that is a Captive that no enemy holds" : "(Captives included)") : null);
   note(["exceptSphere"], typeof pick.exceptSphere === "string" ? `that is not a ${pick.exceptSphere} card` : null);
   note(["lowestAttack"], pick.lowestAttack === true ? "with the lowest Attack of those (ties: the chooser decides)" : null);
+  note(["highestCost"], pick.highestCost === true ? "with the highest printed cost of those (no printed cost counts as 0; ties: the chooser decides)" : null);
   note(["lowestThreat"], pick.lowestThreat === true ? "with the lowest Threat of those (ties: the chooser decides)" : null);
+  note(["fortitudeDiscarded"], pick.fortitudeDiscarded === true ? "discarded for the Fortitude test in progress and still in the encounter discard pile" : null);
   note(["who"], pick.who === "firstPlayer" ? "chosen by the first player" : null);
   note(["engagedEnemies"], pick.engagedEnemies === true ? "(enemies engaged with a player included)" : null);
   note(["hasShadow"], pick.hasShadow === true ? "with a shadow card" : null);

@@ -7,7 +7,9 @@
 // intents the reducer lists; the screen sends the one the player picks and nothing else. A choice the card lets a seat pass
 // ("each player may choose") lists the reducer's `skip` as `decline`, a visible "No boon", not as one more tile.
 import type { Instruction } from "../catalog/boundary.ts";
+import type { CampaignEnd } from "../catalog/campaign-record.ts";
 import { andList, carryVerb, carryWords } from "./carry-words.ts";
+import { endedInDefeat } from "../rules/core/eliminate.ts";
 import { legalIntents, type ScenarioState } from "../rules/engine/reduce.ts";
 import { answeredSeats, asksPlayers, resolutionResult, SKIP } from "../rules/setup/resolution.ts";
 import { isEncounterOption, LOG_LINE, poolTally, removalCode, removalSeat } from "../rules/families/wilderland/pool.ts";
@@ -16,6 +18,7 @@ import { ALLY_LINE_FACTS, BELDIS_BOXES, type AllyLine } from "../catalog/ally-li
 import { contextOf } from "./session.ts";
 import type { World } from "./world.ts";
 import { afterwardsWords } from "./resolution-then.ts";
+import { KEPT_RING_RECORDS } from "./return-of-the-king-words.ts";
 import { isTwoTowersChoice, pickWords, twoTowersChoosing, twoTowersNotes } from "./resolution-two-towers.ts";
 import { beldisUsed, cappedTally } from "./wilderland.ts";
 
@@ -23,7 +26,7 @@ import { beldisUsed, cappedTally } from "./wilderland.ts";
 // word under the name that tells a kind apart (an encounter card of the pool), `copies` the copies of such a card the pool holds.
 // `held`: a burden among the Hazard cards that this Resolution has already earned for the pool, so choosing it adds nothing.
 // `says`: the sentence above Confirm for this tile, where the choice words it itself (The Two Towers' options and heroes).
-export type ResolutionTile = { optionId: string; code: string | null; name: string; hero: string | null; label: string; wide?: true; tag?: string; copies?: number; held?: true; says?: string };
+export type ResolutionTile = { optionId: string; code: string | null; name: string; hero: string | null; label: string; wide?: true; tag?: string; copies?: number; held?: true; says?: string; loses?: true };
 
 // The decline of an optional choice: the reducer's `skip` option, with its words ("No boon").
 export type ResolutionDecline = { optionId: string; label: string };
@@ -70,6 +73,8 @@ export type ResolutionView =
     }
   | {
       kind: "settled";
+      // The scenario ended on its last player's elimination (The Black Gate Opens): the screen says so instead of Victory.
+      ended?: true;
       earned: readonly SettledCard[];
       fallen: readonly string[];
       captives: readonly string[];
@@ -87,6 +92,8 @@ export type ResolutionView =
       beldis?: readonly string[];
       // What The Two Towers' Resolution records: the threat penalties, the hero who returned, the heroes removed, the enemies under The Black Gate.
       notes?: readonly string[];
+      // How the saga ended, when this Resolution decided it (Mount Doom's ChooseOption): the Resolution screen words the campaign's end from it.
+      campaignEnd?: CampaignEnd;
     };
 
 // The boxes beside Beldis this game marks (the Action of 12188 marks one for the player who used it), one sentence a seat whose count rose above the log's (`logged`), in the log screen's count: "Player 1 marks 1 box beside Beldis (3 of 4 marked)", solo "You mark 1 box ...".
@@ -142,12 +149,14 @@ export function resolutionView(state: ScenarioState, world: World, logged: reado
     const notes = twoTowersNotes(settled, state.seatCount, (code) => nameOf(world, code));
     return {
       kind: "settled",
+      ...(endedInDefeat(state) ? { ended: true as const } : {}),
       ...((settled.treasures ?? []).length > 0 ? { treasures: [...(settled.treasures ?? [])] } : {}),
       ...((settled.allyLines ?? []).length > 0 ? { lines: [...(settled.allyLines ?? [])] } : {}),
       ...(changes.added.length > 0 ? { poolAdded: changes.added } : {}),
       ...(gone.length > 0 ? { poolRemoved: gone } : {}),
       ...beldisBoxes(state, logged),
       ...(notes.length > 0 ? { notes } : {}),
+      ...(settled.campaignEnd ? { campaignEnd: settled.campaignEnd } : {}),
       earned: settled.earned.map((item) => ({ code: item.code, hero: item.to === "hero" ? item.hero : null, seat: item.seat })),
       fallen: [...settled.fallen],
       captives: settled.captives.map((item) => item.hero),
@@ -399,6 +408,11 @@ function cardWords(world: World, card: SettledCard): string {
   return card.hero ? `${nameOf(world, card.code)} on ${nameOf(world, card.hero)}` : nameOf(world, card.code);
 }
 
+/** What the settled screen says in place of the sentence when the scenario was cleared before: "won", or "played" for an end (`view.ended`). */
+export function replayedSentence(view: Extract<ResolutionView, { kind: "settled" }>): string {
+  return `You have ${view.ended === true ? "played" : "won"} this scenario before. Nothing is granted a second time.`;
+}
+
 /** The sentence above the final Confirm: what the log will hold (a boon on its hero), and the scenario that unlocks, or that the campaign is complete
  * (`completes` is the campaign's name when the scenario is the last of its campaign, The Caves of Nibin-Dûm for both Mirkwood campaigns). */
 export function settledSentence(view: Extract<ResolutionView, { kind: "settled" }>, world: World, next: string | null, completes: string | null = null): string {
@@ -412,8 +426,11 @@ export function settledSentence(view: Extract<ResolutionView, { kind: "settled" 
     return copies > 1 ? `${copies} copies of ${text}` : kind ? `the ${kind} ${text}` : text;
   });
   const list = andList(earned);
-  const records = earned.length > 0 ? `Confirming records ${list} in the campaign` : "Confirming records the win";
-  const unlocked = next ? `${records} and unlocks ${next}.` : completes ? `${records} and completes ${completes}.` : `${records}.`;
+  // A scenario that ends when its last player falls (The Black Gate Opens) records its end, never a win.
+  const what = view.ended === true ? "the end" : "the win";
+  const records = earned.length > 0 ? `Confirming records ${view.ended === true ? `the end and ${list}` : list} in the campaign` : `Confirming records ${what}`;
+  // The ring kept ends the campaign lost (146079:B:1): the sentence says the end and its result, never a win or a completed campaign.
+  const unlocked = view.campaignEnd === "lost" ? KEPT_RING_RECORDS : next ? `${records} and unlocks ${next}.` : completes ? `${records} and completes ${completes}.` : `${records}.`;
   // A once-per-campaign Action used in this game or an earlier scenario is written to the log (41044:A:3).
   const names = (view.used ?? []).map((code) => nameOf(world, code));
   const sentence = names.length > 0 ? `${unlocked} ${andList(names)} ${names.length === 1 ? "is" : "are"} recorded as used this campaign.` : unlocked;

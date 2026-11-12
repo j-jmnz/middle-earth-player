@@ -18,6 +18,7 @@ import { flagged, inPlay, updateCard } from "../../core/state.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
 import { openStrike } from "../attack/index.ts";
 import { healBlocked } from "../burden/life.ts";
+import { healAllowed, healDamage } from "../dreamchaser/heal-cap.ts";
 import { effectData } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 import { playerSource } from "../quest/threat.ts";
@@ -35,13 +36,13 @@ export function healAmong(state: ScenarioState, instruction: Extract<Instruction
   const total = resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
   const healed = instruction.healed ?? 0;
   if (healed >= total || focus.chosen === DONE) return state;
-  const options = pickCandidates(state, { ...instruction.pick, damaged: true }, focus.seat, [], focus.sourceId, ctx).filter((id) => !healBlocked(state, id));
+  const options = pickCandidates(state, { ...instruction.pick, damaged: true }, focus.seat, [], focus.sourceId, ctx).filter((id) => !healBlocked(state, id) && healAllowed(state, id, 1, ctx) > 0);
   if (options.length === 0) return state;
   const chosen = focus.chosen && options.includes(focus.chosen) ? focus.chosen : undefined;
   if (!chosen) return effectData(state) ? askTarget(state, { instruction, seat: focus.seat, chosen: null }, [...options, DONE]) : state;
   const card = state.cards[chosen];
   if (!card) return state;
-  const healedOne = queueEvent(updateCard(state, chosen, { damage: card.damage - 1 }), { trigger: "healed", seat: card.controller, cardId: chosen, ...(playerSource(state, focus.sourceId, ctx) ? { byPlayerCard: true } : {}) });
+  const healedOne = queueEvent(healDamage(state, chosen, 1, ctx).state, { trigger: "healed", seat: card.controller, cardId: chosen, ...(playerSource(state, focus.sourceId, ctx) ? { byPlayerCard: true } : {}) });
   return again(healedOne, { ...instruction, healed: healed + 1 }, focus.seat);
 }
 

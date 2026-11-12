@@ -7,6 +7,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { captureRingBearer, releaseRingBearer } from "./captive.ts";
+import { freeRingBearers } from "./free.ts";
 import { assignDamage, discardEach, noneDiscarded } from "./damage.ts";
 import { assignFaceup } from "./faceup.ts";
 import { attachToActiveLocation, makeSetAsideActive, pickHighestEngagement, revealUntilThreat } from "./reveal.ts";
@@ -31,6 +32,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return captureRingBearer(state, instruction, ctx);
     case "ReleaseRingBearer":
       return releaseRingBearer(state, instruction, focus, ctx);
+    case "FreeRingBearer":
+      return state;
     case "DamageActiveLocation":
       return markLocationDamage(state);
     case "AttackFromStaging":
@@ -44,4 +47,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "south", settle: { before: (state, ctx) => damageLoss(state, ctx.cards) }, condition: (state, condition) => noneDiscarded(state, condition), verbs: ["MakeSetAsideActive", "DiscardEach", "AssignDamage", "RevealUntilThreat", "AssignFaceup", "CaptureRingBearer", "ReleaseRingBearer", "DamageActiveLocation", "AttackFromStaging", "PickHighestEngagement", "AttachToActiveLocation"], run };
+export const manifest: RulesFamily = { name: "south", settle: { before: (state, ctx) => damageLoss(state, ctx.cards), sweep: (state, ctx) => freeRingBearers(state, ctx) }, condition: (state, condition) => noneDiscarded(state, condition), verbs: ["MakeSetAsideActive", "DiscardEach", "AssignDamage", "RevealUntilThreat", "AssignFaceup", "CaptureRingBearer", "ReleaseRingBearer", "FreeRingBearer", "DamageActiveLocation", "AttackFromStaging", "PickHighestEngagement", "AttachToActiveLocation"], run };

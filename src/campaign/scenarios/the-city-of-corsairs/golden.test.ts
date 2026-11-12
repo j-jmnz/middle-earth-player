@@ -81,8 +81,8 @@ goldenSuite<CorsairsGolden, CorsairsDecks>({
       expect(of(state, CODES.blackKey)[0], golden.name).toMatchObject({ zone: "play", host: stormcaller?.id, face: "up" });
       expect(of(state, CODES.dreamChaser)[0]?.zone === "play" || of(state, "110136")[0]?.zone === "play", golden.name).toBe(true);
       expect(of(state, CODES.calaerion)[0], golden.name).toMatchObject({ zone: "play", face: golden.upgraded ? "B" : "up" });
-      // Gavin is in play only when the Campaign Log says "Gavin returned", and then on his Upgraded side.
-      expect(of(state, CODES.gavin)[0], golden.name).toMatchObject(golden.upgraded ? { zone: "play", face: "B" } : { zone: "setAside" });
+      // Gavin is in play only when the Campaign Log says "Gavin returned", and then on his only side (the ledger prints no Upgraded side for him).
+      expect(of(state, CODES.gavin)[0], golden.name).toMatchObject(golden.upgraded ? { zone: "play", face: "up" } : { zone: "setAside" });
       expect(["11211", "11212", "11213", "11214"].map((c) => of(state, c)[0]?.zone), golden.name).toEqual(["setAside", "setAside", "setAside", "setAside"]);
       expect(of(state, CODES.theBlackSword)[0]?.zone, golden.name).toBe("setAside");
       expect(of(state, CODES.captainSahir)[0]?.zone, golden.name).toBe("setAside");

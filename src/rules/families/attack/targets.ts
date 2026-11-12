@@ -6,6 +6,7 @@
 // (OfferAttacks: "You may declare and resolve an attack against each non-unique enemy in the staging area as if it were engaged
 // with you"). combat.ts and legal.ts ask these.
 import { attackerLimitReason } from "../aflame/attack.ts";
+import { attackersAtOnceReason } from "../pelennor/combat.ts";
 import type { PlayerIntent } from "../../core/intents.ts";
 import { hasKeyword } from "../../core/keywords.ts";
 import { printedOf, type PrintedCard } from "../../core/printed.ts";
@@ -45,7 +46,7 @@ export function withCardTargets(state: ScenarioState, engaged: readonly string[]
 // The rules a card adds to a declared attack, or null when they are met: a card's window takes only its targets, and a
 // character that may attack the staging area only alone attacks an enemy there with no other attacker (01009:A:1).
 export function attackRuleReason(state: ScenarioState, intent: Extract<PlayerIntent, { type: "DeclareAttackers" }>): string | null {
-  const limited = attackerLimitReason(state, intent.enemyId, intent.attackerIds.length);
+  const limited = attackerLimitReason(state, intent.enemyId, intent.attackerIds.length) ?? attackersAtOnceReason(state, intent.enemyId, intent.attackerIds.length);
   if (limited) return limited;
   const offered = offeredTargets(state);
   if (offered) return offered.includes(intent.enemyId) ? null : "That enemy cannot be attacked";

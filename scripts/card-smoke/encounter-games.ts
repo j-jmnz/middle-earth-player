@@ -71,6 +71,10 @@ function complete(state: ScenarioState, ctx: ReduceContext, offer: LegalIntent, 
       const ids = legalTargets(state, { type: "CommitHide" }, ctx);
       return { type: "CommitHide", cardIds: ids.length > 0 ? subset(roll, ids) : [] };
     }
+    case "CommitFortitude": {
+      const ids = legalTargets(state, { type: "CommitFortitude" }, ctx);
+      return { type: "CommitFortitude", cardIds: ids.length > 0 ? subset(roll, ids) : [] };
+    }
     case "Travel": {
       const locationId = pickOne(roll, legalTargets(state, { type: "Travel" }, ctx));
       return locationId ? { type: "Travel", locationId } : null;

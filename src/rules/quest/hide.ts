@@ -8,11 +8,11 @@ import { modifiedStat } from "../core/keywords.ts";
 import { openFrameActions } from "../windows/pass.ts";
 import { isAllyLike, printedOf, type PrintedCard } from "../core/printed.ts";
 import type { Frame, HideData, HideResult, ScenarioState } from "../core/state.ts";
-import { inPlay, updateCards } from "../core/state.ts";
 import { offerResponses } from "../windows/responses.ts";
 import { pruneUses } from "../player/usage.ts";
 import { fireForced } from "../windows/triggers.ts";
 import { hideCommitLimit, noteEffectHide } from "../families/nightmare/guards.ts";
+import { commitReason, commitToTest, committedWillpower, pruneFailures } from "./test-frame.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "../windows/windows.ts";
 import { moveCard } from "../core/zones.ts";
 
@@ -39,29 +39,12 @@ export function hideCommitReason(
   intent: Extract<PlayerIntent, { type: "CommitHide" }>,
   ctx: ReduceContext,
 ): string | null {
-  const window = state.window;
-  if (window?.kind !== "hideCommit") return "That intent is not legal in this window";
-  if (window.seat !== state.activeSeat) return "Only the revealing seat commits to a Hide test";
-  const legal = new Set(hideCommitters(state, window.seat, ctx.cards));
   // "Players cannot commit more than 2 characters to a Hide test" (906106:A:1).
-  const limit = hideCommitLimit(state);
-  if (limit != null && intent.cardIds.length > limit) return `No more than ${limit} characters can commit to a Hide test`;
-  const seen = new Set<string>();
-  for (const id of intent.cardIds) {
-    if (seen.has(id)) return "That character cannot commit twice";
-    seen.add(id);
-    if (!legal.has(id)) return "That character cannot commit to a Hide test";
-  }
-  return null;
+  return commitReason(state, "hide", intent, (seat) => hideCommitters(state, seat, ctx.cards), hideCommitLimit(state));
 }
 
 export function commitHide(state: ScenarioState, cardIds: readonly string[], steps: EngineStep[]): ScenarioState {
-  const top = topFrame(state);
-  if (top?.data.kind !== "hide") return state;
-  for (const id of cardIds) steps.push({ kind: "hideCommit", cardId: id });
-  const next = updateCards(state, cardIds.map((id) => [id, { exhausted: true }]));
-  const recorded = patchTop(next, { data: { ...top.data, committedIds: [...cardIds] } });
-  return { ...recorded, window: null };
+  return commitToTest(state, "hide", cardIds, steps);
 }
 
 export function hideStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
@@ -119,14 +102,7 @@ function allies(state: ScenarioState, seat: number, ctx: ReduceContext): number 
 // The willpower a Hide test measures: the committed characters still in play, plus what the seat or the table holds for
 // the test (a stage that adds 1 per ally, a location). The table's Hide sheet shows this same number.
 export function hideWillpower(state: ScenarioState, seat: number, committedIds: readonly string[], ctx: ReduceContext): number {
-  let willpower = 0;
-  let committed = 0;
-  for (const id of committedIds) {
-    const instance = state.cards[id];
-    if (!instance || !inPlay(instance.zone)) continue;
-    willpower += modifiedStat(state, instance, "willpower", ctx.cards);
-    committed += 1;
-  }
+  const { willpower, committed } = committedWillpower(state, committedIds, ctx);
   return willpower + heldStat(state, seat, "hideWillpower", { committed, ally: allies(state, seat, ctx) });
 }
 
@@ -169,15 +145,9 @@ function finish(state: ScenarioState, data: HideData, steps: EngineStep[]): Scen
   return patchTop(popped, { data: { ...parent.data, hide: data.result } });
 }
 
-// A Hide failure only matters during its own round, so older ones go when the round advances.
-function pruneHideFailures(state: ScenarioState): ScenarioState {
-  const kept = state.hideFailures.filter((failure) => failure.round === state.round);
-  return kept.length === state.hideFailures.length ? state : { ...state, hideFailures: kept };
-}
-
-// Records that only matter during one round: Hide failures and uses of limited effects.
+// Records that only matter during one round: Hide and Fortitude failures and uses of limited effects.
 export function pruneRoundRecords(state: ScenarioState): ScenarioState {
-  return pruneUses(pruneHideFailures(state));
+  return pruneUses(pruneFailures(pruneFailures(state, "hide"), "fortitude"));
 }
 
 // A Hide test passes when the committed willpower is at least the threat of the cards discarded (mec109.hide-tests).

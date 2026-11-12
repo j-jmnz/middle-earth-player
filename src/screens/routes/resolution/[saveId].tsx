@@ -9,7 +9,7 @@ import { Pressable, View } from "react-native";
 import { useStore } from "zustand";
 
 import { gameReport } from "../../../campaign/report";
-import { consequenceSentence, resolutionView, settledSentence, type ResolutionTile } from "../../../campaign/resolution-view";
+import { consequenceSentence, replayedSentence, resolutionView, settledSentence, type ResolutionTile } from "../../../campaign/resolution-view";
 import { finish } from "../../../campaign/session";
 import { scoreParts, scoreTotal } from "../../../campaign/score";
 import { ActionBar, BodyText, Label, StatTile, NavBar, OutcomeTitle, PrimaryButton, Screen, ScreenScroll, Section, TextButton, TwoPane } from "../../kit/chrome";
@@ -144,7 +144,10 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
   // The last scenario of the campaign: the win completes it.
   const completes = !done && at >= 0 && nextId == null ? (campaign?.name ?? null) : null;
   // The words of the campaign's end: the campaign card's printed line, and where the campaign stands.
-  const end = completes && campaign ? campaignEnd(campaign, scenarioOf(game.scenarioId)?.campaignCard ?? null) : null;
+  const end = completes && campaign ? campaignEnd(campaign, scenarioOf(game.scenarioId)?.campaignCard ?? null, view.kind === "settled" ? (view.campaignEnd ?? null) : null) : null;
+  // The scenario ended (The Black Gate Opens) or the ring was kept, which loses the campaign (Mount Doom): neither a win nor a defeat, so the scene is calm and the title muted, with no glow and no red.
+  const keptRing = view.kind === "settled" && view.campaignEnd === "lost";
+  const calm = (view.kind === "settled" && view.ended === true) || keptRing;
   const picked = view.kind === "choosing" ? (view.tiles.find((tile) => tile.optionId === chosen) ?? null) : null;
   const declined = view.kind === "choosing" && view.decline != null && chosen === view.decline.optionId;
   const answer = picked?.optionId ?? (declined && view.kind === "choosing" ? (view.decline?.optionId ?? null) : null);
@@ -153,17 +156,24 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
   const parts = scoreParts(game, session.world.cards);
   const titleBlock = (
     <View className={view.kind === "choosing" ? "mt-2" : "mt-8"}>
-      <OutcomeTitle won scenario={scenarioName(game.scenarioId)} testID="resolution-outcome" />
-      {end && view.kind === "settled" ? (
+      <OutcomeTitle won ended={calm} scenario={scenarioName(game.scenarioId)} testID="resolution-outcome" />
+      {view.kind === "settled" && view.ended ? (
+        <BodyText className="mt-3 text-center" testID="resolution-ended">
+          Every player fell. The scenario ends here, and the campaign goes on.
+        </BodyText>
+      ) : null}
+      {end && view.kind === "settled" && !keptRing ? (
         <View className="mt-3 items-center" testID="resolution-campaign-end">
           {end.line ? (
-            <Text className="text-center font-display text-heading text-bone" testID="resolution-campaign-line">
+            <Text className={`text-center font-display text-heading ${end.tone === "danger" ? "text-danger" : "text-bone"}`} testID="resolution-campaign-line">
               {end.line}
             </Text>
           ) : null}
-          <BodyText className="mt-1 text-center" testID="resolution-campaign-summary">
-            {end.summary}
-          </BodyText>
+          {end.summary ? (
+            <BodyText className="mt-1 text-center" testID="resolution-campaign-summary">
+              {end.summary}
+            </BodyText>
+          ) : null}
         </View>
       ) : null}
       <View className="mt-4 flex-row gap-2" testID="resolution-tiles">
@@ -203,7 +213,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
   const split = size === "expanded" && view.kind === "choosing";
 
   return (
-    <Screen testID="resolution" scene="victory">
+    <Screen testID="resolution" scene={calm ? "calm" : "victory"}>
       {back}
       {/* While choosing, the tiles and the decline under Confirm are one radio group. */}
       <View className="min-h-0 flex-1" {...(view.kind === "choosing" ? { accessibilityRole: "radiogroup" as const } : {})}>
@@ -246,7 +256,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
           ) : null}
           {view.kind === "choosing" ? (
             <>
-              <Label tone="muted" className="mb-3 text-center" testID="resolution-consequence">
+              <Label tone={picked?.loses === true ? "danger" : "muted"} className="mb-3 text-center" testID="resolution-consequence">
                 {consequenceSentence(view, picked, declined)}
               </Label>
               <PrimaryButton
@@ -274,7 +284,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
           ) : (
             <>
               <Label tone="muted" className="mb-3 text-center" testID="resolution-consequence">
-                {done ? "You have won this scenario before. Nothing is granted a second time." : settledSentence(view, session.world, nextName, completes)}
+                {done ? replayedSentence(view) : settledSentence(view, session.world, nextName, completes)}
               </Label>
               <PrimaryButton
                 label={end ? "Finish the campaign" : "Confirm"}

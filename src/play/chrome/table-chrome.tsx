@@ -75,11 +75,13 @@ export function ThreatRing({
   ring = null,
   ringMark = "oneRing",
   limit,
+  eliminates,
   filled,
   limitWords,
   goal,
   warn,
   note,
+  notch,
   onPress,
 }: {
   threat: SeatThreat;
@@ -108,6 +110,8 @@ export function ThreatRing({
   ringMark?: "oneRing" | "hero";
   // The number at which the players lose, when it is not the elimination level (the pursuit dial, 30): the meter fills toward it, the dial warms near it, and the reader hears it. Needs `elimination`.
   limit?: number;
+  // The limit is the elimination level of a Dire quest (99, mec113.dire): the reader hears "near elimination", not "near the limit".
+  eliminates?: boolean;
   // The number the ring fills with when it is not the disc's: Saruman's gate shows his hit points left on the disc and fills the ring with the damage toward his hit points (`limit`).
   filled?: number;
   // What a screen reader hears of the limit ("the players lose at 30" when absent): the Defense dial's limit advances the stage instead (fortress.ts).
@@ -118,12 +122,14 @@ export function ThreatRing({
   warn?: { level: "near" | "critical"; words: string };
   // What a screen reader hears after the number and the limit: what the number is (Saruman's hit points left, the win gate).
   note?: string;
+  // A threat value the ring marks with a short radial bar (the starting level stage 2B of The Passing of the Grey Company keeps the threat above), distinct from the engagement-cost dots.
+  notch?: number;
   // A tap opens the threat panel (each enemy's cost against the threat), or peeks at the seat (a dial that is not shown).
   onPress?: () => void;
 }) {
   const s = useUiScale();
   const id = testID ?? `threat-${threat.seat}`;
-  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} spokenWord={spokenWord} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} limit={limit} filled={filled} limitWords={limitWords} goal={goal} warn={warn} note={note} onPress={onPress} />;
+  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} spokenWord={spokenWord} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} limit={limit} eliminates={eliminates} filled={filled} limitWords={limitWords} goal={goal} warn={warn} note={note} notch={notch} onPress={onPress} />;
   return (
     <View testID={id} accessible accessibilityLabel={`${label} ${threat.threat}`} className="items-center">
       <View className="h-12 w-12 items-center justify-center rounded-control">
@@ -153,11 +159,13 @@ function ThreatDial({
   ring,
   ringMark,
   limit,
+  eliminates,
   filled,
   limitWords,
   goal,
   warn,
   note,
+  notch,
   onPress,
 }: {
   threat: SeatThreat;
@@ -173,11 +181,13 @@ function ThreatDial({
   ring: string | null;
   ringMark: "oneRing" | "hero";
   limit?: number;
+  eliminates?: boolean;
   filled?: number;
   limitWords?: string;
   goal?: boolean;
   warn?: { level: "near" | "critical"; words: string };
   note?: string;
+  notch?: number;
   onPress?: () => void;
 }) {
   const speed = useMotionScale();
@@ -218,7 +228,8 @@ function ThreatDial({
   const deltaWords = change ? threatDeltaWords(name, change.before, change.after) : null;
   const critical = level === "critical" && !threat.eliminated;
   // The words for a dial near its limit: its own warning first, then what the number alone says.
-  const nearWords = own === "critical" ? (limit != null ? ", near the limit" : ", near elimination") : "";
+  const losesAtLimit = limit != null && eliminates !== true;
+  const nearWords = own === "critical" ? (losesAtLimit ? ", near the limit" : ", near elimination") : "";
   const levelWords = warn ? `, ${warn.words}${nearWords}` : critical ? nearWords : "";
   // The glow, the track and the disc wash are threat red, or the accent on a dial that counts toward a goal.
   const hue = goal ? t.accent : t.threat;
@@ -262,7 +273,7 @@ function ThreatDial({
           {/* A tick on the ring at each staging enemy's engagement cost: bone where the threat has reached it, faint where not yet. */}
           {elimination && !threat.eliminated
             ? ticks.map((cost, index) => {
-                const angle = threatMeter(cost) * 2 * Math.PI - Math.PI / 2;
+                const angle = threatMeter(cost, limit) * 2 * Math.PI - Math.PI / 2;
                 const r = (DIAL / 2 - 2) * s;
                 return (
                   <View
@@ -273,6 +284,14 @@ function ThreatDial({
                 );
               })
             : null}
+          {/* A notch on the ring at a level the threat is kept above (stage 2B's starting level): a short radial bar across the arc, apart from the engagement ticks' dots. */}
+          {notch != null && !threat.eliminated ? (
+            <View
+              testID={`${id}-notch`}
+              pointerEvents="none"
+              style={{ position: "absolute", left: (DIAL / 2) * s - 1 * s, top: -2.5 * s, width: 2 * s, height: 9 * s, borderRadius: 1 * s, backgroundColor: t.bone, transformOrigin: `${1 * s}px ${(DIAL / 2 + 2.5) * s}px`, transform: [{ rotate: `${threatMeter(notch, limit) * 360}deg` }] }}
+            />
+          ) : null}
         </View>
         <Animated.View pointerEvents="none" style={[StyleSheet.absoluteFill, { borderRadius: 999, borderWidth: 2 * s, borderColor: t.accent }, ringStyle]} />
         {/* Peeking at this seat: a bone ring just outside the dial and an eye on its corner, clear of the label and its Ring mark. */}

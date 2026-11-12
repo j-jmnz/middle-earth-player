@@ -33,7 +33,11 @@ const command = (code: string, options: Options): Effect => ({
 // 11201:A:5 "Put an ally with cost X or less in your discard pile into play. Discard it at the end of the phase."
 const CHEAP_ALLY = { type: "ally", control: "you", from: "discard", maxCost: { level: true, plusChosen: true }, intoPlay: true } as const;
 // 11202:A:3 and 11203:A:5: every copy of the player's own cards the options name.
+const SPYGLASS = "11180";
 const SPYGLASS_FROM = (from: "hand" | "deck" | "discard"): PickSpec => ({ type: "card", control: "you", from, names: ["Spyglass"] });
+// In campaign mode the Spyglass is the campaign's own card, which sits outside the game until a setup or this option puts it into play (dcce.campaign-mode; agent recommendation, no ruling found: "put into play" works from any out-of-play area, and a copy already removed from the game is not offered):
+// the option offers the copy from outside the game while none is in play, on its Upgraded side when the Campaign Log marks its boxes (the collection card is dealt as an upgraded card is). A standalone game has no such copy.
+const SPYGLASS_OUTSIDE = { kind: "campaignCopyOutside", code: SPYGLASS } as const;
 const BLESSINGS: PickSpec = { type: "attachment", control: "any", names: [BLESSING] };
 const BOTTOM_CARD = { type: "card", control: "you", from: "deck", bottom: 1 } as const;
 const ANY_LOCATION_NON_UNIQUE = { type: "location", control: "any", nonUnique: true } as const;
@@ -44,6 +48,12 @@ const putSpyglass = (from: "hand" | "deck" | "discard"): InnerOptions[number] =>
   requires: { kind: "canPick", pick: SPYGLASS_FROM(from) },
   instructions: [{ verb: "Pick", pick: SPYGLASS_FROM(from) }, { verb: "PutIntoPlay", card: "picked", host: ANY_HERO }, ...(from === "deck" ? [{ verb: "ShuffleDeck" } as const] : [])],
 });
+
+const putSpyglassOutside: InnerOptions[number] = {
+  id: "spyglassOutside",
+  requires: SPYGLASS_OUTSIDE,
+  instructions: [{ verb: "TakeCardFromCollection", code: SPYGLASS }, { verb: "PutIntoPlay", card: "picked", host: ANY_HERO }],
+};
 
 // 11205 to 11208 Círdan's Blessing (the boon the campaign card of The Drowned Ruins lets one player take into hand; Scalable): it enters play with X resources on it, X one more than its level in the Campaign
 // Log (dcce.scalable-upgradable). The Leadership copy adds +3 Defense to the attached character as it defends, the Tactics copy +3 Attack as it attacks (both remove a resource from the card), the Spirit copy
@@ -97,7 +107,7 @@ export const RECORDS: readonly Effect[] = [
     heroGets("willpower", "willpower"),
     { id: "noExhaust", requires: { kind: "canPick", pick: WITH_BLESSING }, instructions: [{ verb: "Each", pick: WITH_BLESSING, instructions: [{ verb: "ModifyStat", stat: "noExhaustQuest", amount: 1, until: "endOfRound", target: "picked" }] }] },
     { id: "progress", requires: { kind: "canPick", pick: ANY_LOCATION_NON_UNIQUE }, instructions: [{ verb: "Pick", pick: ANY_LOCATION_NON_UNIQUE }, { verb: "PlaceProgressOn", amount: 2, target: "picked" }] },
-    { id: "spyglass", requires: { kind: "any", conditions: (["hand", "deck", "discard"] as const).map((from) => ({ kind: "canPick" as const, pick: SPYGLASS_FROM(from) })) }, instructions: [{ verb: "Choose", who: "actor", options: [putSpyglass("hand"), putSpyglass("deck"), putSpyglass("discard")] }] },
+    { id: "spyglass", requires: { kind: "any", conditions: [...(["hand", "deck", "discard"] as const).map((from) => ({ kind: "canPick" as const, pick: SPYGLASS_FROM(from) })), SPYGLASS_OUTSIDE] }, instructions: [{ verb: "Choose", who: "actor", options: [putSpyglass("hand"), putSpyglass("deck"), putSpyglass("discard"), putSpyglassOutside] }] },
   ]),
   command("11204", [
     heroGets("attack", "attack"),

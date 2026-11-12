@@ -25,7 +25,7 @@ import { refillsAnyTime } from "../families/nightmare/guards.ts";
 import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
 import { encounterRaised } from "../families/quest/threat.ts";
 import { flagged, livingSeats, updateCard, type ScenarioState } from "../core/state.ts";
-import { attachTo, cardsUnder, moveCard } from "../core/zones.ts";
+import { attachTo, cardsUnder, discardFromHand, moveCard, turnedUp } from "../core/zones.ts";
 import { currentCause, ruleCause, UNATTRIBUTED } from "../core/cause.ts";
 import { takeProgressOff } from "../core/progress.ts";
 import { noteEncounterThreat } from "../families/encounter/reveal.ts";
@@ -50,7 +50,13 @@ export function shuffleEncounterDeck(state: ScenarioState): ScenarioState {
 // (rr.running-out-of-cards, rr.step-3-3). Outside the quest phase it stays empty.
 export function resetEncounterDeck(state: ScenarioState, steps: EngineStep[]): ScenarioState {
   // In any phase while the Nightmare setup card says so (encounterRefill, 900201:A:3).
-  if ((state.phase !== "Quest" && !refillsAnyTime(state)) || state.encounterDeck.length > 0 || state.encounterDiscard.length === 0) return state;
+  if (state.phase !== "Quest" && !refillsAnyTime(state)) return state;
+  return reshuffleDiscard(state, steps, "rr.running-out-of-cards");
+}
+
+// The encounter discard pile back into an empty encounter deck, shuffled, whatever the phase: what a rule that says "if the deck is ever empty" does (the Fortitude test, mec113.fortitude-tests).
+export function reshuffleDiscard(state: ScenarioState, steps: EngineStep[], rule: string): ScenarioState {
+  if (state.encounterDeck.length > 0 || state.encounterDiscard.length === 0) return state;
   // Gollum and Sméagol are never shuffled into the encounter deck (mec112.gollum-smeagol): a defeated Gollum lies in the discard pile only until his Forced effect flips him.
   const returning = state.encounterDiscard.filter((id) => !isGollum(state.cards[id]?.code));
   if (returning.length === 0) return state;
@@ -59,7 +65,7 @@ export function resetEncounterDeck(state: ScenarioState, steps: EngineStep[]): S
   for (const id of returning) {
     next = updateCard(moveCard(next, id, { zone: "encounterDeck" }), id, { face: "down" });
   }
-  steps.push({ kind: "resetEncounterDeck", count, cause: ruleCause("rr.running-out-of-cards") });
+  steps.push({ kind: "resetEncounterDeck", count, cause: ruleCause(rule) });
   return shuffleEncounterDeck(next);
 }
 
@@ -87,9 +93,9 @@ export function runExtraVerb(
     case "ShuffleEncounterDeck":
       return shuffleEncounterDeck(state);
     case "AddSetAsideToStaging": {
-      const copies = state.setAside.filter((candidate) => state.cards[candidate]?.code === instruction.code);
+      const copies = state.setAside.filter((candidate) => (instruction.code != null ? state.cards[candidate]?.code === instruction.code : instruction.trait != null && hasTrait(state, candidate, instruction.trait, ctx)));
       // Into the acting seat's own staging area once stages are separate (mec109.multiple-staging-areas).
-      return (instruction.all === true ? copies : copies.slice(0, 1)).reduce((next, id) => updateCard(moveCard(next, id, stagingDest(next, focus.seat)), id, { face: "up" }), state);
+      return (instruction.all === true ? copies : copies.slice(0, 1)).reduce((next, id) => updateCard(moveCard(next, id, stagingDest(next, focus.seat)), id, { face: turnedUp(next, id) }), state);
     }
     case "ShuffleOutOfPlayIntoEncounterDeck": {
       // Outside an effect frame nobody can be asked, so the first choice goes (effect-frames.ts asks the first player when
@@ -105,7 +111,7 @@ export function runExtraVerb(
       return afterProgress(placed, before, ctx, steps);
     }
     case "DiscardUntilEnemies":
-      return discardUntilEnemies(state, instruction.perPlayer * livingSeats(state).length, ctx, steps, instruction.to);
+      return discardUntilEnemies(state, instruction.perPlayer * livingSeats(state).length, ctx, steps, instruction.to, instruction.cardType);
     case "ShuffleSelfIntoEncounterDeck": {
       return focus.sourceId ? shuffleIntoEncounterDeck(state, focus.sourceId) : state;
     }
@@ -134,7 +140,12 @@ export function runExtraVerb(
     }
     case "ReturnUnderToStaging": {
       let next = state;
-      for (const id of focus.sourceId ? cardsUnder(state, focus.sourceId) : []) next = updateCard(moveCard(next, id, { zone: "staging" }), id, { face: "up" });
+      // `to: "engaged"` (146029:A:2): each enemy comes into play engaged with the first player, who is then engaged by it (the enemy's "After X engages you" lines hear it).
+      if (instruction.to === "engaged") {
+        for (const id of focus.sourceId ? cardsUnder(state, focus.sourceId) : []) next = moveEncounter(next, id, "engaged", next.firstPlayer, ctx, steps);
+        return next;
+      }
+      for (const id of focus.sourceId ? cardsUnder(state, focus.sourceId) : []) next = updateCard(moveCard(next, id, { zone: "staging" }), id, { face: turnedUp(next, id) });
       return next;
     }
     case "DamageAll":
@@ -266,17 +277,17 @@ function committedHeroes(state: ScenarioState, seat: number, exceptSphere: strin
   }).length;
 }
 
-// Cards come off the top of the encounter deck into its discard pile until `count` enemies are among them, or the deck is
+// Cards come off the top of the encounter deck into its discard pile until `count` enemies (locations, with `cardType`) are among them, or the deck is
 // empty (rr.effects: as many as there are). Each of those enemies is then put into play engaged with the first player
-// (141045:A:2): it has engaged that player (rr.engaged), "cannot be engaged" or not (engageWith).
-function discardUntilEnemies(state: ScenarioState, count: number, ctx: ReduceContext, steps: EngineStep[], to?: "staging"): ScenarioState {
+// (141045:A:2): it has engaged that player (rr.engaged), "cannot be engaged" or not (engageWith). Locations are added to the staging area (146077:A:1).
+function discardUntilEnemies(state: ScenarioState, count: number, ctx: ReduceContext, steps: EngineStep[], to?: "staging", cardType?: "location"): ScenarioState {
   let next = state;
   const enemies: string[] = [];
   while (enemies.length < count) {
     const top = next.encounterDeck[0];
     if (!top) break;
-    next = updateCard(moveCard(next, top, { zone: "encounterDiscard" }), top, { face: "up" });
-    if (printedOf(ctx.cards, next.cards[top]?.code ?? "").type === "enemy") enemies.push(top);
+    next = updateCard(moveCard(next, top, { zone: "encounterDiscard" }), top, { face: turnedUp(next, top) });
+    if (printedOf(ctx.cards, next.cards[top]?.code ?? "").type === (cardType ?? "enemy")) enemies.push(top);
   }
   // Engaged with the first player, or added to the staging area (They Are Coming!, 142056:A:2).
   for (const id of enemies) next = to === "staging" ? moveEncounter(next, id, "staging", next.firstPlayer, ctx, steps) : engageWith(next, next.firstPlayer, id, steps);
@@ -318,7 +329,7 @@ function discardRandom(state: ScenarioState, seat: number, amount: number, sourc
     const card = id ? next.cards[id] : undefined;
     if (!id || !card) break;
     // "After a card is discarded from your hand" hears a random discard too.
-    next = queueEvent(moveCard(next, id, { zone: "discard", seat: card.owner ?? seat }), { trigger: "discardedFromHand", seat: card.owner ?? seat, cardId: id });
+    next = discardFromHand(next, id, card.owner ?? seat);
   }
   return next;
 }
@@ -347,7 +358,7 @@ function discardTarget(
   ctx: ReduceContext,
   steps: EngineStep[],
 ): ScenarioState {
-  const id = kind === "self" || kind === "host" || kind === "picked" || kind === "previous" || kind === "subject" || kind === "attacker" ? refCard(state, kind, frameScope(state, focus.seat, focus.sourceId)) : null;
+  const id = kind === "self" || kind === "host" || kind === "picked" || kind === "previous" || kind === "subject" || kind === "attacker" || kind === "activeLocation" ? refCard(state, kind, frameScope(state, focus.seat, focus.sourceId)) : null;
   if (!id || !state.cards[id]) return state;
   // "Unique locations cannot be discarded from play by encounter card effects" (12193:B:1): the card holds the flag.
   if (flagged(state, id, "cannotBeDiscardedByEncounter") && isEncounterCardEffect(state, ctx.cards, focus.sourceId)) return state;

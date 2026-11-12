@@ -37,21 +37,26 @@ const VERBS = [
   // The Ring-bearer (the hero with that trait that a player controls) loses every token (damage, resources, progress), and it and
   // each card attached to it are placed facedown under the card in play with the code `under`. It and its attachments stay in play, and nobody controls
   // them (mec109.stage-4).
-  z.strictObject({ verb: z.literal("CaptureRingBearer"), under: z.string().min(1), ...when }),
+  // `guarded`: the hero lies faceup under the card as a guarded objective, keeping its tokens and its attachments faceup (The Tower of Cirith Ungol: "The first player loses control of the Ring-bearer and places it faceup under Topmost Chamber as a guarded objective", 146066:A:1). It is a held hero of its
+  // owner (`guardedHero`, the flag Carried Away uses), so it takes no damage while nobody controls it and its owner is not out of heroes; FreeRingBearer gives it back.
+  z.strictObject({ verb: z.literal("CaptureRingBearer"), under: z.string().min(1), guarded: z.literal(true).optional(), ...when }),
   // The first player takes control of the Ring-bearer facedown under the source and of the cards attached to it: it returns to play
   // faceup in their play area exhausted with `damage` damage on it (142024:A:3).
   z.strictObject({ verb: z.literal("ReleaseRingBearer"), damage: z.number().int().min(0), ...when }),
+  // Constant (146067:B:2, "When the Ring-bearer is free of encounters, the first player gains control of it"): the settle loop gives the first player the Ring-bearer a card guards (CaptureRingBearer `guarded`) as soon as that card is out of play, with its tokens, its state and its attachments as they were. A marker: the record names the line,
+  // and a game with such a record looks for the hero.
+  z.strictObject({ verb: z.literal("FreeRingBearer") }),
   // A shadow card's effect on the attack in progress: undefended damage is placed on an active location instead of a hero, the
   // defending player choosing the location (142035:A:2). Damage goes to the hero as usual when no location is active.
   z.strictObject({ verb: z.literal("DamageActiveLocation"), ...when }),
   // The enemy (the picked card) in the staging area attacks the actor now, as an attack outside the combat phase, though it is not
   // engaged (142038:A:2). It is dealt a shadow card of its own.
   // `target: self`: the source enemy attacks (a When Revealed on the enemy, 142047:A:1). `who: firstPlayer`: the first player is attacked, whoever
-  // the actor is ("The Balrog makes an attack", 142043:A:2, which is considered engaged with the first player).
+  // the actor is ("The Balrog makes an attack", 142043:A:2, which is considered engaged with the first player). `raiseThreatIfDestroys`: the player attacked raises his threat by this much once the attack ends, if it destroyed a character ("If this attack destroys a character, raise your threat by 4", 146039:A:2). `who: eventSeat`: the player the answered event happened to is attacked ("The Mouth of Sauron makes an immediate attack against that player", 146031:A:2: the player who canceled the When Revealed).
   // `undefendedToStage`: "Undefended damage from this attack must be dealt to Hrogar's Hill" (19081:A:1): the damage of the attack if it is left undefended goes on the main quest card, not a hero (emce.side-quests).
   // `orEngaged`: the picked enemy may be engaged with a player instead and attacks as it is, without leaving its engagement ("Fram's Shade makes an immediate attack against each player", 19097:A:3).
   // `target: host`: the enemy the source is attached to attacks ("Saruman attacks that player", 143048:A:1). `shadows`: it is dealt this many shadow cards for the attack ("Deal and resolve 2 shadow cards", 143048:A:1).
-  z.strictObject({ verb: z.literal("AttackFromStaging"), target: z.enum(["self", "host"]).optional(), shadows: z.number().int().min(2).max(4).optional(), who: z.literal("firstPlayer").optional(), undefendedToStage: z.literal(true).optional(), orEngaged: z.literal(true).optional(), ...when }),
+  z.strictObject({ verb: z.literal("AttackFromStaging"), target: z.enum(["self", "host"]).optional(), shadows: z.number().int().min(2).max(4).optional(), who: z.enum(["firstPlayer", "eventSeat"]).optional(), raiseThreatIfDestroys: z.number().int().positive().optional(), undefendedToStage: z.literal(true).optional(), orEngaged: z.literal(true).optional(), ...when }),
   // Choose, among the enemies in the staging area with this trait, the one with the highest engagement cost (ties: the first player
   // chooses) and pick it, or pick nothing when there is none (142038:A:2).
   z.strictObject({ verb: z.literal("PickHighestEngagement"), trait: z.string().min(1), ...when }),

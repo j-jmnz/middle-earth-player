@@ -19,6 +19,8 @@ export type {
   FrameData,
   FrameName,
   GameEvent,
+  FortitudeData,
+  FortitudeResult,
   HideData,
   HideFailure,
   HideResult,
@@ -120,7 +122,7 @@ export type CardInstance = {
   guardedHero?: true;
   // A Captive of The Uruk-hai (families/captives): a hero faceup in the captive zone under To Isengard! or an enemy, in play, controlled by nobody. `owner` is the seat it belongs to, `heroSlot` its place among that seat's heroes.
   captive?: true;
-  // A player card an enemy holds under it, faceup (Hobgoblin, 18050:A:2): it returns to its owner's hand once the holder is out of play (families/wilderland/kings.ts returnHeld). Set only by GuardWithDeckTop.
+  // A player card an enemy holds, faceup: under it (Hobgoblin, 18050:A:2) or attached to it (a boon Shagrat guards, 146069:B:1). It returns to its owner's hand once the holder is out of play (families/wilderland/kings.ts returnHeld). Set by GuardWithDeckTop and GuardWithSetAside.
   held?: true;
   // The damage on a card set aside "out of play (Do not remove damage tokens from it)" (Cold-Drake, 19024:A:1) stays on it as it enters play again. Set only by SetAsideInPlay with keepDamage.
   keepsDamage?: true;
@@ -212,6 +214,7 @@ export type Window =
   // `targets`: a card opened the window (OfferAttacks): the seat may attack only these enemies, each once, as extra attacks.
   | { kind: "playerAttack"; targets?: readonly string[] }
   | { kind: "hideCommit"; seat: number }
+  | { kind: "fortitudeCommit"; seat: number }
   | { kind: "frameAction" }
   | { kind: "choose"; seat: number; options: readonly string[] }
   | { kind: "cancelOffer"; seat: number }
@@ -319,6 +322,8 @@ export type ScenarioState = {
   // The damage each card has taken this round, for a card that takes no more than a number each round (the flag `damageCap`), and the threat each seat's
   // effects have lowered this round (the flag `threatReductionCap`). Kept only in a game that has such a card; cleared as the round ends.
   roundDamage?: Readonly<Record<string, number>>;
+  // The damage healed from each character this round, for the flag `healCap` (145033:A:1). Kept only in a game that has such a card; cleared as the round ends.
+  roundHealed?: Readonly<Record<string, number>>;
   threatLoweredBy?: Readonly<Record<number, number>>;
   // The threat each seat's player card effects have lowered this round (the flag `playerThreatReductionCap`, 19104:A:2). Kept only in a game that has such a card; cleared as the round ends.
   playerThreatLoweredBy?: Readonly<Record<number, number>>;
@@ -409,6 +414,13 @@ export type ScenarioState = {
   // The seats that control an ally in play which can gain the hero card type (Prince Imrahil, 145005:A:1): a seat with no heroes left
   // is not eliminated until the play sweep has given that ally the type (families/play/sweep.ts, rr.card-types).
   heroSavers?: readonly number[];
+  // The main quest card in play prints the Dire keyword (mec113.dire, families/black-gate/dire.ts): each seat's threat elimination level is 99. Kept by settle; absent otherwise.
+  dire?: true;
+  // The Fortitude tests players failed this round (mec113.fortitude-tests, families/mount-doom/failures.ts), for "if a player has failed a Fortitude test this round". Kept only once a test is failed; the round ends them.
+  fortitudeFailures?: readonly HideFailure[];
+  // The Embassy from the Dark Tower (146072:B:1, families/black-gate/embassy.ts): the player cards placed faceup in front of the players and the encounter cards placed faceup (all lie set aside, faceup, while the Embassy lasts), the pairs made in the order they were
+  // paired, and how many pairs the running effect has taken (`at`: the pair it is on is `pairs[at - 1]`). Kept from EmbassyDeal to EmbassyEnd.
+  embassy?: { readonly players: readonly string[]; readonly encounter: readonly string[]; readonly pairs: readonly { readonly player: string; readonly encounter: string }[]; readonly at: number };
   // The stage the quest left when it advanced to `to` past stages that were never played (AdvanceToStage, families/quest/branch.ts noteSkippedStage): "After a quest card is defeated" names it.
   stageLeft?: { to: string; from: string; bypassed?: true };
   undo: UndoLog;

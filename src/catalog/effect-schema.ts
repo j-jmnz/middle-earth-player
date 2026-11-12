@@ -141,6 +141,9 @@ const optionEachSchema = z.strictObject({
   ...when,
 });
 
+// An AfterAttack inside a choice's option: the instructions run once the attack in progress ends, as a record's own AfterAttack runs them ("Either raise your threat by 2, or return attacking enemy to the staging area after this attack", 145021:A:3).
+const optionAfterAttackSchema = z.strictObject({ verb: z.literal("AfterAttack"), instructions: z.array(simpleInstructionSchema), ...when });
+
 const choiceSchema = verbFlags(z.strictObject({
   verb: z.literal("Choose"),
   who: whoSchema,
@@ -156,7 +159,7 @@ const choiceSchema = verbFlags(z.strictObject({
       z.strictObject({
         id: z.string().min(1),
         requires: conditionSchema.optional(),
-        instructions: z.array(z.discriminatedUnion("verb", [...simpleVerbs, simpleChoiceSchema, optionEachSchema])),
+        instructions: z.array(z.discriminatedUnion("verb", [...simpleVerbs, simpleChoiceSchema, optionEachSchema, optionAfterAttackSchema])),
       }),
     )
     .min(1),
@@ -319,6 +322,14 @@ export const effectSchema = z.strictObject({
 }).refine((effect) => effect.instructions.every((instruction) => instruction.verb !== "AddEncounterToPool" || (instruction.codes != null) !== (instruction.fromDeck != null)), {
   // AddEncounterToPool names the codes it adds or the deck whose enemies in play it adds, never both and never neither (emce.campaign-pool-encounter).
   message: "AddEncounterToPool names exactly one of codes and fromDeck",
+  path: ["instructions"],
+}).refine((effect) => effect.instructions.every((instruction) => instruction.verb !== "RaiseStagingThreat" || (instruction.amount != null) !== (instruction.live != null)), {
+  // RaiseStagingThreat names the amount it raises or the live count (the allies in a discard pile), never both and never neither (01104:A:1, 145060:A:2).
+  message: "RaiseStagingThreat names exactly one of amount and live",
+  path: ["instructions"],
+}).refine((effect) => effect.instructions.every((instruction) => instruction.verb !== "AddSetAsideToStaging" || (instruction.code != null) !== (instruction.trait != null)), {
+  // AddSetAsideToStaging names the code it adds or the trait the set aside cards share, never both and never neither (145078:B:1).
+  message: "AddSetAsideToStaging names exactly one of code and trait",
   path: ["instructions"],
 });
 

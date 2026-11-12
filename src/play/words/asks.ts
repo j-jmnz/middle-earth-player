@@ -7,6 +7,8 @@
 import type { Amount, Condition, Instruction } from "../../catalog/boundary.ts";
 import type { Cause } from "../../rules/core/cause.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
+import { embassyPairNow } from "../readouts/black-gate.ts";
+import { ringBearerId } from "../../rules/families/burden/deck.ts";
 import { frameScope, resolveAmount } from "../../rules/interpret/amounts.ts";
 import { holds } from "../../rules/interpret/conditions.ts";
 import type { ReduceContext } from "../../rules/interpret/interpret.ts";
@@ -24,7 +26,7 @@ import { askedSeat, seatSays } from "./seat.ts";
 export type Text = string | readonly { when?: Condition; text: string }[];
 
 /**
- * One entry of an asks file. Templates hold `{card}` (the card the record is on), `{owner}` ("Player N", the seat asked), `{n}` (what the instruction after a Pick deals or places, read now: a Pick's entry only, a Choose
+ * One entry of an asks file. Templates hold `{card}` (the card the record is on), `{owner}` ("Player N", the seat asked), `{picked}` (the card of the row a caution is about: a caution's text only), `{host}` (the card the record's card lies on), `{pair}` (the Embassy's pair being decided: the player card with its owner and the encounter card it is paired with) and `{ringBearer}` (the hero with the Ring-bearer trait), `{n}` (what the instruction after a Pick deals or places, read now: a Pick's entry only, a Choose
  * has none), `{pursuitLimit}` (the value at which the players lose, in a scenario with a pursuit tracker) and a `{name}` for each key of `bind`. Every `Text` below is a template or variants.
  * - `note`: the sentence over a Pick or a Choose (the entry keyed with the instruction's verb).
  * - `why`: the reason the window opened. It is said after the card's title and before the note, "Card: why note" ("Player 1, Card: why note" when owned and two-handed).
@@ -87,9 +89,9 @@ export function templatesOf(entry: Ask): string[] {
   return [...textsOf(entry.note), ...(entry.why == null ? [] : [entry.why]), ...textsOf(entry.label), ...Object.values(entry.labels ?? {}).flatMap(textsOf), ...textsOf(entry.caution?.text)];
 }
 
-/** The placeholders of an entry that no value answers: none of `card`, `owner`, `n` (only where `withN`: a Pick has what its next instruction deals, a Choose has nothing), `pursuitLimit` and its `bind` names. */
+/** The placeholders of an entry that no value answers: none of `card`, `owner`, `picked`, `host`, `ringBearer`, `n` (only where `withN`: a Pick has what its next instruction deals, a Choose has nothing), `pursuitLimit` and its `bind` names. */
 export function unknownPlaceholders(entry: Ask, withN = true): string[] {
-  const known = new Set(["card", "owner", "pursuitLimit", ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {})]);
+  const known = new Set(["card", "owner", "picked", "host", "ringBearer", "pair", "pursuitLimit", ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {})]);
   return [...new Set(templatesOf(entry).flatMap(placeholdersOf))].filter((name) => !known.has(name));
 }
 
@@ -136,7 +138,16 @@ export function askAt(a: AskFacts, table?: AsksTable): AskAt | null {
 export function askValues(a: AskFacts, entry: Ask): { values: Values; scope: ReturnType<typeof frameScope> } {
   const seat = askedSeat(a.game);
   const scope = frameScope(a.game, seat, a.source);
-  const values: Values = { card: a.source ? a.names.card(a.source) : "This card", owner: `Player ${seat + 1}`, n: a.amountNow, pursuitLimit: a.game.widgets.pursuitTracker };
+  const values: Values = { card: a.source ? a.names.card(a.source) : "This card", owner: `Player ${seat + 1}`, picked: "The picked card", n: a.amountNow, pursuitLimit: a.game.widgets.pursuitTracker };
+  // The card the record's card lies on ("Exhaust Frodo Baggins, who carries A Heavy Burden") and the Ring-bearer, named only where an entry says them.
+  const hostId = a.source ? a.game.cards[a.source]?.host : undefined;
+  values.host = hostId ? a.names.card(hostId) : "Its host";
+  if (templatesOf(entry).some((template) => placeholdersOf(template).includes("ringBearer"))) {
+    const bearer = ringBearerId(a.game, a.ctx);
+    values.ringBearer = bearer ? a.names.card(bearer) : "The Ring-bearer";
+  }
+  // The Embassy's pair being decided ("Player 1's Gandalf with Hill-troll"), named only where an entry says it (146072:B:1).
+  if (templatesOf(entry).some((template) => placeholdersOf(template).includes("pair"))) values.pair = embassyPairNow(a.game, (id) => a.names.card(id)) ?? "this pair";
   for (const [name, amount] of Object.entries(entry.bind ?? {})) values[name] = resolveAmount(a.game, amount, scope, a.ctx);
   return { values, scope };
 }
@@ -155,7 +166,7 @@ const scopeOf = (a: AskFacts, hit: Hit, picked?: string) => ({ actor: hit.scope.
 function said(a: AskFacts, hit: Hit, text: Text, picked?: string): string | null {
   const scope = scopeOf(a, hit, picked);
   const chosen = typeof text === "string" ? text : text.find((variant) => variant.when === undefined || holds(a.game, variant.when, scope, a.ctx))?.text;
-  return chosen === undefined ? null : fill(chosen, hit.values);
+  return chosen === undefined ? null : fill(chosen, picked ? { ...hit.values, picked: a.names.card(picked) } : hit.values);
 }
 
 // The warning of one row: its text when the entry's condition holds with that row picked.

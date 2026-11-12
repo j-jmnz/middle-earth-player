@@ -51,7 +51,7 @@ const VERBS = [
   // "Shuffle the Spiders of Mirkwood encounter set into the encounter deck" (18072:A): the cards of the set-aside deck join the encounter deck, which is shuffled, and the deck stays empty (emce.setup-lost-in-mirkwood).
   z.strictObject({ verb: z.literal("ShufflePileIntoEncounterDeck"), pile, ...when }),
   // Constant on a location, the Deep keyword (emce.deep; 18046:A, 19016:A): after the players travel to it and the Responses to the travel are done, they discard it and the top card of the Caves deck replaces it as the active location. Ignored with the Caves
-  // deck empty, while the location is no longer the active location, or while a card in play ignores the keyword (IgnoreKeyword). A location that is not a Deep location is not touched; the engine reads this record when the players travel (families/wilderland/deep.ts).
+  // deck empty, while the location is no longer the active location (unless its own Response added it to the victory display before the keyword, 18055:A:2), or while a card in play ignores the keyword (IgnoreKeyword). A location that is not a Deep location is not touched; the engine reads this record when the players travel (families/wilderland/deep.ts).
   z.strictObject({ verb: z.literal("Deep") }),
   // Constant on a card in play, usually the campaign card or the quest stage: "Ignore the deep keyword" / "Ignore the deep and discover keywords" (12187:A, 12195:A, 18080:B, 19023:B; emce.deep, emce.discover). While the card is in play the keywords
   // are not resolved: the scenario-level switch. It does nothing when run.
@@ -126,8 +126,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("PutOnPileBottom"), pile, code, ...when }),
   // "Attach to a questing hero" (18048:A:1): the source card is attached to the last picked card (a Pick of a committed hero comes first).
   z.strictObject({ verb: z.literal("AttachSelfToPicked"), ...when }),
-  // "Search the encounter deck and discard pile for a Dragon treachery and attach it to Fire-drake, if able" (18080:A:1): the first player chooses a card of the type and trait in the encounter deck or its discard pile (one of each title) that the enemy named `to` does not carry yet, and it is attached to that enemy in play. The deck is shuffled by the instruction after it.
-  z.strictObject({ verb: z.literal("AttachSearched"), type: z.enum(["treachery"]), trait: z.string().min(1), to: z.string().min(1), ...when }),
+  // "Search the encounter deck and discard pile for a Dragon treachery and attach it to Fire-drake, if able" (18080:A:1): the first player chooses a card of the type and trait in the encounter deck or its discard pile (one of each title) that the enemy named `to` does not carry yet, and it is attached to that enemy in play. The deck is shuffled by the instruction after it. `name`: only a card with this title ("a Fell Beast", 145077:A:1).
+  z.strictObject({ verb: z.literal("AttachSearched"), type: z.enum(["treachery"]), trait: z.string().min(1), to: z.string().min(1), name: z.string().min(1).optional(), ...when }),
   // "The first player chooses a player to attach an Artifact attachment from his hand to Dragon Hoard. That attachment gains the guarded (location) keyword" (18043:A:3): the last picked card of a hand is guarded by a location of the encounter deck, found as the Guarded (location) keyword does (emce.guarded-x), and lies in the staging area; once nothing guards it the players claim it, the first player choosing the character it attaches to, as for a treasure. With no location to find it is claimed at once.
   z.strictObject({ verb: z.literal("GuardPickedAttachment"), types: z.array(z.enum(["enemy", "location"])).min(1), ...when }),
   // "The first player attaches the top card of his deck to Hobgoblin faceup as a guarded attachment" (18050:A:2): the first player's top deck card lies faceup under the source, which guards it (cardsUnder). Nothing happens with an empty deck.

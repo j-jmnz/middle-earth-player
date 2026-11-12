@@ -23,7 +23,7 @@ export const resolve = (code: string, timing: Effect["timing"], source?: string)
 /** Both of the first seat's heroes commit and the quest is played to its end; `outcome` is checked against the willpower and threat the quest compared. */
 export const quest = (outcome: "success" | "fail"): Act => ({ act: "quest", outcome });
 /** The enemy attacks the first seat in the combat phase with `shadow` dealt to it (a filler enemy by default), the first hero defending. Must be the first action. */
-export const attack = (enemy: string, options: { shadow?: string; undefended?: boolean } = {}): Act => ({ act: "attack", enemy, ...options });
+export const attack = (enemy: string, options: { shadow?: string; undefended?: boolean; lands?: Readonly<Record<string, string>> } = {}): Act => ({ act: "attack", enemy, ...options });
 /** The card is put on top of the encounter deck and revealed, its When Revealed resolving. */
 export const reveal = (code: string): Act => ({ act: "reveal", code });
 /** The players travel to the location (in the staging area; the layout's phase is Travel). */
@@ -40,6 +40,8 @@ export const defend = (withCode: string): Act => ({ act: "defend", with: withCod
 export const respond = (code: string): Act => ({ act: "respond", code });
 /** The first player cancels the effect the open cancel offer is about, paying its cost from a hero's pool (the layout's `heroResources`). */
 export const cancel: Act = { act: "cancel" };
+/** The player asked to commit to a Fortitude test commits these heroes (none: an empty list), and the test is played to its end: the discards, the count and the actions window passed (mec113.fortitude-tests). */
+export const commit = (...heroes: string[]): Act => ({ act: "commit", heroes });
 /** The engine announces an event to the Forced effects (a trigger, the card it is about, and any other fields), the way a step of the game does. */
 export const announce = (trigger: GameEvent["trigger"], code?: string, extra: Partial<GameEvent> = {}): Act => ({ act: "announce", trigger, ...(code ? { code } : {}), ...(Object.keys(extra).length > 0 ? { extra } : {}) });
 

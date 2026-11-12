@@ -79,3 +79,13 @@ describe("a scenario the app cannot deal yet (coming soon)", () => {
     expect(pathAfter(won).filter((entry) => entry.status === "completed")).toHaveLength(frontier);
   });
 });
+
+describe("a scenario that ends when its last player falls", () => {
+  it("marks its stop ended when its campaign card holds the flag, and no other", () => {
+    const names = Object.fromEntries(order.map((id) => [id, id]));
+    const path = campaignPath(campaign, names, emptyLog(1), (id) => id === order[0]);
+    expect(path[0]?.ended).toBe(true);
+    expect(path.slice(1).some((stop) => stop.ended != null)).toBe(false);
+    expect(campaignPath(campaign, names, emptyLog(1))[0]?.ended).toBeUndefined();
+  });
+});

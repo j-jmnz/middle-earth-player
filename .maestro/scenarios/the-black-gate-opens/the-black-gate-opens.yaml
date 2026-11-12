@@ -1,0 +1,24 @@
+appId: com.middleearth.lcg
+tags:
+  - scenario
+---
+# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `opens-won` (scripts/e2e/the-black-gate-opens.ts): a real two-handed game of The Black Gate Opens (the Defenders of Gondor and Swords of the Noldor
+# lists, Easy, after The Tower of Cirith Ungol's win), parked on its end: the scenario cannot be won (146073:B:3), so the end is the last player's elimination (the threat at 99 under Dire, or no hero left), which runs the campaign card's Resolution (user decision, 2026-11-12).
+# The fixture is OPEN until scripts/e2e/fixtures.ts finds such a game of those lists in its seeds (docs/phases/STATUS.md).
+# The rail reads The end and not Victory, and so does the Resolution screen; the Resolution asks nothing (the tokens on The Black Gate are recorded, Gwaihir is earned when the first player controls him), and the campaign has no XP.
+# The end unlocks Mount Doom: the road offers it next.
+- runFlow:
+    file: ../../subflows/scenario-win.yaml
+    env:
+      FIXTURE: opens-won
+      SCENARIO_ID: the-black-gate-opens
+      NO_XP: "true"
+      RAIL_WORD: "The end"
+      OUTCOME_WORD: "The end"
+- assertVisible:
+    id: node-mount-doom-status
+    text: "Next"
+- assertVisible:
+    id: begin
+- assertNotVisible:
+    id: path-soon

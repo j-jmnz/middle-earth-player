@@ -146,7 +146,7 @@ export function fellowshipLoadout(campaign: CampaignData, seatCount: 1 | 2, star
 }
 
 /** What every campaign golden names: the seats, the seed, the difficulty, and whether it plays after the earlier parts, on the Upgraded sides, or with a Mode card. */
-export type CampaignGoldenBase = { seatCount: 1 | 2; seed: number; difficulty: Difficulty; upgraded?: boolean; after?: boolean; mode?: ModeCard };
+export type CampaignGoldenBase = { seatCount: 1 | 2; seed: number; difficulty: Difficulty; upgraded?: boolean; after?: boolean; mode?: ModeCard; standalone?: boolean };
 
 /** The campaign log the earlier parts leave: the XP each gained (in campaign order), the cards they put in the pool, and the marks on the cards. */
 export type EarlierParts = { xp: readonly number[]; pool: readonly { code: string; seat?: number }[]; marks: Readonly<Record<string, number>> };
@@ -175,7 +175,7 @@ export type CampaignGameSpec<D extends string, P extends object> = {
 };
 
 /** What a campaign game's start takes beyond the seats, the seed and the difficulty: the campaign facts, the log the earlier parts leave, the mode card, the Campaign Setup's answers and the seats' decks. */
-export type StartOptions = { facts?: Omit<CampaignFacts, "modeCard"> | undefined; log?: CampaignLog | undefined; modeCard?: ModeCard | undefined; choices?: readonly string[] | undefined; loadout?: LoadoutSeat[] | undefined };
+export type StartOptions = { facts?: Omit<CampaignFacts, "modeCard"> | undefined; log?: CampaignLog | undefined; modeCard?: ModeCard | undefined; choices?: readonly string[] | undefined; loadout?: LoadoutSeat[] | undefined; standalone?: boolean | undefined };
 
 /**
  * The seeded whole game of one scenario of a campaign (test/scenarios/<scenario-id>/game.ts): its world (the cards a campaign game
@@ -224,7 +224,7 @@ export function campaignGame<D extends string, P extends object>(spec: CampaignG
   }
 
   function start(seatCount: 1 | 2, seed: number, difficulty: Difficulty, options: StartOptions = {}): StartScenario {
-    const { facts, modeCard, choices, loadout } = options;
+    const { facts, modeCard, choices, loadout, standalone } = options;
     const checked = plan(seatCount, options.log ?? emptyLog(seatCount), choices, difficulty, loadout);
     // The campaign's own columns of the log reach the game as they do in startFor (src/campaign/briefing.ts); another campaign's are none.
     const logged = wilderlandFacts(checked.log, spec.campaign.id);
@@ -239,24 +239,26 @@ export function campaignGame<D extends string, P extends object>(spec: CampaignG
       effects: EFFECTS,
       difficulty,
       poolEncounterCards: checked.poolEncounterCards,
+      poolEncounterOwners: checked.poolEncounterOwners,
       poolIntoPlay: checked.poolIntoPlay,
       removedFromEncounter: checked.removedFromEncounter,
       removedFromCaves: checked.removedFromCaves,
       ...(dealtFacts ? { facts: dealtFacts } : {}),
       ...(modeCard ? { modeCard } : {}),
+      ...(standalone ? { mode: "standalone" as const } : {}),
     });
   }
 
   /** Plays until the scenario is lost, or won and every Resolution choice is answered. */
-  function play(seatCount: 1 | 2, seed: number, difficulty: Difficulty, ctx: ReduceContext, options: { facts?: Omit<CampaignFacts, "modeCard">; log?: CampaignLog; policy?: Partial<P>; mode?: ModeCard; choices?: readonly string[]; limit?: number } = {}): PlayedGame {
+  function play(seatCount: 1 | 2, seed: number, difficulty: Difficulty, ctx: ReduceContext, options: { facts?: Omit<CampaignFacts, "modeCard">; log?: CampaignLog; policy?: Partial<P>; mode?: ModeCard; choices?: readonly string[]; limit?: number; standalone?: boolean } = {}): PlayedGame {
     const policy = { ...spec.policy, ...options.policy };
-    return playToEnd(start(seatCount, seed, difficulty, { facts: options.facts, log: options.log, modeCard: options.mode, choices: options.choices }), ctx, (state, memory) => spec.intent(state, ctx, memory, policy), options.limit ?? spec.limit);
+    return playToEnd(start(seatCount, seed, difficulty, { facts: options.facts, log: options.log, modeCard: options.mode, choices: options.choices, standalone: options.standalone }), ctx, (state, memory) => spec.intent(state, ctx, memory, policy), options.limit ?? spec.limit);
   }
 
   /** A golden: its upgraded cards or, after the earlier parts, their levels as the campaign facts; the earlier parts' log; its policy over the default. */
   function playGolden(golden: CampaignGoldenBase & { policy?: Partial<P> }, ctx: ReduceContext, choices?: readonly string[]): PlayedGame {
     const facts = golden.upgraded ? { prisoner: null, usedOnce: [], counters: {}, upgraded: spec.upgraded } : golden.after && spec.levels ? { prisoner: null, usedOnce: [], counters: {}, levels: spec.levels } : undefined;
-    return play(golden.seatCount, golden.seed, golden.difficulty, ctx, { facts, log: golden.after ? after(golden.seatCount) : undefined, policy: golden.policy, mode: golden.mode, choices });
+    return play(golden.seatCount, golden.seed, golden.difficulty, ctx, { facts, log: golden.after ? after(golden.seatCount) : undefined, policy: golden.policy, mode: golden.mode, choices, standalone: golden.standalone });
   }
 
   return { world, after, plan, start, play, playGolden };

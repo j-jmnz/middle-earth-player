@@ -2,12 +2,14 @@ import { readdirSync, readFileSync } from "node:fs";
 import path from "node:path";
 
 import type { CampaignData, ScenarioData } from "../../../src/catalog/scenario-data.ts";
+import { AUTHORED_CAMPAIGN_FOLDERS } from "./authored-paths.ts";
 
 // The barrel of the authored effect files (src/effects/generated/authored.ts). Metro cannot glob, so pnpm data build lists
 // them. A top-level file of src/effects/authored/ that exports AUTHORED_EFFECTS is named for a campaign (its box's cards) or
 // a scenario (its records). The merge order is the order the engine resolves records in: for each campaign in data/campaigns
 // order, its own file and then its scenarios' files (a scenario in two campaigns counts once), then the scenarios no campaign
-// lists, then the three folders that follow. A file named for neither fails the build.
+// lists, then the three folders that follow. A file named for neither fails the build. A campaign's own folder (AUTHORED_CAMPAIGN_FOLDERS) holds
+// its box's file and its scenarios' files; a name here is the path under src/effects/authored/ without the extension.
 const FOLDERS = [
   { exports: ["NIGHTMARE_AUTHORED_EFFECTS", "NIGHTMARE_AUTHORED_REPLACES"], from: "nightmare/index.ts" },
   { exports: ["POOL_AUTHORED_EFFECTS", "POOL_AUTHORED_REPLACES"], from: "pool/index.ts" },
@@ -15,18 +17,23 @@ const FOLDERS = [
 ] as const;
 
 export function authoredFileNames(dir: string): string[] {
-  return readdirSync(dir, { withFileTypes: true })
-    .filter((entry) => entry.isFile() && entry.name.endsWith(".ts") && !entry.name.endsWith(".test.ts"))
-    .filter((entry) => /export const AUTHORED_EFFECTS\b/.test(readFileSync(path.join(dir, entry.name), "utf8")))
-    .map((entry) => entry.name.slice(0, -3))
+  const holders = ["", ...Object.values(AUTHORED_CAMPAIGN_FOLDERS)];
+  return holders
+    .flatMap((folder) =>
+      readdirSync(path.join(dir, folder), { withFileTypes: true })
+        .filter((entry) => entry.isFile() && entry.name.endsWith(".ts") && !entry.name.endsWith(".test.ts"))
+        .filter((entry) => /export const AUTHORED_EFFECTS\b/.test(readFileSync(path.join(dir, folder, entry.name), "utf8")))
+        .map((entry) => (folder ? `${folder}/` : "") + entry.name.slice(0, -3)),
+    )
     .sort();
 }
 
 export function authoredOrder(names: readonly string[], campaigns: readonly Pick<CampaignData, "id" | "scenarios">[], scenarios: readonly Pick<ScenarioData, "id">[]): string[] {
-  const wanted = new Set(names);
+  const byBase = new Map(names.map((name) => [name.slice(name.lastIndexOf("/") + 1), name]));
   const order: string[] = [];
-  const take = (name: string) => {
-    if (wanted.has(name) && !order.includes(name)) order.push(name);
+  const take = (base: string) => {
+    const name = byBase.get(base);
+    if (name !== undefined && !order.includes(name)) order.push(name);
   };
   for (const campaign of campaigns) {
     take(campaign.id);
@@ -39,7 +46,7 @@ export function authoredOrder(names: readonly string[], campaigns: readonly Pick
 }
 
 export function renderAuthoredBarrel(order: readonly string[]): string {
-  const ident = (name: string) => name.toUpperCase().replaceAll("-", "_");
+  const ident = (name: string) => name.slice(name.lastIndexOf("/") + 1).toUpperCase().replaceAll("-", "_");
   const imports = order.map((name) => `import { AUTHORED_EFFECTS as ${ident(name)}_EFFECTS, AUTHORED_REPLACES as ${ident(name)}_REPLACES } from "../authored/${name}.ts";`);
   const folders = FOLDERS.map((folder) => `import { ${folder.exports.join(", ")} } from "../authored/${folder.from}";`);
   const effects = [...order.map((name) => `...${ident(name)}_EFFECTS`), ...FOLDERS.map((folder) => `...${folder.exports[0]}`)];

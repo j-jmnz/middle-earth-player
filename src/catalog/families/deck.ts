@@ -55,8 +55,9 @@ const VERBS = [
   // The effect's X grows by this amount, read now ("the total cost of the allies exhausted to pay for this effect").
   z.strictObject({ verb: z.literal("AddToX"), amount: amountSchema, ...when }),
   // The instructions after it in this effect resolve for the player picked last (`pickedPlayer`: their hand, deck and choices,
-  // "That player searches the top 5 cards of his deck"), or again for the effect's own actor (`actor`).
-  z.strictObject({ verb: z.literal("ActAs"), who: z.enum(["pickedPlayer", "actor"]), ...when }),
+  // "That player searches the top 5 cards of his deck"), for the first player (`firstPlayer`: an encounter effect that targets a single player or card names it through the first player, rr.first-player),
+  // or again for the effect's own actor (`actor`).
+  z.strictObject({ verb: z.literal("ActAs"), who: z.enum(["pickedPlayer", "actor", "firstPlayer"]), ...when }),
   // The actor plays a card that matches `pick` (from a discard pile, as if it were in their hand) when it could be played now:
   // an event resolves its Action and goes to its owner's discard pile, an attachment goes on a host the actor chooses. It is
   // paid for from the actor's heroes, or costs nothing with `free` (an attachment or an ally is played only for free). Copies of one card

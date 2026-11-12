@@ -35,12 +35,17 @@ function inPlayWithCode(state: ScenarioState, code: string): string | undefined 
   return Object.values(state.cards).find((card) => card.code === code && inPlay(card.zone))?.id;
 }
 
+/** The card `id` becomes the card `into`, faceup and ready in the staging area, controlled by no one, with its damage removed; it keeps its resources and the cards attached to it, and the card it was is kept as its other side. Shared by FlipToEnemySide and ReturnFromVictory. */
+export function turnIntoInStaging(state: ScenarioState, id: string, into: string): ScenarioState {
+  const card = state.cards[id];
+  if (!card) return state;
+  return updateCard(moveCard(state, id, { zone: "staging" }), id, { code: into, other: card.code, face: "up", controller: null, damage: 0, exhausted: false });
+}
+
 /** FlipToEnemySide: the card in play with the code becomes `into`, faceup and ready in the staging area, controlled by no one, with its damage removed; it keeps its resources and the cards attached to it. The old side is kept as the card's other side. */
 export function flipToEnemySide(state: ScenarioState, instruction: Verb<"FlipToEnemySide">): ScenarioState {
   const id = inPlayWithCode(state, instruction.code);
-  const card = id ? state.cards[id] : undefined;
-  if (!id || !card) return state;
-  return updateCard(moveCard(state, id, { zone: "staging" }), id, { code: instruction.into, other: card.code, face: "up", controller: null, damage: 0, exhausted: false });
+  return id ? turnIntoInStaging(state, id, instruction.into) : state;
 }
 
 /**

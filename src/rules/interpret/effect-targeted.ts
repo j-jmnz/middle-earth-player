@@ -21,7 +21,9 @@ import type { Frame, QueueItem, ScenarioState } from "../core/state.ts";
 import { livingSeats, updateCard } from "../core/state.ts";
 import { seatFor, shuffleIntoEncounterDeck } from "./verbs.ts";
 import { patchTop, topFrame } from "../windows/windows.ts";
-import { attachTo, moveCard } from "../core/zones.ts";
+import { queueEvent } from "../windows/queue.ts";
+import { gameReads } from "../core/game-reads.ts";
+import { attachTo, moveCard, turnedUp } from "../core/zones.ts";
 
 function hasEnemyType(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
   const instance = state.cards[id];
@@ -71,11 +73,13 @@ function candidates(state: ScenarioState, item: QueueItem, sourceId: string | nu
     case "SearchMove":
     case "SearchReveal": {
       const found = searchable(state, instruction, ctx);
-      const required = instruction.verb === "SearchMove" && instruction.require ? searchable(state, { code: instruction.require }, ctx) : [];
+      const data = topFrame(state)?.data;
+      // "One of those enemies must be Corsair Captain, if able" (145030:A:3): the requirement is met once an earlier search of this effect has found a card with that code (the frame's picked cards, kept by applyTargeted).
+      const met = instruction.verb === "SearchMove" && instruction.require != null && data?.kind === "effect" && (data.picked ?? []).some((id) => state.cards[id]?.code === instruction.require);
+      const required = instruction.verb === "SearchMove" && instruction.require && !met ? searchable(state, { code: instruction.require }, ctx) : [];
       if (required.length > 0) return required;
       if (instruction.verb !== "SearchMove" || !instruction.different) return found;
-      // A different title: not one an earlier search of this effect has found (the frame's picked cards, kept by applyTargeted).
-      const data = topFrame(state)?.data;
+      // A different title: not one an earlier search of this effect has found.
       const taken = new Set((data?.kind === "effect" ? (data.picked ?? []) : []).map((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").name));
       return found.filter((id) => !taken.has(printedOf(ctx.cards, state.cards[id]?.code ?? "").name));
     }
@@ -146,7 +150,10 @@ function applyTargeted(
       let count = 0;
       for (const id of ids) {
         if (!next.cards[id]) continue;
+        const engaged = next.cards[id]?.zone === "engaged";
         next = updateCard(moveCard(next, id, { zone: "staging" }), id, { controller: null });
+        // "After an enemy enters the staging area" hears an engaged enemy that comes back (146017:A:1); only a game with such a record queues it.
+        if (engaged && gameReads(next, ctx, '"trigger":"returnedToStaging"')) next = queueEvent(next, { trigger: "returnedToStaging", seat: item.seat, cardId: id });
         count += 1;
       }
       const data = topFrame(next)?.data;
@@ -172,12 +179,12 @@ function applyTargeted(
         // encounter discard pile was shuffled back into the deck with lies facedown (rr.running-out-of-cards, resetEncounterDeck). A side it shows (A or B) stays.
         const facedown = next.cards[id]?.face === "down";
         next = instruction.to === "staging" ? moveCard(next, id, stagingDest(next, item.seat)) : moveCard(next, id, { zone: "engaged", seat: state.firstPlayer });
-        if (instruction.each || facedown) next = updateCard(next, id, { face: "up" });
+        if (instruction.each || facedown) next = updateCard(next, id, { face: turnedUp(next, id) });
       }
       // A `different` search tells the next one which titles are taken.
       const data = topFrame(next)?.data;
       const moved = instruction.each ? ids : ids.slice(0, 1);
-      return (instruction.different || instruction.remember) && data?.kind === "effect" ? patchTop(next, { data: { ...data, picked: [...(data.picked ?? []), ...moved] } }) : next;
+      return (instruction.different || instruction.remember || instruction.require) && data?.kind === "effect" ? patchTop(next, { data: { ...data, picked: [...(data.picked ?? []), ...moved] } }) : next;
     }
     case "SearchReveal":
       return first ? startReveal(state, seatFor(state, instruction.who, item.seat), ctx, steps, first, undefined, instruction.to === "engaged") : state;

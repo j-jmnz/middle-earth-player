@@ -61,8 +61,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "12195:constant:1", cardCode: "12195", lines: ["12195:A:3"], timing: "constant", instructions: [{ verb: "IgnoreKeyword", keywords: ["deep", "discover"] }] },
     copyLine("11215:B:4", "12195:B:1"),
 
-    // 19155 The Goblins' Assault (objective). Urdug gets +2 Defense for each other enemy in play, and takes no damage unless he has resolved an attack this phase. After the players quest unsuccessfully (once, whatever the number of players)
-    // it gets 1 progress for each player.
+    // 19155 The Goblins' Assault (objective). Urdug gets +2 Defense for each other enemy in play, and takes no damage unless he has resolved an attack this phase. After the players quest unsuccessfully
+    // it gets 1 progress for each player. The card prints no limit; the engine announces a failed quest to every seat, so the group's one quest is heard by the first player's seat (the condition) and the progress is placed once.
     {
       id: "19155:constant:1",
       cardCode: "19155",
@@ -78,7 +78,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       condition: { kind: "not", condition: { kind: "attackedThisPhase", name: URDUG } },
       instructions: [{ verb: "ModifyStat", stat: "cannotTakeDamage", amount: 1, until: "whileSourceInPlay", holders: URDUG_ENEMY }],
     },
-    { id: "19155:forced:1", cardCode: "19155", lines: ["19155:A:2"], timing: "forced", trigger: "questFailed", limit: "oncePerRound", instructions: [{ verb: "PlaceProgressOn", amount: { players: true }, target: "self" }] },
+    { id: "19155:forced:1", cardCode: "19155", lines: ["19155:A:2"], timing: "forced", trigger: "questFailed", condition: { kind: "firstPlayer" }, instructions: [{ verb: "PlaceProgressOn", amount: { players: true }, target: "self" }] },
 
     // 19156 The Heroes' Defense (objective). With 5 resources for each player on it Urdug is considered engaged with each player, as the Watcher in the Water is (he adds no Threat to the staging area, rr.engaged). Response: after an enemy is destroyed
     // it gets 1 resource (the flag Gate of Gundabad sets bars it, and the Response is then not offered).

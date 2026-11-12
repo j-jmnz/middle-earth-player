@@ -33,19 +33,22 @@ export function outOfPlayChoices(state: ScenarioState, code: string): string[] {
 
 export function searchable(
   state: ScenarioState,
-  selector: { code?: string; trait?: string; type?: string; nonUnique?: boolean; deckOnly?: boolean },
+  selector: { code?: string; trait?: string; traits?: readonly string[]; type?: string; nonUnique?: boolean; deckOnly?: boolean; victory?: boolean },
   ctx: ReduceContext,
   // `deckOnly`: the encounter deck alone, not its discard pile ("search the encounter deck for a Harad enemy", 144037:A:1).
   zones: readonly ("encounterDeck" | "encounterDiscard")[] = selector.deckOnly === true ? ["encounterDeck"] : ["encounterDeck", "encounterDiscard"],
 ): string[] {
   const found: string[] = [];
-  for (const zone of zones) {
-    for (const id of state[zone]) {
+  // `victory`: the victory display is searched too ("search the encounter deck, discard pile, and victory display for a Nazgûl enemy", 146036:A:2).
+  const piles = [...zones.map((zone) => state[zone]), ...(selector.victory === true ? [state.victory] : [])];
+  for (const pile of piles) {
+    for (const id of pile) {
       const instance = state.cards[id];
       if (!instance) continue;
       const printed = printedOf(ctx.cards, instance.code);
       if (selector.code != null && printed.code !== selector.code) continue;
       if (selector.trait != null && !printed.traits.includes(selector.trait)) continue;
+      if (selector.traits != null && !selector.traits.some((trait) => printed.traits.includes(trait))) continue;
       if ((selector.type != null && printed.type !== selector.type) || (selector.nonUnique === true && printed.isUnique)) continue;
       found.push(id);
     }

@@ -3,6 +3,7 @@ import { printedOf } from "../../src/rules/core/printed.ts";
 import { updateCard } from "../../src/rules/core/state.ts";
 import { spawn } from "../../src/rules/core/zones.ts";
 import { settle } from "../../src/rules/engine/machine.ts";
+import { syncConstants } from "../../src/rules/interpret/constants.ts";
 import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
 import { pushCardEffects } from "../../src/rules/interpret/effect-frames.ts";
 import type { EngineStep } from "../../src/rules/core/intents.ts";
@@ -102,7 +103,8 @@ function shadow(base: ScenarioState, ctx: ReduceContext, code: string, defended:
 
 function travel(base: ScenarioState, ctx: ReduceContext, code: string, steps: EngineStep[]): { state: ScenarioState; note: string | null } {
   const placed = spawn({ ...base, ...opening("Travel") }, code, { zone: "staging" });
-  const at = placed.state;
+  // The constants of a card that has just entered the staging area hold before the players travel (a location that cannot leave the staging area is not offered, 146066:B:1).
+  const at = syncConstants(placed.state, ctx);
   const legal = legalIntents(at, ctx);
   const target = legalTargets(at, { type: "Travel" }, ctx).find((id) => id === placed.id);
   if (!legal.some((intent) => intent.type === "Travel") || target == null) return { state: at, note: "not offered as a travel target on this table" };

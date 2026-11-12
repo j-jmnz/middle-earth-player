@@ -124,10 +124,20 @@ describe("Deep (emce.deep)", () => {
     expect(codesOf(passed, [passed.activeLocation ?? ""])).toEqual(["cave1"]);
   });
 
-  it("is ignored when the location has left the active slot before the keyword resolves (a Response moved it)", () => {
+  it("still resolves when its own Response added the location to the victory display: the top Caves card becomes the active location and nothing is discarded (18055:A:2)", () => {
     const { state, deepId } = atTravel(["cave1"]);
     // Forked Passage's Response adds it to the victory display before the keyword is resolved (18055:A:2); a Forced effect stands in for it.
     const away = record("deepA:forced:1", "deepA", "forced", [{ verb: "MoveEncounterCard", card: "self", to: "victory" }], { trigger: "traveled", subject: "self" });
+    const done = travel(state, deepId, [DEEP, away]);
+    expect(codesOf(done, [done.activeLocation ?? ""])).toEqual(["cave1"]);
+    expect(done.cards[deepId]?.zone).toBe("victory");
+    expect(done.encounterDiscard).not.toContain(deepId);
+    expect(pileOf(done, "cavesDeck")).toEqual([]);
+  });
+
+  it("is ignored when the location left play another way before the keyword resolves (a Response discarded it)", () => {
+    const { state, deepId } = atTravel(["cave1"]);
+    const away = record("deepA:forced:1", "deepA", "forced", [{ verb: "MoveEncounterCard", card: "self", to: "discard" }], { trigger: "traveled", subject: "self" });
     const done = travel(state, deepId, [DEEP, away]);
     expect(done.activeLocation).not.toBe(deepId);
     expect(codesOf(done, pileOf(done, "cavesDeck"))).toEqual(["cave1"]);

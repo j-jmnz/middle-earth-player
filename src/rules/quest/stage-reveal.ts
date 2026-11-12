@@ -14,7 +14,7 @@ import { defeatedBefore, questCardDefeatedHeard } from "../families/quest/branch
 import { queueEvent } from "../windows/queue.ts";
 import { offerResponses } from "../windows/responses.ts";
 import { restricted } from "../interpret/restrictions.ts";
-import { livingSeats, withMode, type ScenarioState } from "../core/state.ts";
+import { flagged, livingSeats, withMode, type ScenarioState } from "../core/state.ts";
 import { stageSeat } from "../families/breaking/areas.ts";
 import { payOwed } from "../families/breaking/progress.ts";
 import { fireForced } from "../windows/triggers.ts";
@@ -110,11 +110,12 @@ function askStage(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[])
 // (rr.quest-advancement: "immediately"; faq.progress-without-advancing lets it take more meanwhile): To the River... once no
 // Hill Troll is in play (01126:B:2), The Necromancer's Tower once the players have an objective (01123:B:3). The rules engine
 // asks between two steps of the round, with no window open, no effect resolving and no attack under way. A stage with no
-// progress is left for the progress it next takes (a stage at 0 quest points, advanceStage).
+// progress is left for the progress it next takes (a stage at 0 quest points, advanceStage), unless it holds the flag advancesWhenFreed (146066:B:3).
 export function advanceFreed(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (state.window || state.stack.length > 0 || state.pendingAttack || state.pendingStrike || state.stageCleared || state.lost) return state;
   const stage = state.questStage ? state.cards[state.questStage] : undefined;
-  if (!stage || stage.progress === 0) return state;
+  // A stage with the flag advances with no progress once the game is under way: in Setup the cards that hold it back are not yet in play.
+  if (!stage || (stage.progress === 0 && (state.phase === "Setup" || !flagged(state, stage.id, "advancesWhenFreed")))) return state;
   const points = questPointsOf(state, stage, ctx.cards);
   const canAdvance = (current: ScenarioState) => restricted(current, ctx, "advance").length === 0;
   if (points == null || stage.progress < points || !canAdvance(state)) return state;

@@ -19,6 +19,7 @@ import { logLineSpeech, type LogLine } from "../store/log.ts";
 import { CloseButton, TextButton } from "../../ui/buttons.tsx";
 import { LineMark } from "./table-chrome.tsx";
 import { SettingsRows } from "./setting-rows.tsx";
+import { ELIMINATION_THREAT } from "../readouts/threat-level.ts";
 import type { TableSettings } from "../../ui/table-settings.ts";
 import { capLines, touch, useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
@@ -239,23 +240,27 @@ export function LogPanel({ round, lines, onClose }: { round: number; lines: read
 export function ThreatPanel({
   seatLabel,
   threat,
+  limit,
   rows,
   onClose,
 }: {
   // "Player 2" in two-handed play, else null.
   seatLabel: string | null;
   threat: number;
+  // The elimination level: 99 while the main quest has Dire (mec113.dire); the usual one when absent.
+  limit?: number;
   rows: readonly { id: string; name: string; cost: number; verdict: { word: string; engages: boolean } }[];
   onClose: () => void;
 }) {
   const s = useUiScale();
   const focus = usePanelFocus();
+  const of = limit ?? ELIMINATION_THREAT;
   return (
     <View testID="threat-panel" collapsable={false} style={{ flexShrink: 1 }}>
-      <View ref={focus} accessible accessibilityRole="header" accessibilityLabel={`${seatLabel ? `${seatLabel}, ` : ""}Threat ${threat} of 50`} className="items-center" style={{ paddingHorizontal: CLOSE_CLEAR * s }}>
+      <View ref={focus} accessible accessibilityRole="header" accessibilityLabel={`${seatLabel ? `${seatLabel}, ` : ""}Threat ${threat} of ${of}`} className="items-center" style={{ paddingHorizontal: CLOSE_CLEAR * s }}>
         {seatLabel ? <Text className="font-display text-eyebrow uppercase text-inkLabel">{seatLabel}</Text> : null}
         <Text className="mt-1 font-display text-title text-ink">Threat</Text>
-        <Text className="font-display text-heading text-inkMuted">{`${threat} of 50`}</Text>
+        <Text className="font-display text-heading text-inkMuted">{`${threat} of ${of}`}</Text>
       </View>
       <PanelClose testID="threat-panel-close" onPress={onClose} />
       <ScrollView className="mt-3" style={{ flexGrow: 0, flexShrink: 1 }}>

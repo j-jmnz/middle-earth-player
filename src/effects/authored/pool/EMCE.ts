@@ -40,7 +40,7 @@ export const RECORDS: readonly Effect[] = [
   // 12177 Unbroken (+1 Defense is a template): Action: any player once each round discards a card from hand to heal 1 damage from the hero.
   {"id":"12177:action:1","cardCode":"12177","lines":["12177:A:4"],"timing":"action","anyPlayer":true,"limit":"oncePerRoundEachPlayer","condition":{"kind":"handHasCard"},"instructions":[{"verb":"DiscardFromHand","amount":1},{"verb":"Heal","amount":1,"target":"host"}]},
   // 12178 The Steadfast (+1 Willpower is a template): after the hero commits to the quest, with its player's threat at 40 or higher, 1 progress goes on the current quest.
-  {"id":"12178:response:1","cardCode":"12178","lines":["12178:A:4"],"timing":"response","trigger":"committed","subject":"host","condition":{"kind":"threat","min":40},"instructions":[{"verb":"QuestProgress","amount":1}]},
+  {"id":"12178:response:1","cardCode":"12178","lines":["12178:A:4"],"timing":"response","trigger":"committed","subject":"host","condition":{"kind":"threat","min":40,"valour":true},"instructions":[{"verb":"QuestProgress","amount":1}]},
   // 12179 Dragon-slayer (+1 Attack is a template): after a non-unique enemy is added to the staging area its bearer's player exhausts it to engage that enemy, which makes an immediate attack against them.
   {"id":"12179:response:1","cardCode":"12179","lines":["12179:A:4"],"timing":"response","trigger":"addedToStaging","subject":{"type":"enemy","control":"any","nonUnique":true},"cost":{"kind":"exhaustSelf"},"instructions":[{"verb":"Engage","target":"subject"},{"verb":"ImmediateAttackBy","target":"subject"}]},
   // 12180 to 12183, the Song boons (events). The hero a Song names is the one the Accolade boon is on.

@@ -1,0 +1,24 @@
+appId: com.middleearth.lcg
+tags:
+  - scenario
+---
+# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `fields-won` (scripts/e2e/the-battle-of-the-pelennor-fields.ts): a real two-handed game of The Battle of the Pelennor Fields
+# (The One Deck and the Defenders of Gondor list, after The Siege of Gondor's win; Aragorn the first player's saga hero, set aside until The Corsair Fleet's resources run out), parked on its win (Fighting in the Fields defeated with The Witch-king in the victory display and
+# Aragorn in play). The fixture is OPEN until scripts/e2e/fixtures.ts finds a win of those lists in its seeds (docs/phases/STATUS.md).
+# The Resolution (145078) asks nothing: each player earns a Wraith on Wings, and an Esquire still on a hero is earned for its controller. The campaign has no XP. Minas Tirith's damage is shown on its top-bar dial (`pelennor-city`), which is still on the win table
+# (Minas Tirith stays in the staging area); the Fleet's dial is gone with the Fleet, which is in the victory display.
+# The win unlocks The Tower of Cirith Ungol, whose node reads Next and the path offers Begin (the part is playable, so no line says it is coming soon).
+- runFlow:
+    file: ../../subflows/scenario-win.yaml
+    env:
+      FIXTURE: fields-won
+      SCENARIO_ID: the-battle-of-the-pelennor-fields
+      TABLE_WIDGET: pelennor-city
+      NO_XP: "true"
+- assertVisible:
+    id: node-the-tower-of-cirith-ungol-status
+    text: "Next"
+- assertVisible:
+    id: begin
+- assertNotVisible:
+    id: path-soon

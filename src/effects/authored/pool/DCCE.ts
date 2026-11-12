@@ -141,7 +141,7 @@ const ANOTHER_ALLY: PickSpec = { type: "ally", control: "any", other: true };
 const starlaStat = (stat: "willpower" | "attack" | "defense"): Effect["instructions"][number] => ({ verb: "ModifyStat", stat, amount: { level: true, halved: true }, until: "whileSourceInPlay" });
 // 11210 Gavin (objective ally; an Encounter-keyword player card): his When Revealed takes him into play under a player the first player chooses, committed to the quest, and adds a resource to Lanwyn when she is
 // in play. The other two lines (his Planning Action shuffles a random set-aside Send for Help in with him; he is removed from the game when he leaves play by anything but that) stay open.
-const FIRST_PLAYER_CHOOSES = { verb: "Pick", pick: { type: "player", control: "any", who: "firstPlayer" } } as const;
+export const FIRST_PLAYER_CHOOSES = { verb: "Pick", pick: { type: "player", control: "any", who: "firstPlayer" } } as const;
 const LANWYN: PickSpec = { type: "hero", control: "any", names: ["Lanwyn"] };
 
 export const RECORDS: readonly Effect[] = [

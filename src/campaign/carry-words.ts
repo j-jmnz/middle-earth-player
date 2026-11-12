@@ -1,5 +1,6 @@
 // How the cards a Resolution keeps for the next campaign read (01131:B:2): one phrase for the Resolution sentence, the Campaign Log's row and
 // the campaign setup's offer. Pure, so a test reads it.
+import { seatPenalty, threatWords } from "./two-towers-view.ts";
 
 type Carried = { code: string; perPlayer?: boolean };
 
@@ -28,10 +29,22 @@ export function andList(parts: readonly string[]): string {
   return parts.length > 1 ? `${parts.slice(0, -1).join(", ")} and ${parts.at(-1)}` : (parts[0] ?? "");
 }
 
-/** What a continued save takes in from a finished save of the box before it, a zero left out: "3 heroes, 1 fallen hero, 1 captive, 2 cards in the pool and a +1 threat penalty". */
-export function continueWords(offer: { heroes: number; fallen: number; captives: number; pool: number; penalty: number }): string {
+/** What a finished save hands on: the counts, and the threat penalties (the table's, and each seat's own where it took one, as the log's Threat Modifiers row reads them). */
+type Continued = { heroes: number; fallen: number; captives: number; pool: number; penalty: number; penaltyBySeat?: readonly number[]; seatCount?: number; enemies?: number };
+
+/** The permanent threat penalty of a finished save in words: "a +1 threat penalty", and with a penalty a seat took of its own the Threat Modifiers row's words ("threat penalties (Player 1: +3 · Player 2: +1)"); none for no penalty. */
+function penaltyWords(offer: Continued): string[] {
+  const bySeat = offer.penaltyBySeat ?? [];
+  if (bySeat.every((amount) => amount === 0)) return offer.penalty > 0 ? [`a +${offer.penalty} threat penalty`] : [];
+  const seats = offer.seatCount ?? 1;
+  const log = { threatPenalty: offer.penalty, threatPenaltyBySeat: bySeat };
+  return seats === 1 ? [`a +${seatPenalty(log, 0)} threat penalty`] : [`threat penalties (${threatWords(log, seats)})`];
+}
+
+/** What a continued save takes in from a finished save of the box before it, a zero left out: "3 heroes, 1 fallen hero, 1 captive, 2 cards in the pool and a +1 threat penalty". The enemies under The Black Gate come last. */
+export function continueWords(offer: Continued): string {
   const count = (n: number, one: string, many: string): string[] => (n > 0 ? [`${n} ${n === 1 ? one : many}`] : []);
-  const parts = [...count(offer.heroes, "hero", "heroes"), ...count(offer.fallen, "fallen hero", "fallen heroes"), ...count(offer.captives, "captive", "captives"), ...count(offer.pool, "card in the pool", "cards in the pool"), ...(offer.penalty > 0 ? [`a +${offer.penalty} threat penalty`] : [])];
+  const parts = [...count(offer.heroes, "hero", "heroes"), ...count(offer.fallen, "fallen hero", "fallen heroes"), ...count(offer.captives, "captive", "captives"), ...count(offer.pool, "card in the pool", "cards in the pool"), ...penaltyWords(offer), ...count(offer.enemies ?? 0, "enemy under The Black Gate", "enemies under The Black Gate")];
   return parts.length === 0 ? "an empty log" : andList(parts);
 }
 

@@ -250,9 +250,16 @@ export const pickSchema = z.strictObject({
   engageable: z.literal(true).optional(),
   // The effect discards the card chosen, for a condition that asks before the discard (a canPick ahead of DiscardFromHand): a card that player card effects cannot discard (18026:A:1) is left out. A Pick followed by DiscardPicked is known without it (families/wilderland/pick.ts).
   discarded: z.literal(true).optional(),
+  // The black-gate family's filters (src/rules/families/black-gate/pick.ts). `embassy`: a card of the Embassy from the Dark Tower's faceup row that is not paired yet, the player cards placed in front of the players (`player`) or the encounter cards placed faceup (`encounter`, 146072:B:1).
+  // `highestThreat`: of the cards that matched, those with the highest current Threat, a card with none counting 0 ("the highest threat encounter card remaining"); every one when tied, and the chooser decides.
+  embassy: z.enum(["player", "encounter"]).optional(),
+  highestThreat: z.literal(true).optional(),
+  // The mount-doom family's filter (src/rules/families/mount-doom/pick.ts): a card discarded for the Fortitude test in progress that still lies in the encounter discard pile ("choose an encounter card discarded for this test", 146049:A:3).
+  fortitudeDiscarded: z.literal(true).optional(),
   // The sidequests family's filters (src/rules/families/sidequests/pick.ts).
   // A card with the same title as the active location ("each location in the staging area with the same title as the active location").
-  sameTitleAs: z.literal("activeLocation").optional(),
+  // `picked`: a card with the same title as the last card the running effect picked, never that card itself ("if there is a copy of that enemy in the staging area", 146019:A:1; Pick, canPick and matches read it).
+  sameTitleAs: z.enum(["activeLocation", "picked"]).optional(),
   // A character committed to a side quest (`sideQuest`), or to the current quest (`mainQuest`).
   committedTo: z.enum(["sideQuest", "mainQuest"]).optional(),
   // With `from: loot`, only the loot guarding the card the answered event is about.
@@ -278,6 +285,9 @@ export const pickSchema = z.strictObject({
   // when tied, and then the chooser (the player who reveals) decides. Read by the harad family (src/rules/families/harad/pick.ts).
   lowestAttack: z.literal(true).optional(),
   lowestThreat: z.literal(true).optional(),
+  // Of the cards that match, only those with the highest printed cost, a card with no printed cost counting as 0 ("discard the highest cost attachment you control", 145041:A:1); every one of them when tied, and then the
+  // chooser decides. Read by the costs family (src/rules/families/costs/pick.ts).
+  highestCost: z.literal(true).optional(),
 });
 
 export type PickSpec = z.infer<typeof pickSchema>;

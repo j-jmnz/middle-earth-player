@@ -10,7 +10,7 @@ import { loadCards } from "../load-cards.ts";
 import { RINGSDB_ORIGIN } from "../../../src/screens/images/policy.ts";
 import type { Card } from "../../../src/catalog/card-facts.ts";
 import { PDF_CACHE_DIR, PICTURE_CACHE_DIR, RAW_DIR } from "../paths.ts";
-import { MEC109_CHANGED, MEC112_CHANGED, scanTargets, type ScanSide } from "../printed/scope.ts";
+import { MEC109_CHANGED, MEC112_CHANGED, MEC113_CHANGED, scanTargets, type ScanSide } from "../printed/scope.ts";
 import { bytes, createLog, type Log } from "../../log.ts";
 import { combinedPin, fetchBytes, sha256, type SourceFile, type SourceRecord } from "./fetch.ts";
 import { driveFileUrl, JVZIJP_FOLDER, JVZIJP_SITE, jvzijpFile, jvzijpPictures, listDriveTree } from "./jvzijp.ts";
@@ -126,7 +126,7 @@ export function fallbackUrls(card: Pick<Card, "imagesrc" | "printings">): string
   return [...(card.imagesrc ? [`${RINGSDB_ORIGIN}${card.imagesrc}`] : []), ...others.filter((url) => !url.includes("dragncards")), ...others.filter((url) => url.includes("dragncards"))];
 }
 
-function cardgameTools(file: string): { rows: Map<string, CardgameToolsRow>; products: Product[] } {
+export function cardgameTools(file: string): { rows: Map<string, CardgameToolsRow>; products: Product[] } {
   const database = new Database(file, { readonly: true });
   try {
     const products = database.prepare("select Code as code, Name as name, Type as type from products").all() as Product[];
@@ -217,9 +217,9 @@ export async function syncPictures(log: Log = createLog("pictures")): Promise<So
     const card = cards.get(target.code);
     if (!card) throw new Error(`${key} is not in data/cards`);
     const page = PDF_PAGES.find((entry) => entry.code === target.code && entry.side === target.side);
-    // Each source in order of preference, as a fetch or a render. The cards MEC109 and MEC112 reword have no picture of that printing.
+    // Each source in order of preference, as a fetch or a render. The cards MEC109, MEC112 and MEC113 reword have no picture of that printing.
     const sources: { from: keyof typeof from; url: string; load: () => Promise<Uint8Array> }[] = [];
-    if (!MEC109_CHANGED.includes(target.code) && !MEC112_CHANGED.includes(target.code)) {
+    if (!MEC109_CHANGED.includes(target.code) && !MEC112_CHANGED.includes(target.code) && !MEC113_CHANGED.includes(target.code)) {
       const drivePicture = jvzijpFile(jvzijp, card, target.side, page ? (page.pdf === CORE_CAMPAIGN_PDF ? page.page : -1) : null);
       if (drivePicture) {
         const url = driveFileUrl(drivePicture.id);

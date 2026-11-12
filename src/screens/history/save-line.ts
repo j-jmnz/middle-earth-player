@@ -2,6 +2,7 @@
 // names its campaign, seats and progress, and the sentences a screen reader hears for it. Pure: no component.
 import { campaignPath, nextStep, soonWords, type NextStep, type PathNode } from "../../campaign/path";
 import { campaignOf, scenarioNames } from "../data/campaign-data";
+import { scenarioEndsInDefeat } from "../data/scenario-ends";
 import type { ListedSave } from "../data/campaign-store";
 import { seatWord } from "../data/seats";
 import { STALE_STEP } from "../session/stale-words";
@@ -14,7 +15,7 @@ export type SaveLine = { name: string; seats: string; done: number; total: numbe
 /** A save as the lists word it: `name` is its campaign's, and the path is read from its log. */
 export function saveLine(save: ListedSave, name: string): SaveLine {
   const campaign = campaignOf(save.campaignId);
-  const path = campaign ? campaignPath(campaign, scenarioNames(campaign), save.log) : [];
+  const path = campaign ? campaignPath(campaign, scenarioNames(campaign), save.log, scenarioEndsInDefeat) : [];
   return {
     name,
     seats: seatWord(save.seatCount),

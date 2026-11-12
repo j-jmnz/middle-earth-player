@@ -19,7 +19,9 @@ import { alliesToHandDestination } from "../families/deck/rules.ts";
 import { reduceLife, takesLifeInstead } from "../families/burden/life.ts";
 import { placedLimit } from "../families/uncharted/limit.ts";
 import { grappleThreat } from "../families/grapple/values.ts";
+import { perDamage, threatPerHostWillpower } from "../families/cirith-ungol/values.ts";
 import { printedStat, victoryOf } from "./printed-stat.ts";
+import { wallRoom } from "../families/pelennor/wall.ts";
 import { heldBy } from "./holder-classes.ts";
 import { eliminateEmpties, markLoss } from "./eliminate.ts";
 
@@ -64,6 +66,9 @@ export function modifiedStat(
     else total += modifier.amount;
     if (!modifier.set && modifier.amount > 0) floor += modifier.amount;
   }
+  // Effects that count the damage on the card or the Willpower of its host (146023:A:1, 146022:A:3, 146014:A:2), recalculated as they change (faq.lasting-effects).
+  total += perDamage(state, instance, printed, stat);
+  if (stat === "threat") total += threatPerHostWillpower(state, instance, printed, cards);
   const lowered = set ?? total;
   const value = stat === "willpower" && lowered < floor && flagged(state, instance.id, "cannotReduceWillpower") ? floor : lowered;
   return CARD_STATS.has(stat) ? Math.max(0, value) : value;
@@ -196,6 +201,15 @@ function indestructible(state: ScenarioState, id: string, printed: PrintedCard):
 }
 
 export function placeDamage(state: ScenarioState, assigned: string, amount: number, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[], source: DamageSource, cause: Cause, sourceId?: string | null): ScenarioState {
+  // "Damage that would be placed on Minas Tirith must be placed on City Wall first" (145046:A:1): the wall takes what it has room for, the rest goes on the card.
+  const wall = amount > 0 ? wallRoom(state, assigned, cards) : null;
+  if (!wall) return placeDamageHere(state, assigned, amount, cards, steps, source, cause, sourceId);
+  const onWall = Math.min(amount, wall.room);
+  const first = placeDamageHere(state, wall.wall, onWall, cards, steps, source, cause, sourceId);
+  return amount > onWall ? placeDamageHere(first, assigned, amount - onWall, cards, steps, source, cause, sourceId) : first;
+}
+
+function placeDamageHere(state: ScenarioState, assigned: string, amount: number, cards: ReadonlyMap<string, PrintedCard>, steps: EngineStep[], source: DamageSource, cause: Cause, sourceId?: string | null): ScenarioState {
   // Damage assigned to a card another takes for it ("attached hero takes all damage assigned to the chosen hero", 02099).
   const id = damageGoesTo(state, assigned);
   const instance = state.cards[id];
@@ -257,7 +271,9 @@ function destroyAndAnnounce(state: ScenarioState, instance: CardInstance, printe
   if (printed.type === "enemy" || printed.type === "hero") next = noteHostDefeated(next, instance.id, printed.type === "hero" ? cards : undefined);
   next = destroyCard(next, instance.id, cards, steps, false, true);
   if (isCharacterType(printed)) next = queueEvent(next, { trigger: "characterDestroyed", seat: instance.controller, subject: instance.id });
-  if (printed.type === "enemy") next = queueEvent(next, { trigger: "enemyDestroyed", seat: instance.controller, subject: instance.id });
+  // Under Assault (145075:B:4) the event carries the enemy's total Threat as it stood in play, for the progress its destruction places (a Wraith on Wings' resources count; they stop counting once it has left play).
+  const threat = printed.type === "enemy" && state.questStage != null && flagged(state, state.questStage, "assault") ? { amount: modifiedStat(state, instance, "threat", cards) } : {};
+  if (printed.type === "enemy") next = queueEvent(next, { trigger: "enemyDestroyed", seat: instance.controller, subject: instance.id, ...threat });
   return next;
 }
 
@@ -311,7 +327,8 @@ export function defeatedDestination(
   // A claimed objective that is discarded or loses its hero returns to the staging area (01108:A:2, families/objectives/claimed.ts).
   // A Captive destroyed under To Isengard! or an enemy goes to its owner's discard pile (families/captives).
   const usual: Destination =
-    !fromEncounterDeck(printed) && (instance.controller != null || (instance.captive === true && instance.owner != null))
+    // An ally in the staging area under nobody's control (Retreat from Osgiliath, 145074:B:2) is still its owner's: it goes to that discard pile.
+    !fromEncounterDeck(printed) && (instance.controller != null || ((instance.captive === true || instance.zone === "staging") && instance.owner != null))
       ? { zone: "discard", seat: instance.owner ?? instance.controller ?? 0 }
       : printed.type === "quest"
         ? { zone: "setAside" }

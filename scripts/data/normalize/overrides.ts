@@ -51,6 +51,12 @@ const overridesSchema = z.object({
       }),
     )
     .default([]),
+  // A twin pack card whose Hall of Beorn `RingsDbCardId` is another card's: the code RingsDB gives it, by Hall of Beorn's card set and collector number (The Mountain of
+  // Fire's Orc Disguise, Captains of the West and Raise the Shire).
+  hobRingsDbCodes: z.array(z.object({ set: z.string().min(1), number: z.number().int().positive(), code: z.string().regex(/^\d{5,6}$/), reason: z.string().min(1), source: z.string().min(1) })).default([]),
+  // A card Hall of Beorn's scenario list counts that the scenario does not deal: the epic multiplayer mode's cards (mec113.epic-multiplayer-mode), which are dealt by the Epic
+  // Multiplayer Mode campaign card's Setup. The dealt count is checked against the rest of the list only.
+  scenarioExcluded: z.array(z.object({ scenario: z.string().min(1), code: z.string().min(1), reason: z.string().min(1), source: z.string().min(1) })).default([]),
   // A product whose Hall of Beorn codes collide with another product's: the code is `prefix` and the collector number padded to
   // `width` digits (two by default), which is the code RingsDB gives the same cards where it lists them. A set may have several
   // entries, each for the collector numbers from `from` up (0 by default); the entry with the highest `from` the card reaches wins.

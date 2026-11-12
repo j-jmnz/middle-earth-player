@@ -1,18 +1,22 @@
-// Rules: rr.campaign-cards, rr.campaign-setup-checklist, ltp.campaign-setup-checklist (data/rules/entries.json). The Two Towers' Resolution verbs run in resolution.ts beside this file.
+// Rules: rr.campaign-cards, rr.campaign-setup-checklist, ltp.campaign-setup-checklist (data/rules/entries.json). The Two Towers' Resolution verbs run in resolution.ts beside this file, The Return of the King's in saga-end.ts.
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 
 import type { ScenarioState } from "../../core/state.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
+import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { attachTo, moveCard, spawn } from "../../core/zones.ts";
 import { inPlay, updateCard } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
+import { recordedCount, returnSetAsideHero, setAsideHeroWithAttachments, setAsideLogged } from "./aside.ts";
+import { attachToHeroWith, guardWithSetAside, moveAttachment } from "./guarded.ts";
 
 // The verbs src/catalog/families/campaign.ts adds. Only PutObjectiveAllyIntoPlay runs in the engine: it is a Setup instruction the
 // campaign checklist hands the start. The others are dealt before the game starts (AttachChosen, AddToHandAfterMulligan,
 // AddToPool: campaign/checklist.ts) or run by the Resolution (CarryOver: rules/setup/resolution.ts), so they change nothing here.
-export function run(state: ScenarioState, instruction: Instruction, focus: Focus): ScenarioState | null {
+export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext): ScenarioState | null {
   switch (instruction.verb) {
     case "PutObjectiveAllyIntoPlay":
       // Under the first player, ready (no Hide test, no reveal).
@@ -25,8 +29,22 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     }
     case "AttachSetAside":
       return attachSetAside(state, instruction.code, lastPicked(state));
+    case "SetAsideHeroWithAttachments":
+      return setAsideHeroWithAttachments(state, instruction);
+    case "ReturnSetAsideHero":
+      return returnSetAsideHero(state, instruction);
+    case "SetAsideLogged":
+      return setAsideLogged(state, instruction, focus, ctx);
     case "PlaceToken":
       return placeToken(state, focus.sourceId, instruction.amount ?? 1);
+    case "PlaceTokensOnCampaignCard":
+      return placeTokensOnCampaignCard(state, resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx));
+    case "AttachToHeroWith":
+      return attachToHeroWith(state, instruction);
+    case "MoveAttachment":
+      return moveAttachment(state, instruction, ctx);
+    case "GuardWithSetAside":
+      return guardWithSetAside(state, instruction, focus, ctx);
     case "EarnAttached":
     case "NamePrisoner":
     case "ChooseOption":
@@ -36,6 +54,12 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "ReviveFallenHero":
     case "TrimHeroes":
     case "RecordUnderneath":
+    case "EarnOnThreatDial":
+    case "RecordTokens":
+    case "RemoveFromPoolByCode":
+    case "LoseGuardedBoons":
+    case "IgnoreDiscardedHeroes":
+    case "EndCampaign":
       // Resolution verbs: rules/setup/resolution.ts runs them.
       return state;
     case "AttachChosen":
@@ -46,6 +70,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "RemoveBurdenSets":
     case "ShuffleIntoEachDeck":
     case "ChooseCopyOrResources":
+    case "SearchDeckForCard":
+    case "SetAsideBoon":
       return state;
     default:
       return null;
@@ -56,6 +82,12 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 function placeToken(state: ScenarioState, sourceId: string | null, amount: number): ScenarioState {
   const card = sourceId ? state.cards[sourceId] : undefined;
   return card ? updateCard(state, card.id, { resources: card.resources + amount }) : state;
+}
+
+// PlaceTokensOnCampaignCard (146079:A:1): the campaign card kept in the game takes the tokens; with no campaign card in the game (a standalone one) nothing is placed.
+function placeTokensOnCampaignCard(state: ScenarioState, amount: number): ScenarioState {
+  const card = Object.values(state.cards).find((candidate) => candidate.zone === "campaign");
+  return card && amount > 0 ? updateCard(state, card.id, { resources: card.resources + amount }) : state;
 }
 
 // The tokens on the card with this code in play: what a campaign card's Resolution reads (the `tokens` condition).
@@ -72,4 +104,4 @@ function attachSetAside(state: ScenarioState, code: string, hostId: string): Sce
   return queueEvent(attachTo(placed, copy, hostId), { trigger: "attached", seat: host.controller, subject: copy, other: hostId });
 }
 
-export const manifest: RulesFamily = { name: "campaign", verbs: ["PutObjectiveAllyIntoPlay", "SetAsideEachPlayer", "AttachSetAside", "PlaceToken", "EarnAttached", "NamePrisoner", "AttachChosen", "AddToHandAfterMulligan", "AddToPool", "CarryOver", "RemovePoolCards", "RemoveBurdenSets", "ShuffleIntoEachDeck", "ChooseCopyOrResources", "ChooseOption", "ThreatPenaltyForPick", "EarnForPick", "EarnHeldCopies", "ReviveFallenHero", "TrimHeroes", "RecordUnderneath"], run };
+export const manifest: RulesFamily = { name: "campaign", verbs: ["SetAsideHeroWithAttachments", "ReturnSetAsideHero", "SetAsideLogged", "PutObjectiveAllyIntoPlay", "SetAsideEachPlayer", "AttachSetAside", "PlaceToken", "EarnAttached", "NamePrisoner", "AttachChosen", "AddToHandAfterMulligan", "AddToPool", "CarryOver", "RemovePoolCards", "RemoveBurdenSets", "ShuffleIntoEachDeck", "ChooseCopyOrResources", "ChooseOption", "ThreatPenaltyForPick", "EarnForPick", "EarnHeldCopies", "ReviveFallenHero", "TrimHeroes", "RecordUnderneath", "SearchDeckForCard", "EarnOnThreatDial", "RecordTokens", "RemoveFromPoolByCode", "LoseGuardedBoons", "IgnoreDiscardedHeroes", "EndCampaign", "AttachToHeroWith", "SetAsideBoon", "GuardWithSetAside", "MoveAttachment", "PlaceTokensOnCampaignCard"], run, amount: (state, found) => (found.recorded ? recordedCount(state, found.recorded) : null) };

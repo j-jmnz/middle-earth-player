@@ -21,6 +21,7 @@ import { ruleCause } from "../core/cause.ts";
 import { canAnnounce, drainEvents } from "../windows/events.ts";
 import { advanceFrame, stagingStep } from "../windows/frames.ts";
 import { commitHide, pruneRoundRecords } from "../quest/hide.ts";
+import { commitFortitude } from "../families/mount-doom/commit.ts";
 import type { EngineStep, PlayerIntent } from "../core/intents.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { drawMany, gainSeatResources, type ReduceContext } from "../interpret/interpret.ts";
@@ -30,6 +31,7 @@ import { playCard } from "../player/planning.ts";
 import { afterPlay } from "../families/costs/play.ts";
 import { gameReads } from "../core/game-reads.ts";
 import { playSweep } from "../families/play/sweep.ts";
+import { syncDire } from "../families/black-gate/dire.ts";
 import { afterPaying } from "../families/deck/play.ts";
 import { doRefresh } from "./refresh.ts";
 import { askReadyPayments } from "../families/attachments/ready.ts";
@@ -95,13 +97,15 @@ export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineSt
     }
     // The seats a card keeps in the game at the threat elimination level (10124:A:2).
     current = syncThreatSaves(current, ctx, steps);
+    // The main quest's Dire keyword (mec113.dire) is kept on the state for the elimination level.
+    current = syncDire(current, ctx);
     // A cancel already resolving holds the damage too, even when paying for it discarded the last card that could answer
     // (Loyal Hound, 19148).
     const resolving = current.stack.some((frame) => frame.data.kind === "effect" && frame.data.hold != null);
     // The Stormcaller Elite whose indestructible lapsed with the stage (12039:B:1) wait, lethal, for the When Revealed that flips them (12040:B:1), and Cold-Drake for the one that sets it aside (19024:A:1): advancing is immediate.
     const held = (candidate: ScenarioState, id: string): boolean => ((answerable || resolving) && damageHeld(candidate, id)) || heldByLapsedStage(candidate, id, ctx) || heldBySettingAside(candidate, id, ctx);
     // The play family's constants (families/play/sweep.ts): hero card type, first player control, discard at a stat.
-    const swept = current.lost || current.failure ? current : runSettle("sweep", destroyOverwhelmed(playSweep(clearEliminated(current, ctx.cards), ctx, steps), ctx.cards, steps, held), ctx, steps);
+    const swept = current.lost || current.failure ? current : runSettle("sweep", destroyOverwhelmed(playSweep(clearEliminated(current, ctx.cards, ctx), ctx, steps), ctx.cards, steps, held), ctx, steps);
     if (swept !== current) {
       // A seat a sweep eliminated (an empty hand on stage 3B) hands its open window on at once, as one eliminated by an intent does.
       current = handoffEliminated(swept);
@@ -150,6 +154,8 @@ export function applyIntent(
       return askingToCommit(state) ? performSailing(state, intent.cardIds, ctx, steps) : commit(state, intent.cardIds, steps, intent.sideQuestId);
     case "CommitHide":
       return commitHide(state, intent.cardIds, steps);
+    case "CommitFortitude":
+      return commitFortitude(state, intent.cardIds, steps);
     case "Trigger":
       return applyTrigger(state, intent, ctx, steps);
     case "Choose":

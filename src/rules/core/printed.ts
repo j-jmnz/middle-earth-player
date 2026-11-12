@@ -60,12 +60,18 @@ export type Keywords = {
   boarding: number | null;
   // The Sailing success symbols the card prints (dcce.sailing-tests), null when it prints none.
   sailingSuccess: number | null;
+  // The Sauron's Eye icons the card prints (mec113.fortitude-tests), null when it prints none.
+  eyeIcons: number | null;
   // Uncharted: the card is a double-sided location whose side B is a Lost Island (dcce.uncharted).
   uncharted: boolean;
   // Aflame X (dcce.aflame): the damage on a location that destroys it, null when the card prints none.
   aflame: number | null;
   // Grapple (dcce.grapple): the location in the staging area the enemy attaches to, facedown, when it is revealed; null when the card prints none.
   grapple: "highestThreat" | "lowestThreat" | "highestQuestPoints" | "lowestQuestPoints" | null;
+  // Phantom (mec113.phantom): the damage the enemy's attack would deal becomes a threat raise for the defending player (families/grey-company/).
+  phantom: boolean;
+  // Dire (mec113.dire): read from the current quest card by families/black-gate/dire.ts.
+  dire: boolean;
 };
 
 // A ship (dcce.ships): a ship-enemy is an enemy and a ship-objective an objective ally for every purpose (`type` says which), with the
@@ -128,9 +134,12 @@ const EMPTY_KEYWORDS: Keywords = {
   sailing: false,
   boarding: null,
   sailingSuccess: null,
+  eyeIcons: null,
   uncharted: false,
   aflame: null,
   grapple: null,
+  phantom: false,
+  dire: false,
 };
 
 // The Upgraded side's stats of a data/cards record, when its side B prints all four (dcce.scalable-upgradable), or a location's side B that prints a Threat.
@@ -369,9 +378,12 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
       sailing: keywords.sailing === true,
       boarding: keywords.boarding ?? null,
       sailingSuccess: keywords.sailingSuccess ?? null,
+      eyeIcons: keywords.eyeIcons ?? null,
       uncharted: keywords.uncharted === true,
       aflame: keywords.aflame ?? null,
       grapple: keywords.grapple ?? null,
+      phantom: keywords.phantom === true,
+      dire: keywords.dire === true,
     },
   });
 }

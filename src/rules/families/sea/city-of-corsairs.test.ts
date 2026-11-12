@@ -1,4 +1,4 @@
-// Rules: dcce.from-sea-to-land, dcce.indestructible, rr.travel, rr.forced, rr.lasting-effects, rr.play-and-put-into-play, rr.cannot, mec109.immune-to-player-card-effects, rr.attacks-outside-the-combat-phase (data/rules/entries.json).
+// Rules: dcce.scalable-upgradable, dcce.from-sea-to-land, dcce.indestructible, rr.travel, rr.forced, rr.lasting-effects, rr.play-and-put-into-play, rr.cannot, mec109.immune-to-player-card-effects, rr.attacks-outside-the-combat-phase (data/rules/entries.json).
 // The mechanics The City of Corsairs' encounter cards and campaign card add, each read from its record on the scenario's table (test/scenarios/the-city-of-corsairs/scene.ts): the boons and burdens carried to the second
 // deck (11215:B:1), the Raiders immune to events (12159:A:1), the limit on allies entering play (12155:A:1), the resources a player spends (12153:A:2), a player named to reveal a Corsair (12154:A:1), Streets of Umbar's
 // travel (12160:A:1), the table that bars optional engagement (12164:A:1) and the attacks on the other players (11216:A:4).
@@ -18,7 +18,7 @@ import { holds } from "../../interpret/conditions.ts";
 import { syncConstants } from "../../interpret/constants.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
 import { attachTo, moveCard, spawn } from "../../core/zones.ts";
-import { opening } from "../../../../test/harness/scene-kit.ts";
+import { opening, revealFromTop } from "../../../../test/harness/scene-kit.ts";
 import { updateCard } from "../../core/state.ts";
 import { entriesBarred, entriesRefusal, noteEntries } from "./entries.ts";
 import { stampRoutes } from "./routes.ts";
@@ -407,5 +407,22 @@ describe("Slave Ship (12152:A:3)", () => {
     const heroes = [fight.made.hero, fight.made.hero2].map((id) => fight.run.state.cards[id]?.damage ?? 0);
     expect(ship?.damage).toBeGreaterThan(0);
     expect(heroes[0]! + heroes[1]!).toBe(ship?.damage);
+  });
+});
+
+// dcce.scalable-upgradable: an upgraded card uses its Upgraded side for the rest of the campaign, so a card dealt facedown shows that side when it is turned faceup.
+describe("The Shattered Monument (110129) revealed in an upgraded game", () => {
+  const facts = { prisoner: null, usedOnce: [], counters: {}, upgraded: [MONUMENT] };
+  const revealed = (upgraded: boolean) => {
+    const made = make();
+    const state = upgraded ? { ...made.state, campaignFacts: facts } : made.state;
+    const { state: after, id } = revealFromTop(state, made.ctx, MONUMENT, []);
+    return after.cards[id];
+  };
+
+  it("shows side B when it is revealed from the facedown encounter deck, and side A in a game that has not upgraded it", () => {
+    expect(revealed(true)?.zone).toBe("staging");
+    expect(revealed(true)?.face).toBe("B");
+    expect(revealed(false)?.face).toBe("up");
   });
 });
