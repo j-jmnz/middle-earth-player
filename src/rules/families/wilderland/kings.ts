@@ -120,7 +120,8 @@ export function returnHeld(state: ScenarioState, ctx: ReduceContext): ScenarioSt
     const host = card.zone === "under" && card.host ? state.cards[card.host] : undefined;
     if (card.zone === "under" && host && inPlay(host.zone)) continue;
     const owner = card.zone === "discard" ? state.seats.findIndex((seat) => seat.discard.includes(card.id)) : (card.owner ?? card.controller ?? -1);
-    if (owner >= 0 && (card.zone === "discard" || card.zone === "under")) next = updateCard(moveCard(next, card.id, { zone: "hand", seat: owner }), card.id, { owner: undefined, face: "up", held: undefined });
+    // A boon guarded on Shagrat lands in the encounter discard pile when he leaves play (nobody controls it); its owner is kept on it.
+    if (owner >= 0 && (card.zone === "discard" || card.zone === "under" || card.zone === "encounterDiscard")) next = updateCard(moveCard(next, card.id, { zone: "hand", seat: owner }), card.id, { owner: undefined, face: "up", held: undefined });
   }
   return next;
 }

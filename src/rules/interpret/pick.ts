@@ -106,6 +106,8 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
   else if (spec.type === "attachment") {
     for (const instance of Object.values(state.cards)) {
       if (instance.host == null || (instance.zone !== "play" && instance.zone !== "attached")) continue;
+      // A boon guarded on an enemy is held for its owner, not an attachment any player controls (146069:B:1).
+      if (instance.held === true) continue;
       // An encounter attachment (a Condition) has no controller: any player's filter sees it.
       if (instance.controller != null && !seats.includes(instance.controller)) continue;
       raw.push(instance.id);
