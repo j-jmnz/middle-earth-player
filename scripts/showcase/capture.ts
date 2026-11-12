@@ -251,7 +251,7 @@ function onScreen(log: Log, sim: SimDevice, label: string, kept: string): void {
   try {
     const words = screenWords(JSON.parse(json));
     writeFileSync(path.join(kept, "hierarchy.json"), json);
-    log.warn(`${label}: on screen after the failure: ${words.length > 0 ? words.slice(0, 40).join(" ") : "nothing Maestro can read (the app may have crashed, or still be on its splash screen)"}`);
+    log.warn(`${label}: on screen after the failure: ${words.length > 0 ? words.slice(0, 150).join(" ") : "nothing Maestro can read (the app may have crashed, or still be on its splash screen)"}`);
   } catch {
     log.warn(`${label}: Maestro's answer was not a hierarchy: ${lastLines(read.stdout, 5)}`);
   }

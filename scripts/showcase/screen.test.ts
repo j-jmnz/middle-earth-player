@@ -9,8 +9,9 @@ describe("the capture's screen summary", () => {
       children: [
         { attributes: { "resource-id": "campaign-list", text: "" }, children: [{ attributes: { accessibilityText: "Campaigns" } }, { attributes: { text: "Campaigns" } }] },
         { attributes: { "resource-id": "settings-open", accessibilityText: "Settings" } },
+        { attributes: { "resource-id": "sheet-option-i35", bounds: "[10,20][110,60]" } },
       ],
     };
-    expect(screenWords(tree)).toEqual(["#campaign-list", '"Campaigns"', "#settings-open", '"Settings"']);
+    expect(screenWords(tree)).toEqual(["#campaign-list", '"Campaigns"', "#settings-open", '"Settings"', "#sheet-option-i35[10,20][110,60]"]);
   });
 });
