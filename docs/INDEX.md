@@ -77,7 +77,7 @@ Read the sections your task touches.
   - 378–383 Catalog build (~410)
   - 384–401 Tests (~2.0K) ← 5
   - 402–417 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~124.9K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~129.3K tok)
   - 17–39 Sections (~450)
   - 40–51 Product (~590)
   - 52–65 Non-goals (~540)
@@ -94,43 +94,43 @@ Read the sections your task touches.
     - 311–318 Engine steps (~180)
     - 319–347 Core round (~1.3K) ← 1
     - 348–377 Keywords implemented once (~1.6K)
-  - 378–535 Fellowship of the Ring (~10.4K)
+  - 378–535 Fellowship of the Ring (~10.6K)
     - 402–416 Scenario 1 resolution (~370)
     - 417–430 A Knife in the Dark (~1.6K) ← 1
     - 431–434 Hide tests (~130)
     - 435–458 Flight to the Ford burden deck and life (~1.6K) ← 1
     - 459–473 The Ring Goes South, stage 4 and the damage on locations (~1.3K)
     - 474–489 Journey in the Dark, the Doom countdown and the Balrog (~1.7K)
-    - 490–513 Breaking of the Fellowship, stage 2B (~2.2K) ← 1
+    - 490–513 Breaking of the Fellowship, stage 2B (~2.4K) ← 1
     - 514–535 Seeded decks (~660)
-  - 536–635 Mirkwood Paths and The Dark of Mirkwood (~12.0K) ← 2
+  - 536–635 Mirkwood Paths and The Dark of Mirkwood (~12.1K) ← 2
     - 554–567 Passage Through Mirkwood (~1.6K)
     - 568–581 Journey Along the Anduin (~2.1K)
     - 582–602 Escape from Dol Guldur (~2.7K)
-    - 603–617 The Oath (~2.3K)
+    - 603–617 The Oath (~2.4K)
     - 618–635 The Caves of Nibin-Dûm (~2.4K)
-  - 636–693 Dream-chaser (~15.6K) ← 4
-  - 694–720 Ered Mithrin (~15.8K) ← 7
-  - 721–857 The Two Towers (~15.5K) ← 21
-  - 858–1092 The Return of the King (~26.3K) ← 23
-    - 885–910 The Passing of the Grey Company (~2.5K) ← 1
-    - 911–942 The Siege of Gondor (~4.0K) ← 1
-    - 943–988 The Battle of the Pelennor Fields (~5.6K) ← 1
-    - 989–1026 The Tower of Cirith Ungol (~4.1K) ← 1
-    - 1027–1063 The Black Gate Opens (~4.2K) ← 3
-    - 1064–1092 Mount Doom (~4.0K) ← 1
-  - 1093–1101 Nightmare (~410) ← 19
-  - 1102–1140 Deckbuilding (~1.9K)
-  - 1141–1219 Effects (~3.2K)
-    - 1143–1201 Three layers (~2.4K) ← 10
-    - 1202–1211 Player side quests, contracts and saga cards (~430)
-    - 1212–1215 Window stack (~100)
-    - 1216–1219 Coverage test (~270)
-  - 1220–1240 Data sources (~530)
-  - 1241–1259 Card images (~1.2K) ← 9
-  - 1260–1285 Persistence and shipping (~2.6K) ← 6
-  - 1286–1327 Screens (~4.9K) ← 1
-    - 1312–1327 Table screen (~1.8K) ← 3
+  - 636–694 Dream-chaser (~16.2K) ← 4
+  - 695–722 Ered Mithrin (~16.4K) ← 7
+  - 723–860 The Two Towers (~16.4K) ← 21
+  - 861–1096 The Return of the King (~28.2K) ← 23
+    - 889–914 The Passing of the Grey Company (~2.7K) ← 1
+    - 915–946 The Siege of Gondor (~4.1K) ← 1
+    - 947–992 The Battle of the Pelennor Fields (~5.8K) ← 1
+    - 993–1030 The Tower of Cirith Ungol (~4.4K) ← 1
+    - 1031–1067 The Black Gate Opens (~4.4K) ← 3
+    - 1068–1096 Mount Doom (~4.3K) ← 1
+  - 1097–1105 Nightmare (~410) ← 19
+  - 1106–1144 Deckbuilding (~1.9K)
+  - 1145–1223 Effects (~3.2K)
+    - 1147–1205 Three layers (~2.4K) ← 10
+    - 1206–1215 Player side quests, contracts and saga cards (~430)
+    - 1216–1219 Window stack (~100)
+    - 1220–1223 Coverage test (~270)
+  - 1224–1244 Data sources (~530)
+  - 1245–1263 Card images (~1.2K) ← 9
+  - 1264–1289 Persistence and shipping (~2.6K) ← 6
+  - 1290–1331 Screens (~4.9K) ← 1
+    - 1316–1331 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~49.3K tok)
   - 5–8 Overview (~130) ← 1
   - 9–23 Top bar (~3.1K) ← 4
