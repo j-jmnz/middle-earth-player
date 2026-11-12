@@ -7,7 +7,7 @@ tags:
 # (docs/phases/STATUS.md).
 # The Resolution (146069) asks nothing: a boon still guarded on Shagrat, in play, leaves the pool, and the others stay. The Campaign Setup asked each player for an Item boon of the pool to set aside (the Palantir of Orthanc; the fixture's loadout answers it). The campaign has no XP.
 # The scenario's top-bar dials (`ungol-chamber`, `ungol-watchers`, `ungol-x`) are gone on the win table (Topmost Chamber and The Two Watchers are in the victory display), so the flow passes no TABLE_WIDGET.
-# The win unlocks The Black Gate Opens, which the app cannot deal yet: its node reads Next and the line under the road says it is coming soon (scripts/checks/maestro.test.ts, path-soon).
+# The win unlocks The Black Gate Opens: its node reads Next and the road offers Begin.
 - runFlow:
     file: ../../subflows/scenario-win.yaml
     env:
@@ -18,6 +18,6 @@ tags:
     id: node-the-black-gate-opens-status
     text: "Next"
 - assertVisible:
-    id: path-soon
-- assertNotVisible:
     id: begin
+- assertNotVisible:
+    id: path-soon

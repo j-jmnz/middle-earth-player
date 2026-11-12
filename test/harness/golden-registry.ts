@@ -38,7 +38,7 @@ import * as company from "../scenarios/the-passing-of-the-grey-company/game.ts";
 import * as gondor from "../scenarios/the-siege-of-gondor/game.ts";
 import * as fields from "../scenarios/the-battle-of-the-pelennor-fields/game.ts";
 import * as ungol from "../scenarios/the-tower-of-cirith-ungol/game.ts";
-// import * as opens from "../scenarios/the-black-gate-opens/game.ts";
+import * as opens from "../scenarios/the-black-gate-opens/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -102,5 +102,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-siege-of-gondor", "The Siege of Gondor", gondor.GONDOR_GOLDENS, gondor.gondorWorld, gondor.playGolden),
   entry("the-battle-of-the-pelennor-fields", "The Battle of the Pelennor Fields", fields.FIELDS_GOLDENS, fields.fieldsWorld, fields.playGolden),
   entry("the-tower-of-cirith-ungol", "The Tower of Cirith Ungol", ungol.UNGOL_GOLDENS, ungol.ungolWorld, ungol.playGolden),
-  // entry("the-black-gate-opens", "The Black Gate Opens", opens.OPENS_GOLDENS, opens.opensWorld, opens.playGolden),
+  entry("the-black-gate-opens", "The Black Gate Opens", opens.OPENS_GOLDENS, opens.opensWorld, opens.playGolden),
 ];

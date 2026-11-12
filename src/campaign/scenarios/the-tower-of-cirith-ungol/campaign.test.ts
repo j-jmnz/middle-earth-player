@@ -147,7 +147,7 @@ describe("The Tower of Cirith Ungol in the the-return-of-the-king campaign", () 
     expect(log.campaignPool.map((card) => card.code)).toEqual(expect.arrayContaining([STING, MITHRIL, GLAMDRING, PHIAL]));
   });
 
-  it("146069:B:2 unlocks The Black Gate Opens, the next part, on the log the win writes; the app cannot deal it yet, so the path says it is coming soon", () => {
+  it("146069:B:2 unlocks The Black Gate Opens, the next part, on the log the win writes; the path offers it next", () => {
     const state = goldenState("the-tower-of-cirith-ungol", "two-handed, won, Normal, after the earlier parts, Shagrat defeated");
     const log = applyResolution(afterFields, state.scenarioId, state, world.cards, NO_COPY_LIMITS);
     const path = campaignPath(campaign, {}, log);
@@ -156,9 +156,9 @@ describe("The Tower of Cirith Ungol in the the-return-of-the-king campaign", () 
       ["the-siege-of-gondor", "completed"],
       ["the-battle-of-the-pelennor-fields", "completed"],
       ["the-tower-of-cirith-ungol", "completed"],
-      ["the-black-gate-opens", "soon"],
+      ["the-black-gate-opens", "current"],
     ]);
-    expect(PLAYABLE_SCENARIOS).not.toContain("the-black-gate-opens");
+    expect(PLAYABLE_SCENARIOS).toContain("the-black-gate-opens");
   });
 
   it("a lost game writes nothing: the Resolution is for a win only, so finishing the lost golden leaves the log as it was", () => {
