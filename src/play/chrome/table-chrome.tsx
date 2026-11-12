@@ -267,7 +267,7 @@ function ThreatDial({
           {/* A tick on the ring at each staging enemy's engagement cost: bone where the threat has reached it, faint where not yet. */}
           {elimination && !threat.eliminated
             ? ticks.map((cost, index) => {
-                const angle = threatMeter(cost) * 2 * Math.PI - Math.PI / 2;
+                const angle = threatMeter(cost, limit) * 2 * Math.PI - Math.PI / 2;
                 const r = (DIAL / 2 - 2) * s;
                 return (
                   <View
@@ -283,7 +283,7 @@ function ThreatDial({
             <View
               testID={`${id}-notch`}
               pointerEvents="none"
-              style={{ position: "absolute", left: (DIAL / 2) * s - 1 * s, top: -2.5 * s, width: 2 * s, height: 9 * s, borderRadius: 1 * s, backgroundColor: t.bone, transformOrigin: `${1 * s}px ${(DIAL / 2 + 2.5) * s}px`, transform: [{ rotate: `${threatMeter(notch) * 360}deg` }] }}
+              style={{ position: "absolute", left: (DIAL / 2) * s - 1 * s, top: -2.5 * s, width: 2 * s, height: 9 * s, borderRadius: 1 * s, backgroundColor: t.bone, transformOrigin: `${1 * s}px ${(DIAL / 2 + 2.5) * s}px`, transform: [{ rotate: `${threatMeter(notch, limit) * 360}deg` }] }}
             />
           ) : null}
         </View>

@@ -55,8 +55,10 @@ const line = (text: string | null, tone: CardLine["tone"]): CardLine[] => (text 
 function runLines(run: RunRecord | null, nameOf: NameOf): CardLine[] {
   if (!run) return [];
   const cause = run.result === "lost" ? run.lossCause : null;
+  // A won run with a cause ended on its last player's elimination and went on to its Resolution (campaign/runs.ts).
+  const ended = run.result === "won" ? run.lossCause : null;
   const how = [runDate(run), runDetail(run, nameOf)].filter((part) => part != null).join(" · ");
-  return [...line(cause, "danger"), ...line(how || null, "muted")];
+  return [...line(cause, "danger"), ...line(ended, "muted"), ...line(how || null, "muted")];
 }
 
 /** "3 runs, latest: A Shadow of the Past, Lost, 24 Oct 2026, …": what a card's runs say to a screen reader, kept to the newest. */

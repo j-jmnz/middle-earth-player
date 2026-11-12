@@ -4,6 +4,7 @@
 // The phase rail names, in words, the step the engine is in, with the step before and the step after. It reads the
 // engine's mode and phase and nothing else, so it cannot skip a step the engine runs. The pill also names the phase and the
 // phases beside it (carousel.ts lays the whole round out for the strip a tap on the pill opens).
+import { endedInDefeat } from "../../rules/core/eliminate.ts";
 import { extraPhaseMode, phaseOf, type ModeName, type ScenarioState } from "../../rules/core/state.ts";
 
 // `phase` is the word the pill shows over the step ("" when there is none: Setup, Mulligan); `previousPhase` and `nextPhase` are
@@ -84,7 +85,7 @@ export function railFor(game: ScenarioState): Rail {
     additional,
   };
   if (game.lost) return { ...base, previous: STEP_WORDS[game.mode], current: "Defeat", next: "" };
-  if (game.stageCleared) return { ...base, previous: STEP_WORDS[game.mode], current: "Victory", next: "Resolution" };
+  if (game.stageCleared) return { ...base, previous: STEP_WORDS[game.mode], current: endedInDefeat(game) ? "The end" : "Victory", next: "Resolution" };
   if (game.mode === "afterOpening" || game.mode === "mulligan") {
     return { ...base, previous: game.mode === "mulligan" ? "Setup" : "", current: STEP_WORDS[game.mode], next: STEP_WORDS.beginRound };
   }

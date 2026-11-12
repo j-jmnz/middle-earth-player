@@ -16,7 +16,8 @@ export function runDate(run: RunRecord): string | null {
 
 /** "Won", or "Lost" and the cause the engine gave. */
 export function resultWords(run: RunRecord): string {
-  return run.result === "won" ? "Won" : run.lossCause ? `Lost · ${run.lossCause}` : "Lost";
+  if (run.result === "won") return run.lossCause ? `Ended · ${run.lossCause}` : "Won";
+  return run.lossCause ? `Lost · ${run.lossCause}` : "Lost";
 }
 
 /** "Aragorn, Théodred" or, two-handed, "Aragorn, Théodred / Gimli"; null with no hero known. */

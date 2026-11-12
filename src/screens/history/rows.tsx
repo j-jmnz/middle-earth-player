@@ -132,18 +132,20 @@ function RunLine({ run, nameOf, faces }: { run: RunRecord; nameOf: (code: string
   const date = runDate(run);
   const detail = runDetail(run, nameOf);
   const won = run.result === "won";
+  // A won run with a cause is a scenario that ended when its last player fell and went on to its Resolution (campaign/runs.ts): it reads as an end, not a win.
+  const ended = won && run.lossCause != null;
   return (
     <View className="mt-3" testID={`run-${run.id}`}>
       <View className="flex-row items-center gap-2">
         <Text className="shrink text-body font-semibold text-bone" numberOfLines={1}>
           {scenarioName(run.scenarioId)}
         </Text>
-        <Chip label={won ? "Won" : "Lost"} tone={won ? "accent" : "danger"} />
+        <Chip label={ended ? "Ended" : won ? "Won" : "Lost"} tone={won ? "accent" : "danger"} />
         <View className="flex-1" />
         {date ? <Label tone="faint">{date}</Label> : null}
       </View>
-      {!won && run.lossCause ? (
-        <Text className="mt-0.5 text-label text-danger" testID={`run-${run.id}-cause`}>
+      {run.lossCause ? (
+        <Text className={ended ? "mt-0.5 text-label text-muted" : "mt-0.5 text-label text-danger"} testID={`run-${run.id}-cause`}>
           {run.lossCause}
         </Text>
       ) : null}

@@ -2,12 +2,11 @@ appId: com.middleearth.lcg
 tags:
   - scenario
 ---
-# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `opens-lost` (scripts/e2e/the-black-gate-opens.ts): a real two-handed
-# game of The Black Gate Opens, parked on its loss. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
-# The steps are the shared subflow's (.maestro/subflows/scenario-loss.yaml); add this scenario's own assertions after the call.
+# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `opens-lost` (scripts/e2e/the-black-gate-opens.ts): a real two-handed game of The Black Gate Opens (the Defenders of Gondor and Swords of the Noldor
+# lists, Easy, after The Tower of Cirith Ungol's win), parked on its loss. The only loss of the scenario in Campaign Mode is Aragorn leaving play (146002: "the players lose the game"); the last player's elimination is its end, not a loss.
+# A loss writes nothing, so the subflow's own assertions on the log screen are all it checks (docs/handover/agent-brief.md, Scenario procedure). The fixture is OPEN until scripts/e2e/fixtures.ts finds such a game in its seeds (docs/phases/STATUS.md).
 - runFlow:
     file: ../../subflows/scenario-loss.yaml
     env:
       FIXTURE: opens-lost
       SCENARIO_ID: the-black-gate-opens
-# TODO: this scenario's own assertions on the log screen after the loss.

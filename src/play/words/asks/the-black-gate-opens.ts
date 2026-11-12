@@ -78,7 +78,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   // 146072:B:1 (Embassy from the Dark Tower): the first player decides a tie for the next pair, then each pair in turn.
   "146072:whenRevealed:1 @1.0 Pick": { owned: true, note: "Embassy from the Dark Tower: two player cards have the highest cost. Choose the one to pair next.", verb: "Pair" },
   "146072:whenRevealed:1 @1.1 Pick": { owned: true, note: "Embassy from the Dark Tower: two encounter cards have the highest Threat. Choose the one that pairs with the player card.", verb: "Pair" },
-  "146072:whenRevealed:1 @2.1 Choose": { owned: true, note: "Embassy: for this pair, discard both cards, or reveal the encounter card and play the player card at no cost." },
+  "146072:whenRevealed:1 @2.1 Choose": { owned: true, note: "Embassy: {pair}. Discard both cards, or reveal the encounter card and play the player card at no cost." },
   "146072:whenRevealed:1 @2.1 discard": { label: "Discard both cards of the pair" },
   "146072:whenRevealed:1 @2.1 play": { label: "Reveal the encounter card and play the player card at no cost" },
 

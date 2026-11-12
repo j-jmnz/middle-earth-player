@@ -392,11 +392,11 @@ export function PaperSheet({ step, title, children, footer, maxHeight }: { step?
 }
 
 /**
- * Victory or Defeat: the outcome word in Marcellus SC 50 pt (72 on a tablet), tracked wide, inside a glowing ring with the One Ring
+ * Victory or Defeat (The end for a scenario that ends when its last player falls, The Black Gate Opens): the outcome word in Marcellus SC 50 pt (72 on a tablet), tracked wide, inside a glowing ring with the One Ring
  * faint in it, and the scenario's name under it. Silver for a win, threat red for a loss. Resolution and the standalone outcome both
  * say it this way.
  */
-export function OutcomeTitle({ won, scenario, testID }: { won: boolean; scenario: string; testID: string }) {
+export function OutcomeTitle({ won, scenario, testID, ended }: { won: boolean; scenario: string; testID: string; ended?: boolean }) {
   const palette = usePalette();
   const t = useTableTokens();
   const { size, s } = useSizeClass();
@@ -435,7 +435,7 @@ export function OutcomeTitle({ won, scenario, testID }: { won: boolean; scenario
           ...(light ? {} : { textShadowColor: won ? withAlphaHex(palette.glow, 0.7) : withAlphaHex(palette.threat, 0.7), textShadowRadius: 24, textShadowOffset: { width: 0, height: 0 } }),
         }}
       >
-        {won ? "Victory" : "Defeat"}
+        {ended ? "The end" : won ? "Victory" : "Defeat"}
       </Text>
       <Text className="mt-1 text-center font-display text-heading text-muted">{scenario}</Text>
     </View>

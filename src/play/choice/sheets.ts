@@ -7,6 +7,7 @@
 import type { Effect } from "../../catalog/boundary.ts";
 import { rejectionReason } from "../../rules/engine/legal.ts";
 import { effectById, effectsOf } from "../../rules/windows/listen.ts";
+import { endedInDefeat } from "../../rules/core/eliminate.ts";
 import { isLocationCard, isLocationId, printedOf } from "../../rules/core/printed.ts";
 import { engagementCostOf, questPointsOf } from "../../rules/quest/quest.ts";
 import { legalTargets, type LegalIntent, type ReduceContext, type ScenarioState } from "../../rules/engine/reduce.ts";
@@ -119,6 +120,8 @@ export function isStepWindow(game: ScenarioState): boolean {
 // win has nothing to choose, and the outcome screen shows the score.
 export function wonSheet(game: ScenarioState): Sheet {
   const rewards = game.resolution.length > 0;
+  // A scenario that ends when its last player falls (The Black Gate Opens) is no victory: the sheet says what happened and that the Resolution is next.
+  if (endedInDefeat(game)) return { kind: "outcome", key: "won", result: "won", step: "Resolution", title: "The end", note: "Every player has fallen. The scenario ends here, and the campaign card's Resolution is next.", action: "See the Resolution" };
   // A Resolution that asks nothing (The Oath's: the tokens and the burden they earn) has no rewards to choose: the screen after it only shows what is recorded.
   const asks = game.resolution.some(asksPlayers);
   return {

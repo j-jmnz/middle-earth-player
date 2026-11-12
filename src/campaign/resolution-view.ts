@@ -9,6 +9,7 @@
 import type { Instruction } from "../catalog/boundary.ts";
 import type { CampaignEnd } from "../catalog/campaign-record.ts";
 import { andList, carryVerb, carryWords } from "./carry-words.ts";
+import { endedInDefeat } from "../rules/core/eliminate.ts";
 import { legalIntents, type ScenarioState } from "../rules/engine/reduce.ts";
 import { answeredSeats, asksPlayers, resolutionResult, SKIP } from "../rules/setup/resolution.ts";
 import { isEncounterOption, LOG_LINE, poolTally, removalCode, removalSeat } from "../rules/families/wilderland/pool.ts";
@@ -71,6 +72,8 @@ export type ResolutionView =
     }
   | {
       kind: "settled";
+      // The scenario ended on its last player's elimination (The Black Gate Opens): the screen says so instead of Victory.
+      ended?: true;
       earned: readonly SettledCard[];
       fallen: readonly string[];
       captives: readonly string[];
@@ -145,6 +148,7 @@ export function resolutionView(state: ScenarioState, world: World, logged: reado
     const notes = twoTowersNotes(settled, state.seatCount, (code) => nameOf(world, code));
     return {
       kind: "settled",
+      ...(endedInDefeat(state) ? { ended: true as const } : {}),
       ...((settled.treasures ?? []).length > 0 ? { treasures: [...(settled.treasures ?? [])] } : {}),
       ...((settled.allyLines ?? []).length > 0 ? { lines: [...(settled.allyLines ?? [])] } : {}),
       ...(changes.added.length > 0 ? { poolAdded: changes.added } : {}),

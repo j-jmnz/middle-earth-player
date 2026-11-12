@@ -7,6 +7,7 @@
 import type { Amount, Condition, Instruction } from "../../catalog/boundary.ts";
 import type { Cause } from "../../rules/core/cause.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
+import { embassyPairNow } from "../readouts/black-gate.ts";
 import { ringBearerId } from "../../rules/families/burden/deck.ts";
 import { frameScope, resolveAmount } from "../../rules/interpret/amounts.ts";
 import { holds } from "../../rules/interpret/conditions.ts";
@@ -25,7 +26,7 @@ import { askedSeat, seatSays } from "./seat.ts";
 export type Text = string | readonly { when?: Condition; text: string }[];
 
 /**
- * One entry of an asks file. Templates hold `{card}` (the card the record is on), `{owner}` ("Player N", the seat asked), `{picked}` (the card of the row a caution is about: a caution's text only), `{host}` (the card the record's card lies on) and `{ringBearer}` (the hero with the Ring-bearer trait), `{n}` (what the instruction after a Pick deals or places, read now: a Pick's entry only, a Choose
+ * One entry of an asks file. Templates hold `{card}` (the card the record is on), `{owner}` ("Player N", the seat asked), `{picked}` (the card of the row a caution is about: a caution's text only), `{host}` (the card the record's card lies on), `{pair}` (the Embassy's pair being decided: the player card with its owner and the encounter card it is paired with) and `{ringBearer}` (the hero with the Ring-bearer trait), `{n}` (what the instruction after a Pick deals or places, read now: a Pick's entry only, a Choose
  * has none), `{pursuitLimit}` (the value at which the players lose, in a scenario with a pursuit tracker) and a `{name}` for each key of `bind`. Every `Text` below is a template or variants.
  * - `note`: the sentence over a Pick or a Choose (the entry keyed with the instruction's verb).
  * - `why`: the reason the window opened. It is said after the card's title and before the note, "Card: why note" ("Player 1, Card: why note" when owned and two-handed).
@@ -90,7 +91,7 @@ export function templatesOf(entry: Ask): string[] {
 
 /** The placeholders of an entry that no value answers: none of `card`, `owner`, `picked`, `host`, `ringBearer`, `n` (only where `withN`: a Pick has what its next instruction deals, a Choose has nothing), `pursuitLimit` and its `bind` names. */
 export function unknownPlaceholders(entry: Ask, withN = true): string[] {
-  const known = new Set(["card", "owner", "picked", "host", "ringBearer", "pursuitLimit", ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {})]);
+  const known = new Set(["card", "owner", "picked", "host", "ringBearer", "pair", "pursuitLimit", ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {})]);
   return [...new Set(templatesOf(entry).flatMap(placeholdersOf))].filter((name) => !known.has(name));
 }
 
@@ -145,6 +146,8 @@ export function askValues(a: AskFacts, entry: Ask): { values: Values; scope: Ret
     const bearer = ringBearerId(a.game, a.ctx);
     values.ringBearer = bearer ? a.names.card(bearer) : "The Ring-bearer";
   }
+  // The Embassy's pair being decided ("Player 1's Gandalf with Hill-troll"), named only where an entry says it (146072:B:1).
+  if (templatesOf(entry).some((template) => placeholdersOf(template).includes("pair"))) values.pair = embassyPairNow(a.game, (id) => a.names.card(id)) ?? "this pair";
   for (const [name, amount] of Object.entries(entry.bind ?? {})) values[name] = resolveAmount(a.game, amount, scope, a.ctx);
   return { values, scope };
 }

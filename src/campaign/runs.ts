@@ -2,6 +2,7 @@
 // record History lists. Every number in it comes from the engine's final state (the score from scoreOf, the loss cause from
 // the state's lossReason, each seat's threat from the seat); nothing is typed. It sits beside the campaign log, not in it: the
 // log's rule that a loss writes nothing stays, and a loss writes a run. A run is written once and never rewritten. Pure.
+import { ENDED_BY_DEFEAT, endedInDefeat } from "../rules/core/eliminate.ts";
 import { resolutionResult } from "../rules/setup/resolution.ts";
 import type { PrintedCard } from "../rules/core/printed.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
@@ -25,7 +26,7 @@ export type RunRecord = {
   box: string;
   scenarioId: string;
   result: RunResult;
-  // The engine's lossReason on a loss ("Threat reached 50", a quest card's loss line).
+  // The engine's lossReason on a loss ("Threat reached 50", a quest card's loss line); on a "won" run of a scenario that ends when its last player falls, how it ended ("Every player fell").
   lossCause: string | null;
   seatCount: 1 | 2;
   // Each seat's heroes as dealt. A back-filled campaign win lists the log's current fellowship (the log keeps no earlier one).
@@ -99,7 +100,8 @@ export function runOf(input: RunInput): RunRecord | null {
     box: input.box,
     scenarioId: state.scenarioId,
     result: won ? "won" : "lost",
-    lossCause: won ? null : state.lossReason,
+    // A scenario that ends when its last player falls (The Black Gate Opens) is a run that went on to its Resolution: the cause says how it ended, and the run list words it as an end, not a win.
+    lossCause: won ? (endedInDefeat(state) ? ENDED_BY_DEFEAT : null) : state.lossReason,
     seatCount: state.seatCount === 2 ? 2 : 1,
     heroes: input.heroes.map((seat) => [...seat]),
     rounds: score ? score.rounds : completedRounds(state),

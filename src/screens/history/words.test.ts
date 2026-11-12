@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import type { RunRecord } from "../../campaign/runs";
-import { durationSpoken, durationWords, playtimeSpoken, playtimeWords, runDetail, runLabel } from "./words";
+import { durationSpoken, durationWords, playtimeSpoken, playtimeWords, resultWords, runDetail, runLabel } from "./words";
 
 const MIN = 60000;
 const HOUR = 60 * MIN;
@@ -83,5 +83,13 @@ describe("playtimeWords", () => {
     expect(durationSpoken(74 * HOUR)).toBe("3 days 2 hours");
     expect(durationSpoken(48 * HOUR)).toBe("2 days");
     expect(playtimeSpoken(run({ startedAt: 0, endedAt: 107 * MIN }))).toBe("1 hour 47 minutes in all");
+  });
+});
+
+describe("resultWords", () => {
+  it("says Won, Lost and the cause, and Ended and the cause for a won run of a scenario that ends when its last player falls (The Black Gate Opens)", () => {
+    expect(resultWords(run())).toBe("Won");
+    expect(resultWords(run({ result: "lost", lossCause: "Threat reached 50" }))).toBe("Lost · Threat reached 50");
+    expect(resultWords(run({ lossCause: "Every player fell" }))).toBe("Ended · Every player fell");
   });
 });

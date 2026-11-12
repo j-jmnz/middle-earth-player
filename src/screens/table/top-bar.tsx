@@ -65,6 +65,8 @@ export type TopBarProps = {
   // The engagement costs marked on each dial, by seat.
   ticks: readonly (readonly number[])[];
   // The pursuit value of The Uruk-hai and the value at which the players lose (mec112.pursuit), or null: a dial after Life that warms toward the limit.
+  // The main quest has Dire (mec113.dire): each player is eliminated at 99, so the seat dials fill and warm toward it.
+  direLimit?: number | undefined;
   pursuit?: { value: number; limit: number } | null;
   // The tokens on The Defense of Helm's Deep, its name and the number that ends it and the stage it advances to (mec112.defense, 143033:A:3), or null: a dial after Pursuit whose ring fills toward the limit in the accent.
   defense?: { name: string; value: number; limit: number; stage: number } | null;
@@ -81,7 +83,7 @@ export type TopBarProps = {
   onMenu: () => void;
 };
 
-export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens = null, heading = null, island = null, onIsland, onNightmare = null, rail, stopAhead, carouselOpen, narrow, areas, ticks, pursuit = null, defense = null, scenarioDials, hands, held, menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
+export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens = null, heading = null, island = null, onIsland, onNightmare = null, rail, stopAhead, carouselOpen, narrow, areas, ticks, direLimit, pursuit = null, defense = null, scenarioDials, hands, held, menuOpen, onThreat, onRail, onMenu }: TopBarProps) {
   const t = useTableTokens();
   const s = useUiScale();
   const screen = useWindowDimensions();
@@ -149,6 +151,8 @@ export function TableTopBar({ threats, acting, viewed, life, burdenDeck, tokens 
                     label={hand ? hand.label : seatLabel}
                     accessibilityName={threats.length > 1 ? `Player ${threat.seat + 1} threat` : "Threat"}
                     spokenWord="Threat"
+                    limit={direLimit}
+                    limitWords={direLimit != null ? `a player is eliminated at ${direLimit}` : undefined}
                     role={dial.role}
                     hint={dial.hint}
                     compact

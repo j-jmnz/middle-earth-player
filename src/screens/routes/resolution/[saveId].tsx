@@ -153,7 +153,12 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
   const parts = scoreParts(game, session.world.cards);
   const titleBlock = (
     <View className={view.kind === "choosing" ? "mt-2" : "mt-8"}>
-      <OutcomeTitle won scenario={scenarioName(game.scenarioId)} testID="resolution-outcome" />
+      <OutcomeTitle won ended={view.kind === "settled" && view.ended === true} scenario={scenarioName(game.scenarioId)} testID="resolution-outcome" />
+      {view.kind === "settled" && view.ended ? (
+        <BodyText className="mt-3 text-center" testID="resolution-ended">
+          Every player fell. The scenario ends here, and the campaign goes on.
+        </BodyText>
+      ) : null}
       {end && view.kind === "settled" ? (
         <View className="mt-3 items-center" testID="resolution-campaign-end">
           {end.line ? (
