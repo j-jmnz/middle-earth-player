@@ -11,7 +11,7 @@ import { attachTo, moveCard, spawn } from "../../core/zones.ts";
 import { inPlay, updateCard } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { recordedCount, returnSetAsideHero, setAsideHeroWithAttachments, setAsideLogged } from "./aside.ts";
-import { attachToHeroWith, guardWithSetAside, moveAttachment } from "./guarded.ts";
+import { attachToHeroWith, guardWithSetAside, moveAttachment, placeLoggedHeroDamage } from "./guarded.ts";
 
 // The verbs src/catalog/families/campaign.ts adds. Only PutObjectiveAllyIntoPlay runs in the engine: it is a Setup instruction the
 // campaign checklist hands the start. The others are dealt before the game starts (AttachChosen, AddToHandAfterMulligan,
@@ -43,6 +43,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return attachToHeroWith(state, instruction);
     case "MoveAttachment":
       return moveAttachment(state, instruction, ctx);
+    case "PlaceLoggedHeroDamage":
+      return placeLoggedHeroDamage(state);
     case "GuardWithSetAside":
       return guardWithSetAside(state, instruction, focus, ctx);
     case "EarnAttached":
@@ -56,6 +58,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "RecordUnderneath":
     case "EarnOnThreatDial":
     case "RecordTokens":
+    case "RecordDamageOn":
+    case "RecordHeroDamage":
     case "RemoveFromPoolByCode":
     case "LoseGuardedBoons":
     case "IgnoreDiscardedHeroes":
@@ -104,4 +108,4 @@ function attachSetAside(state: ScenarioState, code: string, hostId: string): Sce
   return queueEvent(attachTo(placed, copy, hostId), { trigger: "attached", seat: host.controller, subject: copy, other: hostId });
 }
 
-export const manifest: RulesFamily = { name: "campaign", verbs: ["SetAsideHeroWithAttachments", "ReturnSetAsideHero", "SetAsideLogged", "PutObjectiveAllyIntoPlay", "SetAsideEachPlayer", "AttachSetAside", "PlaceToken", "EarnAttached", "NamePrisoner", "AttachChosen", "AddToHandAfterMulligan", "AddToPool", "CarryOver", "RemovePoolCards", "RemoveBurdenSets", "ShuffleIntoEachDeck", "ChooseCopyOrResources", "ChooseOption", "ThreatPenaltyForPick", "EarnForPick", "EarnHeldCopies", "ReviveFallenHero", "TrimHeroes", "RecordUnderneath", "SearchDeckForCard", "EarnOnThreatDial", "RecordTokens", "RemoveFromPoolByCode", "LoseGuardedBoons", "IgnoreDiscardedHeroes", "EndCampaign", "AttachToHeroWith", "SetAsideBoon", "GuardWithSetAside", "MoveAttachment", "PlaceTokensOnCampaignCard"], run, amount: (state, found) => (found.recorded ? recordedCount(state, found.recorded) : null) };
+export const manifest: RulesFamily = { name: "campaign", verbs: ["SetAsideHeroWithAttachments", "ReturnSetAsideHero", "SetAsideLogged", "PutObjectiveAllyIntoPlay", "SetAsideEachPlayer", "AttachSetAside", "PlaceToken", "PlaceLoggedHeroDamage", "RecordDamageOn", "RecordHeroDamage", "EarnAttached", "NamePrisoner", "AttachChosen", "AddToHandAfterMulligan", "AddToPool", "CarryOver", "RemovePoolCards", "RemoveBurdenSets", "ShuffleIntoEachDeck", "ChooseCopyOrResources", "ChooseOption", "ThreatPenaltyForPick", "EarnForPick", "EarnHeldCopies", "ReviveFallenHero", "TrimHeroes", "RecordUnderneath", "SearchDeckForCard", "EarnOnThreatDial", "RecordTokens", "RemoveFromPoolByCode", "LoseGuardedBoons", "IgnoreDiscardedHeroes", "EndCampaign", "AttachToHeroWith", "SetAsideBoon", "GuardWithSetAside", "MoveAttachment", "PlaceTokensOnCampaignCard"], run, amount: (state, found) => (found.recorded ? recordedCount(state, found.recorded) : null) };

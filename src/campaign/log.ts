@@ -88,6 +88,15 @@ export type CampaignLog = {
   corsairFleet: number | null;
   blackGateTokens: number | null;
   campaignEnd: CampaignEnd | null;
+  // The Angmar Awakened Campaign Log's "Damage Tracking" (mec108.campaign-log-tracking, src/campaign/log-angmar-awakened.ts). A log saved before it reads with these defaults.
+  // The damage noted on Protect the Innocent / Arnor Ravaged, replaced by each Resolution that notes it; null until noted.
+  protectDamage: number | null;
+  // The damage noted on each hero, by hero code ("Damage on Heroes"): a hero that is back at full health is left out.
+  heroDamage: Readonly<Record<string, number>>;
+  // The characters marked "determined" (the Determination boon, The Wastes of Eriador), by card code.
+  determined: readonly string[];
+  // The unique cards each seat lost to the Goblins in Escape from Mount Gram: still in the captured deck and out of play at the end, never in that player's deck again.
+  stolenCards: readonly (readonly string[])[];
 };
 
 export const MARSHES_CHOICES = ["penalty", "searchingEye"] as const;
@@ -95,7 +104,7 @@ export type MarshesChoice = (typeof MARSHES_CHOICES)[number];
 
 export function emptyLog(seatCount: number): CampaignLog {
   const seats = Array.from({ length: seatCount }, () => [] as readonly string[]);
-  return { heroesBySeat: seats, fallenHeroesBySeat: seats, threatPenalty: 0, campaignPool: [], captives: [], completed: [], earned: {}, scenarios: {}, score: 0, notes: "", prisoner: null, usedOnce: [], counters: {}, carryOver: [], carryIn: [], xpGained: {}, marks: {}, modes: {}, modeDefault: null, treasures: [], allyLines: [], beldisUses: [], encounterPool: {}, threatPenaltyBySeat: [], marshesChoice: [], blackGate: {}, scoreBase: 0, scoreBaseCampaigns: [], corsairFleet: null, blackGateTokens: null, campaignEnd: null };
+  return { heroesBySeat: seats, fallenHeroesBySeat: seats, threatPenalty: 0, campaignPool: [], captives: [], completed: [], earned: {}, scenarios: {}, score: 0, notes: "", prisoner: null, usedOnce: [], counters: {}, carryOver: [], carryIn: [], xpGained: {}, marks: {}, modes: {}, modeDefault: null, treasures: [], allyLines: [], beldisUses: [], encounterPool: {}, threatPenaltyBySeat: [], marshesChoice: [], blackGate: {}, scoreBase: 0, scoreBaseCampaigns: [], corsairFleet: null, blackGateTokens: null, campaignEnd: null, protectDamage: null, heroDamage: {}, determined: [], stolenCards: [] };
 }
 
 // The Ring-bearer may have moved to another seat with the first player token (mec109.multiplayer-the-one-ring).
@@ -200,5 +209,9 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
     corsairFleet: result.recorded?.corsairFleet ?? log.corsairFleet,
     blackGateTokens: result.recorded?.blackGateTokens ?? log.blackGateTokens,
     campaignEnd: result.campaignEnd ?? log.campaignEnd,
+    protectDamage: result.damageNotes?.protect ?? log.protectDamage,
+    heroDamage: result.damageNotes?.heroes ?? log.heroDamage,
+    determined: log.determined,
+    stolenCards: log.stolenCards,
   };
 }

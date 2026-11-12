@@ -56,6 +56,8 @@ export type ResolutionLog = {
   recorded?: Readonly<Partial<Record<RecordedCount, number>>>;
   discardedNotFallen?: true;
   campaignEnd?: CampaignEnd;
+  // Angmar Awakened (docs/brief.md, Angmar Awakened), left out while a Resolution notes none: the damage on Protect the Innocent / Arnor Ravaged (RecordDamageOn) and on each hero in play by code (RecordHeroDamage).
+  damageNotes?: { protect?: number; heroes?: Readonly<Record<string, number>> };
 };
 
 // The campaign log's structured facts, handed to the engine at the start of a scenario in Campaign Mode (campaign/log.ts writes
@@ -87,4 +89,7 @@ export type CampaignFacts = {
   // What The Two Towers' Resolutions recorded in the notes and the saga's later campaign cards' Setup reads (The Return of the King; left out in a game of another campaign): the enemies under The Black Gate
   // by card code and quantity, and the two counts of `RecordedCount` (null until recorded).
   notes?: { blackGate: Readonly<Record<string, number>>; corsairFleet: number | null; blackGateTokens: number | null };
+  // Angmar Awakened's Campaign Log as the game reads it (left out in a game of another campaign): the damage noted for Protect the Innocent / Arnor Ravaged (null until noted), the damage noted on each hero by code, the characters marked "determined"
+  // and the unique cards each seat lost to the Goblins (src/campaign/log-angmar-awakened.ts).
+  angmar?: { protectDamage: number | null; heroDamage: Readonly<Record<string, number>>; determined: readonly string[]; stolen: readonly (readonly string[])[] };
 };

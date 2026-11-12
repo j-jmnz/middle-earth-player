@@ -99,6 +99,13 @@ const VERBS = [
   // Resolution: the resources on the cards in play with these codes are counted and recorded in the notes section of the Campaign Log under `as` ("Count the number of resources on The Corsair Fleet and record that number in
   // the notes section", 145070:B:1; "Record the number of resource tokens on The Black Gate", 146074:B:1). A card of two sides is two codes; the count is their sum.
   z.strictObject({ verb: z.literal("RecordTokens"), codes: z.array(code).min(1), as: z.enum(RECORDED_COUNTS), ...when }),
+  // Angmar Awakened's Campaign Log (docs/brief.md, Angmar Awakened; src/campaign/log-angmar-awakened.ts). Resolution: the damage on the cards in play with these codes is added up and noted in the log's "Damage on: Protect the Innocent / Arnor Ravaged"
+  // row, replacing the previous number ("Note the amount of damage on Protect the Innocent in the Campaign Log", 10156:B:1). A card of two sides is two codes; with none in play the note is 0.
+  z.strictObject({ verb: z.literal("RecordDamageOn"), codes: z.array(code).min(1), ...when }),
+  // Resolution: the damage on each hero in play is noted in the log's "Damage on Heroes" row by hero code, replacing the previous notes ("Note the amount of damage on each hero at the end of the game", 10188:B:1). A hero out of play has none to note.
+  z.strictObject({ verb: z.literal("RecordHeroDamage"), ...when }),
+  // Campaign Setup: each hero begins the game with the damage the Campaign Log noted for it ("Each hero begins the game with damage on them equal to the amount noted for them in the Campaign Log", 10193:A:2). A hero the log holds no note for, and a game with no log, takes none.
+  verbFlags(z.strictObject({ verb: z.literal("PlaceLoggedHeroDamage") }), { setupRole: "afterSetup" }),
   // Resolution: each card with one of these codes leaves the Campaign Pool, once ("Remove Army of the Dead from the campaign pool", 145070:B:1). With `perCopyInVictory`, one entry leaves for each copy of the code in the
   // victory display and none when there is none ("If a Wraith on Wings is in the victory display, remove that copy from the campaign pool", 146074:B:1). Nothing happens for a code the pool does not hold. The Setup's
   // RemovePoolCards is the same removal before a game.

@@ -49,3 +49,15 @@ export function guardWithSetAside(state: ScenarioState, instruction: Verb<"Guard
   }
   return next;
 }
+
+/** PlaceLoggedHeroDamage (10193:A:2): each hero in play takes the damage the Campaign Log noted for its code (`campaignFacts.angmar.heroDamage`); a hero with no note takes none. */
+export function placeLoggedHeroDamage(state: ScenarioState): ScenarioState {
+  const noted = state.campaignFacts?.angmar?.heroDamage;
+  if (!noted) return state;
+  let next = state;
+  for (const hero of Object.values(state.cards).filter((card) => card.zone === "heroes")) {
+    const damage = noted[hero.code] ?? 0;
+    if (damage > 0) next = updateCard(next, hero.id, { damage: hero.damage + damage });
+  }
+  return next;
+}

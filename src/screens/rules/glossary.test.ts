@@ -7,8 +7,8 @@ const GLOSSARY = glossary();
 describe("GLOSSARY", () => {
   it("holds the rule books' spans and leaves out decklists, setups and stages", () => {
     const docs = new Set(GLOSSARY.map((entry) => entry.doc));
-    expect([...docs].sort()).toEqual(["dcce", "easy-mode", "emce", "faq", "learn-to-play", "mec109", "mec112", "mec113", "rr", "tdom"]);
-    expect(GLOSSARY.some((entry) => /^(decklist\.|mec109\.(starter-|setup-|stage-)|dcce\.(campaign-)?setup-|emce\.setup-|mec11[23]\.setup-)/.test(entry.id))).toBe(false);
+    expect([...docs].sort()).toEqual(["dcce", "easy-mode", "emce", "faq", "learn-to-play", "mec108", "mec109", "mec112", "mec113", "rr", "tdom"]);
+    expect(GLOSSARY.some((entry) => /^(decklist\.|mec109\.(starter-|setup-|stage-)|dcce\.(campaign-)?setup-|emce\.setup-|mec108\.(campaign-)?setup-|mec11[23]\.setup-)/.test(entry.id))).toBe(false);
     expect(glossaryEntry("dcce.gaining-xp")?.source).toBe("Dream-chaser campaign rulebook · page 29");
     expect(glossaryEntry("mec109.hide-tests")?.source).toBe("Fellowship of the Ring campaign book · page 4");
     expect(glossaryEntry("emce.treasure")?.source).toBe("Ered Mithrin campaign rulebook · page 3");

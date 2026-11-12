@@ -4,6 +4,7 @@ import { ScrollView, View } from "react-native";
 
 import { printedMap, type CatalogRow } from "../../../campaign/cards";
 import { scoreBaseName } from "../../../campaign/continue";
+import { angmarAwakenedRows } from "../../../campaign/log-angmar-awakened";
 import { returnOfTheKingRows } from "../../../campaign/log-return-of-the-king";
 import { keepsSagaColumns } from "../../../campaign/saga";
 import { blackGateEnemies, marshesLines, SEARCHING_EYE, threatWords } from "../../../campaign/two-towers-view";
@@ -144,6 +145,10 @@ export default function Log() {
   const marshes = sagaColumns ? marshesLines(log, save.seatCount, nameOf) : [];
   const blackGate = sagaColumns ? blackGateEnemies(log) : [];
   const sagaNotes = sagaColumns ? returnOfTheKingRows(log) : [];
+  // Angmar Awakened's Damage Tracking (mec108.campaign-log-tracking): the damage on Protect the Innocent, on each hero, the unique cards the Goblins stole and the determined characters.
+  const angmar = campaign.id === "angmar-awakened" ? angmarAwakenedRows(log, save.seatCount) : [];
+  const angmarLines = (row: (typeof angmar)[number]): Line[] =>
+    row.id === "log-hero-damage" ? Object.entries(log.heroDamage).map(([code, damage]): Line => [cardSegment(code, nameOf), { text: `: ${damage}` }]) : row.codes.map((code): Line => [cardSegment(code, nameOf)]);
   const names = scenarioNames(campaign);
   const notes = edited ?? log.notes;
 
@@ -175,6 +180,7 @@ export default function Log() {
           {campaign.xp ? <Row label="Upgradable Cards" lines={marked("upgradable")} onCard={card} speech={markedSpeech(log, "upgradable")} testID="log-upgradable" /> : null}
           <Row label="Boons" lines={pool("boon")} onCard={card} testID="log-boons" />
           <Row label="Burdens" lines={pool("burden")} onCard={card} testID="log-burdens" />
+          {angmar.map((row) => (row.value != null && row.id === "log-protect-damage" ? <Row key={row.id} label={row.label} value={row.value} testID={row.id} /> : <Row key={row.id} label={row.label} lines={angmarLines(row)} onCard={card} testID={row.id} />))}
           {wilderland ? <Row label="Treasures" lines={namesOnLines(wilderland.treasures, nameOf)} onCard={card} testID="log-treasures" /> : null}
           {wilderland ? <Row label="Unique Allies Protecting Wilderland" lines={wilderland.lines.map((words): Line => [{ text: words }])} onCard={card} testID="log-ally-lines" /> : null}
           {wilderland ? <Row label="Beldis" lines={wilderland.beldis.map((row): Line => [{ text: `${row.prefix}${row.boxes}` }])} onCard={card} speech={wilderland.beldis.map((row) => row.speech).join(". ")} testID="log-beldis" /> : null}
