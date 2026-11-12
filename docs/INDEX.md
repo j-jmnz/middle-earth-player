@@ -118,7 +118,7 @@ Read the sections your task touches.
     - 943–988 The Battle of the Pelennor Fields (~5.6K) ← 1
     - 989–1026 The Tower of Cirith Ungol (~4.1K) ← 1
     - 1027–1063 The Black Gate Opens (~4.2K) ← 3
-    - 1064–1092 Mount Doom (~4.0K)
+    - 1064–1092 Mount Doom (~4.0K) ← 1
   - 1093–1101 Nightmare (~410) ← 19
   - 1102–1140 Deckbuilding (~1.9K)
   - 1141–1219 Effects (~3.2K)
@@ -211,16 +211,16 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~11.7K tok)
+- `docs/phases/STATUS.md` — Phase status (~12.0K tok)
   - 5–15 Rules (~410)
   - 16–103 Phases (~1.8K)
-  - 104–247 Open items (~8.8K)
+  - 104–250 Open items (~9.1K)
     - 106–110 Releases (~150)
-    - 111–142 Fixtures and Maestro (~1.8K)
-    - 143–190 Rules and engine (~2.2K)
-    - 191–215 Screens and code (~1.6K)
-    - 216–247 Rules and engine (The Two Towers) (~3.1K)
-  - 248–267 Standing decisions (~640)
+    - 111–143 Fixtures and Maestro (~1.8K)
+    - 144–191 Rules and engine (~2.2K)
+    - 192–216 Screens and code (~1.6K)
+    - 217–250 Rules and engine (The Two Towers) (~3.3K)
+  - 251–270 Standing decisions (~640)
 
 ## Live plans
 
@@ -241,7 +241,6 @@ Read when a task names the plan.
   - 274–288 Readings the review catches (~550) ← 4
   - 289–308 Not expressible yet: leave open, report (~390)
 - `docs/plans/readme-showcase.md` — README showcase (~170 tok)
-- `docs/plans/return-of-the-king.md` — Plan: The Return of the King (~1.1K tok)
 - `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.7K tok)
   - 3–14 Context (~450)
   - 15–24 What does not move (~190)
@@ -266,7 +265,7 @@ Open work; read when a task names it.
   - 38–56 Files you own (edit freely) (~490)
   - 57–70 Shared files (~300)
   - 71–85 Approach (~670) ← 1
-  - 86–124 Scenario procedure (~2.1K) ← 23
+  - 86–124 Scenario procedure (~2.1K) ← 22
   - 125–134 Checkpoints (API usage limits can stop you mid-task) (~210)
   - 135–149 Checks before committing (~310)
   - 150–156 Merge (~140) ← 1

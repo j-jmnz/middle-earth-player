@@ -92,14 +92,14 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 66 | The Passage of the Marshes | completed | 2026-11-11. Review round done. Open: `marshes-won`. |
 | 67 | Journey to the Cross-roads | completed | 2026-11-11. Review round done. Open: `roads-won`. |
 | 68 | Shelob's Lair | completed | 2026-11-11. Review round done. Open: `lair-won`. |
-| 69 | The Return of the King data | completed | 2026-11-11. Review round done (with phase 70). Plan: `docs/plans/return-of-the-king.md`. |
+| 69 | The Return of the King data | completed | 2026-11-11. Review round done (with phase 70). |
 | 70 | The Return of the King campaign shell | completed | 2026-11-11. Review round done. Open: six campaign-card lines left to their scenarios. |
 | 71 | The Passing of the Grey Company | completed | 2026-11-11. Review round done. Open: `company-won`. |
 | 72 | The Siege of Gondor | completed | 2026-11-11. Review round done. Open: `gondor-won`. |
 | 73 | The Battle of the Pelennor Fields | completed | 2026-11-12. Review round done. Open: `fields-won`. |
 | 74 | The Tower of Cirith Ungol | completed | 2026-11-12. Review round done. Open: `ungol-won`. |
 | 75 | The Black Gate Opens | completed | 2026-11-12. Review round done. |
-| 76 | Mount Doom | active | 2026-11-12. |
+| 76 | Mount Doom | completed | 2026-11-12. Review round done. Open: `doom-won`. |
 
 ## Open items
 
@@ -110,6 +110,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 
 ### Fixtures and Maestro
 - `marshes-won` is not committed: no seed in 600 wins The Passage of the Marshes with The One Deck and Defenders of Gondor (every game reaches threat 50 by round 4). Until it exists `.maestro/scenarios/the-passage-of-the-marshes/the-passage-of-the-marshes.yaml` cannot run.
+- `doom-won` is not committed: no seed in 800 wins Mount Doom with the saved decklists (the Ring-bearer falls in combat in round 1). Until it exists `.maestro/scenarios/mount-doom/mount-doom.yaml` and `mount-doom-keep.yaml` cannot run.
 - `ungol-won` is not committed: no seed in 600 wins The Tower of Cirith Ungol with the saved decklists. Until it exists `.maestro/scenarios/the-tower-of-cirith-ungol/the-tower-of-cirith-ungol.yaml` cannot run.
 - `fields-won` is not committed: no seed in 100 wins The Battle of the Pelennor Fields with the saved decklists. Until it exists `.maestro/scenarios/the-battle-of-the-pelennor-fields/the-battle-of-the-pelennor-fields.yaml` cannot run.
 - `gondor-won` is not committed: no seed in 400 wins The Siege of Gondor with the saved decklists (threat or Aragorn's death ends every game by round 3). Until it exists `.maestro/scenarios/the-siege-of-gondor/the-siege-of-gondor.yaml` cannot run.
@@ -243,6 +244,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - The Black Gate Opens readings not user-confirmed (`docs/brief.md`, The Black Gate Opens): agent recommendations on the Embassy's pairing order and ties, the first player choosing per pair, an unplayable player card discarded with its pair (146072:B:1), the Embassy's timing in Setup, each player choosing their Beleaguered Hills enemy (146026:A:2), X or no printed cost counting 0 (146033:A:2), the revealing player choosing for Hell-hawk (146036:A:2), the first player choosing Onslaught's enemy (146040:A:2) and stage 1B advancing on its next progress; "put into play engaged" counting as engaging rests on one secondhand quotation.
 - The Black Gate Opens: the Embassy's faceup cards are not drawn on the table; the dock's Read button opens the pair's previews.
 - Renderer gaps, The Black Gate Opens (behaviour proven by spec rows): a self-only travel bar reads "any location" (146024:A:1), the cancelling seat shown as "the acting player" (146031:A:2), a subjectless leave-play trigger shown as any card (146028:A:1), the Embassy, `totalOf`, `mostPerPlayer`, `PlaceUnderSelf`, `ReturnUnderToStaging`, `SearchMove`, `EngageNextPlayer`, `RemoveFromQuest`, `DealShadowTo`, `TakeControl`, `AssignDamage` and the campaign verbs printed as JSON, and `firstPlayerReveals`, `raiseThreatIfDestroys` and `endsInDefeat` as bare names (146025 to 146041, 146072 to 146074).
+- Mount Doom readings not user-confirmed (`docs/brief.md`, Mount Doom): agent recommendations on a mid-test reshuffle counting a card again, the first treachery each quest phase (146075:B:2, 146077:B:1), 'Wicked Master!''s attack order and a fetched Gollum not attacking (146054), 4B's one extra card per player (146078:B:2) and Brake of Thorns' copy made active at Setup; community answers only for Gollum's lasting engagement and his Forced after the discards (146049), failure effects resolving inside the test, Heavy and Tired's host (146057) and Brake of Thorns' Forced at Setup.
+- Renderer gaps, Mount Doom (behaviour proven by spec rows): `firstPlayerTens`, `stageProgress`, `mostPerPlayer`, `DiscardUntil`, `MoveEncounterCard`, `AssignDamage`, `SearchMove`, `TravelTo`, `LimitEntries`, `UncancelableWhenRevealed`, `ChooseOption`, `EndCampaign` and the campaign verbs print as JSON, `other` as a bare flag (146043 to 146057, 146075:A:1, 146076, 146078:B:1, 146079).
 - Easy: the DragnCards `E0C.12` deck keeps all ten Great Spider cards where Hall of Beorn keeps six; the E0C decks lead (user decision, 2026-11-07).
 
 ## Standing decisions
