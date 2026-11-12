@@ -1,7 +1,7 @@
-import type { Effect } from "../../catalog/boundary.ts";
+import type { Effect } from "../../../catalog/boundary.ts";
 
-import { AUTHORED_EFFECTS as THE_CITY_OF_CORSAIRS } from "./the-city-of-corsairs.ts";
-import { copyLine, withCopies } from "./reprint.ts";
+import { AUTHORED_EFFECTS as THE_CITY_OF_CORSAIRS } from "../the-city-of-corsairs.ts";
+import { copyLine, withCopies } from "../reprint.ts";
 
 // The campaign cards of Angmar Awakened (10156, 10159, 10166, 10171, 10174, 10182, 10184, 10188, 10193; Setup on the front, Resolution on the back, ledger data/printed/angmar-awakened.json) that the box's campaign shell reads: the lines
 // that only change the pool, the decks, the hand and the Campaign Log's Damage Tracking. Their vocabulary is the campaign family's (src/catalog/families/campaign.ts): the checklist deals the Setup verbs (src/campaign/checklist.ts) and the Resolution

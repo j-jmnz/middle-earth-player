@@ -4,14 +4,14 @@
 // The log has the earlier parts recorded as won (Intruders in Chetwood's two-handed win, with Protect the Innocent in its pool), so the open scenario is the playthrough's current node and `openNode` resumes it.
 // The Campaign Setup asks nothing (Protect the Innocent and Mysterious Omens are dealt from the pool); the Resolution asks nothing (the damage is noted, a boon is earned only when Mysterious Omens was defeated and a player chose one). The decklists are played with
 // the scenario's golden policy (test/scenarios/the-weather-hills/game.ts: the players engage and kill the enemies, one character defends each attack, one quests) with card play on.
-import type { CampaignLog } from "../../src/campaign/log.ts";
-import type { StoredLoadout } from "../../src/campaign/save.ts";
-import type { PlayerIntent, ReduceContext, ScenarioState } from "../../src/rules/engine/reduce.ts";
+import type { CampaignLog } from "../../../src/campaign/log.ts";
+import type { StoredLoadout } from "../../../src/campaign/save.ts";
+import type { PlayerIntent, ReduceContext, ScenarioState } from "../../../src/rules/engine/reduce.ts";
 
-import { CHETWOOD_GOLDENS, chetwoodWorld, playGolden as playChetwood } from "../../test/scenarios/intruders-in-chetwood/game.ts";
-import { DEFAULT_POLICY, HILLS_POLICY, hillsIntent } from "../../test/scenarios/the-weather-hills/game.ts";
-import { createLog } from "../log.ts";
-import { firstSeed, wonLog } from "./seed-kit.ts";
+import { CHETWOOD_GOLDENS, chetwoodWorld, playGolden as playChetwood } from "../../../test/scenarios/intruders-in-chetwood/game.ts";
+import { DEFAULT_POLICY, HILLS_POLICY, hillsIntent } from "../../../test/scenarios/the-weather-hills/game.ts";
+import { createLog } from "../../log.ts";
+import { firstSeed, wonLog } from "../seed-kit.ts";
 
 const say = createLog("e2e-hills");
 

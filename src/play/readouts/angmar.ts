@@ -3,7 +3,7 @@
 // The dials Intruders in Chetwood's pieces hold now, in the order the top bar draws them: Protect the Innocent's damage against the number that loses the game (it warms toward it), the time counters taken off Rescue Iârion
 // (it warms toward the last, which discards Iârion and loses the game) and, while Orc Rearguard is in the staging area, the progress placed on the current quest this round against its cap of 3. The engine decided every number
 // (`heldAmount`, `timeOf`, `questCapTally`); nothing here changes one. Empty in any other scenario. Pure, so a test reads it.
-import { HUNT_FLIP_TOKENS } from "../../effects/authored/the-weather-hills.ts";
+import { HUNT_FLIP_TOKENS } from "../../effects/authored/angmar-awakened/the-weather-hills.ts";
 import { heldAmount, inPlay } from "../../rules/core/state.ts";
 import { frameScope, resolveAmount } from "../../rules/interpret/amounts.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";

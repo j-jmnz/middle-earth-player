@@ -48,7 +48,7 @@ const VERBS = [
   // `to: "lastPlayer"`: the last player takes control of it instead of the first ("the last player takes control of Na'asiyah", 12092:A:1).
   // `to: "anyPlayer"`: "Put Gavin into play under any player's control" (11209:A:3): the first player chooses which player takes it (the only player takes it without being asked).
   // `to: "actor"`: the player who uses the effect takes it ("Take control of 1 set aside copy of Dol Amroth Warship", 12136:A:3).
-  verbFlags(z.strictObject({ verb: z.literal("PutSetAsideInPlay"), name: z.string().min(1), withCard: z.string().min(1).optional(), to: z.enum(["firstPlayer", "lastPlayer", "anyPlayer", "actor"]).optional(), ...when }), { setupRole: "afterSetup" }),
+  verbFlags(z.strictObject({ verb: z.literal("PutSetAsideInPlay"), name: z.string().min(1), withCard: z.string().min(1).optional(), to: z.enum(["firstPlayer", "lastPlayer", "anyPlayer", "actor"]).optional(), ...when }), { setupRole: "afterSetup", setupRuns: "top" }),
   // Campaign Setup: "Attach Spyglass to Calphon" (11179:A:2): the set-aside copy of the card with this code is attached to the card in play with that name. A card dealt on its
   // Upgraded side stays so.
   verbFlags(z.strictObject({ verb: z.literal("AttachSetAsideTo"), code: z.string().min(1), to: z.string().min(1), ...when }), { setupRole: "afterSetup" }),

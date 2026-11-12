@@ -1,4 +1,4 @@
-export const CATALOG_VERSION = 205694341;
+export const CATALOG_VERSION = 1516930899;
 
 // The version is a hash of what the catalog holds, so any change to it differs from the one a phone applied.
 // Newer and older do not mean anything for a hash: only equal and not equal do.

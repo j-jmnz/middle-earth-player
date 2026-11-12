@@ -1,8 +1,8 @@
-import type { Condition, Effect, Instruction, PickSpec } from "../../catalog/boundary.ts";
+import type { Condition, Effect, Instruction, PickSpec } from "../../../catalog/boundary.ts";
 
-import { AUTHORED_EFFECTS as THE_FATE_OF_NUMENOR } from "./the-fate-of-numenor.ts";
-import { AUTHORED_EFFECTS as THE_OATH } from "./the-oath.ts";
-import { copyLine, withCopies } from "./reprint.ts";
+import { AUTHORED_EFFECTS as THE_FATE_OF_NUMENOR } from "../the-fate-of-numenor.ts";
+import { AUTHORED_EFFECTS as THE_OATH } from "../the-oath.ts";
+import { copyLine, withCopies } from "../reprint.ts";
 
 // Records for Intruders in Chetwood (Angmar Awakened part 1, campaign card 10156): Iârion, the Orc War Party, the three side quests that act on the table (Orc Rearguard, Rescue Iârion, Lost in the Wilderness) and Orc Ambush, the encounter cards no template reads,
 // the quest card, and the lines of the campaign card (the Setup) and of its two cards (Iârion's Pendant, Protect the Innocent) that need this scenario's table. Every line is read from the scan ledger (data/printed/angmar-awakened.json); a line a template already writes

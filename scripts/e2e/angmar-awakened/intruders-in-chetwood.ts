@@ -3,12 +3,12 @@
 // that loses, parked on the loss. A game not found in the seeds is left out.
 // The Campaign Setup's question (each player may place 4 damage on Protect the Innocent for 1 resource on each hero) is answered by the policy's safe options ("keep"); the Resolution asks nothing (the damage is noted and Protect the Innocent joins the pool).
 // The decklists are played with the scenario's golden policy (test/scenarios/intruders-in-chetwood/game.ts: the players engage and kill the enemies, one character defends each attack, one quests) with card play on.
-import type { StoredLoadout } from "../../src/campaign/save.ts";
-import type { PlayerIntent, ReduceContext, ScenarioState } from "../../src/rules/engine/reduce.ts";
+import type { StoredLoadout } from "../../../src/campaign/save.ts";
+import type { PlayerIntent, ReduceContext, ScenarioState } from "../../../src/rules/engine/reduce.ts";
 
-import { CHETWOOD_POLICY, DEFAULT_POLICY, chetwoodIntent } from "../../test/scenarios/intruders-in-chetwood/game.ts";
-import { createLog } from "../log.ts";
-import { firstSeed } from "./seed-kit.ts";
+import { CHETWOOD_POLICY, DEFAULT_POLICY, chetwoodIntent } from "../../../test/scenarios/intruders-in-chetwood/game.ts";
+import { createLog } from "../../log.ts";
+import { firstSeed } from "../seed-kit.ts";
 
 const say = createLog("e2e-chetwood");
 

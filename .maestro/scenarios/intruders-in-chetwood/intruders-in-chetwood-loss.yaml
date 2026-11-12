@@ -2,7 +2,7 @@ appId: com.middleearth.lcg
 tags:
   - scenario
 ---
-# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `chetwood-lost` (scripts/e2e/intruders-in-chetwood.ts): a real two-handed game of Intruders in Chetwood (The One Deck and the Defenders of Gondor
+# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `chetwood-lost` (scripts/e2e/angmar-awakened/intruders-in-chetwood.ts): a real two-handed game of Intruders in Chetwood (The One Deck and the Defenders of Gondor
 # lists, Easy), parked on its loss (no seats remain). A loss has no reward screen and writes nothing (the Resolution is for a win): Protect the Innocent does not join the pool and the scenario stays the next part.
 # The steps are the shared subflow's (.maestro/subflows/scenario-loss.yaml).
 - runFlow:

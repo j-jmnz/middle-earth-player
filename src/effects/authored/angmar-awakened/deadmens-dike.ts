@@ -1,9 +1,9 @@
-import type { Condition, Effect, Instruction, PickSpec } from "../../catalog/boundary.ts";
+import type { Condition, Effect, Instruction, PickSpec } from "../../../catalog/boundary.ts";
 
-import { AUTHORED_EFFECTS as DROWNED } from "./the-drowned-ruins.ts";
-import { AUTHORED_EFFECTS as SIEGE } from "./return-of-the-king/the-siege-of-gondor.ts";
+import { AUTHORED_EFFECTS as DROWNED } from "../the-drowned-ruins.ts";
+import { AUTHORED_EFFECTS as SIEGE } from "../return-of-the-king/the-siege-of-gondor.ts";
 import { AUTHORED_EFFECTS as WEATHER } from "./the-weather-hills.ts";
-import { copyLine, withCopies } from "./reprint.ts";
+import { copyLine, withCopies } from "../reprint.ts";
 
 // Records for Deadmen's Dike (Angmar Awakened part 3, campaign card 10166): the encounter cards no template reads, the two quest stages, the campaign card's Setup and Forced effect, Arnor Ravaged, Amarthiúl's Courage and Thaurdir's three burdens.
 // Every line is read from the scan ledger (data/printed/angmar-awakened.json); a line a template already writes (pnpm data build) or another card prints word for word needs no record here. The three encounter side quests lie in the encounter deck
@@ -13,7 +13,6 @@ import { copyLine, withCopies } from "./reprint.ts";
 const THAURDIR = "09033";
 const BALEFUL_SHADE = "09035";
 const FORNOST_SQUARE = "09038";
-const IARION = "09016";
 const PENDANT = "10157";
 const PROTECT_THE_INNOCENT = "10158";
 const ARNOR_RAVAGED = "100158";

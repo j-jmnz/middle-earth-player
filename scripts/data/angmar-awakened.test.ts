@@ -92,7 +92,10 @@ describe("The Angmar Awakened campaign", () => {
     expect(loadScenario("escape-from-mount-gram").cards.filter((card) => card.pile === "encounterDeck2").map((card) => byCode.get(card.code)?.name).sort()).toEqual(["Angmar Captain", "Angmar Marauder", "Angmar Orc", "Orc Ambush"]);
     expect(loadScenario("intruders-in-chetwood").campaignPlaced).toEqual(["10157", "10158"]);
     expect(loadScenario("deadmens-dike").campaignPlaced).toEqual(expect.arrayContaining(["100158", "10157", "10167", "10168", "10169", "10170"]));
-    expect(loadScenario("the-treachery-of-rhudaur").campaignPlaced).toEqual(["10185", "10186", "10187"]);
+    // Mysterious Omens' five boons are dealt set aside with every later scenario, which can shuffle Omens in (overrides.scenarioCampaignPlaced).
+    expect(loadScenario("the-treachery-of-rhudaur").campaignPlaced).toEqual(["10161", "10162", "10163", "10164", "10165", "10185", "10186", "10187"]);
+    expect(loadScenario("deadmens-dike").campaignPlaced).toEqual(expect.arrayContaining(["10161", "10162", "10163", "10164", "10165"]));
+    expect(loadScenario("intruders-in-chetwood").campaignPlaced).not.toContain("10161");
   });
 
   it("takes the Easy counts the printed set icons give where DragnCards' Easy decks differ (data/overrides.json, scenarioEasy)", () => {

@@ -4,6 +4,7 @@ import { loadCampaignsInOrder } from "../load-scenarios.ts";
 // box whose scenarios would crowd the top level: scripts/checks/layout.test.ts holds the count); every other file is top-level, named for its scenario or campaign.
 export const AUTHORED_CAMPAIGN_FOLDERS: Readonly<Record<string, string>> = {
   "the-return-of-the-king": "return-of-the-king",
+  "angmar-awakened": "angmar-awakened",
 };
 
 /** The path under src/effects/authored/, without the extension, of the file named `id` for a scenario (or the campaign card file) of `campaignId`. */

@@ -3,22 +3,22 @@
 // that loses, parked on the loss. A game not found in the seeds is left out.
 // The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.
 // TODO: say what the Campaign Setup and the Resolution ask, and which answers the saved decklists' policy gives them.
-import type { CampaignLog } from "../../src/campaign/log.ts";
-import type { StoredLoadout } from "../../src/campaign/save.ts";
-import type { PlayerIntent, ScenarioState } from "../../src/rules/engine/reduce.ts";
+import type { CampaignLog } from "../../../src/campaign/log.ts";
+import type { StoredLoadout } from "../../../src/campaign/save.ts";
+import type { PlayerIntent, ScenarioState } from "../../../src/rules/engine/reduce.ts";
 
-import { HILLS_GOLDENS, hillsWorld, playGolden as playHills } from "../../test/scenarios/the-weather-hills/game.ts";
+import { HILLS_GOLDENS, hillsWorld, playGolden as playHills } from "../../../test/scenarios/the-weather-hills/game.ts";
 import { chetwoodWonLog } from "./the-weather-hills.ts";
-import { nextIntent } from "../../test/harness/auto-player.ts";
-import { createLog } from "../log.ts";
-import { firstSeed, wonLog } from "./seed-kit.ts";
+import { nextIntent } from "../../../test/harness/auto-player.ts";
+import { createLog } from "../../log.ts";
+import { firstSeed, wonLog } from "../seed-kit.ts";
 
 const say = createLog("e2e-dike");
 
 export type DikeFixture = { campaignId: string; seatCount: 2; loadout: StoredLoadout; seed: number; intents: PlayerIntent[]; log: CampaignLog };
 export type DikeFixtureName = "dike-won" | "dike-lost";
 
-// The log of a playthrough whose first 2 parts were won: the log of the parts before The Weather Hills (scripts/e2e/the-weather-hills.ts), then the The Weather Hills golden's two-handed win, resolved onto it, their heroes and what hangs on them left out.
+// The log of a playthrough whose first 2 parts were won: the log of the parts before The Weather Hills (scripts/e2e/angmar-awakened/the-weather-hills.ts), then the The Weather Hills golden's two-handed win, resolved onto it, their heroes and what hangs on them left out.
 export async function hillsWonLog(): Promise<CampaignLog> {
   return wonLog({ title: "The Weather Hills", goldens: HILLS_GOLDENS, world: hillsWorld, play: playHills }, await chetwoodWonLog());
 }

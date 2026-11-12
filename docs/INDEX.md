@@ -111,7 +111,7 @@ Read the sections your task touches.
     - 624–641 The Caves of Nibin-Dûm (~2.4K)
   - 642–700 Dream-chaser (~16.2K) ← 4
   - 701–728 Ered Mithrin (~16.4K) ← 8
-  - 729–817 Angmar Awakened (~9.3K) ← 6
+  - 729–817 Angmar Awakened (~9.4K) ← 6
     - 752–786 Intruders in Chetwood (~3.5K)
     - 787–817 The Weather Hills (~3.9K)
   - 818–955 The Two Towers (~16.4K) ← 20

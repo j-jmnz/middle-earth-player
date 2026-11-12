@@ -2,7 +2,7 @@ appId: com.middleearth.lcg
 tags:
   - scenario
 ---
-# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `hills-lost` (scripts/e2e/the-weather-hills.ts): a real two-handed game of The Weather Hills (the Defenders of Gondor and Swords of the Noldor
+# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `hills-lost` (scripts/e2e/angmar-awakened/the-weather-hills.ts): a real two-handed game of The Weather Hills (the Defenders of Gondor and Swords of the Noldor
 # lists, Easy), played after Intruders in Chetwood's win and parked on its loss. A loss has no reward screen and writes nothing (the Resolution is for a win): the scenario stays the next part, Protect the Innocent keeps the damage the log noted, and Deadmen's Dike is not offered.
 # The steps are the shared subflow's (.maestro/subflows/scenario-loss.yaml).
 - runFlow:

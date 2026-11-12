@@ -1,4 +1,4 @@
-import type { Condition, Effect, Instruction, PickSpec } from "../../catalog/boundary.ts";
+import type { Condition, Effect, Instruction, PickSpec } from "../../../catalog/boundary.ts";
 
 // Records for The Weather Hills (Angmar Awakened part 2, campaign card 10159): the encounter cards no template reads, the two quest stages, Hunting the Orcs and Savage Counter-attack, the lines of the campaign card (the Setup) and of Mysterious Omens with its five boons.
 // Every line is read from the scan ledger (data/printed/angmar-awakened.json); a line a template already writes (pnpm data build) or another card prints word for word needs no record here. The Orc deck (mec108.orc-deck) is the pile `angmarOrcs`, the cards the
@@ -90,7 +90,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "09032:constant:1", cardCode: "09032", lines: ["09032:A:1"], timing: "constant", instructions: [{ verb: "Time", amount: 4 }] },
   { id: "09032:forced:1", cardCode: "09032", lines: ["09032:A:2"], timing: "forced", trigger: "lastTimeCounterRemoved", subject: "self", instructions: [EACH_PLAYER_DAMAGES(MY_HERO, 4), { verb: "PlaceResourceTokens", amount: 4, on: "self" }] },
 
-  // 09043 Angmar Orc, 09044 Angmar Marauder and 09045 Angmar Captain are Intruders in Chetwood's records (src/effects/authored/intruders-in-chetwood.ts).
+  // 09043 Angmar Orc, 09044 Angmar Marauder and 09045 Angmar Captain are Intruders in Chetwood's records (src/effects/authored/angmar-awakened/intruders-in-chetwood.ts).
 
   // 09052 Biting Wind. When Revealed: the first player assigns X damage among the characters committed to the quest, X the number committed. Shadow: 1 damage to the defending character.
   { id: "09052:whenRevealed:1", cardCode: "09052", lines: ["09052:A:1"], timing: "whenRevealed", instructions: [{ verb: "AssignDamage", amount: { count: COMMITTED }, pick: COMMITTED }] },
