@@ -22,12 +22,14 @@ export function NextStop({ id, line, onNext, onPath, onLog }: { id: string; line
   if (next.kind === "finished") return null;
   // A scenario the app cannot deal yet has no Resume: the stop says it is coming soon and the path and log stay.
   const soon = next.kind === "soon";
+  // The eyebrow says what a tap does where it is not the plain "next": a scenario coming soon, or an open one that asks to be continued or restarted.
+  const eyebrow = soon || (next.kind === "resume" && next.needsChoice === true);
   const go = soon ? null : <PrimaryButton label="Resume" testID="continue" accessibilityLabel={`Resume ${next.node.name}, ${describe(line)}`} onPress={onNext} />;
   return (
     <View testID={`save-${id}`} style={{ gap: 14 * s }}>
       <View testID="continue-next" accessible accessibilityRole="header" accessibilityLabel={nextSummary(next)}>
-        {soon ? <Eyebrow tone="accent">{nextLabel(next, line.path)}</Eyebrow> : null}
-        <Text className={`${soon ? "mt-1 " : ""}font-display text-bone`} style={{ fontSize: 24 * s, lineHeight: 28 * s }}>
+        {eyebrow ? <Eyebrow tone="accent">{nextLabel(next, line.path)}</Eyebrow> : null}
+        <Text className={`${eyebrow ? "mt-1 " : ""}font-display text-bone`} style={{ fontSize: 24 * s, lineHeight: 28 * s }}>
           {next.node.name}
         </Text>
       </View>

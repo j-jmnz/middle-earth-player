@@ -1,4 +1,5 @@
 import { sourceUrl } from "./sideload-source.ts";
+import { joinNames } from "./reach.ts";
 import type { Change, CommitType } from "./version.ts";
 
 // The release notes, written from the commits since the last release (.claude/rules/release-standards.md, Release notes).
@@ -12,8 +13,8 @@ export type NotesInput = {
   repository: string;
   catalogVersion: number;
   engineVersion: number;
-  /** The engine version at the previous release; a different one drops an open scenario on update. */
-  previousEngineVersion: number | undefined;
+  /** The scenarios whose open games the update can reach (reach.ts), by the names players read; undefined on the first release. */
+  reach: { all: boolean; names: readonly string[] } | undefined;
   apk?: { name: string; sha256: string; certificateSha256: string | undefined };
   ipa?: { name: string; sha256: string };
   /** The TestFlight public link (the repository variable TESTFLIGHT_URL), set only while the optional TestFlight channel runs. */
@@ -31,9 +32,8 @@ const SECTIONS: readonly { type: CommitType; title: string }[] = [
 export function renderNotes(input: NotesInput): string {
   const out: string[] = [];
   const warnings = input.changes.flatMap((change) => change.breaking);
-  if (input.previousTag && input.previousEngineVersion !== undefined && input.previousEngineVersion !== input.engineVersion) {
-    warnings.push("A scenario left open in an earlier release is dropped when this one opens; the campaign log is kept.");
-  }
+  if (input.previousTag && input.reach?.all) warnings.push("Open games of any scenario may ask you to continue or restart; the campaign log is kept.");
+  else if (input.previousTag && input.reach && input.reach.names.length > 0) warnings.push(`Open games of ${joinNames(input.reach.names)} may ask you to continue or restart; the campaign log is kept.`);
   if (!input.previousTag) out.push("The first release.", "");
   if (warnings.length > 0) out.push("## Before you update", "", ...warnings.map((line) => `- ${line}`), "");
   for (const { type, title } of SECTIONS) {

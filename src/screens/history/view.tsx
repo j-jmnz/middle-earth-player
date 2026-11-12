@@ -9,7 +9,7 @@ import { useCallback, useState, type ReactNode } from "react";
 import { View } from "react-native";
 
 import type { RunKind, RunRecord } from "../../campaign/runs";
-import { standaloneStatus, type ListedStandalone } from "../../campaign/standalone";
+import { isOpenStatus, standaloneStatus, type ListedStandalone } from "../../campaign/standalone";
 import { scenarioName } from "../data/campaign-data";
 import { archiveSave, deleteSave, restoreSave } from "../data/campaign-store";
 import { BodyText, NavBar, PillButton, Screen, Section, Segmented } from "../kit/chrome";
@@ -94,7 +94,7 @@ export function HistoryView({ initial }: { initial: RunKind }) {
     runs,
     folded: (section) => folds.folded(foldId(section), true),
     finished: (ref) => ref.line.next.kind === "finished",
-    playing: (game) => standaloneStatus(game) === "playing",
+    playing: (game) => isOpenStatus(standaloneStatus(game)),
   });
   const anyRef = kind === "campaign" ? library.saves.length + library.archivedSaves.length > 0 : library.games.length + library.archivedGames.length > 0;
 

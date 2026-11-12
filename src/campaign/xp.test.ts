@@ -161,7 +161,7 @@ describe("picking and marking boxes", () => {
     const save = { ...newSave("s", "dream-chaser", 1), log };
     const spent = spendOnSave(save, { [COMMAND_LEADERSHIP]: 1 });
     expect(spent.ok && spent.save.log.marks).toEqual({ [COMMAND_LEADERSHIP]: 1 });
-    const open = { ...save, active: { engineVersion: 1, dataHash: 1, seed: 1, intents: [] } };
+    const open = { ...save, active: { engineVersion: 1, dataHash: 1, world: null, seed: 1, intents: [] } };
     expect(spendOnSave(open, { [COMMAND_LEADERSHIP]: 1 })).toEqual({ ok: false, reason: "XP is spent only before or after a scenario" });
   });
 });

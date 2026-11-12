@@ -4,6 +4,7 @@ import { and, eq, inArray } from "drizzle-orm";
 import type { BaseSQLiteDatabase } from "drizzle-orm/sqlite-core";
 
 import { collectionVerbs, type Effect } from "../catalog/boundary.ts";
+import { contentVersion } from "../catalog/content-hash.ts";
 import type { DeckSaveCard } from "../catalog/deck-save.ts";
 import { cards } from "../catalog/schema.ts";
 import { campaignGameCodes, recordInstructions, scenarioCards, type CampaignData, type ScenarioData } from "../catalog/scenario-data.ts";
@@ -26,6 +27,28 @@ export type World = {
   // How many copies of each card one collection holds (the catalog's quantity), which caps the encounter cards the Campaign Pool tallies (emce.campaign-pool-encounter).
   copies?: ReadonlyMap<string, number>;
 };
+
+const sortedEntries = <V>(map: ReadonlyMap<string, V> | undefined): [string, V][] => (map ? [...map].sort(([a], [b]) => (a < b ? -1 : a > b ? 1 : 0)) : []);
+
+// The last hash computed for a world: its key (the codes it covered) and the number. A world is hashed for one set of codes in practice (the game's).
+const HASHES = new WeakMap<World, { key: string; hash: number }>();
+
+// What a replay of a game reads, as a number: the printed rows of the codes the game can reach (gameCodes: the scenario's, plus `extra`, the
+// codes of the loadout and the log, which is what the table's open loads and what a deal stamps), the scenario and the campaign data, and the effect
+// records of those codes. A save stamps it (ActiveScenario.world) and the table compares it on open, so a card, a scenario or a record that is not in
+// this game never moves it, and a world loaded for a briefing (every saved deck) gives the number the table's world gives. The codes are sorted, so it does
+// not depend on the order a Map was filled in. Computed once for a world and a set of codes.
+export function worldHash(world: World, extra: Iterable<string> = []): number {
+  const codes = new Set(gameCodes(world.campaign, world.scenario, world.effects, extra));
+  const key = [...codes].sort().join("\0");
+  const known = HASHES.get(world);
+  if (known?.key === key) return known.hash;
+  const within = <V>(map: ReadonlyMap<string, V> | undefined) => sortedEntries(map).filter(([code]) => codes.has(code));
+  const effects = world.effects.filter((effect) => codes.has(effect.cardCode));
+  const hash = contentVersion([world.campaign, world.scenario, within(world.cards), within(world.sets), within(world.deckFacts), within(world.copies), effects]);
+  HASHES.set(world, { key, hash });
+  return hash;
+}
 
 function instructionCodes(effects: readonly Effect[], card: string): string[] {
   const codes: string[] = [];
@@ -66,6 +89,19 @@ export function worldCodes(campaign: CampaignData, scenario: ScenarioData, effec
 // The codes a log names: its heroes, its fallen heroes, the cards of its pool and the cards it takes in from another campaign.
 export function logCodes(log: CampaignLog): string[] {
   return [...log.heroesBySeat.flat(), ...log.fallenHeroesBySeat.flat(), ...log.campaignPool.map((card) => card.code), ...log.carryIn.map((card) => card.code), ...log.campaignPool.flatMap((card) => (card.attachedTo ? [card.attachedTo] : [])), ...log.treasures, ...Object.keys(log.encounterPool), ...Object.keys(log.blackGate)];
+}
+
+// The codes of a deal's loadout: the Ring-bearer and the heroes and cards of each seat's deck. Shared by what the table opens with (a save's
+// log adds its own) and what a deal stamps, so both hash the same cards (worldHash).
+export function dealtCodes(loadout: { ringBearer: string | null; seats: readonly { heroes: readonly string[]; deck: readonly string[] }[] } | null): string[] {
+  if (!loadout) return [];
+  return [...(loadout.ringBearer ? [loadout.ringBearer] : []), ...loadout.seats.flatMap((seat) => [...seat.heroes, ...seat.deck])];
+}
+
+// Every code a game can reach, which loadWorld loads and worldHash hashes: worldCodes, `extra`, and the cards its records take from the collection by code.
+export function gameCodes(campaign: CampaignData, scenario: ScenarioData, effects: readonly Effect[], extra: Iterable<string> = []): string[] {
+  const dealt = worldCodes(campaign, scenario, effects, extra);
+  return [...new Set([...dealt, ...collectionTaken(effects, new Set(dealt))])];
 }
 
 export function worldFrom(campaign: CampaignData, scenario: ScenarioData, effects: readonly Effect[], rows: readonly CatalogRow[]): World {
@@ -144,8 +180,7 @@ export function loadWorld<TRun>(
   effects: readonly Effect[],
   extra: Iterable<string> = [],
 ): World {
-  const dealt = worldCodes(campaign, scenario, effects, extra);
-  const codes = [...new Set([...dealt, ...collectionTaken(effects, new Set(dealt))])];
+  const codes = gameCodes(campaign, scenario, effects, extra);
   const rows = catalog.select().from(cards).where(inArray(cards.code, codes)).all();
   // A record that draws a random treasure (AttachRandomTreasure, emce.treasure) needs every treasure of the catalog: the draw is from the ones the log has not recorded.
   const treasures = namesTreasures(effects, new Set(codes)) ? catalog.select().from(cards).where(eq(cards.campaignKind, "treasure")).all() : [];

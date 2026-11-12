@@ -1,7 +1,7 @@
 // The chrome's frame (docs/design-system.md, Components): the page and its scrolling body, the top bar, rows, panels, stat tiles,
 // the pinned action bar, the paper sheet and the outcome word. Re-exported by chrome.tsx.
 import { useContext, useRef, type ComponentRef, type ReactNode, type RefObject } from "react";
-import { Pressable, ScrollView, View, type ViewProps } from "react-native";
+import { Pressable, ScrollView, View, type DimensionValue, type ViewProps } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { vars } from "nativewind";
 
@@ -358,15 +358,18 @@ export function ActionBar({ children, safe = true, testID, align = "auto" }: { c
   );
 }
 
-/** Parchment sheet over the rail or a list, on the table sheets' frame. Repeats the step in an eyebrow. */
-export function PaperSheet({ step, title, children }: { step?: string; title: string; children: ReactNode }) {
+/**
+ * Parchment sheet over the rail or a list, on the table sheets' frame. Repeats the step in an eyebrow. With a `footer` the sheet is capped at
+ * `maxHeight`: the header and the children scroll and the footer stays pinned under them, so its buttons are never below the screen (a phone on its side).
+ */
+export function PaperSheet({ step, title, children, footer, maxHeight }: { step?: string; title: string; children: ReactNode; footer?: ReactNode; maxHeight?: DimensionValue }) {
   // A sheet floating centred (SheetModal outside compact) is not pulled down from its top edge, so it has no grabber.
   const floating = useContext(SheetCornersContext) === "all";
   // The title is a header, and a screen reader's focus lands on it when the sheet opens or its title changes (docs/design-system.md, Screen reader).
   const titleRef = useRef<ComponentRef<typeof View>>(null);
   useOpenFocus(titleRef, title);
-  return (
-    <SheetFrame animated={false}>
+  const head = (
+    <>
       {floating ? null : <View className="mb-4 h-1 w-10 self-center rounded-control bg-inkLine" />}
       <View className="items-center">
         {step ? <Eyebrow tone="inkLabel">{step}</Eyebrow> : null}
@@ -375,6 +378,15 @@ export function PaperSheet({ step, title, children }: { step?: string; title: st
         </Text>
       </View>
       <View className="mt-5">{children}</View>
+    </>
+  );
+  if (footer == null) return <SheetFrame animated={false}>{head}</SheetFrame>;
+  return (
+    <SheetFrame animated={false} {...(maxHeight != null ? { maxHeight } : {})}>
+      <ScrollView style={{ flexShrink: 1 }} showsVerticalScrollIndicator={false}>
+        {head}
+      </ScrollView>
+      {footer}
     </SheetFrame>
   );
 }

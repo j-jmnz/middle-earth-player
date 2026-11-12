@@ -43,6 +43,11 @@ export const saves = sqliteTable("saves", {
   // When the save was last written (ms since the epoch): a deal, an intent, a resolution, the notes. The campaign list puts
   // the one written last first, as Current. Archive and Restore do not write it. Rows from before 0003 read null.
   updatedAt: integer("updated_at"),
+  // The table of the open scenario as a checkpoint ({ stateVersion, intentCount, seed, state }, src/campaign/checkpoint.ts): the state without its Undo log,
+  // written at each phase boundary and when the play clock pauses, never per intent. Null until the game reaches one. Continue rebases onto it when the rules changed.
+  checkpoint: text("checkpoint", { mode: "json" }).$type<StoredJson | null>(),
+  // The state a rebased open scenario replays from ({ stateVersion, state }, ActiveScenario.from), kept apart from `activeScenario` so the per-intent write stays small. Null for a game that replays from its seed.
+  rebase: text("rebase", { mode: "json" }).$type<StoredJson | null>(),
 });
 
 // One row per standalone game: one deal of one scenario, outside any campaign (src/campaign/standalone.ts). No log and no
@@ -60,6 +65,9 @@ export const standaloneGames = sqliteTable("standalone_games", {
   createdAt: integer("created_at").notNull(),
   // When the player put it away. An archived game keeps everything and comes back as it was on restore.
   archivedAt: integer("archived_at"),
+  // The open game's checkpoint and rebase, as saves.checkpoint and saves.rebase.
+  checkpoint: text("checkpoint", { mode: "json" }).$type<StoredJson | null>(),
+  rebase: text("rebase", { mode: "json" }).$type<StoredJson | null>(),
 });
 
 // One row per stored booklet PDF. `path` is relative to the document directory (booklets/<id>.pdf), so the row survives
@@ -116,6 +124,8 @@ export const runs = sqliteTable("runs", {
   activeMs: integer("active_ms"),
   engineVersion: integer("engine_version"),
   backfilled: integer("backfilled", { mode: "boolean" }).notNull().default(false),
+  // The game was rebased onto a checkpoint at some point: it was finished across an update that changed the rules (History marks it).
+  rebased: integer("rebased", { mode: "boolean" }).notNull().default(false),
 });
 
 export const meta = sqliteTable(

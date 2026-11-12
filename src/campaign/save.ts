@@ -68,8 +68,13 @@ export const campaignLogSchema = z.strictObject({
 export const activeScenarioSchema = z.strictObject({
   engineVersion: z.number().int(),
   dataHash: z.number(),
+  // The worldHash of what the game reads (world.ts), stamped when it is dealt. A game saved before it existed reads as null.
+  world: z.number().nullable().default(null),
   seed: z.number().int(),
   intents: z.array(z.looseObject({ type: z.string() })),
+  // The tableDigest after each intent (digest.ts); absent on a save written before it, and a list of another length reads as none.
+  checks: z.array(z.number().int()).optional(),
+  continued: z.literal(true).optional(),
   startedAt: z.number().optional(),
   activeMs: z.number().optional(),
 });

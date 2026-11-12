@@ -126,7 +126,7 @@ export function fixtureSave(name: FixtureName, id: string, dataHash: number): Sa
     campaignId: found.campaignId,
     seatCount: found.seatCount,
     log: found.log,
-    active: { engineVersion: ENGINE_VERSION, dataHash, seed: found.seed, intents: [...found.intents] },
+    active: { engineVersion: ENGINE_VERSION, dataHash, world: null, seed: found.seed, intents: [...found.intents] },
     loadout: found.loadout,
   };
 }

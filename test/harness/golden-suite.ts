@@ -2,6 +2,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { applyResolution, emptyLog, type CampaignLog } from "../../src/campaign/log.ts";
 import { campaignPath, nextStep, type PathNode } from "../../src/campaign/path.ts";
+import { tableDigest } from "../../src/campaign/digest.ts";
 import { beginActive, recordIntent, replay } from "../../src/campaign/replay.ts";
 import { xpAwarded } from "../../src/campaign/xp.ts";
 import type { CampaignData, ScenarioData } from "../../src/catalog/scenario-data.ts";
@@ -84,6 +85,16 @@ export function logBefore(campaign: CampaignData, scenario: ScenarioData, seatCo
   return { ...emptyLog(seatCount), completed: campaign.scenarios.slice(0, campaign.scenarios.indexOf(scenario.id)) };
 }
 
+/** The digest of the table after each intent of a played game: the ones the player collected, or, for a game built by hand that did not, a replay of its intents. */
+export function checksOf(game: Pick<PlayedGame, "kept" | "intents" | "checks">, ctx: ReduceContext): number[] {
+  if (game.checks) return game.checks;
+  let state = game.kept;
+  return game.intents.map((intent) => {
+    state = expectOk(reduce(state, intent, ctx)).state;
+    return tableDigest(state);
+  });
+}
+
 export function goldenSuite<G extends SuiteGolden<D>, D extends string, P extends PlayedGame = PlayedGame>(spec: GoldenSuiteSpec<G, D, P>): void {
   const worlds = new Map<D, SuiteWorld>();
   const games = new Map<string, P>();
@@ -117,7 +128,8 @@ export function goldenSuite<G extends SuiteGolden<D>, D extends string, P extend
     it("plays the same intents to the same state on fixed seeds", async () => {
       const out = spec.goldens.map((golden) => {
         const played = games.get(golden.name);
-        return { ...golden, intents: played?.intents, state: played?.state };
+        // The checks are the digest of the table after each intent (src/campaign/digest.ts): they move only when a change reaches this scenario's games.
+        return { ...golden, intents: played?.intents, state: played?.state, checks: played ? checksOf(played, worlds.get(golden.decks)!.ctx) : undefined };
       });
       await expect(JSON.stringify(out)).toMatchFileSnapshot(spec.file);
       // A later part reads these states back from golden.json in place of playing the games again (test/harness/golden-state.ts).

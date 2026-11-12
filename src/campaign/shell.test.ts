@@ -175,7 +175,7 @@ describe("scenario facts", () => {
 });
 
 function dealt(world: World = past, save: Save = newSave("save-1", campaign.id, 1)): Save {
-  const result = deal(save, world, loadoutOf(), SEED, CATALOG_VERSION);
+  const result = deal(save, world, loadoutOf(), SEED);
   if (!result.ok) throw new Error(result.briefing.problems.map((problem) => problem.message).join(" "));
   return result.save;
 }
@@ -187,7 +187,7 @@ function opened(name: FixtureName): { save: Save; world: World; state: ScenarioS
   const loadout = withLog.loadout;
   const codes = [...(loadout?.ringBearer ? [loadout.ringBearer] : []), ...(loadout?.seats.flatMap((seat) => [...seat.heroes, ...seat.deck]) ?? [])];
   const world = loadWorld(catalog, campaign, loadScenario("a-shadow-of-the-past"), EFFECTS, [...codes, ...logCodes(withLog.log)]);
-  const resumed = resume(withLog, world, CATALOG_VERSION);
+  const resumed = resume(withLog, world);
   if (!resumed.ok) throw new Error(resumed.reason);
   return { save: withLog, world, state: resumed.state };
 }
@@ -217,8 +217,8 @@ describe("a save across a relaunch", () => {
     const first = dealt();
     const stored = JSON.parse(JSON.stringify(first)) as Save;
     const again: Save = { ...stored, log: parseLog(stored.log), active: parseActive(stored.active), loadout: parseLoadout(stored.loadout) };
-    const a = resume(first, past, CATALOG_VERSION);
-    const b = resume(again, past, CATALOG_VERSION);
+    const a = resume(first, past);
+    const b = resume(again, past);
     expect(a.ok && b.ok).toBe(true);
     if (a.ok && b.ok) expect(JSON.stringify(b.state)).toBe(JSON.stringify(a.state));
   });
@@ -226,23 +226,24 @@ describe("a save across a relaunch", () => {
   it("drops the open scenario when the engine version differs and keeps the log and the loadout decks", () => {
     const first = dealt();
     const old: Save = { ...first, log: { ...first.log, notes: "kept" }, active: first.active ? { ...first.active, engineVersion: ENGINE_VERSION - 1 } : null };
-    expect(resume(old, past, CATALOG_VERSION)).toEqual({ ok: false, reason: "engineVersion" });
+    expect(resume(old, past)).toEqual({ ok: false, reason: "engineVersion" });
     const after = drop(old);
     expect(after.active).toBeNull();
     expect(after.log.notes).toBe("kept");
   });
 
   it("drops the open scenario when the data hash differs", () => {
-    expect(resume(dealt(), past, CATALOG_VERSION + 1)).toEqual({ ok: false, reason: "dataHash" });
+    const first = dealt();
+    expect(resume({ ...first, active: first.active && { ...first.active, world: (first.active.world ?? 0) + 1 } }, past)).toEqual({ ok: false, reason: "dataHash" });
   });
 
   it("takes back the last intent: the save then replays to the state before it", () => {
     const first = dealt();
-    const before = resume(first, past, CATALOG_VERSION);
+    const before = resume(first, past);
     const kept = record(first, { type: "Keep" });
-    const after = resume(kept, past, CATALOG_VERSION);
+    const after = resume(kept, past);
     const back = unrecord(kept);
-    const again = resume(back, past, CATALOG_VERSION);
+    const again = resume(back, past);
     expect(before.ok && after.ok && again.ok).toBe(true);
     expect(back.active?.intents).toEqual(first.active?.intents);
     if (before.ok && after.ok && again.ok) {
@@ -253,7 +254,7 @@ describe("a save across a relaunch", () => {
 
   it("drops it when the reducer refuses a stored intent", () => {
     const bad = record(dealt(), { type: "Travel", locationId: "nowhere" } as PlayerIntent);
-    expect(resume(bad, past, CATALOG_VERSION)).toEqual({ ok: false, reason: "intent" });
+    expect(resume(bad, past)).toEqual({ ok: false, reason: "intent" });
   });
 });
 
@@ -295,7 +296,7 @@ describe("a win and a loss", () => {
   it.skipIf(!WON)("a relaunch in the middle of the Resolution replays to the same choices", () => {
     const first = opened("won");
     const stored = JSON.parse(JSON.stringify(first.save)) as Save;
-    const again = resume({ ...stored, log: parseLog(stored.log), active: parseActive(stored.active), loadout: parseLoadout(stored.loadout) }, first.world, CATALOG_VERSION);
+    const again = resume({ ...stored, log: parseLog(stored.log), active: parseActive(stored.active), loadout: parseLoadout(stored.loadout) }, first.world);
     if (!again.ok) throw new Error(again.reason);
     const view = resolutionView(again.state, first.world);
     expect(view).toEqual(resolutionView(first.state, first.world));

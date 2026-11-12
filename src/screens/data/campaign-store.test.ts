@@ -5,7 +5,8 @@ import { describe, expect, it } from "vitest";
 
 import migrations from "../../../drizzle/migrations";
 import { emptyLog } from "../../campaign/log";
-import { newSave } from "../../campaign/save";
+import { newSave, type Save } from "../../campaign/save";
+import { CATALOG_VERSION } from "../../catalog/version";
 import { ENGINE_VERSION } from "../../campaign/replay";
 import { drop } from "../../campaign/session";
 import { archiveSave, createSave, deleteSave, listArchivedSaves, listSaves, readBooklet, restoreSave, readSave, readSaveChecked, writeActive, writeBooklet, writeLastPage, writeSave } from "./campaign-store";
@@ -37,7 +38,7 @@ describe("campaign store", () => {
     const save = {
       ...newSave("save-w", "fellowship-of-the-ring", 1),
       log: { ...emptyLog(1), notes: "kept" },
-      active: { engineVersion: ENGINE_VERSION, dataHash: 7, seed: 3, intents: [{ type: "Keep" as const }] },
+      active: { engineVersion: ENGINE_VERSION, dataHash: 7, world: null, seed: 3, intents: [{ type: "Keep" as const }] },
       loadout: { scenarioId: "a-knife-in-the-dark", difficulty: "Easy" as const, seats: [{ deckId: "d", heroes: ["141002"], deck: ["01040"] }], ringBearer: "141001", choices: [], acceptPenalty: false },
     };
     writeSave(user, save, 1000);
@@ -58,11 +59,25 @@ describe("campaign store", () => {
     const user = openUser();
     const save = {
       ...newSave("save-l1", "fellowship-of-the-ring", 1),
-      active: { engineVersion: ENGINE_VERSION, dataHash: 7, seed: 3, intents: [{ type: "Keep" as const }] },
+      active: { engineVersion: ENGINE_VERSION, dataHash: 7, world: null, seed: 3, intents: [{ type: "Keep" as const }] },
       loadout: { scenarioId: "a-knife-in-the-dark", difficulty: "Easy" as const, seats: [{ deckId: "d", heroes: ["141002"], deck: ["01040"] }], ringBearer: "141001", choices: [], acceptPenalty: false },
     };
     writeSave(user, save);
-    expect(listSaves(user)).toEqual([{ id: "save-l1", campaignId: save.campaignId, seatCount: 1, log: save.log, loadout: save.loadout, active: true }]);
+    // Another data hash with no digests to compare: opening it will ask for a choice, which the list says without a world.
+    expect(listSaves(user)).toEqual([{ id: "save-l1", campaignId: save.campaignId, seatCount: 1, log: save.log, loadout: save.loadout, active: true, needsChoice: true }]);
+  });
+
+  it("a list row marks only a scenario that will ask for a choice: not a current one, nor another version with a digest for every move", () => {
+    const user = openUser();
+    const loadout = { scenarioId: "a-knife-in-the-dark", difficulty: "Easy" as const, seats: [{ deckId: "d", heroes: ["141002"], deck: ["01040"] }], ringBearer: "141001", choices: [], acceptPenalty: false };
+    const open = (id: string, active: NonNullable<Save["active"]>) => writeSave(user, { ...newSave(id, "fellowship-of-the-ring", 1), active, loadout });
+    const keep = { type: "Keep" as const };
+    open("current", { engineVersion: ENGINE_VERSION, dataHash: CATALOG_VERSION, world: 5, seed: 3, intents: [keep] });
+    open("checked", { engineVersion: ENGINE_VERSION - 1, dataHash: CATALOG_VERSION, world: 5, seed: 3, intents: [keep], checks: [1] });
+    open("unchecked", { engineVersion: ENGINE_VERSION - 1, dataHash: CATALOG_VERSION, world: 5, seed: 3, intents: [keep] });
+    open("fresh", { engineVersion: ENGINE_VERSION - 1, dataHash: CATALOG_VERSION, world: 5, seed: 3, intents: [] });
+    const marked = new Map(listSaves(user).map((row) => [row.id, row.needsChoice === true]));
+    expect(Object.fromEntries(marked)).toEqual({ current: false, checked: false, unchecked: true, fresh: true });
   });
 
   it("a new playthrough stores the carry-over it took in, and an older stored log reads with the facts' defaults", () => {
@@ -81,7 +96,7 @@ describe("campaign store", () => {
     const save = {
       ...newSave("save-a", "fellowship-of-the-ring", 1),
       log: { ...emptyLog(1), notes: "Frodo's burden", completed: ["a-shadow-of-the-past"], earned: { "a-shadow-of-the-past": ["141078"] } },
-      active: { engineVersion: ENGINE_VERSION, dataHash: 7, seed: 3, intents: [{ type: "Keep" as const }, { type: "Pass" as const }] },
+      active: { engineVersion: ENGINE_VERSION, dataHash: 7, world: null, seed: 3, intents: [{ type: "Keep" as const }, { type: "Pass" as const }] },
       loadout: { scenarioId: "a-knife-in-the-dark", difficulty: "Easy" as const, seats: [{ deckId: "d", heroes: ["141002"], deck: ["01040"] }], ringBearer: "141001", choices: [], acceptPenalty: false },
     };
     writeSave(user, save);
@@ -111,7 +126,7 @@ describe("campaign store", () => {
 
   it("a dropped scenario written back leaves the log, and no deck or image row is touched", () => {
     const user = openUser();
-    const active = { engineVersion: ENGINE_VERSION - 1, dataHash: 1, seed: 1, intents: [] };
+    const active = { engineVersion: ENGINE_VERSION - 1, dataHash: 1, world: null, seed: 1, intents: [] };
     const loadout = { scenarioId: "a-shadow-of-the-past", difficulty: "Normal" as const, seats: [], ringBearer: null, choices: [], acceptPenalty: false };
     const save = { ...newSave("save-c", "fellowship-of-the-ring", 1), log: { ...emptyLog(1), notes: "kept" }, active, loadout };
     writeSave(user, save);
@@ -121,7 +136,7 @@ describe("campaign store", () => {
 
   it("archives a save out of the open list and restores it whole, and a later write keeps it archived", () => {
     const user = openUser();
-    const active = { engineVersion: ENGINE_VERSION, dataHash: 7, seed: 3, intents: [{ type: "Keep" as const }] };
+    const active = { engineVersion: ENGINE_VERSION, dataHash: 7, world: null, seed: 3, intents: [{ type: "Keep" as const }] };
     const loadout = { scenarioId: "a-shadow-of-the-past", difficulty: "Normal" as const, seats: [], ringBearer: null, choices: [], acceptPenalty: false };
     const kept = { ...newSave("save-d", "fellowship-of-the-ring", 1), log: { ...emptyLog(1), notes: "kept" }, active, loadout };
     const other = createSave(user, "fellowship-of-the-ring", 2, { now: 2000 });

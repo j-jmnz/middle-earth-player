@@ -4,6 +4,7 @@ import { campaignPath, nextStep, soonWords, type NextStep, type PathNode } from 
 import { campaignOf, scenarioNames } from "../data/campaign-data";
 import type { ListedSave } from "../data/campaign-store";
 import { seatWord } from "../data/seats";
+import { STALE_STEP } from "../session/stale-words";
 
 // One save as the list words it: campaign, seats and progress. Two playthroughs of one campaign differ only here, so every
 // control on a save names it with this line.
@@ -19,7 +20,7 @@ export function saveLine(save: ListedSave, name: string): SaveLine {
     seats: seatWord(save.seatCount),
     done: path.filter((node) => node.status === "completed").length,
     total: campaign?.scenarios.length ?? 0,
-    next: nextStep(path, save.loadout?.scenarioId),
+    next: nextStep(path, save.loadout?.scenarioId, save.needsChoice === true),
     path,
   };
 }
@@ -38,10 +39,16 @@ export function describe(line: SaveLine): string {
   return `${line.name}, ${line.seats}, ${line.done} of ${line.total} completed`;
 }
 
-/** "Next: A Knife in the Dark", "On the table: ...", "The Drowned Ruins is coming soon" or "Campaign won": the next step in one phrase (a row, a folded header). */
+/** The word before the name of a next stop: "Needs a choice" for an open scenario that asks to be continued or restarted, "On the table" for another open one, "Next" for one not dealt. */
+export function nextWord(next: Exclude<NextStep, { kind: "finished" }>): string {
+  if (next.kind !== "resume") return "Next";
+  return next.needsChoice ? STALE_STEP : "On the table";
+}
+
+/** "Next: A Knife in the Dark", "On the table: ...", "Needs a choice: ...", "The Drowned Ruins is coming soon" or "Campaign won": the next step in one phrase (a row, a folded header). */
 export function nextSummary(next: NextStep): string {
   if (next.kind === "soon") return soonWords(next.node);
-  return next.kind === "finished" ? "Campaign won" : `${next.kind === "resume" ? "On the table" : "Next"}: ${next.node.name}`;
+  return next.kind === "finished" ? "Campaign won" : `${nextWord(next)}: ${next.node.name}`;
 }
 
 /** What Delete asks, naming the playthrough by `describe`, since two of one campaign differ only there. */
