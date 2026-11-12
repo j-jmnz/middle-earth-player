@@ -177,7 +177,8 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
   return {
     heroesBySeat,
     fallenHeroesBySeat,
-    threatPenalty: log.threatPenalty,
+    // A reduction the game marked (Fend Off Despair, 10173:A:2) is added to the one starting threat modifier, cumulative with the earlier ones.
+    threatPenalty: log.threatPenalty + (result.startingThreat ?? 0),
     campaignPool: pool,
     captives: [...log.captives, ...result.captives],
     completed: [...log.completed, scenarioId],
@@ -211,7 +212,7 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
     campaignEnd: result.campaignEnd ?? log.campaignEnd,
     protectDamage: result.damageNotes?.protect ?? log.protectDamage,
     heroDamage: result.damageNotes?.heroes ?? log.heroDamage,
-    determined: log.determined,
+    determined: [...new Set([...log.determined, ...(result.determined ?? [])])],
     stolenCards: log.stolenCards,
   };
 }

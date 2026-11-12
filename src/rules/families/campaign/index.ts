@@ -63,6 +63,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "RecordTokens":
     case "RecordDamageOn":
     case "RecordHeroDamage":
+    case "RecordDetermined":
     case "RemoveFromPoolByCode":
     case "LoseGuardedBoons":
     case "IgnoreDiscardedHeroes":

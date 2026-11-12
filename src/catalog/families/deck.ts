@@ -69,6 +69,9 @@ const VERBS = [
   // The next event with the Doomed keyword the actor plays before `until` raises each player's threat by `amount` less
   // (not below 0): "Reduce the X value of the next Doomed X event you play this phase by 2".
   z.strictObject({ verb: z.literal("ReduceNextDoomed"), amount: z.number().int().positive(), until: z.enum(["endOfPhase", "endOfRound"]), ...when }),
+  // A constant: each card that matches the pick gains Doomed `amount`, on top of any Doomed X it prints ("Each event card gains doomed 1", 10173:A:1; rr.keywords, rr.doomed-x): a player who plays it raises each player's threat by the sum.
+  // Read when the card is played (rules/player/planning.ts); it does nothing when a record runs it.
+  z.strictObject({ verb: z.literal("GainsDoomed"), amount: z.number().int().positive(), pick: pickSchema }),
   // Setup: the actor keeps their opening hand and takes no mulligan; the next player decides ("instead of taking a mulligan").
   z.strictObject({ verb: z.literal("KeepOpeningHand"), ...when }),
   // Read by the play of the card, never run: in a Response to `paying` on the card itself, its player may pay this much less of

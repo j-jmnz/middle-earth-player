@@ -18,6 +18,7 @@ import { playElsewhere, playTargets } from "../families/attachments/play.ts";
 import { payerOk } from "../families/costs/pay.ts";
 import { exhaustSlack, extraCostReason } from "../families/costs/play.ts";
 import { alternativeActions, eventLimitReason, noteEventLimits, payingSlack, searchOrLaterPick } from "../families/deck/play.ts";
+import { gainedDoomed } from "../families/deck/gains-doomed.ts";
 import { doomedRaise } from "../families/deck/rules.ts";
 import { chosenX } from "../families/misc/cost.ts";
 import { playBlocked } from "../families/sidequests/contract.ts";
@@ -71,7 +72,7 @@ export function playCard(
   next = { ...next, played: [...(next.played ?? []).filter((entry) => entry.round === next.round), { id: intent.cardId, code: instance.code, seat, round: next.round, ...(next.phase === "Planning" ? {} : { phase: next.phase }) }] };
   // Doomed X: each player raises their threat by X when the card is played (rr.doomed-x), less a reduction the seat holds for
   // its next Doomed event (families/deck/rules.ts).
-  const doomed = doomedRaise(next, seat, printed);
+  const doomed = doomedRaise(next, seat, printed, gainedDoomed(next, intent.cardId, seat, ctx));
   next = doomed.state;
   if (doomed.amount > 0) {
     for (const index of livingSeats(next)) next = raiseThreat(next, index, doomed.amount, steps, ruleCause("rr.doomed-x"));

@@ -9,6 +9,7 @@ import { constantInstructions } from "../../interpret/constant-records.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
 import { printedOf, type PrintedCard } from "../../core/printed.ts";
+import { checkCostPerDamaged } from "../angmar/check-cost.ts";
 import { engagementCostOf } from "../../quest/quest.ts";
 import type { CardInstance, ScenarioState } from "../../core/state.ts";
 import { modifierActive } from "../../core/state.ts";
@@ -45,5 +46,6 @@ export function checkCost(state: ScenarioState, instance: CardInstance, seat: nu
     if (modifier.stat !== "engagementCheckCost" || modifier.instanceId !== instance.id || !modifierActive(state, modifier)) continue;
     if (state.cards[modifier.sourceId]?.controller === seat) extra += modifier.amount;
   }
-  return cost + extra;
+  // The cost an encounter enemy holds per damaged character of the checking seat (Hunting Pack, families/angmar/check-cost.ts), never below 0.
+  return Math.max(0, cost + extra + checkCostPerDamaged(state, instance, seat, cards));
 }

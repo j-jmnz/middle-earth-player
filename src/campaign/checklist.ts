@@ -352,7 +352,7 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
   const threatPenalty = log.threatPenalty + added + forcedPenalty;
   note(3, [...(changed === 0 ? ["No hero was changed."] : waived ? [`${changed} hero change(s) cost nothing: the campaign card waives the +1 penalty.`] : [`${changed} hero change(s) add ${changed} to the threat penalty.`]), ...(forcedPenalty > 0 ? ["Aragorn leaves the list of fallen heroes: each player takes a permanent +1 threat penalty (mec112.campaign-mode-aragorn)."] : [])]);
   const extra = Array.from({ length: seatCount }, (_, index) => log.threatPenaltyBySeat[index] ?? 0);
-  note(4, [`Each player's starting threat is the combined threat cost of their heroes plus ${threatPenalty}.`, ...extra.flatMap((more, index) => (more > 0 ? [`Seat ${index + 1} takes a permanent +${more} starting threat penalty of its own, so its starting threat is plus ${threatPenalty + more}.`] : []))]);
+  note(4, [threatPenalty < 0 ? `Each player's starting threat is the combined threat cost of their heroes ${threatPenalty}, and at least 0.` : `Each player's starting threat is the combined threat cost of their heroes plus ${threatPenalty}.`, ...extra.flatMap((more, index) => (more > 0 ? [`Seat ${index + 1} takes a permanent +${more} starting threat penalty of its own, so its starting threat is plus ${threatPenalty + more}.`] : []))]);
 
   const seats: Working[] = input.seats.map((seat, index) => ({ heroes: [...(dealtBySeat[index] ?? [])], deck: [...seat.deck], attachments: [], hand: [], afterMulligan: [], ...((extra[index] ?? 0) > 0 ? { threatPenalty: extra[index] } : {}) }));
 

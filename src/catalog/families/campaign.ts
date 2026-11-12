@@ -107,6 +107,9 @@ const VERBS = [
   z.strictObject({ verb: z.literal("RecordDamageOn"), codes: z.array(code).min(1), ...when }),
   // Resolution: the damage on each hero in play is noted in the log's "Damage on Heroes" row by hero code, replacing the previous notes ("Note the amount of damage on each hero at the end of the game", 10188:B:1). A hero out of play has none to note.
   z.strictObject({ verb: z.literal("RecordHeroDamage"), ...when }),
+  // Resolution: each character in play with a copy of the card with this code attached is marked "determined" in the log's row of that name, by the character's code ("Forced: If you win this scenario, mark in the Campaign Log that attached character is 'determined'", 10172:A:1).
+  // The marks add to the ones the log holds and stay when the character later falls. A copy attached to a character that left play marks nothing.
+  z.strictObject({ verb: z.literal("RecordDetermined"), code, ...when }),
   // Campaign Setup: each hero begins the game with the damage the Campaign Log noted for it ("Each hero begins the game with damage on them equal to the amount noted for them in the Campaign Log", 10193:A:2). A hero the log holds no note for, and a game with no log, takes none.
   verbFlags(z.strictObject({ verb: z.literal("PlaceLoggedHeroDamage") }), { setupRole: "afterSetup" }),
   // Resolution: each card with one of these codes leaves the Campaign Pool, once ("Remove Army of the Dead from the campaign pool", 145070:B:1). With `perCopyInVictory`, one entry leaves for each copy of the code in the

@@ -212,6 +212,8 @@ export const pickSchema = z.strictObject({
   // "each unguarded objective in the staging area", 12121:A:1). `isGuard`: an enemy attached to an objective as its guard (`false`: "an enemy that is not currently guarding an objective", 12133:A:1).
   hasGuard: z.boolean().optional(),
   isGuard: z.boolean().optional(),
+  // A character whose code the Campaign Log marks "determined" (`campaignFacts.angmar.determined`, Angmar Awakened): "each character who is 'determined' in the Campaign Log" (10172:A:1). Read by the angmar family.
+  determined: z.literal(true).optional(),
   onPicked: z.boolean().optional(),
   // A player card (`false`: an encounter card, "all encounter cards are immune", 12172:A:2).
   playerCard: z.boolean().optional(),

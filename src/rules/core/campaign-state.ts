@@ -58,6 +58,10 @@ export type ResolutionLog = {
   campaignEnd?: CampaignEnd;
   // Angmar Awakened (docs/brief.md, Angmar Awakened), left out while a Resolution notes none: the damage on Protect the Innocent / Arnor Ravaged (RecordDamageOn) and on each hero in play by code (RecordHeroDamage).
   damageNotes?: { protect?: number; heroes?: Readonly<Record<string, number>> };
+  // Angmar Awakened, The Wastes of Eriador (docs/brief.md, Angmar Awakened), each left out while a game notes none: the change to every player's starting threat the game marked (RecordStartingThreat, a delta: -2 for a defeated Fend Off Despair; campaign/log.ts adds it to the
+  // log's `threatPenalty`), and the codes of the characters the Resolution marked "determined" (RecordDetermined; campaign/log.ts adds them to the log's `determined`).
+  startingThreat?: number;
+  determined?: readonly string[];
 };
 
 // The campaign log's structured facts, handed to the engine at the start of a scenario in Campaign Mode (campaign/log.ts writes

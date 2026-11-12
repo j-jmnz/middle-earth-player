@@ -24,10 +24,10 @@ export function lookedDeckSeat(state: ScenarioState, data: EffectData | undefine
   return id ? (state.cards[id]?.controller ?? null) : null;
 }
 
-/** The Doomed value the event raises each player's threat by, with the seat's next-Doomed reduction spent on it
+/** The Doomed value the event raises each player's threat by, `gained` (GainsDoomed) added to the printed X, with the seat's next-Doomed reduction spent on it
  * (ReduceNextDoomed: "Reduce the X value of the next Doomed X event you play this phase by 2"). */
-export function doomedRaise(state: ScenarioState, seat: number, printed: PrintedCard): { state: ScenarioState; amount: number } {
-  const doomed = printed.keywords.doomed ?? 0;
+export function doomedRaise(state: ScenarioState, seat: number, printed: PrintedCard, gained = 0): { state: ScenarioState; amount: number } {
+  const doomed = (printed.keywords.doomed ?? 0) + gained;
   if (doomed <= 0 || printed.type !== "event") return { state, amount: doomed };
   const holder = `seat:${seat}`;
   const at = state.modifiers.findIndex((modifier) => modifier.stat === "doomedReduction" && modifier.instanceId === holder && modifierActive(state, modifier));

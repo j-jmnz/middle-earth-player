@@ -11,6 +11,7 @@ import { shuffleIds } from "../../core/seed.ts";
 import { inPlay, livingSeats, updateCard, type ScenarioState } from "../../core/state.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import { askTarget } from "../../windows/choices.ts";
+import { effectsOf } from "../../windows/listen.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { effectData } from "../encounter/moves.ts";
 import { frameScope, refCard } from "../../interpret/amounts.ts";
@@ -85,6 +86,9 @@ export function attachSelfToNamed(state: ScenarioState, instruction: Verb<"Attac
   if (!id || !state.cards[id]) return state;
   const named = (card: { code: string }): boolean => printedOf(ctx.cards, card.code).name === instruction.name;
   const aside = new Set(state.setAside);
-  const host = Object.values(state.cards).find((card) => card.id !== id && named(card) && (inPlay(card.zone) || (instruction.outOfPlay === true && aside.has(card.id))));
+  // A pool card's Setup resolves after the quest card's, which may be the one that puts the host into play ("Put Amarthiúl into play", 10013:A:1): the host set aside that Setup names is the card the burden attaches to, and it goes into play with it (rr.setup).
+  const stageCode = state.questStage ? state.cards[state.questStage]?.code : undefined;
+  const entering = stageCode != null && effectsOf(ctx, stageCode).some((record) => record.timing === "setup" && record.instructions.some((step) => step.verb === "PutSetAsideInPlay" && step.name === instruction.name));
+  const host = Object.values(state.cards).find((card) => card.id !== id && named(card) && (inPlay(card.zone) || ((instruction.outOfPlay === true || entering) && aside.has(card.id))));
   return host ? attachBurden(state, id, host.id) : moveCard(state, id, { zone: "removed" });
 }

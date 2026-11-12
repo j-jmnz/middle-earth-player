@@ -51,6 +51,12 @@ const VERBS = [
   // Setup of a pool card (a later scenario): the source attaches to the card in play with this title, or with `outOfPlay` to one set aside as well; with no such card it is removed from the game ("Attach to Thaurdir (even if he is out of play). Otherwise, remove this card
   // from the game", 10168:A:1; "Attach to Amarthiúl. Otherwise, remove ... from the game", 10167:A:1).
   z.strictObject({ verb: z.literal("AttachSelfToNamed"), name: z.string().min(1), outOfPlay: z.boolean().optional(), ...when }),
+  // The Time objective (Daybreak / Nightfall, one double-sided card) shows `to` faceup (`other`: its other side): the state is Day or Night as the side up says (mec108.day-and-night). The cards in play hear that it became Day (`becameDay`) or Night (`becameNight`);
+  // a flip to the side already up changes nothing and announces nothing ("Flip the Time objective to Nightfall", 10015:A:1, 10026:A:1; "flip this objective", 10011:A:3). Nothing happens with no Time objective in play.
+  z.strictObject({ verb: z.literal("FlipTimeObjective"), to: z.enum(["day", "night", "other"]), ...when }),
+  // Marks in the Campaign Log that each player's starting threat is changed by `amount` (a reduction is negative), cumulative with the marks it holds ("each player's starting threat is reduced by 2", 10173:A:2): the game's resolution log carries the change to the campaign log
+  // when the scenario is won, which adds it to the log's one starting threat modifier. A lost game writes nothing (rr.campaign-mode). A seat's starting threat is never below 0.
+  z.strictObject({ verb: z.literal("RecordStartingThreat"), amount: z.number().int(), ...when }),
   verbFlags(z.strictObject({ verb: z.literal("TradeDamageForResources"), code, damage: z.number().int().positive(), resources: z.number().int().positive(), seat: z.number().int().min(0).optional() }), { setupRole: "afterSetup" }),
 ] as const;
 
@@ -59,6 +65,9 @@ const TRIGGERS = [
   "lastTimeCounterRemoved",
   // About the enemy whose attack just damaged a character (a hero or an ally; the other card is the character), once for the attack: "After an attack damages a character" (10158:A:1). Damage canceled or prevented is not damage, and an attack that damages nobody is not heard.
   "attackDamagedCharacter",
+  // The Time objective was flipped to Daybreak or to Nightfall (not heard at Setup, where Daybreak is dealt faceup): every card in play hears it, the staging area and the quest card included ("Forced: When it becomes Night, reveal an encounter card", 10012:A:2).
+  "becameDay",
+  "becameNight",
 ] as const;
 
 const FLAGS = [
@@ -79,6 +88,9 @@ const FLAGS = [
   "discardLocked",
   // On a hero (target `host`): its printed Traits are treated as blank as well as its text box ("treated as if its printed text box were blank", Thaurdir's Legacy, 10168:A:2; rr.blank): `hasTrait` ignores the printed Traits, while a Trait another card grants stays. Set beside `blankText`.
   "blanksTraits",
+  // On an enemy (the card itself): while a player makes an engagement check against it, its engagement cost changes by this amount for each damaged character that player controls, hero or ally, not below 0 ("-1 engagement cost for each damaged character that player controls", 10020:A:2;
+  // families/angmar/check-cost.ts). An optional engagement does not read it (rr.optional-engagement).
+  "checkCostPerDamaged",
 ] as const;
 
 export const manifest = { name: "angmar", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

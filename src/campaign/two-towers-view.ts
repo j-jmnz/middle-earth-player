@@ -7,12 +7,17 @@ export function seatPenalty(log: Pick<CampaignLog, "threatPenalty" | "threatPena
   return log.threatPenalty + (log.threatPenaltyBySeat[seat] ?? 0);
 }
 
+/** A starting threat modifier with its sign: "+3", "-2" (a reduction, Fend Off Despair, 10173:A:2), "+0". */
+export function signed(amount: number): string {
+  return amount < 0 ? `${amount}` : `+${amount}`;
+}
+
 /** The Threat Modifiers row: one number for every player ("None", "+1") until a seat has a penalty of its own, then each seat's ("Player 1: +3 · Player 2: +1"). */
 export function threatWords(log: Pick<CampaignLog, "threatPenalty" | "threatPenaltyBySeat">, seatCount: number): string {
   const seats = Array.from({ length: seatCount }, (_, seat) => seat);
-  if (seats.every((seat) => (log.threatPenaltyBySeat[seat] ?? 0) === 0)) return log.threatPenalty === 0 ? "None" : `+${log.threatPenalty}`;
-  if (seatCount === 1) return `+${seatPenalty(log, 0)}`;
-  return seats.map((seat) => `Player ${seat + 1}: ${seatPenalty(log, seat) === 0 ? "None" : `+${seatPenalty(log, seat)}`}`).join(" · ");
+  if (seats.every((seat) => (log.threatPenaltyBySeat[seat] ?? 0) === 0)) return log.threatPenalty === 0 ? "None" : signed(log.threatPenalty);
+  if (seatCount === 1) return signed(seatPenalty(log, 0));
+  return seats.map((seat) => `Player ${seat + 1}: ${seatPenalty(log, seat) === 0 ? "None" : signed(seatPenalty(log, seat))}`).join(" · ");
 }
 
 const CHOICE_WORDS: Readonly<Record<Exclude<MarshesChoice, "searchingEye">, string>> = { penalty: "a permanent +2 starting threat penalty" };

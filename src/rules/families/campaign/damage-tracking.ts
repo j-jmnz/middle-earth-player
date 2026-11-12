@@ -2,7 +2,7 @@
 // and a Setup verb gives each hero the damage the log noted. src/rules/setup/resolution.ts and the campaign family's `run` call them.
 import type { Instruction } from "../../../catalog/boundary.ts";
 import type { ResolutionLog } from "../../core/campaign-state.ts";
-import { updateCard, type ScenarioState } from "../../core/state.ts";
+import { inPlay, updateCard, type ScenarioState } from "../../core/state.ts";
 import { tokensOn } from "./saga-end.ts";
 
 type Verb<V extends Instruction["verb"]> = Extract<Instruction, { verb: V }>;
@@ -20,6 +20,16 @@ export function recordHeroDamage(state: ScenarioState): ResolutionLog {
     if (card.zone === "heroes" && card.damage > 0) heroes[card.code] = card.damage;
   }
   return { ...state.resolutionLog, damageNotes: { ...(state.resolutionLog.damageNotes ?? {}), heroes } };
+}
+
+/** RecordDetermined: the characters in play with a copy of the card attached, by their codes (10172:A:1); the log adds them to the ones it holds. */
+export function recordDetermined(state: ScenarioState, instruction: Verb<"RecordDetermined">): ResolutionLog {
+  const marked: string[] = [...(state.resolutionLog.determined ?? [])];
+  for (const card of Object.values(state.cards)) {
+    const host = card.code === instruction.code && card.zone === "attached" && card.host ? state.cards[card.host] : undefined;
+    if (host && inPlay(host.zone) && !marked.includes(host.code)) marked.push(host.code);
+  }
+  return { ...state.resolutionLog, determined: marked };
 }
 
 /** PlaceLoggedHeroDamage (10193:A:2): each hero in play takes the damage the Campaign Log noted for its code (`campaignFacts.angmar.heroDamage`); a hero with no note takes none. */

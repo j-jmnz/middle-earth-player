@@ -166,7 +166,8 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     state = placeContracts(state, index, ctx);
     // Threat costs lowered by a card in play ("Each hero you control with a printed Lore resource icon gets -1 threat cost").
     threat -= threatCostCut(state, index, ctx);
-    state = withThreat(state, index, threat);
+    // A campaign's reduction of the starting threat (Fend Off Despair, 10173:A:2) never takes a seat below 0.
+    state = withThreat(state, index, Math.max(0, threat));
     state = shuffleZone(state, index);
   }
   if (input.seats.some((seat) => (seat.loot?.length ?? 0) > 0)) state = { ...state, lootPlan: input.seats.slice(0, input.seatCount).map((seat) => seat.loot ?? []) };

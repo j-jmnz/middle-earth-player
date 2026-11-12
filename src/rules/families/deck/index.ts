@@ -39,10 +39,11 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "KeepOpeningHand":
       return keepOpeningHand(state, focus);
     case "ReducePlayCost":
+    case "GainsDoomed":
       return state;
     default:
       return null;
   }
 }
 
-export const manifest: RulesFamily = { name: "deck", verbs: ["MoveCard", "GivePicked", "SwapPicked", "ShuffleDiscardIntoDeck", "ShuffleHandIntoDeck", "DiscardFromDeck", "AddToX", "ActAs", "PlayFrom", "ReduceNextDoomed", "KeepOpeningHand", "ReducePlayCost"], run, settle: { sweep: eliminateEmptyPiles }, amount: (state, found, _scope, ctx) => discardedAmount(state, found, ctx) };
+export const manifest: RulesFamily = { name: "deck", verbs: ["MoveCard", "GivePicked", "SwapPicked", "ShuffleDiscardIntoDeck", "ShuffleHandIntoDeck", "DiscardFromDeck", "AddToX", "ActAs", "PlayFrom", "ReduceNextDoomed", "KeepOpeningHand", "ReducePlayCost", "GainsDoomed"], run, settle: { sweep: eliminateEmptyPiles }, amount: (state, found, _scope, ctx) => discardedAmount(state, found, ctx) };

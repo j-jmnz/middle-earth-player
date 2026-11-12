@@ -39,7 +39,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "SetStatUntil":
       return setStatUntil(state, instruction, focus, ctx);
     case "RemoveAllQuestProgress":
-      return removeAllQuestProgress(state, steps);
+      return removeAllQuestProgress(state, steps, instruction.of === "stage");
     case "ShuffleCopyIntoEachDeck":
       return shuffleCopyIntoEachDeck(state, instruction.code);
     default:

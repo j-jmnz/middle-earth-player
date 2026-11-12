@@ -11,6 +11,8 @@ import type { Focus } from "../index.ts";
 import { chooseBoon } from "./boons.ts";
 import { attachRandomBurden, attachSelfToNamed, moveToHero } from "./burdens.ts";
 import { placeHandUnderSelf } from "./cards-under.ts";
+import { determinedMatches } from "./determined.ts";
+import { flipTimeObjective, timeOfDayHolds } from "./day-night.ts";
 import { placeLoggedDamageOn } from "./logged.ts";
 import { endPhase } from "./phase.ts";
 import { travelUnpayable } from "./travel.ts";
@@ -54,6 +56,10 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return moveToHero(state, instruction, focus, ctx, steps);
     case "AttachSelfToNamed":
       return attachSelfToNamed(state, instruction, focus, ctx);
+    case "FlipTimeObjective":
+      return flipTimeObjective(state, instruction);
+    case "RecordStartingThreat":
+      return { ...state, resolutionLog: { ...state.resolutionLog, startingThreat: (state.resolutionLog.startingThreat ?? 0) + instruction.amount } };
     default:
       return null;
   }
@@ -61,10 +67,11 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "angmar",
-  verbs: ["Time", "RemoveTimeCounters", "HoldUnder", "DiscardHeld", "PlaceHandUnderSelf", "ChooseCurrentQuest", "AttachNewTo", "TradeDamageForResources", "FirstTraitSurge", "EndPhase", "PlaceLoggedDamageOn", "ChooseBoon", "AttachRandomBurden", "MoveToHero", "AttachSelfToNamed"],
+  verbs: ["Time", "RemoveTimeCounters", "HoldUnder", "DiscardHeld", "PlaceHandUnderSelf", "ChooseCurrentQuest", "AttachNewTo", "TradeDamageForResources", "FirstTraitSurge", "EndPhase", "PlaceLoggedDamageOn", "ChooseBoon", "AttachRandomBurden", "MoveToHero", "AttachSelfToNamed", "FlipTimeObjective", "RecordStartingThreat"],
   run,
   revealed: (state, id, ctx) => noteFirstTrait(timeOnReveal(state, id, ctx), id, ctx),
   travel: { unpayable: travelUnpayable },
-  condition: (state, condition, scope, ctx) => currentQuestHolds(state, condition, scope, ctx) ?? questLeadsHolds(state, condition, ctx) ?? hitPointsLeftHolds(state, condition, ctx),
+  pick: (state, id, spec) => determinedMatches(state, id, spec),
+  condition: (state, condition, scope, ctx) => timeOfDayHolds(state, condition) ?? currentQuestHolds(state, condition, scope, ctx) ?? questLeadsHolds(state, condition, ctx) ?? hitPointsLeftHolds(state, condition, ctx),
   amount: (state, found, _scope, ctx) => questCardsAmount(state, found, ctx),
 };

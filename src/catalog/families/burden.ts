@@ -41,8 +41,9 @@ const VERBS = [
   // The quest phase ends at once: the cards it has yet to reveal are not revealed and the quest is not resolved
   // (rr.step-3-3). Nothing happens outside the quest phase.
   z.strictObject({ verb: z.literal("EndQuestPhase"), ...when }),
-  // All the progress on the current quest card is removed.
-  z.strictObject({ verb: z.literal("RemoveAllQuestProgress"), ...when }),
+  // All the progress on the current quest card is removed: the encounter side quest that is the current quest while one is (mec108.side-quests-in-play: "If this attack destroys a character, remove all progress from the current quest", 10025:A:2), else the main quest card.
+  // `of: stage` is the main quest card whatever the current quest is ("discard all progress from this stage", 10015:B:2).
+  z.strictObject({ verb: z.literal("RemoveAllQuestProgress"), of: z.literal("stage").optional(), ...when }),
   // A lasting set: the stat of each card that matches `holders` now is set to `value` until `until`, whatever else modifies it
   // (rr.modifiers: "reduce ... to 0"). `holders` is read from the actor's side.
   z.strictObject({
