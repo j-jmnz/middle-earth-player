@@ -2,7 +2,7 @@
 // mec108.setup-across-the-ettenmoors, mec108.setup-the-treachery-of-rhudaur, mec108.setup-the-battle-of-carn-dum, mec108.setup-the-dread-realm, mec108.orc-deck,
 // mec108.captured-deck, mec108.campaign-mode (data/rules/entries.json).
 // The Angmar Awakened campaign built from The Lost Realm, the six Adventure Packs and the Angmar Awakened Campaign Expansion (MEC108): its codes, scenarios, piles, rules spans and
-// scan-read ledger. Not playable yet (src/campaign/playable.ts).
+// scan-read ledger. Playable from its first scenario (src/campaign/playable.ts).
 import { readFileSync } from "node:fs";
 import path from "node:path";
 

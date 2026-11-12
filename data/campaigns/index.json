@@ -53,7 +53,7 @@
     "id": "angmar-awakened",
     "name": "Angmar Awakened",
     "scenarioCount": 9,
-    "playable": false,
+    "playable": true,
     "kind": "campaign",
     "box": null,
     "released": "2022-08-19",
