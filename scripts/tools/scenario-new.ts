@@ -4,6 +4,7 @@ import { fileURLToPath } from "node:url";
 
 import { loadCards } from "../data/load-cards.ts";
 import { loadCampaignsInOrder, loadScenario } from "../data/load-scenarios.ts";
+import { seedFinderRel } from "../data/effects/seed-finder-paths.ts";
 import { ROOT } from "../data/paths.ts";
 import { runScript, type Log } from "../log.ts";
 import { asksFile, authoredFile, authoredPath, campaignTestFile, camel, gameFile, goldenTestFile, lossFlowFile, seedFinderFile, specTestFile, winFlowFile, type Facts, type PreviousPart } from "./scenario-new-files.ts";
@@ -15,7 +16,7 @@ import { asksFile, authoredFile, authoredPath, campaignTestFile, camel, gameFile
 //
 // Files (never overwritten: if any exists the command refuses, listing them): the game (test/scenarios/<id>/), the golden test, the campaign test and the
 // spec rows (src/campaign/scenarios/<id>/), the choice words as an asks file (src/play/words/asks/<id>.ts, listed in its barrel by pnpm data build), the seed finder
-// (scripts/e2e/<id>.ts), both Maestro flows (.maestro/scenarios/<id>/), the authored effects file (src/effects/authored/<id>.ts, or in the campaign's folder: scripts/data/effects/authored-paths.ts) and the empty fixture file
+// (scripts/e2e/<id>.ts, or in the campaign's folder: scripts/data/effects/seed-finder-paths.ts), both Maestro flows (.maestro/scenarios/<id>/), the authored effects file (src/effects/authored/<id>.ts, or in the campaign's folder: scripts/data/effects/authored-paths.ts) and the empty fixture file
 // (src/campaign/fixtures/<id>.json). There is no scene file: the game, the golden test and the campaign test read the scenario from data/, and the card tests are spec rows
 // (on tableFromLayout).
 // Registry lines: the fixture registry, the JSON import and FILES entry in src/campaign/fixtures.ts, the writer in scripts/e2e/fixtures.ts,
@@ -80,21 +81,25 @@ function factsOf(id: string, short: string, repo: Repo): Facts {
     codes.push([keyFor(name, code, used), code, name]);
   }
   const previousId = at > 0 ? (campaign.scenarios[at - 1] ?? null) : null;
-  return { id, name: scenario.name, short, campaignId: campaign.id, part: at + 1, previous: previousId ? previousPart(previousId, repo) : null, campaignCard: scenario.campaignCard, stages: scenario.stages, codes };
+  return { id, name: scenario.name, short, campaignId: campaign.id, part: at + 1, previous: previousId ? previousPart(previousId, campaign.id, repo) : null, finderRel: seedFinderRel(id, campaign.id), campaignCard: scenario.campaignCard, stages: scenario.stages, codes };
 }
 
 // The names the previous part's modules export, from the places that list them (the golden registry line, the seed finder's functions).
-function previousPart(id: string, repo: Repo): PreviousPart {
+// A previous part with no seed finder is an error: a finder built on a blank log would drop the earlier parts without a word.
+function previousPart(id: string, campaignId: string, repo: Repo): PreviousPart {
   const name = loadScenario(id).name;
   const registry = repo.read(GOLDEN_REGISTRY) ?? "";
   const line = new RegExp(`^\\s*entry\\("${id}",\\s*"[^"]*",\\s*(\\w+)\\.(\\w+),\\s*\\1\\.(\\w+),\\s*\\1\\.(\\w+)\\),?$`, "m").exec(registry);
-  const finder = repo.read(`scripts/e2e/${id}.ts`);
+  const finderRel = seedFinderRel(id, campaignId);
+  const finder = repo.read(`scripts/e2e/${finderRel}.ts`);
+  if (finder == null) throw new Error(`the previous part ${id} has no seed finder at scripts/e2e/${finderRel}.ts: scaffold or move it first (scripts/data/effects/seed-finder-paths.ts)`);
   const earlierLog = finder ? (/export async function (\w+)\(\): Promise<CampaignLog>/.exec(finder)?.[1] ?? null) : null;
   return {
     id,
     name,
+    finderRel,
     game: line ? { alias: line[1] as string, goldens: line[2] as string, world: line[3] as string, play: line[4] as string } : null,
-    finder: { exists: finder != null, earlierLog },
+    finder: { exists: true, earlierLog },
   };
 }
 
@@ -171,7 +176,7 @@ export function planScenario(id: string, options: { short?: string }, repo: Repo
     { file: `src/campaign/scenarios/${id}/campaign.test.ts`, text: campaignTestFile(facts) },
     { file: `src/campaign/scenarios/${id}/spec.test.ts`, text: specTestFile(facts) },
     { file: `src/play/words/asks/${id}.ts`, text: asksFile(facts) },
-    { file: `scripts/e2e/${id}.ts`, text: seedFinderFile(facts) },
+    { file: `scripts/e2e/${facts.finderRel}.ts`, text: seedFinderFile(facts) },
     { file: `.maestro/scenarios/${id}/${id}.yaml`, text: winFlowFile(facts) },
     { file: `.maestro/scenarios/${id}/${id}-loss.yaml`, text: lossFlowFile(facts) },
     { file: authoredPath(facts), text: authoredFile(facts) },
@@ -219,7 +224,7 @@ export function planScenario(id: string, options: { short?: string }, repo: Repo
       problems.push(`${WRITERS} already has ${c}Fixtures: pass --short with another name`);
       return text;
     }
-    let next = insert(text, WRITERS, { anchor: /^import \{ \w+Fixtures \} from "\.\/[a-z0-9-]+\.ts";$/ }, `import { ${c}Fixtures } from "./${id}.ts";`, "after", problems);
+    let next = insert(text, WRITERS, { anchor: /^import \{ \w+Fixtures \} from "\.\/[a-z0-9-\/]+\.ts";$/ }, `import { ${c}Fixtures } from "./${facts.finderRel}.ts";`, "after", problems);
     const entry = `  "${id}": () => ${c}Fixtures(),`;
     const after = new RegExp(`^  "${previous}": `);
     next = previous && blockHas(next, WRITERS_MAP, after) ? insert(next, WRITERS, { block: WRITERS_MAP, anchor: after }, entry, "after", problems) : insert(next, WRITERS, { block: WRITERS_MAP }, entry, "before", problems);
