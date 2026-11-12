@@ -93,7 +93,7 @@ function searchCaves(table: Table, instruction: Extract<Instruction, { verb: "Re
   table.out.did.push(...found.removed.map((code) => `The first player searches the Caves deck and removes ${table.name(code)} from the game.`));
 }
 
-// SearchBoonAllyToHand (12175:A), SearchBoonOrTreasureToHand (12195:A) and SearchDeckForCard (145066:A:1): each player in turn, first player first, may take a card of their deck that `eligible` names (a pool card that step 7 would shuffle into it, or one the deck holds) into their hand, or skip. `untilFirst`: the offer ends
+// SearchBoonAllyToHand (12175:A), SearchBoonOrTreasureToHand (12195:A), SearchBoonToHand (10193:A:2) and SearchDeckForCard (145066:A:1): each player in turn, first player first, may take a card of their deck that `eligible` names (a pool card that step 7 would shuffle into it, or one the deck holds) into their hand, or skip. `untilFirst`: the offer ends
 // with the first who takes one ("a player may search"); otherwise every player is asked ("each player may search"). `firstOnly`: only the first player is asked ("The first player may ... search his deck"). `raise`: the search costs each player's threat that much for this game ("raise each player's threat by 1"), added to every seat's starting threat when the first player takes it.
 // Setup follows the opening hand and any mulligan (rr.setup step 7), so the card joins the hand after the mulligan, as AddToHandAfterMulligan's cards do; a pool card stays in the pool but is not shuffled into the deck.
 type HandSearch = { eligible: (printed: PrintedCard) => boolean; looksFor: string; untilFirst: boolean; skipped: (seat: number, seatCount: number) => string; firstOnly?: boolean; raise?: number };
@@ -135,6 +135,7 @@ const searchBoonAlly = (table: Table): void => searchToHand(table, { eligible: (
 // SearchDeckForCard: the first player alone may pay the threat to search for the named card.
 const searchDeckForCard = (table: Table, instruction: Extract<Instruction, { verb: "SearchDeckForCard" }>): void =>
   searchToHand(table, { eligible: (printed) => printed.code === instruction.code, looksFor: table.name(instruction.code), untilFirst: true, firstOnly: true, raise: instruction.raiseThreat, skipped: () => `The first player does not search for ${table.name(instruction.code)}.` });
+const searchBoon = (table: Table): void => searchToHand(table, { eligible: (printed) => printed.campaignKind === "boon", looksFor: "a boon card", untilFirst: false, skipped: (seat, seatCount) => `${seatCount === 1 ? "You do" : `Player ${seat + 1} does`} not search for a boon card.` });
 const searchBoonOrTreasure = (table: Table): void => searchToHand(table, { eligible: (printed) => printed.campaignKind === "boon" || printed.campaignKind === "treasure", looksFor: "a boon or treasure card", untilFirst: false, skipped: (seat, seatCount) => `${seatCount === 1 ? "You do" : `Player ${seat + 1} does`} not search for a boon or treasure card.` });
 
 // SetAsideBoon (146069:A:1): each player in turn, first player first, chooses a boon of the whole campaign pool with the trait, other than `except`, and sets it aside, out of play (the card says "from the campaign pool", not from their own boons). The set-aside boon is the chooser's:
@@ -248,6 +249,7 @@ function campaignSetupSteps(campaignSetup: readonly Instruction[], input: Checkl
     else if (instruction.verb === "RemoveFromCavesIfLogged") searchCaves(table, instruction);
     else if (instruction.verb === "SearchBoonAllyToHand") searchBoonAlly(table);
     else if (instruction.verb === "SearchBoonOrTreasureToHand") searchBoonOrTreasure(table);
+    else if (instruction.verb === "SearchBoonToHand") searchBoon(table);
     else if (instruction.verb === "SearchDeckForCard") searchDeckForCard(table, instruction);
     else if (instruction.verb === "SetAsideBoon") setAsideBoon(table, instruction);
     else if (instruction.verb === "RemovePoolCards") table.out.did.push(...removePoolCards(table.pool, table.seats, instruction).map((code) => `${table.name(code)} is removed from the Campaign Pool.`));

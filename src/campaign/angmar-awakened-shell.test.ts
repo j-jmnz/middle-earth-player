@@ -8,7 +8,7 @@ import { resolutionResult } from "../rules/setup/resolution.ts";
 import { settle } from "../rules/engine/machine.ts";
 import { updateCard, type ScenarioState } from "../rules/core/state.ts";
 import { spawn } from "../rules/core/zones.ts";
-import { placeLoggedHeroDamage } from "../rules/families/campaign/guarded.ts";
+import { placeLoggedHeroDamage } from "../rules/families/campaign/damage-tracking.ts";
 import { loadPrinted } from "../../test/harness/catalog.ts";
 import { loadWorld, table, type World as SceneWorld } from "../../test/scenarios/a-shadow-of-the-past/scene.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
@@ -16,7 +16,7 @@ import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts
 import { heroBansOf } from "./loadout.ts";
 import { checklist, type ChecklistPlan } from "./checklist.ts";
 import { applyResolution as writeLog, emptyLog, poolCard, type CampaignLog } from "./log.ts";
-import { angmarAwakenedFacts, angmarAwakenedRows } from "./log-angmar-awakened.ts";
+import { angmarAwakenedCodes, angmarAwakenedFacts, angmarAwakenedRows } from "./log-angmar-awakened.ts";
 import { newSave, parseLog } from "./save.ts";
 import { buildStart } from "./start.ts";
 import { NO_COPY_LIMITS } from "./wilderland.ts";
@@ -28,13 +28,12 @@ const GLORFINDEL = "01011";
 const BERAVOR = "01012";
 const AMARTHIUL_HERO = "10115";
 const PROTECT = "10158";
-const ARNOR = "100158";
 const PENDANT = "10157";
 const COURAGE = "10167";
 const DETERMINATION = "10172";
 const FEND_OFF = "10173";
 const CARN_DUM_BOONS = ["10189", "10190", "10191", "10192"];
-const CARDS = [GLORFINDEL, BERAVOR, AMARTHIUL_HERO, PROTECT, ARNOR, PENDANT, COURAGE, DETERMINATION, FEND_OFF, ...CARN_DUM_BOONS];
+const CARDS = [GLORFINDEL, BERAVOR, AMARTHIUL_HERO, PROTECT, "100158", PENDANT, COURAGE, DETERMINATION, FEND_OFF, ...CARN_DUM_BOONS];
 
 const campaign = loadCampaign("angmar-awakened");
 const [chetwood, hills, dike, wastes, gram, ettenmoors, rhudaur, carnDum, dread] = campaign.scenarios.map((id) => loadScenario(id));
@@ -70,7 +69,7 @@ describe("the campaign", () => {
     expect(save.log.protectDamage).toBeNull();
   });
 
-  it("deals the first scenario in Campaign Mode with the campaign card's Resolution", () => {
+  it("deals each scenario's campaign card in Campaign Mode", () => {
     for (const scenario of campaign.scenarios.map((id) => loadScenario(id))) {
       const start = buildStart({ campaign, scenario, seatCount: 1, seed: 1, threatModifier: 0, seats: [{ heroes: [GLORFINDEL], deck: [] }], effects: EFFECTS });
       expect(start.definition.campaignCard, scenario.id).toBe(scenario.campaignCard);
@@ -96,7 +95,15 @@ describe("the log's Damage Tracking (mec108.campaign-log-tracking)", () => {
   it("shows a row once it holds something, and hands the game its facts only in this campaign", () => {
     expect(angmarAwakenedRows(emptyLog(1), 1)).toEqual([]);
     const log: CampaignLog = { ...emptyLog(1), protectDamage: 0, heroDamage: { [GLORFINDEL]: 3 }, determined: [BERAVOR], stolenCards: [[PENDANT]] };
-    expect(angmarAwakenedRows(log, 1).map((row) => [row.id, row.value])).toEqual([["log-protect-damage", "0"], ["log-hero-damage", "3"], ["log-stolen", null], ["log-determined", null]]);
+    expect(angmarAwakenedRows(log, 1)).toEqual([
+      { id: "log-protect-damage", label: "Damage on Protect the Innocent / Arnor Ravaged", value: "0" },
+      { id: "log-hero-damage", label: "Damage on Heroes", lines: [{ prefix: "", codes: [GLORFINDEL], amount: 3 }] },
+      { id: "log-stolen", label: "Unique Cards Stolen by Goblins", lines: [{ prefix: "", codes: [PENDANT], amount: null }] },
+      { id: "log-determined", label: "Determined Characters", lines: [{ prefix: "", codes: [BERAVOR], amount: null }] },
+    ]);
+    const two = angmarAwakenedRows({ ...log, stolenCards: [[], [PENDANT]] }, 2).find((row) => row.id === "log-stolen");
+    expect(two).toMatchObject({ lines: [{ prefix: "Player 1: ", codes: [] }, { prefix: "Player 2: ", codes: [PENDANT] }] });
+    expect(angmarAwakenedCodes(log).sort()).toEqual([GLORFINDEL, BERAVOR, PENDANT].sort());
     expect(angmarAwakenedFacts(emptyLog(1), "angmar-awakened")).toEqual({});
     expect(angmarAwakenedFacts(log, "angmar-awakened")).toEqual({ angmar: { protectDamage: 0, heroDamage: { [GLORFINDEL]: 3 }, determined: [BERAVOR], stolen: [[PENDANT]] } });
     expect(angmarAwakenedFacts(log, "ered-mithrin")).toEqual({});
@@ -127,6 +134,19 @@ describe("the Setup of The Battle of Carn Dûm (10188:A:2)", () => {
 });
 
 describe("the Setup of The Dread Realm (10193:A:2)", () => {
+  it("asks each player in turn for a boon card (no treasure) from the deck or the pool, and leaves the damage to the table's Setup", () => {
+    const log: CampaignLog = { ...emptyLog(2), campaignPool: [pooled(CARN_DUM_BOONS[0] ?? "", 0), pooled(CARN_DUM_BOONS[1] ?? "", 1)] };
+    const asked = plan(dread as never, undefined, 2, log);
+    expect(asked).toMatchObject({ ok: false, needs: { seat: 0, options: [CARN_DUM_BOONS[0], "skip"] } });
+    if (asked.ok || !asked.needs) throw new Error("no question");
+    expect(asked.needs.note).toMatch(/boon card/);
+    expect(asked.needs.note).not.toMatch(/treasure/);
+    const made = ok(plan(dread as never, [CARN_DUM_BOONS[0] ?? "", "skip"], 2, log));
+    expect(made.seats.map((seat) => seat.afterMulligan)).toEqual([[CARN_DUM_BOONS[0]], []]);
+    const start = buildStart({ campaign, scenario: dread as never, seatCount: 1, seed: 1, threatModifier: 0, seats: [{ heroes: [GLORFINDEL], deck: [] }], effects: EFFECTS });
+    expect(start.definition.afterSetup?.map((instruction) => instruction.verb)).toEqual(["PlaceLoggedHeroDamage"]);
+  });
+
   it("gives each hero the damage the log noted for it, and none to a hero it noted nothing for", () => {
     const { state } = table(scene, { seats: 1 });
     const heroes = Object.values(state.cards).filter((card) => card.zone === "heroes").map((card) => card.id);
@@ -167,15 +187,28 @@ describe("the Resolutions that write the log", () => {
     expect(write(won("10159").state, before).protectDamage).toBe(0);
   });
 
-  it("10166 notes the damage on either side, swaps Protect the Innocent for Arnor Ravaged and lets the first player choose the Pendant or the Courage", () => {
-    const { state, ctx } = won("10166", 1, damaged(ARNOR, 4));
-    const options = legalIntents(state, ctx).flatMap((intent) => (intent.type === "ChooseResolution" ? [intent.optionId] : []));
-    expect(options).toEqual(expect.arrayContaining([PENDANT, COURAGE]));
-    const done = reduce(state, { type: "ChooseResolution", optionId: COURAGE }, ctx).state;
+  const choices = (state: ScenarioState, ctx: Parameters<typeof legalIntents>[1]): string[] => legalIntents(state, ctx).flatMap((intent) => (intent.type === "ChooseResolution" ? [intent.optionId] : []));
+
+  it("10166 notes the damage on Protect the Innocent, swaps it for Arnor Ravaged and lets the first player choose the Pendant or the Courage", () => {
+    const { state, ctx } = won("10166", 1, damaged(PROTECT, 4));
+    expect(choices(state, ctx).map((option) => option.split(">")[0]).sort()).toEqual([PENDANT, COURAGE]);
+    const option = choices(state, ctx).find((id) => id.startsWith(`${COURAGE}>`)) ?? "";
+    const done = reduce(state, { type: "ChooseResolution", optionId: option }, ctx).state;
     const before: CampaignLog = { ...emptyLog(1), campaignPool: [pooled(PROTECT, null)], protectDamage: 9 };
     const log = write(done, before);
     expect(log.protectDamage).toBe(4);
-    expect(log.campaignPool.map((card) => card.code).sort()).toEqual([ARNOR, COURAGE].sort());
+    expect(log.campaignPool.map((card) => card.code).sort()).toEqual(["100158", COURAGE].sort());
+  });
+
+  it("10166 lets the first player choose which player takes the Pendant, and it is fixed to that seat's deck", () => {
+    const { state, ctx } = won("10166", 2, damaged(PROTECT, 1));
+    const options = choices(state, ctx);
+    expect(options.filter((id) => id.startsWith(`${PENDANT}>`))).toHaveLength(2);
+    const second = options.find((id) => id.startsWith(`${PENDANT}>`) && state.cards[id.split(">")[1] ?? ""]?.controller === 1) ?? "";
+    expect(second).not.toBe("");
+    const log = write(reduce(state, { type: "ChooseResolution", optionId: second }, ctx).state, emptyLog(2));
+    expect(log.campaignPool.filter((card) => card.code === PENDANT).map((card) => card.seat)).toEqual([1]);
+    expect(log.campaignPool.some((card) => card.code === COURAGE)).toBe(false);
   });
 
   it("10171 adds Fend Off Despair to the pool", () => {
@@ -189,6 +222,22 @@ describe("the Resolutions that write the log", () => {
     });
     const log = write(state);
     expect(Object.values(log.heroDamage)).toEqual([1]);
-    expect(write(won("10193").state).campaignEnd).toBe("won");
+    expect(write(won("10193").state).campaignEnd).toBeNull();
+  });
+
+  it("10188 notes the damage on a hero of each seat in two-handed play", () => {
+    const { state } = won("10188", 2, (table) => {
+      let next = table;
+      for (const hero of Object.values(table.cards).filter((card) => card.zone === "heroes")) next = updateCard(next, hero.id, { damage: hero.controller === 1 ? 2 : 1 });
+      return next;
+    });
+    const noted = write(state).heroDamage;
+    expect(Object.keys(noted).length).toBeGreaterThan(1);
+    expect(new Set(Object.values(noted))).toEqual(new Set([1, 2]));
+  });
+
+  it("10193 prints the line the end of the other campaigns print, so its Resolution asks and writes nothing", () => {
+    expect(recordInstructions(EFFECTS, "10193", "resolution")).toEqual([]);
+    expect(recordInstructions(EFFECTS, "12195", "resolution")).toEqual([]);
   });
 });

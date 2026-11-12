@@ -99,6 +99,9 @@ const VERBS = [
   // Resolution: the resources on the cards in play with these codes are counted and recorded in the notes section of the Campaign Log under `as` ("Count the number of resources on The Corsair Fleet and record that number in
   // the notes section", 145070:B:1; "Record the number of resource tokens on The Black Gate", 146074:B:1). A card of two sides is two codes; the count is their sum.
   z.strictObject({ verb: z.literal("RecordTokens"), codes: z.array(code).min(1), as: z.enum(RECORDED_COUNTS), ...when }),
+  // Campaign Setup: each player in turn may search their deck for a boon card and add it to their opening hand, after the mulligan ("Each player may search their deck for a boon and add it to their hand", 10193:A:2). A boon the pool holds is in the deck by then.
+  // The checklist deals it (src/campaign/checklist.ts), so it changes nothing in the game.
+  z.strictObject({ verb: z.literal("SearchBoonToHand") }),
   // Angmar Awakened's Campaign Log (docs/brief.md, Angmar Awakened; src/campaign/log-angmar-awakened.ts). Resolution: the damage on the cards in play with these codes is added up and noted in the log's "Damage on: Protect the Innocent / Arnor Ravaged"
   // row, replacing the previous number ("Note the amount of damage on Protect the Innocent in the Campaign Log", 10156:B:1). A card of two sides is two codes; with none in play the note is 0.
   z.strictObject({ verb: z.literal("RecordDamageOn"), codes: z.array(code).min(1), ...when }),

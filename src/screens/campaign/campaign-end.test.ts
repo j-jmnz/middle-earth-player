@@ -20,6 +20,10 @@ describe("the end of a campaign", () => {
     expect(dreamChaser.won).toBe(`${campaignOf("dream-chaser")?.name} won. The players win the campaign!`);
   });
 
+  it("Angmar Awakened says the printed Resolution line of The Dread Realm's card", () => {
+    expect(endOf("angmar-awakened")).toEqual({ won: "Angmar Awakened won. The players win the campaign!", line: "The players win the campaign!", summary: "Angmar Awakened is complete: 9 of 9 scenarios won.", tone: "default" });
+  });
+
   it("The Return of the King words its end from the log, never from the option lines of Mount Doom's card", () => {
     const campaign = campaignOf("the-return-of-the-king");
     if (!campaign) throw new Error("no campaign the-return-of-the-king");

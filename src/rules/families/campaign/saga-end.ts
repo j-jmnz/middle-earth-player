@@ -23,9 +23,14 @@ export function threatDialCopies(state: ScenarioState, instruction: Verb<"EarnOn
   return out.sort((a, b) => (a.seat ?? 0) - (b.seat ?? 0));
 }
 
+/** The tokens of one counter (`resources` or `damage`) on the cards in play with these codes, added up. */
+export function tokensOn(state: ScenarioState, codes: readonly string[], counter: "resources" | "damage"): number {
+  return Object.values(state.cards).filter((card) => codes.includes(card.code) && inPlay(card.zone)).reduce((sum, card) => sum + card[counter], 0);
+}
+
 /** RecordTokens: the resources on the cards in play with these codes, added up, under the record's name. */
 export function recordTokens(state: ScenarioState, instruction: Verb<"RecordTokens">): ResolutionLog {
-  const count = Object.values(state.cards).filter((card) => instruction.codes.includes(card.code) && inPlay(card.zone)).reduce((sum, card) => sum + card.resources, 0);
+  const count = tokensOn(state, instruction.codes, "resources");
   return { ...state.resolutionLog, recorded: { ...(state.resolutionLog.recorded ?? {}), [instruction.as]: count } };
 }
 
@@ -52,19 +57,4 @@ export function ignoreDiscardedHeroes(state: ScenarioState): ResolutionLog {
 /** EndCampaign: the saga's end. */
 export function endCampaign(state: ScenarioState, instruction: Verb<"EndCampaign">): ResolutionLog {
   return { ...state.resolutionLog, campaignEnd: instruction.result };
-}
-
-/** RecordDamageOn: the damage on the cards in play with these codes, added up (Protect the Innocent / Arnor Ravaged, 10156:B:1). */
-export function recordDamageOn(state: ScenarioState, instruction: Verb<"RecordDamageOn">): ResolutionLog {
-  const protect = Object.values(state.cards).filter((card) => instruction.codes.includes(card.code) && inPlay(card.zone)).reduce((sum, card) => sum + card.damage, 0);
-  return { ...state.resolutionLog, damageNotes: { ...(state.resolutionLog.damageNotes ?? {}), protect } };
-}
-
-/** RecordHeroDamage: the damage on each hero in play, by hero code, a hero with none left out (10188:B:1). */
-export function recordHeroDamage(state: ScenarioState): ResolutionLog {
-  const heroes: Record<string, number> = {};
-  for (const card of Object.values(state.cards)) {
-    if (card.zone === "heroes" && card.damage > 0) heroes[card.code] = card.damage;
-  }
-  return { ...state.resolutionLog, damageNotes: { ...(state.resolutionLog.damageNotes ?? {}), heroes } };
 }

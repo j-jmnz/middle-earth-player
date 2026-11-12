@@ -16,7 +16,8 @@ import { discardToPoolFromSets } from "../families/wilderland/mirkwood.ts";
 import { addEncounterCards, allyOrLineOptions, applyAllyOrLine, applyRemoval, applyStagedLocation, discoverTreasures, noteRemovalAnswer, playerOptions, removalOptions, removeEncounterCards, stagedLocationOptions } from "../families/wilderland/pool.ts";
 import { drawTreasures } from "../families/wilderland/treasure.ts";
 import { applyHazard, discardHazards, hazardOptions } from "../families/wilderland/hazards.ts";
-import { endCampaign, ignoreDiscardedHeroes, loseGuardedBoons, recordDamageOn, recordHeroDamage, recordTokens, removeFromPool, threatDialCopies } from "../families/campaign/saga-end.ts";
+import { recordDamageOn, recordHeroDamage } from "../families/campaign/damage-tracking.ts";
+import { endCampaign, ignoreDiscardedHeroes, loseGuardedBoons, recordTokens, removeFromPool, threatDialCopies } from "../families/campaign/saga-end.ts";
 import { applyChooseOption, applyRevive, applyTrim, boonHeroes, chooseOptionIds, earnForPick, earnHeldCopies, reviveOptions, threatPenalties, trimOptions, underneath } from "../families/campaign/resolution.ts";
 
 // A won scenario runs the campaign card's Resolution instructions in order. An instruction that opens a choice asks

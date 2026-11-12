@@ -77,7 +77,7 @@ Read the sections your task touches.
   - 378–383 Catalog build (~410)
   - 384–401 Tests (~2.0K) ← 5
   - 402–417 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~131.3K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~131.4K tok)
   - 17–40 Sections (~490)
   - 41–52 Product (~590)
   - 53–66 Non-goals (~540)
@@ -111,27 +111,27 @@ Read the sections your task touches.
     - 624–641 The Caves of Nibin-Dûm (~2.4K)
   - 642–700 Dream-chaser (~16.2K) ← 4
   - 701–728 Ered Mithrin (~16.4K) ← 8
-  - 729–752 Angmar Awakened (~1.8K) ← 4
-  - 753–890 The Two Towers (~16.4K) ← 20
-  - 891–1126 The Return of the King (~28.2K) ← 22
-    - 919–944 The Passing of the Grey Company (~2.7K)
-    - 945–976 The Siege of Gondor (~4.1K)
-    - 977–1022 The Battle of the Pelennor Fields (~5.8K)
-    - 1023–1060 The Tower of Cirith Ungol (~4.4K)
-    - 1061–1097 The Black Gate Opens (~4.4K) ← 2
-    - 1098–1126 Mount Doom (~4.3K)
-  - 1127–1135 Nightmare (~410) ← 19
-  - 1136–1174 Deckbuilding (~1.9K)
-  - 1175–1253 Effects (~3.2K)
-    - 1177–1235 Three layers (~2.4K) ← 10
-    - 1236–1245 Player side quests, contracts and saga cards (~430)
-    - 1246–1249 Window stack (~100)
-    - 1250–1253 Coverage test (~270)
-  - 1254–1274 Data sources (~530)
-  - 1275–1293 Card images (~1.2K) ← 9
-  - 1294–1319 Persistence and shipping (~2.6K) ← 6
-  - 1320–1361 Screens (~4.9K) ← 1
-    - 1346–1361 Table screen (~1.8K) ← 3
+  - 729–751 Angmar Awakened (~2.0K) ← 5
+  - 752–889 The Two Towers (~16.4K) ← 20
+  - 890–1125 The Return of the King (~28.2K) ← 22
+    - 918–943 The Passing of the Grey Company (~2.7K)
+    - 944–975 The Siege of Gondor (~4.1K)
+    - 976–1021 The Battle of the Pelennor Fields (~5.8K)
+    - 1022–1059 The Tower of Cirith Ungol (~4.4K)
+    - 1060–1096 The Black Gate Opens (~4.4K) ← 2
+    - 1097–1125 Mount Doom (~4.3K)
+  - 1126–1134 Nightmare (~410) ← 19
+  - 1135–1173 Deckbuilding (~1.9K)
+  - 1174–1252 Effects (~3.2K)
+    - 1176–1234 Three layers (~2.4K) ← 10
+    - 1235–1244 Player side quests, contracts and saga cards (~430)
+    - 1245–1248 Window stack (~100)
+    - 1249–1252 Coverage test (~270)
+  - 1253–1273 Data sources (~530)
+  - 1274–1292 Card images (~1.2K) ← 9
+  - 1293–1318 Persistence and shipping (~2.6K) ← 6
+  - 1319–1360 Screens (~4.9K) ← 1
+    - 1345–1360 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~49.3K tok)
   - 5–8 Overview (~130) ← 1
   - 9–23 Top bar (~3.1K) ← 4
@@ -165,7 +165,7 @@ Read the sections your task touches.
   - 345–356 Banner (~750) ← 5
   - 357–376 Screen reader (~2.8K) ← 17
   - 377–380 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~29.7K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~29.9K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~580)
   - 34–44 Performance (~680) ← 4
@@ -180,7 +180,7 @@ Read the sections your task touches.
   - 230–244 Icons (~480) ← 7
   - 245–263 Card art (~740) ← 2
   - 264–278 Tablets (~510) ← 13
-  - 279–466 Screens (~16.7K)
+  - 279–466 Screens (~16.9K)
     - 283–286 Splash (~40)
     - 287–290 App icon (~80)
     - 291–306 Campaigns (campaign list) (~1.5K) ← 6
@@ -189,7 +189,7 @@ Read the sections your task touches.
     - 333–350 Briefing (~1.8K) ← 5
     - 351–354 Campaign setup (~1.0K) ← 3
     - 355–360 Campaign path (~890) ← 4
-    - 361–364 Campaign log (~690) ← 1
+    - 361–364 Campaign log (~840) ← 1
     - 365–368 Spend XP (~610) ← 1
     - 369–372 Table — landscape (~30) ← 1
     - 373–376 Table opens stale (~750) ← 4
@@ -291,7 +291,7 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `scripts/tools`: handover/agent-brief.md, Scenario procedure (4); .claude/rules/code-standards.md, Test cost (2); architecture.md, Modules (1); design-system-table.md, Choice tray (1)
 - `src/campaign`: handover/agent-brief.md, Scenario procedure (12); brief.md, The Return of the King (6); brief.md, The Two Towers (6); brief.md, Nightmare (4); architecture.md, Tests (2); brief.md, Angmar Awakened (2); brief.md, Ered Mithrin (2); architecture.md, Persistence (1); brief.md, Persistence and shipping (1); design-system.md, Table opens stale (1); showcase.md, Saves and decks (1)
 - `src/catalog`: architecture.md, Mechanic families (2); brief.md, Nightmare (2); brief.md, The Return of the King (2); brief.md, The Two Towers (2); brief.md, A Knife in the Dark (1); brief.md, Angmar Awakened (1); brief.md, Dream-chaser (1); brief.md, Ered Mithrin (1); brief.md, Flight to the Ford burden deck and life (1); brief.md, Three layers (1)
-- `src/effects`: brief.md, The Return of the King (13); brief.md, The Two Towers (5); brief.md, Breaking of the Fellowship, stage 2B (1); brief.md, Nightmare (1)
+- `src/effects`: brief.md, The Return of the King (13); brief.md, The Two Towers (5); brief.md, Angmar Awakened (1); brief.md, Breaking of the Fellowship, stage 2B (1); brief.md, Nightmare (1)
 - `src/play`: design-system-table.md, Spotlight (29); design-system-table.md, Choice tray (28); design-system-table.md, Cards (24); design-system-table.md, Screen reader (12); design-system-table.md, Command column (11); design-system-table.md, Spacing and the play area's rows (9); design-system-table.md, The Island Map (8); architecture.md, State (6); design-system-table.md, Piles (6); architecture.md, Images (5); design-system-table.md, Motion (5); design-system-table.md, Reading panels (5); design-system-table.md, The Sailing test (5); design-system.md, Type (5); architecture.md, Performance (4); brief.md, Three layers (4); design-system-table.md, Banner (4); design-system-table.md, Gestures (4); brief.md, Table screen (3); design-system-table.md, Top bar (3); architecture.md, Tests (2); design-system-table.md, Quest scale (2); design-system.md, Settings (2); architecture.md, Modules (1); architecture.md, Screens (1); design-system-table.md, Peeking at the other seat (1); design-system-table.md, Table menu (1); design-system-table.md, Two taps (1); design-system.md, Components (1); design-system.md, Icons (1); design-system.md, Screen reader (1); design-system.md, Table — landscape (1); design-system.md, Tablets (1)
 - `src/rules`: brief.md, Nightmare (5); brief.md, The Two Towers (4); architecture.md, Mechanic families (3); brief.md, The engine plays the game (3); architecture.md, State (1); brief.md, Angmar Awakened (1); brief.md, The Black Gate Opens (1); brief.md, The Return of the King (1)
 - `src/screens`: design-system.md, Tablets (8); design-system.md, Campaigns (campaign list) (6); brief.md, Three layers (5); design-system.md, Briefing (5); design-system.md, Components (5); brief.md, Card images (4); design-system.md, Campaign path (4); design-system.md, History (4); design-system.md, Settings (4); design-system.md, Campaign setup (3); design-system.md, Card pool (the Cards tab) (3); design-system.md, Deck builder (deck editor) (3); design-system.md, Navigation (3); design-system.md, Performance (3); design-system.md, Screen reader (3); brief.md, Persistence and shipping (2); brief.md, The Two Towers (2); design-system.md, Backdrops (2); design-system.md, Booklet (2); design-system.md, Card (2); design-system.md, Card art (2); design-system.md, Decks (2); design-system.md, Table opens stale (2); architecture.md, Images (1); architecture.md, State (1); architecture.md, Tests (1); brief.md, Campaign (1); brief.md, Nightmare (1); brief.md, Screens (1); brief.md, The Black Gate Opens (1); design-system-table.md, Marks of the open moment (1); design-system-table.md, Screen reader (1); design-system.md, Campaign log (1); design-system.md, Color (1); design-system.md, Icons (1); design-system.md, Resolution and standalone outcome (1); design-system.md, Rule (1); design-system.md, Rules (1); design-system.md, Scenarios (1); design-system.md, Spend XP (1); design-system.md, Type (1); releasing.md, TestFlight (optional) (1)

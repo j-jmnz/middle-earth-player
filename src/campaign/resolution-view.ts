@@ -17,6 +17,7 @@ import { ALLY_LINE_FACTS, BELDIS_BOXES, type AllyLine } from "../catalog/ally-li
 
 import { contextOf } from "./session.ts";
 import type { World } from "./world.ts";
+import { angmarAwakenedNotes } from "./log-angmar-awakened.ts";
 import { afterwardsWords } from "./resolution-then.ts";
 import { KEPT_RING_RECORDS } from "./return-of-the-king-words.ts";
 import { isTwoTowersChoice, pickWords, twoTowersChoosing, twoTowersNotes } from "./resolution-two-towers.ts";
@@ -146,7 +147,7 @@ export function resolutionView(state: ScenarioState, world: World, logged: reado
     // The tally the log will hold: the copies are capped at what one collection holds (applyResolution).
     const changes = poolChanges(state, settled.encounterPool ? cappedTally(settled.encounterPool, world.copies) : undefined);
     const gone = [...changes.removed, ...(settled.poolRemoved ?? []).map((item) => item.code)];
-    const notes = twoTowersNotes(settled, state.seatCount, (code) => nameOf(world, code));
+    const notes = [...twoTowersNotes(settled, state.seatCount, (code) => nameOf(world, code)), ...angmarAwakenedNotes(settled, (code) => nameOf(world, code))];
     return {
       kind: "settled",
       ...(endedInDefeat(state) ? { ended: true as const } : {}),
