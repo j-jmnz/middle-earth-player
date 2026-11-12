@@ -66,11 +66,13 @@ export function announceProgress(state: ScenarioState, steps: EngineStep[], ctx:
   if (steps.length === from || !listens(state, ctx, "progressPlaced")) return state;
   // The player who placed the progress (the step's `seat`, stamped by the effect that placed it) is told only to a card that asks for it (`eventSeat`, 19102:A:2); every other game announces it with no seat.
   const reads = gameReadsOnTrigger(state, ctx, "progressPlaced", '"eventSeat"');
+  // The amount just placed ("X is the amount of progress just placed", 146020:A:3) is told only to a card that reads X: the Forced record hears it as its `x`.
+  const amounts = gameReadsOnTrigger(state, ctx, "progressPlaced", '"x":true');
   let next = state;
   for (const step of steps.slice(from)) {
     if (step.kind !== "progress" || step.amount <= 0) continue;
     const card = next.cards[step.targetId];
-    if (card && inPlay(card.zone)) next = queueEvent(next, { trigger: "progressPlaced", seat: reads ? (step.seat ?? null) : null, cardId: step.targetId });
+    if (card && inPlay(card.zone)) next = queueEvent(next, { trigger: "progressPlaced", seat: reads ? (step.seat ?? null) : null, cardId: step.targetId, ...(amounts ? { amount: step.amount } : {}) });
   }
   return next;
 }

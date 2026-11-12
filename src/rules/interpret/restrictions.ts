@@ -55,6 +55,8 @@ function scanRestricted(state: ScenarioState, ctx: ReduceContext, what: Restrict
 
 export function travelBlocked(state: ScenarioState, ctx: ReduceContext, locationId: string): boolean {
   const location = state.cards[locationId];
+  // A location that cannot leave the staging area cannot become the active location ("Each non-unique location ... cannot leave the staging area", 146066:B:1).
+  if (flagged(state, locationId, "cannotLeaveStaging")) return true;
   return restricted(state, ctx, "travel").some((rule) => {
     // Every location with a trait (Grond's, 145044:A:1 and the Gate's kin).
     if (rule.trait != null) return printedOf(ctx.cards, location?.code ?? "").traits.includes(rule.trait);

@@ -64,7 +64,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("heroExhausted") }),
   // The attack in progress has no defender (declared or considered).
   z.strictObject({ kind: z.literal("undefended") }),
-  z.strictObject({ kind: z.literal("searchable"), trait: z.string().min(1).optional(), code: z.string().min(1).optional(), deckOnly: z.literal(true).optional() }),
+  // `type`: only a card of this printed type counts ("discard cards from the top of the encounter deck until an enemy is discarded" is offered while an enemy is left in the deck, 146061:A:1).
+  z.strictObject({ kind: z.literal("searchable"), trait: z.string().min(1).optional(), code: z.string().min(1).optional(), type: z.enum(["enemy", "location", "treachery", "objective"]).optional(), deckOnly: z.literal(true).optional() }),
   // Some card matches this pick (for the actor now): a choice that could be made.
   z.strictObject({ kind: z.literal("canPick"), pick: pickSchema }),
   // Each of the actor's heroes has this trait, and the actor has one ("Play only if each of your heroes is a Hobbit",
@@ -194,7 +195,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   // `inPlay`: the card is in play now (`false`: it is not), for "if that ally is still in play".
   z.strictObject({
     kind: z.literal("matches"),
-    card: z.enum(["self", "host", "subject", "other", "activeLocation", "picked", "attacker", "defender"]),
+    // `previous`: the card picked before the last one ("if that copy was discarded", 146019:A:1).
+    card: z.enum(["self", "host", "subject", "other", "activeLocation", "picked", "previous", "attacker", "defender"]),
     pick: pickSchema.optional(),
     inPlay: z.boolean().optional(),
     // The card is in a staging area now (`false`: it is not): "raise your threat by its Threat to engage that enemy" needs the enemy still there (142067:B:2).

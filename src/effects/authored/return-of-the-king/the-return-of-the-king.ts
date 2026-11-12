@@ -2,8 +2,8 @@ import type { Effect } from "../../../catalog/boundary.ts";
 
 // The campaign cards of The Return of the King (145066, 145070, 145078, 146069, 146074, 146079; Setup on the front, Resolution on the back, ledger data/printed/the-return-of-the-king.json). Their vocabulary is the campaign
 // family's (src/catalog/families/campaign.ts): the checklist deals the Setup verbs (src/campaign/checklist.ts) and the Resolution runs the rest (src/rules/setup/resolution.ts, src/rules/families/campaign/saga-end.ts).
-// Written here: the Setup of the cards that only change the pool, the decks and the hand (145066, 145070, 146074), and every Resolution. Left to the scenarios that play them, since each needs a mechanic that scenario builds: the Setup lines
-// that set cards aside, attach them or place tokens in the game (146069:A:1, 146079:A:1) and the Forced lines of the campaign cards in play (146069:B:1, 146079:A:2). 145078's Setup and Forced are in pelennor/stages.ts.
+// Written here: the Setup of the cards that only change the pool, the decks and the hand (145066, 145070, 146074), every Resolution, and the Setup and Forced of The Tower of Cirith Ungol (146069, whose boons and Heavy Burden its scenario builds). Left to the scenarios that play them, since each needs a mechanic that scenario builds: the
+// Setup lines that place tokens in the game (146079:A:1) and the Forced lines of the campaign cards in play (146079:A:2). 145078's Setup and Forced are in pelennor/stages.ts.
 const FELLOWSHIP_AND_TWO_TOWERS_SETS = ["A Shadow of the Past", "Flight to the Ford", "The Ring Goes South", "The Passage of the Marshes", "Shelob's Lair"];
 const ANDURIL = "142014";
 const OVERCOME_BY_FEAR = "145016";
@@ -14,6 +14,10 @@ const ESQUIRE_OF_ROHAN = "145014";
 const ESQUIRE_OF_GONDOR = "145015";
 const CORSAIR_FLEET = ["145071", "145072"];
 const SHAGRAT = "146020";
+const LAST_OF_THE_COMPANY = "146014";
+const HEAVY_BURDEN = "144052";
+const ESCAPE_FROM_CIRITH_UNGOL = "Escape from Cirith Ungol";
+const THREE_BURDEN_SETS = ["Helm's Deep", "The Road to Isengard", "The Passing of the Grey Company"];
 const BLACK_GATE = "146024";
 const GWAIHIR = "146041";
 
@@ -32,7 +36,40 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 145078 The Battle of the Pelennor Fields. Resolution: each player earns a Wraith on Wings, and an Esquire on a hero is earned for that hero's controller.
   {"id":"145078:resolution:1","cardCode":"145078","lines":["145078:B:2"],"timing":"resolution","instructions":[{"verb":"Earn","codes":[WRAITH_ON_WINGS],"eachPlayer":true},{"verb":"EarnAttached","codes":[ESQUIRE_OF_GONDOR,ESQUIRE_OF_ROHAN]}]},
 
-  // 146069 The Tower of Cirith Ungol. Resolution: with Shagrat in play, the boons attached to him are lost from the pool.
+  // 146069 The Tower of Cirith Ungol. Setup: no +1 for changing heroes; A Heavy Burden, from the supply, is attached to the hero that has Last of the Company (the quest card's Setup attaches it, so this resolves after it); each player chooses an Item boon other than Andúril from the pool and sets it aside, out of play;
+  // the burdens of Helm's Deep, The Road to Isengard and The Passing of the Grey Company are left out of the encounter deck. Forced: when the players advance to stage 3A, once its When Revealed has resolved the Heavy Burden moves to the Ring-bearer (one card, never a second copy) and each set-aside boon is attached to Shagrat as a guarded
+  // objective, if he is in play (else it stays set aside); when Shagrat leaves play each guarded boon returns to its owner's hand (a marker: the settle loop does it). Resolution: with Shagrat in play, the boons attached to him are lost from the pool.
+  {
+    id: "146069:campaignSetup:1",
+    cardCode: "146069",
+    lines: ["146069:A:1"],
+    timing: "campaignSetup",
+    instructions: [
+      { verb: "WaiveThreatPenalty" },
+      { verb: "AttachToHeroWith", code: HEAVY_BURDEN, with: LAST_OF_THE_COMPANY },
+      { verb: "SetAsideBoon", trait: "Item", except: ANDURIL },
+      { verb: "RemoveBurdenSets", sets: THREE_BURDEN_SETS },
+    ],
+  },
+  {
+    id: "146069:forced:1",
+    cardCode: "146069",
+    lines: ["146069:B:1"],
+    timing: "forced",
+    trigger: "afterStageRevealed",
+    condition: { kind: "matches", card: "subject", pick: { type: "card", control: "any", names: [ESCAPE_FROM_CIRITH_UNGOL] } },
+    instructions: [{ verb: "MoveAttachment", code: HEAVY_BURDEN, to: "ringBearer" }],
+  },
+  {
+    id: "146069:forced:2",
+    cardCode: "146069",
+    lines: ["146069:B:1"],
+    timing: "forced",
+    trigger: "afterStageRevealed",
+    condition: { kind: "matches", card: "subject", pick: { type: "card", control: "any", names: [ESCAPE_FROM_CIRITH_UNGOL] } },
+    instructions: [{ verb: "GuardWithSetAside", host: SHAGRAT, kind: "boon" }],
+  },
+  { id: "146069:forced:3", cardCode: "146069", lines: ["146069:B:1"], timing: "forced", trigger: "leftPlay", subject: { type: "enemy", control: "any", names: ["Shagrat"] }, instructions: [{ verb: "ReturnGuardedToHand" }] },
   {"id":"146069:resolution:1","cardCode":"146069","lines":["146069:B:2"],"timing":"resolution","instructions":[{"verb":"LoseGuardedBoons","host":SHAGRAT,"when":{"kind":"inPlay","code":SHAGRAT,"is":true}}]},
 
   // 146074 The Black Gate Opens. Setup: no +1 for changing heroes, the Andúril search and the five burden sets. Resolution: the tokens on The Black Gate are recorded; each Wraith on Wings in the victory display leaves the pool; the first

@@ -12,7 +12,7 @@ import { definePrinted } from "../../core/printed.ts";
 import { moveCard, spawn } from "../../core/zones.ts";
 import { enemy, hero, table } from "../defense/table.ts";
 
-// Rules: mec113.setup-the-tower-of-cirith-ungol, mec113.the-fellowship-sphere, rr.lasting-effects, rr.victory-display, rr.traits, faq.lasting-effects (data/rules/entries.json); ledger lines 146068:A:1, 146023:A:1, 146019:A:1, 146067:B:1, 146020:A:1, 146014:A:1.
+// Rules: mec113.setup-the-tower-of-cirith-ungol, mec113.the-fellowship-sphere, rr.lasting-effects, rr.discard-pile-and-victory-display, rr.traits, faq.lasting-effects (data/rules/entries.json); ledger lines 146068:A:1, 146023:A:1, 146019:A:1, 146067:B:1, 146020:A:1, 146014:A:1.
 // The Tower of Cirith Ungol's small pieces: a card back from the victory display as its other side, the Threat that follows an enemy's damage, the copy of a picked enemy, the boons a card may carry and the Fellowship sphere a hero is granted.
 
 const focus = { seat: 0, sourceId: null };

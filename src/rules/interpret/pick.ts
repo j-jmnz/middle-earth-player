@@ -340,8 +340,8 @@ export function feedsDiscard(instructions: readonly Instruction[]): boolean {
 }
 
 // How many cards match a filter from a seat's side: the count an amount or a condition reads.
-export function countMatching(state: ScenarioState, spec: PickSpec, seat: number, sourceId: string | null, ctx: ReduceContext, participants?: readonly string[]): number {
-  const found = pickCandidates(state, spec, seat, [], sourceId, ctx, undefined, participants, true);
+export function countMatching(state: ScenarioState, spec: PickSpec, seat: number, sourceId: string | null, ctx: ReduceContext, participants?: readonly string[], picked: readonly string[] = []): number {
+  const found = pickCandidates(state, spec, seat, picked, sourceId, ctx, undefined, participants, true);
   // "When counting the number of Dwarf characters you control, Bombur counts as two" (families/misc/traits.ts).
   return found.length + countsExtra(state, found, spec);
 }

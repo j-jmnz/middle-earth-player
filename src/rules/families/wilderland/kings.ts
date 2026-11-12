@@ -109,10 +109,10 @@ export function guardWithDeckTop(state: ScenarioState, focus: Focus): ScenarioSt
 
 /**
  * The settle sweep for ReturnGuardedToHand ("When Hobgoblin leaves play, return the card it was guarding to its owner's hand"): a card held under an enemy that is no longer in play returns to its owner's hand. Only a game whose records hold a card
- * (a card of the game has a record with the verb) looks.
+ * (a card of the game has a record with GuardWithDeckTop, or GuardWithSetAside for the boons Shagrat guards, 146069:B:1) looks.
  */
 export function returnHeld(state: ScenarioState, ctx: ReduceContext): ScenarioState {
-  if (!gameReads(state, ctx, '"ReturnGuardedToHand"')) return state;
+  if (!gameReads(state, ctx, '"GuardWithDeckTop"') && !gameReads(state, ctx, '"GuardWithSetAside"')) return state;
   let next = state;
   for (const card of Object.values(state.cards)) {
     if (card.held !== true) continue;

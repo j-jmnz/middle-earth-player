@@ -78,7 +78,10 @@ describe("GuardWithSetAside and ReturnGuardedToHand (146069:B:1)", () => {
     // The campaign card holds the Forced record that names the verb, so the sweep looks in this game.
     const campaign = spawn(state, "c", { zone: "campaign" });
     const shagrat = spawn(campaign.state, "shagrat", { zone: "staging" });
-    const effects = [{ id: "c:forced:1", cardCode: "c", lines: ["c:B:1"], timing: "forced" as const, trigger: "leftPlay" as const, instructions: [{ verb: "ReturnGuardedToHand" as const }] }];
+    const effects = [
+      { id: "c:forced:1", cardCode: "c", lines: ["c:B:1"], timing: "forced" as const, trigger: "afterStageRevealed" as const, instructions: [{ verb: "GuardWithSetAside" as const, host: "shagrat", kind: "boon" as const }] },
+      { id: "c:forced:2", cardCode: "c", lines: ["c:B:1"], timing: "forced" as const, trigger: "leftPlay" as const, instructions: [{ verb: "ReturnGuardedToHand" as const }] },
+    ];
     return { ...base, state: shagrat.state, aside, shagrat: shagrat.id, ctx: { ...base.ctx, effects } };
   }
 
