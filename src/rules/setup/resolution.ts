@@ -16,7 +16,7 @@ import { discardToPoolFromSets } from "../families/wilderland/mirkwood.ts";
 import { addEncounterCards, allyOrLineOptions, applyAllyOrLine, applyRemoval, applyStagedLocation, discoverTreasures, noteRemovalAnswer, playerOptions, removalOptions, removeEncounterCards, stagedLocationOptions } from "../families/wilderland/pool.ts";
 import { drawTreasures } from "../families/wilderland/treasure.ts";
 import { applyHazard, discardHazards, hazardOptions } from "../families/wilderland/hazards.ts";
-import { recordDamageOn, recordDetermined, recordHeroDamage } from "../families/campaign/damage-tracking.ts";
+import { recordDamageOn, recordDetermined, recordHeroDamage, recordStolenCards } from "../families/campaign/damage-tracking.ts";
 import { endCampaign, ignoreDiscardedHeroes, loseGuardedBoons, recordTokens, removeFromPool, threatDialCopies } from "../families/campaign/saga-end.ts";
 import { applyChooseOption, applyRevive, applyTrim, boonHeroes, chooseOptionIds, earnForPick, earnHeldCopies, reviveOptions, threatPenalties, trimOptions, underneath } from "../families/campaign/resolution.ts";
 
@@ -167,6 +167,9 @@ export function advanceResolution(state: ScenarioState, ctx: ReduceContext): Sce
         break;
       case "RecordDetermined":
         next = stepOver(next, recordDetermined(next, instruction));
+        break;
+      case "RecordStolenCards":
+        next = stepOver(next, recordStolenCards(next, ctx));
         break;
       case "RemoveFromPoolByCode":
         next = stepOver(next, removeFromPool(next, instruction));

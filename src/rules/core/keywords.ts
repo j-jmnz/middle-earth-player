@@ -59,6 +59,7 @@ export function modifiedStat(
     if (!modifierActive(state, modifier)) continue;
     if (modifier.when?.kind === "versusHighEngagement" && !versusHighEngagement(state, modifier.when.role, instance, cards, against)) continue;
     if (modifier.when?.kind === "versusDefender" && !versusDefender(state, instance, modifier.when, cards)) continue;
+    if (modifier.when?.kind === "versusVictoryTrait" && !versusVictoryTrait(state, instance, cards, against)) continue;
     // "+2 Attack while attacking that enemy": only while the holder attacks it.
     if (modifier.against != null && modifier.against !== against) continue;
     // "+1 Attack when attacking an Orc" (families/attack/strike.ts).
@@ -97,6 +98,20 @@ export function versusHighEngagement(
   const enemy = enemyId ? state.cards[enemyId] : undefined;
   if (!enemy || printedOf(cards, enemy.code).engagementCost == null) return false;
   return modifiedStat(state, enemy, "engagementCost", cards) > threat;
+}
+
+// The enemy the holder attacks, or defends against in the attack in progress, shares a Trait with an enemy in the victory display (10181:A:2).
+export function versusVictoryTrait(state: ScenarioState, holder: CardInstance, cards: ReadonlyMap<string, PrintedCard>, against?: string): boolean {
+  const attack = state.pendingAttack;
+  const enemyId = attack && attack.defenderId === holder.id && !attack.undefended ? attack.enemyId : against;
+  const enemy = enemyId ? state.cards[enemyId] : undefined;
+  if (!enemy) return false;
+  const traits = printedOf(cards, enemy.code).traits;
+  return state.victory.some((id) => {
+    const card = state.cards[id];
+    const printed = card ? printedOf(cards, card.code) : undefined;
+    return printed?.type === "enemy" && printed.traits.some((trait) => traits.includes(trait));
+  });
 }
 
 // The holder is the enemy making the attack in progress and the character defending it has at most this many printed hit points (142071:A:2).

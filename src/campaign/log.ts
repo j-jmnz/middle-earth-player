@@ -9,6 +9,7 @@ import type { AllyLine } from "../catalog/ally-lines.ts";
 
 import { scoreOf, type ScenarioScore } from "./score.ts";
 import { marshesAfter, penaltiesAfter, revisedFallen, revisedHeroes } from "./log-two-towers.ts";
+import { stolenAfter } from "./log-angmar-awakened.ts";
 import { cappedTally } from "./wilderland.ts";
 import { xpAwarded, type ModeCard } from "./xp.ts";
 
@@ -213,6 +214,6 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
     protectDamage: result.damageNotes?.protect ?? log.protectDamage,
     heroDamage: result.damageNotes?.heroes ?? log.heroDamage,
     determined: [...new Set([...log.determined, ...(result.determined ?? [])])],
-    stolenCards: log.stolenCards,
+    stolenCards: stolenAfter(log.stolenCards, result.stolen),
   };
 }

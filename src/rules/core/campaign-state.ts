@@ -62,6 +62,8 @@ export type ResolutionLog = {
   // log's `threatPenalty`), and the codes of the characters the Resolution marked "determined" (RecordDetermined; campaign/log.ts adds them to the log's `determined`).
   startingThreat?: number;
   determined?: readonly string[];
+  // Angmar Awakened, Escape from Mount Gram: the unique cards still in each seat's captured deck when the game was won, by card code (RecordStolenCards; campaign/log.ts adds them to the log's `stolenCards`).
+  stolen?: readonly (readonly string[])[];
 };
 
 // The campaign log's structured facts, handed to the engine at the start of a scenario in Campaign Mode (campaign/log.ts writes

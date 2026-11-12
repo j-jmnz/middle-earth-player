@@ -22,7 +22,7 @@ import { lookedPool } from "../families/deck/pick.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hasKeyword, isPlayerCardEffect, modifiedStat, playerCardEffectCanChoose, sourcePrinted, uniqueBlocked } from "../core/keywords.ts";
 import { cardTypeOf, isAllyLike, isPlayerType, printedOf } from "../core/printed.ts";
-import { activeFor, sharedStaging } from "../families/breaking/areas.ts";
+import { activeFor, sharedStaging, sharing } from "../families/breaking/areas.ts";
 import { breakingPickMatches } from "../families/breaking/attack.ts";
 import type { ScenarioState } from "../core/state.ts";
 import { heldAmount, inPlay, livingSeats } from "../core/state.ts";
@@ -59,7 +59,7 @@ export type PickContext = {
 function seatsOf(state: ScenarioState, spec: PickSpec, asking: number): number[] {
   if (spec.control === "you") return [asking];
   // "At this stage": the chooser's own once stages are separate (mec109.multiple-staging-areas).
-  if (spec.atStage && state.separate) return [asking];
+  if (spec.atStage && state.separate) return sharing(state, asking);
   if (spec.control === "other") return livingSeats(state).filter((seat) => seat !== asking);
   return livingSeats(state);
 }
@@ -126,7 +126,7 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
       raw.push(instance.id);
     }
   } else if (spec.type === "enemy") {
-    const engagedSeats = spec.engaged === "you" || (spec.atStage && state.separate) ? [asking] : spec.engaged === "other" ? livingSeats(state).filter((seat) => seat !== asking) : livingSeats(state);
+    const engagedSeats = spec.atStage && state.separate ? sharing(state, asking) : spec.engaged === "you" ? [asking] : spec.engaged === "other" ? livingSeats(state).filter((seat) => seat !== asking) : livingSeats(state);
     if (!spec.stagingOnly) for (const index of engagedSeats) raw.push(...(state.seats[index]?.engaged ?? []));
     // `staging` with `engaged`: the staging area and the enemies engaged as `engaged` says ("or engaged with another player").
     if (spec.staging || (spec.stagingOnly && spec.engaged == null)) raw.push(...stagingFor(state, spec, asking));

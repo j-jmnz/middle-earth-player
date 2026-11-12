@@ -16,6 +16,12 @@ export function angmarAwakenedFacts(log: AngmarColumns, campaignId: string): Pic
   return empty ? {} : { angmar: { protectDamage: log.protectDamage, heroDamage: log.heroDamage, determined: log.determined, stolen: log.stolenCards } };
 }
 
+/** The unique cards each seat lost, with the ones a won Escape from Mount Gram stole (`ResolutionLog.stolen`): each seat's codes added to the logged ones, once each. */
+export function stolenAfter(logged: readonly (readonly string[])[], stolen: readonly (readonly string[])[] | undefined): readonly (readonly string[])[] {
+  if (!stolen) return logged;
+  return stolen.map((codes, seat) => [...new Set([...(logged[seat] ?? []), ...codes])]);
+}
+
 /** Whether the campaign keeps the Damage Tracking rows. */
 export function keepsAngmarAwakenedLog(campaign: { id: string }): boolean {
   return campaign.id === ANGMAR_AWAKENED_CAMPAIGN;

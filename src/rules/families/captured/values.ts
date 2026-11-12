@@ -6,6 +6,7 @@ import type { Amount, Condition, PickSpec } from "../../../catalog/boundary.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { inPlay, livingSeats } from "../../core/state.ts";
+import { effectsOf } from "../../windows/listen.ts";
 import type { AmountScope } from "../../interpret/amounts.ts";
 import type { Scope } from "../../interpret/conditions.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -23,6 +24,14 @@ export function capturedPool(state: ScenarioState, spec: PickSpec, asking: numbe
   const engaged = sharing(state, head).flatMap((seat) => state.seats[seat]?.engaged ?? []);
   const staged = state.separate ? (state.viewSeat === head ? state.staging : [...(state.seats[head]?.staging ?? []), ...(state.capture?.here ?? []).filter((id) => state.cards[id]?.zone === "staging")]) : state.staging;
   return [...new Set([...staged, ...activeFor(state, asking), ...engaged])].filter((id) => inPlay(state.cards[id]?.zone ?? "removed"));
+}
+
+// Whether the campaign card in play raises each player's threat at the end of the refresh phase by its own count instead of 1 (10174:B:1): its Forced record raises by the completed quest cards and the side quests in the victory display.
+export function refreshRaiseReplaced(state: ScenarioState, ctx: ReduceContext): boolean {
+  if (!state.capture) return false;
+  return Object.values(state.cards).some(
+    (card) => card.zone === "campaign" && effectsOf(ctx, card.code).some((effect) => effect.trigger === "endOfPhase" && effect.instructions.some((instruction) => instruction.verb === "RaiseThreat" && typeof instruction.amount === "object" && instruction.amount.captured === "questsAndSides")),
+  );
 }
 
 // Whether a card has captured cards underneath it.
@@ -56,5 +65,6 @@ export function capturedAmount(state: ScenarioState, found: Exclude<Amount, numb
 export function capturedHolds(state: ScenarioState, condition: Condition, scope: Scope): boolean | null {
   if (condition.kind !== "captured") return null;
   if (condition.is === "noneUnderSelf") return scope.sourceId != null && !holdsCaptured(state, scope.sourceId);
+  if (condition.is === "noneUnderAttacker") return !holdsCaptured(state, state.pendingAttack?.enemyId ?? "");
   return state.capture?.none === true;
 }

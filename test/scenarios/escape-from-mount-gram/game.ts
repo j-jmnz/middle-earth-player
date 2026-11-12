@@ -1,4 +1,5 @@
 import { emptyLog, type CampaignLog } from "../../../src/campaign/log.ts";
+import type { LoadoutSeat } from "../../../src/campaign/loadout.ts";
 import type { Difficulty } from "../../../src/catalog/scenario-data.ts";
 import type { CampaignFacts, ModeCard } from "../../../src/rules/core/campaign-state.ts";
 import { legalIntents, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
@@ -22,7 +23,7 @@ export const gramLoadout = fillerLoadout;
 export const gramWorld = (decks: GramDecks = "strong") => game.world(decks);
 export const afterEriador = (seatCount: 1 | 2) => game.after(seatCount);
 export const gramPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount)) => game.plan(seatCount, log);
-export const gramStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard) => game.start(seatCount, seed, difficulty, { facts, log, modeCard });
+export const gramStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, loadout?: LoadoutSeat[]) => game.start(seatCount, seed, difficulty, { facts, log, modeCard, ...(loadout ? { loadout } : {}) });
 
 export type GramPolicy = {
   // The option a Choose window with these answers takes: the first or the last.

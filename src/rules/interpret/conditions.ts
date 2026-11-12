@@ -16,7 +16,7 @@ import { seatThreat } from "../families/play/hooks.ts";
 import { distinctTraitCount, flaggedTrait } from "../families/misc/traits.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { currentQuestHas, engagedThisPhase, questHasKeywords, stepHolds } from "../families/quest/conditions.ts";
-import { modifiedStat, versusDefender, versusHighEngagement } from "../core/keywords.ts";
+import { modifiedStat, versusDefender, versusHighEngagement, versusVictoryTrait } from "../core/keywords.ts";
 import { effectsOf } from "../windows/listen.ts";
 import { countMatching, matchesPick, pickCandidates } from "./pick.ts";
 import { committedWillpower, stagingThreat } from "../quest/quest.ts";
@@ -206,6 +206,10 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     case "versusDefender": {
       const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
       return holder != null && versusDefender(state, holder, condition, ctx.cards);
+    }
+    case "versusVictoryTrait": {
+      const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
+      return holder != null && versusVictoryTrait(state, holder, ctx.cards, scope.against);
     }
     case "versusHighEngagement": {
       const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];

@@ -38,7 +38,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "PlaceDiscardUnderDeck":
       return placeDiscardUnderDeck(state);
     case "StartSeparateStage":
-      return startSeparateStage(state, instruction.code, focus.seat);
+      return startSeparateStage(state, instruction.code, focus.seat, instruction.reveal === true ? { ctx, steps } : undefined);
     case "AdvanceToStage":
       return advanceToStage(state, instruction.code, ctx, steps);
     case "DealOutStaging":
@@ -115,7 +115,7 @@ function placeDiscardUnderDeck(state: ScenarioState): ScenarioState {
 
 // StartSeparateStage (142062:B:1): stages are separate from here on, and the quest deck's card with the code is the acting seat's stage, side B up as an
 // advanced stage is (rules/quest/quest.ts advanceStage). The seat's staging area starts empty.
-function startSeparateStage(state: ScenarioState, code: string, seat: number): ScenarioState {
+function startSeparateStage(state: ScenarioState, code: string, seat: number, reveal?: { ctx: ReduceContext; steps: EngineStep[] }): ScenarioState {
   const id = state.questDeck.find((candidate) => state.cards[candidate]?.code === code);
   if (!id || !state.seats[seat]) return state;
   // An active location of the shared stages goes back to the staging area, so it is dealt out with the rest (a seat's own slot is empty).
@@ -123,7 +123,12 @@ function startSeparateStage(state: ScenarioState, code: string, seat: number): S
   for (const location of [state.activeLocation, state.secondActiveLocation]) if (location && !state.separate) shared = moveCard(shared, location, { zone: "staging" });
   const separate: ScenarioState = { ...shared, separate: true };
   const view = { ...viewOf(separate, seat), questStage: null };
-  return mergeView(separate, seat, updateCard(moveCard(view, id, { zone: "questStage" }), id, { face: "B", controller: seat }));
+  const started = mergeView(separate, seat, updateCard(moveCard(view, id, { zone: "questStage" }), id, { face: "B", controller: seat }));
+  if (!reveal) return started;
+  // The stage is revealed for the seat: its When Revealed effects are pushed (quest/stage-reveal.ts afterProgress).
+  const before = reveal.steps.length;
+  reveal.steps.push({ kind: "advance", cardId: id });
+  return afterProgress(started, before, reveal.ctx, reveal.steps);
 }
 
 // MovePickedToOwnStaging (142062:B:1): the last picked card, in the shared staging area, goes to the acting seat's staging area.

@@ -87,7 +87,7 @@ describe("record routes", () => {
   });
 
   it("reads every verb of a campaign card's Setup (src/campaign/start.ts, src/campaign/checklist.ts)", () => {
-    const roles = new Set([...setupRoleVerbs("dealt"), ...setupRoleVerbs("afterSetup")]);
+    const roles = new Set([...setupRoleVerbs("dealt"), ...setupRoleVerbs("afterSetup"), ...setupRoleVerbs("beforeReveal")]);
     const dropped = records("campaignSetup").flatMap((effect) => effect.instructions.filter((instruction) => !roles.has(instruction.verb) && !(instruction.verb in READ_FROM_CAMPAIGN_SETUP)).map((instruction) => `${effect.id}: ${instruction.verb}`));
     expect(dropped, "a campaign Setup verb nothing reads: give its schema entry a setupRole flag, or read it in the start or the checklist").toEqual([]);
     for (const [verb, file] of Object.entries(READ_FROM_CAMPAIGN_SETUP)) expect(source(file), `${verb} in ${file}`).toContain(`"${verb}"`);

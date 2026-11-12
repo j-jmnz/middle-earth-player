@@ -46,6 +46,7 @@ export type LoadoutRule =
   | "sameHero"
   | "bannedHero"
   | "bannedTitle"
+  | "stolenCard"
   | "secondVersion"
   | "undiscoveredTreasure"
   | "treasureCopies";
@@ -99,7 +100,8 @@ function grantedHeroErrors(heroCards: Cards, deckCards: Cards, cards: ReadonlyMa
 
 // `discovered` is the treasures the Campaign Log records (emce.treasure): a deck may hold a treasure only when its code is listed, one copy by title, and a game without a log lists none.
 // `rules` is the scenario's saga start and title bans (SagaRules).
-export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMap<string, PrintedCard>, saga: boolean, bans: readonly HeroBan[] = [], discovered: readonly string[] = [], rules: SagaRules = {}): LoadoutError[] {
+// `stolen` is the unique cards the campaign log records as stolen from each seat in Escape from Mount Gram (10174:B:3), by seat: they cannot be in that player's deck for the rest of the campaign, and a stolen hero cannot start.
+export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMap<string, PrintedCard>, saga: boolean, bans: readonly HeroBan[] = [], discovered: readonly string[] = [], rules: SagaRules = {}, stolen: readonly (readonly string[])[] = []): LoadoutError[] {
   const errors: LoadoutError[] = [];
   const fail = (rule: LoadoutRule, card: PrintedCard, why: string) =>
     errors.push({ rule, code: card.code, card: card.name, message: `${card.name} (${card.code}): ${why}` });
@@ -128,6 +130,14 @@ export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMa
     const ban = card == null ? undefined : bans.find((item) => item.code === card.code);
     if (card != null && ban != null) fail("bannedHero", card, `${ban.name} cannot be used in this scenario of the campaign (${ban.rule})`);
   }
+
+  // A unique card stolen from the player (mec108.captured-deck, 10174:B:3) is no deck card of theirs and no hero of theirs.
+  seats.forEach((seat, index) => {
+    const lost = stolen[index] ?? [];
+    for (const card of [...heroCards[index] ?? [], ...deckCards[index] ?? []]) {
+      if (card != null && lost.includes(card.code)) fail("stolenCard", card, "the Goblins of Mount Gram stole this unique card (the campaign log notes it), so it cannot be in this player's deck for the rest of the campaign");
+    }
+  });
 
   // A title the box refuses (mec112.saruman-grima-smeagol): a hero or an ally, or any card for Frodo Baggins in the scenarios that grant ☺ Aragorn.
   for (const ban of rules.titleBans ?? []) {

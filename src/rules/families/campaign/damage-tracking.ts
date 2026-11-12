@@ -2,6 +2,8 @@
 // and a Setup verb gives each hero the damage the log noted. src/rules/setup/resolution.ts and the campaign family's `run` call them.
 import type { Instruction } from "../../../catalog/boundary.ts";
 import type { ResolutionLog } from "../../core/campaign-state.ts";
+import { printedOf } from "../../core/printed.ts";
+import type { ReduceContext } from "../../interpret/interpret.ts";
 import { inPlay, updateCard, type ScenarioState } from "../../core/state.ts";
 import { tokensOn } from "./saga-end.ts";
 
@@ -31,6 +33,14 @@ export function recordDetermined(state: ScenarioState, instruction: Verb<"Record
     if (host && inPlay(host.zone) && !marked.includes(host.code)) marked.push(host.code);
   }
   return { ...state.resolutionLog, determined: marked };
+}
+
+/** RecordStolenCards (10174:B:3): for each seat, the unique cards (heroes too) still in its captured deck, not those captured underneath a card: by code, in deck order. The log adds them to the cards the campaign refuses that player (loadout.ts). */
+export function recordStolenCards(state: ScenarioState, ctx: ReduceContext): ResolutionLog {
+  const stolen = Array.from({ length: state.seatCount }, (_, seat) => [
+    ...new Set((state.seats[seat]?.captured ?? []).flatMap((id) => (printedOf(ctx.cards, state.cards[id]?.code ?? "").isUnique ? [state.cards[id]?.code ?? ""] : []))),
+  ]);
+  return { ...state.resolutionLog, stolen };
 }
 
 /** PlaceLoggedHeroDamage (10193:A:2): each hero in play takes the damage the Campaign Log noted for its code (`campaignFacts.angmar.heroDamage`); a hero with no note takes none. */

@@ -1,4 +1,5 @@
 // Rules: rr.refresh-phase, rr.step-7-3, ltp.phase-7-refresh (data/rules/entries.json).
+import { refreshRaiseReplaced } from "../families/captured/values.ts";
 import { ruleCause } from "../core/cause.ts";
 import type { GameEvent } from "../windows/frame-types.ts";
 import type { EngineStep } from "../core/intents.ts";
@@ -26,7 +27,8 @@ export function doRefresh(state: ScenarioState, ctx: ReduceContext, steps: Engin
   let next = updateCards(state, patches);
   for (const event of readied) next = queueEvent(next, event);
   // "Players do not raise their threat at the end of the refresh phase" (noRefreshThreat, 146042:A:1).
-  if (!flagged(next, "table", "noRefreshThreat")) for (const seat of livingSeats(next)) next = raiseThreat(next, seat, 1, steps, ruleCause("rr.step-7-3"));
+  // The campaign card of Escape from Mount Gram raises it by its own count instead (families/captured/values.ts).
+  if (!flagged(next, "table", "noRefreshThreat") && !refreshRaiseReplaced(next, ctx)) for (const seat of livingSeats(next)) next = raiseThreat(next, seat, 1, steps, ruleCause("rr.step-7-3"));
   return withMode(passToken(next, ctx, steps), "endRound");
 }
 
