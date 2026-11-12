@@ -94,7 +94,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 12175:B:6 (back): Resolution: Add each Accolade boon in play to the campaign pool. Each player may choose one of the following boons and add it to the campaign pool: The Canny Huntsman, A Tale of Victories, Lay of Courage, Rhyme of the Slayer.
   12175:resolution:1: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json EarnAttached {"verb":"EarnAttached","codes":["12176","12177","12178","12179"]}]
+    - each copy of code 12176, code 12177, code 12178 and code 12179 attached to a hero in play joins the Campaign Pool attached to that hero
     - [json ChooseCards {"verb":"ChooseCards","codes":["12180","12181","12182","12183"],"who":"eachSeat","to":"pool","optional":true}]
 
 12175:B:7 (back): If there are 4 Dragon Sign objectives in the victory display, the players also look at 3 random undiscovered treasures and choose 1 to attach to an eligible character.
@@ -214,7 +214,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
   19018:response:1: Response after the players travel (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json AttachGuardedFromPile {"verb":"AttachGuardedFromPile","pile":"caves","code":"19012"}]
-    - [json ShufflePile {"verb":"ShufflePile","pile":"caves"}]
+    - shuffle the caves deck
 
 19018:A:2 (front): Travel: Shuffle the encounter discard pile into the encounter deck and discard cards from the top until an enemy is discarded. Add that enemy to the staging area.
   19018:travel:1: Travel
@@ -236,7 +236,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 
 19019:A:3 (front): Travel: Assign X damage among characters in play.
   19019:travel:1: Travel
-    - [json AssignDamage {"verb":"AssignDamage","amount":{"count":{"type":"location","control":"any","stagingOnly":true}},"pick":{"type":"character","control":"any"}}]
+    - the acting player assigns the number of location (any player controls) in the staging area only damage among the character (any player controls), one at a time
 
 ## 19020 Heavy Snow
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -277,7 +277,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 19022:A:1 (front): Setup: Set Cold-Drake and all four copies of Dragon Sign aside, out of play. Create the Caves deck (see insert) and set it next to the quest deck. Shuffle 2 set aside Dragon Sign objectives into the Caves deck. Shuffle the encounter deck and discard cards from the top until X locations are discarded, where X is the number of players. Add each discarded location to the staging area.
   19022:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ShufflePile {"verb":"ShufflePile","pile":"caves"}]
+    - shuffle the caves deck
     - [json ShuffleSetAsideIntoPile {"verb":"ShuffleSetAsideIntoPile","pile":"caves","code":"19012","count":2}]
     - shuffle the encounter deck
     - for each player, first player first:
@@ -390,4 +390,4 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
     - later, at the end of this phase:
       - the players win the game
 
-(rendered pieces: 251 by template, 79 as JSON)
+(rendered pieces: 258 by template, 75 as JSON)

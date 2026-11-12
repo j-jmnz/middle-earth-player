@@ -120,7 +120,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   },
 
   // 09055 Make Camp (side quest, 6 quest points; Surge is a keyword). Characters cannot be healed while it is in the staging area. Response: after it is defeated each player heals up to 3 damage from a hero he controls.
-  { id: "09055:constant:1", cardCode: "09055", lines: ["09055:A:2"], timing: "constant", condition: IN_STAGING, instructions: [{ verb: "ModifyStat", stat: "cannotBeHealed", amount: 1, until: "whileSourceInPlay", target: "characters" }] },
+  { id: "09055:constant:1", cardCode: "09055", lines: ["09055:A:2"], timing: "constant", condition: IN_STAGING, instructions: [{ verb: "ModifyStat", stat: "cannotBeHealed", amount: 1, until: "whileSourceInPlay", holders: { type: "character", control: "any" } }] },
   {
     id: "09055:response:1",
     cardCode: "09055",

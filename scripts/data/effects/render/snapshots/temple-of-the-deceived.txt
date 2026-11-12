@@ -93,7 +93,7 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
     - [json SetAside {"verb":"SetAside","code":"11198"}]
     - [json SetAside {"verb":"SetAside","code":"11199"}]
     - [json SetAside {"verb":"SetAside","code":"11199"}]
-    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"11181"}]
+    - the set-aside card with code 11181 is shuffled into the encounter deck
     - [json FlipSetAside {"verb":"FlipSetAside","name":"Temple Guardian"}]
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11183","to":"Captain Sahír"}]
     - [json PlaceSecrets {"verb":"PlaceSecrets","codes":["11198","11199","11199"]}]
@@ -460,4 +460,4 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
     - then, if the active location is a Ruins location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): for each hero (any player controls) with resources on it:
       - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"picked"}]
 
-(rendered pieces: 229 by template, 78 as JSON)
+(rendered pieces: 230 by template, 77 as JSON)

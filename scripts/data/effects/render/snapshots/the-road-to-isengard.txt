@@ -13,7 +13,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
     - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"}]
     - the acting player chooses one of:
       * option "use" (only if threat of the top card of the encounter discard pile is less than willpower of its host):
-        - [json RemoveFromCampaignPool {"verb":"RemoveFromCampaignPool"}]
+        - this card is removed from the Campaign Pool
         - [json AddSourceToVictory {"verb":"AddSourceToVictory"}]
         - choose player (any player controls)
         - [json RevealFewer {"verb":"RevealFewer","amount":1,"min":0,"who":"picked"}]
@@ -143,7 +143,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
     only if the card the event is about had enough progress to be explored
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","type":"enemy","to":"engaged"}]
+      - the acting player finds one enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
     - shuffle the encounter deck
 
 ## 143055 Ring-wall of Isengard
@@ -188,7 +188,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 143057:A:2 (front): Wizardry: Assign X damage among characters in play. X is 1 more than the number of players in the game.
   143057:forced:2: Forced on the event wizardry (heard about this card)
     only if the card the event is about had enough progress to be explored
-    - [json AssignDamage {"verb":"AssignDamage","amount":{"players":true,"plus":1},"pick":{"type":"character","control":"any"}}]
+    - the acting player assigns the number of players + 1 damage among the character (any player controls), one at a time
 
 ## 143058 Plain of Isengard
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -227,7 +227,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 
 143060:A:1 (front): When Revealed: Assign X damage among characters committed to the quest. X is 1 more than the number of players in the game.
   143060:whenRevealed:1: When revealed
-    - [json AssignDamage {"verb":"AssignDamage","amount":{"players":true,"plus":1},"pick":{"type":"character","control":"any","committed":true}}]
+    - the acting player assigns the number of players + 1 damage among the character (any player controls) committed to the quest, one at a time
 
 143060:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending player has 1 or fewer cards in his hand).
   143060:shadow:1: Shadow
@@ -244,7 +244,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 143061:A:2 (front): When Revealed: Exhaust each damaged character. Until the end of the combat phase, treat each damaged character's text box as if it were blank (except for Traits).
   143061:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ExhaustEach {"verb":"ExhaustEach","pick":{"type":"character","control":"any","damaged":true}}]
+    - exhaust each damaged character (any player controls)
     - damagedCharacters: stat blankText (its text box is blank) 1, endOfCombat
 
 143061:A:3 (shadow): Shadow: Discard a non-objective attachment you control.
@@ -279,7 +279,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a hero (any player controls) committed to the quest to choose: choose hero (any player controls) committed to the quest
     - [json AttachSelfToPicked {"verb":"AttachSelfToPicked","when":{"kind":"canPick","pick":{"type":"hero","control":"any","committed":true}}}]
-    - [json RemoveFromQuest {"verb":"RemoveFromQuest","when":{"kind":"canPick","pick":{"type":"hero","control":"any","committed":true}}}]
+    - then, if there is a hero (any player controls) committed to the quest to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the last picked character is removed from the quest (it stays exhausted)
   143068:constant:1: Constant
     - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
   143068:forced:1: Forced after a card is committed to the quest (heard about the host)
@@ -378,4 +378,4 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
     - the table: stat eliminatedAtEmptyHand 1, while this card is in play
     - the table: stat trackQuestProgress 1, while this card is in play
 
-(rendered pieces: 200 by template, 39 as JSON)
+(rendered pieces: 213 by template, 33 as JSON)

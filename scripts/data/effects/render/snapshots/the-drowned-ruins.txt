@@ -10,7 +10,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json KeepCampaignCard {"verb":"KeepCampaignCard"}]
     - [json SetAside {"verb":"SetAside","code":"11183"}]
-    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"11181"}]
+    - the set-aside card with code 11181 is shuffled into the encounter deck
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11183","to":"Captain Sahír"}]
     - [json ChooseCards {"verb":"ChooseCards","codes":["11201","11202","11203","11204"],"who":"eachSeat","to":"hand","optional":true,"unearned":true,"afterMulligan":true}]
     - [json ChooseCards {"verb":"ChooseCards","codes":["11205","11206","11207","11208"],"who":"onePlayer","to":"hand","optional":true,"unearned":true,"afterMulligan":true}]
@@ -21,7 +21,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json KeepCampaignCard {"verb":"KeepCampaignCard"}]
     - [json SetAside {"verb":"SetAside","code":"11183"}]
-    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"11181"}]
+    - the set-aside card with code 11181 is shuffled into the encounter deck
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11183","to":"Captain Sahír"}]
     - [json ChooseCards {"verb":"ChooseCards","codes":["11201","11202","11203","11204"],"who":"eachSeat","to":"hand","optional":true,"unearned":true,"afterMulligan":true}]
     - [json ChooseCards {"verb":"ChooseCards","codes":["11205","11206","11207","11208"],"who":"onePlayer","to":"hand","optional":true,"unearned":true,"afterMulligan":true}]
@@ -106,7 +106,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
     - when the attack in progress ends:
       - [json RemoveNamedFromGame {"verb":"RemoveNamedFromGame","name":"Captain Sahír"}]
       - for each player, first player first:
-        - [json SearchMove {"verb":"SearchMove","trait":"Undead","type":"enemy","to":"staging"}]
+        - the acting player finds one Undead enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
       - shuffle the encounter deck
 
 12093:B:1 (back): While an Underwater location is the active location, players cannot play attachments or allies.
@@ -331,7 +331,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
 
 12106:A:2 (shadow): Shadow: If the active location is Underwater, search the encounter deck and discard pile for a Creature enemy, and add it to the staging area.
   12106:shadow:1: Shadow
-    - [json SearchMove {"verb":"SearchMove","trait":"Creature","type":"enemy","to":"staging","when":{"kind":"matches","card":"activeLocation","pick":{"type":"location","control":"any","trait":"Underwater"}}}]
+    - if the active location is a Underwater location (any player controls): the acting player finds one Creature enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
 
 ## 12107 Tangling and Grasping
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -340,7 +340,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
   12107:whenRevealed:1: When revealed
     - for each player, first player first:
       - choose character (you control) committed to the quest
-      - [json RemoveFromQuest {"verb":"RemoveFromQuest"}]
+      - the last picked character is removed from the quest (it stays exhausted)
       - then, if the active location is a Underwater location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the picked card
 
 12107:A:2 (shadow): Shadow: Discard an attachment you control.
@@ -362,4 +362,4 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if the active location is a Underwater location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
 
-(rendered pieces: 175 by template, 61 as JSON)
+(rendered pieces: 182 by template, 56 as JSON)

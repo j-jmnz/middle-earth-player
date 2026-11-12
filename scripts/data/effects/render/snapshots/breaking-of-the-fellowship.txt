@@ -259,7 +259,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 142073:A:2 (front): Travel: Search the encounter deck and discard pile for an enemy and add it to the staging area to travel here. Shuffle the encounter deck.
   142073:travel:1: Travel
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchMove {"verb":"SearchMove","type":"enemy","to":"staging"}]
+    - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
 
 142073:A:3 (front): While Parth Galen is in play, the players cannot win the game.
@@ -328,7 +328,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 142078:A:2 (front): Travel: Search the encounter deck and discard pile for an enemy and add it to this staging area to travel here. Shuffle the encounter deck.
   142078:travel:1: Travel
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchMove {"verb":"SearchMove","type":"enemy","to":"staging"}]
+    - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
 
 ## 142079 Slopes of Amon Hen
@@ -433,4 +433,4 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
     only if not (this card is in the staging area)
     - raise threat by 2 (hostController)
 
-(rendered pieces: 189 by template, 57 as JSON)
+(rendered pieces: 191 by template, 55 as JSON)

@@ -32,8 +32,9 @@ const PENDANT = "10157";
 const COURAGE = "10167";
 const DETERMINATION = "10172";
 const FEND_OFF = "10173";
+const OMENS = "10160";
 const CARN_DUM_BOONS = ["10189", "10190", "10191", "10192"];
-const CARDS = [GLORFINDEL, BERAVOR, AMARTHIUL_HERO, PROTECT, "100158", PENDANT, COURAGE, DETERMINATION, FEND_OFF, ...CARN_DUM_BOONS];
+const CARDS = [GLORFINDEL, BERAVOR, AMARTHIUL_HERO, PROTECT, OMENS, "100158", PENDANT, COURAGE, DETERMINATION, FEND_OFF, ...CARN_DUM_BOONS];
 
 const campaign = loadCampaign("angmar-awakened");
 const [chetwood, hills, dike, wastes, gram, ettenmoors, rhudaur, carnDum, dread] = campaign.scenarios.map((id) => loadScenario(id));
@@ -119,6 +120,28 @@ describe("the Setup of The Wastes of Eriador (10171:A:2)", () => {
     expect(made.log.campaignPool.map((card) => [card.code, card.seat, card.perPlayer])).toEqual([[DETERMINATION, 0, true], [DETERMINATION, 1, true]]);
     const start = buildStart({ campaign, scenario: wastes as never, seatCount: 1, seed: 1, threatModifier: 0, seats: [{ heroes: [GLORFINDEL], deck: [] }], effects: EFFECTS });
     expect(start.encounterDeck).toContain(FEND_OFF);
+  });
+});
+
+describe("the Setup of The Weather Hills (10159:A:2)", () => {
+  const logged = (): CampaignLog => ({ ...emptyLog(1), campaignPool: [pooled(PROTECT, null)] });
+
+  it("adds Mysterious Omens to the pool and leaves it and Protect the Innocent to the Setup, so step 8 shuffles neither into the encounter deck", () => {
+    const made = ok(plan(hills as never, undefined, 1, logged()));
+    expect(made.log.campaignPool.map((card) => card.code)).toEqual([PROTECT, OMENS]);
+    expect(made.poolEncounterCards).not.toContain(PROTECT);
+    expect(made.poolEncounterCards).not.toContain(OMENS);
+  });
+
+  it("does not add a second Mysterious Omens when the pool already holds one (a game played again)", () => {
+    const first = ok(plan(hills as never, undefined, 1, logged()));
+    const again = ok(plan(hills as never, undefined, 1, first.log));
+    expect(again.log.campaignPool.filter((card) => card.code === OMENS)).toHaveLength(1);
+    expect(again.poolEncounterCards).not.toContain(OMENS);
+  });
+
+  it("leaves the other scenarios' step 8 as it was: Protect the Innocent in the pool is shuffled into The Wastes of Eriador's encounter deck", () => {
+    expect(ok(plan(wastes as never, undefined, 1, logged())).poolEncounterCards).toContain(PROTECT);
   });
 });
 

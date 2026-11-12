@@ -55,7 +55,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     - [json SetAside {"verb":"SetAside","code":"11212"}]
     - [json SetAside {"verb":"SetAside","code":"11213"}]
     - [json SetAside {"verb":"SetAside","code":"11214"}]
-    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"11177"}]
+    - the set-aside card with code 11177 is shuffled into the encounter deck
     - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Raider Flagship"}]
     - [json FitShips {"verb":"FitShips","codes":["11172","11173","11174","11175"]}]
@@ -77,7 +77,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     - [json SetAside {"verb":"SetAside","code":"11212"}]
     - [json SetAside {"verb":"SetAside","code":"11213"}]
     - [json SetAside {"verb":"SetAside","code":"11214"}]
-    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"11177"}]
+    - the set-aside card with code 11177 is shuffled into the encounter deck
     - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Raider Flagship"}]
     - [json FitShips {"verb":"FitShips","codes":["11172","11173","11174","11175"]}]
@@ -141,7 +141,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json PrepareCorsairDeck {"verb":"PrepareCorsairDeck"}]
     - [json PrepareFleet {"verb":"PrepareFleet"}]
-    - [json SearchMove {"verb":"SearchMove","type":"objective","trait":"Dol Amroth","to":"staging","remember":true}]
+    - the acting player finds one Dol Amroth objective in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"remember":true}]
     - shuffle the encounter deck
     - [json GuardObjective {"verb":"GuardObjective","target":"picked"}]
 
@@ -166,8 +166,8 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 12121:A:1 (front): When Revealed: Search the encounter deck and discard pile for a Ship enemy and add it to the staging area (2 Ship enemies instead if there are 3 or more players in the game). Shuffle the encounter deck. For each unguarded objective in the staging area, attach a non-unique Ship enemy in the staging area to that objective, guarding it.
   12121:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchMove {"verb":"SearchMove","type":"enemy","trait":"Ship","to":"staging"}]
-    - [json SearchMove {"verb":"SearchMove","type":"enemy","trait":"Ship","to":"staging","when":{"kind":"count","pick":{"type":"player","control":"any"},"min":3}}]
+    - the acting player finds one Ship enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - then, if the number of player (any player controls) is at least 3 (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player finds one Ship enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
     - for each objective (any player controls) in the staging area only [also {"hasGuard":false}]:
       - choose non-unique Ship enemy (any player controls) in the staging area only [also {"isGuard":false}]
@@ -291,7 +291,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 12127:A:3 (front): When Revealed: Search the encounter deck and discard pile for a Dol Amroth objective and add it to the staging area. Then, attach Heavy Cruiser to that objective, guarding it. Shuffle the encounter deck.
   12127:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchMove {"verb":"SearchMove","type":"objective","trait":"Dol Amroth","to":"staging","remember":true}]
+    - the acting player finds one Dol Amroth objective in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"remember":true}]
     - [json AttachGuard {"verb":"AttachGuard","to":"picked"}]
     - shuffle the encounter deck
 
@@ -444,4 +444,4 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     only if [json condition {"kind":"controlledByPlayers"}]
     - this card: stat archeryBonus -4, while this card is in play
 
-(rendered pieces: 144 by template, 119 as JSON)
+(rendered pieces: 150 by template, 115 as JSON)

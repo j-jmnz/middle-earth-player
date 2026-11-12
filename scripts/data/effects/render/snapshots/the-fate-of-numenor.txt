@@ -102,9 +102,9 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
   11027:forced:1: Forced on the event flippedOver (heard about this card)
     only if this card is the active location
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ExhaustEach {"verb":"ExhaustEach","pick":{"type":"ally","control":"any","cardType":"ally","maxCost":2}}]
+    - exhaust each ally (any player controls) of card type ally [also {"maxCost":2}]
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","trait":"Undead","type":"enemy","to":"engaged"}]
+      - the acting player finds one Undead enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
     - shuffle the encounter deck
 
 11027:B:1: Uncharted.
@@ -170,7 +170,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
     only if this card is the active location
     - the first player chooses one of:
       * option "exhaust":
-        - [json ExhaustEach {"verb":"ExhaustEach","pick":{"type":"hero","control":"any","state":"ready"}}]
+        - exhaust each ready hero (any player controls)
       * option "return":
         - return this card to the staging area
 
@@ -435,7 +435,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json KeepCampaignCard {"verb":"KeepCampaignCard"}]
     - [json SetAside {"verb":"SetAside","code":"11180"}]
-    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"11181"}]
+    - the set-aside card with code 11181 is shuffled into the encounter deck
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11180","to":"Calphon"}]
     - [json TradeDamageForThreat {"verb":"TradeDamageForThreat","damage":1,"threat":1}]
 
@@ -463,4 +463,4 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
   11179:resolution:5: Resolution
     - [json GainXp {"verb":"GainXp","amount":-1,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Ominous Fate"]},"min":1}}]
 
-(rendered pieces: 174 by template, 95 as JSON)
+(rendered pieces: 179 by template, 92 as JSON)

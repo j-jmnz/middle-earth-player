@@ -63,7 +63,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01105:A:2 (shadow): Shadow: Resolve the "When Revealed" effect of Iron Shackles.
   01105:shadow:1: Shadow
-    - [json ResolveWhenRevealed {"verb":"ResolveWhenRevealed","card":"self"}]
+    - the When Revealed effects of this card resolve as if it had just been revealed
 
 ## 01107 Tower Gate
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -221,4 +221,4 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
     - [json CarryOver {"verb":"CarryOver","codes":["01135"],"when":{"kind":"inPlay","code":"01135","is":true}}]
     - [json CarryOver {"verb":"CarryOver","codes":["01132"],"eachPlayer":true,"when":{"kind":"inPlay","code":"01135","is":true}}]
 
-(rendered pieces: 102 by template, 39 as JSON)
+(rendered pieces: 103 by template, 38 as JSON)

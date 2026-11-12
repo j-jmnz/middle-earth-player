@@ -135,7 +135,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
   19072:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","trait":"Goblin","type":"enemy","to":"engaged","different":true}]
+      - the acting player finds one Goblin enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed) [also {"different":true}]
     - shuffle the encounter deck
 
 ## 19073 Face the Dragon
@@ -251,7 +251,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 
 19079:A:2 (front): Travel: Each player assigns X damage among characters he controls.
   19079:travel:1: Travel
-    - [json AssignDamage {"verb":"AssignDamage","amount":{"count":{"type":"card","control":"any","from":"victory","cardType":"encounter-side-quest"},"plus":1},"pick":{"type":"character","control":"you"},"who":"eachSeat"}]
+    - each player assigns the number of card (any player controls) in the victory display, of card type encounter-side-quest + 1 damage among the character (you control), one at a time
 
 ## 19080 Powerful in Wrath
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -290,7 +290,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 
 19082:A:1 (front): When Revealed: Each player assigns X damage among characters he controls, where X is 1 more than the number of side quests in the victory display.
   19082:whenRevealed:1: When revealed
-    - [json AssignDamage {"verb":"AssignDamage","amount":{"count":{"type":"card","control":"any","from":"victory","cardType":"encounter-side-quest"},"plus":1},"pick":{"type":"character","control":"you"},"who":"eachSeat"}]
+    - each player assigns the number of card (any player controls) in the victory display, of card type encounter-side-quest + 1 damage among the character (you control), one at a time
 
 19082:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each side quest in the victory display.
   19082:shadow:1: Shadow
@@ -302,7 +302,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
 19083:A:1 (front): Setup: Search the encounter deck for all 8 encounter side quests, shuffle them together, and place them facedown next to the quest deck. This is the side quest deck. The first player adds Dagnir to the staging area and shuffles the encounter deck. Each other player reveals an encounter card.
   19083:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ShufflePile {"verb":"ShufflePile","pile":"sideQuests"}]
+    - shuffle the sideQuests deck
     - shuffle the encounter deck
     - for each player, first player first:
       - if not (the actor holds the first player token): the acting player reveals an encounter card
@@ -324,4 +324,4 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
   19083:constant:2: Constant
     - this card: stat loseAtDamage quest points of this card, while this card is in play
 
-(rendered pieces: 180 by template, 20 as JSON)
+(rendered pieces: 189 by template, 17 as JSON)

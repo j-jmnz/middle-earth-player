@@ -165,7 +165,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
   146035:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a character (you control) committed to the quest to choose: choose character (you control) committed to the quest
-    - [json RemoveFromQuest {"verb":"RemoveFromQuest","when":{"kind":"canPick","pick":{"type":"character","control":"you","committed":true}}}]
+    - then, if there is a character (you control) committed to the quest to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the last picked character is removed from the quest (it stays exhausted)
 
 146035:A:3 (shadow): Shadow: Defending character cannot ready until the end of the round.
   146035:shadow:1: Shadow
@@ -181,7 +181,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
   146036:whenRevealed:1: When revealed
     - the acting player chooses one of:
       * option "search" (only if [json condition {"kind":"searchable","trait":"Nazgûl","type":"enemy","victory":true}]):
-        - [json SearchMove {"verb":"SearchMove","trait":"Nazgûl","type":"enemy","to":"staging","victory":true}]
+        - the acting player finds one Nazgûl enemy in the encounter deck or its discard pile or the victory display and adds it to the staging area (it is not revealed)
       * option "attach" (only if there is a Nazgûl enemy (any player controls) or in the staging area [also {"hasAttachment":{"names":["Hell-hawk","Fell Beast"],"none":true}}] to choose):
         - choose Nazgûl enemy (any player controls) or in the staging area [also {"hasAttachment":{"names":["Hell-hawk","Fell Beast"],"none":true}}]
         - [json AttachSelfToPicked {"verb":"AttachSelfToPicked"}]
@@ -220,7 +220,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 
 146038:A:1 (front): When Revealed: Each player assigns X damage among characters he controls, where X is the number of resources on The Black Gate.
   146038:whenRevealed:1: When revealed
-    - [json AssignDamage {"verb":"AssignDamage","amount":{"stat":"resources","ofNamed":"The Black Gate"},"pick":{"type":"character","control":"you"},"who":"eachSeat"}]
+    - each player assigns resources of "The Black Gate" damage among the character (you control), one at a time
 
 146038:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each resource on The Black Gate.
   146038:shadow:1: Shadow
@@ -318,7 +318,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
   146073:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","traits":["Orc","Troll","Nazgûl"],"type":"enemy","to":"staging","different":true}]
+      - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"traits":["Orc","Troll","Nazgûl"],"different":true}]
     - [json ShuffleSetAsideIntoEncounterDeck {"verb":"ShuffleSetAsideIntoEncounterDeck","code":"146041"}]
 
 146073:B:1 (back): Dire. During the staging step, the first player does not reveal an encounter card as normal. Instead, he reveals 1 encounter card for each resource on The Black Gate.
@@ -336,4 +336,4 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
   146073:constant:2: Constant
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 182 by template, 39 as JSON)
+(rendered pieces: 189 by template, 36 as JSON)

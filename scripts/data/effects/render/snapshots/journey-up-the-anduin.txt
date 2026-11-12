@@ -9,7 +9,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
   120165:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json PutObjectiveAllyIntoPlay {"verb":"PutObjectiveAllyIntoPlay","code":"12166"}]
-    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"12167"}]
+    - the set-aside card with code 12167 is shuffled into the encounter deck
 
 120165:A:3 (front): Response: After you explore a non-unique location, put a resource here. Then, if there are X resources here, the players look at 3 random undiscovered treasures and choose 1 to attach to an eligible character. X is 3 more than the number of players in the game.
   120165:response:1: Response on the event locationExplored (heard about non-unique location (any player controls))
@@ -53,7 +53,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18017:A:1 (front): Forced: When Wooded Riverbank is explored, put the top card of the Evil Creatures deck into play engaged with the first player.
   18017:forced:1: Forced on the event locationExplored (heard about this card)
-    - [json AddFromPile {"verb":"AddFromPile","pile":"evilCreatures","to":"engaged","who":"firstPlayer"}]
+    - for the first player, the top card(s) of the evilCreatures deck go to the engaged area
 
 18017:A:2 (shadow): Shadow: Deal 1 damage to the defending character.
   18017:shadow:1: Shadow
@@ -64,7 +64,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18018:A:1 (front): When Revealed: Add the top card of the Evil Creatures deck to the staging area and attach Frenzied Creature to it. (Counts as a Condition attachment with the text: "Attached enemy gets +1 Threat, +1 Attack, +1 Defense and is immune to player card effects.")
   18018:whenRevealed:1: When revealed
-    - [json AddFromPile {"verb":"AddFromPile","pile":"evilCreatures","to":"staging","attachSource":true}]
+    - for the acting player, the top card(s) of the evilCreatures deck go to the staging area, attached to this card
   18018:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
@@ -83,7 +83,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 18019:A:1 (front): When Revealed: Each player assigns X damage among characters he controls, where X is the Threat of the active location. If X is less than 3, Dangerous Crossing gains surge.
   18019:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AssignDamage {"verb":"AssignDamage","amount":{"stat":"threat","of":"activeLocation"},"pick":{"type":"character","control":"you"},"who":"eachSeat"}]
+    - each player assigns threat of the active location damage among the character (you control), one at a time
     - [json GainSurge {"verb":"GainSurge","when":{"kind":"less","left":{"stat":"threat","of":"activeLocation"},"right":3}}]
 
 18019:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defender is damaged).
@@ -231,7 +231,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
     - [json SetAside {"verb":"SetAside","code":"18016"}]
   18066:setup:2: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ShufflePile {"verb":"ShufflePile","pile":"evilCreatures"}]
+    - shuffle the evilCreatures deck
     - shuffle the encounter deck
     - repeat the number of players times:
       - [json DiscardUntil {"verb":"DiscardUntil","type":"location"}]
@@ -246,7 +246,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
   18066:forced:2: Forced when a phase begins
     only if it is the Encounter phase
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddFromPile {"verb":"AddFromPile","pile":"evilCreatures","to":"staging","when":{"kind":"less","left":0,"right":{"stat":"resources","of":"self"}}}]
+    - if 0 is less than resources of this card: for the acting player, the top card(s) of the evilCreatures deck go to the staging area
     - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"self"}]
 
 18066:B:3 (back): This stage cannot be defeated while an enemy from the Evil Creatures deck is in play.
@@ -270,7 +270,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18067:B:2 (back): Forced: After the players travel to a location, add the top card of the Evil Creatures deck to the staging area.
   18067:forced:1: Forced after the players travel (heard about location (any player controls))
-    - [json AddFromPile {"verb":"AddFromPile","pile":"evilCreatures","to":"staging"}]
+    - for the acting player, the top card(s) of the evilCreatures deck go to the staging area
 
 18067:B:3 (back): The players cannot defeat this stage unless the first player controls Haldan.
   18067:constant:2: Constant
@@ -285,7 +285,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"18016"}]
     - for each player, first player first:
-      - [json AddFromPile {"verb":"AddFromPile","pile":"evilCreatures","to":"staging","when":{"kind":"not","condition":{"kind":"firstPlayer"}}}]
+      - if not (the actor holds the first player token): for the acting player, the top card(s) of the evilCreatures deck go to the staging area
 
 18068:B:1 (back): The players cannot travel to The Old Ford unless there is at least 5 progress here.
   18068:constant:1: Constant
@@ -295,7 +295,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 18068:B:2 (back): Forced: At the beginning of the quest phase, add the top card of the Evil Creatures deck to the staging area.
   18068:forced:1: Forced when a phase begins
     only if it is the Quest phase
-    - [json AddFromPile {"verb":"AddFromPile","pile":"evilCreatures","to":"staging"}]
+    - for the acting player, the top card(s) of the evilCreatures deck go to the staging area
 
 18068:B:3 (back): This stage cannot be defeated while The Old Ford is in play. When The Old Ford is explored, the players win the game.
   18068:constant:2: Constant
@@ -314,7 +314,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
   18069:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddFromPile {"verb":"AddFromPile","pile":"evilCreatures","to":"staging"}]
+    - for the acting player, the top card(s) of the evilCreatures deck go to the staging area
     - [json FlipOver {"verb":"FlipOver","into":"18070","guardedBy":"picked"}]
 
 ## 18070 Haldan
@@ -332,4 +332,4 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
   18070:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
     - the players lose the game
 
-(rendered pieces: 165 by template, 51 as JSON)
+(rendered pieces: 181 by template, 41 as JSON)

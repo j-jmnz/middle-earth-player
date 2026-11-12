@@ -15,7 +15,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
   41004:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","type":"location","to":"staging","different":true}]
+      - the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"different":true}]
     - shuffle the encounter deck
 
 ## 41005 Surprise Attack
@@ -26,7 +26,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"41027"}]
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","type":"enemy","to":"staging","different":true}]
+      - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"different":true}]
     - shuffle the encounter deck
 
 41005:B:1 (back): During the encounter phase, treat each enemy's engagement cost as if it were 0.
@@ -49,7 +49,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 41006:B:1 (back): Forced: Reveal an additional encounter card during the quest phase.
   41006:forced:1: Forced when a phase begins
     only if it is the Quest phase
-    - [json RevealMore {"verb":"RevealMore","amount":1}]
+    - reveal 1 additional encounter card(s) in the staging step this phase
 
 41006:B:2 (back): Progress cannot be placed on Cracked Pillar while it is in the staging area.
   41006:constant:1: Constant
@@ -127,7 +127,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
     only if all of: (the card with code 41029 in play is ready) and (there is a Dark location (any player controls) to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - exhaust this card
-    - [json ChooseX {"verb":"ChooseX","max":[3]}]
+    - the acting player chooses X, from undefined to the most the picked card allows [also {"max":[3]}]
     - choose Dark location (any player controls)
     - place X progress on the picked card
 
@@ -298,9 +298,9 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
   41051:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json AddToHandAfterMulligan {"verb":"AddToHandAfterMulligan","code":"41048"}]
-    - [json AddToPool {"verb":"AddToPool","code":"41048","eachPlayer":true}]
-    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"41042"}]
-    - [json AddToPool {"verb":"AddToPool","code":"41042"}]
+    - the card with code 41048 is added to the Campaign Pool (a copy for each player)
+    - the set-aside card with code 41042 is shuffled into the encounter deck
+    - the card with code 41042 is added to the Campaign Pool
 
 41051:B:1 (back): Resolution: Check the final threat of the player with the highest threat: If it is under 40, you have rescued a retired Ranger who shares his wisdom with you. Each player may add 1 copy of Ranger Sense to their deck and to the Campaign Pool. At the start of your next campaign, each player may also shuffle 1 copy of Ranger Sense into their deck and add it to the Campaign Pool.
   41051:resolution:1: Resolution
@@ -308,4 +308,4 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
     - [json Earn {"verb":"Earn","codes":["41049"],"eachPlayer":true,"when":{"kind":"highestThreat","max":39}}]
     - [json CarryOver {"verb":"CarryOver","codes":["41049"],"eachPlayer":true,"when":{"kind":"highestThreat","max":39}}]
 
-(rendered pieces: 150 by template, 36 as JSON)
+(rendered pieces: 154 by template, 32 as JSON)

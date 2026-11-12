@@ -2,17 +2,14 @@
 // ledger lines 09026:A:2, 09029:A:2, 09054:A:1, 09069:B:1, 09069:B:2, 09070:A:1, 09071:A:1, 09072:A:1, 10159:A:2, 10160:A:3, 10165:A:4. The angmar family's verbs of The Weather Hills, on tables built from data/ by the layout kit.
 import { describe, expect, it } from "vitest";
 
-import type { EngineStep } from "../../core/intents.ts";
-import { hasKeyword, modifiedStat } from "../../core/keywords.ts";
+import { hasKeyword } from "../../core/keywords.ts";
 import { definePrinted } from "../../core/printed.ts";
 import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { spawn } from "../../core/zones.ts";
+import { queueEvent } from "../../windows/queue.ts";
 import { settle } from "../../engine/machine.ts";
 import { textBlank } from "../attachments/hold.ts";
-import { holds } from "../../interpret/conditions.ts";
-import { runInstruction } from "../../interpret/interpret.ts";
-import { travelCostUnpayable } from "../../interpret/restrictions.ts";
-import { HERO, HERO2, idOf, resolveRecords, revealFromTop, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { HERO, idOf, resolveRecords, revealFromTop, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "the-weather-hills";
 const built = (layout: Layout = {}) => tableFromLayout(SCENARIO, layout);
@@ -38,5 +35,73 @@ describe("Cold from Angmar", () => {
     expect(hasKeyword(state, ally.id, "sentinel", ctx.cards)).toBe(true);
     const bare = settle(updateCard(ally.state, ally.id, { damage: 0 }), ctx, []);
     expect(textBlankOf(bare, ally.id, ctx.cards)).toBe(false);
+  });
+});
+
+describe("the first Weather treachery of a round", () => {
+  it("09069:B:1 gains surge, the second of the round does not, and a card without the Trait never does", () => {
+    const t = built({ deck: ["f0", "f3", "f0"] });
+    const first = revealFromTop(t.state, t.ctx, "09052", []);
+    expect(codesAt(first.state, first.state.staging)).toContain("f0");
+    const second = revealFromTop(first.state, t.ctx, "09052", []);
+    expect(second.state.staging.filter((id) => second.state.cards[id]?.code === "f3")).toHaveLength(0);
+    // A Weather treachery that is not the first of the round is not marked, a new round clears the mark.
+    const next = revealFromTop({ ...settle(first.state, t.ctx, []), modifiers: first.state.modifiers.filter((modifier) => modifier.stat !== "traitRevealed") }, t.ctx, "09052", []);
+    expect(codesAt(next.state, next.state.staging)).toContain("f3");
+  });
+});
+
+describe("Cornered Animals", () => {
+  const layout: Layout = { phase: "Combat", setAside: ["09046", "09026"], discard: ["f3"], deck: ["09043"], piles: { angmarOrcDeck: ["09044", "09030"] } };
+
+  it("09070:A:1 ends the combat phase, shuffles the discard pile and the Orc deck into the encounter deck, and reveals Orc Ambush and Amon Forn", () => {
+    const t = built(layout);
+    const run = resolveRecords(t.state, t.ctx, "09070", "whenRevealed", undefined, undefined, false);
+    const state = run.state;
+    // Orc Ambush's When Revealed ran: the first player's search found the Orc enemy in the encounter deck and engaged it.
+    expect(codesAt(state, state.staging)).toEqual(expect.arrayContaining(["09046", "09026"]));
+    expect(state.seats[0]?.engaged.map((id) => state.cards[id]?.code)).toContain("09043");
+    // The discard pile and the Orc deck are in the encounter deck now (the shuffle came after the search: the search ran after them).
+    expect(state.piles?.angmarOrcDeck ?? []).toEqual([]);
+    expect(codesAt(state, state.encounterDeck).sort()).toEqual(["09030", "09044", "f3"]);
+    // The phase ended with the effect: the combat phase is over.
+    expect(state.phase).not.toBe("Combat");
+  });
+
+  it("09070:A:1 in the quest phase leaves the characters exhausted and uncommitted and skips the quest resolution", () => {
+    const t = built({ ...layout, phase: "Quest", committed: [HERO] });
+    expect(t.state.cards[idOf(t.state, HERO)]?.committed).toBe(true);
+    const run = resolveRecords(t.state, t.ctx, "09070", "whenRevealed", undefined, undefined, false);
+    expect(run.state.cards[idOf(run.state, HERO)]?.committed).toBe(false);
+    expect(run.state.phase).not.toBe("Quest");
+  });
+});
+
+describe("Hunting the Orcs and Savage Counter-attack", () => {
+  it("09071:A:1 places a token for each defeated enemy and, at 3 more than the players, flips to Savage Counter-attack with its tokens; 09072:A:1 advances the quest to stage 2A", () => {
+    const below = built({ staging: [{ code: "09071", resources: 2 }] });
+    const placed = resolveRecords(below.state, below.ctx, "09071", "forced", idOf(below.state, "09071"));
+    expect(placed.state.cards[idOf(placed.state, "09071")]?.resources).toBe(3);
+    const at = built({ staging: [{ code: "09071", resources: 3 }] });
+    const run = resolveRecords(at.state, at.ctx, "09071", "forced", idOf(at.state, "09071"));
+    const flipped = run.state.cards[idOf(run.state, "09072")];
+    expect(flipped?.resources).toBe(4);
+    expect(run.state.cards[run.state.questStage ?? ""]?.code).toBe("09070");
+    // Two players make X 5.
+    const two = built({ seats: 2, staging: [{ code: "09071", resources: 3 }] });
+    const short = resolveRecords(two.state, two.ctx, "09071", "forced", idOf(two.state, "09071"));
+    expect(short.state.cards[idOf(short.state, "09071")]?.resources).toBe(4);
+  });
+
+  it("09072:A:2, 09072:A:3 discards a token when an enemy attacks and destroys a character, and loses the game with no token left", () => {
+    const t = built({ staging: [{ code: "09072", resources: 2 }] });
+    const savage = idOf(t.state, "09072");
+    const hero = idOf(t.state, HERO);
+    const destroyed = settle(queueEvent(t.state, { trigger: "characterDestroyedByAttack", seat: 0, cardId: hero, subject: hero, other: savage }), t.ctx, []);
+    expect(destroyed.cards[savage]?.resources).toBe(1);
+    expect(destroyed.lost).not.toBe(true);
+    const last = settle(queueEvent(destroyed, { trigger: "characterDestroyedByAttack", seat: 0, cardId: hero, subject: hero, other: savage }), t.ctx, []);
+    expect(last.cards[savage]?.resources).toBe(0);
+    expect(last.lost).toBe(true);
   });
 });

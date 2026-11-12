@@ -49,7 +49,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
     - [json SetAside {"verb":"SetAside","code":"11175"}]
     - [json SetAside {"verb":"SetAside","code":"11192"}]
     - [json SetAside {"verb":"SetAside","code":"11193"}]
-    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"11177"}]
+    - the set-aside card with code 11177 is shuffled into the encounter deck
     - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
     - [json FlipStormcaller {"verb":"FlipStormcaller"}]
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Stormcaller"}]
@@ -117,7 +117,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 12013:A:1 (front): When Revealed: Search the encounter deck and discard pile for 1 copy of Swift Raider and add it to the staging area. Shuffle the encounter deck.
   12013:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchMove {"verb":"SearchMove","code":"12021","to":"staging"}]
+    - the acting player finds one card with code 12021 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
 
 12013:B:1: Sailing.
@@ -155,7 +155,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
   12015:whenRevealed:1: When revealed (cannot be canceled while the number of hero (any player controls) is at least 0)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json DiscardUntil {"verb":"DiscardUntil","type":"treachery","trait":"Weather"}]
-    - [json ResolveWhenRevealed {"verb":"ResolveWhenRevealed","when":{"kind":"matches","card":"picked","pick":{"type":"treachery","control":"any","trait":"Weather"}}}]
+    - then, if the picked card is a Weather treachery (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the When Revealed effects of the picked card resolve as if it had just been revealed
 
 12015:B:1: Sailing.
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
@@ -191,7 +191,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 12017:A:1 (front): When Revealed: Search the encounter deck and discard pile for 1 copy of Sahír's Escort and add it to the Stormcaller's area. Shuffle the encounter deck.
   12017:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchMove {"verb":"SearchMove","code":"12020","to":"stormcallerArea"}]
+    - the acting player finds one card with code 12020 in the encounter deck or its discard pile and adds it to the Stormcaller's area (it is not revealed)
     - shuffle the encounter deck
 
 12017:B:1 (back): If the players are off-course (Cloud, Rain, or Storm), the Stormcaller gets +2 Threat.
@@ -371,11 +371,11 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 
 12029:A:2 (front): When Revealed: Attach Raging Squall to the current quest. (Counts as a Condition attachment with the text: "Forced: After an ally is committed to the quest, deal 1 damage to that ally if you are off-course.")
   12029:whenRevealed:1: When revealed
-    - [json AttachToQuest {"verb":"AttachToQuest"}]
+    - this card is attached to the current quest card (the side quest that is the current quest, else the main quest card) and leaves with it
   12029:constant:1: Constant
     - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
   12029:forced:1: Forced after a card is committed to the quest (heard about ally (any player controls))
     only if [json condition {"kind":"heading","is":"offCourse"}]
     - deal 1 damage to the card the event is about
 
-(rendered pieces: 128 by template, 63 as JSON)
+(rendered pieces: 135 by template, 58 as JSON)

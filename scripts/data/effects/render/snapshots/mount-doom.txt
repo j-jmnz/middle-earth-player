@@ -88,7 +88,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
 
 146047:A:2 (front): Forced: After Brake of Thorns becomes the active location, each player assigns X damage among characters he controls, where X is the tens digit of his threat dial.
   146047:forced:1: Forced after this location becomes the active location (heard about this card)
-    - [json AssignDamage {"verb":"AssignDamage","amount":{"threat":"tens"},"pick":{"type":"character","control":"you"},"who":"eachSeat"}]
+    - each player assigns the tens digit of your threat damage among the character (you control), one at a time
 
 ## 146048 Old Water-course
 (the scenario deals it into the staging pile; the piles place it, no record does)
@@ -200,7 +200,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a enemy (any player controls) named "Gollum" to choose: choose enemy (any player controls) named "Gollum"
     - then, if there is a enemy (any player controls) named "Gollum" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area (or engaged)
-    - [json SearchMove {"verb":"SearchMove","code":"146049","to":"engagedFirstPlayer","when":{"kind":"not","condition":{"kind":"canPick","pick":{"type":"enemy","control":"any","names":["Gollum"]}}}}]
+    - then, if not (there is a enemy (any player controls) named "Gollum" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player finds one card with code 146049 in the encounter deck or its discard pile and puts it into play engaged with the first player (it is not revealed)
 
 146054:A:2 (shadow): Shadow: If attacking enemy is Gollum, he makes an additional attack after this one.
   146054:shadow:1: Shadow
@@ -265,7 +265,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
   146075:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","type":"location","to":"staging","different":true}]
+      - the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"different":true}]
     - shuffle the encounter deck
 
 146075:B:1 (back): Dire. This stage gets +4 quest points for each player.
@@ -284,7 +284,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
   (the keyword part is owned by the card's keywords; the records cover: When Revealed: Search the encounter deck, discard pile, and victory display for Mordor Road and add it to the staging area. Shuffle the encounter discard pile into the encounter deck and travel to Mordor Road.)
   146076:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchMove {"verb":"SearchMove","code":"146045","to":"staging","victory":true,"remember":true}]
+    - the acting player finds one card with code 146045 in the encounter deck or its discard pile or the victory display and adds it to the staging area (it is not revealed) [also {"remember":true}]
     - shuffle the encounter discard pile into the encounter deck
     - [json TravelTo {"verb":"TravelTo","target":"picked","unlessActive":true}]
 
@@ -354,4 +354,4 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
     - then, if the last Fortitude test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the players lose the game (The Ring-bearer claimed The One Ring)
     - then, if the last Fortitude test the running effect made was passed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the players win the game
 
-(rendered pieces: 198 by template, 23 as JSON)
+(rendered pieces: 205 by template, 21 as JSON)

@@ -179,7 +179,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 01126:B:1 (back): When Revealed: Search the encounter deck for 1 Hill Troll (if one is not already in play), and place it in the staging area. Shuffle the encounter deck.
   01126:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchMove {"verb":"SearchMove","code":"01082","to":"staging","when":{"kind":"inPlay","code":"01082","is":false}}]
+    - if the card with code 01082 is not in play: the acting player finds one card with code 01082 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
 
 01126:B:2 (back): Players cannot defeat this stage while any Hill Troll cards are in play.
@@ -248,7 +248,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 01130:B:1 (back): Resolution: Add each copy of Valor and Scarred in play to the Campaign Pool. Record the names of heroes with Valor and/or Scarred attached in the notes section of the Campaign Log and attach them to those heroes when setting up each subsequent scenario in this campaign. The hero with the most damage will be taken prisoner at the beginning of Escape from Dol Guldur (in case of a tie, randomly select among the heroes with the most damage). Record the name of the "prisoner" in the notes section of the Campaign Log.
   01130:resolution:1: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json EarnAttached {"verb":"EarnAttached","codes":["01133","01138"]}]
+    - each copy of code 01133 and code 01138 attached to a hero in play joins the Campaign Pool attached to that hero
     - [json NamePrisoner {"verb":"NamePrisoner"}]
 
-(rendered pieces: 116 by template, 22 as JSON)
+(rendered pieces: 119 by template, 20 as JSON)

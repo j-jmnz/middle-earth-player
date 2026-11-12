@@ -70,8 +70,8 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
     - [json SetAside {"verb":"SetAside","code":"141048"}]
     - [json SetAside {"verb":"SetAside","code":"141068"}]
     - [json SetAside {"verb":"SetAside","code":"141069"}]
-    - [json AddToStaging {"verb":"AddToStaging","code":"141045"}]
-    - [json AddToStaging {"verb":"AddToStaging","code":"141051"}]
+    - the set-aside card with code 141045 is added to the staging area
+    - the set-aside card with code 141051 is added to the staging area
     - shuffle the encounter deck
 
 141025:B:1 (back): The players cannot advance while The Prancing Pony is in play.
@@ -109,7 +109,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"141046"}]
     - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"141068"}]
-    - [json SearchMove {"verb":"SearchMove","trait":"Nazgûl","type":"enemy","to":"staging","each":true}]
+    - every Nazgûl enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
 
 141027:B:1 (back): If there are no Nazgûl enemies in play, the players win the game.
@@ -265,9 +265,9 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
     - the acting player chooses one of:
       * option "heroes" (only if there is a hero (you control) committed to the quest to choose):
         - choose hero (you control) committed to the quest
-        - [json RemoveFromQuest {"verb":"RemoveFromQuest"}]
+        - the last picked character is removed from the quest (it stays exhausted)
         - choose hero (you control) committed to the quest
-        - [json RemoveFromQuest {"verb":"RemoveFromQuest"}]
+        - the last picked character is removed from the quest (it stays exhausted)
       * option "ringwraith" (only if [json condition {"kind":"outOfPlay","code":"141069"}]):
         - [json ShuffleOutOfPlayIntoEncounterDeck {"verb":"ShuffleOutOfPlayIntoEncounterDeck","code":"141069"}]
 
@@ -378,9 +378,9 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player chooses one of:
       * option "staging" (only if [json condition {"kind":"searchable","trait":"Nazgûl"}]):
-        - [json SearchMove {"verb":"SearchMove","trait":"Nazgûl","to":"staging"}]
+        - the acting player finds one Nazgûl card in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
       * option "engage" (only if [json condition {"kind":"searchable","trait":"Nazgûl"}]):
-        - [json SearchMove {"verb":"SearchMove","trait":"Nazgûl","to":"engagedFirstPlayer"}]
+        - the acting player finds one Nazgûl card in the encounter deck or its discard pile and puts it into play engaged with the first player (it is not revealed)
     - shuffle the encounter deck
 
 141073:A:3 (shadow): Shadow: Attacking enemy makes an additional attack after this one.
@@ -573,4 +573,4 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
   906209:constant:1: Constant
     - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
 
-(rendered pieces: 212 by template, 62 as JSON)
+(rendered pieces: 219 by template, 55 as JSON)

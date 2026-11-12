@@ -52,7 +52,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
     - shuffle the encounter discard pile into the encounter deck
     - for each player, first player first:
       - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"}]
-      - [json AssignDamage {"verb":"AssignDamage","amount":{"stat":"threat","of":"discardTop","printed":true},"pick":{"type":"character","control":"you"}}]
+      - the acting player assigns printed threat of the top card of the encounter discard pile damage among the character (you control), one at a time
 
 18029:A:3 (front): Forced: After the players travel here, advance to the next stage A, if able.
   18029:forced:1: Forced after the players travel (heard about this card)
@@ -166,7 +166,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
   18036:whenRevealed:1: When revealed
     - for each player, first player first:
       - choose character (you control) committed to the quest
-      - [json RemoveFromQuest {"verb":"RemoveFromQuest"}]
+      - the last picked character is removed from the quest (it stays exhausted)
       - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"}]
       - then, if willpower of the picked card is less than printed threat of the top card of the encounter discard pile (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
 
@@ -259,8 +259,8 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 18071:A:1 (front): Setup: Set the Spiders of Mirkwood and Dol Guldur Orcs encounter sets aside, out of play. The first player takes control of Haldan and adds Searching for a Way Out to the staging area. Each player adds 1 Forest Spider to the staging area. Shuffle the encounter deck.
   18071:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddToStaging {"verb":"AddToStaging","code":"18028"}]
-    - [json AddToStaging {"verb":"AddToStaging","code":"01096"}]
+    - the set-aside card with code 18028 is added to the staging area
+    - the set-aside card with code 01096 is added to the staging area
     - shuffle the encounter deck
   18071:setup:2: Setup
     - [json TakeControlOfSetAside {"verb":"TakeControlOfSetAside","code":"18070"}]
@@ -279,7 +279,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 18072:A:1 (front): When Revealed: Shuffle the Spiders of Mirkwood encounter set into the encounter deck. Then, reveal 1 encounter card per player.
   18072:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ShufflePileIntoEncounterDeck {"verb":"ShufflePileIntoEncounterDeck","pile":"spiders"}]
+    - shuffle the spiders deck into the encounter deck
     - repeat the number of players times:
       - the acting player reveals an encounter card
 
@@ -299,7 +299,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 18073:A:1 (front): When Revealed: Shuffle the Dol Guldur Orcs encounter set into the encounter deck. Then, reveal 1 encounter card per player.
   18073:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ShufflePileIntoEncounterDeck {"verb":"ShufflePileIntoEncounterDeck","pile":"orcs"}]
+    - shuffle the orcs deck into the encounter deck
     - repeat the number of players times:
       - the acting player reveals an encounter card
 
@@ -416,4 +416,4 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
     only if any of: (there is a enemy (any player controls) engaged with you to choose) or (there is a enemy (any player controls) engaged with another player to choose)
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 200 by template, 79 as JSON)
+(rendered pieces: 208 by template, 73 as JSON)

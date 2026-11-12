@@ -50,7 +50,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
   142022:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","type":"enemy","to":"staging","require":"142025"}]
+      - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"require":"142025"}]
     - shuffle the encounter deck
 
 142022:B:1 (back): During the travel phase, the players must travel to a location, if able.
@@ -186,7 +186,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142029:A:2 (front): Forced: When Redhorn Pass is explored, each player assigns X damage among characters he controls. X is the number of damage here.
   142029:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
-    - [json AssignDamage {"verb":"AssignDamage","amount":{"stat":"damage","of":"self"},"pick":{"type":"character","control":"you"},"who":"eachSeat"}]
+    - each player assigns damage of this card damage among the character (you control), one at a time
 
 ## 142030 Doors of Durin
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -333,4 +333,4 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
     - raise threat by 1 (each player)
     - [json SetStatUntil {"verb":"SetStatUntil","stat":"willpower","value":0,"until":"endOfRound","holders":{"type":"hero","control":"any","isHost":true}}]
 
-(rendered pieces: 147 by template, 40 as JSON)
+(rendered pieces: 150 by template, 39 as JSON)

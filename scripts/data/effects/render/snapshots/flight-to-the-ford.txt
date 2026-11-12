@@ -10,8 +10,8 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
     - [json AttachToRingBearer {"verb":"AttachToRingBearer","code":"141057"}]
     - [json SetAside {"verb":"SetAside","code":"141059"}]
     - [json SetAside {"verb":"SetAside","code":"141068"}]
-    - [json AddToStaging {"verb":"AddToStaging","code":"141058"}]
-    - [json AddToStaging {"verb":"AddToStaging","code":"141063"}]
+    - the set-aside card with code 141058 is added to the staging area
+    - the set-aside card with code 141063 is added to the staging area
     - [json SetLife {"verb":"SetLife","value":15}]
     - shuffle the encounter deck
 
@@ -231,7 +231,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
       * option "exhaust" (only if the card with code 141085 in play is ready):
         - exhaust the card with code 141085
       * option "reveal":
-        - [json RevealMore {"verb":"RevealMore","amount":1}]
+        - reveal 1 additional encounter card(s) in the staging step this phase
 
 ## 141081 Fear of Discovery
 (the scenario deals it into the burden pile; the piles place it, no record does)
@@ -304,4 +304,4 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
   141084:shadow:1: Shadow
     - the acting player discards 1 random card(s) from hand
 
-(rendered pieces: 109 by template, 41 as JSON)
+(rendered pieces: 112 by template, 38 as JSON)

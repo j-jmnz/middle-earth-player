@@ -62,6 +62,7 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["fortitudeDiscarded"], pick.fortitudeDiscarded === true ? "discarded for the Fortitude test in progress and still in the encounter discard pile" : null);
   note(["who"], pick.who === "firstPlayer" ? "chosen by the first player" : null);
   note(["engagedEnemies"], pick.engagedEnemies === true ? "(enemies engaged with a player included)" : null);
+  note(["isHost"], pick.isHost === true ? "that this card is attached to" : null);
   note(["hasShadow"], pick.hasShadow === true ? "with a shadow card" : null);
   // A Captive is in play but no player controls it (families/captives owns "Captives are in play but are not under any player's control", 143022:A:1).
   const control = pick.captive === "only" || pick.captive === "free" ? "in play, controlled by no player" : typeof pick.control === "string" ? (CONTROL[pick.control] ?? pick.control) : "";

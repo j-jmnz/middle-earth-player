@@ -6,7 +6,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 41001:A:1 (front): Setup: Search the encounter deck for 1 copy of The Eaves of Mirkwood and Goblin Troop. Add The Eaves of Mirkwood to the staging area and set Goblin Troop aside, out of play. Shuffle the encounter deck.
   41001:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddToStaging {"verb":"AddToStaging","code":"41010"}]
+    - the set-aside card with code 41010 is added to the staging area
     - [json SetAside {"verb":"SetAside","code":"41019"}]
     - shuffle the encounter deck
 
@@ -17,7 +17,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
   41002:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","trait":"Forest","type":"location","to":"staging"}]
+      - the acting player finds one Forest location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
 
 41002:B:2 (back): This stage cannot be defeated unless at least 1 copy of Goblin Trail is in the victory display.
@@ -33,7 +33,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"41019"}]
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","trait":"Goblin","type":"enemy","to":"staging","when":{"kind":"not","condition":{"kind":"firstPlayer"}}}]
+      - if not (the actor holds the first player token): the acting player finds one Goblin enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
 
 41003:B:1 (back): This stage cannot be defeated while Goblin Troop is in play. When this stage is defeated, the heroes discover the trail to the Goblins' secret lair and the players win the game.
   41003:constant:1: Constant
@@ -104,7 +104,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
   41013:action:1: Action (any player may use it)
     only if all of: (it is the Quest phase) and ([json condition {"kind":"searchable","trait":"Spider"}])
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchMove {"verb":"SearchMove","trait":"Spider","type":"enemy","to":"engaged"}]
+    - the acting player finds one Spider enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
     - discard this card
 
 ## 41014 Goblin Trail
@@ -253,7 +253,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
   41024:whenRevealed:1: When revealed (cannot be canceled while this card is in the staging area)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","trait":"Goblin","type":"enemy","to":"engaged"}]
+      - the acting player finds one Goblin enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
     - shuffle the encounter deck
 
 41024:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each Goblin enemy engaged with you.
@@ -306,8 +306,8 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
   41050:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json ChooseCards {"verb":"ChooseCards","codes":["41044","41045","41046","41047"],"who":"eachSeat","to":"hero"}]
-    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"41041"}]
-    - [json AddToPool {"verb":"AddToPool","code":"41041"}]
+    - the set-aside card with code 41041 is shuffled into the encounter deck
+    - the card with code 41041 is added to the Campaign Pool
 
 41050:A:3 (front): Response: At the end of each round, place 1 resource token here.
   41050:response:1: Response at the end of the round
@@ -317,4 +317,4 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
   41050:resolution:1: Resolution
     - [json Earn {"verb":"Earn","codes":["41043"],"when":{"kind":"tokens","code":"41050","min":6}}]
 
-(rendered pieces: 150 by template, 32 as JSON)
+(rendered pieces: 159 by template, 25 as JSON)

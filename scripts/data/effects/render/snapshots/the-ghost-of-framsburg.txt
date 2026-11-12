@@ -9,9 +9,9 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
   12189:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json WaiveThreatPenalty {"verb":"WaiveThreatPenalty"}]
-    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"12190"}]
-    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"12191"}]
-    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"12192"}]
+    - the set-aside card with code 12190 is shuffled into the encounter deck
+    - the set-aside card with code 12191 is shuffled into the encounter deck
+    - the set-aside card with code 12192 is shuffled into the encounter deck
     - [json SearchBoonAllyToHand {"verb":"SearchBoonAllyToHand"}]
     - if the Campaign Log holds "isolde": remove 3 treacheries from the encounter deck
     - if the Campaign Log holds "beldis": remove 3 non-unique locations from the encounter deck
@@ -309,7 +309,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
   19109:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","type":"location","to":"staging","different":true}]
+      - the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"different":true}]
     - shuffle the encounter deck
 
 19109:B:1 (back): This stage cannot be defeated unless the players control at least 1 Loot objective.
@@ -350,7 +350,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"19097","when":{"kind":"firstPlayer"}}]
-      - [json SearchMove {"verb":"SearchMove","type":"enemy","trait":"Undead","nonUnique":true,"to":"staging","when":{"kind":"not","condition":{"kind":"firstPlayer"}}}]
+      - then, if not (the actor holds the first player token) (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player finds one Undead enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"nonUnique":true}]
     - shuffle the encounter deck
 
 19111:B:1 (back): Fram's Shade is immune to player card effects.
@@ -367,4 +367,4 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
     only if [json condition {"kind":"inVictory","code":"19098","is":false}]
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 171 by template, 56 as JSON)
+(rendered pieces: 176 by template, 53 as JSON)

@@ -12,14 +12,16 @@ const IARIONS_PENDANT = "10157";
 const AMARTHIULS_COURAGE = "10167";
 const DETERMINATION = "10172";
 const FEND_OFF_DESPAIR = "10173";
+// The boons Mysterious Omens offers (10160:A:3): the ones attached to heroes when the scenario is won stay with them in the pool (rr.campaign-pool, ltp.permanent).
+const MYSTERIOUS_OMENS_BOONS = ["10161", "10162", "10163", "10164", "10165"];
 const CARN_DUM_BOONS = ["10189", "10190", "10191", "10192"];
 
 export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   // 10156 Intruders in Chetwood. Resolution: the damage on Protect the Innocent is noted in the log and the side quest joins the Campaign Pool.
   { id: "10156:resolution:1", cardCode: "10156", lines: ["10156:B:1"], timing: "resolution", instructions: [{ verb: "RecordDamageOn", codes: [PROTECT_THE_INNOCENT] }, { verb: "Earn", codes: [PROTECT_THE_INNOCENT] }] },
 
-  // 10159 The Weather Hills. Resolution: the damage on Protect the Innocent replaces the number in the log.
-  { id: "10159:resolution:1", cardCode: "10159", lines: ["10159:B:1"], timing: "resolution", instructions: [{ verb: "RecordDamageOn", codes: [PROTECT_THE_INNOCENT] }] },
+  // 10159 The Weather Hills. Resolution: the damage on Protect the Innocent replaces the number in the log, and each of Mysterious Omens' boons attached to a hero is recorded with it.
+  { id: "10159:resolution:1", cardCode: "10159", lines: ["10159:B:1"], timing: "resolution", instructions: [{ verb: "RecordDamageOn", codes: [PROTECT_THE_INNOCENT] }, { verb: "EarnAttached", codes: MYSTERIOUS_OMENS_BOONS }] },
 
   // 10166 Deadmen's Dike. Resolution: the damage on Protect the Innocent is noted, Protect the Innocent leaves the pool and Arnor Ravaged takes its place, and the first player chooses Iârion's Pendant or Amarthiúl's Courage for the group and which player takes it (to "player": fixed to that seat, as 11197:B:1 does; docs/brief.md, Angmar Awakened).
   { id: "10166:resolution:1", cardCode: "10166", lines: ["10166:B:1"], timing: "resolution", instructions: [

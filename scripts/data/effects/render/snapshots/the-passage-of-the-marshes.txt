@@ -10,7 +10,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
   144015:forced:1: Forced on the event enteredHand (heard about this card)
     - the acting player chooses one of:
       * option "exhaust" (only if there is a ready hero (you control) to choose):
-        - [json ExhaustEach {"verb":"ExhaustEach","pick":{"type":"hero","control":"you"}}]
+        - exhaust each hero (you control)
       * option "reveal":
         - the acting player reveals an encounter card
 
@@ -111,7 +111,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
     - this card: stat mire 2, while this card is in play
   144021:forced:1: Forced on the event discardedByMire (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchMove {"verb":"SearchMove","trait":"Undead","type":"enemy","to":"staging"}]
+    - the acting player finds one Undead enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
 
 144021:A:2 (front): Travel: Exhaust Sméagol to travel here.
@@ -156,7 +156,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 
 144024:A:2 (front): When Revealed: Attach to the current quest. (Counts as a Condition attachment with the text: "Forced: At the end of the refresh phase, place 1 mire token on each location in the staging area. Then, discard Creeping Marshes.")
   144024:whenRevealed:1: When revealed
-    - [json AttachToQuest {"verb":"AttachToQuest"}]
+    - this card is attached to the current quest card (the side quest that is the current quest, else the main quest card) and leaves with it
   144024:constant:1: Constant
     - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
   144024:forced:1: Forced at the end of the phase
@@ -225,7 +225,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
   144054:whenRevealed:1: When revealed
     - the first player chooses one of:
       * option "search" (only if [json condition {"kind":"searchable","trait":"Nazgûl"}]):
-        - [json SearchMove {"verb":"SearchMove","trait":"Nazgûl","type":"enemy","to":"staging"}]
+        - the acting player finds one Nazgûl enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
       * option "reveal":
         - exhaust the card with code 144063
         - the acting player reveals an encounter card
@@ -267,7 +267,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json EngageSetAside {"verb":"EngageSetAside","code":"144075"}]
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","type":"location","to":"staging"}]
+      - the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
 
 144064:B:1 (back): The players cannot advance unless the first player controls Sméagol.
@@ -314,7 +314,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
   144066:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","trait":"Undead","type":"enemy","to":"engaged"}]
+      - the acting player finds one Undead enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
     - shuffle every location in the victory display into the encounter deck
 
 144066:B:1 (back): While any player is engaged with an Undead enemy, progress cannot be placed on this stage.
@@ -363,4 +363,4 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
   144076:triggered:1: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
     - the players lose the game (Sméagol was destroyed)
 
-(rendered pieces: 207 by template, 26 as JSON)
+(rendered pieces: 214 by template, 20 as JSON)

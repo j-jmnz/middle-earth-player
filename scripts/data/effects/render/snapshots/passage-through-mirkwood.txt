@@ -194,7 +194,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
   01098:whenRevealed:1: When revealed
     - for each player, first player first:
       - choose character (you control) committed to the quest
-      - [json RemoveFromQuest {"verb":"RemoveFromQuest"}]
+      - the last picked character is removed from the quest (it stays exhausted)
 
 ## 01099 Old Forest Road
 (the scenario deals it into the staging pile; the piles place it, no record does)
@@ -219,8 +219,8 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 01119:A:1 (front): Setup: Search the encounter deck for 1 copy of the Forest Spider and 1 copy of the Old Forest Road, and add them to the staging area. Then, shuffle the encounter deck.
   01119:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddToStaging {"verb":"AddToStaging","code":"01096"}]
-    - [json AddToStaging {"verb":"AddToStaging","code":"01099"}]
+    - the set-aside card with code 01096 is added to the staging area
+    - the set-aside card with code 01099 is added to the staging area
     - shuffle the encounter deck
 
 ## 01120 A Fork in the Road
@@ -236,7 +236,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 01121:B:1 (back): When Revealed: Each player must search the encounter deck and discard pile for 1 Spider card of his choice, and add it to the staging area.
   01121:whenRevealed:1: When revealed
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","trait":"Spider","to":"staging"}]
+      - the acting player finds one Spider card in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
 
 01121:B:2 (back): The players must find and defeat Ungoliant's Spawn to win this game.
   01121:constant:1: Constant
@@ -272,4 +272,4 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
     - [json Earn {"verb":"Earn","codes":["01136"],"when":{"kind":"stageReached","code":"01122","is":true}}]
     - [json Earn {"verb":"Earn","codes":["01137"],"when":{"kind":"stageReached","code":"01121","is":true}}]
 
-(rendered pieces: 138 by template, 15 as JSON)
+(rendered pieces: 142 by template, 11 as JSON)

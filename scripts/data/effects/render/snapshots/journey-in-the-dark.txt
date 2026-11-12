@@ -8,7 +8,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json PlaceDamageOn {"verb":"PlaceDamageOn","code":"142043","amount":10}]
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","type":"location","to":"staging","different":true}]
+      - the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"different":true}]
     - shuffle the encounter deck
 
 142040:B:1 (back): Forced: After a player optionally engages an enemy, remove 1 damage token from Doom, Doom, Doom.
@@ -25,11 +25,11 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 142041:B:1 (back): If there are no enemies in the staging area at the beginning of the quest phase, the first player reveals an additional encounter card during the staging step.
   142041:forced:1: Forced when a phase begins
     only if all of: (it is the Quest phase) and (the number of enemy (any player controls) in the staging area only is at most 0)
-    - [json RevealMore {"verb":"RevealMore","amount":1}]
+    - reveal 1 additional encounter card(s) in the staging step this phase
 
 142041:B:2 (back): The players cannot advance unless there are X resource tokens on this stage. X is the number of players times 3.
   142041:constant:1: Constant
-    only if not ([json condition {"kind":"tokens","code":"142041","min":3,"perPlayer":true}])
+    only if not (the card with code 142041 in play holds at least 3 resource token(s) for each player)
     - the players cannot defeat this stage while this holds
 
 142041:B:3 (back): Forced: After an enemy is defeated, place 1 resource token on this stage.
@@ -159,11 +159,11 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 
 142049:A:2 (front): X is the number of players in the game.
   142049:whenRevealed:1: When revealed (record also names 142049:A:3)
-    - [json AssignDamage {"verb":"AssignDamage","amount":{"players":true},"pick":{"type":"character","control":"you"}}]
+    - the acting player assigns the number of players damage among the character (you control), one at a time
 
 142049:A:3 (front): When Revealed: Assign X damage among characters you control.
   142049:whenRevealed:1: When revealed (record also names 142049:A:2)
-    - [json AssignDamage {"verb":"AssignDamage","amount":{"players":true},"pick":{"type":"character","control":"you"}}]
+    - the acting player assigns the number of players damage among the character (you control), one at a time
 
 ## 142050 The Great Bridge
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -192,7 +192,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
   142051:travel:1: Travel
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","type":"enemy","to":"staging","different":true,"require":"142045"}]
+      - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"different":true,"require":"142045"}]
     - shuffle the encounter deck
 
 ## 142052 Mines of Moria
@@ -266,11 +266,11 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 142057:A:1 (front): When Revealed: Each player assigns X damage among characters he controls. X is the number of exhausted characters he controls.
   142057:whenRevealed:1: When revealed
     - for each player, first player first:
-      - [json AssignDamage {"verb":"AssignDamage","amount":{"count":{"type":"character","control":"you","state":"exhausted"}},"pick":{"type":"character","control":"you"}}]
+      - the acting player assigns the number of exhausted character (you control) damage among the character (you control), one at a time
 
 142057:A:2 (shadow): Shadow: Assign X damage among characters you control. X is the number of enemies engaged with you.
   142057:shadow:1: Shadow
-    - [json AssignDamage {"verb":"AssignDamage","amount":{"count":{"type":"enemy","control":"any","engaged":"you"}},"pick":{"type":"character","control":"you"}}]
+    - the acting player assigns the number of enemy (any player controls) engaged with you damage among the character (you control), one at a time
 
 ## 142058 Deep Fissure
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -282,7 +282,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
   142058:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose character (you control) committed to the quest
-    - [json RemoveFromQuest {"verb":"RemoveFromQuest"}]
+    - the last picked character is removed from the quest (it stays exhausted)
     - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"}]
     - then, if printed willpower of the card picked before is less than threat of the top card of the encounter discard pile (checked when this step runs, after the steps above; not tied to whether they did anything): discard the card picked before
 
@@ -337,7 +337,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 
 142087:A:1 (front): Setup: Add Overcome by Grief to the staging area.
   142087:setup:1: Setup
-    - [json AddToStaging {"verb":"AddToStaging","code":"142087"}]
+    - the set-aside card with code 142087 is added to the staging area
 
 142087:A:2 (front): Forced: After a character is destroyed, if Overcome by Grief is unattached, attach to a hero. (Counts as a Condition attachment with the text: "Forced: After a character you control is destroyed, exhaust attached hero. Until the end of the round, attached hero cannot ready.")
   142087:forced:1: Forced on the event characterDestroyed
@@ -355,7 +355,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 
 142088:A:1 (front): Setup: Add Grievous Wound to the staging area.
   142088:setup:1: Setup
-    - [json AddToStaging {"verb":"AddToStaging","code":"142088"}]
+    - the set-aside card with code 142088 is added to the staging area
 
 142088:A:2 (front): Forced: After a hero takes damage, if Grievous Wound is unattached, attach to that hero. (Counts as a Condition attachment with the text: "Forced: After attached hero exhausts, deal 1 damage to it.")
   142088:forced:1: Forced after a card takes damage (heard about hero (any player controls))
@@ -367,4 +367,4 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
     only if not (this card is in the staging area)
     - deal 1 damage to its host
 
-(rendered pieces: 164 by template, 31 as JSON)
+(rendered pieces: 183 by template, 22 as JSON)

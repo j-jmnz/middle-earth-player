@@ -120,7 +120,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
 
 144032:A:2 (front): Travel: The first player reveals the top facedown card under The Cross-roads and adds it to the staging area to travel here.
   144032:travel:1: Travel
-    - [json AddFromPile {"verb":"AddFromPile","pile":"harad","to":"staging","reveal":true}]
+    - the acting player reveals the top card of the harad deck and resolves its staging, into the staging area, as if it was just revealed from the encounter deck (nothing with the deck empty)
 
 ## 144033 Foothills of Ephel Dúath
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -177,7 +177,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
         - choose Harad enemy (any player controls) engaged with you, with the lowest Attack of those (ties: the chooser decides)
         - place the picked card facedown under the card with code 144027 in play (out of play there; its attachments are discarded, its tokens go)
       * option "reveal" (only if the number of cards in the Harad deck is at least 1):
-        - [json AddFromPile {"verb":"AddFromPile","pile":"harad","to":"engaged","reveal":true}]
+        - the acting player reveals the top card of the harad deck and resolves its staging, into the engaged area, as if it was just revealed from the encounter deck (nothing with the deck empty)
 
 ## 144037 Marching Up the Road
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -189,7 +189,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
         * option "return" (only if the actor has an enemy engaged):
           - return one enemy engaged with the acting player (that player picks which) to the staging area
         * option "search" (only if [json condition {"kind":"searchable","trait":"Harad","deckOnly":true}]):
-          - [json SearchMove {"verb":"SearchMove","trait":"Harad","type":"enemy","to":"engaged","deckOnly":true}]
+          - the acting player finds one Harad enemy in the encounter deck and puts it into play engaged with them (it is not revealed)
 
 144037:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, place attacking enemy facedown under The Black Gate.
   144037:shadow:1: Shadow
@@ -270,7 +270,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
 
 144058:A:2 (front): Forced: After Haradrim Archer engages you, assign X damage among characters you control.
   144058:forced:1: Forced after an enemy engages a player (heard about this card)
-    - [json AssignDamage {"verb":"AssignDamage","amount":{"players":true},"pick":{"type":"character","control":"you"}}]
+    - the acting player assigns the number of players damage among the character (you control), one at a time
 
 144058:A:3 (shadow): Shadow: Deal 1 damage to the defending character.
   144058:shadow:1: Shadow
@@ -282,15 +282,15 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
 144068:A:1 (front): Setup: Add The Black Gate and The Cross-roads to the staging area. Shuffle the Men of Harad encounter set and place it facedown under The Cross-roads. Each player, except the first player, searches the encounter deck for a different non-unique location and adds it to the staging area. Shuffle the encounter deck.
   144068:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ShufflePile {"verb":"ShufflePile","pile":"harad"}]
+    - shuffle the harad deck
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","type":"location","nonUnique":true,"to":"staging","different":true,"when":{"kind":"not","condition":{"kind":"firstPlayer"}}}]
+      - if not (the actor holds the first player token): the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"nonUnique":true,"different":true}]
     - shuffle the encounter deck
 
 144068:B:1 (back): Forced: At the beginning of the quest phase, reveal the top facedown card from under The Cross-roads and add it to the staging area.
   144068:forced:1: Forced when a phase begins
     only if all of: (it is the Quest phase) and (the number of location (any player controls) named "Henneth Annûn" [also {"active":true}] is at most 0)
-    - [json AddFromPile {"verb":"AddFromPile","pile":"harad","to":"staging","reveal":true}]
+    - the acting player reveals the top card of the harad deck and resolves its staging, into the staging area, as if it was just revealed from the encounter deck (nothing with the deck empty)
 
 144068:B:2 (back): The players cannot defeat this stage while The Cross-roads is in play. When The Cross-roads is explored, the players win the game.
   144068:constant:1: Constant
@@ -299,4 +299,4 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
   144068:forced:2: Forced on the event locationExplored (heard about location (any player controls) named "The Cross-roads")
     - the players win the game
 
-(rendered pieces: 185 by template, 15 as JSON)
+(rendered pieces: 195 by template, 9 as JSON)

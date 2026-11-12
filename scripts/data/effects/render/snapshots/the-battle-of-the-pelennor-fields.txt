@@ -248,7 +248,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
   145056:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","type":"enemy","to":"engaged"}]
+      - the acting player finds one enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
     - shuffle the encounter deck
 
 145056:A:2 (shadow): Shadow: Either deal 3 damage to Minas Tirith or attacking enemy makes an additional attack after this one.
@@ -286,7 +286,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
   145058:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control) [also {"hasAttachment":{"names":["Black Dart"],"none":true}}]
-    - [json RemoveFromQuest {"verb":"RemoveFromQuest","when":{"kind":"canPick","pick":{"type":"hero","control":"you","hasAttachment":{"names":["Black Dart"],"none":true}}}}]
+    - then, if there is a hero (you control) [also {"hasAttachment":{"names":["Black Dart"],"none":true}}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the last picked character is removed from the quest (it stays exhausted)
     - [json AttachSelfToPicked {"verb":"AttachSelfToPicked","when":{"kind":"canPick","pick":{"type":"hero","control":"you","hasAttachment":{"names":["Black Dart"],"none":true}}}}]
   145058:forced:1: Forced at the end of the round
     - deal 1 damage to its host
@@ -353,7 +353,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 
 145062:A:1 (front): Setup: Add Wraith on Wings to the staging area.
   145062:setup:1: Setup
-    - [json AddToStaging {"verb":"AddToStaging","code":"145062"}]
+    - the set-aside card with code 145062 is added to the staging area
 
 145062:A:2 (front): Cannot have non-Morgul attachments.
   145062:constant:1: Constant
@@ -377,7 +377,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
   145072:forced:1: Forced when a phase begins
     only if it is the Quest phase
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json RemoveResourceTokens {"verb":"RemoveResourceTokens","code":"145072","amount":1}]
+    - up to 1 resource token(s) come off the card with code 145072 in play
     - [json ReturnSetAsideHero {"verb":"ReturnSetAsideHero","code":"145001","when":{"kind":"less","left":{"stat":"resources","of":"self"},"right":1}}]
     - [json AddSourceToVictory {"verb":"AddSourceToVictory","when":{"kind":"less","left":{"stat":"resources","of":"self"},"right":1}}]
 
@@ -433,7 +433,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 
 145074:B:3 (back): Forced: At the end of the round, assign damage among allies in the staging area equal to the number of enemies in the staging area.
   145074:forced:1: Forced at the end of the round
-    - [json AssignDamage {"verb":"AssignDamage","amount":{"count":{"type":"enemy","control":"any","stagingOnly":true}},"pick":{"type":"ally","control":"any","stagingOnly":true,"who":"firstPlayer"}}]
+    - the acting player assigns the number of enemy (any player controls) in the staging area only damage among the ally (any player controls) in the staging area only, chosen by the first player, one at a time
 
 ## 145075 The White City Besieged
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -447,7 +447,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"145044"}]
     - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"145079"}]
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","type":"enemy","to":"staging","different":true,"when":{"kind":"not","condition":{"kind":"firstPlayer"}}}]
+      - if not (the actor holds the first player token): the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"different":true}]
     - shuffle the encounter deck
 
 145075:B:1 (back): Assault.
@@ -482,7 +482,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
   145076:constant:1: Constant
     - this card: stat progressAsDamage 1, while this card is in play
   145076:triggered:1: Triggered (mandatory, not printed as Forced) on the event progressReplaced
-    - [json AssignDamage {"verb":"AssignDamage","amount":{"x":true},"pick":{"type":"enemy","control":"any","staging":true,"who":"firstPlayer"}}]
+    - the acting player assigns X damage among the enemy (any player controls) or in the staging area, chosen by the first player, one at a time
 
 145076:B:2 (back): Forced: At the end of the quest phase, advance to stage 5A.
   145076:forced:1: Forced at the end of the phase
@@ -495,7 +495,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 145077:A:1 (front): When Revealed: The first player adds The Witch-king to the staging area (Sorcerer side faceup). Then, he searches the encounter deck and discard pile for a Fell Beast and attaches it to The Witch-king, if able. Shuffle the encounter deck. Each other player reveals an encounter card.
   145077:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddToStaging {"verb":"AddToStaging","code":"145080"}]
+    - the set-aside card with code 145080 is added to the staging area
     - [json AttachSearched {"verb":"AttachSearched","type":"treachery","trait":"Morgul","to":"The Witch-king","name":"Fell Beast"}]
     - shuffle the encounter deck
     - for each player, first player first:
@@ -535,7 +535,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
   145078:resolution:1: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json Earn {"verb":"Earn","codes":["145062"],"eachPlayer":true}]
-    - [json EarnAttached {"verb":"EarnAttached","codes":["145015","145014"]}]
+    - each copy of code 145015 and code 145014 attached to a hero in play joins the Campaign Pool attached to that hero
 
 ## 145079 The Witch-king
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -569,4 +569,4 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     - [json EngageFirstPlayer {"verb":"EngageFirstPlayer"}]
     - then, if this card is engaged with the player (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
-(rendered pieces: 264 by template, 70 as JSON)
+(rendered pieces: 280 by template, 63 as JSON)

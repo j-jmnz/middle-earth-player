@@ -64,7 +64,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
   144043:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchMove {"verb":"SearchMove","code":"144053","to":"staging"}]
+    - the acting player finds one card with code 144053 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
     - the first player chooses one of:
       * option "exhaust" (only if the card with code 144063 in play is ready):
@@ -123,7 +123,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 144046:A:1 (front): Forced: When The Spider's Lair is explored, remove 1 resource from Shelob.
   144046:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
-    - [json RemoveResourceTokens {"verb":"RemoveResourceTokens","code":"144040","amount":1}]
+    - up to 1 resource token(s) come off the card with code 144040 in play
 
 144046:A:2 (front): Forced: After The Spider's Lair becomes the active location, Shelob makes an immediate attack against the first player.
   144046:forced:2: Forced after this location becomes the active location (heard about this card)
@@ -255,7 +255,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 
 144060:A:2 (shadow): Shadow: If attacking enemy is Shelob, resolve the 'When Revealed' effect on Shelob's Poison.
   144060:shadow:1: Shadow
-    - [json ResolveWhenRevealed {"verb":"ResolveWhenRevealed","card":"self","when":{"kind":"matches","card":"attacker","pick":{"type":"enemy","control":"any","names":["Shelob"]}}}]
+    - if the attacking enemy is a enemy (any player controls) named "Shelob": the When Revealed effects of this card resolve as if it had just been revealed
 
 ## 144061 Lurking Malice
 (the scenario deals it into the greatSpiderDeck pile; the piles place it, no record does)
@@ -328,7 +328,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"144040"}]
     - shuffle the encounter discard pile into the encounter deck
-    - [json ShufflePileIntoEncounterDeck {"verb":"ShufflePileIntoEncounterDeck","pile":"greatSpider"}]
+    - shuffle the greatSpider deck into the encounter deck
 
 144071:B:1 (back): Shelob cannot leave the staging area and Sméagol cannot attack or defend.
   144071:constant:1: Constant
@@ -370,4 +370,4 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
     only if any of: ([json condition {"kind":"inVictory","code":"144040","is":false}]) or ([json condition {"kind":"inVictory","code":"144075","is":false}])
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 226 by template, 26 as JSON)
+(rendered pieces: 232 by template, 22 as JSON)

@@ -90,7 +90,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143037:A:2 (front): Forced: When The Hornburg is explored, assign X damage among characters in play. X is the number of enemies in play.
   143037:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
-    - [json AssignDamage {"verb":"AssignDamage","amount":{"count":{"type":"enemy","control":"any","staging":true}},"pick":{"type":"character","control":"any"}}]
+    - the acting player assigns the number of enemy (any player controls) or in the staging area damage among the character (any player controls), one at a time
 
 ## 143038 Deeping Wall
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -209,8 +209,8 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143045:A:2 (front): When Revealed: Either remove 1 resource token from The Defense of Helm's Deep, or reveal 2 additional encounter cards.
   143045:whenRevealed:1: When revealed
     - the acting player chooses one of:
-      * option "remove" (only if [json condition {"kind":"tokens","code":"143033","min":1}]):
-        - [json RemoveResourceTokens {"verb":"RemoveResourceTokens","code":"143033","amount":1}]
+      * option "remove" (only if the card with code 143033 in play holds at least 1 resource token(s)):
+        - up to 1 resource token(s) come off the card with code 143033 in play
       * option "reveal":
         - the acting player reveals an encounter card
         - the acting player reveals an encounter card
@@ -333,4 +333,4 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
     only if [json condition {"kind":"enemyInPlay","is":false}]
     - the players win the game
 
-(rendered pieces: 146 by template, 35 as JSON)
+(rendered pieces: 152 by template, 32 as JSON)
