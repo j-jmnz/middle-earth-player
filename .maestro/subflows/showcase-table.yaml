@@ -15,13 +15,14 @@ appId: com.middleearth.lcg
     visible:
       id: table
     timeout: 30000
-# The table opens on the quest stage in play (quest-advance.ts, openingLatch), a moment after the table itself: the flow waits for it and taps
-# Continue until it is gone, so it covers neither the shot nor the dock.
+# The table shows its id while the save is still replaying; the board, and the quest stage in play it opens on (quest-advance.ts,
+# openingLatch), come once the replay is done, and every showcase save has a stage in play. So the stage's Continue is what says the board
+# is there: the flow waits for it, then taps it until it is gone, so it covers neither the shot nor the dock, and only then waits for the
+# pictures (which, during the replay, has nothing to wait for).
 - extendedWaitUntil:
     visible:
       id: quest-advance-progress
-    timeout: 10000
-    optional: true
+    timeout: 60000
 - repeat:
     while:
       visible:
