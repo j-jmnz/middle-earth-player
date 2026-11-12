@@ -1,6 +1,6 @@
 // The words History shows for a run. A field the store never knew (a back-filled run's end time, threats, start) is left out,
 // never invented. Pure.
-import type { RunRecord } from "../../campaign/runs";
+import { runEnded, type RunRecord } from "../../campaign/runs";
 import { seatWord } from "../data/seats";
 import { whenOf } from "./list";
 
@@ -16,7 +16,8 @@ export function runDate(run: RunRecord): string | null {
 
 /** "Won", or "Lost" and the cause the engine gave. */
 export function resultWords(run: RunRecord): string {
-  if (run.result === "won") return run.lossCause ? `Ended · ${run.lossCause}` : "Won";
+  if (runEnded(run)) return `Ended · ${run.lossCause}`;
+  if (run.result === "won") return "Won";
   return run.lossCause ? `Lost · ${run.lossCause}` : "Lost";
 }
 

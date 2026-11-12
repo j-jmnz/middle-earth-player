@@ -3,7 +3,8 @@
 import type { ScenarioState } from "../../rules/engine/reduce.ts";
 
 import { guardedBoons } from "../readouts/ungol.ts";
-import { captiveWords, chamberHoldsWords, guardedBoonWords, guardsWords, lastOfTheCompanyWords, ownerWords } from "../words/scenarios/ungol.ts";
+import { captiveWords, chamberHoldsWords, guardedBoonWords, guardsWords, lastOfTheCompanyWords } from "../words/scenarios/ungol.ts";
+import { ownerWords } from "../words/owner.ts";
 
 const CHAMBER = "146015";
 const SHAGRAT = "146020";

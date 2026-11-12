@@ -6,7 +6,8 @@ import { modifiedStat } from "../../rules/core/keywords.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 import { stageNumber } from "../../rules/families/caves/progress.ts";
 
-import { chamberWords, companyLabel, companyWords, ownerWords, watchersEnemyWords, watchersTravelWords, watchersXWords, type GuardedBoon } from "../words/scenarios/ungol.ts";
+import { chamberWords, companyLabel, companyWords, watchersEnemyWords, watchersTravelWords, watchersXWords, type GuardedBoon } from "../words/scenarios/ungol.ts";
+import { ownerWords } from "../words/owner.ts";
 import { cardsOf, type TableDial } from "./dials.ts";
 import type { HandMark } from "./isengard.ts";
 

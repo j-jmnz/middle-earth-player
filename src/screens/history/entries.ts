@@ -1,5 +1,5 @@
 // How History words each card (docs/design-system.md, History): a playthrough, a standalone game, as the title, lines, chip and the sentence a screen reader hears. Where a card leads is the view's. Pure.
-import type { RunRecord } from "../../campaign/runs";
+import { runEnded, type RunRecord } from "../../campaign/runs";
 import { isOpenStatus, standaloneStatus, type ListedStandalone, type StandaloneStatus } from "../../campaign/standalone";
 import { BOXES, boxOf, scenarioName } from "../data/campaign-data";
 import type { LibrarySave } from "./read";
@@ -56,7 +56,7 @@ function runLines(run: RunRecord | null, nameOf: NameOf): CardLine[] {
   if (!run) return [];
   const cause = run.result === "lost" ? run.lossCause : null;
   // A won run with a cause ended on its last player's elimination and went on to its Resolution (campaign/runs.ts).
-  const ended = run.result === "won" ? run.lossCause : null;
+  const ended = runEnded(run) ? run.lossCause : null;
   const how = [runDate(run), runDetail(run, nameOf)].filter((part) => part != null).join(" · ");
   return [...line(cause, "danger"), ...line(ended, "muted"), ...line(how || null, "muted")];
 }

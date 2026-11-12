@@ -3,6 +3,8 @@
 // The rest of the scenario's words are in its asks file (src/play/words/asks/the-black-gate-opens.ts). Pure.
 import type { Instruction } from "../../../catalog/boundary.ts";
 
+import { plural } from "../list.ts";
+
 /** One instruction of the scenario's own verbs in words, as a branch of a Choose says it, or null when it is not one of them. */
 export function blackGateWords(instruction: Instruction): string | null {
   switch (instruction.verb) {
@@ -16,8 +18,6 @@ export function blackGateWords(instruction: Instruction): string | null {
       return null;
   }
 }
-
-const plural = (n: number, one: string, many: string): string => `${n} ${n === 1 ? one : many}`;
 
 /**
  * What the dial of the resources on The Black Gate says: it gains one each quest phase (146024:A:3); on stage 2B the first player reveals that many encounter cards in each staging step and Jaws of Steel deals that much damage (146073:B:1, 146038:A:1); at the

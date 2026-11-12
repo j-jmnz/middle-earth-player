@@ -118,6 +118,11 @@ export function runOf(input: RunInput): RunRecord | null {
   };
 }
 
+/** A won run that carries a cause ended on its last player's elimination and went on to its Resolution (`ENDED_BY_DEFEAT`): the run list words it as an end, not a win. */
+export function runEnded(run: Pick<RunRecord, "result" | "lossCause">): boolean {
+  return run.result === "won" && run.lossCause != null;
+}
+
 export type KnownSave = { id: string; campaignId: string; seatCount: 1 | 2; log: CampaignLog };
 export type KnownGame = { id: string; campaignId: string; scenarioId: string; seatCount: 1 | 2; seats: readonly (readonly string[])[]; result: StandaloneResult | null; createdAt: number };
 

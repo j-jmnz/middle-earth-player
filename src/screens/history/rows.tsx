@@ -4,7 +4,7 @@
 import type { ReactNode } from "react";
 import { Pressable, View } from "react-native";
 
-import type { RunRecord } from "../../campaign/runs";
+import { runEnded, type RunRecord } from "../../campaign/runs";
 import { longPressA11y } from "../../ui/long-press-action";
 import { rowSurface } from "../../ui/surfaces";
 import { withAlphaHex } from "../../ui/tokens";
@@ -133,7 +133,7 @@ function RunLine({ run, nameOf, faces }: { run: RunRecord; nameOf: (code: string
   const detail = runDetail(run, nameOf);
   const won = run.result === "won";
   // A won run with a cause is a scenario that ended when its last player fell and went on to its Resolution (campaign/runs.ts): it reads as an end, not a win.
-  const ended = won && run.lossCause != null;
+  const ended = runEnded(run);
   return (
     <View className="mt-3" testID={`run-${run.id}`}>
       <View className="flex-row items-center gap-2">

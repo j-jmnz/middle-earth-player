@@ -1,6 +1,5 @@
 // Rules: mec112.setup-shelobs-lair, rr.play-and-put-into-play, rr.active-location (data/rules/entries.json); ledger lines 144040:A:2, 144071:B:2, 144071:B:3, 144072:B:2. The words of Shelob's Lair's table dials (src/play/readouts/lair.ts).
-
-const plural = (count: number, one: string, many: string): string => `${count} ${count === 1 ? one : many}`;
+import { plural } from "../list.ts";
 
 /**
  * What Shelob's dial reads (144040:A:2, 144072:B:2): her resources, the Threat each gives her (not once she is engaged: her Threat no longer counts there), on stage 3B the damage each cancels, and what her Forced

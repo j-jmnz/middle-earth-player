@@ -2,12 +2,6 @@
 // The words of The Tower of Cirith Ungol's table pieces: the progress that lets the players travel to Topmost Chamber (18 on stage 2B) and to The Two Watchers (12 on stage 3B), the Watchers' X, the hero that carries Last of the Company, the Ring-bearer under
 // Topmost Chamber and the boons guarded on Shagrat with their owners. Pure.
 
-/** Whose a seat's card is, lower case for the middle of a sentence: "Player 2's" two-handed, "your" solo ("yours" as a noun, in a list). Null when the card has no owner. */
-export function ownerWords(seatCount: number, seat: number | null | undefined, noun?: boolean): string | null {
-  if (seat == null) return null;
-  return seatCount > 1 ? `Player ${seat + 1}'s` : noun === true ? "yours" : "your";
-}
-
 const capital = (words: string): string => `${words.charAt(0).toUpperCase()}${words.slice(1)}`;
 
 /** The one sentence of what happens to the Ring-bearer when Topmost Chamber leaves play (146067:B:2): `held` is its name, or "it". */

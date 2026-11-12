@@ -4,6 +4,7 @@
 // decides it (a pair at a time), and the seat that controls Gwaihir. The engine decided every number (`state.embassy`, the tokens, the card's controller); nothing here changes one. Pure, so a test reads it.
 import type { ScenarioState } from "../../rules/engine/reduce.ts";
 
+import { ownerWords } from "../words/owner.ts";
 import { embassyWords, gateWords, gwaihirLabel, gwaihirWords, moatWords, pairWords } from "../words/scenarios/black-gate.ts";
 import { cardsOf, type TableDial } from "./dials.ts";
 import type { HandMark } from "./isengard.ts";
@@ -14,14 +15,12 @@ const MOAT = "146029";
 const GWAIHIR = "146041";
 const STAGE_TWO = "146073";
 
-const ownerOf = (game: ScenarioState, seat: number | null | undefined): string | null => (seat == null ? null : game.seatCount > 1 ? `Player ${seat + 1}'s` : "your");
-
 /** The pair the first player is deciding now ("Player 1's Gandalf with Hill-troll"), null with no Embassy or before the first pair is taken. `nameOfCard` names a card by id. */
 export function embassyPairNow(game: ScenarioState, nameOfCard: (id: string) => string): string | null {
   const embassy = game.embassy;
   const pair = embassy && embassy.at > 0 ? embassy.pairs[embassy.at - 1] : undefined;
   const player = pair ? game.cards[pair.player] : undefined;
-  return pair && player ? pairWords(ownerOf(game, player.controller ?? player.owner), nameOfCard(pair.player), nameOfCard(pair.encounter)) : null;
+  return pair && player ? pairWords(ownerWords(game.seatCount, player.controller ?? player.owner), nameOfCard(pair.player), nameOfCard(pair.encounter)) : null;
 }
 
 /** The pairs the Embassy has made, in the order the first player decides them, each as "Player 1's Gandalf with Hill-troll". The pair being decided is first once it is taken; decided pairs are gone. Empty with no Embassy. */
@@ -31,7 +30,7 @@ export function embassyPairs(game: ScenarioState, nameOf: (code: string) => stri
   return embassy.pairs.slice(Math.max(0, embassy.at - 1)).flatMap((pair) => {
     const player = game.cards[pair.player];
     const encounter = game.cards[pair.encounter];
-    return player && encounter ? [pairWords(ownerOf(game, player.controller ?? player.owner), nameOf(player.code), nameOf(encounter.code))] : [];
+    return player && encounter ? [pairWords(ownerWords(game.seatCount, player.controller ?? player.owner), nameOf(player.code), nameOf(encounter.code))] : [];
   });
 }
 
