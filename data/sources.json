@@ -88,9 +88,9 @@
       "site": "https://hallofbeorn.com",
       "pin": {
         "kind": "sha256",
-        "value": "8e2580e7c4bf9dba8a525ec6c4d64b8c234aa14f826e68e706e36dce69cedfdb"
+        "value": "1893f9b9928cc4de8ec1f3f7f7df9cadcc39f24570b62e48662749875cae7f87"
       },
-      "fetchedAt": "2026-11-11T17:13:08.689Z",
+      "fetchedAt": "2026-11-12T11:49:31.913Z",
       "files": [
         {
           "path": "raw/hallofbeorn/EncounterCards.json",
@@ -253,6 +253,60 @@
           "url": "https://hallofbeorn.com/Export/Scenarios/Mount-Doom",
           "sha256": "61eb72531cbca0d5725ce7bdf7aeb4f3085bf59eaf469d0db3e2ec60415c8afa",
           "bytes": 14716
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Intruders-in-Chetwood.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Intruders-in-Chetwood",
+          "sha256": "4f70de48d948fc92d1492b59dc3f4b50dde9737c5d0eed0667edf8ea2855ddc6",
+          "bytes": 8549
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Weather-Hills.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Weather-Hills",
+          "sha256": "c82aa43a5a9b8d1c0e1d02d04dcc5a506498b782c0e368d4d4ffadfbc45868a4",
+          "bytes": 11184
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Deadmen's-Dike.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Deadmen's-Dike",
+          "sha256": "7daccbd3e18a26a472cc0cba459eecef2618823314b0ded8909401c4abe5175e",
+          "bytes": 10735
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Wastes-of-Eriador.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Wastes-of-Eriador",
+          "sha256": "2ea9573516e5e260885efcf4ba254cc63f9875e4eb74d60de61974142333ea00",
+          "bytes": 13637
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Escape-from-Mount-Gram.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Escape-from-Mount-Gram",
+          "sha256": "d0a181fdc6c64c5249586bb1def426e516b5e5246db97a4d399143b92338d455",
+          "bytes": 12751
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/Across-the-Ettenmoors.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/Across-the-Ettenmoors",
+          "sha256": "b57beaf6ae1378bc33a197c51552516762a4909af709a1aa8932fd1f15925444",
+          "bytes": 17168
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Treachery-of-Rhudaur.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Treachery-of-Rhudaur",
+          "sha256": "f18f3bb5e24c827e5071dd547056f86af18e1e474e3f4f22fa332f5e66609261",
+          "bytes": 12168
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Battle-of-Carn-Dûm.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Battle-of-Carn-Dûm",
+          "sha256": "8896f9e6dab7776b97e9a780bbefd03526afbab080bdd8b0dfaf8b3b2c81323d",
+          "bytes": 12109
+        },
+        {
+          "path": "raw/hallofbeorn/Scenarios/The-Dread-Realm.json",
+          "url": "https://hallofbeorn.com/Export/Scenarios/The-Dread-Realm",
+          "sha256": "d2fe56e37e36bd20bba21dcce8d74d1f8bb6a949e8b23c63986cfa7b4f32b6d6",
+          "bytes": 13316
         },
         {
           "path": "raw/hallofbeorn/Scenarios/Voyage-Across-Belegaer.json",
@@ -18629,9 +18683,9 @@
       "site": "https://www.fantasyflightgames.com/en/the-lord-of-the-rings-the-card-game/",
       "pin": {
         "kind": "sha256",
-        "value": "1147918a6c43823774197e586bac5656f4fa303b88ad2b5189a7ecada21973cd"
+        "value": "776222fe05ff0af294c6d9837ea3ff96903251987de5754f77fd954fec4d37c5"
       },
-      "fetchedAt": "2026-11-05T01:43:14.004Z",
+      "fetchedAt": "2026-11-12T11:49:49.499Z",
       "files": [
         {
           "path": "pdf/mec109_rulebook-compressed.pdf",
@@ -18668,6 +18722,12 @@
           "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec115_rules-web.pdf",
           "sha256": "4a730c7cbee16f59656c649ba195f3fa411d6b5db35a1adbc1f14bf8b810837c",
           "bytes": 10198396
+        },
+        {
+          "path": "pdf/mec108_rules.pdf",
+          "url": "https://cdn.svc.asmodee.net/production-fantasyflightgames/uploads/2026/09/mec108_rules.pdf",
+          "sha256": "59a123897ec1defcb9cd5f8af2abdd759de03c02d9bb91274645897688bdef05",
+          "bytes": 6677417
         },
         {
           "path": "pdf/lotr_faq_19.pdf",

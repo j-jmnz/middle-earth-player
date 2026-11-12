@@ -31,6 +31,7 @@ const BOOK_SCENE: Readonly<Record<string, string>> = {
   "the-dark-of-mirkwood": "the-oath",
   "dream-chaser": "voyage-across-belegaer",
   "ered-mithrin": "journey-up-the-anduin",
+  "angmar-awakened": "intruders-in-chetwood",
   "the-two-towers": "the-uruk-hai",
   "the-return-of-the-king": "the-passing-of-the-grey-company",
 };

@@ -1374,24 +1374,6 @@
   ],
   "campaigns": [
     {
-      "id": "angmar-awakened",
-      "name": "Angmar Awakened",
-      "kind": "campaign",
-      "box": "Angmar Awakened Campaign Expansion",
-      "products": [
-        "The Lost Realm",
-        "The Wastes of Eriador",
-        "Escape from Mount Gram",
-        "Across the Ettenmoors",
-        "Treachery of Rhudaur",
-        "The Battle of Carn Dûm",
-        "The Dread Realm"
-      ],
-      "released": "2022-08-19",
-      "reason": "No source names the campaign's scenarios together. RingsDB lists the Angmar Awakened Campaign Expansion (AACE, cycle 19), which plays The Lost Realm and its six Adventure Packs (cycles 17 and 18) as one campaign, as the Dream-chaser and Ered Mithrin expansions do theirs; Hall of Beorn lists the nine scenarios under the original products and has no product for the expansion, which is the RCO box the campaign is printed in. The scenario count is Hall of Beorn's listing.",
-      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycles 17, 18 and 19; hallofgondor.com/release-dates (released: US release of the first product)"
-    },
-    {
       "id": "shadows-of-mirkwood",
       "name": "Shadows of Mirkwood",
       "kind": "cycle",

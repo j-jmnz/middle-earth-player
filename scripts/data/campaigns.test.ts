@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import { campaignIndexSchema } from "../../src/catalog/scenario-data.ts";
 import { DATA_DIR } from "./paths.ts";
 import { loadCampaign } from "./load-scenarios.ts";
-import { CAMPAIGNS } from "./campaign-defs.ts";
+import { CAMPAIGNS, scenarioProductOf } from "./campaign-defs.ts";
 import { buildCampaignIndex } from "./normalize/campaigns.ts";
 import { parseOverrides } from "./normalize/overrides.ts";
 import { hobScenarioIndexSchema } from "./sources/hallofbeorn.ts";
@@ -62,7 +62,7 @@ describe("data/campaigns/index.json", () => {
 
   it("accounts for every official product Hall of Beorn lists: built, coming later, or a reprint the app plays from its revised box", () => {
     const products = new Set(hobScenarioIndexSchema.parse(JSON.parse(readFileSync(path.join(DATA_DIR, "raw", "hallofbeorn", "Scenarios.json"), "utf8"))).map((entry) => entry.Product));
-    const listed = new Set([...CAMPAIGNS.flatMap((campaign) => campaign.products), ...overrides.campaigns.flatMap((campaign) => campaign.products)]);
+    const listed = new Set([...CAMPAIGNS.flatMap((campaign) => campaign.products.map(scenarioProductOf)), ...overrides.campaigns.flatMap((campaign) => campaign.products)]);
     // The 2011 Core Set and the Two-Player Limited Edition Starter print the scenarios the Revised Core Set and The Dark of Mirkwood reprint.
     const reprinted = ["Core Set", "Two-Player Limited Edition Starter"];
     // Fan-made: A Long-extended Party's packs (RingsDB names them "ALeP - ...") and the scenarios RingsDB lists no pack for. The

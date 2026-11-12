@@ -3,8 +3,8 @@ import { describe, expect, it } from "vitest";
 import { BOOKLETS, bookletName, bookletPath, isBookletId, startPage } from "./books";
 
 describe("booklet ids", () => {
-  it("names the eight books the app bundles", () => {
-    expect(BOOKLETS.map((book) => book.id)).toEqual(["fellowship-of-the-ring", "learn-to-play", "rules-reference", "the-dark-of-mirkwood", "dream-chaser", "ered-mithrin", "the-two-towers", "the-return-of-the-king"]);
+  it("names the nine books the app bundles", () => {
+    expect(BOOKLETS.map((book) => book.id)).toEqual(["fellowship-of-the-ring", "learn-to-play", "rules-reference", "the-dark-of-mirkwood", "dream-chaser", "ered-mithrin", "angmar-awakened", "the-two-towers", "the-return-of-the-king"]);
     expect(isBookletId("learn-to-play")).toBe(true);
     expect(isBookletId("../etc/passwd")).toBe(false);
     expect(bookletName("learn-to-play")).toBe("Learn to Play");
