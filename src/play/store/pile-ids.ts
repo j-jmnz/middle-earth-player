@@ -6,7 +6,7 @@ import type { ScenarioState } from "../../rules/core/state.ts";
 // discard pile while it deals that (emce.evil-creatures-deck), or one deck alone: the Uncharted deck (dcce.uncharted-deck), the Grotto deck (dcce.grotto-deck) or the Caves deck
 // (emce.caves-deck), or the Harad deck lying under The Cross-roads (mec112.setup-journey-to-the-cross-roads). The victory display is a pile too, at staging's right end, only while a card is in it (ltp.victory-display). Only the discard piles and the victory display open a list.
 export type BasePileId = "deck" | "discard" | "encounterDeck" | "encounterDiscard";
-export type SecondPileId = "corsairDeck" | "corsairDiscard" | "unchartedDeck" | "grottoDeck" | "evilCreaturesDeck" | "evilCreaturesDiscard" | "cavesDeck" | "haradDeck";
+export type SecondPileId = "corsairDeck" | "corsairDiscard" | "unchartedDeck" | "grottoDeck" | "evilCreaturesDeck" | "evilCreaturesDiscard" | "cavesDeck" | "haradDeck" | "angmarOrcDeck";
 export type VictoryPileId = "victory";
 export type PileId = BasePileId | SecondPileId | VictoryPileId;
 
@@ -17,6 +17,7 @@ const UNCHARTED_PILES: readonly SecondPileId[] = ["unchartedDeck"];
 const GROTTO_PILES: readonly SecondPileId[] = ["grottoDeck"];
 const CAVES_PILES: readonly SecondPileId[] = ["cavesDeck"];
 const HARAD_PILES: readonly SecondPileId[] = ["haradDeck"];
+const ANGMAR_PILES: readonly SecondPileId[] = ["angmarOrcDeck"];
 const NONE_PILES: readonly SecondPileId[] = [];
 
 export const PILE_WORDS: Readonly<Record<PileId, string>> = {
@@ -32,6 +33,7 @@ export const PILE_WORDS: Readonly<Record<PileId, string>> = {
   evilCreaturesDiscard: "Evil Creatures discard pile",
   cavesDeck: "Caves deck",
   haradDeck: "Harad deck",
+  angmarOrcDeck: "Orc deck",
   victory: "Victory display",
 };
 
@@ -42,6 +44,7 @@ export function secondPilesOf(game: Pick<ScenarioState, "corsairDeck" | "unchart
   if (game.uncharted?.grotto === true) return GROTTO_PILES;
   if (game.uncharted !== undefined) return UNCHARTED_PILES;
   if (game.piles?.haradDeck !== undefined) return HARAD_PILES;
+  if (game.piles?.angmarOrcDeck !== undefined) return ANGMAR_PILES;
   return game.piles?.cavesDeck !== undefined ? CAVES_PILES : NONE_PILES;
 }
 

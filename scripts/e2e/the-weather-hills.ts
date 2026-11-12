@@ -1,14 +1,15 @@
 // The Maestro fixtures of The Weather Hills (angmar-awakened part 2), written into src/campaign/fixtures/the-weather-hills.json by scripts/e2e/fixtures.ts: real games of saved decklists (the Defenders of
-// Gondor and Swords of the Noldor lists of data/decks/prebuilt.json), two-handed, Easy, so each is a real save. `hills-won` is the first seed that wins, parked on the win (the Resolution waits); `hills-lost` the first
+// Gondor and Swords of the Noldor lists of data/prebuilt-decks.json), two-handed, Easy, so each is a real save. `hills-won` is the first seed that wins, parked on the win (the Resolution waits); `hills-lost` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.
-// The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.
-// TODO: say what the Campaign Setup and the Resolution ask, and which answers the saved decklists' policy gives them.
+// The log has the earlier parts recorded as won (Intruders in Chetwood's two-handed win, with Protect the Innocent in its pool), so the open scenario is the playthrough's current node and `openNode` resumes it.
+// The Campaign Setup asks nothing (Protect the Innocent and Mysterious Omens are dealt from the pool); the Resolution asks nothing (the damage is noted, a boon is earned only when Mysterious Omens was defeated and a player chose one). The decklists are played with
+// the scenario's golden policy (test/scenarios/the-weather-hills/game.ts: the players engage and kill the enemies, one character defends each attack, one quests) with card play on.
 import type { CampaignLog } from "../../src/campaign/log.ts";
 import type { StoredLoadout } from "../../src/campaign/save.ts";
-import type { PlayerIntent, ScenarioState } from "../../src/rules/engine/reduce.ts";
+import type { PlayerIntent, ReduceContext, ScenarioState } from "../../src/rules/engine/reduce.ts";
 
 import { CHETWOOD_GOLDENS, chetwoodWorld, playGolden as playChetwood } from "../../test/scenarios/intruders-in-chetwood/game.ts";
-import { nextIntent } from "../../test/harness/auto-player.ts";
+import { DEFAULT_POLICY, HILLS_POLICY, hillsIntent } from "../../test/scenarios/the-weather-hills/game.ts";
 import { createLog } from "../log.ts";
 import { firstSeed, wonLog } from "./seed-kit.ts";
 
@@ -25,8 +26,7 @@ export async function chetwoodWonLog(): Promise<CampaignLog> {
 export async function hillsFixtures(): Promise<Partial<Record<HillsFixtureName, HillsFixture>>> {
   const log = await chetwoodWonLog();
   const find = (wanted: (state: ScenarioState) => boolean, label: string): HillsFixture | null => {
-    // TODO: the scenario's own answers in place of the saved decklists' policy, when the scenario needs them (scripts/e2e/temple-of-the-deceived.ts is the pattern).
-    const found = firstSeed(say, { campaignId: "angmar-awakened", scenarioId: "the-weather-hills", seatCount: 2, log, answer: (state: ScenarioState, ctx: Parameters<typeof nextIntent>[1], memory: Set<string>) => nextIntent(state, ctx, { scout: "", prefer: "", protect: "", play: true, act: true }, memory) }, "HILLS_SEEDS", wanted, label);
+    const found = firstSeed(say, { campaignId: "angmar-awakened", scenarioId: "the-weather-hills", seatCount: 2, log, answer: (state: ScenarioState, ctx: ReduceContext, memory: Set<string>) => hillsIntent(state, ctx, memory, { ...DEFAULT_POLICY, defend: "all", quest: "one" }, { ...HILLS_POLICY, play: true, act: true }) }, "HILLS_SEEDS", wanted, label);
     return found && { ...found, log };
   };
   const won = find((state) => state.stageCleared && !state.lost, "hills-won");

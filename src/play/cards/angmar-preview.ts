@@ -8,7 +8,8 @@ import { ownerWords } from "../words/owner.ts";
 import { timeOf } from "../../rules/families/angmar/time.ts";
 import { captiveUnder } from "../../rules/families/south/captive.ts";
 
-import { CURRENT_QUEST_WORDS, heldWords, holdsWords, protectPreviewWords, wildernessWords } from "../words/scenarios/angmar-table.ts";
+import { huntLimit } from "../readouts/angmar.ts";
+import { CURRENT_QUEST_WORDS, heldWords, holdsWords, huntPreviewWords, protectPreviewWords, savagePreviewWords, wildernessWords } from "../words/scenarios/angmar-table.ts";
 
 const WILDERNESS = "09051";
 
@@ -30,6 +31,8 @@ export function angmarDetail(game: ScenarioState, ctx: ReduceContext, cardId: st
   const held = captiveUnder(game, cardId);
   if (held && timeOf(ctx, card.code) != null) return holdsWords(name(held), card.resources);
   if (card.code === WILDERNESS) return wildernessWords(handsUnder(game, cardId));
+  if (card.code === "09071") return huntPreviewWords(card.resources, huntLimit(game, ctx, cardId));
+  if (card.code === "09072") return savagePreviewWords(card.resources);
   const lines: string[] = [];
   const limit = heldAmount(game, cardId, "loseAtDamage");
   if (limit > 0 && card.zone === "staging") lines.push(protectPreviewWords(card.damage, limit));

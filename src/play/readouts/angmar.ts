@@ -4,17 +4,22 @@
 // (it warms toward the last, which discards Iârion and loses the game) and, while Orc Rearguard is in the staging area, the progress placed on the current quest this round against its cap of 3. The engine decided every number
 // (`heldAmount`, `timeOf`, `questCapTally`); nothing here changes one. Empty in any other scenario. Pure, so a test reads it.
 import { heldAmount, inPlay } from "../../rules/core/state.ts";
+import { frameScope, resolveAmount } from "../../rules/interpret/amounts.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 import { questCapTally } from "../../rules/families/caves/progress.ts";
 import { timeOf } from "../../rules/families/angmar/time.ts";
 import { cardsUnder } from "../../rules/core/zones.ts";
 import { captiveUnder } from "../../rules/families/south/captive.ts";
 
-import { handUnderLabel, handUnderWords, iarionLabel, iarionWords, protectNearWords, protectWords, rearguardLimitWords, rearguardWords, timeNearWords, timeWords } from "../words/scenarios/angmar-table.ts";
+import { handUnderLabel, handUnderWords, huntNearWords, huntWords, iarionLabel, iarionWords, protectNearWords, protectWords, savageNearWords, savageWords, rearguardLimitWords, rearguardWords, timeNearWords, timeWords } from "../words/scenarios/angmar-table.ts";
 import { cardsOf, type TableDial } from "./dials.ts";
 import type { HandMark } from "./isengard.ts";
 
 const REARGUARD = "09023";
+const HUNTING_THE_ORCS = "09071";
+const SAVAGE_COUNTER_ATTACK = "09072";
+/** The number of resource tokens at which Hunting the Orcs flips: 3 more than the players (09071:A:1), read as the record reads it. */
+export const huntLimit = (game: ScenarioState, ctx: ReduceContext, sourceId: string): number => resolveAmount(game, { players: true, plus: 3 }, frameScope(game, 0, sourceId), ctx);
 
 export function angmarDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code: string) => string): readonly TableDial[] {
   if (game.sideQuests !== true) return [];
@@ -34,6 +39,33 @@ export function angmarDials(game: ScenarioState, ctx: ReduceContext, nameOf: (co
       ...(card.damage + 2 >= limit ? { warn: { level: card.damage + 1 >= limit ? ("critical" as const) : ("near" as const), words: protectNearWords(card.damage, limit) } } : {}),
       limitWords: `${limit} loses the game`,
       note: protectWords(card.damage, limit),
+    });
+  }
+  // Hunting the Orcs: its tokens against the number at which it flips (09071:A:1), warming toward it. Savage Counter-attack: its tokens, a countdown to the loss at 0 (09072:A:3), warming as it falls to 2 and critical at 1.
+  for (const card of cardsOf(game, HUNTING_THE_ORCS)) {
+    const limit = huntLimit(game, ctx, card.id);
+    dials.push({
+      id: "hunt",
+      testID: "angmar-hunt",
+      label: "Hunted",
+      name: `Resource tokens on ${nameOf(card.code)}, it flips at ${limit}:`,
+      value: card.resources,
+      limit,
+      warms: true,
+      ...(card.resources + 2 >= limit ? { warn: { level: card.resources + 1 >= limit ? ("critical" as const) : ("near" as const), words: huntNearWords(card.resources, limit) } } : {}),
+      limitWords: `${limit} flips it`,
+      note: huntWords(card.resources, limit),
+    });
+  }
+  for (const card of cardsOf(game, SAVAGE_COUNTER_ATTACK)) {
+    dials.push({
+      id: "savage",
+      testID: "angmar-savage",
+      label: "Counter",
+      name: `Resource tokens on ${nameOf(card.code)}, the players lose at 0:`,
+      value: card.resources,
+      ...(card.resources <= 2 ? { warn: { level: card.resources <= 1 ? ("critical" as const) : ("near" as const), words: savageNearWords(card.resources) } } : {}),
+      note: savageWords(card.resources),
     });
   }
   // Rescue Iârion: the time counters left, a countdown as Mount Doom's Doom is (no ring to fill): it warns at 2 left and is critical at 1, the last discards what it holds (09024:A:3).

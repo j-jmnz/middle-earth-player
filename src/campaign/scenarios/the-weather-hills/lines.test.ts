@@ -1,4 +1,4 @@
-// Rules: mec108.orc-deck, mec108.side-quests-in-play, mec108.time-x, rr.blank, rr.travel, rr.first-player, rr.effects, rr.destroy, rr.campaign-pool, ltp.permanent, faq.progress-without-advancing, mec112.gollum-smeagol (data/rules/entries.json); ledger lines 09025:A:2, 09026:A:3, 09029:A:1, 09029:A:2, 09030:A:1, 09031:A:1, 09054:A:1, 09055:A:3, 09058:A:1, 09059:A:2, 09069:A:1, 09069:B:1, 09069:B:2, 09070:A:1, 09070:B:2, 09070:B:3, 10162:A:4, 10163:A:4, 10164:A:4, 10165:A:4.
+// Rules: mec108.orc-deck, mec108.side-quests-in-play, mec108.time-x, rr.blank, rr.travel, rr.first-player, rr.effects, rr.destroy, rr.campaign-pool, ltp.permanent, faq.progress-without-advancing, mec112.gollum-smeagol (data/rules/entries.json); ledger lines 09025:A:2, 09026:A:3, 09029:A:1, 09029:A:2, 09030:A:1, 09031:A:1, 09053:A:2, 09054:A:1, 09055:A:3, 09058:A:1, 09059:A:2, 09069:A:1, 09069:B:1, 09069:B:2, 09070:A:1, 09070:B:2, 09070:B:3, 10162:A:4, 10163:A:4, 10164:A:4, 10165:A:4.
 import { describe, expect, it } from "vitest";
 
 import { hasKeyword } from "../../../rules/core/keywords.ts";
@@ -125,6 +125,15 @@ describe("Ice Storm (09031:A:1)", () => {
     const cards = Object.values(done.state.cards);
     expect(cards.filter((card) => card.zone === "heroes" || card.zone === "play").filter((card) => card.damage > 0).every((card) => card.exhausted)).toBe(true);
     expect(cards.filter((card) => card.code === "ally")[0]?.exhausted).toBe(true);
+  });
+});
+
+describe("Freezing Blast (09053:A:2)", () => {
+  it("09053:A:2 removes each damaged character from the quest, and an undamaged committed character stays committed", () => {
+    const t = built({ deck: ["f0"], play: [{ code: "ally", damage: 1 }], committed: ["ally", "dh1"] });
+    const run = revealFromTop(t.state, t.ctx, "09053", []);
+    expect(run.state.cards[idOf(run.state, "ally")]?.committed).toBe(false);
+    expect(run.state.cards[idOf(run.state, "dh1")]?.committed).toBe(true);
   });
 });
 

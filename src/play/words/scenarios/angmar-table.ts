@@ -1,8 +1,24 @@
-// Rules: mec108.time-x, mec108.side-quests, mec108.side-quests-in-play, mec108.objective-allies (data/rules/entries.json); ledger lines 09023:A:1, 09024:A:1, 09024:A:2, 09024:A:3, 09051:A:1, 10158:A:1, 10158:A:2, 10158:A:3.
+// Rules: mec108.time-x, mec108.side-quests, mec108.side-quests-in-play, mec108.objective-allies, mec108.orc-deck (data/rules/entries.json); ledger lines 09023:A:1, 09024:A:1, 09024:A:2, 09024:A:3, 09051:A:1, 09071:A:1, 09072:A:2, 09072:A:3, 10158:A:1, 10158:A:2, 10158:A:3.
 // What the table says of Intruders in Chetwood's pieces (src/play/readouts/angmar.ts, src/play/cards/angmar-preview.ts): Protect the Innocent's damage against the number that loses, the time counters on Rescue Iârion, the progress placed this round
 // against Orc Rearguard's cap, the current quest, and the card held under a side quest. The engine decided every number; these only say it. Each sentence stays at about 25 words (docs/design-system-table.md, Choice tray, Plain words).
 
 const plural = (count: number, one: string, many: string): string => `${count} ${count === 1 ? one : many}`;
+
+/** The note of Hunting the Orcs' dial: the resource tokens it holds against the number at which it flips (09071:A:1). */
+export const huntWords = (tokens: number, limit: number): string => `${tokens} of ${limit} resource tokens. Each defeated enemy places 1. At ${limit} it flips to Savage Counter-attack, and the quest advances to stage 2.`;
+
+/** The warning when the next defeated enemy, or a few more, flips Hunting the Orcs. */
+export const huntNearWords = (tokens: number, limit: number): string => (tokens + 1 >= limit ? "One more defeated enemy flips it." : `${limit - tokens} more defeated enemies flip it.`);
+
+/** The note of Savage Counter-attack's dial: its tokens, which fall when an enemy attacks and destroys a character; with none the players lose (09072:A:2, 09072:A:3). */
+export const savageWords = (tokens: number): string => `${plural(tokens, "resource token", "resource tokens")} left. Each character an attack destroys discards 1, and with none left the players lose the game.`;
+
+/** The warning when the next character an attack destroys, or the one after, takes the last token. */
+export const savageNearWords = (tokens: number): string => (tokens <= 1 ? "The next character an attack destroys loses the game." : `${tokens} resource tokens are left.`);
+
+/** The line under Hunting the Orcs and Savage Counter-attack in their previews. */
+export const huntPreviewWords = (tokens: number, limit: number): string => `${tokens} of ${limit} resource tokens on it. It flips to Savage Counter-attack at ${limit}, tokens and all.`;
+export const savagePreviewWords = (tokens: number): string => `${plural(tokens, "resource token", "resource tokens")} on it. Each character an attack destroys discards 1. The players lose when none is left.`;
 
 /** The note of Protect the Innocent's dial. */
 export const protectWords = (damage: number, limit: number): string => `${damage} of ${limit} damage. Each attack that damages a character places 1; progress placed on it removes damage.`;

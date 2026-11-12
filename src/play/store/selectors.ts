@@ -268,6 +268,7 @@ export function pileIds(game: ScenarioState, pile: PileId, seat: number): readon
     case "evilCreaturesDiscard":
     case "cavesDeck":
     case "haradDeck":
+    case "angmarOrcDeck":
       return game.piles?.[pile] ?? NONE;
     case "victory":
       return game.victory;

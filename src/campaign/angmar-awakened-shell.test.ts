@@ -131,6 +131,9 @@ describe("the Setup of The Weather Hills (10159:A:2)", () => {
     expect(made.log.campaignPool.map((card) => card.code)).toEqual([PROTECT, OMENS]);
     expect(made.poolEncounterCards).not.toContain(PROTECT);
     expect(made.poolEncounterCards).not.toContain(OMENS);
+    // Nor does either fall through to a player's deck: the Setup deals the one card each.
+    expect(made.seats[0]?.deck).not.toContain(PROTECT);
+    expect(made.seats[0]?.deck).not.toContain(OMENS);
   });
 
   it("does not add a second Mysterious Omens when the pool already holds one (a game played again)", () => {

@@ -424,6 +424,11 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
       did8.push(`${name(card.code)} is put into play instead of being shuffled into the encounter deck.`);
       continue;
     }
+    // A side quest the campaign card's own Setup deals (Protect the Innocent, Mysterious Omens) is the one physical card that Setup puts in play: no deck takes a copy of it.
+    if (card.back === "encounter" && dealtByCampaignSetup(campaignSetup, card.code, input.cards)) {
+      did8.push(`${name(card.code)} is dealt by the campaign card's Setup, not shuffled into a deck.`);
+      continue;
+    }
     // Shuffled into the chosen player's deck once the starting hand is drawn (11197:B:1): dealt after the mulligan (setup.ts, AFTER_HAND).
     const seat = poolSeat(card, seatCount);
     if (card.afterHand) {
