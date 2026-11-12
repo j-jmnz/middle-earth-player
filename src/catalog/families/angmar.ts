@@ -36,7 +36,8 @@ const VERBS = [
   // the quest is not resolved (as EndQuestPhase); in the combat phase the attacks left are not made.
   z.strictObject({ verb: z.literal("EndPhase"), ...when }),
   // Campaign Setup: the card in play with this code gets the damage the Campaign Log noted for it ("place damage on it equal to the amount of damage noted for it in the Campaign Log", 10159:A:2): the Protect the Innocent damage, 0 when none is noted.
-  verbFlags(z.strictObject({ verb: z.literal("PlaceLoggedDamageOn"), code }), { setupRole: "afterSetup" }),
+  // Only Protect the Innocent (10158) and Arnor Ravaged (100158) have damage the log notes (`protectDamage`), so no other code is accepted.
+  verbFlags(z.strictObject({ verb: z.literal("PlaceLoggedDamageOn"), code: z.enum(["10158", "100158"]) }), { setupRole: "afterSetup" }),
   // Starting with the first player, each player may choose 1 of the boons that are still set aside and attach it to a hero they control ("each player may choose 1 of the following boons and attach it to a hero they control", 10160:A:3): the player picks a boon or none, then the hero.
   // A boon taken is not offered again. `seat` is engine use: the player whose turn it is.
   z.strictObject({ verb: z.literal("ChooseBoon"), codes: z.array(code).min(1), seat: z.number().int().min(0).optional(), ...when }),

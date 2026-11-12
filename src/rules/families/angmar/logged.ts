@@ -3,7 +3,7 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { inPlay, updateCard, type ScenarioState } from "../../core/state.ts";
 
-/** PlaceLoggedDamageOn: the card in play with the code takes the damage the Campaign Log noted for Protect the Innocent (`campaignFacts.angmar.protectDamage`), none when the log notes none. The tokens are placed, not dealt: nothing cancels them. */
+/** PlaceLoggedDamageOn: the card in play with the code (Protect the Innocent or Arnor Ravaged, the only two the schema accepts: they share the one number in the log) takes the damage the Campaign Log noted for them (`campaignFacts.angmar.protectDamage`), none when the log notes none. The tokens are placed, not dealt: nothing cancels them. */
 export function placeLoggedDamageOn(state: ScenarioState, instruction: Extract<Instruction, { verb: "PlaceLoggedDamageOn" }>): ScenarioState {
   const damage = state.campaignFacts?.angmar?.protectDamage ?? 0;
   const card = Object.values(state.cards).find((candidate) => candidate.code === instruction.code && inPlay(candidate.zone));

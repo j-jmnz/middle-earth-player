@@ -82,7 +82,7 @@ function PlayableMark({ slot, t, s }: { slot: CardSlot; t: TableTokens; s: numbe
   );
 }
 
-// The piles that show the printed encounter back (the Eye): the encounter pair, the Corsair pair, the Evil Creatures pair and the Caves deck.
+// The piles that show the printed encounter back (the Eye): the encounter pair, the Corsair pair, the Evil Creatures pair, the Caves deck, the Harad deck and the Angmar Orc deck (The Weather Hills' Orc deck).
 const ENCOUNTER_PILES: ReadonlySet<string> = new Set(["encounterDeck", "encounterDiscard", "corsairDeck", "corsairDiscard", "evilCreaturesDeck", "evilCreaturesDiscard", "cavesDeck", "haradDeck", "angmarOrcDeck"]);
 
 /**

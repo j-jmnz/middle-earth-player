@@ -88,7 +88,7 @@ export type HillsGame = PlayedGame;
 // `after`: the log of a campaign whose earlier parts were won. `upgraded`: the Upgraded sides. `mode`: the Hard or Expert Mode card.
 export type HillsGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: HillsDecks; outcome: "won" | "lost"; policy?: Partial<HillsPolicy>; after?: boolean; upgraded?: boolean; mode?: ModeCard; lossReason?: string };
 
-// Every game is played after Intruders in Chetwood's win (`after`): Protect the Innocent lies in the pool (a fresh log would deal it twice), Mysterious Omens joins it at the Setup. Wins: true solo, true solo answering every choice with its first
+// Every game is played after Intruders in Chetwood's win (`after`): Protect the Innocent lies in the pool and is staged with the damage the log noted for it (a fresh log stages it with none), Mysterious Omens joins the pool at the Setup. Wins: true solo, true solo answering every choice with its first
 // option, and two-handed with one character defending and one questing for each player. The ways to lose: Protect the Innocent holding 10 damage, Savage Counter-attack holding no token (the first option of Cornered Animals' choice removes one each round),
 // the players' threat at 50 (heroes too small to quest) and every hero destroyed. The default policy answers the choices safely (an additional card revealed, never a token removed).
 const SAFE_DEFENDING = { defend: "all", quest: "one" } as const;

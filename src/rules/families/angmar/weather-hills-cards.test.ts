@@ -110,14 +110,12 @@ describe("the side quests and the damage the log noted", () => {
 
   it("09056:A:1 hears the cancel of a treachery's When Revealed effect with the treachery as its subject, and not the cancel of an enemy's", () => {
     const t = built({ staging: ["09056"] });
-    const ruins = idOf(t.state, "09056");
     const treachery = spawn(t.state, "09052", { zone: "staging" });
     const heard = settle(queueEvent(treachery.state, { trigger: "whenRevealedCanceled", seat: 0, subject: treachery.id }), t.ctx, []);
     expect(heard.seats[0]?.threat).toBe((t.state.seats[0]?.threat ?? 0) + 2);
     const enemy = spawn(t.state, "09044", { zone: "staging" });
     const quiet = settle(queueEvent(enemy.state, { trigger: "whenRevealedCanceled", seat: 0, subject: enemy.id }), t.ctx, []);
     expect(quiet.seats[0]?.threat).toBe(t.state.seats[0]?.threat);
-    expect(ruins).toBeTruthy();
   });
 });
 

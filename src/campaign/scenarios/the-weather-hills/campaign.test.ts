@@ -117,7 +117,7 @@ describe("The Weather Hills in the angmar-awakened campaign", () => {
     expect(none.campaignPool.filter((card) => BOONS.includes(card.code))).toEqual([]);
   });
 
-  it("10160:A:3 in a later scenario the Campaign Setup Checklist attaches each boon to the hero recorded for it, and asks nobody", () => {
+  it("10160:A:3 the Campaign Setup Checklist attaches a boon the pool holds to the hero recorded for it when the scenario is dealt again from that log (a replay), and asks nobody", () => {
     const { log } = afterChetwood(2);
     const plan = hillsPlan(2, log);
     const hero = plan.seats[0]?.heroes[0] ?? "";
@@ -126,8 +126,10 @@ describe("The Weather Hills in the angmar-awakened campaign", () => {
     expect(next.seats[0]?.attachments).toContainEqual({ host: hero, code: "10162" });
     expect(next.steps.find((step) => step.n === 5)?.did.join(" ")).toContain("goes on");
     const started = opened(2, carried);
-    const boon = copies(started, "10162")[0];
-    expect(started.cards[boon?.host ?? ""]?.code).toBe(hero);
+    // The copy in play is the attached one (the others stay set aside): the one on the hero recorded for it.
+    const inPlayCopies = copies(started, "10162").filter((card) => card.zone === "play");
+    expect(inPlayCopies).toHaveLength(1);
+    expect(started.cards[inPlayCopies[0]?.host ?? ""]?.code).toBe(hero);
   });
 
   it("a lost game writes nothing: the Resolution is for a win only, so finishing each lost golden leaves the log as it was", () => {
