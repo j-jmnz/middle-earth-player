@@ -132,7 +132,16 @@ export function FireMarkView({ rect, mark, fonts, images, t, s }: { rect: Rect; 
  * as the foot pills drop their art. The preview and the screen reader's line say what it means.
  */
 export function CurrentQuestMark({ rect, fonts, t, s }: { rect: Rect; fonts: Fonts; t: TableTokens; s: number }) {
-  const text = "Current";
+  return <WordPill rect={rect} text="Current" fonts={fonts} t={t} s={s} />;
+}
+
+/** A hero or ally the Campaign Log marks determined ("Determined"), or that carries a Determination ("Determination"): the same pill as the current quest's, a character wearing neither of the other marks (mec108.campaign-log, ledger line 10172:A:1). */
+export function DeterminedMarkView({ rect, word, fonts, t, s }: { rect: Rect; word: string; fonts: Fonts; t: TableTokens; s: number }) {
+  return <WordPill rect={rect} text={word} fonts={fonts} t={t} s={s} />;
+}
+
+// An accent pill with a word inside the card's top edge, upright; where the word does not fit, a short accent dot in its place.
+function WordPill({ rect, text, fonts, t, s }: { rect: Rect; text: string; fonts: Fonts; t: TableTokens; s: number }) {
   const words = fonts.badge.getTextWidth(text);
   const box = currentMark(rect, words, BADGE_H * s, s);
   const r = Math.min(box.width, box.height) / 2;

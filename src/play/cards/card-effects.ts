@@ -28,6 +28,7 @@ import { engagesAt } from "../store/foresight.ts";
 import type { IconName } from "../../ui/icon-map.ts";
 import { stagePoints } from "../readouts/objective.ts";
 import { stageDefeatLoses } from "../readouts/fortress.ts";
+import { determinedMark, type DeterminedMark } from "./determined-mark.ts";
 import { sideQuestMark, stagedSideQuest, type SideQuestMark } from "./side-quest-mark.ts";
 
 export type BadgeStat = "willpower" | "attack" | "defense" | "hitPoints" | "threat" | "questPoints" | "engagementCost";
@@ -268,6 +269,7 @@ function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, 
     loss: card != null && inPlay(card.zone) ? shipLoss(game, ctx, cardId) : null,
     place: card?.zone === "staging" ? stagingPlace(game, cardId) : null,
     side: sideQuestMark(game, ctx, cardId),
+    determined: determinedMark(game, ctx, cardId),
     combat: card != null ? combatNumber(game, ctx, card) : null,
   };
 }
@@ -335,6 +337,8 @@ export type SlotNumbers = {
   place: PlaceMark | null;
   // An encounter side quest in the staging area: the current-quest mark, and its damage against the number that loses the game (side-quest-mark.ts).
   side: SideQuestMark | null;
+  // A hero or ally the Campaign Log marks determined, or that carries a Determination (determined-mark.ts): a small pill with the word, and what it means in the preview and to the reader.
+  determined: DeterminedMark | null;
   // In the enemy attacks step: an engaged enemy's attack or a character's defense, drawn at the card's foot (combatNumber).
   combat: CombatNumber | null;
 };

@@ -7,7 +7,7 @@ import { memo } from "react";
 import { Moving } from "../motion/card-motion.native.tsx";
 import { CardMarks, Glow, PickRing } from "./card-marks.native.tsx";
 import { Badges, CardBody, HeldMark, NotAppliedMark, StackMark, SuccessMedallion, Tokens } from "./pieces.native.tsx";
-import { CombatPill, CurrentQuestMark, DelayedMark, EngagementMark, FireMarkView, OptionMarkView, PlaceMarkView, ShipLossView, StageMarks, UnderMarkView } from "./mark-pieces.native.tsx";
+import { CombatPill, CurrentQuestMark, DelayedMark, DeterminedMarkView, EngagementMark, FireMarkView, OptionMarkView, PlaceMarkView, ShipLossView, StageMarks, UnderMarkView } from "./mark-pieces.native.tsx";
 import { sphereIcon } from "../../ui/icon-map.ts";
 import { Pile } from "./pile-piece.native.tsx";
 import { type CardSlot } from "../layout/layout.ts";
@@ -72,6 +72,7 @@ function drawOverlay(p: PieceProps) {
         {info?.fire ? <FireMarkView rect={rect} mark={info.fire} fonts={fonts} images={tokens} t={t} s={s} /> : null}
         {info?.side?.loses ? <FireMarkView rect={rect} mark={info.side.loses} fonts={fonts} images={tokens} t={t} s={s} /> : null}
         {info?.side?.current ? <CurrentQuestMark rect={rect} fonts={fonts} t={t} s={s} /> : null}
+        {info?.determined ? <DeterminedMarkView rect={rect} word={info.determined.word} fonts={fonts} t={t} s={s} /> : null}
         {info?.loss ? <ShipLossView rect={rect} mark={info.loss} fonts={fonts} t={t} s={s} /> : null}
         {info?.place ? <PlaceMarkView rect={rect} mark={info.place} t={t} s={s} /> : null}
         {info?.under ? <UnderMarkView rect={rect} mark={info.under} fonts={fonts} t={t} s={s} /> : null}

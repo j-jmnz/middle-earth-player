@@ -173,7 +173,7 @@ export default function Log() {
           {/* A card's name in a row opens its preview (user request, 2026-11-01). */}
           <Row label="Heroes" lines={bySeat(log.heroesBySeat)} onCard={card} testID="log-heroes" />
           <Row label="Fallen Heroes" lines={bySeat(log.fallenHeroesBySeat)} onCard={card} testID="log-fallen" />
-          <Row label="Threat Modifiers" value={sagaColumns ? threatWords(log, save.seatCount) : log.threatPenalty === 0 ? "None" : `+${log.threatPenalty}`} testID="log-threat" icon="threat" />
+          <Row label="Threat Modifiers" value={threatWords(log, save.seatCount)} testID="log-threat" icon="threat" />
           {/* Dream-chaser: the XP the Resolutions gave and what is unspent, and the boxes marked beside the scalable and upgradable cards (MEC111 p31). */}
           {campaign.xp ? <Row label="XP" value={xpWords(log)} testID="log-xp" /> : null}
           {campaign.xp ? <Row label="Scalable Cards" lines={marked("scalable")} onCard={card} speech={markedSpeech(log, "scalable")} testID="log-scalable" /> : null}

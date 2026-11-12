@@ -1,4 +1,4 @@
-// The extra top-bar dials of the scenarios that have them, in the order the bar draws them: The Road to Isengard's (readouts/isengard.ts), The Passage of the Marshes' (readouts/marshes.ts), Journey to the Cross-roads' (readouts/roads.ts), Shelob's Lair's (readouts/lair.ts), The Passing of the Grey Company's (readouts/company.ts), The Siege of Gondor's (readouts/siege.ts), The Battle of the Pelennor Fields' (readouts/pelennor.ts), The Tower of Cirith Ungol's (readouts/ungol.ts) and The Black Gate Opens' (readouts/black-gate.ts) and Mount Doom's (readouts/mount-doom.ts).
+// The extra top-bar dials of the scenarios that have them, in the order the bar draws them: The Road to Isengard's (readouts/isengard.ts), The Passage of the Marshes' (readouts/marshes.ts), Journey to the Cross-roads' (readouts/roads.ts), Shelob's Lair's (readouts/lair.ts), The Passing of the Grey Company's (readouts/company.ts), The Siege of Gondor's (readouts/siege.ts), The Battle of the Pelennor Fields' (readouts/pelennor.ts), The Tower of Cirith Ungol's (readouts/ungol.ts) and The Black Gate Opens' (readouts/black-gate.ts) and Mount Doom's (readouts/mount-doom.ts), Intruders in Chetwood's, Deadmen's Dike's (readouts/angmar.ts) and The Wastes of Eriador's (readouts/wastes.ts).
 // Each scenario's list is empty in any other scenario, so a new scenario's dials are one more line in `scenarioDials`. The engine decided each number; nothing here changes one. Pure, so a test reads it.
 import { useMemo } from "react";
 
@@ -17,10 +17,11 @@ import { pelennorDials, pelennorHands } from "./pelennor.ts";
 import { roadsDials } from "./roads.ts";
 import { siegeDials, siegeHands } from "./siege.ts";
 import { ungolDials, ungolHands } from "./ungol.ts";
+import { wastesDials, wastesHands } from "./wastes.ts";
 
 /** Every scenario dial the game holds now. */
 export function scenarioDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code: string) => string): readonly TableDial[] {
-  return [...isengardDials(game, ctx, nameOf), ...marshesDials(game, ctx, nameOf), ...roadsDials(game, ctx, nameOf), ...lairDials(game, ctx, nameOf), ...companyDials(game, ctx, nameOf), ...siegeDials(game, ctx, nameOf), ...pelennorDials(game, ctx, nameOf), ...ungolDials(game, ctx, nameOf), ...blackGateDials(game, nameOf), ...mountDoomDials(game, nameOf), ...angmarDials(game, ctx, nameOf)];
+  return [...isengardDials(game, ctx, nameOf), ...marshesDials(game, ctx, nameOf), ...roadsDials(game, ctx, nameOf), ...lairDials(game, ctx, nameOf), ...companyDials(game, ctx, nameOf), ...siegeDials(game, ctx, nameOf), ...pelennorDials(game, ctx, nameOf), ...ungolDials(game, ctx, nameOf), ...blackGateDials(game, nameOf), ...mountDoomDials(game, nameOf), ...angmarDials(game, ctx, nameOf), ...wastesDials(game, nameOf)];
 }
 
 /** The dials for the top bar: the same list while no dial's words or number changed, so the bar re-renders only when a token, a hit point or a card moves. */
@@ -28,10 +29,10 @@ export function useScenarioDials(game: ScenarioState, ctx: ReduceContext, nameOf
   return useStableDials(scenarioDials(game, ctx, nameOf));
 }
 
-/** The marks the seat dials wear: The Road to Isengard's cards in hand on stage 3B, Shelob's Lair's allies this round, The Passing of the Grey Company's Overcome by Fear and threat floor, The Siege of Gondor's Army of the Dead, The Battle of the Pelennor Fields' Aragorn, The Tower of Cirith Ungol's hero with Last of the Company, The Black Gate Opens' controller of Gwaihir, Mount Doom's hero with Heavy and Tired and Intruders in Chetwood's hands under Lost in the Wilderness and controller of Iârion.
+/** The marks the seat dials wear: The Road to Isengard's cards in hand on stage 3B, Shelob's Lair's allies this round, The Passing of the Grey Company's Overcome by Fear and threat floor, The Siege of Gondor's Army of the Dead, The Battle of the Pelennor Fields' Aragorn, The Tower of Cirith Ungol's hero with Last of the Company, The Black Gate Opens' controller of Gwaihir, Mount Doom's hero with Heavy and Tired and Intruders in Chetwood's hands under Lost in the Wilderness and controller of Iârion, Deadmen's Dike's decks and The Wastes of Eriador's starting threat lowered by Fend Off Despair.
  * A seat wears one mark: when two scenarios' pieces fall on the same seat (Fear and the Army, the Army and Aragorn) their labels, notes and notches are merged into it. */
 export function seatMarks(game: ScenarioState, ctx: ReduceContext): readonly HandMark[] {
-  return mergedBySeat([...isengardHands(game), ...lairHands(game, ctx), ...companyHands(game, ctx), ...siegeHands(game), ...pelennorHands(game), ...ungolHands(game, ctx), ...blackGateHands(game), ...mountDoomHands(game, ctx), ...angmarHands(game)]);
+  return mergedBySeat([...isengardHands(game), ...lairHands(game, ctx), ...companyHands(game, ctx), ...siegeHands(game), ...pelennorHands(game), ...ungolHands(game, ctx), ...blackGateHands(game), ...mountDoomHands(game, ctx), ...angmarHands(game), ...wastesHands(game)]);
 }
 
 // The label after the seat prefix ("P1 · Fear" is "Fear"); a bare seat ("P1") or "Threat" says nothing more.

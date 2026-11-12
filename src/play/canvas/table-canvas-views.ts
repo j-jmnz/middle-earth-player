@@ -79,5 +79,7 @@ export function marksText(slot: SlotInfo | null): string {
   // A side quest in the staging area: the current quest, and Protect the Innocent's damage against the number that loses (the same words the native reader says, card-speech.ts).
   const current = slot.side?.current ? " · the current quest" : "";
   const sideLoses = slot.side?.loses ? ` · ${slot.side.loses.speech}${slot.side.loses.danger ? ", one more damage loses the game" : ""}` : "";
-  return `${engagement}${loss}${current}${sideLoses}${slot.delayed ? " · an effect comes later" : ""}`;
+  // A character the Campaign Log marks determined, or that carries Determination (the same words the native reader says, card-speech.ts).
+  const determined = slot.determined ? ` · ${slot.determined.speech}` : "";
+  return `${engagement}${loss}${current}${sideLoses}${determined}${slot.delayed ? " · an effect comes later" : ""}`;
 }

@@ -48,7 +48,7 @@ export function angmarAwakenedRows(log: AngmarColumns, seatCount: number): Angma
   return rows;
 }
 
-/** The sentences the Resolution screen adds for the damage the Resolution noted (`damageNotes`), as the Two Towers' notes say a recorded count. */
+/** The sentences the Resolution screen adds for what the Resolution noted: the damage (`damageNotes`), the starting threat Fend Off Despair lowered and the characters marked determined, as the Two Towers' notes say a recorded count. */
 export function angmarAwakenedNotes(log: ResolutionLog, name: (code: string) => string): readonly string[] {
   const notes: string[] = [];
   const { protect, heroes } = log.damageNotes ?? {};
@@ -57,5 +57,8 @@ export function angmarAwakenedNotes(log: ResolutionLog, name: (code: string) => 
     const damaged = Object.entries(heroes);
     notes.push(damaged.length === 0 ? "No hero has damage to note in the campaign log." : `Damage on heroes noted in the campaign log: ${damaged.map(([code, damage]) => `${name(code)} ${damage}`).join(", ")}.`);
   }
+  // The Wastes of Eriador: what the win wrote to the log (Fend Off Despair's lowered starting threat, the characters marked determined), as the Two Towers' notes say a recorded count.
+  if (log.startingThreat != null && log.startingThreat !== 0) notes.push(`Each player's starting threat is ${Math.abs(log.startingThreat)} ${log.startingThreat < 0 ? "lower" : "higher"} from now on, noted in the campaign log.`);
+  if (log.determined != null && log.determined.length > 0) notes.push(`Marked determined in the campaign log: ${log.determined.map(name).join(", ")}.`);
   return notes;
 }

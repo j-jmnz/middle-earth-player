@@ -1,7 +1,7 @@
-// Rules: mec108.time-x, mec108.side-quests, mec108.side-quests-in-play, mec108.indestructible, rr.player-elimination (data/rules/entries.json); ledger lines 09023:A:1, 09024:A:1, 09024:A:3, 09036:A:2, 09073:B:3, 09074:B:2, 10158:A:3.
+// Rules: mec108.time-x, mec108.side-quests, mec108.side-quests-in-play, mec108.indestructible, rr.player-elimination (data/rules/entries.json); ledger lines 09023:A:1, 10023:A:1, 09024:A:1, 09024:A:3, 09036:A:2, 09073:B:3, 09074:B:2, 10158:A:3.
 //
 // The dials Intruders in Chetwood's pieces hold now, in the order the top bar draws them: Protect the Innocent's damage against the number that loses the game (it warms toward it), the time counters taken off Rescue Iârion
-// (it warms toward the last, which discards Iârion and loses the game) and, while Orc Rearguard is in the staging area, the progress placed on the current quest this round against its cap of 3. The engine decided every number
+// (it warms toward the last, which discards Iârion and loses the game) and, while Orc Rearguard (or Eriador Wastes) is in the staging area, the progress placed on the current quest this round against its cap of 3. The engine decided every number
 // (`heldAmount`, `timeOf`, `questCapTally`); nothing here changes one. Empty in any other scenario. Pure, so a test reads it.
 import { HUNT_FLIP_TOKENS } from "../../effects/authored/angmar-awakened/the-weather-hills.ts";
 import { flagged, heldAmount, inPlay, livingSeats, type CardInstance } from "../../rules/core/state.ts";
@@ -20,6 +20,9 @@ import { cardsOf, type TableDial } from "./dials.ts";
 import type { HandMark } from "./isengard.ts";
 
 const REARGUARD = "09023";
+const ERIADOR_WASTES = "10023";
+// The encounter cards that cap the progress placed on the current quest each round while they are in the staging area.
+const CAPPERS = [REARGUARD, ERIADOR_WASTES];
 const HUNTING_THE_ORCS = "09071";
 const SAVAGE_COUNTER_ATTACK = "09072";
 const FIND_SHELTER = "09032";
@@ -143,9 +146,10 @@ export function angmarDials(game: ScenarioState, ctx: ReduceContext, nameOf: (co
       note: shelter ? shelterTimeWords(card.resources) : battlements ? battlementsTimeWords(card.resources) : timeWords(card.resources, heldName),
     });
   }
-  // Orc Rearguard: no more than 3 progress on the current quest each round (09023:A:1), the tally of the round.
-  const cap = cardsOf(game, REARGUARD).some((card) => card.zone === "staging") ? questCapTally(game) : null;
-  if (cap) {
+  // Orc Rearguard: no more than 3 progress on the current quest each round (09023:A:1), Eriador Wastes: no more than 5 (10023:A:1); the tally of the round. The cap is the table's, so two copies are one dial, named for the first.
+  const capper = CAPPERS.flatMap((code) => cardsOf(game, code).filter((card) => card.zone === "staging"))[0];
+  const cap = capper ? questCapTally(game) : null;
+  if (capper && cap) {
     dials.push({
       id: "cap",
       testID: "angmar-cap",
@@ -154,7 +158,7 @@ export function angmarDials(game: ScenarioState, ctx: ReduceContext, nameOf: (co
       value: cap.placed,
       limit: cap.limit,
       ...(cap.placed >= cap.limit ? { warn: { level: "near" as const, words: rearguardWords(cap.placed, cap.limit) } } : {}),
-      limitWords: rearguardLimitWords(cap.limit, nameOf(REARGUARD)),
+      limitWords: rearguardLimitWords(cap.limit, nameOf(capper.code)),
     });
   }
   return dials;

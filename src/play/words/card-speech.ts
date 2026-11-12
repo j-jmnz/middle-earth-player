@@ -154,6 +154,7 @@ function labelOf(game: ScenarioState, seat: number, card: CardInstance, deps: Ca
     else if (card.progress > 0 && !island) parts.push(`${card.progress} progress`);
   }
   if (info.fire) parts.push(`Aflame ${info.fire.text}${info.fire.danger ? ", one more damage destroys it" : ""}`);
+  if (info.determined) parts.push(info.determined.speech);
   if (info.side?.current) parts.push("the current quest");
   if (info.side?.loses) parts.push(`${info.side.loses.speech}${info.side.loses.danger ? ", one more damage loses the game" : ""}`);
   parts.push(...statWords(game, card, printed, deps, info));

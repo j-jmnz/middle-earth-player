@@ -82,6 +82,7 @@ export function ThreatRing({
   warn,
   note,
   notch,
+  word,
   onPress,
 }: {
   threat: SeatThreat;
@@ -124,12 +125,14 @@ export function ThreatRing({
   note?: string;
   // A threat value the ring marks with a short radial bar (the starting level stage 2B of The Passing of the Grey Company keeps the threat above), distinct from the engagement-cost dots.
   notch?: number;
+  // The disc says this word in place of the number (the Day and Night dial: "Day"); the number only makes the dial pop when it changes, and no change badge is drawn.
+  word?: string;
   // A tap opens the threat panel (each enemy's cost against the threat), or peeks at the seat (a dial that is not shown).
   onPress?: () => void;
 }) {
   const s = useUiScale();
   const id = testID ?? `threat-${threat.seat}`;
-  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} spokenWord={spokenWord} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} limit={limit} eliminates={eliminates} filled={filled} limitWords={limitWords} goal={goal} warn={warn} note={note} notch={notch} onPress={onPress} />;
+  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} spokenWord={spokenWord} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} limit={limit} eliminates={eliminates} filled={filled} limitWords={limitWords} goal={goal} warn={warn} note={note} notch={notch} word={word} onPress={onPress} />;
   return (
     <View testID={id} accessible accessibilityLabel={`${label} ${threat.threat}`} className="items-center">
       <View className="h-12 w-12 items-center justify-center rounded-control">
@@ -166,6 +169,7 @@ function ThreatDial({
   warn,
   note,
   notch,
+  word,
   onPress,
 }: {
   threat: SeatThreat;
@@ -188,6 +192,7 @@ function ThreatDial({
   warn?: { level: "near" | "critical"; words: string };
   note?: string;
   notch?: number;
+  word?: string;
   onPress?: () => void;
 }) {
   const speed = useMotionScale();
@@ -224,8 +229,8 @@ function ThreatDial({
     return () => clearTimeout(timer);
   }, [change]);
   const pop = useAnimatedStyle(() => ({ transform: [{ scale: scale.get() }] }));
-  const delta = change ? threatDelta(change.before, change.after) : null;
-  const deltaWords = change ? threatDeltaWords(name, change.before, change.after) : null;
+  const delta = change && word == null ? threatDelta(change.before, change.after) : null;
+  const deltaWords = change && word == null ? threatDeltaWords(name, change.before, change.after) : null;
   const critical = level === "critical" && !threat.eliminated;
   // The words for a dial near its limit: its own warning first, then what the number alone says.
   const losesAtLimit = limit != null && eliminates !== true;
@@ -236,7 +241,7 @@ function ThreatDial({
   const engaging = ticks.filter((cost) => cost <= threat.threat).length;
   const tickWords = ticks.length === 0 ? "" : ticks.length === 1 ? `, the enemy in staging ${engaging === 1 ? "engages" : "does not engage"} at this threat` : `, ${engaging} of the ${ticks.length} enemies in staging engage at this threat`;
   // The dial is one control with one name (the change badge's words included), so Android gives it one focus stop.
-  const dialWords = `${spokenWord ? dialSpeech(spokenWord, threat.threat, label, role) : `${name} ${threat.threat}`}${threat.eliminated ? ", eliminated" : levelWords}${note ? `, ${note}` : ""}${limit != null ? `, ${limitWords ?? `the players lose at ${limit}`}` : ""}${tickWords}${ring ? `. ${ring}` : ""}${deltaWords ? `. ${deltaWords}` : ""}`;
+  const dialWords = `${spokenWord ? dialSpeech(spokenWord, threat.threat, label, role) : `${name} ${word ?? threat.threat}`}${threat.eliminated ? ", eliminated" : levelWords}${note ? `, ${note}` : ""}${limit != null ? `, ${limitWords ?? `the players lose at ${limit}`}` : ""}${tickWords}${ring ? `. ${ring}` : ""}${deltaWords ? `. ${deltaWords}` : ""}`;
   return (
     <Pressable
       {...focus.props}
@@ -264,8 +269,8 @@ function ThreatDial({
                 backgroundImage: critical ? undefined : `radial-gradient(circle, ${withAlphaHex(hue, 0.28)}, ${withAlphaHex(t.night, 0.92)})`,
               }}
             >
-              <Text testID={`${id}-value`} className="font-display" style={{ fontSize: 20 * s, lineHeight: 24 * s, color: critical ? t.onThreat : t.depth === "light" ? t.bone : t.onThreat }}>
-                {String(threat.threat)}
+              <Text testID={`${id}-value`} className="font-display" style={{ fontSize: (word == null ? 20 : 12) * s, lineHeight: (word == null ? 24 : 16) * s, color: critical ? t.onThreat : t.depth === "light" ? t.bone : t.onThreat }}>
+                {word ?? String(threat.threat)}
               </Text>
               {icon && icon !== "threat" ? <GameIcon name={icon} size={9 * s} tint="danger" /> : null}
             </View>
