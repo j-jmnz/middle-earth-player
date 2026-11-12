@@ -250,6 +250,10 @@ export const pickSchema = z.strictObject({
   engageable: z.literal(true).optional(),
   // The effect discards the card chosen, for a condition that asks before the discard (a canPick ahead of DiscardFromHand): a card that player card effects cannot discard (18026:A:1) is left out. A Pick followed by DiscardPicked is known without it (families/wilderland/pick.ts).
   discarded: z.literal(true).optional(),
+  // The black-gate family's filters (src/rules/families/black-gate/pick.ts). `embassy`: a card of the Embassy from the Dark Tower's faceup row that is not paired yet, the player cards placed in front of the players (`player`) or the encounter cards placed faceup (`encounter`, 146072:B:1).
+  // `highestThreat`: of the cards that matched, those with the highest current Threat, a card with none counting 0 ("the highest threat encounter card remaining"); every one when tied, and the chooser decides.
+  embassy: z.enum(["player", "encounter"]).optional(),
+  highestThreat: z.literal(true).optional(),
   // The sidequests family's filters (src/rules/families/sidequests/pick.ts).
   // A card with the same title as the active location ("each location in the staging area with the same title as the active location").
   // `picked`: a card with the same title as the last card the running effect picked, never that card itself ("if there is a copy of that enemy in the staging area", 146019:A:1; Pick, canPick and matches read it).

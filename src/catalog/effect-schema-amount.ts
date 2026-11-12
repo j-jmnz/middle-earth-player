@@ -92,6 +92,8 @@ export const amountExprSchema = z.strictObject({
   // 145021:A:1). Read by the grey-company family (src/rules/families/grey-company/amounts.ts).
   highestThreat: z.literal(true).optional(),
   playersAtThreat: z.number().int().positive().optional(),
+  // With `stat`: the stat of every card that matches the pick, added up, read live ("X is the total Threat of each engaged enemy", 146026:A:1). Read by the black-gate family.
+  totalOf: pickSchema.optional(),
   // The damage tokens on the cards that match, added up ("equal to the total damage on each Ship objective he controls", 12148:A:1; read by the sea family, src/rules/families/sea/swap.ts).
   damageOn: pickSchema.optional(),
   // The total printed cost of the allies in the staging area ("X is the total cost of all allies in the staging area", 145074:B:1; a card with no printed cost counts 0). Read by the pelennor family.

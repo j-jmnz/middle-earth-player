@@ -110,8 +110,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("ReturnEventToHand"), ...when }),
   // The picked card (the top card of the actor's deck) is played for no cost if it can be: an ally enters play, an
   // attachment is attached to a host the actor chooses, an event's Action resolves. Otherwise it goes to the bottom of
-  // the deck.
-  z.strictObject({ verb: z.literal("PlayRevealedFree"), ...when }),
+  // the deck. `embassy`: the player card of the Embassy from the Dark Tower's current pair (EmbassyNext), lying faceup in front of its owner, is played by its owner instead; when it cannot be played it goes to its owner's discard pile (146072:B:1).
+  z.strictObject({ verb: z.literal("PlayRevealedFree"), embassy: z.literal(true).optional(), ...when }),
 ] as const;
 
 const TRIGGERS = [

@@ -165,15 +165,28 @@ function played(state: ScenarioState, cardId: string, seat: number, ctx: ReduceC
   return next;
 }
 
+// A card that can be played for no cost now by this seat: an ally unless a unique one is in play, an attachment with a host, an event with an Action that could resolve (rr.play-and-put-into-play). The Embassy from the Dark Tower offers that option only for such a card (146072:B:1).
+export function canPlayFree(state: ScenarioState, id: string, seat: number, ctx: ReduceContext): boolean {
+  const card = state.cards[id];
+  if (!card) return false;
+  const printed = printedOf(ctx.cards, card.code);
+  if ((printed.type === "ally" || printed.type === "attachment") && uniqueBlocked(state, printed, ctx.cards)) return false;
+  if (printed.type === "ally") return true;
+  if (printed.type === "attachment") return attachmentHostIds(state, seat, card.code, ctx).length > 0;
+  return printed.type === "event" && playableActions(state, id, seat, ctx).length > 0;
+}
+
 // The top card of the actor's deck, revealed, is played for no cost if it can be (Vilya, 04137:A:2): an ally enters play, an
 // attachment goes on a host the actor chooses, an event's Action resolves. Otherwise it goes to the bottom of the deck.
+// `embassy`: the player card of the Embassy from the Dark Tower's current pair, lying faceup in front of its owner, is played by its owner, and goes to his discard pile when it cannot be (146072:B:1).
 function playRevealedFree(state: ScenarioState, item: QueueItem, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const id = lastPicked(state);
+  const embassy = item.instruction.verb === "PlayRevealedFree" && item.instruction.embassy === true;
+  const id = embassy ? (state.embassy?.pairs[state.embassy.at - 1]?.player ?? "") : lastPicked(state);
   const card = state.cards[id];
-  const seat = item.seat;
-  if (!card || card.zone !== "deck" || card.controller !== seat) return state;
+  const seat = embassy ? (card?.controller ?? item.seat) : item.seat;
+  if (!card || card.zone !== (embassy ? "setAside" : "deck") || card.controller !== seat) return state;
   const printed = printedOf(ctx.cards, card.code);
-  const bottom = putOnDeck(state, id, "bottom");
+  const bottom = embassy ? moveCard(state, id, { zone: "discard", seat: card.owner ?? seat }) : putOnDeck(state, id, "bottom");
   if ((printed.type === "ally" || printed.type === "attachment") && uniqueBlocked(state, printed, ctx.cards)) return bottom;
   if (printed.type === "ally") {
     const entered = updateCard(moveCard(played(state, id, seat, ctx, steps), id, { zone: "play", seat }), id, { exhausted: entersExhausted(ctx, card.code) });
@@ -182,7 +195,7 @@ function playRevealedFree(state: ScenarioState, item: QueueItem, ctx: ReduceCont
   if (printed.type === "attachment") {
     const hosts = attachmentHostIds(state, seat, card.code, ctx);
     if (hosts.length === 0) return bottom;
-    if (!item.chosen && hosts.length > 1 && effectData(state)) return askTarget(state, item, hosts);
+    if (!item.chosen && hosts.length > 1 && effectData(state)) return askTarget(state, { ...item, seat }, hosts);
     const host = item.chosen && hosts.includes(item.chosen) ? item.chosen : hosts[0];
     if (!host) return bottom;
     const placed = updateCard(moveCard(played(state, id, seat, ctx, steps), id, { zone: "play", seat }), id, { exhausted: entersExhausted(ctx, card.code) });

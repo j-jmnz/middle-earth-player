@@ -134,6 +134,11 @@ export function runExtraVerb(
     }
     case "ReturnUnderToStaging": {
       let next = state;
+      // `to: "engaged"` (146029:A:2): each enemy comes into play engaged with the first player, who is then engaged by it (the enemy's "After X engages you" lines hear it).
+      if (instruction.to === "engaged") {
+        for (const id of focus.sourceId ? cardsUnder(state, focus.sourceId) : []) next = moveEncounter(next, id, "engaged", next.firstPlayer, ctx, steps);
+        return next;
+      }
       for (const id of focus.sourceId ? cardsUnder(state, focus.sourceId) : []) next = updateCard(moveCard(next, id, { zone: "staging" }), id, { face: "up" });
       return next;
     }

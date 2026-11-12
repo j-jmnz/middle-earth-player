@@ -20,4 +20,12 @@ describe("search selector traits (146073:A:1)", () => {
     // One trait alone is the old selector.
     expect(searchable(state, { trait: "Wolf" }, ctx).map((id) => state.cards[id]?.code)).toEqual(["warg"]);
   });
+
+  it("reads the victory display only when asked (146036:A:2)", () => {
+    const base = table({ cards, effects: [], heroes: [{ code: "a" }] });
+    const state = spawn(spawn(base.state, "nazgul", { zone: "encounterDeck" }).state, "nazgul", { zone: "victory" }).state;
+    const ctx = { effects: [], cards: cardMap(cards) };
+    expect(searchable(state, { traits: ["Nazgûl", "Orc"], type: "enemy" }, ctx)).toHaveLength(1);
+    expect(searchable(state, { traits: ["Nazgûl", "Orc"], type: "enemy", victory: true }, ctx)).toHaveLength(2);
+  });
 });

@@ -33,6 +33,7 @@ import { highestAttack } from "../families/sea/ramming.ts";
 import { chosenCopies, levelAmount } from "../families/aflame/values.ts";
 import { sidePickMatches } from "../families/grapple/values.ts";
 import { islandPool, outsideCells } from "../families/island/pick.ts";
+import { embassyPool, highestThreatOf } from "../families/black-gate/pick.ts";
 import { seatPickMatches } from "../families/wilderland/seat-pick.ts";
 
 // What a filter is read against: who is choosing or counting, the effect's source, what it has picked, its X, and the
@@ -74,6 +75,9 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
   // The Island Map's filters start from its own cards (families/island/pick.ts).
   const mapped = islandPool(state, spec);
   if (mapped) return mapped;
+  // The Embassy from the Dark Tower's faceup row (families/black-gate/pick.ts).
+  const embassy = embassyPool(state, spec);
+  if (embassy) return embassy;
   // A burden card in play or in the encounter deck or its discard pile (142074:A:2).
   if (spec.burden) {
     return Object.values(state.cards)
@@ -321,6 +325,8 @@ export function pickCandidates(
   // "The Harad enemy engaged with you with the lowest Attack" (families/harad/pick.ts).
   if (spec.lowestAttack) return lowestOf(state, found, "attack", ctx);
   if (spec.lowestThreat) return lowestOf(state, found, "threat", ctx);
+  // "The highest threat encounter card remaining" (families/black-gate/pick.ts).
+  if (spec.highestThreat) return highestThreatOf(state, found, ctx);
   // "The highest cost attachment you control" (families/costs/pick.ts).
   if (spec.highestCost) return highestCost(state, found, ctx);
   // "The engaged Ship enemy with the highest Attack" (families/sea/ramming.ts).
