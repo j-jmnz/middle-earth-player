@@ -4,7 +4,7 @@ import type { Effect } from "../../../catalog/boundary.ts";
 import { syncConstants } from "../../interpret/constants.ts";
 import { runInstruction } from "../../interpret/interpret.ts";
 import { holds } from "../../interpret/conditions.ts";
-import { attachBlocked } from "../../interpret/restrictions.ts";
+import { attachBlocked, travelBlocked } from "../../interpret/restrictions.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
 import { heroPays } from "../../player/payments.ts";
 import { modifiedStat, placeDamage } from "../../core/keywords.ts";
@@ -178,5 +178,42 @@ describe("Last of the Company's action (146014:A:2)", () => {
     const at = until(state, ctx, (_current, legal) => offered(legal, "146014:action:1"));
     const tired = { ...at, cards: { ...at.cards, [ids["146065"]!]: { ...at.cards[ids["146065"]!]!, exhausted: true } } };
     expect(offered(legalIntents(tired, ctx), "146014:action:1")).toBe(false);
+  });
+});
+
+describe("The Two Watchers' enemy side in the staging area (146066:B:2, 146071:A:2)", () => {
+  const records = recordsOf(EFFECTS, "146066", "146071");
+  const stage = definePrinted({ code: "146066", name: "Pass the Two Watchers", type: "quest", questPoints: 0 });
+  const watchers = definePrinted({ code: "146071", name: "The Two Watchers", type: "enemy", traits: ["Mordor"], isUnique: true, attack: 5, defense: 2, health: 4, threat: 2, engagementCost: 50, keywords: { immuneToPlayerCardEffects: true } });
+
+  function attacked() {
+    const built = table({ cards: [hero("a"), stage, watchers, treachery("shade")], effects: records, heroes: [{ code: "a" }], staging: [{ code: "146071" }], encounter: ["shade"] });
+    const state = syncConstants(spawn(built.state, "146066", { zone: "questStage" }).state, built.ctx);
+    const defense = until(send(state, { type: "DeclineEngage" }, built.ctx), built.ctx, (current) => current.window?.kind === "defense");
+    const before = defense.seats[0].threat;
+    const after = until(send(defense, { type: "Undefended", heroId: built.ids.a! }, built.ctx), built.ctx, (current) => current.pendingAttack == null);
+    return { defense, after, before, ids: built.ids };
+  }
+
+  it("attacks the players from the staging area and its damage is canceled for threat, though nothing engaged it", () => {
+    const { defense, after, before, ids } = attacked();
+    expect(defense.pendingAttack?.enemyId).toBe(ids["146071"]);
+    expect(after.cards[ids.a!]?.damage).toBe(0);
+    expect(after.seats[0].threat).toBe(before + 5);
+    expect(after.cards[ids["146071"]!]?.zone).toBe("staging");
+  });
+});
+
+describe("a location that cannot leave the staging area (146066:B:1)", () => {
+  const stage = definePrinted({ code: "146066", name: "Pass the Two Watchers", type: "quest", questPoints: 0 });
+  const place = (code: string, isUnique: boolean) => definePrinted({ code, name: code, type: "location", threat: 2, questPoints: 3, isUnique });
+
+  it("is not offered for travel, and gets -1 Threat, while a unique location is", () => {
+    const built = table({ cards: [hero("a"), stage, place("passage", false), place("chamber", true)], effects: recordsOf(EFFECTS, "146066"), heroes: [{ code: "a" }], staging: [{ code: "passage" }, { code: "chamber" }] });
+    const state = syncConstants(spawn(built.state, "146066", { zone: "questStage" }).state, built.ctx);
+    expect(travelBlocked(state, built.ctx, built.ids.passage!)).toBe(true);
+    expect(travelBlocked(state, built.ctx, built.ids.chamber!)).toBe(false);
+    expect(modifiedStat(state, state.cards[built.ids.passage!]!, "threat", built.ctx.cards)).toBe(1);
+    expect(modifiedStat(state, state.cards[built.ids.chamber!]!, "threat", built.ctx.cards)).toBe(2);
   });
 });

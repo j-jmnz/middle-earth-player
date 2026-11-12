@@ -1,0 +1,386 @@
+Scenario piles that place cards with no record (quest: 146066 Pass the Two Watchers; quest: 146067 Fighting in the Tower; quest: 146068 Escape from Cirith Ungol; staging: 146015 Topmost Chamber; staging: 146070 The Two Watchers; setAside: 146020 Shagrat; attachedChosen: 146014 Last of the Company)
+
+## 146014 Last of the Company
+(the scenario deals it into the attachedChosen pile; the piles place it, no record does)
+
+146014:A:1 (front): Attached hero gains the Ring-bearer trait and the Fellowship sphere. You cannot lose control of the first player token.
+  146014:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json GrantTrait {"verb":"GrantTrait","trait":"Ring-bearer"}]
+    - [json GrantIcon {"verb":"GrantIcon","sphere":"fellowship"}]
+    - the table: stat firstPlayerLocked 1, while this card is in play
+
+146014:A:2 (front): Action: Exhaust The One Ring and raise your threat by 1 to choose an enemy. Until the end of the phase, that enemy gets -X Threat, where X is the attached hero's Willpower.
+  146014:action:1: Action
+    only if all of: (the card with code 146065 in play is ready) and (there is a enemy (any player controls) or in the staging area to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - exhaust the card with code 146065
+    - raise threat by 1 (the acting player)
+    - choose enemy (any player controls) or in the staging area
+    - the picked card: stat threat minus (willpower of its host), until the end of the phase
+
+## 146015 Topmost Chamber
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+146015:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+146015:A:2 (front): The players cannot travel here unless there is at least 18 progress on stage 2B.
+  146015:constant:1: Constant
+    only if not ([json condition {"kind":"stageProgress","min":18}])
+    - the players cannot travel to any location while this holds
+  146015:constant:2: Constant
+    only if not (the players are on stage 2)
+    - the players cannot travel to any location while this holds
+
+146015:A:3 (front): Travel: Add Shagrat to the staging area to travel here.
+  146015:travel:1: Travel
+    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"146020"}]
+
+## 146016 Echoing Passage
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+146016:A:1 (front): Echoing Passage gets +1 Threat for each enemy in the staging area.
+  146016:constant:1: Constant
+    - this card: stat threat the number of enemy (any player controls) in the staging area only, while this card is in play
+
+146016:A:2 (front): While Echoing Passage is the active location, each enemy gets +2 Defense.
+  146016:constant:2: Constant
+    only if this card is the active location
+    - each enemy (any player controls) or in the staging area: stat defense 2, while this card is in play
+
+## 146017 Bloodied Courtyard
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+146017:A:1 (front): While Bloodied Courtyard is the active location, it gains: "Forced: After an enemy enters the staging area, deal 1 damage to it."
+  146017:forced:1: Forced after an encounter card is added to the staging area (heard about enemy (any player controls))
+    only if this card is the active location
+    - deal 1 damage to the card the event is about
+
+146017:A:2 (front): Travel: Raise each player's threat by 1 to travel here.
+  146017:travel:1: Travel
+    - raise threat by 1 (each player)
+
+## 146018 Winding Stairs
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+146018:A:1 (front): While Winding Stairs is the active location, each enemy in the staging area gets +10 engagement cost.
+  146018:constant:1: Constant
+    only if this card is the active location
+    - each enemy (any player controls) in the staging area only: stat engagementCost 10, while this card is in play
+
+146018:A:2 (front): Travel: Each player must exhaust a character he controls to travel here.
+  146018:travel:1: Travel
+    - for each player, first player first:
+      - choose ready character (you control)
+      - exhaust the picked card
+
+## 146019 Torch-lit Hall
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+146019:A:1 (front): Forced: After the players travel to Torch-lit Hall, discard cards from the top of the encounter deck until an enemy is discarded. If there is a copy of that enemy in the staging area, discard that copy as well. If there is not, add the just discarded enemy to the staging area.
+  146019:forced:1: Forced after the players travel (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy"}]
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"all","conditions":[{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"},"inPlay":false},{"kind":"count","pick":{"type":"enemy","control":"any","stagingOnly":true,"sameTitleAs":"picked"},"max":0}]}}]
+    - then, if there is a enemy (any player controls) in the staging area only [also {"sameTitleAs":"picked"}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) in the staging area only [also {"sameTitleAs":"picked"}]
+    - then, if all of: (the picked card is a enemy (any player controls) in the staging area only) and (the card picked before is a enemy (any player controls) [also {"inPlay":false}]) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+
+## 146020 Shagrat
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+146020:A:1 (front): Cannot have non-boon attachments. Cannot take non-combat damage.
+  146020:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json Restrict {"verb":"Restrict","what":"attach","exceptBoon":true}]
+    - this card: stat cannotTakeNonCombatDamage 1, while this card is in play
+
+146020:A:2 (front): Allies cannot attack or defend against Shagrat.
+  146020:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat alliesCannotAttack (allies cannot be declared as attackers against it) 1, while this card is in play
+    - allies cannot be declared as defenders against this card's attacks (only this card's, not another enemy's)
+
+146020:A:3 (front): Forced: After progress is placed on the quest, Shagrat gets -X engagement cost until the end of the round. X is the amount of progress just placed.
+  146020:forced:1: Forced on the event progressPlaced (heard about card (any player controls) named "Pass the Two Watchers" or "Fighting in the Tower" or "Escape from Cirith Ungol")
+    - this card: stat engagementCost minus X, until the end of the round
+
+## 146021 Gorbag
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+146021:A:1 (front): Cannot have attachments.
+  146021:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+146021:A:2 (front): Forced: After Gorbag engages you, it makes an immediate attack.
+  146021:forced:1: Forced after an enemy engages a player (heard about this card)
+    - this enemy attacks now, dealt a new shadow card after its old ones are discarded
+
+146021:A:3 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
+  146021:shadow:1: Shadow
+    - when the attack in progress ends:
+      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt no shadow card
+
+## 146022 Wounded Uruk
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+146022:A:1 (front): Wounded Uruk enters play with 2 damage on it.
+  146022:triggered:1: Triggered (mandatory, not printed as Forced) on the event encounterEnteredPlay (heard about this card)
+    - [json PlaceDamage {"verb":"PlaceDamage","amount":2}]
+
+146022:A:2 (front): Forced: After Wounded Uruk engages you, it gets +2 Attack until the end of the round.
+  146022:forced:1: Forced after an enemy engages a player (heard about this card)
+    - this card: stat attack 2, until the end of the round
+
+146022:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack for each damage on it.
+  146022:shadow:1: Shadow
+    - the attacking enemy: stat attack damage of the attacking enemy, until the end of the attack
+
+## 146023 Orcish Howls
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+146023:A:1 (front): When Revealed: Deal 1 damage to each enemy in the staging area. Until the end of the phase, each enemy gets +1 Threat for each damage on it. If there are no enemies in the staging area, Orcish Howls gains surge.
+  146023:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json GainSurge {"verb":"GainSurge","when":{"kind":"count","pick":{"type":"enemy","control":"any","stagingOnly":true},"max":0}}]
+    - for each enemy (any player controls) in the staging area only:
+      - deal 1 damage to the picked card
+    - every enemy in play: stat threatPerDamage 1, until the end of the phase
+
+146023:A:2 (shadow): Shadow: If you are engaged with another enemy, resolve this attack against that enemy.
+  146023:shadow:1: Shadow
+    only if there is a enemy (any player controls) engaged with you [also {"attackingEnemy":false}] to choose
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) engaged with you [also {"attackingEnemy":false}]
+    - the attack in progress is resolved against the last picked enemy instead of the defenders: that enemy takes the damage after its Defense
+
+## 146058 Orc of Mordor
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+146058:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+146058:A:2 (front): Forced: After Orc of Mordor engages you, exhaust a character you control.
+  146058:forced:1: Forced after an enemy engages a player (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+
+146058:A:3 (shadow): Shadow: Exhaust a character you control.
+  146058:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+
+## 146059 Snaga Archer
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+146059:A:1: Archery 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+146059:A:2 (front): Forced: After Snaga Archer engages you, deal 2 damage to a character you control.
+  146059:forced:1: Forced after an enemy engages a player (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (you control)
+    - deal 2 damage to the picked card
+
+146059:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending character is damaged).
+  146059:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the defender is a damaged character (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the defender is a damaged character (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 146060 Uruk Soldier
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+146060:A:1 (front): Forced: After Uruk Soldier engages you, raise your threat by 2.
+  146060:forced:1: Forced after an enemy engages a player (heard about this card)
+    - raise threat by 2 (the player the event is about)
+
+146060:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, return attacking enemy to the staging area.
+  146060:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 146061 Drawn to the Ring
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+146061:A:1 (front): When Revealed: The first player must choose: either exhaust The One Ring and reveal an encounter card, or discard cards from the top of the encounter deck until an enemy is discarded and put it into play engaged with him.
+  146061:whenRevealed:1: When revealed
+    - the first player chooses one of:
+      * option "ring" (only if the card with code 146065 in play is ready):
+        - exhaust the card with code 146065
+        - the acting player reveals an encounter card
+      * option "enemy" (only if [json condition {"kind":"searchable","type":"enemy","deckOnly":true}]):
+        - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy"}]
+        - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"engaged","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"},"inPlay":false}}]
+
+146061:A:2 (shadow): Shadow: Discard a non-objective attachment you control.
+  146061:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (you control) that is not an objective
+    - discard the picked card
+
+## 146062 Deep Shadows
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+146062:A:1: Doomed 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+146062:A:2 (front): When Revealed: Each player must choose: either discard your hand (with at least 3 cards in it), or reveal an encounter card.
+  146062:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "discard" (only if the number of card (you control) in hand is at least 3):
+          - the acting player discards all the cards in their hand
+        * option "reveal":
+          - the acting player reveals an encounter card
+
+146062:A:3 (shadow): Shadow: Attacking enemy makes an additional attack after this one.
+  146062:shadow:1: Shadow
+    - when the attack in progress ends:
+      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+
+## 146063 Evil Vigilance
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+146063:A:1 (front): When Revealed: Each player must choose: either discard a questing character you control, or raise your threat by 1 for each questing character you control.
+  146063:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "discard" (only if there is a character (you control) committed to the quest to choose):
+          - choose character (you control) committed to the quest
+          - discard the picked card
+        * option "threat":
+          - raise threat by the number of character (you control) committed to the quest (the acting player)
+
+146063:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, reveal the top card of the encounter deck.
+  146063:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the acting player reveals an encounter card
+
+## 146066 Pass the Two Watchers
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+146066:A:1 (front): Setup: Set Shagrat aside, out of play. Add The Two Watchers (location side faceup) and Topmost Chamber to the staging area. The first player loses control of the Ring-bearer and places it faceup under Topmost Chamber as a guarded objective. Then, the first player attaches Last of the Company to a hero he controls and attaches The One Ring to that hero.
+  146066:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json CaptureRingBearer {"verb":"CaptureRingBearer","under":"146015","guarded":true}]
+    - [json SetAside {"verb":"SetAside","code":"146014"}]
+    - choose hero (any player controls) chosen by the first player
+    - [json AttachSetAside {"verb":"AttachSetAside","code":"146014"}]
+    - the card with code 146065 in play moves, with what is on it, to the last picked hero (one card moves; it never leaves play)
+
+146066:B:1 (back): Each non-unique location gets -1 Threat and cannot leave the staging area.
+  146066:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each non-unique location (any player controls) in the staging area only: stat threat -1, while this card is in play
+    - each non-unique location (any player controls) in the staging area only: stat cannotLeaveStaging (nothing moves it out of the staging area: not an engagement, a return, a discard or an effect) 1, while this card is in play
+
+146066:B:2 (back): While The Two Watchers is in the staging area (enemy side faceup), it is considered to be engaged with each player.
+  146066:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy (any player controls) in the staging area only, named "The Two Watchers": stat engagedWithAll 1, while this card is in play
+    - each enemy (any player controls) in the staging area only, named "The Two Watchers": stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
+    - each enemy (any player controls) in the staging area only, named "The Two Watchers": stat noThreatContribution 1, while this card is in play
+    - each enemy (any player controls) in the staging area only, named "The Two Watchers": stat attackableByAny 1, while this card is in play
+
+146066:B:3 (back): This stage cannot be defeated while The Two Watchers is in play.
+  146066:constant:3: Constant
+    only if any of: (the card with code 146070 is in play) or (the card with code 146071 is in play)
+    - the players cannot defeat this stage while this holds
+  146066:constant:4: Constant
+    - this card: stat advancesWhenFreed 1, while this card is in play
+
+## 146067 Fighting in the Tower
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+146067:A:1 (front): When Revealed: Shuffle the encounter discard pile into the encounter deck and discard cards from the top until X enemies are discarded, where X is the number of players in the game. Add each enemy discarded by this effect to the staging area.
+  146067:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - discard from the top of the encounter deck until 1 enemy for each player is discarded; add those enemies to the staging area
+
+146067:B:1 (back): Forced: At the beginning of the quest phase, discard cards from the top of the encounter deck until an enemy is discarded. If there is a copy of that enemy in the staging area, discard that copy as well. If there is not, add the discarded enemy to the staging area.
+  146067:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy"}]
+    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"all","conditions":[{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"},"inPlay":false},{"kind":"count","pick":{"type":"enemy","control":"any","stagingOnly":true,"sameTitleAs":"picked"},"max":0}]}}]
+    - then, if there is a enemy (any player controls) in the staging area only [also {"sameTitleAs":"picked"}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) in the staging area only [also {"sameTitleAs":"picked"}]
+    - then, if all of: (the picked card is a enemy (any player controls) in the staging area only) and (the card picked before is a enemy (any player controls) [also {"inPlay":false}]) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+
+146067:B:2 (back): This stage cannot be defeated unless Topmost Chamber is in the victory display. When the Ring-bearer is free of encounters, the first player gains control of it.
+  146067:constant:1: Constant
+    only if [json condition {"kind":"inVictory","code":"146015","is":false}]
+    - the players cannot defeat this stage while this holds
+  146067:constant:2: Constant
+    - (rule marker) the first player gains control of the Ring-bearer a card guards as soon as that card is out of play: it returns among their heroes where it was, as it was held
+
+## 146068 Escape from Cirith Ungol
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+146068:A:1 (front): When Revealed: Add Last of the Company to the victory display. Attach The One Ring to the Ring-bearer and exhaust the Ring-bearer. The first player moves The Two Watchers from the victory display to the staging area (location side faceup). Each other player reveals an encounter card.
+  146068:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose card (any player controls) named "Last of the Company"
+    - [json AddToVictory {"verb":"AddToVictory","target":"picked"}]
+    - the card with code 146065 in play moves, with what is on it, to the Ring-bearer (one card moves; it never leaves play)
+    - choose Ring-bearer hero (any player controls)
+    - exhaust the picked card
+    - the card with code 146071 in the victory display returns to the staging area as the card with code 146070, faceup, ready, controlled by no one and with no damage
+    - for each player, first player first:
+      - if not (the actor holds the first player token): the acting player reveals an encounter card
+
+146068:B:1 (back): The players cannot travel to The Two Watchers unless there is at least 12 progress on this stage.
+  146068:constant:1: Constant
+    only if not ([json condition {"kind":"stageProgress","min":12}])
+    - the players cannot travel to the location with code 146070 while this holds
+
+146068:B:2 (back): While The Two Watchers is in the staging area (enemy side faceup), it gets +3 Threat and +3 Defense and is considered to be engaged with each player.
+  146068:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy (any player controls) in the staging area only, named "The Two Watchers": stat threat 3, while this card is in play
+    - each enemy (any player controls) in the staging area only, named "The Two Watchers": stat defense 3, while this card is in play
+    - each enemy (any player controls) in the staging area only, named "The Two Watchers": stat engagedWithAll 1, while this card is in play
+    - each enemy (any player controls) in the staging area only, named "The Two Watchers": stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
+    - each enemy (any player controls) in the staging area only, named "The Two Watchers": stat noThreatContribution 1, while this card is in play
+    - each enemy (any player controls) in the staging area only, named "The Two Watchers": stat attackableByAny 1, while this card is in play
+
+146068:B:3 (back): This stage cannot be defeated while The Two Watchers is in play. If this stage is defeated, the players win the game.
+  146068:constant:3: Constant
+    only if any of: (the card with code 146070 is in play) or (the card with code 146071 is in play)
+    - the players cannot defeat this stage while this holds
+  146068:questResolution:1: Quest resolution
+    - the players win the game
+
+## 146070 The Two Watchers
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+146070:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+146070:A:2 (front): X is twice the stage number of the main quest.
+  146070:constant:1: Constant
+    - this card: stat threat the stage number of the quest x 2, while this card is in play
+
+146070:A:3 (front): Forced: After the players travel here, flip The Two Watchers to its enemy side and move it to the staging area.
+  146070:forced:1: Forced after the players travel (heard about this card)
+    - [json FlipToEnemySide {"verb":"FlipToEnemySide","code":"146070","into":"146071"}]
+
+## 146071 The Two Watchers
+
+146071:A:1 (front): Immune to player card effects. Cannot be optionally engaged.
+  (the keyword part is owned by the card's keywords; the records cover: Cannot be optionally engaged.)
+  146071:constant:1: Constant
+    - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
+
+146071:A:2 (front): Forced: When The Two Watchers deals any amount of damage, cancel that damage and raise the defending player's threat by X instead. X is the amount of damage just canceled.
+  146071:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    - this card: stat phantom 1, until the end of the attack
+
+(rendered pieces: 235 by template, 29 as JSON)
