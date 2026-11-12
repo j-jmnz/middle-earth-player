@@ -1,4 +1,4 @@
-// Rules: mec113.fortitude-tests, mec113.dire, mec113.saga-staging-rules, rr.step-7-3, rr.cannot, rr.travel, rr.quest-advancement, rr.undefended, faq.progress-without-advancing (data/rules/entries.json).
+// Rules: mec113.fortitude-tests, mec113.dire, mec113.saga-staging-rules, rr.step-7-3, rr.cannot, rr.travel, rr.quest-advancement, ltp.undefended-attack, faq.progress-without-advancing (data/rules/entries.json).
 // What a card-spec row cannot hold on Mount Doom's own cards: the refresh phase the Tower of Barad-dur skips, the bar on travel to Mount Doom, a failed test remembered for the round (the shadows of Foul Fumes and The Lidless Eye), and the stages' own
 // flow (stage 2B's advance, stage 3B's cap and bar, stage 4B's bar on allies). Each test title starts with the line it covers (scripts/checks/spec-coverage.test.ts).
 import { describe, expect, it } from "vitest";
