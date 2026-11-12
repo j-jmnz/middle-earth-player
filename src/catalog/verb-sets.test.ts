@@ -22,7 +22,7 @@ describe("verb flags", () => {
   });
 
   it("mark exactly the verbs the start resolves after the quest card's Setup", () => {
-    expect(sorted(setupRoleVerbs("afterSetup"))).toEqual(["AttachNewTo", "AttachSetAsideTo", "AttachToHeroWith", "FitShips", "FlipSetAside", "FlipStormcaller", "PlaceLoggedHeroDamage", "PlaceSecrets", "PutSetAsideInPlay", "PutTrust", "RaiseThreatToAttach", "SearchGuardForTreasure", "ShuffleIntoPile", "TradeDamageForResources", "TradeDamageForThreat", "TradeShipDamage"]);
+    expect(sorted(setupRoleVerbs("afterSetup"))).toEqual(["AttachNewTo", "AttachSetAsideTo", "AttachToHeroWith", "FitShips", "FlipSetAside", "FlipStormcaller", "PlaceLoggedDamageOn", "PlaceLoggedHeroDamage", "PlaceSecrets", "PutSetAsideInPlay", "PutTrust", "RaiseThreatToAttach", "SearchGuardForTreasure", "ShuffleIntoPile", "TradeDamageForResources", "TradeDamageForThreat", "TradeShipDamage"]);
   });
 
   it("mark exactly the verbs that reach into the collection", () => {

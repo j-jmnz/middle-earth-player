@@ -114,8 +114,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     timing: "constant",
     condition: { kind: "not", condition: IN_STAGING },
     instructions: [
-      { verb: "ModifyStat", stat: "blankText", amount: 1, until: "whileSourceInPlay", target: "damagedCharacters" },
-      { verb: "ModifyStat", stat: "keepsKeywords", amount: 1, until: "whileSourceInPlay", target: "damagedCharacters" },
+      { verb: "ModifyStat", stat: "blankText", amount: 1, until: "whileSourceInPlay", holders: DAMAGED },
+      { verb: "ModifyStat", stat: "keepsKeywords", amount: 1, until: "whileSourceInPlay", holders: DAMAGED },
     ],
   },
 
@@ -193,7 +193,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       { verb: "StageSetAside", code: AMON_FORN },
     ],
   },
-  { id: "09070:constant:1", cardCode: "09070", lines: ["09070:B:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "willpower", amount: -1, until: "whileSourceInPlay", target: "damagedCharacters" }] },
+  { id: "09070:constant:1", cardCode: "09070", lines: ["09070:B:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "willpower", amount: -1, until: "whileSourceInPlay", holders: DAMAGED }] },
   {
     id: "09070:forced:1",
     cardCode: "09070",

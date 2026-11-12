@@ -172,7 +172,19 @@ export function announceCanceled(state: ScenarioState, before: ScenarioState, ct
   if (state === before || !listenerInPlay(state, "whenRevealedCanceled", ctx.effects)) return state;
   if (revealedWithoutWhenRevealed(before, ctx)) return state;
   if (state.pendingAttack?.shadowCanceled && !before.pendingAttack?.shadowCanceled) return state;
-  return queueEvent(state, { trigger: "whenRevealedCanceled", seat });
+  // The card whose effects were canceled is the event's subject, for a record that hears only some cards ("the 'when revealed' effect of a treachery card", 09056:A:1).
+  const canceled = canceledCard(before);
+  return queueEvent(state, { trigger: "whenRevealedCanceled", seat, ...(canceled ? { subject: canceled } : {}) });
+}
+
+// The card of the innermost open Response window on a reveal (or on its pending When Revealed effects): the card whose When Revealed effects a cancel answers.
+function canceledCard(before: ScenarioState): string | null {
+  const index = before.stack.findLastIndex((frame) => frame.data.kind === "responses");
+  const window = before.stack[index];
+  if (window?.data.kind !== "responses") return null;
+  const event = window.data.event;
+  if (event.trigger === "whenRevealedPending") return event.subject ?? event.cardId ?? null;
+  return event.trigger === "encounterRevealed" ? (before.stack[index - 1]?.cardId ?? null) : null;
 }
 
 // The innermost open Response window is on a card's reveal and that card has no When Revealed record: a cancel there cancels no When Revealed effect.
