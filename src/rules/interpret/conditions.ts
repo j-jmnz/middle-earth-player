@@ -312,6 +312,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return Object.values(state.cards).some((card) => card.zone === "campaign");
     case "upgraded":
       return state.campaignFacts?.upgraded?.includes(condition.code) === true;
+    case "campaignCopyOutside":
+      return Object.values(state.cards).some((card) => card.zone === "campaign") && !Object.values(state.cards).some((card) => card.code === condition.code && inPlay(card.zone));
     case "x":
       return (scope.x ?? 0) >= condition.min;
     case "discardedCost":

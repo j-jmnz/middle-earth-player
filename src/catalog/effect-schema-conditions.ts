@@ -266,6 +266,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("campaign") }),
   // The Campaign Log marks this card upgraded (every box beside it is marked, dcce.scalable-upgradable): "If \"Gavin returned,\" put him into play" (11215:A:3). False in a game with no campaign facts.
   z.strictObject({ kind: z.literal("upgraded"), code: z.string().min(1) }),
+  // The scenario is played in Campaign Mode and no card with this code is in play: the campaign's own copy of the card is outside the game, where an effect may put it into play from ("Put Spyglass into play", 11203:A:5, dcce.campaign-mode).
+  z.strictObject({ kind: z.literal("campaignCopyOutside"), code: z.string().min(1) }),
   // The card DiscardBottom discarded in this effect has a printed cost of `max` or less ("If that card's printed cost is 2 or less", 11032:A:2); a card with no printed cost does not, and nothing
   // discarded does not. Read by the uncharted family (src/rules/families/uncharted/cards.ts).
   z.strictObject({ kind: z.literal("discardedCost"), max: z.number().int().min(0) }),

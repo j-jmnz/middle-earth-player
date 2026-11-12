@@ -226,6 +226,40 @@ describe("Command (Spirit) 11203 (A:2 to A:5)", () => {
     const made = table(CODES.command11203, 1);
     expect(options(play(made).state)).not.toContain("spyglass");
   });
+
+  // dcce.campaign-mode: in a campaign the campaign's own Spyglass is outside the game, and "put into play" takes it from there; a standalone game has no such copy.
+  describe("the campaign's own Spyglass, from outside the game (A:5)", () => {
+    const outside = (levels: Readonly<Record<string, number>>, upgraded: readonly string[], layout: RuinsLayout = { campaign: true }) => {
+      const made = table(CODES.command11203, 3, layout);
+      const facts = { prisoner: null, usedOnce: [], counters: {}, levels: { [CODES.command11203]: 3, ...levels }, upgraded };
+      return { ...made, state: syncConstants({ ...made.state, campaignFacts: facts }, made.ctx) };
+    };
+    const put = (made: ReturnType<typeof table>) => finish(play(made), made.ctx, script("spyglass", "spyglassOutside", made.hero2));
+
+    it("puts a Spyglass from outside the game into play attached to a hero chosen, in campaign mode", () => {
+      const made = outside({}, []);
+      expect(options(play(made).state)).toContain("spyglass");
+      const run = put(made);
+      expect(run.state.cards[idOf(run.state, SPYGLASS)]).toMatchObject({ zone: "play", host: made.hero2 });
+    });
+
+    it("puts it into play on its Upgraded side when the Campaign Log marks its boxes, and on side A otherwise", () => {
+      const faceOf = (upgraded: readonly string[]) => {
+        const run = put(outside({}, upgraded));
+        return run.state.cards[idOf(run.state, SPYGLASS)]?.face;
+      };
+      expect(faceOf([SPYGLASS])).toBe("B");
+      expect(faceOf([])).toBe("up");
+    });
+
+    it("is not offered while a Spyglass is in play, nor in a standalone game", () => {
+      const inPlay = outside({}, []);
+      const worn = spawn(inPlay.state, SPYGLASS, { zone: "play", seat: 0 });
+      expect(options(play({ ...inPlay, state: syncConstants(attachTo(worn.state, worn.id, inPlay.hero), inPlay.ctx) }).state)).not.toContain("spyglass");
+      const standalone = outside({}, [], {});
+      expect(options(play(standalone).state)).not.toContain("spyglass");
+    });
+  });
 });
 
 describe("Command (Tactics) 11204 (A:2 to A:5)", () => {
