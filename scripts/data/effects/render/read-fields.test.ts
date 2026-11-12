@@ -12,6 +12,11 @@ const HERO = { type: "hero", control: "you" };
 const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   ModifyStat: [{ verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfPhase", holders: HERO, per: "hero", trait: "Dwarf", subtract: true }, { verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfRound", target: "heroes" }],
   Pick: [{ verb: "Pick", pick: HERO }],
+  FortitudeTest: [{ verb: "FortitudeTest", who: "firstPlayer", extraCards: { players: true }, extraEyes: { amount: 2, when: { kind: "firstPlayer" } } }],
+  IgnoreFortitudeEyes: [{ verb: "IgnoreFortitudeEyes" }],
+  FirstTreacheryImmuneSurge: [{ verb: "FirstTreacheryImmuneSurge" }],
+  DiscardUntilLocations: [{ verb: "DiscardUntilLocations", perPlayer: 2 }],
+  PlaceTokensOnCampaignCard: [{ verb: "PlaceTokensOnCampaignCard", amount: 3 }],
   PlaceProgressOn: [{ verb: "PlaceProgressOn", amount: 2, target: "self" }],
   RemoveProgressFrom: [{ verb: "RemoveProgressFrom", amount: 2, named: "Camp" }],
   PlaceResourceTokens: [{ verb: "PlaceResourceTokens", amount: 2, on: "self" }],
@@ -213,6 +218,9 @@ describe("effects render read fields, conditions", () => {
     pileHas: [{ kind: "pileHas", pile: "harad", min: 1, max: 3 }],
     facedownUnder: [{ kind: "facedownUnder", code: "144027", min: 3, max: 8, players: true }],
     soleAttacker: [{ kind: "soleAttacker" }],
+    lastFortitudeFailed: [{ kind: "lastFortitudeFailed" }],
+    lastFortitudePassed: [{ kind: "lastFortitudePassed" }],
+    fortitudeFailed: [{ kind: "fortitudeFailed", scope: "round", who: "any" }],
     captives: [{ kind: "captives", min: 1, max: 2, of: "actor" }],
     matches: [{ kind: "matches", card: "picked", pick: { type: "enemy", control: "any" } }],
     controls: [{ kind: "controls", code: "12345" }],
@@ -270,6 +278,7 @@ describe("effects render read fields, picks", () => {
     lowestAttack: true,
     lowestThreat: true,
     highestCost: true,
+    fortitudeDiscarded: true,
   };
   const SAMPLES: readonly Obj[] = [
     BIG,

@@ -2,8 +2,7 @@ import type { Effect } from "../../../catalog/boundary.ts";
 
 // The campaign cards of The Return of the King (145066, 145070, 145078, 146069, 146074, 146079; Setup on the front, Resolution on the back, ledger data/printed/the-return-of-the-king.json). Their vocabulary is the campaign
 // family's (src/catalog/families/campaign.ts): the checklist deals the Setup verbs (src/campaign/checklist.ts) and the Resolution runs the rest (src/rules/setup/resolution.ts, src/rules/families/campaign/saga-end.ts).
-// Written here: the Setup of the cards that only change the pool, the decks and the hand (145066, 145070, 146074), every Resolution, and the Setup and Forced of The Tower of Cirith Ungol (146069, whose boons and Heavy Burden its scenario builds). Left to the scenarios that play them, since each needs a mechanic that scenario builds: the
-// Setup lines that place tokens in the game (146079:A:1) and the Forced lines of the campaign cards in play (146079:A:2). 145078's Setup and Forced are in pelennor/stages.ts.
+// Written here: the Setup of the cards that only change the pool, the decks and the hand (145066, 145070, 146074), every Resolution, and the Setup and Forced of The Tower of Cirith Ungol (146069, whose boons and Heavy Burden its scenario builds), and the Setup tokens and the Forced timer of Mount Doom (146079). 145078's Setup and Forced are in pelennor/stages.ts.
 const FELLOWSHIP_AND_TWO_TOWERS_SETS = ["A Shadow of the Past", "Flight to the Ford", "The Ring Goes South", "The Passage of the Marshes", "Shelob's Lair"];
 const ANDURIL = "142014";
 const OVERCOME_BY_FEAR = "145016";
@@ -83,7 +82,10 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // The Black Gate Opens has no win (146073:B:3): it ends when the last player is eliminated, and that end runs this Resolution as a win does (user decision, 2026-11-12; docs/brief.md, The Return of the King). The campaign card is in the game for it, in the campaign zone.
   {"id":"146074:constant:1","cardCode":"146074","lines":["146074:B:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"endsInDefeat","amount":1,"until":"whileSourceInPlay","target":"table"}]},
 
-  // 146079 Mount Doom. Resolution: the first player keeps The One Ring (the players lose the campaign) or destroys it (they win).
+  // 146079 Mount Doom. Setup: no +1 for changing heroes; X resource tokens are placed on the card (the campaign card is kept in the game: it has a Forced), X the tokens recorded for The Black Gate in the campaign log (0 with no record); the burdens of Helm's Deep, The Road to Isengard and The Passing of the Grey Company
+  // are left out of the encounter deck. Forced: at the end of each round one token comes off the card, and the players lose the game when none is left (a loss writes nothing): X tokens last X rounds, and the first end of round loses with none. Resolution: the first player keeps The One Ring (the players lose the campaign) or destroys it (they win).
+  {"id":"146079:campaignSetup:1","cardCode":"146079","lines":["146079:A:1"],"timing":"campaignSetup","instructions":[{"verb":"WaiveThreatPenalty"},{"verb":"PlaceTokensOnCampaignCard","amount":{"recorded":"blackGateTokens"}},{"verb":"RemoveBurdenSets","sets":THREE_BURDEN_SETS}]},
+  {"id":"146079:forced:1","cardCode":"146079","lines":["146079:A:2"],"timing":"forced","trigger":"endOfRound","instructions":[{"verb":"RemoveResourceTokens","code":"146079","amount":1},{"verb":"LoseGame","reason":"No resource token is left on Mount Doom","when":{"kind":"less","left":{"stat":"resources","of":"self"},"right":1}}]},
   {"id":"146079:resolution:1","cardCode":"146079","lines":["146079:B:1"],"timing":"resolution","instructions":[{"verb":"ChooseOption","name":"ring","options":[{"id":"keep"},{"id":"destroy"}],"who":"firstPlayer"}]},
   {"id":"146079:resolution:2","cardCode":"146079","lines":["146079:B:2"],"timing":"resolution","instructions":[{"verb":"EndCampaign","result":"lost","when":{"kind":"picked","name":"ring","option":"keep"}}]},
   {"id":"146079:resolution:3","cardCode":"146079","lines":["146079:B:3"],"timing":"resolution","instructions":[{"verb":"EndCampaign","result":"won","when":{"kind":"picked","name":"ring","option":"destroy"}}]},

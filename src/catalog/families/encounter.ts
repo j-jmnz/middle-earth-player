@@ -95,7 +95,8 @@ const VERBS = [
   }),
   // The players travel to the location (the picked card, or `target`) without resolving its Travel effect (rr.travel); an
   // active location already there returns to the staging area first. Nothing happens if the players cannot travel there.
-  z.strictObject({ verb: z.literal("TravelTo"), target: cardRefSchema.optional(), ...when }),
+  // With `unlessActive` the players travel only when no location is active ("The players cannot travel if another location card is active", rr.active-location; "travel to Mordor Road", 146076:A:1): an active location stays, and the location stays in the staging area.
+  z.strictObject({ verb: z.literal("TravelTo"), target: cardRefSchema.optional(), unlessActive: z.literal(true).optional(), ...when }),
   // Places `amount` progress on the current quest; the active location takes it first (rr.active-location).
   z.strictObject({ verb: z.literal("ProgressQuest"), amount: positiveAmountSchema, ...when }),
   // The actor's threat becomes `amount` if it is lower ("set your threat equal to the engagement cost of that enemy").

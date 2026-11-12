@@ -15,6 +15,9 @@ const VERBS = [
   z.strictObject({ verb: z.literal("FortitudeTest"), who: whoSchema.optional(), extraCards: positiveAmountSchema.optional(), extraEyes: z.strictObject({ amount: z.number().int().positive(), when: conditionSchema }).optional(), ...when }),
   // "...and ignore its Sauron's Eye icons" (146049:A:3): the last card picked (a card discarded for the Fortitude test in progress, filter `fortitudeDiscarded`) adds no icons to that test.
   z.strictObject({ verb: z.literal("IgnoreFortitudeEyes"), ...when }),
+  // "Discard cards from the top until X locations are discarded, where X is the number of players in the game. Add each location discarded this way to the staging area" (146077:A:1): cards come off the top of the encounter deck into its discard pile until `perPlayer` locations for each player in the game are among them, or the deck is empty; each of those locations
+  // is added to the staging area (not revealed). The "shuffle the encounter discard pile into the encounter deck" before it is a ShuffleEncounterDiscard.
+  z.strictObject({ verb: z.literal("DiscardUntilLocations"), perPlayer: z.number().int().positive(), ...when }),
   // Constant on a quest stage: "The first treachery revealed each quest phase is immune to player card effects and gains surge" (146075:B:2, 146077:B:1). While the card is in play the engine marks the first treachery the encounter deck reveals in each quest phase, as it is
   // revealed (before its When Revealed effects): it is immune to player card effects until it leaves play, and gains surge. It does nothing when run.
   z.strictObject({ verb: z.literal("FirstTreacheryImmuneSurge") }),

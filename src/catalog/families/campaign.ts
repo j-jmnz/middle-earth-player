@@ -5,6 +5,7 @@ import { z } from "zod";
 
 import { CAMPAIGN_ENDS, RECORDED_COUNTS } from "../campaign-record.ts";
 import type { CatalogFamily } from "../family-manifest.ts";
+import { positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { verbFlags } from "../verb-flags.ts";
 
@@ -46,6 +47,8 @@ const VERBS = [
   // Places `amount` resource tokens (1 by default) on the source card: the campaign card counts them ("Response: At the end of each round, place 1
   // resource token here", 41050:A:3). It is no hero's resource pool, so nothing collects it and no `resourcesAdded` is announced.
   z.strictObject({ verb: z.literal("PlaceToken"), amount: z.number().int().positive().optional(), ...when }),
+  // Campaign Setup: "Place X resource tokens on this card, where X is the number of resource tokens on The Black Gate, as recorded in the campaign log" (146079:A:1). The campaign card, which the game keeps because it has a Forced effect, takes `amount` resource tokens (an amount: `recorded`, 0 with no record). The engine deals it in Setup.
+  verbFlags(z.strictObject({ verb: z.literal("PlaceTokensOnCampaignCard"), amount: positiveAmountSchema, ...when }), { setupRole: "dealt" }),
   // The Two Towers' campaign cards (docs/brief.md, The Two Towers; src/campaign/checklist-two-towers.ts deals the Setup ones, src/rules/families/campaign/resolution.ts runs the Resolution ones).
   // Campaign Setup: these cards leave the Campaign Pool ("Remove Gildor Inglorion and Mr. Underhill from the Campaign Pool", 143071:A:2). The log loses them; a card on a hero goes with it.
   z.strictObject({ verb: z.literal("RemovePoolCards"), codes: z.array(code).min(1) }),

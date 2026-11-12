@@ -85,6 +85,19 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     return { text: `${holders}${trait}: stat ${str(i.stat)}${STAT_NOTE[str(i.stat)] ?? ""} ${sign}${amount(i.amount, ctx)}${per}, ${untilWords(i.until)}`, read: ["stat", "amount", "until", "holders", "target", "per", "trait", "subtract"] };
   },
   Pick: (i, ctx) => ({ text: `choose ${pick(i.pick, ctx)}`, read: ["pick"] }),
+  // The mount-doom family (src/catalog/families/mount-doom.ts).
+  FortitudeTest: (i, ctx) => {
+    const extraCards = i.extraCards === undefined ? "" : `, plus ${amount(i.extraCards, ctx)} more cards`;
+    const extraEyes = isObj(i.extraEyes) ? `, plus ${str(i.extraEyes.amount)} icons if ${renderCondition(i.extraEyes.when, ctx)} as the test is made` : "";
+    return {
+      text: `${who(i.who ?? "actor")} makes a Fortitude test: exhausts any number of ready heroes to commit them, discards the top X cards of the encounter deck (X the tens digit of their threat${extraCards}), counts the Sauron's Eye icons on them${extraEyes}, the players take actions, and the committed heroes' total Willpower must be greater than the icons to pass (equal or fewer fails)`,
+      read: ["who", "extraCards", "extraEyes"],
+    };
+  },
+  IgnoreFortitudeEyes: () => ({ text: "the card just chosen (discarded for the Fortitude test in progress) adds no Sauron's Eye icons to that test", read: [] }),
+  FirstTreacheryImmuneSurge: () => ({ text: "while this card is in play, the first treachery the encounter deck reveals each quest phase is immune to player card effects until it leaves play and gains surge (marked as it is revealed, before its When Revealed effects)", read: [] }),
+  DiscardUntilLocations: (i) => ({ text: `discard cards from the top of the encounter deck until ${str(i.perPlayer)} location(s) for each player in the game are discarded, or the deck is empty, and add each location discarded to the staging area`, read: ["perPlayer"] }),
+  PlaceTokensOnCampaignCard: (i, ctx) => ({ text: `place ${amount(i.amount, ctx)} resource tokens on the campaign card (kept in the game)`, read: ["amount"] }),
   PlaceProgressOn: (i, ctx) => ({ text: `place ${amount(i.amount, ctx)} progress on ${cardRef(i.target)}`, read: ["amount", "target"] }),
   RemoveProgressFrom: (i, ctx) => ({ text: `remove ${amount(i.amount, ctx)} progress from "${str(i.named)}"`, read: ["amount", "named"] }),
   PlaceResourceTokens: (i, ctx) => ({ text: `place ${amount(i.amount, ctx)} resource tokens on ${cardRef(i.on)}`, read: ["amount", "on"] }),
