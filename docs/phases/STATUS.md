@@ -258,5 +258,6 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - The combat spotlight stage is always dark, a lone attack runs about 2.2 s, and a destroyed target burns (user, 2026-10-29).
 - Page art has no hard edges: it fades to black or into the fog; framed tiles and panels keep theirs (user, 2026-10-30).
 - The screen reader path is independent of ordinary play: with no phone screen reader on, nothing drawn, touched, heard or timed changes, the web build included; new reader behaviour is gated on `useReaderMode()`, which the Table as a list setting set to Always also turns on (user, 2026-11-05, 2026-11-07).
+- The Black Gate Opens ends when the last player is eliminated, and that end runs 146074's Resolution and unlocks Mount Doom; every other scenario's loss writes nothing (user, 2026-11-12).
 - One scenario pipeline; no more A/B tests (user decision, 2026-11-08). The procedure is in `docs/handover/agent-brief.md` (Scenario procedure).
 - An open game is never dropped by the app: after an update the player chooses Continue (from the saved table, checked against the engine) or Restart (user decision, 2026-11-11).
