@@ -4,18 +4,18 @@
 import { describe, expect, it } from "vitest";
 
 import type { Effect } from "../../../catalog/boundary.ts";
-import { modifiedStat } from "../../core/keywords.ts";
-import type { ScenarioState } from "../../core/state.ts";
-import { flagged, updateCard } from "../../core/state.ts";
-import { settle } from "../../engine/machine.ts";
-import type { PlayerIntent } from "../../engine/reduce.ts";
-import { holds, hasTrait } from "../../interpret/conditions.ts";
-import { pickCandidates } from "../../interpret/pick.ts";
-import { restricted, travelCostUnpayable } from "../../interpret/restrictions.ts";
-import { playCost } from "../../player/attach.ts";
-import { spawn } from "../../core/zones.ts";
-import { fireForced } from "../../windows/triggers.ts";
-import { allyCard, finish, idOf, idsOf, legalIntents, resolveRecords, revealFromTop, send, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { modifiedStat } from "../../../rules/core/keywords.ts";
+import type { ScenarioState } from "../../../rules/core/state.ts";
+import { flagged, updateCard } from "../../../rules/core/state.ts";
+import { settle } from "../../../rules/engine/machine.ts";
+import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
+import { holds, hasTrait } from "../../../rules/interpret/conditions.ts";
+import { matchesPick, pickCandidates } from "../../../rules/interpret/pick.ts";
+import { restricted, travelCostUnpayable } from "../../../rules/interpret/restrictions.ts";
+import { playCost } from "../../../rules/player/attach.ts";
+import { spawn } from "../../../rules/core/zones.ts";
+import { fireForced } from "../../../rules/windows/triggers.ts";
+import { allyCard, fightEnemy, finish, idOf, idsOf, legalIntents, resolveRecords, revealFromTop, send, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const ID = "deadmens-dike";
 const THAURDIR = "09033";
@@ -407,14 +407,16 @@ describe("10167:A:1, 10168:A:1, 10169:A:1 and 10170:A:1 attach a pool card to th
     expect(run.state.cards[made.id]?.host).toBe(idOf(run.state, THAURDIR));
   });
 
-  it("10169:A:1 and 10170:A:1 do the same, and with no Thaurdir at all the card is removed from the game", () => {
-    for (const code of ["10169", "10170"]) {
-      const made = pool(code, { setAside: [THAURDIR] });
-      expect(resolveRecords(made.state, made.t.ctx, code, "setup", made.id).state.cards[made.id]?.host).toBe(idOf(made.state, THAURDIR));
-      const none = pool(code);
-      expect(resolveRecords(none.state, none.t.ctx, code, "setup", none.id).state.cards[none.id]?.zone).toBe("removed");
-    }
-  });
+  const attachesToThaurdir = (code: string) => {
+    const made = pool(code, { setAside: [THAURDIR] });
+    expect(resolveRecords(made.state, made.t.ctx, code, "setup", made.id).state.cards[made.id]?.host).toBe(idOf(made.state, THAURDIR));
+    const none = pool(code);
+    expect(resolveRecords(none.state, none.t.ctx, code, "setup", none.id).state.cards[none.id]?.zone).toBe("removed");
+  };
+
+  it("10169:A:1 attaches to Thaurdir though he is out of play, and with no Thaurdir at all the card is removed from the game", () => attachesToThaurdir("10169"));
+
+  it("10170:A:1 attaches to Thaurdir though he is out of play, and with no Thaurdir at all the card is removed from the game", () => attachesToThaurdir("10170"));
 
   it("10167:A:1 attaches to Amarthiúl in play, and is removed from the game when he is not there", () => {
     const withHim = pool("10167", { play: ["10067"] });
@@ -482,5 +484,251 @@ describe("10160:A:3 offers a boon only while no other copy of it is in the game"
 
   it("10160:A:3 asks nobody when every boon it names is held already", () => {
     expect(offeredBoons({ attached: [{ code: "10161", to: HERO }, { code: "10162", to: HERO }, { code: "10163", to: HERO }] })).toEqual([]);
+  });
+});
+
+describe("the Travel line and the discards of the locations", () => {
+  it("09036:A:3 makes each player discard the top card of his deck as the Travel line, and the players travel", () => {
+    const t = at({ phase: "Travel", seats: 2, staging: ["09036"], deckOf: ["filler", "filler", "filler"] });
+    const run = resolveRecords(t.state, t.ctx, "09036", "travel", idOf(t.state, "09036"));
+    for (const seat of [0, 1]) expect(run.state.seats[seat]?.deck, `seat ${seat}`).toHaveLength(2);
+  });
+
+  it("09037:A:1 shuffles the top 5 cards of each player's own discard pile into his own deck when it is explored", () => {
+    const t = at({ phase: "Quest", seats: 2, active: "09037", deckOf: ["filler"] });
+    let state = t.state;
+    for (let count = 0; count < 6; count += 1) state = discarded(discarded(state, "event", 0), "filler", 1);
+    const run = resolveRecords(state, t.ctx, "09037", "response", idOf(state, "09037"));
+    for (const seat of [0, 1]) {
+      expect(run.state.seats[seat]?.deck, `seat ${seat}`).toHaveLength(6);
+      expect(run.state.seats[seat]?.discard, `seat ${seat}`).toHaveLength(1);
+    }
+    expect((run.state.seats[0]?.deck ?? []).every((id) => run.state.cards[id]?.owner == null || run.state.cards[id]?.owner === 0)).toBe(true);
+  });
+
+  it("09037:A:1 still shuffles while The Power of Angmar is in the staging area: the lock stops player card effects, not an encounter card's", () => {
+    const t = at({ phase: "Quest", active: "09037", staging: ["09067"], deckOf: ["filler"] });
+    expect(flagged(t.state, "table", "discardLocked")).toBe(true);
+    const state = discarded(discarded(t.state, "event"), "filler");
+    const run = resolveRecords(state, t.ctx, "09037", "response", idOf(state, "09037"));
+    expect(run.state.seats[0]?.deck).toHaveLength(3);
+    expect(run.state.seats[0]?.discard).toHaveLength(0);
+  });
+
+  it("09067:A:2 still lets Norbury Tombs' Travel return the topmost enemy from the encounter discard pile, which is no player's pile", () => {
+    const t = at({ phase: "Travel", staging: ["09037", "09067"], discard: ["f0", "f3"], deckOf: ["filler"] });
+    expect(travelCostUnpayable(t.state, t.ctx, idOf(t.state, "09037"))).toBe(false);
+    const run = resolveRecords(t.state, t.ctx, "09037", "travel", idOf(t.state, "09037"));
+    expect(run.state.cards[idOf(run.state, "f3")]?.zone).toBe("staging");
+  });
+
+  it("09040:A:1 discards from the deck of the seat that triggered the ability, not the other player's", () => {
+    const t = at({ phase: "Planning", seats: 2, active: "09040", deckOf: ["filler", "filler", "filler"] });
+    const card = idOf(t.state, "09040");
+    const steps: never[] = [];
+    const heard = settle(fireForced({ ...t.state, window: null, mode: "stopped" }, { trigger: "playerAbilityTriggered", seat: 1, cardId: card, subject: card }, t.ctx, steps), t.ctx, steps);
+    expect(heard.seats[1]?.deck).toHaveLength(2);
+    expect(heard.seats[0]?.deck).toHaveLength(3);
+  });
+});
+
+describe("09041:A:2 Unnatural Fog lets each player choose for himself", () => {
+  const fog = (layout: Layout, answer: (seat: number) => string) => {
+    const t = at({ phase: "Quest", seats: 2, deckOf: ["filler", "filler", "filler", "filler"], ...layout });
+    let asked = 0;
+    const run = resolveRecords(t.state, t.ctx, "09041", "whenRevealed", undefined, (state) => (state.window?.kind === "choose" ? answer(asked++) : ""));
+    return { run, asked };
+  };
+  const committed = (state: ScenarioState): string[] => Object.values(state.cards).filter((card) => card.committed).map((card) => card.code);
+
+  it("09041:A:2 discards 1 card for each questing character from the deck of the player who chose it, and removes the characters of the player who chose that", () => {
+    const { run, asked } = fog({ committed: ["dh1", "dh2", "dh3"] }, (seat) => (seat === 0 ? "discard" : "remove"));
+    expect(asked).toBe(2);
+    expect(run.state.seats[0]?.deck).toHaveLength(2);
+    expect(run.state.seats[1]?.deck).toHaveLength(4);
+    expect(committed(run.state)).toEqual(["dh1", "dh2"]);
+  });
+
+  it("09041:A:2 asks a player with no questing character nothing (no option changes the game)", () => {
+    const { run, asked } = fog({}, () => "discard");
+    expect(asked).toBe(0);
+    expect(run.state.seats[0]?.deck).toHaveLength(4);
+  });
+});
+
+describe("09042:A:2 The Shadow World discards as many cards as there are Undead enemies engaged with each player", () => {
+  it("09042:A:2 reads the Undead enemies engaged with each player, and not the ones in the staging area", () => {
+    const t = at({ phase: "Refresh", seats: 2, staging: ["09042", "09060"], engaged: [{ code: "09061", seat: 0 }, { code: "09061", seat: 0 }, { code: "09061", seat: 1 }, { code: "f0", seat: 1 }], deckOf: ["filler", "filler", "filler", "filler"] });
+    const run = resolveRecords(t.state, t.ctx, "09042", "forced", idOf(t.state, "09042"));
+    expect(run.state.seats[0]?.deck).toHaveLength(2);
+    expect(run.state.seats[1]?.deck).toHaveLength(3);
+  });
+});
+
+describe("a card of its title in its owner's discard pile (09061:A:2, 09065:A:2, 09065:A:3, 09066:A:2)", () => {
+  const OWNER = { type: "character", control: "any", copyInDiscard: "owner" } as const;
+  const CONTROLLER = { type: "character", control: "any", copyInDiscard: true } as const;
+  const stolen = () => {
+    const t = at({ phase: "Combat", seats: 2, deckOf: ["filler", "filler"] });
+    // An ally of seat 0's deck that seat 1 controls now, and a copy of it in seat 0's discard pile.
+    const ally = spawn(t.state, "ally", { zone: "play", seat: 1 });
+    const state = discarded(updateCard(ally.state, ally.id, { owner: 0 }), "ally", 0);
+    return { t, id: ally.id, state };
+  };
+
+  it("09061:A:2 counts the copy in the owner's discard pile, the seat the defending character came from, not the one that controls it", () => {
+    const { t, id, state } = stolen();
+    expect(matchesPick(state, id, OWNER, { seat: 0, sourceId: null, counting: true }, t.ctx)).toBe(true);
+    expect(matchesPick(state, id, CONTROLLER, { seat: 0, sourceId: null, counting: true }, t.ctx)).toBe(false);
+  });
+
+  it("09061:A:2 adds 2 Attack instead of 1 when the defending character has a copy in its owner's discard pile, and 1 with none", () => {
+    const fight = (copy: boolean) => fightEnemy((made: Layout) => at(made), "09061", "f3", { stage: "09073", deckOf: ["filler", "filler"] }, { tweak: (state) => (copy ? discarded(state, "dh1", 0) : state) });
+    // The hero defends (Defense 2): Attack 1 + 1 leaves no damage, Attack 1 + 2 leaves 1.
+    const plain = fight(false);
+    const copied = fight(true);
+    expect(plain.run.state.cards[plain.made.hero]?.damage).toBe(0);
+    expect(copied.run.state.cards[copied.made.hero]?.damage).toBe(1);
+  });
+
+  it("09065:A:2 discards each ally its controller has a copy of in his own discard pile, the shared title being read in his pile, not another player's", () => {
+    const t = at({ phase: "Quest", seats: 2, play: ["ally", { code: "ally", seat: 1 }], deckOf: ["filler", "filler"] });
+    const state = discarded(t.state, "ally", 0);
+    const run = resolveRecords(state, t.ctx, "09065", "whenRevealed");
+    const zones = idsOf(run.state, "ally").map((id) => [run.state.cards[id]?.controller, run.state.cards[id]?.zone]);
+    expect(zones).toContainEqual([0, "discard"]);
+    expect(zones).toContainEqual([1, "play"]);
+  });
+
+  it("09065:A:3 discards the defending character when a copy of it lies in its owner's discard pile, and not otherwise", () => {
+    const fight = (copy: boolean) =>
+      fightEnemy((made: Layout) => at(made), "09065", "f3", { stage: "09073", deckOf: ["filler", "filler"], play: ["ally"] }, {
+        defender: (made) => idOf(made.state, "ally"),
+        tweak: (state) => (copy ? discarded(state, "ally", 0) : state),
+      });
+    const withCopy = fight(true);
+    expect(withCopy.run.state.cards[idOf(withCopy.run.state, "ally") ?? ""]?.zone).toBe("discard");
+    const alone = fight(false);
+    expect(alone.run.state.cards[idsOf(alone.run.state, "ally")[0] ?? ""]?.zone).toBe("play");
+  });
+
+  it("09066:A:2 raises the cost of a card played from any zone, one played from the discard pile counting itself, and of a card controlled by another seat's owner", () => {
+    const t = at({ phase: "Planning", seats: 2, hand: ["ally"], deckOf: ["filler"] });
+    const { id: curse, state: cursed } = (() => {
+      const made = spawn(t.state, "09066", { zone: "play", seat: 0 });
+      return { id: made.id, state: made.state };
+    })();
+    expect(curse).toBeTruthy();
+    const inHand = idOf(cursed, "ally");
+    const plain = playCost(cursed, inHand, 0, t.ctx) ?? 0;
+    // From the discard pile: the card itself is the card of its title there.
+    const down = spawn(cursed, "ally", { zone: "discard", seat: 0 });
+    expect(playCost(down.state, down.id, 0, t.ctx)).toBe(plain + 1);
+    // A card of the other seat's discard pile does not count for this seat's card.
+    const other = spawn(cursed, "ally", { zone: "discard", seat: 1 });
+    expect(playCost(other.state, inHand, 0, t.ctx)).toBe(plain);
+    // An owner that is not the controller: the card that seat 1 plays is raised by the copy in seat 0's pile, its owner's.
+    const lent = spawn(spawn(cursed, "ally", { zone: "hand", seat: 1 }).state, "ally", { zone: "discard", seat: 0 });
+    const hand1 = Object.values(lent.state.cards).find((card) => card.code === "ally" && card.zone === "hand" && card.controller === 1)?.id ?? "";
+    expect(playCost(updateCard(lent.state, hand1, { owner: 0 }), hand1, 1, t.ctx)).toBe(plain + 1);
+  });
+});
+
+describe("09074:A:1 reveals the encounter cards only when Thaurdir was added to the staging area", () => {
+  it("09074:A:1 adds Thaurdir to the staging area and then reveals 1 card for each player", () => {
+    const t = at({ stage: "09074", phase: "Quest", seats: 2, setAside: [THAURDIR], deck: ["f0", "f0", "f0"], deckOf: ["filler"] });
+    const run = resolveRecords(t.state, t.ctx, "09074", "whenRevealed");
+    expect(run.state.cards[idOf(run.state, THAURDIR)]?.zone).toBe("staging");
+    expect(run.state.encounterDeck).toHaveLength(1);
+  });
+
+  it("09074:A:1 reveals nothing with no Thaurdir to add (rr.then: the second part resolves only when the first did)", () => {
+    const t = at({ stage: "09074", phase: "Quest", seats: 2, deck: ["f0", "f0", "f0"], deckOf: ["filler"] });
+    const run = resolveRecords(t.state, t.ctx, "09074", "whenRevealed");
+    expect(run.state.encounterDeck).toHaveLength(3);
+  });
+});
+
+describe("09074:B:1 hears a character that Thaurdir's attack destroyed, and only that", () => {
+  const stage = (layout: Layout = {}) => ({ stage: "09074", deckOf: ["filler", "filler", "filler", "filler", "filler"], ...layout });
+
+  it("09074:B:1 asks the controller of a hero an undefended attack of Thaurdir destroyed, and the discard takes 3 cards from his deck only", () => {
+    const asked: { seat: number; options: string[] }[] = [];
+    const run = fightEnemy((made: Layout) => at(made), "f0", THAURDIR, stage({ seats: 2 }), {
+      undefended: true,
+      pick: (state) => {
+        if (state.window?.kind === "choose") asked.push({ seat: state.activeSeat, options: [...state.window.options] });
+        return "discard";
+      },
+    });
+    expect(run.run.state.cards[run.made.hero]?.zone).toBe("discard");
+    expect(asked).toEqual([{ seat: 0, options: ["discard", "return"] }]);
+    expect(run.run.state.seats[0]?.deck).toHaveLength(2);
+    expect(run.run.state.seats[1]?.deck).toHaveLength(5);
+  });
+
+  it("09074:B:1 puts the choice to the destroyed character's controller: the event seat is his, not the first player's", () => {
+    const t = at(stage({ seats: 2, phase: "Combat", engaged: [{ code: THAURDIR, seat: 1 }], firstPlayer: 0 }));
+    const steps: never[] = [];
+    const base = { ...t.state, window: null, mode: "stopped" as const };
+    const heard = settle(fireForced(base, { trigger: "characterDestroyedByAttack", seat: 1, subject: t.seat1Hero ?? "", other: idOf(base, THAURDIR) }, t.ctx, steps), t.ctx, steps);
+    expect(heard.window?.kind).toBe("choose");
+    expect(heard.activeSeat).toBe(1);
+  });
+
+  it("09074:B:1 returns Thaurdir to the staging area when the controller chooses that, and offers nothing to return when he is staged", () => {
+    const run = fightEnemy((made: Layout) => at(made), "f0", THAURDIR, stage(), { undefended: true, pick: () => "return" });
+    expect(run.run.state.cards[idOf(run.run.state, THAURDIR)]?.zone).toBe("staging");
+  });
+
+  it("09074:B:1 does not hear a character that was discarded and not destroyed: Dark Sorcery's shadow discards the defender and the attack goes on", () => {
+    const asked: string[][] = [];
+    const run = fightEnemy((made: Layout) => at(made), "09065", THAURDIR, stage({ play: ["ally"] }), {
+      defender: (made) => idOf(made.state, "ally"),
+      // A copy of the ally lies in its owner's discard pile, and Thaurdir's Attack is taken to 0 so that nothing is destroyed when the attack goes on without its defender.
+      tweak: (state) => ({ ...discarded(state, "ally", 0), modifiers: [...state.modifiers, { instanceId: idOf(state, THAURDIR), sourceId: "t", stat: "attack" as const, amount: -6, until: "endOfRound" as const }] }),
+      pick: (state) => {
+        if (state.window?.kind === "choose") asked.push([...state.window.options]);
+        return state.window?.kind === "choose" ? (state.window.options[0] ?? "") : "";
+      },
+    });
+    expect(run.run.state.cards[idsOf(run.run.state, "ally")[0] ?? ""]?.zone).not.toBe("play");
+    expect(asked.filter((options) => options.includes("return"))).toEqual([]);
+  });
+
+  it("09074:B:1 does not hear another enemy's attack that destroys a character", () => {
+    const run = fightEnemy((made: Layout) => at(made), "f0", "f3", stage({ staging: [THAURDIR] }), {
+      undefended: true,
+      tweak: (state, made) => updateCard(state, made.hero, { damage: 5 }),
+      pick: () => "discard",
+    });
+    expect(run.run.state.seats[0]?.deck).toHaveLength(5);
+  });
+});
+
+describe("the cards of the Resolution and the Setup", () => {
+  it("100158:A:1 adds Arnor Ravaged to the staging area from the pool with the damage the log noted (none noted here)", () => {
+    const t = at({ phase: "Planning", campaign: true });
+    const spawned = spawn(t.state, "100158", { zone: "setAside" });
+    const run = resolveRecords(spawned.state, t.ctx, "100158", "setup", spawned.id);
+    expect(run.state.staging.map((id) => run.state.cards[id]?.code)).toContain("100158");
+  });
+
+  it("10167:A:2 gives the attached hero +1 Willpower and +1 hit point", () => {
+    const bare = at({ phase: "Planning" });
+    const boosted = at({ phase: "Planning", attached: [{ code: "10167", to: HERO }] });
+    const stat = (t: Table, name: "willpower" | "hitPoints") => modifiedStat(t.state, t.state.cards[idOf(t.state, HERO)]!, name, t.cards);
+    expect(stat(boosted, "willpower")).toBe(stat(bare, "willpower") + 1);
+    expect(stat(boosted, "hitPoints")).toBe(stat(bare, "hitPoints") + 1);
+  });
+
+  it("10167:A:3 readies the attached hero with its Action, once in the game", () => {
+    const t = at({ phase: "Planning", attached: [{ code: "10167", to: HERO }], deckOf: ["filler", "filler", "filler"] });
+    const tired = { ...t.state, cards: { ...t.state.cards, [idOf(t.state, HERO)]: { ...t.state.cards[idOf(t.state, HERO)]!, exhausted: true } } } as ScenarioState;
+    const intent = legalIntents(tired, t.ctx).find((one) => one.type === "Trigger" && one.cardId === idOf(tired, "10167"));
+    expect(intent).toBeTruthy();
+    const run = finish(send({ state: tired, steps: [] }, intent as PlayerIntent, t.ctx), t.ctx);
+    expect(run.state.cards[idOf(run.state, HERO)]?.exhausted).toBe(false);
+    expect(legalIntents(run.state, t.ctx).some((one) => one.type === "Trigger" && one.cardId === idOf(run.state, "10167"))).toBe(false);
   });
 });

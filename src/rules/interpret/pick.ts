@@ -219,8 +219,8 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.minAttack != null && modifiedStat(state, instance, "attack", ctx.cards) < spec.minAttack) return false;
   // The nightmare family's filters: a Willpower at most this, below 0 counting as 0 (900102:A:1).
   if (spec.maxWillpower != null && Math.max(0, modifiedStat(state, instance, "willpower", ctx.cards)) > spec.maxWillpower) return false;
-  // A copy of it in its controller's discard pile (900309:A:2).
-  if (spec.copyInDiscard && !(instance.controller != null && (state.seats[instance.controller]?.discard ?? []).some((other) => other !== id && printedOf(ctx.cards, state.cards[other]?.code ?? "").name === printed.name))) return false;
+  // A copy of it in its controller's discard pile (900309:A:2), or a card of its title in its owner's discard pile, itself counting when it lies there (09066:A:2, 09061:A:2, 09065:A:3).
+  if (spec.copyInDiscard && !titleInDiscard(state, instance, spec.copyInDiscard === "owner", ctx)) return false;
   // The breaking family's filter: fewer printed hit points than the attacking enemy (families/breaking/attack.ts).
   if (!breakingPickMatches(state, id, spec, ctx)) return false;
   // The sidequests family's filters: a Trait or a title shared with another card, the quest a character is committed to
@@ -274,6 +274,14 @@ function onHost(state: ScenarioState, hostId: string | null, on: NonNullable<Pic
   const type = cardTypeOf(host, printedOf(ctx.cards, host.code));
   if (on.type === "hero" ? type !== "hero" : type !== "hero" && type !== "ally") return false;
   return on.control === "any" || (on.control === "you") === (host.controller === asking);
+}
+
+// A card of the instance's title lies in a discard pile: another card in its controller's (`owner` false), or any card, the instance itself when it lies there, in its owner's (`owner` true; an owner not noted is the controller).
+function titleInDiscard(state: ScenarioState, instance: ScenarioState["cards"][string], owner: boolean, ctx: ReduceContext): boolean {
+  const seat = owner ? (instance.owner ?? instance.controller) : instance.controller;
+  if (seat == null) return false;
+  const name = printedOf(ctx.cards, instance.code).name;
+  return (state.seats[seat]?.discard ?? []).some((other) => (owner || other !== instance.id) && printedOf(ctx.cards, state.cards[other]?.code ?? "").name === name);
 }
 
 // The character is attacking in the attack in progress: one of the attackers of a player attack.

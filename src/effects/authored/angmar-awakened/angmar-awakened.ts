@@ -23,12 +23,14 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   // 10159 The Weather Hills. Resolution: the damage on Protect the Innocent replaces the number in the log, and each of Mysterious Omens' boons attached to a hero is recorded with it.
   { id: "10159:resolution:1", cardCode: "10159", lines: ["10159:B:1"], timing: "resolution", instructions: [{ verb: "RecordDamageOn", codes: [PROTECT_THE_INNOCENT] }, { verb: "EarnAttached", codes: MYSTERIOUS_OMENS_BOONS }] },
 
-  // 10166 Deadmen's Dike. Resolution: the damage on Protect the Innocent is noted, Protect the Innocent leaves the pool and Arnor Ravaged takes its place, the first player chooses Iârion's Pendant or Amarthiúl's Courage for the group and which player takes it, and the burden Thaurdir carried (or a hero holds now) joins the pool (to "player": fixed to that seat, as 11197:B:1 does; docs/brief.md, Angmar Awakened).
+  // 10166 Deadmen's Dike. Resolution: the damage on Protect the Innocent is noted, Protect the Innocent leaves the pool and Arnor Ravaged takes its place, the first player chooses Iârion's Pendant or Amarthiúl's Courage for the group and which player takes it, the Omens boons attached to heroes are recorded with them, and the burden Thaurdir carried (or a hero holds now) joins the pool (to "player": fixed to that seat, as 11197:B:1 does; docs/brief.md, Angmar Awakened).
   { id: "10166:resolution:1", cardCode: "10166", lines: ["10166:B:1"], timing: "resolution", instructions: [
     { verb: "RecordDamageOn", codes: [PROTECT_THE_INNOCENT] },
     { verb: "RemoveFromPoolByCode", codes: [PROTECT_THE_INNOCENT] },
     { verb: "Earn", codes: [ARNOR_RAVAGED] },
     { verb: "ChooseCards", codes: [IARIONS_PENDANT, AMARTHIULS_COURAGE], who: "firstPlayer", to: "player", only: true },
+    // A boon Mysterious Omens gave a hero in this scenario is recorded with its hero as in The Weather Hills (rr.campaign-pool, ltp.permanent: a Permanent card's hero is recorded); a boon the pool already had on a hero is not earned twice.
+    { verb: "EarnAttached", codes: MYSTERIOUS_OMENS_BOONS },
     // "Add that card to the Campaign Pool" (10166:A:3): the burden the Forced effect attached to Thaurdir joins the pool when the scenario is won, whoever carries it then (rr.campaign-pool); a lost game writes nothing.
     { verb: "EarnAllBurdens" }] },
 

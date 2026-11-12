@@ -270,8 +270,9 @@ export const pickSchema = z.strictObject({
   // counting as 0 ("is discarded if its Willpower is 0", 900102:A:1).
   maxWillpower: z.number().int().min(0).optional(),
   // A card a player controls with a copy (a card of the same title) in that player's discard pile ("Discard each card you control that has at
-  // least 1 copy of itself in your discard pile", 900309:A:2).
-  copyInDiscard: z.literal(true).optional(),
+  // least 1 copy of itself in your discard pile", 900309:A:2). `"owner"`: a card with its title in its OWNER's discard pile, itself counting when it lies there ("if there is a card that has the same title in its owner's discard pile", 09066:A:2; "in its owner's
+  // discard pile", 09061:A:2, 09065:A:3).
+  copyInDiscard: z.union([z.literal(true), z.literal("owner")]).optional(),
   // The grapple family's filter (src/rules/families/grapple/values.ts): a card that shows this side ("if Sea Serpent (Enraged side) is in play", side B, 11194:B:6).
   side: z.enum(["A", "B"]).optional(),
   // The aflame family's filters (src/rules/families/aflame/pick.ts). `aflame`: a location that prints the Aflame keyword (`false`: any other card). `lowestAflame`: of the cards that match, only

@@ -10,6 +10,7 @@ import type { CatalogFamily } from "../family-manifest.ts";
 import { amountSchema, cardRefSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { pickSchema } from "../effect-schema-pick.ts";
+import { verbFlags } from "../verb-flags.ts";
 
 // Where a player card may be when MoveCard moves it.
 const zone = z.enum(["hand", "play", "discard", "deck"]);
@@ -44,14 +45,15 @@ const VERBS = [
   // `count`, the effect's X becomes how many of them match it (read with the X the effect had, for `costIsX`) and whose printed
   // cost is at least `costAtLeast`, and the first such card is picked ("" when none is): "If at least one of those cards has
   // cost equal to the named number", "If the discarded card's printed cost is equal to or higher than ...".
-  z.strictObject({
+  // A Shadow effect with it runs in a frame, which holds the cards discarded for the amount `discarded` (09039:A:2, 09064:A:2).
+  verbFlags(z.strictObject({
     verb: z.literal("DiscardFromDeck"),
     amount: positiveAmountSchema,
     shuffle: z.boolean().optional(),
     count: pickSchema.optional(),
     costAtLeast: amountSchema.optional(),
     ...when,
-  }),
+  }), { runsInFrame: true }),
   // The effect's X grows by this amount, read now ("the total cost of the allies exhausted to pay for this effect").
   z.strictObject({ verb: z.literal("AddToX"), amount: amountSchema, ...when }),
   // The instructions after it in this effect resolve for the player picked last (`pickedPlayer`: their hand, deck and choices,

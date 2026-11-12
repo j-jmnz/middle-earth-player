@@ -23,11 +23,10 @@ const ACTIVE: Condition = { kind: "sourceIn", zone: "activeLocation" };
 const REFRESH_ENDS: Condition = { kind: "phase", is: "Refresh" };
 // "Thaurdir": the enemy with that title, in play.
 const THAURDIR_PICK: PickSpec = { type: "enemy", control: "any", names: ["Thaurdir"] };
-const UNDEAD_ENEMY: PickSpec = { type: "enemy", control: "any", trait: "Undead" };
+// "Each Undead enemy in play": staged or engaged with anyone.
+const UNDEAD_ENEMY: PickSpec = { type: "enemy", control: "any", trait: "Undead", staging: true };
 const MY_CHARACTER: PickSpec = { type: "character", control: "you" };
 const MY_QUESTER: PickSpec = { type: "character", control: "you", committed: true };
-// "If this attack destroys a character" / "After X attacks and destroys a character": the defender is a character that is out of play now.
-const DEFENDER_DESTROYED: Condition = { kind: "matches", card: "other", pick: { type: "character", control: "any" }, inPlay: false };
 const EACH_PLAYER = (instructions: Extract<Instruction, { verb: "ForEachPlayer" }>["instructions"]): Instruction => ({ verb: "ForEachPlayer", order: "firstFirst", instructions });
 const ATTACKER_PLUS = (amount: Extract<Instruction, { verb: "ModifyStat" }>["amount"]): Instruction => ({ verb: "ModifyStat", stat: "attack", amount, until: "endOfAttack", target: "attacker" });
 // "each player discards the top N cards of his deck".
@@ -37,7 +36,7 @@ const EACH_SHUFFLES_TOP_FIVE: Instruction = { verb: "Each", pick: { type: "card"
 // "Forced: At the end of the refresh phase" while the side quest is in the staging area.
 const STAGED_AT_REFRESH_END: Condition = { kind: "all", conditions: [REFRESH_ENDS, IN_STAGING] };
 // The Undead enemy count, and the same in a player's engagement area.
-const MY_UNDEAD: PickSpec = { ...UNDEAD_ENEMY, engaged: "you" };
+const MY_UNDEAD: PickSpec = { type: "enemy", control: "any", trait: "Undead", engaged: "you" };
 // "Each player reveals 1 encounter card per player" (the stages' When Revealed): the first player's reveals, one per player.
 const REVEAL_PER_PLAYER: Instruction = { verb: "Repeat", times: { players: true }, instructions: [{ verb: "RevealEncounter" }] };
 
@@ -165,7 +164,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "shadow",
       instructions: [
         ATTACKER_PLUS(1),
-        { verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfAttack", target: "attacker", when: { kind: "matches", card: "defender", pick: { type: "character", control: "any", copyInDiscard: true } } },
+        { verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfAttack", target: "attacker", when: { kind: "matches", card: "defender", pick: { type: "character", control: "any", copyInDiscard: "owner" } } },
       ],
     },
 
@@ -231,12 +230,12 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       cardCode: "09065",
       lines: ["09065:A:3"],
       timing: "shadow",
-      instructions: [{ verb: "Pick", pick: { type: "character", control: "any", defending: true, copyInDiscard: true } }, { verb: "DiscardPicked" }],
+      instructions: [{ verb: "Pick", pick: { type: "character", control: "any", defending: true, copyInDiscard: "owner" } }, { verb: "DiscardPicked" }],
     },
 
     // 09066 Heavy Curse. When Revealed: attached to the current quest as a Condition attachment; while it is in play a card a player plays from hand costs 1 more when a card with the same title is in its owner's discard pile (several Curses stack).
     { id: "09066:whenRevealed:1", cardCode: "09066", lines: ["09066:A:2"], timing: "whenRevealed", instructions: [{ verb: "AttachToQuest" }] },
-    { id: "09066:constant:1", cardCode: "09066", lines: ["09066:A:2"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Condition" }, { verb: "IncreaseCost", amount: 1, pick: { type: "card", control: "any", copyInDiscard: true } }] },
+    { id: "09066:constant:1", cardCode: "09066", lines: ["09066:A:2"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Condition" }, { verb: "IncreaseCost", amount: 1, pick: { type: "card", control: "any", copyInDiscard: "owner" } }] },
 
     // 09067 The Power of Angmar (side quest, 8 quest points). In the staging area no player card effect takes a card out of a discard pile. Forced: after it is defeated each player shuffles the top 5 cards of his discard pile into his deck.
     { id: "09067:constant:1", cardCode: "09067", lines: ["09067:A:2"], timing: "constant", condition: IN_STAGING, instructions: [{ verb: "ModifyStat", stat: "discardLocked", amount: 1, until: "whileSourceInPlay", target: "table" }] },
@@ -257,22 +256,33 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
 
     // 09074 A Fell Wraith (stage 2). When Revealed: Thaurdir is added to the staging area and 1 encounter card is revealed per player. Side B: after Thaurdir attacks and destroys a character, that character's controller chooses to discard the top 3 cards of his deck or to return Thaurdir to
     // the staging area (not offered when he is there); a player with no cards in his deck is eliminated; the players cannot defeat the stage while Thaurdir has hit points remaining, and winning it wins the game (the final stage).
-    { id: "09074:whenRevealed:1", cardCode: "09074", lines: ["09074:A:1"], timing: "whenRevealed", instructions: [{ verb: "AddSetAsideToStaging", code: THAURDIR, announce: true }, REVEAL_PER_PLAYER] },
+    {
+      id: "09074:whenRevealed:1",
+      cardCode: "09074",
+      lines: ["09074:A:1"],
+      timing: "whenRevealed",
+      instructions: [
+        { verb: "AddSetAsideToStaging", code: THAURDIR, announce: true },
+        // "Then": the reveals resolve only when Thaurdir was added to the staging area (rr.then).
+        { verb: "Repeat", times: { players: true }, instructions: [{ verb: "RevealEncounter", when: { kind: "canPick", pick: { ...THAURDIR_PICK, stagingOnly: true } } }] },
+      ],
+    },
     {
       id: "09074:forced:1",
       cardCode: "09074",
       lines: ["09074:B:1"],
       timing: "forced",
-      trigger: "attackResolved",
-      subject: THAURDIR_PICK,
-      condition: DEFENDER_DESTROYED,
+      // The event is about the destroyed character (its controller is the event's seat); `other` is the attacking enemy.
+      trigger: "characterDestroyedByAttack",
+      subject: { type: "character", control: "any" },
+      condition: { kind: "matches", card: "other", pick: THAURDIR_PICK },
       instructions: [
         {
           verb: "Choose",
           who: "actor",
           options: [
             { id: "discard", instructions: [{ verb: "DiscardFromDeck", amount: 3 }] },
-            { id: "return", requires: { kind: "not", condition: { kind: "matches", card: "subject", pick: { type: "enemy", control: "any", stagingOnly: true } } }, instructions: [{ verb: "ReturnToStaging", target: { kind: "subject" } }] },
+            { id: "return", requires: { kind: "not", condition: { kind: "canPick", pick: { ...THAURDIR_PICK, stagingOnly: true } } }, instructions: [{ verb: "ReturnToStaging", target: { kind: "other" } }] },
           ],
         },
       ],
