@@ -105,8 +105,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 79 | Intruders in Chetwood | completed | 2026-11-12. Review round done. Open: `chetwood-won`. |
 | 80 | The Weather Hills | completed | 2026-11-12. Review round done. Open: `hills-won`. |
 | 81 | Deadmen's Dike | completed | 2026-11-12. Review round done. Open: `dike-won`. |
-| 82 | The Wastes of Eriador | active | 2026-11-12. `docs/plans/angmar-awakened.md`. |
-| 83 | Escape from Mount Gram | not started |  |
+| 82 | The Wastes of Eriador | completed | 2026-11-12. Review round done. Open: `eriador-won`. |
+| 83 | Escape from Mount Gram | active | 2026-11-12. `docs/plans/angmar-awakened.md`. |
 | 84 | Across the Ettenmoors | not started |  |
 | 85 | The Treachery of Rhudaur | not started |  |
 | 86 | The Battle of Carn Dûm | not started |  |
@@ -120,6 +120,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - The release notes' golden-check comparison (`scripts/release/reach.ts`) has not run against a real previous tag; the first tag after it compares by `ENGINE_CHANGES` only.
 
 ### Fixtures and Maestro
+- `eriador-won` is not committed: no seed in 700 wins The Wastes of Eriador with the saved decklists. Until it exists `.maestro/scenarios/the-wastes-of-eriador/the-wastes-of-eriador.yaml` cannot run.
 - `dike-won` is not committed: no seed in 600 wins Deadmen's Dike with the saved decklists (their heroes cannot put 9 damage on Thaurdir). Until it exists `.maestro/scenarios/deadmens-dike/deadmens-dike.yaml` cannot run; its Resolution step is unverified against the `to: player` view.
 - `hills-won` is not committed: no seed in 100 wins The Weather Hills with the saved decklists (Defenders of Gondor, Swords of the Noldor, Easy). Until it exists `.maestro/scenarios/the-weather-hills/the-weather-hills.yaml` cannot run.
 - `chetwood-won` is not committed: no seed in 100 wins Intruders in Chetwood with The One Deck and Defenders of Gondor under five policies. Until it exists `.maestro/scenarios/intruders-in-chetwood/intruders-in-chetwood.yaml` cannot run.
@@ -221,7 +222,15 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - Deadmen's Dike: stage 2B (09074:B:2) needs its 13 progress and Thaurdir at 9 damage, and an empty deck eliminates at each check (community source only). Not user-confirmed.
 - `AddSetAsideToStaging` announces no entering play (no `announceEntered`, no family hook) for a set-aside card it stages; routing it through `moveEncounter` moves 14 goldens (Dream-chaser, Ered Mithrin, Fellowship and Two Towers scenarios), so Thaurdir uses `EnterSetAsideStaging` instead. Not fixed.
 - Renderer gaps, Deadmen's Dike (behaviour proven by tests): "top 5 of his discard pile" per player (09037:A:1, 09067:A:3), an unpayable Travel cost (09037:A:2, 09018:A:1), `playerAbilityTriggered` from a played event (09040:A:1), what `discardLocked` blocks (09067:A:2), `eliminatedAtEmptyDeck` (09073:B:3, 09074:B:2), 10166:B:1's choice and earned burden print as JSON; the 09074:whenRevealed:1 "then" check runs per reveal because `Repeat` takes no `when`.
-- Angmar Awakened campaign-card lines left to their scenarios' Build: the `determined` write (The Wastes of Eriador), 10174:A:2 and B:1 to B:3 with the `stolenCards` write and its deck refusal (Escape from Mount Gram), 10182:A:2, A:3 and B:1 (Across the Ettenmoors), 10184:B:1 (The Treachery of Rhudaur). The boons' own lines (10176 to 10181, 10185 to 10187, 10189 to 10192) go with the scenario that first deals each.
+- The Wastes of Eriador: a flip of the Time objective to the side already up changes nothing (agent recommendation). Not user-confirmed.
+- The Wastes of Eriador: at Night (10012:A:1) progress cannot be placed on quest cards, a current side quest included, but the active location still takes it (two forum members, no official answer). Not user-confirmed.
+- The Wastes of Eriador: Northern Warg's +1 Threat (10018:A:1) covers itself and Wargs entering later in the phase (community note). Not user-confirmed.
+- The Wastes of Eriador: Eriador Wastes' cap (10023:A:1) counts quest-card progress only and does not stack between copies (community only). Not user-confirmed.
+- The Wastes of Eriador: Predatory Wolves (10027:A:1) counts Amarthiúl as an ally of cost 0, and a player may take the search option instead (one forum reply). Not user-confirmed.
+- The Wastes of Eriador: Determination's "determined" mark is cumulative and kept if the character later falls (agent recommendation). Not user-confirmed.
+- The Wastes of Eriador: Northern Warg's shadow makes no third attack in the combat phase (community only). Not user-confirmed.
+- Renderer gaps, The Wastes of Eriador (behaviour proven by tests): what `noQuestProgress` covers at Night (10012:A:1), the recalculated Warg pick (10018:A:1), who engages Blood-thirsty Warg (10019:A:1), `checkCostPerDamaged` (10020:A:2), Eriador Wastes' per-round, non-stacking cap and unpayable Travel (10023:A:1, A:2), Amarthiúl in Predatory Wolves' pick (10027:A:1), `Earn` in 10171:B:1 prints as JSON.
+- Angmar Awakened campaign-card lines left to their scenarios' Build: 10174:A:2 and B:1 to B:3 with the `stolenCards` write and its deck refusal (Escape from Mount Gram), 10182:A:2, A:3 and B:1 (Across the Ettenmoors), 10184:B:1 (The Treachery of Rhudaur). Each of those three Resolutions also runs `RecordDetermined` (code 10172), as 10171:B:1 and 10188:B:1 do, or a Determination attached there is never marked. The boons' own lines (10176 to 10181, 10185 to 10187, 10189 to 10192) go with the scenario that first deals each.
 - Intruders in Chetwood: quest cards in play are the main quest, the staged encounter side quests and the player side quests, at least 1 (09016, 09019, 09047, 09048, 09050). Not user-confirmed.
 - Intruders in Chetwood: Iârion's Response (09016:A:3) hears a side quest revealed by a search of the encounter deck, not of the discard pile. Not user-confirmed.
 - Intruders in Chetwood: Iârion held facedown under Rescue Iârion (09024:A:2) stays in play and has not left it. Not user-confirmed.
