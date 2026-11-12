@@ -101,8 +101,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 75 | The Black Gate Opens | completed | 2026-11-12. Review round done. |
 | 76 | Mount Doom | completed | 2026-11-12. Review round done. Open: `doom-won`. |
 | 77 | Angmar Awakened data | completed | 2026-11-12. Review round done. Open: Easy counts and MEC108 wording not user-confirmed. |
-| 78 | Angmar Awakened campaign shell | active | 2026-11-12. `docs/plans/angmar-awakened.md`. |
-| 79 | Intruders in Chetwood | not started |  |
+| 78 | Angmar Awakened campaign shell | completed | 2026-11-12. Review round done. Open: campaign-card lines left to their scenarios. |
+| 79 | Intruders in Chetwood | active | 2026-11-12. `docs/plans/angmar-awakened.md`. |
 | 80 | The Weather Hills | not started |  |
 | 81 | Deadmen's Dike | not started |  |
 | 82 | The Wastes of Eriador | not started |  |
@@ -193,6 +193,10 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - Angmar Awakened data: Easy counts of Angmar Captain (09045, 1) and Angmar Marauder (09044, 2) in Escape from Mount Gram and Ruins of Arnor (09056, 2) in The Treachery of Rhudaur follow Hall of Beorn against DragnCards' E05 decks; no printed icon check. Not user-confirmed.
 - Angmar Awakened data: `MEC108_CHANGED` is empty because no scan shows the MEC108 printing of the 155 reprinted encounter cards; a rewording cannot be found until one is read. Not user-confirmed.
 - Angmar Awakened data: the Prison Cell, Savage Trollspawn and Amarthiúl (Wastes) piles follow each quest's Setup over DragnCards' load layout (agent recommendation). Not user-confirmed.
+- Angmar Awakened campaign cards: Iârion's Pendant at 10166:B:1 goes to the player the first player names, as the Ered Mithrin boon-ally ruling (agent recommendation; no ruling found). Not user-confirmed.
+- Angmar Awakened campaign cards: "add the Mysterious Omens side quest to the Campaign Log" (10159:A:2) adds it to the Campaign Pool (agent recommendation). Not user-confirmed.
+- Angmar Awakened campaign cards: the Amarthiúl hero ban ends at 10188:A:2 and does not return in The Dread Realm (agent recommendation). Not user-confirmed.
+- Angmar Awakened campaign-card lines left to their scenarios' Build: 10156:A:2 (Intruders in Chetwood), 10159:A:2 (The Weather Hills), 10166:A:2 and A:3 (Deadmen's Dike), the `determined` write (The Wastes of Eriador), 10174:A:2 and B:1 to B:3 with the `stolenCards` write and its deck refusal (Escape from Mount Gram), 10182:A:2, A:3 and B:1 (Across the Ettenmoors), 10184:B:1 (The Treachery of Rhudaur). The boons' and burdens' own lines (10157, 10161 to 10165, 10167 to 10170, 10176 to 10181, 10185 to 10187, 10189 to 10192) go with the scenario that first deals each.
 - Angmar Awakened: the `angmarOrcDeck` pile and the box's new Setup steps (`buildOrcDeck`, `prepareCapturedDeck`, `captureUnder` and the others) are catalog data only; the engine reads them in their scenarios' phases.
 
 ### Screens and code
