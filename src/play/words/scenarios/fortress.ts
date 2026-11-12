@@ -36,5 +36,5 @@ export const defenseFillsWords = (points: number, loses: boolean): string => (lo
 export function fortressWords(instruction: Instruction, nameOf: (code: string) => string): string | null {
   if (instruction.verb !== "RemoveResourceTokens") return null;
   const amount = typeof instruction.amount === "number" ? instruction.amount : 1;
-  return `remove ${amount} resource token${amount === 1 ? "" : "s"} from ${instruction.code != null ? nameOf(instruction.code) : "the card"}`;
+  return `remove ${amount} resource token${amount === 1 ? "" : "s"} from ${instruction.code != null ? nameOf(instruction.code) : "the chosen card"}`;
 }

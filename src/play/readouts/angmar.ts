@@ -3,6 +3,7 @@
 // The dials Intruders in Chetwood's pieces hold now, in the order the top bar draws them: Protect the Innocent's damage against the number that loses the game (it warms toward it), the time counters taken off Rescue Iârion
 // (it warms toward the last, which discards Iârion and loses the game) and, while Orc Rearguard is in the staging area, the progress placed on the current quest this round against its cap of 3. The engine decided every number
 // (`heldAmount`, `timeOf`, `questCapTally`); nothing here changes one. Empty in any other scenario. Pure, so a test reads it.
+import { HUNT_FLIP_TOKENS } from "../../effects/authored/the-weather-hills.ts";
 import { heldAmount, inPlay } from "../../rules/core/state.ts";
 import { frameScope, resolveAmount } from "../../rules/interpret/amounts.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
@@ -11,15 +12,16 @@ import { timeOf } from "../../rules/families/angmar/time.ts";
 import { cardsUnder } from "../../rules/core/zones.ts";
 import { captiveUnder } from "../../rules/families/south/captive.ts";
 
-import { handUnderLabel, handUnderWords, huntNearWords, huntWords, iarionLabel, iarionWords, protectNearWords, protectWords, savageNearWords, savageWords, rearguardLimitWords, rearguardWords, timeNearWords, timeWords } from "../words/scenarios/angmar-table.ts";
+import { handUnderLabel, handUnderWords, huntWords, iarionLabel, iarionWords, protectNearWords, protectWords, savageNearWords, savageWords, rearguardLimitWords, rearguardWords, shelterTimeNearWords, shelterTimeWords, timeNearWords, timeWords } from "../words/scenarios/angmar-table.ts";
 import { cardsOf, type TableDial } from "./dials.ts";
 import type { HandMark } from "./isengard.ts";
 
 const REARGUARD = "09023";
 const HUNTING_THE_ORCS = "09071";
 const SAVAGE_COUNTER_ATTACK = "09072";
+const FIND_SHELTER = "09032";
 /** The number of resource tokens at which Hunting the Orcs flips: 3 more than the players (09071:A:1), read as the record reads it. */
-export const huntLimit = (game: ScenarioState, ctx: ReduceContext, sourceId: string): number => resolveAmount(game, { players: true, plus: 3 }, frameScope(game, 0, sourceId), ctx);
+export const huntLimit = (game: ScenarioState, ctx: ReduceContext, sourceId: string): number => resolveAmount(game, HUNT_FLIP_TOKENS, frameScope(game, 0, sourceId), ctx);
 
 export function angmarDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code: string) => string): readonly TableDial[] {
   if (game.sideQuests !== true) return [];
@@ -41,7 +43,7 @@ export function angmarDials(game: ScenarioState, ctx: ReduceContext, nameOf: (co
       note: protectWords(card.damage, limit),
     });
   }
-  // Hunting the Orcs: its tokens against the number at which it flips (09071:A:1), warming toward it. Savage Counter-attack: its tokens, a countdown to the loss at 0 (09072:A:3), warming as it falls to 2 and critical at 1.
+  // Hunting the Orcs: its tokens against the number at which it flips (09071:A:1), the players' way out of stage 1, so a goal dial that fills and never warms. Savage Counter-attack: its tokens, a countdown to the loss at 0 (09072:A:3), warming as it falls to 2 and critical at 1.
   for (const card of cardsOf(game, HUNTING_THE_ORCS)) {
     const limit = huntLimit(game, ctx, card.id);
     dials.push({
@@ -51,8 +53,7 @@ export function angmarDials(game: ScenarioState, ctx: ReduceContext, nameOf: (co
       name: `Resource tokens on ${nameOf(card.code)}, it flips at ${limit}:`,
       value: card.resources,
       limit,
-      warms: true,
-      ...(card.resources + 2 >= limit ? { warn: { level: card.resources + 1 >= limit ? ("critical" as const) : ("near" as const), words: huntNearWords(card.resources, limit) } } : {}),
+      goal: true,
       limitWords: `${limit} flips it`,
       note: huntWords(card.resources, limit),
     });
@@ -68,20 +69,22 @@ export function angmarDials(game: ScenarioState, ctx: ReduceContext, nameOf: (co
       note: savageWords(card.resources),
     });
   }
-  // Rescue Iârion: the time counters left, a countdown as Mount Doom's Doom is (no ring to fill): it warns at 2 left and is critical at 1, the last discards what it holds (09024:A:3).
+  // Rescue Iârion: the time counters left, a countdown as Mount Doom's Doom is (no ring to fill): it warns at 2 left and is critical at 1, the last discards what it holds (09024:A:3). Find Shelter's is the same dial worded for its own last counter, never critical.
   for (const card of Object.values(game.cards)) {
     const total = inPlay(card.zone) ? timeOf(ctx, card.code) : null;
     if (total == null) continue;
     const held = captiveUnder(game, card.id);
     const heldName = held ? nameOf(game.cards[held]?.code ?? "") : null;
+    // Find Shelter's last counter costs damage and returns 4 counters (09032:A:2), not the game: its dial warns near and never critical.
+    const shelter = card.code === FIND_SHELTER;
     dials.push({
       id: "time",
       testID: "angmar-time",
       label: "Time",
       name: `Time counters left on ${nameOf(card.code)}:`,
       value: card.resources,
-      ...(card.resources <= 2 ? { warn: { level: card.resources <= 1 ? ("critical" as const) : ("near" as const), words: timeNearWords(card.resources) } } : {}),
-      note: timeWords(card.resources, heldName),
+      ...(card.resources <= 2 ? { warn: { level: card.resources <= 1 && !shelter ? ("critical" as const) : ("near" as const), words: shelter ? shelterTimeNearWords(card.resources) : timeNearWords(card.resources) } } : {}),
+      note: shelter ? shelterTimeWords(card.resources) : timeWords(card.resources, heldName),
     });
   }
   // Orc Rearguard: no more than 3 progress on the current quest each round (09023:A:1), the tally of the round.

@@ -125,9 +125,9 @@ export function gundabadAsk(instruction: Instruction, source: string | null, nam
   if (instruction.verb !== "Pick") return null;
   const pick = instruction.pick;
   if (pick.type === "hero" && next?.verb === "FlipInPlace") return group("Attach", `${card}: choose a hero of any player to carry ${nameOf(ctx, next.code)}, flipped to its ${sideTrait(ctx, next.into, next.code) ?? "other"} side. ${loses}`);
-  if (pick.type === "hero" && pick.attachable != null && next?.verb === "AttachSetAside") return group("Attach", `${card}: choose the hero who carries ${names.code(next.code)}, ${sideTrait(ctx, next.code, null) ?? "starting"} side up. ${loses}`);
   // The shapes other records share are told only here.
   if (!inGundabad(game)) return null;
+  if (pick.type === "hero" && pick.attachable != null && next?.verb === "AttachSetAside") return group("Attach", `${card}: choose the hero who carries ${names.code(next.code)}, ${sideTrait(ctx, next.code, null) ?? "starting"} side up. ${loses}`);
   if (pick.names?.[0] != null && next?.verb === "Discard") return own("Discard", `choose the ${[pick.trait, pick.names[0]].filter((word) => word != null).join(" ")} you control to discard.`);
   if (pick.names?.[0] != null && next?.verb === "AddToVictory") return own("Add", `${pick.names[0]} has no hit points remaining: it is added to the victory display and the players win the game.`);
   if (pick.committed === true && pick.control === "you" && pick.type === "character" && next?.verb === "DamageCard") {

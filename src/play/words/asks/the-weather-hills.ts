@@ -24,8 +24,8 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "09030:travel:1 @0 SearchMove": { note: "Concealed Orc-camp: search the encounter deck and discard pile for an Orc enemy. Put it into play engaged with the first player.", verb: "Engage" },
 
   // 09031 Ice Storm: each player assigns X damage (X the quest cards in play) among the characters he controls, one at a time; every damaged character is then exhausted.
-  "09031:whenRevealed:1 @0 AssignDamage": { owned: true, note: "Ice Storm: assign {x} damage among the characters you control, 1 at a time (X is the quest cards in play). Every damaged character is then exhausted.", bind: { x: { questCards: true } }, verb: "Assign" },
-  "09031:shadow:1 @0 AssignDamage": { owned: true, note: "Ice Storm's shadow: assign {x} damage among the characters you control, 1 at a time (X is the quest cards in play).", bind: { x: { questCards: true } }, verb: "Assign" },
+  "09031:whenRevealed:1 @0 AssignDamage": { owned: true, note: "Ice Storm: assign {x} damage among the characters you control, 1 at a time ({x}, the quest cards in play; {left} left). Every damaged character is then exhausted.", bind: { x: { questCards: true } }, verb: "Assign" },
+  "09031:shadow:1 @0 AssignDamage": { owned: true, note: "Ice Storm's shadow: assign {x} damage among the characters you control, 1 at a time ({x}, the quest cards in play; {left} left).", bind: { x: { questCards: true } }, verb: "Assign" },
 
   // 09032:A:2 (Forced after the last time counter): each player deals 4 damage to one hero he controls.
   "09032:forced:1 @0.0 Pick": { owned: true, note: "Find Shelter: choose a hero you control to take all 4 damage.", verb: "Assign" },
@@ -38,7 +38,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "09046:whenRevealed:1 @0.0 SearchMove": { owned: true, note: "Orc Ambush: search the encounter deck and discard pile for an Orc enemy. Put it into play engaged with you.", verb: "Engage" },
 
   // 09052:A:1 (When Revealed): the first player assigns X damage among the committed characters, any player's, X the number committed.
-  "09052:whenRevealed:1 @0 AssignDamage": { note: "Biting Wind: assign {x} damage among the characters committed to the quest, 1 at a time ({x} is the number committed).", bind: { x: { count: COMMITTED } }, verb: "Assign" },
+  "09052:whenRevealed:1 @0 AssignDamage": { note: "Biting Wind: assign {x} damage among the characters committed to the quest, 1 at a time (one for each character committed; {left} left).", bind: { x: { count: COMMITTED } }, verb: "Assign" },
 
   // 09054:A:1 (When Revealed): each player deals 1 damage to a hero he controls.
   "09054:whenRevealed:1 @0.0 Pick": { owned: true, note: "Cold from Angmar: choose a hero you control to take 1 damage. Cold from Angmar then blanks the text of each damaged character while it is attached to the quest.", verb: "Assign" },

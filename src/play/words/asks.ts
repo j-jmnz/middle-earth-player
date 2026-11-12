@@ -27,7 +27,7 @@ export type Text = string | readonly { when?: Condition; text: string }[];
 
 /**
  * One entry of an asks file. Templates hold `{card}` (the card the record is on), `{owner}` ("Player N", the seat asked), `{picked}` (the card of the row a caution is about: a caution's text only), `{host}` (the card the record's card lies on), `{pair}` (the Embassy's pair being decided: the player card with its owner and the encounter card it is paired with) and `{ringBearer}` (the hero with the Ring-bearer trait), `{n}` (what the instruction after a Pick deals or places, read now: a Pick's entry only, a Choose
- * has none), `{pursuitLimit}` (the value at which the players lose, in a scenario with a pursuit tracker) and a `{name}` for each key of `bind`. Every `Text` below is a template or variants.
+ * has none), `{left}` (the damage an AssignDamage still has to place, counting the step asked: its note only), `{pursuitLimit}` (the value at which the players lose, in a scenario with a pursuit tracker) and a `{name}` for each key of `bind`. Every `Text` below is a template or variants.
  * - `note`: the sentence over a Pick or a Choose (the entry keyed with the instruction's verb).
  * - `why`: the reason the window opened. It is said after the card's title and before the note, "Card: why note" ("Player 1, Card: why note" when owned and two-handed).
  * - `owned`: one player's own choice. Two-handed the sentence leads with the player and the sheet adds no "Player N chooses."; solo it has no lead, and a note with no `why` is capitalised.
@@ -91,7 +91,7 @@ export function templatesOf(entry: Ask): string[] {
 
 /** The placeholders of an entry that no value answers: none of `card`, `owner`, `picked`, `host`, `ringBearer`, `n` (only where `withN`: a Pick has what its next instruction deals, a Choose has nothing), `pursuitLimit` and its `bind` names. */
 export function unknownPlaceholders(entry: Ask, withN = true): string[] {
-  const known = new Set(["card", "owner", "picked", "host", "ringBearer", "pair", "pursuitLimit", ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {})]);
+  const known = new Set(["card", "owner", "picked", "host", "ringBearer", "pair", "left", "pursuitLimit", ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {})]);
   return [...new Set(templatesOf(entry).flatMap(placeholdersOf))].filter((name) => !known.has(name));
 }
 
@@ -141,6 +141,8 @@ export function askValues(a: AskFacts, entry: Ask): { values: Values; scope: Ret
   const values: Values = { card: a.source ? a.names.card(a.source) : "This card", owner: `Player ${seat + 1}`, picked: "The picked card", n: a.amountNow, pursuitLimit: a.game.widgets.pursuitTracker };
   // The card the record's card lies on ("Exhaust Frodo Baggins, who carries A Heavy Burden") and the Ring-bearer, named only where an entry says them.
   const hostId = a.source ? a.game.cards[a.source]?.host : undefined;
+  // An AssignDamage not yet split into steps holds all of its amount.
+  if (a.instruction.verb === "AssignDamage") values.left = a.instruction.left ?? resolveAmount(a.game, a.instruction.amount, scope, a.ctx);
   values.host = hostId ? a.names.card(hostId) : "Its host";
   if (templatesOf(entry).some((template) => placeholdersOf(template).includes("ringBearer"))) {
     const bearer = ringBearerId(a.game, a.ctx);

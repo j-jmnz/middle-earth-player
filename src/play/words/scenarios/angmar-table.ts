@@ -2,19 +2,22 @@
 // What the table says of Intruders in Chetwood's pieces (src/play/readouts/angmar.ts, src/play/cards/angmar-preview.ts): Protect the Innocent's damage against the number that loses, the time counters on Rescue Iârion, the progress placed this round
 // against Orc Rearguard's cap, the current quest, and the card held under a side quest. The engine decided every number; these only say it. Each sentence stays at about 25 words (docs/design-system-table.md, Choice tray, Plain words).
 
+import type { Instruction } from "../../../catalog/boundary.ts";
+import type { ScenarioState } from "../../../rules/core/state.ts";
+
+import type { ChoiceNames, PickWords } from "../choice.ts";
+import { seatSays } from "../seat.ts";
+
 const plural = (count: number, one: string, many: string): string => `${count} ${count === 1 ? one : many}`;
 
 /** The note of Hunting the Orcs' dial: the resource tokens it holds against the number at which it flips (09071:A:1). */
 export const huntWords = (tokens: number, limit: number): string => `${tokens} of ${limit} resource tokens. Each defeated enemy places 1. At ${limit} it flips to Savage Counter-attack, and the quest advances to stage 2.`;
 
-/** The warning when the next defeated enemy, or a few more, flips Hunting the Orcs. */
-export const huntNearWords = (tokens: number, limit: number): string => (tokens + 1 >= limit ? "One more defeated enemy flips it." : `${limit - tokens} more defeated enemies flip it.`);
-
 /** The note of Savage Counter-attack's dial: its tokens, which fall when an enemy attacks and destroys a character; with none the players lose (09072:A:2, 09072:A:3). */
 export const savageWords = (tokens: number): string => `${plural(tokens, "resource token", "resource tokens")} left. Each character an attack destroys discards 1, and with none left the players lose the game.`;
 
-/** The warning when the next character an attack destroys, or the one after, takes the last token. */
-export const savageNearWords = (tokens: number): string => (tokens <= 1 ? "The next character an attack destroys loses the game." : `${tokens} resource tokens are left.`);
+/** The warning when the next character an attack destroys, or the one after, takes the last token (at 2 left, the count of characters it takes). */
+export const savageNearWords = (tokens: number): string => (tokens <= 1 ? "The next character an attack destroys loses the game." : "Two more characters destroyed by an attack lose the game. Cornered Animals can also take one.");
 
 /** The line under Hunting the Orcs and Savage Counter-attack in their previews. */
 export const huntPreviewWords = (tokens: number, limit: number): string => `${tokens} of ${limit} resource tokens on it. It flips to Savage Counter-attack at ${limit}, tokens and all.`;
@@ -25,6 +28,16 @@ export const protectWords = (damage: number, limit: number): string => `${damage
 
 /** The warning when one more damage, or a few more, would lose the game. */
 export const protectNearWords = (damage: number, limit: number): string => (damage + 1 >= limit ? "One more damage loses the game." : `${limit - damage} more damage loses the game.`);
+
+/** The note of the dial that counts the time counters left on Find Shelter (09032:A:2): the last one removed makes each player deal 4 damage to a hero, then 4 time counters return. */
+export const shelterTimeWords = (left: number): string =>
+  `${plural(left, "time counter", "time counters")} left. One comes off at the end of each refresh phase. With the last gone, each player deals 4 damage to a hero they control, then 4 time counters return.`;
+
+/** The warning when the next refresh phase takes Find Shelter's last time counter: not a loss, so it never goes critical. */
+export const shelterTimeNearWords = (left: number): string => (left <= 1 ? "The next refresh phase takes the last time counter: each player deals 4 damage to a hero." : `${left} time counters are left.`);
+
+/** The line under Find Shelter in its preview. */
+export const shelterPreviewWords = (left: number): string => `${plural(left, "time counter", "time counters")} on it. With the last gone, each player deals 4 damage to a hero they control, then 4 time counters return.`;
 
 /** The note of the dial that counts the time counters left on Rescue Iârion. */
 export const timeWords = (left: number, held: string | null): string =>
@@ -61,3 +74,16 @@ export const handUnderWords = (count: number): string => `${plural(count, "card"
 export const iarionLabel = (seat: number | null): string => (seat == null ? "Iârion" : `P${seat + 1} · Iârion`);
 export const iarionWords = "Iârion is under this player's control. If he leaves play the players lose the game.";
 
+
+/** Whether an option of a ChooseBoon pick is one of its boon codes (the other is "none"), which a row names by the card and pictures by its code. */
+export const isBoonCode = (instruction: Instruction, id: string): boolean => instruction.verb === "ChooseBoon" && instruction.codes.includes(id);
+
+/**
+ * The words of the hero pick that follows a boon chosen in Mysterious Omens' reward (10160:A:3): the player who took the boon picks the hero that carries it (rr.campaign-pool). One player's own choice, so two-handed it leads with the player. Null for any other pick, and in a game
+ * without the side quest rules.
+ */
+export function boonHeroAsk(instruction: Instruction, source: string | null, names: ChoiceNames, next: Instruction | undefined, game: ScenarioState | undefined): PickWords | null {
+  if (!game || game.sideQuests !== true || instruction.verb !== "Pick" || instruction.pick.type !== "hero" || instruction.pick.attachable == null || next?.verb !== "AttachSetAside") return null;
+  const says = seatSays(game);
+  return { verb: "Attach", prompt: says.say(`${source ? names.card(source) : "this card"}: choose a hero you control to carry ${names.code(next.code)}. It stays with that hero through the campaign.`), ...says.owned };
+}

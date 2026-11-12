@@ -17,6 +17,7 @@ import type { ChoiceNames, PickWords } from "../choice.ts";
 import { heathAsk, heathBranchWords, heathChooseNote, heathOptionLabel } from "./heath.ts";
 import { framsburgAsk, framsburgBranchNow, framsburgBranchWords, framsburgChooseNote } from "./framsburg.ts";
 import { fateAsk, fateBranchRows, fateBranchWords, fateChooseNote } from "./fate.ts";
+import { boonHeroAsk } from "./angmar-table.ts";
 import { dragonSicknessAsk, gundabadAsk, gundabadBranchWords, gundabadChooseNote } from "./gundabad.ts";
 import { nightAsk, nightBranchWords, nightChooseNote, nightQuestsNow } from "./night.ts";
 import { rhovanionAsk, rhovanionBranchWords, rhovanionChooseNote } from "./rhovanion.ts";
@@ -134,7 +135,7 @@ export function wilderlandAsk(instruction: Instruction, source: string | null, n
   }
   const kings = kingsQuestAsk(instruction, source, names, next, facts);
   if (kings) return kings;
-  const heath = heathAsk(instruction, source, names, next, facts) ?? rhovanionAsk(instruction, source, names, next, facts) ?? nightAsk(instruction, source, names, next, facts) ?? framsburgAsk(instruction, source, names, next, facts) ?? dragonSicknessAsk(instruction, source, names, next) ?? gundabadAsk(instruction, source, names, next, facts?.game, facts?.ctx) ?? fateAsk(instruction, source, names, next, facts?.game, facts?.ctx);
+  const heath = heathAsk(instruction, source, names, next, facts) ?? rhovanionAsk(instruction, source, names, next, facts) ?? nightAsk(instruction, source, names, next, facts) ?? framsburgAsk(instruction, source, names, next, facts) ?? dragonSicknessAsk(instruction, source, names, next) ?? boonHeroAsk(instruction, source, names, next, facts?.game) ?? gundabadAsk(instruction, source, names, next, facts?.game, facts?.ctx) ?? fateAsk(instruction, source, names, next, facts?.game, facts?.ctx);
   if (heath) return heath;
   if (instruction.verb !== "AttachRandomTreasure") return null;
   const choose = `Choose 1 of ${drawn} random undiscovered treasures to attach as a guarded objective.`;

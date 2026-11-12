@@ -28,17 +28,16 @@ const namesOf = (made: Made, state: Made["state"] = made.state): SheetNames => (
 const dial = (made: Made, id: string, state = made.state) => angmarDials(state, made.ctx, nameOf(made)).find((one) => one.id === id);
 
 describe("Hunting the Orcs' dial", () => {
-  it("09071:A:1 reads its tokens against 3 more than the players (4 solo, 5 for two), warms near the flip and is gone with the card", () => {
+  it("09071:A:1 reads its tokens against 3 more than the players (4 solo, 5 for two) as a goal dial, the players' way out: it never warms or warns, and is gone with the card", () => {
     const made = built({ staging: [{ code: HUNT, resources: 1 }] });
-    expect(dial(made, "hunt")).toMatchObject({ testID: "angmar-hunt", value: 1, limit: 4, warms: true, limitWords: "4 flips it" });
-    expect(dial(made, "hunt")?.warn).toBeUndefined();
-    const near = built({ staging: [{ code: HUNT, resources: 2 }] });
-    expect(dial(near, "hunt")?.warn).toMatchObject({ level: "near", words: "2 more defeated enemies flip it." });
-    const last = built({ staging: [{ code: HUNT, resources: 3 }] });
-    expect(dial(last, "hunt")?.warn).toMatchObject({ level: "critical", words: "One more defeated enemy flips it." });
+    expect(dial(made, "hunt")).toMatchObject({ testID: "angmar-hunt", value: 1, limit: 4, goal: true, limitWords: "4 flips it" });
+    for (const tokens of [2, 3]) {
+      const near = dial(built({ staging: [{ code: HUNT, resources: tokens }] }), "hunt");
+      expect(near?.warms).toBeUndefined();
+      expect(near?.warn).toBeUndefined();
+    }
     const two = built({ seats: 2, staging: [{ code: HUNT, resources: 3 }] });
-    expect(dial(two, "hunt")).toMatchObject({ limit: 5 });
-    expect(dial(two, "hunt")?.warn).toMatchObject({ level: "near" });
+    expect(dial(two, "hunt")).toMatchObject({ limit: 5, goal: true });
     expect(dial(built({ staging: [] }), "hunt")).toBeUndefined();
   });
 
@@ -61,7 +60,7 @@ describe("Savage Counter-attack's dial", () => {
     expect(dial(made, "savage")?.limit).toBeUndefined();
     expect(dial(made, "savage")?.warn).toBeUndefined();
     const id = idOf(made.state, SAVAGE);
-    expect(dial(made, "savage", updateCard(made.state, id, { resources: 2 }))?.warn).toMatchObject({ level: "near", words: "2 resource tokens are left." });
+    expect(dial(made, "savage", updateCard(made.state, id, { resources: 2 }))?.warn).toMatchObject({ level: "near", words: "Two more characters destroyed by an attack lose the game. Cornered Animals can also take one." });
     expect(dial(made, "savage", updateCard(made.state, id, { resources: 1 }))?.warn).toMatchObject({ level: "critical", words: "The next character an attack destroys loses the game." });
     expect(dial(made, "savage")?.note).toContain("with none left the players lose the game");
   });
@@ -69,6 +68,30 @@ describe("Savage Counter-attack's dial", () => {
   it("09072:A:2 says the tokens in its preview", () => {
     const made = built({ staging: [{ code: SAVAGE, resources: 3 }] });
     expect(angmarDetail(made.state, made.ctx, idOf(made.state, SAVAGE), idName(made, made.state))).toBe("3 resource tokens on it. Each character an attack destroys discards 1. The players lose when none is left.");
+  });
+});
+
+describe("Find Shelter's time dial", () => {
+  const SHELTER = "09032";
+  it("09032:A:2 words the last counter as 4 damage on a hero and 4 counters back, warns near and never critical, and Rescue Iârion keeps its loss words", () => {
+    const made = built({ staging: [{ code: SHELTER, resources: 1 }] });
+    const time = dial(made, "time");
+    expect(time).toMatchObject({ testID: "angmar-time", value: 1 });
+    expect(time?.note).toContain("each player deals 4 damage to a hero they control, then 4 time counters return.");
+    expect(time?.note).not.toContain("lose");
+    expect(time?.warn).toMatchObject({ level: "near", words: "The next refresh phase takes the last time counter: each player deals 4 damage to a hero." });
+    expect(dial(built({ staging: [{ code: SHELTER, resources: 2 }] }), "time")?.warn).toMatchObject({ level: "near", words: "2 time counters are left." });
+    expect(dial(built({ staging: [{ code: SHELTER, resources: 4 }] }), "time")?.warn).toBeUndefined();
+    const iarion = built({ staging: [{ code: "09024", resources: 1 }] });
+    expect(dial(iarion, "time")?.note).toContain("the players lose");
+    expect(dial(iarion, "time")?.warn).toMatchObject({ level: "critical" });
+  });
+
+  it("09032:A:2 says the counters and the last one's cost in its preview", () => {
+    const made = built({ staging: [{ code: SHELTER, resources: 3 }] });
+    // The encounter deck holds another copy, so pick the one in the staging area.
+    const staged = Object.values(made.state.cards).find((card) => card.code === SHELTER && card.zone === "staging")?.id ?? "";
+    expect(angmarDetail(made.state, made.ctx, staged, idName(made, made.state))).toBe("3 time counters on it. With the last gone, each player deals 4 damage to a hero they control, then 4 time counters return.");
   });
 });
 
@@ -116,5 +139,54 @@ describe("a pick that spans seats names the owner on each row", () => {
     const one = updateCard(updateCard(solo.state, idOf(solo.state, "dh1"), { damage: 2 }), idOf(solo.state, "dh2"), { damage: 1 });
     const soloSheet = sheetsOf({ ...solo, state: one }, "09029", "response", idOf(one, "09029"))[0];
     expect(soloSheet?.options.map((option) => option.label)).toEqual(["dh1", "dh2"]);
+  });
+});
+
+describe("Mysterious Omens' boon choice", () => {
+  const BOONS = ["10161", "10162", "10163", "10164", "10165"];
+  // The sheets the reward opens, answering the boon "10162" and then its first hero.
+  const omens = (seats: 1 | 2): PickSheet[] => {
+    const made = built({ seats, setAside: BOONS, staging: ["10160"] });
+    const seen: PickSheet[] = [];
+    resolveRecords(made.state, made.ctx, "10160", "forced", idOf(made.state, "10160"), (state) => {
+      const sheet = sheetFor(state, made.ctx, legalIntents(state, made.ctx), namesOf(made, state));
+      if (sheet?.kind === "pick") seen.push(sheet);
+      return state.window?.kind === "choose" ? (state.window.options.includes("10162") ? "10162" : (state.window.options[0] ?? "")) : "";
+    });
+    return seen;
+  };
+
+  it("10160:A:3 names each boon by its card and pictures it by its code, never by the number", () => {
+    const made = built();
+    const boons = omens(1)[0];
+    expect(boons?.options.map((one) => one.code)).toEqual([...BOONS, null]);
+    expect(boons?.options.map((one) => one.label)).toEqual([...BOONS.map((code) => made.cards.get(code)?.name), "Take no boon"]);
+    for (const one of boons?.options ?? []) expect(one.label).not.toMatch(/^\d{5}$/);
+  });
+
+  it("10160:A:3 words the hero that carries the boon on its own, not as Mount Gundabad's Condition, and leads with the player two-handed", () => {
+    const name = built().cards.get("10162")?.name ?? "";
+    const solo = omens(1)[1];
+    expect(solo?.note).toContain(`choose a hero you control to carry ${name}. It stays with that hero through the campaign.`);
+    expect(solo?.note).not.toMatch(/Condition|lose the game/);
+    const two = omens(2)[1];
+    expect(two?.note).toMatch(new RegExp(`^Player 1: .*carry ${name}\\.`));
+    expect(two?.note).not.toContain("Player 1 chooses");
+  });
+});
+
+describe("the damage-assign sheets count what is left", () => {
+  it("09031:A:1 Ice Storm names X as the quest cards in play and the damage still to place, falling as each is placed", () => {
+    const made = built({ staging: [PROTECT] });
+    const notes: string[] = [];
+    resolveRecords(made.state, made.ctx, "09031", "whenRevealed", undefined, (state) => {
+      const sheet = sheetFor(state, made.ctx, legalIntents(state, made.ctx), namesOf(made, state));
+      if (sheet?.kind === "pick") notes.push(sheet.note ?? "");
+      return state.window?.kind === "choose" ? (state.window.options[0] ?? "") : "";
+    });
+    expect(notes.length).toBeGreaterThan(1);
+    expect(notes[0]).toContain("assign 2 damage among the characters you control, 1 at a time (2, the quest cards in play; 2 left).");
+    expect(notes[1]).toContain("1 left)");
+    expect(notes.join(" ")).not.toContain("X is");
   });
 });

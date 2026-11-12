@@ -32,8 +32,10 @@ const EACH_PLAYER = (instructions: Extract<Instruction, { verb: "ForEachPlayer" 
 const ATTACKER_PLUS = (amount: number | { readonly count: PickSpec }): Instruction => ({ verb: "ModifyStat", stat: "attack", amount, until: "endOfAttack", target: "attacker" });
 // "Each player deals 1 damage to a character (a hero) he controls".
 const EACH_PLAYER_DAMAGES = (pick: PickSpec, amount: number): Instruction => EACH_PLAYER([{ verb: "Pick", pick }, { verb: "DamageCard", amount, target: "picked" }]);
+/** The X of Hunting the Orcs (09071:A:1), 3 more than the players: the dial and the preview of src/play read the number the record flips at from here. */
+export const HUNT_FLIP_TOKENS = { players: true, plus: 3 } as const;
 // "X resource tokens here" read as a count of the quest's own tokens: at least 3 more than the players.
-const AT_LEAST_X_TOKENS: Condition = { kind: "not", condition: { kind: "less", left: { stat: "resources", of: "self" }, right: { players: true, plus: 3 } } };
+const AT_LEAST_X_TOKENS: Condition = { kind: "not", condition: { kind: "less", left: { stat: "resources", of: "self" }, right: HUNT_FLIP_TOKENS } };
 
 export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 09025 Cornered Orc. Forced: after it engages a player it makes an immediate attack (also when put into play engaged by a search). Shadow: +1 Attack, +2 instead if the defending character is damaged.
