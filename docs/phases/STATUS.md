@@ -100,8 +100,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 74 | The Tower of Cirith Ungol | completed | 2026-11-12. Review round done. Open: `ungol-won`. |
 | 75 | The Black Gate Opens | completed | 2026-11-12. Review round done. |
 | 76 | Mount Doom | completed | 2026-11-12. Review round done. Open: `doom-won`. |
-| 77 | Angmar Awakened data | active | 2026-11-12. `docs/plans/angmar-awakened.md`. |
-| 78 | Angmar Awakened campaign shell | not started |  |
+| 77 | Angmar Awakened data | completed | 2026-11-12. Review round done. Open: Easy counts and MEC108 wording not user-confirmed. |
+| 78 | Angmar Awakened campaign shell | active | 2026-11-12. `docs/plans/angmar-awakened.md`. |
 | 79 | Intruders in Chetwood | not started |  |
 | 80 | The Weather Hills | not started |  |
 | 81 | Deadmen's Dike | not started |  |
@@ -188,6 +188,12 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - Nightmare, Escape from Dol Guldur: Torture Master captures the hero the attack was made against, not each of several defenders; with 3 or 4 players the logged prisoner swap (01131:A:3) may leave one player with two prisoners.
 - Ered Mithrin data: Crypt Stalker (19099) Easy count is 1 (Hall of Beorn) against E08.7's 2; no printed source settles it.
 - Ered Mithrin data: the EMCE box prints collector numbers one below Hall of Beorn and RingsDB; codes and `printings[].number` follow the sources' number.
+
+### Rules and engine (Angmar Awakened)
+- Angmar Awakened data: Easy counts of Angmar Captain (09045, 1) and Angmar Marauder (09044, 2) in Escape from Mount Gram and Ruins of Arnor (09056, 2) in The Treachery of Rhudaur follow Hall of Beorn against DragnCards' E05 decks; no printed icon check. Not user-confirmed.
+- Angmar Awakened data: `MEC108_CHANGED` is empty because no scan shows the MEC108 printing of the 155 reprinted encounter cards; a rewording cannot be found until one is read. Not user-confirmed.
+- Angmar Awakened data: the Prison Cell, Savage Trollspawn and Amarthiúl (Wastes) piles follow each quest's Setup over DragnCards' load layout (agent recommendation). Not user-confirmed.
+- Angmar Awakened: the `angmarOrcDeck` pile and the box's new Setup steps (`buildOrcDeck`, `prepareCapturedDeck`, `captureUnder` and the others) are catalog data only; the engine reads them in their scenarios' phases.
 
 ### Screens and code
 - Fire in the Night: the table has no side-quest deck area or current-quest mark (`docs/brief.md`, Ered Mithrin).
