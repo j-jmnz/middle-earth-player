@@ -15,6 +15,9 @@ appId: com.middleearth.lcg
     visible:
       id: table
     timeout: 30000
+# The table lies landscape on both devices, but the start left the iPhone's simulator in portrait: Maestro then reads the table's controls
+# as off the screen. The simulator turns with the table.
+- setOrientation: LANDSCAPE_LEFT
 # The table shows its id while the save is still replaying; the board, and the quest stage in play it opens on (quest-advance.ts,
 # openingLatch), come once the replay is done, and every showcase save has a stage in play. So the stage's Continue is what says the board
 # is there: the flow waits for it, then taps it until it is gone, so it covers neither the shot nor the dock, and only then waits for the
