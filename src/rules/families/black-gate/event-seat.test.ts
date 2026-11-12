@@ -21,7 +21,7 @@ describe("whenRevealedCanceled carries the seat that canceled (146031:A:2)", () 
     const announced = announceCanceled(changed, state, ctx, 1);
     expect(announced.pendingEvents?.at(-1)).toMatchObject({ trigger: "whenRevealedCanceled", seat: 1 });
     // Asked for no seat (the older callers), it carries none.
-    expect(announceCanceled(changed, state, ctx).pendingEvents?.at(-1)).toMatchObject({ trigger: "whenRevealedCanceled", seat: null });
+    expect(announceCanceled(changed, state, ctx, null).pendingEvents?.at(-1)).toMatchObject({ trigger: "whenRevealedCanceled", seat: null });
   });
 });
 

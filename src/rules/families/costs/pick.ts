@@ -15,6 +15,14 @@ import { threatCostOf } from "./stats.ts";
 
 const VALOUR = new WeakMap<readonly unknown[], Map<string, boolean>>();
 
+// A record asks for the Valour threshold: a `threat` condition marked `valour` with a minimum, in the record's condition or inside an instruction (PlayOnlyIf).
+function asksValour(value: unknown): boolean {
+  if (value == null || typeof value !== "object") return false;
+  const fields = value as Record<string, unknown>;
+  if (fields.kind === "threat" && fields.valour === true && typeof fields.min === "number") return true;
+  return Object.values(fields).some(asksValour);
+}
+
 // A card with a Valour ability: one of its records asks for the Valour threshold (`valour` on a `threat` condition: a Valour Action or Response).
 export function hasValour(ctx: ReduceContext, code: string): boolean {
   let known = VALOUR.get(ctx.effects);
@@ -24,7 +32,7 @@ export function hasValour(ctx: ReduceContext, code: string): boolean {
   }
   const cached = known.get(code);
   if (cached != null) return cached;
-  const found = effectsOf(ctx, code).some((effect) => /"kind":"threat","min":40,"valour":true/.test(JSON.stringify(effect)));
+  const found = effectsOf(ctx, code).some((effect) => asksValour(effect));
   known.set(code, found);
   return found;
 }

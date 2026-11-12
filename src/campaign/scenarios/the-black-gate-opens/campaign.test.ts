@@ -63,7 +63,7 @@ const resolve = (name: string, before: CampaignLog = afterUngol) => {
   return { state, log: applyResolution(before, state.scenarioId, state, world.cards, NO_COPY_LIMITS) };
 };
 
-// The Black Gate Opens in the the-return-of-the-king campaign (part 17, campaign card 146074).
+// The Black Gate Opens in the the-return-of-the-king campaign (part 5 of the box, campaign card 146074).
 describe("The Black Gate Opens in the the-return-of-the-king campaign", () => {
   it("is part 5 of the saga and names its campaign card", () => {
     expect(campaign.scenarios.indexOf(opens.id)).toBe(4);

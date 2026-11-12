@@ -1,11 +1,9 @@
 // Rules: mec113.dire, mec113.saga-staging-rules, mec113.immune-to-player-card-effects, mec113.peril, rr.effects, rr.forced, rr.shadow-effects, rr.lasting-effects, rr.engaged, rr.then, rr.defending-player, faq.additional-attacks, faq.lasting-effects (data/rules/entries.json).
-import { describe, it } from "vitest";
-
 import { announce, answer, attack, attackersOf, cardSpecs, damageOn, deckCount, defend, endPhase, flag, quest, reveal, resolve, resourcesOn, stagingThreat, stat, threat, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
-// Card specs for The Black Gate Opens (the-return-of-the-king part 17): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
+// Card specs for The Black Gate Opens (the-return-of-the-king, part 5 of the box): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/handover/agent-brief.md, Scenario procedure, Finish). What a row cannot hold (a bar on travel, a card
-// that leaves the quest, a choice that needs a Fellowship hero, the Embassy's pairs, the staging step's reveals, the scenario's end) is in lines.test.ts and stages.test.ts, each test titled with its line.
+// that leaves the quest, a choice that needs a Fellowship hero) is in lines.test.ts, each test titled with its line; the scenario's end is in end.test.ts and the golden.
 // The stand-in heroes have 2 Willpower, 2 Attack, 2 Defense and 6 hit points and every seat starts at threat 28; f3 is an enemy with Threat 3, Attack 1, Defense 1 and 3 hit points, f0 the same with Threat 0.
 // Stage 1 (146072) has no quest points and skips nothing the rows need, but the rows that quest or attack are played at stage 2 (146073), whose Forced and reveal rules they do not touch.
 const GATE = "146024";
@@ -72,5 +70,4 @@ const ROWS: readonly Row[] = [
   { line: "146073:B:2", name: "Forced: after the players quest unsuccessfully the active location is discarded", layout: { ...STAGE2, active: "place", staging: ["f3", "f3", "f3"] }, act: quest("fail"), expect: zone("place", "encounterDiscard") },
 ];
 
-if (ROWS.length > 0) cardSpecs("the-black-gate-opens", ROWS);
-else describe("the-black-gate-opens card specs", () => it.todo("a row for each record whose behaviour needs a game moment"));
+cardSpecs("the-black-gate-opens", ROWS);

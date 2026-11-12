@@ -167,7 +167,7 @@ export function cancelNotAllowed(state: ScenarioState, offer: ResponseOffer, eff
 // listens hears it ("Forced: After a 'when revealed' effect is canceled, reduce the Ring-bearer's life by 1", 906304:A:1; rr.cancel). `before`
 // is the state the cancel was made in: the event is announced only when the cancel changed it, only while a card that listens is in play,
 // and only when the canceled card has a When Revealed effect to cancel (a revealed enemy with none announces nothing, 144049:A:1). The event's seat is the player who canceled it: "makes an immediate attack against that player" (146031:A:2, `who: eventSeat`).
-export function announceCanceled(state: ScenarioState, before: ScenarioState, ctx: ReduceContext, seat: number | null = null): ScenarioState {
+export function announceCanceled(state: ScenarioState, before: ScenarioState, ctx: ReduceContext, seat: number | null): ScenarioState {
   if (state === before || !listenerInPlay(state, "whenRevealedCanceled", ctx.effects)) return state;
   if (revealedWithoutWhenRevealed(before, ctx)) return state;
   if (state.pendingAttack?.shadowCanceled && !before.pendingAttack?.shadowCanceled) return state;

@@ -371,9 +371,9 @@ describe("Flight to the Ford Nightmare's vocabulary (906301:A:2, 906304:A:1; rr.
     const { state: base } = table();
     const forest = spawn({ ...base, life: 10 }, "906304", { zone: "staging" }).state;
     const canceled = { ...forest, round: forest.round };
-    const announced = announceCanceled({ ...canceled }, forest, fordCtx);
+    const announced = announceCanceled({ ...canceled }, forest, fordCtx, null);
     expect(announced.pendingEvents?.at(-1)).toMatchObject({ trigger: "whenRevealedCanceled" });
-    expect(announceCanceled(forest, forest, fordCtx)).toBe(forest);
+    expect(announceCanceled(forest, forest, fordCtx, null)).toBe(forest);
     const resolved = settle(announced, fordCtx, []);
     expect(resolved.life).toBe(9);
   });
@@ -393,15 +393,15 @@ describe("Flight to the Ford Nightmare's vocabulary (906301:A:2, 906304:A:1; rr.
     const open = revealing(placed.id);
     const changed = { ...open, round: open.round };
     // No When Revealed record on the revealed card: nothing was canceled that Den of Night hears.
-    expect(announceCanceled(changed, open, fordCtx)).toBe(changed);
-    expect(announceCanceled(changed, open, withRecord).pendingEvents?.at(-1)).toMatchObject({ trigger: "whenRevealedCanceled" });
+    expect(announceCanceled(changed, open, fordCtx, null)).toBe(changed);
+    expect(announceCanceled(changed, open, withRecord, null).pendingEvents?.at(-1)).toMatchObject({ trigger: "whenRevealedCanceled" });
   });
 
   it("announces nothing while no card that listens for a canceled when revealed effect is in play", () => {
     const { state: base } = table();
     const discarded = spawn({ ...base, life: 10 }, "906304", { zone: "encounterDiscard" }).state;
     const changed = { ...discarded, round: discarded.round };
-    expect(announceCanceled(changed, discarded, fordCtx)).toBe(changed);
+    expect(announceCanceled(changed, discarded, fordCtx, null)).toBe(changed);
   });
 
   it("holds the last stage back while Ford of Bruinen is in play: the players cannot win (the setup card's constant, zone nightmare)", () => {

@@ -99,8 +99,10 @@ export function attackNowFromStaging(state: ScenarioState, id: string, seat: num
   for (let more = 1; shadow && more < (shadows ?? 1); more += 1) dealt = dealAdditionalShadow(dealt, id, steps);
   const begun = beginEnemyAttack(dealt, seat, id, ctx, steps, { fromStaging: enemy?.zone === "staging", shadow });
   // `raiseIfDestroys`: the effect the attack leaves for its end, with X the characters it destroyed (146039:A:2).
-  const after = raiseIfDestroys ? { after: [{ verb: "RaiseThreat" as const, amount: raiseIfDestroys, who: "actor" as const, when: { kind: "x" as const, min: 1 } }], afterCause: currentCause(steps, UNATTRIBUTED) } : {};
-  return begun.pendingAttack ? { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true, ...marks, ...after } } : begun;
+  const attack = begun.pendingAttack;
+  if (!attack) return begun;
+  const after = raiseIfDestroys ? { after: [...(attack.after ?? []), { verb: "RaiseThreat" as const, amount: raiseIfDestroys, who: "actor" as const, when: { kind: "x" as const, min: 1 } }], afterCause: attack.afterCause ?? currentCause(steps, UNATTRIBUTED) } : {};
+  return { ...begun, pendingAttack: { ...attack, immediate: true, ...marks, ...after } };
 }
 
 // DamageActiveLocation: a shadow effect marks the attack in progress: its undefended damage goes on an active location.

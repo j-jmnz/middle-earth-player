@@ -64,9 +64,9 @@ export type TopBarProps = {
   areas?: boolean;
   // The engagement costs marked on each dial, by seat.
   ticks: readonly (readonly number[])[];
-  // The pursuit value of The Uruk-hai and the value at which the players lose (mec112.pursuit), or null: a dial after Life that warms toward the limit.
   // The main quest has Dire (mec113.dire): each player is eliminated at 99, so the seat dials fill and warm toward it.
   direLimit?: number | undefined;
+  // The pursuit value of The Uruk-hai and the value at which the players lose (mec112.pursuit), or null: a dial after Life that warms toward the limit.
   pursuit?: { value: number; limit: number } | null;
   // The tokens on The Defense of Helm's Deep, its name and the number that ends it and the stage it advances to (mec112.defense, 143033:A:3), or null: a dial after Pursuit whose ring fills toward the limit in the accent.
   defense?: { name: string; value: number; limit: number; stage: number } | null;

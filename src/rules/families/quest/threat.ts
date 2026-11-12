@@ -46,8 +46,9 @@ export function lowerThreatByEffect(state: ScenarioState, seat: number, amount: 
   // "Cannot be reduced by more than 1 via player card effects each round" (19104:A:2): only what player card effects took off counts, and only they are held to it. Copies of the card do not add up: the smallest cap holds.
   // While the main quest is Dire the same cap is 1 for every non-boon player card (mec113.dire).
   const dire = player && state.dire === true && !isBoon(state, sourceId, ctx);
-  const held0 = player ? heldLeast(state, `seat:${seat}`, "playerThreatReductionCap") : 0;
-  const playerCap = dire ? (held0 > 0 ? Math.min(held0, DIRE_REDUCTION_CAP) : DIRE_REDUCTION_CAP) : held0;
+  const printedCap = player ? heldLeast(state, `seat:${seat}`, "playerThreatReductionCap") : 0;
+  const caps = [printedCap, dire ? DIRE_REDUCTION_CAP : 0].filter((cap) => cap > 0);
+  const playerCap = caps.length > 0 ? Math.min(...caps) : 0;
   const held = playerCap > 0 ? Math.max(0, Math.min(capped, playerCap - (state.playerThreatLoweredBy?.[seat] ?? 0))) : capped;
   const before = state.seats[seat]?.threat ?? 0;
   const moved = lowerThreat(state, seat, held, steps, cause);
