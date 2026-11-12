@@ -18,6 +18,13 @@ const PROTECT_THE_INNOCENT = "10158";
 const ARNOR_RAVAGED = "100158";
 const BURDENS = ["10168", "10169", "10170"];
 
+// A burden's Forced effect and constants: after a Sorcery treachery is revealed it moves to the hero holding the most of `most`; it counts as a Sorcery attachment and, on a hero, applies its stat lines. The three burdens differ only by code, `most` and `mods`.
+const BURDEN = (code: string, most: Extract<Instruction, { verb: "MoveToHero" }>["most"], mods: readonly Instruction[]): Effect[] => [
+  { id: `${code}:forced:1`, cardCode: code, lines: [`${code}:A:2`], timing: "forced", trigger: "revealed", subject: { type: "treachery", control: "any", trait: "Sorcery" }, instructions: [{ verb: "MoveToHero", most }] },
+  { id: `${code}:constant:1`, cardCode: code, lines: [`${code}:A:2`], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Sorcery" }] },
+  { id: `${code}:constant:2`, cardCode: code, lines: [`${code}:A:2`], timing: "constant", condition: { kind: "matches", card: "host", pick: { type: "hero", control: "any" } }, instructions: [...mods] },
+];
+
 const IN_STAGING: Condition = { kind: "sourceIn", zone: "staging" };
 const ACTIVE: Condition = { kind: "sourceIn", zone: "activeLocation" };
 const REFRESH_ENDS: Condition = { kind: "phase", is: "Refresh" };
@@ -233,7 +240,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [{ verb: "Pick", pick: { type: "character", control: "any", defending: true, copyInDiscard: "owner" } }, { verb: "DiscardPicked" }],
     },
 
-    // 09066 Heavy Curse. When Revealed: attached to the current quest as a Condition attachment; while it is in play a card a player plays from hand costs 1 more when a card with the same title is in its owner's discard pile (several Curses stack).
+    // 09066 Heavy Curse. When Revealed: attached to the current quest as a Condition attachment; while it is in play a card a player plays (from any zone) costs 1 more when a card with the same title is in its owner's discard pile (several Curses stack).
     { id: "09066:whenRevealed:1", cardCode: "09066", lines: ["09066:A:2"], timing: "whenRevealed", instructions: [{ verb: "AttachToQuest" }] },
     { id: "09066:constant:1", cardCode: "09066", lines: ["09066:A:2"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Condition" }, { verb: "IncreaseCost", amount: 1, pick: { type: "card", control: "any", copyInDiscard: "owner" } }] },
 
@@ -262,8 +269,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       lines: ["09074:A:1"],
       timing: "whenRevealed",
       instructions: [
-        { verb: "AddSetAsideToStaging", code: THAURDIR, announce: true },
-        // "Then": the reveals resolve only when Thaurdir was added to the staging area (rr.then).
+        { verb: "EnterSetAsideStaging", code: THAURDIR },
+        // "Then": the reveals resolve only when Thaurdir was added to the staging area (rr.then). Repeat takes no `when`, so the check is on each reveal; the difference is only a reveal that moves Thaurdir out of the staging area mid-way, which nothing in these encounter sets does.
         { verb: "Repeat", times: { players: true }, instructions: [{ verb: "RevealEncounter", when: { kind: "canPick", pick: { ...THAURDIR_PICK, stagingOnly: true } } }] },
       ],
     },
@@ -281,7 +288,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
           verb: "Choose",
           who: "actor",
           options: [
-            { id: "discard", instructions: [{ verb: "DiscardFromDeck", amount: 3 }] },
+            { id: "discard", requires: { kind: "canPick", pick: { type: "card", control: "you", from: "deck" } }, instructions: [{ verb: "DiscardFromDeck", amount: 3 }] },
             { id: "return", requires: { kind: "not", condition: { kind: "canPick", pick: { ...THAURDIR_PICK, stagingOnly: true } } }, instructions: [{ verb: "ReturnToStaging", target: { kind: "other" } }] },
           ],
         },
@@ -330,70 +337,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "10168:setup:1", cardCode: "10168", lines: ["10168:A:1"], timing: "setup", instructions: [{ verb: "AttachSelfToNamed", name: "Thaurdir", outOfPlay: true }] },
     copyLine("10168:A:1", "10169:A:1"),
     copyLine("10168:A:1", "10170:A:1"),
-    {
-      id: "10168:forced:1",
-      cardCode: "10168",
-      lines: ["10168:A:2"],
-      timing: "forced",
-      trigger: "revealed",
-      subject: { type: "treachery", control: "any", trait: "Sorcery" },
-      instructions: [{ verb: "MoveToHero", most: "resources" }],
-    },
-    { id: "10168:constant:1", cardCode: "10168", lines: ["10168:A:2"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Sorcery" }] },
-    {
-      id: "10168:constant:2",
-      cardCode: "10168",
-      lines: ["10168:A:2"],
-      timing: "constant",
-      condition: { kind: "matches", card: "host", pick: { type: "hero", control: "any" } },
-      instructions: [
-        { verb: "ModifyStat", stat: "willpower", amount: -2, until: "whileSourceInPlay", target: "host" },
-        { verb: "ModifyStat", stat: "blankText", amount: 1, until: "whileSourceInPlay", target: "host" },
-        { verb: "ModifyStat", stat: "blanksTraits", amount: 1, until: "whileSourceInPlay", target: "host" },
-      ],
-    },
-    {
-      id: "10169:forced:1",
-      cardCode: "10169",
-      lines: ["10169:A:2"],
-      timing: "forced",
-      trigger: "revealed",
-      subject: { type: "treachery", control: "any", trait: "Sorcery" },
-      instructions: [{ verb: "MoveToHero", most: "nonObjectiveAttachments" }],
-    },
-    { id: "10169:constant:1", cardCode: "10169", lines: ["10169:A:2"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Sorcery" }] },
-    {
-      id: "10169:constant:2",
-      cardCode: "10169",
-      lines: ["10169:A:2"],
-      timing: "constant",
-      condition: { kind: "matches", card: "host", pick: { type: "hero", control: "any" } },
-      instructions: [
-        { verb: "ModifyStat", stat: "attack", amount: -2, until: "whileSourceInPlay", target: "host" },
-        { verb: "ModifyStat", stat: "cannotQuest", amount: 1, until: "whileSourceInPlay", target: "host" },
-      ],
-    },
-    {
-      id: "10170:forced:1",
-      cardCode: "10170",
-      lines: ["10170:A:2"],
-      timing: "forced",
-      trigger: "revealed",
-      subject: { type: "treachery", control: "any", trait: "Sorcery" },
-      instructions: [{ verb: "MoveToHero", most: "damage" }],
-    },
-    { id: "10170:constant:1", cardCode: "10170", lines: ["10170:A:2"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Sorcery" }] },
-    {
-      id: "10170:constant:2",
-      cardCode: "10170",
-      lines: ["10170:A:2"],
-      timing: "constant",
-      condition: { kind: "matches", card: "host", pick: { type: "hero", control: "any" } },
-      instructions: [
-        { verb: "ModifyStat", stat: "defense", amount: -2, until: "whileSourceInPlay", target: "host" },
-        { verb: "ModifyStat", stat: "cannotBeHealed", amount: 1, until: "whileSourceInPlay", target: "host" },
-      ],
-    },
+    ...BURDEN("10168", "resources", [{ verb: "ModifyStat", stat: "willpower", amount: -2, until: "whileSourceInPlay", target: "host" }, { verb: "ModifyStat", stat: "blankText", amount: 1, until: "whileSourceInPlay", target: "host" }, { verb: "ModifyStat", stat: "blanksTraits", amount: 1, until: "whileSourceInPlay", target: "host" }]),
+    ...BURDEN("10169", "nonObjectiveAttachments", [{ verb: "ModifyStat", stat: "attack", amount: -2, until: "whileSourceInPlay", target: "host" }, { verb: "ModifyStat", stat: "cannotQuest", amount: 1, until: "whileSourceInPlay", target: "host" }]),
+    ...BURDEN("10170", "damage", [{ verb: "ModifyStat", stat: "defense", amount: -2, until: "whileSourceInPlay", target: "host" }, { verb: "ModifyStat", stat: "cannotBeHealed", amount: 1, until: "whileSourceInPlay", target: "host" }]),
   ],
   { pool: [...DROWNED, ...SIEGE, ...WEATHER] },
 );

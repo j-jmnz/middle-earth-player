@@ -99,8 +99,8 @@ describe("Rescue Iârion on the table", () => {
   it("09024:A:1 puts 4 time counters on it, and the dial counts those taken off against 4: it warms as the last nears", () => {
     const { made, rescue, state } = held();
     const counted = updateCard(state, rescue, { resources: 4 });
-    const dial = (game: typeof state) => angmarDials(game, made.ctx, nameOf(made)).find((one) => one.id === "time");
-    expect(dial(counted)).toMatchObject({ testID: "angmar-time", value: 4 });
+    const dial = (game: typeof state) => angmarDials(game, made.ctx, nameOf(made)).find((one) => one.id === `time:${rescue}`);
+    expect(dial(counted)).toMatchObject({ testID: `angmar-time:${rescue}`, value: 4, label: "Time" });
     expect(dial(counted)?.limit).toBeUndefined();
     expect(dial(counted)?.warn).toBeUndefined();
     expect(dial(updateCard(state, rescue, { resources: 2 }))?.warn).toMatchObject({ level: "near", words: "2 time counters are left." });

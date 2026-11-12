@@ -55,8 +55,8 @@ const overridesSchema = z.object({
   // Fire's Orc Disguise, Captains of the West and Raise the Shire). `title` names one of two cards that share a collector number (Angmar Awakened's Protect the Innocent and Arnor Ravaged, the two sides of one card).
   hobRingsDbCodes: z.array(z.object({ set: z.string().min(1), number: z.number().int().positive(), title: z.string().min(1).optional(), code: z.string().regex(/^\d{5,6}$/), reason: z.string().min(1), source: z.string().min(1) })).default([]),
   // A card a dealt campaign card's own text hands out, which no Setup or Resolution line of the campaign card names: the five boons Mysterious Omens (10160) offers are loaded with The Weather Hills and every later
-  // Angmar scenario that can shuffle Omens in (a copy comes from the supply when a player takes it). `code` is the card, `scenario` the game (or games) that load it.
-  scenarioCampaignPlaced: z.array(z.object({ scenario: z.union([z.string().min(1), z.array(z.string().min(1)).min(1)]), code: z.string().min(1), reason: z.string().min(1), source: z.string().min(1) })).default([]),
+  // Angmar scenario that can shuffle Omens in (a copy comes from the supply when a player takes it). `code` is the card (or the cards, with one reason), `scenario` the game (or games) that load it.
+  scenarioCampaignPlaced: z.array(z.object({ scenario: z.union([z.string().min(1), z.array(z.string().min(1)).min(1)]), code: z.union([z.string().min(1), z.array(z.string().min(1)).min(1)]), reason: z.string().min(1), source: z.string().min(1) })).default([]),
   // A card Hall of Beorn's scenario list counts that the scenario does not deal: the epic multiplayer mode's cards (mec113.epic-multiplayer-mode), which are dealt by the Epic
   // Multiplayer Mode campaign card's Setup. The dealt count is checked against the rest of the list only.
   scenarioExcluded: z.array(z.object({ scenario: z.string().min(1), code: z.string().min(1), reason: z.string().min(1), source: z.string().min(1) })).default([]),

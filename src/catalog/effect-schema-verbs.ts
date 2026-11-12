@@ -152,7 +152,9 @@ export const simpleVerbs = [
   verbFlags(codeVerb("AttachToRingBearer"), { setupRole: "dealt" }),
   // Moves a card that was set aside, out of play, into the staging area. It is not a reveal. `all`: every set aside copy of the code joins it ("each set aside Soldier of Isengard", 143073:A:1), not one.
   // Exactly one of `code` and `trait` (the effect schema refuses neither and both). `trait` instead of `code`: the set aside cards with that trait ("add each set aside Harad enemy to the staging area", 145078:B:1; with `all`). `announce`: the card entering play is announced as added to the staging area (`addedToStaging`), for the cards that hear it ("Forced: After Thaurdir enters play", 10166:A:3); without it nothing is announced.
-  z.strictObject({ verb: z.literal("AddSetAsideToStaging"), code: z.string().min(1).optional(), trait: z.string().min(1).optional(), all: z.literal(true).optional(), announce: z.literal(true).optional(), ...when }),
+  z.strictObject({ verb: z.literal("AddSetAsideToStaging"), code: z.string().min(1).optional(), trait: z.string().min(1).optional(), all: z.literal(true).optional(), ...when }),
+  // A set-aside card with this code is added to the staging area and enters play, as an encounter card effect puts a card there (the cards that hear it enter play or be added to the staging area hear it: Thaurdir, 10166:A:3, 09074:A:1). AddSetAsideToStaging does not announce.
+  z.strictObject({ verb: z.literal("EnterSetAsideStaging"), code: z.string().min(1), ...when }),
   // During play: one out-of-play copy of the card (the `outOfPlay` condition's zones) joins the encounter deck, which is
   // shuffled ("shuffle 1 out of play Ringwraith into the encounter deck", 141026:B:2, 141051:A:2, 141053:A:1, 141054:A:2).
   // When copies are out of play in more than one zone, the first player chooses which (rr.first-player). Nothing happens

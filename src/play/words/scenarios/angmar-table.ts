@@ -47,26 +47,46 @@ export const timeWords = (left: number, held: string | null): string =>
 /** The warning when the next refresh phase takes the last time counter. */
 export const timeNearWords = (left: number): string => (left <= 1 ? "The next refresh phase takes the last time counter." : `${left} time counters are left.`);
 
-/** The note of Thaurdir's dial, the players' way out of stage 2 (09074:B:2): his damage against his hit points. He is Indestructible, so the damage stays on him; the stage cannot be defeated while he has any hit points left. */
-export const thaurdirWords = (damage: number, limit: number): string => `${damage} of ${limit} damage. He cannot be destroyed, and stage 2 cannot be won while he has hit points left.`;
+/** What stage 2B needs besides Thaurdir's damage: its own quest points in progress (09074:B:2 holds the stage back only while he has hit points left, so both are needed), null when the stage card is not the current one. */
+const stageNeeds = (limit: number, points: number | null): string => (points == null ? `${limit} damage on him` : `its ${points} progress and ${limit} damage on him`);
 
-/** The line under Thaurdir in his preview: his damage against his hit points, and the burden he carries. */
-export const thaurdirPreviewWords = (damage: number, limit: number, burden: string | null): string =>
-  `${damage} of ${limit} damage on him. Indestructible: the damage stays, and stage 2 can be won once it reaches ${limit}.${burden ? ` He carries ${burden}.` : ""}`;
+/** The note of Thaurdir's dial (09074:B:2, 09033:A:3): stage 2 needs its quest points in progress and his damage at his hit points. He is Indestructible, so the damage stays, but he heals 3 on each Sorcery treachery revealed. */
+export const thaurdirWords = (damage: number, limit: number, points: number | null): string =>
+  damage >= limit
+    ? `He has no hit points left${points == null ? "" : `: ${points} progress wins`}. He cannot be destroyed, and each Sorcery treachery revealed heals 3 damage from him.`
+    : `${damage} of ${limit} damage. He cannot be destroyed, and each Sorcery treachery revealed heals 3 damage from him. Stage 2 needs ${stageNeeds(limit, points)}.`;
 
-/** The mark of a seat's deck while a stage eliminates a player with no cards in his deck (09073:B:3, 09074:B:2): the cards left; it warms at 5 and is critical at 2. */
-export const deckLabel = (seat: number | null, cards: number): string => (seat == null ? `Deck ${cards}` : `P${seat + 1} · Deck ${cards}`);
-export const deckWords = (cards: number): string => `${plural(cards, "card", "cards")} left in this player's deck. A player with no cards in his deck is eliminated.`;
-export const deckNearWords = (cards: number): string => (cards <= 0 ? "No cards left: this player is eliminated." : cards === 1 ? "One more card and this player is eliminated." : `${cards} cards left. At 0 this player is eliminated.`);
+/** What the dial's limit says: his hit points, and the progress that wins with them. */
+export const thaurdirLimitWords = (limit: number, points: number | null): string => (points == null ? `${limit} opens the stage` : `${limit} damage and ${points} progress win the stage`);
+
+/** The line under Thaurdir in his preview: his damage against his hit points, what stage 2 needs, the heal and the burden he carries. */
+export const thaurdirPreviewWords = (damage: number, limit: number, points: number | null, burden: string | null): string =>
+  `${damage} of ${limit} damage on him. Indestructible, but he heals 3 on each Sorcery treachery revealed. ${damage >= limit ? `He has no hit points left${points == null ? "" : `: ${points} progress wins`}.` : `Stage 2 needs ${stageNeeds(limit, points)}.`}${burden ? ` He carries ${burden}.` : ""}`;
+
+// A digit-wide space: a count under 10 keeps the width of one over it.
+const FIGURE_SPACE = "\u2007";
+/** The mark of a seat's deck while a stage eliminates a player with no cards in his deck (09073:B:3, 09074:B:2): the cards left, padded to two digits so the mark keeps its width from 10 to 9; it warms at 5 and is critical at 2. The last player eliminated loses the game. */
+export const deckLabel = (seat: number | null, cards: number): string => `${seat == null ? "Deck" : `P${seat + 1} · Deck`} ${String(cards).padStart(2, FIGURE_SPACE)}`;
+export const deckWords = (cards: number): string => `${plural(cards, "card", "cards")} left in this player's deck. A player with no cards in his deck is eliminated. If you are the last player, the game is lost.`;
+export const deckNearWords = (cards: number): string => (cards <= 0 ? "No cards left: this player is eliminated. If you are the last player, the game is lost." : cards === 1 ? "One more card and this player is eliminated. If you are the last player, the game is lost." : `${cards} cards left. At 0 this player is eliminated.`);
 
 /** The note of the dial that counts the time counters left on Broken Battlements (09036:A:2): the last one makes each player discard 5 cards and place 1 time counter. Not a loss, so it never goes critical. */
 export const battlementsTimeWords = (left: number): string =>
   `${plural(left, "time counter", "time counters")} left. One comes off at the end of each refresh phase. With the last gone, each player discards the top 5 cards of their deck and places 1 time counter here.`;
-export const battlementsTimeNearWords = (left: number): string => (left <= 1 ? "The next refresh phase takes the last time counter: each player discards 5 cards." : `${left} time counters are left.`);
+/**
+ * The warning on Broken Battlements' dial. At the last counter each player discards 5 cards (6 on stage 1B, which also discards 1 at the end of the refresh phase): a seat whose deck is at or under that is eliminated, and `doomed` names each one ("Player 2 has 4 cards"; solo "You have 4 cards"),
+ * the game lost when it is the last player (rr.player-elimination).
+ */
+export const battlementsTimeNearWords = (left: number, doomed: readonly { owner: string | null; cards: number }[] = []): string => {
+  if (left > 1) return `${left} time counters are left.`;
+  if (doomed.length === 0) return "The next refresh phase takes the last time counter: each player discards 5 cards.";
+  const seats = doomed.map((seat) => `${seat.owner ?? "You"} ${seat.owner == null ? "have" : "has"} ${plural(seat.cards, "card", "cards")}`).join("; ");
+  return `The next refresh phase takes the last time counter, and each player discards 5 cards. ${seats}: that eliminates ${doomed.length === 1 && doomed[0]?.owner == null ? "you, and the game is lost" : "them. If it is the last player, the game is lost"}.`;
+};
 export const battlementsPreviewWords = (left: number): string => `${plural(left, "time counter", "time counters")} on it. With the last gone, each player discards the top 5 cards of their deck and places 1 time counter here.`;
 
 /** The line under Fornost Square in its preview: its tokens and what they add to its Threat (09038:A:1), and what places one (09038:A:2). */
-export const fornostWords = (tokens: number): string => `${plural(tokens, "resource token", "resource tokens")} on it: +${tokens} Threat. The first player discarding cards from the top of his deck places 1, once for each discard.`;
+export const fornostWords = (tokens: number, first: string | null): string => `${plural(tokens, "resource token", "resource tokens")} on it: +${tokens} Threat. Each time the first player${first ? ` (${first})` : ""} discards cards from the top of their deck, however many, it places 1.`;
 
 /** The line under a burden of Thaurdir's in its preview: where it lies and what it does there (10168:A:2, 10169:A:2, 10170:A:2). `host`: the card it lies on; `onHero`: that card is a hero. */
 const BURDEN_EFFECTS = {
@@ -78,11 +98,11 @@ export const isBurden = (code: string): code is keyof typeof BURDEN_EFFECTS => c
 export const burdenWords = (code: keyof typeof BURDEN_EFFECTS, host: string, onHero: boolean): string => {
   const burden = BURDEN_EFFECTS[code];
   const moves = `After a Sorcery treachery is revealed it moves to ${burden.most}.`;
-  return onHero ? `On ${host}: ${burden.effect}. ${moves}` : `Carried by ${host}, with no effect on him. ${moves} It joins the Campaign Pool when the scenario is won.`;
+  return onHero ? `On ${host}: ${burden.effect}. ${moves} It joins the Campaign Pool when the scenario is won.` : `Carried by ${host}, with no effect on him. ${moves} It joins the Campaign Pool when the scenario is won.`;
 };
 
 /** The line under The Power of Angmar in its preview while it is in the staging area (09067:A:2). */
-export const POWER_OF_ANGMAR_WORDS = "While it is in the staging area, no player card effect can take a card out of a discard pile. Encounter card effects can.";
+export const POWER_OF_ANGMAR_WORDS = "While it is in the staging area, no player card effect can take a card out of a player's discard pile. Encounter card effects can.";
 
 /** What the cap dial's limit says: the number Orc Rearguard allows each round. */
 export const rearguardLimitWords = (limit: number, title: string): string => `${limit} allowed each round by ${title}`;

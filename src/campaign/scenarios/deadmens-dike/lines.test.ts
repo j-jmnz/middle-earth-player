@@ -7,12 +7,13 @@ import { modifiedStat } from "../../../rules/core/keywords.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { flagged, updateCard } from "../../../rules/core/state.ts";
 import { settle } from "../../../rules/engine/machine.ts";
+import { syncConstants } from "../../../rules/interpret/constants.ts";
 import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
 import { holds } from "../../../rules/interpret/conditions.ts";
 import { matchesPick, pickCandidates } from "../../../rules/interpret/pick.ts";
 import { restricted, travelCostUnpayable } from "../../../rules/interpret/restrictions.ts";
 import { playCost } from "../../../rules/player/attach.ts";
-import { spawn } from "../../../rules/core/zones.ts";
+import { moveCard, spawn } from "../../../rules/core/zones.ts";
 import { fireForced } from "../../../rules/windows/triggers.ts";
 import { fightEnemy, finish, idOf, idsOf, legalIntents, resolveRecords, revealFromTop, send, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 
@@ -143,6 +144,17 @@ describe("09040:A:1 hears the Actions and Responses a player triggers", () => {
     expect(deck(resolveRecords(refresh.state, refresh.ctx, "09073", "forced").state)).toBe(deck(refresh.state) - 1);
   });
 
+  it("09040:A:1 does not hear Iârion's Response: an encounter card's effect is not a player card's (Reading 12)", () => {
+    const t = gate({ play: ["09016"] });
+    const tired = updateCard(t.state, idOf(t.state, "09016"), { exhausted: true });
+    const revealed = revealFromTop(syncConstants(tired, t.ctx), t.ctx, "09042", []);
+    const response = legalIntents(revealed.state, t.ctx).find((intent) => intent.type === "Trigger" && intent.cardId === idOf(revealed.state, "09016"));
+    expect(response, "Iârion's Response is offered after the side quest is revealed").toBeTruthy();
+    const run = finish(send({ state: revealed.state, steps: [] }, response as PlayerIntent, t.ctx), t.ctx);
+    expect(run.state.cards[idOf(run.state, "09016")]?.exhausted).toBe(false);
+    expect(deck(run.state)).toBe(deck(revealed.state));
+  });
+
   it("09040:A:1 is not in force while Deadmen's Gate is in the staging area, not active", () => {
     const t = at({ phase: "Planning", staging: ["09040"], heroResources: 3, deckOf: ["filler", "filler"], attached: [{ code: "10167", to: HERO }] });
     const intent = trigger(t.state, t, "10167");
@@ -211,6 +223,12 @@ describe("09067:A:2 keeps the discard piles shut to player card effects", () => 
     expect(reach(player.state, t, idOf(player.state, "09067"))).toHaveLength(1);
   });
 
+  it("09067:A:2 does not lock an effect with no source card: that is no player card's effect", () => {
+    const t = at({ phase: "Planning", staging: ["09067"] });
+    const state = discarded(t.state, "ally");
+    expect(reach(state, t, null)).toHaveLength(1);
+  });
+
   it("09067:A:2 lets a player card reach the discard pile once the side quest has left the staging area", () => {
     const t = at({ phase: "Planning" });
     const player = spawn(discarded(t.state, "ally"), "ally", { zone: "hand", seat: 0 });
@@ -252,7 +270,18 @@ describe("09039:A:1 gives the first Undead enemy revealed each round surge while
     expect(staged(second.state)).not.toContain("f3");
   });
 
-  it("09039:A:1 notes nothing while no card holds the marker (the Keep is not in play)", () => {
+  it("09039:A:1 tallies an Undead revealed while the Keep still lies in the encounter deck (Reading 11): the Keep that enters play later finds the round's first Undead already revealed", () => {
+    const t = at({ phase: "Quest", deck: ["09039", "f0", "f3"] });
+    const first = revealFromTop(t.state, t.ctx, "09060", []);
+    expect(first.state.modifiers.some((modifier) => modifier.stat === "traitRevealed")).toBe(true);
+    expect(staged(first.state)).not.toContain("f0");
+    const keepId = idOf(first.state, "09039");
+    const active = { ...moveCard(first.state, keepId, { zone: "staging" }), activeLocation: keepId };
+    const second = revealFromTop(rest(active, t.ctx), t.ctx, "09060", []);
+    expect(staged(second.state)).not.toContain("f3");
+  });
+
+  it("09039:A:1 notes nothing when the game deals no Keep: no Undead tally is kept", () => {
     const t = at({ phase: "Quest", deck: ["f0"] });
     const first = revealFromTop(t.state, t.ctx, "09060", []);
     expect(first.state.modifiers.some((modifier) => modifier.stat === "traitRevealed")).toBe(false);

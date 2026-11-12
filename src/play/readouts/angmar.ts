@@ -4,16 +4,18 @@
 // (it warms toward the last, which discards Iârion and loses the game) and, while Orc Rearguard is in the staging area, the progress placed on the current quest this round against its cap of 3. The engine decided every number
 // (`heldAmount`, `timeOf`, `questCapTally`); nothing here changes one. Empty in any other scenario. Pure, so a test reads it.
 import { HUNT_FLIP_TOKENS } from "../../effects/authored/angmar-awakened/the-weather-hills.ts";
-import { printedOf } from "../../rules/core/printed.ts";
-import { flagged, heldAmount, inPlay, livingSeats } from "../../rules/core/state.ts";
+import { flagged, heldAmount, inPlay, livingSeats, type CardInstance } from "../../rules/core/state.ts";
 import { frameScope, resolveAmount } from "../../rules/interpret/amounts.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 import { questCapTally } from "../../rules/families/caves/progress.ts";
+import { hitPointsOf } from "../../rules/families/angmar/quest.ts";
 import { timeOf } from "../../rules/families/angmar/time.ts";
+import { stageOf } from "../../rules/families/breaking/areas.ts";
+import { questPointsOf } from "../../rules/quest/quest.ts";
 import { cardsUnder } from "../../rules/core/zones.ts";
 import { captiveUnder } from "../../rules/families/south/captive.ts";
 
-import { battlementsTimeNearWords, battlementsTimeWords, deckLabel, deckNearWords, deckWords, thaurdirWords, handUnderLabel, handUnderWords, huntWords, iarionLabel, iarionWords, protectNearWords, protectWords, savageNearWords, savageWords, rearguardLimitWords, rearguardWords, shelterTimeNearWords, shelterTimeWords, timeNearWords, timeWords } from "../words/scenarios/angmar-table.ts";
+import { battlementsTimeNearWords, battlementsTimeWords, deckLabel, deckNearWords, deckWords, thaurdirLimitWords, thaurdirWords, handUnderLabel, handUnderWords, huntWords, iarionLabel, iarionWords, protectNearWords, protectWords, savageNearWords, savageWords, rearguardLimitWords, rearguardWords, shelterTimeNearWords, shelterTimeWords, timeNearWords, timeWords } from "../words/scenarios/angmar-table.ts";
 import { cardsOf, type TableDial } from "./dials.ts";
 import type { HandMark } from "./isengard.ts";
 
@@ -23,8 +25,34 @@ const SAVAGE_COUNTER_ATTACK = "09072";
 const FIND_SHELTER = "09032";
 const BROKEN_BATTLEMENTS = "09036";
 const THAURDIR = "09033";
+const THAURDIR_STAGE = "09074";
+const DEADMENS_DIKE_STAGE_1 = "09073";
 /** The number of resource tokens at which Hunting the Orcs flips: 3 more than the players (09071:A:1), read as the record reads it. */
 export const huntLimit = (game: ScenarioState, ctx: ReduceContext, sourceId: string): number => resolveAmount(game, HUNT_FLIP_TOKENS, frameScope(game, 0, sourceId), ctx);
+
+// The quest points of the current stage 2B of Deadmen's Dike, the progress it needs besides Thaurdir's damage; null when another stage is current.
+export function thaurdirStagePoints(game: ScenarioState, ctx: ReduceContext): number | null {
+  const id = stageOf(game, 0);
+  const stage = id ? game.cards[id] : undefined;
+  return stage?.code === THAURDIR_STAGE ? questPointsOf(game, stage, ctx.cards) : null;
+}
+
+// Where a copy of a card with several lies: the active location or the staging area, numbered when more than one copy shares the place.
+function placeOf(card: CardInstance, copies: readonly CardInstance[]): string {
+  const place = card.zone === "activeLocation" ? "active" : "staging";
+  const same = copies.filter((other) => other.zone === card.zone).sort((left, right) => left.id.localeCompare(right.id));
+  return same.length > 1 ? `${place} ${same.indexOf(card) + 1}` : place;
+}
+
+// The living seats whose deck the last time counter's discard empties: Broken Battlements makes each player discard 5, and stage 1B discards 1 more at the end of the same refresh phase (09036:A:2, 09073:B:2).
+function battlementsDoomed(game: ScenarioState): { seat: number; cards: number }[] {
+  const stage = stageOf(game, 0);
+  const discard = 5 + (stage && game.cards[stage]?.code === DEADMENS_DIKE_STAGE_1 ? 1 : 0);
+  return livingSeats(game).flatMap((seat) => {
+    const cards = game.seats[seat]?.deck.length ?? 0;
+    return cards <= discard ? [{ seat, cards }] : [];
+  });
+}
 
 export function angmarDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code: string) => string): readonly TableDial[] {
   if (game.sideQuests !== true) return [];
@@ -46,20 +74,22 @@ export function angmarDials(game: ScenarioState, ctx: ReduceContext, nameOf: (co
       note: protectWords(card.damage, limit),
     });
   }
-  // Thaurdir (stage 2B of Deadmen's Dike): the damage on him against his hit points, the players' way out (the stage cannot be defeated while he has any left, 09074:B:2), so a goal dial that fills in the accent and never warms. He cannot be destroyed, so it can pass its limit.
+  // Thaurdir (stage 2B of Deadmen's Dike): the damage on him against his hit points, one of the two things that win stage 2 (the stage cannot be defeated while he has any left, 09074:B:2, and it needs its own quest points in progress), so a goal dial that fills in the accent and never warms. He cannot be
+  // destroyed, so it can pass its limit.
   for (const card of cardsOf(game, THAURDIR)) {
-    const limit = printedOf(ctx.cards, card.code).health ?? 0;
+    const limit = hitPointsOf(game, card, ctx);
     if (limit <= 0) continue;
+    const points = thaurdirStagePoints(game, ctx);
     dials.push({
       id: "thaurdir",
       testID: "angmar-thaurdir",
       label: "Thaurdir",
-      name: `Damage on ${nameOf(card.code)}, stage 2 can be won at ${limit}:`,
+      name: `Damage on ${nameOf(card.code)}, stage 2 needs ${points == null ? "" : `its ${points} progress and `}${limit} damage on him:`,
       value: card.damage,
       limit,
       goal: true,
-      limitWords: `${limit} opens the stage`,
-      note: thaurdirWords(card.damage, limit),
+      limitWords: thaurdirLimitWords(limit, points),
+      note: thaurdirWords(card.damage, limit, points),
     });
   }
   // Hunting the Orcs: its tokens against the number at which it flips (09071:A:1), the players' way out of stage 1, so a goal dial that fills and never warms. Savage Counter-attack: its tokens, a countdown to the loss at 0 (09072:A:3), warming as it falls to 2 and critical at 1.
@@ -88,7 +118,8 @@ export function angmarDials(game: ScenarioState, ctx: ReduceContext, nameOf: (co
       note: savageWords(card.resources),
     });
   }
-  // Rescue Iârion: the time counters left, a countdown as Mount Doom's Doom is (no ring to fill): it warns at 2 left and is critical at 1, the last discards what it holds (09024:A:3). Find Shelter's is the same dial worded for its own last counter, never critical.
+  // Rescue Iârion: the time counters left, a countdown as Mount Doom's Doom is (no ring to fill): it warns at 2 left and is critical at 1, the last discards what it holds (09024:A:3). Find Shelter's is the same dial worded for its own last counter, never critical. Broken Battlements has three copies, so
+  // each dial is its card's (id and test id) and says where its copy lies.
   for (const card of Object.values(game.cards)) {
     const total = inPlay(card.zone) ? timeOf(ctx, card.code) : null;
     if (total == null) continue;
@@ -96,16 +127,19 @@ export function angmarDials(game: ScenarioState, ctx: ReduceContext, nameOf: (co
     const heldName = held ? nameOf(game.cards[held]?.code ?? "") : null;
     // Find Shelter's last counter costs damage and returns 4 counters (09032:A:2), not the game: its dial warns near and never critical.
     const shelter = card.code === FIND_SHELTER;
-    // Broken Battlements' last counter makes each player discard 5 cards and place 1 counter (09036:A:2): not a loss either.
+    // Broken Battlements' last counter makes each player discard 5 cards and place 1 counter (09036:A:2): a loss only for a seat whose deck it empties.
     const battlements = card.code === BROKEN_BATTLEMENTS;
-    const costly = shelter || battlements;
+    const doomed = battlements && card.resources <= 1 ? battlementsDoomed(game) : [];
+    const level = card.resources <= 1 && (!(shelter || battlements) || doomed.length > 0) ? ("critical" as const) : ("near" as const);
+    const copies = Object.values(game.cards).filter((other) => other.code === card.code && inPlay(other.zone));
+    const where = copies.length > 1 ? placeOf(card, copies) : null;
     dials.push({
-      id: "time",
-      testID: "angmar-time",
-      label: "Time",
-      name: `Time counters left on ${nameOf(card.code)}:`,
+      id: `time:${card.id}`,
+      testID: `angmar-time:${card.id}`,
+      label: where ? `Time · ${where}` : "Time",
+      name: `Time counters left on ${nameOf(card.code)}${where ? ` (${where})` : ""}:`,
       value: card.resources,
-      ...(card.resources <= 2 ? { warn: { level: card.resources <= 1 && !costly ? ("critical" as const) : ("near" as const), words: shelter ? shelterTimeNearWords(card.resources) : battlements ? battlementsTimeNearWords(card.resources) : timeNearWords(card.resources) } } : {}),
+      ...(card.resources <= 2 ? { warn: { level, words: shelter ? shelterTimeNearWords(card.resources) : battlements ? battlementsTimeNearWords(card.resources, doomed.map((seat) => ({ owner: game.seatCount > 1 ? `Player ${seat.seat + 1}` : null, cards: seat.cards }))) : timeNearWords(card.resources) } } : {}),
       note: shelter ? shelterTimeWords(card.resources) : battlements ? battlementsTimeWords(card.resources) : timeWords(card.resources, heldName),
     });
   }

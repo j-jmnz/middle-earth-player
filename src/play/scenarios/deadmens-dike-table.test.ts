@@ -24,25 +24,29 @@ type Made = ReturnType<typeof built>;
 const nameOf = (made: Made) => (code: string) => made.cards.get(code)?.name ?? code;
 const idName = (made: Made, state: Made["state"]) => (id: string) => made.cards.get(state.cards[id]?.code ?? "")?.name ?? id;
 const namesOf = (made: Made, state: Made["state"] = made.state): SheetNames => ({ card: (id) => made.cards.get(state.cards[id]?.code ?? "")?.name ?? id, line: () => null });
-const dial = (made: Made, id: string, state = made.state) => angmarDials(state, made.ctx, nameOf(made)).find((one) => one.id === id);
+// A time dial is its card's (`time:<card id>`), so a dial is found by the start of its id.
+const dials = (made: Made, state = made.state) => angmarDials(state, made.ctx, nameOf(made));
+const dial = (made: Made, id: string, state = made.state) => dials(made, state).find((one) => one.id === id || one.id.startsWith(`${id}:`));
 
 describe("Thaurdir's dial", () => {
   it("09074:B:2 reads his damage against his 9 hit points as a goal dial, the players' way out of stage 2: it never warms or warns, and is gone while he is set aside", () => {
     const made = built({ staging: [{ code: THAURDIR, damage: 4 }] });
-    expect(dial(made, "thaurdir")).toMatchObject({ testID: "angmar-thaurdir", label: "Thaurdir", value: 4, limit: 9, goal: true, limitWords: "9 opens the stage" });
+    expect(dial(made, "thaurdir")).toMatchObject({ testID: "angmar-thaurdir", label: "Thaurdir", value: 4, limit: 9, goal: true, limitWords: "9 damage and 13 progress win the stage", name: "Damage on Thaurdir, stage 2 needs its 13 progress and 9 damage on him:" });
     for (const damage of [7, 8, 9, 12]) {
       const near = dial(built({ staging: [{ code: THAURDIR, damage }] }), "thaurdir");
       expect(near?.warms).toBeUndefined();
       expect(near?.warn).toBeUndefined();
     }
-    expect(dial(made, "thaurdir")?.note).toBe("4 of 9 damage. He cannot be destroyed, and stage 2 cannot be won while he has hit points left.");
+    expect(dial(made, "thaurdir")?.note).toBe("4 of 9 damage. He cannot be destroyed, and each Sorcery treachery revealed heals 3 damage from him. Stage 2 needs its 13 progress and 9 damage on him.");
+    // At his hit points the damage is no longer what holds the stage: the progress is.
+    expect(dial(built({ staging: [{ code: THAURDIR, damage: 9 }] }), "thaurdir")?.note).toBe("He has no hit points left: 13 progress wins. He cannot be destroyed, and each Sorcery treachery revealed heals 3 damage from him.");
     expect(dial(built({ setAside: [THAURDIR] }), "thaurdir")).toBeUndefined();
     expect(scenarioDials(made.state, made.ctx, nameOf(made)).map((one) => one.testID)).toContain("angmar-thaurdir");
   });
 
   it("09074:B:2 says his damage, his hit points and the burden he carries in his preview", () => {
     const made = built({ staging: [{ code: THAURDIR, damage: 3 }], attached: [{ code: "10169", to: THAURDIR }] });
-    expect(angmarDetail(made.state, made.ctx, idOf(made.state, THAURDIR), idName(made, made.state))).toBe("3 of 9 damage on him. Indestructible: the damage stays, and stage 2 can be won once it reaches 9. He carries Thaurdir's Majesty.");
+    expect(angmarDetail(made.state, made.ctx, idOf(made.state, THAURDIR), idName(made, made.state))).toBe("3 of 9 damage on him. Indestructible, but he heals 3 on each Sorcery treachery revealed. Stage 2 needs its 13 progress and 9 damage on him. He carries Thaurdir's Majesty.");
   });
 });
 
@@ -51,20 +55,20 @@ describe("each seat's deck against the elimination at 0", () => {
 
   it("09073:B:3 marks each living seat with its deck count, solo and two-handed, and warms it near empty: near at 5, critical at 2", () => {
     const solo = built({ stage: "09073", deckOf: Array(12).fill("filler") });
-    expect(marks(solo)).toMatchObject([{ seat: 0, label: "Deck 12", note: "12 cards left in this player's deck. A player with no cards in his deck is eliminated." }]);
+    expect(marks(solo)).toMatchObject([{ seat: 0, label: "Deck 12", note: "12 cards left in this player's deck. A player with no cards in his deck is eliminated. If you are the last player, the game is lost." }]);
     expect(marks(solo)[0]?.warn).toBeUndefined();
     const near = built({ stage: "09073", seats: 2, deckOf: Array(5).fill("filler") });
-    expect(marks(near).map((mark) => [mark.label, mark.warn?.level, mark.warn?.words])).toEqual([["P1 · Deck 5", "near", "5 cards left. At 0 this player is eliminated."], ["P2 · Deck 5", "near", "5 cards left. At 0 this player is eliminated."]]);
+    expect(marks(near).map((mark) => [mark.label, mark.warn?.level, mark.warn?.words])).toEqual([["P1 · Deck \u20075", "near", "5 cards left. At 0 this player is eliminated."], ["P2 · Deck \u20075", "near", "5 cards left. At 0 this player is eliminated."]]);
     const low = built({ stage: "09074", deckOf: Array(2).fill("filler") });
     expect(marks(low)[0]?.warn).toMatchObject({ level: "critical", words: "2 cards left. At 0 this player is eliminated." });
-    expect(marks(built({ stage: "09074", deckOf: ["filler"] }))[0]?.warn?.words).toBe("One more card and this player is eliminated.");
+    expect(marks(built({ stage: "09074", deckOf: ["filler"] }))[0]?.warn?.words).toBe("One more card and this player is eliminated. If you are the last player, the game is lost.");
   });
 
   it("09074:B:2 joins the seat's other marks: the first player's deck count and Iârion", () => {
     const made = built({ stage: "09074", play: ["09016"], deckOf: Array(9).fill("filler") });
     const merged = seatMarks(made.state, made.ctx);
     expect(merged).toHaveLength(1);
-    expect(merged[0]?.label).toBe("Deck 9 · Iârion");
+    expect(merged[0]?.label).toBe("Deck \u20079 · Iârion");
   });
 
   it("09073:B:3 shows no deck mark in a scenario that does not eliminate a player with no cards in his deck, nor on a game that holds no such stage", () => {
@@ -76,13 +80,15 @@ describe("each seat's deck against the elimination at 0", () => {
 describe("Fornost Square, Broken Battlements and The Power of Angmar", () => {
   it("09038:A:1 says the tokens and the Threat they add in its preview", () => {
     const made = built({ staging: [{ code: SQUARE, resources: 2 }] });
-    expect(angmarDetail(made.state, made.ctx, idOf(made.state, SQUARE), idName(made, made.state))).toBe("2 resource tokens on it: +2 Threat. The first player discarding cards from the top of his deck places 1, once for each discard.");
+    expect(angmarDetail(made.state, made.ctx, idOf(made.state, SQUARE), idName(made, made.state))).toBe("2 resource tokens on it: +2 Threat. Each time the first player discards cards from the top of their deck, however many, it places 1.");
+    const two = built({ seats: 2, firstPlayer: 1, staging: [{ code: SQUARE, resources: 2 }] });
+    expect(angmarDetail(two.state, two.ctx, idOf(two.state, SQUARE), idName(two, two.state))).toContain("Each time the first player (Player 2) discards cards from the top of their deck, however many, it places 1.");
   });
 
   it("09036:A:2 words Broken Battlements' last counter as 5 cards discarded and 1 counter back, warns near and never critical, and Rescue Iârion keeps its loss words", () => {
     const made = built({ staging: [{ code: BATTLEMENTS, resources: 1 }] });
     const time = dial(made, "time");
-    expect(time).toMatchObject({ testID: "angmar-time", value: 1 });
+    expect(time).toMatchObject({ testID: expect.stringMatching(/^angmar-time:/), value: 1 });
     expect(time?.note).toContain("each player discards the top 5 cards of their deck and places 1 time counter here.");
     expect(time?.note).not.toContain("lose");
     expect(time?.warn).toMatchObject({ level: "near", words: "The next refresh phase takes the last time counter: each player discards 5 cards." });
@@ -91,9 +97,32 @@ describe("Fornost Square, Broken Battlements and The Power of Angmar", () => {
     expect(angmarDetail(made.state, made.ctx, idOf(made.state, BATTLEMENTS), idName(made, made.state))).toBe("1 time counter on it. With the last gone, each player discards the top 5 cards of their deck and places 1 time counter here.");
   });
 
+  it("09036:A:2 makes the last counter's warning critical and names the seat whose deck it empties: 5 cards, 6 on stage 1B which also discards 1 at the end of the refresh phase", () => {
+    const warn = (layout: Layout) => dial(built({ staging: [{ code: BATTLEMENTS, resources: 1 }], ...layout }), "time")?.warn;
+    expect(warn({ deckOf: Array(5).fill("filler") })).toMatchObject({ level: "critical", words: expect.stringContaining("You have 5 cards: that eliminates you, and the game is lost.") });
+    expect(warn({ deckOf: Array(6).fill("filler") })?.level).toBe("near");
+    expect(warn({ stage: "09073", deckOf: Array(6).fill("filler") })?.level).toBe("critical");
+    expect(warn({ stage: "09073", deckOf: Array(7).fill("filler") })?.level).toBe("near");
+    const two = warn({ seats: 2, deckOf: Array(4).fill("filler") });
+    expect(two?.level).toBe("critical");
+    expect(two?.words).toContain("Player 1 has 4 cards; Player 2 has 4 cards: that eliminates them. If it is the last player, the game is lost.");
+    // With two counters left the warning is still a near one, whatever the decks hold.
+    expect(dial(built({ staging: [{ code: BATTLEMENTS, resources: 2 }], deckOf: Array(3).fill("filler") }), "time")?.warn?.level).toBe("near");
+  });
+
+  it("09036:A:2 gives each of three Broken Battlements its own dial, id and words: where it lies, numbered when two share the place", () => {
+    const made = built({ staging: [{ code: BATTLEMENTS, resources: 3 }, { code: BATTLEMENTS, resources: 2 }], active: BATTLEMENTS });
+    const all = dials(made).filter((one) => one.id.startsWith("time:"));
+    expect(all).toHaveLength(3);
+    expect(new Set(all.map((one) => one.id)).size).toBe(3);
+    expect(new Set(all.map((one) => one.testID)).size).toBe(3);
+    expect(all.map((one) => one.label).sort()).toEqual(["Time · active", "Time · staging 1", "Time · staging 2"]);
+    expect(all.find((one) => one.label === "Time · active")?.name).toBe("Time counters left on Broken Battlements (active):");
+  });
+
   it("09067:A:2 says what the lock is in The Power of Angmar's preview while it is in the staging area, and nothing once it has left", () => {
     const made = built({ staging: ["09067"] });
-    expect(angmarDetail(made.state, made.ctx, idOf(made.state, "09067"), idName(made, made.state))).toContain("no player card effect can take a card out of a discard pile. Encounter card effects can.");
+    expect(angmarDetail(made.state, made.ctx, idOf(made.state, "09067"), idName(made, made.state))).toContain("no player card effect can take a card out of a player's discard pile. Encounter card effects can.");
     const gone = built({ victory: ["09067"] });
     expect(angmarDetail(gone.state, gone.ctx, idOf(gone.state, "09067"), idName(gone, gone.state))).toBeNull();
   });
@@ -163,6 +192,22 @@ describe("a pick that spans seats names the owner on each row", () => {
     expect(note(solo)).toMatch(/^Unnatural Fog: discard the top card of your deck/);
   });
 
+  it("09041:A:2 warns on Unnatural Fog's discard when the deck is at or under the questing count, and says the game is lost for the last player", () => {
+    const sheetJson = (deck: number) => {
+      const made = built({ stage: "09073", committed: ["dh1", "dh2"], deckOf: Array(deck).fill("filler") });
+      let said = "";
+      resolveRecords(made.state, made.ctx, "09041", "whenRevealed", undefined, (state) => {
+        const sheet = sheetFor(state, made.ctx, legalIntents(state, made.ctx), namesOf(made, state));
+        if (sheet && said === "") said = JSON.stringify(sheet);
+        return state.window?.kind === "choose" ? (state.window.options[0] ?? "") : "";
+      });
+      return said;
+    };
+    // Two characters quest ("2 cards"): a deck of 2 is emptied by the discard, one of 3 is not.
+    expect(sheetJson(2)).toContain("Tap again: your deck would be empty and you would be eliminated. If you are the last player, the game is lost");
+    expect(sheetJson(3)).not.toContain("Tap again");
+  });
+
   it("09074:B:1 A Fell Wraith's choice is the destroyed character's controller's own, and warns on the discard when it would empty his deck", () => {
     const sheetOf = (deck: number) => {
       const made = built({ seats: 2, engaged: [{ code: THAURDIR, seat: 1 }], deckOf: Array(deck).fill("filler") });
@@ -175,7 +220,7 @@ describe("a pick that spans seats names the owner on each row", () => {
     expect(JSON.stringify(sheet)).toContain("Player 2: A Fell Wraith: Thaurdir destroyed your character.");
     expect(JSON.stringify(sheet)).toContain("you have 5");
     const tight = JSON.stringify(sheetOf(3).sheet);
-    expect(tight).toContain("Tap again: your deck would be empty and you would be eliminated");
+    expect(tight).toContain("Tap again: your deck would be empty and you would be eliminated. If you are the last player, the game is lost");
     expect(JSON.stringify(sheetOf(5).sheet)).not.toContain("Tap again");
   });
 });

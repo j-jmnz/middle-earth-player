@@ -8,7 +8,7 @@ import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { Scope } from "../../interpret/conditions.ts";
 import { modifiedStat } from "../../core/keywords.ts";
-import { flagged, inPlay, type ScenarioState } from "../../core/state.ts";
+import { flagged, inPlay, type CardInstance, type ScenarioState } from "../../core/state.ts";
 import { committedWillpower, stagingThreat } from "../../quest/quest.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { effectData } from "../encounter/moves.ts";
@@ -76,9 +76,14 @@ export function questLeadsHolds(state: ScenarioState, condition: Condition, ctx:
   return condition.kind === "questLeads" ? committedWillpower(state, ctx.cards) > stagingThreat(state, ctx.cards) : null;
 }
 
+/** A card's hit points now: the printed number with the constant effects applied (Thaurdir's 9, a burden or boon that changes it). The one reading the stage's hold and the table's dial share. */
+export function hitPointsOf(state: ScenarioState, card: CardInstance, ctx: ReduceContext): number {
+  return modifiedStat(state, card, "hitPoints", ctx.cards);
+}
+
 /** The condition `hitPointsLeft`: the card in play with the code has damage below its hit points (09074:B:2: the stage cannot be defeated while Thaurdir has any hit points remaining). False with no such card in play. */
 export function hitPointsLeftHolds(state: ScenarioState, condition: Condition, ctx: ReduceContext): boolean | null {
   if (condition.kind !== "hitPointsLeft") return null;
   const card = Object.values(state.cards).find((other) => other.code === condition.code && inPlay(other.zone));
-  return card != null && card.damage < modifiedStat(state, card, "hitPoints", ctx.cards);
+  return card != null && card.damage < hitPointsOf(state, card, ctx);
 }

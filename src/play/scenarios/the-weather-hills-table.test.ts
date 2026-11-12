@@ -25,7 +25,8 @@ type Made = ReturnType<typeof built>;
 const nameOf = (made: Made) => (code: string) => made.cards.get(code)?.name ?? code;
 const idName = (made: Made, state: Made["state"]) => (id: string) => made.cards.get(state.cards[id]?.code ?? "")?.name ?? id;
 const namesOf = (made: Made, state: Made["state"] = made.state): SheetNames => ({ card: (id) => made.cards.get(state.cards[id]?.code ?? "")?.name ?? id, line: () => null });
-const dial = (made: Made, id: string, state = made.state) => angmarDials(state, made.ctx, nameOf(made)).find((one) => one.id === id);
+// A time dial is its card's (`time:<card id>`), so a dial is found by the start of its id.
+const dial = (made: Made, id: string, state = made.state) => angmarDials(state, made.ctx, nameOf(made)).find((one) => one.id === id || one.id.startsWith(`${id}:`));
 
 describe("Hunting the Orcs' dial", () => {
   it("09071:A:1 reads its tokens against 3 more than the players (4 solo, 5 for two) as a goal dial, the players' way out: it never warms or warns, and is gone with the card", () => {
@@ -76,7 +77,7 @@ describe("Find Shelter's time dial", () => {
   it("09032:A:2 words the last counter as 4 damage on a hero and 4 counters back, warns near and never critical, and Rescue Iârion keeps its loss words", () => {
     const made = built({ staging: [{ code: SHELTER, resources: 1 }] });
     const time = dial(made, "time");
-    expect(time).toMatchObject({ testID: "angmar-time", value: 1 });
+    expect(time).toMatchObject({ testID: expect.stringMatching(/^angmar-time:/), value: 1, label: "Time" });
     expect(time?.note).toContain("each player deals 4 damage to a hero they control, then 4 time counters return.");
     expect(time?.note).not.toContain("lose");
     expect(time?.warn).toMatchObject({ level: "near", words: "The next refresh phase takes the last time counter: each player deals 4 damage to a hero." });

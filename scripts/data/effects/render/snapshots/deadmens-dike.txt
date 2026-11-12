@@ -298,7 +298,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
 09074:A:1 (front): When Revealed: Add Thaurdir to the staging area. Then, reveal 1 encounter card per player.
   09074:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - one set-aside card with code 09033 joins the staging area (it is not revealed); it entering play is announced to the cards that hear a card added to the staging area
+    - the set-aside card with code 09033 is added to the staging area and enters play: the cards that hear it enter play or be added to the staging area hear it
     - repeat the number of players times:
       - if there is a enemy (any player controls) in the staging area only, named "Thaurdir" to choose: the acting player reveals an encounter card
 
@@ -306,7 +306,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
   09074:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
     only if the event's other card is a enemy (any player controls) named "Thaurdir"
     - the acting player chooses one of:
-      * option "discard":
+      * option "discard" (only if there is a card (you control) in the deck to choose):
         - the top 3 card(s) of the acting player's deck go to their discard pile
       * option "return" (only if not (there is a enemy (any player controls) in the staging area only, named "Thaurdir" to choose)):
         - return the event's other card to the staging area
@@ -424,4 +424,4 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
     - its host: stat defense -2, while this card is in play
     - its host: stat cannotBeHealed 1, while this card is in play
 
-(rendered pieces: 247 by template, 4 as JSON)
+(rendered pieces: 249 by template, 4 as JSON)

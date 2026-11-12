@@ -9,12 +9,13 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { printedOf } from "../../core/printed.ts";
 import { shuffleIds } from "../../core/seed.ts";
 import { inPlay, livingSeats, updateCard, type ScenarioState } from "../../core/state.ts";
-import { attachTo, moveCard, spawn } from "../../core/zones.ts";
+import { attachTo, moveCard } from "../../core/zones.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { effectData } from "../encounter/moves.ts";
 import { frameScope, refCard } from "../../interpret/amounts.ts";
 import type { Focus } from "../index.ts";
+import { freeCodes, takeOrSpawnSetAside } from "./set-aside.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
@@ -35,16 +36,13 @@ function attachBurden(state: ScenarioState, id: string, hostId: string): Scenari
 export function attachRandomBurden(state: ScenarioState, instruction: Verb<"AttachRandomBurden">, focus: Focus, ctx: ReduceContext): ScenarioState {
   const hostId = refCard(state, instruction.to ?? "subject", frameScope(state, focus.seat, focus.sourceId));
   const host = hostId ? state.cards[hostId] : undefined;
-  const aside = new Set(state.setAside);
-  const free = instruction.codes.filter((code) => ctx.cards.has(code) && Object.values(state.cards).every((card) => card.code !== code || aside.has(card.id)));
+  const free = freeCodes(state, instruction.codes, ctx);
   if (!host || !inPlay(host.zone) || free.length === 0) return state;
   const shuffled = shuffleIds(free, state.seed, state.seedCursor);
   const code = shuffled.ids[0];
   if (!code) return state;
-  const copy = state.setAside.find((id) => state.cards[id]?.code === code);
-  const from = copy ? state : spawn(state, code, { zone: "setAside" }, "up").state;
-  const id = copy ?? Object.values(from.cards).find((card) => card.code === code && from.setAside.includes(card.id))?.id;
-  return id ? attachBurden({ ...from, seedCursor: shuffled.cursor }, id, host.id) : state;
+  const taken = takeOrSpawnSetAside(state, code);
+  return attachBurden({ ...taken.state, seedCursor: shuffled.cursor }, taken.id, host.id);
 }
 
 // The heroes of the living players, in play.

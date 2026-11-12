@@ -17,7 +17,8 @@ import type { GameEvent, ResponseOffer, ScenarioState } from "../core/state.ts";
 import { inPlay, livingSeats, perilLock } from "../core/state.ts";
 import { payUsage, controllerSeat, offerable, usable, usageReason } from "../player/usage.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
-import { announceAbility } from "../families/deck/pressure.ts";
+import { announceAbility, announcePlayerAbility } from "../families/deck/pressure.ts";
+import { isPlayerCardEffect } from "../core/keywords.ts";
 
 type TriggerIntent = Extract<PlayerIntent, { type: "Trigger" }>;
 
@@ -181,7 +182,8 @@ export function applyResponse(state: ScenarioState, intent: TriggerIntent, ctx: 
     },
     steps,
   );
-  return announceAbility(framed, intent.cardId, seat, ctx, true);
+  // Only a player card's Response is "a player triggers a Response effect" (09040:A:1): an encounter card's (Iârion's) is not.
+  return isPlayerCardEffect(framed, ctx.cards, intent.cardId) ? announcePlayerAbility(framed, intent.cardId, seat, ctx) : announceAbility(framed, intent.cardId, seat, ctx);
 }
 
 // Pass: the seat gives up every Response it was offered for this event.

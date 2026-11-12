@@ -10,16 +10,21 @@ import type { ScenarioState } from "../../core/state.ts";
 import { eliminateSeat } from "../../core/eliminate.ts";
 import { flagged } from "../../core/state.ts";
 
-/**
- * An Action or a Response a card's controller initiated, or a Forced effect of the card that triggered: the card hears it triggered, once (`abilityTriggered`). An Action or a Response a player triggered (`byPlayer`: the Action or Response of a card in play, an event
- * played for its Action or Response) is also announced as `playerAbilityTriggered` to the cards that hear "a player triggers an Action or Response effect" (09040:A:1; rr.triggered-ability). Only a game with a record on the trigger announces it.
- */
-export function announceAbility(state: ScenarioState, cardId: string, seat: number, ctx: ReduceContext, byPlayer = false): ScenarioState {
+/** A Forced effect of the card that triggered, or any ability the card hears about itself: announced once as `abilityTriggered` (Saruman's Voice). Only a game with a record on the trigger announces it. */
+export function announceAbility(state: ScenarioState, cardId: string, seat: number, ctx: ReduceContext): ScenarioState {
   const card = state.cards[cardId];
-  let next = state;
-  if (gameReads(state, ctx, '"trigger":"abilityTriggered"')) next = queueEvent(next, { trigger: "abilityTriggered", seat: card?.controller ?? seat, cardId });
-  if (byPlayer && gameReads(state, ctx, '"trigger":"playerAbilityTriggered"')) next = queueEvent(next, { trigger: "playerAbilityTriggered", seat: card?.controller ?? seat, cardId });
-  return next;
+  if (!gameReads(state, ctx, '"trigger":"abilityTriggered"')) return state;
+  return queueEvent(state, { trigger: "abilityTriggered", seat: card?.controller ?? seat, cardId });
+}
+
+/**
+ * An Action or a Response a player triggered from a player card (the Action or Response of a card in play, an event played for its Action or Response): `abilityTriggered` as above, and `playerAbilityTriggered` to the cards that hear "a player triggers an
+ * Action or Response effect" (09040:A:1; rr.triggered-ability). An encounter card's Response (an ally with an encounter back, Iârion's) is not a player card's: it is announced as `announceAbility` only.
+ */
+export function announcePlayerAbility(state: ScenarioState, cardId: string, seat: number, ctx: ReduceContext): ScenarioState {
+  const next = announceAbility(state, cardId, seat, ctx);
+  if (!gameReads(state, ctx, '"trigger":"playerAbilityTriggered"')) return next;
+  return queueEvent(next, { trigger: "playerAbilityTriggered", seat: state.cards[cardId]?.controller ?? seat, cardId });
 }
 
 /** An event played for its Action (09040:A:1): announced as a triggered Action to the cards that hear a player trigger one; the event's own `abilityTriggered` stays unannounced, so The Road to Isengard's Saruman's Voice hears what it always did. */

@@ -234,11 +234,14 @@ export function payUsage(
       case "raiseThreat":
         next = raiseThreat(next, seat, cost.amount, steps, currentCause(steps, UNATTRIBUTED));
         break;
-      case "discardDeckTop":
+      case "discardDeckTop": {
         // Each card is announced ("After ~ is discarded from your deck", families/deck/moves.ts).
-        for (const id of (next.seats[seat]?.deck ?? []).slice(0, cost.amount)) next = queueEvent(moveCard(next, id, { zone: "discard", seat }), { trigger: "discardedFromDeck", seat, cardId: id });
-        next = announceTopDiscard(next, seat, Math.min(cost.amount, state.seats[seat]?.deck.length ?? 0), ctx);
+        // The deck is the one being paid from (`next`), read before the cards move.
+        const top = (next.seats[seat]?.deck ?? []).slice(0, cost.amount);
+        for (const id of top) next = queueEvent(moveCard(next, id, { zone: "discard", seat }), { trigger: "discardedFromDeck", seat, cardId: id });
+        next = announceTopDiscard(next, seat, top.length, ctx);
         break;
+      }
       case "playEvent":
         // A Response event played from the top of the deck (Gandalf, 142002) spends that permission and is held like a card
         // in the hand until its effect is done.

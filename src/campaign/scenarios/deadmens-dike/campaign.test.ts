@@ -45,7 +45,7 @@ describe("Deadmen's Dike in the angmar-awakened campaign", () => {
     expect(dike.campaignCard).toBe("10166");
   });
 
-  it("10160:A:3 deals the five boons set aside, so Mysterious Omens left in the pool (The Weather Hills lost or Omens not defeated) has them to offer here, and the boon the pool holds on a hero is not offered twice", () => {
+  it("10160:A:3 loads the five boons and deals no copy of them, so Mysterious Omens left in the pool (The Weather Hills lost or Omens not defeated) takes a copy from the supply for the one chosen, and the boon the pool holds on a hero is not offered twice", () => {
     expect(dike.campaignPlaced).toEqual(expect.arrayContaining(BOONS));
     const log = afterHills(2);
     const hero = dikePlan(2, log).seats[0]?.heroes[0] ?? "";

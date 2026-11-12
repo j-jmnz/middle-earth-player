@@ -1,5 +1,6 @@
 import type { Condition, PickSpec } from "../../../catalog/boundary.ts";
 import type { Ask } from "../asks.ts";
+import { POOL_BOON_ASKS } from "../pool-boon-asks.ts";
 
 // The choice words of The Weather Hills (angmar-awakened part 2), one entry for each Pick and Choose of its records: `<record id> @<instruction path> <verb | option id>` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
 // `pnpm test scenario the-weather-hills --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=the-weather-hills` prints each sentence.
@@ -59,8 +60,6 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   // 10160:A:3 (Forced after Mysterious Omens is defeated): each player in turn, the first player first, may take one boon not yet taken, then picks the hero that carries it.
   "10160:forced:2 @1 ChooseBoon": { owned: true, note: "Mysterious Omens: choose one of the boons not yet taken to attach to a hero you control, or take none. A boon stays with its hero through the campaign.", verb: "Take", labels: { none: "Take no boon" } },
 
-  // 10164:A:4 (Action, Ruthless): move any amount of damage from the attached hero to an enemy engaged with you.
-  "10164:action:1 @0 Pick": { owned: true, note: "Ruthless: choose the hero it is attached to, to move damage from.", verb: "Move" },
-  "10164:action:1 @1 ChooseX": { owned: true, note: "Ruthless: choose how much damage to move, from 1 up to what the hero holds." },
-  "10164:action:1 @2 Pick": { owned: true, note: "Ruthless: choose an enemy engaged with you to take the damage.", verb: "Move" },
+  // Ruthless (10164:A:4), worded once for every scenario that can deal it.
+  ...POOL_BOON_ASKS,
 };

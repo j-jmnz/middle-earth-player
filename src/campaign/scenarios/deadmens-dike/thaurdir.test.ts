@@ -57,6 +57,16 @@ describe("09074:B:1 hears a character that Thaurdir's attack destroyed, and only
     expect(heard.activeSeat).toBe(1);
   });
 
+  it("09074:B:1 does not offer the 3-card discard with an empty deck (Reading 23): the controller's only option is to return Thaurdir", () => {
+    const t = at(stage({ seats: 2, phase: "Combat", engaged: [{ code: THAURDIR, seat: 1 }], firstPlayer: 0 }));
+    const steps: never[] = [];
+    const base = { ...t.state, window: null, mode: "stopped" as const, seats: t.state.seats.map((seat, index) => (index === 1 ? { ...seat, deck: [] } : seat)) as unknown as ScenarioState["seats"] };
+    const heard = settle(fireForced(base, { trigger: "characterDestroyedByAttack", seat: 1, subject: t.seat1Hero ?? "", other: idOf(base, THAURDIR) }, t.ctx, steps), t.ctx, steps);
+    const options = heard.window?.kind === "choose" ? heard.window.options : [];
+    expect(options).not.toContain("discard");
+    expect(heard.cards[idOf(heard, THAURDIR)]?.zone === "staging" || options.includes("return")).toBe(true);
+  });
+
   it("09074:B:1 returns Thaurdir to the staging area when the controller chooses that, and offers nothing to return when he is staged", () => {
     const run = fightEnemy((made: Layout) => at(made), "f0", THAURDIR, stage(), { undefended: true, pick: () => "return" });
     expect(run.run.state.cards[idOf(run.run.state, THAURDIR)]?.zone).toBe("staging");
