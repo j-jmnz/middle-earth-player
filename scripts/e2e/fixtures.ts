@@ -87,6 +87,7 @@ import { ungolFixtures } from "./the-tower-of-cirith-ungol.ts";
 import { opensFixtures } from "./the-black-gate-opens.ts";
 import { doomFixtures } from "./mount-doom.ts";
 import { chetwoodFixtures } from "./intruders-in-chetwood.ts";
+import { hillsFixtures } from "./the-weather-hills.ts";
 import { FIXTURE_REGISTRY, fixtureFile, type FixtureName, type FixtureScenarioId } from "../../src/campaign/fixtures/registry.ts";
 import { createLog, runScript } from "../log.ts";
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
@@ -418,6 +419,7 @@ const WRITERS: Record<Chained, (written: Written) => Promise<object> | object> =
   "the-black-gate-opens": () => opensFixtures(),
   "mount-doom": () => doomFixtures(),
   "intruders-in-chetwood": () => chetwoodFixtures(),
+  "the-weather-hills": () => hillsFixtures(),
 };
 
 // The won game is open: no legal win of the two starter decks has been found on this engine (docs/phases/STATUS.md), so
