@@ -85,9 +85,9 @@ describe("Captured cards", () => {
   });
 
   it("10043:A:2 and 10051:A:2 capture the ally an attack would damage instead of dealing the damage, a hero is damaged as usual", () => {
-    const t = table({ play: ["ally"], engaged: ["f3"] });
+    const t = table({ play: ["ally"], engaged: ["f3", "10043"] });
     const ally = idOf(t.state, "ally");
-    const torturer = spawn(t.state, "10043", { zone: "engaged", seat: 0 }).state;
+    const torturer = t.state;
     const enemy = idOf(torturer, "10043");
     const steps: EngineStep[] = [];
     const taken = combatDamage(torturer, enemy, ally, 3, t.ctx, steps);

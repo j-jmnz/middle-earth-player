@@ -54,6 +54,7 @@ type Hooked = {
   readonly playReason: readonly RulesFamily[];
   readonly revealed: readonly RulesFamily[];
   readonly pick: readonly RulesFamily[];
+  readonly pool: readonly RulesFamily[];
   readonly condition: readonly RulesFamily[];
   readonly amount: readonly RulesFamily[];
   readonly attached: readonly RulesFamily[];
@@ -76,6 +77,7 @@ function hooked(families: readonly RulesFamily[]): Hooked {
       playReason: families.filter((family) => family.playReason != null),
       revealed: families.filter((family) => family.revealed != null),
       pick: families.filter((family) => family.pick != null),
+      pool: families.filter((family) => family.pool != null),
       condition: families.filter((family) => family.condition != null),
       amount: families.filter((family) => family.amount != null),
       attached: families.filter((family) => family.attached != null),
@@ -195,6 +197,15 @@ export function familyOptionalEngageBarred(state: ScenarioState, enemyId: string
 export function familyPickMatches(state: ScenarioState, id: string, spec: PickSpec, at: PickContext, ctx: ReduceContext, families: readonly RulesFamily[] = active()): boolean {
   for (const family of hooked(families).pick) if (family.pick?.(state, id, spec, at, ctx) === false) return false;
   return true;
+}
+
+/** The first family's pool for a pick, or null when no family owns the pick. */
+export function familyPool(state: ScenarioState, spec: PickSpec, asking: number, sourceId: string | null, ctx: ReduceContext, families: readonly RulesFamily[] = active()): string[] | null {
+  for (const family of hooked(families).pool) {
+    const found = family.pool?.(state, spec, asking, sourceId, ctx);
+    if (found != null) return found;
+  }
+  return null;
 }
 
 /** The first family's answer to a condition, or null when none owns it. */

@@ -14,7 +14,6 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { frameScope, refCard } from "../../interpret/amounts.ts";
 import { lastPicked, pickedList, seatOf } from "../../interpret/player-verbs.ts";
 import { attachmentHostIds } from "../../player/attach.ts";
-import { effectsOf } from "../../windows/listen.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { effectData } from "../encounter/moves.ts";
@@ -48,22 +47,6 @@ export function captureAttachments(state: ScenarioState): ScenarioState {
 // CaptureInsteadOfDamage run as a Shadow effect: the attack in progress captures the ally it would damage.
 export function capturingAttack(state: ScenarioState): ScenarioState {
   return state.pendingAttack ? { ...state, pendingAttack: { ...state.pendingAttack, captures: true } } : state;
-}
-
-// An enemy marked with CaptureInsteadOfDamage in its own record (Cruel Torturer) captures the allies its attacks would damage.
-function markedToCapture(state: ScenarioState, enemyId: string, ctx: ReduceContext): boolean {
-  const code = state.cards[enemyId]?.code;
-  return code != null && effectsOf(ctx, code).some((effect) => effect.instructions.some((instruction) => instruction.verb === "CaptureInsteadOfDamage"));
-}
-
-// The damage step of an attack (defense/excess.ts combatDamage): an ally the attack would damage is captured underneath the attacking enemy instead, whatever the damage, a lethal blow included; nothing is dealt, so nothing is destroyed (rr.replacement-effects). Null when
-// it does not apply: no damage, a hero, or an attack that does not capture.
-export function captureInstead(state: ScenarioState, enemyId: string, assigned: string, raw: number, ctx: ReduceContext): ScenarioState | null {
-  if (!state.capture || raw <= 0) return null;
-  const ally = state.cards[assigned];
-  if (!ally || ally.zone !== "play" || printedOf(ctx.cards, ally.code).type !== "ally") return null;
-  if (state.pendingAttack?.captures !== true && !markedToCapture(state, enemyId, ctx)) return null;
-  return captureCard(state, assigned, enemyId);
 }
 
 // EngageSelfWithPicked: the source enemy engages the picked player; one already engaged with that player stays.

@@ -6,7 +6,7 @@
 // your threat." The damage still goes on the character; the excess is read before it lands, and a card that cancels the damage
 // afterwards does not call the threat back (it was assigned as it was dealt). Great Cave-troll (`excessToQuestProgress`) takes that many progress
 // tokens off the current quest instead.
-import { captureInstead } from "../captured/play.ts";
+import { captureInstead } from "../captured/instead.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { modifiedStat, placeDamage, raiseThreat } from "../../core/keywords.ts";

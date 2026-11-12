@@ -437,7 +437,7 @@ export type ScenarioState = {
   stageLeft?: { to: string; from: string; bypassed?: true };
   // Escape from Mount Gram's captured cards (families/captured/): the Capture X each card prints by code, the codes that are "in each player's staging area" and the cards of those codes now in play (`here`), the rescue the running
   // effect made (the cards it returned to hands), and the permanent boons a hero held when it was put into the captured deck, set aside until the hero returns (boon id, hero id). Absent in every other game.
-  capture?: { x: Readonly<Record<string, number>>; everyArea: readonly string[]; here: readonly string[]; none?: boolean };
+  capture?: { x: Readonly<Record<string, number>>; everyArea: readonly string[]; here: readonly string[]; instead: readonly string[]; refresh?: true; none?: boolean };
   rescued?: readonly string[];
   heroBoons?: readonly (readonly [string, string])[];
   undo: UndoLog;

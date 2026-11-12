@@ -55,6 +55,9 @@ export type RevealHook = (state: ScenarioState, cardId: string, ctx: ReduceConte
 /** A filter predicate of a family: false takes the card out of the pick, true leaves the other predicates to decide. Runs after the core's. */
 export type PickHook = (state: ScenarioState, id: string, spec: PickSpec, at: PickContext, ctx: ReduceContext) => boolean;
 
+/** The cards a pick starts from, for a pick whose filter names a pool of the family's own (the cards captured underneath a card): the card ids, or null when the pick is not the family's. */
+export type PoolHook = (state: ScenarioState, spec: PickSpec, asking: number, sourceId: string | null, ctx: ReduceContext) => string[] | null;
+
 /** A condition kind of a family: true or false, or null when the condition is not the family's. Asked before the core's switch. */
 export type ConditionHook = (state: ScenarioState, condition: Condition, scope: Scope, ctx: ReduceContext) => boolean | null;
 
@@ -93,6 +96,7 @@ export type RulesFamily = {
   readonly settle?: SettleHooks;
   readonly travel?: TravelHooks;
   readonly pick?: PickHook;
+  readonly pool?: PoolHook;
   readonly condition?: ConditionHook;
   readonly amount?: AmountHook;
   readonly attached?: AttachedHook;

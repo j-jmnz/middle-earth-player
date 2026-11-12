@@ -14,6 +14,8 @@ import { captureFromDeck } from "./pile.ts";
 export function markCapture(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   const x: Record<string, number> = {};
   const everyArea: string[] = [];
+  const instead: string[] = [];
+  let refresh = false;
   // The cards dealt, and the cards the Setup names to put into play (the campaign card's Loot the Dungeons).
   const codes = new Set([...Object.values(state.cards).map((card) => card.code), ...state.setup.flatMap((instruction) => ("code" in instruction && typeof instruction.code === "string" ? [instruction.code] : []))]);
   for (const effect of ctx.effects) {
@@ -21,9 +23,13 @@ export function markCapture(state: ScenarioState, ctx: ReduceContext): ScenarioS
     for (const instruction of effect.instructions) {
       if (instruction.verb === "Capture") x[effect.cardCode] = instruction.amount;
       if (instruction.verb === "InEveryArea") everyArea.push(effect.cardCode);
+      // An enemy whose own record captures the allies its attacks would damage (Cruel Torturer; play.ts captureInstead).
+      if (instruction.verb === "CaptureInsteadOfDamage" && effect.timing === "forced") instead.push(effect.cardCode);
+      // The campaign card raises each player's threat at the end of the refresh phase by its own count instead of 1 (10174:B:1; engine/refresh.ts).
+      if (instruction.verb === "RaiseThreat" && effect.trigger === "endOfPhase" && typeof instruction.amount === "object" && instruction.amount.captured === "questsAndSides") refresh = true;
     }
   }
-  return Object.keys(x).length === 0 && everyArea.length === 0 ? state : { ...state, capture: { x, everyArea, here: [] } };
+  return Object.keys(x).length === 0 && everyArea.length === 0 && instead.length === 0 && !refresh ? state : { ...state, capture: { x, everyArea, here: [], instead, ...(refresh ? { refresh: true as const } : {}) } };
 }
 
 // The seats that capture for a card entering at `dest`: the seat an enemy is engaged with, the players sharing the staging area it goes to, the seat whose stage it becomes; every living player for the shared staging area.

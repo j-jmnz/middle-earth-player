@@ -1,7 +1,6 @@
 // Rules: rr.in-play-and-out-of-play, mec109.immune-to-player-card-effects, mec109.permanent (data/rules/entries.json).
 import { discardLockedFor } from "../families/angmar/lock.ts";
 import { captiveIds } from "../families/captives/values.ts";
-import { capturedPool } from "../families/captured/values.ts";
 import type { Instruction, PickSpec } from "../../catalog/boundary.ts";
 
 import { attachmentHostIds } from "../player/attach.ts";
@@ -11,7 +10,7 @@ import { attachmentsPickMatches } from "../families/attachments/pick.ts";
 import { costsPickMatches, highestCost } from "../families/costs/pick.ts";
 import { attackPickMatches } from "../families/attack/pick.ts";
 import { miscPickMatches } from "../families/misc/pick.ts";
-import { familyPickMatches } from "./family-hooks.ts";
+import { familyPickMatches, familyPool } from "./family-hooks.ts";
 import { immuneToSource } from "../families/misc/guards.ts";
 import { countsExtra } from "../families/misc/traits.ts";
 import { seatThreat } from "../families/play/hooks.ts";
@@ -91,7 +90,7 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
       .map((card) => card.id);
   }
   // The captured cards a pick starts from (families/captured/values.ts).
-  const captured = capturedPool(state, spec, asking, sourceId, ctx);
+  const captured = spec.captured ? familyPool(state, spec, asking, sourceId, ctx) : null;
   if (captured) return captured;
   // The Uruk-hai's Captives, alone or among the heroes (families/captives).
   if (spec.captive === "only" || spec.captive === "free") return captiveIds(state, spec.captive, ctx.cards);

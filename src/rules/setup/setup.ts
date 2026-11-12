@@ -132,8 +132,8 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
   if (input.doubleSided && input.doubleSided.length > 0) state = dealDoubleSided(state, input.doubleSided, ctx);
   // A game that deals encounter side quests in its encounter deck reads the side quest rules (families/wilderland/night-quest.ts).
   state = markSideQuests(state, ctx.cards);
-  state = markCapture(state, ctx);
   state = placeCampaignCard(state, input.definition.campaignCard, ctx);
+  state = markCapture(state, ctx);
   // The Nightmare setup card, side A faceup next to the quest deck: its lines stay active all game (docs/brief.md, Nightmare).
   if (input.definition.nightmareCard) state = spawn(state, input.definition.nightmareCard, { zone: "nightmare" }, "A").state;
   const chosen = input.seats.slice(0, input.seatCount).flatMap((seat, at) => (seat.chosen ?? []).map((code) => ({ code, seat: at })));

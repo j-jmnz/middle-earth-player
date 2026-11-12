@@ -1,0 +1,362 @@
+Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; quest: 10039 Gornákh's Dungeons; quest: 10040 Flight from Mount Gram; setAside: 10041 Jailor Gornákh; setAside: 10042 Southern Gate; encounterDeck2: 09043 Angmar Orc; encounterDeck2: 09044 Angmar Marauder; encounterDeck2: 09045 Angmar Captain; encounterDeck2: 09046 Orc Ambush)
+
+## 10038 Unexpected Rescue
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+10038:A:1 (front): Setup: Each player shuffles his starting hand into his deck. Each player prepares a separate captured deck (see insert). Each player adds 2 resources to his starting hero and sets his threat to that hero's threat cost. Set Southern Gate, Jailor Gornákh and the Angmar Orcs encounter set aside, out of play. Shuffle the encounter deck. Each player draws a new starting hand of 3 cards.
+  10038:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - [json ShuffleHandIntoDeck {"verb":"ShuffleHandIntoDeck"}]
+      - choose hero (you control)
+      - [json PrepareCapturedDeck {"verb":"PrepareCapturedDeck"}]
+    - shuffle the encounter deck
+    - for each player, first player first:
+      - the acting player draws 3 card(s)
+
+10038:B:1 (back): When Revealed: Each player creates his own staging area and advances to a different stage 2A.
+  10038:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - [json StartSeparateStage {"verb":"StartSeparateStage","code":"10039","reveal":true}]
+
+## 10039 Gornákh's Dungeons
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+10039:A:1 (front): Capture 7.
+  10039:constant:1: Constant
+    - [json Capture {"verb":"Capture","amount":7}]
+
+10039:A:2 (front): When Revealed: Search the encounter deck for 1 copy of Prison Cell, reveal it, and add it to your staging area. Then, capture an additional 2 cards from the top of your captured deck underneath that copy of Prison Cell.
+  10039:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player searches the encounter deck and discard pile for a card, reveals it and adds it to the staging area [also {"code":"10046"}]
+    - [json CaptureFromDeck {"verb":"CaptureFromDeck","amount":2,"end":"top","under":{"code":"10046"}}]
+
+10039:B:1 (back): Any time players would place progress tokens on this quest, rescue an equal number of captured cards at random from underneath it instead. (Progress is placed on the active location before triggering this effect.)
+  10039:constant:2: Constant
+    - this card: stat progressRescues 1, while this card is in play
+
+10039:B:2 (back): Forced: If there are no captured cards underneath Gornákh's Dungeons, join another player at the beginning of the travel phase. If you cannot join another player, all players advance to stage 3A together.
+  10039:forced:1: Forced when a phase begins
+    only if all of: (it is the Travel phase) and ([json condition {"kind":"captured","is":"noneUnderSelf"}])
+    - [json JoinAnotherPlayer {"verb":"JoinAnotherPlayer","advanceTo":"10040"}]
+
+## 10040 Flight from Mount Gram
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+10040:A:1 (front): When Revealed: Add Southern Gate and Jailor Gornákh to the staging area. Shuffle the Angmar Orcs encounter set into the encounter deck. Then, reveal 1 encounter card per player from the top of the encounter deck.
+  10040:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - one set-aside card with code 10042 joins the staging area (it is not revealed)
+    - one set-aside card with code 10041 joins the staging area (it is not revealed)
+    - [json ShuffleSetAsideSet {"verb":"ShuffleSetAsideSet","set":"Angmar Orcs"}]
+    - shuffle the encounter deck
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+10040:B:1 (back): The players cannot travel to Southern Gate unless there is at least 16 progress on this stage.
+  10040:constant:1: Constant
+    only if not (the current quest stage holds at least 16 progress)
+    - the players cannot travel to the location with code 10042 while this holds
+
+10040:B:2 (back): The players cannot defeat this stage while Southern Gate is in play. If the players defeat this stage, they have escaped Mount Gram and win the game.
+  10040:constant:2: Constant
+    only if the card with code 10042 is in play
+    - the players cannot defeat this stage while this holds
+
+## 10041 Jailor Gornákh
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+10041:A:1 (front): Forced: After 1 or more captured cards are rescued, Jailor Gornákh engages the player with the highest threat and makes an immediate attack.
+  10041:forced:1: Forced on the event capturedRescued (heard about card (any player controls))
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose player (any player controls) chosen by the first player [also {"highestThreat":true}]
+    - [json EngageSelfWithPicked {"verb":"EngageSelfWithPicked"}]
+    - [json SwitchActor {"verb":"SwitchActor","to":"picked"}]
+    - this enemy attacks now, dealt a new shadow card after its old ones are discarded
+
+## 10042 Southern Gate
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+10042:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+10042:A:2 (front): While Southern Gate is the active location, each Orc enemy gets +2 Attack.
+  10042:constant:1: Constant
+    only if this card is the active location
+    - each Orc enemy (any player controls) or in the staging area: stat attack 2, while this card is active
+
+10042:A:3 (front): Forced: When Southern Gate becomes the active location, each player with less than 35 threat must raise his threat to 35.
+  10042:forced:1: Forced after this location becomes the active location (heard about this card)
+    - [json RaiseThreatTo {"verb":"RaiseThreatTo","amount":35}]
+
+## 10043 Cruel Torturer
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10043:A:1 (front): Capture 1.
+  10043:constant:1: Constant
+    - [json Capture {"verb":"Capture","amount":1}]
+
+10043:A:2 (front): Forced: When Cruel Torturer would damage an ally by an attack, capture that ally underneath Cruel Torturer instead.
+  10043:forced:1: Forced on the event wouldDamageAlly (heard about this card)
+    - [json CaptureInsteadOfDamage {"verb":"CaptureInsteadOfDamage"}]
+
+## 10044 Dungeon Guard
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10044:A:1 (front): Capture 1.
+  10044:constant:1: Constant
+    - [json Capture {"verb":"Capture","amount":1}]
+
+10044:A:2 (front): Response: After the captured card(s) underneath Dungeon Guard are rescued, the players may put 1 of them into play at no cost.
+  10044:response:1: Response on the event capturedRescued (heard about this card)
+    only if there is a card (any player controls) chosen by the first player [also {"captured":"rescued"}] to choose
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose card (any player controls) chosen by the first player [also {"captured":"rescued"}]
+    - [json PutCapturedIntoPlay {"verb":"PutCapturedIntoPlay"}]
+
+## 10045 Goblin Tormentor
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10045:A:1 (front): Capture 1.
+  10045:constant:1: Constant
+    - [json Capture {"verb":"Capture","amount":1}]
+
+10045:A:2 (front): X is the number of cards in play with 1 or more captured cards underneath them.
+  10045:constant:2: Constant
+    - this card: stat attack [json amount {"captured":"cardsWith"}], while this card is in play
+
+10045:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if it has no captured cards underneath it).
+  10045:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if [json condition {"kind":"captured","is":"noneUnderAttacker"}]: the attacking enemy: stat attack 2, until the end of the attack
+    - then, if not ([json condition {"kind":"captured","is":"noneUnderAttacker"}]) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
+
+## 10046 Prison Cell
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10046:A:1 (front): Capture 1.
+  10046:constant:1: Constant
+    - [json Capture {"verb":"Capture","amount":1}]
+
+10046:A:2 (front): Response: After the players travel to Prison Cell, look at the captured card(s) underneath it and choose 1 to put into play at no cost. Place the other cards back underneath Prison Cell.
+  10046:response:1: Response after the players travel (heard about this card)
+    only if there is a card (any player controls) chosen by the first player [also {"captured":"underSelf"}] to choose
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose card (any player controls) chosen by the first player [also {"captured":"underSelf"}]
+    - [json PutCapturedIntoPlay {"verb":"PutCapturedIntoPlay"}]
+
+## 10047 Patrol Room
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10047:A:1 (front): Capture 2.
+  10047:constant:1: Constant
+    - [json Capture {"verb":"Capture","amount":2}]
+
+10047:A:2 (front): Travel: Each player raises his threat by 3 to travel here.
+  10047:travel:1: Travel
+    - for each player, first player first:
+      - raise threat by 3 (the acting player)
+
+10047:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending player's threat is 20 or higher).
+  10047:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the actor's threat is at least 20): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the actor's threat is at least 20 (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 10048 Tunnels of Mount Gram
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10048:A:1 (front): Capture 1.
+  10048:constant:1: Constant
+    - [json Capture {"verb":"Capture","amount":1}]
+
+10048:A:2 (front): X is the number of captured cards underneath Tunnels of Mount Gram.
+  10048:constant:2: Constant
+    - this card: stat threat [json amount {"captured":"under"}], while this card is in play
+
+10048:A:3 (shadow): Shadow: Capture each attachment attached to the defending character underneath the attacking enemy.
+  10048:shadow:1: Shadow
+    - [json CaptureAttachments {"verb":"CaptureAttachments"}]
+
+## 10049 Sound the Alarm!
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10049:A:1: Doomed 3.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+10049:A:2 (front): When Revealed: Until the end of the round, each enemy gets -10 engagement cost and +1 Attack. If there are no enemies in play, search the encounter deck and discard pile for an enemy and add it to the staging area.
+  10049:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy (any player controls) or in the staging area [also {"atStage":true}]: stat engagementCost -10, until the end of the round
+    - each enemy (any player controls) or in the staging area [also {"atStage":true}]: stat attack 1, until the end of the round
+    - then, if [json condition {"kind":"enemyInPlay","is":false}] (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+
+## 10050 Feeble and Weary
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10050:A:1 (front): When Revealed: Each player must either deal 1 damage to each exhausted character he controls, or remove each exhausted character he controls from the quest.
+  10050:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "damage" (only if there is a exhausted character (you control) to choose):
+          - for each exhausted character (you control):
+            - deal 1 damage to the picked card
+        * option "remove" (only if there is a exhausted character (you control) committed to the quest to choose):
+          - for each exhausted character (you control) committed to the quest:
+            - the last picked character is removed from the quest (it stays exhausted)
+
+10050:A:2 (shadow): Shadow: Exhaust a character you control.
+  10050:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+
+## 10051 Captives of Gornákh
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10051:A:1 (front): When Revealed: Each player chooses one of his allies and captures it underneath the encounter card with the highest Threat.
+  10051:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - choose ally (you control)
+      - then, if there is a ally (you control) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) chosen by the first player [also {"captured":"hosts","highestThreat":true}]
+      - [json CapturePicked {"verb":"CapturePicked"}]
+
+10051:A:2 (shadow): Shadow: If this attack would damage an ally, capture that ally underneath the attacking enemy instead.
+  10051:shadow:1: Shadow
+    - [json CaptureInsteadOfDamage {"verb":"CaptureInsteadOfDamage"}]
+
+## 10052 Interrogation
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10052:A:1 (front): When Revealed: Each player discards the top card of his captured deck and raises his threat by that card's printed resource cost. If at least 1 player discarded no cards from this effect, Interrogation gains doomed 2.
+  10052:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json DiscardCapturedTop {"verb":"DiscardCapturedTop","raiseByCost":true}]
+    - [json Doomed {"verb":"Doomed","amount":2,"when":{"kind":"captured","is":"someoneEmpty"}}]
+
+10052:A:2 (shadow): Shadow: Discard a random card from your hand and raise your threat by its printed cost.
+  10052:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player discards 1 random card(s) from hand (the last card discarded becomes the picked card)
+    - raise threat by the combined printed cost of the cards this effect has discarded from decks (a card with no printed cost counts 0) (the acting player)
+
+## 10053 Stop the Executioners!
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10053:A:1 (front): Capture 5.
+  10053:constant:1: Constant
+    - [json Capture {"verb":"Capture","amount":5}]
+
+10053:A:2 (front): Time 4.
+  10053:constant:2: Constant
+    - Time 4: when this card is revealed, 4 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+
+10053:A:3 (front): Forced: When the last time counter is removed from this quest, discard its captured cards and remove this quest from the game. Then, raise each player's threat by 3 for each of his characters that was discarded by this effect.
+  10053:forced:1: Forced on the event lastTimeCounterRemoved (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json DiscardCapturedUnder {"verb":"DiscardCapturedUnder","threat":3}]
+    - [json RemoveFromGame {"verb":"RemoveFromGame"}]
+
+## 10174 Escape from Mount Gram
+
+10174:A:1 (front): You are playing campaign mode.
+  (inert: the engine applies it by rule, no record)
+
+10174:A:2 (front): Setup: Set aside any permanent boon attachments on heroes that are added to a player's captured deck. Add the Loot the Dungeons side quest to the staging area, capturing the bottom 5 cards of each player's captured deck underneath it. Flip this card over.
+  10174:campaignSetup:1: Campaign setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SetAsideCapturedBoons {"verb":"SetAsideCapturedBoons"}]
+    - the card with code 10175 is added to the staging area (the copy a Setup search found, else one the Setup deals)
+    - [json CaptureFromDeck {"verb":"CaptureFromDeck","amount":5,"end":"bottom","under":{"code":"10175"},"who":"eachSeat"}]
+
+10174:B:1 (back): Forced: Instead of raising their threat by 1 during the refresh phase, each player raises their threat by the number of completed quest cards plus the number of side quests in the victory display.
+  10174:forced:1: Forced at the end of the phase
+    only if it is the Refresh phase
+    - raise threat by [json amount {"captured":"questsAndSides"}] (each player)
+
+10174:B:2 (back): Forced: After a hero enters play, attach to that hero each set-aside permanent boon attachment assigned to that character in the Campaign Log.
+  10174:forced:2: Forced on the event heroEnteredPlay (heard about hero (any player controls))
+    - [json AttachHeroBoons {"verb":"AttachHeroBoons"}]
+
+10174:B:3 (back): Resolution: Each player must make note of which unique cards are still in their captured deck and not in play at the end of the game. Those cards cannot be included in that player's deck for the rest of the campaign.
+  10174:resolution:1: Resolution
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json RecordStolenCards {"verb":"RecordStolenCards"}]
+    - mark in the Campaign Log, as "determined", each character in play that a copy of the card with code 10172 is attached to
+
+## 10175 Loot the Dungeons
+
+10175:A:1 (front): Loot the Dungeons is considered to be in each player's staging area and gets +4 quest points for each player in the game at every staging area.
+  10175:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json InEveryArea {"verb":"InEveryArea"}]
+    - this card: stat questPoints [json amount {"captured":"players","times":4}], while this card is in play
+
+10175:A:2 (front): Forced: When Loot the Dungeons is defeated, each player (at every staging area) may choose one of the following boons and add it to their hand: Berelind, Chieftain's Brooch, Coruhaer, Laermuin, Mail of Eärnur, or Silverthorn. Add the chosen cards to the Campaign Pool.
+  10175:forced:1: Forced on the event questDefeated (heard about this card)
+    - [json ChooseBoonToHand {"verb":"ChooseBoonToHand","codes":["10176","10177","10178","10179","10180","10181"]}]
+
+## 10176 Berelind
+
+10176:A:1 (front): Response: After Berelind attacks and destroys an enemy, place 1 progress on a quest card in play.
+  10176:response:1: Response after a player's attack destroys an enemy (heard about this card)
+    - [json ProgressQuest {"verb":"ProgressQuest","amount":1}]
+
+## 10177 Chieftain's Brooch
+
+10177:A:1 (front): Attach to a hero. Restricted.
+  10177:constant:1: Constant
+    - [json AttachesTo {"verb":"AttachesTo","host":{"kind":"hero"}}]
+
+10177:A:2 (front): Each ally that shares a Trait with attached hero gets +1 Willpower.
+  10177:constant:2: Constant
+    - each ally (any player controls) [also {"sharesTrait":"host"}]: stat willpower 1, while this card is in play
+
+## 10178 Coruhaer
+
+10178:A:1 (front): Response: After Coruhaer defends an attack, spend 1 resource to deal 2 damage to the attacking enemy.
+  10178:response:1: Response after a character is declared as a defender (heard about this card; cost: pay 1 resource(s))
+    - deal 2 damage to the event's other card
+
+## 10179 Laermuin
+
+10179:A:1 (front): Response: After Laermuin commits to a quest, heal 1 damage from a character.
+  10179:response:1: Response after a card is committed to the quest (heard about this card)
+    only if there is a damaged character (any player controls) to choose
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose damaged character (any player controls)
+    - heal 1 damage from the picked card
+
+## 10180 Mail of Eärnur
+
+10180:A:1 (front): Attach to a hero. Restricted.
+  10180:constant:1: Constant
+    - [json AttachesTo {"verb":"AttachesTo","host":{"kind":"hero"}}]
+
+10180:A:2 (front): Attached hero gets +2 hit points.
+  10180:constant:2: Constant
+    - its host: stat hitPoints 2, while this card is in play
+
+10180:A:3 (front): Response: After a player's threat is reduced, heal 1 damage from attached hero.
+  10180:response:1: Response on the event threatLowered
+    only if its host is a damaged hero (any player controls)
+    - heal 1 damage from its host
+
+## 10181 Silverthorn
+
+10181:A:1 (front): Attach to a hero. Restricted.
+  10181:constant:1: Constant
+    - [json AttachesTo {"verb":"AttachesTo","host":{"kind":"hero"}}]
+
+10181:A:2 (front): While attacking or defending against an enemy, attached hero gets +1 Attack and +1 Defense if that enemy shares a Trait with an enemy in the victory display.
+  10181:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if [json condition {"kind":"versusVictoryTrait"}]: its host: stat attack 1, while this card is in play
+    - then, if [json condition {"kind":"versusVictoryTrait"}] (checked when this step runs, after the steps above; not tied to whether they did anything): its host: stat defense 1, while this card is in play
+
+10181:A:3 (front): Response: After attached hero attacks and destroys an enemy, add that enemy to the victory display. (Limit once per game.)
+  10181:response:1: Response after a player's attack destroys an enemy (heard about the host; limit once per game)
+    - [json AddToVictory {"verb":"AddToVictory","target":"other"}]
+
+(rendered pieces: 146 by template, 58 as JSON)

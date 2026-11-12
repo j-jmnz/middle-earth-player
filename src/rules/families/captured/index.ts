@@ -11,7 +11,7 @@ import type { Focus } from "../index.ts";
 import { captureFromDeckVerb, chooseBoonToHand, discardCapturedTop, discardCapturedUnder, prepareCapturedDeck, setAsideCapturedBoons } from "./deck.ts";
 import { joinAnotherPlayer } from "./join.ts";
 import { attachBoonsOfSubject, captureAttachments, capturePicked, capturingAttack, engageSelfWithPicked, putCapturedIntoPlay } from "./play.ts";
-import { capturedAmount, capturedHolds } from "./values.ts";
+import { capturedAmount, capturedHolds, capturedPool } from "./values.ts";
 
 // The verbs src/catalog/families/captured.ts adds. Null when the verb is not one of them.
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
@@ -56,6 +56,7 @@ export const manifest: RulesFamily = {
   name: "captured",
   verbs: ["Capture", "InEveryArea", "PrepareCapturedDeck", "SetAsideCapturedBoons", "CaptureFromDeck", "CapturePicked", "CaptureAttachments", "CaptureInsteadOfDamage", "PutCapturedIntoPlay", "DiscardCapturedUnder", "DiscardCapturedTop", "EngageSelfWithPicked", "JoinAnotherPlayer", "AttachHeroBoons", "RecordStolenCards", "ChooseBoonToHand"],
   run,
+  pool: (state, spec, asking, sourceId, ctx) => capturedPool(state, spec, asking, sourceId, ctx),
   condition: (state, condition, scope) => capturedHolds(state, condition, scope),
   amount: (state, found, scope, ctx) => capturedAmount(state, found, scope, ctx),
 };
