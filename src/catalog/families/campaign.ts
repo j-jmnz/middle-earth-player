@@ -113,6 +113,17 @@ const VERBS = [
   z.strictObject({ verb: z.literal("ReturnSetAsideHero"), code, ...when }),
   // Campaign Setup: each enemy recorded in the Campaign Log under The Black Gate with this trait is set aside, out of play, one copy for each recorded ("Set each Harad enemy recorded in the campaign log aside, out of play", 145078:A:1). With no log, nothing is set aside.
   verbFlags(z.strictObject({ verb: z.literal("SetAsideLogged"), trait: z.string().min(1) }), { setupRole: "dealt" }),
+  // The Tower of Cirith Ungol's campaign card (docs/brief.md, The Return of the King). Campaign Setup: A Heavy Burden-like card from the supply is attached to the hero that has the card `with` attached ("Attach A Heavy Burden to the hero with Last of the Company attached", 146069:A:1). It resolves after the quest card's Setup,
+  // which attaches `with`; with no such hero nothing happens.
+  verbFlags(z.strictObject({ verb: z.literal("AttachToHeroWith"), code, with: code }), { setupRole: "afterSetup" }),
+  // Campaign Setup: each player in turn chooses a boon of the campaign pool with this trait, other than `except`, from the pool cards dealt to them, and sets it aside, out of play: it is left out of their deck this game ("Each player chooses an Item boon (excluding Andúril) from the campaign pool and sets it aside, out of play", 146069:A:1).
+  // The checklist asks (src/campaign/checklist.ts, step 6) and the start spawns the set-aside copy (StartSeat.setAside); a player with no such boon, and a game with no pool, choose nothing.
+  z.strictObject({ verb: z.literal("SetAsideBoon"), trait: z.string().min(1), except: code }),
+  // "Attach each set aside Item boon to Shagrat as a guarded objective" (146069:B:1): each set-aside card of the campaign pool of the kind `boon` goes onto the card in play with the code `host` as its guarded objective, held for its owner: it leaves play with the host and then returns to its owner's hand
+  // (ReturnGuardedToHand), unless the Resolution finds the host still in play (LoseGuardedBoons). With the host out of play the boons stay set aside.
+  z.strictObject({ verb: z.literal("GuardWithSetAside"), host: code, kind: z.literal("boon"), ...when }),
+  // "Attach A Heavy Burden to the Ring-bearer" (146069:B:1): the card in play with this code moves to the hero `to` names, the last picked hero or the Ring-bearer, with the cards it is attached to unchanged: one card moves, no copy is added, and it does not leave play. Nothing happens with no such card or no such hero.
+  z.strictObject({ verb: z.literal("MoveAttachment"), code, to: z.enum(["picked", "ringBearer"]), ...when }),
 ] as const;
 
 const TRIGGERS = [] as const;

@@ -45,6 +45,8 @@ export type StartSeat = {
   afterMulligan?: readonly string[];
   // The cards the campaign card's Setup let this seat choose and a Resolution earns (ChooseCards `unearned`): recorded as a game fact (ScenarioState.chosenAtSetup).
   chosen?: readonly string[];
+  // The boons this seat set aside, out of play, at Setup (SetAsideBoon, 146069:A:1): dealt to the set-aside area as the seat's own, so a later effect (GuardWithSetAside) can find and return them.
+  setAside?: readonly string[];
   // The 14 Item or Artifact attachments a Burglar's Turn player chose from their collection: their loot deck (families/sidequests/loot.ts).
   loot?: readonly string[];
 };
@@ -149,6 +151,10 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     }
     for (const code of seat.hand ?? []) state = spawn(state, code, { zone: "hand", seat: index }).state;
     for (const code of seat.deck) state = spawn(state, code, { zone: "deck", seat: index }).state;
+    for (const code of seat.setAside ?? []) {
+      const aside = spawn(state, code, { zone: "setAside" }, "down");
+      state = updateCard(aside.state, aside.id, { owner: index });
+    }
     // The cards with the Encounter keyword are set aside, not drawn (families/sidequests/encounter.ts).
     state = setAsideEncounterCards(state, index, ctx);
     // A contract in the deck begins the game in its player's play area (families/sidequests/contract.ts).

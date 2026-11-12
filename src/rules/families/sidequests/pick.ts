@@ -15,8 +15,9 @@ function traitsOf(state: ScenarioState, id: string, ctx: ReduceContext): string[
   return instance ? [...printedOf(ctx.cards, instance.code).traits, ...grantedTraits(state, id, ctx)] : [];
 }
 
-// The card a `sharesTrait` (activeLocation, attackingEnemy) or `sameTitleAs` filter compares with.
-function comparedWith(state: ScenarioState, which: "activeLocation" | "attackingEnemy"): string | null {
+// The card a `sharesTrait` (activeLocation, attackingEnemy) or `sameTitleAs` (activeLocation, picked) filter compares with.
+function comparedWith(state: ScenarioState, which: "activeLocation" | "attackingEnemy" | "picked", at: PickContext): string | null {
+  if (which === "picked") return at.picked?.at(-1) ?? null;
   return which === "activeLocation" ? state.activeLocation : (state.pendingAttack?.enemyId ?? state.pendingStrike?.enemyId ?? null);
 }
 
@@ -31,13 +32,13 @@ export function copyInVictory(state: ScenarioState, id: string | null, ctx: Redu
 export function sidequestsPickMatches(state: ScenarioState, id: string, spec: PickSpec, at: PickContext, ctx: ReduceContext): boolean {
   if (spec.guardsSubject && !(at.subject != null && state.cards[id]?.host === at.subject)) return false;
   if (spec.sharesTrait === "activeLocation" || spec.sharesTrait === "attackingEnemy") {
-    const other = comparedWith(state, spec.sharesTrait);
+    const other = comparedWith(state, spec.sharesTrait, at);
     if (!other || other === id) return false;
     const mine = traitsOf(state, id, ctx);
     if (!traitsOf(state, other, ctx).some((trait) => mine.includes(trait))) return false;
   }
   if (spec.sameTitleAs) {
-    const other = comparedWith(state, spec.sameTitleAs);
+    const other = comparedWith(state, spec.sameTitleAs, at);
     const instance = state.cards[id];
     const compared = other ? state.cards[other] : undefined;
     if (!instance || !compared || other === id) return false;

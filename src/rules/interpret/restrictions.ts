@@ -16,7 +16,7 @@ import { isPlayerType, printedOf } from "../core/printed.ts";
 import { flagged, heldAmount, inPlay, livingSeats, type CardInstance, type ScenarioState } from "../core/state.ts";
 
 type Restrict = Extract<Instruction, { verb: "Restrict" }>;
-export type Restriction = { sourceId: string; what: Restrict["what"]; location?: string; guarding?: string; trait?: string; exceptTrait?: string; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean };
+export type Restriction = { sourceId: string; what: Restrict["what"]; location?: string; guarding?: string; trait?: string; exceptTrait?: string; exceptBoon?: true; maxWillpower?: number; allies?: boolean; belowSourceHitPoints?: boolean };
 
 // Rules from constant effects that forbid something. The question names what is being asked about, and
 // each record names the card it came from, so a caller can tell whose rule it is.
@@ -44,6 +44,7 @@ function scanRestricted(state: ScenarioState, ctx: ReduceContext, what: Restrict
       ...(instruction.guarding ? { guarding: instruction.guarding } : {}),
       ...(instruction.trait ? { trait: instruction.trait } : {}),
       ...(instruction.exceptTrait ? { exceptTrait: instruction.exceptTrait } : {}),
+      ...(instruction.exceptBoon ? { exceptBoon: true as const } : {}),
       ...(instruction.maxWillpower != null ? { maxWillpower: instruction.maxWillpower } : {}),
       ...(instruction.allies ? { allies: true } : {}),
       ...(instruction.belowSourceHitPoints ? { belowSourceHitPoints: true } : {}),
@@ -166,7 +167,7 @@ export function attachBlocked(state: ScenarioState, ctx: ReduceContext, hostId: 
   if (flagged(state, hostId, "cannotHaveTreachery") && printedOf(ctx.cards, attachmentCode).type === "treachery") return true;
   if (flagged(state, hostId, "cannotHaveRestricted") && printedOf(ctx.cards, attachmentCode).keywords.restricted) return true;
   return restricted(state, ctx, "attach").some(
-    (rule) => rule.sourceId === hostId && !(rule.exceptTrait != null && traits.includes(rule.exceptTrait)),
+    (rule) => rule.sourceId === hostId && !(rule.exceptTrait != null && traits.includes(rule.exceptTrait)) && !(rule.exceptBoon === true && printedOf(ctx.cards, attachmentCode).campaignKind === "boon"),
   );
 }
 

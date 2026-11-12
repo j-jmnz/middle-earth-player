@@ -16,6 +16,8 @@ const TRIGGERS = [] as const;
 const FLAGS = [
   // On an enemy: it loses the Phantom keyword (mec113.phantom): the damage of its attacks is dealt as ordinary damage. "Loses the Phantom keyword for this attack" (145023:A:3, `endOfAttack`), "each Oathbreaker enemy loses the Phantom keyword" (145065:B:1).
   "losesPhantom",
+  // On an enemy: its attacks deal their damage as Phantom's do (mec113.phantom) without the keyword: the damage is canceled and the defending player raises their threat by as much ("Forced: When The Two Watchers deals any amount of damage, cancel that damage and raise the defending player's threat by X instead", 146071:A:2). It is a printed Forced, not the keyword, so `losesPhantom` does not take it away.
+  "phantom",
   // On a seat: it cannot play cards from its hand until the flag ends ("you cannot play cards this phase", 145064:B:3). Abilities of cards in play and cards put into play are not barred (rr.play-and-put-into-play).
   "cannotPlayCards",
 ] as const;

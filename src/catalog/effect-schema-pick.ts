@@ -252,7 +252,8 @@ export const pickSchema = z.strictObject({
   discarded: z.literal(true).optional(),
   // The sidequests family's filters (src/rules/families/sidequests/pick.ts).
   // A card with the same title as the active location ("each location in the staging area with the same title as the active location").
-  sameTitleAs: z.literal("activeLocation").optional(),
+  // `picked`: a card with the same title as the last card the running effect picked, never that card itself ("if there is a copy of that enemy in the staging area", 146019:A:1; Pick, canPick and matches read it).
+  sameTitleAs: z.enum(["activeLocation", "picked"]).optional(),
   // A character committed to a side quest (`sideQuest`), or to the current quest (`mainQuest`).
   committedTo: z.enum(["sideQuest", "mainQuest"]).optional(),
   // With `from: loot`, only the loot guarding the card the answered event is about.

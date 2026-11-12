@@ -12,7 +12,7 @@ import { modifiedStat } from "../../core/keywords.ts";
 import { moveCard, spawn } from "../../core/zones.ts";
 import { ally, enemy, hero, send, table, treachery, until, type TableSpec } from "../defense/table.ts";
 
-// Rules: mec113.phantom, rr.step-6-4-3, rr.defending-player, rr.play-and-put-into-play, rr.threat-threat-dial (data/rules/entries.json); ledger lines 145022:A:1, 145023:A:3, 145065:B:1, 145063:B:2, 145064:B:3, 145064:B:1, 145021:A:1.
+// Rules: mec113.phantom, rr.step-6-4-3, rr.defending-player, rr.play-and-put-into-play, rr.threat-threat-dial (data/rules/entries.json); ledger lines 146071:A:2, 145022:A:1, 145023:A:3, 145065:B:1, 145063:B:2, 145064:B:3, 145064:B:1, 145021:A:1.
 // The grey-company family: Phantom's cancel in the combat damage step, the flag that takes the keyword away, the hand discarded whole, the seat that cannot play cards and the two threat amounts.
 
 const shade = treachery("shade");
@@ -58,6 +58,22 @@ describe("Phantom (145022:A:1)", () => {
     const { after, before, ids } = attacked({ cards: [hero("a"), enemy("plain", { attack: 3 }), shade], enemies: [{ code: "plain" }] }, (ids) => ({ type: "Undefended", heroId: ids.a! }));
     expect(after.cards[ids.a!]?.damage).toBe(3);
     expect(after.seats[0].threat).toBe(before);
+  });
+});
+
+describe("the flag phantom (146071:A:2)", () => {
+  const flagging = (code: string): Effect => ({ id: `${code}:constant:1`, cardCode: code, lines: [`${code}:A:1`], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "phantom", amount: 1, until: "whileSourceInPlay", target: "self" }] });
+
+  it("cancels an enemy's damage and raises the defending player's threat without the keyword", () => {
+    const { after, before, ids } = attacked({ cards: [hero("a"), enemy("watcher", { attack: 3 }), shade], enemies: [{ code: "watcher" }], effects: [flagging("watcher")] }, (ids) => ({ type: "Undefended", heroId: ids.a! }));
+    expect(after.cards[ids.a!]?.damage).toBe(0);
+    expect(after.seats[0].threat).toBe(before + 3);
+  });
+
+  it("is not taken away by losesPhantom, the printed Forced having no keyword to lose", () => {
+    const { after, before, ids } = attacked({ cards: [hero("a"), enemy("watcher", { attack: 3 }), shade], enemies: [{ code: "watcher" }], effects: [flagging("watcher"), loses("watcher")] }, (ids) => ({ type: "Undefended", heroId: ids.a! }));
+    expect(after.cards[ids.a!]?.damage).toBe(0);
+    expect(after.seats[0].threat).toBe(before + 3);
   });
 });
 

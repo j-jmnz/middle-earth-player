@@ -21,7 +21,7 @@ import { placedLimit } from "../families/uncharted/limit.ts";
 import { grappleThreat } from "../families/grapple/values.ts";
 import { printedStat, victoryOf } from "./printed-stat.ts";
 import { wallRoom } from "../families/pelennor/wall.ts";
-import { heldBy } from "./holder-classes.ts";
+import { heldAmountByClass, heldBy } from "./holder-classes.ts";
 import { eliminateEmpties, markLoss } from "./eliminate.ts";
 
 // `combat` is the damage of an attack (rr.step-6-4-3, rr.step-6-8-3); every other kind is non-combat damage.
@@ -65,6 +65,8 @@ export function modifiedStat(
     else total += modifier.amount;
     if (!modifier.set && modifier.amount > 0) floor += modifier.amount;
   }
+  // "+1 Threat for each damage on it" (146023:A:1): held per damage, read as the Threat is.
+  if (stat === "threat" && instance.damage > 0) total += instance.damage * heldAmountByClass(state, instance, printed, "threatPerDamage");
   const lowered = set ?? total;
   const value = stat === "willpower" && lowered < floor && flagged(state, instance.id, "cannotReduceWillpower") ? floor : lowered;
   return CARD_STATS.has(stat) ? Math.max(0, value) : value;

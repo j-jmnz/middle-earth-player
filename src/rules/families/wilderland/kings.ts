@@ -112,7 +112,7 @@ export function guardWithDeckTop(state: ScenarioState, focus: Focus): ScenarioSt
  * (a card of the game has a record with the verb) looks.
  */
 export function returnHeld(state: ScenarioState, ctx: ReduceContext): ScenarioState {
-  if (!gameReads(state, ctx, '"GuardWithDeckTop"')) return state;
+  if (!gameReads(state, ctx, '"ReturnGuardedToHand"')) return state;
   let next = state;
   for (const card of Object.values(state.cards)) {
     if (card.held !== true) continue;

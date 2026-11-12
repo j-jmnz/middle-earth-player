@@ -1,4 +1,4 @@
-// Rules: mec113.phantom, rr.step-6-4-3, rr.defending-player (data/rules/entries.json); ledger lines 145022:A:1, 145023:A:1, 145023:A:3, 145024:A:1, 145025:A:1, 145065:B:1, 145067:A:1.
+// Rules: mec113.phantom, rr.step-6-4-3, rr.defending-player (data/rules/entries.json); ledger lines 146071:A:2, 145022:A:1, 145023:A:1, 145023:A:3, 145024:A:1, 145025:A:1, 145065:B:1, 145067:A:1.
 //
 // Phantom: "During the 'determine combat damage' step of an attack made by an enemy with Phantom, if any damage would be dealt by the attack it is canceled and the defending player raises their threat by an equal amount instead."
 // Every place an enemy attack deals its damage to a character goes through `combatDamage` (families/defense/excess.ts), so the cancel is made there: before any damage window opens (rr.cancel answers damage that was dealt), for a
@@ -11,10 +11,11 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { flagged } from "../../core/state.ts";
 
-/** Whether the enemy has the Phantom keyword now: printed, and not lost for this attack or while the Stone of Erech is the active location (`losesPhantom`). */
+/** Whether the enemy deals its damage as Phantom does now: it has the keyword, printed and not lost for this attack or while the Stone of Erech is the active location (`losesPhantom`), or it holds the flag `phantom` (a printed Forced that does the same, 146071:A:2, which nothing takes away). */
 export function hasPhantom(state: ScenarioState, enemyId: string, ctx: ReduceContext): boolean {
   const enemy = state.cards[enemyId];
-  return enemy != null && printedOf(ctx.cards, enemy.code).keywords.phantom && !flagged(state, enemyId, "losesPhantom");
+  if (!enemy) return false;
+  return flagged(state, enemyId, "phantom") || (printedOf(ctx.cards, enemy.code).keywords.phantom && !flagged(state, enemyId, "losesPhantom"));
 }
 
 /** The state after a Phantom enemy's `raw` combat damage is canceled and the defending player (the attacked player) raises their threat by as much, or null when the enemy has no Phantom or the attack would deal none. */

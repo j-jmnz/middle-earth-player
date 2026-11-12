@@ -37,10 +37,15 @@ const VERBS = [
   // The Ring-bearer (the hero with that trait that a player controls) loses every token (damage, resources, progress), and it and
   // each card attached to it are placed facedown under the card in play with the code `under`. It and its attachments stay in play, and nobody controls
   // them (mec109.stage-4).
-  z.strictObject({ verb: z.literal("CaptureRingBearer"), under: z.string().min(1), ...when }),
+  // `guarded`: the hero lies faceup under the card as a guarded objective, keeping its tokens and its attachments faceup (The Tower of Cirith Ungol: "The first player loses control of the Ring-bearer and places it faceup under Topmost Chamber as a guarded objective", 146066:A:1). It is a held hero of its
+  // owner (`guardedHero`, the flag Carried Away uses), so it takes no damage while nobody controls it and its owner is not out of heroes; FreeRingBearer gives it back.
+  z.strictObject({ verb: z.literal("CaptureRingBearer"), under: z.string().min(1), guarded: z.literal(true).optional(), ...when }),
   // The first player takes control of the Ring-bearer facedown under the source and of the cards attached to it: it returns to play
   // faceup in their play area exhausted with `damage` damage on it (142024:A:3).
   z.strictObject({ verb: z.literal("ReleaseRingBearer"), damage: z.number().int().min(0), ...when }),
+  // Constant (146067:B:2, "When the Ring-bearer is free of encounters, the first player gains control of it"): the settle loop gives the first player the Ring-bearer a card guards (CaptureRingBearer `guarded`) as soon as that card is out of play, with its tokens, its state and its attachments as they were. A marker: the record names the line,
+  // and a game with such a record looks for the hero.
+  z.strictObject({ verb: z.literal("FreeRingBearer") }),
   // A shadow card's effect on the attack in progress: undefended damage is placed on an active location instead of a hero, the
   // defending player choosing the location (142035:A:2). Damage goes to the hero as usual when no location is active.
   z.strictObject({ verb: z.literal("DamageActiveLocation"), ...when }),

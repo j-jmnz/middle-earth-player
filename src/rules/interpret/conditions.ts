@@ -218,7 +218,8 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return scope.explored === true;
     }
     case "canPick":
-      return pickCandidates(state, condition.pick, scope.actor, [], scope.sourceId, ctx, undefined, undefined, false, { subject: scope.subject, other: scope.other }).length > 0;
+      // A pick for the copy of the last picked card (`sameTitleAs: picked`) reads what the effect picked; every other filter asks as if nothing were picked (its `different` has nothing to leave out).
+      return pickCandidates(state, condition.pick, scope.actor, condition.pick.sameTitleAs === "picked" ? (scope.picked ?? []) : [], scope.sourceId, ctx, undefined, undefined, false, { subject: scope.subject, other: scope.other }).length > 0;
     case "handHasCard":
       return (state.seats[scope.actor]?.hand ?? []).some((id) => id !== scope.sourceId);
     case "engagedAboveThreat": {

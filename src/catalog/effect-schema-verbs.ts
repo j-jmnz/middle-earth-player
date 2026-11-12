@@ -247,6 +247,8 @@ export const simpleVerbs = [
     // With "travel" and `location`: only the location with that code that guards the objective with this title ("the Grey Moorland guarding Tiny", 19048:B:3).
     guarding: z.string().min(1).optional(),
     exceptTrait: z.string().min(1).optional(),
+    // With "attach": the card may have boons attached though it has no other attachments ("Cannot have non-boon attachments", 146020:A:1). A boon is a card the campaign pool holds as one (`campaignKind`), which no trait names.
+    exceptBoon: z.literal(true).optional(),
     // With "travel" on a card that is not the location: the players cannot travel to a location with this trait ("The players cannot travel to Pelennor locations", 145075:B:3).
     trait: z.string().min(1).optional(),
     maxWillpower: z.number().int().min(0).optional(),
@@ -350,7 +352,8 @@ export const simpleVerbs = [
   z.strictObject({ verb: z.literal("DeckLimit"), copies: z.number().int().positive(), ...when }),
   // Constants on an attachment: the attached card gains this trait, or this resource icon.
   z.strictObject({ verb: z.literal("GrantTrait"), trait: z.string().min(1), ...when }),
-  z.strictObject({ verb: z.literal("GrantIcon"), sphere: z.enum(["leadership", "tactics", "spirit", "lore"]), ...when }),
+  // `fellowship`: the hero also pays for Fellowship cards and counts as a Fellowship hero for a filter that reads the sphere ("Attached hero gains the Ring-bearer trait and the Fellowship sphere", 146014:A:1).
+  z.strictObject({ verb: z.literal("GrantIcon"), sphere: z.enum(["leadership", "tactics", "spirit", "lore", "fellowship"]), ...when }),
   // Engine use (Restricted): the source card's controller moves one of its restricted attachments to its owner's discard pile.
   verb("DiscardRestricted"),
   // Adds resources to the pool of the hero the source card is attached to.
