@@ -407,6 +407,11 @@ function cardWords(world: World, card: SettledCard): string {
   return card.hero ? `${nameOf(world, card.code)} on ${nameOf(world, card.hero)}` : nameOf(world, card.code);
 }
 
+/** What the settled screen says in place of the sentence when the scenario was cleared before: "won", or "played" for an end (`view.ended`). */
+export function replayedSentence(view: Extract<ResolutionView, { kind: "settled" }>): string {
+  return `You have ${view.ended === true ? "played" : "won"} this scenario before. Nothing is granted a second time.`;
+}
+
 /** The sentence above the final Confirm: what the log will hold (a boon on its hero), and the scenario that unlocks, or that the campaign is complete
  * (`completes` is the campaign's name when the scenario is the last of its campaign, The Caves of Nibin-Dûm for both Mirkwood campaigns). */
 export function settledSentence(view: Extract<ResolutionView, { kind: "settled" }>, world: World, next: string | null, completes: string | null = null): string {
@@ -420,7 +425,9 @@ export function settledSentence(view: Extract<ResolutionView, { kind: "settled" 
     return copies > 1 ? `${copies} copies of ${text}` : kind ? `the ${kind} ${text}` : text;
   });
   const list = andList(earned);
-  const records = earned.length > 0 ? `Confirming records ${list} in the campaign` : "Confirming records the win";
+  // A scenario that ends when its last player falls (The Black Gate Opens) records its end, never a win.
+  const what = view.ended === true ? "the end" : "the win";
+  const records = earned.length > 0 ? `Confirming records ${view.ended === true ? `the end and ${list}` : list} in the campaign` : `Confirming records ${what}`;
   const unlocked = next ? `${records} and unlocks ${next}.` : completes ? `${records} and completes ${completes}.` : `${records}.`;
   // A once-per-campaign Action used in this game or an earlier scenario is written to the log (41044:A:3).
   const names = (view.used ?? []).map((code) => nameOf(world, code));

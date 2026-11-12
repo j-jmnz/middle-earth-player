@@ -13,7 +13,7 @@ import { useUiScale } from "../../ui/ui-scale";
 import { Text } from "../../ui/text";
 import { stopLabel, stopState } from "./road-speech";
 
-const TAG = { completed: "Won", current: "Next", locked: "Locked", soon: "Coming soon" } as const;
+const TAG = { completed: "Won", ended: "Ended", current: "Next", locked: "Locked", soon: "Coming soon" } as const;
 
 /** Where the stops sit across the road, as fractions of its width: two columns on a phone, a wandering line on a wide screen. */
 const NARROW = [0.27, 0.73];
@@ -98,14 +98,14 @@ export function Road({ stops, height, width, label, onStop, scores, go = null }:
       {stops.map((stop) => {
         const { node, size } = stop;
         const press = onStop(node);
-        const tag = node.status === "completed" ? `${TAG.completed}${scores.get(node.id) ? ` · ${scores.get(node.id)}` : ""}` : TAG[node.status];
+        const tag = node.status === "completed" ? `${node.ended === true ? TAG.ended : TAG.completed}${scores.get(node.id) ? ` · ${scores.get(node.id)}` : ""}` : TAG[node.status];
         const tone = node.status === "completed" ? palette.ok : node.status === "current" ? palette.accentHigh : palette.faint;
         const labelWidth = Math.min(width * 0.46, 200 * s);
         return (
           <View key={node.id} testID={`node-${node.id}`} style={{ position: "absolute", left: stop.x - labelWidth / 2, top: stop.y - size / 2, width: labelWidth, alignItems: "center" }}>
             <Pressable
               accessibilityRole={press ? "button" : undefined}
-              accessibilityLabel={stopLabel(node.name, node.status, scores.get(node.id))}
+              accessibilityLabel={stopLabel(node.name, node.status, scores.get(node.id), node.ended)}
               accessibilityState={stopState(press != null)}
               accessibilityHint={go?.id === node.id ? go.action : undefined}
               disabled={!press}

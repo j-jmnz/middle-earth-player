@@ -18,11 +18,14 @@ export type PathNode = {
   // The codes the scenario's Resolution recorded; shown on a completed node.
   reward: readonly string[];
   score: number | null;
+  // The scenario ends when its last player falls (its campaign card holds `endsInDefeat`, The Black Gate Opens): a completed stop reads "Ended", not "Won".
+  ended?: true;
   // The XP the scenario's Resolution awarded (Dream-chaser), absent where the campaign has none.
   xp?: number;
 };
 
-export function campaignPath(campaign: CampaignData, names: Readonly<Record<string, string>>, log: CampaignLog): PathNode[] {
+// `endsInDefeat` says of a scenario whether its campaign card holds the flag (screens/data/scenario-ends.ts).
+export function campaignPath(campaign: CampaignData, names: Readonly<Record<string, string>>, log: CampaignLog, endsInDefeat?: (scenarioId: string) => boolean): PathNode[] {
   let currentSeen = false;
   return campaign.scenarios.map((id, index) => {
     const won = log.completed.includes(id);
@@ -35,6 +38,7 @@ export function campaignPath(campaign: CampaignData, names: Readonly<Record<stri
       status,
       reward: won ? (log.earned[id] ?? []) : [],
       score: log.scenarios[id]?.score ?? null,
+      ...(endsInDefeat?.(id) === true ? { ended: true as const } : {}),
       ...(log.xpGained[id] != null ? { xp: log.xpGained[id] } : {}),
     };
   });

@@ -9,7 +9,7 @@ import { Pressable, View } from "react-native";
 import { useStore } from "zustand";
 
 import { gameReport } from "../../../campaign/report";
-import { consequenceSentence, resolutionView, settledSentence, type ResolutionTile } from "../../../campaign/resolution-view";
+import { consequenceSentence, replayedSentence, resolutionView, settledSentence, type ResolutionTile } from "../../../campaign/resolution-view";
 import { finish } from "../../../campaign/session";
 import { scoreParts, scoreTotal } from "../../../campaign/score";
 import { ActionBar, BodyText, Label, StatTile, NavBar, OutcomeTitle, PrimaryButton, Screen, ScreenScroll, Section, TextButton, TwoPane } from "../../kit/chrome";
@@ -281,7 +281,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
           ) : (
             <>
               <Label tone="muted" className="mb-3 text-center" testID="resolution-consequence">
-                {done ? "You have won this scenario before. Nothing is granted a second time." : settledSentence(view, session.world, nextName, completes)}
+                {done ? replayedSentence(view) : settledSentence(view, session.world, nextName, completes)}
               </Label>
               <PrimaryButton
                 label={end ? "Finish the campaign" : "Confirm"}

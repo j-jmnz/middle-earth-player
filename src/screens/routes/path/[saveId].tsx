@@ -19,6 +19,7 @@ import { xpWords } from "../../../campaign/xp-view";
 import { xpUnspentOf } from "../../../campaign/xp";
 import { campaignEnd } from "../../campaign/campaign-end";
 import { bookletParams, campaignOf, scenarioNames, scenarioOf } from "../../data/campaign-data";
+import { scenarioEndsInDefeat } from "../../data/scenario-ends";
 import { cardNames } from "../../data/card-names";
 import { useDatabases } from "../../data/databases";
 import { usePalette } from "../../kit/palette-hook";
@@ -89,7 +90,7 @@ export default function CampaignPath() {
   const preview = useListPreview();
 
   const campaign = save ? campaignOf(save.campaignId) : null;
-  const nodes = useMemo(() => (save && campaign ? campaignPath(campaign, scenarioNames(campaign), save.log) : []), [save, campaign]);
+  const nodes = useMemo(() => (save && campaign ? campaignPath(campaign, scenarioNames(campaign), save.log, scenarioEndsInDefeat) : []), [save, campaign]);
   const stageNames = useMemo(() => cardNames(catalog, campaign ? campaign.scenarios.flatMap((id) => scenarioOf(id)?.stages ?? []) : []), [catalog, campaign]);
   const names = useMemo(() => {
     if (!save) return new Map<string, string>();

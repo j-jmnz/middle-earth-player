@@ -5,7 +5,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { endedInDefeat, ENDED_BY_DEFEAT } from "../../../rules/core/eliminate.ts";
 import { opensWorld } from "../../../../test/scenarios/the-black-gate-opens/game.ts";
 import { goldenState } from "../../../../test/harness/golden-state.ts";
-import { resolutionView } from "../../resolution-view.ts";
+import { replayedSentence, resolutionView, settledSentence } from "../../resolution-view.ts";
 import { runOf } from "../../runs.ts";
 import { scoreParts } from "../../score.ts";
 import { printedOf } from "../../../rules/core/printed.ts";
@@ -46,5 +46,15 @@ describe("the end of The Black Gate Opens is recorded as an end", () => {
     expect(heroCost).toBeGreaterThan(0);
     expect(parts.destroyed).toBeGreaterThanOrEqual(heroCost);
     expect(parts.damage).toBe(0);
+  });
+
+  it("146074:B:1 the sentence above Confirm records the end and unlocks Mount Doom, and a replay says it was played before", () => {
+    const view = resolutionView(goldenState("the-black-gate-opens", ENDED), world);
+    if (view.kind !== "settled") throw new Error("the end settles at once");
+    const sentence = settledSentence(view, world, "Mount Doom");
+    expect(sentence).toMatch(/^Confirming records the end/);
+    expect(sentence).toContain("unlocks Mount Doom");
+    expect(sentence).not.toContain("the win");
+    expect(replayedSentence(view)).toBe("You have played this scenario before. Nothing is granted a second time.");
   });
 });
