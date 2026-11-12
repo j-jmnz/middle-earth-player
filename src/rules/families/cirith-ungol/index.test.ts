@@ -10,7 +10,9 @@ import { heroPays } from "../../player/payments.ts";
 import { modifiedStat, placeDamage } from "../../core/keywords.ts";
 import { definePrinted } from "../../core/printed.ts";
 import { moveCard, spawn } from "../../core/zones.ts";
-import { enemy, hero, table } from "../defense/table.ts";
+import { EFFECTS } from "../../../effects/index.ts";
+import { legalIntents } from "../../engine/reduce.ts";
+import { enemy, hero, offered, recordsOf, send, table, treachery, until } from "../defense/table.ts";
 
 // Rules: mec113.setup-the-tower-of-cirith-ungol, mec113.the-fellowship-sphere, rr.lasting-effects, rr.discard-pile-and-victory-display, rr.traits, faq.lasting-effects (data/rules/entries.json); ledger lines 146068:A:1, 146023:A:1, 146019:A:1, 146067:B:1, 146020:A:1, 146014:A:1.
 // The Tower of Cirith Ungol's small pieces: a card back from the victory display as its other side, the Threat that follows an enemy's damage, the copy of a picked enemy, the boons a card may carry and the Fellowship sphere a hero is granted.
@@ -111,5 +113,70 @@ describe("GrantIcon fellowship (146014:A:1)", () => {
     expect(heroPays(base.state, base.ids.sam!, "fellowship", base.ctx)).toBe(true);
     const bare = table({ cards: [hero("sam", { sphere: "lore" })], effects: [company], heroes: [{ code: "sam" }] });
     expect(heroPays(bare.state, bare.ids.sam!, "fellowship", bare.ctx)).toBe(false);
+  });
+});
+
+describe("ResolveAttackAgainst (146023:A:2)", () => {
+  const other = { type: "enemy", control: "any", engaged: "you", attackingEnemy: false } as const;
+  const howls: Effect = {
+    id: "howls:shadow:1",
+    cardCode: "howls",
+    lines: ["howls:A:2"],
+    timing: "shadow",
+    condition: { kind: "canPick", pick: other },
+    instructions: [{ verb: "Pick", pick: other }, { verb: "ResolveAttackAgainst" }],
+  };
+  const play = (enemies: readonly { code: string }[]) => {
+    const built = table({ cards: [hero("a"), enemy("attacker", { attack: 4 }), enemy("victim", { defense: 1, health: 9 }), treachery("howls")], effects: [howls], heroes: [{ code: "a" }], enemies, encounter: ["howls"] });
+    const declined = send(built.state, { type: "DeclineEngage" }, built.ctx);
+    const chosen = declined.window?.kind === "chooseEnemy" ? send(declined, { type: "ChooseEnemy", enemyId: built.ids.attacker! }, built.ctx) : declined;
+    const defense = until(chosen, built.ctx, (state) => state.window?.kind === "defense");
+    const after = until(send(defense, { type: "Undefended", heroId: built.ids.a! }, built.ctx), built.ctx, (state) => state.pendingAttack == null);
+    return { after, ids: built.ids };
+  };
+
+  it("resolves the attack against the player's other engaged enemy: it takes the damage after its Defense and no hero is hurt", () => {
+    const { after, ids } = play([{ code: "attacker" }, { code: "victim" }]);
+    expect(after.cards[ids.a!]?.damage).toBe(0);
+    expect(after.cards[ids.victim!]?.damage).toBe(3);
+  });
+
+  it("changes nothing when the player is engaged with no other enemy", () => {
+    const { after, ids } = play([{ code: "attacker" }]);
+    expect(after.cards[ids.a!]?.damage).toBe(4);
+  });
+});
+
+describe("Last of the Company's action (146014:A:2)", () => {
+  const records = recordsOf(EFFECTS, "146014");
+  const company = definePrinted({ code: "146014", name: "Last of the Company", type: "objective" });
+  const ring = definePrinted({ code: "146065", name: "The One Ring", type: "objective" });
+  const act = () => {
+    const built = table({
+      cards: [hero("sam", { willpower: 3 }), company, ring, orc("o1"), enemy("watchers", { keywords: { immuneToPlayerCardEffects: true } })],
+      effects: records,
+      heroes: [{ code: "sam" }],
+      attachments: [{ code: "146014", host: "sam" }, { code: "146065", host: "sam" }],
+      staging: [{ code: "o1" }],
+    });
+    const state = built.state;
+    return { ...built, state };
+  };
+
+  it("exhausts The One Ring, raises the actor's threat by 1 and gives the enemy -X Threat, X the attached hero's Willpower, until the end of the phase", () => {
+    const { state, ids, ctx } = act();
+    const at = until(state, ctx, (_current, legal) => offered(legal, "146014:action:1"));
+    expect(offered(legalIntents(at, ctx), "146014:action:1")).toBe(true);
+    const used = until(send(at, { type: "Trigger", cardId: ids["146014"]!, effectId: "146014:action:1", payments: [] }, ctx), ctx, (current) => current.stack.length === 0 && current.window?.kind !== "choose");
+    expect(used.cards[ids["146065"]!]?.exhausted).toBe(true);
+    expect(used.seats[0].threat).toBe(at.seats[0].threat + 1);
+    expect(modifiedStat(used, used.cards[ids.o1!]!, "threat", ctx.cards)).toBe(0);
+  });
+
+  it("is not offered while The One Ring is exhausted", () => {
+    const { state, ids, ctx } = act();
+    const at = until(state, ctx, (_current, legal) => offered(legal, "146014:action:1"));
+    const tired = { ...at, cards: { ...at.cards, [ids["146065"]!]: { ...at.cards[ids["146065"]!]!, exhausted: true } } };
+    expect(offered(legalIntents(tired, ctx), "146014:action:1")).toBe(false);
   });
 });

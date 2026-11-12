@@ -63,7 +63,7 @@ export const STAGE_RECORDS: readonly Effect[] = [
     lines: ["146068:A:1"],
     timing: "whenRevealed",
     instructions: [
-      { verb: "Pick", pick: { type: "objective", control: "any", names: ["Last of the Company"] } },
+      { verb: "Pick", pick: { type: "card", control: "any", names: ["Last of the Company"] } },
       { verb: "AddToVictory", target: "picked" },
       { verb: "MoveAttachment", code: ONE_RING, to: "ringBearer" },
       { verb: "Pick", pick: { type: "hero", control: "any", trait: "Ring-bearer" } },

@@ -114,7 +114,8 @@ function askStage(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[])
 export function advanceFreed(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (state.window || state.stack.length > 0 || state.pendingAttack || state.pendingStrike || state.stageCleared || state.lost) return state;
   const stage = state.questStage ? state.cards[state.questStage] : undefined;
-  if (!stage || (stage.progress === 0 && !flagged(state, stage.id, "advancesWhenFreed"))) return state;
+  // A stage with the flag advances with no progress once the game is under way: in Setup the cards that hold it back are not yet in play.
+  if (!stage || (stage.progress === 0 && (state.phase === "Setup" || !flagged(state, stage.id, "advancesWhenFreed")))) return state;
   const points = questPointsOf(state, stage, ctx.cards);
   const canAdvance = (current: ScenarioState) => restricted(current, ctx, "advance").length === 0;
   if (points == null || stage.progress < points || !canAdvance(state)) return state;

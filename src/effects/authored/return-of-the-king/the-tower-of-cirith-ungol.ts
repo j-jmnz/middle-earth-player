@@ -66,7 +66,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       cardCode: "146015",
       lines: ["146015:A:2"],
       timing: "constant",
-      condition: { kind: "stageReached", code: "146067", is: false },
+      condition: { kind: "not", condition: { kind: "onStage", stage: 2 } },
       instructions: [{ verb: "Restrict", what: "travel" }],
     },
     { id: "146015:travel:1", cardCode: "146015", lines: ["146015:A:3"], timing: "travel", instructions: [{ verb: "AddSetAsideToStaging", code: SHAGRAT }] },

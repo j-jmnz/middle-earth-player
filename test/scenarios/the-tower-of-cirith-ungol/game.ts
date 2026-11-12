@@ -5,9 +5,12 @@ import { legalIntents, type PlayerIntent, type ReduceContext, type ScenarioState
 
 import { loadCampaign, loadScenario } from "../../../scripts/data/load-scenarios.ts";
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
-import { campaignGame, fillerLoadout, HERO_STATS, type PlayedGame } from "../../harness/game-kit.ts";
+import type { LoadoutSeat } from "../../../src/campaign/loadout.ts";
+import { campaignGame, fillerLoadout, HERO_STATS, RING_BEARER, type PlayedGame } from "../../harness/game-kit.ts";
 
 const campaign = loadCampaign("the-return-of-the-king");
+// The Item boons a pool can hold (Sting, the Mithril shirt, Glamdring, Andúril, the Lórien gifts): the campaign card's Setup sets one aside for each player (146069:A:1; Andúril is not offered).
+export const ITEM_BOONS = ["142011", "142012", "142013", "142014", "142015", "142016", "142017", "142018"] as const;
 const ungol = loadScenario("the-tower-of-cirith-ungol");
 
 // Test helper. A whole game of The Tower of Cirith Ungol in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
@@ -16,13 +19,23 @@ export const UNGOL_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "",
 // "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
 export type UngolDecks = "strong" | "weak" | "brittle";
 
-export const ungolLoadout = fillerLoadout;
+// The first player holds the Ring-bearer with The One Ring attached (the saga start of scenario 16, mec113.setting-up-the-game): Frodo, beside three stand-in heroes (Setup lays him under Topmost Chamber and gives Last of the Company to one of them); a second seat has three.
+export const ungolLoadout = (seatCount: 1 | 2): LoadoutSeat[] => {
+  const [, second] = fillerLoadout(2);
+  const first = { heroes: [RING_BEARER, "q1", "q2", "q3"], deck: fillerLoadout(1)[0]!.deck };
+  return seatCount === 1 ? [first] : [first, second!];
+};
 
 // The goldens' world, the plan and start of a game, and the log of a campaign whose earlier parts were won: the seeded game's parts every scenario shares (test/harness/game-kit.ts).
-export const ungolWorld = (decks: UngolDecks = "strong") => game.world(decks);
+// Frodo, the Ring-bearer, takes the numbers of the deck like the stand-in heroes beside him (his printed numbers could not quest or defend a game of auto-played turns).
+export const ungolWorld = async (decks: UngolDecks = "strong") => {
+  const world = await game.world(decks);
+  world.cards.set(RING_BEARER, { ...world.cards.get(RING_BEARER)!, ...HERO_STATS[decks] });
+  return world;
+};
 export const afterFields = (seatCount: 1 | 2) => game.after(seatCount);
-export const ungolPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount)) => game.plan(seatCount, log);
-export const ungolStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard) => game.start(seatCount, seed, difficulty, { facts, log, modeCard });
+export const ungolPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), choices?: readonly string[]) => game.plan(seatCount, log, choices);
+export const ungolStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, extra: { choices?: readonly string[] } = {}) => game.start(seatCount, seed, difficulty, { facts, log, modeCard, ...extra });
 
 export type UngolPolicy = {
   // The option a Choose window with these answers takes: the first or the last.
@@ -51,7 +64,8 @@ const game = campaignGame<UngolDecks, UngolPolicy>({
   scenario: ungol,
   stats: HERO_STATS,
   // TODO: the cards a game loads besides the scenario's piles, its campaign card's and the campaign's game codes.
-  codes: [...ungol.cards.map((card) => card.code)],
+  codes: [...ungol.cards.map((card) => card.code), RING_BEARER, "144052", "146065", ...ITEM_BOONS],
+  loadout: ungolLoadout,
   intent: ungolIntent,
   policy: DEFAULT_POLICY,
   limit: 6000,
