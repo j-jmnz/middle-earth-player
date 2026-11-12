@@ -112,7 +112,7 @@ describe("The Black Gate Opens in the the-return-of-the-king campaign", () => {
     expect(log.blackGateTokens).toBe(tokens);
     expect(log.completed).toEqual([...afterUngol.completed, "the-black-gate-opens"]);
     const path = campaignPath(campaign, {}, log);
-    expect(path.map((node) => [node.id, node.status]).slice(4, 6)).toEqual([["the-black-gate-opens", "completed"], ["mount-doom", "next"]]);
+    expect(path.map((node) => [node.id, node.status]).slice(4, 6)).toEqual([["the-black-gate-opens", "completed"], ["mount-doom", "current"]]);
     expect(PLAYABLE_SCENARIOS).toContain("mount-doom");
   });
 
