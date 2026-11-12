@@ -80,7 +80,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "RemoveEnemyDamage":
       return removeEnemyDamage(state, ctx, steps);
     case "MoveDamageTo":
-      return moveDamageTo(state, instruction.from, instruction.to, focus, ctx, steps);
+      return moveDamageTo(state, instruction.from, instruction.to, instruction.amount, focus, ctx, steps);
     case "TakeMorePrisoners":
       return takeMorePrisoners(state, ctx);
     case "TakeHeroPrisoner":
@@ -215,8 +215,13 @@ function engageSetAside(state: ScenarioState, code: string, focus: Focus, ctx: R
 
 // PickDiscardTop: the topmost card of the encounter discard pile (its last card) of one of these printed types is picked (900107:A:2).
 function pickDiscardTop(state: ScenarioState, types: readonly string[], ctx: ReduceContext, trait?: string): ScenarioState {
-  const found = [...state.encounterDiscard].reverse().find((id) => types.includes(printedOf(ctx.cards, state.cards[id]?.code ?? "").type) && (trait == null || hasTrait(state, id, trait, ctx)));
+  const found = topOfEncounterDiscard(state, types, ctx, trait);
   return found ? markPicked(state, found) : state;
+}
+
+/** The topmost card of the encounter discard pile (the last put there) of one of these types, with the Trait when one is named; undefined with none. */
+export function topOfEncounterDiscard(state: ScenarioState, types: readonly string[], ctx: ReduceContext, trait?: string): string | undefined {
+  return [...state.encounterDiscard].reverse().find((id) => types.includes(printedOf(ctx.cards, state.cards[id]?.code ?? "").type) && (trait == null || hasTrait(state, id, trait, ctx)));
 }
 
 // DealShadowFromDiscard: the topmost card of the encounter discard pile with a Shadow effect (a shadow record: every printed line has one) becomes
@@ -282,13 +287,14 @@ function removeEnemyDamage(state: ScenarioState, ctx: ReduceContext, steps: Engi
   return data ? patchTop(next, { data: { ...data, x: total } }) : next;
 }
 
-// MoveDamageTo: all damage on one card moves to another (900209:A:2), which it may destroy.
-function moveDamageTo(state: ScenarioState, from: CardRef, to: CardRef, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+// MoveDamageTo: all damage on one card (with `amount`, at most that much: 100158:A:2) moves to another (900209:A:2), which it may destroy.
+function moveDamageTo(state: ScenarioState, from: CardRef, to: CardRef, amount: number | undefined, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const scope = frameScope(state, focus.seat, focus.sourceId);
   const source = state.cards[refCard(state, from, scope) ?? ""];
   const target = state.cards[refCard(state, to, scope) ?? ""];
   if (!source || !target || source.id === target.id || source.damage <= 0 || !inPlay(source.zone) || !inPlay(target.zone)) return state;
-  return placeDamage(updateCard(state, source.id, { damage: 0 }), target.id, source.damage, ctx.cards, steps, "framework", currentCause(steps, UNATTRIBUTED));
+  const moved = Math.min(source.damage, amount ?? source.damage);
+  return placeDamage(updateCard(state, source.id, { damage: source.damage - moved }), target.id, moved, ctx.cards, steps, "framework", currentCause(steps, UNATTRIBUTED));
 }
 
 // The candidate with the highest measure is picked; the first player chooses among a tie (PickLowestEngagement measures the staging area's

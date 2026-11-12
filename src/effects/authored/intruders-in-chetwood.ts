@@ -68,7 +68,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     },
     { id: "09017:constant:3", cardCode: ORC_WAR_PARTY, lines: ["09017:A:3"], timing: "constant", instructions: [{ verb: "Restrict", what: "advance" }] },
 
-    // 09018 Chetwood Forest. Travel: one player (the first player decides which) chooses and engages an enemy in the staging area; the travel is not conditional on it. Shadow: the defending player either exhausts a hero he controls or the attacker returns to the staging area after the attack.
+    // 09018 Chetwood Forest. Travel: one player (the first player decides which) chooses and engages an enemy in the staging area; a Travel line is a cost (rr.travel), so the players cannot travel here while no enemy is in the staging area (families/angmar/travel.ts travelUnpayable). Shadow: the defending player either exhausts a hero he controls or the attacker returns to the staging area after the attack.
     {
       id: "09018:travel:1",
       cardCode: "09018",

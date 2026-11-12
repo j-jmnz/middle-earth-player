@@ -22,7 +22,7 @@ import { countMatching, matchesPick, pickCandidates } from "./pick.ts";
 import { committedWillpower, stagingThreat } from "../quest/quest.ts";
 import { cardTypeOf, printedOf, type Sphere } from "../core/printed.ts";
 import type { ScenarioState } from "../core/state.ts";
-import { inPlay, livingSeats } from "../core/state.ts";
+import { flagged, inPlay, livingSeats } from "../core/state.ts";
 import { combatStepIs } from "../families/defense/conditions.ts";
 import { faceUp, flagHeld } from "../families/sidequests/contract.ts";
 import { copyInVictory } from "../families/sidequests/pick.ts";
@@ -106,7 +106,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
   switch (condition.kind) {
     // A family's condition hook answers these before this switch (south: noneDiscarded; black-gate: embassy; wilderland: the campaign log, the Caves deck, the quest deck, Discover, the Fate of Wilderland's); the cases only complete the switch.
     case "noneDiscarded": case "logged": case "treasuresLogged": case "beldisBox": case "cavesDeck": case "pileHas": case "facedownUnder": case "questDeck": case "soleAttacker": case "captives":
-    case "attackedThisPhase": case "namedFlag": case "discoverUnavailable": case "encounterPlacedOnStage": case "playerUnengaged": case "hasWizardry": case "onDial": case "canAttachToDial": case "embassy": case "lastFortitudeFailed": case "lastFortitudePassed": case "fortitudeFailed": case "hostControlledByActor": case "currentQuest": case "questLeads":
+    case "attackedThisPhase": case "namedFlag": case "discoverUnavailable": case "encounterPlacedOnStage": case "playerUnengaged": case "hasWizardry": case "onDial": case "canAttachToDial": case "embassy": case "lastFortitudeFailed": case "lastFortitudePassed": case "fortitudeFailed": case "hostControlledByActor": case "currentQuest": case "questLeads": case "hitPointsLeft":
       return false;
     case "hideFailed":
       return state.hideFailures.some(
@@ -408,7 +408,7 @@ export function hasTrait(state: ScenarioState, id: string, trait: string, ctx: R
   const instance = state.cards[id];
   return (
     instance != null &&
-    (printedOf(ctx.cards, instance.code).traits.includes(trait) || grantedTraits(state, id, ctx).includes(trait) || flaggedTrait(state, id, trait) || countedTraits(state, id, ctx).includes(trait))
+    ((printedOf(ctx.cards, instance.code).traits.includes(trait) && !flagged(state, id, "blanksTraits")) || grantedTraits(state, id, ctx).includes(trait) || flaggedTrait(state, id, trait) || countedTraits(state, id, ctx).includes(trait))
   );
 }
 

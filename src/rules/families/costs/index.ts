@@ -34,6 +34,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "PaidByIcons":
     case "CannotPayFor":
     case "ThreatCost":
+    case "IncreaseCost":
     case "PlayCost":
     case "ExhaustToReduce":
       return state;
@@ -42,4 +43,4 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-export const manifest: RulesFamily = { name: "costs", verbs: ["ReduceNextCost", "ChooseX", "SetX", "DiscardResources", "SpendResources", "HeroesGainResources", "Reattach", "PlayFromHand", "PayToPlay", "PaysAsIcons", "PaidByIcons", "CannotPayFor", "ThreatCost", "PlayCost", "ExhaustToReduce"], run };
+export const manifest: RulesFamily = { name: "costs", verbs: ["ReduceNextCost", "ChooseX", "SetX", "DiscardResources", "SpendResources", "HeroesGainResources", "Reattach", "PlayFromHand", "PayToPlay", "PaysAsIcons", "PaidByIcons", "CannotPayFor", "ThreatCost", "IncreaseCost", "PlayCost", "ExhaustToReduce"], run };

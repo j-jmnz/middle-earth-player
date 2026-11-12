@@ -181,7 +181,7 @@ export function applyResponse(state: ScenarioState, intent: TriggerIntent, ctx: 
     },
     steps,
   );
-  return announceAbility(framed, intent.cardId, seat, ctx);
+  return announceAbility(framed, intent.cardId, seat, ctx, true);
 }
 
 // Pass: the seat gives up every Response it was offered for this event.

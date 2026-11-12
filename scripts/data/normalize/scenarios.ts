@@ -309,7 +309,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     for (const code of codesOf(camp, ["earned", "choose"])) campaignPlaced.add(code);
     for (const code of campaignNamed) campaignPlaced.add(code);
     for (const code of campaignTextCodes({ names, byCode, ruleById, campaignCard, campaignLines: campaignLines.others, setupSpan: def.deck !== undefined ? def.setupSpan : null, cardPacks, campaignCardsOnly: productOf(def.campaignProduct ?? def.product).campaignCardRewards === true })) campaignPlaced.add(code);
-    for (const rule of overrides.scenarioCampaignPlaced) if (rule.scenario === id) campaignPlaced.add(rule.code);
+    for (const rule of overrides.scenarioCampaignPlaced) if ([rule.scenario].flat().includes(id)) campaignPlaced.add(rule.code);
     // Everything the quest Setup names must be in a pile.
     const inPile = (code: string, piles: readonly string[]) => placed.some((item) => same(item.code, code) && piles.includes(item.pile));
     for (const clause of quest.clauses) {

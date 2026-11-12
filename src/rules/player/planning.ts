@@ -4,6 +4,8 @@ import type { Effect } from "../../catalog/boundary.ts";
 
 import { attachmentHostIds, enforceRestricted, playCost } from "./attach.ts";
 import { discardGrantHosts, discardGranted, spendDiscardGrant } from "../families/angmar/discard-play.ts";
+import { discardsLocked } from "../families/angmar/lock.ts";
+import { announceEventAction } from "../families/deck/pressure.ts";
 import { playLimit, playLimitReason } from "../families/dungeon/limit.ts";
 import { effectCause, ruleCause } from "../core/cause.ts";
 import { deckPlayHero, markDeckPlay, playableFromDeck } from "./deck-play.ts";
@@ -116,7 +118,7 @@ function playEvent(state: ScenarioState, cardId: string, seat: number, ctx: Redu
   if (!first) return moveCard(state, cardId, { zone: "discard", seat });
   // Two Actions on different lines (an Action and a Valour Action): the player uses one (families/deck/play.ts).
   const choice = alternativeActions(running);
-  return pushEffectFrame(
+  const framed = pushEffectFrame(
     { ...noteEventLimits(state, running, cardId, seat, ctx, steps), window: null },
     {
       frame: "ResolveEffect",
@@ -134,6 +136,8 @@ function playEvent(state: ScenarioState, cardId: string, seat: number, ctx: Redu
     },
     steps,
   );
+  // The event is an Action a player triggers (09040:A:1).
+  return announceEventAction(framed, cardId, seat, ctx);
 }
 
 // Why an event cannot be played in this window: no Action of its has its condition hold (a Combat Action outside combat), or
@@ -191,6 +195,8 @@ function discardPlay(ctx: ReduceContext, code: string): { allowed: boolean; only
 
 // The cards of the seat's discard pile its text lets it play from there.
 export function discardPlayable(state: ScenarioState, seat: number, ctx: ReduceContext): string[] {
+  // The Power of Angmar: a card's own text cannot take it out of the discard pile (families/angmar/lock.ts).
+  if (discardsLocked(state)) return [];
   const own = (state.seats[seat]?.discard ?? []).filter((id) => discardPlay(ctx, state.cards[id]?.code ?? "").allowed);
   // An attachment Stalwart lets its hero's controller play from the discard pile (families/angmar/discard-play.ts).
   const granted = discardGranted(state, seat, ctx).filter((id) => !own.includes(id));
@@ -202,7 +208,7 @@ export function playWindowReason(state: ScenarioState, cardId: string, ctx: Redu
   if (state.window?.kind !== "pass" && state.window?.kind !== "frameAction") return "That intent is not legal in this window";
   const instance = state.cards[cardId];
   const fromDeck = instance?.zone === "deck" && playableFromDeck(state, cardId, state.activeSeat, ctx);
-  const fromDiscard = instance?.zone === "discard" && (discardPlay(ctx, instance.code).allowed || discardGranted(state, state.activeSeat, ctx).includes(instance.id));
+  const fromDiscard = instance?.zone === "discard" && !discardsLocked(state) && (discardPlay(ctx, instance.code).allowed || discardGranted(state, state.activeSeat, ctx).includes(instance.id));
   if (!instance || (instance.zone !== "hand" && !fromDeck && !fromDiscard) || instance.controller !== state.activeSeat) return "That card is not in hand";
   if (instance.zone === "hand" && discardPlay(ctx, instance.code).only) return "That card can only be played from the discard pile";
   // "Play only if ..." (a play restriction, rr.initiating-abilities-playing-cards).

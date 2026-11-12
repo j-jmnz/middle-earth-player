@@ -3,6 +3,7 @@
 import { z } from "zod";
 
 import type { CatalogFamily } from "../family-manifest.ts";
+import { cardRefSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { verbFlags } from "../verb-flags.ts";
 
@@ -30,8 +31,8 @@ const VERBS = [
   verbFlags(z.strictObject({ verb: z.literal("AttachNewTo"), code, to: z.string().min(1) }), { setupRole: "afterSetup" }),
   // Campaign Setup: starting with the first player, each player may place `damage` damage on the card with this code to add `resources` resource to each of their heroes' pools ("each player may place 4 damage on Protect the Innocent to add 1 resource to each of their heroes'
   // resource pools", 10156:A:2). The tokens are placed, not dealt: nothing cancels them, and a player may take the card to its limit. `seat` is engine use: the player whose turn it is.
-  // A constant marker on a quest stage ("The first Weather treachery card revealed each round gains surge", 09069:B:1): the first card with this Trait revealed in a round (from the encounter deck or by an effect) gains Surge as it is revealed (rr.surge).
-  z.strictObject({ verb: z.literal("FirstTraitSurge"), trait: z.string().min(1) }),
+  // A constant marker on a quest stage ("The first Weather treachery card revealed each round gains surge", 09069:B:1): the first card with this Trait revealed in a round (from the encounter deck or by an effect) gains Surge as it is revealed (rr.surge). `type` is the card type, a treachery unless it says "enemy" ("The first Undead enemy revealed each round gains surge", 09039:A:1, a marker with a record condition: while Haunted Keep is the active location). Each Trait has one tally a round, kept while no card holds the marker.
+  z.strictObject({ verb: z.literal("FirstTraitSurge"), trait: z.string().min(1), type: z.enum(["treachery", "enemy"]).optional() }),
   // The phase in progress ends once the effect that ends it has finished: the steps of the phase left are skipped and the next phase begins ("End the current phase", 09070:A:1; mec108.campaign-mode). In the quest phase the characters stay exhausted but are no longer committed and
   // the quest is not resolved (as EndQuestPhase); in the combat phase the attacks left are not made.
   z.strictObject({ verb: z.literal("EndPhase"), ...when }),
@@ -41,6 +42,15 @@ const VERBS = [
   // Starting with the first player, each player may choose 1 of the boons that are still set aside and attach it to a hero they control ("each player may choose 1 of the following boons and attach it to a hero they control", 10160:A:3): the player picks a boon or none, then the hero.
   // A boon taken is not offered again. `seat` is engine use: the player whose turn it is.
   z.strictObject({ verb: z.literal("ChooseBoon"), codes: z.array(code).min(1), seat: z.number().int().min(0).optional(), ...when }),
+  // After Thaurdir enters play (campaign mode): of the burdens named that the game set aside, one is picked at random (the game's seed) and attached to the card the record names, `to` (the event's card by default), even to a card that cannot have attachments: a campaign burden
+  // may ("randomly select one of the following burdens and attach it to Thaurdir", 10166:A:3). Nothing is attached with none set aside (standalone play).
+  z.strictObject({ verb: z.literal("AttachRandomBurden"), codes: z.array(code).min(1), to: cardRefSchema.optional(), ...when }),
+  // The source burden moves to the hero (any player's) that holds the most resources, non-objective attachments or damage ("move Thaurdir's Legacy to the hero with the most resources", 10168:A:2). The hero it is on counts, so it stays when that hero holds the most;
+  // the first player chooses among heroes that tie (rr.first-player).
+  z.strictObject({ verb: z.literal("MoveToHero"), most: z.enum(["resources", "nonObjectiveAttachments", "damage"]), ...when }),
+  // Setup of a pool card (a later scenario): the source attaches to the card in play with this title, or with `outOfPlay` to one set aside as well; with no such card it is removed from the game ("Attach to Thaurdir (even if he is out of play). Otherwise, remove this card
+  // from the game", 10168:A:1; "Attach to Amarthiúl. Otherwise, remove ... from the game", 10167:A:1).
+  z.strictObject({ verb: z.literal("AttachSelfToNamed"), name: z.string().min(1), outOfPlay: z.boolean().optional(), ...when }),
   verbFlags(z.strictObject({ verb: z.literal("TradeDamageForResources"), code, damage: z.number().int().positive(), resources: z.number().int().positive(), seat: z.number().int().min(0).optional() }), { setupRole: "afterSetup" }),
 ] as const;
 
@@ -64,6 +74,11 @@ const FLAGS = [
   "phaseEnds",
   // On a hero (target `host`), until the end of the phase: its controller may play an attachment from their discard pile onto this hero, paying its cost; the play uses it up ("Play an attachment from your discard pile on attached hero", 10165:A:4; families/angmar/discard-play.ts).
   "attachmentFromDiscard",
+  // Held by the table while a card in play says so (the side quest The Power of Angmar while it is in the staging area): no player card effect takes a card out of a discard pile ("Cards in each player's discard pile cannot leave that player's discard pile by player
+  // card effect", 09067:A:2). A Pick `from: discard`, ShuffleDiscardIntoDeck and the play of a card from the discard pile (PlayFromDiscard, Stalwart) read it for a player card's effect; an encounter card's effect is not stopped (families/angmar/lock.ts).
+  "discardLocked",
+  // On a hero (target `host`): its printed Traits are treated as blank as well as its text box ("treated as if its printed text box were blank", Thaurdir's Legacy, 10168:A:2; rr.blank): `hasTrait` ignores the printed Traits, while a Trait another card grants stays. Set beside `blankText`.
+  "blanksTraits",
 ] as const;
 
 export const manifest = { name: "angmar", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

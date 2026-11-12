@@ -102,5 +102,5 @@ export function applyTrigger(
     },
     steps,
   );
-  return announceAbility(framed, intent.cardId, seat, ctx);
+  return announceAbility(framed, intent.cardId, seat, ctx, true);
 }

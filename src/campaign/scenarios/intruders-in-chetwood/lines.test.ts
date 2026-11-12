@@ -5,7 +5,7 @@ import { updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import type { PlayerIntent, ReduceContext } from "../../../rules/engine/reduce.ts";
 import { pickCandidates } from "../../../rules/interpret/pick.ts";
-import { restricted } from "../../../rules/interpret/restrictions.ts";
+import { restricted, travelCostUnpayable } from "../../../rules/interpret/restrictions.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { setCurrentQuest } from "../../../rules/families/angmar/quest.ts";
 import { removeTimeCounters } from "../../../rules/families/angmar/time.ts";
@@ -168,10 +168,11 @@ describe("Iârion's Pendant's Response (10157:A:2)", () => {
 });
 
 describe("the other lines a row cannot show", () => {
-  it("09018:A:1 travels even with no enemy to engage, and offers each enemy in the staging area when there are several", () => {
+  it("09018:A:1 cannot be travelled to while no enemy is in the staging area (rr.travel: the players cannot travel if they cannot pay the Travel cost), and offers each enemy in the staging area when there are several", () => {
     const none = built({ phase: "Travel", staging: ["09018"] });
-    const run = resolveRecords(none.state, none.ctx, "09018", "travel", idOf(none.state, "09018"));
-    expect(run.state.window?.kind).not.toBe("choose");
+    expect(travelCostUnpayable(none.state, none.ctx, idOf(none.state, "09018"))).toBe(true);
+    const one = built({ phase: "Travel", staging: ["09018", "f3"] });
+    expect(travelCostUnpayable(one.state, one.ctx, idOf(one.state, "09018"))).toBe(false);
     const two = built({ phase: "Travel", staging: ["09018", "f0", "f3"] });
     const picked = resolveRecords(two.state, two.ctx, "09018", "travel", idOf(two.state, "09018"), (state) => (state.window?.kind === "choose" ? (state.window.options.find((id) => state.cards[id]?.code === "f3") ?? "") : ""));
     expect(picked.state.cards[idOf(picked.state, "f3")]?.zone).toBe("engaged");

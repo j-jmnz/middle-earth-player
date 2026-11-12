@@ -17,6 +17,7 @@ import type { CardInstance, ScenarioState } from "../core/state.ts";
 import { inPlay, updateCard } from "../core/state.ts";
 import { moveCard } from "../core/zones.ts";
 import { queueEvent } from "../windows/queue.ts";
+import { announceTopDiscard } from "../families/deck/pressure.ts";
 import { currentCause, UNATTRIBUTED } from "../core/cause.ts";
 import { campaignUsed, noteCampaignUse } from "../families/campaign/used.ts";
 
@@ -236,6 +237,7 @@ export function payUsage(
       case "discardDeckTop":
         // Each card is announced ("After ~ is discarded from your deck", families/deck/moves.ts).
         for (const id of (next.seats[seat]?.deck ?? []).slice(0, cost.amount)) next = queueEvent(moveCard(next, id, { zone: "discard", seat }), { trigger: "discardedFromDeck", seat, cardId: id });
+        next = announceTopDiscard(next, seat, Math.min(cost.amount, state.seats[seat]?.deck.length ?? 0), ctx);
         break;
       case "playEvent":
         // A Response event played from the top of the deck (Gandalf, 142002) spends that permission and is held like a card

@@ -33,10 +33,11 @@ export function outOfPlayChoices(state: ScenarioState, code: string): string[] {
 
 export function searchable(
   state: ScenarioState,
-  selector: { code?: string; trait?: string; traits?: readonly string[]; type?: string; nonUnique?: boolean; deckOnly?: boolean; victory?: boolean },
+  selector: { code?: string; trait?: string; traits?: readonly string[]; type?: string; nonUnique?: boolean; deckOnly?: boolean; discardOnly?: boolean; victory?: boolean },
   ctx: ReduceContext,
   // `deckOnly`: the encounter deck alone, not its discard pile ("search the encounter deck for a Harad enemy", 144037:A:1).
-  zones: readonly ("encounterDeck" | "encounterDiscard")[] = selector.deckOnly === true ? ["encounterDeck"] : ["encounterDeck", "encounterDiscard"],
+  // `discardOnly`: the encounter discard pile alone ("Put each copy of Cursed Dead in the discard pile into play", 09061:A:1).
+  zones: readonly ("encounterDeck" | "encounterDiscard")[] = selector.deckOnly === true ? ["encounterDeck"] : selector.discardOnly === true ? ["encounterDiscard"] : ["encounterDeck", "encounterDiscard"],
 ): string[] {
   const found: string[] = [];
   // `victory`: the victory display is searched too ("search the encounter deck, discard pile, and victory display for a Nazgûl enemy", 146036:A:2).

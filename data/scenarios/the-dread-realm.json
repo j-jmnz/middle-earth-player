@@ -162,7 +162,13 @@
     }
   ],
   "campaignCard": "10193",
-  "campaignPlaced": [],
+  "campaignPlaced": [
+    "10161",
+    "10162",
+    "10163",
+    "10164",
+    "10165"
+  ],
   "widgets": {
     "hide": false,
     "secondActiveLocation": false,

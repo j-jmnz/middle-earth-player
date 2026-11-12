@@ -1,4 +1,5 @@
 // Rules: rr.in-play-and-out-of-play, mec109.immune-to-player-card-effects, mec109.permanent (data/rules/entries.json).
+import { discardLockedFor } from "../families/angmar/lock.ts";
 import { captiveIds } from "../families/captives/values.ts";
 import type { Instruction, PickSpec } from "../../catalog/boundary.ts";
 
@@ -307,6 +308,8 @@ export function pickCandidates(
   // Immunity is to player card effects: an encounter card's Pick may choose an immune card (mec109.immune-to-player-card-effects).
   // An ally with an encounter back is an encounter card and has encounter card effects (dcce.encounter-cards: the ship-objectives, the Modification attachments, Calaerion, Gavin, Send for Help). The Stormcaller Elite's objective allies have no encounter back (dcce.stormcaller-elite) and stay objectives.
   const playerEffect = !counting && isPlayerCardEffect(state, ctx.cards, sourceId);
+  // The Power of Angmar: a player card effect cannot choose a card in a discard pile (families/angmar/lock.ts).
+  if (spec.from === "discard" && !counting && discardLockedFor(state, sourceId, ctx)) return [];
   const raw = spec.attachedTo ? attachedPool(state, spec.attachedTo, sourceId) : pool(state, spec, asking, ctx);
   const at: PickContext = { seat, sourceId, picked, ...(x != null ? { x } : {}), ...(participants ? { participants } : {}), counting, ...event };
   const found = raw.filter((id) => {

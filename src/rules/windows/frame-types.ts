@@ -107,6 +107,8 @@ export type EffectData = {
   hold?: string;
   // The card DiscardBottom discarded from the bottom of a deck in this effect (the `discardedCost` condition, families/uncharted/cards.ts).
   discarded?: string;
+  // Every card the running effect discarded from the top of a deck, over all the players it acted for, oldest first (the amount `discarded`, families/deck/discarded.ts).
+  discardedFromDecks?: readonly string[];
   // How many cards DiscardEach has discarded in this effect (the `noneDiscarded` condition, families/south/damage.ts).
   discardedCount?: number;
   // The last Hide test this effect made failed (HideTest; the `lastHideFailed` condition, families/nightmare/guards.ts).

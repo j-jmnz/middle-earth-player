@@ -9,15 +9,22 @@ import { queueFront } from "../play/refs.ts";
 import type { Focus } from "../index.ts";
 import { seatTurn } from "./in-turn.ts";
 
+// A boon is offered while its set-aside copy is there and no other card of that title is in the game: each boon has one copy, so one the Campaign Pool already attached to a hero (an earlier Omens or The Weather Hills' reward) is not taken twice.
+function offered(state: ScenarioState, code: string): boolean {
+  const aside = new Set(state.setAside);
+  const copies = Object.values(state.cards).filter((card) => card.code === code);
+  return copies.some((card) => aside.has(card.id)) && copies.every((card) => aside.has(card.id));
+}
+
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
 /**
  * ChooseBoon: the player whose turn it is (the first living seat first) is asked which of the boons still set aside to take, or none. A boon is picked by its code; the player then picks the hero that carries it (a hero that can hold it) and a set-aside copy is attached; the next player
- * is asked once this one has answered. A boon taken is not offered again; with none left nobody is asked. Run outside an effect frame, which cannot ask, the step fails.
+ * is asked once this one has answered. A boon taken, or already held from the pool, is not offered again; with none left nobody is asked. Run outside an effect frame, which cannot ask, the step fails.
  */
 export function chooseBoon(state: ScenarioState, instruction: Verb<"ChooseBoon">, focus: Focus, steps: EngineStep[]): ScenarioState {
   const turn = seatTurn(state, instruction, steps);
-  const left = instruction.codes.filter((code) => state.setAside.some((id) => state.cards[id]?.code === code));
+  const left = instruction.codes.filter((code) => offered(state, code));
   if (!turn || left.length === 0) return state;
   const { seat, cause, goOn } = turn;
   if (focus.chosen == null) return effectData(state) ? askTarget(state, { instruction: turn.asked, seat, chosen: null, cause }, [...left, "none"]) : { ...state, failure: "Choosing a boon needs a choice, and no effect is asking" };

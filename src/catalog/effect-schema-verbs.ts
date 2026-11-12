@@ -183,6 +183,8 @@ export const simpleVerbs = [
     each: z.boolean().optional(),
     // The encounter deck alone is searched, not its discard pile ("search the encounter deck for a Harad enemy", 144037:A:1; rr.search: the discard pile is searched only when the line says so).
     deckOnly: z.literal(true).optional(),
+    // The encounter discard pile alone is searched ("Put each copy of Cursed Dead in the discard pile into play in the staging area", 09061:A:1; with `each`, `to: "staging"`: no search of the deck).
+    discardOnly: z.literal(true).optional(),
     // The victory display is searched too ("search the encounter deck, discard pile, and victory display for a Nazgûl enemy", 146036:A:2).
     victory: z.literal(true).optional(),
     // While a card with this code is in the encounter deck or its discard pile, the search must take it, until an earlier search of the same effect has taken one ("one of those enemies must be

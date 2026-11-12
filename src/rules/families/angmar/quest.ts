@@ -7,7 +7,8 @@ import type { EngineStep } from "../../core/intents.ts";
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { Scope } from "../../interpret/conditions.ts";
-import { flagged, type ScenarioState } from "../../core/state.ts";
+import { modifiedStat } from "../../core/keywords.ts";
+import { flagged, inPlay, type ScenarioState } from "../../core/state.ts";
 import { committedWillpower, stagingThreat } from "../../quest/quest.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { effectData } from "../encounter/moves.ts";
@@ -73,4 +74,11 @@ export function currentQuestHolds(state: ScenarioState, condition: Condition, sc
 /** The condition `questLeads`: the total Willpower of the characters committed to the quest is greater than the total Threat in the staging area now (09021:A:1). */
 export function questLeadsHolds(state: ScenarioState, condition: Condition, ctx: ReduceContext): boolean | null {
   return condition.kind === "questLeads" ? committedWillpower(state, ctx.cards) > stagingThreat(state, ctx.cards) : null;
+}
+
+/** The condition `hitPointsLeft`: the card in play with the code has damage below its hit points (09074:B:2: the stage cannot be defeated while Thaurdir has any hit points remaining). False with no such card in play. */
+export function hitPointsLeftHolds(state: ScenarioState, condition: Condition, ctx: ReduceContext): boolean | null {
+  if (condition.kind !== "hitPointsLeft") return null;
+  const card = Object.values(state.cards).find((other) => other.code === condition.code && inPlay(other.zone));
+  return card != null && card.damage < modifiedStat(state, card, "hitPoints", ctx.cards);
 }
