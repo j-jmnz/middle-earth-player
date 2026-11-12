@@ -79,7 +79,7 @@ describe("19155 The Goblins' Assault", () => {
     expect(damageTo(t.state, CODES.goblinTroop, 2)).toBe(2);
   });
 
-  it("19155:A:2 Forced: after the players quest unsuccessfully, it gets 1 progress for each player, once", () => {
+  it("19155:A:2 Forced: after the players quest unsuccessfully, it gets 1 progress for each player (no once-per-round limit is printed)", () => {
     for (const seats of [1, 2] as const) {
       const t = fight(FAILING, { seats, stage: "19168", threat: [30, 30] });
       const run = quest(t, t.state);

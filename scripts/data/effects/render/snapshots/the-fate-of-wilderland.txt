@@ -31,7 +31,8 @@ Scenario piles that place cards with no record (quest: 19168 Urdug's Assault; qu
     - each enemy (any player controls) or in the staging area, named "Urdug": stat cannotTakeDamage 1, while this card is in play
 
 19155:A:2 (front): Forced: After the players quest unsuccessfully, place 1 progress here for each player in the game.
-  19155:forced:1: Forced after the players quest unsuccessfully (limit once per round)
+  19155:forced:1: Forced after the players quest unsuccessfully
+    only if the actor holds the first player token
     - place the number of players progress on this card
 
 ## 19156 The Heroes' Defense
@@ -289,4 +290,4 @@ Scenario piles that place cards with no record (quest: 19168 Urdug's Assault; qu
     - place the number of enemy (any player controls) or in the staging area progress on the picked card
     - then, if the number of players x 8 + 7 is less than progress of "The Goblins' Assault" (checked when this step runs, after the steps above; not tied to whether they did anything): the players lose the game (The Goblins' Assault holds as much progress as the players can bear)
 
-(rendered pieces: 195 by template, 0 as JSON)
+(rendered pieces: 196 by template, 0 as JSON)
