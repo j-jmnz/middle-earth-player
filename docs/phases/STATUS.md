@@ -104,8 +104,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 78 | Angmar Awakened campaign shell | completed | 2026-11-12. Review round done. Open: campaign-card lines left to their scenarios. |
 | 79 | Intruders in Chetwood | completed | 2026-11-12. Review round done. Open: `chetwood-won`. |
 | 80 | The Weather Hills | completed | 2026-11-12. Review round done. Open: `hills-won`. |
-| 81 | Deadmen's Dike | active | 2026-11-12. `docs/plans/angmar-awakened.md`. |
-| 82 | The Wastes of Eriador | not started |  |
+| 81 | Deadmen's Dike | completed | 2026-11-12. Review round done. Open: `dike-won`. |
+| 82 | The Wastes of Eriador | active | 2026-11-12. `docs/plans/angmar-awakened.md`. |
 | 83 | Escape from Mount Gram | not started |  |
 | 84 | Across the Ettenmoors | not started |  |
 | 85 | The Treachery of Rhudaur | not started |  |
@@ -120,6 +120,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - The release notes' golden-check comparison (`scripts/release/reach.ts`) has not run against a real previous tag; the first tag after it compares by `ENGINE_CHANGES` only.
 
 ### Fixtures and Maestro
+- `dike-won` is not committed: no seed in 600 wins Deadmen's Dike with the saved decklists (their heroes cannot put 9 damage on Thaurdir). Until it exists `.maestro/scenarios/deadmens-dike/deadmens-dike.yaml` cannot run; its Resolution step is unverified against the `to: player` view.
 - `hills-won` is not committed: no seed in 100 wins The Weather Hills with the saved decklists (Defenders of Gondor, Swords of the Noldor, Easy). Until it exists `.maestro/scenarios/the-weather-hills/the-weather-hills.yaml` cannot run.
 - `chetwood-won` is not committed: no seed in 100 wins Intruders in Chetwood with The One Deck and Defenders of Gondor under five policies. Until it exists `.maestro/scenarios/intruders-in-chetwood/intruders-in-chetwood.yaml` cannot run.
 - `marshes-won` is not committed: no seed in 600 wins The Passage of the Marshes with The One Deck and Defenders of Gondor (every game reaches threat 50 by round 4). Until it exists `.maestro/scenarios/the-passage-of-the-marshes/the-passage-of-the-marshes.yaml` cannot run.
@@ -205,7 +206,22 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - The Weather Hills: Mysterious Omens' boons (10160:A:3): each player in turn may take one boon still set aside; it is Permanent and recorded with its hero. Not user-confirmed.
 - The Weather Hills: Stalwart (10165:A:4) marks the hero for the phase and the attachment is played through the normal play. Not user-confirmed.
 - Test kit: `test/harness/game-kit.ts` hands a game only the Wilderland and Angmar log facts, while `src/campaign/briefing.ts` also hands XP, Two Towers and Return of the King facts; sharing one helper moves 17 Dream-chaser, Two Towers and Return of the King goldens, so those goldens are dealt without facts a real game has. Not fixed.
-- Angmar Awakened campaign-card lines left to their scenarios' Build: 10166:A:2 and A:3 (Deadmen's Dike), the `determined` write (The Wastes of Eriador), 10174:A:2 and B:1 to B:3 with the `stolenCards` write and its deck refusal (Escape from Mount Gram), 10182:A:2, A:3 and B:1 (Across the Ettenmoors), 10184:B:1 (The Treachery of Rhudaur). The boons' and burdens' own lines (10167 to 10170, 10176 to 10181, 10185 to 10187, 10189 to 10192) go with the scenario that first deals each.
+- Deadmen's Dike: Thaurdir's burden (10166:A:3) attaches to him although he "Cannot have attachments" (09033:A:2, rr.cannot); no ruling found. Not user-confirmed.
+- Deadmen's Dike: a boon chosen at Mysterious Omens in this scenario is recorded with its hero at 10166:B:1 (orchestrator decision; not in the printed text). Not user-confirmed.
+- Deadmen's Dike: a burden's current host counts for "the hero with the most" (10168 to 10170), ties chosen by the first player, moving on any Sorcery reveal. Not user-confirmed.
+- Deadmen's Dike: Broken Battlements (09036:A:2) places 1 time counter for each player. Not user-confirmed.
+- Deadmen's Dike: Fornost Square (09038:A:2) takes 1 token per discard effect or cost from the top of the first player's deck, not per card. Not user-confirmed.
+- Deadmen's Dike: Haunted Keep's first-Undead surge (09039:A:1) tallies from the round's start. Not user-confirmed.
+- Deadmen's Dike: Deadmen's Gate (09040:A:1) hears an event played for its Action or Response as triggered; encounter card abilities do not count. Not user-confirmed.
+- Deadmen's Dike: Terror of the North (09064:A:1) pools card types across all players' discards. Not user-confirmed.
+- Deadmen's Dike: Arnor Ravaged (100158:A:2) moves 1 damage once per attack. Not user-confirmed.
+- Deadmen's Dike: Norbury Tombs' Travel (09037:A:2) is a cost and cannot be paid with no enemy in the encounter discard pile (rr.travel; community sources for the card). Not user-confirmed.
+- Deadmen's Dike: Heavy Curse (09066:A:2) raises a card played from any zone, and a card played from the discard pile counts as its own copy (community source only). Not user-confirmed.
+- Deadmen's Dike: The Power of Angmar (09067:A:2) locks only player card effects on player discard piles (community source only). Not user-confirmed.
+- Deadmen's Dike: stage 2B (09074:B:2) needs its 13 progress and Thaurdir at 9 damage, and an empty deck eliminates at each check (community source only). Not user-confirmed.
+- `AddSetAsideToStaging` announces no entering play (no `announceEntered`, no family hook) for a set-aside card it stages; routing it through `moveEncounter` moves 14 goldens (Dream-chaser, Ered Mithrin, Fellowship and Two Towers scenarios), so Thaurdir uses `EnterSetAsideStaging` instead. Not fixed.
+- Renderer gaps, Deadmen's Dike (behaviour proven by tests): "top 5 of his discard pile" per player (09037:A:1, 09067:A:3), an unpayable Travel cost (09037:A:2, 09018:A:1), `playerAbilityTriggered` from a played event (09040:A:1), what `discardLocked` blocks (09067:A:2), `eliminatedAtEmptyDeck` (09073:B:3, 09074:B:2), 10166:B:1's choice and earned burden print as JSON; the 09074:whenRevealed:1 "then" check runs per reveal because `Repeat` takes no `when`.
+- Angmar Awakened campaign-card lines left to their scenarios' Build: the `determined` write (The Wastes of Eriador), 10174:A:2 and B:1 to B:3 with the `stolenCards` write and its deck refusal (Escape from Mount Gram), 10182:A:2, A:3 and B:1 (Across the Ettenmoors), 10184:B:1 (The Treachery of Rhudaur). The boons' own lines (10176 to 10181, 10185 to 10187, 10189 to 10192) go with the scenario that first deals each.
 - Intruders in Chetwood: quest cards in play are the main quest, the staged encounter side quests and the player side quests, at least 1 (09016, 09019, 09047, 09048, 09050). Not user-confirmed.
 - Intruders in Chetwood: Iârion's Response (09016:A:3) hears a side quest revealed by a search of the encounter deck, not of the discard pile. Not user-confirmed.
 - Intruders in Chetwood: Iârion held facedown under Rescue Iârion (09024:A:2) stays in play and has not left it. Not user-confirmed.
