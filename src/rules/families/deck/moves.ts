@@ -168,12 +168,12 @@ export function addToX(state: ScenarioState, instruction: Verb<"AddToX">, focus:
   return patchData(state, { x: (scope.x ?? 0) + resolveAmount(state, instruction.amount, scope, ctx) });
 }
 
-// ActAs: the rest of the effect resolves for the last picked player, or for the effect's actor again.
+// ActAs: the rest of the effect resolves for the last picked player, the first player (rr.first-player), or the effect's actor again.
 export function actAs(state: ScenarioState, instruction: Verb<"ActAs">): ScenarioState {
   const data = effectData(state);
   if (!data) return state;
   const player = [...(data.picked ?? [])].reverse().find((entry) => seatOf(entry) != null);
-  const seat = instruction.who === "actor" ? data.actor : seatOf(player ?? "");
+  const seat = instruction.who === "actor" ? data.actor : instruction.who === "firstPlayer" ? state.firstPlayer : seatOf(player ?? "");
   if (seat == null || !state.seats[seat] || state.seats[seat]?.eliminated) return state;
   return patchTop(state, { data: { ...data, queue: data.queue.map((item) => ({ ...item, seat })) } });
 }

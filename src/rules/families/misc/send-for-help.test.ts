@@ -1,4 +1,4 @@
-// Rules: rr.search, rr.unique-cards, rr.play-and-put-into-play, rr.framework-steps, rr.delayed-effects (data/rules/entries.json); ledger lines 11212:A:2, 11213:A:2, 11214:A:2.
+// Rules: rr.first-player, rr.search, rr.unique-cards, rr.play-and-put-into-play, rr.framework-steps, rr.delayed-effects (data/rules/entries.json); ledger lines 11212:A:2, 11213:A:2, 11214:A:2.
 // The three Send for Help events that take a card from the collection or add a phase, run through their real records on the table of A Storm on Cobas Haven (test/scenarios/a-storm-on-cobas-haven/scene.ts).
 // The Upgraded clauses ("If Send for Help (...) is upgraded") are in none of the records: no source prints an Upgraded side (the header of src/effects/authored/pool/DCCEHaven.ts).
 import { beforeAll, describe, expect, it } from "vitest";
@@ -6,6 +6,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { loadPrinted } from "../../../../test/harness/catalog.ts";
 import { addStandIns } from "../../../../test/harness/scene-kit.ts";
 import { finish, havenTable, idOf, idsOf, legalIntents, loadHavenWorld, resolveRecords, send, type HavenLayout, type HavenWorld, type Run } from "../../../../test/scenarios/a-storm-on-cobas-haven/scene.ts";
+import { pushCardEffects } from "../../interpret/effect-frames.ts";
 import { destroyCard } from "../../core/keywords.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { settle } from "../../engine/machine.ts";
@@ -184,5 +185,31 @@ describe("11214:A:2 Send for Help (Lore): put Gandalf from the collection into p
     const done = resolveRecords(made.state, { ...made.ctx, cards }, "11214", "whenRevealed", idOf(made.state, "11214"), answers([]));
     expect(cardsOf(done.state, GANDALF)).toHaveLength(0);
     expect(done.state.cards[idOf(made.state, "11214")]?.zone).toBe("removed");
+  });
+});
+
+// rr.first-player: an encounter effect that targets a single player or card has the first player select, whoever revealed the card.
+describe("Send for Help: the first player chooses the player, the hero and Gandalf (rr.first-player)", () => {
+  // The card is revealed by seat 1 while seat 0 holds the first player token; the first question is put to the seat the window names.
+  const firstQuestion = (code: string): { seat: number | undefined; options: readonly string[] } => {
+    const made = make({ staging: [code], seats: 2, deckOf: ["filler", "filler", "filler", "filler"] });
+    const id = idOf(made.state, code);
+    expect(made.state.firstPlayer).toBe(0);
+    const effects = made.ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "whenRevealed");
+    const pushed = pushCardEffects(made.state, "whenRevealed", id, 1, false, effects, made.ctx, []);
+    const asked = settle({ ...pushed, window: null, mode: "stopped" }, made.ctx, []).window;
+    return { seat: asked?.kind === "choose" ? asked.seat : undefined, options: asked?.kind === "choose" ? asked.options : [] };
+  };
+
+  it("11211:A:2 names the player", () => {
+    expect(firstQuestion("11211")).toEqual({ seat: 0, options: ["seat:0", "seat:1"] });
+  });
+
+  it("11212:A:2 names the hero", () => {
+    expect(firstQuestion("11212").seat).toBe(0);
+  });
+
+  it("11214:A:2 names the player who controls Gandalf", () => {
+    expect(firstQuestion("11214")).toEqual({ seat: 0, options: ["seat:0", "seat:1"] });
   });
 });
