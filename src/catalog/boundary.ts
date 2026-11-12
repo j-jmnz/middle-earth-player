@@ -188,6 +188,7 @@ export const scenarioDefinitionSchema = z.strictObject({
   // The campaign card's Setup instructions that need the quest card's Setup done first (a Dream-chaser Setup that names the ship-objectives the quest
   // card's Setup prepares): they resolve in a frame after it (rules/setup/setup.ts).
   afterSetup: z.array(instructionSchema).optional(),
+  beforeReveal: z.array(instructionSchema).optional(),
 });
 
 export type RingsDbPack = z.infer<typeof ringsDbPackSchema>;

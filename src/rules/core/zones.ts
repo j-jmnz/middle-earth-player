@@ -6,6 +6,8 @@ import { releaseOrcGuard } from "../families/dungeon/guard.ts";
 import { dealtFace } from "../families/dreamchaser/facts.ts";
 import { routeDestination } from "../families/sea/routes.ts";
 import { grappledWith } from "../families/grapple/values.ts";
+import { captureOnEntry } from "../families/captured/entry.ts";
+import { rescueUnder } from "../families/captured/rescue.ts";
 import { discardedFromDeck, joinStormcallerArea } from "../families/stormcaller/zone.ts";
 import { joinUnchartedDeck, shuffleUnchartedDeck, unchartedRoute, unchartedWon } from "../families/uncharted/zone.ts";
 import { deckRoute, isDeckZone, joinPile, leavePile, type PileZone } from "./piles.ts";
@@ -29,6 +31,8 @@ export type Destination =
   | { zone: "under"; locationId: string }
   // `hostId` null: a prisoner hero, held under no card (families/prisoner.ts).
   | { zone: "captive"; hostId: string | null }
+  // Captured: out of play under `hostId`, or in the captured deck of `seat` (the card's owner by default) with no host (families/captured/pile.ts).
+  | { zone: "captured"; hostId: string | null; seat?: number }
   // Attached facedown to a location in the staging area by Grapple (families/grapple/attach.ts).
   | { zone: "grappled"; locationId: string };
 
@@ -125,6 +129,12 @@ function detach(state: ScenarioState, id: string): ScenarioState {
     case "captive":
     case "grappled":
       return updateCard(state, id, { host: null });
+    // A card of a captured deck leaves its owner's list; a card under a host just loses the host.
+    case "captured": {
+      const owner = current.host == null && current.owner != null ? state.seats[current.owner] : undefined;
+      const left = owner && current.owner != null && owner.captured?.includes(id) ? withSeat(state, current.owner, { ...owner, captured: without(owner.captured, id) }) : state;
+      return updateCard(left, id, { host: null });
+    }
     case "shadow": {
       const enemy = current.host ? state.cards[current.host] : undefined;
       if (!enemy) return state;
@@ -194,7 +204,7 @@ export function unhost(state: ScenarioState, id: string): ScenarioState {
 
 // A destination that is one of a seat's own lists.
 function seatList(dest: Destination): dest is Extract<Destination, { zone: "deck" | "hand" | "discard" | "heroes" | "play" | "engaged" | "seatStaging" }> {
-  return "seat" in dest && dest.zone !== "seatQuest" && dest.zone !== "activeLocation" && dest.zone !== "secondActiveLocation" && dest.zone !== "questStage";
+  return "seat" in dest && dest.zone !== "captured" && dest.zone !== "seatQuest" && dest.zone !== "activeLocation" && dest.zone !== "secondActiveLocation" && dest.zone !== "questStage";
 }
 
 function attach(state: ScenarioState, id: string, dest: Destination): ScenarioState {
@@ -221,6 +231,13 @@ function attach(state: ScenarioState, id: string, dest: Destination): ScenarioSt
   // Facedown under an enemy, still in play and controlled by nobody (the Ring-bearer under the Watcher in the Water).
   if (dest.zone === "captive") {
     return updateCard(state, id, { zone: "captive", host: dest.hostId, controller: null, face: "down" });
+  }
+  // Captured: out of play, facedown, controlled by nobody, its tokens gone and its owner remembered; in a captured deck (no host) the owner's list takes it (mec108.captured-cards).
+  if (dest.zone === "captured") {
+    const owner = dest.seat ?? current.owner ?? current.controller;
+    const stamped = updateCard(state, id, { zone: "captured", host: dest.hostId, controller: null, face: "down", exhausted: false, committed: false, damage: 0, progress: 0, resources: 0, ...(owner != null ? { owner } : {}) });
+    const seat = owner != null ? stamped.seats[owner] : undefined;
+    return dest.hostId == null && owner != null && seat ? withSeat(stamped, owner, { ...seat, captured: append(seat.captured ?? [], id) }) : stamped;
   }
   // Facedown on a location in the staging area, in play, not in the staging area (dcce.grapple).
   if (dest.zone === "grappled") {
@@ -340,6 +357,12 @@ export function moveCard(state: ScenarioState, id: string, requested: Destinatio
   let moved = stampEntry(attach(next, id, dest), id, current.zone);
   // A Captive that leaves the captive zone is a Captive no more, and no seat holds it (families/captives): the discard pile it went to was read above.
   if (current.captive === true && dest.zone !== "captive") moved = updateCard(moved, id, { captive: undefined, owner: undefined, heroSlot: undefined });
+  // A captured card that leaves the zone is no one's but its owner's again (mec108.captured-cards); a card that enters play from out of play with Capture X captures (families/captured/entry.ts).
+  if (current.zone === "captured" && dest.zone !== "captured") moved = updateCard(moved, id, { owner: undefined });
+  if (moved.capture && !inPlay(current.zone) && inPlay(dest.zone)) moved = captureOnEntry(moved, id, dest);
+  // A host that leaves play rescues every card captured underneath it (mec108.captured-cards).
+  // A card captured with a hero that is itself put into a captured deck stays with it (the boons set aside with it, mec108.captured-deck).
+  if (moved.capture && inPlay(current.zone) && !inPlay(dest.zone) && dest.zone !== "captured") moved = rescueUnder(moved, id);
   // A card that goes from the encounter deck to its discard pile is announced in a game with ships (families/stormcaller/zone.ts).
   if (current.zone === "encounterDeck" && dest.zone === "encounterDiscard") moved = discardedFromDeck(moved, id);
   // A card shuffled back into the Uncharted deck is shuffled into it (families/uncharted/zone.ts).

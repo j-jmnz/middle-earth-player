@@ -115,6 +115,7 @@ export function blankScenario(input: {
     resolution: input.definition.resolution,
     ...(input.definition.part != null ? { part: input.definition.part } : {}),
     ...(input.definition.afterSetup && input.definition.afterSetup.length > 0 && input.definition.campaignCard ? { afterSetup: { card: input.definition.campaignCard, instructions: input.definition.afterSetup } } : {}),
+    ...(input.definition.beforeReveal && input.definition.beforeReveal.length > 0 && input.definition.campaignCard ? { beforeReveal: { card: input.definition.campaignCard, instructions: input.definition.beforeReveal } } : {}),
     resolutionAt: 0,
     resolutionSeat: 0,
     resolutionLog: { earned: [], fallen: [], captives: [] },

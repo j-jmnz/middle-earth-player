@@ -1,6 +1,7 @@
 // Rules: rr.in-play-and-out-of-play, mec109.immune-to-player-card-effects, mec109.permanent (data/rules/entries.json).
 import { discardLockedFor } from "../families/angmar/lock.ts";
 import { captiveIds } from "../families/captives/values.ts";
+import { capturedPool } from "../families/captured/values.ts";
 import type { Instruction, PickSpec } from "../../catalog/boundary.ts";
 
 import { attachmentHostIds } from "../player/attach.ts";
@@ -71,7 +72,7 @@ function stagingFor(state: ScenarioState, spec: PickSpec, asking: number): reado
 }
 
 // The cards a filter starts from: its zone group and whose cards they are.
-function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceContext): string[] {
+function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceContext, sourceId: string | null): string[] {
   const seats = seatsOf(state, spec, asking);
   const raw: string[] = [];
   // The Island Map's filters start from its own cards (families/island/pick.ts).
@@ -89,6 +90,9 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
       .filter((card) => (inPlay(card.zone) || card.zone === "encounterDeck" || card.zone === "encounterDiscard") && printedOf(ctx.cards, card.code).campaignKind === "burden")
       .map((card) => card.id);
   }
+  // The captured cards a pick starts from (families/captured/values.ts).
+  const captured = capturedPool(state, spec, asking, sourceId, ctx);
+  if (captured) return captured;
   // The Uruk-hai's Captives, alone or among the heroes (families/captives).
   if (spec.captive === "only" || spec.captive === "free") return captiveIds(state, spec.captive, ctx.cards);
   const from = spec.from ?? "play";
@@ -318,7 +322,7 @@ export function pickCandidates(
   const playerEffect = !counting && isPlayerCardEffect(state, ctx.cards, sourceId);
   // The Power of Angmar: a player card effect cannot choose a card in a discard pile (families/angmar/lock.ts).
   if (spec.from === "discard" && !counting && discardLockedFor(state, sourceId, ctx)) return [];
-  const raw = spec.attachedTo ? attachedPool(state, spec.attachedTo, sourceId) : pool(state, spec, asking, ctx);
+  const raw = spec.attachedTo ? attachedPool(state, spec.attachedTo, sourceId) : pool(state, spec, asking, ctx, sourceId);
   const at: PickContext = { seat, sourceId, picked, ...(x != null ? { x } : {}), ...(participants ? { participants } : {}), counting, ...event };
   const found = raw.filter((id) => {
     const instance = state.cards[id];

@@ -44,6 +44,7 @@ import { constantWin, heldStat, NO_COUNTS } from "../interpret/constants.ts";
 import { finishMulliganChoice, finishSetup, mulliganSeat } from "../setup/setup.ts";
 import { attackResumes, discardShadows, resolveAttack, resumeAttack } from "../combat/shadow.ts";
 import { stepWindow, stepWindowResumes } from "./step-window.ts";
+import { areaSeats } from "../families/breaking/areas.ts";
 import { flagged, inPlay, livingSeats, reached, updateCard, withMode, type ModeName, type ScenarioState } from "../core/state.ts";
 import { runSettle } from "../interpret/family-hooks.ts";
 import { heldByLapsedStage } from "../families/grapple/values.ts";
@@ -234,10 +235,10 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
       if (flagged(state, "table", "skipTravel")) return withMode(state, nextAfterTravel(state));
       // The travel opportunity was taken or declined: the window after it (4.2), still in the Travel phase.
       if (reached(state, "traveled")) return stepWindow(state, ctx, "4.2") ?? withMode(state, nextAfterTravel(state));
-      const seat = state.separate ? livingSeats(state).find((index) => !(state.travelDone ?? []).includes(index)) : livingSeats(state)[0];
+      const seat = state.separate ? areaSeats(state).find((index) => !(state.travelDone ?? []).includes(index)) : livingSeats(state)[0];
       if (seat == null) {
         // Stages are separate and every seat has had its opportunity (families/breaking/areas.ts).
-        if (state.separate && livingSeats(state).length > 0) return travelTaken({ ...state, travelDone: livingSeats(state) });
+        if (state.separate && livingSeats(state).length > 0) return travelTaken({ ...state, travelDone: areaSeats(state) });
         return state.lost
           ? state
           : { ...state, lost: true, lossReason: "No seats remain", window: null };
@@ -311,7 +312,7 @@ function nextAfterTravel(state: ScenarioState): ModeName {
 function openOptional(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   // No enemy a player could optionally engage (rr.optional-engagement): the step has nothing to offer. Stages that are separate offer each seat
   // the enemies in its own staging area (mec109.multiple-staging-areas).
-  const offered = state.separate ? livingSeats(state).some((seat) => optionalEnemies(state, ctx.cards, seat).length > 0) : optionalEnemies(state, ctx.cards).length > 0;
+  const offered = state.separate ? areaSeats(state).some((seat) => optionalEnemies(state, ctx.cards, seat).length > 0) : optionalEnemies(state, ctx.cards).length > 0;
   if (!offered) {
     return { ...withMode(state, "engagement"), window: null, engagement: { ordinal: 0, engagedThisPass: false } };
   }

@@ -57,7 +57,8 @@ const BREAKING_VERBS: ReadonlySet<string> = new Set(catalog.verbs.map((schema) =
 
 // Whether the verb is one of this family's that works on the whole state, not on one seat's view of it (rules/interpret/interpret.ts runInstruction).
 export function isBreakingVerb(verb: string): boolean {
-  return BREAKING_VERBS.has(verb);
+  // Joining another player's staging area changes the areas themselves (families/captured/join.ts).
+  return BREAKING_VERBS.has(verb) || verb === "JoinAnotherPlayer";
 }
 
 // AdvanceToStage ("advance to stage 4A", 142063:B:2): runs on the acting seat's view, so the stage is that seat's. The stage left is defeated (its attachments are

@@ -1,5 +1,5 @@
 import { setupRoleVerbs, type Effect, type ScenarioDefinition } from "../catalog/boundary.ts";
-import { burdenCodes, campaignScenario, corsairCodes, dealtPiles, doubleSidedCards, encounterCodes, recordInstructions, scenarioDefinition, setupInstructions, sideInstructions, unchartedCodes, type CampaignData, type Difficulty, type ScenarioData } from "../catalog/scenario-data.ts";
+import { burdenCodes, campaignScenario, corsairCodes, dealtPiles, doubleSidedCards, encounterCodes, questDeckCodes, recordInstructions, scenarioDefinition, setupInstructions, sideInstructions, unchartedCodes, type CampaignData, type Difficulty, type ScenarioData } from "../catalog/scenario-data.ts";
 import type { CampaignFacts } from "../rules/core/campaign-state.ts";
 import type { StartScenario, StartSeat } from "../rules/setup/setup.ts";
 
@@ -55,6 +55,7 @@ export type StartInput = {
 // (ScenarioDefinition.afterSetup): each verb's schema entry says which (src/catalog/verb-flags.ts).
 const DEALT_VERBS = setupRoleVerbs("dealt");
 const AFTER_SETUP_VERBS = setupRoleVerbs("afterSetup");
+const BEFORE_REVEAL_VERBS = setupRoleVerbs("beforeReveal");
 
 function hasFacts(facts: CampaignFacts): boolean {
   return facts.prisoner != null || facts.usedOnce.length > 0 || Object.keys(facts.counters).length > 0 || facts.levels != null || facts.upgraded != null || facts.modeCard != null || facts.treasures != null || facts.allyLines != null || facts.beldisUses != null || facts.encounterPool != null || facts.pool != null || facts.heroLog != null || facts.notes != null || facts.angmar != null;
@@ -103,6 +104,7 @@ export function buildStart(start: StartInput): StartScenario {
   // A line that reads the Campaign Log ("If there are 6 or more treasures recorded in the campaign log, shuffle Dragon-sickness into the encounter deck") holds by the log's facts.
   const shuffledIn = campaignSetup.flatMap((instruction) => (instruction.verb === "ShuffleIntoEncounterDeck" && logConditionHolds(instruction.when, start.facts) ? [instruction.code] : []));
   const afterSetup = campaignSetup.filter((instruction) => AFTER_SETUP_VERBS.has(instruction.verb));
+  const beforeReveal = campaignSetup.filter((instruction) => BEFORE_REVEAL_VERBS.has(instruction.verb));
   const burden = burdenCodes(input.scenario);
   // The Corsair deck the scenario deals, and the cards the campaign card shuffles into it ("Shuffle Crowley into the Corsair deck"); the quest card's Setup shuffles it.
   const corsair = [...corsairCodes(input.scenario, input.difficulty), ...campaignSetup.flatMap((instruction) => (instruction.verb === "ShuffleIntoCorsairDeck" ? [instruction.code] : []))];
@@ -121,6 +123,7 @@ export function buildStart(start: StartInput): StartScenario {
     definition: {
       ...definition,
       ...(afterSetup.length > 0 ? { afterSetup } : {}),
+      ...(beforeReveal.length > 0 ? { beforeReveal } : {}),
       setup: [
         ...input.campaign.prelude.map((card) => ({ verb: "AttachToRingBearer" as const, code: card.code })),
         // The One Ring a Two Towers scenario of the Ring-bearer attaches (ScenarioData.sagaStart); its campaign's prelude is empty.
@@ -134,7 +137,7 @@ export function buildStart(start: StartInput): StartScenario {
     seats: input.seats,
     ...(input.poolEncounterOwners && input.poolEncounterOwners.length > 0 && !standalone ? { encounterOwners: input.poolEncounterOwners } : {}),
     encounterDeck: withoutCards([...encounterCodes(input.scenario, input.difficulty, input.seatCount), ...shuffledIn, ...(input.poolEncounterCards ?? [])], standalone ? [] : (input.removedFromEncounter ?? [])),
-    questDeck: input.scenario.stages,
+    questDeck: questDeckCodes(input.scenario, input.difficulty, input.seatCount),
     ...(burden.length > 0 ? { burdenDeck: burden } : {}),
     ...(corsair.length > 0 ? { corsairDeck: corsair } : {}),
     ...(uncharted.length > 0 ? { unchartedDeck: uncharted } : {}),

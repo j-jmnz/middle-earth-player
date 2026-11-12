@@ -6,6 +6,7 @@
 // your threat." The damage still goes on the character; the excess is read before it lands, and a card that cancels the damage
 // afterwards does not call the threat back (it was assigned as it was dealt). Great Cave-troll (`excessToQuestProgress`) takes that many progress
 // tokens off the current quest instead.
+import { captureInstead } from "../captured/play.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { modifiedStat, placeDamage, raiseThreat } from "../../core/keywords.ts";
@@ -59,6 +60,9 @@ export function combatDamage(
   // Phantom (mec113.phantom): the damage is canceled and the defending player raises their threat by as much instead, before the character is dealt any.
   const phantom = cancelPhantomDamage(state, enemyId, raw, ctx, steps);
   if (phantom) return phantom;
+  // An ally the attack would damage is captured instead (Cruel Torturer, Captives of Gornákh's shadow; families/captured/play.ts).
+  const captured = captureInstead(state, enemyId, assigned, raw, ctx);
+  if (captured) return captured;
   const logged = steps.length;
   const targetId = damageGoesTo(state, assigned);
   const damaged = placeDamage(state, assigned, raw, ctx.cards, steps, "combat", cause);

@@ -17,7 +17,8 @@ export type CollectionUse = "hero" | "card" | "treasure";
 // Which of a campaign card's Setup verbs the scenario's start handles itself (src/campaign/start.ts):
 // - "dealt": the engine runs it in Setup, in the campaign card's printed order, before the quest card's Setup (the Fellowship's two verbs, an objective ally put into play, a card set aside).
 // - "afterSetup": it names the ships or cards the quest card's Setup prepares, so it resolves in a frame after it (ScenarioDefinition.afterSetup).
-export type SetupRole = "dealt" | "afterSetup";
+// - "beforeReveal": it resolves in a frame after the quest card's Setup and before its side B's When Revealed (ScenarioDefinition.beforeReveal): Escape from Mount Gram's campaign Setup captures cards from the decks the quest card's Setup prepared, before stage 2A captures.
+export type SetupRole = "dealt" | "afterSetup" | "beforeReveal";
 
 export interface VerbFlags {
   // A Shadow effect with this verb at its top level runs in a frame (src/rules/combat/shadow.ts runsInFrame): only a frame asks a player, expands a Repeat or an Each, or waits for the effects the verb pushes.
@@ -38,7 +39,7 @@ export function verbFlagsOf(schema: z.ZodType): VerbFlags {
   const flags: VerbFlags = {};
   if (meta?.runsInFrame === true) flags.runsInFrame = true;
   if (meta?.setupRuns === "top" || meta?.setupRuns === "inForEachPlayer" || meta?.setupRuns === "inEach" || meta?.setupRuns === "inChoose") flags.setupRuns = meta.setupRuns;
-  if (meta?.setupRole === "dealt" || meta?.setupRole === "afterSetup") flags.setupRole = meta.setupRole;
+  if (meta?.setupRole === "dealt" || meta?.setupRole === "afterSetup" || meta?.setupRole === "beforeReveal") flags.setupRole = meta.setupRole;
   if (meta?.collection === "hero" || meta?.collection === "card" || meta?.collection === "treasure") flags.collection = meta.collection;
   return flags;
 }

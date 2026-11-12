@@ -236,6 +236,17 @@ export function encounterCodes(data: ScenarioData, difficulty: Difficulty = "Nor
   });
 }
 
+// The quest deck: each stage once, and a stage printed in several copies ("a different stage 2A" for each player, 10038:B:1) once for each seat, never more than
+// the copies the box holds. Every stage the box prints once is dealt once, so a scenario without such a stage deals `data.stages` unchanged.
+export function questDeckCodes(data: ScenarioData, difficulty: Difficulty = "Normal", seatCount = 1): string[] {
+  const placements = placementsAt(data, difficulty);
+  return data.stages.flatMap((code) => {
+    const printed = placements.find((card) => card.pile === "quest" && card.code === code);
+    const copies = printed ? Math.max(1, Math.min(copiesAt(printed, difficulty), seatCount)) : 1;
+    return Array.from({ length: copies }, () => code);
+  });
+}
+
 const SETUP_VERB = {
   setAside: "SetAside",
   // The Stormcaller's quest stages wait set aside until the Setup prepares the Stormcaller's area (dcce.stormcallers-area).

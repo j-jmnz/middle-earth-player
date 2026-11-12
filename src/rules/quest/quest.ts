@@ -24,7 +24,8 @@ import { noteQuestPlaced, questRoom } from "../families/caves/progress.ts";
 import { noteQuestPhase, overflowWaits } from "../families/wizardry/progress.ts";
 import { branchFrom, reached as reachedStage } from "../families/quest/branch.ts";
 import { randomStageFrom } from "../families/wilderland/random-stage.ts";
-import { viewOf, withView } from "../families/breaking/areas.ts";
+import { headOf, sharing, viewOf, withView } from "../families/breaking/areas.ts";
+import { rescueRandom } from "../families/captured/rescue.ts";
 import { oweDiscards } from "../families/breaking/progress.ts";
 import { arrivalFace, orderedNext, stageToVictory } from "../families/quest/order.ts";
 import { caughtUp } from "../families/stormcaller/values.ts";
@@ -107,7 +108,7 @@ export function committedWillpower(state: ScenarioState, cards: Cards, only?: nu
   const view = viewOf(state, only);
   let total = 0;
   for (const [index, seat] of view.seats.entries()) {
-    if (seat.eliminated || (only != null && index !== only)) continue;
+    if (seat.eliminated || (only != null && headOf(view, index) !== headOf(view, only))) continue;
     for (const id of [...seat.heroes, ...seat.play]) {
       const instance = view.cards[id];
       // A character committed to a side quest places its Willpower on that quest, not against the staging area (families/sidequests/quest.ts).
@@ -153,7 +154,7 @@ export function resolveQuest(
   const threat = stagingThreat(state, cards, only);
   steps.push({ kind: "quest", willpower, threat, cause: ruleCause("rr.step-3-4") });
   // The seats that hear it: the one that quested, or every living seat.
-  const hearing = only == null ? livingSeats(state) : [only];
+  const hearing = only == null ? livingSeats(state) : sharing(state, only);
   let next = state;
   // A family that places the progress or the threat itself (the Defense keyword, families/fortress) answers first; the core resolves the quest otherwise.
   const family = familyQuestResult(state, { willpower, threat, ...(only != null ? { only } : {}) }, cards, steps, canAdvance);
@@ -214,6 +215,11 @@ export function placeQuestProgress(
   // Progress a stage turns into discards from the encounter deck (families/breaking/progress.ts).
   if (remaining > 0 && next.questStage && flagged(next, next.questStage, "progressDiscards")) {
     next = oweDiscards(next, remaining);
+    remaining = 0;
+  }
+  // Progress a stage turns into rescued captured cards, at random, instead of progress on it (families/captured/rescue.ts, 10039:B:1).
+  if (remaining > 0 && next.questStage && flagged(next, next.questStage, "progressRescues")) {
+    next = rescueRandom(next, next.questStage, remaining);
     remaining = 0;
   }
   // Progress a stage turns into an event its record hears (progressReplaced, with the amount) instead of progress on it.

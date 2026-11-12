@@ -16,7 +16,7 @@
 //   the threat total, the engagement checks, the travel and pick helpers and the quest's progress and advance read the seat's staging area and stage
 //   without knowing about seats. `mergeView` writes what a view changed back. Nothing is cached on the view.
 import type { ScenarioState } from "../../core/state.ts";
-import { updateCard } from "../../core/state.ts";
+import { livingSeats, updateCard } from "../../core/state.ts";
 import type { Destination } from "../../core/zones.ts";
 import { moveCard } from "../../core/zones.ts";
 
@@ -24,10 +24,34 @@ export function isSeparate(state: ScenarioState): boolean {
   return state.separate === true;
 }
 
+// The seat whose area and stage the seat has: itself, or the player it joined (mec108.joining-another-player, families/captured/join.ts). A game that never joins returns the seat.
+export function headOf(state: ScenarioState, seat: number): number {
+  return state.separate ? (state.seats[seat]?.joined ?? seat) : seat;
+}
+
+// The living seats that share the seat's staging area and stage, in player order: the head of the area and the players that joined it. Not separate: every living seat.
+export function sharing(state: ScenarioState, seat: number): number[] {
+  if (!state.separate) return livingSeats(state);
+  const head = headOf(state, seat);
+  return livingSeats(state).filter((index) => headOf(state, index) === head);
+}
+
+// The living seats that own an area (not a seat that joined another): the seats a phase resolves for once stages are separate. A game with no joined seat returns every living seat.
+export function areaSeats(state: ScenarioState): number[] {
+  return state.separate ? livingSeats(state).filter((index) => headOf(state, index) === index) : livingSeats(state);
+}
+
+// The encounter cards that are in every area at once ("considered to be in each player's staging area", 10175:A:1): the cards of the shared staging area the game marked (state.capture.here).
+function everyArea(state: ScenarioState): readonly string[] {
+  const here = state.capture?.here;
+  return here && here.length > 0 ? here.filter((id) => state.cards[id]?.zone === "staging") : [];
+}
+
 // The encounter cards in the seat's staging area; the shared staging area when stages are not separate.
 export function stagingOf(state: ScenarioState, seat: number): readonly string[] {
   if (!state.separate) return state.staging;
-  return state.viewSeat === seat ? state.staging : (state.seats[seat]?.staging ?? []);
+  const head = headOf(state, seat);
+  return state.viewSeat === head ? state.staging : [...(state.seats[head]?.staging ?? []), ...everyArea(state)];
 }
 
 // The seat whose staging area holds the card, or null when it is in no area (the shared staging area, or not in staging).
@@ -47,7 +71,8 @@ export function sharedStaging(state: ScenarioState): readonly string[] {
 // The seat's quest stage, or the shared one when stages are not separate.
 export function stageOf(state: ScenarioState, seat: number): string | null {
   if (!state.separate) return state.questStage;
-  return state.viewSeat === seat ? state.questStage : (state.seats[seat]?.stage ?? null);
+  const head = headOf(state, seat);
+  return state.viewSeat === head ? state.questStage : (state.seats[head]?.stage ?? null);
 }
 
 // The seat whose stage the card is, or null.
@@ -61,21 +86,25 @@ export function stageSeat(state: ScenarioState, id: string): number | null {
 
 // Where a card the seat puts into "the staging area" goes: that seat's own area once stages are separate.
 export function stagingDest(state: ScenarioState, seat: number): Destination {
-  return state.separate ? { zone: "staging", area: seat } : { zone: "staging" };
+  return state.separate ? { zone: "staging", area: headOf(state, seat) } : { zone: "staging" };
 }
 
 // The state as the seat sees it: its own staging area and its own stage in the shared fields. Not separate: the state itself.
 export function viewOf(state: ScenarioState, seat: number | undefined): ScenarioState {
   if (!state.separate || seat == null) return state;
-  const owner = state.seats[seat];
+  const head = headOf(state, seat);
+  const owner = state.seats[head];
   if (!owner) return state;
-  return { ...state, staging: owner.staging, questStage: owner.stage ?? null, activeLocation: owner.active ?? null, secondActiveLocation: null, viewSeat: seat };
+  // A card that is in every area is in this seat's too (mergeView leaves it out of the seat's own list).
+  const everywhere = everyArea(state);
+  return { ...state, staging: everywhere.length > 0 ? [...owner.staging, ...everywhere] : owner.staging, questStage: owner.stage ?? null, activeLocation: owner.active ?? null, secondActiveLocation: null, viewSeat: head };
 }
 
 // The seat's active location, or the shared one when stages are not separate.
 export function activeOf(state: ScenarioState, seat: number): string | null {
   if (!state.separate) return state.activeLocation;
-  return state.viewSeat === seat ? state.activeLocation : (state.seats[seat]?.active ?? null);
+  const head = headOf(state, seat);
+  return state.viewSeat === head ? state.activeLocation : (state.seats[head]?.active ?? null);
 }
 
 // The active locations a seat's effect sees: its own once stages are separate, unless it reads every area (`all`); the shared slots otherwise.
@@ -95,14 +124,16 @@ function mirrored(state: ScenarioState): ScenarioState {
 // What a function did to a view of the seat, written back: the seat's own area and stage take the view's, the other seats' areas are the view's
 // seats, and the shared fields (the stage, the union of the staging cards) are rebuilt from the original. A card the view moved out of staging
 // leaves every list.
-export function mergeView(state: ScenarioState, seat: number | undefined, view: ScenarioState): ScenarioState {
+export function mergeView(state: ScenarioState, asked: number | undefined, view: ScenarioState): ScenarioState {
+  const seat = asked == null ? undefined : headOf(state, asked);
   if (!state.separate || seat == null || !state.seats[seat]) return view;
+  const everywhere = new Set(everyArea(state));
   const was = state.seats[seat].staging;
   const seats: [typeof view.seats[0], typeof view.seats[1]] = [view.seats[0], view.seats[1]];
   // A card the view put into another seat's area (`{ zone: "staging", area }`, or an enemy returned from that seat's engagement) is in that area only,
   // not in this seat's too.
   const elsewhere = new Set(seats.flatMap((other, index) => (index === seat ? [] : other.staging)));
-  const now = view.staging.filter((id) => !elsewhere.has(id));
+  const now = view.staging.filter((id) => !elsewhere.has(id) && !everywhere.has(id));
   const owner = seats[seat];
   const { stage: _old, active: _active, ...rest } = owner;
   seats[seat] = { ...rest, staging: now, ...(view.questStage != null ? { stage: view.questStage } : {}), ...(view.activeLocation != null ? { active: view.activeLocation } : {}) };

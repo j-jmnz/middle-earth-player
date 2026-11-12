@@ -91,6 +91,10 @@ export const amountExprSchema = z.strictObject({
   discarded: z.enum(["cost", "types"]).optional(),
   // The number of quest cards in play: the main quest card, the encounter side quests in the staging area and the player side quests in the quest areas, at least 1 ("X is the number of quest cards in play", 09016:A:1; mec108.side-quests-in-play). Read by the angmar family.
   questCards: z.literal(true).optional(),
+  // Captured cards (Escape from Mount Gram, read by the captured family): `under` the cards captured underneath the source ("X is the number of captured cards underneath Tunnels of Mount Gram", 10048:A:2), `cardsWith` the cards in play with 1 or more captured cards underneath
+  // them ("X is the number of cards in play with 1 or more captured cards underneath them", 10045:A:2), `questsAndSides` the quest cards the players have completed plus the side quests in the victory display ("the number of completed quest cards plus the number of side
+  // quests in the victory display", 10174:B:1), `players` the players in the game (Loot the Dungeons, "for each player in the game at every staging area", 10175:A:1).
+  captured: z.enum(["under", "cardsWith", "questsAndSides", "players"]).optional(),
   // The pursuit value (mec112.pursuit; `pursuit`), 0 while no tracker is set: "X is the pursuit value" (143069:B:1). Read by the pursuit family.
   pursuit: z.literal(true).optional(),
   // The highest threat among the living players ("X is the threat of the player with the highest threat", 145064:B:1), and the number of living players whose threat is at least this ("+1 Threat for each player with a threat of 35 or higher",

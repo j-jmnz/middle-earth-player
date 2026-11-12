@@ -20,7 +20,7 @@ import { attachTo, moveCard, turnedUp } from "../core/zones.ts";
 import { announceEntered, noteEncounterThreat, revealSeat, revealSkipped, revealsAllowed, spendSkippedReveal, watchReveal } from "../families/encounter/reveal.ts";
 import { discardsAfterReveal } from "../families/sidequests/encounter.ts";
 import { engageWith } from "../quest/quest.ts";
-import { stagingDest } from "../families/breaking/areas.ts";
+import { sharing, stagingDest } from "../families/breaking/areas.ts";
 import { grapplesOnReveal, pushGrapple } from "../families/grapple/attach.ts";
 import { skipLoot } from "../families/wilderland/loot.ts";
 import { familyRevealed } from "../interpret/family-hooks.ts";
@@ -160,7 +160,10 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
     case 1: {
       let next = patchTop(state, { step: 2 });
       if (printed.keywords.doomed != null && printed.keywords.doomed > 0) {
+        // The players sharing the staging area it was added to, once stages are separate and the game has joined areas (families/captured/).
+        const sharers = next.capture && next.separate ? sharing(next, seat) : null;
         for (let index = 0; index < next.seatCount; index += 1) {
+          if (sharers && !sharers.includes(index)) continue;
           next = noteEncounterThreat(raiseThreat(next, index, printed.keywords.doomed, steps, ruleCause("rr.doomed-x")), index, printed.keywords.doomed, id, ctx);
         }
         // An encounter card's Doomed raise is heard by Elfhelm (02100:A:1).

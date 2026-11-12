@@ -217,6 +217,8 @@ export type PendingAttack = {
   heroId?: string;
   // A shadow effect made the attack count as undefended.
   undefended?: boolean;
+  // A shadow effect made the attack capture an ally it would damage instead (CaptureInsteadOfDamage, families/captured/).
+  captures?: true;
   shadowResolved?: boolean;
   // The Responses to the shadow effect have been offered, and a Response canceled it.
   shadowOffered?: boolean;

@@ -13,8 +13,8 @@ import { travelTo } from "./quest.ts";
 import { offerResponses } from "../windows/responses.ts";
 import { travelBlocked } from "../interpret/restrictions.ts";
 import type { ScenarioState } from "../core/state.ts";
-import { withView } from "../families/breaking/areas.ts";
-import { livingSeats, markReached } from "../core/state.ts";
+import { areaSeats, withView } from "../families/breaking/areas.ts";
+import { markReached } from "../core/state.ts";
 import { fireForced } from "../windows/triggers.ts";
 import { pushDeep } from "../families/wilderland/deep.ts";
 import { pushDiscover } from "../families/wilderland/discover.ts";
@@ -22,7 +22,7 @@ import { pushDiscover } from "../families/wilderland/discover.ts";
 // A seat's travel opportunity is taken or declined. Stages that are separate give each living seat one in player order, so the Travel phase's opportunity is
 // over only when the last has had its own (mec109.multiple-staging-areas); with one staging area it is over at once.
 export function travelTaken(state: ScenarioState): ScenarioState {
-  if (state.separate && livingSeats(state).some((seat) => !(state.travelDone ?? []).includes(seat))) return state;
+  if (state.separate && areaSeats(state).some((seat) => !(state.travelDone ?? []).includes(seat))) return state;
   const { travelDone: _done, ...rest } = state;
   return markReached(rest, "traveled");
 }

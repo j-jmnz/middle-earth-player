@@ -930,6 +930,16 @@
     },
     {
       "match": {
+        "code": "10053"
+      },
+      "set": {
+        "questPoints": 6
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Stop the Executioners no quest points (its Victory 10 is the only number it exports). The scan prints a quest points box of 6 and Victory 10, so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 10053.A (hallofbeorn-resources Angmar-Awakened/Stop-the-Executioners.jpg, read for the quest points box)"
+    },
+    {
+      "match": {
         "code": "09051"
       },
       "set": {
@@ -1866,6 +1876,19 @@
       ],
       "reason": "The Wastes of Eriador's Campaign Setup adds Determination (10172) to the Campaign Pool and shuffles Fend Off Despair (10173) into its encounter deck, and its Resolution adds Fend Off Despair to the pool. Both stay in the pool, so a later scenario's Campaign Setup Checklist deals them (a player may hold Determination in their deck and Fend Off Despair is shuffled into the encounter deck), and each is played and defeated there as it was here: the printed card of each is loaded with every later Angmar Awakened scenario.",
       "source": "scans 10171.A, 10171.B, 10172.A and 10173.A (data/printed/angmar-awakened.json); mec108.campaign-setup-the-wastes-of-eriador"
+    },
+    {
+      "scenario": "escape-from-mount-gram",
+      "code": [
+        "10176",
+        "10177",
+        "10178",
+        "10179",
+        "10180",
+        "10181"
+      ],
+      "reason": "Loot the Dungeons (10175) says \"each player ... may choose one of the following boons and add it to their hand: Berelind, Chieftain's Brooch, Coruhaer, Laermuin, Mail of Eärnur, or Silverthorn\", so the six boons are dealt with Escape from Mount Gram as set-aside cards, each a single copy, though no Setup or Resolution line of the campaign card names them.",
+      "source": "scan 10175.A (data/printed/angmar-awakened.json); mec108.campaign-setup-escape-from-mount-gram"
     }
   ],
   "scenarioExcluded": [

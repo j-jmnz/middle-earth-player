@@ -14,8 +14,8 @@ import { defeatedBefore, questCardDefeatedHeard } from "../families/quest/branch
 import { queueEvent } from "../windows/queue.ts";
 import { offerResponses } from "../windows/responses.ts";
 import { restricted } from "../interpret/restrictions.ts";
-import { flagged, livingSeats, withMode, type ScenarioState } from "../core/state.ts";
-import { stageSeat } from "../families/breaking/areas.ts";
+import { flagged, withMode, type ScenarioState } from "../core/state.ts";
+import { areaSeats, stageSeat } from "../families/breaking/areas.ts";
 import { payOwed } from "../families/breaking/progress.ts";
 import { fireForced } from "../windows/triggers.ts";
 import { announceStageRevealed } from "../families/nightmare/setup.ts";
@@ -49,7 +49,7 @@ const failureAmountRead = (state: ScenarioState, ctx: ReduceContext): boolean =>
 // progress on its own stage or only its own threat raised (resolveQuest with `only`). The commitments end once every seat has resolved.
 function resolveSeparate(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[], canAdvance: (state: ScenarioState) => boolean): ScenarioState {
   let next = state;
-  for (const seat of livingSeats(state)) {
+  for (const seat of areaSeats(state)) {
     next = resolveQuest(next, ctx.cards, steps, canAdvance, questFailureRaise(ctx, steps), seat, failureAmountRead(state, ctx));
     if (next.stageCleared || next.lost) break;
   }

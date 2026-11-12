@@ -252,6 +252,9 @@ export const pickSchema = z.strictObject({
   engageable: z.literal(true).optional(),
   // The effect discards the card chosen, for a condition that asks before the discard (a canPick ahead of DiscardFromHand): a card that player card effects cannot discard (18026:A:1) is left out. A Pick followed by DiscardPicked is known without it (families/wilderland/pick.ts).
   discarded: z.literal(true).optional(),
+  // Captured cards (Escape from Mount Gram, read by the captured family): the cards a pick starts from are `underSelf` the cards captured underneath the source (any owner's; one the owner cannot put into play is left out), `rescued` the cards the last rescue
+  // put into hands that are still there (10044:A:2), `hosts` the encounter cards in play in the asking player's staging area (the staged cards, the active location and the enemies engaged with a player there; 10051:A:1).
+  captured: z.enum(["underSelf", "rescued", "hosts"]).optional(),
   // The black-gate family's filters (src/rules/families/black-gate/pick.ts). `embassy`: a card of the Embassy from the Dark Tower's faceup row that is not paired yet, the player cards placed in front of the players (`player`) or the encounter cards placed faceup (`encounter`, 146072:B:1).
   // `highestThreat`: of the cards that matched, those with the highest current Threat, a card with none counting 0 ("the highest threat encounter card remaining"); every one when tied, and the chooser decides.
   embassy: z.enum(["player", "encounter"]).optional(),
