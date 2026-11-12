@@ -94,6 +94,18 @@ describe("10172:A:1 is Determination", () => {
   });
 });
 
+describe("10172:A:1 marks its host at a later win too", () => {
+  it("10188:B:1 marks the characters that carry a Determination determined in the Campaign Log, as the Wastes' Resolution does, and nothing when it is lost", () => {
+    const t = at({ phase: "Quest", attached: [{ code: DETERMINATION, to: "dh1" }] });
+    const resolution = recordInstructions(EFFECTS, "10188", "resolution");
+    expect(resolution.some((step) => step.verb === "RecordDetermined")).toBe(true);
+    const won = settle({ ...t.state, window: null, stageCleared: true, resolution }, t.ctx, []);
+    expect(applyResolution({ ...emptyLog(1), determined: ["x"] }, ID, won, t.cards, NO_COPY_LIMITS).determined).toEqual(["x", "dh1"]);
+    // A lost game writes nothing: the log is read from a won game only.
+    expect(applyResolution(emptyLog(1), ID, { ...won, lost: true }, t.cards, NO_COPY_LIMITS).determined).toEqual([]);
+  });
+});
+
 describe("10173:A:1 and 10173:A:2 are Fend Off Despair", () => {
   // The threat each player gains from playing the event, the card in hand with `doomed` printed on it (an event with a free Action of its own).
   const play = (layout: Layout, code: string, doomed = 0) => {

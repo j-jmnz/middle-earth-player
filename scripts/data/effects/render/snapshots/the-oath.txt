@@ -225,7 +225,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 41021:A:2 (shadow): Shadow: Attacking enemy makes an additional attack immediately after this one. (Deal a new shadow card for that attack.)
   41021:shadow:1: Shadow
     - when the attack in progress ends:
-      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+      - the attacking enemy attacks again, the player it is engaged with by then (the defending player, or the next player when an earlier step engaged it with them; an additional attack), dealt a new shadow card after its old ones are discarded
 
 ## 41022 Goblintown Scavengers
 (the scenario deals it into the encounter pile; the piles place it, no record does)

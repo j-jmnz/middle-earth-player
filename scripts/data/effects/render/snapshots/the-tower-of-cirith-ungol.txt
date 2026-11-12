@@ -243,7 +243,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 146062:A:3 (shadow): Shadow: Attacking enemy makes an additional attack after this one.
   146062:shadow:1: Shadow
     - when the attack in progress ends:
-      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+      - the attacking enemy attacks again, the player it is engaged with by then (the defending player, or the next player when an earlier step engaged it with them; an additional attack), dealt a new shadow card after its old ones are discarded
 
 ## 146063 Evil Vigilance
 (the scenario deals it into the encounter pile; the piles place it, no record does)

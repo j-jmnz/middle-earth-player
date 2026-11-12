@@ -139,7 +139,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
   10018:shadow:1: Shadow
     - when the attack in progress ends:
       - if another player is still in the game: the attacking enemy engages the next player
-      - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+      - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy attacks again, the player it is engaged with by then (the defending player, or the next player when an earlier step engaged it with them; an additional attack), dealt a new shadow card after its old ones are discarded
 
 ## 10019 Blood-thirsty Warg
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -175,7 +175,7 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
 10021:A:2 (shadow): Shadow: If it is Night, attacking enemy makes an additional attack after this one.
   10021:shadow:1: Shadow
     - when the attack in progress ends:
-      - if it is Night (Nightfall is faceup): the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+      - if it is Night (Nightfall is faceup): the attacking enemy attacks again, the player it is engaged with by then (the defending player, or the next player when an earlier step engaged it with them; an additional attack), dealt a new shadow card after its old ones are discarded
 
 ## 10022 Wolf of Angmar
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -276,10 +276,10 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
   10172:action:1: Action
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose unique character (any player controls)
-    - this card attaches to the picked card (nowhere if that card carries one of its title already)
-    - for each character (any player controls) with an attachment named "Determination":
+    - this card attaches to the picked card (any number of copies may be attached to one card)
+    - then, if this card is attached to a card (checked when this step runs, after the steps above; not tied to whether they did anything): for each character (any player controls) with an attachment named "Determination":
       - ready the picked card
-    - for each character (any player controls) that the Campaign Log marks determined:
+    - then, if this card is attached to a card (checked when this step runs, after the steps above; not tied to whether they did anything): for each character (any player controls) that the Campaign Log marks determined:
       - ready the picked card
   10172:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
@@ -294,4 +294,4 @@ Scenario piles that place cards with no record (activeLocation: 09048 Shrouded H
   10173:forced:1: Forced on the event questDefeated (heard about this card)
     - mark in the Campaign Log that each player's starting threat is reduced by 2 (cumulative; written when the scenario is won)
 
-(rendered pieces: 181 by template, 0 as JSON)
+(rendered pieces: 183 by template, 0 as JSON)

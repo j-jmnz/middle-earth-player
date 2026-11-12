@@ -365,7 +365,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
   141072:shadow:1: Shadow
     - when the attack in progress ends:
       - if another player is still in the game: the attacking enemy engages the next player
-      - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+      - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy attacks again, the player it is engaged with by then (the defending player, or the next player when an earlier step engaged it with them; an additional attack), dealt a new shadow card after its old ones are discarded
 
 ## 141073 Piercing Cry
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -386,7 +386,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 141073:A:3 (shadow): Shadow: Attacking enemy makes an additional attack after this one.
   141073:shadow:1: Shadow
     - when the attack in progress ends:
-      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+      - the attacking enemy attacks again, the player it is engaged with by then (the defending player, or the next player when an earlier step engaged it with them; an additional attack), dealt a new shadow card after its old ones are discarded
 
 ## 141076 Lure of the Ring
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -557,7 +557,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
   906208:shadow:1: Shadow
     - when the attack in progress ends:
       - if another player is still in the game: the attacking enemy engages the next player
-      - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+      - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy attacks again, the player it is engaged with by then (the defending player, or the next player when an earlier step engaged it with them; an additional attack), dealt a new shadow card after its old ones are discarded
 
 ## 906209 Blade Tip
 

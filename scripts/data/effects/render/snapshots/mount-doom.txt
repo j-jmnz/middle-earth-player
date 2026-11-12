@@ -205,7 +205,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
 146054:A:2 (shadow): Shadow: If attacking enemy is Gollum, he makes an additional attack after this one.
   146054:shadow:1: Shadow
     - if the attacking enemy is a enemy (any player controls) named "Gollum": when the attack in progress ends:
-      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt no shadow card
+      - the attacking enemy attacks again, the player it is engaged with by then (the defending player, or the next player when an earlier step engaged it with them; an additional attack), dealt no shadow card
 
 ## 146055 The Lidless Eye
 (the scenario deals it into the encounter pile; the piles place it, no record does)

@@ -43,11 +43,12 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   // The Forced effect inside the line 10172:A:1 (a Determination: "If you win this scenario, mark in the Campaign Log that attached character is 'determined'"), whose line the Action record of 10172 owns: the Resolution marks each character in play that still carries one (a lost game writes nothing).
   { id: "10171:resolution:1", cardCode: "10171", lines: ["10171:B:1"], timing: "resolution", instructions: [{ verb: "Earn", codes: [FEND_OFF_DESPAIR] }, { verb: "RecordDetermined", code: DETERMINATION }] },
 
-  // 10188 The Battle of Carn Dûm. Setup: no +1 for changing heroes (Amarthiúl may be a hero: src/campaign/loadout.ts HERO_BANS); each player in turn may take one of the four boons into their opening hand, and it joins the pool. Resolution: the damage on each hero is noted.
+  // 10188 The Battle of Carn Dûm. Setup: no +1 for changing heroes (Amarthiúl may be a hero: src/campaign/loadout.ts HERO_BANS); each player in turn may take one of the four boons into their opening hand, and it joins the pool. Resolution: the damage on each hero is noted, and the characters that carry a Determination are marked determined.
   { id: "10188:campaignSetup:1", cardCode: "10188", lines: ["10188:A:2"], timing: "campaignSetup", instructions: [
     { verb: "WaiveThreatPenalty" },
     { verb: "ChooseCards", codes: CARN_DUM_BOONS, who: "eachSeat", to: "hand", optional: true, afterMulligan: true }] },
-  { id: "10188:resolution:1", cardCode: "10188", lines: ["10188:B:1"], timing: "resolution", instructions: [{ verb: "RecordHeroDamage" }] },
+  // A Determination in a later scenario marks its host determined at that win too (10172:A:1): every later Resolution runs RecordDetermined (the Resolutions of 10174, 10182 and 10184 take it when their phases write them; 10193 ends the campaign and writes nothing).
+  { id: "10188:resolution:1", cardCode: "10188", lines: ["10188:B:1"], timing: "resolution", instructions: [{ verb: "RecordHeroDamage" }, { verb: "RecordDetermined", code: DETERMINATION }] },
 
   // 10193 The Dread Realm. Setup: each player may search their deck for a boon and add it to their opening hand; each hero begins with the damage the log noted for it. Resolution: the players win the campaign (copied below).
   { id: "10193:campaignSetup:1", cardCode: "10193", lines: ["10193:A:2"], timing: "campaignSetup", instructions: [{ verb: "SearchBoonToHand" }, { verb: "PlaceLoggedHeroDamage" }] },

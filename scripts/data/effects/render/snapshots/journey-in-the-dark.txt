@@ -134,7 +134,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
-      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the attacking enemy attacks again, the player it is engaged with by then (the defending player, or the next player when an earlier step engaged it with them; an additional attack), dealt a new shadow card after its old ones are discarded
 
 ## 142048 Moria Orc
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -331,7 +331,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 142086:A:3 (shadow): Shadow: Attacking enemy makes an additional attack after this one.
   142086:shadow:1: Shadow
     - when the attack in progress ends:
-      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+      - the attacking enemy attacks again, the player it is engaged with by then (the defending player, or the next player when an earlier step engaged it with them; an additional attack), dealt a new shadow card after its old ones are discarded
 
 ## 142087 Overcome by Grief
 

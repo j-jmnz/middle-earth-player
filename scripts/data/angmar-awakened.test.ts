@@ -93,9 +93,13 @@ describe("The Angmar Awakened campaign", () => {
     expect(loadScenario("intruders-in-chetwood").campaignPlaced).toEqual(["10157", "10158"]);
     expect(loadScenario("deadmens-dike").campaignPlaced).toEqual(expect.arrayContaining(["100158", "10157", "10167", "10168", "10169", "10170"]));
     // Mysterious Omens' five boons are dealt set aside with every later scenario, which can shuffle Omens in (overrides.scenarioCampaignPlaced).
-    expect(loadScenario("the-treachery-of-rhudaur").campaignPlaced).toEqual(["10161", "10162", "10163", "10164", "10165", "10185", "10186", "10187"]);
+    expect(loadScenario("the-treachery-of-rhudaur").campaignPlaced).toEqual(["10161", "10162", "10163", "10164", "10165", "10172", "10173", "10185", "10186", "10187"]);
     expect(loadScenario("deadmens-dike").campaignPlaced).toEqual(expect.arrayContaining(["10161", "10162", "10163", "10164", "10165"]));
     expect(loadScenario("intruders-in-chetwood").campaignPlaced).not.toContain("10161");
+    // Determination and Fend Off Despair stay in the pool after The Wastes of Eriador, so every later scenario loads them (overrides.scenarioCampaignPlaced); the scenarios before it never deal them.
+    for (const id of ["escape-from-mount-gram", "across-the-ettenmoors", "the-treachery-of-rhudaur", "the-battle-of-carn-dum", "the-dread-realm"]) expect(loadScenario(id).campaignPlaced, id).toEqual(expect.arrayContaining(["10172", "10173"]));
+    for (const id of ["intruders-in-chetwood", "deadmens-dike"]) expect(loadScenario(id).campaignPlaced, id).not.toContain("10172");
+    expect(loadScenario("the-wastes-of-eriador").campaignPlaced).toEqual(expect.arrayContaining(["10172", "10173"]));
   });
 
   it("takes the Easy counts the printed set icons give where DragnCards' Easy decks differ (data/overrides.json, scenarioEasy)", () => {
