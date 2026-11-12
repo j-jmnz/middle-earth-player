@@ -1559,6 +1559,22 @@
       "from": 0,
       "reason": "Hall of Beorn and RingsDB number the box's cards one above the collector number the cards print (the scans print 164 on Journey Up the Anduin, 166 on A Growing Threat, 167 on Lost in Mirkwood), and the code follows their number. The Journey Up the Anduin campaign card is their number 165, and '12165' is Fury and Malice of The City of Corsairs (RingsDB, pack CoC; 12164 is Umbar Patrol). The six-digit prefix 120 is unused (the prefixes in use are 110, 131-132, 140-148 and 900-907), so the card is 120165.",
       "source": "hallofbeorn.com/Export/QuestCards (CardSet Ered Mithrin Campaign Expansion, Number 165); ringsdb.com pack CoC (12165 Fury and Malice); scans 120165.A (prints 164), 12167.A (prints 166), 12168.A (prints 167); Ered Mithrin Campaign Expansion rulebook MEC115"
+    },
+    {
+      "set": "The Dread Realm",
+      "prefix": "101",
+      "width": 3,
+      "from": 156,
+      "reason": "Hall of Beorn numbers The Dread Realm's encounter cards 10140 to 10164, and its last nine (collector numbers 156 to 164: Witch of Angmar, Wraith of Carn Dûm, Sinister Dungeon, Tombs of Carn Dûm, Dark Halls, Unholy Crypt, Possession, A Fell Dread, Death and Calamity) share their codes with the Angmar Awakened Campaign Expansion's cards, which RingsDB lists as 10157 to 10192 (Iârion's Pendant, Protect the Innocent, Mysterious Omens, Cunning to Stalwart) and Hall of Beorn numbers 10156 to 10193 (the nine campaign cards). The expansion keeps those codes; the Dread Realm's nine take '101' and the collector number, which no other card bears.",
+      "source": "data/raw/hallofbeorn (EncounterCards.json, QuestCards.json, PlayerCards.json RingsDbCardId); data/raw/ringsdb/cards/AACE.json"
+    },
+    {
+      "set": "The Dread Realm",
+      "prefix": "10",
+      "width": 3,
+      "from": 0,
+      "reason": "The cards of The Dread Realm numbered below 156 keep the code Hall of Beorn gives them ('10' and the collector number, 10150 to 10155); a card set with a productCodes rule takes the code of the entry its collector number reaches, so this entry holds the rest of the set beside the one that moves the last nine.",
+      "source": "data/raw/hallofbeorn (EncounterCards.json, QuestCards.json RingsDbCardId)"
     }
   ],
   "dragnPackAliases": [
@@ -1692,6 +1708,14 @@
       "code": "146009",
       "reason": "Hall of Beorn gives The Mountain of Fire's Orc Disguise (#13) the RingsDbCardId of another card of the pack: it numbers the player cards in collector order, RingsDB numbers Orc Disguise 146009, Captains of the West 146010 and Raise the Shire 146013. RingsDB's own record of the pack names the card with this code.",
       "source": "ringsdb.com/api/public/cards (MoF 146009 Orc Disguise, 146010 Captains of the West, 146013 Raise the Shire); hallofbeorn.com/Export/PlayerCards (The Mountain of Fire #9, #10, #13)"
+    },
+    {
+      "set": "Angmar Awakened Campaign Expansion",
+      "number": 158,
+      "title": "Arnor Ravaged",
+      "code": "100158",
+      "reason": "Protect the Innocent and Arnor Ravaged are the two sides of one card (#158; the Deadmen's Dike campaign card: \"Add Arnor Ravaged to the Campaign Pool in its place (found on the opposite side of Protect the Innocent)\"), and Hall of Beorn gives both RingsDbCardId 10158. Protect the Innocent keeps RingsDB's code; Arnor Ravaged, which RingsDB lists no record for, takes '100' and the collector number, which no other card bears.",
+      "source": "data/raw/hallofbeorn (EncounterCards.json); data/raw/ringsdb/cards/AACE.json; mec108.campaign-setup-deadmens-dike"
     }
   ]
 }

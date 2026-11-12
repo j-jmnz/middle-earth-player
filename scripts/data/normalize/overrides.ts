@@ -51,9 +51,9 @@ const overridesSchema = z.object({
       }),
     )
     .default([]),
-  // A twin pack card whose Hall of Beorn `RingsDbCardId` is another card's: the code RingsDB gives it, by Hall of Beorn's card set and collector number (The Mountain of
-  // Fire's Orc Disguise, Captains of the West and Raise the Shire).
-  hobRingsDbCodes: z.array(z.object({ set: z.string().min(1), number: z.number().int().positive(), code: z.string().regex(/^\d{5,6}$/), reason: z.string().min(1), source: z.string().min(1) })).default([]),
+  // A card whose Hall of Beorn `RingsDbCardId` is another card's: the code RingsDB gives it (or, where RingsDB lists none, a six-digit code), by Hall of Beorn's card set and collector number (The Mountain of
+  // Fire's Orc Disguise, Captains of the West and Raise the Shire). `title` names one of two cards that share a collector number (Angmar Awakened's Protect the Innocent and Arnor Ravaged, the two sides of one card).
+  hobRingsDbCodes: z.array(z.object({ set: z.string().min(1), number: z.number().int().positive(), title: z.string().min(1).optional(), code: z.string().regex(/^\d{5,6}$/), reason: z.string().min(1), source: z.string().min(1) })).default([]),
   // A card Hall of Beorn's scenario list counts that the scenario does not deal: the epic multiplayer mode's cards (mec113.epic-multiplayer-mode), which are dealt by the Epic
   // Multiplayer Mode campaign card's Setup. The dealt count is checked against the rest of the list only.
   scenarioExcluded: z.array(z.object({ scenario: z.string().min(1), code: z.string().min(1), reason: z.string().min(1), source: z.string().min(1) })).default([]),

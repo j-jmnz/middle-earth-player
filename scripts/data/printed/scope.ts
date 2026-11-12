@@ -13,6 +13,7 @@ import { driveFileUrl, type DriveFile } from "../sources/jvzijp.ts";
 import type { HobCard } from "../sources/hallofbeorn.ts";
 import { foldTwoSided } from "../normalize/product-cards.ts";
 import { titleKey } from "../normalize/names.ts";
+import { MEC108_SCAN_URLS } from "./mec108-scans.ts";
 
 // The packs the Campaign Expansions' cards are printed in (ProductDef.campaignExpansion, scripts/data/campaign-defs.ts).
 const CAMPAIGN_EXPANSION_PACKS: ReadonlySet<string> = new Set(PRODUCTS.filter((product) => product.campaignExpansion).flatMap((product) => product.packs));
@@ -27,6 +28,12 @@ export type ScanTarget = { code: string; side: ScanSide; printing: string; urls:
 // Cards the MEC109 printing words differently from the 2013 and 2014 printings that RingsDB carries (phase 8b found nine).
 // Burdens and the Phial belong to later scenarios, but their printed text is settled here from the MEC109 scan.
 export const MEC109_CHANGED = ["141078", "141080", "141081", "141082", "141083", "141084", "142015", "142085", "142086"];
+
+// Cards the 2022 MEC108 printing words differently from the 2014 and 2015 Lost Realm and Adventure Pack printings it reprints. Hall of Beorn's scans and lotr.cardgame.tools' MEC108
+// rows for the scenario cards (numbers 1 to 155) are the original printings' (cardgame.tools files them under the MEC38 to MEC44 images and holds one text for both), so a MEC108
+// rewording cannot be found from these scans: the list stays empty until a scan of the MEC108 cards is read. The Campaign Expansion's own cards (numbers 156 to 193) are read from
+// their MEC108 scans (mec108-scans.ts).
+export const MEC108_CHANGED: readonly string[] = [];
 
 // Cards the 2023 MEC112 printing words differently from the 2015 Treason of Saruman and Land of Shadow printings it reprints. Hall of Beorn's TTwT front text, keywords,
 // stats, shadow and quantity equal the twins' for all 156 pairs, and no pinned scan shows the 2023 wording (the ledger's printing is ToS or LoS), so a MEC112 rewording
@@ -47,6 +54,7 @@ export const KNOWN_ERRORS = ["141025", "141026", "141029", "142062"];
 // file name that Hall of Beorn's record keeps in (Nárelenya, Círdan's Blessing).
 const DREAM_CHASER_SCANS = "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Dream-chaser-Campaign-Expansion";
 const SCAN_URL_FIXES: Readonly<Record<string, readonly string[]>> = {
+  ...MEC108_SCAN_URLS,
   "110139": [`${DREAM_CHASER_SCANS}/Glorinaith.jpg`],
   "110140": [`${DREAM_CHASER_SCANS}/Narelenya.jpg`],
   "110140.B": [`${DREAM_CHASER_SCANS}/Narelenya-Upgraded.jpg`],

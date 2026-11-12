@@ -1,0 +1,4013 @@
+{
+  "campaign": "angmar-awakened",
+  "conventions": [
+    "One entry per code and side. Side A is the front, side B the back of a double-sided card; a shadow effect is a line of side A.",
+    "lines are the ability text of the text box in print order, one ability per line: no title, traits, stats, flavor text, or Victory line. Keyword lines (Surge., Doomed 1., Time 4., Capture 1.) stay.",
+    "Icons are written as the words Hall of Beorn uses (Willpower, Attack, Defense, Threat). Apostrophes and quotation marks are straight.",
+    "A printed typo is written corrected in lines, and the printed wording is kept under misprints.",
+    "inert lists line numbers that need no effect record, with the reason. A line that is only keywords the engine reads is owned by the keyword.",
+    "A quest stage's card side B is its stage B. A double-sided card of the Campaign Expansion whose sides are two catalog cards (Protect the Innocent 10158 and Arnor Ravaged 100158) is each side A of its own code.",
+    "A campaign card's side A opens with the marker line \"You are playing campaign mode.\" (Treachery of Rhudaur's holds only that line); its side B holds the Resolution paragraphs, each paragraph one line. Flavor text under the rules is not a line.",
+    "The scan of a Lost Realm or Adventure Pack card is the 2014 or 2015 printing (the MEC108 reprint carries the same text: no card is in MEC108_CHANGED); the Campaign Expansion's own cards are read from their MEC108 scans (lotr.cardgame.tools)."
+  ],
+  "entries": [
+    {
+      "code": "09016",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Iârion.jpg",
+        "sha256": "d5dcb0a894e92eeea4629b3ba87780b4e330c73974267aef25b93c10c3bf2755"
+      },
+      "lines": [
+        "X is the number of quest cards in play.",
+        "The first player gains control of Iârion.",
+        "Response: After a side quest is revealed from the encounter deck, ready Iârion.",
+        "If Iârion leaves play, the players lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09017",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Orc-War-Party.jpg",
+        "sha256": "1c465462126d962a84178730d5e82efeead9fc78ab784ab137a9eee1190ff0e1"
+      },
+      "lines": [
+        "Cannot have attachments.",
+        "While Orc War Party is in the staging area, enemies in the staging area cannot take damage.",
+        "The players cannot win the game while Orc War Party is in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09018",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Chetwood-Forest.jpg",
+        "sha256": "0fab1af605802da477532554395a67510efd450cb05ef8dd156c96abaeb053cd"
+      },
+      "lines": [
+        "Travel: One player chooses and engages an enemy in the staging area.",
+        "Shadow: Defending player either exhausts a hero he controls, or returns attacking enemy to the staging area after this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09019",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Borders-of-Bree-land.jpg",
+        "sha256": "bc9164632bc539800452aa8b338b77b637d1f28d8ec35ccfc6005ea8c536d37b"
+      },
+      "lines": [
+        "While Borders of Bree-land is in the staging area, it gains: \"Forced: At the beginning of the quest phase, return 1 enemy engaged with a player to the staging area.\"",
+        "Shadow: Defending character gets -1 Defense for each quest stage in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09020",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Outlying-Homestead.jpg",
+        "sha256": "e2c53d6581ab50f48e31432394617b073eaffc772acb601e4f41a8e2db3d5e9c"
+      },
+      "lines": [
+        "Doomed 1.",
+        "While Outlying Homestead is in the staging area, players cannot reduce their threat.",
+        "Travel: Reveal a card from the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09021",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Sudden-Assault.jpg",
+        "sha256": "fc0e7e04660c22a49bf4ebc3e6f6cd6b1eeab1b851f69ac1e0f433bcec00e8f0"
+      },
+      "lines": [
+        "When Revealed: If the total Willpower of characters committed to the quest is greater than the total Threat in the staging area, each enemy in the staging area makes an immediate attack against the first player. If no attack is made this way, search the encounter deck and discard pile for an Orc War Party and add it to the staging area. Shuffle the encounter deck. This effect cannot be canceled."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09022",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Surprising-Speed.jpg",
+        "sha256": "26642d567de48f56e1ba09475ccf4aef010d573464b3c1189826337f2fc7d238"
+      },
+      "lines": [
+        "When Revealed: Each player returns 1 enemy engaged with him to the staging area. If no enemy was returned to the staging area this way, Surprising Speed gains surge and doomed 1.",
+        "Shadow: Attacking enemy gets +1 Attack. Return attacking enemy to the staging area after this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09023",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Orc-Rearguard.jpg",
+        "sha256": "74702a629f7b3c5a303677e6c4dcc8aee3ff239f697bed8edfe38aaef3490565"
+      },
+      "lines": [
+        "No more than 3 progress tokens can be placed on the current quest each round.",
+        "While Orc Rearguard is the current quest it gains: \"Forced: At the end of the staging step, reveal 1 card from the encounter deck.\""
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09024",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Rescue-Iârion.jpg",
+        "sha256": "4bc98772475db6658aec16d60063e59946af9305ddf6a9c6d7d2316f84e66e66"
+      },
+      "lines": [
+        "Time 4. When Revealed: The first player loses control of Iârion and places him facedown underneath this stage. When this stage is defeated, the first player takes control of Iârion and exhausts him.",
+        "Forced: After the last time counter is removed from this stage, discard Iârion."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09025",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Cornered-Orc.jpg",
+        "sha256": "d354e3b4b00228f0f73eb72248b05eaccd397e122977896a6b29e4717742fab6"
+      },
+      "lines": [
+        "Forced: After Cornered Orc engages a player, it makes an immediate attack.",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending character is damaged)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09026",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Amon-Forn.jpg",
+        "sha256": "09f9e265e5ce8cd2a0fb2b3f359b5422eb88fbf1f6f0bab31ca81a8cdf69039a"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "While Amon Forn is the active location, it gains: \"Forced: After an Orc enemy is added to the staging area, it makes an immediate attack against the first player.\"",
+        "The players cannot win while Amon Forn is in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09027",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Weathered-Hilltop.jpg",
+        "sha256": "0e6ec8146559d0b52b34a831d9ffc16cd1639f5b591728a68fc29e193858fa1b"
+      },
+      "lines": [
+        "Weathered Hilltop gets +1 Threat for each resource token on it.",
+        "Forced: After a Weather treachery is revealed from the encounter deck, place 1 resource token here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09028",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Exposed-Ridge.jpg",
+        "sha256": "6585d45f24fff948fe10434d5805d42698b3e804f30ef3b15db47a6c9e9edd99"
+      },
+      "lines": [
+        "While Exposed Ridge is the active location, it gains: \"Forced: At the end of the refresh phase, each player deals 1 damage to a character he controls.\"",
+        "Shadow: Attacking enemy gets +1 Attack for each damaged character the defending player controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09029",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Sheltered-Valley.jpg",
+        "sha256": "03f112ca2afb038d843c2bd715e487962892c35996f6658d85ebafde5785962b"
+      },
+      "lines": [
+        "While Sheltered Valley is the active location, it gains: \"Response: When Sheltered Valley is explored, heal all damage from 1 character.\"",
+        "Travel: Remove 1 resource token from the Mission objective."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09030",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Concealed-Orc-camp.jpg",
+        "sha256": "91711953e1863536c6eda391a46257a08b75844c997397146ee8a64baaa6a0e6"
+      },
+      "lines": [
+        "While Concealed Orc-camp is the active location, it gains: \"Response: When Concealed Orc-camp is explored, place 1 resource token on the Mission objective.\"",
+        "Travel: The first player searches the encounter deck and discard pile for an Orc enemy and puts it into play engaged with him. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09031",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Ice-Storm.jpg",
+        "sha256": "b821460d9a3509802a73e5b346f53d0eabf25bcbca6ec9818e17b7646cfe26d2"
+      },
+      "lines": [
+        "When Revealed: Each player assigns X damage among characters he controls, where X is the number of quest cards in play. Then, exhaust each damaged character.",
+        "Shadow: Assign X damage among characters you control. X is the number of quest cards in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09032",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Find-Shelter.jpg",
+        "sha256": "999b3b854a6c5fc4facbf994251e46d7bf35c899cd3d1d9cba1dc92c58b56183"
+      },
+      "lines": [
+        "Surge. Time 4.",
+        "Forced: After the last time counter is removed from this quest card, each player deals 4 damage to a hero he controls. Then, place 4 time counters on this quest card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09033",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Thaurdir.jpg",
+        "sha256": "3ba47387d833f5aa340f354e3fa989c6926fb084b2d9a64a5dd6b90af797a677"
+      },
+      "lines": [
+        "Indestructible. Cannot have attachments.",
+        "Forced: After a treachery card with the Sorcery trait is revealed from the encounter deck, Thaurdir heals 3 damage and makes an immediate attack against the first player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09034",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Thaurdir's-Damned.jpg",
+        "sha256": "7bee68f3c95cfc2930f8136d166e4dc640d52159d31896b958b3c6c346d4c0ca"
+      },
+      "lines": [
+        "Forced: After Thaurdir's Damned engages you, discard the top 2 cards of your deck and assign X damage among characters you control. X is the combined printed cost of the discarded cards."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09035",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Baleful-Shade.jpg",
+        "sha256": "8d7031828b80da5c85a90c019bf91fcf7fe63ad0316fd2cb37cb89e96399ae31"
+      },
+      "lines": [
+        "Forced: When Baleful Shade attacks, the defending player discards the top card of his deck. If the discarded card is an ally, Baleful Shade gets +2 Attack for this attack.",
+        "Shadow: Exhaust a character you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09036",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Broken-Battlements.jpg",
+        "sha256": "7cdb3473ca0d325c39f84f74543ceb07c248d2786ff819b9f76f07c281a01196"
+      },
+      "lines": [
+        "Time 3. Forced: After the last time counter is removed from Broken Battlements, each player discards the top 5 cards of his deck and places 1 time counter here.",
+        "Travel: Each player discards the top card of his deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09037",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Norbury-Tombs.jpg",
+        "sha256": "4f43a80cfe3e6ad574e5a7b60c24777963f59079eb809d1e86ffaf2a5c491c9a"
+      },
+      "lines": [
+        "While Norbury Tombs is the active location, it gains: \"Response: When Norbury Tombs is explored, each player shuffles the top 5 cards of his discard pile back into his deck.\"",
+        "Travel: Return the topmost enemy in the encounter discard pile to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09038",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Fornost-Square.jpg",
+        "sha256": "934dc95a26688b9b547c8c5b106750d9bd132461991c9801985b6946f89639d4"
+      },
+      "lines": [
+        "Fornost Square gets +1 Threat for each resource token on it.",
+        "Forced: After the first player discards any number of cards from the top of his deck, place 1 resource token here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09039",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Haunted-Keep.jpg",
+        "sha256": "1e4e69ef236dc61b45130de6ee2d5278ab13628f178ec0bb019d381b3f5f9447"
+      },
+      "lines": [
+        "While Haunted Keep is the active location, the first Undead enemy revealed each round gains surge.",
+        "Shadow: Defending player discards the top card of his deck. Attacking enemy gets +X Attack where X is the discarded card's printed cost."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09040",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Deadmen's-Gate.jpg",
+        "sha256": "f269c7ccbc960d81cda19e536ba69d61ec7eefb434b3795207698491fe07eb2e"
+      },
+      "lines": [
+        "While Deadmen's Gate is the active location, it gains: \"Forced: After a player triggers an 'Action' or 'Response' effect, he must discard the top card of his deck.\"",
+        "Shadow: Discard an attachment you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09041",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Unnatural-Fog.jpg",
+        "sha256": "c83a0d19ada60955681c73731ffa1bf2ba65abb74ae3f907366d5139be3e4603"
+      },
+      "lines": [
+        "Doomed 2.",
+        "When Revealed: Each player must either discard 1 card from the top of his deck for each questing character he controls, or remove each character he controls from the quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09042",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/The-Shadow-World.jpg",
+        "sha256": "716f5897303f3b5de106d44af6c01039fc9bc585984cabc2e0fc425a653670c5"
+      },
+      "lines": [
+        "Surge.",
+        "Forced: At the end of the refresh phase, each player discards the top X cards of his deck, where X is the number of Undead enemies engaged with him."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09043",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Angmar-Orc.jpg",
+        "sha256": "bc2d24486ce3dd336978bbfeac46a86d28cebd458d1225870f91d334f942eb8a"
+      },
+      "lines": [
+        "When Revealed: Either discard 1 ally from play, or reveal an additional encounter card.",
+        "Shadow: Attacking enemy gets +1 Attack. If this attack destroys an ally, return attacking enemy to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09044",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Angmar-Marauder.jpg",
+        "sha256": "f9fe1d8bfccc4c6adb75b50609bf3cbafcd87514f3404328a75d97217a2fd415"
+      },
+      "lines": [
+        "Forced: After Angmar Marauder attacks and destroys an ally, return it to the staging area.",
+        "Shadow: Attacking enemy gets +1 Attack for each ally the defending player controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09045",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Angmar-Captain.jpg",
+        "sha256": "7d9761b25ab4df962ab1566983650346cd2d76fc3c3651d5fd2afad3297932cf"
+      },
+      "lines": [
+        "Forced: After Angmar Captain attacks and destroys an ally, discard the top card of the defending player's deck. If the discarded card is an ally, Angmar Captain makes an additional attack against the defending player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09046",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Orc-Ambush.jpg",
+        "sha256": "23166712e497a77b663e0fa515b3d3204e5e6ad4c56ad87d7368f562141eddd0"
+      },
+      "lines": [
+        "Each Orc enemy gets +1 Threat, +1 Attack, and +1 Defense.",
+        "When Revealed: Each player must search the encounter deck and discard pile for an Orc enemy and put it into play engaged with him. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09047",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Rugged-Country.jpg",
+        "sha256": "23166bcf9948c1840606f1684b174cd9e03320a43ddd4e6dcfddc3b70568c9f3"
+      },
+      "lines": [
+        "If the current quest is a side quest, Rugged Country gets +2 Threat.",
+        "Shadow: Attacking enemy gets +1 Attack for each quest card in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09048",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Shrouded-Hills.jpg",
+        "sha256": "97a7ea44b410bd04229f0a5e976f22be173046649fed350bb000592916203e5f"
+      },
+      "lines": [
+        "X is the number of quest cards in play.",
+        "While there is only 1 quest card in play, Shrouded Hills gains surge."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09049",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Pressing-Needs.jpg",
+        "sha256": "3c3e66f95f7af4a5c2c3de021ae7292b3e40be6cd481ed5e273729d828fbdd1e"
+      },
+      "lines": [
+        "Doomed 2.",
+        "When Revealed: Either search the encounter deck and discard pile for an encounter side quest and reveal it, or choose a different quest card in play to be the current quest until the end of the phase. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09050",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Weight-of-Responsibility.jpg",
+        "sha256": "399d21b795c536adf8cbf3be0f35987b6cb0b72af28fa52d0c61be9436d901e4"
+      },
+      "lines": [
+        "When Revealed: Reveal 1 encounter card for each quest card in play.",
+        "Shadow: Defending player discards 1 attachment he controls for each quest card in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09051",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Lost-in-the-Wilderness.jpg",
+        "sha256": "b52277ac178cf601ac45a3426765238eed395dfe44cb8a014afd8288e3288ce3"
+      },
+      "lines": [
+        "When Revealed: Each player places all cards in his hand facedown underneath Lost in the Wilderness.",
+        "Forced: When Lost in the Wilderness is defeated, return each card underneath it to its owner's hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09052",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Biting-Wind.jpg",
+        "sha256": "030651015f5112e1b8cea533150a06f3ba53fd88f20bf7e611e435e36fd67928"
+      },
+      "lines": [
+        "When Revealed: Assign X damage among characters committed to the quest. X is the number of characters committed to the quest.",
+        "Shadow: Deal 1 damage to the defending character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09053",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Freezing-Blast.jpg",
+        "sha256": "ee7dfe5c545607bc90301aa3b65e92ea355b84a79f7676317abd0da13d05358a"
+      },
+      "lines": [
+        "Doomed 2.",
+        "When Revealed: Remove each damaged character from the quest.",
+        "Shadow: Attacking enemy gets +1 Attack for each damaged character the defending player controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09054",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Cold-from-Angmar.jpg",
+        "sha256": "e58d91cd58b5b0cc9868add4672064b764e860cb4ddfe3cc03df4cbf3d6f517a"
+      },
+      "lines": [
+        "When Revealed: Each player deals 1 damage to a hero he controls. Attach Cold from Angmar to the current quest. (Counts as a Condition attachment with the text: \"Treat each damaged character's printed text box as if it were blank, except for keywords and Traits.\")"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09055",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Make-Camp.jpg",
+        "sha256": "51bbd0fc07496efa9dc25a3f06d0f384ca632258f8dd318491ef5417af114915"
+      },
+      "lines": [
+        "Surge.",
+        "Characters cannot be healed.",
+        "Response: After Make Camp is defeated, each player heals up to 3 damage from a hero he controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09056",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Ruins-of-Arnor.jpg",
+        "sha256": "9717b080626a1c63d7fc772832d1d2c8ab8e6b17d086892c71d5080ee1760ef0"
+      },
+      "lines": [
+        "Forced: After the \"when revealed\" effect of a treachery card is canceled, raise each player's threat by 2.",
+        "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, the defending player raises his threat by 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09057",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Ancient-Causeway.jpg",
+        "sha256": "0bcdbdc9d4dbb8e14a74253ad435388bb962c860ae115791c932784b0938e298"
+      },
+      "lines": [
+        "Forced: When Ancient Causeway is explored, raise each player's threat by 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09058",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Tragic-Discovery.jpg",
+        "sha256": "f956fe8daeb8b4af1620912c570bab4de90ad753201ae3dd7acb924d4348e067"
+      },
+      "lines": [
+        "When Revealed: Raise each player's threat by the Threat of the active location.",
+        "Shadow: Defending player either raises his threat by 3, or this attack is considered undefended."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09059",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Search-the-Ruins.jpg",
+        "sha256": "aa7f349e28baf43ac95155934917e3c9b433c5fddbd654da1e400e21241361f4"
+      },
+      "lines": [
+        "Surge.",
+        "Forced: At the end of the refresh phase, raise each player's threat by 2.",
+        "Response: After Search the Ruins is defeated, reduce each player's threat by 3."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09060",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Dead-Lord.jpg",
+        "sha256": "5ec999a4cae7257e6c27d0c1a65d4b0ca77389bbdf128ac9827c22c8b6e18e02"
+      },
+      "lines": [
+        "Forced: After Dead Lord engages you, put the topmost Undead enemy in the discard pile into play engaged with you.",
+        "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, reveal 1 encounter card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09061",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Cursed-Dead.jpg",
+        "sha256": "bc1a0916979649a8ab68519d57f09a185c996c58f4a99304657fc7e64850b532"
+      },
+      "lines": [
+        "When Revealed: Put each copy of Cursed Dead in the discard pile into play in the staging area.",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if there is a copy of the defending character in its owner's discard pile)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09062",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Restless-Evil.jpg",
+        "sha256": "f4106b2fdaa038dc685c8990740f3c2ce122b2afd0c4149aa4569acb634f6cda"
+      },
+      "lines": [
+        "When Revealed: Each Undead enemy gets +1 Threat, +1 Attack, and +1 Defense until the end of the round. If there are no Undead enemies in play, Restless Evil gains surge.",
+        "Shadow: Each Undead enemy engaged with you gets +1 Attack and +1 Defense until the end of the round."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09063",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Seal-the-Tomb.jpg",
+        "sha256": "73c9b0a8fb1edadaa13283cbe4c3fc93ab5d9787cec232e1c44510bf6d4ec7d9"
+      },
+      "lines": [
+        "Surge.",
+        "Forced: At the end of the refresh phase, discard the top 3 cards of the encounter deck. Return the topmost Undead enemy in the encounter discard pile to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09064",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Terror-of-the-North.jpg",
+        "sha256": "76bc3668dbc1d4e236523cb4b632e4096d978a5dab3b4b9d48ab768769d95407"
+      },
+      "lines": [
+        "When Revealed: Each player discards the top 3 cards of his deck. Until the end of the round, add 2 to the total Threat in the staging area for each different card type discarded this way.",
+        "Shadow: Defending player discards the top 3 cards of his deck. Attacking enemy gets +1 Attack for each different card type discarded this way."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09065",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Dark-Sorcery.jpg",
+        "sha256": "127cc77f5770adf22943fdcdf2292fc16507d5d316178056cad0587ba94f3733"
+      },
+      "lines": [
+        "Doomed 2.",
+        "When Revealed: Each player discards each ally he controls that has the same title as a card in his discard pile.",
+        "Shadow: Discard the defending character if there is a copy of that character in its owner's discard pile."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09066",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Heavy-Curse.jpg",
+        "sha256": "6a5405bae23651e38150582e70d48209d478384779717c35d024ef0fbf7c6aa3"
+      },
+      "lines": [
+        "Surge.",
+        "When Revealed: Attach to the current quest. (Counts as a Condition attachment with the text: \"When a player plays a card, increase its cost by 1 if there is a card that has the same title in its owner's discard pile.\")"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09067",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/The-Power-of-Angmar.jpg",
+        "sha256": "9e1016051f2d329eb0cf437a981049a156ad1403f54fcae332dc92e13c6450ba"
+      },
+      "lines": [
+        "Surge.",
+        "Cards in each player's discard pile cannot leave that player's discard pile by player card effect.",
+        "Forced: After this stage is defeated, each player shuffles the top 5 cards of his discard pile back into his deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09068",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Stop-the-War-Party-1A.jpg",
+        "sha256": "8d19d668bd26b3520f0317feb0563ee78ea37e07f4b2b7650f60f678abf9eedf"
+      },
+      "lines": [
+        "Setup: Put Iârion into play. Add 1 Orc War Party to the staging area. Each player adds 1 different location to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09068",
+      "side": "B",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Stop-the-War-Party-1B.jpg",
+        "sha256": "5fc548d66240d37ad8b5bc5f98b0372fbdf2b60804e4f6965860ff5a5e01c96a"
+      },
+      "lines": [
+        "Enemies do not make engagement checks.",
+        "Forced: At the end of the refresh phase, raise each player's threat by 1 for each enemy in the staging area.",
+        "The players cannot defeat this stage unless the first player controls Iârion. If the players defeat this stage, they win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09069",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Scattered-Among-the-Hills-1A.jpg",
+        "sha256": "f05198f56a89983de2e9ce880a258af3cad9fdf2e4178a7e407b199b47861700"
+      },
+      "lines": [
+        "Setup: Set Orc Ambush and Amon Forn aside, out of play. Create the Orc deck (see insert) and set it next to the quest deck. Make Exposed Ridge the active location. Add Hunting the Orcs and 1 Weathered Hilltop to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09069",
+      "side": "B",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Scattered-Among-the-Hills-1B.jpg",
+        "sha256": "f05468afe2a4f45d92012c02743d962e8dff2a9c75f170ded9110973212ee19b"
+      },
+      "lines": [
+        "The first Weather treachery card revealed each round gains surge.",
+        "Forced: After the active location is explored, reveal the top card of the Orc deck and resolve it as if it was just revealed from the encounter deck (reveal the top 2 cards instead if there are 3 or more players in the game)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09070",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Cornered-Animals-2A.jpg",
+        "sha256": "6ddbdab6fb826cea8e403666fc2d780153d8dc602c25dc0f496eaf46d6898c0b"
+      },
+      "lines": [
+        "When Revealed: End the current phase. Shuffle the encounter discard pile and the Orc deck into the encounter deck. Reveal Orc Ambush and Amon Forn and add them to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09070",
+      "side": "B",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Cornered-Animals-2B.jpg",
+        "sha256": "b59ce8c4928767bfd8071853870741857a5cafe18c34a18c18623db1e876fb9b"
+      },
+      "lines": [
+        "Each damaged character gets -1 Willpower.",
+        "Forced: At the beginning of the quest phase, either discard 1 resource token from Savage Counter-attack, or reveal an additional encounter card this phase.",
+        "If the players defeat this stage, they win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09071",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Hunting-the-Orcs.jpg",
+        "sha256": "facb90e621d701f77f6141506a55fa56e4a245cda2ac1f5164727f411c3cb0b0"
+      },
+      "lines": [
+        "Forced: After an enemy is defeated, place 1 resource token here. Then, if there are at least X resource tokens here, flip Hunting the Orcs and place each resource token that was on it on Savage Counter-attack. X is 3 more than the number of players in the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09072",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/Savage-Counter-attack.jpg",
+        "sha256": "4cb92973dcb8da059678fec7c640116f104c9cbc1731604123a3942a254ce3f4"
+      },
+      "lines": [
+        "Forced: After Savage Counter-attack enters play, advance to stage 2A.",
+        "Forced: After an enemy attacks and destroys a character, discard 1 resource token from Savage Counter-attack.",
+        "If there are no resource tokens here, the players lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09073",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/The-Shades-of-Angmar-1A.jpg",
+        "sha256": "3e6f903a715257eeb406638324875b63e044c65837b0fe1c75b66b3cd214b472"
+      },
+      "lines": [
+        "Setup: Put Iârion into play. Set Thaurdir aside, out of play. Add 1 copy of Fornost Square to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09073",
+      "side": "B",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/The-Shades-of-Angmar-1B.jpg",
+        "sha256": "d74e34ce5a4bae96ab44db8d408185b8de46b1c98edb2c226b8d3b8239895bf9"
+      },
+      "lines": [
+        "When Revealed: Each player must search the encounter deck for a Baleful Shade and put it into play engaged with him. Shuffle the encounter deck and reveal 1 encounter card per player.",
+        "Forced: At the end of the refresh phase, each player discards the top card of his deck.",
+        "If a player has no cards in his deck, he is eliminated from the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09074",
+      "side": "A",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/A-Fell-Wraith-2A.jpg",
+        "sha256": "27d4aca3e2831430f6f3d1042b67207fd22aa463f16e2c0d04a8349d9c35e0e2"
+      },
+      "lines": [
+        "When Revealed: Add Thaurdir to the staging area. Then, reveal 1 encounter card per player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "09074",
+      "side": "B",
+      "printing": "TLR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Lost-Realm/A-Fell-Wraith-2B.jpg",
+        "sha256": "e3589e52f19258c6d43bf85e7e29d6a9d364aee046553b709ec5e08ed206d1c4"
+      },
+      "lines": [
+        "Forced: After Thaurdir attacks and destroys a character, that character's controller must either discard the top 3 cards of his deck, or return Thaurdir to the staging area.",
+        "If a player has no cards in his deck, he is eliminated from the game. The players cannot defeat this stage while Thaurdir has any hit points remaining. If the players defeat this stage, they win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10011",
+      "side": "A",
+      "printing": "WoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wastes-of-Eriador/Daybreak.jpg",
+        "sha256": "950d59eeb3c70d7d347a24b9b47a7afe1b2bf4d717614e76273a725d8e254b56"
+      },
+      "lines": [
+        "It is Day. Enemies do not make engagement checks.",
+        "Forced: When it becomes Day, return each enemy in play to the staging area.",
+        "Forced: At the end of the round, flip this objective."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10012",
+      "side": "A",
+      "printing": "WoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wastes-of-Eriador/Nightfall.jpg",
+        "sha256": "ac23ef3b9a47a749b97fb46e9a4032016005be2f77259a814bb202ce16b8a564"
+      },
+      "lines": [
+        "It is Night. Progress cannot be placed on quest cards. Encounter card effects cannot be canceled.",
+        "Forced: When it becomes Night, reveal an encounter card.",
+        "Forced: At the end of the round, flip this objective."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10013",
+      "side": "A",
+      "printing": "WoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wastes-of-Eriador/Across-the-Wastes-1A.jpg",
+        "sha256": "8b8fc882b39159653a6cc1bdb5478efe69e0da265875631b91978c90874663fe"
+      },
+      "lines": [
+        "Setup: Set Pack Leader aside, out of play. Make Shrouded Hills the active location. Add the Time objective to the staging area with Daybreak faceup. The first player takes control of Amarthiúl. Shuffle the encounter deck. Reveal 1 card from the encounter deck per player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10013",
+      "side": "B",
+      "printing": "WoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wastes-of-Eriador/Across-the-Wastes-1B.jpg",
+        "sha256": "dea120ee2371b1978b086e9bbd449886a734b0bcb3951eb23a0dcd02e24e9831"
+      },
+      "lines": [
+        "While it is Day, each hero gets +1 Willpower.",
+        "Forced: When it becomes Night, raise each player's threat by 1."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10014",
+      "side": "A",
+      "printing": "WoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wastes-of-Eriador/Howling-at-Night-2A.jpg",
+        "sha256": "44687b1f2645ba6efe4000f7bf899794c626027ebb609bad344d9f2f72fe5dba"
+      },
+      "lines": [
+        "When Revealed: Shuffle the encounter discard pile into the encounter deck. Discard cards from the top of the encounter deck until X Warg enemies are discarded. X is the number of players in the game. Add each discarded enemy to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10014",
+      "side": "B",
+      "printing": "WoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wastes-of-Eriador/Howling-at-Night-2B.jpg",
+        "sha256": "2965deb53e1bc458e5f53951bd9eaa2a0199dcb8d94200d0d49bb771076a94c6"
+      },
+      "lines": [
+        "Forced: When it becomes Day, each player draws 1 card.",
+        "Forced: When it becomes Night, discard 1 non-objective ally from play (discard 2 non-objective allies instead if there are 3 or more players in the game)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10015",
+      "side": "A",
+      "printing": "WoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wastes-of-Eriador/Battle-with-the-Pack-3A.jpg",
+        "sha256": "636bf27dd09a8a4b9cbffebdcadebfe970ca27103c5a8d708efdf0af94a65717"
+      },
+      "lines": [
+        "When Revealed: Flip the Time objective to Nightfall. Add Pack Leader to the staging area. Shuffle the encounter discard pile into the encounter deck. Discard cards from the top of the encounter deck until X Warg enemies are discarded. X is 1 less than the number of players in the game. Add each discarded enemy to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10015",
+      "side": "B",
+      "printing": "WoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wastes-of-Eriador/Battle-with-the-Pack-3B.jpg",
+        "sha256": "f96f4a55a5d61b3ad903a0175ab689ae0ff6aaa15135e00b8117aafe4bab4f00"
+      },
+      "lines": [
+        "Pack Leader cannot take damage unless there are at least 5 progress tokens on this stage.",
+        "Forced: When it becomes Day, discard all progress from this stage.",
+        "The players cannot defeat this stage while Pack Leader is in play. If Pack Leader is destroyed, the players win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "100158",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-158-back-EncounterSideQuest-Protect_the_Innocent-Arnor_Ravaged-Intruders_in_Chetwood_Campaign.jpg",
+        "sha256": "4003e124fef123fbab1b37a92f13c84c4f56bd3a4db6807a0198463f54522a0f"
+      },
+      "lines": [
+        "Setup: Add Arnor Ravaged to the staging area with damage on it equal to the amount of damage marked for it in the Campaign Log.",
+        "Forced: After an attack damages a character but does not destroy it, move 1 damage from Arnor Ravaged to that character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10016",
+      "side": "A",
+      "printing": "WoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wastes-of-Eriador/Amarthiúl.jpg",
+        "sha256": "3d679c964ee621021692a0d5ef14e321c6a0e34a4ae3034db2b9ce4b2d02d261"
+      },
+      "lines": [
+        "Response: After an enemy engages a player, give control of Amarthiúl to that player.",
+        "If Amarthiúl leaves play, the players lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10017",
+      "side": "A",
+      "printing": "WoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wastes-of-Eriador/Pack-Leader.jpg",
+        "sha256": "6c92567575671cc8a15f4cfd2b71c8e1a739b2a259284e6e803d26934f0cd60c"
+      },
+      "lines": [
+        "Cannot have attachments.",
+        "Cannot be optionally engaged.",
+        "Forced: After Pack Leader engages you, exhaust a character you control for each Warg enemy engaged with you."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10018",
+      "side": "A",
+      "printing": "WoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wastes-of-Eriador/Northern-Warg.jpg",
+        "sha256": "2bfee28ae45814e259a8e3ed06db548fd2fe8a479d9b3d5c05f58c4cf49890fd"
+      },
+      "lines": [
+        "When Revealed: Each Warg enemy gets +1 Threat until the end of the phase.",
+        "Shadow: After this attack, attacking enemy engages the next player, then makes an immediate attack (deal a new shadow card for that attack)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10019",
+      "side": "A",
+      "printing": "WoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wastes-of-Eriador/Blood-thirsty-Warg.jpg",
+        "sha256": "16328c2a5610389f72c9779f96c28f489ca3d99cb978fb1c78ccd69ee9f3d061"
+      },
+      "lines": [
+        "While Blood-thirsty Warg is in the staging area, it gains: \"Forced: When it becomes Night, Blood-thirsty Warg engages the first player and makes an immediate attack.\""
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10020",
+      "side": "A",
+      "printing": "WoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wastes-of-Eriador/Hunting-Pack.jpg",
+        "sha256": "1c359d99c832420a1b606401b87738c036520164179641f6d08f88be1e7f52ef"
+      },
+      "lines": [
+        "Cannot have attachments.",
+        "While a player is making an engagement check against Hunting Pack, it gets -1 engagement cost for each damaged character that player controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10021",
+      "side": "A",
+      "printing": "WoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wastes-of-Eriador/White-Warg.jpg",
+        "sha256": "c4bd605de4bed1b383f42d12b50f09f5b27dfba44856b9561a35e401ef26032d"
+      },
+      "lines": [
+        "Forced: After White Warg engages you, deal 1 damage to a character you control (2 damage instead if it is Night).",
+        "Shadow: If it is Night, attacking enemy makes an additional attack after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10022",
+      "side": "A",
+      "printing": "WoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wastes-of-Eriador/Wolf-of-Angmar.jpg",
+        "sha256": "5f4c68ad55ee709297d0fd80a519cd8f3cfeb8b64896ef58b8a8cc9ff0cf555a"
+      },
+      "lines": [
+        "Surge.",
+        "While it is Night, Wolf of Angmar gets +2 Attack.",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if it is Night)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10023",
+      "side": "A",
+      "printing": "WoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wastes-of-Eriador/Eriador-Wastes.jpg",
+        "sha256": "e05d76c2cc1c9e0f1258400e6184a34da5625d618978be11ac4c2683c7938a17"
+      },
+      "lines": [
+        "While Eriador Wastes is in the staging area, no more than 5 progress can be placed on the current quest each round.",
+        "Travel: The first player engages a Warg enemy in the staging area and deals it a shadow card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10024",
+      "side": "A",
+      "printing": "WoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wastes-of-Eriador/Warg's-Den.jpg",
+        "sha256": "187d9872191f54f1cc731bcc7cf1330ab69b68817add807974b4be9d694dc7c8"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "Travel: The first player searches the encounter deck and discard pile for a Warg enemy, reveals it, and puts it into play engaged with him. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10025",
+      "side": "A",
+      "printing": "WoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wastes-of-Eriador/North-Downs.jpg",
+        "sha256": "e1fc07641aaed629b7da49c069b742681e590d16a3fe40cbfede06f06c3fc214"
+      },
+      "lines": [
+        "While it is Night, North Downs gets +2 Threat.",
+        "Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, remove all progress from the current quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10026",
+      "side": "A",
+      "printing": "WoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wastes-of-Eriador/Sudden-Darkness.jpg",
+        "sha256": "7e14dfdcf75d838d818e051d0b9eb730abf77116fa9fc16af7486e1138b6b5ee"
+      },
+      "lines": [
+        "When Revealed: If it is Night, raise each player's threat by 4. If it is Day, flip the Time objective to Nightfall.",
+        "Shadow: Put the topmost Warg enemy from the discard pile into play engaged with you and deal it a shadow card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10027",
+      "side": "A",
+      "printing": "WoE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Wastes-of-Eriador/Predatory-Wolves.jpg",
+        "sha256": "a10d78e9ec5c04edba2cc26eab41f5d8d07ac58a9ec66724f08fa3172e77138a"
+      },
+      "lines": [
+        "When Revealed: Each player must choose: either discard the highest cost ally he controls, or search the encounter deck and discard pile for a Warg enemy, reveal it, and add it to the staging area. Shuffle the encounter deck.",
+        "Shadow: Exhaust a character you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10038",
+      "side": "A",
+      "printing": "EfMG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Mount-Gram/Unexpected-Rescue-1A.jpg",
+        "sha256": "fbe5a58a697be46c44b59d1b9f9bada8717c63db70513fed7165feed52d07f8e"
+      },
+      "lines": [
+        "Setup: Each player shuffles his starting hand into his deck. Each player prepares a separate captured deck (see insert). Each player adds 2 resources to his starting hero and sets his threat to that hero's threat cost. Set Southern Gate, Jailor Gornákh and the Angmar Orcs encounter set aside, out of play. Shuffle the encounter deck. Each player draws a new starting hand of 3 cards."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10038",
+      "side": "B",
+      "printing": "EfMG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Mount-Gram/Unexpected-Rescue-1B.jpg",
+        "sha256": "251c16ffb02609880e3a8f07c1f786eabbf1e0161f4881bda5f54b5c83387c88"
+      },
+      "lines": [
+        "When Revealed: Each player creates his own staging area and advances to a different stage 2A."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10039",
+      "side": "A",
+      "printing": "EfMG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Mount-Gram/Gornákh's-Dungeons-2A.jpg",
+        "sha256": "ecb2553b1f928944425e6c594c0b29aa663a90dc73734902b3269985853c22da"
+      },
+      "lines": [
+        "Capture 7.",
+        "When Revealed: Search the encounter deck for 1 copy of Prison Cell, reveal it, and add it to your staging area. Then, capture an additional 2 cards from the top of your captured deck underneath that copy of Prison Cell."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10039",
+      "side": "B",
+      "printing": "EfMG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Mount-Gram/Gornákh's-Dungeons-2B.jpg",
+        "sha256": "1feaecf6d19f14d69dc3d5464e17b24194066ff3557416f0511c2f17a3c1d395"
+      },
+      "lines": [
+        "Any time players would place progress tokens on this quest, rescue an equal number of captured cards at random from underneath it instead. (Progress is placed on the active location before triggering this effect.)",
+        "Forced: If there are no captured cards underneath Gornákh's Dungeons, join another player at the beginning of the travel phase. If you cannot join another player, all players advance to stage 3A together."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10040",
+      "side": "A",
+      "printing": "EfMG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Mount-Gram/Flight-from-Mount-Gram-3A.jpg",
+        "sha256": "9e2527a671bcbc54542904bc96332867e53fa46e72dd6f9399ce7184e187e3c3"
+      },
+      "lines": [
+        "When Revealed: Add Southern Gate and Jailor Gornákh to the staging area. Shuffle the Angmar Orcs encounter set into the encounter deck. Then, reveal 1 encounter card per player from the top of the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10040",
+      "side": "B",
+      "printing": "EfMG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Mount-Gram/Flight-from-Mount-Gram-3B.jpg",
+        "sha256": "5372e3607fda05595e384c3dfb82eed269f69010e184eff902ad05505da254d0"
+      },
+      "lines": [
+        "The players cannot travel to Southern Gate unless there is at least 16 progress on this stage.",
+        "The players cannot defeat this stage while Southern Gate is in play. If the players defeat this stage, they have escaped Mount Gram and win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10041",
+      "side": "A",
+      "printing": "EfMG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Mount-Gram/Jailor-Gornákh.jpg",
+        "sha256": "f643bed92987d07a510db18c51bcf4e8371eeba543a0c6577fc541e455d94920"
+      },
+      "lines": [
+        "Forced: After 1 or more captured cards are rescued, Jailor Gornákh engages the player with the highest threat and makes an immediate attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10042",
+      "side": "A",
+      "printing": "EfMG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Mount-Gram/Southern-Gate.jpg",
+        "sha256": "e8113b631bce8c1a9ead1c8f181b235b504811c40219e700b01d32cce7ae1eb7"
+      },
+      "lines": [
+        "Immune to player card effects.",
+        "While Southern Gate is the active location, each Orc enemy gets +2 Attack.",
+        "Forced: When Southern Gate becomes the active location, each player with less than 35 threat must raise his threat to 35."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10043",
+      "side": "A",
+      "printing": "EfMG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Mount-Gram/Cruel-Torturer.jpg",
+        "sha256": "dab0d433da8cae082e51d8760f56e886d10e565b66031b9088e720d54dbb3124"
+      },
+      "lines": [
+        "Capture 1.",
+        "Forced: When Cruel Torturer would damage an ally by an attack, capture that ally underneath Cruel Torturer instead."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10044",
+      "side": "A",
+      "printing": "EfMG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Mount-Gram/Dungeon-Guard.jpg",
+        "sha256": "e88f09cd82c67bafd613934d56615ced77e8ebb9492047100cc42cac76bd5b24"
+      },
+      "lines": [
+        "Capture 1.",
+        "Response: After the captured card(s) underneath Dungeon Guard are rescued, the players may put 1 of them into play at no cost."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10045",
+      "side": "A",
+      "printing": "EfMG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Mount-Gram/Goblin-Tormentor.jpg",
+        "sha256": "a2f33b4bc10c0325b3af3a8a90fec2d2222d9b6e6a5d62f65605fa978adefba7"
+      },
+      "lines": [
+        "Capture 1.",
+        "X is the number of cards in play with 1 or more captured cards underneath them.",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if it has no captured cards underneath it)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10046",
+      "side": "A",
+      "printing": "EfMG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Mount-Gram/Prison-Cell.jpg",
+        "sha256": "bfd1369cf8483d665abd36af9b6636fa59a16619294fefce50bf390bf1df79ac"
+      },
+      "lines": [
+        "Capture 1.",
+        "Response: After the players travel to Prison Cell, look at the captured card(s) underneath it and choose 1 to put into play at no cost. Place the other cards back underneath Prison Cell."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10047",
+      "side": "A",
+      "printing": "EfMG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Mount-Gram/Patrol-Room.jpg",
+        "sha256": "fa4237477be6ad35e74655ae7be18d6e269116228ee0223a99ddb7947852c7fa"
+      },
+      "lines": [
+        "Capture 2.",
+        "Travel: Each player raises his threat by 3 to travel here.",
+        "Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending player's threat is 20 or higher)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10048",
+      "side": "A",
+      "printing": "EfMG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Mount-Gram/Tunnels-of-Mount-Gram.jpg",
+        "sha256": "29ebe639fcc42cc31d05178fa1f32faf62b3050538b9d60412842631edec3a2c"
+      },
+      "lines": [
+        "Capture 1.",
+        "X is the number of captured cards underneath Tunnels of Mount Gram.",
+        "Shadow: Capture each attachment attached to the defending character underneath the attacking enemy."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10049",
+      "side": "A",
+      "printing": "EfMG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Mount-Gram/Sound-the-Alarm.jpg",
+        "sha256": "0b58654205963dbb7a72855e76aa22ff8e22ddb886b1a4e0f83939c5eaddcc9e"
+      },
+      "lines": [
+        "Doomed 3.",
+        "When Revealed: Until the end of the round, each enemy gets -10 engagement cost and +1 Attack. If there are no enemies in play, search the encounter deck and discard pile for an enemy and add it to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10050",
+      "side": "A",
+      "printing": "EfMG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Mount-Gram/Feeble-and-Weary.jpg",
+        "sha256": "5353334eb37f89b9a7584e37b0e543c26d3ef23cb27a27a82773f945c6d77f8d"
+      },
+      "lines": [
+        "When Revealed: Each player must either deal 1 damage to each exhausted character he controls, or remove each exhausted character he controls from the quest.",
+        "Shadow: Exhaust a character you control."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10051",
+      "side": "A",
+      "printing": "EfMG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Mount-Gram/Captives-of-Gornákh.jpg",
+        "sha256": "48b4b9825f7a07b13f0a73279a400abef64440e831da7b16aa45900aedddda47"
+      },
+      "lines": [
+        "When Revealed: Each player chooses one of his allies and captures it underneath the encounter card with the highest Threat.",
+        "Shadow: If this attack would damage an ally, capture that ally underneath the attacking enemy instead."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10052",
+      "side": "A",
+      "printing": "EfMG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Mount-Gram/Interrogation.jpg",
+        "sha256": "07c00aafc9df688b9566f0d9c0bda71d33e1f52d6fa838f03d56faee3817d648"
+      },
+      "lines": [
+        "When Revealed: Each player discards the top card of his captured deck and raises his threat by that card's printed resource cost. If at least 1 player discarded no cards from this effect, Interrogation gains doomed 2.",
+        "Shadow: Discard a random card from your hand and raise your threat by its printed cost."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10053",
+      "side": "A",
+      "printing": "EfMG",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Escape-from-Mount-Gram/Stop-the-Executioners.jpg",
+        "sha256": "b1a13dcce400f2bc208db8d392c7ee99d9ea341b5e246e4ba8a48997d76cbd3f"
+      },
+      "lines": [
+        "Capture 5.",
+        "Time 4. Forced: When the last time counter is removed from this quest, discard its captured cards and remove this quest from the game. Then, raise each player's threat by 3 for each of his characters that was discarded by this effect."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10064",
+      "side": "A",
+      "printing": "AtE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Across-the-Ettenmoors/Into-the-Ettenmoors-1A.jpg",
+        "sha256": "f00e709df4819f15b9624abd210567b0b2418147f91f0e1fc841e01fc8ce9f7c"
+      },
+      "lines": [
+        "Setup: Set aside each of the 3 Across the Ettenmoors side quests and each of the 4 locations with the safe keyword. Reveal 1 of those side quests at random and 1 of those safe locations at random, adding them to the staging area with the safe location guarded by the side quest. Search the encounter deck for 1 copy of Savage Trollspawn per player and add them to the staging area. Shuffle the remaining side quests and safe locations back into the encounter deck. The first player gains control of Amarthiúl."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10064",
+      "side": "B",
+      "printing": "AtE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Across-the-Ettenmoors/Into-the-Ettenmoors-1B.jpg",
+        "sha256": "b7c957056d15351d7daf27baea057cb09fd9e48ea3f525792447cf78253adb03"
+      },
+      "lines": [
+        "Forced: At the beginning of the quest phase, if there are no encounter side quests in play, discard cards from the top of the encounter deck until a side quest is discarded, reveal it, and add it to the staging area.",
+        "Forced: When a side quest is defeated, place progress tokens on Into the Ettenmoors equal to that side quest's quest points."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10065",
+      "side": "A",
+      "printing": "AtE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Across-the-Ettenmoors/A-Miserable-Journey-2A.jpg",
+        "sha256": "7d0cf467ac91a5824c64f02884f46c3339a8a4a547523580d71894ce03002b0a"
+      },
+      "lines": [
+        "When Revealed: Shuffle the encounter discard pile into the encounter deck. Discard cards from the top of the encounter deck until a side quest is discarded. Reveal that side quest and add it to the staging area, if able."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10065",
+      "side": "B",
+      "printing": "AtE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Across-the-Ettenmoors/A-Miserable-Journey-2B.jpg",
+        "sha256": "384c8b19b0a1faa87235b1982a3d20b1502bd83f4236bf5ee04cd9896323bb7a"
+      },
+      "lines": [
+        "Reveal 1 additional encounter card during the quest phase unless there is an active location with the safe keyword."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10066",
+      "side": "A",
+      "printing": "AtE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Across-the-Ettenmoors/Journey's-End-3A.jpg",
+        "sha256": "4ab3100e7f9c2348bad84ebcc5f67245e81b5192884b5d0d4ce946ff4d61dfa0"
+      },
+      "lines": [
+        "When Revealed: Shuffle the encounter discard pile into the encounter deck. Discard cards from the top of the encounter deck until a side quest is discarded. Reveal that side quest and add it to the staging area, if able."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10066",
+      "side": "B",
+      "printing": "AtE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Across-the-Ettenmoors/Journey's-End-3B.jpg",
+        "sha256": "0a243e782b2c471efbf83c2df8b5b36059a4843c7a0cd5c13b21fc18345a4f3e"
+      },
+      "lines": [
+        "Each damaged character gets -2 Willpower unless there is an active location with the safe keyword.",
+        "If the players defeat this stage, they have escaped the Ettenmoors with their lives, and win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10067",
+      "side": "A",
+      "printing": "AtE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Across-the-Ettenmoors/Amarthiúl.jpg",
+        "sha256": "e89a40ce129aa6354b1dae90b46541487b2595d2cd3d8e30bb8a2af5a6f094b8"
+      },
+      "lines": [
+        "Response: After an enemy engages a player, give control of Amarthiúl to that player.",
+        "If Amarthiúl leaves play, the players lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10068",
+      "side": "A",
+      "printing": "AtE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Across-the-Ettenmoors/Secluded-Cave.jpg",
+        "sha256": "5ffd5142cc714fc430b429ef362ff823f2f23a259f825b4de77c72f95253aa7b"
+      },
+      "lines": [
+        "Guarded. Safe.",
+        "Immune to player card effects.",
+        "Response: After you travel to Secluded Cave, each player draws 3 cards."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10069",
+      "side": "A",
+      "printing": "AtE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Across-the-Ettenmoors/The-Hoarwell.jpg",
+        "sha256": "6057b951625e02e802a3badc91cdbfb6fee05f078b9d81e1832c71be32fa2a7f"
+      },
+      "lines": [
+        "Guarded. Safe.",
+        "Immune to player card effects.",
+        "Response: After you travel to The Hoarwell, heal 1 damage from each character in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10070",
+      "side": "A",
+      "printing": "AtE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Across-the-Ettenmoors/Abandoned-Camp.jpg",
+        "sha256": "846caf57b43d5db50c4a6d9037275288c9ccdea1c52cfd9b8356c3056376f98d"
+      },
+      "lines": [
+        "Guarded. Safe.",
+        "Immune to player card effects.",
+        "Response: After you travel to Abandoned Camp, each player may return 1 card from his discard pile to his hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10071",
+      "side": "A",
+      "printing": "AtE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Across-the-Ettenmoors/Patch-of-Woods.jpg",
+        "sha256": "4bad5964d0a95f330ecc567821886aee3934a1548662f8fd56d4f3b98edc8a1d"
+      },
+      "lines": [
+        "Guarded. Safe.",
+        "Immune to player card effects.",
+        "Response: After you travel to Patch of Woods, each player adds 1 resource to each of his heroes' resource pools."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10072",
+      "side": "A",
+      "printing": "AtE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Across-the-Ettenmoors/Savage-Trollspawn.jpg",
+        "sha256": "9d738c3879babb06e27dc0fe8d5595fe386dcb3eebe222ef794eb494c11d5fc3"
+      },
+      "lines": [
+        "Savage Trollspawn gets +1 Attack for each damaged character the engaged player controls.",
+        "Shadow: Attacking enemy gets +1 Attack for each damaged character the defending player controls."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10073",
+      "side": "A",
+      "printing": "AtE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Across-the-Ettenmoors/Coldfell-Giant.jpg",
+        "sha256": "ea2f31c56f621bf32f40be14296db74ed8fc6dc980bf19bde0cfbc3bba842f0a"
+      },
+      "lines": [
+        "Forced: After Coldfell Giant engages you, deal 1 damage to 3 different characters you control.",
+        "Shadow: If the defending character has at least 1 damage token on it, attacking enemy makes an additional attack after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10074",
+      "side": "A",
+      "printing": "AtE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Across-the-Ettenmoors/Cruel-Mountain-troll.jpg",
+        "sha256": "ce093779d51645263e4875e2c252370f55afb080c754e1f1227cd24442c70604"
+      },
+      "lines": [
+        "For each excess point of combat damage dealt by Cruel Mountain-troll (damage that is dealt beyond the remaining hit points of the character damaged by its attack) you must remove 1 progress from each quest card in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10075",
+      "side": "A",
+      "printing": "AtE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Across-the-Ettenmoors/Ruthless-Hill-troll.jpg",
+        "sha256": "186800b8d83c52063cbf35f5aedc1f8ca8d5b2dd017d1b8cc5c3a2ef8e696fe1"
+      },
+      "lines": [
+        "Ruthless Hill-troll gets +2 Attack and +2 Defense while it has 3 or more damage on it.",
+        "Shadow: Shuffle 1 location with the safe keyword (but not its attached encounter) back into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10076",
+      "side": "A",
+      "printing": "AtE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Across-the-Ettenmoors/Goblin-Pursuer.jpg",
+        "sha256": "a29d6a586b010693bbced756d1c8dbc991ce3e4066a76b1522a3f034a8ecde44"
+      },
+      "lines": [
+        "Damaged characters cannot be declared as attackers or defenders against Goblin Pursuer.",
+        "Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if this attack is undefended)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10077",
+      "side": "A",
+      "printing": "AtE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Across-the-Ettenmoors/Troll-fells.jpg",
+        "sha256": "40643c278dc4649e56bd2568e89149db78cce985813c50c4b06db8cf52a099d6"
+      },
+      "lines": [
+        "While Troll-fells is the active location, Weather cards gain doomed 1.",
+        "When Revealed: If Troll-fells is not revealed guarding a safe location, search the encounter deck and discard pile for a location with the safe keyword and attach it to Troll-fells, guarded. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10078",
+      "side": "A",
+      "printing": "AtE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Across-the-Ettenmoors/Barren-Moorland.jpg",
+        "sha256": "e9c7be9060dd0f0167de19aaa5a9c93e2aff86510e8b07312cd62eb8e34a0675"
+      },
+      "lines": [
+        "While Barren Moorland is in the staging area, it gains: \"Forced: When an ally enters play, you must either exhaust it or deal 1 damage to it.\"",
+        "Travel: Deal 1 damage to each exhausted character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10079",
+      "side": "A",
+      "printing": "AtE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Across-the-Ettenmoors/Arador's-Bane.jpg",
+        "sha256": "a796694365feeb8c37bb59fbeb1410a089549cc65a2b6ec311761788b2ea4eb1"
+      },
+      "lines": [
+        "When Revealed: Starting with the first player, each player must either engage an enemy in the staging area with a higher engagement cost than his threat, or search the encounter deck and discard pile for a Troll or Giant enemy and add it to the staging area. Deal each enemy that engages a player through this effect 2 shadow cards."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10080",
+      "side": "A",
+      "printing": "AtE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Across-the-Ettenmoors/No-Rest.jpg",
+        "sha256": "9eff54dc52a44af95285bb4568dc76d24027206a1f4991857755e6004903fdeb"
+      },
+      "lines": [
+        "When Revealed: Attach to an exhausted hero, or to a ready hero if there are no exhausted heroes. (Counts as a Condition attachment with the text: \"Limit 1 per hero. Attached hero cannot ready and does not collect resources during the resource phase. Discard No Rest if the players travel to a safe location.\")"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10081",
+      "side": "A",
+      "printing": "AtE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Across-the-Ettenmoors/Lie-Low.jpg",
+        "sha256": "c9702ac761ad1193e9a09f8c920c7bf0e7fb186c26420f087c0136c458bfbb15"
+      },
+      "lines": [
+        "Forced: At the end of the quest phase, if no progress was placed on Lie Low this round, each enemy gets -20 engagement cost until the end of the round.",
+        "Response: After this stage is defeated, choose an enemy in the staging area and shuffle it into the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10082",
+      "side": "A",
+      "printing": "AtE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Across-the-Ettenmoors/Forage-for-Food.jpg",
+        "sha256": "695d7532beb4325cf73e4d283ca641c07d21861ad348c0a047a3137efac36632"
+      },
+      "lines": [
+        "Forced: After 1 or more resources are spent from a hero's resource pool, deal 1 damage to that hero.",
+        "Response: After this stage is defeated, heal 1 damage from each hero."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10083",
+      "side": "A",
+      "printing": "AtE",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Across-the-Ettenmoors/Scavenge-for-Supplies.jpg",
+        "sha256": "d40b563e7390b94108d57a7d7a92bc0717410af838c2d059ef08945548734240"
+      },
+      "lines": [
+        "The cost to play each player card is increased by 1.",
+        "Forced: When this stage is defeated, search the encounter deck and discard pile for a Troll enemy and put it into play engaged with the player with the highest threat. Each player may play a card from his hand, at no cost."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10094",
+      "side": "A",
+      "printing": "ToR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Treachery-of-Rhudaur/Secrets-of-Rhudaur-1A.jpg",
+        "sha256": "36525f65763a704a0d0a4465bee87e004bcdb0082f84a1ae4433d606f0b605f7"
+      },
+      "lines": [
+        "Setup: Make The Great Hall the active location. Set Thaurdir aside, out of play. Add the 3 Treachery of Rhudaur side quests to the staging area, quest side faceup. Search the encounter deck for 1 copy of Ancient Causeway, and add it to the staging area (2 copies instead if there are 3 or 4 players in the game). The first player gains control of Amarthiúl."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10094",
+      "side": "B",
+      "printing": "ToR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Treachery-of-Rhudaur/Secrets-of-Rhudaur-1B.jpg",
+        "sha256": "361a52ba93988c13420d1e21dae407cdc15029c547bad665ae3bc4d54ca34a18"
+      },
+      "lines": [
+        "Time 5. Forced: After the last time counter is removed from Secrets of Rhudaur, remove each Treachery of Rhudaur side quest from the game and immediately advance to stage 2.",
+        "During the quest phase, Secrets of Rhudaur cannot be chosen as the current quest.",
+        "If there are no Treachery of Rhudaur side quests in play, immediately advance to stage 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10095",
+      "side": "A",
+      "printing": "ToR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Treachery-of-Rhudaur/Thaurdir's-Pursuit-2A.jpg",
+        "sha256": "3a1eb3f4710cffbbe057ca16741081754e0c550dfdb2d783134f105d5d20ab49"
+      },
+      "lines": [
+        "When Revealed: Add Thaurdir to the staging area. Each player searches the encounter deck and discard pile for an Undead enemy and adds it to the staging area. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10095",
+      "side": "B",
+      "printing": "ToR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Treachery-of-Rhudaur/Thaurdir's-Pursuit-2B.jpg",
+        "sha256": "55ddfe834f3af1979666cb4cc5eca575e6bb9a0bcb0b2a81cf8f597cde04f00f"
+      },
+      "lines": [
+        "Thaurdir's Pursuit has -5 quest points for each Clue objective attached to a character.",
+        "This stage cannot be defeated while Thaurdir has any hit points remaining. If this stage is defeated, the players win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10096",
+      "side": "A",
+      "printing": "ToR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Treachery-of-Rhudaur/Amarthiúl.jpg",
+        "sha256": "f2c1234f150fdaeceb146bd3c521d89620f40b05a651410543b56c500764be0f"
+      },
+      "lines": [
+        "Response: After an enemy engages a player, give control of Amarthiúl to that player.",
+        "If Amarthiúl leaves play, the players lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10097",
+      "side": "A",
+      "printing": "ToR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Treachery-of-Rhudaur/The-Great-Hall.jpg",
+        "sha256": "cab493af1670db91786ceb8ca8d494463da69ddbb9a246d09446bac27a0c700e"
+      },
+      "lines": [
+        "Forced: When The Great Hall is explored, each player discards the top 5 cards of the encounter deck and chooses an Undead enemy he discarded in this way to add to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10098",
+      "side": "A",
+      "printing": "ToR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Treachery-of-Rhudaur/Thaurdir.jpg",
+        "sha256": "3399b48f60a096b5f3c29140926835b4f93d27ec4547ff9d1e66e92d4c2e91eb"
+      },
+      "lines": [
+        "Indestructible. Cannot have attachments.",
+        "Forced: After a treachery card with the Sorcery trait is revealed from the encounter deck, Thaurdir heals 3 damage and makes an immediate attack against the first player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10099",
+      "side": "A",
+      "printing": "ToR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Treachery-of-Rhudaur/Wight-of-Rhudaur.jpg",
+        "sha256": "a85ae353cb0c2cf2fc713c8aa231d11ff4f091ee149d4d95e3fa964b424e4802"
+      },
+      "lines": [
+        "While the current quest has 1 or more progress on it, Wight of Rhudaur gains surge.",
+        "While the current quest has 0 progress on it, Wight of Rhudaur gains doomed 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10100",
+      "side": "A",
+      "printing": "ToR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Treachery-of-Rhudaur/Traitorous-Wight.jpg",
+        "sha256": "51f103f25df9b20d4583a8f767a3031eef089d5c145c949dfae5456cb41fa24d"
+      },
+      "lines": [
+        "Forced: When Traitorous Wight engages a player, remove 2 progress from each quest card in play.",
+        "Shadow: For each point of damage dealt by this attack, remove 1 progress from each quest in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10101",
+      "side": "A",
+      "printing": "ToR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Treachery-of-Rhudaur/Forbidden-Descent.jpg",
+        "sha256": "d98978d3752c870e116897803f5f93733d27f92b142552f1e79d02f67e5af48e"
+      },
+      "lines": [
+        "While Forbidden Descent is in the staging area, the first 2 progress that would be placed on a quest each round must be placed on Forbidden Descent, instead.",
+        "Forced: If Forbidden Descent leaves play from the staging area, raise each player's threat by 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10102",
+      "side": "A",
+      "printing": "ToR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Treachery-of-Rhudaur/Eerie-Halls.jpg",
+        "sha256": "007c68e7a5bbf1b8a83d0260eff317d8fb31b25be8f67e652a6ed8b814900fcd"
+      },
+      "lines": [
+        "Action: Raise your threat by 1 to reduce the Threat of Eerie Halls by 1 until the end of the phase. (Any player may trigger this action.)",
+        "Shadow: If the defending player does not control at least 1 Clue objective, the attacking enemy makes an additional attack after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10103",
+      "side": "A",
+      "printing": "ToR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Treachery-of-Rhudaur/Ghostly-Ruins.jpg",
+        "sha256": "b6e1bc5248d8b49dc8a79c10d14b943933662c4db2bb96968e966260b50fec85"
+      },
+      "lines": [
+        "Any time the encounter deck runs out of cards, return the topmost Undead enemy in the encounter discard pile to the staging area before resetting the encounter deck.",
+        "Travel: Return the topmost Undead enemy in the encounter discard pile to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10104",
+      "side": "A",
+      "printing": "ToR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Treachery-of-Rhudaur/Decrepit-Remains.jpg",
+        "sha256": "cf715831fc60ef98e06704bd3277883f1d8bf81cf329a8ced7e9871737546740"
+      },
+      "lines": [
+        "While Decrepit Remains is in the staging area, each location and side quest in the staging area gets +2 quest points.",
+        "Shadow: For each point of damage dealt by this attack, remove 1 progress from each quest in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10105",
+      "side": "A",
+      "printing": "ToR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Treachery-of-Rhudaur/Centuries-of-Sorrow.jpg",
+        "sha256": "f92716fc3618a199458f06d4586c48747242b5bbbe248df13ce96a218c2bf004"
+      },
+      "lines": [
+        "Surge.",
+        "When Revealed: The first player must choose a new quest to be the current quest, if able.",
+        "Shadow: If the defending player does not control at least 1 Clue objective, this attack is considered undefended."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10106",
+      "side": "A",
+      "printing": "ToR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Treachery-of-Rhudaur/Curse-of-the-Years.jpg",
+        "sha256": "98a40ec2d1b8bde815bbe7a4ca8ad042942321c3c535c3556c45860e7015a30c"
+      },
+      "lines": [
+        "When Revealed: Deal 1 damage to each exhausted character. Each player with a threat of 35 or higher must also discard each exhausted attachment he controls.",
+        "Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if the defending player does not control at least 1 Clue objective)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10107",
+      "side": "A",
+      "printing": "ToR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Treachery-of-Rhudaur/Dark-Covenant.jpg",
+        "sha256": "dbf3be2f695fd73ac4f8638d10c7552ef785b320ad3b0a79e425622b86e63ee4"
+      },
+      "lines": [
+        "When Revealed: Discard the top 3 cards of the encounter deck. The first player must either remove X progress from among the quests in play, or assign X damage among characters he controls. X is the total Threat of the discarded cards.",
+        "Shadow: If this attack destroys a character, raise your threat by the destroyed character's Willpower."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10108",
+      "side": "A",
+      "printing": "ToR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Treachery-of-Rhudaur/Haunting-Fog.jpg",
+        "sha256": "b57f55959c4f55019cf77beace87b32d55140e1c058580e8911bc0681e74bc73"
+      },
+      "lines": [
+        "When Revealed: Each player must exhaust a character he controls. Attach Haunting Fog to the current quest. (Counts as a Condition attachment with the text: \"Attached quest gets +6 quest points.\")"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10109",
+      "side": "A",
+      "printing": "ToR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Treachery-of-Rhudaur/Quiet-the-Spirits.jpg",
+        "sha256": "f278af333c3bb57d8f4fc1448263179883602192f8174b8647f535dc39e0e9c7"
+      },
+      "lines": [
+        "While Quiet the Spirits is the current quest, each Undead enemy that enters play immediately engages the player with the highest threat. Enemies that engage a player from this effect contribute their Threat to the total Threat in the staging area until the end of the phase.",
+        "Forced: After an enemy is destroyed, place 2 progress on Quiet the Spirits.",
+        "When this quest is defeated, flip it over."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10110",
+      "side": "A",
+      "printing": "ToR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Treachery-of-Rhudaur/Daechanar's-Brand.jpg",
+        "sha256": "ca892cf5c494b9e1b0b47ca82d514b466a40a2b577cd61e108dd67d7ebac45cf"
+      },
+      "lines": [
+        "Action: Exhaust Amarthiúl or a hero to claim Daechanar's Brand. Then, attach Daechanar's Brand to that character.",
+        "Attached character gets +1 Attack while attacking Undead enemies."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10111",
+      "side": "A",
+      "printing": "ToR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Treachery-of-Rhudaur/Sift-through-the-Debris.jpg",
+        "sha256": "afadcdb0c5246c0134bee66cc05d21bccc833438a5d83dbe99ca330a8029ff30"
+      },
+      "lines": [
+        "While Sift through the Debris is the current quest, each location in the staging area gets +1 Threat.",
+        "Forced: After a location is explored, place 2 progress on Sift through the Debris.",
+        "When this quest is defeated, flip it over."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10112",
+      "side": "A",
+      "printing": "ToR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Treachery-of-Rhudaur/Heirloom-of-Iârchon.jpg",
+        "sha256": "12a14ccc9865a3e5b9beff165e201265f5b9dbd2ecfd89245b5ffe3e3ce4c0c3"
+      },
+      "lines": [
+        "Action: Exhaust Amarthiúl or a hero to claim Heirloom of Iârchon. Then, attach Heirloom of Iârchon to that character.",
+        "Attached character gets +1 Willpower."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10113",
+      "side": "A",
+      "printing": "ToR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Treachery-of-Rhudaur/Decipher-Ancient-Texts.jpg",
+        "sha256": "62a5f497399c10d3d693809a6e4f4e1f0c4ed9252196dc4d7ad1283e321b98b7"
+      },
+      "lines": [
+        "While Decipher Ancient Texts is the current quest, allies get -2 Willpower.",
+        "Action: Pay 1 resource to place 1 progress on Decipher Ancient Texts. (Any player may trigger this action. Limit 3 times per round.)",
+        "When this quest is defeated, flip it over."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10114",
+      "side": "A",
+      "printing": "ToR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Treachery-of-Rhudaur/Orders-from-Angmar.jpg",
+        "sha256": "a26e55d7bb2facd475a567b120b48b50eec3fea793b9199b2f99bc80b2141849"
+      },
+      "lines": [
+        "Action: Exhaust Amarthiúl or a hero to claim Orders From Angmar. Then, attach Orders From Angmar to that character.",
+        "Attached character gets +1 Defense while defending against Undead enemies."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "101156",
+      "side": "A",
+      "printing": "TDR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dread-Realm/Witch-of-Angmar.jpg",
+        "sha256": "f1a272726a0241e5d49b819d4f8f696acb33c8e64916689ebebe4e43df795e55"
+      },
+      "lines": [
+        "Forced: When you resolve shadow cards dealt to Witch of Angmar, if they have the Sorcery trait, resolve their \"when revealed\" effects. (Resolve any shadow effects first.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "101157",
+      "side": "A",
+      "printing": "TDR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dread-Realm/Wraith-of-Carn-Dûm.jpg",
+        "sha256": "a0ef6aa02f3eae42199ce177869719ce62c63147cf78d3378194f79274f55383"
+      },
+      "lines": [
+        "Forced: When Wraith of Carn Dûm leaves play, attach it to a character in play. (Counts as a Sorcery attachment with the text: \"Attached character has -1 Willpower, -1 Attack, and -1 Defense. If the attached character leaves play, return Wraith of Carn Dûm to the staging area as an enemy.\")"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "101158",
+      "side": "A",
+      "printing": "TDR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dread-Realm/Sinister-Dungeon.jpg",
+        "sha256": "6e5b7f549c93146f959bba60db0624c99094aeaf425610d772b638b10a4375d0"
+      },
+      "lines": [
+        "Forced: When Sinister Dungeon is explored, the first player reanimates a random card from his hand and deals Sinister Dungeon to it facedown as a shadow card.",
+        "Shadow: Discard the top 2 cards of the encounter deck. Resolve the \"when revealed\" effects of each Sorcery card discarded by this effect."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "101159",
+      "side": "A",
+      "printing": "TDR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dread-Realm/Tombs-of-Carn-Dûm.jpg",
+        "sha256": "dfb764ed69145ec15c4d5cd958f63a3c402a6144ad0508014ebce4c35b11ecfb"
+      },
+      "lines": [
+        "Forced: At the end of the round, discard the top card of each player's deck. Each player must reanimate each ally he discarded by this effect.",
+        "Travel: Deal 1 shadow card to each Undead enemy in play to travel here."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "101160",
+      "side": "A",
+      "printing": "TDR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dread-Realm/Dark-Halls.jpg",
+        "sha256": "d5b077a205b786bd8e3577be0d82422492d0ed680d12212c0dafd22e36a52f26"
+      },
+      "lines": [
+        "While Dark Halls is in the staging area, each Reanimated Dead gets +1 Attack and +1 Defense.",
+        "Shadow: If there is a copy of the defending character in your discard pile, reanimate it and deal it 1 shadow card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "101161",
+      "side": "A",
+      "printing": "TDR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dread-Realm/Unholy-Crypt.jpg",
+        "sha256": "828d41fa5c08ac04bf6069f0b11dff9ed86ef50031c4feba8b6026d6503db8b5"
+      },
+      "lines": [
+        "Unholy Crypt gets +1 Threat for each Reanimated Dead in play.",
+        "Shadow: If this attack destroys a character, reanimate that character and deal it 1 shadow card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "101162",
+      "side": "A",
+      "printing": "TDR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dread-Realm/Possession.jpg",
+        "sha256": "629737221aef5a647adcdf5916d655bd925f3e1d896ea80d64bb5b36c9dd7fac"
+      },
+      "lines": [
+        "Doomed 1.",
+        "When Revealed: Destroy the highest cost ally in play. That ally's controller reanimates that character, adds it to the staging area, and attaches Possession to it. (Counts as a Condition attachment with the text: \"If Possession is discarded, the attached card is also discarded.\")"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "101163",
+      "side": "A",
+      "printing": "TDR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dread-Realm/A-Fell-Dread.jpg",
+        "sha256": "c929c187415142962ee16c60c5082d627ecca76905cc57ffa414ce2dfdf55d20"
+      },
+      "lines": [
+        "When Revealed: The player with the highest threat must attach A Fell Dread to a hero he controls without A Fell Dread attached. (Counts as a Condition attachment with the text: \"Attached hero's Willpower is reduced to 0. During the quest phase, attached hero must commit to the quest, if able.\")"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "101164",
+      "side": "A",
+      "printing": "TDR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dread-Realm/Death-and-Calamity.jpg",
+        "sha256": "b669e6a9d9f12a6a4b87aa5e7a7bcdb1bc1365d3cb36ccbda836f95105d90b8b"
+      },
+      "lines": [
+        "When Revealed: Attach Death and Calamity to the current quest. Then, the first player reanimates the top X cards of his deck, where X is the number of copies of Death and Calamity in play.",
+        "Shadow: Attacking enemy gets +X Attack, where X is the number of Sorcery cards in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10125",
+      "side": "A",
+      "printing": "BoCD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Carn-Dum/The-Clutches-of-Carn-Dûm-1A.jpg",
+        "sha256": "b7915392cd7fe0cc91821393c9227dcaf6acaf3a07044c0e3e216c896c319265"
+      },
+      "lines": [
+        "Setup: Add Thaurdir to the staging area, Captain side faceup. Add 1 copy of Carn Dûm Garrison per player to the staging area. Search the encounter deck for 1 copy of Accursed Battlefield and make it the active location. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10125",
+      "side": "B",
+      "printing": "BoCD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Carn-Dum/The-Clutches-of-Carn-Dûm-1B.jpg",
+        "sha256": "938e06f93d669739c762ec191ba02d1b2d9e2b82b8563654f0c93b1285db9fc8"
+      },
+      "lines": [
+        "Thaurdir cannot leave the staging area and cannot take damage. At the end of the round, if Thaurdir is Champion side faceup, flip him.",
+        "Do not discard unresolved shadow cards at the end of the combat phase.",
+        "Forced: If there are 3 shadow cards dealt to Thaurdir, flip him."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10126",
+      "side": "A",
+      "printing": "BoCD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Carn-Dum/Midwinter's-Crux-2A.jpg",
+        "sha256": "9e60d57913782d09c6cba50f6f72f837aa9906e3108f1457c586be264adc161c"
+      },
+      "lines": [
+        "When Revealed: Raise each player's threat by X, where X is the number of shadow cards in play. If Thaurdir is Captain side faceup, flip him."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10126",
+      "side": "B",
+      "printing": "BoCD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Carn-Dum/Midwinter's-Crux-2B.jpg",
+        "sha256": "be516be82e9adbf53284248df1739d0d9bb61107925bc9c170c60c5b9cd13251"
+      },
+      "lines": [
+        "Thaurdir cannot leave the staging area, is considered to be engaged with each player, and attacks each player in turn during the combat phase (deal and discard a new shadow card for each attack). At the end of the round, if Thaurdir is Captain side faceup, flip him.",
+        "While Midwinter's Crux has 15 or more progress on it, Thaurdir loses indestructible. You cannot defeat this stage while Thaurdir is in play.",
+        "If Thaurdir is defeated, you win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10127",
+      "side": "A",
+      "printing": "BoCD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Carn-Dum/Thaurdir-Captain.jpg",
+        "sha256": "53eae41002b701f073e9991046c56395022015045dee3b5fed085c17a08fb87b"
+      },
+      "lines": [
+        "Indestructible. Cannot have attachments.",
+        "Each other enemy gets +10 engagement cost.",
+        "Forced: After Thaurdir is flipped or a treachery card with the Sorcery trait is revealed, deal 1 shadow card to each enemy in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10128",
+      "side": "A",
+      "printing": "BoCD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Carn-Dum/Thaurdir-Champion.jpg",
+        "sha256": "9ff5fef85ab8e4f396ddbe60225336858226ee47a97e21c36e178c71b1d749b0"
+      },
+      "lines": [
+        "Indestructible. Cannot have attachments.",
+        "Each other enemy gets -10 engagement cost.",
+        "Forced: After Thaurdir is flipped or a treachery card with the Sorcery trait is revealed, Thaurdir heals 3 damage and makes an immediate attack against the first player."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10129",
+      "side": "A",
+      "printing": "BoCD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Carn-Dum/Carn-Dûm-Garrison.jpg",
+        "sha256": "c339d78dc9c36e4fd7cb17324369c2463c9f12f6ef8680cfe946b2e2d2ceb752"
+      },
+      "lines": [
+        "Carn Dûm Garrison gets +1 Threat for each shadow card currently dealt to it.",
+        "Shadow: Attacking enemy gets +1 Attack for each shadow card currently dealt to it."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10130",
+      "side": "A",
+      "printing": "BoCD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Carn-Dum/Orc-Grunts.jpg",
+        "sha256": "ea679c1fd01f8e7f1abe96b2cd7d74451ac28e243407e25ebe75a5b4a69f695b"
+      },
+      "lines": [
+        "Doomed 1. Surge.",
+        "Any time progress is placed on the current quest, reduce the amount of progress placed by 1.",
+        "Shadow: Add Orc Grunts to the staging area."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10131",
+      "side": "A",
+      "printing": "BoCD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Carn-Dum/Werewolf-of-Angmar.jpg",
+        "sha256": "46d88babbed636119f37412ba73e035271306ba78c8e1af5980fee5b8645ec29"
+      },
+      "lines": [
+        "Forced: After an event card is played, deal 1 shadow card to Werewolf of Angmar.",
+        "Forced: If there are 3 shadow cards dealt to Werewolf of Angmar and it is in the staging area, it engages the first player and makes an immediate attack (do not deal it another shadow card for this attack)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10132",
+      "side": "A",
+      "printing": "BoCD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Carn-Dum/Accursed-Battlefield.jpg",
+        "sha256": "c4012b14abdd5df92cdce625e8517c46dc7da3972c38fc952816f81e51f21e34"
+      },
+      "lines": [
+        "While Accursed Battlefield is the active location, each quest card in play gains the battle keyword.",
+        "Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if the defending player's threat is higher than the attacking enemy's engagement cost)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10133",
+      "side": "A",
+      "printing": "BoCD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Carn-Dum/Mountains-of-Angmar.jpg",
+        "sha256": "38fec8ba570c5430d859904d2389a62bfc1bc96607d9a03cf8e63379f66a92ea"
+      },
+      "lines": [
+        "While Mountains of Angmar is the active location, each shadow card with no shadow effect gains: \"Shadow: Raise defending player's threat by 2.\"",
+        "Shadow: Raise defending player's threat by 2."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10134",
+      "side": "A",
+      "printing": "BoCD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Carn-Dum/Blight-of-Carn-Dûm.jpg",
+        "sha256": "68a3cab9db538768cd56f9a3a1befb23fc10e76eff871a2085c089208d3de037"
+      },
+      "lines": [
+        "Forced: After an enemy attacks, heal 1 damage from it.",
+        "Travel: Deal each enemy in play 1 shadow card to travel here.",
+        "Shadow: If the attacking enemy is Thaurdir, heal 3 damage from him."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10135",
+      "side": "A",
+      "printing": "BoCD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Carn-Dum/Fortress-Walls.jpg",
+        "sha256": "7b5514c997f73d89356e9099d3354cbbee363108c4e3de79492291c51744d492"
+      },
+      "lines": [
+        "While Fortress Walls is the active location, for each resource spent by a player, raise that player's threat by 1.",
+        "Shadow: If your threat is 40 or higher, attacking enemy makes an additional attack against you after this one."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10136",
+      "side": "A",
+      "printing": "BoCD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Carn-Dum/The-Sky-Darkens.jpg",
+        "sha256": "2c206c6b1e23582dd56930710bfb9b7032aac420fadd4fdbc1fca8a86b487302"
+      },
+      "lines": [
+        "When Revealed: Each player must discard a random card from his hand. Each player then searches his deck for each other copy of the card he discarded, and discards those as well. Shuffle each searched deck.",
+        "Shadow: Discard a random card from the defending player's hand."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10137",
+      "side": "A",
+      "printing": "BoCD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Carn-Dum/Vile-Afflication.jpg",
+        "sha256": "501128919c5d728ded18e2d5816934258ceff7c0a74c219bdc0ad71bea3e938d"
+      },
+      "lines": [
+        "When Revealed: Each player must distribute damage among questing characters he controls equal to the printed cost of the highest cost card in that player's discard pile.",
+        "Shadow: Attacking enemy gets +1 Attack. If this attack destroys an ally, search your deck for another copy of that ally and discard it, if able."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10138",
+      "side": "A",
+      "printing": "BoCD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Carn-Dum/Daechanar's-Will.jpg",
+        "sha256": "9bf8defd7e8bca7628e5b77427c7ef72e7d6e27275428a2c96d96b96d5c58c98"
+      },
+      "lines": [
+        "When Revealed: Flip Thaurdir. Then, if he is Captain side faceup, Daechanar's Will gains surge.",
+        "Shadow: Flip Thaurdir after this attack."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10139",
+      "side": "A",
+      "printing": "BoCD",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Battle-of-Carn-Dum/Furious-Charge.jpg",
+        "sha256": "13a50671732e71c8f35806b37d5c332f43b66a37810c07a32e223a41042bd7bc"
+      },
+      "lines": [
+        "Surge.",
+        "Forced: When at least 1 progress is placed on Furious Charge, each character gets -2 Defense until the end of the round. If Thaurdir is Captain side faceup, flip him.",
+        "Response: After Furious Charge is defeated, add 10 progress to the main quest."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10150",
+      "side": "A",
+      "printing": "TDR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dread-Realm/The-Catacombs-of-Carn-Dûm-1A.jpg",
+        "sha256": "84b3288245ff6930d26532241d3a26cb51cde9e081850bcf81c1454d65b6b811"
+      },
+      "lines": [
+        "Setup: Set Daechanar and Altar of Midwinter aside, out of play. Each player reveals an encounter card from the top of the encounter deck. Each player reanimates the top card of his deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10150",
+      "side": "B",
+      "printing": "TDR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dread-Realm/The-Catacombs-of-Carn-Dûm-1B.jpg",
+        "sha256": "796b1a38db54c3be0e532a431fe614a762e772db1a7961fd84ef5a80ff8aecd9"
+      },
+      "lines": [
+        "Reanimated Dead are Undead enemies with 2 Threat, 2 Attack, 2 Defense and 2 hit points.",
+        "When the players advance to stage 2, all Sorcery cards attached to this stage are attached to stage 2B."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10151",
+      "side": "A",
+      "printing": "TDR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dread-Realm/Angmar-Awakened-2A.jpg",
+        "sha256": "a7a96c7a0e58db857be977da6d1fd33172ed4d1604cb97758dca8b068c8e2707"
+      },
+      "lines": [
+        "When Revealed: Add Daechanar to the staging area. Make Altar of Midwinter the active location, returning any previously active location to the staging area. Each player reanimates the top card of his deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10151",
+      "side": "B",
+      "printing": "TDR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dread-Realm/Angmar-Awakened-2B.jpg",
+        "sha256": "84d4eae1a51cea2691852d6f9de6087cd41dab29a9d7140753162c7313be5160"
+      },
+      "lines": [
+        "Reanimated Dead are Undead enemies with 2 Threat, 2 Attack, 2 Defense and 2 hit points.",
+        "When Daechanar is defeated, advance to the next stage."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10152",
+      "side": "A",
+      "printing": "TDR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dread-Realm/Daechanar's-Fall-3A.jpg",
+        "sha256": "84c823e1a0a27adae914bc7f480c930d83ac086a88b3bd93c14b6ea8cba098b3"
+      },
+      "lines": [
+        "When Revealed: If there are less than X locations in the staging area, search the encounter deck and discard pile and add locations to the staging area until there are X locations in staging area. X is the number of players in the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10152",
+      "side": "B",
+      "printing": "TDR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dread-Realm/Daechanar's-Fall-3B.jpg",
+        "sha256": "b9f426dd48ed1e56a473906e06332232353ab574d2c73c7598531a2703029d43"
+      },
+      "lines": [
+        "Reanimated Dead are Undead enemies with 2 Threat, 2 Attack, 2 Defense and 2 hit points.",
+        "Progress that would be placed on this quest is instead placed on locations in the staging area, divided as you choose.",
+        "Forced: At the end of the quest phase, if there are any locations in play, deal 1 damage to all characters in play. If there are no locations in play, the players have escaped Carn Dûm, and win the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10153",
+      "side": "A",
+      "printing": "TDR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dread-Realm/Daechanar.jpg",
+        "sha256": "19628fd6e7648f6037a709337c99e253a6b03a1e90f919db20be7de70efb800c"
+      },
+      "lines": [
+        "Cannot have attachments.",
+        "Daechanar gets +1 Attack for each Sorcery card in play, and gains indestructible while at least 1 Sorcery card is in play.",
+        "Forced: When Daechanar is damaged, if there is at least 1 Sorcery card in play, cancel all damage just dealt and remove a Sorcery card from the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10154",
+      "side": "A",
+      "printing": "TDR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dread-Realm/Altar-of-Midwinter.jpg",
+        "sha256": "4b425a35f0aee760584460f438a2430b55988f47a083d718efe62cbd3a7154b6"
+      },
+      "lines": [
+        "While Daechanar is in play, progress cannot be placed on Altar of Midwinter.",
+        "Forced: At the end of the staging step, the first player must either reveal 1 additional card from the encounter deck, or reanimate the top card of his deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10155",
+      "side": "A",
+      "printing": "TDR",
+      "scan": {
+        "url": "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/The-Dread-Realm/Dwimmerlaik.jpg",
+        "sha256": "bb67c6e45da6cd4033e6e42f7c39b2e9733674f71ed43ff0f5ccdf8fad1a5610"
+      },
+      "lines": [
+        "Forced: After Dwimmerlaik attacks and destroys a character, the defending player reanimates that character and deals it 1 shadow card.",
+        "Shadow: If this attack destroys a character, reanimate that character and deal it 1 shadow card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10156",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-156-front-Campaign-Intruders_in_Chetwood-Angmar_Awakened_Part_1-A-Intruders_in_Chetwood_Campaign.jpg",
+        "sha256": "d47bb7c8ac41477f39c02ed6e00299b80f561c4cbe15ff51e2fa324a9be1fd38"
+      },
+      "lines": [
+        "You are playing campaign mode.",
+        "Setup: Attach Iârion's Pendant to Iârion and add the Protect the Innocent side quest to the staging area. Starting with the first player, each player may place 4 damage on Protect the Innocent to add 1 resource to each of their heroes' resource pools."
+      ],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "Reminder that campaign mode is in use. No game effect."
+        }
+      ],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10156",
+      "side": "B",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-156-back-Campaign-Intruders_in_Chetwood-Angmar_Awakened_Part_1-A-Intruders_in_Chetwood_Campaign.jpg",
+        "sha256": "47aa1e38a5d1b2ec77bb5b2508783128c06c725056345635dbc15ee9ae6c557e"
+      },
+      "lines": [
+        "Resolution: Note the amount of damage on Protect the Innocent in the Campaign Log and add Protect the Innocent to the Campaign Pool."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10157",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-157-front-Attachment-Boon-Iarions_Pendant-Neutral.jpg",
+        "sha256": "9bddece741dad388b0b7ccc18835105587c72b7cedb394db907864b52e524d3c"
+      },
+      "lines": [
+        "Attached character gets +1 Willpower.",
+        "Response: Add Iârion's Pendant to the victory display to cancel the 'when revealed' effects of a card that was just revealed from the encounter deck, or to cancel a shadow effect just triggered."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10158",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-158-front-EncounterSideQuest-Protect_the_Innocent-Arnor_Ravaged-Intruders_in_Chetwood_Campaign.jpg",
+        "sha256": "bd8b072b59aaca7fccb918eae0a6e6678807190c9fdbb97d9fab0ac942b7dd46"
+      },
+      "lines": [
+        "Forced: After an attack damages a character, place 1 damage on Protect the Innocent.",
+        "When progress would be placed on Protect the Innocent, remove that much damage from it instead.",
+        "If Protect the Innocent has 10 or more damage on it (20 or more damage if there are 3 or 4 players in the game), the players lose the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10159",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-159-front-Campaign-The_Weather_Hills-Angmar_Awakened_Part_2-A-The_Weather_Hills_Campaign.jpg",
+        "sha256": "e1fd7c02e6b0fae8bd632343ff0f47ef9ebb63413812f8601d2467b0dbc71565"
+      },
+      "lines": [
+        "You are playing campaign mode.",
+        "Setup: Add the Mysterious Omens side quest to the Campaign Log and shuffle it into the encounter deck. Add the Protect the Innocent side quest to the staging area and place damage on it equal to the amount of damage noted for it in the Campaign Log."
+      ],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "Reminder that campaign mode is in use. No game effect."
+        }
+      ],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10159",
+      "side": "B",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-159-back-Campaign-The_Weather_Hills-Angmar_Awakened_Part_2-A-The_Weather_Hills_Campaign.jpg",
+        "sha256": "fe0e0c52c9d6fb60986ec096c1708f3a27a854970230c968397cfe59cd2e371b"
+      },
+      "lines": [
+        "Resolution: Note the amount of damage on Protect the Innocent in the Campaign Log (replacing the previous number)."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10160",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-160-front-EncounterSideQuest-Mysterious_Omens-The_Weather_Hills_Campaign.jpg",
+        "sha256": "7bd52d4ece4d3a2939b572e357464fcbb3cad0dc6aa7a597b94d4ff764e23ebb"
+      },
+      "lines": [
+        "Surge.",
+        "Forced: After Mysterious Omens becomes the current quest, each player discards 1 random card from their hand.",
+        "Forced: When Mysterious Omens is defeated, remove it from the Campaign Pool. Then, each player may choose 1 of the following boons and attach it to a hero they control: Cunning, Hardy, Resolute, Ruthless, or Stalwart."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10161",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-161-front-Attachment-Boon-Cunning-Neutral.jpg",
+        "sha256": "d46eb4b48ac7d96342aed5c67050bffc6f9bbff6e7f42f95209cd5b0077c5a48"
+      },
+      "lines": [
+        "Permanent.",
+        "Setup: Attach to a hero. Add 2 resources to that hero's resource pool.",
+        "Action: Attached hero gets +2 Willpower, +2 Attack, and +2 Defense until the end of the phase. (Limit once per game.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10162",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-162-front-Attachment-Boon-Hardy-Neutral.jpg",
+        "sha256": "1d21cd88021160ba41348a0beff9c8f8074cd2140d6e033d180b9f299ea224e1"
+      },
+      "lines": [
+        "Permanent.",
+        "Setup: Attach to a hero.",
+        "Attached hero gets +2 hit points.",
+        "Action: Ready attached hero. (Limit once per game.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10163",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-163-front-Attachment-Boon-Resolute-Neutral.jpg",
+        "sha256": "9688fd2675c447df33cdd313e80a429e520845203e543459dfc0acf538525999"
+      },
+      "lines": [
+        "Permanent.",
+        "Setup: Attach to a hero.",
+        "Attached hero gets +1 Willpower.",
+        "Response: Cancel up to 2 points of damage just dealt to attached hero. (Limit once per game.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10164",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-164-front-Attachment-Boon-Ruthless-Neutral.jpg",
+        "sha256": "682f38b4bfcec35ba5983ac8abcc5c4029f6f3f4e62c1cf51507e22804925519"
+      },
+      "lines": [
+        "Permanent.",
+        "Setup: Attach to a hero.",
+        "Attached hero gets +1 Attack.",
+        "Action: Move any amount of damage from attached hero to an enemy engaged with you. (Limit once per game.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10165",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-165-front-Attachment-Boon-Stalwart-Neutral.jpg",
+        "sha256": "90f84d7aec4d626719f5df5cbe32b30aac563cbecdfd83e95a54c290f4409548"
+      },
+      "lines": [
+        "Permanent.",
+        "Setup: Attach to a hero.",
+        "Attached hero gets +1 Defense.",
+        "Planning Action: Play an attachment from your discard pile on attached hero. (Limit once per game.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10166",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-166-front-Campaign-Deadmens_Dike-Angmar_Awakened_Part_3-A-Deadmens_Dike_Campaign.jpg",
+        "sha256": "0b5a6a81ea81b87f667f453fdf9e73dec1e519da6da132b54511c3f96b29813a"
+      },
+      "lines": [
+        "You are playing campaign mode.",
+        "Setup: Attach Iârion's Pendant to Iârion. Add the Protect the Innocent side quest to the staging area and place damage on it equal to the amount of damage noted in the Campaign Log.",
+        "Forced: After Thaurdir enters play, randomly select one of the following burdens and attach it to Thaurdir: Thaurdir's Legacy, Thaurdir's Majesty, or Thaurdir's Spite. Add that card to the Campaign Pool."
+      ],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "Reminder that campaign mode is in use. No game effect."
+        }
+      ],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10166",
+      "side": "B",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-166-back-Campaign-Deadmens_Dike-Angmar_Awakened_Part_3-A-Deadmens_Dike_Campaign.jpg",
+        "sha256": "d02f00d8c48f14caa17a634763e2f9c392d17c1095c1d65ccc232ff1a3beaccb"
+      },
+      "lines": [
+        "Resolution: Note the amount of damage on Protect the Innocent in the Campaign Log (replacing the previous number) and remove Protect the Innocent from the Campaign Pool. Add Arnor Ravaged to the Campaign Pool in its place (found on the opposite side of Protect the Innocent). The players as a group must select either Iârion's Pendant or Amarthiúl's Courage to add to the Campaign Pool. Any player may add Iârion's Pendant to their deck if it is chosen."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10167",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-167-front-Attachment-Boon-Amarthiuls_Courage-Neutral.jpg",
+        "sha256": "44fba5fe4ef2177b276a251dc8e68cbd66f78fdb7f26a848e4e09eb19948f0ce"
+      },
+      "lines": [
+        "Setup: Attach to Amarthiúl. Otherwise, remove Amarthiúl's Courage from the game.",
+        "Amarthiúl gets +1 Willpower and +1 hit point.",
+        "Action: Ready Amarthiúl. (Limit once per game.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10168",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-168-front-Objective-Burden-Thaurdirs_Legacy-Deadmens_Dike_Campaign.jpg",
+        "sha256": "c2664c3ec4b6140b8ab6bfedea3b5e9053f21f0d81644ba692e40043a6c1f8a9"
+      },
+      "lines": [
+        "Setup: Attach to Thaurdir (even if he is out of play). Otherwise, remove this card from the game.",
+        "Forced: After a Sorcery treachery is revealed, move Thaurdir's Legacy to the hero with the most resources. (Counts as a Sorcery attachment with the text: \"Attached hero gets -2 Willpower and is treated as if its printed text box were blank.\")"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10169",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-169-front-Objective-Burden-Thaurdirs_Majesty-Deadmens_Dike_Campaign.jpg",
+        "sha256": "53fe601f930480177dd57fae2e7c21ee9982ac2e799bb1a89407b9e25f5aee43"
+      },
+      "lines": [
+        "Setup: Attach to Thaurdir (even if he is out of play). Otherwise, remove this card from the game.",
+        "Forced: After a Sorcery treachery is revealed, move Thaurdir's Majesty to the hero with the most non-objective attachments. (Counts as a Sorcery attachment with the text: \"Attached hero gets -2 Attack and cannot commit to the quest.\")"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10170",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-170-front-Objective-Burden-Thaurdirs_Spite-Deadmens_Dike_Campaign.jpg",
+        "sha256": "b6f5180b84d981a773bbeb3c2caab309f19707b189df1a840a8684670de29b48"
+      },
+      "lines": [
+        "Setup: Attach to Thaurdir (even if he is out of play). Otherwise, remove this card from the game.",
+        "Forced: After a Sorcery treachery is revealed, move Thaurdir's Spite to the hero with the most damage. (Counts as a Sorcery attachment with the text: \"Attached hero gets -2 Defense and cannot be healed.\")"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10171",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-171-front-Campaign-The_Wastes_of_Eriador-Angmar_Awakened_Part_4-A-The_Wastes_of_Eriador_Campaign.jpg",
+        "sha256": "76295342295c7045678954d21d44db62ba14f62480fa262b04062c67b2514ede"
+      },
+      "lines": [
+        "You are playing campaign mode.",
+        "Setup: Each player may change hero cards without incurring the +1 threat penalty. Each player adds 1 copy of Determination to their starting hand. Add each of those events to the Campaign Pool. Shuffle the Fend Off Despair side quest into the encounter deck."
+      ],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "Reminder that campaign mode is in use. No game effect."
+        }
+      ],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10171",
+      "side": "B",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-171-back-Campaign-The_Wastes_of_Eriador-Angmar_Awakened_Part_4-A-The_Wastes_of_Eriador_Campaign.jpg",
+        "sha256": "77f4984a4a065442df0b19406e49ab24b4014c4389f87ff2247c66329ad8d4c3"
+      },
+      "lines": [
+        "Resolution: Add Fend Off Despair to the Campaign Pool."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10172",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-172-front-Event-Boon-Determination-Neutral.jpg",
+        "sha256": "424a8699b48c7680d0a5f0fcddce4e6c560ce2217730182c731fad8f4d1b769a"
+      },
+      "lines": [
+        "Action: Attach Determination to a unique character. Then, ready each character with a copy of Determination attached, as well as each character who is \"determined\" in the Campaign Log. (Counts as a Condition attachment with the text: \"Forced: If you win this scenario, mark in the Campaign Log that attached character is 'determined.'\")"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10173",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-173-front-EncounterSideQuest-Fend_Off_Despair-The_Wastes_of_Eriador_Campaign.jpg",
+        "sha256": "7ca257dcbedad620e6ebc65a428394317f53a31ca10286c89f4382e28394f024"
+      },
+      "lines": [
+        "Each event card gains doomed 1.",
+        "Forced: When Fend Off Despair is defeated, mark in the Campaign Log that each player's starting threat is reduced by 2. (This reduction is cumulative.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10174",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-174-front-Campaign-Escape_from_Mount_Gram-Angmar_Awakened_Part_5-A-Escape_from_Mount_Gram_Campaign.jpg",
+        "sha256": "2d1f51431d0783c6351e3e2cdab34d94c7af0fbafd1fdc92a42088a677cefa9d"
+      },
+      "lines": [
+        "You are playing campaign mode.",
+        "Setup: Set aside any permanent boon attachments on heroes that are added to a player's captured deck. Add the Loot the Dungeons side quest to the staging area, capturing the bottom 5 cards of each player's captured deck underneath it. Flip this card over."
+      ],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "Reminder that campaign mode is in use. No game effect."
+        }
+      ],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10174",
+      "side": "B",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-174-back-Campaign-Escape_from_Mount_Gram-Angmar_Awakened_Part_5-A-Escape_from_Mount_Gram_Campaign.jpg",
+        "sha256": "978f2f7ef2360d4d771bfe946b5814845a9e91f8b55106cb0ef6d7811566e696"
+      },
+      "lines": [
+        "Forced: Instead of raising their threat by 1 during the refresh phase, each player raises their threat by the number of completed quest cards plus the number of side quests in the victory display.",
+        "Forced: After a hero enters play, attach to that hero each set-aside permanent boon attachment assigned to that character in the Campaign Log.",
+        "Resolution: Each player must make note of which unique cards are still in their captured deck and not in play at the end of the game. Those cards cannot be included in that player's deck for the rest of the campaign."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10175",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-175-front-EncounterSideQuest-Loot_the_Dungeons-Escape_from_Mount_Gram_Campaign.jpg",
+        "sha256": "4e717e448de31be6ba20d3f767da6ca9d068993b6e88e6bceb5e06f951ebda2f"
+      },
+      "lines": [
+        "Loot the Dungeons is considered to be in each player's staging area and gets +4 quest points for each player in the game at every staging area.",
+        "Forced: When Loot the Dungeons is defeated, each player (at every staging area) may choose one of the following boons and add it to their hand: Berelind, Chieftain's Brooch, Coruhaer, Laermuin, Mail of Eärnur, or Silverthorn. Add the chosen cards to the Campaign Pool."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10176",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-176-front-Ally-Boon-Berelind-Neutral.jpg",
+        "sha256": "bf4a607bfe186ea3d108fdcd04e4f281fca3ddd9206069148bcae294a5d075f6"
+      },
+      "lines": [
+        "Response: After Berelind attacks and destroys an enemy, place 1 progress on a quest card in play."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10177",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-177-front-Attachment-Boon-Chieftains_Brooch-Neutral.jpg",
+        "sha256": "caed8752d4f7a93f81ded83cfa53efe208564b45697d20f259c1b6b73cce2371"
+      },
+      "lines": [
+        "Attach to a hero. Restricted.",
+        "Each ally that shares a Trait with attached hero gets +1 Willpower."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10178",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-178-front-Ally-Boon-Coruhaer-Neutral.jpg",
+        "sha256": "b154ed7df7fc9ff1d518d6e8e5d5cede66d1a7a38e4db3b7b821217fb0964e74"
+      },
+      "lines": [
+        "Response: After Coruhaer defends an attack, spend 1 resource to deal 2 damage to the attacking enemy."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10179",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-179-front-Ally-Boon-Laermuin-Neutral.jpg",
+        "sha256": "f9a5a4c7e84fb7e3d0b45bdff85d25d06e5ec92996232b1e979c9ebd0a2f310e"
+      },
+      "lines": [
+        "Response: After Laermuin commits to a quest, heal 1 damage from a character."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10180",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-180-front-Attachment-Boon-Mail_of_Earnur-Neutral.jpg",
+        "sha256": "e9f56201034d4f2dbe50ee384285bfeb9f0a7225ff1f84c0afcc57811412184e"
+      },
+      "lines": [
+        "Attach to a hero. Restricted.",
+        "Attached hero gets +2 hit points.",
+        "Response: After a player's threat is reduced, heal 1 damage from attached hero."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10181",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-181-front-Attachment-Boon-Silverthorn-Neutral.jpg",
+        "sha256": "65e97953febed218fbdc65786d8a7274b021e69041694055f1cf3aa918fd44bb"
+      },
+      "lines": [
+        "Attach to a hero. Restricted.",
+        "While attacking or defending against an enemy, attached hero gets +1 Attack and +1 Defense if that enemy shares a Trait with an enemy in the victory display.",
+        "Response: After attached hero attacks and destroys an enemy, add that enemy to the victory display. (Limit once per game.)"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10182",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-182-front-Campaign-Across_the_Ettenmoors-Angmar_Awakened_Part_6-A-Across_the_Ettenmoors_Campaign.jpg",
+        "sha256": "5a2144245ef28f16ae701c46252674bfd340af64f44c710ae82a1453ecd0939b"
+      },
+      "lines": [
+        "You are playing campaign mode.",
+        "Setup: Set all 5 Losing Time treacheries aside, out of play.",
+        "Forced: At the beginning of the quest phase, place 1 resource on this card. Then, if there are 3 or more resources on it, remove 3 resources from it to reveal 1 set-aside copy of Losing Time and place it in the encounter discard pile."
+      ],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "Reminder that campaign mode is in use. No game effect."
+        }
+      ],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10182",
+      "side": "B",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-182-back-Campaign-Across_the_Ettenmoors-Angmar_Awakened_Part_6-A-Across_the_Ettenmoors_Campaign.jpg",
+        "sha256": "c68f7a44d537509aa2821d091f80e8c6691d5d578151c01ac77a2a002ccbe4d2"
+      },
+      "lines": [
+        "Resolution: Add each copy of Losing Time in the encounter deck or encounter discard pile to the Campaign Pool."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10183",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-183-front-Treachery-Burden-Losing_Time-Across_the_Ettenmoors_Campaign.jpg",
+        "sha256": "1ea5b4aa0bbec9e747747519d451df12de063ccf8c4eb6be4cc687ee37a816d0"
+      },
+      "lines": [
+        "Surge.",
+        "When Revealed: Each player must either raise their threat by 3 or exhaust a hero they control.",
+        "Shadow: Attacking enemy either gets +3 Attack or +3 Defense until the end of the phase."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10184",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-184-front-Campaign-The_Treachery_of_Rhudaur-Angmar_Awakened_Part_7-A-The_Treachery_of_Rhudaur_Campaign.jpg",
+        "sha256": "589a00ff10f1d5e956d4ef744a5ea8435c573fbd80e0c613832a603dc75a6a18"
+      },
+      "lines": [
+        "You are playing campaign mode."
+      ],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "Reminder that campaign mode is in use. No game effect."
+        }
+      ],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10184",
+      "side": "B",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-184-back-Campaign-The_Treachery_of_Rhudaur-Angmar_Awakened_Part_7-A-The_Treachery_of_Rhudaur_Campaign.jpg",
+        "sha256": "90d460255be71588f9fde65bf6b1cacc2f661bcb0c322fd73f0f7ca323331672"
+      },
+      "lines": [
+        "Resolution: For each Clue a player controls, that player may add the boon with the same name to the Campaign Pool and their deck."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10185",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-185-front-Attachment-Boon-Daechanars_Brand-Neutral.jpg",
+        "sha256": "0eeb6f4bdbd8f0679ff890680b9122b60ddb7b7c51d452e7444d88475c6c54ad"
+      },
+      "lines": [
+        "Attach to a hero. Restricted.",
+        "Attached hero gets +1 Attack (+2 Attack instead when attacking an Undead enemy).",
+        "Response: After you play Daechanar's Brand, search the top 5 cards of the encounter deck for a Sorcery treachery and add it to the victory display. Shuffle the encounter deck."
+      ],
+      "inert": [],
+      "misprints": [
+        {
+          "line": 3,
+          "printed": "Response: After you play Daechnar's Brand, search the top 5 cards of the encounter deck for a Sorcery treachery and add it to the victory display. Shuffle the encounter deck."
+        }
+      ],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10186",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-186-front-Attachment-Boon-Heirloom_of_Iarchon-Neutral.jpg",
+        "sha256": "18295f612c7dc9e56d05e8fe9dee4feffe2851cbecaecabde71d6c78ee06d86e"
+      },
+      "lines": [
+        "Attach to a hero. Restricted.",
+        "Attached hero gets +1 Willpower.",
+        "Response: After you play Heirloom of Iârchon, heal all damage from attached hero."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10187",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-187-front-Attachment-Boon-Orders_from_Angmar-Neutral.jpg",
+        "sha256": "315afcec8c8ca64b55fce8f6e39f114f7e62ba21ddf5e87278de51ad7184c1a8"
+      },
+      "lines": [
+        "Attach to a hero. Restricted.",
+        "Attached hero gets +1 Defense (+2 Defense instead while defending against an Undead enemy).",
+        "Response: After you play Orders from Angmar, discard a non-unique Undead enemy with 2 or less remaining hit points."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10188",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-188-front-Campaign-The_Battle_of_Carn_Dum-Angmar_Awakened_Part_8-A-The_Battle_of_Carn_Dum_Campaign.jpg",
+        "sha256": "4657e1c203c832e67bad83a8282fad3f96d02845e8610c191f387cee0f4513b4"
+      },
+      "lines": [
+        "You are playing campaign mode.",
+        "Setup: Each player may change hero cards without incurring the +1 threat penalty, and Amarthiúl may be included among a player's heroes. Then, each player in turn order may select one of the following boons and add it to their opening hand: Elrond's Champion, Lore of Ancient Arnor, Raiment of the Second Age, or Rivendell Skirmishers. Add the chosen cards to the Campaign Pool."
+      ],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "Reminder that campaign mode is in use. No game effect."
+        }
+      ],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10188",
+      "side": "B",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-188-back-Campaign-The_Battle_of_Carn_Dum-Angmar_Awakened_Part_8-A-The_Battle_of_Carn_Dum_Campaign.jpg",
+        "sha256": "b40595bc944f3f96a60248d30f03d6bf303a5c1b29e1f0212ead0b2705b6cea1"
+      },
+      "lines": [
+        "Resolution: Note the amount of damage on each hero at the end of the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10189",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-189-front-Ally-Boon-Elronds_Champion-Neutral.jpg",
+        "sha256": "0d526d14ea65131831883483163435e5cbb5b0fa31f3bc1bf26250639433a6de"
+      },
+      "lines": [
+        "Response: After an enemy engages you, ready Elrond's Champion."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10190",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-190-front-Event-Boon-Lore_of_Ancient_Arnor-Neutral.jpg",
+        "sha256": "5103a96e11ec8bc81602e07bad19e8bae21429132bb7f18e21cfc67fb6a43a38"
+      },
+      "lines": [
+        "Action: Each player returns 1 card from their discard pile to their hand (2 cards instead if you are the only player in the game) and shuffles the rest of their discard pile back into their deck. Then, remove this card from the game."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10191",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-191-front-Attachment-Boon-Raiment_of_the_Second_Age-Neutral.jpg",
+        "sha256": "ad23b96ffdc78b50722a041086aff127f79b6e22f010dce6a214ccc749427737"
+      },
+      "lines": [
+        "Attach to a character. Restricted.",
+        "Attached character gets +2 Attack and +2 hit points.",
+        "Response: After attached character attacks and destroys an enemy, draw 1 card."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10192",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-192-front-Ally-Boon-Rivendell_Skirmishers-Neutral.jpg",
+        "sha256": "a7b60602d3920ee4a6347ffae5ee900eea007e25c3de56f17404e902faceab45"
+      },
+      "lines": [
+        "Response: After Rivendell Skirmishers exhausts to defend an attack from non-unique enemy, discard each shadow card from that enemy."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10193",
+      "side": "A",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-193-front-Campaign-The_Dread_Realm-Angmar_Awakened_Part_9-A-The_Dread_Realm_Campaign.jpg",
+        "sha256": "37758693c8c7d487c040ea200a7ca56504dd5b1c61123b4a5c5740028a5e744d"
+      },
+      "lines": [
+        "You are playing campaign mode.",
+        "Setup: Each player may search their deck for a boon card and add it to their opening hand. Each hero begins the game with damage on them equal to the amount noted for them in the Campaign Log."
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    },
+    {
+      "code": "10193",
+      "side": "B",
+      "printing": "AACE",
+      "scan": {
+        "url": "https://images.cardgame.tools/lotr/MEC108-193-back-Campaign-The_Dread_Realm-Angmar_Awakened_Part_9-A-The_Dread_Realm_Campaign.jpg",
+        "sha256": "b8536a665b1f8bad62ded7929b83c974d1997f823f04935f641618240ead2116"
+      },
+      "lines": [
+        "Resolution: The players win the campaign!"
+      ],
+      "inert": [],
+      "misprints": [],
+      "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
+      "confirmedBy": null
+    }
+  ]
+}
