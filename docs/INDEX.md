@@ -53,7 +53,7 @@ Read the sections your task touches.
     - 184–187 Maestro (~130)
   - 188–224 Commands (~1.1K)
   - 225–228 Contributing (~80)
-  - 229–239 Documentation (~200)
+  - 229–239 Documentation (~190)
   - 240–257 Attribution (~470)
   - 258–261 License (~50)
 - `docs/architecture.md` — Architecture (~21.9K tok)
@@ -193,7 +193,7 @@ Read the sections your task touches.
     - 457–460 Database (~20)
   - 461–480 States (~620)
 - `docs/releasing.md` — Releasing (~2.3K tok)
-- `docs/showcase.md` — README showcase (~2.1K tok)
+- `docs/showcase.md` — README showcase (~1.9K tok)
 
 ## Phases
 
@@ -228,7 +228,7 @@ Read when a task names the plan.
   - 237–273 Mechanic families: engine and records together (~1.4K) ← 1
   - 274–288 Readings the review catches (~550) ← 4
   - 289–308 Not expressible yet: leave open, report (~390)
-- `docs/plans/readme-showcase.md` — README showcase (~180 tok)
+- `docs/plans/readme-showcase.md` — README showcase (~170 tok)
 - `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.7K tok)
   - 3–14 Context (~450)
   - 15–24 What does not move (~190)

@@ -1,6 +1,6 @@
 name: showcase
 
-# Takes the README's screenshots and GIFs (docs/showcase.md): a Release simulator build of the app with every card picture packed and
+# Takes the README's screenshots (docs/showcase.md): a Release simulator build of the app with every card picture packed and
 # the showcase marker on, the flows in .maestro/showcase/ on the newest iPhone Pro and iPad Pro simulators in both themes, then the post-process.
 # The images, the contact sheet and the manifest are a workflow artifact; with publish on, the images replace the one commit of the `showcase`
 # branch, which the README links. Start it from the Actions tab or with `gh workflow run showcase.yml --ref main -f publish=true`.
@@ -40,11 +40,10 @@ jobs:
           distribution: temurin
           java-version: 17
       - uses: ./.github/actions/pack-assets
-      - name: Install Maestro and ffmpeg
+      - name: Install Maestro
         run: |
           curl -fsSL "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> "$GITHUB_PATH"
-          brew install ffmpeg
       - name: Capture
         id: capture
         continue-on-error: true
