@@ -14,6 +14,7 @@ import type { ScenarioState } from "../../core/state.ts";
 import { updateCard } from "../../core/state.ts";
 import { noteHostDefeated } from "../attachments/hold.ts";
 import { questCardDefeatedHeard } from "../quest/branch.ts";
+import { releaseHeldOnDefeat } from "../angmar/hold.ts";
 import { addToVictory } from "./victory.ts";
 
 // The side quests in the players' quest areas, in seat order.
@@ -81,7 +82,8 @@ export function resolveSideQuests(state: ScenarioState, committed: ReadonlyMap<s
 export function defeatSideQuest(state: ScenarioState, questId: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const quest = state.cards[questId];
   if (!quest) return state;
-  let next = releaseAttachments(noteHostDefeated(state, questId), questId, ctx.cards, steps);
+  // A card the side quest holds under it in play comes back to its players (Rescue Iârion, families/angmar/hold.ts).
+  let next = releaseHeldOnDefeat(releaseAttachments(noteHostDefeated(state, questId), questId, ctx.cards, steps), questId);
   next = updateCard(addToVictory(next, questId, ctx), questId, { progress: 0, committed: false });
   next = queueEvent(next, { trigger: "questDefeated", seat: quest.controller, cardId: questId, subject: questId });
   // Any quest card hears that a quest card was defeated ("After a quest card is defeated", 01135:A:3).

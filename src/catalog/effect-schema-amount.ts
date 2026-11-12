@@ -86,6 +86,8 @@ export const amountExprSchema = z.strictObject({
   max: z.literal(true).optional(),
   // The number of cards left in this deck beside the encounter deck ("gets -1 Threat for each facedown card under it", 144030:A:2: the Harad deck lies under The Cross-roads). 0 in a game that did not deal it. Read by the wilderland family.
   pile: pileNameSchema.optional(),
+  // The number of quest cards in play: the main quest card, the encounter side quests in the staging area and the player side quests in the quest areas, at least 1 ("X is the number of quest cards in play", 09016:A:1; mec108.side-quests-in-play). Read by the angmar family.
+  questCards: z.literal(true).optional(),
   // The pursuit value (mec112.pursuit; `pursuit`), 0 while no tracker is set: "X is the pursuit value" (143069:B:1). Read by the pursuit family.
   pursuit: z.literal(true).optional(),
   // The highest threat among the living players ("X is the threat of the player with the highest threat", 145064:B:1), and the number of living players whose threat is at least this ("+1 Threat for each player with a threat of 35 or higher",

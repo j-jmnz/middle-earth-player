@@ -188,7 +188,7 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
       // A card still in play has entered play (rr.staging, step 3): "After a location enters play" (04060:A:1).
       const next = patchTop(announceEntered(unlocked, id, seat, ctx), { step: 6 });
       const revealing = next.seats[seat];
-      const surge = printed.keywords.surge || (frame.data.kind === "reveal" && frame.data.surge);
+      const surge = printed.keywords.surge || flagged(next, id, "gainsSurge") || (frame.data.kind === "reveal" && frame.data.surge);
       if (!surge || !revealing || revealing.eliminated) return next;
       return startReveal(next, seat, ctx, steps);
     }

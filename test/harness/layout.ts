@@ -7,6 +7,7 @@ import { attachTo, spawn, type Destination } from "../../src/rules/core/zones.ts
 import type { ReduceContext, ScenarioState } from "../../src/rules/engine/reduce.ts";
 import { holdCaptive } from "../../src/rules/families/captives/index.ts";
 import { syncConstants } from "../../src/rules/interpret/constants.ts";
+import { markSideQuests } from "../../src/rules/families/wilderland/night-quest.ts";
 
 import { gameCodes, loadCampaigns, loadScenario } from "../../scripts/data/load-scenarios.ts";
 import { loadCards } from "../../scripts/data/load-cards.ts";
@@ -171,6 +172,8 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
   if (layout.captive) state = holdCaptive(state, idOf(state, layout.captive.hero), idOf(state, layout.captive.under));
   if (layout.pursuit != null) state = { ...state, pursuit: layout.pursuit };
   for (const code of layout.committed ?? []) for (const id of idsOf(state, code)) state = updateCard(state, id, { committed: true });
+  // A game that deals encounter side quests in its encounter deck reads the side quest rules, as its start notes (families/wilderland/night-quest.ts markSideQuests).
+  state = markSideQuests(state, cards);
   state = { ...state, ...opening(layout.phase ?? "Quest"), ...(layout.firstPlayer != null ? { firstPlayer: layout.firstPlayer } : {}) };
   return { state: syncConstants(state, ctx), ctx, hero: first.id, hero2: secondHero.id, seat1Hero, definition, cards };
 }

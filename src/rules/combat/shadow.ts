@@ -19,6 +19,7 @@ import { effectCause, inCause, ruleCause } from "../core/cause.ts";
 import { offerResponses } from "../windows/responses.ts";
 import { enemyAttackWindow } from "../engine/step-window.ts";
 import { noteAttackDamage } from "../families/defense/damage.ts";
+import { announceHurt } from "../families/angmar/damage.ts";
 import { combatDamage } from "../families/defense/excess.ts";
 import { attackCanceled, defendersDeclared, holdAttackEnd, specialStrike } from "../families/defense/defenders.ts";
 import { holdAttack } from "../families/defense/listen.ts";
@@ -283,7 +284,7 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   const cleared = attack.immediate && done.phase !== "Combat" ? discardShadowOf(done, attack.enemyId) : done;
   // "After an attack in which ~ defends resolves", "After a non-unique enemy attacks you": the attack is over.
   const defender = attack.defenderId && !attack.undefended ? { other: attack.defenderId } : {};
-  const announced = queueEvent(announceDestroyed(cleared, attack, ctx), { trigger: "attackResolved", seat: attack.seat, cardId: attack.enemyId, ...defender, ...(blank ? { shadowBlank: true as const } : {}) });
+  const announced = queueEvent(announceHurt(announceDestroyed(cleared, attack, ctx), attack), { trigger: "attackResolved", seat: attack.seat, cardId: attack.enemyId, ...defender, ...(blank ? { shadowBlank: true as const } : {}) });
   // An immediate attack leaves resolvedAttacks alone (it does not use up the enemy's attack). A game with a card that asks whether an enemy attacked this phase notes it for the phase it was made in (attackedThisPhase); every other game's state stays as it was.
   const noted = attack.immediate && gameReads(done, ctx, '"kind":"attackedThisPhase"') ? { immediateAttacks: noteImmediate(done, attack.enemyId) } : {};
   const ended: ScenarioState = { ...announced, pendingAttack: null, window: null, resolvedAttacks, ...noted };

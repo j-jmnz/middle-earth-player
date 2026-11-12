@@ -18,6 +18,7 @@ import { readsAmount, readsCondition } from "../../interpret/amounts.ts";
 import { gameReads } from "../../core/game-reads.ts";
 import { removeQuestProgress } from "../caves/progress.ts";
 import { cancelPhantomDamage } from "../grey-company/phantom.ts";
+import { noteHurt } from "../angmar/damage.ts";
 import { damageGoesTo } from "./damage.ts";
 
 // The damage this attack has dealt so far, kept on the attack only while a shadow effect waits to read it after the attack ("Raise your threat by 1
@@ -62,7 +63,7 @@ export function combatDamage(
   const targetId = damageGoesTo(state, assigned);
   const damaged = placeDamage(state, assigned, raw, ctx.cards, steps, "combat", cause);
   const landed = steps.slice(logged).reduce((sum, step) => (step.kind === "damage" && step.targetId === targetId && step.amount > 0 ? sum + step.amount : sum), 0);
-  const placed = noteLanded(damaged, landed);
+  const placed = noteHurt(noteLanded(damaged, landed), targetId, state.cards[targetId]?.damage ?? 0, landed, ctx);
   const toThreat = flagged(state, enemyId, "excessToThreat");
   const toQuest = flagged(state, enemyId, "excessToQuestProgress");
   const toShip = flagged(state, enemyId, "excessToShip");

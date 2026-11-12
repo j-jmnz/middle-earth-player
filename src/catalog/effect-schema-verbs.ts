@@ -25,7 +25,8 @@ const searchSelector = {
   traits: z.array(z.string().min(1)).min(2).optional(),
   // A non-unique card ("searches the encounter deck and discard pile for a non-unique Undead enemy", 19111:A:1).
   nonUnique: z.boolean().optional(),
-  type: z.enum(["enemy", "location", "treachery", "objective"]).optional(),
+  // `encounter-side-quest`: "search the encounter deck and discard pile for an encounter side quest" (09049:A:2).
+  type: z.enum(["enemy", "location", "treachery", "objective", "encounter-side-quest"]).optional(),
 };
 
 export const simpleVerbs = [

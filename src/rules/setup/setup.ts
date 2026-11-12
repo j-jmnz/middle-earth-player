@@ -23,6 +23,7 @@ import { placeCampaignCard } from "../families/burden/campaign.ts";
 import { snapshotOf } from "../engine/undo.ts";
 import { attachTo, moveCard, spawn } from "../core/zones.ts";
 import { stampRoutes } from "../families/sea/routes.ts";
+import { markSideQuests } from "../families/wilderland/night-quest.ts";
 import { dealDoubleSided, dealUnchartedDeck, type DoubleSidedCard } from "../families/uncharted/deal.ts";
 
 /** The prefix of an `afterMulligan` entry that is shuffled into the deck, not added to the hand, once the opening hands are final. */
@@ -127,6 +128,8 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
   }
   if (input.unchartedDeck && input.unchartedDeck.length > 0) state = dealUnchartedDeck(state, input.unchartedDeck, ctx);
   if (input.doubleSided && input.doubleSided.length > 0) state = dealDoubleSided(state, input.doubleSided, ctx);
+  // A game that deals encounter side quests in its encounter deck reads the side quest rules (families/wilderland/night-quest.ts).
+  state = markSideQuests(state, ctx.cards);
   state = placeCampaignCard(state, input.definition.campaignCard, ctx);
   // The Nightmare setup card, side A faceup next to the quest deck: its lines stay active all game (docs/brief.md, Nightmare).
   if (input.definition.nightmareCard) state = spawn(state, input.definition.nightmareCard, { zone: "nightmare" }, "A").state;

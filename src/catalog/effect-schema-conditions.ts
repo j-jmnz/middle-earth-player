@@ -74,7 +74,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The attack in progress has no defender (declared or considered).
   z.strictObject({ kind: z.literal("undefended") }),
   // `type`: only a card of this printed type counts ("discard cards from the top of the encounter deck until an enemy is discarded" is offered while an enemy is left in the deck, 146061:A:1). `victory`: the victory display is read too (146036:A:2).
-  z.strictObject({ kind: z.literal("searchable"), trait: z.string().min(1).optional(), code: z.string().min(1).optional(), type: z.enum(["enemy", "location", "treachery", "objective"]).optional(), deckOnly: z.literal(true).optional(), victory: z.literal(true).optional() }),
+  z.strictObject({ kind: z.literal("searchable"), trait: z.string().min(1).optional(), code: z.string().min(1).optional(), type: z.enum(["enemy", "location", "treachery", "objective", "encounter-side-quest"]).optional(), deckOnly: z.literal(true).optional(), victory: z.literal(true).optional() }),
   // Some card matches this pick (for the actor now): a choice that could be made.
   z.strictObject({ kind: z.literal("canPick"), pick: pickSchema }),
   // Each of the actor's heroes has this trait, and the actor has one ("Play only if each of your heroes is a Hobbit",
@@ -301,6 +301,12 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The When Revealed effects of the source card are resolving now: a quest stage's side B holds from the moment it is revealed, but its text is not in force while side A's When Revealed is
   // ("Each Raider enemy revealed by the encounter deck enters play with 1 resource on it" does not reach the cards revealed by the stage's own When Revealed, 11037:B:2).
   z.strictObject({ kind: z.literal("revealing") }),
+  // The current quest, read by the angmar family: `side` a side quest is the current quest ("If the current quest is a side quest", 09047:A:1), `self` the source is the side quest that is the current quest ("While Orc Rearguard is the current quest", 09023:A:2),
+  // `other` there is a quest card besides the current one that may be chosen to be the current quest (09049:A:2: the main quest card, or an encounter side quest in the staging area).
+  z.strictObject({ kind: z.literal("currentQuest"), is: z.enum(["side", "self", "other"]) }),
+  // The total Willpower of the characters committed to the quest is greater than the total Threat in the staging area, as the quest would count them now ("If the total Willpower of characters committed to the quest is greater than the total Threat in the staging area", 09021:A:1; rr.step-3-4). Read by the angmar family.
+  // With `attacks`: and an enemy is in the staging area to attack, so an attack is made (the line's "if no attack is made this way" is the negation).
+  z.strictObject({ kind: z.literal("questLeads"), attacks: z.literal(true).optional() }),
   // The pursuit value (mec112.pursuit, the pursuit tracker beside the quest deck) is at most `max` and at least `min`: "If the pursuit value is 25 or lower" (143071:B:1), "30 or greater" (143022:A:2). False while no tracker is set (ScenarioState.pursuit).
   z.strictObject({ kind: z.literal("pursuit"), max: z.number().int().min(0).optional(), min: z.number().int().min(0).optional() }),
   // The sole attacker: exactly one character was declared as an attacker in the attack in progress ("declared as the only attacker", 143015:A:3; rr.step-6-8b). Read by the attack family.
