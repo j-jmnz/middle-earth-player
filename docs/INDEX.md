@@ -56,15 +56,15 @@ Read the sections your task touches.
   - 229–239 Documentation (~190)
   - 240–257 Attribution (~470)
   - 258–261 License (~50)
-- `docs/architecture.md` — Architecture (~23.9K tok)
+- `docs/architecture.md` — Architecture (~24.3K tok)
   - 7–41 Stack (~1.1K)
   - 42–77 Processes (~680)
   - 78–160 Modules (~2.3K) ← 3
     - 126–160 Repository map (~880) ← 1
   - 161–186 State (~1.1K) ← 9
   - 187–208 Play loop (~250)
-  - 209–234 Engine (~5.6K)
-    - 223–234 Mechanic families (~4.6K) ← 5
+  - 209–234 Engine (~5.9K)
+    - 223–234 Mechanic families (~4.9K) ← 5
   - 235–240 Effects (~600) ← 5
   - 241–273 Scenario definition (~800)
   - 274–318 Persistence (~3.0K) ← 1

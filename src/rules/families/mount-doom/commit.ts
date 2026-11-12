@@ -1,6 +1,5 @@
 // Rules: mec113.fortitude-tests (data/rules/entries.json). Committing heroes to a Fortitude test: only a hero the tester controls, ready, and not barred by `noFortitudeCommit` (146057:A:1) may be exhausted for it.
 import type { EngineStep, PlayerIntent } from "../../core/intents.ts";
-import type { ReduceContext } from "../../interpret/interpret.ts";
 import { flagged, updateCards, type ScenarioState } from "../../core/state.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
 
@@ -10,7 +9,7 @@ export function fortitudeCommitters(state: ScenarioState, seat: number): string[
 }
 
 /** Why the intent is not legal, or null: it is the tester's, any number of heroes, each once. */
-export function fortitudeCommitReason(state: ScenarioState, intent: Extract<PlayerIntent, { type: "CommitFortitude" }>, _ctx: ReduceContext): string | null {
+export function fortitudeCommitReason(state: ScenarioState, intent: Extract<PlayerIntent, { type: "CommitFortitude" }>): string | null {
   const window = state.window;
   if (window?.kind !== "fortitudeCommit") return "That intent is not legal in this window";
   if (window.seat !== state.activeSeat) return "Only the player making the Fortitude test commits to it";

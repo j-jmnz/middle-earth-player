@@ -147,7 +147,7 @@ export function rejectionReason(state: ScenarioState, intent: PlayerIntent, ctx:
     case "CommitHide":
       return hideCommitReason(state, intent, ctx);
     case "CommitFortitude":
-      return fortitudeCommitReason(state, intent, ctx);
+      return fortitudeCommitReason(state, intent);
     case "Trigger":
       return triggerReason(state, intent, ctx);
     case "Choose":
