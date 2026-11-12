@@ -77,7 +77,7 @@ Read the sections your task touches.
   - 378–383 Catalog build (~410)
   - 384–401 Tests (~2.0K) ← 5
   - 402–417 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~144.4K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~144.6K tok)
   - 17–40 Sections (~490)
   - 41–52 Product (~590) ← 2
   - 53–66 Non-goals (~540)
@@ -111,10 +111,10 @@ Read the sections your task touches.
     - 624–641 The Caves of Nibin-Dûm (~2.4K)
   - 642–700 Dream-chaser (~16.2K) ← 4
   - 701–728 Ered Mithrin (~16.4K) ← 8
-  - 729–856 Angmar Awakened (~14.9K) ← 6
+  - 729–856 Angmar Awakened (~15.1K) ← 6
     - 752–786 Intruders in Chetwood (~3.5K)
     - 787–817 The Weather Hills (~3.9K)
-    - 818–856 Deadmen's Dike (~5.6K)
+    - 818–856 Deadmen's Dike (~5.8K)
   - 857–994 The Two Towers (~16.4K) ← 20
   - 995–1230 The Return of the King (~28.2K) ← 22
     - 1023–1048 The Passing of the Grey Company (~2.7K)
@@ -135,7 +135,7 @@ Read the sections your task touches.
   - 1398–1423 Persistence and shipping (~2.6K) ← 6
   - 1424–1465 Screens (~4.9K) ← 1
     - 1450–1465 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~51.7K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~51.9K tok)
   - 5–8 Overview (~130) ← 1
   - 9–23 Top bar (~3.1K) ← 4
   - 24–27 Table menu (~490) ← 2
@@ -143,7 +143,7 @@ Read the sections your task touches.
   - 36–39 Canvas (~560)
   - 40–52 Spacing and the play area's rows (~1.9K) ← 9
   - 53–58 Pictures on the table (~320) ← 1
-  - 59–100 Cards (~15.2K) ← 26
+  - 59–100 Cards (~15.4K) ← 26
   - 101–106 The Sailing test (~690) ← 5
   - 107–120 The Island Map (~1.8K) ← 8
   - 121–124 Tokens and effects (~320)

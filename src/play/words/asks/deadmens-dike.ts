@@ -34,7 +34,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "09041:whenRevealed:1 @0.0 remove": { label: "Remove each of your characters from the quest" },
 
   // 09074:B:1 (Forced after Thaurdir attacks and destroys a character): its controller chooses; a player left with no cards in his deck is eliminated.
-  "09074:forced:1 @0 Choose": { owned: true, note: "A Fell Wraith: Thaurdir destroyed your character. Either discard the top 3 cards of your deck (you have {cards}; at 0 you are eliminated, and if you are the last player the game is lost), or return Thaurdir to the staging area.", bind: { cards: { count: DECK } } },
+  "09074:forced:1 @0 Choose": { owned: true, note: "A Fell Wraith: Thaurdir destroyed your character. Either discard the top 3 cards of your deck (you have {cards}; at 0 you are eliminated), or return Thaurdir to the staging area.", bind: { cards: { count: DECK } } },
   "09074:forced:1 @0 discard": { label: "Discard the top 3 cards of your deck", caution: { when: { kind: "count", pick: DECK, max: 3 }, text: "Tap again: your deck would be empty and you would be eliminated. If you are the last player, the game is lost" } },
   "09074:forced:1 @0 return": { label: "Return Thaurdir to the staging area" },
 
