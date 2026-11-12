@@ -8,7 +8,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - When you start a phase, set it to `active` with a one-line note. Do not mark the next phase active. More than one phase may be active only when their files say they can run beside each other.
 - A phase is `completed` when its exit is green and `/reviewer` reports no blocks. A phase that changes `src/screens` or `src/play` also needs `/ux` to report no blocks. Write the date.
 - A scenario phase has an engine half and a screen half (`docs/handover/agent-brief.md`, Scenario procedure). When the engine half's exit is green and reviewed, write `engine done` in the note and leave the phase `active`. The phase is completed when both halves are.
-- Phases 27 to 33 and 37 to 60 (Mirkwood Paths, Dream-chaser and Ered Mithrin) have one review round per phase, as `.claude/agents/orchestrator.md` "One review round" says, in place of "`/reviewer` reports no blocks" (user instructions, 2026-10-27, 2026-10-30, 2026-11-05). A block the fix pass leaves open goes in the phase's note.
+- Phases 27 to 33, 37 to 60 and 77 to 87 (Mirkwood Paths, Dream-chaser, Ered Mithrin and Angmar Awakened) have one review round per phase, as `.claude/agents/orchestrator.md` "One review round" says, in place of "`/reviewer` reports no blocks" (user instructions, 2026-10-27, 2026-10-30, 2026-11-05, 2026-11-12). A block the fix pass leaves open goes in the phase's note.
 - Maestro flows are written in the phase that names them. `maestro test` runs after the last phase; it does not gate an earlier phase.
 - Phone and tablet checks are not tracked: no phase waits on one, and none is listed here (user instruction, 2026-11-06).
 - Current counts live in code: the engine version in `src/rules/engine/version.ts`, the playable scenarios in `src/campaign/playable.ts`, the printed lines no record owns in `src/effects/open-lines.ts` (`pnpm effects open`).
@@ -100,6 +100,17 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 74 | The Tower of Cirith Ungol | completed | 2026-11-12. Review round done. Open: `ungol-won`. |
 | 75 | The Black Gate Opens | completed | 2026-11-12. Review round done. |
 | 76 | Mount Doom | completed | 2026-11-12. Review round done. Open: `doom-won`. |
+| 77 | Angmar Awakened data | active | 2026-11-12. `docs/plans/angmar-awakened.md`. |
+| 78 | Angmar Awakened campaign shell | not started |  |
+| 79 | Intruders in Chetwood | not started |  |
+| 80 | The Weather Hills | not started |  |
+| 81 | Deadmen's Dike | not started |  |
+| 82 | The Wastes of Eriador | not started |  |
+| 83 | Escape from Mount Gram | not started |  |
+| 84 | Across the Ettenmoors | not started |  |
+| 85 | The Treachery of Rhudaur | not started |  |
+| 86 | The Battle of Carn Dûm | not started |  |
+| 87 | The Dread Realm | not started |  |
 
 ## Open items
 

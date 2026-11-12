@@ -110,7 +110,7 @@ Read the sections your task touches.
     - 603–617 The Oath (~2.4K)
     - 618–635 The Caves of Nibin-Dûm (~2.4K)
   - 636–694 Dream-chaser (~16.2K) ← 4
-  - 695–722 Ered Mithrin (~16.4K) ← 7
+  - 695–722 Ered Mithrin (~16.4K) ← 8
   - 723–860 The Two Towers (~16.4K) ← 20
   - 861–1096 The Return of the King (~28.2K) ← 22
     - 889–914 The Passing of the Grey Company (~2.7K)
@@ -211,21 +211,22 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~9.3K tok)
-  - 5–15 Rules (~410)
-  - 16–103 Phases (~1.8K)
-  - 104–225 Open items (~6.4K)
-    - 106–110 Releases (~150)
-    - 111–143 Fixtures and Maestro (~1.8K)
-    - 144–180 Rules and engine (~1.5K)
-    - 181–205 Screens and code (~1.6K)
-    - 206–225 Rules and engine (The Two Towers) (~1.4K)
-  - 226–246 Standing decisions (~700)
+- `docs/phases/STATUS.md` — Phase status (~9.5K tok)
+  - 5–15 Rules (~420)
+  - 16–114 Phases (~1.9K)
+  - 115–236 Open items (~6.4K)
+    - 117–121 Releases (~150)
+    - 122–154 Fixtures and Maestro (~1.8K)
+    - 155–191 Rules and engine (~1.5K)
+    - 192–216 Screens and code (~1.6K)
+    - 217–236 Rules and engine (The Two Towers) (~1.4K)
+  - 237–257 Standing decisions (~700)
 
 ## Live plans
 
 Read when a task names the plan.
 
+- `docs/plans/angmar-awakened.md` — Angmar Awakened (~1.5K tok)
 - `docs/plans/effect-authoring.md` — Authoring effect records (~7.5K tok)
   - 12–33 Workflow (~460)
   - 34–50 Where records live (~390)
@@ -265,7 +266,7 @@ Open work; read when a task names it.
   - 38–56 Files you own (edit freely) (~490)
   - 57–70 Shared files (~300)
   - 71–85 Approach (~670) ← 1
-  - 86–124 Scenario procedure (~2.1K) ← 22
+  - 86–124 Scenario procedure (~2.1K) ← 23
   - 125–134 Checkpoints (API usage limits can stop you mid-task) (~210)
   - 135–149 Checks before committing (~310)
   - 150–156 Merge (~140) ← 1
