@@ -14,12 +14,13 @@ const ARAGORN: When = { kind: "matches", card: "picked", pick: { type: "hero", c
 const DESTROYED_BY = (damage: number): When => ({ kind: "less", left: { stat: "hitPoints", of: "picked" }, right: { stat: "damage", of: "picked", plus: damage + 1 } });
 const ARAGORN_DESTROYED_BY = (damage: number): When => ({ kind: "all", conditions: [ARAGORN, DESTROYED_BY(damage)] }) as When;
 const LOSES_ARAGORN = "Tap again: the damage destroys {picked}, and the players lose the game";
-// The raise takes the player to the elimination level, 99 under Dire: the end of the scenario when it is the last player.
-const ELIMINATED = (raise: number): { when: When; text: NonNullable<Ask["caution"]>["text"] } => ({
-  when: { kind: "threat", min: 99 - raise } as When,
+// The raise takes the player to the elimination level, 99 under Dire or more: the end of the scenario when it is the last player. `raise` is a number or an amount read now (The Hour of Doom's characters); the Black Gate's resources are `{tokens}`.
+const ELIMINATED = (raise: number | Amount): { when: When; text: NonNullable<Ask["caution"]>["text"] } => ({
+  // Threat plus the raise is 99 or more: 98 less the threat is less than the raise.
+  when: (typeof raise === "number" ? { kind: "threat", min: 99 - raise } : { kind: "less", left: { threat: "actor", times: -1, plus: 98 }, right: raise }) as When,
   text: [
-    { when: { kind: "inPlay", code: "146074", is: true } as When, text: "Tap again: this takes your threat to 99 and eliminates you. If you are the last player the scenario ends, and the {n} resources on The Black Gate go to Mount Doom" },
-    { text: "Tap again: this takes your threat to 99 and eliminates you. If you are the last player, the game is lost" },
+    { when: { kind: "inPlay", code: "146074", is: true } as When, text: "Tap again: this takes your threat to 99 or more and eliminates you. If you are the last player the scenario ends, and the resources on The Black Gate ({tokens} now) go to Mount Doom" },
+    { text: "Tap again: this takes your threat to 99 or more and eliminates you. If you are the last player, the game is lost" },
   ],
 });
 
@@ -43,7 +44,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
 
   // 146037:A:2, A:3 (The Hour of Doom): each player in turn, the first player first.
   "146037:whenRevealed:1 @0.0 Choose": { owned: true, note: "The Hour of Doom: raise your threat by 1 for each character you control, or discard the highest cost ally you control." },
-  "146037:whenRevealed:1 @0.0 threat": { label: "Raise your threat by {n}, 1 for each character you control", bind: { n: CHARACTERS } },
+  "146037:whenRevealed:1 @0.0 threat": { label: "Raise your threat by {n}, 1 for each character you control", bind: { n: CHARACTERS, tokens: GATE_TOKENS }, caution: ELIMINATED(CHARACTERS) },
   "146037:whenRevealed:1 @0.0 ally": { label: "Discard the highest cost ally you control" },
   "146037:whenRevealed:1 @0.0.ally.0 Pick": { owned: true, note: "The Hour of Doom: choose the highest cost ally you control to discard.", verb: "Discard" },
   "146037:shadow:1 @0 Pick": { owned: true, note: "The Hour of Doom shadow: choose a non-objective attachment you control to discard.", verb: "Discard" },
@@ -61,13 +62,13 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   // 146041:A:2 (Gwaihir): the first player chooses for the group. Gwaihir joins the campaign pool only when the first player controls him at the end (146074:B:1).
   "146041:whenRevealed:1 @0 Choose": { owned: true, note: "Gwaihir: take control of him, or spend 1 Fellowship resource and discard him to discard a non-unique enemy in the staging area." },
   "146041:whenRevealed:1 @0 control": { label: "Take control of Gwaihir. He joins the campaign pool if you control him when the scenario ends" },
-  "146041:whenRevealed:1 @0 discard": { label: "Spend 1 Fellowship resource: discard Gwaihir and a non-unique enemy in the staging area" },
+  "146041:whenRevealed:1 @0 discard": { label: "Spend 1 Fellowship resource: discard Gwaihir and a non-unique enemy in the staging area. He does not join the campaign pool" },
   "146041:whenRevealed:1 @0.discard.0 SpendResources": { owned: true, note: "Gwaihir: choose the hero whose pool pays 1 Fellowship resource.", verb: "Pay" },
   "146041:whenRevealed:1 @0.discard.1 Pick": { owned: true, note: "Gwaihir: choose a non-unique enemy in the staging area to discard with him.", verb: "Discard" },
 
   // 146032:A:2 (Nazgûl of Mordor, Forced after it attacks): the defending player chooses.
   "146032:forced:1 @0 Choose": { owned: true, note: "Nazgûl of Mordor attacked you: raise your threat by 4, or return it to the staging area." },
-  "146032:forced:1 @0 threat": { label: "Raise your threat by 4", bind: { n: GATE_TOKENS }, caution: ELIMINATED(4) },
+  "146032:forced:1 @0 threat": { label: "Raise your threat by 4", bind: { tokens: GATE_TOKENS }, caution: ELIMINATED(4) },
   "146032:forced:1 @0 staging": { label: "Return Nazgûl of Mordor to the staging area" },
 
   // 146058:A:2, A:3, 146059:A:2 (the Orcs): the player the Orc engaged or attacked chooses.

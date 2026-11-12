@@ -403,7 +403,8 @@ export function OutcomeTitle({ won, scenario, testID, ended }: { won: boolean; s
   const big = size === "compact" ? 50 : 72;
   const ring = (size === "compact" ? 240 : 330) * s;
   const light = t.depth === "light";
-  const tone = won ? (light ? palette.accent : palette.glow) : palette.threat;
+  // An end (The Black Gate Opens) is neither: muted, with no glow or red.
+  const tone = ended === true ? palette.muted : won ? (light ? palette.accent : palette.glow) : palette.threat;
   return (
     <View className="items-center justify-center" style={{ height: ring }}>
       <View
@@ -421,18 +422,18 @@ export function OutcomeTitle({ won, scenario, testID, ended }: { won: boolean; s
         }}
       >
         <View style={{ opacity: 0.12 }}>
-          <GameIcon name="oneRing" size={ring * 0.62} tint={won ? "bone" : "danger"} />
+          <GameIcon name="oneRing" size={ring * 0.62} tint={won || ended === true ? "bone" : "danger"} />
         </View>
       </View>
       <Text
         testID={testID}
         accessibilityRole="header"
-        className={`text-center font-display ${won ? "text-accentHigh" : "text-danger"}`}
+        className={`text-center font-display ${ended === true ? "text-bone" : won ? "text-accentHigh" : "text-danger"}`}
         style={{
           fontSize: big * s,
           lineHeight: big * 1.2 * s,
           letterSpacing: (big >= 72 ? 8 : 6) * s,
-          ...(light ? {} : { textShadowColor: won ? withAlphaHex(palette.glow, 0.7) : withAlphaHex(palette.threat, 0.7), textShadowRadius: 24, textShadowOffset: { width: 0, height: 0 } }),
+          ...(light || ended === true ? {} : { textShadowColor: won ? withAlphaHex(palette.glow, 0.7) : withAlphaHex(palette.threat, 0.7), textShadowRadius: 24, textShadowOffset: { width: 0, height: 0 } }),
         }}
       >
         {ended ? "The end" : won ? "Victory" : "Defeat"}

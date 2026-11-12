@@ -20,6 +20,7 @@ import { branchThreat, branchWords, outOfPlayLabel, type ChoiceNames } from "../
 import { islandBlocked, islandBlockedTitle, islandOptionLabel, islandTravelNote, islandTravelRow } from "../words/scenarios/island.ts";
 import { grantedTravelWords, grappleOptionLabel, grappleTravel, returnsNote, travelNote } from "../words/scenarios/grapple.ts";
 import { isFreedTreasureClaim, isTreasureDraw, wilderlandBranchNow, wilderlandChooseNote, wilderlandOptionLabel, wilderlandTravel } from "../words/scenarios/wilderland.ts";
+import { embassyPairCards } from "../readouts/black-gate.ts";
 import { branchCaution, discardCaution } from "./wilderland-sheets.ts";
 import { heathLookNote } from "../words/scenarios/heath.ts";
 import { seaOptionLabel, travelTaxCaution } from "../words/scenarios/sea.ts";
@@ -236,6 +237,8 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           note: [`${ask}${/^Player \d+[:,] /.test(ask) ? "" : who}`, line].filter((part) => part != null).join(" "),
           verb: "Choose",
           confirm: "Confirm",
+          // The Embassy's pair: the Read button opens the player card and the encounter card it is paired with.
+          ...(embassyPairCards(game).length > 0 ? { about: embassyPairCards(game) } : {}),
           alternative: stop ? { label: stop.label, intent: { type: "Choose", optionId: stop.optionId }, caution: stop.caution } : null,
           options: window.options.filter((id) => !(stop && id === DONE)).map((id): PickOption => {
             // A branch that raises or lowers threat carries the threat icon with the record's amount.

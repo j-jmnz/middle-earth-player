@@ -5,7 +5,7 @@
 import type { ScenarioState } from "../../rules/engine/reduce.ts";
 
 import { ownerWords } from "../words/owner.ts";
-import { embassyWords, gateWords, gwaihirLabel, gwaihirWords, moatWords, pairWords } from "../words/scenarios/black-gate.ts";
+import { cannotBeWonReadout, embassyWords, gateWords, gwaihirLabel, gwaihirWords, moatWords, pairWords } from "../words/scenarios/black-gate.ts";
 import { cardsOf, type TableDial } from "./dials.ts";
 import type { HandMark } from "./isengard.ts";
 
@@ -14,6 +14,23 @@ const GATE = "146024";
 const MOAT = "146029";
 const GWAIHIR = "146041";
 const STAGE_TWO = "146073";
+const CAMPAIGN_CARD = "146074";
+
+// A standalone game deals no campaign card, so the end is a loss.
+const standalone = (game: ScenarioState): boolean => cardsOf(game, CAMPAIGN_CARD).length === 0;
+
+/** What the quest readout adds on stage 2B, which has no quest points to show: it cannot be defeated, and what ends the scenario (146073:B:3). Empty on every other stage and in any other scenario. */
+export function blackGateQuestEnd(game: ScenarioState): string {
+  if (game.scenarioId !== SCENARIO || game.cards[game.questStage ?? ""]?.code !== STAGE_TWO) return "";
+  return `. ${cannotBeWonReadout(standalone(game))}`;
+}
+
+/** The two cards of the pair the first player is deciding now (the player card, then the encounter card), for the choice's Read button; empty with no Embassy or before the first pair is taken. */
+export function embassyPairCards(game: ScenarioState): readonly string[] {
+  const embassy = game.embassy;
+  const pair = embassy && embassy.at > 0 ? embassy.pairs[embassy.at - 1] : undefined;
+  return pair ? [pair.player, pair.encounter] : [];
+}
 
 /** The pair the first player is deciding now ("Player 1's Gandalf with Hill-troll"), null with no Embassy or before the first pair is taken. `nameOfCard` names a card by id. */
 export function embassyPairNow(game: ScenarioState, nameOfCard: (id: string) => string): string | null {
@@ -45,14 +62,15 @@ export function blackGateDials(game: ScenarioState, nameOf: (code: string) => st
   if (gate) {
     const tokens = gate.resources;
     const second = game.cards[game.questStage ?? ""]?.code === STAGE_TWO;
-    dials.push({ id: "gate", testID: "gate-tokens", label: "Gate", name: `Resource tokens on ${nameOf(GATE)}:`, value: tokens, note: gateWords(tokens, second) });
+    dials.push({ id: "gate", testID: "gate-tokens", label: "Gate", name: `Resource tokens on ${nameOf(GATE)}:`, value: tokens, note: gateWords(tokens, second, standalone(game)) });
   }
   const moat = cardsOf(game, MOAT)[0];
   const under = moat ? Object.values(game.cards).filter((card) => card.zone === "under" && card.host === moat.id) : [];
   if (moat && under.length > 0) dials.push({ id: "moat", testID: "moat-under", label: "Moat", name: `Enemies under ${nameOf(MOAT)}:`, value: under.length, note: moatWords(under.map((card) => nameOf(card.code))) });
   const embassy = game.embassy;
-  if (embassy) {
-    const pairs = embassyPairs(game, nameOf);
+  // The dial is there once the row is paired: while Setup is still placing it there is nothing to decide.
+  const pairs = embassy ? embassyPairs(game, nameOf) : [];
+  if (embassy && pairs.length > 0) {
     dials.push({ id: "embassy", testID: "embassy-pairs", label: "Embassy", name: "Embassy from the Dark Tower, pairs left to decide:", value: pairs.length, note: embassyWords(pairs.length, pairs) });
   }
   return dials;

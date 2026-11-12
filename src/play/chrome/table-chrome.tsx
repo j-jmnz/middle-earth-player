@@ -75,6 +75,7 @@ export function ThreatRing({
   ring = null,
   ringMark = "oneRing",
   limit,
+  eliminates,
   filled,
   limitWords,
   goal,
@@ -109,6 +110,8 @@ export function ThreatRing({
   ringMark?: "oneRing" | "hero";
   // The number at which the players lose, when it is not the elimination level (the pursuit dial, 30): the meter fills toward it, the dial warms near it, and the reader hears it. Needs `elimination`.
   limit?: number;
+  // The limit is the elimination level of a Dire quest (99, mec113.dire): the reader hears "near elimination", not "near the limit".
+  eliminates?: boolean;
   // The number the ring fills with when it is not the disc's: Saruman's gate shows his hit points left on the disc and fills the ring with the damage toward his hit points (`limit`).
   filled?: number;
   // What a screen reader hears of the limit ("the players lose at 30" when absent): the Defense dial's limit advances the stage instead (fortress.ts).
@@ -126,7 +129,7 @@ export function ThreatRing({
 }) {
   const s = useUiScale();
   const id = testID ?? `threat-${threat.seat}`;
-  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} spokenWord={spokenWord} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} limit={limit} filled={filled} limitWords={limitWords} goal={goal} warn={warn} note={note} notch={notch} onPress={onPress} />;
+  if (compact) return <ThreatDial threat={threat} label={label} id={id} icon={icon} name={accessibilityName ?? label} spokenWord={spokenWord} role={role} hint={hint} elimination={elimination} ticks={ticks} ring={ring} ringMark={ringMark} limit={limit} eliminates={eliminates} filled={filled} limitWords={limitWords} goal={goal} warn={warn} note={note} notch={notch} onPress={onPress} />;
   return (
     <View testID={id} accessible accessibilityLabel={`${label} ${threat.threat}`} className="items-center">
       <View className="h-12 w-12 items-center justify-center rounded-control">
@@ -156,6 +159,7 @@ function ThreatDial({
   ring,
   ringMark,
   limit,
+  eliminates,
   filled,
   limitWords,
   goal,
@@ -177,6 +181,7 @@ function ThreatDial({
   ring: string | null;
   ringMark: "oneRing" | "hero";
   limit?: number;
+  eliminates?: boolean;
   filled?: number;
   limitWords?: string;
   goal?: boolean;
@@ -223,7 +228,8 @@ function ThreatDial({
   const deltaWords = change ? threatDeltaWords(name, change.before, change.after) : null;
   const critical = level === "critical" && !threat.eliminated;
   // The words for a dial near its limit: its own warning first, then what the number alone says.
-  const nearWords = own === "critical" ? (limit != null ? ", near the limit" : ", near elimination") : "";
+  const losesAtLimit = limit != null && eliminates !== true;
+  const nearWords = own === "critical" ? (losesAtLimit ? ", near the limit" : ", near elimination") : "";
   const levelWords = warn ? `, ${warn.words}${nearWords}` : critical ? nearWords : "";
   // The glow, the track and the disc wash are threat red, or the accent on a dial that counts toward a goal.
   const hue = goal ? t.accent : t.threat;

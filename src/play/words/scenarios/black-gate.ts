@@ -23,8 +23,14 @@ export function blackGateWords(instruction: Instruction): string | null {
  * What the dial of the resources on The Black Gate says: it gains one each quest phase (146024:A:3); on stage 2B the first player reveals that many encounter cards in each staging step and Jaws of Steel deals that much damage (146073:B:1, 146038:A:1); at the
  * end of the scenario the count is recorded for Mount Doom (146074:B:1). `second`: the main quest is stage 2.
  */
-export const gateWords = (tokens: number, second: boolean): string =>
-  `${plural(tokens, "resource", "resources")} on The Black Gate, one more each quest phase. ${second ? `The first player reveals ${plural(tokens, "encounter card", "encounter cards")} in each staging step, and Jaws of Steel deals ${tokens} damage` : "From stage 2B the first player reveals that many encounter cards in each staging step"}. When the scenario ends the count is recorded for Mount Doom`;
+export const gateWords = (tokens: number, second: boolean, standalone: boolean): string =>
+  `${plural(tokens, "resource", "resources")} on The Black Gate, one more each quest phase. ${second ? `The first player reveals ${plural(tokens, "encounter card", "encounter cards")} in each staging step, and Jaws of Steel deals ${tokens} damage. ${cannotBeWonWords(standalone)}` : "From stage 2B the first player reveals that many encounter cards in each staging step"}. When the scenario ends the count is recorded for Mount Doom`;
+
+/** Stage 2B cannot be defeated (146073:B:3): the scenario ends when the last player is eliminated, and in Campaign Mode that end runs the Resolution (146074:B:1); standalone it is a loss. */
+export const cannotBeWonWords = (standalone: boolean): string => `This stage cannot be defeated. The scenario ends when the last player is eliminated, and ${standalone ? "the game is lost" : "the Resolution follows"}`;
+
+/** The short form the quest readout adds on stage 2B, where the stage has no quest points to show. */
+export const cannotBeWonReadout = (standalone: boolean): string => `This stage cannot be defeated: the scenario ends when the last player is eliminated${standalone ? ", and the game is lost" : ""}`;
 
 /** The dial of the enemies lying under Reeking Moat: they engage the first player when it leaves play (146029:A:1, A:2). */
 export const moatWords = (names: readonly string[]): string => `${names.join(", ")} ${names.length === 1 ? "lies" : "lie"} facedown under Reeking Moat, out of play. When it leaves play ${names.length === 1 ? "it engages" : "they engage"} the first player`;
@@ -33,7 +39,7 @@ export const moatWords = (names: readonly string[]): string => `${names.join(", 
 export const pairWords = (owner: string | null, player: string, encounter: string): string => `${owner == null ? "" : `${owner} `}${player} with ${encounter}`;
 
 /** What the Embassy dial says: how many pairs are left and each pair, in the order the first player decides them (146072:B:1). */
-export const embassyWords = (left: number, pairs: readonly string[]): string => `${plural(left, "pair", "pairs")} left to decide. The first player discards both cards of a pair, or reveals the encounter card and plays the player card at no cost. ${pairs.length > 0 ? `${pairs.join("; ")}` : "No pairs are made yet"}`;
+export const embassyWords = (left: number, pairs: readonly string[]): string => `${plural(left, "pair", "pairs")} left to decide. The first player discards both cards of a pair, or reveals the encounter card and plays the player card at no cost. ${pairs.join("; ")}`;
 
 /** The mark of the seat that controls Gwaihir ("Gwaihir", "P1 · Gwaihir" two-handed): he joins the campaign pool only if the first player controls him when the scenario ends (146041:A:2, 146074:B:1). */
 export const gwaihirLabel = (seat: number | null): string => (seat == null ? "Gwaihir" : `P${seat + 1} · Gwaihir`);

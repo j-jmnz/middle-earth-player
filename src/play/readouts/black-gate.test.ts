@@ -4,7 +4,11 @@ import { describe, expect, it } from "vitest";
 import { moveCard } from "../../rules/core/zones.ts";
 import { idOf, tableFromLayout, type Layout } from "../../../test/harness/scene-kit.ts";
 
-import { blackGateDials, blackGateHands, embassyPairNow, embassyPairs } from "./black-gate.ts";
+import { holds } from "../../rules/interpret/conditions.ts";
+import { withThreat } from "../../rules/core/state.ts";
+import { resolveAmount } from "../../rules/interpret/amounts.ts";
+import { ASKS } from "../words/asks/the-black-gate-opens.ts";
+import { blackGateDials, blackGateHands, blackGateQuestEnd, embassyPairCards, embassyPairNow, embassyPairs } from "./black-gate.ts";
 import { dialLimit, threatLevel } from "./threat-level.ts";
 
 const ID = "the-black-gate-opens";
@@ -20,6 +24,43 @@ describe("the pieces of The Black Gate Opens' table", () => {
     expect(first[0]?.note).toContain("From stage 2B");
     const second = blackGateDials(at({ stage: "146073", staging: [{ code: "146024", resources: 2 }] }).state, name);
     expect(second[0]?.note).toContain("reveals 2 encounter cards in each staging step, and Jaws of Steel deals 2 damage");
+  });
+
+  it("146073:B:3 stage 2B says it cannot be defeated and what ends the scenario, in the gate dial and the quest readout, and stage 1 does not", () => {
+    const second = at({ stage: "146073", staging: [{ code: "146024", resources: 2 }] }).state;
+    // The table kit deals no campaign card, so the end is a loss, as in a standalone game.
+    expect(blackGateDials(second, name)[0]?.note).toContain("This stage cannot be defeated. The scenario ends when the last player is eliminated, and the game is lost");
+    expect(blackGateQuestEnd(second)).toBe(". This stage cannot be defeated: the scenario ends when the last player is eliminated, and the game is lost");
+    const campaign = at({ stage: "146073", staging: [{ code: "146024", resources: 2 }], campaign: true }).state;
+    expect(blackGateDials(campaign, name)[0]?.note).toContain("and the Resolution follows");
+    expect(blackGateQuestEnd(campaign)).not.toContain("game is lost");
+    const first = at({ staging: [{ code: "146024", resources: 2 }] }).state;
+    expect(blackGateDials(first, name)[0]?.note).not.toContain("cannot be defeated");
+    expect(blackGateQuestEnd(first)).toBe("");
+  });
+
+  it("146037:A:2 The Hour of Doom's raise arms the Tap again when the characters it counts take the threat to 99 or more, and the Nazgul's 4 at 95", () => {
+    const made = at({ play: ["ally"] });
+    const scope = { actor: 0, sourceId: null, returned: 0 };
+    const characters = resolveAmount(made.state, { count: { type: "character", control: "you" } }, scope, made.ctx);
+    expect(characters).toBeGreaterThan(1);
+    const hour = ASKS["146037:whenRevealed:1 @0.0 threat"]!.caution!.when;
+    expect(holds(withThreat(made.state, 0, 99 - characters), hour, scope, made.ctx)).toBe(true);
+    expect(holds(withThreat(made.state, 0, 98 - characters), hour, scope, made.ctx)).toBe(false);
+    const nazgul = ASKS["146032:forced:1 @0 threat"]!.caution!.when;
+    expect(holds(withThreat(made.state, 0, 95), nazgul, scope, made.ctx)).toBe(true);
+    expect(holds(withThreat(made.state, 0, 94), nazgul, scope, made.ctx)).toBe(false);
+  });
+
+  it("146072:B:1 the Embassy dial waits for the paired row, and the pair's two cards open from the choice", () => {
+    const made = at({ staging: ["f3"], hand: ["c3"] });
+    const unpaired = { ...made.state, embassy: { players: [], encounter: [], pairs: [], at: 0 } };
+    expect(blackGateDials(unpaired, name).find((dial) => dial.id === "embassy")).toBeUndefined();
+    expect(embassyPairCards(unpaired)).toEqual([]);
+    const player = idOf(made.state, "c3");
+    const encounter = idOf(made.state, "f3");
+    const paired = { ...made.state, embassy: { players: [player], encounter: [encounter], pairs: [{ player, encounter }], at: 1 } };
+    expect(embassyPairCards(paired)).toEqual([player, encounter]);
   });
 
   it("146029:A:1 the enemies under Reeking Moat are a dial counting them, and there is none with nothing under it", () => {

@@ -210,7 +210,7 @@ function Resolution({ session, opened, saveId }: { session: Extract<TableSession
   const split = size === "expanded" && view.kind === "choosing";
 
   return (
-    <Screen testID="resolution" scene="victory">
+    <Screen testID="resolution" scene={view.kind === "settled" && view.ended === true ? "calm" : "victory"}>
       {back}
       {/* While choosing, the tiles and the decline under Confirm are one radio group. */}
       <View className="min-h-0 flex-1" {...(view.kind === "choosing" ? { accessibilityRole: "radiogroup" as const } : {})}>
