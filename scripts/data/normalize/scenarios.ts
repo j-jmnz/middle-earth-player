@@ -340,7 +340,8 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     // Encounter sets: the booklet's Setup paragraph names them, in its order; Hall of Beorn's list must agree.
     const rule = ruleById.get(def.setupSpan);
     // Angmar Awakened's booklet lists an icon named for an objective-ally (Amarthiúl) among the encounter sets; his card is dealt in its own scenario's set, so the name is a card title, not a set.
-    const booklet = bookletSetsOf(rule).filter((name) => !(def.deck && placed.some((item) => byCode.get(item.code)?.type === "objective" && canon(byCode.get(item.code)?.name ?? "") === canon(name) && canon(byCode.get(item.code)?.encounterSet ?? "") !== canon(name))));
+    const namesAnObjective = (name: string) => placed.some((item) => byCode.get(item.code)?.type === "objective" && canon(byCode.get(item.code)?.name ?? "") === canon(name) && canon(byCode.get(item.code)?.encounterSet ?? "") !== canon(name));
+    const booklet = bookletSetsOf(rule).filter((name) => !(def.deck && namesAnObjective(name)));
     const first = hob.QuestCards[0];
     const isCampaign = (code: string) => byCode.get(code)?.typeName === "Campaign" || byCode.get(code)?.campaignKind != null;
     let hobSets = [first?.EncounterInfo?.EncounterSet, ...(first?.EncounterInfo?.IncludedEncounterSets ?? [])].filter((name): name is string => !!name).map((name) => name.replace(CAMPAIGN_SUFFIX, ""));

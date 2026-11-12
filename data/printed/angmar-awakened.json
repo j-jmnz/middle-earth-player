@@ -2,13 +2,13 @@
   "campaign": "angmar-awakened",
   "conventions": [
     "One entry per code and side. Side A is the front, side B the back of a double-sided card; a shadow effect is a line of side A.",
-    "lines are the ability text of the text box in print order, one ability per line: no title, traits, stats, flavor text, or Victory line. Keyword lines (Surge., Doomed 1., Time 4., Capture 1.) stay.",
+    "lines are the ability text of the text box in print order, one ability per line: no title, traits, stats, flavor text, or Victory line. Keyword lines (Surge., Doomed 1., Time 4., Capture 1.) stay, a keyword on its own line: one followed by more text (Time 4. Forced: ..., Indestructible. Cannot have attachments.) is split.",
     "Icons are written as the words Hall of Beorn uses (Willpower, Attack, Defense, Threat). Apostrophes and quotation marks are straight.",
     "A printed typo is written corrected in lines, and the printed wording is kept under misprints.",
     "inert lists line numbers that need no effect record, with the reason. A line that is only keywords the engine reads is owned by the keyword.",
     "A quest stage's card side B is its stage B. A double-sided card of the Campaign Expansion whose sides are two catalog cards (Protect the Innocent 10158 and Arnor Ravaged 100158) is each side A of its own code.",
     "A campaign card's side A opens with the marker line \"You are playing campaign mode.\" (Treachery of Rhudaur's holds only that line); its side B holds the Resolution paragraphs, each paragraph one line. Flavor text under the rules is not a line.",
-    "The scan of a Lost Realm or Adventure Pack card is the 2014 or 2015 printing (the MEC108 reprint carries the same text: no card is in MEC108_CHANGED); the Campaign Expansion's own cards are read from their MEC108 scans (lotr.cardgame.tools)."
+    "The scan of a Lost Realm or Adventure Pack card is the 2014 or 2015 printing (no MEC108 rewording can be found from these scans, so MEC108_CHANGED in scripts/data/printed/scope.ts stays empty until a scan of the MEC108 cards is read); the Campaign Expansion's own cards are read from their MEC108 scans (lotr.cardgame.tools)."
   ],
   "entries": [
     {
@@ -159,7 +159,8 @@
         "sha256": "4bc98772475db6658aec16d60063e59946af9305ddf6a9c6d7d2316f84e66e66"
       },
       "lines": [
-        "Time 4. When Revealed: The first player loses control of Iârion and places him facedown underneath this stage. When this stage is defeated, the first player takes control of Iârion and exhausts him.",
+        "Time 4.",
+        "When Revealed: The first player loses control of Iârion and places him facedown underneath this stage. When this stage is defeated, the first player takes control of Iârion and exhausts him.",
         "Forced: After the last time counter is removed from this stage, discard Iârion."
       ],
       "inert": [],
@@ -313,7 +314,8 @@
         "sha256": "3ba47387d833f5aa340f354e3fa989c6926fb084b2d9a64a5dd6b90af797a677"
       },
       "lines": [
-        "Indestructible. Cannot have attachments.",
+        "Indestructible.",
+        "Cannot have attachments.",
         "Forced: After a treachery card with the Sorcery trait is revealed from the encounter deck, Thaurdir heals 3 damage and makes an immediate attack against the first player."
       ],
       "inert": [],
@@ -363,7 +365,8 @@
         "sha256": "7cdb3473ca0d325c39f84f74543ceb07c248d2786ff819b9f76f07c281a01196"
       },
       "lines": [
-        "Time 3. Forced: After the last time counter is removed from Broken Battlements, each player discards the top 5 cards of his deck and places 1 time counter here.",
+        "Time 3.",
+        "Forced: After the last time counter is removed from Broken Battlements, each player discards the top 5 cards of his deck and places 1 time counter here.",
         "Travel: Each player discards the top card of his deck."
       ],
       "inert": [],
@@ -1776,7 +1779,8 @@
       },
       "lines": [
         "Capture 5.",
-        "Time 4. Forced: When the last time counter is removed from this quest, discard its captured cards and remove this quest from the game. Then, raise each player's threat by 3 for each of his characters that was discarded by this effect."
+        "Time 4.",
+        "Forced: When the last time counter is removed from this quest, discard its captured cards and remove this quest from the game. Then, raise each player's threat by 3 for each of his characters that was discarded by this effect."
       ],
       "inert": [],
       "misprints": [],
@@ -2196,7 +2200,8 @@
         "sha256": "361a52ba93988c13420d1e21dae407cdc15029c547bad665ae3bc4d54ca34a18"
       },
       "lines": [
-        "Time 5. Forced: After the last time counter is removed from Secrets of Rhudaur, remove each Treachery of Rhudaur side quest from the game and immediately advance to stage 2.",
+        "Time 5.",
+        "Forced: After the last time counter is removed from Secrets of Rhudaur, remove each Treachery of Rhudaur side quest from the game and immediately advance to stage 2.",
         "During the quest phase, Secrets of Rhudaur cannot be chosen as the current quest.",
         "If there are no Treachery of Rhudaur side quests in play, immediately advance to stage 2."
       ],
@@ -2280,7 +2285,8 @@
         "sha256": "3399b48f60a096b5f3c29140926835b4f93d27ec4547ff9d1e66e92d4c2e91eb"
       },
       "lines": [
-        "Indestructible. Cannot have attachments.",
+        "Indestructible.",
+        "Cannot have attachments.",
         "Forced: After a treachery card with the Sorcery trait is revealed from the encounter deck, Thaurdir heals 3 damage and makes an immediate attack against the first player."
       ],
       "inert": [],
@@ -2790,7 +2796,8 @@
         "sha256": "53eae41002b701f073e9991046c56395022015045dee3b5fed085c17a08fb87b"
       },
       "lines": [
-        "Indestructible. Cannot have attachments.",
+        "Indestructible.",
+        "Cannot have attachments.",
         "Each other enemy gets +10 engagement cost.",
         "Forced: After Thaurdir is flipped or a treachery card with the Sorcery trait is revealed, deal 1 shadow card to each enemy in play."
       ],
@@ -2808,7 +2815,8 @@
         "sha256": "9ff5fef85ab8e4f396ddbe60225336858226ee47a97e21c36e178c71b1d749b0"
       },
       "lines": [
-        "Indestructible. Cannot have attachments.",
+        "Indestructible.",
+        "Cannot have attachments.",
         "Each other enemy gets -10 engagement cost.",
         "Forced: After Thaurdir is flipped or a treachery card with the Sorcery trait is revealed, Thaurdir heals 3 damage and makes an immediate attack against the first player."
       ],

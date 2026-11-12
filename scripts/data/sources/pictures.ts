@@ -103,6 +103,13 @@ export function productsOfPacks(packs: readonly { code: string; name: string }[]
 
 type CardgameToolsRow = { slug: string; front: string; back: string | null };
 
+// A double-sided card is filed as `<Type>-<front title>-<back title>-<set>`; the card named by the second title is the back, a card of its own whose side A
+// is the row's back image (Protect the Innocent's back is Arnor Ravaged, a separate objective).
+function isBackTitle(row: CardgameToolsRow, name: string): boolean {
+  const titles = row.slug.split("-").map((part) => lettersOf(part));
+  return row.back != null && titles.length >= 4 && titles[2] === lettersOf(name) && titles[1] !== lettersOf(name);
+}
+
 // The image file of one side on cardgame.tools: the first printing whose product row's slug names the card.
 export function cardgameToolsFile(
   rows: ReadonlyMap<string, CardgameToolsRow>,
@@ -115,6 +122,7 @@ export function cardgameToolsFile(
     const number = printing.number == null ? null : (FILED_UNDER[`${printing.pack} ${printing.number}`] ?? printing.number);
     const row = product && number != null ? rows.get(`${product} ${number}`) : undefined;
     if (!row || !lettersOf(row.slug).includes(lettersOf(card.name))) continue;
+    if (isBackTitle(row, card.name)) return side === "A" ? row.back : null;
     return side === "A" ? row.front : row.back;
   }
   return null;

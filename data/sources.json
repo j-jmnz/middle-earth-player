@@ -5329,9 +5329,9 @@
       "site": "https://drive.google.com/drive/folders/1jEy_yvRaPXGylPfilxhweQjffo9AZQsQ",
       "pin": {
         "kind": "sha256",
-        "value": "cab06bee492b0ed888a9c60aee095557256dd8fdafcdf97e4e66a7aca709a659"
+        "value": "127735bb9e052937288de3547b3856c8f1f599b51150b22dd04b25ba5512e45f"
       },
-      "fetchedAt": "2026-11-12T12:21:12.032Z",
+      "fetchedAt": "2026-11-12T12:52:01.139Z",
       "files": [
         {
           "path": "pdf/core_set_campaign_cards.pdf",
@@ -8551,9 +8551,9 @@
         },
         {
           "path": "pictures/100158.A.jpg",
-          "url": "https://images.cardgame.tools/lotr/MEC108-158-front-EncounterSideQuest-Protect_the_Innocent-Arnor_Ravaged-Intruders_in_Chetwood_Campaign.jpg",
-          "sha256": "bd8b072b59aaca7fccb918eae0a6e6678807190c9fdbb97d9fab0ac942b7dd46",
-          "bytes": 282186
+          "url": "https://images.cardgame.tools/lotr/MEC108-158-back-EncounterSideQuest-Protect_the_Innocent-Arnor_Ravaged-Intruders_in_Chetwood_Campaign.jpg",
+          "sha256": "4003e124fef123fbab1b37a92f13c84c4f56bd3a4db6807a0198463f54522a0f",
+          "bytes": 322158
         },
         {
           "path": "pictures/10016.A.jpg",

@@ -4,6 +4,12 @@ import type { NameIndex, SetupClause } from "./setup-text.ts";
 // Angmar Awakened's Setup sentences (mec108.*): the nine stage 1A cards' and the nine campaign cards'. Every pattern is quoted from a ledger line
 // (data/printed/angmar-awakened.json), names the cards it moves, and returns null for a sentence it does not read, so the other patterns try it. A step that names cards
 // returns null when a name finds no card: the sentence ends up unread and the scenario is not built, a name is never dropped silently.
+// The three Across the Ettenmoors side quests and the four safe locations its Setup sets aside.
+const ETTENMOORS_SAFE_AND_QUESTS = "Lie Low, Forage for Food, Scavenge for Supplies, Secluded Cave, The Hoarwell, Abandoned Camp, Patch of Woods";
+
+// "2" is 2, "a" and "an" are 1.
+const countOf = (word: string | undefined): number => (/^\d+$/.test(word ?? "") ? Number(word) : 1);
+
 export function readAngmarAwakened(sentence: string, names: NameIndex, before: readonly SetupClause[]): SetupClause[] | null {
   const last = before.at(-1);
   const step = stepWith([]);
@@ -34,10 +40,10 @@ export function readAngmarAwakened(sentence: string, names: NameIndex, before: r
     const codes = named("Daybreak");
     return codes.length === 0 ? null : [{ kind: "stage", codes, perPlayer: null, count: 1 }];
   }
-  if ((match = /^Reveal (\d+|an?) cards? from the encounter deck per player$/i.exec(sentence))) return [step("revealPerPlayer", { count: /^\d+$/.test(match[1] ?? "") ? Number(match[1]) : 1 })];
+  if ((match = /^Reveal (\d+|an?) cards? from the encounter deck per player$/i.exec(sentence))) return [step("revealPerPlayer", { count: countOf(match[1]) })];
   if ((match = /^Each player adds (\d+|an?) cop(?:y|ies) of (.+?) to their starting hand$/i.exec(sentence))) {
     const codes = names.codesOf(match[2] ?? "");
-    return codes.length === 0 ? null : [step("addToStartingHand", { codes, count: /^\d+$/.test(match[1] ?? "") ? Number(match[1]) : 1 })];
+    return codes.length === 0 ? null : [step("addToStartingHand", { codes, count: countOf(match[1]) })];
   }
   if (/^Add each of those events to the Campaign Pool$/i.test(sentence)) return last?.kind === "step" && last.step === "addToStartingHand" ? [{ kind: "addToCampaignPool", codes: last.codes }] : null;
 
@@ -54,11 +60,11 @@ export function readAngmarAwakened(sentence: string, names: NameIndex, before: r
 
   // Across the Ettenmoors: the three side quests and the four safe locations.
   if ((match = /^Set aside each of the 3 Across the Ettenmoors side quests and each of the 4 locations with the safe keyword$/i.exec(sentence))) {
-    const codes = named("Lie Low, Forage for Food, Scavenge for Supplies, Secluded Cave, The Hoarwell, Abandoned Camp, Patch of Woods");
+    const codes = named(ETTENMOORS_SAFE_AND_QUESTS);
     return codes.length === 7 ? [{ kind: "aside", codes, allCopies: false }] : null;
   }
   if (/^Reveal 1 of those side quests at random and 1 of those safe locations at random, adding them to the staging area with the safe location guarded by the side quest$/i.test(sentence)) {
-    const codes = named("Lie Low, Forage for Food, Scavenge for Supplies, Secluded Cave, The Hoarwell, Abandoned Camp, Patch of Woods");
+    const codes = named(ETTENMOORS_SAFE_AND_QUESTS);
     return codes.length === 7 ? [step("revealSafeLocationGuarded", { codes })] : null;
   }
   if ((match = /^Search the encounter deck for 1 copy of (.+?) per player and add them to the staging area$/i.exec(sentence))) {
@@ -68,7 +74,8 @@ export function readAngmarAwakened(sentence: string, names: NameIndex, before: r
   if (/^Shuffle the remaining side quests and safe locations back into the encounter deck$/i.test(sentence)) return [step("shuffleRemainingSafe")];
 
   // The Treachery of Rhudaur and The Battle of Carn Dûm.
-  if ((match = /^Make (.+?) the active location$/i.exec(sentence))) {
+  // Only the active locations Angmar's stage 1 cards name, so this reader cannot take another box's "Make X the active location" (setup-two-towers.ts).
+  if ((match = /^Make (Exposed Ridge|Shrouded Hills|The Great Hall) the active location$/i.exec(sentence))) {
     const codes = names.codesOf(match[1] ?? "");
     return codes.length === 0 ? null : [{ kind: "active", codes }];
   }

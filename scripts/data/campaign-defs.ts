@@ -382,7 +382,7 @@ for (const campaign of CAMPAIGNS) {
 export function scenarioProductOf(name: string): string {
   return productOf(name).scenarioProduct ?? name;
 }
-export const BUILT_PRODUCTS: ReadonlySet<string> = new Set(CAMPAIGNS.flatMap((campaign) => campaign.products.map(scenarioProductOf)));
+export const BUILT_SCENARIO_PRODUCTS: ReadonlySet<string> = new Set(CAMPAIGNS.flatMap((campaign) => campaign.products.map(scenarioProductOf)));
 
 // Hall of Beorn lists a scenario as "Passage Through Mirkwood (Campaign)" when it is the campaign-mode edition of a box
 // that also prints a Nightmare or standalone scenario. The suffix is not part of the scenario's name.

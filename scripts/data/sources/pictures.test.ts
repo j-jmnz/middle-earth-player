@@ -60,6 +60,32 @@ describe("pictures", () => {
     ]);
   });
 
+  it("takes a double-sided card's back image for the card named by the slug's second title", () => {
+    const rows = new Map([
+      ["MEC108 158", { slug: "EncounterSideQuest-Protect_the_Innocent- Arnor_Ravaged-Intruders_in_Chetwood_Campaign", front: "158-front.jpg", back: "158-back.jpg" }],
+    ]);
+    const products = new Map([["AACE", "MEC108"]]);
+    const printing = [{ pack: "AACE", number: 158 }];
+    expect(cardgameToolsFile(rows, products, { name: "Protect the Innocent", printings: printing }, "A")).toBe("158-front.jpg");
+    expect(cardgameToolsFile(rows, products, { name: "Arnor Ravaged", printings: printing }, "A")).toBe("158-back.jpg");
+  });
+
+  it("pins no picture to two cards, except the printings of one card face", () => {
+    const { sources } = JSON.parse(readFileSync(path.join(DATA_DIR, "sources.json"), "utf8")) as { sources: Record<string, { files: { path: string; sha256: string }[] } | undefined> };
+    const byHash = new Map<string, string[]>();
+    for (const file of sources.pictures?.files ?? []) {
+      const code = /^pictures\/(\w+)\.A\./.exec(file.path)?.[1];
+      if (code) byHash.set(file.sha256, [...(byHash.get(file.sha256) ?? []), code]);
+    }
+    const names = new Map<string, string>();
+    for (const file of readdirSync(path.join(DATA_DIR, "cards")).filter((name) => name.endsWith(".json"))) {
+      for (const card of JSON.parse(readFileSync(path.join(DATA_DIR, "cards", file), "utf8")) as { code: string; name: string }[]) names.set(card.code, lettersOf(card.name));
+    }
+    // Two codes may share a picture only when they are one card's name (a reprint or a twin); another name is a side filed under the wrong card.
+    const shared = [...byHash.values()].filter((codes) => new Set(codes.map((code) => names.get(code) ?? code)).size > 1);
+    expect(shared).toEqual([]);
+  });
+
   it("names one PDF page per side of the 21 campaign, boon and burden cards", () => {
     const keys = PDF_PAGES.map((entry) => `${entry.code}.${entry.side}`);
     expect(new Set(keys).size).toBe(keys.length);

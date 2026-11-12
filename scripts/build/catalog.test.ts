@@ -6,7 +6,7 @@ import { DatabaseSync } from "node:sqlite";
 import { afterEach, describe, expect, it } from "vitest";
 
 import type { Card } from "../../src/catalog/card-facts.ts";
-import { backPictureOf, buildCatalog, pictureOf, type BuildCatalogOptions } from "./catalog.ts";
+import { backPictureOf, buildCatalog, pictureOf, scansOfEntries, type BuildCatalogOptions } from "./catalog.ts";
 import { catalogStamp } from "../../src/catalog/version.ts";
 
 const databases: DatabaseSync[] = [];
@@ -204,6 +204,26 @@ describe("buildCatalog", () => {
     expect(backPictureOf(stage, new Map())).toBe(`${hob}B.jpg`);
     expect(backPictureOf(card({ printings: [{ pack: "TGH", number: 16, imageUrls: [`${dragn}.jpg`, `${dragn}.B.jpg`] }] }), new Map())).toBe(`${dragn}.B.jpg`);
     expect(backPictureOf(card(), new Map())).toBeNull();
+  });
+
+  it("derives a campaign card's back picture from its Hall of Beorn SetupA front", () => {
+    const hob = "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/Angmar-Awakened-Campaign-Expansion/The-Weather-Hills";
+    const campaign = card({ code: "10159", type: "campaign", imagesrc: null, printings: [{ pack: "AACE", number: 159, imageUrls: [`${hob}-SetupA.jpg`] }] });
+    expect(backPictureOf(campaign, new Map())).toBe(`${hob}-SetupB.jpg`);
+    expect(backPictureOf({ ...campaign, type: "objective" }, new Map())).toBeNull();
+  });
+
+  it("keeps only the ledger scans the app can download", () => {
+    const hob = "https://s3.amazonaws.com/hallofbeorn-resources/Images/Cards/x.jpg";
+    const scans = scansOfEntries([
+      { code: "1", side: "A", scan: { url: hob } },
+      { code: "1", side: "B", scan: { url: hob } },
+      { code: "2", side: "A", scan: { url: "https://images.cardgame.tools/lotr/MEC108-156-front.jpg" } },
+      { code: "3", side: "A", scan: { url: "https://drive.usercontent.google.com/download?id=abc&export=download" } },
+      { code: "3", side: "B", scan: { url: "https://drive.usercontent.google.com/download?id=abd&export=download" } },
+    ]);
+    expect([...scans.fronts]).toEqual([["1", hob]]);
+    expect([...scans.backs]).toEqual([["1", hob]]);
   });
 
   it("holds only cards, packs, campaigns and meta", () => {
