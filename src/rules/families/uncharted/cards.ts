@@ -19,6 +19,7 @@ import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
 import { patchTop } from "../../windows/windows.ts";
 import { attachTo, discardFromHand, moveCard, turnedUp, turnedUpCode } from "../../core/zones.ts";
 import { effectData } from "../encounter/moves.ts";
+import { askTradeOrKeep } from "../trade.ts";
 import type { Focus } from "../index.ts";
 import { queueFront } from "../play/refs.ts";
 import { lowerThreatByEffect } from "../quest/threat.ts";
@@ -69,11 +70,8 @@ export function tradeDamageForThreat(state: ScenarioState, instruction: Verb<"Tr
   const seat = state.cards[character]?.controller ?? focus.seat;
   const next = all[all.indexOf(character) + 1];
   const goOn = (current: ScenarioState): ScenarioState => (next ? queueFront(current, [{ instruction: { ...instruction, character: next }, seat, chosen: null, cause }]) : current);
-  if (focus.chosen == null) {
-    if (!effectData(state)) return { ...state, failure: "Trading damage for threat needs a choice, and no effect is asking" };
-    return askTarget(state, { instruction: { ...instruction, character }, seat, chosen: null, cause }, ["trade", "keep"]);
-  }
-  if (focus.chosen !== "trade") return goOn(state);
+  const decided = askTradeOrKeep(state, focus, { instruction: { ...instruction, character }, seat, cause }, "Trading damage for threat needs a choice, and no effect is asking", goOn);
+  if (decided) return decided;
   const damaged = placeDamage(state, character, instruction.damage, ctx.cards, steps, "framework", cause);
   return goOn(lowerThreatByEffect(damaged, seat, instruction.threat, focus.sourceId, ctx, steps, cause));
 }

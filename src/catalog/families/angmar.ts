@@ -1,5 +1,5 @@
 // The vocabulary Angmar Awakened (mec108) adds to effect records: Time X and its time counters, a card held facedown under a side quest, the cards a side quest holds from the players' hands, the current quest chosen among the quest cards in play, and the
-// Setup of the campaign card that names a card and a trade of damage. The amount `questCards` and the conditions `currentQuest` and `held` are in effect-schema-amount.ts and effect-schema-conditions.ts; src/rules/families/angmar runs and reads them.
+// Setup of the campaign card that names a card and a trade of damage. The amount `questCards` and the conditions `currentQuest` and `questLeads` are in effect-schema-amount.ts and effect-schema-conditions.ts; src/rules/families/angmar runs and reads them.
 import { z } from "zod";
 
 import type { CatalogFamily } from "../family-manifest.ts";

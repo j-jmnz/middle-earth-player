@@ -8,6 +8,7 @@ import { modifiedStat } from "../../core/keywords.ts";
 import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { spawn } from "../../core/zones.ts";
 import { settle } from "../../engine/machine.ts";
+import { questCapTally } from "../caves/progress.ts";
 import { resolveAmount } from "../../interpret/amounts.ts";
 import { holds } from "../../interpret/conditions.ts";
 import { runInstruction } from "../../interpret/interpret.ts";
@@ -138,6 +139,21 @@ describe("the current quest", () => {
     // The next round the tally is new.
     const next = settle({ ...placed, modifiers: placed.modifiers.filter((modifier) => modifier.stat !== "questProgressPlaced") }, ambush.ctx, []);
     expect(placeQuestProgress(next, 1, ambush.cards, [], canAdvance).cards[idOf(placed, "09046")]?.progress).toBe(4);
+  });
+
+  it("09023:A:1 counts only the progress a side quest took, not the room left: a side quest 1 short of full, or a Protect the Innocent holding 1 damage, leave 2 of the 3 for the rest of the round", () => {
+    const wilds = built({ staging: [REARGUARD, { code: "09051", progress: 3 }] });
+    const current = setCurrentQuest(wilds.state, idOf(wilds.state, "09051"), wilds.ctx);
+    const placed = placeQuestProgress(current, 5, wilds.cards, [], canAdvance);
+    expect(placed.cards[idOf(placed, "09051")]?.progress).toBe(4);
+    expect(questCapTally(placed)).toEqual({ placed: 1, limit: 3 });
+    const full = built({ staging: [REARGUARD, { code: "09051", progress: 4 }] });
+    const stuck = placeQuestProgress(setCurrentQuest(full.state, idOf(full.state, "09051"), full.ctx), 5, full.cards, [], canAdvance);
+    expect(questCapTally(stuck)).toEqual({ placed: 0, limit: 3 });
+    const protect = built({ staging: [REARGUARD, { code: PROTECT, damage: 1 }] });
+    const healed = placeQuestProgress(setCurrentQuest(protect.state, idOf(protect.state, PROTECT), protect.ctx), 3, protect.cards, [], canAdvance);
+    expect(healed.cards[idOf(healed, PROTECT)]?.damage).toBe(0);
+    expect(questCapTally(healed)).toEqual({ placed: 1, limit: 3 });
   });
 
   it("10158:A:2 removes as much damage from Protect the Innocent as the progress placed on it, no more than it holds, instead of placing progress", () => {

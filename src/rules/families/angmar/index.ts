@@ -10,7 +10,7 @@ import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { placeHandUnderSelf } from "./cards-under.ts";
 import { discardHeld, holdUnder } from "./hold.ts";
-import { chooseCurrentQuest, currentQuestHolds, questCardsAmount } from "./quest.ts";
+import { chooseCurrentQuest, currentQuestHolds, questCardsAmount, questLeadsHolds } from "./quest.ts";
 import { removeTimeCounters, timeOnReveal } from "./time.ts";
 import { attachNewTo, tradeDamageForResources } from "./trade.ts";
 
@@ -43,6 +43,6 @@ export const manifest: RulesFamily = {
   verbs: ["Time", "RemoveTimeCounters", "HoldUnder", "DiscardHeld", "PlaceHandUnderSelf", "ChooseCurrentQuest", "AttachNewTo", "TradeDamageForResources"],
   run,
   revealed: timeOnReveal,
-  condition: (state, condition, scope, ctx) => currentQuestHolds(state, condition, scope, ctx),
+  condition: (state, condition, scope, ctx) => currentQuestHolds(state, condition, scope, ctx) ?? questLeadsHolds(state, condition, ctx),
   amount: (state, found, _scope, ctx) => questCardsAmount(state, found, ctx),
 };

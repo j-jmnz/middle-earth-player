@@ -8,10 +8,9 @@ import { printedOf } from "../../core/printed.ts";
 import { inPlay, livingSeats, updateCard, type ScenarioState } from "../../core/state.ts";
 import { attachTo, spawn } from "../../core/zones.ts";
 import { queueEvent } from "../../windows/queue.ts";
-import { askTarget } from "../../windows/choices.ts";
-import { effectData } from "../encounter/moves.ts";
 import { queueFront } from "../play/refs.ts";
 import type { Focus } from "../index.ts";
+import { askTradeOrKeep } from "../trade.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
@@ -25,21 +24,18 @@ export function attachNewTo(state: ScenarioState, instruction: Verb<"AttachNewTo
 
 /**
  * TradeDamageForResources: starting with the first player, each player decides in turn whether to place `damage` damage on the card with the code in play and add `resources` resource to each hero in their pool; a trade places the tokens (nothing cancels them) and gives
- * the resources. The next player is asked once this one has answered; with the card not in play nobody is asked. Run outside an effect frame, which cannot ask, nobody trades.
+ * the resources. The next player is asked once this one has answered; with the card not in play nobody is asked. Run outside an effect frame, which cannot ask, the step fails.
  */
 export function tradeDamageForResources(state: ScenarioState, instruction: Verb<"TradeDamageForResources">, focus: Focus, steps: EngineStep[]): ScenarioState {
   const target = Object.values(state.cards).find((card) => card.code === instruction.code && inPlay(card.zone));
-  const order = [...livingSeats(state)].sort((a, b) => ((a - state.firstPlayer + state.seatCount) % state.seatCount) - ((b - state.firstPlayer + state.seatCount) % state.seatCount));
+  const order = livingSeats(state); // first player first
   const seat = instruction.seat ?? order[0];
   if (!target || seat == null) return state;
   const next = order[order.indexOf(seat) + 1];
   const cause = currentCause(steps, UNATTRIBUTED);
   const goOn = (current: ScenarioState): ScenarioState => (next != null ? queueFront(current, [{ instruction: { ...instruction, seat: next }, seat: next, chosen: null, cause }]) : current);
-  if (focus.chosen == null) {
-    if (!effectData(state)) return state;
-    return askTarget(state, { instruction: { ...instruction, seat }, seat, chosen: null, cause }, ["trade", "keep"]);
-  }
-  if (focus.chosen !== "trade") return goOn(state);
+  const decided = askTradeOrKeep(state, focus, { instruction: { ...instruction, seat }, seat, cause }, "Trading damage needs a choice, and no effect is asking", goOn);
+  if (decided) return decided;
   steps.push({ kind: "damage", targetId: target.id, amount: instruction.damage, cause });
   let traded = updateCard(state, target.id, { damage: target.damage + instruction.damage });
   for (const heroId of traded.seats[seat]?.heroes ?? []) {

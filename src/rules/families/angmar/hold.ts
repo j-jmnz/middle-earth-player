@@ -6,11 +6,10 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { destroyCard } from "../../core/keywords.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
-import { inPlay, updateCard, type ScenarioState } from "../../core/state.ts";
-import { attachTo, moveCard } from "../../core/zones.ts";
+import { inPlay, type ScenarioState } from "../../core/state.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import type { Focus } from "../index.ts";
-import { captiveUnder, captureHero } from "../south/captive.ts";
+import { captiveUnder, captureHero, releaseHero } from "../south/captive.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
@@ -31,13 +30,7 @@ export function releaseHeldOnDefeat(state: ScenarioState, questId: string): Scen
   const held = heldId ? state.cards[heldId] : undefined;
   if (!heldId || !held) return state;
   const seat = state.firstPlayer;
-  let next = updateCard(moveCard(state, heldId, { zone: "play", seat }), heldId, { face: "up", exhausted: true });
-  for (const id of [...held.attachments]) {
-    const card = next.cards[id];
-    if (!card) continue;
-    const placed = card.owner == null ? next : moveCard(next, id, { zone: "play", seat });
-    next = attachTo(updateCard(placed, id, { face: "up" }), id, heldId);
-  }
+  const next = releaseHero(state, heldId, seat, { face: "up", exhausted: true }, {}, false, "play");
   return queueEvent(next, { trigger: "changedControl", seat, cardId: heldId });
 }
 

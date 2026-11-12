@@ -305,7 +305,6 @@ const atomSchema = z.discriminatedUnion("kind", [
   // `other` there is a quest card besides the current one that may be chosen to be the current quest (09049:A:2: the main quest card, or an encounter side quest in the staging area).
   z.strictObject({ kind: z.literal("currentQuest"), is: z.enum(["side", "self", "other"]) }),
   // The total Willpower of the characters committed to the quest is greater than the total Threat in the staging area, as the quest would count them now ("If the total Willpower of characters committed to the quest is greater than the total Threat in the staging area", 09021:A:1; rr.step-3-4). Read by the angmar family.
-  // With `attacks`: and an enemy is in the staging area to attack, so an attack is made (the line's "if no attack is made this way" is the negation).
   z.strictObject({ kind: z.literal("questLeads") }),
   // The pursuit value (mec112.pursuit, the pursuit tracker beside the quest deck) is at most `max` and at least `min`: "If the pursuit value is 25 or lower" (143071:B:1), "30 or greater" (143022:A:2). False while no tracker is set (ScenarioState.pursuit).
   z.strictObject({ kind: z.literal("pursuit"), max: z.number().int().min(0).optional(), min: z.number().int().min(0).optional() }),

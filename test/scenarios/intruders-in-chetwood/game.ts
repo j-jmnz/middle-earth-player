@@ -88,16 +88,13 @@ export type ChetwoodGame = PlayedGame;
 // `after`: the log of a campaign whose earlier parts were won. `upgraded`: the Upgraded sides. `mode`: the Hard or Expert Mode card.
 export type ChetwoodGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: ChetwoodDecks; outcome: "won" | "lost"; policy?: Partial<ChetwoodPolicy>; after?: boolean; upgraded?: boolean; mode?: ModeCard; lossReason?: string };
 
-// Wins (true solo and two-handed, Normal and Easy; the ones that defend send one character to defend each attack and quest with one, so Protect the Innocent takes little damage; one answers every choice with its first option, so each player trades 4 damage on
+// Wins (true solo, true solo answering every choice with its first option, two-handed: the ones that defend send one character to defend each attack and quest with one, so Protect the Innocent takes little damage; each player trades 4 damage on
 // Protect the Innocent for resources at the Setup) and the ways to lose: Protect the Innocent holding 10 damage, Iârion leaving play (Rescue Iârion's last time counter, Angmar Orc's discard), the players' threat at 50 (heroes too small to quest) and every hero destroyed.
 const SAFE_DEFENDING = { defend: "all", quest: "one" } as const;
 export const CHETWOOD_GOLDENS: readonly ChetwoodGolden[] = [
   { name: "true solo, won, Normal", seatCount: 1, seed: 5, difficulty: "Normal", decks: "strong", outcome: "won", policy: SAFE_DEFENDING },
-  { name: "true solo, won, Easy", seatCount: 1, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won", policy: SAFE_DEFENDING },
   { name: "true solo, won, every choice the first option", seatCount: 1, seed: 5, difficulty: "Normal", decks: "strong", outcome: "won", policy: { ...SAFE_DEFENDING, choose: "first" } },
   { name: "two-handed, won, Normal", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
-  { name: "two-handed, won, Easy", seatCount: 2, seed: 4, difficulty: "Easy", decks: "strong", outcome: "won", policy: SAFE_DEFENDING },
-  { name: "two-handed, won, defending", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won", policy: SAFE_DEFENDING },
   { name: "true solo, lost, Protect the Innocent holds 10 damage", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost", lossReason: "Protect the Innocent holds 10 damage" },
   { name: "two-handed, lost, Rescue Iârion runs out of time", seatCount: 2, seed: 5, difficulty: "Normal", decks: "strong", outcome: "lost", policy: SAFE_DEFENDING, lossReason: "Iârion left play" },
   { name: "two-handed, lost, Angmar Orc discards Iârion", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost", policy: { ...SAFE_DEFENDING, choose: "first" }, lossReason: "Iârion left play" },

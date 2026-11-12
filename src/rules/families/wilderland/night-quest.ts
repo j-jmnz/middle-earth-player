@@ -42,8 +42,8 @@ export function currentSideQuest(state: ScenarioState): string | null {
 /**
  * Progress that is left after the active locations is placed on the current side quest instead of the main quest card (emce.side-quests-in-play, mec108.side-quests-in-play): it takes what it needs to be full and the rest is discarded, never placed on any other quest card. Returns the
  * state and the progress still to place (all of it when no side quest is the current quest). A full side quest is defeated by the sweep (defeatFullSideQuests), once the effect that placed the progress is done. "No more than 3 progress tokens can be placed on the current quest each
- * round" (09023:A:1) bounds what a side quest takes as it does the main quest (`questRoom`, families/caves/progress.ts), and the progress counts toward the round's tally. A side quest that holds `progressRemovesDamage` (Protect the Innocent, 10158:A:2) takes the progress as
- * damage removed from it instead: no more than it holds, the rest is lost.
+ * round" (09023:A:1) bounds what a side quest takes as it does the main quest (`questRoom`, families/caves/progress.ts), and what it takes (not the room left) counts toward the round's tally. A side quest that holds `progressRemovesDamage` (Protect the Innocent, 10158:A:2) takes the progress as
+ * damage removed from it instead: no more than it holds, the rest is lost, and only the damage removed counts toward the tally.
  */
 export function placeOnCurrentSideQuest(state: ScenarioState, amount: number, cards: ReduceContext["cards"], steps: EngineStep[]): { state: ScenarioState; remaining: number } {
   const id = currentSideQuest(state);
@@ -54,13 +54,13 @@ export function placeOnCurrentSideQuest(state: ScenarioState, amount: number, ca
   if (flagged(state, id, "progressRemovesDamage")) {
     const removed = Math.min(room, quest.damage);
     if (removed > 0) steps.push({ kind: "damage", targetId: id, amount: -removed, cause: ruleCause("mec108.side-quests-in-play") });
-    return { state: noteQuestPlaced(removed > 0 ? updateCard(state, id, { damage: quest.damage - removed }) : state, room), remaining: 0 };
+    return { state: noteQuestPlaced(removed > 0 ? updateCard(state, id, { damage: quest.damage - removed }) : state, removed), remaining: 0 };
   }
   const points = sideQuestPoints(state, quest, cards);
   const placed = points == null ? room : Math.min(room, Math.max(0, points - quest.progress));
-  if (placed <= 0) return { state: noteQuestPlaced(state, room), remaining: 0 };
+  if (placed <= 0) return { state, remaining: 0 };
   steps.push({ kind: "progress", targetId: id, amount: placed, cause: ruleCause("emce.side-quests-in-play") });
-  return { state: noteQuestPlaced(updateCard(state, id, { progress: quest.progress + placed }), room), remaining: 0 };
+  return { state: noteQuestPlaced(updateCard(state, id, { progress: quest.progress + placed }), placed), remaining: 0 };
 }
 
 /** Whether the card is a quest card or a side quest: damage it deals is no "non-quest effect" (Dagnir's cap, 19074:A:2). */

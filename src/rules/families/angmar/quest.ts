@@ -63,10 +63,14 @@ export function questCardsAmount(state: ScenarioState, found: Exclude<Amount, nu
  * current quest that could be chosen (the second option of 09049:A:2).
  */
 export function currentQuestHolds(state: ScenarioState, condition: Condition, scope: Scope, ctx: ReduceContext): boolean | null {
-  if (condition.kind === "questLeads") return committedWillpower(state, ctx.cards) > stagingThreat(state, ctx.cards);
   if (condition.kind !== "currentQuest") return null;
   const side = currentSideQuest(state);
   if (condition.is === "side") return side != null;
   if (condition.is === "self") return side != null && side === scope.sourceId && flagged(state, side, "currentQuest");
   return choosable(state, ctx).some((id) => id !== currentQuestCard(state));
+}
+
+/** The condition `questLeads`: the total Willpower of the characters committed to the quest is greater than the total Threat in the staging area now (09021:A:1). */
+export function questLeadsHolds(state: ScenarioState, condition: Condition, ctx: ReduceContext): boolean | null {
+  return condition.kind === "questLeads" ? committedWillpower(state, ctx.cards) > stagingThreat(state, ctx.cards) : null;
 }

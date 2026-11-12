@@ -19,6 +19,7 @@ import { attachTo, moveCard, turnedUpCode } from "../../core/zones.ts";
 import { effectData } from "../encounter/moves.ts";
 import { queueFront } from "../play/refs.ts";
 import type { Focus } from "../index.ts";
+import { askTradeOrKeep } from "../trade.ts";
 
 /** The ship-objectives the players control, in the order their seats choose: each living seat in player order, a seat's ships in the order they were taken. */
 export function controlledShips(state: ScenarioState, ctx: ReduceContext): string[] {
@@ -81,8 +82,8 @@ export function tradeShipDamage(state: ScenarioState, instruction: Trade, focus:
   const ask = (current: ScenarioState, options: readonly string[], carry: Trade): ScenarioState => (effectData(current) ? askTarget(current, { instruction: carry, seat, chosen: null, cause }, options) : { ...current, failure: "Trading damage needs a choice, and no effect is asking" });
   // Deciding whether to trade.
   if (instruction.hero == null) {
-    if (focus.chosen == null) return ask(state, ["trade", "keep"], { ...instruction, ship });
-    if (focus.chosen !== "trade") return goOn(state);
+    const decided = askTradeOrKeep(state, focus, { instruction: { ...instruction, ship }, seat, cause }, "Trading damage needs a choice, and no effect is asking", goOn);
+    if (decided) return decided;
     const heroes = heroesOf(state, seat);
     if (heroes.length === 0) return goOn(state);
     if (heroes.length > 1) return ask(state, heroes, { ...instruction, ship, hero: "?" });
