@@ -24,8 +24,8 @@ const VERBS = [
   // "Add Na'asiyah and Captain Sahír to the staging area, enemy side faceup" (11037:A:1): the set-aside card with this code joins the staging area, announced as added to it (its Forced effects hear that,
   // "Captain Sahír engages the first player"), and enters play. It is not revealed (rr.staging).
   // `name` in place of `code`: the set-aside card with this title, for a card a campaign game deals as its reprint (The Thing in the Depths 12049, 110063; 12040:B:1).
-  // `remember`: the card staged is the effect's picked card afterward, for the instructions that follow ("Reveal Orc Ambush ... and add it to the staging area": a ResolveWhenRevealed after it resolves the card's When Revealed effects, 09070:A:1).
-  z.strictObject({ verb: z.literal("StageSetAside"), code: z.string().min(1).optional(), name: z.string().min(1).optional(), remember: z.literal(true).optional(), ...when }),
+  // `remember`: the card staged is the effect's picked card afterward, for the instructions that follow. `reveal`: the card is revealed (rr.reveal) as it joins the staging area, so its keywords and When Revealed effects resolve and a trigger on a reveal hears it ("Reveal Orc Ambush and Amon Forn and add them to the staging area", 09070:A:1); the effect goes on once it is resolved.
+  z.strictObject({ verb: z.literal("StageSetAside"), code: z.string().min(1).optional(), name: z.string().min(1).optional(), remember: z.literal(true).optional(), reveal: z.literal(true).optional(), ...when }),
   // "Remove Calphon and each attachment on him from the game, ignoring his 'leaves play' ability" (11182:A:3): the card in play with this title and the cards attached to it leave the game, and none of them
   // is announced as leaving play, so no "If ~ leaves play" ability triggers. The campaign pool is left alone.
   z.strictObject({ verb: z.literal("RemoveNamedFromGame"), name: z.string().min(1), ...when }),

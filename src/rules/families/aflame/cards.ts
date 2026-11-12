@@ -4,6 +4,7 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
 import { askTarget } from "../../windows/choices.ts";
+import { startReveal } from "../../windows/frames.ts";
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -89,6 +90,8 @@ export function dealtCopies(state: ScenarioState, codes: readonly string[], step
 export function stageSetAside(state: ScenarioState, instruction: Verb<"StageSetAside">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const id = instruction.code != null ? state.setAside.find((other) => state.cards[other]?.code === instruction.code) : setAsideNamed(state, instruction.name ?? "", ctx);
   if (!id) return state;
+  // "Reveal ... and add it to the staging area" (09070:A:1, rr.reveal): the reveal frame resolves the card's keywords and When Revealed effects and places it (the staging area, or engaged for an enemy that engages).
+  if (instruction.reveal) return startReveal(markPicked(state, id), focus.seat, ctx, steps, id);
   // A card set aside on its Campaign Mode only side (The Thing in the Depths, FlipSetAside) keeps that side as it joins the staging area.
   const side = state.cards[id]?.face === "B" ? "B" : null;
   const staged = moveEncounter(state, id, "staging", focus.seat, ctx, steps);

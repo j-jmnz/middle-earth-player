@@ -73,11 +73,11 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "09028:shadow:1", cardCode: "09028", lines: ["09028:A:2"], timing: "shadow", instructions: [ATTACKER_PLUS(FOR_EACH_DAMAGED_CHARACTER)] },
 
   // 09029 Sheltered Valley. While it is the active location, when it is explored 1 character is healed of all its damage. Travel: remove 1 resource token from the Mission objective (a cost: the players cannot travel here while none holds a token).
-  { id: "09029:response:1", cardCode: "09029", lines: ["09029:A:1"], timing: "response", trigger: "locationExplored", subject: "self", instructions: [{ verb: "Pick", pick: DAMAGED }, { verb: "Heal", all: true, target: "picked" }] },
+  { id: "09029:response:1", cardCode: "09029", lines: ["09029:A:1"], timing: "response", trigger: "activeExplored", subject: "self", instructions: [{ verb: "Pick", pick: DAMAGED }, { verb: "Heal", all: true, target: "picked" }] },
   { id: "09029:travel:1", cardCode: "09029", lines: ["09029:A:2"], timing: "travel", instructions: [{ verb: "Pick", pick: MISSION }, { verb: "RemoveResourceTokens", on: "picked", amount: 1 }] },
 
   // 09030 Concealed Orc-camp. While it is the active location, when it is explored 1 resource token goes on the Mission objective. Travel: the first player searches the encounter deck and discard pile for an Orc enemy and puts it into play engaged with him; the deck is shuffled.
-  { id: "09030:response:1", cardCode: "09030", lines: ["09030:A:1"], timing: "response", trigger: "locationExplored", subject: "self", instructions: [{ verb: "Pick", pick: MISSION }, { verb: "PlaceResourceTokens", amount: 1, on: "picked" }] },
+  { id: "09030:response:1", cardCode: "09030", lines: ["09030:A:1"], timing: "response", trigger: "activeExplored", subject: "self", instructions: [{ verb: "Pick", pick: MISSION }, { verb: "PlaceResourceTokens", amount: 1, on: "picked" }] },
   { id: "09030:travel:1", cardCode: "09030", lines: ["09030:A:2"], timing: "travel", instructions: [{ verb: "SearchMove", trait: "Orc", type: "enemy", to: "engagedFirstPlayer" }, { verb: "ShuffleEncounterDeck" }] },
 
   // 09031 Ice Storm. When Revealed: each player assigns X damage among characters he controls, X the number of quest cards in play, then each damaged character (any controller) is exhausted. Shadow: the defending player assigns X damage among the characters he controls.
@@ -131,7 +131,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     instructions: [EACH_PLAYER([{ verb: "Pick", pick: { ...MY_HERO, damaged: true } }, { verb: "Heal", amount: 3, target: "picked" }])],
   },
 
-  // 09056 Ruins of Arnor. In the staging area, after the When Revealed effect of a treachery card is canceled each player raises his threat by 2. Shadow: +1 Attack; if the attack destroys a character the defending player raises his threat by 2.
+  // 09056 Ruins of Arnor. In play (the staging area or the active location), after the When Revealed effect of a treachery card is canceled each player raises his threat by 2. Shadow: +1 Attack; if the attack destroys a character the defending player raises his threat by 2.
   {
     id: "09056:forced:1",
     cardCode: "09056",
@@ -139,7 +139,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     timing: "forced",
     trigger: "whenRevealedCanceled",
     subject: { type: "treachery", control: "any" },
-    condition: IN_STAGING,
+    condition: { kind: "any", conditions: [IN_STAGING, ACTIVE] },
     instructions: [{ verb: "RaiseThreat", amount: 2, who: "eachSeat" }],
   },
   { id: "09056:shadow:1", cardCode: "09056", lines: ["09056:A:2"], timing: "shadow", instructions: [ATTACKER_PLUS(1), { verb: "AfterAttack", instructions: [{ verb: "RaiseThreat", amount: 2, who: "actor", when: { kind: "x", min: 1 } }] }] },
@@ -170,14 +170,14 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     cardCode: "09069",
     lines: ["09069:B:2"],
     timing: "forced",
-    trigger: "locationExplored",
+    trigger: "activeExplored",
     instructions: [
       { verb: "AddFromPile", pile: "angmarOrcs", to: "staging", reveal: true, who: "firstPlayer" },
       { verb: "AddFromPile", pile: "angmarOrcs", to: "staging", reveal: true, who: "firstPlayer", when: { kind: "less", left: 2, right: { players: true } } },
     ],
   },
 
-  // 09070 Cornered Animals. When Revealed: the current phase ends once the effect has finished; the encounter discard pile and the Orc deck are shuffled into the encounter deck; Orc Ambush and Amon Forn are revealed and added to the staging area. Side B: each damaged character
+  // 09070 Cornered Animals. When Revealed: the current phase ends once the effect has finished; the encounter discard pile and the Orc deck are shuffled into the encounter deck; Orc Ambush and Amon Forn are revealed (keywords, When Revealed) and added to the staging area. Side B: each damaged character
   // gets -1 Willpower; at the beginning of the quest phase the first player either discards 1 resource token from Savage Counter-attack or an additional encounter card is revealed this phase (an option that cannot change the game is not offered); defeating the stage wins the game.
   {
     id: "09070:whenRevealed:1",
@@ -188,9 +188,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       { verb: "EndPhase" },
       { verb: "ShuffleEncounterDiscard" },
       { verb: "ShufflePileIntoEncounterDeck", pile: "angmarOrcs" },
-      { verb: "StageSetAside", code: ORC_AMBUSH, remember: true },
-      { verb: "ResolveWhenRevealed" },
-      { verb: "StageSetAside", code: AMON_FORN },
+      { verb: "StageSetAside", code: ORC_AMBUSH, reveal: true },
+      { verb: "StageSetAside", code: AMON_FORN, reveal: true },
     ],
   },
   { id: "09070:constant:1", cardCode: "09070", lines: ["09070:B:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "willpower", amount: -1, until: "whileSourceInPlay", holders: DAMAGED }] },
