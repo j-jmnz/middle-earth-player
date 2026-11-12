@@ -112,8 +112,8 @@ describe("The Black Gate Opens in the the-return-of-the-king campaign", () => {
     expect(log.blackGateTokens).toBe(tokens);
     expect(log.completed).toEqual([...afterUngol.completed, "the-black-gate-opens"]);
     const path = campaignPath(campaign, {}, log);
-    expect(path.map((node) => [node.id, node.status]).slice(4, 6)).toEqual([["the-black-gate-opens", "completed"], ["mount-doom", "soon"]]);
-    expect(PLAYABLE_SCENARIOS).not.toContain("mount-doom");
+    expect(path.map((node) => [node.id, node.status]).slice(4, 6)).toEqual([["the-black-gate-opens", "completed"], ["mount-doom", "next"]]);
+    expect(PLAYABLE_SCENARIOS).toContain("mount-doom");
   });
 
   it("146074:B:1 Resolution: tokens differ with the rounds survived, and Gwaihir is earned only when the first player controls him", () => {

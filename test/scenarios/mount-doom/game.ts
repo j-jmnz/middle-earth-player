@@ -1,7 +1,7 @@
 import { emptyLog, type CampaignLog } from "../../../src/campaign/log.ts";
 import type { Difficulty } from "../../../src/catalog/scenario-data.ts";
 import type { CampaignFacts, ModeCard } from "../../../src/rules/core/campaign-state.ts";
-import { legalIntents, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
+import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 
 import { loadCampaign, loadScenario } from "../../../scripts/data/load-scenarios.ts";
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
@@ -18,7 +18,7 @@ export const DOOM_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", 
 export type DoomDecks = "strong" | "weak" | "brittle";
 
 // The strong stand-ins start at a threat of 20 each and Frodo, the Ring-bearer, takes the numbers of the deck like them (his printed numbers could not quest or defend a game of auto-played turns).
-const DOOM_STATS = { strong: { ...HERO_STATS.strong, threat: 20, attack: 30, defense: 20 }, weak: HERO_STATS.weak, brittle: { ...HERO_STATS.brittle, threat: 8 } } as const satisfies Record<DoomDecks, HeroStats>;
+const DOOM_STATS = { strong: { ...HERO_STATS.strong, threat: 8, attack: 30, defense: 20 }, weak: HERO_STATS.weak, brittle: { ...HERO_STATS.brittle, threat: 8 } } as const satisfies Record<DoomDecks, HeroStats>;
 
 // The first player holds the Ring-bearer with The One Ring attached (the saga start of scenario 18, mec113.setting-up-the-game), beside three stand-in heroes; a second seat has three.
 export const doomLoadout = (seatCount: 1 | 2): LoadoutSeat[] => {
@@ -38,26 +38,64 @@ export const doomPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount
 export const doomStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard) => game.start(seatCount, seed, difficulty, { facts, log, modeCard });
 
 export type DoomPolicy = {
-  // The option a Choose window with these answers takes: the first or the last.
-  choose: "first" | "last";
+  // What the first player does with The One Ring in the Resolution (146079:B:1): destroys it (the players win the campaign) or keeps it (they lose the campaign). Every other choice takes its last option, which keeps Frodo and The One Ring in play (the discard of a questing character is a first option of Evil Vigilance).
+  ring: "destroy" | "keep";
+  // The quest: every ready character but the last (kept ready for a Fortitude test, which exhausts the heroes it commits), or all of them.
+  quest: "most" | "all";
+  // How many heroes a Fortitude test commits (the first that may): none fails the test unless X is 0.
+  fortitude: number;
 };
-export const DEFAULT_POLICY: DoomPolicy = { choose: "first" };
+// The resource tokens The Black Gate Opens leaves on its card in a golden whose earlier parts were won (146079:A:1 places as many on the campaign card).
+export const TOKENS = 6;
+export const DEFAULT_POLICY: DoomPolicy = { ring: "destroy", quest: "most", fortitude: 1 };
 
-// The auto-player's answer (test/harness/auto-player.ts), except: a choice takes the first option, or the last as the policy says. Every intent is one the reducer listed.
+// The auto-player's answer (test/harness/auto-player.ts), except: a choice takes its last option, and the Resolution's as the policy says. Every intent is one the reducer listed.
 // TODO: the scenario's own answers (where the players travel, who defends, which locations they explore) go before the auto-player's.
 export function doomIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: DoomPolicy = DEFAULT_POLICY): PlayerIntent {
-  if (state.window?.kind === "choose") return { type: "Choose", optionId: (policy.choose === "last" ? state.window.options.at(-1) : state.window.options[0]) ?? "" };
-  return nextIntent(state, ctx, DOOM_POLICY, memory, legalIntents(state, ctx));
+  if (state.window?.kind === "choose") return { type: "Choose", optionId: state.window.options.at(-1) ?? "" };
+  // The Resolution's choice (146079:B:1): the first player keeps or destroys The One Ring.
+  if (state.window?.kind === "resolution") {
+    const answers = legalIntents(state, ctx).filter((intent) => intent.type === "ChooseResolution");
+    return answers.find((intent) => intent.optionId === policy.ring) ?? answers[0] ?? nextIntent(state, ctx, DOOM_POLICY, memory, legalIntents(state, ctx));
+  }
+  const intents = legalIntents(state, ctx);
+  // A Fortitude test commits one hero, so the rest quest: the test exhausts the heroes it commits, and a quest of exhausted heroes has no Willpower.
+  if (state.window?.kind === "fortitudeCommit") return { type: "CommitFortitude", cardIds: legalTargets(state, { type: "CommitFortitude" }, ctx).slice(0, policy.fortitude) };
+  if (state.window?.kind === "travel") {
+    const wanted = legalTargets(state, { type: "Travel" }, ctx)[0];
+    return wanted ? { type: "Travel", locationId: wanted } : { type: "DeclineTravel" };
+  }
+  if (state.window?.kind === "pass" && state.mode === "questCommit") {
+    const quested = Object.values(state.cards).some((card) => card.committed && card.controller === state.activeSeat);
+    const ids = legalTargets(state, { type: "Commit" }, ctx);
+    if (!quested && ids.length > 0) return { type: "Commit", cardIds: policy.quest === "all" ? ids : ids.slice(0, Math.max(1, ids.length - 1)) };
+  }
+  return nextIntent(state, ctx, DOOM_POLICY, memory, intents);
 }
 
 export type DoomGame = PlayedGame;
 
 // The goldens (src/campaign/scenarios/mount-doom/golden.test.ts).
 // `after`: the log of a campaign whose earlier parts were won. `upgraded`: the Upgraded sides. `mode`: the Hard or Expert Mode card.
-export type DoomGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: DoomDecks; outcome: "won" | "lost"; policy?: Partial<DoomPolicy>; after?: boolean; upgraded?: boolean; mode?: ModeCard; lossReason?: string };
+export type DoomGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: DoomDecks; outcome: "won" | "lost"; policy?: Partial<DoomPolicy>; after?: boolean; upgraded?: boolean; mode?: ModeCard; lossReason?: string; tokens?: number };
 
-// TODO: the games to pin (at most 3000 intents in all, .claude/rules/code-standards.md, Test cost), a few wins (true solo and two-handed, Normal and Easy, a Mode card, after the earlier parts) and a few losses (each way the scenario can be lost), each on a fixed seed.
-export const DOOM_GOLDENS: readonly DoomGolden[] = [];
+// The goldens are a few wins and a loss for each way the scenario is lost: the players destroy The One Ring (they win the campaign) or keep it (they lose the campaign), solo and two-handed, with and without the earlier parts' tokens on the campaign
+// card; the last stage's Fortitude test failed (the Ring-bearer claims The One Ring), the threat at 99 under Dire, the Ring-bearer destroyed (The One Ring leaves play) and the campaign card's timer at 0. 4B's test is the game's last, so the wins pass it.
+export const DOOM_GOLDENS: readonly DoomGolden[] = [
+  { name: "true solo, Normal, after the earlier parts, The One Ring destroyed", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won", after: true, policy: { ring: "destroy" } },
+  { name: "true solo, Easy, after the earlier parts, The One Ring kept", seatCount: 1, seed: 3, difficulty: "Easy", decks: "strong", outcome: "won", after: true, policy: { ring: "keep" } },
+  { name: "true solo, Normal, with no earlier log, The One Ring destroyed", seatCount: 1, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won", policy: { ring: "destroy" } },
+  { name: "two-handed, Normal, after the earlier parts, The One Ring destroyed", seatCount: 2, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won", after: true, policy: { ring: "destroy" } },
+  { name: "two-handed, Easy, after the earlier parts, The One Ring kept", seatCount: 2, seed: 2, difficulty: "Easy", decks: "strong", outcome: "won", after: true, policy: { ring: "keep" } },
+  { name: "true solo, lost, the last Fortitude test fails", seatCount: 1, seed: 2, difficulty: "Normal", decks: "strong", outcome: "lost", after: true, lossReason: "The Ring-bearer claimed The One Ring" },
+  { name: "two-handed, lost, the last Fortitude test fails", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost", after: true, lossReason: "The Ring-bearer claimed The One Ring" },
+  { name: "true solo, lost, the threat reaches 99", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", after: true, lossReason: "No seats remain" },
+  { name: "two-handed, lost, the threat reaches 99", seatCount: 2, seed: 3, difficulty: "Normal", decks: "weak", outcome: "lost", after: true, lossReason: "No seats remain" },
+  { name: "true solo, lost, the Ring-bearer is destroyed", seatCount: 1, seed: 2, difficulty: "Normal", decks: "brittle", outcome: "lost", after: true, lossReason: "The One Ring left play" },
+  { name: "two-handed, lost, the Ring-bearer is destroyed", seatCount: 2, seed: 4, difficulty: "Normal", decks: "brittle", outcome: "lost", after: true, lossReason: "The One Ring left play" },
+  { name: "true solo, lost, the campaign card's last token is removed", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost", after: true, tokens: 2, lossReason: "No resource token is left on Mount Doom" },
+  { name: "two-handed, lost, the campaign card's last token is removed", seatCount: 2, seed: 2, difficulty: "Normal", decks: "strong", outcome: "lost", after: true, tokens: 2, lossReason: "No resource token is left on Mount Doom" },
+];
 
 const game = campaignGame<DoomDecks, DoomPolicy>({
   campaign,
@@ -74,4 +112,7 @@ const game = campaignGame<DoomDecks, DoomPolicy>({
   earlier: { xp: [0, 0, 0, 0, 0], pool: [], marks: {} },
 });
 
-export const playGolden = (golden: DoomGolden, ctx: ReduceContext): DoomGame => game.playGolden(golden, ctx);
+// The campaign log's count of resource tokens on The Black Gate reaches the game through the notes of its facts (src/campaign/log-return-of-the-king.ts); a game with no earlier parts has none recorded.
+export const doomFacts = (tokens: number | null): Omit<CampaignFacts, "modeCard"> => ({ prisoner: null, usedOnce: [], counters: {}, notes: { blackGate: {}, corsairFleet: null, blackGateTokens: tokens } });
+export const playGolden = (golden: DoomGolden, ctx: ReduceContext): DoomGame =>
+  game.play(golden.seatCount, golden.seed, golden.difficulty, ctx, { facts: doomFacts(golden.after ? (golden.tokens ?? TOKENS) : null), ...(golden.after ? { log: game.after(golden.seatCount) } : {}), ...(golden.policy ? { policy: golden.policy } : {}), ...(golden.mode ? { mode: golden.mode } : {}) });

@@ -10,13 +10,13 @@ const DISCARDED_FOR_THE_TEST = { type: "card", control: "any", fortitudeDiscarde
 const ATTACHMENTS_ON_HOST = { type: "card", control: "any", attachedTo: "host", nonObjective: true } as const;
 
 export const ENEMY_RECORDS: readonly (Effect | Copy)[] = [
-  // 146049 Gollum (Surge is a keyword). Immune to non-Fellowship player card effects. He engages the first player, as he comes into play and when the first player token passes (the Forced of 144075 on the token pass).
+  // 146049 Gollum (Surge is a keyword). Immune to non-Fellowship player card effects. He engages the first player, as he comes into play, when the first player token passes (the Forced of 144075 on the token pass) and when he is returned to the staging area.
   // Forced: after he is discarded during a Fortitude test, once the test's cards are all discarded he comes into play engaged with the first player, who then chooses an encounter card discarded for the test (still in the discard pile): its icons are not counted.
   { id: "146049:constant:1", cardCode: GOLLUM, lines: ["146049:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "immuneToNonFellowship", amount: 1, until: "whileSourceInPlay", target: "self" }] },
-  copyLine("12158:A:1", "146049:A:2"),
+  { id: "146049:forced:1", cardCode: GOLLUM, lines: ["146049:A:2"], timing: "forced", trigger: "addedToStaging", subject: "self", instructions: [{ verb: "EngageFirstPlayer" }] },
   { id: "146049:triggered:1", cardCode: GOLLUM, lines: ["146049:A:2"], timing: "triggered", trigger: "firstPlayerTokenPassed", instructions: [{ verb: "FollowFirstPlayer" }] },
   {
-    id: "146049:forced:2",
+    id: "146049:forced:3",
     cardCode: GOLLUM,
     lines: ["146049:A:3"],
     timing: "forced",
@@ -28,6 +28,8 @@ export const ENEMY_RECORDS: readonly (Effect | Copy)[] = [
       { verb: "IgnoreFortitudeEyes", ...WHEN_CAN_PICK(DISCARDED_FOR_THE_TEST) },
     ],
   },
+  // The unprefixed line is a passive: he follows the first player token and engages again at once when an effect returns him to the staging area (the trigger returnedToStaging, which a game reads only when a record names it).
+  { id: "146049:forced:2", cardCode: GOLLUM, lines: ["146049:A:2"], timing: "forced", trigger: "returnedToStaging", subject: "self", instructions: [{ verb: "EngageFirstPlayer" }] },
 
   // 146050 Ringwraith of Sauron (A:1 is a template). While it is in the staging area it gains the Forced "after a player fails a Fortitude test, it engages that player and makes an immediate attack": the test's failure is heard before the card that made the test goes on.
   {
