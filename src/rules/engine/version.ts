@@ -17,11 +17,11 @@ export const ENGINE_CHANGES_SINCE = 26;
 
 export const ENGINE_CHANGES: readonly EngineChange[] = [
   { version: 27, scenarios: ["the-fate-of-wilderland"], note: "The Goblins' Assault hears the players' failed quest once, as the card prints it, with no once-a-round limit." },
-  { version: 27, scenarios: ["a-storm-on-cobas-haven", "the-city-of-corsairs"], note: "The first player, not the player who revealed the card, chooses the player, the hero or Gandalf for the Send for Help events." },
-  { version: 27, scenarios: ["a-storm-on-cobas-haven", "the-city-of-corsairs"], note: "A card you upgraded in the campaign log is turned up on its Upgraded side when it comes out of a facedown deck, for example The Shattered Monument and Gavin." },
+  { version: 27, scenarios: ["a-storm-on-cobas-haven", "the-city-of-corsairs"], note: "The first player, not the player who revealed the card, chooses the player who searches for each Send for Help event, and who controls Gandalf." },
+  { version: 27, scenarios: ["a-storm-on-cobas-haven", "the-city-of-corsairs"], note: "A card you upgraded in the campaign log is turned up on its Upgraded side when it comes out of a facedown deck, for example The Shattered Monument." },
   { version: 27, scenarios: ["the-kings-quest", "mount-gundabad"], note: "A Deep location that its own Response sends to the victory display, like Forked Passage, is still replaced by the top card of the Caves deck." },
-  { version: 27, scenarios: ["the-drowned-ruins"], note: "Command (Spirit) can put the campaign's own Spyglass from outside the game into play, on its Upgraded side when its boxes are marked, while no Spyglass is in play." },
-  { version: 27, scenarios: ["the-passing-of-the-grey-company", "the-siege-of-gondor", "the-black-gate-opens"], note: "Raising each player's threat to search for Anduril happens after the starting threat level is set, so threat cannot be reduced below the level without that raise." },
+  { version: 27, scenarios: ["the-drowned-ruins", "a-storm-on-cobas-haven", "the-city-of-corsairs"], note: "Command (Spirit) can put the campaign's own Spyglass from outside the game into play, on its Upgraded side when its boxes are marked, while no Spyglass is in play." },
+  { version: 27, scenarios: ["the-passing-of-the-grey-company", "the-siege-of-gondor", "the-black-gate-opens"], note: "Raising each player's threat to search for Andúril happens after the starting threat level is set, so the threat floor no longer includes that raise." },
 ];
 
 export const ENGINE_VERSION = 27;

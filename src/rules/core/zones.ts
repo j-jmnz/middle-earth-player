@@ -414,7 +414,12 @@ export function spawn(
 
 /** The face a card shows when it is turned faceup from a deck, the encounter discard pile or the set-aside cards: its Upgraded side, side B, in a campaign that has upgraded it (dcce.scalable-upgradable), else faceup. */
 export function turnedUp(state: Pick<ScenarioState, "campaignFacts" | "cards">, id: string): CardFace {
-  return dealtFace(state, state.cards[id]?.code ?? "", "up");
+  return turnedUpCode(state, state.cards[id]?.code ?? "");
+}
+
+/** `turnedUp` for a card named by its code. */
+export function turnedUpCode(state: Pick<ScenarioState, "campaignFacts">, code: string): CardFace {
+  return dealtFace(state, code, "up");
 }
 
 export { inPlay } from "./state.ts";

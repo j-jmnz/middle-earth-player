@@ -34,21 +34,31 @@ export function pushDeep(state: ScenarioState, locationId: string, ctx: ReduceCo
  */
 export function resolveDeep(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   if (ignoresKeyword(state, ctx, "deep")) return state;
-  return replaceFromCaves(state, focus, ctx, steps, true);
+  const id = focus.sourceId;
+  if (id && claimedByVictoryDisplay(state, id)) return replaceWithTop(state, focus, ctx, steps, false);
+  return replaceFromCaves(state, focus, ctx, steps);
 }
 
-/** The source active location is discarded and the top card of the Caves deck replaces it (a Caves card that is not a location goes to the staging area). Nothing happens with the Caves deck empty or the source no longer an active location (`afterResponse`, the Deep keyword:
- * a source its own Response added to the victory display, with no location active, is replaced all the same and has nothing to discard); a keyword that is ignored is the caller's. */
-export function replaceFromCaves(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[], afterResponse = false): ScenarioState {
+/** The source active location is discarded and the top card of the Caves deck replaces it (a Caves card that is not a location goes to the staging area). Nothing happens with the Caves deck empty or the source no longer an active location. */
+export function replaceFromCaves(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const id = focus.sourceId;
+  if (!id || (state.activeLocation !== id && state.secondActiveLocation !== id)) return state;
+  return replaceWithTop(state, focus, ctx, steps, true);
+}
+
+/** The Deep keyword's own case: a source its own Response added to the victory display, with no location active, has nothing to discard and is replaced all the same. */
+function claimedByVictoryDisplay(state: ScenarioState, id: string): boolean {
+  return state.cards[id]?.zone === "victory" && state.activeLocation == null && state.secondActiveLocation !== id;
+}
+
+// The top card of the Caves deck replaces the source (`discardSource`: the source is discarded first). Nothing happens with the Caves deck empty.
+function replaceWithTop(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[], discardSource: boolean): ScenarioState {
   const id = focus.sourceId;
   const top = topOf(state, "cavesDeck");
   if (!id || top === undefined) return state;
-  const active = state.activeLocation === id || state.secondActiveLocation === id;
-  const claimed = afterResponse && !active && state.cards[id]?.zone === "victory" && state.activeLocation == null;
-  if (!active && !claimed) return state;
   const replacement = state.cards[top];
   if (!replacement) return state;
-  const discarded = claimed ? state : moveEncounter(state, id, "discard", focus.seat, ctx, steps);
+  const discarded = discardSource ? moveEncounter(state, id, "discard", focus.seat, ctx, steps) : state;
   if (printedOf(ctx.cards, replacement.code).type === "location") return moveEncounter(discarded, top, "activeLocation", focus.seat, ctx, steps);
   return resolveGuarded(moveEncounter(discarded, top, "staging", focus.seat, ctx, steps), top, focus, ctx, steps);
 }

@@ -35,7 +35,7 @@ const CHEAP_ALLY = { type: "ally", control: "you", from: "discard", maxCost: { l
 // 11202:A:3 and 11203:A:5: every copy of the player's own cards the options name.
 const SPYGLASS = "11180";
 const SPYGLASS_FROM = (from: "hand" | "deck" | "discard"): PickSpec => ({ type: "card", control: "you", from, names: ["Spyglass"] });
-// In campaign mode the Spyglass is the campaign's own card, which sits outside the game until a setup or this option puts it into play (dcce.campaign-mode, rr.play-and-put-into-play: "put into play" works from any out-of-play area):
+// In campaign mode the Spyglass is the campaign's own card, which sits outside the game until a setup or this option puts it into play (dcce.campaign-mode; agent recommendation, no ruling found: "put into play" works from any out-of-play area, and a copy already removed from the game is not offered):
 // the option offers the copy from outside the game while none is in play, on its Upgraded side when the Campaign Log marks its boxes (the collection card is dealt as an upgraded card is). A standalone game has no such copy.
 const SPYGLASS_OUTSIDE = { kind: "campaignCopyOutside", code: SPYGLASS } as const;
 const BLESSINGS: PickSpec = { type: "attachment", control: "any", names: [BLESSING] };

@@ -12,7 +12,7 @@ import { goldenSuite } from "../../../../test/harness/golden-suite.ts";
 // Checklist and buildStart, the stage and Caves records, the Resolution's pool, log line and treasure effects and the reducer, so a change that moves a game shows up as a diff here. Update the snapshot only when the change is meant.
 //
 // Underground Lake prints X quest points (the engine explores it since engine 24, cards.test.ts); the pinned wins' policy keeps it in the Caves deck (the stage 2 look sends it to the bottom) or,
-// when Forked Passage's Response leaves the Deep keyword to bring it up as the active location, plays on with it or explores it into the victory display (engine 27); a test below says which.
+// when Forked Passage's Response leaves the Deep keyword to bring it up as the active location, plays on with it or explores it into the victory display (engine 27); the last test pins which each win does.
 const treasures: readonly string[] = TREASURES;
 const treacheries = (state: { cards: Record<string, { code: string }> }, cards: ReadonlyMap<string, { type: string }>) => Object.values(state.cards).filter((card) => cards.get(card.code)?.type === "treachery").length;
 
@@ -107,10 +107,22 @@ describe("The King's Quest golden", () => {
         }
       });
 
-      it("ends with Underground Lake in the Caves deck (the stage 2 look sends it to the bottom), or brought up by Forked Passage's Deep as the active location or explored into the victory display", () => {
-        for (const golden of KINGSQUEST_GOLDENS.filter((item) => item.outcome === "won")) {
+      it("ends with Underground Lake where the pinned game leaves it: in the Caves deck, brought up by Forked Passage's Deep as the active location, or explored into the victory display", () => {
+        const expected: Readonly<Record<string, string>> = {
+          "true solo, won, after the earlier parts, Isolde joins the pool, The Threat to Wilderland, a treasure discovered": "victory",
+          "true solo, won, after the earlier parts, Dagnir's Spawn, a treasure discovered": "victory",
+          "true solo, won from a blank log, a treasure discovered": "cavesDeck",
+          "true solo, Easy, won, Turayn's oath, Isolde's line, Dagnir's Spawn, no treasure": "activeLocation",
+          "true solo, Easy, won, Turayn's oath, Isolde joins the pool, a treasure discovered": "cavesDeck",
+          "two-handed, won, after the earlier parts, a treasure discovered": "cavesDeck",
+          "two-handed, won, after the earlier parts, Dagnir's Spawn, no treasure": "victory",
+          "two-handed, Easy, won, Turayn's oath, Isolde's line, Dagnir's Spawn, a treasure discovered": "cavesDeck",
+        };
+        const won = KINGSQUEST_GOLDENS.filter((item) => item.outcome === "won");
+        expect(won.map((golden) => golden.name).sort()).toEqual(Object.keys(expected).sort());
+        for (const golden of won) {
           const lake = Object.values(game(golden).state.cards).find((card) => card.code === CODES.undergroundLake);
-          expect(["cavesDeck", "activeLocation", "victory"], golden.name).toContain(lake?.zone);
+          expect(lake?.zone, golden.name).toBe(expected[golden.name]);
         }
       });
     },

@@ -6,7 +6,6 @@ import { askTarget } from "../../windows/choices.ts";
 import { frameScope } from "../../interpret/amounts.ts";
 import { placeProgress } from "../../interpret/effect-verbs.ts";
 import { progressRoom } from "../south/locations.ts";
-import { dealtFace } from "../dreamchaser/facts.ts";
 import { raiseThreat } from "../../core/keywords.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { queueFront } from "../play/refs.ts";
@@ -20,7 +19,7 @@ import { seatThreat } from "../play/hooks.ts";
 import { shuffleIds } from "../../core/seed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { inPlay, livingSeats, updateCard, withSeat } from "../../core/state.ts";
-import { attachTo, cardsUnder, moveCard } from "../../core/zones.ts";
+import { attachTo, cardsUnder, moveCard, turnedUp, turnedUpCode } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 import { effectData } from "../encounter/moves.ts";
 import { templeCells } from "./map.ts";
@@ -41,7 +40,7 @@ export function attachGuarded(state: ScenarioState, instruction: Verb<"AttachGua
   const host = Object.values(state.cards).find((card) => inPlay(card.zone) && printedOf(ctx.cards, card.code).name === instruction.to);
   if (!id || !host) return state;
   // A card the campaign log upgraded is dealt on its Upgraded side (dcce.scalable-upgradable).
-  const placed = updateCard(moveCard(state, id, { zone: "attached" }), id, { face: dealtFace(state, state.cards[id]?.code ?? "", "up"), controller: null, claimed: true });
+  const placed = updateCard(moveCard(state, id, { zone: "attached" }), id, { face: turnedUp(state, id), controller: null, claimed: true });
   return attachTo(placed, id, host.id);
 }
 
@@ -137,7 +136,7 @@ export function raiseThreatToAttach(state: ScenarioState, instruction: Verb<"Rai
     }
     const host = state.cards[focus.chosen];
     if (!host) return state;
-    const placed = updateCard(moveCard(state, id, { zone: "play", seat: host.controller ?? seat }), id, { face: dealtFace(state, instruction.code, "up") });
+    const placed = updateCard(moveCard(state, id, { zone: "play", seat: host.controller ?? seat }), id, { face: turnedUpCode(state, instruction.code) });
     return queueEvent(attachTo(placed, id, host.id), { trigger: "attached", seat: host.controller ?? seat, subject: id, other: host.id });
   }
   const next = seats[seats.indexOf(seat) + 1];

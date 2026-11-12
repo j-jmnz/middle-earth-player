@@ -1,6 +1,7 @@
 import type { Effect, Instruction, PickSpec } from "../../../catalog/boundary.ts";
 
 import { copyLines, withCopies } from "../reprint.ts";
+import { FIRST_PLAYER_CHOOSES } from "./DCCE.ts";
 
 // Records for the cards A Storm on Cobas Haven's campaign card (11209) sets aside or puts into play: Gavin (11210) and the four Send for Help events (11211 to 11214), read from the scan ledger
 // (data/printed/dream-chaser.json). Rules: dcce.encounter-cards, dcce.campaign-setup-a-storm-on-cobas-haven, rr.search, rr.play-and-put-into-play (data/rules/entries.json). Gavin's When Revealed is in DCCE.ts.
@@ -14,8 +15,7 @@ const TOP_TEN: PickSpec = { type: "card", control: "you", from: "deck", top: 10 
 // 11211 Send for Help (Leadership). When Revealed: the first player chooses a player (rr.first-player: an encounter effect that targets a single player, so the first player selects), who searches the top 10 cards of their deck for a card and draws it or plays it at no cost (an event, an ally or an attachment;
 // the cards the player cannot play are not offered to the second), then shuffles that deck. Send for Help leaves the game.
 const SEARCH_AND_DRAW_OR_PLAY: Effect["instructions"] = [
-  { verb: "ActAs", who: "firstPlayer" },
-  { verb: "Pick", pick: { type: "player", control: "any" } },
+  FIRST_PLAYER_CHOOSES,
   { verb: "ActAs", who: "pickedPlayer" },
   {
     verb: "Choose",
