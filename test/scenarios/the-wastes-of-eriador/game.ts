@@ -27,7 +27,8 @@ export const eriadorLoadout = fillerLoadout;
 export const eriadorWorld = (decks: EriadorDecks = "strong") => game.world(decks);
 export const afterDike = (seatCount: 1 | 2) => game.after(seatCount);
 export const eriadorPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount)) => game.plan(seatCount, log);
-export const eriadorStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard) => game.start(seatCount, seed, difficulty, { facts, log, modeCard });
+// `choices`: the Campaign Setup Checklist's answers; `standalone`: the scenario alone, with no campaign card.
+export const eriadorStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, extra: { choices?: readonly string[]; standalone?: boolean } = {}) => game.start(seatCount, seed, difficulty, { facts, log, modeCard, ...extra });
 
 export type EriadorPolicy = {
   // The option a Choose window takes: the first, the last, or the first of SAFE_CHOICES that is offered. (A Choose that asks for a side quest to be the current quest reads its last option as the side quest.)
@@ -45,7 +46,7 @@ export const DEFAULT_POLICY: EriadorPolicy = { choose: "safe", engage: false, de
 
 // The auto-player's answer (test/harness/auto-player.ts), except: a choice is answered as the policy says; the rest is the Deadmen's Dike policy's (the players engage the Wargs of the staging area, the first ready character of each seat attacks, a defender is a hero), with Pack Leader attacked before any other Warg.
 // Every intent is one the reducer listed.
-export function eriadorIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: EriadorPolicy = DEFAULT_POLICY): PlayerIntent {
+export function eriadorIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: EriadorPolicy = DEFAULT_POLICY, options: PolicyOptions = ERIADOR_POLICY): PlayerIntent {
   if (state.window?.kind === "choose") {
     const offered = state.window.options;
     const safe = SAFE_CHOICES.find((id) => offered.includes(id));
@@ -63,7 +64,7 @@ export function eriadorIntent(state: ScenarioState, ctx: ReduceContext, memory: 
   }
   // The Time objective: no progress is placed at Night (one hero still commits: the quest needs a character), and Pack Leader exhausts a ready character for each Warg engaged with the player, so the heroes stay ready at Night to attack him (progress from the Day's quest is still on the stage then).
   const night = Object.values(state.cards).some((card) => card.code === NIGHTFALL && card.zone === "staging");
-  return dikeIntent(state, ctx, memory, { choose: "first", engage: policy.engage, defend: policy.defend, quest: night ? "one" : policy.quest }, ERIADOR_POLICY);
+  return dikeIntent(state, ctx, memory, { choose: "first", engage: policy.engage, defend: policy.defend, quest: night ? "one" : policy.quest }, options);
 }
 
 export type EriadorGame = PlayedGame;
