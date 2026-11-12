@@ -4,10 +4,14 @@
 // data/rules/entries.json).
 import { z } from "zod";
 
+import type { Instruction } from "../boundary.ts";
 import type { CatalogFamily } from "../family-manifest.ts";
 import { positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { verbFlags } from "../verb-flags.ts";
+
+/** "Each player must exhaust a character he controls to travel here" (12044:A:1, 146018:A:2): the cost of a Travel line, which the players cannot pay without a ready character each (rr.travel). Shared by the card that grants it and by the records that print it. */
+export const EXHAUST_COST: Instruction = { verb: "ForEachPlayer", order: "firstFirst", instructions: [{ verb: "Pick", pick: { type: "character", control: "you", state: "ready" } }, { verb: "Exhaust", target: { kind: "picked" } }] };
 
 const VERBS = [
   // "Immediately attach that enemy facedown to the location in the staging area specified in parentheses" (dcce.grapple): the source enemy (or the last picked card) with the Grapple keyword

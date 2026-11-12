@@ -156,7 +156,7 @@ const game = campaignGame<UngolDecks, UngolPolicy>({
   campaign,
   scenario: ungol,
   stats: UNGOL_STATS,
-  // TODO: the cards a game loads besides the scenario's piles, its campaign card's and the campaign's game codes.
+  // The cards a game loads besides the scenario's piles, its campaign card's and the campaign's game codes.
   codes: [...ungol.cards.map((card) => card.code), RING_BEARER, "144052", "146065", "146071", ...ITEM_BOONS, "145014", "145015", "145016", "145062", "143020", "143021", "145001", "142014", "145013"],
   loadout: ungolLoadout,
   intent: ungolIntent,

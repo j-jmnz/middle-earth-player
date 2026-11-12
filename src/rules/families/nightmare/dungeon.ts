@@ -35,7 +35,7 @@ export function takeMorePrisoners(state: ScenarioState, ctx: ReduceContext): Sce
     const rolled = shuffleIds(free, next.seed, next.seedCursor);
     const chosen = rolled.ids[0];
     if (!chosen) return next;
-    next = captureHero({ ...next, seedCursor: rolled.cursor }, chosen, null, true, campaignTurnsDown(next));
+    next = captureHero({ ...next, seedCursor: rolled.cursor }, chosen, null, { prisoner: true, attachmentsDown: campaignTurnsDown(next) });
   }
   return next;
 }
@@ -49,7 +49,7 @@ export function takeHeroPrisoner(state: ScenarioState, card: CardRef, focus: Foc
   let next = state;
   let captured = 0;
   if (id && hero && (data?.dealt ?? 0) > 0 && hero.zone === "heroes" && printedOf(ctx.cards, hero.code).type === "hero") {
-    next = updateCard(captureHero(state, id, null, true, campaignTurnsDown(state)), id, { damage: hero.damage });
+    next = updateCard(captureHero(state, id, null, { prisoner: true, attachmentsDown: campaignTurnsDown(state) }), id, { damage: hero.damage });
     captured = 1;
   }
   const after = effectData(next);

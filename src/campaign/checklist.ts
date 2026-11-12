@@ -10,6 +10,7 @@ import { fallenWithoutAragorn, freedBy, moveToGranted, sagaOf, sagaSeat } from "
 import { burdenLeftOut, chooseCopyOrResources, removePoolCards, shuffleIntoEachDeck, type BurdenRemoval } from "./checklist-two-towers.ts";
 import { logConditionHolds, poolEncounterCopies, removeFromDeck, searchableCaves, searchableDeck } from "./wilderland.ts";
 import { xpRowOf } from "./xp.ts";
+import { setAsideBoonWords } from "./return-of-the-king-words.ts";
 
 // The Campaign Setup Checklist as numbered steps. Each step names the rule it follows and says what it did, so the
 // briefing screen (phase 10) and a test can show the same eight lines. The answers to the campaign card's own Setup
@@ -148,7 +149,7 @@ function setAsideBoon(table: Table, instruction: Extract<Instruction, { verb: "S
     const pooled = pool.filter((card) => card.attachedTo == null && card.back === "player" && !fresh.has(card) && !table.aside.has(card) && eligible(card.code));
     const options = [...new Set(pooled.map((card) => card.code))];
     if (options.length === 0) continue;
-    const answer = takeAnswer(table, options, index, `Choose an ${instruction.trait} boon from the pool to set aside. Shagrat guards it at stage 3, and it is lost if he is in play at the end.`);
+    const answer = takeAnswer(table, options, index, setAsideBoonWords(instruction.trait));
     if (answer == null) return;
     const taken = pooled.find((card) => card.code === answer && poolSeat(card, seats.length) === index) ?? pooled.find((card) => card.code === answer);
     if (taken) table.aside.add(taken);

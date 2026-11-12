@@ -3,6 +3,11 @@
 import type { CampaignEnd, RecordedCount } from "../catalog/campaign-record.ts";
 import type { ResolutionLog } from "../rules/core/campaign-state.ts";
 
+/** The sentence over the Campaign Setup's boon choice (146069:A:1): Shagrat guards the boon at stage 3, and it is lost if he is in play when the players win. */
+export function setAsideBoonWords(trait: string): string {
+  return `Choose ${/^[aeiou]/i.test(trait) ? "an" : "a"} ${trait} boon from the pool to set aside. Shagrat guards it at stage 3, and it is lost if he is in play when the players win.`;
+}
+
 /** One count as a phrase: "1 resource on The Corsair Fleet", "6 resource tokens on The Black Gate". */
 export function recordedWords(which: RecordedCount, count: number): string {
   const [one, many, place] = which === "corsairFleet" ? ["resource", "resources", "The Corsair Fleet"] : ["resource token", "resource tokens", "The Black Gate"];

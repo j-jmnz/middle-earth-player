@@ -41,7 +41,7 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
   if (card.code === ORC_GUARD_CODE) return "The facedown card under it returns to its owner's discard pile when it leaves play.";
   if (card.prisoner === true && card.zone === "captive" && card.host == null) return prisonerWords(name(cardId));
   // The Ring-bearer under Topmost Chamber, the boons on Shagrat and Last of the Company are told before the held-hero words of Lost in Mirkwood, which would call the Chamber an enemy that holds a hero facedown.
-  const ungol = ungolDetail(game, ctx, card, name);
+  const ungol = ungolDetail(game, card, name);
   if (ungol) return ungol;
   const captive = captiveDetail(game, ctx, card, name);
   if (captive) return captive;

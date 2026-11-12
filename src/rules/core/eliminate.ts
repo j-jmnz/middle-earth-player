@@ -2,6 +2,9 @@
 import { threatSaved } from "../families/quest/threat.ts";
 import { GOLLUM, SMEAGOL, isGollum } from "../families/gollum/index.ts";
 import { discardArea } from "../families/breaking/areas.ts";
+import type { ReduceContext } from "../interpret/interpret.ts";
+import { queueEvent } from "../windows/queue.ts";
+import { gameReads } from "./game-reads.ts";
 import type { EngineStep } from "./intents.ts";
 import { fromEncounterDeck, printedOf, type PrintedCard } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
@@ -16,8 +19,8 @@ export function markLoss(state: ScenarioState, reason: string): ScenarioState {
 // An eliminated seat leaves the game (rr.player-elimination): its hand, its deck and every card it controls go to their
 // owners' discard piles, and the enemies engaged with it return to the staging area with their damage. An attack on
 // that seat ends, and a Peril lock it held is released. If it held the first player token, the token passes clockwise at once (rr.first-player,
-// faq.first-player-elimination). Nothing is cleared once the game is lost.
-export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>): ScenarioState {
+// faq.first-player-elimination). Nothing is cleared once the game is lost. With `ctx`, an enemy that returns to the staging area queues "returnedToStaging" in a game whose records name it (146017:A:1).
+export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>, ctx?: ReduceContext): ScenarioState {
   if (state.lost) return state;
   let next = state;
   // Gollum is engaged with the first player and Sméagol is controlled by them (144075:A:1, 144076:A:1): when that seat leaves they pass to the new first player, keeping their exhaustion and damage (agent recommendation, docs/brief.md, The Two Towers).
@@ -37,6 +40,7 @@ export function clearEliminated(state: ScenarioState, cards: ReadonlyMap<string,
       }
       next = moveCard(next, enemyId, { zone: "staging" });
       next = updateCard(next, enemyId, { controller: null });
+      if (ctx && gameReads(next, ctx, '"trigger":"returnedToStaging"')) next = queueEvent(next, { trigger: "returnedToStaging", seat: index, cardId: enemyId });
     }
     if (smeagol && heir != null) next = moveCard(next, smeagol.id, { zone: "play", seat: heir });
     for (const card of controlled) {

@@ -45,7 +45,7 @@ describe("The Tower of Cirith Ungol golden", () => {
         expect(hostOf(state, "146065"), golden.name).toBe(carrier);
         expect(hostOf(state, "144052"), golden.name).toBe(carrier);
         // Each seat set aside the first Item boon of the pool, out of play; the first option answers the Setup's choice.
-        const aside = state.setAside.map((id) => state.cards[id]?.code).filter((code) => code?.startsWith("1420") || code === "142015");
+        const aside = state.setAside.map((id) => state.cards[id]?.code).filter((code) => code?.startsWith("1420"));
         expect(aside.sort(), golden.name).toEqual(ASIDE(golden).sort());
       },
     },
@@ -105,7 +105,8 @@ describe("The Tower of Cirith Ungol golden", () => {
           const shagrat = cardsOf(state, "146020")[0]!;
           for (const code of ASIDE(golden)) {
             const boon = cardsOf(state, code)[0]!;
-            if (shagrat.zone === "victory") expect(["hand", "setAside"], `${golden.name} ${code}`).toContain(boon.zone);
+            // Defeated before stage 3A, Shagrat guarded nothing: the boons stay set aside. Defeated at stage 3A or later they come home to hand.
+            if (shagrat.zone === "victory") expect(boon.zone, `${golden.name} ${code}`).toBe(golden.name.includes("before stage 3A") ? "setAside" : "hand");
             else expect([boon.zone, hostOf(state, code)], `${golden.name} ${code}`).toEqual(["attached", "146020"]);
           }
         }

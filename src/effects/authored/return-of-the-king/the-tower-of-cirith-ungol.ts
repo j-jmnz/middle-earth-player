@@ -1,4 +1,5 @@
 import type { Effect, PickSpec } from "../../../catalog/boundary.ts";
+import { EXHAUST_COST } from "../../../catalog/families/grapple.ts";
 
 import { AUTHORED_EFFECTS as SIEGE } from "./the-siege-of-gondor.ts";
 import { AUTHORED_EFFECTS as PELENNOR } from "./the-battle-of-the-pelennor-fields.ts";
@@ -19,7 +20,6 @@ import { EACH_PLAYER } from "./pelennor/shared.ts";
 // rr.travel, rr.active-location, rr.staging, rr.engaged, rr.damage, rr.attachment-cards, faq.lasting-effects, faq.additional-attacks, faq.triggering-forced-effects, faq.last-encounter-card, faq.progress-without-advancing (data/rules/entries.json).
 const RING_READY: Cond = { kind: "exhausted", code: ONE_RING, is: false };
 const MY_CHARACTER: PickSpec = { type: "character", control: "you" };
-const READY_CHARACTER: PickSpec = { type: "character", control: "you", state: "ready" };
 const QUESTING_CHARACTER: PickSpec = { type: "character", control: "you", committed: true };
 const ANY_ENEMY: PickSpec = { type: "enemy", control: "any", staging: true };
 
@@ -115,7 +115,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       condition: { kind: "sourceIn", zone: "activeLocation" },
       instructions: [{ verb: "ModifyStat", stat: "engagementCost", amount: 10, until: "whileSourceInPlay", holders: { type: "enemy", control: "any", stagingOnly: true } }],
     },
-    { id: "146018:travel:1", cardCode: "146018", lines: ["146018:A:2"], timing: "travel", instructions: [EACH_PLAYER([{ verb: "Pick", pick: READY_CHARACTER }, { verb: "Exhaust", target: { kind: "picked" } }])] },
+    { id: "146018:travel:1", cardCode: "146018", lines: ["146018:A:2"], timing: "travel", instructions: [EXHAUST_COST] },
 
     // 146019 Torch-lit Hall. After the players travel here: cards are discarded from the top of the encounter deck until an enemy is discarded; a copy of it in the staging area is discarded too, else it is added to the staging area (not revealed).
     { id: "146019:forced:1", cardCode: "146019", lines: ["146019:A:1"], timing: "forced", trigger: "traveled", subject: "self", instructions: DISCARD_UNTIL_ENEMY_OR_COPY },

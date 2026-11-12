@@ -11,6 +11,8 @@ import { modifiedStat, placeDamage } from "../../core/keywords.ts";
 import { definePrinted } from "../../core/printed.ts";
 import { moveCard, spawn } from "../../core/zones.ts";
 import { EFFECTS } from "../../../effects/index.ts";
+import { eliminateSeat } from "../../core/eliminate.ts";
+import { settle } from "../../engine/machine.ts";
 import { legalIntents } from "../../engine/reduce.ts";
 import { enemy, hero, offered, recordsOf, send, table, treachery, until } from "../defense/table.ts";
 
@@ -215,5 +217,28 @@ describe("a location that cannot leave the staging area (146066:B:1)", () => {
     expect(travelBlocked(state, built.ctx, built.ids.chamber!)).toBe(false);
     expect(modifiedStat(state, state.cards[built.ids.passage!]!, "threat", built.ctx.cards)).toBe(1);
     expect(modifiedStat(state, state.cards[built.ids.chamber!]!, "threat", built.ctx.cards)).toBe(2);
+  });
+});
+
+describe("Bloodied Courtyard hears an enemy sent back to the staging area when its player is eliminated (146017:A:1)", () => {
+  const courtyard = definePrinted({ code: "146017", name: "Bloodied Courtyard", type: "location", threat: 2, questPoints: 3 });
+  const twoHanded = (withCourtyard: boolean) => {
+    const built = table({ seatCount: 2, cards: [hero("a"), hero("b"), orc("o1", { health: 6 }), courtyard], effects: withCourtyard ? recordsOf(EFFECTS, "146017") : [], heroes: [{ code: "a" }, { code: "b", seat: 1 }], enemies: [{ code: "o1", seat: 1 }] });
+    const active = spawn(built.state, "146017", { zone: "activeLocation" });
+    return { ...built, state: { ...active.state, activeLocation: active.id } };
+  };
+
+  it("deals the enemy 1 damage as it returns to the staging area", () => {
+    const { state, ctx, ids } = twoHanded(true);
+    const after = settle(eliminateSeat(state, 1, []), ctx, []);
+    expect(after.cards[ids.o1!]?.zone).toBe("staging");
+    expect(after.cards[ids.o1!]?.damage).toBe(1);
+  });
+
+  it("queues nothing in a game without the record: the enemy returns undamaged", () => {
+    const { state, ctx, ids } = twoHanded(false);
+    const after = settle(eliminateSeat(state, 1, []), ctx, []);
+    expect(after.cards[ids.o1!]?.zone).toBe("staging");
+    expect(after.cards[ids.o1!]?.damage).toBe(0);
   });
 });

@@ -22,7 +22,7 @@ const ROWS: readonly Row[] = [
   { line: "146017:A:1", name: "while it is the active location an enemy added to the staging area takes 1 damage", layout: { active: "146017", staging: ["f3"] }, act: announce("addedToStaging", "f3"), expect: damageOn("f3", 1) },
   { line: "146017:A:1", name: "an enemy returned from being engaged to the staging area takes 1 damage as well", layout: { active: "146017", staging: ["f3"] }, act: announce("returnedToStaging", "f3"), expect: damageOn("f3", 1) },
   { line: "146017:A:1", name: "an enemy a shadow card returns to the staging area takes 1 damage", layout: { ...STAGE2, active: "146017", play: [{ code: "ally", damage: 1 }] }, act: [attack("f3", { shadow: "146060" }), defend("ally")], expect: [zone("f3", "staging"), damageOn("f3", 1)] },
-  { line: "146017:A:2", name: "Travel: each player raises their threat by 2", layout: { ...STAGE2, phase: "Travel", staging: ["146017"], seats: 2 }, act: travel("146017"), expect: [threat(30), threat(30, 1)] },
+  { line: "146017:A:2", name: "Travel: each player raises their threat by 1 (the refresh adds 1 more)", layout: { ...STAGE2, phase: "Travel", staging: ["146017"], seats: 2 }, act: travel("146017"), expect: [threat(30), threat(30, 1)] },
 
   { line: "146018:A:1", name: "while it is the active location each enemy in the staging area gets +10 engagement cost", layout: { active: "146018", staging: ["f3"], engaged: [{ code: "f0", seat: 0 }] }, act: [], expect: [stat("f3", "engagementCost", 60), stat("f0", "engagementCost", 50)] },
   { line: "146018:A:2", name: "Travel: each player exhausts a character they control", layout: { ...STAGE2, phase: "Travel", staging: ["146018"], seats: 2 }, act: [resolve("146018", "travel"), answer("dh1")], expect: [exhausted("dh1"), exhausted("dh3")] },
@@ -50,6 +50,8 @@ const ROWS: readonly Row[] = [
 
   { line: "146059:A:2", name: "Forced: after it engages you it deals 2 damage to one character you control", layout: { engaged: [{ code: "146059", seat: 0 }] }, act: resolve("146059", "forced"), expect: damageOn("dh1", 2) },
   { line: "146059:A:3", name: "Shadow: +1 Attack", layout: STAGE2, act: attack("f3", { shadow: "146059", undefended: true }), expect: damageOn("dh1", 2) },
+
+  { line: "146059:A:3", name: "Shadow: +2 Attack instead while the defending character is damaged", layout: { ...STAGE2, play: [{ code: "ally", damage: 1 }] }, act: [attack("f3", { shadow: "146059" }), defend("ally")], expect: damageOn("ally", 3) },
 
   { line: "146060:A:1", name: "Forced: after it engages you you raise your threat by 2", layout: { engaged: [{ code: "146060", seat: 0 }] }, act: announce("engaged", "146060", { seat: 0 }), expect: threat(30) },
   { line: "146060:A:2", name: "Shadow: a character it destroys sends the attacking enemy back to the staging area", layout: { ...STAGE2, play: [{ code: "ally", damage: 1 }] }, act: [attack("f3", { shadow: "146060" }), defend("ally")], expect: [zone("ally", "discard"), zone("f3", "staging")] },

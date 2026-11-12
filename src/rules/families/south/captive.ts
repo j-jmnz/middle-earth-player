@@ -24,7 +24,7 @@ export function captureRingBearer(state: ScenarioState, instruction: Extract<Ins
   const heroId = ringBearerId(state, ctx);
   const hostId = Object.values(state.cards).find((card) => card.code === instruction.under && inPlay(card.zone))?.id;
   if (!heroId || !hostId || !state.cards[hostId]) return state;
-  if (instruction.guarded) return updateCard(captureHero(state, heroId, hostId, false, false, true), heroId, { face: "up", guardedHero: true, committed: false, ...heldFrom(state, heroId) });
+  if (instruction.guarded) return updateCard(captureHero(state, heroId, hostId, { attachmentsDown: false, keepTokens: true }), heroId, { face: "up", guardedHero: true, committed: false, ...heldFrom(state, heroId) });
   return captureHero(state, heroId, hostId);
 }
 
@@ -39,7 +39,10 @@ export function heldFrom(state: ScenarioState, heroId: string): Pick<CardInstanc
 // (`prisoner`: the prisoner of Escape from Dol Guldur, families/prisoner.ts, whose cards are also flagged as the prisoner's and whose
 // hero remembers the seat it came from). Every token on them is discarded, unless `keepTokens`. `attachmentsDown`: the attached cards are turned facedown too (the
 // Ring-bearer's always are; the prisoner's only when the campaign card says so, 01131:A:3).
-export function captureHero(state: ScenarioState, heroId: string, hostId: string | null, prisoner = false, attachmentsDown = true, keepTokens = false): ScenarioState {
+/** `prisoner`: the cards are flagged as the prisoner's; `attachmentsDown` (default true): the attached cards are turned facedown too; `keepTokens`: nothing is discarded. */
+export type CaptureOptions = { prisoner?: boolean; attachmentsDown?: boolean; keepTokens?: boolean };
+export function captureHero(state: ScenarioState, heroId: string, hostId: string | null, options: CaptureOptions = {}): ScenarioState {
+  const { prisoner = false, attachmentsDown = true, keepTokens = false } = options;
   const attachments = [...(state.cards[heroId]?.attachments ?? [])];
   const tokens = keepTokens ? {} : { damage: 0, resources: 0, progress: 0 };
   let next = updateCard(moveCard(state, heroId, { zone: "captive", hostId }), heroId, { ...tokens, ...(prisoner ? { prisoner: true as const, ...heldFrom(state, heroId) } : {}) });
