@@ -1,6 +1,7 @@
-// Rules: mec108.time-x, mec108.side-quests, mec108.side-quests-in-play, mec108.objective-allies, mec108.orc-deck (data/rules/entries.json); ledger lines 09023:A:1, 09024:A:1, 09024:A:2, 09024:A:3, 09051:A:1, 09071:A:1, 09072:A:2, 09072:A:3, 10158:A:1, 10158:A:2, 10158:A:3.
+// Rules: mec108.time-x, mec108.side-quests, mec108.side-quests-in-play, mec108.objective-allies, mec108.orc-deck, mec108.indestructible, rr.player-elimination (data/rules/entries.json); ledger lines 09023:A:1, 09024:A:1, 09024:A:2, 09024:A:3, 09036:A:2, 09038:A:1, 09038:A:2, 09051:A:1, 09067:A:2, 09071:A:1, 09072:A:2, 09072:A:3, 09073:B:3, 09074:B:2, 10158:A:1, 10158:A:2, 10158:A:3, 10168:A:2, 10169:A:2, 10170:A:2.
 // What the table says of Intruders in Chetwood's pieces (src/play/readouts/angmar.ts, src/play/cards/angmar-preview.ts): Protect the Innocent's damage against the number that loses, the time counters on Rescue Iârion, the progress placed this round
-// against Orc Rearguard's cap, the current quest, and the card held under a side quest. The engine decided every number; these only say it. Each sentence stays at about 25 words (docs/design-system-table.md, Choice tray, Plain words).
+// against Orc Rearguard's cap, the current quest, and the card held under a side quest; Deadmen's Dike's: the damage on Thaurdir against the hit points that open stage 2B, each seat's deck against the elimination at 0, Fornost Square's tokens, Broken Battlements' time counters, a burden on its host,
+// The Power of Angmar's lock. The engine decided every number; these only say it. Each sentence stays at about 25 words (docs/design-system-table.md, Choice tray, Plain words).
 
 import type { Instruction } from "../../../catalog/boundary.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
@@ -45,6 +46,43 @@ export const timeWords = (left: number, held: string | null): string =>
 
 /** The warning when the next refresh phase takes the last time counter. */
 export const timeNearWords = (left: number): string => (left <= 1 ? "The next refresh phase takes the last time counter." : `${left} time counters are left.`);
+
+/** The note of Thaurdir's dial, the players' way out of stage 2 (09074:B:2): his damage against his hit points. He is Indestructible, so the damage stays on him; the stage cannot be defeated while he has any hit points left. */
+export const thaurdirWords = (damage: number, limit: number): string => `${damage} of ${limit} damage. He cannot be destroyed, and stage 2 cannot be won while he has hit points left.`;
+
+/** The line under Thaurdir in his preview: his damage against his hit points, and the burden he carries. */
+export const thaurdirPreviewWords = (damage: number, limit: number, burden: string | null): string =>
+  `${damage} of ${limit} damage on him. Indestructible: the damage stays, and stage 2 can be won once it reaches ${limit}.${burden ? ` He carries ${burden}.` : ""}`;
+
+/** The mark of a seat's deck while a stage eliminates a player with no cards in his deck (09073:B:3, 09074:B:2): the cards left; it warms at 5 and is critical at 2. */
+export const deckLabel = (seat: number | null, cards: number): string => (seat == null ? `Deck ${cards}` : `P${seat + 1} · Deck ${cards}`);
+export const deckWords = (cards: number): string => `${plural(cards, "card", "cards")} left in this player's deck. A player with no cards in his deck is eliminated.`;
+export const deckNearWords = (cards: number): string => (cards <= 0 ? "No cards left: this player is eliminated." : cards === 1 ? "One more card and this player is eliminated." : `${cards} cards left. At 0 this player is eliminated.`);
+
+/** The note of the dial that counts the time counters left on Broken Battlements (09036:A:2): the last one makes each player discard 5 cards and place 1 time counter. Not a loss, so it never goes critical. */
+export const battlementsTimeWords = (left: number): string =>
+  `${plural(left, "time counter", "time counters")} left. One comes off at the end of each refresh phase. With the last gone, each player discards the top 5 cards of their deck and places 1 time counter here.`;
+export const battlementsTimeNearWords = (left: number): string => (left <= 1 ? "The next refresh phase takes the last time counter: each player discards 5 cards." : `${left} time counters are left.`);
+export const battlementsPreviewWords = (left: number): string => `${plural(left, "time counter", "time counters")} on it. With the last gone, each player discards the top 5 cards of their deck and places 1 time counter here.`;
+
+/** The line under Fornost Square in its preview: its tokens and what they add to its Threat (09038:A:1), and what places one (09038:A:2). */
+export const fornostWords = (tokens: number): string => `${plural(tokens, "resource token", "resource tokens")} on it: +${tokens} Threat. The first player discarding cards from the top of his deck places 1, once for each discard.`;
+
+/** The line under a burden of Thaurdir's in its preview: where it lies and what it does there (10168:A:2, 10169:A:2, 10170:A:2). `host`: the card it lies on; `onHero`: that card is a hero. */
+const BURDEN_EFFECTS = {
+  "10168": { most: "the hero with the most resources", effect: "-2 Willpower and its text box, Traits included, is blank" },
+  "10169": { most: "the hero with the most attachments that are not objectives", effect: "-2 Attack and it cannot commit to the quest" },
+  "10170": { most: "the hero with the most damage", effect: "-2 Defense and it cannot be healed" },
+} as const;
+export const isBurden = (code: string): code is keyof typeof BURDEN_EFFECTS => code in BURDEN_EFFECTS;
+export const burdenWords = (code: keyof typeof BURDEN_EFFECTS, host: string, onHero: boolean): string => {
+  const burden = BURDEN_EFFECTS[code];
+  const moves = `After a Sorcery treachery is revealed it moves to ${burden.most}.`;
+  return onHero ? `On ${host}: ${burden.effect}. ${moves}` : `Carried by ${host}, with no effect on him. ${moves} It joins the Campaign Pool when the scenario is won.`;
+};
+
+/** The line under The Power of Angmar in its preview while it is in the staging area (09067:A:2). */
+export const POWER_OF_ANGMAR_WORDS = "While it is in the staging area, no player card effect can take a card out of a discard pile. Encounter card effects can.";
 
 /** What the cap dial's limit says: the number Orc Rearguard allows each round. */
 export const rearguardLimitWords = (limit: number, title: string): string => `${limit} allowed each round by ${title}`;
