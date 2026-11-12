@@ -940,6 +940,36 @@
     },
     {
       "match": {
+        "code": "09032"
+      },
+      "set": {
+        "questPoints": 6
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Find Shelter no quest points (its Victory is the only number it exports). The scan prints a quest points box of 6, so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 09032.A (read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "09055"
+      },
+      "set": {
+        "questPoints": 6
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Make Camp no quest points (its Victory is the only number it exports). The scan prints a quest points box of 6, so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 09055.A (read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "09059"
+      },
+      "set": {
+        "questPoints": 8
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Search the Ruins no quest points (its Victory is the only number it exports). The scan prints a quest points box of 8, so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 09059.A (read for the quest points box)"
+    },
+    {
+      "match": {
         "code": "144075"
       },
       "set": {
@@ -1757,6 +1787,38 @@
       "set": "Journey Along the Anduin",
       "reason": "The Revised Core Set's Learn to Play (p25) and the Easy Mode sheet (p2) call the second core scenario and its encounter set \"Journey Down the Anduin\". The scenario's own campaign card, quest cards and encounter set icon print \"Journey Along the Anduin\" (Mirkwood Paths - Part 2, scan 01130.A), and Hall of Beorn follows the cards. The card wins (authority order); the booklet's name is an alias.",
       "source": "Learn to Play p25 (ltp.setup-journey-along-the-anduin); scan 01130.A; hallofbeorn.com/Export/Scenarios/Journey-Along-the-Anduin-(Campaign)"
+    }
+  ],
+  "scenarioCampaignPlaced": [
+    {
+      "scenario": "the-weather-hills",
+      "code": "10161",
+      "reason": "Mysterious Omens (10160) says \"each player may choose 1 of the following boons and attach it to a hero they control: Cunning, Hardy, Resolute, Ruthless, or Stalwart\", so Cunning is dealt with The Weather Hills, though no Setup or Resolution line of the campaign card names it.",
+      "source": "scan 10160.A (data/printed/angmar-awakened.json); mec108.campaign-setup-the-weather-hills"
+    },
+    {
+      "scenario": "the-weather-hills",
+      "code": "10162",
+      "reason": "Mysterious Omens (10160) says \"each player may choose 1 of the following boons and attach it to a hero they control: Cunning, Hardy, Resolute, Ruthless, or Stalwart\", so Hardy is dealt with The Weather Hills, though no Setup or Resolution line of the campaign card names it.",
+      "source": "scan 10160.A (data/printed/angmar-awakened.json); mec108.campaign-setup-the-weather-hills"
+    },
+    {
+      "scenario": "the-weather-hills",
+      "code": "10163",
+      "reason": "Mysterious Omens (10160) says \"each player may choose 1 of the following boons and attach it to a hero they control: Cunning, Hardy, Resolute, Ruthless, or Stalwart\", so Resolute is dealt with The Weather Hills, though no Setup or Resolution line of the campaign card names it.",
+      "source": "scan 10160.A (data/printed/angmar-awakened.json); mec108.campaign-setup-the-weather-hills"
+    },
+    {
+      "scenario": "the-weather-hills",
+      "code": "10164",
+      "reason": "Mysterious Omens (10160) says \"each player may choose 1 of the following boons and attach it to a hero they control: Cunning, Hardy, Resolute, Ruthless, or Stalwart\", so Ruthless is dealt with The Weather Hills, though no Setup or Resolution line of the campaign card names it.",
+      "source": "scan 10160.A (data/printed/angmar-awakened.json); mec108.campaign-setup-the-weather-hills"
+    },
+    {
+      "scenario": "the-weather-hills",
+      "code": "10165",
+      "reason": "Mysterious Omens (10160) says \"each player may choose 1 of the following boons and attach it to a hero they control: Cunning, Hardy, Resolute, Ruthless, or Stalwart\", so Stalwart is dealt with The Weather Hills, though no Setup or Resolution line of the campaign card names it.",
+      "source": "scan 10160.A (data/printed/angmar-awakened.json); mec108.campaign-setup-the-weather-hills"
     }
   ],
   "scenarioExcluded": [

@@ -963,7 +963,7 @@
       },
       "lines": [
         "The first Weather treachery card revealed each round gains surge.",
-        "Forced: After the active location is explored, reveal the top card of the Orc deck and resolve it as if it was just revealed from the encounter deck (reveal the top 2 cards instead if there are 3 or more players in the game)."
+        "Forced: After the active location is explored, reveal the top card of the Orc deck and resolve its staging as if it was just revealed from the encounter deck (reveal the top 2 cards instead if there are 3 or more players in the game)."
       ],
       "inert": [],
       "misprints": [],
