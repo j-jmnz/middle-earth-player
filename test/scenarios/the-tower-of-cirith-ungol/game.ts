@@ -58,9 +58,10 @@ const WATCHERS = "146071";
 const SHAGRAT = "146020";
 const TOPMOST_CHAMBER = "146015";
 const EVIL_VIGILANCE = "146063";
+const THE_ONE_RING = "146065";
 
 // The auto-player's answer (test/harness/auto-player.ts), except: the travel goes to Topmost Chamber whenever the stage lets the players, an engagement and the attack are answered as the policy says, a choice takes the first option or the last, and an attack
-// falls on the character with the least damage. Every intent is one the reducer listed.
+// falls on the character with the least damage that does not carry The One Ring. Every intent is one the reducer listed.
 export function ungolIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: UngolPolicy = DEFAULT_POLICY, options: PolicyOptions = UNGOL_POLICY): PlayerIntent {
   const intents = legalIntents(state, ctx);
   if (state.window?.kind === "choose") {
@@ -93,7 +94,9 @@ export function ungolIntent(state: ScenarioState, ctx: ReduceContext, memory: Se
     }
   }
   if (state.window?.kind === "defense") {
-    const least = [...legalTargets(state, { type: "Undefended" }, ctx)].sort((left, right) => (state.cards[left]?.damage ?? 0) - (state.cards[right]?.damage ?? 0))[0];
+    // An attack falls on the character with the least damage, but never on the hero that carries The One Ring while another can take it: its destruction loses the game.
+    const carrier = Object.values(state.cards).find((card) => card.code === THE_ONE_RING)?.host;
+    const least = [...legalTargets(state, { type: "Undefended" }, ctx)].sort((left, right) => Number(left === carrier) - Number(right === carrier) || (state.cards[left]?.damage ?? 0) - (state.cards[right]?.damage ?? 0))[0];
     if (least) return { type: "Undefended", heroId: least };
   }
   if (state.window?.kind === "pass" && state.mode === "questCommit") {

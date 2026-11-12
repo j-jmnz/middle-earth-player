@@ -115,7 +115,7 @@ describe("The Battle of the Pelennor Fields in the the-return-of-the-king campai
     }
   });
 
-  it("145078:B:2 unlocks The Tower of Cirith Ungol, the next part, on the log the win writes; the app cannot deal it yet, so the path says it is coming soon", () => {
+  it("145078:B:2 unlocks The Tower of Cirith Ungol, the next part, on the log the win writes, and the path offers it", () => {
     const state = goldenState("the-battle-of-the-pelennor-fields", "two-handed, won, Normal, after the Siege");
     const log = applyResolution(afterSiege, state.scenarioId, state, world.cards, NO_COPY_LIMITS);
     const path = campaignPath(campaign, {}, log);
@@ -123,9 +123,9 @@ describe("The Battle of the Pelennor Fields in the the-return-of-the-king campai
       ["the-passing-of-the-grey-company", "completed"],
       ["the-siege-of-gondor", "completed"],
       ["the-battle-of-the-pelennor-fields", "completed"],
-      ["the-tower-of-cirith-ungol", "soon"],
+      ["the-tower-of-cirith-ungol", "current"],
     ]);
-    expect(PLAYABLE_SCENARIOS).not.toContain("the-tower-of-cirith-ungol");
+    expect(PLAYABLE_SCENARIOS).toContain("the-tower-of-cirith-ungol");
   });
 
   it("a lost game writes nothing: the Resolution is for a win only, so finishing the lost golden leaves the log as it was", () => {

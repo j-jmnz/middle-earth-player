@@ -7,7 +7,7 @@ tags:
 # Aragorn in play). The fixture is OPEN until scripts/e2e/fixtures.ts finds a win of those lists in its seeds (docs/phases/STATUS.md).
 # The Resolution (145078) asks nothing: each player earns a Wraith on Wings, and an Esquire still on a hero is earned for its controller. The campaign has no XP. Minas Tirith's damage is shown on its top-bar dial (`pelennor-city`), which is still on the win table
 # (Minas Tirith stays in the staging area); the Fleet's dial is gone with the Fleet, which is in the victory display.
-# The win unlocks The Tower of Cirith Ungol, which the app cannot deal yet: its node reads Next and the line under the road says it is coming soon (scripts/checks/maestro.test.ts, path-soon).
+# The win unlocks The Tower of Cirith Ungol, whose node reads Next and the path offers Begin (the part is playable, so no line says it is coming soon).
 - runFlow:
     file: ../../subflows/scenario-win.yaml
     env:
@@ -19,6 +19,6 @@ tags:
     id: node-the-tower-of-cirith-ungol-status
     text: "Next"
 - assertVisible:
-    id: path-soon
-- assertNotVisible:
     id: begin
+- assertNotVisible:
+    id: path-soon
