@@ -116,9 +116,11 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
     - [json EngageFirstPlayer {"verb":"EngageFirstPlayer"}]
   146049:triggered:1: Triggered (mandatory, not printed as Forced) on the event firstPlayerTokenPassed
     - this enemy moves to the first player's play area and engages them (nothing if it is not engaged, or already engaged with them)
+  146049:forced:2: Forced on the event returnedToStaging (heard about this card)
+    - [json EngageFirstPlayer {"verb":"EngageFirstPlayer"}]
 
 146049:A:3 (front): *Forced: After Gollum is discarded during a Fortitude test, put him into play engaged with the first player. Then, choose an encounter card discarded for this test and ignore its Sauron's Eye icons.
-  146049:forced:2: Forced on the event discardedInFortitude (heard about this card)
+  146049:forced:3: Forced on the event discardedInFortitude (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"self","to":"engaged","when":{"kind":"all","conditions":[{"kind":"matches","card":"self","inPlay":false},{"kind":"firstPlayer"}]}}]
@@ -352,4 +354,4 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
     - then, if the last Fortitude test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the players lose the game (The Ring-bearer claimed The One Ring)
     - then, if the last Fortitude test the running effect made was passed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the players win the game
 
-(rendered pieces: 197 by template, 22 as JSON)
+(rendered pieces: 198 by template, 23 as JSON)
