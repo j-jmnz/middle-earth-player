@@ -2,8 +2,8 @@
 // Maestro. The app is a Release simulator build with EXPO_PUBLIC_SHOWCASE=1 and EXPO_PUBLIC_E2E_SEED=1 and every picture packed: `--build` makes it
 // (expo prebuild, then xcodebuild into .cache/showcase/build; run `pnpm assets` first), `--app <App.app>` takes one already built. For each device
 // (shots.ts) it boots the newest simulator of that kind, sets a clean status bar, installs the app, and runs each of the device's flows in
-// .maestro/showcase/ once per theme, with THEME and DEVICE. What a flow writes (a screenshot, a recording) lands in --out (default
-// .cache/showcase/raw) as <device>-<theme>-<shot>.png or .mp4, with capture.json saying which captures were taken and which failed. A flow that
+// .maestro/showcase/ once per theme, with THEME and DEVICE. What a flow writes (its screenshot) lands in --out (default
+// .cache/showcase/raw) as <device>-<theme>-<shot>.png, with capture.json saying which captures were taken and which failed. A flow that
 // fails is run once more, with Maestro's debug output kept in <out>/failures/; the script fails when any capture is still missing, and stops early
 // when its first two captures both fail.
 //
@@ -125,8 +125,28 @@ async function buildApp(log: Log): Promise<string> {
   const products = path.join(derived, "Build", "Products", "Release-iphonesimulator");
   const app = readdirSync(products).find((name) => name.endsWith(".app"));
   if (!app) throw new Error(`No .app in ${products}`);
+  writeFileSync(STAMP, sourceStamp());
   log.info(`built ${path.join(products, app)}`);
   return path.join(products, app);
+}
+
+// What the app is built from: every tracked file under src/ and the app config, with uncommitted changes. The build writes it beside the app;
+// a run with --app compares it, since the saves, the flows' screens and the marker are all compiled into the app (user report, 2026-11-12).
+const STAMP = path.join(ROOT, ".cache", "showcase", "build", "source-stamp.txt");
+
+function sourceStamp(): string {
+  const files = spawnSync("git", ["ls-files", "-s", "--", "src", "app.json", "app.config.js"], { cwd: ROOT, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 }).stdout;
+  const changes = spawnSync("git", ["diff", "HEAD", "--", "src", "app.json", "app.config.js"], { cwd: ROOT, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 }).stdout;
+  return sha(files, changes);
+}
+
+// A warning when the app given with --app was built from other code than this checkout's.
+function checkBuilt(log: Log): void {
+  if (!existsSync(STAMP)) {
+    log.warn("the app has no build stamp, so it may be older than this checkout: rebuild with --build if its saves or screens changed");
+    return;
+  }
+  if (readFileSync(STAMP, "utf8") !== sourceStamp()) log.warn("the app was built from older code than this checkout (src/ changed since): its saves and screens are the old ones. Rebuild with --build");
 }
 
 type SimDevice = { name: string; udid: string; isAvailable: boolean };
@@ -231,23 +251,23 @@ function onScreen(log: Log, sim: SimDevice, label: string, kept: string): void {
   try {
     const words = screenWords(JSON.parse(json));
     writeFileSync(path.join(kept, "hierarchy.json"), json);
-    log.warn(`${label}: on screen after the failure: ${words.length > 0 ? words.slice(0, 40).join(" ") : "nothing Maestro can read (the app may have crashed, or still be on its splash screen)"}`);
+    log.warn(`${label}: on screen after the failure: ${words.length > 0 ? words.slice(0, 150).join(" ") : "nothing Maestro can read (the app may have crashed, or still be on its splash screen)"}`);
   } catch {
     log.warn(`${label}: Maestro's answer was not a hierarchy: ${lastLines(read.stdout, 5)}`);
   }
 }
 
-// Runs one flow and moves what it wrote into `out` under its capture name. Maestro writes a screenshot or a recording into the folder it runs in, or
+// Runs one flow and moves what it wrote into `out` under its capture name. Maestro writes a screenshot into the folder it runs in, or
 // into its test output folder, by version; both are searched.
 async function capture(log: Log, sim: SimDevice, device: Device, theme: Theme, shot: Shot, out: string, step: string): Promise<boolean> {
   const name = captureName(device, theme, shot.id);
-  const extension = shot.kind === "gif" ? ".mp4" : ".png";
+  const extension = ".png";
   const started = performance.now();
   for (let attempt = 1; attempt <= 2; attempt += 1) {
     const work = mkdtempSync(path.join(tmpdir(), "showcase-"));
     const flow = path.join(FLOWS, `${shot.id}.yaml`);
     const label = `${step} ${name}${attempt > 1 ? `, attempt ${attempt}` : ""}`;
-    log.info(`${label}: ${shot.kind === "gif" ? "recording" : "taking"} ${shot.caption}`);
+    log.info(`${label}: taking ${shot.caption}`);
     const ok = await runLong(log, label, "maestro", ["--device", sim.udid, "test", "--test-output-dir", path.join(work, "output"), "-e", `THEME=${theme}`, "-e", `DEVICE=${device}`, flow], { cwd: work, quiet: true });
     const file = written(work, [extension]).find((item) => path.basename(item, extension) === name);
     if (ok && file) {
@@ -272,7 +292,9 @@ async function capture(log: Log, sim: SimDevice, device: Device, theme: Theme, s
 
 void runScript("showcase-capture", async (log) => {
   const given = flag("app");
-  const app = process.argv.includes("--build") ? await buildApp(log) : given;
+  const building = process.argv.includes("--build");
+  const app = building ? await buildApp(log) : given;
+  if (!building && app) checkBuilt(log);
   if (!app || !existsSync(app)) throw new Error("Usage: pnpm assets capture --build | --app <App.app> [--out <dir>] [--only <shot,shot>] [--device <iphone|ipad>] [--theme <dark|light>] [--ios <version>] [--force] [--verbose]");
   const out = path.resolve(flag("out") ?? path.join(ROOT, ".cache", "showcase", "raw"));
   mkdirSync(out, { recursive: true });
@@ -303,7 +325,7 @@ void runScript("showcase-capture", async (log) => {
     const keyOf = (theme: Theme, shot: Shot) => sha(appKey, sim.name, theme, flowFingerprint(shot));
     const unchanged = (theme: Theme, shot: Shot) => {
       const name = captureName(device, theme, shot.id);
-      return before.get(name)?.key === keyOf(theme, shot) && existsSync(path.join(out, `${name}${shot.kind === "gif" ? ".mp4" : ".png"}`));
+      return before.get(name)?.key === keyOf(theme, shot) && existsSync(path.join(out, `${name}.png`));
     };
     const todo = themes.flatMap((theme) => shots.map((shot) => ({ theme, shot }))).filter(({ theme, shot }) => !unchanged(theme, shot));
     log.info(`${device}: ${captures(shots.length * themes.length)} on ${sim.name}, ${todo.length} to take${todo.length < shots.length * themes.length ? `, ${shots.length * themes.length - todo.length} unchanged since the last run and kept (--force takes them again)` : ""}`);

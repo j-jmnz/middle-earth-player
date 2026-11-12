@@ -187,3 +187,8 @@ export function boardHolds(state: ScenarioState, least: Partial<Board>): boolean
     (!least.location || board.location)
   );
 }
+
+/** True when every seat is still in the game with at least `heroes` heroes: a showcase table shows both players' areas, none emptied. */
+export function seatsStanding(state: ScenarioState, heroes: number): boolean {
+  return state.seats.slice(0, state.seatCount).every((seat) => !seat.eliminated && seat.heroes.length >= heroes);
+}

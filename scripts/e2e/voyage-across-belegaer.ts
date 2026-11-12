@@ -9,7 +9,7 @@ import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type
 
 import { nextIntent } from "../../test/harness/auto-player.ts";
 import { createLog } from "../log.ts";
-import { boardHolds, DREAM_CHASER, firstSeed } from "./seed-kit.ts";
+import { boardHolds, seatsStanding, DREAM_CHASER, firstSeed } from "./seed-kit.ts";
 import { attackTogether, engageOneEach } from "../../test/harness/game-kit.ts";
 
 const say = createLog("e2e-voyage");
@@ -53,7 +53,7 @@ const never = (): boolean => false;
 const atCommit = (state: ScenarioState): boolean => askingToCommit(state);
 const atPlanning = (state: ScenarioState): boolean => state.mode === "planning" && state.activeSeat === 0;
 // The README showcase's sea table (docs/showcase.md, Saves and decks): a planning window from round 3 on, with the ships and the characters in play and cards in staging.
-const atShowcase = (state: ScenarioState): boolean => state.round >= 3 && atPlanning(state) && !state.lost && boardHolds(state, { play: 8, staging: 2 });
+const atShowcase = (state: ScenarioState): boolean => seatsStanding(state, 2) && state.round >= 3 && atPlanning(state) && !state.lost && boardHolds(state, { play: 8, staging: 2 });
 
 // The first seed of the Voyage game that `wanted` accepts, parked where `stop` says (checked before each intent) or at the game's end.
 function find(seatCount: 1 | 2, stop: ((state: ScenarioState, intents: number) => boolean) | undefined, wanted: (state: ScenarioState) => boolean, label: string): VoyageFixture | null {
