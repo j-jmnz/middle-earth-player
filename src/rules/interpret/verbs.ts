@@ -352,7 +352,7 @@ function discardTarget(
   ctx: ReduceContext,
   steps: EngineStep[],
 ): ScenarioState {
-  const id = kind === "self" || kind === "host" || kind === "picked" || kind === "previous" || kind === "subject" || kind === "attacker" ? refCard(state, kind, frameScope(state, focus.seat, focus.sourceId)) : null;
+  const id = kind === "self" || kind === "host" || kind === "picked" || kind === "previous" || kind === "subject" || kind === "attacker" || kind === "activeLocation" ? refCard(state, kind, frameScope(state, focus.seat, focus.sourceId)) : null;
   if (!id || !state.cards[id]) return state;
   // "Unique locations cannot be discarded from play by encounter card effects" (12193:B:1): the card holds the flag.
   if (flagged(state, id, "cannotBeDiscardedByEncounter") && isEncounterCardEffect(state, ctx.cards, focus.sourceId)) return state;

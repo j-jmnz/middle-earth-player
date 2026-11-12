@@ -26,13 +26,19 @@ function picker(queue: string[], lenient: boolean): (state: ScenarioState) => st
   };
 }
 
+// The hero an undefended attack lands on: a hero of the seat attacked (a second seat has its own hero), else the first hero, or the second when the first has gone.
+function undefendedHero(state: ScenarioState, table: LayoutTable): string {
+  if (state.pendingAttack?.seat === 1 && table.seat1Hero != null && state.cards[table.seat1Hero]?.zone === "heroes") return table.seat1Hero;
+  return state.cards[table.hero]?.zone === "heroes" ? table.hero : table.hero2;
+}
+
 // Plays the first window that asks for nothing until `done`: the passes, the declines and the defenses nobody makes.
 function passOn(run: Run, table: LayoutTable, done: (state: ScenarioState) => boolean, pick: (state: ScenarioState) => string): Run {
   let current = run;
   for (let guard = 0; guard < 400 && !done(current.state) && !current.state.lost && !current.state.stageCleared; guard += 1) {
     const window = current.state.window;
     if (window?.kind === "choose" || window?.kind === "look") current = finish(current, table.ctx, pick);
-    else if (window?.kind === "defense") current = send(current, { type: "Undefended", heroId: current.state.cards[table.hero]?.zone === "heroes" ? table.hero : table.hero2 }, table.ctx);
+    else if (window?.kind === "defense") current = send(current, { type: "Undefended", heroId: undefendedHero(current.state, table) }, table.ctx);
     else if (window?.kind === "chooseEnemy") current = send(current, { type: "ChooseEnemy", enemyId: window.options[0] ?? "" }, table.ctx);
     else {
       const next = legalIntents(current.state, table.ctx).find((intent) => intent.type === "Pass" || intent.type === "DeclineAttack" || intent.type === "DeclineEngage" || intent.type === "DeclineTravel");
