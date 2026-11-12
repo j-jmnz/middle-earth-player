@@ -100,7 +100,7 @@ function grantedHeroErrors(heroCards: Cards, deckCards: Cards, cards: ReadonlyMa
 
 // `discovered` is the treasures the Campaign Log records (emce.treasure): a deck may hold a treasure only when its code is listed, one copy by title, and a game without a log lists none.
 // `rules` is the scenario's saga start and title bans (SagaRules).
-// `stolen` is the unique cards the campaign log records as stolen from each seat in Escape from Mount Gram (10174:B:3), by seat: they cannot be in that player's deck for the rest of the campaign, and a stolen hero cannot start.
+// `stolen` is the unique cards the campaign log records as stolen from each seat in Escape from Mount Gram (10174:B:3), by seat: they cannot be in that player's deck for the rest of the campaign (a hero is no deck card: rr.player-deck).
 export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMap<string, PrintedCard>, saga: boolean, bans: readonly HeroBan[] = [], discovered: readonly string[] = [], rules: SagaRules = {}, stolen: readonly (readonly string[])[] = []): LoadoutError[] {
   const errors: LoadoutError[] = [];
   const fail = (rule: LoadoutRule, card: PrintedCard, why: string) =>
@@ -131,10 +131,10 @@ export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMa
     if (card != null && ban != null) fail("bannedHero", card, `${ban.name} cannot be used in this scenario of the campaign (${ban.rule})`);
   }
 
-  // A unique card stolen from the player (mec108.captured-deck, 10174:B:3) is no deck card of theirs and no hero of theirs.
+  // A unique card stolen from the player (mec108.captured-deck, 10174:B:3) is no deck card of theirs; the card says "deck", and the player deck holds allies, attachments and events, so a stolen hero may still start (rr.player-deck).
   seats.forEach((seat, index) => {
     const lost = stolen[index] ?? [];
-    for (const card of [...heroCards[index] ?? [], ...deckCards[index] ?? []]) {
+    for (const card of deckCards[index] ?? []) {
       if (card != null && lost.includes(card.code)) fail("stolenCard", card, "the Goblins of Mount Gram stole this unique card (the campaign log notes it), so it cannot be in this player's deck for the rest of the campaign");
     }
   });

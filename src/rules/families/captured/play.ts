@@ -33,14 +33,13 @@ export function capturePicked(state: ScenarioState): ScenarioState {
   return captureCard(state, ally, host);
 }
 
-// CaptureAttachments (a Shadow effect): each attachment a player owns on the defending character goes underneath the attacking enemy.
+// CaptureAttachments (a Shadow effect): each attachment on the defending character goes underneath the attacking enemy, an encounter attachment too (the card says "each attachment"; it is rescued to the encounter discard pile).
 export function captureAttachments(state: ScenarioState): ScenarioState {
   const attack = state.pendingAttack;
   const defender = attack ? state.cards[attack.defenderId ?? attack.heroId ?? ""] : undefined;
   if (!attack || !defender || !inPlay(state.cards[attack.enemyId]?.zone ?? "removed")) return state;
   return defender.attachments.reduce((next, id) => {
-    const attachment = next.cards[id];
-    return attachment && (attachment.owner ?? attachment.controller) != null ? captureCard(next, id, attack.enemyId) : next;
+    return next.cards[id] ? captureCard(next, id, attack.enemyId) : next;
   }, state);
 }
 

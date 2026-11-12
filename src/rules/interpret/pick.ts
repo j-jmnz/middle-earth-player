@@ -10,6 +10,7 @@ import { attachmentsPickMatches } from "../families/attachments/pick.ts";
 import { costsPickMatches, highestCost } from "../families/costs/pick.ts";
 import { attackPickMatches } from "../families/attack/pick.ts";
 import { miscPickMatches } from "../families/misc/pick.ts";
+import { questCardPool } from "../families/quest/quest-card.ts";
 import { familyPickMatches, familyPool } from "./family-hooks.ts";
 import { immuneToSource } from "../families/misc/guards.ts";
 import { countsExtra } from "../families/misc/traits.ts";
@@ -89,6 +90,8 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
       .filter((card) => (inPlay(card.zone) || card.zone === "encounterDeck" || card.zone === "encounterDiscard") && printedOf(ctx.cards, card.code).campaignKind === "burden")
       .map((card) => card.id);
   }
+  // The quest cards in play (families/quest/quest-card.ts).
+  if (spec.questCard) return questCardPool(state, asking, ctx);
   // The captured cards a pick starts from (families/captured/values.ts).
   const captured = spec.captured ? familyPool(state, spec, asking, sourceId, ctx) : null;
   if (captured) return captured;

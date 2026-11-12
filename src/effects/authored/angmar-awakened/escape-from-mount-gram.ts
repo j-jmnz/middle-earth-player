@@ -46,7 +46,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     cardCode: STAGE_2,
     lines: ["10039:A:2"],
     timing: "whenRevealed",
-    instructions: [{ verb: "SearchReveal", code: PRISON_CELL, who: "actor" }, { verb: "CaptureFromDeck", amount: 2, end: "top", under: { code: PRISON_CELL } }],
+    instructions: [{ verb: "SearchReveal", code: PRISON_CELL, who: "actor", deckOnly: true }, { verb: "CaptureFromDeck", amount: 2, end: "top", under: { code: PRISON_CELL } }],
   },
   { id: "10039:constant:2", cardCode: STAGE_2, lines: ["10039:B:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "progressRescues", amount: 1, until: "whileSourceInPlay" }] },
   {
@@ -88,7 +88,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     instructions: [{ verb: "Pick", pick: { type: "player", control: "any", highestThreat: true, who: "firstPlayer" } }, { verb: "EngageSelfWithPicked" }, { verb: "SwitchActor", to: "picked" }, { verb: "ImmediateAttack" }],
   },
 
-  // 10042 Southern Gate (location). While it is the active location each Orc enemy gets +2 Attack; Forced: when it becomes the active location each player with less than 35 threat raises it to 35.
+  // 10042 Southern Gate (location). While it is the active location each Orc enemy gets +2 Attack; Forced: when it becomes the active location each player with less than 35 threat raises it to 35 (the verb runs for each player, in turn).
   {
     id: "10042:constant:1",
     cardCode: SOUTHERN_GATE,
@@ -97,7 +97,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     condition: { kind: "sourceIn", zone: "activeLocation" },
     instructions: [{ verb: "ModifyStat", stat: "attack", amount: 2, until: "whileSourceActive", holders: { type: "enemy", control: "any", staging: true, trait: "Orc" } }],
   },
-  { id: "10042:forced:1", cardCode: SOUTHERN_GATE, lines: ["10042:A:3"], timing: "forced", trigger: "becameActive", subject: "self", instructions: [{ verb: "RaiseThreatTo", amount: 35 }] },
+  { id: "10042:forced:1", cardCode: SOUTHERN_GATE, lines: ["10042:A:3"], timing: "forced", trigger: "becameActive", subject: "self", instructions: [EACH_PLAYER([{ verb: "RaiseThreatTo", amount: 35 }])] },
 
   // 10043 Cruel Torturer. Capture 1. A marker the damage step reads: the ally its attack would damage is captured underneath it instead.
   capture("10043", "10043:A:1", 1),
@@ -152,15 +152,15 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "10048:constant:2", cardCode: "10048", lines: ["10048:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "threat", amount: { captured: "under" }, until: "whileSourceInPlay" }] },
   { id: "10048:shadow:1", cardCode: "10048", lines: ["10048:A:3"], timing: "shadow", instructions: [{ verb: "CaptureAttachments" }] },
 
-  // 10049 Sound the Alarm. When Revealed: until the end of the round each enemy in the staging area gets -10 engagement cost and +1 Attack; with no enemy in play, an enemy found in the encounter deck or discard pile is added to the staging area.
+  // 10049 Sound the Alarm. When Revealed: until the end of the round each enemy (in its staging area, and arriving later: an encounter card's lasting effect) gets -10 engagement cost and +1 Attack; with no enemy in play there, an enemy found in the encounter deck or discard pile is added to the staging area.
   {
     id: "10049:whenRevealed:1",
     cardCode: "10049",
     lines: ["10049:A:2"],
     timing: "whenRevealed",
     instructions: [
-      { verb: "ModifyStat", stat: "engagementCost", amount: -10, until: "endOfRound", holders: { type: "enemy", control: "any", staging: true, atStage: true } },
-      { verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfRound", holders: { type: "enemy", control: "any", staging: true, atStage: true } },
+      { verb: "ModifyStat", stat: "engagementCost", amount: -10, until: "endOfRound", target: "enemies" },
+      { verb: "ModifyStat", stat: "attack", amount: 1, until: "endOfRound", target: "enemies" },
       { verb: "SearchMove", type: "enemy", to: "staging", when: { kind: "enemyInPlay", is: false } },
     ],
   },
@@ -221,7 +221,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     cardCode: "10052",
     lines: ["10052:A:2"],
     timing: "shadow",
-    instructions: [{ verb: "DiscardRandomFromHand", remember: true }, { verb: "RaiseThreat", amount: { discarded: "cost" }, who: "actor" }],
+    instructions: [{ verb: "DiscardRandomFromHand", raiseByCost: true }],
   },
 
   // 10053 Stop the Executioners! (encounter side quest, 6 quest points). Capture 5, Time 4. Forced: when the last time counter is removed, its captured cards are discarded and it is removed from the game; each player raises their threat by 3 for each of their characters so discarded.
@@ -254,8 +254,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   { id: "10175:constant:1", cardCode: LOOT, lines: ["10175:A:1"], timing: "constant", instructions: [{ verb: "InEveryArea" }, { verb: "ModifyStat", stat: "questPoints", amount: { captured: "players", times: 4 }, until: "whileSourceInPlay" }] },
   { id: "10175:forced:1", cardCode: LOOT, lines: ["10175:A:2"], timing: "forced", trigger: "questDefeated", subject: "self", instructions: [{ verb: "ChooseBoonToHand", codes: BOONS }] },
 
-  // 10176 Berelind (ally boon). Response: after she attacks and destroys an enemy, 1 progress is placed on the current quest.
-  { id: "10176:response:1", cardCode: "10176", lines: ["10176:A:1"], timing: "response", trigger: "attackDestroyed", subject: "self", instructions: [{ verb: "ProgressQuest", amount: 1 }] },
+  // 10176 Berelind (ally boon). Response: after she attacks and destroys an enemy, 1 progress is placed on a quest card in play (the player chooses it).
+  { id: "10176:response:1", cardCode: "10176", lines: ["10176:A:1"], timing: "response", trigger: "attackDestroyed", subject: "self", instructions: [{ verb: "Pick", pick: { type: "card", control: "any", questCard: true } }, { verb: "PlaceProgressOnQuestCard", amount: 1 }] },
   // 10177 Chieftain's Brooch (attachment boon). Each ally that shares a Trait with the attached hero gets +1 Willpower.
   { id: "10177:constant:2", cardCode: "10177", lines: ["10177:A:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "willpower", amount: 1, until: "whileSourceInPlay", holders: { type: "ally", control: "any", sharesTrait: "host" } }] },
   // 10178 Coruhaer (ally boon). Response: after he defends an attack, spend 1 resource to deal 2 damage to the attacking enemy.

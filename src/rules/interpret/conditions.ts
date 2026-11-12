@@ -16,7 +16,8 @@ import { seatThreat } from "../families/play/hooks.ts";
 import { distinctTraitCount, flaggedTrait } from "../families/misc/traits.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { currentQuestHas, engagedThisPhase, questHasKeywords, stepHolds } from "../families/quest/conditions.ts";
-import { modifiedStat, versusDefender, versusHighEngagement, versusVictoryTrait } from "../core/keywords.ts";
+import { headOf } from "../families/breaking/areas.ts";
+import { inAreaOf, modifiedStat, versusDefender, versusHighEngagement, versusVictoryTrait } from "../core/keywords.ts";
 import { effectsOf } from "../windows/listen.ts";
 import { countMatching, matchesPick, pickCandidates } from "./pick.ts";
 import { committedWillpower, stagingThreat } from "../quest/quest.ts";
@@ -207,6 +208,10 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
       return holder != null && versusDefender(state, holder, condition, ctx.cards);
     }
+    case "inArea": {
+      const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
+      return holder != null && inAreaOf(state, holder, condition.seat);
+    }
     case "versusVictoryTrait": {
       const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
       return holder != null && versusVictoryTrait(state, holder, ctx.cards, scope.against);
@@ -248,8 +253,10 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     }
     case "enemyInPlay": {
       const trait = condition.trait;
+      // Mount Gram: while the staging areas are separate an enemy "in play" is one in the asking player's own area (mec108.create-staging-area).
+      const area = state.separate && state.capture ? headOf(state, scope.actor) : null;
       const found = Object.values(state.cards).some(
-        (card) => inPlay(card.zone) && printedOf(ctx.cards, card.code).type === "enemy" && (trait == null || hasTrait(state, card.id, trait, ctx)),
+        (card) => inPlay(card.zone) && printedOf(ctx.cards, card.code).type === "enemy" && (trait == null || hasTrait(state, card.id, trait, ctx)) && (area == null || inAreaOf(state, card, area)),
       );
       return found === condition.is;
     }

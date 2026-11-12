@@ -36,6 +36,13 @@ export function sharing(state: ScenarioState, seat: number): number[] {
   return livingSeats(state).filter((index) => headOf(state, index) === head);
 }
 
+// The first player of the seat's area: the player of the area nearest the first player in turn order ("the resolution of each phase occurs as if only the player or players that share any given staging area are currently in the game", mec108.create-staging-area).
+export function firstOfArea(state: ScenarioState, seat: number): number {
+  const mine = sharing(state, seat);
+  const count = Math.max(1, state.seatCount);
+  return [...mine].sort((left, right) => ((left - state.firstPlayer + count) % count) - ((right - state.firstPlayer + count) % count))[0] ?? state.firstPlayer;
+}
+
 // The living seats that own an area (not a seat that joined another): the seats a phase resolves for once stages are separate. A game with no joined seat returns every living seat.
 export function areaSeats(state: ScenarioState): number[] {
   return state.separate ? livingSeats(state).filter((index) => headOf(state, index) === index) : livingSeats(state);
@@ -97,7 +104,9 @@ export function viewOf(state: ScenarioState, seat: number | undefined): Scenario
   if (!owner) return state;
   // A card that is in every area is in this seat's too (mergeView leaves it out of the seat's own list).
   const everywhere = everyArea(state);
-  return { ...state, staging: everywhere.length > 0 ? [...owner.staging, ...everywhere] : owner.staging, questStage: owner.stage ?? null, activeLocation: owner.active ?? null, secondActiveLocation: null, viewSeat: head };
+  // Mount Gram: "the first player" of an effect in an area is the area's own (the table's first player may be in another area).
+  const first = state.capture ? { firstPlayer: firstOfArea(state, head) } : {};
+  return { ...state, ...first, staging: everywhere.length > 0 ? [...owner.staging, ...everywhere] : owner.staging, questStage: owner.stage ?? null, activeLocation: owner.active ?? null, secondActiveLocation: null, viewSeat: head };
 }
 
 // The seat's active location, or the shared one when stages are not separate.
@@ -140,7 +149,9 @@ export function mergeView(state: ScenarioState, asked: number | undefined, view:
   const kept = state.staging.filter((id) => !was.includes(id) || now.includes(id) || elsewhere.has(id));
   const added = [...now, ...elsewhere].filter((id) => !state.staging.includes(id));
   const { viewSeat: _seat, ...plain } = view;
-  const merged: ScenarioState = { ...plain, seats, questStage: state.questStage, staging: [...kept, ...added] };
+  // The view's first player is the area's own (viewOf), unless the view passed the token on.
+  const first = state.capture && view.firstPlayer === firstOfArea(state, seat) ? { firstPlayer: state.firstPlayer } : {};
+  const merged: ScenarioState = { ...plain, ...first, seats, questStage: state.questStage, staging: [...kept, ...added] };
   return mirrored({ ...merged, staging: merged.staging.filter((id) => merged.cards[id]?.zone === "staging") });
 }
 

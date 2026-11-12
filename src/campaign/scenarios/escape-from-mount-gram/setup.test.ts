@@ -2,15 +2,13 @@
 // A game of Escape from Mount Gram started from the campaign: the Setup of the quest card and of the campaign card, stage 2A, and what the Resolution records for the campaign.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { emptyLog } from "../../log.ts";
-import { expectOk } from "../../../rules/core/test-fixture.ts";
 import { printedOf } from "../../../rules/core/printed.ts";
-import { reduce, startScenario } from "../../../rules/engine/reduce.ts";
 import { capturedDeck, capturedUnder } from "../../../rules/families/captured/pile.ts";
 import { recordStolenCards } from "../../../rules/families/campaign/damage-tracking.ts";
 import { spawn } from "../../../rules/core/zones.ts";
 import { idOf, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
-import { gramStart, gramWorld } from "../../../../test/scenarios/escape-from-mount-gram/game.ts";
+import { BOONS, begin as begun } from "../../../../test/scenarios/escape-from-mount-gram/begun.ts";
+import { gramWorld } from "../../../../test/scenarios/escape-from-mount-gram/game.ts";
 
 describe("Setup", () => {
   let world: Awaited<ReturnType<typeof gramWorld>>;
@@ -18,19 +16,7 @@ describe("Setup", () => {
     world = await gramWorld("strong");
   }, 120_000);
 
-  // The deck holds three copies of each boon (allies and Items), so each captured deck has more than the Setup captures.
-  const BOONS = ["10176", "10177", "10178", "10179", "10180", "10181"];
-  const deck = [...BOONS, ...BOONS, ...BOONS, ...Array.from({ length: 12 }, () => "filler")];
-
-  function begin(seats: 1 | 2) {
-    const loadout = Array.from({ length: seats }, (_, seat) => ({ heroes: seat === 0 ? ["q1", "q2", "q3"] : ["q4", "q5", "q6"], deck }));
-    let state = startScenario(gramStart(seats, 7, "Normal", undefined, emptyLog(seats), undefined, loadout), world.ctx);
-    state = expectOk(reduce(state, { type: "Keep" }, world.ctx)).state;
-    if (seats === 2) state = expectOk(reduce(state, { type: "Keep" }, world.ctx)).state;
-    // Each player chooses the starting hero: the first of the heroes.
-    for (let guard = 0; guard < 20 && state.window?.kind === "choose"; guard += 1) state = expectOk(reduce(state, { type: "Choose", optionId: state.window.options[0] ?? "" }, world.ctx)).state;
-    return state;
-  }
+  const begin = (seats: 1 | 2) => begun(world.ctx, seats);
 
   it("10038:A:1 prepares each captured deck from the allies and Items of the deck and the other heroes, sets the threat to the starting hero's cost and draws a new hand", () => {
     const state = begin(1);
@@ -47,7 +33,7 @@ describe("Setup", () => {
     expect(state.cards[seat.heroes[0] ?? ""]?.resources).toBeGreaterThanOrEqual(2);
   });
 
-  it("10174:A:2, 10039:A:1 and 10039:A:2 capture the bottom 5 under Loot the Dungeons before stage 2A captures 7, and Prison Cell holds 3 cards", () => {
+  it("10174:A:2 captures the bottom 5 of each captured deck under Loot the Dungeons before stage 2A captures 7", () => {
     const state = begin(1);
     const stage = idOf(state, "10039");
     const loot = idOf(state, "10175");
@@ -62,6 +48,22 @@ describe("Setup", () => {
     expect(capturedDeck(state, 0)).toHaveLength(20 - 5 - 7 - 3);
   });
 
+  it("10039:A:1 Capture 7 takes the top 7 cards of the captured deck, after Loot took the bottom 5, each owned by the player", () => {
+    const state = begin(1);
+    const under = capturedUnder(state, idOf(state, "10039"));
+    expect(under).toHaveLength(7);
+    expect(under.every((id) => state.cards[id]?.owner === 0 && state.cards[id]?.zone === "captured")).toBe(true);
+    // The hero set aside on top of the deck is among the seven (it was on top).
+    expect(under.some((id) => state.cards[id]?.heroSlot != null)).toBe(true);
+  });
+
+  it("10039:A:2 puts the 3 cards of the player's Prison Cell under it: the one Capture 1 took and 2 more from the top", () => {
+    const state = begin(1);
+    const cell = state.seats[0].staging.find((id) => state.cards[id]?.code === "10046") ?? "";
+    expect(capturedUnder(state, cell)).toHaveLength(3);
+    expect(state.encounterDeck.some((id) => state.cards[id]?.code === "10046")).toBe(true);
+  });
+
   it("10038:B:1 gives each of two players a different stage 2A and a staging area of their own, each with a Prison Cell", () => {
     const state = begin(2);
     const stages = state.seats.map((seat) => seat.stage);
@@ -71,6 +73,17 @@ describe("Setup", () => {
     const loot = idOf(state, "10175");
     expect(state.seats.every((seat) => !seat.staging.includes(loot))).toBe(true);
     expect(capturedUnder(state, loot)).toHaveLength(10);
+  });
+
+  it("10039:A:2 gives each seat's 3 cards under that seat's own Prison Cell, taken from that seat's captured deck", () => {
+    const state = begin(2);
+    const cells = state.seats.map((seat) => seat.staging.find((id) => state.cards[id]?.code === "10046") ?? "");
+    expect(new Set(cells).size).toBe(2);
+    for (const [seat, cell] of cells.entries()) {
+      const under = capturedUnder(state, cell);
+      expect(under).toHaveLength(3);
+      expect(under.every((id) => state.cards[id]?.owner === seat)).toBe(true);
+    }
   });
 });
 

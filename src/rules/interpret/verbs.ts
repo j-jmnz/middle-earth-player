@@ -130,6 +130,13 @@ export function runExtraVerb(
       }
       const seat = instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat;
       const discarded = discardRandom(state, seat, instruction.amount == null ? 1 : resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx), focus.sourceId, ctx);
+      if (instruction.raiseByCost) {
+        // The discarded card is the one now on top of the discard pile (a card that left the hand another way, a hand with none, raises nothing).
+        const pile = discarded.seats[seat]?.discard ?? [];
+        const id = pile.length > (state.seats[seat]?.discard.length ?? 0) ? pile.at(-1) : undefined;
+        const cost = id ? (printedOf(ctx.cards, discarded.cards[id]?.code ?? "").cost ?? 0) : 0;
+        return noteEncounterThreat(raiseThreat(discarded, seat, cost, steps, currentCause(steps, UNATTRIBUTED)), seat, cost, focus.sourceId, ctx);
+      }
       if (!instruction.remember) return discarded;
       // `remember`: the card discarded is the effect's picked card afterward ("the discarded card's printed cost", 143066:A:2).
       const pile = discarded.seats[seat]?.discard ?? [];

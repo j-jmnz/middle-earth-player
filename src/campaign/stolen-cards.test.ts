@@ -8,7 +8,7 @@ import { stolenAfter } from "./log-angmar-awakened.ts";
 import type { World } from "./world.ts";
 
 // Rules: mec108.captured-deck, mec108.campaign-log, rr.deckbuilding (data/rules/entries.json); ledger line 10174:B:3. The unique cards still in a player's captured deck when Escape from Mount Gram is won are recorded for that player; the loadout refuses them in that
-// player's deck and as that player's hero in every later part (the deck builder's ready-to-play check, src/campaign/briefing.ts loadoutProblems).
+// player's deck in every later part (a hero is no deck card) (the deck builder's ready-to-play check, src/campaign/briefing.ts loadoutProblems).
 const FILLERS = Array.from({ length: 17 }, (_, index) => `c${index}`);
 const cards = new Map<string, PrintedCard>([
   ["h1", definePrinted({ code: "h1", name: "Hero One", type: "hero", sphere: "tactics", threat: 8, willpower: 1, attack: 1, defense: 1, health: 3, isUnique: true })],
@@ -27,10 +27,10 @@ const seat = (heroes: readonly string[], deck: readonly string[]) => ({ deckId: 
 const check = (seats: ReturnType<typeof seat>[], stolen: readonly (readonly string[])[]) => loadoutProblems({ world, seatCount: seats.length as 1 | 2, seats, ringBearer: null }, [], [], [], stolen).problems.map((problem) => `${problem.rule}: ${problem.message}`);
 
 describe("10174:B:3 stolen cards", () => {
-  it("refuses a stolen unique card in that player's deck and as that player's hero, and no other player's", () => {
+  it("10174:B:3 refuses a stolen unique card in that player's deck, not a stolen hero as a hero (the player deck holds no heroes), and no other player's", () => {
     const stolen = [["a1", "h2"], []];
     expect(check([seat(["h1"], [...FIFTY, "a1"])], stolen)).toEqual([expect.stringContaining("A unique card the Goblins stole: Unique Ally (a1)")]);
-    expect(check([seat(["h2"], FIFTY)], stolen)).toEqual([expect.stringContaining("A unique card the Goblins stole: Hero Two (h2)")]);
+    expect(check([seat(["h2"], FIFTY)], stolen)).toEqual([]);
     expect(check([seat(["h1"], FIFTY), seat(["h2"], [...FIFTY, "a1"])], stolen)).toEqual([]);
     expect(check([seat(["h1"], [...FIFTY, "a1"])], [[], []])).toEqual([]);
   });

@@ -23,11 +23,14 @@ export function attachHeroBoons(state: ScenarioState, heroId: string): ScenarioS
   return next;
 }
 
-// One captured card goes back: a hero into play under its owner, anything else into its owner's hand. A card whose owner has left the game goes to that owner's discard pile.
+// One captured card goes back: a hero into play under its owner, anything else into its owner's hand. A card whose owner has left the game goes to that owner's discard pile; an encounter card (the scenario owns it: rr.ownership-and-control, an encounter attachment
+// Tunnels of Mount Gram captured) goes to the encounter discard pile, the scenario's equivalent out of play area.
 function release(state: ScenarioState, id: string): { state: ScenarioState; toHand: boolean } {
   const card = state.cards[id];
   const owner = card?.owner;
-  if (!card || owner == null || !state.seats[owner]) return { state: moveCard(state, id, { zone: "removed" }), toHand: false };
+  if (!card) return { state, toHand: false };
+  if (owner == null) return { state: updateCard(moveCard(state, id, { zone: "encounterDiscard" }), id, { face: "up", controller: null }), toHand: false };
+  if (!state.seats[owner]) return { state: moveCard(state, id, { zone: "removed" }), toHand: false };
   if (state.seats[owner]?.eliminated) return { state: updateCard(moveCard(state, id, { zone: "discard", seat: owner }), id, { face: "up" }), toHand: false };
   if (card.heroSlot != null) {
     const entered = updateCard(moveCard(state, id, { zone: "heroes", seat: owner }), id, { face: "up", heroSlot: undefined });

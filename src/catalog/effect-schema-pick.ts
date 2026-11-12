@@ -255,6 +255,8 @@ export const pickSchema = z.strictObject({
   // Captured cards (Escape from Mount Gram, read by the captured family): the cards a pick starts from are `underSelf` the cards captured underneath the source (any owner's; one the owner cannot put into play is left out), `rescued` the cards the last rescue
   // put into hands that are still there (10044:A:2), `hosts` the encounter cards in play in the asking player's staging area (the staged cards, the active location and the enemies engaged with a player there; 10051:A:1).
   captured: z.enum(["underSelf", "rescued", "hosts"]).optional(),
+  // With `type: card`: only the quest cards in play the asking player can name: their current quest stage, the encounter side quests in their staging area and the player side quests in the quest areas ("a quest card in play", 10176:A:1).
+  questCard: z.literal(true).optional(),
   // The black-gate family's filters (src/rules/families/black-gate/pick.ts). `embassy`: a card of the Embassy from the Dark Tower's faceup row that is not paired yet, the player cards placed in front of the players (`player`) or the encounter cards placed faceup (`encounter`, 146072:B:1).
   // `highestThreat`: of the cards that matched, those with the highest current Threat, a card with none counting 0 ("the highest threat encounter card remaining"); every one when tied, and the chooser decides.
   embassy: z.enum(["player", "encounter"]).optional(),

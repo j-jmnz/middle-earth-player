@@ -24,7 +24,7 @@ const VERBS = [
   verbFlags(z.strictObject({ verb: z.literal("CaptureFromDeck"), amount: z.number().int().positive(), end: z.enum(["top", "bottom"]), under: z.union([z.literal("self"), z.strictObject({ code })]), who: z.enum(["actor", "eachSeat"]).optional(), ...when }), { setupRole: "beforeReveal" }),
   // The last card picked before the last pick is captured underneath the card the last pick chose ("captures it underneath the encounter card with the highest Threat", 10051:A:1): an ally the actor controls, captured from play; nothing happens when the pick before found no ally.
   z.strictObject({ verb: z.literal("CapturePicked"), ...when }),
-  // Each attachment a player owns that is attached to the defending character is captured underneath the attacking enemy ("Capture each attachment attached to the defending character underneath the attacking enemy", 10048:A:3); an attachment no player owns stays.
+  // Each attachment attached to the defending character is captured underneath the attacking enemy ("Capture each attachment attached to the defending character underneath the attacking enemy", 10048:A:3); an encounter attachment too (rescued to the encounter discard pile).
   z.strictObject({ verb: z.literal("CaptureAttachments"), ...when }),
   // A replacement: an ally the attack would damage is captured underneath the attacking enemy instead, with no damage dealt ("When Cruel Torturer would damage an ally by an attack, capture that ally underneath Cruel Torturer instead", 10043:A:2). On the enemy it is a marker the
   // damage step reads; run as a Shadow effect it makes the attack in progress do it ("If this attack would damage an ally, capture that ally underneath the attacking enemy instead", 10051:A:2).
