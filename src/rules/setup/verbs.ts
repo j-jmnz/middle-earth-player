@@ -3,7 +3,7 @@ import type { Instruction } from "../../catalog/boundary.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
 import { printedOf } from "../core/printed.ts";
 import { updateCard, type ScenarioState } from "../core/state.ts";
-import { attachTo, moveCard, spawn, type Destination } from "../core/zones.ts";
+import { attachTo, moveCard, spawn, turnedUp, type Destination } from "../core/zones.ts";
 
 export type SetupInstruction = Extract<
   Instruction,
@@ -17,7 +17,7 @@ export type SetupInstruction = Extract<
 export function runSetupVerb(state: ScenarioState, instruction: SetupInstruction, ctx: ReduceContext, sourceId: string | null = null): ScenarioState {
   const found = sourceId ? state.cards[sourceId] : undefined;
   const own = found != null && found.zone === "setAside" && found.code === instruction.code ? found.id : null;
-  const place = (dest: Destination, face?: "down"): ScenarioState => (own ? updateCard(moveCard(state, own, dest), own, { face: "up" }) : spawn(state, instruction.code, dest, face).state);
+  const place = (dest: Destination, face?: "down"): ScenarioState => (own ? updateCard(moveCard(state, own, dest), own, { face: turnedUp(state, own) }) : spawn(state, instruction.code, dest, face).state);
   switch (instruction.verb) {
     case "AddToStaging":
       return place({ zone: "staging" });

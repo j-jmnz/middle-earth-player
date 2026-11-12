@@ -21,7 +21,7 @@ import { flagged, heldAmount, updateCard } from "../core/state.ts";
 import { raiseFor, refillEncounterDeck, runExtraVerb } from "./verbs.ts";
 import { readyNamedCard } from "./restrictions.ts";
 import { withFrame } from "../windows/windows.ts";
-import { moveCard } from "../core/zones.ts";
+import { moveCard, turnedUp } from "../core/zones.ts";
 import { shadowFace } from "../families/defense/shadow.ts";
 import { drawCards } from "../families/dungeon/deck.ts";
 import { withView } from "../families/breaking/areas.ts";
@@ -43,7 +43,7 @@ export function addToStaging(state: ScenarioState, id: string): ScenarioState {
   const instance = state.cards[id];
   if (!instance) return state;
   const moved = moveCard(state, id, { zone: "staging" });
-  return updateCard(moved, id, { face: "up" });
+  return updateCard(moved, id, { face: turnedUp(moved, id) });
 }
 
 export function runEffects(

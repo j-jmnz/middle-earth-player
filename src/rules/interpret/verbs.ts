@@ -25,7 +25,7 @@ import { refillsAnyTime } from "../families/nightmare/guards.ts";
 import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
 import { encounterRaised } from "../families/quest/threat.ts";
 import { flagged, livingSeats, updateCard, type ScenarioState } from "../core/state.ts";
-import { attachTo, cardsUnder, discardFromHand, moveCard } from "../core/zones.ts";
+import { attachTo, cardsUnder, discardFromHand, moveCard, turnedUp } from "../core/zones.ts";
 import { currentCause, ruleCause, UNATTRIBUTED } from "../core/cause.ts";
 import { takeProgressOff } from "../core/progress.ts";
 import { noteEncounterThreat } from "../families/encounter/reveal.ts";
@@ -95,7 +95,7 @@ export function runExtraVerb(
     case "AddSetAsideToStaging": {
       const copies = state.setAside.filter((candidate) => (instruction.code != null ? state.cards[candidate]?.code === instruction.code : instruction.trait != null && hasTrait(state, candidate, instruction.trait, ctx)));
       // Into the acting seat's own staging area once stages are separate (mec109.multiple-staging-areas).
-      return (instruction.all === true ? copies : copies.slice(0, 1)).reduce((next, id) => updateCard(moveCard(next, id, stagingDest(next, focus.seat)), id, { face: "up" }), state);
+      return (instruction.all === true ? copies : copies.slice(0, 1)).reduce((next, id) => updateCard(moveCard(next, id, stagingDest(next, focus.seat)), id, { face: turnedUp(next, id) }), state);
     }
     case "ShuffleOutOfPlayIntoEncounterDeck": {
       // Outside an effect frame nobody can be asked, so the first choice goes (effect-frames.ts asks the first player when
@@ -145,7 +145,7 @@ export function runExtraVerb(
         for (const id of focus.sourceId ? cardsUnder(state, focus.sourceId) : []) next = moveEncounter(next, id, "engaged", next.firstPlayer, ctx, steps);
         return next;
       }
-      for (const id of focus.sourceId ? cardsUnder(state, focus.sourceId) : []) next = updateCard(moveCard(next, id, { zone: "staging" }), id, { face: "up" });
+      for (const id of focus.sourceId ? cardsUnder(state, focus.sourceId) : []) next = updateCard(moveCard(next, id, { zone: "staging" }), id, { face: turnedUp(next, id) });
       return next;
     }
     case "DamageAll":
@@ -286,7 +286,7 @@ function discardUntilEnemies(state: ScenarioState, count: number, ctx: ReduceCon
   while (enemies.length < count) {
     const top = next.encounterDeck[0];
     if (!top) break;
-    next = updateCard(moveCard(next, top, { zone: "encounterDiscard" }), top, { face: "up" });
+    next = updateCard(moveCard(next, top, { zone: "encounterDiscard" }), top, { face: turnedUp(next, top) });
     if (printedOf(ctx.cards, next.cards[top]?.code ?? "").type === (cardType ?? "enemy")) enemies.push(top);
   }
   // Engaged with the first player, or added to the staging area (They Are Coming!, 142056:A:2).
