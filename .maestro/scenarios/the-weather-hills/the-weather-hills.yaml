@@ -14,4 +14,12 @@ tags:
       # CHOICE_ID: "TODO"
       # CHOICE_PROMPT: "TODO"
       # CHOICE_CONSEQUENCE: "TODO"
-# TODO: this scenario's own assertions on the path screen after the win (the next part's node, a carried card).
+# The win unlocks Deadmen's Dike, which the app cannot deal yet: its node reads Coming soon and the road offers no Begin (scripts/checks/maestro.test.ts, path-soon).
+- assertVisible:
+    id: node-deadmens-dike-status
+    text: "Coming soon"
+- assertVisible:
+    id: path-soon
+- assertNotVisible:
+    id: begin
+# TODO: this scenario's own assertions on the path screen after the win (a carried card).

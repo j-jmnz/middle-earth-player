@@ -6,7 +6,7 @@ tags:
 # lists, Easy), parked on its win (the Orc War Parties out of play, 30 progress on Stop the War Party with the first player controlling Iârion). The fixture is OPEN: scripts/e2e/fixtures.ts found no win of those lists in its 100 seeds with any of the policies the
 # scenario's goldens play (docs/phases/STATUS.md), so this flow cannot run until a seed wins.
 # The Campaign Setup asked each player whether to place 4 damage on Protect the Innocent (the fixture's loadout answers "keep"). The Resolution (10156:B:1) asks nothing: it notes the damage on Protect the Innocent in the log and adds the card to the pool. The campaign has no XP.
-# The win unlocks The Weather Hills, which the app cannot deal yet: its node reads Coming soon and the road offers no Begin (scripts/checks/maestro.test.ts, path-soon).
+# The win unlocks The Weather Hills, whose node reads Next (scripts/checks/maestro.test.ts, path-soon).
 - runFlow:
     file: ../../subflows/scenario-win.yaml
     env:
@@ -19,8 +19,6 @@ tags:
     text: ".*Protect the Innocent.*"
 - assertVisible:
     id: node-the-weather-hills-status
-    text: "Coming soon"
-- assertVisible:
-    id: path-soon
+    text: "Next"
 - assertNotVisible:
-    id: begin
+    id: path-soon

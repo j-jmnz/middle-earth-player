@@ -48,12 +48,12 @@ describe("Intruders in Chetwood in the angmar-awakened campaign", () => {
     expect(chetwood.campaignCard).toBe("10156");
   });
 
-  it("is playable, and the path offers it first on a fresh log, with the next part (The Weather Hills) not playable yet", () => {
+  it("is playable, and the path offers it first on a fresh log, with the next part (The Weather Hills) playable too", () => {
     expect(PLAYABLE_SCENARIOS).toContain("intruders-in-chetwood");
     const path = campaignPath(campaign, {}, emptyLog(1));
     expect(path[0]).toMatchObject({ id: "intruders-in-chetwood", status: "current" });
     expect(nextStep(path, null)).toMatchObject({ kind: "begin", node: { id: "intruders-in-chetwood" } });
-    expect(PLAYABLE_SCENARIOS).not.toContain(campaign.scenarios[1]);
+    expect(PLAYABLE_SCENARIOS).toContain(campaign.scenarios[1]);
   });
 
   it("10156:A:2 deals the Campaign Setup: Protect the Innocent in the staging area, Iârion's Pendant on Iârion, and nothing dealt from the campaign card itself", () => {
@@ -105,11 +105,11 @@ describe("Intruders in Chetwood in the angmar-awakened campaign", () => {
     expect(log.protectDamage).toBe(5);
   });
 
-  it("10156:B:1 unlocks The Weather Hills, the next part, which the app cannot deal yet: the road reads it as Coming soon", () => {
+  it("10156:B:1 unlocks The Weather Hills, the next part: the road reads it as Next", () => {
     const state = goldenState("intruders-in-chetwood", "two-handed, won, Normal");
     const log = applyResolution(emptyLog(2), state.scenarioId, state, world.cards, NO_COPY_LIMITS);
     const path = campaignPath(campaign, {}, log);
-    expect(path.map((node) => [node.id, node.status]).slice(0, 2)).toEqual([["intruders-in-chetwood", "completed"], ["the-weather-hills", "soon"]]);
+    expect(path.map((node) => [node.id, node.status]).slice(0, 2)).toEqual([["intruders-in-chetwood", "completed"], ["the-weather-hills", "current"]]);
   });
 
   it("a lost game writes nothing: the Resolution is for a win only, so finishing the lost golden leaves the log as it was", () => {

@@ -239,7 +239,7 @@ function chooseCards(table: Table, instruction: Extract<Instruction, { verb: "Ch
 
 // Step 6: the campaign card's Setup instructions that deal a card to a player, in the order the card lists them.
 function campaignSetupSteps(campaignSetup: readonly Instruction[], input: ChecklistInput, seats: Working[], pool: PoolCard[], fresh: Set<PoolCard>, name: (code: string) => string): Dealing & { removed: string[]; removedCaves: string[]; leftOut: (card: PoolCard) => boolean; aside: ReadonlySet<PoolCard> } {
-  const table: Table = { input, seats, pool, fresh, aside: new Set(), answers: [...(input.choices ?? [])], name, out: { did: [], errors: [], needs: null }, deck: searchableDeck(input.scenario, input.difficulty, input.seats.length, [...encounterDeal(pool, input.effects, campaignSetup, () => false).map((card) => card.code), ...poolEncounterCopies(input.log.encounterPool)]), removed: [], caves: searchableCaves(input.scenario, input.difficulty), removedCaves: [], burdens: [] };
+  const table: Table = { input, seats, pool, fresh, aside: new Set(), answers: [...(input.choices ?? [])], name, out: { did: [], errors: [], needs: null }, deck: searchableDeck(input.scenario, input.difficulty, input.seats.length, [...encounterDeal(pool, input.effects, campaignSetup, input.cards, () => false).map((card) => card.code), ...poolEncounterCopies(input.log.encounterPool)]), removed: [], caves: searchableCaves(input.scenario, input.difficulty), removedCaves: [], burdens: [] };
   for (const instruction of campaignSetup) {
     // A line that shuffles a card into the encounter deck puts it where the searches after it look (the Setup lines run in print order).
     if (instruction.verb === "ShuffleIntoEncounterDeck" && logConditionHolds(instruction.when, input.log)) table.deck.push(instruction.code);
@@ -271,13 +271,16 @@ function putsItselfIntoPlay(effects: readonly Effect[], code: string): boolean {
 
 // The pool entries the deal shuffles into the encounter deck (step 8): not attached, not skipped by the caller (set by the campaign card's Setup or already dealt),
 // backed by the encounter deck, not shuffled into a player's deck after the hand, and not put into play by their own record. The one definition the Setup searches and step 8 share.
-function encounterDeal(pool: readonly PoolCard[], effects: readonly Effect[], campaignSetup: readonly Instruction[], skipped: (card: PoolCard) => boolean): PoolCard[] {
-  return pool.filter((card) => card.attachedTo == null && !skipped(card) && card.back === "encounter" && !card.afterHand && !putsItselfIntoPlay(effects, card.code) && !dealtByCampaignSetup(campaignSetup, card.code));
+function encounterDeal(pool: readonly PoolCard[], effects: readonly Effect[], campaignSetup: readonly Instruction[], cards: ReadonlyMap<string, PrintedCard>, skipped: (card: PoolCard) => boolean): PoolCard[] {
+  return pool.filter((card) => card.attachedTo == null && !skipped(card) && card.back === "encounter" && !card.afterHand && !putsItselfIntoPlay(effects, card.code) && !dealtByCampaignSetup(campaignSetup, card.code, cards));
 }
 
-// A pool card the campaign card's own Setup always deals ("Add Protect the Innocent to the staging area", "shuffle Mysterious Omens into the encounter deck", The Weather Hills, 10159:A:2): that line deals it each game, so step 8 does not shuffle a second copy of it in.
-function dealtByCampaignSetup(campaignSetup: readonly Instruction[], code: string): boolean {
-  return campaignSetup.some((instruction) => (instruction.verb === "AddToStaging" || instruction.verb === "ShuffleIntoEncounterDeck") && instruction.code === code && instruction.when == null);
+// A pool side quest the campaign card's own Setup deals each game: "Add Protect the Innocent to the staging area", or "add Mysterious Omens to the Campaign Log and shuffle it into the encounter deck" (AddToPool with the shuffle, The Weather Hills, 10159:A:2). A side quest in the pool is the
+// one physical card the Setup deals, so step 8 does not shuffle a second copy in. A burden or boon the Setup also shuffles in is another copy, and step 8 still deals the pool's.
+function dealtByCampaignSetup(campaignSetup: readonly Instruction[], code: string, cards: ReadonlyMap<string, PrintedCard>): boolean {
+  if (cards.get(code)?.type !== "encounter-side-quest") return false;
+  const named = (verb: Instruction["verb"]): boolean => campaignSetup.some((instruction) => instruction.verb === verb && "code" in instruction && instruction.code === code && !("when" in instruction && instruction.when != null));
+  return named("AddToStaging") || (named("AddToPool") && named("ShuffleIntoEncounterDeck"));
 }
 
 export function checklist(input: ChecklistInput): ChecklistPlan {
@@ -394,7 +397,7 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
   const poolEncounterCards: string[] = [];
   const poolEncounterOwners: PoolEncounterOwner[] = [];
   const poolIntoPlay: string[] = [];
-  const toDeck = new Set(encounterDeal(pool, input.effects, campaignSetup, (card) => fresh.has(card) || dealt(card) || six.leftOut(card)));
+  const toDeck = new Set(encounterDeal(pool, input.effects, campaignSetup, input.cards, (card) => fresh.has(card) || dealt(card) || six.leftOut(card)));
   for (const card of pool) {
     if (card.attachedTo != null || fresh.has(card)) continue;
     if (dealt(card)) continue;
