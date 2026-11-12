@@ -37,6 +37,8 @@ export type StartSeat = {
   hand?: readonly string[];
   // The permanent starting threat penalty this seat takes of its own, on top of the table's `threatModifier` (The Passage of the Marshes, docs/brief.md, The Two Towers).
   threatPenalty?: number;
+  // A raise of this seat's threat that step 7 of Setup makes after the initial threat level is set (the first player's search for Andúril, 145066:A:1: "raise each player's threat"), so it is not part of the starting threat level (rr.setup, rr.initial-threat-level).
+  threatRaise?: number;
   // Resources each of this seat's heroes starts with beyond the usual (The Two Towers: "add 1 resource to each of his heroes' pools", 144069:A:2).
   resources?: number;
   // Cards a campaign card's Setup adds to the hand once the mulligan is over (AddToHandAfterMulligan): not drawn, not shuffled
@@ -169,6 +171,11 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
   state = stampRoutes(state, ctx.cards);
   // The starting threat level, for a card that reduces threat back to it (04053:A:2).
   state = recordStartingThreat(state, ctx);
+  // The raises of Setup step 7 come after the initial threat level is recorded.
+  for (let index = 0; index < input.seatCount; index += 1) {
+    const raise = input.seats[index]?.threatRaise ?? 0;
+    if (raise > 0) state = withThreat(state, index, (state.seats[index]?.threat ?? 0) + raise);
+  }
   const quiet: EngineStep[] = [];
   state = searchSetup(state, "player", ctx, quiet);
   state = handSetup(state, ctx, quiet);

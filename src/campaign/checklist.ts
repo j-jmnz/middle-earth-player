@@ -18,7 +18,7 @@ import { setAsideBoonWords } from "./return-of-the-king-words.ts";
 
 export type ChecklistStep = { n: number; rule: "rr.campaign-setup-checklist"; text: string; did: string[] };
 // The seat while the checklist fills it in; StartSeat is the read-only shape it hands to the start.
-type Working = { heroes: string[]; deck: string[]; attachments: { host: string; code: string }[]; hand: string[]; afterMulligan: string[]; chosen?: string[]; setAside?: string[]; threatPenalty?: number; resources?: number };
+type Working = { heroes: string[]; deck: string[]; attachments: { host: string; code: string }[]; hand: string[]; afterMulligan: string[]; chosen?: string[]; setAside?: string[]; threatPenalty?: number; threatRaise?: number; resources?: number };
 
 // `note` says what the choice is when the options alone do not (a search of the encounter deck for cards to remove from the game).
 // `words` gives an option that is not a card the words it is shown with (`resources`); a card option is shown as the card.
@@ -123,7 +123,7 @@ function searchToHand(table: Table, search: HandSearch): void {
     }
     seat.afterMulligan.push(answer);
     if (search.raise != null) {
-      for (const each of seats) each.threatPenalty = (each.threatPenalty ?? 0) + search.raise;
+      for (const each of seats) each.threatRaise = (each.threatRaise ?? 0) + search.raise;
       table.out.did.push(`Each player's threat is raised by ${search.raise} for this game.`);
     }
     table.out.did.push(`Seat ${index + 1} searches their deck for ${name(answer)} and adds it to their hand after the mulligan.`);

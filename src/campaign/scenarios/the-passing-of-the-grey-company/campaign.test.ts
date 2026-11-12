@@ -70,7 +70,10 @@ describe("The Passing of the Grey Company in the the-return-of-the-king campaign
     expect(plain.startingThreat).toEqual([9, 9]);
     const taken = opened(2, emptyLog(2), { loadout: andurilLoadout(2), choices: [ANDURIL] });
     expect(copies(taken, ANDURIL).map((card) => card.zone)).toEqual(["hand"]);
-    expect(taken.startingThreat).toEqual([10, 10]);
+    // rr.setup: the raise is made in step 7, after step 2 set the initial threat level, so the starting threat stays 9 (rr.initial-threat-level) while each dial is 1 higher than without the search.
+    expect(taken.startingThreat).toEqual([9, 9]);
+    const dial = (state: ScenarioState): number[] => state.seats.slice(0, 2).map((seat) => seat.threat);
+    expect(dial(taken)).toEqual(dial(plain).map((threat) => threat + 1));
     const skipped = opened(2, emptyLog(2), { loadout: andurilLoadout(2), choices: ["skip"] });
     expect(copies(skipped, ANDURIL).map((card) => card.zone)).toEqual(["deck"]);
     expect(skipped.startingThreat).toEqual([9, 9]);
