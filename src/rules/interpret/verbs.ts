@@ -95,7 +95,11 @@ export function runExtraVerb(
     case "AddSetAsideToStaging": {
       const copies = state.setAside.filter((candidate) => (instruction.code != null ? state.cards[candidate]?.code === instruction.code : instruction.trait != null && hasTrait(state, candidate, instruction.trait, ctx)));
       // Into the acting seat's own staging area once stages are separate (mec109.multiple-staging-areas).
-      return (instruction.all === true ? copies : copies.slice(0, 1)).reduce((next, id) => updateCard(moveCard(next, id, stagingDest(next, focus.seat)), id, { face: turnedUp(next, id) }), state);
+      return (instruction.all === true ? copies : copies.slice(0, 1)).reduce((next, id) => {
+        const added = updateCard(moveCard(next, id, stagingDest(next, focus.seat)), id, { face: turnedUp(next, id) });
+        // `announce`: the card entered play, and the cards that hear it added to the staging area hear it (Thaurdir, 10166:A:3).
+        return instruction.announce === true ? queueEvent(added, { trigger: "addedToStaging", seat: focus.seat, cardId: id }) : added;
+      }, state);
     }
     case "ShuffleOutOfPlayIntoEncounterDeck": {
       // Outside an effect frame nobody can be asked, so the first choice goes (effect-frames.ts asks the first player when

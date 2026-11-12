@@ -65,7 +65,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
     - shuffle the encounter discard pile into the encounter deck
     - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy"}]
     - for each player, first player first:
-      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"engaged","when":{"kind":"all","conditions":[{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"},"inPlay":false},{"kind":"firstPlayer"}]}}]
+      - if all of: (the picked card is a enemy (any player controls) that is out of play now) and (the actor holds the first player token): the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
 
 ## 146029 Reeking Moat
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -187,7 +187,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
         - [json AttachSelfToPicked {"verb":"AttachSelfToPicked"}]
   146036:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Mount"}]
+    - this card counts as a Mount attachment while it is attached
     - its host: stat threat 2, while this card is in play
     - its host: stat attack 2, while this card is in play
     - its host: stat defense 2, while this card is in play
@@ -336,4 +336,4 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
   146073:constant:2: Constant
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 189 by template, 36 as JSON)
+(rendered pieces: 195 by template, 34 as JSON)

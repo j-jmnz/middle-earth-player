@@ -85,7 +85,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 141026:B:1 (back): When Revealed: Add Midgewater to the staging area. Each player places 1 progress on the current quest.
   141026:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"141048"}]
+    - one set-aside card with code 141048 joins the staging area (it is not revealed)
     - [json PlaceQuestProgress {"verb":"PlaceQuestProgress","perPlayer":1}]
 
 141026:B:2 (back): Forced: At the end of the round, either remove X progress from the current quest or shuffle 1 out of play Ringwraith into the encounter deck. X is the number of players in the game.
@@ -107,8 +107,8 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 141027:A:1 (front): When Revealed: Add Weathertop and The Witch-king to the staging area. Search the encounter deck and discard pile and add each Nazgûl enemy found to the staging area. Shuffle the encounter deck.
   141027:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"141046"}]
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"141068"}]
+    - one set-aside card with code 141046 joins the staging area (it is not revealed)
+    - one set-aside card with code 141068 joins the staging area (it is not revealed)
     - every Nazgûl enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
 
@@ -252,7 +252,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
       * option "ringwraith" (only if [json condition {"kind":"outOfPlay","code":"141069"}]):
         - [json ShuffleOutOfPlayIntoEncounterDeck {"verb":"ShuffleOutOfPlayIntoEncounterDeck","code":"141069"}]
       * option "reveal":
-        - [json GainSurge {"verb":"GainSurge"}]
+        - this card gains surge (one more encounter card is revealed when it has been resolved)
 
 ## 141054 Unwanted Attention
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -290,7 +290,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
     - [json SetStat {"verb":"SetStat","stat":"willpower","value":0,"target":"host"}]
     - [json SetStat {"verb":"SetStat","stat":"attack","value":0,"target":"host"}]
     - [json SetStat {"verb":"SetStat","stat":"defense","value":0,"target":"host"}]
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - this card counts as a Condition attachment while it is attached
 
 ## 141068 The Witch-king
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -571,6 +571,6 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
     only if it is the Refresh phase
     - raise threat by 2 (hostController)
   906209:constant:1: Constant
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - this card counts as a Condition attachment while it is attached
 
-(rendered pieces: 219 by template, 55 as JSON)
+(rendered pieces: 225 by template, 49 as JSON)

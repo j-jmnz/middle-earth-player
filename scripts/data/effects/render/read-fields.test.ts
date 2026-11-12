@@ -47,12 +47,26 @@ const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   ChooseCurrentQuest: [{ verb: "ChooseCurrentQuest" }],
   AttachNewTo: [{ verb: "AttachNewTo", code: "10157", to: "Iârion" }],
   TradeDamageForResources: [{ verb: "TradeDamageForResources", code: "10158", damage: 4, resources: 1 }],
-  FirstTraitSurge: [{ verb: "FirstTraitSurge", trait: "Weather" }],
+  FirstTraitSurge: [{ verb: "FirstTraitSurge", trait: "Weather", type: "enemy" }],
+  AddSetAsideToStaging: [{ verb: "AddSetAsideToStaging", code: "09033", all: true, announce: true }, { verb: "AddSetAsideToStaging", trait: "Orc" }],
+  DiscardFromDeck: [{ verb: "DiscardFromDeck", amount: 2, shuffle: true, count: HERO, costAtLeast: 2 }],
+  MoveCard: [{ verb: "MoveCard", card: "self", from: ["discard"], to: "deckShuffle" }],
+  PickDiscardTop: [{ verb: "PickDiscardTop", types: ["enemy"], trait: "Undead" }],
+  MoveEncounterCard: [{ verb: "MoveEncounterCard", card: "deckTop", to: "staging" }],
+  GainSurge: [{ verb: "GainSurge" }],
+  CountsAs: [{ verb: "CountsAs", cardType: "attachment", trait: "Sorcery" }],
+  IncreaseCost: [{ verb: "IncreaseCost", amount: 1, pick: HERO }],
+  RaiseStagingThreat: [{ verb: "RaiseStagingThreat", amount: 2, until: "endOfRound" }],
+  PutSetAsideInPlay: [{ verb: "PutSetAsideInPlay", name: "Iârion", to: "lastPlayer" }, { verb: "PutSetAsideInPlay", name: "Calaerion", withCard: "Dream-chaser" }],
+  AttachRandomBurden: [{ verb: "AttachRandomBurden", codes: ["10168", "10169"], to: "self" }],
+  MoveToHero: [{ verb: "MoveToHero", most: "damage" }],
+  AttachSelfToNamed: [{ verb: "AttachSelfToNamed", name: "Thaurdir", outOfPlay: true }],
+  MoveDamageTo: [{ verb: "MoveDamageTo", from: "self", to: "other", amount: 1 }],
   EndPhase: [{ verb: "EndPhase" }],
   PlaceLoggedDamageOn: [{ verb: "PlaceLoggedDamageOn", code: "10158" }],
   ChooseBoon: [{ verb: "ChooseBoon", codes: ["10161", "10162"], seat: 1 }],
   RemoveResourceTokens: [{ verb: "RemoveResourceTokens", code: "09072", amount: 1 }, { verb: "RemoveResourceTokens", on: "picked", amount: 1 }],
-  SearchMove: [{ verb: "SearchMove", trait: "Orc", type: "enemy", code: "09043", to: "engagedFirstPlayer", each: true, deckOnly: true, victory: true }, { verb: "SearchMove", to: "engaged" }, { verb: "SearchMove", to: "stormcallerArea" }],
+  SearchMove: [{ verb: "SearchMove", trait: "Orc", type: "enemy", code: "09043", to: "engagedFirstPlayer", each: true, deckOnly: true, victory: true }, { verb: "SearchMove", code: "09061", to: "engaged", discardOnly: true }, { verb: "SearchMove", to: "engaged" }, { verb: "SearchMove", to: "stormcallerArea" }],
   AssignDamage: [{ verb: "AssignDamage", amount: 2, pick: HERO, who: "eachSeat", left: 1, of: 2 }],
   ExhaustEach: [{ verb: "ExhaustEach", pick: HERO }],
   RemoveFromQuest: [{ verb: "RemoveFromQuest" }],
@@ -251,6 +265,7 @@ describe("effects render read fields, conditions", () => {
     tokens: [{ kind: "tokens", code: "09072", min: 1, perPlayer: true }],
     currentQuest: [{ kind: "currentQuest", is: "side" }, { kind: "currentQuest", is: "self" }, { kind: "currentQuest", is: "other" }],
     questLeads: [{ kind: "questLeads" }],
+    hitPointsLeft: [{ kind: "hitPointsLeft", code: "09033" }],
     pileHas: [{ kind: "pileHas", pile: "harad", min: 1, max: 3 }],
     facedownUnder: [{ kind: "facedownUnder", code: "144027", min: 3, max: 8, players: true }],
     soleAttacker: [{ kind: "soleAttacker" }],
@@ -259,7 +274,7 @@ describe("effects render read fields, conditions", () => {
     fortitudeFailed: [{ kind: "fortitudeFailed", scope: "round", who: "any" }],
     hostControlledByActor: [{ kind: "hostControlledByActor" }],
     captives: [{ kind: "captives", min: 1, max: 2, of: "actor" }],
-    matches: [{ kind: "matches", card: "picked", pick: { type: "enemy", control: "any" } }],
+    matches: [{ kind: "matches", card: "picked", pick: { type: "enemy", control: "any" }, inPlay: false }],
     controls: [{ kind: "controls", code: "12345" }],
     // The combinators are not in the table: renderCondition words them.
     not: [{ kind: "not", condition: { kind: "firstPlayer" } }],
@@ -312,6 +327,8 @@ describe("effects render read fields, picks", () => {
     who: "firstPlayer",
     engagedEnemies: true,
     hasShadow: true,
+    copyInDiscard: true,
+    looked: true,
     lowestAttack: true,
     lowestThreat: true,
     highestCost: true,
@@ -336,7 +353,7 @@ describe("effects render read fields, picks", () => {
 
   it("claims no field whose value it leaves unsaid", () => {
     // A false the template has no words for stays out of its claim, so it prints as `[also {...}]` in place of vanishing.
-    for (const key of ["unique", "nonUnique", "hasResources", "attacking", "defending", "staging", "stagingOnly", "hasShadow", "engagedEnemies", "objective", "nonObjective"]) {
+    for (const key of ["unique", "nonUnique", "hasResources", "attacking", "defending", "staging", "stagingOnly", "hasShadow", "copyInDiscard", "looked", "engagedEnemies", "objective", "nonObjective"]) {
       expect(renderPick({ type: "hero", control: "you", [key]: false }, newCtx()), key).toContain(`[also {"${key}":false}]`);
     }
   });

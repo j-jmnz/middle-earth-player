@@ -67,7 +67,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
     - for the acting player, the top card(s) of the evilCreatures deck go to the staging area, attached to this card
   18018:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - this card counts as a Condition attachment while it is attached
     - its host: stat threat 1, while this card is in play
     - its host: stat attack 1, while this card is in play
     - its host: stat defense 1, while this card is in play
@@ -84,7 +84,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
   18019:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each player assigns threat of the active location damage among the character (you control), one at a time
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"less","left":{"stat":"threat","of":"activeLocation"},"right":3}}]
+    - then, if threat of the active location is less than 3 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 18019:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defender is damaged).
   18019:shadow:1: Shadow
@@ -125,7 +125,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 
 18021:A:3 (shadow): Shadow: Add Stray Goblin to staging area.
   18021:shadow:1: Shadow
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"self","to":"staging"}]
+    - this card goes to the staging area (it is not revealed)
 
 ## 18022 Pack of Wargs
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -211,7 +211,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
     - attach this card to a hero
     - exhaust its host
   18027:constant:1: Constant
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - this card counts as a Condition attachment while it is attached
   18027:forced:1: Forced on the event readied (heard about the host)
     - the acting player chooses one of:
       * option "other" (only if there is a card (any player controls) that is not an objective [also {"attachedTo":"host","other":true}] to choose):
@@ -235,7 +235,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
     - shuffle the encounter deck
     - repeat the number of players times:
       - [json DiscardUntil {"verb":"DiscardUntil","type":"location"}]
-      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging"}]
+      - the picked card goes to the staging area (it is not revealed)
 
 18066:B:1 (back): Forced: After placing progress here from questing successfully, place 1 resource here.
   18066:forced:1: Forced on the event progressPlaced (heard about this card)
@@ -260,7 +260,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 18067:A:1 (front): When Revealed: The first player adds Woodmen Village to the staging area. Each other player reveals an encounter card.
   18067:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"18069"}]
+    - one set-aside card with code 18069 joins the staging area (it is not revealed)
     - for each player, first player first:
       - if not (the actor holds the first player token): the acting player reveals an encounter card
 
@@ -283,7 +283,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 18068:A:1 (front): When Revealed: The first player adds The Old Ford to the staging area. Each other player adds the top card of the Evil Creatures deck to the staging area.
   18068:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"18016"}]
+    - one set-aside card with code 18016 joins the staging area (it is not revealed)
     - for each player, first player first:
       - if not (the actor holds the first player token): for the acting player, the top card(s) of the evilCreatures deck go to the staging area
 
@@ -332,4 +332,4 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
   18070:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
     - the players lose the game
 
-(rendered pieces: 181 by template, 41 as JSON)
+(rendered pieces: 190 by template, 34 as JSON)

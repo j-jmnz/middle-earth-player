@@ -84,9 +84,9 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
     - choose player (any player controls)
     - [json SwitchActor {"verb":"SwitchActor","to":"picked"}]
     - [json LookAtTop {"verb":"LookAtTop","count":{"discoverValue":true},"deck":"own"}]
-    - choose card (you control) in the deck [also {"looked":true}]
+    - choose card (you control) in the deck, among the cards this effect looked at or discarded
     - move the picked card to hand
-    - for each card (you control) in the deck [also {"looked":true}]:
+    - for each card (you control) in the deck, among the cards this effect looked at or discarded:
       - [json PutOnDeck {"verb":"PutOnDeck","position":"bottom","target":"picked"}]
 
 ## 19096 Scatha's Teeth
@@ -191,7 +191,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
   19101:forced:1: Forced after this location becomes the active location (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy","trait":"Undead"}]
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging"}]
+    - the picked card goes to the staging area (it is not revealed)
     - [json AttachLootFromDiscard {"verb":"AttachLootFromDiscard"}]
 
 ## 19102 Haunted Hall
@@ -263,7 +263,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - [json ResolveDiscover {"verb":"ResolveDiscover"}]
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"discoverUnavailable"}}]
+    - then, if [json condition {"kind":"discoverUnavailable"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
     - [json Doomed {"verb":"Doomed","amount":2,"when":{"kind":"discoverUnavailable"}}]
 
 19106:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
@@ -335,7 +335,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
         - raise threat by 2 (each player)
       * option "location":
         - [json DiscardUntil {"verb":"DiscardUntil","type":"location"}]
-        - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging"}]
+        - the picked card goes to the staging area (it is not revealed)
 
 19110:B:2 (back): This stage cannot be defeated unless the players control at least 2 Loot objectives.
   19110:constant:1: Constant
@@ -349,7 +349,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
   19111:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"19097","when":{"kind":"firstPlayer"}}]
+      - if the actor holds the first player token: one set-aside card with code 19097 joins the staging area (it is not revealed)
       - then, if not (the actor holds the first player token) (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player finds one Undead enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"nonUnique":true}]
     - shuffle the encounter deck
 
@@ -367,4 +367,4 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
     only if [json condition {"kind":"inVictory","code":"19098","is":false}]
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 176 by template, 53 as JSON)
+(rendered pieces: 183 by template, 48 as JSON)

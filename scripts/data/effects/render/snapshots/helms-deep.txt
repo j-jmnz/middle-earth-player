@@ -193,7 +193,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) in the staging area only [also {"highestAttack":true}]
     - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the acting player now, from the staging area
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"not","condition":{"kind":"canPick","pick":{"type":"enemy","control":"any","stagingOnly":true}}}}]
+    - then, if not (there is a enemy (any player controls) in the staging area only to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 143044:A:3 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   143044:shadow:1: Shadow
@@ -252,8 +252,8 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143073:A:1 (front): When Revealed: Add The Defense of Helm's Deep and each set aside copy of Soldier of Isengard to the staging area. Make Deeping Wall the active location. Shuffle the encounter deck. Then, each player reveals 1 encounter card.
   143073:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"143033"}]
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"143036","all":true}]
+    - one set-aside card with code 143033 joins the staging area (it is not revealed)
+    - every set-aside card with code 143036 joins the staging area (it is not revealed)
     - [json MakeSetAsideActive {"verb":"MakeSetAsideActive","code":"143038"}]
     - shuffle the encounter deck
     - for each player, first player first:
@@ -333,4 +333,4 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
     only if [json condition {"kind":"enemyInPlay","is":false}]
     - the players win the game
 
-(rendered pieces: 152 by template, 32 as JSON)
+(rendered pieces: 158 by template, 29 as JSON)

@@ -59,8 +59,8 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Raider Flagship"}]
     - [json FitShips {"verb":"FitShips","codes":["11172","11173","11174","11175"]}]
-    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Calaerion","withCard":"Dream-chaser"}]
-    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Gavin","to":"anyPlayer"}]
+    - the set-aside card titled "Calaerion" is put into play under the control of the player who controls the card titled "Dream-chaser"
+    - the set-aside card titled "Gavin" is put into play under a player the first player chooses
     - [json ChooseCards {"verb":"ChooseCards","codes":["11205","11206","11207","11208"],"who":"onePlayer","to":"hand","optional":true,"unearned":true,"afterMulligan":true}]
 
 11209:A:3 (front): Put Calaerion into play under the control of the player with the Dream-chaser. Put Gavin into play under any player's control. One player may choose a copy of Círdan's Blessing not in the Campaign Pool and add it to their hand.
@@ -81,8 +81,8 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Raider Flagship"}]
     - [json FitShips {"verb":"FitShips","codes":["11172","11173","11174","11175"]}]
-    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Calaerion","withCard":"Dream-chaser"}]
-    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Gavin","to":"anyPlayer"}]
+    - the set-aside card titled "Calaerion" is put into play under the control of the player who controls the card titled "Dream-chaser"
+    - the set-aside card titled "Gavin" is put into play under a player the first player chooses
     - [json ChooseCards {"verb":"ChooseCards","codes":["11205","11206","11207","11208"],"who":"onePlayer","to":"hand","optional":true,"unearned":true,"afterMulligan":true}]
 
 11209:B:1 (back): Resolution: Add the Círdan's Blessing chosen during setup to the Campaign Pool. The players may spend 4 XP on Gavin to record in the Campaign Log that "Gavin returned."
@@ -351,7 +351,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
   12132:whenRevealed:1: When revealed
     - [json AttachSelf {"verb":"AttachSelf","to":{"kind":"ship"}}]
   12132:constant:1: Constant
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - this card counts as a Condition attachment while it is attached
   12132:forced:1: Forced on the event shipExhausted (heard about the host)
     - deal 2 damage to its host
   12132:action:1: Action
@@ -376,7 +376,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     - then, if there is a objective (any player controls) in the staging area only [also {"hasGuard":false}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): return the picked card to the staging area
     - choose objective (any player controls) in the staging area only [also {"hasGuard":false}]
     - [json AttachGuard {"verb":"AttachGuard","guard":"previous","to":"picked"}]
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"noneReturned"}}]
+    - then, if [json condition {"kind":"noneReturned"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 ## 12134 Sea-ward Tower
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -426,7 +426,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 12136:A:3 (front): Planning Action: If the players control The Beacon, exhaust it and spend 5 resources to take control of 1 set aside copy of Dol Amroth Warship. Any player may trigger this action.
   12136:action:1: Action (cost: exhaust this card and pay 5 resource(s))
     only if all of: (it is the Planning phase) and ([json condition {"kind":"controlledByPlayers"}])
-    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Dol Amroth Warship","to":"actor"}]
+    - the set-aside card titled "Dol Amroth Warship" is put into play under the acting player
 
 ## 12137 Tower of the Heron
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -444,4 +444,4 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     only if [json condition {"kind":"controlledByPlayers"}]
     - this card: stat archeryBonus -4, while this card is in play
 
-(rendered pieces: 150 by template, 115 as JSON)
+(rendered pieces: 157 by template, 109 as JSON)

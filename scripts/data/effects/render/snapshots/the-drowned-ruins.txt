@@ -76,8 +76,8 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
     - [json PrepareGrottoDeck {"verb":"PrepareGrottoDeck"}]
     - [json AddFromGrottoDeck {"verb":"AddFromGrottoDeck","count":2,"when":{"kind":"not","condition":{"kind":"count","pick":{"type":"player","control":"any"},"min":3}}}]
     - [json AddFromGrottoDeck {"verb":"AddFromGrottoDeck","count":3,"when":{"kind":"count","pick":{"type":"player","control":"any"},"min":3}}]
-    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Captain Sahír"}]
-    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Na'asiyah","to":"lastPlayer"}]
+    - the set-aside card titled "Captain Sahír" is put into play under the first player
+    - the set-aside card titled "Na'asiyah" is put into play under the last player
 
 12092:B:1 (back): While an Underwater location is the active location, players cannot play attachments or allies.
   12092:constant:1: Constant
@@ -293,7 +293,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
     only if all of: (it is the Quest phase) and (this card is the active location)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - [json DiscardFromDeck {"verb":"DiscardFromDeck","amount":10}]
+      - the top 10 card(s) of the acting player's deck go to their discard pile
     - the first player chooses one of:
       * option "return":
         - return this card to the staging area
@@ -327,7 +327,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
           - [json DiscardEach {"verb":"DiscardEach","pick":{"type":"card","control":"you","from":"hand","notCardType":"player-side-quest"}}]
         * option "treasure":
           - [json DiscardEach {"verb":"DiscardEach","pick":{"type":"card","control":"you","from":"hand","notCardType":"treasure"}}]
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"noneDiscarded"}}]
+    - then, if [json condition {"kind":"noneDiscarded"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 12106:A:2 (shadow): Shadow: If the active location is Underwater, search the encounter deck and discard pile for a Creature enemy, and add it to the staging area.
   12106:shadow:1: Shadow
@@ -362,4 +362,4 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if the active location is a Underwater location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
 
-(rendered pieces: 182 by template, 56 as JSON)
+(rendered pieces: 186 by template, 53 as JSON)

@@ -30,8 +30,8 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 141029:B:1 (back): When Revealed: Add Ford of Bruinen and The Witch-king to the staging area.
   141029:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"141059"}]
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"141068"}]
+    - one set-aside card with code 141059 joins the staging area (it is not revealed)
+    - one set-aside card with code 141068 joins the staging area (it is not revealed)
 
 141029:B:2 (back): While at least 1 Nazgûl enemy is in play, Race to Rivendell gets +15 quest points.
   141029:constant:1: Constant
@@ -100,7 +100,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 141059:A:2 (front): Response: After Ford of Bruinen leaves play as an explored location, all engaged enemies are discarded.
   141059:response:1: Response after a card leaves play (heard about this card)
     - for each enemy (any player controls):
-      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"discard"}]
+      - the picked card goes to the encounter discard pile
 
 141059:A:3 (front): Travel: The first player must reveal the top card of the encounter deck to travel here.
   141059:travel:1: Travel
@@ -167,7 +167,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
     - the acting player chooses one of:
       * option "burden" (only if [json condition {"kind":"burdenDeck"}]):
         - [json MoveBurden {"verb":"MoveBurden","to":"encounterShuffle"}]
-        - [json GainSurge {"verb":"GainSurge"}]
+        - this card gains surge (one more encounter card is revealed when it has been resolved)
       * option "threat":
         - raise threat by 3 (each player)
         - end the quest phase at once (no quest resolution)
@@ -179,7 +179,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
   141065:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json ImmediateAttackEach {"verb":"ImmediateAttackEach"}]
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"noneReturned"}}]
+    - then, if [json condition {"kind":"noneReturned"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 141065:A:2 (shadow): Shadow: If this attack destroys a character, remove all progress from the current quest.
   141065:shadow:1: Shadow
@@ -209,7 +209,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
   141067:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each character (any player controls): stat blankText (its text box is blank) 1, until the end of the round
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"count","pick":{"type":"enemy","control":"any","stagingOnly":true,"trait":"Nazgûl"},"min":1}}]
+    - then, if the number of Nazgûl enemy (any player controls) in the staging area only is at least 1 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 141067:A:2 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
   141067:shadow:1: Shadow
@@ -304,4 +304,4 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
   141084:shadow:1: Shadow
     - the acting player discards 1 random card(s) from hand
 
-(rendered pieces: 112 by template, 38 as JSON)
+(rendered pieces: 120 by template, 33 as JSON)

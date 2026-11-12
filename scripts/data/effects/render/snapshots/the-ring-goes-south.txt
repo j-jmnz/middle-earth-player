@@ -74,7 +74,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
   142023:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json MakeSetAsideActive {"verb":"MakeSetAsideActive","code":"142030"}]
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"142024"}]
+    - one set-aside card with code 142024 joins the staging area (it is not revealed)
     - [json CaptureRingBearer {"verb":"CaptureRingBearer","under":"142024"}]
 
 142023:B:1 (back): There can be 2 active locations. During the travel phase, the players must travel to a location, if able.
@@ -123,7 +123,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
   142025:forced:1: Forced after an enemy engages a player (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy","trait":"Warg"}]
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","to":"engaged"}]
+    - the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
 
 ## 142026 Hound of Sauron
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -281,7 +281,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
   142036:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json AttachToActiveLocation {"verb":"AttachToActiveLocation"}]
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"not","condition":{"kind":"x","min":1}}}]
+    - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
   142036:constant:1: Constant
     - its host: stat progressCap 3, while this card is in play
 
@@ -317,7 +317,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
         - the picked enemy attacks the acting player now, from the staging area
       * option "engagement":
         - each Warg enemy (any player controls) in the staging area only: stat engagementCost -20, until the end of the round
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"not","condition":{"kind":"count","pick":{"type":"enemy","control":"any","stagingOnly":true,"trait":"Warg"},"min":1}}}]
+    - then, if not (the number of Warg enemy (any player controls) in the staging area only is at least 1) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 ## 142084 Lust for the Ring
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -333,4 +333,4 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
     - raise threat by 1 (each player)
     - [json SetStatUntil {"verb":"SetStatUntil","stat":"willpower","value":0,"until":"endOfRound","holders":{"type":"hero","control":"any","isHost":true}}]
 
-(rendered pieces: 150 by template, 39 as JSON)
+(rendered pieces: 159 by template, 35 as JSON)

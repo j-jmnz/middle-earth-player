@@ -109,7 +109,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01113:A:1 (front): Forced: If Banks of the Anduin leaves play, return it to the top of the encounter deck instead of placing it in the discard pile.
   01113:forced:1: Forced after a card leaves play (heard about this card)
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"self","to":"deckTop"}]
+    - this card goes on top of the encounter deck
 
 ## 01114 Gladden Fields
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -127,7 +127,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01115:A:2 (front): Forced: After Eastern Crows is defeated, shuffle it back into the encounter deck.
   01115:forced:1: Forced after an enemy is destroyed (heard about this card)
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"self","to":"shuffle"}]
+    - this card is shuffled into the encounter deck
 
 01115:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if defending player's threat is 35 or higher.)
   01115:shadow:1: Shadow
@@ -251,4 +251,4 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
     - each copy of code 01133 and code 01138 attached to a hero in play joins the Campaign Pool attached to that hero
     - [json NamePrisoner {"verb":"NamePrisoner"}]
 
-(rendered pieces: 119 by template, 20 as JSON)
+(rendered pieces: 121 by template, 18 as JSON)

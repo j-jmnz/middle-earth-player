@@ -155,8 +155,8 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
     - [json RevealIslandCorners {"verb":"RevealIslandCorners"}]
     - choose location (any player controls) chosen by the first player [also {"island":"start"}]
     - [json SetIslandActive {"verb":"SetIslandActive"}]
-    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Captain Sahír"}]
-    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Na'asiyah"}]
+    - the set-aside card titled "Captain Sahír" is put into play under the first player
+    - the set-aside card titled "Na'asiyah" is put into play under the first player
     - [json AttachGuarded {"verb":"AttachGuarded","name":"Gate Key","to":"Temple Guardian"}]
     - shuffle the encounter deck
 
@@ -411,7 +411,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 12078:A:1 (front): When Revealed: Until the end of the phase, add X Threat to the total Threat in the staging area. X is the total Threat of all locations to the left of the active location (in its row). If X is 0, Deeper into the Ruins gains Doomed 1.
   12078:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json RaiseStagingThreat {"verb":"RaiseStagingThreat","amount":{"islandLeft":true},"until":"endOfPhase","when":{"kind":"less","left":0,"right":{"islandLeft":true}}}]
+    - if 0 is less than [json amount {"islandLeft":true}]: the total Threat in the staging area is [json amount {"islandLeft":true}] higher until the end of the phase
     - [json Doomed {"verb":"Doomed","amount":1,"when":{"kind":"less","left":{"islandLeft":true},"right":1}}]
 
 ## 12079 Furious Rainstorm
@@ -460,4 +460,4 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
     - then, if the active location is a Ruins location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): for each hero (any player controls) with resources on it:
       - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"picked"}]
 
-(rendered pieces: 230 by template, 77 as JSON)
+(rendered pieces: 234 by template, 76 as JSON)

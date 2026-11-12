@@ -108,7 +108,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - return one enemy engaged with the acting player (that player picks which) to the staging area
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"noneReturned"}}]
+    - then, if [json condition {"kind":"noneReturned"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
     - [json Doomed {"verb":"Doomed","amount":1,"when":{"kind":"noneReturned"}}]
 
 09022:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. Return attacking enemy to the staging area after this attack.
@@ -163,14 +163,14 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the attacking enemy: stat attack 1, until the end of the attack
     - when the attack in progress ends:
-      - if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (the event's other card is a ally (any player controls) [also {"inPlay":false}]): return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+      - if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (the event's other card is a ally (any player controls) that is out of play now): return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
 
 ## 09044 Angmar Marauder
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 09044:A:1 (front): Forced: After Angmar Marauder attacks and destroys an ally, return it to the staging area.
   09044:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
-    only if the event's other card is a ally (any player controls) [also {"inPlay":false}]
+    only if the event's other card is a ally (any player controls) that is out of play now
     - return this card to the staging area
 
 09044:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each ally the defending player controls.
@@ -182,9 +182,9 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 
 09045:A:1 (front): Forced: After Angmar Captain attacks and destroys an ally, discard the top card of the defending player's deck. If the discarded card is an ally, Angmar Captain makes an additional attack against the defending player.
   09045:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
-    only if the event's other card is a ally (any player controls) [also {"inPlay":false}]
+    only if the event's other card is a ally (any player controls) that is out of play now
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json DiscardFromDeck {"verb":"DiscardFromDeck","amount":1,"count":{"type":"ally","control":"any","looked":true}}]
+    - the top 1 card(s) of the acting player's deck go to their discard pile; X becomes how many of them are a ally (any player controls) among the cards this effect looked at or discarded
     - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
 ## 09046 Orc Ambush
@@ -276,7 +276,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 09068:A:1 (front): Setup: Put Iârion into play. Add 1 Orc War Party to the staging area. Each player adds 1 different location to the staging area. Shuffle the encounter deck.
   09068:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Iârion","to":"firstPlayer"}]
+    - the set-aside card titled "Iârion" is put into play under the first player
     - for each player, first player first:
       - the acting player finds one location in the encounter deck and adds it to the staging area (it is not revealed) [also {"different":true}]
     - shuffle the encounter deck
@@ -342,4 +342,4 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
     - if not (2 is less than the number of players): this card: stat loseAtDamage 10, while this card is in play
     - then, if 2 is less than the number of players (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat loseAtDamage 20, while this card is in play
 
-(rendered pieces: 192 by template, 19 as JSON)
+(rendered pieces: 199 by template, 14 as JSON)

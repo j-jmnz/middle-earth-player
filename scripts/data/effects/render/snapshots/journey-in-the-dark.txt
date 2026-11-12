@@ -20,7 +20,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 
 142041:A:1 (front): When Revealed: Add Chamber of Mazarbul to the staging area.
   142041:whenRevealed:1: When revealed
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"142051"}]
+    - one set-aside card with code 142051 joins the staging area (it is not revealed)
 
 142041:B:1 (back): If there are no enemies in the staging area at the beginning of the quest phase, the first player reveals an additional encounter card during the staging step.
   142041:forced:1: Forced when a phase begins
@@ -42,7 +42,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 142042:A:1 (front): When Revealed: Add The Great Bridge to the staging area. Each player reveals 1 encounter card and removes 1 damage token from Doom, Doom, Doom.
   142042:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"142050"}]
+    - one set-aside card with code 142050 joins the staging area (it is not revealed)
     - for each player, first player first:
       - the acting player reveals an encounter card
       - [json RemoveDamageFrom {"verb":"RemoveDamageFrom","code":"142043","amount":1}]
@@ -68,7 +68,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
     only if it is the Quest phase
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json RemoveDamageFrom {"verb":"RemoveDamageFrom","code":"142043","amount":1}]
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"142044","when":{"kind":"damageHere","max":0}}]
+    - then, if [json condition {"kind":"damageHere","max":0}] (checked when this step runs, after the steps above; not tied to whether they did anything): one set-aside card with code 142044 joins the staging area (it is not revealed)
 
 142043:A:2 (front): Forced: At the end of the quest phase, The Balrog makes an attack if it is in play.
   142043:forced:2: Forced at the end of the phase
@@ -231,8 +231,8 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
   142054:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"}]
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"location","control":"any"}}}]
+    - the top card of the encounter deck goes to the encounter discard pile
+    - then, if the picked card is a location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
 
 ## 142055 Ancient Guardroom
 (the scenario deals it into the staging pile; the piles place it, no record does)
@@ -245,7 +245,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 142055:A:2 (front): Travel: Discard the top card of the encounter deck to travel here. Each player raises his threat by X, where X is the discarded card's Threat.
   142055:travel:1: Travel
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"}]
+    - the top card of the encounter deck goes to the encounter discard pile
     - raise threat by threat of the top card of the encounter discard pile (each player)
 
 ## 142056 They Are Coming!
@@ -283,7 +283,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose character (you control) committed to the quest
     - the last picked character is removed from the quest (it stays exhausted)
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"}]
+    - the top card of the encounter deck goes to the encounter discard pile
     - then, if printed willpower of the card picked before is less than threat of the top card of the encounter discard pile (checked when this step runs, after the steps above; not tied to whether they did anything): discard the card picked before
 
 ## 142059 Fool of a Took!
@@ -344,7 +344,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
     only if this card is in the staging area
     - attach this card to a hero
   142087:constant:1: Constant
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - this card counts as a Condition attachment while it is attached
   142087:forced:2: Forced on the event characterDestroyed (heard about character (any player controls) [also {"controlledBy":"host"}])
     only if not (this card is in the staging area)
     (steps run in order; a step depends on an earlier one only through its own condition)
@@ -362,9 +362,9 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
     only if this card is in the staging area
     - [json AttachToSubject {"verb":"AttachToSubject"}]
   142088:constant:1: Constant
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - this card counts as a Condition attachment while it is attached
   142088:forced:2: Forced on the event exhausted (heard about the host)
     only if not (this card is in the staging area)
     - deal 1 damage to its host
 
-(rendered pieces: 183 by template, 22 as JSON)
+(rendered pieces: 194 by template, 14 as JSON)

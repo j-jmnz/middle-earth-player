@@ -141,7 +141,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the encounter discard pile into the encounter deck
     - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy"}]
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"},"inPlay":false}}]
+    - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
 
 ## 145050 The Black Serpent
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -326,7 +326,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ally (you control)
     - then, if there is a ally (you control) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
-    - [json RaiseStagingThreat {"verb":"RaiseStagingThreat","until":"endOfPhase","live":"alliesInDiscard"}]
+    - the total Threat in the staging area is raised, live, by the allies in a discard pile until the end of the phase
 
 145060:A:3 (shadow): Shadow: Discard a non-objective attachment you control.
   145060:shadow:1: Shadow
@@ -416,7 +416,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
   145074:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"145062"}]
+      - one set-aside card with code 145062 joins the staging area (it is not revealed)
       - the acting player reveals an encounter card
     - for each player, first player first:
       - [json DiscardAllyToStaging {"verb":"DiscardAllyToStaging"}]
@@ -443,9 +443,9 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
       - [json TakeControlOfStagedAllies {"verb":"TakeControlOfStagedAllies"}]
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"145043"}]
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"145044"}]
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"145079"}]
+    - one set-aside card with code 145043 joins the staging area (it is not revealed)
+    - one set-aside card with code 145044 joins the staging area (it is not revealed)
+    - one set-aside card with code 145079 joins the staging area (it is not revealed)
     - for each player, first player first:
       - if not (the actor holds the first player token): the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"different":true}]
     - shuffle the encounter deck
@@ -529,7 +529,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 145078:B:1 (back): Forced: When the players advance to stage 5B, add each set aside Harad enemy to the staging area.
   145078:forced:1: Forced on the event afterStageRevealed
     only if the card the event is about is a card (any player controls) named "Fighting in the Fields"
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","trait":"Harad","all":true}]
+    - every set-aside card with the trait Harad joins the staging area (it is not revealed)
 
 145078:B:2 (back): Resolution: Add 1 copy, per player, of Wraith on Wings to the campaign pool. The players have earned those burdens. If Esquire of Gondor, or Esquire of Rohan, is attached to a hero, that hero's controller has earned that boon.
   145078:resolution:1: Resolution
@@ -554,7 +554,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     only if it is the Quest phase
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy"}]
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"},"inPlay":false}}]
+    - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
 
 ## 145080 The Witch-king
 
@@ -569,4 +569,4 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     - [json EngageFirstPlayer {"verb":"EngageFirstPlayer"}]
     - then, if this card is engaged with the player (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
-(rendered pieces: 280 by template, 63 as JSON)
+(rendered pieces: 292 by template, 55 as JSON)

@@ -1,0 +1,426 @@
+Scenario piles that place cards with no record (staging: 09038 Fornost Square; quest: 09073 The Shades of Angmar; quest: 09074 A Fell Wraith; setAside: 09033 Thaurdir; setAside: 09016 Iârion)
+
+## 09033 Thaurdir
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+09033:A:1: Indestructible.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+09033:A:2 (front): Cannot have attachments.
+  09033:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+09033:A:3 (front): Forced: After a treachery card with the Sorcery trait is revealed from the encounter deck, Thaurdir heals 3 damage and makes an immediate attack against the first player.
+  09033:forced:1: Forced after a card is revealed (heard about Sorcery treachery (any player controls); not for a card found in the encounter discard pile)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - heal 3 damage from this card
+    - this card attacks the first player now, from the staging area (or engaged)
+
+## 09034 Thaurdir's Damned
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09034:A:1 (front): Forced: After Thaurdir's Damned engages you, discard the top 2 cards of your deck and assign X damage among characters you control. X is the combined printed cost of the discarded cards.
+  09034:forced:1: Forced after an enemy engages a player (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the top 2 card(s) of the acting player's deck go to their discard pile
+    - the acting player assigns the combined printed cost of the cards this effect has discarded from decks (a card with no printed cost counts 0) damage among the character (you control), one at a time
+
+## 09035 Baleful Shade
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09035:A:1 (front): Forced: When Baleful Shade attacks, the defending player discards the top card of his deck. If the discarded card is an ally, Baleful Shade gets +2 Attack for this attack.
+  09035:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the top 1 card(s) of the acting player's deck go to their discard pile; X becomes how many of them are a ally (any player controls) among the cards this effect looked at or discarded
+    - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat attack 2, until the end of the attack
+
+09035:A:2 (shadow): Shadow: Exhaust a character you control.
+  09035:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+
+## 09036 Broken Battlements
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09036:A:1 (front): Time 3.
+  09036:constant:1: Constant
+    - Time 3: when this card is revealed, 3 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+
+09036:A:2 (front): Forced: After the last time counter is removed from Broken Battlements, each player discards the top 5 cards of his deck and places 1 time counter here.
+  09036:forced:1: Forced on the event lastTimeCounterRemoved (heard about this card)
+    - for each player, first player first:
+      - the top 5 card(s) of the acting player's deck go to their discard pile
+      - place 1 resource tokens on this card
+
+09036:A:3 (front): Travel: Each player discards the top card of his deck.
+  09036:travel:1: Travel
+    - for each player, first player first:
+      - the top 1 card(s) of the acting player's deck go to their discard pile
+
+## 09037 Norbury Tombs
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09037:A:1 (front): While Norbury Tombs is the active location, it gains: "Response: When Norbury Tombs is explored, each player shuffles the top 5 cards of his discard pile back into his deck."
+  09037:response:1: Response on the event activeExplored (heard about this card)
+    - for each card (any player controls) in the discard pile, among the top 5:
+      - the picked card goes into its owner's deck, which is shuffled
+
+09037:A:2 (front): Travel: Return the topmost enemy in the encounter discard pile to the staging area.
+  09037:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the topmost enemy in the encounter discard pile (the last put there) is picked (nothing with none)
+    - the picked card goes to the staging area (it is not revealed)
+
+## 09038 Fornost Square
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+09038:A:1 (front): Fornost Square gets +1 Threat for each resource token on it.
+  09038:constant:1: Constant
+    - this card: stat threat resources of this card, while this card is in play
+
+09038:A:2 (front): Forced: After the first player discards any number of cards from the top of his deck, place 1 resource token here.
+  09038:forced:1: Forced on the event deckTopDiscarded
+    only if the actor holds the first player token
+    - place 1 resource tokens on this card
+
+## 09039 Haunted Keep
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09039:A:1 (front): While Haunted Keep is the active location, the first Undead enemy revealed each round gains surge.
+  09039:constant:1: Constant
+    only if this card is the active location
+    - the first Undead enemy card revealed each round gains surge
+
+09039:A:2 (shadow): Shadow: Defending player discards the top card of his deck. Attacking enemy gets +X Attack where X is the discarded card's printed cost.
+  09039:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the top 1 card(s) of the acting player's deck go to their discard pile
+    - the attacking enemy: stat attack the combined printed cost of the cards this effect has discarded from decks (a card with no printed cost counts 0), until the end of the attack
+
+## 09040 Deadmen's Gate
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09040:A:1 (front): While Deadmen's Gate is the active location, it gains: "Forced: After a player triggers an 'Action' or 'Response' effect, he must discard the top card of his deck."
+  09040:forced:1: Forced on the event playerAbilityTriggered (heard about card (any player controls))
+    only if this card is the active location
+    - the top 1 card(s) of the acting player's deck go to their discard pile
+
+09040:A:2 (shadow): Shadow: Discard an attachment you control.
+  09040:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose attachment (you control)
+    - discard the picked card
+
+## 09041 Unnatural Fog
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09041:A:1: Doomed 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+09041:A:2 (front): When Revealed: Each player must either discard 1 card from the top of his deck for each questing character he controls, or remove each character he controls from the quest.
+  09041:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "discard" (only if there is a character (you control) committed to the quest to choose):
+          - the top the number of character (you control) committed to the quest card(s) of the acting player's deck go to their discard pile
+        * option "remove" (only if there is a character (you control) committed to the quest to choose):
+          - for each character (you control) committed to the quest:
+            - the last picked character is removed from the quest (it stays exhausted)
+
+## 09042 The Shadow World
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09042:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+09042:A:2 (front): Forced: At the end of the refresh phase, each player discards the top X cards of his deck, where X is the number of Undead enemies engaged with him.
+  09042:forced:1: Forced at the end of the phase
+    only if all of: (it is the Refresh phase) and (this card is in the staging area)
+    - for each player, first player first:
+      - the top the number of Undead enemy (any player controls) engaged with you card(s) of the acting player's deck go to their discard pile
+
+## 09060 Dead Lord
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09060:A:1 (front): Forced: After Dead Lord engages you, put the topmost Undead enemy in the discard pile into play engaged with you.
+  09060:forced:1: Forced after an enemy engages a player (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the topmost enemy with the trait Undead in the encounter discard pile (the last put there) is picked (nothing with none)
+    - the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
+
+09060:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, reveal 1 encounter card.
+  09060:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the acting player reveals an encounter card
+
+## 09061 Cursed Dead
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09061:A:1 (front): When Revealed: Put each copy of Cursed Dead in the discard pile into play in the staging area.
+  09061:whenRevealed:1: When revealed
+    - every card with code 09061 in the encounter discard pile (the deck is not searched) and adds it to the staging area (it is not revealed)
+
+09061:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if there is a copy of the defending character in its owner's discard pile).
+  09061:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the defender is a character (any player controls) with a copy of it (the same title) in its controller's discard pile (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
+
+## 09062 Restless Evil
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09062:A:1 (front): When Revealed: Each Undead enemy gets +1 Threat, +1 Attack, and +1 Defense until the end of the round. If there are no Undead enemies in play, Restless Evil gains surge.
+  09062:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (there is a Undead enemy (any player controls) to choose): this card gains surge (one more encounter card is revealed when it has been resolved)
+    - for each Undead enemy (any player controls):
+      - the picked card: stat threat 1, until the end of the round
+      - the picked card: stat attack 1, until the end of the round
+      - the picked card: stat defense 1, until the end of the round
+
+09062:A:2 (shadow): Shadow: Each Undead enemy engaged with you gets +1 Attack and +1 Defense until the end of the round.
+  09062:shadow:1: Shadow
+    - for each Undead enemy (any player controls) engaged with you:
+      - the picked card: stat attack 1, until the end of the round
+      - the picked card: stat defense 1, until the end of the round
+
+## 09063 Seal the Tomb
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09063:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+09063:A:2 (front): Forced: At the end of the refresh phase, discard the top 3 cards of the encounter deck. Return the topmost Undead enemy in the encounter discard pile to the staging area.
+  09063:forced:1: Forced at the end of the phase
+    only if all of: (it is the Refresh phase) and (this card is in the staging area)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard 3 card(s) from the top of the encounter deck
+    - the topmost enemy with the trait Undead in the encounter discard pile (the last put there) is picked (nothing with none)
+    - the picked card goes to the staging area (it is not revealed)
+
+## 09064 Terror of the North
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09064:A:1 (front): When Revealed: Each player discards the top 3 cards of his deck. Until the end of the round, add 2 to the total Threat in the staging area for each different card type discarded this way.
+  09064:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the top 3 card(s) of the acting player's deck go to their discard pile
+    - the total Threat in the staging area is the number of different card types among the cards this effect has discarded from decks, all the players' together x 2 higher until the end of the round
+
+09064:A:2 (shadow): Shadow: Defending player discards the top 3 cards of his deck. Attacking enemy gets +1 Attack for each different card type discarded this way.
+  09064:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the top 3 card(s) of the acting player's deck go to their discard pile
+    - the attacking enemy: stat attack the number of different card types among the cards this effect has discarded from decks, all the players' together, until the end of the attack
+
+## 09065 Dark Sorcery
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09065:A:1: Doomed 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+09065:A:2 (front): When Revealed: Each player discards each ally he controls that has the same title as a card in his discard pile.
+  09065:whenRevealed:1: When revealed
+    - for each ally (any player controls) with a copy of it (the same title) in its controller's discard pile:
+      - discard the picked card
+
+09065:A:3 (shadow): Shadow: Discard the defending character if there is a copy of that character in its owner's discard pile.
+  09065:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (any player controls) defending, with a copy of it (the same title) in its controller's discard pile
+    - discard the picked card
+
+## 09066 Heavy Curse
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09066:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+09066:A:2 (front): When Revealed: Attach to the current quest. (Counts as a Condition attachment with the text: "When a player plays a card, increase its cost by 1 if there is a card that has the same title in its owner's discard pile.")
+  09066:whenRevealed:1: When revealed
+    - this card is attached to the current quest card (the side quest that is the current quest, else the main quest card) and leaves with it
+  09066:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card counts as a Condition attachment while it is attached
+    - while this card is in play, each card a player plays from hand that is a card (any player controls) with a copy of it (the same title) in its controller's discard pile costs 1 more (every player's; several such cards stack)
+
+## 09067 The Power of Angmar
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09067:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+09067:A:2 (front): Cards in each player's discard pile cannot leave that player's discard pile by player card effect.
+  09067:constant:1: Constant
+    only if this card is in the staging area
+    - the table: stat discardLocked 1, while this card is in play
+
+09067:A:3 (front): Forced: After this stage is defeated, each player shuffles the top 5 cards of his discard pile back into his deck.
+  09067:forced:1: Forced on the event questDefeated (heard about this card)
+    - for each card (any player controls) in the discard pile, among the top 5:
+      - the picked card goes into its owner's deck, which is shuffled
+
+## 09073 The Shades of Angmar
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+09073:A:1 (front): Setup: Put Iârion into play. Set Thaurdir aside, out of play. Add 1 copy of Fornost Square to the staging area. Shuffle the encounter deck.
+  09073:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the set-aside card titled "Iârion" is put into play under the first player
+    - shuffle the encounter deck
+
+09073:B:1 (back): When Revealed: Each player must search the encounter deck for a Baleful Shade and put it into play engaged with him. Shuffle the encounter deck and reveal 1 encounter card per player.
+  09073:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player finds one card with code 09035 in the encounter deck and puts it into play engaged with them (it is not revealed)
+    - shuffle the encounter deck
+    - repeat the number of players times:
+      - the acting player reveals an encounter card
+
+09073:B:2 (back): Forced: At the end of the refresh phase, each player discards the top card of his deck.
+  09073:forced:1: Forced at the end of the phase
+    only if it is the Refresh phase
+    - for each player, first player first:
+      - the top 1 card(s) of the acting player's deck go to their discard pile
+
+09073:B:3 (back): If a player has no cards in his deck, he is eliminated from the game.
+  09073:constant:1: Constant
+    - the table: stat eliminatedAtEmptyDeck 1, while this card is in play
+
+## 09074 A Fell Wraith
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+09074:A:1 (front): When Revealed: Add Thaurdir to the staging area. Then, reveal 1 encounter card per player.
+  09074:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - one set-aside card with code 09033 joins the staging area (it is not revealed); it entering play is announced to the cards that hear a card added to the staging area
+    - repeat the number of players times:
+      - the acting player reveals an encounter card
+
+09074:B:1 (back): Forced: After Thaurdir attacks and destroys a character, that character's controller must either discard the top 3 cards of his deck, or return Thaurdir to the staging area.
+  09074:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about enemy (any player controls) named "Thaurdir")
+    only if the event's other card is a character (any player controls) that is out of play now
+    - the acting player chooses one of:
+      * option "discard":
+        - the top 3 card(s) of the acting player's deck go to their discard pile
+      * option "return" (only if not (the card the event is about is a enemy (any player controls) in the staging area only)):
+        - return the card the event is about to the staging area
+
+09074:B:2 (back): If a player has no cards in his deck, he is eliminated from the game. The players cannot defeat this stage while Thaurdir has any hit points remaining. If the players defeat this stage, they win the game.
+  09074:constant:1: Constant
+    - the table: stat eliminatedAtEmptyDeck 1, while this card is in play
+  09074:constant:2: Constant
+    only if the card with code 09033 in play has damage below its hit points (any hit points remaining)
+    - the players cannot defeat this stage while this holds
+
+## 100158 Arnor Ravaged
+
+100158:A:1 (front): Setup: Add Arnor Ravaged to the staging area with damage on it equal to the amount of damage marked for it in the Campaign Log.
+  100158:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the card with code 100158 is added to the staging area (the copy a Setup search found, else one the Setup deals)
+    - the card with code 100158 in play gets the damage the Campaign Log noted for Protect the Innocent (none when it noted none)
+
+100158:A:2 (front): Forced: After an attack damages a character but does not destroy it, move 1 damage from Arnor Ravaged to that character.
+  100158:forced:1: Forced on the event attackDamagedCharacter (heard about enemy (any player controls) or in the staging area)
+    - up to 1 damage on this card moves to the event's other card (placed, not dealt; it can destroy a character at its limit; nothing with the target out of play)
+
+## 10166 Deadmen's Dike
+
+10166:A:1 (front): You are playing campaign mode.
+  (inert: the engine applies it by rule, no record)
+
+10166:A:2 (front): Setup: Attach Iârion's Pendant to Iârion. Add the Protect the Innocent side quest to the staging area and place damage on it equal to the amount of damage noted in the Campaign Log.
+  10166:campaignSetup:1: Campaign setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - a copy of the card with code 10157 from the supply is put into play attached to the card titled "Iârion"
+    - the card with code 10158 is added to the staging area (the copy a Setup search found, else one the Setup deals)
+    - the card with code 10158 in play gets the damage the Campaign Log noted for Protect the Innocent (none when it noted none)
+
+10166:A:3 (front): Forced: After Thaurdir enters play, randomly select one of the following burdens and attach it to Thaurdir: Thaurdir's Legacy, Thaurdir's Majesty, or Thaurdir's Spite. Add that card to the Campaign Pool.
+  10166:forced:1: Forced after an encounter card is added to the staging area (heard about enemy (any player controls) named "Thaurdir")
+    - one of the burdens code 10168, code 10169 and code 10170 not yet in the game is picked at random (the game's seed) and attached to the card the event is about, though it cannot have attachments (nothing when none is loaded)
+
+10166:B:1 (back): Resolution: Note the amount of damage on Protect the Innocent in the Campaign Log (replacing the previous number) and remove Protect the Innocent from the Campaign Pool. Add Arnor Ravaged to the Campaign Pool in its place (found on the opposite side of Protect the Innocent). The players as a group must select either Iârion's Pendant or Amarthiúl's Courage to add to the Campaign Pool. Any player may add Iârion's Pendant to their deck if it is chosen.
+  10166:resolution:1: Resolution
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - note the damage on the card with code 10158 in the Campaign Log (replacing the previous number)
+    - [json RemoveFromPoolByCode {"verb":"RemoveFromPoolByCode","codes":["10158"]}]
+    - [json Earn {"verb":"Earn","codes":["100158"]}]
+    - [json ChooseCards {"verb":"ChooseCards","codes":["10157","10167"],"who":"firstPlayer","to":"player","only":true}]
+    - [json EarnAllBurdens {"verb":"EarnAllBurdens"}]
+
+## 10167 Amarthiúl's Courage
+
+10167:A:1 (front): Setup: Attach to Amarthiúl. Otherwise, remove Amarthiúl's Courage from the game.
+  10167:setup:1: Setup
+    - this card is attached to the card in play titled "Amarthiúl"; with none it is removed from the game
+
+10167:A:2 (front): Amarthiúl gets +1 Willpower and +1 hit point.
+  10167:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - its host: stat willpower 1, while this card is in play
+    - its host: stat hitPoints 1, while this card is in play
+
+10167:A:3 (front): Action: Ready Amarthiúl. (Limit once per game.)
+  10167:action:1: Action (limit once per game)
+    - ready its host
+
+## 10168 Thaurdir's Legacy
+
+10168:A:1 (front): Setup: Attach to Thaurdir (even if he is out of play). Otherwise, remove this card from the game.
+  10168:setup:1: Setup
+    - this card is attached to the card in play titled "Thaurdir" (or one set aside, out of play); with none it is removed from the game
+
+10168:A:2 (front): Forced: After a Sorcery treachery is revealed, move Thaurdir's Legacy to the hero with the most resources. (Counts as a Sorcery attachment with the text: "Attached hero gets -2 Willpower and is treated as if its printed text box were blank.")
+  10168:forced:1: Forced after a card is revealed (heard about Sorcery treachery (any player controls))
+    - this burden moves to the hero (any player's) that holds the most resource tokens; the hero it is on counts, and the first player chooses among heroes that tie
+  10168:constant:1: Constant
+    - this card counts as a Sorcery attachment while it is attached
+  10168:constant:2: Constant
+    only if its host is a hero (any player controls)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - its host: stat willpower -2, while this card is in play
+    - its host: stat blankText (its text box is blank) 1, while this card is in play
+    - its host: stat blanksTraits 1, while this card is in play
+
+## 10169 Thaurdir's Majesty
+
+10169:A:1 (front): Setup: Attach to Thaurdir (even if he is out of play). Otherwise, remove this card from the game.
+  10169:setup:1: Setup
+    - this card is attached to the card in play titled "Thaurdir" (or one set aside, out of play); with none it is removed from the game
+
+10169:A:2 (front): Forced: After a Sorcery treachery is revealed, move Thaurdir's Majesty to the hero with the most non-objective attachments. (Counts as a Sorcery attachment with the text: "Attached hero gets -2 Attack and cannot commit to the quest.")
+  10169:forced:1: Forced after a card is revealed (heard about Sorcery treachery (any player controls))
+    - this burden moves to the hero (any player's) that holds the most attachments that are not objectives; the hero it is on counts, and the first player chooses among heroes that tie
+  10169:constant:1: Constant
+    - this card counts as a Sorcery attachment while it is attached
+  10169:constant:2: Constant
+    only if its host is a hero (any player controls)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - its host: stat attack -2, while this card is in play
+    - its host: stat cannotQuest 1, while this card is in play
+
+## 10170 Thaurdir's Spite
+
+10170:A:1 (front): Setup: Attach to Thaurdir (even if he is out of play). Otherwise, remove this card from the game.
+  10170:setup:1: Setup
+    - this card is attached to the card in play titled "Thaurdir" (or one set aside, out of play); with none it is removed from the game
+
+10170:A:2 (front): Forced: After a Sorcery treachery is revealed, move Thaurdir's Spite to the hero with the most damage. (Counts as a Sorcery attachment with the text: "Attached hero gets -2 Defense and cannot be healed.")
+  10170:forced:1: Forced after a card is revealed (heard about Sorcery treachery (any player controls))
+    - this burden moves to the hero (any player's) that holds the most damage; the hero it is on counts, and the first player chooses among heroes that tie
+  10170:constant:1: Constant
+    - this card counts as a Sorcery attachment while it is attached
+  10170:constant:2: Constant
+    only if its host is a hero (any player controls)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - its host: stat defense -2, while this card is in play
+    - its host: stat cannotBeHealed 1, while this card is in play
+
+(rendered pieces: 244 by template, 4 as JSON)

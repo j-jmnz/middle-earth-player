@@ -51,13 +51,13 @@ const game = campaignGame<DikeDecks, DikePolicy>({
   scenario: dike,
   stats: HERO_STATS,
   // TODO: the cards a game loads besides the scenario's piles, its campaign card's and the campaign's game codes.
-  codes: [...dike.cards.map((card) => card.code)],
+  codes: [...dike.cards.map((card) => card.code), "10160", "10161", "10162", "10163", "10164", "10165"],
   intent: dikeIntent,
   policy: DEFAULT_POLICY,
   limit: 6000,
   upgraded: [],
   // TODO: the XP each earlier part gained (in campaign order), the cards they put in the pool and the marks on the cards, as a campaign that won them leaves the log.
-  earlier: { xp: [0, 0], pool: [], marks: {} },
+  earlier: { xp: [0, 0], pool: [{ code: "10158" }, { code: "10160" }], marks: {} },
 });
 
 export const playGolden = (golden: DikeGolden, ctx: ReduceContext): DikeGame => game.playGolden(golden, ctx);

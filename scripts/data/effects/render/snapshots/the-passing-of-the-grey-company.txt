@@ -295,8 +295,8 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
 145065:A:1 (front): When Revealed: Add The Stone of Erech and Army of the Dead (enemy side faceup) to the staging area. Each player may raise his threat by 3 to detach Overcome by Fear from his threat dial and set it aside, out of play.
   145065:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"145017"}]
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"145067"}]
+    - one set-aside card with code 145017 joins the staging area (it is not revealed)
+    - one set-aside card with code 145067 joins the staging area (it is not revealed)
     - for each player, first player first:
       - the acting player chooses one of:
         * option "detach" (only if the actor's threat dial holds a copy of the card with code 145016):
@@ -336,4 +336,4 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
         - choose ally (you control)
         - discard the picked card
 
-(rendered pieces: 189 by template, 9 as JSON)
+(rendered pieces: 191 by template, 7 as JSON)

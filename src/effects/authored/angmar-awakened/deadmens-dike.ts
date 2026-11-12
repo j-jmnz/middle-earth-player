@@ -118,7 +118,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
 
     // 09040 Deadmen's Gate. While it is the active location it gains a Forced effect: after a player triggers an Action or a Response effect he discards the top card of his deck (an event played for its Action counts; not a Forced effect or a Travel line). Shadow: discard an attachment
     // you control (copied).
-    { id: "09040:forced:1", cardCode: "09040", lines: ["09040:A:1"], timing: "forced", trigger: "playerAbilityTriggered", condition: ACTIVE, instructions: [{ verb: "DiscardFromDeck", amount: 1 }] },
+    { id: "09040:forced:1", cardCode: "09040", lines: ["09040:A:1"], timing: "forced", trigger: "playerAbilityTriggered", subject: { type: "card", control: "any" }, condition: ACTIVE, instructions: [{ verb: "DiscardFromDeck", amount: 1 }] },
     copyLine("12107:A:2", "09040:A:2"),
 
     // 09041 Unnatural Fog. When Revealed: each player chooses for himself: discard 1 card from the top of his deck for each questing character he controls, or remove each character he controls from the quest (an option that changes nothing is not offered).
@@ -152,7 +152,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "forced",
       trigger: "engaged",
       subject: "self",
-      instructions: [{ verb: "PickDiscardTop", types: ["enemy"], trait: "Undead" }, { verb: "MoveEncounterCard", card: "picked", to: "engaged", when: { kind: "matches", card: "picked" } }],
+      instructions: [{ verb: "PickDiscardTop", types: ["enemy"], trait: "Undead" }, { verb: "MoveEncounterCard", card: "picked", to: "engaged"}],
     },
     { id: "09060:shadow:1", cardCode: "09060", lines: ["09060:A:2"], timing: "shadow", instructions: [ATTACKER_PLUS(1), { verb: "AfterAttack", instructions: [{ verb: "RevealEncounter", when: { kind: "x", min: 1 } }] }] },
 
@@ -204,7 +204,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "forced",
       trigger: "endOfPhase",
       condition: STAGED_AT_REFRESH_END,
-      instructions: [{ verb: "DiscardEncounterTop", count: 3 }, { verb: "PickDiscardTop", types: ["enemy"], trait: "Undead" }, { verb: "MoveEncounterCard", card: "picked", to: "staging", when: { kind: "matches", card: "picked" } }],
+      instructions: [{ verb: "DiscardEncounterTop", count: 3 }, { verb: "PickDiscardTop", types: ["enemy"], trait: "Undead" }, { verb: "MoveEncounterCard", card: "picked", to: "staging"}],
     },
 
     // 09064 Terror of the North. When Revealed: each player discards the top 3 cards of his deck; until the end of the round the total Threat in the staging area is 2 higher for each different card type discarded (all the players' cards together). Shadow: the defending player
@@ -257,7 +257,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
 
     // 09074 A Fell Wraith (stage 2). When Revealed: Thaurdir is added to the staging area and 1 encounter card is revealed per player. Side B: after Thaurdir attacks and destroys a character, that character's controller chooses to discard the top 3 cards of his deck or to return Thaurdir to
     // the staging area (not offered when he is there); a player with no cards in his deck is eliminated; the players cannot defeat the stage while Thaurdir has hit points remaining, and winning it wins the game (the final stage).
-    { id: "09074:whenRevealed:1", cardCode: "09074", lines: ["09074:A:1"], timing: "whenRevealed", instructions: [{ verb: "AddSetAsideToStaging", code: THAURDIR }, REVEAL_PER_PLAYER] },
+    { id: "09074:whenRevealed:1", cardCode: "09074", lines: ["09074:A:1"], timing: "whenRevealed", instructions: [{ verb: "AddSetAsideToStaging", code: THAURDIR, announce: true }, REVEAL_PER_PLAYER] },
     {
       id: "09074:forced:1",
       cardCode: "09074",

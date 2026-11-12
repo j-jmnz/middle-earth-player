@@ -83,7 +83,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 18044:A:2 (front): Travel: Each player discards the top 4 cards of his deck to travel here.
   18044:travel:1: Travel
     - for each player, first player first:
-      - [json DiscardFromDeck {"verb":"DiscardFromDeck","amount":4}]
+      - the top 4 card(s) of the acting player's deck go to their discard pile
 
 ## 18045 Contested Depths
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -119,7 +119,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) in the staging area only, chosen by the first player [also {"highestAttack":true}]
     - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"not","condition":{"kind":"canPick","pick":{"type":"enemy","control":"any","stagingOnly":true}}}}]
+    - then, if not (there is a enemy (any player controls) in the staging area only to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 18047:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   18047:shadow:1: Shadow
@@ -141,7 +141,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
     - [json SetStat {"verb":"SetStat","stat":"willpower","value":0,"target":"host"}]
     - its host: stat blankText (its text box is blank) 1, while this card is in play
   18048:constant:2: Constant
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - this card counts as a Condition attachment while it is attached
 
 ## 18049 Stone-troll
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -247,7 +247,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
     (steps run in order; a step depends on an earlier one only through its own condition)
     - raise threat by 2 (each player)
     - [json ArrangeCaves {"verb":"ArrangeCaves","count":2}]
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"self","to":"victory"}]
+    - this card goes to the victory display
 
 ## 18056 Dark Places
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -256,9 +256,9 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
   18056:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each location (any player controls) [also {"active":true}]:
-      - [json RaiseStagingThreat {"verb":"RaiseStagingThreat","amount":{"stat":"threat","of":"picked"},"until":"endOfPhase"}]
+      - the total Threat in the staging area is threat of the picked card higher until the end of the phase
     - [json DiscardUntil {"verb":"DiscardUntil","type":"location","when":{"kind":"not","condition":{"kind":"canPick","pick":{"type":"location","control":"any","active":true}}}}]
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"location","control":"any"},"inPlay":false}}]
+    - then, if the picked card is a location (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
 
 18056:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack.
   18056:shadow:1: Shadow
@@ -296,7 +296,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
   18058:whenRevealed:1: When revealed
     - [json AttachSelf {"verb":"AttachSelf","to":{"kind":"enemy","trait":"Dragon"}}]
   18058:constant:1: Constant
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - this card counts as a Condition attachment while it is attached
   18058:forced:1: Forced on the event enemyAttacks (heard about the host)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each character (you control):
@@ -313,7 +313,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
   18059:whenRevealed:1: When revealed
     - [json AttachSelf {"verb":"AttachSelf","to":{"kind":"enemy","trait":"Dragon"}}]
   18059:constant:1: Constant
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - this card counts as a Condition attachment while it is attached
   18059:constant:2: Constant
     - its host: stat cancelsDamage 1, while this card is in play
 
@@ -362,7 +362,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
   18063:forced:1: Forced when the staging step begins, before the first card is revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json DiscardUntil {"verb":"DiscardUntil","type":"treachery"}]
-    - then, if the picked card is a treachery (any player controls) [also {"inPlay":false}] (checked when this step runs, after the steps above; not tied to whether they did anything): the When Revealed effects of the picked card resolve as if it had just been revealed
+    - then, if the picked card is a treachery (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the When Revealed effects of the picked card resolve as if it had just been revealed
 
 ## 18064 Crumbling Cavern
 (the scenario deals it into the cavesDeck pile; the piles place it, no record does)
@@ -395,7 +395,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
     - shuffle the encounter deck
     - for each player, first player first:
       - [json DiscardUntil {"verb":"DiscardUntil","types":["enemy","location"]}]
-      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging"}]
+      - the picked card goes to the staging area (it is not revealed)
 
 18078:B:1 (back): Forced: At the beginning of the quest phase, discard cards from the top of the encounter deck until a location is discarded. Either add that location to the staging area, or raise each player's threat by X, where X is that location's printed Threat.
   18078:forced:1: Forced when a phase begins
@@ -403,9 +403,9 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json DiscardUntil {"verb":"DiscardUntil","type":"location"}]
     - the first player chooses one of:
-      * option "add" (only if the picked card is a location (any player controls) [also {"inPlay":false}]):
-        - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging"}]
-      * option "threat" (only if the picked card is a location (any player controls) [also {"inPlay":false}]):
+      * option "add" (only if the picked card is a location (any player controls) that is out of play now):
+        - the picked card goes to the staging area (it is not revealed)
+      * option "threat" (only if the picked card is a location (any player controls) that is out of play now):
         - raise threat by printed threat of the picked card (each player)
 
 18078:B:2 (back): This stage cannot be defeated unless there are 3 locations with victory points in the victory display.
@@ -420,7 +420,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
   18079:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json PutOnPileBottom {"verb":"PutOnPileBottom","pile":"caves","code":"18043"}]
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"18042"}]
+    - one set-aside card with code 18042 joins the staging area (it is not revealed)
     - [json ShuffleSetAsideSet {"verb":"ShuffleSetAsideSet","set":"Dragon Might"}]
     - shuffle the encounter deck
 
@@ -469,4 +469,4 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
   18080:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, named "Fire-drake")
     - the players win the game
 
-(rendered pieces: 239 by template, 67 as JSON)
+(rendered pieces: 259 by template, 53 as JSON)

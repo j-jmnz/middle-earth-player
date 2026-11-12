@@ -64,13 +64,15 @@ describe("Mysterious Omens", () => {
     expect(run.state.removedFromPool?.map((entry) => entry.code)).toEqual(["10160"]);
   });
 
-  it("10160:A:3 lets a player decline, and offers nothing once every boon is taken", () => {
+  it("10160:A:3 lets a player decline, and offers nothing when no boon card is loaded", () => {
     const t = built({ seats: 2, setAside: BOONS, staging: ["10160"] });
     const declined = resolveRecords(t.state, t.ctx, "10160", "forced", idOf(t.state, "10160"), (state) => (state.window?.kind === "choose" && state.window.options.includes("none") ? "none" : (state.window?.kind === "choose" ? (state.window.options[0] ?? "") : "")));
     expect(attachedTo(declined.state, idOf(declined.state, "dh1"))).toEqual([]);
     expect(attachedTo(declined.state, declined.state.seats[1]?.heroes[0] ?? "")).toEqual([]);
     expect(declined.state.setAside).toHaveLength(5);
+    // A game that loaded no boon card has none to offer (the boons come from the supply when none is set aside: families/angmar/boons.ts).
     const none = built({ staging: ["10160"] });
+    for (const code of BOONS) none.cards.delete(code);
     const quiet = resolveRecords(none.state, none.ctx, "10160", "forced", idOf(none.state, "10160"));
     expect(quiet.state.cards[idOf(quiet.state, "dh1")]?.attachments).toEqual([]);
   });

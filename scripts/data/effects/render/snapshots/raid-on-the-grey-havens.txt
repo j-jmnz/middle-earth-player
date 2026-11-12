@@ -132,7 +132,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11043:A:4 (shadow): Shadow: Add Burning Piers to the staging area.
   11043:shadow:1: Shadow
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"self","to":"staging"}]
+    - this card goes to the staging area (it is not revealed)
 
 ## 11044 Pillaged Ship
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -146,8 +146,8 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
       * option "damage":
         - deal 3 damage to this card
       * option "discard" (only if [json condition {"kind":"encounterHas","piles":"discard","cardType":"enemy"}]):
-        - [json PickDiscardTop {"verb":"PickDiscardTop","types":["enemy"]}]
-        - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging"}]
+        - the topmost enemy in the encounter discard pile (the last put there) is picked (nothing with none)
+        - the picked card goes to the staging area (it is not revealed)
 
 11044:A:3 (shadow): Shadow: If attacking enemy is a Raider, move all resources from defending character to attacking enemy.
   11044:shadow:1: Shadow
@@ -237,7 +237,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 11049:A:2 (front): When Revealed: Deal 1 damage to each Aflame location in play. If less than 3 total damage is dealt by this effect, The Fires Spread gains surge.
   11049:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"count","pick":{"type":"location","control":"any","aflame":true},"max":2}}]
+    - if the number of location (any player controls) [also {"aflame":true}] is at most 2: this card gains surge (one more encounter card is revealed when it has been resolved)
     - deal 1 damage to each location (any player controls) [also {"aflame":true}]
 
 11049:A:3 (shadow): Shadow: If this attack destroys a character, deal 1 damage to each Aflame location in play.
@@ -295,7 +295,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     - for each Raider enemy (any player controls) or in the staging area:
       - place 1 resource tokens on the picked card
     - [json ImmediateAttackEach {"verb":"ImmediateAttackEach","notTrait":"Ship"}]
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"noneReturned"}}]
+    - then, if [json condition {"kind":"noneReturned"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 11067:A:2 (shadow): Shadow: If the attacking enemy is a Raider, place 2 resources on it.
   11067:shadow:1: Shadow
@@ -481,4 +481,4 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     only if all of: (this card is engaged with the player) and (this card is a enemy (any player controls) with a shadow card)
     - place shadowCards of this card resource tokens on this card
 
-(rendered pieces: 270 by template, 60 as JSON)
+(rendered pieces: 276 by template, 57 as JSON)

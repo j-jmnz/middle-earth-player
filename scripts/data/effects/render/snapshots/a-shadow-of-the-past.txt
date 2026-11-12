@@ -56,7 +56,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141024:A:1 (front): When Revealed: Add Bucklebury Ferry to the staging area.
   141024:whenRevealed:1: When revealed
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"141035"}]
+    - one set-aside card with code 141035 joins the staging area (it is not revealed)
 
 141024:B:1 (back): When Revealed: The first player searches the encounter deck and discard pile for a Black Rider, reveals it (cannot be canceled), and adds it to the staging area. Shuffle the encounter deck.
   141024:whenRevealed:2: When revealed
@@ -253,7 +253,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
   141043:forced:1: Forced on the event hideFailed
     - discard its host
   141043:constant:1: Constant
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - this card counts as a Condition attachment while it is attached
 
 ## 141072 Pathless Country
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -312,7 +312,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
   141075:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - return every enemy with the trait Nazgûl engaged with a player to the staging area
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"noneReturned"}}]
+    - then, if [json condition {"kind":"noneReturned"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 141075:A:2 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
   141075:shadow:1: Shadow
@@ -518,7 +518,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
   906107:forced:1: Forced on the event hideFailed
     - the acting player discards 1 random card(s) from hand
   906107:constant:1: Constant
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - this card counts as a Condition attachment while it is attached
 
 ## 906108 Followed by Shadows
 
@@ -553,4 +553,4 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): raise threat by 3 (the acting player)
 
-(rendered pieces: 199 by template, 56 as JSON)
+(rendered pieces: 203 by template, 53 as JSON)

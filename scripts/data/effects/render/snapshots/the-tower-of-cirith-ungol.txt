@@ -35,7 +35,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 
 146015:A:3 (front): Travel: Add Shagrat to the staging area to travel here.
   146015:travel:1: Travel
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"146020"}]
+    - one set-aside card with code 146020 joins the staging area (it is not revealed)
 
 ## 146016 Echoing Passage
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -85,9 +85,9 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
   146019:forced:1: Forced after the players travel (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy"}]
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"all","conditions":[{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"},"inPlay":false},{"kind":"count","pick":{"type":"enemy","control":"any","stagingOnly":true,"sameTitleAs":"picked"},"max":0}]}}]
+    - then, if all of: (the picked card is a enemy (any player controls) that is out of play now) and (the number of enemy (any player controls) in the staging area only [also {"sameTitleAs":"picked"}] is at most 0) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
     - then, if there is a enemy (any player controls) in the staging area only [also {"sameTitleAs":"picked"}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) in the staging area only [also {"sameTitleAs":"picked"}]
-    - then, if all of: (the picked card is a enemy (any player controls) in the staging area only) and (the card picked before is a enemy (any player controls) [also {"inPlay":false}]) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+    - then, if all of: (the picked card is a enemy (any player controls) in the staging area only) and (the card picked before is a enemy (any player controls) that is out of play now) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
 
 ## 146020 Shagrat
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -146,7 +146,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each enemy (any player controls) in the staging area only:
       - deal 1 damage to the picked card
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"count","pick":{"type":"enemy","control":"any","stagingOnly":true},"max":0}}]
+    - then, if the number of enemy (any player controls) in the staging area only is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
     - every enemy in play: stat threatPerDamage 1, until the end of the phase
 
 146023:A:2 (shadow): Shadow: If you are engaged with another enemy, resolve this attack against that enemy.
@@ -217,7 +217,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
         - the acting player reveals an encounter card
       * option "enemy" (only if [json condition {"kind":"searchable","type":"enemy","deckOnly":true}]):
         - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy"}]
-        - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"engaged","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"},"inPlay":false}}]
+        - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
 
 146061:A:2 (shadow): Shadow: Discard a non-objective attachment you control.
   146061:shadow:1: Shadow
@@ -312,9 +312,9 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
     only if it is the Quest phase
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy"}]
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"all","conditions":[{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"},"inPlay":false},{"kind":"count","pick":{"type":"enemy","control":"any","stagingOnly":true,"sameTitleAs":"picked"},"max":0}]}}]
+    - then, if all of: (the picked card is a enemy (any player controls) that is out of play now) and (the number of enemy (any player controls) in the staging area only [also {"sameTitleAs":"picked"}] is at most 0) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
     - then, if there is a enemy (any player controls) in the staging area only [also {"sameTitleAs":"picked"}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) in the staging area only [also {"sameTitleAs":"picked"}]
-    - then, if all of: (the picked card is a enemy (any player controls) in the staging area only) and (the card picked before is a enemy (any player controls) [also {"inPlay":false}]) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+    - then, if all of: (the picked card is a enemy (any player controls) in the staging area only) and (the card picked before is a enemy (any player controls) that is out of play now) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
 
 146067:B:2 (back): This stage cannot be defeated unless Topmost Chamber is in the victory display. When the Ring-bearer is free of encounters, the first player gains control of it.
   146067:constant:1: Constant
@@ -385,4 +385,4 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
   146071:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
     - this card: stat phantom 1, until the end of the attack
 
-(rendered pieces: 235 by template, 30 as JSON)
+(rendered pieces: 254 by template, 25 as JSON)

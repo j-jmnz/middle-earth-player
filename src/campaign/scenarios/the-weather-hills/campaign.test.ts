@@ -55,12 +55,12 @@ describe("The Weather Hills in the angmar-awakened campaign", () => {
     expect(hills.campaignCard).toBe("10159");
   });
 
-  it("is playable, and the road offers it after Intruders in Chetwood's win while the part after it (Deadmen's Dike) is not playable yet", () => {
+  it("is playable, and the road offers it after Intruders in Chetwood's win, with the part after it (Deadmen's Dike) playable too", () => {
     expect(PLAYABLE_SCENARIOS).toContain("the-weather-hills");
-    expect(PLAYABLE_SCENARIOS).not.toContain(campaign.scenarios[2]);
+    expect(PLAYABLE_SCENARIOS).toContain(campaign.scenarios[2]);
     const { log } = afterChetwood(2);
     const path = campaignPath(campaign, {}, log);
-    expect(path.map((node) => [node.id, node.status]).slice(0, 3)).toEqual([["intruders-in-chetwood", "completed"], ["the-weather-hills", "current"], ["deadmens-dike", "soon"]]);
+    expect(path.map((node) => [node.id, node.status]).slice(0, 3)).toEqual([["intruders-in-chetwood", "completed"], ["the-weather-hills", "current"], ["deadmens-dike", "locked"]]);
     expect(nextStep(path, null)).toMatchObject({ kind: "begin", node: { id: "the-weather-hills" } });
   });
 
@@ -102,7 +102,7 @@ describe("The Weather Hills in the angmar-awakened campaign", () => {
     expect(log.completed).toEqual(["intruders-in-chetwood", "the-weather-hills"]);
     expect(log.campaignPool.map((card) => card.code).sort()).toEqual([OMENS, PROTECT].sort());
     const path = campaignPath(campaign, {}, log);
-    expect(path.map((node) => [node.id, node.status]).slice(1, 3)).toEqual([["the-weather-hills", "completed"], ["deadmens-dike", "soon"]]);
+    expect(path.map((node) => [node.id, node.status]).slice(1, 3)).toEqual([["the-weather-hills", "completed"], ["deadmens-dike", "current"]]);
   });
 
   it("10160:A:3 records each boon a won game ended with on the hero that carries it, one for each boon", () => {

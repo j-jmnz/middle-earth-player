@@ -47,9 +47,9 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "PlaceLoggedDamageOn":
       return placeLoggedDamageOn(state, instruction);
     case "ChooseBoon":
-      return chooseBoon(state, instruction, focus, steps);
+      return chooseBoon(state, instruction, focus, ctx, steps);
     case "AttachRandomBurden":
-      return attachRandomBurden(state, instruction, focus);
+      return attachRandomBurden(state, instruction, focus, ctx);
     case "MoveToHero":
       return moveToHero(state, instruction, focus, ctx, steps);
     case "AttachSelfToNamed":

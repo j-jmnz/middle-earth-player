@@ -54,7 +54,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
     - [json FlipStormcaller {"verb":"FlipStormcaller"}]
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Stormcaller"}]
     - [json FitShips {"verb":"FitShips","codes":["11172","11173","11174","11175"]}]
-    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Calaerion","withCard":"Dream-chaser"}]
+    - the set-aside card titled "Calaerion" is put into play under the control of the player who controls the card titled "Dream-chaser"
 
 11191:B:1 (back): Resolution: Gain the following:
   11191:resolution:1: Resolution (record also names 11191:B:2)
@@ -373,9 +373,9 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
   12029:whenRevealed:1: When revealed
     - this card is attached to the current quest card (the side quest that is the current quest, else the main quest card) and leaves with it
   12029:constant:1: Constant
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - this card counts as a Condition attachment while it is attached
   12029:forced:1: Forced after a card is committed to the quest (heard about ally (any player controls))
     only if [json condition {"kind":"heading","is":"offCourse"}]
     - deal 1 damage to the card the event is about
 
-(rendered pieces: 135 by template, 58 as JSON)
+(rendered pieces: 137 by template, 56 as JSON)

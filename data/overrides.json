@@ -1861,7 +1861,7 @@
         "the-dread-realm"
       ],
       "code": "10161",
-      "reason": "Mysterious Omens (10160) stays in the Campaign Pool when it is not defeated in The Weather Hills, and a later scenario's Campaign Setup Checklist shuffles it into the encounter deck. Its Forced offers the five boons (\"Cunning, Hardy, Resolute, Ruthless, or Stalwart\"), so Cunning is dealt set aside with every later Angmar Awakened scenario; a boon already in the Campaign Pool or attached to a hero is skipped (each has one copy).",
+      "reason": "Mysterious Omens (10160) stays in the Campaign Pool when it is not defeated in The Weather Hills, and a later scenario's Campaign Setup Checklist shuffles it into the encounter deck. Its Forced offers the five boons (\"Cunning, Hardy, Resolute, Ruthless, or Stalwart\"), so the printed card of Cunning is loaded with every later Angmar Awakened scenario and a copy comes from the supply when a player takes it; a boon the Campaign Pool already holds on a hero is not offered (each has one copy).",
       "source": "scan 10160.A (data/printed/angmar-awakened.json); mec108.campaign-setup-deadmens-dike"
     },
     {
@@ -1875,7 +1875,7 @@
         "the-dread-realm"
       ],
       "code": "10162",
-      "reason": "Mysterious Omens (10160) stays in the Campaign Pool when it is not defeated in The Weather Hills, and a later scenario's Campaign Setup Checklist shuffles it into the encounter deck. Its Forced offers the five boons (\"Cunning, Hardy, Resolute, Ruthless, or Stalwart\"), so Hardy is dealt set aside with every later Angmar Awakened scenario; a boon already in the Campaign Pool or attached to a hero is skipped (each has one copy).",
+      "reason": "Mysterious Omens (10160) stays in the Campaign Pool when it is not defeated in The Weather Hills, and a later scenario's Campaign Setup Checklist shuffles it into the encounter deck. Its Forced offers the five boons (\"Cunning, Hardy, Resolute, Ruthless, or Stalwart\"), so the printed card of Hardy is loaded with every later Angmar Awakened scenario and a copy comes from the supply when a player takes it; a boon the Campaign Pool already holds on a hero is not offered (each has one copy).",
       "source": "scan 10160.A (data/printed/angmar-awakened.json); mec108.campaign-setup-deadmens-dike"
     },
     {
@@ -1889,7 +1889,7 @@
         "the-dread-realm"
       ],
       "code": "10163",
-      "reason": "Mysterious Omens (10160) stays in the Campaign Pool when it is not defeated in The Weather Hills, and a later scenario's Campaign Setup Checklist shuffles it into the encounter deck. Its Forced offers the five boons (\"Cunning, Hardy, Resolute, Ruthless, or Stalwart\"), so Resolute is dealt set aside with every later Angmar Awakened scenario; a boon already in the Campaign Pool or attached to a hero is skipped (each has one copy).",
+      "reason": "Mysterious Omens (10160) stays in the Campaign Pool when it is not defeated in The Weather Hills, and a later scenario's Campaign Setup Checklist shuffles it into the encounter deck. Its Forced offers the five boons (\"Cunning, Hardy, Resolute, Ruthless, or Stalwart\"), so the printed card of Resolute is loaded with every later Angmar Awakened scenario and a copy comes from the supply when a player takes it; a boon the Campaign Pool already holds on a hero is not offered (each has one copy).",
       "source": "scan 10160.A (data/printed/angmar-awakened.json); mec108.campaign-setup-deadmens-dike"
     },
     {
@@ -1903,7 +1903,7 @@
         "the-dread-realm"
       ],
       "code": "10164",
-      "reason": "Mysterious Omens (10160) stays in the Campaign Pool when it is not defeated in The Weather Hills, and a later scenario's Campaign Setup Checklist shuffles it into the encounter deck. Its Forced offers the five boons (\"Cunning, Hardy, Resolute, Ruthless, or Stalwart\"), so Ruthless is dealt set aside with every later Angmar Awakened scenario; a boon already in the Campaign Pool or attached to a hero is skipped (each has one copy).",
+      "reason": "Mysterious Omens (10160) stays in the Campaign Pool when it is not defeated in The Weather Hills, and a later scenario's Campaign Setup Checklist shuffles it into the encounter deck. Its Forced offers the five boons (\"Cunning, Hardy, Resolute, Ruthless, or Stalwart\"), so the printed card of Ruthless is loaded with every later Angmar Awakened scenario and a copy comes from the supply when a player takes it; a boon the Campaign Pool already holds on a hero is not offered (each has one copy).",
       "source": "scan 10160.A (data/printed/angmar-awakened.json); mec108.campaign-setup-deadmens-dike"
     },
     {
@@ -1917,7 +1917,7 @@
         "the-dread-realm"
       ],
       "code": "10165",
-      "reason": "Mysterious Omens (10160) stays in the Campaign Pool when it is not defeated in The Weather Hills, and a later scenario's Campaign Setup Checklist shuffles it into the encounter deck. Its Forced offers the five boons (\"Cunning, Hardy, Resolute, Ruthless, or Stalwart\"), so Stalwart is dealt set aside with every later Angmar Awakened scenario; a boon already in the Campaign Pool or attached to a hero is skipped (each has one copy).",
+      "reason": "Mysterious Omens (10160) stays in the Campaign Pool when it is not defeated in The Weather Hills, and a later scenario's Campaign Setup Checklist shuffles it into the encounter deck. Its Forced offers the five boons (\"Cunning, Hardy, Resolute, Ruthless, or Stalwart\"), so the printed card of Stalwart is loaded with every later Angmar Awakened scenario and a copy comes from the supply when a player takes it; a boon the Campaign Pool already holds on a hero is not offered (each has one copy).",
       "source": "scan 10160.A (data/printed/angmar-awakened.json); mec108.campaign-setup-deadmens-dike"
     }
   ],

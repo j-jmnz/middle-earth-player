@@ -10,7 +10,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
   143020:action:1: Action (cost: exhaust this card and exhaust the attached card)
     only if it is the Quest phase
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"}]
+    - the top card of the encounter deck goes to the encounter discard pile
     - the acting player chooses one of:
       * option "use" (only if threat of the top card of the encounter discard pile is less than willpower of its host):
         - this card is removed from the Campaign Pool
@@ -28,7 +28,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready hero (you control)
     - exhaust the picked card
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"}]
+    - the top card of the encounter deck goes to the encounter discard pile
     - [json PlaceToken {"verb":"PlaceToken","amount":1,"when":{"kind":"less","left":{"stat":"threat","of":"discardTop"},"right":{"stat":"willpower","of":"previous"}}}]
     - [json TakeControl {"verb":"TakeControl","who":"actor","when":{"kind":"less","left":2,"right":{"stat":"resources","of":"self"}}}]
     - [json DiscardResources {"verb":"DiscardResources","amount":3,"target":"self","when":{"kind":"less","left":2,"right":{"stat":"resources","of":"self"}}}]
@@ -68,7 +68,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 143049:A:2 (front): Forced: After Gríma attacks a player, that player shuffles Gríma back into the encounter deck and reveals an encounter card.
   143049:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"self","to":"shuffle"}]
+    - this card is shuffled into the encounter deck
     - the player the event is about reveals an encounter card
 
 143049:A:3 (shadow): Shadow: This attack is considered undefended.
@@ -128,7 +128,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json LookAtTop {"verb":"LookAtTop","count":3}]
     - [json PickEncounter {"verb":"PickEncounter","from":"looked"}]
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","to":"deckTop"}]
+    - the picked card goes on top of the encounter deck
     - the acting player reveals an encounter card
     - [json DiscardOtherLooked {"verb":"DiscardOtherLooked"}]
 
@@ -259,7 +259,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 143062:A:1 (front): When Revealed: Trigger the Wizardry effect on the active location. If no Wizardry effect is triggered this way, Machines of Isengard gains surge.
   143062:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"not","condition":{"kind":"hasWizardry"}}}]
+    - if not ([json condition {"kind":"hasWizardry"}]): this card gains surge (one more encounter card is revealed when it has been resolved)
     - [json TriggerWizardry {"verb":"TriggerWizardry","target":"activeLocation"}]
 
 143062:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, discard 1 random card from your hand.
@@ -281,7 +281,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
     - [json AttachSelfToPicked {"verb":"AttachSelfToPicked","when":{"kind":"canPick","pick":{"type":"hero","control":"any","committed":true}}}]
     - then, if there is a hero (any player controls) committed to the quest to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the last picked character is removed from the quest (it stays exhausted)
   143068:constant:1: Constant
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - this card counts as a Condition attachment while it is attached
   143068:forced:1: Forced after a card is committed to the quest (heard about the host)
     - discard 1 cards from hand
   143068:forced:2: Forced after a character is declared as an attacker (heard about the host)
@@ -326,8 +326,8 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
   143079:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json MakeSetAsideActive {"verb":"MakeSetAsideActive","code":"143054"}]
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"143047"}]
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"143053"}]
+    - one set-aside card with code 143047 joins the staging area (it is not revealed)
+    - one set-aside card with code 143053 joins the staging area (it is not revealed)
 
 143079:B:1 (back): The players cannot travel to Orthanc.
   143079:constant:1: Constant
@@ -370,7 +370,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
     only if the card the event is about had enough progress to be explored
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json CancelPhaseProgress {"verb":"CancelPhaseProgress"}]
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"subject","to":"staging"}]
+    - the card the event is about goes to the staging area (it is not revealed)
 
 143080:B:3 (back): If a player has 0 cards in his hand, he is eliminated from the game. If the players defeat this stage, they win the game.
   143080:constant:2: Constant
@@ -378,4 +378,4 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
     - the table: stat eliminatedAtEmptyHand 1, while this card is in play
     - the table: stat trackQuestProgress 1, while this card is in play
 
-(rendered pieces: 213 by template, 33 as JSON)
+(rendered pieces: 223 by template, 25 as JSON)

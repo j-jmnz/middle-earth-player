@@ -30,7 +30,7 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the encounter discard pile into the encounter deck
     - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy","trait":"Corsair"}]
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any","trait":"Corsair"},"inPlay":false}}]
+    - then, if the picked card is a Corsair enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
 
 ## 145032 Corsair Dromon
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -45,7 +45,7 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the encounter discard pile into the encounter deck
     - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy","trait":"Corsair"}]
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any","trait":"Corsair"},"inPlay":false}}]
+    - then, if the picked card is a Corsair enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
 
 ## 145033 Port of Pelargir
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -146,9 +146,9 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
         - return every enemy with the trait Corsair engaged with the acting player to the staging area
       * option "discard" (only if [json condition {"kind":"searchable"}]):
         - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy","trait":"Corsair"}]
-        - then, if not (the picked card is a Corsair enemy (any player controls) [also {"inPlay":false}]) (checked when this step runs, after the steps above; not tied to whether they did anything): shuffle the encounter discard pile into the encounter deck
+        - then, if not (the picked card is a Corsair enemy (any player controls) that is out of play now) (checked when this step runs, after the steps above; not tied to whether they did anything): shuffle the encounter discard pile into the encounter deck
         - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy","trait":"Corsair","when":{"kind":"not","condition":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any","trait":"Corsair"},"inPlay":false}}}]
-        - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"engaged","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any","trait":"Corsair"},"inPlay":false}}]
+        - then, if the picked card is a Corsair enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
 
 ## 145040 Black Sails
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -171,7 +171,7 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
     - for each player, first player first:
       - the acting player chooses one of:
         * option "threat":
-          - [json RaiseStagingThreat {"verb":"RaiseStagingThreat","amount":3,"until":"endOfPhase"}]
+          - the total Threat in the staging area is 3 higher until the end of the phase
         * option "discard" (only if there is a attachment (you control) to choose):
           - choose attachment (you control) with the highest printed cost of those (no printed cost counts as 0; ties: the chooser decides)
           - discard the picked card
@@ -219,7 +219,7 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
 
 145068:A:3 (front): If Army of the Dead leaves play, remove it from the game.
   145068:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"self","to":"removed"}]
+    - this card is removed from the game
 
 ## 145069 Attack on Pelargir
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -254,4 +254,4 @@ Scenario piles that place cards with no record (quest: 145069 Attack on Pelargir
         * option "damage" (only if there is a character (you control) to choose):
           - the acting player assigns the resource tokens on objective (any player controls) named "The Corsair Fleet" damage among the character (you control), one at a time
 
-(rendered pieces: 161 by template, 16 as JSON)
+(rendered pieces: 173 by template, 10 as JSON)
