@@ -5,7 +5,8 @@ import { legalIntents, type PlayerIntent, type ReduceContext, type ScenarioState
 
 import { loadCampaign, loadScenario } from "../../../scripts/data/load-scenarios.ts";
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
-import { campaignGame, fillerLoadout, HERO_STATS, type PlayedGame } from "../../harness/game-kit.ts";
+import type { LoadoutSeat } from "../../../src/campaign/loadout.ts";
+import { campaignGame, fillerLoadout, HERO_STATS, RING_BEARER, type HeroStats, type PlayedGame } from "../../harness/game-kit.ts";
 
 const campaign = loadCampaign("the-return-of-the-king");
 const doom = loadScenario("mount-doom");
@@ -16,10 +17,22 @@ export const DOOM_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", 
 // "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
 export type DoomDecks = "strong" | "weak" | "brittle";
 
-export const doomLoadout = fillerLoadout;
+// The strong stand-ins start at a threat of 20 each and Frodo, the Ring-bearer, takes the numbers of the deck like them (his printed numbers could not quest or defend a game of auto-played turns).
+const DOOM_STATS = { strong: { ...HERO_STATS.strong, threat: 20, attack: 30, defense: 20 }, weak: HERO_STATS.weak, brittle: { ...HERO_STATS.brittle, threat: 8 } } as const satisfies Record<DoomDecks, HeroStats>;
+
+// The first player holds the Ring-bearer with The One Ring attached (the saga start of scenario 18, mec113.setting-up-the-game), beside three stand-in heroes; a second seat has three.
+export const doomLoadout = (seatCount: 1 | 2): LoadoutSeat[] => {
+  const [, second] = fillerLoadout(2);
+  const first = { heroes: [RING_BEARER, "q1", "q2", "q3"], deck: fillerLoadout(1)[0]!.deck };
+  return seatCount === 1 ? [first] : [first, second!];
+};
 
 // The goldens' world, the plan and start of a game, and the log of a campaign whose earlier parts were won: the seeded game's parts every scenario shares (test/harness/game-kit.ts).
-export const doomWorld = (decks: DoomDecks = "strong") => game.world(decks);
+export const doomWorld = async (decks: DoomDecks = "strong") => {
+  const world = await game.world(decks);
+  world.cards.set(RING_BEARER, { ...world.cards.get(RING_BEARER)!, ...DOOM_STATS[decks], threat: 0 });
+  return world;
+};
 export const afterOpens = (seatCount: 1 | 2) => game.after(seatCount);
 export const doomPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount)) => game.plan(seatCount, log);
 export const doomStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard) => game.start(seatCount, seed, difficulty, { facts, log, modeCard });
@@ -49,9 +62,10 @@ export const DOOM_GOLDENS: readonly DoomGolden[] = [];
 const game = campaignGame<DoomDecks, DoomPolicy>({
   campaign,
   scenario: doom,
-  stats: HERO_STATS,
+  stats: DOOM_STATS,
+  loadout: doomLoadout,
   // TODO: the cards a game loads besides the scenario's piles, its campaign card's and the campaign's game codes.
-  codes: [...doom.cards.map((card) => card.code)],
+  codes: [...doom.cards.map((card) => card.code), RING_BEARER, "146065", "145014", "145015", "145016", "145062", "143020", "143021"],
   intent: doomIntent,
   policy: DEFAULT_POLICY,
   limit: 6000,

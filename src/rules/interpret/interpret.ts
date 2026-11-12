@@ -29,6 +29,7 @@ import { isBreakingVerb } from "../families/breaking/index.ts";
 import { announceDraw } from "../families/dreamchaser/index.ts";
 import { announceEnteredHand } from "../families/island/hand.ts";
 import { playerSource } from "../families/quest/threat.ts";
+import { announceSetupActive } from "../families/quest/places.ts";
 
 export type ReduceContext = {
   effects: readonly Effect[];
@@ -152,8 +153,9 @@ function runTwinned(state: ScenarioState, instruction: Instruction, focus: Focus
       return focus.sourceId
         ? updateCard(state, focus.sourceId, { committed: true, exhausted: true })
         : state;
-    case "AddToStaging":
     case "MakeActiveLocation":
+      return announceSetupActive(runSetupVerb(state, instruction, ctx, focus.sourceId), ctx, steps);
+    case "AddToStaging":
     case "SetAside":
     case "AttachToRingBearer":
       return runSetupVerb(state, instruction, ctx, focus.sourceId);

@@ -27,7 +27,7 @@ const DECK = {
   "the-battle-of-the-pelennor-fields": { normal: 40, easy: 30, sets: ["The Battle of the Pelennor Fields"], staging: [], setAside: ["145014", "145015", "145043", "145044", "145062", "145079"], active: ["145047"] },
   "the-tower-of-cirith-ungol": { normal: 36, easy: 30, sets: ["The Tower of Cirith Ungol", "Orcs of Mordor", "Deep Shadows"], staging: ["146015", "146070"], setAside: ["146020"], active: [] },
   "the-black-gate-opens": { normal: 47, easy: 38, sets: ["The Black Gate Opens", "Orcs of Mordor"], staging: ["146024", "146031"], setAside: ["146041"], active: [] },
-  "mount-doom": { normal: 40, easy: 27, sets: ["Mount Doom", "Deep Shadows"], staging: ["146042", "146043", "146044", "146045", "146046", "146047", "146048"], setAside: [], active: ["146047"] },
+  "mount-doom": { normal: 41, easy: 28, sets: ["Mount Doom", "Deep Shadows"], staging: ["146042", "146043", "146044", "146045", "146046", "146047", "146048"], setAside: [], active: ["146047"] },
 } as const;
 
 describe("The Return of the King codes", () => {
@@ -112,9 +112,10 @@ describe("The Return of the King campaign", () => {
     for (const id of ["the-black-gate-opens", "mount-doom"]) for (const code of ["146064", "146081", "146082"]) expect(loadScenario(id).cards.some((card) => card.code === code), `${id} ${code}`).toBe(false);
   });
 
-  it("stages Mount Doom and Brake of Thorns as the Setup names them, and finds the other locations in the deck for each player", () => {
+  it("stages Mount Doom, makes one Brake of Thorns active as the Setup names them, and finds the other locations in the deck for each player (the set's other copies of Brake of Thorns among them)", () => {
     const staging = loadScenario("mount-doom").cards.filter((card) => card.pile === "staging");
-    expect(staging.filter((card) => card.searched === true).map((card) => byCode.get(card.code)?.name).sort()).toEqual(["Mordor Road", "Old Water-course", "Orc-hold", "Plain of Gorgoroth"]);
+    expect(staging.filter((card) => card.searched !== true).map((card) => byCode.get(card.code)?.name).sort()).toEqual(["Mount Doom", "The Tower of Barad-dûr"]);
+    expect(staging.filter((card) => card.searched === true).map((card) => byCode.get(card.code)?.name).sort()).toEqual(["Brake of Thorns", "Mordor Road", "Old Water-course", "Orc-hold", "Plain of Gorgoroth"]);
   });
 });
 

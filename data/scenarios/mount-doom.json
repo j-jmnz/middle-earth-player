@@ -176,7 +176,8 @@
       "code": "146047",
       "normal": 1,
       "easy": 1,
-      "pile": "staging"
+      "pile": "staging",
+      "searched": true
     },
     {
       "code": "146048",

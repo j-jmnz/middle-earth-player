@@ -279,8 +279,8 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       }
       // "Each player sets 1 copy of X aside" (143072:A:1, an `aside` clause with `eachPlayer`) places one copy for each player, as the `stage` clauses of a per-player Setup do.
       const perPlayer = clausesOf(quest, "stage").find((clause) => clause.perPlayer != null && clause.codes.includes(code))?.perPlayer ?? clausesOf(quest, "aside").find((clause) => clause.eachPlayer != null && clause.codes.includes(code))?.eachPlayer;
-      // A location the quest's Setup has each player add (found in the encounter deck): dealt with the deck, found by the Setup record. A location the Setup names (Mount Doom, Brake of Thorns) is staged or made active as it says.
-      const searched = pile === "staging" && printed?.type === "location" && clausesOf(quest, "eachPlayerAddsLocation").length > 0 && !facts.said(["stage", "active"]);
+      // A location the quest's Setup has each player add (found in the encounter deck): dealt with the deck, found by the Setup record. A location the Setup stages (Mount Doom) is staged as it says; one it makes the active location (Brake of Thorns, of which the set holds more copies) is made active by one copy, and its other copies are found like any location.
+      const searched = pile === "staging" && printed?.type === "location" && clausesOf(quest, "eachPlayerAddsLocation").length > 0 && !facts.said(["stage"]);
       // "(2 copies instead if there are 3 or more players in the game)": the copies of this card the Setup stages.
       const staged = pile === "staging" ? clausesOf(quest, "stage").find((clause) => clause.many != null && clause.codes.includes(code)) : undefined;
       const byPlayers = staged?.many ? { few: staged.count, many: staged.many.count, from: staged.many.from } : undefined;
