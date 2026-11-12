@@ -125,8 +125,8 @@ describe("built catalog", () => {
       expect(database.prepare("select name, scenario_count, playable from campaigns where id = ?").get("ered-mithrin")).toMatchObject({ name: "Ered Mithrin", scenario_count: 9, playable: 1 });
       // The Return of the King follows The Two Towers, at the Fellowship's place (`position`).
       expect((database.prepare("select id from campaigns order by position").all() as { id: string }[]).map((row) => row.id).slice(11, 14)).toEqual(["fellowship-of-the-ring", "the-two-towers", "the-return-of-the-king"]);
-      // Angmar Awakened is built (nine scenario files) and locked until a scenario is playable; a cycle (part of no campaign) only the Scenarios tab lists, locked too.
-      expect(database.prepare("select name, kind, box, scenario_count, playable from campaigns where id = ?").get("angmar-awakened")).toMatchObject({ name: "Angmar Awakened", kind: "campaign", box: null, scenario_count: 9, playable: 0 });
+      // Angmar Awakened is built (nine scenario files) and playable from its first scenario; a cycle (part of no campaign) only the Scenarios tab lists, locked.
+      expect(database.prepare("select name, kind, box, scenario_count, playable from campaigns where id = ?").get("angmar-awakened")).toMatchObject({ name: "Angmar Awakened", kind: "campaign", box: null, scenario_count: 9, playable: 1 });
       expect(database.prepare("select kind, box, scenario_count, playable from campaigns where id = ?").get("dwarrowdelf")).toMatchObject({ kind: "cycle", box: null, scenario_count: 9, playable: 0 });
       for (const code of ["12168", "120165", "18020", "19099", "12204"]) expect(database.prepare("select campaign_id from cards where code = ?").get(code)?.campaign_id, code).toBe("ered-mithrin");
       expect(database.prepare("select name, type_code, campaign_kind, deck_legal from cards where code = ?").get("12204")).toMatchObject({ name: "Masterwork Bow", type_code: "treasure", campaign_kind: "treasure", deck_legal: 0 });
