@@ -98,8 +98,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 72 | The Siege of Gondor | completed | 2026-11-11. Review round done. Open: `gondor-won`. |
 | 73 | The Battle of the Pelennor Fields | completed | 2026-11-12. Review round done. Open: `fields-won`. |
 | 74 | The Tower of Cirith Ungol | completed | 2026-11-12. Review round done. Open: `ungol-won`. |
-| 75 | The Black Gate Opens | active | 2026-11-12. |
-| 76 | Mount Doom | not started | |
+| 75 | The Black Gate Opens | completed | 2026-11-12. Review round done. |
+| 76 | Mount Doom | active | 2026-11-12. |
 
 ## Open items
 
@@ -240,6 +240,9 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - Renderer gaps, The Battle of the Pelennor Fields (behaviour proven by spec rows): the `pelennor` and campaign `aside` verbs, `GrantTrait`, `AttachSelfToPicked`, `SearchMove`, `DiscardUntil` and the `notHost`, `damageFirst`, `assault`, `attackOnlyByEngaged`, `undefendedToMinasTirith` and `shadowsImmune` pieces print as JSON or bare flags (145014, 145015, 145043 to 145080, 145078:B:2); City Wall's discard reads a fixed 4 (145046:A:2); stage 5A spawns a fresh Sorcerer Witch-king while the Captain stays set aside (145077:A:1).
 - The Tower of Cirith Ungol readings not user-confirmed (`docs/brief.md`, The Tower of Cirith Ungol): agent recommendations on the one Heavy Burden moving to the Ring-bearer at 3A, after 3A's When Revealed (146069:B:1), Shagrat's boons staying set aside if he is not in play and returning whenever he leaves play (146069:B:1), the captive Ring-bearer faceup with its tokens and attachments (146066:A:1), the granted Fellowship sphere (146014:A:1), the Watchers' enemy side counting as a staged enemy (146016:A:1), discard-until with an empty deck or a unique enemy in play (146019:A:1, 146067:B:1), Orcish Howls' redirect (146023:A:2), travel on stage 1B (146066:B:1), control of the freed Ring-bearer (146067:B:2) and the Watchers' Forced as Phantom (146071:A:2).
 - Renderer gaps, The Tower of Cirith Ungol (behaviour proven by spec rows): a self-only travel bar reads "any location" (146015:A:2), `DiscardUntil`, `MoveEncounterCard`, `AddSetAsideToStaging`, `PlaceDamage`, `FlipToEnemySide`, `GrantTrait`, `GrantIcon`, `CaptureRingBearer` and the campaign verbs print as JSON (146014:A:1, 146015:A:3, 146019:A:1, 146020:A:1, 146022:A:1, 146061:A:1, 146067:B:1, 146067:B:2, 146068:B:1, 146070:A:3, 146069:A:1, 146069:B:2), `advancesWhenFreed` and `phantom` show as bare flags (146066:B:3, 146071:A:2).
+- The Black Gate Opens readings not user-confirmed (`docs/brief.md`, The Black Gate Opens): agent recommendations on the Embassy's pairing order and ties, the first player choosing per pair, an unplayable player card discarded with its pair (146072:B:1), the Embassy's timing in Setup, each player choosing their Beleaguered Hills enemy (146026:A:2), X or no printed cost counting 0 (146033:A:2), the revealing player choosing for Hell-hawk (146036:A:2), the first player choosing Onslaught's enemy (146040:A:2) and stage 1B advancing on its next progress; "put into play engaged" counting as engaging rests on one secondhand quotation.
+- The Black Gate Opens: the Embassy's faceup cards are not drawn on the table; the dock's Read button opens the pair's previews.
+- Renderer gaps, The Black Gate Opens (behaviour proven by spec rows): a self-only travel bar reads "any location" (146024:A:1), the cancelling seat shown as "the acting player" (146031:A:2), a subjectless leave-play trigger shown as any card (146028:A:1), the Embassy, `totalOf`, `mostPerPlayer`, `PlaceUnderSelf`, `ReturnUnderToStaging`, `SearchMove`, `EngageNextPlayer`, `RemoveFromQuest`, `DealShadowTo`, `TakeControl`, `AssignDamage` and the campaign verbs printed as JSON, and `firstPlayerReveals`, `raiseThreatIfDestroys` and `endsInDefeat` as bare names (146025 to 146041, 146072 to 146074).
 - Easy: the DragnCards `E0C.12` deck keeps all ten Great Spider cards where Hall of Beorn keeps six; the E0C decks lead (user decision, 2026-11-07).
 
 ## Standing decisions
