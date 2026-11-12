@@ -23,13 +23,14 @@ import { captureCard } from "./pile.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
-// CapturePicked: the card picked before the last pick, an ally the actor controls in play, is captured underneath the card the last pick chose.
-export function capturePicked(state: ScenarioState): ScenarioState {
+// CapturePicked: the card picked before the last pick, an ally the actor controls in play, is captured underneath the card the last pick chose; the picks of another player's turn captured nothing here.
+export function capturePicked(state: ScenarioState, focus: Focus): ScenarioState {
   const picks = pickedList(state);
   const host = picks.at(-1);
   const ally = picks.at(-2);
   const card = ally ? state.cards[ally] : undefined;
-  if (!host || !ally || host === ally || !card || card.zone !== "play" || !inPlay(state.cards[host]?.zone ?? "removed")) return state;
+  // The ally is the acting player's own: a player with no ally picked none, and the picks of the player before are not theirs to capture.
+  if (!host || !ally || host === ally || !card || card.zone !== "play" || card.controller !== focus.seat || !inPlay(state.cards[host]?.zone ?? "removed")) return state;
   return captureCard(state, ally, host);
 }
 
@@ -60,7 +61,8 @@ export function engageSelfWithPicked(state: ScenarioState, focus: Focus): Scenar
 // Whether a captured card can be put into play: an ally or a hero, or an attachment its owner has a host for.
 export function playable(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
   const card = state.cards[id];
-  const owner = card?.owner;
+  // A card rescued into a hand has no captured owner any more: its player controls it (mec108.captured-cards).
+  const owner = card?.owner ?? card?.controller ?? undefined;
   if (!card || owner == null || state.seats[owner]?.eliminated) return false;
   const type = printedOf(ctx.cards, card.code).type;
   if (type === "ally" || type === "hero") return true;
@@ -71,7 +73,7 @@ export function playable(state: ScenarioState, id: string, ctx: ReduceContext): 
 export function putCapturedIntoPlay(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[], instruction: Verb<"PutCapturedIntoPlay">): ScenarioState {
   const id = lastPicked(state);
   const card = state.cards[id];
-  const owner = card?.owner;
+  const owner = card?.owner ?? card?.controller ?? undefined;
   if (!card || owner == null || card.zone === "play" || card.zone === "heroes" || !playable(state, id, ctx)) return state;
   const type = printedOf(ctx.cards, card.code).type;
   if (type === "hero" || card.heroSlot != null) {

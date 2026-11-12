@@ -27,7 +27,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "CaptureFromDeck":
       return captureFromDeckVerb(state, instruction, focus);
     case "CapturePicked":
-      return capturePicked(state);
+      return capturePicked(state, focus);
     case "CaptureAttachments":
       return captureAttachments(state);
     // On an enemy a marker the damage step reads; as a Shadow effect it marks the attack in progress.

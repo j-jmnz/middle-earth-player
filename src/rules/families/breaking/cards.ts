@@ -32,7 +32,7 @@ export function runCards(state: ScenarioState, instruction: Instruction, focus: 
     case "ReturnFallenHero":
       return returnFallen(state);
     case "RemoveFromGame":
-      return removeFromGame(state, lastPicked(state));
+      return instruction.self ? (focus.sourceId ? moveCard(state, focus.sourceId, { zone: "removed" }) : state) : removeFromGame(state, lastPicked(state));
     case "LockFirstPlayer":
       return focus.sourceId ? addTableModifier(state, { stat: "firstPlayerLocked", amount: 1, until: "endOfGame" }, focus) : state;
     case "TakeRingBearer":

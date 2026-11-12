@@ -8,6 +8,7 @@ import { routeDestination } from "../families/sea/routes.ts";
 import { grappledWith } from "../families/grapple/values.ts";
 import { captureOnEntry } from "../families/captured/entry.ts";
 import { rescueUnder } from "../families/captured/rescue.ts";
+import { areaHeadOf } from "../families/breaking/areas.ts";
 import { discardedFromDeck, joinStormcallerArea } from "../families/stormcaller/zone.ts";
 import { joinUnchartedDeck, shuffleUnchartedDeck, unchartedRoute, unchartedWon } from "../families/uncharted/zone.ts";
 import { deckRoute, isDeckZone, joinPile, leavePile, type PileZone } from "./piles.ts";
@@ -362,7 +363,7 @@ export function moveCard(state: ScenarioState, id: string, requested: Destinatio
   if (moved.capture && !inPlay(current.zone) && inPlay(dest.zone)) moved = captureOnEntry(moved, id, dest);
   // A host that leaves play rescues every card captured underneath it (mec108.captured-cards).
   // A card captured with a hero that is itself put into a captured deck stays with it (the boons set aside with it, mec108.captured-deck).
-  if (moved.capture && inPlay(current.zone) && !inPlay(dest.zone) && dest.zone !== "captured") moved = rescueUnder(moved, id);
+  if (moved.capture && inPlay(current.zone) && !inPlay(dest.zone) && dest.zone !== "captured") moved = rescueUnder(moved, id, areaHeadOf(state, id));
   // A card that goes from the encounter deck to its discard pile is announced in a game with ships (families/stormcaller/zone.ts).
   if (current.zone === "encounterDeck" && dest.zone === "encounterDiscard") moved = discardedFromDeck(moved, id);
   // A card shuffled back into the Uncharted deck is shuffled into it (families/uncharted/zone.ts).

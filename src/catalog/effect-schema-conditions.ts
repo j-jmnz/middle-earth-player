@@ -354,8 +354,8 @@ export const conditionSchema = z.discriminatedUnion("kind", [
 
 export type Condition = z.infer<typeof conditionSchema>;
 
-export function isStatCondition(condition: Condition | undefined): condition is Extract<Condition, { kind: "versusHighEngagement" | "attacking" | "versusDefender" | "inArea" }> {
-  return condition?.kind === "versusHighEngagement" || condition?.kind === "attacking" || condition?.kind === "versusDefender" || condition?.kind === "inArea";
+export function isStatCondition(condition: Condition | undefined): condition is Extract<Condition, { kind: "versusHighEngagement" | "attacking" | "versusDefender" | "versusVictoryTrait" | "inArea" }> {
+  return condition?.kind === "versusHighEngagement" || condition?.kind === "attacking" || condition?.kind === "versusDefender" || condition?.kind === "versusVictoryTrait" || condition?.kind === "inArea";
 }
 
 export const targetSchema = z.discriminatedUnion("kind", [

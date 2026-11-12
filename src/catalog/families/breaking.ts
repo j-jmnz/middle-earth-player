@@ -63,7 +63,8 @@ const VERBS = [
   // its own code, one defeated while it was an enemy goes to its owner's discard pile.
   z.strictObject({ verb: z.literal("ReturnFallenHero"), ...when }),
   // The last picked card leaves the game, and, in Campaign Mode, the campaign pool ("remove it from the game ... remove that card from the campaign pool", 142074:A:2).
-  z.strictObject({ verb: z.literal("RemoveFromGame"), ...when }),
+  // `self`: the source card leaves the game instead ("remove this quest from the game", 10053:A:3); a quest removed this way is not a card of the campaign pool.
+  z.strictObject({ verb: z.literal("RemoveFromGame"), self: z.literal(true).optional(), ...when }),
   // "For the rest of the game, you cannot lose control of the first player token" (142068:A:2): the table holds `firstPlayerLocked` for the rest of the game (`endOfGame`), so the
   // token does not pass at the end of the refresh phase.
   z.strictObject({ verb: z.literal("LockFirstPlayer"), ...when }),

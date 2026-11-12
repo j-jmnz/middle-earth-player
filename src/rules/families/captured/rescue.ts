@@ -8,6 +8,7 @@ import { updateCard } from "../../core/state.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { nextUint } from "../../core/seed.ts";
+import { areaHeadOf, firstOfArea } from "../breaking/areas.ts";
 import { capturedUnder } from "./pile.ts";
 
 // The permanent boons set aside for the hero come back attached to it, in the order they were set aside (10174:B:2): the Campaign Log's boons of that character.
@@ -40,7 +41,7 @@ function release(state: ScenarioState, id: string): { state: ScenarioState; toHa
 }
 
 // Rescues the cards (all at once): a rescue of none changes nothing and announces nothing. `host` is the card they were under (the subject of the announcement).
-export function rescueCards(state: ScenarioState, host: string, ids: readonly string[]): ScenarioState {
+export function rescueCards(state: ScenarioState, host: string, ids: readonly string[], area: number | null = areaHeadOf(state, host)): ScenarioState {
   if (ids.length === 0) return state;
   let next = state;
   const toHand: string[] = [];
@@ -49,12 +50,13 @@ export function rescueCards(state: ScenarioState, host: string, ids: readonly st
     next = released.state;
     if (released.toHand) toHand.push(id);
   }
-  return queueEvent({ ...next, rescued: toHand }, { trigger: "capturedRescued", seat: null, cardId: host, subject: host });
+  // The event is about the first player of the area the host was in (mec108.create-staging-area): that player answers its Response.
+  return queueEvent({ ...next, rescued: toHand }, { trigger: "capturedRescued", seat: area == null ? null : firstOfArea(next, area), cardId: host, subject: host });
 }
 
 // A host that leaves play: every card captured underneath it is rescued (moveCard).
-export function rescueUnder(state: ScenarioState, host: string): ScenarioState {
-  return rescueCards(state, host, capturedUnder(state, host));
+export function rescueUnder(state: ScenarioState, host: string, area: number | null): ScenarioState {
+  return rescueCards(state, host, capturedUnder(state, host), area);
 }
 
 // `amount` of the cards under the host, chosen at random with the game's seed, are rescued; what lies under it when there are fewer is all rescued and the rest of the amount is lost (10039:B:1).

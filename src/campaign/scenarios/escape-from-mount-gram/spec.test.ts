@@ -1,7 +1,7 @@
 // Rules: mec108.joining-another-player, mec108.side-quests-in-play, mec108.time-x, rr.forced, rr.travel, rr.shadow-effects, rr.first-player, rr.reveal, rr.lasting-effects, rr.replacement-effects, faq.enemy-attacks-outside-combat (data/rules/entries.json).
 import { describe, it } from "vitest";
 
-import { announce, answer, attack, cardSpecs, damageOn, exhausted, handCount, notWon, resolve, reveal, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
+import { announce, answer, attack, cardSpecs, damageOn, exhausted, handCount, notWon, resolve, resourcesOn, reveal, stat, threat, travel, zone, type Row } from "../../../../test/harness/card-spec.ts";
 
 // Card specs for Escape from Mount Gram (angmar-awakened part 5): one row for each record whose behaviour needs a game moment (a line id, the table by zone, one action, what must hold afterwards).
 // `cardSpecs` runs each row again with the records of its line removed and fails a row that still passes (docs/handover/agent-brief.md, Scenario procedure, Finish). What a row cannot express (the cards captured underneath a card, the areas of two players, the
@@ -35,6 +35,10 @@ const ROWS: readonly Row[] = [
   { line: "10049:A:2", name: "When Revealed with no enemy in play: an enemy found in the encounter deck is added to the staging area, and it gets the bonus too", layout: { deck: ["f3"] }, act: reveal(SOUND_THE_ALARM), expect: [zone("f3", "staging"), stat("f3", "attack", 2)] },
 
   { line: "10050:A:2", name: "Shadow: the defending player exhausts a character they control", layout: { engaged: [{ code: "f3", seat: 0 }], play: ["ally"] }, act: [attack("f3", { shadow: FEEBLE, undefended: true }), answer("dh2")], expect: exhausted("dh2") },
+
+  { line: "10053:A:2", name: "Time 4: four time counters on it when it is revealed", layout: { deck: DECK }, act: reveal("10053"), expect: resourcesOn("10053", 4) },
+  { line: "10053:A:3", name: "Forced after the last time counter is removed: the quest is removed from the game", layout: { staging: [{ code: "10053", resources: 0 }] }, act: announce("lastTimeCounterRemoved", "10053"), expect: zone("10053", "removed") },
+  { line: "10180:A:2", name: "The attached hero gets +2 hit points", layout: { attached: [{ code: "10180", to: "dh1" }] }, act: [], expect: stat("dh1", "hitPoints", 8) },
 
   { line: "10052:A:2", name: "Shadow: discard a random card from your hand and raise your threat by its printed cost", layout: { engaged: [{ code: "f3", seat: 0 }], hand: ["c3"] }, act: attack("f3", { shadow: INTERROGATION, undefended: true }), expect: [threat(31), handCount(0)] },
 

@@ -112,6 +112,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
     timing: "response",
     trigger: "capturedRescued",
     subject: "self",
+    // The event is about the first player of the area the guard was in: that player answers (mec108.create-staging-area).
+    answeredBy: "eventSeat",
     condition: { kind: "canPick", pick: { type: "card", control: "any", captured: "rescued", who: "firstPlayer" } },
     instructions: [{ verb: "Pick", pick: { type: "card", control: "any", captured: "rescued", who: "firstPlayer" } }, { verb: "PutCapturedIntoPlay" }],
   },
@@ -227,7 +229,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
   // 10053 Stop the Executioners! (encounter side quest, 6 quest points). Capture 5, Time 4. Forced: when the last time counter is removed, its captured cards are discarded and it is removed from the game; each player raises their threat by 3 for each of their characters so discarded.
   capture("10053", "10053:A:1", 5),
   { id: "10053:constant:2", cardCode: "10053", lines: ["10053:A:2"], timing: "constant", instructions: [{ verb: "Time", amount: 4 }] },
-  { id: "10053:forced:1", cardCode: "10053", lines: ["10053:A:3"], timing: "forced", trigger: "lastTimeCounterRemoved", subject: "self", instructions: [{ verb: "DiscardCapturedUnder", threat: 3 }, { verb: "RemoveFromGame" }] },
+  { id: "10053:forced:1", cardCode: "10053", lines: ["10053:A:3"], timing: "forced", trigger: "lastTimeCounterRemoved", subject: "self", instructions: [{ verb: "DiscardCapturedUnder", threat: 3 }, { verb: "RemoveFromGame", self: true }] },
 
   // 10174 Escape from Mount Gram (campaign card). Setup (after the quest card's, before stage 2A is revealed): the permanent boons of the heroes in the captured decks are set aside, Loot the Dungeons joins the staging area and each player's bottom 5 captured cards are captured underneath it.
   // Forced: the refresh phase raises each player's threat by the completed quest cards plus the side quests in the victory display instead of 1; after a hero enters play it gets its set-aside boons. Resolution: the unique cards still in each captured deck are recorded as stolen.

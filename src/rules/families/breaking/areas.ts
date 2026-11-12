@@ -43,6 +43,18 @@ export function firstOfArea(state: ScenarioState, seat: number): number {
   return [...mine].sort((left, right) => ((left - state.firstPlayer + count) % count) - ((right - state.firstPlayer + count) % count))[0] ?? state.firstPlayer;
 }
 
+// The seat that heads the area the card is in: its staging area, its active location or the engagement of a player of the area; null for a card in no area (or while stages are not separate).
+export function areaHeadOf(state: ScenarioState, id: string): number | null {
+  if (!state.separate) return null;
+  const card = state.cards[id];
+  if (!card) return null;
+  const staged = areaOf(state, id);
+  if (staged != null) return headOf(state, staged);
+  const active = state.seats.findIndex((seat, index) => index < state.seatCount && seat.active === id);
+  if (active >= 0) return headOf(state, active);
+  return card.zone === "engaged" && card.controller != null ? headOf(state, card.controller) : null;
+}
+
 // The living seats that own an area (not a seat that joined another): the seats a phase resolves for once stages are separate. A game with no joined seat returns every living seat.
 export function areaSeats(state: ScenarioState): number[] {
   return state.separate ? livingSeats(state).filter((index) => headOf(state, index) === index) : livingSeats(state);
