@@ -217,6 +217,12 @@ export function fightEnemy<T extends FightTable, L>(table: (layout: L) => T, sha
     // A second attack (the attacking enemy attacks again): defended as the first was, unless the defender is exhausted by then, and then by the second hero when the first is no hero.
     if (window?.kind === "defense") {
       const canDefend = legalTargets(run.state, { type: "DeclareDefender" }, made.ctx).includes(defender);
+      // The attack of a second seat (the attacking enemy engaged the next player) lands on that seat's own hero.
+      const otherSeat = run.state.pendingAttack?.seat ?? 0;
+      if (otherSeat !== 0 && run.state.seats[otherSeat]?.heroes[0]) {
+        run = send(run, { type: "Undefended", heroId: run.state.seats[otherSeat]?.heroes[0] ?? "" }, made.ctx);
+        continue;
+      }
       run = send(run, options.undefended || !canDefend ? { type: "Undefended", heroId: undefendedOn(run.state, options.lands, run.state.cards[defender]?.zone === "heroes" ? defender : made.hero2) } : { type: "DeclareDefender", defenderId: defender }, made.ctx);
       continue;
     }

@@ -41,6 +41,8 @@ const ROWS: readonly Row[] = [
   { line: "146033:A:2", name: "Forced: after it destroys a character the defending player discards a random card from their hand and raises their threat by its printed cost", layout: { ...STAGE2, engaged: [{ code: "146033", seat: 0 }], hand: ["c3"], play: [{ code: "ally" }] }, act: [attack("146033"), defend("ally")], expect: [zone("c3", "discard"), threat(31)] },
 
   { line: "146034:A:2", name: "When Revealed: the revealing player deals 1 damage to a character they control that is questing", layout: { committed: ["dh1"] }, act: reveal("146034"), expect: damageOn("dh1", 1) },
+  { line: "146034:A:3", name: "Shadow: after the attack the attacking enemy engages the next player and attacks again", layout: { seats: 2, engaged: [{ code: "f3", seat: 0 }], deck: ["f0", "f0", "f0"] }, act: attack("f3", { shadow: "146034", undefended: true }), expect: [attackersOf("dh3", ["f3"]), zone("f3", "engaged")] },
+  { line: "146035:A:3", name: "Shadow: the defending character cannot ready until the end of the round", layout: STAGE2, act: attack("f3", { shadow: "146035" }), expect: flag("dh1", "cannotReady") },
   { line: "146036:A:2", name: "When Revealed: it attaches to a Nazgûl enemy in play, which gets +2 Threat, +2 Attack and +2 Defense and is immune to player card effects", layout: { staging: ["146032"] }, act: reveal("146036"), expect: [stat("146032", "threat", 6), stat("146032", "attack", 8), stat("146032", "defense", 6), flag("146032", "immuneToPlayerCards")] },
   { line: "146036:A:2", name: "or searches the encounter deck for a Nazgûl enemy and adds it to the staging area", layout: { deck: ["146032"] }, act: reveal("146036"), expect: zone("146032", "staging") },
 
