@@ -6,7 +6,7 @@ tags:
 # lists, Easy), played after The Weather Hills' win and parked on its win (stage 2B defeated with 9 damage on Thaurdir). The fixture is OPEN until scripts/e2e/fixtures.ts finds a win of those lists in its seeds with the scenario's golden policy (docs/phases/STATUS.md),
 # so this flow cannot run until a seed wins. The Campaign Setup asked nothing (Iârion's Pendant is attached, Protect the Innocent staged with the damage the log noted, Mysterious Omens shuffled in). The Resolution (10166:B:1) asks the first player which of Iârion's Pendant and
 # Amarthiúl's Courage joins the pool and which player takes it ("Choose a player", as Temple of the Deceived's Recurring Nightmare does); confirming notes the damage on Protect the Innocent, puts Arnor Ravaged in its place and adds the burden Thaurdir carried. The campaign has
-# no XP. The part after it, The Wastes of Eriador, is not playable yet, so the path says so (scripts/checks/maestro.test.ts, path-soon).
+# no XP. The win unlocks The Wastes of Eriador, whose node reads Next (scripts/checks/maestro.test.ts, path-soon).
 - launchApp:
     clearState: true
 - openLink: "middleearthlcg://e2e/dike-won"
@@ -71,6 +71,9 @@ tags:
 - assertVisible:
     id: pool
     text: ".*Iârion's Pendant.*"
-# The Wastes of Eriador cannot be dealt yet: the path says it is coming soon and offers no Begin.
+# The win unlocks The Wastes of Eriador.
 - assertVisible:
+    id: node-the-wastes-of-eriador-status
+    text: "Next"
+- assertNotVisible:
     id: path-soon

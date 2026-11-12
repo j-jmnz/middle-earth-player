@@ -10,7 +10,7 @@ tags:
     env:
       FIXTURE: dike-lost
       SCENARIO_ID: deadmens-dike
-# Back on the path, this part wrote nothing: Arnor Ravaged is not in the pool, Protect the Innocent still is, the scenario is still the next part, and The Wastes of Eriador is still coming soon.
+# Back on the path, this part wrote nothing: Arnor Ravaged is not in the pool, Protect the Innocent still is, and the scenario is still the next part.
 - tapOn:
     id: log-back
 - extendedWaitUntil:
@@ -23,5 +23,3 @@ tags:
 - assertVisible:
     id: node-deadmens-dike-status
     text: "Next"
-- assertVisible:
-    id: path-soon

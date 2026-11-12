@@ -80,11 +80,11 @@ describe("Deadmen's Dike in the angmar-awakened campaign", () => {
     expect(pooled({})).toEqual([]);
   });
 
-  it("is playable, the road offers it after The Weather Hills' win, and the part after it (The Wastes of Eriador) is not playable yet", () => {
+  it("is playable, the road offers it after The Weather Hills' win, and the part after it (The Wastes of Eriador) waits behind it", () => {
     expect(PLAYABLE_SCENARIOS).toContain("deadmens-dike");
-    expect(PLAYABLE_SCENARIOS).not.toContain(campaign.scenarios[3]);
+    expect(PLAYABLE_SCENARIOS).toContain(campaign.scenarios[3]);
     const path = campaignPath(campaign, {}, afterHills(1));
-    expect(path.map((node) => [node.id, node.status]).slice(1, 4)).toEqual([["the-weather-hills", "completed"], ["deadmens-dike", "current"], ["the-wastes-of-eriador", "soon"]]);
+    expect(path.map((node) => [node.id, node.status]).slice(1, 4)).toEqual([["the-weather-hills", "completed"], ["deadmens-dike", "current"], ["the-wastes-of-eriador", "locked"]]);
   });
 
   it("10166:A:2 deals the Campaign Setup: Iârion's Pendant on Iârion, and Protect the Innocent staged with the damage the log noted for it (The Weather Hills' Resolution)", () => {
@@ -123,7 +123,7 @@ describe("Deadmen's Dike in the angmar-awakened campaign", () => {
   });
 
   // The Resolution (10166:B:1) on the won golden's final state (goldenState, not a game played again), over the log The Weather Hills left.
-  it("10166:B:1 notes the damage on Protect the Innocent, takes it out of the pool for Arnor Ravaged, earns the burden Thaurdir carried and the group's choice of the Pendant or Amarthiúl's Courage, and leaves The Wastes of Eriador, not playable yet, the part after", () => {
+  it("10166:B:1 notes the damage on Protect the Innocent, takes it out of the pool for Arnor Ravaged, earns the burden Thaurdir carried and the group's choice of the Pendant or Amarthiúl's Courage, and leaves The Wastes of Eriador, playable, the part after", () => {
     const before = dikePlan(1, afterHills(1)).log;
     const state = goldenState("deadmens-dike", "true solo, won, Normal");
     expect(state.stageCleared).toBe(true);
@@ -137,7 +137,7 @@ describe("Deadmen's Dike in the angmar-awakened campaign", () => {
     expect(pooled.filter((code) => code === "10157" || code === "10167")).toHaveLength(1);
     expect(log.completed).toEqual(["intruders-in-chetwood", "the-weather-hills", "deadmens-dike"]);
     const path = campaignPath(campaign, {}, log);
-    expect(path.map((node) => [node.id, node.status]).slice(2, 4)).toEqual([["deadmens-dike", "completed"], ["the-wastes-of-eriador", "soon"]]);
+    expect(path.map((node) => [node.id, node.status]).slice(2, 4)).toEqual([["deadmens-dike", "completed"], ["the-wastes-of-eriador", "current"]]);
   });
 
   it("10166:B:1 records a boon Mysterious Omens gave a hero in this scenario with that hero, as The Weather Hills does, and not twice a boon the pool already held on a hero", () => {

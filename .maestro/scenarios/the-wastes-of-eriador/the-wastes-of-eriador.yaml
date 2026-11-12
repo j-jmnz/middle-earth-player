@@ -15,3 +15,6 @@ tags:
       # CHOICE_PROMPT: "TODO"
       # CHOICE_CONSEQUENCE: "TODO"
 # TODO: this scenario's own assertions on the path screen after the win (the next part's node, a carried card).
+# The win unlocks The Treachery of Rhudaur, which the app cannot deal yet: the path says it is coming soon (scripts/checks/maestro.test.ts, path-soon).
+- assertVisible:
+    id: path-soon

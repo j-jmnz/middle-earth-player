@@ -34,13 +34,14 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     // "Add that card to the Campaign Pool" (10166:A:3): the burden the Forced effect attached to Thaurdir joins the pool when the scenario is won, whoever carries it then (rr.campaign-pool); a lost game writes nothing.
     { verb: "EarnAllBurdens" }] },
 
-  // 10171 The Wastes of Eriador. Setup: no +1 for changing heroes; each player adds a Determination to their starting hand and to the pool; Fend Off Despair is shuffled into the encounter deck. Resolution: Fend Off Despair joins the pool.
+  // 10171 The Wastes of Eriador. Setup: no +1 for changing heroes; each player adds a Determination to their starting hand and to the pool; Fend Off Despair is shuffled into the encounter deck. Resolution: Fend Off Despair joins the pool, and the characters that carry a Determination are marked determined.
   { id: "10171:campaignSetup:1", cardCode: "10171", lines: ["10171:A:2"], timing: "campaignSetup", instructions: [
     { verb: "WaiveThreatPenalty" },
     { verb: "AddToHandAfterMulligan", code: DETERMINATION },
     { verb: "AddToPool", code: DETERMINATION, eachPlayer: true },
     { verb: "ShuffleIntoEncounterDeck", code: FEND_OFF_DESPAIR }] },
-  { id: "10171:resolution:1", cardCode: "10171", lines: ["10171:B:1"], timing: "resolution", instructions: [{ verb: "Earn", codes: [FEND_OFF_DESPAIR] }] },
+  // The Forced effect inside the line 10172:A:1 (a Determination: "If you win this scenario, mark in the Campaign Log that attached character is 'determined'"), whose line the Action record of 10172 owns: the Resolution marks each character in play that still carries one (a lost game writes nothing).
+  { id: "10171:resolution:1", cardCode: "10171", lines: ["10171:B:1"], timing: "resolution", instructions: [{ verb: "Earn", codes: [FEND_OFF_DESPAIR] }, { verb: "RecordDetermined", code: DETERMINATION }] },
 
   // 10188 The Battle of Carn Dûm. Setup: no +1 for changing heroes (Amarthiúl may be a hero: src/campaign/loadout.ts HERO_BANS); each player in turn may take one of the four boons into their opening hand, and it joins the pool. Resolution: the damage on each hero is noted.
   { id: "10188:campaignSetup:1", cardCode: "10188", lines: ["10188:A:2"], timing: "campaignSetup", instructions: [
