@@ -284,7 +284,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
   (the keyword part is owned by the card's keywords; the records cover: When Revealed: Search the encounter deck, discard pile, and victory display for Mordor Road and add it to the staging area. Shuffle the encounter discard pile into the encounter deck and travel to Mordor Road.)
   146076:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchMove {"verb":"SearchMove","code":"146045","to":"staging","victory":true}]
+    - [json SearchMove {"verb":"SearchMove","code":"146045","to":"staging","victory":true,"remember":true}]
     - shuffle the encounter discard pile into the encounter deck
     - [json TravelTo {"verb":"TravelTo","target":"picked","unlessActive":true}]
 
