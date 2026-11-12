@@ -41,6 +41,7 @@ import lairFixtures from "./fixtures/shelobs-lair.json";
 import companyFixtures from "./fixtures/the-passing-of-the-grey-company.json";
 import gondorFixtures from "./fixtures/the-siege-of-gondor.json";
 import fieldsFixtures from "./fixtures/the-battle-of-the-pelennor-fields.json";
+import ungolFixtures from "./fixtures/the-tower-of-cirith-ungol.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -98,6 +99,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-passing-of-the-grey-company": companyFixtures,
   "the-siege-of-gondor": gondorFixtures,
   "the-battle-of-the-pelennor-fields": fieldsFixtures,
+  "the-tower-of-cirith-ungol": ungolFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(
