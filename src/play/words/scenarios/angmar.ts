@@ -8,6 +8,7 @@ export function angmarWords(instruction: Instruction): string | null {
     case "ChooseCurrentQuest":
       return "choose a different quest card in play to be the current quest until the end of the phase";
     case "SearchReveal":
+      if (instruction.type === "enemy" && instruction.to === "staging") return `search for ${instruction.trait ? `a ${instruction.trait}` : "an"} enemy and add it to the staging area`;
       return instruction.type === "encounter-side-quest" ? "search the encounter deck and discard pile for an encounter side quest and reveal it" : null;
     case "Time":
       return `put ${instruction.amount} time counters on this card`;
