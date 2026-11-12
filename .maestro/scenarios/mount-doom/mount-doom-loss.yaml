@@ -1,0 +1,13 @@
+appId: com.middleearth.lcg
+tags:
+  - scenario
+---
+# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `doom-lost` (scripts/e2e/mount-doom.ts): a real two-handed
+# game of Mount Doom, parked on its loss. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
+# The steps are the shared subflow's (.maestro/subflows/scenario-loss.yaml); add this scenario's own assertions after the call.
+- runFlow:
+    file: ../../subflows/scenario-loss.yaml
+    env:
+      FIXTURE: doom-lost
+      SCENARIO_ID: mount-doom
+# TODO: this scenario's own assertions on the log screen after the loss.
