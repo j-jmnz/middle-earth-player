@@ -190,8 +190,9 @@ const atomSchema = z.discriminatedUnion("kind", [
   // Every card of `of` also matches `match`, and there is at least one ("if each hero you control has a printed Leadership
   // resource icon"; heroesAll is the Hobbit case).
   z.strictObject({ kind: z.literal("allMatch"), of: pickSchema, match: pickSchema }),
-  // The actor's threat is at least `min` and at most `max` (Valour: 40 or higher; Secrecy: 20 or less).
-  z.strictObject({ kind: z.literal("threat"), min: z.number().int().min(0).optional(), max: z.number().int().min(0).optional() }),
+  // The actor's threat is at least `min` and at most `max` (Valour: 40 or higher; Secrecy: 20 or less). `valour` marks Valour's own
+  // threshold (`min: 40`) or its complement (`max: 39`): both read 40 higher while the main quest has Dire (mec113.dire).
+  z.strictObject({ kind: z.literal("threat"), min: z.number().int().min(0).optional(), max: z.number().int().min(0).optional(), valour: z.boolean().optional() }),
   // The source card, its host, the card the event was about, or the active location matches the filter (its zone is not
   // checked): "while ~ is committed to a quest", "if attached hero is a Dwarf", "if that enemy is an Orc".
   // `inPlay`: the card is in play now (`false`: it is not), for "if that ally is still in play".

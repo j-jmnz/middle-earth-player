@@ -6,6 +6,7 @@ import { withThreat } from "../../core/state.ts";
 import { spawn } from "../../core/zones.ts";
 import { lowerThreatByEffect } from "../quest/threat.ts";
 import { hero, table, treachery } from "../defense/table.ts";
+import { holds } from "../../interpret/conditions.ts";
 import { DIRE_ELIMINATION_LEVEL, questIsDire, syncDire } from "./dire.ts";
 
 // Rules: mec113.dire (data/rules/entries.json): while the main quest has the Dire keyword each player's threat elimination level is 99 and non-boon player card effects lower a player's threat by at most 1 each round.
@@ -65,5 +66,21 @@ describe("Dire (mec113.dire)", () => {
     const plain = onStage("plain-stage", {});
     const calm = spawn(withThreat(plain.state, 0, 40), "calm", { zone: "hand", seat: 0 });
     expect(lowerThreatByEffect(calm.state, 0, 3, calm.id, plain.ctx, [], { kind: "rule", ruleId: "test" } as never).seats[0]?.threat).toBe(37);
+  });
+
+  it("moves Valour's threshold from 40 to 80, and the complement of 22138 and 22002 with it, but not another threat condition", () => {
+    const scope = { actor: 0, sourceId: null, returned: 0 };
+    const valour = { kind: "threat", min: 40, valour: true } as const;
+    const notValour = { kind: "threat", max: 39, valour: true } as const;
+    const own = { kind: "threat", min: 40 } as const;
+    const at = (made: ReturnType<typeof onStage>, threat: number) => {
+      const state = withThreat(made.state, 0, threat);
+      return [valour, notValour, own].map((condition) => holds(state, condition, scope, made.ctx));
+    };
+    const plain = onStage("plain-stage", {});
+    expect([39, 40].map((threat) => at(plain, threat))).toEqual([[false, true, false], [true, false, true]]);
+    const dire = onStage("dire-stage", { dire: true });
+    // Between 40 and 79 under Dire the card is not at Valour: the "not Valour" branch holds, a threshold of its own stays at 40.
+    expect([39, 40, 79, 80].map((threat) => at(dire, threat))).toEqual([[false, true, false], [false, true, true], [false, true, true], [true, false, true]]);
   });
 });

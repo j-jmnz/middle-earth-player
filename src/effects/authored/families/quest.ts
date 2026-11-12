@@ -68,7 +68,7 @@ export const RECORDS: readonly Effect[] = [
   // 10117 Doom Hangs Still: the Planning Action and the Valour Planning Action are one choice.
   {"id":"10117:action:1","cardCode":"10117","lines":["10117:A:1","10117:A:2"],"timing":"action","condition":{"kind":"phase","is":"Planning"},"instructions":[{"verb":"Choose","who":"actor","options":[
     {"id":"waive","instructions":[{"verb":"WaiveQuestThreat","who":"eachSeat","until":"endOfRound"}]},
-    {"id":"valour","requires":{"kind":"threat","min":40},"instructions":[{"verb":"RaiseThreat","amount":2,"who":"eachSeat"},{"verb":"SkipQuestPhase"}]}]}]},
+    {"id":"valour","requires":{"kind":"threat","min":40,"valour":true},"instructions":[{"verb":"RaiseThreat","amount":2,"who":"eachSeat"},{"verb":"SkipQuestPhase"}]}]}]},
   // 10124 Favor of the Valar: settle keeps its seat from elimination until this resolves (families/quest/threat.ts).
   {"id":"10124:forced:1","cardCode":"10124","lines":["10124:A:2"],"timing":"forced","trigger":"wouldBeEliminated","eventSeat":"you","instructions":[{"verb":"SetThreat","value":45},{"verb":"Discard","target":{"kind":"self"}}]},
   // 11005 Grappling Hook: the hook is discarded once its character is committed.
@@ -151,7 +151,7 @@ export const RECORDS: readonly Effect[] = [
   // 22007 Charge into Battle (line 2 is the attack family's).
   {"id":"22007:constant:1","cardCode":"22007","lines":["22007:A:1"],"timing":"constant","instructions":[{"verb":"PlayOnlyIf","condition":{"kind":"step","is":"afterStaging"}}]},
   // 22029 Need Drives Them.
-  {"id":"22029:action:1","cardCode":"22029","lines":["22029:A:1"],"timing":"action","instructions":[{"verb":"ForEachPlayer","order":"firstFirst","instructions":[{"verb":"ReadyAll","when":{"kind":"threat","min":40}}]}]},
+  {"id":"22029:action:1","cardCode":"22029","lines":["22029:A:1"],"timing":"action","instructions":[{"verb":"ForEachPlayer","order":"firstFirst","instructions":[{"verb":"ReadyAll","when":{"kind":"threat","min":40,"valour":true}}]}]},
   // 22054 Saruman (line 3 is 22054:response:1).
   {"id":"22054:constant:1","cardCode":"22054","lines":["22054:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"threatReductionToOne","amount":1,"until":"whileSourceInPlay","target":"actorSeat"}]},
   // 22061 Rohirrim Scout.

@@ -4,7 +4,7 @@ import type { Effect } from "../../../catalog/boundary.ts";
 export const RECORDS: readonly Effect[] = [
   // The damage window: damage just dealt to a character is canceled, reduced or moved before it can destroy it (rr.cancel).
   {"id":"10004:response:1","cardCode":"10004","lines":["10004:A:1"],"timing":"response","trigger":"damageDealt","subject":{"type":"character","control":"any"},"cost":{"kind":"exhaustSelf"},"instructions":[{"verb":"CancelDamage","amount":1}]},
-  {"id":"10004:response:2","cardCode":"10004","lines":["10004:A:2"],"timing":"response","trigger":"damageDealt","subject":{"type":"character","control":"any"},"cost":[{"kind":"exhaustSelf"},{"kind":"discardSelf"}],"condition":{"kind":"threat","min":40},"instructions":[{"verb":"CancelDamage","amount":5}]},
+  {"id":"10004:response:2","cardCode":"10004","lines":["10004:A:2"],"timing":"response","trigger":"damageDealt","subject":{"type":"character","control":"any"},"cost":[{"kind":"exhaustSelf"},{"kind":"discardSelf"}],"condition":{"kind":"threat","min":40,"valour":true},"instructions":[{"verb":"CancelDamage","amount":5}]},
   {"id":"10005:response:1","cardCode":"10005","lines":["10005:A:2"],"timing":"response","trigger":"damageDealt","subject":"host","cost":{"kind":"exhaustSelf"},"instructions":[{"verb":"CancelDamage","amount":1}]},
   {"id":"10148:response:1","cardCode":"10148","lines":["10148:A:2"],"timing":"response","trigger":"damageDealt","subject":"host","cost":{"kind":"exhaustSelf"},"condition":{"kind":"matches","card":"host","pick":{"type":"character","control":"any","committed":true}},"instructions":[{"verb":"CancelDamage","amount":1}]},
   {"id":"06060:response:1","cardCode":"06060","lines":["06060:A:1"],"timing":"response","trigger":"damageDealt","subject":{"type":"character","control":"any","trait":"Gondor"},"cost":{"kind":"playEvent"},"instructions":[{"verb":"CancelDamage","amount":2}]},
@@ -99,7 +99,7 @@ export const RECORDS: readonly Effect[] = [
 
   // Other.
   {"id":"06038:action:1","cardCode":"06038","lines":["06038:A:2"],"timing":"action","instructions":[{"verb":"ModifyStat","stat":"defenseFromWillpower","amount":1,"until":"endOfPhase","holders":{"type":"character","control":"any","spheres":["spirit"]}}]},
-  {"id":"10144:action:2","cardCode":"10144","lines":["10144:A:2"],"timing":"action","condition":{"kind":"threat","min":40},"instructions":[{"verb":"Pick","pick":{"type":"player","control":"any"}},{"verb":"ModifyStat","stat":"noExhaustAttack","amount":1,"until":"endOfPhase","target":"pickedPlayerHeroes"},{"verb":"ModifyStat","stat":"noExhaustDefend","amount":1,"until":"endOfPhase","target":"pickedPlayerHeroes"}]},
+  {"id":"10144:action:2","cardCode":"10144","lines":["10144:A:2"],"timing":"action","condition":{"kind":"threat","min":40,"valour":true},"instructions":[{"verb":"Pick","pick":{"type":"player","control":"any"}},{"verb":"ModifyStat","stat":"noExhaustAttack","amount":1,"until":"endOfPhase","target":"pickedPlayerHeroes"},{"verb":"ModifyStat","stat":"noExhaustDefend","amount":1,"until":"endOfPhase","target":"pickedPlayerHeroes"}]},
   {"id":"08142:action:1","cardCode":"08142","lines":["08142:A:1"],"timing":"action","condition":{"kind":"all","conditions":[{"kind":"phase","is":"Quest"},{"kind":"canPick","pick":{"type":"enemy","control":"any","stagingOnly":true,"nonUnique":true}}]},"instructions":[{"verb":"Pick","pick":{"type":"enemy","control":"any","stagingOnly":true,"nonUnique":true}},{"verb":"ModifyStat","stat":"takesQuestProgress","amount":1,"until":"endOfPhase","target":"picked"}]},
 ];
 

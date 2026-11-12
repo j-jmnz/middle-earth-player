@@ -3,6 +3,7 @@ import { familyCondition } from "./family-hooks.ts";
 import { outOfPlayCopies, searchable } from "./search.ts";
 import { locationThreatHolds } from "../families/grapple/values.ts";
 import { islandHolds } from "../families/island/pick.ts";
+import { DIRE_VALOUR_SHIFT } from "../families/black-gate/dire.ts";
 import type { Condition } from "../../catalog/boundary.ts";
 
 import { resolveAmount, type AmountScope } from "./amounts.ts";
@@ -259,7 +260,9 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     }
     case "threat": {
       const threat = seatThreat(state, scope.actor);
-      return (condition.min == null || threat >= condition.min) && (condition.max == null || threat <= condition.max);
+      // Valour's threshold is 80 while the main quest has Dire (mec113.dire): the marked bounds move up by 40.
+      const shift = condition.valour && state.dire ? DIRE_VALOUR_SHIFT : 0;
+      return (condition.min == null || threat >= condition.min + shift) && (condition.max == null || threat <= condition.max + shift);
     }
     case "matches": {
       const id = conditionCard(state, condition.card, scope);

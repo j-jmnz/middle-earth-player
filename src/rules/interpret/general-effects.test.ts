@@ -47,8 +47,8 @@ describe("filters and read amounts", () => {
     const scope = { actor: 0, sourceId: null, returned: 0 };
     expect(holds(next, { kind: "count", pick: { type: "character", control: "you", trait: "Silvan" }, min: 1 }, scope, ctx)).toBe(true);
     expect(holds(next, { kind: "allMatch", of: { type: "character", control: "you" }, match: { type: "character", control: "you", trait: "Silvan" } }, scope, ctx)).toBe(false);
-    expect(holds(withThreat(next, 0, 40), { kind: "threat", min: 40 }, scope, ctx)).toBe(true);
-    expect(holds(next, { kind: "not", condition: { kind: "threat", min: 40 } }, scope, ctx)).toBe(true);
+    expect(holds(withThreat(next, 0, 40), { kind: "threat", min: 40, valour: true }, scope, ctx)).toBe(true);
+    expect(holds(next, { kind: "not", condition: { kind: "threat", min: 40, valour: true } }, scope, ctx)).toBe(true);
   });
 
   it("give a constant to every card a filter names, with an amount read each time the records are rebuilt", () => {

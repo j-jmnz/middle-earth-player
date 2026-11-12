@@ -15,7 +15,7 @@ import { threatCostOf } from "./stats.ts";
 
 const VALOUR = new WeakMap<readonly unknown[], Map<string, boolean>>();
 
-// A card with a Valour ability: one of its records asks for a threat of 40 or more (a Valour Action or Response).
+// A card with a Valour ability: one of its records asks for the Valour threshold (`valour` on a `threat` condition: a Valour Action or Response).
 export function hasValour(ctx: ReduceContext, code: string): boolean {
   let known = VALOUR.get(ctx.effects);
   if (!known) {
@@ -24,7 +24,7 @@ export function hasValour(ctx: ReduceContext, code: string): boolean {
   }
   const cached = known.get(code);
   if (cached != null) return cached;
-  const found = effectsOf(ctx, code).some((effect) => /"kind":"threat","min":40[,}]/.test(JSON.stringify(effect)));
+  const found = effectsOf(ctx, code).some((effect) => /"kind":"threat","min":40,"valour":true/.test(JSON.stringify(effect)));
   known.set(code, found);
   return found;
 }

@@ -15,8 +15,8 @@ export const RECORDS: readonly Effect[] = [
   // Valour Action on a chosen player. With at most two seats, "another player" is the one other seat.
   {"id":"10088:action:1","cardCode":"10088","lines":["10088:A:1","10088:A:2"],"timing":"action","instructions":[{"verb":"Choose","who":"actor","options":[
     {"id":"all","instructions":[{"verb":"ModifyStat","stat":"attack","amount":-1,"until":"endOfPhase","holders":{"type":"enemy","control":"any","staging":true}}]},
-    {"id":"valour-you","requires":{"kind":"threat","min":40},"instructions":[{"verb":"ModifyStat","stat":"attack","amount":-3,"until":"endOfPhase","holders":{"type":"enemy","control":"any","engaged":"you"}}]},
-    {"id":"valour-other","requires":{"kind":"all","conditions":[{"kind":"threat","min":40},{"kind":"otherPlayer"}]},"instructions":[{"verb":"ModifyStat","stat":"attack","amount":-3,"until":"endOfPhase","holders":{"type":"enemy","control":"any","engaged":"other"}}]}]}]},
+    {"id":"valour-you","requires":{"kind":"threat","min":40,"valour":true},"instructions":[{"verb":"ModifyStat","stat":"attack","amount":-3,"until":"endOfPhase","holders":{"type":"enemy","control":"any","engaged":"you"}}]},
+    {"id":"valour-other","requires":{"kind":"all","conditions":[{"kind":"threat","min":40,"valour":true},{"kind":"otherPlayer"}]},"instructions":[{"verb":"ModifyStat","stat":"attack","amount":-3,"until":"endOfPhase","holders":{"type":"enemy","control":"any","engaged":"other"}}]}]}]},
   // 10089 Galadhrim Weaver
   {"id":"10089:constant:1","cardCode":"10089","lines":["10089:A:1"],"timing":"constant","instructions":[{"verb":"ModifyStat","stat":"cannotAttack","amount":1,"until":"whileSourceInPlay"},{"verb":"ModifyStat","stat":"cannotDefend","amount":1,"until":"whileSourceInPlay"}]},
   {"id":"10089:response:1","cardCode":"10089","lines":["10089:A:2"],"timing":"response","trigger":"enteredPlay","subject":"self","condition":{"kind":"canPick","pick":{"type":"card","control":"you","from":"discard"}},"instructions":[{"verb":"Pick","pick":{"type":"card","control":"you","from":"discard","topmost":true}},{"verb":"PutOnDeck","position":"shuffle","target":"picked"}]},
