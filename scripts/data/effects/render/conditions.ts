@@ -35,6 +35,7 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   lastFortitudeFailed: () => ({ text: "the last Fortitude test the running effect made was failed (false before it has made one)", read: [] }),
   lastFortitudePassed: () => ({ text: "the last Fortitude test the running effect made was passed (false before it has made one)", read: [] }),
   fortitudeFailed: (c) => ({ text: `${c.who === "any" ? "any player has" : "the actor has"} failed a Fortitude test this ${str(c.scope)}`, read: ["scope", "who"] }),
+  hostControlledByActor: () => ({ text: "the card this one is attached to is controlled by the acting player", read: [] }),
   phase: (c) => ({ text: `it is the ${str(c.is)} phase`, read: ["is"] }),
   hasEngaged: (c) => ({ text: `the actor has ${typeof c.trait === "string" ? `a ${c.trait} ` : "an "}enemy engaged`, read: ["trait"] }),
   exhausted: (c) => ({ text: `the card with code ${str(c.code)} in play is ${c.is === true ? "exhausted" : "ready"}`, read: ["code", "is"] }),

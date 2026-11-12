@@ -221,6 +221,7 @@ describe("effects render read fields, conditions", () => {
     lastFortitudeFailed: [{ kind: "lastFortitudeFailed" }],
     lastFortitudePassed: [{ kind: "lastFortitudePassed" }],
     fortitudeFailed: [{ kind: "fortitudeFailed", scope: "round", who: "any" }],
+    hostControlledByActor: [{ kind: "hostControlledByActor" }],
     captives: [{ kind: "captives", min: 1, max: 2, of: "actor" }],
     matches: [{ kind: "matches", card: "picked", pick: { type: "enemy", control: "any" } }],
     controls: [{ kind: "controls", code: "12345" }],

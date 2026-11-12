@@ -47,6 +47,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("lastFortitudeFailed") }),
   z.strictObject({ kind: z.literal("lastFortitudePassed") }),
   z.strictObject({ kind: z.literal("fortitudeFailed"), scope: z.literal("round"), who: z.enum(["actor", "any"]) }),
+  // The source card is attached to a card the actor controls ("After you fail a Fortitude test, exhaust attached hero", 146057:A:1): an encounter card attached to a hero is controlled by nobody, so the Forced effect's actor, the player the event happened to, is compared with the host's controller.
+  z.strictObject({ kind: z.literal("hostControlledByActor") }),
   z.strictObject({ kind: z.literal("phase"), is: phaseNameSchema }),
   // The encounter deck or discard pile holds a card with this code or trait.
   // Where the source card is now. `play` means any zone the source's controller plays from.

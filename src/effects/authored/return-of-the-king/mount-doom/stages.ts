@@ -15,11 +15,10 @@ export const STAGE_RECORDS: readonly (Effect | Copy)[] = [
   { id: "146075:constant:1", cardCode: STAGE_1, lines: ["146075:B:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "questPoints", amount: { players: true, times: 4 }, until: "whileSourceInPlay", target: "self" }] },
   { id: "146075:constant:2", cardCode: STAGE_1, lines: ["146075:B:2"], timing: "constant", instructions: [{ verb: "FirstTreacheryImmuneSurge" }] },
 
-  // 146076 Stage 2 (no quest points: it never advances by progress, only by its own record). When Revealed: Mordor Road is searched for in the encounter deck, discard pile and victory display and added to the staging area; the discard pile is shuffled into the deck; the players travel to Mordor Road
+  // 146076 Stage 2 (no quest points: no progress can defeat it, only its own record advances it). When Revealed: Mordor Road is searched for in the encounter deck, discard pile and victory display and added to the staging area; the discard pile is shuffled into the deck; the players travel to Mordor Road
   // (only when no location is active: rr.active-location; the Forced of Mordor Road resolves if they do). Side B: after progress is placed here from questing successfully each player, in player order, makes a Fortitude test: a pass places a resource here, a failure discards cards until an enemy is discarded and puts it into play
   // engaged with that player. At the end of the quest phase, with at least as many resources here as there are players, the quest advances to stage 3.
   { id: "146076:whenRevealed:1", cardCode: STAGE_2, lines: ["146076:A:1"], timing: "whenRevealed", instructions: [{ verb: "SearchMove", code: MORDOR_ROAD, to: "staging", victory: true }, { verb: "ShuffleEncounterDiscard" }, { verb: "TravelTo", target: "picked", unlessActive: true }] },
-  { id: "146076:constant:1", cardCode: STAGE_2, lines: ["146076:B:1"], timing: "constant", instructions: [{ verb: "Restrict", what: "advance" }] },
   {
     id: "146076:forced:1",
     cardCode: STAGE_2,
@@ -61,7 +60,7 @@ export const STAGE_RECORDS: readonly (Effect | Copy)[] = [
   },
   { id: "146077:constant:2", cardCode: STAGE_3, lines: ["146077:B:3"], timing: "constant", condition: { kind: "not", condition: MOUNT_DOOM_ACTIVE }, instructions: [{ verb: "Restrict", what: "advance" }] },
 
-  // 146078 Stage 4 (no quest points: it never advances). When Revealed: the discard pile is shuffled into the deck and cards are discarded until one enemy for each player is discarded; those enemies are added to the staging area. Side B: allies cannot enter play and 'when revealed' effects cannot be canceled.
+  // 146078 Stage 4 (no quest points: no progress can defeat it). When Revealed: the discard pile is shuffled into the deck and cards are discarded until one enemy for each player is discarded; those enemies are added to the staging area. Side B: allies cannot enter play and 'when revealed' effects cannot be canceled.
   // Forced: when Mount Doom is explored the first player makes a Fortitude test with one extra card discarded for each player: a failure loses the game (the Ring-bearer claims The One Ring: nothing is written), a pass wins it (the campaign card's Resolution follows).
   { id: "146078:whenRevealed:1", cardCode: STAGE_4, lines: ["146078:A:1"], timing: "whenRevealed", instructions: [{ verb: "ShuffleEncounterDiscard" }, { verb: "DiscardUntilEnemies", perPlayer: 1, to: "staging" }] },
   {
@@ -69,7 +68,7 @@ export const STAGE_RECORDS: readonly (Effect | Copy)[] = [
     cardCode: STAGE_4,
     lines: ["146078:B:1"],
     timing: "constant",
-    instructions: [{ verb: "Restrict", what: "advance" }, { verb: "LimitEntries", cardType: "ally", max: 0 }, { verb: "UncancelableWhenRevealed" }],
+    instructions: [{ verb: "LimitEntries", cardType: "ally", max: 0 }, { verb: "UncancelableWhenRevealed" }],
   },
   {
     id: "146078:forced:1",

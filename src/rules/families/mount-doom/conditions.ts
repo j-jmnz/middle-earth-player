@@ -14,6 +14,10 @@ export function fortitudeCondition(state: ScenarioState, condition: Condition, s
       return lastFortitude(state, "passed");
     case "fortitudeFailed":
       return failedThisRound(state, condition.who === "actor" ? scope.actor : null);
+    case "hostControlledByActor": {
+      const host = scope.sourceId ? state.cards[scope.sourceId]?.host : null;
+      return host != null && state.cards[host]?.controller === scope.actor;
+    }
     default:
       return null;
   }

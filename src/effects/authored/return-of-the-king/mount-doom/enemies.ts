@@ -140,7 +140,8 @@ export const ENEMY_RECORDS: readonly (Effect | Copy)[] = [
     lines: ["146057:A:1"],
     timing: "forced",
     trigger: "fortitudeFailed",
-    eventSeat: "you",
+    // "After you fail": the player who failed (the Forced effect's actor) controls the attached hero (the card is attached, controlled by nobody, so it cannot ask whose card it is).
+    condition: { kind: "hostControlledByActor" },
     instructions: [{ verb: "Exhaust", target: { kind: "ref", ref: "host" } }, { verb: "DiscardEach", pick: ATTACHMENTS_ON_HOST }],
   },
 ];
