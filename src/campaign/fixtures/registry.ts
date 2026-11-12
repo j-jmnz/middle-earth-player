@@ -9,7 +9,7 @@
 // two-handed games of one scenario, parked on its win or loss, and a part after the first starts from the log the earlier
 // parts' wins write). The names with `showcase` are the README's captures (docs/showcase.md), parked on a full table.
 export const FIXTURE_REGISTRY = [
-  { scenarioId: "a-shadow-of-the-past", file: "scenario-1", names: ["won", "lost", "duo", "past-showcase-board", "past-showcase-quest", "past-showcase-combat"] },
+  { scenarioId: "a-shadow-of-the-past", file: "scenario-1", names: ["won", "lost", "duo", "past-showcase-board"] },
   { scenarioId: "a-knife-in-the-dark", names: ["knife-lost"] },
   { scenarioId: "passage-through-mirkwood", names: ["mirkwood-won", "mirkwood-lost"] },
   { scenarioId: "journey-along-the-anduin", names: ["anduin-won", "anduin-lost"] },
