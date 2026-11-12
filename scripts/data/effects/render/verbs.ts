@@ -232,7 +232,10 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   }),
   AttachSelf: (i) => (isObj(i.to) && i.to.kind === "hero" ? { text: `attach this card to ${typeof i.to.trait === "string" ? `a ${i.to.trait} hero` : "a hero"}`, read: ["to"] } : null),
   EndQuestPhase: () => ({ text: "end the quest phase at once (no quest resolution)", read: [] }),
-  ImmediateAttack: (i, ctx) => ({ text: `${ctx.attacker === true ? "the attacking enemy attacks again, the player it is engaged with by then (the defending player, or the next player when an earlier step engaged it with them; an additional attack)" : "this enemy attacks now"}${i.shadow === false ? ", dealt no shadow card" : ", dealt a new shadow card after its old ones are discarded"}`, read: ["shadow"] }),
+  ImmediateAttack: (i, ctx) => ({
+    text: `${ctx.attacker !== true ? "this enemy attacks now" : ctx.engagedNext === true ? "the attacking enemy makes an immediate attack against the player it just engaged" : "the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack)"}${i.shadow === false ? ", dealt no shadow card" : ", dealt a new shadow card after its old ones are discarded"}`,
+    read: ["shadow"],
+  }),
   ConsiderUndefended: () => ({ text: "this attack is considered undefended", read: [] }),
   DiscardShadowOf: (i) => ({ text: `discard a shadow card dealt to ${cardRef(i.target ?? "picked")}`, read: ["target"] }),
   DamageEach: (i, ctx) => ({ text: `deal ${amount(i.amount, ctx)} damage to each ${pick(i.pick, ctx)}`, read: ["amount", "pick"] }),
@@ -329,7 +332,12 @@ export function renderInstruction(value: unknown, ctx: Ctx, depth = 0, later = f
     for (const option of childrenOf(value, made)) lines.push(...renderOption(option, ctx, depth + 1));
   } else {
     const inner = value.verb === "AfterAttack" ? { ...ctx, attacker: true } : ctx;
-    childrenOf(value, made).forEach((child, at) => lines.push(...renderInstruction(child, inner, depth + 1, at > 0)));
+    // An EngageNextPlayer step makes the attacks after it, in the same list, against the player just engaged.
+    let engagedNext = ctx.engagedNext === true;
+    childrenOf(value, made).forEach((child, at) => {
+      lines.push(...renderInstruction(child, { ...inner, engagedNext }, depth + 1, at > 0));
+      if (isObj(child) && child.verb === "EngageNextPlayer") engagedNext = true;
+    });
   }
   return lines;
 }

@@ -48,9 +48,9 @@ export function setStatUntil(state: ScenarioState, instruction: Extract<Instruct
   return { ...state, modifiers: [...state.modifiers, ...holders.map((instanceId) => ({ instanceId, sourceId, stat: instruction.stat, amount: instruction.value, until: instruction.until, set: true }))] };
 }
 
-// All the progress on the current quest card is removed (141065:A:2).
-export function removeAllQuestProgress(state: ScenarioState, steps: EngineStep[], stageOnly = false): ScenarioState {
-  const side = stageOnly ? null : currentSideQuest(state);
+// All the progress on the current quest card is removed (141065:A:2); `of: "stage"` takes the main quest's stage even while a side quest is current.
+export function removeAllQuestProgress(state: ScenarioState, steps: EngineStep[], of: "stage" | undefined): ScenarioState {
+  const side = of === "stage" ? null : currentSideQuest(state);
   const stage = side ? state.cards[side] : state.questStage ? state.cards[state.questStage] : undefined;
   if (!stage || stage.progress <= 0) return state;
   steps.push({ kind: "progress", targetId: stage.id, amount: -stage.progress, cause: currentCause(steps, UNATTRIBUTED) });

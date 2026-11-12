@@ -13,6 +13,9 @@ import { angmarDetail } from "../cards/angmar-preview.ts";
 import { determinedMark } from "../cards/determined-mark.ts";
 import { slotNumbers } from "../cards/card-effects.ts";
 import { sheetFor } from "../choice/sheets.ts";
+import { effectById } from "../../rules/windows/listen.ts";
+import { ASKS } from "../words/asks/the-wastes-of-eriador.ts";
+import { asksOption, type AskFacts } from "../words/asks.ts";
 import type { PickSheet, SheetNames } from "../choice/sheet-types.ts";
 import { angmarDials } from "../readouts/angmar.ts";
 import { scenarioDials, seatMarks } from "../readouts/scenario-dials.ts";
@@ -70,11 +73,11 @@ describe("Pack Leader's gate on stage 3B", () => {
       expect(near?.warms).toBeUndefined();
       expect(near?.warn).toBeUndefined();
     }
-    expect(dial(made, "gate")?.note).toBe("2 of 5 progress on the stage. Pack Leader takes no damage until it holds 5. All progress is discarded when it becomes Day.");
+    expect(dial(made, "gate")?.note).toBe("2 progress on the stage. Pack Leader takes no damage until the stage holds 5. All progress is discarded when it becomes Day.");
   });
 
   it("10015:B:1 says Pack Leader can take damage once the stage holds 5, and the players win by destroying him (10015:B:3)", () => {
-    expect(dial(stage3(5), "gate")?.note).toBe("5 progress on the stage: Pack Leader can take damage now. Destroy him to win the stage. All progress is discarded when it becomes Day.");
+    expect(dial(stage3(5), "gate")?.note).toBe("5 progress on the stage: Pack Leader can take damage now. Destroy him to win the game. All progress is discarded when it becomes Day.");
     expect(dial(stage3(7), "gate")?.note).toContain("7 progress on the stage: Pack Leader can take damage now.");
   });
 
@@ -85,8 +88,12 @@ describe("Pack Leader's gate on stage 3B", () => {
 
   it("10015:B:1 says the gate in Pack Leader's and the stage's previews", () => {
     const made = stage3(3);
-    expect(detail(made, "10017")).toContain("3 of 5 progress on the stage. Pack Leader takes no damage until it holds 5.");
-    expect(detail(made, "10015")).toContain("3 of 5 progress on the stage.");
+    expect(detail(made, "10017")).toContain("3 progress on the stage. Pack Leader takes no damage until the stage holds 5.");
+    expect(detail(made, "10015")).toContain("3 progress on the stage.");
+    // The screen reader hears the 5 twice at most: in the note and in the limit words, not in the dial's name.
+    const gate = dial(made, "gate");
+    expect(`${gate?.name} ${gate?.note} ${gate?.limitWords}`.match(/\b5\b/g)).toHaveLength(2);
+    expect(detail(stage3(0, { staging: [DAYBREAK] }), "10015")).toBeNull();
   });
 });
 
@@ -109,6 +116,13 @@ describe("Eriador Wastes' cap and Arnor Ravaged's damage", () => {
     expect(dial(made, "ravaged")?.warn).toBeUndefined();
     expect(detail(made, "100158")).toBe("4 damage on it. After an attack damages a character but does not destroy it, 1 damage moves from it to that character.");
     expect(dial(tableFromLayout("deadmens-dike", { stage: "09073", phase: "Quest" }), "ravaged")).toBeUndefined();
+  });
+
+  it("100158:A:2 says Arnor Ravaged does nothing once no damage is left on it", () => {
+    const made = tableFromLayout("deadmens-dike", { stage: "09073", phase: "Quest", staging: ["100158"] });
+    expect(dial(made, "ravaged")?.note).toBe("No damage left on it: it does nothing.");
+    expect(detail(made, "100158")).toBe("No damage left on it: it does nothing.");
+    expect(dial(tableFromLayout("deadmens-dike", { stage: "09073", phase: "Quest", staging: [{ code: "100158", damage: 1 }] }), "ravaged")?.note).toContain("1 damage moves from it to that character");
   });
 });
 
@@ -156,6 +170,28 @@ describe("Fend Off Despair's starting threat", () => {
   it("10173:A:1 says in Fend Off Despair's preview that each event gains Doomed 1 and what its defeat writes to the log", () => {
     const made = built({ staging: [DAYBREAK, "10173"] });
     expect(detail(made, "10173")).toBe("Each event card gains Doomed 1. When it is defeated and the scenario is won, each player's starting threat is 2 lower in the Campaign Log.");
+  });
+});
+
+describe("Predatory Wolves' discard option", () => {
+  const discardWords = (made: Made) => {
+    const record = effectById(made.ctx, "10027:whenRevealed:1");
+    // "Each player, in player order": the Choose is the first instruction of the ForEachPlayer (path 0.0).
+    const each = record?.instructions[0];
+    const choose = each?.verb === "ForEachPlayer" ? each.instructions[0] : undefined;
+    const asked: AskFacts = { game: made.state, ctx: made.ctx, names: { card: idName(made, made.state), code: nameOf(made) }, instruction: choose!, effectId: "10027:whenRevealed:1", source: idOf(made.state, "10027"), options: [] };
+    return asksOption(asked, "discard", ASKS);
+  };
+
+  it("10027:A:1 names the ally the option takes when one ally is the highest cost, and says the plain words when two tie", () => {
+    expect(discardWords(built({ staging: [DAYBREAK, "10027"], play: ["ally"] }))?.label).toBe("Discard ally");
+    const tied = built({ staging: [DAYBREAK, "10027"], play: ["ally", "ally"] });
+    expect(discardWords(tied)?.label).toBe("Discard your highest-cost ally");
+  });
+
+  it("10027:A:1 names Amarthiúl, armed only with the short caution (his leaving play loses the game for every player, 10016:A:2)", () => {
+    const only = discardWords(built({ staging: [DAYBREAK, "10027"], play: ["10016"] }));
+    expect(only).toEqual({ label: "Discard Amarthiúl", caution: "Tap again: discarding Amarthiúl loses the game" });
   });
 });
 

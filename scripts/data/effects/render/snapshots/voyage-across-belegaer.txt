@@ -413,7 +413,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 11024:A:2 (shadow): Shadow: If your heading is at the worst setting (Storm), attacking enemy makes an additional attack after this one.
   11024:shadow:1: Shadow
     - if [json condition {"kind":"heading","is":"worst"}]: when the attack in progress ends:
-      - the attacking enemy attacks again, the player it is engaged with by then (the defending player, or the next player when an earlier step engaged it with them; an additional attack), dealt a new shadow card after its old ones are discarded
+      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
 ## 11050 Calm Waters
 (the scenario deals it into the encounter pile; the piles place it, no record does)

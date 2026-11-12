@@ -4,7 +4,8 @@
 import { Circle, Group, Image, Line, RoundedRect, Text, type SkFont, type SkImage, vec } from "@shopify/react-native-skia";
 
 import { cardCorner } from "../../ui/card-corner.ts";
-import { type CombatNumber } from "../cards/card-effects.ts";
+import { type CardEffects, type CombatNumber } from "../cards/card-effects.ts";
+import { DETERMINED_WORD } from "../words/scenarios/wastes-table.ts";
 import { type IconName } from "../../ui/icon-map.ts";
 import { glyphCells, type PlaceMark } from "../store/island-place.ts";
 import { COLS, ROWS } from "../dream-chaser/island-table.ts";
@@ -131,25 +132,36 @@ export function FireMarkView({ rect, mark, fonts, images, t, s }: { rect: Rect; 
  * The current quest among the side quests in the staging area: a small accent pill with the word "Current" inside the card's top edge, upright, left of the damage token's column (mec108.side-quests-in-play); where the word does not fit, a short accent dot in its place,
  * as the foot pills drop their art. The preview and the screen reader's line say what it means.
  */
-export function CurrentQuestMark({ rect, fonts, t, s }: { rect: Rect; fonts: Fonts; t: TableTokens; s: number }) {
-  return <WordPill rect={rect} text="Current" fonts={fonts} t={t} s={s} />;
+export function CurrentQuestMark({ rect, clear, fonts, t, s }: { rect: Rect; clear: number; fonts: Fonts; t: TableTokens; s: number }) {
+  return <WordPill rect={rect} text="Current" clear={clear} fonts={fonts} t={t} s={s} />;
 }
 
 /** A hero or ally the Campaign Log marks determined ("Determined"), or that carries a Determination ("Determination"): the same pill as the current quest's, a character wearing neither of the other marks (mec108.campaign-log, ledger line 10172:A:1). */
-export function DeterminedMarkView({ rect, word, fonts, t, s }: { rect: Rect; word: string; fonts: Fonts; t: TableTokens; s: number }) {
-  return <WordPill rect={rect} text={word} fonts={fonts} t={t} s={s} />;
+export function DeterminedMarkView({ rect, word, clear, fonts, t, s }: { rect: Rect; word: string; clear: number; fonts: Fonts; t: TableTokens; s: number }) {
+  // Where the word does not fit, "Determined" falls back to a round "D" and "Determination" to the plain dot, so the two differ without colour.
+  return <WordPill rect={rect} text={word} short={word === DETERMINED_WORD ? "D" : undefined} clear={clear} fonts={fonts} t={t} s={s} />;
 }
 
-// An accent pill with a word inside the card's top edge, upright; where the word does not fit, a short accent dot in its place.
-function WordPill({ rect, text, fonts, t, s }: { rect: Rect; text: string; fonts: Fonts; t: TableTokens; s: number }) {
+/** How far the widest effect badge reaches from the card's left edge, so a word pill keeps clear of the badge column (the rows are drawn by `Badges`: a stat is the icon, the number and 5 pt, a flag the pill and 4 pt, the "more" pill 24 pt). */
+export function badgeReach(effects: CardEffects, fonts: Fonts, s: number): number {
+  const widths = [
+    ...effects.stats.map((badge) => 15 * s + fonts.badge.getTextWidth(`${badge.delta > 0 ? "+" : "-"}${Math.abs(badge.delta)}`) + 5 * s),
+    ...effects.flags.map(() => BADGE_H * s + 4 * s),
+  ];
+  return widths.length === 0 ? 0 : 2 * s + Math.max(24 * s, ...widths);
+}
+
+// An accent pill with a word inside the card's top edge, upright, clear of the effect badges' column; where the word does not fit, a short accent dot in its place (a round pill with `short` in it when the word has one).
+function WordPill({ rect, text, short, clear, fonts, t, s }: { rect: Rect; text: string; short?: string; clear: number; fonts: Fonts; t: TableTokens; s: number }) {
   const words = fonts.badge.getTextWidth(text);
-  const box = currentMark(rect, words, BADGE_H * s, s);
+  const box = currentMark(rect, words, BADGE_H * s, s, clear, short != null);
   const r = Math.min(box.width, box.height) / 2;
   return (
     <Group>
       <RoundedRect x={box.x} y={box.y} width={box.width} height={box.height} r={r} color={t.accent} />
       <RoundedRect x={box.x} y={box.y} width={box.width} height={box.height} r={r} color={t.night} style="stroke" strokeWidth={1 * s} />
       {box.kind === "word" ? <Text x={box.x + (box.width - words) / 2} y={box.y + 11.5 * s} text={text} font={fonts.badge} color={t.onAccent} /> : null}
+      {box.kind === "dot" && short != null ? <Text x={box.x + (box.width - fonts.badge.getTextWidth(short)) / 2} y={box.y + 11.5 * s} text={short} font={fonts.badge} color={t.onAccent} /> : null}
     </Group>
   );
 }

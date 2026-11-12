@@ -2,7 +2,7 @@
 //
 // The pieces The Wastes of Eriador's cards hold on the table: the Day and Night dial (which side of the Time objective is up, what it does and that it flips at the end of the round), Pack Leader's gate (the progress on stage 3B against the 5 that let him take damage, a goal dial:
 // it is the players' way out), the damage still on Arnor Ravaged, and the seat mark of Fend Off Despair's lowered starting threat. The engine decided every number (`timeObjective`, `stageOf`, `startingThreat`); nothing here changes one. Empty in any other scenario. Pure, so a test reads it.
-import { inPlay, livingSeats } from "../../rules/core/state.ts";
+import { livingSeats } from "../../rules/core/state.ts";
 import type { ScenarioState } from "../../rules/engine/reduce.ts";
 import { DAYBREAK, timeObjective } from "../../rules/families/angmar/day-night.ts";
 import { stageOf } from "../../rules/families/breaking/areas.ts";
@@ -11,11 +11,19 @@ import { TIME_NAME, gateLimitWords, gateWords, ravagedWords, startMarkLabel, sta
 import { cardsOf, type TableDial } from "./dials.ts";
 import type { HandMark } from "./isengard.ts";
 
-const PACK_LEADER = "10017";
-const PACK_LEADER_STAGE = "10015";
-const ARNOR_RAVAGED = "100158";
+export const PACK_LEADER = "10017";
+export const PACK_LEADER_STAGE = "10015";
+export const ARNOR_RAVAGED = "100158";
+export const FEND_OFF_DESPAIR = "10173";
 /** The progress on stage 3B that lets Pack Leader take damage (10015:B:1). */
 export const GATE = 5;
+
+/** Pack Leader's gate: the current stage's code and progress while stage 3B is current and Pack Leader is in play, else null (10015:B:1). The one test the dial and the previews share. */
+export function packLeaderGate(game: ScenarioState): { code: string; progress: number } | null {
+  const stageId = stageOf(game, 0);
+  const stage = stageId ? game.cards[stageId] : undefined;
+  return stage?.code === PACK_LEADER_STAGE && cardsOf(game, PACK_LEADER).length > 0 ? { code: stage.code, progress: stage.progress } : null;
+}
 
 export function wastesDials(game: ScenarioState, nameOf: (code: string) => string): readonly TableDial[] {
   const dials: TableDial[] = [];
@@ -26,19 +34,18 @@ export function wastesDials(game: ScenarioState, nameOf: (code: string) => strin
     dials.push({ id: "daynight", testID: "angmar-daynight", label: "Time", name: TIME_NAME, value: day ? 1 : 0, word: timeWord(day), note: timeWords(day) });
   }
   // Pack Leader's gate: while stage 3B is current and he is in play, the progress on it against the 5 that let him take damage. A goal dial: it fills in the accent and never warms.
-  const stageId = stageOf(game, 0);
-  const stage = stageId ? game.cards[stageId] : undefined;
-  if (stage?.code === PACK_LEADER_STAGE && cardsOf(game, PACK_LEADER).length > 0) {
+  const gate = packLeaderGate(game);
+  if (gate) {
     dials.push({
       id: "gate",
       testID: "angmar-gate",
       label: "Gate",
-      name: `Progress on ${nameOf(stage.code)}, Pack Leader can take damage at ${GATE}:`,
-      value: stage.progress,
+      name: `Progress on ${nameOf(gate.code)}:`,
+      value: gate.progress,
       limit: GATE,
       goal: true,
       limitWords: gateLimitWords(GATE),
-      note: gateWords(stage.progress, GATE),
+      note: gateWords(gate.progress, GATE),
     });
   }
   // Arnor Ravaged: the damage still on it. It prints no limit, so the dial has no ring to fill and never warms.
@@ -55,9 +62,3 @@ export function wastesHands(game: ScenarioState): readonly HandMark[] {
   if (amount <= 0) return [];
   return livingSeats(game).map((seat) => ({ seat, label: startMarkLabel(game.seatCount > 1 ? seat : null, amount), note: startMarkWords(amount) }));
 }
-
-/** Whether the card is the Time objective, either side. */
-export const isTimeObjective = (game: ScenarioState, cardId: string): boolean => {
-  const card = game.cards[cardId];
-  return card != null && inPlay(card.zone) && timeObjective(game)?.id === cardId;
-};

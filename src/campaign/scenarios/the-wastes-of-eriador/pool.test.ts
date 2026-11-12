@@ -149,15 +149,18 @@ describe("10173:A:1 and 10173:A:2 are Fend Off Despair", () => {
     expect(deep.seats[0]?.threat).toBe(0);
   });
 
-  it("10173:A:2 reads in the log and the checklist as -2, not +-2", () => {
-    expect(threatWords({ threatPenalty: -2, threatPenaltyBySeat: [] }, 1)).toBe("-2");
+  it("10173:A:2 reads in the log and the checklist as −2, not +-2", () => {
+    expect(threatWords({ threatPenalty: -2, threatPenaltyBySeat: [] }, 1)).toBe("−2");
     expect(threatWords({ threatPenalty: 0, threatPenaltyBySeat: [] }, 1)).toBe("None");
     expect(threatWords({ threatPenalty: 1, threatPenaltyBySeat: [] }, 2)).toBe("+1");
-    expect(threatWords({ threatPenalty: -2, threatPenaltyBySeat: [0, 1] }, 2)).toBe("Player 1: -2 · Player 2: -1");
+    expect(threatWords({ threatPenalty: -2, threatPenaltyBySeat: [0, 1] }, 2)).toBe("Player 1: −2 · Player 2: −1");
     expect(signed(3)).toBe("+3");
     expect(seatPenalty({ threatPenalty: -2, threatPenaltyBySeat: [1] }, 0)).toBe(-1);
     const step4 = eriadorPlan(1, { ...afterDike(1), threatPenalty: -2 }).steps.find((step) => step.n === 4);
-    expect(step4?.did[0]).toBe("Each player's starting threat is the combined threat cost of their heroes -2, and at least 0.");
+    expect(step4?.did[0]).toBe("Each player's starting threat is the combined threat cost of their heroes minus 2, and at least 0.");
+    // A seat's own penalty on a reduction reads truly: the total, not "plus -1".
+    const seated = eriadorPlan(1, { ...afterDike(1), threatPenalty: -2, threatPenaltyBySeat: [1] }).steps.find((step) => step.n === 4);
+    expect(seated?.did[1]).toBe("Seat 1 takes a permanent +1 starting threat penalty of its own: its starting threat is the combined threat cost of its heroes minus 1, and at least 0.");
   });
 });
 

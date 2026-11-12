@@ -269,7 +269,8 @@ function ThreatDial({
                 backgroundImage: critical ? undefined : `radial-gradient(circle, ${withAlphaHex(hue, 0.28)}, ${withAlphaHex(t.night, 0.92)})`,
               }}
             >
-              <Text testID={`${id}-value`} className="font-display" style={{ fontSize: (word == null ? 20 : 12) * s, lineHeight: (word == null ? 24 : 16) * s, color: critical ? t.onThreat : t.depth === "light" ? t.bone : t.onThreat }}>
+              {/* The disc is 38·s wide and counts on the word fitting (Day, Night): one line, shrunk to the disc at the phone's larger text sizes (docs/design-system.md, Type). */}
+              <Text testID={`${id}-value`} className="font-display" numberOfLines={word == null ? undefined : 1} adjustsFontSizeToFit={word != null} minimumFontScale={0.6} style={{ fontSize: (word == null ? 20 : 12) * s, lineHeight: (word == null ? 24 : 16) * s, color: critical ? t.onThreat : t.depth === "light" ? t.bone : t.onThreat }}>
                 {word ?? String(threat.threat)}
               </Text>
               {icon && icon !== "threat" ? <GameIcon name={icon} size={9 * s} tint="danger" /> : null}

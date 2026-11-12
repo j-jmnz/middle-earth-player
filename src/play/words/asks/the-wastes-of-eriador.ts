@@ -15,7 +15,7 @@ const PICKED_AMARTHIUL: Condition = { kind: "matches", card: "picked", pick: AMA
 // Every highest-cost ally the player controls is Amarthiúl: the discard option can only take him.
 const ONLY_AMARTHIUL: Condition = { kind: "allMatch", of: HIGHEST_COST_ALLY, match: AMARTHIUL };
 const NIGHT: Condition = { kind: "timeOfDay", is: "night" };
-const LOSES: string = "Tap again: discarding Amarthiúl loses the game. If you are the only player, the game is lost";
+const LOSES: string = "Tap again: discarding Amarthiúl loses the game";
 
 export const ASKS: Readonly<Record<string, Ask>> = {
   // 10014:B:2 (Forced when it becomes Night): the first player chooses the non-objective ally to discard, any player's; with 3 or more players the second ally is chosen the same way.
@@ -33,7 +33,8 @@ export const ASKS: Readonly<Record<string, Ask>> = {
 
   // 10027:A:1 (When Revealed): each player, in player order, discards their highest-cost ally or searches for a Warg enemy.
   "10027:whenRevealed:1 @0.0 Choose": { owned: true, note: "Predatory Wolves: discard your highest-cost ally (Amarthiúl counts as cost 0), or search for a Warg enemy to add to the staging area." },
-  "10027:whenRevealed:1 @0.0 discard": { label: "Discard your highest-cost ally", caution: { when: ONLY_AMARTHIUL, text: LOSES } },
+  // With one highest-cost ally the option takes it with no second step, so its row names it ("Discard Faramir"); with a tie the player picks next.
+  "10027:whenRevealed:1 @0.0 discard": { named: { ally: { pick: HIGHEST_COST_ALLY, otherwise: "your highest-cost ally" } }, label: "Discard {ally}", caution: { when: ONLY_AMARTHIUL, text: LOSES } },
   "10027:whenRevealed:1 @0.0 search": { label: "Search for a Warg enemy and add it to the staging area" },
   "10027:whenRevealed:1 @0.0.discard.0 Pick": { owned: true, note: "Predatory Wolves: choose which of your highest-cost allies to discard.", verb: "Discard", caution: { when: PICKED_AMARTHIUL, text: LOSES } },
 

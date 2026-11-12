@@ -19,11 +19,12 @@ export const timePreviewWords = (day: boolean): string => timeWords(day);
 export const gateLimitWords = (limit: number): string => `${limit} progress let Pack Leader take damage`;
 export const gateWords = (progress: number, limit: number): string =>
   progress >= limit
-    ? `${progress} progress on the stage: Pack Leader can take damage now. Destroy him to win the stage. All progress is discarded when it becomes Day.`
-    : `${progress} of ${limit} progress on the stage. Pack Leader takes no damage until it holds ${limit}. All progress is discarded when it becomes Day.`;
+    ? `${progress} progress on the stage: Pack Leader can take damage now. Destroy him to win the game. All progress is discarded when it becomes Day.`
+    : `${progress} progress on the stage. Pack Leader takes no damage until the stage holds ${limit}. All progress is discarded when it becomes Day.`;
 
 /** Arnor Ravaged's dial and preview (100158:A:2): the damage still on it, which moves to a character one at a time. */
-export const ravagedWords = (damage: number): string => `${damage} damage on it. After an attack damages a character but does not destroy it, 1 damage moves from it to that character.`;
+export const ravagedWords = (damage: number): string =>
+  damage <= 0 ? "No damage left on it: it does nothing." : `${damage} damage on it. After an attack damages a character but does not destroy it, 1 damage moves from it to that character.`;
 
 /** What a character wears while it carries a Determination or the Campaign Log marks it determined (10172:A:1). */
 export const DETERMINED_WORD = "Determined";

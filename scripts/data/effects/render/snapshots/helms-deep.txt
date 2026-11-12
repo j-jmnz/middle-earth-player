@@ -198,7 +198,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143044:A:3 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   143044:shadow:1: Shadow
     - when the attack in progress ends:
-      - the attacking enemy attacks again, the player it is engaged with by then (the defending player, or the next player when an earlier step engaged it with them; an additional attack), dealt a new shadow card after its old ones are discarded
+      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
 ## 143045 Night Without End
 (the scenario deals it into the encounter pile; the piles place it, no record does)

@@ -126,7 +126,7 @@ describe("The Wastes of Eriador in the angmar-awakened campaign", () => {
     expect(state.resolutionLog.startingThreat).toBe(-2);
     const log = applyResolution(before, "the-wastes-of-eriador", state, world.cards, NO_COPY_LIMITS);
     expect(log.threatPenalty).toBe(-2);
-    expect(threatWords(log, 1)).toBe("-2");
+    expect(threatWords(log, 1)).toBe("−2");
     expect(seatPenalty(log, 0)).toBe(-2);
     expect(angmarAwakenedNotes(state.resolutionLog, (code) => world.cards.get(code)?.name ?? code)).toContain("Each player's starting threat is 2 lower from now on, noted in the campaign log.");
     // A game dealt from that log (every later start reads the same field) starts each hero 2 lower than one dealt from the log before it.

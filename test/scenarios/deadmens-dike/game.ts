@@ -1,11 +1,12 @@
 import { emptyLog, type CampaignLog } from "../../../src/campaign/log.ts";
 import type { Difficulty } from "../../../src/catalog/scenario-data.ts";
 import type { CampaignFacts, ModeCard } from "../../../src/rules/core/campaign-state.ts";
-import { legalIntents, legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
+import type { PlayerIntent, ReduceContext, ScenarioState } from "../../../src/rules/engine/reduce.ts";
 
 import { loadCampaign, loadScenario } from "../../../scripts/data/load-scenarios.ts";
-import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
-import { attackTogether, campaignGame, fillerLoadout, HERO_STATS, type PlayedGame } from "../../harness/game-kit.ts";
+import { angmarIntent, type AngmarPolicy, type AngmarScenario } from "../../harness/angmar-policy.ts";
+import type { PolicyOptions } from "../../harness/auto-player.ts";
+import { campaignGame, fillerLoadout, HERO_STATS, type PlayedGame } from "../../harness/game-kit.ts";
 
 const campaign = loadCampaign("angmar-awakened");
 const dike = loadScenario("deadmens-dike");
@@ -28,64 +29,16 @@ export const dikePlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount
 // `choices`: the Campaign Setup Checklist's answers; `standalone`: the scenario alone, with no campaign card.
 export const dikeStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, extra: { choices?: readonly string[]; standalone?: boolean } = {}) => game.start(seatCount, seed, difficulty, { facts, log, modeCard, ...extra });
 
-export type DikePolicy = {
-  // The option a Choose window takes: the first, the last, or the first of SAFE_CHOICES that is offered.
-  choose: "first" | "last" | "safe";
-  // Whether the players engage the enemies of the staging area, one at a time.
-  engage: boolean;
-  // Whether a character defends every attack ("all") or none: with nobody defending the attack falls on the character with the least damage.
-  defend: "none" | "all";
-  // The quest: no character, the first ready character of a seat, or every one but the last, or all.
-  quest: "none" | "one" | "most" | "all";
-};
+export type DikePolicy = AngmarPolicy;
 // The options that keep what the players have: Thaurdir returned to the staging area rather than 3 cards discarded after he destroys a character, and the cards of Unnatural Fog discarded rather than every character removed from the quest.
 const SAFE_CHOICES = ["return", "discard"];
 export const DEFAULT_POLICY: DikePolicy = { choose: "safe", engage: false, defend: "none", quest: "one" };
 
-// The auto-player's answer (test/harness/auto-player.ts), except: the travel, an engagement, the attack and a defender are answered as the policy says; a choice takes the first option, the last, or the first safe one. Every intent is one the reducer listed.
-export function dikeIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: DikePolicy = DEFAULT_POLICY, options: PolicyOptions = DIKE_POLICY): PlayerIntent {
-  const intents = legalIntents(state, ctx);
-  if (state.window?.kind === "choose") {
-    const offered = state.window.options;
-    const safe = SAFE_CHOICES.find((id) => offered.includes(id));
-    return { type: "Choose", optionId: (policy.choose === "last" ? offered.at(-1) : policy.choose === "safe" ? (safe ?? offered[0]) : offered[0]) ?? "" };
-  }
-  if (state.window?.kind === "optionalEngage") {
-    const seat = state.seats[state.activeSeat];
-    const wanted = legalTargets(state, { type: "Engage" }, ctx)[0];
-    return policy.engage && wanted && seat && seat.engaged.length < seat.heroes.length ? { type: "Engage", enemyId: wanted } : { type: "DeclineEngage" };
-  }
-  if (state.window?.kind === "travel") {
-    const wanted = legalTargets(state, { type: "Travel" }, ctx)[0];
-    return wanted ? { type: "Travel", locationId: wanted } : { type: "DeclineTravel" };
-  }
-  if (state.window?.kind === "playerAttack") {
-    // One character at a time, so the others are left to attack another enemy in the next window; an enemy is attacked once in a phase (the memory holds the round and the enemy).
-    const seat = state.seats[state.activeSeat];
-    // Thaurdir first: the second stage cannot be won until 9 damage is on him (09074:B:2); Iârion never attacks.
-    const rank = (enemyId: string) => (state.cards[enemyId]?.code === THAURDIR ? 0 : 1);
-    const attack = (seat?.heroes ?? []).map((one) => attackTogether(state, ctx, (id) => id === one, rank)).find((intent) => intent?.type === "DeclareAttackers" && !memory.has(`${state.round}:${intent.enemyId}`));
-    if (attack?.type === "DeclareAttackers") {
-      memory.add(`${state.round}:${attack.enemyId}`);
-      return attack;
-    }
-  }
-  if (state.window?.kind === "defense") {
-    const byDamage = (ids: readonly string[]) => [...ids].sort((left, right) => (state.cards[left]?.damage ?? 0) - (state.cards[right]?.damage ?? 0))[0];
-    // Only a hero defends: Iârion (an objective-ally under the first player) would lose the game if an attack destroyed him.
-    const defender = policy.defend === "all" && intents.some((intent) => intent.type === "DeclareDefender") ? byDamage(legalTargets(state, { type: "DeclareDefender" }, ctx).filter((id) => state.cards[id]?.zone === "heroes")) : undefined;
-    if (defender) return { type: "DeclareDefender", defenderId: defender };
-    const least = byDamage(legalTargets(state, { type: "Undefended" }, ctx));
-    if (least) return { type: "Undefended", heroId: least };
-  }
-  if (state.window?.kind === "pass" && state.mode === "questCommit") {
-    const quested = Object.values(state.cards).some((card) => card.committed && card.controller === state.activeSeat);
-    // Heroes only: Iârion (an objective-ally under the first player) stays out of the quest and the defense, since his destruction loses the game.
-    const ids = legalTargets(state, { type: "Commit" }, ctx).filter((id) => state.cards[id]?.zone === "heroes");
-    if (!quested && ids.length > 0) return { type: "Commit", cardIds: policy.quest === "none" ? [] : policy.quest === "all" ? ids : policy.quest === "most" ? ids.slice(0, Math.max(1, ids.length - 1)) : ids.slice(0, 1) };
-  }
-  return nextIntent(state, ctx, options, memory, intents);
-}
+// Thaurdir is attacked first: the second stage cannot be won until 9 damage is on him (09074:B:2); Iârion never attacks.
+const DIKE: AngmarScenario = { safe: SAFE_CHOICES, rank: (state, enemyId) => (state.cards[enemyId]?.code === THAURDIR ? 0 : 1) };
+
+// The shared Angmar policy (test/harness/angmar-policy.ts) with Thaurdir attacked first.
+export const dikeIntent = (state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: DikePolicy = DEFAULT_POLICY, options: PolicyOptions = DIKE_POLICY): PlayerIntent => angmarIntent(state, ctx, memory, policy, options, DIKE);
 
 export type DikeGame = PlayedGame;
 

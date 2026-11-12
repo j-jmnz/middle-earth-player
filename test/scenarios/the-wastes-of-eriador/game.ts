@@ -4,8 +4,8 @@ import type { CampaignFacts, ModeCard } from "../../../src/rules/core/campaign-s
 import { type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 
 import { loadCampaign, loadScenario } from "../../../scripts/data/load-scenarios.ts";
+import { angmarIntent, type AngmarPolicy } from "../../harness/angmar-policy.ts";
 import { type PolicyOptions } from "../../harness/auto-player.ts";
-import { dikeIntent } from "../deadmens-dike/game.ts";
 import { attackTogether, campaignGame, fillerLoadout, HERO_STATS, type PlayedGame } from "../../harness/game-kit.ts";
 
 const campaign = loadCampaign("angmar-awakened");
@@ -16,7 +16,7 @@ const NIGHTFALL = "10012";
 // Test helper. A whole game of The Wastes of Eriador in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
 // events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. The players quest with the heroes the policy names (the Time objective is Day when stage 1B's quest places its progress, Night when the
 // enemies engage), attack Pack Leader first (stage 3B is won by destroying him once 5 progress is on it), defend as the policy says, and answer each choice with the policy's answer: the safe option of Predatory Wolves is the search, which keeps the
-// players' allies and Amarthiúl (his leaving play loses the game). Travel, engagement and the heroes-only commit and defense are the Deadmen's Dike policy's (test/scenarios/deadmens-dike/game.ts): the same auto-player, with Pack Leader in Thaurdir's place.
+// players' allies and Amarthiúl (his leaving play loses the game). Travel, engagement and the heroes-only commit and defense are the shared Angmar policy's (test/harness/angmar-policy.ts, which Deadmen's Dike plays too): the same auto-player, with Pack Leader in Thaurdir's place.
 export const ERIADOR_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: false, act: false };
 // "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
 export type EriadorDecks = "strong" | "weak" | "brittle";
@@ -30,28 +30,14 @@ export const eriadorPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCo
 // `choices`: the Campaign Setup Checklist's answers; `standalone`: the scenario alone, with no campaign card.
 export const eriadorStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, extra: { choices?: readonly string[]; standalone?: boolean } = {}) => game.start(seatCount, seed, difficulty, { facts, log, modeCard, ...extra });
 
-export type EriadorPolicy = {
-  // The option a Choose window takes: the first, the last, or the first of SAFE_CHOICES that is offered. (A Choose that asks for a side quest to be the current quest reads its last option as the side quest.)
-  choose: "first" | "last" | "safe";
-  // Whether the players engage the enemies of the staging area, one at a time (Pack Leader cannot be engaged this way: he engages at the Night's engagement check, which takes the highest engagement cost first).
-  engage: boolean;
-  // Whether a character defends every attack ("all") or none: with nobody defending the attack falls on the character with the least damage.
-  defend: "none" | "all";
-  // The quest: no character, the first ready character of a seat, or every one but the last, or all.
-  quest: "none" | "one" | "most" | "all";
-};
+export type EriadorPolicy = AngmarPolicy;
 // The options that keep what the players have: Predatory Wolves' search for a Warg rather than the discard of an ally (Amarthiúl counts as cost 0 and his leaving play loses the game).
 const SAFE_CHOICES = ["search"];
 export const DEFAULT_POLICY: EriadorPolicy = { choose: "safe", engage: false, defend: "none", quest: "all" };
 
-// The auto-player's answer (test/harness/auto-player.ts), except: a choice is answered as the policy says; the rest is the Deadmen's Dike policy's (the players engage the Wargs of the staging area, the first ready character of each seat attacks, a defender is a hero), with Pack Leader attacked before any other Warg.
+// The auto-player's answer (test/harness/auto-player.ts), except: a choice is answered as the policy says; the rest is the shared Angmar policy's (the players engage the Wargs of the staging area, the first ready character of each seat attacks, a defender is a hero), with Pack Leader attacked before any other Warg.
 // Every intent is one the reducer listed.
 export function eriadorIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: EriadorPolicy = DEFAULT_POLICY, options: PolicyOptions = ERIADOR_POLICY): PlayerIntent {
-  if (state.window?.kind === "choose") {
-    const offered = state.window.options;
-    const safe = SAFE_CHOICES.find((id) => offered.includes(id));
-    return { type: "Choose", optionId: (policy.choose === "last" ? offered.at(-1) : policy.choose === "safe" ? (safe ?? offered[0]) : offered[0]) ?? "" };
-  }
   if (state.window?.kind === "playerAttack") {
     // One character at a time, so the others are left to attack another enemy in the next window; an enemy is attacked once in a phase (the memory holds the round and the enemy). Pack Leader first: stage 3B is won by destroying him.
     const seat = state.seats[state.activeSeat];
@@ -64,7 +50,7 @@ export function eriadorIntent(state: ScenarioState, ctx: ReduceContext, memory: 
   }
   // The Time objective: no progress is placed at Night (one hero still commits: the quest needs a character), and Pack Leader exhausts a ready character for each Warg engaged with the player, so the heroes stay ready at Night to attack him (progress from the Day's quest is still on the stage then).
   const night = Object.values(state.cards).some((card) => card.code === NIGHTFALL && card.zone === "staging");
-  return dikeIntent(state, ctx, memory, { choose: "first", engage: policy.engage, defend: policy.defend, quest: night ? "one" : policy.quest }, options);
+  return angmarIntent(state, ctx, memory, { ...policy, quest: night ? "one" : policy.quest }, options, { safe: SAFE_CHOICES, rank: () => 1 });
 }
 
 export type EriadorGame = PlayedGame;

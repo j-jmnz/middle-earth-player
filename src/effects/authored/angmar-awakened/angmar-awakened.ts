@@ -10,7 +10,8 @@ const PROTECT_THE_INNOCENT = "10158";
 const ARNOR_RAVAGED = "100158";
 const IARIONS_PENDANT = "10157";
 const AMARTHIULS_COURAGE = "10167";
-const DETERMINATION = "10172";
+/** Determination, the event of the pool (10172): the table reads it too (src/play/cards/determined-mark.ts). */
+export const DETERMINATION = "10172";
 const FEND_OFF_DESPAIR = "10173";
 // The boons Mysterious Omens offers (10160:A:3): the ones attached to heroes when the scenario is won stay with them in the pool (rr.campaign-pool, ltp.permanent).
 const MYSTERIOUS_OMENS_BOONS = ["10161", "10162", "10163", "10164", "10165"];

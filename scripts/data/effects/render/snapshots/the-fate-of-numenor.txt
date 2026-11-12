@@ -335,7 +335,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json DiscardBottom {"verb":"DiscardBottom"}]
     - then, if [json condition {"kind":"discardedCost","max":2}] (checked when this step runs, after the steps above; not tied to whether they did anything): when the attack in progress ends:
-      - the attacking enemy attacks again, the player it is engaged with by then (the defending player, or the next player when an earlier step engaged it with them; an additional attack), dealt a new shadow card after its old ones are discarded
+      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
 ## 11072 Flooded Ruins
 (the scenario deals it into the unchartedDeck pile; the piles place it, no record does)

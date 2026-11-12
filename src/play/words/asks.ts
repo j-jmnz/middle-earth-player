@@ -4,13 +4,14 @@
 // The tail is the instruction's verb for the sentence over a Pick or a Choose, and an option id for one branch of a Choose. A game reads only its own scenario's file (`ASKS_BY_SCENARIO[game.scenarioId]`): a card
 // several scenarios deal is worded by each scenario's file, never by another's. Every number comes from an `Amount` read with the engine's reader, every warning from a `Condition` read with the engine's, so a
 // sentence says what the table holds and no code counts it. Pure.
-import type { Amount, Condition, Instruction } from "../../catalog/boundary.ts";
+import type { Amount, Condition, Instruction, PickSpec } from "../../catalog/boundary.ts";
 import type { Cause } from "../../rules/core/cause.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
 import { embassyPairNow } from "../readouts/black-gate.ts";
 import { ringBearerId } from "../../rules/families/burden/deck.ts";
 import { frameScope, resolveAmount } from "../../rules/interpret/amounts.ts";
 import { holds } from "../../rules/interpret/conditions.ts";
+import { pickCandidates } from "../../rules/interpret/pick.ts";
 import type { ReduceContext } from "../../rules/interpret/interpret.ts";
 import { effectById, effectsOf } from "../../rules/windows/listen.ts";
 
@@ -35,6 +36,7 @@ export type Text = string | readonly { when?: Condition; text: string }[];
  * - `labels`: the rows of a Pick that are no card, by option id ("skip", "done"). A key that names a card is refused.
  * - `label`: the row of one branch of a Choose (the entry keyed with the option id).
  * - `bind`: a name for each number a template says, as the `Amount` the engine reads.
+ * - `named`: a name for each card a template says, as the `PickSpec` that finds it for the seat asked: the card's name when exactly one card matches, else the words `otherwise` ("your highest-cost ally"), so a row names the card it takes when there is no second step to choose.
  * - `caution`: the two-tap warning, said as "Tap again: ..." when `when` holds. It belongs to a row: on a Pick `when` is read once for each row with `picked` set to that row's id, so the confirm arms only on the row that loses
  *   the game, and on a Choose it is read for the branch the entry is keyed with. A warning that holds whatever is picked is a `when` that does not read `picked`; there is no sheet-wide caution.
  */
@@ -46,6 +48,7 @@ export type Ask = {
   label?: Text;
   labels?: Readonly<Record<string, Text>>;
   bind?: Readonly<Record<string, Amount>>;
+  named?: Readonly<Record<string, { pick: PickSpec; otherwise: string }>>;
   caution?: { when: Condition; text: Text };
 };
 
@@ -89,9 +92,9 @@ export function templatesOf(entry: Ask): string[] {
   return [...textsOf(entry.note), ...(entry.why == null ? [] : [entry.why]), ...textsOf(entry.label), ...Object.values(entry.labels ?? {}).flatMap(textsOf), ...textsOf(entry.caution?.text)];
 }
 
-/** The placeholders of an entry that no value answers: none of `card`, `owner`, `picked`, `host`, `ringBearer`, `n` (only where `withN`: a Pick has what its next instruction deals, a Choose has nothing), `pursuitLimit` and its `bind` names. */
+/** The placeholders of an entry that no value answers: none of `card`, `owner`, `picked`, `host`, `ringBearer`, `n` (only where `withN`: a Pick has what its next instruction deals, a Choose has nothing), `pursuitLimit` and its `bind` and `named` names. */
 export function unknownPlaceholders(entry: Ask, withN = true): string[] {
-  const known = new Set(["card", "owner", "picked", "host", "ringBearer", "pair", "left", "pursuitLimit", ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {})]);
+  const known = new Set(["card", "owner", "picked", "host", "ringBearer", "pair", "left", "pursuitLimit", ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {}), ...Object.keys(entry.named ?? {})]);
   return [...new Set(templatesOf(entry).flatMap(placeholdersOf))].filter((name) => !known.has(name));
 }
 
@@ -151,6 +154,10 @@ export function askValues(a: AskFacts, entry: Ask): { values: Values; scope: Ret
   // The Embassy's pair being decided ("Player 1's Gandalf with Hill-troll"), named only where an entry says it (146072:B:1).
   if (templatesOf(entry).some((template) => placeholdersOf(template).includes("pair"))) values.pair = embassyPairNow(a.game, (id) => a.names.card(id)) ?? "this pair";
   for (const [name, amount] of Object.entries(entry.bind ?? {})) values[name] = resolveAmount(a.game, amount, scope, a.ctx);
+  for (const [name, named] of Object.entries(entry.named ?? {})) {
+    const only = pickCandidates(a.game, named.pick, scope.actor, [], scope.sourceId, a.ctx, undefined, undefined, true);
+    values[name] = only.length === 1 && only[0] !== undefined ? a.names.card(only[0]) : named.otherwise;
+  }
   return { values, scope };
 }
 

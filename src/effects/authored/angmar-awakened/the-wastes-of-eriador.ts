@@ -1,5 +1,6 @@
 import type { Condition, Effect, Instruction, PickSpec } from "../../../catalog/boundary.ts";
 
+import { DETERMINATION } from "./angmar-awakened.ts";
 import { AUTHORED_EFFECTS as SIEGE } from "../return-of-the-king/the-siege-of-gondor.ts";
 import { copyLine, withCopies } from "../reprint.ts";
 
@@ -11,7 +12,6 @@ import { copyLine, withCopies } from "../reprint.ts";
 // rr.the-word-choose, rr.running-out-of-cards, rr.attachment-cards, faq.triggering-forced-effects, faq.lasting-effects, faq.additional-attacks, faq.enemy-attacks-outside-combat, faq.next-player, faq.progress-without-advancing (data/rules/entries.json).
 const DAYBREAK = "10011";
 const PACK_LEADER = "10017";
-const DETERMINATION = "10172";
 
 const DAY: Condition = { kind: "timeOfDay", is: "day" };
 const NIGHT: Condition = { kind: "timeOfDay", is: "night" };
@@ -24,8 +24,9 @@ const ATTACKER_PLUS = (amount: number, when?: Condition): Instruction => ({ verb
 // "Discard 1 non-objective ally from play": the first player chooses among the allies of every player (Amarthiúl, an objective, is not one); with none left nothing is discarded.
 const ALLY_TO_DISCARD: PickSpec = { type: "ally", control: "any", who: "firstPlayer", nonObjective: true };
 const THREE_PLAYERS: Condition = { kind: "count", pick: { type: "player", control: "any" }, min: 3 };
-const DISCARD_ALLY = (threePlayers: boolean): Instruction[] => {
-  const when: Condition = threePlayers ? { kind: "all", conditions: [{ kind: "canPick", pick: ALLY_TO_DISCARD }, THREE_PLAYERS] } : { kind: "canPick", pick: ALLY_TO_DISCARD };
+// The `count`th ally of the Forced effect: the first is discarded always, the second only with 3 or more players.
+const DISCARD_ALLY = (count: 1 | 2): Instruction[] => {
+  const when: Condition = count === 2 ? { kind: "all", conditions: [{ kind: "canPick", pick: ALLY_TO_DISCARD }, THREE_PLAYERS] } : { kind: "canPick", pick: ALLY_TO_DISCARD };
   return [{ verb: "Pick", pick: ALLY_TO_DISCARD, when }, { verb: "Discard", target: { kind: "picked" }, when }];
 };
 const READY_CHARACTER: PickSpec = { type: "character", control: "you", state: "ready" };
@@ -54,7 +55,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   // when it becomes Night 1 non-objective ally (2 with 3 or more players) is discarded from play, chosen by the first player among every player's.
   { id: "10014:whenRevealed:1", cardCode: "10014", lines: ["10014:A:1"], timing: "whenRevealed", instructions: [{ verb: "ShuffleEncounterDiscard" }, { verb: "DiscardUntilEnemies", perPlayer: 1, trait: "Warg", to: "staging" }] },
   { id: "10014:forced:1", cardCode: "10014", lines: ["10014:B:1"], timing: "forced", trigger: "becameDay", instructions: [EACH_PLAYER([{ verb: "Draw", amount: 1 }])] },
-  { id: "10014:forced:2", cardCode: "10014", lines: ["10014:B:2"], timing: "forced", trigger: "becameNight", instructions: [...DISCARD_ALLY(false), ...DISCARD_ALLY(true)] },
+  { id: "10014:forced:2", cardCode: "10014", lines: ["10014:B:2"], timing: "forced", trigger: "becameNight", instructions: [...DISCARD_ALLY(1), ...DISCARD_ALLY(2)] },
 
   // 10015 Battle with the Pack (3A/3B). When Revealed: the Time objective flips to Nightfall, Pack Leader is added to the staging area, and as 2A with 1 fewer Warg than players (none alone: the pile is only shuffled in). 3B: Pack Leader cannot take damage unless 5 or more progress is on
   // this stage; when it becomes Day all progress on the stage is discarded; the stage cannot be defeated while Pack Leader is in play, and the players win when he is destroyed.

@@ -7,9 +7,9 @@ export function seatPenalty(log: Pick<CampaignLog, "threatPenalty" | "threatPena
   return log.threatPenalty + (log.threatPenaltyBySeat[seat] ?? 0);
 }
 
-/** A starting threat modifier with its sign: "+3", "-2" (a reduction, Fend Off Despair, 10173:A:2), "+0". */
+/** A starting threat modifier with its sign: "+3", "−2" (a reduction, Fend Off Despair, 10173:A:2; the minus sign U+2212 the design system writes, docs/design-system.md, Type), "+0". */
 export function signed(amount: number): string {
-  return amount < 0 ? `${amount}` : `+${amount}`;
+  return amount < 0 ? `−${-amount}` : `+${amount}`;
 }
 
 /** The Threat Modifiers row: one number for every player ("None", "+1") until a seat has a penalty of its own, then each seat's ("Player 1: +3 · Player 2: +1"). */
