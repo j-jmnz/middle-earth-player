@@ -1,0 +1,211 @@
+{
+  "id": "the-treachery-of-rhudaur",
+  "name": "The Treachery of Rhudaur",
+  "number": 4,
+  "stages": [
+    "10094",
+    "10095"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Treachery of Rhudaur",
+      "count": 24
+    },
+    {
+      "name": "Cursed Dead",
+      "count": 10
+    },
+    {
+      "name": "Ruins of Arnor",
+      "count": 7
+    }
+  ],
+  "cards": [
+    {
+      "code": "10099",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "10100",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "10101",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "10102",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "10103",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "10104",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "10105",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "10106",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "10107",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "10108",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "09060",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09061",
+      "normal": 5,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "09062",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09063",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09056",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "09057",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09058",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "09059",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "10094",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "10095",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "10109",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging",
+      "back": "10110"
+    },
+    {
+      "code": "10111",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging",
+      "back": "10112"
+    },
+    {
+      "code": "10113",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging",
+      "back": "10114"
+    },
+    {
+      "code": "09057",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging",
+      "byPlayers": {
+        "few": 1,
+        "many": 2,
+        "from": 3
+      }
+    },
+    {
+      "code": "10097",
+      "normal": 1,
+      "easy": 1,
+      "pile": "activeLocation"
+    },
+    {
+      "code": "10096",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "10098",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    }
+  ],
+  "campaignCard": "10184",
+  "campaignPlaced": [
+    "10185",
+    "10186",
+    "10187"
+  ],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q05.7",
+    "dragnEasy": "E05.7",
+    "hobSlug": "The-Treachery-of-Rhudaur"
+  }
+}

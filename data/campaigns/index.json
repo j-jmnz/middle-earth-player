@@ -50,6 +50,16 @@
     "position": 16
   },
   {
+    "id": "angmar-awakened",
+    "name": "Angmar Awakened",
+    "scenarioCount": 9,
+    "playable": false,
+    "kind": "campaign",
+    "box": null,
+    "released": "2022-08-19",
+    "position": 11
+  },
+  {
     "id": "the-two-towers",
     "name": "The Two Towers",
     "scenarioCount": 6,
@@ -68,16 +78,6 @@
     "box": null,
     "released": "2024-10-10",
     "position": 14
-  },
-  {
-    "id": "angmar-awakened",
-    "name": "Angmar Awakened",
-    "scenarioCount": 9,
-    "playable": false,
-    "kind": "campaign",
-    "box": "Angmar Awakened Campaign Expansion",
-    "released": "2022-08-19",
-    "position": 11
   },
   {
     "id": "shadows-of-mirkwood",

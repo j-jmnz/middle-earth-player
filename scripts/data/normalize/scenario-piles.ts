@@ -45,7 +45,7 @@ export function pileAccepts(args: { code: string; pile: string; printed: Card | 
   const fleet = stepExists("prepareFleet") && /Fleet/.test(printed?.encounterSet ?? "");
   switch (pile) {
     case "setAside":
-      return said(["aside"]) || putEngaged || steps("takeControl", "attach", "prepareStormcallerArea", "attachToDifferentHeroes", "attachToThreatDial") || setAsideBySet || loggedHarad(quest, printed) || (fleet && (printed?.type === "ship-objective" || printed?.type === "objective")) || (stepExists("asideEachOtherObjective") && printed?.type === "objective");
+      return said(["aside", "putIntoPlay"]) || putEngaged || steps("takeControl", "attach", "prepareStormcallerArea", "attachToDifferentHeroes", "attachToThreatDial") || setAsideBySet || loggedHarad(quest, printed) || (fleet && (printed?.type === "ship-objective" || printed?.type === "objective")) || (stepExists("asideEachOtherObjective") && printed?.type === "objective");
     case "activeLocation":
       return said(["active"]);
     case "attachedChosen":
@@ -71,7 +71,10 @@ export function pileAccepts(args: { code: string; pile: string; printed: Card | 
     case "stormcallerQuests":
       return stepExists("prepareStormcallerArea");
     case "encounterDeck2":
-      return stepExists("secondDeck", "buildDeck") && setAsideBySet;
+      return stepExists("secondDeck", "buildDeck", "setSetsAside") && setAsideBySet;
+    // Angmar Awakened's Orc deck: built by the Weather Hills' Setup step.
+    case "angmarOrcDeck":
+      return stepExists("buildOrcDeck");
     // Ered Mithrin's decks: built by their Setup step, or (the two Lost in Mirkwood sets) set aside by set name.
     case "evilCreaturesDeck":
       return stepExists("buildEvilCreaturesDeck");

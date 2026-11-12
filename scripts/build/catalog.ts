@@ -17,6 +17,7 @@ import { PACK_CAMPAIGN, REPRINT_PACKS } from "../data/campaign-defs.ts";
 import { loadCards } from "../data/load-cards.ts";
 import { DATA_DIR } from "../data/paths.ts";
 import { parseLedger } from "../data/printed/ledger.ts";
+import { cardImageUrl } from "../../src/screens/images/policy.ts";
 
 const log = createLog("catalog:build");
 
@@ -94,7 +95,9 @@ function ledgerScans(dataDir: string): { fronts: Map<string, string>; backs: Map
   if (!existsSync(dir)) return { fronts, backs };
   for (const name of readdirSync(dir).filter((file) => file.endsWith(".json")).sort()) {
     const ledger = parseLedger(JSON.parse(readFileSync(path.join(dir, name), "utf8")) as unknown);
-    for (const entry of ledger.entries) (entry.side === "A" ? fronts : backs).set(entry.code, entry.scan.url);
+    // A scan the app cannot download (the Angmar Awakened Campaign Expansion's MEC108 scans on cardgame.tools, src/screens/images/policy.ts) is what the ledger was read from, not
+    // the picture the phone falls back to: the card keeps the picture its printings give.
+    for (const entry of ledger.entries) if (cardImageUrl(entry.scan.url) !== null) (entry.side === "A" ? fronts : backs).set(entry.code, entry.scan.url);
   }
   return { fronts, backs };
 }
@@ -118,7 +121,9 @@ export function backPictureOf(card: Card, backs: ReadonlyMap<string, string>): s
   const ledgered = backs.get(card.code);
   if (ledgered) return ledgered;
   const urls = card.printings.flatMap((printing) => printing.imageUrls ?? []);
-  return urls.find((url) => url.includes("hallofbeorn") && /-\d+B\.jpg$/.test(url)) ?? urls.find((url) => url.includes("dragncards") && url.endsWith(".B.jpg")) ?? null;
+  // A campaign card's Hall of Beorn front is its `<title>-SetupA.jpg`; its back is the `SetupB` picture beside it.
+  const setup = card.type === "campaign" ? urls.find((url) => url.includes("hallofbeorn") && url.endsWith("-SetupA.jpg")) : undefined;
+  return urls.find((url) => url.includes("hallofbeorn") && /-\d+B\.jpg$/.test(url)) ?? urls.find((url) => url.includes("dragncards") && url.endsWith(".B.jpg")) ?? (setup ? setup.replace(/-SetupA\.jpg$/, "-SetupB.jpg") : null);
 }
 
 // A card belongs to the campaign of the first catalog pack it is printed in that PACK_CAMPAIGN lists (a Fellowship card also in the

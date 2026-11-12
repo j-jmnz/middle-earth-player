@@ -18,7 +18,7 @@ describe("data/campaigns/index.json", () => {
   it("lists the built campaigns playable and the later campaigns and cycles locked, with the scenario counts Hall of Beorn lists", () => {
     expect(index.filter((entry) => entry.playable).map((entry) => entry.id)).toEqual(["fellowship-of-the-ring", "mirkwood-paths", "the-dark-of-mirkwood", "dream-chaser", "ered-mithrin", "the-two-towers", "the-return-of-the-king"]);
     expect(index.find((entry) => entry.id === "fellowship-of-the-ring")?.scenarioCount).toBe(loadCampaign().scenarios.length);
-    // A campaign is playable once one of its scenarios is in PLAYABLE_SCENARIOS. The Return of the King is built (scripts/data/return-of-the-king.test.ts) and playable from its first scenario, its box named by no override. The other locked entries have no scenario files: the
+    // A campaign is playable once one of its scenarios is in PLAYABLE_SCENARIOS. The Return of the King is built (scripts/data/return-of-the-king.test.ts) and playable from its first scenario, its box named by no override. The other locked entries but Angmar Awakened have no scenario files: the
     // campaigns played in Campaign Mode, under their RCO boxes, then the cycles: scenarios that are part of no campaign (data/overrides.json, campaigns).
     const locked = index.filter((entry) => !entry.playable).map((entry) => [entry.name, entry.kind, entry.scenarioCount]);
     expect(locked).toEqual([
@@ -34,7 +34,8 @@ describe("data/campaigns/index.json", () => {
     ]);
     expect(index.filter((entry) => entry.playable).every((entry) => entry.kind === "campaign")).toBe(true);
     expect(index.filter((entry) => entry.kind === "cycle").every((entry) => entry.box === null)).toBe(true);
-    expect(index.filter((entry) => !entry.playable && entry.kind === "campaign").map((entry) => entry.box)).toEqual(["Angmar Awakened Campaign Expansion"]);
+    // Angmar Awakened is built (scripts/data/angmar-awakened.test.ts) and stays locked until one of its scenarios is playable: a built campaign names no box.
+    expect(index.filter((entry) => !entry.playable && entry.kind === "campaign").map((entry) => entry.box)).toEqual([null]);
   });
 
   it("orders every campaign and cycle by release, the Lord of the Rings saga boxes together at the Fellowship's release", () => {
@@ -80,7 +81,7 @@ describe("data/campaigns/index.json", () => {
   });
 
   it("lists The Two Towers, built from six scenario files, as a playable campaign of six scenarios after Ered Mithrin", () => {
-    expect(index.map((entry) => entry.id).slice(0, 7)).toEqual(["fellowship-of-the-ring", "mirkwood-paths", "the-dark-of-mirkwood", "dream-chaser", "ered-mithrin", "the-two-towers", "the-return-of-the-king"]);
+    expect(index.map((entry) => entry.id).slice(0, 8)).toEqual(["fellowship-of-the-ring", "mirkwood-paths", "the-dark-of-mirkwood", "dream-chaser", "ered-mithrin", "angmar-awakened", "the-two-towers", "the-return-of-the-king"]);
     expect(index.find((entry) => entry.id === "the-two-towers")).toMatchObject({ name: "The Two Towers", scenarioCount: 6, playable: true });
     expect(loadCampaign("the-two-towers").scenarios).toHaveLength(6);
   });

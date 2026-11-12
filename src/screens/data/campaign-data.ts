@@ -2,6 +2,7 @@ import dreamChaser from "../../../data/campaigns/dream-chaser.json";
 import fellowship from "../../../data/campaigns/fellowship-of-the-ring.json";
 import darkOfMirkwood from "../../../data/campaigns/the-dark-of-mirkwood.json";
 import eredMithrin from "../../../data/campaigns/ered-mithrin.json";
+import angmarAwakened from "../../../data/campaigns/angmar-awakened.json";
 import returnOfTheKing from "../../../data/campaigns/the-return-of-the-king.json";
 import twoTowers from "../../../data/campaigns/the-two-towers.json";
 import mirkwoodPaths from "../../../data/campaigns/mirkwood-paths.json";
@@ -46,6 +47,15 @@ import pelennor from "../../../data/scenarios/the-battle-of-the-pelennor-fields.
 import cirithUngol from "../../../data/scenarios/the-tower-of-cirith-ungol.json";
 import blackGate from "../../../data/scenarios/the-black-gate-opens.json";
 import mountDoom from "../../../data/scenarios/mount-doom.json";
+import intruders from "../../../data/scenarios/intruders-in-chetwood.json";
+import weatherHills from "../../../data/scenarios/the-weather-hills.json";
+import deadmensDike from "../../../data/scenarios/deadmens-dike.json";
+import wastes from "../../../data/scenarios/the-wastes-of-eriador.json";
+import mountGram from "../../../data/scenarios/escape-from-mount-gram.json";
+import ettenmoors from "../../../data/scenarios/across-the-ettenmoors.json";
+import rhudaur from "../../../data/scenarios/the-treachery-of-rhudaur.json";
+import carnDum from "../../../data/scenarios/the-battle-of-carn-dum.json";
+import dreadRealm from "../../../data/scenarios/the-dread-realm.json";
 import { printedScenarioName } from "../../campaign/printed-name";
 import { campaignDataSchema, parseScenarioData, type CampaignData, type ScenarioData } from "../../catalog/scenario-data";
 
@@ -53,8 +63,8 @@ import { campaignDataSchema, parseScenarioData, type CampaignData, type Scenario
 // source for them. Metro needs static JSON imports, so the map is written by hand; campaign-data.test.ts checks it against
 // data/campaigns/index.json and data/scenarios. Each file is parsed (zod) the first time it is asked for, not when the module
 // loads, and kept: the app opens without parsing every scenario, and a screen pays only for the ones it shows.
-const RAW_CAMPAIGNS: Readonly<Record<string, unknown>> = Object.fromEntries([fellowship, mirkwoodPaths, darkOfMirkwood, dreamChaser, eredMithrin, twoTowers, returnOfTheKing].map((raw) => [raw.id, raw]));
-const RAW_SCENARIOS: Readonly<Record<string, unknown>> = Object.fromEntries([past, knife, flight, south, journey, breaking, passage, anduin, dolGuldur, oath, caves, voyage, fate, raid, stormcaller, depths, temple, ruins, cobas, corsairs, upTheAnduin, lostInMirkwood, kingsQuest, witheredHeath, roam, fireInTheNight, framsburg, gundabad, wilderland, urukHai, helmsDeep, isengard, marshes, crossRoads, shelob, greyCompany, siege, pelennor, cirithUngol, blackGate, mountDoom].map((raw) => [raw.id, raw]));
+const RAW_CAMPAIGNS: Readonly<Record<string, unknown>> = Object.fromEntries([fellowship, mirkwoodPaths, darkOfMirkwood, dreamChaser, eredMithrin, angmarAwakened, twoTowers, returnOfTheKing].map((raw) => [raw.id, raw]));
+const RAW_SCENARIOS: Readonly<Record<string, unknown>> = Object.fromEntries([past, knife, flight, south, journey, breaking, passage, anduin, dolGuldur, oath, caves, voyage, fate, raid, stormcaller, depths, temple, ruins, cobas, corsairs, upTheAnduin, lostInMirkwood, kingsQuest, witheredHeath, roam, fireInTheNight, framsburg, gundabad, wilderland, urukHai, helmsDeep, isengard, marshes, crossRoads, shelob, greyCompany, siege, pelennor, cirithUngol, blackGate, mountDoom, intruders, weatherHills, deadmensDike, wastes, mountGram, ettenmoors, rhudaur, carnDum, dreadRealm].map((raw) => [raw.id, raw]));
 
 const campaigns = new Map<string, CampaignData>();
 const scenarios = new Map<string, ScenarioData>();
@@ -75,6 +85,8 @@ export const BOXES: readonly Box[] = [
   // In the campaigns table's order (`position`): by release, the Lord of the Rings saga boxes together at the Fellowship's.
   { id: "revised-core", name: "Revised Core Set", campaignId: "mirkwood-paths", scenarios: ["passage-through-mirkwood", "journey-along-the-anduin", "escape-from-dol-guldur"] },
   { id: "the-dark-of-mirkwood", name: "The Dark of Mirkwood", campaignId: "the-dark-of-mirkwood", scenarios: ["the-oath", "the-caves-of-nibin-dum"] },
+  // The Lost Realm and the six Adventure Packs are one box with the Campaign Expansion on the Scenarios tab, as the other campaign expansions' are.
+  { id: "angmar-awakened", name: "Angmar Awakened Campaign Expansion", campaignId: "angmar-awakened", scenarios: ["intruders-in-chetwood", "the-weather-hills", "deadmens-dike", "the-wastes-of-eriador", "escape-from-mount-gram", "across-the-ettenmoors", "the-treachery-of-rhudaur", "the-battle-of-carn-dum", "the-dread-realm"] },
   { id: "fellowship-of-the-ring", name: "The Fellowship of the Ring Saga Expansion", campaignId: "fellowship-of-the-ring", scenarios: ["a-shadow-of-the-past", "a-knife-in-the-dark", "flight-to-the-ford", "the-ring-goes-south", "journey-in-the-dark", "breaking-of-the-fellowship"] },
   // The Treason of Saruman and The Land of Shadow are the second saga box (MEC112); its standalone games follow its campaign's saga flag and the per-scenario saga start.
   { id: "the-two-towers", name: "The Two Towers Saga Expansion", campaignId: "the-two-towers", scenarios: ["the-uruk-hai", "helms-deep", "the-road-to-isengard", "the-passage-of-the-marshes", "journey-to-the-cross-roads", "shelobs-lair"] },

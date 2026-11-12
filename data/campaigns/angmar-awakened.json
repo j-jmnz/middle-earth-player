@@ -1,11 +1,41 @@
 {
   "id": "angmar-awakened",
   "name": "Angmar Awakened",
-  "scenarios": [],
-  "campaignCards": {},
+  "scenarios": [
+    "intruders-in-chetwood",
+    "the-weather-hills",
+    "deadmens-dike",
+    "the-wastes-of-eriador",
+    "escape-from-mount-gram",
+    "across-the-ettenmoors",
+    "the-treachery-of-rhudaur",
+    "the-battle-of-carn-dum",
+    "the-dread-realm"
+  ],
+  "campaignCards": {
+    "intruders-in-chetwood": "10156",
+    "the-weather-hills": "10159",
+    "deadmens-dike": "10166",
+    "the-wastes-of-eriador": "10171",
+    "escape-from-mount-gram": "10174",
+    "across-the-ettenmoors": "10182",
+    "the-treachery-of-rhudaur": "10184",
+    "the-battle-of-carn-dum": "10188",
+    "the-dread-realm": "10193"
+  },
   "prelude": [],
   "starterDecks": [],
-  "bookletPages": {},
+  "bookletPages": {
+    "intruders-in-chetwood": 5,
+    "the-weather-hills": 6,
+    "deadmens-dike": 9,
+    "the-wastes-of-eriador": 11,
+    "escape-from-mount-gram": 13,
+    "across-the-ettenmoors": 16,
+    "the-treachery-of-rhudaur": 19,
+    "the-battle-of-carn-dum": 21,
+    "the-dread-realm": 22
+  },
   "bookletId": "angmar-awakened",
   "saga": false
 }

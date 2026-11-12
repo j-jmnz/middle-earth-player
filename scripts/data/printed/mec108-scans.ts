@@ -1,4 +1,4 @@
-// The scans the Angmar Awakened Campaign Expansion's 36 cards are read from (scripts/data/printed/scope.ts, SCAN_URL_FIXES). Hall of Beorn's pictures of them are the 2022
+// The scans the Angmar Awakened Campaign Expansion's 39 cards are read from (scripts/data/printed/scope.ts, SCAN_URL_FIXES). Hall of Beorn's pictures of them are the 2022
 // proxies with the text layer missing (the colours inverted, the text boxes empty), so no ledger line can be read from them; lotr.cardgame.tools hosts the full-colour scans of
 // the same cards (about 720 x 1020), found through its card database (`productCards`, product MEC108, numbers 156 to 193). A key is a code (side A) or "<code>.B"; the code is
 // Hall of Beorn's and RingsDB's `10` and the collector number, and 100158 is Arnor Ravaged, the other side of #158 (overrides.hobRingsDbCodes).

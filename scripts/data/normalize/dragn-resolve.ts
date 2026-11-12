@@ -16,7 +16,8 @@ export function dragnResolver(
   // A Dream-chaser card: DragnCards files each side of a double-sided card as a row of its own, named after that side, and Hall of Beorn
   // has no OCTGN guid for many of them. The row's box (packName) and type find the card: by name when the name is one card's in the
   // box (Dark Abyss), else by the collector number (the "Lost Island" side of Lush Jungle is #30). A card is `type` when it matches the row's type bar.
-  const typeKey = (value: string): string => value.toLowerCase().replace(/[\s-]/g, "");
+  // DragnCards types an encounter side quest "Side Quest" (Angmar Awakened's Rescue Iârion, Sift Through the Debris).
+  const typeKey = (value: string): string => value.toLowerCase().replace(/[\s-]/g, "").replace(/^encounter(?=sidequest)/, "");
   const byProduct = (row: Record<string, string>): Card | null => {
     const product = PRODUCTS.find((item) => item.name === row.packName && item.twinPack === null && item.load === "dragncards");
     const pack = product?.packs[0];
