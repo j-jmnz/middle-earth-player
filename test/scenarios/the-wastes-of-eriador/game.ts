@@ -50,14 +50,14 @@ const game = campaignGame<EriadorDecks, EriadorPolicy>({
   campaign,
   scenario: eriador,
   stats: HERO_STATS,
-  // TODO: the cards a game loads besides the scenario's piles, its campaign card's and the campaign's game codes.
-  codes: [...eriador.cards.map((card) => card.code)],
+  // The scenario's cards; the campaign card's, the cards it places (Determination, Fend Off Despair, the Omens boons) and the campaign's game codes are added by the kit. The pool holds what Deadmen's Dike leaves: Mysterious Omens and its boons, Arnor Ravaged, Amarthiúl's Courage and a burden.
+  codes: [...eriador.cards.map((card) => card.code), "10160", "10161", "10162", "10163", "10164", "10165", "100158", "10157", "10167", "10168", "10169", "10170"],
   intent: eriadorIntent,
   policy: DEFAULT_POLICY,
   limit: 6000,
   upgraded: [],
-  // TODO: the XP each earlier part gained (in campaign order), the cards they put in the pool and the marks on the cards, as a campaign that won them leaves the log.
-  earlier: { xp: [0, 0, 0], pool: [], marks: {} },
+  // Intruders in Chetwood, The Weather Hills and Deadmen's Dike were won: no XP in this campaign; in the pool Mysterious Omens, Arnor Ravaged (with the damage the log noted), Amarthiúl's Courage and Thaurdir's Legacy.
+  earlier: { xp: [0, 0, 0], pool: [{ code: "10160" }, { code: "100158" }, { code: "10167" }, { code: "10168" }], marks: {} },
 });
 
 export const playGolden = (golden: EriadorGolden, ctx: ReduceContext): EriadorGame => game.playGolden(golden, ctx);

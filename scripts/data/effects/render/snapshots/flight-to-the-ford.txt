@@ -184,7 +184,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 141065:A:2 (shadow): Shadow: If this attack destroys a character, remove all progress from the current quest.
   141065:shadow:1: Shadow
     - when the attack in progress ends:
-      - [json RemoveAllQuestProgress {"verb":"RemoveAllQuestProgress","when":{"kind":"x","min":1}}]
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): all progress on the current quest is removed (the encounter side quest that is the current quest while there is one, else the main quest card)
 
 ## 141066 Pain Assailed Him
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -304,4 +304,4 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
   141084:shadow:1: Shadow
     - the acting player discards 1 random card(s) from hand
 
-(rendered pieces: 120 by template, 33 as JSON)
+(rendered pieces: 122 by template, 32 as JSON)

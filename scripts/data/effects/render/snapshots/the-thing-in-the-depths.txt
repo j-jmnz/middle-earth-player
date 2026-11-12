@@ -231,7 +231,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
   12047:forced:1: Forced on the event shadowsDealt
     only if all of: (it is the Combat phase) and (this card is the active location)
     - for each enemy (any player controls) engaged with you:
-      - [json DealShadowTo {"verb":"DealShadowTo","target":"picked"}]
+      - the picked card is dealt a shadow card
 
 12047:A:2 (shadow): Shadow: Discard an attachment you control.
   12047:shadow:1: Shadow
@@ -371,4 +371,4 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
       - choose enemy (any player controls) or in the staging area, named "The Thing in the Depths"
       - the picked enemy attacks the acting player now, from the staging area
 
-(rendered pieces: 162 by template, 40 as JSON)
+(rendered pieces: 163 by template, 39 as JSON)

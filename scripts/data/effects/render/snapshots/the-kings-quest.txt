@@ -132,8 +132,8 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 18048:A:1 (front): When Revealed: Attach to a questing hero and remove it from the quest. (Counts as a Condition attachment with the text: "Limit 1 per hero. While the active location has the Dark trait, reduce attached hero's Willpower to 0, and treat its text box as if it were blank, except for Traits.")
   18048:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose hero (any player controls) committed to the quest, chosen by the first player [also {"hasAttachment":{"names":["Afraid of the Dark"],"none":true}}]
-    - [json AttachSelfToPicked {"verb":"AttachSelfToPicked"}]
+    - choose hero (any player controls) committed to the quest, chosen by the first player, with no attachment named "Afraid of the Dark"
+    - this card attaches to the picked card (nowhere if that card carries one of its title already)
     - the last picked character is removed from the quest (it stays exhausted)
   18048:constant:1: Constant
     only if there is a Dark location (any player controls) [also {"active":true}] to choose
@@ -432,7 +432,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
 
 18079:B:2 (back): Response: After placing progress here from questing successfully, remove 5 progress from this stage to look at the top 2 cards of the Caves deck. Put one on top of the Caves deck and put the other on the bottom.
   18079:response:1: Response on the event progressPlaced (heard about this card)
-    only if all of: (it is the Quest phase) and (the quest succeeded) and ([json condition {"kind":"stageProgress","min":5}]) and ([json condition {"kind":"cavesDeck"}])
+    only if all of: (it is the Quest phase) and (the quest succeeded) and (the current quest stage holds at least 5 progress) and ([json condition {"kind":"cavesDeck"}])
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json RemoveProgressFromQuest {"verb":"RemoveProgressFromQuest","amount":5}]
     - [json ArrangeCaves {"verb":"ArrangeCaves","count":2}]
@@ -469,4 +469,4 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
   18080:triggered:1: Triggered (mandatory, not printed as Forced) after an enemy is destroyed (heard about enemy (any player controls) or in the staging area, named "Fire-drake")
     - the players win the game
 
-(rendered pieces: 259 by template, 53 as JSON)
+(rendered pieces: 262 by template, 50 as JSON)

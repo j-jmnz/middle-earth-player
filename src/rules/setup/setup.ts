@@ -16,6 +16,7 @@ import type { PileZone } from "../core/piles.ts";
 import { printedOf } from "../core/printed.ts";
 import { shuffleIds } from "../core/seed.ts";
 import { handSetup, searchSetup } from "./search.ts";
+import { attachPending } from "../families/angmar/burdens.ts";
 import { nightmareDuringSetup, nightmareSetup } from "../families/nightmare/setup.ts";
 import { blankScenario, livingSeats, updateCard, withMode, withSeat, withThreat, type ScenarioState } from "../core/state.ts";
 import type { CampaignFacts } from "../core/campaign-state.ts";
@@ -214,7 +215,8 @@ export function finishSetup(state: ScenarioState, ctx: ReduceContext, steps: Eng
     if (next.failure || next.lost) return next;
   }
   if (next.questStage) next = updateCard(next, next.questStage, { face: "B" });
-  // The campaign card's Setup that needs the quest card's Setup done first (ScenarioDefinition.afterSetup) goes down first, so it resolves after it.
+  // A pool card's Setup that waited for a host the quest card's Setup puts into play, and the campaign card's Setup that needs the quest card's Setup done first (ScenarioDefinition.afterSetup), go down first, so they resolve after it.
+  next = attachPending(next, ctx, steps);
   next = campaignAfterSetup(next, ctx, steps);
   // The first quest card's own Setup that reveals cards, and its side B's When Revealed (families/quest/setup.ts).
   next = questStageStart(next, ctx, steps);

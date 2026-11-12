@@ -11,6 +11,7 @@ import { shuffleIds } from "../../core/seed.ts";
 import { inPlay, livingSeats, updateCard, type ScenarioState } from "../../core/state.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import { askTarget } from "../../windows/choices.ts";
+import { pushCardEffects } from "../../interpret/effect-frames.ts";
 import { effectsOf } from "../../windows/listen.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { effectData } from "../encounter/moves.ts";
@@ -80,15 +81,33 @@ export function moveToHero(state: ScenarioState, instruction: Verb<"MoveToHero">
 /**
  * AttachSelfToNamed (Setup of a burden or boon of the pool): the source attaches to the card with the title in play (`outOfPlay`: or set aside, out of play), and with no such card it is removed from the game. Run for a pool card at a later scenario's
  * Setup (Amarthiúl's Courage, the three burdens).
+ * A pool card's Setup resolves after the quest card's (rr.setup, mec109.setup), which may be the one that puts the host into play ("The first player takes control of Amarthiúl", 10013:A:1). The deal runs a pool card's Setup before that, when the host is still to come: the card then
+ * waits, set aside (`pendingAttach`), and the same line runs again once the quest card's Setup is done (`attachPending`), when a missing host removes it.
  */
 export function attachSelfToNamed(state: ScenarioState, instruction: Verb<"AttachSelfToNamed">, focus: Focus, ctx: ReduceContext): ScenarioState {
   const id = focus.sourceId;
   if (!id || !state.cards[id]) return state;
   const named = (card: { code: string }): boolean => printedOf(ctx.cards, card.code).name === instruction.name;
   const aside = new Set(state.setAside);
-  // A pool card's Setup resolves after the quest card's, which may be the one that puts the host into play ("Put Amarthiúl into play", 10013:A:1): the host set aside that Setup names is the card the burden attaches to, and it goes into play with it (rr.setup).
-  const stageCode = state.questStage ? state.cards[state.questStage]?.code : undefined;
-  const entering = stageCode != null && effectsOf(ctx, stageCode).some((record) => record.timing === "setup" && record.instructions.some((step) => step.verb === "PutSetAsideInPlay" && step.name === instruction.name));
-  const host = Object.values(state.cards).find((card) => card.id !== id && named(card) && (inPlay(card.zone) || ((instruction.outOfPlay === true || entering) && aside.has(card.id))));
-  return host ? attachBurden(state, id, host.id) : moveCard(state, id, { zone: "removed" });
+  const waiting = state.pendingAttach?.includes(id) === true;
+  const host = Object.values(state.cards).find((card) => card.id !== id && named(card) && (inPlay(card.zone) || (instruction.outOfPlay === true && aside.has(card.id))));
+  const rest = waiting ? { ...state, pendingAttach: (state.pendingAttach ?? []).filter((other) => other !== id) } : state;
+  if (host) return attachBurden(rest, id, host.id);
+  // The quest card of the first stage while the pool cards are set up (the deal has not turned it up yet).
+  const stageCode = state.questStage ? state.cards[state.questStage]?.code : state.stages[0]?.code;
+  const coming = stageCode != null && effectsOf(ctx, stageCode).some((record) => record.timing === "setup" && record.instructions.some((step) => step.verb === "PutSetAsideInPlay" && step.name === instruction.name));
+  if (coming && !waiting) return { ...state, pendingAttach: [...(state.pendingAttach ?? []), id] };
+  return moveCard(rest, id, { zone: "removed" });
+}
+
+/** The pool cards that waited for a host the quest card's Setup puts into play (`pendingAttach`): their Setup lines go down in frames of their own, which resolve once that Setup has (finishSetup). */
+export function attachPending(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  let next = state;
+  for (const id of [...(state.pendingAttach ?? [])].reverse()) {
+    const card = state.cards[id];
+    if (!card) continue;
+    const records = effectsOf(ctx, card.code).filter((effect) => effect.timing === "setup" && effect.instructions.some((step) => step.verb === "AttachSelfToNamed"));
+    next = pushCardEffects(next, "setup", id, card.controller ?? state.firstPlayer, false, records, ctx, steps);
+  }
+  return next;
 }

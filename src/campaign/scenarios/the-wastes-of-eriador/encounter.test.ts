@@ -112,6 +112,27 @@ describe("10025:A:1 and 10025:A:2 are North Downs", () => {
   });
 });
 
+describe("10025:A:2 removes progress from the current quest, a side quest while one is current", () => {
+  it("10025:A:2 takes all progress off the encounter side quest that is the current quest, and none off the main quest card", () => {
+    const run = fight("day", "10025", { progress: 4, staging: [DAYBREAK, { code: "09055", progress: 3 }] }, (state, made) => {
+      const quest = idOf(state, "09055");
+      const hurt = updateCard(state, made.hero, { damage: 5 });
+      return { ...hurt, modifiers: [...hurt.modifiers, { instanceId: quest, sourceId: quest, stat: "currentQuest" as const, amount: 1, until: "endOfGame" as const }] };
+    });
+    expect(run.run.state.cards[idOf(run.run.state, "09055")]?.progress).toBe(0);
+    expect(run.run.state.cards[idOf(run.run.state, "10013")]?.progress).toBe(4);
+  });
+
+  it("10015:B:2 discards the progress of this stage, the main quest card, whatever side quest is the current quest", () => {
+    const t = night({ stage: "10015", progress: 6, staging: [{ code: "09055", progress: 2 }] });
+    const quest = idOf(t.state, "09055");
+    const current = { ...t.state, modifiers: [...t.state.modifiers, { instanceId: quest, sourceId: quest, stat: "currentQuest" as const, amount: 1, until: "endOfPhase" as const }] };
+    const run = resolveRecords(current, t.ctx, "10015", "forced", idOf(t.state, "10015"));
+    expect(run.state.cards[idOf(run.state, "10015")]?.progress).toBe(0);
+    expect(run.state.cards[quest]?.progress).toBe(2);
+  });
+});
+
 describe("10026:A:2 is the Sudden Darkness shadow", () => {
   it("10026:A:2 puts the topmost Warg enemy of the discard pile into play engaged with you and deals it a shadow card", () => {
     const run = fight("day", "10026", { discard: ["10025", "10019", "10018"] });
@@ -121,7 +142,13 @@ describe("10026:A:2 is the Sudden Darkness shadow", () => {
   });
 });
 
-describe("10027:A:1 is Predatory Wolves", () => {
+describe("10027:A:1 and 10027:A:2 are Predatory Wolves", () => {
+  it("10027:A:2 exhausts a character the defending player controls as a shadow effect", () => {
+    const run = fight("day", "10027");
+    const exhausted = Object.values(run.during.cards).filter((card) => card.zone === "heroes" && card.exhausted).length;
+    expect(exhausted).toBe(1);
+  });
+
   const reveal = (layout: Layout, pick: (state: ScenarioState) => string) => {
     const t = at({ phase: "Encounter", ...layout });
     return resolveRecords(t.state, t.ctx, "10027", "whenRevealed", undefined, pick);

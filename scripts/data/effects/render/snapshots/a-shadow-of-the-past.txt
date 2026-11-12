@@ -266,7 +266,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 141072:A:2 (shadow): Shadow: After this attack, the attacking enemy engages the next player then makes an immediate attack.
   141072:shadow:1: Shadow
     - when the attack in progress ends:
-      - [json EngageNextPlayer {"verb":"EngageNextPlayer","when":{"kind":"otherPlayer"}}]
+      - if another player is still in the game: the attacking enemy engages the next player
       - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
 
 ## 141073 Piercing Cry
@@ -487,7 +487,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 906105:A:3 (shadow): Shadow: After this attack, attacking enemy engages the next player then makes an immediate attack.
   906105:shadow:1: Shadow
     - when the attack in progress ends:
-      - [json EngageNextPlayer {"verb":"EngageNextPlayer","when":{"kind":"otherPlayer"}}]
+      - if another player is still in the game: the attacking enemy engages the next player
       - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
 
 ## 906106 Stock Woods
@@ -553,4 +553,4 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): raise threat by 3 (the acting player)
 
-(rendered pieces: 203 by template, 53 as JSON)
+(rendered pieces: 207 by template, 51 as JSON)

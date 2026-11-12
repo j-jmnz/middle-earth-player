@@ -166,7 +166,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 143056:A:1 (front): While Underground Armoury is in the staging area, it gains: "Forced: After an enemy engages a player, deal it a shadow card."
   143056:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls))
     only if this card is in the staging area
-    - [json DealShadowTo {"verb":"DealShadowTo","target":"subject"}]
+    - the card the event is about is dealt a shadow card
 
 143056:A:2 (front): Wizardry: Each player exhausts a character he controls.
   143056:forced:2: Forced on the event wizardry (heard about this card)
@@ -278,7 +278,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
   143068:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a hero (any player controls) committed to the quest to choose: choose hero (any player controls) committed to the quest
-    - [json AttachSelfToPicked {"verb":"AttachSelfToPicked","when":{"kind":"canPick","pick":{"type":"hero","control":"any","committed":true}}}]
+    - then, if there is a hero (any player controls) committed to the quest to choose (checked when this step runs, after the steps above; not tied to whether they did anything): this card attaches to the picked card (nowhere if that card carries one of its title already)
     - then, if there is a hero (any player controls) committed to the quest to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the last picked character is removed from the quest (it stays exhausted)
   143068:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
@@ -378,4 +378,4 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
     - the table: stat eliminatedAtEmptyHand 1, while this card is in play
     - the table: stat trackQuestProgress 1, while this card is in play
 
-(rendered pieces: 223 by template, 25 as JSON)
+(rendered pieces: 227 by template, 23 as JSON)

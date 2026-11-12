@@ -58,6 +58,8 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   pursuit: (c) => ({ text: `the pursuit value is ${range(c.min, c.max)}`, read: ["min", "max"] }),
   currentQuest: (c) => ({ text: c.is === "side" ? "the current quest is a side quest" : c.is === "self" ? "this card is the current quest" : "there is a quest card besides the current quest that could be chosen to be the current quest (the main quest card, or an encounter side quest in the staging area)", read: ["is"] }),
   hitPointsLeft: (c) => ({ text: `the card with code ${str(c.code)} in play has damage below its hit points (any hit points remaining)`, read: ["code"] }),
+  timeOfDay: (c) => ({ text: `it is ${c.is === "day" ? "Day (Daybreak is faceup)" : "Night (Nightfall is faceup)"}`, read: ["is"] }),
+  stageProgress: (c) => ({ text: `the current quest stage holds at least ${str(c.min)} progress`, read: ["min"] }),
   questLeads: () => ({ text: "the total Willpower of the characters committed to the quest is greater than the total Threat in the staging area", read: [] }),
   soleAttacker: () => ({ text: "exactly one character was declared as an attacker in this attack", read: [] }),
   captives: (c) => ({ text: `the number of Captives in play${c.of === "actor" ? " that belong to the acting seat" : ""} is ${range(c.min, c.max)}`, read: ["min", "max", "of"] }),

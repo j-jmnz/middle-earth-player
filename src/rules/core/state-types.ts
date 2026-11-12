@@ -319,6 +319,8 @@ export type ScenarioState = {
   // quest card's Setup is done (ScenarioDefinition.afterSetup).
   part?: number;
   afterSetup?: { card: string; instructions: readonly Instruction[] };
+  // The pool cards whose Setup (AttachSelfToNamed) found no host yet and wait, set aside, for the quest card's Setup to put it into play (families/angmar/burdens.ts attachPending).
+  pendingAttach?: readonly string[];
   // The damage each card has taken this round, for a card that takes no more than a number each round (the flag `damageCap`), and the threat each seat's
   // effects have lowered this round (the flag `threatReductionCap`). Kept only in a game that has such a card; cleared as the round ends.
   roundDamage?: Readonly<Record<string, number>>;

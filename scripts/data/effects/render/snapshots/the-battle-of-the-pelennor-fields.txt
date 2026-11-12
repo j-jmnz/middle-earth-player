@@ -196,7 +196,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 
 145053:A:2 (front): When Revealed: Put the topmost Orc enemy in the discard pile into play engaged with you.
   145053:whenRevealed:1: When revealed
-    - [json PutTopmostFromEncounterDiscard {"verb":"PutTopmostFromEncounterDiscard","type":"enemy","trait":"Orc"}]
+    - the topmost Orc enemy in the encounter discard pile is put into play engaged with the acting player (not revealed)
 
 145053:A:3 (shadow): Shadow: If this attack destroys a character, return attacking enemy to the staging area.
   145053:shadow:1: Shadow
@@ -268,8 +268,8 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 145057:A:2 (front): When Revealed: Attach to a Nazgûl enemy. Limit 1 per enemy. (Counts as a Mount attachment with the text: "Attached enemy gets +1 Threat, +1 Attack, +1 Defense and -10 engagement cost. Forced: At the end of the round, return attached enemy to the staging area.")
   145057:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose Nazgûl enemy (any player controls) or in the staging area [also {"hasAttachment":{"names":["Fell Beast"],"none":true}}]
-    - [json AttachSelfToPicked {"verb":"AttachSelfToPicked","when":{"kind":"canPick","pick":{"type":"enemy","control":"any","staging":true,"trait":"Nazgûl","hasAttachment":{"names":["Fell Beast"],"none":true}}}}]
+    - choose Nazgûl enemy (any player controls) or in the staging area, with no attachment named "Fell Beast"
+    - then, if there is a Nazgûl enemy (any player controls) or in the staging area, with no attachment named "Fell Beast" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): this card attaches to the picked card (nowhere if that card carries one of its title already)
   145057:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - its host: stat threat 1, while this card is in play
@@ -285,9 +285,9 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 145058:A:1 (front): When Revealed: Remove a hero you control from the quest and attach Black Dart to that hero. Limit 1 per hero. (Counts as a Condition attachment with the text: "Forced: At the end of the round, deal 1 damage to attached hero.")
   145058:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose hero (you control) [also {"hasAttachment":{"names":["Black Dart"],"none":true}}]
-    - then, if there is a hero (you control) [also {"hasAttachment":{"names":["Black Dart"],"none":true}}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the last picked character is removed from the quest (it stays exhausted)
-    - [json AttachSelfToPicked {"verb":"AttachSelfToPicked","when":{"kind":"canPick","pick":{"type":"hero","control":"you","hasAttachment":{"names":["Black Dart"],"none":true}}}}]
+    - choose hero (you control) with no attachment named "Black Dart"
+    - then, if there is a hero (you control) with no attachment named "Black Dart" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the last picked character is removed from the quest (it stays exhausted)
+    - then, if there is a hero (you control) with no attachment named "Black Dart" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): this card attaches to the picked card (nowhere if that card carries one of its title already)
   145058:forced:1: Forced at the end of the round
     - deal 1 damage to its host
 
@@ -393,8 +393,8 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
         - [json AttachSetAside {"verb":"AttachSetAside","code":"145014"}]
       * option "none":
     - the first player chooses one of:
-      * option "gondor" (only if there is a hero (any player controls) chosen by the first player [also {"attachable":"145015","hasAttachment":{"names":["Esquire of Rohan"],"none":true}}] to choose):
-        - choose hero (any player controls) chosen by the first player [also {"attachable":"145015","hasAttachment":{"names":["Esquire of Rohan"],"none":true}}]
+      * option "gondor" (only if there is a hero (any player controls) chosen by the first player, with no attachment named "Esquire of Rohan" [also {"attachable":"145015"}] to choose):
+        - choose hero (any player controls) chosen by the first player, with no attachment named "Esquire of Rohan" [also {"attachable":"145015"}]
         - [json AttachSetAside {"verb":"AttachSetAside","code":"145015"}]
       * option "none":
 
@@ -569,4 +569,4 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     - [json EngageFirstPlayer {"verb":"EngageFirstPlayer"}]
     - then, if this card is engaged with the player (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
-(rendered pieces: 292 by template, 55 as JSON)
+(rendered pieces: 302 by template, 49 as JSON)

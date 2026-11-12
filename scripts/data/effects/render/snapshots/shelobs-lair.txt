@@ -140,13 +140,13 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
     - each Orc enemy (any player controls) or in the staging area: stat engagementCost -5, while this card is in play
   144047:forced:1: Forced after an enemy engages a player (heard about Orc enemy (any player controls))
     only if this card is in the staging area
-    - [json DealShadowTo {"verb":"DealShadowTo","target":"subject"}]
+    - the card the event is about is dealt a shadow card
 
 144047:A:2 (shadow): Shadow: Deal the attacking enemy 2 additional shadow cards.
   144047:shadow:1: Shadow
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json DealShadowTo {"verb":"DealShadowTo","target":"attacker"}]
-    - [json DealShadowTo {"verb":"DealShadowTo","target":"attacker"}]
+    - the attacking enemy is dealt a shadow card
+    - the attacking enemy is dealt a shadow card
 
 ## 144048 Deep Dark Passage
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -370,4 +370,4 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
     only if any of: ([json condition {"kind":"inVictory","code":"144040","is":false}]) or ([json condition {"kind":"inVictory","code":"144075","is":false}])
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 235 by template, 19 as JSON)
+(rendered pieces: 238 by template, 16 as JSON)

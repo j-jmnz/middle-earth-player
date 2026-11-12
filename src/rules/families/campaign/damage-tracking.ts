@@ -26,7 +26,8 @@ export function recordHeroDamage(state: ScenarioState): ResolutionLog {
 export function recordDetermined(state: ScenarioState, instruction: Verb<"RecordDetermined">): ResolutionLog {
   const marked: string[] = [...(state.resolutionLog.determined ?? [])];
   for (const card of Object.values(state.cards)) {
-    const host = card.code === instruction.code && card.zone === "attached" && card.host ? state.cards[card.host] : undefined;
+    // An attachment played onto its host lies in play, one attached by an effect in the attached zone: either way it carries its host.
+    const host = card.code === instruction.code && card.host ? state.cards[card.host] : undefined;
     if (host && inPlay(host.zone) && !marked.includes(host.code)) marked.push(host.code);
   }
   return { ...state.resolutionLog, determined: marked };

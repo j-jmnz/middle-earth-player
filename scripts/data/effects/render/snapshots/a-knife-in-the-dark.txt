@@ -364,7 +364,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 141072:A:2 (shadow): Shadow: After this attack, the attacking enemy engages the next player then makes an immediate attack.
   141072:shadow:1: Shadow
     - when the attack in progress ends:
-      - [json EngageNextPlayer {"verb":"EngageNextPlayer","when":{"kind":"otherPlayer"}}]
+      - if another player is still in the game: the attacking enemy engages the next player
       - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
 
 ## 141073 Piercing Cry
@@ -556,7 +556,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 906208:A:2 (shadow): Shadow: After this attack, attacking enemy engages the next player then makes an immediate attack.
   906208:shadow:1: Shadow
     - when the attack in progress ends:
-      - [json EngageNextPlayer {"verb":"EngageNextPlayer","when":{"kind":"otherPlayer"}}]
+      - if another player is still in the game: the attacking enemy engages the next player
       - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
 
 ## 906209 Blade Tip
@@ -573,4 +573,4 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
   906209:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
 
-(rendered pieces: 225 by template, 49 as JSON)
+(rendered pieces: 229 by template, 47 as JSON)

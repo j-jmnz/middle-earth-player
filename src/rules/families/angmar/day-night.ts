@@ -28,6 +28,6 @@ export function flipTimeObjective(state: ScenarioState, instruction: Extract<Ins
   const shown = card.code === DAYBREAK ? "day" : "night";
   const to = instruction.to === "other" ? (shown === "day" ? "night" : "day") : instruction.to;
   if (to === shown) return state;
-  const flipped = updateCard(state, card.id, { code: to === "day" ? DAYBREAK : NIGHTFALL, other: card.code });
+  const flipped = updateCard(state, card.id, { code: to === "day" ? DAYBREAK : NIGHTFALL });
   return queueEvent(flipped, { trigger: to === "day" ? "becameDay" : "becameNight", seat: null });
 }

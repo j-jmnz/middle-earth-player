@@ -26,7 +26,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
     only if not (the players are on stage 3)
     - the players cannot travel to any location while this holds
   146043:constant:3: Constant
-    only if not ([json condition {"kind":"stageProgress","min":20}])
+    only if not (the current quest stage holds at least 20 progress)
     - the players cannot travel to any location while this holds
 
 146043:A:3 (front): Travel: Each player makes a Fortitude test. If a player fails this test, raise his threat by 9.
@@ -354,4 +354,4 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
     - then, if the last Fortitude test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the players lose the game (The Ring-bearer claimed The One Ring)
     - then, if the last Fortitude test the running effect made was passed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the players win the game
 
-(rendered pieces: 224 by template, 16 as JSON)
+(rendered pieces: 225 by template, 15 as JSON)

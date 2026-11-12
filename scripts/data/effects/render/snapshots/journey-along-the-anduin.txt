@@ -102,7 +102,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 01112:A:2 (shadow): Shadow: Deal X shadow cards to this attacker. X is the number of players in the game.
   01112:shadow:1: Shadow
     - repeat the number of players times:
-      - [json DealShadowTo {"verb":"DealShadowTo","target":"attacker"}]
+      - the attacking enemy is dealt a shadow card
 
 ## 01113 Banks of the Anduin
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -251,4 +251,4 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
     - each copy of code 01133 and code 01138 attached to a hero in play joins the Campaign Pool attached to that hero
     - [json NamePrisoner {"verb":"NamePrisoner"}]
 
-(rendered pieces: 121 by template, 18 as JSON)
+(rendered pieces: 122 by template, 17 as JSON)

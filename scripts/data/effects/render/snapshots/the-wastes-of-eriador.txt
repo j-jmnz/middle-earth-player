@@ -1,0 +1,297 @@
+Scenario piles that place cards with no record (activeLocation: 09048 Shrouded Hills; quest: 10013 Across the Wastes; quest: 10014 Howling at Night; quest: 10015 Battle with the Pack; staging: 10011 Daybreak; setAside: 10016 Amarthiúl; setAside: 10017 Pack Leader)
+
+## 10011 Daybreak
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+10011:A:1 (front): It is Day. Enemies do not make engagement checks.
+  10011:constant:1: Constant
+    - the table: stat noEngagementChecks 1, while this card is in play
+
+10011:A:2 (front): Forced: When it becomes Day, return each enemy in play to the staging area.
+  10011:forced:1: Forced on the event becameDay
+    - return every enemy engaged with a player to the staging area
+
+10011:A:3 (front): Forced: At the end of the round, flip this objective.
+  10011:forced:2: Forced at the end of the round
+    - the Time objective is flipped to its other side; a flip to the side already up changes nothing, and any other flip is heard as "it becomes Day or Night"
+
+## 10012 Nightfall
+
+10012:A:1 (front): It is Night. Progress cannot be placed on quest cards. Encounter card effects cannot be canceled.
+  10012:constant:1: Constant
+    - the table: stat noQuestProgress 1, while this card is in play
+  10012:constant:2: Constant
+    - the table: stat encounterUncancelable 1, while this card is in play
+
+10012:A:2 (front): Forced: When it becomes Night, reveal an encounter card.
+  10012:forced:1: Forced on the event becameNight
+    - the first player reveals an encounter card
+
+10012:A:3 (front): Forced: At the end of the round, flip this objective.
+  10012:forced:2: Forced at the end of the round
+    - the Time objective is flipped to its other side; a flip to the side already up changes nothing, and any other flip is heard as "it becomes Day or Night"
+
+## 10013 Across the Wastes
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+10013:A:1 (front): Setup: Set Pack Leader aside, out of play. Make Shrouded Hills the active location. Add the Time objective to the staging area with Daybreak faceup. The first player takes control of Amarthiúl. Shuffle the encounter deck. Reveal 1 card from the encounter deck per player.
+  10013:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the set-aside card titled "Amarthiúl" is put into play under the first player
+    - shuffle the encounter deck
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+
+10013:B:1 (back): While it is Day, each hero gets +1 Willpower.
+  10013:constant:1: Constant
+    only if it is Day (Daybreak is faceup)
+    - every hero in play: stat willpower 1, while this card is in play
+
+10013:B:2 (back): Forced: When it becomes Night, raise each player's threat by 1.
+  10013:forced:1: Forced on the event becameNight
+    - raise threat by 1 (each player)
+
+## 10014 Howling at Night
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+10014:A:1 (front): When Revealed: Shuffle the encounter discard pile into the encounter deck. Discard cards from the top of the encounter deck until X Warg enemies are discarded. X is the number of players in the game. Add each discarded enemy to the staging area.
+  10014:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - discard from the top of the encounter deck until 1 Warg enemy for each player is discarded; add those enemies to the staging area
+
+10014:B:1 (back): Forced: When it becomes Day, each player draws 1 card.
+  10014:forced:1: Forced on the event becameDay
+    - for each player, first player first:
+      - the acting player draws 1 card(s)
+
+10014:B:2 (back): Forced: When it becomes Night, discard 1 non-objective ally from play (discard 2 non-objective allies instead if there are 3 or more players in the game).
+  10014:forced:2: Forced on the event becameNight
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if there is a ally (any player controls) that is not an objective, chosen by the first player to choose: choose ally (any player controls) that is not an objective, chosen by the first player
+    - then, if there is a ally (any player controls) that is not an objective, chosen by the first player to choose (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+    - then, if all of: (there is a ally (any player controls) that is not an objective, chosen by the first player to choose) and (the number of player (any player controls) is at least 3) (checked when this step runs, after the steps above; not tied to whether they did anything): choose ally (any player controls) that is not an objective, chosen by the first player
+    - then, if all of: (there is a ally (any player controls) that is not an objective, chosen by the first player to choose) and (the number of player (any player controls) is at least 3) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
+
+## 10015 Battle with the Pack
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+10015:A:1 (front): When Revealed: Flip the Time objective to Nightfall. Add Pack Leader to the staging area. Shuffle the encounter discard pile into the encounter deck. Discard cards from the top of the encounter deck until X Warg enemies are discarded. X is 1 less than the number of players in the game. Add each discarded enemy to the staging area.
+  10015:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the Time objective is flipped to Nightfall (Night); a flip to the side already up changes nothing, and any other flip is heard as "it becomes Night"
+    - the set-aside card with code 10017 is added to the staging area and enters play: the cards that hear it enter play or be added to the staging area hear it
+    - shuffle the encounter discard pile into the encounter deck
+    - discard from the top of the encounter deck until 1 Warg enemy for each player less 1 is discarded; add those enemies to the staging area
+
+10015:B:1 (back): Pack Leader cannot take damage unless there are at least 5 progress tokens on this stage.
+  10015:constant:1: Constant
+    only if not (the current quest stage holds at least 5 progress)
+    - each enemy (any player controls) or in the staging area, named "Pack Leader": stat cannotTakeDamage 1, while this card is in play
+
+10015:B:2 (back): Forced: When it becomes Day, discard all progress from this stage.
+  10015:forced:1: Forced on the event becameDay
+    - all progress on this stage (the main quest card) is discarded
+
+10015:B:3 (back): The players cannot defeat this stage while Pack Leader is in play. If Pack Leader is destroyed, the players win the game.
+  10015:constant:2: Constant
+    only if the card with code 10017 is in play
+    - the players cannot defeat this stage while this holds
+  10015:forced:2: Forced after an enemy is destroyed (heard about enemy (any player controls) named "Pack Leader")
+    - the players win the game
+
+## 10016 Amarthiúl
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+10016:A:1 (front): Response: After an enemy engages a player, give control of Amarthiúl to that player.
+  10016:response:1: Response after an enemy engages a player (event happened to another player)
+    - control of this card goes to the player the event happened to
+
+10016:A:2 (front): If Amarthiúl leaves play, the players lose the game.
+  10016:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    - the players lose the game
+
+## 10017 Pack Leader
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+10017:A:1 (front): Cannot have attachments.
+  10017:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+10017:A:2 (front): Cannot be optionally engaged.
+  10017:constant:2: Constant
+    - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
+
+10017:A:3 (front): Forced: After Pack Leader engages you, exhaust a character you control for each Warg enemy engaged with you.
+  10017:forced:1: Forced after an enemy engages a player (heard about this card)
+    - repeat the number of Warg enemy (any player controls) engaged with you times:
+      - choose ready character (you control)
+      - exhaust the picked card
+
+## 10018 Northern Warg
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10018:A:1 (front): When Revealed: Each Warg enemy gets +1 Threat until the end of the phase.
+  10018:whenRevealed:1: When revealed
+    - every enemy in play (Warg only): stat threat 1, until the end of the phase
+
+10018:A:2 (shadow): Shadow: After this attack, attacking enemy engages the next player, then makes an immediate attack (deal a new shadow card for that attack).
+  10018:shadow:1: Shadow
+    - when the attack in progress ends:
+      - if another player is still in the game: the attacking enemy engages the next player
+      - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+
+## 10019 Blood-thirsty Warg
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10019:A:1 (front): While Blood-thirsty Warg is in the staging area, it gains: "Forced: When it becomes Night, Blood-thirsty Warg engages the first player and makes an immediate attack."
+  10019:forced:1: Forced on the event becameNight
+    only if this card is in the staging area
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - engage this card
+    - then, if this card is engaged with the player (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
+
+## 10020 Hunting Pack
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10020:A:1 (front): Cannot have attachments.
+  10020:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+10020:A:2 (front): While a player is making an engagement check against Hunting Pack, it gets -1 engagement cost for each damaged character that player controls.
+  10020:constant:2: Constant
+    - this card: stat checkCostPerDamaged -1, while this card is in play
+
+## 10021 White Warg
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10021:A:1 (front): Forced: After White Warg engages you, deal 1 damage to a character you control (2 damage instead if it is Night).
+  10021:forced:1: Forced after an enemy engages a player (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (you control)
+    - then, if not (it is Night (Nightfall is faceup)) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 1 damage to the picked card
+    - then, if it is Night (Nightfall is faceup) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the picked card
+
+10021:A:2 (shadow): Shadow: If it is Night, attacking enemy makes an additional attack after this one.
+  10021:shadow:1: Shadow
+    - when the attack in progress ends:
+      - if it is Night (Nightfall is faceup): the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+
+## 10022 Wolf of Angmar
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10022:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+10022:A:2 (front): While it is Night, Wolf of Angmar gets +2 Attack.
+  10022:constant:1: Constant
+    only if it is Night (Nightfall is faceup)
+    - this card: stat attack 2, while this card is in play
+
+10022:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if it is Night).
+  10022:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (it is Night (Nightfall is faceup)): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if it is Night (Nightfall is faceup) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 10023 Eriador Wastes
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10023:A:1 (front): While Eriador Wastes is in the staging area, no more than 5 progress can be placed on the current quest each round.
+  10023:constant:1: Constant
+    only if this card is in the staging area
+    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 5, while this card is in play
+
+10023:A:2 (front): Travel: The first player engages a Warg enemy in the staging area and deals it a shadow card.
+  10023:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose Warg enemy (any player controls) in the staging area only, chosen by the first player
+    - engage the picked card
+    - the picked card is dealt a shadow card
+
+## 10024 Warg's Den
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10024:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+10024:A:2 (front): Travel: The first player searches the encounter deck and discard pile for a Warg enemy, reveals it, and puts it into play engaged with him. Shuffle the encounter deck.
+  10024:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player searches the encounter deck and discard pile for a Warg enemy, reveals it and puts it into play engaged with them (a Travel cost: payable only when a card is found)
+    - shuffle the encounter deck
+
+## 10025 North Downs
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10025:A:1 (front): While it is Night, North Downs gets +2 Threat.
+  10025:constant:1: Constant
+    only if it is Night (Nightfall is faceup)
+    - this card: stat threat 2, while this card is in play
+
+10025:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, remove all progress from the current quest.
+  10025:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): all progress on the current quest is removed (the encounter side quest that is the current quest while there is one, else the main quest card)
+
+## 10026 Sudden Darkness
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10026:A:1 (front): When Revealed: If it is Night, raise each player's threat by 4. If it is Day, flip the Time objective to Nightfall.
+  10026:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if it is Night (Nightfall is faceup): raise threat by 4 (each player)
+    - then, if it is Day (Daybreak is faceup) (checked when this step runs, after the steps above; not tied to whether they did anything): the Time objective is flipped to Nightfall (Night); a flip to the side already up changes nothing, and any other flip is heard as "it becomes Night"
+
+10026:A:2 (shadow): Shadow: Put the topmost Warg enemy from the discard pile into play engaged with you and deal it a shadow card.
+  10026:shadow:1: Shadow
+    - the topmost Warg enemy in the encounter discard pile is put into play engaged with the acting player (not revealed) and dealt a shadow card
+
+## 10027 Predatory Wolves
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10027:A:1 (front): When Revealed: Each player must choose: either discard the highest cost ally he controls, or search the encounter deck and discard pile for a Warg enemy, reveal it, and add it to the staging area. Shuffle the encounter deck.
+  10027:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "discard" (only if there is a ally (you control) with the highest printed cost of those (no printed cost counts as 0; ties: the chooser decides) to choose):
+          - choose ally (you control) with the highest printed cost of those (no printed cost counts as 0; ties: the chooser decides)
+          - discard the picked card
+        * option "search":
+          - the acting player searches the encounter deck and discard pile for a Warg enemy, reveals it and adds it to the staging area
+    - shuffle the encounter deck
+
+10027:A:2 (shadow): Shadow: Exhaust a character you control.
+  10027:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose ready character (you control)
+    - exhaust the picked card
+
+## 10172 Determination
+
+10172:A:1 (front): Action: Attach Determination to a unique character. Then, ready each character with a copy of Determination attached, as well as each character who is "determined" in the Campaign Log. (Counts as a Condition attachment with the text: "Forced: If you win this scenario, mark in the Campaign Log that attached character is 'determined.'")
+  10172:action:1: Action
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose unique character (any player controls)
+    - this card attaches to the picked card (nowhere if that card carries one of its title already)
+    - for each character (any player controls) with an attachment named "Determination":
+      - ready the picked card
+    - for each character (any player controls) that the Campaign Log marks determined:
+      - ready the picked card
+  10172:constant:1: Constant
+    - this card counts as a Condition attachment while it is attached
+
+## 10173 Fend off Despair
+
+10173:A:1 (front): Each event card gains doomed 1.
+  10173:constant:1: Constant
+    - each card (any player controls) of card type event gains doomed 1 (each player raises their threat by that much more when one is played)
+
+10173:A:2 (front): Forced: When Fend Off Despair is defeated, mark in the Campaign Log that each player's starting threat is reduced by 2. (This reduction is cumulative.)
+  10173:forced:1: Forced on the event questDefeated (heard about this card)
+    - mark in the Campaign Log that each player's starting threat is reduced by 2 (cumulative; written when the scenario is won)
+
+(rendered pieces: 181 by template, 0 as JSON)

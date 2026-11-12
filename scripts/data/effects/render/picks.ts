@@ -65,6 +65,9 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["isHost"], pick.isHost === true ? "that this card is attached to" : null);
   note(["hasShadow"], pick.hasShadow === true ? "with a shadow card" : null);
   note(["looked"], pick.looked === true ? "among the cards this effect looked at or discarded" : null);
+  const attached = isObj(pick.hasAttachment) && Array.isArray(pick.hasAttachment.names) && Object.keys(pick.hasAttachment).every((key) => key === "names" || key === "none") ? pick.hasAttachment : null;
+  note(["hasAttachment"], attached ? `${attached.none === true ? "with no" : "with an"} attachment named ${quoted(attached.names as unknown[])}` : null);
+  note(["determined"], pick.determined === true ? "that the Campaign Log marks determined" : null);
   note(["copyInDiscard"], pick.copyInDiscard === true ? "with a copy of it (the same title) in its controller's discard pile" : pick.copyInDiscard === "owner" ? "with a card of its title in its owner's discard pile" : null);
   // A Captive is in play but no player controls it (families/captives owns "Captives are in play but are not under any player's control", 143022:A:1).
   const control = pick.captive === "only" || pick.captive === "free" ? "in play, controlled by no player" : typeof pick.control === "string" ? (CONTROL[pick.control] ?? pick.control) : "";

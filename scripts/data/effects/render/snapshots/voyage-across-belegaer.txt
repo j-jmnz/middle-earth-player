@@ -369,7 +369,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11021:B:4 (back): If this stage has 10 or more progress on it, you have lost your pursuers, and win the game.
   11021:constant:3: Constant
-    only if [json condition {"kind":"stageProgress","min":10}]
+    only if the current quest stage holds at least 10 progress
     - the players win the game
 
 ## 11022 Scouting Ship
@@ -448,7 +448,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
   11052:whenRevealed:1: When revealed
     - the acting player chooses one of:
       * option "progress":
-        - [json RemoveAllQuestProgress {"verb":"RemoveAllQuestProgress"}]
+        - all progress on the current quest is removed (the encounter side quest that is the current quest while there is one, else the main quest card)
         - raise threat by 4 (each player)
       * option "heading":
         - [json ShiftHeading {"verb":"ShiftHeading","direction":"offCourse"}]
@@ -741,4 +741,4 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
   11171:resolution:9: Resolution
     - [json GainXp {"verb":"GainXp","amount":-1,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Ominous Fate"]},"min":1}}]
 
-(rendered pieces: 256 by template, 76 as JSON)
+(rendered pieces: 258 by template, 74 as JSON)

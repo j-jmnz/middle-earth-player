@@ -152,7 +152,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 146034:A:3 (shadow): Shadow: After this attack, attacking enemy engages the next player then makes an attack.
   146034:shadow:1: Shadow
     - when the attack in progress ends:
-      - [json EngageNextPlayer {"verb":"EngageNextPlayer","when":{"kind":"otherPlayer"}}]
+      - if another player is still in the game: the attacking enemy engages the next player
       - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
 
 ## 146035 Warrior of Rhûn
@@ -182,9 +182,9 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
     - the acting player chooses one of:
       * option "search" (only if [json condition {"kind":"searchable","trait":"Nazgûl","type":"enemy","victory":true}]):
         - the acting player finds one Nazgûl enemy in the encounter deck or its discard pile or the victory display and adds it to the staging area (it is not revealed)
-      * option "attach" (only if there is a Nazgûl enemy (any player controls) or in the staging area [also {"hasAttachment":{"names":["Hell-hawk","Fell Beast"],"none":true}}] to choose):
-        - choose Nazgûl enemy (any player controls) or in the staging area [also {"hasAttachment":{"names":["Hell-hawk","Fell Beast"],"none":true}}]
-        - [json AttachSelfToPicked {"verb":"AttachSelfToPicked"}]
+      * option "attach" (only if there is a Nazgûl enemy (any player controls) or in the staging area, with no attachment named "Hell-hawk" or "Fell Beast" to choose):
+        - choose Nazgûl enemy (any player controls) or in the staging area, with no attachment named "Hell-hawk" or "Fell Beast"
+        - this card attaches to the picked card (nowhere if that card carries one of its title already)
   146036:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card counts as a Mount attachment while it is attached
@@ -261,7 +261,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a non-unique enemy (any player controls) in the staging area only, chosen by the first player to choose: choose non-unique enemy (any player controls) in the staging area only, chosen by the first player
     - then, if there is a non-unique enemy (any player controls) in the staging area only, chosen by the first player to choose (checked when this step runs, after the steps above; not tied to whether they did anything): engage the picked card
-    - [json DealShadowTo {"verb":"DealShadowTo","target":"picked","when":{"kind":"canPick","pick":{"type":"enemy","control":"any","stagingOnly":true,"nonUnique":true,"who":"firstPlayer"}}}]
+    - then, if there is a non-unique enemy (any player controls) in the staging area only, chosen by the first player to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is dealt a shadow card
 
 ## 146041 Gwaihir
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -336,4 +336,4 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
   146073:constant:2: Constant
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 195 by template, 34 as JSON)
+(rendered pieces: 203 by template, 29 as JSON)
