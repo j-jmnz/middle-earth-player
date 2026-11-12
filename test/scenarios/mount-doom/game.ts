@@ -51,7 +51,7 @@ export const DEFAULT_POLICY: DoomPolicy = { ring: "destroy", quest: "most", fort
 
 // The auto-player's answer (test/harness/auto-player.ts), except: a choice takes its last option, and the Resolution's as the policy says. Every intent is one the reducer listed.
 // TODO: the scenario's own answers (where the players travel, who defends, which locations they explore) go before the auto-player's.
-export function doomIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: DoomPolicy = DEFAULT_POLICY): PlayerIntent {
+export function doomIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: DoomPolicy = DEFAULT_POLICY, options: PolicyOptions = DOOM_POLICY): PlayerIntent {
   if (state.window?.kind === "choose") return { type: "Choose", optionId: state.window.options.at(-1) ?? "" };
   // The Resolution's choice (146079:B:1): the first player keeps or destroys The One Ring.
   if (state.window?.kind === "resolution") {
@@ -65,12 +65,18 @@ export function doomIntent(state: ScenarioState, ctx: ReduceContext, memory: Set
     const wanted = legalTargets(state, { type: "Travel" }, ctx)[0];
     return wanted ? { type: "Travel", locationId: wanted } : { type: "DeclineTravel" };
   }
+  // A character of another seat defends only with Sentinel: the saved decklists' characters of the other seat are left out of the candidates.
+  if (state.window?.kind === "defense" && state.pendingAttack && !state.pendingAttack.undefended) {
+    const seat = state.pendingAttack.seat;
+    const defender = legalTargets(state, { type: "DeclareDefender" }, ctx).find((id) => state.cards[id]?.controller === seat);
+    return defender ? { type: "DeclareDefender", defenderId: defender } : { type: "Undefended", heroId: legalTargets(state, { type: "Undefended" }, ctx)[0] ?? "" };
+  }
   if (state.window?.kind === "pass" && state.mode === "questCommit") {
     const quested = Object.values(state.cards).some((card) => card.committed && card.controller === state.activeSeat);
     const ids = legalTargets(state, { type: "Commit" }, ctx);
     if (!quested && ids.length > 0) return { type: "Commit", cardIds: policy.quest === "all" ? ids : ids.slice(0, Math.max(1, ids.length - 1)) };
   }
-  return nextIntent(state, ctx, DOOM_POLICY, memory, intents);
+  return nextIntent(state, ctx, options, memory, intents);
 }
 
 export type DoomGame = PlayedGame;
