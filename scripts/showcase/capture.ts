@@ -125,8 +125,28 @@ async function buildApp(log: Log): Promise<string> {
   const products = path.join(derived, "Build", "Products", "Release-iphonesimulator");
   const app = readdirSync(products).find((name) => name.endsWith(".app"));
   if (!app) throw new Error(`No .app in ${products}`);
+  writeFileSync(STAMP, sourceStamp());
   log.info(`built ${path.join(products, app)}`);
   return path.join(products, app);
+}
+
+// What the app is built from: every tracked file under src/ and the app config, with uncommitted changes. The build writes it beside the app;
+// a run with --app compares it, since the saves, the flows' screens and the marker are all compiled into the app (user report, 2026-11-12).
+const STAMP = path.join(ROOT, ".cache", "showcase", "build", "source-stamp.txt");
+
+function sourceStamp(): string {
+  const files = spawnSync("git", ["ls-files", "-s", "--", "src", "app.json", "app.config.js"], { cwd: ROOT, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 }).stdout;
+  const changes = spawnSync("git", ["diff", "HEAD", "--", "src", "app.json", "app.config.js"], { cwd: ROOT, encoding: "utf8", maxBuffer: 64 * 1024 * 1024 }).stdout;
+  return sha(files, changes);
+}
+
+// A warning when the app given with --app was built from other code than this checkout's.
+function checkBuilt(log: Log): void {
+  if (!existsSync(STAMP)) {
+    log.warn("the app has no build stamp, so it may be older than this checkout: rebuild with --build if its saves or screens changed");
+    return;
+  }
+  if (readFileSync(STAMP, "utf8") !== sourceStamp()) log.warn("the app was built from older code than this checkout (src/ changed since): its saves and screens are the old ones. Rebuild with --build");
 }
 
 type SimDevice = { name: string; udid: string; isAvailable: boolean };
@@ -272,7 +292,9 @@ async function capture(log: Log, sim: SimDevice, device: Device, theme: Theme, s
 
 void runScript("showcase-capture", async (log) => {
   const given = flag("app");
-  const app = process.argv.includes("--build") ? await buildApp(log) : given;
+  const building = process.argv.includes("--build");
+  const app = building ? await buildApp(log) : given;
+  if (!building && app) checkBuilt(log);
   if (!app || !existsSync(app)) throw new Error("Usage: pnpm assets capture --build | --app <App.app> [--out <dir>] [--only <shot,shot>] [--device <iphone|ipad>] [--theme <dark|light>] [--ios <version>] [--force] [--verbose]");
   const out = path.resolve(flag("out") ?? path.join(ROOT, ".cache", "showcase", "raw"));
   mkdirSync(out, { recursive: true });

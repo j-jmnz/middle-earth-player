@@ -17,12 +17,20 @@ tags:
           id: dock-more-actions
 - tapOn:
     id: sheet-list
+- waitForAnimationToEnd:
+    timeout: 3000
 - tapOn:
     id: sheet-option-i35
+- waitForAnimationToEnd:
+    timeout: 3000
 - tapOn:
     id: sheet-option-i36
+- waitForAnimationToEnd:
+    timeout: 3000
 - tapOn:
     id: sheet-option-i34
+- waitForAnimationToEnd:
+    timeout: 3000
 - tapOn:
     id: sheet-primary
 - waitForAnimationToEnd:
