@@ -198,7 +198,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       condition: { kind: "sourceIn", zone: "staging" },
       instructions: [{ verb: "ModifyStat", stat: "noProgressPlaced", amount: 1, until: "whileSourceInPlay", holders: { type: "location", control: "any", stagingOnly: true, trait: "Dark" } }],
     },
-    // 18055 Forked Passage: when the players travel here (before Deep), each player raises their threat by 2 to look at the top 2 cards of the Caves deck; one stays on top and the other goes to the bottom. Then it is added to the victory display, so the Deep keyword does nothing (it is no longer the active location).
+    // 18055 Forked Passage: when the players travel here (before Deep), each player raises their threat by 2 to look at the top 2 cards of the Caves deck; one stays on top and the other goes to the bottom. Then it is added to the victory display; the Deep keyword still resolves afterwards (it is before resolving the keyword) and the top Caves card replaces it as the active location (emce.deep).
     {
       id: "18055:response:1",
       cardCode: "18055",

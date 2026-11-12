@@ -131,16 +131,17 @@ describe("18046 Deep Chasm, 18054 Dark Tunnel and 18055 Forked Passage", () => {
     expect(flagged(none.state, idOf(none.state, CODES.undergroundLake), "noProgressPlaced")).toBe(false);
   });
 
-  it("18055:A:2 traveling here, each player raises their threat by 2 to look at the top 2 Caves cards: the chosen one stays on top, the other goes to the bottom, and Forked Passage goes to the victory display", () => {
+  it("18055:A:2 traveling here, each player raises their threat by 2 to look at the top 2 Caves cards: the chosen one stays on top, the other goes to the bottom, and Forked Passage goes to the victory display; the Deep keyword then replaces it with the top card (emce.deep)", () => {
     const caves = [CODES.lostArmory, CODES.ancientTreasury, CODES.frightfulDen];
     const { run, t } = travel(CODES.forkedPassage, { seats: 2, caves }, "18055:response:1", (state) => (state.window?.kind === "choose" ? (state.window.options.at(-1) ?? "") : ""));
     const deck = (run.state.piles?.cavesDeck ?? []).map((id) => run.state.cards[id]?.code);
-    expect(deck).toEqual([CODES.ancientTreasury, CODES.frightfulDen, CODES.lostArmory]);
+    // The Response ran "before resolving the deep keyword": the top card (the one left on top) then becomes the active location.
+    expect(deck).toEqual([CODES.frightfulDen, CODES.lostArmory]);
     expect(run.state.seats[0]?.threat).toBe(31);
     expect(run.state.seats[1]?.threat).toBe(31);
     expect(codesIn(run.state, "victory")).toContain(CODES.forkedPassage);
-    // It is no longer the active location, so the Deep keyword does nothing.
-    expect(run.state.activeLocation).toBeNull();
+    expect(run.state.cards[run.state.activeLocation ?? ""]?.code).toBe(CODES.ancientTreasury);
+    expect(run.state.encounterDiscard).not.toContain(idOf(t.state, CODES.forkedPassage));
     expect(t.state.piles?.cavesDeck).toHaveLength(3);
   });
 });

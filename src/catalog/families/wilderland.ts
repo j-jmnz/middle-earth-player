@@ -51,7 +51,7 @@ const VERBS = [
   // "Shuffle the Spiders of Mirkwood encounter set into the encounter deck" (18072:A): the cards of the set-aside deck join the encounter deck, which is shuffled, and the deck stays empty (emce.setup-lost-in-mirkwood).
   z.strictObject({ verb: z.literal("ShufflePileIntoEncounterDeck"), pile, ...when }),
   // Constant on a location, the Deep keyword (emce.deep; 18046:A, 19016:A): after the players travel to it and the Responses to the travel are done, they discard it and the top card of the Caves deck replaces it as the active location. Ignored with the Caves
-  // deck empty, while the location is no longer the active location, or while a card in play ignores the keyword (IgnoreKeyword). A location that is not a Deep location is not touched; the engine reads this record when the players travel (families/wilderland/deep.ts).
+  // deck empty, while the location is no longer the active location (unless its own Response added it to the victory display before the keyword, 18055:A:2), or while a card in play ignores the keyword (IgnoreKeyword). A location that is not a Deep location is not touched; the engine reads this record when the players travel (families/wilderland/deep.ts).
   z.strictObject({ verb: z.literal("Deep") }),
   // Constant on a card in play, usually the campaign card or the quest stage: "Ignore the deep keyword" / "Ignore the deep and discover keywords" (12187:A, 12195:A, 18080:B, 19023:B; emce.deep, emce.discover). While the card is in play the keywords
   // are not resolved: the scenario-level switch. It does nothing when run.

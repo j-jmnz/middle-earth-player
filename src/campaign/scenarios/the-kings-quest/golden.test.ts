@@ -11,8 +11,8 @@ import { goldenSuite } from "../../../../test/harness/golden-suite.ts";
 // searched down to Dragon Hoard through Deep and Contested Depths, Fire-drake engaged and defeated) and through each way to lose (heroes too small to quest, heroes too brittle to survive). It pins the path from data/ through the Campaign Setup
 // Checklist and buildStart, the stage and Caves records, the Resolution's pool, log line and treasure effects and the reducer, so a change that moves a game shows up as a diff here. Update the snapshot only when the change is meant.
 //
-// Underground Lake prints X quest points (the engine explores it since engine 24, cards.test.ts); the pinned wins' policy still keeps it out of the game (it stays in the Caves deck, which the stage 2 look sends it to the bottom of),
-// and a test below says so, so the goldens stay as they were.
+// Underground Lake prints X quest points (the engine explores it since engine 24, cards.test.ts); the pinned wins' policy keeps it in the Caves deck (the stage 2 look sends it to the bottom) or,
+// when Forked Passage's Response leaves the Deep keyword to bring it up as the active location, plays on with it or explores it into the victory display (engine 27); a test below says which.
 const treasures: readonly string[] = TREASURES;
 const treacheries = (state: { cards: Record<string, { code: string }> }, cards: ReadonlyMap<string, { type: string }>) => Object.values(state.cards).filter((card) => cards.get(card.code)?.type === "treachery").length;
 
@@ -107,10 +107,10 @@ describe("The King's Quest golden", () => {
         }
       });
 
-      it("keeps Underground Lake in the Caves deck: the policy of the pinned wins sends it to the bottom at the stage 2 look", () => {
+      it("ends with Underground Lake in the Caves deck (the stage 2 look sends it to the bottom), or brought up by Forked Passage's Deep as the active location or explored into the victory display", () => {
         for (const golden of KINGSQUEST_GOLDENS.filter((item) => item.outcome === "won")) {
           const lake = Object.values(game(golden).state.cards).find((card) => card.code === CODES.undergroundLake);
-          expect(lake?.zone, golden.name).toBe("cavesDeck");
+          expect(["cavesDeck", "activeLocation", "victory"], golden.name).toContain(lake?.zone);
         }
       });
     },
