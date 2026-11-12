@@ -3,9 +3,8 @@
 // Shagrat guards with their owners. The engine decided each number; nothing here changes one.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { emptyLog, poolCard } from "../../campaign/log.ts";
 import { opened } from "../../../test/harness/campaign-kit.ts";
-import { ungolStart, ungolWorld } from "../../../test/scenarios/the-tower-of-cirith-ungol/game.ts";
+import { afterFields, ITEM_CHOICES, ungolStart, ungolWorld } from "../../../test/scenarios/the-tower-of-cirith-ungol/game.ts";
 import { reduce, type ReduceContext, type ScenarioState } from "../../rules/engine/reduce.ts";
 import { settle } from "../../rules/engine/machine.ts";
 import { holds } from "../../rules/interpret/conditions.ts";
@@ -36,8 +35,7 @@ beforeAll(async () => {
 const byCode = (state: ScenarioState, code: string) => Object.values(state.cards).find((card) => card.code === code)!;
 const nameOfId = (state: ScenarioState) => (id: string) => names(state.cards[id]?.code ?? id);
 function open(seats: 1 | 2 = 1): ScenarioState {
-  const log = { ...emptyLog(seats), campaignPool: [poolCard(world.cards.get(STING)!, STING, null, 0), poolCard(world.cards.get(GLAMDRING)!, GLAMDRING, null, seats === 2 ? 1 : 0)] };
-  return syncConstants(opened(ungolStart(seats, 1, "Normal", undefined, log, undefined, { choices: seats === 2 ? [STING, GLAMDRING] : [STING] }), ctx), ctx);
+  return syncConstants(opened(ungolStart(seats, 1, "Normal", undefined, afterFields(seats), undefined, { choices: ITEM_CHOICES(seats) }), ctx), ctx);
 }
 // The Two Watchers' enemy side defeated, so stage 1 gives way to stage 2; then Topmost Chamber explored, so stage 3 comes with Shagrat in play.
 function stage2(seats: 1 | 2 = 1): ScenarioState {
@@ -51,7 +49,14 @@ function stage3(seats: 1 | 2 = 1): ScenarioState {
   const ready = syncConstants({ ...state, phase: "Travel", mode: "travel", window: { kind: "travel" } } as ScenarioState, ctx);
   const traveled = reduce(ready, { type: "Travel", locationId: byCode(ready, "146015").id }, ctx);
   if (!traveled.ok) throw new Error(traveled.reason);
-  return settle(syncConstants({ ...moveCard(traveled.state, byCode(traveled.state, "146015").id, { zone: "victory" }), window: null, activeLocation: null }, ctx), ctx, []);
+  let done = settle(syncConstants({ ...moveCard(traveled.state, byCode(traveled.state, "146015").id, { zone: "victory" }), window: null, activeLocation: null }, ctx), ctx, []);
+  // Stage 3A makes each other player reveal an encounter card: a choice it opens is answered with the first option.
+  for (let guard = 0; guard < 20 && done.window != null; guard += 1) {
+    const answered = reduce(done, done.window.kind === "choose" ? { type: "Choose", optionId: done.window.options[0] ?? "" } : { type: "Pass" }, ctx);
+    if (!answered.ok) break;
+    done = answered.state;
+  }
+  return done;
 }
 const dial = (state: ScenarioState, id: string) => ungolDials(state, ctx, names).find((one) => one.id === id);
 

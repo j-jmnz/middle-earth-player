@@ -2,7 +2,7 @@
 import { beforeAll, describe, expect, it } from "vitest";
 
 import type { ReduceContext, ScenarioState } from "../../../rules/engine/reduce.ts";
-import { GLAMDRING, MITHRIL, PHIAL, STING, ungolStart, ungolWorld } from "../../../../test/scenarios/the-tower-of-cirith-ungol/game.ts";
+import { GLAMDRING, MITHRIL, PHIAL, STING, ungolLoadout, ungolStart, ungolWorld } from "../../../../test/scenarios/the-tower-of-cirith-ungol/game.ts";
 import { fieldsWorld } from "../../../../test/scenarios/the-battle-of-the-pelennor-fields/game.ts";
 import { gondorWorld } from "../../../../test/scenarios/the-siege-of-gondor/game.ts";
 import { loadCampaign, loadScenario } from "../../../../scripts/data/load-scenarios.ts";
@@ -19,7 +19,6 @@ import { PLAYABLE_SCENARIOS } from "../../playable.ts";
 import { NO_COPY_LIMITS } from "../../wilderland.ts";
 import { EFFECTS } from "../../../effects/index.ts";
 import { campaignScenario } from "../../../catalog/scenario-data.ts";
-import { ungolLoadout } from "../../../../test/scenarios/the-tower-of-cirith-ungol/game.ts";
 
 const campaign = loadCampaign("the-return-of-the-king");
 const ungol = loadScenario("the-tower-of-cirith-ungol");
