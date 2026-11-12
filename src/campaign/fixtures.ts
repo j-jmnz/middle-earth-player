@@ -48,6 +48,7 @@ import chetwoodFixtures from "./fixtures/intruders-in-chetwood.json";
 import hillsFixtures from "./fixtures/the-weather-hills.json";
 import dikeFixtures from "./fixtures/deadmens-dike.json";
 import eriadorFixtures from "./fixtures/the-wastes-of-eriador.json";
+import gramFixtures from "./fixtures/escape-from-mount-gram.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -112,6 +113,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-weather-hills": hillsFixtures,
   "deadmens-dike": dikeFixtures,
   "the-wastes-of-eriador": eriadorFixtures,
+  "escape-from-mount-gram": gramFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(
