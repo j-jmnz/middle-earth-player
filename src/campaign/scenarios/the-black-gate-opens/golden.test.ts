@@ -1,6 +1,7 @@
 // Rules: mec113.dire, mec113.setting-up-the-game, mec113.saga-staging-rules, mec113.campaign-mode, rr.player-elimination, rr.threat-elimination-level, rr.first-player, rr.winning-the-game, rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 146072:B:1, 146073:B:1, 146073:B:3, 146024:A:3, 146074:B:1.
 import { describe, expect, it } from "vitest";
 
+import { endedInDefeat } from "../../../rules/core/eliminate.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { emptyLog, type CampaignLog } from "../../log.ts";
 
@@ -84,13 +85,14 @@ describe("The Black Gate Opens golden", () => {
         expect(gwaihir).toContain(false);
       });
 
-      it("146073:B:3 no game of the scenario is won: each ends on a stage that cannot be defeated, by the last elimination alone", () => {
+      it("146073:B:3 no game of the scenario is won: each ends on a stage that cannot be defeated (2A or 2B, or 1B), by the last elimination alone", () => {
         for (const golden of ended) {
           const state = game(golden).state;
           // Every seat but the last was eliminated by a step of its own; the last one's elimination ended the game.
           const eliminations = game(golden).steps.filter((step) => step.kind === "eliminate").length;
           expect(eliminations, golden.name).toBe(golden.seatCount);
-          expect(state.cards[state.questStage ?? ""]?.progress, golden.name).toBeGreaterThanOrEqual(0);
+          expect(state.cards[state.questStage ?? ""]?.code, golden.name).toMatch(/^14607[23]$/);
+          expect(endedInDefeat(state), golden.name).toBe(true);
         }
       });
 

@@ -3,10 +3,12 @@
 // How loud the threat dial is. A player whose threat reaches 50 is eliminated at once, so the dial's meter fills toward 50
 // and the dial warms as it nears it: tinted from 40, solid threat red from 45 (docs/design-system-table.md). The change
 // badge says what the last intent did to it ("−6" when it fell, "+2" when it rose).
+import { ELIMINATION_LEVEL } from "../../rules/core/eliminate.ts";
+import { DIRE_ELIMINATION_LEVEL } from "../../rules/families/black-gate/dire.ts";
 
-export const ELIMINATION_THREAT = 50;
+export const ELIMINATION_THREAT = ELIMINATION_LEVEL;
 /** The elimination level while the main quest has Dire (mec113.dire): the dial's meter, its warming and its words read it. */
-export const DIRE_THREAT = 99;
+export const DIRE_THREAT = DIRE_ELIMINATION_LEVEL;
 /** The number a threat dial's meter fills toward: 99 under Dire, else the elimination level (undefined: the dial's own default). */
 export const dialLimit = (dire: boolean): number | undefined => (dire ? DIRE_THREAT : undefined);
 const NEAR = 40;

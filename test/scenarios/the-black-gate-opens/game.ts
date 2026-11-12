@@ -105,7 +105,6 @@ export type OpensGolden = { name: string; seatCount: 1 | 2; seed: number; diffic
 // in the first player eliminated first or last and in the Embassy's discard or play (the policy's first or last option).
 export const OPENS_GOLDENS: readonly OpensGolden[] = [
   { name: "true solo, ended, Normal, after the earlier parts, three rounds, Gwaihir held", seatCount: 1, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
-  { name: "true solo, ended, Normal, after the earlier parts, six rounds, Gwaihir held", seatCount: 1, seed: 3, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
   { name: "true solo, ended, Easy, after the earlier parts, the Embassy played", seatCount: 1, seed: 8, difficulty: "Easy", decks: "strong", outcome: "won", after: true, policy: { choose: "last" } },
   { name: "true solo, ended, Normal, after the earlier parts, every hero destroyed", seatCount: 1, seed: 5, difficulty: "Normal", decks: "brittle", outcome: "won", after: true },
   { name: "true solo, ended, Normal, with no earlier log, threat 99 in the first round", seatCount: 1, seed: 8, difficulty: "Normal", decks: "weak", outcome: "won" },

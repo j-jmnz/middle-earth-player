@@ -167,6 +167,12 @@ export function addStandIns(cards: Map<string, PrintedCard>, names: readonly Sta
   for (const cost of costs) cards.set(`c${cost}`, eventCard(`c${cost}`, cost));
 }
 
+/** The hero an undefended attack of a second seat lands on (the attacking enemy engaged the next player): that seat's own first hero; null when the attack is the first seat's. */
+export function secondSeatHero(state: ScenarioState): string | null {
+  const seat = state.pendingAttack?.seat ?? 0;
+  return seat === 0 ? null : (state.seats[seat]?.heroes[0] ?? null);
+}
+
 // The card an undefended attack lands on: the one `lands` names for the attacking enemy's code, else the hero asked for.
 function undefendedOn(state: ScenarioState, lands: Readonly<Record<string, string>> | undefined, hero: string): string {
   const attacker = state.pendingAttack ? state.cards[state.pendingAttack.enemyId]?.code : undefined;
@@ -217,10 +223,9 @@ export function fightEnemy<T extends FightTable, L>(table: (layout: L) => T, sha
     // A second attack (the attacking enemy attacks again): defended as the first was, unless the defender is exhausted by then, and then by the second hero when the first is no hero.
     if (window?.kind === "defense") {
       const canDefend = legalTargets(run.state, { type: "DeclareDefender" }, made.ctx).includes(defender);
-      // The attack of a second seat (the attacking enemy engaged the next player) lands on that seat's own hero.
-      const otherSeat = run.state.pendingAttack?.seat ?? 0;
-      if (otherSeat !== 0 && run.state.seats[otherSeat]?.heroes[0]) {
-        run = send(run, { type: "Undefended", heroId: run.state.seats[otherSeat]?.heroes[0] ?? "" }, made.ctx);
+      const otherHero = secondSeatHero(run.state);
+      if (otherHero != null) {
+        run = send(run, { type: "Undefended", heroId: otherHero }, made.ctx);
         continue;
       }
       run = send(run, options.undefended || !canDefend ? { type: "Undefended", heroId: undefendedOn(run.state, options.lands, run.state.cards[defender]?.zone === "heroes" ? defender : made.hero2) } : { type: "DeclareDefender", defenderId: defender }, made.ctx);

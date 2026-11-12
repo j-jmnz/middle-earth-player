@@ -7,7 +7,7 @@ import type { EngineStep } from "../../src/rules/core/intents.ts";
 import type { PlayerIntent } from "../../src/rules/engine/reduce.ts";
 
 import type { Act, Done, Row } from "./card-spec-types.ts";
-import { fightEnemy, finish, first, idOf, legalIntents, opening, resolveRecords, revealFromTop, send, start as begin, tableFromLayout, type Layout, type LayoutTable, type Run, type ScenePhase } from "./scene-kit.ts";
+import { fightEnemy, finish, first, idOf, legalIntents, opening, resolveRecords, revealFromTop, secondSeatHero, send, start as begin, tableFromLayout, type Layout, type LayoutTable, type Run, type ScenePhase } from "./scene-kit.ts";
 
 // Test helper. Plays the actions of a card-spec row (card-spec-types.ts, Act) on a table built from its layout: each action is the scene kit's helper for it (`resolveRecords`, `revealFromTop`, `fightEnemy`, `send` of an
 // intent from `legalIntents`). Rules: rr.forced, rr.response, rr.reveal, rr.cancel, rr.travel (data/rules/entries.json).
@@ -28,7 +28,8 @@ function picker(queue: string[], lenient: boolean): (state: ScenarioState) => st
 
 // The hero an undefended attack lands on: a hero of the seat attacked (a second seat has its own hero), else the first hero, or the second when the first has gone.
 function undefendedHero(state: ScenarioState, table: LayoutTable): string {
-  if (state.pendingAttack?.seat === 1 && table.seat1Hero != null && state.cards[table.seat1Hero]?.zone === "heroes") return table.seat1Hero;
+  const other = secondSeatHero(state);
+  if (other != null) return other;
   return state.cards[table.hero]?.zone === "heroes" ? table.hero : table.hero2;
 }
 

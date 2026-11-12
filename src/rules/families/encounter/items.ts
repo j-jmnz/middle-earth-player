@@ -187,21 +187,19 @@ function playRevealedFree(state: ScenarioState, item: QueueItem, ctx: ReduceCont
   if (!card || card.zone !== (embassy ? "setAside" : "deck") || card.controller !== seat) return state;
   const printed = printedOf(ctx.cards, card.code);
   const bottom = embassy ? moveCard(state, id, { zone: "discard", seat: card.owner ?? seat }) : putOnDeck(state, id, "bottom");
-  if ((printed.type === "ally" || printed.type === "attachment") && uniqueBlocked(state, printed, ctx.cards)) return bottom;
+  if (!canPlayFree(state, id, seat, ctx)) return bottom;
   if (printed.type === "ally") {
     const entered = updateCard(moveCard(played(state, id, seat, ctx, steps), id, { zone: "play", seat }), id, { exhausted: entersExhausted(ctx, card.code) });
     return queueEvent(queueEvent(entered, { trigger: "played", seat, cardId: id }), { trigger: "enteredPlay", seat, cardId: id });
   }
   if (printed.type === "attachment") {
     const hosts = attachmentHostIds(state, seat, card.code, ctx);
-    if (hosts.length === 0) return bottom;
     if (!item.chosen && hosts.length > 1 && effectData(state)) return askTarget(state, { ...item, seat }, hosts);
     const host = item.chosen && hosts.includes(item.chosen) ? item.chosen : hosts[0];
     if (!host) return bottom;
     const placed = updateCard(moveCard(played(state, id, seat, ctx, steps), id, { zone: "play", seat }), id, { exhausted: entersExhausted(ctx, card.code) });
     return enforceRestricted(queueEvent(attachTo(placed, id, host), { trigger: "played", seat, cardId: id }), host, ctx, steps);
   }
-  if (printed.type !== "event") return bottom;
   const running = playableActions(state, id, seat, ctx);
   const first = running[0];
   if (!first) return bottom;

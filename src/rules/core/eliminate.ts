@@ -1,6 +1,7 @@
 // Elimination (rr.player-elimination): a seat out of heroes or at the threat elimination level leaves the game, and the cards it held go with it.
 import { threatSaved } from "../families/quest/threat.ts";
 import { GOLLUM, SMEAGOL, isGollum } from "../families/gollum/index.ts";
+import { DIRE_ELIMINATION_LEVEL } from "../families/black-gate/dire.ts";
 import { discardArea } from "../families/breaking/areas.ts";
 import type { ReduceContext } from "../interpret/interpret.ts";
 import { queueEvent } from "../windows/queue.ts";
@@ -10,6 +11,9 @@ import { fromEncounterDeck, printedOf, type PrintedCard } from "./printed.ts";
 import type { ScenarioState } from "./state.ts";
 import { flagged, heldAmount, heldHero, livingSeats, updateCard, withSeat } from "./state.ts";
 import { inPlay, moveCard, type Destination } from "./zones.ts";
+
+/** The threat at which a player is eliminated (rr.player-elimination); a Dire quest raises it (`DIRE_ELIMINATION_LEVEL`). */
+export const ELIMINATION_LEVEL = 50;
 
 export function markLoss(state: ScenarioState, reason: string): ScenarioState {
   if (state.lost) return state;
@@ -116,7 +120,7 @@ export function eliminateEmpties(state: ScenarioState, steps: EngineStep[], fina
     const seat = next.seats[index];
     if (!seat || seat.eliminated) continue;
     // The elimination level (99 while the main quest is Dire, mec113.dire), lowered by a card the seat holds (The One Ring, families/misc.ts).
-    const level = (next.dire ? 99 : 50) - Math.max(0, heldAmount(next, `seat:${index}`, "eliminationReduction"));
+    const level = (next.dire ? DIRE_ELIMINATION_LEVEL : ELIMINATION_LEVEL) - Math.max(0, heldAmount(next, `seat:${index}`, "eliminationReduction"));
     if (!final && seat.threat < level && seat.heroes.length === 0 && (state.heroSavers ?? []).includes(index)) continue;
     // A hero an enemy guards is in play, not killed (Carried Away, 18074:B:1; rr.player-elimination): its owner is not out of heroes while it is held.
     const held = seat.threat < level && seat.heroes.length === 0 && Object.values(next.cards).some((card) => heldHero(card) && card.owner === index);

@@ -1,6 +1,7 @@
 // Rules: ltp.scoring, rr.scoring, faq.scoring (data/rules/entries.json).
 import { printedOf, type PrintedCard } from "../rules/core/printed.ts";
 import { victoryPointsOf } from "../rules/core/printed-stat.ts";
+import { endedInDefeat } from "../rules/core/eliminate.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
 
 export type ScenarioScore = { rounds: number; victoryPoints: number; score: number };
@@ -25,13 +26,16 @@ export function scoreParts(state: ScenarioState, cards: ReadonlyMap<string, Prin
   let threat = 0;
   let destroyed = 0;
   let damage = 0;
+  // A scenario that ends when its last player falls (The Black Gate Opens) leaves that seat as it stood for the Resolution, but every player fell: it scores as eliminated like the seats that fell before it.
+  const everyoneFell = endedInDefeat(state);
   for (const seat of state.seats.slice(0, state.seatCount)) {
-    threat += seat.eliminated ? 50 : seat.threat;
+    const out = seat.eliminated || everyoneFell;
+    threat += out ? 50 : seat.threat;
     for (const id of seat.discard) {
       const instance = state.cards[id];
       if (instance && printedOf(cards, instance.code).type === "hero") destroyed += printedOf(cards, instance.code).threat ?? 0;
     }
-    if (seat.eliminated) {
+    if (out) {
       for (const id of seat.heroes) destroyed += printedOf(cards, state.cards[id]?.code ?? "").threat ?? 0;
     } else {
       for (const id of seat.heroes) damage += state.cards[id]?.damage ?? 0;
