@@ -8,6 +8,7 @@ import { undefendedToCity } from "../pelennor/combat.ts";
 import type { Instruction } from "../../../catalog/boundary.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { currentCause, ruleCause, UNATTRIBUTED } from "../../core/cause.ts";
+import { frameScope } from "../../interpret/amounts.ts";
 import { attackBarred } from "../../interpret/constants.ts";
 import { beginEnemyAttack } from "../../combat/combat.ts";
 import { dealAdditionalShadow, dealOneShadow, type ReduceContext } from "../../interpret/interpret.ts";
@@ -67,9 +68,10 @@ export function dealForAttack(state: ScenarioState, enemyId: string, steps: Engi
   return state.cards[enemyId]?.zone === "engaged" ? state : dealOneShadow(discardShadowOf(state, enemyId), enemyId, steps);
 }
 
-// The enemy that attacks: the source itself, the card the source is attached to, or the one a Pick chose.
-function attackerOf(state: ScenarioState, target: "self" | "host" | undefined, focus: Focus): string {
+// The enemy that attacks: the source itself, the card the source is attached to, the card the event was about, or the one a Pick chose.
+function attackerOf(state: ScenarioState, target: "self" | "host" | "subject" | undefined, focus: Focus): string {
   if (target === "self") return focus.sourceId ?? "";
+  if (target === "subject") return frameScope(state, focus.seat, focus.sourceId).subject ?? "";
   if (target === "host") return state.cards[focus.sourceId ?? ""]?.host ?? "";
   return lastPicked(state);
 }

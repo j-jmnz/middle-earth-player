@@ -8,7 +8,12 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
+import { chooseBoon } from "./boons.ts";
 import { placeHandUnderSelf } from "./cards-under.ts";
+import { placeLoggedDamageOn } from "./logged.ts";
+import { endPhase } from "./phase.ts";
+import { missionTokenUnpayable } from "./travel.ts";
+import { noteFirstTrait } from "./weather.ts";
 import { discardHeld, holdUnder } from "./hold.ts";
 import { chooseCurrentQuest, currentQuestHolds, questCardsAmount, questLeadsHolds } from "./quest.ts";
 import { removeTimeCounters, timeOnReveal } from "./time.ts";
@@ -33,6 +38,15 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return attachNewTo(state, instruction, ctx);
     case "TradeDamageForResources":
       return tradeDamageForResources(state, instruction, focus, steps);
+    // A marker the reveal hook reads (weather.ts).
+    case "FirstTraitSurge":
+      return state;
+    case "EndPhase":
+      return endPhase(state, focus);
+    case "PlaceLoggedDamageOn":
+      return placeLoggedDamageOn(state, instruction);
+    case "ChooseBoon":
+      return chooseBoon(state, instruction, focus, steps);
     default:
       return null;
   }
@@ -40,9 +54,10 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "angmar",
-  verbs: ["Time", "RemoveTimeCounters", "HoldUnder", "DiscardHeld", "PlaceHandUnderSelf", "ChooseCurrentQuest", "AttachNewTo", "TradeDamageForResources"],
+  verbs: ["Time", "RemoveTimeCounters", "HoldUnder", "DiscardHeld", "PlaceHandUnderSelf", "ChooseCurrentQuest", "AttachNewTo", "TradeDamageForResources", "FirstTraitSurge", "EndPhase", "PlaceLoggedDamageOn", "ChooseBoon"],
   run,
-  revealed: timeOnReveal,
+  revealed: (state, id, ctx) => noteFirstTrait(timeOnReveal(state, id, ctx), id, ctx),
+  travel: { unpayable: missionTokenUnpayable },
   condition: (state, condition, scope, ctx) => currentQuestHolds(state, condition, scope, ctx) ?? questLeadsHolds(state, condition, ctx),
   amount: (state, found, _scope, ctx) => questCardsAmount(state, found, ctx),
 };

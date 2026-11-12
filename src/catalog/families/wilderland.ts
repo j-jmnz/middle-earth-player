@@ -229,7 +229,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("SearchQuestDeck"), ...when }),
   // "Flip Wormsbane to its Reforged side" (19122:A:3): the card in play with the code `code` shows its other side `into`, staying where it lies with its tokens and attachments (the old side is kept as the card's other side).
   // With `attachTo: "picked"` it then moves to the hero last picked, leaving the card it was attached to.
-  z.strictObject({ verb: z.literal("FlipInPlace"), code, into: code, attachTo: z.literal("picked").optional(), ...when }),
+  // With `entersPlay` the new side enters play: it hears "After X enters play" ("After Savage Counter-attack enters play", 09072:A:1; mec112.gollum-smeagol).
+  z.strictObject({ verb: z.literal("FlipInPlace"), code, into: code, attachTo: z.literal("picked").optional(), entersPlay: z.literal(true).optional(), ...when }),
   // "Search the Caves deck for a location and make it the active location. Shuffle the Caves deck" (19137:B:2): the actor chooses a card of the Caves deck, which becomes the active location (the one active now returns to the staging area) and hears that it did. The shuffle is the record's (ShufflePile).
   // Nothing happens with the Caves deck empty.
   z.strictObject({ verb: z.literal("ActivateFromCaves"), ...when }),

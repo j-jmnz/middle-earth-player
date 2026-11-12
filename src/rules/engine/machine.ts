@@ -64,6 +64,7 @@ import { announceCollected } from "../families/aflame/attack.ts";
 import { chooseLookDone, chooseShift, performSailing, sailingStep } from "../families/sea/sailing.ts";
 import { askingToCommit, askingToLook, askingToShift } from "../families/sea/sailing-legal.ts";
 import { askCurrentQuest } from "../families/wilderland/night.ts";
+import { phaseEnds } from "../families/angmar/phase.ts";
 
 export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let current = handoffEliminated(state);
@@ -201,6 +202,9 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
   if (state.pendingAttack?.defenseWaits) return openDefense(state, ctx);
   // The Responses to a shadow effect, or a shadow effect that asked a player, are done: the attack goes on.
   if (attackResumes(state)) return resolveAttack(state, ctx, steps);
+  // "End the current phase" (09070:A:1): once the effect has finished, the round goes to the end of the phase in progress.
+  const phaseOver = phaseEnds(state);
+  if (phaseOver) return phaseOver;
   switch (state.mode) {
     case "afterOpening": {
       // A Setup that waits for the opening hands (The One Ring: attach it to a hero, search the deck) resolves first.

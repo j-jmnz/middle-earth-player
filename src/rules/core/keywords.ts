@@ -3,6 +3,7 @@ import type { ModifierStat, ModifierUntil } from "../../catalog/boundary.ts";
 
 import type { Cause } from "./cause.ts";
 import { isGuarded, noteHostDefeated, releaseGuarded, textBlank } from "../families/attachments/hold.ts";
+import { keywordsKept } from "../families/angmar/blank.ts";
 import type { EngineStep } from "./intents.ts";
 import { cardTypeOf, fromEncounterDeck, isCharacterType, isLocationCard, isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
 import { queueEvent } from "../windows/queue.ts";
@@ -414,8 +415,8 @@ export function hasKeyword(state: ScenarioState, id: string, keyword: "sentinel"
   const instance = state.cards[id];
   if (!instance) return false;
   const printed = printedOf(cards, instance.code);
-  // A card whose printed text box is blank has none of its printed keywords; one gained from another source stays (rr.blank).
-  const blank = textBlank(state, id, cards);
+  // A card whose printed text box is blank has none of its printed keywords, unless a keepsKeywords modifier says they stay (09054:A:1); one gained from another source stays (rr.blank).
+  const blank = textBlank(state, id, cards) && !keywordsKept(state, id, cards);
   if (keyword === "doomed") return !blank && (printed.keywords.doomed ?? 0) > 0;
   if (keyword === "ranged" && flagged(state, id, "loseRanged")) return false;
   if (!blank && printed.keywords[keyword]) return true;

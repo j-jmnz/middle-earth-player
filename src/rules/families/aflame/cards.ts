@@ -17,7 +17,7 @@ import { moveCard } from "../../core/zones.ts";
 import { effectData, moveEncounter, setAsideNamed } from "../encounter/moves.ts";
 import { healBlocked } from "../burden/life.ts";
 import type { Focus } from "../index.ts";
-import { queueFront } from "../play/refs.ts";
+import { markPicked, queueFront } from "../play/refs.ts";
 import { aflameOf } from "./values.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
@@ -92,7 +92,8 @@ export function stageSetAside(state: ScenarioState, instruction: Verb<"StageSetA
   // A card set aside on its Campaign Mode only side (The Thing in the Depths, FlipSetAside) keeps that side as it joins the staging area.
   const side = state.cards[id]?.face === "B" ? "B" : null;
   const staged = moveEncounter(state, id, "staging", focus.seat, ctx, steps);
-  return side ? updateCard(staged, id, { face: side }) : staged;
+  const faced = side ? updateCard(staged, id, { face: side }) : staged;
+  return instruction.remember ? markPicked(faced, id) : faced;
 }
 
 /** RemoveNamedFromGame: the card in play with this title and each card attached to it leave the game, and nothing is announced as leaving play ("ignoring his 'leaves play' ability"). */

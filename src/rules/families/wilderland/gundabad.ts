@@ -107,12 +107,14 @@ function shuffleDeck(state: ScenarioState): ScenarioState {
 
 /**
  * FlipInPlace: the card in play with the code shows its other side `into`, where it lies, keeping its tokens and attachments; with `attachTo: "picked"` it then moves to the hero last picked (a hero any player controls), leaving the card it was attached to ("flip Wormsbane to its Reforged
- * side and attach it to any hero", 19122:A:3). Announced to the cards that hear a flip. The host then discards any Restricted attachment over its limit.
+ * side and attach it to any hero", 19122:A:3). Announced to the cards that hear a flip (and, with `entersPlay`, as entering play). The host then discards any Restricted attachment over its limit.
  */
 export function flipInPlace(state: ScenarioState, instruction: Verb<"FlipInPlace">, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const card = Object.values(state.cards).find((candidate) => candidate.code === instruction.code && inPlay(candidate.zone));
   if (!card) return state;
   let next = queueEvent(updateCard(state, card.id, { code: instruction.into, other: card.code }), { trigger: "flippedOver", seat: null, cardId: card.id });
+  // The card that enters play by the flip (09072:A:1, Savage Counter-attack) hears it as any card entering play does.
+  if (instruction.entersPlay) next = queueEvent(next, { trigger: "enteredPlay", seat: card.controller, cardId: card.id });
   const hostId = instruction.attachTo ? lastPicked(next) : "";
   const host = next.cards[hostId];
   if (!host || host.zone !== "heroes" || host.controller == null || card.host === hostId) return next;

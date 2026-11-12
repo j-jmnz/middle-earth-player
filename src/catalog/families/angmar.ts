@@ -30,6 +30,16 @@ const VERBS = [
   verbFlags(z.strictObject({ verb: z.literal("AttachNewTo"), code, to: z.string().min(1) }), { setupRole: "afterSetup" }),
   // Campaign Setup: starting with the first player, each player may place `damage` damage on the card with this code to add `resources` resource to each of their heroes' pools ("each player may place 4 damage on Protect the Innocent to add 1 resource to each of their heroes'
   // resource pools", 10156:A:2). The tokens are placed, not dealt: nothing cancels them, and a player may take the card to its limit. `seat` is engine use: the player whose turn it is.
+  // A constant marker on a quest stage ("The first Weather treachery card revealed each round gains surge", 09069:B:1): the first card with this Trait revealed in a round (from the encounter deck or by an effect) gains Surge as it is revealed (rr.surge).
+  z.strictObject({ verb: z.literal("FirstTraitSurge"), trait: z.string().min(1) }),
+  // The phase in progress ends once the effect that ends it has finished: the steps of the phase left are skipped and the next phase begins ("End the current phase", 09070:A:1; mec108.campaign-mode). In the quest phase the characters stay exhausted but are no longer committed and
+  // the quest is not resolved (as EndQuestPhase); in the combat phase the attacks left are not made.
+  z.strictObject({ verb: z.literal("EndPhase"), ...when }),
+  // Campaign Setup: the card in play with this code gets the damage the Campaign Log noted for it ("place damage on it equal to the amount of damage noted for it in the Campaign Log", 10159:A:2): the Protect the Innocent damage, 0 when none is noted.
+  verbFlags(z.strictObject({ verb: z.literal("PlaceLoggedDamageOn"), code }), { setupRole: "afterSetup" }),
+  // Starting with the first player, each player may choose 1 of the boons that are still set aside and attach it to a hero they control ("each player may choose 1 of the following boons and attach it to a hero they control", 10160:A:3): the player picks a boon or none, then the hero.
+  // A boon taken is not offered again. `seat` is engine use: the player whose turn it is.
+  z.strictObject({ verb: z.literal("ChooseBoon"), codes: z.array(code).min(1), seat: z.number().int().min(0).optional(), ...when }),
   verbFlags(z.strictObject({ verb: z.literal("TradeDamageForResources"), code, damage: z.number().int().positive(), resources: z.number().int().positive(), seat: z.number().int().min(0).optional() }), { setupRole: "afterSetup" }),
 ] as const;
 
@@ -45,6 +55,14 @@ const FLAGS = [
   "progressRemovesDamage",
   // On a card: it has the Surge keyword ("While there is only 1 quest card in play, Shrouded Hills gains surge", 09048:A:2): the reveal frame reads it as it reads the printed keyword (rr.surge; windows/frames.ts).
   "gainsSurge",
+  // On the table, until the end of the round: a card with the Trait a FirstTraitSurge names was revealed (the round's first has gained surge).
+  "traitRevealed",
+  // On the characters a blankText modifier holds (target `damagedCharacters`): their keywords stay although the rest of the printed text box is treated as blank ("except for keywords and Traits", 09054:A:1; rr.blank).
+  "keepsKeywords",
+  // On the table, until the end of the phase: an EndPhase ran, and the phase ends once the effect that ran it has finished (families/angmar/phase.ts).
+  "phaseEnds",
+  // On a hero (target `host`), until the end of the phase: its controller may play an attachment from their discard pile onto this hero, paying its cost; the play uses it up ("Play an attachment from your discard pile on attached hero", 10165:A:4; families/angmar/discard-play.ts).
+  "attachmentFromDiscard",
 ] as const;
 
 export const manifest = { name: "angmar", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

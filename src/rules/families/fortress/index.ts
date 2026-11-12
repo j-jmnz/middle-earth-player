@@ -3,7 +3,7 @@
 // becomes progress the first player places on the current quest instead of a threat raise. The core calls the hook (interpret/family-hooks.ts, familyQuestResult), not this file by name.
 import type { Condition, Instruction, PickSpec } from "../../../catalog/boundary.ts";
 
-import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
+import { frameScope, refCard, resolveAmount } from "../../interpret/amounts.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { QuestTotals, RulesFamily } from "../../interpret/family-manifest.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -28,11 +28,12 @@ function questResult(state: ScenarioState, totals: QuestTotals, cards: Cards, st
   return queueEvent({ ...placed, defensePlaced: onStage }, { trigger: "defenseQuestResolved", seat: null, subject: stageId });
 }
 
-// RemoveResourceTokens: up to `amount` tokens come off the card in play with this code.
+// RemoveResourceTokens: up to `amount` tokens come off the card in play with this code, or off the card the record picked (`on`).
 function removeTokens(state: ScenarioState, instruction: Extract<Instruction, { verb: "RemoveResourceTokens" }>, focus: Focus, ctx: ReduceContext): ScenarioState {
-  const card = Object.values(state.cards).find((candidate) => candidate.code === instruction.code && inPlay(candidate.zone));
-  if (!card) return state;
-  const amount = Math.min(card.resources, resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx));
+  const scope = frameScope(state, focus.seat, focus.sourceId);
+  const card = instruction.on != null ? state.cards[refCard(state, instruction.on, scope) ?? ""] : Object.values(state.cards).find((candidate) => candidate.code === instruction.code && inPlay(candidate.zone));
+  if (!card || !inPlay(card.zone)) return state;
+  const amount = Math.min(card.resources, resolveAmount(state, instruction.amount, scope, ctx));
   return amount > 0 ? updateCard(state, card.id, { resources: card.resources - amount }) : state;
 }
 
