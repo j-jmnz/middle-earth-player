@@ -178,4 +178,13 @@ describe("The Return of the King printed-text ledger", () => {
     expect([eyes("146044"), eyes("146050"), eyes("146054"), eyes("146046"), eyes("146058")]).toEqual([1, 2, 3, 0, 0]);
     expect(ledger.byKey.get(keyOf("146044", "A"))?.lines.some((line) => line.includes("("))).toBe(false);
   });
+
+  it("carries each card's Sauron's Eye icons into the catalog as keywords.eyeIcons, and Mount Doom's printed Immune", () => {
+    for (const [key, entry] of ledger.byKey) {
+      if (!key.endsWith(":A") || entry.eyeIcons == null) continue;
+      expect(byCode.get(entry.code)?.keywords?.eyeIcons, `${entry.code} ${key}`).toBe(entry.eyeIcons || undefined);
+    }
+    expect([byCode.get("146044")?.keywords?.eyeIcons, byCode.get("146054")?.keywords?.eyeIcons, byCode.get("146046")?.keywords?.eyeIcons]).toEqual([1, 3, undefined]);
+    expect(byCode.get("146043")?.keywords?.immune).toBe(true);
+  });
 });

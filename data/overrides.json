@@ -1044,6 +1044,18 @@
     },
     {
       "match": {
+        "code": "146043"
+      },
+      "set": {
+        "keywords": {
+          "immune": true
+        }
+      },
+      "reason": "Mount Doom prints \"Immune to player card effects.\" as its first sentence; Hall of Beorn lists no keyword for it, so the engine would read no immunity.",
+      "source": "scan 146043.A (data/printed/the-return-of-the-king.json)"
+    },
+    {
+      "match": {
         "code": "146071"
       },
       "set": {

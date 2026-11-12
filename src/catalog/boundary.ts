@@ -80,6 +80,8 @@ export const printedKeywordsSchema = z.strictObject({
   // Not a keyword but a printed mark, kept here with the rule flags: the Sailing success symbols an encounter card prints in the bottom left
   // corner of its text box, read from the scan into the ledger (dcce.sailing-tests). Absent when the card prints none.
   sailingSuccess: z.number().int().positive().optional(),
+  // Also a printed mark: the Sauron's Eye icons an encounter card prints in the bottom left corner of its text box, which a Fortitude test counts when the card is discarded for it (mec113.fortitude-tests, src/rules/families/mount-doom/). Absent when the card prints none.
+  eyeIcons: z.number().int().positive().optional(),
   // Not a keyword either: the location prints X for its quest points (`quest` stays null), and a constant record sets them (Hills of Wilderland, Underground Lake): the engine lets it take progress and be explored.
   questPointsX: z.boolean().optional(),
 });
