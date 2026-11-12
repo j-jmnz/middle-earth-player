@@ -126,6 +126,26 @@ export function FireMarkView({ rect, mark, fonts, images, t, s }: { rect: Rect; 
   return <FootPill rect={rect} image={images.damage} icon="damage" value={mark.text} danger={mark.danger} lift={false} fonts={fonts} t={t} s={s} />;
 }
 
+/**
+ * The current quest among the side quests in the staging area: a small accent pill with the word "Current" at the card's top edge, upright, clear of the damage token's corner and the effect pills down the left edge
+ * (mec108.side-quests-in-play). The preview and the screen reader's line say what it means.
+ */
+export function CurrentQuestMark({ rect, fonts, t, s }: { rect: Rect; fonts: Fonts; t: TableTokens; s: number }) {
+  const { x, y, w } = rect;
+  const pill = BADGE_H * s;
+  const text = "Current";
+  const width = Math.min(fonts.badge.getTextWidth(text) + 10 * s, w - 4 * s);
+  const left = x + (w - width) / 2;
+  const top = y - pill / 2;
+  return (
+    <Group>
+      <RoundedRect x={left} y={top} width={width} height={pill} r={pill / 2} color={t.accent} />
+      <RoundedRect x={left} y={top} width={width} height={pill} r={pill / 2} color={t.night} style="stroke" strokeWidth={1 * s} />
+      <Text x={left + (width - fonts.badge.getTextWidth(text)) / 2} y={top + 11.5 * s} text={text} font={fonts.badge} color={t.onAccent} />
+    </Group>
+  );
+}
+
 /** A Ship location's Threat against the total that loses the game at stage 3 ("8/9"): the Threat icon and the count on a pill at the card's foot, threat red at the total (12041:B:2). */
 export function ShipLossView({ rect, mark, fonts, t, s }: { rect: Rect; mark: { text: string; danger: boolean }; fonts: Fonts; t: TableTokens; s: number }) {
   return <FootPill rect={rect} image={null} icon="threat" value={mark.text} danger={mark.danger} lift={false} fonts={fonts} t={t} s={s} />;

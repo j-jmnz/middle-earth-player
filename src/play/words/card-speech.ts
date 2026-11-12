@@ -96,7 +96,7 @@ function damageWords(game: ScenarioState, card: CardInstance, printed: PrintedCa
     const points = modifiedStat(game, card, "hitPoints", deps.cards);
     return card.damage > 0 ? `${card.damage} damage of ${points} hit points` : `${points} hit points`;
   }
-  return card.damage > 0 && info.fire == null ? plural(card.damage, "damage", "damage") : null;
+  return card.damage > 0 && info.fire == null && info.side?.loses == null ? plural(card.damage, "damage", "damage") : null;
 }
 
 // The names of the cards attached to this one; a card the table keeps facedown is not named.
@@ -154,6 +154,8 @@ function labelOf(game: ScenarioState, seat: number, card: CardInstance, deps: Ca
     else if (card.progress > 0 && !island) parts.push(`${card.progress} progress`);
   }
   if (info.fire) parts.push(`Aflame ${info.fire.text}${info.fire.danger ? ", one more damage destroys it" : ""}`);
+  if (info.side?.current) parts.push("the current quest");
+  if (info.side?.loses) parts.push(`${info.side.loses.speech}${info.side.loses.danger ? ", one more damage loses the game" : ""}`);
   parts.push(...statWords(game, card, printed, deps, info));
   // A card not yet in play says what it costs.
   if (card.zone === "hand" || card.zone === "discard" || card.zone === "deck") {

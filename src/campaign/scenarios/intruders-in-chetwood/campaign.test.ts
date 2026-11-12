@@ -1,4 +1,4 @@
-// Rules: mec108.campaign-setup-intruders-in-chetwood, mec108.setup-intruders-in-chetwood, mec108.campaign-log-tracking, ltp.campaign-setup-checklist, rr.winning-the-game (data/rules/entries.json); ledger lines 10156:A:1, 10156:A:2 and 10156:B:1.
+// Rules: mec108.campaign-setup-intruders-in-chetwood, mec108.setup-intruders-in-chetwood, mec108.campaign-log-tracking, ltp.campaign-setup-checklist, rr.winning-the-game (data/rules/entries.json); ledger lines 10156:A:2 and 10156:B:1.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { updateCard } from "../../../rules/core/state.ts";

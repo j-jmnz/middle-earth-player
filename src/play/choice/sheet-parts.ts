@@ -53,6 +53,28 @@ export function stagedAllyLabel(game: ScenarioState, ctx: ReduceContext, names: 
   return owners.size > 1 ? `${names.card(id)} · Player ${card.owner + 1}'s ally` : undefined;
 }
 
+/** The seat a card of a pick belongs to: the player an enemy is engaged with, or the player who controls a character in play. Null when it belongs to no seat. */
+function seatOfCard(game: ScenarioState, id: string): number | null {
+  const card = game.cards[id];
+  if (!card) return null;
+  if (card.zone === "engaged") return game.seats.findIndex((seat) => seat.engaged.includes(id));
+  return card.zone === "play" || card.zone === "heroes" ? card.controller : null;
+}
+
+/**
+ * The row of a card in a pick of Intruders in Chetwood whose options belong to more than one player (Borders of Bree-land's enemy, Angmar Orc's ally): the owner is named on each row, "Angmar Orc \u00b7 engaged with Player 2",
+ * "Gimli \u00b7 Player 1's ally". Undefined for any other row, and in a game with one seat or none of the side quest rules.
+ */
+export function seatedLabel(game: ScenarioState, ctx: ReduceContext, names: SheetNames, id: string, options: readonly string[]): string | undefined {
+  if (game.sideQuests !== true || game.seatCount < 2) return undefined;
+  const seat = seatOfCard(game, id);
+  if (seat == null || seat < 0) return undefined;
+  const seats = new Set(options.map((other) => seatOfCard(game, other)).filter((other) => other != null && other >= 0));
+  if (seats.size < 2) return undefined;
+  const type = printedOf(ctx.cards, game.cards[id]?.code ?? "").type;
+  return type === "enemy" ? `${names.card(id)} \u00b7 engaged with Player ${seat + 1}` : `${names.card(id)} \u00b7 Player ${seat + 1}'s ${type === "hero" ? "hero" : type === "attachment" ? "attachment" : "ally"}`;
+}
+
 export function option(game: ScenarioState, names: SheetNames, id: string): SheetOption {
   if (id.startsWith("seat:")) return { id, label: `Player ${Number(id.slice(5)) + 1}`, code: null };
   // The staging area, where a Trap or a Guarded attachment is played (src/rules/families/attachments/play.ts).

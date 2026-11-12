@@ -28,6 +28,7 @@ import { engagesAt } from "../store/foresight.ts";
 import type { IconName } from "../../ui/icon-map.ts";
 import { stagePoints } from "../readouts/objective.ts";
 import { stageDefeatLoses } from "../readouts/fortress.ts";
+import { sideQuestMark, stagedSideQuest, type SideQuestMark } from "./side-quest-mark.ts";
 
 export type BadgeStat = "willpower" | "attack" | "defense" | "hitPoints" | "threat" | "questPoints" | "engagementCost";
 
@@ -248,7 +249,7 @@ function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, 
   const card = game.cards[cardId];
   const effects = cardEffects(game, ctx, cardId);
   // The Stormcaller's current quest stage wears the strip a quest card does (dcce.stormcallers-area).
-  const questing = card != null && (card.zone === "questStage" || card.zone === "activeLocation" || card.zone === "secondActiveLocation" || card.zone === "seatQuest" || areaRoleOf(game, cardId) === "stage");
+  const questing = card != null && (stagedSideQuest(game, ctx, cardId) || card.zone === "questStage" || card.zone === "activeLocation" || card.zone === "secondActiveLocation" || card.zone === "seatQuest" || areaRoleOf(game, cardId) === "stage");
   const enemy = card != null && card.zone === "staging" && card.face !== "down" && printedOf(ctx.cards, card.code).type === "enemy";
   const cost = enemy ? engagementCostOf(game, card, ctx.cards) : null;
   return {
@@ -266,6 +267,7 @@ function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, 
     // A Ship location while the stage that loses at a total Threat of 9 is in play: its Threat against that total (12041:B:2).
     loss: card != null && inPlay(card.zone) ? shipLoss(game, ctx, cardId) : null,
     place: card?.zone === "staging" ? stagingPlace(game, cardId) : null,
+    side: sideQuestMark(game, ctx, cardId),
     combat: card != null ? combatNumber(game, ctx, card) : null,
   };
 }
@@ -331,6 +333,8 @@ export type SlotNumbers = {
   loss: ShipLoss | null;
   // A location of the Island Map in the staging area: its place on the map and the marker's, drawn as the 5 × 3 glyph (island-place.ts).
   place: PlaceMark | null;
+  // An encounter side quest in the staging area: the current-quest mark, and its damage against the number that loses the game (side-quest-mark.ts).
+  side: SideQuestMark | null;
   // In the enemy attacks step: an engaged enemy's attack or a character's defense, drawn at the card's foot (combatNumber).
   combat: CombatNumber | null;
 };
