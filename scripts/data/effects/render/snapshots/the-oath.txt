@@ -6,7 +6,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 41001:A:1 (front): Setup: Search the encounter deck for 1 copy of The Eaves of Mirkwood and Goblin Troop. Add The Eaves of Mirkwood to the staging area and set Goblin Troop aside, out of play. Shuffle the encounter deck.
   41001:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the set-aside card with code 41010 is added to the staging area
+    - the card with code 41010 is added to the staging area (the copy a Setup search found, else one the Setup deals)
     - [json SetAside {"verb":"SetAside","code":"41019"}]
     - shuffle the encounter deck
 
@@ -306,7 +306,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
   41050:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json ChooseCards {"verb":"ChooseCards","codes":["41044","41045","41046","41047"],"who":"eachSeat","to":"hero"}]
-    - the set-aside card with code 41041 is shuffled into the encounter deck
+    - a card with code 41041 from the box joins the encounter deck, which is shuffled
     - the card with code 41041 is added to the Campaign Pool
 
 41050:A:3 (front): Response: At the end of each round, place 1 resource token here.

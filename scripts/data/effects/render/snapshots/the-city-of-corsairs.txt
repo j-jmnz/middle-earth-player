@@ -41,7 +41,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
     - [json SetAside {"verb":"SetAside","code":"11213"}]
     - [json SetAside {"verb":"SetAside","code":"11214"}]
     - [json SetAside {"verb":"SetAside","code":"11216"}]
-    - the set-aside card with code 11177 is shuffled into the encounter deck
+    - a card with code 11177 from the box joins the encounter deck, which is shuffled
     - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Stormcaller"}]
     - [json FitShips {"verb":"FitShips","codes":["11172","11173","11174","11175"]}]
@@ -64,7 +64,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
     - [json SetAside {"verb":"SetAside","code":"11213"}]
     - [json SetAside {"verb":"SetAside","code":"11214"}]
     - [json SetAside {"verb":"SetAside","code":"11216"}]
-    - the set-aside card with code 11177 is shuffled into the encounter deck
+    - a card with code 11177 from the box joins the encounter deck, which is shuffled
     - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Stormcaller"}]
     - [json FitShips {"verb":"FitShips","codes":["11172","11173","11174","11175"]}]

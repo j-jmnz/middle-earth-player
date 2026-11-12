@@ -259,8 +259,8 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 18071:A:1 (front): Setup: Set the Spiders of Mirkwood and Dol Guldur Orcs encounter sets aside, out of play. The first player takes control of Haldan and adds Searching for a Way Out to the staging area. Each player adds 1 Forest Spider to the staging area. Shuffle the encounter deck.
   18071:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the set-aside card with code 18028 is added to the staging area
-    - the set-aside card with code 01096 is added to the staging area
+    - the card with code 18028 is added to the staging area (the copy a Setup search found, else one the Setup deals)
+    - the card with code 01096 is added to the staging area (the copy a Setup search found, else one the Setup deals)
     - shuffle the encounter deck
   18071:setup:2: Setup
     - [json TakeControlOfSetAside {"verb":"TakeControlOfSetAside","code":"18070"}]

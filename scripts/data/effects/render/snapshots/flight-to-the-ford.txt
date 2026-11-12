@@ -10,8 +10,8 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
     - [json AttachToRingBearer {"verb":"AttachToRingBearer","code":"141057"}]
     - [json SetAside {"verb":"SetAside","code":"141059"}]
     - [json SetAside {"verb":"SetAside","code":"141068"}]
-    - the set-aside card with code 141058 is added to the staging area
-    - the set-aside card with code 141063 is added to the staging area
+    - the card with code 141058 is added to the staging area (the copy a Setup search found, else one the Setup deals)
+    - the card with code 141063 is added to the staging area (the copy a Setup search found, else one the Setup deals)
     - [json SetLife {"verb":"SetLife","value":15}]
     - shuffle the encounter deck
 

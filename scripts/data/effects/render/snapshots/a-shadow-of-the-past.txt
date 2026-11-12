@@ -21,7 +21,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
   141022:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json SetAside {"verb":"SetAside","code":"141035"}]
-    - the set-aside card with code 141039 is added to the staging area
+    - the card with code 141039 is added to the staging area (the copy a Setup search found, else one the Setup deals)
     - [json MakeActiveLocation {"verb":"MakeActiveLocation","code":"141031"}]
     - shuffle the encounter deck
 
@@ -81,9 +81,9 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
   141030:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json AttachToRingBearer {"verb":"AttachToRingBearer","code":"141017"}]
-    - the set-aside card with code 141078 is added to the staging area
-    - the set-aside card with code 141077 is shuffled into the encounter deck
-    - the set-aside card with code 141079 is shuffled into the encounter deck
+    - the card with code 141078 is added to the staging area (the copy a Setup search found, else one the Setup deals)
+    - a card with code 141077 from the box joins the encounter deck, which is shuffled
+    - a card with code 141079 from the box joins the encounter deck, which is shuffled
 
 141030:B:1 (back): Resolution: Choose Gandalf's Delay or The Ring Draws Them and add it to the Campaign Pool. Then, choose Gildor Inglorion or Mr. Underhill and add it to the Campaign Pool. The chosen cards have been earned by the players.
   141030:resolution:1: Resolution
@@ -353,7 +353,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141078:A:1 (front): Setup: Add Gandalf's Delay to the staging area.
   141078:setup:1: Setup
-    - the set-aside card with code 141078 is added to the staging area
+    - the card with code 141078 is added to the staging area (the copy a Setup search found, else one the Setup deals)
 
 141078:A:2 (front): Each player draws 1 less card in his starting hand.
   141078:setup:2: Setup

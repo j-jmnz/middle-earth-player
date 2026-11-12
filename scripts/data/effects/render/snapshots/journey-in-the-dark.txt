@@ -337,7 +337,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 
 142087:A:1 (front): Setup: Add Overcome by Grief to the staging area.
   142087:setup:1: Setup
-    - the set-aside card with code 142087 is added to the staging area
+    - the card with code 142087 is added to the staging area (the copy a Setup search found, else one the Setup deals)
 
 142087:A:2 (front): Forced: After a character is destroyed, if Overcome by Grief is unattached, attach to a hero. (Counts as a Condition attachment with the text: "Forced: After a character you control is destroyed, exhaust attached hero. Until the end of the round, attached hero cannot ready.")
   142087:forced:1: Forced on the event characterDestroyed
@@ -355,7 +355,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 
 142088:A:1 (front): Setup: Add Grievous Wound to the staging area.
   142088:setup:1: Setup
-    - the set-aside card with code 142088 is added to the staging area
+    - the card with code 142088 is added to the staging area (the copy a Setup search found, else one the Setup deals)
 
 142088:A:2 (front): Forced: After a hero takes damage, if Grievous Wound is unattached, attach to that hero. (Counts as a Condition attachment with the text: "Forced: After attached hero exhausts, deal 1 damage to it.")
   142088:forced:1: Forced after a card takes damage (heard about hero (any player controls))

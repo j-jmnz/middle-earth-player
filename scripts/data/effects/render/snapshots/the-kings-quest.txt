@@ -11,7 +11,7 @@ Scenario piles that place cards with no record (quest: 18078 The Iron Hills; que
     - [json WaiveThreatPenalty {"verb":"WaiveThreatPenalty"}]
     - [json PutObjectiveAllyIntoPlay {"verb":"PutObjectiveAllyIntoPlay","code":"12171"}]
     - [json AddToStagingWithResources {"verb":"AddToStagingWithResources","code":"12172","amount":{"part":true}}]
-    - the set-aside card with code 12173 is shuffled into the encounter deck
+    - a card with code 12173 from the box joins the encounter deck, which is shuffled
     - [json ShuffleIntoPile {"verb":"ShuffleIntoPile","pile":"caves","code":"12174","placed":true}]
     - if the Campaign Log holds "turayn": remove 3 treacheries from the encounter deck
 

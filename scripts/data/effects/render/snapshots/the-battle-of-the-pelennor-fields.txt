@@ -353,7 +353,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 
 145062:A:1 (front): Setup: Add Wraith on Wings to the staging area.
   145062:setup:1: Setup
-    - the set-aside card with code 145062 is added to the staging area
+    - the card with code 145062 is added to the staging area (the copy a Setup search found, else one the Setup deals)
 
 145062:A:2 (front): Cannot have non-Morgul attachments.
   145062:constant:1: Constant
@@ -495,7 +495,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 145077:A:1 (front): When Revealed: The first player adds The Witch-king to the staging area (Sorcerer side faceup). Then, he searches the encounter deck and discard pile for a Fell Beast and attaches it to The Witch-king, if able. Shuffle the encounter deck. Each other player reveals an encounter card.
   145077:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the set-aside card with code 145080 is added to the staging area
+    - the card with code 145080 is added to the staging area (the copy a Setup search found, else one the Setup deals)
     - [json AttachSearched {"verb":"AttachSearched","type":"treachery","trait":"Morgul","to":"The Witch-king","name":"Fell Beast"}]
     - shuffle the encounter deck
     - for each player, first player first:

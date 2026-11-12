@@ -9,9 +9,9 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
   12189:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json WaiveThreatPenalty {"verb":"WaiveThreatPenalty"}]
-    - the set-aside card with code 12190 is shuffled into the encounter deck
-    - the set-aside card with code 12191 is shuffled into the encounter deck
-    - the set-aside card with code 12192 is shuffled into the encounter deck
+    - a card with code 12190 from the box joins the encounter deck, which is shuffled
+    - a card with code 12191 from the box joins the encounter deck, which is shuffled
+    - a card with code 12192 from the box joins the encounter deck, which is shuffled
     - [json SearchBoonAllyToHand {"verb":"SearchBoonAllyToHand"}]
     - if the Campaign Log holds "isolde": remove 3 treacheries from the encounter deck
     - if the Campaign Log holds "beldis": remove 3 non-unique locations from the encounter deck

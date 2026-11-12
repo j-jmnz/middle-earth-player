@@ -49,7 +49,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
     - [json SetAside {"verb":"SetAside","code":"11175"}]
     - [json SetAside {"verb":"SetAside","code":"11192"}]
     - [json SetAside {"verb":"SetAside","code":"11193"}]
-    - the set-aside card with code 11177 is shuffled into the encounter deck
+    - a card with code 11177 from the box joins the encounter deck, which is shuffled
     - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
     - [json FlipStormcaller {"verb":"FlipStormcaller"}]
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Stormcaller"}]

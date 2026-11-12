@@ -409,7 +409,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     - [json SetAside {"verb":"SetAside","code":"11180"}]
     - [json SetAside {"verb":"SetAside","code":"11183"}]
     - [json PutObjectiveAllyIntoPlay {"verb":"PutObjectiveAllyIntoPlay","code":"110013"}]
-    - the set-aside card with code 11188 is shuffled into the encounter deck
+    - a card with code 11188 from the box joins the encounter deck, which is shuffled
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11180","to":"Calphon"}]
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11183","to":"Calphon"}]
     - [json ChooseCards {"verb":"ChooseCards","codes":["11184","11185","11186","11187"],"who":"eachSeat","to":"hand","optional":true,"unearned":true,"afterMulligan":true}]

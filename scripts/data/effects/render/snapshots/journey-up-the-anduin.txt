@@ -9,7 +9,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
   120165:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json PutObjectiveAllyIntoPlay {"verb":"PutObjectiveAllyIntoPlay","code":"12166"}]
-    - the set-aside card with code 12167 is shuffled into the encounter deck
+    - a card with code 12167 from the box joins the encounter deck, which is shuffled
 
 120165:A:3 (front): Response: After you explore a non-unique location, put a resource here. Then, if there are X resources here, the players look at 3 random undiscovered treasures and choose 1 to attach to an eligible character. X is 3 more than the number of players in the game.
   120165:response:1: Response on the event locationExplored (heard about non-unique location (any player controls))

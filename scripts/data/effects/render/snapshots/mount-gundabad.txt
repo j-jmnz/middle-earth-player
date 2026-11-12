@@ -8,7 +8,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 12193:A:2 (front): Setup: If there are 6 or more treasures recorded in the campaign log, shuffle Dragon-sickness into the encounter deck. A player may search their deck for a unique boon ally and add it to their hand. If "Melanwar has given you guidance on traversing Wilderland," search the encounter deck for 2 non-unique locations and the Caves deck for 1 location and remove them from the game. If "Beldis's care has bolstered the heroes' spirits," search the encounter deck for 3 treacheries and remove them from the game. Flip this card.
   12193:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - if [json condition {"kind":"treasuresLogged","min":6}]: the set-aside card with code 12194 is shuffled into the encounter deck
+    - if [json condition {"kind":"treasuresLogged","min":6}]: a card with code 12194 from the box joins the encounter deck, which is shuffled
     - [json SearchBoonAllyToHand {"verb":"SearchBoonAllyToHand"}]
     - if the Campaign Log holds "melanwar": remove 2 non-unique locations from the encounter deck
     - [json RemoveFromCavesIfLogged {"verb":"RemoveFromCavesIfLogged","line":"melanwar","count":1,"cardType":"location"}]

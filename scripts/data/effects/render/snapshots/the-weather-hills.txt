@@ -307,8 +307,8 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
   10159:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the card with code 10160 is added to the Campaign Pool
-    - the set-aside card with code 10160 is shuffled into the encounter deck
-    - the set-aside card with code 10158 is added to the staging area
+    - a card with code 10160 from the box joins the encounter deck, which is shuffled
+    - the card with code 10158 is added to the staging area (the copy a Setup search found, else one the Setup deals)
     - the card with code 10158 in play gets the damage the Campaign Log noted for Protect the Innocent (none when it noted none)
 
 10159:B:1 (back): Resolution: Note the amount of damage on Protect the Innocent in the Campaign Log (replacing the previous number).
@@ -403,7 +403,7 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
     only if all of: (there is a damaged hero (you control) that this card is attached to to choose) and (there is a enemy (any player controls) engaged with you to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose damaged hero (you control) that this card is attached to
-    - the acting player chooses X, from 1 to the most the picked card allows [also {"max":[{"stat":"damage","of":"picked"}]}]
+    - the acting player chooses X, from 1 to damage of the picked card
     - choose enemy (any player controls) engaged with you
     - move X damage from the card picked before the last to the last picked card
 
@@ -425,4 +425,4 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
     only if it is the Planning phase
     - its host: stat attachmentFromDiscard 1, until the end of the phase
 
-(rendered pieces: 237 by template, 1 as JSON)
+(rendered pieces: 239 by template, 0 as JSON)

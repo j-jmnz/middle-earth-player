@@ -9,6 +9,9 @@ type Made = { text: string; read: readonly string[]; children?: readonly Obj[] }
 type Template = (ins: Obj, ctx: Ctx) => Made | null;
 
 const amount = (value: unknown, ctx: Ctx): string => renderAmount(value, ctx, renderPick);
+
+// The most ChooseX allows: its one amount, or the least of several (the engine takes the smallest of `max`).
+const chooseXMost = (max: unknown, ctx: Ctx): string => (Array.isArray(max) ? (max.length === 1 ? amount(max[0], ctx) : `the least of ${joinAnd(max.map((one) => amount(one, ctx)))}`) : "?");
 const pick = (value: unknown, ctx: Ctx): string => renderPick(value, ctx);
 const WHO: Readonly<Record<string, string>> = { actor: "the acting player", firstPlayer: "the first player", picked: "the picked player", eventSeat: "the player the event is about", eachSeat: "each player", defendingPlayer: "the defending player (the player this enemy is engaged with)" };
 const who = (value: unknown): string => WHO[str(value)] ?? str(value);
@@ -185,13 +188,13 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   RevealMore: (i) => ({ text: `reveal ${str(i.amount)} additional encounter card(s) in the staging step this phase`, read: ["amount"] }),
   FlipInPlace: (i) => ({ text: `the card with code ${str(i.code)} in play is flipped to the card with code ${str(i.into)}, where it lies, with its tokens and attachments${i.attachTo === "picked" ? ", and moves to the last picked hero" : ""}${i.entersPlay === true ? "; the new side enters play" : ""}`, read: ["code", "into", "attachTo", "entersPlay"] }),
   AddToPool: (i) => ({ text: `the card with code ${str(i.code)} is added to the Campaign Pool${i.eachPlayer === true ? " (a copy for each player)" : ""}`, read: ["code", "eachPlayer"] }),
-  ShuffleIntoEncounterDeck: (i) => ({ text: `the set-aside card with code ${str(i.code)} is shuffled into the encounter deck`, read: ["code"] }),
-  AddToStaging: (i) => ({ text: `the set-aside card with code ${str(i.code)} is added to the staging area`, read: ["code"] }),
+  ShuffleIntoEncounterDeck: (i) => ({ text: `a card with code ${str(i.code)} from the box joins the encounter deck, which is shuffled`, read: ["code"] }),
+  AddToStaging: (i) => ({ text: `the card with code ${str(i.code)} is added to the staging area (the copy a Setup search found, else one the Setup deals)`, read: ["code"] }),
   RecordDamageOn: (i) => ({ text: `note the damage on the card${Array.isArray(i.codes) && i.codes.length > 1 ? "s" : ""} with code ${Array.isArray(i.codes) ? joinAnd(i.codes.map(str)) : "?"} in the Campaign Log (replacing the previous number)`, read: ["codes"] }),
   EarnAttached: (i) => ({ text: `each copy of ${Array.isArray(i.codes) ? joinAnd(i.codes.map((code) => `code ${str(code)}`)) : "?"} attached to a hero in play joins the Campaign Pool attached to that hero`, read: ["codes"] }),
   RemoveFromCampaignPool: () => ({ text: "this card is removed from the Campaign Pool", read: [] }),
   CancelDamage: (i, ctx) => ({ text: i.all === true ? "cancel all of the damage just dealt" : `cancel up to ${i.amount === undefined ? "1" : amount(i.amount, ctx)} point(s) of the damage just dealt${i.target === undefined ? "" : ` to ${cardRef(i.target)}`}`, read: ["amount", "all", "target"] }),
-  ChooseX: (i) => ({ text: `the acting player chooses X, from ${str(i.min)} to the most the picked card allows`, read: ["min"] }),
+  ChooseX: (i, ctx) => ({ text: `the acting player chooses X, from ${i.min === undefined ? "1" : str(i.min)} to ${chooseXMost(i.max, ctx)}`, read: ["min", "max"] }),
   MoveDamage: (i, ctx) => ({ text: `move ${i.all === true ? "all" : amount(i.amount, ctx)} damage from the card picked before the last to the last picked card`, read: ["amount", "all"] }),
   TakeLoggedCaptives: (i) => ({ text: `each seat the Campaign Log names a Captive for has that hero lie faceup under the card with code ${str(i.under)}`, read: ["under"] }),
   MakeCaptive: (i) => ({ text: `the picked hero becomes a Captive: it lies faceup under the card with code ${str(i.under)}, in play and controlled by no one`, read: ["under"] }),

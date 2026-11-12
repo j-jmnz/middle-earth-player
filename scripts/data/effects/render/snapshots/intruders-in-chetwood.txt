@@ -303,7 +303,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 10156:A:2 (front): Setup: Attach Iârion's Pendant to Iârion and add the Protect the Innocent side quest to the staging area. Starting with the first player, each player may place 4 damage on Protect the Innocent to add 1 resource to each of their heroes' resource pools.
   10156:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the set-aside card with code 10158 is added to the staging area
+    - the card with code 10158 is added to the staging area (the copy a Setup search found, else one the Setup deals)
     - a copy of the card with code 10157 from the supply is put into play attached to the card titled "Iârion"
     - starting with the first player, each player may place 4 damage on the card with code 10158 to add 1 resource to each of their heroes' pools
 

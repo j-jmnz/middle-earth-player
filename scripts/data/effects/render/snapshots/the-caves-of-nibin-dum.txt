@@ -127,7 +127,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
     only if all of: (the card with code 41029 in play is ready) and (there is a Dark location (any player controls) to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - exhaust this card
-    - the acting player chooses X, from undefined to the most the picked card allows [also {"max":[3]}]
+    - the acting player chooses X, from 1 to 3
     - choose Dark location (any player controls)
     - place X progress on the picked card
 
@@ -299,7 +299,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json AddToHandAfterMulligan {"verb":"AddToHandAfterMulligan","code":"41048"}]
     - the card with code 41048 is added to the Campaign Pool (a copy for each player)
-    - the set-aside card with code 41042 is shuffled into the encounter deck
+    - a card with code 41042 from the box joins the encounter deck, which is shuffled
     - the card with code 41042 is added to the Campaign Pool
 
 41051:B:1 (back): Resolution: Check the final threat of the player with the highest threat: If it is under 40, you have rescued a retired Ranger who shares his wisdom with you. Each player may add 1 copy of Ranger Sense to their deck and to the Campaign Pool. At the start of your next campaign, each player may also shuffle 1 copy of Ranger Sense into their deck and add it to the Campaign Pool.
@@ -308,4 +308,4 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
     - [json Earn {"verb":"Earn","codes":["41049"],"eachPlayer":true,"when":{"kind":"highestThreat","max":39}}]
     - [json CarryOver {"verb":"CarryOver","codes":["41049"],"eachPlayer":true,"when":{"kind":"highestThreat","max":39}}]
 
-(rendered pieces: 154 by template, 32 as JSON)
+(rendered pieces: 155 by template, 31 as JSON)

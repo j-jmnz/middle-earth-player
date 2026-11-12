@@ -70,8 +70,8 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
     - [json SetAside {"verb":"SetAside","code":"141048"}]
     - [json SetAside {"verb":"SetAside","code":"141068"}]
     - [json SetAside {"verb":"SetAside","code":"141069"}]
-    - the set-aside card with code 141045 is added to the staging area
-    - the set-aside card with code 141051 is added to the staging area
+    - the card with code 141045 is added to the staging area (the copy a Setup search found, else one the Setup deals)
+    - the card with code 141051 is added to the staging area (the copy a Setup search found, else one the Setup deals)
     - shuffle the encounter deck
 
 141025:B:1 (back): The players cannot advance while The Prancing Pony is in play.

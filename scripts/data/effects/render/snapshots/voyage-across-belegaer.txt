@@ -695,8 +695,8 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
     - [json SetAside {"verb":"SetAside","code":"11173"}]
     - [json SetAside {"verb":"SetAside","code":"11174"}]
     - [json SetAside {"verb":"SetAside","code":"11175"}]
-    - the set-aside card with code 11176 is shuffled into the encounter deck
-    - the set-aside card with code 11177 is shuffled into the encounter deck
+    - a card with code 11176 from the box joins the encounter deck, which is shuffled
+    - a card with code 11177 from the box joins the encounter deck, which is shuffled
     - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
     - [json FitShips {"verb":"FitShips","codes":["11172","11173","11174","11175"]}]
     - [json TradeShipDamage {"verb":"TradeShipDamage","damage":2,"resources":1}]
