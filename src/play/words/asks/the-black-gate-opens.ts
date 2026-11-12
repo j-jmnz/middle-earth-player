@@ -1,23 +1,20 @@
 import type { Amount } from "../../../catalog/boundary.ts";
 import type { Ask } from "../asks.ts";
+import { DESTROYED_BY, ELIMINATED as ELIMINATED_WHEN, type When } from "../asks-conditions.ts";
 
 // The choice words of The Black Gate Opens (the-return-of-the-king part 5), one entry for each Pick and Choose of its records: `<record id> @<instruction path> <verb | option id>` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
 // `pnpm test scenario the-black-gate-opens --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=the-black-gate-opens` prints each sentence.
 // What can lose the game says so on the row: Aragorn destroyed by the damage (mec113.multiplayer-aragorn: if he leaves play the players lose), and a threat raise that takes a player to 99 (the elimination level under Dire, mec113.dire), which ends the scenario when it is the last
 // player: in Campaign Mode that end runs the campaign card's Resolution (the Black Gate's resources go to Mount Doom), standalone it is a loss. A pick for the whole table (the first player chooses) leads with the first player.
-type When = NonNullable<Ask["caution"]>["when"];
 const GATE_TOKENS: Amount = { stat: "resources", ofNamed: "The Black Gate" };
 const CHARACTERS: Amount = { count: { type: "character", control: "you" } };
 // The picked character is Aragorn, whose leaving play loses the game.
 const ARAGORN: When = { kind: "matches", card: "picked", pick: { type: "hero", control: "any", names: ["Aragorn"] } };
-// The picked character would be destroyed by `damage` more damage: its hit points are less than its damage plus that damage plus 1.
-const DESTROYED_BY = (damage: number): When => ({ kind: "less", left: { stat: "hitPoints", of: "picked" }, right: { stat: "damage", of: "picked", plus: damage + 1 } });
 const ARAGORN_DESTROYED_BY = (damage: number): When => ({ kind: "all", conditions: [ARAGORN, DESTROYED_BY(damage)] }) as When;
 const LOSES_ARAGORN = "Tap again: the damage destroys {picked}, and the players lose the game";
 // The raise takes the player to the elimination level, 99 under Dire or more: the end of the scenario when it is the last player. `raise` is a number or an amount read now (The Hour of Doom's characters); the Black Gate's resources are `{tokens}`.
 const ELIMINATED = (raise: number | Amount): { when: When; text: NonNullable<Ask["caution"]>["text"] } => ({
-  // Threat plus the raise is 99 or more: 98 less the threat is less than the raise.
-  when: (typeof raise === "number" ? { kind: "threat", min: 99 - raise } : { kind: "less", left: { threat: "actor", times: -1, plus: 98 }, right: raise }) as When,
+  when: ELIMINATED_WHEN(raise),
   text: [
     { when: { kind: "inPlay", code: "146074", is: true } as When, text: "Tap again: this takes your threat to 99 or more and eliminates you. If you are the last player the scenario ends, and the resources on The Black Gate ({tokens} now) go to Mount Doom" },
     { text: "Tap again: this takes your threat to 99 or more and eliminates you. If you are the last player, the game is lost" },

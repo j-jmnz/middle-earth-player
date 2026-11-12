@@ -6,11 +6,10 @@ import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
-import { livingSeats, type ScenarioState } from "../../core/state.ts";
+import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { fortitudeCondition } from "./conditions.ts";
 import { ignoreEyes, pushFortitude } from "./fortitude.ts";
-import { discardUntilLocations } from "./locations.ts";
 import { noteFirstTreachery } from "./treachery.ts";
 
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
@@ -19,8 +18,6 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return pushFortitude(state, instruction, focus, ctx, steps);
     case "IgnoreFortitudeEyes":
       return ignoreEyes(state, lastPicked(state) || null);
-    case "DiscardUntilLocations":
-      return discardUntilLocations(state, instruction.perPlayer * livingSeats(state).length, ctx, steps);
     // A marker the reveal hook reads.
     case "FirstTreacheryImmuneSurge":
       return state;
@@ -31,7 +28,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "mount-doom",
-  verbs: ["FortitudeTest", "IgnoreFortitudeEyes", "FirstTreacheryImmuneSurge", "DiscardUntilLocations"],
+  verbs: ["FortitudeTest", "IgnoreFortitudeEyes", "FirstTreacheryImmuneSurge"],
   run,
   condition: (state, condition, scope) => fortitudeCondition(state, condition, scope),
   revealed: noteFirstTreachery,

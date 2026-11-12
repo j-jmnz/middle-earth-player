@@ -1,19 +1,13 @@
 import type { Amount } from "../../../catalog/boundary.ts";
 import type { Ask } from "../asks.ts";
+import { CARRIES_RING, RING_DESTROYED_BY } from "../asks-conditions.ts";
 
 // The choice words of The Tower of Cirith Ungol (the-return-of-the-king part 16), one entry for each Pick and Choose of its records: `<record id> @<instruction path> <verb | option id>` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
 // `pnpm test scenario the-tower-of-cirith-ungol --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=the-tower-of-cirith-ungol` prints each sentence.
 // What can lose the game says so on the row: the hero carrying The One Ring destroyed or discarded (the One Ring leaving play loses, mec113.the-one-ring). The Item boon each player sets aside at Setup is chosen on the Campaign Setup checklist (src/campaign/checklist.ts, SetAsideBoon).
-type When = NonNullable<Ask["caution"]>["when"];
 const QUESTING: Amount = { count: { type: "character", control: "you", committed: true } };
 const HAND: Amount = { count: { type: "card", control: "you", from: "hand" } };
-// The picked character carries The One Ring: its loss from play loses the game.
-const CARRIES_RING: When = { kind: "matches", card: "picked", pick: { type: "character", control: "any", hasAttachment: { names: ["The One Ring"] } } };
-// The picked character would be destroyed by `damage` more damage: its hit points are less than its damage plus that damage plus 1.
-const DESTROYED_BY = (damage: number): When => ({ kind: "less", left: { stat: "hitPoints", of: "picked" }, right: { stat: "damage", of: "picked", plus: damage + 1 } });
 
-// The picked character carries The One Ring and would be destroyed by `damage` more damage.
-const RING_DESTROYED_BY = (damage: number): When => ({ kind: "all", conditions: [CARRIES_RING, DESTROYED_BY(damage)] }) as When;
 
 export const ASKS: Readonly<Record<string, Ask>> = {
   // 146014:A:2 (Action): the acting player chooses any enemy, in the staging area or engaged. The Threat it loses is the Willpower of the hero carrying Last of the Company now, and follows it while the effect lasts.

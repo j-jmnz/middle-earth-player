@@ -120,6 +120,18 @@ describe("FortitudeTest (146043:A:3)", () => {
     expect(threat(pass(commit(run, "a"), run))).toBe(34);
   });
 
+  it("shuffles the discard pile back when the last discard empties the deck, so the failed test's reveal has a card (Orc Captain, 146051:A:1)", () => {
+    // X = 4 and exactly 4 cards in the deck: the 4 icons beat Willpower 3, and the refilled deck gives the reveal its card.
+    const reveal: Instruction = { verb: "RevealEncounter", who: "actor", when: { kind: "lastFortitudeFailed" } };
+    const run = begin({ instructions: [TEST, reveal], threat: 40, encounter: ["e1", "e1", "e1", "e1"] });
+    const committed = commit(run, "a");
+    expect(committed.encounterDeck).toHaveLength(4);
+    const done = pass(committed, run);
+    // One of the four was revealed (a treachery with no text goes to the discard pile); the other three are the deck.
+    expect(done.encounterDeck).toHaveLength(3);
+    expect(done.encounterDiscard).toHaveLength(1);
+  });
+
   it("lets the players act before the Willpower is measured: the window is an action window inside the test", () => {
     const committed = commit(begin({ encounter: ["e2", "e0", "e0"] }), "a");
     expect(committed.window?.kind).toBe("frameAction");

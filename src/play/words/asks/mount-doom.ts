@@ -1,23 +1,17 @@
 import type { Amount } from "../../../catalog/boundary.ts";
 import type { Ask } from "../asks.ts";
+import { CARRIES_RING, RING_DESTROYED_BY, ELIMINATED as ELIMINATED_WHEN, type When } from "../asks-conditions.ts";
 
 // The choice words of Mount Doom (the-return-of-the-king part 6), one entry for each Pick and Choose of its records: `<record id> @<instruction path> <verb | option id>` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
 // `pnpm test scenario mount-doom --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=mount-doom` prints each sentence. The Fortitude test's commit is a sheet of its own (src/play/readouts/fortitude.ts, fortitudeCommitNote).
 // What can lose the game says so on the row: the hero carrying The One Ring destroyed or discarded (The One Ring leaving play loses, mec113.the-one-ring), and a threat raise that takes a player to 99 (the elimination level under Dire, mec113.dire), which loses the game for the last player.
 // The Resolution's choice (146079:B:1) is worded on the Resolution screen (src/campaign/return-of-the-king-words.ts).
-type When = NonNullable<Ask["caution"]>["when"];
 const ALLIES: Amount = { count: { type: "ally", control: "you" } };
 const QUESTING: Amount = { count: { type: "character", control: "you", committed: true } };
 const HAND: Amount = { count: { type: "card", control: "you", from: "hand" } };
-// The picked character carries The One Ring: its loss from play loses the game.
-const CARRIES_RING: When = { kind: "matches", card: "picked", pick: { type: "character", control: "any", hasAttachment: { names: ["The One Ring"] } } };
-// The picked character would be destroyed by `damage` more damage: its hit points are less than its damage plus that damage plus 1.
-const DESTROYED_BY = (damage: number): When => ({ kind: "less", left: { stat: "hitPoints", of: "picked" }, right: { stat: "damage", of: "picked", plus: damage + 1 } });
-const RING_DESTROYED_BY = (damage: number): When => ({ kind: "all", conditions: [CARRIES_RING, DESTROYED_BY(damage)] }) as When;
 // The raise takes the player to the elimination level, 99 under Dire or more: `raise` is a number or an amount read now.
 const ELIMINATED = (raise: number | Amount): { when: When; text: string } => ({
-  // Threat plus the raise is 99 or more: 98 less the threat is less than the raise.
-  when: (typeof raise === "number" ? { kind: "threat", min: 99 - raise } : { kind: "less", left: { threat: "actor", times: -1, plus: 98 }, right: raise }) as When,
+  when: ELIMINATED_WHEN(raise),
   text: "Tap again: this takes your threat to 99 or more and eliminates you. If you are the last player, the game is lost",
 });
 

@@ -170,7 +170,10 @@ describe("stage 4B: exploring Mount Doom (146078:B:2)", () => {
   it("discards one extra card for each player before the count: the fourth card's icons count", () => {
     const { run, state } = explored(["eyes0", "eyes0", "eyes0", "eyes3"]);
     const committed = commitAll(run, state, "a");
-    expect(committed.encounterDiscard).toHaveLength(4);
+    // The fourth discard empties the deck, so the discard pile is shuffled back in.
+    const test = committed.stack.find((frame) => frame.data.kind === "fortitude")?.data;
+    expect(test?.kind === "fortitude" ? test.discardedIds : []).toHaveLength(4);
+    expect(committed.encounterDeck).toHaveLength(4);
     const done = pass(run, committed);
     expect(done.lost).toBe(true);
   });

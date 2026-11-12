@@ -98,7 +98,7 @@ export const DOOM_GOLDENS: readonly DoomGolden[] = [
   { name: "true solo, lost, the threat reaches 99", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", after: true, lossReason: "No seats remain" },
   { name: "two-handed, lost, the threat reaches 99", seatCount: 2, seed: 3, difficulty: "Normal", decks: "weak", outcome: "lost", after: true, lossReason: "No seats remain" },
   { name: "true solo, lost, the Ring-bearer is destroyed", seatCount: 1, seed: 2, difficulty: "Normal", decks: "brittle", outcome: "lost", after: true, lossReason: "The One Ring left play" },
-  { name: "two-handed, lost, the Ring-bearer is destroyed", seatCount: 2, seed: 4, difficulty: "Normal", decks: "brittle", outcome: "lost", after: true, lossReason: "The One Ring left play" },
+  { name: "two-handed, lost, the Ring-bearer is destroyed", seatCount: 2, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", after: true, lossReason: "The One Ring left play" },
   { name: "true solo, lost, the campaign card's last token is removed", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "lost", after: true, tokens: 2, lossReason: "No resource token is left on Mount Doom" },
   { name: "two-handed, lost, the campaign card's last token is removed", seatCount: 2, seed: 2, difficulty: "Normal", decks: "strong", outcome: "lost", after: true, tokens: 2, lossReason: "No resource token is left on Mount Doom" },
 ];

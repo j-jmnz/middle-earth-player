@@ -15,7 +15,6 @@ const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   FortitudeTest: [{ verb: "FortitudeTest", who: "firstPlayer", extraCards: { players: true }, extraEyes: { amount: 2, when: { kind: "firstPlayer" } } }],
   IgnoreFortitudeEyes: [{ verb: "IgnoreFortitudeEyes" }],
   FirstTreacheryImmuneSurge: [{ verb: "FirstTreacheryImmuneSurge" }],
-  DiscardUntilLocations: [{ verb: "DiscardUntilLocations", perPlayer: 2 }],
   PlaceTokensOnCampaignCard: [{ verb: "PlaceTokensOnCampaignCard", amount: 3 }],
   PlaceProgressOn: [{ verb: "PlaceProgressOn", amount: 2, target: "self" }],
   RemoveProgressFrom: [{ verb: "RemoveProgressFrom", amount: 2, named: "Camp" }],

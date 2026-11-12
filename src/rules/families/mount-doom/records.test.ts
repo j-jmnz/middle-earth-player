@@ -116,10 +116,10 @@ describe("The first treachery each quest phase (146075:B:2)", () => {
   });
 });
 
-describe("DiscardUntilLocations (146077:A:1)", () => {
+describe("DiscardUntilEnemies with cardType location (146077:A:1)", () => {
   it("discards from the top until a location for each player is found and adds each to the staging area, leaving the other cards in the discard pile", () => {
     const base = table({ cards: [hero("a"), treachery("t1"), location("l1"), location("l2")], effects: [], heroes: [{ code: "a" }], encounter: ["t1", "l1", "t1", "l2"] });
-    const done = runInstruction({ ...base.state, window: null }, { verb: "DiscardUntilLocations", perPlayer: 1 }, { seat: 0, sourceId: null }, base.ctx, []);
+    const done = runInstruction({ ...base.state, window: null }, { verb: "DiscardUntilEnemies", perPlayer: 1, to: "staging", cardType: "location" }, { seat: 0, sourceId: null }, base.ctx, []);
     expect(done.staging.map((id) => done.cards[id]?.code)).toEqual(["l1"]);
     expect(done.encounterDiscard.map((id) => done.cards[id]?.code)).toEqual(["t1"]);
     expect(done.encounterDeck).toHaveLength(2);
@@ -127,7 +127,7 @@ describe("DiscardUntilLocations (146077:A:1)", () => {
 
   it("stops at the end of the deck", () => {
     const base = table({ cards: [hero("a"), treachery("t1"), location("l1")], effects: [], heroes: [{ code: "a" }], seatCount: 2, encounter: ["l1", "t1"] });
-    const done = runInstruction({ ...base.state, window: null }, { verb: "DiscardUntilLocations", perPlayer: 1 }, { seat: 0, sourceId: null }, base.ctx, []);
+    const done = runInstruction({ ...base.state, window: null }, { verb: "DiscardUntilEnemies", perPlayer: 1, to: "staging", cardType: "location" }, { seat: 0, sourceId: null }, base.ctx, []);
     expect(done.staging.map((id) => done.cards[id]?.code)).toEqual(["l1"]);
     expect(done.encounterDeck).toHaveLength(0);
   });

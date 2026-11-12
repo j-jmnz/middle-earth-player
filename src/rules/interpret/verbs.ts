@@ -111,7 +111,7 @@ export function runExtraVerb(
       return afterProgress(placed, before, ctx, steps);
     }
     case "DiscardUntilEnemies":
-      return discardUntilEnemies(state, instruction.perPlayer * livingSeats(state).length, ctx, steps, instruction.to);
+      return discardUntilEnemies(state, instruction.perPlayer * livingSeats(state).length, ctx, steps, instruction.to, instruction.cardType);
     case "ShuffleSelfIntoEncounterDeck": {
       return focus.sourceId ? shuffleIntoEncounterDeck(state, focus.sourceId) : state;
     }
@@ -277,17 +277,17 @@ function committedHeroes(state: ScenarioState, seat: number, exceptSphere: strin
   }).length;
 }
 
-// Cards come off the top of the encounter deck into its discard pile until `count` enemies are among them, or the deck is
+// Cards come off the top of the encounter deck into its discard pile until `count` enemies (locations, with `cardType`) are among them, or the deck is
 // empty (rr.effects: as many as there are). Each of those enemies is then put into play engaged with the first player
-// (141045:A:2): it has engaged that player (rr.engaged), "cannot be engaged" or not (engageWith).
-function discardUntilEnemies(state: ScenarioState, count: number, ctx: ReduceContext, steps: EngineStep[], to?: "staging"): ScenarioState {
+// (141045:A:2): it has engaged that player (rr.engaged), "cannot be engaged" or not (engageWith). Locations are added to the staging area (146077:A:1).
+function discardUntilEnemies(state: ScenarioState, count: number, ctx: ReduceContext, steps: EngineStep[], to?: "staging", cardType?: "location"): ScenarioState {
   let next = state;
   const enemies: string[] = [];
   while (enemies.length < count) {
     const top = next.encounterDeck[0];
     if (!top) break;
     next = updateCard(moveCard(next, top, { zone: "encounterDiscard" }), top, { face: "up" });
-    if (printedOf(ctx.cards, next.cards[top]?.code ?? "").type === "enemy") enemies.push(top);
+    if (printedOf(ctx.cards, next.cards[top]?.code ?? "").type === (cardType ?? "enemy")) enemies.push(top);
   }
   // Engaged with the first player, or added to the staging area (They Are Coming!, 142056:A:2).
   for (const id of enemies) next = to === "staging" ? moveEncounter(next, id, "staging", next.firstPlayer, ctx, steps) : engageWith(next, next.firstPlayer, id, steps);

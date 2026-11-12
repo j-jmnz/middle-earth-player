@@ -96,7 +96,6 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   },
   IgnoreFortitudeEyes: () => ({ text: "the card just chosen (discarded for the Fortitude test in progress) adds no Sauron's Eye icons to that test", read: [] }),
   FirstTreacheryImmuneSurge: () => ({ text: "while this card is in play, the first treachery the encounter deck reveals each quest phase is immune to player card effects until it leaves play and gains surge (marked as it is revealed, before its When Revealed effects)", read: [] }),
-  DiscardUntilLocations: (i) => ({ text: `discard cards from the top of the encounter deck until ${str(i.perPlayer)} location(s) for each player in the game are discarded, or the deck is empty, and add each location discarded to the staging area`, read: ["perPlayer"] }),
   PlaceTokensOnCampaignCard: (i, ctx) => ({ text: `place ${amount(i.amount, ctx)} resource tokens on the campaign card (kept in the game)`, read: ["amount"] }),
   PlaceProgressOn: (i, ctx) => ({ text: `place ${amount(i.amount, ctx)} progress on ${cardRef(i.target)}`, read: ["amount", "target"] }),
   RemoveProgressFrom: (i, ctx) => ({ text: `remove ${amount(i.amount, ctx)} progress from "${str(i.named)}"`, read: ["amount", "named"] }),
@@ -186,7 +185,9 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   ShuffleEncounterDeck: () => ({ text: "shuffle the encounter deck", read: [] }),
   ShuffleEncounterDiscard: () => ({ text: "shuffle the encounter discard pile into the encounter deck", read: [] }),
   DiscardEncounterTop: (i, ctx) => ({ text: `discard ${amount(i.count, ctx)} card(s) from the top of the encounter deck`, read: ["count"] }),
-  DiscardUntilEnemies: (i) => ({ text: `discard from the top of the encounter deck until ${str(i.perPlayer)} enem${i.perPlayer === 1 ? "y" : "ies"} for each player ${i.perPlayer === 1 ? "is" : "are"} discarded${i.to === "staging" ? "; add those enemies to the staging area" : ""}`, read: ["perPlayer", "to"] }),
+  DiscardUntilEnemies: (i) => i.cardType === "location"
+    ? { text: `discard cards from the top of the encounter deck until ${str(i.perPlayer)} location(s) for each player in the game are discarded, or the deck is empty, and add each location discarded to the staging area`, read: ["perPlayer", "to", "cardType"] }
+    : ({ text: `discard from the top of the encounter deck until ${str(i.perPlayer)} enem${i.perPlayer === 1 ? "y" : "ies"} for each player ${i.perPlayer === 1 ? "is" : "are"} discarded${i.to === "staging" ? "; add those enemies to the staging area" : ""}`, read: ["perPlayer", "to", "cardType"] }),
   RevealEncounter: (i) => ({ text: `${who(i.who ?? "actor")} reveals an encounter card`, read: ["who"] }),
   AdvanceStage: () => ({ text: "advance to the next quest stage", read: [] }),
   WinGame: () => ({ text: "the players win the game", read: [] }),

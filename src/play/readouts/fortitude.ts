@@ -2,9 +2,9 @@
 //
 // The Fortitude test's numbers beside its sheets: while the heroes are chosen, the Willpower of the ones picked (and the icons a card already added to the test), then, in the action window after the cards are discarded, the Willpower against the icons counted, with the
 // cards discarded and the icons ignored. The engine decided each number (`fortitudeCards`, `fortitudeEyes`, `fortitudeWillpower`); nothing here changes one. Pure, so a test reads it.
-import type { Frame, ScenarioState } from "../../rules/core/state.ts";
+import type { ScenarioState } from "../../rules/core/state.ts";
 import type { ReduceContext } from "../../rules/engine/reduce.ts";
-import { fortitudeCards, fortitudeEyes, fortitudeWillpower, eyesOf } from "../../rules/families/mount-doom/fortitude.ts";
+import { fortitudeCards, fortitudeEyes, fortitudeWillpower, eyesOf, nearestFortitude, type FortitudeFrame } from "../../rules/families/mount-doom/fortitude.ts";
 import { topFrame } from "../../rules/windows/windows.ts";
 
 import { fortitudeCommitWords, fortitudeCountWords, fortitudeFailWords, fortitudeResult } from "../words/scenarios/mount-doom.ts";
@@ -16,12 +16,8 @@ const WILL = (value: number): SheetStat => ({ icon: "willpower", value, word: "W
 const EYES = (value: number): SheetStat => ({ icon: "nightmare", value, word: "Sauron's Eye icons" });
 
 /** The Fortitude frame nearest the top, or undefined with no test going on. */
-export function fortitudeFrame(game: ScenarioState): (Frame & { data: Extract<Frame["data"], { kind: "fortitude" }> }) | undefined {
-  for (let index = game.stack.length - 1; index >= 0; index -= 1) {
-    const frame = game.stack[index];
-    if (frame?.data.kind === "fortitude") return frame as Frame & { data: Extract<Frame["data"], { kind: "fortitude" }> };
-  }
-  return undefined;
+export function fortitudeFrame(game: ScenarioState): FortitudeFrame | undefined {
+  return nearestFortitude(game)?.frame;
 }
 
 /** The commit sheet's note: the cards discarded next, the icons already added and what failing does, led by the player who tests when two play. */

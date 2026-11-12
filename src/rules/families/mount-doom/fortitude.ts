@@ -9,10 +9,10 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { reshuffleDiscard } from "../../interpret/verbs.ts";
 import { gameReads } from "../../core/game-reads.ts";
 import type { EngineStep } from "../../core/intents.ts";
-import { modifiedStat } from "../../core/keywords.ts";
 import { printedOf } from "../../core/printed.ts";
-import { inPlay, type Frame, type FortitudeData, type ScenarioState } from "../../core/state.ts";
+import type { Frame, FortitudeData, ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
+import { committedWillpower } from "../../quest/test-frame.ts";
 import { openFrameActions } from "../../windows/pass.ts";
 import { fireForced } from "../../windows/triggers.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "../../windows/windows.ts";
@@ -75,6 +75,8 @@ function discardCards(state: ScenarioState, data: FortitudeData, seat: number, c
     next = moveCard(next, id, { zone: "encounterDiscard" });
     discardedIds.push(id);
   }
+  // The last discard may have emptied the deck: it is refilled at once, as it would be for one more card (mec113.fortitude-tests: "if the encounter deck is ever empty during a Fortitude test").
+  next = reshuffleDiscard(next, steps, "mec113.fortitude-tests");
   next = patchTop(next, { step: 2, data: { ...data, discardedIds } });
   if (!gameReads(next, ctx, '"discardedInFortitude"')) return next;
   for (const id of discardedIds) next = fireForced(next, { trigger: "discardedInFortitude", seat, subject: id }, ctx, steps);
@@ -101,12 +103,7 @@ function countEyes(state: ScenarioState, data: FortitudeData, seat: number, ctx:
 
 /** The committed heroes' Willpower that are still in play. The table's Fortitude sheet shows this same number. */
 export function fortitudeWillpower(state: ScenarioState, committedIds: readonly string[], ctx: ReduceContext): number {
-  let willpower = 0;
-  for (const id of committedIds) {
-    const instance = state.cards[id];
-    if (instance && inPlay(instance.zone)) willpower += modifiedStat(state, instance, "willpower", ctx.cards);
-  }
-  return willpower;
+  return committedWillpower(state, committedIds, ctx).willpower;
 }
 
 // A tie fails: the Willpower must be greater than the icons (mec113.fortitude-tests).
@@ -135,11 +132,24 @@ function finish(state: ScenarioState, data: FortitudeData, steps: EngineStep[]):
   return data.result ? noteEffectFortitude(popped, data.result.success) : popped;
 }
 
+/** A Fortitude frame, its data typed. */
+export type FortitudeFrame = Frame & { data: FortitudeData };
+
+const isFortitude = (frame: Frame): frame is FortitudeFrame => frame.data.kind === "fortitude";
+
+/** The Fortitude frame nearest the top of the stack and its place in it, or undefined with no test going on. */
+export function nearestFortitude(state: ScenarioState): { frame: FortitudeFrame; index: number } | undefined {
+  for (let index = state.stack.length - 1; index >= 0; index -= 1) {
+    const frame = state.stack[index];
+    if (frame && isFortitude(frame)) return { frame, index };
+  }
+  return undefined;
+}
+
 /** IgnoreFortitudeEyes: the last card picked adds no icons to the Fortitude test in progress. */
 export function ignoreEyes(state: ScenarioState, picked: string | null): ScenarioState {
-  const at = state.stack.findLastIndex((entry) => entry.data.kind === "fortitude");
-  const frame = state.stack[at];
-  if (!picked || !frame || frame.data.kind !== "fortitude" || !frame.data.discardedIds.includes(picked)) return state;
-  const stack = state.stack.map((entry, index) => (index === at && entry.data.kind === "fortitude" ? { ...entry, data: { ...entry.data, ignored: [...entry.data.ignored, picked] } } : entry));
+  const found = nearestFortitude(state);
+  if (!picked || !found || !found.frame.data.discardedIds.includes(picked)) return state;
+  const stack = state.stack.map((entry, index) => (index === found.index && entry.data.kind === "fortitude" ? { ...entry, data: { ...entry.data, ignored: [...entry.data.ignored, picked] } } : entry));
   return { ...state, stack };
 }

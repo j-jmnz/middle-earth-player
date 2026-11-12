@@ -47,7 +47,7 @@ export const STAGE_RECORDS: readonly (Effect | Copy)[] = [
 
   // 146077 Stage 3 (20 quest points). When Revealed: the discard pile is shuffled into the deck and cards are discarded until one location for each player is discarded; those locations are added to the staging area. Side B: the first treachery revealed each quest phase is immune and gains surge (the line of stage 1).
   // Forced: at the beginning of the quest phase the first player makes a Fortitude test; if he fails it no more than 5 progress can be placed here this round (the active location still takes progress first). The stage cannot be defeated unless Mount Doom is the active location (progress still goes on).
-  { id: "146077:whenRevealed:1", cardCode: STAGE_3, lines: ["146077:A:1"], timing: "whenRevealed", instructions: [{ verb: "ShuffleEncounterDiscard" }, { verb: "DiscardUntilLocations", perPlayer: 1 }] },
+  { id: "146077:whenRevealed:1", cardCode: STAGE_3, lines: ["146077:A:1"], timing: "whenRevealed", instructions: [{ verb: "ShuffleEncounterDiscard" }, { verb: "DiscardUntilEnemies", perPlayer: 1, to: "staging", cardType: "location" }] },
   copyLine("146075:B:2", "146077:B:1"),
   {
     id: "146077:forced:1",

@@ -2,10 +2,11 @@
 import type { PickSpec } from "../../../catalog/boundary.ts";
 
 import type { ScenarioState } from "../../core/state.ts";
+import { nearestFortitude } from "./fortitude.ts";
 
 /** The pool of a `fortitudeDiscarded` filter, or null when the filter is not set. Empty with no Fortitude test in progress. */
 export function fortitudePool(state: ScenarioState, spec: PickSpec): string[] | null {
   if (!spec.fortitudeDiscarded) return null;
-  const frame = state.stack.findLast((entry) => entry.data.kind === "fortitude");
-  return frame?.data.kind === "fortitude" ? frame.data.discardedIds.filter((id) => state.cards[id]?.zone === "encounterDiscard") : [];
+  const frame = nearestFortitude(state)?.frame;
+  return frame ? frame.data.discardedIds.filter((id) => state.cards[id]?.zone === "encounterDiscard") : [];
 }

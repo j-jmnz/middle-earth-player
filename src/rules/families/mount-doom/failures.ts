@@ -12,14 +12,6 @@ export function failedThisRound(state: ScenarioState, seat: number | null): bool
   return (state.fortitudeFailures ?? []).some((failure) => failure.round === state.round && (seat == null || failure.seat === seat));
 }
 
-/** The failures of earlier rounds go when the round advances (a state with none is returned as it is). */
-export function pruneFortitudeFailures(state: ScenarioState): ScenarioState {
-  const failures = state.fortitudeFailures;
-  if (!failures) return state;
-  const kept = failures.filter((failure) => failure.round === state.round);
-  return kept.length === failures.length ? state : { ...state, fortitudeFailures: kept };
-}
-
 /** The test just finished is noted on the effect that made it, for `lastFortitudeFailed` and `lastFortitudePassed`. */
 export function noteEffectFortitude(state: ScenarioState, success: boolean): ScenarioState {
   const top = topFrame(state);
