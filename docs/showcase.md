@@ -56,7 +56,7 @@ The workflow `.github/workflows/showcase.yml` does the same on GitHub's macOS ru
 
 ## Saves and decks
 
-The table shots open fixtures registered in `src/campaign/fixtures/registry.ts`: `past-showcase-board`, `past-showcase-quest` and `past-showcase-combat` (A Shadow of the Past, The One Deck and Stealth and Steadfastness, written by `scripts/e2e/showcase-past.ts`), `sea-showcase` and `deep-showcase` (written by their scenarios' seed finders), all by `pnpm scenario fixtures <scenario-id>`. Each is the first seed whose game reaches a full table (`boardOf`, `boardHolds` in `scripts/e2e/seed-kit.ts`). The quest and combat saves carry what their flow taps (`showcase` in `scenario-1.json`); `src/campaign/showcase-fixtures.test.ts` replays each save to its moment and checks those taps against the flows.
+The table shots open fixtures registered in `src/campaign/fixtures/registry.ts`: `past-showcase-board`, `past-showcase-quest` and `past-showcase-combat` (A Shadow of the Past, The One Deck and Stealth and Steadfastness, written by `scripts/e2e/showcase-past.ts`), `sea-showcase` and `deep-showcase` (written by their scenarios' seed finders), all by `pnpm scenario fixtures <scenario-id>`. Each is the first seed whose game reaches a full table with both players still in it (`boardOf`, `boardHolds` and `seatsStanding` in `scripts/e2e/seed-kit.ts`). The GIFs tap only the tray's first three rows, which the iPhone's landscape table shows without scrolling. The quest and combat saves carry what their flow taps (`showcase` in `scenario-1.json`); `src/campaign/showcase-fixtures.test.ts` replays each save to its moment and checks those taps against the flows.
 
 ## Every picture drawn
 

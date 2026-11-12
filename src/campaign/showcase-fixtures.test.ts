@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 import { EFFECTS } from "../effects/index.ts";
 import { CATALOG_VERSION } from "../catalog/version.ts";
 import { loadCampaign, loadScenario } from "../../scripts/data/load-scenarios.ts";
-import { boardHolds } from "../../scripts/e2e/seed-kit.ts";
+import { boardHolds, seatsStanding } from "../../scripts/e2e/seed-kit.ts";
 import { MEC109_CHANGED, MEC112_CHANGED } from "../../scripts/data/printed/scope.ts";
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 import { legalTargets } from "../rules/engine/reduce.ts";
@@ -50,6 +50,7 @@ describe("README showcase fixtures", () => {
       expect(state.round, name).toBeGreaterThanOrEqual(3);
       expect([state.mode, state.activeSeat], name).toEqual(["planning", 0]);
       expect(boardHolds(state, board), name).toBe(true);
+      expect(seatsStanding(state, 2), `${name}: both players in, two heroes or more`).toBe(true);
     }
   });
 
@@ -79,6 +80,7 @@ describe("README showcase fixtures", () => {
     expect(commit.length).toBeGreaterThan(0);
     const legal = legalTargets(state, { type: "Commit" }, ctx);
     for (const id of commit) expect(legal, id).toContain(id);
+    expect(commit, "the first three rows of the tray, which the iPhone shows without scrolling").toEqual(legal.slice(0, 3));
     expect(tapped("table-quest"), "the quest GIF's flow taps the committed characters").toEqual(commit);
   });
 
@@ -87,7 +89,7 @@ describe("README showcase fixtures", () => {
     expect(state.window?.kind).toBe("defense");
     const defender = TAPS["past-showcase-combat"]?.showcase?.defender;
     expect(defender).toBeDefined();
-    expect(legalTargets(state, { type: "DeclareDefender" }, ctx)).toContain(defender);
+    expect(legalTargets(state, { type: "DeclareDefender" }, ctx).slice(0, 3), "one of the tray's first three rows").toContain(defender);
     expect(tapped("table-combat"), "the combat GIF's flow taps the defender").toEqual([defender]);
   });
 });

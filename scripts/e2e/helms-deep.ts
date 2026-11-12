@@ -12,7 +12,7 @@ import type { PlayerIntent, ReduceContext, ScenarioState } from "../../src/rules
 import { HAI_GOLDENS, haiWorld, playGolden as playHai } from "../../test/scenarios/the-uruk-hai/game.ts";
 import { DEEP_POLICY, DEFAULT_POLICY, deepIntent } from "../../test/scenarios/helms-deep/game.ts";
 import { createLog } from "../log.ts";
-import { boardHolds, firstSeed, wonLog } from "./seed-kit.ts";
+import { boardHolds, seatsStanding, firstSeed, wonLog } from "./seed-kit.ts";
 
 const say = createLog("e2e-deep");
 
@@ -26,7 +26,7 @@ export async function haiWonLog(): Promise<CampaignLog> {
 
 // The README showcase's Helm's Deep table (docs/showcase.md, Saves and decks): the first player's planning window from round 3 on, with both seats' characters in
 // play, enemies engaged and the staging row holding cards.
-const atBoard = (state: ScenarioState): boolean => state.round >= 3 && state.mode === "planning" && state.activeSeat === 0 && !state.lost && boardHolds(state, { play: 8, engaged: 2, staging: 2 });
+const atBoard = (state: ScenarioState): boolean => seatsStanding(state, 2) && state.round >= 3 && state.mode === "planning" && state.activeSeat === 0 && !state.lost && boardHolds(state, { play: 8, engaged: 2, staging: 2 });
 
 export async function deepFixtures(): Promise<Partial<Record<DeepFixtureName, DeepFixture>>> {
   const log = await haiWonLog();

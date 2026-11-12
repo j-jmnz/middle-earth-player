@@ -5,14 +5,16 @@
 // `past-showcase-board`: the first player's planning window in round 3 or later, on the first seed whose table is full (heroes and allies in play with
 // attachments, an enemy engaged, an active location, cards in staging). `past-showcase-quest`: the quest commit of a round from 3 on, with staging
 // holding cards, so a commit reveals into a busy row. `past-showcase-combat`: an enemy's attack waiting for a defender, from round 2 on.
-// Each holds `showcase`, what the flow taps: the characters the auto-player commits, or the defender with the most Defense that is not the Ring-bearer.
+// Every moment has both players in the game with three heroes or more (`seatsStanding`).
+// Each holds `showcase`, what the flow taps among the tray's first three rows: the characters it commits, or the defender with the most Defense
+// that is not the Ring-bearer.
 import type { StoredLoadout } from "../../src/campaign/save.ts";
 import { legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../src/rules/engine/reduce.ts";
 
 import { nextIntent } from "../../test/harness/auto-player.ts";
 import { loadCampaign } from "../data/load-scenarios.ts";
 import { createLog } from "../log.ts";
-import { boardHolds, playSeed, prebuiltDeck, type SeedSpec } from "./seed-kit.ts";
+import { boardHolds, playSeed, prebuiltDeck, seatsStanding, type SeedSpec } from "./seed-kit.ts";
 
 const say = createLog("e2e-showcase-past");
 const FRODO = "141001";
@@ -46,9 +48,9 @@ function loadout(): StoredLoadout {
 const answer = (state: ScenarioState, ctx: ReduceContext, memory: Set<string>): PlayerIntent => nextIntent(state, ctx, { scout: "", prefer: "141035", protect: FRODO, play: true, act: true }, memory);
 
 const FULL = { play: 8, attached: 4, engaged: 1, staging: 2, location: true } as const;
-const atBoard = (state: ScenarioState) => state.round >= 3 && state.mode === "planning" && state.activeSeat === 0 && boardHolds(state, FULL);
-const atQuest = (state: ScenarioState) => state.round >= 3 && state.mode === "questCommit" && state.window?.kind === "pass" && boardHolds(state, { play: 8, staging: 2 });
-const atCombat = (state: ScenarioState) => state.round >= 2 && state.window?.kind === "defense" && boardHolds(state, { play: 8, staging: 1 });
+const atBoard = (state: ScenarioState) => seatsStanding(state, 3) && state.round >= 3 && state.mode === "planning" && state.activeSeat === 0 && boardHolds(state, FULL);
+const atQuest = (state: ScenarioState) => seatsStanding(state, 3) && state.round >= 3 && state.mode === "questCommit" && state.window?.kind === "pass" && boardHolds(state, { play: 8, staging: 2 });
+const atCombat = (state: ScenarioState) => seatsStanding(state, 3) && state.round >= 2 && state.window?.kind === "defense" && boardHolds(state, { play: 8, staging: 1 });
 
 // The first seed whose game reaches `at`, parked there, with what the flow taps on it.
 function find(at: (state: ScenarioState) => boolean, tap: (state: ScenarioState, ctx: ReduceContext) => ShowcaseTap, label: string): PastShowcase | null {
@@ -70,23 +72,29 @@ function find(at: (state: ScenarioState) => boolean, tap: (state: ScenarioState,
     };
     const game = playSeed(spec, seed);
     if (!seen || !at(game.state)) continue;
+    // A moment whose taps the tray's first rows cannot give (fewer than three to commit, only the Ring-bearer to defend) is not a showcase.
+    const taps = tap(game.state, seen);
+    if (label !== "past-showcase-board" && (taps.commit ?? []).length < SHOWN && taps.defender == null) continue;
     say.info(`${label}: seed ${seed}, ${game.intents.length} intents, round ${game.state.round}`);
-    return { seatCount: 2, loadout: base, seed, intents: game.intents, showcase: tap(game.state, seen) };
+    return { seatCount: 2, loadout: base, seed, intents: game.intents, showcase: taps };
   }
   say.warn(`no ${label} game found in ${SEEDS} seeds`);
   return null;
 }
 
-// The characters the auto-player commits on this quest.
+// The tray lists a choice's options in the engine's order (legalTargets), and on the iPhone's landscape table it shows about three rows: the
+// flows tap among the first three, which a capture never has to scroll to.
+const SHOWN = 3;
+
+// The first SHOWN characters the tray offers to commit.
 function commitTap(state: ScenarioState, ctx: ReduceContext): ShowcaseTap {
-  const intent = answer(state, ctx, new Set());
-  return intent.type === "Commit" ? { commit: [...intent.cardIds] } : {};
+  return { commit: legalTargets(state, { type: "Commit" }, ctx).slice(0, SHOWN) };
 }
 
-// The defender with the most Defense, never the Ring-bearer (his hit points hold The One Ring).
+// The defender with the most Defense among the first SHOWN rows, never the Ring-bearer (his hit points hold The One Ring).
 function defenderTap(state: ScenarioState, ctx: ReduceContext): ShowcaseTap {
   const defense = (id: string) => ctx.cards.get(state.cards[id]?.code ?? "")?.defense ?? 0;
-  const defenders = legalTargets(state, { type: "DeclareDefender" }, ctx).filter((id) => state.cards[id]?.code !== FRODO);
+  const defenders = legalTargets(state, { type: "DeclareDefender" }, ctx).slice(0, SHOWN).filter((id) => state.cards[id]?.code !== FRODO);
   const best = [...defenders].sort((left, right) => defense(right) - defense(left))[0];
   return best ? { defender: best } : {};
 }
