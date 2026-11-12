@@ -136,8 +136,8 @@ const searchDeckForCard = (table: Table, instruction: Extract<Instruction, { ver
   searchToHand(table, { eligible: (printed) => printed.code === instruction.code, looksFor: table.name(instruction.code), untilFirst: true, firstOnly: true, raise: instruction.raiseThreat, skipped: () => `The first player does not search for ${table.name(instruction.code)}.` });
 const searchBoonOrTreasure = (table: Table): void => searchToHand(table, { eligible: (printed) => printed.campaignKind === "boon" || printed.campaignKind === "treasure", looksFor: "a boon or treasure card", untilFirst: false, skipped: (seat, seatCount) => `${seatCount === 1 ? "You do" : `Player ${seat + 1} does`} not search for a boon or treasure card.` });
 
-// SetAsideBoon (146069:A:1): each player in turn, first player first, chooses one of the boons dealt to them (a pool card of theirs that step 7 would shuffle into their deck) with the trait, other than `except`, and sets it aside, out of play. It is left out of their deck for this game and stays in the pool.
-// A player with no such boon chooses nothing; a game with no pool (a standalone one) has no campaign card and never gets here.
+// SetAsideBoon (146069:A:1): each player in turn, first player first, chooses a boon of the whole campaign pool with the trait, other than `except`, and sets it aside, out of play (the card says "from the campaign pool", not from their own boons). The set-aside boon is the chooser's:
+// it is left out of the decks this game and stays in the pool. A copy the chooser's own seat holds is taken before another seat's. A player with no boon left to choose chooses nothing; a game with no pool (a standalone one) has no campaign card and never gets here.
 function setAsideBoon(table: Table, instruction: Extract<Instruction, { verb: "SetAsideBoon" }>): void {
   const { seats, pool, fresh, input, name } = table;
   for (const [index, seat] of seats.entries()) {
@@ -145,12 +145,12 @@ function setAsideBoon(table: Table, instruction: Extract<Instruction, { verb: "S
       const printed = input.cards.get(code);
       return printed != null && printed.campaignKind === "boon" && printed.traits.includes(instruction.trait) && code !== instruction.except;
     };
-    const pooled = pool.filter((card) => card.attachedTo == null && card.back === "player" && !fresh.has(card) && !table.aside.has(card) && poolSeat(card, seats.length) === index && eligible(card.code));
+    const pooled = pool.filter((card) => card.attachedTo == null && card.back === "player" && !fresh.has(card) && !table.aside.has(card) && eligible(card.code));
     const options = [...new Set(pooled.map((card) => card.code))];
     if (options.length === 0) continue;
-    const answer = takeAnswer(table, options, index, `Choose an ${instruction.trait} boon to set aside, out of play. It is left out of your deck this game.`);
+    const answer = takeAnswer(table, options, index, `Choose an ${instruction.trait} boon of the campaign pool to set aside, out of play. It is left out of the decks this game.`);
     if (answer == null) return;
-    const taken = pooled.find((card) => card.code === answer);
+    const taken = pooled.find((card) => card.code === answer && poolSeat(card, seats.length) === index) ?? pooled.find((card) => card.code === answer);
     if (taken) table.aside.add(taken);
     seat.setAside = [...(seat.setAside ?? []), answer];
     table.out.did.push(`Seat ${index + 1} sets ${name(answer)} aside, out of play.`);
@@ -390,7 +390,7 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
     if (dealt(card)) continue;
     // A boon the campaign card's Setup had its player set aside stays in the pool and is not dealt (SetAsideBoon).
     if (six.aside.has(card)) {
-      did7.push(`${name(card.code)} is set aside, out of play, for seat ${poolSeat(card, seatCount) + 1}: it is left out of the deck.`);
+      did7.push(`${name(card.code)} is set aside, out of play: it is left out of the decks.`);
       continue;
     }
     // A burden of a set the campaign card's Setup removes stays in the pool and is not dealt (RemoveBurdenSets).

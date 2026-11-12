@@ -21,6 +21,8 @@ import type { Frame, QueueItem, ScenarioState } from "../core/state.ts";
 import { livingSeats, updateCard } from "../core/state.ts";
 import { seatFor, shuffleIntoEncounterDeck } from "./verbs.ts";
 import { patchTop, topFrame } from "../windows/windows.ts";
+import { queueEvent } from "../windows/queue.ts";
+import { gameReads } from "../core/game-reads.ts";
 import { attachTo, moveCard } from "../core/zones.ts";
 
 function hasEnemyType(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
@@ -148,7 +150,10 @@ function applyTargeted(
       let count = 0;
       for (const id of ids) {
         if (!next.cards[id]) continue;
+        const engaged = next.cards[id]?.zone === "engaged";
         next = updateCard(moveCard(next, id, { zone: "staging" }), id, { controller: null });
+        // "After an enemy enters the staging area" hears an engaged enemy that comes back (146017:A:1); only a game with such a record queues it.
+        if (engaged && gameReads(next, ctx, '"trigger":"returnedToStaging"')) next = queueEvent(next, { trigger: "returnedToStaging", seat: item.seat, cardId: id });
         count += 1;
       }
       const data = topFrame(next)?.data;

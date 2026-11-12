@@ -20,7 +20,7 @@ export const STAGE_RECORDS: readonly Effect[] = [
     instructions: [
       { verb: "CaptureRingBearer", under: TOPMOST_CHAMBER, guarded: true },
       { verb: "SetAside", code: LAST_OF_THE_COMPANY },
-      { verb: "Pick", pick: { type: "hero", control: "any", who: "firstPlayer" } },
+      { verb: "Pick", pick: { type: "hero", control: "you", who: "firstPlayer" } },
       { verb: "AttachSetAside", code: LAST_OF_THE_COMPANY },
       { verb: "MoveAttachment", code: ONE_RING, to: "picked" },
     ],

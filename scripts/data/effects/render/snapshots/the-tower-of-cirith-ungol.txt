@@ -17,7 +17,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
     - exhaust the card with code 146065
     - raise threat by 1 (the acting player)
     - choose enemy (any player controls) or in the staging area
-    - the picked card: stat threat minus (willpower of its host), until the end of the phase
+    - the picked card: stat threatPerHostWillpower -1, until the end of the phase
 
 ## 146015 Topmost Chamber
 (the scenario deals it into the staging pile; the piles place it, no record does)
@@ -54,6 +54,9 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 
 146017:A:1 (front): While Bloodied Courtyard is the active location, it gains: "Forced: After an enemy enters the staging area, deal 1 damage to it."
   146017:forced:1: Forced after an encounter card is added to the staging area (heard about enemy (any player controls))
+    only if this card is the active location
+    - deal 1 damage to the card the event is about
+  146017:forced:2: Forced on the event returnedToStaging (heard about enemy (any player controls))
     only if this card is the active location
     - deal 1 damage to the card the event is about
 
@@ -118,8 +121,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 
 146021:A:3 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   146021:shadow:1: Shadow
-    - when the attack in progress ends:
-      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt no shadow card
+    - this enemy attacks now, dealt a new shadow card after its old ones are discarded [also {"afterThis":true}]
 
 ## 146022 Wounded Uruk
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -134,7 +136,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 
 146022:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack for each damage on it.
   146022:shadow:1: Shadow
-    - the attacking enemy: stat attack damage of the attacking enemy, until the end of the attack
+    - the attacking enemy: stat attackPerDamage 1, until the end of the attack
 
 ## 146023 Orcish Howls
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -142,9 +144,9 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 146023:A:1 (front): When Revealed: Deal 1 damage to each enemy in the staging area. Until the end of the phase, each enemy gets +1 Threat for each damage on it. If there are no enemies in the staging area, Orcish Howls gains surge.
   146023:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"count","pick":{"type":"enemy","control":"any","stagingOnly":true},"max":0}}]
     - for each enemy (any player controls) in the staging area only:
       - deal 1 damage to the picked card
+    - [json GainSurge {"verb":"GainSurge","when":{"kind":"count","pick":{"type":"enemy","control":"any","stagingOnly":true},"max":0}}]
     - every enemy in play: stat threatPerDamage 1, until the end of the phase
 
 146023:A:2 (shadow): Shadow: If you are engaged with another enemy, resolve this attack against that enemy.
@@ -271,7 +273,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json CaptureRingBearer {"verb":"CaptureRingBearer","under":"146015","guarded":true}]
     - [json SetAside {"verb":"SetAside","code":"146014"}]
-    - choose hero (any player controls) chosen by the first player
+    - choose hero (you control) chosen by the first player
     - [json AttachSetAside {"verb":"AttachSetAside","code":"146014"}]
     - the card with code 146065 in play moves, with what is on it, to the last picked hero (one card moves; it never leaves play)
 
@@ -383,4 +385,4 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
   146071:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
     - this card: stat phantom 1, until the end of the attack
 
-(rendered pieces: 235 by template, 29 as JSON)
+(rendered pieces: 235 by template, 30 as JSON)

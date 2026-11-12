@@ -1,7 +1,9 @@
-// Rules: mec113.setting-up-the-game, mec113.the-one-ring, mec113.saga-staging-rules, rr.guarded, rr.travel, rr.quest-advancement, rr.ownership-and-control, faq.progress-without-advancing (data/rules/entries.json); ledger lines 146066:A:1, 146066:B:3, 146015:A:2, 146015:A:3, 146067:B:2, 146068:A:1, 146069:B:1, 146020:A:3.
+// Rules: mec113.setting-up-the-game, mec113.the-one-ring, mec113.saga-staging-rules, rr.guarded, rr.travel, rr.quest-advancement, rr.ownership-and-control, faq.progress-without-advancing (data/rules/entries.json); ledger lines 146014:A:1, 146014:A:2, 146022:A:3, 146066:A:1, 146066:B:3, 146015:A:2, 146015:A:3, 146067:B:2, 146068:A:1, 146068:B:1, 146068:B:3, 146069:B:1, 146020:A:3.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { emptyLog, poolCard } from "../../log.ts";
+import { heroPays } from "../../../rules/player/payments.ts";
+import { hasTrait } from "../../../rules/interpret/conditions.ts";
 import { opened } from "../../../../test/harness/campaign-kit.ts";
 import { ungolStart, ungolWorld } from "../../../../test/scenarios/the-tower-of-cirith-ungol/game.ts";
 import { legalTargets, reduce, type ReduceContext, type ScenarioState } from "../../../rules/engine/reduce.ts";
@@ -9,8 +11,8 @@ import { settle } from "../../../rules/engine/machine.ts";
 import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { runInstruction } from "../../../rules/interpret/interpret.ts";
-import { updateCard } from "../../../rules/core/state.ts";
-import { moveCard } from "../../../rules/core/zones.ts";
+import { flagged, updateCard } from "../../../rules/core/state.ts";
+import { moveCard, spawn } from "../../../rules/core/zones.ts";
 
 // The quest through its three stages as the engine plays it: the Setup of stage 1, the Watchers' defeat and the advance, the chamber's travel bar and its Travel cost, the Ring-bearer's release, and stage 3A with the campaign card's Forced. Each test reaches its moment from the one before.
 const STING = "142011";
@@ -123,5 +125,61 @@ describe("the-tower-of-cirith-ungol stages", () => {
     const steps: never[] = [];
     const placed = settle(syncConstants(runInstruction({ ...spawned, window: null }, { verb: "AddStageProgress", amount: 5 }, { seat: 0, sourceId: null }, ctx, steps), ctx), ctx, steps);
     expect(modifiedStat(placed, placed.cards[shagrat.id]!, "engagementCost", ctx.cards)).toBe(before - 5);
+  });
+
+  it("146014:A:1 gives the attached hero the Ring-bearer trait and the Fellowship sphere, and the first player token never leaves its player", () => {
+    const state = open();
+    const stand = byCode(state, "q1");
+    expect(hasTrait(state, stand.id, "Ring-bearer", ctx)).toBe(true);
+    expect(heroPays(state, stand.id, "fellowship", ctx)).toBe(true);
+    expect(flagged(state, "table", "firstPlayerLocked")).toBe(true);
+  });
+
+  it("146014:A:2 follows the attached hero's Willpower while the effect lasts", () => {
+    const state = open();
+    const company = byCode(state, "146014");
+    const stand = state.cards[company.host ?? ""]!;
+    const orc = spawn(state, "146060", { zone: "staging" });
+    const laid = { ...orc.state, modifiers: [...orc.state.modifiers, { instanceId: orc.id, sourceId: company.id, stat: "threatPerHostWillpower" as const, amount: -1, until: "endOfPhase" as const }] };
+    const threatOf = (current: ScenarioState) => modifiedStat(current, current.cards[orc.id]!, "threat", ctx.cards);
+    const printed = modifiedStat(orc.state, orc.state.cards[orc.id]!, "threat", ctx.cards);
+    const willpower = modifiedStat(laid, laid.cards[stand.id]!, "willpower", ctx.cards);
+    expect(threatOf(laid)).toBe(Math.max(0, printed - willpower));
+    // The hero's Willpower rises later in the phase: the Threat taken off follows it.
+    const stronger = { ...laid, modifiers: [...laid.modifiers, { instanceId: stand.id, sourceId: stand.id, stat: "willpower" as const, amount: 1, until: "endOfPhase" as const }] };
+    expect(threatOf(stronger)).toBe(Math.max(0, printed - willpower - 1));
+  });
+
+  it("146022:A:3 recalculates the Attack for each damage on the enemy while the shadow lasts", () => {
+    const state = open();
+    const uruk = spawn(state, "146022", { zone: "staging" });
+    const laid = { ...uruk.state, modifiers: [...uruk.state.modifiers, { instanceId: uruk.id, sourceId: uruk.id, stat: "attackPerDamage" as const, amount: 1, until: "endOfAttack" as const }] };
+    const attack = (current: ScenarioState) => modifiedStat(current, current.cards[uruk.id]!, "attack", ctx.cards);
+    const bare = attack(laid);
+    expect(attack(updateCard(laid, uruk.id, { damage: 2 }))).toBe(bare + 2);
+    expect(attack(updateCard(laid, uruk.id, { damage: 3 }))).toBe(bare + 3);
+  });
+
+  it("146066:A:1 lets the first player choose Last of the Company's hero among the heroes he controls, never the captive Ring-bearer or another seat's hero", () => {
+    const two = syncConstants(opened(ungolStart(2, 1, "Normal", undefined, emptyLog(2)), ctx), ctx);
+    const host = two.cards[byCode(two, "146014").host ?? ""];
+    expect(host?.controller).toBe(two.firstPlayer);
+    expect(host?.code).not.toBe("141001");
+  });
+
+  it("146068:B:1 bars the Watchers' location until stage 3B holds 12 progress", () => {
+    const at3 = stage3();
+    const at = (progress: number) => travelWindow(updateCard(at3, at3.questStage!, { progress }));
+    expect(targets(at(11))).not.toContain("146070");
+    expect(targets(at(12))).toContain("146070");
+  });
+
+  it("146068:B:3 keeps stage 3B while The Two Watchers is in play, and defeating it wins the game", () => {
+    const at3 = stage3();
+    const full = syncConstants(updateCard(at3, at3.questStage!, { progress: 99 }), ctx);
+    expect(settle({ ...full, window: null }, ctx, []).stageCleared).toBeFalsy();
+    const gone = moveCard(full, byCode(full, "146070").id, { zone: "victory" });
+    const won = settle(syncConstants({ ...gone, window: null }, ctx), ctx, []);
+    expect(won.stageCleared).toBe(true);
   });
 });

@@ -26,7 +26,7 @@ const ANY_ENEMY: PickSpec = { type: "enemy", control: "any", staging: true };
 export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
   [
     // 146014 Last of the Company (an objective attached to a hero in Setup). The attached hero gains the Ring-bearer trait and the Fellowship sphere, and the first player token never leaves its player. Action: exhaust The One Ring and raise your threat by 1 to choose an enemy: until the
-    // end of the phase it gets -X Threat, X the attached hero's Willpower as it resolves (a lasting effect of an encounter card read once, faq.lasting-effects). The enemy may be in the staging area or engaged.
+    // end of the phase it gets -X Threat, X the attached hero's Willpower now, recalculated while it lasts (a lasting effect of an encounter card, faq.lasting-effects). The enemy may be in the staging area or engaged.
     {
       id: "146014:constant:1",
       cardCode: LAST_OF_THE_COMPANY,
@@ -48,7 +48,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
         { verb: "Exhaust", target: { kind: "byCode", code: ONE_RING } },
         { verb: "RaiseThreat", amount: 1, who: "actor" },
         { verb: "Pick", pick: ANY_ENEMY },
-        { verb: "ModifyStat", stat: "threat", amount: { stat: "willpower", of: "host", negative: true }, until: "endOfPhase", target: "picked" },
+        { verb: "ModifyStat", stat: "threatPerHostWillpower", amount: -1, until: "endOfPhase", target: "picked" },
       ],
     },
 
@@ -89,6 +89,17 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       lines: ["146017:A:1"],
       timing: "forced",
       trigger: "addedToStaging",
+      subject: { type: "enemy", control: "any" },
+      condition: { kind: "sourceIn", zone: "activeLocation" },
+      instructions: [{ verb: "DamageCard", amount: 1, target: "subject" }],
+    },
+    // The same Forced for an enemy returned from being engaged (the trigger returnedToStaging, which only this card's record hears).
+    {
+      id: "146017:forced:2",
+      cardCode: "146017",
+      lines: ["146017:A:1"],
+      timing: "forced",
+      trigger: "returnedToStaging",
       subject: { type: "enemy", control: "any" },
       condition: { kind: "sourceIn", zone: "activeLocation" },
       instructions: [{ verb: "DamageCard", amount: 1, target: "subject" }],
@@ -134,16 +145,17 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [{ verb: "ModifyStat", stat: "engagementCost", amount: { x: true }, subtract: true, until: "endOfRound", target: "self" }],
     },
 
-    // 146021 Gorbag (A:1, Cannot have attachments, is a keyword; A:4 is a template). Forced: after he engages you he makes an immediate attack (copied from Haradrim Soldier). Shadow: an additional attack against you after this one (copied from The Dragon's Fury).
+    // 146021 Gorbag (A:1, Cannot have attachments, is a keyword; A:4 is a template). Forced: after he engages you he makes an immediate attack (copied from Haradrim Soldier). Shadow: an additional attack against you after this one, dealt a new shadow card.
     copyLine("144057:A:1", "146021:A:2"),
-    copyLine("19081:A:2", "146021:A:3"),
+    // The additional attack is dealt a new shadow card, the old ones discarded first (faq.additional-attacks); written on its own, as Haradrim Soldier's is (144057:shadow:1), not copied from 19081:A:2.
+    { id: "146021:shadow:1", cardCode: "146021", lines: ["146021:A:3"], timing: "shadow", instructions: [{ verb: "ImmediateAttack", afterThis: true }] },
 
-    // 146022 Wounded Uruk. It enters play with 2 damage on it (staged, engaged or revealed). Forced: after it engages you it gets +2 Attack until the end of the round. Shadow: the attacking enemy gets +1 Attack for each damage on it as the attack is made.
+    // 146022 Wounded Uruk. It enters play with 2 damage on it (staged, engaged or revealed). Forced: after it engages you it gets +2 Attack until the end of the round. Shadow: the attacking enemy gets +1 Attack for each damage on it, recalculated during the attack (faq.lasting-effects).
     { id: "146022:triggered:1", cardCode: "146022", lines: ["146022:A:1"], timing: "triggered", trigger: "encounterEnteredPlay", subject: "self", instructions: [{ verb: "PlaceDamage", amount: 2 }] },
     { id: "146022:forced:1", cardCode: "146022", lines: ["146022:A:2"], timing: "forced", trigger: "engaged", subject: "self", instructions: [{ verb: "ModifyStat", stat: "attack", amount: 2, until: "endOfRound", target: "self" }] },
-    { id: "146022:shadow:1", cardCode: "146022", lines: ["146022:A:3"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "attack", amount: { stat: "damage", of: "attacker" }, until: "endOfAttack", target: "attacker" }] },
+    { id: "146022:shadow:1", cardCode: "146022", lines: ["146022:A:3"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "attackPerDamage", amount: 1, until: "endOfAttack", target: "attacker" }] },
 
-    // 146023 Orcish Howls (Surge is a keyword on its own line). When Revealed: with no enemy in the staging area it gains surge (read before the damage); each enemy in the staging area takes 1 damage; until the end of the phase each enemy gets +1 Threat for each damage on it,
+    // 146023 Orcish Howls (Surge is a keyword on its own line). When Revealed: each enemy in the staging area takes 1 damage; then with no enemy left there it gains surge (an enemy the damage destroys counts as gone); until the end of the phase each enemy gets +1 Threat for each damage on it,
     // read live and for an enemy that arrives later (the flag threatPerDamage). Shadow: if you are engaged with another enemy the attack is resolved against that enemy (chosen by the defending player), which takes the damage after its Defense.
     {
       id: "146023:whenRevealed:1",
@@ -151,8 +163,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       lines: ["146023:A:1"],
       timing: "whenRevealed",
       instructions: [
-        { verb: "GainSurge", when: { kind: "count", pick: STAGED_ENEMIES, max: 0 } },
         { verb: "Each", pick: STAGED_ENEMIES, instructions: [{ verb: "DamageCard", amount: 1, target: "picked" }] },
+        { verb: "GainSurge", when: { kind: "count", pick: STAGED_ENEMIES, max: 0 } },
         { verb: "ModifyStat", stat: "threatPerDamage", amount: 1, until: "endOfPhase", target: "enemies" },
       ],
     },

@@ -30,14 +30,25 @@ const pooled = (seats: 1 | 2, rows: readonly (readonly [string, number])[]): Cam
 const needs = (plan: ReturnType<typeof ungolPlan>) => (plan.ok ? null : plan.needs);
 
 describe("the-tower-of-cirith-ungol SetAsideBoon", () => {
-  it("146069:A:1 asks each player for an Item boon of their own pool cards, never Andúril", () => {
+  it("146069:A:1 asks each player for an Item boon of the whole pool, never Andúril, and not one already set aside", () => {
     const log = pooled(2, [[STING, 0], [ANDURIL, 0], [GLAMDRING, 1], [PHIAL, 1]]);
     const first = needs(ungolPlan(2, log, []));
     expect(first?.seat).toBe(0);
-    expect(first?.options).toEqual([STING]);
-    const second = needs(ungolPlan(2, log, [STING]));
+    expect([...(first?.options ?? [])].sort()).toEqual([STING, GLAMDRING, PHIAL]);
+    // The second player may take a boon the first player's seat holds, and not the one the first chose.
+    const second = needs(ungolPlan(2, log, [GLAMDRING]));
     expect(second?.seat).toBe(1);
-    expect([...(second?.options ?? [])].sort()).toEqual([GLAMDRING, PHIAL]);
+    expect([...(second?.options ?? [])].sort()).toEqual([STING, PHIAL]);
+  });
+
+  it("146069:A:1 sets a boon another seat holds aside as the chooser's, leaving it out of the other seat's deck", () => {
+    const log = pooled(2, [[STING, 0], [GLAMDRING, 1]]);
+    const plan = ungolPlan(2, log, [GLAMDRING, STING]);
+    if (!plan.ok) throw new Error("the plan asks again");
+    expect(plan.seats[0]?.setAside).toEqual([GLAMDRING]);
+    expect(plan.seats[1]?.setAside).toEqual([STING]);
+    expect(plan.seats[0]?.deck).not.toContain(STING);
+    expect(plan.seats[1]?.deck).not.toContain(GLAMDRING);
   });
 
   it("146069:A:1 sets the chosen boon aside for its seat and leaves it out of that seat's deck", () => {

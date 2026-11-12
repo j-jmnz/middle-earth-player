@@ -67,9 +67,24 @@ export function modifiedStat(
   }
   // "+1 Threat for each damage on it" (146023:A:1): held per damage, read as the Threat is.
   if (stat === "threat" && instance.damage > 0) total += instance.damage * heldAmountByClass(state, instance, printed, "threatPerDamage");
+  // "+1 Attack for each damage on it" (146022:A:3) and "-X Threat, X the attached hero's Willpower" (146014:A:2): encounter cards' lasting effects, recalculated as the damage and the Willpower change (faq.lasting-effects).
+  if (stat === "attack" && instance.damage > 0) total += instance.damage * heldAmountByClass(state, instance, printed, "attackPerDamage");
+  if (stat === "threat") total += threatPerHostWillpower(state, instance, printed, cards);
   const lowered = set ?? total;
   const value = stat === "willpower" && lowered < floor && flagged(state, instance.id, "cannotReduceWillpower") ? floor : lowered;
   return CARD_STATS.has(stat) ? Math.max(0, value) : value;
+}
+
+// The Threat a card holds from effects that follow the Willpower of their source's host (the flag threatPerHostWillpower, an amount of -1 for "-X Threat"): read now, so the number follows the hero's Willpower while the effect lasts.
+function threatPerHostWillpower(state: ScenarioState, instance: CardInstance, printed: PrintedCard, cards: ReadonlyMap<string, PrintedCard>): number {
+  let total = 0;
+  for (const modifier of state.modifiers) {
+    if (modifier.stat !== "threatPerHostWillpower" || !modifierActive(state, modifier) || !heldBy(modifier, instance, printed)) continue;
+    const hostId = state.cards[modifier.sourceId]?.host;
+    const host = hostId ? state.cards[hostId] : undefined;
+    if (host) total += modifier.amount * modifiedStat(state, host, "willpower", cards);
+  }
+  return total;
 }
 
 // The enemy in this attack costs more to engage than the threat of the holder's controller. "Your threat" in "defending
