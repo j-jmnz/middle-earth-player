@@ -1,0 +1,344 @@
+Scenario piles that place cards with no record (staging: 09017 Orc War Party; quest: 09068 Stop the War Party; setAside: 09016 Iârion)
+
+## 09016 Iârion
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+09016:A:1 (front): X is the number of quest cards in play.
+  09016:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat willpower the number of quest cards in play (the main quest card, each encounter side quest in the staging area and each player side quest; at least 1), while this card is in play
+    - this card: stat attack the number of quest cards in play (the main quest card, each encounter side quest in the staging area and each player side quest; at least 1), while this card is in play
+    - this card: stat defense the number of quest cards in play (the main quest card, each encounter side quest in the staging area and each player side quest; at least 1), while this card is in play
+
+09016:A:2 (front): The first player gains control of Iârion.
+  09016:constant:2: Constant
+    - [json ControlledBy {"verb":"ControlledBy","who":"firstPlayer","card":"self"}]
+
+09016:A:3 (front): Response: After a side quest is revealed from the encounter deck, ready Iârion.
+  09016:response:1: Response after a card is revealed (heard about card (any player controls) of card type encounter-side-quest)
+    only if this card is a exhausted character (you control)
+    - ready this card
+
+09016:A:4 (front): If Iârion leaves play, the players lose the game.
+  09016:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    - the players lose the game
+
+## 09017 Orc War Party
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+09017:A:1 (front): Cannot have attachments.
+  09017:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+09017:A:2 (front): While Orc War Party is in the staging area, enemies in the staging area cannot take damage.
+  09017:constant:2: Constant
+    only if this card is in the staging area
+    - each enemy (any player controls) in the staging area only: stat cannotTakeDamage 1, while this card is in play
+
+09017:A:3 (front): The players cannot win the game while Orc War Party is in play.
+  09017:constant:3: Constant
+    - the players cannot defeat this stage while this holds
+
+## 09018 Chetwood Forest
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09018:A:1 (front): Travel: One player chooses and engages an enemy in the staging area.
+  09018:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose player (any player controls) chosen by the first player
+    - [json SwitchActor {"verb":"SwitchActor","to":"picked"}]
+    - choose enemy (any player controls) in the staging area only
+    - engage the picked card
+
+09018:A:2 (shadow): Shadow: Defending player either exhausts a hero he controls, or returns attacking enemy to the staging area after this attack.
+  09018:shadow:1: Shadow
+    - the acting player chooses one of:
+      * option "exhaust" (only if there is a ready hero (you control) to choose):
+        - choose ready hero (you control)
+        - exhaust the picked card
+      * option "staging":
+        - when the attack in progress ends:
+          - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 09019 Borders of Bree-land
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09019:A:1 (front): While Borders of Bree-land is in the staging area, it gains: "Forced: At the beginning of the quest phase, return 1 enemy engaged with a player to the staging area."
+  09019:forced:1: Forced when a phase begins
+    only if all of: (it is the Quest phase) and (this card is in the staging area)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) chosen by the first player
+    - return the picked card to the staging area
+
+09019:A:2 (shadow): Shadow: Defending character gets -1 Defense for each quest stage in play.
+  09019:shadow:1: Shadow
+    - the defender: stat defense minus (the number of quest cards in play (the main quest card, each encounter side quest in the staging area and each player side quest; at least 1)), until the end of the attack
+
+## 09020 Outlying Homestead
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09020:A:1: Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+09020:A:2 (front): While Outlying Homestead is in the staging area, players cannot reduce their threat.
+  09020:constant:1: Constant
+    only if this card is in the staging area
+    - each player: stat noThreatReduction 1, while this card is in play
+
+09020:A:3 (front): Travel: Reveal a card from the encounter deck.
+  09020:travel:1: Travel
+    - the acting player reveals an encounter card
+
+## 09021 Sudden Assault
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09021:A:1 (front): When Revealed: If the total Willpower of characters committed to the quest is greater than the total Threat in the staging area, each enemy in the staging area makes an immediate attack against the first player. If no attack is made this way, search the encounter deck and discard pile for an Orc War Party and add it to the staging area. Shuffle the encounter deck. This effect cannot be canceled.
+  09021:whenRevealed:1: When revealed (cannot be canceled while this card is in the staging area)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json SearchMove {"verb":"SearchMove","code":"09017","to":"staging","when":{"kind":"not","condition":{"kind":"questLeads","attacks":true}}}]
+    - then, if the total Willpower of the characters committed to the quest is greater than the total Threat in the staging area (checked when this step runs, after the steps above; not tied to whether they did anything): for each enemy (any player controls) in the staging area only:
+      - the picked enemy attacks the first player now, from the staging area
+    - shuffle the encounter deck
+
+## 09022 Surprising Speed
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09022:A:1 (front): When Revealed: Each player returns 1 enemy engaged with him to the staging area. If no enemy was returned to the staging area this way, Surprising Speed gains surge and doomed 1.
+  09022:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - return one enemy engaged with the acting player (that player picks which) to the staging area
+    - [json GainSurge {"verb":"GainSurge","when":{"kind":"noneReturned"}}]
+    - [json Doomed {"verb":"Doomed","amount":1,"when":{"kind":"noneReturned"}}]
+
+09022:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. Return attacking enemy to the staging area after this attack.
+  09022:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 09023 Orc Rearguard
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09023:A:1 (front): No more than 3 progress tokens can be placed on the current quest each round.
+  09023:constant:1: Constant
+    only if this card is in the staging area
+    - the table: stat questProgressCap (no more than this much progress can be placed on the current quest in all; progress that goes to the active location first does not count) 3, while this card is in play
+
+09023:A:2 (front): While Orc Rearguard is the current quest it gains: "Forced: At the end of the staging step, reveal 1 card from the encounter deck."
+  09023:forced:1: Forced on the event stagingStepEnds
+    only if this card is the current quest
+    - the acting player reveals an encounter card
+
+## 09024 Rescue Iârion
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09024:A:1 (front): Time 4.
+  09024:constant:1: Constant
+    - Time 4: when this card is revealed, 4 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+
+09024:A:2 (front): When Revealed: The first player loses control of Iârion and places him facedown underneath this stage. When this stage is defeated, the first player takes control of Iârion and exhausts him.
+  09024:whenRevealed:1: When revealed
+    - the card with code 09016 that a player controls lies facedown under this card, still in play, controlled by no one, with what is attached to it; when this card is defeated it returns under the first player, exhausted
+
+09024:A:3 (front): Forced: After the last time counter is removed from this stage, discard Iârion.
+  09024:forced:1: Forced on the event lastTimeCounterRemoved
+    - the card held under this card is discarded from where it lies, and leaves play
+
+## 09043 Angmar Orc
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09043:A:1 (front): When Revealed: Either discard 1 ally from play, or reveal an additional encounter card.
+  09043:whenRevealed:1: When revealed
+    - the first player chooses one of:
+      * option "ally" (only if there is a ally (any player controls) to choose):
+        - choose ally (any player controls) chosen by the first player
+        - discard the picked card
+      * option "reveal":
+        - the acting player reveals an encounter card
+
+09043:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys an ally, return attacking enemy to the staging area.
+  09043:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (the event's other card is a ally (any player controls) [also {"inPlay":false}]): return the attacking enemy (the card whose shadow this is the attacker of) to the staging area
+
+## 09044 Angmar Marauder
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09044:A:1 (front): Forced: After Angmar Marauder attacks and destroys an ally, return it to the staging area.
+  09044:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    only if the event's other card is a ally (any player controls) [also {"inPlay":false}]
+    - return this card to the staging area
+
+09044:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each ally the defending player controls.
+  09044:shadow:1: Shadow
+    - the attacking enemy: stat attack the number of ally (you control), until the end of the attack
+
+## 09045 Angmar Captain
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09045:A:1 (front): Forced: After Angmar Captain attacks and destroys an ally, discard the top card of the defending player's deck. If the discarded card is an ally, Angmar Captain makes an additional attack against the defending player.
+  09045:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
+    only if the event's other card is a ally (any player controls) [also {"inPlay":false}]
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json DiscardFromDeck {"verb":"DiscardFromDeck","amount":1,"count":{"type":"ally","control":"any","looked":true}}]
+    - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
+
+## 09046 Orc Ambush
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09046:A:1 (front): Each Orc enemy gets +1 Threat, +1 Attack, and +1 Defense.
+  09046:constant:1: Constant
+    only if this card is in the staging area
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - every enemy in play (Orc only): stat threat 1, while this card is in play
+    - every enemy in play (Orc only): stat attack 1, while this card is in play
+    - every enemy in play (Orc only): stat defense 1, while this card is in play
+
+09046:A:2 (front): When Revealed: Each player must search the encounter deck and discard pile for an Orc enemy and put it into play engaged with him. Shuffle the encounter deck.
+  09046:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - [json SearchMove {"verb":"SearchMove","trait":"Orc","type":"enemy","to":"engaged"}]
+    - shuffle the encounter deck
+
+## 09047 Rugged Country
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09047:A:1 (front): If the current quest is a side quest, Rugged Country gets +2 Threat.
+  09047:constant:1: Constant
+    only if the current quest is a side quest
+    - this card: stat threat 2, while this card is in play
+
+09047:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each quest card in play.
+  09047:shadow:1: Shadow
+    - the attacking enemy: stat attack the number of quest cards in play (the main quest card, each encounter side quest in the staging area and each player side quest; at least 1), until the end of the attack
+
+## 09048 Shrouded Hills
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09048:A:1 (front): X is the number of quest cards in play.
+  09048:constant:1: Constant
+    - this card: stat threat the number of quest cards in play (the main quest card, each encounter side quest in the staging area and each player side quest; at least 1), while this card is in play
+
+09048:A:2 (front): While there is only 1 quest card in play, Shrouded Hills gains surge.
+  09048:constant:2: Constant
+    only if the number of quest cards in play (the main quest card, each encounter side quest in the staging area and each player side quest; at least 1) is less than 2
+    - this card: stat gainsSurge 1, while this card is in play
+
+## 09049 Pressing Needs
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09049:A:1: Doomed 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+09049:A:2 (front): When Revealed: Either search the encounter deck and discard pile for an encounter side quest and reveal it, or choose a different quest card in play to be the current quest until the end of the phase. Shuffle the encounter deck.
+  09049:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the first player chooses one of:
+      * option "search" (only if [json condition {"kind":"searchable","type":"encounter-side-quest"}]):
+        - the first player searches the encounter deck and discard pile for a encounter-side-quest, reveals it and adds it to the staging area
+      * option "current" (only if there is a quest card besides the current quest that could be chosen to be the current quest (the main quest card, or an encounter side quest in the staging area)):
+        - the first player chooses a quest card other than the current quest (the main quest card, or an encounter side quest in the staging area) to be the current quest until the end of the phase
+    - shuffle the encounter deck
+
+## 09050 Weight of Responsibility
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09050:A:1 (front): When Revealed: Reveal 1 encounter card for each quest card in play.
+  09050:whenRevealed:1: When revealed
+    - the acting player reveals the number of quest cards in play (the main quest card, each encounter side quest in the staging area and each player side quest; at least 1) encounter cards, one after the other, each in a staging of its own
+
+09050:A:2 (shadow): Shadow: Defending player discards 1 attachment he controls for each quest card in play.
+  09050:shadow:1: Shadow
+    - repeat the number of quest cards in play (the main quest card, each encounter side quest in the staging area and each player side quest; at least 1) times:
+      - choose attachment (you control)
+      - discard the picked card
+
+## 09051 Lost in the Wilderness
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09051:A:1 (front): When Revealed: Each player places all cards in his hand facedown underneath Lost in the Wilderness.
+  09051:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player places every card in their hand facedown under this card (out of play, still theirs)
+
+09051:A:2 (front): Forced: When Lost in the Wilderness is defeated, return each card underneath it to its owner's hand.
+  09051:forced:1: Forced on the event questDefeated
+    - [json ReturnFacedownToHands {"verb":"ReturnFacedownToHands"}]
+
+## 09068 Stop the War Party
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+09068:A:1 (front): Setup: Put Iârion into play. Add 1 Orc War Party to the staging area. Each player adds 1 different location to the staging area. Shuffle the encounter deck.
+  09068:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Iârion","to":"firstPlayer"}]
+    - for each player, first player first:
+      - [json SearchMove {"verb":"SearchMove","type":"location","to":"staging","different":true,"deckOnly":true}]
+    - shuffle the encounter deck
+
+09068:B:1 (back): Enemies do not make engagement checks.
+  09068:constant:1: Constant
+    - the table: stat noEngagementChecks 1, while this card is in play
+
+09068:B:2 (back): Forced: At the end of the refresh phase, raise each player's threat by 1 for each enemy in the staging area.
+  09068:forced:1: Forced at the end of the phase
+    only if it is the Refresh phase
+    - raise threat by the number of enemy (any player controls) in the staging area only (each player)
+
+09068:B:3 (back): The players cannot defeat this stage unless the first player controls Iârion. If the players defeat this stage, they win the game.
+  09068:constant:2: Constant
+    only if not (the actor controls the card with code 09016)
+    - the players cannot defeat this stage while this holds
+
+## 10156 Intruders in Chetwood
+
+10156:A:1 (front): You are playing campaign mode.
+  (inert: the engine applies it by rule, no record)
+
+10156:A:2 (front): Setup: Attach Iârion's Pendant to Iârion and add the Protect the Innocent side quest to the staging area. Starting with the first player, each player may place 4 damage on Protect the Innocent to add 1 resource to each of their heroes' resource pools.
+  10156:campaignSetup:1: Campaign setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json AddToStaging {"verb":"AddToStaging","code":"10158"}]
+    - a copy of the card with code 10157 from the supply is put into play attached to the card titled "Iârion"
+    - starting with the first player, each player may place 4 damage on the card with code 10158 to add 1 resource to each of their heroes' pools
+
+10156:B:1 (back): Resolution: Note the amount of damage on Protect the Innocent in the Campaign Log and add Protect the Innocent to the Campaign Pool.
+  10156:resolution:1: Resolution
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - [json RecordDamageOn {"verb":"RecordDamageOn","codes":["10158"]}]
+    - [json Earn {"verb":"Earn","codes":["10158"]}]
+
+## 10157 Iârion's Pendant
+
+10157:A:1 (front): Attached character gets +1 Willpower.
+  10157:constant:1: Constant
+    - its host: stat willpower 1, while this card is in play
+
+10157:A:2 (front): Response: Add Iârion's Pendant to the victory display to cancel the 'when revealed' effects of a card that was just revealed from the encounter deck, or to cancel a shadow effect just triggered.
+  10157:response:1: Response on the event whenRevealedPending (heard about card (any player controls); cost: [json cost {"kind":"addSelfToVictory"}])
+    - [json CancelEffect {"verb":"CancelEffect"}]
+  10157:response:2: Response on the event shadowPending (cost: [json cost {"kind":"addSelfToVictory"}])
+    - [json CancelEffect {"verb":"CancelEffect"}]
+
+## 10158 Protect the Innocent
+
+10158:A:1 (front): Forced: After an attack damages a character, place 1 damage on Protect the Innocent.
+  10158:forced:1: Forced on the event attackDamagedCharacter (heard about enemy (any player controls) or in the staging area)
+    - [json PlaceDamageOn {"verb":"PlaceDamageOn","code":"10158","amount":1}]
+
+10158:A:2 (front): When progress would be placed on Protect the Innocent, remove that much damage from it instead.
+  10158:constant:1: Constant
+    - this card: stat progressRemovesDamage 1, while this card is in play
+
+10158:A:3 (front): If Protect the Innocent has 10 or more damage on it (20 or more damage if there are 3 or 4 players in the game), the players lose the game.
+  10158:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (2 is less than the number of players): this card: stat loseAtDamage 10, while this card is in play
+    - then, if 2 is less than the number of players (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat loseAtDamage 20, while this card is in play
+
+(rendered pieces: 186 by template, 22 as JSON)

@@ -39,6 +39,7 @@ function base(expr: Obj, ctx: Ctx, pick: PickRenderer): { text: string; read: st
   if (expr.highestThreat === true) return { text: "the highest threat among the living players", read: ["highestThreat"] };
   if (typeof expr.playersAtThreat === "number") return { text: `the number of living players with a threat of ${expr.playersAtThreat} or higher`, read: ["playersAtThreat"] };
   if (expr.pursuit === true) return { text: "the pursuit value", read: ["pursuit"] };
+  if (expr.questCards === true) return { text: "the number of quest cards in play (the main quest card, each encounter side quest in the staging area and each player side quest; at least 1)", read: ["questCards"] };
   if (expr.x === true) return { text: "X", read: ["x"] };
   if (expr.stage === true) return { text: "the stage number of the quest", read: ["stage"] };
   if (typeof expr.threat === "string") return { text: expr.threat === "tens" ? "the tens digit of your threat" : "your threat", read: ["threat"] };

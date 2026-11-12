@@ -56,6 +56,8 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   onDial: (c) => ({ text: `the actor's threat dial holds a copy of the card with code ${str(c.code)}`, read: ["code"] }),
   canAttachToDial: (c) => ({ text: `a copy of the card with code ${str(c.code)} is set aside and the actor's threat dial holds none`, read: ["code"] }),
   pursuit: (c) => ({ text: `the pursuit value is ${range(c.min, c.max)}`, read: ["min", "max"] }),
+  currentQuest: (c) => ({ text: c.is === "side" ? "the current quest is a side quest" : c.is === "self" ? "this card is the current quest" : "there is a quest card besides the current quest that could be chosen to be the current quest (the main quest card, or an encounter side quest in the staging area)", read: ["is"] }),
+  questLeads: (c) => ({ text: `the total Willpower of the characters committed to the quest is greater than the total Threat in the staging area${c.attacks === true ? ", and an enemy is in the staging area to attack" : ""}`, read: ["attacks"] }),
   soleAttacker: () => ({ text: "exactly one character was declared as an attacker in this attack", read: [] }),
   captives: (c) => ({ text: `the number of Captives in play${c.of === "actor" ? " that belong to the acting seat" : ""} is ${range(c.min, c.max)}`, read: ["min", "max", "of"] }),
   matches: (c, ctx) => ({ text: `${typeof c.card === "string" ? cardRefWords(c.card) : "the card"} is a ${renderPick(c.pick, ctx)}`, read: ["card", "pick"] }),

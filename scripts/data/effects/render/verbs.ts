@@ -147,6 +147,14 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   SetPursuit: (i) => ({ text: `set the pursuit value to ${str(i.value)}`, read: ["value"] }),
   RaisePursuit: (i, ctx) => ({ text: `increase the pursuit value by ${amount(i.amount, ctx)}`, read: ["amount"] }),
   LowerPursuit: (i, ctx) => ({ text: `reduce the pursuit value by ${amount(i.amount, ctx)} (never below 0)`, read: ["amount"] }),
+  Time: (i) => ({ text: `Time ${str(i.amount)}: when this card is revealed, ${str(i.amount)} resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase`, read: ["amount"] }),
+  RemoveTimeCounters: () => ({ text: "one time counter comes off each card in play with Time X (the end of the refresh phase, after its Forced effects); a card whose last counter goes hears it", read: [] }),
+  HoldUnder: (i) => ({ text: `the card with code ${str(i.code)} that a player controls lies facedown under this card, still in play, controlled by no one, with what is attached to it; when this card is defeated it returns under the first player, exhausted`, read: ["code"] }),
+  DiscardHeld: () => ({ text: "the card held under this card is discarded from where it lies, and leaves play", read: [] }),
+  PlaceHandUnderSelf: () => ({ text: "the acting player places every card in their hand facedown under this card (out of play, still theirs)", read: [] }),
+  ChooseCurrentQuest: () => ({ text: "the first player chooses a quest card other than the current quest (the main quest card, or an encounter side quest in the staging area) to be the current quest until the end of the phase", read: [] }),
+  AttachNewTo: (i) => ({ text: `a copy of the card with code ${str(i.code)} from the supply is put into play attached to the card titled "${str(i.to)}"`, read: ["code", "to"] }),
+  TradeDamageForResources: (i) => ({ text: `starting with the first player, each player may place ${str(i.damage)} damage on the card with code ${str(i.code)} to add ${str(i.resources)} resource to each of their heroes' pools`, read: ["code", "damage", "resources"] }),
   TakeLoggedCaptives: (i) => ({ text: `each seat the Campaign Log names a Captive for has that hero lie faceup under the card with code ${str(i.under)}`, read: ["under"] }),
   MakeCaptive: (i) => ({ text: `the picked hero becomes a Captive: it lies faceup under the card with code ${str(i.under)}, in play and controlled by no one`, read: ["under"] }),
   HoldCaptive: () => ({ text: "the picked Captive is attached to this card", read: [] }),
@@ -188,7 +196,7 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   DiscardUntilEnemies: (i) => i.cardType === "location"
     ? { text: `discard cards from the top of the encounter deck until ${str(i.perPlayer)} location(s) for each player in the game are discarded, or the deck is empty, and add each location discarded to the staging area`, read: ["perPlayer", "to", "cardType"] }
     : ({ text: `discard from the top of the encounter deck until ${str(i.perPlayer)} enem${i.perPlayer === 1 ? "y" : "ies"} for each player ${i.perPlayer === 1 ? "is" : "are"} discarded${i.to === "staging" ? "; add those enemies to the staging area" : ""}`, read: ["perPlayer", "to", "cardType"] }),
-  RevealEncounter: (i) => ({ text: `${who(i.who ?? "actor")} reveals an encounter card`, read: ["who"] }),
+  RevealEncounter: (i, ctx) => ({ text: i.times === undefined ? `${who(i.who ?? "actor")} reveals an encounter card` : `${who(i.who ?? "actor")} reveals ${amount(i.times, ctx)} encounter cards, one after the other, each in a staging of its own`, read: ["who", "times"] }),
   AdvanceStage: () => ({ text: "advance to the next quest stage", read: [] }),
   WinGame: () => ({ text: "the players win the game", read: [] }),
   LoseGame: (i) => ({ text: `the players lose the game${typeof i.reason === "string" ? ` (${i.reason})` : ""}`, read: ["reason"] }),

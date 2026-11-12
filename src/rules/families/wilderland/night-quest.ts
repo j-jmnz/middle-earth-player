@@ -17,7 +17,7 @@ export function hasSideQuests(state: Pick<ScenarioState, "piles" | "sideQuests">
 
 /** The start of a game that deals an encounter side quest outside a side quest deck notes it (`sideQuests`); a game with the deck, or with none, is left as it is. */
 export function markSideQuests(state: ScenarioState, cards: ReduceContext["cards"]): ScenarioState {
-  if (hasSideQuests(state) || !Object.values(state.cards).some((card) => printedOf(cards, card.code).type === "encounter-side-quest")) return state;
+  if (hasSideQuests(state) || !Object.values(state.cards).some((card) => cards.get(card.code)?.type === "encounter-side-quest")) return state;
   return { ...state, sideQuests: true };
 }
 
