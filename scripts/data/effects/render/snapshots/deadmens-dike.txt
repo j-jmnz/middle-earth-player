@@ -246,7 +246,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
   09066:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card counts as a Condition attachment while it is attached
-    - while this card is in play, each card a player plays from hand that is a card (any player controls) with a card of its title in its owner's discard pile costs 1 more (every player's; several such cards stack)
+    - while this card is in play, each card a player plays (from any zone) that is a card (any player controls) with a card of its title in its owner's discard pile costs 1 more (every player's; several such cards stack)
 
 ## 09067 The Power of Angmar
 (the scenario deals it into the encounter pile; the piles place it, no record does)

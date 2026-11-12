@@ -42,7 +42,7 @@ import * as opens from "../scenarios/the-black-gate-opens/game.ts";
 import * as doom from "../scenarios/mount-doom/game.ts";
 import * as chetwood from "../scenarios/intruders-in-chetwood/game.ts";
 import * as hills from "../scenarios/the-weather-hills/game.ts";
-// import * as dike from "../scenarios/deadmens-dike/game.ts";
+import * as dike from "../scenarios/deadmens-dike/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -98,6 +98,7 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-fate-of-wilderland", "The Fate of Wilderland", wilderland.WILDERLAND_GOLDENS, wilderland.wilderlandWorld, wilderland.playGolden),
   entry("intruders-in-chetwood", "Intruders in Chetwood", chetwood.CHETWOOD_GOLDENS, chetwood.chetwoodWorld, chetwood.playGolden),
   entry("the-weather-hills", "The Weather Hills", hills.HILLS_GOLDENS, hills.hillsWorld, hills.playGolden),
+  entry("deadmens-dike", "Deadmen's Dike", dike.DIKE_GOLDENS, dike.dikeWorld, dike.playGolden),
   entry("the-uruk-hai", "The Uruk-hai", hai.HAI_GOLDENS, hai.haiWorld, hai.playGolden),
   entry("helms-deep", "Helm's Deep", deep.DEEP_GOLDENS, deep.deepWorld, deep.playGolden),
   entry("the-road-to-isengard", "The Road to Isengard", isengard.ISENGARD_GOLDENS, isengard.isengardWorld, isengard.playGolden),
@@ -110,5 +111,4 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-tower-of-cirith-ungol", "The Tower of Cirith Ungol", ungol.UNGOL_GOLDENS, ungol.ungolWorld, ungol.playGolden),
   entry("the-black-gate-opens", "The Black Gate Opens", opens.OPENS_GOLDENS, opens.opensWorld, opens.playGolden),
   entry("mount-doom", "Mount Doom", doom.DOOM_GOLDENS, doom.doomWorld, doom.playGolden),
-  // entry("deadmens-dike", "Deadmen's Dike", dike.DIKE_GOLDENS, dike.dikeWorld, dike.playGolden),
 ];

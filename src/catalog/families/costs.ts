@@ -12,7 +12,7 @@ const icon = z.enum(["leadership", "tactics", "spirit", "lore"]);
 const spendIcon = z.enum(["leadership", "tactics", "spirit", "lore", "fellowship"]);
 
 const VERBS = [
-  // Constant on a card in play (an encounter card: it applies to every player): a card a player plays from hand costs `amount` more when it matches `pick`, read from the playing seat's side ("increase its cost by 1 if there is a card that has the same
+  // Constant on a card in play (an encounter card: it applies to every player): a card a player plays (from any zone, the discard pile included) costs `amount` more when it matches `pick`, read from the playing seat's side ("increase its cost by 1 if there is a card that has the same
   // title in its owner's discard pile", 09066:A:2; rr.modifiers: a cost below 0 counts as 0). Several cards stack. Read where a card is paid for (src/rules/player/cost-rules.ts costIncrease).
   z.strictObject({ verb: z.literal("IncreaseCost"), amount: z.number().int().positive(), pick: pickSchema, ...when }),
   // Constant on a hero: while it pays for a card that matches `pick`, it counts as having these resource icons (resource match
