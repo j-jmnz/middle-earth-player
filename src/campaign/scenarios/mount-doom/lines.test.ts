@@ -20,13 +20,6 @@ const fire = (state: ScenarioState, ctx: ReduceContext, event: Parameters<typeof
   const steps: EngineStep[] = [];
   return settle(fireForced({ ...state, window: null }, event, ctx, steps), ctx, steps);
 };
-// The first player's Fortitude test: commit nobody and play the test's action window to its end.
-const failTest = (state: ScenarioState, ctx: ReduceContext): ScenarioState => {
-  let run = start(state);
-  if (run.state.window?.kind === "fortitudeCommit") run = send(run, { type: "CommitFortitude", cardIds: [] }, ctx);
-  for (let guard = 0; guard < 10 && run.state.window?.kind === "frameAction"; guard += 1) run = send(run, { type: "Pass" }, ctx);
-  return run.state;
-};
 const failed = (state: ScenarioState): ScenarioState => ({ ...state, fortitudeFailures: [{ seat: 0, round: state.round, phase: "Quest" }] });
 
 describe("The Tower of Barad-dur", () => {
