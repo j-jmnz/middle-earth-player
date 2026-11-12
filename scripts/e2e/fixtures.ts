@@ -89,6 +89,7 @@ import { doomFixtures } from "./mount-doom.ts";
 import { chetwoodFixtures } from "./angmar-awakened/intruders-in-chetwood.ts";
 import { hillsFixtures } from "./angmar-awakened/the-weather-hills.ts";
 import { dikeFixtures } from "./angmar-awakened/deadmens-dike.ts";
+import { eriadorFixtures } from "./angmar-awakened/the-wastes-of-eriador.ts";
 import { FIXTURE_REGISTRY, fixtureFile, type FixtureName, type FixtureScenarioId } from "../../src/campaign/fixtures/registry.ts";
 import { createLog, runScript } from "../log.ts";
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
@@ -422,6 +423,7 @@ const WRITERS: Record<Chained, (written: Written) => Promise<object> | object> =
   "intruders-in-chetwood": () => chetwoodFixtures(),
   "the-weather-hills": () => hillsFixtures(),
   "deadmens-dike": () => dikeFixtures(),
+  "the-wastes-of-eriador": () => eriadorFixtures(),
 };
 
 // The won game is open: no legal win of the two starter decks has been found on this engine (docs/phases/STATUS.md), so
