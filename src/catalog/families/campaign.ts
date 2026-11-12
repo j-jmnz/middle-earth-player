@@ -127,6 +127,10 @@ const VERBS = [
 ] as const;
 
 const TRIGGERS = [] as const;
-const FLAGS = [] as const;
+const FLAGS = [
+  // On "table" (target `table`), from the campaign card, for the whole scenario: the scenario has no win, and it ends when the last player is eliminated, which runs the Resolution as a win does (The Black Gate Opens, 146073:B:3 and 146074:B:1; docs/brief.md,
+  // The Return of the King). The last seat is not marked eliminated, so the Resolution reads the state as it stood when it fell. Held by no other scenario: every other scenario's loss writes nothing.
+  "endsInDefeat",
+] as const;
 
 export const manifest = { name: "campaign", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

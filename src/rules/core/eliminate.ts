@@ -81,10 +81,21 @@ function livingSuccessor(state: ScenarioState): number | null {
   return null;
 }
 
+/** The scenario's records say its last player's elimination is its Resolution, not a loss (the flag `endsInDefeat`, held from the campaign card). */
+export function endsInDefeat(state: ScenarioState): boolean {
+  return heldAmount(state, "table", "endsInDefeat") > 0;
+}
+
 // A seat leaves the game (rr.player-elimination): the step is recorded and the seat marked eliminated; settle moves its cards (clearEliminated). With no seat left the game is lost. Every elimination goes through here.
 export function eliminateSeat(state: ScenarioState, index: number, steps: EngineStep[]): ScenarioState {
   const seat = state.seats[index];
   if (!seat || seat.eliminated) return state;
+  // A scenario whose records hold `endsInDefeat` ends when its last player is eliminated, and the end is its Resolution (The Black Gate Opens): the seat stays as it stood and the scenario is cleared, so a win's Resolution reads that state.
+  if (endsInDefeat(state) && livingSeats(state).length === 1) {
+    if (state.stageCleared) return state;
+    steps.push({ kind: "eliminate", seat: index });
+    return { ...state, stageCleared: true, window: null, pendingAttack: null };
+  }
   steps.push({ kind: "eliminate", seat: index });
   const next = withSeat(state, index, { ...seat, eliminated: true });
   return livingSeats(next).length === 0 ? markLoss(next, "No seats remain") : next;
@@ -96,8 +107,8 @@ export function eliminateEmpties(state: ScenarioState, steps: EngineStep[], fina
   for (let index = 0; index < next.seatCount; index += 1) {
     const seat = next.seats[index];
     if (!seat || seat.eliminated) continue;
-    // The elimination level, lowered by a card the seat holds (The One Ring, families/misc.ts).
-    const level = 50 - Math.max(0, heldAmount(next, `seat:${index}`, "eliminationReduction"));
+    // The elimination level (99 while the main quest is Dire, mec113.dire), lowered by a card the seat holds (The One Ring, families/misc.ts).
+    const level = (next.dire ? 99 : 50) - Math.max(0, heldAmount(next, `seat:${index}`, "eliminationReduction"));
     if (!final && seat.threat < level && seat.heroes.length === 0 && (state.heroSavers ?? []).includes(index)) continue;
     // A hero an enemy guards is in play, not killed (Carried Away, 18074:B:1; rr.player-elimination): its owner is not out of heroes while it is held.
     const held = seat.threat < level && seat.heroes.length === 0 && Object.values(next.cards).some((card) => heldHero(card) && card.owner === index);

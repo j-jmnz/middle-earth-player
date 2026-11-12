@@ -52,11 +52,11 @@ const VERBS = [
   // The enemy (the picked card) in the staging area attacks the actor now, as an attack outside the combat phase, though it is not
   // engaged (142038:A:2). It is dealt a shadow card of its own.
   // `target: self`: the source enemy attacks (a When Revealed on the enemy, 142047:A:1). `who: firstPlayer`: the first player is attacked, whoever
-  // the actor is ("The Balrog makes an attack", 142043:A:2, which is considered engaged with the first player).
+  // the actor is ("The Balrog makes an attack", 142043:A:2, which is considered engaged with the first player). `who: eventSeat`: the player the answered event happened to is attacked ("The Mouth of Sauron makes an immediate attack against that player", 146031:A:2: the player who canceled the When Revealed).
   // `undefendedToStage`: "Undefended damage from this attack must be dealt to Hrogar's Hill" (19081:A:1): the damage of the attack if it is left undefended goes on the main quest card, not a hero (emce.side-quests).
   // `orEngaged`: the picked enemy may be engaged with a player instead and attacks as it is, without leaving its engagement ("Fram's Shade makes an immediate attack against each player", 19097:A:3).
   // `target: host`: the enemy the source is attached to attacks ("Saruman attacks that player", 143048:A:1). `shadows`: it is dealt this many shadow cards for the attack ("Deal and resolve 2 shadow cards", 143048:A:1).
-  z.strictObject({ verb: z.literal("AttackFromStaging"), target: z.enum(["self", "host"]).optional(), shadows: z.number().int().min(2).max(4).optional(), who: z.literal("firstPlayer").optional(), undefendedToStage: z.literal(true).optional(), orEngaged: z.literal(true).optional(), ...when }),
+  z.strictObject({ verb: z.literal("AttackFromStaging"), target: z.enum(["self", "host"]).optional(), shadows: z.number().int().min(2).max(4).optional(), who: z.enum(["firstPlayer", "eventSeat"]).optional(), undefendedToStage: z.literal(true).optional(), orEngaged: z.literal(true).optional(), ...when }),
   // Choose, among the enemies in the staging area with this trait, the one with the highest engagement cost (ties: the first player
   // chooses) and pick it, or pick nothing when there is none (142038:A:2).
   z.strictObject({ verb: z.literal("PickHighestEngagement"), trait: z.string().min(1), ...when }),

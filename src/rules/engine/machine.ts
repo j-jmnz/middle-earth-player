@@ -30,6 +30,7 @@ import { playCard } from "../player/planning.ts";
 import { afterPlay } from "../families/costs/play.ts";
 import { gameReads } from "../core/game-reads.ts";
 import { playSweep } from "../families/play/sweep.ts";
+import { syncDire } from "../families/black-gate/dire.ts";
 import { afterPaying } from "../families/deck/play.ts";
 import { doRefresh } from "./refresh.ts";
 import { askReadyPayments } from "../families/attachments/ready.ts";
@@ -95,6 +96,8 @@ export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineSt
     }
     // The seats a card keeps in the game at the threat elimination level (10124:A:2).
     current = syncThreatSaves(current, ctx, steps);
+    // The main quest's Dire keyword (mec113.dire) is kept on the state for the elimination level.
+    current = syncDire(current, ctx);
     // A cancel already resolving holds the damage too, even when paying for it discarded the last card that could answer
     // (Loyal Hound, 19148).
     const resolving = current.stack.some((frame) => frame.data.kind === "effect" && frame.data.hold != null);

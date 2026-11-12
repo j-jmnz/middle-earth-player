@@ -68,6 +68,8 @@ export type Keywords = {
   grapple: "highestThreat" | "lowestThreat" | "highestQuestPoints" | "lowestQuestPoints" | null;
   // Phantom (mec113.phantom): the damage the enemy's attack would deal becomes a threat raise for the defending player (families/grey-company/).
   phantom: boolean;
+  // Dire (mec113.dire): read from the current quest card by families/black-gate/dire.ts.
+  dire: boolean;
 };
 
 // A ship (dcce.ships): a ship-enemy is an enemy and a ship-objective an objective ally for every purpose (`type` says which), with the
@@ -134,6 +136,7 @@ const EMPTY_KEYWORDS: Keywords = {
   aflame: null,
   grapple: null,
   phantom: false,
+  dire: false,
 };
 
 // The Upgraded side's stats of a data/cards record, when its side B prints all four (dcce.scalable-upgradable), or a location's side B that prints a Threat.
@@ -376,6 +379,7 @@ export function printedFromCard(card: PrintedSource): PrintedCard {
       aflame: keywords.aflame ?? null,
       grapple: keywords.grapple ?? null,
       phantom: keywords.phantom === true,
+      dire: keywords.dire === true,
     },
   });
 }

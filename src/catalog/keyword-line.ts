@@ -21,6 +21,7 @@ const FLAGS: Readonly<Record<string, keyof PrintedKeywords>> = {
   sailing: "sailing",
   uncharted: "uncharted",
   phantom: "phantom",
+  dire: "dire",
 };
 
 const NUMBERED: Readonly<Record<string, keyof PrintedKeywords>> = {

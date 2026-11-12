@@ -411,6 +411,8 @@ export type ScenarioState = {
   // The seats that control an ally in play which can gain the hero card type (Prince Imrahil, 145005:A:1): a seat with no heroes left
   // is not eliminated until the play sweep has given that ally the type (families/play/sweep.ts, rr.card-types).
   heroSavers?: readonly number[];
+  // The main quest card in play prints the Dire keyword (mec113.dire, families/black-gate/dire.ts): each seat's threat elimination level is 99. Kept by settle; absent otherwise.
+  dire?: true;
   // The stage the quest left when it advanced to `to` past stages that were never played (AdvanceToStage, families/quest/branch.ts noteSkippedStage): "After a quest card is defeated" names it.
   stageLeft?: { to: string; from: string; bypassed?: true };
   undo: UndoLog;

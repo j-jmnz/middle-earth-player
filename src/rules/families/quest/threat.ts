@@ -18,6 +18,7 @@ import { queueEvent } from "../../windows/queue.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { flagged, heldAmount, heldLeast, inPlay, livingSeats } from "../../core/state.ts";
 import { heard, queueHeard } from "./events.ts";
+import { DIRE_REDUCTION_CAP, isBoon } from "../black-gate/dire.ts";
 
 const QUEST_FAILURE: Cause = ruleCause("rr.step-3-4");
 
@@ -43,7 +44,10 @@ export function lowerThreatByEffect(state: ScenarioState, seat: number, amount: 
   const roundCap = heldAmount(state, `seat:${seat}`, "threatReductionCap");
   const capped = roundCap > 0 ? Math.max(0, Math.min(once, roundCap - (state.threatLoweredBy?.[seat] ?? 0))) : once;
   // "Cannot be reduced by more than 1 via player card effects each round" (19104:A:2): only what player card effects took off counts, and only they are held to it. Copies of the card do not add up: the smallest cap holds.
-  const playerCap = player ? heldLeast(state, `seat:${seat}`, "playerThreatReductionCap") : 0;
+  // While the main quest is Dire the same cap is 1 for every non-boon player card (mec113.dire).
+  const dire = player && state.dire === true && !isBoon(state, sourceId, ctx);
+  const held0 = player ? heldLeast(state, `seat:${seat}`, "playerThreatReductionCap") : 0;
+  const playerCap = dire ? (held0 > 0 ? Math.min(held0, DIRE_REDUCTION_CAP) : DIRE_REDUCTION_CAP) : held0;
   const held = playerCap > 0 ? Math.max(0, Math.min(capped, playerCap - (state.playerThreatLoweredBy?.[seat] ?? 0))) : capped;
   const before = state.seats[seat]?.threat ?? 0;
   const moved = lowerThreat(state, seat, held, steps, cause);

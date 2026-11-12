@@ -12,7 +12,7 @@ import { attackBarred } from "../../interpret/constants.ts";
 import { beginEnemyAttack } from "../../combat/combat.ts";
 import { dealAdditionalShadow, dealOneShadow, type ReduceContext } from "../../interpret/interpret.ts";
 import { modifiedStat, placeDamage } from "../../core/keywords.ts";
-import { lastPicked } from "../../interpret/player-verbs.ts";
+import { lastPicked, seatsFor } from "../../interpret/player-verbs.ts";
 import type { PendingAttack, ScenarioState } from "../../core/state.ts";
 import { flagged } from "../../core/state.ts";
 import { discardShadowOf } from "../../combat/shadow.ts";
@@ -78,7 +78,9 @@ function attackerOf(state: ScenarioState, target: "self" | "host" | undefined, f
 // player (`who: firstPlayer`, 142043:A:2).
 export function attackFromStaging(state: ScenarioState, instruction: Extract<Instruction, { verb: "AttackFromStaging" }>, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const id = attackerOf(state, instruction.target, focus);
-  const seat = instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat;
+  // `eventSeat`: the player the event happened to (the one who canceled a When Revealed, 146031:A:2); with none the attack is not made.
+  const seat = instruction.who === "firstPlayer" ? state.firstPlayer : instruction.who === "eventSeat" ? seatsFor(state, "eventSeat", focus.seat)[0] : focus.seat;
+  if (seat == null) return state;
   // "Undefended damage from this attack must be dealt to Hrogar's Hill" (19081:A:1): the main quest card takes it.
   return attackNowFromStaging(state, id, seat, ctx, steps, { shadow: true, ...(instruction.shadows ? { shadows: instruction.shadows } : {}), ...(instruction.undefendedToStage ? { toStage: true } : {}), ...(instruction.orEngaged ? { engaged: true } : {}) });
 }

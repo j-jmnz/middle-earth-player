@@ -33,7 +33,7 @@ export function outOfPlayChoices(state: ScenarioState, code: string): string[] {
 
 export function searchable(
   state: ScenarioState,
-  selector: { code?: string; trait?: string; type?: string; nonUnique?: boolean; deckOnly?: boolean },
+  selector: { code?: string; trait?: string; traits?: readonly string[]; type?: string; nonUnique?: boolean; deckOnly?: boolean },
   ctx: ReduceContext,
   // `deckOnly`: the encounter deck alone, not its discard pile ("search the encounter deck for a Harad enemy", 144037:A:1).
   zones: readonly ("encounterDeck" | "encounterDiscard")[] = selector.deckOnly === true ? ["encounterDeck"] : ["encounterDeck", "encounterDiscard"],
@@ -46,6 +46,7 @@ export function searchable(
       const printed = printedOf(ctx.cards, instance.code);
       if (selector.code != null && printed.code !== selector.code) continue;
       if (selector.trait != null && !printed.traits.includes(selector.trait)) continue;
+      if (selector.traits != null && !selector.traits.some((trait) => printed.traits.includes(trait))) continue;
       if ((selector.type != null && printed.type !== selector.type) || (selector.nonUnique === true && printed.isUnique)) continue;
       found.push(id);
     }

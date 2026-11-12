@@ -1008,6 +1008,42 @@
     },
     {
       "match": {
+        "code": "146024"
+      },
+      "set": {
+        "keywords": {
+          "immune": true
+        }
+      },
+      "reason": "The Black Gate prints \"Immune to player card effects.\" as its first sentence; Hall of Beorn lists no keyword for it, so the engine would read no immunity.",
+      "source": "scan 146024.A (data/printed/the-return-of-the-king.json)"
+    },
+    {
+      "match": {
+        "code": "146025"
+      },
+      "set": {
+        "keywords": {
+          "immune": true
+        }
+      },
+      "reason": "Towers of the Teeth prints \"Immune to player card effects.\" as its first sentence; Hall of Beorn lists no keyword for it, so the engine would read no immunity.",
+      "source": "scan 146025.A (data/printed/the-return-of-the-king.json)"
+    },
+    {
+      "match": {
+        "code": "146031"
+      },
+      "set": {
+        "keywords": {
+          "immune": true
+        }
+      },
+      "reason": "The Mouth of Sauron prints \"Immune to player card effects.\" as its first sentence; Hall of Beorn lists no keyword for it, so the engine would read no immunity.",
+      "source": "scan 146031.A (data/printed/the-return-of-the-king.json)"
+    },
+    {
+      "match": {
         "code": "146071"
       },
       "set": {

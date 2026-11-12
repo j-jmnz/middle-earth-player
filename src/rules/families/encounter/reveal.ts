@@ -16,7 +16,7 @@ import { exhaustCard, readyCard } from "../../interpret/player-verbs.ts";
 import { printedOf } from "../../core/printed.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import type { Frame, Modifier, ScenarioState } from "../../core/state.ts";
-import { inPlay, modifierActive, updateCard } from "../../core/state.ts";
+import { flagged, heldAmount, inPlay, modifierActive, updateCard } from "../../core/state.ts";
 import { resetEncounterDeck } from "../../interpret/verbs.ts";
 import { stageSeat } from "../breaking/areas.ts";
 import { popFrame } from "../../windows/windows.ts";
@@ -48,6 +48,9 @@ export function listens(state: ScenarioState, ctx: ReduceContext, trigger: Trigg
 // less card from the encounter deck this phase (To a minimum of 1.)" and "(to a minimum of 0)", and more while it holds
 // revealMore flags: "reveal an additional encounter card this phase" (141080:A:2).
 export function revealsAllowed(state: ScenarioState, base: number): number {
+  // The first player's own reveal is replaced by his count (146073:B:1): one reveal of the base becomes that many.
+  const own = firstPlayerReveals(state);
+  if (own != null) base = Math.max(0, base - 1) + own;
   let toZero = 0;
   let toOne = 0;
   let more = 0;
@@ -62,6 +65,11 @@ export function revealsAllowed(state: ScenarioState, base: number): number {
   if (toZero === 0 && toOne === 0) return base + more;
   const floored = toOne > 0 ? Math.max(Math.min(1, base), base - toOne) : base;
   return Math.max(0, floored - toZero) + more;
+}
+
+// "Instead, he reveals 1 encounter card for each resource on The Black Gate" (146073:B:1): how many cards the first player reveals in place of his one, or null while no card holds that.
+export function firstPlayerReveals(state: ScenarioState): number | null {
+  return flagged(state, "table", "firstPlayerReveals") ? heldAmount(state, "table", "firstPlayerRevealCount") : null;
 }
 
 // The reduction one player holds on their own reveals (RevealFewer `who: picked`): the modifier that skips the reveal this seat is about to make, or null. A reduction "to a minimum of 1" (revealFewerMinOne) never
@@ -79,6 +87,9 @@ export function spendSkippedReveal(state: ScenarioState, skipped: Modifier): Sce
 // ("reveal one more card for each player", 142067:B:1) go to the seat whose stage says so, since "the quest" is each seat's own
 // (mec109.multiple-staging-areas).
 export function revealSeat(state: ScenarioState, index: number, seats: readonly number[]): number | undefined {
+  // The first player's replaced reveals come first, all his; the other seats follow in turn (mec113.saga-staging-rules).
+  const own = firstPlayerReveals(state);
+  if (own != null && !state.separate) return index < own ? seats[0] : seats[(index - own + 1) % Math.max(1, seats.length)];
   if (state.separate && index >= seats.length) {
     const owner = state.modifiers.filter((modifier) => modifier.stat === "revealMore" && modifierActive(state, modifier)).map((modifier) => stageSeat(state, modifier.sourceId));
     const mine = owner.find((seat): seat is number => seat != null && seats.includes(seat));

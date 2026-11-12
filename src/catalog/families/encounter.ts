@@ -133,6 +133,10 @@ const FLAGS = [
   "revealFewerMinOne",
   // Held by the table until the end of the phase: the staging step reveals this many more cards (`RevealMore`).
   "revealMore",
+  // Held by the table while its source is in play: the first player's reveal of the staging step is replaced by `firstPlayerRevealCount` reveals, all his, before the next player's own ("the first player does not reveal an encounter card as normal. Instead, he
+  // reveals 1 encounter card for each resource on The Black Gate", 146073:B:1; mec113.saga-staging-rules). `firstPlayerReveals` is the marker (a count of 0 is no modifier at all, so it cannot say "none"); the count is a live amount and is absent at 0.
+  "firstPlayerReveals",
+  "firstPlayerRevealCount",
   // Held by the table: the lasting effects WatchReveals sets (its `when` names the type of card it watches for).
   "watchThreatZero",
   "watchDamage",

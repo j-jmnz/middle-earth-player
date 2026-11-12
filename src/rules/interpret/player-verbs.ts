@@ -225,7 +225,7 @@ export function runPlayerVerb(
     }
     case "CancelEffect":
       // Fire-filled Trench cancels a player event's cancel of a revealed treachery (families/pelennor/combat.ts).
-      return counterCancel(state, ctx) ?? announceCanceled(cancelAnswered(state), state, ctx);
+      return counterCancel(state, ctx) ?? announceCanceled(cancelAnswered(state), state, ctx, focus.seat);
     case "LookAtEncounterTop": {
       const top = state.encounterDeck[0];
       return top ? { ...state, window: { kind: "look", seat: focus.seat, cardIds: [top] }, activeSeat: focus.seat, passed: [] } : state;
