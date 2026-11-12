@@ -43,11 +43,13 @@ describe("the Andúril search of 145066, 145070 and 146074 (the first player may
     });
   }
 
-  it("takes the card out of the deck into the hand after the mulligan and raises every seat's starting threat by 1 for this game only", () => {
+  it("takes the card out of the deck into the hand after the mulligan and raises every seat's threat by 1 for this game only, after the starting threat level is set", () => {
     const made = ok(plan("the-passing-of-the-grey-company", log(), ["d1", ANDURIL], [ANDURIL], 2));
     expect(made.seats[0]?.deck).toEqual(["d1"]);
     expect(made.seats[0]?.afterMulligan).toEqual([ANDURIL]);
-    expect(made.seats.map((seat) => seat.threatPenalty)).toEqual([1, 1]);
+    // rr.setup: a step 7 raise, so no part of the starting threat level (the seat's threatPenalty, which step 2 reads).
+    expect(made.seats.map((seat) => seat.threatRaise)).toEqual([1, 1]);
+    expect(made.seats.map((seat) => seat.threatPenalty)).toEqual([undefined, undefined]);
     // The search is not a permanent penalty and the second player's deck is not searched.
     expect(made.threatModifier).toBe(0);
     expect(made.log.threatPenalty).toBe(0);
