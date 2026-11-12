@@ -17,8 +17,12 @@ tags:
           id: dock-more-actions
 - tapOn:
     id: sheet-list
+- waitForAnimationToEnd:
+    timeout: 3000
 - tapOn:
     id: sheet-option-i88
+- waitForAnimationToEnd:
+    timeout: 3000
 - tapOn:
     id: sheet-primary
     optional: true
