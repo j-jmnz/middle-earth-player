@@ -8,15 +8,13 @@ import type { ScenarioState } from "../../core/state.ts";
 import { legalIntents } from "../../engine/reduce.ts";
 import { pruneRoundRecords } from "../../quest/hide.ts";
 import { hero, send, table, type TableSpec } from "../defense/table.ts";
+import { STOP } from "./stop.ts";
 
 // Rules: mec113.fortitude-tests, mec113.player-actions-during-fortitude-tests (data/rules/entries.json); ledger line 146043:A:3. The Fortitude test: commit, discard, count, actions, measure.
 
 const card = (code: string, eyeIcons?: number) => definePrinted({ code, name: code, type: "treachery", keywords: eyeIcons ? { eyeIcons } : {} });
 const RAISE_4: Instruction = { verb: "RaiseThreat", amount: 4, when: { kind: "lastFortitudeFailed" } };
 const TEST: Instruction = { verb: "FortitudeTest" };
-
-// The effect ends in a choice nobody answers, so the game does not run on into the next phases while a test reads the table.
-const STOP: Instruction = { verb: "Choose", who: "actor", options: [{ id: "stay", instructions: [{ verb: "RaiseThreat", amount: 1 }] }, { id: "go", instructions: [{ verb: "RaiseThreat", amount: 2 }] }] };
 
 type Options = Partial<TableSpec> & { instructions?: readonly Instruction[]; effects?: readonly Effect[] };
 
