@@ -20,7 +20,7 @@ export type HillsFixtureName = "hills-won" | "hills-lost";
 
 // The log of a playthrough whose first 1 part was won: the Intruders in Chetwood golden's two-handed win, resolved onto a blank log, their heroes and what hangs on them left out.
 export async function chetwoodWonLog(): Promise<CampaignLog> {
-  return wonLog({ title: "Intruders in Chetwood", goldens: CHETWOOD_GOLDENS, world: chetwoodWorld, play: playChetwood });
+  return wonLog({ title: "Intruders in Chetwood", goldens: CHETWOOD_GOLDENS, world: chetwoodWorld, play: playChetwood, golden: "two-handed, won, Normal", scenarioId: "intruders-in-chetwood" });
 }
 
 export async function hillsFixtures(): Promise<Partial<Record<HillsFixtureName, HillsFixture>>> {

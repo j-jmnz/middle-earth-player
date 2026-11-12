@@ -96,6 +96,7 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("mount-gundabad", "Mount Gundabad", gundabad.GUNDABAD_GOLDENS, gundabad.gundabadWorld, gundabad.playGolden),
   entry("the-fate-of-wilderland", "The Fate of Wilderland", wilderland.WILDERLAND_GOLDENS, wilderland.wilderlandWorld, wilderland.playGolden),
   entry("intruders-in-chetwood", "Intruders in Chetwood", chetwood.CHETWOOD_GOLDENS, chetwood.chetwoodWorld, chetwood.playGolden),
+  entry("the-weather-hills", "The Weather Hills", hills.HILLS_GOLDENS, hills.hillsWorld, hills.playGolden),
   entry("the-uruk-hai", "The Uruk-hai", hai.HAI_GOLDENS, hai.haiWorld, hai.playGolden),
   entry("helms-deep", "Helm's Deep", deep.DEEP_GOLDENS, deep.deepWorld, deep.playGolden),
   entry("the-road-to-isengard", "The Road to Isengard", isengard.ISENGARD_GOLDENS, isengard.isengardWorld, isengard.playGolden),
@@ -108,5 +109,4 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-tower-of-cirith-ungol", "The Tower of Cirith Ungol", ungol.UNGOL_GOLDENS, ungol.ungolWorld, ungol.playGolden),
   entry("the-black-gate-opens", "The Black Gate Opens", opens.OPENS_GOLDENS, opens.opensWorld, opens.playGolden),
   entry("mount-doom", "Mount Doom", doom.DOOM_GOLDENS, doom.doomWorld, doom.playGolden),
-  entry("the-weather-hills", "The Weather Hills", hills.HILLS_GOLDENS, hills.hillsWorld, hills.playGolden),
 ];

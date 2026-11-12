@@ -176,7 +176,11 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     read: ["pile", "to", "count", "who", "attachSource", "reveal"],
   }),
   ShufflePileIntoEncounterDeck: (i) => ({ text: `shuffle the ${str(i.pile)} deck into the encounter deck`, read: ["pile"] }),
-  StageSetAside: (i) => ({ text: `the set-aside card ${typeof i.code === "string" ? `with code ${i.code}` : `titled "${str(i.name)}"`} joins the staging area (not revealed)${i.remember === true ? "; it becomes the picked card" : ""}`, read: ["code", "name", "remember"] }),
+  StageSetAside: (i) => {
+    const which = typeof i.code === "string" ? `with code ${i.code}` : `titled "${str(i.name)}"`;
+    const how = i.reveal === true ? "is revealed (its keywords and When Revealed effects resolve) and added to the staging area" : "joins the staging area (not revealed)";
+    return { text: `the set-aside card ${which} ${how}${i.remember === true ? "; it becomes the picked card" : ""}`, read: ["code", "name", "remember", "reveal"] };
+  },
   ResolveWhenRevealed: (i) => ({ text: `the When Revealed effects of ${i.card === undefined ? "the picked card" : cardRef(i.card)} resolve as if it had just been revealed`, read: ["card"] }),
   RevealMore: (i) => ({ text: `reveal ${str(i.amount)} additional encounter card(s) in the staging step this phase`, read: ["amount"] }),
   FlipInPlace: (i) => ({ text: `the card with code ${str(i.code)} in play is flipped to the card with code ${str(i.into)}, where it lies, with its tokens and attachments${i.attachTo === "picked" ? ", and moves to the last picked hero" : ""}${i.entersPlay === true ? "; the new side enters play" : ""}`, read: ["code", "into", "attachTo", "entersPlay"] }),

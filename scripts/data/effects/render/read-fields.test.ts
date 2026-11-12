@@ -60,7 +60,7 @@ const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   ShufflePile: [{ verb: "ShufflePile", pile: "angmarOrcs" }],
   AddFromPile: [{ verb: "AddFromPile", pile: "angmarOrcs", to: "engaged", count: 2, who: "firstPlayer", attachSource: true }, { verb: "AddFromPile", pile: "angmarOrcs", to: "engaged", reveal: true, who: "firstPlayer" }],
   ShufflePileIntoEncounterDeck: [{ verb: "ShufflePileIntoEncounterDeck", pile: "angmarOrcs" }],
-  StageSetAside: [{ verb: "StageSetAside", code: "09046", remember: true }, { verb: "StageSetAside", name: "Orc Ambush" }],
+  StageSetAside: [{ verb: "StageSetAside", code: "09046", remember: true }, { verb: "StageSetAside", name: "Orc Ambush" }, { verb: "StageSetAside", code: "09046", reveal: true }],
   ResolveWhenRevealed: [{ verb: "ResolveWhenRevealed", card: "self" }],
   RevealMore: [{ verb: "RevealMore", amount: 1 }],
   FlipInPlace: [{ verb: "FlipInPlace", code: "09071", into: "09072", attachTo: "picked", entersPlay: true }],

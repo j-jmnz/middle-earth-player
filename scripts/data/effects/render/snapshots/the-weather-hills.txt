@@ -60,7 +60,7 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 09029:A:1 (front): While Sheltered Valley is the active location, it gains: "Response: When Sheltered Valley is explored, heal all damage from 1 character."
-  09029:response:1: Response on the event locationExplored (heard about this card)
+  09029:response:1: Response on the event activeExplored (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose damaged character (any player controls)
     - heal all damage from the picked card
@@ -75,7 +75,7 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
 (the scenario deals it into the angmarOrcDeck pile; the piles place it, no record does)
 
 09030:A:1 (front): While Concealed Orc-camp is the active location, it gains: "Response: When Concealed Orc-camp is explored, place 1 resource token on the Mission objective."
-  09030:response:1: Response on the event locationExplored (heard about this card)
+  09030:response:1: Response on the event activeExplored (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose Mission objective (any player controls)
     - place 1 resource tokens on the picked card
@@ -179,7 +179,7 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
 
 09056:A:1 (front): Forced: After the "when revealed" effect of a treachery card is canceled, raise each player's threat by 2.
   09056:forced:1: Forced on the event whenRevealedCanceled (heard about treachery (any player controls))
-    only if this card is in the staging area
+    only if any of: (this card is in the staging area) or (this card is the active location)
     - raise threat by 2 (each player)
 
 09056:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, the defending player raises his threat by 2.
@@ -240,7 +240,7 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
     - the first Weather treachery card revealed each round gains surge
 
 09069:B:2 (back): Forced: After the active location is explored, reveal the top card of the Orc deck and resolve its staging as if it was just revealed from the encounter deck (reveal the top 2 cards instead if there are 3 or more players in the game).
-  09069:forced:1: Forced on the event locationExplored
+  09069:forced:1: Forced on the event activeExplored
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the first player reveals the top card of the angmarOrcs deck and resolves its staging, into the staging area, as if it was just revealed from the encounter deck (nothing with the deck empty)
     - then, if 2 is less than the number of players (checked when this step runs, after the steps above; not tied to whether they did anything): the first player reveals the top card of the angmarOrcs deck and resolves its staging, into the staging area, as if it was just revealed from the encounter deck (nothing with the deck empty)
@@ -254,9 +254,8 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
     - the phase in progress ends once this effect has finished (what is left of it is skipped: in the quest phase the characters stay exhausted and uncommitted and the quest is not resolved; in the combat phase no attack is made); its end-of-phase Forced effects resolve as it ends
     - shuffle the encounter discard pile into the encounter deck
     - shuffle the angmarOrcs deck into the encounter deck
-    - the set-aside card with code 09046 joins the staging area (not revealed); it becomes the picked card
-    - the When Revealed effects of the picked card resolve as if it had just been revealed
-    - the set-aside card with code 09026 joins the staging area (not revealed)
+    - the set-aside card with code 09046 is revealed (its keywords and When Revealed effects resolve) and added to the staging area
+    - the set-aside card with code 09026 is revealed (its keywords and When Revealed effects resolve) and added to the staging area
 
 09070:B:1 (back): Each damaged character gets -1 Willpower.
   09070:constant:1: Constant
@@ -426,4 +425,4 @@ Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop
     only if it is the Planning phase
     - its host: stat attachmentFromDiscard 1, until the end of the phase
 
-(rendered pieces: 236 by template, 1 as JSON)
+(rendered pieces: 237 by template, 1 as JSON)
