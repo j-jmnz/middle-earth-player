@@ -96,8 +96,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 70 | The Return of the King campaign shell | completed | 2026-11-11. Review round done. Open: six campaign-card lines left to their scenarios. |
 | 71 | The Passing of the Grey Company | completed | 2026-11-11. Review round done. Open: `company-won`. |
 | 72 | The Siege of Gondor | completed | 2026-11-11. Review round done. Open: `gondor-won`. |
-| 73 | The Battle of the Pelennor Fields | active | 2026-11-11. |
-| 74 | The Tower of Cirith Ungol | not started | |
+| 73 | The Battle of the Pelennor Fields | completed | 2026-11-12. Review round done. Open: `fields-won`. |
+| 74 | The Tower of Cirith Ungol | active | 2026-11-12. |
 | 75 | The Black Gate Opens | not started | |
 | 76 | Mount Doom | not started | |
 
@@ -110,6 +110,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 
 ### Fixtures and Maestro
 - `marshes-won` is not committed: no seed in 600 wins The Passage of the Marshes with The One Deck and Defenders of Gondor (every game reaches threat 50 by round 4). Until it exists `.maestro/scenarios/the-passage-of-the-marshes/the-passage-of-the-marshes.yaml` cannot run.
+- `fields-won` is not committed: no seed in 100 wins The Battle of the Pelennor Fields with the saved decklists. Until it exists `.maestro/scenarios/the-battle-of-the-pelennor-fields/the-battle-of-the-pelennor-fields.yaml` cannot run.
 - `gondor-won` is not committed: no seed in 400 wins The Siege of Gondor with the saved decklists (threat or Aragorn's death ends every game by round 3). Until it exists `.maestro/scenarios/the-siege-of-gondor/the-siege-of-gondor.yaml` cannot run.
 - `company-won` is not committed: no seed in 400 wins The Passing of the Grey Company with the saved decklists (threat ends every game by round 4). Until it exists `.maestro/scenarios/the-passing-of-the-grey-company/the-passing-of-the-grey-company.yaml` cannot run.
 - `lair-won` is not committed: no seed in 600 wins Shelob's Lair with The One Deck and Defenders of Gondor. Until it exists `.maestro/scenarios/shelobs-lair/shelobs-lair.yaml` cannot run.
@@ -234,6 +235,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - The Siege of Gondor readings not user-confirmed (`docs/brief.md`, The Siege of Gondor): agent recommendations on the Corsair Fleet's choices taken in player order (145071:A:1), only the first search taking the Corsair Captain (145030:A:3), engagement timing (145035:A:2, 145037:A:2, 145038:A:1), the revealing player searching (145040:A:2), a cost of none counting as 0 and attachments anywhere counting (145041:A:1), discarding stopping when no Corsair is left (145039:A:2) and the whole deck discarded with none (145031:A:2, 145032:A:2).
 - Raiding the Coasts' discard row (145041:A:1) cannot name the attachment or its cost: an asks template names only the record's own card.
 - Renderer gaps, The Siege of Gondor (behaviour proven by spec rows): a self-only travel bar reads "any location" (145030:A:2), `require` binding once across players (145030:A:3), `healCap` per character per round (145033:A:1), the damaged character as "the event's other card" (145033:A:2), the win left to the final stage (145069:B:2), and the `DiscardUntil`, `MoveEncounterCard`, `PlaceDamage`, `dealt` and `searchable` pieces printed as JSON (145039:A:2, 145040:A:2 and others).
+- The Battle of the Pelennor Fields readings not user-confirmed (`docs/brief.md`, The Battle of the Pelennor Fields): agent recommendations on the first player placing the Esquires (145073:A:1), no beginning-of-quest Forced on stage 1 (145073:B), City Wall taking damage up to its quest points with the rest on Minas Tirith (145046), Mordor Orc's undefended damage and its shadow engaging itself (145055), the 2A and 2B staged allies (145074), the Captain's empty-deck search (145079), the first player assigning damage (145074:B:3, 145076), Aragorn in play only as a hero, the Sorcerer attacked only by its engaged player (145080), one Black Serpent attacker at a time (145050), the Southron Champion's chooser, Fire-filled Trench's paid event (145048), Siege Tower's shuffle (145049), the choice at the end of the attack (145052:A:1), Aragorn returning with 0 Fleet resources recorded (145072:A:1), and fresh Andúril and Banner copies (145078:A:1).
+- Renderer gaps, The Battle of the Pelennor Fields (behaviour proven by spec rows): the `pelennor` and campaign `aside` verbs, `GrantTrait`, `AttachSelfToPicked`, `SearchMove`, `DiscardUntil` and the `notHost`, `damageFirst`, `assault`, `attackOnlyByEngaged`, `undefendedToMinasTirith` and `shadowsImmune` pieces print as JSON or bare flags (145014, 145015, 145043 to 145080, 145078:B:2); City Wall's discard reads a fixed 4 (145046:A:2); stage 5A spawns a fresh Sorcerer Witch-king while the Captain stays set aside (145077:A:1).
 - Easy: the DragnCards `E0C.12` deck keeps all ten Great Spider cards where Hall of Beorn keeps six; the E0C decks lead (user decision, 2026-11-07).
 
 ## Standing decisions
