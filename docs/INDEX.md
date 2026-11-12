@@ -111,14 +111,14 @@ Read the sections your task touches.
     - 618–635 The Caves of Nibin-Dûm (~2.4K)
   - 636–694 Dream-chaser (~16.2K) ← 4
   - 695–722 Ered Mithrin (~16.4K) ← 7
-  - 723–860 The Two Towers (~16.4K) ← 21
-  - 861–1096 The Return of the King (~28.2K) ← 23
-    - 889–914 The Passing of the Grey Company (~2.7K) ← 1
-    - 915–946 The Siege of Gondor (~4.1K) ← 1
-    - 947–992 The Battle of the Pelennor Fields (~5.8K) ← 1
-    - 993–1030 The Tower of Cirith Ungol (~4.4K) ← 1
-    - 1031–1067 The Black Gate Opens (~4.4K) ← 3
-    - 1068–1096 Mount Doom (~4.3K) ← 1
+  - 723–860 The Two Towers (~16.4K) ← 20
+  - 861–1096 The Return of the King (~28.2K) ← 22
+    - 889–914 The Passing of the Grey Company (~2.7K)
+    - 915–946 The Siege of Gondor (~4.1K)
+    - 947–992 The Battle of the Pelennor Fields (~5.8K)
+    - 993–1030 The Tower of Cirith Ungol (~4.4K)
+    - 1031–1067 The Black Gate Opens (~4.4K) ← 2
+    - 1068–1096 Mount Doom (~4.3K)
   - 1097–1105 Nightmare (~410) ← 19
   - 1106–1144 Deckbuilding (~1.9K)
   - 1145–1223 Effects (~3.2K)
@@ -211,16 +211,16 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~12.0K tok)
+- `docs/phases/STATUS.md` — Phase status (~9.3K tok)
   - 5–15 Rules (~410)
   - 16–103 Phases (~1.8K)
-  - 104–250 Open items (~9.1K)
+  - 104–225 Open items (~6.4K)
     - 106–110 Releases (~150)
     - 111–143 Fixtures and Maestro (~1.8K)
-    - 144–191 Rules and engine (~2.2K)
-    - 192–216 Screens and code (~1.6K)
-    - 217–250 Rules and engine (The Two Towers) (~3.3K)
-  - 251–270 Standing decisions (~640)
+    - 144–180 Rules and engine (~1.5K)
+    - 181–205 Screens and code (~1.6K)
+    - 206–225 Rules and engine (The Two Towers) (~1.4K)
+  - 226–246 Standing decisions (~700)
 
 ## Live plans
 
