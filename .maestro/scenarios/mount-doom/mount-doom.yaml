@@ -2,16 +2,25 @@ appId: com.middleearth.lcg
 tags:
   - scenario
 ---
-# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `doom-won` (scripts/e2e/mount-doom.ts): a real two-handed
-# game of Mount Doom, parked on its win. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
-# The steps are the shared subflow's (.maestro/subflows/scenario-win.yaml); add this scenario's own assertions after the call.
+# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `doom-won` (scripts/e2e/mount-doom.ts): a real two-handed game of Mount Doom (The One Deck and the Defenders of Gondor lists,
+# Easy, the saga Frodo as the Ring-bearer with The One Ring, after The Black Gate Opens' end), parked on its win (stage 4B's Fortitude test passed when Mount Doom was explored). The fixture is OPEN until scripts/e2e/fixtures.ts finds a win
+# of those lists in its seeds (docs/phases/STATUS.md).
+# The Resolution (146079) asks the first player to keep or destroy The One Ring: the flow destroys it, so the confirm line says the players win the campaign. The campaign has no XP, and Mount Doom is its last part, so the flow passes NO_XP and
+# LAST_PART; the road ends with the campaign's end ("The One Ring is destroyed. The players win the campaign.", `path-complete`) and offers no next part.
 - runFlow:
     file: ../../subflows/scenario-win.yaml
     env:
       FIXTURE: doom-won
       SCENARIO_ID: mount-doom
-      # A Resolution that asks one choice: the code of the card it offers, the choice's eyebrow text and the sentence the confirm line shows.
-      # CHOICE_ID: "TODO"
-      # CHOICE_PROMPT: "TODO"
-      # CHOICE_CONSEQUENCE: "TODO"
-# TODO: this scenario's own assertions on the path screen after the win (the next part's node, a carried card).
+      CHOICE_ID: "destroy"
+      CHOICE_PROMPT: "The players choose"
+      CHOICE_CONSEQUENCE: ".*The One Ring is destroyed.*the players win the campaign.*"
+      NO_XP: "true"
+      LAST_PART: "1"
+- assertVisible:
+    id: path-complete
+    text: ".*The One Ring is destroyed. The players win the campaign.*"
+- assertNotVisible:
+    id: begin
+- assertNotVisible:
+    id: path-soon

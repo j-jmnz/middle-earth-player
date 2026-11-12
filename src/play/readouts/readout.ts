@@ -23,6 +23,8 @@ import { defenseOutcome, stageHasDefense } from "./fortress.ts";
 import { companyProgressWords } from "./company.ts";
 import { lairProgressWords } from "./lair.ts";
 import { blackGateQuestEnd } from "./black-gate.ts";
+import { fortitudeNumbers } from "./fortitude.ts";
+import { mountDoomQuestNote } from "./mount-doom.ts";
 import { DIRE_THREAT, ELIMINATION_THREAT } from "./threat-level.ts";
 import { pelennorQuestWords } from "./pelennor.ts";
 import { siegeProgressWords } from "./siege.ts";
@@ -32,7 +34,7 @@ import { choiceFor, type Choice } from "../choice/table-choice.ts";
 
 // `join` is the word between two numbers: "against" (willpower against threat), or "then" for the staging threat before and
 // after a travel.
-export type Readout = { kind: "quest" | "hide" | "attack" | "defense" | "travel" | "sailing"; stats: readonly SheetStat[]; result: string | null; join?: string };
+export type Readout = { kind: "quest" | "hide" | "fortitude" | "attack" | "defense" | "travel" | "sailing"; stats: readonly SheetStat[]; result: string | null; join?: string };
 
 const WILL = (value: number): SheetStat => ({ icon: "willpower", value, word: "Willpower" });
 const THREAT = (value: number): SheetStat => ({ icon: "threat", value, word: "Threat" });
@@ -100,6 +102,9 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     const { willpower, threat, x } = sheet.hide;
     return { kind: "hide", stats: [WILL(willpower), THREAT(threat)], result: `Hide ${x}: ${hidePassed(willpower, threat) ? "passed" : "failed"} if nothing changes` };
   }
+  // A Fortitude test: the Willpower of the heroes picked (then committed) against the Sauron's Eye icons already added (then counted).
+  const fortitude = fortitudeNumbers(game, ctx, sheet?.kind === "multi" && sheet.build.kind === "CommitFortitude" ? (choice?.ids ?? []) : null);
+  if (fortitude) return { kind: "fortitude", ...fortitude };
   // An enemy attacks: its attack against the defender picked or declared, or all of it on an undefended hero.
   const attack = game.pendingAttack;
   if (attack) {
@@ -171,7 +176,7 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     const seat = questSeat(game);
     const willpower = committedWillpower(game, ctx.cards, seat) + added;
     const threat = stagingThreat(game, ctx.cards, seat);
-    if (game.mode === "questCommit") return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: `${commitWords(game, ctx, picked)}${blackGateQuestEnd(game)}` };
+    if (game.mode === "questCommit") return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: `${commitWords(game, ctx, picked)}${blackGateQuestEnd(game)}${mountDoomQuestNote(game, ctx)}` };
     // A stage with Defense (mec112.defense): the Threat that beats the Willpower is progress the encounter deck places, so no player's threat rises and no elimination is warned of.
     if (stageHasDefense(game)) return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: defenseQuestResult(willpower, threat, defenseOutcome(game, ctx)) };
     // Stage 3B of The Battle of the Pelennor Fields (Assault) places no progress on the stage and damages Minas Tirith instead of raising threat, and stage 4B deals the progress as damage: neither warns of an elimination.
@@ -181,7 +186,7 @@ export function readoutFor(game: ScenarioState, ctx: ReduceContext, sheet: Sheet
     const held = lairProgressWords(game, ctx, willpower - threat) ?? companyProgressWords(game, ctx, willpower - threat);
     // The Siege's words carry their own "if nothing changes" ("4 progress if nothing changes: held while Great Corsair Ship is in play").
     const siege = siegeProgressWords(game, ctx, willpower - threat);
-    return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: `${siege ?? (held ? `${held} if nothing changes` : questResult(willpower, threat))}${eliminationWords(game, threat - willpower, seat)}${blackGateQuestEnd(game)}` };
+    return { kind: "quest", stats: [WILL(willpower), THREAT(threat)], result: `${siege ?? (held ? `${held} if nothing changes` : questResult(willpower, threat))}${eliminationWords(game, threat - willpower, seat)}${blackGateQuestEnd(game)}${mountDoomQuestNote(game, ctx)}` };
   }
   return null;
 }

@@ -2,7 +2,7 @@ import type { Amount } from "../../../catalog/boundary.ts";
 import type { Ask } from "../asks.ts";
 
 // The choice words of Mount Doom (the-return-of-the-king part 6), one entry for each Pick and Choose of its records: `<record id> @<instruction path> <verb | option id>` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
-// `pnpm test scenario mount-doom --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=mount-doom` prints each sentence. The Fortitude test's commit is a sheet of its own (src/play/choice/sheet-notes.ts, fortitudeCommitNote).
+// `pnpm test scenario mount-doom --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=mount-doom` prints each sentence. The Fortitude test's commit is a sheet of its own (src/play/readouts/fortitude.ts, fortitudeCommitNote).
 // What can lose the game says so on the row: the hero carrying The One Ring destroyed or discarded (The One Ring leaving play loses, mec113.the-one-ring), and a threat raise that takes a player to 99 (the elimination level under Dire, mec113.dire), which loses the game for the last player.
 // The Resolution's choice (146079:B:1) is worded on the Resolution screen (src/campaign/return-of-the-king-words.ts).
 type When = NonNullable<Ask["caution"]>["when"];

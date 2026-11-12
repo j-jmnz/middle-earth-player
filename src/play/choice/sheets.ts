@@ -42,9 +42,10 @@ import { freeSlot } from "../../rules/families/south/locations.ts";
 import { recordsOfFace } from "../../rules/families/dreamchaser/faces.ts";
 import { islandMayTravel } from "../../rules/families/island/travel.ts";
 import { hideCommitLimit } from "../../rules/families/nightmare/guards.ts";
+import { fortitudeCommitNote, fortitudeCountNote } from "../readouts/fortitude.ts";
 import { sailingSheet, shipRow } from "./sea-sheets.ts";
 import { asksCollection, collectionLabel, collectionOrder } from "./collection-sheets.ts";
-import { answeredCard, fortitudeCommitNote, hideCommitNote, hideNumbers, lookNote, optionalEngageNote, responseNote } from "./sheet-notes.ts";
+import { answeredCard, hideCommitNote, hideNumbers, lookNote, optionalEngageNote, responseNote } from "./sheet-notes.ts";
 import { captiveLabel, cardLabel, has, option, stagedAllyLabel, statOf, step } from "./sheet-parts.ts";
 import { nightActionNote } from "../words/scenarios/night.ts";
 import { framsburgActionCaution, framsburgActionNote } from "../words/scenarios/framsburg.ts";
@@ -188,7 +189,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         key: `fortitudeCommit:${frame?.id ?? ""}`,
         step: "Fortitude test",
         title: source ? `${names.card(source)}: Fortitude test` : "Fortitude test",
-        note: fortitudeCommitNote(),
+        note: fortitudeCommitNote(game, ctx),
         verb: "Commit",
         options: legalTargets(game, { type: "CommitFortitude" }, ctx).map((id) => ({ ...option(game, names, id), stats: statOf(game, ctx, id, "willpower") })),
         build: { kind: "CommitFortitude" },
@@ -200,15 +201,17 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
     case "frameAction": {
       if (isStepWindow(game)) return null;
       const hide = game.widgets.hide && frame?.data.kind === "hide" ? hideNumbers(game, ctx, frame) : null;
+      // A Fortitude test's action window: the Willpower against the icons counted, the cards discarded and the icons ignored.
+      const fortitude = frame?.data.kind === "fortitude" ? fortitudeCountNote(game, ctx, names.card) : null;
       const source = frame?.cardId ?? null;
       return {
         kind: "trigger",
         key: `frameAction:${frame?.id ?? ""}:${frame?.step ?? 0}`,
-        step: hide ? "Hide test" : step(game),
+        step: hide ? "Hide test" : fortitude ? "Fortitude test" : step(game),
         title: source ? names.card(source) : "Action window",
         sourceId: source,
         timing: "Action",
-        note: hide ? `Hide ${hide.x}: willpower ${hide.willpower} against threat ${hide.threat}.` : "Actions may be used before this resolves.",
+        note: hide ? `Hide ${hide.x}: willpower ${hide.willpower} against threat ${hide.threat}.` : (fortitude ?? "Actions may be used before this resolves."),
         hide,
         options: triggerOptions(game, ctx, legal, names),
         pass: "Continue",
