@@ -40,6 +40,7 @@ import * as fields from "../scenarios/the-battle-of-the-pelennor-fields/game.ts"
 import * as ungol from "../scenarios/the-tower-of-cirith-ungol/game.ts";
 import * as opens from "../scenarios/the-black-gate-opens/game.ts";
 import * as doom from "../scenarios/mount-doom/game.ts";
+// import * as chetwood from "../scenarios/intruders-in-chetwood/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -105,4 +106,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-tower-of-cirith-ungol", "The Tower of Cirith Ungol", ungol.UNGOL_GOLDENS, ungol.ungolWorld, ungol.playGolden),
   entry("the-black-gate-opens", "The Black Gate Opens", opens.OPENS_GOLDENS, opens.opensWorld, opens.playGolden),
   entry("mount-doom", "Mount Doom", doom.DOOM_GOLDENS, doom.doomWorld, doom.playGolden),
+  // entry("intruders-in-chetwood", "Intruders in Chetwood", chetwood.CHETWOOD_GOLDENS, chetwood.chetwoodWorld, chetwood.playGolden),
 ];
