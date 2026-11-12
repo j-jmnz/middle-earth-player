@@ -9,7 +9,7 @@ Read a section, not a file: `pnpm docs section <file> "<heading>"` prints one se
 Read whole.
 
 - `CLAUDE.md` — Claude Code (~2.6K tok)
-- `.claude/rules/authority.md` — Authority (~470 tok)
+- `.claude/rules/authority.md` — Authority (~790 tok)
 - `.claude/rules/code-standards.md` — Code standards (~2.4K tok)
 - `.claude/rules/commit-standards.md` — Commit standards (~890 tok)
 - `.claude/rules/docs-standards.md` — Docs standards (~1.1K tok)
@@ -20,10 +20,10 @@ Read whole.
 Each agent reads its own file.
 
 - `.claude/agents/effect-author.md` — Writes effect records for card lines no template reads (~1.1K tok)
-- `.claude/agents/implementer.md` — Implements one phase from docs/phases (~1.4K tok)
-- `.claude/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~2.0K tok)
-- `.claude/agents/reading-judge.md` — Reads each effect record, rendered as English, against the printed ledger line it implements and says ok, wrong, ambiguous or render-gap (~960 tok)
-- `.claude/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~2.4K tok)
+- `.claude/agents/implementer.md` — Implements one phase from docs/phases (~1.5K tok)
+- `.claude/agents/orchestrator.md` — Carries out a multi-part plan (a docs/plans file or a list of phases) by handing each part to an implementer, checking and committing each one, then running one review round (~2.1K tok)
+- `.claude/agents/reading-judge.md` — Reads each effect record, rendered as English, against the printed ledger line it implements and says ok, wrong, ambiguous or render-gap (~1.0K tok)
+- `.claude/agents/reviewer.md` — Reviews a diff for bugs, duplication, readability, oversized files, and repository structure (~2.5K tok)
 - `.claude/agents/scenario-author.md` — Builds one scenario's engine half, one task per run (Read, Build or Finish), each run fresh from the hand-off note (~1.2K tok)
 - `.claude/agents/ux.md` — Reviews the current screens for phone UX and visual design, and changes the design system when asked (~1.3K tok)
 
@@ -226,7 +226,7 @@ STATUS.md, then the active phase file.
 
 Read when a task names the plan.
 
-- `docs/plans/angmar-awakened.md` — Angmar Awakened (~1.5K tok)
+- `docs/plans/angmar-awakened.md` — Angmar Awakened (~1.4K tok)
 - `docs/plans/effect-authoring.md` — Authoring effect records (~7.5K tok)
   - 12–33 Workflow (~460)
   - 34–50 Where records live (~390)
@@ -261,12 +261,12 @@ Read when a task names the plan.
 
 Open work; read when a task names it.
 
-- `docs/handover/agent-brief.md` — Brief for a mechanic-family or scenario agent (~5.2K tok)
+- `docs/handover/agent-brief.md` — Brief for a mechanic-family or scenario agent (~5.0K tok)
   - 19–37 Setup (~440)
   - 38–56 Files you own (edit freely) (~490)
   - 57–70 Shared files (~300)
   - 71–85 Approach (~670) ← 1
-  - 86–124 Scenario procedure (~2.1K) ← 23
+  - 86–124 Scenario procedure (~1.9K) ← 23
   - 125–134 Checkpoints (API usage limits can stop you mid-task) (~210)
   - 135–149 Checks before committing (~310)
   - 150–156 Merge (~140) ← 1

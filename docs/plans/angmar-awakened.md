@@ -11,7 +11,7 @@ The Angmar Awakened campaign made playable, in a campaign and standalone: the ni
 
 ## Decisions
 
-- **Open points are researched online, not asked** (user instruction, 2026-11-12, as `docs/handover/agent-brief.md`, Scenario procedure, Open points are researched, not asked): official sources first (the FAQ, FFG and designer rulings, Hall of Beorn), then community discussion (BoardGameGeek, the lotrlcg subreddit, the FFG and Hall of Beorn forums). Where nothing settles a point, the agent takes its recommended reading. Every reading goes to `docs/brief.md` under its scenario with its source or "agent recommendation"; a recommended or community-only one also goes to Open items in `docs/phases/STATUS.md`. This holds for the data and campaign-shell phases too (an Easy count, a rewording, a campaign rule the booklet leaves open). A scan that cannot be read is the one question that goes to the user.
+- **Open points are researched online, not asked** in every phase, the data and campaign-shell phases too, as `.claude/rules/authority.md` (Open points) says (an Easy count, a rewording, a campaign rule the booklet leaves open). A scan that cannot be read is the one question that goes to the user.
 - **One review round per phase** (`reviewer`, and `ux` when `src/screens` or `src/play` changed), then one fix task, as for The Return of the King.
 - **Each phase is one checkpointed commit series on the session branch**; nothing moves another scenario's golden or fixture unless a researched rule changes it (then `ENGINE_VERSION`, and the commit says which goldens moved and why).
 
