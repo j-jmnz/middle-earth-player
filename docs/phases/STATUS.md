@@ -103,8 +103,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 77 | Angmar Awakened data | completed | 2026-11-12. Review round done. Open: Easy counts and MEC108 wording not user-confirmed. |
 | 78 | Angmar Awakened campaign shell | completed | 2026-11-12. Review round done. Open: campaign-card lines left to their scenarios. |
 | 79 | Intruders in Chetwood | completed | 2026-11-12. Review round done. Open: `chetwood-won`. |
-| 80 | The Weather Hills | active | 2026-11-12. `docs/plans/angmar-awakened.md`. |
-| 81 | Deadmen's Dike | not started |  |
+| 80 | The Weather Hills | completed | 2026-11-12. Review round done. Open: `hills-won`. |
+| 81 | Deadmen's Dike | active | 2026-11-12. `docs/plans/angmar-awakened.md`. |
 | 82 | The Wastes of Eriador | not started |  |
 | 83 | Escape from Mount Gram | not started |  |
 | 84 | Across the Ettenmoors | not started |  |
@@ -120,6 +120,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - The release notes' golden-check comparison (`scripts/release/reach.ts`) has not run against a real previous tag; the first tag after it compares by `ENGINE_CHANGES` only.
 
 ### Fixtures and Maestro
+- `hills-won` is not committed: no seed in 100 wins The Weather Hills with the saved decklists (Defenders of Gondor, Swords of the Noldor, Easy). Until it exists `.maestro/scenarios/the-weather-hills/the-weather-hills.yaml` cannot run.
 - `chetwood-won` is not committed: no seed in 100 wins Intruders in Chetwood with The One Deck and Defenders of Gondor under five policies. Until it exists `.maestro/scenarios/intruders-in-chetwood/intruders-in-chetwood.yaml` cannot run.
 - `marshes-won` is not committed: no seed in 600 wins The Passage of the Marshes with The One Deck and Defenders of Gondor (every game reaches threat 50 by round 4). Until it exists `.maestro/scenarios/the-passage-of-the-marshes/the-passage-of-the-marshes.yaml` cannot run.
 - `doom-won` is not committed: no seed in 800 wins Mount Doom with the saved decklists (the Ring-bearer falls in combat in round 1). Until it exists `.maestro/scenarios/mount-doom/mount-doom.yaml` and `mount-doom-keep.yaml` cannot run.
@@ -197,7 +198,14 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - Angmar Awakened campaign cards: Iârion's Pendant at 10166:B:1 goes to the player the first player names, as the Ered Mithrin boon-ally ruling (agent recommendation; no ruling found). Not user-confirmed.
 - Angmar Awakened campaign cards: "add the Mysterious Omens side quest to the Campaign Log" (10159:A:2) adds it to the Campaign Pool (agent recommendation). Not user-confirmed.
 - Angmar Awakened campaign cards: the Amarthiúl hero ban ends at 10188:A:2 and does not return in The Dread Realm (agent recommendation). Not user-confirmed.
-- Angmar Awakened campaign-card lines left to their scenarios' Build: 10156:A:2 (Intruders in Chetwood), 10159:A:2 (The Weather Hills), 10166:A:2 and A:3 (Deadmen's Dike), the `determined` write (The Wastes of Eriador), 10174:A:2 and B:1 to B:3 with the `stolenCards` write and its deck refusal (Escape from Mount Gram), 10182:A:2, A:3 and B:1 (Across the Ettenmoors), 10184:B:1 (The Treachery of Rhudaur). The boons' and burdens' own lines (10157, 10161 to 10165, 10167 to 10170, 10176 to 10181, 10185 to 10187, 10189 to 10192) go with the scenario that first deals each.
+- The Weather Hills: Cold from Angmar (09054) attaches to the current quest card, the side quest when one is current (community sources only). Not user-confirmed.
+- The Weather Hills: the quest-card count (09031 and others) follows Intruders in Chetwood's reading. Not user-confirmed.
+- The Weather Hills: "End the current phase" (09070:A:1) ends any phase once the effect and an attack in progress finish, combat included. Not user-confirmed.
+- The Weather Hills: Amon Forn (09026:A:2) hears Orc enemies returned to the staging area as well as revealed ones. Not user-confirmed.
+- The Weather Hills: Mysterious Omens' boons (10160:A:3): each player in turn may take one boon still set aside; it is Permanent and recorded with its hero. Not user-confirmed.
+- The Weather Hills: Stalwart (10165:A:4) marks the hero for the phase and the attachment is played through the normal play. Not user-confirmed.
+- Test kit: `test/harness/game-kit.ts` hands a game only the Wilderland and Angmar log facts, while `src/campaign/briefing.ts` also hands XP, Two Towers and Return of the King facts; sharing one helper moves 17 Dream-chaser, Two Towers and Return of the King goldens, so those goldens are dealt without facts a real game has. Not fixed.
+- Angmar Awakened campaign-card lines left to their scenarios' Build: 10166:A:2 and A:3 (Deadmen's Dike), the `determined` write (The Wastes of Eriador), 10174:A:2 and B:1 to B:3 with the `stolenCards` write and its deck refusal (Escape from Mount Gram), 10182:A:2, A:3 and B:1 (Across the Ettenmoors), 10184:B:1 (The Treachery of Rhudaur). The boons' and burdens' own lines (10167 to 10170, 10176 to 10181, 10185 to 10187, 10189 to 10192) go with the scenario that first deals each.
 - Intruders in Chetwood: quest cards in play are the main quest, the staged encounter side quests and the player side quests, at least 1 (09016, 09019, 09047, 09048, 09050). Not user-confirmed.
 - Intruders in Chetwood: Iârion's Response (09016:A:3) hears a side quest revealed by a search of the encounter deck, not of the discard pile. Not user-confirmed.
 - Intruders in Chetwood: Iârion held facedown under Rescue Iârion (09024:A:2) stays in play and has not left it. Not user-confirmed.
@@ -212,7 +220,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - Intruders in Chetwood: Orc Rearguard's cap (09023:A:1) holds on whichever quest is current (community source only). Not user-confirmed.
 - Intruders in Chetwood: Iârion's control follows the first player token (09016:A:2), by the Aragorn and Calphon rulings and a community source only. Not user-confirmed.
 - Renderer gaps, Intruders in Chetwood (behaviour proven by tests): 09016:A:2 control has no template; Orc War Party's stage bar does not say it binds the main quest only (09017:A:3); Orc Rearguard's cap does not say "each round" (09023:A:1); `lastTimeCounterRemoved` and `questDefeated` do not say "this card" (09024:A:3, 09051:A:2); Angmar Captain's X and target (09045:A:1); 09068:B:3's first player and win; the Pendant's cancel limits (10157:A:2); `SearchMove` with `when` prints as JSON.
-- Angmar Awakened: the `angmarOrcDeck` pile and the box's new Setup steps (`buildOrcDeck`, `prepareCapturedDeck`, `captureUnder` and the others) are catalog data only; the engine reads them in their scenarios' phases.
+- Angmar Awakened: the box's Setup steps other than the Orc deck (`prepareCapturedDeck`, `captureUnder` and the others) are catalog data only; the engine reads them in their scenarios' phases.
 
 ### Screens and code
 - Fire in the Night: the table has no side-quest deck area or current-quest mark (`docs/brief.md`, Ered Mithrin).
