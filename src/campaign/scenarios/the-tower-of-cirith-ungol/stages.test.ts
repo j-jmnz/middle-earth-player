@@ -91,19 +91,28 @@ describe("the-tower-of-cirith-ungol stages", () => {
     expect(explored.cards[explored.questStage ?? ""]?.code).toBe("146068");
   });
 
-  it("146068:A:1 and 146069:B:1 send Last of the Company to the victory display, put The One Ring and the Burden on the Ring-bearer, exhaust him, return the Watchers and guard the boon", () => {
+  function stage3(): ScenarioState {
     const stage2 = killWatchers(open());
     const ready = travelWindow(updateCard(stage2, stage2.questStage!, { progress: 18 }));
     const traveled = reduce(ready, { type: "Travel", locationId: byCode(ready, "146015").id }, ctx);
     if (!traveled.ok) throw new Error(traveled.reason);
-    const at3 = settle(syncConstants({ ...moveCard(traveled.state, byCode(traveled.state, "146015").id, { zone: "victory" }), window: null, activeLocation: null }, ctx), ctx, []);
+    return settle(syncConstants({ ...moveCard(traveled.state, byCode(traveled.state, "146015").id, { zone: "victory" }), window: null, activeLocation: null }, ctx), ctx, []);
+  }
+
+  it("146068:A:1 sends Last of the Company to the victory display, puts The One Ring on the Ring-bearer, exhausts him and returns The Two Watchers to the staging area", () => {
+    const at3 = stage3();
     expect(zoneOf(at3, "146014")).toBe("victory");
     expect(hostCode(at3, "146065")).toBe("141001");
-    expect(hostCode(at3, "144052")).toBe("141001");
     expect(byCode(at3, "141001").exhausted).toBe(true);
     expect(zoneOf(at3, "146070")).toBe("staging");
+  });
+
+  it("146069:B:1 moves A Heavy Burden to the Ring-bearer and attaches the set-aside boon to Shagrat, held for its owner", () => {
+    const at3 = stage3();
+    expect(hostCode(at3, "144052")).toBe("141001");
+    expect(Object.values(at3.cards).filter((card) => card.code === "144052")).toHaveLength(1);
     const sting = byCode(at3, STING);
-    expect([sting.zone, hostCode(at3, STING), sting.held]).toEqual(["attached", "146020", true]);
+    expect([sting.zone, hostCode(at3, STING), sting.held, sting.owner]).toEqual(["attached", "146020", true, 0]);
   });
 
   it("146020:A:3 lowers Shagrat's engagement cost by the progress just placed on the quest, until the end of the round", () => {
