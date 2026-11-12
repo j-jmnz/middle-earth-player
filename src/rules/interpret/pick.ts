@@ -34,6 +34,7 @@ import { chosenCopies, levelAmount } from "../families/aflame/values.ts";
 import { sidePickMatches } from "../families/grapple/values.ts";
 import { islandPool, outsideCells } from "../families/island/pick.ts";
 import { embassyPool, highestThreatOf } from "../families/black-gate/pick.ts";
+import { fortitudePool } from "../families/mount-doom/pick.ts";
 import { seatPickMatches } from "../families/wilderland/seat-pick.ts";
 
 // What a filter is read against: who is choosing or counting, the effect's source, what it has picked, its X, and the
@@ -78,6 +79,9 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
   // The Embassy from the Dark Tower's faceup row (families/black-gate/pick.ts).
   const embassy = embassyPool(state, spec);
   if (embassy) return embassy;
+  // The cards discarded for the Fortitude test in progress (families/mount-doom/pick.ts).
+  const fortitude = fortitudePool(state, spec);
+  if (fortitude) return fortitude;
   // A burden card in play or in the encounter deck or its discard pile (142074:A:2).
   if (spec.burden) {
     return Object.values(state.cards)

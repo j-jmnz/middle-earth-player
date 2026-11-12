@@ -78,6 +78,11 @@ export function lookNote(game: ScenarioState, cardIds: readonly string[], seat: 
   return `The ${deck[0] === cardIds[0] || deck.length === 0 ? "top" : "bottom"} of the encounter deck. Nothing moves.`;
 }
 
+// The Fortitude sheet's note (mec113.fortitude-tests).
+export function fortitudeCommitNote(): string {
+  return "Commit heroes to the Fortitude test. Their willpower must be greater than the Sauron's Eye icons on the encounter cards discarded.";
+}
+
 // The Hide sheet's note, with the most characters a card lets commit ("players cannot commit more than 2 characters to a Hide test",
 // 906106:A:1).
 export function hideCommitNote(limit: number | null): string {

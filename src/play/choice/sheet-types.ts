@@ -73,7 +73,7 @@ export type PickSheet = {
 // A card a Sailing test looked at, with the success symbols its ledger side prints (sea-sheets.ts).
 export type LookRow = { id: string; code: string; name: string; success: number };
 
-export type MultiBuild = { kind: "Commit" } | { kind: "CommitHide" } | { kind: "attack"; enemyId: string };
+export type MultiBuild = { kind: "Commit" } | { kind: "CommitHide" } | { kind: "CommitFortitude" } | { kind: "attack"; enemyId: string };
 
 export type MultiSheet = {
   kind: "multi";

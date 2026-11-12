@@ -21,6 +21,7 @@ import { ruleCause } from "../core/cause.ts";
 import { canAnnounce, drainEvents } from "../windows/events.ts";
 import { advanceFrame, stagingStep } from "../windows/frames.ts";
 import { commitHide, pruneRoundRecords } from "../quest/hide.ts";
+import { commitFortitude } from "../families/mount-doom/commit.ts";
 import type { EngineStep, PlayerIntent } from "../core/intents.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { drawMany, gainSeatResources, type ReduceContext } from "../interpret/interpret.ts";
@@ -153,6 +154,8 @@ export function applyIntent(
       return askingToCommit(state) ? performSailing(state, intent.cardIds, ctx, steps) : commit(state, intent.cardIds, steps, intent.sideQuestId);
     case "CommitHide":
       return commitHide(state, intent.cardIds, steps);
+    case "CommitFortitude":
+      return commitFortitude(state, intent.cardIds, steps);
     case "Trigger":
       return applyTrigger(state, intent, ctx, steps);
     case "Choose":

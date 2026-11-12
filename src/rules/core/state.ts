@@ -4,7 +4,7 @@ import type { CardInstance, ModeName, Modifier, Phase, ScenarioState, Seat, Zone
 
 // The scenario state's helpers: a blank state, its seats and phase, modifiers, and the immutable updates every reducer step
 // makes (updateCard, updateCards). The types are in state-types.ts; this file re-exports them, so callers import both from here.
-export type { CancelOffer, CardFace, CardInstance, DelayedEffect, Discount, EffectData, Frame, FrameData, FrameName, GameEvent, HideData, HideFailure, HideResult, ModeName, Modifier, PendingAttack, PendingStrike, Phase, QueueItem, ResponseOffer, ResumeData, ScenarioState, Seat, UndoLog, UsedEffect, Window, ZoneName } from "./state-types.ts";
+export type { CancelOffer, CardFace, CardInstance, DelayedEffect, Discount, EffectData, Frame, FrameData, FrameName, FortitudeData, FortitudeResult, GameEvent, HideData, HideFailure, HideResult, ModeName, Modifier, PendingAttack, PendingStrike, Phase, QueueItem, ResponseOffer, ResumeData, ScenarioState, Seat, UndoLog, UsedEffect, Window, ZoneName } from "./state-types.ts";
 
 export function emptySeat(eliminated: boolean): Seat {
   return {

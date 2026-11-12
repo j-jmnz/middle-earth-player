@@ -13,6 +13,7 @@ import { offerResponses } from "../windows/responses.ts";
 import { pruneUses } from "../player/usage.ts";
 import { fireForced } from "../windows/triggers.ts";
 import { hideCommitLimit, noteEffectHide } from "../families/nightmare/guards.ts";
+import { pruneFortitudeFailures } from "../families/mount-doom/failures.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "../windows/windows.ts";
 import { moveCard } from "../core/zones.ts";
 
@@ -175,9 +176,9 @@ function pruneHideFailures(state: ScenarioState): ScenarioState {
   return kept.length === state.hideFailures.length ? state : { ...state, hideFailures: kept };
 }
 
-// Records that only matter during one round: Hide failures and uses of limited effects.
+// Records that only matter during one round: Hide and Fortitude failures and uses of limited effects.
 export function pruneRoundRecords(state: ScenarioState): ScenarioState {
-  return pruneUses(pruneHideFailures(state));
+  return pruneUses(pruneFortitudeFailures(pruneHideFailures(state)));
 }
 
 // A Hide test passes when the committed willpower is at least the threat of the cards discarded (mec109.hide-tests).

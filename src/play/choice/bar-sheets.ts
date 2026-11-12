@@ -208,6 +208,8 @@ export function multiIntent(sheet: MultiSheet, ids: readonly string[]): PlayerIn
       return { type: "Commit", cardIds: [...ids] };
     case "CommitHide":
       return { type: "CommitHide", cardIds: [...ids] };
+    case "CommitFortitude":
+      return { type: "CommitFortitude", cardIds: [...ids] };
     case "attack":
       return { type: "DeclareAttackers", enemyId: sheet.build.enemyId, attackerIds: [...ids] };
   }

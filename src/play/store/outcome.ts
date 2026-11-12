@@ -223,6 +223,10 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         if (count) line(boardingWords({ ship: names.card(step.enemyId), count, seat: step.seat, seats: after.seatCount }), null, [step.enemyId]);
         return;
       }
+      case "fortitudeTest":
+        open(1, step.success ? "Fortitude test passed" : "Fortitude test failed", step.success ? "good" : "bad");
+        line(`Willpower ${step.willpower} against ${step.eyes} Sauron's Eye icons`, "willpower");
+        return;
       case "hideTest":
         open(1, step.success ? "Hide test passed" : "Hide test failed", step.success ? "good" : "bad");
         line(`Willpower ${step.willpower} against threat ${step.threat}`, "willpower");
@@ -311,6 +315,8 @@ export function intentWords(intent: PlayerIntent, card: (cardId: string) => stri
       return `${listed(intent.cardIds, card)} committed to the ${before && askingToCommit(before) ? "Sailing test" : "quest"}`;
     case "CommitHide":
       return `${listed(intent.cardIds, card)} committed to the Hide test`;
+    case "CommitFortitude":
+      return `${listed(intent.cardIds, card)} committed to the Fortitude test`;
     case "Travel":
       return `Traveled to ${card(intent.locationId)}`;
     case "DeclineTravel":

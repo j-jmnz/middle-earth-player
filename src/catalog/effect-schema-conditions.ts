@@ -42,6 +42,11 @@ const atomSchema = z.discriminatedUnion("kind", [
   z.strictObject({ kind: z.literal("noneDiscarded") }),
   // The Embassy from the Dark Tower's pair the running effect is on (EmbassyNext): `pair`, there is one (its player card still lies faceup); `playable`, its player card can be played at no cost by its owner now (146072:B:1). Read by src/rules/families/black-gate/embassy.ts.
   z.strictObject({ kind: z.literal("embassy"), is: z.enum(["pair", "playable"]) }),
+  // The mount-doom family's conditions (src/rules/families/mount-doom/conditions.ts). `lastFortitudeFailed`, `lastFortitudePassed`: the last Fortitude test the running effect made was failed, or passed ("If you fail this test", 146051:A:1; "If a player passes this test", 146076:B:1);
+  // false before the effect has made one. `fortitudeFailed`: a player failed a Fortitude test this round, `who` the actor ("If you failed a Fortitude test this round", 146055:A:3) or any player ("If a player has failed a Fortitude test this round", 146046:A:1).
+  z.strictObject({ kind: z.literal("lastFortitudeFailed") }),
+  z.strictObject({ kind: z.literal("lastFortitudePassed") }),
+  z.strictObject({ kind: z.literal("fortitudeFailed"), scope: z.literal("round"), who: z.enum(["actor", "any"]) }),
   z.strictObject({ kind: z.literal("phase"), is: phaseNameSchema }),
   // The encounter deck or discard pile holds a card with this code or trait.
   // Where the source card is now. `play` means any zone the source's controller plays from.

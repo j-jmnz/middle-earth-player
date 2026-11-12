@@ -254,6 +254,8 @@ export const pickSchema = z.strictObject({
   // `highestThreat`: of the cards that matched, those with the highest current Threat, a card with none counting 0 ("the highest threat encounter card remaining"); every one when tied, and the chooser decides.
   embassy: z.enum(["player", "encounter"]).optional(),
   highestThreat: z.literal(true).optional(),
+  // The mount-doom family's filter (src/rules/families/mount-doom/pick.ts): a card discarded for the Fortitude test in progress that still lies in the encounter discard pile ("choose an encounter card discarded for this test", 146049:A:3).
+  fortitudeDiscarded: z.literal(true).optional(),
   // The sidequests family's filters (src/rules/families/sidequests/pick.ts).
   // A card with the same title as the active location ("each location in the staging area with the same title as the active location").
   // `picked`: a card with the same title as the last card the running effect picked, never that card itself ("if there is a copy of that enemy in the staging area", 146019:A:1; Pick, canPick and matches read it).

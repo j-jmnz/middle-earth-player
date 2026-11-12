@@ -19,6 +19,8 @@ export type EngineStep =
   | { kind: "engage"; seat: number; enemyId: string; boarding?: string }
   | { kind: "commit"; cardId: string }
   | { kind: "hideCommit"; cardId: string }
+  | { kind: "fortitudeCommit"; cardId: string }
+  | { kind: "fortitudeTest"; seat: number; discardedIds: readonly string[]; willpower: number; eyes: number; success: boolean }
   | { kind: "hideTest"; cardId: string; discardedIds: readonly string[]; willpower: number; threat: number; success: boolean }
   // `stormcaller`: the Stormcaller's quest stage advanced (dcce.stormcallers-area-stages), not the players' quest.
   | { kind: "advance"; cardId: string; stormcaller?: true }
@@ -59,6 +61,7 @@ export type PlayerIntent =
   // `sideQuestId`: the characters quest on that side quest in a quest area instead of the current quest.
   | { type: "Commit"; cardIds: readonly string[]; sideQuestId?: string }
   | { type: "CommitHide"; cardIds: readonly string[] }
+  | { type: "CommitFortitude"; cardIds: readonly string[] }
   | { type: "Travel"; locationId: string }
   | { type: "DeclineTravel" }
   | { type: "Engage"; enemyId: string }
@@ -86,6 +89,7 @@ export type LegalIntent =
   | { type: "PlayCard"; cardId: string }
   | { type: "Commit" }
   | { type: "CommitHide" }
+  | { type: "CommitFortitude" }
   | { type: "Travel" }
   | { type: "DeclineTravel" }
   | { type: "Engage" }
@@ -104,6 +108,7 @@ export type Selection =
   | { type: "PlayCard"; cardId: string }
   | { type: "Commit" }
   | { type: "CommitHide" }
+  | { type: "CommitFortitude" }
   | { type: "Travel" }
   | { type: "Engage" }
   | { type: "ChooseEnemy" }

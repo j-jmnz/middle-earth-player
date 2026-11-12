@@ -50,7 +50,13 @@ export function shuffleEncounterDeck(state: ScenarioState): ScenarioState {
 // (rr.running-out-of-cards, rr.step-3-3). Outside the quest phase it stays empty.
 export function resetEncounterDeck(state: ScenarioState, steps: EngineStep[]): ScenarioState {
   // In any phase while the Nightmare setup card says so (encounterRefill, 900201:A:3).
-  if ((state.phase !== "Quest" && !refillsAnyTime(state)) || state.encounterDeck.length > 0 || state.encounterDiscard.length === 0) return state;
+  if (state.phase !== "Quest" && !refillsAnyTime(state)) return state;
+  return reshuffleDiscard(state, steps, "rr.running-out-of-cards");
+}
+
+// The encounter discard pile back into an empty encounter deck, shuffled, whatever the phase: what a rule that says "if the deck is ever empty" does (the Fortitude test, mec113.fortitude-tests).
+export function reshuffleDiscard(state: ScenarioState, steps: EngineStep[], rule: string): ScenarioState {
+  if (state.encounterDeck.length > 0 || state.encounterDiscard.length === 0) return state;
   // Gollum and Sméagol are never shuffled into the encounter deck (mec112.gollum-smeagol): a defeated Gollum lies in the discard pile only until his Forced effect flips him.
   const returning = state.encounterDiscard.filter((id) => !isGollum(state.cards[id]?.code));
   if (returning.length === 0) return state;
@@ -59,7 +65,7 @@ export function resetEncounterDeck(state: ScenarioState, steps: EngineStep[]): S
   for (const id of returning) {
     next = updateCard(moveCard(next, id, { zone: "encounterDeck" }), id, { face: "down" });
   }
-  steps.push({ kind: "resetEncounterDeck", count, cause: ruleCause("rr.running-out-of-cards") });
+  steps.push({ kind: "resetEncounterDeck", count, cause: ruleCause(rule) });
   return shuffleEncounterDeck(next);
 }
 

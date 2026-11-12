@@ -44,7 +44,7 @@ import { islandMayTravel } from "../../rules/families/island/travel.ts";
 import { hideCommitLimit } from "../../rules/families/nightmare/guards.ts";
 import { sailingSheet, shipRow } from "./sea-sheets.ts";
 import { asksCollection, collectionLabel, collectionOrder } from "./collection-sheets.ts";
-import { answeredCard, hideCommitNote, hideNumbers, lookNote, optionalEngageNote, responseNote } from "./sheet-notes.ts";
+import { answeredCard, fortitudeCommitNote, hideCommitNote, hideNumbers, lookNote, optionalEngageNote, responseNote } from "./sheet-notes.ts";
 import { captiveLabel, cardLabel, has, option, stagedAllyLabel, statOf, step } from "./sheet-parts.ts";
 import { nightActionNote } from "../words/scenarios/night.ts";
 import { framsburgActionCaution, framsburgActionNote } from "../words/scenarios/framsburg.ts";
@@ -110,7 +110,7 @@ export function travelRefusals(whole: ScenarioState, ctx: ReduceContext, names: 
  * like any action window, with Pass, the Actions list and the hand.
  */
 export function isStepWindow(game: ScenarioState): boolean {
-  return game.window?.kind === "frameAction" && topFrame(game)?.frame !== "hide";
+  return game.window?.kind === "frameAction" && topFrame(game)?.frame !== "hide" && topFrame(game)?.frame !== "fortitude";
 }
 
 /**
@@ -176,6 +176,22 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         verb: "Commit",
         options: legalTargets(game, { type: "CommitHide" }, ctx).map((id) => ({ ...option(game, names, id), stats: statOf(game, ctx, id, "willpower") })),
         build: { kind: "CommitHide" },
+        allowEmpty: true,
+        preselected: [],
+        alternative: null,
+      };
+    }
+    case "fortitudeCommit": {
+      const source = frame?.cardId ?? null;
+      return {
+        kind: "multi",
+        key: `fortitudeCommit:${frame?.id ?? ""}`,
+        step: "Fortitude test",
+        title: source ? `${names.card(source)}: Fortitude test` : "Fortitude test",
+        note: fortitudeCommitNote(),
+        verb: "Commit",
+        options: legalTargets(game, { type: "CommitFortitude" }, ctx).map((id) => ({ ...option(game, names, id), stats: statOf(game, ctx, id, "willpower") })),
+        build: { kind: "CommitFortitude" },
         allowEmpty: true,
         preselected: [],
         alternative: null,

@@ -19,6 +19,8 @@ export type {
   FrameData,
   FrameName,
   GameEvent,
+  FortitudeData,
+  FortitudeResult,
   HideData,
   HideFailure,
   HideResult,
@@ -212,6 +214,7 @@ export type Window =
   // `targets`: a card opened the window (OfferAttacks): the seat may attack only these enemies, each once, as extra attacks.
   | { kind: "playerAttack"; targets?: readonly string[] }
   | { kind: "hideCommit"; seat: number }
+  | { kind: "fortitudeCommit"; seat: number }
   | { kind: "frameAction" }
   | { kind: "choose"; seat: number; options: readonly string[] }
   | { kind: "cancelOffer"; seat: number }
@@ -413,6 +416,8 @@ export type ScenarioState = {
   heroSavers?: readonly number[];
   // The main quest card in play prints the Dire keyword (mec113.dire, families/black-gate/dire.ts): each seat's threat elimination level is 99. Kept by settle; absent otherwise.
   dire?: true;
+  // The Fortitude tests players failed this round (mec113.fortitude-tests, families/mount-doom/failures.ts), for "if a player has failed a Fortitude test this round". Kept only once a test is failed; the round ends them.
+  fortitudeFailures?: readonly HideFailure[];
   // The Embassy from the Dark Tower (146072:B:1, families/black-gate/embassy.ts): the player cards placed faceup in front of the players and the encounter cards placed faceup (all lie set aside, faceup, while the Embassy lasts), the pairs made in the order they were
   // paired, and how many pairs the running effect has taken (`at`: the pair it is on is `pairs[at - 1]`). Kept from EmbassyDeal to EmbassyEnd.
   embassy?: { readonly players: readonly string[]; readonly encounter: readonly string[]; readonly pairs: readonly { readonly player: string; readonly encounter: string }[]; readonly at: number };

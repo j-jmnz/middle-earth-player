@@ -155,6 +155,7 @@ function varied(state: ScenarioState, ctx: ReduceContext, random: () => number, 
     const other = legalIntents(state, ctx).find((intent) => intent.type === "Choose" && state.cards[intent.optionId]?.code !== FRODO);
     if (other?.type === "Choose") return { type: "Choose", optionId: other.optionId };
   }
+  if (base.type === "CommitFortitude") return { type: "CommitFortitude", cardIds: legalTargets(state, { type: "CommitFortitude" }, ctx) };
   if (base.type === "CommitHide") return { type: "CommitHide", cardIds: legalTargets(state, { type: "CommitHide" }, ctx).slice(0, hideCommitLimit(state) ?? undefined) };
   // On A Shortcut to Mushrooms each ally adds 1 to every Hide test's threat (141023:B:2), so the search holds allies back.
   const stage = state.cards[state.questStage ?? ""]?.code;
