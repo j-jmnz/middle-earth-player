@@ -315,14 +315,12 @@ describe("the campaign card's Setup (10156:A:2)", () => {
 });
 
 describe("Sudden Assault's comparison (09021:A:1)", () => {
-  it("09021:A:1 holds when the committed Willpower is greater than the Threat in the staging area, with an enemy to attack for `attacks`", () => {
+  it("09021:A:1 holds when the committed Willpower is greater than the Threat in the staging area (an empty staging area: 0 Threat)", () => {
     const strong = built({ staging: ["f3"], committed: [HERO, HERO2] });
     expect(holds(strong.state, { kind: "questLeads" }, scope, strong.ctx)).toBe(true);
-    expect(holds(strong.state, { kind: "questLeads", attacks: true }, scope, strong.ctx)).toBe(true);
     const weak = built({ staging: ["f3", "f3"], committed: [HERO] });
     expect(holds(weak.state, { kind: "questLeads" }, scope, weak.ctx)).toBe(false);
     const empty = built({ committed: [HERO] });
     expect(holds(empty.state, { kind: "questLeads" }, scope, empty.ctx)).toBe(true);
-    expect(holds(empty.state, { kind: "questLeads", attacks: true }, scope, empty.ctx)).toBe(false);
   });
 });

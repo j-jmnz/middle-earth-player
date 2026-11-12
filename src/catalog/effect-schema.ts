@@ -306,6 +306,8 @@ export const effectSchema = z.strictObject({
   // A "revealed" event is heard only when the encounter deck itself revealed the card (staging, a surge, the top card;
   // rr.staging), not when a player searched for it and revealed it ("as it is revealed by the encounter deck", 01006:A:1).
   byEncounterDeck: z.literal(true).optional(),
+  // A "revealed" event is not heard when the card was found in the encounter discard pile by a search ("revealed from the encounter deck" counts a search of the deck, 09016:A:3).
+  notFromDiscard: z.literal(true).optional(),
   cancel: cancelSchema.optional(),
   // While this holds, nothing may cancel the effect ("If The One Ring is exhausted, this effect cannot be canceled").
   uncancelable: conditionSchema.optional(),

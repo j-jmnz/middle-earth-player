@@ -51,6 +51,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       lines: ["09016:A:3"],
       timing: "response",
       trigger: "revealed",
+      notFromDiscard: true,
       subject: SIDE_QUEST,
       condition: { kind: "matches", card: "self", pick: { type: "character", control: "you", state: "exhausted" } },
       instructions: [{ verb: "Ready" }],
@@ -115,8 +116,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     },
     { id: "09020:travel:1", cardCode: "09020", lines: ["09020:A:3"], timing: "travel", instructions: [{ verb: "RevealEncounter" }] },
 
-    // 09021 Sudden Assault. When Revealed: with the committed Willpower above the Threat in the staging area each enemy there attacks the first player (outside the combat phase, each dealt a shadow card, staying in the staging area); with no attack made (the Willpower
-    // is not above, or no enemy is there) an Orc War Party is found and added to the staging area (decided before the attacks, which can change the committed Willpower); the deck is shuffled. The effect cannot be canceled.
+    // 09021 Sudden Assault. When Revealed: with the committed Willpower above the Threat in the staging area each enemy there attacks the first player (outside the combat phase, each dealt a shadow card, staying in the staging area); then, with no attack made (the Willpower
+    // is not above, or no enemy is there: the running effect counts each attack, noneReturned), an Orc War Party is found and added to the staging area, after the attacks so it does not attack; the deck is shuffled. The effect cannot be canceled (a treachery is in the
+    // staging area while its When Revealed resolves).
     {
       id: "09021:whenRevealed:1",
       cardCode: "09021",
@@ -124,13 +126,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "whenRevealed",
       uncancelable: { kind: "sourceIn", zone: "staging" },
       instructions: [
-        {
-          verb: "SearchMove",
-          code: ORC_WAR_PARTY,
-          to: "staging",
-          when: { kind: "not", condition: { kind: "questLeads", attacks: true } },
-        },
         { verb: "Each", pick: STAGED_ENEMY, instructions: [{ verb: "AttackFromStaging", who: "firstPlayer" }], when: { kind: "questLeads" } },
+        { verb: "SearchMove", code: ORC_WAR_PARTY, to: "staging", when: { kind: "noneReturned" } },
         { verb: "ShuffleEncounterDeck" },
       ],
     },
@@ -314,7 +311,15 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [{ verb: "AddToStaging", code: PROTECT_THE_INNOCENT }, { verb: "AttachNewTo", code: PENDANT, to: "Iârion" }, { verb: "TradeDamageForResources", code: PROTECT_THE_INNOCENT, damage: 4, resources: 1 }],
     },
 
-    // 10157 Iârion's Pendant (boon; Attached character gets +1 Willpower is written by the build). Response: add it to the victory display to cancel the When Revealed effects of a card just revealed from the encounter deck (a side quest's, and an effect that cannot be canceled, are not), or a shadow effect just triggered.
+    // 10157 Iârion's Pendant (boon). Attached character gets +1 Willpower: only while the host is a character (the build's record reads any host; Iârion held facedown under Rescue Iârion is not a faceup character, so AUTHORED_REPLACES lists it). Response: add it to the victory display to cancel the When Revealed effects of a card just revealed from the encounter deck (a side quest's, and an effect that cannot be canceled, are not), or a shadow effect just triggered.
+    {
+      id: "10157:constant:1",
+      cardCode: PENDANT,
+      lines: ["10157:A:1"],
+      timing: "constant",
+      condition: { kind: "matches", card: "host", pick: { type: "character", control: "any" } },
+      instructions: [{ verb: "ModifyStat", stat: "willpower", amount: 1, until: "whileSourceInPlay", target: "host" }],
+    },
     {
       id: "10157:response:1",
       cardCode: PENDANT,
@@ -352,4 +357,5 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
   { pool: [...THE_FATE_OF_NUMENOR, ...THE_OATH] },
 );
 
-export const AUTHORED_REPLACES: readonly string[] = [];
+// 10157:constant:1: the template reads any host; the authored record adds the host being a faceup character (09024:A:2 holds Iârion facedown).
+export const AUTHORED_REPLACES: readonly string[] = ["10157:constant:1"];

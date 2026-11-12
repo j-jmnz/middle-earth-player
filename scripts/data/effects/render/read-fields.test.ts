@@ -223,7 +223,7 @@ describe("effects render read fields, conditions", () => {
     canAttachToDial: [{ kind: "canAttachToDial", code: "145016" }],
     pursuit: [{ kind: "pursuit", min: 3, max: 6 }],
     currentQuest: [{ kind: "currentQuest", is: "side" }, { kind: "currentQuest", is: "self" }, { kind: "currentQuest", is: "other" }],
-    questLeads: [{ kind: "questLeads", attacks: true }],
+    questLeads: [{ kind: "questLeads" }],
     pileHas: [{ kind: "pileHas", pile: "harad", min: 1, max: 3 }],
     facedownUnder: [{ kind: "facedownUnder", code: "144027", min: 3, max: 8, players: true }],
     soleAttacker: [{ kind: "soleAttacker" }],

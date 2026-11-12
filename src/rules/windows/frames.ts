@@ -61,6 +61,8 @@ export function startReveal(
   guards?: string,
   // An enemy found by a search is put into play engaged with the revealing seat, not staged (SearchReveal `to: engaged`).
   engage?: boolean,
+  // The found card lay in the encounter discard pile (SearchReveal): the `revealed` event says so, for "revealed from the encounter deck" (09016:A:3).
+  fromDiscard?: boolean,
 ): ScenarioState {
   // A Loot card on top of the deck is discarded, not revealed (emce.loot).
   const skipped = cardId ? { state, top: cardId } : skipLoot(resetEncounterDeck(state, steps), ctx, steps);
@@ -70,7 +72,7 @@ export function startReveal(
   if (!id || !instance) return ready;
   const peril = printedOf(ctx.cards, instance.code).keywords.peril;
   const fromDeck = cardId == null ? { fromDeck: true } : {};
-  return pushFrame(ready, { frame: "reveal", cardId: id, seat, peril, data: { kind: "reveal", hide: null, surge: false, ...fromDeck, ...(guards ? { guards } : {}), ...(engage ? { engage: true as const } : {}) } }, steps);
+  return pushFrame(ready, { frame: "reveal", cardId: id, seat, peril, data: { kind: "reveal", hide: null, surge: false, ...fromDeck, ...(fromDiscard ? { fromDiscard: true as const } : {}), ...(guards ? { guards } : {}), ...(engage ? { engage: true as const } : {}) } }, steps);
 }
 
 // A reveal started by an effect instruction. It cannot wait for a player, so a Hide test or any other
@@ -176,7 +178,7 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
       return runRevealed(patchTop(state, { step: 4 }), id, seat, frame.peril, ctx, steps);
     case 4:
       // The Responses "after an enemy is revealed" (142067:B:2) are offered once the Forced effects of the reveal have resolved: their frame goes under those.
-      const heard = { trigger: "revealed", seat, cardId: id, ...(frame.data.fromDeck ? { fromDeck: true } : {}) } as const;
+      const heard = { trigger: "revealed", seat, cardId: id, ...(frame.data.fromDeck ? { fromDeck: true } : {}), ...(frame.data.kind === "reveal" && frame.data.fromDiscard ? { fromDiscard: true as const } : {}) } as const;
       return fireForced(offerResponses(patchTop(state, { step: 5 }), heard, ctx, steps), heard, ctx, steps);
     case 5: {
       // A revealed treachery is resolved, then placed in the encounter discard pile unless its text says otherwise

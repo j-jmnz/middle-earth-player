@@ -64,6 +64,7 @@ export function hears(state: ScenarioState, effect: Effect, listener: CardInstan
   // A card whose printed text box is blank has none of its abilities (rr.blank).
   if (textBlank(state, listener.id, ctx.cards)) return false;
   if (effect.byEncounterDeck && !event.fromDeck) return false;
+  if (effect.notFromDiscard && event.fromDiscard) return false;
   // An event stamped with the clock is heard only by cards that were in play when it occurred (rr.forced: a Forced effect must be in play and active at the time its trigger occurs).
   if (event.at != null && listener.enteredPlay > event.at) return false;
   if (effect.eventSeat) {

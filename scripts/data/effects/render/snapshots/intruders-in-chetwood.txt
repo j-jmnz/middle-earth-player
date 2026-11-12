@@ -15,7 +15,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
     - [json ControlledBy {"verb":"ControlledBy","who":"firstPlayer","card":"self"}]
 
 09016:A:3 (front): Response: After a side quest is revealed from the encounter deck, ready Iârion.
-  09016:response:1: Response after a card is revealed (heard about card (any player controls) of card type encounter-side-quest)
+  09016:response:1: Response after a card is revealed (heard about card (any player controls) of card type encounter-side-quest; not for a card found in the encounter discard pile)
     only if this card is a exhausted character (you control)
     - ready this card
 
@@ -95,9 +95,9 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 09021:A:1 (front): When Revealed: If the total Willpower of characters committed to the quest is greater than the total Threat in the staging area, each enemy in the staging area makes an immediate attack against the first player. If no attack is made this way, search the encounter deck and discard pile for an Orc War Party and add it to the staging area. Shuffle the encounter deck. This effect cannot be canceled.
   09021:whenRevealed:1: When revealed (cannot be canceled while this card is in the staging area)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchMove {"verb":"SearchMove","code":"09017","to":"staging","when":{"kind":"not","condition":{"kind":"questLeads","attacks":true}}}]
-    - then, if the total Willpower of the characters committed to the quest is greater than the total Threat in the staging area (checked when this step runs, after the steps above; not tied to whether they did anything): for each enemy (any player controls) in the staging area only:
+    - if the total Willpower of the characters committed to the quest is greater than the total Threat in the staging area: for each enemy (any player controls) in the staging area only:
       - the picked enemy attacks the first player now, from the staging area
+    - [json SearchMove {"verb":"SearchMove","code":"09017","to":"staging","when":{"kind":"noneReturned"}}]
     - shuffle the encounter deck
 
 ## 09022 Surprising Speed
@@ -317,6 +317,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 
 10157:A:1 (front): Attached character gets +1 Willpower.
   10157:constant:1: Constant
+    only if its host is a character (any player controls)
     - its host: stat willpower 1, while this card is in play
 
 10157:A:2 (front): Response: Add Iârion's Pendant to the victory display to cancel the 'when revealed' effects of a card that was just revealed from the encounter deck, or to cancel a shadow effect just triggered.
@@ -341,4 +342,4 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
     - if not (2 is less than the number of players): this card: stat loseAtDamage 10, while this card is in play
     - then, if 2 is less than the number of players (checked when this step runs, after the steps above; not tied to whether they did anything): this card: stat loseAtDamage 20, while this card is in play
 
-(rendered pieces: 186 by template, 22 as JSON)
+(rendered pieces: 188 by template, 22 as JSON)

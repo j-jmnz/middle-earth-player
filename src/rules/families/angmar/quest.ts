@@ -7,7 +7,6 @@ import type { EngineStep } from "../../core/intents.ts";
 import { currentCause, UNATTRIBUTED } from "../../core/cause.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { Scope } from "../../interpret/conditions.ts";
-import { printedOf } from "../../core/printed.ts";
 import { flagged, type ScenarioState } from "../../core/state.ts";
 import { committedWillpower, stagingThreat } from "../../quest/quest.ts";
 import { askTarget } from "../../windows/choices.ts";
@@ -64,7 +63,7 @@ export function questCardsAmount(state: ScenarioState, found: Exclude<Amount, nu
  * current quest that could be chosen (the second option of 09049:A:2).
  */
 export function currentQuestHolds(state: ScenarioState, condition: Condition, scope: Scope, ctx: ReduceContext): boolean | null {
-  if (condition.kind === "questLeads") return committedWillpower(state, ctx.cards) > stagingThreat(state, ctx.cards) && (condition.attacks !== true || state.staging.some((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "enemy"));
+  if (condition.kind === "questLeads") return committedWillpower(state, ctx.cards) > stagingThreat(state, ctx.cards);
   if (condition.kind !== "currentQuest") return null;
   const side = currentSideQuest(state);
   if (condition.is === "side") return side != null;

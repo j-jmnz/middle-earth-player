@@ -2,7 +2,6 @@
 // Gondor and Swords of the Noldor lists of data/decks/prebuilt.json), two-handed, Easy, so each is a real save. `chetwood-won` is the first seed that wins, parked on the win (the Resolution waits); `chetwood-lost` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.
 // TODO: say what the Campaign Setup and the Resolution ask, and which answers the saved decklists' policy gives them.
-import type { CampaignLog } from "../../src/campaign/log.ts";
 import type { StoredLoadout } from "../../src/campaign/save.ts";
 import type { PlayerIntent, ScenarioState } from "../../src/rules/engine/reduce.ts";
 
