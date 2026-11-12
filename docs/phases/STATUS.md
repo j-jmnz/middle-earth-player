@@ -102,8 +102,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 76 | Mount Doom | completed | 2026-11-12. Review round done. Open: `doom-won`. |
 | 77 | Angmar Awakened data | completed | 2026-11-12. Review round done. Open: Easy counts and MEC108 wording not user-confirmed. |
 | 78 | Angmar Awakened campaign shell | completed | 2026-11-12. Review round done. Open: campaign-card lines left to their scenarios. |
-| 79 | Intruders in Chetwood | active | 2026-11-12. `docs/plans/angmar-awakened.md`. |
-| 80 | The Weather Hills | not started |  |
+| 79 | Intruders in Chetwood | completed | 2026-11-12. Review round done. Open: `chetwood-won`. |
+| 80 | The Weather Hills | active | 2026-11-12. `docs/plans/angmar-awakened.md`. |
 | 81 | Deadmen's Dike | not started |  |
 | 82 | The Wastes of Eriador | not started |  |
 | 83 | Escape from Mount Gram | not started |  |
@@ -120,6 +120,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - The release notes' golden-check comparison (`scripts/release/reach.ts`) has not run against a real previous tag; the first tag after it compares by `ENGINE_CHANGES` only.
 
 ### Fixtures and Maestro
+- `chetwood-won` is not committed: no seed in 100 wins Intruders in Chetwood with The One Deck and Defenders of Gondor under five policies. Until it exists `.maestro/scenarios/intruders-in-chetwood/intruders-in-chetwood.yaml` cannot run.
 - `marshes-won` is not committed: no seed in 600 wins The Passage of the Marshes with The One Deck and Defenders of Gondor (every game reaches threat 50 by round 4). Until it exists `.maestro/scenarios/the-passage-of-the-marshes/the-passage-of-the-marshes.yaml` cannot run.
 - `doom-won` is not committed: no seed in 800 wins Mount Doom with the saved decklists (the Ring-bearer falls in combat in round 1). Until it exists `.maestro/scenarios/mount-doom/mount-doom.yaml` and `mount-doom-keep.yaml` cannot run.
 - `ungol-won` is not committed: no seed in 600 wins The Tower of Cirith Ungol with the saved decklists. Until it exists `.maestro/scenarios/the-tower-of-cirith-ungol/the-tower-of-cirith-ungol.yaml` cannot run.
@@ -197,6 +198,20 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - Angmar Awakened campaign cards: "add the Mysterious Omens side quest to the Campaign Log" (10159:A:2) adds it to the Campaign Pool (agent recommendation). Not user-confirmed.
 - Angmar Awakened campaign cards: the Amarthiúl hero ban ends at 10188:A:2 and does not return in The Dread Realm (agent recommendation). Not user-confirmed.
 - Angmar Awakened campaign-card lines left to their scenarios' Build: 10156:A:2 (Intruders in Chetwood), 10159:A:2 (The Weather Hills), 10166:A:2 and A:3 (Deadmen's Dike), the `determined` write (The Wastes of Eriador), 10174:A:2 and B:1 to B:3 with the `stolenCards` write and its deck refusal (Escape from Mount Gram), 10182:A:2, A:3 and B:1 (Across the Ettenmoors), 10184:B:1 (The Treachery of Rhudaur). The boons' and burdens' own lines (10157, 10161 to 10165, 10167 to 10170, 10176 to 10181, 10185 to 10187, 10189 to 10192) go with the scenario that first deals each.
+- Intruders in Chetwood: quest cards in play are the main quest, the staged encounter side quests and the player side quests, at least 1 (09016, 09019, 09047, 09048, 09050). Not user-confirmed.
+- Intruders in Chetwood: Iârion's Response (09016:A:3) hears a side quest revealed by a search of the encounter deck, not of the discard pile. Not user-confirmed.
+- Intruders in Chetwood: Iârion held facedown under Rescue Iârion (09024:A:2) stays in play and has not left it. Not user-confirmed.
+- Intruders in Chetwood: Time counters come off after the end-of-refresh Forced effects. Not user-confirmed.
+- Intruders in Chetwood: Outlying Homestead (09020:A:2) bars threat reduction by player card effects only. Not user-confirmed.
+- Intruders in Chetwood: Sudden Assault (09021:A:1) attacks first and searches for an Orc War Party only if no attack was made. Not user-confirmed.
+- Intruders in Chetwood: Angmar Orc's ally choice (09043:A:1) may take Iârion; the first player chooses. Not user-confirmed.
+- Intruders in Chetwood: Pressing Needs (09049:A:2): search-and-reveal a side quest or make a different quest card current; player side quests not eligible. Not user-confirmed.
+- Intruders in Chetwood: Weight of Responsibility (09050) counts quest cards when it resolves. Not user-confirmed.
+- Intruders in Chetwood: Stop the War Party's Setup (09068:A:1): each player searches for one location with a different title. Not user-confirmed.
+- Intruders in Chetwood: Protect the Innocent (10158:A:1) takes 1 damage per attack that damages a character. Not user-confirmed.
+- Intruders in Chetwood: Orc Rearguard's cap (09023:A:1) holds on whichever quest is current (community source only). Not user-confirmed.
+- Intruders in Chetwood: Iârion's control follows the first player token (09016:A:2), by the Aragorn and Calphon rulings and a community source only. Not user-confirmed.
+- Renderer gaps, Intruders in Chetwood (behaviour proven by tests): 09016:A:2 control has no template; Orc War Party's stage bar does not say it binds the main quest only (09017:A:3); Orc Rearguard's cap does not say "each round" (09023:A:1); `lastTimeCounterRemoved` and `questDefeated` do not say "this card" (09024:A:3, 09051:A:2); Angmar Captain's X and target (09045:A:1); 09068:B:3's first player and win; the Pendant's cancel limits (10157:A:2); `SearchMove` with `when` prints as JSON.
 - Angmar Awakened: the `angmarOrcDeck` pile and the box's new Setup steps (`buildOrcDeck`, `prepareCapturedDeck`, `captureUnder` and the others) are catalog data only; the engine reads them in their scenarios' phases.
 
 ### Screens and code
