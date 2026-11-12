@@ -130,3 +130,45 @@ describe("Heavy and Tired (146057:A:1)", () => {
     expect(passed.cards[run.ids[HEAVY] ?? ""]?.zone).toBe("play");
   });
 });
+
+describe("Brake of Thorns (146047:A:1)", () => {
+  const brake = definePrinted({ code: "146047", name: "Brake of Thorns", type: "location", threat: 3, questPoints: 3 });
+  const placed = (zone: "staging" | "active") => {
+    const run = begin(["eyes0", "eyes0", "eyes0", "orc"], { cards: [hero("a", { willpower: 1 }), card("eyes0"), brake, enemy("orc")], effects: recordsOf(AUTHORED_EFFECTS, "146047"), ...(zone === "staging" ? { staging: [{ code: "146047" }] } : {}) });
+    return run;
+  };
+
+  it("adds one icon to each Fortitude test while it is in the staging area: Willpower 1 against 1 icon fails", () => {
+    const run = placed("staging");
+    expect(threat(send(commit(run), { type: "Pass" }, run.ctx))).toBe(34);
+  });
+
+  it("adds none while it is not in the staging area", () => {
+    const run = placed("active");
+    expect(threat(send(commit(run), { type: "Pass" }, run.ctx))).toBe(30);
+  });
+});
+
+describe("The Lidless Eye (146055:A:2)", () => {
+  const eye = definePrinted({ code: "146055", name: "The Lidless Eye", type: "treachery", keywords: { peril: true, eyeIcons: 2 } });
+  const ring = definePrinted({ code: "146065", name: "The One Ring", type: "objective" });
+
+  function revealed(exhausted: boolean) {
+    const base = table({ cards: [hero("a", { willpower: 2 }), card("eyes0"), eye, ring], effects: recordsOf(AUTHORED_EFFECTS, "146055"), heroes: [{ code: "a" }], attachments: [{ code: "146065", host: "a" }], encounter: ["eyes0", "eyes0", "eyes0"], threat: 30 });
+    const ringId = base.ids["146065"] ?? "";
+    const state = exhausted ? { ...base.state, cards: { ...base.state.cards, [ringId]: { ...base.state.cards[ringId]!, exhausted: true } } } : base.state;
+    const record = AUTHORED_EFFECTS.find((effect) => effect.id === "146055:whenRevealed:1");
+    const pushed = pushEffectFrame({ ...state, window: null }, { frame: "whenRevealed", sourceId: null, actor: 0, peril: false, effectId: "146055:whenRevealed:1", instructions: [...(record?.instructions ?? []), STOP], cancel: null, blockCancel: null }, []);
+    return { ...base, state: settle(pushed, base.ctx, []) };
+  }
+
+  it("adds two icons to its own test while The One Ring is exhausted, and raises the threat of the player who fails by 10", () => {
+    const run = revealed(true);
+    expect(threat(send(commit(run), { type: "Pass" }, run.ctx))).toBe(40);
+  });
+
+  it("adds none while The One Ring is ready: Willpower 2 against 0 passes", () => {
+    const run = revealed(false);
+    expect(threat(send(commit(run), { type: "Pass" }, run.ctx))).toBe(30);
+  });
+});
