@@ -900,6 +900,46 @@
     },
     {
       "match": {
+        "code": "09023"
+      },
+      "set": {
+        "questPoints": 3
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Orc Rearguard no quest points (its Victory 10 is the only number it exports). The scan prints a quest points box of 3 and Victory 10, so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 09023.A (hallofbeorn-resources The-Lost-Realm/Orc-Rearguard.jpg, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "09024"
+      },
+      "set": {
+        "questPoints": 6
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Rescue Iârion no quest points (its Victory 10 is the only number it exports). The scan prints a quest points box of 6 and Victory 10, so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 09024.A (hallofbeorn-resources The-Lost-Realm/Rescue-Iârion.jpg, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "09046"
+      },
+      "set": {
+        "questPoints": 4
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Orc Ambush no quest points (its Victory 10 is the only number it exports). The scan prints a quest points box of 4 and Victory 10, so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 09046.A (hallofbeorn-resources The-Lost-Realm/Orc-Ambush.jpg, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "09051"
+      },
+      "set": {
+        "questPoints": 4
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Lost in the Wilderness no quest points (its Victory 10 is the only number it exports). The scan prints a quest points box of 4 and Victory 10, so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 09051.A (hallofbeorn-resources The-Lost-Realm/Lost-in-the-Wilderness.jpg, read for the quest points box)"
+    },
+    {
+      "match": {
         "code": "144075"
       },
       "set": {
