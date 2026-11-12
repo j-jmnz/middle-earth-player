@@ -14,7 +14,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   // 09018:A:2 (Shadow): the defending player chooses.
   "09018:shadow:1 @0 Choose": { owned: true, note: "Chetwood Forest shadow: you either exhaust a hero you control, or the attacking enemy returns to the staging area after this attack." },
   "09018:shadow:1 @0 exhaust": { label: "Exhaust a hero you control" },
-  "09018:shadow:1 @0 staging": { label: "The attacking enemy returns to the staging area after the attack" },
+  "09018:shadow:1 @0 staging": { label: "{host} returns to the staging area after the attack" },
   "09018:shadow:1 @0.exhaust.0 Pick": { owned: true, note: "Chetwood Forest shadow: choose a ready hero you control to exhaust.", verb: "Exhaust" },
 
   // 09019:A:1 (Forced, beginning of the quest phase): the first player chooses the one enemy for the group.
@@ -49,5 +49,5 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   "09068:setup:1 @1.0 SearchMove": { owned: true, note: "Stop the War Party: search the encounter deck for a location with a different title from those added. Add it to the staging area.", verb: "Add" },
 
   // 10156:A:2 (campaign Setup): each player in turn may trade damage on Protect the Innocent for resources.
-  "10156:campaignSetup:1 @2 TradeDamageForResources": { owned: true, note: "Protect the Innocent: you may place 4 damage on it to add 1 resource to each hero you control. The players lose with 10 damage on it.", labels: { trade: "Place 4 damage on Protect the Innocent, add 1 resource to each of your heroes", keep: "Place no damage" } },
+  "10156:campaignSetup:1 @2 TradeDamageForResources": { owned: true, note: "Protect the Innocent holds {held} of 10 damage; placing 4 makes {made}. You may place 4 damage on it to add 1 resource to each hero you control. The players lose at 10.", bind: { held: { stat: "damage", ofNamed: "Protect the Innocent" }, made: { stat: "damage", ofNamed: "Protect the Innocent", plus: 4 } }, labels: { trade: "Place 4 damage on Protect the Innocent, add 1 resource to each of your heroes", keep: "Place no damage" } },
 };

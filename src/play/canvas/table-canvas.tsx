@@ -22,7 +22,8 @@ import { areaTell } from "../words/scenarios/stormcaller.ts";
 import { headingStepOf, headingLook } from "../dream-chaser/heading.ts";
 import { headingLine, pileCountWords, secondSlotLine, shipsLine } from "../words/scenarios/sea.ts";
 import { PILE_WORDS, PILES, hidesFace, isPrisoner, pileIds, secondPilesOf, TABLE_ZONES, pileSelector, shownSeat, zoneSelector, type PileId, type ZoneId } from "../store/selectors.ts";
-import type { SlotInfo, TableCanvasProps } from "./table-canvas-types.ts";
+import type { TableCanvasProps } from "./table-canvas-types.ts";
+import { marksText } from "./table-canvas-views.ts";
 import type { TableTokens } from "../../ui/tokens.ts";
 import { useUiScale } from "../../ui/ui-scale.ts";
 import { useTableTokens } from "../../ui/use-table-tokens.ts";
@@ -65,15 +66,6 @@ function CardButton({ id, label, faceDown, onTap, onPreview, highlight, t }: { i
       )}
     </Pressable>
   );
-}
-
-// What the canvas draws on a card, in words for the web list: an enemy's engagement cost against the threat, a delayed
-// effect to come.
-function marksText(slot: SlotInfo | null): string {
-  if (!slot) return "";
-  const engagement = slot.engagement ? ` · engagement ${slot.engagement.cost}, ${slot.engagement.engages ? "engages" : "stays"}` : "";
-  const loss = slot.loss ? ` · ${slot.loss.speech}` : "";
-  return `${engagement}${loss}${slot.delayed ? " · an effect comes later" : ""}`;
 }
 
 // A treasure in the staging area, in words: who guards it, or that it is free to claim (emce.treasure).

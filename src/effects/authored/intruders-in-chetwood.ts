@@ -311,7 +311,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       instructions: [{ verb: "AddToStaging", code: PROTECT_THE_INNOCENT }, { verb: "AttachNewTo", code: PENDANT, to: "Iârion" }, { verb: "TradeDamageForResources", code: PROTECT_THE_INNOCENT, damage: 4, resources: 1 }],
     },
 
-    // 10157 Iârion's Pendant (boon). Attached character gets +1 Willpower: only while the host is a character (the build's record reads any host; Iârion held facedown under Rescue Iârion is not a faceup character, so AUTHORED_REPLACES lists it). Response: add it to the victory display to cancel the When Revealed effects of a card just revealed from the encounter deck (a side quest's, and an effect that cannot be canceled, are not), or a shadow effect just triggered.
+    // 10157 Iârion's Pendant (boon). Attached character gets +1 Willpower: only while the host is a character the pick finds (the build's record reads any host; Iârion held facedown under Rescue Iârion lies in the captive zone, which has no controller, so the pick finds nothing and AUTHORED_REPLACES lists it). Response: add it to the victory display to cancel the When Revealed effects of a card just revealed from the encounter deck (a side quest's, and an effect that cannot be canceled, are not), or a shadow effect just triggered.
     {
       id: "10157:constant:1",
       cardCode: PENDANT,
@@ -357,5 +357,5 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
   { pool: [...THE_FATE_OF_NUMENOR, ...THE_OATH] },
 );
 
-// 10157:constant:1: the template reads any host; the authored record adds the host being a faceup character (09024:A:2 holds Iârion facedown).
+// 10157:constant:1: the template reads any host; the authored record adds the host being a character the pick finds: the captive zone has no controller, so Iârion held facedown (09024:A:2) is not one.
 export const AUTHORED_REPLACES: readonly string[] = ["10157:constant:1"];

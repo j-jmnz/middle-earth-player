@@ -11,6 +11,7 @@ import { COLS, ROWS } from "../dream-chaser/island-table.ts";
 import type { CombatMark, Rect } from "../layout/layout.ts";
 import { STAGE_APART_WORD } from "../words/scenarios/stormcaller.ts";
 import type { OptionMark } from "../choice/sheet-types.ts";
+import { currentMark } from "./current-mark.ts";
 import { TOKEN } from "./token-spots.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
 import { CanvasIcon, BADGE_H, type Fonts, type TokenImages } from "./pieces.native.tsx";
@@ -127,21 +128,19 @@ export function FireMarkView({ rect, mark, fonts, images, t, s }: { rect: Rect; 
 }
 
 /**
- * The current quest among the side quests in the staging area: a small accent pill with the word "Current" at the card's top edge, upright, clear of the damage token's corner and the effect pills down the left edge
- * (mec108.side-quests-in-play). The preview and the screen reader's line say what it means.
+ * The current quest among the side quests in the staging area: a small accent pill with the word "Current" inside the card's top edge, upright, left of the damage token's column (mec108.side-quests-in-play); where the word does not fit, a short accent dot in its place,
+ * as the foot pills drop their art. The preview and the screen reader's line say what it means.
  */
 export function CurrentQuestMark({ rect, fonts, t, s }: { rect: Rect; fonts: Fonts; t: TableTokens; s: number }) {
-  const { x, y, w } = rect;
-  const pill = BADGE_H * s;
   const text = "Current";
-  const width = Math.min(fonts.badge.getTextWidth(text) + 10 * s, w - 4 * s);
-  const left = x + (w - width) / 2;
-  const top = y - pill / 2;
+  const words = fonts.badge.getTextWidth(text);
+  const box = currentMark(rect, words, BADGE_H * s, s);
+  const r = Math.min(box.width, box.height) / 2;
   return (
     <Group>
-      <RoundedRect x={left} y={top} width={width} height={pill} r={pill / 2} color={t.accent} />
-      <RoundedRect x={left} y={top} width={width} height={pill} r={pill / 2} color={t.night} style="stroke" strokeWidth={1 * s} />
-      <Text x={left + (width - fonts.badge.getTextWidth(text)) / 2} y={top + 11.5 * s} text={text} font={fonts.badge} color={t.onAccent} />
+      <RoundedRect x={box.x} y={box.y} width={box.width} height={box.height} r={r} color={t.accent} />
+      <RoundedRect x={box.x} y={box.y} width={box.width} height={box.height} r={r} color={t.night} style="stroke" strokeWidth={1 * s} />
+      {box.kind === "word" ? <Text x={box.x + (box.width - words) / 2} y={box.y + 11.5 * s} text={text} font={fonts.badge} color={t.onAccent} /> : null}
     </Group>
   );
 }

@@ -1,4 +1,4 @@
-// Rules: mec108.side-quests, mec108.side-quests-in-play, mec108.time-x, mec108.objective-allies, mec108.setup-intruders-in-chetwood, rr.first-player, rr.in-play-and-out-of-play, rr.cancel, rr.forced (data/rules/entries.json); ledger lines 09016:A:2, 09016:A:3, 09017:A:3, 09018:A:1, 09019:A:1, 09021:A:1, 09023:A:1, 09024:A:3, 09045:A:1, 09051:A:2, 09068:B:1, 09068:B:2, 09068:B:3, 10157:A:1, 10157:A:2, 10158:A:1.
+// Rules: mec108.side-quests, mec108.side-quests-in-play, mec108.time-x, mec108.objective-allies, mec108.setup-intruders-in-chetwood, rr.first-player, rr.in-play-and-out-of-play, rr.cancel, rr.forced (data/rules/entries.json); ledger lines 09016:A:2, 09016:A:3, 09017:A:3, 09018:A:1, 09019:A:1, 09021:A:1, 09023:A:1, 09024:A:3, 09045:A:1, 09051:A:2, 09068:B:1, 09068:B:2, 09068:B:3, 10157:A:1, 10157:A:2, 10158:A:1, 10158:A:2.
 import { describe, expect, it } from "vitest";
 
 import { updateCard, type ScenarioState } from "../../../rules/core/state.ts";
@@ -120,6 +120,20 @@ describe("the main quest and the side quests (09017:A:3, 09023:A:1)", () => {
   });
 });
 
+describe("Protect the Innocent takes progress as damage removed (10158:A:2)", () => {
+  it("10158:A:2 progress placed on it as the current quest removes that much damage, no more than it holds, and places none on it or on the main quest", () => {
+    const t = built({ staging: [{ code: "10158", damage: 3 }] });
+    const protect = idOf(t.state, "10158");
+    const current = setCurrentQuest(t.state, protect, t.ctx);
+    const some = placeQuestProgress(current, 2, t.cards, [], canAdvance);
+    expect(some.cards[protect]).toMatchObject({ damage: 1, progress: 0 });
+    const all = placeQuestProgress(some, 5, t.cards, [], canAdvance);
+    expect(all.cards[protect]).toMatchObject({ damage: 0, progress: 0 });
+    expect(all.cards[all.questStage ?? ""]?.progress).toBe(0);
+    expect(settle({ ...all, window: null, mode: "stopped" }, t.ctx, []).cards[protect]?.zone).toBe("staging");
+  });
+});
+
 describe("Iârion's Pendant's Response (10157:A:2)", () => {
   const withPendant = (layout: Layout = {}) => built({ play: [IARION], attached: [{ code: PENDANT, to: IARION }], ...layout });
 
@@ -232,7 +246,7 @@ describe("the other lines a row cannot show", () => {
     const hold = (table: ReturnType<typeof built>): ScenarioState => resolveRecords(table.state, table.ctx, RESCUE, "whenRevealed", idOf(table.state, RESCUE)).state;
     const heldWith = syncConstants(hold(free), free.ctx);
     const heldWithout = syncConstants(hold(without), without.ctx);
-    const willpower = (state: ScenarioState, ctx: ReduceContext) => ctx.cards.size > 0 && state.modifiers.filter((modifier) => modifier.stat === "willpower" && modifier.instanceId === idOf(state, IARION)).reduce((sum, modifier) => sum + modifier.amount, 0);
-    expect(willpower(heldWith, free.ctx)).toBe(willpower(heldWithout, without.ctx));
+    const willpower = (state: ScenarioState): number => state.modifiers.filter((modifier) => modifier.stat === "willpower" && modifier.instanceId === idOf(state, IARION)).reduce((sum, modifier) => sum + modifier.amount, 0);
+    expect(willpower(heldWith)).toBe(willpower(heldWithout));
   });
 });

@@ -76,7 +76,7 @@ work together with yours. A line that restates a rule the engine applies anyway 
    implement it in the engine following the Rules Reference text in `data/rules`, test it, then write the records.
 3. Prefer general vocabulary over card-specific code, and existing verbs and patterns where they fit (the cookbook lists
    them). Check the other families' `VERBS` before adding one: a verb two families define fails to load.
-4. The engine supports 1 to 4 seats. "Choose a player", control changes and "each player" must work with several seats.
+4. The engine plays one or two seats (`seatCount: 1 | 2`, `docs/brief.md`, Product). "Choose a player", control changes and "each player" must work for both.
 5. Choices: the reducer never takes a number or a card the engine did not offer; choices are frames with options (see
    `Pick`, `Choose`, `effect-frames.ts`). If you add a verb that can appear inside a `Choose` option, give it words in
    `src/play/words/instruction.ts` (`instructionWords`): a test checks every branch reads as a sentence.

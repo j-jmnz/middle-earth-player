@@ -14,12 +14,13 @@ import { cardEffects, slotNumbers } from "../cards/card-effects.ts";
 import { dungeonDetail } from "../cards/dungeon-preview.ts";
 import { sheetFor } from "../choice/sheets.ts";
 import type { PickSheet, SheetNames } from "../choice/sheet-types.ts";
-import { angmarDials } from "../readouts/angmar.ts";
-import { scenarioDials } from "../readouts/scenario-dials.ts";
+import { angmarDials, angmarHands } from "../readouts/angmar.ts";
+import { scenarioDials, seatMarks } from "../readouts/scenario-dials.ts";
 import { heldDials } from "../readouts/widgets.ts";
 import { zoneSelector } from "../store/selectors.ts";
 import { pictureCode } from "../canvas/picture-key.ts";
 import { NO_HIGHLIGHT } from "../store/peek.ts";
+import { marksText } from "../canvas/table-canvas-views.ts";
 import { cardSpeech, type CardSpeechDeps } from "../words/card-speech.ts";
 
 const ID = "intruders-in-chetwood";
@@ -45,7 +46,7 @@ const speechDeps = (made: Made): CardSpeechDeps => ({
 const namesOf = (made: Made, state: Made["state"] = made.state): SheetNames => ({ card: (id) => made.cards.get(state.cards[id]?.code ?? "")?.name ?? id, line: () => null });
 
 describe("Protect the Innocent's dial", () => {
-  it("09016:A:2 reads the damage against the number that loses (10 for one or two players), warms near it, and is gone with the card", () => {
+  it("10158:A:3 reads the damage against the number that loses (10 for one or two players), warms near it, and is gone with the card", () => {
     const made = built({ staging: [{ code: PROTECT, damage: 3 }] });
     const dial = angmarDials(made.state, made.ctx, nameOf(made)).find((one) => one.id === "protect");
     expect(dial).toMatchObject({ testID: "angmar-protect", value: 3, limit: 10, warms: true });
@@ -99,10 +100,12 @@ describe("Rescue Iârion on the table", () => {
     const { made, rescue, state } = held();
     const counted = updateCard(state, rescue, { resources: 4 });
     const dial = (game: typeof state) => angmarDials(game, made.ctx, nameOf(made)).find((one) => one.id === "time");
-    expect(dial(counted)).toMatchObject({ testID: "angmar-time", value: 0, limit: 4, warms: true });
+    expect(dial(counted)).toMatchObject({ testID: "angmar-time", value: 4 });
+    expect(dial(counted)?.limit).toBeUndefined();
     expect(dial(counted)?.warn).toBeUndefined();
     expect(dial(updateCard(state, rescue, { resources: 2 }))?.warn).toMatchObject({ level: "near", words: "2 time counters are left." });
-    expect(dial(updateCard(state, rescue, { resources: 1 }))).toMatchObject({ value: 3, warn: { level: "critical", words: "The next refresh phase takes the last time counter." } });
+    expect(dial(updateCard(state, rescue, { resources: 1 }))).toMatchObject({ value: 1, warn: { level: "critical", words: "The next refresh phase takes the last time counter." } });
+    expect(dial(counted)?.note).toContain("4 time counters left");
     expect(dial(counted)?.note).toContain("Iârion is discarded and the players lose");
   });
 
@@ -136,16 +139,55 @@ describe("the current quest and the side quests", () => {
   it("09023:A:1 reads the progress placed this round against Orc Rearguard's cap of 3, and warns once it is used up", () => {
     const made = built({ staging: [REARGUARD] });
     const dial = (game: typeof made.state) => angmarDials(game, made.ctx, nameOf(made)).find((one) => one.id === "cap");
-    expect(dial(made.state)).toMatchObject({ testID: "angmar-cap", value: 0, limit: 3 });
+    expect(dial(made.state)).toMatchObject({ testID: "angmar-cap", value: 0, limit: 3, limitWords: `3 allowed each round by ${nameOf(made)(REARGUARD)}` });
+    expect(dial(made.state)?.warn).toBeUndefined();
     const placed = placeQuestProgress(made.state, 5, made.cards, [], () => true);
-    expect(dial(placed)).toMatchObject({ value: 3, limit: 3, warn: { level: "near" } });
+    expect(dial(placed)).toMatchObject({ value: 3, limit: 3, warn: { level: "near", words: expect.stringContaining("No more can be placed until the next round.") } });
+    expect(dial(placed)?.limitWords).not.toContain("No more");
     expect(angmarDials(built({ staging: ["09046"] }).state, made.ctx, nameOf(made)).some((one) => one.id === "cap")).toBe(false);
   });
 
   it("09051:A:1 says the hands under Lost in the Wilderness are the players', and that they return when it is defeated", () => {
     const made = built({ seats: 2, staging: ["09051"], hand: ["filler", "filler"] });
     const state = resolveRecords(made.state, made.ctx, "09051", "whenRevealed", idOf(made.state, "09051")).state;
-    expect(angmarDetail(state, made.ctx, idOf(state, "09051"), idName(made, state))).toBe("4 cards from the players' hands lie facedown under it. They return to their owners when it is defeated.");
+    expect(angmarDetail(state, made.ctx, idOf(state, "09051"), idName(made, state))).toBe("Facedown under it: Player 1's hand, 2 cards; Player 2's hand, 2 cards. They return to their owners' hands when it is defeated.");
+    const solo = built({ staging: ["09051"], hand: ["filler", "filler", "filler"] });
+    const taken = resolveRecords(solo.state, solo.ctx, "09051", "whenRevealed", idOf(solo.state, "09051")).state;
+    expect(angmarDetail(taken, solo.ctx, idOf(taken, "09051"), idName(solo, taken))).toBe("Facedown under it: your hand, 3 cards. They return to their owners' hands when it is defeated.");
+  });
+
+  it("09051:A:1, 09016:A:2 marks each seat with cards under Lost in the Wilderness, and the seat that controls Iârion", () => {
+    const made = built({ seats: 2, play: [IARION], staging: ["09051"], hand: ["filler", "filler"] });
+    expect(angmarHands(made.state)).toEqual([{ seat: made.state.firstPlayer, label: `P${made.state.firstPlayer + 1} · Iârion`, note: expect.stringContaining("Iârion is under this player's control") }]);
+    const state = resolveRecords(made.state, made.ctx, "09051", "whenRevealed", idOf(made.state, "09051")).state;
+    expect(angmarHands(state).map((mark) => mark.label).sort()).toEqual(["P1 · Hand under", "P1 · Iârion", "P2 · Hand under"]);
+    expect(seatMarks(state, made.ctx).map((mark) => [mark.seat, mark.label]).sort()).toEqual([[0, "P1 · Hand under · Iârion"], [1, "P2 · Hand under"]]);
+    const solo = built({ play: [IARION], staging: ["09051"], hand: ["filler"] });
+    const soloState = resolveRecords(solo.state, solo.ctx, "09051", "whenRevealed", idOf(solo.state, "09051")).state;
+    expect(angmarHands(soloState).map((mark) => mark.label)).toEqual(["Hand under", "Iârion"]);
+    // Held under Rescue Iârion he is controlled by nobody: no mark.
+    const rescue = built({ play: [IARION], staging: [RESCUE] });
+    const heldState = resolveRecords(rescue.state, rescue.ctx, RESCUE, "whenRevealed", idOf(rescue.state, RESCUE)).state;
+    expect(angmarHands(heldState)).toEqual([]);
+    expect(angmarHands(tableFromLayout("the-oath", {}).state)).toEqual([]);
+  });
+});
+
+describe("a side quest of Fire in the Night wears the same pieces (the side quest strip is not Chetwood's alone)", () => {
+  it("12187:B:4 a side quest made the current quest wears the strip and the Current pill, and the web list says so", () => {
+    const night = tableFromLayout("fire-in-the-night", { staging: ["19070"] });
+    const id = idOf(night.state, "19070");
+    const current = setCurrentQuest(night.state, id, night.ctx);
+    const numbers = slotNumbers(current, night.ctx, id);
+    expect(numbers.questPoints).not.toBeNull();
+    expect(numbers.side).toMatchObject({ current: true });
+    expect(slotNumbers(night.state, night.ctx, id).side).toBeNull();
+    expect(marksText(numbers)).toContain("the current quest");
+  });
+
+  it("10158:A:3 the web list says Protect the Innocent's damage against the number that loses", () => {
+    const made = built({ staging: [{ code: PROTECT, damage: 9 }] });
+    expect(marksText(slotNumbers(made.state, made.ctx, idOf(made.state, PROTECT)))).toContain("9 of 10 damage, the players lose at 10, one more damage loses the game");
   });
 });
 

@@ -19,7 +19,7 @@ import { attachTo, moveCard, turnedUpCode } from "../../core/zones.ts";
 import { effectData } from "../encounter/moves.ts";
 import { queueFront } from "../play/refs.ts";
 import type { Focus } from "../index.ts";
-import { askTradeOrKeep } from "../trade.ts";
+import { askTradeOrKeep } from "../encounter/trade.ts";
 
 /** The ship-objectives the players control, in the order their seats choose: each living seat in player order, a seat's ships in the order they were taken. */
 export function controlledShips(state: ScenarioState, ctx: ReduceContext): string[] {

@@ -19,7 +19,7 @@ import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
 import { patchTop } from "../../windows/windows.ts";
 import { attachTo, discardFromHand, moveCard, turnedUp, turnedUpCode } from "../../core/zones.ts";
 import { effectData } from "../encounter/moves.ts";
-import { askTradeOrKeep } from "../trade.ts";
+import { askTradeOrKeep } from "../encounter/trade.ts";
 import type { Focus } from "../index.ts";
 import { queueFront } from "../play/refs.ts";
 import { lowerThreatByEffect } from "../quest/threat.ts";

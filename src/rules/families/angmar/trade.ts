@@ -10,7 +10,7 @@ import { attachTo, spawn } from "../../core/zones.ts";
 import { queueEvent } from "../../windows/queue.ts";
 import { queueFront } from "../play/refs.ts";
 import type { Focus } from "../index.ts";
-import { askTradeOrKeep } from "../trade.ts";
+import { askTradeOrKeep } from "../encounter/trade.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 

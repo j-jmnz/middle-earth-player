@@ -4,12 +4,23 @@
 import { cardsUnder } from "../../rules/core/zones.ts";
 import { flagged, heldAmount, type ScenarioState } from "../../rules/core/state.ts";
 import type { ReduceContext } from "../../rules/engine/reduce.ts";
+import { ownerWords } from "../words/owner.ts";
 import { timeOf } from "../../rules/families/angmar/time.ts";
 import { captiveUnder } from "../../rules/families/south/captive.ts";
 
 import { CURRENT_QUEST_WORDS, heldWords, holdsWords, protectPreviewWords, wildernessWords } from "../words/scenarios/angmar-table.ts";
 
 const WILDERNESS = "09051";
+
+/** Each seat's cards under the card, in seat order, with whose they are in words. */
+function handsUnder(game: ScenarioState, cardId: string): { owner: string; count: number }[] {
+  const counts = new Map<number, number>();
+  for (const id of cardsUnder(game, cardId)) {
+    const owner = game.cards[id]?.owner;
+    if (owner != null) counts.set(owner, (counts.get(owner) ?? 0) + 1);
+  }
+  return [...counts].sort((left, right) => left[0] - right[0]).map(([seat, count]) => ({ owner: ownerWords(game.seatCount, seat), count }));
+}
 
 export function angmarDetail(game: ScenarioState, ctx: ReduceContext, cardId: string, name: (id: string) => string): string | null {
   const card = game.cards[cardId];
@@ -18,7 +29,7 @@ export function angmarDetail(game: ScenarioState, ctx: ReduceContext, cardId: st
   if (host && timeOf(ctx, host.code) != null) return heldWords(name(host.id), host.resources);
   const held = captiveUnder(game, cardId);
   if (held && timeOf(ctx, card.code) != null) return holdsWords(name(held), card.resources);
-  if (card.code === WILDERNESS) return wildernessWords(cardsUnder(game, cardId).length);
+  if (card.code === WILDERNESS) return wildernessWords(handsUnder(game, cardId));
   const lines: string[] = [];
   const limit = heldAmount(game, cardId, "loseAtDamage");
   if (limit > 0 && card.zone === "staging") lines.push(protectPreviewWords(card.damage, limit));

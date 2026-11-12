@@ -99,7 +99,6 @@ const ROWS: readonly Row[] = [
   { line: "10157:A:2", name: "Response: adding it to the victory display cancels the When Revealed effects of a card just revealed from the encounter deck", layout: { play: [IARION], attached: [{ code: PENDANT, to: IARION }], deck: [ANGMAR_ORC, "f0"], heroResources: 0 }, act: [reveal(ANGMAR_ORC), respond(PENDANT)], expect: [zone(PENDANT, "victory"), zone("f0", "encounterDeck")] },
 
   { line: "10158:A:1", name: "Forced after an attack damages a character: place 1 damage on it", layout: { staging: [PROTECT] }, act: attack(MARAUDER, { undefended: true }), expect: damageOn(PROTECT, 1) },
-  { line: "10158:A:2", name: "it carries the replacement of the progress placed on it by damage removed (the removal itself: lines.test.ts and the angmar family test)", layout: { stage: STAGE, staging: [{ code: PROTECT, damage: 3 }] }, act: [resolve(PRESSING, "whenRevealed")], expect: [damageOn(PROTECT, 3), flag(PROTECT, "progressRemovesDamage")] },
   { line: "10158:A:3", name: "the players lose the game when it holds 10 damage", layout: { staging: [{ code: PROTECT, damage: 9 }] }, act: attack(MARAUDER, { undefended: true }), expect: lost },
 ];
 

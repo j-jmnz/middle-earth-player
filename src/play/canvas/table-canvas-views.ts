@@ -7,7 +7,7 @@ import { useStore } from "zustand";
 import { SPHERE_TINT } from "../../ui/icon-map.ts";
 import type { CardSlot, LayoutViews, PileViews } from "../layout/layout.ts";
 import { PILES, TABLE_ZONES, pileSelector, secondPilesOf, victoryPileSelector, zoneSelector, type BasePileId, type PileView, type ZoneFacts, type ZoneId } from "../store/selectors.ts";
-import type { TableCanvasProps } from "./table-canvas-types.ts";
+import type { SlotInfo, TableCanvasProps } from "./table-canvas-types.ts";
 import { tableTokens, type TableTokens } from "../../ui/tokens.ts";
 
 const noPoints = () => 0;
@@ -67,4 +67,16 @@ export function stripText(slot: CardSlot, questPoints: number | null, owner?: st
   if (questPoints == null) return null;
   const count = `${owner ? `${owner} · ` : ""}${slot.progress}${slot.stormcaller === "stage" ? "/" : " / "}${questPoints}`;
   return loses ? `${count} · lose` : count;
+}
+
+// What the canvas draws on a card, in words for the web list: an enemy's engagement cost against the threat, a delayed
+// effect to come.
+export function marksText(slot: SlotInfo | null): string {
+  if (!slot) return "";
+  const engagement = slot.engagement ? ` · engagement ${slot.engagement.cost}, ${slot.engagement.engages ? "engages" : "stays"}` : "";
+  const loss = slot.loss ? ` · ${slot.loss.speech}` : "";
+  // A side quest in the staging area: the current quest, and Protect the Innocent's damage against the number that loses (the same words the native reader says, card-speech.ts).
+  const current = slot.side?.current ? " · the current quest" : "";
+  const sideLoses = slot.side?.loses ? ` · ${slot.side.loses.speech}${slot.side.loses.danger ? ", one more damage loses the game" : ""}` : "";
+  return `${engagement}${loss}${current}${sideLoses}${slot.delayed ? " · an effect comes later" : ""}`;
 }
