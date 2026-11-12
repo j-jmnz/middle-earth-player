@@ -2,12 +2,24 @@ appId: com.middleearth.lcg
 tags:
   - scenario
 ---
-# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `chetwood-lost` (scripts/e2e/intruders-in-chetwood.ts): a real two-handed
-# game of Intruders in Chetwood, parked on its loss. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
-# The steps are the shared subflow's (.maestro/subflows/scenario-loss.yaml); add this scenario's own assertions after the call.
+# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `chetwood-lost` (scripts/e2e/intruders-in-chetwood.ts): a real two-handed game of Intruders in Chetwood (The One Deck and the Defenders of Gondor
+# lists, Easy), parked on its loss (no seats remain). A loss has no reward screen and writes nothing (the Resolution is for a win): Protect the Innocent does not join the pool and the scenario stays the next part.
+# The steps are the shared subflow's (.maestro/subflows/scenario-loss.yaml).
 - runFlow:
     file: ../../subflows/scenario-loss.yaml
     env:
       FIXTURE: chetwood-lost
       SCENARIO_ID: intruders-in-chetwood
-# TODO: this scenario's own assertions on the log screen after the loss.
+# Back on the path, this part wrote nothing: Protect the Innocent is not in the pool, the scenario is still the next part, and the part after it is not offered.
+- tapOn:
+    id: log-back
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- assertNotVisible:
+    id: pool
+    text: ".*Protect the Innocent.*"
+- assertVisible:
+    id: node-intruders-in-chetwood-status
+    text: "Next"
