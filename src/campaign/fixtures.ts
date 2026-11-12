@@ -46,6 +46,7 @@ import opensFixtures from "./fixtures/the-black-gate-opens.json";
 import doomFixtures from "./fixtures/mount-doom.json";
 import chetwoodFixtures from "./fixtures/intruders-in-chetwood.json";
 import hillsFixtures from "./fixtures/the-weather-hills.json";
+import dikeFixtures from "./fixtures/deadmens-dike.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -108,6 +109,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "mount-doom": doomFixtures,
   "intruders-in-chetwood": chetwoodFixtures,
   "the-weather-hills": hillsFixtures,
+  "deadmens-dike": dikeFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(

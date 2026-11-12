@@ -48,6 +48,7 @@ export const FIXTURE_REGISTRY = [
   { scenarioId: "mount-doom", names: ["doom-won", "doom-lost"] },
   { scenarioId: "intruders-in-chetwood", names: ["chetwood-won", "chetwood-lost"] },
   { scenarioId: "the-weather-hills", names: ["hills-won", "hills-lost"] },
+  { scenarioId: "deadmens-dike", names: ["dike-won", "dike-lost"] },
 ] as const satisfies readonly { scenarioId: string; file?: string; names: readonly string[] }[];
 
 export type FixtureScenarioId = (typeof FIXTURE_REGISTRY)[number]["scenarioId"];
