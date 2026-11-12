@@ -9,6 +9,7 @@ import { flagged } from "../../../rules/core/state.ts";
 import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { holds } from "../../../rules/interpret/conditions.ts";
+import { placeQuestProgress } from "../../../rules/quest/quest.ts";
 import { fireForced } from "../../../rules/windows/triggers.ts";
 import { finish, idOf, resolveRecords, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 
@@ -61,6 +62,20 @@ describe("10011:A:1, 10012:A:1 and the condition timeOfDay read the side of the 
     expect(flagged(t.state, "table", "noQuestProgress")).toBe(true);
     expect(flagged(t.state, "table", "encounterUncancelable")).toBe(true);
     expect(flagged(t.state, "table", "noEngagementChecks")).toBe(false);
+  });
+
+  it("10012:A:1 stops progress on the main quest card and on a current encounter side quest at Night, while the active location still takes its progress", () => {
+    // Fend Off Despair (10173) is the current quest, Shrouded Hills (5 quest points) the active location; 7 progress is placed by questing.
+    const placed = (table: Table) => {
+      const quest = idOf(table.state, "10173");
+      const current = { ...table.state, modifiers: [...table.state.modifiers, { instanceId: quest, sourceId: quest, stat: "currentQuest" as const, amount: 1, until: "endOfPhase" as const }] };
+      const next = placeQuestProgress(current, 7, table.cards, [], () => false, true);
+      return { location: next.cards[idOf(next, "09048")]?.progress, sideQuest: next.cards[quest]?.progress, stage: next.cards[idOf(next, "10013")]?.progress };
+    };
+    const layout = { phase: "Quest" as const, active: "09048" };
+    expect(placed(night({ ...layout, staging: ["10173"] }))).toEqual({ location: 5, sideQuest: 0, stage: 0 });
+    // By day the same 7 fill the location and put the other 2 on the side quest.
+    expect(placed(at({ ...layout, staging: [DAYBREAK, "10173"] }))).toEqual({ location: 5, sideQuest: 2, stage: 0 });
   });
 
   it("10011:A:1 and 10012:A:1 follow the flip: the flags of the side that was up end, the other side's begin", () => {

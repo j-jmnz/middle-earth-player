@@ -16,6 +16,7 @@ const DETERMINATION = "10172";
 const DAY: Condition = { kind: "timeOfDay", is: "day" };
 const NIGHT: Condition = { kind: "timeOfDay", is: "night" };
 const NOT_NIGHT: Condition = { kind: "not", condition: NIGHT };
+const ATTACHED: Condition = { kind: "sourceIn", zone: "attached" };
 const IN_STAGING: Condition = { kind: "sourceIn", zone: "staging" };
 const WARG_IN_STAGING: PickSpec = { type: "enemy", control: "any", stagingOnly: true, trait: "Warg" };
 const EACH_PLAYER = (instructions: Extract<Instruction, { verb: "ForEachPlayer" }>["instructions"]): Instruction => ({ verb: "ForEachPlayer", order: "firstFirst", instructions });
@@ -115,13 +116,14 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     { verb: "ShuffleEncounterDeck" }] },
   copyLine("145042:A:3", "10027:A:2"),
 
-  // 10172 Determination (event, Action). Attach it to a unique character in play (any controller's hero or unique ally), where it stays as a Condition attachment; then ready each character with a Determination attached and each character the Campaign Log marks "determined".
+  // 10172 Determination (event, Action). Attach it to a unique character in play (any controller's hero or unique ally; any number of copies may be attached to one card), where it stays as a Condition attachment; then ready each character with a Determination attached and each character the Campaign Log marks "determined".
   // The Forced "if you win this scenario, mark ... determined" is read by the Resolution (RecordDetermined, run by the campaign card's record in angmar-awakened.ts) for a Determination still attached to a character in play.
   { id: "10172:action:1", cardCode: DETERMINATION, lines: ["10172:A:1"], timing: "action", instructions: [
     { verb: "Pick", pick: UNIQUE_CHARACTER },
-    { verb: "AttachSelfToPicked" },
-    { verb: "Each", pick: { type: "character", control: "any", hasAttachment: { names: ["Determination"] } }, instructions: [{ verb: "Ready", target: "picked" }] },
-    { verb: "Each", pick: { type: "character", control: "any", determined: true }, instructions: [{ verb: "Ready", target: "picked" }] }] },
+    { verb: "AttachSelfToPicked", unlimited: true },
+    // "Then, ready ...": only when the attach happened (rr.then), so with no unique character to attach to nothing is readied.
+    { verb: "Each", pick: { type: "character", control: "any", hasAttachment: { names: ["Determination"] } }, instructions: [{ verb: "Ready", target: "picked" }], when: ATTACHED },
+    { verb: "Each", pick: { type: "character", control: "any", determined: true }, instructions: [{ verb: "Ready", target: "picked" }], when: ATTACHED }] },
   { id: "10172:constant:1", cardCode: DETERMINATION, lines: ["10172:A:1"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Condition" }] },
 
   // 10173 Fend Off Despair (encounter side quest). Each event card gains doomed 1 (every player raises their threat by 1 more when one is played). Forced: when it is defeated, each player's starting threat is reduced by 2 in the Campaign Log (cumulative, written when the scenario is won).

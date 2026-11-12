@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import type { EngineStep } from "../../../rules/core/intents.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
 import { flagged, updateCard } from "../../../rules/core/state.ts";
+import { moveCard } from "../../../rules/core/zones.ts";
 import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { checkCost } from "../../../rules/families/costs/stats.ts";
@@ -165,9 +166,22 @@ describe("10018:A:1 and 10018:A:2 are the Northern Warg's lines", () => {
     expect(warg(run.id)).toBe((t.cards.get("10018")?.threat ?? 0) + 1);
   });
 
+  it("10018:A:1 is recalculated: a Warg that enters play later in the phase gets the +1 as well, and one that is not a Warg gets none", () => {
+    const t = at({ staging: [DAYBREAK], deck: ["10021"], discard: ["10025"] });
+    const run = resolveRecords(t.state, t.ctx, "10018", "whenRevealed");
+    const entered = moveCard(run.state, idOf(run.state, "10021"), { zone: "staging" });
+    const threat = (state: ScenarioState, code: string) => modifiedStat(state, state.cards[idOf(state, code)]!, "threat", t.cards);
+    expect(threat(entered, "10021")).toBe((t.cards.get("10021")?.threat ?? 0) + 1);
+    const other = moveCard(run.state, idOf(run.state, "10025"), { zone: "staging" });
+    expect(threat(other, "10025")).toBe(t.cards.get("10025")?.threat ?? 0);
+  });
+
   it("10018:A:2 engages the next player after the attack and attacks again, with a second player", () => {
     const fight = fightEnemy((layout: Layout) => at(layout), "10018", "f3", { seats: 2, stage: "10013", phase: "Encounter", deckOf: ["filler", "filler"] });
     expect(fight.run.state.cards[idOf(fight.run.state, "f3")]?.controller).toBe(1);
+    // The immediate attack is made against the player just engaged, not the defending player again: the second seat's hero takes it.
+    const second = fight.run.state.seats[1]?.heroes[0] ?? "";
+    expect(fight.run.state.cards[second]?.damage ?? 0).toBeGreaterThan(0);
   });
 
   it("10018:A:2 stays with the only player, who is not attacked again", () => {
@@ -186,6 +200,14 @@ describe("10019:A:1 and 10020:A:2 are the Wargs that read the night and the woun
     expect(zoneOf(hear(engaged.state, engaged.ctx, "becameNight"), "10019")).toBe("engaged");
   });
 
+  it("10019:A:1 engages the first player, whichever seat holds the token, and not the player whose turn it is", () => {
+    const t = at({ seats: 2, staging: [DAYBREAK, "10019"], deckOf: ["filler"], deck: ["f0", "f0"] });
+    const second = { ...t.state, firstPlayer: 1 };
+    const out = hear(second, t.ctx, "becameNight");
+    expect(zoneOf(out, "10019")).toBe("engaged");
+    expect(out.cards[idOf(out, "10019")]?.controller).toBe(1);
+  });
+
   it("10020:A:2 lowers the cost it checks against a player by 1 for each damaged character they control, hero or ally, never below 0", () => {
     const t = at({ staging: [DAYBREAK, "10020"], play: ["ally"] });
     const hunting = t.state.cards[idOf(t.state, "10020")]!;
@@ -195,5 +217,19 @@ describe("10019:A:1 and 10020:A:2 are the Wargs that read the night and the woun
     const all = updateCard(hurt, t.hero2, { damage: 1 });
     expect(checkCost(all, all.cards[hunting.id]!, 0, t.cards)).toBe(Math.max(0, base - 3));
     expect(modifiedStat(all, all.cards[hunting.id]!, "engagementCost", t.cards)).toBe(base);
+  });
+
+  it("10020:A:2 counts only the damaged characters of the player making the check, and the cost it checks never falls below 0", () => {
+    const t = at({ seats: 2, staging: [DAYBREAK, "10020"] });
+    const hunting = t.state.cards[idOf(t.state, "10020")]!;
+    const base = checkCost(t.state, hunting, 0, t.cards) ?? 0;
+    // Only seat 0's hero is damaged: seat 0's check is 1 lower, seat 1's is the printed cost.
+    const hurt = updateCard(t.state, t.state.seats[0]?.heroes[0] ?? "", { damage: 1 });
+    expect(checkCost(hurt, hurt.cards[hunting.id]!, 0, t.cards)).toBe(base - 1);
+    expect(checkCost(hurt, hurt.cards[hunting.id]!, 1, t.cards)).toBe(base);
+    // With the cost brought down to 1 by another card, 2 damaged characters leave 0, not -1.
+    const cheap = { ...hurt, modifiers: [...hurt.modifiers, { instanceId: hunting.id, sourceId: hunting.id, stat: "engagementCost" as const, amount: 1 - base, until: "endOfGame" as const }] };
+    const wounded = updateCard(cheap, t.state.seats[0]?.heroes[1] ?? t.hero2, { damage: 1 });
+    expect(checkCost(wounded, wounded.cards[hunting.id]!, 0, t.cards)).toBe(0);
   });
 });

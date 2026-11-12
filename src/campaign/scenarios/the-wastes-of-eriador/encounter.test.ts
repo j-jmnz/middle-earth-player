@@ -5,7 +5,8 @@ import { describe, expect, it } from "vitest";
 
 import type { EngineStep } from "../../../rules/core/intents.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
-import { flagged, updateCard } from "../../../rules/core/state.ts";
+import { expireModifiers, flagged, updateCard } from "../../../rules/core/state.ts";
+import { placeQuestProgress } from "../../../rules/quest/quest.ts";
 import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { travelCostUnpayable } from "../../../rules/interpret/restrictions.ts";
 import { fightEnemy, idOf, idsOf, resolveRecords, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
@@ -67,6 +68,24 @@ describe("10023:A:1 and 10023:A:2 are Eriador Wastes", () => {
     const t = at({ staging: [DAYBREAK, "10023"] });
     expect(questRoom(t.state)).toBe(5);
     expect(questRoom(at({ active: "10023" }).state)).toBe(Number.MAX_SAFE_INTEGER);
+  });
+
+  it("10023:A:1 counts the 5 against each round: the quest card takes 5 of 8 progress, nothing more that round, and 5 more the next", () => {
+    const t = at({ phase: "Quest", staging: [DAYBREAK, "10023"] });
+    const place = (state: ScenarioState, amount: number) => placeQuestProgress(state, amount, t.cards, [], () => false, true);
+    const stage = (state: ScenarioState) => state.cards[idOf(state, "10013")]?.progress ?? 0;
+    const first = place(t.state, 8);
+    expect(stage(first)).toBe(5);
+    expect(stage(place(first, 3))).toBe(5);
+    const next = expireModifiers(first, ["endOfPhase", "endOfRound"]);
+    expect(stage(place(next, 8))).toBe(10);
+  });
+
+  it("10023:A:1 with two copies in the staging area still caps the quest card at 5 each round, not 10", () => {
+    const t = at({ phase: "Quest", staging: [DAYBREAK, "10023", "10023"] });
+    expect(questRoom(t.state)).toBe(5);
+    const placed = placeQuestProgress(t.state, 9, t.cards, [], () => false, true);
+    expect(placed.cards[idOf(placed, "10013")]?.progress).toBe(5);
   });
 
   it("10023:A:2 has the first player engage a Warg enemy in the staging area and deal it a shadow card, and cannot be paid with no Warg there", () => {
@@ -158,6 +177,17 @@ describe("10027:A:1 and 10027:A:2 are Predatory Wolves", () => {
     const run = reveal({ play: ["ally", "10016"], deck: ["10018"] }, () => "discard");
     expect(zoneOf(run.state, "ally")).toBe("discard");
     expect(zoneOf(run.state, "10016")).toBe("play");
+  });
+
+  it("10027:A:1 offers Amarthiúl (cost 0) as the highest-cost ally when he is the only ally, and discarding him loses the game (10016:A:2)", () => {
+    const t = at({ phase: "Encounter", play: ["10016"], deck: ["10018"] });
+    const pick = (state: ScenarioState) => (state.window?.kind === "choose" ? (state.window.options.includes("discard") ? "discard" : state.window.options[0] ?? "") : "");
+    const asked = resolveRecords(t.state, t.ctx, "10027", "whenRevealed", undefined, (state) => {
+      expect(state.window?.kind === "choose" ? state.window.options : []).toContain("discard");
+      return pick(state);
+    });
+    expect(zoneOf(asked.state, "10016")).toBe("encounterDiscard");
+    expect(asked.state.lost).toBe(true);
   });
 
   it("10027:A:1 lets a player search for a Warg enemy, reveal it and add it to the staging area instead", () => {

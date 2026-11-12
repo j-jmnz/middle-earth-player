@@ -13,6 +13,7 @@ const ZONE: Readonly<Record<string, string>> = {
   hand: "is in its player's hand",
   stormcallerArea: "is in the Stormcaller's area",
   encounterDeck: "is in the encounter deck",
+  attached: "is attached to a card",
 };
 
 const range = (min: unknown, max: unknown): string => {

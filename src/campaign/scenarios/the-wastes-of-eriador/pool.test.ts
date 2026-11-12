@@ -54,6 +54,15 @@ describe("10172:A:1 is Determination", () => {
     expect(determination?.host).not.toBeNull();
   });
 
+  it("10172:A:1 attaches to a character that already carries a copy: there is no limit to the number of attachments (rr.attachment-cards)", () => {
+    const t = at({ hand: [DETERMINATION], heroResources: 2, play: ["10016"], attached: [{ code: DETERMINATION, to: "10016" }] });
+    const inHand = copies(t.state, DETERMINATION).find((card) => card.zone === "hand")?.id ?? "";
+    const run = finish(send({ state: t.state, steps: [] }, { type: "PlayCard", cardId: inHand, payments: [{ heroId: t.hero, amount: 1 }] }, t.ctx), t.ctx);
+    const amarthiul = idOf(t.state, "10016");
+    expect(run.state.cards[inHand]).toMatchObject({ zone: "attached", host: amarthiul });
+    expect(copies(run.state, DETERMINATION).map((card) => card.host)).toEqual([amarthiul, amarthiul]);
+  });
+
   it("10172:A:1 readies the host and every character with a Determination attached, and every character the Campaign Log marks determined", () => {
     const t = at({ hand: [DETERMINATION], heroResources: 2, play: ["10016"] });
     const tired = [t.hero, t.hero2, idOf(t.state, "10016")].reduce((state, id) => updateCard(state, id, { exhausted: true }), t.state);

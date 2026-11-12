@@ -55,7 +55,7 @@ const SAMPLES: Readonly<Record<string, readonly Obj[]>> = {
   ChangeControl: [{ verb: "ChangeControl", to: "eventSeat" }],
   EngageNextPlayer: [{ verb: "EngageNextPlayer" }],
   DealShadowTo: [{ verb: "DealShadowTo", target: "picked" }],
-  AttachSelfToPicked: [{ verb: "AttachSelfToPicked" }],
+  AttachSelfToPicked: [{ verb: "AttachSelfToPicked" }, { verb: "AttachSelfToPicked", unlimited: true }],
   RemoveAllQuestProgress: [{ verb: "RemoveAllQuestProgress", of: "stage" }],
   PutTopmostFromEncounterDiscard: [{ verb: "PutTopmostFromEncounterDiscard", type: "enemy", trait: "Warg", dealShadow: true }],
   EnterSetAsideStaging: [{ verb: "EnterSetAsideStaging", code: "09033" }],
