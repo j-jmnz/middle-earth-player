@@ -18,7 +18,7 @@ export const STAGE_RECORDS: readonly (Effect | Copy)[] = [
   // 146076 Stage 2 (no quest points: no progress can defeat it, only its own record advances it). When Revealed: Mordor Road is searched for in the encounter deck, discard pile and victory display and added to the staging area; the discard pile is shuffled into the deck; the players travel to Mordor Road
   // (only when no location is active: rr.active-location; the Forced of Mordor Road resolves if they do). Side B: after progress is placed here from questing successfully each player, in player order, makes a Fortitude test: a pass places a resource here, a failure discards cards until an enemy is discarded and puts it into play
   // engaged with that player. At the end of the quest phase, with at least as many resources here as there are players, the quest advances to stage 3.
-  { id: "146076:whenRevealed:1", cardCode: STAGE_2, lines: ["146076:A:1"], timing: "whenRevealed", instructions: [{ verb: "SearchMove", code: MORDOR_ROAD, to: "staging", victory: true }, { verb: "ShuffleEncounterDiscard" }, { verb: "TravelTo", target: "picked", unlessActive: true }] },
+  { id: "146076:whenRevealed:1", cardCode: STAGE_2, lines: ["146076:A:1"], timing: "whenRevealed", instructions: [{ verb: "SearchMove", code: MORDOR_ROAD, to: "staging", victory: true, remember: true }, { verb: "ShuffleEncounterDiscard" }, { verb: "TravelTo", target: "picked", unlessActive: true }] },
   {
     id: "146076:forced:1",
     cardCode: STAGE_2,

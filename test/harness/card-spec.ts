@@ -40,6 +40,8 @@ export const defend = (withCode: string): Act => ({ act: "defend", with: withCod
 export const respond = (code: string): Act => ({ act: "respond", code });
 /** The first player cancels the effect the open cancel offer is about, paying its cost from a hero's pool (the layout's `heroResources`). */
 export const cancel: Act = { act: "cancel" };
+/** The player asked to commit to a Fortitude test commits these heroes (none: an empty list), and the test is played to its end: the discards, the count and the actions window passed (mec113.fortitude-tests). */
+export const commit = (...heroes: string[]): Act => ({ act: "commit", heroes });
 /** The engine announces an event to the Forced effects (a trigger, the card it is about, and any other fields), the way a step of the game does. */
 export const announce = (trigger: GameEvent["trigger"], code?: string, extra: Partial<GameEvent> = {}): Act => ({ act: "announce", trigger, ...(code ? { code } : {}), ...(Object.keys(extra).length > 0 ? { extra } : {}) });
 

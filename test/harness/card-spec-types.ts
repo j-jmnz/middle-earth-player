@@ -26,6 +26,7 @@ export type Act =
   | { act: "answer"; id: string }
   | { act: "respond"; code: string }
   | { act: "cancel" }
+  | { act: "commit"; heroes: readonly string[] }
   | { act: "announce"; trigger: GameEvent["trigger"]; code?: string; extra?: Partial<GameEvent> };
 
 export type Expect =
