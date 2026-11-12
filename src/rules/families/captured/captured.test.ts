@@ -11,7 +11,7 @@ import { runInstruction } from "../../interpret/interpret.ts";
 import { combatDamage } from "../defense/excess.ts";
 import { placeQuestProgress } from "../../quest/quest.ts";
 import { withView } from "../breaking/areas.ts";
-import { idOf, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
+import { idOf, resolveRecords, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
 import { capturedUnder, captureCard } from "./pile.ts";
 import { rescueCards, rescueRandom } from "./rescue.ts";
 
@@ -108,6 +108,21 @@ describe("Captured cards", () => {
     expect(capturedUnder(run, quest)).toHaveLength(0);
     expect(run.seats[0].discard.length).toBeGreaterThanOrEqual(2);
     expect(run.seats[0].threat).toBe(36);
+  });
+});
+
+describe("Captives of Gornákh", () => {
+  it("10051:A:1 captures the ally under the encounter card with the highest Threat, and the card itself is never the one it is captured under", () => {
+    const t = table({ play: ["ally"], staging: ["f3", "f0"] });
+    const run = resolveRecords(t.state, t.ctx, "10051", "whenRevealed");
+    const ally = idOf(run.state, "ally");
+    expect(run.state.cards[ally]).toMatchObject({ zone: "captured", host: idOf(run.state, "f3") });
+  });
+
+  it("10051:A:1 captures nothing when the player has no ally", () => {
+    const t = table({ staging: ["f3"] });
+    const run = resolveRecords(t.state, t.ctx, "10051", "whenRevealed");
+    expect(Object.values(run.state.cards).filter((card) => card.zone === "captured")).toHaveLength(0);
   });
 });
 
