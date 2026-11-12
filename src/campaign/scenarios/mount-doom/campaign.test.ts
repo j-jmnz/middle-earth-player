@@ -143,7 +143,7 @@ describe("Mount Doom in the the-return-of-the-king campaign", () => {
   it("146079:B:2 Resolution: keeping The One Ring ends the campaign lost, and the path and the Resolution say so (src/screens/campaign/campaign-end.ts words it from the log)", () => {
     const ended = resolve(GOLDENS.kept).log.campaignEnd;
     expect(ended).toBe("lost");
-    expect(campaignEndLine("lost")).toBe("The players lose the campaign.");
+    expect(campaignEndLine("lost")).toBe("The One Ring is kept. The players lose the campaign.");
     expect(endedWords("lost")).toBe("The One Ring is kept. The players lose the campaign.");
   });
 

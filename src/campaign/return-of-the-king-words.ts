@@ -23,14 +23,17 @@ export function endedWords(ended: CampaignEnd): string {
   return `${RING[ended]} ${ENDING[ended]}`;
 }
 
-/** The campaign's end as the path and the Resolution say it once the saga is over: the win names the ring, the loss only the result. */
+/** The campaign's end as the path and the Resolution say it once the saga is over: the ring's fate and the result, for a win and for a loss. */
 export function campaignEndLine(ended: CampaignEnd): string {
-  return ended === "won" ? endedWords("won") : ENDING.lost;
+  return endedWords(ended);
 }
 
-/** The options of Mount Doom's Resolution (146079:B:1), by `<name>:<id>`: the label on the tile and the sentence above Confirm. */
-export const RING_OPTIONS: Readonly<Record<string, { label: string; says: () => string }>> = {
-  "ring:keep": { label: "Keep The One Ring and succumb to the power of Sauron", says: () => "The One Ring is kept and the power of Sauron wins: the players lose the campaign." },
+/** The sentence over the final Confirm when the ring was kept: what the log records (the end), and what it makes of the campaign. */
+export const KEPT_RING_RECORDS = "Confirming records the end: The One Ring is kept and the players lose the campaign.";
+
+/** The options of Mount Doom's Resolution (146079:B:1), by `<name>:<id>`: the label on the tile and the sentence above Confirm. `loses` marks the option that loses the campaign: its sentence is set in danger. */
+export const RING_OPTIONS: Readonly<Record<string, { label: string; says: () => string; loses?: true }>> = {
+  "ring:keep": { label: "Keep The One Ring and succumb to the power of Sauron", loses: true, says: () => "The One Ring is kept and the power of Sauron wins: the players lose the campaign." },
   "ring:destroy": { label: "Destroy The One Ring and defeat the power of Sauron", says: () => "The One Ring is destroyed and the power of Sauron is defeated: the players win the campaign." },
 };
 
@@ -40,6 +43,7 @@ export function returnOfTheKingNotes(log: ResolutionLog): readonly string[] {
   if (log.recorded?.corsairFleet != null) notes.push(`${recordedWords("corsairFleet", log.recorded.corsairFleet)}, recorded in the notes section of the campaign log.`);
   if (log.recorded?.blackGateTokens != null) notes.push(`${recordedWords("blackGateTokens", log.recorded.blackGateTokens)}, recorded in the notes section of the campaign log.`);
   if (log.discardedNotFallen) notes.push("A hero in its controller's discard pile is not added to the list of fallen heroes.");
-  if (log.campaignEnd) notes.push(endedWords(log.campaignEnd));
+  // The ring kept is said once, by the sentence over Confirm (KEPT_RING_RECORDS).
+  if (log.campaignEnd === "won") notes.push(endedWords("won"));
   return notes;
 }

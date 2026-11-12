@@ -12,7 +12,7 @@ const campaign = loadCampaign("the-return-of-the-king");
 const doom = loadScenario("mount-doom");
 
 // Test helper. A whole game of Mount Doom in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
-// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. TODO: say how the players travel, engage and answer the choices this scenario asks.
+// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. The players answer each choice with its last option, commit heroes to every Fortitude test by the policy's `fortitude` and quest as `quest` says (src/campaign/scenarios/mount-doom/golden.test.ts).
 export const DOOM_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: false, act: false };
 // "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
 export type DoomDecks = "strong" | "weak" | "brittle";
@@ -50,7 +50,6 @@ export const TOKENS = 6;
 export const DEFAULT_POLICY: DoomPolicy = { ring: "destroy", quest: "most", fortitude: 1 };
 
 // The auto-player's answer (test/harness/auto-player.ts), except: a choice takes its last option, and the Resolution's as the policy says. Every intent is one the reducer listed.
-// TODO: the scenario's own answers (where the players travel, who defends, which locations they explore) go before the auto-player's.
 export function doomIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: DoomPolicy = DEFAULT_POLICY, options: PolicyOptions = DOOM_POLICY): PlayerIntent {
   if (state.window?.kind === "choose") return { type: "Choose", optionId: state.window.options.at(-1) ?? "" };
   // The Resolution's choice (146079:B:1): the first player keeps or destroys The One Ring.
@@ -108,13 +107,13 @@ const game = campaignGame<DoomDecks, DoomPolicy>({
   scenario: doom,
   stats: DOOM_STATS,
   loadout: doomLoadout,
-  // TODO: the cards a game loads besides the scenario's piles, its campaign card's and the campaign's game codes.
+  // The cards a game loads besides the scenario's piles: the Ring-bearer, The One Ring and the campaign cards the earlier parts' pools hold.
   codes: [...doom.cards.map((card) => card.code), RING_BEARER, "146065", "145014", "145015", "145016", "145062", "143020", "143021"],
   intent: doomIntent,
   policy: DEFAULT_POLICY,
   limit: 6000,
   upgraded: [],
-  // TODO: the XP each earlier part gained (in campaign order), the cards they put in the pool and the marks on the cards, as a campaign that won them leaves the log.
+  // What the five earlier parts left in the log: none gained XP, put cards in the pool or marked a card.
   earlier: { xp: [0, 0, 0, 0, 0], pool: [], marks: {} },
 });
 

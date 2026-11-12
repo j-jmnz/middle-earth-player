@@ -18,6 +18,7 @@ import { ALLY_LINE_FACTS, BELDIS_BOXES, type AllyLine } from "../catalog/ally-li
 import { contextOf } from "./session.ts";
 import type { World } from "./world.ts";
 import { afterwardsWords } from "./resolution-then.ts";
+import { KEPT_RING_RECORDS } from "./return-of-the-king-words.ts";
 import { isTwoTowersChoice, pickWords, twoTowersChoosing, twoTowersNotes } from "./resolution-two-towers.ts";
 import { beldisUsed, cappedTally } from "./wilderland.ts";
 
@@ -25,7 +26,7 @@ import { beldisUsed, cappedTally } from "./wilderland.ts";
 // word under the name that tells a kind apart (an encounter card of the pool), `copies` the copies of such a card the pool holds.
 // `held`: a burden among the Hazard cards that this Resolution has already earned for the pool, so choosing it adds nothing.
 // `says`: the sentence above Confirm for this tile, where the choice words it itself (The Two Towers' options and heroes).
-export type ResolutionTile = { optionId: string; code: string | null; name: string; hero: string | null; label: string; wide?: true; tag?: string; copies?: number; held?: true; says?: string };
+export type ResolutionTile = { optionId: string; code: string | null; name: string; hero: string | null; label: string; wide?: true; tag?: string; copies?: number; held?: true; says?: string; loses?: true };
 
 // The decline of an optional choice: the reducer's `skip` option, with its words ("No boon").
 export type ResolutionDecline = { optionId: string; label: string };
@@ -428,7 +429,8 @@ export function settledSentence(view: Extract<ResolutionView, { kind: "settled" 
   // A scenario that ends when its last player falls (The Black Gate Opens) records its end, never a win.
   const what = view.ended === true ? "the end" : "the win";
   const records = earned.length > 0 ? `Confirming records ${view.ended === true ? `the end and ${list}` : list} in the campaign` : `Confirming records ${what}`;
-  const unlocked = next ? `${records} and unlocks ${next}.` : completes ? `${records} and completes ${completes}.` : `${records}.`;
+  // The ring kept ends the campaign lost (146079:B:1): the sentence says the end and its result, never a win or a completed campaign.
+  const unlocked = view.campaignEnd === "lost" ? KEPT_RING_RECORDS : next ? `${records} and unlocks ${next}.` : completes ? `${records} and completes ${completes}.` : `${records}.`;
   // A once-per-campaign Action used in this game or an earlier scenario is written to the log (41044:A:3).
   const names = (view.used ?? []).map((code) => nameOf(world, code));
   const sentence = names.length > 0 ? `${unlocked} ${andList(names)} ${names.length === 1 ? "is" : "are"} recorded as used this campaign.` : unlocked;

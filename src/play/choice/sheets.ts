@@ -42,7 +42,7 @@ import { freeSlot } from "../../rules/families/south/locations.ts";
 import { recordsOfFace } from "../../rules/families/dreamchaser/faces.ts";
 import { islandMayTravel } from "../../rules/families/island/travel.ts";
 import { hideCommitLimit } from "../../rules/families/nightmare/guards.ts";
-import { fortitudeCommitNote, fortitudeCountNote } from "../readouts/fortitude.ts";
+import { eyesStat, fortitudeCommitCheck, fortitudeCommitNote, fortitudeCountNote, fortitudePassCaution } from "../readouts/fortitude.ts";
 import { sailingSheet, shipRow } from "./sea-sheets.ts";
 import { asksCollection, collectionLabel, collectionOrder } from "./collection-sheets.ts";
 import { answeredCard, hideCommitNote, hideNumbers, lookNote, optionalEngageNote, responseNote } from "./sheet-notes.ts";
@@ -184,6 +184,8 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
     }
     case "fortitudeCommit": {
       const source = frame?.cardId ?? null;
+      const heroes = legalTargets(game, { type: "CommitFortitude" }, ctx);
+      const check = fortitudeCommitCheck(game, ctx, heroes);
       return {
         kind: "multi",
         key: `fortitudeCommit:${frame?.id ?? ""}`,
@@ -191,11 +193,12 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         title: source ? `${names.card(source)}: Fortitude test` : "Fortitude test",
         note: fortitudeCommitNote(game, ctx),
         verb: "Commit",
-        options: legalTargets(game, { type: "CommitFortitude" }, ctx).map((id) => ({ ...option(game, names, id), stats: statOf(game, ctx, id, "willpower") })),
+        options: heroes.map((id) => ({ ...option(game, names, id), stats: statOf(game, ctx, id, "willpower") })),
         build: { kind: "CommitFortitude" },
         allowEmpty: true,
         preselected: [],
         alternative: null,
+        ...(check ? { fortitude: check } : {}),
       };
     }
     case "frameAction": {
@@ -203,6 +206,8 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
       const hide = game.widgets.hide && frame?.data.kind === "hide" ? hideNumbers(game, ctx, frame) : null;
       // A Fortitude test's action window: the Willpower against the icons counted, the cards discarded and the icons ignored.
       const fortitude = frame?.data.kind === "fortitude" ? fortitudeCountNote(game, ctx, names.card) : null;
+      // While the count fails, Continue says so and what it costs, as the other sheets that can lose something do.
+      const fortitudeCaution = fortitude ? fortitudePassCaution(game, ctx) : null;
       const source = frame?.cardId ?? null;
       return {
         kind: "trigger",
@@ -215,6 +220,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
         hide,
         options: triggerOptions(game, ctx, legal, names),
         pass: "Continue",
+        ...(fortitudeCaution ? { passCaution: fortitudeCaution } : {}),
       };
     }
     case "choose": {
@@ -288,6 +294,8 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const card = option(game, names, id);
           // The Willpower each character the players may remove from the quest adds up (11075:A:1), as the commit sheet shows it.
           const willpower = wait?.kind === "target" && wait.item.instruction.verb === "RemoveWillpowerFromQuest" ? statOf(game, ctx, id, "willpower") : [];
+          // Gollum's pick of the card whose Sauron's Eye icons are not counted: each row shows the icons it adds.
+          const eyes = data?.queue[0]?.instruction.verb === "IgnoreFortitudeEyes" ? [eyesStat(game, ctx, id)] : [];
           // An option of a sea verb that is no card: trade or keep the damage, the deck to discard from, the title named.
           const sea = wait?.kind === "target" ? (seaOptionLabel(wait.item.instruction, id, game, ctx.cards) ?? grappleOptionLabel(wait.item.instruction, id) ?? wilderlandOptionLabel(wait.item.instruction, id, words) ?? unchartedOptionLabel(wait.item.instruction, id, game, words) ?? islandOptionLabel(wait.item.instruction, id, game, words) ?? gundabadOptionLabel(wait.item.instruction, id, game, ctx, words)) : null;
           // Copies of one card in different zones are told apart by where each one is.
@@ -301,7 +309,7 @@ export function sheetFor(game: ScenarioState, ctx: ReduceContext, legal: readonl
           const label = (game.cards[id] ? undefined : asked.labels?.[id]) ?? fire?.label ?? sea ?? ship?.label ?? captiveLabel(game, ctx, names, id, window.options) ?? stagedAllyLabel(game, ctx, names, id, window.options) ?? (collection ? collectionLabel(game, ctx, id, window.options, names) : outOfPlay ? outOfPlayLabel(game, id, words) : card.label);
           // Another defender's pooled damage (Stand Together, families/defense/defenders.ts).
           const pooled = data?.effectId === DEFENDERS_FRAME ? extraDefender(game, ctx, id) : null;
-          return { ...card, label, ...(wait?.kind === "target" && (isTreasureDraw(wait.item.instruction)) ? { code: id } : {}), ...(willpower.length > 0 ? { stats: willpower } : {}), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(rowCaution ? { caution: rowCaution } : {}), intent: { type: "Choose", optionId: id } };
+          return { ...card, label, ...(wait?.kind === "target" && (isTreasureDraw(wait.item.instruction)) ? { code: id } : {}), ...(willpower.length > 0 || eyes.length > 0 ? { stats: [...willpower, ...eyes] } : {}), ...(pooled ?? {}), ...(fire ? { mark: fire.mark } : {}), ...(rowCaution ? { caution: rowCaution } : {}), intent: { type: "Choose", optionId: id } };
         }),
       };
     }

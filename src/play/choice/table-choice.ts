@@ -19,6 +19,7 @@ import type { CombatMark } from "../layout/layout.ts";
 import { firstShares, shareOf, sharesReady, tapShare, type Share } from "./pay.ts";
 import type { LegalIntent } from "../store/store.ts";
 import type { Sheet, SheetNames, SheetStat } from "./sheet-types.ts";
+import { fortitudeCommitCaution } from "../readouts/fortitude.ts";
 
 /** What the player has picked for the open sheet. `key` is the sheet's: a new sheet starts a new choice. */
 export type Choice = { key: string; ids: readonly string[]; shares: readonly Share[] };
@@ -309,7 +310,9 @@ export function dockFor(
     case "multi": {
       const count = choice.ids.length;
       const label = count === 0 && sheet.allowEmpty ? `${sheet.verb} no one` : `${sheet.verb} ${count}`;
-      primary = { label, action: { kind: "intent", intent: multiIntent(sheet, choice.ids) }, arm: count === 0, armed: "Tap again: nobody is committed", testID: "sheet-primary" };
+      // A Fortitude commit that cannot pass names the failure it makes certain; no one committed is armed either way.
+      const failing = sheet.fortitude ? fortitudeCommitCaution(sheet.fortitude, choice.ids) : null;
+      primary = { label, action: { kind: "intent", intent: multiIntent(sheet, choice.ids) }, arm: count === 0 || failing != null, armed: failing ?? "Tap again: nobody is committed", testID: "sheet-primary" };
       if (!sheet.allowEmpty && count === 0) why = sheet.options.length === 0 ? "No character can be chosen." : options.surface === "panel" ? "Choose at least one above." : "Tap at least one glowing card.";
       if (sheet.alternative) secondary.push(alternativeButton(sheet.alternative));
       break;

@@ -32,21 +32,22 @@ export function mountDoomQuestNote(game: ScenarioState, ctx: ReduceContext): str
 
 /**
  * The dials Mount Doom's pieces hold now, in the order the top bar draws them: the tokens on the campaign card first (the one that warns: the count only falls, two left is near and the last one critical, and it is no ring that fills), then the resources on stage 2B toward
- * the number of players (a goal dial: the ring fills in the accent and is full only when the quest advances). Empty in any other scenario, and with no campaign card in the game (a standalone one has no timer).
+ * the number of players (a goal dial: the ring fills in the accent and is full only when the quest advances). Empty in any other scenario. The tokens' dial is left out while none is on the campaign card: a standalone game and a campaign with no count recorded have no timer.
  */
 export function mountDoomDials(game: ScenarioState, nameOf: (code: string) => string): readonly TableDial[] {
   if (game.scenarioId !== SCENARIO) return [];
   const dials: TableDial[] = [];
+  // The timer runs from the tokens Setup placed (the count the log recorded for The Black Gate): with none on the card it never ran, whatever the round, and the dial is left out. The last token off is the loss.
   const card = cardsOf(game, CAMPAIGN_CARD)[0];
-  if (card) {
+  if (card && card.resources > 0) {
     const tokens = card.resources;
     const warn = doomWarn(tokens);
-    dials.push({ id: "doom", testID: "doom-tokens", label: "Doom", name: `Resource tokens on ${nameOf(CAMPAIGN_CARD)}:`, value: tokens, ...(warn ? { warn } : {}), note: doomWords(tokens, tokens > 0 || game.round > 1) });
+    dials.push({ id: "doom", testID: "doom-tokens", label: "Doom", name: "Resource tokens on the campaign card:", value: tokens, ...(warn ? { warn } : {}), note: doomWords(tokens) });
   }
   const stage = game.cards[game.questStage ?? ""];
   if (stage?.code === STAGE_TWO) {
     const players = livingSeats(game).length;
-    dials.push({ id: "resources", testID: "doom-resources", label: "Stage", name: `Resources on ${nameOf(STAGE_TWO)}, of ${players}:`, value: stage.resources, limit: players, goal: true, note: stageTwoWords(stage.resources, players) });
+    dials.push({ id: "resources", testID: "doom-resources", label: "Stage", name: `Resources on ${nameOf(STAGE_TWO)}, of ${players}:`, value: stage.resources, limit: players, goal: true, note: stageTwoWords(stage.resources, players, nameOf(STAGE_TWO)) });
   }
   return dials;
 }

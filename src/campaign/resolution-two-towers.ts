@@ -21,7 +21,7 @@ export function isTwoTowersChoice(instruction: Instruction | undefined): instruc
 
 // The words of an option, by the instruction's name and the option's id: the label on the tile and the sentence above Confirm.
 // `says` is told for the seat that answers (`who`: "You", or "Player 2"); `code` is the card an option is about, so its tile shows the card.
-const OPTIONS: Readonly<Record<string, { label: string; says: (who: string) => string; code?: string }>> = {
+const OPTIONS: Readonly<Record<string, { label: string; says: (who: string) => string; code?: string; loses?: true }>> = {
   "uruk:boons": { label: "Each player earns a Skill boon", says: () => "Each player earns one of the Skill boons and attaches it to a hero they control." },
   "uruk:hope": { label: "One player earns Beyond All Hope", says: () => "One player earns Beyond All Hope, takes control of a fallen hero and attaches the boon to it." },
   "marshes:penalty": { label: "Take a permanent +2 starting threat penalty", says: (who) => `${who} ${who === YOU ? "take" : "takes"} a permanent +2 starting threat penalty, recorded in the campaign log.` },
@@ -35,7 +35,7 @@ export type TwoTowersView = {
   eyebrow: string;
   noun: string;
   prompt: string;
-  tiles: readonly { optionId: string; code: string | null; name: string; hero: string | null; label: string; says: string; wide?: true }[];
+  tiles: readonly { optionId: string; code: string | null; name: string; hero: string | null; label: string; says: string; wide?: true; loses?: true }[];
   firstPlayerAnswers: boolean;
   eachSeat: boolean;
 };
@@ -51,7 +51,7 @@ export function twoTowersChoosing(state: ScenarioState, instruction: TwoTowersCh
       prompt: instruction.who === "eachSeat" || state.seatCount === 1 ? "Choose one option. Your choice is written to the campaign log when you confirm." : "The players choose one option; the first player confirms.",
       tiles: optionIds.map((id) => {
         const words = OPTIONS[`${instruction.name}:${id}`] ?? { label: id, says: () => id };
-        return { optionId: id, code: words.code ?? null, name: words.label, hero: null, label: words.label, says: words.says(seatWords(state, seat)), wide: true as const };
+        return { optionId: id, code: words.code ?? null, name: words.label, hero: null, label: words.label, says: words.says(seatWords(state, seat)), wide: true as const, ...("loses" in words && words.loses ? { loses: true as const } : {}) };
       }),
       firstPlayerAnswers: instruction.who === "firstPlayer",
       eachSeat: instruction.who === "eachSeat",

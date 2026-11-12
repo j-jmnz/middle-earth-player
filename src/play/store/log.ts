@@ -1,5 +1,6 @@
 // The table's log: this round's engine steps in words, each with its cause from phase 8d (the rule title, or the card and
 // its printed line), so a player can check a number against its source. It is text, not a control.
+import { plural } from "../words/list.ts";
 import { detachLine, grappleLine } from "../words/scenarios/grapple.ts";
 import { discoverLogLine, setAsideLine } from "../words/scenarios/wilderland.ts";
 import type { Cause } from "../../rules/core/cause.ts";
@@ -108,7 +109,7 @@ function words(step: EngineStep, names: LogNames): string | null {
     case "fortitudeCommit":
       return `${names.card(step.cardId)} commits to the Fortitude test`;
     case "fortitudeTest":
-      return `Fortitude test ${step.success ? "passed" : "failed"}: willpower ${step.willpower} against ${step.eyes} Sauron's Eye icons`;
+      return `Fortitude test ${step.success ? "passed" : "failed"}: willpower ${step.willpower} against ${plural(step.eyes, "Sauron's Eye icon")}`;
     case "hideTest":
       return `Hide test ${step.success ? "passed" : "failed"}: willpower ${step.willpower} against threat ${step.threat}`;
     case "quest":

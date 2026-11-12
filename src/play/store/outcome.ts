@@ -10,6 +10,7 @@ import type { EngineStep, PlayerIntent } from "../../rules/core/intents.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
 
 import type { LogMark } from "./log.ts";
+import { plural } from "../words/list.ts";
 import { detachLine, grappleLine } from "../words/scenarios/grapple.ts";
 import { boardingWords } from "../words/scenarios/sea.ts";
 import type { FateNames } from "../words/scenarios/fate-beats.ts";
@@ -225,7 +226,7 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
       }
       case "fortitudeTest":
         open(1, step.success ? "Fortitude test passed" : "Fortitude test failed", step.success ? "good" : "bad");
-        line(`Willpower ${step.willpower} against ${step.eyes} Sauron's Eye icons`, "willpower");
+        line(`Willpower ${step.willpower} against ${plural(step.eyes, "Sauron's Eye icon")}`, "willpower");
         return;
       case "hideTest":
         open(1, step.success ? "Hide test passed" : "Hide test failed", step.success ? "good" : "bad");

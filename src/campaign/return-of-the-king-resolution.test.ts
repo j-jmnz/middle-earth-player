@@ -216,6 +216,7 @@ describe("146079 Mount Doom: keeping or destroying The One Ring", () => {
     expect(options(state, ctx)).toEqual(["keep", "destroy"]);
     const view = resolutionView(state, world);
     expect(view.kind === "choosing" && view.tiles.map((tile) => tile.label)).toEqual(["Keep The One Ring and succumb to the power of Sauron", "Destroy The One Ring and defeat the power of Sauron"]);
+    expect(view.kind === "choosing" && view.tiles.map((tile) => tile.loses)).toEqual([true, undefined]);
     expect(view.kind === "choosing" && view.tiles.map((tile) => tile.says)).toEqual(["The One Ring is kept and the power of Sauron wins: the players lose the campaign.", "The One Ring is destroyed and the power of Sauron is defeated: the players win the campaign."]);
   });
 
@@ -233,7 +234,10 @@ describe("146079 Mount Doom: keeping or destroying The One Ring", () => {
     expect(view.kind === "settled" && view.campaignEnd).toBe("won");
     const lost = resolutionView(kept, world);
     expect(lost.kind === "settled" && lost.campaignEnd).toBe("lost");
-    expect(lost.kind === "settled" && lost.notes).toEqual(["The One Ring is kept. The players lose the campaign."]);
+    // The loss is said once: the sentence over Confirm, which records the end.
+    expect(lost.kind === "settled" && (lost.notes ?? [])).toEqual([]);
+    expect(lost.kind === "settled" && settledSentence(lost, world, null, "The Return of the King")).toBe("Confirming records the end: The One Ring is kept and the players lose the campaign.");
+    expect(view.kind === "settled" && settledSentence(view, world, null, "The Return of the King")).toBe("Confirming records the win and completes The Return of the King. The One Ring is destroyed. The players win the campaign.");
   });
 
   it("writes no ending for any other Resolution, and keeps one already recorded", () => {

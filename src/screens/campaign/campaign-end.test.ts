@@ -27,7 +27,7 @@ describe("the end of a campaign", () => {
     const won = campaignEnd(campaign, card, "won");
     expect(won).toEqual({ won: "The Return of the King won. The One Ring is destroyed. The players win the campaign.", line: "The One Ring is destroyed. The players win the campaign.", summary: "The Return of the King is complete: 6 of 6 scenarios won.", tone: "default" });
     const lost = campaignEnd(campaign, card, "lost");
-    expect(lost).toEqual({ won: "The players lose the campaign.", line: "The players lose the campaign.", summary: null, tone: "danger" });
+    expect(lost).toEqual({ won: "The Return of the King lost. The One Ring is kept. The players lose the campaign.", line: "The One Ring is kept. The players lose the campaign.", summary: null, tone: "danger" });
     for (const end of [won, lost]) expect(`${end.won} ${end.line}`).not.toMatch(/^-|Destroy The One Ring card/);
   });
 

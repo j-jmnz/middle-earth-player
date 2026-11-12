@@ -77,7 +77,7 @@ Read the sections your task touches.
   - 378–383 Catalog build (~410)
   - 384–401 Tests (~2.0K) ← 5
   - 402–417 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~125.1K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~124.9K tok)
   - 17–39 Sections (~450)
   - 40–51 Product (~590)
   - 52–65 Non-goals (~540)
@@ -112,13 +112,13 @@ Read the sections your task touches.
   - 636–693 Dream-chaser (~15.6K) ← 4
   - 694–720 Ered Mithrin (~15.8K) ← 7
   - 721–857 The Two Towers (~15.5K) ← 21
-  - 858–1092 The Return of the King (~26.5K) ← 23
+  - 858–1092 The Return of the King (~26.3K) ← 23
     - 885–910 The Passing of the Grey Company (~2.5K) ← 1
     - 911–942 The Siege of Gondor (~4.0K) ← 1
     - 943–988 The Battle of the Pelennor Fields (~5.6K) ← 1
     - 989–1026 The Tower of Cirith Ungol (~4.1K) ← 1
     - 1027–1063 The Black Gate Opens (~4.2K) ← 3
-    - 1064–1092 Mount Doom (~4.2K)
+    - 1064–1092 Mount Doom (~4.0K)
   - 1093–1101 Nightmare (~410) ← 19
   - 1102–1140 Deckbuilding (~1.9K)
   - 1141–1219 Effects (~3.2K)
@@ -131,7 +131,7 @@ Read the sections your task touches.
   - 1260–1285 Persistence and shipping (~2.6K) ← 6
   - 1286–1327 Screens (~4.9K) ← 1
     - 1312–1327 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~49.1K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~49.3K tok)
   - 5–8 Overview (~130) ← 1
   - 9–23 Top bar (~3.1K) ← 4
   - 24–27 Table menu (~490) ← 2
@@ -139,7 +139,7 @@ Read the sections your task touches.
   - 36–39 Canvas (~560)
   - 40–52 Spacing and the play area's rows (~1.9K) ← 9
   - 53–58 Pictures on the table (~320) ← 1
-  - 59–97 Cards (~12.7K) ← 25
+  - 59–97 Cards (~13.0K) ← 25
   - 98–103 The Sailing test (~690) ← 5
   - 104–117 The Island Map (~1.8K) ← 8
   - 118–121 Tokens and effects (~320)
@@ -164,7 +164,7 @@ Read the sections your task touches.
   - 345–356 Banner (~750) ← 5
   - 357–376 Screen reader (~2.8K) ← 17
   - 377–380 Android Back (~90)
-- `docs/design-system.md` — Design system — Carved Stone (~29.6K tok)
+- `docs/design-system.md` — Design system — Carved Stone (~29.7K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~580)
   - 34–44 Performance (~680) ← 4
@@ -179,7 +179,7 @@ Read the sections your task touches.
   - 230–244 Icons (~480) ← 7
   - 245–263 Card art (~740) ← 2
   - 264–278 Tablets (~510) ← 13
-  - 279–466 Screens (~16.6K)
+  - 279–466 Screens (~16.7K)
     - 283–286 Splash (~40)
     - 287–290 App icon (~80)
     - 291–306 Campaigns (campaign list) (~1.5K) ← 6
@@ -187,12 +187,12 @@ Read the sections your task touches.
     - 321–332 History (~1.4K) ← 4
     - 333–350 Briefing (~1.8K) ← 5
     - 351–354 Campaign setup (~1.0K) ← 3
-    - 355–360 Campaign path (~880) ← 4
+    - 355–360 Campaign path (~890) ← 4
     - 361–364 Campaign log (~690) ← 1
     - 365–368 Spend XP (~610) ← 1
     - 369–372 Table — landscape (~30) ← 1
     - 373–376 Table opens stale (~750) ← 4
-    - 377–390 Resolution and standalone outcome (~1.8K) ← 2
+    - 377–390 Resolution and standalone outcome (~1.9K) ← 2
     - 391–400 Decks (~920) ← 2
     - 401–410 Deck builder (deck editor) (~840) ← 3
     - 411–420 Card pool (the Cards tab) (~770) ← 3

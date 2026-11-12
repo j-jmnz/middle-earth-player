@@ -17,7 +17,7 @@ const ELIMINATED = (raise: number | Amount): { when: When; text: string } => ({
 
 export const ASKS: Readonly<Record<string, Ask>> = {
   // 146047:A:2 (Forced, after it becomes the active location, at Setup): each player assigns X damage, X the tens digit of their own threat, among the characters they control.
-  "146047:forced:1 @0 AssignDamage": { owned: true, note: "Brake of Thorns: assign {x} damage, 1 at a time, to characters you control: the tens digit of your threat.", bind: { x: { threat: "tens" } }, verb: "Assign", caution: { when: RING_DESTROYED_BY(1), text: "Tap again: the damage destroys {picked}, which carries The One Ring, and the players lose the game" } },
+  "146047:forced:1 @0 AssignDamage": { owned: true, note: "Brake of Thorns: assign {x} damage (the tens digit of your threat) to characters you control, 1 at a time.", bind: { x: { threat: "tens" } }, verb: "Assign", caution: { when: RING_DESTROYED_BY(1), text: "Tap again: the damage destroys {picked}, which carries The One Ring, and the players lose the game" } },
 
   // 146048:A:2 (Travel): each player in turn, the first player first; a player with no ready hero cannot pay, so the players cannot travel.
   "146048:travel:1 @0.0 Pick": { owned: true, note: "Old Water-course: choose a ready hero you control to exhaust. All players pay to travel here.", verb: "Exhaust" },

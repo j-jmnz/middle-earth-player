@@ -7,7 +7,7 @@ import { play } from "../../../test/harness/card-spec-play.ts";
 import { reveal } from "../../../test/harness/card-spec.ts";
 import { idOf, send, start, tableFromLayout, type Layout } from "../../../test/harness/scene-kit.ts";
 
-import { fortitudeCommitNote, fortitudeCountNote, fortitudeNumbers } from "./fortitude.ts";
+import { eyesStat, fortitudeCommitCaution, fortitudeCommitCheck, fortitudeCommitNote, fortitudeCountNote, fortitudeNumbers, fortitudePassCaution } from "./fortitude.ts";
 import { mountDoomDials, mountDoomHands, mountDoomQuestNote } from "./mount-doom.ts";
 import { dialLimit } from "./threat-level.ts";
 
@@ -29,11 +29,17 @@ describe("146079:A:2 the tokens on the campaign card", () => {
       expect(dial?.limit).toBeUndefined();
       expect(dial?.goal).toBeUndefined();
     }
-    expect(mountDoomDials(withTokens({}, 1).state, name)[0]?.note).toContain("the next end of round loses");
+    const [last] = mountDoomDials(withTokens({}, 1).state, name);
+    expect(last?.warn?.words).toContain("the players lose the game at the end of this round");
+    expect(last?.note).not.toContain("next end of round");
+    expect(last?.name).toBe("Resource tokens on the campaign card:");
+    expect(last?.note).toContain("on the campaign card");
   });
 
-  it("with none recorded, and none on the card, say the timer does not run, and a standalone game has no dial", () => {
-    expect(mountDoomDials(withTokens({}, 0).state, name)[0]?.note).toContain("the timer does not run");
+  it("are left out while none is on the card, whatever the round: the timer never ran, and a standalone game has none", () => {
+    expect(mountDoomDials(withTokens({}, 0).state, name)).toEqual([]);
+    const later = withTokens({}, 0).state;
+    expect(mountDoomDials({ ...later, round: 2 }, name)).toEqual([]);
     expect(mountDoomDials(at({}).state, name)).toEqual([]);
   });
 
@@ -50,7 +56,7 @@ describe("146076:B:2 stage 2B's resources", () => {
     const [dial] = mountDoomDials(state, name);
     expect(dial).toMatchObject({ id: "resources", value: 1, limit: 2, goal: true });
     expect(dial?.warn).toBeUndefined();
-    expect(dial?.note).toContain("1 resource on stage 2B of 2");
+    expect(dial?.note).toContain("1 of 2 resources on 146076.");
     expect(mountDoomDials(at({ stage: "146075" }).state, name)).toEqual([]);
   });
 });
@@ -58,9 +64,12 @@ describe("146076:B:2 stage 2B's resources", () => {
 describe("146077:B:2 and 146043:A:1 what the quest readout adds", () => {
   it("says the cap after a failed test on stage 3B, and Mount Doom's X while it is in the staging area", () => {
     const made = at({ stage: "146077", staging: ["146043"], threat: [34, 28] });
-    expect(mountDoomQuestNote(made.state, made.ctx)).toBe(". Mount Doom's Threat X is 3, the tens digit of the first player's threat (34)");
+    expect(mountDoomQuestNote(made.state, made.ctx)).toBe(". Mount Doom's Threat X is 3 (the tens digit of the first player's 34)");
     const capped = { ...made.state, modifiers: [...made.state.modifiers, { instanceId: "table", sourceId: idOf(made.state, "146077"), stat: "questProgressCap" as const, amount: 5, until: "endOfRound" as const }] };
-    expect(mountDoomQuestNote(capped, made.ctx)).toContain("The first player failed the Fortitude test: no more than 5 progress can be placed here this round");
+    const both = mountDoomQuestNote(capped, made.ctx);
+    expect(both).toContain("Fortitude test failed: no more than 5 progress here this round");
+    // The result holds three lines of about 56 characters: the notes and a typical quest result stay within them.
+    expect(`7 progress if nothing changes${both}`.length).toBeLessThanOrEqual(168);
     expect(mountDoomQuestNote(at({ stage: "146076" }).state, made.ctx)).toBe("");
   });
 });
@@ -103,9 +112,46 @@ describe("146055:A:2 the Fortitude test's sheets and readout", () => {
     const nameOf = (id: string) => counted.cards[id]?.code ?? id;
     const note = fortitudeCountNote(counted, ctx, nameOf);
     expect(note).toContain("Fortitude test: Willpower 2 against 1 Sauron's Eye icon. It passes if nothing changes.");
-    expect(note).toContain("Discarded: 146052 (1)");
+    expect(note).toContain("Discarded: 146052 (1 icon)");
     expect(fortitudeNumbers(counted, ctx, null)).toMatchObject({ result: "Fortitude passed if nothing changes" });
     expect(fortitudeNumbers(counted, ctx, null)?.stats.map((stat) => stat.value)).toEqual([2, 1]);
+  });
+
+  it("adds each standing effect of a failed test that is in play to the commit note (Ringwraith of Sauron in the staging area)", () => {
+    const { state, ctx } = waiting({ staging: ["146050"], deck: ["f0", "f0"] }, [reveal("146055")]);
+    expect(fortitudeCommitNote(state, ctx)).toContain("If you fail, raise your threat by 10 and Ringwraith of Sauron engages you and attacks.");
+  });
+
+  it("says what a failed count costs in the action window, and arms Continue with it while the count fails", () => {
+    const { state, ctx, hero } = waiting({ deck: ["146054", "f0", "f0"] }, [reveal("146055")]);
+    const counted = send(start(state), { type: "CommitFortitude", cardIds: [hero] }, ctx).state;
+    expect(fortitudeCountNote(counted, ctx, (id) => counted.cards[id]?.code ?? id)).toContain("It fails, a tie included if nothing changes. If it fails, raise your threat by 10.");
+    expect(fortitudePassCaution(counted, ctx)).toBe("Tap again: the test fails: raise your threat by 10");
+    const passing = waiting({ deck: ["f0", "f0", "f0"] }, [reveal("146055")]);
+    const done = send(start(passing.state), { type: "CommitFortitude", cardIds: [passing.hero] }, passing.ctx).state;
+    expect(fortitudePassCaution(done, passing.ctx)).toBeNull();
+  });
+
+  it("leads the action window's note with the player who tests when two play", () => {
+    const { state, ctx, hero } = waiting({ seats: 2, deck: ["f0", "f0", "f0"] }, [reveal("146055")]);
+    const counted = send(start(state), { type: "CommitFortitude", cardIds: [hero] }, ctx).state;
+    expect(fortitudeCountNote(counted, ctx, (id) => counted.cards[id]?.code ?? id)).toMatch(/^Player 1, Fortitude test: Willpower /);
+  });
+
+  it("arms a commit that cannot pass: no one, or a Willpower that does not beat the icons already added", () => {
+    const { state, ctx, hero } = waiting({ staging: ["146047"], deck: ["f0", "f0"], threat: [34, 28] }, [reveal("146055")]);
+    const check = fortitudeCommitCheck(state, ctx, [hero]);
+    if (!check) throw new Error("no test going on");
+    expect(check.added).toBe(1);
+    expect(fortitudeCommitCaution(check, [])).toBe("Tap again: nobody is committed, so the test fails: raise your threat by 10");
+    expect(fortitudeCommitCaution({ ...check, willpower: { [hero]: 1 } }, [hero])).toBe("Tap again: Willpower 1 does not beat the 1 icon already added, so the test fails: raise your threat by 10");
+    expect(fortitudeCommitCaution(check, [hero])).toBeNull();
+  });
+
+  it("146049:A:3 marks a card's icons on its row", () => {
+    const { state, ctx } = waiting({ deck: ["146054", "f0", "f0"] }, [reveal("146055")]);
+    const id = Object.keys(state.cards).find((key) => state.cards[key]?.code === "146054") ?? "";
+    expect(eyesStat(state, ctx, id)).toEqual({ icon: "nightmare", value: 3, word: "Sauron's Eye icons" });
   });
 
   it("146049:A:3 shows the icons ignored apart from the ones counted", () => {
@@ -115,7 +161,7 @@ describe("146055:A:2 the Fortitude test's sheets and readout", () => {
     const data = ids?.data.kind === "fortitude" ? ids.data : null;
     expect(data?.eyes).toBe(3);
     const ignored = { ...counted, stack: counted.stack.map((frame) => (frame.data.kind === "fortitude" ? { ...frame, data: { ...frame.data, ignored: frame.data.discardedIds.filter((id) => counted.cards[id]?.code === "146054"), eyes: 0 } } : frame)) };
-    expect(fortitudeCountNote(ignored, ctx, (id) => counted.cards[id]?.code ?? id)).toContain("Ignored: 146054 (3).");
+    expect(fortitudeCountNote(ignored, ctx, (id) => counted.cards[id]?.code ?? id)).toContain("Ignored: 146054 (3 icons).");
   });
 });
 
