@@ -13,7 +13,7 @@ const ARAGORN: When = { kind: "matches", card: "picked", pick: { type: "hero", c
 // The picked character would be destroyed by `damage` more damage: its hit points are less than its damage plus that damage plus 1.
 const DESTROYED_BY = (damage: number): When => ({ kind: "less", left: { stat: "hitPoints", of: "picked" }, right: { stat: "damage", of: "picked", plus: damage + 1 } });
 const ARAGORN_DESTROYED_BY = (damage: number): When => ({ kind: "all", conditions: [ARAGORN, DESTROYED_BY(damage)] }) as When;
-const LOSES_ARAGORN = "Tap again: {picked} is Aragorn and the damage destroys him, and the players lose the game";
+const LOSES_ARAGORN = "Tap again: the damage destroys {picked}, and the players lose the game";
 // The raise takes the player to the elimination level, 99 under Dire: the end of the scenario when it is the last player.
 const ELIMINATED = (raise: number): { when: When; text: NonNullable<Ask["caution"]>["text"] } => ({
   when: { kind: "threat", min: 99 - raise } as When,

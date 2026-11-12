@@ -1,4 +1,4 @@
-// Rules: mec113.saga-staging-rules, mec113.dire, rr.first-player, rr.under (data/rules/entries.json); ledger lines 146024:A:3, 146029:A:1, 146029:A:2, 146041:A:2, 146073:B:1, 146072:B:1, 146074:B:1.
+// Rules: mec113.saga-staging-rules, mec113.dire, rr.first-player (data/rules/entries.json); ledger lines 146024:A:3, 146029:A:1, 146029:A:2, 146041:A:2, 146073:B:1, 146072:B:1, 146074:B:1.
 // The words of The Black Gate Opens' own branches of a Choose (Gwaihir's control, the Embassy's pair) and of its table pieces (readouts/black-gate.ts): the resources on The Black Gate, the enemies under Reeking Moat, the Embassy's row, the seat that controls Gwaihir.
 // The rest of the scenario's words are in its asks file (src/play/words/asks/the-black-gate-opens.ts). Pure.
 import type { Instruction } from "../../../catalog/boundary.ts";
