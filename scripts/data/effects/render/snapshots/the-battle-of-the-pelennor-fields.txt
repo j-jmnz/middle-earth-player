@@ -125,8 +125,8 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 145048:A:1 (front): Forced: When a player plays an event that would cancel the effects of a treachery card just revealed from the encounter deck, cancel the effects of that event. Then, discard Fire-filled Trench.
-  145048:forced:1: Forced on the event whenRevealedCanceled
-    - [json CounterCancel {"verb":"CounterCancel"}]
+  145048:forced:1: Forced on the event counterCanceled
+    - discard this card
 
 ## 145049 Siege Tower
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -326,7 +326,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ally (you control)
     - then, if there is a ally (you control) to choose (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
-    - [json RaiseStagingThreat {"verb":"RaiseStagingThreat","amount":1,"until":"endOfPhase","live":"alliesInDiscard"}]
+    - [json RaiseStagingThreat {"verb":"RaiseStagingThreat","until":"endOfPhase","live":"alliesInDiscard"}]
 
 145060:A:3 (shadow): Shadow: Discard a non-objective attachment you control.
   145060:shadow:1: Shadow
@@ -569,4 +569,4 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     - [json EngageFirstPlayer {"verb":"EngageFirstPlayer"}]
     - then, if this card is engaged with the player (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
-(rendered pieces: 263 by template, 71 as JSON)
+(rendered pieces: 264 by template, 70 as JSON)

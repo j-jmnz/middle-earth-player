@@ -91,6 +91,18 @@ describe("The Battle of the Pelennor Fields golden", () => {
         expect(new Set(lost.map((golden) => golden.lossKind))).toEqual(new Set(["city", "heroes", "threat"]));
       });
 
+      it("145016:A:2, 145016:A:3 the Overcome by Fear the Grey Company leaves is on each seat's dial after the Siege: threat that cannot be reduced, raised by 1 at the end of each round, and none with an empty log", () => {
+        for (const golden of FIELDS_GOLDENS.filter((item) => item.after === true)) {
+          const state = opened(golden);
+          const fears = cardsOf(state, "145016").filter((card) => card.controller != null);
+          expect(fears.map((card) => card.controller).sort(), golden.name).toEqual(Array.from({ length: golden.seatCount }, (_, seat) => seat));
+          expect(state.modifiers.filter((modifier) => modifier.stat === "threatReductionBarred").length, golden.name).toBe(golden.seatCount);
+          const raised = game(golden).steps.filter((step) => step.kind === "threat" && "effect" in step.cause && step.cause.effect === "145016:forced:1");
+          expect(raised.length, golden.name).toBeGreaterThan(0);
+        }
+        for (const golden of FIELDS_GOLDENS.filter((item) => item.after !== true)) expect(cardsOf(opened(golden), "145016").filter((card) => card.controller != null), golden.name).toEqual([]);
+      });
+
       it("145072:A:1 The Corsair Fleet frees Aragorn once its resources are gone: the first player controls him in every game that is won", () => {
         for (const golden of FIELDS_GOLDENS.filter((item) => item.outcome === "won")) {
           const state = game(golden).state;

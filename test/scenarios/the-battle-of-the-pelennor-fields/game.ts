@@ -20,8 +20,9 @@ export const FIELDS_POLICY: PolicyOptions = { scout: "", prefer: "", protect: ""
 // "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat or Minas Tirith falls; "brittle": strong questers that die to an attack.
 export type FieldsDecks = "strong" | "weak" | "brittle";
 
-// The Harad and Mordor enemies engage at costs of 30 and more, so the strong and brittle stand-ins start at a threat of 16 each (the players are engaged by the enemies a quest does not clear: the numbers are the deck's, not the scenario's).
-const FIELDS_STATS = { strong: { ...HERO_STATS.strong, threat: 11, attack: 30, defense: 20 }, weak: HERO_STATS.weak, brittle: { ...HERO_STATS.brittle, threat: 11 } } as const satisfies Record<FieldsDecks, HeroStats>;
+// The strong stand-ins start at a threat of 8 each (24 for three): the refresh and Overcome by Fear, which the Passing of the Grey Company leaves on each dial (the pool entries below), each raise a seat's threat by 1 a round and it cannot be reduced, so a game of ten rounds or so ends under 50.
+// The Harad and Mordor enemies engage at costs of 30 and more, so they engage once the threat has risen to it, the numbers being the deck's, not the scenario's. The brittle ones start at 11: they die before the threat matters.
+const FIELDS_STATS = { strong: { ...HERO_STATS.strong, threat: 8, attack: 30, defense: 20 }, weak: HERO_STATS.weak, brittle: { ...HERO_STATS.brittle, threat: 11 } } as const satisfies Record<FieldsDecks, HeroStats>;
 
 const ARAGORN = "145001";
 // The first player starts with the saga's Aragorn (145001, mec113.setting-up-the-game) beside two stand-in heroes; a second seat has three. The campaign card's Setup sets him aside with Andúril and the Banner of Elendil.
@@ -32,7 +33,8 @@ export const fieldsLoadout = (seatCount: 1 | 2): LoadoutSeat[] => {
 };
 
 // What the earlier parts hand on (the campaign log): the resources on The Corsair Fleet the Siege recorded (145070:B:1) and the Harad enemies under The Black Gate that Journey to the Cross-roads recorded (the log's `blackGate`; each is
-// set aside, one copy for each recorded, 145078:A:1).
+// set aside, one copy for each recorded, 145078:A:1). The numbers are the goldens' own choices, not what the real chain hands on: the Siege's golden records 12 resources on the Fleet and the Two Towers' goldens record no enemy under The Black Gate, so a 4 and three Harad enemies are
+// written by hand here (enough that Aragorn returns at the fourth quest phase and that the Setup sets several enemies aside).
 export const FLEET_RECORDED = 4;
 export const BLACK_GATE_RECORDED: Readonly<Record<string, number>> = { "144028": 1, "144057": 1, "144058": 1 };
 
@@ -126,18 +128,18 @@ export type FieldsGolden = {
 // Wins (true solo and two-handed, Normal and Easy; after the Siege with its Fleet and the Harad enemies recorded, once with an empty log so the Fleet holds no resource, once with no Esquire attached and the damage answered for the City) and the ways to
 // lose that a game of stand-ins reaches: Minas Tirith destroyed (heroes too small to quest), every hero destroyed, and a threat at 50.
 export const FIELDS_GOLDENS: readonly FieldsGolden[] = [
-  { name: "true solo, won, Normal, after the Siege", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
+  { name: "true solo, won, Normal, after the Siege", seatCount: 1, seed: 5, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
   { name: "true solo, won, Easy, after the Siege", seatCount: 1, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won", after: true },
-  { name: "true solo, won, Normal, with no earlier log", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won" },
-  { name: "true solo, won, after the Siege, no Esquire, the City damaged", seatCount: 1, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won", after: true, policy: { choose: "last" } },
-  { name: "two-handed, won, Normal, after the Siege", seatCount: 2, seed: 3, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
-  { name: "two-handed, won, Easy, after the Siege", seatCount: 2, seed: 2, difficulty: "Easy", decks: "strong", outcome: "won", after: true },
-  { name: "two-handed, won, after the Siege, no Esquire, the City damaged", seatCount: 2, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won", after: true, policy: { choose: "last" } },
+  { name: "true solo, won, Normal, with no earlier log", seatCount: 1, seed: 4, difficulty: "Normal", decks: "strong", outcome: "won" },
+  { name: "true solo, won, after the Siege, no Esquire, the City damaged", seatCount: 1, seed: 5, difficulty: "Normal", decks: "strong", outcome: "won", after: true, policy: { choose: "last" } },
+  { name: "two-handed, won, Normal, after the Siege", seatCount: 2, seed: 6, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
+  { name: "two-handed, won, Easy, after the Siege", seatCount: 2, seed: 3, difficulty: "Easy", decks: "strong", outcome: "won", after: true },
+  { name: "two-handed, won, after the Siege, no Esquire, the City damaged", seatCount: 2, seed: 15, difficulty: "Normal", decks: "strong", outcome: "won", after: true, policy: { choose: "last" } },
   { name: "true solo, lost, Minas Tirith destroyed", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", after: true, lossReason: "Minas Tirith has no hit points remaining", lossKind: "city" },
   { name: "two-handed, lost, Minas Tirith destroyed", seatCount: 2, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", after: true, lossReason: "Minas Tirith has no hit points remaining", lossKind: "city" },
   { name: "true solo, lost, every hero destroyed", seatCount: 1, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", after: true, lossReason: "No seats remain", lossKind: "heroes" },
   { name: "two-handed, lost, every hero destroyed", seatCount: 2, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", after: true, lossReason: "No seats remain", lossKind: "heroes" },
-  { name: "true solo, lost, threat reaches 50", seatCount: 1, seed: 8, difficulty: "Normal", decks: "strong", outcome: "lost", after: true, lossReason: "No seats remain", lossKind: "threat" },
+  { name: "true solo, lost, threat reaches 50", seatCount: 1, seed: 18, difficulty: "Normal", decks: "strong", outcome: "lost", after: true, lossReason: "No seats remain", lossKind: "threat" },
 ];
 
 const game = campaignGame<FieldsDecks, FieldsPolicy>({
@@ -152,7 +154,7 @@ const game = campaignGame<FieldsDecks, FieldsPolicy>({
   limit: 6000,
   upgraded: [],
   // The Passing of the Grey Company earns no XP and leaves an Overcome by Fear for each seat whose dial held one (145066:B:1; a true solo game reads both rows for its one seat); the Siege earns none and removes the Army of the Dead boon (145070:B:1).
-  earlier: { xp: [0, 0], pool: [], marks: {} },
+  earlier: { xp: [0, 0], pool: [{ code: "145016", seat: 0 }, { code: "145016", seat: 1 }], marks: {} },
 });
 
 // A golden: the log of the earlier parts it plays after (the Fleet's resources and the Harad enemies carried), its policy over the default.

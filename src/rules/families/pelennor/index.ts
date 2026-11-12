@@ -10,6 +10,7 @@ import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { Focus } from "../index.ts";
+import { cityLeft } from "./city.ts";
 import { discardAllyToStaging, stagedAlliesCost, takeControlOfStagedAllies } from "./allies.ts";
 import { attackerBarredByEngagement } from "./combat.ts";
 import { attachShadowToHero, engageShadowCard, putTopmostFromEncounterDiscard } from "./moves.ts";
@@ -34,8 +35,6 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return takeControlOfStagedAllies(state, instruction, focus, ctx);
     case "PutTopmostFromEncounterDiscard":
       return putTopmostFromEncounterDiscard(state, instruction, focus, ctx, steps);
-    case "CounterCancel":
-      return state;
     case "EngageShadowCard":
       return engageShadowCard(state, focus, ctx, steps);
     case "AttachShadowToHero":
@@ -47,9 +46,9 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "pelennor",
-  verbs: ["DamageMinasTirith", "PlaceProgressActiveFirst", "DiscardAllyToStaging", "TakeControlOfStagedAllies", "PutTopmostFromEncounterDiscard", "EngageShadowCard", "AttachShadowToHero", "CounterCancel"],
+  verbs: ["DamageMinasTirith", "PlaceProgressActiveFirst", "DiscardAllyToStaging", "TakeControlOfStagedAllies", "PutTopmostFromEncounterDiscard", "EngageShadowCard", "AttachShadowToHero"],
   run,
   combat: { attack: (state, enemyId, _attacker, _target, attackerId) => attackerBarredByEngagement(state, enemyId, attackerId) },
-  amount: (state, found, _scope, ctx) => (found.stagedAlliesCost ? stagedAlliesCost(state, ctx) : null),
+  amount: (state, found, _scope, ctx) => (found.stagedAlliesCost ? stagedAlliesCost(state, ctx) : found.minasTirithLeft ? cityLeft(state, ctx.cards) : null),
   questResult: (state, totals, cards, steps) => assaultQuestResult(state, totals, cards, steps, minasTirithId(state)),
 };

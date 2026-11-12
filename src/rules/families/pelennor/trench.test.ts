@@ -19,7 +19,7 @@ const trench = definePrinted({ code: "trench", name: "Fire-filled Trench", type:
 const stage = definePrinted({ code: "stage", name: "Stage", type: "quest", questPoints: 20 });
 const cards = cardMap([hero("a", "tactics", 9, 1), bad, hasty, trench, stage]);
 const records: Effect[] = [
-  { id: "trench:forced:1", cardCode: "trench", lines: ["trench:A:1"], timing: "forced", trigger: "whenRevealedCanceled", instructions: [{ verb: "CounterCancel" }] },
+  { id: "trench:forced:1", cardCode: "trench", lines: ["trench:A:1"], timing: "forced", trigger: "counterCanceled", instructions: [{ verb: "Discard", target: { kind: "self" } }] },
   { id: "bad:whenRevealed:1", cardCode: "bad", lines: ["bad:A:1"], timing: "whenRevealed", instructions: [{ verb: "RaiseThreat", amount: 5 }] },
   { id: "hasty:response:1", cardCode: "hasty", lines: ["hasty:A:1"], timing: "response", trigger: "whenRevealedPending", cost: { kind: "playEvent" }, instructions: [{ verb: "CancelEffect" }, { verb: "RaiseThreat", amount: 1 }] },
 ];

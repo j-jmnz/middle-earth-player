@@ -10,7 +10,7 @@ import { useStableDials } from "./dials.ts";
 import { isengardDials, isengardHands, type HandMark } from "./isengard.ts";
 import { lairDials, lairHands } from "./lair.ts";
 import { marshesDials } from "./marshes.ts";
-import { pelennorDials } from "./pelennor.ts";
+import { pelennorDials, pelennorHands } from "./pelennor.ts";
 import { roadsDials } from "./roads.ts";
 import { siegeDials, siegeHands } from "./siege.ts";
 
@@ -24,10 +24,10 @@ export function useScenarioDials(game: ScenarioState, ctx: ReduceContext, nameOf
   return useStableDials(scenarioDials(game, ctx, nameOf));
 }
 
-/** The marks the seat dials wear: The Road to Isengard's cards in hand on stage 3B, Shelob's Lair's allies this round, The Passing of the Grey Company's Overcome by Fear and threat floor, and The Siege of Gondor's Army of the Dead.
- * A seat wears one mark: when two scenarios' pieces fall on the same seat (Fear and the Army) their labels, notes and notches are merged into it. */
+/** The marks the seat dials wear: The Road to Isengard's cards in hand on stage 3B, Shelob's Lair's allies this round, The Passing of the Grey Company's Overcome by Fear and threat floor, The Siege of Gondor's Army of the Dead and The Battle of the Pelennor Fields' Aragorn.
+ * A seat wears one mark: when two scenarios' pieces fall on the same seat (Fear and the Army, the Army and Aragorn) their labels, notes and notches are merged into it. */
 export function seatMarks(game: ScenarioState, ctx: ReduceContext): readonly HandMark[] {
-  return mergedBySeat([...isengardHands(game), ...lairHands(game, ctx), ...companyHands(game, ctx), ...siegeHands(game)]);
+  return mergedBySeat([...isengardHands(game), ...lairHands(game, ctx), ...companyHands(game, ctx), ...siegeHands(game), ...pelennorHands(game)]);
 }
 
 // The label after the seat prefix ("P1 · Fear" is "Fear"); a bare seat ("P1") or "Threat" says nothing more.

@@ -323,6 +323,14 @@ export const effectSchema = z.strictObject({
   // AddEncounterToPool names the codes it adds or the deck whose enemies in play it adds, never both and never neither (emce.campaign-pool-encounter).
   message: "AddEncounterToPool names exactly one of codes and fromDeck",
   path: ["instructions"],
+}).refine((effect) => effect.instructions.every((instruction) => instruction.verb !== "RaiseStagingThreat" || (instruction.amount != null) !== (instruction.live != null)), {
+  // RaiseStagingThreat names the amount it raises or the live count (the allies in a discard pile), never both and never neither (01104:A:1, 145060:A:2).
+  message: "RaiseStagingThreat names exactly one of amount and live",
+  path: ["instructions"],
+}).refine((effect) => effect.instructions.every((instruction) => instruction.verb !== "AddSetAsideToStaging" || (instruction.code != null) !== (instruction.trait != null)), {
+  // AddSetAsideToStaging names the code it adds or the trait the set aside cards share, never both and never neither (145078:B:1).
+  message: "AddSetAsideToStaging names exactly one of code and trait",
+  path: ["instructions"],
 });
 
 export type Instruction = z.infer<typeof instructionSchema>;

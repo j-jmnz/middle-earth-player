@@ -53,8 +53,15 @@ function scanRestricted(state: ScenarioState, ctx: ReduceContext, what: Restrict
 }
 
 export function travelBlocked(state: ScenarioState, ctx: ReduceContext, locationId: string): boolean {
-  // A restriction on the location itself, or one a card puts on the location with this code ("The players cannot travel to The Old Ford", 18068:B:1).
-  return restricted(state, ctx, "travel").some((rule) => (rule.trait != null ? printedOf(ctx.cards, state.cards[locationId]?.code ?? "").traits.includes(rule.trait) : rule.location == null ? rule.sourceId === locationId : state.cards[locationId]?.code === rule.location && (rule.guarding == null || guardsTitled(state, ctx, locationId, rule.guarding))));
+  const location = state.cards[locationId];
+  return restricted(state, ctx, "travel").some((rule) => {
+    // Every location with a trait (Grond's, 145044:A:1 and the Gate's kin).
+    if (rule.trait != null) return printedOf(ctx.cards, location?.code ?? "").traits.includes(rule.trait);
+    // A restriction on the location itself.
+    if (rule.location == null) return rule.sourceId === locationId;
+    // One a card puts on the location with this code ("The players cannot travel to The Old Ford", 18068:B:1).
+    return location?.code === rule.location && (rule.guarding == null || guardsTitled(state, ctx, locationId, rule.guarding));
+  });
 }
 
 /**

@@ -3,20 +3,16 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 import { moveCard } from "../../../rules/core/zones.ts";
 import { advanceResolution } from "../../../rules/setup/resolution.ts";
-import { expectOk } from "../../../rules/core/test-fixture.ts";
-import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../../../rules/engine/reduce.ts";
+import type { ReduceContext, ScenarioState } from "../../../rules/engine/reduce.ts";
 import { andurilLoadout, companyStart, companyWorld } from "../../../../test/scenarios/the-passing-of-the-grey-company/game.ts";
-import { LAIR_GOLDENS, lairWorld, playGolden as playLair } from "../../../../test/scenarios/shelobs-lair/game.ts";
 import { loadCampaign, loadScenario } from "../../../../scripts/data/load-scenarios.ts";
-import { roadsWonLog } from "../../../../scripts/e2e/shelobs-lair.ts";
-import { wonLog } from "../../../../scripts/e2e/seed-kit.ts";
+import { twoTowersFinishedLog } from "../../../../scripts/e2e/shelobs-lair.ts";
+import { expectLossWritesNothing, opened as openedAt } from "../../../../test/harness/campaign-kit.ts";
 import { goldenState } from "../../../../test/harness/golden-state.ts";
 
-import { continuedLog } from "../../continue.ts";
 import { applyResolution, emptyLog, poolCard, type CampaignLog } from "../../log.ts";
 import { campaignPath, nextStep } from "../../path.ts";
 import { PLAYABLE_SCENARIOS } from "../../playable.ts";
-import { newSave } from "../../save.ts";
 import { NO_COPY_LIMITS } from "../../wilderland.ts";
 
 const campaign = loadCampaign("the-return-of-the-king");
@@ -34,18 +30,11 @@ let afterTwoTowers: CampaignLog;
 beforeAll(async () => {
   world = await companyWorld("strong");
   ctx = world.ctx;
-  const roads = await roadsWonLog();
-  const finished = await wonLog({ title: "Shelob's Lair", golden: "two-handed, won, Normal", goldens: LAIR_GOLDENS, world: lairWorld, play: playLair, scenarioId: "shelobs-lair" }, roads);
-  afterTwoTowers = continuedLog({ id: "tt", campaignId: "the-two-towers", seatCount: 2, log: { ...finished, campaignPool: [...finished.campaignPool] } });
+  afterTwoTowers = await twoTowersFinishedLog();
 }, 240_000);
 
-// The scenario dealt and its Setup played to the first round: the starting hands kept, every question answered with the first option.
-function opened(seats: 1 | 2, log: CampaignLog, extra: Parameters<typeof companyStart>[6] = {}): ScenarioState {
-  let state = startScenario(companyStart(seats, 1, "Normal", undefined, log, undefined, extra), ctx);
-  while (state.window?.kind === "mulligan") state = expectOk(reduce(state, { type: "Keep" }, ctx)).state;
-  for (let guard = 0; guard < 40 && state.window?.kind === "choose" && state.phase !== "Planning"; guard += 1) state = expectOk(reduce(state, { type: "Choose", optionId: state.window.options[0] ?? "" }, ctx)).state;
-  return state;
-}
+// The scenario dealt and its Setup played to the first round (test/harness/campaign-kit.ts).
+const opened = (seats: 1 | 2, log: CampaignLog, extra: Parameters<typeof companyStart>[6] = {}): ScenarioState => openedAt(companyStart(seats, 1, "Normal", undefined, log, undefined, extra), ctx);
 const copies = (state: ScenarioState, code: string) => Object.values(state.cards).filter((card) => card.code === code);
 
 // The Passing of the Grey Company in the the-return-of-the-king campaign (part 1, campaign card 145066).
@@ -123,11 +112,8 @@ describe("The Passing of the Grey Company in the the-return-of-the-king campaign
     expect(PLAYABLE_SCENARIOS).toContain("the-siege-of-gondor");
   });
 
-  it("a lost game writes nothing: the Resolution is for a win only, so the save keeps the log it began with", () => {
-    const state = goldenState("the-passing-of-the-grey-company", "two-handed, lost, threat reaches 50");
-    expect(state.lost).toBe(true);
-    expect(state.stageCleared).toBe(false);
-    expect(newSave("rk", "the-return-of-the-king", 2).log.completed).toEqual([]);
+  it("a lost game writes nothing: the Resolution is for a win only, so finishing the lost golden leaves the log as it was", () => {
+    expectLossWritesNothing(afterTwoTowers, "the-passing-of-the-grey-company", "two-handed, lost, threat reaches 50", world.cards);
   });
 
   it("deals the original card in a standalone game, with no campaign card", () => {

@@ -24,12 +24,12 @@ const VERBS = [
   // "If this attack damages a hero, attach Black Dart to that hero" (145058:A:2), read in the effect an AfterAttack leaves for the attack's end: the attacking enemy's shadow card with this code attaches faceup to the hero the attack damaged
   // (its defender, or the hero an undefended attack landed on), unless that hero carries one already (Limit 1 per hero). A damaged ally or no damage attaches nothing. The record carries `when: {kind: "dealt"}`, so the attack keeps the damage it dealt for the effect that reads it.
   z.strictObject({ verb: z.literal("AttachShadowToHero"), code: z.string().min(1), ...when }),
-  // A marker in a Forced record of the card that does the countering ("cancel the effects of that event. Then, discard Fire-filled Trench", 145048:A:1): while the card is in play, a player event whose effect would cancel the effects of a treachery card just revealed from
-  // the encounter deck has its own effects canceled instead and the card is discarded (families/pelennor/combat.ts counterCancel, called by CancelEffect). Running the instruction does nothing.
-  z.strictObject({ verb: z.literal("CounterCancel"), ...when }),
 ] as const;
 
-const TRIGGERS = [] as const;
+const TRIGGERS = [
+  // A player event's cancel of the effects of a treachery card just revealed from the encounter deck was countered by this card, the card the event is about: its effects were canceled instead ("Forced: When a player plays an event that would cancel the effects of a treachery card just revealed from the encounter deck, cancel the effects of that event. Then, discard Fire-filled Trench", 145048:A:1). Announced by families/pelennor/combat.ts counterCancel, called by CancelEffect while a card whose Forced record hears it is in play; the record discards the card.
+  "counterCanceled",
+] as const;
 
 const FLAGS = [
   // On a card (the objective Minas Tirith, by the holders of City Wall's constant): damage that would be placed on it is placed on the source card first, up to the source's quest points, and the rest on this card ("damage that would be placed on Minas Tirith must be placed here first", 145046:A:1).

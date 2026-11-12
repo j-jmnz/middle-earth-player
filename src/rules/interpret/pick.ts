@@ -128,10 +128,8 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
     if (!spec.stagingOnly) raw.push(...Object.values(state.cards).filter((card) => card.claimed === true && card.controller != null && seats.includes(card.controller)).map((card) => card.id));
     // `controlled` also counts a tower the players control as a group: freed of encounters, in the staging area, claimed with no controller (ControlWhenFree, families/objectives/control.ts).
     if (spec.controlled && spec.control !== "you") raw.push(...stagingFor(state, spec, asking).filter((id) => state.cards[id]?.claimed === true));
-  } else if (spec.type === "ally" && spec.stagingOnly) {
-    // The allies lying in the staging area under nobody's control (families/pelennor/allies.ts, 145074:B:2).
-    raw.push(...stagingFor(state, spec, asking));
-  } else if (spec.type === "card" && spec.stagingOnly) {
+  } else if ((spec.type === "ally" || spec.type === "card") && spec.stagingOnly) {
+    // The cards lying in the staging area; for allies, those under nobody's control (families/pelennor/allies.ts, 145074:B:2).
     raw.push(...stagingFor(state, spec, asking));
   } else if (spec.type === "card") {
     for (const index of seats) raw.push(...(state.seats[index]?.heroes ?? []), ...(state.seats[index]?.play ?? []));

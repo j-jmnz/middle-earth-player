@@ -55,6 +55,7 @@ describe("EngageShadowCard (145055:A:3)", () => {
     expect([card.zone, card.controller, card.host]).toEqual(["engaged", 1, null]);
     expect(next.cards[built.ids.host!]?.shadowId).toBeNull();
     expect(next.seats[1].engaged).toContain(shadow.id);
+    expect(next.staging).not.toContain(shadow.id);
   });
 
   it("does nothing for a shadow card that is no enemy", () => {

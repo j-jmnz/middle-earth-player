@@ -5,13 +5,13 @@
 // the seat that controls the Army of the Dead. The engine decided every number (the Fleet's tokens, `roundHealed`, the records' limits); nothing here changes one. Pure, so a test reads it.
 import type { Effect } from "../../catalog/boundary.ts";
 import { modifiedStat } from "../../rules/core/keywords.ts";
-import { heldLeast, inPlay } from "../../rules/core/state.ts";
+import { heldLeast } from "../../rules/core/state.ts";
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 import { countMatching } from "../../rules/interpret/pick.ts";
 import { effectsOf } from "../../rules/windows/listen.ts";
 
 import { armyLabel, ARMY_WORDS, fleetWords, heldProgressWords, portReachedWords, portWords, quaysNearWords, quaysWords, shipsWords } from "../words/scenarios/siege.ts";
-import type { TableDial } from "./dials.ts";
+import { cardsOf, type TableDial } from "./dials.ts";
 import { reaches, type HandMark } from "./isengard.ts";
 
 const GREAT_SHIP = "145030";
@@ -20,9 +20,6 @@ const PORT = "145033";
 const QUAYS = "145034";
 const STAGE = "145069";
 const ARMY = "145068";
-
-/** The cards of a code that are in play (the staging area, the active location, a play area). */
-const cardsOf = (game: ScenarioState, code: string) => Object.values(game.cards).filter((card) => card.code === code && inPlay(card.zone));
 
 type ShipsRule = { needed: number; pick: Extract<NonNullable<Effect["condition"]>, { kind: "count" }>["pick"] };
 

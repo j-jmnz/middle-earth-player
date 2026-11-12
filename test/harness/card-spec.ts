@@ -23,7 +23,7 @@ export const resolve = (code: string, timing: Effect["timing"], source?: string)
 /** Both of the first seat's heroes commit and the quest is played to its end; `outcome` is checked against the willpower and threat the quest compared. */
 export const quest = (outcome: "success" | "fail"): Act => ({ act: "quest", outcome });
 /** The enemy attacks the first seat in the combat phase with `shadow` dealt to it (a filler enemy by default), the first hero defending. Must be the first action. */
-export const attack = (enemy: string, options: { shadow?: string; undefended?: boolean } = {}): Act => ({ act: "attack", enemy, ...options });
+export const attack = (enemy: string, options: { shadow?: string; undefended?: boolean; lands?: Readonly<Record<string, string>> } = {}): Act => ({ act: "attack", enemy, ...options });
 /** The card is put on top of the encounter deck and revealed, its When Revealed resolving. */
 export const reveal = (code: string): Act => ({ act: "reveal", code });
 /** The players travel to the location (in the staging area; the layout's phase is Travel). */

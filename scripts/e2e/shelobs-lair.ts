@@ -9,8 +9,9 @@ import type { StoredLoadout } from "../../src/campaign/save.ts";
 import type { PlayerIntent, ReduceContext, ScenarioState } from "../../src/rules/engine/reduce.ts";
 
 import { ROADS_GOLDENS, roadsWorld, playGolden as playRoads } from "../../test/scenarios/journey-to-the-cross-roads/game.ts";
-import { DEFAULT_POLICY, LAIR_POLICY, lairIntent } from "../../test/scenarios/shelobs-lair/game.ts";
+import { DEFAULT_POLICY, LAIR_GOLDENS, LAIR_POLICY, lairIntent, lairWorld, playGolden as playLair } from "../../test/scenarios/shelobs-lair/game.ts";
 import { marshesWonLog } from "./journey-to-the-cross-roads.ts";
+import { continuedLog } from "../../src/campaign/continue.ts";
 import { createLog } from "../log.ts";
 import { firstSeed, FIXTURE_DECKS, prebuiltDeck, wonLog } from "./seed-kit.ts";
 
@@ -25,6 +26,12 @@ export type LairFixtureName = "lair-won" | "lair-lost";
 // The log of a playthrough whose first 5 parts were won: the log of the parts before Journey to the Cross-roads (scripts/e2e/journey-to-the-cross-roads.ts), then the Journey to the Cross-roads golden's two-handed win, resolved onto it, their heroes and what hangs on them left out.
 export async function roadsWonLog(): Promise<CampaignLog> {
   return wonLog({ title: "Journey to the Cross-roads", golden: "two-handed, won, Normal", goldens: ROADS_GOLDENS, world: roadsWorld, play: playRoads, scenarioId: "journey-to-the-cross-roads" }, await marshesWonLog());
+}
+
+// The log a finished Two Towers hands on: the six parts' Resolutions written one onto the other (Shelob's Lair's golden win last, read with `goldenState`), taken into a new Return of the King save (`continuedLog`, SAGA_PREVIOUS), which the first part of The Return of the King starts from.
+export async function twoTowersFinishedLog(): Promise<CampaignLog> {
+  const finished = await wonLog({ title: "Shelob's Lair", golden: "two-handed, won, Normal", goldens: LAIR_GOLDENS, world: lairWorld, play: playLair, scenarioId: "shelobs-lair" }, await roadsWonLog());
+  return continuedLog({ id: "tt", campaignId: "the-two-towers", seatCount: 2, log: { ...finished, campaignPool: [...finished.campaignPool] } });
 }
 
 export async function lairFixtures(): Promise<Partial<Record<LairFixtureName, LairFixture>>> {

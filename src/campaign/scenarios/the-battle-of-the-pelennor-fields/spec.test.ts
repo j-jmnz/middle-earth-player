@@ -63,8 +63,8 @@ const ROWS: readonly Row[] = [
   { line: "145054:A:3", name: "Shadow: the attacking enemy gets +1 Attack", layout: STAGE2, act: attack("f3", { shadow: "145054", undefended: true }), expect: damageOn("dh1", 2) },
   { line: "145054:A:3", name: "+2 Attack with the Mordor trait", layout: STAGE2, act: attack("145053", { shadow: "145054", undefended: true }), expect: damageOn("dh1", 5) },
 
-  { line: "145055:A:2", name: "while Minas Tirith is in play its undefended damage goes to Minas Tirith, not to a hero", layout: { stage: "145074", staging: [CITY] }, act: attack("145055", { undefended: true }), expect: [damageOn(CITY, 2), damageOn("dh1", 0)] },
-  { line: "145055:A:3", name: "Shadow: with Minas Tirith in play this card engages the defending player and stays engaged", layout: { stage: "145074", staging: [CITY], deck: ["f0", "f0", "f0"] }, act: attack("f3", { shadow: "145055", undefended: true }), expect: zone("145055", "engaged") },
+  { line: "145055:A:2", name: "while Minas Tirith is in play its undefended damage goes to Minas Tirith, not to a hero", layout: { stage: "145074", staging: [CITY] }, act: attack("145055", { undefended: true, lands: { "145055": CITY } }), expect: [damageOn(CITY, 2), damageOn("dh1", 0)] },
+  { line: "145055:A:3", name: "Shadow: with Minas Tirith in play this card engages the defending player and stays engaged", layout: { stage: "145074", staging: [CITY], deck: ["f0", "f0", "f0"] }, act: attack("f3", { shadow: "145055", undefended: true, lands: { "145055": CITY } }), expect: zone("145055", "engaged") },
 
   { line: "145056:A:1", name: "When Revealed: each player searches the encounter deck and discard pile for an enemy and puts it into play engaged with them", layout: { seats: 2, deck: ["f0", "f3"], discard: ["145054"] }, act: [reveal("145056"), answer("f3"), answer("145054")], expect: [zone("f3", "engaged"), zone("145054", "engaged")] },
   { line: "145056:A:2", name: "Shadow: the defending player chooses 3 damage to Minas Tirith", layout: { stage: "145074", staging: [CITY] }, act: [attack("f3", { shadow: "145056", undefended: true }), answer("city")], expect: damageOn(CITY, 3) },

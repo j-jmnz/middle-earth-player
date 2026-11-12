@@ -171,7 +171,7 @@ export function play(scenarioId: string, row: Row, effects: readonly Effect[], l
     const picks = takeAnswers();
     const engaged = [...(layout.engaged ?? []), ...((layout.engaged ?? []).some((item) => (typeof item === "string" ? item : item.code) === firstAct.enemy) ? [] : [{ code: firstAct.enemy, seat: 0 }])];
     const dealt = firstAct.shadow ? { deck: [firstAct.shadow, ...(layout.deck ?? ["f0", "f0", "f0"])] } : {};
-    const options = { undefended: firstAct.undefended === true, pick: picker(picks, lenient), ...(defender ? { defender: (made: LayoutTable) => idOf(made.state, defender) } : {}) };
+    const options = { undefended: firstAct.undefended === true, ...(firstAct.lands ? { lands: firstAct.lands } : {}), pick: picker(picks, lenient), ...(defender ? { defender: (made: LayoutTable) => idOf(made.state, defender) } : {}) };
     const fought = fightEnemy(build, firstAct.shadow ?? "f0", firstAct.enemy, { ...layout, engaged, ...dealt }, options);
     done = { run: fought.run, table: fought.made, during: fought.during };
   } else {

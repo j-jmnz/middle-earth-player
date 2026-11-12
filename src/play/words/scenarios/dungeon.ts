@@ -30,7 +30,7 @@ export function dungeonWords(instruction: Instruction, nameOf: (code: string) =>
     case "TurnFaceUp":
       return `turn ${nameOf(instruction.code)} faceup, still out of play`;
     case "RaiseStagingThreat":
-      return `raise the total Threat in the staging area by ${amountWords(instruction.amount)} until the end of the ${instruction.until === "endOfRound" ? "round" : "phase"}`;
+      return `raise the total Threat in the staging area by ${instruction.amount == null ? "1 for each ally in the discard pile" : amountWords(instruction.amount)} until the end of the ${instruction.until === "endOfRound" ? "round" : "phase"}`;
     case "LimitPlays":
       return `the players play at most ${instruction.max} ${instruction.cardType} card${instruction.max === 1 ? "" : "s"} each round`;
     default:

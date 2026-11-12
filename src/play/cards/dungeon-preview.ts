@@ -10,6 +10,7 @@ import { FALLEN_SUFFIX, ORC_GUARD_CODE, fallenBase, isShipObjectiveCode, printed
 import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
 
 import { prisonerWords } from "../readouts/widgets.ts";
+import { pelennorDetail } from "./pelennor-preview.ts";
 import { rhovanionDetail } from "./rhovanion-preview.ts";
 
 /**
@@ -40,7 +41,7 @@ export function dungeonDetail(game: ScenarioState, ctx: ReduceContext, cardId: s
   if (card.prisoner === true && card.zone === "captive" && card.host == null) return prisonerWords(name(cardId));
   const captive = captiveDetail(game, ctx, card, name);
   if (captive) return captive;
-  const lost = kingsQuestDetail(game, ctx, card, name) ?? lostInMirkwoodDetail(game, ctx, card, name) ?? heathDetail(game, ctx, card, name) ?? rhovanionDetail(game, ctx, card);
+  const lost = kingsQuestDetail(game, ctx, card, name) ?? lostInMirkwoodDetail(game, ctx, card, name) ?? heathDetail(game, ctx, card, name) ?? rhovanionDetail(game, ctx, card) ?? pelennorDetail(game, ctx, card);
   if (lost) return lost;
   if (game.seats.some((seat) => seat.deckAttached?.includes(cardId))) return `${name(cardId)}: your next draw is discarded`;
   // A treasure attached as a guarded objective (AttachRandomTreasure) is told like an objective: who guards it, or that it is free of encounters (emce.treasure).

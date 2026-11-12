@@ -4,7 +4,7 @@
 // The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it.
 // The Campaign Setup asks the first player the two Esquire questions (attach Esquire of Rohan, then Esquire of Gondor, each to a hero of any seat): the policy takes the first option, so both are attached. The Resolution asks nothing (each player earns a Wraith on Wings,
 // and an Esquire still on a hero is earned for its controller). The decklists are played with the scenario's golden policy (test/scenarios/the-battle-of-the-pelennor-fields/game.ts: one character quests, the others attack, the players engage and defend Mordor Orc's
-// attacks) with card play on. The Siege's win is the log's: its Fleet's resources are in the notes; the Black Gate's enemies are the Two Towers' (none from their goldens).
+// attacks) with card play on. The Siege's win is the log's: its Fleet's resources are in the notes (what its golden recorded); the Two Towers' goldens record no enemy under The Black Gate, so the log's `blackGate` is empty and no Harad enemy is set aside.
 import type { CampaignLog } from "../../src/campaign/log.ts";
 import type { StoredLoadout } from "../../src/campaign/save.ts";
 import type { PlayerIntent, ReduceContext, ScenarioState } from "../../src/rules/engine/reduce.ts";

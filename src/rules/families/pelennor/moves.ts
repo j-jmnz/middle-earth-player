@@ -27,7 +27,7 @@ export function engageShadowCard(state: ScenarioState, focus: Focus, ctx: Reduce
   const attack = state.pendingAttack;
   if (!id || !card || card.zone !== "shadow" || !attack || printedOf(ctx.cards, card.code).type !== "enemy") return state;
   const free = updateCard(moveCard(state, id, { zone: "staging" }), id, { host: null, face: "up", controller: null });
-  return moveEncounter({ ...free, staging: free.staging.filter((other) => other !== id) }, id, "engaged", attack.seat, ctx, steps);
+  return moveEncounter(free, id, "engaged", attack.seat, ctx, steps);
 }
 
 /** AttachShadowToHero: at the end of an attack that damaged its defending hero (or the hero an undefended attack landed on), the attacker's shadow card with the code attaches to that hero faceup, unless the hero carries a copy. */

@@ -130,9 +130,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       ],
     },
 
-    // 145048 Fire-filled Trench. Forced: when a player plays an event that would cancel the effects of a treachery card just revealed from the encounter deck, that event's effects are canceled instead and the Trench is discarded. The marker CounterCancel is read by
-    // CancelEffect while the Trench is in play (families/pelennor/combat.ts counterCancel); the event is played and paid for and does nothing.
-    { id: "145048:forced:1", cardCode: "145048", lines: ["145048:A:1"], timing: "forced", trigger: "whenRevealedCanceled", instructions: [{ verb: "CounterCancel" }] },
+    // 145048 Fire-filled Trench. Forced: when a player plays an event that would cancel the effects of a treachery card just revealed from the encounter deck, that event's effects are canceled instead and the Trench is discarded. CancelEffect (families/pelennor/combat.ts
+    // counterCancel) cancels the event's own effects while a card whose Forced record hears `counterCanceled` is in play, and announces that event about the Trench; the record discards it. The event is played and paid for and does nothing.
+    { id: "145048:forced:1", cardCode: "145048", lines: ["145048:A:1"], timing: "forced", trigger: "counterCanceled", instructions: [{ verb: "Discard", target: { kind: "self" } }] },
 
     // 145049 Siege Tower. While it is in the staging area it has Archery 3 (the archery of cards in play adds up). Forced: after it becomes the active location the encounter discard pile is shuffled into the deck and cards are discarded until an enemy is
     // discarded; that enemy is added to the staging area (with none left nothing is added).
@@ -312,7 +312,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = [
       instructions: [
         { verb: "Pick", pick: { type: "ally", control: "you" } },
         { verb: "Discard", target: { kind: "picked" }, when: { kind: "canPick", pick: { type: "ally", control: "you" } } },
-        { verb: "RaiseStagingThreat", amount: 1, until: "endOfPhase", live: "alliesInDiscard" },
+        { verb: "RaiseStagingThreat", until: "endOfPhase", live: "alliesInDiscard" },
       ],
     },
     { id: "145060:shadow:1", cardCode: "145060", lines: ["145060:A:3"], timing: "shadow", instructions: [{ verb: "Pick", pick: { type: "attachment", control: "you", nonObjective: true } }, { verb: "DiscardPicked" }] },

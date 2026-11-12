@@ -65,7 +65,7 @@ Read the sections your task touches.
   - 187–208 Play loop (~250)
   - 209–234 Engine (~5.6K)
     - 223–234 Mechanic families (~4.6K) ← 5
-  - 235–240 Effects (~600)
+  - 235–240 Effects (~600) ← 5
   - 241–273 Scenario definition (~800)
   - 274–318 Persistence (~3.0K) ← 1
     - 295–298 Open games across an update (~50)
@@ -77,7 +77,7 @@ Read the sections your task touches.
   - 378–383 Catalog build (~410)
   - 384–401 Tests (~2.0K) ← 5
   - 402–417 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~112.2K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~112.5K tok)
   - 17–39 Sections (~450)
   - 40–51 Product (~590)
   - 52–65 Non-goals (~540)
@@ -112,10 +112,10 @@ Read the sections your task touches.
   - 636–693 Dream-chaser (~15.6K) ← 4
   - 694–720 Ered Mithrin (~15.8K) ← 7
   - 721–857 The Two Towers (~15.5K) ← 21
-  - 858–988 The Return of the King (~13.6K) ← 14
+  - 858–988 The Return of the King (~13.9K) ← 14
     - 885–910 The Passing of the Grey Company (~2.5K) ← 1
     - 911–942 The Siege of Gondor (~4.0K) ← 1
-    - 943–988 The Battle of the Pelennor Fields (~5.3K)
+    - 943–988 The Battle of the Pelennor Fields (~5.6K)
   - 989–997 Nightmare (~410) ← 19
   - 998–1036 Deckbuilding (~1.9K)
   - 1037–1115 Effects (~3.2K)
@@ -128,7 +128,7 @@ Read the sections your task touches.
   - 1156–1181 Persistence and shipping (~2.6K) ← 6
   - 1182–1223 Screens (~4.9K) ← 1
     - 1208–1223 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~45.9K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~46.1K tok)
   - 5–8 Overview (~130) ← 1
   - 9–23 Top bar (~3.0K) ← 4
   - 24–27 Table menu (~490) ← 2
@@ -136,7 +136,7 @@ Read the sections your task touches.
   - 36–39 Canvas (~560)
   - 40–52 Spacing and the play area's rows (~1.9K) ← 9
   - 53–58 Pictures on the table (~320) ← 1
-  - 59–94 Cards (~9.7K) ← 22
+  - 59–94 Cards (~9.9K) ← 22
   - 95–100 The Sailing test (~690) ← 5
   - 101–114 The Island Map (~1.8K) ← 8
   - 115–118 Tokens and effects (~320)
@@ -225,7 +225,7 @@ Read when a task names the plan.
 
 - `docs/plans/effect-authoring.md` — Authoring effect records (~7.5K tok)
   - 12–33 Workflow (~460)
-  - 34–50 Where records live (~400)
+  - 34–50 Where records live (~390)
   - 51–75 Templates and copied lines (~690) ← 5
   - 76–100 The record (~500)
   - 101–117 Which card an instruction acts on (~380)

@@ -1,21 +1,18 @@
 // Rules: mec113.campaign-mode, mec113.setting-up-the-game, mec113.campaign-mode-aragorn, mec113.multiplayer-aragorn, ltp.campaign-setup-checklist, rr.winning-the-game, rr.in-play-and-out-of-play (data/rules/entries.json); ledger lines 145078:A:1, 145078:B:1 and 145078:B:2.
 import { beforeAll, describe, expect, it } from "vitest";
 
-import { expectOk } from "../../../rules/core/test-fixture.ts";
-import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../../../rules/engine/reduce.ts";
+import type { ReduceContext, ScenarioState } from "../../../rules/engine/reduce.ts";
 import { BLACK_GATE_RECORDED, fieldsStart, fieldsWorld } from "../../../../test/scenarios/the-battle-of-the-pelennor-fields/game.ts";
 import { gondorWorld } from "../../../../test/scenarios/the-siege-of-gondor/game.ts";
-import { LAIR_GOLDENS, lairWorld, playGolden as playLair } from "../../../../test/scenarios/shelobs-lair/game.ts";
 import { loadCampaign, loadScenario } from "../../../../scripts/data/load-scenarios.ts";
-import { roadsWonLog } from "../../../../scripts/e2e/shelobs-lair.ts";
-import { wonLog } from "../../../../scripts/e2e/seed-kit.ts";
+import { twoTowersFinishedLog } from "../../../../scripts/e2e/shelobs-lair.ts";
+import { goldenResolved } from "../../../../scripts/e2e/seed-kit.ts";
+import { expectLossWritesNothing, opened as openedAt } from "../../../../test/harness/campaign-kit.ts";
 import { goldenState } from "../../../../test/harness/golden-state.ts";
 
-import { continuedLog } from "../../continue.ts";
 import { applyResolution, emptyLog, poolCard, type CampaignLog } from "../../log.ts";
 import { campaignPath, nextStep } from "../../path.ts";
 import { PLAYABLE_SCENARIOS } from "../../playable.ts";
-import { newSave } from "../../save.ts";
 import { NO_COPY_LIMITS } from "../../wilderland.ts";
 
 const campaign = loadCampaign("the-return-of-the-king");
@@ -36,22 +33,12 @@ let afterSiege: CampaignLog;
 beforeAll(async () => {
   world = await fieldsWorld("strong");
   ctx = world.ctx;
-  const roads = await roadsWonLog();
-  const finished = await wonLog({ title: "Shelob's Lair", golden: "two-handed, won, Normal", goldens: LAIR_GOLDENS, world: lairWorld, play: playLair, scenarioId: "shelobs-lair" }, roads);
-  const afterTwoTowers = continuedLog({ id: "tt", campaignId: "the-two-towers", seatCount: 2, log: { ...finished, campaignPool: [...finished.campaignPool] } });
-  const company = goldenState("the-passing-of-the-grey-company", "two-handed, won, Normal");
-  const afterCompany = applyResolution(afterTwoTowers, company.scenarioId, company, world.cards, NO_COPY_LIMITS);
-  const siege = goldenState("the-siege-of-gondor", "two-handed, won, after the Grey Company, engaging");
-  afterSiege = applyResolution(afterCompany, siege.scenarioId, siege, (await gondorWorld("strong")).cards, NO_COPY_LIMITS);
+  const afterCompany = goldenResolved(await twoTowersFinishedLog(), "the-passing-of-the-grey-company", "two-handed, won, Normal", world.cards);
+  afterSiege = goldenResolved(afterCompany, "the-siege-of-gondor", "two-handed, won, after the Grey Company, engaging", (await gondorWorld("strong")).cards);
 }, 240_000);
 
-// The scenario dealt and its Setup played to the first round: the starting hands kept, every question answered with the first option (the Esquires attached).
-function opened(seats: 1 | 2, log: CampaignLog): ScenarioState {
-  let state = startScenario(fieldsStart(seats, 1, "Normal", undefined, log), ctx);
-  while (state.window?.kind === "mulligan") state = expectOk(reduce(state, { type: "Keep" }, ctx)).state;
-  for (let guard = 0; guard < 40 && state.window?.kind === "choose" && state.phase !== "Planning"; guard += 1) state = expectOk(reduce(state, { type: "Choose", optionId: state.window.options[0] ?? "" }, ctx)).state;
-  return state;
-}
+// The scenario dealt and its Setup played to the first round: the Esquires attached (test/harness/campaign-kit.ts).
+const opened = (seats: 1 | 2, log: CampaignLog): ScenarioState => openedAt(fieldsStart(seats, 1, "Normal", undefined, log), ctx);
 const copies = (state: ScenarioState, code: string) => Object.values(state.cards).filter((card) => card.code === code);
 const zones = (state: ScenarioState, code: string) => copies(state, code).map((card) => card.zone);
 const HARAD_CODES = ["144028", "144029", "144056", "144057", "144058"];
@@ -141,11 +128,8 @@ describe("The Battle of the Pelennor Fields in the the-return-of-the-king campai
     expect(PLAYABLE_SCENARIOS).not.toContain("the-tower-of-cirith-ungol");
   });
 
-  it("a lost game writes nothing: the Resolution is for a win only, so the save keeps the log it began with", () => {
-    const state = goldenState("the-battle-of-the-pelennor-fields", "two-handed, lost, Minas Tirith destroyed");
-    expect(state.lost).toBe(true);
-    expect(state.stageCleared).toBe(false);
-    expect(newSave("rk", "the-return-of-the-king", 2).log.completed).toEqual([]);
+  it("a lost game writes nothing: the Resolution is for a win only, so finishing the lost golden leaves the log as it was", () => {
+    expectLossWritesNothing(afterSiege, "the-battle-of-the-pelennor-fields", "two-handed, lost, Minas Tirith destroyed", world.cards);
   });
 
   it("deals the original card in a standalone game, with no campaign card", () => {
