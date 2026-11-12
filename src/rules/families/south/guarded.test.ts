@@ -84,6 +84,14 @@ describe("FreeRingBearer (146067:B:2)", () => {
     expect([sting.zone, sting.controller, sting.face]).toEqual(["play", 0, "up"]);
   });
 
+  it("does nothing in a game with no card that has a FreeRingBearer record, though the effect list holds one", () => {
+    const { state, ids, ctx } = captured();
+    const away = moveCard(state, ids.chamber!, { zone: "victory" });
+    const without = { ...away, cards: Object.fromEntries(Object.entries(away.cards).filter(([, card]) => card.code !== "stage")) };
+    const next = settle(syncConstants(without, ctx), ctx, []);
+    expect(next.cards[ids.frodo!]?.zone).toBe("captive");
+  });
+
   it("does nothing in a game with no FreeRingBearer record", () => {
     const { state, ids, ctx } = captured();
     const away = moveCard(state, ids.chamber!, { zone: "victory" });
