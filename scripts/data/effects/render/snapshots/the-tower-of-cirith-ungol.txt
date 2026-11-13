@@ -151,10 +151,9 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 
 146023:A:2 (shadow): Shadow: If you are engaged with another enemy, resolve this attack against that enemy.
   146023:shadow:1: Shadow
-    only if there is a enemy (any player controls) engaged with you [also {"attackingEnemy":false}] to choose
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose enemy (any player controls) engaged with you [also {"attackingEnemy":false}]
-    - the attack in progress is resolved against the last picked enemy instead of the defenders: that enemy takes the damage after its Defense
+    - if there is a enemy (any player controls) engaged with you [also {"attackingEnemy":false}] to choose: choose enemy (any player controls) engaged with you [also {"attackingEnemy":false}]
+    - then, if there is a enemy (any player controls) engaged with you [also {"attackingEnemy":false}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the attack in progress is resolved against the last picked enemy instead of the defenders: that enemy takes the damage after its Defense
 
 ## 146058 Orc of Mordor
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -385,4 +384,4 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
   146071:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
     - this card: stat phantom 1, until the end of the attack
 
-(rendered pieces: 263 by template, 16 as JSON)
+(rendered pieces: 264 by template, 17 as JSON)
