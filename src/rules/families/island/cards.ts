@@ -161,7 +161,7 @@ export function placeProgressInStaging(state: ScenarioState, instruction: Verb<"
   if (focus.chosen == null) {
     if (open.length === 0) return state;
     if (!effectData(state)) return { ...state, failure: "Placing progress in the staging area needs a choice, and no effect is asking" };
-    return askTarget(state, { instruction: { ...instruction, left }, seat: state.firstPlayer, chosen: null, cause }, [...open, KEEP]);
+    return askTarget(state, { instruction: { ...instruction, left }, seat: state.firstPlayer, chosen: null, cause }, instruction.required === true ? open : [...open, KEEP]);
   }
   if (focus.chosen === KEEP || !open.includes(focus.chosen)) return state;
   const placed = Math.min(left, progressRoom(state, focus.chosen, ctx.cards));

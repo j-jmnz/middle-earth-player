@@ -88,18 +88,36 @@ const VERBS = [
   z.strictObject({ verb: z.literal("FlipTwoSided"), front: code, back: code, ...when }),
   // Deals each enemy in play (staging area and engaged with a player) one shadow card from the top of the encounter deck, in the order the staging area then the players hold them; with `target`, only that enemy, wherever it is ("deal 1 shadow card to each enemy in play",
   // 10127:A:4, 10134:A:2; "deal 1 shadow card to Werewolf of Angmar", 10131:A:1). The cards stay with the enemies facedown (they resolve when the enemy attacks); an empty deck deals none. Each deal is heard by the enemy (`shadowDealtTo`).
-  // As a Travel line it is a cost: the players cannot travel to the location while the encounter deck holds fewer cards than there are enemies in play (rr.travel, rr.cost).
-  z.strictObject({ verb: z.literal("DealShadowInPlay"), target: cardRefSchema.optional(), ...when }),
+  // As a Travel line it is a cost: the players cannot travel to the location while the encounter deck holds fewer cards than there are enemies in play (rr.travel, rr.cost). With `trait`, only the enemies in play with that Trait count and are dealt one ("Deal 1 shadow card to each Undead enemy in play to travel here",
+  // 101159:A:2: the Reanimated Dead and Daechanar are Undead).
+  z.strictObject({ verb: z.literal("DealShadowInPlay"), target: cardRefSchema.optional(), trait: z.string().min(1).optional(), ...when }),
   // The actor searches their deck for the cards with the same title as the card the effect picked last (`of: picked`: the card DiscardRandomFromHand `remember`ed) or as the other card of the event (`of: other`: the ally the attack destroyed, only when it is an ally), and discards
   // each of them (`all`) or one of them; with `shuffle` the deck is shuffled after ("Each player then searches his deck for each other copy of the card he discarded, and discards those as well. Shuffle each searched deck", 10136:A:1; "search your deck for another copy of that ally and discard it, if able", 10137:A:2).
   // Nothing happens with no such card picked. A copy is a card with the same printed title (rr.unique-cards).
   z.strictObject({ verb: z.literal("DiscardCopiesFromDeck"), of: z.enum(["picked", "other"]), all: z.boolean().optional(), shuffle: z.boolean().optional(), ...when }),
   // The Dread Realm (mec108.reanimated-dead): the cards the source names are placed facedown in front of the player (the actor, or the first player) as if they had just engaged them, and act as Undead enemies (0 engagement cost, 2 Threat, 2 Attack, 2 Defense, 2 hit points, no text) until they leave play,
   // by any exit, for their owner's discard pile. `deckTop`: the top `count` cards of the player's own deck (1 by default, at most the deck holds; "reanimates the top card of his deck", 10150:A:1). `handRandom`: a card of their hand chosen by the game's seed ("a random card from his hand", 101158:A:1).
-  // `discardTop`: the card on top of their discard pile when it is an ally ("each ally he discarded by this effect", 101159:A:1). `card`: the card the effect names (`picked` by default, `subject`, `other`) when it lies in a discard pile ("reanimate that character", 10155:A:1). `destroyed`: the character the attack that left
+  // `discardTop`: the card on top of their discard pile when it is an ally that the effect just discarded from the top of a deck with DiscardFromDeck ("each ally he discarded by this effect", 101159:A:1). `card`: the card the effect names (`picked` by default, `subject`, `other`) when it lies in a discard pile ("reanimate that character", 10155:A:1). `destroyed`: the character the attack that left
   // the effect destroyed ("If this attack destroys a character, reanimate that character", 101161:A:2). `to: staging` adds the card to the staging area instead of engaging the player (101162:A:2). Each card reanimated becomes the effect's last picked card (a failed one leaves none), so a later instruction (DealShadowInPlay
   // `target: picked`, "deal it 1 shadow card") acts on it. Reanimating counts as an enemy engaging the player (rr.engaged): the player's "after an enemy engages you" Responses hear it.
-  z.strictObject({ verb: z.literal("Reanimate"), from: z.enum(["deckTop", "handRandom", "discardTop", "card", "destroyed"]), count: positiveAmountSchema.optional(), card: cardRefSchema.optional(), who: z.enum(["actor", "firstPlayer"]).optional(), to: z.enum(["engaged", "staging"]).optional(), ...when }),
+  verbFlags(z.strictObject({ verb: z.literal("Reanimate"), from: z.enum(["deckTop", "handRandom", "discardTop", "card", "destroyed"]), count: positiveAmountSchema.optional(), card: cardRefSchema.optional(), who: z.enum(["actor", "firstPlayer"]).optional(), to: z.enum(["engaged", "staging"]).optional(), ...when }), { setupRuns: "inForEachPlayer" }),
+  // The "when revealed" effects of the cards with this Trait that the effect names, in the order they lay (The Dread Realm): `heldShadows` the shadow cards dealt to the source, resolved by the defending player after the shadow effects ("if they have the Sorcery trait, resolve
+  // their 'when revealed' effects", 101156:A:1, a Forced on `shadowsResolved`); `looked` the cards the effect discarded from the top of the encounter deck with DiscardEncounterTop, which lie in the discard pile ("Resolve the 'when revealed' effects of each Sorcery card discarded by this effect", 101158:A:2). A card that no
+  // longer lies where it was (it attached itself) is not resolved twice.
+  z.strictObject({ verb: z.literal("ResolveWhenRevealedOf"), of: z.enum(["heldShadows", "looked"]), trait: z.string().min(1), ...when }),
+  // The source, a card that has just left play, is dealt facedown as a shadow card to the card the effect picked last, an enemy in play ("deals Sinister Dungeon to it facedown as a shadow card", 101158:A:1): it goes from the encounter discard pile to that enemy with no tokens, and resolves its Shadow effect when
+  // the enemy attacks. Nothing happens when no enemy is picked.
+  z.strictObject({ verb: z.literal("DealSourceAsShadow"), ...when }),
+  // The source, an enemy that has left play (Wraith of Carn Dûm), attaches to the card the effect picked last and counts as an attachment: it has no enemy text while it lies there, and when its host leaves play it returns to the staging area as an enemy instead of being discarded with it ("attach it to a character in play ... If
+  // the attached character leaves play, return Wraith of Carn Dûm to the staging area as an enemy", 101157:A:1). Discarded by another effect while attached it is simply discarded. Nothing happens with no card picked.
+  z.strictObject({ verb: z.literal("AttachEnemyToPicked"), ...when }),
+  // The ally with the highest printed cost among every player's allies in play (an X cost or no printed cost counts 0) is destroyed; the first player chooses among those that tie. It becomes the effect's last picked card and lies in its owner's discard pile; with no ally in play nothing is picked ("Destroy the highest cost ally
+  // in play", 101162:A:2).
+  z.strictObject({ verb: z.literal("DestroyHighestCostAlly"), ...when }),
+  // The card the answered event names as its other card is discarded when it is still in play: the card an attachment that takes its host with it (the flag `discardsHost`) lay on, heard through `attachmentLeft` ("If Possession is discarded, the attached card is also discarded", 101162:A:2).
+  z.strictObject({ verb: z.literal("DiscardOtherInPlay"), ...when }),
+  // The card the effect picked last leaves the game, out of play for the rest of it: no leaves-play Forced of its own is announced to bring it back, and the Campaign Pool is untouched ("remove a Sorcery card from the game", 10153:A:3; rr.removed-from-game). Nothing happens with no card picked.
+  z.strictObject({ verb: z.literal("RemovePickedFromGame"), ...when }),
 ] as const;
 
 const TRIGGERS = [
@@ -119,6 +137,10 @@ const TRIGGERS = [
   // About an enemy: a shadow card was just dealt to it, wherever it is (the subject is the enemy): "If there are 3 shadow cards dealt to Thaurdir" (10125:B:3), "after a shadow card is dealt to Werewolf of Angmar" (10131:A:2). A record reads the count with the amount `shadowCards`.
   // Queued only in a game whose records name it.
   "shadowDealtTo",
+  // About an enemy that holds shadow cards: its attack's shadow cards have resolved, shadow effects first, and damage has not been dealt yet (the subject is the attacking enemy; rr.step-6-4-2): "When you resolve shadow cards dealt to Witch of Angmar" (101156:A:1). Queued only in a game whose records name it.
+  "shadowsResolved",
+  // About an attachment that holds `discardsHost` and left its host by any exit but removal from the game: the subject is the attachment, the other card its host ("If Possession is discarded, the attached card is also discarded", 101162:A:2). Queued only for a card that holds the flag.
+  "attachmentLeft",
 ] as const;
 
 const FLAGS = [
@@ -178,6 +200,12 @@ const FLAGS = [
   "leavesStagingWhenDefeated",
   // On an enemy that attacks from the staging area (Thaurdir on stage 2B): the shadow cards it holds as its first attack of the combat phase begins are not discarded first, so they resolve with it together with the card dealt for it (10126:B:1; families/south/watcher.ts dealForAttack).
   "resolvesHeldShadows",
+  // On an attachment (the card itself): when it leaves play with its host still in play, it takes the host with it, which is discarded too (Possession on the Reanimated Dead it made, 101162:A:2); removed from the game it takes nothing.
+  "discardsHost",
+  // On a quest stage (the card itself): when the quest advances, each Sorcery card attached to the stage is attached to the next stage instead of being discarded with this one ("all Sorcery cards attached to this stage are attached to stage 2B", 10150:B:2; families/angmar/reanimate/stage.ts, read by quest.ts advanceStage).
+  "passesSorcery",
+  // On a hero (target `host`): during the quest phase its controller may not leave it out of the quest: they cannot pass the commitment while it is able to commit (ready, not barred from questing) and has not ("attached hero must commit to the quest, if able", A Fell Dread, 101163:A:1; rules/engine/legal.ts).
+  "mustCommit",
 ] as const;
 
 export const manifest = { name: "angmar", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

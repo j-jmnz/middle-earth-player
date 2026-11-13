@@ -7,6 +7,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import { printedOf } from "../../core/printed.ts";
 import { flagged, inPlay, type ScenarioState } from "../../core/state.ts";
 import { shadowCards } from "../../core/zones.ts";
+import { hasTrait } from "../../interpret/conditions.ts";
 import { refCard, frameScope } from "../../interpret/amounts.ts";
 import { dealAdditionalShadow, type ReduceContext } from "../../interpret/interpret.ts";
 import type { Focus } from "../index.ts";
@@ -15,15 +16,15 @@ import { flipInPlace } from "../wilderland/gundabad.ts";
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
 /** The enemies in play: the staging area's first, then each player's engaged enemies in seat order. */
-export function enemiesInPlay(state: ScenarioState, ctx: ReduceContext): string[] {
+export function enemiesInPlay(state: ScenarioState, ctx: ReduceContext, trait?: string): string[] {
   const staged = state.staging.filter((id) => state.cards[id] && printedOf(ctx.cards, state.cards[id].code).type === "enemy");
   const engaged = state.seats.flatMap((seat) => seat.engaged).filter((id) => state.cards[id] != null);
-  return [...staged, ...engaged];
+  return [...staged, ...engaged].filter((id) => trait == null || hasTrait(state, id, trait, ctx));
 }
 
 /** DealShadowInPlay: one shadow card for each enemy in play (the staging area's first, then the players'), or for the enemy `target` names wherever it is. A card that is not an enemy in play gets none. */
 export function dealShadowInPlay(state: ScenarioState, instruction: Verb<"DealShadowInPlay">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  const ids = instruction.target ? [refCard(state, instruction.target, frameScope(state, focus.seat, focus.sourceId))] : enemiesInPlay(state, ctx);
+  const ids = instruction.target ? [refCard(state, instruction.target, frameScope(state, focus.seat, focus.sourceId))] : enemiesInPlay(state, ctx, instruction.trait);
   let next = state;
   for (const id of ids) {
     const enemy = id ? next.cards[id] : undefined;
@@ -35,7 +36,7 @@ export function dealShadowInPlay(state: ScenarioState, instruction: Verb<"DealSh
 
 /** Whether the Travel line deals a shadow card to each enemy in play and the encounter deck cannot supply one for every enemy: the cost is paid completely or not at all (rr.cost, rr.travel). */
 export function dealShadowUnpayable(state: ScenarioState, instruction: Instruction, ctx: ReduceContext): boolean {
-  return instruction.verb === "DealShadowInPlay" && instruction.target == null && state.encounterDeck.length < enemiesInPlay(state, ctx).length;
+  return instruction.verb === "DealShadowInPlay" && instruction.target == null && state.encounterDeck.length < enemiesInPlay(state, ctx, instruction.trait).length;
 }
 
 /** The amount `shadowCardsInPlay`: every shadow card dealt to an enemy in play. Null for any other amount. */

@@ -373,6 +373,10 @@ function moveCardTo(state: ScenarioState, id: string, requested: Destination, op
   // A captured card that leaves the zone is no one's but its owner's again (mec108.captured-cards); a card that enters play from out of play with Capture X captures (families/captured/entry.ts).
   if (current.zone === "captured" && dest.zone !== "captured") moved = updateCard(moved, id, { owner: undefined });
   if (moved.capture && !inPlay(current.zone) && inPlay(dest.zone)) moved = captureOnEntry(moved, id, dest);
+  // An enemy lying on a character as an attachment (Wraith of Carn Dûm) is no attachment once it leaves that role (families/angmar/reanimate/attached.ts).
+  if (current.asAttachment === true && dest.zone !== "attached") moved = updateCard(moved, id, { asAttachment: undefined });
+  // An attachment that takes its host with it (Possession, the flag `discardsHost`) leaves any way but the game's own removal: its host's card hears it and is discarded (rr.removed-from-game).
+  if (current.zone === "attached" && current.host != null && dest.zone !== "removed" && dest.zone !== "attached" && flagged(state, id, "discardsHost")) moved = queueEvent(moved, { trigger: "attachmentLeft", seat: null, cardId: id, subject: id, other: current.host });
   // A host that leaves play rescues every card captured underneath it (mec108.captured-cards).
   // A card captured with a hero that is itself put into a captured deck stays with it (the boons set aside with it, mec108.captured-deck).
   if (moved.capture && inPlay(current.zone) && !inPlay(dest.zone) && dest.zone !== "captured") moved = rescueUnder(moved, id, areaHeadOf(state, id));

@@ -8,6 +8,7 @@ import { engagementBarred, noteEngaged } from "../families/quest/engage.ts";
 import { currentQuestHas } from "../families/quest/conditions.ts";
 import { noteHostDefeated, withStagingThreat } from "../families/attachments/hold.ts";
 import { progressFirstLocations } from "../families/attachments/quest.ts";
+import { passSorcery } from "../families/angmar/reanimate/stage.ts";
 import { seatThreat } from "../families/play/hooks.ts";
 import type { EngineStep } from "../core/intents.ts";
 import { modifiedStat, raiseThreat, releaseAttachments } from "../core/keywords.ts";
@@ -316,8 +317,8 @@ export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineSt
     })();
     if (!nextId) return clearStage(next);
     const nextCode = next.cards[nextId]?.code;
-    // The defeated quest card leaves play: the cards attached to it hear it and are discarded (rr.attachment-cards).
-    next = releaseAttachments(noteHostDefeated(next, currentId), currentId, cards, steps);
+    // The defeated quest card leaves play: the cards attached to it hear it and are discarded (rr.attachment-cards), the Sorcery cards of a stage that hands them on excepted (10150:B:2).
+    next = releaseAttachments(noteHostDefeated(passSorcery(next, currentId, nextId, cards), currentId), currentId, cards, steps);
     next = moveCard(next, currentId, { zone: stageToVictory(next, cards, current.code) ? "victory" : rolled?.remove ? "removed" : "setAside" });
     if (rolled || (ordered && next.stages.some((stage) => stage.deck === true))) next = { ...next, stageLeft: { to: nextId, from: currentId } };
     next = moveCard(next, nextId, { zone: "questStage" });

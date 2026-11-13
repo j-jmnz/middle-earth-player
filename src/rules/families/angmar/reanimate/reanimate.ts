@@ -45,10 +45,11 @@ function sourcesOf(state: ScenarioState, instruction: Verb<"Reanimate">, seat: n
     // A card of the hand chosen by the game's seed (Sinister Dungeon).
     case "handRandom":
       return own.hand.length === 0 ? [] : [own.hand[nextUint(state.seed, state.seedCursor) % own.hand.length] ?? ""].filter((id) => id !== "");
-    // The card on top of the discard pile, when it is an ally (Tombs of Carn Dûm).
+    // The card on top of the discard pile, when it is an ally the running effect discarded from the top of a deck (DiscardFromDeck; Tombs of Carn Dûm).
     case "discardTop": {
       const top = own.discard.at(-1);
-      return top && printedOf(ctx.cards, state.cards[top]?.code ?? "").type === "ally" ? [top] : [];
+      const discarded = topFrame(state)?.data;
+      return top && discarded?.kind === "effect" && (discarded.discardedFromDecks ?? []).includes(top) && printedOf(ctx.cards, state.cards[top]?.code ?? "").type === "ally" ? [top] : [];
     }
     // A card the effect names: it must lie in a discard pile (a character already reanimated by an earlier effect is not reanimated twice).
     case "card": {

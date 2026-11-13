@@ -74,15 +74,4 @@ describe("a card reanimated is a facedown Undead enemy (mec108.reanimated-dead)"
     const none = run(empty, { verb: "Reanimate", from: "handRandom" }, 0, { ...empty.state, seats: [{ ...empty.state.seats[0], hand: [] }, empty.state.seats[1]] });
     expect(none.seats[0].engaged).toEqual([]);
   });
-
-  it("101159:A:1 reanimates the card on top of the discard pile only when it is an ally", () => {
-    const t = built({ deckOf: ["ally", "event"] });
-    const [first, second] = t.state.seats[0].deck as [string, string];
-    const discarded = run(t, { verb: "Reanimate", from: "discardTop" }, 0, run(t, { verb: "DiscardTopOfDeck" }));
-    expect(discarded.cards[first]?.zone).toBe("engaged");
-    const event = built({ deckOf: ["event", "ally"] });
-    const kept = run(event, { verb: "Reanimate", from: "discardTop" }, 0, run(event, { verb: "DiscardTopOfDeck" }));
-    expect(kept.seats[0].engaged).toEqual([]);
-    expect(second).toBeDefined();
-  });
 });

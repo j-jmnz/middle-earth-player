@@ -11,6 +11,7 @@ import { queueEvent } from "../windows/queue.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { flagged, heldAmount, modifierActive, updateCard, withThreat } from "./state.ts";
 import { claimedDestination } from "../families/objectives/claimed.ts";
+import { returnAsEnemy, returnsAsEnemy } from "../families/angmar/reanimate/attached.ts";
 import { inPlay, moveCard, releaseGrappled, type Destination } from "./zones.ts";
 import { damageGoesTo, defenseFromWillpower } from "../families/defense/damage.ts";
 import { attackingHolds } from "../families/attack/strike.ts";
@@ -362,6 +363,11 @@ export function releaseAttachments(
     // A Guarded attachment the card guarded goes to its player instead (families/attachments/hold.ts).
     if (isGuarded(next, attachmentId)) {
       next = releaseGuarded(next, attachmentId);
+      continue;
+    }
+    // An enemy that was lying on the host as an attachment returns to the staging area as an enemy (families/angmar/reanimate/attached.ts).
+    if (returnsAsEnemy(attachment)) {
+      next = returnAsEnemy(next, attachmentId);
       continue;
     }
     const printed = printedOf(cards, attachment.code);

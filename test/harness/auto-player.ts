@@ -121,6 +121,8 @@ export function nextIntent(
         const ids = legalTargets(state, { type: "Commit" }, ctx).filter((id) => !scoutIds.has(id));
         if (ids.length > 0) return { type: "Commit", cardIds: ids };
       }
+      // A hero that must commit to the quest leaves no Pass open until it has (101163:A:1, the flag `mustCommit`): commit what the engine lists.
+      if (state.mode === "questCommit" && !has(intents, "Pass") && has(intents, "Commit")) return { type: "Commit", cardIds: legalTargets(state, { type: "Commit" }, ctx) };
       return { type: "Pass" };
     }
     case "fortitudeCommit":

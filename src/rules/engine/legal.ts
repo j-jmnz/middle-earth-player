@@ -133,6 +133,7 @@ export function rejectionReason(state: ScenarioState, intent: PlayerIntent, ctx:
       if (state.window?.kind !== "mulligan") return "Mulligan is closed";
       return state.mulliganSeats.includes(state.activeSeat) ? "A second mulligan is not allowed" : null;
     case "Pass":
+      if (mustCommitLeft(state, state.activeSeat, ctx).length > 0) return "A hero must commit to the quest, if able";
       return state.window?.kind === "pass" ||
         state.window?.kind === "frameAction" ||
         state.window?.kind === "cancelOffer" ||
@@ -186,8 +187,14 @@ function mandatory(state: ScenarioState): boolean {
   return kind === "choose" || kind === "cancelOffer" || kind === "defense";
 }
 
+// The heroes that must commit to the quest and have not, while the seat is still able to: "attached hero must commit to the quest, if able" (101163:A:1, the flag `mustCommit`).
+function mustCommitLeft(state: ScenarioState, seat: number, ctx: ReduceContext): string[] {
+  if (state.mode !== "questCommit" || state.window?.kind !== "pass" || state.modifiers.length === 0 || askingToCommit(state)) return [];
+  return committers(state, seat, ctx).filter((id) => flagged(state, id, "mustCommit"));
+}
+
 function passIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {
-  const intents: LegalIntent[] = [{ type: "Pass" }];
+  const intents: LegalIntent[] = mustCommitLeft(state, state.activeSeat, ctx).length > 0 ? [] : [{ type: "Pass" }];
   // Events are Actions and may be played in any action window; allies and attachments in the planning phase.
   // The top card of the deck too, when a hero lets the seat play it (Gandalf).
   const top = state.seats[state.activeSeat]?.deck[0];

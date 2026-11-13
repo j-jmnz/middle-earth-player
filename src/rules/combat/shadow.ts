@@ -27,6 +27,7 @@ import { holdAttack } from "../families/defense/listen.ts";
 import { startShadowAttack } from "../families/defense/shadow-attack.ts";
 import { announceShadowRaise, noteShadowStart } from "../families/defense/shadow.ts";
 import { announceShadowResolved } from "../families/dungeon/shadow.ts";
+import { announceShadowsResolved } from "../families/angmar/reanimate/shadows.ts";
 import { announceShadowWizardry } from "../families/wizardry/shadow.ts";
 import { announceDestroyed, charactersDestroyed, destroyedByAttack } from "../families/burden/attack.ts";
 import { printedOf } from "../core/printed.ts";
@@ -203,8 +204,8 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
   // 6.4.2: the shadow effects are resolved; an action window comes before combat damage. "When a shadow card increases an
   // enemy's Attack" is answered before it too.
   if (next.pendingAttack && !next.pendingAttack.shadowsDone) {
-    next = announceShadowRaise(announceShadowWizardry(announceShadowResolved({ ...next, pendingAttack: { ...next.pendingAttack, shadowsDone: true } }, ctx), ctx), ctx);
-    const between = enemyAttackWindow(next, ctx, "damage") ?? holdAttack(next, ctx, "damage", ["shadowRaisedAttack", "shadowEffectResolved", "shadowWizardry"]);
+    next = announceShadowRaise(announceShadowWizardry(announceShadowsResolved(announceShadowResolved({ ...next, pendingAttack: { ...next.pendingAttack, shadowsDone: true } }, ctx), ctx), ctx), ctx);
+    const between = enemyAttackWindow(next, ctx, "damage") ?? holdAttack(next, ctx, "damage", ["shadowRaisedAttack", "shadowEffectResolved", "shadowsResolved", "shadowWizardry"]);
     if (between) return between;
   }
   const attack = next.pendingAttack;

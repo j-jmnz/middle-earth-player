@@ -29,6 +29,8 @@ import { chooseCurrentQuest, currentQuestHolds, hitPointsLeftHolds, questCardsAm
 import { advanceWhenFlagged, removeSideQuestsFromGame } from "./stage.ts";
 import { removeTimeCounters, timeOnReveal } from "./time.ts";
 import { attachNewTo, tradeDamageForResources } from "./trade.ts";
+import { attachEnemyToPicked, destroyHighestCostAlly, discardOtherInPlay, removePickedFromGame } from "./reanimate/attached.ts";
+import { dealSourceAsShadow, resolveWhenRevealedOf } from "./reanimate/shadows.ts";
 import { reanimate } from "./reanimate/reanimate.ts";
 import { allInPlayPool, reanimatedPickMatches } from "./reanimate/pick.ts";
 
@@ -97,6 +99,18 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return discardCopiesFromDeck(state, instruction, focus, ctx, steps);
     case "Reanimate":
       return reanimate(state, instruction, focus, ctx, steps);
+    case "ResolveWhenRevealedOf":
+      return resolveWhenRevealedOf(state, instruction, focus, ctx, steps);
+    case "DealSourceAsShadow":
+      return dealSourceAsShadow(state, focus);
+    case "AttachEnemyToPicked":
+      return attachEnemyToPicked(state, focus, ctx);
+    case "DestroyHighestCostAlly":
+      return destroyHighestCostAlly(state, instruction, focus, ctx, steps);
+    case "DiscardOtherInPlay":
+      return discardOtherInPlay(state, focus, ctx, steps);
+    case "RemovePickedFromGame":
+      return removePickedFromGame(state);
     default:
       return null;
   }
@@ -104,7 +118,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "angmar",
-  verbs: ["Time", "RemoveTimeCounters", "HoldUnder", "DiscardHeld", "PlaceHandUnderSelf", "ChooseCurrentQuest", "AttachNewTo", "TradeDamageForResources", "FirstTraitSurge", "EndPhase", "PlaceLoggedDamageOn", "ChooseBoon", "AttachRandomBurden", "MoveToHero", "AttachSelfToNamed", "FlipTimeObjective", "RecordStartingThreat", "Safe", "StageRandomGuardedPair", "RevealCard", "ReleaseGuards", "RevealSetAsideForTokens", "EarnEncounterCopies", "RemoveSideQuestsFromGame", "FlipWhenDefeated", "RemoveProgressAmong", "FlipTwoSided", "DealShadowInPlay", "DiscardCopiesFromDeck", "Reanimate"],
+  verbs: ["Time", "RemoveTimeCounters", "HoldUnder", "DiscardHeld", "PlaceHandUnderSelf", "ChooseCurrentQuest", "AttachNewTo", "TradeDamageForResources", "FirstTraitSurge", "EndPhase", "PlaceLoggedDamageOn", "ChooseBoon", "AttachRandomBurden", "MoveToHero", "AttachSelfToNamed", "FlipTimeObjective", "RecordStartingThreat", "Safe", "StageRandomGuardedPair", "RevealCard", "ReleaseGuards", "RevealSetAsideForTokens", "EarnEncounterCopies", "RemoveSideQuestsFromGame", "FlipWhenDefeated", "RemoveProgressAmong", "FlipTwoSided", "DealShadowInPlay", "DiscardCopiesFromDeck", "Reanimate", "ResolveWhenRevealedOf", "DealSourceAsShadow", "AttachEnemyToPicked", "DestroyHighestCostAlly", "DiscardOtherInPlay", "RemovePickedFromGame"],
   run,
   revealed: (state, id, ctx) => noteFirstTrait(timeOnReveal(state, id, ctx), id, ctx),
   travel: { unpayable: travelUnpayable },
