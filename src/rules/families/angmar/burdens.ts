@@ -97,7 +97,7 @@ export function attachSelfToNamed(state: ScenarioState, instruction: Verb<"Attac
   const stageCode = state.questStage ? state.cards[state.questStage]?.code : state.stages[0]?.code;
   const comingInPlay = stageCode != null && effectsOf(ctx, stageCode).some((record) => record.timing === "setup" && record.instructions.some((step) => step.verb === "PutSetAsideInPlay" && step.name === instruction.name));
   // The scenario's own Setup sets the card aside (Thaurdir, 10098: the data's set-aside pile, run after the deal): `outOfPlay` finds it there once that Setup is done.
-  const comingAside = instruction.outOfPlay === true && state.setup.some((step) => step.verb === "SetAside" && printedOf(ctx.cards, step.code).name === instruction.name);
+  const comingAside = instruction.outOfPlay === true && (state.phase === "Setup" || state.phase === "Mulligan") && state.setup.some((step) => step.verb === "SetAside" && printedOf(ctx.cards, step.code).name === instruction.name);
   const coming = comingInPlay || comingAside;
   if (coming && !waiting) return { ...state, pendingAttach: [...(state.pendingAttach ?? []), id] };
   return moveCard(rest, id, { zone: "removed" });

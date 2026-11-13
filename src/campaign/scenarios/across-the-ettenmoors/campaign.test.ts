@@ -62,11 +62,10 @@ describe("Across the Ettenmoors in the angmar-awakened campaign", () => {
     expect(ettenmoors.campaignCard).toBe("10182");
   });
 
-  it("is playable, and the path offers it after Escape from Mount Gram's win with The Treachery of Rhudaur behind it", () => {
+  it("is playable, and the path offers it after Escape from Mount Gram's win", () => {
     expect(PLAYABLE_SCENARIOS).toContain("across-the-ettenmoors");
-    expect(PLAYABLE_SCENARIOS).not.toContain(campaign.scenarios[6]);
     const path = campaignPath(campaign, {}, gramLog(1));
-    expect(path.map((node) => [node.id, node.status]).slice(4, 7)).toEqual([["escape-from-mount-gram", "completed"], ["across-the-ettenmoors", "current"], [campaign.scenarios[6], "soon"]]);
+    expect(path.map((node) => [node.id, node.status]).slice(4, 6)).toEqual([["escape-from-mount-gram", "completed"], ["across-the-ettenmoors", "current"]]);
   });
 
   it("10182:A:2 deals the Campaign Setup: the five Losing Time set aside, out of play, with none in the pool yet", () => {

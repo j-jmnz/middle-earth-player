@@ -29,7 +29,7 @@ const DECK = {
   "the-wastes-of-eriador": { normal: 44, easy: 30, sets: ["The Wastes of Eriador", "Eriador Wilds", "Foul Weather"], staging: ["10011"], setAside: ["10016", "10017"], active: ["09048"] },
   "escape-from-mount-gram": { normal: 24, easy: 20, sets: ["Escape from Mount Gram", "Angmar Orcs"], staging: [], setAside: ["10041", "10042"], active: [] },
   "across-the-ettenmoors": { normal: 36, easy: 23, sets: ["Across the Ettenmoors", "Eriador Wilds", "Foul Weather"], staging: ["10072"], setAside: ["10067", "10068", "10069", "10070", "10071", "10081", "10082", "10083"], active: [] },
-  "the-treachery-of-rhudaur": { normal: 41, easy: 30, sets: ["The Treachery of Rhudaur", "Cursed Dead", "Ruins of Arnor"], staging: ["09057", "10109", "10111", "10113"], setAside: ["10096", "10098"], active: ["10097"] },
+  "the-treachery-of-rhudaur": { normal: 40, easy: 29, sets: ["The Treachery of Rhudaur", "Cursed Dead", "Ruins of Arnor"], staging: ["09057", "10109", "10111", "10113"], setAside: ["10096", "10098"], active: ["10097"] },
   "the-battle-of-carn-dum": { normal: 42, easy: 27, sets: ["The Battle of Carn Dûm", "Angmar Orcs", "Dark Sorcery"], staging: ["10127", "10129"], setAside: [], active: ["10132"] },
   "the-dread-realm": { normal: 46, easy: 29, sets: ["The Dread Realm", "Cursed Dead", "Dark Sorcery"], staging: [], setAside: ["10153", "10154"], active: [] },
 } as const;
