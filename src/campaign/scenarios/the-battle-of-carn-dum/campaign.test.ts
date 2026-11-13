@@ -1,4 +1,4 @@
-// Rules: mec108.campaign-setup-the-battle-of-carn-dum, mec108.campaign-mode, mec108.campaign-log, mec108.thaurdir, rr.campaign-pool, rr.campaign-setup-checklist, rr.campaign-mode (data/rules/entries.json); ledger 10125:A:1, 10188:A:2, 10188:B:1, 10168:A:1, 10167:A:1, 10172:A:1, 10173:A:1, 10160:A:3.
+// Rules: mec108.campaign-setup-the-battle-of-carn-dum, mec108.campaign-mode, mec108.campaign-log, mec108.thaurdir, rr.campaign-pool, rr.campaign-setup-checklist, rr.campaign-mode (data/rules/entries.json); ledger 10125:A:1, 10188:A:2, 10188:B:1, 10168:A:1.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { expectOk } from "../../../rules/core/test-fixture.ts";
@@ -87,7 +87,7 @@ describe("The Battle of Carn Dûm in the angmar-awakened campaign", () => {
     }
   });
 
-  it("deals the pool Rhudaur's won golden left to this part: Arnor Ravaged staged, Fend Off Despair and the Losing Time copies shuffled in, a Determination for each player, the burden on the staged Thaurdir", () => {
+  it("10168:A:1 deals the pool Rhudaur's won golden left to this part: Arnor Ravaged staged, Fend Off Despair and the Losing Time copies shuffled in, a Determination for each player, the burden on the staged Thaurdir", () => {
     for (const seats of [1, 2] as const) {
       const log = rhudaurLog(seats);
       expect(log.completed, `${seats} seats`).toContain("the-treachery-of-rhudaur");

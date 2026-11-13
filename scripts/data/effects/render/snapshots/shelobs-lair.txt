@@ -108,7 +108,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
     only if this card is in the victory display
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each enemy (any player controls) or in the staging area, named "Shelob": stat attack 2, while this card is in play
-    - each enemy (any player controls) or in the staging area, named "Shelob": stat losesKeywords (it loses its keywords, Indestructible among them) 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Shelob": stat losesKeywords (it loses its Indestructible keyword) 1, while this card is in play
     - each enemy (any player controls) or in the staging area, named "Shelob": stat engagedWithFirst 1, while this card is in play
 
 144045:A:3 (front): Travel: Place 1 resource on Shelob to travel here.

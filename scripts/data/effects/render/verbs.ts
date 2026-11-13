@@ -76,7 +76,7 @@ const STAT_NOTE: Readonly<Record<string, string>> = {
   questProgressReduced: " (the progress placed on the current quest is reduced by this amount, after the active location took its share; several holders add)",
   engagedWithAll: " (it stays in the staging area but is considered engaged with each player: it attacks each of them in turn in the combat phase, dealt a shadow card for each attack, and none engages it)",
   attackableByAny: " (any character may be declared as an attacker against it)",
-  losesKeywords: " (it loses its keywords, Indestructible among them)",
+  losesKeywords: " (it loses its Indestructible keyword)",
   engagedThreat: " (while engaged it still adds its Threat to the total Threat in the staging area)",
 };
 const CHOOSE_CARDS_WHO: Readonly<Record<string, string>> = { eachSeat: "each player in turn", firstPlayer: "the first player", onePlayer: "each player in turn (the offer ends once one has taken it)" };
