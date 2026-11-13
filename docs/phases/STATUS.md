@@ -108,8 +108,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 82 | The Wastes of Eriador | completed | 2026-11-12. Review round done. Open: `eriador-won`. |
 | 83 | Escape from Mount Gram | completed | 2026-11-13. Review round done. Open: `gram-won`. |
 | 84 | Across the Ettenmoors | completed | 2026-11-13. Review round done. Open: `ettenmoors-won`. |
-| 85 | The Treachery of Rhudaur | active | 2026-11-13. `docs/plans/angmar-awakened.md`. |
-| 86 | The Battle of Carn Dûm | not started |  |
+| 85 | The Treachery of Rhudaur | completed | 2026-11-13. Review round done. Open: `rhudaur-won`. |
+| 86 | The Battle of Carn Dûm | active | 2026-11-13. `docs/plans/angmar-awakened.md`. |
 | 87 | The Dread Realm | not started |  |
 
 ## Open items
@@ -120,6 +120,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - The release notes' golden-check comparison (`scripts/release/reach.ts`) has not run against a real previous tag; the first tag after it compares by `ENGINE_CHANGES` only.
 
 ### Fixtures and Maestro
+- `rhudaur-won` is not committed: no seed wins The Treachery of Rhudaur with the saved decklists under the golden policy. Until it exists `.maestro/scenarios/the-treachery-of-rhudaur/the-treachery-of-rhudaur.yaml` cannot run.
 - `ettenmoors-won` is not committed: no seed in 100 wins Across the Ettenmoors with the saved decklists. Until it exists `.maestro/scenarios/across-the-ettenmoors/across-the-ettenmoors.yaml` cannot run.
 - `gram-won` is not committed: no seed in 100 wins Escape from Mount Gram with the saved decklists. Until it exists `.maestro/scenarios/escape-from-mount-gram/escape-from-mount-gram.yaml` cannot run.
 - `eriador-won` is not committed: no seed in 700 wins The Wastes of Eriador with the saved decklists. Until it exists `.maestro/scenarios/the-wastes-of-eriador/the-wastes-of-eriador.yaml` cannot run.
@@ -260,7 +261,19 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - Across the Ettenmoors: Losing Time's shadow (10183:A:3): the defending player chooses +3 Attack or +3 Defense (agent recommendation; a play-through agrees). Not user-confirmed.
 - Across the Ettenmoors: the Losing Time clock (10182:A:3) fully reveals a copy (community play-throughs), and with no copy left the resources stay (agent recommendation). Not user-confirmed.
 - Renderer gaps, Across the Ettenmoors (behaviour proven by tests): the travel Forced and Responses of the four safe locations name no destination (10068 to 10071); `excessToEachQuest`, `damagedCannotFace` and `progressPlacedHere` show as flags (10074, 10076, 10081); the safe-location choice's zones (10075:A:2); who chooses for Barren Moorland (10078:A:1); "1 copy per player" in 10064:A:1's pile header.
-- Angmar Awakened campaign-card lines left to their scenarios' Build: 10184:B:1 (The Treachery of Rhudaur), whose Resolution also runs `RecordDetermined` (code 10172), as 10171:B:1, 10174:B:3, 10182:B:1 and 10188:B:1 do, or a Determination attached there is never marked. The boons' own lines (10185 to 10187, 10189 to 10192) go with the scenario that first deals each.
+- The Treachery of Rhudaur: declining the side-quest choice on stage 1 leaves no current quest (10094:B:3; agent recommendation). Not user-confirmed.
+- The Treachery of Rhudaur: after the last side quest flips, the current quest is the main quest 2B (10094:B:4; agent recommendation). Not user-confirmed.
+- The Treachery of Rhudaur: 10094:B:2 removes the side quests still unflipped from the game (community source only). Not user-confirmed.
+- The Treachery of Rhudaur: a discard that runs the encounter deck out resets it and carries on (10097, 10107; agent recommendation by analogy with faq.last-encounter-card). Not user-confirmed.
+- The Treachery of Rhudaur: Forbidden Descent (10101:A:1) takes all progress placed on a quest, card effects included, and each copy takes its own first 2 (text from a community source; scope and stacking agent recommendation). Not user-confirmed.
+- The Treachery of Rhudaur: Ghostly Ruins' Travel (10103:A:2) is a cost unpayable with no Undead enemy in the encounter discard pile (community source only). Not user-confirmed.
+- The Treachery of Rhudaur: Dark Covenant (10107:A:2) raises threat by the destroyed character's Willpower just before it was destroyed (agent recommendation). Not user-confirmed.
+- The Treachery of Rhudaur: Quiet the Spirits (10109:A:1): an Undead entering play by any route engages the highest-threat player (community source); ties go to the first player (agent recommendation). Not user-confirmed.
+- The Treachery of Rhudaur: Decipher Ancient Texts' 3 uses per round (10113:A:2) are shared by all players (community source only). Not user-confirmed.
+- The Treachery of Rhudaur: each Clue's boon (10184:B:1) goes into its controller's deck as well as the pool (agent recommendation). Not user-confirmed.
+- Renderer gaps, The Treachery of Rhudaur (behaviour proven by tests): unclaimed side quests counted by 10094:B:4, Ghostly Ruins' unpayable Travel (10103:A:2), the main quest barred from Centuries of Sorrow's choice and Haunting Fog with no current quest (10105:A:2, 10108:A:1), Amarthiúl as an ally and the shared limit (10113), the boon into the deck (10184:B:1), "Restricted." on 10185 to 10187.
+- `modifiedStat` (`src/rules/core/keywords.ts`) reads traits with no effect list, so a trait an effect grants is not seen by stat conditions such as `defendingAgainst` (the condition path sees it).
+- Angmar Awakened: the boons' own lines 10189 to 10192 go with The Battle of Carn Dûm, which first deals them.
 - Intruders in Chetwood: quest cards in play are the main quest, the staged encounter side quests and the player side quests, at least 1 (09016, 09019, 09047, 09048, 09050). Not user-confirmed.
 - Intruders in Chetwood: Iârion's Response (09016:A:3) hears a side quest revealed by a search of the encounter deck, not of the discard pile. Not user-confirmed.
 - Intruders in Chetwood: Iârion held facedown under Rescue Iârion (09024:A:2) stays in play and has not left it. Not user-confirmed.

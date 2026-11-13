@@ -225,17 +225,17 @@ Read the sections your task touches.
 
 STATUS.md, then the active phase file.
 
-- `docs/phases/STATUS.md` — Phase status (~13.6K tok)
+- `docs/phases/STATUS.md` — Phase status (~14.2K tok)
   - 5–15 Rules (~420)
-  - 16–114 Phases (~2.0K)
-  - 115–324 Open items (~10.4K)
+  - 16–114 Phases (~2.1K)
+  - 115–337 Open items (~11.0K)
     - 117–121 Releases (~150)
-    - 122–160 Fixtures and Maestro (~2.2K)
-    - 161–197 Rules and engine (~1.5K)
-    - 198–279 Rules and engine (Angmar Awakened) (~3.7K)
-    - 280–304 Screens and code (~1.6K)
-    - 305–324 Rules and engine (The Two Towers) (~1.4K)
-  - 325–345 Standing decisions (~700)
+    - 122–161 Fixtures and Maestro (~2.2K)
+    - 162–198 Rules and engine (~1.5K)
+    - 199–292 Rules and engine (Angmar Awakened) (~4.2K)
+    - 293–317 Screens and code (~1.6K)
+    - 318–337 Rules and engine (The Two Towers) (~1.4K)
+  - 338–358 Standing decisions (~700)
 
 ## Live plans
 
