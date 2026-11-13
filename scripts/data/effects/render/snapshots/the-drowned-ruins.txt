@@ -101,7 +101,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
 12093:A:1 (front): When Revealed: Make the set aside Shrine to Morgoth the active location, Grotto side faceup. Captain Sahír flips to his enemy side (removing all tokens) and makes an immediate attack against the first player. Remove Captain Sahír from the game. Each player searches the encounter deck and discard pile for an Undead enemy and adds it to the staging area. Shuffle the encounter deck.
   12093:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json MakeSetAsideActive {"verb":"MakeSetAsideActive","code":"12094"}]
+    - the set-aside card with code 12094 becomes the active location (not traveling: no Travel effect, nothing hears "traveled"); a location already active returns to the staging area, unless a second active location slot is free
     - [json FlipEliteAndAttack {"verb":"FlipEliteAndAttack","name":"Captain Sahír"}]
     - when the attack in progress ends:
       - [json RemoveNamedFromGame {"verb":"RemoveNamedFromGame","name":"Captain Sahír"}]
@@ -362,4 +362,4 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if the active location is a Underwater location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
 
-(rendered pieces: 193 by template, 51 as JSON)
+(rendered pieces: 194 by template, 50 as JSON)

@@ -287,9 +287,9 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
     - attach this card to a hero
   141055:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetStat {"verb":"SetStat","stat":"willpower","value":0,"target":"host"}]
-    - [json SetStat {"verb":"SetStat","stat":"attack","value":0,"target":"host"}]
-    - [json SetStat {"verb":"SetStat","stat":"defense","value":0,"target":"host"}]
+    - the card this one is attached to: stat willpower is set to 0, overriding every other modifier of it
+    - the card this one is attached to: stat attack is set to 0, overriding every other modifier of it
+    - the card this one is attached to: stat defense is set to 0, overriding every other modifier of it
     - this card counts as a Condition attachment while it is attached
 
 ## 141068 The Witch-king
@@ -573,4 +573,4 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
   906209:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
 
-(rendered pieces: 237 by template, 39 as JSON)
+(rendered pieces: 240 by template, 36 as JSON)

@@ -168,7 +168,7 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
   12067:constant:2: Constant
     - this card: stat progressToStaging 1, while this card is in play
   12067:triggered:1: Triggered (mandatory, not printed as Forced) on the event progressReplaced
-    - [json PlaceProgressInStaging {"verb":"PlaceProgressInStaging"}]
+    - the first player chooses a location in the staging area that can take progress and it takes all it can of the progress left, again and again, until none is left or no location can take any more, or they keep the rest on the stage
 
 ## 12068 The Grotto's Entrance
 (the scenario deals it into the islandMap pile; the piles place it, no record does)
@@ -460,4 +460,4 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
     - then, if the active location is a Ruins location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): for each hero (any player controls) with resources on it:
       - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"picked"}]
 
-(rendered pieces: 247 by template, 65 as JSON)
+(rendered pieces: 248 by template, 64 as JSON)

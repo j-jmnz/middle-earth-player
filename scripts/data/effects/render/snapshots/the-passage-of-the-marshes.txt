@@ -24,7 +24,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 
 144016:A:2 (front): Forced: After Groping Dead destroys a character, place 1 mire token on the active location.
   144016:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
-    only if the event's other card is a enemy (any player controls) [also {"isSource":true}]
+    only if the event's other card is a enemy (any player controls) that is this card itself
     - place 1 mire token(s) (resources) on the active location; a location whose mire tokens then reach its Mire X is discarded by the Mire keyword
 
 144016:A:3 (shadow): Shadow: If this attack destroys a character, place 1 mire token on the active location.
@@ -42,7 +42,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 
 144017:A:2 (front): Forced: After Dead Things destroys a character, the defending player must raise his threat by 3.
   144017:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
-    only if the event's other card is a enemy (any player controls) [also {"isSource":true}]
+    only if the event's other card is a enemy (any player controls) that is this card itself
     - raise threat by 3 (the defending player (the player this enemy is engaged with))
 
 144017:A:3 (shadow): Shadow: Raise your threat by 1 for each Undead enemy engaged with you.
@@ -59,7 +59,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 
 144018:A:2 (front): Forced: After Candle-bearer destroys a character, it cannot take damage until the end of the round.
   144018:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
-    only if the event's other card is a enemy (any player controls) [also {"isSource":true}]
+    only if the event's other card is a enemy (any player controls) that is this card itself
     - this card: stat cannotTakeDamage 1, until the end of the round
 
 144018:A:3 (shadow): Shadow: Until the end of the round, attacking enemy cannot take damage.
@@ -363,4 +363,4 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
   144076:triggered:1: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
     - the players lose the game (Sméagol was destroyed)
 
-(rendered pieces: 231 by template, 11 as JSON)
+(rendered pieces: 234 by template, 8 as JSON)

@@ -72,6 +72,10 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["maxHitPointsLeft"], typeof pick.maxHitPointsLeft === "number" ? `with ${pick.maxHitPointsLeft} or fewer hit points remaining` : null);
   note(["determined"], pick.determined === true ? "that the Campaign Log marks determined" : null);
   note(["safe"], pick.safe === true ? "with the safe keyword" : null);
+  note(["isSource"], pick.isSource === true ? "that is this card itself" : null);
+  note(["reanimated"], pick.reanimated === true ? "that is a Reanimated Dead" : null);
+  note(["allInPlay"], pick.allInPlay === true ? "in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not" : null);
+  note(["copyOfDefender"], pick.copyOfDefender === true ? "with the title of the defending character" : null);
   note(["minDamage"], typeof pick.minDamage === "number" ? `with at least ${pick.minDamage} damage on it` : null);
   note(["aboveThreat"], pick.aboveThreat === true ? "with an engagement cost higher than the chooser's threat" : null);
   note(["other"], pick.other === true ? "other than this card" : null);

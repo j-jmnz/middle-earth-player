@@ -1,0 +1,248 @@
+Scenario piles that place cards with no record (quest: 10150 The Catacombs of Carn Dûm; quest: 10151 Angmar Awakened; quest: 10152 Daechanar's Fall; setAside: 10153 Daechanar; setAside: 10154 Altar of Midwinter)
+
+## 101156 Witch of Angmar
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+101156:A:1 (front): Forced: When you resolve shadow cards dealt to Witch of Angmar, if they have the Sorcery trait, resolve their "when revealed" effects. (Resolve any shadow effects first.)
+  101156:forced:1: Forced on the event shadowsResolved (heard about this card)
+    - the "when revealed" effects of each Sorcery shadow card dealt to this enemy resolve, in the order dealt, the defending player revealing them (after the shadow effects)
+
+## 101157 Wraith of Carn Dûm
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+101157:A:1 (front): Forced: When Wraith of Carn Dûm leaves play, attach it to a character in play. (Counts as a Sorcery attachment with the text: "Attached character has -1 Willpower, -1 Attack, and -1 Defense. If the attached character leaves play, return Wraith of Carn Dûm to the staging area as an enemy.")
+  101157:forced:1: Forced on the event exitedPlay (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose character (any player controls) chosen by the first player
+    - this enemy, out of play, attaches to the picked card as an attachment: it has no enemy text there and returns to the staging area as an enemy when that card leaves play
+  101157:constant:1: Constant
+    - this card counts as a Sorcery attachment while it is attached
+  101157:constant:2: Constant
+    only if this card is attached to a card
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - its host: stat willpower -1, while this card is in play
+    - its host: stat attack -1, while this card is in play
+    - its host: stat defense -1, while this card is in play
+
+## 101158 Sinister Dungeon
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+101158:A:1 (front): Forced: When Sinister Dungeon is explored, the first player reanimates a random card from his hand and deals Sinister Dungeon to it facedown as a shadow card.
+  101158:forced:1: Forced on the event locationExplored (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the first player reanimates a random card of their hand (chosen with the game's seed): each is placed facedown in front of them as if it had just engaged them (their engaged Responses hear it) and acts as an Undead enemy (0 engagement cost, 2 Threat, 2 Attack, 2 Defense, 2 hit points, no text) until it leaves play for its owner's discard pile; each is the picked card afterward
+    - this card, out of play, is dealt facedown as a shadow card to the card the effect picked last, an enemy in play (with no progress or damage on it; nothing when no enemy is picked)
+
+101158:A:2 (shadow): Shadow: Discard the top 2 cards of the encounter deck. Resolve the "when revealed" effects of each Sorcery card discarded by this effect.
+  101158:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard 2 card(s) from the top of the encounter deck
+    - the "when revealed" effects of each Sorcery card this effect discarded from the top of the encounter deck resolve, in the order discarded, the acting player revealing them
+
+## 101159 Tombs of Carn Dûm
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+101159:A:1 (front): Forced: At the end of the round, discard the top card of each player's deck. Each player must reanimate each ally he discarded by this effect.
+  101159:forced:1: Forced at the end of the round
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the top 1 card(s) of the acting player's deck go to their discard pile
+    - for each player, first player first:
+      - the acting player reanimates the card on top of their discard pile, if it is an ally that this effect just discarded from the top of a deck: each is placed facedown in front of them as if it had just engaged them (their engaged Responses hear it) and acts as an Undead enemy (0 engagement cost, 2 Threat, 2 Attack, 2 Defense, 2 hit points, no text) until it leaves play for its owner's discard pile; each is the picked card afterward
+
+101159:A:2 (front): Travel: Deal 1 shadow card to each Undead enemy in play to travel here.
+  101159:travel:1: Travel
+    - each Undead enemy in play (in the staging area or engaged) is dealt 1 shadow card from the encounter deck (in a Travel line this is a cost: the players cannot travel unless the encounter deck holds a card for each of them)
+
+## 101160 Dark Halls
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+101160:A:1 (front): While Dark Halls is in the staging area, each Reanimated Dead gets +1 Attack and +1 Defense.
+  101160:constant:1: Constant
+    only if this card is in the staging area
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each enemy (any player controls) or in the staging area, that is a Reanimated Dead: stat attack 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, that is a Reanimated Dead: stat defense 1, while this card is in play
+
+101160:A:2 (shadow): Shadow: If there is a copy of the defending character in your discard pile, reanimate it and deal it 1 shadow card.
+  101160:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose card (you control) in the discard pile, with the title of the defending character
+    - then, if there is a card (you control) in the discard pile, with the title of the defending character to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player reanimates the picked card, if it lies in a discard pile: each is placed facedown in front of them as if it had just engaged them (their engaged Responses hear it) and acts as an Undead enemy (0 engagement cost, 2 Threat, 2 Attack, 2 Defense, 2 hit points, no text) until it leaves play for its owner's discard pile; each is the picked card afterward
+    - the picked card is dealt 1 shadow card from the encounter deck, wherever it is
+
+## 101161 Unholy Crypt
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+101161:A:1 (front): Unholy Crypt gets +1 Threat for each Reanimated Dead in play.
+  101161:constant:1: Constant
+    - this card: stat threat the number of enemy (any player controls) or in the staging area, that is a Reanimated Dead, while this card is in play
+
+101161:A:2 (shadow): Shadow: If this attack destroys a character, reanimate that character and deal it 1 shadow card.
+  101161:shadow:1: Shadow
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the acting player reanimates the character the attack in progress destroyed, if it lies in a discard pile: each is placed facedown in front of them as if it had just engaged them (their engaged Responses hear it) and acts as an Undead enemy (0 engagement cost, 2 Threat, 2 Attack, 2 Defense, 2 hit points, no text) until it leaves play for its owner's discard pile; each is the picked card afterward
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is dealt 1 shadow card from the encounter deck, wherever it is
+
+## 101162 Possession
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+101162:A:1: Doomed 1.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+101162:A:2 (front): When Revealed: Destroy the highest cost ally in play. That ally's controller reanimates that character, adds it to the staging area, and attaches Possession to it. (Counts as a Condition attachment with the text: "If Possession is discarded, the attached card is also discarded.")
+  101162:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the ally with the highest printed cost among every player's allies in play (no printed cost or X counts 0; the first player chooses among ties) is destroyed, and is the picked card in its owner's discard pile
+    - the acting player reanimates the picked card, if it lies in a discard pile: each is placed facedown in the staging area and acts as an Undead enemy (0 engagement cost, 2 Threat, 2 Attack, 2 Defense, 2 hit points, no text) until it leaves play for its owner's discard pile; each is the picked card afterward
+    - this card attaches to the picked card (nowhere if that card carries one of its title already)
+  101162:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card counts as a Sorcery attachment while it is attached
+    - this card: stat discardsHost (when it leaves play with its host still in play, the host is discarded too; not when it is removed from the game) 1, while this card is in play
+  101162:triggered:1: Triggered (mandatory, not printed as Forced) on the event attachmentLeft (heard about this card)
+    - the other card of the event (the card this one was attached to) is discarded if it is still in play
+
+## 101163 A Fell Dread
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+101163:A:1 (front): When Revealed: The player with the highest threat must attach A Fell Dread to a hero he controls without A Fell Dread attached. (Counts as a Condition attachment with the text: "Attached hero's Willpower is reduced to 0. During the quest phase, attached hero must commit to the quest, if able.")
+  101163:whenRevealed:1: When revealed
+    - attach this card to a hero
+  101163:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the card this one is attached to: stat willpower is set to 0, overriding every other modifier of it
+    - its host: stat mustCommit (in the quest phase its controller cannot pass the commitment while it is able to commit and has not) 1, while this card is in play
+    - this card counts as a Condition attachment while it is attached
+
+## 101164 Death and Calamity
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+101164:A:1 (front): When Revealed: Attach Death and Calamity to the current quest. Then, the first player reanimates the top X cards of his deck, where X is the number of copies of Death and Calamity in play.
+  101164:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card is attached to the current quest card (the side quest that is the current quest, else the main quest card) and leaves with it
+    - the first player reanimates the top X card(s) of their deck, X being the number of card (any player controls) named "Death and Calamity", in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not: each is placed facedown in front of them as if it had just engaged them (their engaged Responses hear it) and acts as an Undead enemy (0 engagement cost, 2 Threat, 2 Attack, 2 Defense, 2 hit points, no text) until it leaves play for its owner's discard pile; each is the picked card afterward
+
+101164:A:2 (shadow): Shadow: Attacking enemy gets +X Attack, where X is the number of Sorcery cards in play.
+  101164:shadow:1: Shadow
+    - the attacking enemy: stat attack the number of Sorcery card (any player controls) in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not, until the end of the attack
+
+## 10150 The Catacombs of Carn Dûm
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+10150:A:1 (front): Setup: Set Daechanar and Altar of Midwinter aside, out of play. Each player reveals an encounter card from the top of the encounter deck. Each player reanimates the top card of his deck.
+  10150:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - the acting player reveals an encounter card
+    - for each player, first player first:
+      - the acting player reanimates the top card of their deck: each is placed facedown in front of them as if it had just engaged them (their engaged Responses hear it) and acts as an Undead enemy (0 engagement cost, 2 Threat, 2 Attack, 2 Defense, 2 hit points, no text) until it leaves play for its owner's discard pile; each is the picked card afterward
+
+10150:B:1 (back): Reanimated Dead are Undead enemies with 2 Threat, 2 Attack, 2 Defense and 2 hit points.
+  (inert: the engine applies it by rule, no record)
+
+10150:B:2 (back): When the players advance to stage 2, all Sorcery cards attached to this stage are attached to stage 2B.
+  10150:constant:1: Constant
+    - this card: stat passesSorcery (when the quest advances each Sorcery card attached to this stage is attached to the next stage instead of being discarded) 1, while this card is in play
+
+## 10151 Angmar Awakened
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+10151:A:1 (front): When Revealed: Add Daechanar to the staging area. Make Altar of Midwinter the active location, returning any previously active location to the staging area. Each player reanimates the top card of his deck.
+  10151:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - one set-aside card with code 10153 joins the staging area (it is not revealed)
+    - the set-aside card with code 10154 becomes the active location (not traveling: no Travel effect, nothing hears "traveled"); a location already active returns to the staging area, unless a second active location slot is free
+    - for each player, first player first:
+      - the acting player reanimates the top card of their deck: each is placed facedown in front of them as if it had just engaged them (their engaged Responses hear it) and acts as an Undead enemy (0 engagement cost, 2 Threat, 2 Attack, 2 Defense, 2 hit points, no text) until it leaves play for its owner's discard pile; each is the picked card afterward
+
+10151:B:1 (back): Reanimated Dead are Undead enemies with 2 Threat, 2 Attack, 2 Defense and 2 hit points.
+  (inert: the engine applies it by rule, no record)
+
+10151:B:2 (back): When Daechanar is defeated, advance to the next stage.
+  10151:forced:1: Forced after an enemy is destroyed (heard about enemy (any player controls) named "Daechanar")
+    - advance to the next quest stage
+
+## 10152 Daechanar's Fall
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+10152:A:1 (front): When Revealed: If there are less than X locations in the staging area, search the encounter deck and discard pile and add locations to the staging area until there are X locations in staging area. X is the number of players in the game.
+  10152:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - repeat 2 times:
+      - if the number of location (any player controls) in the staging area only is less than the number of players: the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+10152:B:1 (back): Reanimated Dead are Undead enemies with 2 Threat, 2 Attack, 2 Defense and 2 hit points.
+  (inert: the engine applies it by rule, no record)
+
+10152:B:2 (back): Progress that would be placed on this quest is instead placed on locations in the staging area, divided as you choose.
+  10152:constant:1: Constant
+    - this card: stat progressToStaging 1, while this card is in play
+  10152:forced:1: Forced on the event progressReplaced
+    - the first player chooses a location in the staging area that can take progress and it takes all it can of the progress left, again and again, until none is left or no location can take any more (they may not keep the rest on the stage)
+
+10152:B:3 (back): Forced: At the end of the quest phase, if there are any locations in play, deal 1 damage to all characters in play. If there are no locations in play, the players have escaped Carn Dûm, and win the game.
+  10152:forced:2: Forced at the end of the phase
+    only if all of: (it is the Quest phase) and (the number of location (any player controls) is at least 1)
+    - deal 1 damage to each character (any player controls)
+  10152:forced:3: Forced at the end of the phase
+    only if all of: (it is the Quest phase) and (the number of location (any player controls) is at most 0)
+    - the players win the game
+
+## 10153 Daechanar
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+10153:A:1 (front): Cannot have attachments.
+  10153:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+10153:A:2 (front): Daechanar gets +1 Attack for each Sorcery card in play, and gains indestructible while at least 1 Sorcery card is in play.
+  10153:constant:2: Constant
+    - this card: stat attack the number of Sorcery card (any player controls) in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not, while this card is in play
+  10153:constant:3: Constant
+    only if the number of Sorcery card (any player controls) in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not is at least 1
+    - this card: stat indestructible 1, while this card is in play
+
+10153:A:3 (front): Forced: When Daechanar is damaged, if there is at least 1 Sorcery card in play, cancel all damage just dealt and remove a Sorcery card from the game.
+  10153:forced:1: Forced after a card takes damage (heard about this card)
+    only if the number of Sorcery card (any player controls) in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not is at least 1
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - cancel all of the damage just dealt
+    - choose Sorcery card (any player controls) chosen by the first player, in play, attachments on any card (quest cards, enemies, characters) and the staging area and active location included, shadow cards not
+    - the picked card is removed from the game (neither discarded nor lost from the Campaign Pool)
+
+## 10154 Altar of Midwinter
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+10154:A:1 (front): While Daechanar is in play, progress cannot be placed on Altar of Midwinter.
+  10154:constant:1: Constant
+    only if the number of enemy (any player controls) or in the staging area, named "Daechanar" is at least 1
+    - this card: stat noProgressPlaced 1, while this card is in play
+
+10154:A:2 (front): Forced: At the end of the staging step, the first player must either reveal 1 additional card from the encounter deck, or reanimate the top card of his deck.
+  10154:forced:1: Forced on the event stagingStepEnds
+    - the first player chooses one of:
+      * option "reveal":
+        - the acting player reveals an encounter card
+      * option "reanimate" (only if there is a card (you control) in the deck, among the top 1 to choose):
+        - the acting player reanimates the top card of their deck: each is placed facedown in front of them as if it had just engaged them (their engaged Responses hear it) and acts as an Undead enemy (0 engagement cost, 2 Threat, 2 Attack, 2 Defense, 2 hit points, no text) until it leaves play for its owner's discard pile; each is the picked card afterward
+
+## 10155 Dwimmerlaik
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10155:A:1 (front): Forced: After Dwimmerlaik attacks and destroys a character, the defending player reanimates that character and deals it 1 shadow card.
+  10155:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
+    only if the event's other card is a enemy (any player controls) that is this card itself
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player reanimates the card the event is about, if it lies in a discard pile: each is placed facedown in front of them as if it had just engaged them (their engaged Responses hear it) and acts as an Undead enemy (0 engagement cost, 2 Threat, 2 Attack, 2 Defense, 2 hit points, no text) until it leaves play for its owner's discard pile; each is the picked card afterward
+    - the picked card is dealt 1 shadow card from the encounter deck, wherever it is
+
+10155:A:2 (shadow): Shadow: If this attack destroys a character, reanimate that character and deal it 1 shadow card.
+  10155:shadow:1: Shadow
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): the acting player reanimates the character the attack in progress destroyed, if it lies in a discard pile: each is placed facedown in front of them as if it had just engaged them (their engaged Responses hear it) and acts as an Undead enemy (0 engagement cost, 2 Threat, 2 Attack, 2 Defense, 2 hit points, no text) until it leaves play for its owner's discard pile; each is the picked card afterward
+      - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is dealt 1 shadow card from the encounter deck, wherever it is
+
+(rendered pieces: 154 by template, 0 as JSON)

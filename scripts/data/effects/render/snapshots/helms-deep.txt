@@ -59,7 +59,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 
 143035:A:3 (front): Forced: After Warrior of Dunland attacks and destroys a character, place 3 progress on the active location.
   143035:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
-    only if the event's other card is a enemy (any player controls) [also {"isSource":true}]
+    only if the event's other card is a enemy (any player controls) that is this card itself
     - place 3 progress on the active location
 
 ## 143036 Soldier of Isengard
@@ -70,7 +70,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 
 143036:A:2 (front): Forced: After Soldier of Isengard attacks and destroys a character, place 1 progress on the current quest.
   143036:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
-    only if the event's other card is a enemy (any player controls) [also {"isSource":true}]
+    only if the event's other card is a enemy (any player controls) that is this card itself
     - [json ProgressQuest {"verb":"ProgressQuest","amount":1}]
 
 143036:A:3 (shadow): Shadow: Exhaust a character you control.
@@ -254,7 +254,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
     (steps run in order; a step depends on an earlier one only through its own condition)
     - one set-aside card with code 143033 joins the staging area (it is not revealed)
     - every set-aside card with code 143036 joins the staging area (it is not revealed)
-    - [json MakeSetAsideActive {"verb":"MakeSetAsideActive","code":"143038"}]
+    - the set-aside card with code 143038 becomes the active location (not traveling: no Travel effect, nothing hears "traveled"); a location already active returns to the staging area, unless a second active location slot is free
     - shuffle the encounter deck
     - for each player, first player first:
       - the acting player reveals an encounter card
@@ -333,4 +333,4 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
     only if [json condition {"kind":"enemyInPlay","is":false}]
     - the players win the game
 
-(rendered pieces: 167 by template, 23 as JSON)
+(rendered pieces: 170 by template, 20 as JSON)

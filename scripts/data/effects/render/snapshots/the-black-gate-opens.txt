@@ -132,7 +132,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 
 146033:A:2 (front): Forced: After Gorgoroth Hill-troll attacks and destroys a character, the defending player discards a random card from his hand and raises his threat by that card's printed cost.
   146033:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
-    only if the event's other card is a enemy (any player controls) [also {"isSource":true}]
+    only if the event's other card is a enemy (any player controls) that is this card itself
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player discards 1 random card(s) from hand (the last card discarded becomes the picked card)
     - raise threat by printed cost of the picked card (the acting player)
@@ -336,4 +336,4 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
   146073:constant:2: Constant
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 206 by template, 26 as JSON)
+(rendered pieces: 207 by template, 25 as JSON)

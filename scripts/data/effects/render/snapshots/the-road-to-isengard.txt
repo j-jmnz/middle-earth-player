@@ -80,7 +80,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 
 143050:A:1 (front): Forced: After Lieutenant of Orthanc attacks and destroys a character, that character's controller discards 1 random card from his hand.
   143050:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
-    only if the event's other card is a enemy (any player controls) [also {"isSource":true}]
+    only if the event's other card is a enemy (any player controls) that is this card itself
     - the acting player discards 1 random card(s) from hand
 
 ## 143051 Isengard Orc
@@ -325,7 +325,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
 143079:A:1 (front): When Revealed: Make Gates of Isengard the active location. Add Saruman and Orthanc to the staging area.
   143079:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json MakeSetAsideActive {"verb":"MakeSetAsideActive","code":"143054"}]
+    - the set-aside card with code 143054 becomes the active location (not traveling: no Travel effect, nothing hears "traveled"); a location already active returns to the staging area, unless a second active location slot is free
     - one set-aside card with code 143047 joins the staging area (it is not revealed)
     - one set-aside card with code 143053 joins the staging area (it is not revealed)
 
@@ -378,4 +378,4 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
     - the table: stat eliminatedAtEmptyHand 1, while this card is in play
     - the table: stat trackQuestProgress 1, while this card is in play
 
-(rendered pieces: 236 by template, 18 as JSON)
+(rendered pieces: 238 by template, 16 as JSON)
