@@ -3,6 +3,7 @@
 // from a layout: Thaurdir's two sides, the shadow cards dealt outside an attack, Orc Grunts, Mountains of Angmar and the copies of a card a deck holds.
 import { describe, expect, it } from "vitest";
 
+import type { Effect } from "../../../catalog/boundary.ts";
 import { flagged, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import { moveCard, shadowCards } from "../../../rules/core/zones.ts";
 import type { EngineStep } from "../../../rules/core/intents.ts";
@@ -14,6 +15,7 @@ import { placeQuestProgress, questStatOf } from "../../../rules/quest/quest.ts";
 import { setCurrentQuest } from "../../../rules/families/angmar/quest.ts";
 import { ruleCause } from "../../../rules/core/cause.ts";
 import { discardShadows } from "../../../rules/combat/shadow.ts";
+import { pushCardEffects } from "../../../rules/interpret/effect-frames.ts";
 import { restricted } from "../../../rules/interpret/restrictions.ts";
 import { fightEnemy, finish, idOf, legalIntents, send, start, tableFromLayout, type Layout, type Run } from "../../../../test/harness/scene-kit.ts";
 import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
@@ -161,6 +163,18 @@ describe("Orc Grunts (questProgressReduced)", () => {
     const active = stepped.cards[idOf(stepped, "10133")];
     expect(active?.progress).toBe(5);
     expect(stepped.cards[stepped.questStage ?? ""]?.progress).toBe(0);
+  });
+
+  it("10130:A:2 does not reduce progress a player effect puts on the main quest card while a side quest is the current quest, and does while it is the current quest", () => {
+    const t = built({ stage: "10125", staging: [GRUNTS, "10139"] });
+    const effect: Effect = { id: "t:forced:1", cardCode: "f0", lines: [], timing: "forced", instructions: [{ verb: "Pick", pick: { type: "card", control: "any", questCard: true, names: ["The Clutches of Carn Dûm"] } }, { verb: "PlaceProgressOnQuestCard", amount: 4 }] };
+    const run = (state: ScenarioState): number => {
+      const pushed = pushCardEffects(state, "forced", idOf(state, GRUNTS), 0, false, [effect], t.ctx, []);
+      const done = settled(pushed, t);
+      return done.cards[done.questStage ?? ""]?.progress ?? -1;
+    };
+    expect(run(t.state)).toBe(3);
+    expect(run(setCurrentQuest(t.state, idOf(t.state, "10139"), t.ctx))).toBe(4);
   });
 });
 

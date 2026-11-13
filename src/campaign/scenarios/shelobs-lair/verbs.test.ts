@@ -294,7 +294,7 @@ describe("an Action that needs a Weapon, a cap on the quest's progress and a sta
     const made = table({ stage: "144071" });
     const stage = idOf(made.state, "144071");
     expect(questRoom(made.state)).toBe(4);
-    const placed = putOnStage(made.state, stage, 3, 16, made.ctx.cards, [], () => true, ruleCause("rr.step-3-4"), true);
+    const placed = putOnStage(made.state, stage, 3, 16, made.ctx.cards, [], () => true, ruleCause("rr.step-3-4"), { counted: true });
     expect(placed.cards[stage]?.progress).toBe(3);
     expect(questRoom(placed)).toBe(1);
     expect(placed.modifiers.find((modifier) => modifier.stat === "questProgressPlaced")?.until).toBe("endOfRound");

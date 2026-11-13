@@ -99,6 +99,6 @@ export function addStageProgress(state: ScenarioState, instruction: Verb<"AddSta
   if (!stageId || !quest || amount <= 0 || state.stageCleared) return state;
   const canAdvance = (current: ScenarioState): boolean => restricted(current, ctx, "advance").length === 0;
   const before = steps.length;
-  const next = putOnStage(state, stageId, amount, questPointsOf(state, quest, ctx.cards), ctx.cards, steps, canAdvance, currentCause(steps, UNATTRIBUTED), false);
+  const next = putOnStage(state, stageId, amount, questPointsOf(state, quest, ctx.cards), ctx.cards, steps, canAdvance, currentCause(steps, UNATTRIBUTED), { counted: false });
   return afterProgress(next, before, ctx, steps);
 }

@@ -1,7 +1,7 @@
 // Rules: rr.step-6-2, rr.step-6-4-2, rr.step-6-4-3, rr.shadow-effects, rr.cancel, rr.attacks-outside-the-combat-phase,
 // faq.enemy-attacks-outside-combat, faq.additional-attacks, ltp.shadow-discard (data/rules/entries.json).
 import { undefendedToCity } from "../families/pelennor/combat.ts";
-import { verbsRunningInFrame, type Effect, type Instruction } from "../../catalog/boundary.ts";
+import { verbsRunningInFrame, type Effect } from "../../catalog/boundary.ts";
 
 import { pushEffectFrame } from "../interpret/effect-frames.ts";
 import { holdsNow } from "../interpret/verbs.ts";
@@ -99,6 +99,15 @@ export function discardShadowOf(state: ScenarioState, enemyId: string): Scenario
   let next = state;
   for (const id of shadowCards(state.cards[enemyId])) {
     if (next.cards[id]) next = moveCard(next, id, { zone: "encounterDiscard" });
+  }
+  return next;
+}
+
+// The shadow cards an enemy holds that an earlier attack already turned up: discarded before it is dealt another, so they are not resolved a second time (stage 1B and 2B of The Battle of Carn Dûm).
+export function discardResolvedShadowOf(state: ScenarioState, enemyId: string): ScenarioState {
+  let next = state;
+  for (const id of shadowCards(state.cards[enemyId])) {
+    if (next.cards[id]?.face === "up") next = moveCard(next, id, { zone: "encounterDiscard" });
   }
   return next;
 }
@@ -302,6 +311,8 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   if (after.length === 0) return ended;
   // The attack's own state decides where it was made from: an enemy that attacked from the staging area without being flagged is `fromStaging`.
   if (!attackHere(state, attack.enemyId)) return waiting.length > 0 ? (startShadowAttack(ended, attack.seat, waiting, ctx, steps) ?? ended) : ended;
+  // Only the effect that searches the deck for another copy of a destroyed ally (DiscardCopiesFromDeck of "other", 10137:A:2) reads the ally the attack destroyed.
+  const destroyedAlly = after.some((one) => one.verb === "DiscardCopiesFromDeck" && one.of === "other") ? destroyedAllyOf(state, attack, ctx) : undefined;
   return pushEffectFrame(
     ended,
     {
@@ -317,7 +328,8 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
       ...(sendsExcess ? { excess: attack.defense?.excess ?? 0 } : {}),
       ...(destroyed > 0 ? { x: destroyed } : {}),
       // `other`: the defending character, or the hero an undefended attack landed on ("the hero damaged by this attack", 900209:A:2).
-      ...(afterOther(state, attack, after, ctx) ? { other: afterOther(state, attack, after, ctx) } : {}),
+      ...(afterTarget(attack) ? { other: afterTarget(attack) } : {}),
+      ...(destroyedAlly ? { destroyedAlly } : {}),
       ...(attack.defense?.landed ? { dealt: attack.defense.landed } : {}),
       ...(attack.afterCause ? { cause: attack.afterCause } : {}),
     },
@@ -325,9 +337,8 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   );
 }
 
-// The card `other` names for the effect an attack leaves: the character it was made against, or, for an effect that searches the deck for another copy of a destroyed ally (DiscardCopiesFromDeck, 10137:A:2), the ally the attack destroyed (the first of them).
-function afterOther(state: ScenarioState, attack: PendingAttack, after: readonly Instruction[], ctx: ReduceContext): string | undefined {
-  if (!after.some((one) => one.verb === "DiscardCopiesFromDeck" && one.of === "other")) return afterTarget(attack);
+// The first ally the attack destroyed (the first of them when several).
+function destroyedAllyOf(state: ScenarioState, attack: PendingAttack, ctx: ReduceContext): string | undefined {
   return destroyedByAttack(state, attack, ctx).find((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "ally");
 }
 

@@ -47,7 +47,7 @@ const ROWS: readonly Row[] = [
   { line: "10137:A:2", name: "Shadow: +1 Attack", layout: {}, act: attack("f3", { shadow: AFFLICTION, undefended: true }), expect: damageOn("dh1", 2) },
 
   { line: "10138:A:1", name: "When Revealed: flip Thaurdir; Champion side faceup he becomes Captain and this card gains surge", layout: { stage: STAGE1, staging: [CHAMPION, DAECHANAR], deck: DECK }, act: reveal(DAECHANAR), expect: [zone(CAPTAIN, "staging"), zone("f0", "staging")] },
-  { line: "10138:A:1", name: "When Revealed: Captain side faceup Thaurdir becomes Champion and this card gains no surge", layout: { stage: STAGE2, staging: [CAPTAIN], deck: DECK }, act: reveal(DAECHANAR), expect: [zone(CHAMPION, "staging"), deckCount(DECK.length - 2)] },
+  { line: "10138:A:1", name: "When Revealed: Captain side faceup Thaurdir becomes Champion and this card gains no surge", layout: { stage: STAGE2, staging: [CAPTAIN], deck: DECK }, act: reveal(DAECHANAR), expect: [zone(CHAMPION, "staging"), deckCount(DECK.length - 1)] },
   { line: "10138:A:2", name: "Shadow: Thaurdir flips after this attack", layout: { stage: STAGE2, staging: [CAPTAIN] }, act: attack("f3", { shadow: DAECHANAR, undefended: true }), expect: zone(CHAMPION, "staging") },
 
 ];

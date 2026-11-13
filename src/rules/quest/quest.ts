@@ -244,7 +244,7 @@ export function placeQuestProgress(
       // The explored location's Forced effect may cancel this progress (Orthanc): the stage takes what it needs and advances once those effects have resolved (families/wizardry/progress.ts).
       const waits = overflowWaits(next, steps, started, cards);
       const points = questPointsOf(next, stage, cards);
-      next = putOnStage(next, stageId, waits && points != null ? Math.min(remaining, Math.max(0, points - stage.progress)) : remaining, points, cards, steps, waits ? () => false : canAdvance, ruleCause("rr.step-3-4"), true);
+      next = putOnStage(next, stageId, waits && points != null ? Math.min(remaining, Math.max(0, points - stage.progress)) : remaining, points, cards, steps, waits ? () => false : canAdvance, ruleCause("rr.step-3-4"), { counted: true });
     }
   }
   return next;
@@ -256,13 +256,16 @@ export function placeOnMainQuest(state: ScenarioState, amount: number, cards: Ca
   const stageId = state.questStage;
   const stage = stageId ? state.cards[stageId] : undefined;
   if (!stageId || !stage || state.stageCleared || currentSideQuest(state) == null) return placeQuestProgress(state, amount, cards, steps, canAdvance);
-  return putOnStage(state, stageId, amount, questPointsOf(state, stage, cards), cards, steps, canAdvance, ruleCause("mec108.side-quests-in-play"), false, false);
+  return putOnStage(state, stageId, amount, questPointsOf(state, stage, cards), cards, steps, canAdvance, ruleCause("mec108.side-quests-in-play"), { counted: false, reduced: false });
 }
+
+export type PutOnStageOptions = { readonly counted: boolean; readonly reduced?: boolean };
 
 // Progress put on the current quest card: a quest that can advance takes what it needs, the rest does not carry over to the next stage (rr.quest-advancement); one that cannot advance
 // has no upper limit (faq.progress-without-advancing); a full one advances. `counted`: the progress counts toward what a card in play limits this round (families/caves/progress.ts).
 // `reduced`: Orc Grunts reduce it, as progress placed on the current quest (false for progress placed on the main quest card while a side quest is the current quest).
-export function putOnStage(from: ScenarioState, stageId: string, wanted: number, points: number | null, cards: Cards, steps: EngineStep[], canAdvance: Gate, cause: Cause, counted: boolean, reduced = true): ScenarioState {
+export function putOnStage(from: ScenarioState, stageId: string, wanted: number, points: number | null, cards: Cards, steps: EngineStep[], canAdvance: Gate, cause: Cause, options: PutOnStageOptions): ScenarioState {
+  const { counted, reduced = true } = options;
   // Progress that would be placed on a quest card first fills the sponges in the staging area (Forbidden Descent, 10101:A:1).
   const { state, remaining: absorbed } = absorbProgress(from, wanted, cards, steps);
   // Each Orc Grunts in play reduces the progress placed on the current quest by 1 (10130:A:2).

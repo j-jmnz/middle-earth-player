@@ -16,7 +16,7 @@ import { modifiedStat, placeDamage } from "../../core/keywords.ts";
 import { lastPicked, seatsFor } from "../../interpret/player-verbs.ts";
 import type { PendingAttack, ScenarioState } from "../../core/state.ts";
 import { flagged } from "../../core/state.ts";
-import { discardShadowOf } from "../../combat/shadow.ts";
+import { discardResolvedShadowOf, discardShadowOf } from "../../combat/shadow.ts";
 import { patchTop } from "../../windows/windows.ts";
 import type { Focus } from "../index.ts";
 import { effectData } from "../encounter/moves.ts";
@@ -66,10 +66,10 @@ export function stagingAttackers(state: ScenarioState, seat: number): string[] {
 // An enemy that is not engaged is dealt a shadow card of its own when it attacks; one dealt for an earlier attack is discarded first.
 export function dealForAttack(state: ScenarioState, enemyId: string, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
   if (state.cards[enemyId]?.zone === "engaged") return state;
-  // Stage 1B of The Battle of Carn Dûm keeps the shadow cards dealt (10125:B:2): the enemy is dealt one more, and all of them resolve.
-  if (state.modifiers.length > 0 && flagged(state, "table", "keepShadowCards")) return dealAdditionalShadow(state, enemyId, steps, ctx);
-  // Thaurdir on stage 2B: the shadow cards he holds as his first attack of the combat phase begins resolve with it and go after it; each later attack is dealt and discards a card of its own (10126:B:1, rr.step-6-4-2).
-  if (state.modifiers.length > 0 && flagged(state, enemyId, "resolvesHeldShadows") && !state.resolvedAttacks.some((key) => key.startsWith(`${enemyId}@`))) return dealAdditionalShadow(state, enemyId, steps, ctx);
+  // Stage 1B of The Battle of Carn Dûm keeps the shadow cards dealt (10125:B:2): the enemy is dealt one more and all the facedown ones resolve; one an earlier attack turned up is discarded first, not resolved again.
+  if (state.modifiers.length > 0 && flagged(state, "table", "keepShadowCards")) return dealAdditionalShadow(discardResolvedShadowOf(state, enemyId), enemyId, steps, ctx);
+  // Thaurdir on stage 2B: the shadow cards he holds as his first attack begins resolve with it and go after it; each later attack is dealt and discards a card of its own (10126:B:1, rr.step-6-4-2).
+  if (state.modifiers.length > 0 && flagged(state, enemyId, "resolvesHeldShadows") && !state.resolvedAttacks.some((key) => key.startsWith(`${enemyId}@`))) return dealAdditionalShadow(discardResolvedShadowOf(state, enemyId), enemyId, steps, ctx);
   return dealOneShadow(discardShadowOf(state, enemyId), enemyId, steps, ctx);
 }
 
@@ -102,7 +102,9 @@ export function attackNowFromStaging(state: ScenarioState, id: string, seat: num
   const data = effectData(state);
   const counted = data ? patchTop(state, { data: { ...data, returned: data.returned + 1 } }) : state;
   // "Deal and resolve 2 shadow cards for this attack" (143048:A:1): the first as any attack from the staging area, the others additional ones.
-  let dealt = shadow ? dealForAttack(counted, id, steps, ctx) : counted;
+  // Thaurdir on stage 2B is considered engaged with each player: beginEnemyAttack deals the one card that attack is dealt, so it is not dealt here too.
+  const dealtBelow = flagged(state, id, "resolvesHeldShadows") && engagedWithAll(state, id);
+  let dealt = shadow && !dealtBelow ? dealForAttack(counted, id, steps, ctx) : counted;
   for (let more = 1; shadow && more < (shadows ?? 1); more += 1) dealt = dealAdditionalShadow(dealt, id, steps, ctx);
   const begun = beginEnemyAttack(dealt, seat, id, ctx, steps, { fromStaging: enemy?.zone === "staging", shadow });
   // `raiseIfDestroys`: the effect the attack leaves for its end, with X the characters it destroyed (146039:A:2).

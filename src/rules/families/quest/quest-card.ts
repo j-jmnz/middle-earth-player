@@ -13,6 +13,7 @@ import type { ReduceContext } from "../../interpret/interpret.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
 import { restricted } from "../../interpret/restrictions.ts";
 import { putOnStage, questPointsOf } from "../../quest/quest.ts";
+import { currentSideQuest } from "../wilderland/night-quest.ts";
 import { afterProgress } from "../../quest/stage-reveal.ts";
 import { stageOf, stagingOf } from "../breaking/areas.ts";
 import { rescueRandom } from "../captured/rescue.ts";
@@ -37,7 +38,7 @@ export function placeProgressOnQuestCard(state: ScenarioState, instruction: Extr
     if (id !== stageOf(state, focus.seat) || state.stageCleared) return state;
     if (flagged(state, id, "progressRescues")) return rescueRandom(state, id, amount);
     const before = steps.length;
-    const placed = putOnStage(state, id, amount, questPointsOf(state, quest, ctx.cards), ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length, ruleCause("rr.step-3-4"), false);
+    const placed = putOnStage(state, id, amount, questPointsOf(state, quest, ctx.cards), ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length, ruleCause("rr.step-3-4"), { counted: false, reduced: currentSideQuest(state) == null });
     return afterProgress(placed, before, ctx, steps);
   }
   return placeOnSideQuest(state, id, amount, ruleCause("mec108.side-quests-in-play"), ctx, steps);

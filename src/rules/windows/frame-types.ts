@@ -104,6 +104,8 @@ export type EffectData = {
   dealt?: number;
   // The damage an attack sent on past its defender (excessToShip): the X of "excess damage" an effect left for the attack's end reads.
   excess?: number;
+  // The ally the attack the effect was left by destroyed (DiscardCopiesFromDeck of "other", 10137:A:2).
+  destroyedAlly?: string;
   hold?: string;
   // The card DiscardBottom discarded from the bottom of a deck in this effect (the `discardedCost` condition, families/uncharted/cards.ts).
   discarded?: string;

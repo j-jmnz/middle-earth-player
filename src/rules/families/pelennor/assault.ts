@@ -37,7 +37,7 @@ export function placeProgressActiveFirst(state: ScenarioState, instruction: Extr
   const stage = stageId ? next.cards[stageId] : undefined;
   if (onActive.remaining > 0 && stageId && stage && !next.stageCleared) {
     const canAdvance = (current: ScenarioState): boolean => restricted(current, ctx, "advance").length === 0;
-    next = putOnStage(next, stageId, onActive.remaining, questPointsOf(next, stage, ctx.cards), ctx.cards, steps, canAdvance, ruleCause("mec113.assault"), false);
+    next = putOnStage(next, stageId, onActive.remaining, questPointsOf(next, stage, ctx.cards), ctx.cards, steps, canAdvance, ruleCause("mec113.assault"), { counted: false });
   }
   return afterProgress(next, before, ctx, steps);
 }

@@ -86,7 +86,7 @@ describe("a flip keeps his shadow cards and is heard by the new side", () => {
   it("10126:B:1 flips Captain side faceup Thaurdir to Champion at the end of the round, keeping his shadow card, and the Champion side heals and attacks the first player", () => {
     const { done, id } = flipsOn({ stage: STAGE2 }, CAPTAIN, endOfRound);
     expect(done.cards[id]?.code).toBe(CHAMPION);
-    expect(shadowCards(done.cards[id]).length).toBeGreaterThanOrEqual(1);
+    expect(shadowCards(done.cards[id])).toHaveLength(2);
     expect(done.pendingAttack?.enemyId).toBe(id);
   });
 
@@ -97,7 +97,7 @@ describe("a flip keeps his shadow cards and is heard by the new side", () => {
     const run = resolveRecords(held, t.ctx, STAGE2, "whenRevealed", held.questStage ?? "");
     expect([seatThreat(run.state, 0) - before[0]!, seatThreat(run.state, 1) - before[1]!]).toEqual([3, 3]);
     const id = idOf(run.state, CHAMPION);
-    expect(shadowCards(run.state.cards[id]).length).toBeGreaterThanOrEqual(2);
+    expect(shadowCards(run.state.cards[id])).toHaveLength(3);
   });
 
   it("10139:A:2 flips Captain side faceup Thaurdir when progress is placed on Furious Charge, keeping his shadow card, and the Champion side hears it", () => {
@@ -106,8 +106,56 @@ describe("a flip keeps his shadow cards and is heard by the new side", () => {
     const steps: EngineStep[] = [];
     const placed = settled(placeQuestProgress(held, 3, t.cards, steps, canAdvance), t, steps);
     const id = idOf(placed, CHAMPION);
-    expect(shadowCards(placed.cards[id]).length).toBeGreaterThanOrEqual(1);
+    expect(shadowCards(placed.cards[id])).toHaveLength(2);
     expect(placed.pendingAttack?.enemyId).toBe(id);
+  });
+});
+
+describe("Thaurdir's attack outside combat is dealt the right shadow cards", () => {
+  const attack = (state: ScenarioState, t: ReturnType<typeof built>, id: string): ScenarioState => runInstruction(state, { verb: "AttackFromStaging", target: "self", who: "firstPlayer", orEngaged: true }, { seat: 0, sourceId: id }, t.ctx, []);
+  const faceUp = (state: ScenarioState, ids: readonly string[]): ScenarioState => ids.reduce((next, card) => ({ ...next, cards: { ...next.cards, [card]: { ...next.cards[card]!, face: "up" as const } } }), state);
+
+  it("10126:B:1 his first attack outside combat on 2B resolves the cards he holds and one new card: held + 1, one card off the deck", () => {
+    const t = built({ stage: STAGE2, staging: [CHAMPION] });
+    const id = idOf(t.state, CHAMPION);
+    const held = dealTo(t.state, t, CHAMPION, 2);
+    const run = attack(held, t, id);
+    expect(run.pendingAttack?.enemyId).toBe(id);
+    expect(shadowCards(run.cards[id])).toHaveLength(3);
+    expect(held.encounterDeck.length - run.encounterDeck.length).toBe(1);
+  });
+
+  it("10126:B:1 a later attack discards what he held and is dealt one new card, with no card dealt and discarded unseen", () => {
+    const t = built({ stage: STAGE2, staging: [CHAMPION] });
+    const id = idOf(t.state, CHAMPION);
+    const held = dealTo(t.state, t, CHAMPION, 2);
+    const made: ScenarioState = { ...faceUp(held, shadowCards(held.cards[id])), resolvedAttacks: [`${id}@0`] };
+    const run = attack(made, t, id);
+    expect(shadowCards(run.cards[id])).toHaveLength(1);
+    expect(shadowCards(made.cards[id]).every((card) => run.cards[card]?.zone === "encounterDiscard")).toBe(true);
+    expect(made.encounterDeck.length - run.encounterDeck.length).toBe(1);
+  });
+
+  it("10126:B:1 turned up cards left from an earlier attack are discarded, not resolved again, before the first attack of a phase; the facedown ones still resolve", () => {
+    const t = built({ stage: STAGE2, staging: [CHAMPION] });
+    const id = idOf(t.state, CHAMPION);
+    const held = dealTo(t.state, t, CHAMPION, 2);
+    const [first, second] = shadowCards(held.cards[id]);
+    const run = attack(faceUp(held, [first!]), t, id);
+    expect(run.cards[first!]?.zone).toBe("encounterDiscard");
+    expect(shadowCards(run.cards[id])).toHaveLength(2);
+    expect(shadowCards(run.cards[id])).toContain(second);
+  });
+
+  it("10125:B:2 on 1B a second attack in the phase discards the card his first attack turned up and resolves the facedown cards and the new one", () => {
+    const t = built({ stage: STAGE1, staging: [CHAMPION] });
+    const id = idOf(t.state, CHAMPION);
+    const held = dealTo(t.state, t, CHAMPION, 2);
+    const [first, second] = shadowCards(held.cards[id]);
+    const run = attack(faceUp(held, [first!]), t, id);
+    expect(run.cards[first!]?.zone).toBe("encounterDiscard");
+    expect(shadowCards(run.cards[id])).toHaveLength(2);
+    expect(shadowCards(run.cards[id])).toContain(second);
   });
 });
 

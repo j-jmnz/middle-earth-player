@@ -5,7 +5,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import { printedOf } from "../../core/printed.ts";
 import { type ScenarioState } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
-import { frameScope, refCard } from "../../interpret/amounts.ts";
+import { topFrame } from "../../windows/windows.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
 import { shuffleSeatDeck } from "../deck/moves.ts";
@@ -13,9 +13,15 @@ import type { Focus } from "../index.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
-/** DiscardCopiesFromDeck: the actor's deck is searched for the cards with the printed title of the card named (the last picked card, or the other card of the event when it is an ally); each of them (`all`) or one goes to the actor's discard pile, and the deck is shuffled with `shuffle`. */
+// The ally the attack that left the running effect destroyed (the frame carries it from shadow.ts), or null for any other frame.
+function destroyedAllyOf(state: ScenarioState): string | null {
+  const data = topFrame(state)?.data;
+  return data?.kind === "effect" ? (data.destroyedAlly ?? null) : null;
+}
+
+/** DiscardCopiesFromDeck: the actor's deck is searched for the cards with the printed title of the card named (the last picked card, or the ally the attack that left the effect destroyed); each of them (`all`) or one goes to the actor's discard pile, and the deck is shuffled with `shuffle`. */
 export function discardCopiesFromDeck(state: ScenarioState, instruction: Verb<"DiscardCopiesFromDeck">, focus: Focus, ctx: ReduceContext, _steps: EngineStep[]): ScenarioState {
-  const id = instruction.of === "picked" ? lastPicked(state) : refCard(state, "other", frameScope(state, focus.seat, focus.sourceId));
+  const id = instruction.of === "picked" ? lastPicked(state) : destroyedAllyOf(state);
   const named = id ? state.cards[id] : undefined;
   const seat = state.seats[focus.seat];
   // The card discarded for this seat, not one an earlier seat's discard left picked.

@@ -54,6 +54,8 @@ export type EffectSpec = {
   dealt?: number;
   // The damage an attack sent on past its defender (excessToShip).
   excess?: number;
+  // The ally that attack destroyed, for the copies search of 10137:A:2.
+  destroyedAlly?: string;
   hold?: string;
   // Why the instructions run: the effect record and its printed line. `causes` names one per instruction when several
   // records share a frame.
@@ -87,6 +89,7 @@ export function pushEffectFrame(state: ScenarioState, spec: EffectSpec, steps: E
     ...(spec.other ? { other: spec.other } : {}),
     ...(spec.dealt != null ? { dealt: spec.dealt } : {}),
     ...(spec.excess != null ? { excess: spec.excess } : {}),
+    ...(spec.destroyedAlly ? { destroyedAlly: spec.destroyedAlly } : {}),
     ...(spec.hold ? { hold: spec.hold } : {}),
   };
   return pushFrame(state, { frame: spec.frame, cardId: spec.sourceId, seat: spec.actor, peril: spec.peril, data }, steps);
@@ -223,7 +226,7 @@ function runItemNow(
     case "HideTest":
       return pushHide(state, { cardId: frame.cardId, seat: item.seat, peril: frame.peril }, instruction.x, steps);
     case "ImmediateAttack":
-      return instruction.afterThis ? attackAfterThis(state, frame.cardId, steps) : immediateAttack(state, frame.cardId, item.seat, ctx, steps, instruction.shadow !== false, instruction.keepShadows === true);
+      return instruction.afterThis ? attackAfterThis(state, frame.cardId, steps) : immediateAttack(state, frame.cardId, item.seat, ctx, steps, { shadow: instruction.shadow !== false, keep: instruction.keepShadows === true });
     case "ReadyHero":
     case "BarAttack":
     case "PlaceProgressOnLocation":
@@ -322,8 +325,9 @@ function attackAfterThis(state: ScenarioState, sourceId: string | null, steps: E
   return { ...state, pendingAttack: { ...attack, after: [...(attack.after ?? []), { verb: "ImmediateAttack" }], afterCause: currentCause(steps, UNATTRIBUTED) } };
 }
 
-// The enemy attacks the player it is engaged with, and the frame waits for the defense window.
-function immediateAttack(state: ScenarioState, sourceId: string | null, seat: number, ctx: ReduceContext, steps: EngineStep[], shadow = true, keep = false): ScenarioState {
+// The enemy attacks the player it is engaged with, and the frame waits for the defense window. `shadow`: a shadow card is dealt for the attack (the default); `keep`: with none dealt, the shadow cards the enemy holds stay.
+function immediateAttack(state: ScenarioState, sourceId: string | null, seat: number, ctx: ReduceContext, steps: EngineStep[], options: { readonly shadow?: boolean; readonly keep?: boolean } = {}): ScenarioState {
+  const { shadow = true, keep = false } = options;
   const enemy = sourceId ? state.cards[sourceId] : undefined;
   // An enemy that attacked from the staging area (the Balrog, the Watcher in the Water, Uruk from Mordor, a Storm of Howls attacker) makes the
   // additional attack its shadow grants against the same player, dealt a shadow card of its own ("Attacking enemy makes an additional attack
