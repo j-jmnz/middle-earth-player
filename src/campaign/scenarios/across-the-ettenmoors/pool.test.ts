@@ -51,6 +51,15 @@ describe("the pool Escape from Mount Gram leaves, dealt to Across the Ettenmoors
     expect(copies(state, "10067").map((card) => card.zone)).toEqual(["play"]);
   });
 
+  it("10064:A:1 stages 1 Savage Trollspawn for each player and leaves the other copies in the encounter deck", () => {
+    for (const seats of [1, 2] as const) {
+      const state = opened(gramLog(seats), 1, seats);
+      const trollspawn = copies(state, "10072");
+      expect(trollspawn.filter((card) => card.zone === "staging"), `${seats} seats`).toHaveLength(seats);
+      expect(trollspawn.filter((card) => card.zone !== "staging").every((card) => card.zone === "encounterDeck"), `${seats} seats`).toBe(true);
+    }
+  });
+
   it("10171:A:2 and 10173:A:1 deal Fend Off Despair into the encounter deck and Determination into the pool's hands, as the Wastes left them", () => {
     const log = gramLog(1);
     expect(log.campaignPool.some((card) => card.code === "10172")).toBe(true);

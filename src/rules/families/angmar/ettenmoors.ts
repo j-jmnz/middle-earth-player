@@ -9,7 +9,6 @@ import { printedOf } from "../../core/printed.ts";
 import { shuffleIds } from "../../core/seed.ts";
 import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { startReveal } from "../../windows/frames.ts";
-import { moveEncounter } from "../encounter/moves.ts";
 import { moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 
