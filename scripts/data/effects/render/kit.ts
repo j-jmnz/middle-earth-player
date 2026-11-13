@@ -41,4 +41,6 @@ export const quoted = (names: readonly unknown[]): string => names.map((name) =>
 export const joinAnd = (parts: readonly string[]): string => (parts.length <= 1 ? (parts[0] ?? "") : `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}`);
 
 // "PlaceProgressOn" -> "place progress on".
+/** "a card", "an enemy": the noun with the article it takes. */
+export const withArticle = (noun: string): string => `${/^[aeiou]/i.test(noun) ? "an" : "a"} ${noun}`;
 export const spaced = (name: string): string => name.replace(/([a-z0-9])([A-Z])/g, "$1 $2").toLowerCase();

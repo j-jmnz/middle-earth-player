@@ -8,6 +8,7 @@ import { modifiedStat, placeDamage } from "../../../rules/core/keywords.ts";
 import { flagged, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import { moveCard, spawn } from "../../../rules/core/zones.ts";
 import { canAttack, canDefend } from "../../../rules/combat/combat.ts";
+import { combatDamage } from "../../../rules/families/defense/excess.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { pickCandidates } from "../../../rules/interpret/pick.ts";
@@ -182,6 +183,17 @@ describe("10074:A:1 removes progress for the excess combat damage only", () => {
     const steps: never[] = [];
     const hit = placeDamage(hurt(t.state, [t.hero], 5), t.hero, 4, t.cards, steps, "framework", { rule: "rr.damage" });
     expect(quests(settle(hit, t.ctx, []))).toEqual([5, 3]);
+  });
+});
+
+describe("10074:A:1 leaves the enemy's other excess damage rules in force", () => {
+  it("10074:A:1 removes the progress and still raises the threat when the enemy also sends excess damage to threat", () => {
+    const t = at({ progress: 5, staging: [{ code: "10081", progress: 3 }, "10074"] });
+    const troll = idOf(t.state, "10074");
+    const flagged = { ...t.state, modifiers: [...t.state.modifiers, { instanceId: troll, sourceId: troll, stat: "excessToThreat", amount: 1, until: "endOfPhase" as const }] } as ScenarioState;
+    const after = combatDamage(hurt(flagged, [t.hero], 5), troll, t.hero, 4, t.ctx, []);
+    expect([stageOf(after)?.progress, after.cards[idOf(after, "10081")]?.progress]).toEqual([2, 0]);
+    expect(after.seats[0]?.threat).toBe((flagged.seats[0]?.threat ?? 0) + 3);
   });
 });
 

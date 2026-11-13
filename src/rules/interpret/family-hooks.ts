@@ -234,7 +234,7 @@ export function familyAttached(state: ScenarioState, id: string, host: string, c
 }
 
 /** Why a family bars the character from defending the attack in progress, or null (the first family's reason). */
-export function familyDefenseReason(state: ScenarioState, defender: PrintedCard, cards: ReadonlyMap<string, PrintedCard>, defenderId?: string, families: readonly RulesFamily[] = active()): string | null {
+export function familyDefenseReason(state: ScenarioState, defender: PrintedCard, cards: ReadonlyMap<string, PrintedCard>, defenderId: string, families: readonly RulesFamily[] = active()): string | null {
   for (const family of hooked(families).combat) {
     const reason = family.combat?.defense?.(state, defender, cards, defenderId);
     if (reason) return reason;

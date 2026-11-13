@@ -86,18 +86,19 @@ export function combatDamage(
   const remaining = Math.max(0, modifiedStat(state, target, "hitPoints", ctx.cards) - target.damage);
   const excess = landed - remaining;
   if (excess <= 0) return placed;
-  if (toEachQuest && !toStage) {
-    const eachRecord = effectsOf(ctx, enemy.code).find((effect) => effect.instructions.some((instruction) => instruction.verb === "ModifyStat" && instruction.stat === "excessToEachQuest"));
-    return removeProgressFromEachQuest(placed, excess, enemy.controller ?? target.controller, ctx, steps, eachRecord ? effectCause(eachRecord) : ruleCause("rr.damage"));
-  }
-  if (toStage && state.questStage) return noteHitPointsOn(placeDamage(placed, state.questStage, excess, ctx.cards, steps, "combat", ruleCause("rr.damage")), targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
-  if (!toThreat && !toQuest && !toShip) return noteHitPointsOn(placed, targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
+  // The cause an excess effect names: the record of the enemy that holds the flag, else the rule.
+  const causeOf = (flag: string) => {
+    const record = effectsOf(ctx, enemy.code).find((effect) => effect.instructions.some((instruction) => instruction.verb === "ModifyStat" && instruction.stat === flag));
+    return record ? effectCause(record) : ruleCause("rr.damage");
+  };
+  // Cruel Mountain-troll (10074:A:1): each point of excess takes a progress token off each quest card in play; the enemy's other excess flags still apply.
+  const eachQuest = toEachQuest && !toStage ? removeProgressFromEachQuest(placed, excess, enemy.controller ?? target.controller, ctx, steps, causeOf("excessToEachQuest")) : placed;
+  if (toStage && state.questStage) return noteHitPointsOn(placeDamage(eachQuest, state.questStage, excess, ctx.cards, steps, "combat", ruleCause("rr.damage")), targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
+  if (!toThreat && !toQuest && !toShip) return noteHitPointsOn(eachQuest, targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
   // "Excess damage from this attack is dealt to a Ship objective you control" (11055:A:2): the excess is the X of the effect the attack leaves for its end.
-  if (toShip && !toThreat && !toQuest) return noteExcess(placed, excess);
-  const flag = toThreat ? "excessToThreat" : "excessToQuestProgress";
-  const record = effectsOf(ctx, enemy.code).find((effect) => effect.instructions.some((instruction) => instruction.verb === "ModifyStat" && instruction.stat === flag));
-  const excessCause = record ? effectCause(record) : ruleCause("rr.damage");
+  if (toShip && !toThreat && !toQuest) return noteExcess(eachQuest, excess);
+  const excessCause = causeOf(toThreat ? "excessToThreat" : "excessToQuestProgress");
   // Great Cave-troll (41030:A:2): each point of excess takes a progress token off the current quest.
-  if (!toThreat) return removeQuestProgress(placed, excess, steps, excessCause);
-  return raiseThreat(placed, enemy.controller ?? target.controller, excess, steps, excessCause);
+  if (!toThreat) return removeQuestProgress(eachQuest, excess, steps, excessCause);
+  return raiseThreat(eachQuest, enemy.controller ?? target.controller, excess, steps, excessCause);
 }

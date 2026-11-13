@@ -407,7 +407,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 145073:B:2 (back): Forced: At the end of the planning phase, place 1 progress here.
   145073:forced:1: Forced at the end of the phase
     only if it is the Planning phase
-    - 1 progress is placed on the current quest stage (a quest effect: a full stage advances)
+    - 1 progress is placed on the main quest stage (a quest effect: a full stage advances)
 
 ## 145074 Retreat from Osgiliath
 (the scenario deals it into the quest pile; the piles place it, no record does)

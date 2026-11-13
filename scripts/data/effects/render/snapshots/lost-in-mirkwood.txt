@@ -30,7 +30,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
   18028:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each card (any player controls) [also {"objectiveLocation":true}]: stat immuneToPlayerCards 1, while this card is in play
-    - each card (any player controls) that is revealed guarding an objective-location: stat immuneToPlayerCards 1, while this card is in play
+    - each card (any player controls) attached to an objective-location as its guard: stat immuneToPlayerCards 1, while this card is in play
   18028:constant:2: Constant
     only if not (there is a card (any player controls) [also {"objectiveLocation":true}] to choose)
     - currentQuest: stat progressDiscards 1, while this card is in play

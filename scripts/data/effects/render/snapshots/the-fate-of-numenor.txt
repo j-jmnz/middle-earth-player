@@ -62,7 +62,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 11025:B:2 (back): Forced: After a location is explored, add progress to Explore the Island equal to that location's printed quest points.
   11025:forced:1: Forced after a card leaves play (heard about location (any player controls))
     only if the card the event is about had enough progress to be explored
-    - progress equal to printed quest points of the card the event is about is placed on the current quest stage (a quest effect: a full stage advances)
+    - progress equal to printed quest points of the card the event is about is placed on the main quest stage (a quest effect: a full stage advances)
 
 11025:B:3 (back): Forced: When an Uncharted location becomes the active location, add 1 copy of Lost Island from the top of the Uncharted deck to the staging area.
   11025:forced:2: Forced after this location becomes the active location (heard about location (any player controls) [also {"uncharted":true}])

@@ -349,7 +349,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
   19051:forced:1: Forced after the players quest unsuccessfully (event happened to the controller)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json WaiveQuestThreat {"verb":"WaiveQuestThreat","who":"eachSeat","until":"endOfPhase"}]
-    - progress equal to X is placed on the current quest stage (a quest effect: a full stage advances)
+    - progress equal to X is placed on the main quest stage (a quest effect: a full stage advances)
     - then, if the current quest stage holds at least 5 progress (checked when this step runs, after the steps above; not tied to whether they did anything): the players lose the game (Urdug's Gambit holds as much progress as it has quest points)
 
 19051:B:3 (back): When Urdug has no hit points remaining, the players win the game.

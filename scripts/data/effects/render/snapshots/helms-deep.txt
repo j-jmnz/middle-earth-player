@@ -173,7 +173,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143043:A:1 (front): When Revealed: Place 3 progress on the main quest (bypassing any active location). Until the end of the round, treat each character's text box as if it was blank (except for Traits).
   143043:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - 3 progress is placed on the current quest stage (a quest effect: a full stage advances)
+    - 3 progress is placed on the main quest stage (a quest effect: a full stage advances)
     - every character in play, now and entering later: stat blankText (its text box is blank) 1, until the end of the round
 
 143043:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack and gains Toughness 2 until the end of the round.
@@ -270,7 +270,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 
 143073:B:3 (back): Forced: At the end of the round place 1 progress here for each enemy in the staging area (bypassing any active location).
   143073:forced:2: Forced at the end of the round
-    - progress equal to the number of enemy (any player controls) in the staging area only is placed on the current quest stage (a quest effect: a full stage advances)
+    - progress equal to the number of enemy (any player controls) in the staging area only is placed on the main quest stage (a quest effect: a full stage advances)
 
 ## 143074 The Hosts of Isengard
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -307,7 +307,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 
 143075:B:2 (back): Forced: After a character is destroyed, place 1 progress on this stage (bypassing any active location).
   143075:forced:1: Forced on the event characterDestroyed
-    - 1 progress is placed on the current quest stage (a quest effect: a full stage advances)
+    - 1 progress is placed on the main quest stage (a quest effect: a full stage advances)
 
 143075:B:3 (back): If this stage is defeated, the players lose the game.
   143075:forced:2: Forced on the event questCardDefeated (heard about this card)

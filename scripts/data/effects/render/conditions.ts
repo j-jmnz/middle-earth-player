@@ -1,6 +1,6 @@
 // Conditions: when a record applies, a verb runs or an option is offered. `src/catalog/effect-schema-conditions.ts` owns the kinds; `not`, `all` and `any` combine the others one level deep.
 import { cardRef as cardRefWords, renderAmount } from "./amounts.ts";
-import { done, isObj, jsonOf, str, type Ctx, type Obj } from "./kit.ts";
+import { done, isObj, jsonOf, str, withArticle, type Ctx, type Obj } from "./kit.ts";
 import { renderPick } from "./picks.ts";
 
 const ZONE: Readonly<Record<string, string>> = {
@@ -23,8 +23,6 @@ const range = (min: unknown, max: unknown): string => {
 
 // One template per condition kind; a kind with none prints as JSON. A template returns its text and the keys it read.
 type Template = (c: Obj, ctx: Ctx) => { text: string; read: readonly string[] } | null;
-// "a card", "an enemy": the article the noun takes.
-const articled = (noun: string): string => `${/^[aeiou]/i.test(noun) ? "an" : "a"} ${noun}`;
 
 export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   sourceIn: (c) => ({ text: `this card ${ZONE[str(c.zone)] ?? `is in ${str(c.zone)}`}`, read: ["zone"] }),
@@ -65,7 +63,7 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   timeOfDay: (c) => ({ text: `it is ${c.is === "day" ? "Day (Daybreak is faceup)" : "Night (Nightfall is faceup)"}`, read: ["is"] }),
   safeActive: (c) => ({ text: c.is === false ? "no location with the safe keyword is the active location" : "a location with the safe keyword is the active location", read: ["is"] }),
   setAsideHas: (c) => ({ text: `a copy of the card with code ${str(c.code)} is set aside, out of play`, read: ["code"] }),
-  searchable: (c) => ({ text: `the encounter deck or its discard pile holds ${articled(`${typeof c.trait === "string" ? `${c.trait} ` : ""}${typeof c.type === "string" ? (c.type === "encounter-side-quest" ? "side quest" : str(c.type)) : "card"}`)}${typeof c.code === "string" ? ` with code ${c.code}` : ""}${c.deckOnly === true ? " (the deck alone)" : ""}${c.victory === true ? " (the victory display too)" : ""}`, read: ["trait", "type", "code", "deckOnly", "victory"] }),
+  searchable: (c) => ({ text: `the encounter deck or its discard pile holds ${withArticle(`${typeof c.trait === "string" ? `${c.trait} ` : ""}${typeof c.type === "string" ? (c.type === "encounter-side-quest" ? "side quest" : str(c.type)) : "card"}`)}${typeof c.code === "string" ? ` with code ${c.code}` : ""}${c.deckOnly === true ? " (the deck alone)" : ""}${c.victory === true ? " (the victory display too)" : ""}`, read: ["trait", "type", "code", "deckOnly", "victory"] }),
   stageProgress: (c) => ({ text: `the current quest stage holds at least ${str(c.min)} progress`, read: ["min"] }),
   questLeads: () => ({ text: "the total Willpower of the characters committed to the quest is greater than the total Threat in the staging area", read: [] }),
   soleAttacker: () => ({ text: "exactly one character was declared as an attacker in this attack", read: [] }),

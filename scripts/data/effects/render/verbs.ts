@@ -2,7 +2,7 @@
 // The structural verbs (Choose, Each, Delay, AfterAttack, Repeat, ForEachPlayer) hold instructions of their own and print them indented beneath.
 import { cardRef, renderAmount } from "./amounts.ts";
 import { renderCondition } from "./conditions.ts";
-import { compact, done, isObj, jsonOf, joinAnd, quoted, str, type Ctx, type Obj } from "./kit.ts";
+import { compact, done, isObj, jsonOf, joinAnd, quoted, str, withArticle, type Ctx, type Obj } from "./kit.ts";
 import { renderPick } from "./picks.ts";
 
 type Made = { text: string; read: readonly string[]; children?: readonly Obj[] };
@@ -14,8 +14,6 @@ const amount = (value: unknown, ctx: Ctx): string => renderAmount(value, ctx, re
 const chooseXMost = (max: unknown, ctx: Ctx): string => (Array.isArray(max) ? (max.length === 1 ? amount(max[0], ctx) : `the least of ${joinAnd(max.map((one) => amount(one, ctx)))}`) : "?");
 const pick = (value: unknown, ctx: Ctx): string => renderPick(value, ctx);
 const WHO: Readonly<Record<string, string>> = { actor: "the acting player", firstPlayer: "the first player", picked: "the picked player", eventSeat: "the player the event is about", eachSeat: "each player", defendingPlayer: "the defending player (the player this enemy is engaged with)" };
-// "a card" or "an enemy": the article a noun takes.
-const withArticle = (noun: string): string => `${/^[aeiou]/i.test(noun) ? "an" : "a"} ${noun}`;
 const who = (value: unknown): string => WHO[str(value)] ?? str(value);
 
 // A target: a card reference (`self`) or a target object (`{ kind: "picked" }`).
@@ -177,13 +175,13 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
     return { text: `this attachment may be attached to ${where}${i.limitPerHost === true ? " (limit 1 of it per host)" : ""}`, read: ["host", "hosts", "limitPerHost"] };
   },
   Safe: () => ({ text: "(rule marker) this card has the Safe keyword: when the players travel to it all engaged enemies return to the staging area, and while it is the active location treacheries' When Revealed effects are ignored, encounter side quests' text boxes are blank and enemies make no engagement checks (its other lines say each)", read: [] }),
-  StageRandomGuardedPair: () => ({ text: "of the set-aside encounter side quests one, and of the set-aside objective-locations one, are picked at random (the game's seed) and added to the staging area (not revealed), the side quest attached to the location as its guard", read: [] }),
+  StageRandomGuardedPair: () => ({ text: "of the set-aside encounter side quests one, and of the set-aside objective-locations one, are picked at random (the game's seed) and revealed and added to the staging area, the side quest attached to the location as its guard", read: [] }),
   RevealCard: (i) => ({ text: `${i.card === undefined ? "the picked card" : cardRef(i.card)} is revealed by the acting player as an encounter card, wherever it lies: Surge and Doomed, When Revealed effects and the Responses to a reveal resolve, and it ends where its type puts it (nothing with no card picked)`, read: ["card"] }),
   ReleaseGuards: (i) => ({ text: `the encounter cards that guard ${i.target === undefined ? "the picked card" : cardRef(i.target)} stay in the staging area and no longer guard it`, read: ["target"] }),
   RevealSetAsideForTokens: (i) => ({ text: `if this card holds at least ${str(i.tokens)} resource tokens and a copy of the card with code ${str(i.code)} is set aside: ${str(i.tokens)} tokens come off this card and that copy is revealed as an encounter card (nothing otherwise)`, read: ["code", "tokens"] }),
   EarnEncounterCopies: (i) => ({ text: `one copy of the card${Array.isArray(i.codes) && i.codes.length > 1 ? "s" : ""} with code ${Array.isArray(i.codes) ? joinAnd(i.codes.map(str)) : "?"} joins the Campaign Pool for each copy lying in the encounter deck or the encounter discard pile (a copy set aside, in the staging area or attached does not count)`, read: ["codes"] }),
   ShuffleSetAsideIntoEncounterDeck: (i) => ({ text: `one set-aside copy of the card with code ${str(i.code)}${i.own === true ? " (the acting player's own)" : ""} is shuffled into the encounter deck (nothing with none set aside)`, read: ["code", "own"] }),
-  AddStageProgress: (i, ctx) => ({ text: `${typeof i.amount === "number" ? `${i.amount} progress is` : `progress equal to ${amount(i.amount, ctx)} is`} placed on the current quest stage (a quest effect: a full stage advances)`, read: ["amount"] }),
+  AddStageProgress: (i, ctx) => ({ text: `${typeof i.amount === "number" ? `${i.amount} progress is` : `progress equal to ${amount(i.amount, ctx)} is`} placed on the main quest stage (a quest effect: a full stage advances)`, read: ["amount"] }),
   AddToVictory: (i) => ({ text: `${i.target === undefined ? "the picked card" : cardRef(i.target)} is added to the victory display`, read: ["target"] }),
   HeroesGainResources: (i, ctx) => ({ text: `each hero ${i.who === "picked" ? "the picked player controls" : "the acting player controls"} gains ${amount(i.amount, ctx)} resource(s)${i.unspent === true ? " if it spent none this round" : ""}`, read: ["amount", "who", "unspent"] }),
   SetAside: (i) => ({ text: `a copy of the card with code ${str(i.code)} is set aside, out of play`, read: ["code"] }),

@@ -11,8 +11,8 @@ export function attackerFacing(state: ScenarioState, enemyId: string, attackerId
 }
 
 /** Why a damaged character cannot be declared as a defender of the attack in progress, or null. `defenderId` is the character (the hook knows its printed card only). */
-export function defenderFacing(state: ScenarioState, _defender: PrintedCard, defenderId: string | undefined): string | null {
+export function defenderFacing(state: ScenarioState, _defender: PrintedCard, defenderId: string): string | null {
   const enemyId = state.pendingAttack?.enemyId;
-  if (!enemyId || !defenderId) return null;
+  if (!enemyId) return null;
   return flagged(state, enemyId, "damagedCannotFace") && (state.cards[defenderId]?.damage ?? 0) > 0 ? REASON : null;
 }

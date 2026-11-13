@@ -61,7 +61,7 @@ const VERBS = [
   // The Safe keyword (mec108.safe), a constant marker on an objective-location ("Guarded. Safe.", 10068:A:1): the engine finds the cards with it by their records (the pick filter `safe`, the condition `safeActive`). The verb does nothing when a record runs it; what a safe
   // location does while it is the active location is written with ordinary records beside it.
   z.strictObject({ verb: z.literal("Safe") }),
-  // Setup (Into the Ettenmoors, 10064:A:1): of the set-aside encounter side quests one is picked at random (the game's seed) and of the set-aside objective-locations one, and both are added to the staging area (not revealed: the location's own Guarded keyword takes no further
+  // Setup (Into the Ettenmoors, 10064:A:1): of the set-aside encounter side quests one is picked at random (the game's seed) and of the set-aside objective-locations one, and both are revealed and added to the staging area (the location's own Guarded keyword takes no further
   // card) with the side quest attached to the location as its guard ("with the safe location guarded by the side quest"). Nothing happens when either kind is not set aside.
   verbFlags(z.strictObject({ verb: z.literal("StageRandomGuardedPair"), ...when }), { setupRuns: "top" }),
   // The card (the last picked card by default, `target` by ref) is revealed by the actor as an encounter card, wherever it lies: its Surge and Doomed, its When Revealed effects and the Responses to a reveal resolve, and it ends where its type puts it (a side quest in the staging area)
