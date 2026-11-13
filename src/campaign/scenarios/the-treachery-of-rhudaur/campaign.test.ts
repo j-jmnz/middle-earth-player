@@ -66,7 +66,7 @@ describe("The Treachery of Rhudaur in the angmar-awakened campaign", () => {
   it("is playable, and the path offers it after Across the Ettenmoors' win", () => {
     expect(PLAYABLE_SCENARIOS).toContain("the-treachery-of-rhudaur");
     const path = campaignPath(campaign, {}, ettenmoorsLog(1));
-    expect(path.map((node) => [node.id, node.status]).slice(5, 8)).toEqual([["across-the-ettenmoors", "completed"], ["the-treachery-of-rhudaur", "current"], [campaign.scenarios[7], "soon"]]);
+    expect(path.map((node) => [node.id, node.status]).slice(5, 8)).toEqual([["across-the-ettenmoors", "completed"], ["the-treachery-of-rhudaur", "current"], [campaign.scenarios[7], "locked"]]);
   });
 
   it("10094:A:1 deals the Setup: the Great Hall active, the three side quests and the Ancient Causeway staged, Thaurdir set aside and Amarthiúl under the first player", () => {

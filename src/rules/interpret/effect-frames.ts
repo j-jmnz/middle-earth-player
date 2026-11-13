@@ -223,7 +223,7 @@ function runItemNow(
     case "HideTest":
       return pushHide(state, { cardId: frame.cardId, seat: item.seat, peril: frame.peril }, instruction.x, steps);
     case "ImmediateAttack":
-      return instruction.afterThis ? attackAfterThis(state, frame.cardId, steps) : immediateAttack(state, frame.cardId, item.seat, ctx, steps, instruction.shadow !== false);
+      return instruction.afterThis ? attackAfterThis(state, frame.cardId, steps) : immediateAttack(state, frame.cardId, item.seat, ctx, steps, instruction.shadow !== false, instruction.keepShadows === true);
     case "ReadyHero":
     case "BarAttack":
     case "PlaceProgressOnLocation":
@@ -323,19 +323,19 @@ function attackAfterThis(state: ScenarioState, sourceId: string | null, steps: E
 }
 
 // The enemy attacks the player it is engaged with, and the frame waits for the defense window.
-function immediateAttack(state: ScenarioState, sourceId: string | null, seat: number, ctx: ReduceContext, steps: EngineStep[], shadow = true): ScenarioState {
+function immediateAttack(state: ScenarioState, sourceId: string | null, seat: number, ctx: ReduceContext, steps: EngineStep[], shadow = true, keep = false): ScenarioState {
   const enemy = sourceId ? state.cards[sourceId] : undefined;
   // An enemy that attacked from the staging area (the Balrog, the Watcher in the Water, Uruk from Mordor, a Storm of Howls attacker) makes the
   // additional attack its shadow grants against the same player, dealt a shadow card of its own ("Attacking enemy makes an additional attack
   // after this one", data/printed/fellowship-of-the-ring.json 142047:A:2, 141072:A:2).
   if (sourceId && enemy?.zone === "staging") {
     if (attackBarred(state, sourceId, seat) || state.seats[seat]?.eliminated) return state;
-    const stagedBegun = beginEnemyAttack(shadow ? dealForAttack(state, sourceId, steps, ctx) : discardShadowOf(state, sourceId), seat, sourceId, ctx, steps, { fromStaging: true });
+    const stagedBegun = beginEnemyAttack(shadow ? dealForAttack(state, sourceId, steps, ctx) : keep ? state : discardShadowOf(state, sourceId), seat, sourceId, ctx, steps, { fromStaging: true });
     return stagedBegun.pendingAttack ? { ...stagedBegun, pendingAttack: { ...stagedBegun.pendingAttack, immediate: true } } : stagedBegun;
   }
   if (!sourceId || enemy?.zone !== "engaged" || enemy.controller == null) return state;
   // An attack an effect makes is dealt a shadow card of its own (families/defense/listen.ts), unless the card says it is not (`shadow: false`, 18022:A:1).
-  const dealt = shadow ? dealAttackShadow(state, sourceId, ctx, steps) : discardShadowOf(state, sourceId);
+  const dealt = shadow ? dealAttackShadow(state, sourceId, ctx, steps) : keep ? state : discardShadowOf(state, sourceId);
   const begun = beginEnemyAttack(dealt, enemy.controller, sourceId, ctx, steps);
   if (!begun.pendingAttack) return begun;
   return { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true } };

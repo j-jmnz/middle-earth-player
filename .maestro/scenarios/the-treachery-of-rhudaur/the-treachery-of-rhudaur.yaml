@@ -19,6 +19,7 @@ tags:
 - assertVisible:
     id: pool
     text: ".*Determination.*"
-# The Battle of Carn Dûm is the next part of the campaign and is not playable yet, so the path offers it as coming soon.
+# The win unlocks The Battle of Carn Dûm.
 - assertVisible:
-    id: path-soon
+    id: node-the-battle-of-carn-dum-status
+    text: "Next"

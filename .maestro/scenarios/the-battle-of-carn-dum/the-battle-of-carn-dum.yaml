@@ -14,4 +14,7 @@ tags:
       # CHOICE_ID: "TODO"
       # CHOICE_PROMPT: "TODO"
       # CHOICE_CONSEQUENCE: "TODO"
-# TODO: this scenario's own assertions on the path screen after the win (the next part's node, a carried card).
+# TODO: this scenario's own assertions on the path screen after the win (a carried card).
+# The Dread Realm is the next part of the campaign and is not playable yet, so the path offers it as coming soon.
+- assertVisible:
+    id: path-soon

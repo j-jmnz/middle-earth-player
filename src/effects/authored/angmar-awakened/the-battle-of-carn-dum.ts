@@ -121,7 +121,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       trigger: "shadowDealtTo",
       subject: "self",
       condition: { kind: "all", conditions: [IN_STAGING, MORE_THAN_TWO_ON_SELF, FEWER_THAN_FOUR_ON_SELF] },
-      instructions: [{ verb: "EngageFirstPlayer" }, { verb: "ImmediateAttack", shadow: false, when: { kind: "sourceIn", zone: "engaged" } }],
+      instructions: [{ verb: "EngageFirstPlayer" }, { verb: "ImmediateAttack", shadow: false, keepShadows: true, when: { kind: "sourceIn", zone: "engaged" } }],
     },
 
     // 10132 Accursed Battlefield. While it is the active location each quest card in play (the main quest card and the encounter side quests in the staging area) gains the battle keyword. Shadow: +1 Attack, +3 instead when the defending player's threat is higher than the
