@@ -214,6 +214,12 @@ export const pickSchema = z.strictObject({
   isGuard: z.boolean().optional(),
   // A character whose code the Campaign Log marks "determined" (`campaignFacts.angmar.determined`, Angmar Awakened): "each character who is 'determined' in the Campaign Log" (10172:A:1). Read by the angmar family.
   determined: z.literal(true).optional(),
+  // A Reanimated Dead (The Dread Realm, mec108.reanimated-dead): a player card facedown as an Undead enemy ("each Reanimated Dead", 101160:A:1). Read by the angmar family.
+  reanimated: z.literal(true).optional(),
+  // With `type: card`: every card in play of any kind, the attachments on quest cards, enemies and characters included, and the cards of the staging area, the active location and the quest card ("Sorcery cards in play", 10153:A:2). Read by the angmar family.
+  allInPlay: z.literal(true).optional(),
+  // A card with the printed title of the defending character in the attack in progress ("a copy of the defending character in your discard pile", 101160:A:2). Read by the angmar family.
+  copyOfDefender: z.literal(true).optional(),
   // A card that has the Safe keyword (Across the Ettenmoors, mec108.safe; its record has the constant verb Safe): "a location with the safe keyword" (10075:A:2), for an objective-location (`type: objective`). Read by the angmar family.
   safe: z.literal(true).optional(),
   // A card with at least this many damage tokens on it ("while it has 3 or more damage on it", 10075:A:1). Read by the angmar family.

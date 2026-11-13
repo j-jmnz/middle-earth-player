@@ -313,6 +313,8 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   if (!attackHere(state, attack.enemyId)) return waiting.length > 0 ? (startShadowAttack(ended, attack.seat, waiting, ctx, steps) ?? ended) : ended;
   // Only the effect that searches the deck for another copy of a destroyed ally (DiscardCopiesFromDeck of "other", 10137:A:2) reads the ally the attack destroyed.
   const destroyedAlly = after.some((one) => one.verb === "DiscardCopiesFromDeck" && one.of === "other") ? destroyedAllyOf(state, attack, ctx) : undefined;
+  // Only an effect that reanimates the character the attack destroyed (Unholy Crypt, 101161:A:2) reads it.
+  const destroyedCharacter = after.some((one) => one.verb === "Reanimate" && one.from === "destroyed") ? destroyedByAttack(state, attack, ctx)[0] : undefined;
   return pushEffectFrame(
     ended,
     {
@@ -330,6 +332,7 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
       // `other`: the defending character, or the hero an undefended attack landed on ("the hero damaged by this attack", 900209:A:2).
       ...(afterTarget(attack) ? { other: afterTarget(attack) } : {}),
       ...(destroyedAlly ? { destroyedAlly } : {}),
+      ...(destroyedCharacter ? { destroyedCharacter } : {}),
       ...(attack.defense?.landed ? { dealt: attack.defense.landed } : {}),
       ...(attack.afterCause ? { cause: attack.afterCause } : {}),
     },

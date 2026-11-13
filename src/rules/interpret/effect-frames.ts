@@ -56,6 +56,7 @@ export type EffectSpec = {
   excess?: number;
   // The ally that attack destroyed, for the copies search of 10137:A:2.
   destroyedAlly?: string;
+  destroyedCharacter?: string;
   hold?: string;
   // Why the instructions run: the effect record and its printed line. `causes` names one per instruction when several
   // records share a frame.
@@ -90,6 +91,7 @@ export function pushEffectFrame(state: ScenarioState, spec: EffectSpec, steps: E
     ...(spec.dealt != null ? { dealt: spec.dealt } : {}),
     ...(spec.excess != null ? { excess: spec.excess } : {}),
     ...(spec.destroyedAlly ? { destroyedAlly: spec.destroyedAlly } : {}),
+    ...(spec.destroyedCharacter ? { destroyedCharacter: spec.destroyedCharacter } : {}),
     ...(spec.hold ? { hold: spec.hold } : {}),
   };
   return pushFrame(state, { frame: spec.frame, cardId: spec.sourceId, seat: spec.actor, peril: spec.peril, data }, steps);

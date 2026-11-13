@@ -106,6 +106,8 @@ export type EffectData = {
   excess?: number;
   // The ally the attack the effect was left by destroyed (DiscardCopiesFromDeck of "other", 10137:A:2).
   destroyedAlly?: string;
+  // The first character the attack the effect was left by destroyed, a hero or an ally ("reanimate that character", 101161:A:2).
+  destroyedCharacter?: string;
   hold?: string;
   // The card DiscardBottom discarded from the bottom of a deck in this effect (the `discardedCost` condition, families/uncharted/cards.ts).
   discarded?: string;

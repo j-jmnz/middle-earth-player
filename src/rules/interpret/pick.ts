@@ -95,6 +95,9 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
   // The captured cards a pick starts from (families/captured/values.ts).
   const captured = spec.captured ? familyPool(state, spec, asking, sourceId, ctx) : null;
   if (captured) return captured;
+  // Every card in play of any kind (families/angmar/reanimate/pick.ts).
+  const everything = spec.allInPlay ? familyPool(state, spec, asking, sourceId, ctx) : null;
+  if (everything) return everything;
   // The Uruk-hai's Captives, alone or among the heroes (families/captives).
   if (spec.captive === "only" || spec.captive === "free") return captiveIds(state, spec.captive, ctx.cards);
   const from = spec.from ?? "play";

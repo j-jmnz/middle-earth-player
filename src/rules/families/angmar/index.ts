@@ -29,6 +29,8 @@ import { chooseCurrentQuest, currentQuestHolds, hitPointsLeftHolds, questCardsAm
 import { advanceWhenFlagged, removeSideQuestsFromGame } from "./stage.ts";
 import { removeTimeCounters, timeOnReveal } from "./time.ts";
 import { attachNewTo, tradeDamageForResources } from "./trade.ts";
+import { reanimate } from "./reanimate/reanimate.ts";
+import { allInPlayPool, reanimatedPickMatches } from "./reanimate/pick.ts";
 
 // The verbs src/catalog/families/angmar.ts adds. Null when the verb is not one of them.
 export function run(state: ScenarioState, instruction: Instruction, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState | null {
@@ -93,6 +95,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return dealShadowInPlay(state, instruction, focus, ctx, steps);
     case "DiscardCopiesFromDeck":
       return discardCopiesFromDeck(state, instruction, focus, ctx, steps);
+    case "Reanimate":
+      return reanimate(state, instruction, focus, ctx, steps);
     default:
       return null;
   }
@@ -100,11 +104,12 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "angmar",
-  verbs: ["Time", "RemoveTimeCounters", "HoldUnder", "DiscardHeld", "PlaceHandUnderSelf", "ChooseCurrentQuest", "AttachNewTo", "TradeDamageForResources", "FirstTraitSurge", "EndPhase", "PlaceLoggedDamageOn", "ChooseBoon", "AttachRandomBurden", "MoveToHero", "AttachSelfToNamed", "FlipTimeObjective", "RecordStartingThreat", "Safe", "StageRandomGuardedPair", "RevealCard", "ReleaseGuards", "RevealSetAsideForTokens", "EarnEncounterCopies", "RemoveSideQuestsFromGame", "FlipWhenDefeated", "RemoveProgressAmong", "FlipTwoSided", "DealShadowInPlay", "DiscardCopiesFromDeck"],
+  verbs: ["Time", "RemoveTimeCounters", "HoldUnder", "DiscardHeld", "PlaceHandUnderSelf", "ChooseCurrentQuest", "AttachNewTo", "TradeDamageForResources", "FirstTraitSurge", "EndPhase", "PlaceLoggedDamageOn", "ChooseBoon", "AttachRandomBurden", "MoveToHero", "AttachSelfToNamed", "FlipTimeObjective", "RecordStartingThreat", "Safe", "StageRandomGuardedPair", "RevealCard", "ReleaseGuards", "RevealSetAsideForTokens", "EarnEncounterCopies", "RemoveSideQuestsFromGame", "FlipWhenDefeated", "RemoveProgressAmong", "FlipTwoSided", "DealShadowInPlay", "DiscardCopiesFromDeck", "Reanimate"],
   run,
   revealed: (state, id, ctx) => noteFirstTrait(timeOnReveal(state, id, ctx), id, ctx),
   travel: { unpayable: travelUnpayable },
-  pick: (state, id, spec, _at, ctx) => determinedMatches(state, id, spec) && safePickMatches(state, id, spec, ctx),
+  pick: (state, id, spec, _at, ctx) => determinedMatches(state, id, spec) && safePickMatches(state, id, spec, ctx) && reanimatedPickMatches(state, id, spec, ctx),
+  pool: (state, spec) => allInPlayPool(state, spec),
   combat: { attack: (state, enemyId, _attacker, _target, attackerId) => attackerFacing(state, enemyId, attackerId), defense: (state, defender, _cards, defenderId) => defenderFacing(state, defender, defenderId) },
   condition: (state, condition, scope, ctx) => timeOfDayHolds(state, condition) ?? currentQuestHolds(state, condition, scope, ctx) ?? questLeadsHolds(state, condition, ctx) ?? hitPointsLeftHolds(state, condition, ctx) ?? safeActiveHolds(state, condition, ctx) ?? setAsideHasHolds(state, condition),
   settle: { sweep: advanceWhenFlagged },

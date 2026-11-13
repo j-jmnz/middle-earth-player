@@ -3043,7 +3043,12 @@
         "Reanimated Dead are Undead enemies with 2 Threat, 2 Attack, 2 Defense and 2 hit points.",
         "When the players advance to stage 2, all Sorcery cards attached to this stage are attached to stage 2B."
       ],
-      "inert": [],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "Reminder of the box rule mec108.reanimated-dead, which the engine implements for every Reanimated Dead (core/printed.ts); the line adds nothing the rule does not say."
+        }
+      ],
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
       "confirmedBy": null
@@ -3076,7 +3081,12 @@
         "Reanimated Dead are Undead enemies with 2 Threat, 2 Attack, 2 Defense and 2 hit points.",
         "When Daechanar is defeated, advance to the next stage."
       ],
-      "inert": [],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "Reminder of the box rule mec108.reanimated-dead, which the engine implements for every Reanimated Dead (core/printed.ts); the line adds nothing the rule does not say."
+        }
+      ],
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
       "confirmedBy": null
@@ -3110,7 +3120,12 @@
         "Progress that would be placed on this quest is instead placed on locations in the staging area, divided as you choose.",
         "Forced: At the end of the quest phase, if there are any locations in play, deal 1 damage to all characters in play. If there are no locations in play, the players have escaped Carn Dûm, and win the game."
       ],
-      "inert": [],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "Reminder of the box rule mec108.reanimated-dead, which the engine implements for every Reanimated Dead (core/printed.ts); the line adds nothing the rule does not say."
+        }
+      ],
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
       "confirmedBy": null
@@ -3996,7 +4011,12 @@
         "You are playing campaign mode.",
         "Setup: Each player may search their deck for a boon card and add it to their opening hand. Each hero begins the game with damage on them equal to the amount noted for them in the Campaign Log."
       ],
-      "inert": [],
+      "inert": [
+        {
+          "line": 1,
+          "reason": "Reminder that campaign mode is in use. No game effect."
+        }
+      ],
       "misprints": [],
       "readBy": "Claude Sonnet 5.5 (claude-sonnet-5-5), Claude Code session_0137UhqGkLk6owgiHJyJbwFb, read from the scan image",
       "confirmedBy": null

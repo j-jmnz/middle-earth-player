@@ -94,6 +94,12 @@ const VERBS = [
   // each of them (`all`) or one of them; with `shuffle` the deck is shuffled after ("Each player then searches his deck for each other copy of the card he discarded, and discards those as well. Shuffle each searched deck", 10136:A:1; "search your deck for another copy of that ally and discard it, if able", 10137:A:2).
   // Nothing happens with no such card picked. A copy is a card with the same printed title (rr.unique-cards).
   z.strictObject({ verb: z.literal("DiscardCopiesFromDeck"), of: z.enum(["picked", "other"]), all: z.boolean().optional(), shuffle: z.boolean().optional(), ...when }),
+  // The Dread Realm (mec108.reanimated-dead): the cards the source names are placed facedown in front of the player (the actor, or the first player) as if they had just engaged them, and act as Undead enemies (0 engagement cost, 2 Threat, 2 Attack, 2 Defense, 2 hit points, no text) until they leave play,
+  // by any exit, for their owner's discard pile. `deckTop`: the top `count` cards of the player's own deck (1 by default, at most the deck holds; "reanimates the top card of his deck", 10150:A:1). `handRandom`: a card of their hand chosen by the game's seed ("a random card from his hand", 101158:A:1).
+  // `discardTop`: the card on top of their discard pile when it is an ally ("each ally he discarded by this effect", 101159:A:1). `card`: the card the effect names (`picked` by default, `subject`, `other`) when it lies in a discard pile ("reanimate that character", 10155:A:1). `destroyed`: the character the attack that left
+  // the effect destroyed ("If this attack destroys a character, reanimate that character", 101161:A:2). `to: staging` adds the card to the staging area instead of engaging the player (101162:A:2). Each card reanimated becomes the effect's last picked card (a failed one leaves none), so a later instruction (DealShadowInPlay
+  // `target: picked`, "deal it 1 shadow card") acts on it. Reanimating counts as an enemy engaging the player (rr.engaged): the player's "after an enemy engages you" Responses hear it.
+  z.strictObject({ verb: z.literal("Reanimate"), from: z.enum(["deckTop", "handRandom", "discardTop", "card", "destroyed"]), count: positiveAmountSchema.optional(), card: cardRefSchema.optional(), who: z.enum(["actor", "firstPlayer"]).optional(), to: z.enum(["engaged", "staging"]).optional(), ...when }),
 ] as const;
 
 const TRIGGERS = [
