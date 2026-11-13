@@ -53,12 +53,6 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   // 10175:A:2 (Forced after Loot the Dungeons is defeated): each player in turn may take one boon not yet taken into their hand and the Campaign Pool.
   "10175:forced:1 @0 ChooseBoonToHand": { owned: true, note: "Loot the Dungeons: choose one of the boons not yet taken to add to your hand and the Campaign Pool, or take none.", verb: "Take", labels: { none: "Take no boon" } },
 
-  // 10176:A:1 (Response after Berelind destroys an enemy): 1 progress on a quest card in play: the current quest stage or a side quest.
-  "10176:response:1 @0 Pick": { owned: true, note: "Berelind: choose a quest card in play to place 1 progress on, the current quest or a side quest. The active location does not take it.", verb: "Place" },
-
-  // 10179:A:1 (Response after Laermuin commits to a quest): 1 damage is healed from a character, any player's.
-  "10179:response:1 @0 Pick": { owned: true, note: "Laermuin: choose a character, any player's, to heal 1 damage from.", verb: "Heal" },
-
   // Determination (10172:A:1) and Ruthless (10164:A:4), worded once for every scenario that can deal them.
   ...DETERMINATION_ASKS,
   ...POOL_BOON_ASKS,
