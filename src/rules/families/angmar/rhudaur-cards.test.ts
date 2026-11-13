@@ -234,3 +234,63 @@ describe("Decipher Ancient Texts", () => {
     expect([spent(2), spent(3)]).toEqual([false, true]);
   });
 });
+
+describe("the side quests' progress", () => {
+  it("10109:A:2 places 2 progress on Quiet the Spirits directly after any enemy is destroyed, even when it is not the current quest", () => {
+    const t = built({ staging: ["10109", "10100"] });
+    const wight = idOf(t.state, "10100");
+    const heard = settle(queueEvent(t.state, { trigger: "enemyDestroyed", seat: 0, cardId: wight, subject: wight }), t.ctx, []);
+    expect(heard.cards[idOf(heard, "10109")]?.progress).toBe(2);
+  });
+
+  it("10111:A:2 places 2 progress on Sift through the Debris after a location is explored", () => {
+    const t = built({ staging: ["10111", "10102"] });
+    const place = idOf(t.state, "10102");
+    const heard = settle(queueEvent(t.state, { trigger: "locationExplored", seat: null, subject: place, amount: 0 }), t.ctx, []);
+    expect(heard.cards[idOf(heard, "10111")]?.progress).toBe(2);
+  });
+});
+
+describe("the treacheries", () => {
+  it("10106:A:1 deals 1 damage to each exhausted character, and a player with 35 threat or more discards his exhausted attachments", () => {
+    const t = built({ phase: "Quest", threat: [35, 30], seats: 2, attached: [{ code: "10187", to: HERO }] });
+    const hero = idOf(t.state, HERO);
+    const boon = idOf(t.state, "10187");
+    const tired = updateCard(updateCard(t.state, hero, { exhausted: true }), boon, { exhausted: true });
+    const run = finish(resolveRecords(tired, t.ctx, "10106", "whenRevealed", undefined, undefined, false), t.ctx);
+    expect(run.state.cards[hero]?.damage).toBe(1);
+    expect(run.state.cards[boon]?.zone).toBe("discard");
+    const low = built({ phase: "Quest", threat: [34, 30], attached: [{ code: "10187", to: HERO }] });
+    const kept = finish(resolveRecords(updateCard(updateCard(low.state, idOf(low.state, HERO), { exhausted: true }), idOf(low.state, "10187"), { exhausted: true }), low.ctx, "10106", "whenRevealed", undefined, undefined, false), low.ctx);
+    expect(kept.state.cards[idOf(kept.state, "10187")]?.zone).toBe("play");
+  });
+
+  it("10108:A:1 exhausts a character of each player and attaches to the current quest for +6 quest points, and is discarded with no current quest", () => {
+    const t = built({ phase: "Quest", staging: ["10109"] });
+    const chosen = setCurrentQuest(t.state, idOf(t.state, "10109"), t.ctx);
+    const run = finish(resolveRecords(chosen, t.ctx, "10108", "whenRevealed", undefined, undefined, false), t.ctx);
+    const side = idOf(run.state, "10109");
+    expect(run.state.cards[idOf(run.state, "10108")]?.host).toBe(side);
+    expect(modifiedStat(run.state, run.state.cards[side]!, "questPoints", t.ctx.cards)).toBe((t.ctx.cards.get("10109")?.questPoints ?? 0) + 6);
+    expect(run.state.cards[idOf(run.state, HERO)]?.exhausted).toBe(true);
+    const none = finish(resolveRecords(t.state, t.ctx, "10108", "whenRevealed", undefined, undefined, false), t.ctx);
+    expect(none.state.cards[idOf(none.state, "10108")]?.host ?? null).toBeNull();
+  });
+
+  it("10105:A:2 makes the first player choose another quest card to be the current quest: a staged side quest, never the barred main quest card", () => {
+    const t = built({ phase: "Quest", staging: ["10109", "10111"] });
+    const run = finish(resolveRecords(t.state, t.ctx, "10105", "whenRevealed", undefined, (state) => (state.window?.kind === "choose" ? (state.window.options[0] ?? "") : ""), false), t.ctx);
+    const current = ["10109", "10111"].filter((code) => flagged(run.state, idOf(run.state, code), "currentQuest"));
+    expect(current).toHaveLength(1);
+  });
+
+  it("10102:A:1 lowers the Threat of Eerie Halls by 1 for a raise of 1 in threat, down to 0 and no further", () => {
+    const t = built({ staging: ["10102"], threat: [30, 30] });
+    const halls = idOf(t.state, "10102");
+    const base = modifiedStat(t.state, t.state.cards[halls]!, "threat", t.ctx.cards);
+    const run = resolveRecords(t.state, t.ctx, "10102", "action", halls);
+    expect(modifiedStat(run.state, run.state.cards[halls]!, "threat", t.ctx.cards)).toBe(base - 1);
+    const record = t.ctx.effects.find((effect) => effect.id === "10102:action:1");
+    expect(record?.cost).toEqual({ kind: "raiseThreat", amount: 1 });
+  });
+});

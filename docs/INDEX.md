@@ -77,7 +77,7 @@ Read the sections your task touches.
   - 378–383 Catalog build (~410)
   - 384–401 Tests (~2.0K) ← 5
   - 402–417 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~185.7K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~188.4K tok)
   - 17–40 Sections (~490)
   - 41–52 Product (~590) ← 2
   - 53–66 Non-goals (~540)
@@ -111,7 +111,7 @@ Read the sections your task touches.
     - 624–641 The Caves of Nibin-Dûm (~2.4K)
   - 642–700 Dream-chaser (~16.2K) ← 4
   - 701–728 Ered Mithrin (~16.4K) ← 8
-  - 729–1183 Angmar Awakened (~56.2K) ← 6
+  - 729–1220 Angmar Awakened (~58.9K) ← 6
     - 752–786 Intruders in Chetwood (~3.5K)
     - 787–817 The Weather Hills (~3.9K)
     - 818–853 Deadmen's Dike (~4.5K)
@@ -124,26 +124,27 @@ Read the sections your task touches.
     - 1066–1102 The Wastes of Eriador (~4.8K)
     - 1103–1146 Escape from Mount Gram (~5.3K)
     - 1147–1183 Across the Ettenmoors (~5.0K)
-  - 1184–1321 The Two Towers (~16.4K) ← 20
-  - 1322–1557 The Return of the King (~28.2K) ← 22
-    - 1350–1375 The Passing of the Grey Company (~2.7K)
-    - 1376–1407 The Siege of Gondor (~4.1K)
-    - 1408–1453 The Battle of the Pelennor Fields (~5.8K)
-    - 1454–1491 The Tower of Cirith Ungol (~4.4K)
-    - 1492–1528 The Black Gate Opens (~4.4K) ← 2
-    - 1529–1557 Mount Doom (~4.3K)
-  - 1558–1566 Nightmare (~410) ← 19
-  - 1567–1605 Deckbuilding (~1.9K)
-  - 1606–1684 Effects (~3.2K)
-    - 1608–1666 Three layers (~2.4K) ← 10
-    - 1667–1676 Player side quests, contracts and saga cards (~430)
-    - 1677–1680 Window stack (~100)
-    - 1681–1684 Coverage test (~270)
-  - 1685–1705 Data sources (~530)
-  - 1706–1724 Card images (~1.2K) ← 9
-  - 1725–1750 Persistence and shipping (~2.6K) ← 6
-  - 1751–1792 Screens (~4.9K) ← 1
-    - 1777–1792 Table screen (~1.8K) ← 3
+    - 1184–1220 The Treachery of Rhudaur (~2.7K)
+  - 1221–1358 The Two Towers (~16.4K) ← 20
+  - 1359–1594 The Return of the King (~28.2K) ← 22
+    - 1387–1412 The Passing of the Grey Company (~2.7K)
+    - 1413–1444 The Siege of Gondor (~4.1K)
+    - 1445–1490 The Battle of the Pelennor Fields (~5.8K)
+    - 1491–1528 The Tower of Cirith Ungol (~4.4K)
+    - 1529–1565 The Black Gate Opens (~4.4K) ← 2
+    - 1566–1594 Mount Doom (~4.3K)
+  - 1595–1603 Nightmare (~410) ← 19
+  - 1604–1642 Deckbuilding (~1.9K)
+  - 1643–1721 Effects (~3.2K)
+    - 1645–1703 Three layers (~2.4K) ← 10
+    - 1704–1713 Player side quests, contracts and saga cards (~430)
+    - 1714–1717 Window stack (~100)
+    - 1718–1721 Coverage test (~270)
+  - 1722–1742 Data sources (~530)
+  - 1743–1761 Card images (~1.2K) ← 9
+  - 1762–1787 Persistence and shipping (~2.6K) ← 6
+  - 1788–1829 Screens (~4.9K) ← 1
+    - 1814–1829 Table screen (~1.8K) ← 3
 - `docs/design-system-table.md` — Design system — Table (landscape) (~54.5K tok)
   - 5–8 Overview (~130) ← 1
   - 9–23 Top bar (~3.1K) ← 4
