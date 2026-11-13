@@ -14,7 +14,8 @@ import type { ReduceContext } from "../../../interpret/interpret.ts";
 import { askTarget } from "../../../windows/choices.ts";
 import { currentCause, UNATTRIBUTED } from "../../../core/cause.ts";
 import { lastPicked } from "../../../interpret/player-verbs.ts";
-import { pushPicked } from "../../encounter/moves.ts";
+import { effectData, pushPicked } from "../../encounter/moves.ts";
+import { patchTop } from "../../../windows/windows.ts";
 import { stagingDest } from "../../breaking/areas.ts";
 import type { Focus } from "../../index.ts";
 
@@ -47,7 +48,10 @@ export function destroyHighestCostAlly(state: ScenarioState, _instruction: Verb<
   const chosen = focus.chosen != null && tied.includes(focus.chosen) ? focus.chosen : tied.length === 1 ? tied[0] : undefined;
   if (tied.length === 0) return pushPicked(state, null);
   if (!chosen) return askTarget(state, { instruction: { verb: "DestroyHighestCostAlly" }, seat: state.firstPlayer, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, tied);
-  return pushPicked(destroyCard(state, chosen, ctx.cards, steps), chosen);
+  const controller = state.cards[chosen]?.controller;
+  const destroyed = pushPicked(destroyCard(state, chosen, ctx.cards, steps), chosen);
+  const data = effectData(destroyed);
+  return data && controller != null ? patchTop(destroyed, { data: { ...data, destroyedController: controller } }) : destroyed;
 }
 
 /** DiscardOtherInPlay: the card the answered event names as its other card is discarded when it is still in play ("If Possession is discarded, the attached card is also discarded", 101162:A:2: the event `attachmentLeft` names the card Possession lay on). A card that left play already is left alone. */

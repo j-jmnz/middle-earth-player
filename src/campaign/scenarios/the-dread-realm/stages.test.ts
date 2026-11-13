@@ -115,6 +115,11 @@ describe("stage 2 and the Altar of Midwinter", () => {
     const reanimate = resolveRecords(t.state, t.ctx, ALTAR, "forced", altar, (state) => (state.window?.kind === "choose" ? (state.window.options.find((option) => option.includes("reanimate")) ?? state.window.options[0] ?? "") : ""));
     expect(deadOf(reanimate.state, 1)).toHaveLength(1);
     expect(deadOf(reanimate.state, 0)).toHaveLength(0);
+    // The first player's deck is the one read: the player who is not the first player holds the cards, the first player none.
+    const other = built({ active: ALTAR, firstPlayer: 1, deckOf: [{ code: "filler", seat: 0 }] });
+    const noChoice = resolveRecords(other.state, other.ctx, ALTAR, "forced", idOf(other.state, ALTAR));
+    expect(noChoice.state.staging.length).toBeGreaterThan(other.state.staging.length);
+    expect(deadOf(noChoice.state, 0)).toHaveLength(0);
     const empty = built({ active: ALTAR, firstPlayer: 1 });
     const only = resolveRecords(empty.state, empty.ctx, ALTAR, "forced", idOf(empty.state, ALTAR));
     expect(only.state.staging.length).toBeGreaterThan(empty.state.staging.length);
@@ -137,12 +142,34 @@ describe("stage 3", () => {
   it("10152:B:2 places the progress that would go on the quest on locations in the staging area, the first player choosing, and a location it explores leaves play", () => {
     const t = built({ stage: "10152", staging: ["place", "place"] });
     const synced = settled(t.state, t);
-    const placed = finish({ state: settled(placeQuestProgress(synced, 3, t.cards, [], canAdvance), t), steps: [] }, t.ctx);
+    // Always the first location offered, and all it can take (the last option of the amount step).
+    const takeAll = (state: ScenarioState): string => (state.window?.kind === "choose" ? (state.window.options.at(/^\d+$/.test(state.window.options[0] ?? "") ? -1 : 0) ?? "") : "");
+    const placed = finish({ state: settled(placeQuestProgress(synced, 3, t.cards, [], canAdvance), t), steps: [] }, t.ctx, takeAll);
     const left = placed.state.staging.filter((id) => placed.state.cards[id]?.code === "place");
     // Two quest points each: one location took 2 and was explored, the other holds the last 1.
     expect(left).toHaveLength(1);
     expect(placed.state.cards[left[0]!]?.progress).toBe(1);
     expect(placed.state.encounterDiscard.filter((id) => placed.state.cards[id]?.code === "place")).toHaveLength(1);
+    expect(placed.state.cards[placed.state.questStage ?? ""]?.progress).toBe(0);
+  });
+
+  it("10152:B:2 lets the first player divide the progress as they choose, an amount at a time, each location taking at most what it still needs and the active location taking its share first", () => {
+    const t = built({ stage: "10152", staging: ["place", "place", "place"], active: "place" });
+    const synced = settled(t.state, t);
+    const asked: string[][] = [];
+    // One at a time on the location with the least progress: 2 on the active location first, then 1 and 1 on two staged locations, the third left unexplored.
+    const fewest = (state: ScenarioState): string => {
+      if (state.window?.kind !== "choose") return "";
+      asked.push([...state.window.options]);
+      if (/^\d+$/.test(state.window.options[0] ?? "")) return "1";
+      return [...state.window.options].sort((a, b) => (state.cards[a]?.progress ?? 0) - (state.cards[b]?.progress ?? 0))[0] ?? "";
+    };
+    const placed = finish({ state: settled(placeQuestProgress(synced, 4, t.cards, [], canAdvance), t), steps: [] }, t.ctx, fewest);
+    const staged = placed.state.staging.filter((id) => placed.state.cards[id]?.code === "place");
+    expect(staged.map((id) => placed.state.cards[id]?.progress ?? 0).sort()).toEqual([0, 1, 1]);
+    expect(placed.state.cards[placed.state.activeLocation ?? ""]?.progress ?? 0).toBeLessThanOrEqual(2);
+    // The amount step offers 1 and 2 for a location that needs 2, never a number the location cannot take.
+    expect(asked.some((options) => options.join() === "1,2")).toBe(true);
     expect(placed.state.cards[placed.state.questStage ?? ""]?.progress).toBe(0);
   });
 
@@ -175,6 +202,19 @@ describe("A Fell Dread", () => {
     expect(modifiedStat(settled(run.state, t), settled(run.state, t).cards[hero!]!, "willpower", t.cards)).toBe(0);
     const again = resolveRecords(settled(run.state, t), t.ctx, FELL_DREAD, "whenRevealed");
     expect(again.state.cards[again.id]?.zone).not.toBe("attached");
+  });
+
+  it("101163:A:1 goes on a hero without A Fell Dread already attached: a player with two heroes gets one on each, and a copy on an ally reduces nothing", () => {
+    const t = built({ threat: [33, 25] });
+    const first = resolveRecords(t.state, t.ctx, FELL_DREAD, "whenRevealed");
+    const second = resolveRecords(settled(first.state, t), t.ctx, FELL_DREAD, "whenRevealed");
+    const hosts = [first.state.cards[first.id]?.host, second.state.cards[second.id]?.host];
+    expect(new Set(hosts)).toEqual(new Set([t.hero, t.hero2]));
+    const third = resolveRecords(settled(second.state, t), t.ctx, FELL_DREAD, "whenRevealed");
+    expect(third.state.cards[third.id]?.zone).not.toBe("attached");
+    const ally = built({ play: ["10176"], attached: [{ code: FELL_DREAD, to: "10176" }] });
+    const synced = settled(ally.state, ally);
+    expect(modifiedStat(synced, synced.cards[idOf(synced, "10176")]!, "willpower", ally.cards)).toBe(1);
   });
 
   it("101163:A:1 leaves no Pass in the quest commitment while the hero it is on is able to commit, and the hero commits like any other character", () => {

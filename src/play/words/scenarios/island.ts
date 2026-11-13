@@ -35,6 +35,8 @@ export function islandPickWords(pick: Instruction, next: Instruction | undefined
   const host = sourceId ? names.card(sourceId) : "This card";
   switch (pick.verb) {
     case "PlaceProgressInStaging":
+      if (pick.at != null) return { verb: "Place", prompt: `${host}: ${plural(pick.left ?? 0, "progress", "progress")} left to place. Choose how much goes on ${names.card(pick.at)}; the rest goes on other locations in the staging area.` };
+      if (pick.required === true) return { verb: "Place", prompt: `${host}: ${plural(pick.left ?? 0, "progress", "progress")} left to place, divided as you choose. Choose a location in the staging area to put some of it on.` };
       return { verb: "Place", prompt: `${host}: ${plural(pick.left ?? 0, "progress", "progress")} left to place. Choose a location in the staging area to put it on, or keep it on the quest, where it does nothing.` };
     case "RaiseThreatToAttach": {
       const card = names.code(pick.code);
@@ -59,6 +61,7 @@ export function islandPickWords(pick: Instruction, next: Instruction | undefined
 /** The label of an option that is no card: keep the progress on the quest, raise threat to attach or keep it as it is. Null for a card (the sheet names it). */
 export function islandOptionLabel(instruction: Instruction, id: string, game: ScenarioState, names: ChoiceNames): string | null {
   if (instruction.verb === "PlaceProgressInStaging" && id === "keep") return "Keep the rest on the quest";
+  if (instruction.verb === "PlaceProgressInStaging" && instruction.at != null) return `${id} of the ${instruction.left ?? 0} progress`;
   if (instruction.verb === "RaiseThreatToAttach" && !instruction.accepted) {
     const seat = instruction.seat ?? 0;
     if (id === "attach") return `Raise threat by ${instruction.amount} to ${seatThreat(game, seat) + instruction.amount} and attach ${names.code(instruction.code)} to a hero`;

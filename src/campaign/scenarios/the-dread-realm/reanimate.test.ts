@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import type { EngineStep } from "../../../rules/core/intents.ts";
 import { destroyCard, modifiedStat } from "../../../rules/core/keywords.ts";
+import { pickCandidates } from "../../../rules/interpret/pick.ts";
 import { updateCard, type ScenarioState } from "../../../rules/core/state.ts";
 import { moveCard, shadowCards, spawn } from "../../../rules/core/zones.ts";
 import { settle } from "../../../rules/engine/machine.ts";
@@ -44,6 +45,17 @@ describe("a Dwimmerlaik or an Unholy Crypt that destroys a character", () => {
     const hero = fight.made.hero;
     expect(fight.run.state.cards[hero]?.code).toContain("~dead");
     expect(fight.run.state.seats[0].engaged).toContain(hero);
+    expect(shadowCards(fight.run.state.cards[hero])).toHaveLength(1);
+  });
+});
+
+describe("Dwimmerlaik's Forced names the defending player", () => {
+  it("10155:A:1 has the defending player (not the first player) reanimate the character it destroyed, in front of that player, while the other seat holds the first player token", () => {
+    const fight = fightEnemy(built, "f0", DWIMMERLAIK, { firstPlayer: 1 }, { undefended: true, tweak: (state, made) => updateCard(state, made.hero, { damage: 5 }) });
+    const hero = fight.made.hero;
+    expect(fight.run.state.cards[hero]?.code).toContain("~dead");
+    expect(fight.run.state.seats[0].engaged).toContain(hero);
+    expect(fight.run.state.seats[1].engaged).not.toContain(hero);
     expect(shadowCards(fight.run.state.cards[hero])).toHaveLength(1);
   });
 });
@@ -119,6 +131,26 @@ describe("Witch of Angmar, Sinister Dungeon and Death and Calamity", () => {
     const both = resolveRecords(two.state, two.ctx, CALAMITY, "whenRevealed");
     expect(deadOf(both.state, 0)).toHaveLength(2);
     expect(deadOf(both.state, 1)).toHaveLength(0);
+  });
+
+  it("101164:A:1 reanimates nothing when the attach did not happen (rr.then): with no current quest to hold it, the first player's deck is left alone", () => {
+    const t = built({ deckOf: ["filler", "filler", "filler"] });
+    const noQuest = { ...t.state, questStage: null };
+    const run = resolveRecords(noQuest, t.ctx, CALAMITY, "whenRevealed");
+    expect(run.state.cards[run.id]?.zone).not.toBe("attached");
+    expect(deadOf(run.state, 0)).toHaveLength(0);
+    expect(run.state.seats[0].deck).toHaveLength(t.state.seats[0].deck.length);
+  });
+
+  it("101157:A:1 takes 1 Willpower, Attack and Defense only from an attached character: on a host that is no character the Wraith gives nothing", () => {
+    const t = built({ staging: [DWIMMERLAIK], attached: [{ code: WRAITH, to: DWIMMERLAIK }, { code: WRAITH, to: "dh1" }] });
+    const wraiths = Object.values(t.state.cards).filter((card) => card.code === WRAITH);
+    const onEnemy = wraiths.find((card) => t.state.cards[card.host ?? ""]?.code === DWIMMERLAIK)!;
+    const onHero = wraiths.find((card) => card.id !== onEnemy.id)!;
+    const synced = settled(updateCard(updateCard(t.state, onEnemy.id, { zone: "attached", asAttachment: true }), onHero.id, { zone: "attached", asAttachment: true }), t);
+    expect(modifiedStat(synced, synced.cards[onEnemy.host!]!, "attack", t.cards)).toBe(5);
+    const hero = synced.cards[onHero.host!]!;
+    expect(modifiedStat(synced, hero, "defense", t.cards)).toBe(Math.max(0, (t.cards.get(hero.code)!.defense ?? 0) - 1));
   });
 
   it("101164:A:2 gives the attacking enemy +X Attack, X the Sorcery cards in play, the shadow card itself not counted", () => {
@@ -200,6 +232,27 @@ describe("Possession and the Wraith of Carn Dûm", () => {
     expect(discarded.seats[0].discard).toContain(host.id);
     const removed = settled(moveCard(synced, run.id, { zone: "removed" }), t);
     expect(removed.cards[host.id]).toMatchObject({ code: "10179~dead", zone: "staging" });
+  });
+
+  it("101162:A:2 has the destroyed ally's controller reanimate it, an ally of the other seat included, whoever the effect runs for", () => {
+    // The effect runs for seat 0, who is out of the game: only the controller of the ally (seat 1) can reanimate it.
+    const t = built({ play: [{ code: "10179", seat: 1 }] });
+    const out = { ...t.state, seats: [{ ...t.state.seats[0], eliminated: true }, t.state.seats[1]] as ScenarioState["seats"] };
+    const run = resolveRecords(out, t.ctx, POSSESSION, "whenRevealed");
+    const dead = Object.values(run.state.cards).find((card) => card.code === "10179~dead")!;
+    expect(dead).toMatchObject({ zone: "staging", owner: 1 });
+    expect(run.state.seats[1].discard).not.toContain(dead.id);
+    expect(run.state.cards[run.id]).toMatchObject({ zone: "attached", host: dead.id });
+  });
+
+  it("101162:A:2 counts as a Condition attachment as well as a Sorcery card, so an effect discarding a Condition attachment finds it", () => {
+    const t = built({ play: ["10179"] });
+    const run = resolveRecords(t.state, t.ctx, POSSESSION, "whenRevealed");
+    const synced = settled(run.state, t);
+    const found = pickCandidates(synced, { type: "attachment", control: "any", trait: "Condition" }, 0, [], null, t.ctx);
+    expect(found).toContain(run.id);
+    expect(hasTrait(synced, run.id, "Condition", t.ctx)).toBe(true);
+    expect(hasTrait(synced, run.id, "Sorcery", t.ctx)).toBe(true);
   });
 
   it("101157:A:1 attaches the Wraith to a character when it leaves play, as a Sorcery attachment taking 1 from Willpower, Attack and Defense, and returns it to the staging area as an enemy when that character leaves play", () => {

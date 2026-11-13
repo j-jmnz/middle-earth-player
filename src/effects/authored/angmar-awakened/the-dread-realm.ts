@@ -16,7 +16,9 @@ const AT_LEAST_ONE_SORCERY: Condition = { kind: "count", pick: SORCERY_IN_PLAY, 
 const DAECHANAR_IN_PLAY: Condition = { kind: "count", pick: { type: "enemy", control: "any", staging: true, names: ["Daechanar"] }, min: 1 };
 const LOCATIONS_IN_PLAY: PickSpec = { type: "location", control: "any" };
 const PHASE_QUEST: Condition = { kind: "phase", is: "Quest" };
-const ATTACHED: Condition = { kind: "sourceIn", zone: "attached" };
+const ATTACHED = { kind: "sourceIn", zone: "attached" } as const;
+/** "Attached character", "attached hero": the host is that card type now (a host can change type, rr.then is not involved). */
+const HOST_IS = (type: "character" | "hero") => ({ kind: "matches", card: "host", pick: { type, control: "any" } }) as const;
 const EACH_PLAYER = (instructions: Extract<Instruction, { verb: "ForEachPlayer" }>["instructions"]): Instruction => ({ verb: "ForEachPlayer", order: "firstFirst", instructions });
 /** "Each player reanimates the top card of his deck." */
 const EACH_PLAYER_REANIMATES: Instruction = EACH_PLAYER([{ verb: "Reanimate", from: "deckTop" }]);
@@ -105,7 +107,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   // it, core/zones.ts and keywords.ts releaseAttachments). Its Forced is the enemy's text, and is not heard while it lies attached.
   { id: "101157:forced:1", cardCode: "101157", lines: ["101157:A:1"], timing: "forced", trigger: "exitedPlay", subject: "self", instructions: [{ verb: "Pick", pick: { type: "character", control: "any", ...FIRST_PLAYER } }, { verb: "AttachEnemyToPicked" }] },
   { id: "101157:constant:1", cardCode: "101157", lines: ["101157:A:1"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Sorcery" }] },
-  { id: "101157:constant:2", cardCode: "101157", lines: ["101157:A:1"], timing: "constant", condition: ATTACHED, instructions: [HOST_MINUS_ONE("willpower"), HOST_MINUS_ONE("attack"), HOST_MINUS_ONE("defense")] },
+  { id: "101157:constant:2", cardCode: "101157", lines: ["101157:A:1"], timing: "constant", condition: { kind: "all", conditions: [ATTACHED, HOST_IS("character")] }, instructions: [HOST_MINUS_ONE("willpower"), HOST_MINUS_ONE("attack"), HOST_MINUS_ONE("defense")] },
 
   // 101158 Sinister Dungeon. Forced: when it is explored the first player reanimates a random card from their hand and deals the Dungeon to it facedown as a shadow card (with an empty hand nothing is reanimated and the Dungeon stays in the discard pile). Shadow: the top 2 cards of the encounter deck are
   // discarded and the "when revealed" effects of each Sorcery card discarded resolve.
@@ -159,9 +161,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     cardCode: "101162",
     lines: ["101162:A:2"],
     timing: "whenRevealed",
-    instructions: [{ verb: "DestroyHighestCostAlly" }, { verb: "Reanimate", from: "card", to: "staging" }, { verb: "AttachSelfToPicked" }],
+    instructions: [{ verb: "DestroyHighestCostAlly" }, { verb: "Reanimate", from: "card", to: "staging", who: "controller" }, { verb: "AttachSelfToPicked" }],
   },
-  { id: "101162:constant:1", cardCode: "101162", lines: ["101162:A:2"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Sorcery" }, { verb: "ModifyStat", stat: "discardsHost", amount: 1, until: "whileSourceInPlay", target: "self" }] },
+  { id: "101162:constant:1", cardCode: "101162", lines: ["101162:A:2"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Condition" }, { verb: "ModifyStat", stat: "discardsHost", amount: 1, until: "whileSourceInPlay", target: "self" }] },
   { id: "101162:triggered:1", cardCode: "101162", lines: ["101162:A:2"], timing: "triggered", trigger: "attachmentLeft", subject: "self", instructions: [{ verb: "DiscardOtherInPlay" }] },
 
   // 101163 A Fell Dread. When Revealed: the player with the highest threat attaches it to a hero they control that does not carry one. The hero's Willpower is reduced to 0 and it must commit to the quest, if able.
@@ -171,8 +173,10 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     cardCode: "101163",
     lines: ["101163:A:1"],
     timing: "constant",
-    instructions: [{ verb: "SetStat", stat: "willpower", value: 0, target: "host" }, { verb: "ModifyStat", stat: "mustCommit", amount: 1, until: "whileSourceInPlay", target: "host" }, { verb: "CountsAs", cardType: "attachment", trait: "Condition" }],
+    condition: HOST_IS("hero"),
+    instructions: [{ verb: "SetStat", stat: "willpower", value: 0, target: "host" }, { verb: "ModifyStat", stat: "mustCommit", amount: 1, until: "whileSourceInPlay", target: "host" }],
   },
+  { id: "101163:constant:2", cardCode: "101163", lines: ["101163:A:1"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Condition" }] },
 
   // 101164 Death and Calamity. When Revealed: it is attached to the current quest, then the first player reanimates the top X cards of their deck, X the copies of it in play. Shadow: the attacking enemy gets +X Attack, X the Sorcery cards in play.
   {
@@ -180,7 +184,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     cardCode: "101164",
     lines: ["101164:A:1"],
     timing: "whenRevealed",
-    instructions: [{ verb: "AttachToQuest" }, { verb: "Reanimate", from: "deckTop", count: { count: { type: "card", control: "any", names: ["Death and Calamity"], allInPlay: true } }, ...FIRST_PLAYER }],
+    instructions: [{ verb: "AttachToQuest" }, { verb: "Reanimate", from: "deckTop", count: { count: { type: "card", control: "any", names: ["Death and Calamity"], allInPlay: true } }, when: ATTACHED, ...FIRST_PLAYER }],
   },
   { id: "101164:shadow:1", cardCode: "101164", lines: ["101164:A:2"], timing: "shadow", instructions: [{ verb: "ModifyStat", stat: "attack", amount: { count: SORCERY_IN_PLAY }, until: "endOfAttack", target: "attacker" }] },
 ]);

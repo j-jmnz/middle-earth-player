@@ -108,6 +108,8 @@ export type EffectData = {
   destroyedAlly?: string;
   // The first character the attack the effect was left by destroyed, a hero or an ally ("reanimate that character", 101161:A:2).
   destroyedCharacter?: string;
+  // The seat that controlled the ally DestroyHighestCostAlly destroyed, so "that ally's controller" reanimates it (101162:A:2).
+  destroyedController?: number;
   hold?: string;
   // The card DiscardBottom discarded from the bottom of a deck in this effect (the `discardedCost` condition, families/uncharted/cards.ts).
   discarded?: string;

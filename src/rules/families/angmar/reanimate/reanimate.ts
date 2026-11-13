@@ -17,9 +17,14 @@ import type { Focus } from "../../index.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
-/** The seat a Reanimate stands the card in front of: the actor, or the first player. */
+/** The seat a Reanimate stands the card in front of: the actor, the first player, or the controller of the ally the effect destroyed ("That ally's controller reanimates that character", 101162:A:2). */
 function seatFor(state: ScenarioState, instruction: Verb<"Reanimate">, focus: Focus): number {
-  return instruction.who === "firstPlayer" ? state.firstPlayer : focus.seat;
+  if (instruction.who === "firstPlayer") return state.firstPlayer;
+  if (instruction.who === "controller") {
+    const data = topFrame(state)?.data;
+    return data?.kind === "effect" && data.destroyedController != null ? data.destroyedController : focus.seat;
+  }
+  return focus.seat;
 }
 
 /** Reanimates one card: it is renamed to its Reanimated Dead code, turned facedown and either engages `seat` (the default) or joins the staging area. A card that is already reanimated, in play, or whose seat is out of the game is left as it is. */
