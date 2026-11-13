@@ -48,7 +48,7 @@ import * as gram from "../scenarios/escape-from-mount-gram/game.ts";
 import * as ettenmoors from "../scenarios/across-the-ettenmoors/game.ts";
 import * as rhudaur from "../scenarios/the-treachery-of-rhudaur/game.ts";
 import * as dum from "../scenarios/the-battle-of-carn-dum/game.ts";
-// import * as realm from "../scenarios/the-dread-realm/game.ts";
+import * as realm from "../scenarios/the-dread-realm/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -122,5 +122,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-tower-of-cirith-ungol", "The Tower of Cirith Ungol", ungol.UNGOL_GOLDENS, ungol.ungolWorld, ungol.playGolden),
   entry("the-black-gate-opens", "The Black Gate Opens", opens.OPENS_GOLDENS, opens.opensWorld, opens.playGolden),
   entry("mount-doom", "Mount Doom", doom.DOOM_GOLDENS, doom.doomWorld, doom.playGolden),
-  // entry("the-dread-realm", "The Dread Realm", realm.REALM_GOLDENS, realm.realmWorld, realm.playGolden),
+  entry("the-dread-realm", "The Dread Realm", realm.REALM_GOLDENS, realm.realmWorld, realm.playGolden),
 ];
