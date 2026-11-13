@@ -77,7 +77,7 @@ Read the sections your task touches.
   - 378–383 Catalog build (~410)
   - 384–401 Tests (~2.0K) ← 5
   - 402–417 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~194.7K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~198.9K tok)
   - 17–40 Sections (~490)
   - 41–52 Product (~590) ← 2
   - 53–66 Non-goals (~540)
@@ -111,7 +111,7 @@ Read the sections your task touches.
     - 624–641 The Caves of Nibin-Dûm (~2.4K)
   - 642–700 Dream-chaser (~16.2K) ← 4
   - 701–728 Ered Mithrin (~16.4K) ← 8
-  - 729–1258 Angmar Awakened (~65.2K) ← 6
+  - 729–1289 Angmar Awakened (~69.4K) ← 6
     - 752–786 Intruders in Chetwood (~3.5K)
     - 787–817 The Weather Hills (~3.9K)
     - 818–853 Deadmen's Dike (~4.5K)
@@ -126,27 +126,28 @@ Read the sections your task touches.
     - 1147–1183 Across the Ettenmoors (~5.0K)
     - 1184–1222 The Treachery of Rhudaur (~4.3K)
     - 1223–1258 The Battle of Carn Dûm (~4.7K)
-  - 1259–1396 The Two Towers (~16.4K) ← 20
-  - 1397–1632 The Return of the King (~28.2K) ← 22
-    - 1425–1450 The Passing of the Grey Company (~2.7K)
-    - 1451–1482 The Siege of Gondor (~4.1K)
-    - 1483–1528 The Battle of the Pelennor Fields (~5.8K)
-    - 1529–1566 The Tower of Cirith Ungol (~4.4K)
-    - 1567–1603 The Black Gate Opens (~4.4K) ← 2
-    - 1604–1632 Mount Doom (~4.3K)
-  - 1633–1641 Nightmare (~410) ← 19
-  - 1642–1680 Deckbuilding (~1.9K)
-  - 1681–1759 Effects (~3.2K)
-    - 1683–1741 Three layers (~2.4K) ← 10
-    - 1742–1751 Player side quests, contracts and saga cards (~430)
-    - 1752–1755 Window stack (~100)
-    - 1756–1759 Coverage test (~270)
-  - 1760–1780 Data sources (~530)
-  - 1781–1799 Card images (~1.2K) ← 9
-  - 1800–1825 Persistence and shipping (~2.6K) ← 6
-  - 1826–1867 Screens (~4.9K) ← 1
-    - 1852–1867 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~56.0K tok)
+    - 1259–1289 The Dread Realm (~4.2K)
+  - 1290–1427 The Two Towers (~16.4K) ← 20
+  - 1428–1663 The Return of the King (~28.2K) ← 22
+    - 1456–1481 The Passing of the Grey Company (~2.7K)
+    - 1482–1513 The Siege of Gondor (~4.1K)
+    - 1514–1559 The Battle of the Pelennor Fields (~5.8K)
+    - 1560–1597 The Tower of Cirith Ungol (~4.4K)
+    - 1598–1634 The Black Gate Opens (~4.4K) ← 2
+    - 1635–1663 Mount Doom (~4.3K)
+  - 1664–1672 Nightmare (~410) ← 19
+  - 1673–1711 Deckbuilding (~1.9K)
+  - 1712–1790 Effects (~3.2K)
+    - 1714–1772 Three layers (~2.4K) ← 10
+    - 1773–1782 Player side quests, contracts and saga cards (~430)
+    - 1783–1786 Window stack (~100)
+    - 1787–1790 Coverage test (~270)
+  - 1791–1811 Data sources (~530)
+  - 1812–1830 Card images (~1.2K) ← 9
+  - 1831–1856 Persistence and shipping (~2.6K) ← 6
+  - 1857–1898 Screens (~4.9K) ← 1
+    - 1883–1898 Table screen (~1.8K) ← 3
+- `docs/design-system-table.md` — Design system — Table (landscape) (~57.0K tok)
   - 5–8 Overview (~130) ← 1
   - 9–23 Top bar (~3.1K) ← 4
   - 24–27 Table menu (~490) ← 2
@@ -154,31 +155,31 @@ Read the sections your task touches.
   - 36–39 Canvas (~560)
   - 40–52 Spacing and the play area's rows (~1.9K) ← 9
   - 53–58 Pictures on the table (~320) ← 1
-  - 59–105 Cards (~19.5K) ← 27
-  - 106–111 The Sailing test (~690) ← 5
-  - 112–125 The Island Map (~1.8K) ← 8
-  - 126–129 Tokens and effects (~320)
-  - 130–144 Piles (~2.0K) ← 7
-  - 145–150 Marks of the open moment (~400) ← 1
-  - 151–219 Motion (~3.2K) ← 7
-  - 220–245 Spotlight (~2.5K) ← 33
-  - 246–251 Gestures (~620) ← 4
-  - 252–255 Hold, slide and release (~940)
-  - 256–261 Peeking at the other seat (~600) ← 1
-  - 262–281 Command column (~2.6K) ← 11
-  - 282–285 Two taps (~420) ← 2
-  - 286–289 One answer, one tap (~240)
-  - 290–293 Stops and Always use (~250)
-  - 294–297 Guide (~120)
-  - 298–314 Choice tray (~5.6K) ← 48
-  - 315–329 Reading panels (~1.6K) ← 5
-  - 330–339 Phase carousel (~680)
-  - 340–345 Quest advance (~530) ← 1
-  - 346–349 Undo (~150)
-  - 350–353 Haptics (~280)
-  - 354–365 Banner (~750) ← 5
-  - 366–385 Screen reader (~2.8K) ← 17
-  - 386–389 Android Back (~90)
+  - 59–106 Cards (~20.4K) ← 27
+  - 107–112 The Sailing test (~690) ← 5
+  - 113–126 The Island Map (~1.8K) ← 8
+  - 127–130 Tokens and effects (~320)
+  - 131–145 Piles (~2.0K) ← 7
+  - 146–151 Marks of the open moment (~400) ← 1
+  - 152–220 Motion (~3.2K) ← 7
+  - 221–246 Spotlight (~2.5K) ← 33
+  - 247–252 Gestures (~620) ← 4
+  - 253–256 Hold, slide and release (~940)
+  - 257–262 Peeking at the other seat (~600) ← 1
+  - 263–282 Command column (~2.6K) ← 11
+  - 283–286 Two taps (~420) ← 2
+  - 287–290 One answer, one tap (~240)
+  - 291–294 Stops and Always use (~250)
+  - 295–298 Guide (~120)
+  - 299–315 Choice tray (~5.6K) ← 48
+  - 316–330 Reading panels (~1.6K) ← 5
+  - 331–340 Phase carousel (~680)
+  - 341–346 Quest advance (~530) ← 1
+  - 347–350 Undo (~150)
+  - 351–354 Haptics (~280)
+  - 355–366 Banner (~750) ← 5
+  - 367–386 Screen reader (~2.8K) ← 17
+  - 387–390 Android Back (~90)
 - `docs/design-system.md` — Design system — Carved Stone (~29.9K tok)
   - 7–20 Direction (~670)
   - 21–33 Standards (~580)
@@ -311,4 +312,3 @@ The sections each area's comments cite, most cited first. Read these before chan
 - `src/screens`: design-system.md, Tablets (8); design-system.md, Campaigns (campaign list) (6); brief.md, Three layers (5); design-system.md, Briefing (5); design-system.md, Components (5); brief.md, Card images (4); design-system.md, Campaign path (4); design-system.md, History (4); design-system.md, Settings (4); design-system.md, Campaign setup (3); design-system.md, Card pool (the Cards tab) (3); design-system.md, Deck builder (deck editor) (3); design-system.md, Navigation (3); design-system.md, Performance (3); design-system.md, Screen reader (3); brief.md, Persistence and shipping (2); brief.md, The Two Towers (2); design-system.md, Backdrops (2); design-system.md, Booklet (2); design-system.md, Card (2); design-system.md, Card art (2); design-system.md, Decks (2); design-system.md, Table opens stale (2); architecture.md, Images (1); architecture.md, State (1); architecture.md, Tests (1); brief.md, Campaign (1); brief.md, Nightmare (1); brief.md, Screens (1); brief.md, The Black Gate Opens (1); design-system-table.md, Marks of the open moment (1); design-system-table.md, Screen reader (1); design-system.md, Campaign log (1); design-system.md, Color (1); design-system.md, Icons (1); design-system.md, Resolution and standalone outcome (1); design-system.md, Rule (1); design-system.md, Rules (1); design-system.md, Scenarios (1); design-system.md, Spend XP (1); design-system.md, Type (1); releasing.md, TestFlight (optional) (1)
 - `src/ui`: design-system.md, Settings (4); design-system.md, Type (4); design-system.md, Components (3); design-system-table.md, Screen reader (2); design-system.md, Backdrops (2); design-system.md, Screen reader (2); design-system.md, Tablets (2); design-system-table.md, Banner (1); design-system-table.md, Motion (1); design-system-table.md, Overview (1); design-system-table.md, Spotlight (1); design-system-table.md, Table menu (1); design-system.md, Icons (1); design-system.md, Performance (1); design-system.md, Spacing, radius, border (1); design-system.md, Surfaces (1); showcase.md, Every picture drawn (1)
 - `tailwind.config.js`: design-system.md, Spacing, radius, border (1); design-system.md, Type (1)
-- `test/scenarios`: .claude/rules/code-standards.md, Test cost (1)
