@@ -12,7 +12,7 @@ import { areaHeadOf } from "../families/breaking/areas.ts";
 import { discardedFromDeck, joinStormcallerArea } from "../families/stormcaller/zone.ts";
 import { joinUnchartedDeck, shuffleUnchartedDeck, unchartedRoute, unchartedWon } from "../families/uncharted/zone.ts";
 import { deckRoute, isDeckZone, joinPile, leavePile, type PileZone } from "./piles.ts";
-import { fallenBase, isReanimatedCode, ORC_GUARD_CODE } from "./printed.ts";
+import { isReanimatedCode, ORC_GUARD_CODE, reanimatedBase } from "./printed.ts";
 import { flagged, heldHero, inPlay, updateCard, updateCards, withSeat } from "./state.ts";
 
 export type Destination =
@@ -346,7 +346,7 @@ export function moveCard(state: ScenarioState, id: string, requested: Destinatio
   // A Reanimated Dead stays an enemy in an engaged row or the staging area; by any other exit it is its owner's card again, faceup in the owner's discard pile (mec108.reanimated-dead, rules/core/printed.ts DEAD_SUFFIX).
   if (!dead || !isReanimatedCode(dead.code) || requested.zone === "engaged" || requested.zone === "staging") return moveCardTo(state, id, requested, options);
   const seat = dead.owner ?? dead.controller ?? 0;
-  return updateCard(moveCardTo(state, id, { zone: "discard", seat }, options), id, { code: fallenBase(dead.code), face: "up", owner: undefined, damage: 0 });
+  return updateCard(moveCardTo(state, id, { zone: "discard", seat }, options), id, { code: reanimatedBase(dead.code), face: "up", owner: undefined, damage: 0 });
 }
 
 function moveCardTo(state: ScenarioState, id: string, requested: Destination, options: MoveOptions): ScenarioState {

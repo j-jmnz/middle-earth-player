@@ -231,6 +231,11 @@ export function isReanimatedCode(code: string): boolean {
   return code.endsWith(DEAD_SUFFIX);
 }
 
+/** The printed code of a card turned into a Reanimated Dead. The table never shows it (picture-key.ts keeps the suffix, so a facedown player card is never drawn as its face or named by it). */
+export function reanimatedBase(code: string): string {
+  return isReanimatedCode(code) ? code.slice(0, -DEAD_SUFFIX.length) : code;
+}
+
 function reanimatedOf(card: PrintedCard): PrintedCard {
   let made = DEAD.get(card);
   if (!made) {
@@ -251,7 +256,6 @@ export function isShipObjectiveCode(code: string): boolean {
 
 // The card's own code for the code of a derived card (a fallen hero or a Ship enemy taken as a Ship-objective), or the code itself.
 export function fallenBase(code: string): string {
-  if (code.endsWith(DEAD_SUFFIX)) return code.slice(0, -DEAD_SUFFIX.length);
   if (code.endsWith(SHIP_SUFFIX)) return code.slice(0, -SHIP_SUFFIX.length);
   return code.endsWith(FALLEN_SUFFIX) ? code.slice(0, -FALLEN_SUFFIX.length) : code;
 }
@@ -301,7 +305,7 @@ function fallenOf(hero: PrintedCard): PrintedCard {
 export function printedOf(cards: ReadonlyMap<string, PrintedCard>, code: string): PrintedCard {
   const card = cards.get(code) ?? BUILT_IN.get(code);
   if (card) return card;
-  const dead = code.endsWith(DEAD_SUFFIX) ? cards.get(fallenBase(code)) : undefined;
+  const dead = isReanimatedCode(code) ? cards.get(reanimatedBase(code)) : undefined;
   if (dead) return reanimatedOf(dead);
   const enemy = code.endsWith(SHIP_SUFFIX) ? cards.get(fallenBase(code)) : undefined;
   if (enemy) return shipObjectiveOf(enemy);
