@@ -7,8 +7,8 @@ import { capturedDeck, capturedUnder } from "../../../rules/families/captured/pi
 import { recordStolenCards } from "../../../rules/families/campaign/damage-tracking.ts";
 import { spawn } from "../../../rules/core/zones.ts";
 import { idOf, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
-import { BOONS, begin as begun } from "../../../../test/scenarios/escape-from-mount-gram/begun.ts";
-import { gramWorld } from "../../../../test/scenarios/escape-from-mount-gram/game.ts";
+import { begin as begun } from "../../../../test/scenarios/escape-from-mount-gram/begun.ts";
+import { BOONS, gramWorld } from "../../../../test/scenarios/escape-from-mount-gram/game.ts";
 
 describe("Setup", () => {
   let world: Awaited<ReturnType<typeof gramWorld>>;

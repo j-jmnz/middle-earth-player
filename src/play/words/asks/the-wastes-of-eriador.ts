@@ -1,6 +1,6 @@
 import type { Condition, PickSpec } from "../../../catalog/boundary.ts";
 import type { Ask } from "../asks.ts";
-import { POOL_BOON_ASKS } from "../pool-boon-asks.ts";
+import { DETERMINATION_ASKS, POOL_BOON_ASKS } from "../pool-boon-asks.ts";
 
 // The choice words of The Wastes of Eriador (angmar-awakened part 4), one entry for each Pick and Choose of its records: `<record id> @<instruction path> <verb | option id>` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
 // `pnpm test scenario the-wastes-of-eriador --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=the-wastes-of-eriador` prints each sentence.
@@ -41,9 +41,7 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   // 10027:A:2 (Shadow): the defending player exhausts a character he controls.
   "10027:shadow:1 @0 Pick": { owned: true, note: "Predatory Wolves' shadow: choose a character you control to exhaust.", verb: "Exhaust" },
 
-  // 10172:A:1 (Action): attach Determination to a unique character, any player's, then ready the characters that carry one or are determined.
-  "10172:action:1 @0 Pick": { owned: true, note: "Determination: choose a unique character in play, any player's, to attach it to. Then each character with a Determination or marked determined readies.", verb: "Attach" },
-
-  // Ruthless (10164:A:4), worded once for every scenario that can deal it.
+  // Determination (10172:A:1) and Ruthless (10164:A:4), worded once for every scenario that can deal them.
+  ...DETERMINATION_ASKS,
   ...POOL_BOON_ASKS,
 };

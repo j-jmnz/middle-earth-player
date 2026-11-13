@@ -24,6 +24,9 @@ tags:
 - assertVisible:
     id: pool
     text: ".*Arnor Ravaged.*"
-# The win unlocks Escape from Mount Gram, which the app cannot deal yet: the path says it is coming soon (scripts/checks/maestro.test.ts, path-soon).
+# The win unlocks Escape from Mount Gram.
 - assertVisible:
+    id: node-escape-from-mount-gram-status
+    text: "Next"
+- assertNotVisible:
     id: path-soon

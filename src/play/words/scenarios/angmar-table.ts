@@ -133,8 +133,8 @@ export const iarionLabel = (seat: number | null): string => (seat == null ? "Iâ
 export const iarionWords = "Iârion is under this player's control. If he leaves play the players lose the game.";
 
 
-/** Whether an option of a ChooseBoon pick is one of its boon codes (the other is "none"), which a row names by the card and pictures by its code. */
-export const isBoonCode = (instruction: Instruction, id: string): boolean => instruction.verb === "ChooseBoon" && instruction.codes.includes(id);
+/** Whether an option of a ChooseBoon or ChooseBoonToHand pick is one of its boon codes (the other is "none"), which a row names by the card and pictures by its code. */
+export const isBoonCode = (instruction: Instruction, id: string): boolean => (instruction.verb === "ChooseBoon" || instruction.verb === "ChooseBoonToHand") && instruction.codes.includes(id);
 
 /**
  * The words of the hero pick that follows a boon chosen in Mysterious Omens' reward (10160:A:3): the player who took the boon picks the hero that carries it (rr.campaign-pool). One player's own choice, so two-handed it leads with the player. Null for any other pick, and in a game

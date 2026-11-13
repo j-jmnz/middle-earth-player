@@ -44,7 +44,7 @@ import * as chetwood from "../scenarios/intruders-in-chetwood/game.ts";
 import * as hills from "../scenarios/the-weather-hills/game.ts";
 import * as dike from "../scenarios/deadmens-dike/game.ts";
 import * as eriador from "../scenarios/the-wastes-of-eriador/game.ts";
-// import * as gram from "../scenarios/escape-from-mount-gram/game.ts";
+import * as gram from "../scenarios/escape-from-mount-gram/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -114,5 +114,5 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-tower-of-cirith-ungol", "The Tower of Cirith Ungol", ungol.UNGOL_GOLDENS, ungol.ungolWorld, ungol.playGolden),
   entry("the-black-gate-opens", "The Black Gate Opens", opens.OPENS_GOLDENS, opens.opensWorld, opens.playGolden),
   entry("mount-doom", "Mount Doom", doom.DOOM_GOLDENS, doom.doomWorld, doom.playGolden),
-  // entry("escape-from-mount-gram", "Escape from Mount Gram", gram.GRAM_GOLDENS, gram.gramWorld, gram.playGolden),
+  entry("escape-from-mount-gram", "Escape from Mount Gram", gram.GRAM_GOLDENS, gram.gramWorld, gram.playGolden),
 ];

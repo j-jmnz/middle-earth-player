@@ -53,11 +53,13 @@ export function stagedAllyLabel(game: ScenarioState, ctx: ReduceContext, names: 
   return owners.size > 1 ? `${names.card(id)} · Player ${card.owner + 1}'s ally` : undefined;
 }
 
-/** The seat a card of a pick belongs to: the player an enemy is engaged with, or the player who controls a character in play. Null when it belongs to no seat. */
+/** The seat a card of a pick belongs to: the player an enemy is engaged with, the player who controls a character in play, or the owner of a captured or rescued card. Null when it belongs to no seat. */
 function seatOfCard(game: ScenarioState, id: string): number | null {
   const card = game.cards[id];
   if (!card) return null;
   if (card.zone === "engaged") return game.seats.findIndex((seat) => seat.engaged.includes(id));
+  // A card captured underneath another, or rescued into a hand, is its owner's (Escape from Mount Gram).
+  if (card.zone === "captured" || card.zone === "hand") return card.owner ?? card.controller;
   return card.zone === "play" || card.zone === "heroes" ? card.controller : null;
 }
 

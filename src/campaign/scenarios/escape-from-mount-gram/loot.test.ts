@@ -16,10 +16,10 @@ import { syncConstants } from "../../../rules/interpret/constants.ts";
 import { queueEvent } from "../../../rules/windows/queue.ts";
 import { HERO, idOf, resolveRecords, tableFromLayout } from "../../../../test/harness/scene-kit.ts";
 import { begin as begun } from "../../../../test/scenarios/escape-from-mount-gram/begun.ts";
-import { gramIntent, gramWorld } from "../../../../test/scenarios/escape-from-mount-gram/game.ts";
+import { BOONS, gramIntent, gramWorld } from "../../../../test/scenarios/escape-from-mount-gram/game.ts";
 
 const table = (layout: Parameters<typeof tableFromLayout>[1] = {}) => tableFromLayout("escape-from-mount-gram", layout);
-const BOONS = ["10176", "10177", "10178", "10179", "10180", "10181"];
+
 const firstOption = (state: ScenarioState): string => (state.window?.kind === "choose" ? (state.window.options[0] ?? "") : "");
 
 describe("Loot the Dungeons", () => {
