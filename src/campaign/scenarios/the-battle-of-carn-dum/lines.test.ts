@@ -225,9 +225,9 @@ describe("DiscardShadowOf with all", () => {
 
 describe("Thaurdir on stage 2B (engagedWithAll)", () => {
   // Plays the encounter and combat phases to the end with every attack undefended and nothing declared; the attacks each enemy made, in order.
-  const playCombat = (layout: Layout): { run: Run; attacks: string[]; shadowsAtAttack: number[] } => {
+  const playCombat = (layout: Layout, prepare: (state: ScenarioState, table: ReturnType<typeof built>) => ScenarioState = (state) => state): { run: Run; attacks: string[]; shadowsAtAttack: number[] } => {
     const t = built({ phase: "Encounter", stage: "10126", ...layout });
-    let run = send(start(t.state), { type: "DeclineEngage" }, t.ctx);
+    let run = send(start(prepare(t.state, t)), { type: "DeclineEngage" }, t.ctx);
     const attacks: string[] = [];
     const shadowsAtAttack: number[] = [];
     let seen = 0;
@@ -268,6 +268,17 @@ describe("Thaurdir on stage 2B (engagedWithAll)", () => {
     const thaurdir = run.state.cards[idOf(run.state, CHAMPION)];
     expect(thaurdir?.zone).toBe("staging");
     expect(run.steps.some((step) => step.kind === "engage")).toBe(false);
+  });
+
+  it("10126:B:1 resolves the shadow cards Thaurdir already holds with his first attack of the combat phase, and each later attack is dealt and discards a card of its own", () => {
+    const held = (state: ScenarioState, t: ReturnType<typeof built>): ScenarioState => {
+      const id = idOf(state, CAPTAIN);
+      return [1, 2].reduce((next) => runInstruction(next, { verb: "DealShadowInPlay", target: "self" }, { seat: 0, sourceId: id }, t.ctx, []), state);
+    };
+    const { attacks, shadowsAtAttack } = playCombat({ seats: 2, staging: [CAPTAIN], deck: ACTIVE_FLAGS }, held);
+    expect(attacks).toEqual(["10127@0", "10127@1", "10128@0"]);
+    // Two held cards and the one dealt for the attack resolve together; the second attack discarded them first and was dealt one.
+    expect(shadowsAtAttack).toEqual([3, 1, 1]);
   });
 
   it("10126:B:1 makes Thaurdir attack the one player of a solo game once", () => {

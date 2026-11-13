@@ -1,7 +1,7 @@
 // Rules: rr.step-6-2, rr.step-6-4-2, rr.step-6-4-3, rr.shadow-effects, rr.cancel, rr.attacks-outside-the-combat-phase,
 // faq.enemy-attacks-outside-combat, faq.additional-attacks, ltp.shadow-discard (data/rules/entries.json).
 import { undefendedToCity } from "../families/pelennor/combat.ts";
-import { verbsRunningInFrame, type Effect } from "../../catalog/boundary.ts";
+import { verbsRunningInFrame, type Effect, type Instruction } from "../../catalog/boundary.ts";
 
 import { pushEffectFrame } from "../interpret/effect-frames.ts";
 import { holdsNow } from "../interpret/verbs.ts";
@@ -28,7 +28,8 @@ import { startShadowAttack } from "../families/defense/shadow-attack.ts";
 import { announceShadowRaise, noteShadowStart } from "../families/defense/shadow.ts";
 import { announceShadowResolved } from "../families/dungeon/shadow.ts";
 import { announceShadowWizardry } from "../families/wizardry/shadow.ts";
-import { announceDestroyed, charactersDestroyed } from "../families/burden/attack.ts";
+import { announceDestroyed, charactersDestroyed, destroyedByAttack } from "../families/burden/attack.ts";
+import { printedOf } from "../core/printed.ts";
 import { attackHere, attackKey, locationDamage } from "../families/south/watcher.ts";
 
 // Turns the attacker's shadow card up and runs its shadow effects in their own frame. The attack in
@@ -316,12 +317,18 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
       ...(sendsExcess ? { excess: attack.defense?.excess ?? 0 } : {}),
       ...(destroyed > 0 ? { x: destroyed } : {}),
       // `other`: the defending character, or the hero an undefended attack landed on ("the hero damaged by this attack", 900209:A:2).
-      ...(afterTarget(attack) ? { other: afterTarget(attack) } : {}),
+      ...(afterOther(state, attack, after, ctx) ? { other: afterOther(state, attack, after, ctx) } : {}),
       ...(attack.defense?.landed ? { dealt: attack.defense.landed } : {}),
       ...(attack.afterCause ? { cause: attack.afterCause } : {}),
     },
     steps,
   );
+}
+
+// The card `other` names for the effect an attack leaves: the character it was made against, or, for an effect that searches the deck for another copy of a destroyed ally (DiscardCopiesFromDeck, 10137:A:2), the ally the attack destroyed (the first of them).
+function afterOther(state: ScenarioState, attack: PendingAttack, after: readonly Instruction[], ctx: ReduceContext): string | undefined {
+  if (!after.some((one) => one.verb === "DiscardCopiesFromDeck" && one.of === "other")) return afterTarget(attack);
+  return destroyedByAttack(state, attack, ctx).find((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "ally");
 }
 
 // The character an attack that ended was made against: its defender, or the hero an undefended attack's damage was assigned to.

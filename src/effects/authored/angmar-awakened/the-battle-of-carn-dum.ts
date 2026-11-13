@@ -205,7 +205,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "10139:response:1", cardCode: "10139", lines: ["10139:A:3"], timing: "response", trigger: "questDefeated", subject: "self", instructions: [{ verb: "QuestProgress", amount: 10, main: true }] },
 
     // 10189 Elrond's Champion (boon ally). Response: after an enemy engages you (an engagement check, an optional engagement or an effect; never Thaurdir's "considered" engagement), ready it.
-    { id: "10189:response:1", cardCode: "10189", lines: ["10189:A:1"], timing: "response", trigger: "engaged", eventSeat: "you", instructions: [{ verb: "Ready", target: "self" }] },
+    { id: "10189:response:1", cardCode: "10189", lines: ["10189:A:1"], timing: "response", trigger: "engaged", eventSeat: "you", condition: { kind: "matches", card: "self", pick: { type: "character", control: "any", state: "exhausted" } }, instructions: [{ verb: "Ready", target: "self" }] },
 
     // 10190 Lore of Ancient Arnor (boon event). Action: each player returns 1 card from their discard pile to their hand (2 when they are the only player) and shuffles the rest of it into their deck; then this card is removed from the game (this game only).
     {

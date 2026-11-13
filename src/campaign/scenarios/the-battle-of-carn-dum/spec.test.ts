@@ -19,7 +19,6 @@ const WALLS = "10135";
 const SKY = "10136";
 const AFFLICTION = "10137";
 const DAECHANAR = "10138";
-const FURIOUS = "10139";
 const SORCERY = "09065";
 const DECK = ["f0", "f0", "f0", "f0", "f0", "f0"];
 
