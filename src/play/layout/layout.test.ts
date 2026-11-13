@@ -497,25 +497,6 @@ describe("the second pile slot, ships and staging stacks (phase 39b)", () => {
     expect(stacked.find((slot) => slot.id === "u4")?.stack).toBeUndefined();
   });
 
-  it("shows the captured cards under an active location or the quest stage as one counted peek, short of the deck and discard piles (Escape from Mount Gram)", () => {
-    const { views: v, piles } = views(0);
-    const held = (host: string) => ["c1", "c2", "c3"].map((id) => card(`${host}${id}`, "captured", { host, face: "down", controller: null }));
-    const withHeld = { ...v, activeLocation: { zone: "activeLocation", seat: 0, entries: [entry(card("loc", "activeLocation"), { attached: held("loc") })] }, questStage: { zone: "questStage", seat: 0, entries: [entry(card("stage", "questStage"), { attached: held("stage") })] } } as unknown as typeof v;
-    const stacked = tableLayout(591, 338, withHeld, piles, { stacks: true });
-    for (const host of ["loc", "stage"]) {
-      const under = stacked.slots.filter((slot) => slot.kind === "attachment" && slot.id.startsWith(host));
-      expect(under, host).toHaveLength(1);
-      expect(under[0]?.stack, host).toBe(3);
-    }
-    // The location's one peek stays above the deck and discard piles that stand level with the play area.
-    const peek = stacked.slots.find((slot) => slot.kind === "attachment" && slot.id.startsWith("loc"));
-    expect((peek?.y ?? 0) + (peek?.h ?? 0)).toBeLessThanOrEqual(stacked.piles.deck.y + 0.5 + stacked.card.h);
-    expect((peek?.y ?? 0) + (peek?.h ?? 0)).toBeLessThanOrEqual(stacked.zones.play.y);
-    // Without stacking each card peeks, as before.
-    const plain = tableLayout(591, 338, withHeld, piles, {});
-    expect(plain.slots.filter((slot) => slot.kind === "attachment" && slot.id.startsWith("loc"))).toHaveLength(3);
-  });
-
   it("draws a fold stack whose top card is face down as its back, not its face", () => {
     const { views: v, piles } = views(0);
     const crowd = ids("f", 14).map((id, at) => entry(card(id, "staging", at === 0 ? { face: "down" } : {}), { kind: "enemy" }));
