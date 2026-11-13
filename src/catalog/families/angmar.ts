@@ -67,6 +67,9 @@ const VERBS = [
   // The card (the last picked card by default, `target` by ref) is revealed by the actor as an encounter card, wherever it lies: its Surge and Doomed, its When Revealed effects and the Responses to a reveal resolve, and it ends where its type puts it (a side quest in the staging area)
   // ("discard cards ... until a side quest is discarded, reveal it, and add it to the staging area", 10064:B:1, 10065:A:1, 10066:A:1). Nothing happens when no card is picked (a discard that ran the deck out).
   z.strictObject({ verb: z.literal("RevealCard"), card: cardRefSchema.optional(), ...when }),
+  // The encounter cards attached to the card (the last picked card by default) as its guards stay in the staging area, no longer guarding it: the objective may then leave play without them ("Shuffle 1 location with the safe keyword (but not its attached encounter) back
+  // into the encounter deck", 10075:A:2; rr.guarded). Nothing happens when nothing guards the card.
+  z.strictObject({ verb: z.literal("ReleaseGuards"), target: cardRefSchema.optional(), ...when }),
   // The source (the campaign card) holds `tokens` resource tokens or more and a copy of `code` is set aside: the tokens come off the source and that copy is revealed (a full reveal, as RevealCard), ending in the encounter discard pile as its type puts it ("remove 3 resources from it to
   // reveal 1 set-aside copy of Losing Time and place it in the encounter discard pile", 10182:A:3). With fewer tokens or no copy set aside nothing happens and no token comes off.
   z.strictObject({ verb: z.literal("RevealSetAsideForTokens"), code, tokens: z.number().int().positive(), ...when }),

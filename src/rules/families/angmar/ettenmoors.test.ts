@@ -1,14 +1,21 @@
-// Rules: mec108.objective-locations, mec108.safe, rr.guarded, rr.reveal, rr.setup, rr.active-location, rr.travel, rr.blank (data/rules/entries.json); ledger lines 10064:A:1, 10064:B:1, 10065:A:1, 10068:A:1, 10069:A:3, 10070:A:3, 10071:A:3, 10083:A:1.
+// Rules: mec108.objective-locations, mec108.safe, rr.guarded, rr.reveal, rr.setup, rr.active-location, rr.travel, rr.blank, rr.resource-phase (data/rules/entries.json); ledger lines 10064:A:1, 10065:A:1, 10068:A:1, 10069:A:1, 10069:A:3, 10071:A:3, 10075:A:2, 10080:A:1, 10081:A:1.
 // The verbs of Across the Ettenmoors on tables built from data/ by the layout kit: the Setup pair, the Safe keyword's effects, the reveal of a discarded side quest.
 import { describe, expect, it } from "vitest";
 
-import { settle } from "../../engine/machine.ts";
 import { textBlank } from "../attachments/hold.ts";
 import { constantInstructions } from "../../interpret/constant-records.ts";
 import { holds } from "../../interpret/conditions.ts";
 import { pickCandidates } from "../../interpret/pick.ts";
+import { releaseGuards } from "./ettenmoors.ts";
+import { ruleCause } from "../../core/cause.ts";
+import type { EngineStep, PlayerIntent } from "../../core/intents.ts";
+import { gainSeatResources } from "../../interpret/interpret.ts";
+import { guardWith } from "../objectives/guard.ts";
+import { noteProgressPlaced } from "./progress.ts";
+import { placeOnCurrentSideQuest } from "../wilderland/night-quest.ts";
 import { flagged, type ScenarioState } from "../../core/state.ts";
-import { codesIn, finish, first, idOf, idsOf, resolveRecords, revealFromTop, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { begin } from "../../../../test/harness/scene.ts";
+import { codesIn, finish, idOf, legalIntents, resolveRecords, revealFromTop, send, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 
 const SCENARIO = "across-the-ettenmoors";
 const built = (layout: Layout = {}) => tableFromLayout(SCENARIO, layout);
@@ -136,9 +143,89 @@ describe("the reveal of a discarded side quest", () => {
 });
 
 describe("Scavenge for Supplies", () => {
-  it("10083:A:1 raises the cost of every player card by 1 while it is in play", () => {
+  it("10083:A:1 holds the IncreaseCost record of every player card while it is in play", () => {
     const t = built({ staging: ["10083"], hand: ["ally"] });
     const records = constantInstructions(t.state, t.ctx).filter((item) => item.instruction.verb === "IncreaseCost");
     expect(records.map((item) => item.source.code)).toEqual(["10083"]);
+  });
+});
+
+describe("travelling to a safe location in a round", () => {
+  // Passes (and declines the optional engagement) until the phase is reached, returning the run there.
+  const until = (run: ReturnType<typeof begin>, ctx: ReturnType<typeof built>["ctx"], phase: ScenarioState["phase"], skip = 0) => {
+    let current = run;
+    let seen = 0;
+    for (let guard = 0; guard < 30 && !current.state.lost; guard += 1) {
+      if (current.state.phase === phase && seen >= skip) break;
+      if (current.state.phase === phase) seen += 1;
+      const legal = legalIntents(current.state, ctx);
+      const next = legal.find((intent) => intent.type === "Pass") ?? legal.find((intent) => intent.type === "DeclineEngage") ?? legal.find((intent) => intent.type === "DeclineTravel");
+      if (!next) break;
+      current = send(current, next as PlayerIntent, ctx);
+    }
+    return current;
+  };
+
+  it("10069:A:1 returns the engaged enemy to the staging area, engages nothing in the encounter phase and goes to the victory display at the end of the quest phase", () => {
+    const t = built({ phase: "Travel", staging: ["10069", "10076"], engaged: ["f3"] });
+    const traveled = send(begin(t.state), { type: "Travel", locationId: idOf(t.state, "10069") }, t.ctx);
+    expect(traveled.state.activeLocation).toBe(idOf(t.state, "10069"));
+    expect(traveled.state.seats[0]?.engaged ?? []).toEqual([]);
+    expect(traveled.state.staging.map((id) => traveled.state.cards[id]?.code).sort()).toEqual(["10076", "f3"]);
+    // The encounter phase: Goblin Pursuer (engagement cost 16, below the threat) is not engaged by a check; the player may still engage it by choice.
+    const encounter = until(traveled, t.ctx, "Encounter");
+    expect(legalIntents(encounter.state, t.ctx).some((intent) => intent.type === "Engage")).toBe(true);
+    const quest = until(encounter, t.ctx, "Quest");
+    expect(quest.state.seats[0]?.engaged ?? []).toEqual([]);
+    expect(quest.state.activeLocation).toBe(idOf(t.state, "10069"));
+    // The quest phase ends: the safe location is added to the victory display without being explored.
+    const next = until(quest, t.ctx, "Travel");
+    expect(next.state.cards[idOf(t.state, "10069")]?.zone).toBe("victory");
+    expect(next.state.activeLocation).toBeNull();
+  });
+
+  it("10069:A:1 lets the enemy engage as ever when the players do not travel", () => {
+    const t = built({ phase: "Travel", staging: ["10069", "10076"] });
+    const declined = send(begin(t.state), { type: "DeclineTravel" }, t.ctx);
+    const encounter = until(declined, t.ctx, "Encounter");
+    const engaged = send(encounter, { type: "DeclineEngage" }, t.ctx);
+    expect(engaged.state.seats[0]?.engaged.map((id) => engaged.state.cards[id]?.code)).toContain("10076");
+  });
+});
+
+describe("the flags the Ettenmoors cards hold", () => {
+  it("10080:A:1 keeps a hero from collecting resources in the resource phase (noCollection), while an effect may still add them", () => {
+    const t = built({ heroResources: 1 });
+    const marked = { ...t.state, modifiers: [...t.state.modifiers, { instanceId: t.hero, sourceId: t.hero, stat: "noCollection" as const, amount: 1, until: "whileSourceInPlay" as const }] };
+    const gained = gainSeatResources(marked, 0, [], ruleCause("rr.step-1-2"));
+    expect([gained.cards[t.hero]?.resources, gained.cards[t.hero2]?.resources]).toEqual([1, 2]);
+  });
+
+  it("10081:A:1 notes progress placed on a side quest for the round (progressPlacedHere), once", () => {
+    const t = built({ staging: ["10081"] });
+    const quest = idOf(t.state, "10081");
+    const steps: EngineStep[] = [];
+    const placed = placeOnCurrentSideQuest({ ...t.state, cards: { ...t.state.cards, [quest]: { ...t.state.cards[quest]!, progress: 0 } }, modifiers: [{ instanceId: quest, sourceId: quest, stat: "currentQuest", amount: 1, until: "endOfPhase" }] }, 2, t.cards, steps).state;
+    expect(flagged(placed, quest, "progressPlacedHere")).toBe(true);
+    expect(placed.modifiers.filter((modifier) => modifier.stat === "progressPlacedHere")).toHaveLength(1);
+    expect(flagged(noteProgressPlaced(placed, quest, 1), quest, "progressPlacedHere")).toBe(true);
+    expect(noteProgressPlaced(placed, quest, 1).modifiers).toHaveLength(placed.modifiers.length);
+    expect(flagged(noteProgressPlaced(t.state, quest, 0), quest, "progressPlacedHere")).toBe(false);
+  });
+
+  it("10075:A:2 sets the guards of a card free, staying in the staging area and no longer guarding it", () => {
+    const t = built({ staging: ["10069", "10081"] });
+    const place = idOf(t.state, "10069");
+    const quest = idOf(t.state, "10081");
+    const guarded = guardWith(t.state, quest, place);
+    expect(guarded.cards[quest]?.guard).toBe(true);
+    expect(guarded.cards[place]?.attachments).toEqual([quest]);
+    const freed = releaseGuards(guarded, { verb: "ReleaseGuards", target: "self" }, { seat: 0, sourceId: place });
+    expect(freed.cards[quest]?.guard).toBeUndefined();
+    expect(freed.cards[quest]?.host ?? null).toBeNull();
+    expect(freed.cards[quest]?.zone).toBe("staging");
+    expect(freed.cards[place]?.attachments).toEqual([]);
+    // Nothing guards the card now: the verb changes nothing.
+    expect(releaseGuards(freed, { verb: "ReleaseGuards", target: "self" }, { seat: 0, sourceId: place })).toBe(freed);
   });
 });

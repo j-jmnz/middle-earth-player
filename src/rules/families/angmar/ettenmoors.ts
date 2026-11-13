@@ -46,6 +46,18 @@ export function revealCard(state: ScenarioState, instruction: Verb<"RevealCard">
   return startReveal(state, focus.seat, ctx, steps, id, undefined, false, card.zone === "encounterDiscard");
 }
 
+/** ReleaseGuards: the encounter cards that guard the card (attached to it, marked as guards) stay in the staging area and no longer guard it (10075:A:2). */
+export function releaseGuards(state: ScenarioState, instruction: Verb<"ReleaseGuards">, focus: Focus): ScenarioState {
+  const id = refCard(state, instruction.target ?? "picked", frameScope(state, focus.seat, focus.sourceId));
+  const card = id ? state.cards[id] : undefined;
+  if (!id || !card) return state;
+  const guards = card.attachments.filter((other) => state.cards[other]?.guard === true);
+  if (guards.length === 0) return state;
+  let next = updateCard(state, id, { attachments: card.attachments.filter((other) => !guards.includes(other)) });
+  for (const guard of guards) next = updateCard(next, guard, { host: null, guard: undefined });
+  return next;
+}
+
 /** RevealSetAsideForTokens: `tokens` resource tokens come off the source and a set-aside copy of the card is revealed; nothing happens with fewer tokens or no copy set aside. */
 export function revealSetAsideForTokens(state: ScenarioState, instruction: Verb<"RevealSetAsideForTokens">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const source = focus.sourceId ? state.cards[focus.sourceId] : undefined;

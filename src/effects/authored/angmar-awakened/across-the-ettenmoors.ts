@@ -93,7 +93,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
 
   // 10075 Ruthless Hill-troll. +2 Attack and +2 Defense while it has 3 or more damage. Shadow: the defending player chooses a location with the safe keyword in play and shuffles it (not its guard) into the encounter deck.
   { id: "10075:constant:1", cardCode: "10075", lines: ["10075:A:1"], timing: "constant", condition: { kind: "matches", card: "self", pick: { type: "enemy", control: "any", minDamage: 3 } }, instructions: [{ verb: "ModifyStat", stat: "attack", amount: 2, until: "whileSourceInPlay" }, { verb: "ModifyStat", stat: "defense", amount: 2, until: "whileSourceInPlay" }] },
-  { id: "10075:shadow:1", cardCode: "10075", lines: ["10075:A:2"], timing: "shadow", instructions: [{ verb: "Pick", pick: { type: "objective", control: "any", safe: true } }, { verb: "MoveEncounterCard", card: "picked", to: "shuffle" }] },
+  { id: "10075:shadow:1", cardCode: "10075", lines: ["10075:A:2"], timing: "shadow", instructions: [{ verb: "Pick", pick: { type: "objective", control: "any", safe: true } }, { verb: "ReleaseGuards" }, { verb: "MoveEncounterCard", card: "picked", to: "shuffle" }] },
 
   // 10076 Goblin Pursuer. Damaged characters cannot be declared as attackers or defenders against it (checked at the declaration). Shadow: +1 Attack, +3 instead if the attack is undefended (a template writes it).
   { id: "10076:constant:1", cardCode: "10076", lines: ["10076:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "damagedCannotFace", amount: 1, until: "whileSourceInPlay" }] },

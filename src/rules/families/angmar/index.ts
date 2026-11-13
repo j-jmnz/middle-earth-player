@@ -10,7 +10,7 @@ import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { chooseBoon } from "./boons.ts";
 import { attackerFacing, defenderFacing } from "./combat.ts";
-import { revealCard, revealSetAsideForTokens, stageRandomGuardedPair } from "./ettenmoors.ts";
+import { releaseGuards, revealCard, revealSetAsideForTokens, stageRandomGuardedPair } from "./ettenmoors.ts";
 import { safeActiveHolds, safePickMatches, setAsideHasHolds } from "./safe.ts";
 import { attachRandomBurden, attachSelfToNamed, moveToHero } from "./burdens.ts";
 import { placeHandUnderSelf } from "./cards-under.ts";
@@ -69,6 +69,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return stageRandomGuardedPair(state, focus, ctx, steps);
     case "RevealCard":
       return revealCard(state, instruction, focus, ctx, steps);
+    case "ReleaseGuards":
+      return releaseGuards(state, instruction, focus);
     case "RevealSetAsideForTokens":
       return revealSetAsideForTokens(state, instruction, focus, ctx, steps);
     case "RecordStartingThreat":
@@ -80,7 +82,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "angmar",
-  verbs: ["Time", "RemoveTimeCounters", "HoldUnder", "DiscardHeld", "PlaceHandUnderSelf", "ChooseCurrentQuest", "AttachNewTo", "TradeDamageForResources", "FirstTraitSurge", "EndPhase", "PlaceLoggedDamageOn", "ChooseBoon", "AttachRandomBurden", "MoveToHero", "AttachSelfToNamed", "FlipTimeObjective", "RecordStartingThreat", "Safe", "StageRandomGuardedPair", "RevealCard", "RevealSetAsideForTokens", "EarnEncounterCopies"],
+  verbs: ["Time", "RemoveTimeCounters", "HoldUnder", "DiscardHeld", "PlaceHandUnderSelf", "ChooseCurrentQuest", "AttachNewTo", "TradeDamageForResources", "FirstTraitSurge", "EndPhase", "PlaceLoggedDamageOn", "ChooseBoon", "AttachRandomBurden", "MoveToHero", "AttachSelfToNamed", "FlipTimeObjective", "RecordStartingThreat", "Safe", "StageRandomGuardedPair", "RevealCard", "ReleaseGuards", "RevealSetAsideForTokens", "EarnEncounterCopies"],
   run,
   revealed: (state, id, ctx) => noteFirstTrait(timeOnReveal(state, id, ctx), id, ctx),
   travel: { unpayable: travelUnpayable },
