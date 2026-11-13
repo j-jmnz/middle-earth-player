@@ -108,6 +108,7 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("escape-from-mount-gram", "Escape from Mount Gram", gram.GRAM_GOLDENS, gram.gramWorld, gram.playGolden),
   entry("across-the-ettenmoors", "Across the Ettenmoors", ettenmoors.ETTENMOORS_GOLDENS, ettenmoors.ettenmoorsWorld, ettenmoors.playGolden),
   entry("the-treachery-of-rhudaur", "The Treachery of Rhudaur", rhudaur.RHUDAUR_GOLDENS, rhudaur.rhudaurWorld, rhudaur.playGolden),
+  entry("the-battle-of-carn-dum", "The Battle of Carn Dûm", dum.DUM_GOLDENS, dum.dumWorld, dum.playGolden),
   entry("the-uruk-hai", "The Uruk-hai", hai.HAI_GOLDENS, hai.haiWorld, hai.playGolden),
   entry("helms-deep", "Helm's Deep", deep.DEEP_GOLDENS, deep.deepWorld, deep.playGolden),
   entry("the-road-to-isengard", "The Road to Isengard", isengard.ISENGARD_GOLDENS, isengard.isengardWorld, isengard.playGolden),
@@ -120,5 +121,4 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-tower-of-cirith-ungol", "The Tower of Cirith Ungol", ungol.UNGOL_GOLDENS, ungol.ungolWorld, ungol.playGolden),
   entry("the-black-gate-opens", "The Black Gate Opens", opens.OPENS_GOLDENS, opens.opensWorld, opens.playGolden),
   entry("mount-doom", "Mount Doom", doom.DOOM_GOLDENS, doom.doomWorld, doom.playGolden),
-  entry("the-battle-of-carn-dum", "The Battle of Carn Dûm", dum.DUM_GOLDENS, dum.dumWorld, dum.playGolden),
 ];
