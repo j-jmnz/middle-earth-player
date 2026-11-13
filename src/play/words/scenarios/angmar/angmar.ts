@@ -14,6 +14,11 @@ export function angmarWords(instruction: Instruction): string | null {
     // Dark Covenant's first option (10107:A:1): X is the total printed Threat of the cards it discarded.
     case "RemoveProgressAmong":
       return `remove ${typeof instruction.amount === "number" ? `${instruction.amount} progress` : "progress equal to the discarded cards' Threat"} from among the quest cards in play`;
+    // The Altar of Midwinter's second option (10154:A:2): a card of the player's deck turned into a facedown Undead enemy.
+    case "Reanimate": {
+      const from = { deckTop: "the top card of your deck", handRandom: "a random card of your hand", discardTop: "the card on top of your discard pile", card: "that card", destroyed: "the character the attack destroyed" }[instruction.from];
+      return `reanimate ${from}${instruction.to === "staging" ? ", placing it in the staging area" : ""}`;
+    }
     case "Time":
       return `put ${instruction.amount} time counters on this card`;
     case "HoldUnder":
