@@ -50,6 +50,7 @@ import dikeFixtures from "./fixtures/deadmens-dike.json";
 import eriadorFixtures from "./fixtures/the-wastes-of-eriador.json";
 import gramFixtures from "./fixtures/escape-from-mount-gram.json";
 import ettenmoorsFixtures from "./fixtures/across-the-ettenmoors.json";
+import rhudaurFixtures from "./fixtures/the-treachery-of-rhudaur.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -116,6 +117,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-wastes-of-eriador": eriadorFixtures,
   "escape-from-mount-gram": gramFixtures,
   "across-the-ettenmoors": ettenmoorsFixtures,
+  "the-treachery-of-rhudaur": rhudaurFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(
