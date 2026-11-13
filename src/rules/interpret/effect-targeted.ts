@@ -12,6 +12,7 @@ import type { ReduceContext } from "./interpret.ts";
 import { moveEncounter } from "../families/encounter/moves.ts";
 import { activeOf, stagingDest } from "../families/breaking/areas.ts";
 import { attachHeroHosts, attachHostChooser } from "../families/play/hooks.ts";
+import { lastPickedSeat } from "../families/play/refs.ts";
 import { familyAttached } from "./family-hooks.ts";
 import { controlledShips, defendingShip } from "../families/sea/campaign.ts";
 import { discardRestricted } from "../families/objectives/claimed.ts";
@@ -167,7 +168,7 @@ function applyTargeted(
         // "Put it into play engaged with you" (41013:A:1): the searching player engages it as it enters play (rr.engaged), so Forced effects
         // that hear an engagement hear this one.
         if (instruction.to === "engaged") {
-          next = moveEncounter(next, id, "engaged", item.seat, ctx, steps);
+          next = moveEncounter(next, id, "engaged", (instruction.engagedSeat === "picked" ? lastPickedSeat(next) : null) ?? item.seat, ctx, steps);
           continue;
         }
         // Into the Stormcaller's area (dcce.stormcallers-area).

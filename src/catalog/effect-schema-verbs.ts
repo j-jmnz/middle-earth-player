@@ -27,6 +27,8 @@ const searchSelector = {
   nonUnique: z.boolean().optional(),
   // `encounter-side-quest`: "search the encounter deck and discard pile for an encounter side quest" (09049:A:2).
   type: z.enum(["enemy", "location", "treachery", "objective", "encounter-side-quest"]).optional(),
+  // A card with the Safe keyword (Across the Ettenmoors, mec108.safe): "search the encounter deck and discard pile for a location with the safe keyword" (10077:A:2). With `type: "objective"` the pool's other objectives stay out.
+  safe: z.literal(true).optional(),
 };
 
 export const simpleVerbs = [
@@ -195,6 +197,8 @@ export const simpleVerbs = [
     require: z.string().min(1).optional(),
     // The card found is the effect's picked card afterward, for the instructions that follow ("add it to the staging area. Then, attach Heavy Cruiser to that objective", 12127:A:3).
     remember: z.literal(true).optional(),
+    // With `to: "engaged"`: the card found comes into play engaged with the seat an earlier pick chose (PickHighestThreat), not with the searching player ("puts it into play engaged with the player with the highest threat", 10083:A:2).
+    engagedSeat: z.literal("picked").optional(),
     // The card found must have a title no card an earlier search of this effect found has: "each player searches for a different location" (41004:B:1,
     // 41005:A:1). The titles are the cards' printed names; cards that share one are the same choice.
     different: z.boolean().optional(),

@@ -84,8 +84,8 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
 
   // 10073 Coldfell Giant. Forced: after it engages you, 1 damage to each of 3 different characters you control (each one, with fewer than 3). Shadow: if the defending character has damage on it, the attacking enemy makes an additional attack after this one.
   { id: "10073:forced:1", cardCode: "10073", lines: ["10073:A:1"], timing: "forced", trigger: "engaged", subject: "self", instructions: [{ verb: "Repeat", times: 3, instructions: [
-    { verb: "Pick", pick: { type: "character", control: "you", different: true }, when: { kind: "canPick", pick: { type: "character", control: "you", different: true } } },
-    { verb: "DamageCard", amount: 1, target: "picked", when: { kind: "canPick", pick: { type: "character", control: "you", different: true } } }] }] },
+    // One round: the engaged player picks a character not yet hit and it takes 1 damage; with none left to pick the round does nothing (rr.effects: as much as able). The damage sits in the option so it is gated on this round's pick, not on a later one.
+    { verb: "Choose", who: "actor", options: [{ id: "hit", requires: { kind: "canPick", pick: { type: "character", control: "you", different: true } }, instructions: [{ verb: "Pick", pick: { type: "character", control: "you", different: true } }, { verb: "DamageCard", amount: 1, target: "picked" }] }] }] }] },
   { id: "10073:shadow:1", cardCode: "10073", lines: ["10073:A:2"], timing: "shadow", instructions: [{ verb: "AfterAttack", when: { kind: "matches", card: "defender", pick: { type: "character", control: "any", damaged: true } }, instructions: [{ verb: "ImmediateAttack" }] }] },
 
   // 10074 Cruel Mountain-troll. Each point of excess combat damage it deals takes 1 progress from each quest card in play (families/defense/excess.ts).
@@ -99,10 +99,10 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   { id: "10076:constant:1", cardCode: "10076", lines: ["10076:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "damagedCannotFace", amount: 1, until: "whileSourceInPlay" }] },
 
   // 10077 Troll-fells (location). While it is the active location, Weather cards gain Doomed 1 (on top of a printed Doomed). When Revealed: unless it is revealed guarding a safe location, the first player searches the encounter deck and discard pile for a location with the safe keyword
-  // (the objective-locations: no other objective is in this deck) and adds it to the staging area, guarded by Troll-fells; the encounter deck is shuffled.
+  // (the safe filter keeps the pool objectives out) and adds it to the staging area, guarded by Troll-fells; the encounter deck is shuffled.
   { id: "10077:constant:1", cardCode: "10077", lines: ["10077:A:1"], timing: "constant", condition: ACTIVE, instructions: [{ verb: "GainsDoomed", amount: 1, pick: { type: "treachery", control: "any", trait: "Weather" } }] },
   { id: "10077:whenRevealed:1", cardCode: "10077", lines: ["10077:A:2"], timing: "whenRevealed", condition: { kind: "not", condition: { kind: "matches", card: "self", pick: { type: "location", control: "any", guardsObjectiveLocation: true } } }, instructions: [
-    { verb: "SearchMove", type: "objective", to: "staging", remember: true }, { verb: "AttachGuard", guard: "self", to: "picked" }, { verb: "ShuffleEncounterDeck" }] },
+    { verb: "SearchMove", type: "objective", safe: true, to: "staging", remember: true }, { verb: "AttachGuard", guard: "self", to: "picked" }, { verb: "ShuffleEncounterDeck" }] },
 
   // 10078 Barren Moorland (location). While in the staging area it has the Forced effect: when an ally enters play, its controller exhausts it or deals it 1 damage. Travel: 1 damage to each exhausted character.
   { id: "10078:forced:1", cardCode: "10078", lines: ["10078:A:1"], timing: "forced", trigger: "enteredPlay", subject: { type: "ally", control: "any" }, condition: { kind: "sourceIn", zone: "staging" }, instructions: [{ verb: "Choose", who: "actor", options: [
@@ -139,7 +139,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   // then each player in turn may play a card from their hand at no cost.
   { id: "10083:constant:1", cardCode: "10083", lines: ["10083:A:1"], timing: "constant", instructions: [{ verb: "IncreaseCost", amount: 1, pick: { type: "card", control: "any" } }] },
   { id: "10083:forced:1", cardCode: "10083", lines: ["10083:A:2"], timing: "forced", trigger: "questDefeated", subject: "self", instructions: [
-    { verb: "SearchMove", trait: "Troll", type: "enemy", to: "staging", remember: true }, { verb: "PickHighestThreat" }, { verb: "SwitchActor", to: "picked" }, { verb: "Engage", target: "previous" }, { verb: "ShuffleEncounterDeck" },
+    { verb: "PickHighestThreat" }, { verb: "SearchMove", trait: "Troll", type: "enemy", to: "engaged", engagedSeat: "picked" }, { verb: "ShuffleEncounterDeck" },
     EACH_PLAYER([{ verb: "Choose", who: "actor", options: [
       { id: "play", requires: { kind: "canPick", pick: { type: "card", control: "you", from: "hand" } }, instructions: [{ verb: "PlayFromHand", pick: { type: "card", control: "you" }, free: true }] },
       { id: "skip", instructions: [] },

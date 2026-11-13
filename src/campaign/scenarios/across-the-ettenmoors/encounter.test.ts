@@ -49,10 +49,15 @@ describe("10073:A:1 and 10073:A:2 are the Coldfell Giant's lines", () => {
     expect(hit.every((card) => card.damage === 1)).toBe(true);
   });
 
-  it("10073:A:1 hits each character there is when fewer than 3 are controlled", () => {
-    const t = at({ staging: ["10073"] });
-    const run = resolveRecords(t.state, t.ctx, "10073", "forced", idOf(t.state, "10073"));
-    expect([damageOn(run.state, t.hero), damageOn(run.state, t.hero2)]).toEqual([1, 1]);
+  it("10073:A:1 hits each character there is when fewer than 3 are controlled, and exactly 3 when there are 3 or 4", () => {
+    // The scene has 2 heroes; allies make 3 and 4 characters, and one hero set aside makes 1.
+    const hitCount = (allies: number, heroes: 1 | 2): number => {
+      const t = at({ staging: ["10073"], play: Array.from({ length: allies }, () => "ally") });
+      const start = heroes === 1 ? updateCard(t.state, t.hero2, { zone: "setAside" }) : t.state;
+      const run = resolveRecords(start, t.ctx, "10073", "forced", idOf(start, "10073"));
+      return Object.values(run.state.cards).filter((card) => (card.zone === "heroes" || card.zone === "play") && card.damage > 0).length;
+    };
+    expect([hitCount(0, 1), hitCount(0, 2), hitCount(1, 2), hitCount(2, 2)]).toEqual([1, 2, 3, 3]);
   });
 
   it("10073:A:2 makes an additional attack after this one when the defending character has damage on it, and not otherwise", () => {
@@ -139,6 +144,15 @@ describe("10077:A:1 and 10077:A:2 are Troll-fells' lines", () => {
     // Troll-fells is the guard, attached to the safe location it guards.
     expect(state.cards[run.id]?.host).toBe(place?.id);
     expect(state.cards[run.id]?.guard).toBe(true);
+  });
+
+  it("10077:A:2 leaves another objective (Amarthiúl, a pool objective) alone: only a card with the safe keyword is found", () => {
+    const t = at({ deck: ["f0", "10067", "10069"] });
+    const run = revealFromTop(t.state, t.ctx, "10077", []);
+    const state = finish({ state: run.state, steps: [] }, t.ctx).state;
+    expect(state.window).toBeNull();
+    expect(zoneOf(state, "10069")).toBe("staging");
+    expect(zoneOf(state, "10067")).toBe("encounterDeck");
   });
 
   it("10077:A:2 does nothing but shuffle when Troll-fells is revealed guarding a safe location", () => {
@@ -265,6 +279,18 @@ describe("10083:A:1 and 10083:A:2 are Scavenge for Supplies", () => {
     const run = resolveRecords(t.state, t.ctx, "10083", "forced", idOf(t.state, "10083"), choosing("skip"));
     expect(run.state.seats[1]?.engaged.map((id) => run.state.cards[id]?.code)).toContain("10074");
     expect(run.state.seats[0]?.engaged ?? []).toEqual([]);
+  });
+
+  it("10083:A:2 puts the Troll into play engaged with the highest-threat player without adding it to the staging area first", () => {
+    const t = at({ staging: ["10083"], seats: 2, threat: [25, 31], deck: ["f0", "10074"], hand: ["ally"] });
+    const staged = (state: ScenarioState) => state.staging.map((id) => state.cards[id]?.code);
+    const run = resolveRecords(t.state, t.ctx, "10083", "forced", idOf(t.state, "10083"), choosing("skip"));
+    const troll = idOf(run.state, "10074");
+    expect(run.state.cards[troll]?.zone).toBe("engaged");
+    expect(run.state.cards[troll]?.controller).toBe(1);
+    expect(staged(run.state)).toEqual(staged(t.state));
+    // The only step the Troll's arrival makes is the engagement: it is never announced as added to the staging area (a card moved to staging is, `addedToStaging`).
+    expect(run.steps.map((step) => step.kind)).toEqual(["push", "engage", "pop"]);
   });
 
   it("10083:A:2 lets each player play a card from their hand at no cost, the 1 more of 10083:A:1 included", () => {
