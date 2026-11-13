@@ -5,7 +5,7 @@ import { inPlay, type ScenarioState } from "../../rules/core/state.ts";
 import type { ReduceContext } from "../../rules/engine/reduce.ts";
 import { questPointsOf } from "../../rules/quest/quest.ts";
 
-import { EXECUTIONERS, LOOT, hasCapturedDecks, heldCapturedLine } from "../readouts/gram.ts";
+import { EXECUTIONERS, LOOT, executionersRaises, hasCapturedDecks, heldCapturedLine } from "../readouts/gram.ts";
 import { ownerWords } from "../words/owner.ts";
 import { capturedCardWords, executionersPreviewWords, lootWords } from "../words/scenarios/gram-table.ts";
 
@@ -17,8 +17,8 @@ export function gramDetail(game: ScenarioState, ctx: ReduceContext, cardId: stri
   const held = heldCapturedLine(game, cardId);
   const lines: string[] = [];
   const points = card.code === LOOT && inPlay(card.zone) ? questPointsOf(game, card, ctx.cards) : null;
-  if (points != null) lines.push(lootWords(points, Math.round((points - 4) / 4)));
-  if (card.code === EXECUTIONERS && inPlay(card.zone)) lines.push(executionersPreviewWords(card.resources));
+  if (points != null) lines.push(lootWords(points, game.seatCount));
+  if (card.code === EXECUTIONERS && inPlay(card.zone)) lines.push(executionersPreviewWords(card.resources, executionersRaises(game, card.id, ctx).under));
   if (held) lines.push(held);
   return lines.length > 0 ? lines.join(" ") : null;
 }

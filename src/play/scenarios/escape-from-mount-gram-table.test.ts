@@ -6,6 +6,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import { legalIntents, reduce, type ReduceContext } from "../../rules/engine/reduce.ts";
 import { expectOk } from "../../rules/core/test-fixture.ts";
 import { settle } from "../../rules/engine/machine.ts";
+import { updateCard } from "../../rules/core/state.ts";
 import { moveCard, spawn } from "../../rules/core/zones.ts";
 import { capturedByHost, capturedDeck } from "../../rules/families/captured/pile.ts";
 import type { ScenarioState } from "../../rules/core/state.ts";
@@ -16,6 +17,7 @@ import { angmarDetail } from "../cards/angmar-preview.ts";
 import { slotNumbers } from "../cards/card-effects.ts";
 import { marksText } from "../canvas/table-canvas-views.ts";
 import { sheetFor } from "../choice/sheets.ts";
+import { tiedLabel } from "../choice/sheet-parts.ts";
 import type { PickSheet, SheetNames } from "../choice/sheet-types.ts";
 import { angmarDials } from "../readouts/angmar.ts";
 import { gramHands } from "../readouts/gram.ts";
@@ -50,11 +52,13 @@ describe("each seat's captured deck", () => {
     for (const mark of marks) {
       const count = capturedDeck(pair, mark.seat).length;
       expect(count).toBeGreaterThan(0);
-      expect(mark.label).toBe(`P${mark.seat + 1} · Captured ${count}`);
+      expect(mark.label).toBe(`P${mark.seat + 1} · Captured ${String(count).padStart(2, "\u2007")}`);
+      // The mark keeps its width as the count falls from 10 to 9.
+      expect(mark.label).toHaveLength(`P${mark.seat + 1} · Captured 12`.length);
       expect(mark.note).toContain(`Player ${mark.seat + 1}'s captured deck holds ${count} cards, out of play.`);
     }
     const alone = solo();
-    expect(seatMarks(alone, ctx)[0]?.label).toBe(`Captured ${capturedDeck(alone, 0).length}`);
+    expect(seatMarks(alone, ctx)[0]?.label).toBe(`Captured ${String(capturedDeck(alone, 0).length).padStart(2, "\u2007")}`);
     expect(seatMarks(alone, ctx)[0]?.note).toContain("Your captured deck holds");
   });
 
@@ -71,7 +75,7 @@ describe("each seat's captured deck", () => {
   it("10038:A:1 says an empty captured deck is empty,", () => {
     const state = two();
     const emptied = { ...state, seats: state.seats.map((seat, index) => (index === 1 ? { ...seat, captured: [] } : seat)) } as unknown as ScenarioState;
-    expect(seatMarks(emptied, ctx).find((mark) => mark.seat === 1)).toMatchObject({ label: "P2 · Captured 0", note: expect.stringContaining("Player 2's captured deck is empty.") });
+    expect(seatMarks(emptied, ctx).find((mark) => mark.seat === 1)).toMatchObject({ label: "P2 · Captured \u20070", note: expect.stringContaining("Player 2's captured deck is empty.") });
   });
 
   it("shows nothing in another scenario's game", () => {
@@ -110,14 +114,14 @@ describe("the cards captured under a host", () => {
     const other = Object.values(state.cards).find((card) => card.zone === "captured" && card.owner === 1 && card.host !== cell);
     const mixed = moveCard(state, other?.id ?? "", { zone: "captured", hostId: cell, seat: 1 });
     expect(detail(mixed, cell)).toContain("(3 of Player 1's, 1 of Player 2's)");
-    expect(detail(solo(), prison(solo(), 0))).toContain("(3 of your)");
+    expect(detail(solo(), prison(solo(), 0))).toContain("(3 of yours)");
   });
 
   it("10039:A:2 tells a captured card what holds it and whose it is, not what it is", () => {
     const state = two();
     const cell = prison(state, 0);
     const card = capturedByHost(state).get(cell)?.[0] ?? "";
-    expect(detail(state, card)).toBe("Captured, facedown under Prison Cell, out of play, Player 1's. It is rescued when Prison Cell leaves play.");
+    expect(detail(state, card)).toBe("Captured, facedown under Prison Cell, out of play, Player 1's card. It is rescued when Prison Cell leaves play.");
   });
 
   it("10053:A:1 draws a host's captured cards in a game that holds none as nothing", () => {
@@ -148,7 +152,8 @@ describe("the separate staging areas", () => {
     expect(areaWords(joined, 0, nameOf)?.replace("Player 1's", "")).toBe(areaWords(joined, 1, nameOf)?.replace("Player 2's", ""));
     expect(zoneIds(joined, "questStage", 0)).toEqual(zoneIds(joined, "questStage", 1));
     const mark = seatMarks(joined, ctx).find((one) => one.seat === 0);
-    expect(mark?.label).toBe(`P1 · Captured ${capturedDeck(joined, 0).length} · joined P2`);
+    expect(mark?.label).toBe(`P1 · Captured ${String(capturedDeck(joined, 0).length).padStart(2, "\u2007")}`);
+    expect(mark?.label).not.toContain("joined");
     expect(mark?.note).toContain("Player 1's stage 2B was emptied, so Player 2's area is shared: its staging cards, its stage and its progress.");
     expect(seatMarks(joined, ctx).find((one) => one.seat === 1)?.label).not.toContain("joined");
   });
@@ -162,8 +167,10 @@ describe("Loot the Dungeons in every area", () => {
     expect(zoneIds(state, "staging", 1)).toContain(loot);
     expect(state.seats[0]?.staging).not.toContain(loot);
     expect(areaWords(state, 0, nameOf)).toMatch(/cards/);
-    expect(detail(state, loot)).toBe("In every player's staging area at once: one card, one set of progress. It has 12 quest points, 4 and 4 more for each of the 2 players. 10 cards captured underneath, out of play and facedown (5 of Player 1's, 5 of Player 2's). They are rescued to their owners when this leaves play.");
-    expect(detail(solo(), idOf(solo(), LOOT))).toContain("It has 8 quest points, 4 and 4 more for each of the 1 player.");
+    expect(detail(state, loot)).toBe("In every player's staging area at once: one card, one set of progress. It has 12 quest points: 4, and 4 more for each of the 2 players. 10 cards captured underneath, out of play and facedown (5 of Player 1's, 5 of Player 2's). They are rescued to their owners when this leaves play.");
+    const alone = detail(solo(), idOf(solo(), LOOT));
+    expect(alone).toContain("It has 8 quest points: 4, and 4 more for you.");
+    expect(alone).not.toContain("every");
   });
 });
 
@@ -177,9 +184,9 @@ describe("Stop the Executioners' time", () => {
 
   it("10053:A:3 says what the last time counter does for this card: the cards under it are discarded and threat rises, the game is not lost", () => {
     const { state, id } = timed(4);
-    expect(dialOf(state)).toMatchObject({ value: 4, label: "Time", note: "4 time counters left. One comes off at the end of each refresh phase. With the last gone, every card captured under it is discarded and each player raises threat by 3 for each of their characters discarded that way." });
+    expect(dialOf(state)).toMatchObject({ value: 4, label: "Time", note: "4 time counters left. One comes off at the end of each refresh phase. With the last gone, the quest leaves the game." });
     expect(dialOf(state)?.warn).toBeUndefined();
-    expect(detail(state, id)).toBe("4 time counters on it. With the last gone, the cards captured under it are discarded, heroes among them die, and the quest leaves the game.");
+    expect(detail(state, id)).toBe("4 time counters on it. With the last gone, the quest leaves the game.");
   });
 
   it("10053:A:3 warns near at 2 and at 1 and never says the players lose", () => {
@@ -189,8 +196,70 @@ describe("Stop the Executioners' time", () => {
       expect(dial?.warn?.level).toBe("near");
       expect(dial?.note).not.toContain("lose");
     }
-    expect(dialOf(timed(1).state)?.warn?.words).toBe("The next refresh phase takes the last time counter: the cards under it are discarded.");
+    expect(dialOf(timed(1).state)?.warn?.words).toBe("The next refresh phase takes the last time counter: the quest leaves the game.");
     expect(dialOf(timed(2).state)?.warn?.words).toBe("2 time counters are left.");
+  });
+});
+
+describe("Stop the Executioners' dial counts the characters under it by owner", () => {
+  const dialOf = (state: ScenarioState) => angmarDials(state, ctx, nameOf).find((one) => one.id.startsWith("time:"));
+  // Puts the executioners in play with `counters` time counters and a captured card of each (code, seat) under it.
+  const held = (counters: number, cards: readonly (readonly [string, number])[], base: ScenarioState = two()): { state: ScenarioState; id: string } => {
+    const made = spawn(base, EXECUTIONERS, { zone: "staging", area: 0 }, "up");
+    let state: ScenarioState = { ...made.state, cards: { ...made.state.cards, [made.id]: { ...made.state.cards[made.id]!, resources: counters } } };
+    for (const [code, seat] of cards) state = spawn(state, code, { zone: "captured", hostId: made.id, seat }, "down").state;
+    return { state, id: made.id };
+  };
+  const ALLY = "10178";
+
+  it("10053:A:3 says each owner's threat rise (3 for each character of theirs under it) and nothing of discarding while nothing lies under it", () => {
+    const { state } = held(4, [[ALLY, 0], [ALLY, 0], [ALLY, 1]]);
+    expect(dialOf(state)?.note).toContain("the cards under it are discarded and the quest leaves the game. Player 1's threat rises by 6, Player 2's threat rises by 3.");
+    expect(dialOf(held(4, []).state)?.note).not.toContain("discarded");
+  });
+
+  it("10053:A:3 is critical and names the seat the raise eliminates, and says the game is lost only for a solo player the raise eliminates", () => {
+    const two1 = held(1, [[ALLY, 1], [ALLY, 1], [ALLY, 1]]);
+    const high = { ...two1.state, seats: two1.state.seats.map((seat, index) => (index === 1 ? { ...seat, threat: 42 } : seat)) } as unknown as ScenarioState;
+    expect(dialOf(high)?.warn).toMatchObject({ level: "critical" });
+    expect(dialOf(high)?.warn?.words).toContain("That eliminates Player 2.");
+    expect(dialOf(two1.state)?.warn?.level).toBe("near");
+    const alone = held(1, [[ALLY, 0], [ALLY, 0]], solo());
+    expect(dialOf(alone.state)?.warn?.level).toBe("near");
+    expect(dialOf(alone.state)?.warn?.words).not.toContain("game is lost");
+    const doomed = { ...alone.state, seats: alone.state.seats.map((seat, index) => (index === 0 ? { ...seat, threat: 45 } : seat)) } as unknown as ScenarioState;
+    expect(dialOf(doomed)?.warn?.level).toBe("critical");
+    expect(dialOf(doomed)?.warn?.words).toContain("Your threat rises by 6. That eliminates you, and the game is lost.");
+  });
+});
+
+describe("what a pick and a preview say apart", () => {
+  it("10038:A:1 reads the round-1 starting threat from the hero the Setup recorded, not the first hero in play", () => {
+    const state = two();
+    const seat = state.seats[0]!;
+    const start = seat.startHero ?? "";
+    expect(state.cards[start]?.zone).toBe("heroes");
+    const reordered = { ...state, seats: [{ ...seat, heroes: [...seat.heroes].reverse() }, state.seats[1]] } as unknown as ScenarioState;
+    expect(seatMarks(reordered, ctx)[0]?.note).toContain(`the threat cost of ${nameOf(state.cards[start]?.code ?? "")}`);
+  });
+
+  it("10053:A:3 says the current-quest line as well as the captured cards under a side quest that is the current quest", () => {
+    const made = spawn(two(), EXECUTIONERS, { zone: "staging", area: 0 }, "up");
+    const state = spawn(made.state, "10178", { zone: "captured", hostId: made.id, seat: 0 }, "down").state;
+    const flagged = { ...state, modifiers: [...state.modifiers, { instanceId: made.id, sourceId: made.id, stat: "currentQuest", amount: 1, until: "endOfPhase" }] } as ScenarioState;
+    expect(detail(flagged, made.id)).toContain("captured underneath");
+    expect(detail(flagged, made.id)).toContain("The current quest until the end of the phase.");
+    expect(detail(state, made.id)).not.toContain("The current quest");
+  });
+
+  it("10051:A:1 tells two encounter cards of one name apart by their place and Threat in the Captives of Gornákh pick", () => {
+    const state = two();
+    const first = spawn(state, "10049", { zone: "staging", area: 0 }, "up");
+    const second = spawn(updateCard(first.state, first.id, {}), "10049", { zone: "staging", area: 1 }, "up");
+    const names = namesOf(second.state);
+    const options = [first.id, second.id];
+    expect(tiedLabel(second.state, ctx, names, first.id, options)).toMatch(/ · staging area · \d+ Threat$/);
+    expect(tiedLabel(second.state, ctx, names, first.id, [first.id])).toBeUndefined();
   });
 });
 

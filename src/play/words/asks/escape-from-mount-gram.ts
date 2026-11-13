@@ -25,8 +25,23 @@ export const ASKS: Readonly<Record<string, Ask>> = {
 
   // 10050:A:1 (When Revealed): each player chooses for themselves: 1 damage to each exhausted character they control, or each exhausted character they control is removed from the quest.
   "10050:whenRevealed:1 @0.0 Choose": { owned: true, note: "Feeble and Weary: deal 1 damage to each exhausted character you control, or remove each exhausted character you control from the quest." },
-  "10050:whenRevealed:1 @0.0 damage": { label: "Deal 1 damage to each of your {n} exhausted characters", bind: { n: { count: EXHAUSTED_MINE } } },
-  "10050:whenRevealed:1 @0.0 remove": { label: "Remove your {n} exhausted characters that are committed from the quest", bind: { n: { count: EXHAUSTED_COMMITTED_MINE } } },
+  // The labels say what the row does now: none, the one, or the many.
+  "10050:whenRevealed:1 @0.0 damage": {
+    label: [
+      { when: { kind: "count", pick: EXHAUSTED_MINE, max: 0 }, text: "Deal 1 damage to each exhausted character you control (you control none: nothing happens)" },
+      { when: { kind: "count", pick: EXHAUSTED_MINE, max: 1 }, text: "Deal 1 damage to your exhausted character" },
+      { text: "Deal 1 damage to each of your {n} exhausted characters" },
+    ],
+    bind: { n: { count: EXHAUSTED_MINE } },
+  },
+  "10050:whenRevealed:1 @0.0 remove": {
+    label: [
+      { when: { kind: "count", pick: EXHAUSTED_COMMITTED_MINE, max: 0 }, text: "Remove each exhausted character you control from the quest (none is committed: nothing happens)" },
+      { when: { kind: "count", pick: EXHAUSTED_COMMITTED_MINE, max: 1 }, text: "Remove your exhausted character that is committed from the quest" },
+      { text: "Remove your {n} exhausted characters that are committed from the quest" },
+    ],
+    bind: { n: { count: EXHAUSTED_COMMITTED_MINE } },
+  },
 
   // 10050:A:2 (Shadow): the defending player exhausts a character he controls.
   "10050:shadow:1 @0 Pick": { owned: true, note: "Feeble and Weary's shadow: choose a character you control to exhaust.", verb: "Exhaust" },

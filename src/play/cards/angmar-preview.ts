@@ -33,7 +33,8 @@ export function angmarDetail(game: ScenarioState, ctx: ReduceContext, cardId: st
   if (wastes) return wastes;
   // Escape from Mount Gram's captured cards, Loot the Dungeons and Stop the Executioners.
   const gram = gramDetail(game, ctx, cardId, name);
-  if (gram) return gram;
+  // A side quest that holds captured cards (Stop the Executioners, Loot) is the current quest too: both lines are said.
+  if (gram) return card && card.zone === "staging" && flagged(game, cardId, "currentQuest") ? `${gram} ${CURRENT_QUEST_WORDS}` : gram;
   if (!card || game.sideQuests !== true) return null;
   const host = card.zone === "captive" && card.host != null ? game.cards[card.host] : undefined;
   if (host && timeOf(ctx, host.code) != null) return heldWords(name(host.id), host.resources);

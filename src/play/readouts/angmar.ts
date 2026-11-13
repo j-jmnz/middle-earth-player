@@ -18,7 +18,7 @@ import { captiveUnder } from "../../rules/families/south/captive.ts";
 import { battlementsTimeNearWords, battlementsTimeWords, deckLabel, deckNearWords, deckWords, thaurdirLimitWords, thaurdirWords, handUnderLabel, handUnderWords, huntWords, iarionLabel, iarionWords, protectNearWords, protectWords, savageNearWords, savageWords, rearguardLimitWords, rearguardWords, shelterTimeNearWords, shelterTimeWords, timeNearWords, timeWords } from "../words/scenarios/angmar-table.ts";
 import { executionersNearWords, executionersTimeWords } from "../words/scenarios/gram-table.ts";
 import { cardsOf, type TableDial } from "./dials.ts";
-import { EXECUTIONERS } from "./gram.ts";
+import { EXECUTIONERS, executionersRaises } from "./gram.ts";
 import type { HandMark } from "./isengard.ts";
 
 const REARGUARD = "09023";
@@ -135,9 +135,10 @@ export function angmarDials(game: ScenarioState, ctx: ReduceContext, nameOf: (co
     // Broken Battlements' last counter makes each player discard 5 cards and place 1 counter (09036:A:2): a loss only for a seat whose deck it empties.
     const battlements = card.code === BROKEN_BATTLEMENTS;
     const doomed = battlements && card.resources <= 1 ? battlementsDoomed(game) : [];
-    // Stop the Executioners' last counter discards the cards captured under it and raises threat (10053:A:3): it never loses the game by itself, so its dial warns near.
+    // Stop the Executioners' last counter discards the cards captured under it and raises threat (10053:A:3): it loses the game only when the raise eliminates the last player, so its dial warns near and is critical only then.
     const executioners = card.code === EXECUTIONERS;
-    const level = card.resources <= 1 && (!(shelter || battlements || executioners) || doomed.length > 0) ? ("critical" as const) : ("near" as const);
+    const executed = executioners ? executionersRaises(game, card.id, ctx) : { under: 0, raises: [] };
+    const level = card.resources <= 1 && (!(shelter || battlements || executioners) || doomed.length > 0 || executed.raises.some((raise) => raise.out)) ? ("critical" as const) : ("near" as const);
     const copies = Object.values(game.cards).filter((other) => other.code === card.code && inPlay(other.zone));
     const where = copies.length > 1 ? placeOf(card, copies) : null;
     dials.push({
@@ -146,8 +147,8 @@ export function angmarDials(game: ScenarioState, ctx: ReduceContext, nameOf: (co
       label: where ? `Time · ${where}` : "Time",
       name: `Time counters left on ${nameOf(card.code)}${where ? ` (${where})` : ""}:`,
       value: card.resources,
-      ...(card.resources <= 2 ? { warn: { level, words: executioners ? executionersNearWords(card.resources) : shelter ? shelterTimeNearWords(card.resources) : battlements ? battlementsTimeNearWords(card.resources, doomed.map((seat) => ({ owner: game.seatCount > 1 ? `Player ${seat.seat + 1}` : null, cards: seat.cards }))) : timeNearWords(card.resources) } } : {}),
-      note: executioners ? executionersTimeWords(card.resources) : shelter ? shelterTimeWords(card.resources) : battlements ? battlementsTimeWords(card.resources) : timeWords(card.resources, heldName),
+      ...(card.resources <= 2 ? { warn: { level, words: executioners ? executionersNearWords(card.resources, executed.under, executed.raises, game.seatCount <= 1) : shelter ? shelterTimeNearWords(card.resources) : battlements ? battlementsTimeNearWords(card.resources, doomed.map((seat) => ({ owner: game.seatCount > 1 ? `Player ${seat.seat + 1}` : null, cards: seat.cards }))) : timeNearWords(card.resources) } } : {}),
+      note: executioners ? executionersTimeWords(card.resources, executed.under, executed.raises) : shelter ? shelterTimeWords(card.resources) : battlements ? battlementsTimeWords(card.resources) : timeWords(card.resources, heldName),
     });
   }
   // Orc Rearguard: no more than 3 progress on the current quest each round (09023:A:1), Eriador Wastes: no more than 5 (10023:A:1); the tally of the round. The cap is the table's, so two copies are one dial, named for the first.

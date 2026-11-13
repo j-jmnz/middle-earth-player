@@ -9,7 +9,7 @@ import type { CardInstance } from "../../rules/core/state.ts";
 
 import { pictureKey } from "../canvas/picture-key.ts";
 import type { BasePileId, FightKind, PileId, PileView, SecondPileId, VictoryPileId, ZoneId, ZoneView } from "../store/selectors.ts";
-import { ASPECT, deepestUnder, MIN_TARGET, placeUnder, rowXs, slotOf, type Metrics } from "./slots.ts";
+import { ASPECT, deepestUnder, MIN_TARGET, placeCounted, placeUnder, rowXs, slotOf, type Metrics } from "./slots.ts";
 import { placePlay, playPlan } from "./play-area.ts";
 import { placeEngaged, placeRow, type RowFolding } from "./row-place.ts";
 import type { RowReach } from "./row-reach.ts";
@@ -315,11 +315,16 @@ export function tableLayout(
   const slots: CardSlot[] = [];
   const marks: CombatMark[] = [];
   const stageEntry = views.questStage.entries[0];
-  if (stageEntry) slots.push(slotOf(stageEntry.card, "questStage", "card", questStage, true));
+  // The cards captured under the quest stage and under an active location are one counted peek where the table stacks what lies under a card (Escape from Mount Gram): the peek stays within the depth the left column reserves, short of the deck and discard piles.
+  if (stageEntry) {
+    if (options.stacks) placeCounted(stageEntry, "questStage", questStage, slots, peek, true);
+    slots.push(slotOf(stageEntry.card, "questStage", "card", questStage, true));
+  }
   for (const [id, rect] of [["activeLocation", activeLocation], ["secondActiveLocation", secondActiveLocation]] as const) {
     const entry = views[id].entries[0];
     if (!entry) continue;
-    placeUnder(entry, id, rect, slots, [], peek);
+    if (options.stacks) placeCounted(entry, id, rect, slots, peek);
+    else placeUnder(entry, id, rect, slots, [], peek);
     slots.push(slotOf(entry.card, id, "card", rect));
   }
   // Staging and the engagement area squeeze to 44 pt steps and then fold the groups the moment does not ask about into a stack at the row's left end (row-fold.ts).

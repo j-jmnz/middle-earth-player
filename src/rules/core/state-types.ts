@@ -168,6 +168,8 @@ export type Seat = {
   captured?: readonly string[];
   // The seat whose staging area and stage this seat shares after it joined that player (mec108.joining-another-player, families/captured/join.ts): its own staging, stage and active location are empty then. Absent while it has an area of its own.
   joined?: number;
+  // The hero this seat chose to start with in Escape from Mount Gram (families/captured/deck.ts): the table's round-1 note reads its threat cost, and a hero rescued later is not it.
+  startHero?: string;
   eliminated: boolean;
   // Encounter cards attached to the top of this seat's deck, oldest first (Iron Shackles, 01105:A:1; families/dungeon.ts). Absent when none.
   deckAttached?: readonly string[];

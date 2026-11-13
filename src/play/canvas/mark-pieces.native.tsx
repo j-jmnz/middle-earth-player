@@ -14,6 +14,7 @@ import { STAGE_APART_WORD } from "../words/scenarios/stormcaller.ts";
 import type { OptionMark } from "../choice/sheet-types.ts";
 import { currentMark } from "./current-mark.ts";
 import { TOKEN } from "./token-spots.ts";
+import { underMarkBox } from "./under-mark.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
 import { CanvasIcon, BADGE_H, type Fonts, type TokenImages } from "./pieces.native.tsx";
 
@@ -76,17 +77,23 @@ export function OptionMarkView({ rect, mark, fonts, images, t, s }: { rect: Rect
  * The cards underneath The Havens Burn against the number that loses the game: a night pill at the card's foot with the short count ("2/5"), threat red when the next card placed under it loses (11038:A:2).
  * The count is short on purpose: it stays inside the card at every size (the full sentence is in the preview and the screen reader's line). Only the count is shown, never which cards are underneath.
  */
-export function UnderMarkView({ rect, mark, fonts, t, s }: { rect: Rect; mark: { text: string; loses: boolean }; fonts: Fonts; t: TableTokens; s: number }) {
-  const { x, y, w, h } = rect;
-  const token = TOKEN * s;
-  const width = Math.min(w - 4 * s, fonts.badge.getTextWidth(mark.text) + 10 * s);
-  const left = x + (w - width) / 2;
-  const top = y + h - token - 4 * s;
+export function UnderMarkView({ rect, mark, fonts, t, s }: { rect: Rect; mark: { text: string; loses: boolean; count?: number }; fonts: Fonts; t: TableTokens; s: number }) {
+  // Captured cards (a `count`) stand a row above the foot, clear of the engagement cost, the combat number and the quest strip; where "3 captured" does not fit, a facedown-card glyph and the bare count stand in.
+  const counted = mark.count != null;
+  const count = String(mark.count ?? "");
+  const box = underMarkBox(rect, fonts.badge.getTextWidth(mark.text), fonts.badge.getTextWidth(count), s, counted);
+  const text = box.kind === "words" ? mark.text : count;
+  const words = fonts.badge.getTextWidth(text);
+  const token = box.height;
+  const left = box.x;
+  const top = box.y;
+  const glyph = box.kind === "count";
   return (
     <Group>
-      <RoundedRect x={left} y={top} width={width} height={token} r={token / 2} color={mark.loses ? t.threat : t.night} />
-      <RoundedRect x={left} y={top} width={width} height={token} r={token / 2} color={mark.loses ? t.danger : t.hairline} style="stroke" strokeWidth={1 * s} />
-      <Text x={left + (width - fonts.badge.getTextWidth(mark.text)) / 2} y={top + token - 5 * s} text={mark.text} font={fonts.badge} color={t.bone} />
+      <RoundedRect x={left} y={top} width={box.width} height={token} r={token / 2} color={mark.loses ? t.threat : t.night} />
+      <RoundedRect x={left} y={top} width={box.width} height={token} r={token / 2} color={mark.loses ? t.danger : t.hairline} style="stroke" strokeWidth={1 * s} />
+      {glyph ? <RoundedRect x={left + 5 * s} y={top + (token - 10 * s) / 2} width={7 * s} height={10 * s} r={1.5 * s} color={t.bone} style="stroke" strokeWidth={1 * s} /> : null}
+      <Text x={glyph ? left + 5 * s + 9 * s : left + (box.width - words) / 2} y={top + token - 5 * s} text={text} font={fonts.badge} color={t.bone} />
     </Group>
   );
 }

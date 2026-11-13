@@ -78,6 +78,21 @@ export function seatedLabel(game: ScenarioState, ctx: ReduceContext, names: Shee
   return type === "enemy" ? `${names.card(id)} \u00b7 engaged with Player ${seat + 1}` : `${names.card(id)} \u00b7 Player ${seat + 1}'s ${kind}`;
 }
 
+/**
+ * The row of an encounter card in play in a pick of Escape from Mount Gram (Captives of Gornákh's tie, 10051:A:1) that shares its name with another row: "Goblin Tormentor · staging area · 3 Threat", "· engaged with Player 2", "· active location", so two cards of one name read apart.
+ * Undefined for any other row, and in a game with no captured deck.
+ */
+export function tiedLabel(game: ScenarioState, ctx: ReduceContext, names: SheetNames, id: string, options: readonly string[]): string | undefined {
+  const card = game.cards[id];
+  if (game.capture == null || !card || (card.zone !== "staging" && card.zone !== "activeLocation" && card.zone !== "engaged")) return undefined;
+  const name = names.card(id);
+  if (options.filter((other) => other !== id && game.cards[other] != null && names.card(other) === name).length === 0) return undefined;
+  const seat = card.zone === "engaged" ? game.seats.findIndex((one) => one.engaged.includes(id)) : -1;
+  const place = card.zone === "activeLocation" ? "active location" : card.zone === "engaged" ? (game.seatCount > 1 && seat >= 0 ? `engaged with Player ${seat + 1}` : "engaged with you") : "staging area";
+  const threat = printedOf(ctx.cards, card.code).threat == null ? 0 : modifiedStat(game, card, "threat", ctx.cards);
+  return `${name} \u00b7 ${place} \u00b7 ${threat} Threat`;
+}
+
 export function option(game: ScenarioState, names: SheetNames, id: string): SheetOption {
   if (id.startsWith("seat:")) return { id, label: `Player ${Number(id.slice(5)) + 1}`, code: null };
   // The staging area, where a Trap or a Guarded attachment is played (src/rules/families/attachments/play.ts).

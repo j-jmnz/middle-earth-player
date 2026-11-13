@@ -80,6 +80,15 @@ export function deepestUnder(entries: readonly ZoneEntry[]): number {
   return Math.max(0, ...entries.map((entry) => entry.attached.filter((attached) => !(attached.zone === "shadow" && attached.face !== "down")).length));
 }
 
+// One peek under a card of the left column (the quest stage, an active location) that holds cards, with the count when there are several: the last put is the one that shows. `landscape` is a sideways card's (the quest stage).
+export function placeCounted(entry: ZoneEntry, zone: ZoneId, rect: Rect, out: CardSlot[], peek: number, landscape = false): void {
+  const under = entry.attached.filter((card) => !(card.zone === "shadow" && card.face !== "down"));
+  const last = under[under.length - 1];
+  if (!last) return;
+  const slot = slotOf(last, zone, last.zone === "shadow" ? "shadow" : "attachment", { x: rect.x, y: rect.y + peek, w: rect.w, h: rect.h }, landscape);
+  out.push(under.length > 1 ? { ...slot, stack: under.length } : slot);
+}
+
 // One peek under a staging card that holds more than one card, with the count: a grappled arm, Black Key on the Raider Flagship (the last put is the one that shows).
 export function placeStaging(entry: ZoneEntry, rect: Rect, out: CardSlot[], m: Metrics): void {
   const under = entry.attached.filter((card) => !(card.zone === "shadow" && card.face !== "down"));

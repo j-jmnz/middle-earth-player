@@ -10,7 +10,7 @@ import { raiseThreat } from "../../core/keywords.ts";
 import { printedOf } from "../../core/printed.ts";
 import { nextUint, shuffleIds } from "../../core/seed.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { inPlay, livingSeats, updateCard, withThreat } from "../../core/state.ts";
+import { inPlay, livingSeats, updateCard, withSeat, withThreat } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
@@ -66,6 +66,8 @@ export function prepareCapturedDeck(state: ScenarioState, focus: Focus, ctx: Red
   // The starting hero gets 2 resources and the dial is set to its threat cost.
   const hero = next.cards[start];
   if (hero) next = updateCard(next, start, { resources: hero.resources + 2 });
+  const chosen = next.seats[seatIndex];
+  if (chosen) next = withSeat(next, seatIndex, { ...chosen, startHero: start });
   return withThreat(next, seatIndex, printedOf(ctx.cards, hero?.code ?? "").threat ?? next.seats[seatIndex]?.threat ?? 0);
 }
 
