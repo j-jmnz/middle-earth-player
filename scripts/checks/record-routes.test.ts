@@ -86,6 +86,11 @@ describe("record routes", () => {
     expect(failing, "a Shadow record that would fail with \"Unimplemented instruction\": flag its verb `runsInFrame` in its family file (src/catalog/verb-flags.ts)").toEqual([]);
   });
 
+  it("holds no Shadow record with a record-level condition: a Shadow runs on instruction-level `when` only (combat/shadow.ts resolveShadowCard)", () => {
+    const conditioned = records("shadow").filter((effect) => effect.condition != null).map((effect) => effect.id);
+    expect(conditioned, "a Shadow record's `condition` is never read: move it to the `when` of its instructions").toEqual([]);
+  });
+
   it("reads every verb of a campaign card's Setup (src/campaign/start.ts, src/campaign/checklist.ts)", () => {
     const roles = new Set([...setupRoleVerbs("dealt"), ...setupRoleVerbs("afterSetup"), ...setupRoleVerbs("beforeReveal")]);
     const dropped = records("campaignSetup").flatMap((effect) => effect.instructions.filter((instruction) => !roles.has(instruction.verb) && !(instruction.verb in READ_FROM_CAMPAIGN_SETUP)).map((instruction) => `${effect.id}: ${instruction.verb}`));

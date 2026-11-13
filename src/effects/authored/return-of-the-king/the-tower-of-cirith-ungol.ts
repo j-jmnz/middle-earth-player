@@ -22,6 +22,9 @@ const RING_READY: Cond = { kind: "exhausted", code: ONE_RING, is: false };
 const MY_CHARACTER: PickSpec = { type: "character", control: "you" };
 const QUESTING_CHARACTER: PickSpec = { type: "character", control: "you", committed: true };
 const ANY_ENEMY: PickSpec = { type: "enemy", control: "any", staging: true };
+// Orcish Howls (146023:A:2): an enemy engaged with the defending player other than the attacker; the Shadow runs only while there is one (an instruction-level `when`, the only condition a Shadow reads).
+const OTHER_ENGAGED: PickSpec = { type: "enemy", control: "any", engaged: "you", attackingEnemy: false };
+const OTHER_ENGAGED_EXISTS: Cond = { kind: "canPick", pick: OTHER_ENGAGED };
 
 export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
   [
@@ -173,8 +176,10 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       cardCode: "146023",
       lines: ["146023:A:2"],
       timing: "shadow",
-      condition: { kind: "canPick", pick: { type: "enemy", control: "any", engaged: "you", attackingEnemy: false } },
-      instructions: [{ verb: "Pick", pick: { type: "enemy", control: "any", engaged: "you", attackingEnemy: false } }, { verb: "ResolveAttackAgainst" }],
+      instructions: [
+        { verb: "Pick", pick: OTHER_ENGAGED, when: OTHER_ENGAGED_EXISTS },
+        { verb: "ResolveAttackAgainst", when: OTHER_ENGAGED_EXISTS },
+      ],
     },
 
     // 146058 Orc of Mordor. Forced: after it engages you exhaust a character you control (copied from Great Spider). Shadow: exhaust a character you control (copied from Driven to the Brink).
