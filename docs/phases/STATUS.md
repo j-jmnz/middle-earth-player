@@ -109,8 +109,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 83 | Escape from Mount Gram | completed | 2026-11-13. Review round done. Open: `gram-won`. |
 | 84 | Across the Ettenmoors | completed | 2026-11-13. Review round done. Open: `ettenmoors-won`. |
 | 85 | The Treachery of Rhudaur | completed | 2026-11-13. Review round done. Open: `rhudaur-won`. |
-| 86 | The Battle of Carn Dûm | active | 2026-11-13. `docs/plans/angmar-awakened.md`. |
-| 87 | The Dread Realm | not started |  |
+| 86 | The Battle of Carn Dûm | completed | 2026-11-13. Review round done. Open: `dum-won`. |
+| 87 | The Dread Realm | active | 2026-11-13. `docs/plans/angmar-awakened.md`. |
 
 ## Open items
 
@@ -120,6 +120,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - The release notes' golden-check comparison (`scripts/release/reach.ts`) has not run against a real previous tag; the first tag after it compares by `ENGINE_CHANGES` only.
 
 ### Fixtures and Maestro
+- `dum-won` is not committed: no seed in 600 wins The Battle of Carn Dûm with the saved decklists. Until it exists `.maestro/scenarios/the-battle-of-carn-dum/the-battle-of-carn-dum.yaml` cannot run.
 - `rhudaur-won` is not committed: no seed wins The Treachery of Rhudaur with the saved decklists under the golden policy. Until it exists `.maestro/scenarios/the-treachery-of-rhudaur/the-treachery-of-rhudaur.yaml` cannot run.
 - `ettenmoors-won` is not committed: no seed in 100 wins Across the Ettenmoors with the saved decklists. Until it exists `.maestro/scenarios/across-the-ettenmoors/across-the-ettenmoors.yaml` cannot run.
 - `gram-won` is not committed: no seed in 100 wins Escape from Mount Gram with the saved decklists. Until it exists `.maestro/scenarios/escape-from-mount-gram/escape-from-mount-gram.yaml` cannot run.
@@ -273,7 +274,6 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - The Treachery of Rhudaur: each Clue's boon (10184:B:1) goes into its controller's deck as well as the pool (agent recommendation). Not user-confirmed.
 - Renderer gaps, The Treachery of Rhudaur (behaviour proven by tests): unclaimed side quests counted by 10094:B:4, Ghostly Ruins' unpayable Travel (10103:A:2), the main quest barred from Centuries of Sorrow's choice and Haunting Fog with no current quest (10105:A:2, 10108:A:1), Amarthiúl as an ally and the shared limit (10113), the boon into the deck (10184:B:1), "Restricted." on 10185 to 10187.
 - `modifiedStat` (`src/rules/core/keywords.ts`) reads traits with no effect list, so a trait an effect grants is not seen by stat conditions such as `defendingAgainst` (the condition path sees it).
-- Angmar Awakened: the boons' own lines 10189 to 10192 go with The Battle of Carn Dûm, which first deals them.
 - Intruders in Chetwood: quest cards in play are the main quest, the staged encounter side quests and the player side quests, at least 1 (09016, 09019, 09047, 09048, 09050). Not user-confirmed.
 - Intruders in Chetwood: Iârion's Response (09016:A:3) hears a side quest revealed by a search of the encounter deck, not of the discard pile. Not user-confirmed.
 - Intruders in Chetwood: Iârion held facedown under Rescue Iârion (09024:A:2) stays in play and has not left it. Not user-confirmed.
@@ -289,6 +289,18 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - Intruders in Chetwood: Iârion's control follows the first player token (09016:A:2), by the Aragorn and Calphon rulings and a community source only. Not user-confirmed.
 - Renderer gaps, Intruders in Chetwood (behaviour proven by tests): 09016:A:2 control has no template; Orc War Party's stage bar does not say it binds the main quest only (09017:A:3); Orc Rearguard's cap does not say "each round" (09023:A:1); `lastTimeCounterRemoved` and `questDefeated` do not say "this card" (09024:A:3, 09051:A:2); Angmar Captain's X and target (09045:A:1); 09068:B:3's first player and win; the Pendant's cancel limits (10157:A:2); `SearchMove` with `when` prints as JSON.
 - Angmar Awakened: the box's Setup steps other than the Orc deck (`prepareCapturedDeck`, `captureUnder` and the others) are catalog data only; the engine reads them in their scenarios' phases.
+
+- The Battle of Carn Dûm: the Werewolf (10131:A:2) flips on exactly 3 shadow cards, by analogy with the official Thaurdir ruling. Not user-confirmed.
+- The Battle of Carn Dûm: Thaurdir on stage 2B (10126:B:1) attacks each player in player order and fires no engagement event (community thread, no agreement). Not user-confirmed.
+- The Battle of Carn Dûm: Thaurdir's Captain Forced (10127:A:4) is not heard for a Sorcery card revealed as a shadow card (community source only). Not user-confirmed.
+- The Battle of Carn Dûm: engagement costs lowered by Champion Thaurdir (10128:A:3) do not go below 0 (agent recommendation). Not user-confirmed.
+- The Battle of Carn Dûm: Carn Dûm Garrison's shadow (10129:A:2) counts the attacking enemy's shadow cards, itself included (agent recommendation). Not user-confirmed.
+- The Battle of Carn Dûm: Orc Grunts (10130:A:2) reduce only progress landing on the current quest after the active location's share (community only). Not user-confirmed.
+- The Battle of Carn Dûm: any player's event deals the Werewolf (10131:A:1) a shadow card (agent recommendation). Not user-confirmed.
+- The Battle of Carn Dûm: Fortress Walls (10135:A:1) counts resources spent from ally pools as well as hero pools (agent recommendation). Not user-confirmed.
+- The Battle of Carn Dûm: Vile Affliction (10137:A:1) counts an X or blank cost as 0 (agent recommendation). Not user-confirmed.
+- The Battle of Carn Dûm: a Thaurdir burden attaches to the staged Thaurdir although he cannot have attachments, and the Amarthiúl hero stays usable in The Dread Realm (agent recommendation). Not user-confirmed.
+- `beginEnemyAttack` (`src/rules/combat/combat.ts`) deals a shadow card a second time for an attack from staging made by an enemy with `engagedWithAll` (The Ring Goes South's Watcher, Fire in the Night, The Withered Heath, Mount Gundabad, The Fate of Wilderland): `attackNowFromStaging` deals one first. Fixing it moves shipped goldens and needs `ENGINE_VERSION`. Not fixed; Thaurdir's path skips the extra deal.
 
 ### Screens and code
 - Fire in the Night: the table has no side-quest deck area or current-quest mark (`docs/brief.md`, Ered Mithrin).
