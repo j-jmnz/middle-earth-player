@@ -108,9 +108,9 @@ describe("10182:A:2, 10182:A:3 and 10182:B:1 are the campaign card's lines", () 
     expect(run.state.cards[card]?.resources).toBe(3);
   });
 
-  it("10182:B:1 counts each Losing Time in the encounter deck or discard pile for the Campaign Pool, and none set aside, staged or attached", () => {
+  it("10182:B:1 counts each Losing Time in the encounter deck or discard pile for the Campaign Pool, and none set aside, staged or attached, each copy numbered so the pool keeps all of them", () => {
     const t = at({ campaign: true, deck: ["10183", "f0"], discard: ["10183"], setAside: ["10183"], staging: ["10183"] });
-    expect(encounterCopies(t.state, ["10183"], 4)).toEqual([{ code: "10183", to: "pool", seat: null, hero: null, step: 4 }, { code: "10183", to: "pool", seat: null, hero: null, step: 4 }]);
+    expect(encounterCopies(t.state, ["10183"], 4)).toEqual([{ code: "10183", to: "pool", seat: null, hero: null, step: 4, copy: 0 }, { code: "10183", to: "pool", seat: null, hero: null, step: 4, copy: 1 }]);
     expect(flagged(t.state, "table", "noEngagementChecks")).toBe(false);
   });
 });

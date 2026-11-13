@@ -68,9 +68,14 @@ export function revealSetAsideForTokens(state: ScenarioState, instruction: Verb<
   return startReveal(paid, focus.seat, ctx, steps, copy);
 }
 
-/** The copies of the cards with these codes that lie in the encounter deck or discard pile, one pool entry for each (10182:B:1). */
-export function encounterCopies(state: ScenarioState, codes: readonly string[], step: number): { code: string; to: "pool"; seat: null; hero: null; step: number }[] {
+/** The copies of the cards with these codes that lie in the encounter deck or discard pile, one pool entry for each (10182:B:1). Each copy is numbered, so the pool keeps every copy and not one for the code. */
+export function encounterCopies(state: ScenarioState, codes: readonly string[], step: number): { code: string; to: "pool"; seat: null; hero: null; step: number; copy: number }[] {
+  const seen = new Map<string, number>();
   return Object.values(state.cards)
     .filter((card) => codes.includes(card.code) && (card.zone === "encounterDeck" || card.zone === "encounterDiscard"))
-    .map((card) => ({ code: card.code, to: "pool" as const, seat: null, hero: null, step }));
+    .map((card) => {
+      const copy = seen.get(card.code) ?? 0;
+      seen.set(card.code, copy + 1);
+      return { code: card.code, to: "pool" as const, seat: null, hero: null, step, copy };
+    });
 }
