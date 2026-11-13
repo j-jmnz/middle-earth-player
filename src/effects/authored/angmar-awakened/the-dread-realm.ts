@@ -143,7 +143,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     instructions: [
       { verb: "Pick", pick: { type: "card", control: "you", from: "discard", copyOfDefender: true } },
       { verb: "Reanimate", from: "card", card: "picked", when: { kind: "canPick", pick: { type: "card", control: "you", from: "discard", copyOfDefender: true } } },
-      { ...DEAL_IT_A_SHADOW, when: { kind: "canPick", pick: { type: "card", control: "you", from: "discard", copyOfDefender: true } } },
+      DEAL_IT_A_SHADOW,
     ],
   },
 

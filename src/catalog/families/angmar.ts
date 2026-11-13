@@ -104,7 +104,7 @@ const VERBS = [
   // The "when revealed" effects of the cards with this Trait that the effect names, in the order they lay (The Dread Realm): `heldShadows` the shadow cards dealt to the source, resolved by the defending player after the shadow effects ("if they have the Sorcery trait, resolve
   // their 'when revealed' effects", 101156:A:1, a Forced on `shadowsResolved`); `looked` the cards the effect discarded from the top of the encounter deck with DiscardEncounterTop, which lie in the discard pile ("Resolve the 'when revealed' effects of each Sorcery card discarded by this effect", 101158:A:2). A card that no
   // longer lies where it was (it attached itself) is not resolved twice.
-  z.strictObject({ verb: z.literal("ResolveWhenRevealedOf"), of: z.enum(["heldShadows", "looked"]), trait: z.string().min(1), ...when }),
+  verbFlags(z.strictObject({ verb: z.literal("ResolveWhenRevealedOf"), of: z.enum(["heldShadows", "looked"]), trait: z.string().min(1), ...when }), { runsInFrame: true }),
   // The source, a card that has just left play, is dealt facedown as a shadow card to the card the effect picked last, an enemy in play ("deals Sinister Dungeon to it facedown as a shadow card", 101158:A:1): it goes from the encounter discard pile to that enemy with no tokens, and resolves its Shadow effect when
   // the enemy attacks. Nothing happens when no enemy is picked.
   z.strictObject({ verb: z.literal("DealSourceAsShadow"), ...when }),
