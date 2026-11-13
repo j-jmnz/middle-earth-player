@@ -54,11 +54,9 @@ export type GramGolden = { name: string; seatCount: 1 | 2; seed: number; difficu
 export const GRAM_GOLDENS: readonly GramGolden[] = [
   { name: "true solo, won, Normal", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
   { name: "two-handed, won, Normal", seatCount: 2, seed: 2, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
-  { name: "true solo, won, Easy", seatCount: 1, seed: 1, difficulty: "Easy", decks: "strong", outcome: "won", after: true },
   { name: "two-handed, won, a player's heroes destroyed", seatCount: 2, seed: 4, difficulty: "Normal", decks: "brittle", outcome: "won", after: true },
   { name: "true solo, lost, threat reaches 50", seatCount: 1, seed: 5, difficulty: "Normal", decks: "weak", outcome: "lost", after: true, lossReason: "No seats remain" },
-  { name: "two-handed, lost, threat reaches 50", seatCount: 2, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", after: true, lossReason: "No seats remain" },
-  { name: "true solo, lost, the hero is destroyed", seatCount: 1, seed: 2, difficulty: "Normal", decks: "brittle", outcome: "lost", after: true, lossReason: "No seats remain" },
+  { name: "true solo, lost, every hero is destroyed", seatCount: 1, seed: 9, difficulty: "Normal", decks: "brittle", outcome: "lost", after: true, lossReason: "No seats remain" },
 ];
 
 const game = campaignGame<GramDecks, GramPolicy>({

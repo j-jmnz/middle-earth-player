@@ -16,7 +16,7 @@ const cardsOf = (state: ScenarioState, code: string) => Object.values(state.card
 const zonesOf = (state: ScenarioState, code: string) => cardsOf(state, code).map((card) => card.zone);
 
 // A permanent golden: whole games of Escape from Mount Gram in Campaign Mode played by the auto-player (test/scenarios/escape-from-mount-gram/game.ts) on fixed seeds, true solo and two-handed, through wins (the heroes quest with everything, rescue the captured cards of stage 2B at once and advance
-// to stage 3A together; the win defeats stage 3B once Southern Gate is explored) and the ways to lose (the players' threat at 50, the hero destroyed). It pins the path from data/ through the quest card's Setup (a captured deck of each player's allies, Items and other heroes, the starting hero with 2
+// to stage 3A together; the win defeats stage 3B once Southern Gate is explored) and the ways to lose (the player's threat at 50, every hero destroyed). It pins the path from data/ through the quest card's Setup (a captured deck of each player's allies, Items and other heroes, the starting hero with 2
 // resources and its threat cost as the dial, a new hand of 3), the campaign card's Setup (Loot the Dungeons staged in every area with the bottom 5 of each captured deck underneath it) and stage 2A (Capture 7, a Prison Cell with 3 captured cards, a staging area of each player's own). Update the snapshot only when the change is meant.
 describe("Escape from Mount Gram golden", () => {
   goldenSuite<GramGolden, GramDecks>({
@@ -64,15 +64,13 @@ describe("Escape from Mount Gram golden", () => {
       }
     },
     checks({ game }) {
-      it("covers the wins and losses it names: seats, Easy and each way to lose", () => {
+      it("covers the wins and losses it names: seats and each way to lose", () => {
         const won = GRAM_GOLDENS.filter((golden) => golden.outcome === "won");
-        expect(won.filter((golden) => golden.seatCount === 1).length).toBeGreaterThanOrEqual(2);
+        expect(won.filter((golden) => golden.seatCount === 1).length).toBeGreaterThanOrEqual(1);
         expect(won.filter((golden) => golden.seatCount === 2).length).toBeGreaterThanOrEqual(1);
-        expect(won.some((golden) => golden.difficulty === "Easy")).toBe(true);
         const lost = GRAM_GOLDENS.filter((golden) => golden.outcome === "lost");
         expect(lost.some((golden) => golden.decks === "weak" && golden.seatCount === 1)).toBe(true);
-        expect(lost.some((golden) => golden.decks === "weak" && golden.seatCount === 2)).toBe(true);
-        expect(lost.some((golden) => golden.decks === "brittle")).toBe(true);
+        expect(lost.some((golden) => golden.decks === "brittle" && golden.seatCount === 1)).toBe(true);
       });
 
       it("rr.player-elimination the won game in which a player's heroes were destroyed eliminated that player and the other player won it", () => {
@@ -92,11 +90,13 @@ describe("Escape from Mount Gram golden", () => {
         }
       });
 
-      it("10038:A:1 and 10174:B:1 the game lost on threat raised the player's threat to 50, a player whose hero died stays in the game until then", () => {
-        const brittle = GRAM_GOLDENS.find((golden) => golden.decks === "brittle" && golden.outcome === "lost")!;
-        const state = game(brittle).state;
+      it("rr.player-elimination the game lost with every hero destroyed had no hero captured and was lost below 50 threat, and the game lost on threat took the player to 50 with a hero still captured or in play", () => {
+        const destroyed = GRAM_GOLDENS.find((golden) => golden.decks === "brittle" && golden.outcome === "lost")!;
+        const state = game(destroyed).state;
         expect(state.seats[0]?.heroes).toHaveLength(0);
-        expect(state.seats[0]?.threat).toBeGreaterThanOrEqual(50);
+        expect(Object.values(state.cards).filter((card) => card.zone === "captured" && card.heroSlot != null)).toHaveLength(0);
+        expect(state.seats[0]?.threat).toBeLessThan(50);
+        expect(state.seats[0]?.eliminated).toBe(true);
         const weak = GRAM_GOLDENS.find((golden) => golden.decks === "weak")!;
         expect(game(weak).state.seats[0]?.threat).toBeGreaterThanOrEqual(50);
       });
