@@ -920,6 +920,16 @@
     },
     {
       "match": {
+        "code": "10139"
+      },
+      "set": {
+        "questPoints": 30
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Furious Charge no quest points (its Victory 10 is the only number it exports). The scan prints a quest points box of 30 and Victory 10, so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 10139.A (hallofbeorn-resources The-Lost-Realm/Furious-Charge.jpg, read for the quest points box)"
+    },
+    {
+      "match": {
         "code": "09046"
       },
       "set": {

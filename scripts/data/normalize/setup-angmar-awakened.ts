@@ -87,6 +87,11 @@ export function readAngmarAwakened(sentence: string, names: NameIndex, before: r
     const codes = names.codesOf(match[1] ?? "");
     return codes.length === 0 ? null : [{ kind: "stage", codes, perPlayer: null, count: 1, many: { count: Number(match[2]), from: Number(match[3]) } }];
   }
+  // The Battle of Carn Dûm: the Garrison copies are staged one per player, the rest of the box's copies stay in the encounter deck (10125:A:1).
+  if ((match = /^Add 1 cop(?:y|ies) of (.+?) per player to the staging area$/i.exec(sentence))) {
+    const codes = names.codesOf(match[1] ?? "");
+    return codes.length === 0 ? null : [{ kind: "stage", codes, perPlayer: 1, count: 0 }];
+  }
   if ((match = /^Add (.+?) to the staging area, (Captain|Champion) side faceup$/i.exec(sentence))) {
     const codes = names.codesOf(match[1] ?? "");
     return codes.length === 0 ? null : [{ kind: "stage", codes, perPlayer: null, count: 1 }];

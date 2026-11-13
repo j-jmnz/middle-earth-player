@@ -152,7 +152,8 @@
       "code": "10129",
       "normal": 4,
       "easy": 3,
-      "pile": "staging"
+      "pile": "staging",
+      "perPlayer": 1
     },
     {
       "code": "10132",
