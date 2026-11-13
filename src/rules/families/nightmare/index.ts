@@ -31,7 +31,7 @@ import { listenerInPlay } from "./guards.ts";
 import { seatThreat } from "../play/hooks.ts";
 import { markPicked } from "../play/refs.ts";
 import { dealForAttack } from "../south/watcher.ts";
-import { currentSideQuest } from "../wilderland/night-quest.ts";
+import { currentQuestId } from "../wilderland/night-quest.ts";
 
 // The verbs src/catalog/families/nightmare.ts adds, for the Nightmare decks. The attack and pick verbs are here; Escape from Dol Guldur's
 // prisoners, stage return and tokens are in nightmare/dungeon.ts, the setup card's own lines in nightmare/setup.ts, and the reads the
@@ -102,7 +102,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 // advanceStage releases a defeated stage's attachments, rr.attachment-cards).
 function attachToQuest(state: ScenarioState, focus: Focus): ScenarioState {
   const source = focus.sourceId;
-  const quest = currentSideQuest(state) ?? state.questStage;
+  const quest = currentQuestId(state);
   if (!source || !quest || !state.cards[source] || !state.cards[quest]) return state;
   return updateCard(attachTo(moveCard(state, source, { zone: "attached" }), source, quest), source, { face: "up", controller: null });
 }

@@ -304,6 +304,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The current quest, read by the angmar family: `side` a side quest is the current quest ("If the current quest is a side quest", 09047:A:1), `self` the source is the side quest that is the current quest ("While Orc Rearguard is the current quest", 09023:A:2),
   // `other` there is a quest card besides the current one that may be chosen to be the current quest (09049:A:2: the main quest card, or an encounter side quest in the staging area).
   z.strictObject({ kind: z.literal("currentQuest"), is: z.enum(["side", "self", "other"]) }),
+  // The current quest card holds 1 or more progress (`some`) or none (`none`) ("While the current quest has 1 or more progress on it", 10099:A:1; "has 0 progress on it", 10099:A:2). Both are false while there is no current quest: the main quest card cannot be it in the quest phase (10094:B:3). Read by the angmar family.
+  z.strictObject({ kind: z.literal("currentQuestProgress"), is: z.enum(["some", "none"]) }),
   // The total Willpower of the characters committed to the quest is greater than the total Threat in the staging area, as the quest would count them now ("If the total Willpower of characters committed to the quest is greater than the total Threat in the staging area", 09021:A:1; rr.step-3-4). Read by the angmar family.
   z.strictObject({ kind: z.literal("questLeads") }),
   // The card in play with this code has any hit points remaining: its damage is below its hit points now ("cannot defeat this stage while Thaurdir has any hit points remaining", 09074:B:2). False while no such card is in play. Read by the angmar family.

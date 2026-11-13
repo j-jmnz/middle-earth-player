@@ -30,7 +30,7 @@ import { oweDiscards } from "../families/breaking/progress.ts";
 import { arrivalFace, orderedNext, stageToVictory } from "../families/quest/order.ts";
 import { caughtUp } from "../families/stormcaller/values.ts";
 import { islandTravelTo } from "../families/island/travel.ts";
-import { hasSideQuests, placeOnCurrentSideQuest } from "../families/wilderland/night-quest.ts";
+import { hasSideQuests, mainQuestBarred, placeOnCurrentSideQuest } from "../families/wilderland/night-quest.ts";
 import { familyOptionalEngageBarred, familyQuestResult } from "../interpret/family-hooks.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
@@ -232,7 +232,8 @@ export function placeQuestProgress(
   if (remaining > 0 && next.questStage && flagged(next, next.questStage, "assault")) remaining = 0;
   // A side quest that is the current quest takes it instead of the main quest card; what it cannot take is discarded (emce.side-quests-in-play, families/wilderland/night-quest.ts).
   if (remaining > 0 && hasSideQuests(next)) ({ state: next, remaining } = placeOnCurrentSideQuest(next, remaining, cards, steps));
-  if (remaining > 0 && next.questStage && !next.stageCleared) {
+  // The main quest card takes none while it cannot be the current quest and no side quest was chosen (10094:B:3): the progress is lost.
+  if (remaining > 0 && next.questStage && !next.stageCleared && !mainQuestBarred(next)) {
     const stageId = next.questStage;
     const stage = next.cards[stageId];
     // A card in play may limit the progress the quest card takes this round, or stop it (families/caves/progress.ts).

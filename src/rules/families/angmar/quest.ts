@@ -14,7 +14,7 @@ import { askTarget } from "../../windows/choices.ts";
 import { effectData } from "../encounter/moves.ts";
 import { questCardPool } from "../quest/quest-card.ts";
 import { makeCurrentQuest } from "../wilderland/night.ts";
-import { currentSideQuest, stagedSideQuests } from "../wilderland/night-quest.ts";
+import { currentQuestId, currentSideQuest, mainQuestBarred, stagedSideQuests } from "../wilderland/night-quest.ts";
 import type { Focus } from "../index.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
@@ -24,14 +24,14 @@ export function questCardsInPlay(state: ScenarioState, seat: number, ctx: Reduce
   return Math.max(1, questCardPool(state, seat, ctx).length);
 }
 
-/** The cards that may be the current quest: the main quest card and the encounter side quests in the staging area. A player side quest never is. */
+/** The cards that may be the current quest: the main quest card (not in the quest phase while it cannot be chosen, 10094:B:3) and the encounter side quests in the staging area. A player side quest never is. */
 function choosable(state: ScenarioState, ctx: ReduceContext): string[] {
-  return [...(state.questStage ? [state.questStage] : []), ...stagedSideQuests(state, ctx)];
+  return [...(state.questStage && !mainQuestBarred(state) ? [state.questStage] : []), ...stagedSideQuests(state, ctx)];
 }
 
-/** The quest card that is the current quest now: the side quest chosen until the end of the phase, else the main quest card. */
+/** The quest card that is the current quest now: the side quest chosen until the end of the phase, else the main quest card; none in the quest phase while the main quest card cannot be chosen and no side quest was. */
 function currentQuestCard(state: ScenarioState): string | null {
-  return currentSideQuest(state) ?? state.questStage;
+  return currentQuestId(state);
 }
 
 /** The current quest is the card (`id`): the mark of the side quest that held it ends, and a side quest takes it until the end of the phase; the main quest card takes it by holding no mark. */
@@ -59,10 +59,15 @@ export function questCardsAmount(state: ScenarioState, found: Exclude<Amount, nu
 }
 
 /**
- * The condition `currentQuest`: `side` a side quest is the current quest now ("If the current quest is a side quest", 09047:A:1), `self` the source is that side quest ("While Orc Rearguard is the current quest", 09023:A:2), `other` there is a quest card besides the
+ * The condition `currentQuestProgress` (10099:A:1, 10099:A:2): the current quest card holds progress (`some`) or none (`none`); false either way while there is no current quest (10094:B:3). The condition `currentQuest`: `side` a side quest is the current quest now ("If the current quest is a side quest", 09047:A:1), `self` the source is that side quest ("While Orc Rearguard is the current quest", 09023:A:2), `other` there is a quest card besides the
  * current quest that could be chosen (the second option of 09049:A:2).
  */
 export function currentQuestHolds(state: ScenarioState, condition: Condition, scope: Scope, ctx: ReduceContext): boolean | null {
+  if (condition.kind === "currentQuestProgress") {
+    const current = currentQuestId(state);
+    const card = current ? state.cards[current] : undefined;
+    return card != null && (condition.is === "some" ? card.progress > 0 : card.progress === 0);
+  }
   if (condition.kind !== "currentQuest") return null;
   const side = currentSideQuest(state);
   if (condition.is === "side") return side != null;

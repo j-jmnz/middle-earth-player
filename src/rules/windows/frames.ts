@@ -12,7 +12,7 @@ import { raiseThreat } from "../core/keywords.ts";
 import { queueEvent } from "./queue.ts";
 import { offerResponses, responseStep } from "./responses.ts";
 import { printedOf } from "../core/printed.ts";
-import { flagged, inPlay, livingSeats, updateCard, withMode, type Frame, type ScenarioState } from "../core/state.ts";
+import { flagged, heldAmount, inPlay, livingSeats, updateCard, withMode, type Frame, type ScenarioState } from "../core/state.ts";
 import { eventStep, fireForced } from "./triggers.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { resetEncounterDeck, shuffleEncounterDeck } from "../interpret/verbs.ts";
@@ -163,7 +163,8 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
     case 1: {
       let next = patchTop(state, { step: 2 });
       // The Doomed a card in play gives it (Troll-fells gives each Weather card Doomed 1, 10077:A:1) comes on top of the printed number.
-      const doomed = (printed.keywords.doomed ?? 0) + (gameReads(next, ctx, '"GainsDoomed"') ? gainedDoomed(next, id, seat, ctx) : 0);
+      // The Doomed the card gives itself (`gainsDoomed`, Wight of Rhudaur, 10099:A:2) comes on top as well.
+      const doomed = (printed.keywords.doomed ?? 0) + (gameReads(next, ctx, '"GainsDoomed"') ? gainedDoomed(next, id, seat, ctx) : 0) + (next.modifiers.length > 0 ? heldAmount(next, id, "gainsDoomed") : 0);
       if (doomed > 0) {
         // The players sharing the staging area it was added to, once stages are separate and the game has joined areas (families/captured/).
         const sharers = next.capture && next.separate ? sharing(next, seat) : null;

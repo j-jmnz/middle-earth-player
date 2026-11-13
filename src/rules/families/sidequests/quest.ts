@@ -15,6 +15,7 @@ import { updateCard } from "../../core/state.ts";
 import { noteHostDefeated } from "../attachments/hold.ts";
 import { questCardDefeatedHeard } from "../quest/branch.ts";
 import { releaseHeldOnDefeat } from "../angmar/hold.ts";
+import { flipDefeated, flipsInto } from "../angmar/stage.ts";
 import { noteProgressPlaced } from "../angmar/progress.ts";
 import { addToVictory } from "./victory.ts";
 
@@ -83,13 +84,14 @@ export function placeOnSideQuest(state: ScenarioState, questId: string, amount: 
 }
 
 // The side quest is defeated: the cards attached to it hear it and are discarded with it, the quest itself hears it
-// (`questDefeated`), and it is added to the victory display, or to its owner's discard pile when its limit is reached.
+// (`questDefeated`), and it is added to the victory display, or to its owner's discard pile when its limit is reached. A side quest whose record says "When this quest is defeated, flip it over" (10109:A:3) flips into its Clue objective in the staging area instead.
 export function defeatSideQuest(state: ScenarioState, questId: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const quest = state.cards[questId];
   if (!quest) return state;
   // A card the side quest holds under it in play comes back to its players (Rescue Iârion, families/angmar/hold.ts).
   let next = releaseHeldOnDefeat(releaseAttachments(noteHostDefeated(state, questId), questId, ctx.cards, steps), questId);
-  next = updateCard(addToVictory(next, questId, ctx), questId, { progress: 0, committed: false });
+  const into = flipsInto(ctx, quest.code);
+  next = into ? flipDefeated(next, questId, into) : updateCard(addToVictory(next, questId, ctx), questId, { progress: 0, committed: false });
   next = queueEvent(next, { trigger: "questDefeated", seat: quest.controller, cardId: questId, subject: questId });
   // Any quest card hears that a quest card was defeated ("After a quest card is defeated", 01135:A:3).
   return questCardDefeatedHeard(next, ctx) ? queueEvent(next, { trigger: "questCardDefeated", seat: null, subject: questId }) : next;

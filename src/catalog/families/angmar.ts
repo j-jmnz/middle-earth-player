@@ -76,6 +76,11 @@ const VERBS = [
   // Resolution: one copy of each of the cards with these codes for every copy of it that lies in the encounter deck or the encounter discard pile joins the Campaign Pool ("Add each copy of Losing Time in the encounter deck or encounter discard pile to the Campaign Pool", 10182:B:1);
   // a copy set aside, in the staging area or attached does not count. Run by the Resolution (src/rules/setup/resolution.ts).
   z.strictObject({ verb: z.literal("EarnEncounterCopies"), codes: z.array(code).min(1), ...when }),
+  // Stage 1 of The Treachery of Rhudaur ("remove each Treachery of Rhudaur side quest from the game", 10094:B:2): each card in the staging area with one of these titles, quest side up, leaves the game (not the victory display); its attachments are discarded with it. A card flipped into its Clue objective has another title and stays.
+  z.strictObject({ verb: z.literal("RemoveSideQuestsFromGame"), names: z.array(z.string().min(1)).min(1), ...when }),
+  // A constant marker on a side quest ("When this quest is defeated, flip it over", 10109:A:3): when it is defeated it is not added to the victory display but flips into the objective with this code and stays in the staging area, faceup and unclaimed (mec108.the-investigation).
+  // The verb does nothing when a record runs it; families/sidequests/quest.ts defeatSideQuest reads it.
+  z.strictObject({ verb: z.literal("FlipWhenDefeated"), into: code }),
 ] as const;
 
 const TRIGGERS = [
@@ -121,6 +126,12 @@ const FLAGS = [
   "noCollection",
   // On a side quest, until the end of the round: progress was placed on it this round ("if no progress was placed on Lie Low this round", 10081:A:1; families/angmar/progress.ts). The engine notes it for every side quest that takes progress; a record reads it with the condition `flag`.
   "progressPlacedHere",
+  // On the main quest card: it cannot be chosen as the current quest during the quest phase (10094:B:3); a side quest chosen at the start of the phase is the current quest, else there is none (families/wilderland/night-quest.ts currentQuestId).
+  "cannotBeCurrentQuest",
+  // On the main quest card, from a constant "if" ("If there are no Treachery of Rhudaur side quests in play, immediately advance to stage 2", 10094:B:4): once nothing is resolving the quest advances (families/angmar/stage.ts advanceWhenFlagged, a settle sweep).
+  "advanceNow",
+  // On a card: the Doomed X it gains is the amount of this modifier, on top of its printed Doomed ("While the current quest has 0 progress on it, Wight of Rhudaur gains doomed 2", 10099:A:2; read as the card is revealed, windows/frames.ts, rr.doomed-x).
+  "gainsDoomed",
 ] as const;
 
 export const manifest = { name: "angmar", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

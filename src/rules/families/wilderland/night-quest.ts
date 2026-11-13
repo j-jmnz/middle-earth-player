@@ -29,6 +29,16 @@ export function stagedSideQuests(state: ScenarioState, ctx: Pick<ReduceContext, 
   return state.staging.filter((id) => isSideQuest(state, id, ctx));
 }
 
+/** The main quest card cannot be the current quest in the quest phase while it holds `cannotBeCurrentQuest` ("During the quest phase, Secrets of Rhudaur cannot be chosen as the current quest", 10094:B:3): a side quest chosen at the start of the phase is the current quest, or the phase has none. */
+export function mainQuestBarred(state: ScenarioState): boolean {
+  return state.phase === "Quest" && state.questStage != null && flagged(state, state.questStage, "cannotBeCurrentQuest");
+}
+
+/** The quest card that is the current quest now: the side quest chosen until the end of the phase, else the main quest card; null in the quest phase when the main quest card is barred and no side quest was chosen. */
+export function currentQuestId(state: ScenarioState): string | null {
+  return currentSideQuest(state) ?? (mainQuestBarred(state) ? null : state.questStage);
+}
+
 /** The quest points a side quest needs to be full, as modified now, or null when it prints none. */
 export function sideQuestPoints(state: ScenarioState, quest: CardInstance, cards: ReduceContext["cards"]): number | null {
   return printedOf(cards, quest.code).questPoints == null ? null : modifiedStat(state, quest, "questPoints", cards);
