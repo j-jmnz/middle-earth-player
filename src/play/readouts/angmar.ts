@@ -17,6 +17,8 @@ import { captiveUnder } from "../../rules/families/south/captive.ts";
 
 import { battlementsTimeNearWords, battlementsTimeWords, deckLabel, deckNearWords, deckWords, thaurdirLimitWords, thaurdirWords, handUnderLabel, handUnderWords, huntWords, iarionLabel, iarionWords, protectNearWords, protectWords, savageNearWords, savageWords, rearguardLimitWords, rearguardWords, shelterTimeNearWords, shelterTimeWords, timeNearWords, timeWords } from "../words/scenarios/angmar/angmar-table.ts";
 import { executionersNearWords, executionersTimeWords } from "../words/scenarios/angmar/gram-table.ts";
+import { secretsTimeNearWords, secretsTimeWords } from "../words/scenarios/angmar/rhudaur-table.ts";
+import { SECRETS_OF_RHUDAUR, sideQuestsInPlay } from "./rhudaur.ts";
 import { cardsOf, type TableDial } from "./dials.ts";
 import { EXECUTIONERS, executionersRaises } from "./gram.ts";
 import type { HandMark } from "./isengard.ts";
@@ -31,6 +33,9 @@ const FIND_SHELTER = "09032";
 const BROKEN_BATTLEMENTS = "09036";
 const THAURDIR = "09033";
 const THAURDIR_STAGE = "09074";
+// Thaurdir is the same card in Deadmen's Dike (09033) and The Treachery of Rhudaur (10098), and stage 2B is as well (09074 and 10095: the stage cannot be defeated while he has hit points left).
+const THAURDIRS = [THAURDIR, "10098"];
+const THAURDIR_STAGES = [THAURDIR_STAGE, "10095"];
 const DEADMENS_DIKE_STAGE_1 = "09073";
 /** The number of resource tokens at which Hunting the Orcs flips: 3 more than the players (09071:A:1), read as the record reads it. */
 export const huntLimit = (game: ScenarioState, ctx: ReduceContext, sourceId: string): number => resolveAmount(game, HUNT_FLIP_TOKENS, frameScope(game, 0, sourceId), ctx);
@@ -39,7 +44,7 @@ export const huntLimit = (game: ScenarioState, ctx: ReduceContext, sourceId: str
 export function thaurdirStagePoints(game: ScenarioState, ctx: ReduceContext): number | null {
   const id = stageOf(game, 0);
   const stage = id ? game.cards[id] : undefined;
-  return stage?.code === THAURDIR_STAGE ? questPointsOf(game, stage, ctx.cards) : null;
+  return stage && THAURDIR_STAGES.includes(stage.code) ? questPointsOf(game, stage, ctx.cards) : null;
 }
 
 // Where a copy of a card with several lies: the active location or the staging area, numbered when more than one copy shares the place.
@@ -81,7 +86,7 @@ export function angmarDials(game: ScenarioState, ctx: ReduceContext, nameOf: (co
   }
   // Thaurdir (stage 2B of Deadmen's Dike): the damage on him against his hit points, one of the two things that win stage 2 (the stage cannot be defeated while he has any left, 09074:B:2, and it needs its own quest points in progress), so a goal dial that fills in the accent and never warms. He cannot be
   // destroyed, so it can pass its limit.
-  for (const card of cardsOf(game, THAURDIR)) {
+  for (const card of THAURDIRS.flatMap((code) => cardsOf(game, code))) {
     const limit = hitPointsOf(game, card, ctx);
     if (limit <= 0) continue;
     const points = thaurdirStagePoints(game, ctx);
@@ -138,7 +143,9 @@ export function angmarDials(game: ScenarioState, ctx: ReduceContext, nameOf: (co
     // Stop the Executioners' last counter discards the cards captured under it and raises threat (10053:A:3): it loses the game only when the raise eliminates the last player, so its dial warns near and is critical only then.
     const executioners = card.code === EXECUTIONERS;
     const executed = executioners ? executionersRaises(game, card.id, ctx) : { under: 0, raises: [] };
-    const level = card.resources <= 1 && (!(shelter || battlements || executioners) || doomed.length > 0 || executed.raises.some((raise) => raise.out)) ? ("critical" as const) : ("near" as const);
+    // Secrets of Rhudaur's last counter removes the side quests and advances the quest (10094:B:2): never a loss, so its dial warns near only.
+    const secrets = card.code === SECRETS_OF_RHUDAUR;
+    const level = card.resources <= 1 && (!(shelter || battlements || executioners || secrets) || doomed.length > 0 || executed.raises.some((raise) => raise.out)) ? ("critical" as const) : ("near" as const);
     const copies = Object.values(game.cards).filter((other) => other.code === card.code && inPlay(other.zone));
     const where = copies.length > 1 ? placeOf(card, copies) : null;
     dials.push({
@@ -147,8 +154,8 @@ export function angmarDials(game: ScenarioState, ctx: ReduceContext, nameOf: (co
       label: where ? `Time · ${where}` : "Time",
       name: `Time counters left on ${nameOf(card.code)}${where ? ` (${where})` : ""}:`,
       value: card.resources,
-      ...(card.resources <= 2 ? { warn: { level, words: executioners ? executionersNearWords(card.resources, executed.under, executed.raises, game.seatCount <= 1) : shelter ? shelterTimeNearWords(card.resources) : battlements ? battlementsTimeNearWords(card.resources, doomed.map((seat) => ({ owner: game.seatCount > 1 ? `Player ${seat.seat + 1}` : null, cards: seat.cards }))) : timeNearWords(card.resources) } } : {}),
-      note: executioners ? executionersTimeWords(card.resources, executed.under, executed.raises) : shelter ? shelterTimeWords(card.resources) : battlements ? battlementsTimeWords(card.resources) : timeWords(card.resources, heldName),
+      ...(card.resources <= 2 ? { warn: { level, words: secrets ? secretsTimeNearWords(card.resources, sideQuestsInPlay(game)) : executioners ? executionersNearWords(card.resources, executed.under, executed.raises, game.seatCount <= 1) : shelter ? shelterTimeNearWords(card.resources) : battlements ? battlementsTimeNearWords(card.resources, doomed.map((seat) => ({ owner: game.seatCount > 1 ? `Player ${seat.seat + 1}` : null, cards: seat.cards }))) : timeNearWords(card.resources) } } : {}),
+      note: secrets ? secretsTimeWords(card.resources, sideQuestsInPlay(game)) : executioners ? executionersTimeWords(card.resources, executed.under, executed.raises) : shelter ? shelterTimeWords(card.resources) : battlements ? battlementsTimeWords(card.resources) : timeWords(card.resources, heldName),
     });
   }
   // Orc Rearguard: no more than 3 progress on the current quest each round (09023:A:1), Eriador Wastes: no more than 5 (10023:A:1); the tally of the round. The cap is the table's, so two copies are one dial, named for the first.
