@@ -1,6 +1,7 @@
 // Rules: mec108.side-quests-in-play, mec108.time-x (data/rules/entries.json); ledger lines 09049:A:2, 09024:A:2, 09051:A:1, 10156:A:2, 10107:A:1.
 // The verbs of the angmar family (src/catalog/families/angmar.ts) and the search for an encounter side quest, in words for a branch of a Choose ("choose a different quest card to be the current quest").
 import type { Instruction } from "../../../../catalog/boundary.ts";
+import type { PickWords } from "../../choice.ts";
 
 /** One instruction of the angmar family in words, or null when it is not one of them. */
 export function angmarWords(instruction: Instruction): string | null {
@@ -26,4 +27,11 @@ export function angmarWords(instruction: Instruction): string | null {
     default:
       return null;
   }
+}
+
+/** What a window of the angmar family that asks for a card says. Null for any other instruction. */
+export function angmarPickWords(pick: Instruction): PickWords | null {
+  // Possession (101162:A:2): allies tie for the highest printed cost; the first player chooses which is destroyed.
+  if (pick.verb === "DestroyHighestCostAlly") return { verb: "Destroy", prompt: "Possession: allies tie for the highest printed cost. Choose which one is destroyed. Its controller reanimates it into the staging area." };
+  return null;
 }
