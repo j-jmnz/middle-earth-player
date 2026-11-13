@@ -24,7 +24,7 @@ export const ettenmoorsLoadout = fillerLoadout;
 export const ettenmoorsWorld = (decks: EttenmoorsDecks = "strong") => game.world(decks);
 export const afterGram = (seatCount: 1 | 2) => game.after(seatCount);
 export const ettenmoorsPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount)) => game.plan(seatCount, log);
-export const ettenmoorsStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard) => game.start(seatCount, seed, difficulty, { facts, log, modeCard });
+export const ettenmoorsStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, extra: { choices?: readonly string[]; standalone?: boolean } = {}) => game.start(seatCount, seed, difficulty, { facts, log, modeCard, ...extra });
 
 export type EttenmoorsPolicy = AngmarPolicy;
 export const DEFAULT_POLICY: EttenmoorsPolicy = { choose: "first", engage: false, defend: "none", quest: "all" };

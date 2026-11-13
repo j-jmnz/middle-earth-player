@@ -30,6 +30,8 @@ describe("Across the Ettenmoors golden", () => {
       title: "starts at stage 1A with a safe location guarded by a side quest and a Savage Trollspawn for each player in the staging area, Amarthiúl with the first player and five Losing Time set aside",
       check(state, golden) {
         expect(state.cards[state.questStage ?? ""]?.code, golden.name).toBe("10064");
+        // The side quest rules hold: a pick that spans seats names the owner on each row.
+        expect(state.sideQuests, golden.name).toBe(true);
         const staged = state.staging.map((id) => state.cards[id]);
         expect(staged.filter((card) => card?.code === "10072"), golden.name).toHaveLength(golden.seatCount);
         const place = staged.filter((card) => SAFE.includes(card?.code ?? ""));

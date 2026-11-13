@@ -1,6 +1,6 @@
 import type { PickSpec } from "../../../catalog/boundary.ts";
 import type { Ask } from "../asks.ts";
-import { DETERMINATION_ASKS, POOL_BOON_ASKS } from "../pool-boon-asks.ts";
+import { DETERMINATION_ASKS, LOOT_BOON_ASKS, POOL_BOON_ASKS } from "../pool-boon-asks.ts";
 
 // The choice words of Escape from Mount Gram (angmar-awakened part 5), one entry for each Pick and Choose of its records: `<record id> @<instruction path> <verb | option id>` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
 // `pnpm test scenario escape-from-mount-gram --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=escape-from-mount-gram` prints each sentence.
@@ -56,4 +56,5 @@ export const ASKS: Readonly<Record<string, Ask>> = {
   // Determination (10172:A:1) and Ruthless (10164:A:4), worded once for every scenario that can deal them.
   ...DETERMINATION_ASKS,
   ...POOL_BOON_ASKS,
+  ...LOOT_BOON_ASKS,
 };
