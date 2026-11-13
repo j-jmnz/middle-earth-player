@@ -5,6 +5,7 @@ import type { Instruction } from "../../../catalog/boundary.ts";
 import { BELDIS_BOXES } from "../../../catalog/ally-lines.ts";
 import { modifiedStat } from "../../../rules/core/keywords.ts";
 import { printedOf } from "../../../rules/core/printed.ts";
+import { flagged } from "../../../rules/core/state.ts";
 import { MAIN_QUEST } from "../../../rules/families/wilderland/night.ts";
 import { sideQuestPoints } from "../../../rules/families/wilderland/night-quest.ts";
 import type { ScenarioState } from "../../../rules/core/state.ts";
@@ -65,6 +66,13 @@ export function nightQuestsNow(game: ScenarioState, ctx: ReduceContext, choose: 
   return Object.keys(found).length > 0 ? found : null;
 }
 
+/** The main quest card the first player's question is about, and whether it cannot be the current quest in the quest phase (Secrets of Rhudaur, 10094:B:3): declining the side quests then leaves no current quest. Null for another Choose. */
+export function nightMainNow(game: ScenarioState, ctx: ReduceContext, choose: Choose): { name: string; barred: boolean } | null {
+  if (kindOf(choose) !== "current") return null;
+  const stage = game.questStage ? game.cards[game.questStage] : undefined;
+  return stage ? { name: printedOf(ctx.cards, stage.code).name, barred: flagged(game, stage.id, "cannotBeCurrentQuest") } : null;
+}
+
 /** The sentence over a Choose of Fire in the Night: the first player's choice of the current quest (emce.side-quests-in-play), The Dragon's Thrall (19075:A:1), Orc of the Flame (19076:A:1) and Fortify the Defense (19067:A:2). Null for any other Choose. */
 export function nightChooseNote(choose: Choose, game: ScenarioState, ctx: ReduceContext, names: ChoiceNames, source?: string | null): string | null {
   const kind = kindOf(choose);
@@ -74,7 +82,11 @@ export function nightChooseNote(choose: Choose, game: ScenarioState, ctx: Reduce
   const titled = (name: string, text: string): string => (game.seatCount > 1 ? `Player ${seat + 1}, ${name}: ${text}` : `${name}: ${text}`);
   if (kind === "current") {
     const quests = choose.options.filter((option) => option.id !== MAIN_QUEST).length;
-    return say(`make ${quests === 1 ? "the side quest in the staging area" : `1 of the ${quests} side quests in the staging area`} the current quest until the end of the phase, or keep ${HILL}? Progress goes on the active location first, then on the current quest instead of ${HILL}. Progress beyond its quest points is discarded.`);
+    const main = nightMainNow(game, ctx, choose);
+    const side = quests === 1 ? "the side quest in the staging area" : `1 of the ${quests} side quests in the staging area`;
+    if (main?.barred) return say(`make ${side} the current quest until the end of the phase, or have no current quest this phase? ${main.name} cannot be the current quest. Progress goes on the active location first; progress beyond its quest points is lost.`);
+    const name = main?.name ?? HILL;
+    return say(`make ${side} the current quest until the end of the phase, or keep ${name}? Progress goes on the active location first, then on the current quest instead of ${name}. Progress beyond its quest points is discarded.`);
   }
   if (kind === "thrall") {
     const name = source ? names.card(source) : "The Dragon's Thrall";
@@ -90,7 +102,7 @@ export function nightBranchWords(choose: Choose, optionId: string, names: Choice
   const kind = kindOf(choose);
   if (!kind) return null;
   if (kind === "current") {
-    if (optionId === MAIN_QUEST) return `Keep ${HILL} as the current quest`;
+    if (optionId === MAIN_QUEST) return now?.main?.barred ? "Have no current quest this phase" : `Keep ${now?.main?.name ?? HILL} as the current quest`;
     const held = now?.quests?.[optionId];
     return `Make ${names.card(optionId)} the current quest${held ? ` (${held})` : ""}`;
   }

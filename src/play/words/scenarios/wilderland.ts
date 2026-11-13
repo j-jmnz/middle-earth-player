@@ -19,7 +19,7 @@ import { framsburgAsk, framsburgBranchNow, framsburgBranchWords, framsburgChoose
 import { fateAsk, fateBranchRows, fateBranchWords, fateChooseNote } from "./fate.ts";
 import { boonHeroAsk } from "./angmar/angmar-table.ts";
 import { dragonSicknessAsk, gundabadAsk, gundabadBranchWords, gundabadChooseNote } from "./gundabad.ts";
-import { nightAsk, nightBranchWords, nightChooseNote, nightQuestsNow } from "./night.ts";
+import { nightAsk, nightBranchWords, nightChooseNote, nightMainNow, nightQuestsNow } from "./night.ts";
 import { rhovanionAsk, rhovanionBranchWords, rhovanionChooseNote } from "./rhovanion.ts";
 import { askedSeat, seatSays } from "../seat.ts";
 import { assignDamageWords } from "./south.ts";
@@ -240,8 +240,9 @@ export function wilderlandBranchNow(game: ScenarioState, ctx: ReduceContext, cho
     if (spread) counted[option.id] = resolveAmount(game, spread.amount, frameScope(game, seat, sourceId), ctx);
   }
   const quests = nightQuestsNow(game, ctx, choose);
+  const main = nightMainNow(game, ctx, choose);
   const rows = { ...framsburgBranchNow(game, ctx, choose, seat), ...fateBranchRows(game, ctx, choose, sourceId) };
-  return { ...(Object.keys(counted).length > 0 ? { counted } : {}), ...(quests ? { quests } : {}), ...(Object.keys(rows).length > 0 ? { rows } : {}) };
+  return { ...(Object.keys(counted).length > 0 ? { counted } : {}), ...(quests ? { quests } : {}), ...(main ? { main } : {}), ...(Object.keys(rows).length > 0 ? { rows } : {}) };
 }
 
 /** A branch that counts cards, with the number now: "Raise your threat by 3 (1 for each ally you control)", "Deal 1 damage to each ally you control (3)". Null for any other branch. */
