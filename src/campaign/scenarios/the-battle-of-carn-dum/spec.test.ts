@@ -1,4 +1,4 @@
-// Rules: mec108.thaurdir, mec108.indestructible, mec108.battle, rr.forced, rr.response, rr.reveal, rr.shadow-effects, rr.engagement-cost, rr.destroy, faq.additional-attacks, faq.enemy-attacks-outside-combat (data/rules/entries.json).
+// Rules: mec108.thaurdir, mec108.indestructible, mec108.battle, rr.forced, rr.response, rr.reveal, rr.shadow-effects, rr.engagement-check, rr.destroy, faq.additional-attacks, faq.enemy-attacks-outside-combat (data/rules/entries.json).
 import { describe, it } from "vitest";
 
 import { announce, attack, cardSpecs, damageOn, deckCount, endPhase, flag, handCount, reveal, resolve, stat, threat, won, zone, attackersOf, type Row } from "../../../../test/harness/card-spec.ts";

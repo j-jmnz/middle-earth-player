@@ -1,4 +1,4 @@
-// Rules: mec108.thaurdir, mec108.side-quests, mec108.side-quests-in-play, mec108.battle, mec108.indestructible, rr.active-location, rr.staging-threat, rr.forced, rr.destroy, rr.search, rr.resources, rr.printed, faq.enemy-attacks-outside-combat (data/rules/entries.json)
+// Rules: mec108.thaurdir, mec108.side-quests, mec108.side-quests-in-play, mec108.battle, mec108.indestructible, rr.active-location, rr.staging-area, rr.forced, rr.destroy, rr.search, rr.resources, rr.printed, faq.enemy-attacks-outside-combat (data/rules/entries.json)
 // ledger lines 10125:B:1, 10126:A:1, 10126:B:1, 10126:B:2, 10129:A:1, 10131:A:1, 10132:A:1, 10135:A:1, 10137:A:2, 10139:A:2, 10139:A:3, 10191:A:2.
 // Thaurdir's flips and exits, Furious Charge and the cards the judge and the review read again, on tables built from a layout.
 import { describe, expect, it } from "vitest";

@@ -1,4 +1,4 @@
-// Rules: rr.response, rr.engage, rr.search, rr.removed-from-game, rr.shadow-effects, mec108.thaurdir (data/rules/entries.json)
+// Rules: rr.response, rr.engaged, rr.search, rr.removed-from-game, rr.shadow-effects, mec108.thaurdir (data/rules/entries.json)
 // ledger lines 10189:A:1, 10190:A:1, 10191:A:3, 10192:A:1.
 // The four boons the campaign card offers, each in a state of its own: Elrond's Champion, Lore of Ancient Arnor, Raiment of the Second Age and Rivendell Skirmishers.
 import { describe, expect, it } from "vitest";
