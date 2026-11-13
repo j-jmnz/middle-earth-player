@@ -1,4 +1,4 @@
-// Rules: mec108.reanimated-dead, mec108.campaign-mode, mec108.campaign-log, rr.campaign-pool, rr.campaign-setup-checklist, rr.campaign-mode, rr.setup, rr.removed-from-game (data/rules/entries.json); ledger 10150:A:1, 10193:A:2, 10193:B:1, 10168:A:1, 10167:A:1, 10172:A:1.
+// Rules: mec108.reanimated-dead, mec108.campaign-mode, mec108.campaign-log, rr.campaign-pool, rr.campaign-setup-checklist, rr.campaign-mode, rr.setup, rr.removed-from-game (data/rules/entries.json); ledger 10150:A:1, 10193:A:2, 10193:B:1, 10167:A:1.
 import { beforeAll, describe, expect, it } from "vitest";
 
 import { expectOk } from "../../../rules/core/test-fixture.ts";

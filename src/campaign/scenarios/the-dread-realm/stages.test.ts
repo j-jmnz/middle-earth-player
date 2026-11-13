@@ -96,6 +96,16 @@ describe("stage 2 and the Altar of Midwinter", () => {
     expect(flagged(settled(aside.state, aside), idOf(aside.state, ALTAR), "noProgressPlaced")).toBe(false);
   });
 
+  it("10154:A:1 sends the progress the Altar cannot take on to the quest card while Daechanar is in play, and the Altar takes it again once he is gone", () => {
+    const t = built({ stage: "10151", active: ALTAR, staging: [DAECHANAR] });
+    const placed = placeQuestProgress(settled(t.state, t), 2, t.cards, [], canAdvance);
+    expect(placed.cards[idOf(placed, ALTAR)]?.progress).toBe(0);
+    expect(placed.cards[placed.questStage ?? ""]?.progress).toBe(2);
+    const gone = built({ stage: "10151", active: ALTAR });
+    const taken = placeQuestProgress(settled(gone.state, gone), 2, gone.cards, [], canAdvance);
+    expect(taken.cards[idOf(taken, ALTAR)]?.progress).toBe(2);
+  });
+
   it("10154:A:2 has the first player reveal 1 additional card or reanimate the top card of their deck, the second not offered with an empty deck", () => {
     const t = built({ active: ALTAR, deckOf: ["filler"], firstPlayer: 1 });
     const altar = idOf(t.state, ALTAR);
