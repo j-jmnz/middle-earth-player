@@ -48,3 +48,20 @@ export function isCapturedHero(state: ScenarioState, id: string): boolean {
   const card = state.cards[id];
   return card?.zone === "captured" && card.heroSlot != null;
 }
+
+// Every host that holds captured cards and the cards under it, in id order. A state is never changed once the reducer returns it, so the map is kept for the state: the table asks for it once for each card it draws.
+const BY_HOST = new WeakMap<ScenarioState, ReadonlyMap<string, readonly string[]>>();
+export function capturedByHost(state: ScenarioState): ReadonlyMap<string, readonly string[]> {
+  const kept = BY_HOST.get(state);
+  if (kept) return kept;
+  const held = new Map<string, string[]>();
+  if (state.capture != null) {
+    for (const card of Object.values(state.cards)) {
+      if (card.zone !== "captured" || card.host == null) continue;
+      held.set(card.host, [...(held.get(card.host) ?? []), card.id]);
+    }
+    for (const ids of held.values()) ids.sort((left, right) => left.localeCompare(right, undefined, { numeric: true }));
+  }
+  BY_HOST.set(state, held);
+  return held;
+}

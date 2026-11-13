@@ -9,6 +9,7 @@ import { timeOf } from "../../rules/families/angmar/time.ts";
 import { captiveUnder } from "../../rules/families/south/captive.ts";
 
 import { huntLimit, thaurdirStagePoints } from "../readouts/angmar.ts";
+import { gramDetail } from "./gram-preview.ts";
 import { wastesDetail } from "./wastes-preview.ts";
 import { hitPointsOf } from "../../rules/families/angmar/quest.ts";
 import { battlementsPreviewWords, burdenWords, CURRENT_QUEST_WORDS, fornostWords, heldWords, isBurden, POWER_OF_ANGMAR_WORDS, thaurdirPreviewWords, holdsWords, huntPreviewWords, protectPreviewWords, savagePreviewWords, shelterPreviewWords, wildernessWords } from "../words/scenarios/angmar-table.ts";
@@ -30,6 +31,9 @@ export function angmarDetail(game: ScenarioState, ctx: ReduceContext, cardId: st
   // The Wastes of Eriador's own pieces (the Time objective, Pack Leader's gate, Determination) hold in a game whether or not a side quest has been seen yet.
   const wastes = wastesDetail(game, ctx, cardId);
   if (wastes) return wastes;
+  // Escape from Mount Gram's captured cards, Loot the Dungeons and Stop the Executioners.
+  const gram = gramDetail(game, ctx, cardId, name);
+  if (gram) return gram;
   if (!card || game.sideQuests !== true) return null;
   const host = card.zone === "captive" && card.host != null ? game.cards[card.host] : undefined;
   if (host && timeOf(ctx, host.code) != null) return heldWords(name(host.id), host.resources);

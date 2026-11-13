@@ -81,5 +81,7 @@ export function marksText(slot: SlotInfo | null): string {
   const sideLoses = slot.side?.loses ? ` · ${slot.side.loses.speech}${slot.side.loses.danger ? ", one more damage loses the game" : ""}` : "";
   // A character the Campaign Log marks determined, or that carries Determination (the same words the native reader says, card-speech.ts).
   const determined = slot.determined ? ` · ${slot.determined.speech}` : "";
-  return `${engagement}${loss}${current}${sideLoses}${determined}${slot.delayed ? " · an effect comes later" : ""}`;
+  // The cards held underneath a card (the captured cards of Escape from Mount Gram, the pill the canvas draws): the same sentence the native reader says.
+  const under = slot.under ? ` · ${slot.under.speech}` : "";
+  return `${engagement}${loss}${current}${sideLoses}${determined}${under}${slot.delayed ? " · an effect comes later" : ""}`;
 }

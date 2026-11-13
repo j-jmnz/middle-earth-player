@@ -125,6 +125,21 @@ describe("Escape from Mount Gram in the angmar-awakened campaign", () => {
     expect(validateLoadout([{ ...seat!, deck: clean }, { ...seat!, deck: [...clean, first] }], world.cards, false, [], [], {}, [stolen[0] ?? [], []]).filter((error) => error.rule === "stolenCard")).toHaveLength(0);
   });
 
+  it("10174:B:3 shows the stolen cards in a row of the Campaign Log, one line for each seat, none for a seat that lost nothing, and refuses a stolen card in that player's deck with a sentence that says why", () => {
+    const log = { ...wastesLog(2), stolenCards: [["10176"], []] };
+    const row = angmarAwakenedRows(log, 2).find((one) => one.id === "log-stolen");
+    expect(row).toMatchObject({ label: "Unique Cards Stolen by Goblins" });
+    expect(row && "lines" in row ? row.lines.map((line) => [line.prefix, line.codes]) : []).toEqual([["Player 1: ", ["10176"]], ["Player 2: ", []]]);
+    expect(angmarAwakenedRows({ ...log, stolenCards: [[], []] }, 2).some((one) => one.id === "log-stolen")).toBe(false);
+    const [seat] = gramLoadout(1);
+    const unique = seat?.deck.find((code) => world.cards.get(code)?.isUnique === true) ?? "";
+    expect(unique).not.toBe("");
+    const refused = validateLoadout([{ ...seat!, deck: seat!.deck }], world.cards, false, [], [], {}, [[unique]]).filter((error) => error.rule === "stolenCard");
+    expect(refused).toHaveLength(seat!.deck.filter((code) => code === unique).length);
+    expect(refused[0]?.message).toContain(world.cards.get(unique)?.name);
+    expect(refused[0]?.message).toContain("the Goblins of Mount Gram stole this unique card (the campaign log notes it), so it cannot be in this player's deck for the rest of the campaign");
+  });
+
   it("10175:A:2 the boon a player takes at Loot the Dungeons joins the Campaign Pool on a win, with that player's seat, once", () => {
     const state = goldenState("escape-from-mount-gram", WON(2));
     const earned = { ...state, resolutionLog: { ...state.resolutionLog, earned: [...state.resolutionLog.earned, { code: "10176", to: "pool" as const, seat: 1, hero: null, step: 0 }] } };
