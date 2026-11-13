@@ -21,8 +21,10 @@ export const dumLoadout = fillerLoadout;
 // The goldens' world, the plan and start of a game, and the log of a campaign whose earlier parts were won: the seeded game's parts every scenario shares (test/harness/game-kit.ts).
 export const dumWorld = (decks: DumDecks = "strong") => game.world(decks);
 export const afterRhudaur = (seatCount: 1 | 2) => game.after(seatCount);
-export const dumPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount)) => game.plan(seatCount, log);
-export const dumStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard) => game.start(seatCount, seed, difficulty, { facts, log, modeCard });
+// The campaign card's Setup (10188:A:2) through the Campaign Setup Checklist: each seat in turn takes one of the four boons into its opening hand (skipping is allowed); seat 1 takes Elrond's Champion, seat 2 Lore of Ancient Arnor.
+export const boonChoices = (seatCount: 1 | 2): string[] => ["10189", "10190"].slice(0, seatCount);
+export const dumPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), choices: readonly string[] = boonChoices(seatCount)) => game.plan(seatCount, log, choices);
+export const dumStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, extra: { choices?: readonly string[]; standalone?: boolean } = {}) => game.start(seatCount, seed, difficulty, { facts, log, modeCard, choices: boonChoices(seatCount), ...extra });
 
 export type DumPolicy = {
   // The option a Choose window with these answers takes: the first or the last.
@@ -50,14 +52,14 @@ const game = campaignGame<DumDecks, DumPolicy>({
   campaign,
   scenario: dum,
   stats: HERO_STATS,
-  // TODO: the cards a game loads besides the scenario's piles, its campaign card's and the campaign's game codes.
-  codes: [...dum.cards.map((card) => card.code)],
+  // The scenario's cards; the campaign card's, the cards it places (the four boons, Determination, Fend Off Despair, the Loot and Clue boons) and the campaign's game codes are added by the kit. The pool holds what The Treachery of Rhudaur leaves: Mysterious Omens, Arnor Ravaged, Amarthiúl's Courage, a Thaurdir burden, Fend Off Despair and Losing Time.
+  codes: [...dum.cards.flatMap((card) => (card.back != null ? [card.code, card.back] : [card.code])), "10160", "100158", "10157", "10167", "10168", "10169", "10170", "10172", "10173", "10183", "10185", "10186", "10187"],
   intent: dumIntent,
   policy: DEFAULT_POLICY,
   limit: 6000,
   upgraded: [],
-  // TODO: the XP each earlier part gained (in campaign order), the cards they put in the pool and the marks on the cards, as a campaign that won them leaves the log.
-  earlier: { xp: [0, 0, 0, 0, 0, 0, 0], pool: [], marks: {} },
+  // The seven earlier parts were won: no XP in this campaign; in the pool Mysterious Omens, Arnor Ravaged, Amarthiúl's Courage, Thaurdir's Legacy, Fend off Despair and Losing Time.
+  earlier: { xp: [0, 0, 0, 0, 0, 0, 0], pool: [{ code: "10160" }, { code: "100158" }, { code: "10167" }, { code: "10168" }, { code: "10173" }, { code: "10183" }], marks: {} },
 });
 
 export const playGolden = (golden: DumGolden, ctx: ReduceContext): DumGame => game.playGolden(golden, ctx);
