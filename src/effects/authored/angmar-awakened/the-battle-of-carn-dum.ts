@@ -64,7 +64,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
 
     // 10126 Midwinter's Crux. When Revealed: each player raises their threat by the number of shadow cards in play, then Thaurdir flips if he is Captain side faceup.
     { id: "10126:whenRevealed:1", cardCode: "10126", lines: ["10126:A:1"], timing: "whenRevealed", instructions: [{ verb: "RaiseThreat", amount: { shadowCardsInPlay: true }, who: "eachSeat" }, FLIP_TO_CHAMPION] },
-    // Side B: Thaurdir stays in the staging area (no engagement ever moves him; the flag cannotLeaveStaging is not held, since it would also stop him being defeated and discarded, which wins the game, 10126:B:3) but is considered engaged with each player: he attacks each of them in turn in the combat phase with a shadow card of its own for each attack (families/south/watcher.ts), and each player may attack him as an
+    // Side B: Thaurdir cannot leave the staging area (cannotLeaveStaging; the one exit he has is the defeat that discards him and wins the game, 10126:B:3: leavesStagingWhenDefeated) and is considered engaged with each player: he attacks each of them in turn in the combat phase with a shadow card of its own for each attack (families/south/watcher.ts; the cards he holds as his first attack begins resolve with it, resolvesHeldShadows), and each player may attack him as an
     // engaged enemy. No engagement ever happens, so no "after an enemy engages you" effect hears him. His Threat still counts against the quest (he does not enter any play area). At the end of the round he flips to Champion if he is Captain side faceup.
     {
       id: "10126:constant:1",
@@ -72,7 +72,10 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       lines: ["10126:B:1"],
       timing: "constant",
       instructions: [
+        { verb: "ModifyStat", stat: "cannotLeaveStaging", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_HOLDERS },
+        { verb: "ModifyStat", stat: "leavesStagingWhenDefeated", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_HOLDERS },
         { verb: "ModifyStat", stat: "engagedWithAll", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_HOLDERS },
+        { verb: "ModifyStat", stat: "resolvesHeldShadows", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_HOLDERS },
         { verb: "ModifyStat", stat: "cannotBeEngaged", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_HOLDERS },
         { verb: "ModifyStat", stat: "attackableByAny", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_HOLDERS },
       ],
@@ -190,7 +193,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "10138:whenRevealed:1", cardCode: "10138", lines: ["10138:A:1"], timing: "whenRevealed", instructions: [FLIP_EITHER, { verb: "GainSurge", when: CAPTAIN_UP }] },
     { id: "10138:shadow:1", cardCode: "10138", lines: ["10138:A:2"], timing: "shadow", instructions: [{ verb: "AfterAttack", instructions: [FLIP_EITHER] }] },
 
-    // 10139 Furious Charge (Surge: the build). Forced: each time progress is placed on it every character gets -2 Defense until the end of the round, then Thaurdir flips if he is Captain side faceup. Response: after it is defeated, add 10 progress to the main quest.
+    // 10139 Furious Charge (Surge: the build). Forced: each time progress is placed on it every character gets -2 Defense until the end of the round, then Thaurdir flips if he is Captain side faceup. Response: after it is defeated, add 10 progress to the main quest (placed on the main quest card whichever quest is current: with a side quest current the active location keeps none of it).
     {
       id: "10139:forced:1",
       cardCode: "10139",
@@ -199,7 +202,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       trigger: "progressPlaced",
       instructions: [{ verb: "ModifyStat", stat: "defense", amount: -2, until: "endOfRound", holders: { type: "character", control: "any" } }, FLIP_TO_CHAMPION],
     },
-    { id: "10139:response:1", cardCode: "10139", lines: ["10139:A:3"], timing: "response", trigger: "questDefeated", subject: "self", instructions: [{ verb: "QuestProgress", amount: 10 }] },
+    { id: "10139:response:1", cardCode: "10139", lines: ["10139:A:3"], timing: "response", trigger: "questDefeated", subject: "self", instructions: [{ verb: "QuestProgress", amount: 10, main: true }] },
 
     // 10189 Elrond's Champion (boon ally). Response: after an enemy engages you (an engagement check, an optional engagement or an effect; never Thaurdir's "considered" engagement), ready it.
     { id: "10189:response:1", cardCode: "10189", lines: ["10189:A:1"], timing: "response", trigger: "engaged", eventSeat: "you", instructions: [{ verb: "Ready", target: "self" }] },
@@ -223,7 +226,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     },
 
     // 10191 Raiment of the Second Age (boon attachment; Attach to a character, Restricted: keywords). Attached character gets +2 Attack and +2 hit points. Response: after the attached character attacks and destroys an enemy, draw 1 card.
-    { id: "10191:constant:2", cardCode: "10191", lines: ["10191:A:2"], timing: "constant", instructions: [HOST_STAT("attack", 2), HOST_STAT("hitPoints", 2)] },
+    { id: "10191:constant:2", cardCode: "10191", lines: ["10191:A:2"], timing: "constant", condition: { kind: "matches", card: "host", pick: { type: "character", control: "any" } }, instructions: [HOST_STAT("attack", 2), HOST_STAT("hitPoints", 2)] },
     { id: "10191:response:1", cardCode: "10191", lines: ["10191:A:3"], timing: "response", trigger: "attackDestroyed", subject: "host", instructions: [{ verb: "Draw", amount: 1 }] },
 
     // 10192 Rivendell Skirmishers (boon ally). Response: after it exhausts to defend an attack from a non-unique enemy, discard each shadow card dealt to that enemy (before they are flipped).

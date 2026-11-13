@@ -68,6 +68,8 @@ export function dealForAttack(state: ScenarioState, enemyId: string, steps: Engi
   if (state.cards[enemyId]?.zone === "engaged") return state;
   // Stage 1B of The Battle of Carn Dûm keeps the shadow cards dealt (10125:B:2): the enemy is dealt one more, and all of them resolve.
   if (state.modifiers.length > 0 && flagged(state, "table", "keepShadowCards")) return dealAdditionalShadow(state, enemyId, steps, ctx);
+  // Thaurdir on stage 2B: the shadow cards he holds as his first attack of the combat phase begins resolve with it and go after it; each later attack is dealt and discards a card of its own (10126:B:1, rr.step-6-4-2).
+  if (state.modifiers.length > 0 && flagged(state, enemyId, "resolvesHeldShadows") && !state.resolvedAttacks.some((key) => key.startsWith(`${enemyId}@`))) return dealAdditionalShadow(state, enemyId, steps, ctx);
   return dealOneShadow(discardShadowOf(state, enemyId), enemyId, steps, ctx);
 }
 

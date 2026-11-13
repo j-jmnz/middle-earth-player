@@ -3,22 +3,22 @@
 // from a layout: Thaurdir's two sides, the shadow cards dealt outside an attack, Orc Grunts, Mountains of Angmar and the copies of a card a deck holds.
 import { describe, expect, it } from "vitest";
 
-import { flagged, updateCard, type ScenarioState } from "../../core/state.ts";
-import { moveCard, shadowCards } from "../../core/zones.ts";
-import type { EngineStep } from "../../core/intents.ts";
-import { modifiedStat, placeDamage } from "../../core/keywords.ts";
-import { settle } from "../../engine/machine.ts";
-import { resolveAmount } from "../../interpret/amounts.ts";
-import { runInstruction } from "../../interpret/interpret.ts";
-import { placeQuestProgress, questStatOf } from "../../quest/quest.ts";
-import { setCurrentQuest } from "./quest.ts";
-import { ruleCause } from "../../core/cause.ts";
-import { discardShadows } from "../../combat/shadow.ts";
-import { restricted } from "../../interpret/restrictions.ts";
+import { flagged, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
+import { moveCard, shadowCards } from "../../../rules/core/zones.ts";
+import type { EngineStep } from "../../../rules/core/intents.ts";
+import { modifiedStat, placeDamage } from "../../../rules/core/keywords.ts";
+import { settle } from "../../../rules/engine/machine.ts";
+import { resolveAmount } from "../../../rules/interpret/amounts.ts";
+import { runInstruction } from "../../../rules/interpret/interpret.ts";
+import { placeQuestProgress, questStatOf } from "../../../rules/quest/quest.ts";
+import { setCurrentQuest } from "../../../rules/families/angmar/quest.ts";
+import { ruleCause } from "../../../rules/core/cause.ts";
+import { discardShadows } from "../../../rules/combat/shadow.ts";
+import { restricted } from "../../../rules/interpret/restrictions.ts";
 import { fightEnemy, finish, idOf, legalIntents, send, start, tableFromLayout, type Layout, type Run } from "../../../../test/harness/scene-kit.ts";
-import type { PlayerIntent } from "../../engine/reduce.ts";
-import { seatThreat } from "../play/hooks.ts";
-import { travelUnpayable } from "./travel.ts";
+import type { PlayerIntent } from "../../../rules/engine/reduce.ts";
+import { seatThreat } from "../../../rules/families/play/hooks.ts";
+import { travelUnpayable } from "../../../rules/families/angmar/travel.ts";
 
 const SCENARIO = "the-battle-of-carn-dum";
 const CAPTAIN = "10127";

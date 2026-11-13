@@ -32,7 +32,7 @@ import { caughtUp } from "../families/stormcaller/values.ts";
 import { islandTravelTo } from "../families/island/travel.ts";
 import { reduceQuestProgress } from "../families/angmar/progress.ts";
 import { absorbProgress } from "../families/angmar/sponge.ts";
-import { hasSideQuests, mainQuestBarred, placeOnCurrentSideQuest } from "../families/wilderland/night-quest.ts";
+import { currentSideQuest, hasSideQuests, mainQuestBarred, placeOnCurrentSideQuest } from "../families/wilderland/night-quest.ts";
 import { familyOptionalEngageBarred, familyQuestResult } from "../interpret/family-hooks.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
@@ -250,13 +250,23 @@ export function placeQuestProgress(
   return next;
 }
 
+// "Add progress to the main quest" (10139:A:3): the main quest card takes it. While it is the current quest that is placeQuestProgress (the active location takes its share first, rr.active-location); while a side quest is the current quest the main quest card is not the current quest, so the active location
+// keeps none of it, no Orc Grunts reduces it and it goes straight on the card (mec108.side-quests, mec108.side-quests-in-play), after a sponge took its share.
+export function placeOnMainQuest(state: ScenarioState, amount: number, cards: Cards, steps: EngineStep[], canAdvance: Gate): ScenarioState {
+  const stageId = state.questStage;
+  const stage = stageId ? state.cards[stageId] : undefined;
+  if (!stageId || !stage || state.stageCleared || currentSideQuest(state) == null) return placeQuestProgress(state, amount, cards, steps, canAdvance);
+  return putOnStage(state, stageId, amount, questPointsOf(state, stage, cards), cards, steps, canAdvance, ruleCause("mec108.side-quests-in-play"), false, false);
+}
+
 // Progress put on the current quest card: a quest that can advance takes what it needs, the rest does not carry over to the next stage (rr.quest-advancement); one that cannot advance
 // has no upper limit (faq.progress-without-advancing); a full one advances. `counted`: the progress counts toward what a card in play limits this round (families/caves/progress.ts).
-export function putOnStage(from: ScenarioState, stageId: string, wanted: number, points: number | null, cards: Cards, steps: EngineStep[], canAdvance: Gate, cause: Cause, counted: boolean): ScenarioState {
+// `reduced`: Orc Grunts reduce it, as progress placed on the current quest (false for progress placed on the main quest card while a side quest is the current quest).
+export function putOnStage(from: ScenarioState, stageId: string, wanted: number, points: number | null, cards: Cards, steps: EngineStep[], canAdvance: Gate, cause: Cause, counted: boolean, reduced = true): ScenarioState {
   // Progress that would be placed on a quest card first fills the sponges in the staging area (Forbidden Descent, 10101:A:1).
   const { state, remaining: absorbed } = absorbProgress(from, wanted, cards, steps);
   // Each Orc Grunts in play reduces the progress placed on the current quest by 1 (10130:A:2).
-  const amount = reduceQuestProgress(state, absorbed);
+  const amount = reduced ? reduceQuestProgress(state, absorbed) : absorbed;
   const stage = state.cards[stageId];
   if (!stage) return state;
   const advancing = points != null && canAdvance(state);

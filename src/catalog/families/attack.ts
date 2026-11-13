@@ -30,7 +30,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("OfferAttacks"), pick: pickSchema, ...when }),
   // Places `amount` progress tokens on the current quest; the active location takes them first (rr.active-location), and a full
   // quest card advances when it may ("place 2 progress tokens on the current quest", 01005:A:2).
-  z.strictObject({ verb: z.literal("QuestProgress"), amount: positiveAmountSchema, ...when }),
+  // `main`: the main quest card takes them whichever quest is current: a side quest that is the current quest does not, and the active location keeps none of them then ("add 10 progress to the main quest", 10139:A:3).
+  z.strictObject({ verb: z.literal("QuestProgress"), amount: positiveAmountSchema, main: z.boolean().optional(), ...when }),
   // The excess damage of the player attack in progress, dealt beyond the attacked enemy's remaining hit points, is dealt to the
   // last picked enemy as well ("Excess damage dealt by this attack is assigned to the chosen enemy", 08004:A:3).
   z.strictObject({ verb: z.literal("ExcessDamageTo"), ...when }),

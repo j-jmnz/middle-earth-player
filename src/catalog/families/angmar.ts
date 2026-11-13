@@ -168,6 +168,10 @@ const FLAGS = [
   // On the table, held by each Orc Grunts in play (the amount is how much): any time progress is placed on the current quest, the amount placed is reduced by this much, after the active location and a sponge took theirs ("reduce the amount of progress placed by 1", 10130:A:2;
   // families/angmar/progress.ts reduceQuestProgress). Several holders add; the amount stops at 0.
   "questProgressReduced",
+  // On an enemy that holds cannotLeaveStaging: it still leaves the staging area when damage destroys it, the one exit it has (Thaurdir on stage 2B, "cannot leave the staging area ... If Thaurdir is defeated, you win the game", 10126:B:1, 10126:B:3; core/zones.ts moveCard).
+  "leavesStagingWhenDefeated",
+  // On an enemy that attacks from the staging area (Thaurdir on stage 2B): the shadow cards it holds as its first attack of the combat phase begins are not discarded first, so they resolve with it together with the card dealt for it (10126:B:1; families/south/watcher.ts dealForAttack).
+  "resolvesHeldShadows",
 ] as const;
 
 export const manifest = { name: "angmar", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

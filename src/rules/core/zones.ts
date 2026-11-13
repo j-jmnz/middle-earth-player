@@ -338,7 +338,8 @@ function stampEntry(state: ScenarioState, id: string, from: ZoneName): ScenarioS
 }
 
 // `released`: the attachments destroyCard discarded just before the card itself (keywords.ts), named with its leaving.
-export function moveCard(state: ScenarioState, id: string, requested: Destination, released: readonly string[] = []): ScenarioState {
+// `defeated`: the card is leaving because damage destroyed it; a card that holds `leavesStagingWhenDefeated` then leaves the staging area although it cannot leave it any other way (Thaurdir on stage 2B, 10126:B:1, 10126:B:3).
+export function moveCard(state: ScenarioState, id: string, requested: Destination, released: readonly string[] = [], defeated = false): ScenarioState {
   const current = state.cards[id];
   if (!current) return state;
   // A temporary card leaves the game when it leaves play, whether it is defeated, returned to a hand or a deck or discarded ("If those heroes leave play, they are removed from the game", 11212:A:2).
@@ -351,7 +352,7 @@ export function moveCard(state: ScenarioState, id: string, requested: Destinatio
   // A card that cannot enter the staging area stays where it is ("Shrine to Morgoth ... cannot enter the staging area", 12094:A:1).
   if (dest.zone === "staging" && flagged(state, id, "cannotEnterStaging")) return state;
   // A card that cannot leave the staging area stays in it, whatever moves it (Uglúk, 143069:B:2).
-  if (current.zone === "staging" && dest.zone !== "staging" && flagged(state, id, "cannotLeaveStaging")) return state;
+  if (current.zone === "staging" && dest.zone !== "staging" && flagged(state, id, "cannotLeaveStaging") && !(defeated && flagged(state, id, "leavesStagingWhenDefeated"))) return state;
   const leavingPlay = current.zone === "play" || current.zone === "heroes" || current.zone === "attached";
   let next = detach(state, id);
   if ((leavingPlay || guardLeaves(current, dest)) && current.host) next = unhost(next, id);
