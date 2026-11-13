@@ -14,6 +14,12 @@ export function isSafeLocation(state: ScenarioState, id: string | null | undefin
   return code != null && constantVerbCodes(ctx, "Safe").has(code);
 }
 
+/** A safe location with an encounter card attached as its guard cannot be the active location; it returns to the staging area unguarded once the guard leaves play (mec108.objective-locations, which names Across the Ettenmoors' four objective-locations). */
+export function guardedSafeLocation(state: ScenarioState, ctx: Pick<ReduceContext, "effects">, id: string): boolean {
+  const card = state.cards[id];
+  return card != null && card.attachments.some((attached) => state.cards[attached]?.guard === true) && isSafeLocation(state, id, ctx);
+}
+
 /** Whether a location with the Safe keyword is the active location. */
 export function safeActive(state: ScenarioState, ctx: Pick<ReduceContext, "effects">): boolean {
   return isSafeLocation(state, state.activeLocation, ctx);
