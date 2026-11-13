@@ -10,6 +10,7 @@ import { printedOf } from "../../core/printed.ts";
 import type { CardInstance, ScenarioState } from "../../core/state.ts";
 import { flagged, updateCard } from "../../core/state.ts";
 import { noteProgressPlaced } from "../angmar/progress.ts";
+import { absorbProgress } from "../angmar/sponge.ts";
 
 /** The game deals encounter side quests, in a side quest deck of its own (emce.side-quests) or in its encounter deck (mec108.side-quests, `sideQuests`): the other games never read any of this. */
 export function hasSideQuests(state: Pick<ScenarioState, "piles" | "sideQuests">): boolean {
@@ -56,8 +57,11 @@ export function currentSideQuest(state: ScenarioState): string | null {
  * round" (09023:A:1) bounds what a side quest takes as it does the main quest (`questRoom`, families/caves/progress.ts), and what it takes (not the room left) counts toward the round's tally. A side quest that holds `progressRemovesDamage` (Protect the Innocent, 10158:A:2) takes the progress as
  * damage removed from it instead: no more than it holds, the rest is lost, and only the damage removed counts toward the tally.
  */
-export function placeOnCurrentSideQuest(state: ScenarioState, amount: number, cards: ReduceContext["cards"], steps: EngineStep[]): { state: ScenarioState; remaining: number } {
-  const id = currentSideQuest(state);
+export function placeOnCurrentSideQuest(from: ScenarioState, wanted: number, cards: ReduceContext["cards"], steps: EngineStep[]): { state: ScenarioState; remaining: number } {
+  const id = currentSideQuest(from);
+  // Progress that would be placed on a quest card first fills the sponges in the staging area (Forbidden Descent, 10101:A:1); with no side quest current it goes on to the main quest card.
+  const { state, remaining: amount } = id ? absorbProgress(from, wanted, steps) : { state: from, remaining: wanted };
+  if (amount <= 0) return { state, remaining: 0 };
   const quest = id ? state.cards[id] : undefined;
   if (!id || !quest) return { state, remaining: amount };
   const room = Math.min(amount, questRoom(state));

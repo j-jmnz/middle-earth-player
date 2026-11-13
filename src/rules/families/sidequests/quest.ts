@@ -15,6 +15,7 @@ import { updateCard } from "../../core/state.ts";
 import { noteHostDefeated } from "../attachments/hold.ts";
 import { questCardDefeatedHeard } from "../quest/branch.ts";
 import { releaseHeldOnDefeat } from "../angmar/hold.ts";
+import { absorbProgress } from "../angmar/sponge.ts";
 import { flipDefeated, flipsInto } from "../angmar/stage.ts";
 import { noteProgressPlaced } from "../angmar/progress.ts";
 import { addToVictory } from "./victory.ts";
@@ -69,7 +70,9 @@ export function resolveSideQuests(state: ScenarioState, committed: ReadonlyMap<s
 }
 
 // Progress on a side quest: it takes what it needs to be full and no more, and a full one in a quest area is defeated (an encounter side quest in the staging area is swept up by the caller's effect).
-export function placeOnSideQuest(state: ScenarioState, questId: string, amount: number, cause: Cause, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+export function placeOnSideQuest(from: ScenarioState, questId: string, wanted: number, cause: Cause, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  // Progress that would be placed on a quest card first fills the sponges in the staging area (Forbidden Descent, 10101:A:1).
+  const { state, remaining: amount } = absorbProgress(from, wanted, steps);
   const quest = state.cards[questId];
   if (!quest || amount <= 0) return state;
   const points = printedOf(ctx.cards, quest.code).questPoints == null ? null : modifiedStat(state, quest, "questPoints", ctx.cards);

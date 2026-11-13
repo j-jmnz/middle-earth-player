@@ -171,7 +171,7 @@ export function watchReveal(state: ScenarioState, frame: Frame, ctx: ReduceConte
   }
   if (!discard) return next;
   const discarded = updateCard(moveCard(next, id, { zone: "encounterDiscard" }), id, { face: "up", controller: null });
-  return resetEncounterDeck(popFrame(frame.peril ? { ...discarded, perilSeat: null } : discarded, steps), steps);
+  return resetEncounterDeck(popFrame(frame.peril ? { ...discarded, perilSeat: null } : discarded, steps), steps, ctx);
 }
 
 // An encounter card entered play (placed in the staging area at the end of its staging, or put into play by an effect).

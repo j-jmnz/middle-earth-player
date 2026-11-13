@@ -78,7 +78,7 @@ function discardTop(state: ScenarioState, data: HideData, seat: number, ctx: Red
   let threat = heldStat(state, seat, "hideThreat", { committed: data.committedIds.length, ally: allies(state, seat, ctx) });
   const discardedIds: string[] = [];
   for (let count = 0; count < data.x; count += 1) {
-    next = resetEncounterDeck(next, steps);
+    next = resetEncounterDeck(next, steps, ctx);
     const id = next.encounterDeck[0];
     const instance = id ? next.cards[id] : undefined;
     if (!id || !instance) break;

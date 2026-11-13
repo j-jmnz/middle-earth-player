@@ -89,6 +89,8 @@ export const amountExprSchema = z.strictObject({
   // What the running effect discarded from the top of decks so far, over every player it acted for: `cost` the combined printed cost of the cards (a card with no printed cost counts 0: "X is the combined printed cost of the discarded cards", 09034:A:1), `types`
   // the number of different card types among them ("for each different card type discarded this way", 09064:A:1). Read by the deck family.
   discarded: z.enum(["cost", "types"]).optional(),
+  // The total printed Threat of the cards the running effect discarded from the top of the encounter deck (DiscardEncounterTop), looked at by it: an enemy's or a location's Threat, 0 for any other card ("X is the total Threat of the discarded cards", 10107:A:1). Read by the angmar family.
+  discardedThreat: z.literal(true).optional(),
   // The number of quest cards in play: the main quest card, the encounter side quests in the staging area and the player side quests in the quest areas, at least 1 ("X is the number of quest cards in play", 09016:A:1; mec108.side-quests-in-play). Read by the angmar family.
   questCards: z.literal(true).optional(),
   // Captured cards (Escape from Mount Gram, read by the captured family): `under` the cards captured underneath the source ("X is the number of captured cards underneath Tunnels of Mount Gram", 10048:A:2), `cardsWith` the cards in play with 1 or more captured cards underneath

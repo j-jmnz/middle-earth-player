@@ -22,6 +22,7 @@ import { afterProgress } from "../quest/stage-reveal.ts";
 import { mayGainResources } from "../families/misc/guards.ts";
 import { queueHeard } from "../families/quest/events.ts";
 import { refillsAnyTime } from "../families/nightmare/guards.ts";
+import { returnUndeadBeforeReset } from "../families/angmar/run-out.ts";
 import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
 import { encounterRaised } from "../families/quest/threat.ts";
 import { flagged, livingSeats, updateCard, type ScenarioState } from "../core/state.ts";
@@ -48,10 +49,11 @@ export function shuffleEncounterDeck(state: ScenarioState): ScenarioState {
 
 // An encounter deck that is out of cards during the quest phase gets the encounter discard pile back, shuffled
 // (rr.running-out-of-cards, rr.step-3-3). Outside the quest phase it stays empty.
-export function resetEncounterDeck(state: ScenarioState, steps: EngineStep[]): ScenarioState {
+// A card in play that returns an enemy first (Ghostly Ruins, 10103:A:1) acts before the reset when the caller passes the context.
+export function resetEncounterDeck(state: ScenarioState, steps: EngineStep[], ctx?: ReduceContext): ScenarioState {
   // In any phase while the Nightmare setup card says so (encounterRefill, 900201:A:3).
   if (state.phase !== "Quest" && !refillsAnyTime(state)) return state;
-  return reshuffleDiscard(state, steps, "rr.running-out-of-cards");
+  return reshuffleDiscard(ctx ? returnUndeadBeforeReset(state, ctx, steps) : state, steps, "rr.running-out-of-cards");
 }
 
 // The encounter discard pile back into an empty encounter deck, shuffled, whatever the phase: what a rule that says "if the deck is ever empty" does (the Fortitude test, mec113.fortitude-tests).

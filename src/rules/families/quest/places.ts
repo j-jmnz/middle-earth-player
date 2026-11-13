@@ -18,6 +18,7 @@ import { fireForced } from "../../windows/triggers.ts";
 import { effectsOfCard } from "../misc/text.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
 import type { Focus } from "../index.ts";
+import { removeProgressFromEachQuest } from "../angmar/excess.ts";
 import { makeActiveIn } from "../south/locations.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
@@ -92,5 +93,6 @@ export function lowerCardThreat(state: ScenarioState, instruction: Verb<"LowerCa
 // Progress comes off the current quest card: `amount`, or all of it when the card holds fewer ("If there are fewer than 4 progress
 // tokens on the quest, remove all progress tokens from that quest", 01086:A:1). The step records it as a negative amount.
 export function removeProgressFromQuest(state: ScenarioState, instruction: Verb<"RemoveProgressFromQuest">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
-  return takeProgressOff(state, state.questStage, resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx), steps);
+  const amount = resolveAmount(state, instruction.amount, frameScope(state, focus.seat, focus.sourceId), ctx);
+  return instruction.each ? removeProgressFromEachQuest(state, amount, focus.seat, ctx, steps, currentCause(steps, UNATTRIBUTED)) : takeProgressOff(state, state.questStage, amount, steps);
 }

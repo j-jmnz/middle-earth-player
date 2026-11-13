@@ -53,7 +53,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "DiscardCostlier":
       return discardCostlier(state, instruction, focus, ctx);
     case "DiscardEncounterTop":
-      return discardEncounterTop(state, instruction, focus, ctx);
+      return discardEncounterTop(state, instruction, focus, ctx, steps);
     case "StageLooked":
       return stageLooked(state, instruction, focus, ctx, steps);
     case "RemoveWillpowerFromQuest":

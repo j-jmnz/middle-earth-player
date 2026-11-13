@@ -16,6 +16,7 @@ import { attachRandomBurden, attachSelfToNamed, moveToHero } from "./burdens.ts"
 import { placeHandUnderSelf } from "./cards-under.ts";
 import { determinedMatches } from "./determined.ts";
 import { flipTimeObjective, timeOfDayHolds } from "./day-night.ts";
+import { discardedThreatAmount, removeProgressAmong } from "./dark-covenant.ts";
 import { placeLoggedDamageOn } from "./logged.ts";
 import { endPhase } from "./phase.ts";
 import { travelUnpayable } from "./travel.ts";
@@ -66,6 +67,8 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "Safe":
     case "EarnEncounterCopies":
       return state;
+    case "RemoveProgressAmong":
+      return removeProgressAmong(state, instruction, focus, ctx, steps);
     case "RemoveSideQuestsFromGame":
       return removeSideQuestsFromGame(state, instruction, ctx, steps);
     // The marker defeatSideQuest reads (stage.ts).
@@ -88,7 +91,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "angmar",
-  verbs: ["Time", "RemoveTimeCounters", "HoldUnder", "DiscardHeld", "PlaceHandUnderSelf", "ChooseCurrentQuest", "AttachNewTo", "TradeDamageForResources", "FirstTraitSurge", "EndPhase", "PlaceLoggedDamageOn", "ChooseBoon", "AttachRandomBurden", "MoveToHero", "AttachSelfToNamed", "FlipTimeObjective", "RecordStartingThreat", "Safe", "StageRandomGuardedPair", "RevealCard", "ReleaseGuards", "RevealSetAsideForTokens", "EarnEncounterCopies", "RemoveSideQuestsFromGame", "FlipWhenDefeated"],
+  verbs: ["Time", "RemoveTimeCounters", "HoldUnder", "DiscardHeld", "PlaceHandUnderSelf", "ChooseCurrentQuest", "AttachNewTo", "TradeDamageForResources", "FirstTraitSurge", "EndPhase", "PlaceLoggedDamageOn", "ChooseBoon", "AttachRandomBurden", "MoveToHero", "AttachSelfToNamed", "FlipTimeObjective", "RecordStartingThreat", "Safe", "StageRandomGuardedPair", "RevealCard", "ReleaseGuards", "RevealSetAsideForTokens", "EarnEncounterCopies", "RemoveSideQuestsFromGame", "FlipWhenDefeated", "RemoveProgressAmong"],
   run,
   revealed: (state, id, ctx) => noteFirstTrait(timeOnReveal(state, id, ctx), id, ctx),
   travel: { unpayable: travelUnpayable },
@@ -96,5 +99,5 @@ export const manifest: RulesFamily = {
   combat: { attack: (state, enemyId, _attacker, _target, attackerId) => attackerFacing(state, enemyId, attackerId), defense: (state, defender, _cards, defenderId) => defenderFacing(state, defender, defenderId) },
   condition: (state, condition, scope, ctx) => timeOfDayHolds(state, condition) ?? currentQuestHolds(state, condition, scope, ctx) ?? questLeadsHolds(state, condition, ctx) ?? hitPointsLeftHolds(state, condition, ctx) ?? safeActiveHolds(state, condition, ctx) ?? setAsideHasHolds(state, condition),
   settle: { sweep: advanceWhenFlagged },
-  amount: (state, found, scope, ctx) => questCardsAmount(state, found, scope.actor, ctx),
+  amount: (state, found, scope, ctx) => questCardsAmount(state, found, scope.actor, ctx) ?? discardedThreatAmount(state, found, ctx),
 };

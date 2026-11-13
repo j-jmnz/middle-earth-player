@@ -3,7 +3,7 @@
 import { z } from "zod";
 
 import type { CatalogFamily } from "../family-manifest.ts";
-import { cardRefSchema } from "../effect-schema-amount.ts";
+import { cardRefSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { verbFlags } from "../verb-flags.ts";
 
@@ -78,6 +78,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("EarnEncounterCopies"), codes: z.array(code).min(1), ...when }),
   // Stage 1 of The Treachery of Rhudaur ("remove each Treachery of Rhudaur side quest from the game", 10094:B:2): each card in the staging area with one of these titles, quest side up, leaves the game (not the victory display); its attachments are discarded with it. A card flipped into its Clue objective has another title and stays.
   z.strictObject({ verb: z.literal("RemoveSideQuestsFromGame"), names: z.array(z.string().min(1)).min(1), ...when }),
+  // The actor removes `amount` progress from among the quest cards in play, one token at a time from the quest card they choose; with fewer than `amount` on them all of it comes off ("remove X progress from among the quests in play", 10107:A:1). `left` is engine use: the tokens still to go.
+  z.strictObject({ verb: z.literal("RemoveProgressAmong"), amount: positiveAmountSchema, left: z.number().int().min(1).optional(), ...when }),
   // A constant marker on a side quest ("When this quest is defeated, flip it over", 10109:A:3): when it is defeated it is not added to the victory display but flips into the objective with this code and stays in the staging area, faceup and unclaimed (mec108.the-investigation).
   // The verb does nothing when a record runs it; families/sidequests/quest.ts defeatSideQuest reads it.
   z.strictObject({ verb: z.literal("FlipWhenDefeated"), into: code }),
@@ -132,6 +134,12 @@ const FLAGS = [
   "advanceNow",
   // On a card: the Doomed X it gains is the amount of this modifier, on top of its printed Doomed ("While the current quest has 0 progress on it, Wight of Rhudaur gains doomed 2", 10099:A:2; read as the card is revealed, windows/frames.ts, rr.doomed-x).
   "gainsDoomed",
+  // On a location in the staging area: the first 2 progress that would be placed on a quest card each round are placed on it instead ("the first 2 progress that would be placed on a quest each round must be placed on Forbidden Descent, instead", 10101:A:1; families/angmar/sponge.ts).
+  // Each copy takes 2 a round; `spongeTaken` is the progress it took this round (engine use, until the end of the round).
+  "progressSponge",
+  // On the table, while a card in play says so (Ghostly Ruins, staged or active): whenever the encounter deck runs out of cards in the quest phase, the topmost Undead enemy in the encounter discard pile returns to the staging area before the deck is reset ("Any time the encounter deck runs out of cards", 10103:A:1; families/angmar/run-out.ts).
+  "returnsUndeadOnRunOut",
+  "spongeTaken",
 ] as const;
 
 export const manifest = { name: "angmar", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

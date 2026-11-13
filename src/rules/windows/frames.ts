@@ -68,7 +68,7 @@ export function startReveal(
   fromDiscard?: boolean,
 ): ScenarioState {
   // A Loot card on top of the deck is discarded, not revealed (emce.loot).
-  const skipped = cardId ? { state, top: cardId } : skipLoot(resetEncounterDeck(state, steps), ctx, steps);
+  const skipped = cardId ? { state, top: cardId } : skipLoot(resetEncounterDeck(state, steps, ctx), ctx, steps);
   const ready = skipped.state;
   const id = skipped.top;
   const instance = id ? ready.cards[id] : undefined;
@@ -136,7 +136,7 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
   // The card's effects were canceled just after it was revealed: it goes back into the encounter deck and the same
   // seat reveals another card (141001:A:1).
   // A card a Response discarded as it canceled it (The Door is Closed!, 10092:A:1) is not returned: the reveal is over.
-  if (frame.data.canceled && frame.step >= 1) return state.cards[id]?.zone === "staging" ? revealAnother(state, frame, ctx, steps) : resetEncounterDeck(popFrame(frame.peril ? { ...state, perilSeat: null } : state, steps), steps);
+  if (frame.data.canceled && frame.step >= 1) return state.cards[id]?.zone === "staging" ? revealAnother(state, frame, ctx, steps) : resetEncounterDeck(popFrame(frame.peril ? { ...state, perilSeat: null } : state, steps), steps, ctx);
   switch (frame.step) {
     case 0: {
       // Into the revealing seat's own staging area once stages are separate (mec109.multiple-staging-areas).
@@ -205,7 +205,7 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
     }
     default:
       // The revealed card's staging is resolved: an encounter deck it emptied is reset now (faq.last-encounter-card).
-      return resetEncounterDeck(popFrame(frame.peril ? { ...state, perilSeat: null } : state, steps), steps);
+      return resetEncounterDeck(popFrame(frame.peril ? { ...state, perilSeat: null } : state, steps), steps, ctx);
   }
 }
 

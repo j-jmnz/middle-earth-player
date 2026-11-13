@@ -30,6 +30,7 @@ import { oweDiscards } from "../families/breaking/progress.ts";
 import { arrivalFace, orderedNext, stageToVictory } from "../families/quest/order.ts";
 import { caughtUp } from "../families/stormcaller/values.ts";
 import { islandTravelTo } from "../families/island/travel.ts";
+import { absorbProgress } from "../families/angmar/sponge.ts";
 import { hasSideQuests, mainQuestBarred, placeOnCurrentSideQuest } from "../families/wilderland/night-quest.ts";
 import { familyOptionalEngageBarred, familyQuestResult } from "../interpret/family-hooks.ts";
 
@@ -250,7 +251,9 @@ export function placeQuestProgress(
 
 // Progress put on the current quest card: a quest that can advance takes what it needs, the rest does not carry over to the next stage (rr.quest-advancement); one that cannot advance
 // has no upper limit (faq.progress-without-advancing); a full one advances. `counted`: the progress counts toward what a card in play limits this round (families/caves/progress.ts).
-export function putOnStage(state: ScenarioState, stageId: string, amount: number, points: number | null, cards: Cards, steps: EngineStep[], canAdvance: Gate, cause: Cause, counted: boolean): ScenarioState {
+export function putOnStage(from: ScenarioState, stageId: string, wanted: number, points: number | null, cards: Cards, steps: EngineStep[], canAdvance: Gate, cause: Cause, counted: boolean): ScenarioState {
+  // Progress that would be placed on a quest card first fills the sponges in the staging area (Forbidden Descent, 10101:A:1).
+  const { state, remaining: amount } = absorbProgress(from, wanted, steps);
   const stage = state.cards[stageId];
   if (!stage) return state;
   const advancing = points != null && canAdvance(state);

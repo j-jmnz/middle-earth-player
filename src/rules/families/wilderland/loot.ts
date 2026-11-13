@@ -20,7 +20,7 @@ export function skipLoot(state: ScenarioState, ctx: ReduceContext, steps: Engine
   for (let passes = state.encounterDeck.length + state.encounterDiscard.length; passes > 0; passes -= 1) {
     const top = next.encounterDeck[0];
     if (top === undefined || !isLoot(next, top)) return { state: next, top };
-    next = resetEncounterDeck(updateCard(moveCard(next, top, { zone: "encounterDiscard" }), top, { face: "up", controller: null }), steps);
+    next = resetEncounterDeck(updateCard(moveCard(next, top, { zone: "encounterDiscard" }), top, { face: "up", controller: null }), steps, ctx);
   }
   const last = next.encounterDeck[0];
   return { state: next, top: last !== undefined && isLoot(next, last) ? undefined : last };

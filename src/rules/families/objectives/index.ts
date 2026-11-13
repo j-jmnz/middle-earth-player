@@ -55,7 +55,7 @@ function guardObjective(state: ScenarioState, instruction: Extract<Instruction, 
   if (!id || !objective || objective.zone !== "staging" || printedOf(ctx.cards, objective.code).type !== "objective") return state;
   // Guarded (enemy) / Guarded (location): the card found is added to the staging area and guards the objective, not revealed (emce.guarded-x).
   if (instruction.types) return guardedByType(state, id, instruction.types, focus, ctx, steps);
-  const ready = resetEncounterDeck(state, steps);
+  const ready = resetEncounterDeck(state, steps, ctx);
   const at = ready.encounterDeck.findIndex((cardId) => printedOf(ctx.cards, ready.cards[cardId]?.code ?? "").type !== "objective");
   if (at < 0) return ready;
   // The guard comes to the top of the deck, the objectives above it keep their order below it.
@@ -71,13 +71,13 @@ export function guardedByType(state: ScenarioState, objectiveId: string, types: 
   return guardWith(moveEncounter(searched, found, "staging", focus.seat, ctx, steps), found, objectiveId);
 }
 
-// ClaimObjective: the source objective leaves the staging area for the last picked hero, controlled by that hero's controller.
+// ClaimObjective: the source objective leaves the staging area for the last picked hero, controlled by that hero's controller; an objective ally a player controls (Amarthiúl, 10110:A:1) may be the host as well.
 function claimObjective(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const id = focus.sourceId;
   const objective = id ? state.cards[id] : undefined;
   const heroId = lastPicked(state);
   const hero = heroId ? state.cards[heroId] : undefined;
-  if (!id || !objective || objective.zone !== "staging" || !freeOfEncounters(state, id) || !hero || hero.zone !== "heroes" || hero.controller == null) return state;
+  if (!id || !objective || objective.zone !== "staging" || !freeOfEncounters(state, id) || !hero || (hero.zone !== "heroes" && hero.zone !== "play") || hero.controller == null) return state;
   const attached = attachTo(moveCard(state, id, { zone: "attached" }), id, heroId);
   const claimed = updateCard(attached, id, { face: "up", controller: hero.controller, claimed: true });
   return queueEvent(enforceRestricted(claimed, heroId, ctx, steps), { trigger: "claimed", seat: hero.controller, cardId: id });

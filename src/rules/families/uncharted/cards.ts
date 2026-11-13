@@ -3,6 +3,7 @@
 // resource on the campaign card, and the bottom of a deck (looked at, discarded).
 import type { Instruction } from "../../../catalog/boundary.ts";
 
+import { resetEncounterDeck } from "../../interpret/verbs.ts";
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
 import { characters } from "../../combat/combat.ts";
 import { askTarget } from "../../windows/choices.ts";
@@ -133,11 +134,18 @@ export function discardCostlier(state: ScenarioState, instruction: Verb<"Discard
 }
 
 /** DiscardEncounterTop: the top cards of the encounter deck go to its discard pile, face up; they are the cards the effect looked at. */
-export function discardEncounterTop(state: ScenarioState, instruction: Verb<"DiscardEncounterTop">, focus: Focus, ctx: ReduceContext): ScenarioState {
+export function discardEncounterTop(state: ScenarioState, instruction: Verb<"DiscardEncounterTop">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const count = resolveAmount(state, instruction.count, frameScope(state, focus.seat, focus.sourceId), ctx);
-  const ids = state.encounterDeck.slice(0, Math.max(0, count));
   let next = state;
-  for (const id of ids) next = updateCard(moveCard(next, id, { zone: "encounterDiscard" }), id, { face: "up", controller: null });
+  const ids: string[] = [];
+  for (let taken = 0; taken < count; taken += 1) {
+    // A deck that ran out during the effect is reset before the next card is discarded (10097:A:1).
+    if (instruction.reset && next.encounterDeck.length === 0) next = resetEncounterDeck(next, steps, ctx);
+    const id = next.encounterDeck[0];
+    if (id === undefined) break;
+    ids.push(id);
+    next = updateCard(moveCard(next, id, { zone: "encounterDiscard" }), id, { face: "up", controller: null });
+  }
   const data = effectData(next);
   return data ? patchTop(next, { data: { ...data, looked: ids } }) : next;
 }
@@ -145,11 +153,11 @@ export function discardEncounterTop(state: ScenarioState, instruction: Verb<"Dis
 /** StageLooked: each player in turn adds one card of the trait and type, among those the effect discarded, to the staging area. */
 export function stageLooked(state: ScenarioState, instruction: Verb<"StageLooked">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const order = livingSeats(state);
-  const seat = instruction.seat ?? order[0];
+  const seat = instruction.seat ?? (instruction.own ? focus.seat : order[0]);
   if (seat == null || !order.includes(seat)) return state;
   const cause = currentCause(steps, UNATTRIBUTED);
   const options = (effectData(state)?.looked ?? []).filter((id) => state.cards[id]?.zone === "encounterDiscard" && printedOf(ctx.cards, state.cards[id]?.code ?? "").type === instruction.type && hasTrait(state, id, instruction.trait, ctx));
-  const nextSeat = order[order.indexOf(seat) + 1];
+  const nextSeat = instruction.own ? undefined : order[order.indexOf(seat) + 1];
   const goOn = (current: ScenarioState): ScenarioState => (nextSeat == null ? current : queueFront(current, [{ instruction: { ...instruction, seat: nextSeat }, seat: nextSeat, chosen: null, cause }]));
   if (options.length === 0) return state;
   const chosen = focus.chosen && options.includes(focus.chosen) ? focus.chosen : options.length === 1 ? options[0] : undefined;
