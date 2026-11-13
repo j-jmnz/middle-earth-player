@@ -317,6 +317,8 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
   09074:constant:2: Constant
     only if the card with code 09033 in play has damage below its hit points (any hit points remaining)
     - the players cannot defeat this stage while this holds
+  09074:questResolution:1: Quest resolution
+    - the players win the game
 
 ## 100158 Arnor Ravaged
 
@@ -424,4 +426,4 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
     - its host: stat defense -2, while this card is in play
     - its host: stat cannotBeHealed 1, while this card is in play
 
-(rendered pieces: 249 by template, 4 as JSON)
+(rendered pieces: 251 by template, 4 as JSON)

@@ -146,6 +146,9 @@ describe("The Treachery of Rhudaur in the angmar-awakened campaign", () => {
       const spawned = spawn(state, code, { zone: "attached" });
       state = updateCard(attachTo(spawned.state, spawned.id, host), spawned.id, { claimed: true, controller: state.cards[host]?.controller ?? 0, face: "up" });
     }
+    // Seat 0's hero carries a Determination: the Resolution marks it determined.
+    const determination = spawn(state, "10172", { zone: "attached" });
+    state = attachTo(determination.state, determination.id, hero0);
     const won: ScenarioState = { ...state, window: null, stageCleared: true, resolution: recordInstructions(EFFECTS, "10184", "resolution"), resolutionAt: 0, resolutionSeat: 0 };
     // Each window offers the boon and "skip": the player takes the boon, and a Clue nobody controls opens no window.
     const asked: string[] = [];
@@ -159,6 +162,11 @@ describe("The Treachery of Rhudaur in the angmar-awakened campaign", () => {
     const earned = step.resolutionLog.earned.map((item) => `${item.code}:${item.seat}`);
     // Seat 0 controls the Brand and seat 1 the Heirloom; nobody controls the Orders.
     expect(earned.sort()).toEqual(["10185:0", "10186:1"]);
+    // Written onto the log: each boon joins the Campaign Pool as that player's card (so it is in their deck for the next scenario), and the character that carries a Determination is marked determined.
+    const written = applyResolution(log, "the-treachery-of-rhudaur", step, world.cards, NO_COPY_LIMITS);
+    expect(written.campaignPool.filter((card) => ["10185", "10186", "10187"].includes(card.code)).map((card) => `${card.code}:${card.seat}:${card.back}`).sort()).toEqual(["10185:0:player", "10186:1:player"]);
+    expect(written.completed).toContain("the-treachery-of-rhudaur");
+    expect(written.determined).toEqual(expect.arrayContaining([...log.determined, started.cards[hero0]?.code ?? ""]));
   });
 });
 
