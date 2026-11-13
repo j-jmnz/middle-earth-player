@@ -50,8 +50,8 @@ const game = campaignGame<EttenmoorsDecks, EttenmoorsPolicy>({
   campaign,
   scenario: ettenmoors,
   stats: HERO_STATS,
-  // TODO: the cards a game loads besides the scenario's piles, its campaign card's and the campaign's game codes.
-  codes: [...ettenmoors.cards.map((card) => card.code)],
+  // The scenario's cards; the campaign card's, the cards it places (Losing Time, the boons, Determination, Fend Off Despair) and the campaign's game codes are added by the kit. The pool holds what Escape from Mount Gram leaves: Mysterious Omens, Arnor Ravaged, Amarthiúl's Courage and a burden.
+  codes: [...ettenmoors.cards.map((card) => card.code), "10160", "100158", "10157", "10167", "10168", "10169", "10170"],
   intent: ettenmoorsIntent,
   policy: DEFAULT_POLICY,
   limit: 6000,
