@@ -78,7 +78,7 @@ export function putCapturedIntoPlay(state: ScenarioState, focus: Focus, ctx: Red
   const type = printedOf(ctx.cards, card.code).type;
   if (type === "hero" || card.heroSlot != null) {
     const entered = updateCard(moveCard(state, id, { zone: "heroes", seat: owner }), id, { face: "up", heroSlot: undefined });
-    return queueEvent(attachHeroBoons(entered, id), { trigger: "heroEnteredPlay", seat: owner, cardId: id });
+    return queueEvent(entered, { trigger: "heroEnteredPlay", seat: owner, cardId: id });
   }
   if (type === "ally") {
     const entered = updateCard(moveCard(state, id, { zone: "play", seat: owner }), id, { face: "up" });

@@ -7,6 +7,7 @@ import type { EngineStep } from "../../core/intents.ts";
 import { eliminateEmpties } from "../../core/eliminate.ts";
 import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { moveCard, spawn } from "../../core/zones.ts";
+import { settle } from "../../engine/machine.ts";
 import { runInstruction } from "../../interpret/interpret.ts";
 import { combatDamage } from "../defense/excess.ts";
 import { placeQuestProgress } from "../../quest/quest.ts";
@@ -68,10 +69,14 @@ describe("Captured cards", () => {
     const hero = made.id;
     const boon = spawn(updateCard(made.state, hero, { heroSlot: 1, resources: 0 }), "10162", { zone: "setAside" }, "up");
     const set = { ...boon.state, heroBoons: [[boon.id, hero] as const] };
-    const back = rescueCards(set, stage, [hero]);
+    const rescued = rescueCards(set, stage, [hero]);
+    expect(rescued.cards[boon.id]?.zone).toBe("setAside");
+    // The campaign card's record answers the hero entering play and attaches the boon (10174:forced:2).
+    const back = settle({ ...rescued, window: null, mode: "stopped" }, t.ctx, []);
     expect(back.cards[hero]).toMatchObject({ zone: "heroes", controller: 0, exhausted: false, damage: 0 });
     expect(back.cards[boon.id]).toMatchObject({ zone: "attached", host: hero });
-    expect(back.pendingEvents?.map((event) => event.trigger)).toContain("heroEnteredPlay");
+    expect(back.heroBoons ?? []).toHaveLength(0);
+    expect(rescued.pendingEvents?.map((event) => event.trigger)).toContain("heroEnteredPlay");
   });
 
   it("rr.player-elimination: a player whose last hero in play left play stays in the game while one of their heroes is captured, and is eliminated without one", () => {

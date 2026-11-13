@@ -59,7 +59,7 @@ describe("The campaign card", () => {
     const second = spawn(first.state, "10180", { zone: "setAside" }, "up");
     const set = { ...second.state, heroBoons: [[first.id, hero], [second.id, hero]] as const };
     expect(set.cards[first.id]?.host).toBeFalsy();
-    const back = rescueCards(set, stage, [hero]);
+    const back = settle({ ...rescueCards(set, stage, [hero]), window: null, mode: "stopped" }, t.ctx, []);
     expect(back.cards[hero]?.attachments).toEqual([first.id, second.id]);
     expect(back.heroBoons ?? []).toHaveLength(0);
   });

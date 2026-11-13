@@ -16,7 +16,7 @@
 //   the threat total, the engagement checks, the travel and pick helpers and the quest's progress and advance read the seat's staging area and stage
 //   without knowing about seats. `mergeView` writes what a view changed back. Nothing is cached on the view.
 import type { ScenarioState } from "../../core/state.ts";
-import { livingSeats, updateCard } from "../../core/state.ts";
+import { livingSeats, updateCard, withSeat } from "../../core/state.ts";
 import type { Destination } from "../../core/zones.ts";
 import { moveCard } from "../../core/zones.ts";
 
@@ -174,13 +174,39 @@ export function withView(state: ScenarioState, seat: number | undefined, act: (v
 }
 
 // An eliminated seat's stage and the encounter cards at it are discarded (mec109.multiple-staging-areas): the cards in its staging area, its active location, go to the
-// encounter discard pile and its stage card to the set-aside pile, as a defeated stage does. Nothing happens when the seat has neither.
+// encounter discard pile and its stage card to the set-aside pile, as a defeated stage does. Nothing happens when the seat has neither. When players joined the seat
+// (mec108.joining-another-player) they are still in the game and in that area, so the area passes to the first of them clockwise and nothing is discarded
+// (agent recommendation, docs/brief.md, Escape from Mount Gram).
 export function discardArea(state: ScenarioState, seat: number): ScenarioState {
   const owner = state.seats[seat];
   if (!state.separate || !owner) return state;
+  const heir = areaHeir(state, seat);
+  if (heir != null) return passArea(state, seat, heir);
   let next = state;
   for (const id of owner.staging) next = updateCard(moveCard(next, id, { zone: "encounterDiscard" }), id, { face: "up", controller: null });
   if (owner.active) next = updateCard(moveCard(next, owner.active, { zone: "encounterDiscard" }), owner.active, { face: "up", controller: null });
   if (owner.stage) next = moveCard(next, owner.stage, { zone: "setAside" });
   return next;
+}
+
+// The living seat that takes over the area of the eliminated seat: the first clockwise of the seats that joined it; null when none did.
+function areaHeir(state: ScenarioState, seat: number): number | null {
+  const count = Math.max(1, state.seatCount);
+  const joined = livingSeats(state).filter((index) => index !== seat && state.seats[index]?.joined === seat);
+  return [...joined].sort((left, right) => ((left - seat + count) % count) - ((right - seat + count) % count))[0] ?? null;
+}
+
+// The heir holds the area (its staging cards, active location and stage), and the other seats that joined the eliminated seat now share the heir's.
+function passArea(state: ScenarioState, seat: number, heir: number): ScenarioState {
+  const owner = state.seats[seat];
+  const taker = state.seats[heir];
+  if (!owner || !taker) return state;
+  const { joined: _joined, ...rest } = taker;
+  let next = withSeat(state, heir, { ...rest, staging: owner.staging, ...(owner.stage != null ? { stage: owner.stage } : {}), ...(owner.active != null ? { active: owner.active } : {}) });
+  for (let index = 0; index < next.seatCount; index += 1) {
+    const other = next.seats[index];
+    if (index !== heir && other?.joined === seat) next = withSeat(next, index, { ...other, joined: heir });
+  }
+  const { stage: _stage, active: _active, ...left } = next.seats[seat] ?? owner;
+  return mirrored(withSeat(next, seat, { ...left, staging: [] }));
 }

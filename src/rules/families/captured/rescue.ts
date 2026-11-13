@@ -11,7 +11,7 @@ import { nextUint } from "../../core/seed.ts";
 import { areaHeadOf, firstOfArea } from "../breaking/areas.ts";
 import { capturedUnder } from "./pile.ts";
 
-// The permanent boons set aside for the hero come back attached to it, in the order they were set aside (10174:B:2): the Campaign Log's boons of that character.
+// The permanent boons set aside for the hero come back attached to it, in the order they were set aside (10174:B:2, the campaign card's record answering `heroEnteredPlay`): the Campaign Log's boons of that character.
 export function attachHeroBoons(state: ScenarioState, heroId: string): ScenarioState {
   const hero = state.cards[heroId];
   const boons = (state.heroBoons ?? []).filter(([, hero_]) => hero_ === heroId).map(([boon]) => boon);
@@ -35,7 +35,7 @@ function release(state: ScenarioState, id: string): { state: ScenarioState; toHa
   if (state.seats[owner]?.eliminated) return { state: updateCard(moveCard(state, id, { zone: "discard", seat: owner }), id, { face: "up" }), toHand: false };
   if (card.heroSlot != null) {
     const entered = updateCard(moveCard(state, id, { zone: "heroes", seat: owner }), id, { face: "up", heroSlot: undefined });
-    return { state: queueEvent(attachHeroBoons(entered, id), { trigger: "heroEnteredPlay", seat: owner, cardId: id }), toHand: false };
+    return { state: queueEvent(entered, { trigger: "heroEnteredPlay", seat: owner, cardId: id }), toHand: false };
   }
   return { state: updateCard(moveCard(state, id, { zone: "hand", seat: owner }), id, { face: "up" }), toHand: true };
 }
