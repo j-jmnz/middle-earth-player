@@ -7,7 +7,7 @@ import { updateCard } from "../../../rules/core/state.ts";
 import { advanceResolution } from "../../../rules/setup/resolution.ts";
 import { EFFECTS } from "../../../effects/index.ts";
 import { recordInstructions } from "../../../catalog/scenario-data.ts";
-import { legalIntents, reduce, startScenario, type ReduceContext, type ScenarioState } from "../../../rules/engine/reduce.ts";
+import { reduce, startScenario, type ReduceContext, type ScenarioState } from "../../../rules/engine/reduce.ts";
 import { afterHills, dikePlan, dikeWorld } from "../../../../test/scenarios/deadmens-dike/game.ts";
 import { eriadorPlan, eriadorWorld } from "../../../../test/scenarios/the-wastes-of-eriador/game.ts";
 import { gramPlan, gramWorld } from "../../../../test/scenarios/escape-from-mount-gram/game.ts";

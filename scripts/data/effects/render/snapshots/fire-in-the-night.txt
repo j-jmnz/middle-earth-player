@@ -173,9 +173,9 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
   19074:constant:3: Constant
     only if 2 is less than the number of card (any player controls) in the victory display, of card type encounter-side-quest
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - this card: stat engagedWithAll 1, while this card is in play
+    - this card: stat engagedWithAll (it stays in the staging area but is considered engaged with each player: it attacks each of them in turn in the combat phase, dealt a shadow card for each attack, and none engages it) 1, while this card is in play
     - this card: stat noThreatContribution 1, while this card is in play
-    - this card: stat attackableByAny 1, while this card is in play
+    - this card: stat attackableByAny (any character may be declared as an attacker against it) 1, while this card is in play
 
 ## 19075 The Dragon's Thrall
 (the scenario deals it into the encounter pile; the piles place it, no record does)

@@ -5,12 +5,18 @@ import { describe, expect, it } from "vitest";
 
 import { flagged, updateCard, type ScenarioState } from "../../core/state.ts";
 import { moveCard, shadowCards } from "../../core/zones.ts";
+import type { EngineStep } from "../../core/intents.ts";
+import { modifiedStat, placeDamage } from "../../core/keywords.ts";
 import { settle } from "../../engine/machine.ts";
 import { resolveAmount } from "../../interpret/amounts.ts";
 import { runInstruction } from "../../interpret/interpret.ts";
 import { placeQuestProgress } from "../../quest/quest.ts";
+import { questStatOf } from "../../quest/quest.ts";
+import { setCurrentQuest } from "./quest.ts";
+import { ruleCause } from "../../core/cause.ts";
 import { discardShadows } from "../../combat/shadow.ts";
-import { fightEnemy, idOf, legalIntents, send, start, tableFromLayout, type Layout, type Run } from "../../../../test/harness/scene-kit.ts";
+import { restricted } from "../../interpret/restrictions.ts";
+import { fightEnemy, finish, idOf, legalIntents, send, start, tableFromLayout, type Layout, type Run } from "../../../../test/harness/scene-kit.ts";
 import type { PlayerIntent } from "../../engine/reduce.ts";
 import { seatThreat } from "../play/hooks.ts";
 import { travelUnpayable } from "./travel.ts";
@@ -28,7 +34,7 @@ const scope = { actor: 0, sourceId: null, returned: 0 } as const;
 const canAdvance = () => true;
 const shadowsOn = (state: ScenarioState, code: string): number => shadowCards(state.cards[idOf(state, code)]).length;
 // Runs the pending announcements and the Forced effects they start to the end.
-const settled = (state: ScenarioState, t: { ctx: Parameters<typeof settle>[1] }): ScenarioState => settle({ ...state, window: null, mode: "stopped" }, t.ctx, []);
+const settled = (state: ScenarioState, t: { ctx: Parameters<typeof settle>[1] }, steps: EngineStep[] = []): ScenarioState => settle({ ...state, window: null, mode: "stopped" }, t.ctx, steps);
 
 describe("Thaurdir's two sides (FlipTwoSided)", () => {
   it("10127:A:4 flips Captain to Champion and back keeping his damage, shadow cards and attachment, and the new side hears that it was flipped", () => {
@@ -270,5 +276,88 @@ describe("Thaurdir on stage 2B (engagedWithAll)", () => {
     expect(attacks).toEqual(["10128@0"]);
     // Champion side faceup: the end of the round does not flip him.
     expect(run.state.cards[idOf(run.state, CHAMPION)]?.code).toBe(CHAMPION);
+  });
+});
+
+describe("Midwinter's Crux (stage 2B) and the cards that read Thaurdir's side", () => {
+  const FURIOUS = "10139";
+  it("10126:B:2 keeps Thaurdir indestructible below 15 progress on the stage and lets damage destroy him at 15 or more, 10126:B:3 then wins the game", () => {
+    const damageThaurdir = (progress: number): ScenarioState => {
+      const t = built({ stage: "10126", progress, staging: [CHAMPION] });
+      const hit = placeDamage(t.state, idOf(t.state, CHAMPION), 99, t.cards, [], "framework", ruleCause("rr.damage"));
+      return settled(hit, t);
+    };
+    const below = damageThaurdir(14);
+    expect(below.cards[idOf(below, CHAMPION)]?.zone).toBe("staging");
+    expect(below.stageCleared).toBeFalsy();
+    const at = damageThaurdir(15);
+    expect(at.cards[idOf(at, CHAMPION)]?.zone).toBe("encounterDiscard");
+    expect(at.stageCleared).toBe(true);
+  });
+
+  it("10126:B:2 stops the stage from being defeated while Thaurdir is in play, either side, and not once he is gone", () => {
+    const open = (code: string | null) => built({ stage: "10126", progress: 14, staging: code ? [code] : [] });
+    const gate = (t: ReturnType<typeof open>) => (current: ScenarioState) => restricted(current, t.ctx, "advance").length === 0;
+    for (const code of [CAPTAIN, CHAMPION]) {
+      const t = open(code);
+      const placed = placeQuestProgress(t.state, 6, t.cards, [], gate(t));
+      expect(placed.questStage, code).toBe(t.state.questStage);
+      expect(placed.cards[placed.questStage ?? ""]?.progress, code).toBe(20);
+    }
+    const alone = open(null);
+    const advanced = placeQuestProgress(alone.state, 6, alone.cards, [], gate(alone));
+    expect(advanced.questStage === alone.state.questStage && advanced.cards[advanced.questStage ?? ""]?.progress === 20).toBe(false);
+  });
+
+  it("10139:A:2 gives each character -2 Defense for the round and flips Captain Thaurdir when progress is placed on Furious Charge, once for each placement", () => {
+    const t = built({ stage: "10125", staging: [CAPTAIN, FURIOUS] });
+    const current = setCurrentQuest(t.state, idOf(t.state, FURIOUS), t.ctx);
+    const steps: EngineStep[] = [];
+    const placed = settled(placeQuestProgress(current, 2, t.cards, steps, canAdvance), t, steps);
+    expect(placed.cards[idOf(placed, FURIOUS)]?.progress).toBe(2);
+    expect(placed.cards[idOf(placed, CHAMPION)]?.code).toBe(CHAMPION);
+    const hero = placed.cards[t.hero]!;
+    expect(modifiedStat(placed, hero, "defense", t.cards)).toBe(Math.max(0, (t.cards.get("dh1")?.defense ?? 0) - 2));
+    // Champion side up: a second placement flips nobody.
+    const more: EngineStep[] = [];
+    const again = settled(placeQuestProgress(placed, 1, t.cards, more, canAdvance), t, more);
+    expect(again.cards[idOf(again, CHAMPION)]?.code).toBe(CHAMPION);
+  });
+
+  it("10132:A:1 gives the main quest card and the staged side quests the battle keyword while Accursed Battlefield is the active location, a side quest current included", () => {
+    const t = built({ active: "10132", staging: [FURIOUS] });
+    const quest = t.state.questStage ?? "";
+    expect(questStatOf(t.state, t.hero, t.cards)).toBe("attack");
+    const current = setCurrentQuest(t.state, idOf(t.state, FURIOUS), t.ctx);
+    expect(questStatOf(current, t.hero, t.cards)).toBe("attack");
+    expect(flagged(current, idOf(current, FURIOUS), "battle")).toBe(true);
+    expect(flagged(current, quest, "battle")).toBe(true);
+    const off = built({ staging: [FURIOUS] });
+    expect(questStatOf(off.state, off.hero, off.cards)).toBe("willpower");
+  });
+});
+
+describe("Blight of Carn Dûm and Fortress Walls", () => {
+  it("10134:A:1 heals 1 damage from an enemy once its attack is over, while Blight is in the staging area, and nothing without it", () => {
+    const damageAfter = (layout: Layout): number => {
+      const fight = fightEnemy((made: Layout) => built(made), "f0", "f3", { engaged: [{ code: "f3", seat: 0, damage: 2 }], ...layout });
+      return fight.run.state.cards[idOf(fight.run.state, "f3")]?.damage ?? -1;
+    };
+    expect(damageAfter({ staging: ["10134"] })).toBe(1);
+    expect(damageAfter({ active: "10134" })).toBe(1);
+    expect(damageAfter({})).toBe(2);
+  });
+
+  it("10135:A:1 raises a player's threat by 1 for each resource spent while Fortress Walls is the active location, and not otherwise", () => {
+    const threatAfterPlaying = (active: boolean): number => {
+      const t = built({ phase: "Planning", hand: ["ally"], heroResources: 3, ...(active ? { active: "10135" } : {}) });
+      const before = seatThreat(t.state, 0);
+      const cardId = idOf(t.state, "ally");
+      const played = send(start(t.state), { type: "PlayCard", cardId, payments: [{ heroId: t.hero, amount: 1 }] }, t.ctx);
+      const done = finish(played, t.ctx);
+      return seatThreat(done.state, 0) - before;
+    };
+    expect(threatAfterPlaying(true)).toBe(1);
+    expect(threatAfterPlaying(false)).toBe(0);
   });
 });

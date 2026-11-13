@@ -107,8 +107,8 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
     only if the number of card (any player controls) in the victory display, of card type quest is at least 5
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
-    - this card: stat engagedWithAll 1, while this card is in play
-    - this card: stat attackableByAny 1, while this card is in play
+    - this card: stat engagedWithAll (it stays in the staging area but is considered engaged with each player: it attacks each of them in turn in the combat phase, dealt a shadow card for each attack, and none engages it) 1, while this card is in play
+    - this card: stat attackableByAny (any character may be declared as an attacker against it) 1, while this card is in play
 
 ## 19126 Guardian of Gundabad
 (the scenario deals it into the encounter pile; the piles place it, no record does)

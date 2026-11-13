@@ -566,7 +566,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
   145080:forced:1: Forced when a phase begins
     only if it is the Encounter phase
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json EngageFirstPlayer {"verb":"EngageFirstPlayer"}]
+    - this enemy, in the staging area, engages the first player
     - then, if this card is engaged with the player (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
-(rendered pieces: 306 by template, 45 as JSON)
+(rendered pieces: 307 by template, 44 as JSON)

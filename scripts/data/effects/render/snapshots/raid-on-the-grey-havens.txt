@@ -308,7 +308,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11076:A:1 (front): Captain Sahír engages the first player.
   11076:forced:1: Forced after an encounter card is added to the staging area (heard about this card)
-    - [json EngageFirstPlayer {"verb":"EngageFirstPlayer"}]
+    - this enemy, in the staging area, engages the first player
 
 11076:A:2 (front): For each point of damage Captain Sahír would take, discard 1 resource from him and cancel that damage.
   11076:constant:1: Constant
@@ -481,4 +481,4 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     only if all of: (this card is engaged with the player) and (this card is a enemy (any player controls) with a shadow card)
     - place shadowCards of this card resource tokens on this card
 
-(rendered pieces: 280 by template, 54 as JSON)
+(rendered pieces: 281 by template, 53 as JSON)

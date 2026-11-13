@@ -312,7 +312,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 
 12158:A:1 (front): Captain Sahír engages the first player.
   12158:forced:1: Forced after an encounter card is added to the staging area (heard about this card)
-    - [json EngageFirstPlayer {"verb":"EngageFirstPlayer"}]
+    - this enemy, in the staging area, engages the first player
 
 12158:A:2 (front): For each point of damage Captain Sahír would take, discard 1 resource from him and cancel that damage.
   12158:constant:1: Constant
@@ -412,4 +412,4 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
       - the acting player assigns the resource tokens on Raider enemy (any player controls) engaged with you damage among the character (you control), one at a time
     - then, if the number of Raider enemy (any player controls) is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
-(rendered pieces: 257 by template, 44 as JSON)
+(rendered pieces: 258 by template, 43 as JSON)

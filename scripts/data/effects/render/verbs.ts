@@ -71,6 +71,12 @@ const STAT_NOTE: Readonly<Record<string, string>> = {
   gainsSurge: " (it has the Surge keyword as it is revealed)",
   progressSponge: " (while it is in the staging area it takes the first 2 progress each round that would be placed on a quest card; each copy takes 2)",
   returnsUndeadOnRunOut: " (whenever the encounter deck runs out in the quest phase the topmost Undead enemy in the encounter discard pile returns to the staging area before the reset)",
+  keepShadowCards: " (unresolved shadow cards are not discarded at the end of the combat phase, so those dealt to enemies that did not attack stay and add up; an enemy that attacks from the staging area keeps the shadow cards it holds and is dealt one more)",
+  blankShadowGains: " (a shadow card with no shadow effect of its own gains \"Shadow: Raise defending player's threat by\" this amount when it is flipped)",
+  questProgressReduced: " (the progress placed on the current quest is reduced by this amount, after the active location took its share; several holders add)",
+  engagedWithAll: " (it stays in the staging area but is considered engaged with each player: it attacks each of them in turn in the combat phase, dealt a shadow card for each attack, and none engages it)",
+  attackableByAny: " (any character may be declared as an attacker against it)",
+  losesKeywords: " (it loses its keywords, Indestructible among them)",
   engagedThreat: " (while engaged it still adds its Threat to the total Threat in the staging area)",
 };
 const CHOOSE_CARDS_WHO: Readonly<Record<string, string>> = { eachSeat: "each player in turn", firstPlayer: "the first player", onePlayer: "each player in turn (the offer ends once one has taken it)" };
@@ -272,11 +278,24 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   AttachSelf: (i) => (isObj(i.to) && i.to.kind === "hero" ? { text: `attach this card to ${typeof i.to.trait === "string" ? `a ${i.to.trait} hero` : "a hero"}`, read: ["to"] } : null),
   EndQuestPhase: () => ({ text: "end the quest phase at once (no quest resolution)", read: [] }),
   ImmediateAttack: (i, ctx) => ({
-    text: `${i.afterThis === true ? "the attacking enemy makes an additional attack against the defending player once this attack has ended" : ctx.attacker !== true ? "this enemy attacks now" : ctx.engagedNext === true ? "the attacking enemy makes an immediate attack against the player it just engaged" : "the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack)"}${i.shadow === false ? ", dealt no shadow card" : i.afterThis === true ? ", dealt a new shadow card" : ", dealt a new shadow card after its old ones are discarded"}`,
-    read: ["shadow", "afterThis"],
+    text: `${i.afterThis === true ? "the attacking enemy makes an additional attack against the defending player once this attack has ended" : ctx.attacker !== true ? "this enemy attacks now" : ctx.engagedNext === true ? "the attacking enemy makes an immediate attack against the player it just engaged" : "the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack)"}${i.shadow === false ? (i.keepShadows === true ? ", dealt no new shadow card (the shadow cards it holds all resolve)" : ", dealt no shadow card") : i.afterThis === true ? ", dealt a new shadow card" : ", dealt a new shadow card after its old ones are discarded"}`,
+    read: ["shadow", "afterThis", "keepShadows"],
   }),
   ConsiderUndefended: () => ({ text: "this attack is considered undefended", read: [] }),
-  DiscardShadowOf: (i) => ({ text: `discard a shadow card dealt to ${cardRef(i.target ?? "picked")}`, read: ["target"] }),
+  DiscardShadowOf: (i) => ({ text: `discard ${i.all === true ? "each shadow card" : "a shadow card"} dealt to ${cardRef(i.target ?? "picked")}`, read: ["target", "all"] }),
+  FlipTwoSided: (i) => ({ text: `the card with code ${str(i.front)} or ${str(i.back)} in play is flipped to show the other of the two, where it lies, with its damage, tokens, shadow cards and attachments`, read: ["front", "back"] }),
+  DealShadowInPlay: (i) => ({
+    text: i.target === undefined ? "each enemy in play (in the staging area or engaged) is dealt 1 shadow card from the encounter deck (in a Travel line this is a cost: the players cannot travel unless the encounter deck holds a card for each of them)" : `${cardRef(i.target)} is dealt 1 shadow card from the encounter deck, wherever it is`,
+    read: ["target"],
+  }),
+  DiscardCopiesFromDeck: (i) => ({
+    text: `the acting player searches their deck for ${i.all === true ? "each" : "one"} other card with the title of ${i.of === "picked" ? "the card this effect picked (the one just discarded from the hand)" : "the other card of the event, if it is an ally"} and discards ${i.all === true ? "them" : "it"}${i.shuffle === true ? ", then shuffles the deck" : ""}`,
+    read: ["of", "all", "shuffle"],
+  }),
+  EngageFirstPlayer: () => ({ text: "this enemy, in the staging area, engages the first player", read: [] }),
+  QuestProgress: (i, ctx) => ({ text: `place ${amount(i.amount, ctx)} progress on the current quest (the active location takes it first)`, read: ["amount"] }),
+  ShuffleDiscardIntoDeck: () => ({ text: "the acting player shuffles their discard pile into their deck", read: [] }),
+  RemoveSourceFromGame: () => ({ text: "this card is removed from the game", read: [] }),
   DamageEach: (i, ctx) => ({ text: `deal ${amount(i.amount, ctx)} damage to each ${pick(i.pick, ctx)}`, read: ["amount", "pick"] }),
   // A restriction read from the record's own fields; one the template does not word (attach, heroLimit, travelOnly) prints as JSON.
   Restrict: (i) => {

@@ -178,7 +178,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
     - if the number of card (you control) named "Urdug", chosen by the first player is at least 1: choose location (any player controls) in the staging area only, chosen by the first player
     - [json GuardReturnedBy {"verb":"GuardReturnedBy","code":"19052","when":{"kind":"matches","card":"picked","pick":{"type":"location","control":"any"}}}]
     - then, if not (the picked card is a location (any player controls)) (checked when this step runs, after the steps above; not tied to whether they did anything): the total Threat in the staging area is 5 higher until the end of the phase
-    - [json RemoveSourceFromGame {"verb":"RemoveSourceFromGame"}]
+    - this card is removed from the game
 
 ## 19045 Harsh Weather
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -424,4 +424,4 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
   19055:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls) named "Urdug")
     - engage this card
 
-(rendered pieces: 312 by template, 33 as JSON)
+(rendered pieces: 313 by template, 32 as JSON)

@@ -102,10 +102,10 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142024:A:2 (front): Cannot leave the staging area but is considered to be engaged with each player.
   142024:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - this card: stat engagedWithAll 1, while this card is in play
+    - this card: stat engagedWithAll (it stays in the staging area but is considered engaged with each player: it attacks each of them in turn in the combat phase, dealt a shadow card for each attack, and none engages it) 1, while this card is in play
     - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
     - this card: stat noThreatContribution 1, while this card is in play
-    - this card: stat attackableByAny 1, while this card is in play
+    - this card: stat attackableByAny (any character may be declared as an attacker against it) 1, while this card is in play
 
 142024:A:3 (front): Forced: After placing the 6th damage here, the first player takes control of the Ring-bearer, exhausted with 1 damage on it.
   142024:forced:1: Forced after a card takes damage (heard about this card)

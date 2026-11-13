@@ -52,6 +52,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "constant",
       instructions: [
         { verb: "ModifyStat", stat: "cannotLeaveStaging", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_HOLDERS },
+        { verb: "ModifyStat", stat: "cannotBeEngaged", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_HOLDERS },
         { verb: "ModifyStat", stat: "cannotTakeDamage", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_HOLDERS },
       ],
     },
@@ -63,7 +64,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
 
     // 10126 Midwinter's Crux. When Revealed: each player raises their threat by the number of shadow cards in play, then Thaurdir flips if he is Captain side faceup.
     { id: "10126:whenRevealed:1", cardCode: "10126", lines: ["10126:A:1"], timing: "whenRevealed", instructions: [{ verb: "RaiseThreat", amount: { shadowCardsInPlay: true }, who: "eachSeat" }, FLIP_TO_CHAMPION] },
-    // Side B: Thaurdir stays in the staging area but is considered engaged with each player: he attacks each of them in turn in the combat phase with a shadow card of its own for each attack (families/south/watcher.ts), and each player may attack him as an
+    // Side B: Thaurdir stays in the staging area (no engagement ever moves him; the flag cannotLeaveStaging is not held, since it would also stop him being defeated and discarded, which wins the game, 10126:B:3) but is considered engaged with each player: he attacks each of them in turn in the combat phase with a shadow card of its own for each attack (families/south/watcher.ts), and each player may attack him as an
     // engaged enemy. No engagement ever happens, so no "after an enemy engages you" effect hears him. His Threat still counts against the quest (he does not enter any play area). At the end of the round he flips to Champion if he is Captain side faceup.
     {
       id: "10126:constant:1",
@@ -71,7 +72,6 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       lines: ["10126:B:1"],
       timing: "constant",
       instructions: [
-        { verb: "ModifyStat", stat: "cannotLeaveStaging", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_HOLDERS },
         { verb: "ModifyStat", stat: "engagedWithAll", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_HOLDERS },
         { verb: "ModifyStat", stat: "cannotBeEngaged", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_HOLDERS },
         { verb: "ModifyStat", stat: "attackableByAny", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_HOLDERS },
@@ -197,7 +197,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       lines: ["10139:A:2"],
       timing: "forced",
       trigger: "progressPlaced",
-      instructions: [{ verb: "ModifyStat", stat: "defense", amount: -2, until: "endOfRound", target: "characters" }, FLIP_TO_CHAMPION],
+      instructions: [{ verb: "ModifyStat", stat: "defense", amount: -2, until: "endOfRound", holders: { type: "character", control: "any" } }, FLIP_TO_CHAMPION],
     },
     { id: "10139:response:1", cardCode: "10139", lines: ["10139:A:3"], timing: "response", trigger: "questDefeated", subject: "self", instructions: [{ verb: "QuestProgress", amount: 10 }] },
 

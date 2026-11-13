@@ -285,10 +285,10 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 146066:B:2 (back): While The Two Watchers is in the staging area (enemy side faceup), it is considered to be engaged with each player.
   146066:constant:2: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - each enemy (any player controls) in the staging area only, named "The Two Watchers": stat engagedWithAll 1, while this card is in play
+    - each enemy (any player controls) in the staging area only, named "The Two Watchers": stat engagedWithAll (it stays in the staging area but is considered engaged with each player: it attacks each of them in turn in the combat phase, dealt a shadow card for each attack, and none engages it) 1, while this card is in play
     - each enemy (any player controls) in the staging area only, named "The Two Watchers": stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
     - each enemy (any player controls) in the staging area only, named "The Two Watchers": stat noThreatContribution 1, while this card is in play
-    - each enemy (any player controls) in the staging area only, named "The Two Watchers": stat attackableByAny 1, while this card is in play
+    - each enemy (any player controls) in the staging area only, named "The Two Watchers": stat attackableByAny (any character may be declared as an attacker against it) 1, while this card is in play
 
 146066:B:3 (back): This stage cannot be defeated while The Two Watchers is in play.
   146066:constant:3: Constant
@@ -347,10 +347,10 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each enemy (any player controls) in the staging area only, named "The Two Watchers": stat threat 3, while this card is in play
     - each enemy (any player controls) in the staging area only, named "The Two Watchers": stat defense 3, while this card is in play
-    - each enemy (any player controls) in the staging area only, named "The Two Watchers": stat engagedWithAll 1, while this card is in play
+    - each enemy (any player controls) in the staging area only, named "The Two Watchers": stat engagedWithAll (it stays in the staging area but is considered engaged with each player: it attacks each of them in turn in the combat phase, dealt a shadow card for each attack, and none engages it) 1, while this card is in play
     - each enemy (any player controls) in the staging area only, named "The Two Watchers": stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
     - each enemy (any player controls) in the staging area only, named "The Two Watchers": stat noThreatContribution 1, while this card is in play
-    - each enemy (any player controls) in the staging area only, named "The Two Watchers": stat attackableByAny 1, while this card is in play
+    - each enemy (any player controls) in the staging area only, named "The Two Watchers": stat attackableByAny (any character may be declared as an attacker against it) 1, while this card is in play
 
 146068:B:3 (back): This stage cannot be defeated while The Two Watchers is in play. If this stage is defeated, the players win the game.
   146068:constant:3: Constant
