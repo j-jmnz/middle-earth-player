@@ -88,7 +88,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       timing: "whenRevealed",
       instructions: [{ verb: "EnterSetAsideStaging", code: THAURDIR }, EACH_PLAYER([{ verb: "SearchMove", type: "enemy", trait: "Undead", to: "staging" }]), { verb: "ShuffleEncounterDeck" }],
     },
-    { id: "10095:constant:1", cardCode: "10095", lines: ["10095:B:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "questPoints", amount: { count: ANY_CLUE, times: -5 }, until: "whileSourceInPlay", target: "self" }] },
+    { id: "10095:constant:1", cardCode: "10095", lines: ["10095:B:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "questPoints", amount: { count: ANY_CLUE, times: 5, negative: true }, until: "whileSourceInPlay", target: "self" }] },
     { id: "10095:constant:2", cardCode: "10095", lines: ["10095:B:2"], timing: "constant", condition: { kind: "hitPointsLeft", code: THAURDIR }, instructions: [{ verb: "Restrict", what: "advance" }] },
     { id: "10095:questResolution:1", cardCode: "10095", lines: ["10095:B:2"], timing: "questResolution", instructions: [{ verb: "WinGame" }] },
 
@@ -132,7 +132,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       condition: { kind: "less", left: 0, right: { stat: "threat", of: "self" } },
       instructions: [{ verb: "ModifyStat", stat: "threat", amount: -1, until: "endOfPhase", target: "self" }],
     },
-    { id: "10102:shadow:1", cardCode: "10102", lines: ["10102:A:2"], timing: "shadow", condition: NO_CLUE, instructions: [{ verb: "ImmediateAttack", afterThis: true }] },
+    { id: "10102:shadow:1", cardCode: "10102", lines: ["10102:A:2"], timing: "shadow", instructions: [{ verb: "ImmediateAttack", afterThis: true, when: NO_CLUE }] },
 
     // 10103 Ghostly Ruins. While in play the encounter deck's reset first returns the topmost Undead enemy of the discard pile to the staging area. Travel: the same return is the cost (copied from 09037 with the Undead enemy).
     { id: "10103:constant:1", cardCode: "10103", lines: ["10103:A:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "returnsUndeadOnRunOut", amount: 1, until: "whileSourceInPlay", target: "table" }] },
@@ -154,7 +154,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
 
     // 10105 Centuries of Sorrow (Surge is a keyword). When Revealed: the first player chooses a quest card to be the current quest in place of the current one, if able. Shadow: with no Clue controlled by the defending player the attack is considered undefended.
     { id: "10105:whenRevealed:1", cardCode: "10105", lines: ["10105:A:2"], timing: "whenRevealed", instructions: [{ verb: "ChooseCurrentQuest" }] },
-    { id: "10105:shadow:1", cardCode: "10105", lines: ["10105:A:3"], timing: "shadow", condition: NO_CLUE, instructions: [{ verb: "ConsiderUndefended" }] },
+    { id: "10105:shadow:1", cardCode: "10105", lines: ["10105:A:3"], timing: "shadow", instructions: [{ verb: "ConsiderUndefended", when: NO_CLUE }] },
 
     // 10106 Curse of the Years. When Revealed: 1 damage to each exhausted character, then each player with a threat of 35 or higher discards each exhausted attachment he controls. Shadow: +1 Attack, +3 instead when the defending player controls no Clue.
     {

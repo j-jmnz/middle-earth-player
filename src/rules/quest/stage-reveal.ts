@@ -19,6 +19,7 @@ import { areaSeats, stageSeat } from "../families/breaking/areas.ts";
 import { payOwed } from "../families/breaking/progress.ts";
 import { fireForced } from "../windows/triggers.ts";
 import { announceStageRevealed } from "../families/nightmare/setup.ts";
+import { timeOnReveal } from "../families/angmar/time.ts";
 
 // Resolving the quest is two passes. The first adds progress, and each stage the quest advanced to has
 // its When Revealed effects pushed as frames. The second runs once those frames have popped, and ends
@@ -76,6 +77,8 @@ export function afterProgress(state: ScenarioState, before: number, ctx: ReduceC
   for (const cardId of [...advanced].reverse()) {
     const code = next.cards[cardId]?.code;
     const effects = ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "whenRevealed");
+    // A stage with Time X gets its time counters as it is revealed (10094:B:1, mec108.time-x).
+    next = timeOnReveal(next, cardId, ctx);
     // "Forced: After stage 2B is revealed" (11182:A:3) goes down first, so it resolves once the stage's When Revealed effects have.
     next = announceStageRevealed(next, cardId, ctx, steps, "afterStageRevealed");
     // A stage a seat advanced to once stages are separate is revealed by that seat (families/breaking/areas.ts).

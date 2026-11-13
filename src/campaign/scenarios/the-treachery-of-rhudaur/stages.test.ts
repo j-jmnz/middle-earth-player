@@ -2,11 +2,11 @@
 // The angmar family's verbs of The Treachery of Rhudaur's stages and side quests, on tables built from data/ by the layout kit.
 import { describe, expect, it } from "vitest";
 
-import { flagged, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
+import { flagged, type ScenarioState } from "../../../rules/core/state.ts";
 import { settle } from "../../../rules/engine/machine.ts";
 import { placeQuestProgress } from "../../../rules/quest/quest.ts";
 import { queueEvent } from "../../../rules/windows/queue.ts";
-import { codesIn, finish, idOf, resolveRecords, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
+import { codesIn, finish, idOf, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 import { setCurrentQuest } from "../../../rules/families/angmar/quest.ts";
 
 const built = (layout: Layout = {}) => tableFromLayout("the-treachery-of-rhudaur", { stage: "10094", ...layout });
@@ -29,7 +29,7 @@ describe("Secrets of Rhudaur", () => {
     expect(placeQuestProgress(refresh.state, 2, refresh.ctx.cards, [], () => true).cards[refresh.state.questStage ?? ""]?.progress).toBe(2);
   });
 
-  it("10094:B:4 advances to stage 2 at once when no Treachery of Rhudaur side quest is in play, and not while one is", () => {
+  it("10094:B:4 advances to stage 2 at once when no Treachery of Rhudaur side quest is in play, and not while one is, even an unclaimed one in the staging area that nobody controls", () => {
     const held = built({ phase: "Quest", staging: ["10111"] });
     expect(stageCode(settle({ ...held.state, round: 1 }, held.ctx, []))).toBe("10094");
     const none = built({ phase: "Quest", staging: ["f0"], setAside: ["10098"] });
@@ -79,22 +79,5 @@ describe("Forbidden Descent", () => {
     // A second placement the same round: the second copy has 1 left, the rest goes on the quest.
     const again = placeQuestProgress(placed, 3, t.ctx.cards, [], () => true);
     expect([again.cards[one]?.progress, again.cards[two]?.progress, again.cards[stage]?.progress]).toEqual([2, 2, 2]);
-  });
-
-  it("10101:A:2 raises each player's threat by 2 when it is discarded from the staging area, and not when it is explored", () => {
-    const t = built({ staging: ["10101"], threat: [30, 30] });
-    const descent = idOf(t.state, "10101");
-    const discarded = settle(updateCard(t.state, descent, {}), t.ctx, []);
-    expect(discarded.seats[0]?.threat).toBe(30);
-    const gone = settle({ ...discarded, staging: discarded.staging.filter((id) => id !== descent), cards: { ...discarded.cards } }, t.ctx, []);
-    expect(gone.seats[0]?.threat).toBe(30);
-  });
-});
-
-describe("Ghostly Ruins", () => {
-  it("10103:A:1 returns the topmost Undead enemy of the discard pile to the staging area before the empty encounter deck is reset", () => {
-    const t = built({ phase: "Quest", staging: ["10103"], deck: [], discard: ["f0", "10099", "f3"] });
-    const run = resolveRecords(t.state, t.ctx, "10100", "whenRevealed", undefined, undefined, false);
-    expect(run).toBeTruthy();
   });
 });

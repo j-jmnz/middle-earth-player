@@ -166,6 +166,8 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
     const host = idOf(state, attachment.to);
     const spawned = spawn(state, attachment.code, { zone: "play", seat: 0 });
     state = attachTo(spawned.state, spawned.id, host);
+    // An objective attached to a character is a claimed one, controlled by the character's player (The Treachery of Rhudaur's Clues).
+    if (cards.get(attachment.code)?.type === "objective") state = updateCard(state, spawned.id, { claimed: true, controller: state.cards[host]?.controller ?? 0, face: "up" });
   }
   for (const hidden of layout.under ?? []) {
     const spawned = spawn(state, hidden.code, { zone: "under", locationId: idOf(state, hidden.to) }, "down");

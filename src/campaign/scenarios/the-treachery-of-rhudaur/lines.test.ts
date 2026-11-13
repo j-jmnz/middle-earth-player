@@ -304,7 +304,7 @@ describe("the treacheries", () => {
     expect(kept.state.cards[idOf(kept.state, "10187")]?.zone).toBe("play");
   });
 
-  it("10108:A:1 exhausts a character of each player and attaches to the current quest for +6 quest points, and is discarded with no current quest", () => {
+  it("10108:A:1 exhausts a character of each player and attaches to the current quest for +6 quest points, and is discarded on stage 1 with no side quest chosen (no current quest)", () => {
     const t = built({ phase: "Quest", staging: ["10109"] });
     const chosen = setCurrentQuest(t.state, idOf(t.state, "10109"), t.ctx);
     const run = finish(resolveRecords(chosen, t.ctx, "10108", "whenRevealed", undefined, undefined, false), t.ctx);
@@ -316,11 +316,19 @@ describe("the treacheries", () => {
     expect(none.state.cards[idOf(none.state, "10108")]?.host ?? null).toBeNull();
   });
 
-  it("10105:A:2 makes the first player choose another quest card to be the current quest: a staged side quest, never the barred main quest card", () => {
+  it("10105:A:2 makes the first player choose another quest card to be the current quest: a staged side quest, never the barred main quest card (stage 1, quest phase)", () => {
     const t = built({ phase: "Quest", staging: ["10109", "10111"] });
-    const run = finish(resolveRecords(t.state, t.ctx, "10105", "whenRevealed", undefined, (state) => (state.window?.kind === "choose" ? (state.window.options[0] ?? "") : ""), false), t.ctx);
+    const offered: string[][] = [];
+    const pick = (state: ScenarioState) => {
+      if (state.window?.kind !== "choose") return "";
+      offered.push([...state.window.options]);
+      return state.window.options[0] ?? "";
+    };
+    const run = finish(resolveRecords(t.state, t.ctx, "10105", "whenRevealed", undefined, pick, false), t.ctx);
     const current = ["10109", "10111"].filter((code) => flagged(run.state, idOf(run.state, code), "currentQuest"));
     expect(current).toHaveLength(1);
+    expect(offered.flat().filter((option) => option.includes(t.state.questStage ?? "~"))).toEqual([]);
+    expect(flagged(run.state, t.state.questStage ?? "", "currentQuest")).toBe(false);
   });
 
   it("10102:A:1 lowers the Threat of Eerie Halls by 1 for a raise of 1 in threat, down to 0 and no further", () => {

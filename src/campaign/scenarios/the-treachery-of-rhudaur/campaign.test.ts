@@ -83,6 +83,11 @@ describe("The Treachery of Rhudaur in the angmar-awakened campaign", () => {
     }
   });
 
+  it("10094:B:1 puts five time counters on the stage when it is revealed after the Setup", () => {
+    const started = opened(1, ettenmoorsLog(1));
+    expect(started.cards[started.questStage ?? ""]?.resources).toBe(5);
+  });
+
   it("hands the previous parts to this one: Arnor Ravaged staged, Mysterious Omens, Fend Off Despair and the Losing Time copies shuffled in, a Determination for each player", () => {
     for (const seats of [1, 2] as const) {
       const log = ettenmoorsLog(seats);

@@ -8,6 +8,7 @@ import type { EngineStep } from "../core/intents.ts";
 import { recordStartingThreat } from "../families/quest/threat.ts";
 import { questStageStart } from "../families/quest/setup.ts";
 import { pushCardEffects } from "../interpret/effect-frames.ts";
+import { timeOnReveal } from "../families/angmar/time.ts";
 import { placeContracts } from "../families/sidequests/contract.ts";
 import { setAsideEncounterCards } from "../families/sidequests/encounter.ts";
 import { pushPlayerSetup } from "../families/sidequests/setup.ts";
@@ -218,7 +219,7 @@ export function finishSetup(state: ScenarioState, ctx: ReduceContext, steps: Eng
     );
     if (next.failure || next.lost) return next;
   }
-  if (next.questStage) next = updateCard(next, next.questStage, { face: "B" });
+  if (next.questStage) next = timeOnReveal(updateCard(next, next.questStage, { face: "B" }), next.questStage, ctx);
   // A pool card's Setup that waited for a host the quest card's Setup puts into play, and the campaign card's Setup that needs the quest card's Setup done first (ScenarioDefinition.afterSetup), go down first, so they resolve after it.
   next = attachPending(next, ctx, steps);
   next = campaignAfterSetup(next, ctx, steps);
