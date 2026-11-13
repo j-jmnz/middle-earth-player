@@ -3,7 +3,11 @@
 // ignores, a guard drawn over the objective it guards wherever it was staged, No Rest on a hero, and the owner named on each row of a pick that spans seats. The engine decided each; nothing here changes one. No control types damage, resources, threat, progress or life.
 import { describe, expect, it } from "vitest";
 
-import { updateCard, type ScenarioState } from "../../rules/core/state.ts";
+import { updateCard, withSeat, type ScenarioState } from "../../rules/core/state.ts";
+import { spawn } from "../../rules/core/zones.ts";
+import { settle } from "../../rules/engine/machine.ts";
+import { pushCardEffects } from "../../rules/interpret/effect-frames.ts";
+import { queueEvent } from "../../rules/windows/queue.ts";
 import { guardWith } from "../../rules/families/objectives/guard.ts";
 import { crowdedTable } from "../layout/crowded-table.ts";
 import { tableLayout } from "../layout/layout.ts";
@@ -167,6 +171,43 @@ describe("No Rest on a hero", () => {
     expect(state.cards[rest]?.host).toBe(t.hero2);
     expect(detail(rest)).toBe("On Aragorn: Aragorn cannot ready and collects no resources in the resource phase. It is discarded when the players travel to a safe location.");
     expect(detail(t.hero2)).toBe("No Rest: it cannot ready and collects no resources. No Rest is discarded when the players travel to a safe location.");
+  });
+});
+
+describe("the rows that can destroy a character or eliminate a player warn", () => {
+  const names = (state: ScenarioState): SheetNames => ({ card: (id) => (state.cards[id]?.code === "10067" ? "Amarthiúl" : (state.cards[id]?.code ?? id)), line: () => null });
+  const opened = (t: ReturnType<typeof at>, code: string, timing: "forced" | "whenRevealed", state: ScenarioState = t.state): ScenarioState => {
+    const spawned = spawn(state, code, { zone: "staging" });
+    const effects = t.ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === timing);
+    const pushed = pushCardEffects(spawned.state, timing, spawned.id, 0, false, effects, t.ctx, []);
+    return settle({ ...pushed, window: null, mode: "stopped" }, t.ctx, []);
+  };
+  const sheetOf = (t: ReturnType<typeof at>, state: ScenarioState) => sheetFor(state, t.ctx, legalIntents(state, t.ctx), names(state)) as PickSheet;
+
+  it("10073:A:1 warns on a character that one more damage destroys, and says the game is lost for Amarthiúl", () => {
+    const t = at({ play: ["10067"] });
+    const worn = updateCard(updateCard(t.state, t.hero, { damage: 5 }), idOf(t.state, "10067"), { damage: 2 });
+    const cautions = Object.fromEntries(sheetOf(t, opened(t, "10073", "forced", worn)).options.map((option) => [option.label, option.caution]));
+    expect(cautions).toEqual({ dh1: "Tap again: dh1 is destroyed", dh2: undefined, Amarthiúl: "Tap again: Amarthiúl is destroyed and the game is lost" });
+    const fresh = Object.values(sheetOf(t, opened(t, "10073", "forced")).options).map((option) => option.caution);
+    expect(fresh.every((caution) => caution === undefined)).toBe(true);
+  });
+
+  it("10183:A:2 warns before a raise of 3 that takes a player to 50, from 47 up", () => {
+    const t = at();
+    const at47 = (threat: number): ScenarioState => withSeat(t.state, 0, { ...t.state.seats[0]!, threat });
+    const raise = (threat: number) => sheetOf(t, opened(t, "10183", "whenRevealed", at47(threat))).options.find((option) => option.label === "Raise your threat by 3")?.caution;
+    expect(raise(47)).toBe("Tap again: this takes your threat to 50 and eliminates you. If you are the last player, the game is lost");
+    expect(raise(46)).toBeUndefined();
+  });
+
+  it("10078:A:1 names the ally that entered play on both rows and warns when the damage destroys it", () => {
+    const t = at({ staging: ["10078"], play: ["ally"] });
+    const ally = idOf(t.state, "ally");
+    const ask = (state: ScenarioState) => settle({ ...queueEvent(state, { trigger: "enteredPlay", seat: 0, cardId: ally }), window: null, mode: "stopped" }, t.ctx, []);
+    const rows = (state: ScenarioState) => sheetOf(t, ask(state)).options.map((option) => [option.label, option.caution]);
+    expect(rows(t.state)).toEqual([["Exhaust ally", undefined], ["Deal ally 1 damage", undefined]]);
+    expect(rows(updateCard(t.state, ally, { damage: 9 }))).toEqual([["Exhaust ally", undefined], ["Deal ally 1 damage", "Tap again: the damage destroys ally"]]);
   });
 });
 

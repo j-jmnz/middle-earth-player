@@ -27,7 +27,7 @@ import { askedSeat, seatSays } from "./seat.ts";
 export type Text = string | readonly { when?: Condition; text: string }[];
 
 /**
- * One entry of an asks file. Templates hold `{card}` (the card the record is on), `{owner}` ("Player N", the seat asked), `{picked}` (the card of the row a caution is about: a caution's text only), `{host}` (the card the record's card lies on), `{pair}` (the Embassy's pair being decided: the player card with its owner and the encounter card it is paired with) and `{ringBearer}` (the hero with the Ring-bearer trait), `{n}` (what the instruction after a Pick deals or places, read now: a Pick's entry only, a Choose
+ * One entry of an asks file. Templates hold `{card}` (the card the record is on), `{owner}` ("Player N", the seat asked), `{picked}` (the card of the row a caution is about: a caution's text only), `{host}` (the card the record's card lies on), `{subject}` (the card that triggered the record: the ally that entered play), `{pair}` (the Embassy's pair being decided: the player card with its owner and the encounter card it is paired with) and `{ringBearer}` (the hero with the Ring-bearer trait), `{n}` (what the instruction after a Pick deals or places, read now: a Pick's entry only, a Choose
  * has none), `{left}` (the damage an AssignDamage still has to place, counting the step asked: its note only), `{pursuitLimit}` (the value at which the players lose, in a scenario with a pursuit tracker) and a `{name}` for each key of `bind`. Every `Text` below is a template or variants.
  * - `note`: the sentence over a Pick or a Choose (the entry keyed with the instruction's verb).
  * - `why`: the reason the window opened. It is said after the card's title and before the note, "Card: why note" ("Player 1, Card: why note" when owned and two-handed).
@@ -92,9 +92,9 @@ export function templatesOf(entry: Ask): string[] {
   return [...textsOf(entry.note), ...(entry.why == null ? [] : [entry.why]), ...textsOf(entry.label), ...Object.values(entry.labels ?? {}).flatMap(textsOf), ...textsOf(entry.caution?.text)];
 }
 
-/** The placeholders of an entry that no value answers: none of `card`, `owner`, `picked`, `host`, `ringBearer`, `n` (only where `withN`: a Pick has what its next instruction deals, a Choose has nothing), `pursuitLimit` and its `bind` and `named` names. */
+/** The placeholders of an entry that no value answers: none of `card`, `owner`, `picked`, `host`, `subject`, `ringBearer`, `n` (only where `withN`: a Pick has what its next instruction deals, a Choose has nothing), `pursuitLimit` and its `bind` and `named` names. */
 export function unknownPlaceholders(entry: Ask, withN = true): string[] {
-  const known = new Set(["card", "owner", "picked", "host", "ringBearer", "pair", "left", "pursuitLimit", ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {}), ...Object.keys(entry.named ?? {})]);
+  const known = new Set(["card", "owner", "picked", "host", "subject", "ringBearer", "pair", "left", "pursuitLimit", ...(withN ? ["n"] : []), ...Object.keys(entry.bind ?? {}), ...Object.keys(entry.named ?? {})]);
   return [...new Set(templatesOf(entry).flatMap(placeholdersOf))].filter((name) => !known.has(name));
 }
 
@@ -147,6 +147,8 @@ export function askValues(a: AskFacts, entry: Ask): { values: Values; scope: Ret
   // An AssignDamage not yet split into steps holds all of its amount.
   if (a.instruction.verb === "AssignDamage") values.left = a.instruction.left ?? resolveAmount(a.game, a.instruction.amount, scope, a.ctx);
   values.host = hostId ? a.names.card(hostId) : "Its host";
+  // The card that triggered the record (Barren Moorland's ally), named only where an entry says it.
+  if (templatesOf(entry).some((template) => placeholdersOf(template).includes("subject"))) values.subject = scope.subject ? a.names.card(scope.subject) : "that card";
   if (templatesOf(entry).some((template) => placeholdersOf(template).includes("ringBearer"))) {
     const bearer = ringBearerId(a.game, a.ctx);
     values.ringBearer = bearer ? a.names.card(bearer) : "The Ring-bearer";
@@ -169,7 +171,7 @@ function found(a: AskFacts, tail: string | undefined, table?: AsksTable): Hit | 
 }
 
 // What a condition of the entry reads: the seat asked, the card the record is on, and the row a caution is about.
-const scopeOf = (a: AskFacts, hit: Hit, picked?: string) => ({ actor: hit.scope.actor, sourceId: a.source, returned: 0, ...(picked ? { picked: [picked] } : hit.scope.picked ? { picked: hit.scope.picked } : {}) });
+const scopeOf = (a: AskFacts, hit: Hit, picked?: string) => ({ actor: hit.scope.actor, sourceId: a.source, returned: 0, ...(hit.scope.subject ? { subject: hit.scope.subject } : {}), ...(picked ? { picked: [picked] } : hit.scope.picked ? { picked: hit.scope.picked } : {}) });
 
 // A `Text` as it reads now: the first variant whose condition holds, filled. `picked` is the row a caution is about. Null when no variant holds or a placeholder has no value.
 function said(a: AskFacts, hit: Hit, text: Text, picked?: string): string | null {
