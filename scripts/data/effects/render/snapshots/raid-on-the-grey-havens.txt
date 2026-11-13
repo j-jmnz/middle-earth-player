@@ -406,8 +406,8 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 11182:A:2 (front): Setup: The first player takes control of Calphon and attaches Spyglass and Black Key (boon) to him. Shuffle Graxar into the encounter deck. Each player may choose one copy of Galdor's Counsel and add it to their hand. For this game, X is plus 1 for each of those copies.
   11182:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAside {"verb":"SetAside","code":"11180"}]
-    - [json SetAside {"verb":"SetAside","code":"11183"}]
+    - a copy of the card with code 11180 is set aside, out of play
+    - a copy of the card with code 11183 is set aside, out of play
     - [json PutObjectiveAllyIntoPlay {"verb":"PutObjectiveAllyIntoPlay","code":"110013"}]
     - a card with code 11188 from the box joins the encounter deck, which is shuffled
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11180","to":"Calphon"}]
@@ -481,4 +481,4 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     only if all of: (this card is engaged with the player) and (this card is a enemy (any player controls) with a shadow card)
     - place shadowCards of this card resource tokens on this card
 
-(rendered pieces: 276 by template, 57 as JSON)
+(rendered pieces: 278 by template, 55 as JSON)

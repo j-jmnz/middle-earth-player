@@ -140,7 +140,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
   145049:forced:1: Forced after this location becomes the active location (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the encounter discard pile into the encounter deck
-    - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy"}]
+    - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
     - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
 
 ## 145050 The Black Serpent
@@ -407,7 +407,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
 145073:B:2 (back): Forced: At the end of the planning phase, place 1 progress here.
   145073:forced:1: Forced at the end of the phase
     only if it is the Planning phase
-    - [json AddStageProgress {"verb":"AddStageProgress","amount":1}]
+    - 1 progress is placed on the current quest stage (a quest effect: a full stage advances)
 
 ## 145074 Retreat from Osgiliath
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -553,7 +553,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
   145079:forced:1: Forced when a phase begins
     only if it is the Quest phase
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy"}]
+    - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
     - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
 
 ## 145080 The Witch-king
@@ -569,4 +569,4 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     - [json EngageFirstPlayer {"verb":"EngageFirstPlayer"}]
     - then, if this card is engaged with the player (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
-(rendered pieces: 302 by template, 49 as JSON)
+(rendered pieces: 305 by template, 46 as JSON)

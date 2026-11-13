@@ -8,10 +8,10 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 12175:A:2 (front): Setup: A player may search their deck for a unique boon ally and add it to their hand. If "Melanwar has given you guidance on traversing Wilderland," search the encounter deck for 2 non-unique locations and the Caves deck for 1 location and remove them from the game. If "Isolde is on the hunt," search the encounter deck for 3 non-unique enemies and remove them from the game. Flip this card over.
   12175:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAside {"verb":"SetAside","code":"12176"}]
-    - [json SetAside {"verb":"SetAside","code":"12177"}]
-    - [json SetAside {"verb":"SetAside","code":"12178"}]
-    - [json SetAside {"verb":"SetAside","code":"12179"}]
+    - a copy of the card with code 12176 is set aside, out of play
+    - a copy of the card with code 12177 is set aside, out of play
+    - a copy of the card with code 12178 is set aside, out of play
+    - a copy of the card with code 12179 is set aside, out of play
     - [json SearchBoonAllyToHand {"verb":"SearchBoonAllyToHand"}]
     - if the Campaign Log holds "melanwar": remove 2 non-unique locations from the encounter deck
     - [json RemoveFromCavesIfLogged {"verb":"RemoveFromCavesIfLogged","line":"melanwar","count":1,"cardType":"location"}]
@@ -130,7 +130,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 
 19012:A:1 (front): Guarded (enemy).
   19012:whenRevealed:1: When revealed
-    - [json GuardObjective {"verb":"GuardObjective","types":["enemy"]}]
+    - the Guarded keyword: this objective in the staging area is guarded by the first encounter enemy discarded from the deck, added to the staging area
 
 19012:A:2 (front): Attached enemy or location is immune to player card effects.
   19012:constant:1: Constant
@@ -220,7 +220,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
   19018:travel:1: Travel
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the encounter discard pile into the encounter deck
-    - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy"}]
+    - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
     - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
 
 ## 19019 High Falls
@@ -281,7 +281,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
     - [json ShuffleSetAsideIntoPile {"verb":"ShuffleSetAsideIntoPile","pile":"caves","code":"19012","count":2}]
     - shuffle the encounter deck
     - for each player, first player first:
-      - [json DiscardUntil {"verb":"DiscardUntil","type":"location"}]
+      - cards are discarded from the top of the encounter deck until a location is discarded, or the deck is empty; that card becomes the picked card
       - then, if the picked card is a location (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
 
 19022:B:1 (back): Forced: After the active location is explored, look at the top 3 cards of the encounter deck. Reveal 1 of those cards and discard the rest.
@@ -338,7 +338,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
     - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"19011","keepDamage":true}]
     - shuffle the encounter discard pile into the encounter deck
     - for each player, first player first:
-      - [json DiscardUntil {"verb":"DiscardUntil","type":"location"}]
+      - cards are discarded from the top of the encounter deck until a location is discarded, or the deck is empty; that card becomes the picked card
       - then, if the picked card is a location (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
 
 19024:B:1 (back): Forced: After the active location is explored, look at the top 3 cards of the encounter deck. Reveal 1 of those cards and discard the rest.
@@ -390,4 +390,4 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
     - later, at the end of this phase:
       - the players win the game
 
-(rendered pieces: 275 by template, 64 as JSON)
+(rendered pieces: 283 by template, 56 as JSON)

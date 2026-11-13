@@ -14,7 +14,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 120165:A:3 (front): Response: After you explore a non-unique location, put a resource here. Then, if there are X resources here, the players look at 3 random undiscovered treasures and choose 1 to attach to an eligible character. X is 3 more than the number of players in the game.
   120165:response:1: Response on the event locationExplored (heard about non-unique location (any player controls))
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json PlaceToken {"verb":"PlaceToken","amount":1}]
+    - 1 resource token(s) are placed on this card
     - [json ClaimRandomTreasure {"verb":"ClaimRandomTreasure","count":3,"when":{"kind":"all","conditions":[{"kind":"less","left":{"players":true,"plus":2},"right":{"stat":"resources","of":"self"}},{"kind":"less","left":{"stat":"resources","of":"self"},"right":{"players":true,"plus":4}}]}}]
     - then, if all of: (the number of players + 2 is less than resources of this card) and (resources of this card is less than the number of players + 4) (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) chosen by the first player [also {"hostForPicked":true}]
     - [json AttachPicked {"verb":"AttachPicked","when":{"kind":"all","conditions":[{"kind":"less","left":{"players":true,"plus":2},"right":{"stat":"resources","of":"self"}},{"kind":"less","left":{"stat":"resources","of":"self"},"right":{"players":true,"plus":4}}]}}]
@@ -227,20 +227,20 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
 18066:A:1 (front): Setup: Set Woodmen Village and The Old Ford aside, out of play. Create the Evil Creatures deck (see insert) and place it next to the quest deck. Shuffle the encounter deck and discard cards from the top until X locations are discarded, where X is the number of players. Add each discarded location to the staging area.
   18066:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAside {"verb":"SetAside","code":"18069"}]
-    - [json SetAside {"verb":"SetAside","code":"18016"}]
+    - a copy of the card with code 18069 is set aside, out of play
+    - a copy of the card with code 18016 is set aside, out of play
   18066:setup:2: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the evilCreatures deck
     - shuffle the encounter deck
     - repeat the number of players times:
-      - [json DiscardUntil {"verb":"DiscardUntil","type":"location"}]
+      - cards are discarded from the top of the encounter deck until a location is discarded, or the deck is empty; that card becomes the picked card
       - the picked card goes to the staging area (it is not revealed)
 
 18066:B:1 (back): Forced: After placing progress here from questing successfully, place 1 resource here.
   18066:forced:1: Forced on the event progressPlaced (heard about this card)
     only if all of: (it is the Quest phase) and (the quest succeeded)
-    - [json PlaceToken {"verb":"PlaceToken","amount":1}]
+    - 1 resource token(s) are placed on this card
 
 18066:B:2 (back): Forced: At the beginning of the encounter phase, remove 1 resource from this stage. Then, add the top card of the Evil Creatures deck to the staging area.
   18066:forced:2: Forced when a phase begins
@@ -332,4 +332,4 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
   18070:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
     - the players lose the game
 
-(rendered pieces: 191 by template, 33 as JSON)
+(rendered pieces: 196 by template, 28 as JSON)

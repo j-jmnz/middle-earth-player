@@ -88,11 +88,11 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
   11197:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json KeepCampaignCard {"verb":"KeepCampaignCard"}]
-    - [json SetAside {"verb":"SetAside","code":"11180"}]
-    - [json SetAside {"verb":"SetAside","code":"11183"}]
-    - [json SetAside {"verb":"SetAside","code":"11198"}]
-    - [json SetAside {"verb":"SetAside","code":"11199"}]
-    - [json SetAside {"verb":"SetAside","code":"11199"}]
+    - a copy of the card with code 11180 is set aside, out of play
+    - a copy of the card with code 11183 is set aside, out of play
+    - a copy of the card with code 11198 is set aside, out of play
+    - a copy of the card with code 11199 is set aside, out of play
+    - a copy of the card with code 11199 is set aside, out of play
     - a card with code 11181 from the box joins the encounter deck, which is shuffled
     - [json FlipSetAside {"verb":"FlipSetAside","name":"Temple Guardian"}]
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11183","to":"Captain Sahír"}]
@@ -386,8 +386,8 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
   12076:forced:1: Forced when a phase begins
     only if all of: (it is the Encounter phase) and (this card is in the staging area) and (the active location is a Ruins location (any player controls))
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json PickHighestThreat {"verb":"PickHighestThreat"}]
-    - [json SwitchActor {"verb":"SwitchActor","to":"picked"}]
+    - the player with the highest threat becomes the picked player (the first player chooses among a tie)
+    - the effect goes on with the picked player as the acting player
     - engage this card
     - [json DealShadow {"verb":"DealShadow","additional":true}]
     - [json DealShadow {"verb":"DealShadow","additional":true}]
@@ -460,4 +460,4 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
     - then, if the active location is a Ruins location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): for each hero (any player controls) with resources on it:
       - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"picked"}]
 
-(rendered pieces: 234 by template, 76 as JSON)
+(rendered pieces: 241 by template, 69 as JSON)

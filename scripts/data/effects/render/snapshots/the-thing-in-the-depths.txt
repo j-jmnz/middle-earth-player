@@ -40,10 +40,10 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 11194:A:1 (front): You are playing Campaign Mode.
   11194:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAside {"verb":"SetAside","code":"11183"}]
-    - [json SetAside {"verb":"SetAside","code":"11192"}]
-    - [json SetAside {"verb":"SetAside","code":"11195"}]
-    - [json SetAside {"verb":"SetAside","code":"11196"}]
+    - a copy of the card with code 11183 is set aside, out of play
+    - a copy of the card with code 11192 is set aside, out of play
+    - a copy of the card with code 11195 is set aside, out of play
+    - a copy of the card with code 11196 is set aside, out of play
     - [json FlipSetAside {"verb":"FlipSetAside","name":"The Thing in the Depths"}]
 
 11194:A:2 (front): Forced: After Captain Sahír (enemy) enters play, attach Black Key (burden) to him.
@@ -371,4 +371,4 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
       - choose enemy (any player controls) or in the staging area, named "The Thing in the Depths"
       - the picked enemy attacks the acting player now, from the staging area
 
-(rendered pieces: 163 by template, 39 as JSON)
+(rendered pieces: 167 by template, 35 as JSON)

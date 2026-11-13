@@ -62,7 +62,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 11025:B:2 (back): Forced: After a location is explored, add progress to Explore the Island equal to that location's printed quest points.
   11025:forced:1: Forced after a card leaves play (heard about location (any player controls))
     only if the card the event is about had enough progress to be explored
-    - [json AddStageProgress {"verb":"AddStageProgress","amount":{"stat":"questPoints","of":"subject","printed":true}}]
+    - progress equal to printed quest points of the card the event is about is placed on the current quest stage (a quest effect: a full stage advances)
 
 11025:B:3 (back): Forced: When an Uncharted location becomes the active location, add 1 copy of Lost Island from the top of the Uncharted deck to the staging area.
   11025:forced:2: Forced after this location becomes the active location (heard about location (any player controls) [also {"uncharted":true}])
@@ -81,7 +81,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
 11026:B:1 (back): Forced: After a location is explored, if it would be shuffled into the Uncharted deck, add it to the victory display, instead.
   11026:forced:1: Forced after a card leaves play (heard about location (any player controls))
     only if all of: (the card the event is about had enough progress to be explored) and (the card the event is about is a location (any player controls) [also {"uncharted":true}])
-    - [json AddToVictory {"verb":"AddToVictory","target":"subject"}]
+    - the card the event is about is added to the victory display
 
 11026:B:2 (back): The players cannot defeat this stage unless Shrine to Morgoth is in the victory display. When Shrine to Morgoth is added to the victory display, the players win the game.
   11026:constant:1: Constant
@@ -434,7 +434,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
   11179:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json KeepCampaignCard {"verb":"KeepCampaignCard"}]
-    - [json SetAside {"verb":"SetAside","code":"11180"}]
+    - a copy of the card with code 11180 is set aside, out of play
     - a card with code 11181 from the box joins the encounter deck, which is shuffled
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11180","to":"Calphon"}]
     - [json TradeDamageForThreat {"verb":"TradeDamageForThreat","damage":1,"threat":1}]
@@ -463,4 +463,4 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
   11179:resolution:5: Resolution
     - [json GainXp {"verb":"GainXp","amount":-1,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Ominous Fate"]},"min":1}}]
 
-(rendered pieces: 196 by template, 82 as JSON)
+(rendered pieces: 200 by template, 79 as JSON)

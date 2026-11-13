@@ -8,8 +8,8 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json ShuffleBurdenDeck {"verb":"ShuffleBurdenDeck"}]
     - [json AttachToRingBearer {"verb":"AttachToRingBearer","code":"141057"}]
-    - [json SetAside {"verb":"SetAside","code":"141059"}]
-    - [json SetAside {"verb":"SetAside","code":"141068"}]
+    - a copy of the card with code 141059 is set aside, out of play
+    - a copy of the card with code 141068 is set aside, out of play
     - the card with code 141058 is added to the staging area (the copy a Setup search found, else one the Setup deals)
     - the card with code 141063 is added to the staging area (the copy a Setup search found, else one the Setup deals)
     - [json SetLife {"verb":"SetLife","value":15}]
@@ -67,7 +67,7 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
 141057:A:1 (front): Attach to the Ring-bearer. Attached hero cannot be healed.
   141057:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AttachesTo {"verb":"AttachesTo","host":{"kind":"ringBearer"}}]
+    - this attachment may be attached to a Ring-bearer
     - its host: stat cannotBeHealed 1, while this card is in play
 
 141057:A:2 (front): When attached hero would take any amount of damage, reduce the Ring-bearer's life by an equal amount instead.
@@ -304,4 +304,4 @@ Scenario piles that place cards with no record (quest: 141028 Pursued by the Ene
   141084:shadow:1: Shadow
     - the acting player discards 1 random card(s) from hand
 
-(rendered pieces: 122 by template, 32 as JSON)
+(rendered pieces: 125 by template, 29 as JSON)

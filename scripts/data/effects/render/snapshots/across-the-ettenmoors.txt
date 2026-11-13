@@ -1,0 +1,431 @@
+Scenario piles that place cards with no record (quest: 10064 Into the Ettenmoors; quest: 10065 A Miserable Journey; quest: 10066 Journey's End; staging: 10072 Savage Trollspawn; setAside: 10067 Amarthiúl; setAside: 10068 Secluded Cave; setAside: 10069 The Hoarwell; setAside: 10070 Abandoned Camp; setAside: 10071 Patch of Woods; setAside: 10081 Lie Low; setAside: 10082 Forage for Food; setAside: 10083 Scavenge for Supplies)
+
+## 10064 Into the Ettenmoors
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+10064:A:1 (front): Setup: Set aside each of the 3 Across the Ettenmoors side quests and each of the 4 locations with the safe keyword. Reveal 1 of those side quests at random and 1 of those safe locations at random, adding them to the staging area with the safe location guarded by the side quest. Search the encounter deck for 1 copy of Savage Trollspawn per player and add them to the staging area. Shuffle the remaining side quests and safe locations back into the encounter deck. The first player gains control of Amarthiúl.
+  10064:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - of the set-aside encounter side quests one, and of the set-aside objective-locations one, are picked at random (the game's seed) and added to the staging area (not revealed), the side quest attached to the location as its guard
+    - one set-aside copy of the card with code 10081 is shuffled into the encounter deck (nothing with none set aside)
+    - one set-aside copy of the card with code 10082 is shuffled into the encounter deck (nothing with none set aside)
+    - one set-aside copy of the card with code 10083 is shuffled into the encounter deck (nothing with none set aside)
+    - one set-aside copy of the card with code 10068 is shuffled into the encounter deck (nothing with none set aside)
+    - one set-aside copy of the card with code 10069 is shuffled into the encounter deck (nothing with none set aside)
+    - one set-aside copy of the card with code 10070 is shuffled into the encounter deck (nothing with none set aside)
+    - one set-aside copy of the card with code 10071 is shuffled into the encounter deck (nothing with none set aside)
+    - shuffle the encounter deck
+    - the set-aside card titled "Amarthiúl" is put into play under the first player
+
+10064:B:1 (back): Forced: At the beginning of the quest phase, if there are no encounter side quests in play, discard cards from the top of the encounter deck until a side quest is discarded, reveal it, and add it to the staging area.
+  10064:forced:1: Forced when a phase begins
+    only if all of: (it is the Quest phase) and (the number of card (any player controls) of card type encounter-side-quest is at most 0)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - cards are discarded from the top of the encounter deck until a side quest is discarded, or the deck is empty; that card becomes the picked card
+    - the picked card is revealed by the acting player as an encounter card, wherever it lies: Surge and Doomed, When Revealed effects and the Responses to a reveal resolve, and it ends where its type puts it (nothing with no card picked)
+
+10064:B:2 (back): Forced: When a side quest is defeated, place progress tokens on Into the Ettenmoors equal to that side quest's quest points.
+  10064:forced:2: Forced on the event questCardDefeated (heard about card (any player controls) of card type encounter-side-quest)
+    - progress equal to printed quest points of the card the event is about is placed on the current quest stage (a quest effect: a full stage advances)
+  10064:forced:3: Forced on the event questCardDefeated (heard about card (any player controls) of card type player-side-quest)
+    - progress equal to printed quest points of the card the event is about is placed on the current quest stage (a quest effect: a full stage advances)
+
+## 10065 A Miserable Journey
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+10065:A:1 (front): When Revealed: Shuffle the encounter discard pile into the encounter deck. Discard cards from the top of the encounter deck until a side quest is discarded. Reveal that side quest and add it to the staging area, if able.
+  10065:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - cards are discarded from the top of the encounter deck until a side quest is discarded, or the deck is empty; that card becomes the picked card
+    - the picked card is revealed by the acting player as an encounter card, wherever it lies: Surge and Doomed, When Revealed effects and the Responses to a reveal resolve, and it ends where its type puts it (nothing with no card picked)
+
+10065:B:1 (back): Reveal 1 additional encounter card during the quest phase unless there is an active location with the safe keyword.
+  10065:forced:1: Forced when a phase begins
+    only if all of: (it is the Quest phase) and (no location with the safe keyword is the active location)
+    - reveal 1 additional encounter card(s) in the staging step this phase
+
+## 10066 Journey's End
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+10066:A:1 (front): When Revealed: Shuffle the encounter discard pile into the encounter deck. Discard cards from the top of the encounter deck until a side quest is discarded. Reveal that side quest and add it to the staging area, if able.
+  10066:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the encounter discard pile into the encounter deck
+    - cards are discarded from the top of the encounter deck until a side quest is discarded, or the deck is empty; that card becomes the picked card
+    - the picked card is revealed by the acting player as an encounter card, wherever it lies: Surge and Doomed, When Revealed effects and the Responses to a reveal resolve, and it ends where its type puts it (nothing with no card picked)
+
+10066:B:1 (back): Each damaged character gets -2 Willpower unless there is an active location with the safe keyword.
+  10066:constant:1: Constant
+    only if no location with the safe keyword is the active location
+    - each damaged character (any player controls): stat willpower -2, while this card is in play
+
+10066:B:2 (back): If the players defeat this stage, they have escaped the Ettenmoors with their lives, and win the game.
+  10066:questResolution:1: Quest resolution
+    - the players win the game
+
+## 10067 Amarthiúl
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+10067:A:1 (front): Response: After an enemy engages a player, give control of Amarthiúl to that player.
+  10067:response:1: Response after an enemy engages a player (event happened to another player)
+    - control of this card goes to the player the event happened to
+
+10067:A:2 (front): If Amarthiúl leaves play, the players lose the game.
+  10067:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    - the players lose the game
+
+## 10068 Secluded Cave
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+10068:A:1 (front): Guarded. Safe.
+  10068:whenRevealed:1: When revealed
+    - the Guarded keyword: this objective in the staging area is guarded by the next encounter card of the deck that is not an objective, revealed and attached to it
+  10068:constant:1: Constant
+    - (rule marker) this card has the Safe keyword: when the players travel to it all engaged enemies return to the staging area, and while it is the active location treacheries' When Revealed effects are ignored, encounter side quests' text boxes are blank and enemies make no engagement checks (its other lines say each)
+  10068:constant:2: Constant
+    only if this card is the active location
+    - the table: stat noEngagementChecks 1, while this card is in play
+  10068:constant:3: Constant
+    only if this card is the active location
+    - the table: stat treacheryRevealIgnored 1, while this card is in play
+  10068:constant:4: Constant
+    only if this card is the active location
+    - each card (any player controls) of card type encounter-side-quest: stat blankText (its text box is blank) 1, while this card is in play
+  10068:forced:1: Forced after the players travel
+    - return every enemy engaged with a player to the staging area
+  10068:forced:2: Forced at the end of the phase
+    only if all of: (it is the Quest phase) and (this card is the active location)
+    - this card is added to the victory display
+
+10068:A:2: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+10068:A:3 (front): Response: After you travel to Secluded Cave, each player draws 3 cards.
+  10068:response:1: Response after the players travel
+    - for each player, first player first:
+      - the acting player draws 3 card(s)
+
+## 10069 The Hoarwell
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+10069:A:1 (front): Guarded. Safe.
+  10069:whenRevealed:1: When revealed
+    - the Guarded keyword: this objective in the staging area is guarded by the next encounter card of the deck that is not an objective, revealed and attached to it
+  10069:constant:1: Constant
+    - (rule marker) this card has the Safe keyword: when the players travel to it all engaged enemies return to the staging area, and while it is the active location treacheries' When Revealed effects are ignored, encounter side quests' text boxes are blank and enemies make no engagement checks (its other lines say each)
+  10069:constant:2: Constant
+    only if this card is the active location
+    - the table: stat noEngagementChecks 1, while this card is in play
+  10069:constant:3: Constant
+    only if this card is the active location
+    - the table: stat treacheryRevealIgnored 1, while this card is in play
+  10069:constant:4: Constant
+    only if this card is the active location
+    - each card (any player controls) of card type encounter-side-quest: stat blankText (its text box is blank) 1, while this card is in play
+  10069:forced:1: Forced after the players travel
+    - return every enemy engaged with a player to the staging area
+  10069:forced:2: Forced at the end of the phase
+    only if all of: (it is the Quest phase) and (this card is the active location)
+    - this card is added to the victory display
+
+10069:A:2: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+10069:A:3 (front): Response: After you travel to The Hoarwell, heal 1 damage from each character in play.
+  10069:response:1: Response after the players travel
+    - for each character (any player controls):
+      - heal 1 damage from the picked card
+
+## 10070 Abandoned Camp
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+10070:A:1 (front): Guarded. Safe.
+  10070:whenRevealed:1: When revealed
+    - the Guarded keyword: this objective in the staging area is guarded by the next encounter card of the deck that is not an objective, revealed and attached to it
+  10070:constant:1: Constant
+    - (rule marker) this card has the Safe keyword: when the players travel to it all engaged enemies return to the staging area, and while it is the active location treacheries' When Revealed effects are ignored, encounter side quests' text boxes are blank and enemies make no engagement checks (its other lines say each)
+  10070:constant:2: Constant
+    only if this card is the active location
+    - the table: stat noEngagementChecks 1, while this card is in play
+  10070:constant:3: Constant
+    only if this card is the active location
+    - the table: stat treacheryRevealIgnored 1, while this card is in play
+  10070:constant:4: Constant
+    only if this card is the active location
+    - each card (any player controls) of card type encounter-side-quest: stat blankText (its text box is blank) 1, while this card is in play
+  10070:forced:1: Forced after the players travel
+    - return every enemy engaged with a player to the staging area
+  10070:forced:2: Forced at the end of the phase
+    only if all of: (it is the Quest phase) and (this card is the active location)
+    - this card is added to the victory display
+
+10070:A:2: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+10070:A:3 (front): Response: After you travel to Abandoned Camp, each player may return 1 card from his discard pile to his hand.
+  10070:response:1: Response after the players travel
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "return" (only if there is a card (you control) in the discard pile to choose):
+          - choose card (you control) in the discard pile
+          - move the picked card to hand
+        * option "skip":
+
+## 10071 Patch of Woods
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+10071:A:1 (front): Guarded. Safe.
+  10071:whenRevealed:1: When revealed
+    - the Guarded keyword: this objective in the staging area is guarded by the next encounter card of the deck that is not an objective, revealed and attached to it
+  10071:constant:1: Constant
+    - (rule marker) this card has the Safe keyword: when the players travel to it all engaged enemies return to the staging area, and while it is the active location treacheries' When Revealed effects are ignored, encounter side quests' text boxes are blank and enemies make no engagement checks (its other lines say each)
+  10071:constant:2: Constant
+    only if this card is the active location
+    - the table: stat noEngagementChecks 1, while this card is in play
+  10071:constant:3: Constant
+    only if this card is the active location
+    - the table: stat treacheryRevealIgnored 1, while this card is in play
+  10071:constant:4: Constant
+    only if this card is the active location
+    - each card (any player controls) of card type encounter-side-quest: stat blankText (its text box is blank) 1, while this card is in play
+  10071:forced:1: Forced after the players travel
+    - return every enemy engaged with a player to the staging area
+  10071:forced:2: Forced at the end of the phase
+    only if all of: (it is the Quest phase) and (this card is the active location)
+    - this card is added to the victory display
+
+10071:A:2: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+10071:A:3 (front): Response: After you travel to Patch of Woods, each player adds 1 resource to each of his heroes' resource pools.
+  10071:response:1: Response after the players travel
+    - for each player, first player first:
+      - each hero the acting player controls gains 1 resource(s)
+
+## 10072 Savage Trollspawn
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+10072:A:1 (front): Savage Trollspawn gets +1 Attack for each damaged character the engaged player controls.
+  10072:constant:1: Constant
+    only if this card is engaged with the player
+    - this card: stat attack the number of damaged character (you control), while this card is in play
+
+10072:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each damaged character the defending player controls.
+  10072:shadow:1: Shadow
+    - the attacking enemy: stat attack the number of damaged character (you control), until the end of the attack
+
+## 10073 Coldfell Giant
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10073:A:1 (front): Forced: After Coldfell Giant engages you, deal 1 damage to 3 different characters you control.
+  10073:forced:1: Forced after an enemy engages a player (heard about this card)
+    - repeat 3 times:
+      - if there is a character (you control) other than the cards this effect already picked to choose: choose character (you control) other than the cards this effect already picked
+      - then, if there is a character (you control) other than the cards this effect already picked to choose (checked when this step runs, after the steps above; not tied to whether they did anything): deal 1 damage to the picked card
+
+10073:A:2 (shadow): Shadow: If the defending character has at least 1 damage token on it, attacking enemy makes an additional attack after this one.
+  10073:shadow:1: Shadow
+    - if the defender is a damaged character (any player controls): when the attack in progress ends:
+      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
+
+## 10074 Cruel Mountain-troll
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10074:A:1 (front): For each excess point of combat damage dealt by Cruel Mountain-troll (damage that is dealt beyond the remaining hit points of the character damaged by its attack) you must remove 1 progress from each quest card in play.
+  10074:constant:1: Constant
+    - this card: stat excessToEachQuest 1, while this card is in play
+
+## 10075 Ruthless Hill-troll
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10075:A:1 (front): Ruthless Hill-troll gets +2 Attack and +2 Defense while it has 3 or more damage on it.
+  10075:constant:1: Constant
+    only if this card is a enemy (any player controls) with at least 3 damage on it
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card: stat attack 2, while this card is in play
+    - this card: stat defense 2, while this card is in play
+
+10075:A:2 (shadow): Shadow: Shuffle 1 location with the safe keyword (but not its attached encounter) back into the encounter deck.
+  10075:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose objective (any player controls) with the safe keyword
+    - the encounter cards that guard the picked card stay in the staging area and no longer guard it
+    - the picked card is shuffled into the encounter deck
+
+## 10076 Goblin Pursuer
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10076:A:1 (front): Damaged characters cannot be declared as attackers or defenders against Goblin Pursuer.
+  10076:constant:1: Constant
+    - this card: stat damagedCannotFace 1, while this card is in play
+
+10076:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if this attack is undefended).
+  10076:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the attack has no defender): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
+
+## 10077 Troll-fells
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10077:A:1 (front): While Troll-fells is the active location, Weather cards gain doomed 1.
+  10077:constant:1: Constant
+    only if this card is the active location
+    - each Weather treachery (any player controls) gains doomed 1 (each player raises their threat by that much more when one is played)
+
+10077:A:2 (front): When Revealed: If Troll-fells is not revealed guarding a safe location, search the encounter deck and discard pile for a location with the safe keyword and attach it to Troll-fells, guarded. Shuffle the encounter deck.
+  10077:whenRevealed:1: When revealed
+    only if not (this card is a location (any player controls) that is revealed guarding an objective-location)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player finds one objective in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); it is the picked card afterward
+    - this card becomes the guard of the picked card, attached to it in the staging area
+    - shuffle the encounter deck
+
+## 10078 Barren Moorland
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10078:A:1 (front): While Barren Moorland is in the staging area, it gains: "Forced: When an ally enters play, you must either exhaust it or deal 1 damage to it."
+  10078:forced:1: Forced after a card enters play (heard about ally (any player controls))
+    only if this card is in the staging area
+    - the acting player chooses one of:
+      * option "exhaust" (only if the card the event is about is a ready ally (any player controls)):
+        - exhaust the card the event is about
+      * option "damage":
+        - deal 1 damage to the card the event is about
+
+10078:A:2 (front): Travel: Deal 1 damage to each exhausted character.
+  10078:travel:1: Travel
+    - deal 1 damage to each exhausted character (any player controls)
+
+## 10079 Arador's Bane
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10079:A:1 (front): When Revealed: Starting with the first player, each player must either engage an enemy in the staging area with a higher engagement cost than his threat, or search the encounter deck and discard pile for a Troll or Giant enemy and add it to the staging area. Deal each enemy that engages a player through this effect 2 shadow cards.
+  10079:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "engage" (only if there is a enemy (any player controls) in the staging area only, with an engagement cost higher than the chooser's threat to choose):
+          - choose enemy (any player controls) in the staging area only, with an engagement cost higher than the chooser's threat
+          - engage the picked card
+          - the picked card is dealt a shadow card
+          - the picked card is dealt a shadow card
+        * option "search" (only if any of: (the encounter deck or its discard pile holds a Troll enemy) or (the encounter deck or its discard pile holds a Giant enemy)):
+          - the acting player finds one Troll or Giant enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+          - shuffle the encounter deck
+
+## 10080 No Rest
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10080:A:1 (front): When Revealed: Attach to an exhausted hero, or to a ready hero if there are no exhausted heroes. (Counts as a Condition attachment with the text: "Limit 1 per hero. Attached hero cannot ready and does not collect resources during the resource phase. Discard No Rest if the players travel to a safe location.")
+  10080:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if there is a exhausted hero (any player controls) chosen by the first player, with no attachment named "No Rest" to choose: choose exhausted hero (any player controls) chosen by the first player, with no attachment named "No Rest"
+    - then, if not (there is a exhausted hero (any player controls) chosen by the first player, with no attachment named "No Rest" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): choose ready hero (any player controls) chosen by the first player, with no attachment named "No Rest"
+    - this card attaches to the picked card (nowhere if that card carries one of its title already)
+  10080:constant:1: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card counts as a Condition attachment while it is attached
+    - this attachment may be attached to a hero (limit 1 of it per host)
+    - its host: stat cannotReady 1, while this card is in play
+    - its host: stat noCollection 1, while this card is in play
+  10080:triggered:1: Triggered (mandatory, not printed as Forced) after the players travel (heard about objective (any player controls) with the safe keyword)
+    - discard this card
+
+## 10081 Lie Low
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+10081:A:1 (front): Forced: At the end of the quest phase, if no progress was placed on Lie Low this round, each enemy gets -20 engagement cost until the end of the round.
+  10081:forced:1: Forced at the end of the phase
+    only if all of: (it is the Quest phase) and (this card does not hold the flag progressPlacedHere)
+    - every enemy in play: stat engagementCost -20, until the end of the round
+
+10081:A:2 (front): Response: After this stage is defeated, choose an enemy in the staging area and shuffle it into the encounter deck.
+  10081:response:1: Response on the event questDefeated (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose enemy (any player controls) in the staging area only, chosen by the first player
+    - the picked card is shuffled into the encounter deck
+
+## 10082 Forage for Food
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+10082:A:1 (front): Forced: After 1 or more resources are spent from a hero's resource pool, deal 1 damage to that hero.
+  10082:forced:1: Forced on the event heroResourcesSpent (heard about hero (any player controls))
+    - deal 1 damage to the card the event is about
+
+10082:A:2 (front): Response: After this stage is defeated, heal 1 damage from each hero.
+  10082:response:1: Response on the event questDefeated (heard about this card)
+    - for each hero (any player controls):
+      - heal 1 damage from the picked card
+
+## 10083 Scavenge for Supplies
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+10083:A:1 (front): The cost to play each player card is increased by 1.
+  10083:constant:1: Constant
+    - while this card is in play, each card a player plays (from any zone) that is a card (any player controls) costs 1 more (every player's; several such cards stack)
+
+10083:A:2 (front): Forced: When this stage is defeated, search the encounter deck and discard pile for a Troll enemy and put it into play engaged with the player with the highest threat. Each player may play a card from his hand, at no cost.
+  10083:forced:1: Forced on the event questDefeated (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the player with the highest threat becomes the picked player (the first player chooses among a tie)
+    - the effect goes on with the picked player as the acting player
+    - the acting player finds one Troll enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
+    - shuffle the encounter deck
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "play" (only if there is a card (you control) in hand to choose):
+          - the acting player plays a card (you control) from their hand as part of the effect, at no cost (no payment at all)
+        * option "skip":
+
+## 10182 Across the Ettenmoors
+
+10182:A:1 (front): You are playing campaign mode.
+  (inert: the engine applies it by rule, no record)
+
+10182:A:2 (front): Setup: Set all 5 Losing Time treacheries aside, out of play.
+  10182:campaignSetup:1: Campaign setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - a copy of the card with code 10183 is set aside, out of play
+    - a copy of the card with code 10183 is set aside, out of play
+    - a copy of the card with code 10183 is set aside, out of play
+    - a copy of the card with code 10183 is set aside, out of play
+    - a copy of the card with code 10183 is set aside, out of play
+
+10182:A:3 (front): Forced: At the beginning of the quest phase, place 1 resource on this card. Then, if there are 3 or more resources on it, remove 3 resources from it to reveal 1 set-aside copy of Losing Time and place it in the encounter discard pile.
+  10182:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - 1 resource token(s) are placed on this card
+    - if this card holds at least 3 resource tokens and a copy of the card with code 10183 is set aside: 3 tokens come off this card and that copy is revealed as an encounter card (nothing otherwise)
+
+10182:B:1 (back): Resolution: Add each copy of Losing Time in the encounter deck or encounter discard pile to the Campaign Pool.
+  10182:resolution:1: Resolution
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - one copy of the card with code 10183 joins the Campaign Pool for each copy lying in the encounter deck or the encounter discard pile (a copy set aside, in the staging area or attached does not count)
+    - mark in the Campaign Log, as "determined", each character in play that a copy of the card with code 10172 is attached to
+
+## 10183 Losing Time
+
+10183:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+10183:A:2 (front): When Revealed: Each player must either raise their threat by 3 or exhaust a hero they control.
+  10183:whenRevealed:1: When revealed
+    - for each player, first player first:
+      - the acting player chooses one of:
+        * option "threat":
+          - raise threat by 3 (the acting player)
+        * option "exhaust" (only if there is a ready hero (you control) to choose):
+          - choose ready hero (you control)
+          - exhaust the picked card
+
+10183:A:3 (shadow): Shadow: Attacking enemy either gets +3 Attack or +3 Defense until the end of the phase.
+  10183:shadow:1: Shadow
+    - the acting player chooses one of:
+      * option "attack":
+        - the attacking enemy: stat attack 3, until the end of the phase
+      * option "defense":
+        - the attacking enemy: stat defense 3, until the end of the phase
+
+(rendered pieces: 318 by template, 0 as JSON)

@@ -84,7 +84,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 146019:A:1 (front): Forced: After the players travel to Torch-lit Hall, discard cards from the top of the encounter deck until an enemy is discarded. If there is a copy of that enemy in the staging area, discard that copy as well. If there is not, add the just discarded enemy to the staging area.
   146019:forced:1: Forced after the players travel (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy"}]
+    - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
     - then, if all of: (the picked card is a enemy (any player controls) that is out of play now) and (the number of enemy (any player controls) in the staging area only [also {"sameTitleAs":"picked"}] is at most 0) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
     - then, if there is a enemy (any player controls) in the staging area only [also {"sameTitleAs":"picked"}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) in the staging area only [also {"sameTitleAs":"picked"}]
     - then, if all of: (the picked card is a enemy (any player controls) in the staging area only) and (the card picked before is a enemy (any player controls) that is out of play now) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
@@ -215,8 +215,8 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
       * option "ring" (only if the card with code 146065 in play is ready):
         - exhaust the card with code 146065
         - the acting player reveals an encounter card
-      * option "enemy" (only if [json condition {"kind":"searchable","type":"enemy","deckOnly":true}]):
-        - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy"}]
+      * option "enemy" (only if the encounter deck or its discard pile holds an enemy (the deck alone)):
+        - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
         - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
 
 146061:A:2 (shadow): Shadow: Discard a non-objective attachment you control.
@@ -272,7 +272,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
   146066:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json CaptureRingBearer {"verb":"CaptureRingBearer","under":"146015","guarded":true}]
-    - [json SetAside {"verb":"SetAside","code":"146014"}]
+    - a copy of the card with code 146014 is set aside, out of play
     - choose hero (you control) chosen by the first player
     - [json AttachSetAside {"verb":"AttachSetAside","code":"146014"}]
     - the card with code 146065 in play moves, with what is on it, to the last picked hero (one card moves; it never leaves play)
@@ -311,7 +311,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
   146067:forced:1: Forced when a phase begins
     only if it is the Quest phase
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy"}]
+    - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
     - then, if all of: (the picked card is a enemy (any player controls) that is out of play now) and (the number of enemy (any player controls) in the staging area only [also {"sameTitleAs":"picked"}] is at most 0) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
     - then, if there is a enemy (any player controls) in the staging area only [also {"sameTitleAs":"picked"}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) in the staging area only [also {"sameTitleAs":"picked"}]
     - then, if all of: (the picked card is a enemy (any player controls) in the staging area only) and (the card picked before is a enemy (any player controls) that is out of play now) (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
@@ -330,7 +330,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
   146068:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose card (any player controls) named "Last of the Company"
-    - [json AddToVictory {"verb":"AddToVictory","target":"picked"}]
+    - the picked card is added to the victory display
     - the card with code 146065 in play moves, with what is on it, to the Ring-bearer (one card moves; it never leaves play)
     - choose Ring-bearer hero (any player controls)
     - exhaust the picked card
@@ -385,4 +385,4 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
   146071:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
     - this card: stat phantom 1, until the end of the attack
 
-(rendered pieces: 256 by template, 23 as JSON)
+(rendered pieces: 262 by template, 17 as JSON)

@@ -43,12 +43,12 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 11191:A:2 (front): Setup: Flip the Stormcaller to its "Campaign Mode only" side, then attach Black Key (burden) to it. Each player chooses a Modification boon for each of their ship-objectives and attaches it to that ship-objective. Shuffle Thunderstruck into the encounter deck. Shuffle Crowley into the Corsair deck. Put Calaerion into play under the control of the player with the Dream-chaser.
   11191:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAside {"verb":"SetAside","code":"11172"}]
-    - [json SetAside {"verb":"SetAside","code":"11173"}]
-    - [json SetAside {"verb":"SetAside","code":"11174"}]
-    - [json SetAside {"verb":"SetAside","code":"11175"}]
-    - [json SetAside {"verb":"SetAside","code":"11192"}]
-    - [json SetAside {"verb":"SetAside","code":"11193"}]
+    - a copy of the card with code 11172 is set aside, out of play
+    - a copy of the card with code 11173 is set aside, out of play
+    - a copy of the card with code 11174 is set aside, out of play
+    - a copy of the card with code 11175 is set aside, out of play
+    - a copy of the card with code 11192 is set aside, out of play
+    - a copy of the card with code 11193 is set aside, out of play
     - a card with code 11177 from the box joins the encounter deck, which is shuffled
     - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
     - [json FlipStormcaller {"verb":"FlipStormcaller"}]
@@ -154,7 +154,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 12015:A:1 (front): When Revealed: Discard cards from the top of the encounter deck until a Weather treachery is discarded. Resolve that card's "when revealed" effect. That effect cannot be canceled.
   12015:whenRevealed:1: When revealed (cannot be canceled while the number of hero (any player controls) is at least 0)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json DiscardUntil {"verb":"DiscardUntil","type":"treachery","trait":"Weather"}]
+    - cards are discarded from the top of the encounter deck until a treachery with the trait Weather is discarded, or the deck is empty; that card becomes the picked card
     - then, if the picked card is a Weather treachery (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the When Revealed effects of the picked card resolve as if it had just been revealed
 
 12015:B:1: Sailing.
@@ -378,4 +378,4 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
     only if [json condition {"kind":"heading","is":"offCourse"}]
     - deal 1 damage to the card the event is about
 
-(rendered pieces: 137 by template, 56 as JSON)
+(rendered pieces: 144 by template, 49 as JSON)

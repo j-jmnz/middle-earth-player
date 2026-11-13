@@ -249,7 +249,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
     - for each player, first player first:
       - the acting player chooses one of:
         * option "add":
-          - [json HeroesGainResources {"verb":"HeroesGainResources","amount":1,"who":"actor"}]
+          - each hero the acting player controls gains 1 resource(s)
           - raise threat by 3 (the acting player)
         * option "decline":
 
@@ -336,4 +336,4 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
         - choose ally (you control)
         - discard the picked card
 
-(rendered pieces: 191 by template, 7 as JSON)
+(rendered pieces: 192 by template, 6 as JSON)

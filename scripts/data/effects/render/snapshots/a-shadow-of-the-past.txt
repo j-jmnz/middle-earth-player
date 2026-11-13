@@ -20,7 +20,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 141022:A:1 (front): Setup: Set Bucklebury Ferry aside, out of play. Add 1 Black Rider to the staging area and make Bag End the active location. Shuffle the encounter deck.
   141022:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAside {"verb":"SetAside","code":"141035"}]
+    - a copy of the card with code 141035 is set aside, out of play
     - the card with code 141039 is added to the staging area (the copy a Setup search found, else one the Setup deals)
     - [json MakeActiveLocation {"verb":"MakeActiveLocation","code":"141031"}]
     - shuffle the encounter deck
@@ -279,9 +279,9 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
   141073:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player chooses one of:
-      * option "staging" (only if [json condition {"kind":"searchable","trait":"Nazgûl"}]):
+      * option "staging" (only if the encounter deck or its discard pile holds a Nazgûl card):
         - the acting player finds one Nazgûl card in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
-      * option "engage" (only if [json condition {"kind":"searchable","trait":"Nazgûl"}]):
+      * option "engage" (only if the encounter deck or its discard pile holds a Nazgûl card):
         - the acting player finds one Nazgûl card in the encounter deck or its discard pile and puts it into play engaged with the first player (it is not revealed)
     - shuffle the encounter deck
 
@@ -471,7 +471,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 906104:A:2 (front): Forced: After a player fails a Hide test, place 1 resource token here.
   906104:forced:1: Forced on the event hideFailed
-    - [json PlaceToken {"verb":"PlaceToken","amount":1}]
+    - 1 resource token(s) are placed on this card
 
 ## 906105 Green-Hill Country
 
@@ -553,4 +553,4 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): raise threat by 3 (the acting player)
 
-(rendered pieces: 207 by template, 51 as JSON)
+(rendered pieces: 211 by template, 47 as JSON)

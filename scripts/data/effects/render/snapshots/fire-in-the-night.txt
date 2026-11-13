@@ -72,7 +72,7 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
         * option "draw":
           - the acting player draws 3 card(s)
         * option "resources":
-          - [json HeroesGainResources {"verb":"HeroesGainResources","amount":1}]
+          - each hero the acting player controls gains 1 resource(s)
 
 ## 19068 Rally the Woodmen
 (the scenario deals it into the sideQuestDeck pile; the piles place it, no record does)
@@ -324,4 +324,4 @@ Scenario piles that place cards with no record (quest: 19083 Hrogar's Hill; stag
   19083:constant:2: Constant
     - this card: stat loseAtDamage quest points of this card, while this card is in play
 
-(rendered pieces: 193 by template, 16 as JSON)
+(rendered pieces: 194 by template, 15 as JSON)

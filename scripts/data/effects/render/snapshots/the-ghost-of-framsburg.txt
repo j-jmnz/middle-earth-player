@@ -82,7 +82,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
     only if not ([json condition {"kind":"discoverUnavailable"}])
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose player (any player controls)
-    - [json SwitchActor {"verb":"SwitchActor","to":"picked"}]
+    - the effect goes on with the picked player as the acting player
     - [json LookAtTop {"verb":"LookAtTop","count":{"discoverValue":true},"deck":"own"}]
     - choose card (you control) in the deck, among the cards this effect looked at or discarded
     - move the picked card to hand
@@ -190,7 +190,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 19101:A:2 (front): Forced: After Forgotten Crypt becomes the active location, discard cards from the top of the encounter deck until an Undead enemy is discarded and add it to the staging area. Then, attach a Loot objective in the encounter discard pile to that enemy as a guarded objective.
   19101:forced:1: Forced after this location becomes the active location (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy","trait":"Undead"}]
+    - cards are discarded from the top of the encounter deck until an enemy with the trait Undead is discarded, or the deck is empty; that card becomes the picked card
     - the picked card goes to the staging area (it is not revealed)
     - [json AttachLootFromDiscard {"verb":"AttachLootFromDiscard"}]
 
@@ -334,7 +334,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
       * option "threat":
         - raise threat by 2 (each player)
       * option "location":
-        - [json DiscardUntil {"verb":"DiscardUntil","type":"location"}]
+        - cards are discarded from the top of the encounter deck until a location is discarded, or the deck is empty; that card becomes the picked card
         - the picked card goes to the staging area (it is not revealed)
 
 19110:B:2 (back): This stage cannot be defeated unless the players control at least 2 Loot objectives.
@@ -367,4 +367,4 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
     only if [json condition {"kind":"inVictory","code":"19098","is":false}]
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 183 by template, 48 as JSON)
+(rendered pieces: 186 by template, 45 as JSON)

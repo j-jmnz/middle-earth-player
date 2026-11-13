@@ -9,7 +9,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
   11200:campaignSetup:1: Campaign setup (record also names 11200:A:3)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json KeepCampaignCard {"verb":"KeepCampaignCard"}]
-    - [json SetAside {"verb":"SetAside","code":"11183"}]
+    - a copy of the card with code 11183 is set aside, out of play
     - a card with code 11181 from the box joins the encounter deck, which is shuffled
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11183","to":"Captain Sahír"}]
     - [json ChooseCards {"verb":"ChooseCards","codes":["11201","11202","11203","11204"],"who":"eachSeat","to":"hand","optional":true,"unearned":true,"afterMulligan":true}]
@@ -20,7 +20,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
   11200:campaignSetup:1: Campaign setup (record also names 11200:A:2)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json KeepCampaignCard {"verb":"KeepCampaignCard"}]
-    - [json SetAside {"verb":"SetAside","code":"11183"}]
+    - a copy of the card with code 11183 is set aside, out of play
     - a card with code 11181 from the box joins the encounter deck, which is shuffled
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11183","to":"Captain Sahír"}]
     - [json ChooseCards {"verb":"ChooseCards","codes":["11201","11202","11203","11204"],"who":"eachSeat","to":"hand","optional":true,"unearned":true,"afterMulligan":true}]
@@ -362,4 +362,4 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if the active location is a Underwater location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
 
-(rendered pieces: 186 by template, 53 as JSON)
+(rendered pieces: 188 by template, 51 as JSON)

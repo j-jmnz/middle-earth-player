@@ -691,10 +691,10 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 11171:A:2 (front): Setup: Each player chooses a Modification boon for each of their ship-objectives and attaches it to that ship-objective. For each ship-objective, its controller may deal 2 damage to it to add 1 resource to a hero's resource pool. Shuffle Ominous Fate and Thunderstruck into the encounter deck. Shuffle Crowley into the Corsair deck.
   11171:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAside {"verb":"SetAside","code":"11172"}]
-    - [json SetAside {"verb":"SetAside","code":"11173"}]
-    - [json SetAside {"verb":"SetAside","code":"11174"}]
-    - [json SetAside {"verb":"SetAside","code":"11175"}]
+    - a copy of the card with code 11172 is set aside, out of play
+    - a copy of the card with code 11173 is set aside, out of play
+    - a copy of the card with code 11174 is set aside, out of play
+    - a copy of the card with code 11175 is set aside, out of play
     - a card with code 11176 from the box joins the encounter deck, which is shuffled
     - a card with code 11177 from the box joins the encounter deck, which is shuffled
     - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
@@ -741,4 +741,4 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
   11171:resolution:9: Resolution
     - [json GainXp {"verb":"GainXp","amount":-1,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Ominous Fate"]},"min":1}}]
 
-(rendered pieces: 258 by template, 74 as JSON)
+(rendered pieces: 262 by template, 70 as JSON)

@@ -245,7 +245,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
     - the acting player chooses one of:
       * option "reveal":
         - choose player (any player controls)
-        - [json SwitchActor {"verb":"SwitchActor","to":"picked"}]
+        - the effect goes on with the picked player as the acting player
         - the acting player reveals an encounter card
       * option "attack":
         - this card attacks the acting player now, from the staging area
@@ -433,4 +433,4 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
     only if not (this card is in the staging area)
     - raise threat by 2 (hostController)
 
-(rendered pieces: 197 by template, 49 as JSON)
+(rendered pieces: 198 by template, 48 as JSON)

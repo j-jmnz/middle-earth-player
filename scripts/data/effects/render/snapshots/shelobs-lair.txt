@@ -249,7 +249,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
   144060:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card counts as a Condition attachment while it is attached
-    - [json AttachesTo {"verb":"AttachesTo","host":{"kind":"hero"},"limitPerHost":true}]
+    - this attachment may be attached to a hero (limit 1 of it per host)
     - its host: stat blankText (its text box is blank) 1, while this card is in play
     - its host: stat cannotReady 1, while this card is in play
 
@@ -359,7 +359,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 
 144072:B:1 (back): If Gollum is defeated, add him to the victory display. (Do not flip him over.)
   144072:forced:1: Forced after an enemy is destroyed (heard about enemy (any player controls) named "Gollum")
-    - [json AddToVictory {"verb":"AddToVictory","target":"subject"}]
+    - the card the event is about is added to the victory display
 
 144072:B:2 (back): While Shelob has at least 1 resource on her, she gains: "Forced: When Shelob is dealt any amount of damage, cancel that damage and discard 1 resource from Shelob instead."
   144072:constant:1: Constant
@@ -370,4 +370,4 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
     only if any of: ([json condition {"kind":"inVictory","code":"144040","is":false}]) or ([json condition {"kind":"inVictory","code":"144075","is":false}])
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 238 by template, 16 as JSON)
+(rendered pieces: 240 by template, 14 as JSON)

@@ -232,12 +232,12 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the caves deck
     - [json ShuffleStages {"verb":"ShuffleStages","codes":["19135","19137","19138","19139","19140","19141","19142"]}]
-    - [json SetAside {"verb":"SetAside","code":"19143"}]
+    - a copy of the card with code 19143 is set aside, out of play
     - choose hero (you control) [also {"attachable":"19143"}]
     - [json AttachSetAside {"verb":"AttachSetAside","code":"19143"}]
     - shuffle the encounter deck
     - for each player, first player first:
-      - [json DiscardUntil {"verb":"DiscardUntil","type":"location","when":{"kind":"not","condition":{"kind":"firstPlayer"}}}]
+      - if not (the actor holds the first player token): cards are discarded from the top of the encounter deck until a location is discarded, or the deck is empty; that card becomes the picked card
       - then, if the picked card is a location (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
 
 19134:B:1 (back): Forced: At the end of the planning phase, the first player looks at the top 2 cards of the quest deck and chooses 1 to place on the bottom of the quest deck. Then, add The Side Door to the victory display and advance to the top stage 2A of the quest deck.
@@ -482,7 +482,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
         - choose Reforged card (you control) named "Wormsbane"
         - discard the picked card
         - choose enemy (any player controls) or in the staging area, named "Dagnir"
-        - [json AddToVictory {"verb":"AddToVictory","target":"picked"}]
+        - the picked card is added to the victory display
         - the players win the game
       * option "decline":
 
@@ -495,7 +495,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19144:A:1 (front): Attach to a hero. Restricted.
   19144:constant:1: Constant
-    - [json AttachesTo {"verb":"AttachesTo","host":{"kind":"hero"}}]
+    - this attachment may be attached to a hero
 
 19144:A:2 (front): Attached hero gets +X Attack, where X is 1 more than the number of quest cards in the victory display.
   19144:constant:2: Constant
@@ -505,4 +505,4 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
   19144:constant:3: Constant
     - its host: stat lossOnLeavingPlay 1, while this card is in play
 
-(rendered pieces: 299 by template, 56 as JSON)
+(rendered pieces: 305 by template, 52 as JSON)

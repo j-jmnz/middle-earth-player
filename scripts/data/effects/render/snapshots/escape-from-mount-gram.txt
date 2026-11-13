@@ -72,7 +72,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose player (any player controls) chosen by the first player [also {"highestThreat":true}]
     - [json EngageSelfWithPicked {"verb":"EngageSelfWithPicked"}]
-    - [json SwitchActor {"verb":"SwitchActor","to":"picked"}]
+    - the effect goes on with the picked player as the acting player
     - this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
 ## 10042 Southern Gate
@@ -308,7 +308,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 
 10177:A:1 (front): Attach to a hero. Restricted.
   10177:constant:1: Constant
-    - [json AttachesTo {"verb":"AttachesTo","host":{"kind":"hero"}}]
+    - this attachment may be attached to a hero
 
 10177:A:2 (front): Each ally that shares a Trait with attached hero gets +1 Willpower.
   10177:constant:2: Constant
@@ -333,7 +333,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 
 10180:A:1 (front): Attach to a hero. Restricted.
   10180:constant:1: Constant
-    - [json AttachesTo {"verb":"AttachesTo","host":{"kind":"hero"}}]
+    - this attachment may be attached to a hero
 
 10180:A:2 (front): Attached hero gets +2 hit points.
   10180:constant:2: Constant
@@ -348,7 +348,7 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 
 10181:A:1 (front): Attach to a hero. Restricted.
   10181:constant:1: Constant
-    - [json AttachesTo {"verb":"AttachesTo","host":{"kind":"hero"}}]
+    - this attachment may be attached to a hero
 
 10181:A:2 (front): While attacking or defending against an enemy, attached hero gets +1 Attack and +1 Defense if that enemy shares a Trait with an enemy in the victory display.
   10181:constant:2: Constant
@@ -358,6 +358,6 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 
 10181:A:3 (front): Response: After attached hero attacks and destroys an enemy, add that enemy to the victory display. (Limit once per game.)
   10181:response:1: Response after a player's attack destroys an enemy (heard about the host; limit once per game)
-    - [json AddToVictory {"verb":"AddToVictory","target":"other"}]
+    - the event's other card is added to the victory display
 
-(rendered pieces: 145 by template, 58 as JSON)
+(rendered pieces: 150 by template, 53 as JSON)

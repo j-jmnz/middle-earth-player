@@ -224,7 +224,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 144054:A:1 (front): When Revealed: The first player must choose: either search the encounter deck, discard pile, and victory display for a Nazgûl enemy and add it to the staging area, or exhaust The One Ring and reveal the top card of the encounter deck.
   144054:whenRevealed:1: When revealed
     - the first player chooses one of:
-      * option "search" (only if [json condition {"kind":"searchable","trait":"Nazgûl"}]):
+      * option "search" (only if the encounter deck or its discard pile holds a Nazgûl card):
         - the acting player finds one Nazgûl enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
       * option "reveal":
         - exhaust the card with code 144063
@@ -287,7 +287,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 144065:A:1 (front): When Revealed: If the number of locations in the staging area is less than the number of players in the game, discard cards from the encounter deck until a location is discarded. Then, add the discarded location to the staging area.
   144065:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json DiscardUntil {"verb":"DiscardUntil","type":"location","when":{"kind":"less","left":{"count":{"type":"location","control":"any","stagingOnly":true}},"right":{"players":true}}}]
+    - if the number of location (any player controls) in the staging area only is less than the number of players: cards are discarded from the top of the encounter deck until a location is discarded, or the deck is empty; that card becomes the picked card
     - then, if the number of location (any player controls) in the staging area only is less than the number of players (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
 
 144065:B:1 (back): Progress cannot be placed on locations in the staging area.
@@ -363,4 +363,4 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
   144076:triggered:1: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
     - the players lose the game (Sméagol was destroyed)
 
-(rendered pieces: 225 by template, 13 as JSON)
+(rendered pieces: 231 by template, 11 as JSON)

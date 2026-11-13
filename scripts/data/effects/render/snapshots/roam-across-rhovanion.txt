@@ -125,7 +125,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
   19041:forced:1: Forced after this location becomes the active location (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the encounter discard pile into the encounter deck
-    - [json DiscardUntil {"verb":"DiscardUntil","type":"treachery"}]
+    - cards are discarded from the top of the encounter deck until a treachery is discarded, or the deck is empty; that card becomes the picked card
     - then, if the picked card is a treachery (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the When Revealed effects of the picked card resolve as if it had just been revealed
 
 19041:A:2 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
@@ -206,7 +206,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
       - [json AddToX {"verb":"AddToX","amount":1,"when":{"kind":"not","condition":{"kind":"canPick","pick":{"type":"enemy","control":"any","stagingOnly":true,"engageable":true}}}}]
       - then, if there is a enemy (any player controls) in the staging area only [also {"engageable":true}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose enemy (any player controls) in the staging area only [also {"engageable":true}]
       - then, if there is a enemy (any player controls) in the staging area only [also {"engageable":true}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): engage the picked card
-    - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy","trait":"Creature","when":{"kind":"x","min":1}}]
+    - then, if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed) (checked when this step runs, after the steps above; not tied to whether they did anything): cards are discarded from the top of the encounter deck until an enemy with the trait Creature is discarded, or the deck is empty; that card becomes the picked card
     - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
 
 ## 19047 The Goblin's Task
@@ -218,7 +218,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
     - [json TakeControlOfSetAside {"verb":"TakeControlOfSetAside","code":"19052"}]
     - shuffle the encounter deck
     - for each player, first player first:
-      - [json DiscardUntil {"verb":"DiscardUntil","type":"location"}]
+      - cards are discarded from the top of the encounter deck until a location is discarded, or the deck is empty; that card becomes the picked card
       - then, if the picked card is a location (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
 
 19047:B:1 (back): Progress cannot be placed on locations in the staging area.
@@ -236,10 +236,10 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 19048:A:1 (front): When Revealed: The first player searches the encounter deck, discard pile, and victory display for a Grey Moorland, adds it to the staging area, and attaches the set-aside Tiny objective-ally to it as a guarded objective. Shuffle the encounter deck. Each other player reveals an encounter card.
   19048:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the acting player finds one card with code 19041 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"remember":true}]
+    - the acting player finds one card with code 19041 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); it is the picked card afterward
     - one set-aside card with code 19054 joins the staging area (it is not revealed)
     - then, if the picked card is a card (any player controls) named "Grey Moorland" (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) in the staging area only, named "Tiny"
-    - [json AttachGuard {"verb":"AttachGuard","guard":"previous","to":"picked","when":{"kind":"matches","card":"picked","pick":{"type":"card","control":"any","names":["Tiny"]},"inPlay":true}}]
+    - then, if the picked card is a card (any player controls) named "Tiny" (checked when this step runs, after the steps above; not tied to whether they did anything): the card picked before becomes the guard of the picked card, attached to it in the staging area
     - shuffle the encounter deck
     - for each player, first player first:
       - if not (the actor holds the first player token): the acting player reveals an encounter card
@@ -269,10 +269,10 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 19049:A:1 (front): When Revealed: The first player searches the encounter deck, discard pile, and victory display for a Grey Mountain Giant, adds it to the staging area, and attaches the set-aside Urdug's Horn to it as a guarded objective. Shuffle the encounter deck. Each other player reveals an encounter card.
   19049:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the acting player finds one card with code 19038 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"remember":true}]
+    - the acting player finds one card with code 19038 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); it is the picked card afterward
     - one set-aside card with code 19037 joins the staging area (it is not revealed)
     - then, if the picked card is a card (any player controls) named "Grey Mountain Giant" (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) in the staging area only, named "Urdug's Horn"
-    - [json AttachGuard {"verb":"AttachGuard","guard":"previous","to":"picked","when":{"kind":"matches","card":"picked","pick":{"type":"card","control":"any","names":["Urdug's Horn"]},"inPlay":true}}]
+    - then, if the picked card is a card (any player controls) named "Urdug's Horn" (checked when this step runs, after the steps above; not tied to whether they did anything): the card picked before becomes the guard of the picked card, attached to it in the staging area
     - shuffle the encounter deck
     - for each player, first player first:
       - if not (the actor holds the first player token): the acting player reveals an encounter card
@@ -301,10 +301,10 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 19050:A:1 (front): When Revealed: The first player searches the encounter deck, discard pile, and victory display for a Deep Ravine, adds it to the staging area, and attaches the set-aside Durin's Key to it as a guarded objective. Shuffle the encounter deck. Each other player reveals an encounter card.
   19050:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the acting player finds one card with code 19042 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"remember":true}]
+    - the acting player finds one card with code 19042 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); it is the picked card afterward
     - one set-aside card with code 19036 joins the staging area (it is not revealed)
     - then, if the picked card is a card (any player controls) named "Deep Ravine" (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) in the staging area only, named "Durin's Key"
-    - [json AttachGuard {"verb":"AttachGuard","guard":"previous","to":"picked","when":{"kind":"matches","card":"picked","pick":{"type":"card","control":"any","names":["Durin's Key"]},"inPlay":true}}]
+    - then, if the picked card is a card (any player controls) named "Durin's Key" (checked when this step runs, after the steps above; not tied to whether they did anything): the card picked before becomes the guard of the picked card, attached to it in the staging area
     - shuffle the encounter deck
     - for each player, first player first:
       - if not (the actor holds the first player token): the acting player reveals an encounter card
@@ -349,7 +349,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
   19051:forced:1: Forced after the players quest unsuccessfully (event happened to the controller)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json WaiveQuestThreat {"verb":"WaiveQuestThreat","who":"eachSeat","until":"endOfPhase"}]
-    - [json AddStageProgress {"verb":"AddStageProgress","amount":{"x":true}}]
+    - progress equal to X is placed on the current quest stage (a quest effect: a full stage advances)
     - then, if the current quest stage holds at least 5 progress (checked when this step runs, after the steps above; not tied to whether they did anything): the players lose the game (Urdug's Gambit holds as much progress as it has quest points)
 
 19051:B:3 (back): When Urdug has no hit points remaining, the players win the game.
@@ -424,4 +424,4 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
   19055:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls) named "Urdug")
     - engage this card
 
-(rendered pieces: 291 by template, 46 as JSON)
+(rendered pieces: 309 by template, 36 as JSON)

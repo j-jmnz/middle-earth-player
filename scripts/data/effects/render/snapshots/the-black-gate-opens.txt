@@ -63,7 +63,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
   146028:forced:1: Forced after a card leaves play
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the encounter discard pile into the encounter deck
-    - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy"}]
+    - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
     - for each player, first player first:
       - if all of: (the picked card is a enemy (any player controls) that is out of play now) and (the actor holds the first player token): the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
 
@@ -180,7 +180,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 146036:A:2 (front): When Revealed: Either search the encounter deck, discard pile, and victory display for a Nazgûl enemy and add it to the staging area, or attach Hell-hawk to a Nazgûl enemy in play. (Counts as a Mount attachment with the text: "Limit 1 per enemy. Attached enemy gets +2 Threat, +2 Attack, +2 Defense and is immune to player card effects.")
   146036:whenRevealed:1: When revealed
     - the acting player chooses one of:
-      * option "search" (only if [json condition {"kind":"searchable","trait":"Nazgûl","type":"enemy","victory":true}]):
+      * option "search" (only if the encounter deck or its discard pile holds a Nazgûl enemy (the victory display too)):
         - the acting player finds one Nazgûl enemy in the encounter deck or its discard pile or the victory display and adds it to the staging area (it is not revealed)
       * option "attach" (only if there is a Nazgûl enemy (any player controls) or in the staging area, with no attachment named "Hell-hawk" or "Fell Beast" to choose):
         - choose Nazgûl enemy (any player controls) or in the staging area, with no attachment named "Hell-hawk" or "Fell Beast"
@@ -318,8 +318,8 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
   146073:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"traits":["Orc","Troll","Nazgûl"],"different":true}]
-    - [json ShuffleSetAsideIntoEncounterDeck {"verb":"ShuffleSetAsideIntoEncounterDeck","code":"146041"}]
+      - the acting player finds one Orc or Troll or Nazgûl enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"different":true}]
+    - one set-aside copy of the card with code 146041 is shuffled into the encounter deck (nothing with none set aside)
 
 146073:B:1 (back): Dire. During the staging step, the first player does not reveal an encounter card as normal. Instead, he reveals 1 encounter card for each resource on The Black Gate.
   (the keyword part is owned by the card's keywords; the records cover: During the staging step, the first player does not reveal an encounter card as normal. Instead, he reveals 1 encounter card for each resource on The Black Gate.)
@@ -336,4 +336,4 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
   146073:constant:2: Constant
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 203 by template, 29 as JSON)
+(rendered pieces: 206 by template, 26 as JSON)

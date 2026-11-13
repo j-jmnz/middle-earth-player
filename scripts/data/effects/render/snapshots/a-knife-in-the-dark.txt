@@ -66,10 +66,10 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 141025:A:1 (front): Setup: Set all copies of Ringwraith, The Witch-king, Midgewater, and Weathertop aside, out of play. Add The Prancing Pony and Bill Ferny to the staging area. Shuffle the encounter deck.
   141025:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAside {"verb":"SetAside","code":"141046"}]
-    - [json SetAside {"verb":"SetAside","code":"141048"}]
-    - [json SetAside {"verb":"SetAside","code":"141068"}]
-    - [json SetAside {"verb":"SetAside","code":"141069"}]
+    - a copy of the card with code 141046 is set aside, out of play
+    - a copy of the card with code 141048 is set aside, out of play
+    - a copy of the card with code 141068 is set aside, out of play
+    - a copy of the card with code 141069 is set aside, out of play
     - the card with code 141045 is added to the staging area (the copy a Setup search found, else one the Setup deals)
     - the card with code 141051 is added to the staging area (the copy a Setup search found, else one the Setup deals)
     - shuffle the encounter deck
@@ -377,9 +377,9 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
   141073:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player chooses one of:
-      * option "staging" (only if [json condition {"kind":"searchable","trait":"Nazgûl"}]):
+      * option "staging" (only if the encounter deck or its discard pile holds a Nazgûl card):
         - the acting player finds one Nazgûl card in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
-      * option "engage" (only if [json condition {"kind":"searchable","trait":"Nazgûl"}]):
+      * option "engage" (only if the encounter deck or its discard pile holds a Nazgûl card):
         - the acting player finds one Nazgûl card in the encounter deck or its discard pile and puts it into play engaged with the first player (it is not revealed)
     - shuffle the encounter deck
 
@@ -525,7 +525,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 906206:A:1 (front): The Old Road enters play with 3 resource tokens on it.
   906206:triggered:1: Triggered (mandatory, not printed as Forced) on the event encounterEnteredPlay (heard about this card)
-    - [json PlaceToken {"verb":"PlaceToken","amount":3}]
+    - 3 resource token(s) are placed on this card
 
 906206:A:2 (front): Forced: At the end of the round, discard 1 resource token here. Then, if there are no resource tokens here, shuffle 1 out of play Ringwraith into the encounter deck.
   906206:forced:1: Forced at the end of the round
@@ -573,4 +573,4 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
   906209:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
 
-(rendered pieces: 229 by template, 47 as JSON)
+(rendered pieces: 236 by template, 40 as JSON)

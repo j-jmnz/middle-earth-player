@@ -44,17 +44,17 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 11209:A:2 (front): Setup: Attach Black Key (burden) to Raider Flagship. Each player chooses a Modification boon for each of their ship-objectives and attaches it to that ship-objective. Shuffle Thunderstruck into the encounter deck. Shuffle Crowley into the Corsair deck.
   11209:campaignSetup:1: Campaign setup (record also names 11209:A:3)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAside {"verb":"SetAside","code":"11172"}]
-    - [json SetAside {"verb":"SetAside","code":"11173"}]
-    - [json SetAside {"verb":"SetAside","code":"11174"}]
-    - [json SetAside {"verb":"SetAside","code":"11175"}]
-    - [json SetAside {"verb":"SetAside","code":"11192"}]
-    - [json SetAside {"verb":"SetAside","code":"11193"}]
-    - [json SetAside {"verb":"SetAside","code":"11210"}]
-    - [json SetAside {"verb":"SetAside","code":"11211"}]
-    - [json SetAside {"verb":"SetAside","code":"11212"}]
-    - [json SetAside {"verb":"SetAside","code":"11213"}]
-    - [json SetAside {"verb":"SetAside","code":"11214"}]
+    - a copy of the card with code 11172 is set aside, out of play
+    - a copy of the card with code 11173 is set aside, out of play
+    - a copy of the card with code 11174 is set aside, out of play
+    - a copy of the card with code 11175 is set aside, out of play
+    - a copy of the card with code 11192 is set aside, out of play
+    - a copy of the card with code 11193 is set aside, out of play
+    - a copy of the card with code 11210 is set aside, out of play
+    - a copy of the card with code 11211 is set aside, out of play
+    - a copy of the card with code 11212 is set aside, out of play
+    - a copy of the card with code 11213 is set aside, out of play
+    - a copy of the card with code 11214 is set aside, out of play
     - a card with code 11177 from the box joins the encounter deck, which is shuffled
     - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Raider Flagship"}]
@@ -66,17 +66,17 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 11209:A:3 (front): Put Calaerion into play under the control of the player with the Dream-chaser. Put Gavin into play under any player's control. One player may choose a copy of Círdan's Blessing not in the Campaign Pool and add it to their hand.
   11209:campaignSetup:1: Campaign setup (record also names 11209:A:2)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAside {"verb":"SetAside","code":"11172"}]
-    - [json SetAside {"verb":"SetAside","code":"11173"}]
-    - [json SetAside {"verb":"SetAside","code":"11174"}]
-    - [json SetAside {"verb":"SetAside","code":"11175"}]
-    - [json SetAside {"verb":"SetAside","code":"11192"}]
-    - [json SetAside {"verb":"SetAside","code":"11193"}]
-    - [json SetAside {"verb":"SetAside","code":"11210"}]
-    - [json SetAside {"verb":"SetAside","code":"11211"}]
-    - [json SetAside {"verb":"SetAside","code":"11212"}]
-    - [json SetAside {"verb":"SetAside","code":"11213"}]
-    - [json SetAside {"verb":"SetAside","code":"11214"}]
+    - a copy of the card with code 11172 is set aside, out of play
+    - a copy of the card with code 11173 is set aside, out of play
+    - a copy of the card with code 11174 is set aside, out of play
+    - a copy of the card with code 11175 is set aside, out of play
+    - a copy of the card with code 11192 is set aside, out of play
+    - a copy of the card with code 11193 is set aside, out of play
+    - a copy of the card with code 11210 is set aside, out of play
+    - a copy of the card with code 11211 is set aside, out of play
+    - a copy of the card with code 11212 is set aside, out of play
+    - a copy of the card with code 11213 is set aside, out of play
+    - a copy of the card with code 11214 is set aside, out of play
     - a card with code 11177 from the box joins the encounter deck, which is shuffled
     - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Raider Flagship"}]
@@ -141,9 +141,9 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json PrepareCorsairDeck {"verb":"PrepareCorsairDeck"}]
     - [json PrepareFleet {"verb":"PrepareFleet"}]
-    - the acting player finds one Dol Amroth objective in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"remember":true}]
+    - the acting player finds one Dol Amroth objective in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); it is the picked card afterward
     - shuffle the encounter deck
-    - [json GuardObjective {"verb":"GuardObjective","target":"picked"}]
+    - the Guarded keyword: the picked card in the staging area is guarded by the next encounter card of the deck that is not an objective, revealed and attached to it
 
 12120:B:1: Sailing.
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
@@ -171,7 +171,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     - shuffle the encounter deck
     - for each objective (any player controls) in the staging area only [also {"hasGuard":false}]:
       - choose non-unique Ship enemy (any player controls) in the staging area only [also {"isGuard":false}]
-      - [json AttachGuard {"verb":"AttachGuard","guard":"picked","to":"previous"}]
+      - the picked card becomes the guard of the card picked before, attached to it in the staging area
 
 12121:B:1: Sailing.
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
@@ -276,7 +276,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     only if all of: (it is the Quest phase) and (this card is in the staging area) and (this card is a enemy (any player controls) [also {"isGuard":false}]) and (there is a objective (any player controls) in the staging area only [also {"hasGuard":false}] to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose objective (any player controls) in the staging area only [also {"hasGuard":false}]
-    - [json AttachGuard {"verb":"AttachGuard","to":"picked"}]
+    - this card becomes the guard of the picked card, attached to it in the staging area
 
 ## 12127 Heavy Cruiser
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -291,8 +291,8 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 12127:A:3 (front): When Revealed: Search the encounter deck and discard pile for a Dol Amroth objective and add it to the staging area. Then, attach Heavy Cruiser to that objective, guarding it. Shuffle the encounter deck.
   12127:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - the acting player finds one Dol Amroth objective in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"remember":true}]
-    - [json AttachGuard {"verb":"AttachGuard","to":"picked"}]
+    - the acting player finds one Dol Amroth objective in the encounter deck or its discard pile and adds it to the staging area (it is not revealed); it is the picked card afterward
+    - this card becomes the guard of the picked card, attached to it in the staging area
     - shuffle the encounter deck
 
 ## 12128 Coast of Anfalas
@@ -375,7 +375,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     - if there is a objective (any player controls) in the staging area only [also {"hasGuard":false}] to choose: choose Ship enemy (any player controls) or in the staging area [also {"isGuard":false}]
     - then, if there is a objective (any player controls) in the staging area only [also {"hasGuard":false}] to choose (checked when this step runs, after the steps above; not tied to whether they did anything): return the picked card to the staging area
     - choose objective (any player controls) in the staging area only [also {"hasGuard":false}]
-    - [json AttachGuard {"verb":"AttachGuard","guard":"previous","to":"picked"}]
+    - the card picked before becomes the guard of the picked card, attached to it in the staging area
     - then, if [json condition {"kind":"noneReturned"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 ## 12134 Sea-ward Tower
@@ -383,7 +383,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 12134:A:1 (front): Guarded.
   12134:whenRevealed:1: When revealed
-    - [json GuardObjective {"verb":"GuardObjective"}]
+    - the Guarded keyword: this objective in the staging area is guarded by the next encounter card of the deck that is not an objective, revealed and attached to it
 
 12134:A:2 (front): If Sea-ward Tower is free of encounters, add it to the staging area, controlled by the players.
   12134:constant:1: Constant
@@ -399,7 +399,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 12135:A:1 (front): Guarded.
   12135:whenRevealed:1: When revealed
-    - [json GuardObjective {"verb":"GuardObjective"}]
+    - the Guarded keyword: this objective in the staging area is guarded by the next encounter card of the deck that is not an objective, revealed and attached to it
 
 12135:A:2 (front): If Tower of the Gull is free of encounters, add it to the staging area, controlled by the players.
   12135:constant:1: Constant
@@ -417,7 +417,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 12136:A:1 (front): Guarded.
   12136:whenRevealed:1: When revealed
-    - [json GuardObjective {"verb":"GuardObjective"}]
+    - the Guarded keyword: this objective in the staging area is guarded by the next encounter card of the deck that is not an objective, revealed and attached to it
 
 12136:A:2 (front): If The Beacon is free of encounters, add it to the staging area, controlled by the players.
   12136:constant:1: Constant
@@ -433,7 +433,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
 
 12137:A:1 (front): Guarded.
   12137:whenRevealed:1: When revealed
-    - [json GuardObjective {"verb":"GuardObjective"}]
+    - the Guarded keyword: this objective in the staging area is guarded by the next encounter card of the deck that is not an objective, revealed and attached to it
 
 12137:A:2 (front): If Tower of the Heron is free of encounters, add it to the staging area, controlled by the players.
   12137:constant:1: Constant
@@ -444,4 +444,4 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; qu
     only if [json condition {"kind":"controlledByPlayers"}]
     - this card: stat archeryBonus -4, while this card is in play
 
-(rendered pieces: 157 by template, 109 as JSON)
+(rendered pieces: 190 by template, 76 as JSON)

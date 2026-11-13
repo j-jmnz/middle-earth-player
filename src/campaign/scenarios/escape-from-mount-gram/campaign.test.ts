@@ -54,11 +54,11 @@ describe("Escape from Mount Gram in the angmar-awakened campaign", () => {
     expect(gram.campaignCard).toBe("10174");
   });
 
-  it("is playable, the road offers it after The Wastes of Eriador's win, and the part after it (Across the Ettenmoors) waits behind it as coming soon", () => {
+  it("is playable, the road offers it after The Wastes of Eriador's win, and the part after it (Across the Ettenmoors) waits behind it", () => {
     expect(PLAYABLE_SCENARIOS).toContain("escape-from-mount-gram");
-    expect(PLAYABLE_SCENARIOS).not.toContain(campaign.scenarios[5]);
+    expect(PLAYABLE_SCENARIOS).toContain(campaign.scenarios[5]);
     const path = campaignPath(campaign, {}, wastesLog(1));
-    expect(path.map((node) => [node.id, node.status]).slice(3, 6)).toEqual([["the-wastes-of-eriador", "completed"], ["escape-from-mount-gram", "current"], ["across-the-ettenmoors", "soon"]]);
+    expect(path.map((node) => [node.id, node.status]).slice(3, 6)).toEqual([["the-wastes-of-eriador", "completed"], ["escape-from-mount-gram", "current"], ["across-the-ettenmoors", "locked"]]);
   });
 
   it("10174:A:2 deals the Campaign Setup: Loot the Dungeons in the staging area holding the bottom 5 cards of each captured deck, the pool's Determination dealt as the Wastes left it", () => {
@@ -103,7 +103,7 @@ describe("Escape from Mount Gram in the angmar-awakened campaign", () => {
       }
       expect(angmarAwakenedRows(log, seats).some((row) => row.id === "log-stolen") === log.stolenCards.some((cards) => cards.length > 0)).toBe(true);
       const path = campaignPath(campaign, {}, log);
-      expect(path.map((node) => [node.id, node.status]).slice(4, 6)).toEqual([["escape-from-mount-gram", "completed"], ["across-the-ettenmoors", "soon"]]);
+      expect(path.map((node) => [node.id, node.status]).slice(4, 6)).toEqual([["escape-from-mount-gram", "completed"], ["across-the-ettenmoors", "current"]]);
     }
   });
 

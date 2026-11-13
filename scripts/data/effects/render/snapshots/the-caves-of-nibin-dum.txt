@@ -6,7 +6,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 41004:A:1 (front): Setup: Search the encounter deck for Goblin Chieftain, Cracked Pillar, and Cave Torch. Set Goblin Chieftain and Cracked Pillar aside, out of play. The first player attaches Cave Torch to one of his heroes. Shuffle the encounter deck.
   41004:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAside {"verb":"SetAside","code":"41029"}]
+    - a copy of the card with code 41029 is set aside, out of play
     - choose hero (you control) [also {"attachable":"41029"}]
     - [json AttachSetAside {"verb":"AttachSetAside","code":"41029"}]
     - shuffle the encounter deck
@@ -120,7 +120,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 
 41029:A:1 (front): Attach to a hero. Restricted.
   41029:constant:1: Constant
-    - [json AttachesTo {"verb":"AttachesTo","host":{"kind":"hero"}}]
+    - this attachment may be attached to a hero
 
 41029:A:2 (front): Action: Exhaust Cave Torch to place up to 3 progress tokens on a Dark location.
   41029:action:1: Action
@@ -308,4 +308,4 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
     - [json Earn {"verb":"Earn","codes":["41049"],"eachPlayer":true,"when":{"kind":"highestThreat","max":39}}]
     - [json CarryOver {"verb":"CarryOver","codes":["41049"],"eachPlayer":true,"when":{"kind":"highestThreat","max":39}}]
 
-(rendered pieces: 169 by template, 21 as JSON)
+(rendered pieces: 171 by template, 19 as JSON)

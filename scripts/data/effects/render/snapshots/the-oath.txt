@@ -7,7 +7,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
   41001:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the card with code 41010 is added to the staging area (the copy a Setup search found, else one the Setup deals)
-    - [json SetAside {"verb":"SetAside","code":"41019"}]
+    - a copy of the card with code 41019 is set aside, out of play
     - shuffle the encounter deck
 
 ## 41002 Mirkwood Forest
@@ -102,7 +102,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 
 41013:A:1 (front): Quest Action: Search the encounter deck and discard pile for a Spider enemy and put it into play engaged with you to discard Spider Den. (Any player may trigger this effect.)
   41013:action:1: Action (any player may use it)
-    only if all of: (it is the Quest phase) and ([json condition {"kind":"searchable","trait":"Spider"}])
+    only if all of: (it is the Quest phase) and (the encounter deck or its discard pile holds a Spider card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player finds one Spider enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
     - discard this card
@@ -311,10 +311,10 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 
 41050:A:3 (front): Response: At the end of each round, place 1 resource token here.
   41050:response:1: Response at the end of the round
-    - [json PlaceToken {"verb":"PlaceToken","amount":1}]
+    - 1 resource token(s) are placed on this card
 
 41050:B:1 (back): Resolution: If there are 6 or more resource tokens here, the thought of the captured villagers suffering weighs heavily on you. Add the Guilty Conscience treachery burden to the Campaign Pool.
   41050:resolution:1: Resolution
     - [json Earn {"verb":"Earn","codes":["41043"],"when":{"kind":"tokens","code":"41050","min":6}}]
 
-(rendered pieces: 174 by template, 17 as JSON)
+(rendered pieces: 177 by template, 14 as JSON)

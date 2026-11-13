@@ -29,18 +29,18 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 11215:A:2 (front): Setup: Flip the Stormcaller to its "Campaign Mode only" side, then attach Black Key (burden) to it. Each player chooses a Modification boon for each of their ship-objectives and attaches it to that ship-objective. Shuffle Thunderstruck into the encounter deck. Shuffle Crowley into the Corsair deck.
   11215:campaignSetup:1: Campaign setup (record also names 11215:A:3)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAside {"verb":"SetAside","code":"11172"}]
-    - [json SetAside {"verb":"SetAside","code":"11173"}]
-    - [json SetAside {"verb":"SetAside","code":"11174"}]
-    - [json SetAside {"verb":"SetAside","code":"11175"}]
-    - [json SetAside {"verb":"SetAside","code":"11192"}]
-    - [json SetAside {"verb":"SetAside","code":"11193"}]
-    - [json SetAside {"verb":"SetAside","code":"11210"}]
-    - [json SetAside {"verb":"SetAside","code":"11211"}]
-    - [json SetAside {"verb":"SetAside","code":"11212"}]
-    - [json SetAside {"verb":"SetAside","code":"11213"}]
-    - [json SetAside {"verb":"SetAside","code":"11214"}]
-    - [json SetAside {"verb":"SetAside","code":"11216"}]
+    - a copy of the card with code 11172 is set aside, out of play
+    - a copy of the card with code 11173 is set aside, out of play
+    - a copy of the card with code 11174 is set aside, out of play
+    - a copy of the card with code 11175 is set aside, out of play
+    - a copy of the card with code 11192 is set aside, out of play
+    - a copy of the card with code 11193 is set aside, out of play
+    - a copy of the card with code 11210 is set aside, out of play
+    - a copy of the card with code 11211 is set aside, out of play
+    - a copy of the card with code 11212 is set aside, out of play
+    - a copy of the card with code 11213 is set aside, out of play
+    - a copy of the card with code 11214 is set aside, out of play
+    - a copy of the card with code 11216 is set aside, out of play
     - a card with code 11177 from the box joins the encounter deck, which is shuffled
     - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Stormcaller"}]
@@ -52,18 +52,18 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 11215:A:3 (front): Put Calaerion into play under the control of the player with the Dream-chaser. One player may choose a copy of Círdan's Blessing not in the Campaign Pool and add it to their hand. If "Gavin returned," put him into play under any player's control. Flip this card over.
   11215:campaignSetup:1: Campaign setup (record also names 11215:A:2)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAside {"verb":"SetAside","code":"11172"}]
-    - [json SetAside {"verb":"SetAside","code":"11173"}]
-    - [json SetAside {"verb":"SetAside","code":"11174"}]
-    - [json SetAside {"verb":"SetAside","code":"11175"}]
-    - [json SetAside {"verb":"SetAside","code":"11192"}]
-    - [json SetAside {"verb":"SetAside","code":"11193"}]
-    - [json SetAside {"verb":"SetAside","code":"11210"}]
-    - [json SetAside {"verb":"SetAside","code":"11211"}]
-    - [json SetAside {"verb":"SetAside","code":"11212"}]
-    - [json SetAside {"verb":"SetAside","code":"11213"}]
-    - [json SetAside {"verb":"SetAside","code":"11214"}]
-    - [json SetAside {"verb":"SetAside","code":"11216"}]
+    - a copy of the card with code 11172 is set aside, out of play
+    - a copy of the card with code 11173 is set aside, out of play
+    - a copy of the card with code 11174 is set aside, out of play
+    - a copy of the card with code 11175 is set aside, out of play
+    - a copy of the card with code 11192 is set aside, out of play
+    - a copy of the card with code 11193 is set aside, out of play
+    - a copy of the card with code 11210 is set aside, out of play
+    - a copy of the card with code 11211 is set aside, out of play
+    - a copy of the card with code 11212 is set aside, out of play
+    - a copy of the card with code 11213 is set aside, out of play
+    - a copy of the card with code 11214 is set aside, out of play
+    - a copy of the card with code 11216 is set aside, out of play
     - a card with code 11177 from the box joins the encounter deck, which is shuffled
     - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Stormcaller"}]
@@ -412,4 +412,4 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
       - the acting player assigns the resource tokens on Raider enemy (any player controls) engaged with you damage among the character (you control), one at a time
     - then, if the number of Raider enemy (any player controls) is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
-(rendered pieces: 233 by template, 68 as JSON)
+(rendered pieces: 257 by template, 44 as JSON)

@@ -34,7 +34,7 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
 
 142041:B:3 (back): Forced: After an enemy is defeated, place 1 resource token on this stage.
   142041:forced:2: Forced after an enemy is destroyed
-    - [json PlaceToken {"verb":"PlaceToken","amount":1}]
+    - 1 resource token(s) are placed on this card
 
 ## 142042 The Bridge of Khazad-dûm
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -367,4 +367,4 @@ Scenario piles that place cards with no record (staging: 142052 Mines of Moria; 
     only if not (this card is in the staging area)
     - deal 1 damage to its host
 
-(rendered pieces: 194 by template, 14 as JSON)
+(rendered pieces: 195 by template, 13 as JSON)
