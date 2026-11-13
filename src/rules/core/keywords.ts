@@ -407,8 +407,6 @@ export function destroyCard(
   // An enemy that "gains victory" (the flag gainsVictory, 11178:A:1) goes to the victory display as one that prints it does.
   const victorious = heldAmount(state, id, "gainsVictory") > 0 && printed.type === "enemy" && printed.victory == null ? { ...printed, victory: heldAmount(state, id, "gainsVictory") } : printed;
   next = moveCard(next, id, alliesToHandDestination(next, latest, victorious) ?? defeatedDestination(latest, victorious), instance.attachments);
-  // A location explored in the staging area did not leave it by being discarded or removed: `leftStagingArea` (10101:A:2) is not heard.
-  if (explored && instance.zone === "staging" && next.pendingEvents?.some((event) => event.trigger === "leftStagingArea" && event.cardId === id)) next = { ...next, pendingEvents: next.pendingEvents.filter((event) => !(event.trigger === "leftStagingArea" && event.cardId === id)) };
   steps.push({ kind: "destroy", targetId: id });
   if (cardTypeOf(instance, printed) === "ally" && inPlay(instance.zone)) next = queueEvent(next, { trigger: "allyLeftPlay", seat: instance.controller, subject: id });
   next = discardedFromPlay(next, instance, byDamage);

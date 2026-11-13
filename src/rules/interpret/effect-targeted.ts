@@ -10,6 +10,7 @@ import { startReveal } from "../windows/frames.ts";
 import type { EngineStep } from "../core/intents.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { moveEncounter } from "../families/encounter/moves.ts";
+import { announceEntered } from "../families/encounter/reveal.ts";
 import { activeOf, stagingDest } from "../families/breaking/areas.ts";
 import { attachHeroHosts, attachHostChooser } from "../families/play/hooks.ts";
 import { lastPickedSeat } from "../families/play/refs.ts";
@@ -24,7 +25,7 @@ import { seatFor, shuffleIntoEncounterDeck } from "./verbs.ts";
 import { patchTop, topFrame } from "../windows/windows.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { gameReads } from "../core/game-reads.ts";
-import { attachTo, moveCard, turnedUp } from "../core/zones.ts";
+import { attachTo, inPlay, moveCard, turnedUp } from "../core/zones.ts";
 
 function hasEnemyType(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
   const instance = state.cards[id];
@@ -179,8 +180,11 @@ function applyTargeted(
         // Into the searching seat's own staging area once stages are separate (families/breaking/areas.ts). A card found facedown is turned faceup: one the
         // encounter discard pile was shuffled back into the deck with lies facedown (rr.running-out-of-cards, resetEncounterDeck). A side it shows (A or B) stays.
         const facedown = next.cards[id]?.face === "down";
+        const wasInPlay = inPlay(next.cards[id]?.zone ?? "removed");
         next = instruction.to === "staging" ? moveCard(next, id, stagingDest(next, item.seat)) : moveCard(next, id, { zone: "engaged", seat: state.firstPlayer });
         if (instruction.each || facedown) next = updateCard(next, id, { face: turnedUp(next, id) });
+        // A card found out of play enters play: the cards that hear an encounter card entering play hear it (Quiet the Spirits, 10109:A:1).
+        if (!wasInPlay) next = announceEntered(next, id, item.seat, ctx);
       }
       // A `different` search tells the next one which titles are taken.
       const data = topFrame(next)?.data;

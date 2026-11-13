@@ -60,7 +60,7 @@ export function currentSideQuest(state: ScenarioState): string | null {
 export function placeOnCurrentSideQuest(from: ScenarioState, wanted: number, cards: ReduceContext["cards"], steps: EngineStep[]): { state: ScenarioState; remaining: number } {
   const id = currentSideQuest(from);
   // Progress that would be placed on a quest card first fills the sponges in the staging area (Forbidden Descent, 10101:A:1); with no side quest current it goes on to the main quest card.
-  const { state, remaining: amount } = id ? absorbProgress(from, wanted, steps) : { state: from, remaining: wanted };
+  const { state, remaining: amount } = id ? absorbProgress(from, wanted, cards, steps) : { state: from, remaining: wanted };
   if (amount <= 0) return { state, remaining: 0 };
   const quest = id ? state.cards[id] : undefined;
   if (!id || !quest) return { state, remaining: amount };

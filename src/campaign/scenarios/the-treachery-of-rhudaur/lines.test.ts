@@ -2,15 +2,17 @@
 // The cards of The Treachery of Rhudaur whose records use the angmar family's verbs, on tables built from data/ by the layout kit.
 import { describe, expect, it } from "vitest";
 
-import { flagged, updateCard, type ScenarioState } from "../../core/state.ts";
-import { destroyCard, modifiedStat } from "../../core/keywords.ts";
-import { moveCard } from "../../core/zones.ts";
-import { settle } from "../../engine/machine.ts";
-import { limitSpent } from "../../player/usage.ts";
-import { giveControl } from "../play/control.ts";
-import { queueEvent } from "../../windows/queue.ts";
+import { flagged, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
+import { modifiedStat } from "../../../rules/core/keywords.ts";
+import { moveCard } from "../../../rules/core/zones.ts";
+import { settle } from "../../../rules/engine/machine.ts";
+import { placeQuestProgress } from "../../../rules/quest/quest.ts";
+import { limitSpent } from "../../../rules/player/usage.ts";
+import { giveControl } from "../../../rules/families/play/control.ts";
+import { queueEvent } from "../../../rules/windows/queue.ts";
 import { codesIn, finish, fightEnemy, HERO, idOf, resolveRecords, revealFromTop, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
-import { setCurrentQuest } from "./quest.ts";
+import { setCurrentQuest } from "../../../rules/families/angmar/quest.ts";
+import { moveEncounter } from "../../../rules/families/encounter/moves.ts";
 
 const built = (layout: Layout = {}) => tableFromLayout("the-treachery-of-rhudaur", { stage: "10094", ...layout });
 const codesAt = (state: ScenarioState, ids: readonly string[]) => ids.map((id) => state.cards[id]?.code);
@@ -53,18 +55,51 @@ describe("Traitorous Wight", () => {
 });
 
 describe("Quiet the Spirits", () => {
-  it("10109:A:1 makes an Undead enemy added to the staging area engage the player with the highest threat at once while it is the current quest, and not otherwise", () => {
-    const layout: Layout = { seats: 2, phase: "Quest", staging: ["10109", "10100"], threat: [30, 35] };
-    const t = built(layout);
-    const wight = idOf(t.state, "10100");
-    const heard = (state: ScenarioState) => settle(queueEvent(state, { trigger: "addedToStaging", seat: 0, cardId: wight, subject: wight }), t.ctx, []);
-    const current = setCurrentQuest(t.state, idOf(t.state, "10109"), t.ctx);
-    const engaged = heard(current);
-    expect(engaged.cards[wight]?.zone).toBe("engaged");
-    expect(engaged.cards[wight]?.controller).toBe(1);
-    expect(flagged(engaged, wight, "engagedThreat")).toBe(true);
-    const idle = heard(t.state);
-    expect(idle.cards[wight]?.zone).toBe("staging");
+  const table = (extra: Layout = {}) => built({ seats: 2, phase: "Quest", staging: ["10109"], threat: [30, 35], ...extra });
+  const quiet = (state: ScenarioState, ctx: Parameters<typeof setCurrentQuest>[2]) => setCurrentQuest(state, idOf(state, "10109"), ctx);
+
+  it("10109:A:1 an Undead enemy revealed from the encounter deck engages the player with the highest threat at once while it is the current quest, and not otherwise", () => {
+    const t = table();
+    const run = revealFromTop(quiet(t.state, t.ctx), t.ctx, "10100", []);
+    expect(run.state.cards[run.id]?.zone).toBe("engaged");
+    expect(run.state.cards[run.id]?.controller).toBe(1);
+    expect(flagged(run.state, run.id, "engagedThreat")).toBe(true);
+    const idle = revealFromTop(t.state, t.ctx, "10100", []);
+    expect(idle.state.cards[idle.id]?.zone).toBe("staging");
+    const other = revealFromTop(quiet(t.state, t.ctx), t.ctx, "f3", []);
+    expect(other.state.cards[other.id]?.zone).toBe("staging");
+  });
+
+  it("10109:A:1 an Undead enemy added to the staging area by a search engages the highest threat player, Thaurdir included once he is added", () => {
+    const t = table({ deck: ["10100", "f0"] });
+    const current = quiet(t.state, t.ctx);
+    const searched = finish(resolveRecords(current, t.ctx, "10095", "whenRevealed", undefined, undefined, false), t.ctx);
+    const engaged = searched.state.cards[idOf(searched.state, "10100")];
+    expect(engaged?.zone).toBe("engaged");
+    expect(engaged?.controller).toBe(1);
+  });
+
+  it("10109:A:1 an Undead enemy returned to the staging area from the discard pile engages too, and one engaged then returned to the staging area (already in play) does not", () => {
+    const t = table({ discard: ["10100"], deck: ["f0"] });
+    const current = quiet(t.state, t.ctx);
+    const wight = idOf(current, "10100");
+    const ruined = settle(moveEncounter(current, wight, "staging", 0, t.ctx, []), t.ctx, []);
+    expect(ruined.cards[wight]?.zone).toBe("engaged");
+    expect(ruined.cards[wight]?.controller).toBe(1);
+    // An enemy already in play engaged with a player and sent back to the staging area stays there: it did not enter play.
+    const back = moveEncounter(ruined, wight, "staging", 0, t.ctx, []);
+    expect(back.cards[wight]?.zone).toBe("staging");
+    expect(settle(back, t.ctx, []).cards[wight]?.zone).toBe("staging");
+  });
+
+  it("10109:A:1 an Undead enemy put into play engaged with a player engages the highest threat player instead", () => {
+    const t = table({ discard: ["10100"], deck: ["f0"] });
+    const current = quiet(t.state, t.ctx);
+    const wight = idOf(current, "10100");
+    const put = moveEncounter(current, wight, "engaged", 0, t.ctx, []);
+    const settled = settle(put, t.ctx, []);
+    expect(settled.cards[wight]?.zone).toBe("engaged");
+    expect(settled.cards[wight]?.controller).toBe(1);
   });
 });
 
@@ -103,15 +138,19 @@ describe("the encounter deck running out", () => {
 });
 
 describe("Forbidden Descent leaving play", () => {
-  it("10101:A:2 raises each player's threat by 2 when it leaves play from the staging area, discarded or removed, and not when it is explored", () => {
+  it("10101:A:2 raises each player's threat by 2 when it leaves play from the staging area, discarded, removed or explored there by the progress it took (rr.explored), and not when travelled to", () => {
     const t = built({ staging: ["10101"], threat: [30, 30], seats: 2 });
     const descent = idOf(t.state, "10101");
     const discarded = settle(moveCard(t.state, descent, { zone: "encounterDiscard" }), t.ctx, []);
     expect([discarded.seats[0]?.threat, discarded.seats[1]?.threat]).toEqual([32, 32]);
-    const explored = settle(destroyCard(t.state, descent, t.ctx.cards, [], true), t.ctx, []);
-    expect([explored.seats[0]?.threat, explored.seats[1]?.threat]).toEqual([30, 30]);
     const travelled = settle(moveCard(t.state, descent, { zone: "activeLocation" }), t.ctx, []);
     expect(travelled.seats[0]?.threat).toBe(30);
+    const full = built({ stage: "10095", phase: "Quest", staging: [{ code: "10101", progress: 4 }], threat: [30, 30], seats: 2 });
+    const placed = settle(placeQuestProgress(full.state, 3, full.ctx.cards, [], () => true), full.ctx, []);
+    expect(placed.cards[placed.questStage ?? ""]?.progress).toBe(1);
+    expect(codesIn(placed, "encounterDiscard")).toContain("10101");
+    expect(codesIn(placed, "staging")).not.toContain("10101");
+    expect([placed.seats[0]?.threat, placed.seats[1]?.threat]).toEqual([32, 32]);
   });
 });
 

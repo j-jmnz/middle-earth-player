@@ -2,12 +2,12 @@
 // The angmar family's verbs of The Treachery of Rhudaur's stages and side quests, on tables built from data/ by the layout kit.
 import { describe, expect, it } from "vitest";
 
-import { flagged, updateCard, type ScenarioState } from "../../core/state.ts";
-import { settle } from "../../engine/machine.ts";
-import { placeQuestProgress } from "../../quest/quest.ts";
-import { queueEvent } from "../../windows/queue.ts";
+import { flagged, updateCard, type ScenarioState } from "../../../rules/core/state.ts";
+import { settle } from "../../../rules/engine/machine.ts";
+import { placeQuestProgress } from "../../../rules/quest/quest.ts";
+import { queueEvent } from "../../../rules/windows/queue.ts";
 import { codesIn, finish, idOf, resolveRecords, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
-import { setCurrentQuest } from "./quest.ts";
+import { setCurrentQuest } from "../../../rules/families/angmar/quest.ts";
 
 const built = (layout: Layout = {}) => tableFromLayout("the-treachery-of-rhudaur", { stage: "10094", ...layout });
 const stageCode = (state: ScenarioState) => state.cards[state.questStage ?? ""]?.code;

@@ -296,6 +296,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     },
     { id: "09074:constant:1", cardCode: "09074", lines: ["09074:B:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "eliminatedAtEmptyDeck", amount: 1, until: "whileSourceInPlay", target: "table" }] },
     { id: "09074:constant:2", cardCode: "09074", lines: ["09074:B:2"], timing: "constant", condition: { kind: "hitPointsLeft", code: THAURDIR }, instructions: [{ verb: "Restrict", what: "advance" }] },
+    { id: "09074:questResolution:1", cardCode: "09074", lines: ["09074:B:2"], timing: "questResolution", instructions: [{ verb: "WinGame" }] },
 
     // 10166 Deadmen's Dike (campaign card). Setup (after the quest card's): Iârion's Pendant is attached to Iârion and Protect the Innocent is added to the staging area with the damage the Campaign Log noted. Forced: after Thaurdir enters play one of the three burdens (set aside in
     // campaign mode) is picked at random and attached to him; it joins the Campaign Pool when the scenario is won (the Resolution, in the box's campaign file, angmar-awakened.ts).

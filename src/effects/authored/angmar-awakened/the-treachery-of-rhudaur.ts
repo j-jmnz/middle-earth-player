@@ -90,6 +90,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     },
     { id: "10095:constant:1", cardCode: "10095", lines: ["10095:B:1"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "questPoints", amount: { count: ANY_CLUE, times: -5 }, until: "whileSourceInPlay", target: "self" }] },
     { id: "10095:constant:2", cardCode: "10095", lines: ["10095:B:2"], timing: "constant", condition: { kind: "hitPointsLeft", code: THAURDIR }, instructions: [{ verb: "Restrict", what: "advance" }] },
+    { id: "10095:questResolution:1", cardCode: "10095", lines: ["10095:B:2"], timing: "questResolution", instructions: [{ verb: "WinGame" }] },
 
     // 10096 Amarthiúl (objective ally). Response: after an enemy engages a player, control of him goes to that player (copied).
     copyLine("10067:A:1", "10096:A:1"),
@@ -202,14 +203,14 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "10108:constant:1", cardCode: "10108", lines: ["10108:A:1"], timing: "constant", instructions: [{ verb: "CountsAs", cardType: "attachment", trait: "Condition" }] },
     { id: "10108:constant:2", cardCode: "10108", lines: ["10108:A:1"], timing: "constant", condition: { kind: "not", condition: IN_STAGING }, instructions: [{ verb: "ModifyStat", stat: "questPoints", amount: 6, until: "whileSourceInPlay", target: "host" }] },
 
-    // 10109 Quiet the Spirits. While it is the current quest each Undead enemy added to the staging area engages the player with the highest threat at once (the first player breaks a tie) and adds its Threat to the staging area until the end of the phase.
+    // 10109 Quiet the Spirits. While it is the current quest each Undead enemy that enters play (revealed, added or returned to the staging area, put into play by an effect; not an engaged enemy returned to the staging area) engages the player with the highest threat at once (the first player breaks a tie) and adds its Threat to the staging area until the end of the phase.
     // Forced: after an enemy is destroyed, 2 progress goes on it. When it is defeated it flips over into the Clue objective.
     {
       id: "10109:forced:1",
       cardCode: "10109",
       lines: ["10109:A:1"],
       timing: "forced",
-      trigger: "addedToStaging",
+      trigger: "encounterEnteredPlay",
       subject: UNDEAD,
       condition: { kind: "currentQuest", is: "self" },
       instructions: [{ verb: "PickHighestThreat" }, { verb: "SwitchActor", to: "picked" }, { verb: "Engage", target: "subject" }, { verb: "ModifyStat", stat: "engagedThreat", amount: 1, until: "endOfPhase", target: "subject" }],

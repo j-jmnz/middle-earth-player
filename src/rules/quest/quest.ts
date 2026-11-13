@@ -253,7 +253,7 @@ export function placeQuestProgress(
 // has no upper limit (faq.progress-without-advancing); a full one advances. `counted`: the progress counts toward what a card in play limits this round (families/caves/progress.ts).
 export function putOnStage(from: ScenarioState, stageId: string, wanted: number, points: number | null, cards: Cards, steps: EngineStep[], canAdvance: Gate, cause: Cause, counted: boolean): ScenarioState {
   // Progress that would be placed on a quest card first fills the sponges in the staging area (Forbidden Descent, 10101:A:1).
-  const { state, remaining: amount } = absorbProgress(from, wanted, steps);
+  const { state, remaining: amount } = absorbProgress(from, wanted, cards, steps);
   const stage = state.cards[stageId];
   if (!stage) return state;
   const advancing = points != null && canAdvance(state);
