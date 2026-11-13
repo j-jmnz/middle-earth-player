@@ -31,7 +31,7 @@ function without(...ids: string[]): { repo: Repo; exists: (file: string) => bool
 // Where each registry's block starts and ends: an added line must land between these.
 const BLOCKS: Record<string, { start: RegExp; end: RegExp } | undefined> = {
   "src/campaign/fixtures/registry.ts": { start: /^export const FIXTURE_REGISTRY = \[/, end: /^\] as const/ },
-  "scripts/e2e/fixtures.ts": { start: /^const WRITERS\b/, end: /^};$/ },
+  "scripts/e2e/writers.ts": { start: /^export const WRITERS\b/, end: /^};$/ },
   "test/harness/golden-registry.ts": { start: /^export const GOLDEN_REGISTRY\b/, end: /^\];$/ },
 };
 
@@ -78,7 +78,7 @@ describe("pnpm scenario new", () => {
     const view = without(id, ...alsoLeftOut);
     const { plan, problems } = planScenario(id, {}, view.repo, view.exists);
     expect(problems).toEqual([]);
-    expect(plan?.edits.map((edit) => edit.file)).toEqual(["src/campaign/fixtures/registry.ts", "src/campaign/fixtures.ts", "scripts/e2e/fixtures.ts", "test/harness/golden-registry.ts"]);
+    expect(plan?.edits.map((edit) => edit.file)).toEqual(["src/campaign/fixtures/registry.ts", "src/campaign/fixtures.ts", "scripts/e2e/writers.ts", "test/harness/golden-registry.ts"]);
     for (const edit of plan?.edits ?? []) {
       const lines = edit.after.split("\n");
       const added = addedAt(edit.before, edit.after);
@@ -95,9 +95,9 @@ describe("pnpm scenario new", () => {
         expect(at, `${edit.file}: "${line.trim()}" is before the block's closing line`).toBeLessThan(end);
       }
     }
-    const writers = plan?.edits.find((edit) => edit.file === "scripts/e2e/fixtures.ts");
+    const writers = plan?.edits.find((edit) => edit.file === "scripts/e2e/writers.ts");
     const writerLines = writers?.after.split("\n") ?? [];
-    const from = writerLines.findIndex((line) => /^const WRITERS\b/.test(line));
+    const from = writerLines.findIndex((line) => /^export const WRITERS\b/.test(line));
     const to = writerLines.findIndex((line, index) => index > from && /^};$/.test(line));
     expect(writerLines.slice(from, to).some((line) => line.startsWith(`  "${id}": () => `))).toBe(true);
   });
@@ -127,7 +127,7 @@ describe("pnpm scenario new", () => {
       read: (file) => {
         const text = view.repo.read(file);
         // Two writers for the previous part: the planner cannot tell which one the new line follows.
-        return file === "scripts/e2e/fixtures.ts" && text ? text.replace(/^(  "temple-of-the-deceived": .*)$/m, "$1\n$1") : text;
+        return file === "scripts/e2e/writers.ts" && text ? text.replace(/^(  "temple-of-the-deceived": .*)$/m, "$1\n$1") : text;
       },
     };
     const { plan, problems } = planScenario("the-drowned-ruins", {}, twice, view.exists);
@@ -152,7 +152,7 @@ describe("pnpm scenario new", () => {
       `src/effects/authored/${id}.ts`,
       `src/campaign/fixtures/${id}.json`,
     ]);
-    expect(plan?.edits.map((edit) => edit.file)).toEqual(["src/campaign/fixtures/registry.ts", "src/campaign/fixtures.ts", "scripts/e2e/fixtures.ts", "test/harness/golden-registry.ts"]);
+    expect(plan?.edits.map((edit) => edit.file)).toEqual(["src/campaign/fixtures/registry.ts", "src/campaign/fixtures.ts", "scripts/e2e/writers.ts", "test/harness/golden-registry.ts"]);
     // An edit only inserts lines, and the golden registry's are comments (its test fails on an entry with no golden.json).
     for (const edit of plan?.edits ?? []) {
       const before = edit.before.split("\n");
@@ -189,7 +189,7 @@ describe("pnpm scenario new", () => {
     expect(text).toContain('from "../seed-kit.ts"');
     expect(text).toContain('from "./deadmens-dike.ts"');
     expect(text).toContain("await hillsWonLog()");
-    const writers = plan?.edits.find((edit) => edit.file === "scripts/e2e/fixtures.ts");
+    const writers = plan?.edits.find((edit) => edit.file === "scripts/e2e/writers.ts");
     expect(writers?.after).toContain(`from "./angmar-awakened/${id}.ts"`);
   });
 

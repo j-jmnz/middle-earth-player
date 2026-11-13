@@ -19,7 +19,7 @@ import { asksFile, authoredFile, authoredPath, campaignTestFile, camel, gameFile
 // (scripts/e2e/<id>.ts, or in the campaign's folder: scripts/data/effects/seed-finder-paths.ts), both Maestro flows (.maestro/scenarios/<id>/), the authored effects file (src/effects/authored/<id>.ts, or in the campaign's folder: scripts/data/effects/authored-paths.ts) and the empty fixture file
 // (src/campaign/fixtures/<id>.json). There is no scene file: the game, the golden test and the campaign test read the scenario from data/, and the card tests are spec rows
 // (on tableFromLayout).
-// Registry lines: the fixture registry, the JSON import and FILES entry in src/campaign/fixtures.ts, the writer in scripts/e2e/fixtures.ts,
+// Registry lines: the fixture registry, the JSON import and FILES entry in src/campaign/fixtures.ts, the writer in scripts/e2e/writers.ts,
 // and the golden registry (test/harness/golden-registry.ts), whose two lines are written as comments because that registry's test fails
 // on an entry with no golden.json. Nothing else runs: the next commands are printed.
 // `--short` is the name the identifiers and fixture names start from (lower-case letters and digits, no hyphen; default: the id's last word, "ruins" for the-drowned-ruins).
@@ -34,7 +34,7 @@ export type Plan = { files: { file: string; text: string }[]; edits: Edit[]; fac
 
 const FIXTURE_REGISTRY = "src/campaign/fixtures/registry.ts";
 const FIXTURES = "src/campaign/fixtures.ts";
-const WRITERS = "scripts/e2e/fixtures.ts";
+const WRITERS = "scripts/e2e/writers.ts";
 const GOLDEN_REGISTRY = "test/harness/golden-registry.ts";
 
 function words(name: string): string[] {
@@ -107,7 +107,7 @@ function previousPart(id: string, campaignId: string, repo: Repo): PreviousPart 
 type Block = { start: RegExp; end: RegExp };
 const FIXTURE_ARRAY: Block = { start: /^export const FIXTURE_REGISTRY = \[/, end: /^\] as const/ };
 const FILES_MAP: Block = { start: /^const FILES\b/, end: /^};$/ };
-const WRITERS_MAP: Block = { start: /^const WRITERS\b/, end: /^};$/ };
+const WRITERS_MAP: Block = { start: /^export const WRITERS\b/, end: /^};$/ };
 const GOLDEN_ARRAY: Block = { start: /^export const GOLDEN_REGISTRY\b/, end: /^\];$/ };
 
 // The line indexes strictly between the block's declaration and its closing line, or null when the block is not in the file.

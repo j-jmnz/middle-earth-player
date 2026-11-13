@@ -145,7 +145,7 @@ Read the sections your task touches.
   - 1764–1789 Persistence and shipping (~2.6K) ← 6
   - 1790–1831 Screens (~4.9K) ← 1
     - 1816–1831 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~55.1K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~55.2K tok)
   - 5–8 Overview (~130) ← 1
   - 9–23 Top bar (~3.1K) ← 4
   - 24–27 Table menu (~490) ← 2
@@ -153,7 +153,7 @@ Read the sections your task touches.
   - 36–39 Canvas (~560)
   - 40–52 Spacing and the play area's rows (~1.9K) ← 9
   - 53–58 Pictures on the table (~320) ← 1
-  - 59–104 Cards (~18.5K) ← 27
+  - 59–104 Cards (~18.6K) ← 27
   - 105–110 The Sailing test (~690) ← 5
   - 111–124 The Island Map (~1.8K) ← 8
   - 125–128 Tokens and effects (~320)
@@ -242,7 +242,7 @@ STATUS.md, then the active phase file.
 Read when a task names the plan.
 
 - `docs/plans/angmar-awakened.md` — Angmar Awakened (~1.4K tok)
-- `docs/plans/effect-authoring.md` — Authoring effect records (~7.5K tok)
+- `docs/plans/effect-authoring.md` — Authoring effect records (~7.6K tok)
   - 12–33 Workflow (~460)
   - 34–50 Where records live (~390)
   - 51–75 Templates and copied lines (~690) ← 5
@@ -254,8 +254,8 @@ Read when a task names the plan.
   - 155–174 Triggers and stat flags (~440)
   - 175–236 Patterns (~1.4K)
   - 237–273 Mechanic families: engine and records together (~1.4K) ← 1
-  - 274–288 Readings the review catches (~550) ← 4
-  - 289–308 Not expressible yet: leave open, report (~390)
+  - 274–289 Readings the review catches (~630) ← 4
+  - 290–309 Not expressible yet: leave open, report (~390)
 - `docs/plans/readme-showcase.md` — README showcase (~170 tok)
 - `docs/plans/scenario-pipeline.md` — Plan: cheaper scenarios, same engine (~5.7K tok)
   - 3–14 Context (~450)
