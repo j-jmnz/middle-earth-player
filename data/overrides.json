@@ -936,7 +936,7 @@
         "questPoints": 6
       },
       "reason": "Hall of Beorn gives the encounter side quest Stop the Executioners no quest points (its Victory 10 is the only number it exports). The scan prints a quest points box of 6 and Victory 10, so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
-      "source": "scan 10053.A (hallofbeorn-resources Angmar-Awakened/Stop-the-Executioners.jpg, read for the quest points box)"
+      "source": "scan 10053.A (hallofbeorn-resources Escape-from-Mount-Gram/Stop-the-Executioners.jpg, read for the quest points box)"
     },
     {
       "match": {

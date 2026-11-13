@@ -109,7 +109,7 @@ export function discardCapturedTop(state: ScenarioState, instruction: Verb<"Disc
       continue;
     }
     const cost = instruction.raiseByCost ? (printedOf(ctx.cards, next.cards[top]?.code ?? "").cost ?? 0) : 0;
-    next = updateCard(moveCard(next, top, { zone: "discard", seat }), top, { face: "up" });
+    next = updateCard(moveCard(next, top, { zone: "discard", seat }), top, { face: "up", heroSlot: undefined });
     if (cost > 0) next = raiseThreat(next, seat, cost, steps, ruleCause("mec108.captured-deck"));
   }
   return next.capture ? { ...next, capture: { ...next.capture, none } } : next;

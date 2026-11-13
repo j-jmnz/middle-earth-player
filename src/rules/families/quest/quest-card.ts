@@ -7,7 +7,7 @@ import { ruleCause } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
-import { flagged, updateCard } from "../../core/state.ts";
+import { flagged } from "../../core/state.ts";
 import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { lastPicked } from "../../interpret/player-verbs.ts";
@@ -16,8 +16,7 @@ import { putOnStage, questPointsOf } from "../../quest/quest.ts";
 import { afterProgress } from "../../quest/stage-reveal.ts";
 import { stageOf, stagingOf } from "../breaking/areas.ts";
 import { rescueRandom } from "../captured/rescue.ts";
-import { defeatSideQuest, sideQuestIds } from "../sidequests/quest.ts";
-import { sideQuestPoints } from "../wilderland/night-quest.ts";
+import { placeOnSideQuest, sideQuestIds } from "../sidequests/quest.ts";
 import type { Focus } from "../index.ts";
 
 // The quest cards in play the asking player can name.
@@ -41,12 +40,5 @@ export function placeProgressOnQuestCard(state: ScenarioState, instruction: Extr
     const placed = putOnStage(state, id, amount, questPointsOf(state, quest, ctx.cards), ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length, ruleCause("rr.step-3-4"), false);
     return afterProgress(placed, before, ctx, steps);
   }
-  // A side quest takes what it needs, no more; a full one is defeated.
-  const points = sideQuestPoints(state, quest, ctx.cards);
-  const placed = points == null ? amount : Math.min(amount, Math.max(0, points - quest.progress));
-  if (placed <= 0) return state;
-  steps.push({ kind: "progress", targetId: id, amount: placed, cause: ruleCause("mec108.side-quests-in-play") });
-  const next = updateCard(state, id, { progress: quest.progress + placed });
-  const updated = next.cards[id];
-  return updated && points != null && updated.progress >= points && sideQuestIds(next).includes(id) ? defeatSideQuest(next, id, ctx, steps) : next;
+  return placeOnSideQuest(state, id, amount, ruleCause("mec108.side-quests-in-play"), ctx, steps);
 }

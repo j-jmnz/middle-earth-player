@@ -15,7 +15,7 @@
 // - The engine asks per seat through `viewOf`: the state as that seat sees it, with `staging` its own area and `questStage` its own stage, so
 //   the threat total, the engagement checks, the travel and pick helpers and the quest's progress and advance read the seat's staging area and stage
 //   without knowing about seats. `mergeView` writes what a view changed back. Nothing is cached on the view.
-import type { ScenarioState } from "../../core/state.ts";
+import type { CardInstance, ScenarioState } from "../../core/state.ts";
 import { livingSeats, updateCard, withSeat } from "../../core/state.ts";
 import type { Destination } from "../../core/zones.ts";
 import { moveCard } from "../../core/zones.ts";
@@ -70,7 +70,18 @@ function everyArea(state: ScenarioState): readonly string[] {
 export function stagingOf(state: ScenarioState, seat: number): readonly string[] {
   if (!state.separate) return state.staging;
   const head = headOf(state, seat);
-  return state.viewSeat === head ? state.staging : [...(state.seats[head]?.staging ?? []), ...everyArea(state)];
+  if (state.viewSeat === head) return state.staging;
+  const own = state.seats[head]?.staging ?? [];
+  const everywhere = everyArea(state);
+  return everywhere.length === 0 ? own : [...own, ...everywhere];
+}
+
+// Whether the card is in the staging area of the seat's area, or engaged with a player who shares it (mec108.create-staging-area).
+export function inAreaOf(state: ScenarioState, card: CardInstance, seat: number): boolean {
+  if (!state.separate) return true;
+  if (card.zone === "engaged") return card.controller != null && headOf(state, card.controller) === seat;
+  const area = areaOf(state, card.id);
+  return area == null || headOf(state, area) === seat;
 }
 
 // The seat whose staging area holds the card, or null when it is in no area (the shared staging area, or not in staging).

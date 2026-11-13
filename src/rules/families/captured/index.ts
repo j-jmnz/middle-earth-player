@@ -57,6 +57,6 @@ export const manifest: RulesFamily = {
   verbs: ["Capture", "InEveryArea", "PrepareCapturedDeck", "SetAsideCapturedBoons", "CaptureFromDeck", "CapturePicked", "CaptureAttachments", "CaptureInsteadOfDamage", "PutCapturedIntoPlay", "DiscardCapturedUnder", "DiscardCapturedTop", "EngageSelfWithPicked", "JoinAnotherPlayer", "AttachHeroBoons", "RecordStolenCards", "ChooseBoonToHand"],
   run,
   pool: (state, spec, asking, sourceId, ctx) => capturedPool(state, spec, asking, sourceId, ctx),
-  condition: (state, condition, scope) => capturedHolds(state, condition, scope),
+  condition: (state, condition, scope, ctx) => capturedHolds(state, condition, scope, ctx),
   amount: (state, found, scope, ctx) => capturedAmount(state, found, scope, ctx),
 };

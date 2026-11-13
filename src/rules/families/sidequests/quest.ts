@@ -3,7 +3,7 @@
 // quest cards and the Learn to Play: a side quest sits in its player's quest area, a character commits to it instead of the
 // current quest, the Willpower committed to it is placed on it as progress (it is not compared with the Threat in the staging
 // area), and it is defeated when its progress reaches its quest points.
-import { ruleCause } from "../../core/cause.ts";
+import { ruleCause, type Cause } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { modifiedStat, releaseAttachments } from "../../core/keywords.ts";
@@ -62,19 +62,23 @@ export function sideQuestReason(state: ScenarioState, questId: string): string |
 // resolution clears it.
 export function resolveSideQuests(state: ScenarioState, committed: ReadonlyMap<string, number>, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let next = state;
-  for (const [questId, amount] of committed) {
-    const quest = next.cards[questId];
-    if (!quest || amount <= 0) continue;
-    const points = printedOf(ctx.cards, quest.code).questPoints == null ? null : modifiedStat(next, quest, "questPoints", ctx.cards);
-    const placed = points == null ? amount : Math.min(amount, Math.max(0, points - quest.progress));
-    if (placed > 0) {
-      next = updateCard(next, questId, { progress: quest.progress + placed });
-      steps.push({ kind: "progress", targetId: questId, amount: placed, cause: ruleCause("rr.step-3-4") });
-    }
-    const updated = next.cards[questId];
-    if (updated && points != null && updated.progress >= points) next = defeatSideQuest(next, questId, ctx, steps);
-  }
+  for (const [questId, amount] of committed) next = placeOnSideQuest(next, questId, amount, ruleCause("rr.step-3-4"), ctx, steps);
   return next;
+}
+
+// Progress on a side quest: it takes what it needs to be full and no more, and a full one in a quest area is defeated (an encounter side quest in the staging area is swept up by the caller's effect).
+export function placeOnSideQuest(state: ScenarioState, questId: string, amount: number, cause: Cause, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const quest = state.cards[questId];
+  if (!quest || amount <= 0) return state;
+  const points = printedOf(ctx.cards, quest.code).questPoints == null ? null : modifiedStat(state, quest, "questPoints", ctx.cards);
+  const placed = points == null ? amount : Math.min(amount, Math.max(0, points - quest.progress));
+  let next = state;
+  if (placed > 0) {
+    next = updateCard(next, questId, { progress: quest.progress + placed });
+    steps.push({ kind: "progress", targetId: questId, amount: placed, cause });
+  }
+  const updated = next.cards[questId];
+  return updated && points != null && updated.progress >= points && sideQuestIds(next).includes(questId) ? defeatSideQuest(next, questId, ctx, steps) : next;
 }
 
 // The side quest is defeated: the cards attached to it hear it and are discarded with it, the quest itself hears it

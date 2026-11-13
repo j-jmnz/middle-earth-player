@@ -73,5 +73,5 @@ export const manifest: RulesFamily = {
   travel: { unpayable: travelUnpayable },
   pick: (state, id, spec) => determinedMatches(state, id, spec),
   condition: (state, condition, scope, ctx) => timeOfDayHolds(state, condition) ?? currentQuestHolds(state, condition, scope, ctx) ?? questLeadsHolds(state, condition, ctx) ?? hitPointsLeftHolds(state, condition, ctx),
-  amount: (state, found, _scope, ctx) => questCardsAmount(state, found, ctx),
+  amount: (state, found, scope, ctx) => questCardsAmount(state, found, scope.actor, ctx),
 };

@@ -44,7 +44,7 @@ const VERBS = [
   z.strictObject({ verb: z.literal("JoinAnotherPlayer"), advanceTo: code, ...when }),
   // After a hero enters play (campaign mode): each permanent boon set aside for that hero (SetAsideCapturedBoons) is attached to it, in the order they were set aside ("attach to that hero each set-aside permanent boon attachment assigned to that character in the Campaign Log", 10174:B:2).
   z.strictObject({ verb: z.literal("AttachHeroBoons"), ...when }),
-  // Resolution (10174:B:3): for each player, the unique cards still in their captured deck are recorded in the Campaign Log's stolen cards; the campaign refuses them in that player's deck and as that player's hero for the rest of the campaign.
+  // Resolution (10174:B:3): for each player, the unique cards still in their captured deck are recorded in the Campaign Log's stolen cards; the campaign refuses them in that player's deck for the rest of the campaign (a recorded hero is not refused, rr.deckbuilding).
   z.strictObject({ verb: z.literal("RecordStolenCards") }),
   // The Loot the Dungeons reward (10175:A:2): in order from the first player, each player may choose one of the boons that are still set aside and add it to their hand; the boon joins the Campaign Pool. A boon taken is not offered again. `seat` is engine use: the player whose turn it is.
   z.strictObject({ verb: z.literal("ChooseBoonToHand"), codes: z.array(code).min(1), seat: z.number().int().min(0).optional(), ...when }),

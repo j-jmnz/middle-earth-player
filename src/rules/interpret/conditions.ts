@@ -16,8 +16,8 @@ import { seatThreat } from "../families/play/hooks.ts";
 import { distinctTraitCount, flaggedTrait } from "../families/misc/traits.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { currentQuestHas, engagedThisPhase, questHasKeywords, stepHolds } from "../families/quest/conditions.ts";
-import { headOf } from "../families/breaking/areas.ts";
-import { inAreaOf, modifiedStat, versusDefender, versusHighEngagement, versusVictoryTrait } from "../core/keywords.ts";
+import { headOf, inAreaOf } from "../families/breaking/areas.ts";
+import { modifiedStat, versusDefender, versusHighEngagement } from "../core/keywords.ts";
 import { effectsOf } from "../windows/listen.ts";
 import { countMatching, matchesPick, pickCandidates } from "./pick.ts";
 import { committedWillpower, stagingThreat } from "../quest/quest.ts";
@@ -212,10 +212,9 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
       return holder != null && inAreaOf(state, holder, condition.seat);
     }
-    case "versusVictoryTrait": {
-      const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
-      return holder != null && versusVictoryTrait(state, holder, ctx.cards, scope.against);
-    }
+    // Answered by the captured family's condition hook above (families/captured/values.ts).
+    case "versusVictoryTrait":
+      return false;
     case "versusHighEngagement": {
       const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
       return holder != null && versusHighEngagement(state, condition.role, holder, ctx.cards, scope.against);

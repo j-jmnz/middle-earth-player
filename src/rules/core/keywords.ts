@@ -24,7 +24,8 @@ import { perDamage, threatPerHostWillpower } from "../families/cirith-ungol/valu
 import { printedStat, victoryOf } from "./printed-stat.ts";
 import { wallRoom } from "../families/pelennor/wall.ts";
 import { heldBy } from "./holder-classes.ts";
-import { areaOf, headOf } from "../families/breaking/areas.ts";
+import { inAreaOf } from "../families/breaking/areas.ts";
+import { versusVictoryTrait } from "../families/captured/values.ts";
 import { eliminateEmpties, markLoss } from "./eliminate.ts";
 
 // `combat` is the damage of an attack (rr.step-6-4-3, rr.step-6-8-3); every other kind is non-combat damage.
@@ -100,28 +101,6 @@ export function versusHighEngagement(
   const enemy = enemyId ? state.cards[enemyId] : undefined;
   if (!enemy || printedOf(cards, enemy.code).engagementCost == null) return false;
   return modifiedStat(state, enemy, "engagementCost", cards) > threat;
-}
-
-// The enemy the holder attacks, or defends against in the attack in progress, shares a Trait with an enemy in the victory display (10181:A:2).
-// Whether the card is in the staging area of the seat's area, or engaged with a player who shares it (mec108.create-staging-area).
-export function inAreaOf(state: ScenarioState, card: CardInstance, seat: number): boolean {
-  if (!state.separate) return true;
-  if (card.zone === "engaged") return card.controller != null && headOf(state, card.controller) === seat;
-  const area = areaOf(state, card.id);
-  return area == null || headOf(state, area) === seat;
-}
-
-export function versusVictoryTrait(state: ScenarioState, holder: CardInstance, cards: ReadonlyMap<string, PrintedCard>, against?: string): boolean {
-  const attack = state.pendingAttack;
-  const enemyId = attack && attack.defenderId === holder.id && !attack.undefended ? attack.enemyId : against;
-  const enemy = enemyId ? state.cards[enemyId] : undefined;
-  if (!enemy) return false;
-  const traits = printedOf(cards, enemy.code).traits;
-  return state.victory.some((id) => {
-    const card = state.cards[id];
-    const printed = card ? printedOf(cards, card.code) : undefined;
-    return printed?.type === "enemy" && printed.traits.some((trait) => traits.includes(trait));
-  });
 }
 
 // The holder is the enemy making the attack in progress and the character defending it has at most this many printed hit points (142071:A:2).

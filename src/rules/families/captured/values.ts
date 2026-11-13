@@ -3,13 +3,12 @@
 // What the captured family reads: the pool of a pick (the cards under the source, the cards the last rescue put into hands, the encounter cards in play in an area), the amount and the condition of the cards that name captured cards.
 import type { Amount, Condition, PickSpec } from "../../../catalog/boundary.ts";
 
-import { printedOf } from "../../core/printed.ts";
-import type { ScenarioState } from "../../core/state.ts";
-import { inPlay, livingSeats } from "../../core/state.ts";
+import { printedOf, type PrintedCard } from "../../core/printed.ts";
+import { inPlay, livingSeats, type CardInstance, type ScenarioState } from "../../core/state.ts";
 import type { AmountScope } from "../../interpret/amounts.ts";
 import type { Scope } from "../../interpret/conditions.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
-import { activeFor, headOf, sharing } from "../breaking/areas.ts";
+import { activeFor, headOf, sharing, stagingOf } from "../breaking/areas.ts";
 import { capturedUnder } from "./pile.ts";
 import { playable } from "./play.ts";
 
@@ -21,8 +20,7 @@ export function capturedPool(state: ScenarioState, spec: PickSpec, asking: numbe
   // The encounter cards in play in the asking player's area: its staging cards, its active location and the enemies engaged with a player of the area.
   const head = headOf(state, asking);
   const engaged = sharing(state, head).flatMap((seat) => state.seats[seat]?.engaged ?? []);
-  const staged = state.separate ? (state.viewSeat === head ? state.staging : [...(state.seats[head]?.staging ?? []), ...(state.capture?.here ?? []).filter((id) => state.cards[id]?.zone === "staging")]) : state.staging;
-  return [...new Set([...staged, ...activeFor(state, asking), ...engaged])].filter((id) => inPlay(state.cards[id]?.zone ?? "removed"));
+  return [...new Set([...stagingOf(state, asking), ...activeFor(state, asking), ...engaged])].filter((id) => inPlay(state.cards[id]?.zone ?? "removed"));
 }
 
 // Whether a card has captured cards underneath it.
@@ -53,7 +51,25 @@ export function capturedAmount(state: ScenarioState, found: Exclude<Amount, numb
   }
 }
 
-export function capturedHolds(state: ScenarioState, condition: Condition, scope: Scope): boolean | null {
+// The enemy the holder attacks, or defends against in the attack in progress, shares a Trait with an enemy in the victory display (10181:A:2).
+export function versusVictoryTrait(state: ScenarioState, holder: CardInstance, cards: ReadonlyMap<string, PrintedCard>, against?: string): boolean {
+  const attack = state.pendingAttack;
+  const enemyId = attack && attack.defenderId === holder.id && !attack.undefended ? attack.enemyId : against;
+  const enemy = enemyId ? state.cards[enemyId] : undefined;
+  if (!enemy) return false;
+  const traits = printedOf(cards, enemy.code).traits;
+  return state.victory.some((id) => {
+    const card = state.cards[id];
+    const printed = card ? printedOf(cards, card.code) : undefined;
+    return printed?.type === "enemy" && printed.traits.some((trait) => traits.includes(trait));
+  });
+}
+
+export function capturedHolds(state: ScenarioState, condition: Condition, scope: Scope, ctx: ReduceContext): boolean | null {
+  if (condition.kind === "versusVictoryTrait") {
+    const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
+    return holder != null && versusVictoryTrait(state, holder, ctx.cards, scope.against);
+  }
   if (condition.kind !== "captured") return null;
   if (condition.is === "noneUnderSelf") return scope.sourceId != null && !holdsCaptured(state, scope.sourceId);
   if (condition.is === "noneUnderAttacker") return !holdsCaptured(state, state.pendingAttack?.enemyId ?? "");

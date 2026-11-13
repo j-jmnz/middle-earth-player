@@ -74,7 +74,8 @@ export function seatedLabel(game: ScenarioState, ctx: ReduceContext, names: Shee
   const seats = new Set(options.map((other) => seatOfCard(game, other)).filter((other) => other != null && other >= 0));
   if (seats.size < 2) return undefined;
   const type = printedOf(ctx.cards, game.cards[id]?.code ?? "").type;
-  return type === "enemy" ? `${names.card(id)} \u00b7 engaged with Player ${seat + 1}` : `${names.card(id)} \u00b7 Player ${seat + 1}'s ${type === "hero" ? "hero" : type === "attachment" ? "attachment" : "ally"}`;
+  const kind = type === "hero" || type === "attachment" || type === "event" ? type : type === "player-side-quest" ? "side quest" : "ally";
+  return type === "enemy" ? `${names.card(id)} \u00b7 engaged with Player ${seat + 1}` : `${names.card(id)} \u00b7 Player ${seat + 1}'s ${kind}`;
 }
 
 export function option(game: ScenarioState, names: SheetNames, id: string): SheetOption {

@@ -12,17 +12,16 @@ import { flagged, inPlay, type CardInstance, type ScenarioState } from "../../co
 import { committedWillpower, stagingThreat } from "../../quest/quest.ts";
 import { askTarget } from "../../windows/choices.ts";
 import { effectData } from "../encounter/moves.ts";
-import { sideQuestIds } from "../sidequests/quest.ts";
+import { questCardPool } from "../quest/quest-card.ts";
 import { makeCurrentQuest } from "../wilderland/night.ts";
 import { currentSideQuest, stagedSideQuests } from "../wilderland/night-quest.ts";
 import type { Focus } from "../index.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
-/** The quest cards in play now: the main quest card, the encounter side quests in the staging area and the player side quests in the quest areas. Never fewer than 1 (a game whose quest deck is done has still its last stage in play). */
-export function questCardsInPlay(state: ScenarioState, ctx: ReduceContext): number {
-  const main = state.questStage ? 1 : 0;
-  return Math.max(1, main + stagedSideQuests(state, ctx).length + sideQuestIds(state).length);
+/** The quest cards in play for the seat now (the pool of `questCardPool`: the stage of its area, the encounter side quests in its staging area and the player side quests in the quest areas). Never fewer than 1 (a game whose quest deck is done has still its last stage in play). */
+export function questCardsInPlay(state: ScenarioState, seat: number, ctx: ReduceContext): number {
+  return Math.max(1, questCardPool(state, seat, ctx).length);
 }
 
 /** The cards that may be the current quest: the main quest card and the encounter side quests in the staging area. A player side quest never is. */
@@ -55,8 +54,8 @@ export function chooseCurrentQuest(state: ScenarioState, instruction: Verb<"Choo
 }
 
 /** The amount `questCards` (09016:A:1, 09048:A:1, 09047:A:2, 09050:A:1: "X is the number of quest cards in play"). */
-export function questCardsAmount(state: ScenarioState, found: Exclude<Amount, number>, ctx: ReduceContext): number | null {
-  return found.questCards ? questCardsInPlay(state, ctx) : null;
+export function questCardsAmount(state: ScenarioState, found: Exclude<Amount, number>, seat: number, ctx: ReduceContext): number | null {
+  return found.questCards ? questCardsInPlay(state, seat, ctx) : null;
 }
 
 /**
