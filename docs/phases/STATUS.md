@@ -106,8 +106,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 80 | The Weather Hills | completed | 2026-11-12. Review round done. Open: `hills-won`. |
 | 81 | Deadmen's Dike | completed | 2026-11-12. Review round done. Open: `dike-won`. |
 | 82 | The Wastes of Eriador | completed | 2026-11-12. Review round done. Open: `eriador-won`. |
-| 83 | Escape from Mount Gram | active | 2026-11-12. `docs/plans/angmar-awakened.md`. |
-| 84 | Across the Ettenmoors | not started |  |
+| 83 | Escape from Mount Gram | completed | 2026-11-13. Review round done. Open: `gram-won`. |
+| 84 | Across the Ettenmoors | active | 2026-11-13. `docs/plans/angmar-awakened.md`. |
 | 85 | The Treachery of Rhudaur | not started |  |
 | 86 | The Battle of Carn Dûm | not started |  |
 | 87 | The Dread Realm | not started |  |
@@ -120,6 +120,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - The release notes' golden-check comparison (`scripts/release/reach.ts`) has not run against a real previous tag; the first tag after it compares by `ENGINE_CHANGES` only.
 
 ### Fixtures and Maestro
+- `gram-won` is not committed: no seed in 100 wins Escape from Mount Gram with the saved decklists. Until it exists `.maestro/scenarios/escape-from-mount-gram/escape-from-mount-gram.yaml` cannot run.
 - `eriador-won` is not committed: no seed in 700 wins The Wastes of Eriador with the saved decklists. Until it exists `.maestro/scenarios/the-wastes-of-eriador/the-wastes-of-eriador.yaml` cannot run.
 - `dike-won` is not committed: no seed in 600 wins Deadmen's Dike with the saved decklists (their heroes cannot put 9 damage on Thaurdir). Until it exists `.maestro/scenarios/deadmens-dike/deadmens-dike.yaml` cannot run; its Resolution step is unverified against the `to: player` view.
 - `hills-won` is not committed: no seed in 100 wins The Weather Hills with the saved decklists (Defenders of Gondor, Swords of the Noldor, Easy). Until it exists `.maestro/scenarios/the-weather-hills/the-weather-hills.yaml` cannot run.
@@ -230,7 +231,24 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - The Wastes of Eriador: Determination's "determined" mark is cumulative and kept if the character later falls (agent recommendation). Not user-confirmed.
 - The Wastes of Eriador: Northern Warg's shadow makes no third attack in the combat phase (community only). Not user-confirmed.
 - Renderer gaps, The Wastes of Eriador (behaviour proven by tests): what `noQuestProgress` covers at Night (10012:A:1), the recalculated Warg pick (10018:A:1), who engages Blood-thirsty Warg (10019:A:1), `checkCostPerDamaged` (10020:A:2), Eriador Wastes' per-round, non-stacking cap and unpayable Travel (10023:A:1, A:2), Amarthiúl in Predatory Wolves' pick (10027:A:1), `Earn` in 10171:B:1 prints as JSON.
-- Angmar Awakened campaign-card lines left to their scenarios' Build: 10174:A:2 and B:1 to B:3 with the `stolenCards` write and its deck refusal (Escape from Mount Gram), 10182:A:2, A:3 and B:1 (Across the Ettenmoors), 10184:B:1 (The Treachery of Rhudaur). Each of those three Resolutions also runs `RecordDetermined` (code 10172), as 10171:B:1 and 10188:B:1 do, or a Determination attached there is never marked. The boons' own lines (10176 to 10181, 10185 to 10187, 10189 to 10192) go with the scenario that first deals each.
+- Escape from Mount Gram: starting threat is the starting hero's threat cost, dropping the log's starting-threat modifier (10038:A:1). Not user-confirmed.
+- Escape from Mount Gram: heroes moved to the captured deck at setup have not left play, and their Easy Mode resource is dropped (10038:A:1). Not user-confirmed.
+- Escape from Mount Gram: Capture X on a short or empty captured deck, and on cards added to staging without being revealed. Not user-confirmed.
+- Escape from Mount Gram: the join target among several areas, and the joiner's stage 2B leaving play (10039:B:2). Not user-confirmed.
+- Escape from Mount Gram: an eliminated head seat's area passes to the first joined seat clockwise (no source covers a player who had already joined). Not user-confirmed.
+- Escape from Mount Gram: advancing together returns each area's active location to the staging area (no ruling found). Not user-confirmed.
+- Escape from Mount Gram: Jailor Gornákh (10041:A:1) on a tie, when already engaged, and not hearing a Prison Cell put into play. Not user-confirmed.
+- Escape from Mount Gram: the area's own player chooses for Dungeon Guard and Prison Cell (10044:A:2, 10046:A:2), and Prison Cell's put-into-play is not a rescue. Not user-confirmed.
+- Escape from Mount Gram: Captives of Gornákh's host pool is every encounter card in play in the area (10051:A:1). Not user-confirmed.
+- Escape from Mount Gram: Interrogation (10052) counts a hero's cost as 0 and its Doomed 2 is immediate. Not user-confirmed.
+- Escape from Mount Gram: the refresh raise (10174:B:1) counts the stage reached plus the side quests in the victory display. Not user-confirmed.
+- Escape from Mount Gram: stolen cards (10174:B:3) include unique heroes left in the captured deck, but not cards still under another card; they are barred as deck cards only. Not user-confirmed.
+- Escape from Mount Gram: Loot the Dungeons' quest points count living players, one number for every area (10175:A:1). Not user-confirmed.
+- Escape from Mount Gram: a player whose heroes in play are gone but who has a captured hero stays in the game (orchestrator decision taking the recommendation, rr.player-elimination). Not user-confirmed.
+- Escape from Mount Gram: Berelind (10176:A:1) places progress on a quest card in play the player chooses in their area. Not user-confirmed.
+- Escape from Mount Gram: stage 2B's progress rescues one captured card per point (10039:B:1; community source only). Not user-confirmed.
+- Renderer gaps, Escape from Mount Gram (behaviour proven by tests): the `captured` family's verbs, conditions, amount and pick filter, `SwitchActor`, `ShuffleSetAsideSet`, `RaiseThreatTo`, `StartSeparateStage reveal` and `ProgressQuest` print as JSON; 10049:A:2 reads "every enemy in play" without the area limit; which area's first player acts (10044:A:2, 10046:A:2, 10051:A:1).
+- Angmar Awakened campaign-card lines left to their scenarios' Build: 10182:A:2, A:3 and B:1 (Across the Ettenmoors), 10184:B:1 (The Treachery of Rhudaur). Each of those Resolutions also runs `RecordDetermined` (code 10172), as 10171:B:1, 10174:B:3 and 10188:B:1 do, or a Determination attached there is never marked. The boons' own lines (10185 to 10187, 10189 to 10192) go with the scenario that first deals each.
 - Intruders in Chetwood: quest cards in play are the main quest, the staged encounter side quests and the player side quests, at least 1 (09016, 09019, 09047, 09048, 09050). Not user-confirmed.
 - Intruders in Chetwood: Iârion's Response (09016:A:3) hears a side quest revealed by a search of the encounter deck, not of the discard pile. Not user-confirmed.
 - Intruders in Chetwood: Iârion held facedown under Rescue Iârion (09024:A:2) stays in play and has not left it. Not user-confirmed.
