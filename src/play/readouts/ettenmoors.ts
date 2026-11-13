@@ -7,7 +7,7 @@ import type { ReduceContext } from "../../rules/engine/reduce.ts";
 import { isSafeLocation } from "../../rules/families/angmar/safe.ts";
 import { printedOf } from "../../rules/core/printed.ts";
 
-import { ignoredRevealWords, LOSING_TIME_AT, losingTimeNearWords, losingTimeWords } from "../words/scenarios/ettenmoors-table.ts";
+import { ignoredRevealWords, LOSING_TIME_AT, losingTimeNearWords, losingTimeWords } from "../words/ettenmoors-table.ts";
 import type { TableDial } from "./dials.ts";
 
 export const ETTENMOORS_CAMPAIGN = "10182";

@@ -21,7 +21,7 @@ export const losingTimePreviewWords = (resources: number, setAside: number): str
 
 /** The preview of a safe location that is the active location: what it does now, and that it leaves at the end of the quest phase. */
 export const safeActiveWords = (): string =>
-  "Safe. While it is the active location, enemies make no engagement checks, the When Revealed effects of treacheries are ignored and the text of encounter side quests is blank. It goes to the victory display at the end of the quest phase.";
+  "Safe. While it is the active location, enemies make no engagement checks. The When Revealed effects of treacheries are ignored. The text of encounter side quests is blank. It goes to the victory display at the end of the quest phase.";
 
 /** The preview of a safe location that is not the active location: what travelling to it does. */
 export const safeStagedWords = (): string => "Safe. When the players travel here, every engaged enemy returns to the staging area.";

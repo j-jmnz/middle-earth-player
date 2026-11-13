@@ -7,7 +7,7 @@ import { isSafeLocation } from "../../rules/families/angmar/safe.ts";
 import { textBlank } from "../../rules/families/attachments/hold.ts";
 
 import { activeSafeLocation, ettenmoorsCampaignCard, guardedBy, guardOf, isEncounterSideQuest, losingTimeSetAside, NO_REST } from "../readouts/ettenmoors.ts";
-import { blankSideQuestWords, guardedByWords, guardsWords, losingTimePreviewWords, noRestHostWords, noRestWords, safeActiveWords, safeStagedWords } from "../words/scenarios/ettenmoors-table.ts";
+import { blankSideQuestWords, guardedByWords, guardsWords, losingTimePreviewWords, noRestHostWords, noRestWords, safeActiveWords, safeStagedWords } from "../words/ettenmoors-table.ts";
 
 export function ettenmoorsDetail(game: ScenarioState, ctx: ReduceContext, cardId: string, name: (id: string) => string): string | null {
   const card = game.cards[cardId];

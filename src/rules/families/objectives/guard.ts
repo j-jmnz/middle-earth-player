@@ -35,5 +35,5 @@ export function guardWith(state: ScenarioState, guardId: string, objectiveId: st
 /** An objective-location with an encounter card attached as its guard cannot be the active location; it returns to the staging area unguarded once the guard leaves play (mec108.objective-locations). */
 export function guardedObjectiveLocation(state: ScenarioState, ctx: Pick<ReduceContext, "cards">, id: string): boolean {
   const card = state.cards[id];
-  return card != null && printedOf(ctx.cards, card.code).objectiveLocation === true && card.attachments.some((attached) => state.cards[attached]?.guard === true);
+  return card != null && card.attachments.some((attached) => state.cards[attached]?.guard === true) && printedOf(ctx.cards, card.code).objectiveLocation === true;
 }

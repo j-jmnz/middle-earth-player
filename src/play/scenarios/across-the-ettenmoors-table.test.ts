@@ -66,7 +66,7 @@ describe("a safe location on the table", () => {
   it("10068:A:1 names what the active safe location does, and what travelling to a staged one does", () => {
     const active = at({ active: "10068", staging: ["10081", "10069"] });
     const detail = (state: ScenarioState, code: string) => angmarDetail(state, active.ctx, idOf(state, code), nameOf(state));
-    expect(detail(active.state, "10068")).toBe("Safe. While it is the active location, enemies make no engagement checks, the When Revealed effects of treacheries are ignored and the text of encounter side quests is blank. It goes to the victory display at the end of the quest phase.");
+    expect(detail(active.state, "10068")).toBe("Safe. While it is the active location, enemies make no engagement checks. The When Revealed effects of treacheries are ignored. The text of encounter side quests is blank. It goes to the victory display at the end of the quest phase.");
     expect(detail(active.state, "10069")).toBe("Safe. When the players travel here, every engaged enemy returns to the staging area.");
     expect(detail(active.state, "10081")).toBe("Its text box is blank while Secluded Cave is the active location: its Forced, Response and constant effects do nothing.");
     const staged = at({ staging: ["10081", "10068"] });
