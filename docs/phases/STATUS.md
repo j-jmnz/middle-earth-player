@@ -110,7 +110,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 84 | Across the Ettenmoors | completed | 2026-11-13. Review round done. Open: `ettenmoors-won`. |
 | 85 | The Treachery of Rhudaur | completed | 2026-11-13. Review round done. Open: `rhudaur-won`. |
 | 86 | The Battle of Carn Dûm | completed | 2026-11-13. Review round done. Open: `dum-won`. |
-| 87 | The Dread Realm | active | 2026-11-13. `docs/plans/angmar-awakened.md`. |
+| 87 | The Dread Realm | completed | 2026-11-13. Review round done. Open: `realm-won`. |
 
 ## Open items
 
@@ -120,6 +120,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - The release notes' golden-check comparison (`scripts/release/reach.ts`) has not run against a real previous tag; the first tag after it compares by `ENGINE_CHANGES` only.
 
 ### Fixtures and Maestro
+- `realm-won` is not committed: no seed in 1000 wins The Dread Realm with the saved decklists. Until it exists `.maestro/scenarios/the-dread-realm/the-dread-realm.yaml`, the campaign-end flow, cannot run.
 - `dum-won` is not committed: no seed in 600 wins The Battle of Carn Dûm with the saved decklists. Until it exists `.maestro/scenarios/the-battle-of-carn-dum/the-battle-of-carn-dum.yaml` cannot run.
 - `rhudaur-won` is not committed: no seed wins The Treachery of Rhudaur with the saved decklists under the golden policy. Until it exists `.maestro/scenarios/the-treachery-of-rhudaur/the-treachery-of-rhudaur.yaml` cannot run.
 - `ettenmoors-won` is not committed: no seed in 100 wins Across the Ettenmoors with the saved decklists. Until it exists `.maestro/scenarios/across-the-ettenmoors/across-the-ettenmoors.yaml` cannot run.
@@ -301,6 +302,22 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - The Battle of Carn Dûm: Vile Affliction (10137:A:1) counts an X or blank cost as 0 (agent recommendation). Not user-confirmed.
 - The Battle of Carn Dûm: a Thaurdir burden attaches to the staged Thaurdir although he cannot have attachments, and the Amarthiúl hero stays usable in The Dread Realm (agent recommendation). Not user-confirmed.
 - `beginEnemyAttack` (`src/rules/combat/combat.ts`) deals a shadow card a second time for an attack from staging made by an enemy with `engagedWithAll` (The Ring Goes South's Watcher, Fire in the Night, The Withered Heath, Mount Gundabad, The Fate of Wilderland): `attackNowFromStaging` deals one first. Fixing it moves shipped goldens and needs `ENGINE_VERSION`. Not fixed; Thaurdir's path skips the extra deal.
+
+- The Dread Realm: reanimating a card counts as engaging (10150 and the other reanimating cards; community forum agreement). Not user-confirmed.
+- The Dread Realm: the Witch of Angmar (101156:A:1) resolves the When Revealed of her Sorcery shadow cards, from an official FAQ entry read only as quoted on the FFG forum (the FAQ PDF is unavailable). Not user-confirmed.
+- The Dread Realm: "Sorcery cards in play" excludes shadow cards (101164, 10153; community consensus). Not user-confirmed.
+- The Dread Realm: a Reanimated Dead counts as in play although facedown (agent recommendation). Not user-confirmed.
+- The Dread Realm: a Reanimated Dead reanimated in a step attacks that step with two shadow cards (agent recommendation). Not user-confirmed.
+- The Dread Realm: the defending player reanimates for the Unholy Crypt, Dark Halls and Dwimmerlaik lines (agent recommendation). Not user-confirmed.
+- The Dread Realm: removing Possession from the game leaves its Reanimated Dead in play (agent recommendation). Not user-confirmed.
+- The Dread Realm: ties for A Fell Dread go to the first player (agent recommendation). Not user-confirmed.
+- The Dread Realm: Daechanar (10153:A:3) cancels the whole damage instance and the first player chooses the Sorcery card removed (agent recommendation). Not user-confirmed.
+- The Dread Realm: the Wraith of Carn Dûm's host is chosen by the first player and its Forced is inactive while it lies attached (agent recommendation). Not user-confirmed.
+- The Dread Realm: Sinister Dungeon is dealt as a shadow card instead of going to the discard pile (agent recommendation). Not user-confirmed.
+- The Dread Realm: Dark Halls' shadow reanimates a copy of the defending character from the defending player's discard pile (agent recommendation). Not user-confirmed.
+- The Dread Realm: progress the Altar of Midwinter cannot take goes to the quest card (agent recommendation). Not user-confirmed.
+- The Dread Realm: stage 3's search shuffles the deck after, and the first player divides stage 3's progress freely (agent recommendation). Not user-confirmed.
+- Renderer gaps, The Dread Realm (behaviour proven by tests): A Fell Dread's highest-threat host without one already (101163:A:1), the location count's zones (10152:B:3), the first player as the Altar's actor (10154:A:2), 10193's Setup verbs and its win line print as JSON or "(no instructions)".
 
 ### Screens and code
 - Fire in the Night: the table has no side-quest deck area or current-quest mark (`docs/brief.md`, Ered Mithrin).
