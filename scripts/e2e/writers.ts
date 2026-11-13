@@ -43,6 +43,7 @@ import { eriadorFixtures } from "./angmar-awakened/the-wastes-of-eriador.ts";
 import { gramFixtures } from "./angmar-awakened/escape-from-mount-gram.ts";
 import { ettenmoorsFixtures } from "./angmar-awakened/across-the-ettenmoors.ts";
 import { rhudaurFixtures } from "./angmar-awakened/the-treachery-of-rhudaur.ts";
+import { dumFixtures } from "./angmar-awakened/the-battle-of-carn-dum.ts";
 
 // The scenarios scenario 1's block writes by hand (the won game is a search, `knife-lost` starts from its log).
 export const SCENARIO_ONE = ["a-shadow-of-the-past", "a-knife-in-the-dark"] as const;
@@ -95,4 +96,5 @@ export const WRITERS: Record<Chained, (written: Written) => Promise<object> | ob
   "escape-from-mount-gram": () => gramFixtures(),
   "across-the-ettenmoors": () => ettenmoorsFixtures(),
   "the-treachery-of-rhudaur": () => rhudaurFixtures(),
+  "the-battle-of-carn-dum": () => dumFixtures(),
 };

@@ -51,6 +51,7 @@ import eriadorFixtures from "./fixtures/the-wastes-of-eriador.json";
 import gramFixtures from "./fixtures/escape-from-mount-gram.json";
 import ettenmoorsFixtures from "./fixtures/across-the-ettenmoors.json";
 import rhudaurFixtures from "./fixtures/the-treachery-of-rhudaur.json";
+import dumFixtures from "./fixtures/the-battle-of-carn-dum.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -118,6 +119,7 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "escape-from-mount-gram": gramFixtures,
   "across-the-ettenmoors": ettenmoorsFixtures,
   "the-treachery-of-rhudaur": rhudaurFixtures,
+  "the-battle-of-carn-dum": dumFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(
