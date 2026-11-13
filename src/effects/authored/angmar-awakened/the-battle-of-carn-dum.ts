@@ -10,6 +10,10 @@ import { copyLine, withCopies } from "../reprint.ts";
 // faq.enemy-attacks-outside-combat, faq.additional-attacks, faq.progress-without-advancing (data/rules/entries.json).
 const CAPTAIN = "10127";
 const CHAMPION = "10128";
+/** The shadow cards dealt to Thaurdir that flip him on stage 1B (10125:B:3), the progress on stage 2B that takes his Indestructible away (10126:B:2) and the progress Furious Charge adds to the main quest (10139:A:3): the table's readouts read them here. */
+export const THAURDIR_FLIP_SHADOWS = 3;
+export const CRUX_PROGRESS = 15;
+export const FURIOUS_CHARGE_PROGRESS = 10;
 // "Thaurdir": the enemy with that title, on either side, in the staging area or engaged.
 const THAURDIR_ENEMY: PickSpec = { type: "enemy", control: "any", staging: true, names: ["Thaurdir"] };
 const THAURDIR_HOLDERS = THAURDIR_ENEMY;
@@ -25,8 +29,8 @@ const FLIP_EITHER: Instruction = { verb: "FlipTwoSided", front: CAPTAIN, back: C
 const EXACTLY_THREE_SHADOWS: Condition = {
   kind: "all",
   conditions: [
-    { kind: "less", left: 2, right: { stat: "shadowCards", of: "subject" } },
-    { kind: "less", left: { stat: "shadowCards", of: "subject" }, right: 4 },
+    { kind: "less", left: THAURDIR_FLIP_SHADOWS - 1, right: { stat: "shadowCards", of: "subject" } },
+    { kind: "less", left: { stat: "shadowCards", of: "subject" }, right: THAURDIR_FLIP_SHADOWS + 1 },
   ],
 };
 const MORE_THAN_TWO_ON_SELF: Condition = { kind: "less", left: 2, right: { stat: "shadowCards", of: "self" } };
@@ -82,7 +86,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     },
     { id: "10126:forced:1", cardCode: "10126", lines: ["10126:B:1"], timing: "forced", trigger: "endOfRound", instructions: [FLIP_TO_CHAMPION] },
     // With 15 or more progress on this stage Thaurdir loses indestructible; the stage cannot be defeated while he is in play.
-    { id: "10126:constant:2", cardCode: "10126", lines: ["10126:B:2"], timing: "constant", condition: { kind: "stageProgress", min: 15 }, instructions: [{ verb: "ModifyStat", stat: "losesKeywords", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_HOLDERS }] },
+    { id: "10126:constant:2", cardCode: "10126", lines: ["10126:B:2"], timing: "constant", condition: { kind: "stageProgress", min: CRUX_PROGRESS }, instructions: [{ verb: "ModifyStat", stat: "losesKeywords", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_HOLDERS }] },
     { id: "10126:constant:3", cardCode: "10126", lines: ["10126:B:2"], timing: "constant", condition: THAURDIR_IN_PLAY, instructions: [{ verb: "Restrict", what: "advance" }] },
     // If Thaurdir is defeated, the players win the game.
     { id: "10126:triggered:1", cardCode: "10126", lines: ["10126:B:3"], timing: "triggered", trigger: "enemyDestroyed", subject: THAURDIR_ENEMY, instructions: [{ verb: "WinGame" }] },
@@ -202,7 +206,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       trigger: "progressPlaced",
       instructions: [{ verb: "ModifyStat", stat: "defense", amount: -2, until: "endOfRound", holders: { type: "character", control: "any" } }, FLIP_TO_CHAMPION],
     },
-    { id: "10139:response:1", cardCode: "10139", lines: ["10139:A:3"], timing: "response", trigger: "questDefeated", subject: "self", instructions: [{ verb: "QuestProgress", amount: 10, main: true }] },
+    { id: "10139:response:1", cardCode: "10139", lines: ["10139:A:3"], timing: "response", trigger: "questDefeated", subject: "self", instructions: [{ verb: "QuestProgress", amount: FURIOUS_CHARGE_PROGRESS, main: true }] },
 
     // 10189 Elrond's Champion (boon ally). Response: after an enemy engages you (an engagement check, an optional engagement or an effect; never Thaurdir's "considered" engagement), ready it.
     { id: "10189:response:1", cardCode: "10189", lines: ["10189:A:1"], timing: "response", trigger: "engaged", eventSeat: "you", condition: { kind: "matches", card: "self", pick: { type: "character", control: "any", state: "exhausted" } }, instructions: [{ verb: "Ready", target: "self" }] },
