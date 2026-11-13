@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import { campaignIndexSchema } from "../../src/catalog/scenario-data.ts";
 import { DATA_DIR } from "./paths.ts";
 import { loadCampaign } from "./load-scenarios.ts";
-import { CAMPAIGNS } from "./campaign-defs.ts";
+import { CAMPAIGNS, scenarioProductOf } from "./campaign-defs.ts";
 import { buildCampaignIndex } from "./normalize/campaigns.ts";
 import { parseOverrides } from "./normalize/overrides.ts";
 import { hobScenarioIndexSchema } from "./sources/hallofbeorn.ts";
@@ -16,13 +16,12 @@ const index = campaignIndexSchema.parse(JSON.parse(readFileSync(path.join(DATA_D
 
 describe("data/campaigns/index.json", () => {
   it("lists the built campaigns playable and the later campaigns and cycles locked, with the scenario counts Hall of Beorn lists", () => {
-    expect(index.filter((entry) => entry.playable).map((entry) => entry.id)).toEqual(["fellowship-of-the-ring", "mirkwood-paths", "the-dark-of-mirkwood", "dream-chaser", "ered-mithrin", "the-two-towers", "the-return-of-the-king"]);
+    expect(index.filter((entry) => entry.playable).map((entry) => entry.id)).toEqual(["fellowship-of-the-ring", "mirkwood-paths", "the-dark-of-mirkwood", "dream-chaser", "ered-mithrin", "angmar-awakened", "the-two-towers", "the-return-of-the-king"]);
     expect(index.find((entry) => entry.id === "fellowship-of-the-ring")?.scenarioCount).toBe(loadCampaign().scenarios.length);
-    // A campaign is playable once one of its scenarios is in PLAYABLE_SCENARIOS. The Return of the King is built (scripts/data/return-of-the-king.test.ts) and playable from its first scenario, its box named by no override. The other locked entries have no scenario files: the
+    // A campaign is playable once one of its scenarios is in PLAYABLE_SCENARIOS. The Return of the King is built (scripts/data/return-of-the-king.test.ts) and playable from its first scenario, its box named by no override. Angmar Awakened is built (scripts/data/angmar-awakened.test.ts) and playable from its first scenario. The other locked entries have no scenario files: the
     // campaigns played in Campaign Mode, under their RCO boxes, then the cycles: scenarios that are part of no campaign (data/overrides.json, campaigns).
     const locked = index.filter((entry) => !entry.playable).map((entry) => [entry.name, entry.kind, entry.scenarioCount]);
     expect(locked).toEqual([
-      ["Angmar Awakened", "campaign", 9],
       ["Shadows of Mirkwood", "cycle", 6],
       ["Dwarrowdelf", "cycle", 9],
       ["The Hobbit", "cycle", 6],
@@ -34,7 +33,8 @@ describe("data/campaigns/index.json", () => {
     ]);
     expect(index.filter((entry) => entry.playable).every((entry) => entry.kind === "campaign")).toBe(true);
     expect(index.filter((entry) => entry.kind === "cycle").every((entry) => entry.box === null)).toBe(true);
-    expect(index.filter((entry) => !entry.playable && entry.kind === "campaign").map((entry) => entry.box)).toEqual(["Angmar Awakened Campaign Expansion"]);
+    // Every campaign is built, so none is locked.
+    expect(index.filter((entry) => !entry.playable && entry.kind === "campaign")).toEqual([]);
   });
 
   it("orders every campaign and cycle by release, the Lord of the Rings saga boxes together at the Fellowship's release", () => {
@@ -62,7 +62,7 @@ describe("data/campaigns/index.json", () => {
 
   it("accounts for every official product Hall of Beorn lists: built, coming later, or a reprint the app plays from its revised box", () => {
     const products = new Set(hobScenarioIndexSchema.parse(JSON.parse(readFileSync(path.join(DATA_DIR, "raw", "hallofbeorn", "Scenarios.json"), "utf8"))).map((entry) => entry.Product));
-    const listed = new Set([...CAMPAIGNS.flatMap((campaign) => campaign.products), ...overrides.campaigns.flatMap((campaign) => campaign.products)]);
+    const listed = new Set([...CAMPAIGNS.flatMap((campaign) => campaign.products.map(scenarioProductOf)), ...overrides.campaigns.flatMap((campaign) => campaign.products)]);
     // The 2011 Core Set and the Two-Player Limited Edition Starter print the scenarios the Revised Core Set and The Dark of Mirkwood reprint.
     const reprinted = ["Core Set", "Two-Player Limited Edition Starter"];
     // Fan-made: A Long-extended Party's packs (RingsDB names them "ALeP - ...") and the scenarios RingsDB lists no pack for. The
@@ -80,7 +80,7 @@ describe("data/campaigns/index.json", () => {
   });
 
   it("lists The Two Towers, built from six scenario files, as a playable campaign of six scenarios after Ered Mithrin", () => {
-    expect(index.map((entry) => entry.id).slice(0, 7)).toEqual(["fellowship-of-the-ring", "mirkwood-paths", "the-dark-of-mirkwood", "dream-chaser", "ered-mithrin", "the-two-towers", "the-return-of-the-king"]);
+    expect(index.map((entry) => entry.id).slice(0, 8)).toEqual(["fellowship-of-the-ring", "mirkwood-paths", "the-dark-of-mirkwood", "dream-chaser", "ered-mithrin", "angmar-awakened", "the-two-towers", "the-return-of-the-king"]);
     expect(index.find((entry) => entry.id === "the-two-towers")).toMatchObject({ name: "The Two Towers", scenarioCount: 6, playable: true });
     expect(loadCampaign("the-two-towers").scenarios).toHaveLength(6);
   });

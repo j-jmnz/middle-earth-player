@@ -26,7 +26,8 @@ export function doRefresh(state: ScenarioState, ctx: ReduceContext, steps: Engin
   let next = updateCards(state, patches);
   for (const event of readied) next = queueEvent(next, event);
   // "Players do not raise their threat at the end of the refresh phase" (noRefreshThreat, 146042:A:1).
-  if (!flagged(next, "table", "noRefreshThreat")) for (const seat of livingSeats(next)) next = raiseThreat(next, seat, 1, steps, ruleCause("rr.step-7-3"));
+  // The campaign card of Escape from Mount Gram raises it by its own count instead (families/captured/values.ts).
+  if (!flagged(next, "table", "noRefreshThreat") && next.capture?.refresh !== true) for (const seat of livingSeats(next)) next = raiseThreat(next, seat, 1, steps, ruleCause("rr.step-7-3"));
   return withMode(passToken(next, ctx, steps), "endRound");
 }
 

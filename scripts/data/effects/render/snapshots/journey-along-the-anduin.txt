@@ -22,7 +22,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01083:A:1 (front): During the encounter phase, players cannot optionally engage Goblin Sniper if there are other enemies in the staging area.
   01083:constant:1: Constant
-    only if all of: (it is the Encounter phase) and (this card is in the staging area) and (the number of enemy (any player controls) in the staging area only [also {"other":true}] is at least 1)
+    only if all of: (it is the Encounter phase) and (this card is in the staging area) and (the number of enemy (any player controls) in the staging area only, other than this card is at least 1)
     - this card: stat cannotBeOptionallyEngaged 1, while this card is in play
 
 01083:A:2 (front): Forced: If Goblin Sniper is in the staging area at the end of the combat phase, each player deals 1 point of damage to 1 character he controls.
@@ -58,7 +58,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01086:A:1 (front): When Revealed: Remove 4 progress tokens from the current quest card. (If there are fewer than 4 progress tokens on the quest, remove all progress tokens from that quest.)
   01086:whenRevealed:1: When revealed
-    - [json RemoveProgressFromQuest {"verb":"RemoveProgressFromQuest","amount":4}]
+    - remove 4 progress from the current quest card (all of it when it holds less)
 
 01086:A:2 (shadow): Shadow: Defending character does not count its Defense.
   01086:shadow:1: Shadow
@@ -83,13 +83,13 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01111:A:1 (front): Forced: After Misty Mountain Goblins attacks, remove 1 progress token from the current quest.
   01111:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
-    - [json RemoveProgressFromQuest {"verb":"RemoveProgressFromQuest","amount":1}]
+    - remove 1 progress from the current quest card (all of it when it holds less)
 
 01111:A:2 (shadow): Shadow: Remove 1 progress token from the current quest. (3 progress tokens instead if this attack is undefended.)
   01111:shadow:1: Shadow
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json RemoveProgressFromQuest {"verb":"RemoveProgressFromQuest","amount":1,"when":{"kind":"not","condition":{"kind":"undefended"}}}]
-    - [json RemoveProgressFromQuest {"verb":"RemoveProgressFromQuest","amount":3,"when":{"kind":"undefended"}}]
+    - if not (the attack has no defender): remove 1 progress from the current quest card (all of it when it holds less)
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): remove 3 progress from the current quest card (all of it when it holds less)
 
 ## 01112 Massing at Night
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -102,14 +102,14 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 01112:A:2 (shadow): Shadow: Deal X shadow cards to this attacker. X is the number of players in the game.
   01112:shadow:1: Shadow
     - repeat the number of players times:
-      - [json DealShadowTo {"verb":"DealShadowTo","target":"attacker"}]
+      - the attacking enemy is dealt a shadow card
 
 ## 01113 Banks of the Anduin
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 01113:A:1 (front): Forced: If Banks of the Anduin leaves play, return it to the top of the encounter deck instead of placing it in the discard pile.
   01113:forced:1: Forced after a card leaves play (heard about this card)
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"self","to":"deckTop"}]
+    - this card goes on top of the encounter deck
 
 ## 01114 Gladden Fields
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -127,7 +127,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01115:A:2 (front): Forced: After Eastern Crows is defeated, shuffle it back into the encounter deck.
   01115:forced:1: Forced after an enemy is destroyed (heard about this card)
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"self","to":"shuffle"}]
+    - this card is shuffled into the encounter deck
 
 01115:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack. (+2 Attack instead if defending player's threat is 35 or higher.)
   01115:shadow:1: Shadow
@@ -179,7 +179,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 01126:B:1 (back): When Revealed: Search the encounter deck for 1 Hill Troll (if one is not already in play), and place it in the staging area. Shuffle the encounter deck.
   01126:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchMove {"verb":"SearchMove","code":"01082","to":"staging","when":{"kind":"inPlay","code":"01082","is":false}}]
+    - if the card with code 01082 is not in play: the acting player finds one card with code 01082 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
 
 01126:B:2 (back): Players cannot defeat this stage while any Hill Troll cards are in play.
@@ -248,7 +248,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 01130:B:1 (back): Resolution: Add each copy of Valor and Scarred in play to the Campaign Pool. Record the names of heroes with Valor and/or Scarred attached in the notes section of the Campaign Log and attach them to those heroes when setting up each subsequent scenario in this campaign. The hero with the most damage will be taken prisoner at the beginning of Escape from Dol Guldur (in case of a tie, randomly select among the heroes with the most damage). Record the name of the "prisoner" in the notes section of the Campaign Log.
   01130:resolution:1: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json EarnAttached {"verb":"EarnAttached","codes":["01133","01138"]}]
+    - each copy of code 01133 and code 01138 attached to a hero in play joins the Campaign Pool attached to that hero
     - [json NamePrisoner {"verb":"NamePrisoner"}]
 
-(rendered pieces: 116 by template, 22 as JSON)
+(rendered pieces: 130 by template, 12 as JSON)

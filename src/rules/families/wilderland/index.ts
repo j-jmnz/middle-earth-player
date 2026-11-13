@@ -104,7 +104,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "PutOnPileBottom":
       return putOnPileBottom(state, instruction);
     case "AttachSelfToPicked":
-      return attachSelfToPicked(state, focus, ctx);
+      return attachSelfToPicked(state, instruction, focus, ctx);
     case "AttachSearched":
       return attachSearched(state, instruction, focus, ctx, steps);
     case "GuardPickedAttachment":

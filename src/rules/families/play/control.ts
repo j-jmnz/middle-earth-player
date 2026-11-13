@@ -14,6 +14,7 @@ import { inPlay, livingSeats, updateCard } from "../../core/state.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
 import { attachTo, moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
+import { sharing } from "../breaking/areas.ts";
 import { eventSeat, lastPickedSeat, namedCard, scheduleFor } from "./refs.ts";
 
 type ChangeControl = Extract<Instruction, { verb: "ChangeControl" }>;
@@ -30,6 +31,8 @@ export function giveControl(state: ScenarioState, id: string, seat: number): Sce
   let next = moveCard(state, id, { zone: card.zone, seat });
   if (card.host) next = attachTo(next, id, card.host);
   for (const other of moving.slice(1)) next = attachTo(moveCard(next, other, { zone: "play", seat }), other, id);
+  // A claimed objective attached to the card (a Clue on Amarthiúl, 10110:A:1) is controlled by whoever controls its host.
+  for (const other of card.attachments) if (state.cards[other]?.claimed === true && state.cards[other]?.zone === "attached") next = updateCard(next, other, { controller: seat });
   for (const [other, owner] of owners) next = updateCard(next, other, { owner: owner !== seat ? owner : undefined });
   return queueEvent(next, { trigger: "changedControl", seat, cardId: id });
 }
@@ -76,6 +79,8 @@ export function takeFirstPlayer(state: ScenarioState, seat: number): ScenarioSta
 // Doomed: each player raises their threat from the doomed keyword (rr.doomed-x).
 export function doomed(state: ScenarioState, amount: number, steps: EngineStep[]): ScenarioState {
   let next = state;
-  for (const seat of livingSeats(state)) next = raiseThreat(next, seat, amount, steps, ruleCause("rr.doomed-x"));
+  // The players sharing the acting seat's staging area when areas are joined (families/captured/).
+  const seats = state.capture && state.separate && state.viewSeat != null ? sharing(state, state.viewSeat) : livingSeats(state);
+  for (const seat of seats) next = raiseThreat(next, seat, amount, steps, ruleCause("rr.doomed-x"));
   return next;
 }

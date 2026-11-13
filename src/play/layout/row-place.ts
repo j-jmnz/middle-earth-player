@@ -28,10 +28,10 @@ function foldSlot(zone: "staging" | "engaged", stack: { x: number; w: number; ca
 }
 
 /** Lays a row's cards into `out`, folding and reaching as `folding` and `reach` allow; true when it took the room past its own span. */
-export function placeRow(entries: readonly ZoneEntry[], zone: ZoneId, area: Rect, size: { w: number; h: number }, out: CardSlot[], m: Metrics, folding?: RowFolding, reach: RowReach | null = null): boolean {
-  // A guard lies over the objective it guards, shifted by PAIR_STEP of its width, and the pair keeps a wider gap from its neighbours (rr.guarded).
+export function placeRow(placed: readonly ZoneEntry[], zone: ZoneId, area: Rect, size: { w: number; h: number }, out: CardSlot[], m: Metrics, folding?: RowFolding, reach: RowReach | null = null): boolean {
+  // The selector orders a guard right after the objective it guards (selectors.ts, stagingOrder). A guard lies over the objective it guards, shifted by PAIR_STEP of its width, and the pair keeps a wider gap from its neighbours (rr.guarded).
   const groups: ZoneEntry[][] = [];
-  for (const entry of entries) {
+  for (const entry of placed) {
     const last = groups[groups.length - 1];
     if (zone === "staging" && entry.card.guard === true && last && last[0]?.card.id === entry.card.host) last.push(entry);
     else if (zone === "staging" && entry.area != null && entry.area !== "stage" && last && isAreaGroup(last)) last.push(entry);
@@ -42,9 +42,9 @@ export function placeRow(entries: readonly ZoneEntry[], zone: ZoneId, area: Rect
   const fold = folding && zone === "staging" ? reachRow(groups.map((group, at): FoldGroup => areaGroupFold(group, widths[at] ?? 0, size, m, folding.keep) ?? { id: group[0]?.card.id ?? "", width: widths[at] ?? 0, cards: groupCards(group), rank: stagingRank(group), pinned: keeps(group, folding.keep) }), { x: area.x, width: area.w, gap: m.gap, target: folding.target, stackW: folding.pile.w }, reach) : null;
   const xs = fold ? fold.xs : rowXs(widths, area.x, area.w, m.gap);
   if (fold?.stack && folding) {
-    const areaIds = new Set(entries.filter((entry) => entry.area != null).map((entry) => entry.card.id));
+    const areaIds = new Set(placed.filter((entry) => entry.area != null).map((entry) => entry.card.id));
     const areaOnly = fold.stack.cards.length > 0 && fold.stack.cards.every((id) => areaIds.has(id));
-    foldSlot("staging", fold.stack, area.y, { h: size.h }, folding.pile, new Map(entries.map((entry) => [entry.card.id, entry.card])), out, folding.folds, areaOnly);
+    foldSlot("staging", fold.stack, area.y, { h: size.h }, folding.pile, new Map(placed.map((entry) => [entry.card.id, entry.card])), out, folding.folds, areaOnly);
   }
   const gone = new Set(fold?.stack?.cards ?? []);
   groups.forEach((group, groupAt) => {

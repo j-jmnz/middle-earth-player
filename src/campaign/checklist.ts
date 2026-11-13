@@ -93,7 +93,7 @@ function searchCaves(table: Table, instruction: Extract<Instruction, { verb: "Re
   table.out.did.push(...found.removed.map((code) => `The first player searches the Caves deck and removes ${table.name(code)} from the game.`));
 }
 
-// SearchBoonAllyToHand (12175:A), SearchBoonOrTreasureToHand (12195:A) and SearchDeckForCard (145066:A:1): each player in turn, first player first, may take a card of their deck that `eligible` names (a pool card that step 7 would shuffle into it, or one the deck holds) into their hand, or skip. `untilFirst`: the offer ends
+// SearchBoonAllyToHand (12175:A), SearchBoonOrTreasureToHand (12195:A), SearchBoonToHand (10193:A:2) and SearchDeckForCard (145066:A:1): each player in turn, first player first, may take a card of their deck that `eligible` names (a pool card that step 7 would shuffle into it, or one the deck holds) into their hand, or skip. `untilFirst`: the offer ends
 // with the first who takes one ("a player may search"); otherwise every player is asked ("each player may search"). `firstOnly`: only the first player is asked ("The first player may ... search his deck"). `raise`: the search costs each player's threat that much for this game ("raise each player's threat by 1"), added to every seat's starting threat when the first player takes it.
 // Setup follows the opening hand and any mulligan (rr.setup step 7), so the card joins the hand after the mulligan, as AddToHandAfterMulligan's cards do; a pool card stays in the pool but is not shuffled into the deck.
 type HandSearch = { eligible: (printed: PrintedCard) => boolean; looksFor: string; untilFirst: boolean; skipped: (seat: number, seatCount: number) => string; firstOnly?: boolean; raise?: number };
@@ -135,6 +135,7 @@ const searchBoonAlly = (table: Table): void => searchToHand(table, { eligible: (
 // SearchDeckForCard: the first player alone may pay the threat to search for the named card.
 const searchDeckForCard = (table: Table, instruction: Extract<Instruction, { verb: "SearchDeckForCard" }>): void =>
   searchToHand(table, { eligible: (printed) => printed.code === instruction.code, looksFor: table.name(instruction.code), untilFirst: true, firstOnly: true, raise: instruction.raiseThreat, skipped: () => `The first player does not search for ${table.name(instruction.code)}.` });
+const searchBoon = (table: Table): void => searchToHand(table, { eligible: (printed) => printed.campaignKind === "boon", looksFor: "a boon card", untilFirst: false, skipped: (seat, seatCount) => `${seatCount === 1 ? "You do" : `Player ${seat + 1} does`} not search for a boon card.` });
 const searchBoonOrTreasure = (table: Table): void => searchToHand(table, { eligible: (printed) => printed.campaignKind === "boon" || printed.campaignKind === "treasure", looksFor: "a boon or treasure card", untilFirst: false, skipped: (seat, seatCount) => `${seatCount === 1 ? "You do" : `Player ${seat + 1} does`} not search for a boon or treasure card.` });
 
 // SetAsideBoon (146069:A:1): each player in turn, first player first, chooses a boon of the whole campaign pool with the trait, other than `except`, and sets it aside, out of play (the card says "from the campaign pool", not from their own boons). The set-aside boon is the chooser's:
@@ -177,6 +178,8 @@ function addToHandAfterMulligan(table: Table, instruction: Extract<Instruction, 
 
 // AddToPool: recorded for the next scenario. This game already has the card (shuffled in or in a hand), so steps 7 and 8 leave it be.
 function addToPool(table: Table, instruction: Extract<Instruction, { verb: "AddToPool" }>): void {
+  // A card the pool already holds (a scenario started again from the log it wrote) is not added a second time.
+  if (!instruction.eachPlayer && table.pool.some((card) => card.code === instruction.code && card.attachedTo == null)) return;
   const printed = printedOf(table.input.cards, instruction.code);
   for (const seat of instruction.eachPlayer ? table.seats.map((_, index) => index) : [null]) {
     const added = poolCard(printed, instruction.code, null, seat, instruction.eachPlayer === true);
@@ -236,7 +239,7 @@ function chooseCards(table: Table, instruction: Extract<Instruction, { verb: "Ch
 
 // Step 6: the campaign card's Setup instructions that deal a card to a player, in the order the card lists them.
 function campaignSetupSteps(campaignSetup: readonly Instruction[], input: ChecklistInput, seats: Working[], pool: PoolCard[], fresh: Set<PoolCard>, name: (code: string) => string): Dealing & { removed: string[]; removedCaves: string[]; leftOut: (card: PoolCard) => boolean; aside: ReadonlySet<PoolCard> } {
-  const table: Table = { input, seats, pool, fresh, aside: new Set(), answers: [...(input.choices ?? [])], name, out: { did: [], errors: [], needs: null }, deck: searchableDeck(input.scenario, input.difficulty, input.seats.length, [...encounterDeal(pool, input.effects, () => false).map((card) => card.code), ...poolEncounterCopies(input.log.encounterPool)]), removed: [], caves: searchableCaves(input.scenario, input.difficulty), removedCaves: [], burdens: [] };
+  const table: Table = { input, seats, pool, fresh, aside: new Set(), answers: [...(input.choices ?? [])], name, out: { did: [], errors: [], needs: null }, deck: searchableDeck(input.scenario, input.difficulty, input.seats.length, [...encounterDeal(pool, input.effects, campaignSetup, input.cards, () => false).map((card) => card.code), ...poolEncounterCopies(input.log.encounterPool)]), removed: [], caves: searchableCaves(input.scenario, input.difficulty), removedCaves: [], burdens: [] };
   for (const instruction of campaignSetup) {
     // A line that shuffles a card into the encounter deck puts it where the searches after it look (the Setup lines run in print order).
     if (instruction.verb === "ShuffleIntoEncounterDeck" && logConditionHolds(instruction.when, input.log)) table.deck.push(instruction.code);
@@ -248,6 +251,7 @@ function campaignSetupSteps(campaignSetup: readonly Instruction[], input: Checkl
     else if (instruction.verb === "RemoveFromCavesIfLogged") searchCaves(table, instruction);
     else if (instruction.verb === "SearchBoonAllyToHand") searchBoonAlly(table);
     else if (instruction.verb === "SearchBoonOrTreasureToHand") searchBoonOrTreasure(table);
+    else if (instruction.verb === "SearchBoonToHand") searchBoon(table);
     else if (instruction.verb === "SearchDeckForCard") searchDeckForCard(table, instruction);
     else if (instruction.verb === "SetAsideBoon") setAsideBoon(table, instruction);
     else if (instruction.verb === "RemovePoolCards") table.out.did.push(...removePoolCards(table.pool, table.seats, instruction).map((code) => `${table.name(code)} is removed from the Campaign Pool.`));
@@ -267,8 +271,16 @@ function putsItselfIntoPlay(effects: readonly Effect[], code: string): boolean {
 
 // The pool entries the deal shuffles into the encounter deck (step 8): not attached, not skipped by the caller (set by the campaign card's Setup or already dealt),
 // backed by the encounter deck, not shuffled into a player's deck after the hand, and not put into play by their own record. The one definition the Setup searches and step 8 share.
-function encounterDeal(pool: readonly PoolCard[], effects: readonly Effect[], skipped: (card: PoolCard) => boolean): PoolCard[] {
-  return pool.filter((card) => card.attachedTo == null && !skipped(card) && card.back === "encounter" && !card.afterHand && !putsItselfIntoPlay(effects, card.code));
+function encounterDeal(pool: readonly PoolCard[], effects: readonly Effect[], campaignSetup: readonly Instruction[], cards: ReadonlyMap<string, PrintedCard>, skipped: (card: PoolCard) => boolean): PoolCard[] {
+  return pool.filter((card) => card.attachedTo == null && !skipped(card) && card.back === "encounter" && !card.afterHand && !putsItselfIntoPlay(effects, card.code) && !dealtByCampaignSetup(campaignSetup, card.code, cards));
+}
+
+// A pool side quest the campaign card's own Setup deals each game: "Add Protect the Innocent to the staging area", or "add Mysterious Omens to the Campaign Log and shuffle it into the encounter deck" (AddToPool with the shuffle, The Weather Hills, 10159:A:2). A side quest in the pool is the
+// one physical card the Setup deals, so step 8 does not shuffle a second copy in. A burden or boon the Setup also shuffles in is another copy, and step 8 still deals the pool's.
+function dealtByCampaignSetup(campaignSetup: readonly Instruction[], code: string, cards: ReadonlyMap<string, PrintedCard>): boolean {
+  if (cards.get(code)?.type !== "encounter-side-quest") return false;
+  const named = (verb: Instruction["verb"]): boolean => campaignSetup.some((instruction) => instruction.verb === verb && "code" in instruction && instruction.code === code && !("when" in instruction && instruction.when != null));
+  return named("AddToStaging") || (named("AddToPool") && named("ShuffleIntoEncounterDeck"));
 }
 
 export function checklist(input: ChecklistInput): ChecklistPlan {
@@ -340,7 +352,9 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
   const threatPenalty = log.threatPenalty + added + forcedPenalty;
   note(3, [...(changed === 0 ? ["No hero was changed."] : waived ? [`${changed} hero change(s) cost nothing: the campaign card waives the +1 penalty.`] : [`${changed} hero change(s) add ${changed} to the threat penalty.`]), ...(forcedPenalty > 0 ? ["Aragorn leaves the list of fallen heroes: each player takes a permanent +1 threat penalty (mec112.campaign-mode-aragorn)."] : [])]);
   const extra = Array.from({ length: seatCount }, (_, index) => log.threatPenaltyBySeat[index] ?? 0);
-  note(4, [`Each player's starting threat is the combined threat cost of their heroes plus ${threatPenalty}.`, ...extra.flatMap((more, index) => (more > 0 ? [`Seat ${index + 1} takes a permanent +${more} starting threat penalty of its own, so its starting threat is plus ${threatPenalty + more}.`] : []))]);
+  // A starting threat modifier in words: "plus 3", "minus 2" (a reduction, 10173:A:2), at least 0 once it is a reduction.
+  const modifier = (amount: number): string => (amount < 0 ? `minus ${-amount}, and at least 0` : `plus ${amount}`);
+  note(4, [`Each player's starting threat is the combined threat cost of their heroes ${modifier(threatPenalty)}.`, ...extra.flatMap((more, index) => (more > 0 ? [`Seat ${index + 1} takes a permanent +${more} starting threat penalty of its own: its starting threat is the combined threat cost of its heroes ${modifier(threatPenalty + more)}.`] : []))]);
 
   const seats: Working[] = input.seats.map((seat, index) => ({ heroes: [...(dealtBySeat[index] ?? [])], deck: [...seat.deck], attachments: [], hand: [], afterMulligan: [], ...((extra[index] ?? 0) > 0 ? { threatPenalty: extra[index] } : {}) }));
 
@@ -385,7 +399,7 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
   const poolEncounterCards: string[] = [];
   const poolEncounterOwners: PoolEncounterOwner[] = [];
   const poolIntoPlay: string[] = [];
-  const toDeck = new Set(encounterDeal(pool, input.effects, (card) => fresh.has(card) || dealt(card) || six.leftOut(card)));
+  const toDeck = new Set(encounterDeal(pool, input.effects, campaignSetup, input.cards, (card) => fresh.has(card) || dealt(card) || six.leftOut(card)));
   for (const card of pool) {
     if (card.attachedTo != null || fresh.has(card)) continue;
     if (dealt(card)) continue;
@@ -410,6 +424,11 @@ export function checklist(input: ChecklistInput): ChecklistPlan {
     if (putsItselfIntoPlay(input.effects, card.code)) {
       poolIntoPlay.push(card.code);
       did8.push(`${name(card.code)} is put into play instead of being shuffled into the encounter deck.`);
+      continue;
+    }
+    // A side quest the campaign card's own Setup deals (Protect the Innocent, Mysterious Omens) is the one physical card that Setup puts in play: no deck takes a copy of it.
+    if (card.back === "encounter" && dealtByCampaignSetup(campaignSetup, card.code, input.cards)) {
+      did8.push(`${name(card.code)} is dealt by the campaign card's Setup, not shuffled into a deck.`);
       continue;
     }
     // Shuffled into the chosen player's deck once the starting hand is drawn (11197:B:1): dealt after the mulligan (setup.ts, AFTER_HAND).

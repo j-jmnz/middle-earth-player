@@ -17,6 +17,7 @@ import { PACK_CAMPAIGN, REPRINT_PACKS } from "../data/campaign-defs.ts";
 import { loadCards } from "../data/load-cards.ts";
 import { DATA_DIR } from "../data/paths.ts";
 import { parseLedger } from "../data/printed/ledger.ts";
+import { cardImageUrl } from "../../src/screens/images/policy.ts";
 
 const log = createLog("catalog:build");
 
@@ -85,18 +86,27 @@ function capitalize(word: string): string {
   return word.charAt(0).toUpperCase() + word.slice(1);
 }
 
+type LedgerScan = { code: string; side: "A" | "B"; scan: { url: string } };
+
 // The scan each ledgered card side was read from (data/printed), by code: side A's in `fronts`, side B's in `backs`. Each is pinned in
-// data/sources.json.
-function ledgerScans(dataDir: string): { fronts: Map<string, string>; backs: Map<string, string> } {
+// data/sources.json. A scan on a host the app cannot download from (src/screens/images/policy.ts, SCAN_HOSTS) is what the ledger was read
+// from, not a picture the phone can show, so it is left out and the card keeps the picture its printings give: the Angmar Awakened
+// Campaign Expansion's MEC108 scans on cardgame.tools and the Nightmare ledger's Drive scans (which fall back to the Hall of Beorn printing URLs).
+export function scansOfEntries(entries: readonly LedgerScan[]): { fronts: Map<string, string>; backs: Map<string, string> } {
   const fronts = new Map<string, string>();
   const backs = new Map<string, string>();
-  const dir = path.join(dataDir, "printed");
-  if (!existsSync(dir)) return { fronts, backs };
-  for (const name of readdirSync(dir).filter((file) => file.endsWith(".json")).sort()) {
-    const ledger = parseLedger(JSON.parse(readFileSync(path.join(dir, name), "utf8")) as unknown);
-    for (const entry of ledger.entries) (entry.side === "A" ? fronts : backs).set(entry.code, entry.scan.url);
-  }
+  for (const entry of entries) if (cardImageUrl(entry.scan.url) !== null) (entry.side === "A" ? fronts : backs).set(entry.code, entry.scan.url);
   return { fronts, backs };
+}
+
+function ledgerScans(dataDir: string): { fronts: Map<string, string>; backs: Map<string, string> } {
+  const dir = path.join(dataDir, "printed");
+  if (!existsSync(dir)) return scansOfEntries([]);
+  const entries = readdirSync(dir)
+    .filter((file) => file.endsWith(".json"))
+    .sort()
+    .flatMap((name) => parseLedger(JSON.parse(readFileSync(path.join(dir, name), "utf8")) as unknown).entries);
+  return scansOfEntries(entries);
 }
 
 // The picture the phone downloads: RingsDB's `imagesrc` path. A card RingsDB has no picture for (quest and encounter cards)
@@ -118,7 +128,10 @@ export function backPictureOf(card: Card, backs: ReadonlyMap<string, string>): s
   const ledgered = backs.get(card.code);
   if (ledgered) return ledgered;
   const urls = card.printings.flatMap((printing) => printing.imageUrls ?? []);
-  return urls.find((url) => url.includes("hallofbeorn") && /-\d+B\.jpg$/.test(url)) ?? urls.find((url) => url.includes("dragncards") && url.endsWith(".B.jpg")) ?? null;
+  // A campaign card's Hall of Beorn front is its `<title>-SetupA.jpg`; its back is the `SetupB` picture beside it (a full-colour scan with the Resolution text, checked
+  // online for the Angmar Awakened Campaign Expansion's nine campaign cards; no source lists the URL).
+  const setup = card.type === "campaign" ? urls.find((url) => url.includes("hallofbeorn") && url.endsWith("-SetupA.jpg")) : undefined;
+  return urls.find((url) => url.includes("hallofbeorn") && /-\d+B\.jpg$/.test(url)) ?? urls.find((url) => url.includes("dragncards") && url.endsWith(".B.jpg")) ?? (setup ? setup.replace(/-SetupA\.jpg$/, "-SetupB.jpg") : null);
 }
 
 // A card belongs to the campaign of the first catalog pack it is printed in that PACK_CAMPAIGN lists (a Fellowship card also in the

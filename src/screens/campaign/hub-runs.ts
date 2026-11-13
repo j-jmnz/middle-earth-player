@@ -24,7 +24,8 @@ export function comingScenarios(boxes: readonly Box[], isPlayable: (scenarioId: 
 /**
  * The Scenarios tab's Coming later, in the campaigns table's order: for each row, the waiting scenarios of the boxes that follow
  * its campaign, then the row itself when it is locked. Shelob's Lair, waiting in The Two Towers' box, sits beside The Return of
- * the King. A box whose campaign has no row goes last.
+ * the King. A locked campaign whose box is listed is one tile named by that box ("9 scenarios · Coming soon"), not a tile for each scenario
+ * and the row besides. A box whose campaign has no row goes last.
  */
 export function comingLater(boxes: readonly Box[], rows: readonly CampaignRow[], isPlayable: (scenarioId: string) => boolean, nameOf: (scenarioId: string) => string): LockedTile[] {
   const locked = new Map(lockedBoxTiles(rows).map((tile) => [tile.id, tile]));
@@ -32,7 +33,9 @@ export function comingLater(boxes: readonly Box[], rows: readonly CampaignRow[],
   const waiting = (campaignId: string) => comingScenarios(boxes.filter((box) => box.campaignId === campaignId), isPlayable, nameOf);
   const placed = rows.flatMap((row) => {
     const tile = locked.get(row.id);
-    return tile ? [...waiting(row.id), tile] : waiting(row.id);
+    if (!tile) return waiting(row.id);
+    const box = boxes.find((candidate) => candidate.campaignId === row.id);
+    return box ? [{ ...tile, name: row.box ?? box.name }] : [tile];
   });
   return [...placed, ...comingScenarios(boxes.filter((box) => !ids.has(box.campaignId)), isPlayable, nameOf)];
 }

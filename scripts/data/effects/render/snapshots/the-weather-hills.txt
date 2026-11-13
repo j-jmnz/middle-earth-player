@@ -1,0 +1,428 @@
+Scenario piles that place cards with no record (staging: 09027 Weathered Hilltop; activeLocation: 09028 Exposed Ridge; quest: 09069 Scattered Among the Hills; quest: 09070 Cornered Animals; staging: 09071 Hunting the Orcs; setAside: 09026 Amon Forn; setAside: 09046 Orc Ambush; angmarOrcDeck: 09030 Concealed Orc-camp; angmarOrcDeck: 09043 Angmar Orc; angmarOrcDeck: 09044 Angmar Marauder; angmarOrcDeck: 09045 Angmar Captain)
+
+## 09025 Cornered Orc
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09025:A:1 (front): Forced: After Cornered Orc engages a player, it makes an immediate attack.
+  09025:forced:1: Forced after an enemy engages a player (heard about this card)
+    - this enemy attacks now, dealt a new shadow card after its old ones are discarded
+
+09025:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the defending character is damaged).
+  09025:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if not (the defender is a damaged character (any player controls)): the attacking enemy: stat attack 1, until the end of the attack
+    - then, if the defender is a damaged character (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 2, until the end of the attack
+
+## 09026 Amon Forn
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+09026:A:1: Immune to player card effects.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+09026:A:2 (front): While Amon Forn is the active location, it gains: "Forced: After an Orc enemy is added to the staging area, it makes an immediate attack against the first player."
+  09026:forced:1: Forced after an encounter card is added to the staging area (heard about Orc enemy (any player controls))
+    only if this card is the active location
+    - the card the event is about attacks the first player now, from the staging area
+  09026:forced:2: Forced on the event returnedToStaging (heard about Orc enemy (any player controls))
+    only if this card is the active location
+    - the card the event is about attacks the first player now, from the staging area
+
+09026:A:3 (front): The players cannot win while Amon Forn is in play.
+  09026:constant:2: Constant
+    - the players cannot defeat this stage while this holds
+
+## 09027 Weathered Hilltop
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+09027:A:1 (front): Weathered Hilltop gets +1 Threat for each resource token on it.
+  09027:constant:1: Constant
+    - this card: stat threat resources of this card, while this card is in play
+
+09027:A:2 (front): Forced: After a Weather treachery is revealed from the encounter deck, place 1 resource token here.
+  09027:forced:1: Forced after a card is revealed (heard about Weather treachery (any player controls); not for a card found in the encounter discard pile)
+    - place 1 resource tokens on this card
+
+## 09028 Exposed Ridge
+(the scenario deals it into the activeLocation pile; the piles place it, no record does)
+
+09028:A:1 (front): While Exposed Ridge is the active location, it gains: "Forced: At the end of the refresh phase, each player deals 1 damage to a character he controls."
+  09028:forced:1: Forced at the end of the phase
+    only if all of: (it is the Refresh phase) and (this card is the active location)
+    - for each player, first player first:
+      - choose character (you control)
+      - deal 1 damage to the picked card
+
+09028:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each damaged character the defending player controls.
+  09028:shadow:1: Shadow
+    - the attacking enemy: stat attack the number of damaged character (you control), until the end of the attack
+
+## 09029 Sheltered Valley
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09029:A:1 (front): While Sheltered Valley is the active location, it gains: "Response: When Sheltered Valley is explored, heal all damage from 1 character."
+  09029:response:1: Response on the event activeExplored (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose damaged character (any player controls)
+    - heal all damage from the picked card
+
+09029:A:2 (front): Travel: Remove 1 resource token from the Mission objective.
+  09029:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose Mission objective (any player controls)
+    - up to 1 resource token(s) come off the picked card
+
+## 09030 Concealed Orc-camp
+(the scenario deals it into the angmarOrcDeck pile; the piles place it, no record does)
+
+09030:A:1 (front): While Concealed Orc-camp is the active location, it gains: "Response: When Concealed Orc-camp is explored, place 1 resource token on the Mission objective."
+  09030:response:1: Response on the event activeExplored (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose Mission objective (any player controls)
+    - place 1 resource tokens on the picked card
+
+09030:A:2 (front): Travel: The first player searches the encounter deck and discard pile for an Orc enemy and puts it into play engaged with him. Shuffle the encounter deck.
+  09030:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the acting player finds one Orc enemy in the encounter deck or its discard pile and puts it into play engaged with the first player (it is not revealed)
+    - shuffle the encounter deck
+
+## 09031 Ice Storm
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09031:A:1 (front): When Revealed: Each player assigns X damage among characters he controls, where X is the number of quest cards in play. Then, exhaust each damaged character.
+  09031:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each player assigns the number of quest cards in play (the main quest card, each encounter side quest in the staging area and each player side quest; at least 1) damage among the character (you control), one at a time
+    - exhaust each damaged character (any player controls)
+
+09031:A:2 (shadow): Shadow: Assign X damage among characters you control. X is the number of quest cards in play.
+  09031:shadow:1: Shadow
+    - the acting player assigns the number of quest cards in play (the main quest card, each encounter side quest in the staging area and each player side quest; at least 1) damage among the character (you control), one at a time
+
+## 09032 Find Shelter
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09032:A:1 (front): Surge. Time 4.
+  (the keyword part is owned by the card's keywords; the records cover: Time 4.)
+  09032:constant:1: Constant
+    - Time 4: when this card is revealed, 4 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+
+09032:A:2 (front): Forced: After the last time counter is removed from this quest card, each player deals 4 damage to a hero he controls. Then, place 4 time counters on this quest card.
+  09032:forced:1: Forced on the event lastTimeCounterRemoved (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - choose hero (you control)
+      - deal 4 damage to the picked card
+    - place 4 resource tokens on this card
+
+## 09052 Biting Wind
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09052:A:1 (front): When Revealed: Assign X damage among characters committed to the quest. X is the number of characters committed to the quest.
+  09052:whenRevealed:1: When revealed
+    - the acting player assigns the number of character (any player controls) committed to the quest damage among the character (any player controls) committed to the quest, one at a time
+
+09052:A:2 (shadow): Shadow: Deal 1 damage to the defending character.
+  09052:shadow:1: Shadow
+    - deal 1 damage to the defender
+
+## 09053 Freezing Blast
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09053:A:1: Doomed 2.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+09053:A:2 (front): When Revealed: Remove each damaged character from the quest.
+  09053:whenRevealed:1: When revealed
+    - for each damaged character (any player controls) committed to the quest:
+      - the last picked character is removed from the quest (it stays exhausted)
+
+09053:A:3 (shadow): Shadow: Attacking enemy gets +1 Attack for each damaged character the defending player controls.
+  09053:shadow:1: Shadow
+    - the attacking enemy: stat attack the number of damaged character (you control), until the end of the attack
+
+## 09054 Cold from Angmar
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09054:A:1 (front): When Revealed: Each player deals 1 damage to a hero he controls. Attach Cold from Angmar to the current quest. (Counts as a Condition attachment with the text: "Treat each damaged character's printed text box as if it were blank, except for keywords and Traits.")
+  09054:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each player, first player first:
+      - choose hero (you control)
+      - deal 1 damage to the picked card
+    - this card is attached to the current quest card (the side quest that is the current quest, else the main quest card) and leaves with it
+  09054:constant:1: Constant
+    only if not (this card is in the staging area)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each damaged character (any player controls): stat blankText (its text box is blank) 1, while this card is in play
+    - each damaged character (any player controls): stat keepsKeywords 1, while this card is in play
+
+## 09055 Make Camp
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09055:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+09055:A:2 (front): Characters cannot be healed.
+  09055:constant:1: Constant
+    only if this card is in the staging area
+    - each character (any player controls): stat cannotBeHealed 1, while this card is in play
+
+09055:A:3 (front): Response: After Make Camp is defeated, each player heals up to 3 damage from a hero he controls.
+  09055:response:1: Response on the event questDefeated (heard about this card)
+    - for each player, first player first:
+      - choose damaged hero (you control)
+      - heal 3 damage from the picked card
+
+## 09056 Ruins of Arnor
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09056:A:1 (front): Forced: After the "when revealed" effect of a treachery card is canceled, raise each player's threat by 2.
+  09056:forced:1: Forced on the event whenRevealedCanceled (heard about treachery (any player controls))
+    only if any of: (this card is in the staging area) or (this card is the active location)
+    - raise threat by 2 (each player)
+
+09056:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. If this attack destroys a character, the defending player raises his threat by 2.
+  09056:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the attacking enemy: stat attack 1, until the end of the attack
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): raise threat by 2 (the acting player)
+
+## 09057 Ancient Causeway
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09057:A:1 (front): Forced: When Ancient Causeway is explored, raise each player's threat by 2.
+  09057:forced:1: Forced on the event locationExplored (heard about this card)
+    - raise threat by 2 (each player)
+
+## 09058 Tragic Discovery
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09058:A:1 (front): When Revealed: Raise each player's threat by the Threat of the active location.
+  09058:whenRevealed:1: When revealed
+    - raise threat by threat of the active location (each player)
+
+09058:A:2 (shadow): Shadow: Defending player either raises his threat by 3, or this attack is considered undefended.
+  09058:shadow:1: Shadow
+    - the acting player chooses one of:
+      * option "threat":
+        - raise threat by 3 (the acting player)
+      * option "undefended":
+        - this attack is considered undefended
+
+## 09059 Search the Ruins
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+09059:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+09059:A:2 (front): Forced: At the end of the refresh phase, raise each player's threat by 2.
+  09059:forced:1: Forced at the end of the phase
+    only if all of: (it is the Refresh phase) and (this card is in the staging area)
+    - raise threat by 2 (each player)
+
+09059:A:3 (front): Response: After Search the Ruins is defeated, reduce each player's threat by 3.
+  09059:response:1: Response on the event questDefeated (heard about this card)
+    - lower threat by 3 (each player)
+
+## 09069 Scattered Among the Hills
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+09069:A:1 (front): Setup: Set Orc Ambush and Amon Forn aside, out of play. Create the Orc deck (see insert) and set it next to the quest deck. Make Exposed Ridge the active location. Add Hunting the Orcs and 1 Weathered Hilltop to the staging area. Shuffle the encounter deck.
+  09069:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - shuffle the angmarOrcs deck
+    - shuffle the encounter deck
+
+09069:B:1 (back): The first Weather treachery card revealed each round gains surge.
+  09069:constant:1: Constant
+    - the first Weather treachery card revealed each round gains surge
+
+09069:B:2 (back): Forced: After the active location is explored, reveal the top card of the Orc deck and resolve its staging as if it was just revealed from the encounter deck (reveal the top 2 cards instead if there are 3 or more players in the game).
+  09069:forced:1: Forced on the event activeExplored
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the first player reveals the top card of the angmarOrcs deck and resolves its staging, into the staging area, as if it was just revealed from the encounter deck (nothing with the deck empty)
+    - then, if 2 is less than the number of players (checked when this step runs, after the steps above; not tied to whether they did anything): the first player reveals the top card of the angmarOrcs deck and resolves its staging, into the staging area, as if it was just revealed from the encounter deck (nothing with the deck empty)
+
+## 09070 Cornered Animals
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+09070:A:1 (front): When Revealed: End the current phase. Shuffle the encounter discard pile and the Orc deck into the encounter deck. Reveal Orc Ambush and Amon Forn and add them to the staging area.
+  09070:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the phase in progress ends once this effect has finished (what is left of it is skipped: in the quest phase the characters stay exhausted and uncommitted and the quest is not resolved; in the combat phase no attack is made); its end-of-phase Forced effects resolve as it ends
+    - shuffle the encounter discard pile into the encounter deck
+    - shuffle the angmarOrcs deck into the encounter deck
+    - the set-aside card with code 09046 is revealed (its keywords and When Revealed effects resolve) and added to the staging area
+    - the set-aside card with code 09026 is revealed (its keywords and When Revealed effects resolve) and added to the staging area
+
+09070:B:1 (back): Each damaged character gets -1 Willpower.
+  09070:constant:1: Constant
+    - each damaged character (any player controls): stat willpower -1, while this card is in play
+
+09070:B:2 (back): Forced: At the beginning of the quest phase, either discard 1 resource token from Savage Counter-attack, or reveal an additional encounter card this phase.
+  09070:forced:1: Forced when a phase begins
+    only if it is the Quest phase
+    - the first player chooses one of:
+      * option "discard" (only if the card with code 09072 in play holds at least 1 resource token(s)):
+        - up to 1 resource token(s) come off the card with code 09072 in play
+      * option "reveal":
+        - reveal 1 additional encounter card(s) in the staging step this phase
+
+09070:B:3 (back): If the players defeat this stage, they win the game.
+  09070:constant:2: Constant
+    (no instructions)
+
+## 09071 Hunting the Orcs
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+09071:A:1 (front): Forced: After an enemy is defeated, place 1 resource token here. Then, if there are at least X resource tokens here, flip Hunting the Orcs and place each resource token that was on it on Savage Counter-attack. X is 3 more than the number of players in the game.
+  09071:forced:1: Forced after an enemy is destroyed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - place 1 resource tokens on this card
+    - then, if not (resources of this card is less than the number of players + 3) (checked when this step runs, after the steps above; not tied to whether they did anything): the card with code 09071 in play is flipped to the card with code 09072, where it lies, with its tokens and attachments; the new side enters play
+
+## 09072 Savage Counter-attack
+
+09072:A:1 (front): Forced: After Savage Counter-attack enters play, advance to stage 2A.
+  09072:forced:1: Forced after a card enters play (heard about this card)
+    - advance to the next quest stage
+
+09072:A:2 (front): Forced: After an enemy attacks and destroys a character, discard 1 resource token from Savage Counter-attack.
+  09072:forced:2: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
+    - up to 1 resource token(s) come off the card with code 09072 in play
+
+09072:A:3 (front): If there are no resource tokens here, the players lose the game.
+  09072:constant:1: Constant
+    only if not (the card with code 09072 in play holds at least 1 resource token(s))
+    - the players lose the game (Savage Counter-attack held no resource token)
+
+## 10159 The Weather Hills
+
+10159:A:1 (front): You are playing campaign mode.
+  (inert: the engine applies it by rule, no record)
+
+10159:A:2 (front): Setup: Add the Mysterious Omens side quest to the Campaign Log and shuffle it into the encounter deck. Add the Protect the Innocent side quest to the staging area and place damage on it equal to the amount of damage noted for it in the Campaign Log.
+  10159:campaignSetup:1: Campaign setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the card with code 10160 is added to the Campaign Pool
+    - a card with code 10160 from the box joins the encounter deck, which is shuffled
+    - the card with code 10158 is added to the staging area (the copy a Setup search found, else one the Setup deals)
+    - the card with code 10158 in play gets the damage the Campaign Log noted for Protect the Innocent (none when it noted none)
+
+10159:B:1 (back): Resolution: Note the amount of damage on Protect the Innocent in the Campaign Log (replacing the previous number).
+  10159:resolution:1: Resolution
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - note the damage on the card with code 10158 in the Campaign Log (replacing the previous number)
+    - each copy of code 10161, code 10162, code 10163, code 10164 and code 10165 attached to a hero in play joins the Campaign Pool attached to that hero
+
+## 10160 Mysterious Omens
+
+10160:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+10160:A:2 (front): Forced: After Mysterious Omens becomes the current quest, each player discards 1 random card from their hand.
+  10160:forced:1: Forced on the event becameCurrentQuest (heard about this card)
+    - for each player, first player first:
+      - the acting player discards 1 random card(s) from hand
+
+10160:A:3 (front): Forced: When Mysterious Omens is defeated, remove it from the Campaign Pool. Then, each player may choose 1 of the following boons and attach it to a hero they control: Cunning, Hardy, Resolute, Ruthless, or Stalwart.
+  10160:forced:2: Forced on the event questDefeated (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - this card is removed from the Campaign Pool
+    - starting with the first player, each player may choose 1 of the boons still set aside (code 10161, code 10162, code 10163, code 10164 and code 10165) and attach it to a hero they control; a boon taken is not offered again
+
+## 10161 Cunning
+
+10161:A:1: Permanent.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+10161:A:2 (front): Setup: Attach to a hero. Add 2 resources to that hero's resource pool.
+  10161:setup:1: Setup
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - attach this card to a hero
+    - add 2 resources to its host
+
+10161:A:3 (front): Action: Attached hero gets +2 Willpower, +2 Attack, and +2 Defense until the end of the phase. (Limit once per game.)
+  10161:action:1: Action (limit once per game)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - its host: stat willpower 2, until the end of the phase
+    - its host: stat attack 2, until the end of the phase
+    - its host: stat defense 2, until the end of the phase
+
+## 10162 Hardy
+
+10162:A:1: Permanent.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+10162:A:2 (front): Setup: Attach to a hero.
+  10162:setup:1: Setup
+    - attach this card to a hero
+
+10162:A:3 (front): Attached hero gets +2 hit points.
+  10162:constant:1: Constant
+    - its host: stat hitPoints 2, while this card is in play
+
+10162:A:4 (front): Action: Ready attached hero. (Limit once per game.)
+  10162:action:1: Action (limit once per game)
+    - ready its host
+
+## 10163 Resolute
+
+10163:A:1: Permanent.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+10163:A:2 (front): Setup: Attach to a hero.
+  10163:setup:1: Setup
+    - attach this card to a hero
+
+10163:A:3 (front): Attached hero gets +1 Willpower.
+  10163:constant:1: Constant
+    - its host: stat willpower 1, while this card is in play
+
+10163:A:4 (front): Response: Cancel up to 2 points of damage just dealt to attached hero. (Limit once per game.)
+  10163:response:1: Response on the event damageDealt (heard about the host; limit once per game)
+    - cancel up to 2 point(s) of the damage just dealt
+
+## 10164 Ruthless
+
+10164:A:1: Permanent.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+10164:A:2 (front): Setup: Attach to a hero.
+  10164:setup:1: Setup
+    - attach this card to a hero
+
+10164:A:3 (front): Attached hero gets +1 Attack.
+  10164:constant:1: Constant
+    - its host: stat attack 1, while this card is in play
+
+10164:A:4 (front): Action: Move any amount of damage from attached hero to an enemy engaged with you. (Limit once per game.)
+  10164:action:1: Action (limit once per game)
+    only if all of: (there is a damaged hero (you control) that this card is attached to to choose) and (there is a enemy (any player controls) engaged with you to choose)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose damaged hero (you control) that this card is attached to
+    - the acting player chooses X, from 1 to damage of the picked card
+    - choose enemy (any player controls) engaged with you
+    - move X damage from the card picked before the last to the last picked card
+
+## 10165 Stalwart
+
+10165:A:1: Permanent.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+10165:A:2 (front): Setup: Attach to a hero.
+  10165:setup:1: Setup
+    - attach this card to a hero
+
+10165:A:3 (front): Attached hero gets +1 Defense.
+  10165:constant:1: Constant
+    - its host: stat defense 1, while this card is in play
+
+10165:A:4 (front): Planning Action: Play an attachment from your discard pile on attached hero. (Limit once per game.)
+  10165:action:1: Action (limit once per game)
+    only if it is the Planning phase
+    - its host: stat attachmentFromDiscard 1, until the end of the phase
+
+(rendered pieces: 239 by template, 0 as JSON)

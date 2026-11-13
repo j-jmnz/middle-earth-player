@@ -125,6 +125,9 @@ export function failures(done: Done, wanted: readonly Expect[]): string[] {
         case "won":
           if (!state.stageCleared || state.lost) problems.push("the game is not won");
           break;
+        case "notWon":
+          if (state.stageCleared) problems.push("the game is won");
+          break;
         case "frame":
           if (!steps.some((step) => step.kind === "push" && step.frame === item.name)) problems.push(`no ${item.name} frame was pushed`);
           break;

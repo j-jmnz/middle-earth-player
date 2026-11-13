@@ -8,11 +8,11 @@ import { engagementBarred, noteEngaged } from "../families/quest/engage.ts";
 import { currentQuestHas } from "../families/quest/conditions.ts";
 import { noteHostDefeated, withStagingThreat } from "../families/attachments/hold.ts";
 import { progressFirstLocations } from "../families/attachments/quest.ts";
+import { passSorcery } from "../families/angmar/reanimate/stage.ts";
 import { seatThreat } from "../families/play/hooks.ts";
 import type { EngineStep } from "../core/intents.ts";
 import { modifiedStat, raiseThreat, releaseAttachments } from "../core/keywords.ts";
-import type { PrintedCard } from "../core/printed.ts";
-import { hasQuestPoints, isLocationCard, printedOf } from "../core/printed.ts";
+import { hasQuestPoints, isLocationCard, printedOf, type PrintedCard } from "../core/printed.ts";
 import type { CardInstance, Modifier, ScenarioState } from "../core/state.ts";
 import { flagged, livingSeats, updateCard, updateCards, withMode } from "../core/state.ts";
 import { queueEvent } from "../windows/queue.ts";
@@ -24,12 +24,15 @@ import { noteQuestPlaced, questRoom } from "../families/caves/progress.ts";
 import { noteQuestPhase, overflowWaits } from "../families/wizardry/progress.ts";
 import { branchFrom, reached as reachedStage } from "../families/quest/branch.ts";
 import { randomStageFrom } from "../families/wilderland/random-stage.ts";
-import { viewOf, withView } from "../families/breaking/areas.ts";
+import { headOf, sharing, viewOf, withView } from "../families/breaking/areas.ts";
+import { rescueRandom } from "../families/captured/rescue.ts";
 import { oweDiscards } from "../families/breaking/progress.ts";
 import { arrivalFace, orderedNext, stageToVictory } from "../families/quest/order.ts";
 import { caughtUp } from "../families/stormcaller/values.ts";
 import { islandTravelTo } from "../families/island/travel.ts";
-import { hasSideQuests, placeOnCurrentSideQuest } from "../families/wilderland/night-quest.ts";
+import { reduceQuestProgress } from "../families/angmar/progress.ts";
+import { absorbProgress } from "../families/angmar/sponge.ts";
+import { currentSideQuest, hasSideQuests, mainQuestBarred, placeOnCurrentSideQuest } from "../families/wilderland/night-quest.ts";
 import { familyOptionalEngageBarred, familyQuestResult } from "../interpret/family-hooks.ts";
 
 type Cards = ReadonlyMap<string, PrintedCard>;
@@ -107,7 +110,7 @@ export function committedWillpower(state: ScenarioState, cards: Cards, only?: nu
   const view = viewOf(state, only);
   let total = 0;
   for (const [index, seat] of view.seats.entries()) {
-    if (seat.eliminated || (only != null && index !== only)) continue;
+    if (seat.eliminated || (only != null && headOf(view, index) !== headOf(view, only))) continue;
     for (const id of [...seat.heroes, ...seat.play]) {
       const instance = view.cards[id];
       // A character committed to a side quest places its Willpower on that quest, not against the staging area (families/sidequests/quest.ts).
@@ -153,7 +156,7 @@ export function resolveQuest(
   const threat = stagingThreat(state, cards, only);
   steps.push({ kind: "quest", willpower, threat, cause: ruleCause("rr.step-3-4") });
   // The seats that hear it: the one that quested, or every living seat.
-  const hearing = only == null ? livingSeats(state) : [only];
+  const hearing = only == null ? livingSeats(state) : sharing(state, only);
   let next = state;
   // A family that places the progress or the threat itself (the Defense keyword, families/fortress) answers first; the core resolves the quest otherwise.
   const family = familyQuestResult(state, { willpower, threat, ...(only != null ? { only } : {}) }, cards, steps, canAdvance);
@@ -216,6 +219,11 @@ export function placeQuestProgress(
     next = oweDiscards(next, remaining);
     remaining = 0;
   }
+  // Progress a stage turns into rescued captured cards, at random, instead of progress on it (families/captured/rescue.ts, 10039:B:1).
+  if (remaining > 0 && next.questStage && flagged(next, next.questStage, "progressRescues")) {
+    next = rescueRandom(next, next.questStage, remaining);
+    remaining = 0;
+  }
   // Progress a stage turns into an event its record hears (progressReplaced, with the amount) instead of progress on it.
   const stage = next.questStage;
   if (remaining > 0 && stage && PROGRESS_REPLACED.some((one) => (!one.questingOnly || questing) && flagged(next, stage, one.flag))) {
@@ -226,7 +234,8 @@ export function placeQuestProgress(
   if (remaining > 0 && next.questStage && flagged(next, next.questStage, "assault")) remaining = 0;
   // A side quest that is the current quest takes it instead of the main quest card; what it cannot take is discarded (emce.side-quests-in-play, families/wilderland/night-quest.ts).
   if (remaining > 0 && hasSideQuests(next)) ({ state: next, remaining } = placeOnCurrentSideQuest(next, remaining, cards, steps));
-  if (remaining > 0 && next.questStage && !next.stageCleared) {
+  // The main quest card takes none while it cannot be the current quest and no side quest was chosen (10094:B:3): the progress is lost.
+  if (remaining > 0 && next.questStage && !next.stageCleared && !mainQuestBarred(next)) {
     const stageId = next.questStage;
     const stage = next.cards[stageId];
     // A card in play may limit the progress the quest card takes this round, or stop it (families/caves/progress.ts).
@@ -235,15 +244,32 @@ export function placeQuestProgress(
       // The explored location's Forced effect may cancel this progress (Orthanc): the stage takes what it needs and advances once those effects have resolved (families/wizardry/progress.ts).
       const waits = overflowWaits(next, steps, started, cards);
       const points = questPointsOf(next, stage, cards);
-      next = putOnStage(next, stageId, waits && points != null ? Math.min(remaining, Math.max(0, points - stage.progress)) : remaining, points, cards, steps, waits ? () => false : canAdvance, ruleCause("rr.step-3-4"), true);
+      next = putOnStage(next, stageId, waits && points != null ? Math.min(remaining, Math.max(0, points - stage.progress)) : remaining, points, cards, steps, waits ? () => false : canAdvance, ruleCause("rr.step-3-4"), { counted: true });
     }
   }
   return next;
 }
 
+// "Add progress to the main quest" (10139:A:3): the main quest card takes it. While it is the current quest that is placeQuestProgress (the active location takes its share first, rr.active-location); while a side quest is the current quest the main quest card is not the current quest, so the active location
+// keeps none of it, no Orc Grunts reduces it and it goes straight on the card (mec108.side-quests, mec108.side-quests-in-play), after a sponge took its share.
+export function placeOnMainQuest(state: ScenarioState, amount: number, cards: Cards, steps: EngineStep[], canAdvance: Gate): ScenarioState {
+  const stageId = state.questStage;
+  const stage = stageId ? state.cards[stageId] : undefined;
+  if (!stageId || !stage || state.stageCleared || currentSideQuest(state) == null) return placeQuestProgress(state, amount, cards, steps, canAdvance);
+  return putOnStage(state, stageId, amount, questPointsOf(state, stage, cards), cards, steps, canAdvance, ruleCause("mec108.side-quests-in-play"), { counted: false, reduced: false });
+}
+
+export type PutOnStageOptions = { readonly counted: boolean; readonly reduced?: boolean };
+
 // Progress put on the current quest card: a quest that can advance takes what it needs, the rest does not carry over to the next stage (rr.quest-advancement); one that cannot advance
 // has no upper limit (faq.progress-without-advancing); a full one advances. `counted`: the progress counts toward what a card in play limits this round (families/caves/progress.ts).
-export function putOnStage(state: ScenarioState, stageId: string, amount: number, points: number | null, cards: Cards, steps: EngineStep[], canAdvance: Gate, cause: Cause, counted: boolean): ScenarioState {
+// `reduced`: Orc Grunts reduce it, as progress placed on the current quest (false for progress placed on the main quest card while a side quest is the current quest).
+export function putOnStage(from: ScenarioState, stageId: string, wanted: number, points: number | null, cards: Cards, steps: EngineStep[], canAdvance: Gate, cause: Cause, options: PutOnStageOptions): ScenarioState {
+  const { counted, reduced = true } = options;
+  // Progress that would be placed on a quest card first fills the sponges in the staging area (Forbidden Descent, 10101:A:1).
+  const { state, remaining: absorbed } = absorbProgress(from, wanted, cards, steps);
+  // Each Orc Grunts in play reduces the progress placed on the current quest by 1 (10130:A:2).
+  const amount = reduced ? reduceQuestProgress(state, absorbed) : absorbed;
   const stage = state.cards[stageId];
   if (!stage) return state;
   const advancing = points != null && canAdvance(state);
@@ -290,8 +316,8 @@ export function advanceStage(state: ScenarioState, cards: Cards, steps: EngineSt
     })();
     if (!nextId) return clearStage(next);
     const nextCode = next.cards[nextId]?.code;
-    // The defeated quest card leaves play: the cards attached to it hear it and are discarded (rr.attachment-cards).
-    next = releaseAttachments(noteHostDefeated(next, currentId), currentId, cards, steps);
+    // The defeated quest card leaves play: the cards attached to it hear it and are discarded (rr.attachment-cards), the Sorcery cards of a stage that hands them on excepted (10150:B:2).
+    next = releaseAttachments(noteHostDefeated(passSorcery(next, currentId, nextId, cards), currentId), currentId, cards, steps);
     next = moveCard(next, currentId, { zone: stageToVictory(next, cards, current.code) ? "victory" : rolled?.remove ? "removed" : "setAside" });
     if (rolled || (ordered && next.stages.some((stage) => stage.deck === true))) next = { ...next, stageLeft: { to: nextId, from: currentId } };
     next = moveCard(next, nextId, { zone: "questStage" });

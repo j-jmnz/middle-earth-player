@@ -23,6 +23,8 @@ const upTo = (last: number): number[] => Array.from({ length: last }, (_, index)
 // the campaign card of The King's Quest, the third part, says "Haldan may be included among a player's heroes" (12170:A:2), so the ban holds in every part but that one.
 const HERO_BANS: Readonly<Record<string, HeroBanEntry>> = {
   "dream-chaser": { ban: { code: "12109", name: "Na'asiyah", rule: "dcce.naasiyah" }, parts: upTo(7) },
+  // "When playing campaign mode, the Amarthiúl hero cannot be used until indicated by a campaign card" (mec108.campaign-mode): The Battle of Carn Dûm's campaign card (10188:A:2) is the one that indicates it. From then he stays usable (agent recommendation, docs/brief.md, Angmar Awakened).
+  "angmar-awakened": { ban: { code: "10115", name: "Amarthiúl", rule: "mec108.campaign-mode" }, parts: upTo(7) },
   "ered-mithrin": { ban: { code: "19026", name: "Haldan", rule: "emce.haldan" }, parts: [1, 2, 4, 5, 6, 7, 8, 9] },
 };
 
@@ -44,6 +46,7 @@ export type LoadoutRule =
   | "sameHero"
   | "bannedHero"
   | "bannedTitle"
+  | "stolenCard"
   | "secondVersion"
   | "undiscoveredTreasure"
   | "treasureCopies";
@@ -97,7 +100,8 @@ function grantedHeroErrors(heroCards: Cards, deckCards: Cards, cards: ReadonlyMa
 
 // `discovered` is the treasures the Campaign Log records (emce.treasure): a deck may hold a treasure only when its code is listed, one copy by title, and a game without a log lists none.
 // `rules` is the scenario's saga start and title bans (SagaRules).
-export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMap<string, PrintedCard>, saga: boolean, bans: readonly HeroBan[] = [], discovered: readonly string[] = [], rules: SagaRules = {}): LoadoutError[] {
+// `stolen` is the unique cards the campaign log records as stolen from each seat in Escape from Mount Gram (10174:B:3), by seat: they cannot be in that player's deck for the rest of the campaign (a hero is no deck card: rr.player-deck).
+export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMap<string, PrintedCard>, saga: boolean, bans: readonly HeroBan[] = [], discovered: readonly string[] = [], rules: SagaRules = {}, stolen: readonly (readonly string[])[] = []): LoadoutError[] {
   const errors: LoadoutError[] = [];
   const fail = (rule: LoadoutRule, card: PrintedCard, why: string) =>
     errors.push({ rule, code: card.code, card: card.name, message: `${card.name} (${card.code}): ${why}` });
@@ -126,6 +130,14 @@ export function validateLoadout(seats: readonly LoadoutSeat[], cards: ReadonlyMa
     const ban = card == null ? undefined : bans.find((item) => item.code === card.code);
     if (card != null && ban != null) fail("bannedHero", card, `${ban.name} cannot be used in this scenario of the campaign (${ban.rule})`);
   }
+
+  // A unique card stolen from the player (mec108.captured-deck, 10174:B:3) is no deck card of theirs; the card says "deck", and the player deck holds allies, attachments and events, so a stolen hero may still start (rr.player-deck).
+  seats.forEach((seat, index) => {
+    const lost = stolen[index] ?? [];
+    for (const card of deckCards[index] ?? []) {
+      if (card != null && lost.includes(card.code)) fail("stolenCard", card, "the Goblins of Mount Gram stole this unique card (the campaign log notes it), so it cannot be in this player's deck for the rest of the campaign");
+    }
+  });
 
   // A title the box refuses (mec112.saruman-grima-smeagol): a hero or an ally, or any card for Frodo Baggins in the scenarios that grant ☺ Aragorn.
   for (const ban of rules.titleBans ?? []) {

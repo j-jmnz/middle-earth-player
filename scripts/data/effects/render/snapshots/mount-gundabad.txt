@@ -8,7 +8,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 12193:A:2 (front): Setup: If there are 6 or more treasures recorded in the campaign log, shuffle Dragon-sickness into the encounter deck. A player may search their deck for a unique boon ally and add it to their hand. If "Melanwar has given you guidance on traversing Wilderland," search the encounter deck for 2 non-unique locations and the Caves deck for 1 location and remove them from the game. If "Beldis's care has bolstered the heroes' spirits," search the encounter deck for 3 treacheries and remove them from the game. Flip this card.
   12193:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"12194","when":{"kind":"treasuresLogged","min":6}}]
+    - if [json condition {"kind":"treasuresLogged","min":6}]: a card with code 12194 from the box joins the encounter deck, which is shuffled
     - [json SearchBoonAllyToHand {"verb":"SearchBoonAllyToHand"}]
     - if the Campaign Log holds "melanwar": remove 2 non-unique locations from the encounter deck
     - [json RemoveFromCavesIfLogged {"verb":"RemoveFromCavesIfLogged","line":"melanwar","count":1,"cardType":"location"}]
@@ -45,7 +45,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 19122:A:2 (front): Forced: After The First Forge becomes the active location, exhaust the hero with Wormsbane attached. That hero cannot ready while The First Forge is the active location.
   19122:forced:1: Forced after this location becomes the active location (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose hero (any player controls) [also {"hasAttachment":{"names":["Wormsbane"]}}]
+    - choose hero (any player controls) with an attachment named "Wormsbane"
     - exhaust the picked card
     - the picked card: stat cannotReady 1, while this card is active
 
@@ -54,7 +54,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
     only if the card the event is about had enough progress to be explored
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (any player controls)
-    - [json FlipInPlace {"verb":"FlipInPlace","code":"19143","into":"19144","attachTo":"picked"}]
+    - the card with code 19143 in play is flipped to the card with code 19144, where it lies, with its tokens and attachments, and moves to the last picked hero
 
 ## 19123 Dagnir's Hoard
 (the scenario deals it into the cavesDeck pile; the piles place it, no record does)
@@ -107,8 +107,8 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
     only if the number of card (any player controls) in the victory display, of card type quest is at least 5
     (steps run in order; a step depends on an earlier one only through its own condition)
     - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
-    - this card: stat engagedWithAll 1, while this card is in play
-    - this card: stat attackableByAny 1, while this card is in play
+    - this card: stat engagedWithAll (it stays in the staging area but is considered engaged with each player: it attacks each of them in turn in the combat phase, dealt a shadow card for each attack, and none engages it) 1, while this card is in play
+    - this card: stat attackableByAny (any character may be declared as an attacker against it) 1, while this card is in play
 
 ## 19126 Guardian of Gundabad
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -159,7 +159,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19129:A:3 (shadow): Shadow: If attacking enemy is Dagnir, the defending player must assign X damage among characters he controls, where X is 1 more than the number of quest cards in the victory display.
   19129:shadow:1: Shadow
-    - [json AssignDamage {"verb":"AssignDamage","amount":{"count":{"type":"card","control":"any","from":"victory","cardType":"quest"},"plus":1},"pick":{"type":"character","control":"you"},"when":{"kind":"matches","card":"attacker","pick":{"type":"enemy","control":"any","staging":true,"names":["Dagnir"]}}}]
+    - if the attacking enemy is a enemy (any player controls) or in the staging area, named "Dagnir": the acting player assigns the number of card (any player controls) in the victory display, of card type quest + 1 damage among the character (you control), one at a time
 
 ## 19130 Narrow Stair
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -209,14 +209,14 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 19132:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   19132:shadow:1: Shadow
     - when the attack in progress ends:
-      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt no shadow card
+      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt no shadow card
 
 ## 19133 Suffocating Shadows
 (the scenario deals it into the encounter pile; the piles place it, no record does)
 
 19133:A:1 (front): When Revealed: Each player assigns X damage among allies he controls, where X is 1 more than the number of quest cards in the victory display.
   19133:whenRevealed:1: When revealed
-    - [json AssignDamage {"verb":"AssignDamage","amount":{"count":{"type":"card","control":"any","from":"victory","cardType":"quest"},"plus":1},"pick":{"type":"ally","control":"you"},"who":"eachSeat"}]
+    - each player assigns the number of card (any player controls) in the victory display, of card type quest + 1 damage among the ally (you control), one at a time
 
 19133:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if there are 3 or more quests in the victory display).
   19133:shadow:1: Shadow
@@ -230,15 +230,15 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 19134:A:1 (front): Setup: Add Dagnir to the staging area and set The First Forge aside, out of play. Create the Caves deck and the quest deck (see insert). Attach Wormsbane to a hero, Broken side face-up. Shuffle the encounter deck and discard cards from the top until X locations have been discarded, where X is 1 less than the number of players in the game. Add those locations to the staging area.
   19134:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ShufflePile {"verb":"ShufflePile","pile":"caves"}]
+    - shuffle the caves deck
     - [json ShuffleStages {"verb":"ShuffleStages","codes":["19135","19137","19138","19139","19140","19141","19142"]}]
-    - [json SetAside {"verb":"SetAside","code":"19143"}]
+    - a copy of the card with code 19143 is set aside, out of play
     - choose hero (you control) [also {"attachable":"19143"}]
     - [json AttachSetAside {"verb":"AttachSetAside","code":"19143"}]
     - shuffle the encounter deck
     - for each player, first player first:
-      - [json DiscardUntil {"verb":"DiscardUntil","type":"location","when":{"kind":"not","condition":{"kind":"firstPlayer"}}}]
-      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"location","control":"any"},"inPlay":false}}]
+      - if not (the actor holds the first player token): cards are discarded from the top of the encounter deck until a location is discarded, or the deck is empty; that card becomes the picked card
+      - then, if the picked card is a location (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
 
 19134:B:1 (back): Forced: At the end of the planning phase, the first player looks at the top 2 cards of the quest deck and chooses 1 to place on the bottom of the quest deck. Then, add The Side Door to the victory display and advance to the top stage 2A of the quest deck.
   19134:forced:1: Forced at the end of the phase
@@ -305,7 +305,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
   19137:forced:2: Forced on the event questCardDefeated (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json ActivateFromCaves {"verb":"ActivateFromCaves"}]
-    - [json ShufflePile {"verb":"ShufflePile","pile":"caves"}]
+    - shuffle the caves deck
 
 19137:B:3 (back): At the end of the combat phase, the players may bypass this stage.
   19137:forced:3: Forced at the end of the phase
@@ -482,7 +482,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
         - choose Reforged card (you control) named "Wormsbane"
         - discard the picked card
         - choose enemy (any player controls) or in the staging area, named "Dagnir"
-        - [json AddToVictory {"verb":"AddToVictory","target":"picked"}]
+        - the picked card is added to the victory display
         - the players win the game
       * option "decline":
 
@@ -495,7 +495,7 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
 
 19144:A:1 (front): Attach to a hero. Restricted.
   19144:constant:1: Constant
-    - [json AttachesTo {"verb":"AttachesTo","host":{"kind":"hero"}}]
+    - this attachment may be attached to a hero
 
 19144:A:2 (front): Attached hero gets +X Attack, where X is 1 more than the number of quest cards in the victory display.
   19144:constant:2: Constant
@@ -505,4 +505,4 @@ Scenario piles that place cards with no record (quest: 19134 The Side Door; ques
   19144:constant:3: Constant
     - its host: stat lossOnLeavingPlay 1, while this card is in play
 
-(rendered pieces: 281 by template, 63 as JSON)
+(rendered pieces: 305 by template, 52 as JSON)

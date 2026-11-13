@@ -13,7 +13,7 @@ import { textBlank } from "../families/attachments/hold.ts";
 import { printedOf } from "../core/printed.ts";
 import { inPlay, type ScenarioState } from "../core/state.ts";
 import { payUsage, usable, usageReason } from "./usage.ts";
-import { announceAbility } from "../families/deck/pressure.ts";
+import { announcePlayerAbility } from "../families/deck/pressure.ts";
 
 type TriggerIntent = Extract<PlayerIntent, { type: "Trigger" }>;
 
@@ -102,5 +102,5 @@ export function applyTrigger(
     },
     steps,
   );
-  return announceAbility(framed, intent.cardId, seat, ctx);
+  return announcePlayerAbility(framed, intent.cardId, seat, ctx);
 }

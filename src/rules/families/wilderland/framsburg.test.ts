@@ -85,11 +85,11 @@ describe("dealtShadows", () => {
     const deck = deal(enemies.state, ["mist", "mist", "mist", "mist", "mist"], { zone: "encounterDeck" });
     const [first = "", second = ""] = enemies.ids;
     const flagged = { ...deck.state, modifiers: [...deck.state.modifiers, { instanceId: first, sourceId: first, stat: "dealtShadows" as const, amount: 3, until: "endOfPhase" as const }] };
-    const dealt = dealOneShadow(dealOneShadow(flagged, first, []), second, []);
+    const dealt = dealOneShadow(dealOneShadow(flagged, first, [], ctxOf([])), second, [], ctxOf([]));
     expect(shadowCards(dealt.cards[first])).toHaveLength(3);
     expect(shadowCards(dealt.cards[second])).toHaveLength(1);
     // An enemy that already has its shadow card is dealt no more.
-    expect(shadowCards(dealOneShadow(dealt, first, []).cards[first])).toHaveLength(3);
+    expect(shadowCards(dealOneShadow(dealt, first, [], ctxOf([])).cards[first])).toHaveLength(3);
   });
 
   it("with a shorter deck it is dealt what there is", () => {
@@ -97,7 +97,7 @@ describe("dealtShadows", () => {
     const deck = deal(enemies.state, ["mist"], { zone: "encounterDeck" });
     const first = enemies.ids[0] ?? "";
     const flagged = { ...deck.state, modifiers: [{ instanceId: first, sourceId: first, stat: "dealtShadows" as const, amount: 3, until: "endOfPhase" as const }] };
-    expect(shadowCards(dealOneShadow(flagged, first, []).cards[first])).toHaveLength(1);
+    expect(shadowCards(dealOneShadow(flagged, first, [], ctxOf([])).cards[first])).toHaveLength(1);
   });
 });
 

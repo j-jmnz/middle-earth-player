@@ -85,14 +85,14 @@ describe("the progress cap dial", () => {
     expect(none).toMatchObject({ label: "This round", value: 0, limit: 4, testID: "lair-cap", limitWords: capWords(0, 4) });
     expect(none?.warms).toBeUndefined();
     expect(none?.warn).toBeUndefined();
-    const placed = putOnStage(made.state, stage, 3, 16, made.ctx.cards, [], () => true, ruleCause("rr.step-3-4"), true);
+    const placed = putOnStage(made.state, stage, 3, 16, made.ctx.cards, [], () => true, ruleCause("rr.step-3-4"), { counted: true });
     expect(dial(lairDials(placed, made.ctx, names(made)), "cap")).toMatchObject({ value: 3, limit: 4, limitWords: capWords(3, 4) });
   });
 
   it("144071:B:3 warns once the cap is reached, so a full ring does not read as a goal met", () => {
     const made = table({ stage: "144071" });
     const stage = idOf(made.state, "144071");
-    const full = putOnStage(made.state, stage, 4, 16, made.ctx.cards, [], () => true, ruleCause("rr.step-3-4"), true);
+    const full = putOnStage(made.state, stage, 4, 16, made.ctx.cards, [], () => true, ruleCause("rr.step-3-4"), { counted: true });
     const reached = dial(lairDials(full, made.ctx, names(made)), "cap");
     expect(reached).toMatchObject({ value: 4, limit: 4, warn: { level: "near", words: CAP_REACHED_WORDS } });
     expect(reached?.goal).toBeUndefined();
@@ -149,7 +149,7 @@ describe("what the quest readout says of the progress held back", () => {
   it("144071:B:3 says no progress can be placed once the cap is full, and says nothing on another stage", () => {
     const made = table({ stage: "144071" });
     const stage = idOf(made.state, "144071");
-    const full = putOnStage(made.state, stage, 4, 16, made.ctx.cards, [], () => true, ruleCause("rr.step-3-4"), true);
+    const full = putOnStage(made.state, stage, 4, 16, made.ctx.cards, [], () => true, ruleCause("rr.step-3-4"), { counted: true });
     expect(lairProgressWords(full, made.ctx, 3)).toBe("No progress can be placed on the stage this round");
     const other = table({ stage: "144072" });
     expect(lairProgressWords(other.state, other.ctx, 3)).toBeNull();

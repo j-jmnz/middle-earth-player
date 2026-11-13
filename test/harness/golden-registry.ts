@@ -40,6 +40,15 @@ import * as fields from "../scenarios/the-battle-of-the-pelennor-fields/game.ts"
 import * as ungol from "../scenarios/the-tower-of-cirith-ungol/game.ts";
 import * as opens from "../scenarios/the-black-gate-opens/game.ts";
 import * as doom from "../scenarios/mount-doom/game.ts";
+import * as chetwood from "../scenarios/intruders-in-chetwood/game.ts";
+import * as hills from "../scenarios/the-weather-hills/game.ts";
+import * as dike from "../scenarios/deadmens-dike/game.ts";
+import * as eriador from "../scenarios/the-wastes-of-eriador/game.ts";
+import * as gram from "../scenarios/escape-from-mount-gram/game.ts";
+import * as ettenmoors from "../scenarios/across-the-ettenmoors/game.ts";
+import * as rhudaur from "../scenarios/the-treachery-of-rhudaur/game.ts";
+import * as dum from "../scenarios/the-battle-of-carn-dum/game.ts";
+import * as realm from "../scenarios/the-dread-realm/game.ts";
 
 import type { PlayedGame } from "./game-kit.ts";
 
@@ -93,6 +102,15 @@ export const GOLDEN_REGISTRY: readonly GoldenEntry[] = [
   entry("the-ghost-of-framsburg", "The Ghost of Framsburg", framsburg.FRAMSBURG_GOLDENS, framsburg.framsburgWorld, framsburg.playGolden),
   entry("mount-gundabad", "Mount Gundabad", gundabad.GUNDABAD_GOLDENS, gundabad.gundabadWorld, gundabad.playGolden),
   entry("the-fate-of-wilderland", "The Fate of Wilderland", wilderland.WILDERLAND_GOLDENS, wilderland.wilderlandWorld, wilderland.playGolden),
+  entry("intruders-in-chetwood", "Intruders in Chetwood", chetwood.CHETWOOD_GOLDENS, chetwood.chetwoodWorld, chetwood.playGolden),
+  entry("the-weather-hills", "The Weather Hills", hills.HILLS_GOLDENS, hills.hillsWorld, hills.playGolden),
+  entry("deadmens-dike", "Deadmen's Dike", dike.DIKE_GOLDENS, dike.dikeWorld, dike.playGolden),
+  entry("the-wastes-of-eriador", "The Wastes of Eriador", eriador.ERIADOR_GOLDENS, eriador.eriadorWorld, eriador.playGolden),
+  entry("escape-from-mount-gram", "Escape from Mount Gram", gram.GRAM_GOLDENS, gram.gramWorld, gram.playGolden),
+  entry("across-the-ettenmoors", "Across the Ettenmoors", ettenmoors.ETTENMOORS_GOLDENS, ettenmoors.ettenmoorsWorld, ettenmoors.playGolden),
+  entry("the-treachery-of-rhudaur", "The Treachery of Rhudaur", rhudaur.RHUDAUR_GOLDENS, rhudaur.rhudaurWorld, rhudaur.playGolden),
+  entry("the-battle-of-carn-dum", "The Battle of Carn Dûm", dum.DUM_GOLDENS, dum.dumWorld, dum.playGolden),
+  entry("the-dread-realm", "The Dread Realm", realm.REALM_GOLDENS, realm.realmWorld, realm.playGolden),
   entry("the-uruk-hai", "The Uruk-hai", hai.HAI_GOLDENS, hai.haiWorld, hai.playGolden),
   entry("helms-deep", "Helm's Deep", deep.DEEP_GOLDENS, deep.deepWorld, deep.playGolden),
   entry("the-road-to-isengard", "The Road to Isengard", isengard.ISENGARD_GOLDENS, isengard.isengardWorld, isengard.playGolden),

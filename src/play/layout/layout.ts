@@ -9,7 +9,7 @@ import type { CardInstance } from "../../rules/core/state.ts";
 
 import { pictureKey } from "../canvas/picture-key.ts";
 import type { BasePileId, FightKind, PileId, PileView, SecondPileId, VictoryPileId, ZoneId, ZoneView } from "../store/selectors.ts";
-import { ASPECT, deepestUnder, MIN_TARGET, placeUnder, rowXs, slotOf, type Metrics } from "./slots.ts";
+import { ASPECT, deepestUnder, MIN_TARGET, placeCounted, placeUnder, rowXs, slotOf, type Metrics } from "./slots.ts";
 import { placePlay, playPlan } from "./play-area.ts";
 import { placeEngaged, placeRow, type RowFolding } from "./row-place.ts";
 import type { RowReach } from "./row-reach.ts";
@@ -50,6 +50,8 @@ export type CardSlot = Rect & {
   committed: boolean;
   // The facedown prisoner of Escape from Dol Guldur (01123:B:1): its back wears a small hero mark and a tap still opens its preview.
   held?: true;
+  // A facedown Reanimated Dead (The Dread Realm): a player card back with a small mark, and a tap or a hold opens a preview that says what it is.
+  dead?: true;
   // A deck with an encounter card attached to it (Iron Shackles, 01105:A:1): a chain on its count strip.
   chained?: true;
   // The one peek of a staging card with more than one card under it (a grappled arm, Black Key on the Raider Flagship): how many are under it, drawn as "×2".
@@ -78,7 +80,7 @@ export type CardSlot = Rect & {
 export type CombatMark = { x: number; y: number; kind: FightKind; enemyId: string; preview: boolean };
 
 // The second slot's decks, which stand in its left place, and its discard piles, in its right one.
-const SECOND_DECKS = ["corsairDeck", "unchartedDeck", "grottoDeck", "evilCreaturesDeck", "cavesDeck", "haradDeck"] as const;
+const SECOND_DECKS = ["corsairDeck", "unchartedDeck", "grottoDeck", "evilCreaturesDeck", "cavesDeck", "haradDeck", "angmarOrcDeck"] as const;
 const SECOND_DISCARDS = ["corsairDiscard", "evilCreaturesDiscard"] as const;
 // The four piles every table has, the second slot's when the game has one (the Corsair pair: dcce.corsair-deck; the Evil Creatures pair or the Caves deck: emce.evil-creatures-deck, emce.caves-deck), and the victory display while a card is in it.
 export type TablePiles<T> = Readonly<Record<BasePileId, T>> & Partial<Readonly<Record<SecondPileId | VictoryPileId, T>>>;
@@ -315,11 +317,16 @@ export function tableLayout(
   const slots: CardSlot[] = [];
   const marks: CombatMark[] = [];
   const stageEntry = views.questStage.entries[0];
-  if (stageEntry) slots.push(slotOf(stageEntry.card, "questStage", "card", questStage, true));
+  // The cards captured under the quest stage and under an active location are one counted peek where the table stacks what lies under a card (Escape from Mount Gram): the peek stays within the depth the left column reserves, short of the deck and discard piles.
+  if (stageEntry) {
+    if (options.stacks) placeCounted(stageEntry, "questStage", questStage, slots, peek, true);
+    slots.push(slotOf(stageEntry.card, "questStage", "card", questStage, true));
+  }
   for (const [id, rect] of [["activeLocation", activeLocation], ["secondActiveLocation", secondActiveLocation]] as const) {
     const entry = views[id].entries[0];
     if (!entry) continue;
-    placeUnder(entry, id, rect, slots, [], peek);
+    if (options.stacks) placeCounted(entry, id, rect, slots, peek);
+    else placeUnder(entry, id, rect, slots, [], peek);
     slots.push(slotOf(entry.card, id, "card", rect));
   }
   // Staging and the engagement area squeeze to 44 pt steps and then fold the groups the moment does not ask about into a stack at the row's left end (row-fold.ts).

@@ -13,7 +13,7 @@ import { pickSchema } from "./effect-schema-pick.ts";
 export const cardRefSchema = z.enum(["self", "host", "picked", "subject", "other", "attacker", "defender", "activeLocation", "previous", "discardTop", "questStage"]);
 
 // The decks beside the encounter deck a record names (emce.caves-deck, emce.evil-creatures-deck, mec112.setup-journey-to-the-cross-roads; src/rules/core/piles.ts NAMED_PILES): the one list `pile` of a wilderland verb, the amount `pile` and the condition `pileHas` share.
-export const pileNameSchema = z.enum(["caves", "evilCreatures", "spiders", "orcs", "sideQuests", "harad", "greatSpider"]);
+export const pileNameSchema = z.enum(["caves", "evilCreatures", "spiders", "orcs", "sideQuests", "harad", "greatSpider", "angmarOrcs"]);
 
 export const amountExprSchema = z.strictObject({
   // How many cards match, from the actor's side ("each enemy engaged with you", "each side quest in the victory display").
@@ -86,6 +86,23 @@ export const amountExprSchema = z.strictObject({
   max: z.literal(true).optional(),
   // The number of cards left in this deck beside the encounter deck ("gets -1 Threat for each facedown card under it", 144030:A:2: the Harad deck lies under The Cross-roads). 0 in a game that did not deal it. Read by the wilderland family.
   pile: pileNameSchema.optional(),
+  // What the running effect discarded from the top of decks so far, over every player it acted for: `cost` the combined printed cost of the cards (a card with no printed cost counts 0: "X is the combined printed cost of the discarded cards", 09034:A:1), `types`
+  // the number of different card types among them ("for each different card type discarded this way", 09064:A:1). Read by the deck family.
+  discarded: z.enum(["cost", "types"]).optional(),
+  // The total printed Threat of the cards the running effect discarded from the top of the encounter deck (DiscardEncounterTop), looked at by it: an enemy's or a location's Threat, 0 for any other card ("X is the total Threat of the discarded cards", 10107:A:1). Read by the angmar family.
+  discardedThreat: z.literal(true).optional(),
+  // The Willpower the character the attack destroyed had in play, kept when the attack damaged it ("raise your threat by the destroyed character's Willpower", 10107:A:2); 0 when none was kept. Read by the angmar family.
+  destroyedWillpower: z.literal(true).optional(),
+  // The number of quest cards in play: the main quest card, the encounter side quests in the staging area and the player side quests in the quest areas, at least 1 ("X is the number of quest cards in play", 09016:A:1; mec108.side-quests-in-play). Read by the angmar family.
+  questCards: z.literal(true).optional(),
+  // Every shadow card dealt to an enemy in play, the staging area's and the engaged ones, added up ("where X is the number of shadow cards in play", 10126:A:1). Read by the angmar family.
+  shadowCardsInPlay: z.literal(true).optional(),
+  // The highest printed cost among the cards in the actor's discard pile, 0 for an empty pile, a card with a printed X cost or no cost (a hero) counting 0 ("the printed cost of the highest cost card in that player's discard pile", 10137:A:1). Read by the angmar family.
+  discardPileMaxCost: z.literal(true).optional(),
+  // Captured cards (Escape from Mount Gram, read by the captured family): `under` the cards captured underneath the source ("X is the number of captured cards underneath Tunnels of Mount Gram", 10048:A:2), `cardsWith` the cards in play with 1 or more captured cards underneath
+  // them ("X is the number of cards in play with 1 or more captured cards underneath them", 10045:A:2), `questsAndSides` the quest cards the players have completed plus the side quests in the victory display ("the number of completed quest cards plus the number of side
+  // quests in the victory display", 10174:B:1), `players` the players in the game (Loot the Dungeons, "for each player in the game at every staging area", 10175:A:1).
+  captured: z.enum(["under", "cardsWith", "questsAndSides", "players"]).optional(),
   // The pursuit value (mec112.pursuit; `pursuit`), 0 while no tracker is set: "X is the pursuit value" (143069:B:1). Read by the pursuit family.
   pursuit: z.literal(true).optional(),
   // The highest threat among the living players ("X is the threat of the player with the highest threat", 145064:B:1), and the number of living players whose threat is at least this ("+1 Threat for each player with a threat of 35 or higher",

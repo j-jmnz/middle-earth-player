@@ -5,6 +5,7 @@ import path from "node:path";
 import { describe, expect, it } from "vitest";
 
 import { authoredRelOfScenario } from "../data/effects/authored-paths.ts";
+import { loadCampaignsInOrder } from "../data/load-scenarios.ts";
 import { planScenario, type Repo } from "./scenario-new.ts";
 
 // pnpm scenario new <scenario-id>: it plans from data/scenarios and the registries as they are, edits them only by inserting lines, never
@@ -13,8 +14,9 @@ const ROOT = path.resolve(import.meta.dirname, "..", "..");
 const repo: Repo = { read: (file) => (existsSync(path.join(ROOT, file)) ? readFileSync(path.join(ROOT, file), "utf8") : null) };
 const exists = (file: string): boolean => existsSync(path.join(ROOT, file));
 const SCENARIOS = readdirSync(path.join(ROOT, "data", "scenarios")).filter((name) => name.endsWith(".json")).map((name) => name.slice(0, -".json".length));
-// A scenario that has no authored file yet is one the scaffold has not been run for.
-const NEW = SCENARIOS.find((id) => !exists(`src/effects/authored/${authoredRelOfScenario(id)}.ts`) && !exists(`test/scenarios/${id}`));
+const scaffolded = (id: string): boolean => exists(`src/effects/authored/${authoredRelOfScenario(id)}.ts`) || exists(`test/scenarios/${id}`);
+// The next scenario the scaffold has not been run for: its previous part has its files (the planner refuses a part whose earlier part has none).
+const NEW = loadCampaignsInOrder().flatMap((campaign) => campaign.scenarios.filter((id, at) => SCENARIOS.includes(id) && !scaffolded(id) && (at === 0 || scaffolded(campaign.scenarios[at - 1] as string))))[0];
 
 // A view of the repo as if `ids` had none of their lines in the registries and none of their files: the planner is tested on explicit ids,
 // whether or not the real repo has scaffolded them yet. (Every registry line that names a scenario carries its id.)
@@ -29,7 +31,7 @@ function without(...ids: string[]): { repo: Repo; exists: (file: string) => bool
 // Where each registry's block starts and ends: an added line must land between these.
 const BLOCKS: Record<string, { start: RegExp; end: RegExp } | undefined> = {
   "src/campaign/fixtures/registry.ts": { start: /^export const FIXTURE_REGISTRY = \[/, end: /^\] as const/ },
-  "scripts/e2e/fixtures.ts": { start: /^const WRITERS\b/, end: /^};$/ },
+  "scripts/e2e/writers.ts": { start: /^export const WRITERS\b/, end: /^};$/ },
   "test/harness/golden-registry.ts": { start: /^export const GOLDEN_REGISTRY\b/, end: /^\];$/ },
 };
 
@@ -76,7 +78,7 @@ describe("pnpm scenario new", () => {
     const view = without(id, ...alsoLeftOut);
     const { plan, problems } = planScenario(id, {}, view.repo, view.exists);
     expect(problems).toEqual([]);
-    expect(plan?.edits.map((edit) => edit.file)).toEqual(["src/campaign/fixtures/registry.ts", "src/campaign/fixtures.ts", "scripts/e2e/fixtures.ts", "test/harness/golden-registry.ts"]);
+    expect(plan?.edits.map((edit) => edit.file)).toEqual(["src/campaign/fixtures/registry.ts", "src/campaign/fixtures.ts", "scripts/e2e/writers.ts", "test/harness/golden-registry.ts"]);
     for (const edit of plan?.edits ?? []) {
       const lines = edit.after.split("\n");
       const added = addedAt(edit.before, edit.after);
@@ -93,9 +95,9 @@ describe("pnpm scenario new", () => {
         expect(at, `${edit.file}: "${line.trim()}" is before the block's closing line`).toBeLessThan(end);
       }
     }
-    const writers = plan?.edits.find((edit) => edit.file === "scripts/e2e/fixtures.ts");
+    const writers = plan?.edits.find((edit) => edit.file === "scripts/e2e/writers.ts");
     const writerLines = writers?.after.split("\n") ?? [];
-    const from = writerLines.findIndex((line) => /^const WRITERS\b/.test(line));
+    const from = writerLines.findIndex((line) => /^export const WRITERS\b/.test(line));
     const to = writerLines.findIndex((line, index) => index > from && /^};$/.test(line));
     expect(writerLines.slice(from, to).some((line) => line.startsWith(`  "${id}": () => `))).toBe(true);
   });
@@ -125,7 +127,7 @@ describe("pnpm scenario new", () => {
       read: (file) => {
         const text = view.repo.read(file);
         // Two writers for the previous part: the planner cannot tell which one the new line follows.
-        return file === "scripts/e2e/fixtures.ts" && text ? text.replace(/^(  "temple-of-the-deceived": .*)$/m, "$1\n$1") : text;
+        return file === "scripts/e2e/writers.ts" && text ? text.replace(/^(  "temple-of-the-deceived": .*)$/m, "$1\n$1") : text;
       },
     };
     const { plan, problems } = planScenario("the-drowned-ruins", {}, twice, view.exists);
@@ -150,7 +152,7 @@ describe("pnpm scenario new", () => {
       `src/effects/authored/${id}.ts`,
       `src/campaign/fixtures/${id}.json`,
     ]);
-    expect(plan?.edits.map((edit) => edit.file)).toEqual(["src/campaign/fixtures/registry.ts", "src/campaign/fixtures.ts", "scripts/e2e/fixtures.ts", "test/harness/golden-registry.ts"]);
+    expect(plan?.edits.map((edit) => edit.file)).toEqual(["src/campaign/fixtures/registry.ts", "src/campaign/fixtures.ts", "scripts/e2e/writers.ts", "test/harness/golden-registry.ts"]);
     // An edit only inserts lines, and the golden registry's are comments (its test fails on an entry with no golden.json).
     for (const edit of plan?.edits ?? []) {
       const before = edit.before.split("\n");
@@ -171,6 +173,33 @@ describe("pnpm scenario new", () => {
 
     for (const item of plan?.files ?? []) expect(view.exists(item.file), item.file).toBe(false);
     for (const edit of plan?.edits ?? []) expect(view.repo.read(edit.file), edit.file).toBe(edit.before);
+  });
+
+  it("puts a campaign folder's seed finder in its folder, with imports one level deeper, and builds its log on the previous part's finder", () => {
+    const id = "the-wastes-of-eriador";
+    const view = without(id);
+    const { plan, problems } = planScenario(id, {}, view.repo, view.exists);
+    expect(problems).toEqual([]);
+    const finder = plan?.files.find((item) => item.file === `scripts/e2e/angmar-awakened/${id}.ts`);
+    expect(finder, "the finder is written in the campaign folder").toBeDefined();
+    const text = finder?.text ?? "";
+    expect(text).toContain('from "../../../test/scenarios/deadmens-dike/game.ts"');
+    expect(text).toContain('from "../../../src/campaign/log.ts"');
+    expect(text).toContain('from "../../log.ts"');
+    expect(text).toContain('from "../seed-kit.ts"');
+    expect(text).toContain('from "./deadmens-dike.ts"');
+    expect(text).toContain("await hillsWonLog()");
+    const writers = plan?.edits.find((edit) => edit.file === "scripts/e2e/writers.ts");
+    expect(writers?.after).toContain(`from "./angmar-awakened/${id}.ts"`);
+  });
+
+  it("refuses a scenario whose previous part has no seed finder where the campaign keeps it", () => {
+    const id = "the-wastes-of-eriador";
+    const view = without(id);
+    const missing: Repo = { read: (file) => (file === "scripts/e2e/angmar-awakened/deadmens-dike.ts" ? null : view.repo.read(file)) };
+    const { plan, problems } = planScenario(id, {}, missing, view.exists);
+    expect(plan).toBeNull();
+    expect(problems.join(" ")).toContain("has no seed finder at scripts/e2e/angmar-awakened/deadmens-dike.ts");
   });
 
   // The CLI reads the real repo, so it runs on a scenario the real repo has not scaffolded yet (none, once every scenario has its files).

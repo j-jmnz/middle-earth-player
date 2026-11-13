@@ -8,10 +8,10 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 12175:A:2 (front): Setup: A player may search their deck for a unique boon ally and add it to their hand. If "Melanwar has given you guidance on traversing Wilderland," search the encounter deck for 2 non-unique locations and the Caves deck for 1 location and remove them from the game. If "Isolde is on the hunt," search the encounter deck for 3 non-unique enemies and remove them from the game. Flip this card over.
   12175:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAside {"verb":"SetAside","code":"12176"}]
-    - [json SetAside {"verb":"SetAside","code":"12177"}]
-    - [json SetAside {"verb":"SetAside","code":"12178"}]
-    - [json SetAside {"verb":"SetAside","code":"12179"}]
+    - a copy of the card with code 12176 is set aside, out of play
+    - a copy of the card with code 12177 is set aside, out of play
+    - a copy of the card with code 12178 is set aside, out of play
+    - a copy of the card with code 12179 is set aside, out of play
     - [json SearchBoonAllyToHand {"verb":"SearchBoonAllyToHand"}]
     - if the Campaign Log holds "melanwar": remove 2 non-unique locations from the encounter deck
     - [json RemoveFromCavesIfLogged {"verb":"RemoveFromCavesIfLogged","line":"melanwar","count":1,"cardType":"location"}]
@@ -19,7 +19,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 
 12175:B:1 (back): Forced: After a main quest stage is defeated, any player who does not control an Accolade boon may attach one of the following boons to one of their heroes and memorialize their valorous deeds, based on which quest stage was defeated:
   12175:forced:1: Forced on the event questCardDefeated (heard about card (any player controls)) (record also names 12175:B:2)
-    only if the card the event is about is a card (any player controls) named "Searching for Dragon Sign" [also {"inPlay":false}]
+    only if the card the event is about is a card (any player controls) named "Searching for Dragon Sign" that is out of play now
     - for each player, first player first:
       - the acting player chooses one of:
         * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12176"}]) and (there is a hero (you control) [also {"attachable":"12176"}] to choose)):
@@ -27,7 +27,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
           - [json AttachSetAside {"verb":"AttachSetAside","code":"12176"}]
         * option "decline":
   12175:forced:2: Forced on the event questCardDefeated (heard about card (any player controls)) (record also names 12175:B:3)
-    only if the card the event is about is a card (any player controls) named "The Cold-Drake Attacks!" [also {"inPlay":false}]
+    only if the card the event is about is a card (any player controls) named "The Cold-Drake Attacks!" that is out of play now
     - for each player, first player first:
       - the acting player chooses one of:
         * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12177"}]) and (there is a hero (you control) [also {"attachable":"12177"}] to choose)):
@@ -35,7 +35,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
           - [json AttachSetAside {"verb":"AttachSetAside","code":"12177"}]
         * option "decline":
   12175:forced:3: Forced on the event questCardDefeated (heard about card (any player controls)) (record also names 12175:B:4)
-    only if the card the event is about is a card (any player controls) named "Hunting the Beast" [also {"inPlay":false}]
+    only if the card the event is about is a card (any player controls) named "Hunting the Beast" that is out of play now
     - for each player, first player first:
       - the acting player chooses one of:
         * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12178"}]) and (there is a hero (you control) [also {"attachable":"12178"}] to choose)):
@@ -53,7 +53,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 
 12175:B:2 (back): Stage 1: Attach Master of the Hunt to a hero.
   12175:forced:1: Forced on the event questCardDefeated (heard about card (any player controls)) (record also names 12175:B:1)
-    only if the card the event is about is a card (any player controls) named "Searching for Dragon Sign" [also {"inPlay":false}]
+    only if the card the event is about is a card (any player controls) named "Searching for Dragon Sign" that is out of play now
     - for each player, first player first:
       - the acting player chooses one of:
         * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12176"}]) and (there is a hero (you control) [also {"attachable":"12176"}] to choose)):
@@ -63,7 +63,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 
 12175:B:3 (back): Stage 2: Attach Unbroken to a hero.
   12175:forced:2: Forced on the event questCardDefeated (heard about card (any player controls)) (record also names 12175:B:1)
-    only if the card the event is about is a card (any player controls) named "The Cold-Drake Attacks!" [also {"inPlay":false}]
+    only if the card the event is about is a card (any player controls) named "The Cold-Drake Attacks!" that is out of play now
     - for each player, first player first:
       - the acting player chooses one of:
         * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12177"}]) and (there is a hero (you control) [also {"attachable":"12177"}] to choose)):
@@ -73,7 +73,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 
 12175:B:4 (back): Stage 3: Attach The Steadfast to a hero.
   12175:forced:3: Forced on the event questCardDefeated (heard about card (any player controls)) (record also names 12175:B:1)
-    only if the card the event is about is a card (any player controls) named "Hunting the Beast" [also {"inPlay":false}]
+    only if the card the event is about is a card (any player controls) named "Hunting the Beast" that is out of play now
     - for each player, first player first:
       - the acting player chooses one of:
         * option "attach" (only if all of: (the number of Accolade attachment (you control) is at most 0) and ([json condition {"kind":"outOfPlay","code":"12178"}]) and (there is a hero (you control) [also {"attachable":"12178"}] to choose)):
@@ -94,8 +94,8 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 12175:B:6 (back): Resolution: Add each Accolade boon in play to the campaign pool. Each player may choose one of the following boons and add it to the campaign pool: The Canny Huntsman, A Tale of Victories, Lay of Courage, Rhyme of the Slayer.
   12175:resolution:1: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json EarnAttached {"verb":"EarnAttached","codes":["12176","12177","12178","12179"]}]
-    - [json ChooseCards {"verb":"ChooseCards","codes":["12180","12181","12182","12183"],"who":"eachSeat","to":"pool","optional":true}]
+    - each copy of code 12176, code 12177, code 12178 and code 12179 attached to a hero in play joins the Campaign Pool attached to that hero
+    - each player in turn may take "12180" or "12181" or "12182" or "12183" into the Campaign Pool
 
 12175:B:7 (back): If there are 4 Dragon Sign objectives in the victory display, the players also look at 3 random undiscovered treasures and choose 1 to attach to an eligible character.
   12175:resolution:2: Resolution
@@ -130,7 +130,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 
 19012:A:1 (front): Guarded (enemy).
   19012:whenRevealed:1: When revealed
-    - [json GuardObjective {"verb":"GuardObjective","types":["enemy"]}]
+    - the Guarded keyword: this objective in the staging area is guarded by the first encounter enemy discarded from the deck, added to the staging area
 
 19012:A:2 (front): Attached enemy or location is immune to player card effects.
   19012:constant:1: Constant
@@ -155,7 +155,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 19013:A:3 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   19013:shadow:1: Shadow
     - when the attack in progress ends:
-      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt no shadow card
+      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt no shadow card
 
 ## 19014 Dragon Hatchling
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -214,14 +214,14 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
   19018:response:1: Response after the players travel (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json AttachGuardedFromPile {"verb":"AttachGuardedFromPile","pile":"caves","code":"19012"}]
-    - [json ShufflePile {"verb":"ShufflePile","pile":"caves"}]
+    - shuffle the caves deck
 
 19018:A:2 (front): Travel: Shuffle the encounter discard pile into the encounter deck and discard cards from the top until an enemy is discarded. Add that enemy to the staging area.
   19018:travel:1: Travel
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the encounter discard pile into the encounter deck
-    - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy"}]
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"},"inPlay":false}}]
+    - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
+    - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
 
 ## 19019 High Falls
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -236,7 +236,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 
 19019:A:3 (front): Travel: Assign X damage among characters in play.
   19019:travel:1: Travel
-    - [json AssignDamage {"verb":"AssignDamage","amount":{"count":{"type":"location","control":"any","stagingOnly":true}},"pick":{"type":"character","control":"any"}}]
+    - the acting player assigns the number of location (any player controls) in the staging area only damage among the character (any player controls), one at a time
 
 ## 19020 Heavy Snow
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -277,18 +277,18 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 19022:A:1 (front): Setup: Set Cold-Drake and all four copies of Dragon Sign aside, out of play. Create the Caves deck (see insert) and set it next to the quest deck. Shuffle 2 set aside Dragon Sign objectives into the Caves deck. Shuffle the encounter deck and discard cards from the top until X locations are discarded, where X is the number of players. Add each discarded location to the staging area.
   19022:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ShufflePile {"verb":"ShufflePile","pile":"caves"}]
+    - shuffle the caves deck
     - [json ShuffleSetAsideIntoPile {"verb":"ShuffleSetAsideIntoPile","pile":"caves","code":"19012","count":2}]
     - shuffle the encounter deck
     - for each player, first player first:
-      - [json DiscardUntil {"verb":"DiscardUntil","type":"location"}]
-      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"location","control":"any"},"inPlay":false}}]
+      - cards are discarded from the top of the encounter deck until a location is discarded, or the deck is empty; that card becomes the picked card
+      - then, if the picked card is a location (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
 
 19022:B:1 (back): Forced: After the active location is explored, look at the top 3 cards of the encounter deck. Reveal 1 of those cards and discard the rest.
   19022:forced:1: Forced on the event activeExplored
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json LookAtTop {"verb":"LookAtTop","count":3}]
-    - [json PickEncounter {"verb":"PickEncounter","from":"looked"}]
+    - choose an encounter card among the cards the effect looked at (none when no card matches)
     - [json DiscardOtherLooked {"verb":"DiscardOtherLooked"}]
     - the acting player reveals an encounter card
 
@@ -302,7 +302,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 
 19023:A:1 (front): When Revealed: Add the set-aside Cold-Drake to the staging area.
   19023:whenRevealed:1: When revealed
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"19011"}]
+    - one set-aside card with code 19011 joins the staging area (it is not revealed)
 
 19023:B:1 (back): Ignore the Deep keyword.
   19023:constant:1: Constant
@@ -312,10 +312,10 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
   19023:constant:2: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each enemy (any player controls) or in the staging area, named "Cold-Drake": stat indestructible 1, while this card is in play
-    - each enemy (any player controls) or in the staging area, named "Cold-Drake": stat engagedWithAll 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Cold-Drake": stat engagedWithAll (it stays in the staging area but is considered engaged with each player: it attacks each of them in turn in the combat phase, dealt a shadow card for each attack, and none engages it) 1, while this card is in play
     - each enemy (any player controls) or in the staging area, named "Cold-Drake": stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
     - each enemy (any player controls) or in the staging area, named "Cold-Drake": stat noThreatContribution 1, while this card is in play
-    - each enemy (any player controls) or in the staging area, named "Cold-Drake": stat attackableByAny 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Cold-Drake": stat attackableByAny (any character may be declared as an attacker against it) 1, while this card is in play
 
 19023:B:3 (back): No more than 6 damage can be placed on Cold-Drake each round, and it cannot have more than 18 damage.
   19023:constant:3: Constant
@@ -338,14 +338,14 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
     - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"19011","keepDamage":true}]
     - shuffle the encounter discard pile into the encounter deck
     - for each player, first player first:
-      - [json DiscardUntil {"verb":"DiscardUntil","type":"location"}]
-      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"location","control":"any"},"inPlay":false}}]
+      - cards are discarded from the top of the encounter deck until a location is discarded, or the deck is empty; that card becomes the picked card
+      - then, if the picked card is a location (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
 
 19024:B:1 (back): Forced: After the active location is explored, look at the top 3 cards of the encounter deck. Reveal 1 of those cards and discard the rest.
   19024:forced:1: Forced on the event activeExplored
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json LookAtTop {"verb":"LookAtTop","count":3}]
-    - [json PickEncounter {"verb":"PickEncounter","from":"looked"}]
+    - choose an encounter card among the cards the effect looked at (none when no card matches)
     - [json DiscardOtherLooked {"verb":"DiscardOtherLooked"}]
     - the acting player reveals an encounter card
 
@@ -364,7 +364,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
 19025:A:1 (front): When Revealed: Add Cold-Drake to the staging area. It makes an immediate attack against each player in turn order. (Deal and resolve a shadow card for each attack.)
   19025:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"19011"}]
+    - one set-aside card with code 19011 joins the staging area (it is not revealed)
     - choose enemy (any player controls) or in the staging area, named "Cold-Drake"
     - for each player, first player first:
       - the picked enemy attacks the acting player now, from the staging area
@@ -390,4 +390,4 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
     - later, at the end of this phase:
       - the players win the game
 
-(rendered pieces: 251 by template, 79 as JSON)
+(rendered pieces: 286 by template, 53 as JSON)

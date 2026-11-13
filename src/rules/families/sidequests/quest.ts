@@ -3,7 +3,7 @@
 // quest cards and the Learn to Play: a side quest sits in its player's quest area, a character commits to it instead of the
 // current quest, the Willpower committed to it is placed on it as progress (it is not compared with the Threat in the staging
 // area), and it is defeated when its progress reaches its quest points.
-import { ruleCause } from "../../core/cause.ts";
+import { ruleCause, type Cause } from "../../core/cause.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { modifiedStat, releaseAttachments } from "../../core/keywords.ts";
@@ -14,6 +14,10 @@ import type { ScenarioState } from "../../core/state.ts";
 import { updateCard } from "../../core/state.ts";
 import { noteHostDefeated } from "../attachments/hold.ts";
 import { questCardDefeatedHeard } from "../quest/branch.ts";
+import { releaseHeldOnDefeat } from "../angmar/hold.ts";
+import { absorbProgress } from "../angmar/sponge.ts";
+import { flipDefeated, flipsInto } from "../angmar/stage.ts";
+import { noteProgressPlaced } from "../angmar/progress.ts";
 import { addToVictory } from "./victory.ts";
 
 // The side quests in the players' quest areas, in seat order.
@@ -61,28 +65,38 @@ export function sideQuestReason(state: ScenarioState, questId: string): string |
 // resolution clears it.
 export function resolveSideQuests(state: ScenarioState, committed: ReadonlyMap<string, number>, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let next = state;
-  for (const [questId, amount] of committed) {
-    const quest = next.cards[questId];
-    if (!quest || amount <= 0) continue;
-    const points = printedOf(ctx.cards, quest.code).questPoints == null ? null : modifiedStat(next, quest, "questPoints", ctx.cards);
-    const placed = points == null ? amount : Math.min(amount, Math.max(0, points - quest.progress));
-    if (placed > 0) {
-      next = updateCard(next, questId, { progress: quest.progress + placed });
-      steps.push({ kind: "progress", targetId: questId, amount: placed, cause: ruleCause("rr.step-3-4") });
-    }
-    const updated = next.cards[questId];
-    if (updated && points != null && updated.progress >= points) next = defeatSideQuest(next, questId, ctx, steps);
-  }
+  for (const [questId, amount] of committed) next = placeOnSideQuest(next, questId, amount, ruleCause("rr.step-3-4"), ctx, steps);
   return next;
 }
 
+// Progress on a side quest: it takes what it needs to be full and no more, and a full one in a quest area is defeated (an encounter side quest in the staging area is swept up by the caller's effect).
+export function placeOnSideQuest(from: ScenarioState, questId: string, wanted: number, cause: Cause, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  // Progress that would be placed on a quest card first fills the sponges in the staging area (Forbidden Descent, 10101:A:1).
+  const { state, remaining: amount } = absorbProgress(from, wanted, ctx.cards, steps);
+  const quest = state.cards[questId];
+  if (!quest || amount <= 0) return state;
+  const points = printedOf(ctx.cards, quest.code).questPoints == null ? null : modifiedStat(state, quest, "questPoints", ctx.cards);
+  const placed = points == null ? amount : Math.min(amount, Math.max(0, points - quest.progress));
+  let next = state;
+  if (placed > 0) {
+    next = noteProgressPlaced(updateCard(next, questId, { progress: quest.progress + placed }), questId, placed);
+    steps.push({ kind: "progress", targetId: questId, amount: placed, cause });
+  }
+  const updated = next.cards[questId];
+  return updated && points != null && updated.progress >= points && sideQuestIds(next).includes(questId) ? defeatSideQuest(next, questId, ctx, steps) : next;
+}
+
 // The side quest is defeated: the cards attached to it hear it and are discarded with it, the quest itself hears it
-// (`questDefeated`), and it is added to the victory display, or to its owner's discard pile when its limit is reached.
+// (`questDefeated`), and it is added to the victory display, or to its owner's discard pile when its limit is reached. A side quest whose record says "When this quest is defeated, flip it over" (10109:A:3) flips into its Clue objective in the staging area instead:
+// it stays in play, so its attachments stay on it (rr.attachment-cards: an attachment is discarded only when its host leaves play, and a play restriction is checked only as it enters play).
 export function defeatSideQuest(state: ScenarioState, questId: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const quest = state.cards[questId];
   if (!quest) return state;
-  let next = releaseAttachments(noteHostDefeated(state, questId), questId, ctx.cards, steps);
-  next = updateCard(addToVictory(next, questId, ctx), questId, { progress: 0, committed: false });
+  // A card the side quest holds under it in play comes back to its players (Rescue Iârion, families/angmar/hold.ts).
+  const into = flipsInto(ctx, quest.code);
+  const heard = noteHostDefeated(state, questId);
+  let next = releaseHeldOnDefeat(into ? heard : releaseAttachments(heard, questId, ctx.cards, steps), questId);
+  next = into ? flipDefeated(next, questId, into) : updateCard(addToVictory(next, questId, ctx), questId, { progress: 0, committed: false });
   next = queueEvent(next, { trigger: "questDefeated", seat: quest.controller, cardId: questId, subject: questId });
   // Any quest card hears that a quest card was defeated ("After a quest card is defeated", 01135:A:3).
   return questCardDefeatedHeard(next, ctx) ? queueEvent(next, { trigger: "questCardDefeated", seat: null, subject: questId }) : next;

@@ -54,8 +54,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   // Where the source card is now. `play` means any zone the source's controller plays from.
   // `victory`: the source is in the victory display, and its constant effects work from there (141046:A:2). `hand`: an Action
   // its player uses from the hand ("put Emery into play from your hand", src/rules/families/deck/play.ts). `encounterDeck`: a card that left play
-  // for the encounter deck (Gavin's Planning Action shuffles him in; "When Gavin leaves play (other than by his ability)", 11210:A:3).
-  z.strictObject({ kind: z.literal("sourceIn"), zone: z.enum(["activeLocation", "staging", "engaged", "questStage", "play", "victory", "hand", "stormcallerArea", "encounterDeck"]) }),
+  // for the encounter deck (Gavin's Planning Action shuffles him in; "When Gavin leaves play (other than by his ability)", 11210:A:3). `attached`: the source is attached to a card now (an event that attaches itself, then does more only if it did: 10172:A:1, rr.then).
+  z.strictObject({ kind: z.literal("sourceIn"), zone: z.enum(["activeLocation", "staging", "engaged", "questStage", "play", "victory", "hand", "stormcallerArea", "encounterDeck", "attached"]) }),
   // The source card shows this side (a contract, flipped by FlipCard; side A at the start).
   z.strictObject({ kind: z.literal("faceUp"), side: z.enum(["A", "B"]) }),
   // The actor's seat (`seat`) or the source card (`self`) holds this flag, a modifier of that stat that is in force now (`is`: false
@@ -74,7 +74,7 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The attack in progress has no defender (declared or considered).
   z.strictObject({ kind: z.literal("undefended") }),
   // `type`: only a card of this printed type counts ("discard cards from the top of the encounter deck until an enemy is discarded" is offered while an enemy is left in the deck, 146061:A:1). `victory`: the victory display is read too (146036:A:2).
-  z.strictObject({ kind: z.literal("searchable"), trait: z.string().min(1).optional(), code: z.string().min(1).optional(), type: z.enum(["enemy", "location", "treachery", "objective"]).optional(), deckOnly: z.literal(true).optional(), victory: z.literal(true).optional() }),
+  z.strictObject({ kind: z.literal("searchable"), trait: z.string().min(1).optional(), code: z.string().min(1).optional(), type: z.enum(["enemy", "location", "treachery", "objective", "encounter-side-quest"]).optional(), deckOnly: z.literal(true).optional(), victory: z.literal(true).optional() }),
   // Some card matches this pick (for the actor now): a choice that could be made.
   z.strictObject({ kind: z.literal("canPick"), pick: pickSchema }),
   // Each of the actor's heroes has this trait, and the actor has one ("Play only if each of your heroes is a Hobbit",
@@ -175,6 +175,8 @@ const atomSchema = z.discriminatedUnion("kind", [
   // and the attacking enemy's engagement cost is higher than its controller's threat. `attacking`: the holder is
   // attacking an enemy whose engagement cost is higher than the holder's controller's threat.
   z.strictObject({ kind: z.literal("versusHighEngagement"), role: z.enum(["defending", "attacking"]) }),
+  // The holder is the declared defender of the attack in progress and the attacking enemy has this Trait ("+1 Defense while defending against an Undead enemy", 10114:A:2, 10187:A:2). Read while a stat is read, like versusDefender (src/rules/core/keywords.ts).
+  z.strictObject({ kind: z.literal("defendingAgainst"), trait: z.string().min(1) }),
   // The holder is an enemy attacking a defender (declared, not undefended) whose printed hit points are at most `maxHitPoints` ("gets +2 Attack against
   // characters with 2 or fewer printed hit points", 142071:A:2). Read while a stat is read, like versusHighEngagement (src/rules/core/keywords.ts).
   // `ally`: the defender is an ally ("gets +2 Attack when attacking allies", 12054:A:2).
@@ -301,8 +303,32 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The When Revealed effects of the source card are resolving now: a quest stage's side B holds from the moment it is revealed, but its text is not in force while side A's When Revealed is
   // ("Each Raider enemy revealed by the encounter deck enters play with 1 resource on it" does not reach the cards revealed by the stage's own When Revealed, 11037:B:2).
   z.strictObject({ kind: z.literal("revealing") }),
+  // The current quest, read by the angmar family: `side` a side quest is the current quest ("If the current quest is a side quest", 09047:A:1), `self` the source is the side quest that is the current quest ("While Orc Rearguard is the current quest", 09023:A:2),
+  // `other` there is a quest card besides the current one that may be chosen to be the current quest (09049:A:2: the main quest card, or an encounter side quest in the staging area).
+  z.strictObject({ kind: z.literal("currentQuest"), is: z.enum(["side", "self", "other"]) }),
+  // The current quest card holds 1 or more progress (`some`) or none (`none`) ("While the current quest has 1 or more progress on it", 10099:A:1; "has 0 progress on it", 10099:A:2). Both are false while there is no current quest: the main quest card cannot be it in the quest phase (10094:B:3). Read by the angmar family.
+  z.strictObject({ kind: z.literal("currentQuestProgress"), is: z.enum(["some", "none"]) }),
+  // The total Willpower of the characters committed to the quest is greater than the total Threat in the staging area, as the quest would count them now ("If the total Willpower of characters committed to the quest is greater than the total Threat in the staging area", 09021:A:1; rr.step-3-4). Read by the angmar family.
+  z.strictObject({ kind: z.literal("questLeads") }),
+  // The card in play with this code has any hit points remaining: its damage is below its hit points now ("cannot defeat this stage while Thaurdir has any hit points remaining", 09074:B:2). False while no such card is in play. Read by the angmar family.
+  z.strictObject({ kind: z.literal("hitPointsLeft"), code: z.string().min(1) }),
+  // The time of day, read by the angmar family: the Time objective (Daybreak, Nightfall) shows the side the state is, `day` while Daybreak is faceup, `night` while Nightfall is ("While it is Night, Wolf of Angmar gets +2 Attack", 10022:A:2; mec108.day-and-night).
+  // False while no Time objective is in play.
+  z.strictObject({ kind: z.literal("timeOfDay"), is: z.enum(["day", "night"]) }),
+  // A location with the Safe keyword is the active location now (`is: true`), or none is (`is: false`): "unless there is an active location with the safe keyword" (10065:B:1, 10066:B:1; mec108.safe). Read by the angmar family.
+  z.strictObject({ kind: z.literal("safeActive"), is: z.boolean() }),
+  // A copy of the card with this code is set aside, out of play ("reveal 1 set-aside copy of Losing Time", 10182:A:3). Read by the angmar family.
+  z.strictObject({ kind: z.literal("setAsideHas"), code: z.string().min(1) }),
   // The pursuit value (mec112.pursuit, the pursuit tracker beside the quest deck) is at most `max` and at least `min`: "If the pursuit value is 25 or lower" (143071:B:1), "30 or greater" (143022:A:2). False while no tracker is set (ScenarioState.pursuit).
   z.strictObject({ kind: z.literal("pursuit"), max: z.number().int().min(0).optional(), min: z.number().int().min(0).optional() }),
+  // Captured cards (Escape from Mount Gram, read by the captured family): `noneUnderAttacker` no card is captured underneath the attacking enemy ("+2 Attack instead if it has no captured cards underneath it", 10045:A:3), `noneUnderSelf` no card is captured underneath the source ("If there are no captured cards underneath Gornákh's Dungeons", 10039:B:2), `someoneEmpty` the Interrogation that is
+  // resolving found a captured deck with no card to discard ("If at least 1 player discarded no cards from this effect", 10052:A:1).
+  z.strictObject({ kind: z.literal("captured"), is: z.enum(["noneUnderSelf", "someoneEmpty", "noneUnderAttacker"]) }),
+  // The holder attacks, or defends against, an enemy that shares a Trait with an enemy in the victory display ("+1 Attack and +1 Defense if that enemy shares a Trait with an enemy in the victory display", 10181:A:2). Read while a stat is read (src/rules/core/keywords.ts).
+  z.strictObject({ kind: z.literal("versusVictoryTrait") }),
+  // The holder is in the staging area of the player `seat` or engaged with a player who shares it (mec108.create-staging-area): an encounter card's lasting effect on "each enemy" reaches the enemies of its own staging area only while the staging areas are separate. Engine use: the stat modifier
+  // an encounter card's effect makes carries it; read while a stat is read (src/rules/core/keywords.ts).
+  z.strictObject({ kind: z.literal("inArea"), seat: z.number().int().min(0) }),
   // The sole attacker: exactly one character was declared as an attacker in the attack in progress ("declared as the only attacker", 143015:A:3; rr.step-6-8b). Read by the attack family.
   // The encounter deck placed at least 1 progress on the current quest stage itself as the result of questing, in the quest resolution just made (the Defense keyword, mec112.defense):
   // progress the active location took does not count (143074:B:2). False while no quest has resolved under Defense. Read by the fortress family.
@@ -336,8 +362,8 @@ export const conditionSchema = z.discriminatedUnion("kind", [
 
 export type Condition = z.infer<typeof conditionSchema>;
 
-export function isStatCondition(condition: Condition | undefined): condition is Extract<Condition, { kind: "versusHighEngagement" | "attacking" | "versusDefender" }> {
-  return condition?.kind === "versusHighEngagement" || condition?.kind === "attacking" || condition?.kind === "versusDefender";
+export function isStatCondition(condition: Condition | undefined): condition is Extract<Condition, { kind: "versusHighEngagement" | "attacking" | "versusDefender" | "versusVictoryTrait" | "inArea" | "defendingAgainst" }> {
+  return condition?.kind === "versusHighEngagement" || condition?.kind === "defendingAgainst" || condition?.kind === "attacking" || condition?.kind === "versusDefender" || condition?.kind === "versusVictoryTrait" || condition?.kind === "inArea";
 }
 
 export const targetSchema = z.discriminatedUnion("kind", [

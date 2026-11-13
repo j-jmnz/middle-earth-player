@@ -64,7 +64,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
   144043:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchMove {"verb":"SearchMove","code":"144053","to":"staging"}]
+    - the acting player finds one card with code 144053 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
     - the first player chooses one of:
       * option "exhaust" (only if the card with code 144063 in play is ready):
@@ -108,7 +108,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
     only if this card is in the victory display
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each enemy (any player controls) or in the staging area, named "Shelob": stat attack 2, while this card is in play
-    - each enemy (any player controls) or in the staging area, named "Shelob": stat losesKeywords 1, while this card is in play
+    - each enemy (any player controls) or in the staging area, named "Shelob": stat losesKeywords (it loses its Indestructible keyword) 1, while this card is in play
     - each enemy (any player controls) or in the staging area, named "Shelob": stat engagedWithFirst 1, while this card is in play
 
 144045:A:3 (front): Travel: Place 1 resource on Shelob to travel here.
@@ -123,7 +123,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 144046:A:1 (front): Forced: When The Spider's Lair is explored, remove 1 resource from Shelob.
   144046:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
-    - [json RemoveResourceTokens {"verb":"RemoveResourceTokens","code":"144040","amount":1}]
+    - up to 1 resource token(s) come off the card with code 144040 in play
 
 144046:A:2 (front): Forced: After The Spider's Lair becomes the active location, Shelob makes an immediate attack against the first player.
   144046:forced:2: Forced after this location becomes the active location (heard about this card)
@@ -140,13 +140,13 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
     - each Orc enemy (any player controls) or in the staging area: stat engagementCost -5, while this card is in play
   144047:forced:1: Forced after an enemy engages a player (heard about Orc enemy (any player controls))
     only if this card is in the staging area
-    - [json DealShadowTo {"verb":"DealShadowTo","target":"subject"}]
+    - the card the event is about is dealt a shadow card
 
 144047:A:2 (shadow): Shadow: Deal the attacking enemy 2 additional shadow cards.
   144047:shadow:1: Shadow
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json DealShadowTo {"verb":"DealShadowTo","target":"attacker"}]
-    - [json DealShadowTo {"verb":"DealShadowTo","target":"attacker"}]
+    - the attacking enemy is dealt a shadow card
+    - the attacking enemy is dealt a shadow card
 
 ## 144048 Deep Dark Passage
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -248,14 +248,14 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
     - exhaust its host
   144060:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
-    - [json AttachesTo {"verb":"AttachesTo","host":{"kind":"hero"},"limitPerHost":true}]
+    - this card counts as a Condition attachment while it is attached
+    - this attachment may be attached to a hero (limit 1 of it per host)
     - its host: stat blankText (its text box is blank) 1, while this card is in play
     - its host: stat cannotReady 1, while this card is in play
 
 144060:A:2 (shadow): Shadow: If attacking enemy is Shelob, resolve the 'When Revealed' effect on Shelob's Poison.
   144060:shadow:1: Shadow
-    - [json ResolveWhenRevealed {"verb":"ResolveWhenRevealed","card":"self","when":{"kind":"matches","card":"attacker","pick":{"type":"enemy","control":"any","names":["Shelob"]}}}]
+    - if the attacking enemy is a enemy (any player controls) named "Shelob": the When Revealed effects of this card resolve as if it had just been revealed
 
 ## 144061 Lurking Malice
 (the scenario deals it into the greatSpiderDeck pile; the piles place it, no record does)
@@ -292,7 +292,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 
 144062:A:2 (shadow): Shadow: If attacking enemy is Shelob, she makes an additional attack against you after this one.
   144062:shadow:1: Shadow
-    - if the attacking enemy is a enemy (any player controls) named "Shelob": this enemy attacks now, dealt a new shadow card after its old ones are discarded [also {"afterThis":true}]
+    - if the attacking enemy is a enemy (any player controls) named "Shelob": the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
 
 ## 144070 The Stairs of Cirith Ungol
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -326,9 +326,9 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 144071:A:1 (front): When Revealed: Add Shelob to the staging area and shuffle all cards from The Great Spider encounter set and the encounter discard pile into the encounter deck.
   144071:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"144040"}]
+    - one set-aside card with code 144040 joins the staging area (it is not revealed)
     - shuffle the encounter discard pile into the encounter deck
-    - [json ShufflePileIntoEncounterDeck {"verb":"ShufflePileIntoEncounterDeck","pile":"greatSpider"}]
+    - shuffle the greatSpider deck into the encounter deck
 
 144071:B:1 (back): Shelob cannot leave the staging area and Sméagol cannot attack or defend.
   144071:constant:1: Constant
@@ -351,7 +351,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 144072:A:1 (front): When Revealed: Add Cleft of Cirith Ungol to the staging area. Flip Sméagol to Gollum and heal all damage from Shelob. Each player places 1 resource on Shelob.
   144072:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"144045"}]
+    - one set-aside card with code 144045 joins the staging area (it is not revealed)
     - flip Sméagol to Gollum: discard his damage; he enters play ready, engaged with the first player (nothing if Sméagol is not in play)
     - choose enemy (any player controls) or in the staging area, named "Shelob"
     - then, if there is a enemy (any player controls) or in the staging area, named "Shelob" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): heal all damage from the picked card
@@ -359,7 +359,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 
 144072:B:1 (back): If Gollum is defeated, add him to the victory display. (Do not flip him over.)
   144072:forced:1: Forced after an enemy is destroyed (heard about enemy (any player controls) named "Gollum")
-    - [json AddToVictory {"verb":"AddToVictory","target":"subject"}]
+    - the card the event is about is added to the victory display
 
 144072:B:2 (back): While Shelob has at least 1 resource on her, she gains: "Forced: When Shelob is dealt any amount of damage, cancel that damage and discard 1 resource from Shelob instead."
   144072:constant:1: Constant
@@ -370,4 +370,4 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
     only if any of: ([json condition {"kind":"inVictory","code":"144040","is":false}]) or ([json condition {"kind":"inVictory","code":"144075","is":false}])
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 226 by template, 26 as JSON)
+(rendered pieces: 241 by template, 13 as JSON)

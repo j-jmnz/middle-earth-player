@@ -104,9 +104,17 @@ export type EffectData = {
   dealt?: number;
   // The damage an attack sent on past its defender (excessToShip): the X of "excess damage" an effect left for the attack's end reads.
   excess?: number;
+  // The ally the attack the effect was left by destroyed (DiscardCopiesFromDeck of "other", 10137:A:2).
+  destroyedAlly?: string;
+  // The first character the attack the effect was left by destroyed, a hero or an ally ("reanimate that character", 101161:A:2).
+  destroyedCharacter?: string;
+  // The seat that controlled the ally DestroyHighestCostAlly destroyed, so "that ally's controller" reanimates it (101162:A:2).
+  destroyedController?: number;
   hold?: string;
   // The card DiscardBottom discarded from the bottom of a deck in this effect (the `discardedCost` condition, families/uncharted/cards.ts).
   discarded?: string;
+  // Every card the running effect discarded from the top of a deck, over all the players it acted for, oldest first (the amount `discarded`, families/deck/discarded.ts).
+  discardedFromDecks?: readonly string[];
   // How many cards DiscardEach has discarded in this effect (the `noneDiscarded` condition, families/south/damage.ts).
   discardedCount?: number;
   // The last Hide test this effect made failed (HideTest; the `lastHideFailed` condition, families/nightmare/guards.ts).
@@ -149,7 +157,7 @@ export type FortitudeData = {
 // `occurrence`: events one game occurrence created share it (each character of one commit), and are announced together in
 // a single response window (rr.triggering-condition). `fromDeck`: a "revealed" card the encounter deck itself revealed. `fromStaging`: an
 // "engaged" enemy that came from the staging area, kept only in a game with ships (Boarding, families/sea/boarding.ts).
-export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string; other?: string; participants?: readonly string[]; explored?: boolean; byPlayerCard?: true; amount?: number; attachments?: readonly string[]; occurrence?: string; fromDeck?: boolean; fromStaging?: boolean; shadowBlank?: true; at?: number };
+export type GameEvent = { trigger: Trigger; seat: number | null; phase?: string; cardId?: string; subject?: string; other?: string; participants?: readonly string[]; explored?: boolean; byPlayerCard?: true; amount?: number; attachments?: readonly string[]; occurrence?: string; fromDeck?: boolean; fromDiscard?: true; fromStaging?: boolean; shadowBlank?: true; at?: number };
 
 // A Response a player may use after an event. It is offered once and may be passed. `event` is the one it answers, when a
 // window answers several events of one occurrence.
@@ -163,7 +171,7 @@ export type FrameData =
   // `fromDeck`: the top card of the encounter deck, not a card an effect found. `canceled`: a Response canceled the
   // effects of the card just revealed (Frodo Baggins). `discard`: and the card is discarded, not shuffled back (The Master Ring).
   // `guards`: the card is revealed as the guard of this objective (rr.guarded): it is attached to it as it is placed in the staging area. `engage`: an enemy found by a search is put into play engaged with the revealing seat instead (SearchReveal `to: engaged`).
-  | { kind: "reveal"; hide: HideResult | null; surge: boolean; fromDeck?: boolean; canceled?: boolean; discard?: boolean; guards?: string; engage?: true }
+  | { kind: "reveal"; hide: HideResult | null; surge: boolean; fromDeck?: boolean; fromDiscard?: true; canceled?: boolean; discard?: boolean; guards?: string; engage?: true }
   | HideData
   | FortitudeData
   | EffectData;
@@ -215,6 +223,8 @@ export type PendingAttack = {
   heroId?: string;
   // A shadow effect made the attack count as undefended.
   undefended?: boolean;
+  // A shadow effect made the attack capture an ally it would damage instead (CaptureInsteadOfDamage, families/captured/).
+  captures?: true;
   shadowResolved?: boolean;
   // The Responses to the shadow effect have been offered, and a Response canceled it.
   shadowOffered?: boolean;

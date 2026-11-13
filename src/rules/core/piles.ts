@@ -1,12 +1,12 @@
 // Rules: dcce.corsair-deck, dcce.uncharted-deck, emce.caves-deck, emce.evil-creatures-deck (data/rules/entries.json). The decks that lie beside the encounter deck as zones of their own: where
 // each keeps its card list, which discard pile goes with it, and the pure list operations moveCard (zones.ts) and the deck helpers (decks.ts) share. The Corsair deck and the Uncharted deck of the
-// Dream-chaser box and the decks of Ered Mithrin read and write their lists through one accessor, so a deck is a row in DECKS and not another copy of the code. Types and pure helpers only.
+// Dream-chaser box and the decks of `piles` (Ered Mithrin's, the Harad deck, The Weather Hills' Orc deck) read and write their lists through one accessor, so a deck is a row in DECKS and not another copy of the code. Types and pure helpers only.
 import { shuffleIds } from "./seed.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { updateCard } from "./state.ts";
 
-/** The zones of Ered Mithrin's decks, kept in `ScenarioState.piles`. The one list the zone types (`PileZone`, `ZoneName`, `Destination`, the dealt zones of the Setup) and the zone guard derive from. */
-export const PILE_ZONES = ["cavesDeck", "evilCreaturesDeck", "evilCreaturesDiscard", "spidersDeck", "orcsDeck", "sideQuestDeck", "haradDeck", "greatSpiderDeck"] as const;
+/** The zones of the decks beside the encounter deck that are kept in `ScenarioState.piles` (the Caves, Evil Creatures, Spiders, Orc, Side Quest, Harad, Great Spider and Angmar Orc decks). The one list the zone types (`PileZone`, `ZoneName`, `Destination`, the dealt zones of the Setup) and the zone guard derive from. */
+export const PILE_ZONES = ["cavesDeck", "evilCreaturesDeck", "evilCreaturesDiscard", "spidersDeck", "orcsDeck", "sideQuestDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck"] as const;
 export type PileZone = (typeof PILE_ZONES)[number];
 /** A zone that holds a list of card ids apart from the encounter deck: the Dream-chaser box's keep theirs in `corsairDeck`, `corsairDiscard` and `uncharted.deck`. */
 const DECK_ZONES = [...PILE_ZONES, "corsairDeck", "corsairDiscard", "unchartedDeck"] as const;
@@ -33,9 +33,11 @@ const PLAIN_PILES = {
   harad: { deck: "haradDeck", discard: null },
   // Shelob's Lair's Great Spider set (mec112.setup-shelobs-lair): set aside out of play, shuffled into the encounter deck by The Spider's Pass; its cards are never discarded from it.
   greatSpider: { deck: "greatSpiderDeck", discard: null },
+  // The Weather Hills' Orc deck (mec108.orc-deck): the Angmar Orcs enemies and Concealed Orc-camps, shuffled beside the quest deck; its cards go to the encounter discard pile, an empty deck is ignored.
+  angmarOrcs: { deck: "angmarOrcDeck", discard: null },
 } as const satisfies Record<string, DeckZones>;
 
-/** The piles a record names (`pile` of the wilderland verbs): every deck of Ered Mithrin. */
+/** The piles a record names (`pile` of the wilderland verbs): every deck of `piles`. */
 export const NAMED_PILES = { evilCreatures: DECKS.evilCreatures, ...PLAIN_PILES } as const;
 
 /** The decks a card remembers it was dealt into (CardInstance.deck), so it goes back to that deck's own discard pile. */

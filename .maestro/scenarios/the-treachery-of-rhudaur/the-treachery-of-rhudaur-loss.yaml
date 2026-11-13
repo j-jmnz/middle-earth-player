@@ -1,0 +1,31 @@
+appId: com.middleearth.lcg
+tags:
+  - scenario
+---
+# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `rhudaur-lost` (scripts/e2e/angmar-awakened/the-treachery-of-rhudaur.ts): a real two-handed game of The Treachery of Rhudaur (the Defenders of Gondor and
+# the One Deck lists, Easy), played after Across the Ettenmoors' win and parked on its loss. A loss has no reward screen and writes nothing (the Resolution is for a win): the scenario stays the next part, no Clue boon joins the Campaign Pool, and The Battle of Carn Dûm is not offered.
+# The steps are the shared subflow's (.maestro/subflows/scenario-loss.yaml).
+- runFlow:
+    file: ../../subflows/scenario-loss.yaml
+    env:
+      FIXTURE: rhudaur-lost
+      SCENARIO_ID: the-treachery-of-rhudaur
+# Back on the path, this part wrote nothing: no Clue boon is in the pool, what Across the Ettenmoors left is, and the scenario is still the next part.
+- tapOn:
+    id: log-back
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- assertNotVisible:
+    id: pool
+    text: ".*Daechanar's Brand.*"
+- assertNotVisible:
+    id: pool
+    text: ".*Heirloom of Iârchon.*"
+- assertVisible:
+    id: pool
+    text: ".*Fend Off Despair.*"
+- assertVisible:
+    id: node-the-treachery-of-rhudaur-status
+    text: "Next"

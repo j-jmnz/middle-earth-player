@@ -3,12 +3,14 @@
 // the hand slice alone (docs/architecture.md, State). The reducer keeps the references of the zones it did not touch;
 // these selectors only keep that property through the join of ids and instances.
 import { BLACK_GATE } from "../../rules/families/harad/under.ts";
+import { isReanimatedCode } from "../../rules/core/printed.ts";
 import type { ReduceContext } from "../../rules/engine/reduce.ts";
 import type { CardInstance, ScenarioState } from "../../rules/core/state.ts";
 import { cardsUnder, shadowCards } from "../../rules/core/zones.ts";
 import { lookedIds } from "../../rules/families/sea/sailing.ts";
 import { captivesOf, captivesUnder } from "../../rules/families/captives/values.ts";
 import { captiveUnder } from "../../rules/families/south/captive.ts";
+import { capturedByHost } from "../../rules/families/captured/pile.ts";
 import { grappledWith } from "../../rules/families/grapple/values.ts";
 import { prisonersOfSeat } from "../../rules/families/prisoner/index.ts";
 import { declaredDefenders } from "../../rules/families/defense/defenders.ts";
@@ -45,13 +47,18 @@ export function hidesFace(card: Pick<CardInstance, "face" | "prisoner" | "zone" 
   return card?.face === "down" && !isPrisoner(card);
 }
 
+/** A facedown Reanimated Dead (The Dread Realm): its owner knows the card, and a tap or a hold opens a preview that says what it is without naming or showing the face (realm-preview.ts). */
+export function isDead(card: Pick<CardInstance, "code"> | undefined): boolean {
+  return card != null && isReanimatedCode(card.code);
+}
+
 /** The hero that is the prisoner: facedown in the captive zone under no card (the cards held with it are not). */
 export function isPrisoner(card: Pick<CardInstance, "prisoner" | "zone" | "host">): boolean {
   return card.prisoner === true && card.zone === "captive" && card.host == null;
 }
 
-/** Whether a staging card with more than one card under it shows one counted peek (layout.ts, `stacks`): a sea game (a grappled arm, Black Key) and a game with the Harad deck (the enemies under The Black Gate, 144027:A:2); every other game peeks each card. */
-export const stacksUnder = (state: { game: ScenarioState }): boolean => state.game.sea != null || state.game.piles?.haradDeck !== undefined;
+/** Whether a staging card with more than one card under it shows one counted peek (layout.ts, `stacks`): a sea game (a grappled arm, Black Key) a game with the Harad deck (the enemies under The Black Gate, 144027:A:2) and Escape from Mount Gram (the captured cards under a host, up to 7 under a stage); every other game peeks each card. */
+export const stacksUnder = (state: { game: ScenarioState }): boolean => state.game.sea != null || state.game.piles?.haradDeck !== undefined || state.game.capture != null;
 
 const NONE: readonly string[] = [];
 const EMPTY: readonly CardInstance[] = [];
@@ -198,6 +205,8 @@ function entriesOf(game: ScenarioState, ids: readonly string[], pairs: ReturnTyp
   const entries: ZoneEntry[] = [];
   // The Captives in play, read once for the zone (none in every game but The Uruk-hai's): the zone's cards then ask this list, not every card of the game.
   const held = ids.length > 0 ? captivesOf(game) : EMPTY;
+  // The cards captured underneath each host in Escape from Mount Gram, drawn facedown under it (mec108.captured-cards); none in any other game.
+  const captured = ids.length > 0 && game.capture != null ? capturedByHost(game) : null;
   for (const id of ids) {
     const card = game.cards[id];
     if (!card) continue;
@@ -208,7 +217,8 @@ function entriesOf(game: ScenarioState, ids: readonly string[], pairs: ReturnTyp
     const captive = card.zone === "staging" || card.zone === "captive" || card.zone === "activeLocation" ? captiveUnder(game, id) : null;
     // The Captives of The Uruk-hai lie under To Isengard! or the enemy that holds one, wherever that enemy is (staging or engaged): every one of them is drawn (families/captives).
     const captives = card.zone === "staging" || card.zone === "engaged" || card.zone === "captive" ? (held.length === 0 ? NONE : captivesUnder(game, id, held)) : NONE;
-    const under = captives.length > 0 ? captives : captive ? [captive] : NONE;
+    const capturedHere = captured?.get(id) ?? NONE;
+    const under = captives.length > 0 ? captives : captive ? [captive] : capturedHere;
     // The enemies grappled with a location are drawn facedown under it, as its attachments are (dcce.grapple).
     // The enemies facedown under The Black Gate lie under it, one counted peek (144027:A:2).
     const gated = card.code === BLACK_GATE ? cardsUnder(game, id) : NONE;
@@ -268,6 +278,7 @@ export function pileIds(game: ScenarioState, pile: PileId, seat: number): readon
     case "evilCreaturesDiscard":
     case "cavesDeck":
     case "haradDeck":
+    case "angmarOrcDeck":
       return game.piles?.[pile] ?? NONE;
     case "victory":
       return game.victory;

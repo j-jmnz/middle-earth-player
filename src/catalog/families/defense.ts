@@ -28,8 +28,8 @@ const VERBS = [
     until: z.enum(["endOfPhase", "endOfRound"]),
     ...when,
   }),
-  // Discards a shadow card dealt to the enemy (`target`, the picked one by default): a facedown one if it has any.
-  z.strictObject({ verb: z.literal("DiscardShadowOf"), target: cardRefSchema.optional(), ...when }),
+  // Discards a shadow card dealt to the enemy (`target`, the picked one by default): a facedown one if it has any. With `all`, each shadow card dealt to it ("discard each shadow card from that enemy", 10192:A:1).
+  z.strictObject({ verb: z.literal("DiscardShadowOf"), target: cardRefSchema.optional(), all: z.literal(true).optional(), ...when }),
   // Deals the enemy (`target`) one more shadow card from the encounter deck ("deal the attacking enemy another shadow card"):
   // during its attack it resolves after the ones it has.
   z.strictObject({ verb: z.literal("DealShadowTo"), target: cardRefSchema, ...when }),

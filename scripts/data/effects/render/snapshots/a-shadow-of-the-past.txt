@@ -20,8 +20,8 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 141022:A:1 (front): Setup: Set Bucklebury Ferry aside, out of play. Add 1 Black Rider to the staging area and make Bag End the active location. Shuffle the encounter deck.
   141022:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAside {"verb":"SetAside","code":"141035"}]
-    - [json AddToStaging {"verb":"AddToStaging","code":"141039"}]
+    - a copy of the card with code 141035 is set aside, out of play
+    - the card with code 141039 is added to the staging area (the copy a Setup search found, else one the Setup deals)
     - [json MakeActiveLocation {"verb":"MakeActiveLocation","code":"141031"}]
     - shuffle the encounter deck
 
@@ -56,7 +56,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141024:A:1 (front): When Revealed: Add Bucklebury Ferry to the staging area.
   141024:whenRevealed:1: When revealed
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"141035"}]
+    - one set-aside card with code 141035 joins the staging area (it is not revealed)
 
 141024:B:1 (back): When Revealed: The first player searches the encounter deck and discard pile for a Black Rider, reveals it (cannot be canceled), and adds it to the staging area. Shuffle the encounter deck.
   141024:whenRevealed:2: When revealed
@@ -81,15 +81,15 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
   141030:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json AttachToRingBearer {"verb":"AttachToRingBearer","code":"141017"}]
-    - [json AddToStaging {"verb":"AddToStaging","code":"141078"}]
-    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"141077"}]
-    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"141079"}]
+    - the card with code 141078 is added to the staging area (the copy a Setup search found, else one the Setup deals)
+    - a card with code 141077 from the box joins the encounter deck, which is shuffled
+    - a card with code 141079 from the box joins the encounter deck, which is shuffled
 
 141030:B:1 (back): Resolution: Choose Gandalf's Delay or The Ring Draws Them and add it to the Campaign Pool. Then, choose Gildor Inglorion or Mr. Underhill and add it to the Campaign Pool. The chosen cards have been earned by the players.
   141030:resolution:1: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ChooseCards {"verb":"ChooseCards","codes":["141078","141079"],"who":"firstPlayer","to":"pool"}]
-    - [json ChooseCards {"verb":"ChooseCards","codes":["141077","141017"],"who":"firstPlayer","to":"pool"}]
+    - the first player takes "141078" or "141079" into the Campaign Pool
+    - the first player takes "141077" or "141017" into the Campaign Pool
 
 ## 141031 Bag End
 (the scenario deals it into the activeLocation pile; the piles place it, no record does)
@@ -253,7 +253,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
   141043:forced:1: Forced on the event hideFailed
     - discard its host
   141043:constant:1: Constant
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - this card counts as a Condition attachment while it is attached
 
 ## 141072 Pathless Country
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -266,8 +266,8 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 141072:A:2 (shadow): Shadow: After this attack, the attacking enemy engages the next player then makes an immediate attack.
   141072:shadow:1: Shadow
     - when the attack in progress ends:
-      - [json EngageNextPlayer {"verb":"EngageNextPlayer","when":{"kind":"otherPlayer"}}]
-      - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+      - if another player is still in the game: the attacking enemy engages the next player
+      - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy makes an immediate attack against the player it just engaged, dealt a new shadow card after its old ones are discarded
 
 ## 141073 Piercing Cry
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -279,16 +279,16 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
   141073:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player chooses one of:
-      * option "staging" (only if [json condition {"kind":"searchable","trait":"Nazgûl"}]):
-        - [json SearchMove {"verb":"SearchMove","trait":"Nazgûl","to":"staging"}]
-      * option "engage" (only if [json condition {"kind":"searchable","trait":"Nazgûl"}]):
-        - [json SearchMove {"verb":"SearchMove","trait":"Nazgûl","to":"engagedFirstPlayer"}]
+      * option "staging" (only if the encounter deck or its discard pile holds a Nazgûl card):
+        - the acting player finds one Nazgûl card in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+      * option "engage" (only if the encounter deck or its discard pile holds a Nazgûl card):
+        - the acting player finds one Nazgûl card in the encounter deck or its discard pile and puts it into play engaged with the first player (it is not revealed)
     - shuffle the encounter deck
 
 141073:A:3 (shadow): Shadow: Attacking enemy makes an additional attack after this one.
   141073:shadow:1: Shadow
     - when the attack in progress ends:
-      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
 ## 141074 Black Steed
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -312,7 +312,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
   141075:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - return every enemy with the trait Nazgûl engaged with a player to the staging area
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"noneReturned"}}]
+    - then, if [json condition {"kind":"noneReturned"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 141075:A:2 (shadow): Shadow: Return attacking enemy to the staging area after this attack.
   141075:shadow:1: Shadow
@@ -353,7 +353,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 141078:A:1 (front): Setup: Add Gandalf's Delay to the staging area.
   141078:setup:1: Setup
-    - [json AddToStaging {"verb":"AddToStaging","code":"141078"}]
+    - the card with code 141078 is added to the staging area (the copy a Setup search found, else one the Setup deals)
 
 141078:A:2 (front): Each player draws 1 less card in his starting hand.
   141078:setup:2: Setup
@@ -471,7 +471,7 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 906104:A:2 (front): Forced: After a player fails a Hide test, place 1 resource token here.
   906104:forced:1: Forced on the event hideFailed
-    - [json PlaceToken {"verb":"PlaceToken","amount":1}]
+    - 1 resource token(s) are placed on this card
 
 ## 906105 Green-Hill Country
 
@@ -487,8 +487,8 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 906105:A:3 (shadow): Shadow: After this attack, attacking enemy engages the next player then makes an immediate attack.
   906105:shadow:1: Shadow
     - when the attack in progress ends:
-      - [json EngageNextPlayer {"verb":"EngageNextPlayer","when":{"kind":"otherPlayer"}}]
-      - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+      - if another player is still in the game: the attacking enemy engages the next player
+      - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy makes an immediate attack against the player it just engaged, dealt a new shadow card after its old ones are discarded
 
 ## 906106 Stock Woods
 
@@ -514,11 +514,11 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 
 906107:A:2 (front): When Revealed: Attach to the current quest. (Counts as a Condition attachment with the text: "Forced: After a player fails a Hide test, he discards a random card from his hand.")
   906107:whenRevealed:1: When revealed
-    - [json AttachToQuest {"verb":"AttachToQuest"}]
+    - this card is attached to the current quest card (the side quest that is the current quest, else the main quest card) and leaves with it
   906107:forced:1: Forced on the event hideFailed
     - the acting player discards 1 random card(s) from hand
   906107:constant:1: Constant
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - this card counts as a Condition attachment while it is attached
 
 ## 906108 Followed by Shadows
 
@@ -553,4 +553,4 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): raise threat by 3 (the acting player)
 
-(rendered pieces: 191 by template, 64 as JSON)
+(rendered pieces: 213 by template, 45 as JSON)

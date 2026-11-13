@@ -6,7 +6,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 41004:A:1 (front): Setup: Search the encounter deck for Goblin Chieftain, Cracked Pillar, and Cave Torch. Set Goblin Chieftain and Cracked Pillar aside, out of play. The first player attaches Cave Torch to one of his heroes. Shuffle the encounter deck.
   41004:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAside {"verb":"SetAside","code":"41029"}]
+    - a copy of the card with code 41029 is set aside, out of play
     - choose hero (you control) [also {"attachable":"41029"}]
     - [json AttachSetAside {"verb":"AttachSetAside","code":"41029"}]
     - shuffle the encounter deck
@@ -15,7 +15,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
   41004:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","type":"location","to":"staging","different":true}]
+      - the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"different":true}]
     - shuffle the encounter deck
 
 ## 41005 Surprise Attack
@@ -24,9 +24,9 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 41005:A:1 (front): When Revealed: Add Goblin Chieftain to the staging area. Each player searches the encounter deck and discard pile for a different enemy of his choice and adds it to the staging area. Shuffle the encounter deck.
   41005:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"41027"}]
+    - one set-aside card with code 41027 joins the staging area (it is not revealed)
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","type":"enemy","to":"staging","different":true}]
+      - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"different":true}]
     - shuffle the encounter deck
 
 41005:B:1 (back): During the encounter phase, treat each enemy's engagement cost as if it were 0.
@@ -44,12 +44,12 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
   41006:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json SetAsideInPlay {"verb":"SetAsideInPlay","code":"41027"}]
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"41028"}]
+    - one set-aside card with code 41028 joins the staging area (it is not revealed)
 
 41006:B:1 (back): Forced: Reveal an additional encounter card during the quest phase.
   41006:forced:1: Forced when a phase begins
     only if it is the Quest phase
-    - [json RevealMore {"verb":"RevealMore","amount":1}]
+    - reveal 1 additional encounter card(s) in the staging step this phase
 
 41006:B:2 (back): Progress cannot be placed on Cracked Pillar while it is in the staging area.
   41006:constant:1: Constant
@@ -65,11 +65,11 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 
 41007:A:1 (front): When Revealed: Add Goblin Chieftain to the staging area.
   41007:whenRevealed:1: When revealed
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"41027"}]
+    - one set-aside card with code 41027 joins the staging area (it is not revealed)
 
 41007:B:1 (back): While there are at least 8 progress tokens on this stage, Goblin Chieftain loses the text: "Cannot take damage."
   41007:constant:1: Constant
-    only if [json condition {"kind":"stageProgress","min":8}]
+    only if the current quest stage holds at least 8 progress
     - each enemy (any player controls) or in the staging area, named "Goblin Chieftain": stat losesNoDamage 1, while this card is in play
 
 41007:B:2 (back): This stage cannot be defeated while Goblin Chieftain is in play. When this stage is defeated, the heroes rescue the captives, fulfilling their oaths, and the players win the game!
@@ -96,8 +96,8 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 41027:A:3 (front): Forced: After Goblin Chieftain attacks, either remove X progress from the quest, or return it to the staging area.
   41027:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
     - the first player chooses one of:
-      * option "progress" (only if [json condition {"kind":"stageProgress","min":1}]):
-        - [json RemoveProgressFromQuest {"verb":"RemoveProgressFromQuest","amount":{"stage":true}}]
+      * option "progress" (only if the current quest stage holds at least 1 progress):
+        - remove the stage number of the quest progress from the current quest card (all of it when it holds less)
       * option "staging":
         - return this card to the staging area
 
@@ -120,22 +120,22 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 
 41029:A:1 (front): Attach to a hero. Restricted.
   41029:constant:1: Constant
-    - [json AttachesTo {"verb":"AttachesTo","host":{"kind":"hero"}}]
+    - this attachment may be attached to a hero
 
 41029:A:2 (front): Action: Exhaust Cave Torch to place up to 3 progress tokens on a Dark location.
   41029:action:1: Action
     only if all of: (the card with code 41029 in play is ready) and (there is a Dark location (any player controls) to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - exhaust this card
-    - [json ChooseX {"verb":"ChooseX","max":[3]}]
+    - the acting player chooses X, from 1 to 3
     - choose Dark location (any player controls)
     - place X progress on the picked card
 
 41029:A:3 (front): Forced: After Cave Torch exhausts, discard the top card of the encounter deck. If that card is an enemy, add it to the staging area.
   41029:forced:1: Forced on the event exhausted (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"}]
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"}}}]
+    - the top card of the encounter deck goes to the encounter discard pile
+    - then, if the picked card is a enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
 
 ## 41030 Great Cave-troll
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -170,7 +170,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 41032:A:1 (front): While Goblin Tunnels is in the staging area, it gains: "Forced: After a Goblin is revealed from the encounter deck, remove a progress token from the current quest card."
   41032:forced:1: Forced after a card is revealed (heard about Goblin enemy (any player controls); only when the encounter deck revealed it)
     only if this card is in the staging area
-    - [json RemoveProgressFromQuest {"verb":"RemoveProgressFromQuest","amount":1}]
+    - remove 1 progress from the current quest card (all of it when it holds less)
 
 41032:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+3 Attack instead if attacking enemy is a Goblin.)
   41032:shadow:1: Shadow
@@ -202,7 +202,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
     only if the card the event is about had enough progress to be explored
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json LookAtTop {"verb":"LookAtTop","count":3}]
-    - [json PickEncounter {"verb":"PickEncounter","from":"looked"}]
+    - choose an encounter card among the cards the effect looked at (none when no card matches)
     - [json BottomOtherLooked {"verb":"BottomOtherLooked"}]
     - the acting player reveals an encounter card
 
@@ -246,8 +246,8 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
   41037:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"}]
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"activeLocation","when":{"kind":"matches","card":"picked","pick":{"type":"location","control":"any"}}}]
+    - the top card of the encounter deck goes to the encounter discard pile
+    - then, if the picked card is a location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card becomes the active location
 
 ## 41038 Crumbling Ruin
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -284,7 +284,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
   41040:whenRevealed:1: When revealed
     - attach this card to a hero
   41040:constant:1: Constant
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - this card counts as a Condition attachment while it is attached
   41040:forced:1: Forced at the end of the phase
     only if all of: (it is the Combat phase) and (its host is a exhausted hero (any player controls))
     - the acting player reveals an encounter card
@@ -298,9 +298,9 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
   41051:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json AddToHandAfterMulligan {"verb":"AddToHandAfterMulligan","code":"41048"}]
-    - [json AddToPool {"verb":"AddToPool","code":"41048","eachPlayer":true}]
-    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"41042"}]
-    - [json AddToPool {"verb":"AddToPool","code":"41042"}]
+    - the card with code 41048 is added to the Campaign Pool (a copy for each player)
+    - a card with code 41042 from the box joins the encounter deck, which is shuffled
+    - the card with code 41042 is added to the Campaign Pool
 
 41051:B:1 (back): Resolution: Check the final threat of the player with the highest threat: If it is under 40, you have rescued a retired Ranger who shares his wisdom with you. Each player may add 1 copy of Ranger Sense to their deck and to the Campaign Pool. At the start of your next campaign, each player may also shuffle 1 copy of Ranger Sense into their deck and add it to the Campaign Pool.
   41051:resolution:1: Resolution
@@ -308,4 +308,4 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
     - [json Earn {"verb":"Earn","codes":["41049"],"eachPlayer":true,"when":{"kind":"highestThreat","max":39}}]
     - [json CarryOver {"verb":"CarryOver","codes":["41049"],"eachPlayer":true,"when":{"kind":"highestThreat","max":39}}]
 
-(rendered pieces: 150 by template, 36 as JSON)
+(rendered pieces: 175 by template, 16 as JSON)

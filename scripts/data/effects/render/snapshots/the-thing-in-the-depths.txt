@@ -40,10 +40,10 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 11194:A:1 (front): You are playing Campaign Mode.
   11194:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAside {"verb":"SetAside","code":"11183"}]
-    - [json SetAside {"verb":"SetAside","code":"11192"}]
-    - [json SetAside {"verb":"SetAside","code":"11195"}]
-    - [json SetAside {"verb":"SetAside","code":"11196"}]
+    - a copy of the card with code 11183 is set aside, out of play
+    - a copy of the card with code 11192 is set aside, out of play
+    - a copy of the card with code 11195 is set aside, out of play
+    - a copy of the card with code 11196 is set aside, out of play
     - [json FlipSetAside {"verb":"FlipSetAside","name":"The Thing in the Depths"}]
 
 11194:A:2 (front): Forced: After Captain Sahír (enemy) enters play, attach Black Key (burden) to him.
@@ -55,13 +55,13 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json RemoveCodeFromGame {"verb":"RemoveCodeFromGame","code":"11192"}]
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11183","to":"Captain Sahír"}]
-    - [json StageSetAside {"verb":"StageSetAside","code":"11196"}]
+    - the set-aside card with code 11196 joins the staging area (not revealed)
     - choose player (any player controls)
     - [json AddSetAsideToHand {"verb":"AddSetAsideToHand","code":"11195"}]
 
 11194:B:1 (back): Resolution: The players may add Come Together to the Campaign Pool.
   11194:resolution:1: Resolution
-    - [json ChooseCards {"verb":"ChooseCards","codes":["11195"],"who":"firstPlayer","to":"pool","optional":true}]
+    - the first player may take "11195" into the Campaign Pool
 
 11194:B:2 (back): Gain the following:
   11194:resolution:2: Resolution (record also names 11194:B:3)
@@ -128,7 +128,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
     - [json FlipElite {"verb":"FlipElite","name":"Captain Sahír","to":"firstPlayer"}]
     - [json FlipElite {"verb":"FlipElite","name":"Na'asiyah","to":"lastPlayer"}]
     - [json RemoveEncounterSet {"verb":"RemoveEncounterSet","set":"Corsair Raiders"}]
-    - [json StageSetAside {"verb":"StageSetAside","name":"The Thing in the Depths"}]
+    - the set-aside card titled "The Thing in the Depths" joins the staging area (not revealed)
     - shuffle the encounter discard pile into the encounter deck
     - [json ShuffleSetAsideSet {"verb":"ShuffleSetAsideSet","set":"The Thing in the Depths"}]
     - shuffle the encounter deck
@@ -167,8 +167,8 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 12042:A:3 (front): Forced: When Helm of the Stormcaller becomes the active location, add Captain Sahír and Na'asiyah to the staging area from out of play (enemy side faceup).
   12042:forced:1: Forced after this location becomes the active location (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json StageSetAside {"verb":"StageSetAside","code":"11078"}]
-    - [json StageSetAside {"verb":"StageSetAside","code":"11076"}]
+    - the set-aside card with code 11078 joins the staging area (not revealed)
+    - the set-aside card with code 11076 joins the staging area (not revealed)
 
 ## 12043 Forecastle Deck
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -192,7 +192,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 12044:A:1 (front): While Weather Deck is in the staging area, each other Deck location in play gains: "Travel: Each player must exhaust a character he controls to travel here."
   12044:constant:1: Constant
     only if this card is in the staging area
-    - each Deck location (any player controls) [also {"other":true}]: stat travelExhaust 1, while this card is in play
+    - each Deck location (any player controls) other than this card: stat travelExhaust 1, while this card is in play
 
 12044:A:2 (shadow): Shadow: Exhaust a character you control.
   12044:shadow:1: Shadow
@@ -231,7 +231,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
   12047:forced:1: Forced on the event shadowsDealt
     only if all of: (it is the Combat phase) and (this card is the active location)
     - for each enemy (any player controls) engaged with you:
-      - [json DealShadowTo {"verb":"DealShadowTo","target":"picked"}]
+      - the picked card is dealt a shadow card
 
 12047:A:2 (shadow): Shadow: Discard an attachment you control.
   12047:shadow:1: Shadow
@@ -354,7 +354,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 12055:A:2 (shadow): Shadow: Assign damage among characters you control equal to the number of enemies grappled with locations in the staging area.
   12055:shadow:1: Shadow
-    - [json AssignDamage {"verb":"AssignDamage","amount":{"grappled":true},"pick":{"type":"character","control":"you"}}]
+    - the acting player assigns [json amount {"grappled":true}] damage among the character (you control), one at a time
 
 ## 12056 Lashing Tentacles
 (the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
@@ -371,4 +371,4 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
       - choose enemy (any player controls) or in the staging area, named "The Thing in the Depths"
       - the picked enemy attacks the acting player now, from the staging area
 
-(rendered pieces: 156 by template, 44 as JSON)
+(rendered pieces: 169 by template, 33 as JSON)

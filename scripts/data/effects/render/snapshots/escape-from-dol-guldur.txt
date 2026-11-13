@@ -8,7 +8,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
     only if all of: (this card is in the staging area) and (there is a objective (any player controls) in the staging area only, chosen by the first player to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose objective (any player controls) in the staging area only, chosen by the first player
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"shuffle"}]
+    - the picked card is shuffled into the encounter deck
 
 ## 01102 Nazgûl of Dol Guldur
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -19,7 +19,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01102:A:2 (front): Forced: When the prisoner is "rescued," move Nazgûl of Dol Guldur into the staging area.
   01102:forced:1: Forced on the event prisonerRescued (heard about hero (any player controls))
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"self","to":"staging"}]
+    - this card goes to the staging area (it is not revealed)
 
 01102:A:3 (front): Forced: After a shadow effect dealt to Nazgûl of Dol Guldur resolves, the engaged player must choose and discard 1 character he controls.
   01102:forced:2: Forced on the event shadowEffectResolved (heard about this card)
@@ -46,7 +46,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01104:A:1 (front): When Revealed: Until the end of the phase, raise the total Threat in the staging area by X, where X is the number of players in the game.
   01104:whenRevealed:1: When revealed
-    - [json RaiseStagingThreat {"verb":"RaiseStagingThreat","amount":{"players":true},"until":"endOfPhase"}]
+    - the total Threat in the staging area is the number of players higher until the end of the phase
 
 01104:A:2 (shadow): Shadow: Defending player raises his threat by the number of enemies with which he is engaged.
   01104:shadow:1: Shadow
@@ -59,11 +59,11 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
   01105:whenRevealed:1: When revealed
     - [json AttachToDeck {"verb":"AttachToDeck","who":"firstPlayer"}]
   01105:constant:1: Constant
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - this card counts as a Condition attachment while it is attached
 
 01105:A:2 (shadow): Shadow: Resolve the "When Revealed" effect of Iron Shackles.
   01105:shadow:1: Shadow
-    - [json ResolveWhenRevealed {"verb":"ResolveWhenRevealed","card":"self"}]
+    - the When Revealed effects of this card resolve as if it had just been revealed
 
 ## 01107 Tower Gate
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -78,16 +78,16 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01108:A:1 (front): Guarded. Restricted.
   01108:whenRevealed:1: When revealed
-    - [json GuardObjective {"verb":"GuardObjective"}]
+    - the Guarded keyword: this objective in the staging area is guarded by the next encounter card of the deck that is not an objective, revealed and attached to it
 
 01108:A:2 (front): Action: Raise your threat by 2 to claim this objective when it is free of encounters. When claimed, attach Gandalf's Map to a hero you control. (Counts as an attachment. If detached, return Gandalf's Map to the staging area.)
   01108:action:1: Action (cost: raise your threat by 2)
     only if all of: (this card is in the staging area) and ([json condition {"kind":"freeOfEncounters"}])
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control)
-    - [json ClaimObjective {"verb":"ClaimObjective"}]
+    - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
   01108:constant:1: Constant
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Item"}]
+    - this card counts as a Item attachment while it is attached
 
 01108:A:3 (front): Attached hero cannot attack or defend.
   01108:constant:2: Constant
@@ -100,16 +100,16 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01109:A:1 (front): Guarded. Restricted.
   01109:whenRevealed:1: When revealed
-    - [json GuardObjective {"verb":"GuardObjective"}]
+    - the Guarded keyword: this objective in the staging area is guarded by the next encounter card of the deck that is not an objective, revealed and attached to it
 
 01109:A:2 (front): Action: Raise your threat by 2 to claim this objective when it is free of encounters. When claimed, attach Dungeon Torch to a hero you control. (Counts as an attachment. If detached, return Dungeon Torch to the staging area.)
   01109:action:1: Action (cost: raise your threat by 2)
     only if all of: (this card is in the staging area) and ([json condition {"kind":"freeOfEncounters"}])
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control)
-    - [json ClaimObjective {"verb":"ClaimObjective"}]
+    - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
   01109:constant:1: Constant
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Item"}]
+    - this card counts as a Item attachment while it is attached
 
 01109:A:3 (front): Forced: At the end of each round, raise attached hero's controller's threat by 2.
   01109:forced:1: Forced at the end of the round
@@ -121,16 +121,16 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
 
 01110:A:1 (front): Guarded. Restricted.
   01110:whenRevealed:1: When revealed
-    - [json GuardObjective {"verb":"GuardObjective"}]
+    - the Guarded keyword: this objective in the staging area is guarded by the next encounter card of the deck that is not an objective, revealed and attached to it
 
 01110:A:2 (front): Action: Raise your threat by 2 to claim this objective when it is free of encounters. When claimed, attach Shadow Key to a hero you control. (Counts as an attachment. If detached, return Shadow Key to the staging area.)
   01110:action:1: Action (cost: raise your threat by 2)
     only if all of: (this card is in the staging area) and ([json condition {"kind":"freeOfEncounters"}])
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose hero (you control)
-    - [json ClaimObjective {"verb":"ClaimObjective"}]
+    - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
   01110:constant:1: Constant
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Item"}]
+    - this card counts as a Item attachment while it is attached
 
 01110:A:3 (front): Forced: At the end of each round, attached hero suffers 1 damage.
   01110:forced:1: Forced at the end of the round
@@ -145,7 +145,7 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json TurnFaceUp {"verb":"TurnFaceUp","code":"01102"}]
     - for each objective (any player controls) in the staging area only:
-      - [json GuardObjective {"verb":"GuardObjective","target":"picked"}]
+      - the Guarded keyword: the picked card in the staging area is guarded by the next encounter card of the deck that is not an objective, revealed and attached to it
 
 01123:B:1 (back): When Revealed: Randomly select 1 hero card (among all the heroes controlled by the players) and turn it facedown. That hero is now considered a "prisoner," cannot be used, cannot be damaged, and does not collect resources, until it is "rescued" (as instructed by card effects) later in this quest.
   01123:whenRevealed:1: When revealed
@@ -221,4 +221,4 @@ Scenario piles that place cards with no record (quest: 01123 The Necromancer's T
     - [json CarryOver {"verb":"CarryOver","codes":["01135"],"when":{"kind":"inPlay","code":"01135","is":true}}]
     - [json CarryOver {"verb":"CarryOver","codes":["01132"],"eachPlayer":true,"when":{"kind":"inPlay","code":"01135","is":true}}]
 
-(rendered pieces: 102 by template, 39 as JSON)
+(rendered pieces: 118 by template, 24 as JSON)

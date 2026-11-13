@@ -26,7 +26,8 @@ const VERBS = [
   // The acting player creates a staging area and a quest stage of their own: the quest deck's card with this printed code becomes that seat's stage
   // (`Seat.stage`), stages are separate from now on (`ScenarioState.separate`), and the seat's area is empty ("each player creates their own staging
   // area and advances to a different stage 3A", 142062:B:1; mec109.multiple-staging-areas). Nothing happens when the code is not in the quest deck.
-  z.strictObject({ verb: z.literal("StartSeparateStage"), code: z.string().min(1), ...when }),
+  // `reveal`: the stage is revealed for the seat as it becomes its stage: its When Revealed effects resolve ("advances to a different stage 2A", 10038:B:1; families/captured/).
+  z.strictObject({ verb: z.literal("StartSeparateStage"), code: z.string().min(1), reveal: z.literal(true).optional(), ...when }),
   // "In player order, each player moves 1 encounter card from this staging area to theirs" until none are left (142062:B:1): each living seat in turn
   // picks one card of the shared staging area (the first player's choice when a seat has several; the last one is taken without asking), until it holds
   // none, and the card goes to that seat's own staging area. Entering an area is not a reveal.
@@ -62,7 +63,8 @@ const VERBS = [
   // its own code, one defeated while it was an enemy goes to its owner's discard pile.
   z.strictObject({ verb: z.literal("ReturnFallenHero"), ...when }),
   // The last picked card leaves the game, and, in Campaign Mode, the campaign pool ("remove it from the game ... remove that card from the campaign pool", 142074:A:2).
-  z.strictObject({ verb: z.literal("RemoveFromGame"), ...when }),
+  // `self`: the source card leaves the game instead ("remove this quest from the game", 10053:A:3); a quest removed this way is not a card of the campaign pool.
+  z.strictObject({ verb: z.literal("RemoveFromGame"), self: z.literal(true).optional(), ...when }),
   // "For the rest of the game, you cannot lose control of the first player token" (142068:A:2): the table holds `firstPlayerLocked` for the rest of the game (`endOfGame`), so the
   // token does not pass at the end of the refresh phase.
   z.strictObject({ verb: z.literal("LockFirstPlayer"), ...when }),

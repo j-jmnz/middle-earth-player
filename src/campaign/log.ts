@@ -4,11 +4,13 @@ import { heldCopy, holdsCopy, resolutionResult } from "../rules/setup/resolution
 import { printedOf, type PrintedCard } from "../rules/core/printed.ts";
 import type { CampaignEnd } from "../catalog/campaign-record.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
+import { reanimatedHeroes } from "../rules/families/angmar/reanimate/standing.ts";
 
 import type { AllyLine } from "../catalog/ally-lines.ts";
 
 import { scoreOf, type ScenarioScore } from "./score.ts";
 import { marshesAfter, penaltiesAfter, revisedFallen, revisedHeroes } from "./log-two-towers.ts";
+import { stolenAfter } from "./log-angmar-awakened.ts";
 import { cappedTally } from "./wilderland.ts";
 import { xpAwarded, type ModeCard } from "./xp.ts";
 
@@ -88,6 +90,15 @@ export type CampaignLog = {
   corsairFleet: number | null;
   blackGateTokens: number | null;
   campaignEnd: CampaignEnd | null;
+  // The Angmar Awakened Campaign Log's "Damage Tracking" (mec108.campaign-log-tracking, src/campaign/log-angmar-awakened.ts). A log saved before it reads with these defaults.
+  // The damage noted on Protect the Innocent / Arnor Ravaged, replaced by each Resolution that notes it; null until noted.
+  protectDamage: number | null;
+  // The damage noted on each hero, by hero code ("Damage on Heroes"): a hero that is back at full health is left out.
+  heroDamage: Readonly<Record<string, number>>;
+  // The characters marked "determined" (the Determination boon, The Wastes of Eriador), by card code.
+  determined: readonly string[];
+  // The unique cards each seat lost to the Goblins in Escape from Mount Gram: still in the captured deck and out of play at the end, never in that player's deck again.
+  stolenCards: readonly (readonly string[])[];
 };
 
 export const MARSHES_CHOICES = ["penalty", "searchingEye"] as const;
@@ -95,7 +106,7 @@ export type MarshesChoice = (typeof MARSHES_CHOICES)[number];
 
 export function emptyLog(seatCount: number): CampaignLog {
   const seats = Array.from({ length: seatCount }, () => [] as readonly string[]);
-  return { heroesBySeat: seats, fallenHeroesBySeat: seats, threatPenalty: 0, campaignPool: [], captives: [], completed: [], earned: {}, scenarios: {}, score: 0, notes: "", prisoner: null, usedOnce: [], counters: {}, carryOver: [], carryIn: [], xpGained: {}, marks: {}, modes: {}, modeDefault: null, treasures: [], allyLines: [], beldisUses: [], encounterPool: {}, threatPenaltyBySeat: [], marshesChoice: [], blackGate: {}, scoreBase: 0, scoreBaseCampaigns: [], corsairFleet: null, blackGateTokens: null, campaignEnd: null };
+  return { heroesBySeat: seats, fallenHeroesBySeat: seats, threatPenalty: 0, campaignPool: [], captives: [], completed: [], earned: {}, scenarios: {}, score: 0, notes: "", prisoner: null, usedOnce: [], counters: {}, carryOver: [], carryIn: [], xpGained: {}, marks: {}, modes: {}, modeDefault: null, treasures: [], allyLines: [], beldisUses: [], encounterPool: {}, threatPenaltyBySeat: [], marshesChoice: [], blackGate: {}, scoreBase: 0, scoreBaseCampaigns: [], corsairFleet: null, blackGateTokens: null, campaignEnd: null, protectDamage: null, heroDamage: {}, determined: [], stolenCards: [] };
 }
 
 // The Ring-bearer may have moved to another seat with the first player token (mec109.multiplayer-the-one-ring).
@@ -144,6 +155,8 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
       if (code && printedOf(cards, code).type === "hero") fellBy.add(code);
     }
   }
+  // A destroyed hero lying reanimated (mec108.reanimated-dead) is in no discard pile, and fell all the same.
+  if (!result.discardedNotFallen) for (const hero of reanimatedHeroes(state, cards)) fellBy.add(hero.code);
   // The list read before a removal: a hero that fell and was then removed from the log is still a fallen hero.
   const fallenHeroesBySeat = revisedFallen(listed.map((heroes, index) => [...new Set([...(log.fallenHeroesBySeat[index] ?? []), ...heroes.filter((code) => fellBy.has(code))])]), result);
   const fallen = new Set(fallenHeroesBySeat.flat());
@@ -168,7 +181,8 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
   return {
     heroesBySeat,
     fallenHeroesBySeat,
-    threatPenalty: log.threatPenalty,
+    // A reduction the game marked (Fend Off Despair, 10173:A:2) is added to the one starting threat modifier, cumulative with the earlier ones.
+    threatPenalty: log.threatPenalty + (result.startingThreat ?? 0),
     campaignPool: pool,
     captives: [...log.captives, ...result.captives],
     completed: [...log.completed, scenarioId],
@@ -200,5 +214,9 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
     corsairFleet: result.recorded?.corsairFleet ?? log.corsairFleet,
     blackGateTokens: result.recorded?.blackGateTokens ?? log.blackGateTokens,
     campaignEnd: result.campaignEnd ?? log.campaignEnd,
+    protectDamage: result.damageNotes?.protect ?? log.protectDamage,
+    heroDamage: result.damageNotes?.heroes ?? log.heroDamage,
+    determined: [...new Set([...log.determined, ...(result.determined ?? [])])],
+    stolenCards: stolenAfter(log.stolenCards, result.stolen),
   };
 }

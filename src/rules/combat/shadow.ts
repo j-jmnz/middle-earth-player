@@ -12,21 +12,25 @@ import { queueEvent } from "../windows/queue.ts";
 import { runInstruction, type ReduceContext } from "../interpret/interpret.ts";
 import { defenseAsDefender, modifiedStat } from "../core/keywords.ts";
 import type { PendingAttack, ScenarioState } from "../core/state.ts";
-import { expireModifiers, flagged, inPlay, updateCard } from "../core/state.ts";
+import { expireModifiers, flagged, heldAmount, inPlay, updateCard } from "../core/state.ts";
 import { withFrame } from "../windows/windows.ts";
 import { moveCard, shadowCards } from "../core/zones.ts";
 import { effectCause, inCause, ruleCause } from "../core/cause.ts";
 import { offerResponses } from "../windows/responses.ts";
 import { enemyAttackWindow } from "../engine/step-window.ts";
 import { noteAttackDamage } from "../families/defense/damage.ts";
+import { announceHurt } from "../families/angmar/damage.ts";
+import { discardableShadow } from "../families/angmar/shadows.ts";
 import { combatDamage } from "../families/defense/excess.ts";
 import { attackCanceled, defendersDeclared, holdAttackEnd, specialStrike } from "../families/defense/defenders.ts";
 import { holdAttack } from "../families/defense/listen.ts";
 import { startShadowAttack } from "../families/defense/shadow-attack.ts";
 import { announceShadowRaise, noteShadowStart } from "../families/defense/shadow.ts";
 import { announceShadowResolved } from "../families/dungeon/shadow.ts";
+import { announceShadowsResolved } from "../families/angmar/reanimate/shadows.ts";
 import { announceShadowWizardry } from "../families/wizardry/shadow.ts";
-import { announceDestroyed, charactersDestroyed } from "../families/burden/attack.ts";
+import { announceDestroyed, charactersDestroyed, destroyedByAttack } from "../families/burden/attack.ts";
+import { printedOf } from "../core/printed.ts";
 import { attackHere, attackKey, locationDamage } from "../families/south/watcher.ts";
 
 // Turns the attacker's shadow card up and runs its shadow effects in their own frame. The attack in
@@ -73,6 +77,9 @@ function resolveShadowCard(state: ScenarioState, shadowId: string, seat: number,
   }
   const resolved = withFrame(turned, "shadow", shadowId, false, (framed) => {
     let next = framed;
+    // Mountains of Angmar: a shadow card with no shadow effect gains "Shadow: Raise defending player's threat by 2" (10133:A:1).
+    const gained = effects.length === 0 ? heldAmount(next, "table", "blankShadowGains") : 0;
+    if (gained > 0) next = inCause(steps, ruleCause("rr.shadow-effects"), () => runInstruction(next, { verb: "RaiseThreat", amount: gained, who: "actor" }, { seat, sourceId: shadowId }, ctx, steps));
     for (const effect of ctx.effects) {
       if (effect.cardCode !== shadow.code || effect.timing !== "shadow") continue;
       for (const instruction of effect.instructions) {
@@ -97,6 +104,15 @@ export function discardShadowOf(state: ScenarioState, enemyId: string): Scenario
   return next;
 }
 
+// The shadow cards an enemy holds that an earlier attack already turned up: discarded before it is dealt another, so they are not resolved a second time (stage 1B and 2B of The Battle of Carn Dûm).
+export function discardResolvedShadowOf(state: ScenarioState, enemyId: string): ScenarioState {
+  let next = state;
+  for (const id of shadowCards(state.cards[enemyId])) {
+    if (next.cards[id]?.face === "up") next = moveCard(next, id, { zone: "encounterDiscard" });
+  }
+  return next;
+}
+
 // The next additional shadow card still face down: one already resolved stays with the enemy, face up.
 function nextExtraShadow(state: ScenarioState, enemyId: string): string | undefined {
   return state.cards[enemyId]?.extraShadowIds?.find((id) => state.cards[id]?.face !== "up");
@@ -106,7 +122,8 @@ function nextExtraShadow(state: ScenarioState, enemyId: string): string | undefi
 export function discardShadows(state: ScenarioState): ScenarioState {
   let next = state;
   for (const instance of Object.values(state.cards)) {
-    if (instance.zone === "shadow") next = moveCard(next, instance.id, { zone: "encounterDiscard" });
+    // Stage 1B of The Battle of Carn Dûm: "Do not discard unresolved shadow cards at the end of the combat phase" (10125:B:2).
+    if (instance.zone === "shadow" && discardableShadow(state, instance.id)) next = moveCard(next, instance.id, { zone: "encounterDiscard" });
   }
   return next;
 }
@@ -187,8 +204,8 @@ export function resolveAttack(state: ScenarioState, ctx: ReduceContext, steps: E
   // 6.4.2: the shadow effects are resolved; an action window comes before combat damage. "When a shadow card increases an
   // enemy's Attack" is answered before it too.
   if (next.pendingAttack && !next.pendingAttack.shadowsDone) {
-    next = announceShadowRaise(announceShadowWizardry(announceShadowResolved({ ...next, pendingAttack: { ...next.pendingAttack, shadowsDone: true } }, ctx), ctx), ctx);
-    const between = enemyAttackWindow(next, ctx, "damage") ?? holdAttack(next, ctx, "damage", ["shadowRaisedAttack", "shadowEffectResolved", "shadowWizardry"]);
+    next = announceShadowRaise(announceShadowWizardry(announceShadowsResolved(announceShadowResolved({ ...next, pendingAttack: { ...next.pendingAttack, shadowsDone: true } }, ctx), ctx), ctx), ctx);
+    const between = enemyAttackWindow(next, ctx, "damage") ?? holdAttack(next, ctx, "damage", ["shadowRaisedAttack", "shadowEffectResolved", "shadowsResolved", "shadowWizardry"]);
     if (between) return between;
   }
   const attack = next.pendingAttack;
@@ -283,7 +300,7 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   const cleared = attack.immediate && done.phase !== "Combat" ? discardShadowOf(done, attack.enemyId) : done;
   // "After an attack in which ~ defends resolves", "After a non-unique enemy attacks you": the attack is over.
   const defender = attack.defenderId && !attack.undefended ? { other: attack.defenderId } : {};
-  const announced = queueEvent(announceDestroyed(cleared, attack, ctx), { trigger: "attackResolved", seat: attack.seat, cardId: attack.enemyId, ...defender, ...(blank ? { shadowBlank: true as const } : {}) });
+  const announced = queueEvent(announceHurt(announceDestroyed(cleared, attack, ctx), attack), { trigger: "attackResolved", seat: attack.seat, cardId: attack.enemyId, ...defender, ...(blank ? { shadowBlank: true as const } : {}) });
   // An immediate attack leaves resolvedAttacks alone (it does not use up the enemy's attack). A game with a card that asks whether an enemy attacked this phase notes it for the phase it was made in (attackedThisPhase); every other game's state stays as it was.
   const noted = attack.immediate && gameReads(done, ctx, '"kind":"attackedThisPhase"') ? { immediateAttacks: noteImmediate(done, attack.enemyId) } : {};
   const ended: ScenarioState = { ...announced, pendingAttack: null, window: null, resolvedAttacks, ...noted };
@@ -295,6 +312,10 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
   if (after.length === 0) return ended;
   // The attack's own state decides where it was made from: an enemy that attacked from the staging area without being flagged is `fromStaging`.
   if (!attackHere(state, attack.enemyId)) return waiting.length > 0 ? (startShadowAttack(ended, attack.seat, waiting, ctx, steps) ?? ended) : ended;
+  // Only the effect that searches the deck for another copy of a destroyed ally (DiscardCopiesFromDeck of "other", 10137:A:2) reads the ally the attack destroyed.
+  const destroyedAlly = after.some((one) => one.verb === "DiscardCopiesFromDeck" && one.of === "other") ? destroyedAllyOf(state, attack, ctx) : undefined;
+  // Only an effect that reanimates the character the attack destroyed (Unholy Crypt, 101161:A:2) reads it.
+  const destroyedCharacter = after.some((one) => one.verb === "Reanimate" && one.from === "destroyed") ? destroyedByAttack(state, attack, ctx)[0] : undefined;
   return pushEffectFrame(
     ended,
     {
@@ -311,11 +332,18 @@ export function finishAttack(state: ScenarioState, ctx: ReduceContext, steps: En
       ...(destroyed > 0 ? { x: destroyed } : {}),
       // `other`: the defending character, or the hero an undefended attack landed on ("the hero damaged by this attack", 900209:A:2).
       ...(afterTarget(attack) ? { other: afterTarget(attack) } : {}),
+      ...(destroyedAlly ? { destroyedAlly } : {}),
+      ...(destroyedCharacter ? { destroyedCharacter } : {}),
       ...(attack.defense?.landed ? { dealt: attack.defense.landed } : {}),
       ...(attack.afterCause ? { cause: attack.afterCause } : {}),
     },
     steps,
   );
+}
+
+// The first ally the attack destroyed (the first of them when several).
+function destroyedAllyOf(state: ScenarioState, attack: PendingAttack, ctx: ReduceContext): string | undefined {
+  return destroyedByAttack(state, attack, ctx).find((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").type === "ally");
 }
 
 // The character an attack that ended was made against: its defender, or the hero an undefended attack's damage was assigned to.

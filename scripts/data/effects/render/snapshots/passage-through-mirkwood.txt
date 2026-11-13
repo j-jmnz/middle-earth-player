@@ -78,7 +78,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 01079:A:1 (front): When Revealed: Each player discards all event cards in his hand.
   01079:whenRevealed:1: When revealed
     - for each player, first player first:
-      - [json DiscardEach {"verb":"DiscardEach","pick":{"type":"card","control":"you","from":"hand","cardType":"event"}}]
+      - the acting player discards each card (you control) in hand, of card type event
 
 ## 01080 Caught in a Web
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -88,7 +88,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
     - attach this card to a hero
   01080:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - this card counts as a Condition attachment while it is attached
     - its host: stat doesNotReady 1, while this card is in play
     - its host: stat readyPayment 2, while this card is in play
 
@@ -133,7 +133,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each enemy (any player controls) in the staging area only: stat threat 1, until the end of the phase
     - each location (any player controls) in the staging area only: stat threat 1, until the end of the phase
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"count","pick":{"type":"card","control":"any","stagingOnly":true,"other":true},"max":0}}]
+    - then, if the number of card (any player controls) in the staging area only, other than this card is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 01092:A:2 (shadow): Shadow: Choose and discard 1 attachment from the defending character. (If this attack is undefended, discard all attachments you control.)
   01092:shadow:1: Shadow
@@ -194,7 +194,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
   01098:whenRevealed:1: When revealed
     - for each player, first player first:
       - choose character (you control) committed to the quest
-      - [json RemoveFromQuest {"verb":"RemoveFromQuest"}]
+      - the last picked character is removed from the quest (it stays exhausted)
 
 ## 01099 Old Forest Road
 (the scenario deals it into the staging pile; the piles place it, no record does)
@@ -219,8 +219,8 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 01119:A:1 (front): Setup: Search the encounter deck for 1 copy of the Forest Spider and 1 copy of the Old Forest Road, and add them to the staging area. Then, shuffle the encounter deck.
   01119:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddToStaging {"verb":"AddToStaging","code":"01096"}]
-    - [json AddToStaging {"verb":"AddToStaging","code":"01099"}]
+    - the card with code 01096 is added to the staging area (the copy a Setup search found, else one the Setup deals)
+    - the card with code 01099 is added to the staging area (the copy a Setup search found, else one the Setup deals)
     - shuffle the encounter deck
 
 ## 01120 A Fork in the Road
@@ -236,7 +236,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 01121:B:1 (back): When Revealed: Each player must search the encounter deck and discard pile for 1 Spider card of his choice, and add it to the staging area.
   01121:whenRevealed:1: When revealed
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","trait":"Spider","to":"staging"}]
+      - the acting player finds one Spider card in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
 
 01121:B:2 (back): The players must find and defeat Ungoliant's Spawn to win this game.
   01121:constant:1: Constant
@@ -272,4 +272,4 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
     - [json Earn {"verb":"Earn","codes":["01136"],"when":{"kind":"stageReached","code":"01122","is":true}}]
     - [json Earn {"verb":"Earn","codes":["01137"],"when":{"kind":"stageReached","code":"01121","is":true}}]
 
-(rendered pieces: 138 by template, 15 as JSON)
+(rendered pieces: 148 by template, 8 as JSON)

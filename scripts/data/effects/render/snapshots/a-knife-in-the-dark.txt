@@ -66,12 +66,12 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 141025:A:1 (front): Setup: Set all copies of Ringwraith, The Witch-king, Midgewater, and Weathertop aside, out of play. Add The Prancing Pony and Bill Ferny to the staging area. Shuffle the encounter deck.
   141025:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAside {"verb":"SetAside","code":"141046"}]
-    - [json SetAside {"verb":"SetAside","code":"141048"}]
-    - [json SetAside {"verb":"SetAside","code":"141068"}]
-    - [json SetAside {"verb":"SetAside","code":"141069"}]
-    - [json AddToStaging {"verb":"AddToStaging","code":"141045"}]
-    - [json AddToStaging {"verb":"AddToStaging","code":"141051"}]
+    - a copy of the card with code 141046 is set aside, out of play
+    - a copy of the card with code 141048 is set aside, out of play
+    - a copy of the card with code 141068 is set aside, out of play
+    - a copy of the card with code 141069 is set aside, out of play
+    - the card with code 141045 is added to the staging area (the copy a Setup search found, else one the Setup deals)
+    - the card with code 141051 is added to the staging area (the copy a Setup search found, else one the Setup deals)
     - shuffle the encounter deck
 
 141025:B:1 (back): The players cannot advance while The Prancing Pony is in play.
@@ -85,7 +85,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 141026:B:1 (back): When Revealed: Add Midgewater to the staging area. Each player places 1 progress on the current quest.
   141026:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"141048"}]
+    - one set-aside card with code 141048 joins the staging area (it is not revealed)
     - [json PlaceQuestProgress {"verb":"PlaceQuestProgress","perPlayer":1}]
 
 141026:B:2 (back): Forced: At the end of the round, either remove X progress from the current quest or shuffle 1 out of play Ringwraith into the encounter deck. X is the number of players in the game.
@@ -107,9 +107,9 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 141027:A:1 (front): When Revealed: Add Weathertop and The Witch-king to the staging area. Search the encounter deck and discard pile and add each Nazgûl enemy found to the staging area. Shuffle the encounter deck.
   141027:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"141046"}]
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"141068"}]
-    - [json SearchMove {"verb":"SearchMove","trait":"Nazgûl","type":"enemy","to":"staging","each":true}]
+    - one set-aside card with code 141046 joins the staging area (it is not revealed)
+    - one set-aside card with code 141068 joins the staging area (it is not revealed)
+    - every Nazgûl enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
 
 141027:B:1 (back): If there are no Nazgûl enemies in play, the players win the game.
@@ -124,7 +124,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 141044:B:1 (back): Resolution: Starting with the first player, each player may choose one of the following boon cards and attach it to a hero he controls: Tireless Ranger, Skilled Healer, Valiant Warrior, Noble Hero. The chosen cards have been earned by the players.
   141044:resolution:1: Resolution
-    - [json ChooseCards {"verb":"ChooseCards","codes":["141018","141019","141020","141021"],"who":"eachSeat","to":"hero","optional":true}]
+    - each player in turn may take "141018" or "141019" or "141020" or "141021" attached to a hero
 
 ## 141045 The Prancing Pony
 (the scenario deals it into the staging pile; the piles place it, no record does)
@@ -252,7 +252,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
       * option "ringwraith" (only if [json condition {"kind":"outOfPlay","code":"141069"}]):
         - [json ShuffleOutOfPlayIntoEncounterDeck {"verb":"ShuffleOutOfPlayIntoEncounterDeck","code":"141069"}]
       * option "reveal":
-        - [json GainSurge {"verb":"GainSurge"}]
+        - this card gains surge (one more encounter card is revealed when it has been resolved)
 
 ## 141054 Unwanted Attention
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -265,9 +265,9 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
     - the acting player chooses one of:
       * option "heroes" (only if there is a hero (you control) committed to the quest to choose):
         - choose hero (you control) committed to the quest
-        - [json RemoveFromQuest {"verb":"RemoveFromQuest"}]
+        - the last picked character is removed from the quest (it stays exhausted)
         - choose hero (you control) committed to the quest
-        - [json RemoveFromQuest {"verb":"RemoveFromQuest"}]
+        - the last picked character is removed from the quest (it stays exhausted)
       * option "ringwraith" (only if [json condition {"kind":"outOfPlay","code":"141069"}]):
         - [json ShuffleOutOfPlayIntoEncounterDeck {"verb":"ShuffleOutOfPlayIntoEncounterDeck","code":"141069"}]
 
@@ -287,10 +287,10 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
     - attach this card to a hero
   141055:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetStat {"verb":"SetStat","stat":"willpower","value":0,"target":"host"}]
-    - [json SetStat {"verb":"SetStat","stat":"attack","value":0,"target":"host"}]
-    - [json SetStat {"verb":"SetStat","stat":"defense","value":0,"target":"host"}]
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - the card this one is attached to: stat willpower is set to 0, overriding every other modifier of it
+    - the card this one is attached to: stat attack is set to 0, overriding every other modifier of it
+    - the card this one is attached to: stat defense is set to 0, overriding every other modifier of it
+    - this card counts as a Condition attachment while it is attached
 
 ## 141068 The Witch-king
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -364,8 +364,8 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 141072:A:2 (shadow): Shadow: After this attack, the attacking enemy engages the next player then makes an immediate attack.
   141072:shadow:1: Shadow
     - when the attack in progress ends:
-      - [json EngageNextPlayer {"verb":"EngageNextPlayer","when":{"kind":"otherPlayer"}}]
-      - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+      - if another player is still in the game: the attacking enemy engages the next player
+      - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy makes an immediate attack against the player it just engaged, dealt a new shadow card after its old ones are discarded
 
 ## 141073 Piercing Cry
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -377,16 +377,16 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
   141073:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player chooses one of:
-      * option "staging" (only if [json condition {"kind":"searchable","trait":"Nazgûl"}]):
-        - [json SearchMove {"verb":"SearchMove","trait":"Nazgûl","to":"staging"}]
-      * option "engage" (only if [json condition {"kind":"searchable","trait":"Nazgûl"}]):
-        - [json SearchMove {"verb":"SearchMove","trait":"Nazgûl","to":"engagedFirstPlayer"}]
+      * option "staging" (only if the encounter deck or its discard pile holds a Nazgûl card):
+        - the acting player finds one Nazgûl card in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+      * option "engage" (only if the encounter deck or its discard pile holds a Nazgûl card):
+        - the acting player finds one Nazgûl card in the encounter deck or its discard pile and puts it into play engaged with the first player (it is not revealed)
     - shuffle the encounter deck
 
 141073:A:3 (shadow): Shadow: Attacking enemy makes an additional attack after this one.
   141073:shadow:1: Shadow
     - when the attack in progress ends:
-      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
 ## 141076 Lure of the Ring
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -525,7 +525,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 906206:A:1 (front): The Old Road enters play with 3 resource tokens on it.
   906206:triggered:1: Triggered (mandatory, not printed as Forced) on the event encounterEnteredPlay (heard about this card)
-    - [json PlaceToken {"verb":"PlaceToken","amount":3}]
+    - 3 resource token(s) are placed on this card
 
 906206:A:2 (front): Forced: At the end of the round, discard 1 resource token here. Then, if there are no resource tokens here, shuffle 1 out of play Ringwraith into the encounter deck.
   906206:forced:1: Forced at the end of the round
@@ -556,8 +556,8 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 906208:A:2 (shadow): Shadow: After this attack, attacking enemy engages the next player then makes an immediate attack.
   906208:shadow:1: Shadow
     - when the attack in progress ends:
-      - [json EngageNextPlayer {"verb":"EngageNextPlayer","when":{"kind":"otherPlayer"}}]
-      - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+      - if another player is still in the game: the attacking enemy engages the next player
+      - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy makes an immediate attack against the player it just engaged, dealt a new shadow card after its old ones are discarded
 
 ## 906209 Blade Tip
 
@@ -571,6 +571,6 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
     only if it is the Refresh phase
     - raise threat by 2 (hostController)
   906209:constant:1: Constant
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - this card counts as a Condition attachment while it is attached
 
-(rendered pieces: 212 by template, 62 as JSON)
+(rendered pieces: 240 by template, 36 as JSON)

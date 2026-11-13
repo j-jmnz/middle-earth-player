@@ -18,6 +18,8 @@ export type TableDial = {
   warn?: { level: "near" | "critical"; words: string };
   limitWords?: string;
   note?: string;
+  // The disc says this word in place of the number (the Day and Night dial: "Day"); the number only tells the dial that it changed.
+  word?: string;
 };
 
 /** The cards of a code that are in play (the staging area, the active location, a play area): what a scenario's dial reads its tokens from. */
@@ -38,6 +40,7 @@ export function dialProps(dial: TableDial) {
     goal: dial.goal,
     warn: dial.warn,
     note: dial.note,
+    word: dial.word,
   } as const;
 }
 

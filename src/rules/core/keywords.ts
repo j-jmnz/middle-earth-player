@@ -3,12 +3,15 @@ import type { ModifierStat, ModifierUntil } from "../../catalog/boundary.ts";
 
 import type { Cause } from "./cause.ts";
 import { isGuarded, noteHostDefeated, releaseGuarded, textBlank } from "../families/attachments/hold.ts";
+import { keywordsKept } from "../families/angmar/blank.ts";
+import { defendingAgainst } from "../families/angmar/combat.ts";
 import type { EngineStep } from "./intents.ts";
 import { cardTypeOf, fromEncounterDeck, isCharacterType, isLocationCard, isPlayerType, printedOf, type PrintedCard } from "./printed.ts";
 import { queueEvent } from "../windows/queue.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { flagged, heldAmount, modifierActive, updateCard, withThreat } from "./state.ts";
 import { claimedDestination } from "../families/objectives/claimed.ts";
+import { returnAttachedEnemy } from "../families/angmar/reanimate/attached.ts";
 import { inPlay, moveCard, releaseGrappled, type Destination } from "./zones.ts";
 import { damageGoesTo, defenseFromWillpower } from "../families/defense/damage.ts";
 import { attackingHolds } from "../families/attack/strike.ts";
@@ -23,6 +26,8 @@ import { perDamage, threatPerHostWillpower } from "../families/cirith-ungol/valu
 import { printedStat, victoryOf } from "./printed-stat.ts";
 import { wallRoom } from "../families/pelennor/wall.ts";
 import { heldBy } from "./holder-classes.ts";
+import { inAreaOf } from "../families/breaking/areas.ts";
+import { versusVictoryTrait } from "../families/captured/values.ts";
 import { eliminateEmpties, markLoss } from "./eliminate.ts";
 
 // `combat` is the damage of an attack (rr.step-6-4-3, rr.step-6-8-3); every other kind is non-combat damage.
@@ -58,6 +63,9 @@ export function modifiedStat(
     if (!modifierActive(state, modifier)) continue;
     if (modifier.when?.kind === "versusHighEngagement" && !versusHighEngagement(state, modifier.when.role, instance, cards, against)) continue;
     if (modifier.when?.kind === "versusDefender" && !versusDefender(state, instance, modifier.when, cards)) continue;
+    if (modifier.when?.kind === "defendingAgainst" && !defendingAgainst(state, instance, modifier.when.trait, { effects: [], cards })) continue;
+    if (modifier.when?.kind === "versusVictoryTrait" && !versusVictoryTrait(state, instance, cards, against)) continue;
+    if (modifier.when?.kind === "inArea" && !inAreaOf(state, instance, modifier.when.seat)) continue;
     // "+2 Attack while attacking that enemy": only while the holder attacks it.
     if (modifier.against != null && modifier.against !== against) continue;
     // "+1 Attack when attacking an Orc" (families/attack/strike.ts).
@@ -357,6 +365,12 @@ export function releaseAttachments(
       next = releaseGuarded(next, attachmentId);
       continue;
     }
+    // An enemy that was lying on the host as an attachment returns to the staging area as an enemy (families/angmar/reanimate/attached.ts).
+    const returned = returnAttachedEnemy(next, attachmentId);
+    if (returned) {
+      next = returned;
+      continue;
+    }
     const printed = printedOf(cards, attachment.code);
     const dest: Destination =
       cardTypeOf(host, hostPrinted) === "hero" && printed.keywords.permanent
@@ -399,7 +413,7 @@ export function destroyCard(
   // "Add each ally that leaves play to its owner's hand instead of placing it in the discard pile" (families/deck/rules.ts).
   // An enemy that "gains victory" (the flag gainsVictory, 11178:A:1) goes to the victory display as one that prints it does.
   const victorious = heldAmount(state, id, "gainsVictory") > 0 && printed.type === "enemy" && printed.victory == null ? { ...printed, victory: heldAmount(state, id, "gainsVictory") } : printed;
-  next = moveCard(next, id, alliesToHandDestination(next, latest, victorious) ?? defeatedDestination(latest, victorious), instance.attachments);
+  next = moveCard(next, id, alliesToHandDestination(next, latest, victorious) ?? defeatedDestination(latest, victorious), { released: instance.attachments, defeated: byDamage });
   steps.push({ kind: "destroy", targetId: id });
   if (cardTypeOf(instance, printed) === "ally" && inPlay(instance.zone)) next = queueEvent(next, { trigger: "allyLeftPlay", seat: instance.controller, subject: id });
   next = discardedFromPlay(next, instance, byDamage);
@@ -414,8 +428,8 @@ export function hasKeyword(state: ScenarioState, id: string, keyword: "sentinel"
   const instance = state.cards[id];
   if (!instance) return false;
   const printed = printedOf(cards, instance.code);
-  // A card whose printed text box is blank has none of its printed keywords; one gained from another source stays (rr.blank).
-  const blank = textBlank(state, id, cards);
+  // A card whose printed text box is blank has none of its printed keywords, unless a keepsKeywords modifier says they stay (09054:A:1); one gained from another source stays (rr.blank).
+  const blank = textBlank(state, id, cards) && !keywordsKept(state, id, cards);
   if (keyword === "doomed") return !blank && (printed.keywords.doomed ?? 0) > 0;
   if (keyword === "ranged" && flagged(state, id, "loseRanged")) return false;
   if (!blank && printed.keywords[keyword]) return true;

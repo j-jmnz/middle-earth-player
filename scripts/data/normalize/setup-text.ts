@@ -1,4 +1,5 @@
 import type { Card } from "../../../src/catalog/card-facts.ts";
+import { readAngmarAwakened } from "./setup-angmar-awakened.ts";
 import { readEredMithrin } from "./setup-ered-mithrin.ts";
 import { readReturnOfTheKing } from "./setup-return-of-the-king.ts";
 import { readTwoTowers } from "./setup-two-towers.ts";
@@ -54,7 +55,7 @@ export type SetupClause =
   // `from` is the deck, `nonUnique` the "non-unique" qualifier, `except` "not named Grey Mountain Giant", `alsoCaves` "and the Caves deck for 1 location".
   | { kind: "removeCards"; ifLogged: string | null; count: number; what: "treachery" | "location" | "enemy"; nonUnique: boolean; except: string | null; alsoCaves: number | null }
   // "A player may search their deck for a unique boon ally and add it to their hand" / "Each player may search their deck for a boon or treasure card ...".
-  | { kind: "searchDeckForBoon"; who: "aPlayer" | "eachPlayer"; unique: boolean; cards: "boon ally" | "boon or treasure" };
+  | { kind: "searchDeckForBoon"; who: "aPlayer" | "eachPlayer"; unique: boolean; cards: "boon ally" | "boon or treasure" | "boon" };
 
 // Dream-chaser (docs/brief.md, Dream-chaser): the Setup steps of its stage 1A and campaign cards. Every one is quoted from a
 // ledger line (data/printed/dream-chaser.json) and names the cards (and, for the deck steps, the encounter sets) it moves; the build checks
@@ -122,6 +123,23 @@ export type SetupStep =
   | "loseRingBearer" // "The first player loses control of the Ring-bearer and place it faceup under Topmost Chamber as a guarded objective": `to` the objective
   | "attachToRingBearerHero" // "Then, the first player attaches Last of the Company to a hero he controls and attaches The One Ring to that hero"
   | "attachToCarrier" // "Attach A Heavy Burden to the hero with Last of the Company attached": `to` the attachment that marks the hero
+  // Angmar Awakened (mec108.*): each quoted from a stage 1A or campaign card Setup.
+  | "placeDamageForResources" // "each player may place 4 damage on Protect the Innocent to add 1 resource to each of their heroes' resource pools": `count` the damage, `resources` the resources
+  | "placeLoggedDamage" // "place damage on it equal to the amount of damage noted in the Campaign Log": `codes` the card (Protect the Innocent)
+  | "buildOrcDeck" // "Create the Orc deck (see insert) and set it next to the quest deck": mec108.orc-deck
+  | "revealPerPlayer" // "Reveal 1 card from the encounter deck per player"
+  | "addToStartingHand" // "Each player adds 1 copy of Determination to their starting hand"
+  | "shuffleHandIntoDeck" // "Each player shuffles his starting hand into his deck"
+  | "prepareCapturedDeck" // "Each player prepares a separate captured deck (see insert)": mec108.captured-deck
+  | "startingHero" // "Each player adds 2 resources to his starting hero and sets his threat to that hero's threat cost"
+  | "drawNewHand" // "Each player draws a new starting hand of 3 cards"
+  | "setAsideCapturedBoons" // "Set aside any permanent boon attachments on heroes that are added to a player's captured deck"
+  | "captureUnder" // "capturing the bottom 5 cards of each player's captured deck underneath it": `codes` the card, `count` the cards
+  | "revealSafeLocationGuarded" // "Reveal 1 of those side quests at random and 1 of those safe locations at random, adding them to the staging area with the safe location guarded by the side quest"
+  | "shuffleRemainingSafe" // "Shuffle the remaining side quests and safe locations back into the encounter deck"
+  | "mayBeHero" // "Amarthiúl may be included among a player's heroes": `to` the cards of that name
+  | "reanimateTopCard" // "Each player reanimates the top card of his deck": mec108.reanimated-dead
+  | "heroesBeginDamaged" // "Each hero begins the game with damage on them equal to the amount noted for them in the Campaign Log"
   | "chooseItemBoons"; // "Each player chooses an Item boon (excluding Andúril) from the campaign pool and sets it aside, out of play": `codes` the excluded boon
 
 export type ParsedSetup = { clauses: SetupClause[]; unread: string[] };
@@ -319,7 +337,7 @@ export function parseSetup(text: string, names: NameIndex, set: (name: string) =
   for (const raw of sentencesOf(text.replace(/^Setup:\s*/i, ""))) {
     const sentence = raw.replace(/\.$/, "");
     let match: RegExpExecArray | null;
-    const campaignStep = readDreamChaser(sentence, names) ?? readEredMithrin(sentence, names, clauses) ?? readTwoTowers(sentence, names) ?? readReturnOfTheKing(sentence, names);
+    const campaignStep = readDreamChaser(sentence, names) ?? readEredMithrin(sentence, names, clauses) ?? readAngmarAwakened(sentence, names, clauses) ?? readTwoTowers(sentence, names) ?? readReturnOfTheKing(sentence, names);
     if (campaignStep) {
       clauses.push(...campaignStep);
     } else if ((match = /^Set (all copies of |each copy of )?(.+?) aside,? out of play$/i.exec(sentence))) {

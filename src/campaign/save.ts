@@ -67,6 +67,11 @@ export const campaignLogSchema = z.strictObject({
   corsairFleet: z.number().int().min(0).nullable().default(null),
   blackGateTokens: z.number().int().min(0).nullable().default(null),
   campaignEnd: z.enum(CAMPAIGN_ENDS).nullable().default(null),
+  // Angmar Awakened's Damage Tracking (docs/brief.md, Angmar Awakened). A log saved before it reads with these defaults.
+  protectDamage: z.number().int().min(0).nullable().default(null),
+  heroDamage: z.record(z.string(), z.number().int().positive()).default({}),
+  determined: z.array(z.string()).default([]),
+  stolenCards: seatLists.default([]),
 });
 
 // The intents are checked by the reducer when they are replayed: one it does not know is refused, and the open

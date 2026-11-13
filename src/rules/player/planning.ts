@@ -3,6 +3,9 @@
 import type { Effect } from "../../catalog/boundary.ts";
 
 import { attachmentHostIds, enforceRestricted, playCost } from "./attach.ts";
+import { discardGrantHosts, discardGranted, spendDiscardGrant } from "../families/angmar/discard-play.ts";
+import { discardsLocked } from "../families/angmar/lock.ts";
+import { announceEventAction } from "../families/deck/pressure.ts";
 import { playLimit, playLimitReason } from "../families/dungeon/limit.ts";
 import { effectCause, ruleCause } from "../core/cause.ts";
 import { deckPlayHero, markDeckPlay, playableFromDeck } from "./deck-play.ts";
@@ -15,6 +18,7 @@ import { playElsewhere, playTargets } from "../families/attachments/play.ts";
 import { payerOk } from "../families/costs/pay.ts";
 import { exhaustSlack, extraCostReason } from "../families/costs/play.ts";
 import { alternativeActions, eventLimitReason, noteEventLimits, payingSlack, searchOrLaterPick } from "../families/deck/play.ts";
+import { gainedDoomed } from "../families/deck/gains-doomed.ts";
 import { doomedRaise } from "../families/deck/rules.ts";
 import { chosenX } from "../families/misc/cost.ts";
 import { playBlocked } from "../families/sidequests/contract.ts";
@@ -58,6 +62,8 @@ export function playCard(
   }
   // A card its text lets its owner play from the discard pile is played from there as if it were in the hand.
   if (instance.zone === "discard") {
+    // The permission an attachment came from the discard pile on is used up with it.
+    if (!discardPlay(ctx, instance.code).allowed && intent.hostId) next = spendDiscardGrant(next, intent.hostId);
     next = moveCard(next, intent.cardId, { zone: "hand", seat });
     instance = next.cards[intent.cardId] ?? instance;
   }
@@ -66,7 +72,7 @@ export function playCard(
   next = { ...next, played: [...(next.played ?? []).filter((entry) => entry.round === next.round), { id: intent.cardId, code: instance.code, seat, round: next.round, ...(next.phase === "Planning" ? {} : { phase: next.phase }) }] };
   // Doomed X: each player raises their threat by X when the card is played (rr.doomed-x), less a reduction the seat holds for
   // its next Doomed event (families/deck/rules.ts).
-  const doomed = doomedRaise(next, seat, printed);
+  const doomed = doomedRaise(next, seat, printed, gainedDoomed(next, intent.cardId, seat, ctx));
   next = doomed.state;
   if (doomed.amount > 0) {
     for (const index of livingSeats(next)) next = raiseThreat(next, index, doomed.amount, steps, ruleCause("rr.doomed-x"));
@@ -113,7 +119,7 @@ function playEvent(state: ScenarioState, cardId: string, seat: number, ctx: Redu
   if (!first) return moveCard(state, cardId, { zone: "discard", seat });
   // Two Actions on different lines (an Action and a Valour Action): the player uses one (families/deck/play.ts).
   const choice = alternativeActions(running);
-  return pushEffectFrame(
+  const framed = pushEffectFrame(
     { ...noteEventLimits(state, running, cardId, seat, ctx, steps), window: null },
     {
       frame: "ResolveEffect",
@@ -131,6 +137,8 @@ function playEvent(state: ScenarioState, cardId: string, seat: number, ctx: Redu
     },
     steps,
   );
+  // The event is an Action a player triggers (09040:A:1).
+  return announceEventAction(framed, cardId, seat, ctx);
 }
 
 // Why an event cannot be played in this window: no Action of its has its condition hold (a Combat Action outside combat), or
@@ -188,7 +196,12 @@ function discardPlay(ctx: ReduceContext, code: string): { allowed: boolean; only
 
 // The cards of the seat's discard pile its text lets it play from there.
 export function discardPlayable(state: ScenarioState, seat: number, ctx: ReduceContext): string[] {
-  return (state.seats[seat]?.discard ?? []).filter((id) => discardPlay(ctx, state.cards[id]?.code ?? "").allowed);
+  // The Power of Angmar: a card's own text cannot take it out of the discard pile (families/angmar/lock.ts).
+  if (discardsLocked(state)) return [];
+  const own = (state.seats[seat]?.discard ?? []).filter((id) => discardPlay(ctx, state.cards[id]?.code ?? "").allowed);
+  // An attachment Stalwart lets its hero's controller play from the discard pile (families/angmar/discard-play.ts).
+  const granted = discardGranted(state, seat, ctx).filter((id) => !own.includes(id));
+  return granted.length > 0 ? [...own, ...granted] : own;
 }
 
 // Whether a card in the active seat's hand may be played in the open window, before its host and its cost are looked at.
@@ -196,7 +209,7 @@ export function playWindowReason(state: ScenarioState, cardId: string, ctx: Redu
   if (state.window?.kind !== "pass" && state.window?.kind !== "frameAction") return "That intent is not legal in this window";
   const instance = state.cards[cardId];
   const fromDeck = instance?.zone === "deck" && playableFromDeck(state, cardId, state.activeSeat, ctx);
-  const fromDiscard = instance?.zone === "discard" && discardPlay(ctx, instance.code).allowed;
+  const fromDiscard = instance?.zone === "discard" && !discardsLocked(state) && (discardPlay(ctx, instance.code).allowed || discardGranted(state, state.activeSeat, ctx).includes(instance.id));
   if (!instance || (instance.zone !== "hand" && !fromDeck && !fromDiscard) || instance.controller !== state.activeSeat) return "That card is not in hand";
   if (instance.zone === "hand" && discardPlay(ctx, instance.code).only) return "That card can only be played from the discard pile";
   // "Play only if ..." (a play restriction, rr.initiating-abilities-playing-cards).
@@ -249,7 +262,9 @@ export function playReason(
     const host = state.cards[intent.hostId];
     // The staging area or a seat's play area, for a card that goes there (families/attachments/play.ts).
     const targets = playTargets(state, state.activeSeat, instance.code, ctx) ?? attachmentHostIds(state, state.activeSeat, instance.code, ctx);
-    if (!targets.includes(intent.hostId)) {
+    // An attachment played from the discard pile by Stalwart goes onto that hero only (the permission is the hero's).
+    const grantOnly = instance.zone === "discard" && !discardPlay(ctx, instance.code).allowed;
+    if (!targets.includes(intent.hostId) || (grantOnly && !discardGrantHosts(state, state.activeSeat).includes(intent.hostId))) {
       if (host && !playerCardEffectCanChoose(printedOf(ctx.cards, host.code), state, host.id, printed)) {
         return "Immune to player card effects";
       }

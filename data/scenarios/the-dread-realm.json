@@ -1,0 +1,190 @@
+{
+  "id": "the-dread-realm",
+  "name": "The Dread Realm",
+  "number": 6,
+  "stages": [
+    "10150",
+    "10151",
+    "10152"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Dread Realm",
+      "count": 27
+    },
+    {
+      "name": "Cursed Dead",
+      "count": 10
+    },
+    {
+      "name": "Dark Sorcery",
+      "count": 9
+    }
+  ],
+  "cards": [
+    {
+      "code": "101156",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "101157",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "101158",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "101159",
+      "normal": 3,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "101160",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "101161",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "101162",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "101163",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "101164",
+      "normal": 4,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "10155",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09060",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09061",
+      "normal": 5,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "09062",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09063",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09064",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "09065",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09066",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09067",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "10150",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "10151",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "10152",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "10153",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "10154",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    }
+  ],
+  "campaignCard": "10193",
+  "campaignPlaced": [
+    "10161",
+    "10162",
+    "10163",
+    "10164",
+    "10165",
+    "10172",
+    "10173",
+    "10176",
+    "10177",
+    "10178",
+    "10179",
+    "10180",
+    "10181"
+  ],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q05.9",
+    "dragnEasy": "E05.9",
+    "hobSlug": "The-Dread-Realm"
+  }
+}

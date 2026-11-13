@@ -220,6 +220,30 @@ const FALLEN = new WeakMap<PrintedCard, PrintedCard>();
 // card type ... with Willpower equal to its Threat". The printed card is made from the enemy's: its Attack, Defense, hit points, Traits and keywords stay, its Threat and engagement cost go, and its game
 // text is blank (the Response was for the enemy). The sea family turns the card back into the enemy when it leaves play (families/sea/skirmisher.ts).
 export const SHIP_SUFFIX = "~ship";
+
+// A player card reanimated (The Dread Realm, mec108.reanimated-dead) keeps its card with the code `<code>~dead`: it lies facedown and acts as an Undead enemy with 0 engagement cost, 2 Threat, 2 Attack, 2 Defense and 2 hit points, with no game text of its own. The
+// engine puts the printed code back when the card leaves play, for its owner's discard pile (zones.ts moveCard). Only a card with this code is affected, so no other game reads it.
+export const DEAD_SUFFIX = "~dead";
+const DEAD = new WeakMap<PrintedCard, PrintedCard>();
+
+/** Whether the code is that of a Reanimated Dead (a card turned facedown into an Undead enemy). */
+export function isReanimatedCode(code: string): boolean {
+  return code.endsWith(DEAD_SUFFIX);
+}
+
+/** The printed code of a card turned into a Reanimated Dead. The table never shows it (picture-key.ts keeps the suffix, so a facedown player card is never drawn as its face or named by it). */
+export function reanimatedBase(code: string): string {
+  return isReanimatedCode(code) ? code.slice(0, -DEAD_SUFFIX.length) : code;
+}
+
+function reanimatedOf(card: PrintedCard): PrintedCard {
+  let made = DEAD.get(card);
+  if (!made) {
+    made = definePrinted({ code: card.code + DEAD_SUFFIX, name: "Reanimated Dead", type: "enemy", traits: ["Undead"], threat: 2, engagementCost: 0, attack: 2, defense: 2, health: 2 });
+    DEAD.set(card, made);
+  }
+  return made;
+}
 const SHIPPED = new WeakMap<PrintedCard, PrintedCard>();
 
 // The code of a ship-objective made from a Ship enemy, and the enemy's own code for it.
@@ -281,6 +305,8 @@ function fallenOf(hero: PrintedCard): PrintedCard {
 export function printedOf(cards: ReadonlyMap<string, PrintedCard>, code: string): PrintedCard {
   const card = cards.get(code) ?? BUILT_IN.get(code);
   if (card) return card;
+  const dead = isReanimatedCode(code) ? cards.get(reanimatedBase(code)) : undefined;
+  if (dead) return reanimatedOf(dead);
   const enemy = code.endsWith(SHIP_SUFFIX) ? cards.get(fallenBase(code)) : undefined;
   if (enemy) return shipObjectiveOf(enemy);
   const hero = code.endsWith(FALLEN_SUFFIX) ? cards.get(fallenBase(code)) : undefined;

@@ -55,6 +55,9 @@ export type RevealHook = (state: ScenarioState, cardId: string, ctx: ReduceConte
 /** A filter predicate of a family: false takes the card out of the pick, true leaves the other predicates to decide. Runs after the core's. */
 export type PickHook = (state: ScenarioState, id: string, spec: PickSpec, at: PickContext, ctx: ReduceContext) => boolean;
 
+/** The cards a pick starts from, for a pick whose filter names a pool of the family's own (the cards captured underneath a card): the card ids, or null when the pick is not the family's. */
+export type PoolHook = (state: ScenarioState, spec: PickSpec, asking: number, sourceId: string | null, ctx: ReduceContext) => string[] | null;
+
 /** A condition kind of a family: true or false, or null when the condition is not the family's. Asked before the core's switch. */
 export type ConditionHook = (state: ScenarioState, condition: Condition, scope: Scope, ctx: ReduceContext) => boolean | null;
 
@@ -68,7 +71,7 @@ export type AttachedHook = (state: ScenarioState, id: string, host: string, ctx:
  * `defense` and `attack` return why the character may not, or null; the first family with a reason wins. `undefended` returns the characters an undefended attack's
  * damage may go to instead of the heroes, or an empty list; `candidates` is the player's characters, read only when asked. The first non-empty answer wins. */
 export type CombatHooks = {
-  readonly defense?: (state: ScenarioState, defender: PrintedCard, cards: ReadonlyMap<string, PrintedCard>) => string | null;
+  readonly defense?: (state: ScenarioState, defender: PrintedCard, cards: ReadonlyMap<string, PrintedCard>, defenderId: string) => string | null;
   readonly attack?: (state: ScenarioState, enemyId: string, attacker: PrintedCard, target: PrintedCard, attackerId: string) => string | null;
   readonly undefended?: (state: ScenarioState, candidates: () => readonly string[], cards: ReadonlyMap<string, PrintedCard>) => readonly string[];
 };
@@ -93,6 +96,7 @@ export type RulesFamily = {
   readonly settle?: SettleHooks;
   readonly travel?: TravelHooks;
   readonly pick?: PickHook;
+  readonly pool?: PoolHook;
   readonly condition?: ConditionHook;
   readonly amount?: AmountHook;
   readonly attached?: AttachedHook;

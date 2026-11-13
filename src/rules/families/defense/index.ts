@@ -14,6 +14,7 @@ import { queueEvent } from "../../windows/queue.ts";
 import type { Frame, Modifier, QueueItem, ScenarioState } from "../../core/state.ts";
 import { flagged, inPlay, updateCard } from "../../core/state.ts";
 import { patchTop, topFrame } from "../../windows/windows.ts";
+import { shadowCards } from "../../core/zones.ts";
 import { redirectDamage } from "./damage.ts";
 import { addDefender, addEndReady, assignAttackDamage, cancelAttack, readyUnharmed } from "./defenders.ts";
 import { dealShadowTo, discardShadowOf, lookAtShadow, redirectAttack } from "./shadow.ts";
@@ -82,10 +83,15 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return redirectDamage(state, instruction, focus.seat, focus.sourceId, ctx, steps);
     case "PreventAttacks":
       return preventAttacks(state, instruction, focus);
-    case "DiscardShadowOf":
-      return discardShadowOf(state, ref(state, instruction.target ?? "picked", focus));
+    case "DiscardShadowOf": {
+      const enemyId = ref(state, instruction.target ?? "picked", focus);
+      if (instruction.all !== true) return discardShadowOf(state, enemyId);
+      let next = state;
+      for (let left = shadowCards(state.cards[enemyId]).length; left > 0; left -= 1) next = discardShadowOf(next, enemyId);
+      return next;
+    }
     case "DealShadowTo":
-      return dealShadowTo(state, ref(state, instruction.target, focus), steps);
+      return dealShadowTo(state, ref(state, instruction.target, focus), steps, ctx);
     case "LookAtShadow":
       return lookAtShadow(state, ref(state, instruction.target ?? "picked", focus), focus.seat, instruction.markEffect === true, ctx);
     case "ShadowAttacks":

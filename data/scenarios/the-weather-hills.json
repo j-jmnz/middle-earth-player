@@ -1,0 +1,200 @@
+{
+  "id": "the-weather-hills",
+  "name": "The Weather Hills",
+  "number": 2,
+  "stages": [
+    "09069",
+    "09070"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Weather Hills",
+      "count": 17
+    },
+    {
+      "name": "Angmar Orcs",
+      "count": 8
+    },
+    {
+      "name": "Foul Weather",
+      "count": 9
+    },
+    {
+      "name": "Ruins of Arnor",
+      "count": 8
+    }
+  ],
+  "cards": [
+    {
+      "code": "09025",
+      "normal": 5,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "09027",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "09028",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09029",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "09031",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09032",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09052",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "09053",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09054",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "09055",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09056",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "09057",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "09058",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "09059",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09069",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "09070",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "09027",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "09071",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging",
+      "back": "09072"
+    },
+    {
+      "code": "09028",
+      "normal": 1,
+      "easy": 1,
+      "pile": "activeLocation"
+    },
+    {
+      "code": "09026",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "09046",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "09030",
+      "normal": 3,
+      "easy": 3,
+      "pile": "angmarOrcDeck"
+    },
+    {
+      "code": "09043",
+      "normal": 3,
+      "easy": 3,
+      "pile": "angmarOrcDeck"
+    },
+    {
+      "code": "09044",
+      "normal": 3,
+      "easy": 2,
+      "pile": "angmarOrcDeck"
+    },
+    {
+      "code": "09045",
+      "normal": 2,
+      "easy": 1,
+      "pile": "angmarOrcDeck"
+    }
+  ],
+  "campaignCard": "10159",
+  "campaignPlaced": [
+    "10158",
+    "10160",
+    "10161",
+    "10162",
+    "10163",
+    "10164",
+    "10165"
+  ],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q05.2",
+    "dragnEasy": "E05.2",
+    "hobSlug": "The-Weather-Hills"
+  }
+}

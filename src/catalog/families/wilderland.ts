@@ -124,8 +124,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("ArrangeCaves"), count: z.number().int().min(2), ...when }),
   // "Place Dragon Hoard on the bottom of the Caves deck" (18079:A:1): the set-aside (or encounter deck) card with this code goes to the bottom of the pile, facedown. A game with no such pile dealt, or no such card, changes nothing.
   z.strictObject({ verb: z.literal("PutOnPileBottom"), pile, code, ...when }),
-  // "Attach to a questing hero" (18048:A:1): the source card is attached to the last picked card (a Pick of a committed hero comes first).
-  z.strictObject({ verb: z.literal("AttachSelfToPicked"), ...when }),
+  // "Attach to a questing hero" (18048:A:1): the source card is attached to the last picked card (a Pick of a committed hero comes first). It attaches nowhere when that card already carries one of its title ("Limit 1 per hero"), unless `unlimited` (a card with no such limit, 10172:A:1; rr.attachment-cards).
+  z.strictObject({ verb: z.literal("AttachSelfToPicked"), unlimited: z.literal(true).optional(), ...when }),
   // "Search the encounter deck and discard pile for a Dragon treachery and attach it to Fire-drake, if able" (18080:A:1): the first player chooses a card of the type and trait in the encounter deck or its discard pile (one of each title) that the enemy named `to` does not carry yet, and it is attached to that enemy in play. The deck is shuffled by the instruction after it. `name`: only a card with this title ("a Fell Beast", 145077:A:1).
   z.strictObject({ verb: z.literal("AttachSearched"), type: z.enum(["treachery"]), trait: z.string().min(1), to: z.string().min(1), name: z.string().min(1).optional(), ...when }),
   // "The first player chooses a player to attach an Artifact attachment from his hand to Dragon Hoard. That attachment gains the guarded (location) keyword" (18043:A:3): the last picked card of a hand is guarded by a location of the encounter deck, found as the Guarded (location) keyword does (emce.guarded-x), and lies in the staging area; once nothing guards it the players claim it, the first player choosing the character it attaches to, as for a treasure. With no location to find it is claimed at once.
@@ -229,7 +229,8 @@ const VERBS = [
   z.strictObject({ verb: z.literal("SearchQuestDeck"), ...when }),
   // "Flip Wormsbane to its Reforged side" (19122:A:3): the card in play with the code `code` shows its other side `into`, staying where it lies with its tokens and attachments (the old side is kept as the card's other side).
   // With `attachTo: "picked"` it then moves to the hero last picked, leaving the card it was attached to.
-  z.strictObject({ verb: z.literal("FlipInPlace"), code, into: code, attachTo: z.literal("picked").optional(), ...when }),
+  // With `entersPlay` the new side enters play: it hears "After X enters play" ("After Savage Counter-attack enters play", 09072:A:1; mec112.gollum-smeagol).
+  z.strictObject({ verb: z.literal("FlipInPlace"), code, into: code, attachTo: z.literal("picked").optional(), entersPlay: z.literal(true).optional(), ...when }),
   // "Search the Caves deck for a location and make it the active location. Shuffle the Caves deck" (19137:B:2): the actor chooses a card of the Caves deck, which becomes the active location (the one active now returns to the staging area) and hears that it did. The shuffle is the record's (ShufflePile).
   // Nothing happens with the Caves deck empty.
   z.strictObject({ verb: z.literal("ActivateFromCaves"), ...when }),

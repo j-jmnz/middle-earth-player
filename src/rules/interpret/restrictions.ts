@@ -12,6 +12,7 @@ import { modifiedStat } from "../core/keywords.ts";
 import { pickCandidates } from "./pick.ts";
 import { spendablePools } from "../families/costs/verbs.ts";
 import { guardsTitled } from "../families/objectives/pick.ts";
+import { guardedSafeLocation } from "../families/angmar/safe.ts";
 import { isPlayerType, printedOf } from "../core/printed.ts";
 import { flagged, heldAmount, inPlay, livingSeats, type CardInstance, type ScenarioState } from "../core/state.ts";
 
@@ -57,6 +58,8 @@ export function travelBlocked(state: ScenarioState, ctx: ReduceContext, location
   const location = state.cards[locationId];
   // A location that cannot leave the staging area cannot become the active location ("Each non-unique location ... cannot leave the staging area", 146066:B:1).
   if (flagged(state, locationId, "cannotLeaveStaging")) return true;
+  // A guarded safe objective-location waits for its guard to leave play (mec108.objective-locations).
+  if (guardedSafeLocation(state, ctx, locationId)) return true;
   return restricted(state, ctx, "travel").some((rule) => {
     // Every location with a trait (Grond's, 145044:A:1 and the Gate's kin).
     if (rule.trait != null) return printedOf(ctx.cards, location?.code ?? "").traits.includes(rule.trait);

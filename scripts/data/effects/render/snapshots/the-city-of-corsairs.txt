@@ -29,48 +29,48 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 11215:A:2 (front): Setup: Flip the Stormcaller to its "Campaign Mode only" side, then attach Black Key (burden) to it. Each player chooses a Modification boon for each of their ship-objectives and attaches it to that ship-objective. Shuffle Thunderstruck into the encounter deck. Shuffle Crowley into the Corsair deck.
   11215:campaignSetup:1: Campaign setup (record also names 11215:A:3)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAside {"verb":"SetAside","code":"11172"}]
-    - [json SetAside {"verb":"SetAside","code":"11173"}]
-    - [json SetAside {"verb":"SetAside","code":"11174"}]
-    - [json SetAside {"verb":"SetAside","code":"11175"}]
-    - [json SetAside {"verb":"SetAside","code":"11192"}]
-    - [json SetAside {"verb":"SetAside","code":"11193"}]
-    - [json SetAside {"verb":"SetAside","code":"11210"}]
-    - [json SetAside {"verb":"SetAside","code":"11211"}]
-    - [json SetAside {"verb":"SetAside","code":"11212"}]
-    - [json SetAside {"verb":"SetAside","code":"11213"}]
-    - [json SetAside {"verb":"SetAside","code":"11214"}]
-    - [json SetAside {"verb":"SetAside","code":"11216"}]
-    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"11177"}]
+    - a copy of the card with code 11172 is set aside, out of play
+    - a copy of the card with code 11173 is set aside, out of play
+    - a copy of the card with code 11174 is set aside, out of play
+    - a copy of the card with code 11175 is set aside, out of play
+    - a copy of the card with code 11192 is set aside, out of play
+    - a copy of the card with code 11193 is set aside, out of play
+    - a copy of the card with code 11210 is set aside, out of play
+    - a copy of the card with code 11211 is set aside, out of play
+    - a copy of the card with code 11212 is set aside, out of play
+    - a copy of the card with code 11213 is set aside, out of play
+    - a copy of the card with code 11214 is set aside, out of play
+    - a copy of the card with code 11216 is set aside, out of play
+    - a card with code 11177 from the box joins the encounter deck, which is shuffled
     - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Stormcaller"}]
     - [json FitShips {"verb":"FitShips","codes":["11172","11173","11174","11175"]}]
-    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Calaerion","withCard":"Dream-chaser"}]
-    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Gavin","to":"anyPlayer","when":{"kind":"upgraded","code":"11210"}}]
-    - [json ChooseCards {"verb":"ChooseCards","codes":["11205","11206","11207","11208"],"who":"onePlayer","to":"hand","optional":true,"unearned":true,"afterMulligan":true}]
+    - the set-aside card titled "Calaerion" is put into play under the control of the player who controls the card titled "Dream-chaser"
+    - then, if [json condition {"kind":"upgraded","code":"11210"}] (checked when this step runs, after the steps above; not tied to whether they did anything): the set-aside card titled "Gavin" is put into play under a player the first player chooses
+    - each player in turn (the offer ends once one has taken it) may take "11205" or "11206" or "11207" or "11208" into their hand [also {"unearned":true,"afterMulligan":true}]
 
 11215:A:3 (front): Put Calaerion into play under the control of the player with the Dream-chaser. One player may choose a copy of Círdan's Blessing not in the Campaign Pool and add it to their hand. If "Gavin returned," put him into play under any player's control. Flip this card over.
   11215:campaignSetup:1: Campaign setup (record also names 11215:A:2)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAside {"verb":"SetAside","code":"11172"}]
-    - [json SetAside {"verb":"SetAside","code":"11173"}]
-    - [json SetAside {"verb":"SetAside","code":"11174"}]
-    - [json SetAside {"verb":"SetAside","code":"11175"}]
-    - [json SetAside {"verb":"SetAside","code":"11192"}]
-    - [json SetAside {"verb":"SetAside","code":"11193"}]
-    - [json SetAside {"verb":"SetAside","code":"11210"}]
-    - [json SetAside {"verb":"SetAside","code":"11211"}]
-    - [json SetAside {"verb":"SetAside","code":"11212"}]
-    - [json SetAside {"verb":"SetAside","code":"11213"}]
-    - [json SetAside {"verb":"SetAside","code":"11214"}]
-    - [json SetAside {"verb":"SetAside","code":"11216"}]
-    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"11177"}]
+    - a copy of the card with code 11172 is set aside, out of play
+    - a copy of the card with code 11173 is set aside, out of play
+    - a copy of the card with code 11174 is set aside, out of play
+    - a copy of the card with code 11175 is set aside, out of play
+    - a copy of the card with code 11192 is set aside, out of play
+    - a copy of the card with code 11193 is set aside, out of play
+    - a copy of the card with code 11210 is set aside, out of play
+    - a copy of the card with code 11211 is set aside, out of play
+    - a copy of the card with code 11212 is set aside, out of play
+    - a copy of the card with code 11213 is set aside, out of play
+    - a copy of the card with code 11214 is set aside, out of play
+    - a copy of the card with code 11216 is set aside, out of play
+    - a card with code 11177 from the box joins the encounter deck, which is shuffled
     - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Stormcaller"}]
     - [json FitShips {"verb":"FitShips","codes":["11172","11173","11174","11175"]}]
-    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Calaerion","withCard":"Dream-chaser"}]
-    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Gavin","to":"anyPlayer","when":{"kind":"upgraded","code":"11210"}}]
-    - [json ChooseCards {"verb":"ChooseCards","codes":["11205","11206","11207","11208"],"who":"onePlayer","to":"hand","optional":true,"unearned":true,"afterMulligan":true}]
+    - the set-aside card titled "Calaerion" is put into play under the control of the player who controls the card titled "Dream-chaser"
+    - then, if [json condition {"kind":"upgraded","code":"11210"}] (checked when this step runs, after the steps above; not tied to whether they did anything): the set-aside card titled "Gavin" is put into play under a player the first player chooses
+    - each player in turn (the offer ends once one has taken it) may take "11205" or "11206" or "11207" or "11208" into their hand [also {"unearned":true,"afterMulligan":true}]
 
 11215:B:1 (back): Forced: When stage 2B is revealed, search the encounter deck and discard pile for each boon and non-Ship burden and shuffle them into the second encounter deck.
   11215:forced:1: Forced on the event stageRevealed
@@ -145,7 +145,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
   12148:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - [json AssignDamage {"verb":"AssignDamage","amount":{"damageOn":{"type":"character","control":"you","trait":"Ship"}},"pick":{"type":"character","control":"you","notTraits":["Ship"]}}]
+      - the acting player assigns the damage tokens on Ship character (you control) damage among the character (you control) without Ship, one at a time
     - [json DiscardAllInPlay {"verb":"DiscardAllInPlay","pick":{"type":"enemy","control":"any","staging":true,"trait":"Ship"}}]
     - [json DiscardAllInPlay {"verb":"DiscardAllInPlay","pick":{"type":"character","control":"any","trait":"Ship"}}]
     - [json DiscardAllInPlay {"verb":"DiscardAllInPlay","pick":{"type":"location","control":"any","trait":"Ocean"}}]
@@ -168,8 +168,8 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
     - [json SetAsideFromDeck {"verb":"SetAsideFromDeck","code":"12159"}]
     - [json SetAsideFromDeck {"verb":"SetAsideFromDeck","code":"110129"}]
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","type":"enemy","to":"staging"}]
-      - [json SearchMove {"verb":"SearchMove","type":"location","to":"staging"}]
+      - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+      - the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - then, if [json condition {"kind":"inVictory","code":"12151","is":false}] (checked when this step runs, after the steps above; not tied to whether they did anything): for each Raider enemy (any player controls) or in the staging area:
       - place 1 resource tokens on the picked card
 
@@ -179,11 +179,11 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 12150:A:1 (front): When Revealed: Add The Shattered Monument to the staging area. Put Captain Sahír into play, engaged with the first player. Each player searches the encounter deck and discard pile for an enemy and adds it to the staging area. Shuffle the encounter deck. Add 1 resource to each Raider enemy in play.
   12150:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"12159"}]
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"110129"}]
+    - one set-aside card with code 12159 joins the staging area (it is not revealed)
+    - one set-aside card with code 110129 joins the staging area (it is not revealed)
     - [json EngageSetAside {"verb":"EngageSetAside","code":"12158"}]
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","type":"enemy","to":"staging"}]
+      - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
     - for each Raider enemy (any player controls) or in the staging area:
       - place 1 resource tokens on the picked card
@@ -237,7 +237,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 12152:A:3 (front): For each point of damage that is dealt to a Ship objective by Slave Ship's attack, deal 1 point of damage to a non-Ship character controlled by the defending player, as well.
   12152:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
     - when the attack in progress ends:
-      - [json AssignDamage {"verb":"AssignDamage","amount":{"dealt":true},"pick":{"type":"character","control":"you","notTraits":["Ship"]},"when":{"kind":"all","conditions":[{"kind":"dealt"},{"kind":"matches","card":"other","pick":{"type":"character","control":"any","trait":"Ship"}}]}}]
+      - if all of: ([json condition {"kind":"dealt"}]) and (the event's other card is a Ship character (any player controls)): the acting player assigns the damage just dealt damage among the character (you control) without Ship, one at a time
 
 ## 12153 Umbar Slaver
 (the scenario deals it into the corsairDeck pile; the piles place it, no record does)
@@ -293,8 +293,8 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 12156:A:2 (shadow): Shadow: If this attack destroys an ally, add resources to a Raider enemy in play equal to that character's printed resource cost.
   12156:shadow:1: Shadow
     - when the attack in progress ends:
-      - if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (the event's other card is a card (any player controls) of card type ally [also {"inPlay":false}]): choose Raider enemy (any player controls) or in the staging area
-      - then, if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (the event's other card is a card (any player controls) of card type ally [also {"inPlay":false}]) (checked when this step runs, after the steps above; not tied to whether they did anything): place cost of the event's other card resource tokens on the picked card
+      - if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (the event's other card is a card (any player controls) of card type ally that is out of play now): choose Raider enemy (any player controls) or in the staging area
+      - then, if all of: (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) and (the event's other card is a card (any player controls) of card type ally that is out of play now) (checked when this step runs, after the steps above; not tied to whether they did anything): place cost of the event's other card resource tokens on the picked card
 
 ## 12157 Serpent's Tail
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -303,7 +303,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
   12157:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each Ship enemy (any player controls) or in the staging area:
-      - [json DealShadowTo {"verb":"DealShadowTo","target":"picked"}]
+      - the picked card is dealt a shadow card
     - then, if [json condition {"kind":"heading","is":"offCourse"}] (checked when this step runs, after the steps above; not tied to whether they did anything): for each Ship enemy (any player controls) or in the staging area:
       - the picked card: stat engagementCost -10, until the end of the round
 
@@ -312,7 +312,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 
 12158:A:1 (front): Captain Sahír engages the first player.
   12158:forced:1: Forced after an encounter card is added to the staging area (heard about this card)
-    - [json EngageFirstPlayer {"verb":"EngageFirstPlayer"}]
+    - this enemy, in the staging area, engages the first player
 
 12158:A:2 (front): For each point of damage Captain Sahír would take, discard 1 resource from him and cancel that damage.
   12158:constant:1: Constant
@@ -348,7 +348,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 12160:A:2 (shadow): Shadow: If attacking enemy is a Raider, deal it an additional shadow card for each resource token on it, to a maximum of 3 additional shadow cards.
   12160:shadow:1: Shadow
     - repeat resources of the attacking enemy, at most 3 times:
-      - [json DealShadowTo {"verb":"DealShadowTo","target":"attacker","when":{"kind":"matches","card":"attacker","pick":{"type":"enemy","control":"any","trait":"Raider"}}}]
+      - if the attacking enemy is a Raider enemy (any player controls): the attacking enemy is dealt a shadow card
 
 ## 12161 City of Corsairs
 (the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
@@ -360,7 +360,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
 12161:A:2 (front): Travel: Search the encounter deck and discard pile for a Corsair enemy and add it to the staging area. Shuffle the encounter deck.
   12161:travel:1: Travel
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchMove {"verb":"SearchMove","trait":"Corsair","type":"enemy","to":"staging"}]
+    - the acting player finds one Corsair enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
 
 ## 12162 Umbar Harbor
@@ -388,7 +388,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
     - place 2 resource tokens on the picked card
     - for each Raider enemy (any player controls) in the staging area only:
       - the picked card: stat threat resources of the picked card, until the end of the phase
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"count","pick":{"type":"enemy","control":"any","stagingOnly":true,"trait":"Raider"},"max":0}}]
+    - then, if the number of Raider enemy (any player controls) in the staging area only is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 ## 12164 Umbar Patrol
 (the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
@@ -398,7 +398,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
     (steps run in order; a step depends on an earlier one only through its own condition)
     - return one enemy engaged with a player (that player picks which) to the staging area
     - the table: stat cannotBeOptionallyEngaged 1, until the end of the round
-    - [json SearchMove {"verb":"SearchMove","type":"enemy","to":"staging","when":{"kind":"count","pick":{"type":"enemy","control":"any","stagingOnly":true},"max":0}}]
+    - then, if the number of enemy (any player controls) in the staging area only is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
 
 ## 12165 Fury and Malice
 (the scenario deals it into the encounterDeck2 pile; the piles place it, no record does)
@@ -409,7 +409,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
     - for each Raider enemy (any player controls):
       - place 1 resource tokens on the picked card
     - for each player, first player first:
-      - [json AssignDamage {"verb":"AssignDamage","amount":{"resourcesOn":{"type":"enemy","control":"any","engaged":"you","trait":"Raider"}},"pick":{"type":"character","control":"you"}}]
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"count","pick":{"type":"enemy","control":"any","trait":"Raider"},"max":0}}]
+      - the acting player assigns the resource tokens on Raider enemy (any player controls) engaged with you damage among the character (you control), one at a time
+    - then, if the number of Raider enemy (any player controls) is at most 0 (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
-(rendered pieces: 192 by template, 87 as JSON)
+(rendered pieces: 258 by template, 43 as JSON)

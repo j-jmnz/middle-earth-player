@@ -14,11 +14,12 @@ import { defeatedBefore, questCardDefeatedHeard } from "../families/quest/branch
 import { queueEvent } from "../windows/queue.ts";
 import { offerResponses } from "../windows/responses.ts";
 import { restricted } from "../interpret/restrictions.ts";
-import { flagged, livingSeats, withMode, type ScenarioState } from "../core/state.ts";
-import { stageSeat } from "../families/breaking/areas.ts";
+import { flagged, withMode, type ScenarioState } from "../core/state.ts";
+import { areaSeats, stageSeat } from "../families/breaking/areas.ts";
 import { payOwed } from "../families/breaking/progress.ts";
 import { fireForced } from "../windows/triggers.ts";
 import { announceStageRevealed } from "../families/nightmare/setup.ts";
+import { timeOnReveal } from "../families/angmar/time.ts";
 
 // Resolving the quest is two passes. The first adds progress, and each stage the quest advanced to has
 // its When Revealed effects pushed as frames. The second runs once those frames have popped, and ends
@@ -49,7 +50,7 @@ const failureAmountRead = (state: ScenarioState, ctx: ReduceContext): boolean =>
 // progress on its own stage or only its own threat raised (resolveQuest with `only`). The commitments end once every seat has resolved.
 function resolveSeparate(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[], canAdvance: (state: ScenarioState) => boolean): ScenarioState {
   let next = state;
-  for (const seat of livingSeats(state)) {
+  for (const seat of areaSeats(state)) {
     next = resolveQuest(next, ctx.cards, steps, canAdvance, questFailureRaise(ctx, steps), seat, failureAmountRead(state, ctx));
     if (next.stageCleared || next.lost) break;
   }
@@ -76,6 +77,8 @@ export function afterProgress(state: ScenarioState, before: number, ctx: ReduceC
   for (const cardId of [...advanced].reverse()) {
     const code = next.cards[cardId]?.code;
     const effects = ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "whenRevealed");
+    // A stage with Time X gets its time counters as it is revealed (10094:B:1, mec108.time-x).
+    next = timeOnReveal(next, cardId, ctx);
     // "Forced: After stage 2B is revealed" (11182:A:3) goes down first, so it resolves once the stage's When Revealed effects have.
     next = announceStageRevealed(next, cardId, ctx, steps, "afterStageRevealed");
     // A stage a seat advanced to once stages are separate is revealed by that seat (families/breaking/areas.ts).

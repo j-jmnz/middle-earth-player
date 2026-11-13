@@ -7,7 +7,7 @@ import { memo } from "react";
 import { Moving } from "../motion/card-motion.native.tsx";
 import { CardMarks, Glow, PickRing } from "./card-marks.native.tsx";
 import { Badges, CardBody, HeldMark, NotAppliedMark, StackMark, SuccessMedallion, Tokens } from "./pieces.native.tsx";
-import { CombatPill, DelayedMark, EngagementMark, FireMarkView, OptionMarkView, PlaceMarkView, ShipLossView, StageMarks, UnderMarkView } from "./mark-pieces.native.tsx";
+import { badgeReach, CombatPill, CurrentQuestMark, DelayedMark, DeterminedMarkView, EngagementMark, FireMarkView, OptionMarkView, PlaceMarkView, ShipLossView, StageMarks, UnderMarkView } from "./mark-pieces.native.tsx";
 import { sphereIcon } from "../../ui/icon-map.ts";
 import { Pile } from "./pile-piece.native.tsx";
 import { type CardSlot } from "../layout/layout.ts";
@@ -35,7 +35,8 @@ export function drawBody(p: BodyProps, slot: CardSlot, dim: boolean) {
       pile
     );
   }
-  const encounterBack = slot.kind === "shadow" || slot.zone === "staging" || slot.zone === "engaged" || slot.zone === "encounterDeck";
+  // A Reanimated Dead is a player card lying facedown: its back is the player's.
+  const encounterBack = !slot.dead && (slot.kind === "shadow" || slot.zone === "staging" || slot.zone === "engaged" || slot.zone === "encounterDeck");
   const picked = p.picked > 0;
   const glows = slot.kind === "card" && (picked || p.tappable);
   return (
@@ -70,6 +71,9 @@ function drawOverlay(p: PieceProps) {
         {info?.combat ? <CombatPill rect={rect} combat={info.combat} fonts={fonts} t={t} s={s} /> : null}
         {info?.engagement ? <EngagementMark rect={rect} cost={info.engagement.cost} engages={info.engagement.engages} fonts={fonts} images={tokens} t={t} s={s} /> : null}
         {info?.fire ? <FireMarkView rect={rect} mark={info.fire} fonts={fonts} images={tokens} t={t} s={s} /> : null}
+        {info?.side?.loses ? <FireMarkView rect={rect} mark={info.side.loses} fonts={fonts} images={tokens} t={t} s={s} /> : null}
+        {info?.side?.current ? <CurrentQuestMark rect={rect} clear={badgeReach(info.effects, fonts, s)} fonts={fonts} t={t} s={s} /> : null}
+        {info?.determined ? <DeterminedMarkView rect={rect} word={info.determined.word} clear={badgeReach(info.effects, fonts, s)} fonts={fonts} t={t} s={s} /> : null}
         {info?.loss ? <ShipLossView rect={rect} mark={info.loss} fonts={fonts} t={t} s={s} /> : null}
         {info?.place ? <PlaceMarkView rect={rect} mark={info.place} t={t} s={s} /> : null}
         {info?.under ? <UnderMarkView rect={rect} mark={info.under} fonts={fonts} t={t} s={s} /> : null}
@@ -77,7 +81,8 @@ function drawOverlay(p: PieceProps) {
         {p.stageMarks ? <StageMarks rect={rect} pill={p.stageMarks.pill} apart={p.stageMarks.apart} fonts={fonts} t={t} s={s} /> : null}
         <Tokens slot={slot} rect={rect} images={tokens} fonts={fonts} t={t} s={s} ring={slot.resources > 0 ? sphereRing(p.sphere, t) : null} contrast={contrast} />
         {p.inactive ? <NotAppliedMark rect={rect} t={t} s={s} /> : null}
-        {slot.kind === "card" && slot.faceDown && slot.held ? <HeldMark rect={rect} t={t} s={s} /> : null}
+        {slot.kind === "card" && slot.faceDown && slot.held ? <HeldMark rect={rect} icon="hero" t={t} s={s} /> : null}
+        {slot.kind === "card" && slot.faceDown && slot.dead ? <HeldMark rect={rect} icon="threat" t={t} s={s} /> : null}
         {slot.stack != null ? <StackMark slot={slot} fonts={fonts} t={t} s={s} /> : null}
       </Group>
       {slot.success != null && slot.success > 0 ? <SuccessMedallion slot={slot} fonts={fonts} t={t} s={s} /> : null}

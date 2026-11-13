@@ -23,8 +23,8 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 11037:A:1 (front): When Revealed: Add Na'asiyah and Captain Sahír to the staging area, enemy side faceup. Each player reveals the top card of the encounter deck. Place resources on both Na'asiyah and Captain Sahír equal to the amount of damage on the Dream-chaser. Add 1 resource to each other Raider enemy in play.
   11037:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json StageSetAside {"verb":"StageSetAside","code":"11078"}]
-    - [json StageSetAside {"verb":"StageSetAside","code":"11076"}]
+    - the set-aside card with code 11078 joins the staging area (not revealed)
+    - the set-aside card with code 11076 joins the staging area (not revealed)
     - for each player, first player first:
       - the acting player reveals an encounter card
     - for each enemy (any player controls) or in the staging area, named "Captain Sahír" or "Na'asiyah":
@@ -132,7 +132,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11043:A:4 (shadow): Shadow: Add Burning Piers to the staging area.
   11043:shadow:1: Shadow
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"self","to":"staging"}]
+    - this card goes to the staging area (it is not revealed)
 
 ## 11044 Pillaged Ship
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -146,8 +146,8 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
       * option "damage":
         - deal 3 damage to this card
       * option "discard" (only if [json condition {"kind":"encounterHas","piles":"discard","cardType":"enemy"}]):
-        - [json PickDiscardTop {"verb":"PickDiscardTop","types":["enemy"]}]
-        - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging"}]
+        - the topmost enemy in the encounter discard pile (the last put there) is picked (nothing with none)
+        - the picked card goes to the staging area (it is not revealed)
 
 11044:A:3 (shadow): Shadow: If attacking enemy is a Raider, move all resources from defending character to attacking enemy.
   11044:shadow:1: Shadow
@@ -165,7 +165,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 11045:A:2 (front): Travel: Search the encounter deck and discard pile for a Corsair enemy and add it to the staging area. Shuffle the encounter deck.
   11045:travel:1: Travel
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchMove {"verb":"SearchMove","trait":"Corsair","type":"enemy","to":"staging"}]
+    - the acting player finds one Corsair enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
 
 11045:A:3 (front): Forced: When White Ship is placed underneath The Havens Burn, place 1 resource on each Raider enemy in play.
@@ -200,7 +200,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11047:A:2 (front): Travel: Each player must assign damage among characters he controls equal to the amount of damage on Elven Caravel.
   11047:travel:1: Travel
-    - [json AssignDamage {"verb":"AssignDamage","amount":{"stat":"damage","of":"self"},"pick":{"type":"character","control":"you"},"who":"eachSeat"}]
+    - each player assigns damage of this card damage among the character (you control), one at a time
 
 11047:A:3 (front): Forced: When Elven Caravel is placed underneath The Havens Burn, deal 1 damage to each character in play.
   11047:forced:1: Forced on the event placedUnder (heard about this card)
@@ -237,7 +237,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 11049:A:2 (front): When Revealed: Deal 1 damage to each Aflame location in play. If less than 3 total damage is dealt by this effect, The Fires Spread gains surge.
   11049:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"count","pick":{"type":"location","control":"any","aflame":true},"max":2}}]
+    - if the number of location (any player controls) [also {"aflame":true}] is at most 2: this card gains surge (one more encounter card is revealed when it has been resolved)
     - deal 1 damage to each location (any player controls) [also {"aflame":true}]
 
 11049:A:3 (shadow): Shadow: If this attack destroys a character, deal 1 damage to each Aflame location in play.
@@ -295,7 +295,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     - for each Raider enemy (any player controls) or in the staging area:
       - place 1 resource tokens on the picked card
     - [json ImmediateAttackEach {"verb":"ImmediateAttackEach","notTrait":"Ship"}]
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"noneReturned"}}]
+    - then, if [json condition {"kind":"noneReturned"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 11067:A:2 (shadow): Shadow: If the attacking enemy is a Raider, place 2 resources on it.
   11067:shadow:1: Shadow
@@ -308,7 +308,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11076:A:1 (front): Captain Sahír engages the first player.
   11076:forced:1: Forced after an encounter card is added to the staging area (heard about this card)
-    - [json EngageFirstPlayer {"verb":"EngageFirstPlayer"}]
+    - this enemy, in the staging area, engages the first player
 
 11076:A:2 (front): For each point of damage Captain Sahír would take, discard 1 resource from him and cancel that damage.
   11076:constant:1: Constant
@@ -379,9 +379,9 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11079:A:2 (front): Action: While Na'asiyah is attacking or defending, spend 1 resource from her to give her +2 Attack or +2 Defense for this attack.
   11079:action:2: Action (cost: pay 1 resource(s) from this card's pool)
-    only if any of: ([json condition {"kind":"attacking","card":"self"}]) or (this card is a character (any player controls) defending)
+    only if any of: (this card is attacking) or (this card is a character (any player controls) defending)
     - the acting player chooses one of:
-      * option "attack" (only if [json condition {"kind":"attacking","card":"self"}]):
+      * option "attack" (only if this card is attacking):
         - this card: stat attack 2, until the end of the attack
       * option "defense" (only if this card is a character (any player controls) defending):
         - this card: stat defense 2, until the end of the attack
@@ -406,13 +406,13 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 11182:A:2 (front): Setup: The first player takes control of Calphon and attaches Spyglass and Black Key (boon) to him. Shuffle Graxar into the encounter deck. Each player may choose one copy of Galdor's Counsel and add it to their hand. For this game, X is plus 1 for each of those copies.
   11182:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAside {"verb":"SetAside","code":"11180"}]
-    - [json SetAside {"verb":"SetAside","code":"11183"}]
+    - a copy of the card with code 11180 is set aside, out of play
+    - a copy of the card with code 11183 is set aside, out of play
     - [json PutObjectiveAllyIntoPlay {"verb":"PutObjectiveAllyIntoPlay","code":"110013"}]
-    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"11188"}]
+    - a card with code 11188 from the box joins the encounter deck, which is shuffled
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11180","to":"Calphon"}]
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11183","to":"Calphon"}]
-    - [json ChooseCards {"verb":"ChooseCards","codes":["11184","11185","11186","11187"],"who":"eachSeat","to":"hand","optional":true,"unearned":true,"afterMulligan":true}]
+    - each player in turn may take "11184" or "11185" or "11186" or "11187" into their hand [also {"unearned":true,"afterMulligan":true}]
 
 11182:A:3 (front): Forced: After stage 2B is revealed, remove Calphon and each attachment on him from the game, ignoring his "leaves play" ability.
   11182:forced:1: Forced on the event afterStageRevealed
@@ -421,7 +421,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11182:B:1 (back): Resolution: If Graxar is in the victory display, choose either Parrying Cutlass or Throwing Axe, add it to the Campaign Pool, and record which hero you attach it to.
   11182:resolution:1: Resolution
-    - [json ChooseCards {"verb":"ChooseCards","codes":["11189","11190"],"who":"firstPlayer","to":"hero","anyHero":true,"when":{"kind":"inVictory","code":"11188","is":true}}]
+    - if [json condition {"kind":"inVictory","code":"11188","is":true}]: the first player takes "11189" or "11190" attached to a hero [also {"anyHero":true}]
 
 11182:B:2 (back): Add the copies of Galdor's Counsel chosen during setup to the Campaign Pool.
   11182:resolution:2: Resolution
@@ -481,4 +481,4 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     only if all of: (this card is engaged with the player) and (this card is a enemy (any player controls) with a shadow card)
     - place shadowCards of this card resource tokens on this card
 
-(rendered pieces: 263 by template, 65 as JSON)
+(rendered pieces: 281 by template, 53 as JSON)

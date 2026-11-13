@@ -1,6 +1,6 @@
 // Conditions: when a record applies, a verb runs or an option is offered. `src/catalog/effect-schema-conditions.ts` owns the kinds; `not`, `all` and `any` combine the others one level deep.
 import { cardRef as cardRefWords, renderAmount } from "./amounts.ts";
-import { done, isObj, jsonOf, str, type Ctx, type Obj } from "./kit.ts";
+import { done, isObj, jsonOf, str, withArticle, type Ctx, type Obj } from "./kit.ts";
 import { renderPick } from "./picks.ts";
 
 const ZONE: Readonly<Record<string, string>> = {
@@ -13,6 +13,7 @@ const ZONE: Readonly<Record<string, string>> = {
   hand: "is in its player's hand",
   stormcallerArea: "is in the Stormcaller's area",
   encounterDeck: "is in the encounter deck",
+  attached: "is attached to a card",
 };
 
 const range = (min: unknown, max: unknown): string => {
@@ -22,6 +23,7 @@ const range = (min: unknown, max: unknown): string => {
 
 // One template per condition kind; a kind with none prints as JSON. A template returns its text and the keys it read.
 type Template = (c: Obj, ctx: Ctx) => { text: string; read: readonly string[] } | null;
+
 export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   sourceIn: (c) => ({ text: `this card ${ZONE[str(c.zone)] ?? `is in ${str(c.zone)}`}`, read: ["zone"] }),
   less: (c, ctx) => ({ text: `${renderAmount(c.left, ctx, renderPick)} is less than ${renderAmount(c.right, ctx, renderPick)}`, read: ["left", "right"] }),
@@ -56,9 +58,21 @@ export const CONDITION_TEMPLATES: Readonly<Record<string, Template>> = {
   onDial: (c) => ({ text: `the actor's threat dial holds a copy of the card with code ${str(c.code)}`, read: ["code"] }),
   canAttachToDial: (c) => ({ text: `a copy of the card with code ${str(c.code)} is set aside and the actor's threat dial holds none`, read: ["code"] }),
   pursuit: (c) => ({ text: `the pursuit value is ${range(c.min, c.max)}`, read: ["min", "max"] }),
+  currentQuest: (c) => ({ text: c.is === "side" ? "the current quest is a side quest" : c.is === "self" ? "this card is the current quest" : "there is a quest card besides the current quest that could be chosen to be the current quest (the main quest card, or an encounter side quest in the staging area)", read: ["is"] }),
+  currentQuestProgress: (c) => ({ text: c.is === "some" ? "the current quest card holds 1 or more progress" : "the current quest card holds no progress (neither is true while there is no current quest)", read: ["is"] }),
+  defendingAgainst: (c) => ({ text: `its host is the declared defender of the attack against a ${str(c.trait)} enemy`, read: ["trait"] }),
+  attacking: (c, ctx) => ({ text: `${c.card === "host" ? "its host" : "this card"} is attacking${isObj(c.enemy) ? ` a ${renderPick(c.enemy, ctx)}` : ""}${isObj(c.notEnemy) ? ` that is not a ${renderPick(c.notEnemy, ctx)}` : ""}${c.alone === true ? ", alone" : ""}${c.ranged === true ? ", with a ranged attack" : ""}`, read: ["card", "enemy", "notEnemy", "alone", "ranged"] }),
+  hitPointsLeft: (c) => ({ text: `the card with code ${str(c.code)} in play has damage below its hit points (any hit points remaining)`, read: ["code"] }),
+  timeOfDay: (c) => ({ text: `it is ${c.is === "day" ? "Day (Daybreak is faceup)" : "Night (Nightfall is faceup)"}`, read: ["is"] }),
+  safeActive: (c) => ({ text: c.is === false ? "no location with the safe keyword is the active location" : "a location with the safe keyword is the active location", read: ["is"] }),
+  setAsideHas: (c) => ({ text: `a copy of the card with code ${str(c.code)} is set aside, out of play`, read: ["code"] }),
+  searchable: (c) => ({ text: `the encounter deck or its discard pile holds ${withArticle(`${typeof c.trait === "string" ? `${c.trait} ` : ""}${typeof c.type === "string" ? (c.type === "encounter-side-quest" ? "side quest" : str(c.type)) : "card"}`)}${typeof c.code === "string" ? ` with code ${c.code}` : ""}${c.deckOnly === true ? " (the deck alone)" : ""}${c.victory === true ? " (the victory display too)" : ""}`, read: ["trait", "type", "code", "deckOnly", "victory"] }),
+  stageProgress: (c) => ({ text: `the current quest stage holds at least ${str(c.min)} progress`, read: ["min"] }),
+  questLeads: () => ({ text: "the total Willpower of the characters committed to the quest is greater than the total Threat in the staging area", read: [] }),
   soleAttacker: () => ({ text: "exactly one character was declared as an attacker in this attack", read: [] }),
   captives: (c) => ({ text: `the number of Captives in play${c.of === "actor" ? " that belong to the acting seat" : ""} is ${range(c.min, c.max)}`, read: ["min", "max", "of"] }),
-  matches: (c, ctx) => ({ text: `${typeof c.card === "string" ? cardRefWords(c.card) : "the card"} is a ${renderPick(c.pick, ctx)}`, read: ["card", "pick"] }),
+  matches: (c, ctx) => ({ text: `${typeof c.card === "string" ? cardRefWords(c.card) : "the card"} is a ${renderPick(c.pick, ctx)}${c.inPlay === false ? " that is out of play now" : ""}`, read: ["card", "pick", "inPlay"] }),
+  tokens: (c) => ({ text: `the card with code ${str(c.code)} in play holds at least ${str(c.min)} resource token(s)${c.perPlayer === true ? " for each player" : ""}`, read: ["code", "min", "perPlayer"] }),
   controls: (c) => ({ text: `the actor controls the card with code ${str(c.code)}`, read: ["code"] }),
 };
 

@@ -12,6 +12,7 @@ import type { ReduceContext } from "./interpret.ts";
 import { moveEncounter } from "../families/encounter/moves.ts";
 import { activeOf, stagingDest } from "../families/breaking/areas.ts";
 import { attachHeroHosts, attachHostChooser } from "../families/play/hooks.ts";
+import { lastPickedSeat } from "../families/play/refs.ts";
 import { familyAttached } from "./family-hooks.ts";
 import { controlledShips, defendingShip } from "../families/sea/campaign.ts";
 import { discardRestricted } from "../families/objectives/claimed.ts";
@@ -23,7 +24,8 @@ import { seatFor, shuffleIntoEncounterDeck } from "./verbs.ts";
 import { patchTop, topFrame } from "../windows/windows.ts";
 import { queueEvent } from "../windows/queue.ts";
 import { gameReads } from "../core/game-reads.ts";
-import { attachTo, moveCard, turnedUp } from "../core/zones.ts";
+import { listens } from "../families/encounter/reveal.ts";
+import { attachTo, inPlay, moveCard, turnedUp } from "../core/zones.ts";
 
 function hasEnemyType(state: ScenarioState, id: string, ctx: ReduceContext): boolean {
   const instance = state.cards[id];
@@ -167,7 +169,7 @@ function applyTargeted(
         // "Put it into play engaged with you" (41013:A:1): the searching player engages it as it enters play (rr.engaged), so Forced effects
         // that hear an engagement hear this one.
         if (instruction.to === "engaged") {
-          next = moveEncounter(next, id, "engaged", item.seat, ctx, steps);
+          next = moveEncounter(next, id, "engaged", (instruction.engagedSeat === "picked" ? lastPickedSeat(next) : null) ?? item.seat, ctx, steps);
           continue;
         }
         // Into the Stormcaller's area (dcce.stormcallers-area).
@@ -178,8 +180,11 @@ function applyTargeted(
         // Into the searching seat's own staging area once stages are separate (families/breaking/areas.ts). A card found facedown is turned faceup: one the
         // encounter discard pile was shuffled back into the deck with lies facedown (rr.running-out-of-cards, resetEncounterDeck). A side it shows (A or B) stays.
         const facedown = next.cards[id]?.face === "down";
+        const wasInPlay = inPlay(next.cards[id]?.zone ?? "removed");
         next = instruction.to === "staging" ? moveCard(next, id, stagingDest(next, item.seat)) : moveCard(next, id, { zone: "engaged", seat: state.firstPlayer });
         if (instruction.each || facedown) next = updateCard(next, id, { face: turnedUp(next, id) });
+        // A card found out of play enters play: the cards that hear a search put a card into play hear it (Quiet the Spirits, 10109:A:1); `encounterEnteredPlay` is left to the other ways in.
+        if (!wasInPlay && listens(next, ctx, "searchedIntoPlay")) next = queueEvent(next, { trigger: "searchedIntoPlay", seat: item.seat, subject: id });
       }
       // A `different` search tells the next one which titles are taken.
       const data = topFrame(next)?.data;
@@ -187,7 +192,7 @@ function applyTargeted(
       return (instruction.different || instruction.remember || instruction.require) && data?.kind === "effect" ? patchTop(next, { data: { ...data, picked: [...(data.picked ?? []), ...moved] } }) : next;
     }
     case "SearchReveal":
-      return first ? startReveal(state, seatFor(state, instruction.who, item.seat), ctx, steps, first, undefined, instruction.to === "engaged") : state;
+      return first ? startReveal(state, seatFor(state, instruction.who, item.seat), ctx, steps, first, undefined, instruction.to === "engaged", state.cards[first]?.zone === "encounterDiscard") : state;
     case "ShuffleIntoDeck":
     case "ShuffleOutOfPlayIntoEncounterDeck":
       return first ? shuffleIntoEncounterDeck(state, first) : state;

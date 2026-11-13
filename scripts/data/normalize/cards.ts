@@ -131,8 +131,12 @@ function campaignFacts(card: HobCard): { campaignKind: "boon" | "burden" | "trea
 
 // RingsDB types every boon and burden "treasure" and gives it the type name Campaign. The type bar prints the real
 // type (Attachment, Treachery, Objective Ally), which is what the card does in play. A treasure prints Treasure.
+// A campaign expansion's encounter side quest (Angmar Awakened's Protect the Innocent, Mysterious Omens, Fend off Despair, Loot the Dungeons) is a campaign card
+// RingsDB types "treasure" as well.
+const isCampaignSideQuest = (card: HobCard): boolean => card.CardType === "Encounter_Side_Quest" && PRODUCTS.some((product) => product.campaignExpansion && product.name === card.CardSet);
+
 function realType(card: HobCard): { type: string; typeName: string } | null {
-  return card.CardSubType === "Boon" || card.CardSubType === "Burden" || isCampaignTreasure(card) ? (TYPE_BY_HOB[card.CardType] ?? null) : null;
+  return card.CardSubType === "Boon" || card.CardSubType === "Burden" || isCampaignTreasure(card) || isCampaignSideQuest(card) ? (TYPE_BY_HOB[card.CardType] ?? null) : null;
 }
 
 function backTypeOf(type: string): "player" | "encounter" | null {
@@ -245,7 +249,7 @@ export function buildCards(raw: RawData, overrides: Overrides): { cards: Card[];
   const folded = foldTwoSided(raw.hob).cards;
   // A twin card whose Hall of Beorn RingsDbCardId is another card's takes the code RingsDB gives it (overrides.hobRingsDbCodes).
   const hobCards = [...folded, ...dragnOnlyCards(raw, folded)].map((card) => {
-    const fixed = overrides.hobRingsDbCodes.find((rule) => rule.set === card.CardSet && rule.number === card.Number);
+    const fixed = overrides.hobRingsDbCodes.find((rule) => rule.set === card.CardSet && rule.number === card.Number && (rule.title === undefined || rule.title === card.Title));
     return fixed ? { ...card, RingsDbCardId: fixed.code } : card;
   });
   const hobByCode = new Map<string, HobCard[]>();

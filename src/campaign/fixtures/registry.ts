@@ -1,5 +1,5 @@
 // The Maestro save fixtures, by scenario (docs/architecture.md, Tests). Adding a fixture name is a line here; a new scenario
-// adds its line, its JSON import in ../fixtures.ts (Metro needs static imports) and its writer in `e2e/fixtures.ts` in the scripts folder.
+// adds its line, its JSON import in ../fixtures.ts (Metro needs static imports) and its writer in `e2e/writers.ts` in the scripts folder.
 // FixtureName, FIXTURE_NAMES and STORED in ../fixtures.ts, the e2e fixtures script and the per-scenario checks
 // in ../fixtures.test.ts all read it. `file` is the JSON file's name when it is not the scenario id.
 //
@@ -46,6 +46,15 @@ export const FIXTURE_REGISTRY = [
   { scenarioId: "the-tower-of-cirith-ungol", names: ["ungol-won", "ungol-lost"] },
   { scenarioId: "the-black-gate-opens", names: ["opens-won", "opens-lost"] },
   { scenarioId: "mount-doom", names: ["doom-won", "doom-lost"] },
+  { scenarioId: "intruders-in-chetwood", names: ["chetwood-won", "chetwood-lost"] },
+  { scenarioId: "the-weather-hills", names: ["hills-won", "hills-lost"] },
+  { scenarioId: "deadmens-dike", names: ["dike-won", "dike-lost"] },
+  { scenarioId: "the-wastes-of-eriador", names: ["eriador-won", "eriador-lost"] },
+  { scenarioId: "escape-from-mount-gram", names: ["gram-won", "gram-lost"] },
+  { scenarioId: "across-the-ettenmoors", names: ["ettenmoors-won", "ettenmoors-lost"] },
+  { scenarioId: "the-treachery-of-rhudaur", names: ["rhudaur-won", "rhudaur-lost"] },
+  { scenarioId: "the-battle-of-carn-dum", names: ["dum-won", "dum-lost"] },
+  { scenarioId: "the-dread-realm", names: ["realm-won", "realm-lost"] },
 ] as const satisfies readonly { scenarioId: string; file?: string; names: readonly string[] }[];
 
 export type FixtureScenarioId = (typeof FIXTURE_REGISTRY)[number]["scenarioId"];

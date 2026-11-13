@@ -48,7 +48,7 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready hero (you control)
     - exhaust the picked card
-    - [json ClaimObjective {"verb":"ClaimObjective"}]
+    - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
 
 110078:A:2 (front): Action: Exhaust Gate Key and attached hero and spend 3 resources from attached hero's resource pool to look at the facedown side of a Temple of the Deceived location.
   110078:action:2: Action (cost: exhaust this card and exhaust the attached card and pay 3 resource(s) from the host's pool)
@@ -66,7 +66,7 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready hero (you control)
     - exhaust the picked card
-    - [json ClaimObjective {"verb":"ClaimObjective"}]
+    - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
 
 110078:B:3 (back): Action: Exhaust Gate Key and attached hero to look at the facedown side of a Temple of the Deceived location or secret.
   110078:action:4: Action (cost: exhaust this card and exhaust the attached card)
@@ -88,12 +88,12 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
   11197:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json KeepCampaignCard {"verb":"KeepCampaignCard"}]
-    - [json SetAside {"verb":"SetAside","code":"11180"}]
-    - [json SetAside {"verb":"SetAside","code":"11183"}]
-    - [json SetAside {"verb":"SetAside","code":"11198"}]
-    - [json SetAside {"verb":"SetAside","code":"11199"}]
-    - [json SetAside {"verb":"SetAside","code":"11199"}]
-    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"11181"}]
+    - a copy of the card with code 11180 is set aside, out of play
+    - a copy of the card with code 11183 is set aside, out of play
+    - a copy of the card with code 11198 is set aside, out of play
+    - a copy of the card with code 11199 is set aside, out of play
+    - a copy of the card with code 11199 is set aside, out of play
+    - a card with code 11181 from the box joins the encounter deck, which is shuffled
     - [json FlipSetAside {"verb":"FlipSetAside","name":"Temple Guardian"}]
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11183","to":"Captain Sahír"}]
     - [json PlaceSecrets {"verb":"PlaceSecrets","codes":["11198","11199","11199"]}]
@@ -110,8 +110,8 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
     - [json Earn {"verb":"Earn","codes":["11198"],"when":{"kind":"count","pick":{"type":"ally","control":"any","names":["Starla"]},"min":1}}]
   11197:resolution:2: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ChooseCards {"verb":"ChooseCards","codes":["11199"],"who":"firstPlayer","to":"player","when":{"kind":"island","revealed":{"code":"11199","min":1}}}]
-    - [json ChooseCards {"verb":"ChooseCards","codes":["11199"],"who":"firstPlayer","to":"player","when":{"kind":"island","revealed":{"code":"11199","min":2}}}]
+    - if [json condition {"kind":"island","revealed":{"code":"11199","min":1}}]: the first player takes "11199" for a player (shuffled into their deck)
+    - then, if [json condition {"kind":"island","revealed":{"code":"11199","min":2}}] (checked when this step runs, after the steps above; not tied to whether they did anything): the first player takes "11199" for a player (shuffled into their deck)
 
 11197:B:2 (back): Gain the following:
   11197:resolution:3: Resolution (record also names 11197:B:3)
@@ -155,8 +155,8 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
     - [json RevealIslandCorners {"verb":"RevealIslandCorners"}]
     - choose location (any player controls) chosen by the first player [also {"island":"start"}]
     - [json SetIslandActive {"verb":"SetIslandActive"}]
-    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Captain Sahír"}]
-    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Na'asiyah"}]
+    - the set-aside card titled "Captain Sahír" is put into play under the first player
+    - the set-aside card titled "Na'asiyah" is put into play under the first player
     - [json AttachGuarded {"verb":"AttachGuarded","name":"Gate Key","to":"Temple Guardian"}]
     - shuffle the encounter deck
 
@@ -168,7 +168,7 @@ Scenario piles that place cards with no record (quest: 12067 Searching the Islan
   12067:constant:2: Constant
     - this card: stat progressToStaging 1, while this card is in play
   12067:triggered:1: Triggered (mandatory, not printed as Forced) on the event progressReplaced
-    - [json PlaceProgressInStaging {"verb":"PlaceProgressInStaging"}]
+    - the first player chooses a location in the staging area that can take progress and it takes all it can of the progress left, again and again, until none is left or no location can take any more, or they keep the rest on the stage
 
 ## 12068 The Grotto's Entrance
 (the scenario deals it into the islandMap pile; the piles place it, no record does)
@@ -262,7 +262,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose ready hero (you control)
     - exhaust the picked card
-    - [json ClaimObjective {"verb":"ClaimObjective"}]
+    - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
 
 12071:A:2 (front): Action: Exhaust Gate Key and attached hero and spend 3 resources from attached hero's resource pool to look at the facedown side of a Temple of the Deceived.
   12071:action:2: Action (cost: exhaust this card and exhaust the attached card and pay 3 resource(s) from the host's pool)
@@ -367,7 +367,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 12075:A:1 (front): While engaged with a player, Faithless Desecrator contributes its Threat to the total Threat in the staging area.
   12075:constant:1: Constant
     only if this card is engaged with the player
-    - this card: stat engagedThreat 1, while this card is in play
+    - this card: stat engagedThreat (while engaged it still adds its Threat to the total Threat in the staging area) 1, while this card is in play
 
 12075:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+2 Attack instead if the active location is a Ruins location).
   12075:shadow:1: Shadow
@@ -386,8 +386,8 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
   12076:forced:1: Forced when a phase begins
     only if all of: (it is the Encounter phase) and (this card is in the staging area) and (the active location is a Ruins location (any player controls))
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json PickHighestThreat {"verb":"PickHighestThreat"}]
-    - [json SwitchActor {"verb":"SwitchActor","to":"picked"}]
+    - the player with the highest threat becomes the picked player (the first player chooses among a tie)
+    - the effect goes on with the picked player as the acting player
     - engage this card
     - [json DealShadow {"verb":"DealShadow","additional":true}]
     - [json DealShadow {"verb":"DealShadow","additional":true}]
@@ -403,7 +403,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 
 12077:A:2 (shadow): Shadow: Attacking enemy gets +3 Attack if the players control the Gate Key.
   12077:shadow:1: Shadow
-    - if the number of objective (any player controls) named "Gate Key" [also {"controlled":true}] is at least 1: the attacking enemy: stat attack 3, until the end of the attack
+    - if the number of objective (any player controls) named "Gate Key", that is claimed (attached to a character a player controls) is at least 1: the attacking enemy: stat attack 3, until the end of the attack
 
 ## 12078 Deeper into the Ruins
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -411,7 +411,7 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
 12078:A:1 (front): When Revealed: Until the end of the phase, add X Threat to the total Threat in the staging area. X is the total Threat of all locations to the left of the active location (in its row). If X is 0, Deeper into the Ruins gains Doomed 1.
   12078:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json RaiseStagingThreat {"verb":"RaiseStagingThreat","amount":{"islandLeft":true},"until":"endOfPhase","when":{"kind":"less","left":0,"right":{"islandLeft":true}}}]
+    - if 0 is less than [json amount {"islandLeft":true}]: the total Threat in the staging area is [json amount {"islandLeft":true}] higher until the end of the phase
     - [json Doomed {"verb":"Doomed","amount":1,"when":{"kind":"less","left":{"islandLeft":true},"right":1}}]
 
 ## 12079 Furious Rainstorm
@@ -460,4 +460,4 @@ RECORD NAMING NO LINE OF THIS CARD (12069:B:2)
     - then, if the active location is a Ruins location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): for each hero (any player controls) with resources on it:
       - [json DiscardResources {"verb":"DiscardResources","amount":1,"target":"picked"}]
 
-(rendered pieces: 229 by template, 78 as JSON)
+(rendered pieces: 248 by template, 64 as JSON)

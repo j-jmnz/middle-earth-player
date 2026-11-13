@@ -7,12 +7,12 @@ const sorted = (verbs: ReadonlySet<string>) => [...verbs].sort();
 
 describe("verb flags", () => {
   it("mark exactly the verbs a Shadow effect runs in a frame for", () => {
-    expect(sorted(verbsRunningInFrame())).toEqual(["AssignDamage", "Choose", "DiscardBottom", "EngageOrGrapple", "Each", "ImmediateAttack", "Pick", "Repeat", "ResolveGrapple", "ResolveWhenRevealed", "RevealEncounter", "SearchMove"].sort());
+    expect(sorted(verbsRunningInFrame())).toEqual(["AssignDamage", "Choose", "DiscardBottom", "DiscardFromDeck", "EngageOrGrapple", "Each", "ImmediateAttack", "Pick", "Repeat", "ResolveGrapple", "ResolveWhenRevealed", "ResolveWhenRevealedOf", "RevealEncounter", "SearchMove"].sort());
   });
 
   it("mark exactly the verbs that make a quest card's Setup run", () => {
-    expect(sorted(setupRunVerbs("top"))).toEqual(["AttachSetAside", "DiscardUntilAflame", "DiscardUntilEnemies", "PlaceDamageOn", "PrepareFleet", "PrepareGrottoDeck", "PrepareIslandMap", "PrepareUnchartedDeck", "ShufflePile", "TakeControlOfSetAside", "TakeLoggedCaptives"]);
-    expect(sorted(setupRunVerbs("inForEachPlayer"))).toEqual(["AttachToDial", "RevealEncounter", "SearchMove"]);
+    expect(sorted(setupRunVerbs("top"))).toEqual(["AttachSetAside", "DiscardUntilAflame", "DiscardUntilEnemies", "PlaceDamageOn", "PrepareFleet", "PrepareGrottoDeck", "PrepareIslandMap", "PrepareUnchartedDeck", "PutSetAsideInPlay", "ShufflePile", "StageRandomGuardedPair", "TakeControlOfSetAside", "TakeLoggedCaptives"]);
+    expect(sorted(setupRunVerbs("inForEachPlayer"))).toEqual(["AttachToDial", "PrepareCapturedDeck", "Reanimate", "RevealEncounter", "SearchMove"]);
     expect(sorted(setupRunVerbs("inChoose"))).toEqual(["ShuffleCopyIntoEachDeck"]);
     expect(sorted(setupRunVerbs("inEach"))).toEqual(["GuardObjective"]);
   });
@@ -22,7 +22,11 @@ describe("verb flags", () => {
   });
 
   it("mark exactly the verbs the start resolves after the quest card's Setup", () => {
-    expect(sorted(setupRoleVerbs("afterSetup"))).toEqual(["AttachSetAsideTo", "AttachToHeroWith", "FitShips", "FlipSetAside", "FlipStormcaller", "PlaceSecrets", "PutSetAsideInPlay", "PutTrust", "RaiseThreatToAttach", "SearchGuardForTreasure", "ShuffleIntoPile", "TradeDamageForThreat", "TradeShipDamage"]);
+    expect(sorted(setupRoleVerbs("afterSetup"))).toEqual(["AttachNewTo", "AttachSetAsideTo", "AttachToHeroWith", "FitShips", "FlipSetAside", "FlipStormcaller", "PlaceLoggedDamageOn", "PlaceLoggedHeroDamage", "PlaceSecrets", "PutSetAsideInPlay", "PutTrust", "RaiseThreatToAttach", "SearchGuardForTreasure", "ShuffleIntoPile", "TradeDamageForResources", "TradeDamageForThreat", "TradeShipDamage"]);
+  });
+
+  it("mark exactly the verbs the start resolves between the quest card's Setup and its When Revealed", () => {
+    expect(sorted(setupRoleVerbs("beforeReveal"))).toEqual(["CaptureFromDeck", "SetAsideCapturedBoons"]);
   });
 
   it("mark exactly the verbs that reach into the collection", () => {

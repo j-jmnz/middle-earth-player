@@ -10,7 +10,7 @@ import { loadCards } from "../load-cards.ts";
 import { RINGSDB_ORIGIN } from "../../../src/screens/images/policy.ts";
 import type { Card } from "../../../src/catalog/card-facts.ts";
 import { PDF_CACHE_DIR, PICTURE_CACHE_DIR, RAW_DIR } from "../paths.ts";
-import { MEC109_CHANGED, MEC112_CHANGED, MEC113_CHANGED, scanTargets, type ScanSide } from "../printed/scope.ts";
+import { MEC108_CHANGED, MEC109_CHANGED, MEC112_CHANGED, MEC113_CHANGED, scanTargets, type ScanSide } from "../printed/scope.ts";
 import { bytes, createLog, type Log } from "../../log.ts";
 import { combinedPin, fetchBytes, sha256, type SourceFile, type SourceRecord } from "./fetch.ts";
 import { driveFileUrl, JVZIJP_FOLDER, JVZIJP_SITE, jvzijpFile, jvzijpPictures, listDriveTree } from "./jvzijp.ts";
@@ -103,6 +103,13 @@ export function productsOfPacks(packs: readonly { code: string; name: string }[]
 
 type CardgameToolsRow = { slug: string; front: string; back: string | null };
 
+// A double-sided card is filed as `<Type>-<front title>-<back title>-<set>`; the card named by the second title is the back, a card of its own whose side A
+// is the row's back image (Protect the Innocent's back is Arnor Ravaged, a separate objective).
+function isBackTitle(row: CardgameToolsRow, name: string): boolean {
+  const titles = row.slug.split("-").map((part) => lettersOf(part));
+  return row.back != null && titles.length >= 4 && titles[2] === lettersOf(name) && titles[1] !== lettersOf(name);
+}
+
 // The image file of one side on cardgame.tools: the first printing whose product row's slug names the card.
 export function cardgameToolsFile(
   rows: ReadonlyMap<string, CardgameToolsRow>,
@@ -115,6 +122,7 @@ export function cardgameToolsFile(
     const number = printing.number == null ? null : (FILED_UNDER[`${printing.pack} ${printing.number}`] ?? printing.number);
     const row = product && number != null ? rows.get(`${product} ${number}`) : undefined;
     if (!row || !lettersOf(row.slug).includes(lettersOf(card.name))) continue;
+    if (isBackTitle(row, card.name)) return side === "A" ? row.back : null;
     return side === "A" ? row.front : row.back;
   }
   return null;
@@ -217,9 +225,9 @@ export async function syncPictures(log: Log = createLog("pictures")): Promise<So
     const card = cards.get(target.code);
     if (!card) throw new Error(`${key} is not in data/cards`);
     const page = PDF_PAGES.find((entry) => entry.code === target.code && entry.side === target.side);
-    // Each source in order of preference, as a fetch or a render. The cards MEC109, MEC112 and MEC113 reword have no picture of that printing.
+    // Each source in order of preference, as a fetch or a render. The cards MEC108, MEC109, MEC112 and MEC113 reword have no picture of that printing.
     const sources: { from: keyof typeof from; url: string; load: () => Promise<Uint8Array> }[] = [];
-    if (!MEC109_CHANGED.includes(target.code) && !MEC112_CHANGED.includes(target.code) && !MEC113_CHANGED.includes(target.code)) {
+    if (!MEC108_CHANGED.includes(target.code) && !MEC109_CHANGED.includes(target.code) && !MEC112_CHANGED.includes(target.code) && !MEC113_CHANGED.includes(target.code)) {
       const drivePicture = jvzijpFile(jvzijp, card, target.side, page ? (page.pdf === CORE_CAMPAIGN_PDF ? page.page : -1) : null);
       if (drivePicture) {
         const url = driveFileUrl(drivePicture.id);

@@ -6,10 +6,14 @@ import { releaseOrcGuard } from "../families/dungeon/guard.ts";
 import { dealtFace } from "../families/dreamchaser/facts.ts";
 import { routeDestination } from "../families/sea/routes.ts";
 import { grappledWith } from "../families/grapple/values.ts";
+import { captureOnEntry } from "../families/captured/entry.ts";
+import { rescueUnder } from "../families/captured/rescue.ts";
+import { attachmentLeaves } from "../families/angmar/reanimate/attached.ts";
+import { areaHeadOf } from "../families/breaking/areas.ts";
 import { discardedFromDeck, joinStormcallerArea } from "../families/stormcaller/zone.ts";
 import { joinUnchartedDeck, shuffleUnchartedDeck, unchartedRoute, unchartedWon } from "../families/uncharted/zone.ts";
 import { deckRoute, isDeckZone, joinPile, leavePile, type PileZone } from "./piles.ts";
-import { ORC_GUARD_CODE } from "./printed.ts";
+import { isReanimatedCode, ORC_GUARD_CODE, reanimatedBase } from "./printed.ts";
 import { flagged, heldHero, inPlay, updateCard, updateCards, withSeat } from "./state.ts";
 
 export type Destination =
@@ -29,6 +33,8 @@ export type Destination =
   | { zone: "under"; locationId: string }
   // `hostId` null: a prisoner hero, held under no card (families/prisoner.ts).
   | { zone: "captive"; hostId: string | null }
+  // Captured: out of play under `hostId`, or in the captured deck of `seat` (the card's owner by default) with no host (families/captured/pile.ts).
+  | { zone: "captured"; hostId: string | null; seat?: number }
   // Attached facedown to a location in the staging area by Grapple (families/grapple/attach.ts).
   | { zone: "grappled"; locationId: string };
 
@@ -125,6 +131,12 @@ function detach(state: ScenarioState, id: string): ScenarioState {
     case "captive":
     case "grappled":
       return updateCard(state, id, { host: null });
+    // A card of a captured deck leaves its owner's list; a card under a host just loses the host.
+    case "captured": {
+      const owner = current.host == null && current.owner != null ? state.seats[current.owner] : undefined;
+      const left = owner && current.owner != null && owner.captured?.includes(id) ? withSeat(state, current.owner, { ...owner, captured: without(owner.captured, id) }) : state;
+      return updateCard(left, id, { host: null });
+    }
     case "shadow": {
       const enemy = current.host ? state.cards[current.host] : undefined;
       if (!enemy) return state;
@@ -194,7 +206,7 @@ export function unhost(state: ScenarioState, id: string): ScenarioState {
 
 // A destination that is one of a seat's own lists.
 function seatList(dest: Destination): dest is Extract<Destination, { zone: "deck" | "hand" | "discard" | "heroes" | "play" | "engaged" | "seatStaging" }> {
-  return "seat" in dest && dest.zone !== "seatQuest" && dest.zone !== "activeLocation" && dest.zone !== "secondActiveLocation" && dest.zone !== "questStage";
+  return "seat" in dest && dest.zone !== "captured" && dest.zone !== "seatQuest" && dest.zone !== "activeLocation" && dest.zone !== "secondActiveLocation" && dest.zone !== "questStage";
 }
 
 function attach(state: ScenarioState, id: string, dest: Destination): ScenarioState {
@@ -221,6 +233,13 @@ function attach(state: ScenarioState, id: string, dest: Destination): ScenarioSt
   // Facedown under an enemy, still in play and controlled by nobody (the Ring-bearer under the Watcher in the Water).
   if (dest.zone === "captive") {
     return updateCard(state, id, { zone: "captive", host: dest.hostId, controller: null, face: "down" });
+  }
+  // Captured: out of play, facedown, controlled by nobody, its tokens gone and its owner remembered; in a captured deck (no host) the owner's list takes it (mec108.captured-cards).
+  if (dest.zone === "captured") {
+    const owner = dest.seat ?? current.owner ?? current.controller;
+    const stamped = updateCard(state, id, { zone: "captured", host: dest.hostId, controller: null, face: "down", exhausted: false, committed: false, damage: 0, progress: 0, resources: 0, ...(owner != null ? { owner } : {}) });
+    const seat = owner != null ? stamped.seats[owner] : undefined;
+    return dest.hostId == null && owner != null && seat ? withSeat(stamped, owner, { ...seat, captured: append(seat.captured ?? [], id) }) : stamped;
   }
   // Facedown on a location in the staging area, in play, not in the staging area (dcce.grapple).
   if (dest.zone === "grappled") {
@@ -319,8 +338,20 @@ function stampEntry(state: ScenarioState, id: string, from: ZoneName): ScenarioS
   return updateCard({ ...state, clock }, id, { enteredPlay: clock, damage: keeps ? now.damage : 0, progress: 0, resources: from === "setAside" ? now.resources : 0, exhausted: false, ...(keeps ? { keepsDamage: undefined } : {}) });
 }
 
-// `released`: the attachments destroyCard discarded just before the card itself (keywords.ts), named with its leaving.
-export function moveCard(state: ScenarioState, id: string, requested: Destination, released: readonly string[] = []): ScenarioState {
+export type MoveOptions = { readonly released?: readonly string[]; readonly defeated?: boolean };
+
+// `released` (option): the attachments destroyCard discarded just before the card itself (keywords.ts), named with its leaving.
+// `defeated` (option): the card is leaving because damage destroyed it; a card that holds `leavesStagingWhenDefeated` then leaves the staging area although it cannot leave it any other way (Thaurdir on stage 2B, 10126:B:1, 10126:B:3).
+export function moveCard(state: ScenarioState, id: string, requested: Destination, options: MoveOptions = {}): ScenarioState {
+  const dead = state.cards[id];
+  // A Reanimated Dead stays an enemy in an engaged row or the staging area; by any other exit it is its owner's card again, faceup in the owner's discard pile (mec108.reanimated-dead, rules/core/printed.ts DEAD_SUFFIX).
+  if (!dead || !isReanimatedCode(dead.code) || requested.zone === "engaged" || requested.zone === "staging") return moveCardTo(state, id, requested, options);
+  const seat = dead.owner ?? dead.controller ?? 0;
+  return updateCard(moveCardTo(state, id, { zone: "discard", seat }, options), id, { code: reanimatedBase(dead.code), face: "up", owner: undefined, damage: 0 });
+}
+
+function moveCardTo(state: ScenarioState, id: string, requested: Destination, options: MoveOptions): ScenarioState {
+  const { released = [], defeated = false } = options;
   const current = state.cards[id];
   if (!current) return state;
   // A temporary card leaves the game when it leaves play, whether it is defeated, returned to a hand or a deck or discarded ("If those heroes leave play, they are removed from the game", 11212:A:2).
@@ -333,13 +364,21 @@ export function moveCard(state: ScenarioState, id: string, requested: Destinatio
   // A card that cannot enter the staging area stays where it is ("Shrine to Morgoth ... cannot enter the staging area", 12094:A:1).
   if (dest.zone === "staging" && flagged(state, id, "cannotEnterStaging")) return state;
   // A card that cannot leave the staging area stays in it, whatever moves it (Uglúk, 143069:B:2).
-  if (current.zone === "staging" && dest.zone !== "staging" && flagged(state, id, "cannotLeaveStaging")) return state;
+  if (current.zone === "staging" && dest.zone !== "staging" && flagged(state, id, "cannotLeaveStaging") && !(defeated && flagged(state, id, "leavesStagingWhenDefeated"))) return state;
   const leavingPlay = current.zone === "play" || current.zone === "heroes" || current.zone === "attached";
   let next = detach(state, id);
   if ((leavingPlay || guardLeaves(current, dest)) && current.host) next = unhost(next, id);
   let moved = stampEntry(attach(next, id, dest), id, current.zone);
   // A Captive that leaves the captive zone is a Captive no more, and no seat holds it (families/captives): the discard pile it went to was read above.
   if (current.captive === true && dest.zone !== "captive") moved = updateCard(moved, id, { captive: undefined, owner: undefined, heroSlot: undefined });
+  // A captured card that leaves the zone is no one's but its owner's again (mec108.captured-cards); a card that enters play from out of play with Capture X captures (families/captured/entry.ts).
+  if (current.zone === "captured" && dest.zone !== "captured") moved = updateCard(moved, id, { owner: undefined });
+  if (moved.capture && !inPlay(current.zone) && inPlay(dest.zone)) moved = captureOnEntry(moved, id, dest);
+  // An enemy lying as an attachment (Wraith of Carn Dûm) and an attachment that takes its host with it (Possession) change as they leave that role (families/angmar/reanimate/attached.ts).
+  moved = attachmentLeaves(moved, id, current, dest, state);
+  // A host that leaves play rescues every card captured underneath it (mec108.captured-cards).
+  // A card captured with a hero that is itself put into a captured deck stays with it (the boons set aside with it, mec108.captured-deck).
+  if (moved.capture && inPlay(current.zone) && !inPlay(dest.zone) && dest.zone !== "captured") moved = rescueUnder(moved, id, areaHeadOf(state, id));
   // A card that goes from the encounter deck to its discard pile is announced in a game with ships (families/stormcaller/zone.ts).
   if (current.zone === "encounterDeck" && dest.zone === "encounterDiscard") moved = discardedFromDeck(moved, id);
   // A card shuffled back into the Uncharted deck is shuffled into it (families/uncharted/zone.ts).
@@ -353,6 +392,8 @@ export function moveCard(state: ScenarioState, id: string, requested: Destinatio
   // A player card that leaves play is announced to the abilities that hear it ("After ~ leaves play", "After a character
   // leaves play"). An encounter card's leaving is announced where it happens (stage-reveal.ts).
   if ((current.zone === "play" || current.zone === "heroes") && !inPlay(dest.zone)) moved = queueEvent(moved, { trigger: "leftPlay", seat: current.controller, cardId: id });
+  // A card that holds the sponge (Forbidden Descent, 10101:A:2) leaves play from the staging area: announced to its own Forced effect, whether it was explored there by progress or discarded.
+  if (current.zone === "staging" && !inPlay(dest.zone) && flagged(state, id, "progressSponge")) moved = queueEvent(moved, { trigger: "leftStagingArea", seat: null, cardId: id });
   // An enemy that guards a hero (Carried Away, 18074:B:2) is announced when it leaves play in any way; only a game that holds such a hero asks.
   if ((current.zone === "engaged" || current.zone === "staging") && !inPlay(dest.zone) && Object.values(moved.cards).some((card) => heldHero(card) && card.host === id)) moved = queueEvent(moved, { trigger: "leftPlay", seat: null, cardId: id });
   // A card a player card put out of play under itself "while ~ is in play" comes back to the staging area when it leaves (07003:A:3).

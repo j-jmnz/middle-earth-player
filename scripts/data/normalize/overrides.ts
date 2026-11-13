@@ -37,23 +37,27 @@ const overridesSchema = z.object({
     .array(z.object({ scenario: z.string().min(1), code: z.string().min(1), easy: z.number().int().nonnegative(), reason: z.string().min(1), source: z.string().min(1) }))
     .default([]),
   // A count the sources disagree on, settled by the printed card: the encounter set's size printed on its cards ("19/31") or a Setup line. `normal` and
-  // `easy` are the copies of the card in `pile` (the encounter deck unless named) at that difficulty, replacing the load list's.
+  // `easy` are the copies of the card in `pile` (the encounter deck unless named) at that difficulty, replacing the load list's. A `normal` of 0 drops the
+  // placement, for a card whose copies another pile holds (The Treachery of Rhudaur's Ancient Causeway: the staging pile holds both, the Setup searches the deck for them).
   scenarioCounts: z
     .array(
       z.object({
         scenario: z.string().min(1),
         code: z.string().min(1),
         pile: z.enum(PILES).optional(),
-        normal: z.number().int().positive().optional(),
+        normal: z.number().int().nonnegative().optional(),
         easy: z.number().int().nonnegative().optional(),
         reason: z.string().min(1),
         source: z.string().min(1),
       }),
     )
     .default([]),
-  // A twin pack card whose Hall of Beorn `RingsDbCardId` is another card's: the code RingsDB gives it, by Hall of Beorn's card set and collector number (The Mountain of
-  // Fire's Orc Disguise, Captains of the West and Raise the Shire).
-  hobRingsDbCodes: z.array(z.object({ set: z.string().min(1), number: z.number().int().positive(), code: z.string().regex(/^\d{5,6}$/), reason: z.string().min(1), source: z.string().min(1) })).default([]),
+  // A card whose Hall of Beorn `RingsDbCardId` is another card's: the code RingsDB gives it (or, where RingsDB lists none, a six-digit code), by Hall of Beorn's card set and collector number (The Mountain of
+  // Fire's Orc Disguise, Captains of the West and Raise the Shire). `title` names one of two cards that share a collector number (Angmar Awakened's Protect the Innocent and Arnor Ravaged, the two sides of one card).
+  hobRingsDbCodes: z.array(z.object({ set: z.string().min(1), number: z.number().int().positive(), title: z.string().min(1).optional(), code: z.string().regex(/^\d{5,6}$/), reason: z.string().min(1), source: z.string().min(1) })).default([]),
+  // A card a dealt campaign card's own text hands out, which no Setup or Resolution line of the campaign card names: the five boons Mysterious Omens (10160) offers are loaded with The Weather Hills and every later
+  // Angmar scenario that can shuffle Omens in (a copy comes from the supply when a player takes it). `code` is the card (or the cards, with one reason), `scenario` the game (or games) that load it.
+  scenarioCampaignPlaced: z.array(z.object({ scenario: z.union([z.string().min(1), z.array(z.string().min(1)).min(1)]), code: z.union([z.string().min(1), z.array(z.string().min(1)).min(1)]), reason: z.string().min(1), source: z.string().min(1) })).default([]),
   // A card Hall of Beorn's scenario list counts that the scenario does not deal: the epic multiplayer mode's cards (mec113.epic-multiplayer-mode), which are dealt by the Epic
   // Multiplayer Mode campaign card's Setup. The dealt count is checked against the rest of the list only.
   scenarioExcluded: z.array(z.object({ scenario: z.string().min(1), code: z.string().min(1), reason: z.string().min(1), source: z.string().min(1) })).default([]),

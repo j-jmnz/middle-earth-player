@@ -78,6 +78,8 @@ export const threat = (value: number, seat = 0): Expect => ({ expect: "threat", 
 export const revealedBy = (code: string, seat: number): Expect => ({ expect: "revealedBy", code, seat });
 export const lost: Expect = { expect: "lost" };
 export const won: Expect = { expect: "won" };
+/** The last stage was not defeated: the game is not won. */
+export const notWon: Expect = { expect: "notWon" };
 /** A frame of this name was pushed while the action ran. */
 export const frame = (name: string): Expect => ({ expect: "frame", name });
 /** The intent is legal now (for a card, one of its own: a Response offered after the action). */

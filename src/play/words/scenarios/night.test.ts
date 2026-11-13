@@ -7,7 +7,8 @@ import { MAIN_QUEST } from "../../../rules/families/wilderland/night.ts";
 import type { ReduceContext } from "../../../rules/interpret/interpret.ts";
 import { CODES, loadNightWorld, nightTable, type NightWorld } from "../../../../test/scenarios/fire-in-the-night/scene.ts";
 import type { ChoiceNames } from "../choice.ts";
-import { nightAsk, nightBranchWords, nightChooseNote } from "./night.ts";
+import { tableFromLayout } from "../../../../test/harness/scene-kit.ts";
+import { nightAsk, nightBranchWords, nightChooseNote, nightMainNow } from "./night.ts";
 
 let world: NightWorld;
 beforeAll(async () => {
@@ -77,5 +78,21 @@ describe("the words of Fire in the Night", () => {
     const other: Choose = { verb: "Choose", who: "actor", options: [{ id: "a", instructions: [] }, { id: "b", instructions: [] }] };
     expect(nightChooseNote(other, t.game, t.ctx, names)).toBeNull();
     expect(nightBranchWords(other, "a", names)).toBeNull();
+  });
+});
+
+describe("the words of the current-quest question where the main quest cannot be the current quest", () => {
+  it("10094:B:3 says that declining leaves no current quest, and names the main quest card where it can be chosen", () => {
+    const t = tableFromLayout("the-treachery-of-rhudaur", { stage: "10094", phase: "Quest", staging: ["10109", "10111"] });
+    const game = { ...t.state, window: { kind: "choose" as const, seat: 0, options: [], cardIds: [] } as never };
+    const note = nightChooseNote(MANY, game, t.ctx, names);
+    expect(note).toBe("Make 1 of the 2 side quests in the staging area the current quest until the end of the phase, or have no current quest this phase? Secrets of Rhudaur cannot be the current quest. Progress goes on the active location first, then on the side quest chosen; with no current quest, progress beyond the active location's quest points is discarded.");
+    const main = nightMainNow(game, t.ctx, MANY);
+    expect(main).toEqual({ name: "Secrets of Rhudaur", barred: true });
+    expect(nightBranchWords(MANY, MAIN_QUEST, names, null, { main: main! })).toBe("Have no current quest this phase");
+    const open = tableFromLayout("the-treachery-of-rhudaur", { stage: "10095", phase: "Quest", staging: ["10109"] });
+    const free = nightMainNow({ ...open.state, window: game.window }, open.ctx, MANY);
+    expect(free).toEqual({ name: "Thaurdir's Pursuit", barred: false });
+    expect(nightBranchWords(MANY, MAIN_QUEST, names, null, { main: free! })).toBe("Keep Thaurdir's Pursuit as the current quest");
   });
 });

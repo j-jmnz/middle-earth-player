@@ -74,6 +74,8 @@ export type ZoneName =
   | "modeCard"
   // The Ring-bearer, and the cards attached to it, facedown under the Watcher in the Water (mec109.stage-4): in play, controlled by nobody; the host is the Watcher.
   | "captive"
+  // Out of play, facedown, under no player's control, still owned (`CardInstance.owner`): a card captured underneath another card (the host), or in a player's captured deck (no host, listed in `Seat.captured`; mec108.captured-cards, mec108.captured-deck).
+  | "captured"
   | "grappled"; // Facedown on a location in the staging area by Grapple (dcce.grapple): in play, not in it, controlled by nobody; the host is the location.
 
 export type CardFace = "up" | "down" | "A" | "B";
@@ -126,6 +128,8 @@ export type CardInstance = {
   held?: true;
   // The damage on a card set aside "out of play (Do not remove damage tokens from it)" (Cold-Drake, 19024:A:1) stays on it as it enters play again. Set only by SetAsideInPlay with keepDamage.
   keepsDamage?: true;
+  // An enemy attached to a character as an attachment (Wraith of Carn Dûm, 101157:A:1): it has no enemy text while it lies there, hears no leaving of play, and returns to the staging area as an enemy when its host leaves play (families/angmar/reanimate/attached.ts).
+  asAttachment?: true;
   // The enemy Lost in Mirkwood's stage 4A named the nemesis, until it leaves play (18076:A:1, families/wilderland/nemesis.ts).
   nemesis?: true;
   // An objective a player claimed and attached to a hero: when it leaves that hero it returns to the staging area, uncontrolled
@@ -162,6 +166,12 @@ export type Seat = {
   // The seat's own active location while stages are separate (the card, zone activeLocation); `ScenarioState.activeLocation` and `secondActiveLocation` then mirror the
   // seats' (seat 0's and seat 1's) for code that reads them outside a seat's view (families/breaking/areas.ts). Absent in every other game.
   active?: string;
+  // This seat's captured deck, top card first (the cards in the zone `captured` with no host that this seat owns; mec108.captured-deck, families/captured/). Absent in a game with none.
+  captured?: readonly string[];
+  // The seat whose staging area and stage this seat shares after it joined that player (mec108.joining-another-player, families/captured/join.ts): its own staging, stage and active location are empty then. Absent while it has an area of its own.
+  joined?: number;
+  // The hero this seat chose to start with in Escape from Mount Gram (families/captured/deck.ts): the table's round-1 note reads its threat cost, and a hero rescued later is not it.
+  startHero?: string;
   eliminated: boolean;
   // Encounter cards attached to the top of this seat's deck, oldest first (Iron Shackles, 01105:A:1; families/dungeon.ts). Absent when none.
   deckAttached?: readonly string[];
@@ -319,6 +329,10 @@ export type ScenarioState = {
   // quest card's Setup is done (ScenarioDefinition.afterSetup).
   part?: number;
   afterSetup?: { card: string; instructions: readonly Instruction[] };
+  // The campaign Setup instructions that resolve after the quest card's Setup and before its side B's When Revealed (ScenarioDefinition.beforeReveal; Escape from Mount Gram).
+  beforeReveal?: { card: string; instructions: readonly Instruction[] };
+  // The pool cards whose Setup (AttachSelfToNamed) found no host yet and wait, set aside, for the quest card's Setup to put it into play (families/angmar/burdens.ts attachPending).
+  pendingAttach?: readonly string[];
   // The damage each card has taken this round, for a card that takes no more than a number each round (the flag `damageCap`), and the threat each seat's
   // effects have lowered this round (the flag `threatReductionCap`). Kept only in a game that has such a card; cleared as the round ends.
   roundDamage?: Readonly<Record<string, number>>;
@@ -356,8 +370,12 @@ export type ScenarioState = {
   // "seat:enemyId" for each attack a seat declared this combat phase: one per enemy (faq.limitations-on-attacks).
   declaredAttacks: readonly string[];
   pendingAttack: PendingAttack | null;
-  // The round the first player was asked whether a side quest is the current quest (families/wilderland/night.ts); kept only in a game with a side quest deck.
+  // The round the first player was asked whether a side quest is the current quest (families/wilderland/night.ts); kept only in a game with encounter side quests.
   sideAsked?: number;
+  // The game deals encounter side quests in its encounter deck, not in a side quest deck of its own (Intruders in Chetwood, mec108.side-quests): the side quest reads of families/wilderland/night-quest.ts apply. Set at the start (markSideQuests), absent in every other game.
+  sideQuests?: true;
+  // The game has a card that asks whether progress was placed on a side quest this round ("if no progress was placed on Lie Low this round", 10081:A:1): the engine notes each placement as `progressPlacedHere` (families/angmar/progress.ts). Set at the start (markProgressNoted), absent in every other game.
+  progressNoted?: true;
   pendingStrike: PendingStrike | null;
   // Events raised by code that cannot offer responses itself. settle announces them when no window is open.
   pendingEvents?: readonly GameEvent[];
@@ -423,5 +441,10 @@ export type ScenarioState = {
   embassy?: { readonly players: readonly string[]; readonly encounter: readonly string[]; readonly pairs: readonly { readonly player: string; readonly encounter: string }[]; readonly at: number };
   // The stage the quest left when it advanced to `to` past stages that were never played (AdvanceToStage, families/quest/branch.ts noteSkippedStage): "After a quest card is defeated" names it.
   stageLeft?: { to: string; from: string; bypassed?: true };
+  // Escape from Mount Gram's captured cards (families/captured/): the Capture X each card prints by code, the codes that are "in each player's staging area" and the cards of those codes now in play (`here`), the rescue the running
+  // effect made (the cards it returned to hands), and the permanent boons a hero held when it was put into the captured deck, set aside until the hero returns (boon id, hero id). Absent in every other game.
+  capture?: { x: Readonly<Record<string, number>>; everyArea: readonly string[]; here: readonly string[]; instead: readonly string[]; refresh?: true; none?: boolean };
+  rescued?: readonly string[];
+  heroBoons?: readonly (readonly [string, string])[];
   undo: UndoLog;
 };

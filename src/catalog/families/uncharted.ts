@@ -48,7 +48,7 @@ const VERBS = [
   // `to: "lastPlayer"`: the last player takes control of it instead of the first ("the last player takes control of Na'asiyah", 12092:A:1).
   // `to: "anyPlayer"`: "Put Gavin into play under any player's control" (11209:A:3): the first player chooses which player takes it (the only player takes it without being asked).
   // `to: "actor"`: the player who uses the effect takes it ("Take control of 1 set aside copy of Dol Amroth Warship", 12136:A:3).
-  verbFlags(z.strictObject({ verb: z.literal("PutSetAsideInPlay"), name: z.string().min(1), withCard: z.string().min(1).optional(), to: z.enum(["firstPlayer", "lastPlayer", "anyPlayer", "actor"]).optional(), ...when }), { setupRole: "afterSetup" }),
+  verbFlags(z.strictObject({ verb: z.literal("PutSetAsideInPlay"), name: z.string().min(1), withCard: z.string().min(1).optional(), to: z.enum(["firstPlayer", "lastPlayer", "anyPlayer", "actor"]).optional(), ...when }), { setupRole: "afterSetup", setupRuns: "top" }),
   // Campaign Setup: "Attach Spyglass to Calphon" (11179:A:2): the set-aside copy of the card with this code is attached to the card in play with that name. A card dealt on its
   // Upgraded side stays so.
   verbFlags(z.strictObject({ verb: z.literal("AttachSetAsideTo"), code: z.string().min(1), to: z.string().min(1), ...when }), { setupRole: "afterSetup" }),
@@ -68,11 +68,13 @@ const VERBS = [
   // "Then, he discards each card in his hand with a printed cost higher than that of the discarded card" (11034:A:1): from the hand of `who`, each card whose printed cost is higher
   // than that of the card DiscardBottom discarded goes to its owner's discard pile.
   z.strictObject({ verb: z.literal("DiscardCostlier"), who: who.exclude(["picked"]).optional(), ...when }),
-  // "Discard the top X cards of the encounter deck" (11073:A:1): the top `count` cards go to the encounter discard pile, face up, and are the cards the effect looked at.
-  z.strictObject({ verb: z.literal("DiscardEncounterTop"), count: positiveAmountSchema, ...when }),
+  // "Discard the top X cards of the encounter deck" (11073:A:1): the top `count` cards go to the encounter discard pile, face up, and are the cards the effect looked at. With `reset` a deck that runs out during the quest phase is reset (the discard pile shuffled into it, rr.running-out-of-cards)
+  // and the discard goes on from the new deck ("Discard the top 5 cards of the encounter deck", 10097:A:1; faq.last-encounter-card).
+  z.strictObject({ verb: z.literal("DiscardEncounterTop"), count: positiveAmountSchema, reset: z.literal(true).optional(), ...when }),
   // "Each player adds an Undead enemy discarded by this effect to the staging area" (11073:A:1): in player order, each player adds one card of this trait and type among the
-  // cards DiscardEncounterTop discarded and that are still in the encounter discard pile, choosing among them (`seat` is engine use: the player adding now).
-  z.strictObject({ verb: z.literal("StageLooked"), trait: z.string().min(1), type: z.enum(["enemy"]), seat: z.number().int().min(0).optional(), ...when }),
+  // cards DiscardEncounterTop discarded and that are still in the encounter discard pile, choosing among them (`seat` is engine use: the player adding now). With `own` only the actor adds one, among the cards the actor's own discard looked at ("each player discards ... and chooses an Undead
+  // enemy he discarded in this way", 10097:A:1: run inside ForEachPlayer).
+  z.strictObject({ verb: z.literal("StageLooked"), trait: z.string().min(1), type: z.enum(["enemy"]), own: z.literal(true).optional(), seat: z.number().int().min(0).optional(), ...when }),
   // "Each player must exhaust a character he controls" (11033:A:1): in player order, each player chooses one of the ready characters they control to exhaust, the card choosing
   // for itself when there is one; a player with none exhausts nothing (`seat` is engine use: the player exhausting now).
   z.strictObject({ verb: z.literal("EachExhaustsOne"), seat: z.number().int().min(0).optional(), ...when }),

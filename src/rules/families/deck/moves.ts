@@ -13,6 +13,8 @@ import { matchesPick } from "../../interpret/pick.ts";
 import { lastPicked, pickedList, putOnDeck, seatOf } from "../../interpret/player-verbs.ts";
 import { cardTypeOf, isPlayerType, printedOf } from "../../core/printed.ts";
 import { queueEvent } from "../../windows/queue.ts";
+import { discardLockedFor } from "../angmar/lock.ts";
+import { announceTopDiscard } from "./pressure.ts";
 import { shuffleIds } from "../../core/seed.ts";
 import type { CardInstance, EffectData, ScenarioState } from "../../core/state.ts";
 import { inPlay, updateCard, withSeat } from "../../core/state.ts";
@@ -123,7 +125,8 @@ export function swapPicked(state: ScenarioState): ScenarioState {
 }
 
 // ShuffleDiscardIntoDeck: the player's discard pile goes into their deck, which is shuffled.
-export function shuffleDiscardIn(state: ScenarioState, instruction: Verb<"ShuffleDiscardIntoDeck">, focus: Focus): ScenarioState {
+export function shuffleDiscardIn(state: ScenarioState, instruction: Verb<"ShuffleDiscardIntoDeck">, focus: Focus, ctx: ReduceContext): ScenarioState {
+  if (discardLockedFor(state, focus.sourceId, ctx)) return state;
   const seat = instruction.who === "picked" ? seatOf(lastPicked(state)) : focus.seat;
   if (seat == null || !state.seats[seat]) return state;
   let next = state;
@@ -148,7 +151,7 @@ export function discardFromDeck(state: ScenarioState, instruction: Verb<"Discard
   let next = instruction.shuffle ? shuffleSeatDeck(state, focus.seat) : state;
   const top = (next.seats[focus.seat]?.deck ?? []).slice(0, Math.max(0, amount));
   for (const id of top) next = queueEvent(moveCard(next, id, { zone: "discard", seat: focus.seat }), { trigger: "discardedFromDeck", seat: focus.seat, cardId: id });
-  next = patchData(next, { looked: top });
+  next = announceTopDiscard(patchData(next, { looked: top, discardedFromDecks: [...(effectData(next)?.discardedFromDecks ?? []), ...top] }), focus.seat, top.length, ctx);
   const count = instruction.count;
   if (!count) return next;
   const at = { seat: focus.seat, sourceId: focus.sourceId, counting: true, ...(scope.x != null ? { x: scope.x } : {}) };

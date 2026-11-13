@@ -7,6 +7,7 @@ import type { CardInstance } from "../../rules/core/state.ts";
 
 
 import { dungeonDetail } from "./dungeon-preview.ts";
+import { deadPreview } from "./realm-preview.ts";
 import { earlierStages, heldStage } from "./earlier-stages.ts";
 import { grappleDetail, shipLoss } from "../words/scenarios/grapple.ts";
 import { oathDetail } from "./oath-preview.ts";
@@ -95,6 +96,9 @@ export function previewCards(
     const refusal = id === cardId ? chosen(id) : null;
     const note = id === cardId ? (whyNotPlayable(game, ctx, id, cardName) ?? refusal) : null;
     // A look at the facedown side of a Lost Island shows the real side (dcce.uncharted); the card on the table keeps lying on its Lost Island side.
+    // A Reanimated Dead is a facedown card: the preview says what it is and whose card it is on paper, never its face, and offers no Details (which would open the card behind it).
+    const dead = deadPreview(game, ctx, id, cardName);
+    if (dead) return [{ code: card.code, name: dead.name, source: null, text: dead.text, ...(tokenLines(card).length > 0 ? { tokens: tokenLines(card) } : {}), effects, ...(role ? { role } : {}), ...(note ? { note } : {}), faceless: true }];
     const looked = game.window?.kind === "look" && game.window.side === "A" && game.window.cardIds.includes(id);
     const described = describe(card.code, looked ? card.code : pictureKey(card));
     const lostIsland = !looked && isLostIsland(card, ctx);

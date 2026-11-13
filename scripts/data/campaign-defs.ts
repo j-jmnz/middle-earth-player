@@ -86,10 +86,14 @@ export type ProductDef = {
   // The product reprints cards of the Adventure Packs with a Campaign Mode only or Upgraded side (the Dream-chaser Campaign Expansion): a campaign
   // game deals the reprint (scripts/data/normalize/reprints.ts).
   campaignReprints?: boolean;
+  // The product's name in Hall of Beorn's Scenarios.json where it differs from its card set's name (Angmar Awakened's Treachery of Rhudaur: the card set is "The Treachery of Rhudaur"):
+  // the sync snapshots the scenario files of a campaign's products by it, and the campaign index counts them by it.
+  scenarioProduct?: string;
 };
 
 const DCCE = "Dream-chaser Campaign Expansion";
 const EMCE = "Ered Mithrin Campaign Expansion";
+const AACE = "Angmar Awakened Campaign Expansion";
 
 export const PRODUCTS: readonly ProductDef[] = [
   { name: "The Black Riders", packs: ["TFotR"], home: "fellowship-of-the-ring", load: "dragncards", easySheet: false, twinPack: "TBR", reprint: FELLOWSHIP_REPRINT },
@@ -120,6 +124,15 @@ export const PRODUCTS: readonly ProductDef[] = [
   { name: "Mount Gundabad", packs: ["MG"], home: "ered-mithrin", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
   { name: "The Fate of Wilderland", packs: ["TFoW"], home: "ered-mithrin", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
   { name: EMCE, packs: ["EMCE"], home: "ered-mithrin", load: "dragncards", easySheet: false, twinPack: null, campaignExpansion: true, campaignCardRewards: true, ledgerKeywords: true },
+  // Angmar Awakened: The Lost Realm and the six Adventure Packs of the cycle are the base cards, the Campaign Expansion (MEC108) the campaign.
+  { name: "The Lost Realm", packs: ["TLR"], home: "angmar-awakened", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
+  { name: "The Wastes of Eriador", packs: ["WoE"], home: "angmar-awakened", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
+  { name: "Escape from Mount Gram", packs: ["EfMG"], home: "angmar-awakened", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
+  { name: "Across the Ettenmoors", packs: ["AtE"], home: "angmar-awakened", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
+  { name: "The Treachery of Rhudaur", packs: ["ToR"], home: "angmar-awakened", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true, scenarioProduct: "Treachery of Rhudaur" },
+  { name: "The Battle of Carn Dûm", packs: ["BoCD"], home: "angmar-awakened", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
+  { name: "The Dread Realm", packs: ["TDR"], home: "angmar-awakened", load: "dragncards", easySheet: false, twinPack: null, ledgerKeywords: true },
+  { name: AACE, packs: ["AACE"], home: "angmar-awakened", load: "dragncards", easySheet: false, twinPack: null, campaignExpansion: true, campaignCardRewards: true, ledgerKeywords: true },
 ];
 
 // Every saga box's reprint, once each, in campaign order.
@@ -180,6 +193,11 @@ function dreamChaser(n: number, id: string, product: string, groups: Readonly<Re
 // An Ered Mithrin scenario: its box, the Campaign Expansion's campaign card, and the DragnCards decks (Q08.n / E08.n).
 function eredMithrin(n: number, id: string, product: string, groups: Readonly<Record<string, Pile>> = {}): ScenarioDef {
   return { id, product, campaignProduct: EMCE, setupSpan: `emce.setup-${id}`, deck: { normal: `Q08.${n}`, easy: `E08.${n}` }, groups, takeControlFaceup: true };
+}
+
+// An Angmar Awakened scenario: its box, the Campaign Expansion's campaign card, and the DragnCards decks (Q05.n / E05.n).
+function angmarAwakened(n: number, id: string, product: string, groups: Readonly<Record<string, Pile>> = {}): ScenarioDef {
+  return { id, product, campaignProduct: AACE, setupSpan: `mec108.setup-${id}`, deck: { normal: `Q05.${n}`, easy: `E05.${n}` }, groups };
 }
 
 // A saga scenario (The Two Towers, The Return of the King): its box's product, the quest card's setup span in the saga's booklet (`mec112`, `mec113`) and, where the Setup
@@ -290,6 +308,27 @@ export const CAMPAIGNS: readonly CampaignDef[] = [
     ledger: "ered-mithrin",
   },
   {
+    id: "angmar-awakened",
+    name: "Angmar Awakened",
+    released: "2022-08-19",
+    products: ["The Lost Realm", "The Wastes of Eriador", "Escape from Mount Gram", "Across the Ettenmoors", "The Treachery of Rhudaur", "The Battle of Carn Dûm", "The Dread Realm", AACE],
+    scenarios: [
+      angmarAwakened(1, "intruders-in-chetwood", "The Lost Realm", { player1Play1: "setAside" }),
+      angmarAwakened(2, "the-weather-hills", "The Lost Realm", { sharedEncounterDeck2: "angmarOrcDeck" }),
+      angmarAwakened(3, "deadmens-dike", "The Lost Realm", { player1Play1: "setAside" }),
+      angmarAwakened(4, "the-wastes-of-eriador", "The Wastes of Eriador"),
+      angmarAwakened(5, "escape-from-mount-gram", "Escape from Mount Gram", { sharedEncounterDeck2: "encounterDeck2" }),
+      angmarAwakened(6, "across-the-ettenmoors", "Across the Ettenmoors", { player1Play1: "setAside" }),
+      angmarAwakened(7, "the-treachery-of-rhudaur", "The Treachery of Rhudaur", { player1Play1: "setAside" }),
+      angmarAwakened(8, "the-battle-of-carn-dum", "The Battle of Carn Dûm"),
+      angmarAwakened(9, "the-dread-realm", "The Dread Realm"),
+    ],
+    bookletId: "angmar-awakened",
+    bookletDoc: "mec108",
+    saga: false,
+    ledger: "angmar-awakened",
+  },
+  {
     id: "the-two-towers",
     name: "The Two Towers",
     released: "2023-10-06",
@@ -339,7 +378,11 @@ for (const campaign of CAMPAIGNS) {
 }
 
 // Every Hall of Beorn product some campaign is built from: what the sync snapshots scenario files for.
-export const BUILT_PRODUCTS: ReadonlySet<string> = new Set(CAMPAIGNS.flatMap((campaign) => campaign.products));
+// (Hall of Beorn's own name for each: a product lists its scenarios in Scenarios.json under `scenarioProduct` where that differs from the card set.)
+export function scenarioProductOf(name: string): string {
+  return productOf(name).scenarioProduct ?? name;
+}
+export const BUILT_SCENARIO_PRODUCTS: ReadonlySet<string> = new Set(CAMPAIGNS.flatMap((campaign) => campaign.products.map(scenarioProductOf)));
 
 // Hall of Beorn lists a scenario as "Passage Through Mirkwood (Campaign)" when it is the campaign-mode edition of a box
 // that also prints a Nightmare or standalone scenario. The suffix is not part of the scenario's name.

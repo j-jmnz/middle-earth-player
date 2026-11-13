@@ -19,6 +19,7 @@ import { feedsDiscard, pickCandidates } from "./pick.ts";
 import { barredFromPlayerDiscard } from "../families/wilderland/pick.ts";
 import type { CancelOffer, EffectData, Frame, FrameName, QueueItem, ScenarioState } from "../core/state.ts";
 import { livingSeats, withSeat } from "../core/state.ts";
+import { sharing } from "../families/breaking/areas.ts";
 import { offerResponses } from "../windows/responses.ts";
 import { holdsNow } from "./verbs.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "../windows/windows.ts";
@@ -53,6 +54,9 @@ export type EffectSpec = {
   dealt?: number;
   // The damage an attack sent on past its defender (excessToShip).
   excess?: number;
+  // The ally that attack destroyed, for the copies search of 10137:A:2.
+  destroyedAlly?: string;
+  destroyedCharacter?: string;
   hold?: string;
   // Why the instructions run: the effect record and its printed line. `causes` names one per instruction when several
   // records share a frame.
@@ -86,6 +90,8 @@ export function pushEffectFrame(state: ScenarioState, spec: EffectSpec, steps: E
     ...(spec.other ? { other: spec.other } : {}),
     ...(spec.dealt != null ? { dealt: spec.dealt } : {}),
     ...(spec.excess != null ? { excess: spec.excess } : {}),
+    ...(spec.destroyedAlly ? { destroyedAlly: spec.destroyedAlly } : {}),
+    ...(spec.destroyedCharacter ? { destroyedCharacter: spec.destroyedCharacter } : {}),
     ...(spec.hold ? { hold: spec.hold } : {}),
   };
   return pushFrame(state, { frame: spec.frame, cardId: spec.sourceId, seat: spec.actor, peril: spec.peril, data }, steps);
@@ -212,7 +218,7 @@ function runItemNow(
     case "Choose":
       return openBranch(state, item, returned, ctx);
     case "ForEachPlayer":
-      return expandPlayers(state, instruction, item.cause);
+      return expandPlayers(state, item, instruction, item.cause);
     case "Each":
       return expandEach(state, item, frame, ctx);
     case "Repeat":
@@ -222,7 +228,7 @@ function runItemNow(
     case "HideTest":
       return pushHide(state, { cardId: frame.cardId, seat: item.seat, peril: frame.peril }, instruction.x, steps);
     case "ImmediateAttack":
-      return instruction.afterThis ? attackAfterThis(state, frame.cardId, steps) : immediateAttack(state, frame.cardId, item.seat, ctx, steps, instruction.shadow !== false);
+      return instruction.afterThis ? attackAfterThis(state, frame.cardId, steps) : immediateAttack(state, frame.cardId, item.seat, ctx, steps, { shadow: instruction.shadow !== false, keep: instruction.keepShadows === true });
     case "ReadyHero":
     case "BarAttack":
     case "PlaceProgressOnLocation":
@@ -251,12 +257,14 @@ function runItemNow(
 
 function expandPlayers(
   state: ScenarioState,
+  item: QueueItem,
   instruction: Extract<Instruction, { verb: "ForEachPlayer" }>,
   cause: Cause | undefined,
 ): ScenarioState {
   const data = topFrame(state)?.data;
   if (data?.kind !== "effect") return state;
-  const seats = livingSeats(state);
+  // The players sharing the acting player's staging area when areas are joined (families/captured/); every living player otherwise.
+  const seats = state.capture && state.separate ? sharing(state, item.seat) : livingSeats(state);
   const ordered = instruction.order === "lastFirst" ? [...seats].reverse() : seats;
   const expanded = ordered.flatMap((seat) =>
     instruction.instructions.map((entry): QueueItem => ({ instruction: entry, seat, chosen: null, ...(cause ? { cause } : {}) })),
@@ -319,20 +327,21 @@ function attackAfterThis(state: ScenarioState, sourceId: string | null, steps: E
   return { ...state, pendingAttack: { ...attack, after: [...(attack.after ?? []), { verb: "ImmediateAttack" }], afterCause: currentCause(steps, UNATTRIBUTED) } };
 }
 
-// The enemy attacks the player it is engaged with, and the frame waits for the defense window.
-function immediateAttack(state: ScenarioState, sourceId: string | null, seat: number, ctx: ReduceContext, steps: EngineStep[], shadow = true): ScenarioState {
+// The enemy attacks the player it is engaged with, and the frame waits for the defense window. `shadow`: a shadow card is dealt for the attack (the default); `keep`: with none dealt, the shadow cards the enemy holds stay.
+function immediateAttack(state: ScenarioState, sourceId: string | null, seat: number, ctx: ReduceContext, steps: EngineStep[], options: { readonly shadow?: boolean; readonly keep?: boolean } = {}): ScenarioState {
+  const { shadow = true, keep = false } = options;
   const enemy = sourceId ? state.cards[sourceId] : undefined;
   // An enemy that attacked from the staging area (the Balrog, the Watcher in the Water, Uruk from Mordor, a Storm of Howls attacker) makes the
   // additional attack its shadow grants against the same player, dealt a shadow card of its own ("Attacking enemy makes an additional attack
   // after this one", data/printed/fellowship-of-the-ring.json 142047:A:2, 141072:A:2).
   if (sourceId && enemy?.zone === "staging") {
     if (attackBarred(state, sourceId, seat) || state.seats[seat]?.eliminated) return state;
-    const stagedBegun = beginEnemyAttack(shadow ? dealForAttack(state, sourceId, steps) : discardShadowOf(state, sourceId), seat, sourceId, ctx, steps, { fromStaging: true });
+    const stagedBegun = beginEnemyAttack(shadow ? dealForAttack(state, sourceId, steps, ctx) : keep ? state : discardShadowOf(state, sourceId), seat, sourceId, ctx, steps, { fromStaging: true });
     return stagedBegun.pendingAttack ? { ...stagedBegun, pendingAttack: { ...stagedBegun.pendingAttack, immediate: true } } : stagedBegun;
   }
   if (!sourceId || enemy?.zone !== "engaged" || enemy.controller == null) return state;
   // An attack an effect makes is dealt a shadow card of its own (families/defense/listen.ts), unless the card says it is not (`shadow: false`, 18022:A:1).
-  const dealt = shadow ? dealAttackShadow(state, sourceId, ctx, steps) : discardShadowOf(state, sourceId);
+  const dealt = shadow ? dealAttackShadow(state, sourceId, ctx, steps) : keep ? state : discardShadowOf(state, sourceId);
   const begun = beginEnemyAttack(dealt, enemy.controller, sourceId, ctx, steps);
   if (!begun.pendingAttack) return begun;
   return { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true } };

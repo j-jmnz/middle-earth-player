@@ -63,9 +63,9 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
   146028:forced:1: Forced after a card leaves play
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the encounter discard pile into the encounter deck
-    - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy"}]
+    - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
     - for each player, first player first:
-      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"engaged","when":{"kind":"all","conditions":[{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"},"inPlay":false},{"kind":"firstPlayer"}]}}]
+      - if all of: (the picked card is a enemy (any player controls) that is out of play now) and (the actor holds the first player token): the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
 
 ## 146029 Reeking Moat
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -132,7 +132,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 
 146033:A:2 (front): Forced: After Gorgoroth Hill-troll attacks and destroys a character, the defending player discards a random card from his hand and raises his threat by that card's printed cost.
   146033:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
-    only if the event's other card is a enemy (any player controls) [also {"isSource":true}]
+    only if the event's other card is a enemy (any player controls) that is this card itself
     (steps run in order; a step depends on an earlier one only through its own condition)
     - the acting player discards 1 random card(s) from hand (the last card discarded becomes the picked card)
     - raise threat by printed cost of the picked card (the acting player)
@@ -152,8 +152,8 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 146034:A:3 (shadow): Shadow: After this attack, attacking enemy engages the next player then makes an attack.
   146034:shadow:1: Shadow
     - when the attack in progress ends:
-      - [json EngageNextPlayer {"verb":"EngageNextPlayer","when":{"kind":"otherPlayer"}}]
-      - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+      - if another player is still in the game: the attacking enemy engages the next player
+      - then, if another player is still in the game (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy makes an immediate attack against the player it just engaged, dealt a new shadow card after its old ones are discarded
 
 ## 146035 Warrior of Rhûn
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -165,7 +165,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
   146035:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a character (you control) committed to the quest to choose: choose character (you control) committed to the quest
-    - [json RemoveFromQuest {"verb":"RemoveFromQuest","when":{"kind":"canPick","pick":{"type":"character","control":"you","committed":true}}}]
+    - then, if there is a character (you control) committed to the quest to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the last picked character is removed from the quest (it stays exhausted)
 
 146035:A:3 (shadow): Shadow: Defending character cannot ready until the end of the round.
   146035:shadow:1: Shadow
@@ -180,14 +180,14 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 146036:A:2 (front): When Revealed: Either search the encounter deck, discard pile, and victory display for a Nazgûl enemy and add it to the staging area, or attach Hell-hawk to a Nazgûl enemy in play. (Counts as a Mount attachment with the text: "Limit 1 per enemy. Attached enemy gets +2 Threat, +2 Attack, +2 Defense and is immune to player card effects.")
   146036:whenRevealed:1: When revealed
     - the acting player chooses one of:
-      * option "search" (only if [json condition {"kind":"searchable","trait":"Nazgûl","type":"enemy","victory":true}]):
-        - [json SearchMove {"verb":"SearchMove","trait":"Nazgûl","type":"enemy","to":"staging","victory":true}]
-      * option "attach" (only if there is a Nazgûl enemy (any player controls) or in the staging area [also {"hasAttachment":{"names":["Hell-hawk","Fell Beast"],"none":true}}] to choose):
-        - choose Nazgûl enemy (any player controls) or in the staging area [also {"hasAttachment":{"names":["Hell-hawk","Fell Beast"],"none":true}}]
-        - [json AttachSelfToPicked {"verb":"AttachSelfToPicked"}]
+      * option "search" (only if the encounter deck or its discard pile holds a Nazgûl enemy (the victory display too)):
+        - the acting player finds one Nazgûl enemy in the encounter deck or its discard pile or the victory display and adds it to the staging area (it is not revealed)
+      * option "attach" (only if there is a Nazgûl enemy (any player controls) or in the staging area, with no attachment named "Hell-hawk" or "Fell Beast" to choose):
+        - choose Nazgûl enemy (any player controls) or in the staging area, with no attachment named "Hell-hawk" or "Fell Beast"
+        - this card attaches to the picked card (nowhere if that card carries one of its title already)
   146036:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Mount"}]
+    - this card counts as a Mount attachment while it is attached
     - its host: stat threat 2, while this card is in play
     - its host: stat attack 2, while this card is in play
     - its host: stat defense 2, while this card is in play
@@ -220,7 +220,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
 
 146038:A:1 (front): When Revealed: Each player assigns X damage among characters he controls, where X is the number of resources on The Black Gate.
   146038:whenRevealed:1: When revealed
-    - [json AssignDamage {"verb":"AssignDamage","amount":{"stat":"resources","ofNamed":"The Black Gate"},"pick":{"type":"character","control":"you"},"who":"eachSeat"}]
+    - each player assigns resources of "The Black Gate" damage among the character (you control), one at a time
 
 146038:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack for each resource on The Black Gate.
   146038:shadow:1: Shadow
@@ -261,7 +261,7 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a non-unique enemy (any player controls) in the staging area only, chosen by the first player to choose: choose non-unique enemy (any player controls) in the staging area only, chosen by the first player
     - then, if there is a non-unique enemy (any player controls) in the staging area only, chosen by the first player to choose (checked when this step runs, after the steps above; not tied to whether they did anything): engage the picked card
-    - [json DealShadowTo {"verb":"DealShadowTo","target":"picked","when":{"kind":"canPick","pick":{"type":"enemy","control":"any","stagingOnly":true,"nonUnique":true,"who":"firstPlayer"}}}]
+    - then, if there is a non-unique enemy (any player controls) in the staging area only, chosen by the first player to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is dealt a shadow card
 
 ## 146041 Gwaihir
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -318,8 +318,8 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
   146073:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","traits":["Orc","Troll","Nazgûl"],"type":"enemy","to":"staging","different":true}]
-    - [json ShuffleSetAsideIntoEncounterDeck {"verb":"ShuffleSetAsideIntoEncounterDeck","code":"146041"}]
+      - the acting player finds one Orc or Troll or Nazgûl enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"different":true}]
+    - one set-aside copy of the card with code 146041 is shuffled into the encounter deck (nothing with none set aside)
 
 146073:B:1 (back): Dire. During the staging step, the first player does not reveal an encounter card as normal. Instead, he reveals 1 encounter card for each resource on The Black Gate.
   (the keyword part is owned by the card's keywords; the records cover: During the staging step, the first player does not reveal an encounter card as normal. Instead, he reveals 1 encounter card for each resource on The Black Gate.)
@@ -336,4 +336,4 @@ Scenario piles that place cards with no record (quest: 146072 Embassy from the D
   146073:constant:2: Constant
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 182 by template, 39 as JSON)
+(rendered pieces: 207 by template, 25 as JSON)

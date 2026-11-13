@@ -240,6 +240,51 @@ describe("Ered Mithrin spans", () => {
   });
 });
 
+// Angmar Awakened (phase 77): the Angmar Awakened Campaign Expansion rulebook (MEC108) is the document `mec108`.
+describe("Angmar Awakened spans", () => {
+  const text = (id: string) => (byId.get(id)?.text ?? "").replace(/\s+/g, " ");
+  const SCENARIOS = ["intruders-in-chetwood", "the-weather-hills", "deadmens-dike", "the-wastes-of-eriador", "escape-from-mount-gram", "across-the-ettenmoors", "the-treachery-of-rhudaur", "the-battle-of-carn-dum", "the-dread-realm"];
+
+  it("pin the rulebook as a document of 28 pages with a span for each rule the plan names", () => {
+    expect(docs.get("mec108")?.pages.length).toBe(28);
+    for (const id of [
+      ...SCENARIOS.map((scenario) => `mec108.setup-${scenario}`),
+      ...SCENARIOS.map((scenario) => `mec108.campaign-setup-${scenario}`),
+      ...["campaign-mode", "battle", "immune", "indestructible", "objective-allies", "time-x", "side-quests", "side-quests-in-play", "orc-deck", "day-and-night", "captured-deck", "capture-x", "captured-cards", "create-staging-area", "joining-another-player", "objective-locations", "safe", "the-investigation", "thaurdir", "reanimated-dead", "campaign-log", "campaign-log-tracking"].map((rule) => `mec108.${rule}`),
+    ]) {
+      expect(byId.has(id), id).toBe(true);
+    }
+  });
+
+  it("print each scenario's encounter-deck paragraph, the set lists the build checks the cards against", () => {
+    expect(text("mec108.setup-intruders-in-chetwood")).toContain("Intruders in Chetwood, Iârion, Eriador Wilds, and Angmar Orcs");
+    expect(text("mec108.setup-the-weather-hills")).toContain("The Weather Hills, Angmar Orcs, Foul Weather, and Ruins of Arnor");
+    expect(text("mec108.setup-deadmens-dike")).toContain("Deadmen’s Dike, Iârion, Dark Sorcery, and Cursed Dead");
+    expect(text("mec108.setup-the-wastes-of-eriador")).toContain("Amarthiúl, The Wastes of Eriador, Eriador Wilds, and Foul Weather");
+    expect(text("mec108.setup-escape-from-mount-gram")).toContain("Escape from Mount Gram and Angmar Orcs");
+    expect(text("mec108.setup-across-the-ettenmoors")).toContain("Amarthiúl, Across the Ettenmoors, Eriador Wilds, and Foul Weather");
+    expect(text("mec108.setup-the-treachery-of-rhudaur")).toContain("Amarthiúl, The Treachery of Rhudaur, Cursed Dead, and Ruins of Arnor");
+    expect(text("mec108.setup-the-battle-of-carn-dum")).toContain("The Battle of Carn Dûm, Angmar Orcs, and Dark Sorcery");
+    expect(text("mec108.setup-the-dread-realm")).toContain("The Dread Realm, Cursed Dead, and Dark Sorcery");
+  });
+
+  it("hold the keyword and scenario rules as the rulebook words them", () => {
+    expect(text("mec108.campaign-mode")).toContain("the Amarthiúl hero cannot be used until indicated by a campaign card.");
+    expect(text("mec108.battle")).toContain("those characters count their total [attack] instead of their total [willpower]");
+    expect(text("mec108.time-x")).toContain("At the end of each refresh phase, remove one time counter from each card with the Time X keyword");
+    expect(text("mec108.objective-allies")).toContain("If this character leaves play, the players lose the game.");
+    expect(text("mec108.side-quests-in-play")).toContain("Progress must still be placed on the active location before it can be placed on a side quest.");
+    expect(text("mec108.orc-deck")).toContain("remove each enemy card with the Angmar Orcs encounter set icon, as well as all copies of Concealed Orc-camp");
+    expect(text("mec108.captured-deck")).toContain("remove all allies, Item attachments, Mount attachments, and Artifact attachments from a player’s deck");
+    expect(text("mec108.capture-x")).toContain("each player takes the top X cards of their captured deck");
+    expect(text("mec108.joining-another-player")).toContain("If there is no player to join, then players must continue to stage 3.");
+    expect(text("mec108.safe")).toContain("immediately return all engaged enemies to the staging area");
+    expect(text("mec108.thaurdir")).toContain("Thaurdir cannot be placed or shuffled into the encounter deck for any reason.");
+    expect(text("mec108.reanimated-dead")).toContain("act as if they are Undead enemy cards with 0 engagement cost");
+    expect(text("mec108.campaign-log")).toContain("The Dread Realm");
+  });
+});
+
 // The Two Towers (MEC112): the hand-checked spans its scenario data reads (data/rules/columns.json: the rulebook's art-overlaid pages 3 to 5 are read in boxes that skip the card pictures' captions).
 describe("The Two Towers spans", () => {
   const text = (id: string) => (byId.get(id)?.text ?? "").replace(/\s+/g, " ");

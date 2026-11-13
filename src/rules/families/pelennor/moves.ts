@@ -8,7 +8,7 @@ import type { ScenarioState } from "../../core/state.ts";
 import { inPlay, updateCard } from "../../core/state.ts";
 import { attachTo, moveCard, shadowCards } from "../../core/zones.ts";
 import { hasTrait } from "../../interpret/conditions.ts";
-import type { ReduceContext } from "../../interpret/interpret.ts";
+import { dealOneShadow, type ReduceContext } from "../../interpret/interpret.ts";
 import { effectData, moveEncounter } from "../encounter/moves.ts";
 import type { Focus } from "../index.ts";
 
@@ -17,7 +17,9 @@ type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name 
 /** PutTopmostFromEncounterDiscard: the last card put on the encounter discard pile that is of the type and has the trait enters play engaged with the actor. */
 export function putTopmostFromEncounterDiscard(state: ScenarioState, instruction: Verb<"PutTopmostFromEncounterDiscard">, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const id = [...state.encounterDiscard].reverse().find((candidate) => state.cards[candidate] != null && printedOf(ctx.cards, state.cards[candidate]!.code).type === instruction.type && hasTrait(state, candidate, instruction.trait, ctx));
-  return id ? moveEncounter(state, id, "engaged", focus.seat, ctx, steps) : state;
+  if (!id) return state;
+  const engaged = moveEncounter(state, id, "engaged", focus.seat, ctx, steps);
+  return instruction.dealShadow === true ? dealOneShadow(engaged, id, steps, ctx) : engaged;
 }
 
 /** EngageShadowCard: the shadow card the source is (an enemy) leaves the enemy it was dealt to and engages the player that enemy attacks. */

@@ -50,6 +50,7 @@ export type Expect =
   | { expect: "revealedBy"; code: string; seat: number }
   | { expect: "lost" }
   | { expect: "won" }
+  | { expect: "notWon" }
   | { expect: "frame"; name: string }
   | { expect: "offers"; intent: PlayerIntent["type"]; code?: string };
 

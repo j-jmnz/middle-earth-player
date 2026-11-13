@@ -8,7 +8,9 @@ import type { EngineStep } from "../../core/intents.ts";
 import { reduce, type ScenarioState } from "../../engine/reduce.ts";
 import { pushCardEffects } from "../../interpret/effect-frames.ts";
 import { stagingThreat } from "../../quest/quest.ts";
-import { areaOf, sharedStaging, stageOf, stagingOf, viewOf } from "./areas.ts";
+import { areaOf, areaSeats, headOf, sharedStaging, stageOf, stagingOf, viewOf } from "./areas.ts";
+import { clearEliminated } from "../../core/eliminate.ts";
+import { withSeat } from "../../core/state.ts";
 import { moveCard } from "../../core/zones.ts";
 import { causeProblems } from "../../../../test/harness/cause-check.ts";
 import { DIVIDED, FRODOS_CHOICE, SEAT_OF_SEEING, codes, loadBreakingWorld, makeBreaking, recordOf, settled, type BreakingLayout, type BreakingTable, type BreakingWorld } from "../../../../test/scenarios/breaking-of-the-fellowship/scene.ts";
@@ -178,5 +180,37 @@ describe("the state helpers", () => {
     const past = moveCard(split.state, stage, { zone: "setAside" });
     expect(past.seats[1].stage).toBeUndefined();
     expect(past.seats[0].stage).toBe(split.state.seats[0].stage);
+  });
+});
+
+describe("an area whose head is eliminated (mec108.joining-another-player, rr.player-elimination)", () => {
+  it("passes to the seat that joined it, with its staging cards, active location and stage, instead of stranding that seat", () => {
+    const split = make({ seats: 2, stage: "separate", staging: [], areas: [["grunt"], ["scout", "brute"]] });
+    const state = split.state;
+    // Seat 0 joined seat 1 (its own area is empty); seat 1 reaches the elimination level.
+    const { stage: _stage, ...own } = state.seats[0];
+    const joined = withSeat(withSeat(state, 0, { ...own, staging: [], joined: 1 }), 1, { ...state.seats[1], threat: 50, eliminated: true });
+    const area = joined.seats[1];
+    const after = clearEliminated(joined, world.cards);
+    expect(headOf(after, 0)).toBe(0);
+    expect(after.seats[0].joined).toBeUndefined();
+    expect(after.seats[0].staging).toEqual(area.staging);
+    expect(after.seats[0].stage).toBe(area.stage);
+    expect(codes(after, stagingOf(after, 0)).sort()).toEqual(["brute", "scout"]);
+    expect(stageOf(after, 0)).toBe(area.stage);
+    expect(areaSeats(after)).toEqual([0]);
+    expect(after.seats[1].staging).toEqual([]);
+    expect(after.seats[1].stage).toBeUndefined();
+    expect(after.lost).toBeFalsy();
+    for (const id of area.staging) expect(after.cards[id]?.zone).toBe("staging");
+  });
+
+  it("still discards the area of an eliminated seat that nobody joined", () => {
+    const split = make({ seats: 2, stage: "separate", staging: [], areas: [["grunt"], ["scout"]] });
+    const gone = withSeat(split.state, 1, { ...split.state.seats[1], eliminated: true });
+    const after = clearEliminated(gone, world.cards);
+    expect(after.seats[1].staging).toEqual([]);
+    expect(after.cards[first(split.state, "scout")]?.zone).toBe("encounterDiscard");
+    expect(after.seats[0].staging).toEqual(split.state.seats[0].staging);
   });
 });

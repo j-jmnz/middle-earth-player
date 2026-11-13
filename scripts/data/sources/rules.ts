@@ -21,6 +21,9 @@ export const RULE_PDFS = [
   // The Ered Mithrin Campaign Expansion's rulebook (MEC115, 28 pages, 2024 print): the Caves deck, treasures, each scenario's setup spread
   // and the Campaign Log. The Hall of Beorn S3 host does not have it; the FFG host does (sha256 4a730c7c...).
   { doc: "emce", file: "mec115_rules-web.pdf", url: `${FFG}/mec115_rules-web.pdf` },
+  // The Angmar Awakened Campaign Expansion's rulebook (MEC108, 28 pages): each scenario's setup paragraph, the campaign rules and the Campaign Log. The FFG host and Hall of Beorn's S3
+  // host (Images/LotR/Rules/MEC108.pdf) serve the same bytes (sha256 59a12389...); the FFG host is the one the other FFG PDFs use.
+  { doc: "mec108", file: "mec108_rules.pdf", url: `${FFG}/mec108_rules.pdf` },
   { doc: "faq", file: "lotr_faq_19.pdf", url: `${FFG}/lotr_faq_19.pdf` },
   { doc: "campaign-log", file: "campaign-log.pdf", url: `${FFG}/campaign-log.pdf` },
   { doc: "easy-mode", file: "lotr_easy_mode.pdf", url: `${FFG}/lotr_easy_mode.pdf` },

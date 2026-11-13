@@ -1,6 +1,6 @@
 // How the cards a Resolution keeps for the next campaign read (01131:B:2): one phrase for the Resolution sentence, the Campaign Log's row and
 // the campaign setup's offer. Pure, so a test reads it.
-import { seatPenalty, threatWords } from "./two-towers-view.ts";
+import { seatPenalty, signed, threatWords } from "./two-towers-view.ts";
 
 type Carried = { code: string; perPlayer?: boolean };
 
@@ -35,10 +35,10 @@ type Continued = { heroes: number; fallen: number; captives: number; pool: numbe
 /** The permanent threat penalty of a finished save in words: "a +1 threat penalty", and with a penalty a seat took of its own the Threat Modifiers row's words ("threat penalties (Player 1: +3 · Player 2: +1)"); none for no penalty. */
 function penaltyWords(offer: Continued): string[] {
   const bySeat = offer.penaltyBySeat ?? [];
-  if (bySeat.every((amount) => amount === 0)) return offer.penalty > 0 ? [`a +${offer.penalty} threat penalty`] : [];
+  if (bySeat.every((amount) => amount === 0)) return offer.penalty !== 0 ? [`a ${signed(offer.penalty)} threat penalty`] : [];
   const seats = offer.seatCount ?? 1;
   const log = { threatPenalty: offer.penalty, threatPenaltyBySeat: bySeat };
-  return seats === 1 ? [`a +${seatPenalty(log, 0)} threat penalty`] : [`threat penalties (${threatWords(log, seats)})`];
+  return seats === 1 ? [`a ${signed(seatPenalty(log, 0))} threat penalty`] : [`threat penalties (${threatWords(log, seats)})`];
 }
 
 /** What a continued save takes in from a finished save of the box before it, a zero left out: "3 heroes, 1 fallen hero, 1 captive, 2 cards in the pool and a +1 threat penalty". The enemies under The Black Gate come last. */

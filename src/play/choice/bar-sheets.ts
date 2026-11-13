@@ -4,6 +4,7 @@
 import { legalAttackEnemies } from "../../rules/combat/combat.ts";
 import { sideQuestIds } from "../../rules/families/sidequests/quest.ts";
 import { printedOf } from "../../rules/core/printed.ts";
+import { flagged } from "../../rules/core/state.ts";
 import { questSeat } from "../store/selectors.ts";
 import { stagingThreat } from "../../rules/quest/quest.ts";
 import type { PlayerIntent, LegalIntent, ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts";
@@ -61,6 +62,18 @@ export function noOneQuests(threat: number): string {
 }
 
 /**
+ * The words of a commit window that still owes a hero: "Aragorn must commit to the quest (A Fell Dread)". The heroes are those of the commit options the rules say must commit (the flag `mustCommit`), and each card that says so is named once.
+ * Null when none is owed, or when Pass is still legal (the engine decides: `legal` holds no Pass while a hero is owed, rejectionReason in rules/engine/legal.ts).
+ */
+export function mustCommitWords(game: ScenarioState, names: SheetNames, commit: MultiSheet, legal: readonly LegalIntent[]): string | null {
+  if (legal.some((intent) => intent.type === "Pass")) return null;
+  const owed = commit.options.filter((item) => flagged(game, item.id, "mustCommit"));
+  if (owed.length === 0) return null;
+  const sources = [...new Set(game.modifiers.filter((modifier) => modifier.stat === "mustCommit" && owed.some((item) => item.id === modifier.instanceId)).map((modifier) => names.card(modifier.sourceId)))];
+  return `${owed.map((item) => names.card(item.id)).join(" and ")} must commit to the quest${sources.length > 0 ? ` (${sources.join(", ")})` : ""}`;
+}
+
+/**
  * The ordinary action window as the table answers it: what can be played and used now, the quest commit in the commit
  * window, and Pass. Every card it names comes from legalIntents.
  */
@@ -81,7 +94,10 @@ export function windowSheet(game: ScenarioState, ctx: ReduceContext, legal: read
     const some = Object.values(game.cards).some((card) => card.committed && card.controller === game.activeSeat);
     // A player side quest in a quest area takes characters committed to it instead (families/sidequests/quest.ts).
     const sideQuests = sideQuestIds(game).map((id) => ({ id, label: names.card(id) }));
+    // A hero that must commit has not: passing is not legal, so the window offers Commit only (the dock's primary waits for a pick).
+    const owed = mustCommitWords(game, names, commit, legal);
     const toSide = sideQuests.length > 0 ? ` Or send them to ${sideQuests.map((quest) => quest.label).join(" or ")}: its willpower goes on it as progress.` : "";
+    if (owed != null) return { ...base, sideQuests, title: commitTitle(game, names), note: `${owed}. Tap a character to commit.${toSide}`, mustCommit: owed, pass: null, passNote: null, armed: null };
     return some
       ? { ...base, sideQuests, title: commitTitle(game, names), note: `Tap more characters to quest, or end the commit.${toSide}`, pass: "Done", passNote: "Done ends the commit.", armed: "Tap again: no one else quests" }
       : {

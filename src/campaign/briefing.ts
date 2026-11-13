@@ -11,6 +11,7 @@ import type { StartScenario } from "../rules/setup/setup.ts";
 import { checklist, type ChecklistPlan, type ChecklistStep, type Need } from "./checklist.ts";
 import { heroBansOf, validateLoadout, type HeroBan, type LoadoutSeat, type SagaRules } from "./loadout.ts";
 import type { CampaignLog } from "./log.ts";
+import { angmarAwakenedFacts } from "./log-angmar-awakened.ts";
 import { returnOfTheKingFacts } from "./log-return-of-the-king.ts";
 import { twoTowersFacts } from "./log-two-towers.ts";
 import { isNightmarePlayable, isPlayable } from "./playable.ts";
@@ -99,6 +100,7 @@ const RULE_OF: Readonly<Record<string, string>> = {
   secondFrodo: "One version of Frodo",
   secondVersion: "One version of the ☺ hero",
   bannedTitle: "A title the box refuses",
+  stolenCard: "A unique card the Goblins stole",
   noRingBearer: "A Ring-bearer is required",
   tooManyHeroes: "Three heroes besides the Ring-bearer",
   ringInDeck: "The One Ring is not a deck card",
@@ -118,7 +120,7 @@ function deckCounts(deck: readonly string[]): { code: string; count: number }[] 
 // What a loadout must satisfy before any deal, campaign or standalone: a saved deck per seat with one to three heroes
 // (rr.deckbuilding), no fallen hero (the campaign's list; none in a standalone game), and the saga rules on the
 // loadout (validateLoadout). A treasure in a deck is admitted when the log records it (`discovered`, emce.treasure).
-export function loadoutProblems(input: LoadoutInput, fallen: readonly string[], bans: readonly HeroBan[] = [], discovered: readonly string[] = []): { problems: Problem[]; loadout: LoadoutSeat[] } {
+export function loadoutProblems(input: LoadoutInput, fallen: readonly string[], bans: readonly HeroBan[] = [], discovered: readonly string[] = [], stolen: readonly (readonly string[])[] = []): { problems: Problem[]; loadout: LoadoutSeat[] } {
   const problems: Problem[] = [];
   const { world } = input;
   const nameOf = (code: string) => world.cards.get(code)?.name ?? code;
@@ -140,7 +142,7 @@ export function loadoutProblems(input: LoadoutInput, fallen: readonly string[], 
   });
   const loadout = loadoutOf(input);
   if (problems.length === 0) {
-    for (const error of validateLoadout(loadout, world.cards, world.campaign.saga, bans, discovered, sagaRulesOf(world))) problems.push({ rule: RULE_OF[error.rule] ?? error.rule, message: error.message });
+    for (const error of validateLoadout(loadout, world.cards, world.campaign.saga, bans, discovered, sagaRulesOf(world), stolen)) problems.push({ rule: RULE_OF[error.rule] ?? error.rule, message: error.message });
   }
   return { problems, loadout };
 }
@@ -151,7 +153,7 @@ export function comingSoonProblems(world: World): Problem[] {
 }
 
 function check(input: BriefingInput): { problems: Problem[]; loadout: LoadoutSeat[] } {
-  const { problems, loadout } = loadoutProblems(input, input.log.fallenHeroesBySeat.flat(), heroBansOf(input.world.campaign, input.world.scenario.id), input.log.treasures);
+  const { problems, loadout } = loadoutProblems(input, input.log.fallenHeroesBySeat.flat(), heroBansOf(input.world.campaign, input.world.scenario.id), input.log.treasures, input.log.stolenCards);
   return { problems: [...comingSoonProblems(input.world), ...difficultyProblems(input.world, input.difficulty), ...problems], loadout };
 }
 
@@ -215,7 +217,7 @@ export function startFor(input: BriefingInput, seed: number): StartScenario {
     removedFromCaves: plan.removedFromCaves,
     ...(input.modeCard ? { modeCard: input.modeCard } : {}),
     // The log's structured facts (the pool as the checklist leaves it, with the cards the campaign card's Setup added); a Dream-chaser log adds its scalable cards' levels and its upgraded cards (buildStart adds the Hard/Expert card in play).
-    facts: { prisoner: input.log.prisoner, usedOnce: input.log.usedOnce, counters: input.log.counters, ...xpFacts(input.log), ...wilderlandFacts(plan.log, world.campaign.id), ...twoTowersFacts(plan.log, world.campaign.id, world.cards), ...returnOfTheKingFacts(plan.log, world.campaign.id) },
+    facts: { prisoner: input.log.prisoner, usedOnce: input.log.usedOnce, counters: input.log.counters, ...xpFacts(input.log), ...wilderlandFacts(plan.log, world.campaign.id), ...twoTowersFacts(plan.log, world.campaign.id, world.cards), ...returnOfTheKingFacts(plan.log, world.campaign.id), ...angmarAwakenedFacts(plan.log, world.campaign.id) },
   });
 }
 

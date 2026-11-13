@@ -9,22 +9,22 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
   11200:campaignSetup:1: Campaign setup (record also names 11200:A:3)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json KeepCampaignCard {"verb":"KeepCampaignCard"}]
-    - [json SetAside {"verb":"SetAside","code":"11183"}]
-    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"11181"}]
+    - a copy of the card with code 11183 is set aside, out of play
+    - a card with code 11181 from the box joins the encounter deck, which is shuffled
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11183","to":"Captain Sahír"}]
-    - [json ChooseCards {"verb":"ChooseCards","codes":["11201","11202","11203","11204"],"who":"eachSeat","to":"hand","optional":true,"unearned":true,"afterMulligan":true}]
-    - [json ChooseCards {"verb":"ChooseCards","codes":["11205","11206","11207","11208"],"who":"onePlayer","to":"hand","optional":true,"unearned":true,"afterMulligan":true}]
+    - each player in turn may take "11201" or "11202" or "11203" or "11204" into their hand [also {"unearned":true,"afterMulligan":true}]
+    - each player in turn (the offer ends once one has taken it) may take "11205" or "11206" or "11207" or "11208" into their hand [also {"unearned":true,"afterMulligan":true}]
     - [json TradeDamageForThreat {"verb":"TradeDamageForThreat","damage":1,"threat":1}]
 
 11200:A:3 (front): One player may choose one copy of Círdan's Blessing and add it to their hand. For each character in play, its controller may deal 1 damage to it to reduce their threat by 1.
   11200:campaignSetup:1: Campaign setup (record also names 11200:A:2)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json KeepCampaignCard {"verb":"KeepCampaignCard"}]
-    - [json SetAside {"verb":"SetAside","code":"11183"}]
-    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"11181"}]
+    - a copy of the card with code 11183 is set aside, out of play
+    - a card with code 11181 from the box joins the encounter deck, which is shuffled
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11183","to":"Captain Sahír"}]
-    - [json ChooseCards {"verb":"ChooseCards","codes":["11201","11202","11203","11204"],"who":"eachSeat","to":"hand","optional":true,"unearned":true,"afterMulligan":true}]
-    - [json ChooseCards {"verb":"ChooseCards","codes":["11205","11206","11207","11208"],"who":"onePlayer","to":"hand","optional":true,"unearned":true,"afterMulligan":true}]
+    - each player in turn may take "11201" or "11202" or "11203" or "11204" into their hand [also {"unearned":true,"afterMulligan":true}]
+    - each player in turn (the offer ends once one has taken it) may take "11205" or "11206" or "11207" or "11208" into their hand [also {"unearned":true,"afterMulligan":true}]
     - [json TradeDamageForThreat {"verb":"TradeDamageForThreat","damage":1,"threat":1}]
 
 11200:B:1 (back): Resolution: Add each copy of Command and Círdan's Blessing chosen during setup to the Campaign Pool.
@@ -76,8 +76,8 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
     - [json PrepareGrottoDeck {"verb":"PrepareGrottoDeck"}]
     - [json AddFromGrottoDeck {"verb":"AddFromGrottoDeck","count":2,"when":{"kind":"not","condition":{"kind":"count","pick":{"type":"player","control":"any"},"min":3}}}]
     - [json AddFromGrottoDeck {"verb":"AddFromGrottoDeck","count":3,"when":{"kind":"count","pick":{"type":"player","control":"any"},"min":3}}]
-    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Captain Sahír"}]
-    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Na'asiyah","to":"lastPlayer"}]
+    - the set-aside card titled "Captain Sahír" is put into play under the first player
+    - the set-aside card titled "Na'asiyah" is put into play under the last player
 
 12092:B:1 (back): While an Underwater location is the active location, players cannot play attachments or allies.
   12092:constant:1: Constant
@@ -101,12 +101,12 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
 12093:A:1 (front): When Revealed: Make the set aside Shrine to Morgoth the active location, Grotto side faceup. Captain Sahír flips to his enemy side (removing all tokens) and makes an immediate attack against the first player. Remove Captain Sahír from the game. Each player searches the encounter deck and discard pile for an Undead enemy and adds it to the staging area. Shuffle the encounter deck.
   12093:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json MakeSetAsideActive {"verb":"MakeSetAsideActive","code":"12094"}]
+    - the set-aside card with code 12094 becomes the active location (not traveling: no Travel effect, nothing hears "traveled"); a location already active returns to the staging area, unless a second active location slot is free
     - [json FlipEliteAndAttack {"verb":"FlipEliteAndAttack","name":"Captain Sahír"}]
     - when the attack in progress ends:
       - [json RemoveNamedFromGame {"verb":"RemoveNamedFromGame","name":"Captain Sahír"}]
       - for each player, first player first:
-        - [json SearchMove {"verb":"SearchMove","trait":"Undead","type":"enemy","to":"staging"}]
+        - the acting player finds one Undead enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
       - shuffle the encounter deck
 
 12093:B:1 (back): While an Underwater location is the active location, players cannot play attachments or allies.
@@ -293,7 +293,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
     only if all of: (it is the Quest phase) and (this card is the active location)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - [json DiscardFromDeck {"verb":"DiscardFromDeck","amount":10}]
+      - the top 10 card(s) of the acting player's deck go to their discard pile
     - the first player chooses one of:
       * option "return":
         - return this card to the staging area
@@ -318,20 +318,20 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
     - for each player, first player first:
       - the acting player chooses one of:
         * option "ally":
-          - [json DiscardEach {"verb":"DiscardEach","pick":{"type":"card","control":"you","from":"hand","notCardType":"ally"}}]
+          - the acting player discards each card (you control) in hand [also {"notCardType":"ally"}]
         * option "attachment":
-          - [json DiscardEach {"verb":"DiscardEach","pick":{"type":"card","control":"you","from":"hand","notCardType":"attachment"}}]
+          - the acting player discards each card (you control) in hand [also {"notCardType":"attachment"}]
         * option "event":
-          - [json DiscardEach {"verb":"DiscardEach","pick":{"type":"card","control":"you","from":"hand","notCardType":"event"}}]
+          - the acting player discards each card (you control) in hand [also {"notCardType":"event"}]
         * option "player-side-quest":
-          - [json DiscardEach {"verb":"DiscardEach","pick":{"type":"card","control":"you","from":"hand","notCardType":"player-side-quest"}}]
+          - the acting player discards each card (you control) in hand [also {"notCardType":"player-side-quest"}]
         * option "treasure":
-          - [json DiscardEach {"verb":"DiscardEach","pick":{"type":"card","control":"you","from":"hand","notCardType":"treasure"}}]
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"noneDiscarded"}}]
+          - the acting player discards each card (you control) in hand [also {"notCardType":"treasure"}]
+    - then, if [json condition {"kind":"noneDiscarded"}] (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 12106:A:2 (shadow): Shadow: If the active location is Underwater, search the encounter deck and discard pile for a Creature enemy, and add it to the staging area.
   12106:shadow:1: Shadow
-    - [json SearchMove {"verb":"SearchMove","trait":"Creature","type":"enemy","to":"staging","when":{"kind":"matches","card":"activeLocation","pick":{"type":"location","control":"any","trait":"Underwater"}}}]
+    - if the active location is a Underwater location (any player controls): the acting player finds one Creature enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
 
 ## 12107 Tangling and Grasping
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -340,7 +340,7 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
   12107:whenRevealed:1: When revealed
     - for each player, first player first:
       - choose character (you control) committed to the quest
-      - [json RemoveFromQuest {"verb":"RemoveFromQuest"}]
+      - the last picked character is removed from the quest (it stays exhausted)
       - then, if the active location is a Underwater location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): deal 2 damage to the picked card
 
 12107:A:2 (shadow): Shadow: Discard an attachment you control.
@@ -362,4 +362,4 @@ Scenario piles that place cards with no record (quest: 12092 The Grotto; quest: 
     - the attacking enemy: stat attack 1, until the end of the attack
     - then, if the active location is a Underwater location (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 1, until the end of the attack
 
-(rendered pieces: 175 by template, 61 as JSON)
+(rendered pieces: 194 by template, 50 as JSON)

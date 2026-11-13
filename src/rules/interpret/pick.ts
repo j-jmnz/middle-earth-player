@@ -1,4 +1,5 @@
 // Rules: rr.in-play-and-out-of-play, mec109.immune-to-player-card-effects, mec109.permanent (data/rules/entries.json).
+import { discardLockedFor } from "../families/angmar/lock.ts";
 import { captiveIds } from "../families/captives/values.ts";
 import type { Instruction, PickSpec } from "../../catalog/boundary.ts";
 
@@ -9,7 +10,8 @@ import { attachmentsPickMatches } from "../families/attachments/pick.ts";
 import { costsPickMatches, highestCost } from "../families/costs/pick.ts";
 import { attackPickMatches } from "../families/attack/pick.ts";
 import { miscPickMatches } from "../families/misc/pick.ts";
-import { familyPickMatches } from "./family-hooks.ts";
+import { questCardPool } from "../families/quest/quest-card.ts";
+import { familyPickMatches, familyPool } from "./family-hooks.ts";
 import { immuneToSource } from "../families/misc/guards.ts";
 import { countsExtra } from "../families/misc/traits.ts";
 import { seatThreat } from "../families/play/hooks.ts";
@@ -20,7 +22,7 @@ import { lookedPool } from "../families/deck/pick.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { hasKeyword, isPlayerCardEffect, modifiedStat, playerCardEffectCanChoose, sourcePrinted, uniqueBlocked } from "../core/keywords.ts";
 import { cardTypeOf, isAllyLike, isPlayerType, printedOf } from "../core/printed.ts";
-import { activeFor, sharedStaging } from "../families/breaking/areas.ts";
+import { activeFor, sharedStaging, sharing } from "../families/breaking/areas.ts";
 import { breakingPickMatches } from "../families/breaking/attack.ts";
 import type { ScenarioState } from "../core/state.ts";
 import { heldAmount, inPlay, livingSeats } from "../core/state.ts";
@@ -57,7 +59,7 @@ export type PickContext = {
 function seatsOf(state: ScenarioState, spec: PickSpec, asking: number): number[] {
   if (spec.control === "you") return [asking];
   // "At this stage": the chooser's own once stages are separate (mec109.multiple-staging-areas).
-  if (spec.atStage && state.separate) return [asking];
+  if (spec.atStage && state.separate) return sharing(state, asking);
   if (spec.control === "other") return livingSeats(state).filter((seat) => seat !== asking);
   return livingSeats(state);
 }
@@ -70,7 +72,7 @@ function stagingFor(state: ScenarioState, spec: PickSpec, asking: number): reado
 }
 
 // The cards a filter starts from: its zone group and whose cards they are.
-function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceContext): string[] {
+function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceContext, sourceId: string | null): string[] {
   const seats = seatsOf(state, spec, asking);
   const raw: string[] = [];
   // The Island Map's filters start from its own cards (families/island/pick.ts).
@@ -88,6 +90,14 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
       .filter((card) => (inPlay(card.zone) || card.zone === "encounterDeck" || card.zone === "encounterDiscard") && printedOf(ctx.cards, card.code).campaignKind === "burden")
       .map((card) => card.id);
   }
+  // The quest cards in play (families/quest/quest-card.ts).
+  if (spec.questCard) return questCardPool(state, asking, ctx);
+  // The captured cards a pick starts from (families/captured/values.ts).
+  const captured = spec.captured ? familyPool(state, spec, asking, sourceId, ctx) : null;
+  if (captured) return captured;
+  // Every card in play of any kind (families/angmar/reanimate/pick.ts).
+  const everything = spec.allInPlay ? familyPool(state, spec, asking, sourceId, ctx) : null;
+  if (everything) return everything;
   // The Uruk-hai's Captives, alone or among the heroes (families/captives).
   if (spec.captive === "only" || spec.captive === "free") return captiveIds(state, spec.captive, ctx.cards);
   const from = spec.from ?? "play";
@@ -121,7 +131,7 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
       raw.push(instance.id);
     }
   } else if (spec.type === "enemy") {
-    const engagedSeats = spec.engaged === "you" || (spec.atStage && state.separate) ? [asking] : spec.engaged === "other" ? livingSeats(state).filter((seat) => seat !== asking) : livingSeats(state);
+    const engagedSeats = spec.atStage && state.separate ? sharing(state, asking) : spec.engaged === "you" ? [asking] : spec.engaged === "other" ? livingSeats(state).filter((seat) => seat !== asking) : livingSeats(state);
     if (!spec.stagingOnly) for (const index of engagedSeats) raw.push(...(state.seats[index]?.engaged ?? []));
     // `staging` with `engaged`: the staging area and the enemies engaged as `engaged` says ("or engaged with another player").
     if (spec.staging || (spec.stagingOnly && spec.engaged == null)) raw.push(...stagingFor(state, spec, asking));
@@ -136,6 +146,8 @@ function pool(state: ScenarioState, spec: PickSpec, asking: number, ctx: ReduceC
     // player claimed: attached to a hero, controlled by that player (families/objectives.ts).
     if (spec.control !== "you" && !spec.controlled) raw.push(...stagingFor(state, spec, asking));
     if (!spec.stagingOnly) raw.push(...Object.values(state.cards).filter((card) => card.claimed === true && card.controller != null && seats.includes(card.controller)).map((card) => card.id));
+    // A location with the safe keyword (an objective-location) may be the active location (10075:A:2).
+    if (spec.safe && !spec.stagingOnly) raw.push(...activeFor(state, asking, spec.stagingArea === "any"));
     // `controlled` also counts a tower the players control as a group: freed of encounters, in the staging area, claimed with no controller (ControlWhenFree, families/objectives/control.ts).
     if (spec.controlled && spec.control !== "you") raw.push(...stagingFor(state, spec, asking).filter((id) => state.cards[id]?.claimed === true));
   } else if ((spec.type === "ally" || spec.type === "card") && spec.stagingOnly) {
@@ -218,8 +230,8 @@ export function matchesPick(state: ScenarioState, id: string, spec: PickSpec, at
   if (spec.minAttack != null && modifiedStat(state, instance, "attack", ctx.cards) < spec.minAttack) return false;
   // The nightmare family's filters: a Willpower at most this, below 0 counting as 0 (900102:A:1).
   if (spec.maxWillpower != null && Math.max(0, modifiedStat(state, instance, "willpower", ctx.cards)) > spec.maxWillpower) return false;
-  // A copy of it in its controller's discard pile (900309:A:2).
-  if (spec.copyInDiscard && !(instance.controller != null && (state.seats[instance.controller]?.discard ?? []).some((other) => other !== id && printedOf(ctx.cards, state.cards[other]?.code ?? "").name === printed.name))) return false;
+  // A copy of it in its controller's discard pile (900309:A:2), or a card of its title in its owner's discard pile, itself counting when it lies there (09066:A:2, 09061:A:2, 09065:A:3).
+  if (spec.copyInDiscard && !titleInDiscard(state, instance, spec.copyInDiscard === "owner", ctx)) return false;
   // The breaking family's filter: fewer printed hit points than the attacking enemy (families/breaking/attack.ts).
   if (!breakingPickMatches(state, id, spec, ctx)) return false;
   // The sidequests family's filters: a Trait or a title shared with another card, the quest a character is committed to
@@ -275,6 +287,14 @@ function onHost(state: ScenarioState, hostId: string | null, on: NonNullable<Pic
   return on.control === "any" || (on.control === "you") === (host.controller === asking);
 }
 
+// A card of the instance's title lies in a discard pile: another card in its controller's (`owner` false), or any card, the instance itself when it lies there, in its owner's (`owner` true; an owner not noted is the controller).
+function titleInDiscard(state: ScenarioState, instance: ScenarioState["cards"][string], owner: boolean, ctx: ReduceContext): boolean {
+  const seat = owner ? (instance.owner ?? instance.controller) : instance.controller;
+  if (seat == null) return false;
+  const name = printedOf(ctx.cards, instance.code).name;
+  return (state.seats[seat]?.discard ?? []).some((other) => (owner || other !== instance.id) && printedOf(ctx.cards, state.cards[other]?.code ?? "").name === name);
+}
+
 // The character is attacking in the attack in progress: one of the attackers of a player attack.
 function attackingNow(state: ScenarioState, id: string): boolean {
   return state.pendingStrike?.attackerIds.includes(id) === true;
@@ -307,7 +327,9 @@ export function pickCandidates(
   // Immunity is to player card effects: an encounter card's Pick may choose an immune card (mec109.immune-to-player-card-effects).
   // An ally with an encounter back is an encounter card and has encounter card effects (dcce.encounter-cards: the ship-objectives, the Modification attachments, Calaerion, Gavin, Send for Help). The Stormcaller Elite's objective allies have no encounter back (dcce.stormcaller-elite) and stay objectives.
   const playerEffect = !counting && isPlayerCardEffect(state, ctx.cards, sourceId);
-  const raw = spec.attachedTo ? attachedPool(state, spec.attachedTo, sourceId) : pool(state, spec, asking, ctx);
+  // The Power of Angmar: a player card effect cannot choose a card in a discard pile (families/angmar/lock.ts).
+  if (spec.from === "discard" && !counting && discardLockedFor(state, sourceId, ctx)) return [];
+  const raw = spec.attachedTo ? attachedPool(state, spec.attachedTo, sourceId) : pool(state, spec, asking, ctx, sourceId);
   const at: PickContext = { seat, sourceId, picked, ...(x != null ? { x } : {}), ...(participants ? { participants } : {}), counting, ...event };
   const found = raw.filter((id) => {
     const instance = state.cards[id];

@@ -18,7 +18,8 @@ import { scenarioDefinitionSchema, type Effect, type Instruction, type ScenarioD
 // `spidersDeck` and `orcsDeck` (the Spiders of Mirkwood and Dol Guldur Orcs sets, which the quest swaps into the encounter deck).
 // The Two Towers' second encounter decks (mec112.setup-journey-to-the-cross-roads, mec112.setup-shelobs-lair): `haradDeck` (the Men of Harad set, shuffled and
 // placed facedown under The Cross-roads) and `greatSpiderDeck` (The Great Spider set, set aside). Neither is part of the encounter deck.
-export const PILES = ["encounter", "quest", "staging", "activeLocation", "setAside", "attached", "burden", "attachedChosen", "corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests", "evilCreaturesDeck", "cavesDeck", "sideQuestDeck", "spidersDeck", "orcsDeck", "haradDeck", "greatSpiderDeck"] as const;
+// Angmar Awakened's Orc deck (mec108.orc-deck): `angmarOrcDeck`, the Angmar Orcs enemies and Concealed Orc-camp The Weather Hills' Setup takes out of the encounter deck.
+export const PILES = ["encounter", "quest", "staging", "activeLocation", "setAside", "attached", "burden", "attachedChosen", "corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests", "evilCreaturesDeck", "cavesDeck", "sideQuestDeck", "spidersDeck", "orcsDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck"] as const;
 export type Pile = (typeof PILES)[number];
 
 const placementSchema = z
@@ -235,6 +236,17 @@ export function encounterCodes(data: ScenarioData, difficulty: Difficulty = "Nor
   });
 }
 
+// The quest deck: each stage once, and a stage printed in several copies ("a different stage 2A" for each player, 10038:B:1) once for each seat, never more than
+// the copies the box holds. Every stage the box prints once is dealt once, so a scenario without such a stage deals `data.stages` unchanged.
+export function questDeckCodes(data: ScenarioData, difficulty: Difficulty = "Normal", seatCount = 1): string[] {
+  const placements = placementsAt(data, difficulty);
+  return data.stages.flatMap((code) => {
+    const printed = placements.find((card) => card.pile === "quest" && card.code === code);
+    const copies = printed ? Math.max(1, Math.min(copiesAt(printed, difficulty), seatCount)) : 1;
+    return Array.from({ length: copies }, () => code);
+  });
+}
+
 const SETUP_VERB = {
   setAside: "SetAside",
   // The Stormcaller's quest stages wait set aside until the Setup prepares the Stormcaller's area (dcce.stormcallers-area).
@@ -267,7 +279,7 @@ export function corsairCodes(data: ScenarioData, difficulty: Difficulty = "Norma
 }
 
 // The decks of Ered Mithrin a scenario deals, copy by copy (emce.caves-deck, emce.evil-creatures-deck): each of these piles at the difficulty played, by pile. A pile the scenario does not deal is left out.
-export const DEAL_PILES = ["cavesDeck", "evilCreaturesDeck", "spidersDeck", "orcsDeck", "sideQuestDeck", "haradDeck", "greatSpiderDeck"] as const;
+export const DEAL_PILES = ["cavesDeck", "evilCreaturesDeck", "spidersDeck", "orcsDeck", "sideQuestDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck"] as const;
 export function dealtPiles(data: ScenarioData, difficulty: Difficulty = "Normal"): Partial<Record<(typeof DEAL_PILES)[number], string[]>> {
   const piles: Partial<Record<(typeof DEAL_PILES)[number], string[]>> = {};
   for (const card of placementsAt(data, difficulty)) {

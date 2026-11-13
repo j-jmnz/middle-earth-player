@@ -108,4 +108,10 @@ describe("comingLater", () => {
     expect(tiles.find((tile) => tile.id === "three")).toEqual({ id: "three", name: "Saga Three Expansion", caption: "3 scenarios \u00b7 Coming soon" });
     expect(tiles[0]?.caption).toBe("Cycle \u00b7 3 scenarios \u00b7 Coming soon");
   });
+
+  it("gives a locked campaign whose box is listed one tile named by the box, not a tile for each scenario", () => {
+    const listed: Box[] = [{ id: "awake", name: "Awakened Campaign Expansion", campaignId: "awake", scenarios: ["x", "y", "z"] }];
+    const tiles = comingLater(listed, [row("awake", false, "campaign", null), row("one", true)], () => false, (id) => `Scenario ${id}`);
+    expect(tiles).toEqual([{ id: "awake", name: "Awakened Campaign Expansion", caption: "3 scenarios \u00b7 Coming soon" }]);
+  });
 });

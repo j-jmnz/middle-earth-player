@@ -1,4 +1,5 @@
 import { authoredRel } from "../data/effects/authored-paths.ts";
+import { finderImport } from "../data/effects/seed-finder-paths.ts";
 
 // The skeleton files `pnpm scenario new` writes (scripts/tools/scenario-new.ts). Each function returns one file's text from the plan's facts.
 // A skeleton compiles, passes lint and leaves the suite green: its golden test is a skipped suite and its campaign test one real check and some
@@ -7,6 +8,8 @@ import { authoredRel } from "../data/effects/authored-paths.ts";
 export type PreviousPart = {
   id: string;
   name: string;
+  /** The previous part's seed finder under scripts/e2e/, without the extension (scripts/data/effects/seed-finder-paths.ts). */
+  finderRel: string;
   /** The names the previous part's game module exports, read from test/harness/golden-registry.ts (null when it is not registered). */
   game: { alias: string; goldens: string; world: string; play: string } | null;
   /** The previous part's seed finder: the function that returns the log of the parts before it (null when it exports none). */
@@ -22,6 +25,8 @@ export type Facts = {
   /** The part's place in the campaign, from 1. */
   part: number;
   previous: PreviousPart | null;
+  /** This scenario's seed finder under scripts/e2e/, without the extension. */
+  finderRel: string;
   campaignCard: string;
   stages: readonly string[];
   /** [key, code, card name] for every card the scenario deals, its campaign card and the cards that card places. */
@@ -183,12 +188,17 @@ describe("${facts.name} in the ${facts.campaignId} campaign", () => {
 `;
 }
 
-/** scripts/e2e/<id>.ts */
+/** scripts/e2e/<campaign folder>/<id>.ts */
 export function seedFinderFile(facts: Facts): string {
   const P = pascal(facts.short);
   const c = camel(facts.short);
   const U = upper(facts.short);
   const prev = facts.previous;
+  // The prefixes from the finder to scripts/e2e/ (`e2e`), scripts/ and the repo root: one level more for a campaign folder.
+  const depth = facts.finderRel.split("/").length - 1;
+  const e2e = depth === 0 ? "./" : "../".repeat(depth);
+  const scripts = "../".repeat(depth + 1);
+  const root = `${scripts}../`;
   const dream = facts.campaignId === "dream-chaser";
   const withLog = facts.part > 1;
   const earlier = facts.part - 1;
@@ -202,10 +212,10 @@ export function seedFinderFile(facts: Facts): string {
     if (prev?.game) {
       const play = prev.game.play === "playGolden" ? `playGolden as play${pascal(alias)}` : prev.game.play;
       const playName = prev.game.play === "playGolden" ? `play${pascal(alias)}` : prev.game.play;
-      imports.push(`import { ${prev.game.goldens}, ${prev.game.world}, ${play} } from "../../test/scenarios/${prev.id}/game.ts";`);
+      imports.push(`import { ${prev.game.goldens}, ${prev.game.world}, ${play} } from "${root}test/scenarios/${prev.id}/game.ts";`);
       const before = prev.finder.exists && prev.finder.earlierLog ? prev.finder.earlierLog : null;
-      if (before) imports.push(`import { ${before} } from "./${prev.id}.ts";`);
-      logFunction = `// The log of a playthrough whose first ${parts} won: ${before ? `the log of the parts before ${prev.name} (scripts/e2e/${prev.id}.ts), then ` : ""}the ${prev.name} golden's two-handed win, resolved onto ${before ? "it" : "a blank log"}, their heroes and what hangs on them left out.
+      if (before) imports.push(`import { ${before} } from "${finderImport(facts.finderRel, prev.finderRel)}";`);
+      logFunction = `// The log of a playthrough whose first ${parts} won: ${before ? `the log of the parts before ${prev.name} (scripts/e2e/${prev.finderRel}.ts), then ` : ""}the ${prev.name} golden's two-handed win, resolved onto ${before ? "it" : "a blank log"}, their heroes and what hangs on them left out.
 export async function ${logName}(): Promise<CampaignLog> {
   return wonLog({ title: "${prev.name}", goldens: ${prev.game.goldens}, world: ${prev.game.world}, play: ${playName} }${before ? `, await ${before}()` : ""});
 }
@@ -222,16 +232,16 @@ export async function ${logName}(): Promise<CampaignLog> {
     }
   }
   // Dream-chaser finders share the Raid finder's answers; another campaign starts from the auto-player's default policy (a TODO to tune).
-  imports.push(dream ? `import { intentFor } from "./raid-on-the-grey-havens.ts";` : `import { nextIntent } from "../../test/harness/auto-player.ts";`, `import { createLog } from "../log.ts";`, `import { ${dream ? "DREAM_CHASER, " : ""}firstSeed${withLog ? ", wonLog" : ""} } from "./seed-kit.ts";`);
+  imports.push(dream ? `import { intentFor } from "${e2e}raid-on-the-grey-havens.ts";` : `import { nextIntent } from "${root}test/harness/auto-player.ts";`, `import { createLog } from "${scripts}log.ts";`, `import { ${dream ? "DREAM_CHASER, " : ""}firstSeed${withLog ? ", wonLog" : ""} } from "${e2e}seed-kit.ts";`);
   const campaignId = dream ? "DREAM_CHASER" : `"${facts.campaignId}"`;
   const answer = dream ? "intentFor" : "(state: ScenarioState, ctx: Parameters<typeof nextIntent>[1], memory: Set<string>) => nextIntent(state, ctx, { scout: \"\", prefer: \"\", protect: \"\", play: true, act: true }, memory)";
   return `// The Maestro fixtures of ${facts.name} (${facts.campaignId} part ${facts.part}), written into src/campaign/fixtures/${facts.id}.json by scripts/e2e/fixtures.ts: real games of saved decklists (the Defenders of
 // Gondor and Swords of the Noldor lists of data/decks/prebuilt.json), two-handed, Easy, so each is a real save. \`${facts.short}-won\` is the first seed that wins, parked on the win (the Resolution waits); \`${facts.short}-lost\` the first
 // that loses, parked on the loss. A game not found in the seeds is left out.${withLog ? "\n// The log has the earlier parts recorded as won, so the open scenario is the playthrough's current node and `openNode` resumes it." : ""}
 // TODO: say what the Campaign Setup and the Resolution ask, and which answers the saved decklists' policy gives them.
-import type { CampaignLog } from "../../src/campaign/log.ts";
-import type { StoredLoadout } from "../../src/campaign/save.ts";
-import type { PlayerIntent, ScenarioState } from "../../src/rules/engine/reduce.ts";
+import type { CampaignLog } from "${root}src/campaign/log.ts";
+import type { StoredLoadout } from "${root}src/campaign/save.ts";
+import type { PlayerIntent, ScenarioState } from "${root}src/rules/engine/reduce.ts";
 
 ${imports.join("\n")}
 
@@ -258,7 +268,7 @@ const TODO_FLOW = (kind: "win" | "loss", facts: Facts): string =>
 tags:
   - scenario
 ---
-# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture \`${facts.short}-${kind === "win" ? "won" : "lost"}\` (scripts/e2e/${facts.id}.ts): a real two-handed
+# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture \`${facts.short}-${kind === "win" ? "won" : "lost"}\` (scripts/e2e/${facts.finderRel}.ts): a real two-handed
 # game of ${facts.name}, parked on its ${kind === "win" ? "win" : "loss"}. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
 # The steps are the shared subflow's (.maestro/subflows/scenario-${kind}.yaml); add this scenario's own assertions after the call.
 `;

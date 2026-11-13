@@ -15,6 +15,7 @@ export const BOOKLET_SOURCES: Record<BookletId, string> = {
   "the-dark-of-mirkwood": "dark_of_mirkwood_rulebook_v2.pdf",
   "dream-chaser": "mec111_dream-chaser_campaign_expansion.pdf",
   "ered-mithrin": "mec115_rules-web.pdf",
+  "angmar-awakened": "mec108_rules.pdf",
   "the-two-towers": "mec112_rulebook_eng.pdf",
   "the-return-of-the-king": "mec113_rules-web.pdf",
 };

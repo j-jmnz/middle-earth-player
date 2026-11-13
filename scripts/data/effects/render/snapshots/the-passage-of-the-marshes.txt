@@ -10,7 +10,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
   144015:forced:1: Forced on the event enteredHand (heard about this card)
     - the acting player chooses one of:
       * option "exhaust" (only if there is a ready hero (you control) to choose):
-        - [json ExhaustEach {"verb":"ExhaustEach","pick":{"type":"hero","control":"you"}}]
+        - exhaust each hero (you control)
       * option "reveal":
         - the acting player reveals an encounter card
 
@@ -24,7 +24,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 
 144016:A:2 (front): Forced: After Groping Dead destroys a character, place 1 mire token on the active location.
   144016:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
-    only if the event's other card is a enemy (any player controls) [also {"isSource":true}]
+    only if the event's other card is a enemy (any player controls) that is this card itself
     - place 1 mire token(s) (resources) on the active location; a location whose mire tokens then reach its Mire X is discarded by the Mire keyword
 
 144016:A:3 (shadow): Shadow: If this attack destroys a character, place 1 mire token on the active location.
@@ -42,7 +42,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 
 144017:A:2 (front): Forced: After Dead Things destroys a character, the defending player must raise his threat by 3.
   144017:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
-    only if the event's other card is a enemy (any player controls) [also {"isSource":true}]
+    only if the event's other card is a enemy (any player controls) that is this card itself
     - raise threat by 3 (the defending player (the player this enemy is engaged with))
 
 144017:A:3 (shadow): Shadow: Raise your threat by 1 for each Undead enemy engaged with you.
@@ -59,7 +59,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 
 144018:A:2 (front): Forced: After Candle-bearer destroys a character, it cannot take damage until the end of the round.
   144018:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
-    only if the event's other card is a enemy (any player controls) [also {"isSource":true}]
+    only if the event's other card is a enemy (any player controls) that is this card itself
     - this card: stat cannotTakeDamage 1, until the end of the round
 
 144018:A:3 (shadow): Shadow: Until the end of the round, attacking enemy cannot take damage.
@@ -111,7 +111,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
     - this card: stat mire 2, while this card is in play
   144021:forced:1: Forced on the event discardedByMire (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchMove {"verb":"SearchMove","trait":"Undead","type":"enemy","to":"staging"}]
+    - the acting player finds one Undead enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
 
 144021:A:2 (front): Travel: Exhaust Sméagol to travel here.
@@ -156,9 +156,9 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 
 144024:A:2 (front): When Revealed: Attach to the current quest. (Counts as a Condition attachment with the text: "Forced: At the end of the refresh phase, place 1 mire token on each location in the staging area. Then, discard Creeping Marshes.")
   144024:whenRevealed:1: When revealed
-    - [json AttachToQuest {"verb":"AttachToQuest"}]
+    - this card is attached to the current quest card (the side quest that is the current quest, else the main quest card) and leaves with it
   144024:constant:1: Constant
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - this card counts as a Condition attachment while it is attached
   144024:forced:1: Forced at the end of the phase
     only if it is the Refresh phase
     (steps run in order; a step depends on an earlier one only through its own condition)
@@ -193,15 +193,15 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 144026:A:2 (front): When Revealed: Put the topmost Undead enemy in the encounter discard pile into play engaged with you. Each Undead enemy engaged with you makes an immediate attack.
   144026:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json PickDiscardTop {"verb":"PickDiscardTop","types":["enemy"],"trait":"Undead"}]
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"engaged"}]
+    - the topmost enemy with the trait Undead in the encounter discard pile (the last put there) is picked (nothing with none)
+    - the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
     - [json ImmediateAttackEach {"verb":"ImmediateAttackEach","trait":"Undead","own":true}]
 
 144026:A:3 (shadow): Shadow: Return the topmost Undead enemy in the encounter discard pile to the staging area.
   144026:shadow:1: Shadow
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json PickDiscardTop {"verb":"PickDiscardTop","types":["enemy"],"trait":"Undead"}]
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging"}]
+    - the topmost enemy with the trait Undead in the encounter discard pile (the last put there) is picked (nothing with none)
+    - the picked card goes to the staging area (it is not revealed)
 
 ## 144053 Morgul Wraith
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -224,8 +224,8 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 144054:A:1 (front): When Revealed: The first player must choose: either search the encounter deck, discard pile, and victory display for a Nazgûl enemy and add it to the staging area, or exhaust The One Ring and reveal the top card of the encounter deck.
   144054:whenRevealed:1: When revealed
     - the first player chooses one of:
-      * option "search" (only if [json condition {"kind":"searchable","trait":"Nazgûl"}]):
-        - [json SearchMove {"verb":"SearchMove","trait":"Nazgûl","type":"enemy","to":"staging"}]
+      * option "search" (only if the encounter deck or its discard pile holds a Nazgûl card):
+        - the acting player finds one Nazgûl enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
       * option "reveal":
         - exhaust the card with code 144063
         - the acting player reveals an encounter card
@@ -233,7 +233,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 144054:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   144054:shadow:1: Shadow
     - when the attack in progress ends:
-      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt no shadow card
+      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt no shadow card
 
 ## 144055 We Hates Them!
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -267,7 +267,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json EngageSetAside {"verb":"EngageSetAside","code":"144075"}]
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","type":"location","to":"staging"}]
+      - the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
 
 144064:B:1 (back): The players cannot advance unless the first player controls Sméagol.
@@ -278,7 +278,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 144064:B:2 (back): Forced: After a player declares any number of attackers against Gollum, discard the top card of the encounter deck. Gollum gets +X Defense for this attack, where X is the discarded card's Threat.
   144064:forced:1: Forced on the event enemyAttacked (heard about enemy (any player controls) named "Gollum")
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"}]
+    - the top card of the encounter deck goes to the encounter discard pile
     - the card the event is about: stat defense threat of the picked card, until the end of the attack
 
 ## 144065 Across the Marshes
@@ -287,8 +287,8 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
 144065:A:1 (front): When Revealed: If the number of locations in the staging area is less than the number of players in the game, discard cards from the encounter deck until a location is discarded. Then, add the discarded location to the staging area.
   144065:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json DiscardUntil {"verb":"DiscardUntil","type":"location","when":{"kind":"less","left":{"count":{"type":"location","control":"any","stagingOnly":true}},"right":{"players":true}}}]
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"less","left":{"count":{"type":"location","control":"any","stagingOnly":true}},"right":{"players":true}}}]
+    - if the number of location (any player controls) in the staging area only is less than the number of players: cards are discarded from the top of the encounter deck until a location is discarded, or the deck is empty; that card becomes the picked card
+    - then, if the number of location (any player controls) in the staging area only is less than the number of players (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
 
 144065:B:1 (back): Progress cannot be placed on locations in the staging area.
   144065:constant:1: Constant
@@ -314,7 +314,7 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
   144066:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","trait":"Undead","type":"enemy","to":"engaged"}]
+      - the acting player finds one Undead enemy in the encounter deck or its discard pile and puts it into play engaged with them (it is not revealed)
     - shuffle every location in the victory display into the encounter deck
 
 144066:B:1 (back): While any player is engaged with an Undead enemy, progress cannot be placed on this stage.
@@ -363,4 +363,4 @@ Scenario piles that place cards with no record (quest: 144064 The Taming of Smé
   144076:triggered:1: Triggered (mandatory, not printed as Forced) on the event characterDestroyed (heard about this card)
     - the players lose the game (Sméagol was destroyed)
 
-(rendered pieces: 207 by template, 26 as JSON)
+(rendered pieces: 234 by template, 8 as JSON)

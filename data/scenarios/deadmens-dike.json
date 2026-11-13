@@ -1,0 +1,186 @@
+{
+  "id": "deadmens-dike",
+  "name": "Deadmen's Dike",
+  "number": 3,
+  "stages": [
+    "09073",
+    "09074"
+  ],
+  "encounterSets": [
+    {
+      "name": "Deadmen's Dike",
+      "count": 22
+    },
+    {
+      "name": "Iârion",
+      "count": 0
+    },
+    {
+      "name": "Dark Sorcery",
+      "count": 9
+    },
+    {
+      "name": "Cursed Dead",
+      "count": 10
+    }
+  ],
+  "cards": [
+    {
+      "code": "09034",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09035",
+      "normal": 4,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "09036",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "09037",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "09038",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "09039",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "09040",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09041",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09042",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09064",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "09065",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09066",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09067",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09060",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09061",
+      "normal": 5,
+      "easy": 4,
+      "pile": "encounter"
+    },
+    {
+      "code": "09062",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09063",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09073",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "09074",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "09038",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging"
+    },
+    {
+      "code": "09033",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    },
+    {
+      "code": "09016",
+      "normal": 1,
+      "easy": 1,
+      "pile": "setAside"
+    }
+  ],
+  "campaignCard": "10166",
+  "campaignPlaced": [
+    "100158",
+    "10157",
+    "10158",
+    "10161",
+    "10162",
+    "10163",
+    "10164",
+    "10165",
+    "10167",
+    "10168",
+    "10169",
+    "10170"
+  ],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q05.3",
+    "dragnEasy": "E05.3",
+    "hobSlug": "Deadmen's-Dike"
+  }
+}

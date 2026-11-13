@@ -8,7 +8,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - When you start a phase, set it to `active` with a one-line note. Do not mark the next phase active. More than one phase may be active only when their files say they can run beside each other.
 - A phase is `completed` when its exit is green and `/reviewer` reports no blocks. A phase that changes `src/screens` or `src/play` also needs `/ux` to report no blocks. Write the date.
 - A scenario phase has an engine half and a screen half (`docs/handover/agent-brief.md`, Scenario procedure). When the engine half's exit is green and reviewed, write `engine done` in the note and leave the phase `active`. The phase is completed when both halves are.
-- Phases 27 to 33 and 37 to 60 (Mirkwood Paths, Dream-chaser and Ered Mithrin) have one review round per phase, as `.claude/agents/orchestrator.md` "One review round" says, in place of "`/reviewer` reports no blocks" (user instructions, 2026-10-27, 2026-10-30, 2026-11-05). A block the fix pass leaves open goes in the phase's note.
+- Phases 27 to 33, 37 to 60 and 77 to 87 (Mirkwood Paths, Dream-chaser, Ered Mithrin and Angmar Awakened) have one review round per phase, as `.claude/agents/orchestrator.md` "One review round" says, in place of "`/reviewer` reports no blocks" (user instructions, 2026-10-27, 2026-10-30, 2026-11-05, 2026-11-12). A block the fix pass leaves open goes in the phase's note.
 - Maestro flows are written in the phase that names them. `maestro test` runs after the last phase; it does not gate an earlier phase.
 - Phone and tablet checks are not tracked: no phase waits on one, and none is listed here (user instruction, 2026-11-06).
 - Current counts live in code: the engine version in `src/rules/engine/version.ts`, the playable scenarios in `src/campaign/playable.ts`, the printed lines no record owns in `src/effects/open-lines.ts` (`pnpm effects open`).
@@ -100,6 +100,17 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 74 | The Tower of Cirith Ungol | completed | 2026-11-12. Review round done. Open: `ungol-won`. |
 | 75 | The Black Gate Opens | completed | 2026-11-12. Review round done. |
 | 76 | Mount Doom | completed | 2026-11-12. Review round done. Open: `doom-won`. |
+| 77 | Angmar Awakened data | completed | 2026-11-12. Review round done. Open: Easy counts and MEC108 wording not user-confirmed. |
+| 78 | Angmar Awakened campaign shell | completed | 2026-11-12. Review round done. Open: campaign-card lines left to their scenarios. |
+| 79 | Intruders in Chetwood | completed | 2026-11-12. Review round done. Open: `chetwood-won`. |
+| 80 | The Weather Hills | completed | 2026-11-12. Review round done. Open: `hills-won`. |
+| 81 | Deadmen's Dike | completed | 2026-11-12. Review round done. Open: `dike-won`. |
+| 82 | The Wastes of Eriador | completed | 2026-11-12. Review round done. Open: `eriador-won`. |
+| 83 | Escape from Mount Gram | completed | 2026-11-13. Review round done. Open: `gram-won`. |
+| 84 | Across the Ettenmoors | completed | 2026-11-13. Review round done. Open: `ettenmoors-won`. |
+| 85 | The Treachery of Rhudaur | completed | 2026-11-13. Review round done. Open: `rhudaur-won`. |
+| 86 | The Battle of Carn Dûm | completed | 2026-11-13. Review round done. Open: `dum-won`. |
+| 87 | The Dread Realm | completed | 2026-11-13. Review round done. Open: `realm-won`. |
 
 ## Open items
 
@@ -109,6 +120,15 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - The release notes' golden-check comparison (`scripts/release/reach.ts`) has not run against a real previous tag; the first tag after it compares by `ENGINE_CHANGES` only.
 
 ### Fixtures and Maestro
+- `realm-won` is not committed: no seed in 1000 wins The Dread Realm with the saved decklists. Until it exists `.maestro/scenarios/the-dread-realm/the-dread-realm.yaml`, the campaign-end flow, cannot run.
+- `dum-won` is not committed: no seed in 600 wins The Battle of Carn Dûm with the saved decklists. Until it exists `.maestro/scenarios/the-battle-of-carn-dum/the-battle-of-carn-dum.yaml` cannot run.
+- `rhudaur-won` is not committed: no seed wins The Treachery of Rhudaur with the saved decklists under the golden policy. Until it exists `.maestro/scenarios/the-treachery-of-rhudaur/the-treachery-of-rhudaur.yaml` cannot run.
+- `ettenmoors-won` is not committed: no seed in 100 wins Across the Ettenmoors with the saved decklists. Until it exists `.maestro/scenarios/across-the-ettenmoors/across-the-ettenmoors.yaml` cannot run.
+- `gram-won` is not committed: no seed in 100 wins Escape from Mount Gram with the saved decklists. Until it exists `.maestro/scenarios/escape-from-mount-gram/escape-from-mount-gram.yaml` cannot run.
+- `eriador-won` is not committed: no seed in 700 wins The Wastes of Eriador with the saved decklists. Until it exists `.maestro/scenarios/the-wastes-of-eriador/the-wastes-of-eriador.yaml` cannot run.
+- `dike-won` is not committed: no seed in 600 wins Deadmen's Dike with the saved decklists (their heroes cannot put 9 damage on Thaurdir). Until it exists `.maestro/scenarios/deadmens-dike/deadmens-dike.yaml` cannot run; its Resolution step is unverified against the `to: player` view.
+- `hills-won` is not committed: no seed in 100 wins The Weather Hills with the saved decklists (Defenders of Gondor, Swords of the Noldor, Easy). Until it exists `.maestro/scenarios/the-weather-hills/the-weather-hills.yaml` cannot run.
+- `chetwood-won` is not committed: no seed in 100 wins Intruders in Chetwood with The One Deck and Defenders of Gondor under five policies. Until it exists `.maestro/scenarios/intruders-in-chetwood/intruders-in-chetwood.yaml` cannot run.
 - `marshes-won` is not committed: no seed in 600 wins The Passage of the Marshes with The One Deck and Defenders of Gondor (every game reaches threat 50 by round 4). Until it exists `.maestro/scenarios/the-passage-of-the-marshes/the-passage-of-the-marshes.yaml` cannot run.
 - `doom-won` is not committed: no seed in 800 wins Mount Doom with the saved decklists (the Ring-bearer falls in combat in round 1). Until it exists `.maestro/scenarios/mount-doom/mount-doom.yaml` and `mount-doom-keep.yaml` cannot run.
 - `ungol-won` is not committed: no seed in 600 wins The Tower of Cirith Ungol with the saved decklists. Until it exists `.maestro/scenarios/the-tower-of-cirith-ungol/the-tower-of-cirith-ungol.yaml` cannot run.
@@ -177,6 +197,127 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - Nightmare, Escape from Dol Guldur: Torture Master captures the hero the attack was made against, not each of several defenders; with 3 or 4 players the logged prisoner swap (01131:A:3) may leave one player with two prisoners.
 - Ered Mithrin data: Crypt Stalker (19099) Easy count is 1 (Hall of Beorn) against E08.7's 2; no printed source settles it.
 - Ered Mithrin data: the EMCE box prints collector numbers one below Hall of Beorn and RingsDB; codes and `printings[].number` follow the sources' number.
+
+### Rules and engine (Angmar Awakened)
+- Angmar Awakened data: Easy counts of Angmar Captain (09045, 1) and Angmar Marauder (09044, 2) in Escape from Mount Gram and Ruins of Arnor (09056, 2) in The Treachery of Rhudaur follow Hall of Beorn against DragnCards' E05 decks; no printed icon check. Not user-confirmed.
+- Angmar Awakened data: `MEC108_CHANGED` is empty because no scan shows the MEC108 printing of the 155 reprinted encounter cards; a rewording cannot be found until one is read. Not user-confirmed.
+- Angmar Awakened data: the Prison Cell, Savage Trollspawn and Amarthiúl (Wastes) piles follow each quest's Setup over DragnCards' load layout (agent recommendation). Not user-confirmed.
+- Angmar Awakened campaign cards: Iârion's Pendant at 10166:B:1 goes to the player the first player names, as the Ered Mithrin boon-ally ruling (agent recommendation; no ruling found). Not user-confirmed.
+- Angmar Awakened campaign cards: "add the Mysterious Omens side quest to the Campaign Log" (10159:A:2) adds it to the Campaign Pool (agent recommendation). Not user-confirmed.
+- Angmar Awakened campaign cards: the Amarthiúl hero ban ends at 10188:A:2 and does not return in The Dread Realm (agent recommendation). Not user-confirmed.
+- The Weather Hills: Cold from Angmar (09054) attaches to the current quest card, the side quest when one is current (community sources only). Not user-confirmed.
+- The Weather Hills: the quest-card count (09031 and others) follows Intruders in Chetwood's reading. Not user-confirmed.
+- The Weather Hills: "End the current phase" (09070:A:1) ends any phase once the effect and an attack in progress finish, combat included. Not user-confirmed.
+- The Weather Hills: Amon Forn (09026:A:2) hears Orc enemies returned to the staging area as well as revealed ones. Not user-confirmed.
+- The Weather Hills: Mysterious Omens' boons (10160:A:3): each player in turn may take one boon still set aside; it is Permanent and recorded with its hero. Not user-confirmed.
+- The Weather Hills: Stalwart (10165:A:4) marks the hero for the phase and the attachment is played through the normal play. Not user-confirmed.
+- Test kit: `test/harness/game-kit.ts` hands a game only the Wilderland and Angmar log facts, while `src/campaign/briefing.ts` also hands XP, Two Towers and Return of the King facts; sharing one helper moves 17 Dream-chaser, Two Towers and Return of the King goldens, so those goldens are dealt without facts a real game has. Not fixed.
+- Deadmen's Dike: Thaurdir's burden (10166:A:3) attaches to him although he "Cannot have attachments" (09033:A:2, rr.cannot); no ruling found. Not user-confirmed.
+- Deadmen's Dike: a boon chosen at Mysterious Omens in this scenario is recorded with its hero at 10166:B:1 (orchestrator decision; not in the printed text). Not user-confirmed.
+- Deadmen's Dike: a burden's current host counts for "the hero with the most" (10168 to 10170), ties chosen by the first player, moving on any Sorcery reveal. Not user-confirmed.
+- Deadmen's Dike: Broken Battlements (09036:A:2) places 1 time counter for each player. Not user-confirmed.
+- Deadmen's Dike: Fornost Square (09038:A:2) takes 1 token per discard effect or cost from the top of the first player's deck, not per card. Not user-confirmed.
+- Deadmen's Dike: Haunted Keep's first-Undead surge (09039:A:1) tallies from the round's start. Not user-confirmed.
+- Deadmen's Dike: Deadmen's Gate (09040:A:1) hears an event played for its Action or Response as triggered; encounter card abilities do not count. Not user-confirmed.
+- Deadmen's Dike: Terror of the North (09064:A:1) pools card types across all players' discards. Not user-confirmed.
+- Deadmen's Dike: Arnor Ravaged (100158:A:2) moves 1 damage once per attack. Not user-confirmed.
+- Deadmen's Dike: Norbury Tombs' Travel (09037:A:2) is a cost and cannot be paid with no enemy in the encounter discard pile (rr.travel; community sources for the card). Not user-confirmed.
+- Deadmen's Dike: Heavy Curse (09066:A:2) raises a card played from any zone, and a card played from the discard pile counts as its own copy (community source only). Not user-confirmed.
+- Deadmen's Dike: The Power of Angmar (09067:A:2) locks only player card effects on player discard piles (community source only). Not user-confirmed.
+- Deadmen's Dike: stage 2B (09074:B:2) needs its 13 progress and Thaurdir at 9 damage, and an empty deck eliminates at each check (community source only). Not user-confirmed.
+- `AddSetAsideToStaging` announces no entering play (no `announceEntered`, no family hook) for a set-aside card it stages; routing it through `moveEncounter` moves 14 goldens (Dream-chaser, Ered Mithrin, Fellowship and Two Towers scenarios), so Thaurdir uses `EnterSetAsideStaging` instead. Not fixed.
+- Renderer gaps, Deadmen's Dike (behaviour proven by tests): "top 5 of his discard pile" per player (09037:A:1, 09067:A:3), an unpayable Travel cost (09037:A:2, 09018:A:1), `playerAbilityTriggered` from a played event (09040:A:1), what `discardLocked` blocks (09067:A:2), `eliminatedAtEmptyDeck` (09073:B:3, 09074:B:2), 10166:B:1's choice and earned burden print as JSON; the 09074:whenRevealed:1 "then" check runs per reveal because `Repeat` takes no `when`.
+- The Wastes of Eriador: a flip of the Time objective to the side already up changes nothing (agent recommendation). Not user-confirmed.
+- The Wastes of Eriador: at Night (10012:A:1) progress cannot be placed on quest cards, a current side quest included, but the active location still takes it (two forum members, no official answer). Not user-confirmed.
+- The Wastes of Eriador: Northern Warg's +1 Threat (10018:A:1) covers itself and Wargs entering later in the phase (community note). Not user-confirmed.
+- The Wastes of Eriador: Eriador Wastes' cap (10023:A:1) counts quest-card progress only and does not stack between copies (community only). Not user-confirmed.
+- The Wastes of Eriador: Predatory Wolves (10027:A:1) counts Amarthiúl as an ally of cost 0, and a player may take the search option instead (one forum reply). Not user-confirmed.
+- The Wastes of Eriador: Determination's "determined" mark is cumulative and kept if the character later falls (agent recommendation). Not user-confirmed.
+- The Wastes of Eriador: Northern Warg's shadow makes no third attack in the combat phase (community only). Not user-confirmed.
+- Renderer gaps, The Wastes of Eriador (behaviour proven by tests): what `noQuestProgress` covers at Night (10012:A:1), the recalculated Warg pick (10018:A:1), who engages Blood-thirsty Warg (10019:A:1), `checkCostPerDamaged` (10020:A:2), Eriador Wastes' per-round, non-stacking cap and unpayable Travel (10023:A:1, A:2), Amarthiúl in Predatory Wolves' pick (10027:A:1), `Earn` in 10171:B:1 prints as JSON.
+- Escape from Mount Gram: starting threat is the starting hero's threat cost, dropping the log's starting-threat modifier (10038:A:1). Not user-confirmed.
+- Escape from Mount Gram: heroes moved to the captured deck at setup have not left play, and their Easy Mode resource is dropped (10038:A:1). Not user-confirmed.
+- Escape from Mount Gram: Capture X on a short or empty captured deck, and on cards added to staging without being revealed. Not user-confirmed.
+- Escape from Mount Gram: the join target among several areas, and the joiner's stage 2B leaving play (10039:B:2). Not user-confirmed.
+- Escape from Mount Gram: an eliminated head seat's area passes to the first joined seat clockwise (no source covers a player who had already joined). Not user-confirmed.
+- Escape from Mount Gram: advancing together returns each area's active location to the staging area (no ruling found). Not user-confirmed.
+- Escape from Mount Gram: Jailor Gornákh (10041:A:1) on a tie, when already engaged, and not hearing a Prison Cell put into play. Not user-confirmed.
+- Escape from Mount Gram: the area's own player chooses for Dungeon Guard and Prison Cell (10044:A:2, 10046:A:2), and Prison Cell's put-into-play is not a rescue. Not user-confirmed.
+- Escape from Mount Gram: Captives of Gornákh's host pool is every encounter card in play in the area (10051:A:1). Not user-confirmed.
+- Escape from Mount Gram: Interrogation (10052) counts a hero's cost as 0 and its Doomed 2 is immediate. Not user-confirmed.
+- Escape from Mount Gram: the refresh raise (10174:B:1) counts the stage reached plus the side quests in the victory display. Not user-confirmed.
+- Escape from Mount Gram: stolen cards (10174:B:3) include unique heroes left in the captured deck, but not cards still under another card; they are barred as deck cards only. Not user-confirmed.
+- Escape from Mount Gram: Loot the Dungeons' quest points count living players, one number for every area (10175:A:1). Not user-confirmed.
+- Escape from Mount Gram: a player whose heroes in play are gone but who has a captured hero stays in the game (orchestrator decision taking the recommendation, rr.player-elimination). Not user-confirmed.
+- Escape from Mount Gram: Berelind (10176:A:1) places progress on a quest card in play the player chooses in their area. Not user-confirmed.
+- Escape from Mount Gram: stage 2B's progress rescues one captured card per point (10039:B:1; community source only). Not user-confirmed.
+- Renderer gaps, Escape from Mount Gram (behaviour proven by tests): the `captured` family's verbs, conditions, amount and pick filter, `SwitchActor`, `ShuffleSetAsideSet`, `RaiseThreatTo`, `StartSeparateStage reveal` and `ProgressQuest` print as JSON; 10049:A:2 reads "every enemy in play" without the area limit; which area's first player acts (10044:A:2, 10046:A:2, 10051:A:1).
+- Across the Ettenmoors: with no side quest left in the deck, 10064:B:1, 10065:A:1 and 10066:A:1 discard the deck to empty and reveal nothing (agent recommendation; the order against the current-quest choice rests on one forum answer). Not user-confirmed.
+- Across the Ettenmoors: an active safe location blanks encounter side quests (community sources) and leaves a treachery's Surge in place (agent recommendation). Not user-confirmed.
+- Across the Ettenmoors: Cruel Mountain-troll's (10074) excess is damage beyond remaining hit points, from combat only (community source). Not user-confirmed.
+- Across the Ettenmoors: Troll-fells' (10077:A:2) search for a safe location (community source). Not user-confirmed.
+- Across the Ettenmoors: Barren Moorland (10078:A:1): its trigger and stacking (community source); the ally's controller chooses (agent recommendation). Not user-confirmed.
+- Across the Ettenmoors: Arador's Bane (10079): either option may be chosen when both can act (community source). Not user-confirmed.
+- Across the Ettenmoors: No Rest (10080): one per hero, the first player choosing among the hosts (agent recommendation). Not user-confirmed.
+- Across the Ettenmoors: Scavenge for Supplies (10083): the first player breaks highest-threat ties and the free play skips the +1 cost (agent recommendation). Not user-confirmed.
+- Across the Ettenmoors: Losing Time's shadow (10183:A:3): the defending player chooses +3 Attack or +3 Defense (agent recommendation; a play-through agrees). Not user-confirmed.
+- Across the Ettenmoors: the Losing Time clock (10182:A:3) fully reveals a copy (community play-throughs), and with no copy left the resources stay (agent recommendation). Not user-confirmed.
+- Renderer gaps, Across the Ettenmoors (behaviour proven by tests): the travel Forced and Responses of the four safe locations name no destination (10068 to 10071); `excessToEachQuest`, `damagedCannotFace` and `progressPlacedHere` show as flags (10074, 10076, 10081); the safe-location choice's zones (10075:A:2); who chooses for Barren Moorland (10078:A:1); "1 copy per player" in 10064:A:1's pile header.
+- The Treachery of Rhudaur: declining the side-quest choice on stage 1 leaves no current quest (10094:B:3; agent recommendation). Not user-confirmed.
+- The Treachery of Rhudaur: after the last side quest flips, the current quest is the main quest 2B (10094:B:4; agent recommendation). Not user-confirmed.
+- The Treachery of Rhudaur: 10094:B:2 removes the side quests still unflipped from the game (community source only). Not user-confirmed.
+- The Treachery of Rhudaur: a discard that runs the encounter deck out resets it and carries on (10097, 10107; agent recommendation by analogy with faq.last-encounter-card). Not user-confirmed.
+- The Treachery of Rhudaur: Forbidden Descent (10101:A:1) takes all progress placed on a quest, card effects included, and each copy takes its own first 2 (text from a community source; scope and stacking agent recommendation). Not user-confirmed.
+- The Treachery of Rhudaur: Ghostly Ruins' Travel (10103:A:2) is a cost unpayable with no Undead enemy in the encounter discard pile (community source only). Not user-confirmed.
+- The Treachery of Rhudaur: Dark Covenant (10107:A:2) raises threat by the destroyed character's Willpower just before it was destroyed (agent recommendation). Not user-confirmed.
+- The Treachery of Rhudaur: Quiet the Spirits (10109:A:1): an Undead entering play by any route engages the highest-threat player (community source); ties go to the first player (agent recommendation). Not user-confirmed.
+- The Treachery of Rhudaur: Decipher Ancient Texts' 3 uses per round (10113:A:2) are shared by all players (community source only). Not user-confirmed.
+- The Treachery of Rhudaur: each Clue's boon (10184:B:1) goes into its controller's deck as well as the pool (agent recommendation). Not user-confirmed.
+- Renderer gaps, The Treachery of Rhudaur (behaviour proven by tests): unclaimed side quests counted by 10094:B:4, Ghostly Ruins' unpayable Travel (10103:A:2), the main quest barred from Centuries of Sorrow's choice and Haunting Fog with no current quest (10105:A:2, 10108:A:1), Amarthiúl as an ally and the shared limit (10113), the boon into the deck (10184:B:1), "Restricted." on 10185 to 10187.
+- `modifiedStat` (`src/rules/core/keywords.ts`) reads traits with no effect list, so a trait an effect grants is not seen by stat conditions such as `defendingAgainst` (the condition path sees it).
+- Intruders in Chetwood: quest cards in play are the main quest, the staged encounter side quests and the player side quests, at least 1 (09016, 09019, 09047, 09048, 09050). Not user-confirmed.
+- Intruders in Chetwood: Iârion's Response (09016:A:3) hears a side quest revealed by a search of the encounter deck, not of the discard pile. Not user-confirmed.
+- Intruders in Chetwood: Iârion held facedown under Rescue Iârion (09024:A:2) stays in play and has not left it. Not user-confirmed.
+- Intruders in Chetwood: Time counters come off after the end-of-refresh Forced effects. Not user-confirmed.
+- Intruders in Chetwood: Outlying Homestead (09020:A:2) bars threat reduction by player card effects only. Not user-confirmed.
+- Intruders in Chetwood: Sudden Assault (09021:A:1) attacks first and searches for an Orc War Party only if no attack was made. Not user-confirmed.
+- Intruders in Chetwood: Angmar Orc's ally choice (09043:A:1) may take Iârion; the first player chooses. Not user-confirmed.
+- Intruders in Chetwood: Pressing Needs (09049:A:2): search-and-reveal a side quest or make a different quest card current; player side quests not eligible. Not user-confirmed.
+- Intruders in Chetwood: Weight of Responsibility (09050) counts quest cards when it resolves. Not user-confirmed.
+- Intruders in Chetwood: Stop the War Party's Setup (09068:A:1): each player searches for one location with a different title. Not user-confirmed.
+- Intruders in Chetwood: Protect the Innocent (10158:A:1) takes 1 damage per attack that damages a character. Not user-confirmed.
+- Intruders in Chetwood: Orc Rearguard's cap (09023:A:1) holds on whichever quest is current (community source only). Not user-confirmed.
+- Intruders in Chetwood: Iârion's control follows the first player token (09016:A:2), by the Aragorn and Calphon rulings and a community source only. Not user-confirmed.
+- Renderer gaps, Intruders in Chetwood (behaviour proven by tests): 09016:A:2 control has no template; Orc War Party's stage bar does not say it binds the main quest only (09017:A:3); Orc Rearguard's cap does not say "each round" (09023:A:1); `lastTimeCounterRemoved` and `questDefeated` do not say "this card" (09024:A:3, 09051:A:2); Angmar Captain's X and target (09045:A:1); 09068:B:3's first player and win; the Pendant's cancel limits (10157:A:2); `SearchMove` with `when` prints as JSON.
+- Angmar Awakened: the box's Setup steps other than the Orc deck (`prepareCapturedDeck`, `captureUnder` and the others) are catalog data only; the engine reads them in their scenarios' phases.
+
+- The Battle of Carn Dûm: the Werewolf (10131:A:2) flips on exactly 3 shadow cards, by analogy with the official Thaurdir ruling. Not user-confirmed.
+- The Battle of Carn Dûm: Thaurdir on stage 2B (10126:B:1) attacks each player in player order and fires no engagement event (community thread, no agreement). Not user-confirmed.
+- The Battle of Carn Dûm: Thaurdir's Captain Forced (10127:A:4) is not heard for a Sorcery card revealed as a shadow card (community source only). Not user-confirmed.
+- The Battle of Carn Dûm: engagement costs lowered by Champion Thaurdir (10128:A:3) do not go below 0 (agent recommendation). Not user-confirmed.
+- The Battle of Carn Dûm: Carn Dûm Garrison's shadow (10129:A:2) counts the attacking enemy's shadow cards, itself included (agent recommendation). Not user-confirmed.
+- The Battle of Carn Dûm: Orc Grunts (10130:A:2) reduce only progress landing on the current quest after the active location's share (community only). Not user-confirmed.
+- The Battle of Carn Dûm: any player's event deals the Werewolf (10131:A:1) a shadow card (agent recommendation). Not user-confirmed.
+- The Battle of Carn Dûm: Fortress Walls (10135:A:1) counts resources spent from ally pools as well as hero pools (agent recommendation). Not user-confirmed.
+- The Battle of Carn Dûm: Vile Affliction (10137:A:1) counts an X or blank cost as 0 (agent recommendation). Not user-confirmed.
+- The Battle of Carn Dûm: a Thaurdir burden attaches to the staged Thaurdir although he cannot have attachments, and the Amarthiúl hero stays usable in The Dread Realm (agent recommendation). Not user-confirmed.
+- `beginEnemyAttack` (`src/rules/combat/combat.ts`) deals a shadow card a second time for an attack from staging made by an enemy with `engagedWithAll` (The Ring Goes South's Watcher, Fire in the Night, The Withered Heath, Mount Gundabad, The Fate of Wilderland): `attackNowFromStaging` deals one first. Fixing it moves shipped goldens and needs `ENGINE_VERSION`. Not fixed; Thaurdir's path skips the extra deal.
+
+- The Dread Realm: reanimating a card counts as engaging (10150 and the other reanimating cards; community forum agreement). Not user-confirmed.
+- The Dread Realm: the Witch of Angmar (101156:A:1) resolves the When Revealed of her Sorcery shadow cards, from an official FAQ entry read only as quoted on the FFG forum (the FAQ PDF is unavailable). Not user-confirmed.
+- The Dread Realm: "Sorcery cards in play" excludes shadow cards (101164, 10153; community consensus). Not user-confirmed.
+- The Dread Realm: a Reanimated Dead counts as in play although facedown (agent recommendation). Not user-confirmed.
+- The Dread Realm: a Reanimated Dead reanimated in a step attacks that step with two shadow cards (agent recommendation). Not user-confirmed.
+- The Dread Realm: the defending player reanimates for the Unholy Crypt, Dark Halls and Dwimmerlaik lines (agent recommendation). Not user-confirmed.
+- The Dread Realm: removing Possession from the game leaves its Reanimated Dead in play (agent recommendation). Not user-confirmed.
+- The Dread Realm: ties for A Fell Dread go to the first player (agent recommendation). Not user-confirmed.
+- The Dread Realm: Daechanar (10153:A:3) cancels the whole damage instance and the first player chooses the Sorcery card removed (agent recommendation). Not user-confirmed.
+- The Dread Realm: the Wraith of Carn Dûm's host is chosen by the first player and its Forced is inactive while it lies attached (agent recommendation). Not user-confirmed.
+- The Dread Realm: Sinister Dungeon is dealt as a shadow card instead of going to the discard pile (agent recommendation). Not user-confirmed.
+- The Dread Realm: Dark Halls' shadow reanimates a copy of the defending character from the defending player's discard pile (agent recommendation). Not user-confirmed.
+- The Dread Realm: progress the Altar of Midwinter cannot take goes to the quest card (agent recommendation). Not user-confirmed.
+- The Dread Realm: stage 3's search shuffles the deck after, and the first player divides stage 3's progress freely (agent recommendation). Not user-confirmed.
+- Renderer gaps, The Dread Realm (behaviour proven by tests): A Fell Dread's highest-threat host without one already (101163:A:1), the location count's zones (10152:B:3), the first player as the Altar's actor (10154:A:2), 10193's Setup verbs and its win line print as JSON or "(no instructions)".
 
 ### Screens and code
 - Fire in the Night: the table has no side-quest deck area or current-quest mark (`docs/brief.md`, Ered Mithrin).

@@ -120,7 +120,9 @@ export function noteSpent(state: ScenarioState, payments: readonly Payment[], ct
   const spent = payments.filter((payment) => payment.amount > 0);
   const ids = spent.map((payment) => payment.heroId);
   if (ids.length === 0) return state;
-  const announced = gameReads(state, ctx, '"trigger":"resourcesSpent"') ? announceSpent(state, spent) : state;
+  const seatsHeard = gameReads(state, ctx, '"trigger":"resourcesSpent"') ? announceSpent(state, spent) : state;
+  // Forage for Food (10082:A:1) hears each hero whose pool paid, once for the payment.
+  const announced = gameReads(seatsHeard, ctx, '"trigger":"heroResourcesSpent"') ? announceHeroesSpent(seatsHeard, ids) : seatsHeard;
   if (!gameReads(announced, ctx, '"unspent":true')) return announced;
   const before = announced.spent?.round === announced.round ? announced.spent.ids : [];
   return { ...announced, spent: { round: announced.round, ids: [...new Set([...before, ...ids])] } };
@@ -135,6 +137,13 @@ function announceSpent(state: ScenarioState, spent: readonly Payment[]): Scenari
   }
   let next = state;
   for (const [seat, amount] of bySeat) next = queueEvent(next, { trigger: "resourcesSpent", seat, amount });
+  return next;
+}
+
+// One `heroResourcesSpent` event for each hero whose pool paid (families/angmar).
+function announceHeroesSpent(state: ScenarioState, heroIds: readonly string[]): ScenarioState {
+  let next = state;
+  for (const heroId of new Set(heroIds)) next = queueEvent(next, { trigger: "heroResourcesSpent", seat: state.cards[heroId]?.controller ?? null, cardId: heroId });
   return next;
 }
 

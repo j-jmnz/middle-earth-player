@@ -25,7 +25,10 @@ const searchSelector = {
   traits: z.array(z.string().min(1)).min(2).optional(),
   // A non-unique card ("searches the encounter deck and discard pile for a non-unique Undead enemy", 19111:A:1).
   nonUnique: z.boolean().optional(),
-  type: z.enum(["enemy", "location", "treachery", "objective"]).optional(),
+  // `encounter-side-quest`: "search the encounter deck and discard pile for an encounter side quest" (09049:A:2).
+  type: z.enum(["enemy", "location", "treachery", "objective", "encounter-side-quest"]).optional(),
+  // A card with the Safe keyword (Across the Ettenmoors, mec108.safe): "search the encounter deck and discard pile for a location with the safe keyword" (10077:A:2). With `type: "objective"` the pool's other objectives stay out.
+  safe: z.literal(true).optional(),
 };
 
 export const simpleVerbs = [
@@ -150,8 +153,10 @@ export const simpleVerbs = [
   verbFlags(codeVerb("SetAside"), { setupRole: "dealt" }),
   verbFlags(codeVerb("AttachToRingBearer"), { setupRole: "dealt" }),
   // Moves a card that was set aside, out of play, into the staging area. It is not a reveal. `all`: every set aside copy of the code joins it ("each set aside Soldier of Isengard", 143073:A:1), not one.
-  // Exactly one of `code` and `trait` (the effect schema refuses neither and both). `trait` instead of `code`: the set aside cards with that trait ("add each set aside Harad enemy to the staging area", 145078:B:1; with `all`).
+  // Exactly one of `code` and `trait` (the effect schema refuses neither and both). `trait` instead of `code`: the set aside cards with that trait ("add each set aside Harad enemy to the staging area", 145078:B:1; with `all`). `announce`: the card entering play is announced as added to the staging area (`addedToStaging`), for the cards that hear it ("Forced: After Thaurdir enters play", 10166:A:3); without it nothing is announced.
   z.strictObject({ verb: z.literal("AddSetAsideToStaging"), code: z.string().min(1).optional(), trait: z.string().min(1).optional(), all: z.literal(true).optional(), ...when }),
+  // A set-aside card with this code is added to the staging area and enters play, as an encounter card effect puts a card there (the cards that hear it enter play or be added to the staging area hear it: Thaurdir, 10166:A:3, 09074:A:1). AddSetAsideToStaging does not announce.
+  z.strictObject({ verb: z.literal("EnterSetAsideStaging"), code: z.string().min(1), ...when }),
   // During play: one out-of-play copy of the card (the `outOfPlay` condition's zones) joins the encounter deck, which is
   // shuffled ("shuffle 1 out of play Ringwraith into the encounter deck", 141026:B:2, 141051:A:2, 141053:A:1, 141054:A:2).
   // When copies are out of play in more than one zone, the first player chooses which (rr.first-player). Nothing happens
@@ -169,8 +174,9 @@ export const simpleVerbs = [
   z.strictObject({ verb: z.literal("ReduceOpeningHand"), amount: z.number().int().positive(), ...when }),
   // Moves one matching card from the encounter discard pile into the encounter deck, then shuffles.
   z.strictObject({ verb: z.literal("ShuffleIntoDeck"), ...searchSelector, ...when }),
-  // Finds a card in the encounter deck or discard pile and reveals it. `to: "engaged"`: the enemy found is revealed and put into play engaged with the revealing player instead of staged ("reveal it, and put it into play engaged with you", 143065:A:2).
-  z.strictObject({ verb: z.literal("SearchReveal"), ...searchSelector, who: whoSchema, to: z.enum(["staging", "engaged"]).optional(), ...when }),
+  // Finds a card in the encounter deck or discard pile and reveals it. `cost`: the search is a Travel cost the players must be able to pay, so it needs a card to find ("Travel: The first player searches ... for a Warg enemy", 10024:A:2; rr.travel); read by the angmar family. `to: "engaged"`: the enemy found is revealed and put into play engaged with the revealing player instead of staged ("reveal it, and put it into play engaged with you", 143065:A:2).
+  // `deckOnly`: the encounter deck alone is searched, not its discard pile ("Search the encounter deck for 1 copy of Prison Cell", 10039:A:2).
+  z.strictObject({ verb: z.literal("SearchReveal"), ...searchSelector, who: whoSchema, to: z.enum(["staging", "engaged"]).optional(), cost: z.literal(true).optional(), deckOnly: z.literal(true).optional(), ...when }),
   // Finds a card in the encounter deck or discard pile and puts it out without revealing it. With `each`, every card that
   // matches goes ("add each Nazgûl enemy found to the staging area", 141027:A:1) and nobody chooses.
   verbFlags(z.strictObject({
@@ -182,6 +188,8 @@ export const simpleVerbs = [
     each: z.boolean().optional(),
     // The encounter deck alone is searched, not its discard pile ("search the encounter deck for a Harad enemy", 144037:A:1; rr.search: the discard pile is searched only when the line says so).
     deckOnly: z.literal(true).optional(),
+    // The encounter discard pile alone is searched ("Put each copy of Cursed Dead in the discard pile into play in the staging area", 09061:A:1; with `each`, `to: "staging"`: no search of the deck).
+    discardOnly: z.literal(true).optional(),
     // The victory display is searched too ("search the encounter deck, discard pile, and victory display for a Nazgûl enemy", 146036:A:2).
     victory: z.literal(true).optional(),
     // While a card with this code is in the encounter deck or its discard pile, the search must take it, until an earlier search of the same effect has taken one ("one of those enemies must be
@@ -189,6 +197,8 @@ export const simpleVerbs = [
     require: z.string().min(1).optional(),
     // The card found is the effect's picked card afterward, for the instructions that follow ("add it to the staging area. Then, attach Heavy Cruiser to that objective", 12127:A:3).
     remember: z.literal(true).optional(),
+    // With `to: "engaged"`: the card found comes into play engaged with the seat an earlier pick chose (PickHighestThreat), not with the searching player ("puts it into play engaged with the player with the highest threat", 10083:A:2).
+    engagedSeat: z.literal("picked").optional(),
     // The card found must have a title no card an earlier search of this effect found has: "each player searches for a different location" (41004:B:1,
     // 41005:A:1). The titles are the cards' printed names; cards that share one are the same choice.
     different: z.boolean().optional(),
@@ -229,8 +239,9 @@ export const simpleVerbs = [
   verb("GainSurge"),
   z.strictObject({ verb: z.literal("HideTest"), x: z.number().int().positive(), ...when }),
   // The source enemy attacks now, dealt a shadow card of its own; with `shadow: false` it is dealt none ("makes an additional attack after this one. (Do not deal it a shadow card.)", 18022:A:1).
+  // `keepShadows` (with `shadow: false`): the shadow cards the enemy already holds are not discarded first, so they all resolve in this attack ("do not deal it another shadow card for this attack", 10131:A:2).
   // `afterThis`: while the source enemy's attack is in progress the new attack is made once this one has ended ("makes an additional attack against you after this one", 143052:A:1); with no attack under way nothing happens.
-  verbFlags(z.strictObject({ verb: z.literal("ImmediateAttack"), shadow: z.literal(false).optional(), afterThis: z.literal(true).optional(), ...when }), { runsInFrame: true }),
+  verbFlags(z.strictObject({ verb: z.literal("ImmediateAttack"), shadow: z.literal(false).optional(), keepShadows: z.literal(true).optional(), afterThis: z.literal(true).optional(), ...when }), { runsInFrame: true }),
   // The attack in progress counts as undefended, even if a defender was declared.
   verb("ConsiderUndefended"),
   // The actor readies one hero they control.
@@ -387,7 +398,7 @@ export const simpleVerbs = [
   // `to: staging`: they are added to the staging area instead ("Add each enemy discarded this way to the staging area", 142056:A:2).
   // As a quest card's Setup it is run in a frame of its own after the deal ("Shuffle the encounter deck and discard cards from the top until X enemies are discarded", 19168:A:1).
   // `cardType: location`: locations are counted instead, and with `to: staging` each is added to the staging area ("Discard cards from the top until X locations are discarded... Add each location discarded this way to the staging area", 146077:A:1).
-  verbFlags(z.strictObject({ verb: z.literal("DiscardUntilEnemies"), perPlayer: z.number().int().positive(), to: z.literal("staging").optional(), cardType: z.literal("location").optional(), ...when }), { setupRuns: "top" }),
+  verbFlags(z.strictObject({ verb: z.literal("DiscardUntilEnemies"), perPlayer: z.number().int().positive(), less: z.number().int().positive().optional(), trait: z.string().min(1).optional(), to: z.literal("staging").optional(), cardType: z.literal("location").optional(), ...when }), { setupRuns: "top" }),
   // The last picked card is placed facedown under the source location. While it is there it is out of play (141049:A:1).
   verb("PlaceUnderSelf"),
   // Each card under the source location returns to the staging area face up (141049:A:2). `to: "engaged"`: each is put into play engaged with the first player instead, and counts as engaging him ("put each enemy under it into play engaged with the first player", 146029:A:2).
@@ -395,8 +406,8 @@ export const simpleVerbs = [
   // The source card (a shadow card) is shuffled into the encounter deck instead of being discarded (141069:A:3).
   verb("ShuffleSelfIntoEncounterDeck"),
   // The actor (or, with `who`, the first player) discards cards at random from their hand, `amount` (1 by default; read, so X works). The seed
-  // picks them (141047:A:2, 141084:A:2).
-  z.strictObject({ verb: z.literal("DiscardRandomFromHand"), amount: positiveAmountSchema.optional(), who: z.enum(["firstPlayer", "eachSeat"]).optional(), remember: z.literal(true).optional(), ...when }),
+  // picks them (141047:A:2, 141084:A:2). `raiseByCost`: the discarding player's threat is raised by the discarded card's printed cost, 0 for a card with no printed cost or an X cost ("Discard a random card from your hand and raise your threat by its printed cost", 10052:A:2).
+  z.strictObject({ verb: z.literal("DiscardRandomFromHand"), amount: positiveAmountSchema.optional(), who: z.enum(["firstPlayer", "eachSeat"]).optional(), remember: z.literal(true).optional(), raiseByCost: z.literal(true).optional(), ...when }),
   // Setup: a card from the box joins the encounter deck. The deck is shuffled by the Setup step that says so.
   codeVerb("ShuffleIntoEncounterDeck"),
   // Campaign setup: the voluntary hero change costs no threat penalty on this scenario's card.
@@ -420,6 +431,8 @@ export const simpleVerbs = [
     afterMulligan: z.boolean().optional(),
     // With `to: hero` at a Resolution: the hero may be any player's, not only the chooser's ("record which hero you attach it to", 11182:B:1).
     anyHero: z.boolean().optional(),
+    // A Resolution's offer only to a player who controls the objective with this code (a Clue attached to one of their characters, claimed): the card is offered to that seat alone, or to nobody ("For each Clue a player controls, that player may add the boon with the same name to the Campaign Pool and their deck", 10184:B:1).
+    ifControls: z.string().min(1).optional(),
     // With `to: pool` and `who: firstPlayer`: the first player chooses one of the named cards for the group, and the others do not join the pool ("Gundabad Hunter or Gundabad Stalker", 12189:B:5); the resolution screen says so.
     only: z.literal(true).optional(),
     ...when,

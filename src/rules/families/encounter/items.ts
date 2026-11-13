@@ -9,7 +9,7 @@ import { frameScope, resolveAmount } from "../../interpret/amounts.ts";
 import { attachmentHostIds, enforceRestricted } from "../../player/attach.ts";
 import { effectCause, ruleCause } from "../../core/cause.ts";
 import { askTarget } from "../../windows/choices.ts";
-import { holds } from "../../interpret/conditions.ts";
+import { hasTrait, holds } from "../../interpret/conditions.ts";
 import { pushEffectFrame } from "../../interpret/effect-frames.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
@@ -89,6 +89,7 @@ export function encounterCandidates(state: ScenarioState, instruction: PickEncou
     if (instruction.notType && printed.type === instruction.notType) return false;
     if (instruction.noVictory && (printed.victory ?? 0) > 0) return false;
     if (instruction.nonUnique && printed.isUnique) return false;
+    if (instruction.trait && !hasTrait(state, id, instruction.trait, ctx)) return false;
     if (inPlay(card.zone) && playerEffect && !playerCardEffectCanChoose(printed)) return false;
     if (max != null && (inPlay(card.zone) ? modifiedStat(state, card, "threat", ctx.cards) : (printed.threat ?? 0)) > max) return false;
     return true;

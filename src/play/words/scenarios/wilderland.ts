@@ -17,8 +17,9 @@ import type { ChoiceNames, PickWords } from "../choice.ts";
 import { heathAsk, heathBranchWords, heathChooseNote, heathOptionLabel } from "./heath.ts";
 import { framsburgAsk, framsburgBranchNow, framsburgBranchWords, framsburgChooseNote } from "./framsburg.ts";
 import { fateAsk, fateBranchRows, fateBranchWords, fateChooseNote } from "./fate.ts";
+import { boonHeroAsk } from "./angmar/angmar-table.ts";
 import { dragonSicknessAsk, gundabadAsk, gundabadBranchWords, gundabadChooseNote } from "./gundabad.ts";
-import { nightAsk, nightBranchWords, nightChooseNote, nightQuestsNow } from "./night.ts";
+import { nightAsk, nightBranchWords, nightChooseNote, nightMainNow, nightQuestsNow } from "./night.ts";
 import { rhovanionAsk, rhovanionBranchWords, rhovanionChooseNote } from "./rhovanion.ts";
 import { askedSeat, seatSays } from "../seat.ts";
 import { assignDamageWords } from "./south.ts";
@@ -134,7 +135,7 @@ export function wilderlandAsk(instruction: Instruction, source: string | null, n
   }
   const kings = kingsQuestAsk(instruction, source, names, next, facts);
   if (kings) return kings;
-  const heath = heathAsk(instruction, source, names, next, facts) ?? rhovanionAsk(instruction, source, names, next, facts) ?? nightAsk(instruction, source, names, next, facts) ?? framsburgAsk(instruction, source, names, next, facts) ?? dragonSicknessAsk(instruction, source, names, next) ?? gundabadAsk(instruction, source, names, next, facts?.game, facts?.ctx) ?? fateAsk(instruction, source, names, next, facts?.game, facts?.ctx);
+  const heath = heathAsk(instruction, source, names, next, facts) ?? rhovanionAsk(instruction, source, names, next, facts) ?? nightAsk(instruction, source, names, next, facts) ?? framsburgAsk(instruction, source, names, next, facts) ?? dragonSicknessAsk(instruction, source, names, next) ?? boonHeroAsk(instruction, source, names, next, facts?.game) ?? gundabadAsk(instruction, source, names, next, facts?.game, facts?.ctx) ?? fateAsk(instruction, source, names, next, facts?.game, facts?.ctx);
   if (heath) return heath;
   if (instruction.verb !== "AttachRandomTreasure") return null;
   const choose = `Choose 1 of ${drawn} random undiscovered treasures to attach as a guarded objective.`;
@@ -239,8 +240,9 @@ export function wilderlandBranchNow(game: ScenarioState, ctx: ReduceContext, cho
     if (spread) counted[option.id] = resolveAmount(game, spread.amount, frameScope(game, seat, sourceId), ctx);
   }
   const quests = nightQuestsNow(game, ctx, choose);
+  const main = nightMainNow(game, ctx, choose);
   const rows = { ...framsburgBranchNow(game, ctx, choose, seat), ...fateBranchRows(game, ctx, choose, sourceId) };
-  return { ...(Object.keys(counted).length > 0 ? { counted } : {}), ...(quests ? { quests } : {}), ...(Object.keys(rows).length > 0 ? { rows } : {}) };
+  return { ...(Object.keys(counted).length > 0 ? { counted } : {}), ...(quests ? { quests } : {}), ...(main ? { main } : {}), ...(Object.keys(rows).length > 0 ? { rows } : {}) };
 }
 
 /** A branch that counts cards, with the number now: "Raise your threat by 3 (1 for each ally you control)", "Deal 1 damage to each ally you control (3)". Null for any other branch. */

@@ -36,4 +36,6 @@ export type AttackDefense = {
   hitPointsOn?: Readonly<Record<string, number>>;
   // The attacking enemy's Attack when its shadow cards began to resolve, to tell whether one increased it.
   attackBefore?: number;
+  // The characters this attack placed damage on, each with the damage it held before, noted while a card hears `attackDamagedCharacter` (families/angmar/damage.ts).
+  hurt?: Readonly<Record<string, number>>;
 };

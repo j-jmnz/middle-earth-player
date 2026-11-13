@@ -31,6 +31,7 @@ import { listenerInPlay } from "./guards.ts";
 import { seatThreat } from "../play/hooks.ts";
 import { markPicked } from "../play/refs.ts";
 import { dealForAttack } from "../south/watcher.ts";
+import { currentQuestId } from "../wilderland/night-quest.ts";
 
 // The verbs src/catalog/families/nightmare.ts adds, for the Nightmare decks. The attack and pick verbs are here; Escape from Dol Guldur's
 // prisoners, stage return and tokens are in nightmare/dungeon.ts, the setup card's own lines in nightmare/setup.ts, and the reads the
@@ -79,7 +80,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "RemoveEnemyDamage":
       return removeEnemyDamage(state, ctx, steps);
     case "MoveDamageTo":
-      return moveDamageTo(state, instruction.from, instruction.to, focus, ctx, steps);
+      return moveDamageTo(state, instruction.from, instruction.to, instruction.amount, focus, ctx, steps);
     case "TakeMorePrisoners":
       return takeMorePrisoners(state, ctx);
     case "TakeHeroPrisoner":
@@ -97,11 +98,11 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
   }
 }
 
-// The source treachery goes onto the current quest card, faceup. It is discarded with that stage when the quest advances (quest.ts
+// The source treachery goes onto the current quest card, faceup: the side quest that is the current quest now (09054:A:1; mec108.side-quests-in-play), else the main quest card. It is discarded with that stage when the quest advances (quest.ts
 // advanceStage releases a defeated stage's attachments, rr.attachment-cards).
 function attachToQuest(state: ScenarioState, focus: Focus): ScenarioState {
   const source = focus.sourceId;
-  const quest = state.questStage;
+  const quest = currentQuestId(state);
   if (!source || !quest || !state.cards[source] || !state.cards[quest]) return state;
   return updateCard(attachTo(moveCard(state, source, { zone: "attached" }), source, quest), source, { face: "up", controller: null });
 }
@@ -126,7 +127,7 @@ function attackActor(state: ScenarioState, focus: Focus, ctx: ReduceContext, ste
   if (!id || !enemy || state.seats[focus.seat]?.eliminated || attackBarred(state, id, focus.seat)) return state;
   const staged = enemy.zone === "staging";
   if (!staged && !(enemy.zone === "engaged" && enemy.controller === focus.seat)) return state;
-  const dealt = staged ? dealForAttack(state, id, steps) : dealAttackShadow(state, id, ctx, steps);
+  const dealt = staged ? dealForAttack(state, id, steps, ctx) : dealAttackShadow(state, id, ctx, steps);
   const begun = beginEnemyAttack(dealt, focus.seat, id, ctx, steps, { fromStaging: staged });
   return begun.pendingAttack ? { ...begun, pendingAttack: { ...begun.pendingAttack, immediate: true } } : begun;
 }
@@ -171,7 +172,19 @@ export function announceCanceled(state: ScenarioState, before: ScenarioState, ct
   if (state === before || !listenerInPlay(state, "whenRevealedCanceled", ctx.effects)) return state;
   if (revealedWithoutWhenRevealed(before, ctx)) return state;
   if (state.pendingAttack?.shadowCanceled && !before.pendingAttack?.shadowCanceled) return state;
-  return queueEvent(state, { trigger: "whenRevealedCanceled", seat });
+  // The card whose effects were canceled is the event's subject, for a record that hears only some cards ("the 'when revealed' effect of a treachery card", 09056:A:1).
+  const canceled = canceledCard(before);
+  return queueEvent(state, { trigger: "whenRevealedCanceled", seat, ...(canceled ? { subject: canceled } : {}) });
+}
+
+// The card of the innermost open Response window on a reveal (or on its pending When Revealed effects): the card whose When Revealed effects a cancel answers.
+function canceledCard(before: ScenarioState): string | null {
+  const index = before.stack.findLastIndex((frame) => frame.data.kind === "responses");
+  const window = before.stack[index];
+  if (window?.data.kind !== "responses") return null;
+  const event = window.data.event;
+  if (event.trigger === "whenRevealedPending") return event.subject ?? event.cardId ?? null;
+  return event.trigger === "encounterRevealed" ? (before.stack[index - 1]?.cardId ?? null) : null;
 }
 
 // The innermost open Response window is on a card's reveal and that card has no When Revealed record: a cancel there cancels no When Revealed effect.
@@ -202,8 +215,13 @@ function engageSetAside(state: ScenarioState, code: string, focus: Focus, ctx: R
 
 // PickDiscardTop: the topmost card of the encounter discard pile (its last card) of one of these printed types is picked (900107:A:2).
 function pickDiscardTop(state: ScenarioState, types: readonly string[], ctx: ReduceContext, trait?: string): ScenarioState {
-  const found = [...state.encounterDiscard].reverse().find((id) => types.includes(printedOf(ctx.cards, state.cards[id]?.code ?? "").type) && (trait == null || hasTrait(state, id, trait, ctx)));
+  const found = topOfEncounterDiscard(state, types, ctx, trait);
   return found ? markPicked(state, found) : state;
+}
+
+/** The topmost card of the encounter discard pile (the last put there) of one of these types, with the Trait when one is named; undefined with none. */
+export function topOfEncounterDiscard(state: ScenarioState, types: readonly string[], ctx: ReduceContext, trait?: string): string | undefined {
+  return [...state.encounterDiscard].reverse().find((id) => types.includes(printedOf(ctx.cards, state.cards[id]?.code ?? "").type) && (trait == null || hasTrait(state, id, trait, ctx)));
 }
 
 // DealShadowFromDiscard: the topmost card of the encounter discard pile with a Shadow effect (a shadow record: every printed line has one) becomes
@@ -269,13 +287,14 @@ function removeEnemyDamage(state: ScenarioState, ctx: ReduceContext, steps: Engi
   return data ? patchTop(next, { data: { ...data, x: total } }) : next;
 }
 
-// MoveDamageTo: all damage on one card moves to another (900209:A:2), which it may destroy.
-function moveDamageTo(state: ScenarioState, from: CardRef, to: CardRef, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+// MoveDamageTo: all damage on one card (with `amount`, at most that much: 100158:A:2) moves to another (900209:A:2), which it may destroy.
+function moveDamageTo(state: ScenarioState, from: CardRef, to: CardRef, amount: number | undefined, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const scope = frameScope(state, focus.seat, focus.sourceId);
   const source = state.cards[refCard(state, from, scope) ?? ""];
   const target = state.cards[refCard(state, to, scope) ?? ""];
   if (!source || !target || source.id === target.id || source.damage <= 0 || !inPlay(source.zone) || !inPlay(target.zone)) return state;
-  return placeDamage(updateCard(state, source.id, { damage: 0 }), target.id, source.damage, ctx.cards, steps, "framework", currentCause(steps, UNATTRIBUTED));
+  const moved = Math.min(source.damage, amount ?? source.damage);
+  return placeDamage(updateCard(state, source.id, { damage: source.damage - moved }), target.id, moved, ctx.cards, steps, "framework", currentCause(steps, UNATTRIBUTED));
 }
 
 // The candidate with the highest measure is picked; the first player chooses among a tie (PickLowestEngagement measures the staging area's

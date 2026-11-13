@@ -3,6 +3,7 @@ import { tableDigest } from "../../src/campaign/digest.ts";
 import type { LoadoutSeat } from "../../src/campaign/loadout.ts";
 import { emptyLog, poolCard, type CampaignLog } from "../../src/campaign/log.ts";
 import { buildStart } from "../../src/campaign/start.ts";
+import { angmarAwakenedFacts } from "../../src/campaign/log-angmar-awakened.ts";
 import { wilderlandFacts } from "../../src/campaign/wilderland.ts";
 import { namesTreasures } from "../../src/campaign/world.ts";
 import { campaignScenario, type CampaignData, type Difficulty, type ScenarioData } from "../../src/catalog/scenario-data.ts";
@@ -227,7 +228,7 @@ export function campaignGame<D extends string, P extends object>(spec: CampaignG
     const { facts, modeCard, choices, loadout, standalone } = options;
     const checked = plan(seatCount, options.log ?? emptyLog(seatCount), choices, difficulty, loadout);
     // The campaign's own columns of the log reach the game as they do in startFor (src/campaign/briefing.ts); another campaign's are none.
-    const logged = wilderlandFacts(checked.log, spec.campaign.id);
+    const logged = { ...wilderlandFacts(checked.log, spec.campaign.id), ...angmarAwakenedFacts(checked.log, spec.campaign.id) };
     const dealtFacts = Object.keys(logged).length > 0 ? { prisoner: null, usedOnce: [], counters: {}, ...facts, ...logged } : facts;
     return buildStart({
       campaign: spec.campaign,

@@ -26,7 +26,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
     only if not (the players are on stage 3)
     - the players cannot travel to any location while this holds
   146043:constant:3: Constant
-    only if not ([json condition {"kind":"stageProgress","min":20}])
+    only if not (the current quest stage holds at least 20 progress)
     - the players cannot travel to any location while this holds
 
 146043:A:3 (front): Travel: Each player makes a Fortitude test. If a player fails this test, raise his threat by 9.
@@ -41,15 +41,15 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
 146044:A:1 (front): While Orc-hold is in the staging area, progress cannot be placed on other locations in the staging area.
   146044:constant:1: Constant
     only if this card is in the staging area
-    - each location (any player controls) in the staging area only [also {"other":true}]: stat noProgressPlaced 1, while this card is in play
+    - each location (any player controls) in the staging area only, other than this card: stat noProgressPlaced 1, while this card is in play
 
 146044:A:2 (front): Forced: After Orc-hold becomes the active location, shuffle the encounter discard pile into the encounter deck. Discard cards from the top until an Orc enemy is discarded. Put that enemy into play engaged with the first player.
   146044:forced:1: Forced after this location becomes the active location (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the encounter discard pile into the encounter deck
-    - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy","trait":"Orc"}]
+    - cards are discarded from the top of the encounter deck until an enemy with the trait Orc is discarded, or the deck is empty; that card becomes the picked card
     - for each player, first player first:
-      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"engaged","when":{"kind":"all","conditions":[{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"},"inPlay":false},{"kind":"firstPlayer"}]}}]
+      - if all of: (the picked card is a enemy (any player controls) that is out of play now) and (the actor holds the first player token): the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
 
 ## 146045 Mordor Road
 (the scenario deals it into the staging pile; the piles place it, no record does)
@@ -61,8 +61,8 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
 146045:A:2 (front): Forced: After Mordor Road becomes the active location, each player discards the top card of the encounter deck. Add each enemy discarded this way to the staging area.
   146045:forced:1: Forced after this location becomes the active location (heard about this card)
     - for each player, first player first:
-      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"}]
-      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"},"inPlay":false}}]
+      - the top card of the encounter deck goes to the encounter discard pile
+      - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
 
 ## 146046 Plain of Gorgoroth
 (the scenario deals it into the staging pile; the piles place it, no record does)
@@ -88,7 +88,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
 
 146047:A:2 (front): Forced: After Brake of Thorns becomes the active location, each player assigns X damage among characters he controls, where X is the tens digit of his threat dial.
   146047:forced:1: Forced after this location becomes the active location (heard about this card)
-    - [json AssignDamage {"verb":"AssignDamage","amount":{"threat":"tens"},"pick":{"type":"character","control":"you"},"who":"eachSeat"}]
+    - each player assigns the tens digit of your threat damage among the character (you control), one at a time
 
 ## 146048 Old Water-course
 (the scenario deals it into the staging pile; the piles place it, no record does)
@@ -113,17 +113,17 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
 
 146049:A:2 (front): Gollum engages the first player.
   146049:forced:1: Forced after an encounter card is added to the staging area (heard about this card)
-    - [json EngageFirstPlayer {"verb":"EngageFirstPlayer"}]
+    - this enemy, in the staging area, engages the first player
   146049:triggered:1: Triggered (mandatory, not printed as Forced) on the event firstPlayerTokenPassed
     - this enemy moves to the first player's play area and engages them (nothing if it is not engaged, or already engaged with them)
   146049:forced:2: Forced on the event returnedToStaging (heard about this card)
-    - [json EngageFirstPlayer {"verb":"EngageFirstPlayer"}]
+    - this enemy, in the staging area, engages the first player
 
 146049:A:3 (front): *Forced: After Gollum is discarded during a Fortitude test, put him into play engaged with the first player. Then, choose an encounter card discarded for this test and ignore its Sauron's Eye icons.
   146049:forced:3: Forced on the event discardedInFortitude (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"self","to":"engaged","when":{"kind":"all","conditions":[{"kind":"matches","card":"self","inPlay":false},{"kind":"firstPlayer"}]}}]
+      - if all of: (this card is a [json pick undefined] that is out of play now) and (the actor holds the first player token): this card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
     - then, if there is a card (any player controls) discarded for the Fortitude test in progress and still in the encounter discard pile, chosen by the first player to choose (checked when this step runs, after the steps above; not tied to whether they did anything): choose card (any player controls) discarded for the Fortitude test in progress and still in the encounter discard pile, chosen by the first player
     - then, if there is a card (any player controls) discarded for the Fortitude test in progress and still in the encounter discard pile, chosen by the first player to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the card just chosen (discarded for the Fortitude test in progress) adds no Sauron's Eye icons to that test
 
@@ -200,12 +200,12 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
     (steps run in order; a step depends on an earlier one only through its own condition)
     - if there is a enemy (any player controls) named "Gollum" to choose: choose enemy (any player controls) named "Gollum"
     - then, if there is a enemy (any player controls) named "Gollum" to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the first player now, from the staging area (or engaged)
-    - [json SearchMove {"verb":"SearchMove","code":"146049","to":"engagedFirstPlayer","when":{"kind":"not","condition":{"kind":"canPick","pick":{"type":"enemy","control":"any","names":["Gollum"]}}}}]
+    - then, if not (there is a enemy (any player controls) named "Gollum" to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): the acting player finds one card with code 146049 in the encounter deck or its discard pile and puts it into play engaged with the first player (it is not revealed)
 
 146054:A:2 (shadow): Shadow: If attacking enemy is Gollum, he makes an additional attack after this one.
   146054:shadow:1: Shadow
     - if the attacking enemy is a enemy (any player controls) named "Gollum": when the attack in progress ends:
-      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt no shadow card
+      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt no shadow card
 
 ## 146055 The Lidless Eye
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -250,13 +250,13 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
     - exhaust its host
   146057:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - this card counts as a Condition attachment while it is attached
     - its host: stat noFortitudeCommit 1, while this card is in play
   146057:forced:1: Forced on the event fortitudeFailed
     only if the card this one is attached to is controlled by the acting player
     (steps run in order; a step depends on an earlier one only through its own condition)
     - exhaust its host
-    - [json DiscardEach {"verb":"DiscardEach","pick":{"type":"card","control":"any","attachedTo":"host","nonObjective":true}}]
+    - the acting player discards each card (any player controls) that is not an objective [also {"attachedTo":"host"}]
 
 ## 146075 The Land of Mordor
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -265,7 +265,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
   146075:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","type":"location","to":"staging","different":true}]
+      - the acting player finds one location in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"different":true}]
     - shuffle the encounter deck
 
 146075:B:1 (back): Dire. This stage gets +4 quest points for each player.
@@ -284,7 +284,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
   (the keyword part is owned by the card's keywords; the records cover: When Revealed: Search the encounter deck, discard pile, and victory display for Mordor Road and add it to the staging area. Shuffle the encounter discard pile into the encounter deck and travel to Mordor Road.)
   146076:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchMove {"verb":"SearchMove","code":"146045","to":"staging","victory":true,"remember":true}]
+    - the acting player finds one card with code 146045 in the encounter deck or its discard pile or the victory display and adds it to the staging area (it is not revealed); it is the picked card afterward
     - shuffle the encounter discard pile into the encounter deck
     - [json TravelTo {"verb":"TravelTo","target":"picked","unlessActive":true}]
 
@@ -295,8 +295,8 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
     - for each player, first player first:
       - the acting player makes a Fortitude test: exhausts any number of ready heroes to commit them, discards the top X cards of the encounter deck (X the tens digit of their threat), counts the Sauron's Eye icons on them, the players take actions, and the committed heroes' total Willpower must be greater than the icons to pass (equal or fewer fails)
       - then, if the last Fortitude test the running effect made was passed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): place 1 resource tokens on this card
-      - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy","when":{"kind":"lastFortitudeFailed"}}]
-      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"engaged","when":{"kind":"all","conditions":[{"kind":"lastFortitudeFailed"},{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"},"inPlay":false}]}}]
+      - then, if the last Fortitude test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
+      - then, if all of: (the last Fortitude test the running effect made was failed (false before it has made one)) and (the picked card is a enemy (any player controls) that is out of play now) (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
 
 146076:B:2 (back): At the end of the quest phase, if the number of resources here is equal to or greater than the number of players, advance to stage 3A.
   146076:forced:2: Forced at the end of the phase
@@ -354,4 +354,4 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
     - then, if the last Fortitude test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the players lose the game (The Ring-bearer claimed The One Ring)
     - then, if the last Fortitude test the running effect made was passed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the players win the game
 
-(rendered pieces: 198 by template, 23 as JSON)
+(rendered pieces: 233 by template, 9 as JSON)

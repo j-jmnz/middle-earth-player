@@ -33,13 +33,15 @@ export function revealsPerPlayer(effect: Effect): boolean {
   );
 }
 
-export function questStageStart(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+export function questStageStart(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[], between?: (state: ScenarioState) => ScenarioState): ScenarioState {
   const id = state.questStage;
   const code = id ? state.cards[id]?.code : undefined;
   if (!id || !code) return state;
   const own = ctx.effects.filter((effect) => effect.cardCode === code);
   // The When Revealed effects go down first, so the Setup's reveals resolve before them.
   let next = pushCardEffects(state, "whenRevealed", id, state.firstPlayer, false, own.filter((effect) => effect.timing === "whenRevealed"), ctx, steps);
+  // The campaign Setup that resolves between the quest card's Setup and its When Revealed goes down between them (ScenarioDefinition.beforeReveal).
+  if (between) next = between(next);
   next = pushCardEffects(next, "setup", id, state.firstPlayer, false, own.filter(revealsPerPlayer), ctx, steps);
   return next;
 }

@@ -16,10 +16,11 @@ import type { SlotInfo, TableHighlight } from "../canvas/table-canvas-types.ts";
 import { controlSpeech, treasureSpeech } from "../cards/dungeon-preview.ts";
 import { shareHint, shareValue, wordOf } from "../choice/tray-logic.ts";
 import type { OptionMark, Sheet } from "../choice/sheet-types.ts";
-import { actingSeat, hidesFace, isLooked, isPrisoner, type ZoneFacts, type ZoneId } from "../store/selectors.ts";
+import { actingSeat, hidesFace, isDead, isLooked, isPrisoner, type ZoneFacts, type ZoneId } from "../store/selectors.ts";
 import { areaRoleOf, areaSpeech } from "../store/stormcaller-table.ts";
 import { plural } from "./list.ts";
 import { seatTag } from "./scenarios/area.ts";
+import { REANIMATED_DEAD } from "./scenarios/angmar/dread-realm-table.ts";
 import { grappleDetail } from "./scenarios/grapple.ts";
 import { areaTell } from "./scenarios/stormcaller.ts";
 import { islandTell } from "./scenarios/uncharted.ts";
@@ -96,7 +97,7 @@ function damageWords(game: ScenarioState, card: CardInstance, printed: PrintedCa
     const points = modifiedStat(game, card, "hitPoints", deps.cards);
     return card.damage > 0 ? `${card.damage} damage of ${points} hit points` : `${points} hit points`;
   }
-  return card.damage > 0 && info.fire == null ? plural(card.damage, "damage", "damage") : null;
+  return card.damage > 0 && info.fire == null && info.side?.loses == null ? plural(card.damage, "damage", "damage") : null;
 }
 
 // The names of the cards attached to this one; a card the table keeps facedown is not named.
@@ -126,6 +127,8 @@ function labelOf(game: ScenarioState, seat: number, card: CardInstance, deps: Ca
   // The same three facedown words the web list uses.
   if (isPrisoner(card)) return `Prisoner: ${deps.nameOf(card.code)}, face down`;
   if (card.prisoner === true) return "Face down, held with the prisoner";
+  // A Reanimated Dead says what it is and whose card it is, never the card behind it (realm-preview.ts).
+  if (isDead(card)) return `${REANIMATED_DEAD}, ${deps.info(game, seat, card.id).dead ?? "a facedown Undead enemy"}`;
   if (card.face === "down") return "Face down";
 
   const key = pictureKey(card);
@@ -154,6 +157,9 @@ function labelOf(game: ScenarioState, seat: number, card: CardInstance, deps: Ca
     else if (card.progress > 0 && !island) parts.push(`${card.progress} progress`);
   }
   if (info.fire) parts.push(`Aflame ${info.fire.text}${info.fire.danger ? ", one more damage destroys it" : ""}`);
+  if (info.determined) parts.push(info.determined.speech);
+  if (info.side?.current) parts.push("the current quest");
+  if (info.side?.loses) parts.push(`${info.side.loses.speech}${info.side.loses.danger ? ", one more damage loses the game" : ""}`);
   parts.push(...statWords(game, card, printed, deps, info));
   // A card not yet in play says what it costs.
   if (card.zone === "hand" || card.zone === "discard" || card.zone === "deck") {
@@ -191,7 +197,7 @@ const SHOW_HINT = "Double tap to show the card";
 // A face-up card the moment does not ask about opens large on a tap; a facedown one shows nothing.
 function previewHint(game: ScenarioState, cardId: string): string | null {
   const card = game.cards[cardId];
-  return card && hidesFace(card) && !isLooked(game, cardId) ? null : SHOW_HINT;
+  return card && hidesFace(card) && !isDead(card) && !isLooked(game, cardId) ? null : SHOW_HINT;
 }
 
 function hintOf(game: ScenarioState, cardId: string, deps: CardSpeechDeps): string | null {

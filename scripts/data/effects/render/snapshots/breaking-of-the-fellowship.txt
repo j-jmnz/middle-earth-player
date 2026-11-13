@@ -150,7 +150,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 142067:A:1 (front): When Revealed: Add Parth Galen to the staging area. If it is your quest phase, end the phase (do not resolve the quest).
   142067:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"142073"}]
+    - one set-aside card with code 142073 joins the staging area (it is not revealed)
     - then, if it is the Quest phase (checked when this step runs, after the steps above; not tied to whether they did anything): end the quest phase at once (no quest resolution)
 
 142067:B:1 (back): During the quest phase, reveal 1 additional encounter card for each player in the game.
@@ -198,7 +198,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 142069:A:3 (shadow): Shadow: Attacking enemy makes an additional attack after this one.
   142069:shadow:1: Shadow
     - when the attack in progress ends:
-      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
 ## 142070 Uruk-hai Archer
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -245,7 +245,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
     - the acting player chooses one of:
       * option "reveal":
         - choose player (any player controls)
-        - [json SwitchActor {"verb":"SwitchActor","to":"picked"}]
+        - the effect goes on with the picked player as the acting player
         - the acting player reveals an encounter card
       * option "attack":
         - this card attacks the acting player now, from the staging area
@@ -259,7 +259,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 142073:A:2 (front): Travel: Search the encounter deck and discard pile for an enemy and add it to the staging area to travel here. Shuffle the encounter deck.
   142073:travel:1: Travel
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchMove {"verb":"SearchMove","type":"enemy","to":"staging"}]
+    - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
 
 142073:A:3 (front): While Parth Galen is in play, the players cannot win the game.
@@ -328,7 +328,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 142078:A:2 (front): Travel: Search the encounter deck and discard pile for an enemy and add it to this staging area to travel here. Shuffle the encounter deck.
   142078:travel:1: Travel
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchMove {"verb":"SearchMove","type":"enemy","to":"staging"}]
+    - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
 
 ## 142079 Slopes of Amon Hen
@@ -360,7 +360,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
         - [json MoveToFirstStaging {"verb":"MoveToFirstStaging","target":"picked"}]
       * option "doomed":
         - [json Doomed {"verb":"Doomed","amount":2}]
-        - [json GainSurge {"verb":"GainSurge"}]
+        - this card gains surge (one more encounter card is revealed when it has been resolved)
 
 142080:A:3 (shadow): Shadow: After this attack, move attacking enemy to the first player's staging area.
   142080:shadow:1: Shadow
@@ -404,7 +404,7 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
     - attach this card to a hero
     - [json FallIntoEvil {"verb":"FallIntoEvil"}]
   142083:constant:1: Constant
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - this card counts as a Condition attachment while it is attached
   142083:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
     - [json ReturnFallenHero {"verb":"ReturnFallenHero"}]
 
@@ -416,8 +416,8 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
 142089:A:2 (front): When Revealed: Put the topmost enemy of the encounter deck discard pile into play engaged with you.
   142089:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json PickDiscardTop {"verb":"PickDiscardTop","types":["enemy"]}]
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"engaged"}]
+    - the topmost enemy in the encounter discard pile (the last put there) is picked (nothing with none)
+    - the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
 
 ## 142090 Ill Fate
 
@@ -428,9 +428,9 @@ Scenario piles that place cards with no record (quest: 142061 The Great River; q
   142090:whenRevealed:1: When revealed
     - attach this card to a hero
   142090:constant:1: Constant
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - this card counts as a Condition attachment while it is attached
   142090:forced:1: Forced on the event characterDestroyed (heard about character (any player controls) [also {"controlledBy":"host"}])
     only if not (this card is in the staging area)
     - raise threat by 2 (hostController)
 
-(rendered pieces: 189 by template, 57 as JSON)
+(rendered pieces: 198 by template, 48 as JSON)

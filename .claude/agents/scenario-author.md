@@ -12,7 +12,7 @@ Read `CLAUDE.md`, `.claude/rules/authority.md`, `.claude/rules/code-standards.md
 ## Read
 
 - Inputs: the scenario id and the base commit.
-- Do: `pnpm scenario new <id>` (`--dry-run` first), `pnpm data build`, `pnpm scenario pack <id>`; read `.agent/pack/<id>.md`; group the drafted lines by mechanic; do the readings pass, each line's `faq.*` spans included; research every reading the spans leave open online (`docs/handover/agent-brief.md`, Scenario procedure, Open points are researched, not asked).
+- Do: `pnpm scenario new <id>` (`--dry-run` first), `pnpm data build`, `pnpm scenario pack <id>`; read `.agent/pack/<id>.md`; group the drafted lines by mechanic; do the readings pass, each line's `faq.*` spans included; research every reading the spans leave open online, in the order `.claude/rules/authority.md` (Open points) gives.
 - Hand back: the Readings list (`.claude/agents/orchestrator.md`, Implementer tasks): every line read more than one way, with the reading taken, the alternative, the citation and its status `literal`, `span-settled`, `researched` or `recommended`, with the URLs read; the mechanics that need a new verb, trigger or flag and the family each belongs to; the pack's size. Write no engine code and no records.
 - Checks: `pnpm lint` and `pnpm typecheck` stay green on the scaffold; `pnpm test scenario <id> --quick --list` names the scenario's files.
 

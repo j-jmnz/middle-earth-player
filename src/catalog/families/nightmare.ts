@@ -65,8 +65,8 @@ const VERBS = [
   // just removed from his engaged enemies. If no damage is removed by this effect", 900209:A:1).
   z.strictObject({ verb: z.literal("RemoveEnemyDamage"), ...when }),
   // All damage on the card `from` names moves to the card `to` names; damage that reaches its hit points destroys it ("Move all damage on
-  // this enemy to the defending character", 900209:A:2). Nothing moves when either card is missing or out of play.
-  z.strictObject({ verb: z.literal("MoveDamageTo"), from: cardRefSchema, to: cardRefSchema, ...when }),
+  // this enemy to the defending character", 900209:A:2). Nothing moves when either card is missing or out of play. With `amount`, at most that much damage moves ("move 1 damage from Arnor Ravaged to that character", 100158:A:2).
+  z.strictObject({ verb: z.literal("MoveDamageTo"), from: cardRefSchema, to: cardRefSchema, amount: z.number().int().positive().optional(), ...when }),
   // Heard when a hero was taken prisoner at stage 1B (900301:A:2): more heroes are captured at random with the game's seed, from players who have
   // none captured, until the number captured is 1 with 1 or 2 players, 2 with 3 and 3 with 4. Each is facedown, "the prisoner", as the first
   // (src/rules/families/prisoner/index.ts). Nothing is announced for them.

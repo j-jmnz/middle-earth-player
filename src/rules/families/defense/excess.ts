@@ -6,6 +6,7 @@
 // your threat." The damage still goes on the character; the excess is read before it lands, and a card that cancels the damage
 // afterwards does not call the threat back (it was assigned as it was dealt). Great Cave-troll (`excessToQuestProgress`) takes that many progress
 // tokens off the current quest instead.
+import { captureInstead } from "../captured/instead.ts";
 import type { EngineStep } from "../../core/intents.ts";
 import type { ReduceContext } from "../../interpret/interpret.ts";
 import { modifiedStat, placeDamage, raiseThreat } from "../../core/keywords.ts";
@@ -18,6 +19,9 @@ import { readsAmount, readsCondition } from "../../interpret/amounts.ts";
 import { gameReads } from "../../core/game-reads.ts";
 import { removeQuestProgress } from "../caves/progress.ts";
 import { cancelPhantomDamage } from "../grey-company/phantom.ts";
+import { noteHurt } from "../angmar/damage.ts";
+import { noteWillpower } from "../angmar/last-known.ts";
+import { removeProgressFromEachQuest } from "../angmar/excess.ts";
 import { damageGoesTo } from "./damage.ts";
 
 // The damage this attack has dealt so far, kept on the attack only while a shadow effect waits to read it after the attack ("Raise your threat by 1
@@ -58,19 +62,24 @@ export function combatDamage(
   // Phantom (mec113.phantom): the damage is canceled and the defending player raises their threat by as much instead, before the character is dealt any.
   const phantom = cancelPhantomDamage(state, enemyId, raw, ctx, steps);
   if (phantom) return phantom;
+  // An ally the attack would damage is captured instead (Cruel Torturer, Captives of Gornákh's shadow; families/captured/play.ts).
+  const captured = captureInstead(state, enemyId, assigned, raw, ctx);
+  if (captured) return captured;
   const logged = steps.length;
   const targetId = damageGoesTo(state, assigned);
   const damaged = placeDamage(state, assigned, raw, ctx.cards, steps, "combat", cause);
   const landed = steps.slice(logged).reduce((sum, step) => (step.kind === "damage" && step.targetId === targetId && step.amount > 0 ? sum + step.amount : sum), 0);
-  const placed = noteLanded(damaged, landed);
+  const placed = noteHurt(noteLanded(noteWillpower(damaged, state, targetId, ctx), landed), targetId, state.cards[targetId]?.damage ?? 0, landed, ctx);
   const toThreat = flagged(state, enemyId, "excessToThreat");
   const toQuest = flagged(state, enemyId, "excessToQuestProgress");
   const toShip = flagged(state, enemyId, "excessToShip");
   // "Excess damage must be dealt to Hrogar's Hill" (19083:B:1, 19080:A:3): an attack that the quest card or a Shadow effect marked sends the damage beyond the defender's remaining hit points to the main quest card.
   const toStage = state.pendingAttack?.excessToStage === true && state.questStage != null && state.questStage !== targetId;
+  // Cruel Mountain-troll (10074:A:1): each point of excess takes a progress token off each quest card in play.
+  const toEachQuest = flagged(state, enemyId, "excessToEachQuest");
   // "for each excess point of damage dealt" (18049:A:2): kept for the character the attack destroys, when some card reads it.
   const reads = gameReads(state, ctx, '"excessOf"');
-  if (!toThreat && !toQuest && !toShip && !reads && !toStage) return placed;
+  if (!toThreat && !toQuest && !toShip && !reads && !toStage && !toEachQuest) return placed;
   const enemy = state.cards[enemyId];
   const target = state.cards[targetId];
   if (!enemy || !target || !inPlay(target.zone) || target.controller == null) return placed;
@@ -78,14 +87,19 @@ export function combatDamage(
   const remaining = Math.max(0, modifiedStat(state, target, "hitPoints", ctx.cards) - target.damage);
   const excess = landed - remaining;
   if (excess <= 0) return placed;
-  if (toStage && state.questStage) return noteHitPointsOn(placeDamage(placed, state.questStage, excess, ctx.cards, steps, "combat", ruleCause("rr.damage")), targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
-  if (!toThreat && !toQuest && !toShip) return noteHitPointsOn(placed, targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
+  // The cause an excess effect names: the record of the enemy that holds the flag, else the rule.
+  const causeOf = (flag: string) => {
+    const record = effectsOf(ctx, enemy.code).find((effect) => effect.instructions.some((instruction) => instruction.verb === "ModifyStat" && instruction.stat === flag));
+    return record ? effectCause(record) : ruleCause("rr.damage");
+  };
+  // Cruel Mountain-troll (10074:A:1): each point of excess takes a progress token off each quest card in play; the enemy's other excess flags still apply.
+  const eachQuest = toEachQuest && !toStage ? removeProgressFromEachQuest(placed, excess, enemy.controller ?? target.controller, ctx, steps, causeOf("excessToEachQuest")) : placed;
+  if (toStage && state.questStage) return noteHitPointsOn(placeDamage(eachQuest, state.questStage, excess, ctx.cards, steps, "combat", ruleCause("rr.damage")), targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
+  if (!toThreat && !toQuest && !toShip) return noteHitPointsOn(eachQuest, targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
   // "Excess damage from this attack is dealt to a Ship objective you control" (11055:A:2): the excess is the X of the effect the attack leaves for its end.
-  if (toShip && !toThreat && !toQuest) return noteExcess(placed, excess);
-  const flag = toThreat ? "excessToThreat" : "excessToQuestProgress";
-  const record = effectsOf(ctx, enemy.code).find((effect) => effect.instructions.some((instruction) => instruction.verb === "ModifyStat" && instruction.stat === flag));
-  const excessCause = record ? effectCause(record) : ruleCause("rr.damage");
+  if (toShip && !toThreat && !toQuest) return noteExcess(eachQuest, excess);
+  const excessCause = causeOf(toThreat ? "excessToThreat" : "excessToQuestProgress");
   // Great Cave-troll (41030:A:2): each point of excess takes a progress token off the current quest.
-  if (!toThreat) return removeQuestProgress(placed, excess, steps, excessCause);
-  return raiseThreat(placed, enemy.controller ?? target.controller, excess, steps, excessCause);
+  if (!toThreat) return removeQuestProgress(eachQuest, excess, steps, excessCause);
+  return raiseThreat(eachQuest, enemy.controller ?? target.controller, excess, steps, excessCause);
 }

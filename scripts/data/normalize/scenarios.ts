@@ -40,7 +40,7 @@ const GROUP_PILE: Readonly<Record<string, Pile>> = {
 // ("Prepare the Corsair deck", "Prepare the Uncharted deck"), never by a line naming each card, and they count toward their encounter sets.
 // Ered Mithrin's decks (evilCreaturesDeck, cavesDeck, sideQuestDeck, spidersDeck, orcsDeck) are built by the Setup's deck steps the same way, and
 // The Two Towers' second encounter decks (haradDeck, greatSpiderDeck) by the Setup's encounter set that is shuffled under a card or set aside.
-const EXTRA_DECKS: ReadonlySet<string> = new Set(["corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests", "evilCreaturesDeck", "cavesDeck", "sideQuestDeck", "spidersDeck", "orcsDeck", "haradDeck", "greatSpiderDeck"]);
+const EXTRA_DECKS: ReadonlySet<string> = new Set(["corsairDeck", "encounterDeck2", "unchartedDeck", "islandMap", "grottoDeck", "stormcallerQuests", "evilCreaturesDeck", "cavesDeck", "sideQuestDeck", "spidersDeck", "orcsDeck", "haradDeck", "greatSpiderDeck", "angmarOrcDeck"]);
 
 // A scenario is written only when every check passes. The rest are listed in problems and stay unbuilt
 // until an override or a template resolves them.
@@ -134,7 +134,9 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     // A saga campaign card names cards it does not deal: the earlier box's boons ("Remove Gildor Inglorion and Mr. Underhill from the Campaign Pool") and the box's Fellowship cards ("attaches Andúril and Banner of Elendil to Aragorn").
     const poolCards = product.sagaStart ? cards.filter((card) => (card.campaignKind != null && !card.printings.some((p) => cardPacks.includes(p.pack))) || (card.sphere === "fellowship" && card.printings.some((p) => cardPacks.includes(p.pack)))) : [];
     const sagaNamed = product.sagaStart ? cards.filter((card) => !scope.includes(card) && !isReprint(card) && inCampaignText(card)) : [];
-    const extras = def.deck === undefined ? [...poolCards, ...sagaNamed] : cards.filter((card) => !scope.includes(card) && !isReprint(card) && (card.printings.some((p) => cardPacks.includes(p.pack)) || reprintOf.has(card.code) || inCampaignText(card)));
+    // A hero of the scenario's own box that its campaign card names (The Battle of Carn Dûm: "Amarthiúl may be included among a player's heroes").
+    const heroNamed = (card: Card) => card.type === "hero" && card.printings.some((p) => ownBox.includes(p.pack)) && mentions(mentioned, card.name, campaignText);
+    const extras = def.deck === undefined ? [...poolCards, ...sagaNamed] : cards.filter((card) => !scope.includes(card) && !isReprint(card) && (card.printings.some((p) => cardPacks.includes(p.pack)) || reprintOf.has(card.code) || inCampaignText(card) || heroNamed(card)));
     const names = nameIndex([...scope, ...extras], new Set(scope.filter((card) => card.type !== "quest").map((card) => card.code)));
 
     // Stages in printed order: the Hall of Beorn quest cards give it, the Dragncards deck must agree.
@@ -293,6 +295,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       else if (rule.normal != null) item.normal = rule.normal;
       if (item && rule.easy != null) item.easy = rule.easy;
       if (item) item.easy = Math.min(item.easy, item.normal);
+      if (item && item.normal === 0) placed.splice(placed.indexOf(item), 1);
     }
     // The campaign card's Setup also deals cards the load list put in an encounter deck or a hand.
     for (const code of codesOf(camp, ["stage", "attachRingBearer", "shuffleInto"])) {
@@ -307,6 +310,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
     for (const code of codesOf(camp, ["earned", "choose"])) campaignPlaced.add(code);
     for (const code of campaignNamed) campaignPlaced.add(code);
     for (const code of campaignTextCodes({ names, byCode, ruleById, campaignCard, campaignLines: campaignLines.others, setupSpan: def.deck !== undefined ? def.setupSpan : null, cardPacks, campaignCardsOnly: productOf(def.campaignProduct ?? def.product).campaignCardRewards === true })) campaignPlaced.add(code);
+    for (const rule of overrides.scenarioCampaignPlaced) if ([rule.scenario].flat().includes(id)) for (const code of [rule.code].flat()) campaignPlaced.add(code);
     // Everything the quest Setup names must be in a pile.
     const inPile = (code: string, piles: readonly string[]) => placed.some((item) => same(item.code, code) && piles.includes(item.pile));
     for (const clause of quest.clauses) {
@@ -337,7 +341,9 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
 
     // Encounter sets: the booklet's Setup paragraph names them, in its order; Hall of Beorn's list must agree.
     const rule = ruleById.get(def.setupSpan);
-    const booklet = bookletSetsOf(rule);
+    // Angmar Awakened's booklet lists an icon named for an objective-ally (Amarthiúl) among the encounter sets; his card is dealt in its own scenario's set, so the name is a card title, not a set.
+    const namesAnObjective = (name: string) => placed.some((item) => byCode.get(item.code)?.type === "objective" && canon(byCode.get(item.code)?.name ?? "") === canon(name) && canon(byCode.get(item.code)?.encounterSet ?? "") !== canon(name));
+    const booklet = bookletSetsOf(rule).filter((name) => !(def.deck && namesAnObjective(name)));
     const first = hob.QuestCards[0];
     const isCampaign = (code: string) => byCode.get(code)?.typeName === "Campaign" || byCode.get(code)?.campaignKind != null;
     let hobSets = [first?.EncounterInfo?.EncounterSet, ...(first?.EncounterInfo?.IncludedEncounterSets ?? [])].filter((name): name is string => !!name).map((name) => name.replace(CAMPAIGN_SUFFIX, ""));

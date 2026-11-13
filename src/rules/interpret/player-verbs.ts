@@ -10,6 +10,7 @@ import { declareAttack } from "../families/attack/index.ts";
 import { enforceRestricted } from "../player/attach.ts";
 import { placeProgress, progressPlacer } from "./effect-verbs.ts";
 import { queueEvent } from "../windows/queue.ts";
+import { announceTopDiscard } from "../families/deck/pressure.ts";
 import { shuffleIds } from "../core/seed.ts";
 import type { EngineStep } from "../core/intents.ts";
 import type { ReduceContext } from "./interpret.ts";
@@ -201,7 +202,7 @@ export function runPlayerVerb(
       const top = state.seats[focus.seat]?.deck[0];
       const card = top ? state.cards[top] : undefined;
       if (!top || !card) return state;
-      const discarded = queueEvent(moveCard(state, top, { zone: "discard", seat: focus.seat }), { trigger: "discardedFromDeck", seat: focus.seat, cardId: top });
+      const discarded = announceTopDiscard(queueEvent(moveCard(state, top, { zone: "discard", seat: focus.seat }), { trigger: "discardedFromDeck", seat: focus.seat, cardId: top }), focus.seat, 1, ctx);
       const data = topFrame(discarded)?.data;
       // The discarded card's printed cost is the effect's X.
       return data?.kind === "effect" ? patchTop(discarded, { data: { ...data, x: printedOf(ctx.cards, card.code).cost ?? 0 } }) : discarded;

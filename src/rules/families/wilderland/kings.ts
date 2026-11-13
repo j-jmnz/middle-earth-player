@@ -53,12 +53,12 @@ export function putOnPileBottom(state: ScenarioState, instruction: Verb<"PutOnPi
   return updateCard(moveCard(state, id, { zone }), id, { face: "down", controller: null });
 }
 
-/** AttachSelfToPicked: the source attaches to the last picked card, unless that card already carries one of its title ("Limit 1 per hero"): it attaches nowhere. */
-export function attachSelfToPicked(state: ScenarioState, focus: Focus, ctx: ReduceContext): ScenarioState {
+/** AttachSelfToPicked: the source attaches to the last picked card, unless that card already carries one of its title ("Limit 1 per hero"): it attaches nowhere (`unlimited`: a card with no limit attaches whatever the host carries). */
+export function attachSelfToPicked(state: ScenarioState, instruction: Verb<"AttachSelfToPicked">, focus: Focus, ctx: ReduceContext): ScenarioState {
   const host = lastPicked(state);
   const code = focus.sourceId ? state.cards[focus.sourceId]?.code : undefined;
   if (!focus.sourceId || !host || !state.cards[host]) return state;
-  if (state.cards[host].attachments.some((other) => state.cards[other]?.code === code)) return state;
+  if (instruction.unlimited !== true && state.cards[host].attachments.some((other) => state.cards[other]?.code === code)) return state;
   return attachSelf(state, focus.sourceId, host, ctx);
 }
 

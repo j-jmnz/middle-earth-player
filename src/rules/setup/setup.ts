@@ -8,6 +8,7 @@ import type { EngineStep } from "../core/intents.ts";
 import { recordStartingThreat } from "../families/quest/threat.ts";
 import { questStageStart } from "../families/quest/setup.ts";
 import { pushCardEffects } from "../interpret/effect-frames.ts";
+import { timeOnReveal } from "../families/angmar/time.ts";
 import { placeContracts } from "../families/sidequests/contract.ts";
 import { setAsideEncounterCards } from "../families/sidequests/encounter.ts";
 import { pushPlayerSetup } from "../families/sidequests/setup.ts";
@@ -16,6 +17,7 @@ import type { PileZone } from "../core/piles.ts";
 import { printedOf } from "../core/printed.ts";
 import { shuffleIds } from "../core/seed.ts";
 import { handSetup, searchSetup } from "./search.ts";
+import { attachPending } from "../families/angmar/burdens.ts";
 import { nightmareDuringSetup, nightmareSetup } from "../families/nightmare/setup.ts";
 import { blankScenario, livingSeats, updateCard, withMode, withSeat, withThreat, type ScenarioState } from "../core/state.ts";
 import type { CampaignFacts } from "../core/campaign-state.ts";
@@ -23,6 +25,9 @@ import { placeCampaignCard } from "../families/burden/campaign.ts";
 import { snapshotOf } from "../engine/undo.ts";
 import { attachTo, moveCard, spawn } from "../core/zones.ts";
 import { stampRoutes } from "../families/sea/routes.ts";
+import { markSideQuests } from "../families/wilderland/night-quest.ts";
+import { markProgressNoted } from "../families/angmar/progress.ts";
+import { markCapture } from "../families/captured/entry.ts";
 import { dealDoubleSided, dealUnchartedDeck, type DoubleSidedCard } from "../families/uncharted/deal.ts";
 
 /** The prefix of an `afterMulligan` entry that is shuffled into the deck, not added to the hand, once the opening hands are final. */
@@ -127,7 +132,11 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
   }
   if (input.unchartedDeck && input.unchartedDeck.length > 0) state = dealUnchartedDeck(state, input.unchartedDeck, ctx);
   if (input.doubleSided && input.doubleSided.length > 0) state = dealDoubleSided(state, input.doubleSided, ctx);
+  // A game that deals encounter side quests in its encounter deck reads the side quest rules (families/wilderland/night-quest.ts).
+  state = markSideQuests(state, ctx.cards);
+  state = markProgressNoted(state, ctx);
   state = placeCampaignCard(state, input.definition.campaignCard, ctx);
+  state = markCapture(state, ctx);
   // The Nightmare setup card, side A faceup next to the quest deck: its lines stay active all game (docs/brief.md, Nightmare).
   if (input.definition.nightmareCard) state = spawn(state, input.definition.nightmareCard, { zone: "nightmare" }, "A").state;
   const chosen = input.seats.slice(0, input.seatCount).flatMap((seat, at) => (seat.chosen ?? []).map((code) => ({ code, seat: at })));
@@ -163,7 +172,8 @@ export function startScenario(input: StartScenario, ctx: ReduceContext): Scenari
     state = placeContracts(state, index, ctx);
     // Threat costs lowered by a card in play ("Each hero you control with a printed Lore resource icon gets -1 threat cost").
     threat -= threatCostCut(state, index, ctx);
-    state = withThreat(state, index, threat);
+    // A campaign's reduction of the starting threat (Fend Off Despair, 10173:A:2) never takes a seat below 0.
+    state = withThreat(state, index, Math.max(0, threat));
     state = shuffleZone(state, index);
   }
   if (input.seats.some((seat) => (seat.loot?.length ?? 0) > 0)) state = { ...state, lootPlan: input.seats.slice(0, input.seatCount).map((seat) => seat.loot ?? []) };
@@ -209,11 +219,12 @@ export function finishSetup(state: ScenarioState, ctx: ReduceContext, steps: Eng
     );
     if (next.failure || next.lost) return next;
   }
-  if (next.questStage) next = updateCard(next, next.questStage, { face: "B" });
-  // The campaign card's Setup that needs the quest card's Setup done first (ScenarioDefinition.afterSetup) goes down first, so it resolves after it.
+  if (next.questStage) next = timeOnReveal(updateCard(next, next.questStage, { face: "B" }), next.questStage, ctx);
+  // A pool card's Setup that waited for a host the quest card's Setup puts into play, and the campaign card's Setup that needs the quest card's Setup done first (ScenarioDefinition.afterSetup), go down first, so they resolve after it.
+  next = attachPending(next, ctx, steps);
   next = campaignAfterSetup(next, ctx, steps);
   // The first quest card's own Setup that reveals cards, and its side B's When Revealed (families/quest/setup.ts).
-  next = questStageStart(next, ctx, steps);
+  next = questStageStart(next, ctx, steps, (current) => campaignBeforeReveal(current, ctx, steps));
   // The Nightmare setup card's Forced effects "During setup" (families/nightmare/setup.ts), on top: they resolve first.
   next = nightmareDuringSetup(next, ctx, steps);
   // The Hard/Expert Mode card is put next to the quest deck at the end of setup, faceup on the side the players chose, and stays all game (dcce.hard-expert).
@@ -230,6 +241,16 @@ function campaignAfterSetup(state: ScenarioState, ctx: ReduceContext, steps: Eng
   const record = ctx.effects.find((effect) => effect.cardCode === after.card && effect.timing === "campaignSetup");
   if (!record) return state;
   return pushCardEffects(state, "setup", stage, state.firstPlayer, false, [{ ...record, instructions: [...after.instructions] }], ctx, steps);
+}
+
+// The campaign card's Setup that resolves after the quest card's Setup and before its side B's When Revealed (ScenarioDefinition.beforeReveal): one frame, whose cause is the campaign card's Setup record.
+function campaignBeforeReveal(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
+  const before = state.beforeReveal;
+  const stage = state.questStage;
+  if (!before || !stage) return state;
+  const record = ctx.effects.find((effect) => effect.cardCode === before.card && effect.timing === "campaignSetup");
+  if (!record) return state;
+  return pushCardEffects(state, "setup", stage, state.firstPlayer, false, [{ ...record, instructions: [...before.instructions] }], ctx, steps);
 }
 
 export function mulliganSeat(state: ScenarioState, seat: number, steps: EngineStep[], ctx: ReduceContext): ScenarioState {

@@ -23,9 +23,14 @@ export function threatDialCopies(state: ScenarioState, instruction: Verb<"EarnOn
   return out.sort((a, b) => (a.seat ?? 0) - (b.seat ?? 0));
 }
 
+/** The tokens of one counter (`resources` or `damage`) on the cards in play with these codes, added up. */
+export function tokensOn(state: ScenarioState, codes: readonly string[], counter: "resources" | "damage"): number {
+  return Object.values(state.cards).filter((card) => codes.includes(card.code) && inPlay(card.zone)).reduce((sum, card) => sum + card[counter], 0);
+}
+
 /** RecordTokens: the resources on the cards in play with these codes, added up, under the record's name. */
 export function recordTokens(state: ScenarioState, instruction: Verb<"RecordTokens">): ResolutionLog {
-  const count = Object.values(state.cards).filter((card) => instruction.codes.includes(card.code) && inPlay(card.zone)).reduce((sum, card) => sum + card.resources, 0);
+  const count = tokensOn(state, instruction.codes, "resources");
   return { ...state.resolutionLog, recorded: { ...(state.resolutionLog.recorded ?? {}), [instruction.as]: count } };
 }
 

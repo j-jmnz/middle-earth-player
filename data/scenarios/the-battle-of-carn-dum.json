@@ -1,0 +1,195 @@
+{
+  "id": "the-battle-of-carn-dum",
+  "name": "The Battle of Carn Dûm",
+  "number": 5,
+  "stages": [
+    "10125",
+    "10126"
+  ],
+  "encounterSets": [
+    {
+      "name": "The Battle of Carn Dûm",
+      "count": 24
+    },
+    {
+      "name": "Angmar Orcs",
+      "count": 9
+    },
+    {
+      "name": "Dark Sorcery",
+      "count": 9
+    }
+  ],
+  "cards": [
+    {
+      "code": "10130",
+      "normal": 4,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "10131",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "10132",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "10133",
+      "normal": 2,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "10134",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "10135",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "10136",
+      "normal": 2,
+      "easy": 0,
+      "pile": "encounter"
+    },
+    {
+      "code": "10137",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "10138",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "10139",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09043",
+      "normal": 3,
+      "easy": 3,
+      "pile": "encounter"
+    },
+    {
+      "code": "09044",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "09045",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09046",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09064",
+      "normal": 3,
+      "easy": 2,
+      "pile": "encounter"
+    },
+    {
+      "code": "09065",
+      "normal": 2,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09066",
+      "normal": 3,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "09067",
+      "normal": 1,
+      "easy": 1,
+      "pile": "encounter"
+    },
+    {
+      "code": "10125",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "10126",
+      "normal": 1,
+      "easy": 1,
+      "pile": "quest"
+    },
+    {
+      "code": "10127",
+      "normal": 1,
+      "easy": 1,
+      "pile": "staging",
+      "back": "10128"
+    },
+    {
+      "code": "10129",
+      "normal": 4,
+      "easy": 3,
+      "pile": "staging",
+      "perPlayer": 1
+    },
+    {
+      "code": "10132",
+      "normal": 1,
+      "easy": 1,
+      "pile": "activeLocation"
+    }
+  ],
+  "campaignCard": "10188",
+  "campaignPlaced": [
+    "10161",
+    "10162",
+    "10163",
+    "10164",
+    "10165",
+    "10172",
+    "10173",
+    "10176",
+    "10177",
+    "10178",
+    "10179",
+    "10180",
+    "10181",
+    "10189",
+    "10190",
+    "10191",
+    "10192"
+  ],
+  "widgets": {
+    "hide": false,
+    "secondActiveLocation": false,
+    "perSeatStaging": false
+  },
+  "source": {
+    "dragnNormal": "Q05.8",
+    "dragnEasy": "E05.8",
+    "hobSlug": "The-Battle-of-Carn-Dûm"
+  }
+}

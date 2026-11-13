@@ -196,12 +196,12 @@ describe("the encounter deck refill", () => {
     const gollum = idOf(table, "144075");
     const other = idOf(table, "144022");
     const emptied = { ...moveCard(moveCard(table, gollum, { zone: "encounterDiscard" }), other, { zone: "encounterDiscard" }), phase: "Quest" as const, encounterDeck: [] };
-    const refilled = resetEncounterDeck(emptied, []);
+    const refilled = resetEncounterDeck(emptied, [], ctxOf());
     expect(refilled.encounterDeck).toEqual([other]);
     expect(refilled.encounterDiscard).toEqual([gollum]);
     // With only Gollum in the discard pile the refill does nothing.
     const only = { ...moveCard(table, gollum, { zone: "encounterDiscard" }), phase: "Quest" as const, encounterDeck: [], encounterDiscard: [gollum] };
-    expect(resetEncounterDeck(only, [])).toBe(only);
+    expect(resetEncounterDeck(only, [], ctxOf())).toBe(only);
   });
 });
 

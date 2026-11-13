@@ -44,6 +44,7 @@ import { constantWin, heldStat, NO_COUNTS } from "../interpret/constants.ts";
 import { finishMulliganChoice, finishSetup, mulliganSeat } from "../setup/setup.ts";
 import { attackResumes, discardShadows, resolveAttack, resumeAttack } from "../combat/shadow.ts";
 import { stepWindow, stepWindowResumes } from "./step-window.ts";
+import { areaSeats } from "../families/breaking/areas.ts";
 import { flagged, inPlay, livingSeats, reached, updateCard, withMode, type ModeName, type ScenarioState } from "../core/state.ts";
 import { runSettle } from "../interpret/family-hooks.ts";
 import { heldByLapsedStage } from "../families/grapple/values.ts";
@@ -64,6 +65,7 @@ import { announceCollected } from "../families/aflame/attack.ts";
 import { chooseLookDone, chooseShift, performSailing, sailingStep } from "../families/sea/sailing.ts";
 import { askingToCommit, askingToLook, askingToShift } from "../families/sea/sailing-legal.ts";
 import { askCurrentQuest } from "../families/wilderland/night.ts";
+import { phaseEnds } from "../families/angmar/phase.ts";
 
 export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let current = handoffEliminated(state);
@@ -72,7 +74,7 @@ export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineSt
     // The Stormcaller's area stands in the staging area or out of it as the players' stage says (families/stormcaller/area.ts); the Island Map's locations as the active location says (families/island/map.ts).
     // Core: the constant win check, then the families' `before` hooks (burden, island, south), the encounter deck refill, the families' `after` hooks (sea, stormcaller, island): SETTLE_ORDER.
     const beforeRefill = runSettle("before", constantWin(current, ctx), ctx, steps);
-    const refilled = refillEncounterDeck(beforeRefill, steps);
+    const refilled = refillEncounterDeck(beforeRefill, steps, ctx);
     current = runSettle("after", refilled, ctx, steps);
     if (current.stageCleared && !current.window && !current.failure) {
       const asking = openResolution(current, ctx);
@@ -201,6 +203,9 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
   if (state.pendingAttack?.defenseWaits) return openDefense(state, ctx);
   // The Responses to a shadow effect, or a shadow effect that asked a player, are done: the attack goes on.
   if (attackResumes(state)) return resolveAttack(state, ctx, steps);
+  // "End the current phase" (09070:A:1): once the effect has finished, the round goes to the end of the phase in progress.
+  const phaseOver = phaseEnds(state);
+  if (phaseOver) return phaseOver;
   switch (state.mode) {
     case "afterOpening": {
       // A Setup that waits for the opening hands (The One Ring: attach it to a hero, search the deck) resolves first.
@@ -230,10 +235,10 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
       if (flagged(state, "table", "skipTravel")) return withMode(state, nextAfterTravel(state));
       // The travel opportunity was taken or declined: the window after it (4.2), still in the Travel phase.
       if (reached(state, "traveled")) return stepWindow(state, ctx, "4.2") ?? withMode(state, nextAfterTravel(state));
-      const seat = state.separate ? livingSeats(state).find((index) => !(state.travelDone ?? []).includes(index)) : livingSeats(state)[0];
+      const seat = state.separate ? areaSeats(state).find((index) => !(state.travelDone ?? []).includes(index)) : livingSeats(state)[0];
       if (seat == null) {
         // Stages are separate and every seat has had its opportunity (families/breaking/areas.ts).
-        if (state.separate && livingSeats(state).length > 0) return travelTaken({ ...state, travelDone: livingSeats(state) });
+        if (state.separate && livingSeats(state).length > 0) return travelTaken({ ...state, travelDone: areaSeats(state) });
         return state.lost
           ? state
           : { ...state, lost: true, lossReason: "No seats remain", window: null };
@@ -255,7 +260,7 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
       // "Skip the combat phase" (142075:A:2): the round goes on to the refresh phase.
       return flagged(state, "table", "skipCombat") ? withMode({ ...state, engagement: null }, "refresh") : startCombat(state, ctx);
     case "combatShadows":
-      return withMode(announceShadowsDealt(dealShadows(state, ctx.cards, steps), ctx), "combatActions");
+      return withMode(announceShadowsDealt(dealShadows(state, ctx, steps), ctx), "combatActions");
     case "combatActions":
       return stepWindow(state, ctx, "6.2") ?? withMode(state, "enemyAttacks");
     case "enemyAttacks":
@@ -307,7 +312,7 @@ function nextAfterTravel(state: ScenarioState): ModeName {
 function openOptional(state: ScenarioState, ctx: ReduceContext): ScenarioState {
   // No enemy a player could optionally engage (rr.optional-engagement): the step has nothing to offer. Stages that are separate offer each seat
   // the enemies in its own staging area (mec109.multiple-staging-areas).
-  const offered = state.separate ? livingSeats(state).some((seat) => optionalEnemies(state, ctx.cards, seat).length > 0) : optionalEnemies(state, ctx.cards).length > 0;
+  const offered = state.separate ? areaSeats(state).some((seat) => optionalEnemies(state, ctx.cards, seat).length > 0) : optionalEnemies(state, ctx.cards).length > 0;
   if (!offered) {
     return { ...withMode(state, "engagement"), window: null, engagement: { ordinal: 0, engagedThisPass: false } };
   }

@@ -900,6 +900,226 @@
     },
     {
       "match": {
+        "code": "09023"
+      },
+      "set": {
+        "questPoints": 3
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Orc Rearguard no quest points (its Victory 10 is the only number it exports). The scan prints a quest points box of 3 and Victory 10, so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 09023.A (hallofbeorn-resources The-Lost-Realm/Orc-Rearguard.jpg, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "09024"
+      },
+      "set": {
+        "questPoints": 6
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Rescue Iârion no quest points (its Victory 10 is the only number it exports). The scan prints a quest points box of 6 and Victory 10, so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 09024.A (hallofbeorn-resources The-Lost-Realm/Rescue-Iârion.jpg, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "10139"
+      },
+      "set": {
+        "questPoints": 30
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Furious Charge no quest points (its Victory 10 is the only number it exports). The scan prints a quest points box of 30 and Victory 10, so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 10139.A (hallofbeorn-resources The-Lost-Realm/Furious-Charge.jpg, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "09046"
+      },
+      "set": {
+        "questPoints": 4
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Orc Ambush no quest points (its Victory 10 is the only number it exports). The scan prints a quest points box of 4 and Victory 10, so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 09046.A (hallofbeorn-resources The-Lost-Realm/Orc-Ambush.jpg, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "10053"
+      },
+      "set": {
+        "questPoints": 6
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Stop the Executioners no quest points (its Victory 10 is the only number it exports). The scan prints a quest points box of 6 and Victory 10, so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 10053.A (hallofbeorn-resources Escape-from-Mount-Gram/Stop-the-Executioners.jpg, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "09051"
+      },
+      "set": {
+        "questPoints": 4
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Lost in the Wilderness no quest points (its Victory 10 is the only number it exports). The scan prints a quest points box of 4 and Victory 10, so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 09051.A (hallofbeorn-resources The-Lost-Realm/Lost-in-the-Wilderness.jpg, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "10109"
+      },
+      "set": {
+        "questPoints": 16
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Quiet the Spirits no quest points. The scan prints a quest points box of 16 (orange box, no Victory), so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 10109.A (The Treachery of Rhudaur, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "10111"
+      },
+      "set": {
+        "questPoints": 18
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Sift through the Debris no quest points. The scan prints a quest points box of 18 (orange box, no Victory), so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 10111.A (The Treachery of Rhudaur, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "10113"
+      },
+      "set": {
+        "questPoints": 14
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Decipher Ancient Texts no quest points. The scan prints a quest points box of 14 (orange box, no Victory), so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 10113.A (The Treachery of Rhudaur, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "10068"
+      },
+      "set": {
+        "questPoints": 7
+      },
+      "reason": "Hall of Beorn gives the objective-location Secluded Cave no quest points. The scan prints a quest points box of 7 (orange box, no Threat) and Victory 5, so a player can place progress on it once it is the active location (mec108.objective-locations).",
+      "source": "scan 10068.A (hallofbeorn-resources Across-the-Ettenmoors/Secluded-Cave.jpg, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "10069"
+      },
+      "set": {
+        "questPoints": 3
+      },
+      "reason": "Hall of Beorn gives the objective-location The Hoarwell no quest points. The scan prints a quest points box of 3 (orange box, no Threat) and Victory 5, so a player can place progress on it once it is the active location (mec108.objective-locations).",
+      "source": "scan 10069.A (hallofbeorn-resources Across-the-Ettenmoors/The-Hoarwell.jpg, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "10070"
+      },
+      "set": {
+        "questPoints": 1
+      },
+      "reason": "Hall of Beorn gives the objective-location Abandoned Camp no quest points. The scan prints a quest points box of 1 (orange box, no Threat) and Victory 5, so a player can place progress on it once it is the active location (mec108.objective-locations).",
+      "source": "scan 10070.A (hallofbeorn-resources Across-the-Ettenmoors/Abandoned-Camp.jpg, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "10071"
+      },
+      "set": {
+        "questPoints": 5
+      },
+      "reason": "Hall of Beorn gives the objective-location Patch of Woods no quest points. The scan prints a quest points box of 5 (orange box, no Threat) and Victory 5, so a player can place progress on it once it is the active location (mec108.objective-locations).",
+      "source": "scan 10071.A (hallofbeorn-resources Across-the-Ettenmoors/Patch-of-Woods.jpg, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "10081"
+      },
+      "set": {
+        "questPoints": 8
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Lie Low no quest points (its Victory 10 is the only number it exports). The scan prints a quest points box of 8 and Victory 10, so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 10081.A (hallofbeorn-resources Across-the-Ettenmoors/Lie-Low.jpg, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "10082"
+      },
+      "set": {
+        "questPoints": 6
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Forage for Food no quest points (its Victory 10 is the only number it exports). The scan prints a quest points box of 6 and Victory 10, so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 10082.A (hallofbeorn-resources Across-the-Ettenmoors/Forage-for-Food.jpg, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "10083"
+      },
+      "set": {
+        "questPoints": 7
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Scavenge for Supplies no quest points (its Victory 10 is the only number it exports). The scan prints a quest points box of 7 and Victory 10, so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 10083.A (hallofbeorn-resources Across-the-Ettenmoors/Scavenge-for-Supplies.jpg, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "09032"
+      },
+      "set": {
+        "questPoints": 6
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Find Shelter no quest points (its Victory is the only number it exports). The scan prints a quest points box of 6, so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 09032.A (read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "09055"
+      },
+      "set": {
+        "questPoints": 6
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Make Camp no quest points (its Victory is the only number it exports). The scan prints a quest points box of 6, so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 09055.A (read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "09059"
+      },
+      "set": {
+        "questPoints": 8
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Search the Ruins no quest points (its Victory is the only number it exports). The scan prints a quest points box of 8, so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 09059.A (read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "09042"
+      },
+      "set": {
+        "questPoints": 5
+      },
+      "reason": "Hall of Beorn gives the encounter side quest The Shadow World no quest points (its Victory is the only number it exports). The scan prints a quest points box of 5, so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 09042.A (read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "09063"
+      },
+      "set": {
+        "questPoints": 6
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Seal the Tomb no quest points (its Victory is the only number it exports). The scan prints a quest points box of 6, so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 09063.A (read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "09067"
+      },
+      "set": {
+        "questPoints": 8
+      },
+      "reason": "Hall of Beorn gives the encounter side quest The Power of Angmar no quest points (its Victory is the only number it exports). The scan prints a quest points box of 8, so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 09067.A (read for the quest points box)"
+    },
+    {
+      "match": {
         "code": "144075"
       },
       "set": {
@@ -1077,6 +1297,16 @@
       },
       "reason": "Retreat from Osgiliath prints X for its quest points on side 2B (\"X is the total cost of all allies in the staging area\"). Hall of Beorn lists X in its stats, but the builder reads that X only for the Two Towers boxes, so the stage would have no quest points and never advance; the record 145074:constant:1 sets the value.",
       "source": "scan 145074.B (data/printed/the-return-of-the-king.json); Hall of Beorn QuestCards.json (Back.Stats.QuestPoints X)"
+    },
+    {
+      "match": {
+        "code": "10137"
+      },
+      "set": {
+        "name": "Vile Affliction"
+      },
+      "reason": "Hall of Beorn spells the card's title \"Vile Afflication\"; the scan and DragnCards print Vile Affliction.",
+      "source": "scan 10137.A (data/printed/angmar-awakened.json); data/raw/dragncards/cardDb.tsv"
     }
   ],
   "scenarioPiles": [
@@ -1247,6 +1477,29 @@
       "pile": "setAside",
       "reason": "DragnCards loads the four Overcome by Fear in the staging area (Q0C.13, E0C.13). Stage 1A (The Forbidden Door, 145063) prints \"Each player attaches a copy of Overcome by Fear to his threat dial. Remove each unattached copy of Overcome by Fear from the game.\", so none is staged: they wait set aside, out of play, until each player attaches one and the rest leave the game.",
       "source": "dragncards preBuiltDecks.json (Q0C.13, E0C.13); scan 145063.A; scan 145016.A"
+    },
+    {
+      "scenario": "the-wastes-of-eriador",
+      "code": "10016",
+      "pile": "setAside",
+      "reason": "DragnCards loads Amarthiúl in the staging area; the quest card's Setup has the first player take control of him (\"The first player takes control of Amarthiúl\", 10013:A:1), so he waits set aside until then.",
+      "source": "mec108.setup-the-wastes-of-eriador; data/printed/angmar-awakened.json 10013:A:1; data/raw/dragncards (Q05.4)"
+    },
+    {
+      "scenario": "escape-from-mount-gram",
+      "code": "10046",
+      "from": "staging",
+      "pile": "encounter",
+      "reason": "DragnCards loads the four copies of Prison Cell in the staging area; the Setup stages none: stage 2A's When Revealed searches the encounter deck for 1 copy of Prison Cell for each player (10039:A:2), so the copies are dealt with the encounter deck.",
+      "source": "data/printed/angmar-awakened.json 10039:A:2; data/raw/dragncards (Q05.5)"
+    },
+    {
+      "scenario": "across-the-ettenmoors",
+      "code": "10072",
+      "from": "setAside",
+      "pile": "staging",
+      "reason": "DragnCards loads the four Savage Trollspawn set aside; the quest card's Setup searches the encounter deck for 1 copy per player and adds them to the staging area (10064:A:1), so they are the staged copies, the rest of the box's four staying in the deck.",
+      "source": "data/printed/angmar-awakened.json 10064:A:1; data/raw/dragncards (Q05.6)"
     }
   ],
   "scenarioRemovals": [
@@ -1324,9 +1577,47 @@
       "easy": 3,
       "reason": "The DragnCards Easy deck (E0C.12) keeps 3 Rage and Hunger; Hall of Beorn's scenario list gives Easy 2. No printed source decides: the gold Easy mark is printed on individual copies, so the one pinned scan per code cannot show it. The DragnCards Easy decks lead for The Two Towers (user decision, 2026-11-07), so Easy keeps the E0C.12 count. Not confirmed by a printed source. Normal mode is unaffected.",
       "source": "dragncards preBuiltDecks.json (E0C.12); hallofbeorn.com/Export/Scenarios/Shelob's-Lair"
+    },
+    {
+      "scenario": "escape-from-mount-gram",
+      "code": "09045",
+      "easy": 1,
+      "reason": "DragnCards' Easy deck E05.5 sets all 9 cards of the Angmar Orcs set aside, Angmar Captain included at its Normal count; Hall of Beorn gives the card's Easy count as 1, the count every other scenario of the set (Intruders in Chetwood, The Weather Hills, The Battle of Carn Dûm) passes with, since the Easy Mode copies are the ones whose set icon has a golden border. Settled as researched: the printed icon is the rule (FFG's Easy Mode note), Hall of Beorn reads it, DragnCards' deck keeps the full set.",
+      "source": "Hall of Beorn (data/raw/hallofbeorn/Scenarios/Escape-from-Mount-Gram.json, EasyQuantity); the golden-bordered set icons printed on the cards (https://www.fantasyflightgames.com/en/news/2016/8/12/travel-the-darkest-lands-of-the-north/); data/raw/dragncards (E05.5)"
+    },
+    {
+      "scenario": "escape-from-mount-gram",
+      "code": "09044",
+      "easy": 2,
+      "reason": "DragnCards' Easy deck E05.5 sets all 9 cards of the Angmar Orcs set aside, Angmar Marauder included at its Normal count; Hall of Beorn gives the card's Easy count as 2, the count every other scenario of the set (Intruders in Chetwood, The Weather Hills, The Battle of Carn Dûm) passes with, since the Easy Mode copies are the ones whose set icon has a golden border. Settled as researched: the printed icon is the rule (FFG's Easy Mode note), Hall of Beorn reads it, DragnCards' deck keeps the full set.",
+      "source": "Hall of Beorn (data/raw/hallofbeorn/Scenarios/Escape-from-Mount-Gram.json, EasyQuantity); the golden-bordered set icons printed on the cards (https://www.fantasyflightgames.com/en/news/2016/8/12/travel-the-darkest-lands-of-the-north/); data/raw/dragncards (E05.5)"
+    },
+    {
+      "scenario": "the-treachery-of-rhudaur",
+      "code": "09056",
+      "easy": 2,
+      "reason": "DragnCards' Easy deck E05.7 holds 1 Ruins of Arnor; Hall of Beorn gives the card's Easy count as 2 of its 3 copies, as in The Weather Hills' Easy deck, which agrees with it (the golden-bordered set icon marks the copy Easy Mode removes). Settled as researched: the printed icon is the rule, DragnCards' deck removes one copy too many.",
+      "source": "Hall of Beorn (data/raw/hallofbeorn/Scenarios/The-Treachery-of-Rhudaur.json, EasyQuantity); data/raw/dragncards (E05.7, E05.2); https://www.fantasyflightgames.com/en/news/2016/8/12/travel-the-darkest-lands-of-the-north/"
     }
   ],
   "scenarioCounts": [
+    {
+      "scenario": "the-treachery-of-rhudaur",
+      "code": "09057",
+      "pile": "staging",
+      "normal": 2,
+      "easy": 2,
+      "reason": "The Setup (10094:A:1) searches the encounter deck for 1 copy of Ancient Causeway and adds it to the staging area, 2 copies instead with 3 or 4 players. The Ruins of Arnor set holds 2 copies, both in the encounter deck at the start. The staging pile holds both (1 placed at 1-2 players, 2 at 3-4, the rest stays in the deck), so the encounter pile's copy is dropped.",
+      "source": "scan 10094.A (Setup line); hallofbeorn.com Scenarios/The-Treachery-of-Rhudaur; the Weather Hills deals the same two copies in the deck"
+    },
+    {
+      "scenario": "the-treachery-of-rhudaur",
+      "code": "09057",
+      "normal": 0,
+      "easy": 0,
+      "reason": "The staging pile holds both copies of Ancient Causeway (see the staging entry); the encounter pile's single copy would count one of them twice.",
+      "source": "scan 10094.A (Setup line)"
+    },
     {
       "scenario": "temple-of-the-deceived",
       "code": "12078",
@@ -1373,24 +1664,6 @@
     }
   ],
   "campaigns": [
-    {
-      "id": "angmar-awakened",
-      "name": "Angmar Awakened",
-      "kind": "campaign",
-      "box": "Angmar Awakened Campaign Expansion",
-      "products": [
-        "The Lost Realm",
-        "The Wastes of Eriador",
-        "Escape from Mount Gram",
-        "Across the Ettenmoors",
-        "Treachery of Rhudaur",
-        "The Battle of Carn Dûm",
-        "The Dread Realm"
-      ],
-      "released": "2022-08-19",
-      "reason": "No source names the campaign's scenarios together. RingsDB lists the Angmar Awakened Campaign Expansion (AACE, cycle 19), which plays The Lost Realm and its six Adventure Packs (cycles 17 and 18) as one campaign, as the Dream-chaser and Ered Mithrin expansions do theirs; Hall of Beorn lists the nine scenarios under the original products and has no product for the expansion, which is the RCO box the campaign is printed in. The scenario count is Hall of Beorn's listing.",
-      "source": "hallofbeorn.com/Export/Scenarios (Scenarios.json); ringsdb.com packs, cycles 17, 18 and 19; hallofgondor.com/release-dates (released: US release of the first product)"
-    },
     {
       "id": "shadows-of-mirkwood",
       "name": "Shadows of Mirkwood",
@@ -1577,6 +1850,22 @@
       "from": 0,
       "reason": "Hall of Beorn and RingsDB number the box's cards one above the collector number the cards print (the scans print 164 on Journey Up the Anduin, 166 on A Growing Threat, 167 on Lost in Mirkwood), and the code follows their number. The Journey Up the Anduin campaign card is their number 165, and '12165' is Fury and Malice of The City of Corsairs (RingsDB, pack CoC; 12164 is Umbar Patrol). The six-digit prefix 120 is unused (the prefixes in use are 110, 131-132, 140-148 and 900-907), so the card is 120165.",
       "source": "hallofbeorn.com/Export/QuestCards (CardSet Ered Mithrin Campaign Expansion, Number 165); ringsdb.com pack CoC (12165 Fury and Malice); scans 120165.A (prints 164), 12167.A (prints 166), 12168.A (prints 167); Ered Mithrin Campaign Expansion rulebook MEC115"
+    },
+    {
+      "set": "The Dread Realm",
+      "prefix": "101",
+      "width": 3,
+      "from": 156,
+      "reason": "Hall of Beorn numbers The Dread Realm's encounter cards 10140 to 10164, and its last nine (collector numbers 156 to 164: Witch of Angmar, Wraith of Carn Dûm, Sinister Dungeon, Tombs of Carn Dûm, Dark Halls, Unholy Crypt, Possession, A Fell Dread, Death and Calamity) share their codes with the Angmar Awakened Campaign Expansion's cards, which RingsDB lists as 10157 to 10192 (Iârion's Pendant, Protect the Innocent, Mysterious Omens, Cunning to Stalwart) and Hall of Beorn numbers 10156 to 10193 (the nine campaign cards). The expansion keeps those codes; the Dread Realm's nine take '101' and the collector number, which no other card bears.",
+      "source": "data/raw/hallofbeorn (EncounterCards.json, QuestCards.json, PlayerCards.json RingsDbCardId); data/raw/ringsdb/cards/AACE.json"
+    },
+    {
+      "set": "The Dread Realm",
+      "prefix": "10",
+      "width": 3,
+      "from": 0,
+      "reason": "The cards of The Dread Realm numbered below 156 keep the code Hall of Beorn gives them ('10' and the collector number, 10150 to 10155); a card set with a productCodes rule takes the code of the entry its collector number reaches, so this entry holds the rest of the set beside the one that moves the last nine.",
+      "source": "data/raw/hallofbeorn (EncounterCards.json, QuestCards.json RingsDbCardId)"
     }
   ],
   "dragnPackAliases": [
@@ -1585,6 +1874,12 @@
       "pack": "RevCore",
       "reason": "DragnCards' load lists for Journey Up the Anduin and Lost in Mirkwood (Q08.1, Q08.2) deal the 2011 Core Set's cards of the Wilderlands, Journey Along the Anduin, Passage Through Mirkwood, Spiders of Mirkwood and Dol Guldur Orcs sets. The Ered Mithrin Campaign Expansion's setup text names the same sets, and the app already builds and ledgers them as the Revised Core Set's reprints (same codes 01074 to 01131, same collector numbers), so a Core Set row is the Revised Core Set card with its collector number and name (user decision, 2026-11-05).",
       "source": "DragnCards preBuiltDecks.json (Q08.1, Q08.2) and cardDb.tsv (packName Core Set, numberInPack); Ered Mithrin Campaign Expansion rulebook MEC115 p5 and p6 (emce.setup-journey-up-the-anduin, emce.setup-lost-in-mirkwood)"
+    },
+    {
+      "dragncards": "The Battle of Carn Dum",
+      "pack": "BoCD",
+      "reason": "DragnCards spells the pack's name without the accent (\"The Battle of Carn Dum\"); its rows' collector numbers and names find the cards of BoCD.",
+      "source": "data/raw/dragncards/cardDb.tsv (packName); data/raw/ringsdb/packs.json"
     }
   ],
   "dragnCardCodes": [
@@ -1635,6 +1930,22 @@
       "code": "146071",
       "reason": "The Two Watchers is one physical card with two sides, location and enemy: DragnCards files it as one OCTGN guid with two rows (the guid and its .B picture), both collector number 70. Hall of Beorn files the sides as two cards, #70 (the location) and #71 (the enemy, no guid), so no guid or pack and number match finds the enemy side. Side B of the DragnCards card is the enemy side.",
       "source": "dragncards cardDb.tsv (The Mountain of Fire 70, The Two Watchers rows) and preBuiltDecks.json (Q0C.16); hallofbeorn.com/Export/EncounterCards (The-Two-Watchers-TMoF); scans 146070.A and 146071.A"
+    },
+    {
+      "dragncards": "The Battle of Carn Dum",
+      "number": 127,
+      "side": "a",
+      "code": "10127",
+      "reason": "Thaurdir is one physical card (#127) with a Captain side and a Champion side, which Hall of Beorn files as two cards (#127 and #128) and DragnCards as one id with a .B picture; the row's side finds the card.",
+      "source": "data/raw/dragncards/cardDb.tsv; data/raw/hallofbeorn/EncounterCards.json; mec108.thaurdir"
+    },
+    {
+      "dragncards": "The Battle of Carn Dum",
+      "number": 127,
+      "side": "b",
+      "code": "10128",
+      "reason": "Thaurdir is one physical card (#127) with a Captain side and a Champion side, which Hall of Beorn files as two cards (#127 and #128) and DragnCards as one id with a .B picture; the row's side finds the card.",
+      "source": "data/raw/dragncards/cardDb.tsv; data/raw/hallofbeorn/EncounterCards.json; mec108.thaurdir"
     }
   ],
   "encounterSetAliases": [
@@ -1643,6 +1954,74 @@
       "set": "Journey Along the Anduin",
       "reason": "The Revised Core Set's Learn to Play (p25) and the Easy Mode sheet (p2) call the second core scenario and its encounter set \"Journey Down the Anduin\". The scenario's own campaign card, quest cards and encounter set icon print \"Journey Along the Anduin\" (Mirkwood Paths - Part 2, scan 01130.A), and Hall of Beorn follows the cards. The card wins (authority order); the booklet's name is an alias.",
       "source": "Learn to Play p25 (ltp.setup-journey-along-the-anduin); scan 01130.A; hallofbeorn.com/Export/Scenarios/Journey-Along-the-Anduin-(Campaign)"
+    }
+  ],
+  "scenarioCampaignPlaced": [
+    {
+      "scenario": "the-weather-hills",
+      "code": [
+        "10161",
+        "10162",
+        "10163",
+        "10164",
+        "10165"
+      ],
+      "reason": "Mysterious Omens (10160) says \"each player may choose 1 of the following boons and attach it to a hero they control: Cunning, Hardy, Resolute, Ruthless, or Stalwart\", so the five boons, Cunning, Hardy, Resolute, Ruthless and Stalwart, are dealt with The Weather Hills, though no Setup or Resolution line of the campaign card names them.",
+      "source": "scan 10160.A (data/printed/angmar-awakened.json); mec108.campaign-setup-the-weather-hills"
+    },
+    {
+      "scenario": [
+        "deadmens-dike",
+        "the-wastes-of-eriador",
+        "escape-from-mount-gram",
+        "across-the-ettenmoors",
+        "the-treachery-of-rhudaur",
+        "the-battle-of-carn-dum",
+        "the-dread-realm"
+      ],
+      "code": [
+        "10161",
+        "10162",
+        "10163",
+        "10164",
+        "10165"
+      ],
+      "reason": "Mysterious Omens (10160) stays in the Campaign Pool when it is not defeated in The Weather Hills, and a later scenario's Campaign Setup Checklist shuffles it into the encounter deck. Its Forced offers the five boons (\"Cunning, Hardy, Resolute, Ruthless, or Stalwart\"), so the printed card of each of the five boons is loaded with every later Angmar Awakened scenario and a copy comes from the supply when a player takes it; a boon the Campaign Pool already holds on a hero is not offered (each has one copy).",
+      "source": "scan 10160.A (data/printed/angmar-awakened.json); mec108.campaign-setup-deadmens-dike"
+    },
+    {
+      "scenario": [
+        "escape-from-mount-gram",
+        "across-the-ettenmoors",
+        "the-treachery-of-rhudaur",
+        "the-battle-of-carn-dum",
+        "the-dread-realm"
+      ],
+      "code": [
+        "10172",
+        "10173"
+      ],
+      "reason": "The Wastes of Eriador's Campaign Setup adds Determination (10172) to the Campaign Pool and shuffles Fend Off Despair (10173) into its encounter deck, and its Resolution adds Fend Off Despair to the pool. Both stay in the pool, so a later scenario's Campaign Setup Checklist deals them (a player may hold Determination in their deck and Fend Off Despair is shuffled into the encounter deck), and each is played and defeated there as it was here: the printed card of each is loaded with every later Angmar Awakened scenario.",
+      "source": "scans 10171.A, 10171.B, 10172.A and 10173.A (data/printed/angmar-awakened.json); mec108.campaign-setup-the-wastes-of-eriador"
+    },
+    {
+      "scenario": [
+        "escape-from-mount-gram",
+        "across-the-ettenmoors",
+        "the-treachery-of-rhudaur",
+        "the-battle-of-carn-dum",
+        "the-dread-realm"
+      ],
+      "code": [
+        "10176",
+        "10177",
+        "10178",
+        "10179",
+        "10180",
+        "10181"
+      ],
+      "reason": "Loot the Dungeons (10175) says \"each player ... may choose one of the following boons and add it to their hand: Berelind, Chieftain's Brooch, Coruhaer, Laermuin, Mail of Eärnur, or Silverthorn\", so the six boons are dealt with Escape from Mount Gram as set-aside cards, each a single copy, though no Setup or Resolution line of the campaign card names them. A boon a player added to their hand stays in the Campaign Pool, so each later Angmar Awakened scenario deals the printed card of each of the six too.",
+      "source": "scan 10175.A (data/printed/angmar-awakened.json); mec108.campaign-setup-escape-from-mount-gram"
     }
   ],
   "scenarioExcluded": [
@@ -1710,6 +2089,14 @@
       "code": "146009",
       "reason": "Hall of Beorn gives The Mountain of Fire's Orc Disguise (#13) the RingsDbCardId of another card of the pack: it numbers the player cards in collector order, RingsDB numbers Orc Disguise 146009, Captains of the West 146010 and Raise the Shire 146013. RingsDB's own record of the pack names the card with this code.",
       "source": "ringsdb.com/api/public/cards (MoF 146009 Orc Disguise, 146010 Captains of the West, 146013 Raise the Shire); hallofbeorn.com/Export/PlayerCards (The Mountain of Fire #9, #10, #13)"
+    },
+    {
+      "set": "Angmar Awakened Campaign Expansion",
+      "number": 158,
+      "title": "Arnor Ravaged",
+      "code": "100158",
+      "reason": "Protect the Innocent and Arnor Ravaged are the two sides of one card (#158; the Deadmen's Dike campaign card: \"Add Arnor Ravaged to the Campaign Pool in its place (found on the opposite side of Protect the Innocent)\"), and Hall of Beorn gives both RingsDbCardId 10158. Protect the Innocent keeps RingsDB's code; Arnor Ravaged, which RingsDB lists no record for, takes '100' and the collector number, which no other card bears.",
+      "source": "data/raw/hallofbeorn (EncounterCards.json); data/raw/ringsdb/cards/AACE.json; mec108.campaign-setup-deadmens-dike"
     }
   ]
 }

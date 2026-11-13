@@ -12,7 +12,7 @@ import { raiseThreat } from "../core/keywords.ts";
 import { queueEvent } from "./queue.ts";
 import { offerResponses, responseStep } from "./responses.ts";
 import { printedOf } from "../core/printed.ts";
-import { flagged, inPlay, livingSeats, updateCard, withMode, type Frame, type ScenarioState } from "../core/state.ts";
+import { flagged, heldAmount, inPlay, livingSeats, updateCard, withMode, type Frame, type ScenarioState } from "../core/state.ts";
 import { eventStep, fireForced } from "./triggers.ts";
 import { patchTop, popFrame, pushFrame, topFrame } from "./windows.ts";
 import { resetEncounterDeck, shuffleEncounterDeck } from "../interpret/verbs.ts";
@@ -20,10 +20,13 @@ import { attachTo, moveCard, turnedUp } from "../core/zones.ts";
 import { announceEntered, noteEncounterThreat, revealSeat, revealSkipped, revealsAllowed, spendSkippedReveal, watchReveal } from "../families/encounter/reveal.ts";
 import { discardsAfterReveal } from "../families/sidequests/encounter.ts";
 import { engageWith } from "../quest/quest.ts";
-import { stagingDest } from "../families/breaking/areas.ts";
+import { sharing, stagingDest } from "../families/breaking/areas.ts";
 import { grapplesOnReveal, pushGrapple } from "../families/grapple/attach.ts";
 import { skipLoot } from "../families/wilderland/loot.ts";
 import { familyRevealed } from "../interpret/family-hooks.ts";
+import { gainedDoomed } from "../families/deck/gains-doomed.ts";
+import { gameReads } from "../core/game-reads.ts";
+import { whenRevealedIgnored } from "../families/angmar/safe.ts";
 
 // A frame that waits for a player lives on state.stack. settle advances the top one
 // until it pops or opens a window.
@@ -61,16 +64,18 @@ export function startReveal(
   guards?: string,
   // An enemy found by a search is put into play engaged with the revealing seat, not staged (SearchReveal `to: engaged`).
   engage?: boolean,
+  // The found card lay in the encounter discard pile (SearchReveal): the `revealed` event says so, for "revealed from the encounter deck" (09016:A:3).
+  fromDiscard?: boolean,
 ): ScenarioState {
   // A Loot card on top of the deck is discarded, not revealed (emce.loot).
-  const skipped = cardId ? { state, top: cardId } : skipLoot(resetEncounterDeck(state, steps), ctx, steps);
+  const skipped = cardId ? { state, top: cardId } : skipLoot(resetEncounterDeck(state, steps, ctx), ctx, steps);
   const ready = skipped.state;
   const id = skipped.top;
   const instance = id ? ready.cards[id] : undefined;
   if (!id || !instance) return ready;
   const peril = printedOf(ctx.cards, instance.code).keywords.peril;
   const fromDeck = cardId == null ? { fromDeck: true } : {};
-  return pushFrame(ready, { frame: "reveal", cardId: id, seat, peril, data: { kind: "reveal", hide: null, surge: false, ...fromDeck, ...(guards ? { guards } : {}), ...(engage ? { engage: true as const } : {}) } }, steps);
+  return pushFrame(ready, { frame: "reveal", cardId: id, seat, peril, data: { kind: "reveal", hide: null, surge: false, ...fromDeck, ...(fromDiscard ? { fromDiscard: true as const } : {}), ...(guards ? { guards } : {}), ...(engage ? { engage: true as const } : {}) } }, steps);
 }
 
 // A reveal started by an effect instruction. It cannot wait for a player, so a Hide test or any other
@@ -131,7 +136,7 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
   // The card's effects were canceled just after it was revealed: it goes back into the encounter deck and the same
   // seat reveals another card (141001:A:1).
   // A card a Response discarded as it canceled it (The Door is Closed!, 10092:A:1) is not returned: the reveal is over.
-  if (frame.data.canceled && frame.step >= 1) return state.cards[id]?.zone === "staging" ? revealAnother(state, frame, ctx, steps) : resetEncounterDeck(popFrame(frame.peril ? { ...state, perilSeat: null } : state, steps), steps);
+  if (frame.data.canceled && frame.step >= 1) return state.cards[id]?.zone === "staging" ? revealAnother(state, frame, ctx, steps) : resetEncounterDeck(popFrame(frame.peril ? { ...state, perilSeat: null } : state, steps), steps, ctx);
   switch (frame.step) {
     case 0: {
       // Into the revealing seat's own staging area once stages are separate (mec109.multiple-staging-areas).
@@ -157,9 +162,15 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
     }
     case 1: {
       let next = patchTop(state, { step: 2 });
-      if (printed.keywords.doomed != null && printed.keywords.doomed > 0) {
+      // The Doomed a card in play gives it (Troll-fells gives each Weather card Doomed 1, 10077:A:1) comes on top of the printed number.
+      // The Doomed the card gives itself (`gainsDoomed`, Wight of Rhudaur, 10099:A:2) comes on top as well.
+      const doomed = (printed.keywords.doomed ?? 0) + (gameReads(next, ctx, '"GainsDoomed"') ? gainedDoomed(next, id, seat, ctx) : 0) + (next.modifiers.length > 0 ? heldAmount(next, id, "gainsDoomed") : 0);
+      if (doomed > 0) {
+        // The players sharing the staging area it was added to, once stages are separate and the game has joined areas (families/captured/).
+        const sharers = next.capture && next.separate ? sharing(next, seat) : null;
         for (let index = 0; index < next.seatCount; index += 1) {
-          next = noteEncounterThreat(raiseThreat(next, index, printed.keywords.doomed, steps, ruleCause("rr.doomed-x")), index, printed.keywords.doomed, id, ctx);
+          if (sharers && !sharers.includes(index)) continue;
+          next = noteEncounterThreat(raiseThreat(next, index, doomed, steps, ruleCause("rr.doomed-x")), index, doomed, id, ctx);
         }
         // An encounter card's Doomed raise is heard by Elfhelm (02100:A:1).
         next = encounterRaised(next, livingSeats(next), id, ctx);
@@ -176,7 +187,7 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
       return runRevealed(patchTop(state, { step: 4 }), id, seat, frame.peril, ctx, steps);
     case 4:
       // The Responses "after an enemy is revealed" (142067:B:2) are offered once the Forced effects of the reveal have resolved: their frame goes under those.
-      const heard = { trigger: "revealed", seat, cardId: id, ...(frame.data.fromDeck ? { fromDeck: true } : {}) } as const;
+      const heard = { trigger: "revealed", seat, cardId: id, ...(frame.data.fromDeck ? { fromDeck: true } : {}), ...(frame.data.kind === "reveal" && frame.data.fromDiscard ? { fromDiscard: true as const } : {}) } as const;
       return fireForced(offerResponses(patchTop(state, { step: 5 }), heard, ctx, steps), heard, ctx, steps);
     case 5: {
       // A revealed treachery is resolved, then placed in the encounter discard pile unless its text says otherwise
@@ -188,13 +199,13 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
       // A card still in play has entered play (rr.staging, step 3): "After a location enters play" (04060:A:1).
       const next = patchTop(announceEntered(unlocked, id, seat, ctx), { step: 6 });
       const revealing = next.seats[seat];
-      const surge = printed.keywords.surge || (frame.data.kind === "reveal" && frame.data.surge);
+      const surge = printed.keywords.surge || flagged(next, id, "gainsSurge") || (frame.data.kind === "reveal" && frame.data.surge);
       if (!surge || !revealing || revealing.eliminated) return next;
       return startReveal(next, seat, ctx, steps);
     }
     default:
       // The revealed card's staging is resolved: an encounter deck it emptied is reset now (faq.last-encounter-card).
-      return resetEncounterDeck(popFrame(frame.peril ? { ...state, perilSeat: null } : state, steps), steps);
+      return resetEncounterDeck(popFrame(frame.peril ? { ...state, perilSeat: null } : state, steps), steps, ctx);
   }
 }
 
@@ -221,6 +232,7 @@ function runRevealed(
 ): ScenarioState {
   const code = state.cards[id]?.code;
   if (!code) return state;
-  const effects = ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "whenRevealed");
+  // A safe location that is active makes the players ignore the "when revealed" effects of every treachery (mec108.safe).
+  const effects = whenRevealedIgnored(state, id, ctx) ? [] : ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "whenRevealed");
   return pushCardEffects(state, "whenRevealed", id, seat, peril, effects, ctx, steps);
 }

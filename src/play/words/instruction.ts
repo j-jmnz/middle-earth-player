@@ -28,12 +28,13 @@ import { stormcallerWords } from "./scenarios/stormcaller.ts";
 import { assaultWords } from "./scenarios/assault.ts";
 import { fortressWords } from "./scenarios/fortress.ts";
 import { companyWords } from "./scenarios/company.ts";
+import { angmarWords } from "./scenarios/angmar/angmar.ts";
 import type { ChoiceNames } from "./choice.ts";
 
 export const PICK_NOUNS: Readonly<Record<string, string>> = { hero: "hero", ally: "ally", attachment: "attachment", enemy: "enemy", character: "character", location: "location", player: "player", objective: "objective" };
 
 // The decks beside the encounter deck a record names (src/rules/core/piles.ts NAMED_PILES), as a sentence says them.
-const PILE_NAMES = { caves: "Caves", evilCreatures: "Evil Creatures", spiders: "Spiders of Mirkwood", orcs: "Orcs", sideQuests: "side quest", harad: "Harad", greatSpider: "Great Spider" } as const;
+const PILE_NAMES = { caves: "Caves", evilCreatures: "Evil Creatures", spiders: "Spiders of Mirkwood", orcs: "Orcs", sideQuests: "side quest", harad: "Harad", greatSpider: "Great Spider", angmarOrcs: "Orc" } as const;
 
 export function article(noun: string): string {
   return /^[aeiou]/.test(noun) ? `an ${noun}` : `a ${noun}`;
@@ -313,7 +314,7 @@ export function instructionWords(instruction: Instruction, game: ScenarioState, 
       return `${refWords(instruction.target)} gets ${instruction.amount >= 0 ? `+${instruction.amount}` : instruction.amount} ${STAT_WORDS[instruction.stat] ?? instruction.stat} while attacking ${refWords(instruction.versus)}`;
     default:
       // The encounter family's verbs (src/catalog/families/encounter.ts), then the attachments, attack, play and deck families'.
-      return breakingWords(instruction, names, game) ?? oathWords(instruction, names.code) ?? nightmareWords(instruction, names.code) ?? seaWords(instruction) ?? unchartedWords(instruction) ?? islandWords(instruction) ?? aflameWords(instruction) ?? stormcallerWords(instruction) ?? fortressWords(instruction, names.code) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? moriaWords(instruction, names) ?? burdenWords(instruction, names.code) ?? encounterWords(instruction) ?? attachmentWords(instruction, names.code) ?? companyWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction) ?? assaultWords(instruction) ?? pursuitWords(instruction, game) ?? pelennorWords(instruction) ?? blackGateWords(instruction);
+      return breakingWords(instruction, names, game) ?? oathWords(instruction, names.code) ?? nightmareWords(instruction, names.code) ?? seaWords(instruction) ?? unchartedWords(instruction) ?? islandWords(instruction) ?? aflameWords(instruction) ?? stormcallerWords(instruction) ?? fortressWords(instruction, names.code) ?? cavesWords(instruction, names.code) ?? dungeonWords(instruction, names.code) ?? southWords(instruction) ?? moriaWords(instruction, names) ?? burdenWords(instruction, names.code) ?? encounterWords(instruction) ?? attachmentWords(instruction, names.code) ?? companyWords(instruction) ?? attackWords(instruction) ?? playWords(instruction) ?? deckWords(instruction) ?? miscWords(instruction) ?? assaultWords(instruction) ?? pursuitWords(instruction, game) ?? pelennorWords(instruction) ?? blackGateWords(instruction) ?? angmarWords(instruction);
   }
 }
 

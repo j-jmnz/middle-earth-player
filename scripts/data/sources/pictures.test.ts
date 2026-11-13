@@ -6,7 +6,7 @@ import { describe, expect, it } from "vitest";
 import { scenarioCards } from "../../../src/catalog/scenario-data.ts";
 import { loadScenario } from "../load-scenarios.ts";
 import { DATA_DIR } from "../paths.ts";
-import { MEC109_CHANGED, MEC112_CHANGED, MEC113_CHANGED } from "../printed/scope.ts";
+import { MEC108_CHANGED, MEC109_CHANGED, MEC112_CHANGED, MEC113_CHANGED } from "../printed/scope.ts";
 import { cardgameToolsFile, fallbackUrls, lettersOf, PDF_PAGES, productsOfPacks } from "./pictures.ts";
 
 describe("pictures", () => {
@@ -60,6 +60,32 @@ describe("pictures", () => {
     ]);
   });
 
+  it("takes a double-sided card's back image for the card named by the slug's second title", () => {
+    const rows = new Map([
+      ["MEC108 158", { slug: "EncounterSideQuest-Protect_the_Innocent- Arnor_Ravaged-Intruders_in_Chetwood_Campaign", front: "158-front.jpg", back: "158-back.jpg" }],
+    ]);
+    const products = new Map([["AACE", "MEC108"]]);
+    const printing = [{ pack: "AACE", number: 158 }];
+    expect(cardgameToolsFile(rows, products, { name: "Protect the Innocent", printings: printing }, "A")).toBe("158-front.jpg");
+    expect(cardgameToolsFile(rows, products, { name: "Arnor Ravaged", printings: printing }, "A")).toBe("158-back.jpg");
+  });
+
+  it("pins no picture to two cards, except the printings of one card face", () => {
+    const { sources } = JSON.parse(readFileSync(path.join(DATA_DIR, "sources.json"), "utf8")) as { sources: Record<string, { files: { path: string; sha256: string }[] } | undefined> };
+    const byHash = new Map<string, string[]>();
+    for (const file of sources.pictures?.files ?? []) {
+      const code = /^pictures\/(\w+)\.A\./.exec(file.path)?.[1];
+      if (code) byHash.set(file.sha256, [...(byHash.get(file.sha256) ?? []), code]);
+    }
+    const names = new Map<string, string>();
+    for (const file of readdirSync(path.join(DATA_DIR, "cards")).filter((name) => name.endsWith(".json"))) {
+      for (const card of JSON.parse(readFileSync(path.join(DATA_DIR, "cards", file), "utf8")) as { code: string; name: string }[]) names.set(card.code, lettersOf(card.name));
+    }
+    // Two codes may share a picture only when they are one card's name (a reprint or a twin); another name is a side filed under the wrong card.
+    const shared = [...byHash.values()].filter((codes) => new Set(codes.map((code) => names.get(code) ?? code)).size > 1);
+    expect(shared).toEqual([]);
+  });
+
   it("names one PDF page per side of the 21 campaign, boon and burden cards", () => {
     const keys = PDF_PAGES.map((entry) => `${entry.code}.${entry.side}`);
     expect(new Set(keys).size).toBe(keys.length);
@@ -72,13 +98,13 @@ describe("pictures", () => {
   it("pins a picture for every card a built scenario deals", () => {
     const { sources } = JSON.parse(readFileSync(path.join(DATA_DIR, "sources.json"), "utf8")) as { sources: Record<string, { files: { path: string }[] } | undefined> };
     const pinned = new Set([...(sources.pictures?.files ?? []), ...(sources.nightmare?.files ?? [])].map((file) => /^pictures\/(\w+)\.A\./.exec(file.path)?.[1]).filter((code) => code != null));
-    // The MEC109, MEC112 and MEC113 printings whose wording differs keep their scan (MEC109_CHANGED, MEC112_CHANGED, MEC113_CHANGED). Navigation (11084) is a rules card of The Grey Havens that
+    // The MEC108, MEC109, MEC112 and MEC113 printings whose wording differs keep their scan (MEC108_CHANGED, MEC109_CHANGED, MEC112_CHANGED, MEC113_CHANGED). Navigation (11084) is a rules card of The Grey Havens that
     // neither JvZijp nor cardgame.tools carries.
     // Ered Mithrin: no picture source carries the Campaign Expansion's own cards (cardgame.tools' MEC115 stops at the encounter cards, JvZijp's Drive holds
     // none of a campaign expansion's cards): the pack bundles their scan, Hall of Beorn's digital render (about 1020 × 1451), so each must have one.
     // The Campaign Expansion's 40 cards, by code (120165 is the Journey Up the Anduin campaign card; the rest are 12166 to 12204).
     const emce = ["120165", ...Array.from({ length: 39 }, (_, at) => String(12166 + at))];
-    const unpictured = new Set([...MEC109_CHANGED, ...MEC112_CHANGED, ...MEC113_CHANGED, "11084", ...emce]);
+    const unpictured = new Set([...MEC108_CHANGED, ...MEC109_CHANGED, ...MEC112_CHANGED, ...MEC113_CHANGED, "11084", ...emce]);
     const missing: string[] = [];
     for (const id of readdirSync(path.join(DATA_DIR, "scenarios")).filter((file) => file.endsWith(".json")).map((file) => file.slice(0, -".json".length))) {
       const scenario = loadScenario(id);

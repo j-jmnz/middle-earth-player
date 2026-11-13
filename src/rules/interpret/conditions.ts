@@ -16,13 +16,15 @@ import { seatThreat } from "../families/play/hooks.ts";
 import { distinctTraitCount, flaggedTrait } from "../families/misc/traits.ts";
 import type { ReduceContext } from "./interpret.ts";
 import { currentQuestHas, engagedThisPhase, questHasKeywords, stepHolds } from "../families/quest/conditions.ts";
+import { headOf, inAreaOf } from "../families/breaking/areas.ts";
 import { modifiedStat, versusDefender, versusHighEngagement } from "../core/keywords.ts";
+import { defendingAgainst } from "../families/angmar/combat.ts";
 import { effectsOf } from "../windows/listen.ts";
 import { countMatching, matchesPick, pickCandidates } from "./pick.ts";
 import { committedWillpower, stagingThreat } from "../quest/quest.ts";
 import { cardTypeOf, printedOf, type Sphere } from "../core/printed.ts";
 import type { ScenarioState } from "../core/state.ts";
-import { inPlay, livingSeats } from "../core/state.ts";
+import { flagged, inPlay, livingSeats } from "../core/state.ts";
 import { combatStepIs } from "../families/defense/conditions.ts";
 import { faceUp, flagHeld } from "../families/sidequests/contract.ts";
 import { copyInVictory } from "../families/sidequests/pick.ts";
@@ -106,7 +108,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
   switch (condition.kind) {
     // A family's condition hook answers these before this switch (south: noneDiscarded; black-gate: embassy; wilderland: the campaign log, the Caves deck, the quest deck, Discover, the Fate of Wilderland's); the cases only complete the switch.
     case "noneDiscarded": case "logged": case "treasuresLogged": case "beldisBox": case "cavesDeck": case "pileHas": case "facedownUnder": case "questDeck": case "soleAttacker": case "captives":
-    case "attackedThisPhase": case "namedFlag": case "discoverUnavailable": case "encounterPlacedOnStage": case "playerUnengaged": case "hasWizardry": case "onDial": case "canAttachToDial": case "embassy": case "lastFortitudeFailed": case "lastFortitudePassed": case "fortitudeFailed": case "hostControlledByActor":
+    case "attackedThisPhase": case "namedFlag": case "discoverUnavailable": case "encounterPlacedOnStage": case "playerUnengaged": case "hasWizardry": case "onDial": case "canAttachToDial": case "embassy": case "lastFortitudeFailed": case "lastFortitudePassed": case "captured": case "fortitudeFailed": case "hostControlledByActor": case "currentQuest": case "currentQuestProgress": case "questLeads": case "hitPointsLeft": case "timeOfDay": case "safeActive": case "setAsideHas":
       return false;
     case "hideFailed":
       return state.hideFailures.some(
@@ -203,10 +205,21 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return (state.stagesReached ?? []).includes(condition.code) === condition.is;
     case "inPlay":
       return Object.values(state.cards).some((card) => card.code === condition.code && inPlay(card.zone)) === condition.is;
+    case "defendingAgainst": {
+      const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
+      return holder != null && defendingAgainst(state, holder, condition.trait, ctx);
+    }
     case "versusDefender": {
       const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
       return holder != null && versusDefender(state, holder, condition, ctx.cards);
     }
+    case "inArea": {
+      const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
+      return holder != null && inAreaOf(state, holder, condition.seat);
+    }
+    // Answered by the captured family's condition hook above (families/captured/values.ts).
+    case "versusVictoryTrait":
+      return false;
     case "versusHighEngagement": {
       const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
       return holder != null && versusHighEngagement(state, condition.role, holder, ctx.cards, scope.against);
@@ -244,8 +257,10 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
     }
     case "enemyInPlay": {
       const trait = condition.trait;
+      // Mount Gram: while the staging areas are separate an enemy "in play" is one in the asking player's own area (mec108.create-staging-area).
+      const area = state.separate && state.capture ? headOf(state, scope.actor) : null;
       const found = Object.values(state.cards).some(
-        (card) => inPlay(card.zone) && printedOf(ctx.cards, card.code).type === "enemy" && (trait == null || hasTrait(state, card.id, trait, ctx)),
+        (card) => inPlay(card.zone) && printedOf(ctx.cards, card.code).type === "enemy" && (trait == null || hasTrait(state, card.id, trait, ctx)) && (area == null || inAreaOf(state, card, area)),
       );
       return found === condition.is;
     }
@@ -394,7 +409,7 @@ function engagedAs(card: { zone: string; controller: number | null }, engaged: "
   return engaged === "you" ? card.controller === seat : card.controller !== seat;
 }
 
-function sourceIn(state: ScenarioState, sourceId: string | null, zone: "activeLocation" | "staging" | "engaged" | "questStage" | "play" | "victory" | "hand" | "stormcallerArea" | "encounterDeck"): boolean {
+function sourceIn(state: ScenarioState, sourceId: string | null, zone: "activeLocation" | "staging" | "engaged" | "questStage" | "play" | "victory" | "hand" | "stormcallerArea" | "encounterDeck" | "attached"): boolean {
   const source = sourceId ? state.cards[sourceId] : undefined;
   if (!source) return false;
   // The second active location slot is an active location too (mec109.stage-4).
@@ -408,7 +423,7 @@ export function hasTrait(state: ScenarioState, id: string, trait: string, ctx: R
   const instance = state.cards[id];
   return (
     instance != null &&
-    (printedOf(ctx.cards, instance.code).traits.includes(trait) || grantedTraits(state, id, ctx).includes(trait) || flaggedTrait(state, id, trait) || countedTraits(state, id, ctx).includes(trait))
+    ((printedOf(ctx.cards, instance.code).traits.includes(trait) && !flagged(state, id, "blanksTraits")) || grantedTraits(state, id, ctx).includes(trait) || flaggedTrait(state, id, trait) || countedTraits(state, id, ctx).includes(trait))
   );
 }
 

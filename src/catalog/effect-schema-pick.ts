@@ -212,6 +212,20 @@ export const pickSchema = z.strictObject({
   // "each unguarded objective in the staging area", 12121:A:1). `isGuard`: an enemy attached to an objective as its guard (`false`: "an enemy that is not currently guarding an objective", 12133:A:1).
   hasGuard: z.boolean().optional(),
   isGuard: z.boolean().optional(),
+  // A character whose code the Campaign Log marks "determined" (`campaignFacts.angmar.determined`, Angmar Awakened): "each character who is 'determined' in the Campaign Log" (10172:A:1). Read by the angmar family.
+  determined: z.literal(true).optional(),
+  // A Reanimated Dead (The Dread Realm, mec108.reanimated-dead): a player card facedown as an Undead enemy ("each Reanimated Dead", 101160:A:1). Read by the angmar family.
+  reanimated: z.literal(true).optional(),
+  // With `type: card`: every card in play of any kind, the attachments on quest cards, enemies and characters included, and the cards of the staging area, the active location and the quest card ("Sorcery cards in play", 10153:A:2). Read by the angmar family.
+  allInPlay: z.literal(true).optional(),
+  // A card with the printed title of the defending character in the attack in progress ("a copy of the defending character in your discard pile", 101160:A:2). Read by the angmar family.
+  copyOfDefender: z.literal(true).optional(),
+  // A card that has the Safe keyword (Across the Ettenmoors, mec108.safe; its record has the constant verb Safe): "a location with the safe keyword" (10075:A:2), for an objective-location (`type: objective`). Read by the angmar family.
+  safe: z.literal(true).optional(),
+  // A card with at least this many damage tokens on it ("while it has 3 or more damage on it", 10075:A:1). Read by the angmar family.
+  minDamage: z.number().int().positive().optional(),
+  // A card with at most this many hit points remaining: its hit points as modified now less the damage on it ("an Undead enemy with 2 or less remaining hit points", 10187:A:3). Read by the angmar family.
+  maxHitPointsLeft: z.number().int().min(0).optional(),
   onPicked: z.boolean().optional(),
   // A player card (`false`: an encounter card, "all encounter cards are immune", 12172:A:2).
   playerCard: z.boolean().optional(),
@@ -250,6 +264,11 @@ export const pickSchema = z.strictObject({
   engageable: z.literal(true).optional(),
   // The effect discards the card chosen, for a condition that asks before the discard (a canPick ahead of DiscardFromHand): a card that player card effects cannot discard (18026:A:1) is left out. A Pick followed by DiscardPicked is known without it (families/wilderland/pick.ts).
   discarded: z.literal(true).optional(),
+  // Captured cards (Escape from Mount Gram, read by the captured family): the cards a pick starts from are `underSelf` the cards captured underneath the source (any owner's; one the owner cannot put into play is left out), `rescued` the cards the last rescue
+  // put into hands that are still there (10044:A:2), `hosts` the encounter cards in play in the asking player's staging area (the staged cards, the active location and the enemies engaged with a player there; 10051:A:1).
+  captured: z.enum(["underSelf", "rescued", "hosts"]).optional(),
+  // With `type: card`: only the quest cards in play the asking player can name: their current quest stage, the encounter side quests in their staging area and the player side quests in the quest areas ("a quest card in play", 10176:A:1).
+  questCard: z.literal(true).optional(),
   // The black-gate family's filters (src/rules/families/black-gate/pick.ts). `embassy`: a card of the Embassy from the Dark Tower's faceup row that is not paired yet, the player cards placed in front of the players (`player`) or the encounter cards placed faceup (`encounter`, 146072:B:1).
   // `highestThreat`: of the cards that matched, those with the highest current Threat, a card with none counting 0 ("the highest threat encounter card remaining"); every one when tied, and the chooser decides.
   embassy: z.enum(["player", "encounter"]).optional(),
@@ -270,8 +289,9 @@ export const pickSchema = z.strictObject({
   // counting as 0 ("is discarded if its Willpower is 0", 900102:A:1).
   maxWillpower: z.number().int().min(0).optional(),
   // A card a player controls with a copy (a card of the same title) in that player's discard pile ("Discard each card you control that has at
-  // least 1 copy of itself in your discard pile", 900309:A:2).
-  copyInDiscard: z.literal(true).optional(),
+  // least 1 copy of itself in your discard pile", 900309:A:2). `"owner"`: a card with its title in its OWNER's discard pile, itself counting when it lies there ("if there is a card that has the same title in its owner's discard pile", 09066:A:2; "in its owner's
+  // discard pile", 09061:A:2, 09065:A:3).
+  copyInDiscard: z.union([z.literal(true), z.literal("owner")]).optional(),
   // The grapple family's filter (src/rules/families/grapple/values.ts): a card that shows this side ("if Sea Serpent (Enraged side) is in play", side B, 11194:B:6).
   side: z.enum(["A", "B"]).optional(),
   // The aflame family's filters (src/rules/families/aflame/pick.ts). `aflame`: a location that prints the Aflame keyword (`false`: any other card). `lowestAflame`: of the cards that match, only

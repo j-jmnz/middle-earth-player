@@ -16,6 +16,8 @@ import { discardToPoolFromSets } from "../families/wilderland/mirkwood.ts";
 import { addEncounterCards, allyOrLineOptions, applyAllyOrLine, applyRemoval, applyStagedLocation, discoverTreasures, noteRemovalAnswer, playerOptions, removalOptions, removeEncounterCards, stagedLocationOptions } from "../families/wilderland/pool.ts";
 import { drawTreasures } from "../families/wilderland/treasure.ts";
 import { applyHazard, discardHazards, hazardOptions } from "../families/wilderland/hazards.ts";
+import { encounterCopies } from "../families/angmar/ettenmoors.ts";
+import { recordDamageOn, recordDetermined, recordHeroDamage, recordStolenCards } from "../families/campaign/damage-tracking.ts";
 import { endCampaign, ignoreDiscardedHeroes, loseGuardedBoons, recordTokens, removeFromPool, threatDialCopies } from "../families/campaign/saga-end.ts";
 import { applyChooseOption, applyRevive, applyTrim, boonHeroes, chooseOptionIds, earnForPick, earnHeldCopies, reviveOptions, threatPenalties, trimOptions, underneath } from "../families/campaign/resolution.ts";
 
@@ -158,6 +160,18 @@ export function advanceResolution(state: ScenarioState, ctx: ReduceContext): Sce
       case "RecordTokens":
         next = stepOver(next, recordTokens(next, instruction));
         break;
+      case "RecordDamageOn":
+        next = stepOver(next, recordDamageOn(next, instruction));
+        break;
+      case "RecordHeroDamage":
+        next = stepOver(next, recordHeroDamage(next));
+        break;
+      case "RecordDetermined":
+        next = stepOver(next, recordDetermined(next, instruction));
+        break;
+      case "RecordStolenCards":
+        next = stepOver(next, recordStolenCards(next, ctx));
+        break;
       case "RemoveFromPoolByCode":
         next = stepOver(next, removeFromPool(next, instruction));
         break;
@@ -190,6 +204,10 @@ export function advanceResolution(state: ScenarioState, ctx: ReduceContext): Sce
       }
       case "EarnAllBurdens":
         next = stepOver(next, earn(next, burdensEverywhere(next, ctx).map((code) => ({ code, to: "pool" as const, seat: null, hero: null, step: next.resolutionAt }))));
+        break;
+      // The copies of these cards in the encounter deck or discard pile (families/angmar/ettenmoors.ts, 10182:B:1).
+      case "EarnEncounterCopies":
+        next = stepOver(next, earn(next, encounterCopies(next, instruction.codes, next.resolutionAt)));
         break;
       case "GainXp": {
         // One line of the campaign card's XP list, or the Hard/Expert card's: the condition above already held. The lines add up in the log.
@@ -283,6 +301,11 @@ export function advanceResolution(state: ScenarioState, ctx: ReduceContext): Sce
   return next;
 }
 
+/** The seat controls a claimed objective with this code: a Clue attached to one of its characters (10184:B:1). */
+function controlsObjective(state: ScenarioState, seat: number, code: string): boolean {
+  return Object.values(state.cards).some((card) => card.code === code && card.claimed === true && card.controller === seat && inPlay(card.zone));
+}
+
 function remainingCodes(state: ScenarioState, instruction: Extract<Instruction, { verb: "ChooseCards" }>, step: number): string[] {
   const taken = new Set(state.resolutionLog.earned.filter((item) => item.step === step).map((item) => item.code));
   return instruction.codes.filter((code) => !taken.has(code));
@@ -310,7 +333,7 @@ function resolutionOptions(state: ScenarioState, instruction: Choosing, seat: nu
   }
   const step = state.window?.kind === "resolution" ? state.window.step : state.resolutionAt;
   const codes = remainingCodes(state, instruction, step);
-  if (codes.length === 0) return [];
+  if (codes.length === 0 || (instruction.ifControls != null && !controlsObjective(state, seat, instruction.ifControls))) return [];
   const options = instruction.to === "hero" ? codes.flatMap((code) => boonHeroes(state, ctx, code, heroesOf(state, seat, instruction.anyHero)).map((hero) => `${code}>${hero}`)) : instruction.to === "player" ? playerOptions(state, codes) : codes;
   return instruction.optional ? [...options, SKIP] : options;
 }

@@ -1,5 +1,6 @@
 // The pieces the table's layout places cards with (layout.ts, play-area.ts): a card's slot, its footprint in a row, a row's left
 // edges, and the cards peeking out under a host. Pure.
+import { isReanimatedCode } from "../../rules/core/printed.ts";
 import type { CardInstance } from "../../rules/core/state.ts";
 
 import type { CardSlot, Rect, SlotKind, SlotZone } from "./layout.ts";
@@ -36,6 +37,7 @@ export function slotOf(card: CardInstance, zone: SlotZone, kind: SlotKind, rect:
     count: 0,
     committed: card.committed,
     ...(card.face === "down" && isPrisoner(card) ? { held: true as const } : {}),
+    ...(isReanimatedCode(card.code) ? { dead: true as const } : {}),
   };
 }
 
@@ -78,6 +80,15 @@ export function placeUnder(entry: ZoneEntry, zone: ZoneId, rect: Rect, out: Card
 // The most cards peeking out under one card of these entries: attachments and face-down shadow cards.
 export function deepestUnder(entries: readonly ZoneEntry[]): number {
   return Math.max(0, ...entries.map((entry) => entry.attached.filter((attached) => !(attached.zone === "shadow" && attached.face !== "down")).length));
+}
+
+// One peek under a card of the left column (the quest stage, an active location) that holds cards, with the count when there are several: the last put is the one that shows. `landscape` is a sideways card's (the quest stage).
+export function placeCounted(entry: ZoneEntry, zone: ZoneId, rect: Rect, out: CardSlot[], peek: number, landscape = false): void {
+  const under = entry.attached.filter((card) => !(card.zone === "shadow" && card.face !== "down"));
+  const last = under[under.length - 1];
+  if (!last) return;
+  const slot = slotOf(last, zone, last.zone === "shadow" ? "shadow" : "attachment", { x: rect.x, y: rect.y + peek, w: rect.w, h: rect.h }, landscape);
+  out.push(under.length > 1 ? { ...slot, stack: under.length } : slot);
 }
 
 // One peek under a staging card that holds more than one card, with the count: a grappled arm, Black Key on the Raider Flagship (the last put is the one that shows).

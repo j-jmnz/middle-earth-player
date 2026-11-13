@@ -1,0 +1,27 @@
+appId: com.middleearth.lcg
+tags:
+  - scenario
+---
+# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `realm-lost` (scripts/e2e/angmar-awakened/the-dread-realm.ts): a real two-handed game of The Dread Realm (the One Deck and Defenders of Gondor lists, Easy),
+# played after The Battle of Carn Dûm's win and parked on its loss. A loss has no reward screen and writes nothing (the Resolution is for a win): The Dread Realm stays the next part, the campaign is not complete, and what the earlier parts left is still in the Campaign Pool.
+# The steps are the shared subflow's (.maestro/subflows/scenario-loss.yaml).
+- runFlow:
+    file: ../../subflows/scenario-loss.yaml
+    env:
+      FIXTURE: realm-lost
+      SCENARIO_ID: the-dread-realm
+# Back on the path, this part wrote nothing: the scenario is still the next part, the campaign is not won, and the pool is what Carn Dûm left.
+- tapOn:
+    id: log-back
+- extendedWaitUntil:
+    visible:
+      id: campaign-path
+    timeout: 15000
+- assertVisible:
+    id: node-the-dread-realm-status
+    text: "Next"
+- assertNotVisible:
+    id: path-complete
+- assertVisible:
+    id: pool
+    text: ".*Fend Off Despair.*"

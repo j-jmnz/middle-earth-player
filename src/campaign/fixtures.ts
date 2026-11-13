@@ -44,6 +44,15 @@ import fieldsFixtures from "./fixtures/the-battle-of-the-pelennor-fields.json";
 import ungolFixtures from "./fixtures/the-tower-of-cirith-ungol.json";
 import opensFixtures from "./fixtures/the-black-gate-opens.json";
 import doomFixtures from "./fixtures/mount-doom.json";
+import chetwoodFixtures from "./fixtures/intruders-in-chetwood.json";
+import hillsFixtures from "./fixtures/the-weather-hills.json";
+import dikeFixtures from "./fixtures/deadmens-dike.json";
+import eriadorFixtures from "./fixtures/the-wastes-of-eriador.json";
+import gramFixtures from "./fixtures/escape-from-mount-gram.json";
+import ettenmoorsFixtures from "./fixtures/across-the-ettenmoors.json";
+import rhudaurFixtures from "./fixtures/the-treachery-of-rhudaur.json";
+import dumFixtures from "./fixtures/the-battle-of-carn-dum.json";
+import realmFixtures from "./fixtures/the-dread-realm.json";
 
 import type { PlayerIntent } from "../rules/core/intents.ts";
 import { ENGINE_VERSION } from "../rules/engine/version.ts";
@@ -104,6 +113,15 @@ const FILES: Readonly<Record<FixtureScenarioId, unknown>> = {
   "the-tower-of-cirith-ungol": ungolFixtures,
   "the-black-gate-opens": opensFixtures,
   "mount-doom": doomFixtures,
+  "intruders-in-chetwood": chetwoodFixtures,
+  "the-weather-hills": hillsFixtures,
+  "deadmens-dike": dikeFixtures,
+  "the-wastes-of-eriador": eriadorFixtures,
+  "escape-from-mount-gram": gramFixtures,
+  "across-the-ettenmoors": ettenmoorsFixtures,
+  "the-treachery-of-rhudaur": rhudaurFixtures,
+  "the-battle-of-carn-dum": dumFixtures,
+  "the-dread-realm": realmFixtures,
 };
 
 const STORED: Readonly<Partial<Record<FixtureName, StoredFixture>>> = Object.fromEntries(

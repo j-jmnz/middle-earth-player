@@ -4,14 +4,17 @@
 import { Circle, Group, Image, Line, RoundedRect, Text, type SkFont, type SkImage, vec } from "@shopify/react-native-skia";
 
 import { cardCorner } from "../../ui/card-corner.ts";
-import { type CombatNumber } from "../cards/card-effects.ts";
+import { MUST_COMMIT_WORD, type CardEffects, type CombatNumber } from "../cards/card-effects.ts";
+import { DETERMINED_WORD } from "../words/scenarios/angmar/wastes-table.ts";
 import { type IconName } from "../../ui/icon-map.ts";
 import { glyphCells, type PlaceMark } from "../store/island-place.ts";
 import { COLS, ROWS } from "../dream-chaser/island-table.ts";
 import type { CombatMark, Rect } from "../layout/layout.ts";
 import { STAGE_APART_WORD } from "../words/scenarios/stormcaller.ts";
 import type { OptionMark } from "../choice/sheet-types.ts";
+import { currentMark } from "./current-mark.ts";
 import { TOKEN } from "./token-spots.ts";
+import { underMarkBox } from "./under-mark.ts";
 import { withAlphaHex, type TableTokens } from "../../ui/tokens.ts";
 import { CanvasIcon, BADGE_H, type Fonts, type TokenImages } from "./pieces.native.tsx";
 
@@ -74,17 +77,23 @@ export function OptionMarkView({ rect, mark, fonts, images, t, s }: { rect: Rect
  * The cards underneath The Havens Burn against the number that loses the game: a night pill at the card's foot with the short count ("2/5"), threat red when the next card placed under it loses (11038:A:2).
  * The count is short on purpose: it stays inside the card at every size (the full sentence is in the preview and the screen reader's line). Only the count is shown, never which cards are underneath.
  */
-export function UnderMarkView({ rect, mark, fonts, t, s }: { rect: Rect; mark: { text: string; loses: boolean }; fonts: Fonts; t: TableTokens; s: number }) {
-  const { x, y, w, h } = rect;
-  const token = TOKEN * s;
-  const width = Math.min(w - 4 * s, fonts.badge.getTextWidth(mark.text) + 10 * s);
-  const left = x + (w - width) / 2;
-  const top = y + h - token - 4 * s;
+export function UnderMarkView({ rect, mark, fonts, t, s }: { rect: Rect; mark: { text: string; loses: boolean; count?: number }; fonts: Fonts; t: TableTokens; s: number }) {
+  // Captured cards (a `count`) stand a row above the foot, clear of the engagement cost, the combat number and the quest strip; where "3 captured" does not fit, a facedown-card glyph and the bare count stand in.
+  const counted = mark.count != null;
+  const count = String(mark.count ?? "");
+  const box = underMarkBox(rect, fonts.badge.getTextWidth(mark.text), fonts.badge.getTextWidth(count), s, counted);
+  const text = box.kind === "words" ? mark.text : count;
+  const words = fonts.badge.getTextWidth(text);
+  const token = box.height;
+  const left = box.x;
+  const top = box.y;
+  const glyph = box.kind === "count";
   return (
     <Group>
-      <RoundedRect x={left} y={top} width={width} height={token} r={token / 2} color={mark.loses ? t.threat : t.night} />
-      <RoundedRect x={left} y={top} width={width} height={token} r={token / 2} color={mark.loses ? t.danger : t.hairline} style="stroke" strokeWidth={1 * s} />
-      <Text x={left + (width - fonts.badge.getTextWidth(mark.text)) / 2} y={top + token - 5 * s} text={mark.text} font={fonts.badge} color={t.bone} />
+      <RoundedRect x={left} y={top} width={box.width} height={token} r={token / 2} color={mark.loses ? t.threat : t.night} />
+      <RoundedRect x={left} y={top} width={box.width} height={token} r={token / 2} color={mark.loses ? t.danger : t.hairline} style="stroke" strokeWidth={1 * s} />
+      {glyph ? <RoundedRect x={left + 5 * s} y={top + (token - 10 * s) / 2} width={7 * s} height={10 * s} r={1.5 * s} color={t.bone} style="stroke" strokeWidth={1 * s} /> : null}
+      <Text x={glyph ? left + 5 * s + 9 * s : left + (box.width - words) / 2} y={top + token - 5 * s} text={text} font={fonts.badge} color={t.bone} />
     </Group>
   );
 }
@@ -124,6 +133,44 @@ export function PlaceMarkView({ rect, mark, t, s }: { rect: Rect; mark: PlaceMar
 /** An Aflame location's damage against the value that destroys it ("3/5"): the damage token art and the count on a pill at the card's foot, threat red when one more damage destroys it (dcce.aflame). */
 export function FireMarkView({ rect, mark, fonts, images, t, s }: { rect: Rect; mark: { text: string; danger: boolean }; fonts: Fonts; images: TokenImages; t: TableTokens; s: number }) {
   return <FootPill rect={rect} image={images.damage} icon="damage" value={mark.text} danger={mark.danger} lift={false} fonts={fonts} t={t} s={s} />;
+}
+
+/**
+ * The current quest among the side quests in the staging area: a small accent pill with the word "Current" inside the card's top edge, upright, left of the damage token's column (mec108.side-quests-in-play); where the word does not fit, a short accent dot in its place,
+ * as the foot pills drop their art. The preview and the screen reader's line say what it means.
+ */
+export function CurrentQuestMark({ rect, clear, fonts, t, s }: { rect: Rect; clear: number; fonts: Fonts; t: TableTokens; s: number }) {
+  return <WordPill rect={rect} text="Current" clear={clear} fonts={fonts} t={t} s={s} />;
+}
+
+/** A hero or ally the Campaign Log marks determined ("Determined"), or that carries a Determination ("Determination"): the same pill as the current quest's, a character wearing neither of the other marks (mec108.campaign-log, ledger line 10172:A:1). */
+export function DeterminedMarkView({ rect, word, clear, fonts, t, s }: { rect: Rect; word: string; clear: number; fonts: Fonts; t: TableTokens; s: number }) {
+  // Where the word does not fit, "Determined" falls back to a round "D" and "Determination" to the plain dot, so the two differ without colour.
+  return <WordPill rect={rect} text={word} short={word === DETERMINED_WORD ? "D" : undefined} clear={clear} fonts={fonts} t={t} s={s} />;
+}
+
+/** How far the widest effect badge reaches from the card's left edge, so a word pill keeps clear of the badge column (the rows are drawn by `Badges`: a stat is the icon, the number and 5 pt, a flag the pill and 4 pt (the must-commit pill is a stat's width), the "more" pill 24 pt). */
+export function badgeReach(effects: CardEffects, fonts: Fonts, s: number): number {
+  const widths = [
+    ...effects.stats.map((badge) => 15 * s + fonts.badge.getTextWidth(`${badge.delta > 0 ? "+" : "-"}${Math.abs(badge.delta)}`) + 5 * s),
+    ...effects.flags.map((flag) => (flag.flag === "mustCommit" ? 15 * s + fonts.badge.getTextWidth(MUST_COMMIT_WORD) + 5 * s : BADGE_H * s + 4 * s)),
+  ];
+  return widths.length === 0 ? 0 : 2 * s + Math.max(24 * s, ...widths);
+}
+
+// An accent pill with a word inside the card's top edge, upright, clear of the effect badges' column; where the word does not fit, a short accent dot in its place (a round pill with `short` in it when the word has one).
+function WordPill({ rect, text, short, clear, fonts, t, s }: { rect: Rect; text: string; short?: string; clear: number; fonts: Fonts; t: TableTokens; s: number }) {
+  const words = fonts.badge.getTextWidth(text);
+  const box = currentMark(rect, words, BADGE_H * s, s, clear, short != null);
+  const r = Math.min(box.width, box.height) / 2;
+  return (
+    <Group>
+      <RoundedRect x={box.x} y={box.y} width={box.width} height={box.height} r={r} color={t.accent} />
+      <RoundedRect x={box.x} y={box.y} width={box.width} height={box.height} r={r} color={t.night} style="stroke" strokeWidth={1 * s} />
+      {box.kind === "word" ? <Text x={box.x + (box.width - words) / 2} y={box.y + 11.5 * s} text={text} font={fonts.badge} color={t.onAccent} /> : null}
+      {box.kind === "dot" && short != null ? <Text x={box.x + (box.width - fonts.badge.getTextWidth(short)) / 2} y={box.y + 11.5 * s} text={short} font={fonts.badge} color={t.onAccent} /> : null}
+    </Group>
+  );
 }
 
 /** A Ship location's Threat against the total that loses the game at stage 3 ("8/9"): the Threat icon and the count on a pill at the card's foot, threat red at the total (12041:B:2). */

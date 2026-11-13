@@ -3,7 +3,7 @@ import type { Instruction } from "../../catalog/boundary.ts";
 
 import { resolveAmount } from "../interpret/amounts.ts";
 import { effectsOf } from "../windows/listen.ts";
-import { costReduction } from "./cost-rules.ts";
+import { costIncrease, costReduction } from "./cost-rules.ts";
 import { ruleCause } from "../core/cause.ts";
 import { characters } from "../combat/combat.ts";
 import { hasTrait, holds } from "../interpret/conditions.ts";
@@ -99,7 +99,8 @@ export function playCost(state: ScenarioState, cardId: string, seat: number, ctx
   }
   const reduced = costReduction(state, cardId, seat, ctx, hostId);
   if (reduced.amount > 0) cost = Math.max(Math.min(cost, reduced.min), cost - reduced.amount);
-  return Math.max(0, cost);
+  // A constant of a card in play makes it cost more (IncreaseCost, rr.modifiers: not below 0).
+  return Math.max(0, cost + costIncrease(state, cardId, seat, ctx));
 }
 
 // How many Restricted attachments a character can hold: 2, and more when a card says it can have additional ones (rr.restricted).

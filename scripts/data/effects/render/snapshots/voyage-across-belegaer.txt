@@ -270,7 +270,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 11017:A:1 (front): When Revealed: Search the encounter deck and discard pile for 1 copy of Waterspout and add it to the staging area. Shuffle the encounter deck.
   11017:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchMove {"verb":"SearchMove","code":"11054","to":"staging"}]
+    - the acting player finds one card with code 11054 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
 
 11017:B:1: Sailing.
@@ -279,7 +279,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 11017:B:2 (back): Forced: At the end of the quest phase, if you are off-course (Cloud, Rain, or Storm), each player must distribute 5 damage among characters he controls.
   11017:forced:1: Forced at the end of the phase
     only if all of: (it is the Quest phase) and ([json condition {"kind":"heading","is":"offCourse"}])
-    - [json AssignDamage {"verb":"AssignDamage","amount":5,"pick":{"type":"character","control":"you"},"who":"eachSeat"}]
+    - each player assigns 5 damage among the character (you control), one at a time
 
 11017:B:3 (back): When this stage is defeated, if you are on-course (Sun), look at the top 2 stages of the quest deck and advance to one of your choice, placing the other on the bottom of the quest deck. Otherwise, advance to the top stage of the quest deck.
   11017:constant:1: Constant
@@ -291,7 +291,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 11018:A:1 (front): When Revealed: Search the encounter deck and discard pile for 1 copy of Fog Bank and add it to the staging area. Shuffle the encounter deck.
   11018:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchMove {"verb":"SearchMove","code":"11024","to":"staging"}]
+    - the acting player finds one card with code 11024 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
 
 11018:B:1: Sailing.
@@ -311,7 +311,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 11019:A:1 (front): When Revealed: Search the encounter deck and discard pile for 1 copy of Scouting Ship and add it to the staging area. Shuffle the encounter deck.
   11019:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchMove {"verb":"SearchMove","code":"11022","to":"staging"}]
+    - the acting player finds one card with code 11022 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
 
 11019:B:1: Sailing.
@@ -331,7 +331,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 11020:A:1 (front): When Revealed: Search the encounter deck and discard pile for 1 copy of Starlit Sea and add it to the staging area. Shuffle the encounter deck.
   11020:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchMove {"verb":"SearchMove","code":"11023","to":"staging"}]
+    - the acting player finds one card with code 11023 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
 
 11020:B:1: Sailing.
@@ -369,7 +369,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11021:B:4 (back): If this stage has 10 or more progress on it, you have lost your pursuers, and win the game.
   11021:constant:3: Constant
-    only if [json condition {"kind":"stageProgress","min":10}]
+    only if the current quest stage holds at least 10 progress
     - the players win the game
 
 ## 11022 Scouting Ship
@@ -413,7 +413,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 11024:A:2 (shadow): Shadow: If your heading is at the worst setting (Storm), attacking enemy makes an additional attack after this one.
   11024:shadow:1: Shadow
     - if [json condition {"kind":"heading","is":"worst"}]: when the attack in progress ends:
-      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
 ## 11050 Calm Waters
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -448,7 +448,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
   11052:whenRevealed:1: When revealed
     - the acting player chooses one of:
       * option "progress":
-        - [json RemoveAllQuestProgress {"verb":"RemoveAllQuestProgress"}]
+        - all progress on the current quest is removed (the encounter side quest that is the current quest while there is one, else the main quest card)
         - raise threat by 4 (each player)
       * option "heading":
         - [json ShiftHeading {"verb":"ShiftHeading","direction":"offCourse"}]
@@ -565,7 +565,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 11060:A:1 (front): While Southron Sailor is engaged with you, each Ship enemy engaged with you contributes its Threat to the total Threat in the staging area.
   11060:constant:1: Constant
     only if this card is engaged with the player
-    - each Ship enemy (any player controls) engaged with you: stat engagedThreat 1, while this card is in play
+    - each Ship enemy (any player controls) engaged with you: stat engagedThreat (while engaged it still adds its Threat to the total Threat in the staging area) 1, while this card is in play
 
 ## 11061 Cunning Pirate
 (the scenario deals it into the corsairDeck pile; the piles place it, no record does)
@@ -592,7 +592,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 
 11062:A:2 (front): Forced: When Vicious Marauder attacks you, distribute damage among characters you control equal to the number of resources on it.
   11062:forced:2: Forced when this enemy attacks, before the defender is declared (heard about this card)
-    - [json AssignDamage {"verb":"AssignDamage","amount":{"stat":"resources","of":"self"},"pick":{"type":"character","control":"you"}}]
+    - the acting player assigns resources of this card damage among the character (you control), one at a time
 
 ## 11063 Umbar Captain
 (the scenario deals it into the corsairDeck pile; the piles place it, no record does)
@@ -691,12 +691,12 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 11171:A:2 (front): Setup: Each player chooses a Modification boon for each of their ship-objectives and attaches it to that ship-objective. For each ship-objective, its controller may deal 2 damage to it to add 1 resource to a hero's resource pool. Shuffle Ominous Fate and Thunderstruck into the encounter deck. Shuffle Crowley into the Corsair deck.
   11171:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAside {"verb":"SetAside","code":"11172"}]
-    - [json SetAside {"verb":"SetAside","code":"11173"}]
-    - [json SetAside {"verb":"SetAside","code":"11174"}]
-    - [json SetAside {"verb":"SetAside","code":"11175"}]
-    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"11176"}]
-    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"11177"}]
+    - a copy of the card with code 11172 is set aside, out of play
+    - a copy of the card with code 11173 is set aside, out of play
+    - a copy of the card with code 11174 is set aside, out of play
+    - a copy of the card with code 11175 is set aside, out of play
+    - a card with code 11176 from the box joins the encounter deck, which is shuffled
+    - a card with code 11177 from the box joins the encounter deck, which is shuffled
     - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
     - [json FitShips {"verb":"FitShips","codes":["11172","11173","11174","11175"]}]
     - [json TradeShipDamage {"verb":"TradeShipDamage","damage":2,"resources":1}]
@@ -741,4 +741,4 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
   11171:resolution:9: Resolution
     - [json GainXp {"verb":"GainXp","amount":-1,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Ominous Fate"]},"min":1}}]
 
-(rendered pieces: 245 by template, 84 as JSON)
+(rendered pieces: 262 by template, 70 as JSON)

@@ -118,10 +118,10 @@ describe("the prompts of the choices the scenario opens", () => {
   it("states the real amounts: the threat Spyglass takes you to, and the progress left", () => {
     const made = templeTable(world, { map: MAP, at: 6, threat: [28, 28], engaged: [{ code: "mild", seat: 0 }] });
     const w = host(made.state);
-    expect(islandOptionLabel({ verb: "RaiseThreatToAttach", code: CODES.spyglass, amount: 4, seat: 0 }, "attach", made.state, w)).toBe("Raise threat by 4 to 32 and attach Spyglass to a hero");
-    expect(islandOptionLabel({ verb: "RaiseThreatToAttach", code: CODES.spyglass, amount: 4, seat: 0 }, "keep", made.state, w)).toBe("Keep my threat as it is");
-    expect(islandOptionLabel({ verb: "PlaceProgressInStaging", left: 3 }, "keep", made.state, w)).toBe("Keep the rest on the quest");
-    expect(islandOptionLabel({ verb: "PlaceProgressInStaging", left: 3 }, made.cells[1] ?? "", made.state, w)).toBeNull();
+    expect(islandOptionLabel({ verb: "RaiseThreatToAttach", code: CODES.spyglass, amount: 4, seat: 0 }, "attach", made.state, w, made.ctx.cards)).toBe("Raise threat by 4 to 32 and attach Spyglass to a hero");
+    expect(islandOptionLabel({ verb: "RaiseThreatToAttach", code: CODES.spyglass, amount: 4, seat: 0 }, "keep", made.state, w, made.ctx.cards)).toBe("Keep my threat as it is");
+    expect(islandOptionLabel({ verb: "PlaceProgressInStaging", left: 3 }, "keep", made.state, w, made.ctx.cards)).toBe("Keep the rest on the quest");
+    expect(islandOptionLabel({ verb: "PlaceProgressInStaging", left: 3 }, made.cells[1] ?? "", made.state, w, made.ctx.cards)).toBeNull();
   });
 
   it("says the family's instructions in words", () => {

@@ -30,7 +30,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
   18028:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each card (any player controls) [also {"objectiveLocation":true}]: stat immuneToPlayerCards 1, while this card is in play
-    - each card (any player controls) [also {"guardsObjectiveLocation":true}]: stat immuneToPlayerCards 1, while this card is in play
+    - each card (any player controls) attached to an objective-location as its guard: stat immuneToPlayerCards 1, while this card is in play
   18028:constant:2: Constant
     only if not (there is a card (any player controls) [also {"objectiveLocation":true}] to choose)
     - currentQuest: stat progressDiscards 1, while this card is in play
@@ -44,15 +44,15 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 
 18029:A:1 (front): Guarded (location).
   18029:whenRevealed:1: When revealed
-    - [json GuardObjective {"verb":"GuardObjective","types":["location"]}]
+    - the Guarded keyword: this objective in the staging area is guarded by the first encounter location discarded from the deck, added to the staging area
 
 18029:A:2 (front): Travel: Shuffle the encounter discard pile into the encounter deck. Each player discards the top card of the encounter deck and assigns X damage among characters he controls, where X is that card's Threat.
   18029:travel:1: Travel
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the encounter discard pile into the encounter deck
     - for each player, first player first:
-      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"}]
-      - [json AssignDamage {"verb":"AssignDamage","amount":{"stat":"threat","of":"discardTop","printed":true},"pick":{"type":"character","control":"you"}}]
+      - the top card of the encounter deck goes to the encounter discard pile
+      - the acting player assigns printed threat of the top card of the encounter discard pile damage among the character (you control), one at a time
 
 18029:A:3 (front): Forced: After the players travel here, advance to the next stage A, if able.
   18029:forced:1: Forced after the players travel (heard about this card)
@@ -63,15 +63,15 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 
 18030:A:1 (front): Guarded (location).
   18030:whenRevealed:1: When revealed
-    - [json GuardObjective {"verb":"GuardObjective","types":["location"]}]
+    - the Guarded keyword: this objective in the staging area is guarded by the first encounter location discarded from the deck, added to the staging area
 
 18030:A:2 (front): Travel: Shuffle the encounter discard pile into the encounter deck. Each player discards the top card of the encounter deck. Add each enemy discarded this way to the staging area.
   18030:travel:1: Travel
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the encounter discard pile into the encounter deck
     - for each player, first player first:
-      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"}]
-      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"},"inPlay":false}}]
+      - the top card of the encounter deck goes to the encounter discard pile
+      - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
 
 18030:A:3 (front): Forced: After the players travel here, advance to the next stage C, if able.
   18030:forced:1: Forced after the players travel (heard about this card)
@@ -82,15 +82,15 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 
 18031:A:1 (front): Guarded (enemy).
   18031:whenRevealed:1: When revealed
-    - [json GuardObjective {"verb":"GuardObjective","types":["enemy"]}]
+    - the Guarded keyword: this objective in the staging area is guarded by the first encounter enemy discarded from the deck, added to the staging area
 
 18031:A:2 (front): Travel: Shuffle the encounter discard pile into the encounter deck. Each player discards the top card of the encounter deck. Add each location discarded this way to the staging area.
   18031:travel:1: Travel
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the encounter discard pile into the encounter deck
     - for each player, first player first:
-      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"}]
-      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"location","control":"any"},"inPlay":false}}]
+      - the top card of the encounter deck goes to the encounter discard pile
+      - then, if the picked card is a location (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
 
 18031:A:3 (front): Forced: After the players travel here, advance to the next stage A, if able.
   18031:forced:1: Forced after the players travel (heard about this card)
@@ -101,14 +101,14 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 
 18032:A:1 (front): Guarded (enemy).
   18032:whenRevealed:1: When revealed
-    - [json GuardObjective {"verb":"GuardObjective","types":["enemy"]}]
+    - the Guarded keyword: this objective in the staging area is guarded by the first encounter enemy discarded from the deck, added to the staging area
 
 18032:A:2 (front): Travel: Shuffle the encounter discard pile into the encounter deck. Each player discards the top card of the encounter deck and raises his threat by X, where X is that card's Threat.
   18032:travel:1: Travel
     (steps run in order; a step depends on an earlier one only through its own condition)
     - shuffle the encounter discard pile into the encounter deck
     - for each player, first player first:
-      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"}]
+      - the top card of the encounter deck goes to the encounter discard pile
       - raise threat by printed threat of the top card of the encounter discard pile (the acting player)
 
 18032:A:3 (front): Forced: After the players travel here, advance to the next stage C, if able.
@@ -127,7 +127,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 
 18033:A:2 (front): Forced: After a Forest location is explored, place 1 resource here.
   18033:forced:1: Forced on the event locationExplored (heard about Forest location (any player controls))
-    - [json PlaceToken {"verb":"PlaceToken","amount":1}]
+    - 1 resource token(s) are placed on this card
 
 18033:A:3 (front): Travel: Raise each player's threat by 1 for each resource here. If there are no resources on Twilight Hall, the players cannot travel here.
   18033:travel:1: Travel
@@ -141,7 +141,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
     only if all of: (it is the Encounter phase) and (this card is in the staging area) and (there is a objective (any player controls) in the staging area only [also {"objectiveLocation":true,"hasGuard":false}] to choose)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose objective (any player controls) in the staging area only [also {"objectiveLocation":true,"hasGuard":false}]
-    - [json AttachGuard {"verb":"AttachGuard","guard":"self","to":"picked"}]
+    - this card becomes the guard of the picked card, attached to it in the staging area
 
 18034:A:2 (shadow): Shadow: The defender cannot ready this round.
   18034:shadow:1: Shadow
@@ -157,7 +157,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 18035:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   18035:shadow:1: Shadow
     - when the attack in progress ends:
-      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt no shadow card
+      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt no shadow card
 
 ## 18036 Unseen Danger
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -166,8 +166,8 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
   18036:whenRevealed:1: When revealed
     - for each player, first player first:
       - choose character (you control) committed to the quest
-      - [json RemoveFromQuest {"verb":"RemoveFromQuest"}]
-      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"}]
+      - the last picked character is removed from the quest (it stays exhausted)
+      - the top card of the encounter deck goes to the encounter discard pile
       - then, if willpower of the picked card is less than printed threat of the top card of the encounter discard pile (checked when this step runs, after the steps above; not tied to whether they did anything): discard the picked card
 
 18036:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack and +2 Defense until the end of the phase if it is guarding a card.
@@ -184,7 +184,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each location (any player controls) in the staging area only, that is not an objective, with no progress on it: stat threat 1, until the end of the phase
     - each location (any player controls) in the staging area only, that is not an objective, with progress on it: stat threat 2, until the end of the phase
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"less","left":{"count":{"type":"location","control":"any","stagingOnly":true,"nonObjective":true}},"right":{"players":true}}}]
+    - then, if the number of location (any player controls) in the staging area only, that is not an objective is less than the number of players (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 ## 18038 Accursed Forest
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -209,8 +209,8 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 18039:A:2 (front): Travel: Each player discards the top card of the encounter deck. Add each enemy discarded this way to the staging area.
   18039:travel:1: Travel
     - for each player, first player first:
-      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"deckTop","to":"discard"}]
-      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging","when":{"kind":"matches","card":"picked","pick":{"type":"enemy","control":"any"},"inPlay":false}}]
+      - the top card of the encounter deck goes to the encounter discard pile
+      - then, if the picked card is a enemy (any player controls) that is out of play now (checked when this step runs, after the steps above; not tied to whether they did anything): the picked card goes to the staging area (it is not revealed)
 
 ## 18040 Gathering Gloom
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -241,7 +241,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 18041:A:1 (front): When Revealed: Each player discards each resource from each of his hero's resource pools and raises his threat by 1 for each resource he discarded this way. If no resources were discarded this way, Swarm of Bats gains surge.
   18041:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"less","left":{"resourcesOn":{"type":"hero","control":"any"}},"right":1}}]
+    - if the resource tokens on hero (any player controls) is less than 1: this card gains surge (one more encounter card is revealed when it has been resolved)
     - for each player, first player first:
       - raise threat by the resource tokens on hero (you control) (the acting player)
     - for each hero (any player controls):
@@ -259,8 +259,8 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 18071:A:1 (front): Setup: Set the Spiders of Mirkwood and Dol Guldur Orcs encounter sets aside, out of play. The first player takes control of Haldan and adds Searching for a Way Out to the staging area. Each player adds 1 Forest Spider to the staging area. Shuffle the encounter deck.
   18071:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddToStaging {"verb":"AddToStaging","code":"18028"}]
-    - [json AddToStaging {"verb":"AddToStaging","code":"01096"}]
+    - the card with code 18028 is added to the staging area (the copy a Setup search found, else one the Setup deals)
+    - the card with code 01096 is added to the staging area (the copy a Setup search found, else one the Setup deals)
     - shuffle the encounter deck
   18071:setup:2: Setup
     - [json TakeControlOfSetAside {"verb":"TakeControlOfSetAside","code":"18070"}]
@@ -279,7 +279,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 18072:A:1 (front): When Revealed: Shuffle the Spiders of Mirkwood encounter set into the encounter deck. Then, reveal 1 encounter card per player.
   18072:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ShufflePileIntoEncounterDeck {"verb":"ShufflePileIntoEncounterDeck","pile":"spiders"}]
+    - shuffle the spiders deck into the encounter deck
     - repeat the number of players times:
       - the acting player reveals an encounter card
 
@@ -299,7 +299,7 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
 18073:A:1 (front): When Revealed: Shuffle the Dol Guldur Orcs encounter set into the encounter deck. Then, reveal 1 encounter card per player.
   18073:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ShufflePileIntoEncounterDeck {"verb":"ShufflePileIntoEncounterDeck","pile":"orcs"}]
+    - shuffle the orcs deck into the encounter deck
     - repeat the number of players times:
       - the acting player reveals an encounter card
 
@@ -320,8 +320,8 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
   18074:whenRevealed:1: When revealed
     - for each player, first player first:
       - choose hero (you control)
-      - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy"}]
-      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging"}]
+      - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
+      - the picked card goes to the staging area (it is not revealed)
       - [json CarryAwayHero {"verb":"CarryAwayHero"}]
 
 18074:B:1 (back): Each enemy guarding a hero cannot take non-combat damage. Each guarded hero is in play but under no player's control.
@@ -343,8 +343,8 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
   18075:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - [json DiscardUntil {"verb":"DiscardUntil","type":"location"}]
-      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"staging"}]
+      - cards are discarded from the top of the encounter deck until a location is discarded, or the deck is empty; that card becomes the picked card
+      - the picked card goes to the staging area (it is not revealed)
     - for each player, first player first:
       - [json PlaceHandUnderLocation {"verb":"PlaceHandUnderLocation"}]
 
@@ -403,8 +403,8 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json RemoveCodeFromGame {"verb":"RemoveCodeFromGame","code":"18028"}]
     - for each player, first player first:
-      - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy"}]
-      - [json MoveEncounterCard {"verb":"MoveEncounterCard","card":"picked","to":"engaged"}]
+      - cards are discarded from the top of the encounter deck until an enemy is discarded, or the deck is empty; that card becomes the picked card
+      - the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
 
 18077:B:1 (back): Forced: At the end of the round, raise each player's threat by 1 for each enemy engaged with him.
   18077:forced:1: Forced at the end of the round
@@ -416,4 +416,4 @@ Scenario piles that place cards with no record (quest: 18071 Ambushed at Night; 
     only if any of: (there is a enemy (any player controls) engaged with you to choose) or (there is a enemy (any player controls) engaged with another player to choose)
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 200 by template, 79 as JSON)
+(rendered pieces: 245 by template, 49 as JSON)

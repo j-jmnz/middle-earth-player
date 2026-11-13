@@ -14,6 +14,7 @@ import { plural } from "../words/list.ts";
 import { detachLine, grappleLine } from "../words/scenarios/grapple.ts";
 import { boardingWords } from "../words/scenarios/sea.ts";
 import type { FateNames } from "../words/scenarios/fate-beats.ts";
+import { ignoredRevealNote } from "../readouts/ettenmoors.ts";
 import { firstTreacheryNote, stageArrivalNote, stageBeats } from "../words/scenarios/gundabad-beats.ts";
 import { discoverLines, discoverTitle, POOL_COPY } from "../words/scenarios/wilderland.ts";
 
@@ -201,6 +202,9 @@ export function momentOf(before: ScenarioState, after: ScenarioState, steps: rea
         // The first treachery of a round, while a stage bars canceling its When Revealed effect (19137:B:1).
         const first = firstTreacheryNote(after, step.cardId, names.card(step.cardId));
         if (first) line(first, null, [step.cardId]);
+        // A treachery revealed while a safe location is active: its When Revealed effects are ignored (Across the Ettenmoors).
+        const ignored = ignoredRevealNote(after, step.cardId, names.card);
+        if (ignored) line(ignored, null, [step.cardId]);
         // A treachery that raises the Threat of the staging area for the phase says what it does (The Fate of Wilderland).
         const raised = names.fate?.revealed(after, step.cardId, before.phase === "Quest" && !steps.slice(0, index).some((earlier) => earlier.kind === "quest"));
         if (raised) line(raised, null, [step.cardId]);

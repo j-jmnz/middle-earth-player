@@ -1,5 +1,6 @@
 // Rules: rr.in-play-and-out-of-play, rr.removed-from-game (data/rules/entries.json). The encounter cards an effect can find or shuffle: the out-of-play copies of a card and the matches in the encounter deck and discard pile.
 import { BURN_CODE } from "../families/aflame/values.ts";
+import { isSafeLocation } from "../families/angmar/safe.ts";
 import { printedOf } from "../core/printed.ts";
 import type { ScenarioState } from "../core/state.ts";
 import type { ReduceContext } from "./interpret.ts";
@@ -33,10 +34,11 @@ export function outOfPlayChoices(state: ScenarioState, code: string): string[] {
 
 export function searchable(
   state: ScenarioState,
-  selector: { code?: string; trait?: string; traits?: readonly string[]; type?: string; nonUnique?: boolean; deckOnly?: boolean; victory?: boolean },
+  selector: { code?: string; trait?: string; traits?: readonly string[]; type?: string; nonUnique?: boolean; safe?: boolean; deckOnly?: boolean; discardOnly?: boolean; victory?: boolean },
   ctx: ReduceContext,
   // `deckOnly`: the encounter deck alone, not its discard pile ("search the encounter deck for a Harad enemy", 144037:A:1).
-  zones: readonly ("encounterDeck" | "encounterDiscard")[] = selector.deckOnly === true ? ["encounterDeck"] : ["encounterDeck", "encounterDiscard"],
+  // `discardOnly`: the encounter discard pile alone ("Put each copy of Cursed Dead in the discard pile into play", 09061:A:1).
+  zones: readonly ("encounterDeck" | "encounterDiscard")[] = selector.deckOnly === true ? ["encounterDeck"] : selector.discardOnly === true ? ["encounterDiscard"] : ["encounterDeck", "encounterDiscard"],
 ): string[] {
   const found: string[] = [];
   // `victory`: the victory display is searched too ("search the encounter deck, discard pile, and victory display for a Nazgûl enemy", 146036:A:2).
@@ -50,6 +52,7 @@ export function searchable(
       if (selector.trait != null && !printed.traits.includes(selector.trait)) continue;
       if (selector.traits != null && !selector.traits.some((trait) => printed.traits.includes(trait))) continue;
       if ((selector.type != null && printed.type !== selector.type) || (selector.nonUnique === true && printed.isUnique)) continue;
+      if (selector.safe === true && !isSafeLocation(state, id, ctx)) continue;
       found.push(id);
     }
   }

@@ -43,18 +43,18 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 11191:A:2 (front): Setup: Flip the Stormcaller to its "Campaign Mode only" side, then attach Black Key (burden) to it. Each player chooses a Modification boon for each of their ship-objectives and attaches it to that ship-objective. Shuffle Thunderstruck into the encounter deck. Shuffle Crowley into the Corsair deck. Put Calaerion into play under the control of the player with the Dream-chaser.
   11191:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAside {"verb":"SetAside","code":"11172"}]
-    - [json SetAside {"verb":"SetAside","code":"11173"}]
-    - [json SetAside {"verb":"SetAside","code":"11174"}]
-    - [json SetAside {"verb":"SetAside","code":"11175"}]
-    - [json SetAside {"verb":"SetAside","code":"11192"}]
-    - [json SetAside {"verb":"SetAside","code":"11193"}]
-    - [json ShuffleIntoEncounterDeck {"verb":"ShuffleIntoEncounterDeck","code":"11177"}]
+    - a copy of the card with code 11172 is set aside, out of play
+    - a copy of the card with code 11173 is set aside, out of play
+    - a copy of the card with code 11174 is set aside, out of play
+    - a copy of the card with code 11175 is set aside, out of play
+    - a copy of the card with code 11192 is set aside, out of play
+    - a copy of the card with code 11193 is set aside, out of play
+    - a card with code 11177 from the box joins the encounter deck, which is shuffled
     - [json ShuffleIntoCorsairDeck {"verb":"ShuffleIntoCorsairDeck","code":"11178"}]
     - [json FlipStormcaller {"verb":"FlipStormcaller"}]
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11192","to":"Stormcaller"}]
     - [json FitShips {"verb":"FitShips","codes":["11172","11173","11174","11175"]}]
-    - [json PutSetAsideInPlay {"verb":"PutSetAsideInPlay","name":"Calaerion","withCard":"Dream-chaser"}]
+    - the set-aside card titled "Calaerion" is put into play under the control of the player who controls the card titled "Dream-chaser"
 
 11191:B:1 (back): Resolution: Gain the following:
   11191:resolution:1: Resolution (record also names 11191:B:2)
@@ -117,7 +117,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 12013:A:1 (front): When Revealed: Search the encounter deck and discard pile for 1 copy of Swift Raider and add it to the staging area. Shuffle the encounter deck.
   12013:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchMove {"verb":"SearchMove","code":"12021","to":"staging"}]
+    - the acting player finds one card with code 12021 in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
     - shuffle the encounter deck
 
 12013:B:1: Sailing.
@@ -154,8 +154,8 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 12015:A:1 (front): When Revealed: Discard cards from the top of the encounter deck until a Weather treachery is discarded. Resolve that card's "when revealed" effect. That effect cannot be canceled.
   12015:whenRevealed:1: When revealed (cannot be canceled while the number of hero (any player controls) is at least 0)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json DiscardUntil {"verb":"DiscardUntil","type":"treachery","trait":"Weather"}]
-    - [json ResolveWhenRevealed {"verb":"ResolveWhenRevealed","when":{"kind":"matches","card":"picked","pick":{"type":"treachery","control":"any","trait":"Weather"}}}]
+    - cards are discarded from the top of the encounter deck until a treachery with the trait Weather is discarded, or the deck is empty; that card becomes the picked card
+    - then, if the picked card is a Weather treachery (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): the When Revealed effects of the picked card resolve as if it had just been revealed
 
 12015:B:1: Sailing.
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
@@ -191,7 +191,7 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 12017:A:1 (front): When Revealed: Search the encounter deck and discard pile for 1 copy of Sahír's Escort and add it to the Stormcaller's area. Shuffle the encounter deck.
   12017:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SearchMove {"verb":"SearchMove","code":"12020","to":"stormcallerArea"}]
+    - the acting player finds one card with code 12020 in the encounter deck or its discard pile and adds it to the Stormcaller's area (it is not revealed)
     - shuffle the encounter deck
 
 12017:B:1 (back): If the players are off-course (Cloud, Rain, or Storm), the Stormcaller gets +2 Threat.
@@ -371,11 +371,11 @@ Scenario piles that place cards with no record (staging: 11051 Rolling Seas; que
 
 12029:A:2 (front): When Revealed: Attach Raging Squall to the current quest. (Counts as a Condition attachment with the text: "Forced: After an ally is committed to the quest, deal 1 damage to that ally if you are off-course.")
   12029:whenRevealed:1: When revealed
-    - [json AttachToQuest {"verb":"AttachToQuest"}]
+    - this card is attached to the current quest card (the side quest that is the current quest, else the main quest card) and leaves with it
   12029:constant:1: Constant
-    - [json CountsAs {"verb":"CountsAs","cardType":"attachment","trait":"Condition"}]
+    - this card counts as a Condition attachment while it is attached
   12029:forced:1: Forced after a card is committed to the quest (heard about ally (any player controls))
     only if [json condition {"kind":"heading","is":"offCourse"}]
     - deal 1 damage to the card the event is about
 
-(rendered pieces: 128 by template, 63 as JSON)
+(rendered pieces: 144 by template, 49 as JSON)

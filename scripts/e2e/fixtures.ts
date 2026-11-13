@@ -32,7 +32,6 @@
 // penalty when one did. Two-handed, Easy, the auto-player's answers, every intent up to the loss.
 import { existsSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
-
 import Database from "better-sqlite3";
 import { drizzle } from "drizzle-orm/better-sqlite3";
 
@@ -50,43 +49,9 @@ import { legalIntents, legalTargets, reduce, type PlayerIntent, type ReduceConte
 import { nextIntent } from "../../test/harness/auto-player.ts";
 import { loadCampaign, loadScenario, scenarioOrder } from "../data/load-scenarios.ts";
 import { prebuiltDeck } from "./seed-kit.ts";
+import { WRITERS, isChained, type Chained, type Written } from "./writers.ts";
 import { pastShowcase } from "./showcase-past.ts";
-import { anduinFixtures } from "./journey-along-the-anduin.ts";
-import { dolGuldurFixtures } from "./escape-from-dol-guldur.ts";
-import { mirkwoodFixtures } from "./passage-through-mirkwood.ts";
-import { nibinDumFixtures } from "./the-caves-of-nibin-dum.ts";
-import { oathFixtures } from "./the-oath.ts";
-import { voyageFixtures } from "./voyage-across-belegaer.ts";
-import { fateFixtures } from "./the-fate-of-numenor.ts";
-import { raidFixtures } from "./raid-on-the-grey-havens.ts";
-import { stormcallerFixtures } from "./flight-of-the-stormcaller.ts";
-import { depthsFixtures } from "./the-thing-in-the-depths.ts";
-import { templeFixtures } from "./temple-of-the-deceived.ts";
-import { ruinsFixtures } from "./the-drowned-ruins.ts";
-import { havenFixtures } from "./a-storm-on-cobas-haven.ts";
-import { corsairsFixtures } from "./the-city-of-corsairs.ts";
-import { upanduinFixtures } from "./journey-up-the-anduin.ts";
-import { lostmirkFixtures } from "./lost-in-mirkwood.ts";
-import { kingsquestFixtures } from "./the-kings-quest.ts";
-import { heathFixtures } from "./the-withered-heath.ts";
-import { rhovanionFixtures } from "./roam-across-rhovanion.ts";
-import { nightFixtures } from "./fire-in-the-night.ts";
-import { framsburgFixtures } from "./the-ghost-of-framsburg.ts";
-import { gundabadFixtures } from "./mount-gundabad.ts";
-import { wilderlandFixtures } from "./the-fate-of-wilderland.ts";
-import { haiFixtures } from "./the-uruk-hai.ts";
-import { deepFixtures } from "./helms-deep.ts";
-import { isengardFixtures } from "./the-road-to-isengard.ts";
-import { marshesFixtures } from "./the-passage-of-the-marshes.ts";
-import { roadsFixtures } from "./journey-to-the-cross-roads.ts";
-import { lairFixtures } from "./shelobs-lair.ts";
-import { companyFixtures } from "./the-passing-of-the-grey-company.ts";
-import { gondorFixtures } from "./the-siege-of-gondor.ts";
-import { fieldsFixtures } from "./the-battle-of-the-pelennor-fields.ts";
-import { ungolFixtures } from "./the-tower-of-cirith-ungol.ts";
-import { opensFixtures } from "./the-black-gate-opens.ts";
-import { doomFixtures } from "./mount-doom.ts";
-import { FIXTURE_REGISTRY, fixtureFile, type FixtureName, type FixtureScenarioId } from "../../src/campaign/fixtures/registry.ts";
+import { FIXTURE_REGISTRY, fixtureFile, type FixtureScenarioId } from "../../src/campaign/fixtures/registry.ts";
 import { createLog, runScript } from "../log.ts";
 import { temporaryCatalog } from "../../test/harness/temp-catalog.ts";
 
@@ -366,57 +331,11 @@ function playKnifeLoss(log: CampaignLog): { seed: number; loadout: StoredLoadout
   return { seed, loadout, intents };
 }
 
-// The scenarios scenario 1's block writes by hand (the won game is a search, `knife-lost` starts from its log).
-const SCENARIO_ONE = ["a-shadow-of-the-past", "a-knife-in-the-dark"] as const;
-type Chained = Exclude<FixtureScenarioId, (typeof SCENARIO_ONE)[number]>;
-const isChained = (id: FixtureScenarioId): id is Chained => !(SCENARIO_ONE as readonly string[]).includes(id);
-
 function position(order: readonly string[], id: string): number {
   const at = order.indexOf(id);
   if (at < 0) throw new Error(`${id} is in the fixture registry but in no campaign of data/campaigns`);
   return at;
 }
-
-// One writer per registry scenario. A part after the first is dealt from the log an earlier part's won game writes, so it takes
-// that game from `written`; a game the seeds did not find is absent and the writer leaves its own out.
-type Written = Partial<Record<FixtureName, unknown>>;
-const WRITERS: Record<Chained, (written: Written) => Promise<object> | object> = {
-  "passage-through-mirkwood": () => mirkwoodFixtures(),
-  "journey-along-the-anduin": (written) => anduinFixtures(written["mirkwood-won"] as Parameters<typeof anduinFixtures>[0]),
-  "escape-from-dol-guldur": (written) => dolGuldurFixtures(written["anduin-won"] as Parameters<typeof dolGuldurFixtures>[0]),
-  "the-oath": () => oathFixtures(),
-  "the-caves-of-nibin-dum": (written) => nibinDumFixtures(written["oath-won"] as Parameters<typeof nibinDumFixtures>[0]),
-  "voyage-across-belegaer": () => voyageFixtures(),
-  "the-fate-of-numenor": () => fateFixtures(),
-  "raid-on-the-grey-havens": () => raidFixtures(),
-  "flight-of-the-stormcaller": () => stormcallerFixtures(),
-  "the-thing-in-the-depths": () => depthsFixtures(),
-  "temple-of-the-deceived": () => templeFixtures(),
-  "the-drowned-ruins": () => ruinsFixtures(),
-  "a-storm-on-cobas-haven": () => havenFixtures(),
-  "the-city-of-corsairs": () => corsairsFixtures(),
-  "journey-up-the-anduin": () => upanduinFixtures(),
-  "lost-in-mirkwood": () => lostmirkFixtures(),
-  "the-kings-quest": () => kingsquestFixtures(),
-  "the-withered-heath": () => heathFixtures(),
-  "roam-across-rhovanion": () => rhovanionFixtures(),
-  "fire-in-the-night": () => nightFixtures(),
-  "the-ghost-of-framsburg": () => framsburgFixtures(),
-  "mount-gundabad": () => gundabadFixtures(),
-  "the-fate-of-wilderland": () => wilderlandFixtures(),
-  "the-uruk-hai": () => haiFixtures(),
-  "helms-deep": () => deepFixtures(),
-  "the-road-to-isengard": () => isengardFixtures(),
-  "the-passage-of-the-marshes": () => marshesFixtures(),
-  "journey-to-the-cross-roads": () => roadsFixtures(),
-  "shelobs-lair": () => lairFixtures(),
-  "the-passing-of-the-grey-company": () => companyFixtures(),
-  "the-siege-of-gondor": () => gondorFixtures(),
-  "the-battle-of-the-pelennor-fields": () => fieldsFixtures(),
-  "the-tower-of-cirith-ungol": () => ungolFixtures(),
-  "the-black-gate-opens": () => opensFixtures(),
-  "mount-doom": () => doomFixtures(),
-};
 
 // The won game is open: no legal win of the two starter decks has been found on this engine (docs/phases/STATUS.md), so
 // the search runs only when asked, and `won` and `knife-lost` are written only when it finds one.

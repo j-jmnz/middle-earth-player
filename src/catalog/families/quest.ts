@@ -72,8 +72,12 @@ const VERBS = [
   z.strictObject({ verb: z.literal("LookAtStages"), count: z.number().int().min(2), bottom: z.literal(true).optional() }),
   // Removes `amount` progress tokens from the current quest card, no more than it holds ("Remove 4 progress tokens from the current quest
   // card. (If there are fewer than 4 progress tokens on the quest, remove all progress tokens from that quest.)", 01086:A:1; "remove 1
-  // progress token from the current quest", 01111:A:1). RemoveQuestProgress counts progress per player instead.
-  z.strictObject({ verb: z.literal("RemoveProgressFromQuest"), amount: positiveAmountSchema, ...when }),
+  // progress token from the current quest", 01111:A:1). RemoveQuestProgress counts progress per player instead. With `each` the progress comes off every quest card in play, the main quest card, each encounter side quest in the staging area and each player side quest
+  // ("remove 2 progress from each quest card in play", 10100:A:1).
+  z.strictObject({ verb: z.literal("RemoveProgressFromQuest"), amount: positiveAmountSchema, each: z.literal(true).optional(), ...when }),
+  // Places `amount` progress tokens on the last picked quest card (a pick with `questCard`): the actor's current quest stage (the active location does not take it: the card is named), an encounter side quest in the staging area or a player side quest in a quest area
+  // ("place 1 progress token on a quest card in play", 10176:A:1). A full side quest is defeated as usual; a stage that rescues captured cards instead (10039:B:1) rescues.
+  z.strictObject({ verb: z.literal("PlaceProgressOnQuestCard"), amount: positiveAmountSchema, ...when }),
 ] as const;
 
 const TRIGGERS = [

@@ -16,6 +16,7 @@ import type { ScenarioState } from "../../core/state.ts";
 import { flagged, inPlay, updateCard, withMode } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { listens } from "../encounter/reveal.ts";
+import { currentSideQuest } from "../wilderland/night-quest.ts";
 
 // The quest phase ends at once (141064:A:2): the staging step reveals no more cards, the committed characters stay exhausted but
 // are no longer committed, and the quest is not resolved, so no progress is placed and no threat is raised. The cards already
@@ -47,9 +48,10 @@ export function setStatUntil(state: ScenarioState, instruction: Extract<Instruct
   return { ...state, modifiers: [...state.modifiers, ...holders.map((instanceId) => ({ instanceId, sourceId, stat: instruction.stat, amount: instruction.value, until: instruction.until, set: true }))] };
 }
 
-// All the progress on the current quest card is removed (141065:A:2).
-export function removeAllQuestProgress(state: ScenarioState, steps: EngineStep[]): ScenarioState {
-  const stage = state.questStage ? state.cards[state.questStage] : undefined;
+// All the progress on the current quest card is removed (141065:A:2); `of: "stage"` takes the main quest's stage even while a side quest is current.
+export function removeAllQuestProgress(state: ScenarioState, steps: EngineStep[], of: "stage" | undefined): ScenarioState {
+  const side = of === "stage" ? null : currentSideQuest(state);
+  const stage = side ? state.cards[side] : state.questStage ? state.cards[state.questStage] : undefined;
   if (!stage || stage.progress <= 0) return state;
   steps.push({ kind: "progress", targetId: stage.id, amount: -stage.progress, cause: currentCause(steps, UNATTRIBUTED) });
   return updateCard(state, stage.id, { progress: 0 });

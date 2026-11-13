@@ -8,7 +8,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 
 143021:A:2 (front): Forced: After you draw this card, discard all other cards in your hand.
   143021:forced:1: Forced on the event enteredHand (heard about this card)
-    - [json DiscardEach {"verb":"DiscardEach","pick":{"type":"card","control":"you","from":"hand"}}]
+    - the acting player discards each card (you control) in hand
 
 ## 143033 The Defense of Helm's Deep
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -21,7 +21,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
   143033:forced:1: Forced at the end of the phase (record also names 143033:A:3)
     only if it is the Quest phase
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json PlaceToken {"verb":"PlaceToken","amount":1}]
+    - 1 resource token(s) are placed on this card
     - [json AddSourceToVictory {"verb":"AddSourceToVictory","when":{"kind":"tokens","code":"143033","min":8}}]
     - [json AdvanceToStage {"verb":"AdvanceToStage","code":"143076","when":{"kind":"inVictory","code":"143033","is":true}}]
 
@@ -29,7 +29,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
   143033:forced:1: Forced at the end of the phase (record also names 143033:A:2)
     only if it is the Quest phase
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json PlaceToken {"verb":"PlaceToken","amount":1}]
+    - 1 resource token(s) are placed on this card
     - [json AddSourceToVictory {"verb":"AddSourceToVictory","when":{"kind":"tokens","code":"143033","min":8}}]
     - [json AdvanceToStage {"verb":"AdvanceToStage","code":"143076","when":{"kind":"inVictory","code":"143033","is":true}}]
 
@@ -59,7 +59,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 
 143035:A:3 (front): Forced: After Warrior of Dunland attacks and destroys a character, place 3 progress on the active location.
   143035:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
-    only if the event's other card is a enemy (any player controls) [also {"isSource":true}]
+    only if the event's other card is a enemy (any player controls) that is this card itself
     - place 3 progress on the active location
 
 ## 143036 Soldier of Isengard
@@ -70,7 +70,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 
 143036:A:2 (front): Forced: After Soldier of Isengard attacks and destroys a character, place 1 progress on the current quest.
   143036:forced:1: Forced on the event characterDestroyedByAttack (heard about character (any player controls))
-    only if the event's other card is a enemy (any player controls) [also {"isSource":true}]
+    only if the event's other card is a enemy (any player controls) that is this card itself
     - [json ProgressQuest {"verb":"ProgressQuest","amount":1}]
 
 143036:A:3 (shadow): Shadow: Exhaust a character you control.
@@ -90,7 +90,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143037:A:2 (front): Forced: When The Hornburg is explored, assign X damage among characters in play. X is the number of enemies in play.
   143037:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
-    - [json AssignDamage {"verb":"AssignDamage","amount":{"count":{"type":"enemy","control":"any","staging":true}},"pick":{"type":"character","control":"any"}}]
+    - the acting player assigns the number of enemy (any player controls) or in the staging area damage among the character (any player controls), one at a time
 
 ## 143038 Deeping Wall
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -173,7 +173,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143043:A:1 (front): When Revealed: Place 3 progress on the main quest (bypassing any active location). Until the end of the round, treat each character's text box as if it was blank (except for Traits).
   143043:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddStageProgress {"verb":"AddStageProgress","amount":3}]
+    - 3 progress is placed on the main quest stage (a quest effect: a full stage advances)
     - every character in play, now and entering later: stat blankText (its text box is blank) 1, until the end of the round
 
 143043:A:2 (shadow): Shadow: Attacking enemy gets +2 Attack and gains Toughness 2 until the end of the round.
@@ -193,12 +193,12 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
     (steps run in order; a step depends on an earlier one only through its own condition)
     - choose enemy (any player controls) in the staging area only [also {"highestAttack":true}]
     - then, if there is a enemy (any player controls) in the staging area only to choose (checked when this step runs, after the steps above; not tied to whether they did anything): the picked enemy attacks the acting player now, from the staging area
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"not","condition":{"kind":"canPick","pick":{"type":"enemy","control":"any","stagingOnly":true}}}}]
+    - then, if not (there is a enemy (any player controls) in the staging area only to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 143044:A:3 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   143044:shadow:1: Shadow
     - when the attack in progress ends:
-      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
 ## 143045 Night Without End
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -209,8 +209,8 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143045:A:2 (front): When Revealed: Either remove 1 resource token from The Defense of Helm's Deep, or reveal 2 additional encounter cards.
   143045:whenRevealed:1: When revealed
     - the acting player chooses one of:
-      * option "remove" (only if [json condition {"kind":"tokens","code":"143033","min":1}]):
-        - [json RemoveResourceTokens {"verb":"RemoveResourceTokens","code":"143033","amount":1}]
+      * option "remove" (only if the card with code 143033 in play holds at least 1 resource token(s)):
+        - up to 1 resource token(s) come off the card with code 143033 in play
       * option "reveal":
         - the acting player reveals an encounter card
         - the acting player reveals an encounter card
@@ -252,9 +252,9 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 143073:A:1 (front): When Revealed: Add The Defense of Helm's Deep and each set aside copy of Soldier of Isengard to the staging area. Make Deeping Wall the active location. Shuffle the encounter deck. Then, each player reveals 1 encounter card.
   143073:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"143033"}]
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"143036","all":true}]
-    - [json MakeSetAsideActive {"verb":"MakeSetAsideActive","code":"143038"}]
+    - one set-aside card with code 143033 joins the staging area (it is not revealed)
+    - every set-aside card with code 143036 joins the staging area (it is not revealed)
+    - the set-aside card with code 143038 becomes the active location (not traveling: no Travel effect, nothing hears "traveled"); a location already active returns to the staging area, unless a second active location slot is free
     - shuffle the encounter deck
     - for each player, first player first:
       - the acting player reveals an encounter card
@@ -270,7 +270,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 
 143073:B:3 (back): Forced: At the end of the round place 1 progress here for each enemy in the staging area (bypassing any active location).
   143073:forced:2: Forced at the end of the round
-    - [json AddStageProgress {"verb":"AddStageProgress","amount":{"count":{"type":"enemy","control":"any","stagingOnly":true}}}]
+    - progress equal to the number of enemy (any player controls) in the staging area only is placed on the main quest stage (a quest effect: a full stage advances)
 
 ## 143074 The Hosts of Isengard
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -307,7 +307,7 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
 
 143075:B:2 (back): Forced: After a character is destroyed, place 1 progress on this stage (bypassing any active location).
   143075:forced:1: Forced on the event characterDestroyed
-    - [json AddStageProgress {"verb":"AddStageProgress","amount":1}]
+    - 1 progress is placed on the main quest stage (a quest effect: a full stage advances)
 
 143075:B:3 (back): If this stage is defeated, the players lose the game.
   143075:forced:2: Forced on the event questCardDefeated (heard about this card)
@@ -333,4 +333,4 @@ Scenario piles that place cards with no record (setAside: 143038 Deeping Wall; q
     only if [json condition {"kind":"enemyInPlay","is":false}]
     - the players win the game
 
-(rendered pieces: 146 by template, 35 as JSON)
+(rendered pieces: 170 by template, 20 as JSON)

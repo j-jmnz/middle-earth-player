@@ -68,10 +68,10 @@ export function releaseRingBearer(state: ScenarioState, instruction: Extract<Ins
 
 // The hero comes back among the heroes of `seat` with `patch`, and the cards attached to it come back faceup with `attachmentPatch`: a card a player
 // played goes to the play area of `seat` (of its own owner when `toOwner`); a card nobody owns stays controlled by nobody. Shared by the Ring-bearer's
-// release and the prisoner's rescue (families/prisoner.ts).
-export function releaseHero(state: ScenarioState, heroId: string, seat: number, patch: Partial<CardInstance>, attachmentPatch: Partial<CardInstance> = {}, toOwner = false): ScenarioState {
+// release and the prisoner's rescue (families/prisoner.ts). `zone` is where the hero lands: the hero list, or the play area for a card that is no hero (Iârion, 09024:A:2).
+export function releaseHero(state: ScenarioState, heroId: string, seat: number, patch: Partial<CardInstance>, attachmentPatch: Partial<CardInstance> = {}, toOwner = false, zone: "heroes" | "play" = "heroes"): ScenarioState {
   const attachments = [...(state.cards[heroId]?.attachments ?? [])];
-  let next = updateCard(moveCard(state, heroId, { zone: "heroes", seat }), heroId, patch);
+  let next = updateCard(moveCard(state, heroId, { zone, seat }), heroId, patch);
   for (const id of attachments) {
     const card = next.cards[id];
     if (!card) continue;

@@ -15,7 +15,7 @@ import { tableSettings, toggleAlways } from "../../ui/table-settings.ts";
 import type { Moment } from "../store/outcome.ts";
 import { readoutFor, type Readout } from "../readouts/readout.ts";
 import { useReaderMode, useScreenReader } from "../../ui/screen-reader.ts";
-import { hidesFace, actingSeat, isLooked, onTableFor } from "../store/selectors.ts";
+import { hidesFace, actingSeat, isDead, isLooked, onTableFor } from "../store/selectors.ts";
 import { dropOutcome, targetFromKey } from "../store/selection.ts";
 import { cannotPay } from "./why.ts";
 import { announce } from "../../ui/announce.ts";
@@ -300,7 +300,7 @@ export function useTableChoice({
       // tray), and a tap on it picks it through the same pick as its tray row, so the tray's selection and the board stay in step; a tap
       // on any other card folds the tray.
       const answers = (responses || panelOpen) && tappable(sheet).has(cardId);
-      const action = tapAction({ panelOpen, reader, cardId, peeking, faceDown: hidesFace(game.cards[cardId]) && !isLooked(game, cardId), answers }, pick);
+      const action = tapAction({ panelOpen, reader, cardId, peeking, faceDown: hidesFace(game.cards[cardId]) && !isDead(game.cards[cardId]) && !isLooked(game, cardId), answers }, pick);
       if (action === "fold") setFolded(sheet.key);
       else if (action === "pile") onPile(cardId.slice(5));
       else if (action === "preview") onPreview(cardId);

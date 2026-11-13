@@ -4,6 +4,7 @@ import { ScrollView, View } from "react-native";
 
 import { printedMap, type CatalogRow } from "../../../campaign/cards";
 import { scoreBaseName } from "../../../campaign/continue";
+import { angmarAwakenedCodes, angmarAwakenedRows, keepsAngmarAwakenedLog, type AngmarLine } from "../../../campaign/log-angmar-awakened";
 import { returnOfTheKingRows } from "../../../campaign/log-return-of-the-king";
 import { keepsSagaColumns } from "../../../campaign/saga";
 import { blackGateEnemies, marshesLines, SEARCHING_EYE, threatWords } from "../../../campaign/two-towers-view";
@@ -96,6 +97,7 @@ export default function Log() {
     for (const code of save.log.treasures) codes.add(code);
     for (const code of Object.keys(save.log.encounterPool)) codes.add(code);
     for (const code of Object.keys(save.log.blackGate)) codes.add(code);
+    for (const code of angmarAwakenedCodes(save.log)) codes.add(code);
     if (save.log.marshesChoice.includes("searchingEye")) codes.add(SEARCHING_EYE);
     if (codes.size === 0) return [];
     return catalog.select().from(cards).where(inArray(cards.code, [...codes])).all();
@@ -144,6 +146,9 @@ export default function Log() {
   const marshes = sagaColumns ? marshesLines(log, save.seatCount, nameOf) : [];
   const blackGate = sagaColumns ? blackGateEnemies(log) : [];
   const sagaNotes = sagaColumns ? returnOfTheKingRows(log) : [];
+  // Angmar Awakened's Damage Tracking (mec108.campaign-log-tracking): the damage on Protect the Innocent, on each hero, the unique cards the Goblins stole and the determined characters.
+  const angmar = keepsAngmarAwakenedLog(campaign) ? angmarAwakenedRows(log, save.seatCount) : [];
+  const angmarLine = (line: AngmarLine): Line => [{ text: line.prefix }, ...(line.codes.length > 0 ? namesLine(line.codes, nameOf) : [{ text: "None" }]), ...(line.amount != null ? [{ text: `: ${line.amount}` }] : [])];
   const names = scenarioNames(campaign);
   const notes = edited ?? log.notes;
 
@@ -168,13 +173,14 @@ export default function Log() {
           {/* A card's name in a row opens its preview (user request, 2026-11-01). */}
           <Row label="Heroes" lines={bySeat(log.heroesBySeat)} onCard={card} testID="log-heroes" />
           <Row label="Fallen Heroes" lines={bySeat(log.fallenHeroesBySeat)} onCard={card} testID="log-fallen" />
-          <Row label="Threat Modifiers" value={sagaColumns ? threatWords(log, save.seatCount) : log.threatPenalty === 0 ? "None" : `+${log.threatPenalty}`} testID="log-threat" icon="threat" />
+          <Row label="Threat Modifiers" value={threatWords(log, save.seatCount)} testID="log-threat" icon="threat" />
           {/* Dream-chaser: the XP the Resolutions gave and what is unspent, and the boxes marked beside the scalable and upgradable cards (MEC111 p31). */}
           {campaign.xp ? <Row label="XP" value={xpWords(log)} testID="log-xp" /> : null}
           {campaign.xp ? <Row label="Scalable Cards" lines={marked("scalable")} onCard={card} speech={markedSpeech(log, "scalable")} testID="log-scalable" /> : null}
           {campaign.xp ? <Row label="Upgradable Cards" lines={marked("upgradable")} onCard={card} speech={markedSpeech(log, "upgradable")} testID="log-upgradable" /> : null}
           <Row label="Boons" lines={pool("boon")} onCard={card} testID="log-boons" />
           <Row label="Burdens" lines={pool("burden")} onCard={card} testID="log-burdens" />
+          {angmar.map((row) => ("value" in row ? <Row key={row.id} label={row.label} value={row.value} testID={row.id} /> : <Row key={row.id} label={row.label} lines={row.lines.map(angmarLine)} onCard={card} testID={row.id} />))}
           {wilderland ? <Row label="Treasures" lines={namesOnLines(wilderland.treasures, nameOf)} onCard={card} testID="log-treasures" /> : null}
           {wilderland ? <Row label="Unique Allies Protecting Wilderland" lines={wilderland.lines.map((words): Line => [{ text: words }])} onCard={card} testID="log-ally-lines" /> : null}
           {wilderland ? <Row label="Beldis" lines={wilderland.beldis.map((row): Line => [{ text: `${row.prefix}${row.boxes}` }])} onCard={card} speech={wilderland.beldis.map((row) => row.speech).join(". ")} testID="log-beldis" /> : null}

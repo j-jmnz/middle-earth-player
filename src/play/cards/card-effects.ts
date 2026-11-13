@@ -15,6 +15,8 @@ import { areaRoleOf, stageFactsOf } from "../store/stormcaller-table.ts";
 import { AREA_APART, AREA_TOGETHER, stageLines } from "../words/scenarios/stormcaller.ts";
 import { shipLoss, type ShipLoss } from "../words/scenarios/grapple.ts";
 import { heldWords } from "../words/scenarios/sea.ts";
+import { capturedPill } from "../words/scenarios/angmar/gram-table.ts";
+import { capturedOwners } from "../readouts/gram.ts";
 import { areaStanding } from "../../rules/families/stormcaller/values.ts";
 import { placedLimit } from "../../rules/families/uncharted/limit.ts";
 import { modifiedStat, printedStat } from "../../rules/core/keywords.ts";
@@ -28,6 +30,9 @@ import { engagesAt } from "../store/foresight.ts";
 import type { IconName } from "../../ui/icon-map.ts";
 import { stagePoints } from "../readouts/objective.ts";
 import { stageDefeatLoses } from "../readouts/fortress.ts";
+import { determinedMark, type DeterminedMark } from "./determined-mark.ts";
+import { deadSpeech } from "./realm-preview.ts";
+import { sideQuestMark, stagedSideQuest, type SideQuestMark } from "./side-quest-mark.ts";
 
 export type BadgeStat = "willpower" | "attack" | "defense" | "hitPoints" | "threat" | "questPoints" | "engagementCost";
 
@@ -36,9 +41,12 @@ export type BadgeStat = "willpower" | "attack" | "defense" | "hitPoints" | "thre
 // round), so the pill shows it will go (rr.lasting-effects).
 export type StatBadge = { stat: BadgeStat; icon: IconName; word: string; value: number; delta: number; lasting: boolean };
 
-export type FlagStat = "cannotAttack" | "cannotTakeDamage" | "cannotTakeNonCombatDamage" | "cannotBeEngaged" | "cannotBeOptionallyEngaged" | "damageLimit" | "cancelsDamage";
+export type FlagStat = "cannotAttack" | "cannotTakeDamage" | "cannotTakeNonCombatDamage" | "cannotBeEngaged" | "cannotBeOptionallyEngaged" | "damageLimit" | "cancelsDamage" | "mustCommit";
 
-// A "cannot" an effect put on the card, with the icon of the thing it cannot do.
+// The short word on the pill of a card that must commit to the quest (A Fell Dread, 101163:A:1): a "must", not a "cannot", so it is drawn as the Willpower icon and this word on an accent pill, never struck through.
+export const MUST_COMMIT_WORD = "Quest";
+
+// A "cannot" an effect put on the card, with the icon of the thing it cannot do (drawn struck through in threat red); `mustCommit` is the one flag that asks for something and is drawn as its own pill (MUST_COMMIT_WORD).
 export type FlagBadge = { flag: FlagStat; icon: IconName; word: string };
 
 export type CardEffects = { stats: readonly StatBadge[]; flags: readonly FlagBadge[] };
@@ -72,6 +80,8 @@ const FLAGS: readonly { flag: FlagStat; icon: IconName; word: string }[] = [
   { flag: "damageLimit", icon: "hitPoints", word: "Takes at most %n damage at a time" },
   // Dragon Scales (18059:A:2), the shield badge (the Defense icon, not the hit points icon of the damage-limit badges): all the damage the attached enemy would take is canceled, then the Scales are discarded.
   { flag: "cancelsDamage", icon: "defense", word: "Cancels all the damage it would take, once" },
+  // A Fell Dread (101163:A:1): the attached hero cannot be left out of the quest commitment while it is able to commit.
+  { flag: "mustCommit", icon: "willpower", word: "Must commit to the quest" },
 ];
 
 // A flag's words; "%n" is the amount the effect holds (a damage limit).
@@ -248,7 +258,7 @@ function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, 
   const card = game.cards[cardId];
   const effects = cardEffects(game, ctx, cardId);
   // The Stormcaller's current quest stage wears the strip a quest card does (dcce.stormcallers-area).
-  const questing = card != null && (card.zone === "questStage" || card.zone === "activeLocation" || card.zone === "secondActiveLocation" || card.zone === "seatQuest" || areaRoleOf(game, cardId) === "stage");
+  const questing = card != null && (stagedSideQuest(game, ctx, cardId) || card.zone === "questStage" || card.zone === "activeLocation" || card.zone === "secondActiveLocation" || card.zone === "seatQuest" || areaRoleOf(game, cardId) === "stage");
   const enemy = card != null && card.zone === "staging" && card.face !== "down" && printedOf(ctx.cards, card.code).type === "enemy";
   const cost = enemy ? engagementCostOf(game, card, ctx.cards) : null;
   return {
@@ -266,6 +276,9 @@ function numbersOnSlot(game: ScenarioState, ctx: ReduceContext, cardId: string, 
     // A Ship location while the stage that loses at a total Threat of 9 is in play: its Threat against that total (12041:B:2).
     loss: card != null && inPlay(card.zone) ? shipLoss(game, ctx, cardId) : null,
     place: card?.zone === "staging" ? stagingPlace(game, cardId) : null,
+    side: sideQuestMark(game, ctx, cardId),
+    determined: determinedMark(game, ctx, cardId),
+    dead: deadSpeech(game, ctx.cards, cardId),
     combat: card != null ? combatNumber(game, ctx, card) : null,
   };
 }
@@ -296,7 +309,7 @@ function stagingPlace(game: ScenarioState, cardId: string): PlaceMark | null {
 }
 
 /** The pill on The Havens Burn: "2/5" (cards under it against the number that loses), threat red when the next card placed under it loses the game; `speech` is "2 under, lose at 5". */
-export type UnderMark = { text: string; loses: boolean; speech: string };
+export type UnderMark = { text: string; loses: boolean; speech: string; count?: number };
 
 function underMark(tally: { count: number; limit: number } | null): UnderMark | null {
   return tally ? burnMark(tally) : null;
@@ -305,6 +318,9 @@ function underMark(tally: { count: number; limit: number } | null): UnderMark | 
 // The Ship enemy Belfalas Islet holds out of play while it is the active location (12129:A:2) is the same night pill as the cards under The Havens Burn: "1 held", and the reader hears the enemy's name.
 // The Captives of The Uruk-hai lying under To Isengard! or held by Grishnákh are counted the same way (families/captives): "2 held", and the reader hears each hero's name.
 function heldMark(game: ScenarioState, ctx: ReduceContext, cardId: string): UnderMark | null {
+  // The cards captured underneath a card in Escape from Mount Gram: "3 captured", with their owners spoken (readouts/gram.ts).
+  const owners = game.capture != null ? capturedOwners(game, cardId) : [];
+  if (owners.length > 0) return capturedPill(owners);
   const captives = captivesUnder(game, cardId);
   if (captives.length > 0) return heldWords(captives.map((id) => printedOf(ctx.cards, game.cards[id]?.code ?? "").name));
   const held = Object.values(game.cards).filter((other) => other.zone === "under" && other.host === cardId && game.sea?.held?.[other.id] != null);
@@ -331,6 +347,12 @@ export type SlotNumbers = {
   loss: ShipLoss | null;
   // A location of the Island Map in the staging area: its place on the map and the marker's, drawn as the 5 × 3 glyph (island-place.ts).
   place: PlaceMark | null;
+  // An encounter side quest in the staging area: the current-quest mark, and its damage against the number that loses the game (side-quest-mark.ts).
+  side: SideQuestMark | null;
+  // A hero or ally the Campaign Log marks determined, or that carries a Determination (determined-mark.ts): a small pill with the word, and what it means in the preview and to the reader.
+  determined: DeterminedMark | null;
+  // A facedown Reanimated Dead (The Dread Realm): what it is and whose card it is, drawn as the small mark on its back and said by the reader and the web list (realm-preview.ts). Null on every other card.
+  dead: string | null;
   // In the enemy attacks step: an engaged enemy's attack or a character's defense, drawn at the card's foot (combatNumber).
   combat: CombatNumber | null;
 };

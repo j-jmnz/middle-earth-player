@@ -6,10 +6,10 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142020:A:1 (front): Setup: Set Lust for the Ring, Redhorn Pass, Doors of Durin and Watcher in the Water aside, out of play. Shuffle the encounter deck.
   142020:setup:1: Setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json SetAside {"verb":"SetAside","code":"142084"}]
-    - [json SetAside {"verb":"SetAside","code":"142029"}]
-    - [json SetAside {"verb":"SetAside","code":"142030"}]
-    - [json SetAside {"verb":"SetAside","code":"142024"}]
+    - a copy of the card with code 142084 is set aside, out of play
+    - a copy of the card with code 142029 is set aside, out of play
+    - a copy of the card with code 142030 is set aside, out of play
+    - a copy of the card with code 142024 is set aside, out of play
     - shuffle the encounter deck
 
 142020:B:1 (back): Forced: At the end of the planning phase, each player places the top card of his deck faceup in front of him, in player order, until there are a total of 4 faceup cards between the players. The first player chooses 1 faceup card to be played for 0 cost, 1 to add to its owner's hand, 1 to discard, and 1 to shuffle into its owner's deck. Then, either shuffle Lust for the Ring into the encounter deck, or raise each player's threat by 5. Advance to stage 2.
@@ -30,7 +30,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142021:A:1 (front): When Revealed: Make Redhorn Pass the active location. The first player reveals cards from the encounter deck until there is at least X Threat in the staging area. X is twice the number of players in the game.
   142021:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json MakeSetAsideActive {"verb":"MakeSetAsideActive","code":"142029"}]
+    - the set-aside card with code 142029 becomes the active location (not traveling: no Travel effect, nothing hears "traveled"); a location already active returns to the staging area, unless a second active location slot is free
     - [json RevealUntilThreat {"verb":"RevealUntilThreat","threat":{"players":true,"times":2}}]
 
 142021:B:1 (back): During the travel phase, the players must travel to a location, if able.
@@ -50,7 +50,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
   142022:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - for each player, first player first:
-      - [json SearchMove {"verb":"SearchMove","type":"enemy","to":"staging","require":"142025"}]
+      - the acting player finds one enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed) [also {"require":"142025"}]
     - shuffle the encounter deck
 
 142022:B:1 (back): During the travel phase, the players must travel to a location, if able.
@@ -73,8 +73,8 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142023:A:1 (front): When Revealed: Make Doors of Durin the active location. Add Watcher in the Water to the staging area. Discard all tokens from the Ring-bearer and place it (and each card attached to it) facedown under Watcher in the Water.
   142023:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json MakeSetAsideActive {"verb":"MakeSetAsideActive","code":"142030"}]
-    - [json AddSetAsideToStaging {"verb":"AddSetAsideToStaging","code":"142024"}]
+    - the set-aside card with code 142030 becomes the active location (not traveling: no Travel effect, nothing hears "traveled"); a location already active returns to the staging area, unless a second active location slot is free
+    - one set-aside card with code 142024 joins the staging area (it is not revealed)
     - [json CaptureRingBearer {"verb":"CaptureRingBearer","under":"142024"}]
 
 142023:B:1 (back): There can be 2 active locations. During the travel phase, the players must travel to a location, if able.
@@ -102,10 +102,10 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142024:A:2 (front): Cannot leave the staging area but is considered to be engaged with each player.
   142024:constant:1: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - this card: stat engagedWithAll 1, while this card is in play
+    - this card: stat engagedWithAll (it stays in the staging area but is considered engaged with each player: it attacks each of them in turn in the combat phase, dealt a shadow card for each attack, and none engages it) 1, while this card is in play
     - this card: stat cannotBeEngaged (no player engages it: not optionally, not by an engagement check, not by an effect) 1, while this card is in play
     - this card: stat noThreatContribution 1, while this card is in play
-    - this card: stat attackableByAny 1, while this card is in play
+    - this card: stat attackableByAny (any character may be declared as an attacker against it) 1, while this card is in play
 
 142024:A:3 (front): Forced: After placing the 6th damage here, the first player takes control of the Ring-bearer, exhausted with 1 damage on it.
   142024:forced:1: Forced after a card takes damage (heard about this card)
@@ -122,8 +122,8 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142025:A:2 (front): Forced: After Great Warg Chief engages you, discard cards from the encounter deck until a Warg enemy is discarded. Put that enemy into play engaged with you.
   142025:forced:1: Forced after an enemy engages a player (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json DiscardUntil {"verb":"DiscardUntil","type":"enemy","trait":"Warg"}]
-    - [json MoveEncounterCard {"verb":"MoveEncounterCard","to":"engaged"}]
+    - cards are discarded from the top of the encounter deck until an enemy with the trait Warg is discarded, or the deck is empty; that card becomes the picked card
+    - the picked card is put into play engaged with the acting player (it is not revealed; it has engaged that player)
 
 ## 142026 Hound of Sauron
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -186,7 +186,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
 142029:A:2 (front): Forced: When Redhorn Pass is explored, each player assigns X damage among characters he controls. X is the number of damage here.
   142029:forced:1: Forced after a card leaves play (heard about this card)
     only if the card the event is about had enough progress to be explored
-    - [json AssignDamage {"verb":"AssignDamage","amount":{"stat":"damage","of":"self"},"pick":{"type":"character","control":"you"},"who":"eachSeat"}]
+    - each player assigns damage of this card damage among the character (you control), one at a time
 
 ## 142030 Doors of Durin
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -281,7 +281,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
   142036:whenRevealed:1: When revealed
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json AttachToActiveLocation {"verb":"AttachToActiveLocation"}]
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"not","condition":{"kind":"x","min":1}}}]
+    - then, if not (X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed)) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
   142036:constant:1: Constant
     - its host: stat progressCap 3, while this card is in play
 
@@ -293,14 +293,14 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
     - for each player, first player first:
       - the acting player chooses one of:
         * option "discard":
-          - [json DiscardEach {"verb":"DiscardEach","pick":{"type":"ally","control":"you"}}]
+          - the acting player discards each ally (you control)
         * option "threat":
           - raise threat by the number of ally (you control) (the acting player)
 
 142037:A:2 (shadow): Shadow: Attacking enemy makes an additional attack after this one.
   142037:shadow:1: Shadow
     - when the attack in progress ends:
-      - the attacking enemy attacks the defending player again (an additional attack, against "you" on the shadow card), dealt a new shadow card after its old ones are discarded
+      - the attacking enemy attacks again, the player it is engaged with (the defending player; an additional attack), dealt a new shadow card after its old ones are discarded
 
 ## 142038 Storm of Howls
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -317,7 +317,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
         - the picked enemy attacks the acting player now, from the staging area
       * option "engagement":
         - each Warg enemy (any player controls) in the staging area only: stat engagementCost -20, until the end of the round
-    - [json GainSurge {"verb":"GainSurge","when":{"kind":"not","condition":{"kind":"count","pick":{"type":"enemy","control":"any","stagingOnly":true,"trait":"Warg"},"min":1}}}]
+    - then, if not (the number of Warg enemy (any player controls) in the staging area only is at least 1) (checked when this step runs, after the steps above; not tied to whether they did anything): this card gains surge (one more encounter card is revealed when it has been resolved)
 
 ## 142084 Lust for the Ring
 (the scenario deals it into the setAside pile; the piles place it, no record does)
@@ -333,4 +333,4 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
     - raise threat by 1 (each player)
     - [json SetStatUntil {"verb":"SetStatUntil","stat":"willpower","value":0,"until":"endOfRound","holders":{"type":"hero","control":"any","isHost":true}}]
 
-(rendered pieces: 147 by template, 40 as JSON)
+(rendered pieces: 168 by template, 27 as JSON)

@@ -10,6 +10,7 @@ import type { CatalogFamily } from "../family-manifest.ts";
 import { amountSchema, cardRefSchema, positiveAmountSchema } from "../effect-schema-amount.ts";
 import { when } from "../effect-schema-conditions.ts";
 import { pickSchema } from "../effect-schema-pick.ts";
+import { verbFlags } from "../verb-flags.ts";
 
 // Where a player card may be when MoveCard moves it.
 const zone = z.enum(["hand", "play", "discard", "deck"]);
@@ -44,14 +45,15 @@ const VERBS = [
   // `count`, the effect's X becomes how many of them match it (read with the X the effect had, for `costIsX`) and whose printed
   // cost is at least `costAtLeast`, and the first such card is picked ("" when none is): "If at least one of those cards has
   // cost equal to the named number", "If the discarded card's printed cost is equal to or higher than ...".
-  z.strictObject({
+  // A Shadow effect with it runs in a frame, which holds the cards discarded for the amount `discarded` (09039:A:2, 09064:A:2).
+  verbFlags(z.strictObject({
     verb: z.literal("DiscardFromDeck"),
     amount: positiveAmountSchema,
     shuffle: z.boolean().optional(),
     count: pickSchema.optional(),
     costAtLeast: amountSchema.optional(),
     ...when,
-  }),
+  }), { runsInFrame: true }),
   // The effect's X grows by this amount, read now ("the total cost of the allies exhausted to pay for this effect").
   z.strictObject({ verb: z.literal("AddToX"), amount: amountSchema, ...when }),
   // The instructions after it in this effect resolve for the player picked last (`pickedPlayer`: their hand, deck and choices,
@@ -67,6 +69,9 @@ const VERBS = [
   // The next event with the Doomed keyword the actor plays before `until` raises each player's threat by `amount` less
   // (not below 0): "Reduce the X value of the next Doomed X event you play this phase by 2".
   z.strictObject({ verb: z.literal("ReduceNextDoomed"), amount: z.number().int().positive(), until: z.enum(["endOfPhase", "endOfRound"]), ...when }),
+  // A constant: each card that matches the pick gains Doomed `amount`, on top of any Doomed X it prints ("Each event card gains doomed 1", 10173:A:1; rr.keywords, rr.doomed-x): a player who plays it raises each player's threat by the sum.
+  // Read when the card is played (rules/player/planning.ts); it does nothing when a record runs it.
+  z.strictObject({ verb: z.literal("GainsDoomed"), amount: z.number().int().positive(), pick: pickSchema }),
   // Setup: the actor keeps their opening hand and takes no mulligan; the next player decides ("instead of taking a mulligan").
   z.strictObject({ verb: z.literal("KeepOpeningHand"), ...when }),
   // Read by the play of the card, never run: in a Response to `paying` on the card itself, its player may pay this much less of
@@ -77,6 +82,10 @@ const VERBS = [
 const TRIGGERS = [
   // About a card: one of its own abilities was triggered, an Action or a Response its controller initiated or a Forced effect that triggered (rr.triggered-ability: "triggers its ability", 143068:A:2). Heard only in a game that has a record on it.
   "abilityTriggered",
+  // About the seat and the card: a player triggered an Action or a Response effect: the Action or Response of a card in play, or an event played for its Action or Response, once each; not a Forced effect, a Travel or an encounter card's effect ("After a player triggers an 'Action' or 'Response' effect", 09040:A:1; rr.triggered-ability). Heard only in a game that has a record on it.
+  "playerAbilityTriggered",
+  // About the seat: it discarded cards from the top of its deck, once for the whole discard effect or cost, whatever the number of cards (at least 1 moved), not for a discard from the bottom ("After the first player discards any number of cards from the top of his deck", 09038:A:2). Heard only in a game that has a record on it.
+  "deckTopDiscarded",
   // About the seat: its opening hand was just drawn at setup. A Response here is offered in the mulligan window, in place of
   // the mulligan (Galdor of the Havens, 11002).
   "setupHandDrawn",
@@ -91,6 +100,8 @@ const FLAGS = [
   "cannotGainResources",
   // Held by the table while a card in play says so: a player with 0 cards in hand is eliminated from the game, checked at each settle once what emptied the hand has finished (rr.constant-ability, "If a player has 0 cards in his hand", 143080:B:3; settle hook of the deck family).
   "eliminatedAtEmptyHand",
+  // Held by the table while a card in play says so: a player with no cards in his deck is eliminated from the game, checked as `eliminatedAtEmptyHand` is (rr.constant-ability, "If a player has no cards in his deck, he is eliminated from the game", 09073:B:3, 09074:B:2).
+  "eliminatedAtEmptyDeck",
   // Held by the table until the end of the phase: each ally that leaves play goes to its owner's hand instead of the discard
   // pile (Rallying Cry, 10003).
   "alliesToHand",

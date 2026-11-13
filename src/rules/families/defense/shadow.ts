@@ -40,8 +40,8 @@ export function discardShadowOf(state: ScenarioState, enemyId: string): Scenario
 }
 
 // DealShadowTo: one more shadow card for an engaged enemy; during its attack it resolves after those it has (rr.step-6-4-2).
-export function dealShadowTo(state: ScenarioState, enemyId: string, steps: EngineStep[]): ScenarioState {
-  return state.cards[enemyId]?.zone === "engaged" ? dealAdditionalShadow(state, enemyId, steps) : state;
+export function dealShadowTo(state: ScenarioState, enemyId: string, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
+  return state.cards[enemyId]?.zone === "engaged" ? dealAdditionalShadow(state, enemyId, steps, ctx) : state;
 }
 
 // How a shadow card is dealt to the enemy: face up while the player it is engaged with holds shadowsFaceUp (Silver Lamp,

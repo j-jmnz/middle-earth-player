@@ -1,0 +1,24 @@
+appId: com.middleearth.lcg
+tags:
+  - scenario
+---
+# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `chetwood-won` (scripts/e2e/angmar-awakened/intruders-in-chetwood.ts): a real two-handed game of Intruders in Chetwood (The One Deck and the Defenders of Gondor
+# lists, Easy), parked on its win (the Orc War Parties out of play, 30 progress on Stop the War Party with the first player controlling Iârion). The fixture is OPEN: scripts/e2e/fixtures.ts found no win of those lists in its 100 seeds with any of the policies the
+# scenario's goldens play (docs/phases/STATUS.md), so this flow cannot run until a seed wins.
+# The Campaign Setup asked each player whether to place 4 damage on Protect the Innocent (the fixture's loadout answers "keep"). The Resolution (10156:B:1) asks nothing: it notes the damage on Protect the Innocent in the log and adds the card to the pool. The campaign has no XP.
+# The win unlocks The Weather Hills, whose node reads Next (scripts/checks/maestro.test.ts, path-soon).
+- runFlow:
+    file: ../../subflows/scenario-win.yaml
+    env:
+      FIXTURE: chetwood-won
+      SCENARIO_ID: intruders-in-chetwood
+      NO_XP: "true"
+# The win wrote the campaign card's Resolution to the pool: Protect the Innocent.
+- assertVisible:
+    id: pool
+    text: ".*Protect the Innocent.*"
+- assertVisible:
+    id: node-the-weather-hills-status
+    text: "Next"
+- assertNotVisible:
+    id: path-soon

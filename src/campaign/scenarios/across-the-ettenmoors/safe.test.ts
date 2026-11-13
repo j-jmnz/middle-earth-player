@@ -1,0 +1,239 @@
+// Rules: mec108.objective-locations, mec108.safe, rr.guarded, rr.reveal, rr.setup, rr.active-location, rr.travel, rr.blank, rr.resource-phase (data/rules/entries.json); ledger lines 10064:A:1, 10065:A:1, 10068:A:1, 10069:A:1, 10069:A:3, 10071:A:3, 10075:A:2, 10080:A:1, 10081:A:1.
+// The verbs of Across the Ettenmoors on tables built from data/ by the layout kit: the Setup pair, the Safe keyword's effects, the reveal of a discarded side quest.
+import { describe, expect, it } from "vitest";
+
+import { textBlank } from "../../../rules/families/attachments/hold.ts";
+import { constantInstructions } from "../../../rules/interpret/constant-records.ts";
+import { holds } from "../../../rules/interpret/conditions.ts";
+import { pickCandidates } from "../../../rules/interpret/pick.ts";
+import { releaseGuards } from "../../../rules/families/angmar/ettenmoors.ts";
+import { ruleCause } from "../../../rules/core/cause.ts";
+import type { EngineStep, PlayerIntent } from "../../../rules/core/intents.ts";
+import { gainSeatResources } from "../../../rules/interpret/interpret.ts";
+import { guardWith } from "../../../rules/families/objectives/guard.ts";
+import { noteProgressPlaced } from "../../../rules/families/angmar/progress.ts";
+import { placeOnCurrentSideQuest } from "../../../rules/families/wilderland/night-quest.ts";
+import { flagged, type ScenarioState } from "../../../rules/core/state.ts";
+import { begin } from "../../../../test/harness/scene.ts";
+import { codesIn, finish, idOf, legalIntents, resolveRecords, revealFromTop, send, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
+
+const SCENARIO = "across-the-ettenmoors";
+const built = (layout: Layout = {}) => tableFromLayout(SCENARIO, layout);
+const codesAt = (state: ScenarioState, ids: readonly string[]) => ids.map((id) => state.cards[id]?.code);
+const SAFE = ["10068", "10069", "10070", "10071"];
+const QUESTS = ["10081", "10082", "10083"];
+
+describe("the Setup of Into the Ettenmoors", () => {
+  const layout: Layout = { setAside: [...QUESTS, ...SAFE, "10067"], deck: ["f0", "f3"] };
+
+  it("10064:A:1 stages a random side quest guarding a random safe location, shuffles the rest into the encounter deck and gives the first player Amarthiúl", () => {
+    const t = built(layout);
+    const run = resolveRecords(t.state, t.ctx, "10064", "setup", idOf(t.state, "10064"));
+    const state = run.state;
+    const staged = state.staging.map((id) => state.cards[id]);
+    const quest = staged.find((card) => QUESTS.includes(card?.code ?? ""));
+    const place = staged.find((card) => SAFE.includes(card?.code ?? ""));
+    expect(staged).toHaveLength(2);
+    // Both are revealed (the location, then the side quest as its guard): a reveal step names each, so what hears a reveal hears them.
+    const revealed = run.steps.flatMap((step) => (step.kind === "reveal" ? [step.cardId] : []));
+    expect(revealed).toEqual([place?.id, quest?.id]);
+    // The side quest is the location's guard, attached to it and staged; the location's own Guarded takes no further card from the deck (rr.guarded, replaced by the quest card: the encounter deck keeps its two cards).
+    expect(quest?.guard).toBe(true);
+    expect(quest?.host).toBe(place?.id);
+    expect(place?.attachments).toEqual([quest?.id]);
+    // The other two side quests and three locations are in the encounter deck with the two cards it held.
+    expect(state.encounterDeck).toHaveLength(7);
+    expect(codesAt(state, state.encounterDeck).filter((code) => QUESTS.includes(code ?? ""))).toHaveLength(2);
+    expect(state.setAside.map((id) => state.cards[id]?.code)).toEqual([]);
+    // Amarthiúl is in the first player's area.
+    expect(state.cards[idOf(state, "10067")]?.zone).toBe("play");
+    expect(state.cards[idOf(state, "10067")]?.controller).toBe(0);
+  });
+
+  it("10064:A:1 picks with the game's seed: other seeds stage other pairs", () => {
+    const pairs = new Set<string>();
+    for (const seed of [1, 2, 3, 4, 5, 6, 7, 8]) {
+      const t = built({ ...layout, seed });
+      const state = resolveRecords(t.state, t.ctx, "10064", "setup", idOf(t.state, "10064")).state;
+      pairs.add(state.staging.map((id) => state.cards[id]?.code).sort().join("+"));
+    }
+    expect(pairs.size).toBeGreaterThan(1);
+  });
+});
+
+describe("the Safe keyword", () => {
+  const withActive = (code: string, extra: Layout = {}) => built({ active: code, ...extra });
+
+  it("10068:A:1 is read from the card's constant record (the pick filter safe, the condition safeActive)", () => {
+    const t = withActive("10068", { staging: ["10069", "10075"] });
+    // An encounter card's effect asks (the objective-locations are immune to player card effects).
+    const safe = pickCandidates(t.state, { type: "objective", control: "any", safe: true }, 0, [], idOf(t.state, "10075"), t.ctx);
+    expect(safe.map((id) => t.state.cards[id]?.code).sort()).toEqual(["10068", "10069"]);
+    expect(holds(t.state, { kind: "safeActive", is: true }, { actor: 0, sourceId: null, returned: 0 }, t.ctx)).toBe(true);
+    const none = built({ staging: ["10069"] });
+    expect(holds(none.state, { kind: "safeActive", is: true }, { actor: 0, sourceId: null, returned: 0 }, none.ctx)).toBe(false);
+    expect(holds(none.state, { kind: "safeActive", is: false }, { actor: 0, sourceId: null, returned: 0 }, none.ctx)).toBe(true);
+  });
+
+  it("10068:A:1 while active: no engagement checks, treachery reveals ignored, encounter side quests blank; none of it while the location is only staged", () => {
+    const active = withActive("10068", { staging: ["10081", "f0"] });
+    expect(flagged(active.state, "table", "noEngagementChecks")).toBe(true);
+    expect(flagged(active.state, "table", "treacheryRevealIgnored")).toBe(true);
+    expect(textBlank(active.state, idOf(active.state, "10081"), active.ctx.cards)).toBe(true);
+    const staged = built({ staging: ["10068", "10081"] });
+    expect(flagged(staged.state, "table", "noEngagementChecks")).toBe(false);
+    expect(flagged(staged.state, "table", "treacheryRevealIgnored")).toBe(false);
+    expect(textBlank(staged.state, idOf(staged.state, "10081"), staged.ctx.cards)).toBe(false);
+  });
+
+  it("10068:A:1 ignores the When Revealed of a treachery while active (the treachery is still revealed and discarded)", () => {
+    const quiet = withActive("10068", { deck: ["10073"] });
+    const run = revealFromTop(quiet.state, quiet.ctx, "10079", []);
+    // Arador's Bane (a treachery) asked nothing and searched nothing: it went to the discard pile with no effect.
+    expect(run.state.window ?? null).toBeNull();
+    expect(run.state.cards[run.id]?.zone).toBe("encounterDiscard");
+    expect(codesIn(run.state, "staging")).toEqual([]);
+    // With the location only staged its When Revealed runs: the player searches for the Giant and adds it to the staging area.
+    const loud = built({ deck: ["10073"], staging: ["10068"] });
+    const revealed = finish({ state: revealFromTop(loud.state, loud.ctx, "10079", []).state, steps: [] }, loud.ctx);
+    expect(codesIn(revealed.state, "staging")).toContain("10073");
+  });
+
+  it("10068:A:1 returns every engaged enemy to the staging area when the players travel to the location (Forced, on the traveled event)", () => {
+    const t = built({ phase: "Travel", staging: ["10068"], engaged: ["f3", "f0"] });
+    expect(t.state.seats[0]?.engaged).toHaveLength(2);
+    const run = resolveRecords(t.state, t.ctx, "10068", "forced", idOf(t.state, "10068"));
+    expect(run.state.seats[0]?.engaged ?? []).toEqual([]);
+    expect(run.state.staging.map((id) => run.state.cards[id]?.code).sort()).toEqual(["10068", "f0", "f3"].sort());
+  });
+
+  it("10069:A:3 heals 1 damage from each character in play and 10071:A:3 adds a resource to each hero", () => {
+    const t = built({ staging: ["10069", "10071"], play: [{ code: "ally", damage: 1 }] });
+    const hero = t.hero;
+    const damaged = { ...t.state, cards: { ...t.state.cards, [hero]: { ...t.state.cards[hero]!, damage: 1 } } };
+    const healed = resolveRecords(damaged, t.ctx, "10069", "response", idOf(damaged, "10069"));
+    expect(healed.state.cards[hero]?.damage).toBe(0);
+    expect(healed.state.cards[idOf(healed.state, "ally")]?.damage).toBe(0);
+    const before = t.state.cards[hero]?.resources ?? 0;
+    const paid = resolveRecords(t.state, t.ctx, "10071", "response", idOf(t.state, "10071"));
+    expect(paid.state.cards[hero]?.resources).toBe(before + 1);
+  });
+
+  it("10068:A:1 adds the safe location to the victory display at the end of the quest phase, with its progress", () => {
+    const t = built({ active: "10068" });
+    const run = resolveRecords(t.state, t.ctx, "10068", "forced", idOf(t.state, "10068"));
+    // The Forced record names the end of the phase: the record resolved by hand runs it.
+    expect(run.state.cards[idOf(run.state, "10068")]?.zone).toBe("victory");
+    expect(run.state.activeLocation).toBeNull();
+  });
+});
+
+describe("the reveal of a discarded side quest", () => {
+  it("10065:A:1 shuffles the discard pile in, discards until a side quest, reveals it and adds it to the staging area", () => {
+    const t = built({ stage: "10065", discard: ["f0"], deck: ["f3", "10082", "f0"] });
+    const run = resolveRecords(t.state, t.ctx, "10065", "whenRevealed", idOf(t.state, "10065"));
+    expect(codesIn(run.state, "staging")).toContain("10082");
+    // Whatever was discarded on the way is in the discard pile; the side quest is not.
+    expect(run.state.encounterDiscard.map((id) => run.state.cards[id]?.code)).not.toContain("10082");
+  });
+
+  it("10065:A:1 with no side quest in the deck runs the deck out and reveals nothing", () => {
+    const t = built({ stage: "10065", deck: ["f3", "f0"] });
+    const run = resolveRecords(t.state, t.ctx, "10065", "whenRevealed", idOf(t.state, "10065"));
+    expect(run.state.encounterDeck).toEqual([]);
+    expect(codesIn(run.state, "staging")).toEqual([]);
+  });
+});
+
+describe("Scavenge for Supplies", () => {
+  it("10083:A:1 holds the IncreaseCost record of every player card while it is in play", () => {
+    const t = built({ staging: ["10083"], hand: ["ally"] });
+    const records = constantInstructions(t.state, t.ctx).filter((item) => item.instruction.verb === "IncreaseCost");
+    expect(records.map((item) => item.source.code)).toEqual(["10083"]);
+  });
+});
+
+describe("travelling to a safe location in a round", () => {
+  // Passes (and declines the optional engagement) until the phase is reached, returning the run there.
+  const until = (run: ReturnType<typeof begin>, ctx: ReturnType<typeof built>["ctx"], phase: ScenarioState["phase"], skip = 0) => {
+    let current = run;
+    let seen = 0;
+    for (let guard = 0; guard < 30 && !current.state.lost; guard += 1) {
+      if (current.state.phase === phase && seen >= skip) break;
+      if (current.state.phase === phase) seen += 1;
+      const legal = legalIntents(current.state, ctx);
+      const next = legal.find((intent) => intent.type === "Pass") ?? legal.find((intent) => intent.type === "DeclineEngage") ?? legal.find((intent) => intent.type === "DeclineTravel");
+      if (!next) break;
+      current = send(current, next as PlayerIntent, ctx);
+    }
+    return current;
+  };
+
+  it("10069:A:1 returns the engaged enemy to the staging area, engages nothing in the encounter phase and goes to the victory display at the end of the quest phase", () => {
+    const t = built({ phase: "Travel", staging: ["10069", "10076"], engaged: ["f3"] });
+    const traveled = send(begin(t.state), { type: "Travel", locationId: idOf(t.state, "10069") }, t.ctx);
+    expect(traveled.state.activeLocation).toBe(idOf(t.state, "10069"));
+    expect(traveled.state.seats[0]?.engaged ?? []).toEqual([]);
+    expect(traveled.state.staging.map((id) => traveled.state.cards[id]?.code).sort()).toEqual(["10076", "f3"]);
+    // The encounter phase: Goblin Pursuer (engagement cost 16, below the threat) is not engaged by a check; the player may still engage it by choice.
+    const encounter = until(traveled, t.ctx, "Encounter");
+    expect(legalIntents(encounter.state, t.ctx).some((intent) => intent.type === "Engage")).toBe(true);
+    const quest = until(encounter, t.ctx, "Quest");
+    expect(quest.state.seats[0]?.engaged ?? []).toEqual([]);
+    expect(quest.state.activeLocation).toBe(idOf(t.state, "10069"));
+    // The quest phase ends: the safe location is added to the victory display without being explored.
+    const next = until(quest, t.ctx, "Travel");
+    expect(next.state.cards[idOf(t.state, "10069")]?.zone).toBe("victory");
+    expect(next.state.activeLocation).toBeNull();
+  });
+
+  it("10069:A:1 lets the enemy engage as ever when the players do not travel", () => {
+    const t = built({ phase: "Travel", staging: ["10069", "10076"] });
+    const declined = send(begin(t.state), { type: "DeclineTravel" }, t.ctx);
+    const encounter = until(declined, t.ctx, "Encounter");
+    const engaged = send(encounter, { type: "DeclineEngage" }, t.ctx);
+    expect(engaged.state.seats[0]?.engaged.map((id) => engaged.state.cards[id]?.code)).toContain("10076");
+  });
+});
+
+describe("the flags the Ettenmoors cards hold", () => {
+  it("10080:A:1 keeps a hero from collecting resources in the resource phase (noCollection), while an effect may still add them", () => {
+    const t = built({ heroResources: 1 });
+    const marked = { ...t.state, modifiers: [...t.state.modifiers, { instanceId: t.hero, sourceId: t.hero, stat: "noCollection" as const, amount: 1, until: "whileSourceInPlay" as const }] };
+    const gained = gainSeatResources(marked, 0, [], ruleCause("rr.step-1-2"));
+    expect([gained.cards[t.hero]?.resources, gained.cards[t.hero2]?.resources]).toEqual([1, 2]);
+  });
+
+  it("10081:A:1 notes progress placed on a side quest for the round (progressPlacedHere), once", () => {
+    const t = built({ staging: ["10081"] });
+    const quest = idOf(t.state, "10081");
+    const steps: EngineStep[] = [];
+    const placed = placeOnCurrentSideQuest({ ...t.state, cards: { ...t.state.cards, [quest]: { ...t.state.cards[quest]!, progress: 0 } }, modifiers: [{ instanceId: quest, sourceId: quest, stat: "currentQuest", amount: 1, until: "endOfPhase" }] }, 2, t.cards, steps).state;
+    expect(flagged(placed, quest, "progressPlacedHere")).toBe(true);
+    expect(placed.modifiers.filter((modifier) => modifier.stat === "progressPlacedHere")).toHaveLength(1);
+    expect(flagged(noteProgressPlaced(placed, quest, 1), quest, "progressPlacedHere")).toBe(true);
+    expect(noteProgressPlaced(placed, quest, 1).modifiers).toHaveLength(placed.modifiers.length);
+    expect(flagged(noteProgressPlaced(t.state, quest, 0), quest, "progressPlacedHere")).toBe(false);
+    // A game with no card that reads it notes nothing.
+    const other = tableFromLayout("intruders-in-chetwood", {});
+    expect(other.state.progressNoted).toBeUndefined();
+    expect(noteProgressPlaced(other.state, idOf(other.state, "dh1"), 2)).toBe(other.state);
+    expect(t.state.progressNoted).toBe(true);
+  });
+
+  it("10075:A:2 sets the guards of a card free, staying in the staging area and no longer guarding it", () => {
+    const t = built({ staging: ["10069", "10081"] });
+    const place = idOf(t.state, "10069");
+    const quest = idOf(t.state, "10081");
+    const guarded = guardWith(t.state, quest, place);
+    expect(guarded.cards[quest]?.guard).toBe(true);
+    expect(guarded.cards[place]?.attachments).toEqual([quest]);
+    const freed = releaseGuards(guarded, { verb: "ReleaseGuards", target: "self" }, { seat: 0, sourceId: place });
+    expect(freed.cards[quest]?.guard).toBeUndefined();
+    expect(freed.cards[quest]?.host ?? null).toBeNull();
+    expect(freed.cards[quest]?.zone).toBe("staging");
+    expect(freed.cards[place]?.attachments).toEqual([]);
+    // Nothing guards the card now: the verb changes nothing.
+    expect(releaseGuards(freed, { verb: "ReleaseGuards", target: "self" }, { seat: 0, sourceId: place })).toBe(freed);
+  });
+});

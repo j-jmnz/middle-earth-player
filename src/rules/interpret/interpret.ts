@@ -29,6 +29,7 @@ import { isBreakingVerb } from "../families/breaking/index.ts";
 import { announceDraw } from "../families/dreamchaser/index.ts";
 import { announceEnteredHand } from "../families/island/hand.ts";
 import { playerSource } from "../families/quest/threat.ts";
+import { queueHeard } from "../families/quest/events.ts";
 import { announceSetupActive } from "../families/quest/places.ts";
 
 export type ReduceContext = {
@@ -123,7 +124,8 @@ function runTwinned(state: ScenarioState, instruction: Instruction, focus: Focus
       const locationId = instruction.to === "self" ? focus.sourceId : stagingLocations(state, ctx.cards, focus.seat)[0];
       if (!locationId) return state;
       const traveled = travelNow(state, locationId, ctx, steps);
-      return traveled ?? { ...state, failure: "Travel was refused" };
+      // A player the cost of the travel eliminated (a threat raise to 50 earlier in the effect) travels nowhere: this instruction changes nothing, later instructions of the effect still run and the game goes on (rr.player-elimination).
+      return traveled ?? (state.seats[focus.seat]?.eliminated ? state : { ...state, failure: "Travel was refused" });
     }
     case "Engage": {
       const enemyId = instruction.target ? refCard(state, instruction.target, frameScope(state, focus.seat, focus.sourceId)) : stagingEnemies(state, ctx.cards, focus.seat)[0];
@@ -135,7 +137,7 @@ function runTwinned(state: ScenarioState, instruction: Instruction, focus: Focus
     }
     case "DealShadow":
       if (!focus.sourceId) return state;
-      return instruction.additional ? dealAdditionalShadow(state, focus.sourceId, steps) : dealOneShadow(state, focus.sourceId, steps);
+      return instruction.additional ? dealAdditionalShadow(state, focus.sourceId, steps, ctx) : dealOneShadow(state, focus.sourceId, steps, ctx);
     case "ResolveEffect":
       return withFrame(state, "ResolveEffect", focus.sourceId, false, (framed) => framed, steps);
     case "ModifyStat":
@@ -197,6 +199,8 @@ export function gainSeatResources(state: ScenarioState, seat: number, steps: Eng
   for (const heroId of heroes) {
     const hero = next.cards[heroId];
     if (!hero) continue;
+    // A hero that "does not collect resources during the resource phase" (No Rest, 10080:A:1) holds noCollection.
+    if (next.modifiers.length > 0 && flagged(next, heroId, "noCollection")) continue;
     // A hero that "collects 1 additional resource" holds an extraResource.
     const gained = 1 + Math.max(0, heldAmount(next, heroId, "extraResource"));
     next = updateCard(next, heroId, { resources: hero.resources + gained });
@@ -216,20 +220,20 @@ function placeOneProgress(state: ScenarioState, sourceId: string | null, steps: 
 }
 
 // The enemy's shadow card, when it has none yet. `steps` hears the encounter deck being refilled for it.
-export function dealOneShadow(state: ScenarioState, enemyId: string, steps: EngineStep[]): ScenarioState {
+export function dealOneShadow(state: ScenarioState, enemyId: string, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
   if (state.cards[enemyId]?.shadowId) return state;
-  const dealt = dealAdditionalShadow(state, enemyId, steps);
+  const dealt = dealAdditionalShadow(state, enemyId, steps, ctx);
   // "Deal it a number of shadow cards equal to ..." (the flag dealtShadows, 19098:A:3): the card above is the first, each other an additional one.
   let next = dealt;
-  for (let more = heldAmount(dealt, enemyId, "dealtShadows") - 1; more > 0 && dealt.cards[enemyId]?.shadowId != null; more -= 1) next = dealAdditionalShadow(next, enemyId, steps);
+  for (let more = heldAmount(dealt, enemyId, "dealtShadows") - 1; more > 0 && dealt.cards[enemyId]?.shadowId != null; more -= 1) next = dealAdditionalShadow(next, enemyId, steps, ctx);
   return next;
 }
 
 // One more shadow card for an enemy, beside any it has (141069:A:2). With none yet it is simply its shadow card. An empty
 // encounter deck deals nothing (rr.step-6-2).
-export function dealAdditionalShadow(given: ScenarioState, enemyId: string, steps: EngineStep[]): ScenarioState {
+export function dealAdditionalShadow(given: ScenarioState, enemyId: string, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
   // An empty deck is refilled at once while the Nightmare setup card says so (encounterRefill, 900201:A:3); the reset is logged.
-  const state = refillEncounterDeck(given, steps);
+  const state = refillEncounterDeck(given, steps, ctx);
   const enemy = state.cards[enemyId];
   const top = state.encounterDeck[0];
   // "Do not deal Nazgûl enemies a shadow card" (141061:A:1).
@@ -237,7 +241,8 @@ export function dealAdditionalShadow(given: ScenarioState, enemyId: string, step
   // Face down, or face up while the player it is engaged with holds shadowsFaceUp (07009).
   const face = shadowFace(state, enemyId);
   const moved = moveCard(state, top, { zone: "shadow", enemyId });
-  return updateCard(moved, top, { face });
+  // The enemy hears that it was dealt the card (Thaurdir's stage 1B, the Werewolf of Angmar, 10125:B:3, 10131:A:2).
+  return queueHeard(updateCard(moved, top, { face }), ctx, { trigger: "shadowDealtTo", seat: null, cardId: enemyId, subject: enemyId });
 }
 
 function dealInstructionDamage(
