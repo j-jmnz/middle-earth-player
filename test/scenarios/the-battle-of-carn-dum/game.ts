@@ -1,17 +1,20 @@
 import { emptyLog, type CampaignLog } from "../../../src/campaign/log.ts";
 import type { Difficulty } from "../../../src/catalog/scenario-data.ts";
 import type { CampaignFacts, ModeCard } from "../../../src/rules/core/campaign-state.ts";
-import { legalIntents, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
+import { legalTargets, type PlayerIntent, type ReduceContext, type ScenarioState } from "../../../src/rules/engine/reduce.ts";
 
 import { loadCampaign, loadScenario } from "../../../scripts/data/load-scenarios.ts";
-import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
+import { angmarIntent, type AngmarPolicy, type AngmarScenario } from "../../harness/angmar-policy.ts";
+import { type PolicyOptions } from "../../harness/auto-player.ts";
 import { campaignGame, fillerLoadout, HERO_STATS, type PlayedGame } from "../../harness/game-kit.ts";
 
 const campaign = loadCampaign("angmar-awakened");
 const dum = loadScenario("the-battle-of-carn-dum");
 
-// Test helper. A whole game of The Battle of Carn Dûm in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free
-// events, so the outcome depends on the engine, the seed and the encounter deck, not on player card play. TODO: say how the players travel, engage and answer the choices this scenario asks.
+// Test helper. A whole game of The Battle of Carn Dûm in Campaign Mode played by the auto-player, true solo or two-handed. The heroes are big numbers (or too small to quest, or too brittle to survive an attack) and the decks free events, so the outcome depends on the engine, the seed and
+// the encounter deck, not on player card play. One hero quests (the main quest card counts Attack in place of Willpower while Accursed Battlefield is the active location), nobody engages (Thaurdir cannot be engaged and the Garrison's engagement cost is 30 or 50), the heroes defend nothing (an attack
+// falls on the hero with the least damage) and attack Thaurdir first: on stage 2B he is considered engaged with each player and is destroyed by damage once 15 progress is on the stage (10126:B:2, 10126:B:3). The players travel to the first location the engine lists, a choice takes the first option
+// (or the last, as the policy says). The shared Angmar policy (test/harness/angmar-policy.ts) does the rest.
 export const DUM_POLICY: PolicyOptions = { scout: "", prefer: "", protect: "", play: false, act: false };
 // "strong": big-number heroes that win; "weak": heroes too small to quest, so the players lose on threat; "brittle": strong questers that die to an attack.
 export type DumDecks = "strong" | "weak" | "brittle";
@@ -26,17 +29,20 @@ export const boonChoices = (seatCount: 1 | 2): string[] => ["10189", "10190"].sl
 export const dumPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), choices: readonly string[] = boonChoices(seatCount)) => game.plan(seatCount, log, choices);
 export const dumStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, extra: { choices?: readonly string[]; standalone?: boolean } = {}) => game.start(seatCount, seed, difficulty, { facts, log, modeCard, choices: boonChoices(seatCount), ...extra });
 
-export type DumPolicy = {
-  // The option a Choose window with these answers takes: the first or the last.
-  choose: "first" | "last";
-};
-export const DEFAULT_POLICY: DumPolicy = { choose: "first" };
+export type DumPolicy = AngmarPolicy;
+export const DEFAULT_POLICY: DumPolicy = { choose: "first", engage: false, defend: "none", quest: "one" };
 
-// The auto-player's answer (test/harness/auto-player.ts), except: a choice takes the first option, or the last as the policy says. Every intent is one the reducer listed.
-// TODO: the scenario's own answers (where the players travel, who defends, which locations they explore) go before the auto-player's.
-export function dumIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: DumPolicy = DEFAULT_POLICY): PlayerIntent {
-  if (state.window?.kind === "choose") return { type: "Choose", optionId: (policy.choose === "last" ? state.window.options.at(-1) : state.window.options[0]) ?? "" };
-  return nextIntent(state, ctx, DUM_POLICY, memory, legalIntents(state, ctx));
+// Thaurdir is attacked first (either side), the other enemies in the order they are listed.
+const DUM: AngmarScenario = { safe: [], rank: (state, enemyId) => (["10127", "10128"].includes(state.cards[enemyId]?.code ?? "") ? 0 : 1) };
+
+// The shared Angmar policy with Thaurdir attacked first, and an attack nobody defends falling on the hero with the least damage.
+export function dumIntent(state: ScenarioState, ctx: ReduceContext, memory: Set<string>, policy: DumPolicy = DEFAULT_POLICY, options: PolicyOptions = DUM_POLICY): PlayerIntent {
+  if (state.window?.kind === "defense" && policy.defend === "none") {
+    const heroes = legalTargets(state, { type: "Undefended" }, ctx).filter((id) => state.cards[id]?.zone === "heroes");
+    const least = [...heroes].sort((left, right) => (state.cards[left]?.damage ?? 0) - (state.cards[right]?.damage ?? 0))[0];
+    if (least) return { type: "Undefended", heroId: least };
+  }
+  return angmarIntent(state, ctx, memory, policy, options, DUM);
 }
 
 export type DumGame = PlayedGame;
@@ -45,8 +51,16 @@ export type DumGame = PlayedGame;
 // `after`: the log of a campaign whose earlier parts were won. `upgraded`: the Upgraded sides. `mode`: the Hard or Expert Mode card.
 export type DumGolden = { name: string; seatCount: 1 | 2; seed: number; difficulty: Difficulty; decks: DumDecks; outcome: "won" | "lost"; policy?: Partial<DumPolicy>; after?: boolean; upgraded?: boolean; mode?: ModeCard; lossReason?: string };
 
-// TODO: the games to pin (at most 3000 intents in all, .claude/rules/code-standards.md, Test cost), a few wins (true solo and two-handed, Normal and Easy, a Mode card, after the earlier parts) and a few losses (each way the scenario can be lost), each on a fixed seed.
-export const DUM_GOLDENS: readonly DumGolden[] = [];
+// Every game is played after The Treachery of Rhudaur's win (`after`), so the campaign card is in play (the four boons offered, the first seat taking Elrond's Champion and the second Lore of Ancient Arnor into its opening hand, Amarthiúl allowed as a hero) and the pool holds what the earlier parts left
+// (Arnor Ravaged staged, Mysterious Omens, Fend Off Despair and the Losing Time copies in the encounter deck, Thaurdir's burden attached to him). One hero quests and the others attack Thaurdir (nobody engages: he cannot be engaged, and the Garrison costs 30 or 50 to engage), every attack falls on a hero
+// undefended. Wins: true solo, and two-handed (a second Garrison copy, and Thaurdir attacking each player on stage 2B); both end with Thaurdir destroyed on stage 2B once 15 progress took his Indestructible away. The ways to lose: the players' threat at 50 (heroes too small to quest) and every hero destroyed
+// (heroes too brittle to survive Thaurdir's attacks). The first Resolution note (the damage on each hero) and a Determination mark are the Resolution's; the campaign test reads the rest.
+export const DUM_GOLDENS: readonly DumGolden[] = [
+  { name: "true solo, won, Thaurdir destroyed on stage 2B", seatCount: 1, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
+  { name: "two-handed, won, Thaurdir destroyed on stage 2B", seatCount: 2, seed: 1, difficulty: "Normal", decks: "strong", outcome: "won", after: true },
+  { name: "true solo, lost, threat reaches 50", seatCount: 1, seed: 1, difficulty: "Normal", decks: "weak", outcome: "lost", after: true, lossReason: "No seats remain" },
+  { name: "true solo, lost, every hero destroyed", seatCount: 1, seed: 1, difficulty: "Normal", decks: "brittle", outcome: "lost", after: true, lossReason: "No seats remain" },
+];
 
 const game = campaignGame<DumDecks, DumPolicy>({
   campaign,
@@ -62,4 +76,4 @@ const game = campaignGame<DumDecks, DumPolicy>({
   earlier: { xp: [0, 0, 0, 0, 0, 0, 0], pool: [{ code: "10160" }, { code: "100158" }, { code: "10167" }, { code: "10168" }, { code: "10173" }, { code: "10183" }], marks: {} },
 });
 
-export const playGolden = (golden: DumGolden, ctx: ReduceContext): DumGame => game.playGolden(golden, ctx);
+export const playGolden = (golden: DumGolden, ctx: ReduceContext): DumGame => game.playGolden(golden, ctx, boonChoices(golden.seatCount));
