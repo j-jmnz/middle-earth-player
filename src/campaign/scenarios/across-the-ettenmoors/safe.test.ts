@@ -2,18 +2,18 @@
 // The verbs of Across the Ettenmoors on tables built from data/ by the layout kit: the Setup pair, the Safe keyword's effects, the reveal of a discarded side quest.
 import { describe, expect, it } from "vitest";
 
-import { textBlank } from "../attachments/hold.ts";
-import { constantInstructions } from "../../interpret/constant-records.ts";
-import { holds } from "../../interpret/conditions.ts";
-import { pickCandidates } from "../../interpret/pick.ts";
-import { releaseGuards } from "./ettenmoors.ts";
-import { ruleCause } from "../../core/cause.ts";
-import type { EngineStep, PlayerIntent } from "../../core/intents.ts";
-import { gainSeatResources } from "../../interpret/interpret.ts";
-import { guardWith } from "../objectives/guard.ts";
-import { noteProgressPlaced } from "./progress.ts";
-import { placeOnCurrentSideQuest } from "../wilderland/night-quest.ts";
-import { flagged, type ScenarioState } from "../../core/state.ts";
+import { textBlank } from "../../../rules/families/attachments/hold.ts";
+import { constantInstructions } from "../../../rules/interpret/constant-records.ts";
+import { holds } from "../../../rules/interpret/conditions.ts";
+import { pickCandidates } from "../../../rules/interpret/pick.ts";
+import { releaseGuards } from "../../../rules/families/angmar/ettenmoors.ts";
+import { ruleCause } from "../../../rules/core/cause.ts";
+import type { EngineStep, PlayerIntent } from "../../../rules/core/intents.ts";
+import { gainSeatResources } from "../../../rules/interpret/interpret.ts";
+import { guardWith } from "../../../rules/families/objectives/guard.ts";
+import { noteProgressPlaced } from "../../../rules/families/angmar/progress.ts";
+import { placeOnCurrentSideQuest } from "../../../rules/families/wilderland/night-quest.ts";
+import { flagged, type ScenarioState } from "../../../rules/core/state.ts";
 import { begin } from "../../../../test/harness/scene.ts";
 import { codesIn, finish, idOf, legalIntents, resolveRecords, revealFromTop, send, tableFromLayout, type Layout } from "../../../../test/harness/scene-kit.ts";
 
@@ -34,7 +34,10 @@ describe("the Setup of Into the Ettenmoors", () => {
     const quest = staged.find((card) => QUESTS.includes(card?.code ?? ""));
     const place = staged.find((card) => SAFE.includes(card?.code ?? ""));
     expect(staged).toHaveLength(2);
-    // The side quest is the location's guard, attached to it and staged; the location's own Guarded takes no further card.
+    // Both are revealed (the location, then the side quest as its guard): a reveal step names each, so what hears a reveal hears them.
+    const revealed = run.steps.flatMap((step) => (step.kind === "reveal" ? [step.cardId] : []));
+    expect(revealed).toEqual([place?.id, quest?.id]);
+    // The side quest is the location's guard, attached to it and staged; the location's own Guarded takes no further card from the deck (rr.guarded, replaced by the quest card: the encounter deck keeps its two cards).
     expect(quest?.guard).toBe(true);
     expect(quest?.host).toBe(place?.id);
     expect(place?.attachments).toEqual([quest?.id]);

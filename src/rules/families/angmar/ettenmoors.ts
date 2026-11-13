@@ -10,7 +10,7 @@ import { shuffleIds } from "../../core/seed.ts";
 import { updateCard, type ScenarioState } from "../../core/state.ts";
 import { startReveal } from "../../windows/frames.ts";
 import { moveEncounter } from "../encounter/moves.ts";
-import { guardWith } from "../objectives/guard.ts";
+import { moveCard } from "../../core/zones.ts";
 import type { Focus } from "../index.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
@@ -24,7 +24,8 @@ function setAsidePools(state: ScenarioState, ctx: ReduceContext): { sideQuests: 
   };
 }
 
-/** StageRandomGuardedPair: a random set-aside side quest and a random set-aside safe location join the staging area, the side quest attached to the location as its guard (10064:A:1). The picks use the game's seed; nothing happens when either kind is not set aside. */
+/** StageRandomGuardedPair: a random set-aside safe location is revealed and a random set-aside side quest is revealed as its guard, both join the staging area and the side quest is attached to the location (10064:A:1). The quest card says the side quest guards the location, so
+ * the location's Guarded keyword takes the side quest in place of the next card of the encounter deck (rr.guarded): the side quest is put on top of the deck for that reveal. The picks use the game's seed; nothing happens when either kind is not set aside. */
 export function stageRandomGuardedPair(state: ScenarioState, focus: Focus, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const { sideQuests, locations } = setAsidePools(state, ctx);
   if (sideQuests.length === 0 || locations.length === 0) return state;
@@ -33,9 +34,9 @@ export function stageRandomGuardedPair(state: ScenarioState, focus: Focus, ctx: 
   const quest = quests.ids[0];
   const place = places.ids[0];
   if (!quest || !place) return state;
-  const seeded: ScenarioState = { ...state, seedCursor: places.cursor };
-  const staged = moveEncounter(moveEncounter(seeded, place, "staging", focus.seat, ctx, steps), quest, "staging", focus.seat, ctx, steps);
-  return guardWith(updateCard(updateCard(staged, place, { face: "up" }), quest, { face: "up" }), quest, place);
+  const moved = moveCard({ ...state, seedCursor: places.cursor }, quest, { zone: "encounterDeck" });
+  const stacked = updateCard({ ...moved, encounterDeck: [quest, ...moved.encounterDeck.filter((id) => id !== quest)] }, quest, { face: "down" });
+  return startReveal(stacked, focus.seat, ctx, steps, place);
 }
 
 /** RevealCard: the card (the last picked one by default) is revealed by the actor as an encounter card, wherever it lies. Nothing happens when no card is picked. */
