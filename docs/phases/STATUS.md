@@ -107,8 +107,8 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 | 81 | Deadmen's Dike | completed | 2026-11-12. Review round done. Open: `dike-won`. |
 | 82 | The Wastes of Eriador | completed | 2026-11-12. Review round done. Open: `eriador-won`. |
 | 83 | Escape from Mount Gram | completed | 2026-11-13. Review round done. Open: `gram-won`. |
-| 84 | Across the Ettenmoors | active | 2026-11-13. `docs/plans/angmar-awakened.md`. |
-| 85 | The Treachery of Rhudaur | not started |  |
+| 84 | Across the Ettenmoors | completed | 2026-11-13. Review round done. Open: `ettenmoors-won`. |
+| 85 | The Treachery of Rhudaur | active | 2026-11-13. `docs/plans/angmar-awakened.md`. |
 | 86 | The Battle of Carn Dûm | not started |  |
 | 87 | The Dread Realm | not started |  |
 
@@ -120,6 +120,7 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - The release notes' golden-check comparison (`scripts/release/reach.ts`) has not run against a real previous tag; the first tag after it compares by `ENGINE_CHANGES` only.
 
 ### Fixtures and Maestro
+- `ettenmoors-won` is not committed: no seed in 100 wins Across the Ettenmoors with the saved decklists. Until it exists `.maestro/scenarios/across-the-ettenmoors/across-the-ettenmoors.yaml` cannot run.
 - `gram-won` is not committed: no seed in 100 wins Escape from Mount Gram with the saved decklists. Until it exists `.maestro/scenarios/escape-from-mount-gram/escape-from-mount-gram.yaml` cannot run.
 - `eriador-won` is not committed: no seed in 700 wins The Wastes of Eriador with the saved decklists. Until it exists `.maestro/scenarios/the-wastes-of-eriador/the-wastes-of-eriador.yaml` cannot run.
 - `dike-won` is not committed: no seed in 600 wins Deadmen's Dike with the saved decklists (their heroes cannot put 9 damage on Thaurdir). Until it exists `.maestro/scenarios/deadmens-dike/deadmens-dike.yaml` cannot run; its Resolution step is unverified against the `to: player` view.
@@ -248,7 +249,18 @@ Status is `not started`, `active`, or `completed`. This file keeps only what is 
 - Escape from Mount Gram: Berelind (10176:A:1) places progress on a quest card in play the player chooses in their area. Not user-confirmed.
 - Escape from Mount Gram: stage 2B's progress rescues one captured card per point (10039:B:1; community source only). Not user-confirmed.
 - Renderer gaps, Escape from Mount Gram (behaviour proven by tests): the `captured` family's verbs, conditions, amount and pick filter, `SwitchActor`, `ShuffleSetAsideSet`, `RaiseThreatTo`, `StartSeparateStage reveal` and `ProgressQuest` print as JSON; 10049:A:2 reads "every enemy in play" without the area limit; which area's first player acts (10044:A:2, 10046:A:2, 10051:A:1).
-- Angmar Awakened campaign-card lines left to their scenarios' Build: 10182:A:2, A:3 and B:1 (Across the Ettenmoors), 10184:B:1 (The Treachery of Rhudaur). Each of those Resolutions also runs `RecordDetermined` (code 10172), as 10171:B:1, 10174:B:3 and 10188:B:1 do, or a Determination attached there is never marked. The boons' own lines (10185 to 10187, 10189 to 10192) go with the scenario that first deals each.
+- Across the Ettenmoors: with no side quest left in the deck, 10064:B:1, 10065:A:1 and 10066:A:1 discard the deck to empty and reveal nothing (agent recommendation; the order against the current-quest choice rests on one forum answer). Not user-confirmed.
+- Across the Ettenmoors: an active safe location blanks encounter side quests (community sources) and leaves a treachery's Surge in place (agent recommendation). Not user-confirmed.
+- Across the Ettenmoors: Cruel Mountain-troll's (10074) excess is damage beyond remaining hit points, from combat only (community source). Not user-confirmed.
+- Across the Ettenmoors: Troll-fells' (10077:A:2) search for a safe location (community source). Not user-confirmed.
+- Across the Ettenmoors: Barren Moorland (10078:A:1): its trigger and stacking (community source); the ally's controller chooses (agent recommendation). Not user-confirmed.
+- Across the Ettenmoors: Arador's Bane (10079): either option may be chosen when both can act (community source). Not user-confirmed.
+- Across the Ettenmoors: No Rest (10080): one per hero, the first player choosing among the hosts (agent recommendation). Not user-confirmed.
+- Across the Ettenmoors: Scavenge for Supplies (10083): the first player breaks highest-threat ties and the free play skips the +1 cost (agent recommendation). Not user-confirmed.
+- Across the Ettenmoors: Losing Time's shadow (10183:A:3): the defending player chooses +3 Attack or +3 Defense (agent recommendation; a play-through agrees). Not user-confirmed.
+- Across the Ettenmoors: the Losing Time clock (10182:A:3) fully reveals a copy (community play-throughs), and with no copy left the resources stay (agent recommendation). Not user-confirmed.
+- Renderer gaps, Across the Ettenmoors (behaviour proven by tests): the travel Forced and Responses of the four safe locations name no destination (10068 to 10071); `excessToEachQuest`, `damagedCannotFace` and `progressPlacedHere` show as flags (10074, 10076, 10081); the safe-location choice's zones (10075:A:2); who chooses for Barren Moorland (10078:A:1); "1 copy per player" in 10064:A:1's pile header.
+- Angmar Awakened campaign-card lines left to their scenarios' Build: 10184:B:1 (The Treachery of Rhudaur), whose Resolution also runs `RecordDetermined` (code 10172), as 10171:B:1, 10174:B:3, 10182:B:1 and 10188:B:1 do, or a Determination attached there is never marked. The boons' own lines (10185 to 10187, 10189 to 10192) go with the scenario that first deals each.
 - Intruders in Chetwood: quest cards in play are the main quest, the staged encounter side quests and the player side quests, at least 1 (09016, 09019, 09047, 09048, 09050). Not user-confirmed.
 - Intruders in Chetwood: Iârion's Response (09016:A:3) hears a side quest revealed by a search of the encounter deck, not of the discard pile. Not user-confirmed.
 - Intruders in Chetwood: Iârion held facedown under Rescue Iârion (09024:A:2) stays in play and has not left it. Not user-confirmed.
