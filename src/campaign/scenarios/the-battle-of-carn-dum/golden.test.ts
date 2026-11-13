@@ -61,7 +61,7 @@ describe("The Battle of Carn Dûm golden", () => {
         expect(lost.some((golden) => golden.decks === "brittle")).toBe(true);
       });
 
-      it("10126:B:1 stage 2B's attacks reach each seat: the two-handed win has Thaurdir attack both players in a round", () => {
+      it("10126:B:1 stage 2B's attacks reach each seat: the two-handed win has Thaurdir attack each of the two players during the game", () => {
         const won = DUM_GOLDENS.find((golden) => golden.seatCount === 2 && golden.outcome === "won")!;
         const attackers = game(won).steps.filter((step) => step.kind === "attack" && step.side === "enemy");
         const seats = new Set(attackers.filter((step) => step.kind === "attack" && ["10127", "10128"].includes(game(won).state.cards[step.enemyId]?.code ?? "")).map((step) => (step.kind === "attack" ? step.seat : -1)));

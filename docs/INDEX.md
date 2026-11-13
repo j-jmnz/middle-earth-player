@@ -77,7 +77,7 @@ Read the sections your task touches.
   - 378–383 Catalog build (~410)
   - 384–401 Tests (~2.0K) ← 5
   - 402–417 Performance (~1.2K) ← 4
-- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~194.6K tok)
+- `docs/brief.md` — Middle Earth LCG — decisions and implementer brief (~194.7K tok)
   - 17–40 Sections (~490)
   - 41–52 Product (~590) ← 2
   - 53–66 Non-goals (~540)
@@ -125,7 +125,7 @@ Read the sections your task touches.
     - 1103–1146 Escape from Mount Gram (~5.3K)
     - 1147–1183 Across the Ettenmoors (~5.0K)
     - 1184–1222 The Treachery of Rhudaur (~4.3K)
-    - 1223–1258 The Battle of Carn Dûm (~4.6K)
+    - 1223–1258 The Battle of Carn Dûm (~4.7K)
   - 1259–1396 The Two Towers (~16.4K) ← 20
   - 1397–1632 The Return of the King (~28.2K) ← 22
     - 1425–1450 The Passing of the Grey Company (~2.7K)
@@ -146,7 +146,7 @@ Read the sections your task touches.
   - 1800–1825 Persistence and shipping (~2.6K) ← 6
   - 1826–1867 Screens (~4.9K) ← 1
     - 1852–1867 Table screen (~1.8K) ← 3
-- `docs/design-system-table.md` — Design system — Table (landscape) (~55.8K tok)
+- `docs/design-system-table.md` — Design system — Table (landscape) (~56.0K tok)
   - 5–8 Overview (~130) ← 1
   - 9–23 Top bar (~3.1K) ← 4
   - 24–27 Table menu (~490) ← 2
@@ -154,7 +154,7 @@ Read the sections your task touches.
   - 36–39 Canvas (~560)
   - 40–52 Spacing and the play area's rows (~1.9K) ← 9
   - 53–58 Pictures on the table (~320) ← 1
-  - 59–105 Cards (~19.2K) ← 27
+  - 59–105 Cards (~19.5K) ← 27
   - 106–111 The Sailing test (~690) ← 5
   - 112–125 The Island Map (~1.8K) ← 8
   - 126–129 Tokens and effects (~320)

@@ -8,15 +8,22 @@ import { copyLine, withCopies } from "../reprint.ts";
 // 10127 is his Captain side and 10128 his Champion side: two cards, one flipped over the other (`FlipInPlace`, `FlipTwoSided`), so his damage, shadow cards and attachments, Thaurdir's burdens included, stay on him across a flip. The campaign card's records are in angmar-awakened.ts; the vocabulary the box added is in src/catalog/families/angmar.ts.
 // Rules: mec108.thaurdir, mec108.battle, mec108.indestructible, mec108.side-quests, mec108.side-quests-in-play, rr.shadow-effects, rr.step-6-2, rr.engaged, rr.forced, rr.travel, rr.cost, rr.active-location, rr.current-quest, rr.destroy, rr.search, rr.printed, rr.removed-from-game,
 // faq.enemy-attacks-outside-combat, faq.additional-attacks, faq.progress-without-advancing (data/rules/entries.json).
-const CAPTAIN = "10127";
-const CHAMPION = "10128";
+/** The codes the table's readouts read: the two quest stages, Thaurdir's two sides, the Garrison and Furious Charge. */
+export const CLUTCHES = "10125";
+export const CRUX = "10126";
+export const CAPTAIN = "10127";
+export const CHAMPION = "10128";
+export const GARRISON = "10129";
+export const FURIOUS_CHARGE = "10139";
 /** The shadow cards dealt to Thaurdir that flip him on stage 1B (10125:B:3), the progress on stage 2B that takes his Indestructible away (10126:B:2) and the progress Furious Charge adds to the main quest (10139:A:3): the table's readouts read them here. */
 export const THAURDIR_FLIP_SHADOWS = 3;
 export const CRUX_PROGRESS = 15;
 export const FURIOUS_CHARGE_PROGRESS = 10;
+/** The Defense each character loses when progress is placed on Furious Charge (10139:A:2) and the damage the Champion side heals when Thaurdir flips to it (10128:A:4). */
+export const FURIOUS_CHARGE_DEFENSE = 2;
+export const THAURDIR_HEAL = 3;
 // "Thaurdir": the enemy with that title, on either side, in the staging area or engaged.
 const THAURDIR_ENEMY: PickSpec = { type: "enemy", control: "any", staging: true, names: ["Thaurdir"] };
-const THAURDIR_HOLDERS = THAURDIR_ENEMY;
 const CAPTAIN_UP: Condition = { kind: "inPlay", code: CAPTAIN, is: true };
 const CHAMPION_UP: Condition = { kind: "inPlay", code: CHAMPION, is: true };
 const THAURDIR_IN_PLAY: Condition = { kind: "any", conditions: [CAPTAIN_UP, CHAMPION_UP] };
@@ -55,9 +62,9 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       lines: ["10125:B:1"],
       timing: "constant",
       instructions: [
-        { verb: "ModifyStat", stat: "cannotLeaveStaging", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_HOLDERS },
-        { verb: "ModifyStat", stat: "cannotBeEngaged", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_HOLDERS },
-        { verb: "ModifyStat", stat: "cannotTakeDamage", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_HOLDERS },
+        { verb: "ModifyStat", stat: "cannotLeaveStaging", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_ENEMY },
+        { verb: "ModifyStat", stat: "cannotBeEngaged", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_ENEMY },
+        { verb: "ModifyStat", stat: "cannotTakeDamage", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_ENEMY },
       ],
     },
     { id: "10125:forced:1", cardCode: "10125", lines: ["10125:B:1"], timing: "forced", trigger: "endOfRound", instructions: [FLIP_TO_CAPTAIN] },
@@ -76,29 +83,29 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       lines: ["10126:B:1"],
       timing: "constant",
       instructions: [
-        { verb: "ModifyStat", stat: "cannotLeaveStaging", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_HOLDERS },
-        { verb: "ModifyStat", stat: "leavesStagingWhenDefeated", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_HOLDERS },
-        { verb: "ModifyStat", stat: "engagedWithAll", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_HOLDERS },
-        { verb: "ModifyStat", stat: "resolvesHeldShadows", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_HOLDERS },
-        { verb: "ModifyStat", stat: "cannotBeEngaged", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_HOLDERS },
-        { verb: "ModifyStat", stat: "attackableByAny", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_HOLDERS },
+        { verb: "ModifyStat", stat: "cannotLeaveStaging", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_ENEMY },
+        { verb: "ModifyStat", stat: "leavesStagingWhenDefeated", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_ENEMY },
+        { verb: "ModifyStat", stat: "engagedWithAll", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_ENEMY },
+        { verb: "ModifyStat", stat: "resolvesHeldShadows", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_ENEMY },
+        { verb: "ModifyStat", stat: "cannotBeEngaged", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_ENEMY },
+        { verb: "ModifyStat", stat: "attackableByAny", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_ENEMY },
       ],
     },
     { id: "10126:forced:1", cardCode: "10126", lines: ["10126:B:1"], timing: "forced", trigger: "endOfRound", instructions: [FLIP_TO_CHAMPION] },
     // With 15 or more progress on this stage Thaurdir loses indestructible; the stage cannot be defeated while he is in play.
-    { id: "10126:constant:2", cardCode: "10126", lines: ["10126:B:2"], timing: "constant", condition: { kind: "stageProgress", min: CRUX_PROGRESS }, instructions: [{ verb: "ModifyStat", stat: "losesKeywords", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_HOLDERS }] },
+    { id: "10126:constant:2", cardCode: "10126", lines: ["10126:B:2"], timing: "constant", condition: { kind: "stageProgress", min: CRUX_PROGRESS }, instructions: [{ verb: "ModifyStat", stat: "losesKeywords", amount: 1, until: "whileSourceInPlay", holders: THAURDIR_ENEMY }] },
     { id: "10126:constant:3", cardCode: "10126", lines: ["10126:B:2"], timing: "constant", condition: THAURDIR_IN_PLAY, instructions: [{ verb: "Restrict", what: "advance" }] },
     // If Thaurdir is defeated, the players win the game.
     { id: "10126:triggered:1", cardCode: "10126", lines: ["10126:B:3"], timing: "triggered", trigger: "enemyDestroyed", subject: THAURDIR_ENEMY, instructions: [{ verb: "WinGame" }] },
 
     // 10127 Thaurdir, Captain (Indestructible and Cannot have attachments: the build). Each other enemy gets +10 engagement cost. Forced: after he is flipped or a Sorcery treachery is revealed from the encounter deck, 1 shadow card is dealt to each enemy in play.
-    { id: "10127:constant:2", cardCode: CAPTAIN, lines: ["10127:A:3"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "engagementCost", amount: 10, until: "whileSourceInPlay", holders: { type: "enemy", control: "any", staging: true, notTraits: ["Wraith"] } }] },
+    { id: "10127:constant:2", cardCode: CAPTAIN, lines: ["10127:A:3"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "engagementCost", amount: 10, until: "whileSourceInPlay", holders: { type: "enemy", control: "any", staging: true, other: true } }] },
     { id: "10127:forced:1", cardCode: CAPTAIN, lines: ["10127:A:4"], timing: "forced", trigger: "flippedOver", subject: "self", instructions: [{ verb: "DealShadowInPlay" }] },
     { id: "10127:forced:2", cardCode: CAPTAIN, lines: ["10127:A:4"], timing: "forced", trigger: "revealed", notFromDiscard: true, subject: SORCERY_TREACHERY, instructions: [{ verb: "DealShadowInPlay" }] },
 
     // 10128 Thaurdir, Champion. Each other enemy gets -10 engagement cost. Forced: after he is flipped or a Sorcery treachery is revealed, he heals 3 damage and makes an immediate attack against the first player, from where he is (a shadow card is dealt; 09033:A:3).
-    { id: "10128:constant:2", cardCode: CHAMPION, lines: ["10128:A:3"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "engagementCost", amount: -10, until: "whileSourceInPlay", holders: { type: "enemy", control: "any", staging: true, notTraits: ["Wraith"] } }] },
-    { id: "10128:forced:1", cardCode: CHAMPION, lines: ["10128:A:4"], timing: "forced", trigger: "flippedOver", subject: "self", instructions: [{ verb: "Heal", amount: 3, target: "self" }, { verb: "AttackFromStaging", target: "self", who: "firstPlayer", orEngaged: true }] },
+    { id: "10128:constant:2", cardCode: CHAMPION, lines: ["10128:A:3"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "engagementCost", amount: -10, until: "whileSourceInPlay", holders: { type: "enemy", control: "any", staging: true, other: true } }] },
+    { id: "10128:forced:1", cardCode: CHAMPION, lines: ["10128:A:4"], timing: "forced", trigger: "flippedOver", subject: "self", instructions: [{ verb: "Heal", amount: THAURDIR_HEAL, target: "self" }, { verb: "AttackFromStaging", target: "self", who: "firstPlayer", orEngaged: true }] },
     {
       id: "10128:forced:2",
       cardCode: CHAMPION,
@@ -107,7 +114,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       trigger: "revealed",
       notFromDiscard: true,
       subject: SORCERY_TREACHERY,
-      instructions: [{ verb: "Heal", amount: 3, target: "self" }, { verb: "AttackFromStaging", target: "self", who: "firstPlayer", orEngaged: true }],
+      instructions: [{ verb: "Heal", amount: THAURDIR_HEAL, target: "self" }, { verb: "AttackFromStaging", target: "self", who: "firstPlayer", orEngaged: true }],
     },
 
     // 10129 Carn Dûm Garrison. +1 Threat for each shadow card dealt to it. Shadow: the attacking enemy gets +1 Attack for each shadow card dealt to it (this card included).
@@ -204,7 +211,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       lines: ["10139:A:2"],
       timing: "forced",
       trigger: "progressPlaced",
-      instructions: [{ verb: "ModifyStat", stat: "defense", amount: -2, until: "endOfRound", holders: { type: "character", control: "any" } }, FLIP_TO_CHAMPION],
+      instructions: [{ verb: "ModifyStat", stat: "defense", amount: -FURIOUS_CHARGE_DEFENSE, until: "endOfRound", holders: { type: "character", control: "any" } }, FLIP_TO_CHAMPION],
     },
     { id: "10139:response:1", cardCode: "10139", lines: ["10139:A:3"], timing: "response", trigger: "questDefeated", subject: "self", instructions: [{ verb: "QuestProgress", amount: FURIOUS_CHARGE_PROGRESS, main: true }] },
 
