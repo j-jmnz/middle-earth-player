@@ -20,7 +20,8 @@ type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name 
 /** The settle sweep: the main quest card holds `advanceNow` (its constant "if there are no Treachery of Rhudaur side quests in play, immediately advance", 10094:B:4) once nothing is resolving, so the quest advances and the next stage's When Revealed effects resolve. */
 export function advanceWhenFlagged(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const stage = state.questStage;
-  if (state.modifiers.length === 0 || state.lost || state.stageCleared || state.stack.length > 0 || state.pendingAttack || state.pendingStrike || !stage || !flagged(state, stage, "advanceNow")) return state;
+  // Not during the Setup (round 0): the cards that hold it back are not in play yet.
+  if (state.round < 1 || state.modifiers.length === 0 || state.lost || state.stageCleared || state.stack.length > 0 || state.pendingAttack || state.pendingStrike || !stage || !flagged(state, stage, "advanceNow")) return state;
   const before = steps.length;
   const advanced = advanceStage(state, ctx.cards, steps, (current) => !restricted(current, ctx, "advance").length);
   return afterProgress(advanced, before, ctx, steps);

@@ -22,7 +22,7 @@ export const rhudaurLoadout = fillerLoadout;
 export const rhudaurWorld = (decks: RhudaurDecks = "strong") => game.world(decks);
 export const afterEttenmoors = (seatCount: 1 | 2) => game.after(seatCount);
 export const rhudaurPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount)) => game.plan(seatCount, log);
-export const rhudaurStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard) => game.start(seatCount, seed, difficulty, { facts, log, modeCard });
+export const rhudaurStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, extra: { choices?: readonly string[]; standalone?: boolean } = {}) => game.start(seatCount, seed, difficulty, { facts, log, modeCard, ...extra });
 
 export type RhudaurPolicy = {
   // The option a Choose window with these answers takes: the first or the last.
@@ -50,14 +50,14 @@ const game = campaignGame<RhudaurDecks, RhudaurPolicy>({
   campaign,
   scenario: rhudaur,
   stats: HERO_STATS,
-  // TODO: the cards a game loads besides the scenario's piles, its campaign card's and the campaign's game codes.
-  codes: [...rhudaur.cards.map((card) => card.code)],
+  // The scenario's cards; the campaign card's, the cards it places (the boons, Determination, Fend Off Despair, the Clue boons) and the campaign's game codes are added by the kit. The pool holds what Across the Ettenmoors leaves: Mysterious Omens, Arnor Ravaged, Amarthiúl's Courage, a Thaurdir burden, Fend Off Despair and Losing Time.
+  codes: [...rhudaur.cards.map((card) => card.code), "10160", "100158", "10157", "10167", "10168", "10169", "10170", "10172", "10173", "10183"],
   intent: rhudaurIntent,
   policy: DEFAULT_POLICY,
   limit: 6000,
   upgraded: [],
-  // TODO: the XP each earlier part gained (in campaign order), the cards they put in the pool and the marks on the cards, as a campaign that won them leaves the log.
-  earlier: { xp: [0, 0, 0, 0, 0, 0], pool: [], marks: {} },
+  // The six earlier parts were won: no XP in this campaign; in the pool Mysterious Omens, Arnor Ravaged, Amarthiúl's Courage, Thaurdir's Legacy, Fend off Despair and Losing Time.
+  earlier: { xp: [0, 0, 0, 0, 0, 0], pool: [{ code: "10160" }, { code: "100158" }, { code: "10167" }, { code: "10168" }, { code: "10173" }, { code: "10183" }], marks: {} },
 });
 
 export const playGolden = (golden: RhudaurGolden, ctx: ReduceContext): RhudaurGame => game.playGolden(golden, ctx);

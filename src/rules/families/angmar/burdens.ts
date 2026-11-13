@@ -95,12 +95,15 @@ export function attachSelfToNamed(state: ScenarioState, instruction: Verb<"Attac
   if (host) return attachBurden(rest, id, host.id);
   // The quest card of the first stage while the pool cards are set up (the deal has not turned it up yet).
   const stageCode = state.questStage ? state.cards[state.questStage]?.code : state.stages[0]?.code;
-  const coming = stageCode != null && effectsOf(ctx, stageCode).some((record) => record.timing === "setup" && record.instructions.some((step) => step.verb === "PutSetAsideInPlay" && step.name === instruction.name));
+  const comingInPlay = stageCode != null && effectsOf(ctx, stageCode).some((record) => record.timing === "setup" && record.instructions.some((step) => step.verb === "PutSetAsideInPlay" && step.name === instruction.name));
+  // The scenario's own Setup sets the card aside (Thaurdir, 10098: the data's set-aside pile, run after the deal): `outOfPlay` finds it there once that Setup is done.
+  const comingAside = instruction.outOfPlay === true && state.setup.some((step) => step.verb === "SetAside" && printedOf(ctx.cards, step.code).name === instruction.name);
+  const coming = comingInPlay || comingAside;
   if (coming && !waiting) return { ...state, pendingAttach: [...(state.pendingAttach ?? []), id] };
   return moveCard(rest, id, { zone: "removed" });
 }
 
-/** The pool cards that waited for a host the quest card's Setup puts into play (`pendingAttach`): their Setup lines go down in frames of their own, which resolve once that Setup has (finishSetup). */
+/** The pool cards that waited for a host the quest card's Setup puts into play, or the scenario's Setup sets aside for `outOfPlay` (`pendingAttach`): their Setup lines go down in frames of their own, which resolve once that Setup has (finishSetup). */
 export function attachPending(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let next = state;
   for (const id of [...(state.pendingAttach ?? [])].reverse()) {
