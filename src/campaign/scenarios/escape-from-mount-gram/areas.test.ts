@@ -65,6 +65,14 @@ describe("Separate staging areas", () => {
   };
   const firstOption = (current: ScenarioState) => (current.window?.kind === "choose" ? (current.window.options[0] ?? "") : "");
 
+  it("10047:A:1 a player the Travel cost eliminates (threat 48, 3 more) leaves the game and the travel effect ends: the intent is accepted, not refused", () => {
+    const room = spawn(joined(two()), "10047", { zone: "staging", area: 1 }, "up");
+    const seats = room.state.seats.map((seat, index) => (index === 1 ? { ...seat, threat: 48 } : seat)) as unknown as ScenarioState["seats"];
+    const state: ScenarioState = { ...room.state, seats, phase: "Travel", activeSeat: 1, window: { kind: "travel" } as ScenarioState["window"] };
+    const result = expectOk(reduce(state, { type: "Travel", locationId: room.id }, ctx));
+    expect(result.state.seats[1]?.eliminated).toBe(true);
+  });
+
   it("10051:A:1 captures only the ally of the player who has one, whichever player it is, and nothing of the earlier player's picks", () => {
     // Only the first player has an ally: the second player, with none, picks nothing and captures nothing.
     const mine = spawn(joined(two()), "10176", { zone: "play", seat: 0 }, "up");

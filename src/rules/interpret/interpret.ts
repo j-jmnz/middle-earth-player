@@ -123,7 +123,8 @@ function runTwinned(state: ScenarioState, instruction: Instruction, focus: Focus
       const locationId = instruction.to === "self" ? focus.sourceId : stagingLocations(state, ctx.cards, focus.seat)[0];
       if (!locationId) return state;
       const traveled = travelNow(state, locationId, ctx, steps);
-      return traveled ?? { ...state, failure: "Travel was refused" };
+      // A player the cost of the travel eliminated (a threat raise to 50) travels nowhere: the effect ends, the game goes on (rr.player-elimination).
+      return traveled ?? (state.seats[focus.seat]?.eliminated ? state : { ...state, failure: "Travel was refused" });
     }
     case "Engage": {
       const enemyId = instruction.target ? refCard(state, instruction.target, frameScope(state, focus.seat, focus.sourceId)) : stagingEnemies(state, ctx.cards, focus.seat)[0];

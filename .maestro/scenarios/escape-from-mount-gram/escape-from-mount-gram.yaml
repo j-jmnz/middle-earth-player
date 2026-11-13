@@ -2,16 +2,28 @@ appId: com.middleearth.lcg
 tags:
   - scenario
 ---
-# TODO: the phase, and "Written in a cloud session: it has not run." Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `gram-won` (scripts/e2e/angmar-awakened/escape-from-mount-gram.ts): a real two-handed
-# game of Escape from Mount Gram, parked on its win. The fixture is OPEN until scripts/e2e/fixtures.ts finds a game of that kind in its seeds (docs/phases/STATUS.md).
-# The steps are the shared subflow's (.maestro/subflows/scenario-win.yaml); add this scenario's own assertions after the call.
+# Written in a cloud session: it has not run. Needs the e2e-test build (EXPO_PUBLIC_E2E_SEED=1, eas.json) and the fixture `gram-won` (scripts/e2e/angmar-awakened/escape-from-mount-gram.ts): a real two-handed game of Escape from Mount Gram (the Defenders of Gondor
+# and Swords of the Noldor lists, Easy), played after The Wastes of Eriador's win and parked on its win (stage 3B defeated once Southern Gate is explored). The fixture is OPEN until scripts/e2e/fixtures.ts finds a win of those lists in its seeds with the saved decklists' policy
+# (docs/phases/STATUS.md), so this flow cannot run until a seed wins. The Campaign Setup asked nothing (Loot the Dungeons joined the staging area holding the bottom 5 cards of each captured deck); the Resolution (10174:B:3) asks nothing: confirming writes the unique cards
+# still in each captured deck to the log as stolen and marks the characters that carry a Determination determined. The campaign has no XP.
+# The steps are the shared subflow's (.maestro/subflows/scenario-win.yaml); the captured deck is the scenario's own widget, read while the victory is on the table.
 - runFlow:
     file: ../../subflows/scenario-win.yaml
     env:
       FIXTURE: gram-won
       SCENARIO_ID: escape-from-mount-gram
-      # A Resolution that asks one choice: the code of the card it offers, the choice's eyebrow text and the sentence the confirm line shows.
-      # CHOICE_ID: "TODO"
-      # CHOICE_PROMPT: "TODO"
-      # CHOICE_CONSEQUENCE: "TODO"
-# TODO: this scenario's own assertions on the path screen after the win (the next part's node, a carried card).
+      NO_XP: "1"
+      TABLE_WIDGET: angmar-captured
+# The win left what The Wastes of Eriador left in the pool: Fend Off Despair and the Determinations, with Arnor Ravaged.
+- assertVisible:
+    id: pool
+    text: ".*Fend Off Despair.*"
+- assertVisible:
+    id: pool
+    text: ".*Determination.*"
+- assertVisible:
+    id: pool
+    text: ".*Arnor Ravaged.*"
+# The win unlocks Across the Ettenmoors, which the app cannot deal yet: the path says it is coming soon (scripts/checks/maestro.test.ts, path-soon).
+- assertVisible:
+    id: path-soon

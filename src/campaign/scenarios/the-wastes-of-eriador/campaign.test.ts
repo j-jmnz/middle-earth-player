@@ -52,11 +52,11 @@ describe("The Wastes of Eriador in the angmar-awakened campaign", () => {
     expect(eriador.campaignCard).toBe("10171");
   });
 
-  it("is playable, the road offers it after Deadmen's Dike's win, and the part after it (Escape from Mount Gram) waits behind it as coming soon", () => {
+  it("is playable, the road offers it after Deadmen's Dike's win, and the part after it (Escape from Mount Gram) waits behind it as locked", () => {
     expect(PLAYABLE_SCENARIOS).toContain("the-wastes-of-eriador");
-    expect(PLAYABLE_SCENARIOS).not.toContain(campaign.scenarios[4]);
+    expect(PLAYABLE_SCENARIOS).toContain(campaign.scenarios[4]);
     const path = campaignPath(campaign, {}, dikeLog(1));
-    expect(path.map((node) => [node.id, node.status]).slice(2, 5)).toEqual([["deadmens-dike", "completed"], ["the-wastes-of-eriador", "current"], ["escape-from-mount-gram", "soon"]]);
+    expect(path.map((node) => [node.id, node.status]).slice(2, 5)).toEqual([["deadmens-dike", "completed"], ["the-wastes-of-eriador", "current"], ["escape-from-mount-gram", "locked"]]);
   });
 
   it("10171:A:2 deals the Campaign Setup: a Determination in each hand and in the pool, Fend Off Despair shuffled into the encounter deck, no +1 threat for changing heroes", () => {
@@ -103,7 +103,7 @@ describe("The Wastes of Eriador in the angmar-awakened campaign", () => {
   });
 
   // The Resolution (10171:B:1 and 10173:A:2) on the won goldens' final states (goldenState, not a game played again), over the log Deadmen's Dike left.
-  it("10171:B:1 earns Fend Off Despair, leaves Arnor Ravaged in the pool, and leaves Escape from Mount Gram, coming soon, the part after", () => {
+  it("10171:B:1 earns Fend Off Despair, leaves Arnor Ravaged in the pool, and unlocks Escape from Mount Gram, the part after", () => {
     const before = eriadorPlan(1, dikeLog(1)).log;
     const state = goldenState("the-wastes-of-eriador", "true solo, won, Normal");
     expect(state.stageCleared).toBe(true);
@@ -116,8 +116,7 @@ describe("The Wastes of Eriador in the angmar-awakened campaign", () => {
     expect(log.threatPenalty).toBe(0);
     expect(log.completed).toEqual(["intruders-in-chetwood", "the-weather-hills", "deadmens-dike", "the-wastes-of-eriador"]);
     const path = campaignPath(campaign, {}, log);
-    expect(path.map((node) => [node.id, node.status]).slice(3, 5)).toEqual([["the-wastes-of-eriador", "completed"], ["escape-from-mount-gram", "soon"]]);
-    expect(PLAYABLE_SCENARIOS).not.toContain("escape-from-mount-gram");
+    expect(path.map((node) => [node.id, node.status]).slice(3, 5)).toEqual([["the-wastes-of-eriador", "completed"], ["escape-from-mount-gram", "current"]]);
   });
 
   it("10173:A:2 records Fend Off Despair's -2 on a win, shows it as -2 in the log, and the next start takes 2 off each hero's threat (not below 0)", () => {
