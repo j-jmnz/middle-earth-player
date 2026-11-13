@@ -565,7 +565,7 @@ Scenario piles that place cards with no record (staging: 11022 Scouting Ship; st
 11060:A:1 (front): While Southron Sailor is engaged with you, each Ship enemy engaged with you contributes its Threat to the total Threat in the staging area.
   11060:constant:1: Constant
     only if this card is engaged with the player
-    - each Ship enemy (any player controls) engaged with you: stat engagedThreat 1, while this card is in play
+    - each Ship enemy (any player controls) engaged with you: stat engagedThreat (while engaged it still adds its Threat to the total Threat in the staging area) 1, while this card is in play
 
 ## 11061 Cunning Pirate
 (the scenario deals it into the corsairDeck pile; the piles place it, no record does)

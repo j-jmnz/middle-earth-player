@@ -256,7 +256,7 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
     only if the card this one is attached to is controlled by the acting player
     (steps run in order; a step depends on an earlier one only through its own condition)
     - exhaust its host
-    - [json DiscardEach {"verb":"DiscardEach","pick":{"type":"card","control":"any","attachedTo":"host","nonObjective":true}}]
+    - the acting player discards each card (any player controls) that is not an objective [also {"attachedTo":"host"}]
 
 ## 146075 The Land of Mordor
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -354,4 +354,4 @@ Scenario piles that place cards with no record (staging: 146044 Orc-hold; stagin
     - then, if the last Fortitude test the running effect made was failed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the players lose the game (The Ring-bearer claimed The One Ring)
     - then, if the last Fortitude test the running effect made was passed (false before it has made one) (checked when this step runs, after the steps above; not tied to whether they did anything): the players win the game
 
-(rendered pieces: 229 by template, 12 as JSON)
+(rendered pieces: 230 by template, 12 as JSON)

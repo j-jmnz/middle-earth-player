@@ -379,9 +379,9 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11079:A:2 (front): Action: While Na'asiyah is attacking or defending, spend 1 resource from her to give her +2 Attack or +2 Defense for this attack.
   11079:action:2: Action (cost: pay 1 resource(s) from this card's pool)
-    only if any of: ([json condition {"kind":"attacking","card":"self"}]) or (this card is a character (any player controls) defending)
+    only if any of: (this card is attacking) or (this card is a character (any player controls) defending)
     - the acting player chooses one of:
-      * option "attack" (only if [json condition {"kind":"attacking","card":"self"}]):
+      * option "attack" (only if this card is attacking):
         - this card: stat attack 2, until the end of the attack
       * option "defense" (only if this card is a character (any player controls) defending):
         - this card: stat defense 2, until the end of the attack
@@ -412,7 +412,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     - a card with code 11188 from the box joins the encounter deck, which is shuffled
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11180","to":"Calphon"}]
     - [json AttachSetAsideTo {"verb":"AttachSetAsideTo","code":"11183","to":"Calphon"}]
-    - [json ChooseCards {"verb":"ChooseCards","codes":["11184","11185","11186","11187"],"who":"eachSeat","to":"hand","optional":true,"unearned":true,"afterMulligan":true}]
+    - each player in turn may take "11184" or "11185" or "11186" or "11187" into their hand [also {"unearned":true,"afterMulligan":true}]
 
 11182:A:3 (front): Forced: After stage 2B is revealed, remove Calphon and each attachment on him from the game, ignoring his "leaves play" ability.
   11182:forced:1: Forced on the event afterStageRevealed
@@ -421,7 +421,7 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
 
 11182:B:1 (back): Resolution: If Graxar is in the victory display, choose either Parrying Cutlass or Throwing Axe, add it to the Campaign Pool, and record which hero you attach it to.
   11182:resolution:1: Resolution
-    - [json ChooseCards {"verb":"ChooseCards","codes":["11189","11190"],"who":"firstPlayer","to":"hero","anyHero":true,"when":{"kind":"inVictory","code":"11188","is":true}}]
+    - if [json condition {"kind":"inVictory","code":"11188","is":true}]: the first player takes "11189" or "11190" attached to a hero [also {"anyHero":true}]
 
 11182:B:2 (back): Add the copies of Galdor's Counsel chosen during setup to the Campaign Pool.
   11182:resolution:2: Resolution
@@ -481,4 +481,4 @@ Scenario piles that place cards with no record (staging: 11041 Sahír's Ravager;
     only if all of: (this card is engaged with the player) and (this card is a enemy (any player controls) with a shadow card)
     - place shadowCards of this card resource tokens on this card
 
-(rendered pieces: 278 by template, 55 as JSON)
+(rendered pieces: 280 by template, 54 as JSON)

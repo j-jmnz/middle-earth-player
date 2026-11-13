@@ -227,7 +227,7 @@ Scenario piles that place cards with no record (staging: 09017 Orc War Party; qu
 09048:A:2 (front): While there is only 1 quest card in play, Shrouded Hills gains surge.
   09048:constant:2: Constant
     only if the number of quest cards in play (the main quest card, each encounter side quest in the staging area and each player side quest; at least 1) is less than 2
-    - this card: stat gainsSurge 1, while this card is in play
+    - this card: stat gainsSurge (it has the Surge keyword as it is revealed) 1, while this card is in play
 
 ## 09049 Pressing Needs
 (the scenario deals it into the encounter pile; the piles place it, no record does)

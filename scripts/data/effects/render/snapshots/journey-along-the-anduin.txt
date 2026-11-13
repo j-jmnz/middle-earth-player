@@ -58,7 +58,7 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01086:A:1 (front): When Revealed: Remove 4 progress tokens from the current quest card. (If there are fewer than 4 progress tokens on the quest, remove all progress tokens from that quest.)
   01086:whenRevealed:1: When revealed
-    - [json RemoveProgressFromQuest {"verb":"RemoveProgressFromQuest","amount":4}]
+    - remove 4 progress from the current quest card (all of it when it holds less)
 
 01086:A:2 (shadow): Shadow: Defending character does not count its Defense.
   01086:shadow:1: Shadow
@@ -83,13 +83,13 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
 
 01111:A:1 (front): Forced: After Misty Mountain Goblins attacks, remove 1 progress token from the current quest.
   01111:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
-    - [json RemoveProgressFromQuest {"verb":"RemoveProgressFromQuest","amount":1}]
+    - remove 1 progress from the current quest card (all of it when it holds less)
 
 01111:A:2 (shadow): Shadow: Remove 1 progress token from the current quest. (3 progress tokens instead if this attack is undefended.)
   01111:shadow:1: Shadow
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json RemoveProgressFromQuest {"verb":"RemoveProgressFromQuest","amount":1,"when":{"kind":"not","condition":{"kind":"undefended"}}}]
-    - [json RemoveProgressFromQuest {"verb":"RemoveProgressFromQuest","amount":3,"when":{"kind":"undefended"}}]
+    - if not (the attack has no defender): remove 1 progress from the current quest card (all of it when it holds less)
+    - then, if the attack has no defender (checked when this step runs, after the steps above; not tied to whether they did anything): remove 3 progress from the current quest card (all of it when it holds less)
 
 ## 01112 Massing at Night
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -251,4 +251,4 @@ Scenario piles that place cards with no record (quest: 01126 To the River...; qu
     - each copy of code 01133 and code 01138 attached to a hero in play joins the Campaign Pool attached to that hero
     - [json NamePrisoner {"verb":"NamePrisoner"}]
 
-(rendered pieces: 122 by template, 17 as JSON)
+(rendered pieces: 129 by template, 13 as JSON)

@@ -95,7 +95,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
   12175:resolution:1: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
     - each copy of code 12176, code 12177, code 12178 and code 12179 attached to a hero in play joins the Campaign Pool attached to that hero
-    - [json ChooseCards {"verb":"ChooseCards","codes":["12180","12181","12182","12183"],"who":"eachSeat","to":"pool","optional":true}]
+    - each player in turn may take "12180" or "12181" or "12182" or "12183" into the Campaign Pool
 
 12175:B:7 (back): If there are 4 Dragon Sign objectives in the victory display, the players also look at 3 random undiscovered treasures and choose 1 to attach to an eligible character.
   12175:resolution:2: Resolution
@@ -288,7 +288,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
   19022:forced:1: Forced on the event activeExplored
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json LookAtTop {"verb":"LookAtTop","count":3}]
-    - [json PickEncounter {"verb":"PickEncounter","from":"looked"}]
+    - choose an encounter card among the cards the effect looked at (none when no card matches)
     - [json DiscardOtherLooked {"verb":"DiscardOtherLooked"}]
     - the acting player reveals an encounter card
 
@@ -345,7 +345,7 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
   19024:forced:1: Forced on the event activeExplored
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json LookAtTop {"verb":"LookAtTop","count":3}]
-    - [json PickEncounter {"verb":"PickEncounter","from":"looked"}]
+    - choose an encounter card among the cards the effect looked at (none when no card matches)
     - [json DiscardOtherLooked {"verb":"DiscardOtherLooked"}]
     - the acting player reveals an encounter card
 
@@ -390,4 +390,4 @@ Scenario piles that place cards with no record (quest: 19022 Searching for Drago
     - later, at the end of this phase:
       - the players win the game
 
-(rendered pieces: 283 by template, 56 as JSON)
+(rendered pieces: 286 by template, 53 as JSON)

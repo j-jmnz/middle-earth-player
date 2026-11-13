@@ -47,7 +47,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
     - [json FitShips {"verb":"FitShips","codes":["11172","11173","11174","11175"]}]
     - the set-aside card titled "Calaerion" is put into play under the control of the player who controls the card titled "Dream-chaser"
     - then, if [json condition {"kind":"upgraded","code":"11210"}] (checked when this step runs, after the steps above; not tied to whether they did anything): the set-aside card titled "Gavin" is put into play under a player the first player chooses
-    - [json ChooseCards {"verb":"ChooseCards","codes":["11205","11206","11207","11208"],"who":"onePlayer","to":"hand","optional":true,"unearned":true,"afterMulligan":true}]
+    - each player in turn (the offer ends once one has taken it) may take "11205" or "11206" or "11207" or "11208" into their hand [also {"unearned":true,"afterMulligan":true}]
 
 11215:A:3 (front): Put Calaerion into play under the control of the player with the Dream-chaser. One player may choose a copy of Círdan's Blessing not in the Campaign Pool and add it to their hand. If "Gavin returned," put him into play under any player's control. Flip this card over.
   11215:campaignSetup:1: Campaign setup (record also names 11215:A:2)
@@ -70,7 +70,7 @@ Scenario piles that place cards with no record (quest: 12147 The Coast of Umbar;
     - [json FitShips {"verb":"FitShips","codes":["11172","11173","11174","11175"]}]
     - the set-aside card titled "Calaerion" is put into play under the control of the player who controls the card titled "Dream-chaser"
     - then, if [json condition {"kind":"upgraded","code":"11210"}] (checked when this step runs, after the steps above; not tied to whether they did anything): the set-aside card titled "Gavin" is put into play under a player the first player chooses
-    - [json ChooseCards {"verb":"ChooseCards","codes":["11205","11206","11207","11208"],"who":"onePlayer","to":"hand","optional":true,"unearned":true,"afterMulligan":true}]
+    - each player in turn (the offer ends once one has taken it) may take "11205" or "11206" or "11207" or "11208" into their hand [also {"unearned":true,"afterMulligan":true}]
 
 11215:B:1 (back): Forced: When stage 2B is revealed, search the encounter deck and discard pile for each boon and non-Ship burden and shuffle them into the second encounter deck.
   11215:forced:1: Forced on the event stageRevealed

@@ -38,7 +38,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 
 12189:B:5 (back): Add either Gundabad Hunter or Gundabad Stalker to the campaign pool.
   12189:resolution:2: Resolution
-    - [json ChooseCards {"verb":"ChooseCards","codes":["12191","12192"],"who":"firstPlayer","to":"pool","only":true}]
+    - the first player takes "12191" or "12192" into the Campaign Pool [also {"only":true}]
 
 12189:B:6 (back): Shuffle the encounter discard pile into the encounter deck and discard cards from the top until 2 Hazard cards are discarded. The players, as a group, must choose 1 of those cards and add it to the campaign pool.
   12189:resolution:3: Resolution
@@ -114,7 +114,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 
 19097:A:2 (front): The players cannot travel to The Cursed Tomb unless they control 3 Loot objectives.
   19097:constant:1: Constant
-    only if not (the number of objective (any player controls) [also {"controlled":true,"lootKeyword":true}] is at least 3)
+    only if not (the number of objective (any player controls) that is claimed (attached to a character a player controls) [also {"lootKeyword":true}] is at least 3)
     - the players cannot travel to any location while this holds
 
 19097:A:3 (front): Forced: After the players travel to The Cursed Tomb, search the encounter deck and discard pile for Fram's Shade and add it to the staging area. Shuffle the encounter deck. Fram's Shade makes an immediate attack against each player in turn order.
@@ -137,13 +137,13 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 19098:A:2 (front): Fram's Shade gets +1 Threat, +1 Attack, and +1 Defense for each Loot objective the players control.
   19098:constant:2: Constant
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - this card: stat threat the number of objective (any player controls) [also {"controlled":true,"lootKeyword":true}], while this card is in play
-    - this card: stat attack the number of objective (any player controls) [also {"controlled":true,"lootKeyword":true}], while this card is in play
-    - this card: stat defense the number of objective (any player controls) [also {"controlled":true,"lootKeyword":true}], while this card is in play
+    - this card: stat threat the number of objective (any player controls) that is claimed (attached to a character a player controls) [also {"lootKeyword":true}], while this card is in play
+    - this card: stat attack the number of objective (any player controls) that is claimed (attached to a character a player controls) [also {"lootKeyword":true}], while this card is in play
+    - this card: stat defense the number of objective (any player controls) that is claimed (attached to a character a player controls) [also {"lootKeyword":true}], while this card is in play
 
 19098:A:3 (front): When Fram's Shade is dealt shadow cards, deal it a number of shadow cards equal to the number of Loot objectives the players control (to a minimum of 1).
   19098:constant:3: Constant
-    - this card: stat dealtShadows the number of objective (any player controls) [also {"controlled":true,"lootKeyword":true}], while this card is in play
+    - this card: stat dealtShadows the number of objective (any player controls) that is claimed (attached to a character a player controls) [also {"lootKeyword":true}], while this card is in play
 
 ## 19099 Crypt Stalker
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -314,7 +314,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 
 19109:B:1 (back): This stage cannot be defeated unless the players control at least 1 Loot objective.
   19109:constant:1: Constant
-    only if not (the number of objective (any player controls) [also {"controlled":true,"lootKeyword":true}] is at least 1)
+    only if not (the number of objective (any player controls) that is claimed (attached to a character a player controls) [also {"lootKeyword":true}] is at least 1)
     - the players cannot defeat this stage while this holds
 
 ## 19110 Searching the Ruins
@@ -339,7 +339,7 @@ Scenario piles that place cards with no record (staging: 19101 Forgotten Crypt; 
 
 19110:B:2 (back): This stage cannot be defeated unless the players control at least 2 Loot objectives.
   19110:constant:1: Constant
-    only if not (the number of objective (any player controls) [also {"controlled":true,"lootKeyword":true}] is at least 2)
+    only if not (the number of objective (any player controls) that is claimed (attached to a character a player controls) [also {"lootKeyword":true}] is at least 2)
     - the players cannot defeat this stage while this holds
 
 ## 19111 The Cursed Shade

@@ -110,7 +110,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
       * option "discard" (only if the actor has a card in hand):
         - discard 1 cards from hand
       * option "attack":
-        - this enemy attacks now, dealt a new shadow card after its old ones are discarded [also {"afterThis":true}]
+        - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
 
 143052:A:2 (shadow): Shadow: Deal 1 damage to defending character.
   143052:shadow:1: Shadow
@@ -127,7 +127,7 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
     only if all of: (this card is in the staging area) and (the actor holds the first player token)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json LookAtTop {"verb":"LookAtTop","count":3}]
-    - [json PickEncounter {"verb":"PickEncounter","from":"looked"}]
+    - choose an encounter card among the cards the effect looked at (none when no card matches)
     - the picked card goes on top of the encounter deck
     - the acting player reveals an encounter card
     - [json DiscardOtherLooked {"verb":"DiscardOtherLooked"}]
@@ -378,4 +378,4 @@ Scenario piles that place cards with no record (quest: 143078 Rouse the Ents; qu
     - the table: stat eliminatedAtEmptyHand 1, while this card is in play
     - the table: stat trackQuestProgress 1, while this card is in play
 
-(rendered pieces: 234 by template, 20 as JSON)
+(rendered pieces: 236 by template, 18 as JSON)

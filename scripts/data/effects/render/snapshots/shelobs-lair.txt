@@ -292,7 +292,7 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
 
 144062:A:2 (shadow): Shadow: If attacking enemy is Shelob, she makes an additional attack against you after this one.
   144062:shadow:1: Shadow
-    - if the attacking enemy is a enemy (any player controls) named "Shelob": this enemy attacks now, dealt a new shadow card after its old ones are discarded [also {"afterThis":true}]
+    - if the attacking enemy is a enemy (any player controls) named "Shelob": the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
 
 ## 144070 The Stairs of Cirith Ungol
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -370,4 +370,4 @@ Scenario piles that place cards with no record (quest: 144070 The Stairs of Ciri
     only if any of: ([json condition {"kind":"inVictory","code":"144040","is":false}]) or ([json condition {"kind":"inVictory","code":"144075","is":false}])
     - the players cannot defeat this stage while this holds
 
-(rendered pieces: 240 by template, 14 as JSON)
+(rendered pieces: 241 by template, 13 as JSON)

@@ -245,7 +245,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
   11033:whenRevealed:1: When revealed
     - the acting player chooses one of:
       * option "exhaust":
-        - [json EachExhaustsOne {"verb":"EachExhaustsOne"}]
+        - in player order, each player exhausts a ready character they control, choosing it (a player with none exhausts none)
       * option "threat":
         - each location (any player controls) in the staging area only [also {"uncharted":true}]: stat threat 1, until the end of the phase
 
@@ -369,7 +369,7 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
     only if this card is the active location
     (steps run in order; a step depends on an earlier one only through its own condition)
     - discard the number of players + 2 card(s) from the top of the encounter deck
-    - [json StageLooked {"verb":"StageLooked","trait":"Undead","type":"enemy"}]
+    - each player in turn adds one Undead enemy among the cards this effect discarded (still in the encounter discard pile) to the staging area, choosing among them; not revealed
 
 11073:B:1: Uncharted.
   (keyword line: the card's keywords own it, read by the engine from the card; no record)
@@ -463,4 +463,4 @@ Scenario piles that place cards with no record (quest: 11025 Explore the Island;
   11179:resolution:5: Resolution
     - [json GainXp {"verb":"GainXp","amount":-1,"when":{"kind":"count","pick":{"type":"card","control":"any","from":"victory","names":["Ominous Fate"]},"min":1}}]
 
-(rendered pieces: 200 by template, 79 as JSON)
+(rendered pieces: 202 by template, 77 as JSON)

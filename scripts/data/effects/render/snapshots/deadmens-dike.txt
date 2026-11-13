@@ -352,7 +352,7 @@ Scenario piles that place cards with no record (staging: 09038 Fornost Square; q
     - note the damage on the card with code 10158 in the Campaign Log (replacing the previous number)
     - [json RemoveFromPoolByCode {"verb":"RemoveFromPoolByCode","codes":["10158"]}]
     - [json Earn {"verb":"Earn","codes":["100158"]}]
-    - [json ChooseCards {"verb":"ChooseCards","codes":["10157","10167"],"who":"firstPlayer","to":"player","only":true}]
+    - the first player takes "10157" or "10167" for a player (shuffled into their deck) [also {"only":true}]
     - each copy of code 10161, code 10162, code 10163, code 10164 and code 10165 attached to a hero in play joins the Campaign Pool attached to that hero
     - [json EarnAllBurdens {"verb":"EarnAllBurdens"}]
 

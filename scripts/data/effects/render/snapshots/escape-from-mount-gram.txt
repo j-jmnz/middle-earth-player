@@ -301,8 +301,8 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
 10176:A:1 (front): Response: After Berelind attacks and destroys an enemy, place 1 progress on a quest card in play.
   10176:response:1: Response after a player's attack destroys an enemy (heard about this card)
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - choose card (any player controls) [also {"questCard":true}]
-    - [json PlaceProgressOnQuestCard {"verb":"PlaceProgressOnQuestCard","amount":1}]
+    - choose card (any player controls) that is a quest card in play (the main quest card, an encounter side quest in the staging area or a player side quest)
+    - place 1 progress on the picked quest card, directly (the active location does not take it)
 
 ## 10177 Chieftain's Brooch
 
@@ -360,4 +360,4 @@ Scenario piles that place cards with no record (quest: 10038 Unexpected Rescue; 
   10181:response:1: Response after a player's attack destroys an enemy (heard about the host; limit once per game)
     - the event's other card is added to the victory display
 
-(rendered pieces: 150 by template, 53 as JSON)
+(rendered pieces: 152 by template, 51 as JSON)

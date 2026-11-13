@@ -36,7 +36,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
 
 145017:A:3 (front): Travel: Remove 5 progress from stage 3B to travel here.
   145017:travel:1: Travel
-    - [json RemoveProgressFromQuest {"verb":"RemoveProgressFromQuest","amount":5}]
+    - remove 5 progress from the current quest card (all of it when it holds less)
 
 ## 145018 Dark Door
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -232,7 +232,7 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
       * option "attach" (only if a copy of the card with code 145016 is set aside and the actor's threat dial holds none):
         - the acting player attaches a set-aside copy of the card with code 145016 to their threat dial (nothing when the dial holds one already, Limit 1 per threat dial, or none is set aside)
       * option "attack":
-        - this enemy attacks now, dealt a new shadow card after its old ones are discarded [also {"afterThis":true}]
+        - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
 
 ## 145063 The Forbidden Door
 (the scenario deals it into the quest pile; the piles place it, no record does)
@@ -336,4 +336,4 @@ Scenario piles that place cards with no record (quest: 145063 The Forbidden Door
         - choose ally (you control)
         - discard the picked card
 
-(rendered pieces: 192 by template, 6 as JSON)
+(rendered pieces: 194 by template, 4 as JSON)

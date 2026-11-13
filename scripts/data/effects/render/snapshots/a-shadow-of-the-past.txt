@@ -88,8 +88,8 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
 141030:B:1 (back): Resolution: Choose Gandalf's Delay or The Ring Draws Them and add it to the Campaign Pool. Then, choose Gildor Inglorion or Mr. Underhill and add it to the Campaign Pool. The chosen cards have been earned by the players.
   141030:resolution:1: Resolution
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ChooseCards {"verb":"ChooseCards","codes":["141078","141079"],"who":"firstPlayer","to":"pool"}]
-    - [json ChooseCards {"verb":"ChooseCards","codes":["141077","141017"],"who":"firstPlayer","to":"pool"}]
+    - the first player takes "141078" or "141079" into the Campaign Pool
+    - the first player takes "141077" or "141017" into the Campaign Pool
 
 ## 141031 Bag End
 (the scenario deals it into the activeLocation pile; the piles place it, no record does)
@@ -553,4 +553,4 @@ Scenario piles that place cards with no record (staging: 141039 Black Rider; que
     - when the attack in progress ends:
       - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): raise threat by 3 (the acting player)
 
-(rendered pieces: 211 by template, 47 as JSON)
+(rendered pieces: 213 by template, 45 as JSON)

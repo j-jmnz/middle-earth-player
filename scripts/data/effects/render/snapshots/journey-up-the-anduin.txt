@@ -199,7 +199,7 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
   18026:forced:1: Forced after this card is played (heard about card (you control); event happened to the controller; used from hand)
     only if this card is in its player's hand
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json DiscardEach {"verb":"DiscardEach","pick":{"type":"card","control":"you","from":"hand"}}]
+    - the acting player discards each card (you control) in hand
     - discard this card
 
 ## 18027 Weighed Down
@@ -332,4 +332,4 @@ Scenario piles that place cards with no record (quest: 18066 Traveling North; qu
   18070:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
     - the players lose the game
 
-(rendered pieces: 196 by template, 28 as JSON)
+(rendered pieces: 198 by template, 27 as JSON)

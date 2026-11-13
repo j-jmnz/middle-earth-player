@@ -97,7 +97,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
   41027:forced:1: Forced once an enemy's attack is over (its damage and shadow effect resolved; the event names the attacking enemy and its defender) (heard about this card)
     - the first player chooses one of:
       * option "progress" (only if the current quest stage holds at least 1 progress):
-        - [json RemoveProgressFromQuest {"verb":"RemoveProgressFromQuest","amount":{"stage":true}}]
+        - remove the stage number of the quest progress from the current quest card (all of it when it holds less)
       * option "staging":
         - return this card to the staging area
 
@@ -170,7 +170,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
 41032:A:1 (front): While Goblin Tunnels is in the staging area, it gains: "Forced: After a Goblin is revealed from the encounter deck, remove a progress token from the current quest card."
   41032:forced:1: Forced after a card is revealed (heard about Goblin enemy (any player controls); only when the encounter deck revealed it)
     only if this card is in the staging area
-    - [json RemoveProgressFromQuest {"verb":"RemoveProgressFromQuest","amount":1}]
+    - remove 1 progress from the current quest card (all of it when it holds less)
 
 41032:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack. (+3 Attack instead if attacking enemy is a Goblin.)
   41032:shadow:1: Shadow
@@ -202,7 +202,7 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
     only if the card the event is about had enough progress to be explored
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json LookAtTop {"verb":"LookAtTop","count":3}]
-    - [json PickEncounter {"verb":"PickEncounter","from":"looked"}]
+    - choose an encounter card among the cards the effect looked at (none when no card matches)
     - [json BottomOtherLooked {"verb":"BottomOtherLooked"}]
     - the acting player reveals an encounter card
 
@@ -308,4 +308,4 @@ Scenario piles that place cards with no record (quest: 41004 The Dark of Nibin-D
     - [json Earn {"verb":"Earn","codes":["41049"],"eachPlayer":true,"when":{"kind":"highestThreat","max":39}}]
     - [json CarryOver {"verb":"CarryOver","codes":["41049"],"eachPlayer":true,"when":{"kind":"highestThreat","max":39}}]
 
-(rendered pieces: 171 by template, 19 as JSON)
+(rendered pieces: 175 by template, 16 as JSON)

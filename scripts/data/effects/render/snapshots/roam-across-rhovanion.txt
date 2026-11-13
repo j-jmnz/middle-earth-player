@@ -49,10 +49,10 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
 
 19036:A:3 (front): Forced: At the beginning of the quest phase, the player who controls Durin's Key looks at the top 3 cards of the encounter deck, chooses 1 to reveal, and discards the rest.
   19036:forced:1: Forced when a phase begins
-    only if all of: (it is the Quest phase) and (the number of objective (any player controls) named "Durin's Key" [also {"controlled":true}] is at least 1)
+    only if all of: (it is the Quest phase) and (the number of objective (any player controls) named "Durin's Key", that is claimed (attached to a character a player controls) is at least 1)
     (steps run in order; a step depends on an earlier one only through its own condition)
     - [json LookAtTop {"verb":"LookAtTop","count":3}]
-    - [json PickEncounter {"verb":"PickEncounter","from":"looked"}]
+    - choose an encounter card among the cards the effect looked at (none when no card matches)
     - [json DiscardOtherLooked {"verb":"DiscardOtherLooked"}]
     - the acting player reveals an encounter card
 
@@ -325,7 +325,7 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
     only if not (the number of card (you control) named "Urdug", chosen by the first player is at least 1)
     - the players cannot defeat this stage while this holds
   19050:constant:4: Constant
-    only if not (the number of objective (any player controls) named "Durin's Key" [also {"controlled":true}] is at least 1)
+    only if not (the number of objective (any player controls) named "Durin's Key", that is claimed (attached to a character a player controls) is at least 1)
     - the players cannot defeat this stage while this holds
 
 ## 19051 Urdug's Gambit
@@ -424,4 +424,4 @@ Scenario piles that place cards with no record (quest: 19047 The Goblin's Task; 
   19055:forced:1: Forced after an enemy engages a player (heard about enemy (any player controls) named "Urdug")
     - engage this card
 
-(rendered pieces: 309 by template, 36 as JSON)
+(rendered pieces: 312 by template, 33 as JSON)

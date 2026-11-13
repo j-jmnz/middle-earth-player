@@ -305,7 +305,7 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
 41050:A:2 (front): Setup: Each player chooses 1 Adaptation boon attachment and attaches it to one of their heroes. Shuffle the Stalking Goblin burden enemy into the encounter deck. Add Stalking Goblin and each attached Adaptation to the Campaign Pool.
   41050:campaignSetup:1: Campaign setup
     (steps run in order; a step depends on an earlier one only through its own condition)
-    - [json ChooseCards {"verb":"ChooseCards","codes":["41044","41045","41046","41047"],"who":"eachSeat","to":"hero"}]
+    - each player in turn takes "41044" or "41045" or "41046" or "41047" attached to a hero
     - a card with code 41041 from the box joins the encounter deck, which is shuffled
     - the card with code 41041 is added to the Campaign Pool
 
@@ -317,4 +317,4 @@ Scenario piles that place cards with no record (staging: 41010 The Eaves of Mirk
   41050:resolution:1: Resolution
     - [json Earn {"verb":"Earn","codes":["41043"],"when":{"kind":"tokens","code":"41050","min":6}}]
 
-(rendered pieces: 177 by template, 14 as JSON)
+(rendered pieces: 178 by template, 13 as JSON)

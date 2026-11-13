@@ -228,7 +228,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
       * option "place":
         - once the attack in progress has ended, place this card facedown under the card with code 144027 in play (out of play there; its attachments are discarded, its tokens go)
       * option "attack":
-        - this enemy attacks now, dealt a new shadow card after its old ones are discarded [also {"afterThis":true}]
+        - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
 
 ## 144056 Oliphaunt
 (the scenario deals it into the haradDeck pile; the piles place it, no record does)
@@ -257,7 +257,7 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
 
 144057:A:2 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   144057:shadow:1: Shadow
-    - this enemy attacks now, dealt a new shadow card after its old ones are discarded [also {"afterThis":true}]
+    - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
 
 ## 144058 Haradrim Archer
 (the scenario deals it into the haradDeck pile; the piles place it, no record does)
@@ -299,4 +299,4 @@ Scenario piles that place cards with no record (quest: 144068 Ambush the Men of 
   144068:forced:2: Forced on the event locationExplored (heard about location (any player controls) named "The Cross-roads")
     - the players win the game
 
-(rendered pieces: 197 by template, 7 as JSON)
+(rendered pieces: 199 by template, 5 as JSON)

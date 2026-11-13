@@ -124,7 +124,7 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
 
 141044:B:1 (back): Resolution: Starting with the first player, each player may choose one of the following boon cards and attach it to a hero he controls: Tireless Ranger, Skilled Healer, Valiant Warrior, Noble Hero. The chosen cards have been earned by the players.
   141044:resolution:1: Resolution
-    - [json ChooseCards {"verb":"ChooseCards","codes":["141018","141019","141020","141021"],"who":"eachSeat","to":"hero","optional":true}]
+    - each player in turn may take "141018" or "141019" or "141020" or "141021" attached to a hero
 
 ## 141045 The Prancing Pony
 (the scenario deals it into the staging pile; the piles place it, no record does)
@@ -573,4 +573,4 @@ Scenario piles that place cards with no record (quest: 141025 Trouble in Bree; q
   906209:constant:1: Constant
     - this card counts as a Condition attachment while it is attached
 
-(rendered pieces: 236 by template, 40 as JSON)
+(rendered pieces: 237 by template, 39 as JSON)

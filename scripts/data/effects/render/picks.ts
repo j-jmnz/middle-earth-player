@@ -67,6 +67,9 @@ export const renderPick: PickRenderer = (value, ctx) => {
   note(["looked"], pick.looked === true ? "among the cards this effect looked at or discarded" : null);
   const attached = isObj(pick.hasAttachment) && Array.isArray(pick.hasAttachment.names) && Object.keys(pick.hasAttachment).every((key) => key === "names" || key === "none") ? pick.hasAttachment : null;
   note(["hasAttachment"], attached ? `${attached.none === true ? "with no" : "with an"} attachment named ${quoted(attached.names as unknown[])}` : null);
+  note(["controlled"], pick.controlled === true ? "that is claimed (attached to a character a player controls)" : null);
+  note(["questCard"], pick.questCard === true ? "that is a quest card in play (the main quest card, an encounter side quest in the staging area or a player side quest)" : null);
+  note(["maxHitPointsLeft"], typeof pick.maxHitPointsLeft === "number" ? `with ${pick.maxHitPointsLeft} or fewer hit points remaining` : null);
   note(["determined"], pick.determined === true ? "that the Campaign Log marks determined" : null);
   note(["safe"], pick.safe === true ? "with the safe keyword" : null);
   note(["minDamage"], typeof pick.minDamage === "number" ? `with at least ${pick.minDamage} damage on it` : null);

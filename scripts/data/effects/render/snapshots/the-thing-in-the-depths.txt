@@ -61,7 +61,7 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
 
 11194:B:1 (back): Resolution: The players may add Come Together to the Campaign Pool.
   11194:resolution:1: Resolution
-    - [json ChooseCards {"verb":"ChooseCards","codes":["11195"],"who":"firstPlayer","to":"pool","optional":true}]
+    - the first player may take "11195" into the Campaign Pool
 
 11194:B:2 (back): Gain the following:
   11194:resolution:2: Resolution (record also names 11194:B:3)
@@ -371,4 +371,4 @@ Scenario piles that place cards with no record (staging: 11064 Umbar Raider; que
       - choose enemy (any player controls) or in the staging area, named "The Thing in the Depths"
       - the picked enemy attacks the acting player now, from the staging area
 
-(rendered pieces: 167 by template, 35 as JSON)
+(rendered pieces: 168 by template, 34 as JSON)

@@ -121,7 +121,7 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
 
 146021:A:3 (shadow): Shadow: Attacking enemy makes an additional attack against you after this one.
   146021:shadow:1: Shadow
-    - this enemy attacks now, dealt a new shadow card after its old ones are discarded [also {"afterThis":true}]
+    - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
 
 ## 146022 Wounded Uruk
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -385,4 +385,4 @@ Scenario piles that place cards with no record (quest: 146066 Pass the Two Watch
   146071:forced:1: Forced when this enemy attacks, before the defender is declared (heard about this card)
     - this card: stat phantom 1, until the end of the attack
 
-(rendered pieces: 262 by template, 17 as JSON)
+(rendered pieces: 263 by template, 16 as JSON)

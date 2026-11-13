@@ -78,7 +78,7 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
 01079:A:1 (front): When Revealed: Each player discards all event cards in his hand.
   01079:whenRevealed:1: When revealed
     - for each player, first player first:
-      - [json DiscardEach {"verb":"DiscardEach","pick":{"type":"card","control":"you","from":"hand","cardType":"event"}}]
+      - the acting player discards each card (you control) in hand, of card type event
 
 ## 01080 Caught in a Web
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -272,4 +272,4 @@ Scenario piles that place cards with no record (staging: 01096 Forest Spider; st
     - [json Earn {"verb":"Earn","codes":["01136"],"when":{"kind":"stageReached","code":"01122","is":true}}]
     - [json Earn {"verb":"Earn","codes":["01137"],"when":{"kind":"stageReached","code":"01121","is":true}}]
 
-(rendered pieces: 145 by template, 10 as JSON)
+(rendered pieces: 147 by template, 9 as JSON)

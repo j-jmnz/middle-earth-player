@@ -1,0 +1,407 @@
+Scenario piles that place cards with no record (quest: 10094 Secrets of Rhudaur; quest: 10095 Thaurdir's Pursuit; staging: 10109 Quiet the Spirits; staging: 10111 Sift through the Debris; staging: 10113 Decipher Ancient Texts; staging: 09057 Ancient Causeway; activeLocation: 10097 The Great Hall; setAside: 10096 Amarthiúl; setAside: 10098 Thaurdir)
+
+## 10094 Secrets of Rhudaur
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+10094:A:1 (front): Setup: Make The Great Hall the active location. Set Thaurdir aside, out of play. Add the 3 Treachery of Rhudaur side quests to the staging area, quest side faceup. Search the encounter deck for 1 copy of Ancient Causeway, and add it to the staging area (2 copies instead if there are 3 or 4 players in the game). The first player gains control of Amarthiúl.
+  10094:setup:1: Setup
+    - the set-aside card titled "Amarthiúl" is put into play under the first player
+
+10094:B:1 (back): Time 5.
+  10094:constant:1: Constant
+    - Time 5: when this card is revealed, 5 resource tokens (time counters) are put on it, and one comes off at the end of each refresh phase
+
+10094:B:2 (back): Forced: After the last time counter is removed from Secrets of Rhudaur, remove each Treachery of Rhudaur side quest from the game and immediately advance to stage 2.
+  10094:forced:1: Forced on the event lastTimeCounterRemoved (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each card in the staging area titled "Quiet the Spirits" or "Sift through the Debris" or "Decipher Ancient Texts" (an encounter side quest, quest side up) is removed from the game, not added to the victory display; its attachments are discarded
+    - advance to the next quest stage
+
+10094:B:3 (back): During the quest phase, Secrets of Rhudaur cannot be chosen as the current quest.
+  10094:constant:2: Constant
+    - this card: stat cannotBeCurrentQuest (in the quest phase it cannot be the current quest: only a side quest the first player chooses is, else there is none) 1, while this card is in play
+
+10094:B:4 (back): If there are no Treachery of Rhudaur side quests in play, immediately advance to stage 2.
+  10094:constant:3: Constant
+    only if the number of card (any player controls) named "Quiet the Spirits" or "Sift through the Debris" or "Decipher Ancient Texts" is at most 0
+    - this card: stat advanceNow (once nothing is resolving the quest advances to the next stage at once) 1, while this card is in play
+
+## 10095 Thaurdir's Pursuit
+(the scenario deals it into the quest pile; the piles place it, no record does)
+
+10095:A:1 (front): When Revealed: Add Thaurdir to the staging area. Each player searches the encounter deck and discard pile for an Undead enemy and adds it to the staging area. Shuffle the encounter deck.
+  10095:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the set-aside card with code 10098 is added to the staging area and enters play: the cards that hear it enter play or be added to the staging area hear it
+    - for each player, first player first:
+      - the acting player finds one Undead enemy in the encounter deck or its discard pile and adds it to the staging area (it is not revealed)
+    - shuffle the encounter deck
+
+10095:B:1 (back): Thaurdir's Pursuit has -5 quest points for each Clue objective attached to a character.
+  10095:constant:1: Constant
+    - this card: stat questPoints the number of Clue objective (any player controls) that is claimed (attached to a character a player controls) x -5, while this card is in play
+
+10095:B:2 (back): This stage cannot be defeated while Thaurdir has any hit points remaining. If this stage is defeated, the players win the game.
+  10095:constant:2: Constant
+    only if the card with code 10098 in play has damage below its hit points (any hit points remaining)
+    - the players cannot defeat this stage while this holds
+
+## 10096 Amarthiúl
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+10096:A:1 (front): Response: After an enemy engages a player, give control of Amarthiúl to that player.
+  10096:response:1: Response after an enemy engages a player (event happened to another player)
+    - control of this card goes to the player the event happened to
+
+10096:A:2 (front): If Amarthiúl leaves play, the players lose the game.
+  10096:triggered:1: Triggered (mandatory, not printed as Forced) after a card leaves play (heard about this card)
+    - the players lose the game
+
+## 10097 The Great Hall
+(the scenario deals it into the activeLocation pile; the piles place it, no record does)
+
+10097:A:1 (front): Forced: When The Great Hall is explored, each player discards the top 5 cards of the encounter deck and chooses an Undead enemy he discarded in this way to add to the staging area.
+  10097:forced:1: Forced on the event locationExplored (heard about this card)
+    - for each player, first player first:
+      - discard 5 card(s) from the top of the encounter deck (a deck that runs out in the quest phase is reset from the discard pile and the discard goes on)
+      - the acting player adds one Undead enemy among the cards this effect discarded (still in the encounter discard pile) to the staging area, choosing among those their own discard looked at; not revealed
+
+## 10098 Thaurdir
+(the scenario deals it into the setAside pile; the piles place it, no record does)
+
+10098:A:1: Indestructible.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+10098:A:2 (front): Cannot have attachments.
+  10098:constant:1: Constant
+    - this card: stat cannotHaveAttachments 1, while this card is in play
+
+10098:A:3 (front): Forced: After a treachery card with the Sorcery trait is revealed from the encounter deck, Thaurdir heals 3 damage and makes an immediate attack against the first player.
+  10098:forced:1: Forced after a card is revealed (heard about Sorcery treachery (any player controls); not for a card found in the encounter discard pile)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - heal 3 damage from this card
+    - this card attacks the first player now, from the staging area (or engaged)
+
+## 10099 Wight of Rhudaur
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10099:A:1 (front): While the current quest has 1 or more progress on it, Wight of Rhudaur gains surge.
+  10099:constant:1: Constant
+    only if the current quest card holds 1 or more progress
+    - this card: stat gainsSurge (it has the Surge keyword as it is revealed) 1, while this card is in play
+
+10099:A:2 (front): While the current quest has 0 progress on it, Wight of Rhudaur gains doomed 2.
+  10099:constant:2: Constant
+    only if the current quest card holds no progress (neither is true while there is no current quest)
+    - this card: stat gainsDoomed (the Doomed X it gains as it is revealed, each player raising their threat by it) 2, while this card is in play
+
+## 10100 Traitorous Wight
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10100:A:1 (front): Forced: When Traitorous Wight engages a player, remove 2 progress from each quest card in play.
+  10100:forced:1: Forced after an enemy engages a player (heard about this card)
+    - remove 2 progress from each quest card in play (the main quest card, each encounter side quest in the staging area and each player side quest) (all of it when it holds less)
+
+10100:A:2 (shadow): Shadow: For each point of damage dealt by this attack, remove 1 progress from each quest in play.
+  10100:shadow:1: Shadow
+    - when the attack in progress ends:
+      - remove the damage just dealt progress from each quest card in play (the main quest card, each encounter side quest in the staging area and each player side quest) (all of it when it holds less)
+
+## 10101 Forbidden Descent
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10101:A:1 (front): While Forbidden Descent is in the staging area, the first 2 progress that would be placed on a quest each round must be placed on Forbidden Descent, instead.
+  10101:constant:1: Constant
+    only if this card is in the staging area
+    - this card: stat progressSponge (while it is in the staging area it takes the first 2 progress each round that would be placed on a quest card; each copy takes 2) 1, while this card is in play
+
+10101:A:2 (front): Forced: If Forbidden Descent leaves play from the staging area, raise each player's threat by 2.
+  10101:forced:1: Forced on the event leftStagingArea (heard about this card)
+    - for each player, first player first:
+      - raise threat by 2 (the acting player)
+
+## 10102 Eerie Halls
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10102:A:1 (front): Action: Raise your threat by 1 to reduce the Threat of Eerie Halls by 1 until the end of the phase. (Any player may trigger this action.)
+  10102:action:1: Action (cost: raise your threat by 1; any player may use it)
+    only if 0 is less than threat of this card
+    - this card: stat threat -1, until the end of the phase
+
+10102:A:2 (shadow): Shadow: If the defending player does not control at least 1 Clue objective, the attacking enemy makes an additional attack after this one.
+  10102:shadow:1: Shadow
+    only if not (there is a Clue objective (you control) to choose)
+    - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
+
+## 10103 Ghostly Ruins
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10103:A:1 (front): Any time the encounter deck runs out of cards, return the topmost Undead enemy in the encounter discard pile to the staging area before resetting the encounter deck.
+  10103:constant:1: Constant
+    - the table: stat returnsUndeadOnRunOut (whenever the encounter deck runs out in the quest phase the topmost Undead enemy in the encounter discard pile returns to the staging area before the reset) 1, while this card is in play
+
+10103:A:2 (front): Travel: Return the topmost Undead enemy in the encounter discard pile to the staging area.
+  10103:travel:1: Travel
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the topmost enemy with the trait Undead in the encounter discard pile (the last put there) is picked (nothing with none)
+    - the picked card goes to the staging area (it is not revealed)
+
+## 10104 Decrepit Remains
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10104:A:1 (front): While Decrepit Remains is in the staging area, each location and side quest in the staging area gets +2 quest points.
+  10104:constant:1: Constant
+    only if this card is in the staging area
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each location (any player controls) in the staging area only: stat questPoints 2, while this card is in play
+    - each card (any player controls) in the staging area only, of card type encounter-side-quest: stat questPoints 2, while this card is in play
+
+10104:A:2 (shadow): Shadow: For each point of damage dealt by this attack, remove 1 progress from each quest in play.
+  10104:shadow:1: Shadow
+    - when the attack in progress ends:
+      - remove the damage just dealt progress from each quest card in play (the main quest card, each encounter side quest in the staging area and each player side quest) (all of it when it holds less)
+
+## 10105 Centuries of Sorrow
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10105:A:1: Surge.
+  (keyword line: the card's keywords own it, read by the engine from the card; no record)
+
+10105:A:2 (front): When Revealed: The first player must choose a new quest to be the current quest, if able.
+  10105:whenRevealed:1: When revealed
+    - the first player chooses a quest card other than the current quest (the main quest card, or an encounter side quest in the staging area) to be the current quest until the end of the phase
+
+10105:A:3 (shadow): Shadow: If the defending player does not control at least 1 Clue objective, this attack is considered undefended.
+  10105:shadow:1: Shadow
+    only if not (there is a Clue objective (you control) to choose)
+    - this attack is considered undefended
+
+## 10106 Curse of the Years
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10106:A:1 (front): When Revealed: Deal 1 damage to each exhausted character. Each player with a threat of 35 or higher must also discard each exhausted attachment he controls.
+  10106:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - for each exhausted character (any player controls):
+      - deal 1 damage to the picked card
+    - for each player, first player first:
+      - if the actor's threat is at least 35: the acting player discards each exhausted attachment (you control)
+
+10106:A:2 (shadow): Shadow: Attacking enemy gets +1 Attack (+3 Attack instead if the defending player does not control at least 1 Clue objective).
+  10106:shadow:1: Shadow
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - if there is a Clue objective (you control) to choose: the attacking enemy: stat attack 1, until the end of the attack
+    - then, if not (there is a Clue objective (you control) to choose) (checked when this step runs, after the steps above; not tied to whether they did anything): the attacking enemy: stat attack 3, until the end of the attack
+
+## 10107 Dark Covenant
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10107:A:1 (front): When Revealed: Discard the top 3 cards of the encounter deck. The first player must either remove X progress from among the quests in play, or assign X damage among characters he controls. X is the total Threat of the discarded cards.
+  10107:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - discard 3 card(s) from the top of the encounter deck (a deck that runs out in the quest phase is reset from the discard pile and the discard goes on)
+    - the first player chooses one of:
+      * option "remove" (only if all of: (0 is less than the total printed Threat of the cards this effect discarded from the top of the encounter deck (a card with no printed Threat counts 0)) and (there is a card (any player controls) with progress on it, that is a quest card in play (the main quest card, an encounter side quest in the staging area or a player side quest) to choose)):
+        - the acting player removes the total printed Threat of the cards this effect discarded from the top of the encounter deck (a card with no printed Threat counts 0) progress from among the quest cards in play, one token at a time from the card they choose (all of it when fewer are there)
+      * option "damage" (only if all of: (0 is less than the total printed Threat of the cards this effect discarded from the top of the encounter deck (a card with no printed Threat counts 0)) and (there is a character (you control) to choose)):
+        - the acting player assigns the total printed Threat of the cards this effect discarded from the top of the encounter deck (a card with no printed Threat counts 0) damage among the character (you control), one at a time
+
+10107:A:2 (shadow): Shadow: If this attack destroys a character, raise your threat by the destroyed character's Willpower.
+  10107:shadow:1: Shadow
+    - when the attack in progress ends:
+      - if X is at least 1 (X is the number the running effect counted; in an after-attack step, the characters the attack destroyed): raise threat by the Willpower the destroyed character had in play (last known) (the acting player)
+
+## 10108 Haunting Fog
+(the scenario deals it into the encounter pile; the piles place it, no record does)
+
+10108:A:1 (front): When Revealed: Each player must exhaust a character he controls. Attach Haunting Fog to the current quest. (Counts as a Condition attachment with the text: "Attached quest gets +6 quest points.")
+  10108:whenRevealed:1: When revealed
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - in player order, each player exhausts a ready character they control, choosing it (a player with none exhausts none)
+    - this card is attached to the current quest card (the side quest that is the current quest, else the main quest card) and leaves with it
+  10108:constant:1: Constant
+    - this card counts as a Condition attachment while it is attached
+  10108:constant:2: Constant
+    only if not (this card is in the staging area)
+    - its host: stat questPoints 6, while this card is in play
+
+## 10109 Quiet the Spirits
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+10109:A:1 (front): While Quiet the Spirits is the current quest, each Undead enemy that enters play immediately engages the player with the highest threat. Enemies that engage a player from this effect contribute their Threat to the total Threat in the staging area until the end of the phase.
+  10109:forced:1: Forced after an encounter card is added to the staging area (heard about Undead enemy (any player controls) or in the staging area)
+    only if this card is the current quest
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - the player with the highest threat becomes the picked player (the first player chooses among a tie)
+    - the effect goes on with the picked player as the acting player
+    - engage the card the event is about
+    - the card the event is about: stat engagedThreat (while engaged it still adds its Threat to the total Threat in the staging area) 1, until the end of the phase
+
+10109:A:2 (front): Forced: After an enemy is destroyed, place 2 progress on Quiet the Spirits.
+  10109:forced:2: Forced after an enemy is destroyed (heard about enemy (any player controls))
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose card (any player controls) named "Quiet the Spirits", that is a quest card in play (the main quest card, an encounter side quest in the staging area or a player side quest)
+    - place 2 progress on the picked quest card, directly (the active location does not take it)
+
+10109:A:3 (front): When this quest is defeated, flip it over.
+  10109:constant:flip: Constant
+    - when this side quest is defeated it is not added to the victory display: it flips over into the objective with code 10110 and stays in the staging area, faceup and unclaimed
+
+## 10110 Daechanar's Brand
+
+10110:A:1 (front): Action: Exhaust Amarthiúl or a hero to claim Daechanar's Brand. Then, attach Daechanar's Brand to that character.
+  10110:action:1: Action (any player may use it)
+    only if all of: (this card is in the staging area) and (there is a ready character (you control) to choose)
+    - the acting player chooses one of:
+      * option "hero" (only if there is a ready hero (you control) to choose):
+        - choose ready hero (you control)
+        - exhaust the picked card
+        - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
+      * option "amarthiul" (only if there is a ready character (you control) named "Amarthiúl" to choose):
+        - choose ready character (you control) named "Amarthiúl"
+        - exhaust the picked card
+        - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
+
+10110:A:2 (front): Attached character gets +1 Attack while attacking Undead enemies.
+  10110:constant:1: Constant
+    - if its host is attacking a Undead enemy (any player controls): its host: stat attack 1, while this card is in play
+
+## 10111 Sift through the Debris
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+10111:A:1 (front): While Sift through the Debris is the current quest, each location in the staging area gets +1 Threat.
+  10111:constant:1: Constant
+    only if this card is the current quest
+    - each location (any player controls) in the staging area only: stat threat 1, while this card is in play
+
+10111:A:2 (front): Forced: After a location is explored, place 2 progress on Sift through the Debris.
+  10111:forced:1: Forced on the event locationExplored (heard about location (any player controls))
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose card (any player controls) named "Sift through the Debris", that is a quest card in play (the main quest card, an encounter side quest in the staging area or a player side quest)
+    - place 2 progress on the picked quest card, directly (the active location does not take it)
+
+10111:A:3 (front): When this quest is defeated, flip it over.
+  10111:constant:flip: Constant
+    - when this side quest is defeated it is not added to the victory display: it flips over into the objective with code 10112 and stays in the staging area, faceup and unclaimed
+
+## 10112 Heirloom of Iârchon
+
+10112:A:1 (front): Action: Exhaust Amarthiúl or a hero to claim Heirloom of Iârchon. Then, attach Heirloom of Iârchon to that character.
+  10112:action:1: Action (any player may use it)
+    only if all of: (this card is in the staging area) and (there is a ready character (you control) to choose)
+    - the acting player chooses one of:
+      * option "hero" (only if there is a ready hero (you control) to choose):
+        - choose ready hero (you control)
+        - exhaust the picked card
+        - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
+      * option "amarthiul" (only if there is a ready character (you control) named "Amarthiúl" to choose):
+        - choose ready character (you control) named "Amarthiúl"
+        - exhaust the picked card
+        - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
+
+10112:A:2 (front): Attached character gets +1 Willpower.
+  10112:constant:1: Constant
+    - its host: stat willpower 1, while this card is in play
+
+## 10113 Decipher Ancient Texts
+(the scenario deals it into the staging pile; the piles place it, no record does)
+
+10113:A:1 (front): While Decipher Ancient Texts is the current quest, allies get -2 Willpower.
+  10113:constant:1: Constant
+    only if this card is the current quest
+    - each ally (any player controls): stat willpower -2, while this card is in play
+
+10113:A:2 (front): Action: Pay 1 resource to place 1 progress on Decipher Ancient Texts. (Any player may trigger this action. Limit 3 times per round.)
+  10113:action:1: Action (limit thricePerRound; cost: pay 1 resource(s); any player may use it)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose card (any player controls) named "Decipher Ancient Texts", that is a quest card in play (the main quest card, an encounter side quest in the staging area or a player side quest)
+    - place 1 progress on the picked quest card, directly (the active location does not take it)
+
+10113:A:3 (front): When this quest is defeated, flip it over.
+  10113:constant:flip: Constant
+    - when this side quest is defeated it is not added to the victory display: it flips over into the objective with code 10114 and stays in the staging area, faceup and unclaimed
+
+## 10114 Orders from Angmar
+
+10114:A:1 (front): Action: Exhaust Amarthiúl or a hero to claim Orders From Angmar. Then, attach Orders From Angmar to that character.
+  10114:action:1: Action (any player may use it)
+    only if all of: (this card is in the staging area) and (there is a ready character (you control) to choose)
+    - the acting player chooses one of:
+      * option "hero" (only if there is a ready hero (you control) to choose):
+        - choose ready hero (you control)
+        - exhaust the picked card
+        - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
+      * option "amarthiul" (only if there is a ready character (you control) named "Amarthiúl" to choose):
+        - choose ready character (you control) named "Amarthiúl"
+        - exhaust the picked card
+        - this objective leaves the staging area and attaches to the picked character, controlled by that character's controller (claimed)
+
+10114:A:2 (front): Attached character gets +1 Defense while defending against Undead enemies.
+  10114:constant:1: Constant
+    - if its host is the declared defender of the attack against a Undead enemy: its host: stat defense 1, while this card is in play
+
+## 10184 The Treachery of Rhudaur
+
+10184:A:1 (front): You are playing campaign mode.
+  (inert: the engine applies it by rule, no record)
+
+10184:B:1 (back): Resolution: For each Clue a player controls, that player may add the boon with the same name to the Campaign Pool and their deck.
+  10184:resolution:1: Resolution
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - each player in turn may take "10185" into the Campaign Pool, only a player who controls the claimed objective with code 10110
+    - each player in turn may take "10186" into the Campaign Pool, only a player who controls the claimed objective with code 10112
+    - each player in turn may take "10187" into the Campaign Pool, only a player who controls the claimed objective with code 10114
+    - mark in the Campaign Log, as "determined", each character in play that a copy of the card with code 10172 is attached to
+
+## 10185 Daechanar's Brand
+
+10185:A:1 (front): Attach to a hero. Restricted.
+  10185:constant:1: Constant
+    - this attachment may be attached to a hero
+
+10185:A:2 (front): Attached hero gets +1 Attack (+2 Attack instead when attacking an Undead enemy).
+  10185:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - its host: stat attack 1, while this card is in play
+    - then, if its host is attacking a Undead enemy (any player controls) (checked when this step runs, after the steps above; not tied to whether they did anything): its host: stat attack 1, while this card is in play
+
+10185:A:3 (front): Response: After you play Daechanar's Brand, search the top 5 cards of the encounter deck for a Sorcery treachery and add it to the victory display. Shuffle the encounter deck.
+  10185:response:1: Response after this card is played (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose a Sorcery treachery among the top 5 cards of the encounter deck (none when no card matches)
+    - the picked card goes to the victory display
+    - shuffle the encounter deck
+
+## 10186 Heirloom of Iârchon
+
+10186:A:1 (front): Attach to a hero. Restricted.
+  10186:constant:1: Constant
+    - this attachment may be attached to a hero
+
+10186:A:2 (front): Attached hero gets +1 Willpower.
+  10186:constant:2: Constant
+    - its host: stat willpower 1, while this card is in play
+
+10186:A:3 (front): Response: After you play Heirloom of Iârchon, heal all damage from attached hero.
+  10186:response:1: Response after this card is played (heard about this card)
+    - heal all damage from its host
+
+## 10187 Orders from Angmar
+
+10187:A:1 (front): Attach to a hero. Restricted.
+  10187:constant:1: Constant
+    - this attachment may be attached to a hero
+
+10187:A:2 (front): Attached hero gets +1 Defense (+2 Defense instead while defending against an Undead enemy).
+  10187:constant:2: Constant
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - its host: stat defense 1, while this card is in play
+    - then, if its host is the declared defender of the attack against a Undead enemy (checked when this step runs, after the steps above; not tied to whether they did anything): its host: stat defense 1, while this card is in play
+
+10187:A:3 (front): Response: After you play Orders from Angmar, discard a non-unique Undead enemy with 2 or less remaining hit points.
+  10187:response:1: Response after this card is played (heard about this card)
+    (steps run in order; a step depends on an earlier one only through its own condition)
+    - choose non-unique Undead enemy (any player controls) or in the staging area, with 2 or fewer hit points remaining
+    - discard the picked card
+
+(rendered pieces: 276 by template, 0 as JSON)

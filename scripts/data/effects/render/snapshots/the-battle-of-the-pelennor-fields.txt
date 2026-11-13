@@ -257,7 +257,7 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
       * option "city" (only if the card with code 145043 is in play):
         - [json DamageMinasTirith {"verb":"DamageMinasTirith","amount":3}]
       * option "attack":
-        - this enemy attacks now, dealt a new shadow card after its old ones are discarded [also {"afterThis":true}]
+        - the attacking enemy makes an additional attack against the defending player once this attack has ended, dealt a new shadow card
 
 ## 145057 Fell Beast
 (the scenario deals it into the encounter pile; the piles place it, no record does)
@@ -569,4 +569,4 @@ Scenario piles that place cards with no record (activeLocation: 145047 Pelennor 
     - [json EngageFirstPlayer {"verb":"EngageFirstPlayer"}]
     - then, if this card is engaged with the player (checked when this step runs, after the steps above; not tied to whether they did anything): this enemy attacks now, dealt a new shadow card after its old ones are discarded
 
-(rendered pieces: 305 by template, 46 as JSON)
+(rendered pieces: 306 by template, 45 as JSON)

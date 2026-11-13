@@ -293,7 +293,7 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
     - for each player, first player first:
       - the acting player chooses one of:
         * option "discard":
-          - [json DiscardEach {"verb":"DiscardEach","pick":{"type":"ally","control":"you"}}]
+          - the acting player discards each ally (you control)
         * option "threat":
           - raise threat by the number of ally (you control) (the acting player)
 
@@ -333,4 +333,4 @@ Scenario piles that place cards with no record (quest: 142020 The Council of Elr
     - raise threat by 1 (each player)
     - [json SetStatUntil {"verb":"SetStatUntil","stat":"willpower","value":0,"until":"endOfRound","holders":{"type":"hero","control":"any","isHost":true}}]
 
-(rendered pieces: 164 by template, 30 as JSON)
+(rendered pieces: 166 by template, 29 as JSON)
