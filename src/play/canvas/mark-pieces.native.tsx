@@ -5,7 +5,7 @@ import { Circle, Group, Image, Line, RoundedRect, Text, type SkFont, type SkImag
 
 import { cardCorner } from "../../ui/card-corner.ts";
 import { type CardEffects, type CombatNumber } from "../cards/card-effects.ts";
-import { DETERMINED_WORD } from "../words/scenarios/wastes-table.ts";
+import { DETERMINED_WORD } from "../words/scenarios/angmar/wastes-table.ts";
 import { type IconName } from "../../ui/icon-map.ts";
 import { glyphCells, type PlaceMark } from "../store/island-place.ts";
 import { COLS, ROWS } from "../dream-chaser/island-table.ts";

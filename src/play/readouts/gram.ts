@@ -10,7 +10,7 @@ import type { ReduceContext, ScenarioState } from "../../rules/engine/reduce.ts"
 import { capturedByHost } from "../../rules/families/captured/pile.ts";
 
 import { ownerWords } from "../words/owner.ts";
-import { capturedDeckWords, capturedLabel, heldCapturedWords, joinedWords, startThreatWords, type ExecutionersRaise } from "../words/scenarios/gram-table.ts";
+import { capturedDeckWords, capturedLabel, heldCapturedWords, joinedWords, startThreatWords, type ExecutionersRaise } from "../words/scenarios/angmar/gram-table.ts";
 import type { HandMark } from "./isengard.ts";
 
 export const LOOT = "10175";

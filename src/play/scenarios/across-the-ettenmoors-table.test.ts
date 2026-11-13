@@ -12,6 +12,9 @@ import { finish, idOf, legalIntents, resolveRecords, revealFromTop, tableFromLay
 import { angmarDetail } from "../cards/angmar-preview.ts";
 import { sheetFor } from "../choice/sheets.ts";
 import type { PickSheet, SheetNames } from "../choice/sheet-types.ts";
+import { CURRENT_QUEST_WORDS } from "../words/scenarios/angmar/angmar-table.ts";
+import { dialProps } from "../readouts/dials.ts";
+import { threatLevel } from "../readouts/threat-level.ts";
 import { ettenmoorsDials, ignoredRevealNote } from "../readouts/ettenmoors.ts";
 import { scenarioDials } from "../readouts/scenario-dials.ts";
 
@@ -44,12 +47,28 @@ describe("the Losing Time clock on the campaign card", () => {
 
   it("10182:A:3 says nothing more is revealed once no Losing Time is set aside: no warning, the resources stay", () => {
     const t = at({ campaign: true, setAside: [] });
-    for (const resources of [2, 3]) {
+    for (const resources of [2, 3, 4]) {
       const dial = losing(setResources(t.state, resources));
       expect(dial?.warn).toBeUndefined();
+      expect(dial?.limit).toBeUndefined();
+      expect(dial?.warms).toBeUndefined();
+      expect(dial?.name).not.toContain("revealed at 3");
       expect(dial?.limitWords).toBe("no copy is set aside");
       expect(dial?.note).toBe(`${resources} resources on the campaign card. No Losing Time is set aside, so nothing more is revealed.`);
     }
+  });
+
+  it("10182:A:3 keeps the ring calm and the speech free of a limit at 3 and 4 resources with no copy set aside, and critical at 3 with one set aside", () => {
+    const none = at({ campaign: true, setAside: [] });
+    for (const resources of [3, 4]) {
+      const props = dialProps(losing(setResources(none.state, resources))!);
+      expect(props.elimination).toBe(false);
+      expect(props.limit).toBeUndefined();
+      expect(props.limitWords).toBe("no copy is set aside");
+    }
+    const live = dialProps(losing(setResources(at({ campaign: true, setAside: ["10183"] }).state, 3))!);
+    expect(live.elimination).toBe(true);
+    expect(threatLevel(3, live.limit)).toBe("critical");
   });
 
   it("10182:A:3 is drawn only in a campaign game: a standalone game has no campaign card and no clock", () => {
@@ -80,6 +99,35 @@ describe("a safe location on the table", () => {
     const loud = at({ staging: ["10068"], deck: ["10073"] });
     const revealed = finish({ state: revealFromTop(loud.state, loud.ctx, "10079", []).state, steps: [] }, loud.ctx);
     expect(ignoredRevealNote(revealed.state, idOf(revealed.state, "10079"), nameOf(revealed.state))).toBeNull();
+  });
+});
+
+describe("a safe location's preview follows where it lies", () => {
+  it("10068:A:1 says the travel words only in the staging area, a short line in the victory display and nothing in a pile", () => {
+    const t = at({ staging: ["10069"] });
+    const id = idOf(t.state, "10069");
+    const say = (zone: string) => angmarDetail(updateCard(t.state, id, { zone } as never), t.ctx, id, nameOf(t.state));
+    expect(say("staging")).toBe("Safe. When the players travel here, every engaged enemy returns to the staging area.");
+    expect(say("victory")).toBe("Safe. The players travelled here, and it lies in the victory display.");
+    expect(say("encounterDiscard")).toBeNull();
+    expect(say("encounterDeck")).toBeNull();
+  });
+});
+
+describe("a card with two things to say says both", () => {
+  it("10080:A:1 keeps No Rest on a hero the Campaign Log marks determined, and the current quest on a blanked side quest", () => {
+    const t = at({ phase: "Refresh" });
+    const run = resolveRecords(updateCard(t.state, t.hero2, { exhausted: true }), t.ctx, "10080", "whenRevealed");
+    const logged = { ...run.state, campaignFacts: { prisoner: null, usedOnce: [], counters: {}, angmar: { protectDamage: null, heroDamage: {}, determined: [run.state.cards[t.hero2]?.code ?? ""], stolen: [] } } } as ScenarioState;
+    const says = angmarDetail(logged, t.ctx, t.hero2, () => "No Rest");
+    expect(says).toContain("The Campaign Log marks this character determined");
+    expect(says).toContain("No Rest: it cannot ready");
+    const quiet = at({ active: "10068", staging: ["10081"] });
+    const quest = idOf(quiet.state, "10081");
+    const current = { ...quiet.state, modifiers: [...quiet.state.modifiers, { instanceId: quest, sourceId: quest, stat: "currentQuest", amount: 1, until: "endOfPhase" }] } as ScenarioState;
+    const line = angmarDetail(current, quiet.ctx, quest, nameOf(current));
+    expect(line).toContain("Its text box is blank while Secluded Cave is the active location");
+    expect(line).toContain(CURRENT_QUEST_WORDS);
   });
 });
 
@@ -117,7 +165,7 @@ describe("No Rest on a hero", () => {
     const rest = idOf(state, "10080");
     const detail = (id: string) => angmarDetail(state, t.ctx, id, (card) => (state.cards[card]?.code === "10080" ? "No Rest" : "Aragorn"));
     expect(state.cards[rest]?.host).toBe(t.hero2);
-    expect(detail(rest)).toBe("On Aragorn: it cannot ready and collects no resources in the resource phase. It is discarded when the players travel to a safe location.");
+    expect(detail(rest)).toBe("On Aragorn: Aragorn cannot ready and collects no resources in the resource phase. It is discarded when the players travel to a safe location.");
     expect(detail(t.hero2)).toBe("No Rest: it cannot ready and collects no resources. No Rest is discarded when the players travel to a safe location.");
   });
 });

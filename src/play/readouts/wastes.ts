@@ -7,7 +7,7 @@ import type { ScenarioState } from "../../rules/engine/reduce.ts";
 import { DAYBREAK, timeObjective } from "../../rules/families/angmar/day-night.ts";
 import { stageOf } from "../../rules/families/breaking/areas.ts";
 
-import { TIME_NAME, gateLimitWords, gateWords, ravagedWords, startMarkLabel, startMarkWords, timeWord, timeWords } from "../words/scenarios/wastes-table.ts";
+import { TIME_NAME, gateLimitWords, gateWords, ravagedWords, startMarkLabel, startMarkWords, timeWord, timeWords } from "../words/scenarios/angmar/wastes-table.ts";
 import { cardsOf, type TableDial } from "./dials.ts";
 import type { HandMark } from "./isengard.ts";
 

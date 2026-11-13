@@ -7,7 +7,7 @@ import { DAYBREAK, timeObjective } from "../../rules/families/angmar/day-night.t
 import { stageOf } from "../../rules/families/breaking/areas.ts";
 
 import { ARNOR_RAVAGED, FEND_OFF_DESPAIR, GATE, PACK_LEADER, packLeaderGate } from "../readouts/wastes.ts";
-import { despairPreviewWords, gateWords, ravagedWords, timePreviewWords } from "../words/scenarios/wastes-table.ts";
+import { despairPreviewWords, gateWords, ravagedWords, timePreviewWords } from "../words/scenarios/angmar/wastes-table.ts";
 import { determinedMark } from "./determined-mark.ts";
 
 export function wastesDetail(game: ScenarioState, ctx: ReduceContext, cardId: string): string | null {

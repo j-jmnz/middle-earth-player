@@ -17,7 +17,7 @@ import type { ChoiceNames, PickWords } from "../choice.ts";
 import { heathAsk, heathBranchWords, heathChooseNote, heathOptionLabel } from "./heath.ts";
 import { framsburgAsk, framsburgBranchNow, framsburgBranchWords, framsburgChooseNote } from "./framsburg.ts";
 import { fateAsk, fateBranchRows, fateBranchWords, fateChooseNote } from "./fate.ts";
-import { boonHeroAsk } from "./angmar-table.ts";
+import { boonHeroAsk } from "./angmar/angmar-table.ts";
 import { dragonSicknessAsk, gundabadAsk, gundabadBranchWords, gundabadChooseNote } from "./gundabad.ts";
 import { nightAsk, nightBranchWords, nightChooseNote, nightQuestsNow } from "./night.ts";
 import { rhovanionAsk, rhovanionBranchWords, rhovanionChooseNote } from "./rhovanion.ts";

@@ -3,13 +3,13 @@
 // against Orc Rearguard's cap, the current quest, and the card held under a side quest; Deadmen's Dike's: the damage on Thaurdir against the hit points that open stage 2B, each seat's deck against the elimination at 0, Fornost Square's tokens, Broken Battlements' time counters, a burden on its host,
 // The Power of Angmar's lock. The engine decided every number; these only say it. Each sentence stays at about 25 words (docs/design-system-table.md, Choice tray, Plain words).
 
-import type { Instruction } from "../../../catalog/boundary.ts";
-import type { ScenarioState } from "../../../rules/core/state.ts";
+import type { Instruction } from "../../../../catalog/boundary.ts";
+import type { ScenarioState } from "../../../../rules/core/state.ts";
 
-import type { ChoiceNames, PickWords } from "../choice.ts";
-import { seatSays } from "../seat.ts";
+import type { ChoiceNames, PickWords } from "../../choice.ts";
+import { seatSays } from "../../seat.ts";
+import { plural } from "../../list.ts";
 
-const plural = (count: number, one: string, many: string): string => `${count} ${count === 1 ? one : many}`;
 
 /** The note of Hunting the Orcs' dial: the resource tokens it holds against the number at which it flips (09071:A:1). */
 export const huntWords = (tokens: number, limit: number): string => `${tokens} of ${limit} resource tokens. Each defeated enemy places 1. At ${limit} it flips to Savage Counter-attack, and the quest advances to stage 2.`;

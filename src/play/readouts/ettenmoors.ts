@@ -7,7 +7,7 @@ import type { ReduceContext } from "../../rules/engine/reduce.ts";
 import { isSafeLocation } from "../../rules/families/angmar/safe.ts";
 import { printedOf } from "../../rules/core/printed.ts";
 
-import { ignoredRevealWords, LOSING_TIME_AT, losingTimeNearWords, losingTimeWords } from "../words/ettenmoors-table.ts";
+import { ignoredRevealWords, LOSING_TIME_AT, losingTimeNearWords, losingTimeWords } from "../words/scenarios/angmar/ettenmoors-table.ts";
 import type { TableDial } from "./dials.ts";
 
 export const ETTENMOORS_CAMPAIGN = "10182";
@@ -20,21 +20,21 @@ export const ettenmoorsCampaignCard = (game: ScenarioState): CardInstance | unde
 /** The copies of Losing Time the campaign card still holds out of play. */
 export const losingTimeSetAside = (game: ScenarioState): number => game.setAside.filter((id) => game.cards[id]?.code === LOSING_TIME).length;
 
-/** The Losing Time dial: the campaign card's resources against 3. It warms at 2 resources while a copy is set aside, since the next quest phase then reveals one; with none set aside it never warns and its words say nothing more is revealed. Empty with no campaign card. */
+/** The Losing Time dial: the campaign card's resources against 3. It warms at 2 resources while a copy is set aside, since the next quest phase then reveals one; with none set aside it has no limit, never warms and says nothing more is revealed. Empty with no campaign card. */
 export function ettenmoorsDials(game: ScenarioState, nameOf: (code: string) => string): readonly TableDial[] {
   const card = ettenmoorsCampaignCard(game);
   if (!card) return [];
   const setAside = losingTimeSetAside(game);
+  const live = setAside > 0;
   return [{
     id: "losing",
     testID: "angmar-losing",
     label: "Losing Time",
-    name: `Resources on ${nameOf(card.code)}, a Losing Time is revealed at ${LOSING_TIME_AT}:`,
+    name: live ? `Resources on ${nameOf(card.code)}, a Losing Time is revealed at ${LOSING_TIME_AT}:` : `Resources on ${nameOf(card.code)}, no Losing Time is set aside:`,
     value: card.resources,
-    limit: LOSING_TIME_AT,
-    warms: true,
-    ...(setAside > 0 && card.resources >= LOSING_TIME_AT - 1 ? { warn: { level: "near" as const, words: losingTimeNearWords(setAside) } } : {}),
-    limitWords: setAside > 0 ? `${LOSING_TIME_AT} reveals one` : "no copy is set aside",
+    ...(live ? { limit: LOSING_TIME_AT, warms: true as const } : {}),
+    ...(live && card.resources >= LOSING_TIME_AT - 1 ? { warn: { level: "near" as const, words: losingTimeNearWords(setAside) } } : {}),
+    limitWords: live ? `${LOSING_TIME_AT} reveals one` : "no copy is set aside",
     note: losingTimeWords(card.resources, setAside),
   }];
 }

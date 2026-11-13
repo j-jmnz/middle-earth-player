@@ -13,7 +13,7 @@ import { ettenmoorsDetail } from "./ettenmoors-preview.ts";
 import { gramDetail } from "./gram-preview.ts";
 import { wastesDetail } from "./wastes-preview.ts";
 import { hitPointsOf } from "../../rules/families/angmar/quest.ts";
-import { battlementsPreviewWords, burdenWords, CURRENT_QUEST_WORDS, fornostWords, heldWords, isBurden, POWER_OF_ANGMAR_WORDS, thaurdirPreviewWords, holdsWords, huntPreviewWords, protectPreviewWords, savagePreviewWords, shelterPreviewWords, wildernessWords } from "../words/scenarios/angmar-table.ts";
+import { battlementsPreviewWords, burdenWords, CURRENT_QUEST_WORDS, fornostWords, heldWords, isBurden, POWER_OF_ANGMAR_WORDS, thaurdirPreviewWords, holdsWords, huntPreviewWords, protectPreviewWords, savagePreviewWords, shelterPreviewWords, wildernessWords } from "../words/scenarios/angmar/angmar-table.ts";
 
 const WILDERNESS = "09051";
 
@@ -29,16 +29,13 @@ function handsUnder(game: ScenarioState, cardId: string): { owner: string; count
 
 export function angmarDetail(game: ScenarioState, ctx: ReduceContext, cardId: string, name: (id: string) => string): string | null {
   const card = game.cards[cardId];
-  // The Wastes of Eriador's own pieces (the Time objective, Pack Leader's gate, Determination) hold in a game whether or not a side quest has been seen yet.
-  const wastes = wastesDetail(game, ctx, cardId);
-  if (wastes) return wastes;
-  // Across the Ettenmoors' campaign card clock, safe locations, guards and No Rest.
-  const ettenmoors = ettenmoorsDetail(game, ctx, cardId, name);
-  if (ettenmoors) return ettenmoors;
-  // Escape from Mount Gram's captured cards, Loot the Dungeons and Stop the Executioners.
-  const gram = gramDetail(game, ctx, cardId, name);
-  // A side quest that holds captured cards (Stop the Executioners, Loot) is the current quest too: both lines are said.
-  if (gram) return card && card.zone === "staging" && flagged(game, cardId, "currentQuest") ? `${gram} ${CURRENT_QUEST_WORDS}` : gram;
+  // The pieces of The Wastes of Eriador (the Time objective, Pack Leader's gate, Determination), Across the Ettenmoors (the campaign card clock, safe locations, guards, No Rest) and Escape from Mount Gram (captured cards, Loot the Dungeons, Stop the Executioners) hold
+  // in a game whether or not a side quest has been seen yet. A card can carry two of them (a hero with Determination and No Rest), so the parts are joined; a side quest that is the current quest says so after them.
+  const parts = [wastesDetail(game, ctx, cardId), ettenmoorsDetail(game, ctx, cardId, name), gramDetail(game, ctx, cardId, name)].filter((part): part is string => part != null);
+  if (parts.length > 0) {
+    if (card && card.zone === "staging" && flagged(game, cardId, "currentQuest")) parts.push(CURRENT_QUEST_WORDS);
+    return parts.join(" ");
+  }
   if (!card || game.sideQuests !== true) return null;
   const host = card.zone === "captive" && card.host != null ? game.cards[card.host] : undefined;
   if (host && timeOf(ctx, host.code) != null) return heldWords(name(host.id), host.resources);

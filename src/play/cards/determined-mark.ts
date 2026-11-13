@@ -6,7 +6,7 @@ import { holds } from "../../rules/interpret/conditions.ts";
 import type { ReduceContext } from "../../rules/engine/reduce.ts";
 import { determinedMatches } from "../../rules/families/angmar/determined.ts";
 
-import { CARRIES_WORD, DETERMINED_WORD, determinedWords } from "../words/scenarios/wastes-table.ts";
+import { CARRIES_WORD, DETERMINED_WORD, determinedWords } from "../words/scenarios/angmar/wastes-table.ts";
 
 /** `word`: the pill's word, "Determined" when the log marks the character and "Determination" when it only carries a copy. `speech`: what the preview and the screen reader say. */
 export type DeterminedMark = { word: string; speech: string };

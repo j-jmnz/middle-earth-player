@@ -1,7 +1,9 @@
 // Rules: mec108.captured-deck, mec108.captured-cards, mec108.capture-x, mec108.create-staging-area, mec108.joining-another-player, mec108.time-x, mec108.side-quests-in-play, mec108.setup-escape-from-mount-gram (data/rules/entries.json); ledger lines 10038:A:1, 10038:B:1, 10039:A:1, 10039:B:2, 10053:A:3, 10174:A:2, 10175:A:1.
 // What the table says of Escape from Mount Gram's pieces (src/play/readouts/gram.ts, src/play/cards/gram-preview.ts): each seat's captured deck, the cards captured under a card, a seat joined to another player's area, the starting threat the quest card sets, Loot the Dungeons in every area and
 // Stop the Executioners' time. The engine decided every number; these only say it. Each sentence stays at about 25 words (docs/design-system-table.md, Choice tray, Plain words).
-const plural = (count: number, one: string, many: string): string => `${count} ${count === 1 ? one : many}`;
+
+import { plural } from "../../list.ts";
+
 const sentence = (words: string): string => `${words.charAt(0).toUpperCase()}${words.slice(1)}`;
 
 const FIGURE_SPACE = "\u2007";

@@ -15,8 +15,8 @@ import { questPointsOf } from "../../rules/quest/quest.ts";
 import { cardsUnder } from "../../rules/core/zones.ts";
 import { captiveUnder } from "../../rules/families/south/captive.ts";
 
-import { battlementsTimeNearWords, battlementsTimeWords, deckLabel, deckNearWords, deckWords, thaurdirLimitWords, thaurdirWords, handUnderLabel, handUnderWords, huntWords, iarionLabel, iarionWords, protectNearWords, protectWords, savageNearWords, savageWords, rearguardLimitWords, rearguardWords, shelterTimeNearWords, shelterTimeWords, timeNearWords, timeWords } from "../words/scenarios/angmar-table.ts";
-import { executionersNearWords, executionersTimeWords } from "../words/scenarios/gram-table.ts";
+import { battlementsTimeNearWords, battlementsTimeWords, deckLabel, deckNearWords, deckWords, thaurdirLimitWords, thaurdirWords, handUnderLabel, handUnderWords, huntWords, iarionLabel, iarionWords, protectNearWords, protectWords, savageNearWords, savageWords, rearguardLimitWords, rearguardWords, shelterTimeNearWords, shelterTimeWords, timeNearWords, timeWords } from "../words/scenarios/angmar/angmar-table.ts";
+import { executionersNearWords, executionersTimeWords } from "../words/scenarios/angmar/gram-table.ts";
 import { cardsOf, type TableDial } from "./dials.ts";
 import { EXECUTIONERS, executionersRaises } from "./gram.ts";
 import type { HandMark } from "./isengard.ts";

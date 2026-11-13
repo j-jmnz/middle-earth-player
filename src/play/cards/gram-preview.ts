@@ -7,7 +7,7 @@ import { questPointsOf } from "../../rules/quest/quest.ts";
 
 import { EXECUTIONERS, LOOT, executionersRaises, hasCapturedDecks, heldCapturedLine } from "../readouts/gram.ts";
 import { ownerWords } from "../words/owner.ts";
-import { capturedCardWords, executionersPreviewWords, lootWords } from "../words/scenarios/gram-table.ts";
+import { capturedCardWords, executionersPreviewWords, lootWords } from "../words/scenarios/angmar/gram-table.ts";
 
 export function gramDetail(game: ScenarioState, ctx: ReduceContext, cardId: string, name: (id: string) => string): string | null {
   if (!hasCapturedDecks(game)) return null;
