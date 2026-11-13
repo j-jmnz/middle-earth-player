@@ -17,7 +17,7 @@
     },
     {
       "name": "Ruins of Arnor",
-      "count": 7
+      "count": 6
     }
   ],
   "cards": [
@@ -112,12 +112,6 @@
       "pile": "encounter"
     },
     {
-      "code": "09057",
-      "normal": 1,
-      "easy": 1,
-      "pile": "encounter"
-    },
-    {
       "code": "09058",
       "normal": 2,
       "easy": 2,
@@ -164,8 +158,8 @@
     },
     {
       "code": "09057",
-      "normal": 1,
-      "easy": 1,
+      "normal": 2,
+      "easy": 2,
       "pile": "staging",
       "byPlayers": {
         "few": 1,

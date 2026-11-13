@@ -950,6 +950,36 @@
     },
     {
       "match": {
+        "code": "10109"
+      },
+      "set": {
+        "questPoints": 16
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Quiet the Spirits no quest points. The scan prints a quest points box of 16 (orange box, no Victory), so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 10109.A (The Treachery of Rhudaur, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "10111"
+      },
+      "set": {
+        "questPoints": 18
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Sift through the Debris no quest points. The scan prints a quest points box of 18 (orange box, no Victory), so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 10111.A (The Treachery of Rhudaur, read for the quest points box)"
+    },
+    {
+      "match": {
+        "code": "10113"
+      },
+      "set": {
+        "questPoints": 14
+      },
+      "reason": "Hall of Beorn gives the encounter side quest Decipher Ancient Texts no quest points. The scan prints a quest points box of 14 (orange box, no Victory), so progress can be placed on it once it is the current quest (mec108.side-quests-in-play).",
+      "source": "scan 10113.A (The Treachery of Rhudaur, read for the quest points box)"
+    },
+    {
+      "match": {
         "code": "10068"
       },
       "set": {
@@ -1561,6 +1591,23 @@
     }
   ],
   "scenarioCounts": [
+    {
+      "scenario": "the-treachery-of-rhudaur",
+      "code": "09057",
+      "pile": "staging",
+      "normal": 2,
+      "easy": 2,
+      "reason": "The Setup (10094:A:1) searches the encounter deck for 1 copy of Ancient Causeway and adds it to the staging area, 2 copies instead with 3 or 4 players. The Ruins of Arnor set holds 2 copies, both in the encounter deck at the start. The staging pile holds both (1 placed at 1-2 players, 2 at 3-4, the rest stays in the deck), so the encounter pile's copy is dropped.",
+      "source": "scan 10094.A (Setup line); hallofbeorn.com Scenarios/The-Treachery-of-Rhudaur; the Weather Hills deals the same two copies in the deck"
+    },
+    {
+      "scenario": "the-treachery-of-rhudaur",
+      "code": "09057",
+      "normal": 0,
+      "easy": 0,
+      "reason": "The staging pile holds both copies of Ancient Causeway (see the staging entry); the encounter pile's single copy would count one of them twice.",
+      "source": "scan 10094.A (Setup line)"
+    },
     {
       "scenario": "temple-of-the-deceived",
       "code": "12078",

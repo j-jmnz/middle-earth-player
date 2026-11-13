@@ -295,6 +295,7 @@ export function buildScenarios(raw: RawData, cards: readonly Card[], overrides: 
       else if (rule.normal != null) item.normal = rule.normal;
       if (item && rule.easy != null) item.easy = rule.easy;
       if (item) item.easy = Math.min(item.easy, item.normal);
+      if (item && item.normal === 0) placed.splice(placed.indexOf(item), 1);
     }
     // The campaign card's Setup also deals cards the load list put in an encounter deck or a hand.
     for (const code of codesOf(camp, ["stage", "attachRingBearer", "shuffleInto"])) {

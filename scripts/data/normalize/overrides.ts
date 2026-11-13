@@ -37,14 +37,15 @@ const overridesSchema = z.object({
     .array(z.object({ scenario: z.string().min(1), code: z.string().min(1), easy: z.number().int().nonnegative(), reason: z.string().min(1), source: z.string().min(1) }))
     .default([]),
   // A count the sources disagree on, settled by the printed card: the encounter set's size printed on its cards ("19/31") or a Setup line. `normal` and
-  // `easy` are the copies of the card in `pile` (the encounter deck unless named) at that difficulty, replacing the load list's.
+  // `easy` are the copies of the card in `pile` (the encounter deck unless named) at that difficulty, replacing the load list's. A `normal` of 0 drops the
+  // placement, for a card whose copies another pile holds (The Treachery of Rhudaur's Ancient Causeway: the staging pile holds both, the Setup searches the deck for them).
   scenarioCounts: z
     .array(
       z.object({
         scenario: z.string().min(1),
         code: z.string().min(1),
         pile: z.enum(PILES).optional(),
-        normal: z.number().int().positive().optional(),
+        normal: z.number().int().nonnegative().optional(),
         easy: z.number().int().nonnegative().optional(),
         reason: z.string().min(1),
         source: z.string().min(1),
