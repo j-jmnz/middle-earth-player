@@ -175,7 +175,7 @@ export function canDefend(state: ScenarioState, attackedSeat: number, defenderId
   if (!isCharacterType(printed) || instance.host != null) return false;
   if (flagged(state, defenderId, "cannotDefend")) return false;
   // A ship-enemy's attack is defended only by a ship-objective, and a ship-objective defends only against one (dcce.ship-enemies).
-  if (familyDefenseReason(state, printed, cards)) return false;
+  if (familyDefenseReason(state, printed, cards, defenderId)) return false;
   if (instance.controller === attackedSeat) return true;
   return printed.keywords.sentinel || flagged(state, defenderId, "sentinel");
 }

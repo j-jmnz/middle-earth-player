@@ -58,6 +58,21 @@ const VERBS = [
   // when the scenario is won, which adds it to the log's one starting threat modifier. A lost game writes nothing (rr.campaign-mode). A seat's starting threat is never below 0.
   z.strictObject({ verb: z.literal("RecordStartingThreat"), amount: z.number().int(), ...when }),
   verbFlags(z.strictObject({ verb: z.literal("TradeDamageForResources"), code, damage: z.number().int().positive(), resources: z.number().int().positive(), seat: z.number().int().min(0).optional() }), { setupRole: "afterSetup" }),
+  // The Safe keyword (mec108.safe), a constant marker on an objective-location ("Guarded. Safe.", 10068:A:1): the engine finds the cards with it by their records (the pick filter `safe`, the condition `safeActive`). The verb does nothing when a record runs it; what a safe
+  // location does while it is the active location is written with ordinary records beside it.
+  z.strictObject({ verb: z.literal("Safe") }),
+  // Setup (Into the Ettenmoors, 10064:A:1): of the set-aside encounter side quests one is picked at random (the game's seed) and of the set-aside objective-locations one, and both are added to the staging area (not revealed: the location's own Guarded keyword takes no further
+  // card) with the side quest attached to the location as its guard ("with the safe location guarded by the side quest"). Nothing happens when either kind is not set aside.
+  verbFlags(z.strictObject({ verb: z.literal("StageRandomGuardedPair"), ...when }), { setupRuns: "top" }),
+  // The card (the last picked card by default, `target` by ref) is revealed by the actor as an encounter card, wherever it lies: its Surge and Doomed, its When Revealed effects and the Responses to a reveal resolve, and it ends where its type puts it (a side quest in the staging area)
+  // ("discard cards ... until a side quest is discarded, reveal it, and add it to the staging area", 10064:B:1, 10065:A:1, 10066:A:1). Nothing happens when no card is picked (a discard that ran the deck out).
+  z.strictObject({ verb: z.literal("RevealCard"), card: cardRefSchema.optional(), ...when }),
+  // The source (the campaign card) holds `tokens` resource tokens or more and a copy of `code` is set aside: the tokens come off the source and that copy is revealed (a full reveal, as RevealCard), ending in the encounter discard pile as its type puts it ("remove 3 resources from it to
+  // reveal 1 set-aside copy of Losing Time and place it in the encounter discard pile", 10182:A:3). With fewer tokens or no copy set aside nothing happens and no token comes off.
+  z.strictObject({ verb: z.literal("RevealSetAsideForTokens"), code, tokens: z.number().int().positive(), ...when }),
+  // Resolution: one copy of each of the cards with these codes for every copy of it that lies in the encounter deck or the encounter discard pile joins the Campaign Pool ("Add each copy of Losing Time in the encounter deck or encounter discard pile to the Campaign Pool", 10182:B:1);
+  // a copy set aside, in the staging area or attached does not count. Run by the Resolution (src/rules/setup/resolution.ts).
+  z.strictObject({ verb: z.literal("EarnEncounterCopies"), codes: z.array(code).min(1), ...when }),
 ] as const;
 
 const TRIGGERS = [
@@ -68,6 +83,8 @@ const TRIGGERS = [
   // The Time objective was flipped to Daybreak or to Nightfall (not heard at Setup, where Daybreak is dealt faceup): every card in play hears it, the staging area and the quest card included ("Forced: When it becomes Night, reveal an encounter card", 10012:A:2).
   "becameDay",
   "becameNight",
+  // About a hero: resources were spent from its pool in a payment (a card played, an ability or a Response paid for), once for each hero whose pool paid ("After 1 or more resources are spent from a hero's resource pool", 10082:A:1). Resources moved or removed by an effect are not spent.
+  "heroResourcesSpent",
 ] as const;
 
 const FLAGS = [
@@ -91,6 +108,16 @@ const FLAGS = [
   // On an enemy (the card itself): while a player makes an engagement check against it, its engagement cost changes by this amount for each damaged character that player controls, hero or ally, not below 0 ("-1 engagement cost for each damaged character that player controls", 10020:A:2;
   // families/angmar/check-cost.ts). An optional engagement does not read it (rr.optional-engagement).
   "checkCostPerDamaged",
+  // On the table, while a location with the Safe keyword is the active location (Across the Ettenmoors, mec108.safe): the "when revealed" effects of every treachery card are ignored ("ignore the 'when revealed' effects of all treachery cards"); the treachery is still revealed and keeps its keywords.
+  "treacheryRevealIgnored",
+  // On an enemy (the card itself): a damaged character cannot be declared as an attacker against it nor as a defender against its attack ("Damaged characters cannot be declared as attackers or defenders against Goblin Pursuer", 10076:A:1; families/angmar/combat.ts).
+  "damagedCannotFace",
+  // On an enemy (the card itself): the combat damage its attack deals beyond the remaining hit points of the character it damages takes that many progress tokens off each quest card in play ("remove 1 progress from each quest card in play", 10074:A:1; families/defense/excess.ts).
+  "excessToEachQuest",
+  // On a hero (target `host`): it collects no resources in the resource phase ("does not collect resources during the resource phase", No Rest, 10080:A:1); a resource an effect adds still lands in its pool.
+  "noCollection",
+  // On a side quest, until the end of the round: progress was placed on it this round ("if no progress was placed on Lie Low this round", 10081:A:1; families/angmar/progress.ts). The engine notes it for every side quest that takes progress; a record reads it with the condition `flag`.
+  "progressPlacedHere",
 ] as const;
 
 export const manifest = { name: "angmar", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

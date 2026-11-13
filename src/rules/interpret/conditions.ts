@@ -107,7 +107,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
   switch (condition.kind) {
     // A family's condition hook answers these before this switch (south: noneDiscarded; black-gate: embassy; wilderland: the campaign log, the Caves deck, the quest deck, Discover, the Fate of Wilderland's); the cases only complete the switch.
     case "noneDiscarded": case "logged": case "treasuresLogged": case "beldisBox": case "cavesDeck": case "pileHas": case "facedownUnder": case "questDeck": case "soleAttacker": case "captives":
-    case "attackedThisPhase": case "namedFlag": case "discoverUnavailable": case "encounterPlacedOnStage": case "playerUnengaged": case "hasWizardry": case "onDial": case "canAttachToDial": case "embassy": case "lastFortitudeFailed": case "lastFortitudePassed": case "captured": case "fortitudeFailed": case "hostControlledByActor": case "currentQuest": case "questLeads": case "hitPointsLeft": case "timeOfDay":
+    case "attackedThisPhase": case "namedFlag": case "discoverUnavailable": case "encounterPlacedOnStage": case "playerUnengaged": case "hasWizardry": case "onDial": case "canAttachToDial": case "embassy": case "lastFortitudeFailed": case "lastFortitudePassed": case "captured": case "fortitudeFailed": case "hostControlledByActor": case "currentQuest": case "questLeads": case "hitPointsLeft": case "timeOfDay": case "safeActive": case "setAsideHas":
       return false;
     case "hideFailed":
       return state.hideFailures.some(

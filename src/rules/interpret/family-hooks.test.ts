@@ -163,8 +163,8 @@ describe("combat hooks", () => {
     const a = family("a", { combat: { defense: () => null, attack: () => null, undefended: () => [] } });
     const b = family("b", { combat: { defense: () => "no defense", attack: () => "no attack", undefended: () => ["x"] } });
     const c = family("c", { combat: { defense: () => "other", attack: () => "other", undefended: () => ["y"] } });
-    expect(familyDefenseReason(state, printed, cards, [a, family("none")])).toBeNull();
-    expect(familyDefenseReason(state, printed, cards, [a, b, c])).toBe("no defense");
+    expect(familyDefenseReason(state, printed, cards, undefined, [a, family("none")])).toBeNull();
+    expect(familyDefenseReason(state, printed, cards, undefined, [a, b, c])).toBe("no defense");
     expect(familyAttackReason(state, "e", printed, printed, "h1", [a])).toBeNull();
     expect(familyAttackReason(state, "e", printed, printed, "h1", [a, b, c])).toBe("no attack");
     expect(familyUndefendedTargets(state, () => ["h"], cards, [a])).toEqual([]);

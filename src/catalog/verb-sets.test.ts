@@ -11,7 +11,7 @@ describe("verb flags", () => {
   });
 
   it("mark exactly the verbs that make a quest card's Setup run", () => {
-    expect(sorted(setupRunVerbs("top"))).toEqual(["AttachSetAside", "DiscardUntilAflame", "DiscardUntilEnemies", "PlaceDamageOn", "PrepareFleet", "PrepareGrottoDeck", "PrepareIslandMap", "PrepareUnchartedDeck", "PutSetAsideInPlay", "ShufflePile", "TakeControlOfSetAside", "TakeLoggedCaptives"]);
+    expect(sorted(setupRunVerbs("top"))).toEqual(["AttachSetAside", "DiscardUntilAflame", "DiscardUntilEnemies", "PlaceDamageOn", "PrepareFleet", "PrepareGrottoDeck", "PrepareIslandMap", "PrepareUnchartedDeck", "PutSetAsideInPlay", "ShufflePile", "StageRandomGuardedPair", "TakeControlOfSetAside", "TakeLoggedCaptives"]);
     expect(sorted(setupRunVerbs("inForEachPlayer"))).toEqual(["AttachToDial", "PrepareCapturedDeck", "RevealEncounter", "SearchMove"]);
     expect(sorted(setupRunVerbs("inChoose"))).toEqual(["ShuffleCopyIntoEachDeck"]);
     expect(sorted(setupRunVerbs("inEach"))).toEqual(["GuardObjective"]);

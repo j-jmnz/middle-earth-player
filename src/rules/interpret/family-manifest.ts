@@ -71,7 +71,7 @@ export type AttachedHook = (state: ScenarioState, id: string, host: string, ctx:
  * `defense` and `attack` return why the character may not, or null; the first family with a reason wins. `undefended` returns the characters an undefended attack's
  * damage may go to instead of the heroes, or an empty list; `candidates` is the player's characters, read only when asked. The first non-empty answer wins. */
 export type CombatHooks = {
-  readonly defense?: (state: ScenarioState, defender: PrintedCard, cards: ReadonlyMap<string, PrintedCard>) => string | null;
+  readonly defense?: (state: ScenarioState, defender: PrintedCard, cards: ReadonlyMap<string, PrintedCard>, defenderId?: string) => string | null;
   readonly attack?: (state: ScenarioState, enemyId: string, attacker: PrintedCard, target: PrintedCard, attackerId: string) => string | null;
   readonly undefended?: (state: ScenarioState, candidates: () => readonly string[], cards: ReadonlyMap<string, PrintedCard>) => readonly string[];
 };

@@ -15,6 +15,7 @@ import { updateCard } from "../../core/state.ts";
 import { noteHostDefeated } from "../attachments/hold.ts";
 import { questCardDefeatedHeard } from "../quest/branch.ts";
 import { releaseHeldOnDefeat } from "../angmar/hold.ts";
+import { noteProgressPlaced } from "../angmar/progress.ts";
 import { addToVictory } from "./victory.ts";
 
 // The side quests in the players' quest areas, in seat order.
@@ -74,7 +75,7 @@ export function placeOnSideQuest(state: ScenarioState, questId: string, amount: 
   const placed = points == null ? amount : Math.min(amount, Math.max(0, points - quest.progress));
   let next = state;
   if (placed > 0) {
-    next = updateCard(next, questId, { progress: quest.progress + placed });
+    next = noteProgressPlaced(updateCard(next, questId, { progress: quest.progress + placed }), questId, placed);
     steps.push({ kind: "progress", targetId: questId, amount: placed, cause });
   }
   const updated = next.cards[questId];

@@ -311,6 +311,10 @@ const atomSchema = z.discriminatedUnion("kind", [
   // The time of day, read by the angmar family: the Time objective (Daybreak, Nightfall) shows the side the state is, `day` while Daybreak is faceup, `night` while Nightfall is ("While it is Night, Wolf of Angmar gets +2 Attack", 10022:A:2; mec108.day-and-night).
   // False while no Time objective is in play.
   z.strictObject({ kind: z.literal("timeOfDay"), is: z.enum(["day", "night"]) }),
+  // A location with the Safe keyword is the active location now (`is: true`), or none is (`is: false`): "unless there is an active location with the safe keyword" (10065:B:1, 10066:B:1; mec108.safe). Read by the angmar family.
+  z.strictObject({ kind: z.literal("safeActive"), is: z.boolean() }),
+  // A copy of the card with this code is set aside, out of play ("reveal 1 set-aside copy of Losing Time", 10182:A:3). Read by the angmar family.
+  z.strictObject({ kind: z.literal("setAsideHas"), code: z.string().min(1) }),
   // The pursuit value (mec112.pursuit, the pursuit tracker beside the quest deck) is at most `max` and at least `min`: "If the pursuit value is 25 or lower" (143071:B:1), "30 or greater" (143022:A:2). False while no tracker is set (ScenarioState.pursuit).
   z.strictObject({ kind: z.literal("pursuit"), max: z.number().int().min(0).optional(), min: z.number().int().min(0).optional() }),
   // Captured cards (Escape from Mount Gram, read by the captured family): `noneUnderAttacker` no card is captured underneath the attacking enemy ("+2 Attack instead if it has no captured cards underneath it", 10045:A:3), `noneUnderSelf` no card is captured underneath the source ("If there are no captured cards underneath Gornákh's Dungeons", 10039:B:2), `someoneEmpty` the Interrogation that is

@@ -304,7 +304,7 @@ function defenderReason(
     if (!hasKeyword(state, defender.id, "sentinel", ctx.cards)) return "Sentinel is required to defend for another seat";
   }
   // A ship-enemy's attack is defended only by a ship-objective (dcce.ship-enemies, dcce.ship-objectives).
-  const ship = familyDefenseReason(state, printedOf(ctx.cards, defender.code), ctx.cards);
+  const ship = familyDefenseReason(state, printedOf(ctx.cards, defender.code), ctx.cards, defender.id);
   if (ship) return ship;
   if (!canDefend(state, state.pendingAttack.seat, intent.defenderId, ctx.cards)) return "That character cannot defend";
   if (defenseBlocked(state, ctx, intent.defenderId)) return "That character cannot defend this enemy's attack";

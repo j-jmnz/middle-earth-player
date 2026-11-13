@@ -198,6 +198,8 @@ export function gainSeatResources(state: ScenarioState, seat: number, steps: Eng
   for (const heroId of heroes) {
     const hero = next.cards[heroId];
     if (!hero) continue;
+    // A hero that "does not collect resources during the resource phase" (No Rest, 10080:A:1) holds noCollection.
+    if (next.modifiers.length > 0 && flagged(next, heroId, "noCollection")) continue;
     // A hero that "collects 1 additional resource" holds an extraResource.
     const gained = 1 + Math.max(0, heldAmount(next, heroId, "extraResource"));
     next = updateCard(next, heroId, { resources: hero.resources + gained });

@@ -24,6 +24,9 @@ tags:
 - assertVisible:
     id: pool
     text: ".*Arnor Ravaged.*"
-# The win unlocks Across the Ettenmoors, which the app cannot deal yet: the path says it is coming soon (scripts/checks/maestro.test.ts, path-soon).
+# The win unlocks Across the Ettenmoors.
 - assertVisible:
+    id: node-across-the-ettenmoors-status
+    text: "Next"
+- assertNotVisible:
     id: path-soon

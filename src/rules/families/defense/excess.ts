@@ -20,6 +20,7 @@ import { gameReads } from "../../core/game-reads.ts";
 import { removeQuestProgress } from "../caves/progress.ts";
 import { cancelPhantomDamage } from "../grey-company/phantom.ts";
 import { noteHurt } from "../angmar/damage.ts";
+import { removeProgressFromEachQuest } from "../angmar/excess.ts";
 import { damageGoesTo } from "./damage.ts";
 
 // The damage this attack has dealt so far, kept on the attack only while a shadow effect waits to read it after the attack ("Raise your threat by 1
@@ -73,9 +74,11 @@ export function combatDamage(
   const toShip = flagged(state, enemyId, "excessToShip");
   // "Excess damage must be dealt to Hrogar's Hill" (19083:B:1, 19080:A:3): an attack that the quest card or a Shadow effect marked sends the damage beyond the defender's remaining hit points to the main quest card.
   const toStage = state.pendingAttack?.excessToStage === true && state.questStage != null && state.questStage !== targetId;
+  // Cruel Mountain-troll (10074:A:1): each point of excess takes a progress token off each quest card in play.
+  const toEachQuest = flagged(state, enemyId, "excessToEachQuest");
   // "for each excess point of damage dealt" (18049:A:2): kept for the character the attack destroys, when some card reads it.
   const reads = gameReads(state, ctx, '"excessOf"');
-  if (!toThreat && !toQuest && !toShip && !reads && !toStage) return placed;
+  if (!toThreat && !toQuest && !toShip && !reads && !toStage && !toEachQuest) return placed;
   const enemy = state.cards[enemyId];
   const target = state.cards[targetId];
   if (!enemy || !target || !inPlay(target.zone) || target.controller == null) return placed;
@@ -83,6 +86,10 @@ export function combatDamage(
   const remaining = Math.max(0, modifiedStat(state, target, "hitPoints", ctx.cards) - target.damage);
   const excess = landed - remaining;
   if (excess <= 0) return placed;
+  if (toEachQuest && !toStage) {
+    const eachRecord = effectsOf(ctx, enemy.code).find((effect) => effect.instructions.some((instruction) => instruction.verb === "ModifyStat" && instruction.stat === "excessToEachQuest"));
+    return removeProgressFromEachQuest(placed, excess, enemy.controller ?? target.controller, ctx, steps, eachRecord ? effectCause(eachRecord) : ruleCause("rr.damage"));
+  }
   if (toStage && state.questStage) return noteHitPointsOn(placeDamage(placed, state.questStage, excess, ctx.cards, steps, "combat", ruleCause("rr.damage")), targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
   if (!toThreat && !toQuest && !toShip) return noteHitPointsOn(placed, targetId, modifiedStat(state, target, "hitPoints", ctx.cards));
   // "Excess damage from this attack is dealt to a Ship objective you control" (11055:A:2): the excess is the X of the effect the attack leaves for its end.

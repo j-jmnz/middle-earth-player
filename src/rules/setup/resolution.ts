@@ -16,6 +16,7 @@ import { discardToPoolFromSets } from "../families/wilderland/mirkwood.ts";
 import { addEncounterCards, allyOrLineOptions, applyAllyOrLine, applyRemoval, applyStagedLocation, discoverTreasures, noteRemovalAnswer, playerOptions, removalOptions, removeEncounterCards, stagedLocationOptions } from "../families/wilderland/pool.ts";
 import { drawTreasures } from "../families/wilderland/treasure.ts";
 import { applyHazard, discardHazards, hazardOptions } from "../families/wilderland/hazards.ts";
+import { encounterCopies } from "../families/angmar/ettenmoors.ts";
 import { recordDamageOn, recordDetermined, recordHeroDamage, recordStolenCards } from "../families/campaign/damage-tracking.ts";
 import { endCampaign, ignoreDiscardedHeroes, loseGuardedBoons, recordTokens, removeFromPool, threatDialCopies } from "../families/campaign/saga-end.ts";
 import { applyChooseOption, applyRevive, applyTrim, boonHeroes, chooseOptionIds, earnForPick, earnHeldCopies, reviveOptions, threatPenalties, trimOptions, underneath } from "../families/campaign/resolution.ts";
@@ -203,6 +204,10 @@ export function advanceResolution(state: ScenarioState, ctx: ReduceContext): Sce
       }
       case "EarnAllBurdens":
         next = stepOver(next, earn(next, burdensEverywhere(next, ctx).map((code) => ({ code, to: "pool" as const, seat: null, hero: null, step: next.resolutionAt }))));
+        break;
+      // The copies of these cards in the encounter deck or discard pile (families/angmar/ettenmoors.ts, 10182:B:1).
+      case "EarnEncounterCopies":
+        next = stepOver(next, earn(next, encounterCopies(next, instruction.codes, next.resolutionAt)));
         break;
       case "GainXp": {
         // One line of the campaign card's XP list, or the Hard/Expert card's: the condition above already held. The lines add up in the log.

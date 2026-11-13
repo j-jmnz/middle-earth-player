@@ -214,6 +214,10 @@ export const pickSchema = z.strictObject({
   isGuard: z.boolean().optional(),
   // A character whose code the Campaign Log marks "determined" (`campaignFacts.angmar.determined`, Angmar Awakened): "each character who is 'determined' in the Campaign Log" (10172:A:1). Read by the angmar family.
   determined: z.literal(true).optional(),
+  // A card that has the Safe keyword (Across the Ettenmoors, mec108.safe; its record has the constant verb Safe): "a location with the safe keyword" (10075:A:2), for an objective-location (`type: objective`). Read by the angmar family.
+  safe: z.literal(true).optional(),
+  // A card with at least this many damage tokens on it ("while it has 3 or more damage on it", 10075:A:1). Read by the angmar family.
+  minDamage: z.number().int().positive().optional(),
   onPicked: z.boolean().optional(),
   // A player card (`false`: an encounter card, "all encounter cards are immune", 12172:A:2).
   playerCard: z.boolean().optional(),

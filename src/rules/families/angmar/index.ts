@@ -9,6 +9,9 @@ import type { RulesFamily } from "../../interpret/family-manifest.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import type { Focus } from "../index.ts";
 import { chooseBoon } from "./boons.ts";
+import { attackerFacing, defenderFacing } from "./combat.ts";
+import { revealCard, revealSetAsideForTokens, stageRandomGuardedPair } from "./ettenmoors.ts";
+import { safeActiveHolds, safePickMatches, setAsideHasHolds } from "./safe.ts";
 import { attachRandomBurden, attachSelfToNamed, moveToHero } from "./burdens.ts";
 import { placeHandUnderSelf } from "./cards-under.ts";
 import { determinedMatches } from "./determined.ts";
@@ -58,6 +61,16 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return attachSelfToNamed(state, instruction, focus, ctx);
     case "FlipTimeObjective":
       return flipTimeObjective(state, instruction);
+    // The Safe keyword's marker (safe.ts) and the Resolution's count (setup/resolution.ts) do nothing when run here.
+    case "Safe":
+    case "EarnEncounterCopies":
+      return state;
+    case "StageRandomGuardedPair":
+      return stageRandomGuardedPair(state, focus, ctx, steps);
+    case "RevealCard":
+      return revealCard(state, instruction, focus, ctx, steps);
+    case "RevealSetAsideForTokens":
+      return revealSetAsideForTokens(state, instruction, focus, ctx, steps);
     case "RecordStartingThreat":
       return { ...state, resolutionLog: { ...state.resolutionLog, startingThreat: (state.resolutionLog.startingThreat ?? 0) + instruction.amount } };
     default:
@@ -67,11 +80,12 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "angmar",
-  verbs: ["Time", "RemoveTimeCounters", "HoldUnder", "DiscardHeld", "PlaceHandUnderSelf", "ChooseCurrentQuest", "AttachNewTo", "TradeDamageForResources", "FirstTraitSurge", "EndPhase", "PlaceLoggedDamageOn", "ChooseBoon", "AttachRandomBurden", "MoveToHero", "AttachSelfToNamed", "FlipTimeObjective", "RecordStartingThreat"],
+  verbs: ["Time", "RemoveTimeCounters", "HoldUnder", "DiscardHeld", "PlaceHandUnderSelf", "ChooseCurrentQuest", "AttachNewTo", "TradeDamageForResources", "FirstTraitSurge", "EndPhase", "PlaceLoggedDamageOn", "ChooseBoon", "AttachRandomBurden", "MoveToHero", "AttachSelfToNamed", "FlipTimeObjective", "RecordStartingThreat", "Safe", "StageRandomGuardedPair", "RevealCard", "RevealSetAsideForTokens", "EarnEncounterCopies"],
   run,
   revealed: (state, id, ctx) => noteFirstTrait(timeOnReveal(state, id, ctx), id, ctx),
   travel: { unpayable: travelUnpayable },
-  pick: (state, id, spec) => determinedMatches(state, id, spec),
-  condition: (state, condition, scope, ctx) => timeOfDayHolds(state, condition) ?? currentQuestHolds(state, condition, scope, ctx) ?? questLeadsHolds(state, condition, ctx) ?? hitPointsLeftHolds(state, condition, ctx),
+  pick: (state, id, spec, _at, ctx) => determinedMatches(state, id, spec) && safePickMatches(state, id, spec, ctx),
+  combat: { attack: (state, enemyId, _attacker, _target, attackerId) => attackerFacing(state, enemyId, attackerId), defense: (state, defender, _cards, defenderId) => defenderFacing(state, defender, defenderId) },
+  condition: (state, condition, scope, ctx) => timeOfDayHolds(state, condition) ?? currentQuestHolds(state, condition, scope, ctx) ?? questLeadsHolds(state, condition, ctx) ?? hitPointsLeftHolds(state, condition, ctx) ?? safeActiveHolds(state, condition, ctx) ?? setAsideHasHolds(state, condition),
   amount: (state, found, scope, ctx) => questCardsAmount(state, found, scope.actor, ctx),
 };

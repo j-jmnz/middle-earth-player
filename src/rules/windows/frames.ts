@@ -24,6 +24,9 @@ import { sharing, stagingDest } from "../families/breaking/areas.ts";
 import { grapplesOnReveal, pushGrapple } from "../families/grapple/attach.ts";
 import { skipLoot } from "../families/wilderland/loot.ts";
 import { familyRevealed } from "../interpret/family-hooks.ts";
+import { gainedDoomed } from "../families/deck/gains-doomed.ts";
+import { gameReads } from "../core/game-reads.ts";
+import { whenRevealedIgnored } from "../families/angmar/safe.ts";
 
 // A frame that waits for a player lives on state.stack. settle advances the top one
 // until it pops or opens a window.
@@ -159,12 +162,14 @@ function revealStep(state: ScenarioState, frame: Frame, ctx: ReduceContext, step
     }
     case 1: {
       let next = patchTop(state, { step: 2 });
-      if (printed.keywords.doomed != null && printed.keywords.doomed > 0) {
+      // The Doomed a card in play gives it (Troll-fells gives each Weather card Doomed 1, 10077:A:1) comes on top of the printed number.
+      const doomed = (printed.keywords.doomed ?? 0) + (gameReads(next, ctx, '"GainsDoomed"') ? gainedDoomed(next, id, seat, ctx) : 0);
+      if (doomed > 0) {
         // The players sharing the staging area it was added to, once stages are separate and the game has joined areas (families/captured/).
         const sharers = next.capture && next.separate ? sharing(next, seat) : null;
         for (let index = 0; index < next.seatCount; index += 1) {
           if (sharers && !sharers.includes(index)) continue;
-          next = noteEncounterThreat(raiseThreat(next, index, printed.keywords.doomed, steps, ruleCause("rr.doomed-x")), index, printed.keywords.doomed, id, ctx);
+          next = noteEncounterThreat(raiseThreat(next, index, doomed, steps, ruleCause("rr.doomed-x")), index, doomed, id, ctx);
         }
         // An encounter card's Doomed raise is heard by Elfhelm (02100:A:1).
         next = encounterRaised(next, livingSeats(next), id, ctx);
@@ -226,6 +231,7 @@ function runRevealed(
 ): ScenarioState {
   const code = state.cards[id]?.code;
   if (!code) return state;
-  const effects = ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "whenRevealed");
+  // A safe location that is active makes the players ignore the "when revealed" effects of every treachery (mec108.safe).
+  const effects = whenRevealedIgnored(state, id, ctx) ? [] : ctx.effects.filter((effect) => effect.cardCode === code && effect.timing === "whenRevealed");
   return pushCardEffects(state, "whenRevealed", id, seat, peril, effects, ctx, steps);
 }

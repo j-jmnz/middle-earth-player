@@ -9,6 +9,7 @@ import { NAMED_PILES, pileDealt } from "../../core/piles.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { CardInstance, ScenarioState } from "../../core/state.ts";
 import { flagged, updateCard } from "../../core/state.ts";
+import { noteProgressPlaced } from "../angmar/progress.ts";
 
 /** The game deals encounter side quests, in a side quest deck of its own (emce.side-quests) or in its encounter deck (mec108.side-quests, `sideQuests`): the other games never read any of this. */
 export function hasSideQuests(state: Pick<ScenarioState, "piles" | "sideQuests">): boolean {
@@ -60,7 +61,7 @@ export function placeOnCurrentSideQuest(state: ScenarioState, amount: number, ca
   const placed = points == null ? room : Math.min(room, Math.max(0, points - quest.progress));
   if (placed <= 0) return { state, remaining: 0 };
   steps.push({ kind: "progress", targetId: id, amount: placed, cause: ruleCause("emce.side-quests-in-play") });
-  return { state: noteQuestPlaced(updateCard(state, id, { progress: quest.progress + placed }), placed), remaining: 0 };
+  return { state: noteProgressPlaced(noteQuestPlaced(updateCard(state, id, { progress: quest.progress + placed }), placed), id, placed), remaining: 0 };
 }
 
 /** Whether the card is a quest card or a side quest: damage it deals is no "non-quest effect" (Dagnir's cap, 19074:A:2). */
