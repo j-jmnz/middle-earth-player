@@ -29,6 +29,7 @@ import { isBreakingVerb } from "../families/breaking/index.ts";
 import { announceDraw } from "../families/dreamchaser/index.ts";
 import { announceEnteredHand } from "../families/island/hand.ts";
 import { playerSource } from "../families/quest/threat.ts";
+import { queueHeard } from "../families/quest/events.ts";
 import { announceSetupActive } from "../families/quest/places.ts";
 
 export type ReduceContext = {
@@ -240,7 +241,8 @@ export function dealAdditionalShadow(given: ScenarioState, enemyId: string, step
   // Face down, or face up while the player it is engaged with holds shadowsFaceUp (07009).
   const face = shadowFace(state, enemyId);
   const moved = moveCard(state, top, { zone: "shadow", enemyId });
-  return updateCard(moved, top, { face });
+  // The enemy hears that it was dealt the card (Thaurdir's stage 1B, the Werewolf of Angmar, 10125:B:3, 10131:A:2).
+  return queueHeard(updateCard(moved, top, { face }), ctx, { trigger: "shadowDealtTo", seat: null, cardId: enemyId, subject: enemyId });
 }
 
 function dealInstructionDamage(

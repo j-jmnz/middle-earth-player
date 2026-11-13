@@ -95,6 +95,10 @@ export const amountExprSchema = z.strictObject({
   destroyedWillpower: z.literal(true).optional(),
   // The number of quest cards in play: the main quest card, the encounter side quests in the staging area and the player side quests in the quest areas, at least 1 ("X is the number of quest cards in play", 09016:A:1; mec108.side-quests-in-play). Read by the angmar family.
   questCards: z.literal(true).optional(),
+  // Every shadow card dealt to an enemy in play, the staging area's and the engaged ones, added up ("where X is the number of shadow cards in play", 10126:A:1). Read by the angmar family.
+  shadowCardsInPlay: z.literal(true).optional(),
+  // The highest printed cost among the cards in the actor's discard pile, 0 for an empty pile, a card with a printed X cost or no cost (a hero) counting 0 ("the printed cost of the highest cost card in that player's discard pile", 10137:A:1). Read by the angmar family.
+  discardPileMaxCost: z.literal(true).optional(),
   // Captured cards (Escape from Mount Gram, read by the captured family): `under` the cards captured underneath the source ("X is the number of captured cards underneath Tunnels of Mount Gram", 10048:A:2), `cardsWith` the cards in play with 1 or more captured cards underneath
   // them ("X is the number of cards in play with 1 or more captured cards underneath them", 10045:A:2), `questsAndSides` the quest cards the players have completed plus the side quests in the victory display ("the number of completed quest cards plus the number of side
   // quests in the victory display", 10174:B:1), `players` the players in the game (Loot the Dungeons, "for each player in the game at every staging area", 10175:A:1).

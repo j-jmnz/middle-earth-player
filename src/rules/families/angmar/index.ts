@@ -16,7 +16,9 @@ import { attachRandomBurden, attachSelfToNamed, moveToHero } from "./burdens.ts"
 import { placeHandUnderSelf } from "./cards-under.ts";
 import { determinedMatches } from "./determined.ts";
 import { flipTimeObjective, timeOfDayHolds } from "./day-night.ts";
+import { discardCopiesFromDeck, discardPileMaxCostAmount } from "./copies.ts";
 import { discardedThreatAmount, removeProgressAmong } from "./dark-covenant.ts";
+import { dealShadowInPlay, flipTwoSided, shadowCardsInPlayAmount } from "./shadows.ts";
 import { destroyedWillpowerAmount } from "./last-known.ts";
 import { placeLoggedDamageOn } from "./logged.ts";
 import { endPhase } from "./phase.ts";
@@ -85,6 +87,12 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
       return revealSetAsideForTokens(state, instruction, focus, ctx, steps);
     case "RecordStartingThreat":
       return { ...state, resolutionLog: { ...state.resolutionLog, startingThreat: (state.resolutionLog.startingThreat ?? 0) + instruction.amount } };
+    case "FlipTwoSided":
+      return flipTwoSided(state, instruction, ctx, steps);
+    case "DealShadowInPlay":
+      return dealShadowInPlay(state, instruction, focus, ctx, steps);
+    case "DiscardCopiesFromDeck":
+      return discardCopiesFromDeck(state, instruction, focus, ctx, steps);
     default:
       return null;
   }
@@ -92,7 +100,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
 
 export const manifest: RulesFamily = {
   name: "angmar",
-  verbs: ["Time", "RemoveTimeCounters", "HoldUnder", "DiscardHeld", "PlaceHandUnderSelf", "ChooseCurrentQuest", "AttachNewTo", "TradeDamageForResources", "FirstTraitSurge", "EndPhase", "PlaceLoggedDamageOn", "ChooseBoon", "AttachRandomBurden", "MoveToHero", "AttachSelfToNamed", "FlipTimeObjective", "RecordStartingThreat", "Safe", "StageRandomGuardedPair", "RevealCard", "ReleaseGuards", "RevealSetAsideForTokens", "EarnEncounterCopies", "RemoveSideQuestsFromGame", "FlipWhenDefeated", "RemoveProgressAmong"],
+  verbs: ["Time", "RemoveTimeCounters", "HoldUnder", "DiscardHeld", "PlaceHandUnderSelf", "ChooseCurrentQuest", "AttachNewTo", "TradeDamageForResources", "FirstTraitSurge", "EndPhase", "PlaceLoggedDamageOn", "ChooseBoon", "AttachRandomBurden", "MoveToHero", "AttachSelfToNamed", "FlipTimeObjective", "RecordStartingThreat", "Safe", "StageRandomGuardedPair", "RevealCard", "ReleaseGuards", "RevealSetAsideForTokens", "EarnEncounterCopies", "RemoveSideQuestsFromGame", "FlipWhenDefeated", "RemoveProgressAmong", "FlipTwoSided", "DealShadowInPlay", "DiscardCopiesFromDeck"],
   run,
   revealed: (state, id, ctx) => noteFirstTrait(timeOnReveal(state, id, ctx), id, ctx),
   travel: { unpayable: travelUnpayable },
@@ -100,5 +108,5 @@ export const manifest: RulesFamily = {
   combat: { attack: (state, enemyId, _attacker, _target, attackerId) => attackerFacing(state, enemyId, attackerId), defense: (state, defender, _cards, defenderId) => defenderFacing(state, defender, defenderId) },
   condition: (state, condition, scope, ctx) => timeOfDayHolds(state, condition) ?? currentQuestHolds(state, condition, scope, ctx) ?? questLeadsHolds(state, condition, ctx) ?? hitPointsLeftHolds(state, condition, ctx) ?? safeActiveHolds(state, condition, ctx) ?? setAsideHasHolds(state, condition),
   settle: { sweep: advanceWhenFlagged },
-  amount: (state, found, scope, ctx) => questCardsAmount(state, found, scope.actor, ctx) ?? discardedThreatAmount(state, found, ctx) ?? destroyedWillpowerAmount(state, found, scope),
+  amount: (state, found, scope, ctx) => questCardsAmount(state, found, scope.actor, ctx) ?? discardedThreatAmount(state, found, ctx) ?? destroyedWillpowerAmount(state, found, scope) ?? shadowCardsInPlayAmount(state, found, ctx) ?? discardPileMaxCostAmount(state, found, scope.actor, ctx),
 };

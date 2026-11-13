@@ -30,6 +30,7 @@ import { oweDiscards } from "../families/breaking/progress.ts";
 import { arrivalFace, orderedNext, stageToVictory } from "../families/quest/order.ts";
 import { caughtUp } from "../families/stormcaller/values.ts";
 import { islandTravelTo } from "../families/island/travel.ts";
+import { reduceQuestProgress } from "../families/angmar/progress.ts";
 import { absorbProgress } from "../families/angmar/sponge.ts";
 import { hasSideQuests, mainQuestBarred, placeOnCurrentSideQuest } from "../families/wilderland/night-quest.ts";
 import { familyOptionalEngageBarred, familyQuestResult } from "../interpret/family-hooks.ts";
@@ -253,7 +254,9 @@ export function placeQuestProgress(
 // has no upper limit (faq.progress-without-advancing); a full one advances. `counted`: the progress counts toward what a card in play limits this round (families/caves/progress.ts).
 export function putOnStage(from: ScenarioState, stageId: string, wanted: number, points: number | null, cards: Cards, steps: EngineStep[], canAdvance: Gate, cause: Cause, counted: boolean): ScenarioState {
   // Progress that would be placed on a quest card first fills the sponges in the staging area (Forbidden Descent, 10101:A:1).
-  const { state, remaining: amount } = absorbProgress(from, wanted, cards, steps);
+  const { state, remaining: absorbed } = absorbProgress(from, wanted, cards, steps);
+  // Each Orc Grunts in play reduces the progress placed on the current quest by 1 (10130:A:2).
+  const amount = reduceQuestProgress(state, absorbed);
   const stage = state.cards[stageId];
   if (!stage) return state;
   const advancing = points != null && canAdvance(state);

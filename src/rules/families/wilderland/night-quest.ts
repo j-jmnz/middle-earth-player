@@ -9,7 +9,7 @@ import { NAMED_PILES, pileDealt } from "../../core/piles.ts";
 import { printedOf } from "../../core/printed.ts";
 import type { CardInstance, ScenarioState } from "../../core/state.ts";
 import { flagged, updateCard } from "../../core/state.ts";
-import { noteProgressPlaced } from "../angmar/progress.ts";
+import { noteProgressPlaced, reduceQuestProgress } from "../angmar/progress.ts";
 import { absorbProgress } from "../angmar/sponge.ts";
 
 /** The game deals encounter side quests, in a side quest deck of its own (emce.side-quests) or in its encounter deck (mec108.side-quests, `sideQuests`): the other games never read any of this. */
@@ -60,7 +60,10 @@ export function currentSideQuest(state: ScenarioState): string | null {
 export function placeOnCurrentSideQuest(from: ScenarioState, wanted: number, cards: ReduceContext["cards"], steps: EngineStep[]): { state: ScenarioState; remaining: number } {
   const id = currentSideQuest(from);
   // Progress that would be placed on a quest card first fills the sponges in the staging area (Forbidden Descent, 10101:A:1); with no side quest current it goes on to the main quest card.
-  const { state, remaining: amount } = id ? absorbProgress(from, wanted, cards, steps) : { state: from, remaining: wanted };
+  const absorbed = id ? absorbProgress(from, wanted, cards, steps) : { state: from, remaining: wanted };
+  const state = absorbed.state;
+  // Each Orc Grunts in play reduces the progress placed on the current side quest by 1 (10130:A:2); with none current the main quest card reduces it (quest.ts putOnStage).
+  const amount = id ? reduceQuestProgress(state, absorbed.remaining) : absorbed.remaining;
   if (amount <= 0) return { state, remaining: 0 };
   const quest = id ? state.cards[id] : undefined;
   if (!id || !quest) return { state, remaining: amount };

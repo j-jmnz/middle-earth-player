@@ -12,7 +12,7 @@ import { queueEvent } from "../windows/queue.ts";
 import { runInstruction, type ReduceContext } from "../interpret/interpret.ts";
 import { defenseAsDefender, modifiedStat } from "../core/keywords.ts";
 import type { PendingAttack, ScenarioState } from "../core/state.ts";
-import { expireModifiers, flagged, inPlay, updateCard } from "../core/state.ts";
+import { expireModifiers, flagged, heldAmount, inPlay, updateCard } from "../core/state.ts";
 import { withFrame } from "../windows/windows.ts";
 import { moveCard, shadowCards } from "../core/zones.ts";
 import { effectCause, inCause, ruleCause } from "../core/cause.ts";
@@ -20,6 +20,7 @@ import { offerResponses } from "../windows/responses.ts";
 import { enemyAttackWindow } from "../engine/step-window.ts";
 import { noteAttackDamage } from "../families/defense/damage.ts";
 import { announceHurt } from "../families/angmar/damage.ts";
+import { discardableShadow } from "../families/angmar/shadows.ts";
 import { combatDamage } from "../families/defense/excess.ts";
 import { attackCanceled, defendersDeclared, holdAttackEnd, specialStrike } from "../families/defense/defenders.ts";
 import { holdAttack } from "../families/defense/listen.ts";
@@ -74,6 +75,9 @@ function resolveShadowCard(state: ScenarioState, shadowId: string, seat: number,
   }
   const resolved = withFrame(turned, "shadow", shadowId, false, (framed) => {
     let next = framed;
+    // Mountains of Angmar: a shadow card with no shadow effect gains "Shadow: Raise defending player's threat by 2" (10133:A:1).
+    const gained = effects.length === 0 ? heldAmount(next, "table", "blankShadowGains") : 0;
+    if (gained > 0) next = inCause(steps, ruleCause("rr.shadow-effects"), () => runInstruction(next, { verb: "RaiseThreat", amount: gained, who: "actor" }, { seat, sourceId: shadowId }, ctx, steps));
     for (const effect of ctx.effects) {
       if (effect.cardCode !== shadow.code || effect.timing !== "shadow") continue;
       for (const instruction of effect.instructions) {
@@ -107,7 +111,8 @@ function nextExtraShadow(state: ScenarioState, enemyId: string): string | undefi
 export function discardShadows(state: ScenarioState): ScenarioState {
   let next = state;
   for (const instance of Object.values(state.cards)) {
-    if (instance.zone === "shadow") next = moveCard(next, instance.id, { zone: "encounterDiscard" });
+    // Stage 1B of The Battle of Carn Dûm: "Do not discard unresolved shadow cards at the end of the combat phase" (10125:B:2).
+    if (instance.zone === "shadow" && discardableShadow(state, instance.id)) next = moveCard(next, instance.id, { zone: "encounterDiscard" });
   }
   return next;
 }

@@ -83,6 +83,17 @@ const VERBS = [
   // A constant marker on a side quest ("When this quest is defeated, flip it over", 10109:A:3): when it is defeated it is not added to the victory display but flips into the objective with this code and stays in the staging area, faceup and unclaimed (mec108.the-investigation).
   // The verb does nothing when a record runs it; families/sidequests/quest.ts defeatSideQuest reads it.
   z.strictObject({ verb: z.literal("FlipWhenDefeated"), into: code }),
+  // The card in play with either of these codes (the two sides of a card whose sides are two cards, Thaurdir 10127 / 10128) shows its other side, where it lies, keeping its tokens, damage, shadow cards and attachments, and the new side hears that it was flipped
+  // (`flippedOver`, as FlipInPlace): "flip him" whichever side is up ("Flip Thaurdir", 10138:A:1; "flip him", 10125:B:3). Nothing happens with neither in play.
+  z.strictObject({ verb: z.literal("FlipTwoSided"), front: code, back: code, ...when }),
+  // Deals each enemy in play (staging area and engaged with a player) one shadow card from the top of the encounter deck, in the order the staging area then the players hold them; with `target`, only that enemy, wherever it is ("deal 1 shadow card to each enemy in play",
+  // 10127:A:4, 10134:A:2; "deal 1 shadow card to Werewolf of Angmar", 10131:A:1). The cards stay with the enemies facedown (they resolve when the enemy attacks); an empty deck deals none. Each deal is heard by the enemy (`shadowDealtTo`).
+  // As a Travel line it is a cost: the players cannot travel to the location while the encounter deck holds fewer cards than there are enemies in play (rr.travel, rr.cost).
+  z.strictObject({ verb: z.literal("DealShadowInPlay"), target: cardRefSchema.optional(), ...when }),
+  // The actor searches their deck for the cards with the same title as the card the effect picked last (`of: picked`: the card DiscardRandomFromHand `remember`ed) or as the other card of the event (`of: other`: the ally the attack destroyed, only when it is an ally), and discards
+  // each of them (`all`) or one of them; with `shuffle` the deck is shuffled after ("Each player then searches his deck for each other copy of the card he discarded, and discards those as well. Shuffle each searched deck", 10136:A:1; "search your deck for another copy of that ally and discard it, if able", 10137:A:2).
+  // Nothing happens with no such card picked. A copy is a card with the same printed title (rr.unique-cards).
+  z.strictObject({ verb: z.literal("DiscardCopiesFromDeck"), of: z.enum(["picked", "other"]), all: z.boolean().optional(), shuffle: z.boolean().optional(), ...when }),
 ] as const;
 
 const TRIGGERS = [
@@ -99,6 +110,9 @@ const TRIGGERS = [
   "leftStagingArea",
   // About a card a search put into play: an encounter card found in the encounter deck or discard pile and added to the staging area ("each Undead enemy that enters play", 10109:A:1, hears it beside `encounterEnteredPlay`, which a search does not announce). Queued only in a game whose records name it.
   "searchedIntoPlay",
+  // About an enemy: a shadow card was just dealt to it, wherever it is (the subject is the enemy): "If there are 3 shadow cards dealt to Thaurdir" (10125:B:3), "after a shadow card is dealt to Werewolf of Angmar" (10131:A:2). A record reads the count with the amount `shadowCards`.
+  // Queued only in a game whose records name it.
+  "shadowDealtTo",
 ] as const;
 
 const FLAGS = [
@@ -146,6 +160,14 @@ const FLAGS = [
   "returnsUndeadOnRunOut",
   // On a progressSponge card: the progress it took this round (engine use, until the end of the round).
   "spongeTaken",
+  // On the table, while a card in play says so (the stage 1B of The Battle of Carn Dûm): unresolved shadow cards are not discarded at the end of the combat phase, so those dealt to enemies that did not attack stay and add up; the cards of an attack that was made go as ever. Where an enemy
+  // makes an attack from the staging area, the shadow cards it holds are not discarded before the new one is dealt, so they all resolve (10125:B:2; combat/shadow.ts discardShadows, families/south/watcher.ts dealForAttack).
+  "keepShadowCards",
+  // On the table, amount N, while a card in play says so (Mountains of Angmar as the active location): a shadow card with no shadow effect of its own gains "Shadow: Raise defending player's threat by N" as it is flipped (10133:A:1; combat/shadow.ts resolveShadowCard).
+  "blankShadowGains",
+  // On the table, held by each Orc Grunts in play (the amount is how much): any time progress is placed on the current quest, the amount placed is reduced by this much, after the active location and a sponge took theirs ("reduce the amount of progress placed by 1", 10130:A:2;
+  // families/angmar/progress.ts reduceQuestProgress). Several holders add; the amount stops at 0.
+  "questProgressReduced",
 ] as const;
 
 export const manifest = { name: "angmar", verbs: VERBS, triggers: TRIGGERS, flags: FLAGS } as const satisfies CatalogFamily;

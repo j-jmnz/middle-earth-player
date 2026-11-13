@@ -8,6 +8,7 @@ import { printedOf } from "../../core/printed.ts";
 import type { ScenarioState } from "../../core/state.ts";
 import { effectsOf } from "../../windows/listen.ts";
 import { topOfEncounterDiscard } from "../nightmare/index.ts";
+import { dealShadowUnpayable } from "./shadows.ts";
 
 /** Whether this instruction of a Travel line is a removal of resource tokens from a card the line picks and no card the pick finds holds one. */
 export function missionTokenUnpayable(state: ScenarioState, instruction: Instruction, ctx: ReduceContext, locationId: string): boolean {
@@ -35,6 +36,7 @@ function searchUnpayable(state: ScenarioState, instruction: Extract<Instruction,
  */
 export function travelUnpayable(state: ScenarioState, instruction: Instruction, ctx: ReduceContext, locationId: string): boolean {
   if (instruction.verb === "PickDiscardTop") return topOfEncounterDiscard(state, instruction.types, ctx, instruction.trait) === undefined;
+  if (instruction.verb === "DealShadowInPlay") return dealShadowUnpayable(state, instruction, ctx);
   if (instruction.verb === "SearchReveal" && instruction.cost === true) return searchUnpayable(state, instruction, ctx);
   if (instruction.verb === "Pick" && instruction.pick.type === "enemy") return pickCandidates(state, instruction.pick, state.activeSeat, [], locationId, ctx).length === 0;
   return missionTokenUnpayable(state, instruction, ctx, locationId);

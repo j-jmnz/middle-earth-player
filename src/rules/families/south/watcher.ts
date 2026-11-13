@@ -65,7 +65,10 @@ export function stagingAttackers(state: ScenarioState, seat: number): string[] {
 
 // An enemy that is not engaged is dealt a shadow card of its own when it attacks; one dealt for an earlier attack is discarded first.
 export function dealForAttack(state: ScenarioState, enemyId: string, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
-  return state.cards[enemyId]?.zone === "engaged" ? state : dealOneShadow(discardShadowOf(state, enemyId), enemyId, steps, ctx);
+  if (state.cards[enemyId]?.zone === "engaged") return state;
+  // Stage 1B of The Battle of Carn Dûm keeps the shadow cards dealt (10125:B:2): the enemy is dealt one more, and all of them resolve.
+  if (state.modifiers.length > 0 && flagged(state, "table", "keepShadowCards")) return dealAdditionalShadow(state, enemyId, steps, ctx);
+  return dealOneShadow(discardShadowOf(state, enemyId), enemyId, steps, ctx);
 }
 
 // The enemy that attacks: the source itself, the card the source is attached to, the card the event was about, or the one a Pick chose.
