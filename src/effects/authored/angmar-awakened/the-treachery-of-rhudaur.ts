@@ -60,6 +60,12 @@ const claim = (code: string): Effect => ({
 const flipsInto = (code: string, line: string, into: string, n: number): Effect => ({ id: `${code}:constant:${n}`, cardCode: code, lines: [line], timing: "constant", instructions: [{ verb: "FlipWhenDefeated", into }] });
 
 // Shadow of Eerie Halls, Centuries of Sorrow and Curse of the Years: the effect when the defending player controls no Clue.
+// Quiet the Spirits' first line, as heard on each route an Undead enemy enters play by (10109:forced:1, 10109:forced:3).
+const ENGAGES_UNDEAD: Pick<Effect, "subject" | "condition" | "instructions"> = {
+  subject: UNDEAD,
+  condition: { kind: "currentQuest", is: "self" },
+  instructions: [{ verb: "PickHighestThreat" }, { verb: "SwitchActor", to: "picked" }, { verb: "Engage", target: "subject" }, { verb: "ModifyStat", stat: "engagedThreat", amount: 1, until: "endOfPhase", target: "subject" }],
+};
 const ATTACKER_PLUS = (amount: number, when?: Condition): Instruction => ({ verb: "ModifyStat", stat: "attack", amount, until: "endOfAttack", target: "attacker", ...(when ? { when } : {}) });
 
 export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
@@ -117,7 +123,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "10100:forced:1", cardCode: "10100", lines: ["10100:A:1"], timing: "forced", trigger: "engaged", subject: "self", instructions: [{ verb: "RemoveProgressFromQuest", amount: 2, each: true }] },
     { id: "10100:shadow:1", cardCode: "10100", lines: ["10100:A:2"], timing: "shadow", instructions: [{ verb: "AfterAttack", instructions: [{ verb: "RemoveProgressFromQuest", amount: { dealt: true }, each: true }] }] },
 
-    // 10101 Forbidden Descent. In the staging area it takes the first 2 progress each round that would be placed on a quest (each copy takes 2); when it leaves play from the staging area (not explored, not travelled to) each player raises their threat by 2.
+    // 10101 Forbidden Descent. In the staging area it takes the first 2 progress each round that would be placed on a quest (each copy takes 2); when it leaves play from the staging area (explored there by progress, discarded or removed; travelling to it keeps it in play) each player raises their threat by 2.
     { id: "10101:constant:1", cardCode: "10101", lines: ["10101:A:1"], timing: "constant", condition: IN_STAGING, instructions: [{ verb: "ModifyStat", stat: "progressSponge", amount: 1, until: "whileSourceInPlay", target: "self" }] },
     { id: "10101:forced:1", cardCode: "10101", lines: ["10101:A:2"], timing: "forced", trigger: "leftStagingArea", subject: "self", instructions: [EACH_PLAYER([{ verb: "RaiseThreat", amount: 2, who: "actor" }])] },
 
@@ -211,9 +217,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       lines: ["10109:A:1"],
       timing: "forced",
       trigger: "encounterEnteredPlay",
-      subject: UNDEAD,
-      condition: { kind: "currentQuest", is: "self" },
-      instructions: [{ verb: "PickHighestThreat" }, { verb: "SwitchActor", to: "picked" }, { verb: "Engage", target: "subject" }, { verb: "ModifyStat", stat: "engagedThreat", amount: 1, until: "endOfPhase", target: "subject" }],
+      ...ENGAGES_UNDEAD,
     },
     // The same line for an enemy a search put into play: a search announces no entry of its own.
     {
@@ -222,9 +226,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
       lines: ["10109:A:1"],
       timing: "forced",
       trigger: "searchedIntoPlay",
-      subject: UNDEAD,
-      condition: { kind: "currentQuest", is: "self" },
-      instructions: [{ verb: "PickHighestThreat" }, { verb: "SwitchActor", to: "picked" }, { verb: "Engage", target: "subject" }, { verb: "ModifyStat", stat: "engagedThreat", amount: 1, until: "endOfPhase", target: "subject" }],
+      ...ENGAGES_UNDEAD,
     },
     { id: "10109:forced:2", cardCode: "10109", lines: ["10109:A:2"], timing: "forced", trigger: "enemyDestroyed", subject: { type: "enemy", control: "any" }, instructions: [...SELF_QUEST("Quiet the Spirits"), { verb: "PlaceProgressOnQuestCard", amount: 2 }] },
     flipsInto("10109", "10109:A:3", "10110", 1),
@@ -238,7 +240,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies(
     { id: "10111:forced:1", cardCode: "10111", lines: ["10111:A:2"], timing: "forced", trigger: "locationExplored", subject: { type: "location", control: "any" }, instructions: [...SELF_QUEST("Sift through the Debris"), { verb: "PlaceProgressOnQuestCard", amount: 2 }] },
     flipsInto("10111", "10111:A:3", "10112", 2),
     claim("10112"),
-    
+
     // 10113 Decipher Ancient Texts. While it is the current quest allies get -2 Willpower. Action (any player, 3 times a round together): pay 1 resource to place 1 progress on it. When it is defeated it flips over.
     { id: "10113:constant:1", cardCode: "10113", lines: ["10113:A:1"], timing: "constant", condition: { kind: "currentQuest", is: "self" }, instructions: [{ verb: "ModifyStat", stat: "willpower", amount: -2, until: "whileSourceInPlay", holders: { type: "ally", control: "any" } }] },
     {

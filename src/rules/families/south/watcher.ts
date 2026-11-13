@@ -64,8 +64,8 @@ export function stagingAttackers(state: ScenarioState, seat: number): string[] {
 }
 
 // An enemy that is not engaged is dealt a shadow card of its own when it attacks; one dealt for an earlier attack is discarded first.
-export function dealForAttack(state: ScenarioState, enemyId: string, steps: EngineStep[]): ScenarioState {
-  return state.cards[enemyId]?.zone === "engaged" ? state : dealOneShadow(discardShadowOf(state, enemyId), enemyId, steps);
+export function dealForAttack(state: ScenarioState, enemyId: string, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
+  return state.cards[enemyId]?.zone === "engaged" ? state : dealOneShadow(discardShadowOf(state, enemyId), enemyId, steps, ctx);
 }
 
 // The enemy that attacks: the source itself, the card the source is attached to, the card the event was about, or the one a Pick chose.
@@ -97,8 +97,8 @@ export function attackNowFromStaging(state: ScenarioState, id: string, seat: num
   const data = effectData(state);
   const counted = data ? patchTop(state, { data: { ...data, returned: data.returned + 1 } }) : state;
   // "Deal and resolve 2 shadow cards for this attack" (143048:A:1): the first as any attack from the staging area, the others additional ones.
-  let dealt = shadow ? dealForAttack(counted, id, steps) : counted;
-  for (let more = 1; shadow && more < (shadows ?? 1); more += 1) dealt = dealAdditionalShadow(dealt, id, steps);
+  let dealt = shadow ? dealForAttack(counted, id, steps, ctx) : counted;
+  for (let more = 1; shadow && more < (shadows ?? 1); more += 1) dealt = dealAdditionalShadow(dealt, id, steps, ctx);
   const begun = beginEnemyAttack(dealt, seat, id, ctx, steps, { fromStaging: enemy?.zone === "staging", shadow });
   // `raiseIfDestroys`: the effect the attack leaves for its end, with X the characters it destroyed (146039:A:2).
   const attack = begun.pendingAttack;

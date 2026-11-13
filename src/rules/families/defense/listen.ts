@@ -30,7 +30,7 @@ export function queueHeard(state: ScenarioState, ctx: ReduceContext, event: Game
 // shadow card that was just dealt to an enemy attacking you", 01071:A:2).
 export function dealAttackShadow(state: ScenarioState, enemyId: string, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   const cleared = discardShadowOf(state, enemyId);
-  const dealt = dealOneShadow(cleared, enemyId, steps);
+  const dealt = dealOneShadow(cleared, enemyId, steps, ctx);
   const seat = state.cards[enemyId]?.controller ?? null;
   return dealt.cards[enemyId]?.shadowId != null && seat != null ? queueHeard(dealt, ctx, { trigger: "shadowsDealt", seat }) : dealt;
 }

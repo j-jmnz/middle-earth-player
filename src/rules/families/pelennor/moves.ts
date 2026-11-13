@@ -19,7 +19,7 @@ export function putTopmostFromEncounterDiscard(state: ScenarioState, instruction
   const id = [...state.encounterDiscard].reverse().find((candidate) => state.cards[candidate] != null && printedOf(ctx.cards, state.cards[candidate]!.code).type === instruction.type && hasTrait(state, candidate, instruction.trait, ctx));
   if (!id) return state;
   const engaged = moveEncounter(state, id, "engaged", focus.seat, ctx, steps);
-  return instruction.dealShadow === true ? dealOneShadow(engaged, id, steps) : engaged;
+  return instruction.dealShadow === true ? dealOneShadow(engaged, id, steps, ctx) : engaged;
 }
 
 /** EngageShadowCard: the shadow card the source is (an enemy) leaves the enemy it was dealt to and engages the player that enemy attacks. */

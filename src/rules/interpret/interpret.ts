@@ -136,7 +136,7 @@ function runTwinned(state: ScenarioState, instruction: Instruction, focus: Focus
     }
     case "DealShadow":
       if (!focus.sourceId) return state;
-      return instruction.additional ? dealAdditionalShadow(state, focus.sourceId, steps) : dealOneShadow(state, focus.sourceId, steps);
+      return instruction.additional ? dealAdditionalShadow(state, focus.sourceId, steps, ctx) : dealOneShadow(state, focus.sourceId, steps, ctx);
     case "ResolveEffect":
       return withFrame(state, "ResolveEffect", focus.sourceId, false, (framed) => framed, steps);
     case "ModifyStat":
@@ -219,20 +219,20 @@ function placeOneProgress(state: ScenarioState, sourceId: string | null, steps: 
 }
 
 // The enemy's shadow card, when it has none yet. `steps` hears the encounter deck being refilled for it.
-export function dealOneShadow(state: ScenarioState, enemyId: string, steps: EngineStep[]): ScenarioState {
+export function dealOneShadow(state: ScenarioState, enemyId: string, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
   if (state.cards[enemyId]?.shadowId) return state;
-  const dealt = dealAdditionalShadow(state, enemyId, steps);
+  const dealt = dealAdditionalShadow(state, enemyId, steps, ctx);
   // "Deal it a number of shadow cards equal to ..." (the flag dealtShadows, 19098:A:3): the card above is the first, each other an additional one.
   let next = dealt;
-  for (let more = heldAmount(dealt, enemyId, "dealtShadows") - 1; more > 0 && dealt.cards[enemyId]?.shadowId != null; more -= 1) next = dealAdditionalShadow(next, enemyId, steps);
+  for (let more = heldAmount(dealt, enemyId, "dealtShadows") - 1; more > 0 && dealt.cards[enemyId]?.shadowId != null; more -= 1) next = dealAdditionalShadow(next, enemyId, steps, ctx);
   return next;
 }
 
 // One more shadow card for an enemy, beside any it has (141069:A:2). With none yet it is simply its shadow card. An empty
 // encounter deck deals nothing (rr.step-6-2).
-export function dealAdditionalShadow(given: ScenarioState, enemyId: string, steps: EngineStep[]): ScenarioState {
+export function dealAdditionalShadow(given: ScenarioState, enemyId: string, steps: EngineStep[], ctx: ReduceContext): ScenarioState {
   // An empty deck is refilled at once while the Nightmare setup card says so (encounterRefill, 900201:A:3); the reset is logged.
-  const state = refillEncounterDeck(given, steps);
+  const state = refillEncounterDeck(given, steps, ctx);
   const enemy = state.cards[enemyId];
   const top = state.encounterDeck[0];
   // "Do not deal Nazgûl enemies a shadow card" (141061:A:1).

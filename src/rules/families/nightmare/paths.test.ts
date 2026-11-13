@@ -340,7 +340,7 @@ describe("Journey Along the Anduin Nightmare (900201-900209)", () => {
     const setup = spawn({ ...base, phase: "Combat" }, "900201", { zone: "nightmare" }).state;
     const troll = spawn(deck(setup, ["mist", "road"], "encounterDiscard"), "01082", { zone: "engaged", seat: 0 });
     const steps: EngineStep[] = [];
-    const dealt = dealOneShadow(syncConstants(troll.state, ctx), troll.id, steps);
+    const dealt = dealOneShadow(syncConstants(troll.state, ctx), troll.id, steps, ctx);
     expect(dealt.cards[troll.id]?.shadowId).not.toBeNull();
     expect(steps.some((step) => step.kind === "resetEncounterDeck")).toBe(true);
   });

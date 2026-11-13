@@ -83,15 +83,15 @@ export function characters(state: ScenarioState, seat: number, cards: Cards): st
 
 // Each seat's enemies in player order, the highest engagement cost first (rr.step-6-2). Equal costs keep the order
 // they engaged in.
-export function dealShadows(state: ScenarioState, cards: Cards, steps: EngineStep[]): ScenarioState {
+export function dealShadows(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]): ScenarioState {
   let next = state;
   for (const seat of livingSeats(next)) {
     const cost = (id: string) => {
       const instance = next.cards[id];
-      return instance ? (engagementCostOf(next, instance, cards) ?? 0) : 0;
+      return instance ? (engagementCostOf(next, instance, ctx.cards) ?? 0) : 0;
     };
     const order = [...(next.seats[seat]?.engaged ?? [])].sort((a, b) => cost(b) - cost(a));
-    for (const enemyId of order) next = dealOneShadow(next, enemyId, steps);
+    for (const enemyId of order) next = dealOneShadow(next, enemyId, steps, ctx);
   }
   return next;
 }
@@ -128,7 +128,7 @@ export function beginEnemyAttack(
   if (!attacker || !here || attackBarred(state, enemyId, seat)) return state;
   steps.push({ kind: "attack", side: "enemy", seat, enemyId });
   // An attack an effect makes from the staging area was dealt its shadow card already (attackFromStaging).
-  const dealt = shadow && (engagedWithAll(state, enemyId) || (viaRelay(state, enemyId) && !fromStaging)) ? dealForAttack(state, enemyId, steps) : state;
+  const dealt = shadow && (engagedWithAll(state, enemyId) || (viaRelay(state, enemyId) && !fromStaging)) ? dealForAttack(state, enemyId, steps, ctx) : state;
   const declared: ScenarioState = { ...dealt, pendingAttack: { enemyId, seat, ...(fromStaging ? { fromStaging: true } : {}) }, activeSeat: seat, window: null };
   const fired = fireForced(declared, { trigger: "attacks", seat, cardId: enemyId }, ctx, steps);
   if (fired.stack.length > declared.stack.length && fired.pendingAttack) {

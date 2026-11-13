@@ -1,7 +1,7 @@
 import type { Effect, ScenarioDefinition } from "../../src/catalog/boundary.ts";
 import { campaignScenario, scenarioDefinition, type CampaignData, type ScenarioData } from "../../src/catalog/scenario-data.ts";
 import { EFFECTS } from "../../src/effects/index.ts";
-import { printedFromCard, type PrintedCard } from "../../src/rules/core/printed.ts";
+import { isCharacterType, printedFromCard, type PrintedCard } from "../../src/rules/core/printed.ts";
 import { blankScenario, updateCard, withThreat } from "../../src/rules/core/state.ts";
 import { attachTo, spawn, type Destination } from "../../src/rules/core/zones.ts";
 import type { ReduceContext, ScenarioState } from "../../src/rules/engine/reduce.ts";
@@ -166,8 +166,10 @@ export function tableFromLayout(scenarioId: string, layout: Layout = {}, options
     const host = idOf(state, attachment.to);
     const spawned = spawn(state, attachment.code, { zone: "play", seat: 0 });
     state = attachTo(spawned.state, spawned.id, host);
-    // An objective attached to a character is a claimed one, controlled by the character's player (The Treachery of Rhudaur's Clues).
-    if (cards.get(attachment.code)?.type === "objective") state = updateCard(state, spawned.id, { claimed: true, controller: state.cards[host]?.controller ?? 0, face: "up" });
+    // An objective attached to a character a player controls is a claimed one, controlled by that player (The Treachery of Rhudaur's Clues); one on an enemy or a location (Saruman's Staff, Thaurdir's burdens) is not.
+    const hostCard = state.cards[host];
+    const hostPrinted = hostCard ? cards.get(hostCard.code) : undefined;
+    if (cards.get(attachment.code)?.type === "objective" && hostCard?.controller != null && hostPrinted != null && isCharacterType(hostPrinted)) state = updateCard(state, spawned.id, { claimed: true, controller: hostCard.controller, face: "up" });
   }
   for (const hidden of layout.under ?? []) {
     const spawned = spawn(state, hidden.code, { zone: "under", locationId: idOf(state, hidden.to) }, "down");

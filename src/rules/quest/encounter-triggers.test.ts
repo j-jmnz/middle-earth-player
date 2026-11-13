@@ -137,6 +137,7 @@ describe("a Forced effect when an enemy attacks deals it an additional shadow ca
     condition: { kind: "exhausted", code: "ring", is: true },
   });
 
+  const ctx = { effects: [forced, boostShadow], cards };
   function attackTable(ringExhausted: boolean): { state: ScenarioState; enemy: string; defender: string } {
     let { state, heroes } = seated(1);
     const theRing = spawn(state, "ring", { zone: "play", seat: 0 });
@@ -144,12 +145,11 @@ describe("a Forced effect when an enemy attacks deals it an additional shadow ca
     const enemy = spawn(state, "wraith", { zone: "engaged", seat: 0 });
     state = enemy.state;
     for (const code of ["boost", "boost", "mist"]) state = spawn(state, code, { zone: "encounterDeck" }, "down").state;
-    state = dealOneShadow(state, enemy.id, []);
+    state = dealOneShadow(state, enemy.id, [], ctx);
     return { state: { ...withMode(state, "enemyAttacks"), boundaryPhase: "Combat" }, enemy: enemy.id, defender: heroes[1] ?? "" };
   }
 
   it("deals it before the defender is declared, and resolves every shadow card dealt to the attacker (rr.step-6-4-2)", () => {
-    const ctx = { effects: [forced, boostShadow], cards };
     const { state, enemy, defender } = attackTable(true);
     const asked = settle(state, ctx, []);
     expect(asked.window).toEqual({ kind: "defense", enemyId: enemy, seat: 0 });
@@ -195,8 +195,8 @@ describe("shadow verbs", () => {
     const enemy = spawn(state, "orc", { zone: "engaged", seat: 0 });
     state = spawn(enemy.state, shadowCode, { zone: "encounterDeck" }, "down").state;
     state = spawn(state, "mist", { zone: "encounterDeck" }, "down").state;
-    state = setup(dealOneShadow(state, enemy.id, []));
     const ctx = { effects, cards };
+    state = setup(dealOneShadow(state, enemy.id, [], ctx));
     const asked = settle({ ...withMode(state, "enemyAttacks"), boundaryPhase: "Combat" }, ctx, []);
     return { asked, ctx, enemy: enemy.id, defender: heroes[1] ?? "", heroes };
   }

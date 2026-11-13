@@ -143,7 +143,7 @@ export function engageOrGrapple(state: ScenarioState, instruction: Verb<"EngageO
   if (instruction.choice != null) {
     // The attack is over: the shadow card is still dealt, or already in the encounter discard pile.
     if (instruction.choice === "grapple") return resolveGrapple(state, { verb: "ResolveGrapple", card: id }, focus, ctx, steps);
-    return dealOneShadow(moveEncounter(state, id, "engaged", focus.seat, ctx, steps), id, steps);
+    return dealOneShadow(moveEncounter(state, id, "engaged", focus.seat, ctx, steps), id, steps, ctx);
   }
   if (focus.chosen == null) return effectData(state) ? askTarget(state, { instruction, seat: focus.seat, chosen: null, cause: currentCause(steps, UNATTRIBUTED) }, ["engage", "grapple"]) : state;
   const attack = state.pendingAttack;

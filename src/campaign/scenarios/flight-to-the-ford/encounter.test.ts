@@ -110,13 +110,13 @@ describe("The Last Bridge, the quest stages and the locations", () => {
 describe("Ettenmoors (141061)", () => {
   it("keeps the Nazgûl engaged with a player from being dealt a shadow card while it is the active location (141061:A:1)", () => {
     const active = make({ active: "141061", engaged: [{ code: "141069", seat: 0 }, { code: "grunt", seat: 0 }], deck: ["f0", "f0", "f0"] });
-    const dealt = dealShadows(active.state, active.ctx.cards, []);
+    const dealt = dealShadows(active.state, active.ctx, []);
     expect(dealt.cards[first(dealt, "141069")]?.shadowId).toBeNull();
     expect(dealt.cards[first(dealt, "grunt")]?.shadowId).not.toBeNull();
     // No additional shadow card either (141069:A:2).
-    expect(dealOneShadow(active.state, first(active.state, "141069"), []).cards[first(active.state, "141069")]?.shadowId).toBeNull();
+    expect(dealOneShadow(active.state, first(active.state, "141069"), [], active.ctx).cards[first(active.state, "141069")]?.shadowId).toBeNull();
     const staged = make({ staging: ["141061"], engaged: [{ code: "141069", seat: 0 }], deck: ["f0"] });
-    expect(dealShadows(staged.state, staged.ctx.cards, []).cards[first(staged.state, "141069")]?.shadowId).not.toBeNull();
+    expect(dealShadows(staged.state, staged.ctx, []).cards[first(staged.state, "141069")]?.shadowId).not.toBeNull();
     expect(flagged(active.state, first(active.state, "141069"), "noShadowDealt")).toBe(true);
     expect(flagged(active.state, first(active.state, "grunt"), "noShadowDealt")).toBe(false);
   });

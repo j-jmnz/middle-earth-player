@@ -330,7 +330,7 @@ function immediateAttack(state: ScenarioState, sourceId: string | null, seat: nu
   // after this one", data/printed/fellowship-of-the-ring.json 142047:A:2, 141072:A:2).
   if (sourceId && enemy?.zone === "staging") {
     if (attackBarred(state, sourceId, seat) || state.seats[seat]?.eliminated) return state;
-    const stagedBegun = beginEnemyAttack(shadow ? dealForAttack(state, sourceId, steps) : discardShadowOf(state, sourceId), seat, sourceId, ctx, steps, { fromStaging: true });
+    const stagedBegun = beginEnemyAttack(shadow ? dealForAttack(state, sourceId, steps, ctx) : discardShadowOf(state, sourceId), seat, sourceId, ctx, steps, { fromStaging: true });
     return stagedBegun.pendingAttack ? { ...stagedBegun, pendingAttack: { ...stagedBegun.pendingAttack, immediate: true } } : stagedBegun;
   }
   if (!sourceId || enemy?.zone !== "engaged" || enemy.controller == null) return state;

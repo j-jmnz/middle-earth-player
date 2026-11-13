@@ -85,7 +85,7 @@ export function run(state: ScenarioState, instruction: Instruction, focus: Focus
     case "DiscardShadowOf":
       return discardShadowOf(state, ref(state, instruction.target ?? "picked", focus));
     case "DealShadowTo":
-      return dealShadowTo(state, ref(state, instruction.target, focus), steps);
+      return dealShadowTo(state, ref(state, instruction.target, focus), steps, ctx);
     case "LookAtShadow":
       return lookAtShadow(state, ref(state, instruction.target ?? "picked", focus), focus.seat, instruction.markEffect === true, ctx);
     case "ShadowAttacks":

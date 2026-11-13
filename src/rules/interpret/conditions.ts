@@ -207,7 +207,7 @@ export function holds(state: ScenarioState, named: Condition, scope: Scope, ctx:
       return Object.values(state.cards).some((card) => card.code === condition.code && inPlay(card.zone)) === condition.is;
     case "defendingAgainst": {
       const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];
-      return holder != null && defendingAgainst(state, holder, condition.trait, ctx.cards);
+      return holder != null && defendingAgainst(state, holder, condition.trait, ctx);
     }
     case "versusDefender": {
       const holder = state.cards[scope.holderId ?? scope.sourceId ?? ""];

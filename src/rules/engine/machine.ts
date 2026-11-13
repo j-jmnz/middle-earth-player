@@ -74,7 +74,7 @@ export function settle(state: ScenarioState, ctx: ReduceContext, steps: EngineSt
     // The Stormcaller's area stands in the staging area or out of it as the players' stage says (families/stormcaller/area.ts); the Island Map's locations as the active location says (families/island/map.ts).
     // Core: the constant win check, then the families' `before` hooks (burden, island, south), the encounter deck refill, the families' `after` hooks (sea, stormcaller, island): SETTLE_ORDER.
     const beforeRefill = runSettle("before", constantWin(current, ctx), ctx, steps);
-    const refilled = refillEncounterDeck(beforeRefill, steps);
+    const refilled = refillEncounterDeck(beforeRefill, steps, ctx);
     current = runSettle("after", refilled, ctx, steps);
     if (current.stageCleared && !current.window && !current.failure) {
       const asking = openResolution(current, ctx);
@@ -260,7 +260,7 @@ function automatic(state: ScenarioState, ctx: ReduceContext, steps: EngineStep[]
       // "Skip the combat phase" (142075:A:2): the round goes on to the refresh phase.
       return flagged(state, "table", "skipCombat") ? withMode({ ...state, engagement: null }, "refresh") : startCombat(state, ctx);
     case "combatShadows":
-      return withMode(announceShadowsDealt(dealShadows(state, ctx.cards, steps), ctx), "combatActions");
+      return withMode(announceShadowsDealt(dealShadows(state, ctx, steps), ctx), "combatActions");
     case "combatActions":
       return stepWindow(state, ctx, "6.2") ?? withMode(state, "enemyAttacks");
     case "enemyAttacks":
