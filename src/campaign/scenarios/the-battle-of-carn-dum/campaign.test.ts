@@ -73,7 +73,7 @@ describe("The Battle of Carn Dûm in the angmar-awakened campaign", () => {
   it("is playable, and the path offers it after The Treachery of Rhudaur's win", () => {
     expect(PLAYABLE_SCENARIOS).toContain("the-battle-of-carn-dum");
     const path = campaignPath(campaign, {}, rhudaurLog(1));
-    expect(path.map((node) => [node.id, node.status]).slice(6, 9)).toEqual([["the-treachery-of-rhudaur", "completed"], ["the-battle-of-carn-dum", "current"], [campaign.scenarios[8], "soon"]]);
+    expect(path.map((node) => [node.id, node.status]).slice(6, 9)).toEqual([["the-treachery-of-rhudaur", "completed"], ["the-battle-of-carn-dum", "current"], [campaign.scenarios[8], "locked"]]);
   });
 
   it("10125:A:1 deals the Setup: Thaurdir staged Captain side faceup, one Garrison for each player, Accursed Battlefield active and the stage not advanced", () => {
@@ -171,7 +171,7 @@ describe("The Battle of Carn Dûm in the angmar-awakened campaign", () => {
   });
 
   // The won two-handed golden (goldenState, not played again) resolved onto the parts before it: the log the next part is dealt from.
-  it("10188:A:2 keeps the boons the players took at the Setup in the pool after a win, writes the part as completed and lists the next part as coming soon", () => {
+  it("10188:A:2 keeps the boons the players took at the Setup in the pool after a win, writes the part as completed and offers the next part", () => {
     const wonGolden = "two-handed, won, Thaurdir destroyed on stage 2B";
     const before = rhudaurLog(2);
     // The Campaign Setup Checklist adds the chosen boons to the pool when the scenario is dealt; the Resolution is written onto that log.
@@ -180,6 +180,6 @@ describe("The Battle of Carn Dûm in the angmar-awakened campaign", () => {
     expect(written.campaignPool.filter((card) => ["10189", "10190"].includes(card.code)).map((card) => `${card.code}:${card.seat}`).sort()).toEqual(["10189:0", "10190:1"]);
     // What the earlier parts left stays in the pool.
     for (const card of before.campaignPool) expect(written.campaignPool.map((one) => one.code), card.code).toContain(card.code);
-    expect(campaignPath(campaign, {}, written).find((node) => node.id === campaign.scenarios[8])?.status).toBe("soon");
+    expect(campaignPath(campaign, {}, written).find((node) => node.id === campaign.scenarios[8])?.status).toBe("current");
   });
 });

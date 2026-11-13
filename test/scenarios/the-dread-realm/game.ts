@@ -5,7 +5,7 @@ import { legalIntents, type PlayerIntent, type ReduceContext, type ScenarioState
 
 import { loadCampaign, loadScenario } from "../../../scripts/data/load-scenarios.ts";
 import { nextIntent, type PolicyOptions } from "../../harness/auto-player.ts";
-import { campaignGame, fillerLoadout, HERO_STATS, type PlayedGame } from "../../harness/game-kit.ts";
+import { campaignGame, fillerLoadout, HERO_STATS, type PlayedGame, type StartOptions } from "../../harness/game-kit.ts";
 
 const campaign = loadCampaign("angmar-awakened");
 const realm = loadScenario("the-dread-realm");
@@ -21,8 +21,10 @@ export const realmLoadout = fillerLoadout;
 // The goldens' world, the plan and start of a game, and the log of a campaign whose earlier parts were won: the seeded game's parts every scenario shares (test/harness/game-kit.ts).
 export const realmWorld = (decks: RealmDecks = "strong") => game.world(decks);
 export const afterDum = (seatCount: 1 | 2) => game.after(seatCount);
-export const realmPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount)) => game.plan(seatCount, log);
-export const realmStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard) => game.start(seatCount, seed, difficulty, { facts, log, modeCard });
+// The campaign card's Setup (10193:A:2) through the Campaign Setup Checklist: each player in turn may take a boon from their deck or the pool into their opening hand; the games skip it unless they name a card.
+export const boonChoices = (seatCount: 1 | 2): string[] => ["skip", "skip"].slice(0, seatCount);
+export const realmPlan = (seatCount: 1 | 2, log: CampaignLog = emptyLog(seatCount), choices: readonly string[] = boonChoices(seatCount)) => game.plan(seatCount, log, choices);
+export const realmStart = (seatCount: 1 | 2, seed: number, difficulty: Difficulty, facts?: Omit<CampaignFacts, "modeCard">, log: CampaignLog = emptyLog(seatCount), modeCard?: ModeCard, extra: Pick<StartOptions, "choices" | "standalone" | "loadout"> = {}) => game.start(seatCount, seed, difficulty, { facts, log, modeCard, choices: boonChoices(seatCount), ...extra });
 
 export type RealmPolicy = {
   // The option a Choose window with these answers takes: the first or the last.
@@ -50,14 +52,14 @@ const game = campaignGame<RealmDecks, RealmPolicy>({
   campaign,
   scenario: realm,
   stats: HERO_STATS,
-  // TODO: the cards a game loads besides the scenario's piles, its campaign card's and the campaign's game codes.
-  codes: [...realm.cards.map((card) => card.code)],
+  // The scenario's cards; the campaign card's, the cards it places (Determination, Fend Off Despair, the Loot and Clue boons, the four Carn Dûm boons) and the campaign's game codes are added by the kit. The pool holds what The Battle of Carn Dûm leaves: Mysterious Omens, Arnor Ravaged, Amarthiúl's Courage, a Thaurdir burden, Fend Off Despair, Losing Time and the boon the first player took.
+  codes: [...realm.cards.flatMap((card) => (card.back != null ? [card.code, card.back] : [card.code])), "10160", "100158", "10157", "10167", "10168", "10169", "10170", "10172", "10173", "10183", "10185", "10186", "10187", "10189", "10190", "10191", "10192", "10115"],
   intent: realmIntent,
   policy: DEFAULT_POLICY,
   limit: 6000,
   upgraded: [],
-  // TODO: the XP each earlier part gained (in campaign order), the cards they put in the pool and the marks on the cards, as a campaign that won them leaves the log.
-  earlier: { xp: [0, 0, 0, 0, 0, 0, 0, 0], pool: [], marks: {} },
+  // The eight earlier parts were won: no XP in this campaign; in the pool Mysterious Omens, Arnor Ravaged, Amarthiúl's Courage, Thaurdir's Legacy, Fend off Despair, Losing Time and Elrond's Champion.
+  earlier: { xp: [0, 0, 0, 0, 0, 0, 0, 0], pool: [{ code: "10160" }, { code: "100158" }, { code: "10167" }, { code: "10168" }, { code: "10173" }, { code: "10183" }, { code: "10189", seat: 0 }], marks: {} },
 });
 
-export const playGolden = (golden: RealmGolden, ctx: ReduceContext): RealmGame => game.playGolden(golden, ctx);
+export const playGolden = (golden: RealmGolden, ctx: ReduceContext): RealmGame => game.playGolden(golden, ctx, boonChoices(golden.seatCount));
