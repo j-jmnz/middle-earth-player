@@ -17,12 +17,17 @@ import type { Focus } from "../../index.ts";
 
 type Verb<Name extends Instruction["verb"]> = Extract<Instruction, { verb: Name }>;
 
-/** The seat a Reanimate stands the card in front of: the actor, the first player, or the controller of the ally the effect destroyed ("That ally's controller reanimates that character", 101162:A:2). */
+/** The seat a Reanimate stands the card in front of: the actor, the first player, the controller of the ally the effect destroyed ("That ally's controller reanimates that character", 101162:A:2), or the defending player, the one the attacking source is engaged with (a sentinel ally of another player may be the character that fell, 10155:A:1). */
 function seatFor(state: ScenarioState, instruction: Verb<"Reanimate">, focus: Focus): number {
   if (instruction.who === "firstPlayer") return state.firstPlayer;
   if (instruction.who === "controller") {
     const data = topFrame(state)?.data;
     return data?.kind === "effect" && data.destroyedController != null ? data.destroyedController : focus.seat;
+  }
+  if (instruction.who === "defending") {
+    const source = focus.sourceId;
+    const engagedWith = source ? state.seats.findIndex((one) => one.engaged.includes(source)) : -1;
+    return engagedWith >= 0 ? engagedWith : focus.seat;
   }
   return focus.seat;
 }

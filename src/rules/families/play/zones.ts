@@ -7,7 +7,7 @@ import type { CardInstance, ScenarioState } from "../../core/state.ts";
 import { updateCard } from "../../core/state.ts";
 import { sendAway } from "../objectives/claimed.ts";
 import { cardsUnder, moveCard } from "../../core/zones.ts";
-import { returnAsEnemy, returnsAsEnemy } from "../angmar/reanimate/attached.ts";
+import { returnAttachedEnemy } from "../angmar/reanimate/attached.ts";
 
 // `card` is the card as it was before it left play; `released` are the attachments destroyCard already discarded. Each card
 // still attached goes to its owner's discard pile (an encounter card to the encounter discard pile), and so does a player card
@@ -20,8 +20,9 @@ export function leaveWith(state: ScenarioState, card: CardInstance, released: re
     const attachment = next.cards[id];
     if (!attachment || attachment.host !== card.id) continue;
     // An enemy that was lying on the host as an attachment returns to the staging area as an enemy (families/angmar/reanimate/attached.ts).
-    if (returnsAsEnemy(attachment)) {
-      next = returnAsEnemy(next, id);
+    const returned = returnAttachedEnemy(next, id);
+    if (returned) {
+      next = returned;
       continue;
     }
     const owner = attachment.owner ?? attachment.controller;

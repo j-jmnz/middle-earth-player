@@ -22,7 +22,7 @@ import { attachmentTargets, discardPlayable, playReason, playWindowReason } from
 import { resolutionIntents, resolutionReason } from "../setup/resolution.ts";
 import { optionalEnemies, stagingLocations } from "../quest/quest.ts";
 import { defenseBlocked, forcedTravel, travelBlocked, travelCostUnpayable, travelProgressReason } from "../interpret/restrictions.ts";
-import { flagged, perilLock, type ScenarioState } from "../core/state.ts";
+import { flagged, modifierActive, perilLock, type ScenarioState } from "../core/state.ts";
 import { attackRuleReason } from "../families/attack/targets.ts";
 import { sideQuestReason } from "../families/sidequests/quest.ts";
 import { familyAttackReason, familyDefenseReason, familyMayTravel, familyTravelReach } from "../interpret/family-hooks.ts";
@@ -133,14 +133,16 @@ export function rejectionReason(state: ScenarioState, intent: PlayerIntent, ctx:
       if (state.window?.kind !== "mulligan") return "Mulligan is closed";
       return state.mulliganSeats.includes(state.activeSeat) ? "A second mulligan is not allowed" : null;
     case "Pass":
-      if (mustCommitLeft(state, state.activeSeat, ctx).length > 0) return "A hero must commit to the quest, if able";
-      return state.window?.kind === "pass" ||
+      return (
+        mustCommitReason(state, ctx) ??
+        (state.window?.kind === "pass" ||
         state.window?.kind === "frameAction" ||
         state.window?.kind === "cancelOffer" ||
         state.window?.kind === "look" ||
         state.window?.kind === "response"
-        ? null
-        : "That intent is not legal in this window";
+          ? null
+          : "That intent is not legal in this window")
+      );
     case "PlayCard":
       return playReason(state, intent, ctx);
     case "Commit":
@@ -191,6 +193,15 @@ function mandatory(state: ScenarioState): boolean {
 function mustCommitLeft(state: ScenarioState, seat: number, ctx: ReduceContext): string[] {
   if (state.mode !== "questCommit" || state.window?.kind !== "pass" || state.modifiers.length === 0 || askingToCommit(state)) return [];
   return committers(state, seat, ctx).filter((id) => flagged(state, id, "mustCommit"));
+}
+
+// The refusal of a Pass while a hero still owes its commitment, naming the hero and the card that says so ("Aragorn must commit to the quest (A Fell Dread)").
+function mustCommitReason(state: ScenarioState, ctx: ReduceContext): string | null {
+  const owed = mustCommitLeft(state, state.activeSeat, ctx);
+  if (owed.length === 0) return null;
+  const heroes = owed.map((id) => printedOf(ctx.cards, state.cards[id]?.code ?? "").name);
+  const sources = new Set(state.modifiers.filter((modifier) => modifier.stat === "mustCommit" && owed.includes(modifier.instanceId ?? "") && modifierActive(state, modifier)).map((modifier) => printedOf(ctx.cards, state.cards[modifier.sourceId]?.code ?? "").name));
+  return `${heroes.join(" and ")} must commit to the quest${sources.size > 0 ? ` (${[...sources].join(", ")})` : ""}`;
 }
 
 function passIntents(state: ScenarioState, ctx: ReduceContext): LegalIntent[] {

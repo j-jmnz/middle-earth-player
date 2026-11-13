@@ -10,8 +10,8 @@ export const REANIMATED_DEAD = "Reanimated Dead";
 /** The mark on a seat's dial: the Reanimated Dead engaged with it. */
 export const deadLabel = (seat: number | null): string => (seat == null ? "Dead" : `P${seat + 1} · Dead`);
 
-export const deadSeatWords = (count: number, engaged: boolean, crypts: number): string =>
-  `${plural(count, "Reanimated Dead", "Reanimated Dead")} ${engaged ? "engaged" : "in the staging area"}, each an Undead enemy with 2 Attack and 2 Defense.${crypts > 0 ? ` Each adds 1 Threat to every Unholy Crypt in the staging area.` : ""}`;
+export const deadSeatWords = (count: number, crypts: number): string =>
+  `${plural(count, "Reanimated Dead", "Reanimated Dead")} engaged${count === 1 ? ", an Undead enemy" : ", each an Undead enemy"}.${crypts > 0 ? ` Each adds 1 Threat to every Unholy Crypt in the staging area.` : ""}`;
 
 /** The stats a Reanimated Dead has now, as the engine reads them: 0 engagement cost, 2 Threat, 2 Attack, 2 Defense and 2 hit points before any modifier (a Dark Halls in the staging area adds 1 Attack and 1 Defense). */
 export type DeadStats = { engagementCost: number; threat: number; attack: number; defense: number; hitPoints: number; damage: number };
@@ -39,7 +39,7 @@ export const wraithAttachedWords = (host: string): string =>
 
 /** Possession on its Reanimated Dead. */
 export const possessionAttachedWords = (owner: string): string =>
-  `Attached to a Reanimated Dead (${owner} card). Counts as a Sorcery Condition attachment. Discarding it discards the Reanimated Dead to its owner's discard pile; removing it from the game leaves the Reanimated Dead in the staging area.`;
+  `Attached to a Reanimated Dead (${owner} card). Counts as a Sorcery Condition attachment. Discarding it discards the Reanimated Dead to its owner's discard pile; removing it from the game leaves the Reanimated Dead in play.`;
 
 /** A Fell Dread on its hero. */
 export const fellDreadWords = (hero: string, owner: string | null): string =>
@@ -48,7 +48,7 @@ export const fellDreadWords = (hero: string, owner: string | null): string =>
 /** The Sorcery cards in play, against Daechanar: his Attack and what keeps him from harm. */
 export function daechanarWords(sorcery: number, attack: number): string {
   if (sorcery === 0) return `No Sorcery card is in play: ${attack} Attack, and damage to him lands. Destroying him advances the quest.`;
-  return `${plural(sorcery, "Sorcery card", "Sorcery cards")} in play: ${attack} Attack, Indestructible, and each time he is damaged all of it is canceled and the first player removes a Sorcery card from the game.`;
+  return `${plural(sorcery, "Sorcery card", "Sorcery cards")} in play: ${attack} Attack, Indestructible, and each time he is damaged all the damage just dealt is canceled and the first player removes a Sorcery card from the game.`;
 }
 
 /** The dial of the Sorcery cards in play while Daechanar is. */
@@ -65,7 +65,16 @@ export const altarWords = (daechanarInPlay: boolean): string => (daechanarInPlay
 export const ESCAPE_DIAL_NAME = "Locations in play:";
 export const escapeNote = (locations: number): string =>
   locations === 0
-    ? "No location is in play: the players escape Carn Dûm and win at the end of the quest phase."
+    ? "If none is in play at the end of the quest phase, the players escape Carn Dûm and win."
     : `${plural(locations, "location", "locations")} in play, in the staging area or active. At the end of the quest phase every character takes 1 damage while any location is in play; the players win once none is.`;
-/** The warning while a location is in play and the damage at the end of the quest phase would destroy a character: who it destroys. */
-export const escapeNear = (names: readonly string[]): string => `At the end of the quest phase 1 damage destroys ${names.length <= 3 ? names.join(", ") : `${plural(names.length, "character", "characters")}`}.`;
+/** The warning while a location is in play and the damage at the end of the quest phase would destroy a character: who it destroys. A character is named as `owner`'s (two-handed) and one name that repeats is said once with its count. */
+export function escapeNear(doomed: readonly { name: string; owner: string | null }[]): string {
+  const counts = new Map<string, number>();
+  for (const one of doomed) {
+    const label = one.owner != null ? `${one.owner} ${one.name}` : one.name;
+    counts.set(label, (counts.get(label) ?? 0) + 1);
+  }
+  const labels = [...counts].map(([label, count]) => (count > 1 ? `${label} (x${count})` : label));
+  const who = labels.length <= 3 ? (labels.length > 1 ? `${labels.slice(0, -1).join(", ")} and ${labels.at(-1)}` : (labels[0] ?? "")) : plural(doomed.length, "character", "characters");
+  return `At the end of the quest phase 1 damage destroys ${who}.`;
+}

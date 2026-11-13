@@ -6,8 +6,9 @@ import type { Instruction } from "../../../../catalog/boundary.ts";
 import type { EngineStep } from "../../../core/intents.ts";
 import { destroyCard } from "../../../core/keywords.ts";
 import { printedOf } from "../../../core/printed.ts";
-import { inPlay, updateCard, type ScenarioState } from "../../../core/state.ts";
-import { moveCard } from "../../../core/zones.ts";
+import { flagged, inPlay, updateCard, type CardInstance, type ScenarioState } from "../../../core/state.ts";
+import { moveCard, type Destination } from "../../../core/zones.ts";
+import { queueEvent } from "../../../windows/queue.ts";
 import { frameScope, refCard } from "../../../interpret/amounts.ts";
 import { attachSelf } from "../../../interpret/effect-targeted.ts";
 import type { ReduceContext } from "../../../interpret/interpret.ts";
@@ -28,15 +29,21 @@ export function attachEnemyToPicked(state: ScenarioState, focus: Focus, ctx: Red
   return updateCard(attachSelf(state, focus.sourceId, host, ctx), focus.sourceId, { asAttachment: true });
 }
 
-/** A Wraith lying on a host that has left play (its attachments go with it) returns to the staging area as the enemy it printed, undamaged and ready: true when the attachment is one. */
-export function returnsAsEnemy(attachment: { asAttachment?: true } | undefined): boolean {
-  return attachment?.asAttachment === true;
-}
-
-/** The attachment goes back to the staging area as an enemy: detached from its host, faceup, uncontrolled. */
-export function returnAsEnemy(state: ScenarioState, id: string): ScenarioState {
+/** An enemy lying on its host as an attachment (`asAttachment`: the Wraith of Carn Dûm) goes back to the staging area as an enemy when the host leaves play ("return Wraith of Carn Dûm to the staging area as an enemy", 101157:A:1): detached from the host, faceup, uncontrolled. Its tokens are left as they lie (an attachment holds none). Null when the card is no such attachment, so the caller releases it as any other. */
+export function returnAttachedEnemy(state: ScenarioState, id: string): ScenarioState | null {
+  if (state.cards[id]?.asAttachment !== true) return null;
   const moved = moveCard(state, id, stagingDest(state, state.firstPlayer));
   return updateCard(moved, id, { asAttachment: undefined, face: "up", controller: null, host: null });
+}
+
+/** A card that leaves its role as an attachment, called as `moveCard` moves it (`current` is the card as it was, `dest` where it goes): an enemy lying as an attachment (Wraith of Carn Dûm) is no attachment once it leaves that role, and an attachment that takes its host with it (Possession, the flag `discardsHost`) leaves any way but the game's own removal, so its host's card hears it and is discarded (rr.removed-from-game). */
+export function attachmentLeaves(state: ScenarioState, id: string, current: CardInstance, dest: Destination): ScenarioState {
+  let next = state;
+  if (current.asAttachment === true && dest.zone !== "attached") next = updateCard(next, id, { asAttachment: undefined });
+  if (current.zone === "attached" && current.host != null && dest.zone !== "removed" && dest.zone !== "attached" && flagged(next, id, "discardsHost")) {
+    next = queueEvent(next, { trigger: "attachmentLeft", seat: null, cardId: id, subject: id, other: current.host });
+  }
+  return next;
 }
 
 /** DestroyHighestCostAlly: the ally with the highest printed cost among every player's allies in play (a card with no printed cost or an X counts 0) is destroyed; the first player chooses among allies that tie. It becomes the effect's last picked card, in its owner's discard pile; with no ally in play nothing is picked ("Destroy the highest cost ally in play", 101162:A:2). */

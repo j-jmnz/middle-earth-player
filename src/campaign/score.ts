@@ -3,6 +3,7 @@ import { printedOf, type PrintedCard } from "../rules/core/printed.ts";
 import { victoryPointsOf } from "../rules/core/printed-stat.ts";
 import { endedInDefeat } from "../rules/core/eliminate.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
+import { reanimatedHeroes } from "../rules/families/angmar/reanimate/standing.ts";
 
 export type ScenarioScore = { rounds: number; victoryPoints: number; score: number };
 
@@ -41,6 +42,8 @@ export function scoreParts(state: ScenarioState, cards: ReadonlyMap<string, Prin
       for (const id of seat.heroes) damage += state.cards[id]?.damage ?? 0;
     }
   }
+  // A destroyed hero that lies reanimated is still destroyed (mec108.reanimated-dead): it is in no discard pile.
+  for (const hero of reanimatedHeroes(state, cards)) if (hero.seat < state.seatCount) destroyed += printedOf(cards, hero.code).threat ?? 0;
   const victoryPoints = state.victory.reduce((sum, id) => sum + victoryPointsOf(state, id, cards), 0);
   return { threat, destroyed, damage, rounds: completedRounds(state), victoryPoints };
 }

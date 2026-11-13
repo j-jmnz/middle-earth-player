@@ -60,7 +60,7 @@ function seatOfCard(game: ScenarioState, id: string): number | null {
   if (card.zone === "engaged") return game.seats.findIndex((seat) => seat.engaged.includes(id));
   // A card captured underneath another, or rescued into a hand, is its owner's (Escape from Mount Gram).
   if (card.zone === "captured" || card.zone === "hand") return card.owner ?? card.controller;
-  // An attachment is its host's player's: the player who controls the hero or ally, or the owner of a Reanimated Dead in the staging area (Possession).
+  // An attachment is its host's player's: the player who controls the hero or ally, the player an enemy host is engaged with, or the owner of a Reanimated Dead in the staging area (Possession); a host no seat owns (a location, an enemy in the staging area) gives none.
   if (card.zone === "attached" && card.host != null) {
     const host = game.cards[card.host];
     if (!host) return null;
@@ -71,7 +71,8 @@ function seatOfCard(game: ScenarioState, id: string): number | null {
 
 /**
  * The row of a card in a pick of Intruders in Chetwood whose options belong to more than one player (Borders of Bree-land's enemy, Angmar Orc's ally): the owner is named on each row, "Angmar Orc \u00b7 engaged with Player 2",
- * "Gimli \u00b7 Player 1's ally". Undefined for any other row, and in a game with one seat or none of the side quest rules.
+ * "Gimli \u00b7 Player 1's ally". An attachment names the card it lies on and whose that is, so two of one name read apart ("A Fell Dread \u00b7 on Aragorn, Player 2's hero", "Possession \u00b7 on Reanimated Dead, Player 1's card", "... on Orc Archer, enemy engaged with Player 1");
+ * one lying on a card no seat owns has no label. Undefined for any other row, and in a game with one seat or none of the side quest rules.
  */
 export function seatedLabel(game: ScenarioState, ctx: ReduceContext, names: SheetNames, id: string, options: readonly string[]): string | undefined {
   if (game.sideQuests !== true || game.seatCount < 2) return undefined;
@@ -80,11 +81,13 @@ export function seatedLabel(game: ScenarioState, ctx: ReduceContext, names: Shee
   const seats = new Set(options.map((other) => seatOfCard(game, other)).filter((other) => other != null && other >= 0));
   if (seats.size < 2) return undefined;
   const type = printedOf(ctx.cards, game.cards[id]?.code ?? "").type;
-  // An attachment says whose card it lies on: "A Fell Dread · on Player 2's hero", "Possession · on Player 1's Reanimated Dead".
+  // An attachment says which card it lies on and whose that is.
   const host = game.cards[id]?.zone === "attached" ? game.cards[game.cards[id]?.host ?? ""] : undefined;
   if (host) {
-    const hostType = isReanimatedCode(host.code) ? "Reanimated Dead" : printedOf(ctx.cards, host.code).type === "hero" ? "hero" : "ally";
-    return `${names.card(id)} \u00b7 on Player ${seat + 1}'s ${hostType}`;
+    const hostName = names.card(host.id);
+    const hostType = printedOf(ctx.cards, host.code).type;
+    const on = isReanimatedCode(host.code) ? `${hostName}, Player ${seat + 1}'s card` : hostType === "enemy" ? `${hostName}, enemy engaged with Player ${seat + 1}` : `${hostName}, Player ${seat + 1}'s ${hostType}`;
+    return `${names.card(id)} \u00b7 on ${on}`;
   }
   const kind = type === "hero" || type === "attachment" || type === "event" ? type : type === "player-side-quest" ? "side quest" : "ally";
   return type === "enemy" ? `${names.card(id)} \u00b7 engaged with Player ${seat + 1}` : `${names.card(id)} \u00b7 Player ${seat + 1}'s ${kind}`;

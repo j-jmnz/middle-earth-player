@@ -4,6 +4,7 @@ import { heldCopy, holdsCopy, resolutionResult } from "../rules/setup/resolution
 import { printedOf, type PrintedCard } from "../rules/core/printed.ts";
 import type { CampaignEnd } from "../catalog/campaign-record.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
+import { reanimatedHeroes } from "../rules/families/angmar/reanimate/standing.ts";
 
 import type { AllyLine } from "../catalog/ally-lines.ts";
 
@@ -154,6 +155,8 @@ export function applyResolution(log: CampaignLog, scenarioId: string, state: Sce
       if (code && printedOf(cards, code).type === "hero") fellBy.add(code);
     }
   }
+  // A destroyed hero lying reanimated (mec108.reanimated-dead) is in no discard pile, and fell all the same.
+  if (!result.discardedNotFallen) for (const hero of reanimatedHeroes(state, cards)) fellBy.add(hero.code);
   // The list read before a removal: a hero that fell and was then removed from the log is still a fallen hero.
   const fallenHeroesBySeat = revisedFallen(listed.map((heroes, index) => [...new Set([...(log.fallenHeroesBySeat[index] ?? []), ...heroes.filter((code) => fellBy.has(code))])]), result);
   const fallen = new Set(fallenHeroesBySeat.flat());

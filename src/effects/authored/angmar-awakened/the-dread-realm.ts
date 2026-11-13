@@ -9,6 +9,7 @@ import { copyLine, withCopies } from "../reprint.ts";
 // rr.forced, rr.modifiers, rr.cancel, rr.reveal, rr.current-quest, rr.printed, rr.unique-cards, faq.enemy-attacks-outside-combat, faq.additional-attacks, faq.progress-without-advancing, faq.simultaneous-effects (data/rules/entries.json).
 export const DAECHANAR = "10153";
 export const ALTAR_OF_MIDWINTER = "10154";
+export const UNHOLY_CRYPT = "101161";
 /** Stage 3 of The Dread Realm: the quest card whose B side wins the game once no location is in play at the end of the quest phase. */
 export const ESCAPE_FROM_CARN_DUM = "10152";
 export const WRAITH_OF_CARN_DUM = "101157";
@@ -40,7 +41,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
   { id: "10150:constant:1", cardCode: "10150", lines: ["10150:B:2"], timing: "constant", instructions: [{ verb: "ModifyStat", stat: "passesSorcery", amount: 1, until: "whileSourceInPlay", target: "self" }] },
 
   // 10151 Daechanar's Sorcery (2A/2B). When Revealed: Daechanar joins the staging area, the Altar of Midwinter becomes the active location (the one that was returns to the staging area) and each player reanimates the top card of their deck. 2B: when Daechanar is defeated the quest advances.
-  { id: "10151:whenRevealed:1", cardCode: "10151", lines: ["10151:A:1"], timing: "whenRevealed", instructions: [{ verb: "AddSetAsideToStaging", code: DAECHANAR }, { verb: "MakeSetAsideActive", code: "10154" }, EACH_PLAYER_REANIMATES] },
+  { id: "10151:whenRevealed:1", cardCode: "10151", lines: ["10151:A:1"], timing: "whenRevealed", instructions: [{ verb: "AddSetAsideToStaging", code: DAECHANAR }, { verb: "MakeSetAsideActive", code: ALTAR_OF_MIDWINTER }, EACH_PLAYER_REANIMATES] },
   { id: "10151:forced:1", cardCode: "10151", lines: ["10151:B:2"], timing: "forced", trigger: "enemyDestroyed", subject: { type: "enemy", control: "any", names: ["Daechanar"] }, instructions: [{ verb: "AdvanceStage" }] },
 
   // 10152 Escape from Carn Dûm (3A/3B). When Revealed: the first player searches the encounter deck and discard pile for locations until the staging area holds one for each player (the deck is shuffled after). 3B: progress goes on the staged locations as the first player divides it; at the end of
@@ -103,7 +104,7 @@ export const AUTHORED_EFFECTS: readonly Effect[] = withCopies([
     trigger: "characterDestroyedByAttack",
     subject: { type: "character", control: "any" },
     condition: { kind: "matches", card: "other", pick: { type: "enemy", control: "any", isSource: true } },
-    instructions: [{ verb: "Reanimate", from: "card", card: "subject" }, DEAL_IT_A_SHADOW],
+    instructions: [{ verb: "Reanimate", from: "card", card: "subject", who: "defending" }, DEAL_IT_A_SHADOW],
   },
 
   // 101156 Witch of Angmar. Forced: once her shadow cards have resolved their shadow effects, the "when revealed" effects of those with the Sorcery trait resolve, in the order dealt, with the defending player revealing them.

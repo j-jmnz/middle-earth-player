@@ -43,7 +43,10 @@ export type StatBadge = { stat: BadgeStat; icon: IconName; word: string; value: 
 
 export type FlagStat = "cannotAttack" | "cannotTakeDamage" | "cannotTakeNonCombatDamage" | "cannotBeEngaged" | "cannotBeOptionallyEngaged" | "damageLimit" | "cancelsDamage" | "mustCommit";
 
-// A "cannot" an effect put on the card, with the icon of the thing it cannot do.
+// The short word on the pill of a card that must commit to the quest (A Fell Dread, 101163:A:1): a "must", not a "cannot", so it is drawn as the Willpower icon and this word on an accent pill, never struck through.
+export const MUST_COMMIT_WORD = "Quest";
+
+// A "cannot" an effect put on the card, with the icon of the thing it cannot do (drawn struck through in threat red); `mustCommit` is the one flag that asks for something and is drawn as its own pill (MUST_COMMIT_WORD).
 export type FlagBadge = { flag: FlagStat; icon: IconName; word: string };
 
 export type CardEffects = { stats: readonly StatBadge[]; flags: readonly FlagBadge[] };

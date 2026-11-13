@@ -170,10 +170,12 @@ export type WindowSheet = {
   plays: readonly string[];
   // The Actions the rules allow now.
   triggers: readonly TriggerOption[];
-  // The pass button's word, what passing does, and what the armed button says before the second tap.
-  pass: string;
-  passNote: string;
-  armed: string;
+  // A commit window that still owes a hero a quest commitment (A Fell Dread): who and which card, said by the dock. The window has no Pass then (null below), and the dock's primary waits for a pick.
+  mustCommit?: string;
+  // The pass button's word, what passing does, and what the armed button says before the second tap; null where passing is not legal.
+  pass: string | null;
+  passNote: string | null;
+  armed: string | null;
 };
 
 export type Sheet = PickSheet | MultiSheet | DistributeSheet | TriggerSheet | OutcomeSheet | WindowSheet;

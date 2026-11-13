@@ -2,21 +2,19 @@
 //
 // The pieces The Dread Realm's cards hold on the table: on stage 2B the Sorcery cards in play against Daechanar's guard (a count: each one cancels the damage dealt to him once), on stage 3 the locations in play against the 0 at which the players win at the end of the quest phase, and a seat's Reanimated Dead.
 // The engine decided every number (`countMatching`, `modifiedStat`); nothing here changes one. Empty in any other scenario. Pure, so a test reads it.
-import { A_FELL_DREAD, DAECHANAR, ESCAPE_FROM_CARN_DUM, LOCATIONS_IN_PLAY, SORCERY_IN_PLAY } from "../../effects/authored/angmar-awakened/the-dread-realm.ts";
+import { DAECHANAR, ESCAPE_FROM_CARN_DUM, LOCATIONS_IN_PLAY, SORCERY_IN_PLAY, UNHOLY_CRYPT } from "../../effects/authored/angmar-awakened/the-dread-realm.ts";
 import { modifiedStat } from "../../rules/core/keywords.ts";
 import { isReanimatedCode, printedOf, type PrintedCard } from "../../rules/core/printed.ts";
 import { inPlay, livingSeats, type ScenarioState } from "../../rules/core/state.ts";
 import type { ReduceContext } from "../../rules/engine/reduce.ts";
 import { countMatching } from "../../rules/interpret/pick.ts";
+import { ownerWords } from "../words/owner.ts";
 import { stageOf } from "../../rules/families/breaking/areas.ts";
 
 import { deadLabel, deadSeatWords, escapeNear, escapeNote, ESCAPE_DIAL_NAME, SORCERY_DIAL_NAME, sorceryNote, type DeadStats } from "../words/scenarios/angmar/dread-realm-table.ts";
 import type { TableDial } from "./dials.ts";
 import type { HandMark } from "./isengard.ts";
 
-export const DAECHANAR_CODE = DAECHANAR;
-export const FELL_DREAD = A_FELL_DREAD;
-const UNHOLY_CRYPT = "101161";
 
 /** The Sorcery cards in play now, as the records count them (faceup cards with the trait, attachments included; a facedown shadow card is not in play). */
 export const sorceryInPlay = (game: ScenarioState, ctx: ReduceContext, sourceId: string | null = null): number => countMatching(game, SORCERY_IN_PLAY, 0, sourceId, ctx);
@@ -41,11 +39,11 @@ export function deadStats(game: ScenarioState, cards: ReadonlyMap<string, Printe
   };
 }
 
-/** The characters (heroes and allies in play) that 1 more damage destroys: stage 3's damage at the end of the quest phase is dealt to each of them. */
-function nearDestroyed(game: ScenarioState, ctx: ReduceContext, nameOf: (code: string) => string): string[] {
+/** The characters (heroes and allies in play) that 1 more damage destroys: stage 3's damage at the end of the quest phase is dealt to each of them. Each is named with its controller's seat. */
+function nearDestroyed(game: ScenarioState, ctx: ReduceContext, nameOf: (code: string) => string): { name: string; owner: string | null }[] {
   return Object.values(game.cards)
     .filter((card) => (card.zone === "heroes" || card.zone === "play") && ["hero", "ally"].includes(printedOf(ctx.cards, card.code).type) && modifiedStat(game, card, "hitPoints", ctx.cards) - card.damage <= 1)
-    .map((card) => nameOf(card.code));
+    .map((card) => ({ name: nameOf(card.code), owner: game.seatCount > 1 ? ownerWords(game.seatCount, card.controller ?? card.owner) : null }));
 }
 
 export function realmDials(game: ScenarioState, ctx: ReduceContext, nameOf: (code: string) => string): readonly TableDial[] {
@@ -72,7 +70,7 @@ export function realmHands(game: ScenarioState): readonly HandMark[] {
   const crypts = Object.values(game.cards).filter((card) => card.code === UNHOLY_CRYPT && card.zone === "staging").length;
   for (const seat of livingSeats(game)) {
     const count = (game.seats[seat]?.engaged ?? []).filter((id) => game.cards[id] != null && isReanimatedCode(game.cards[id].code)).length;
-    if (count > 0) marks.push({ seat, label: deadLabel(game.seatCount > 1 ? seat : null), note: deadSeatWords(count, true, crypts) });
+    if (count > 0) marks.push({ seat, label: deadLabel(game.seatCount > 1 ? seat : null), note: deadSeatWords(count, crypts) });
   }
   return marks;
 }

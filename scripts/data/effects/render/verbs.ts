@@ -296,7 +296,8 @@ export const TEMPLATES: Readonly<Record<string, Template>> = {
   SetStat: (i) => ({ text: `${i.target === "host" ? "the card this one is attached to" : "this card"}: stat ${str(i.stat)} is set to ${str(i.value)}, overriding every other modifier of it`, read: ["stat", "value", "target"] }),
   // The Dread Realm (src/catalog/families/angmar.ts): Reanimated Dead, the cards that deal themselves as shadow cards and the Wraith and Possession that attach.
   Reanimate: (i, ctx) => {
-    const seat = i.who === "firstPlayer" ? "the first player" : "the acting player";
+    const seats: Readonly<Record<string, string>> = { firstPlayer: "the first player", controller: "that ally's controller", defending: "the defending player" };
+    const seat = seats[str(i.who)] ?? "the acting player";
     const from: Readonly<Record<string, string>> = {
       deckTop: i.count === undefined ? "the top card of their deck" : typeof i.count === "number" ? `the top ${i.count} card(s) of their deck` : `the top X card(s) of their deck, X being ${amount(i.count, ctx)}`,
       handRandom: "a random card of their hand (chosen with the game's seed)",

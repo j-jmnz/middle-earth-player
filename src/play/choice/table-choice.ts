@@ -353,7 +353,11 @@ export function dockFor(
         for (const quest of sheet.sideQuests ?? []) {
           secondary.push({ label: `To ${quest.label}`, action: { kind: "intent", intent: { type: "Commit", cardIds: [...choice.ids], sideQuestId: quest.id } }, arm: false, testID: `table-commit-side-${quest.id}` });
         }
-      } else {
+      } else if (sheet.mustCommit != null) {
+        // A hero must commit (A Fell Dread): Pass is not legal, so the primary waits for a pick and says who.
+        primary = { label: "Commit", action: { kind: "clear" }, arm: false, testID: "table-commit" };
+        why = sheet.mustCommit;
+      } else if (sheet.pass != null && sheet.armed != null) {
         // Nothing picked: Pass is the filled button. In the commit window it sends no one on the quest.
         primary = PASS(sheet.pass, "table-pass", sheet.armed);
       }

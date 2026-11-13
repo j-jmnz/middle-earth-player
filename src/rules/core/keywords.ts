@@ -11,7 +11,7 @@ import { queueEvent } from "../windows/queue.ts";
 import type { CardInstance, ScenarioState } from "./state.ts";
 import { flagged, heldAmount, modifierActive, updateCard, withThreat } from "./state.ts";
 import { claimedDestination } from "../families/objectives/claimed.ts";
-import { returnAsEnemy, returnsAsEnemy } from "../families/angmar/reanimate/attached.ts";
+import { returnAttachedEnemy } from "../families/angmar/reanimate/attached.ts";
 import { inPlay, moveCard, releaseGrappled, type Destination } from "./zones.ts";
 import { damageGoesTo, defenseFromWillpower } from "../families/defense/damage.ts";
 import { attackingHolds } from "../families/attack/strike.ts";
@@ -366,8 +366,9 @@ export function releaseAttachments(
       continue;
     }
     // An enemy that was lying on the host as an attachment returns to the staging area as an enemy (families/angmar/reanimate/attached.ts).
-    if (returnsAsEnemy(attachment)) {
-      next = returnAsEnemy(next, attachmentId);
+    const returned = returnAttachedEnemy(next, attachmentId);
+    if (returned) {
+      next = returned;
       continue;
     }
     const printed = printedOf(cards, attachment.code);

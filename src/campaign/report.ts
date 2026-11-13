@@ -5,6 +5,7 @@
 import { stagePlace } from "../rules/families/quest/branch.ts";
 import { printedOf, type PrintedCard } from "../rules/core/printed.ts";
 import type { ScenarioState } from "../rules/core/state.ts";
+import { reanimatedHeroes } from "../rules/families/angmar/reanimate/standing.ts";
 
 import { scoreParts, scoreTotal } from "./score.ts";
 
@@ -69,7 +70,9 @@ function seatLines(state: ScenarioState, cards: ReadonlyMap<string, PrintedCard>
       if (!card || printedOf(cards, card.code).type !== "hero") return [];
       return [{ name: printedOf(cards, card.code).name, words: "Destroyed", destroyed: true }];
     });
-    return { label, threat: seat.eliminated ? "Eliminated" : `Threat ${seat.threat}`, heroes: [...standing, ...fallen] };
+    // A destroyed hero lying reanimated (mec108.reanimated-dead) is in no discard pile but is still destroyed.
+    const reanimated = reanimatedHeroes(state, cards).filter((hero) => hero.seat === index).map((hero) => ({ name: printedOf(cards, hero.code).name, words: "Destroyed", destroyed: true }));
+    return { label, threat: seat.eliminated ? "Eliminated" : `Threat ${seat.threat}`, heroes: [...standing, ...fallen, ...reanimated] };
   });
 }
 

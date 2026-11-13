@@ -6,7 +6,7 @@ import { Circle, DashPathEffect, FilterMode, Group, Image, Line, MipmapMode, Pat
 import type { ReactElement } from "react";
 
 import { cardCorner } from "../../ui/card-corner.ts";
-import { badgeSplit, type CardEffects } from "../cards/card-effects.ts";
+import { badgeSplit, MUST_COMMIT_WORD, type CardEffects } from "../cards/card-effects.ts";
 import { SPHERE_TINT, type IconName } from "../../ui/icon-map.ts";
 import { ICONS } from "../../ui/icons/generated.ts";
 import type { CardSlot, Rect } from "../layout/layout.ts";
@@ -294,6 +294,17 @@ export function Badges({
   const shown = items.slice(0, count);
   const rows: ReactElement[] = shown.map((item, index) => {
     const top = y + 3 * s + index * (pill + 2 * s);
+    if (item.kind === "flag" && item.flag.flag === "mustCommit") {
+      const width = 15 * s + fonts.badge.getTextWidth(MUST_COMMIT_WORD) + 5 * s;
+      return (
+        <Group key="fmustCommit">
+          <RoundedRect x={x + 2 * s} y={top} width={width} height={pill} r={pill / 2} color={t.accent} />
+          {contrast ? <RoundedRect x={x + 2 * s} y={top} width={width} height={pill} r={pill / 2} color={t.night} style="stroke" strokeWidth={1.5 * s} /> : null}
+          <BadgeIcon name={item.flag.icon} x={x + 5 * s} y={top + 2 * s} size={11 * s} color={t.onAccent} images={images} />
+          <Text x={x + 18 * s} y={top + 11.5 * s} text={MUST_COMMIT_WORD} font={fonts.badge} color={t.onAccent} />
+        </Group>
+      );
+    }
     if (item.kind === "flag") {
       return (
         <Group key={`f${item.flag.flag}`}>

@@ -3,8 +3,8 @@ import { DETERMINATION_ASKS, LOOT_BOON_ASKS, POOL_BOON_ASKS } from "../pool-boon
 
 // The choice words of The Dread Realm (angmar-awakened part 9), one entry for each Pick and Choose of its records: `<record id> @<instruction path> <verb | option id>` (src/play/words/asks.ts; docs/design-system-table.md, Choice tray).
 // `pnpm test scenario the-dread-realm --words` fails on a Pick or Choose with neither an entry nor words of its own, and `WORDS_DUMP=the-dread-realm` prints each sentence.
-// The first player answers for the group at Daechanar's Forced, the Wraith's attach and the Altar's either/or, so those sentences are not owned and the sheet adds who chooses; the rows of a pick that spans players name the owner of their card. Dark Halls is the defending player's own choice from their own discard pile.
-const DEAD = "a facedown Undead enemy engaged with you, 2 Attack, 2 Defense, 2 hit points"
+// The first player answers for the group at Daechanar's Forced and the Wraith's attach, so those sentences are not owned and the sheet adds who chooses (the Altar's either/or is owned: it is the first player's own deck); the rows of a pick that spans players name the owner of their card. Dark Halls is the defending player's own choice from their own discard pile.
+const DEAD = "a facedown Undead enemy engaged with you"
 
 export const ASKS: Readonly<Record<string, Ask>> = {
   // 10153:A:3 (Forced when Daechanar is damaged with a Sorcery card in play): all that damage is canceled and the first player removes a Sorcery card in play from the game.
